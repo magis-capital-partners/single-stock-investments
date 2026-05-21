@@ -55,6 +55,7 @@ You can delete the old `DASHBOARD_SYNC_TOKEN` secret and archive `single-stock-d
 | [`daily-sync.yml`](.github/workflows/daily-sync.yml) | Daily 12:00 UTC + manual | Download holdings → commit & push |
 | [`dashboard-pages.yml`](.github/workflows/dashboard-pages.yml) | Push to `main` (dashboard paths) + manual | Rebuild JSON → deploy `dashboard/` to GitHub Pages |
 | [`marvin-deep-dive.yml`](.github/workflows/marvin-deep-dive.yml) | Manual (ticker input) | Cursor Cloud Agent deep dive → opens PR |
+| [`marvin-daily-deep-dive.yml`](.github/workflows/marvin-daily-deep-dive.yml) | Daily 13:00 UTC + manual | Auto-picks next holding (no/oldest deep dive) → cloud agent → PR |
 
 Push to `main` after downloads or research triggers a Pages deploy automatically when dashboard-related paths change.
 
@@ -62,7 +63,7 @@ Push to `main` after downloads or research triggers a Pages deploy automatically
 
 | Secret | Required for | How to get |
 |--------|--------------|------------|
-| `CURSOR_API_KEY` | Marvin deep dive in CI | [Cursor Dashboard → Integrations](https://cursor.com/dashboard/integrations) |
+| `CURSOR_API_KEY` | Marvin deep dive in CI (manual + **daily auto**) | [Cursor Dashboard → Integrations](https://cursor.com/dashboard/integrations) |
 
 ### Local publish
 
