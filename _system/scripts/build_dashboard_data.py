@@ -78,6 +78,11 @@ def has_download_script(ticker_dir: Path) -> tuple[bool, str | None]:
     ps1 = ticker_dir / "_scripts" / "download_and_organize.ps1"
     if ps1.exists():
         return True, str(ps1.relative_to(ROOT))
+    scripts_dir = ticker_dir / "_scripts"
+    if scripts_dir.exists():
+        for script in scripts_dir.glob("download*"):
+            if script.is_file():
+                return True, str(script.relative_to(ROOT))
     for py in (ticker_dir / "investor-documents").glob("download_*_investor_docs.py"):
         return True, str(py.relative_to(ROOT))
     for py in ticker_dir.rglob("download_*.py"):
@@ -200,12 +205,19 @@ def recent_developments(ticker_dir: Path, ticker: str) -> list[dict]:
 
 def completeness_score(row: dict) -> int:
     score = 0
-    if row["readme"]: score += 20
-    if row["download_script"]: score += 20
-    if row["research_dir"]: score += 15
-    if row["pdf_count"] >= 10: score += 15
-    if row["last_download"]: score += 15
-    if row["index_file"]: score += 15
+    if row["readme"]:
+        score += 20
+    if row["download_script"]:
+        score += 20
+    if row["research_dir"]:
+        score += 15
+    primary_docs = row["pdf_count"] + row.get("sec_filings", 0)
+    if primary_docs >= 10:
+        score += 15
+    if row["last_download"]:
+        score += 15
+    if row["index_file"]:
+        score += 15
     return min(score, 100)
 
 
