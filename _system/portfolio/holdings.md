@@ -4,7 +4,7 @@ Synced from ticker folders at workspace root. Last inventory: 2026-05-21.
 
 | Ticker | Folder | Company | Market | Last download | Last research | Thesis (one line) |
 |--------|--------|---------|--------|---------------|---------------|-------------------|
-| 3905.T | 3905.T/ | DataSection Co., Ltd. | JP | — | — | TBD |
+| 3905.T | 3905.T/ | DataSection Co., Ltd. | JP | — | 2026-05-21 | GPU/AI infra scale-up; FY26 guide mixed (Apr-2026 revision) |
 | 8697.T | 8697.T/ | Japan Exchange Group | JP | 2026-05-21 | — | TBD |
 | AMZN | AMZN/ | Amazon.com | US | — | — | TBD |
 | APLD | APLD/ | Applied Digital | US | — | — | TBD |

@@ -43,4 +43,4 @@ PDFs are organized under `IR/` subfolders. A canonical URL list exists at `IR/en
 
 ## Index
 
-No `INDEX.csv` yet. PDF count: ~505 files across `IR/` subfolders.
+`INDEX.csv` at folder root inventories IR PDF paths (excluding loose files). PDF count ~505 across `IR/` subfolders.
