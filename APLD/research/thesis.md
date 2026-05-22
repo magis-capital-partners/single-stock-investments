@@ -1,8 +1,16 @@
 # APLD — Investment Thesis
 
-**Status:** strengthening  
-**Last updated:** 2026-05-21  
-**Archetype lenses:** Munger inversion + Pabrai downside focus (growth infrastructure; not croupier/compounder)
+**Last updated:** 2026-05-21
+
+## Classification
+
+| Field | Value |
+|-------|-------|
+| **Archetype** (Stahl) | optionality |
+| **Moat** (Munger) | unproven |
+| **Dhando** (Pabrai) | none |
+| **Stance** | watch |
+| **Cycle** | - |
 
 ## One-line thesis
 
@@ -24,9 +32,6 @@ AI data centre developer with accelerating revenue ($126.6M FQ3, +139% YoY) and 
 | **Pabrai** | **Fails dhando** today — tails not protected; speculative asymmetric bet only |
 | **Stahl** | Cloud Services held-for-sale = simplification event to monitor |
 
-## Thesis status
-
-**strengthening** — operational/lease progress confirmed in Q3 FY26 filings; capital structure prevents **intact**.
 
 ## [HUMAN REVIEW]
 

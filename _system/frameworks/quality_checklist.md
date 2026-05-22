@@ -26,4 +26,4 @@ Use before marking any deep-dive or thesis update ready for human review.
 ## Documentation
 - [ ] Cite primary sources with file paths
 - [ ] Separate facts / inferences / opinions
-- [ ] End with thesis status and [HUMAN REVIEW] items
+- [ ] End with classification table and [HUMAN REVIEW] items

@@ -1,8 +1,16 @@
 # AMZN — Investment Thesis
 
-**Status:** strengthening  
-**Last updated:** 2026-05-21  
-**Archetype lenses:** Munger moat + Pabrai dhando (compounder)
+**Last updated:** 2026-05-21
+
+## Classification
+
+| Field | Value |
+|-------|-------|
+| **Archetype** (Stahl) | compounder |
+| **Moat** (Munger) | stable |
+| **Dhando** (Pabrai) | partial |
+| **Stance** | hold |
+| **Cycle** | - |
 
 ## One-line thesis
 
@@ -24,9 +32,6 @@ Dominant e-commerce + AWS platform compounding at scale (FY2025 $717B sales, $78
 | **Pabrai** | Quality compounder; dhando depends on entry price and FCF recovery timeline |
 | **Stahl** | N/A — not a croupier/toll business |
 
-## Thesis status
-
-**strengthening** — operating momentum and AWS re-acceleration confirmed; FCF/capex trade-off is the main monitor, not business quality.
 
 ## [HUMAN REVIEW]
 

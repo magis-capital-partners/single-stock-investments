@@ -1,7 +1,16 @@
 # WBI — Investment Thesis
 
-**Status:** unclear  
 **Last updated:** 2026-05-21
+
+## Classification
+
+| Field | Value |
+|-------|-------|
+| **Archetype** (Stahl) | infrastructure |
+| **Moat** (Munger) | unproven |
+| **Dhando** (Pabrai) | pending |
+| **Stance** | watch |
+| **Cycle** | - |
 
 ## One-line thesis
 

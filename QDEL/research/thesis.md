@@ -1,7 +1,16 @@
 # QDEL — Investment Thesis
 
-**Status:** weakening  
 **Last updated:** 2026-05-21
+
+## Classification
+
+| Field | Value |
+|-------|-------|
+| **Archetype** (Stahl) | turnaround |
+| **Moat** (Munger) | unproven |
+| **Dhando** (Pabrai) | none |
+| **Stance** | watch |
+| **Cycle** | - |
 
 ## One-line thesis
 

@@ -1,7 +1,17 @@
 # CSU — Investment Thesis
 
-**Status:** strengthening  
-**Last updated:** 2026-05-21  
+**Last updated:** 2026-05-21
+
+## Classification
+
+| Field | Value |
+|-------|-------|
+| **Archetype** (Stahl) | compounder |
+| **Moat** (Munger) | stable |
+| **Dhando** (Pabrai) | partial |
+| **Stance** | core |
+| **Cycle** | - |
+
 **Deep dive:** `research/deep_dive_2026-05-21.md`
 
 ## One-line thesis

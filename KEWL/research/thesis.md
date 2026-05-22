@@ -1,7 +1,17 @@
 # KEWL — Investment Thesis
 
-**Status:** unclear  
-**Last updated:** 2026-05-21  
+**Last updated:** 2026-05-21
+
+## Classification
+
+| Field | Value |
+|-------|-------|
+| **Archetype** (Stahl) | optionality |
+| **Moat** (Munger) | n/a |
+| **Dhando** (Pabrai) | partial |
+| **Stance** | watch |
+| **Cycle** | - |
+
 **Deep dive:** `KEWL/research/deep_dive_2026-05-21.md`
 
 ## One-line thesis

@@ -1,7 +1,17 @@
 # FRMO — Investment Thesis
 
-**Status:** strengthening (NAV) / volatile (reported earnings)  
-**Last updated:** 2026-05-21  
+**Last updated:** 2026-05-21
+
+## Classification
+
+| Field | Value |
+|-------|-------|
+| **Archetype** (Stahl) | holding_co |
+| **Moat** (Munger) | stable |
+| **Dhando** (Pabrai) | partial |
+| **Stance** | hold |
+| **Cycle** | - |
+
 **Deep dive:** `FRMO/research/deep_dive_2026-05-21.md`
 
 ## One-line thesis

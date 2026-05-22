@@ -1,7 +1,16 @@
 # TEQ.ST — Investment Thesis
 
-**Status:** strengthening  
 **Last updated:** 2026-05-21
+
+## Classification
+
+| Field | Value |
+|-------|-------|
+| **Archetype** (Stahl) | serial_acquirer |
+| **Moat** (Munger) | stable |
+| **Dhando** (Pabrai) | partial |
+| **Stance** | hold |
+| **Cycle** | - |
 
 ## One-line thesis
 

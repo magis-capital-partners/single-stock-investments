@@ -12,6 +12,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = ROOT / "dashboard" / "data"
 OUTPUT = DATA_DIR / "dashboard_data.json"
+CLASS_PATH = ROOT / "_system" / "portfolio" / "classification.json"
 
 # Known metadata fallback when holdings.md is sparse
 TICKER_META = {
@@ -33,6 +34,7 @@ TICKER_META = {
     "SPGI": {"company": "S&P Global", "market": "US", "exchange": "NYSE"},
     "TEQ.ST": {"company": "Teqnion AB", "market": "SE", "exchange": "Nasdaq First North"},
     "WBI": {"company": "WaterBridge Infrastructure", "market": "US", "exchange": "NYSE"},
+    "SJT": {"company": "San Juan Basin Royalty Trust", "market": "US", "exchange": "NYSE"},
 }
 
 
@@ -127,13 +129,56 @@ def last_research(ticker_dir: Path) -> str | None:
     return datetime.fromtimestamp(latest.stat().st_mtime, tz=timezone.utc).strftime("%Y-%m-%d")
 
 
-def thesis_status(ticker_dir: Path) -> str:
+def load_classification() -> dict[str, dict]:
+    if not CLASS_PATH.exists():
+        return {}
+    return json.loads(CLASS_PATH.read_text(encoding="utf-8"))
+
+
+def parse_classification_from_thesis(ticker_dir: Path) -> dict | None:
     thesis = ticker_dir / "research" / "thesis.md"
     if not thesis.exists():
-        return "unclear"
+        return None
+    text = thesis.read_text(encoding="utf-8", errors="ignore")
+    fields = {}
+    for key, label in [
+        ("archetype", r"Archetype"),
+        ("moat", r"Moat"),
+        ("dhando", r"Dhando"),
+        ("stance", r"Stance"),
+        ("cycle", r"Cycle"),
+    ]:
+        m = re.search(rf"\*\*{label}\*\*[^|]*\|\s*([^\|]+)", text)
+        if m:
+            fields[key] = m.group(1).strip()
+    return fields if fields else None
+
+
+def classification_for(ticker: str, ticker_dir: Path, portfolio: dict[str, dict]) -> dict:
+    from_thesis = parse_classification_from_thesis(ticker_dir)
+    from_json = portfolio.get(ticker, {})
+    merged = {**from_json, **(from_thesis or {})}
+    defaults = {
+        "archetype": "unknown",
+        "moat": "unproven",
+        "dhando": "pending",
+        "stance": "watch",
+        "cycle": "—",
+    }
+    return {k: merged.get(k, defaults[k]) for k in defaults}
+
+
+def thesis_status(ticker_dir: Path) -> str:
+    """Legacy alias — returns archetype for backward compatibility."""
+    c = parse_classification_from_thesis(ticker_dir)
+    if c and c.get("archetype"):
+        return c["archetype"]
+    thesis = ticker_dir / "research" / "thesis.md"
+    if not thesis.exists():
+        return "unknown"
     text = thesis.read_text(encoding="utf-8", errors="ignore")
     m = re.search(r"\*\*Status:\*\*\s*(\w+)", text)
-    return m.group(1).lower() if m else "unclear"
+    return m.group(1).lower() if m else "unknown"
 
 
 def one_line_thesis(ticker_dir: Path) -> str | None:
@@ -147,7 +192,7 @@ def one_line_thesis(ticker_dir: Path) -> str | None:
     return re.sub(r"\*\*", "", m.group(1).strip())
 
 
-def latest_deep_dive(ticker_dir: Path) -> dict | None:
+def latest_deep_dive(ticker_dir: Path, classification: dict) -> dict | None:
     research = ticker_dir / "research"
     if not research.exists():
         return None
@@ -168,15 +213,15 @@ def latest_deep_dive(ticker_dir: Path) -> dict | None:
         if len(summary) > 600:
             summary = summary[:597] + "..."
 
-    dive_status = thesis_status(ticker_dir)
-    ts = re.search(r"\*\*Thesis status:\*\*\s*\*\*(\w+)\*\*", text)
-    if ts:
-        dive_status = ts.group(1).lower()
+    dive_stance = classification.get("stance", "watch")
+    sm_stance = re.search(r"\*\*Stance\*\*[^|]*\|\s*(\w+)", text)
+    if sm_stance:
+        dive_stance = sm_stance.group(1).strip()
 
     return {
         "path": rel,
         "date": dive_date,
-        "thesis_status": dive_status,
+        "stance": dive_stance,
         "executive_summary": summary,
         "github_url": f"https://github.com/GoldmanDrew/single-stock-investments/blob/main/{rel}",
     }
@@ -282,10 +327,11 @@ def has_index(ticker_dir: Path) -> bool:
     return (ticker_dir / "INDEX.csv").exists() or (ticker_dir / "document-index.csv").exists()
 
 
-def build_ticker_row(ticker: str, holdings: dict[str, dict]) -> dict:
+def build_ticker_row(ticker: str, holdings: dict[str, dict], portfolio_class: dict[str, dict]) -> dict:
     ticker_dir = ROOT / ticker
     meta = {**TICKER_META.get(ticker, {}), **holdings.get(ticker, {})}
     dl_script, dl_path = has_download_script(ticker_dir)
+    classification = classification_for(ticker, ticker_dir, portfolio_class)
     row = {
         "ticker": ticker,
         "company": meta.get("company", ticker),
@@ -301,9 +347,10 @@ def build_ticker_row(ticker: str, holdings: dict[str, dict]) -> dict:
         "index_file": has_index(ticker_dir),
         "last_download": last_download(ticker_dir),
         "last_research": last_research(ticker_dir),
-        "thesis_status": thesis_status(ticker_dir),
+        "classification": classification,
+        "thesis_status": classification["archetype"],
         "one_line_thesis": one_line_thesis(ticker_dir),
-        "deep_dive": latest_deep_dive(ticker_dir),
+        "deep_dive": latest_deep_dive(ticker_dir, classification),
         "recent_files": recent_files(ticker_dir),
         "developments": recent_developments(ticker_dir, ticker),
     }
@@ -313,8 +360,9 @@ def build_ticker_row(ticker: str, holdings: dict[str, dict]) -> dict:
 
 def build() -> dict:
     holdings = parse_holdings()
+    portfolio_class = load_classification()
     tickers = list_tickers()
-    rows = [build_ticker_row(t, holdings) for t in tickers]
+    rows = [build_ticker_row(t, holdings, portfolio_class) for t in tickers]
 
     total_pdfs = sum(r["pdf_count"] for r in rows)
     with_research = sum(1 for r in rows if r["research_dir"])

@@ -1,8 +1,16 @@
 # 3905.T — Investment Thesis
 
-**Status:** strengthening  
-**Last updated:** 2026-05-21  
-**Archetype lenses:** Munger moat + Pabrai dhando (compounder)
+**Last updated:** 2026-05-21
+
+## Classification
+
+| Field | Value |
+|-------|-------|
+| **Archetype** (Stahl) | compounder |
+| **Moat** (Munger) | unproven |
+| **Dhando** (Pabrai) | none |
+| **Stance** | watch |
+| **Cycle** | - |
 
 ## One-line thesis
 
@@ -24,9 +32,6 @@ Japanese AI-infrastructure compounder-in-the-making pivoting to Neo Cloud (GPU +
 | **Pabrai** | Not classic dhando — high upside but tails not protected; size conservatively |
 | **Stahl** | N/A — not a croupier/toll business |
 
-## Thesis status
-
-**strengthening** — revenue inflection and strategic positioning confirmed in primary filings; data centre delays and capital intensity cap conviction until normalized earnings are visible.
 
 ## [HUMAN REVIEW]
 

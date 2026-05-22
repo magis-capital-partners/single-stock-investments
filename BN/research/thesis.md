@@ -1,8 +1,16 @@
 # BN — Investment Thesis
 
-**Status:** strengthening  
-**Last updated:** 2026-05-21  
-**Archetype lenses:** Munger moat + Pabrai capital allocation (compounder); Stahl simplification secondary
+**Last updated:** 2026-05-21
+
+## Classification
+
+| Field | Value |
+|-------|-------|
+| **Archetype** (Stahl) | platform |
+| **Moat** (Munger) | stable |
+| **Dhando** (Pabrai) | partial |
+| **Stance** | hold |
+| **Cycle** | - |
 
 ## One-line thesis
 
@@ -24,9 +32,6 @@ Global alternative-asset compounder earning durable fee streams on $614B fee-bea
 | **Pabrai** | Patient capital allocator; dhando improved on volatility if DE yield attractive |
 | **Stahl** | Spinoff/simplification (BBUC done, BN+BNT pending) — monitor for value unlock |
 
-## Thesis status
-
-**strengthening** — Q1 2026 DE, FRE growth, and capital return activity support the compounder case.
 
 ## [HUMAN REVIEW]
 

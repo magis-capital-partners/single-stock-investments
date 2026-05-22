@@ -1,7 +1,17 @@
 # GOOGL — Investment Thesis
 
-**Status:** strengthening  
-**Last updated:** 2026-05-21  
+**Last updated:** 2026-05-21
+
+## Classification
+
+| Field | Value |
+|-------|-------|
+| **Archetype** (Stahl) | compounder |
+| **Moat** (Munger) | widening |
+| **Dhando** (Pabrai) | partial |
+| **Stance** | hold |
+| **Cycle** | - |
+
 **Deep dive:** `GOOGL/research/deep_dive_2026-05-21.md`
 
 ## One-line thesis

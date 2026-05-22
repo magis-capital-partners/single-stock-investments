@@ -130,6 +130,7 @@
   .badge-ok { color: var(--positive); background: rgba(16,185,129,0.12); border-color: rgba(16,185,129,0.35); }
   .badge-warn { color: var(--warning); background: rgba(245,158,11,0.12); border-color: rgba(245,158,11,0.35); }
   .badge-bad { color: var(--negative); background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.35); }
+  .badge-purple { color: var(--accent-purple); background: rgba(139,92,246,0.12); border-color: rgba(139,92,246,0.35); }
   .bar-wrap { width: 72px; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
   .bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan)); }
 
@@ -215,7 +216,8 @@
             <th data-sort="pdf_count">PDFs</th>
             <th data-sort="completeness">Complete</th>
             <th data-sort="last_download">Download</th>
-            <th data-sort="thesis_status">Thesis</th>
+            <th data-sort="classification.archetype">Archetype</th>
+            <th data-sort="classification.stance">Stance</th>
           </tr>
         </thead>
         <tbody id="tbody"></tbody>
@@ -230,8 +232,31 @@
 
 <script>
 const MARKET_BADGE = { US: 'badge-us', JP: 'badge-jp', SE: 'badge-se', CA: 'badge-jp' };
-const THESIS_BADGE = {
-  intact: 'badge-ok', strengthening: 'badge-ok', weakening: 'badge-bad', unclear: 'badge-warn'
+const ARCHETYPE_BADGE = {
+  croupier: 'badge-purple',
+  compounder: 'badge-ok',
+  serial_acquirer: 'badge-ok',
+  platform: 'badge-us',
+  holding_co: 'badge-warn',
+  optionality: 'badge-warn',
+  turnaround: 'badge-bad',
+  infrastructure: 'badge-us',
+  unknown: 'badge-warn',
+};
+const STANCE_BADGE = {
+  core: 'badge-ok',
+  accumulate: 'badge-ok',
+  hold: 'badge-us',
+  watch: 'badge-warn',
+  trim: 'badge-bad',
+  exit: 'badge-bad',
+};
+const MOAT_BADGE = {
+  widening: 'badge-ok',
+  stable: 'badge-us',
+  eroding: 'badge-bad',
+  unproven: 'badge-warn',
+  'n/a': 'badge-warn',
 };
 
 let data = null;
@@ -276,6 +301,11 @@ function filtered() {
     return true;
   }).sort((a, b) => {
     let av = a[sortKey], bv = b[sortKey];
+    if (sortKey.includes('.')) {
+      const parts = sortKey.split('.');
+      av = a[parts[0]]?.[parts[1]];
+      bv = b[parts[0]]?.[parts[1]];
+    }
     if (typeof av === 'string') av = av.toLowerCase();
     if (typeof bv === 'string') bv = bv.toLowerCase();
     if (av < bv) return sortAsc ? -1 : 1;
@@ -301,7 +331,8 @@ function renderTable() {
         </div>
       </td>
       <td class="mono" style="font-size:11px;color:var(--text-secondary)">${t.last_download || '—'}</td>
-      <td><span class="badge ${THESIS_BADGE[t.thesis_status] || 'badge-warn'}">${t.thesis_status}</span></td>
+      <td><span class="badge ${ARCHETYPE_BADGE[t.classification?.archetype] || 'badge-warn'}">${t.classification?.archetype || '—'}</span></td>
+      <td><span class="badge ${STANCE_BADGE[t.classification?.stance] || 'badge-warn'}">${t.classification?.stance || '—'}</span></td>
     </tr>`).join('');
   tbody.querySelectorAll('tr').forEach(tr => {
     tr.addEventListener('click', () => selectTicker(tr.dataset.ticker));
@@ -316,6 +347,17 @@ function selectTicker(ticker) {
   document.getElementById('detail').innerHTML = `
     <h2>${t.ticker}</h2>
     <div class="subhead">${t.company} · ${t.exchange} · ${t.folder}</div>
+
+    <div class="detail-section">
+      <h3>Classification</h3>
+      <div class="metric-grid">
+        <div class="metric"><div class="k">Archetype</div><div class="v"><span class="badge ${ARCHETYPE_BADGE[t.classification?.archetype] || 'badge-warn'}">${t.classification?.archetype || '—'}</span></div></div>
+        <div class="metric"><div class="k">Stance</div><div class="v"><span class="badge ${STANCE_BADGE[t.classification?.stance] || 'badge-warn'}">${t.classification?.stance || '—'}</span></div></div>
+        <div class="metric"><div class="k">Moat</div><div class="v"><span class="badge ${MOAT_BADGE[t.classification?.moat] || 'badge-warn'}">${t.classification?.moat || '—'}</span></div></div>
+        <div class="metric"><div class="k">Dhando</div><div class="v">${t.classification?.dhando || '—'}</div></div>
+        ${t.classification?.cycle && t.classification.cycle !== '-' && t.classification.cycle !== '—' ? `<div class="metric"><div class="k">Cycle</div><div class="v">${t.classification.cycle}</div></div>` : ''}
+      </div>
+    </div>
 
     <div class="detail-section">
       <h3>Infrastructure</h3>
@@ -335,7 +377,7 @@ function selectTicker(ticker) {
       <div class="research-box">
         ${t.one_line_thesis ? `<div class="thesis-line">${t.one_line_thesis}</div>` : ''}
         ${t.deep_dive.executive_summary ? `<div class="summary">${t.deep_dive.executive_summary}</div>` : ''}
-        <span class="badge ${THESIS_BADGE[t.deep_dive.thesis_status] || 'badge-warn'}">${t.deep_dive.thesis_status}</span>
+        <span class="badge ${STANCE_BADGE[t.deep_dive.stance] || 'badge-warn'}">${t.deep_dive.stance || t.classification?.stance || '—'}</span>
         <div style="margin-top:12px">
           <a class="research-link" href="${t.deep_dive.github_url}" target="_blank" rel="noopener">Full report on GitHub →</a>
         </div>

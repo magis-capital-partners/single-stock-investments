@@ -30,7 +30,7 @@ Single-stock research workflow for this workspace.
 
 ## Output standards
 Every report ends with:
-- Thesis status: intact | weakening | strengthening | unclear
+- **Classification** table (archetype, moat, dhando, stance, cycle) — see `_system/frameworks/classification.md`
 - [HUMAN REVIEW] items
 - [PROPOSED MEMORY] bullets (daily log only)
 

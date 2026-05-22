@@ -1,7 +1,16 @@
 # SPGI — Investment Thesis
 
-**Status:** intact  
 **Last updated:** 2026-05-21
+
+## Classification
+
+| Field | Value |
+|-------|-------|
+| **Archetype** (Stahl) | croupier |
+| **Moat** (Munger) | stable |
+| **Dhando** (Pabrai) | partial |
+| **Stance** | hold |
+| **Cycle** | mid |
 
 ## One-line thesis
 

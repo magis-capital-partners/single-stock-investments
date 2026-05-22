@@ -1,7 +1,16 @@
 # 8697.T — Investment Thesis
 
-**Status:** strengthening  
 **Last updated:** 2026-05-21
+
+## Classification
+
+| Field | Value |
+|-------|-------|
+| **Archetype** (Stahl) | croupier |
+| **Moat** (Munger) | stable |
+| **Dhando** (Pabrai) | partial |
+| **Stance** | hold |
+| **Cycle** | peak |
 
 ## One-line thesis
 
