@@ -4,7 +4,7 @@ Synced from ticker folders at workspace root. Last inventory: 2026-05-21.
 
 | Ticker | Folder | Company | Market | Last download | Last research | Thesis (one line) |
 |--------|--------|---------|--------|---------------|---------------|-------------------|
-| 3905.T | 3905.T/ | DataSection Co., Ltd. | JP | — | 2026-05-21 | Neo Cloud AI-infra pivot; FY2026 guide ¥33.6B vs ¥2.9B base — execution risk |
+| 3905.T | 3905.T/ | DataSection Co., Ltd. | JP | — | 2026-05-22 | Neo Cloud pivot; FY2026 guide ¥33.6B vs ¥2.9B — B300/DC financing/concentration |
 | 8697.T | 8697.T/ | Japan Exchange Group | JP | 2026-05-21 | 2026-05-21 | Stahl croupier; ~58% margins; cyclical volume leverage (approved) |
 | AMZN | AMZN/ | Amazon.com | US | — | 2026-05-21 | AWS re-accelerating; ads/chips scaling — FCF crushed by AI capex |
 | APLD | APLD/ | Applied Digital | US | — | 2026-05-21 | 600+ MW leased pipeline; adj. EBITDA positive — GAAP/debt risk |

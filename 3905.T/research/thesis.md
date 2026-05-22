@@ -1,36 +1,35 @@
 # 3905.T — Investment Thesis
 
 **Status:** strengthening  
-**Last updated:** 2026-05-21  
-**Archetype lenses:** Munger moat + Pabrai dhando (compounder)
+**Last updated:** 2026-05-22  
+**Archetype lenses:** Munger moat + inversion; Pabrai business quality / sizing (not classic dhando); Stahl lens N/A as primary
 
 ## One-line thesis
 
-Japanese AI-infrastructure compounder-in-the-making pivoting to Neo Cloud (GPU + data centres) with a step-change revenue ramp (FY2026 guide ¥33.6B vs ¥2.9B prior year), but execution on data centre commissioning and customer concentration remain key risks.
+Neo Cloud pivot: revised FY2026 guide **¥33.6B** revenue versus **¥2.9B** FY2025 base **plus confirmed hyperscaler-linked DC demand** (**Compal / B300** scale-up, **Inzai** site, phased **May–Jul-2026** start) — but **heavy GPU financing**, **partner pass-through economics**, **Giga B200 backlog resolution**, and **undisclosed customer concentration** dominate the risk ledger.
 
 ## Key questions
 
-- [ ] Hyperscaler contract terms, duration, and revenue recognition timing
-- [ ] Normalized EBITDA once Japan/Australia data centres go live (depreciation ¥2.3B deferred)
-- [ ] GPU supply chain durability (B200/Rubin cycle) and capex funding plan
-- [ ] Valuation vs FY2026 guide and peer AI-infra names
-- [ ] Segment mix: AI infra vs legacy DX/retail-tech
+- [ ] FY2026 **full-year** filing vs **Apr/May disclosures** — revenue recognition, depreciation, **Compal**, **Giga** true-up (scheduled **15 May 2026** per notice — refresh when PDF lands)
+- [ ] **Customer/partner splits** from **Japanese yuho**: identity of hyperscaler economics, tenure, rebates, SLA penalties
+- [ ] **Net debt trajectory** vs **planned customer advances**, **SAR exercise**, **lender waivers/covenants**
+- [ ] **TAIZA** differentiation vs domestic/international **GPU cloud** resale models
 
 ## Archetype lenses
 
 | Lens | Application |
 |------|-------------|
-| **Munger** | Emerging moat (GPU access, TAIZA, hyperscaler relationships); inversion on delays/concentration |
-| **Pabrai** | Not classic dhando — high upside but tails not protected; size conservatively |
-| **Stahl** | N/A — not a croupier/toll business |
+| **Munger** | Emerging moats (supply access, TAIZA, DC sites); inversion on **liquidity/vendor contracts** |
+| **Pabrai** | High-upside equity; **not** “tails I don’t lose much” |
+| **Stahl** | Not a pecuniary croupier |
 
 ## Thesis status
 
-**strengthening** — revenue inflection and strategic positioning confirmed in primary filings; data centre delays and capital intensity cap conviction until normalized earnings are visible.
+**strengthening** — disclosures through **May 2026** **add execution detail** (**B300 roadmap, DC site, financing intent**) atop the **prior revenue inflection** evidence; conviction still capped until **FY2026 actuals** and **normalized margins** stabilize.
 
 ## [HUMAN REVIEW]
 
-- Confirm hyperscaler customer and contract structure from latest yuho.
-- Build normalized EBITDA bridge before sizing.
+- Verify **Japanese yuho** for counterparties/concentrations.
+- Obtain **FY2026 full-year consolidated summary** PDF when issued and reconcile **forecast bridge**.
 
-**Deep dive:** `3905.T/research/deep_dive_2026-05-21.md`
+**Deep dive:** `3905.T/research/deep_dive_2026-05-22.md`

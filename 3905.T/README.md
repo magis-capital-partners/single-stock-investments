@@ -43,4 +43,6 @@ PDFs are organized under `IR/` subfolders. A canonical URL list exists at `IR/en
 
 ## Index
 
-No `INDEX.csv` yet. PDF count: ~505 files across `IR/` subfolders.
+Canonical file map: `3905.T/INDEX.csv` (generated inventory of `IR/` PDFs).
+
+PDF count was ~505+ files across `IR/` subfolders at last scaffold.
