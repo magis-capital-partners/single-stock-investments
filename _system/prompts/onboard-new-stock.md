@@ -1,22 +1,49 @@
 # Onboard New Stock
 
-Ticker: {{TICKER}}
-Company: {{COMPANY_NAME}}
-Market: {{US | JP | EU | OTHER}}
-CIK (US only): {{CIK}}
-IR URL: {{IR_URL}}
+Use the **onboard orchestrator** (dashboard or CLI) — do not manually edit four files.
 
-You are Marvin.
+## Dashboard (cloud)
 
-1. List existing ticker folders to confirm {{TICKER}} does not already exist
-2. Create folder scaffold (use _system/templates/ matching market type)
-3. Write {{TICKER}}/README.md with company name, exchange, IR links, folder map
-4. Create download script:
-   - US: Python script like APLD/investor-documents/download_apld_investor_docs.py (SEC User-Agent required)
-   - JP: PowerShell like 8697.T/_scripts/download_and_organize.ps1 + _pdf_urls.txt
-   - EU: Python or PowerShell targeting IR PDF list → document-index.csv
-5. Run the download script; log results to {{TICKER}}/_download_log.txt
-6. Update _system/portfolio/holdings.md with new row (thesis: TBD)
-7. Write _system/reviews/pending/{{TICKER}}_onboard_{{date}}.md with download summary + gaps
+1. Open portfolio dashboard → **+ Add holding**
+2. Save GitHub PAT via **Token** (repo + actions scope)
+3. **Run onboard on GitHub** — dispatches `marvin-onboard.yml`
+4. Workflow commits scaffold + downloads to `main`, then runs Marvin deep dive (PR)
 
-Do not mark anything FINAL. Do not write to MEMORY.md without [PROPOSED].
+## CLI (local)
+
+```powershell
+python _system/scripts/onboard_ticker.py --ticker TICKER --company "Name" --market US --ir-url "https://ir.example.com"
+```
+
+## GitHub Actions
+
+```powershell
+gh workflow run marvin-onboard.yml -f ticker=SJT -f company="San Juan Basin Royalty Trust" -f market=US
+```
+
+## Watchlist only
+
+```powershell
+python _system/scripts/onboard_ticker.py --ticker XYZ --company "Name" --market US --watchlist-only
+```
+
+Promote from watchlist: dashboard watchlist chip → pre-fills form → submit with **from_watchlist**.
+
+## Registry (source of truth)
+
+`_system/portfolio/registry.json` — syncs to `holdings.md`, `classification.json`, `us_ticker_config.json`:
+
+```powershell
+python _system/scripts/sync_portfolio_from_registry.py
+```
+
+## Marvin checklist (automatic)
+
+1. Scaffold folder (market template)
+2. Register in `registry.json`
+3. Run download (US/JP/EU/CA routing)
+4. `build_folder_indexes.py` + `build_dashboard_data.py`
+5. `_system/reviews/pending/{TICKER}_onboard_{date}.md`
+6. Marvin deep dive via Cloud Agent (PR)
+
+Do not write to MEMORY.md without [PROPOSED].

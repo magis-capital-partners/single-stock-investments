@@ -189,6 +189,48 @@
     text-decoration: none; font-family: 'JetBrains Mono', monospace;
   }
   .research-link:hover { text-decoration: underline; }
+
+  .topbar-actions { display: flex; gap: 10px; align-items: center; }
+  .btn-primary {
+    background: var(--accent-blue); color: #fff; border: none; border-radius: 6px;
+    padding: 8px 14px; font-size: 12px; font-weight: 600; cursor: pointer;
+  }
+  .btn-primary:hover { filter: brightness(1.1); }
+  .btn-secondary {
+    background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border);
+    border-radius: 6px; padding: 8px 14px; font-size: 12px; font-weight: 600; cursor: pointer;
+  }
+
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(0,0,0,.65); z-index: 200;
+    display: none; align-items: center; justify-content: center; padding: 20px;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px;
+    width: min(520px, 100%); max-height: 90vh; overflow: auto; padding: 20px;
+  }
+  .modal h3 { margin-bottom: 14px; font-size: 16px; }
+  .form-row { margin-bottom: 12px; }
+  .form-row label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: .5px; }
+  .form-row input, .form-row select, .form-row textarea {
+    width: 100%; background: var(--bg-input); border: 1px solid var(--border);
+    color: var(--text-primary); border-radius: 6px; padding: 8px 10px; font-size: 13px;
+  }
+  .form-actions { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+  .form-hint { font-size: 11px; color: var(--text-muted); margin-top: 8px; line-height: 1.45; }
+  .status-msg { font-size: 12px; margin-top: 10px; color: var(--accent-cyan); white-space: pre-wrap; }
+  .watchlist-wrap {
+    padding: 0 24px 12px; border-bottom: 1px solid var(--border); background: var(--bg-secondary);
+  }
+  .watchlist-wrap h3 { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 8px; }
+  .watchlist-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .watch-chip {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 999px;
+    padding: 4px 10px; font-size: 12px; cursor: pointer;
+  }
+  .watch-chip:hover { border-color: var(--accent-blue); }
+  .onboard-badge { font-size: 10px; margin-left: 6px; color: var(--accent-amber); }
 </style>
 </head>
 <body>
@@ -197,8 +239,16 @@
     <div class="topbar-left">
       <div class="topbar-logo">SINGLE STOCK PORTFOLIO</div>
       <div class="topbar-meta"><span class="dot dot-green"></span><span id="meta-updated">Loading…</span></div>
+    <div class="topbar-actions">
+      <button class="btn-secondary" id="btn-settings" title="GitHub token for cloud onboard">Token</button>
+      <button class="btn-primary" id="btn-add-holding">+ Add holding</button>
     </div>
   </header>
+
+  <section class="watchlist-wrap" id="watchlist-wrap" style="display:none">
+    <h3>Watchlist · click to onboard</h3>
+    <div class="watchlist-chips" id="watchlist-chips"></div>
+  </section>
 
   <section class="summary-strip" id="summary"></section>
 
@@ -236,7 +286,47 @@
   </div>
 </div>
 
+<div class="modal-backdrop" id="modal-backdrop">
+  <div class="modal" role="dialog" aria-labelledby="modal-title">
+    <h3 id="modal-title">Add holding</h3>
+    <div class="form-row"><label>Ticker</label><input id="ob-ticker" placeholder="SJT" /></div>
+    <div class="form-row"><label>Company</label><input id="ob-company" placeholder="San Juan Basin Royalty Trust" /></div>
+    <div class="form-row"><label>Market</label>
+      <select id="ob-market">
+        <option value="US">US</option><option value="JP">JP</option><option value="CA">CA</option>
+        <option value="SE">SE</option><option value="EU">EU</option><option value="OTC">OTC</option>
+      </select>
+    </div>
+    <div class="form-row"><label>CIK (US, optional)</label><input id="ob-cik" placeholder="Auto-lookup if blank" /></div>
+    <div class="form-row"><label>IR URL(s)</label><input id="ob-ir" placeholder="https://ir.example.com" /></div>
+    <div class="form-row"><label><input type="checkbox" id="ob-8k" /> Download 8-K exhibits (US trusts)</label></div>
+    <div class="form-row"><label><input type="checkbox" id="ob-watchlist-only" /> Watchlist only (no download yet)</label></div>
+    <div class="form-actions">
+      <button class="btn-primary" id="ob-submit-cloud">Run onboard on GitHub</button>
+      <button class="btn-secondary" id="ob-copy-gh">Copy gh command</button>
+      <button class="btn-secondary" id="ob-cancel">Cancel</button>
+    </div>
+    <div class="form-hint">Cloud onboard commits scaffold + downloads to <code>main</code>, then runs Marvin deep dive (PR). Set a GitHub PAT with <code>repo</code> + <code>actions</code> scope via Token button (stored in browser only).</div>
+    <div class="status-msg" id="ob-status"></div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="token-backdrop">
+  <div class="modal">
+    <h3>GitHub token (localStorage)</h3>
+    <div class="form-row"><label>PAT for repository_dispatch</label><input id="gh-token" type="password" placeholder="ghp_..." /></div>
+    <div class="form-actions">
+      <button class="btn-primary" id="token-save">Save</button>
+      <button class="btn-secondary" id="token-clear">Clear</button>
+      <button class="btn-secondary" id="token-cancel">Close</button>
+    </div>
+    <div class="form-hint">Optional: set repo secret <code>ONBOARD_DISPATCH_TOKEN</code> to the same value for validation.</div>
+  </div>
+</div>
+
 <script>
+const GH_REPO = 'GoldmanDrew/single-stock-investments';
+const DISPATCH_EVENT = 'onboard-ticker';
 const MARKET_BADGE = { US: 'badge-us', JP: 'badge-jp', SE: 'badge-se', CA: 'badge-jp' };
 const ARCHETYPE_BADGE = {
   croupier: 'badge-purple',
@@ -287,14 +377,114 @@ async function load() {
   document.getElementById('meta-updated').textContent =
     `Updated ${data.generated_at.replace('T', ' ').replace('Z', ' UTC')} · ${data.summary.ticker_count} tickers`;
   renderSummary();
+  renderWatchlist();
   renderTable();
   if (data.tickers.length) selectTicker(data.tickers[0].ticker);
+}
+
+function renderWatchlist() {
+  const wrap = document.getElementById('watchlist-wrap');
+  const chips = document.getElementById('watchlist-chips');
+  const list = data.watchlist || [];
+  if (!list.length) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+  chips.innerHTML = list.map(w => `
+    <button type="button" class="watch-chip" data-ticker="${escapeHtml(w.ticker)}" data-company="${escapeHtml(w.company)}" data-market="${escapeHtml(w.market)}">
+      <span class="mono">${escapeHtml(w.ticker)}</span> · ${escapeHtml(w.company)} <span class="badge badge-warn">${escapeHtml(w.market)}</span>
+    </button>`).join('');
+  chips.querySelectorAll('.watch-chip').forEach(el => {
+    el.addEventListener('click', () => openOnboardModal({
+      ticker: el.dataset.ticker,
+      company: el.dataset.company,
+      market: el.dataset.market,
+      fromWatchlist: true,
+    }));
+  });
+}
+
+function openOnboardModal(prefill = {}) {
+  document.getElementById('ob-ticker').value = prefill.ticker || '';
+  document.getElementById('ob-company').value = prefill.company || '';
+  document.getElementById('ob-market').value = prefill.market || 'US';
+  document.getElementById('ob-cik').value = '';
+  document.getElementById('ob-ir').value = '';
+  document.getElementById('ob-8k').checked = false;
+  document.getElementById('ob-watchlist-only').checked = !!prefill.watchlistOnly;
+  document.getElementById('ob-status').textContent = '';
+  document.getElementById('modal-backdrop').classList.add('open');
+  document.getElementById('modal-backdrop').dataset.fromWatchlist = prefill.fromWatchlist ? '1' : '';
+}
+
+function closeOnboardModal() {
+  document.getElementById('modal-backdrop').classList.remove('open');
+}
+
+function onboardPayload() {
+  return {
+    ticker: document.getElementById('ob-ticker').value.trim(),
+    company: document.getElementById('ob-company').value.trim(),
+    market: document.getElementById('ob-market').value,
+    cik: document.getElementById('ob-cik').value.trim(),
+    ir_url: document.getElementById('ob-ir').value.trim(),
+    download_8k_exhibits: document.getElementById('ob-8k').checked,
+    watchlist_only: document.getElementById('ob-watchlist-only').checked,
+    from_watchlist: document.getElementById('modal-backdrop').dataset.fromWatchlist === '1',
+    token: localStorage.getItem('gh_onboard_token') || '',
+  };
+}
+
+function ghWorkflowCommand(p) {
+  const flags = [
+    `-f ticker=${p.ticker}`,
+    `-f company=${JSON.stringify(p.company)}`,
+    `-f market=${p.market}`,
+  ];
+  if (p.cik) flags.push(`-f cik=${p.cik}`);
+  if (p.ir_url) flags.push(`-f ir_url=${JSON.stringify(p.ir_url)}`);
+  if (p.from_watchlist) flags.push('-f from_watchlist=true');
+  if (p.watchlist_only) flags.push('-f watchlist_only=true');
+  if (p.download_8k_exhibits) flags.push('-f download_8k_exhibits=true');
+  return `gh workflow run marvin-onboard.yml ${flags.join(' ')}`;
+}
+
+async function submitCloudOnboard() {
+  const p = onboardPayload();
+  const status = document.getElementById('ob-status');
+  if (!p.ticker || !p.company) {
+    status.textContent = 'Ticker and company are required.';
+    return;
+  }
+  const token = localStorage.getItem('gh_onboard_token');
+  if (!token) {
+    status.textContent = 'No GitHub token — use Token button or copy gh command below.';
+    return;
+  }
+  status.textContent = 'Dispatching onboard workflow…';
+  try {
+    const res = await fetch(`https://api.github.com/repos/${GH_REPO}/dispatches`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/vnd.github+json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ event_type: DISPATCH_EVENT, client_payload: p }),
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(`${res.status}: ${err}`);
+    }
+    status.textContent = `Onboard dispatched for ${p.ticker}. Watch Actions tab — commits land on main, deep dive opens a PR.`;
+    setTimeout(closeOnboardModal, 2500);
+  } catch (e) {
+    status.textContent = `Dispatch failed: ${e.message}`;
+  }
 }
 
 function renderSummary() {
   const s = data.summary;
   document.getElementById('summary').innerHTML = [
-    { label: 'Holdings', value: s.ticker_count, sub: s.markets.join(' · ') },
+    { label: 'Holdings', value: s.ticker_count, sub: (s.watchlist_count ? s.watchlist_count + ' watchlist · ' : '') + s.markets.join(' · ') },
     { label: 'Total PDFs', value: s.total_pdfs.toLocaleString(), sub: 'across universe' },
     { label: 'Avg completeness', value: s.avg_completeness + '%', sub: 'infra score' },
     { label: 'With README', value: s.with_readme + '/' + s.ticker_count, sub: 'documented' },
@@ -335,7 +525,7 @@ function renderTable() {
   document.getElementById('empty').style.display = rows.length ? 'none' : 'block';
   tbody.innerHTML = rows.map(t => `
     <tr class="${selected === t.ticker ? 'selected' : ''}" data-ticker="${t.ticker}">
-      <td class="mono ticker-cell">${t.ticker}</td>
+      <td class="mono ticker-cell">${t.ticker}${t.onboard?.phase && t.onboard.phase !== 'complete' ? `<span class="onboard-badge">${t.onboard.phase}</span>` : ''}</td>
       <td>${t.company}</td>
       <td><span class="badge ${MARKET_BADGE[t.market] || 'badge-us'}">${t.market}</span></td>
       <td class="mono">${t.pdf_count}${t.sec_filings ? ` <span style="color:var(--text-muted);font-size:11px">+${t.sec_filings} SEC</span>` : ''}</td>
@@ -453,6 +643,30 @@ document.querySelectorAll('thead th').forEach(th => {
 
 load().catch(err => {
   document.getElementById('detail').innerHTML = `<div class="loading">Failed to load data/dashboard_data.json<br><br>${err}</div>`;
+});
+
+document.getElementById('btn-add-holding').addEventListener('click', () => openOnboardModal());
+document.getElementById('ob-cancel').addEventListener('click', closeOnboardModal);
+document.getElementById('ob-submit-cloud').addEventListener('click', submitCloudOnboard);
+document.getElementById('ob-copy-gh').addEventListener('click', () => {
+  const cmd = ghWorkflowCommand(onboardPayload());
+  navigator.clipboard.writeText(cmd);
+  document.getElementById('ob-status').textContent = 'Copied:\\n' + cmd;
+});
+document.getElementById('btn-settings').addEventListener('click', () => {
+  document.getElementById('gh-token').value = localStorage.getItem('gh_onboard_token') || '';
+  document.getElementById('token-backdrop').classList.add('open');
+});
+document.getElementById('token-save').addEventListener('click', () => {
+  localStorage.setItem('gh_onboard_token', document.getElementById('gh-token').value.trim());
+  document.getElementById('token-backdrop').classList.remove('open');
+});
+document.getElementById('token-clear').addEventListener('click', () => {
+  localStorage.removeItem('gh_onboard_token');
+  document.getElementById('gh-token').value = '';
+});
+document.getElementById('token-cancel').addEventListener('click', () => {
+  document.getElementById('token-backdrop').classList.remove('open');
 });
 </script>
 </body>

@@ -1,0 +1,99 @@
+#!/usr/bin/env python3
+"""Shared helpers for portfolio registry.json."""
+from __future__ import annotations
+
+import json
+from datetime import datetime, timezone
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[2]
+REGISTRY_PATH = ROOT / "_system" / "portfolio" / "registry.json"
+CLASS_PATH = ROOT / "_system" / "portfolio" / "classification.json"
+HOLDINGS_PATH = ROOT / "_system" / "portfolio" / "holdings.md"
+US_CONFIG_PATH = ROOT / "_system" / "scripts" / "us_ticker_config.json"
+
+EXCHANGE_META = {
+    "8697.T": "TSE",
+    "3905.T": "TSE",
+    "AMZN": "NASDAQ",
+    "APLD": "NASDAQ",
+    "BN": "NYSE",
+    "CPRT": "NASDAQ",
+    "CSGP": "NASDAQ",
+    "CSU": "TSX",
+    "DHR": "NYSE",
+    "FRMO": "OTC",
+    "GOOGL": "NASDAQ",
+    "ICE": "NYSE",
+    "KEWL": "OTC Pink",
+    "OTCM": "OTCQX",
+    "QDEL": "NASDAQ",
+    "SJT": "NYSE",
+    "SPGI": "NYSE",
+    "TEQ.ST": "Nasdaq First North",
+    "WBI": "NYSE",
+}
+
+DOWNLOAD_TYPE_OVERRIDES = {
+    "QDEL": "us_dedicated",
+    "CSU": "ca_csu",
+    "TEQ.ST": "eu_teq",
+    "8697.T": "jp_ps1",
+    "3905.T": "jp_archive",
+}
+
+DEFAULT_CLASSIFICATION = {
+    "archetype": "unknown",
+    "moat": "unproven",
+    "dhando": "pending",
+    "stance": "watch",
+    "cycle": "-",
+}
+
+
+def load_registry() -> dict:
+    if not REGISTRY_PATH.exists():
+        return {"meta": {"version": 1}, "holdings": {}, "watchlist": {}}
+    return json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
+
+
+def save_registry(data: dict) -> None:
+    data.setdefault("meta", {})
+    data["meta"]["version"] = 1
+    data["meta"]["updated"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    REGISTRY_PATH.parent.mkdir(parents=True, exist_ok=True)
+    REGISTRY_PATH.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+
+
+def infer_download_type(ticker: str, market: str, us_config: dict) -> str:
+    if ticker in DOWNLOAD_TYPE_OVERRIDES:
+        return DOWNLOAD_TYPE_OVERRIDES[ticker]
+    if market in {"US", "CA"} and ticker in us_config:
+        return "us_shared"
+    if market == "US":
+        return "us_shared"
+    if market == "CA":
+        return "ca_csu"
+    if market in {"SE", "EU"}:
+        return "eu_teq"
+    if market == "JP":
+        return "jp_ps1"
+    return "us_shared"
+
+
+def build_download_block(ticker: str, market: str, us_config: dict) -> dict:
+    dtype = infer_download_type(ticker, market, us_config)
+    block: dict = {"type": dtype}
+    cfg = us_config.get(ticker, {})
+    if cfg:
+        if cfg.get("cik"):
+            block["cik"] = str(cfg["cik"])
+        if cfg.get("ir_roots"):
+            block["ir_roots"] = list(cfg["ir_roots"])
+        opts = {}
+        for key in ("min_filing_date", "sec_any_recent", "download_8k_exhibits"):
+            if key in cfg:
+                opts[key] = cfg[key]
+        if opts:
+            block["options"] = opts
+    return block

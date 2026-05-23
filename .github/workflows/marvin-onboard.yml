@@ -1,0 +1,165 @@
+name: Marvin Onboard Ticker
+
+on:
+  workflow_dispatch:
+    inputs:
+      ticker:
+        description: "Ticker symbol (e.g. SJT, 8697.T, TEQ.ST)"
+        required: true
+        type: string
+      company:
+        description: "Company name"
+        required: true
+        type: string
+      market:
+        description: "Market code"
+        required: true
+        type: choice
+        options:
+          - US
+          - JP
+          - CA
+          - SE
+          - EU
+          - OTC
+        default: US
+      cik:
+        description: "SEC CIK (US only, optional — auto-lookup if blank)"
+        required: false
+        type: string
+      ir_url:
+        description: "Investor relations URL(s), space-separated"
+        required: false
+        type: string
+      from_watchlist:
+        description: "Promote from watchlist"
+        required: false
+        type: boolean
+        default: false
+      watchlist_only:
+        description: "Add to watchlist only (no folder/download)"
+        required: false
+        type: boolean
+        default: false
+      download_8k_exhibits:
+        description: "Download 8-K exhibit PDFs (US royalty trusts etc.)"
+        required: false
+        type: boolean
+        default: false
+  repository_dispatch:
+    types: [onboard-ticker]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: marvin-onboard-${{ github.event.inputs.ticker || github.event.client_payload.ticker }}
+  cancel-in-progress: false
+
+jobs:
+  onboard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve inputs
+        id: vars
+        env:
+          DISPATCH_TOKEN: ${{ secrets.ONBOARD_DISPATCH_TOKEN }}
+        run: |
+          if [ "${{ github.event_name }}" = "repository_dispatch" ]; then
+            PAYLOAD='${{ toJson(github.event.client_payload) }}'
+            echo "ticker=$(echo "$PAYLOAD" | jq -r '.ticker // empty')" >> "$GITHUB_OUTPUT"
+            echo "company=$(echo "$PAYLOAD" | jq -r '.company // empty')" >> "$GITHUB_OUTPUT"
+            echo "market=$(echo "$PAYLOAD" | jq -r '.market // "US"')" >> "$GITHUB_OUTPUT"
+            echo "cik=$(echo "$PAYLOAD" | jq -r '.cik // empty')" >> "$GITHUB_OUTPUT"
+            echo "ir_url=$(echo "$PAYLOAD" | jq -r '.ir_url // empty')" >> "$GITHUB_OUTPUT"
+            echo "from_watchlist=$(echo "$PAYLOAD" | jq -r '.from_watchlist // false')" >> "$GITHUB_OUTPUT"
+            echo "watchlist_only=$(echo "$PAYLOAD" | jq -r '.watchlist_only // false')" >> "$GITHUB_OUTPUT"
+            echo "download_8k_exhibits=$(echo "$PAYLOAD" | jq -r '.download_8k_exhibits // false')" >> "$GITHUB_OUTPUT"
+            TOKEN=$(echo "$PAYLOAD" | jq -r '.token // empty')
+            if [ -n "$DISPATCH_TOKEN" ] && [ -n "$TOKEN" ] && [ "$TOKEN" != "$DISPATCH_TOKEN" ]; then
+              echo "::error::Invalid onboard dispatch token"
+              exit 1
+            fi
+          else
+            echo "ticker=${{ github.event.inputs.ticker }}" >> "$GITHUB_OUTPUT"
+            echo "company=${{ github.event.inputs.company }}" >> "$GITHUB_OUTPUT"
+            echo "market=${{ github.event.inputs.market }}" >> "$GITHUB_OUTPUT"
+            echo "cik=${{ github.event.inputs.cik }}" >> "$GITHUB_OUTPUT"
+            echo "ir_url=${{ github.event.inputs.ir_url }}" >> "$GITHUB_OUTPUT"
+            echo "from_watchlist=${{ github.event.inputs.from_watchlist }}" >> "$GITHUB_OUTPUT"
+            echo "watchlist_only=${{ github.event.inputs.watchlist_only }}" >> "$GITHUB_OUTPUT"
+            echo "download_8k_exhibits=${{ github.event.inputs.download_8k_exhibits }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Run onboard orchestrator
+        run: |
+          ARGS=(
+            --ticker "${{ steps.vars.outputs.ticker }}"
+            --company "${{ steps.vars.outputs.company }}"
+            --market "${{ steps.vars.outputs.market }}"
+          )
+          [ -n "${{ steps.vars.outputs.cik }}" ] && ARGS+=(--cik "${{ steps.vars.outputs.cik }}")
+          [ -n "${{ steps.vars.outputs.ir_url }}" ] && ARGS+=(--ir-url "${{ steps.vars.outputs.ir_url }}")
+          [ "${{ steps.vars.outputs.from_watchlist }}" = "true" ] && ARGS+=(--from-watchlist)
+          [ "${{ steps.vars.outputs.watchlist_only }}" = "true" ] && ARGS+=(--watchlist-only)
+          [ "${{ steps.vars.outputs.download_8k_exhibits }}" = "true" ] && ARGS+=(--download-8k-exhibits)
+          ARGS+=(--no-deep-dive)
+          python _system/scripts/onboard_ticker.py "${ARGS[@]}"
+
+      - name: Commit and push to main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --staged --quiet; then
+            echo "No onboard changes to commit."
+          else
+            git commit -m "feat: onboard ${{ steps.vars.outputs.ticker }} ($(date -u +%Y-%m-%d))"
+            git push origin main
+          fi
+
+      - name: Check Cursor API key
+        if: steps.vars.outputs.watchlist_only != 'true'
+        id: cursor
+        env:
+          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
+        run: |
+          if [ -z "$CURSOR_API_KEY" ]; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::CURSOR_API_KEY not set — skipping deep dive"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run Marvin deep dive (Cloud Agent → PR)
+        if: steps.vars.outputs.watchlist_only != 'true' && steps.cursor.outputs.ready == 'true'
+        env:
+          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
+          TICKER: ${{ steps.vars.outputs.ticker }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          cd _system/scripts && npm install --no-save @cursor/sdk
+          node _system/scripts/marvin_deep_dive.mjs
+
+      - name: Summary
+        if: success()
+        run: |
+          echo "Onboard finished for ${{ steps.vars.outputs.ticker }}"
+          echo "Dashboard will refresh on next Pages deploy."

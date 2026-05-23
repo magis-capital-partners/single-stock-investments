@@ -18,6 +18,7 @@ Single-stock research workflow for this workspace.
 - Proxy / governance docs for US holdings
 
 ## 4. Analyze
+- Apply `_system/frameworks/mental_models.md` (Tier 1 always; Tier 2 by archetype; Tier 3 by trigger)
 - Apply `quality_checklist.md`
 - Apply `ai_disruption_lens.md` where relevant
 - Write to `{TICKER}/research/` — not chat-only
@@ -35,3 +36,14 @@ Every report ends with:
 - [PROPOSED MEMORY] bullets (daily log only)
 
 Separate **facts**, **inferences**, and **opinions**. Cite file paths and page refs where possible.
+
+## 6. Daily automation (GitHub Actions)
+
+| Step | Workflow | Behavior |
+|------|----------|----------|
+| Download | `daily-sync.yml` job `download-and-sync` | 12:00 UTC — pull SEC/IR for all holdings, rebuild INDEX + dashboard JSON, push |
+| News | `daily-sync.yml` job `portfolio-news` or `portfolio-news.yml` | Polygon bulk + Google News RSS → `dashboard/data/portfolio_news.json`; review `_system/reviews/pending/news_{date}.md` |
+| Refresh analysis | `daily-sync.yml` job `marvin-refresh` | After news — pick ticker with **new primary documents or refresh-eligible valuation news** since last deep dive; skip if caught up; Cursor cloud agent opens PR |
+| Manual refresh | `marvin-daily-deep-dive.yml` | Optional ticker; **force_rotate** if you want oldest dive refreshed without new activity |
+
+Picker: `_system/scripts/marvin_pick_ticker.py --json` · News ingest: `_system/scripts/ingest_portfolio_news.py`
