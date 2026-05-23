@@ -1,18 +1,23 @@
 #!/usr/bin/env python3
-"""Orchestrate downloads for all portfolio holdings."""
+"""Orchestrate downloads for all portfolio holdings (registry-driven)."""
 from __future__ import annotations
 
 import json
 import shutil
 import subprocess
 import sys
+from datetime import datetime
 from pathlib import Path
+
+SCRIPTS_DIR = Path(__file__).resolve().parent
+if str(SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_DIR))
+
+from portfolio_registry import load_registry
 
 ROOT = Path(__file__).resolve().parents[2]
 PY = sys.executable
 SCRIPTS = ROOT / "_system" / "scripts"
-
-US_FROM_CONFIG = json.loads((SCRIPTS / "us_ticker_config.json").read_text(encoding="utf-8")).keys()
 
 
 def run(cmd: list[str], label: str) -> None:
@@ -28,32 +33,47 @@ def powershell_script(script: Path) -> list[str]:
 
 
 def main() -> None:
-    for ticker in sorted(US_FROM_CONFIG):
-        if ticker == "QDEL":
-            run([PY, str(ROOT / "QDEL/investor-documents/download_qdel_investor_docs.py")], f"QDEL (dedicated)")
-            continue
-        run([PY, str(SCRIPTS / "download_us_investor_docs.py"), "--ticker", ticker], ticker)
+    reg = load_registry()
+    holdings = reg.get("holdings") or {}
 
-    run(powershell_script(ROOT / "8697.T/_scripts/download_and_organize.ps1"), "8697.T")
+    for ticker in sorted(holdings.keys()):
+        dl = (holdings[ticker].get("download") or {})
+        dtype = dl.get("type", "us_shared")
 
-    run([PY, str(SCRIPTS / "download_teq_st.py")], "TEQ.ST")
-    run([PY, str(SCRIPTS / "download_csu.py")], "CSU")
-    run([PY, str(SCRIPTS / "download_otc_api.py")], "OTC tickers (OTCM/FRMO/KEWL)")
+        if dtype == "us_dedicated":
+            script = ROOT / ticker / "investor-documents" / f"download_{ticker.lower()}_investor_docs.py"
+            if ticker == "QDEL":
+                script = ROOT / "QDEL/investor-documents/download_qdel_investor_docs.py"
+            run([PY, str(script)], f"{ticker} (dedicated)")
+        elif dtype == "us_shared":
+            run([PY, str(SCRIPTS / "download_us_investor_docs.py"), "--ticker", ticker], ticker)
+        elif dtype == "jp_ps1":
+            script = ROOT / ticker / "_scripts" / "download_and_organize.ps1"
+            if script.exists() and script.stat().st_size > 80:
+                run(powershell_script(script), ticker)
+        elif dtype == "jp_archive":
+            log = ROOT / ticker / "_download_log.txt"
+            log.write_text(f"{datetime.now().isoformat()} Archive present; INDEX rebuilt by Marvin\n", encoding="utf-8")
+            script_dir = ROOT / ticker / "_scripts"
+            script_dir.mkdir(parents=True, exist_ok=True)
+            dl_script = script_dir / "download_and_organize.ps1"
+            if not dl_script.exists():
+                dl_script.write_text(
+                    "# Placeholder: PDFs already mirrored. Rebuild INDEX via build_folder_indexes.py\n",
+                    encoding="utf-8",
+                )
 
-    # 3905.T: log refresh from existing archive
-    log3905 = ROOT / "3905.T" / "_download_log.txt"
-    from datetime import datetime
-    log3905.write_text(f"{datetime.now().isoformat()} Archive present; INDEX rebuilt by Marvin\n", encoding="utf-8")
-    script3905 = ROOT / "3905.T" / "_scripts"
-    script3905.mkdir(parents=True, exist_ok=True)
-    dl3905 = script3905 / "download_and_organize.ps1"
-    if not dl3905.exists():
-        dl3905.write_text(
-            "# Placeholder: PDFs already mirrored under IR/. Rebuild INDEX via build_folder_indexes.py\n",
-            encoding="utf-8",
-        )
+    if any((holdings.get(t, {}).get("download") or {}).get("type") == "eu_teq" for t in holdings):
+        run([PY, str(SCRIPTS / "download_teq_st.py")], "TEQ.ST")
+
+    if "CSU" in holdings:
+        run([PY, str(SCRIPTS / "download_csu.py")], "CSU")
+
+    if any(t in holdings for t in ("OTCM", "FRMO", "KEWL")):
+        run([PY, str(SCRIPTS / "download_otc_api.py")], "OTC tickers (OTCM/FRMO/KEWL)")
 
     run([PY, str(SCRIPTS / "build_folder_indexes.py")], "Build INDEX.csv files")
+    run([PY, str(SCRIPTS / "sync_portfolio_from_registry.py")], "Sync portfolio from registry")
     run([PY, str(SCRIPTS / "build_dashboard_data.py")], "Rebuild dashboard JSON")
     print("\nAll download jobs finished.")
 

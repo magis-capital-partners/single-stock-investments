@@ -13,7 +13,9 @@ ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = ROOT / "dashboard" / "data"
 OUTPUT = DATA_DIR / "dashboard_data.json"
 CLASS_PATH = ROOT / "_system" / "portfolio" / "classification.json"
+REGISTRY_PATH = ROOT / "_system" / "portfolio" / "registry.json"
 GITHUB_REPO = "GoldmanDrew/single-stock-investments"
+ONBOARD_WORKFLOW = "marvin-onboard.yml"
 
 
 def github_blob_url(rel_path: str) -> str:
@@ -56,7 +58,19 @@ def list_tickers() -> list[str]:
     return sorted(tickers)
 
 
+def load_registry() -> dict:
+    if not REGISTRY_PATH.exists():
+        return {"holdings": {}, "watchlist": {}}
+    return json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
+
+
 def parse_holdings() -> dict[str, dict]:
+    reg = load_registry()
+    meta: dict[str, dict] = {}
+    for ticker, h in (reg.get("holdings") or {}).items():
+        meta[ticker] = {"company": h.get("company", ticker), "market": h.get("market", "—")}
+    if meta:
+        return meta
     holdings_path = ROOT / "_system" / "portfolio" / "holdings.md"
     meta: dict[str, dict] = {}
     if not holdings_path.exists():
@@ -79,6 +93,32 @@ def parse_holdings() -> dict[str, dict]:
                 "market": parts[3],
             }
     return meta
+
+
+def onboard_status(ticker_dir: Path) -> dict | None:
+    path = ticker_dir / ".onboard_status.json"
+    if not path.exists():
+        return None
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return None
+
+
+def build_watchlist_rows(watchlist: dict) -> list[dict]:
+    rows = []
+    for ticker, w in sorted(watchlist.items()):
+        rows.append(
+            {
+                "ticker": ticker,
+                "company": w.get("company", ticker),
+                "market": w.get("market", "—"),
+                "notes": w.get("notes", ""),
+                "added": w.get("added"),
+                "status": "watchlist",
+            }
+        )
+    return rows
 
 
 def has_download_script(ticker_dir: Path) -> tuple[bool, str | None]:
@@ -372,16 +412,19 @@ def build_ticker_row(ticker: str, holdings: dict[str, dict], portfolio_class: di
         "deep_dive": latest_deep_dive(ticker_dir, classification),
         "recent_files": recent_files(ticker_dir),
         "developments": recent_developments(ticker_dir, ticker),
+        "onboard": onboard_status(ticker_dir),
     }
     row["completeness"] = completeness_score(row)
     return row
 
 
 def build() -> dict:
+    reg = load_registry()
     holdings = parse_holdings()
     portfolio_class = load_classification()
     tickers = list_tickers()
     rows = [build_ticker_row(t, holdings, portfolio_class) for t in tickers]
+    watchlist = build_watchlist_rows(reg.get("watchlist") or {})
 
     total_pdfs = sum(r["pdf_count"] for r in rows)
     with_research = sum(1 for r in rows if r["research_dir"])
@@ -393,13 +436,17 @@ def build() -> dict:
         "workspace": str(ROOT),
         "summary": {
             "ticker_count": len(rows),
+            "watchlist_count": len(watchlist),
             "total_pdfs": total_pdfs,
             "with_readme": with_readme,
             "with_research": with_research,
             "avg_completeness": avg_complete,
             "markets": sorted({r["market"] for r in rows}),
             "github_repo": GITHUB_REPO,
+            "onboard_workflow": ONBOARD_WORKFLOW,
+            "onboard_dispatch_event": "onboard-ticker",
         },
+        "watchlist": watchlist,
         "tickers": rows,
     }
 
