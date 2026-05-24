@@ -451,10 +451,34 @@ def build() -> dict:
     }
 
 
+OAUTH_CONFIG = DATA_DIR / "oauth_config.json"
+
+
+def write_oauth_config() -> None:
+    """Merge OAuth client_id from env (CI) with committed config."""
+    existing: dict = {}
+    if OAUTH_CONFIG.exists():
+        try:
+            existing = json.loads(OAUTH_CONFIG.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            existing = {}
+    client_id = os.environ.get("OAUTH_CLIENT_ID", "").strip() or existing.get("client_id", "")
+    payload = {
+        "client_id": client_id,
+        "scopes": existing.get("scopes", "repo"),
+        "setup": existing.get(
+            "setup",
+            "Create a GitHub OAuth App; callback URL must match .../oauth/callback.html on Pages.",
+        ),
+    }
+    OAUTH_CONFIG.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+
+
 def main() -> None:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     payload = build()
     OUTPUT.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    write_oauth_config()
     print(f"Wrote {OUTPUT} ({payload['summary']['ticker_count']} tickers)")
 
 

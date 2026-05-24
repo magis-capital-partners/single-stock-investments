@@ -4,10 +4,17 @@ Use the **onboard orchestrator** (dashboard or CLI) — do not manually edit fou
 
 ## Dashboard (cloud)
 
-1. Open portfolio dashboard → **+ Add holding**
-2. Save GitHub PAT via **Token** (repo + actions scope)
+1. Open portfolio dashboard → **Sign in with GitHub** (one-time OAuth — no PAT)
+2. **+ Add holding** → fill ticker, company, market
 3. **Run onboard on GitHub** — dispatches `marvin-onboard.yml`
 4. Workflow commits scaffold + downloads to `main`, then runs Marvin deep dive (PR)
+
+### OAuth App setup (one time, repo admin)
+
+1. [New OAuth App](https://github.com/settings/developers) → **Authorization callback URL**:
+   `https://goldmandrew.github.io/single-stock-investments/oauth/callback.html`
+2. Copy **Client ID** → repo **Settings → Secrets and variables → Actions → Variables** → `OAUTH_CLIENT_ID`
+   (Or set `client_id` in `dashboard/data/oauth_config.json` for local-only use.)
 
 ## CLI (local)
 

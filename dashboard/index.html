@@ -239,8 +239,9 @@
     <div class="topbar-left">
       <div class="topbar-logo">SINGLE STOCK PORTFOLIO</div>
       <div class="topbar-meta"><span class="dot dot-green"></span><span id="meta-updated">Loading…</span></div>
+    </div>
     <div class="topbar-actions">
-      <button class="btn-secondary" id="btn-settings" title="GitHub token for cloud onboard">Token</button>
+      <button class="btn-secondary" id="btn-auth" title="Sign in with GitHub to run onboard">Sign in with GitHub</button>
       <button class="btn-primary" id="btn-add-holding">+ Add holding</button>
     </div>
   </header>
@@ -306,24 +307,12 @@
       <button class="btn-secondary" id="ob-copy-gh">Copy gh command</button>
       <button class="btn-secondary" id="ob-cancel">Cancel</button>
     </div>
-    <div class="form-hint">Cloud onboard commits scaffold + downloads to <code>main</code>, then runs Marvin deep dive (PR). Set a GitHub PAT with <code>repo</code> + <code>actions</code> scope via Token button (stored in browser only).</div>
+    <div class="form-hint">Cloud onboard commits scaffold + downloads to <code>main</code>, then runs Marvin deep dive (PR). <strong>Sign in with GitHub</strong> once — no PAT needed (OAuth, stored in browser only).</div>
     <div class="status-msg" id="ob-status"></div>
   </div>
 </div>
 
-<div class="modal-backdrop" id="token-backdrop">
-  <div class="modal">
-    <h3>GitHub token (localStorage)</h3>
-    <div class="form-row"><label>PAT for repository_dispatch</label><input id="gh-token" type="password" placeholder="ghp_..." /></div>
-    <div class="form-actions">
-      <button class="btn-primary" id="token-save">Save</button>
-      <button class="btn-secondary" id="token-clear">Clear</button>
-      <button class="btn-secondary" id="token-cancel">Close</button>
-    </div>
-    <div class="form-hint">Optional: set repo secret <code>ONBOARD_DISPATCH_TOKEN</code> to the same value for validation.</div>
-  </div>
-</div>
-
+<script src="oauth.js"></script>
 <script>
 const GH_REPO = 'GoldmanDrew/single-stock-investments';
 const DISPATCH_EVENT = 'onboard-ticker';
@@ -356,6 +345,7 @@ const MOAT_BADGE = {
 };
 
 let data = null;
+let oauthConfig = null;
 let selected = null;
 let sortKey = 'ticker';
 let sortAsc = true;
@@ -372,6 +362,12 @@ function escapeHtml(s) {
 }
 
 async function load() {
+  try {
+    oauthConfig = await MarvinOAuth.loadConfig();
+  } catch {
+    oauthConfig = { client_id: '' };
+  }
+  MarvinOAuth.refreshAuthUi(document.getElementById('btn-auth'));
   const res = await fetch('data/dashboard_data.json?' + Date.now());
   data = await res.json();
   document.getElementById('meta-updated').textContent =
@@ -429,7 +425,6 @@ function onboardPayload() {
     download_8k_exhibits: document.getElementById('ob-8k').checked,
     watchlist_only: document.getElementById('ob-watchlist-only').checked,
     from_watchlist: document.getElementById('modal-backdrop').dataset.fromWatchlist === '1',
-    token: localStorage.getItem('gh_onboard_token') || '',
   };
 }
 
@@ -454,9 +449,9 @@ async function submitCloudOnboard() {
     status.textContent = 'Ticker and company are required.';
     return;
   }
-  const token = localStorage.getItem('gh_onboard_token');
+  const token = MarvinOAuth.getToken();
   if (!token) {
-    status.textContent = 'No GitHub token — use Token button or copy gh command below.';
+    status.textContent = 'Sign in with GitHub (top right) or copy the gh command below.';
     return;
   }
   status.textContent = 'Dispatching onboard workflow…';
@@ -653,20 +648,27 @@ document.getElementById('ob-copy-gh').addEventListener('click', () => {
   navigator.clipboard.writeText(cmd);
   document.getElementById('ob-status').textContent = 'Copied:\n' + cmd;
 });
-document.getElementById('btn-settings').addEventListener('click', () => {
-  document.getElementById('gh-token').value = localStorage.getItem('gh_onboard_token') || '';
-  document.getElementById('token-backdrop').classList.add('open');
-});
-document.getElementById('token-save').addEventListener('click', () => {
-  localStorage.setItem('gh_onboard_token', document.getElementById('gh-token').value.trim());
-  document.getElementById('token-backdrop').classList.remove('open');
-});
-document.getElementById('token-clear').addEventListener('click', () => {
-  localStorage.removeItem('gh_onboard_token');
-  document.getElementById('gh-token').value = '';
-});
-document.getElementById('token-cancel').addEventListener('click', () => {
-  document.getElementById('token-backdrop').classList.remove('open');
+document.getElementById('btn-auth').addEventListener('click', async () => {
+  const btn = document.getElementById('btn-auth');
+  if (btn.dataset.signedIn === '1') {
+    MarvinOAuth.clearAuth();
+    await MarvinOAuth.refreshAuthUi(btn);
+    return;
+  }
+  if (!oauthConfig?.client_id) {
+    alert(
+      'OAuth not configured yet.\n\n'
+      + '1. Create an OAuth App: https://github.com/settings/developers\n'
+      + '2. Callback URL: ' + MarvinOAuth.redirectUri() + '\n'
+      + '3. Set client_id in dashboard/data/oauth_config.json or repo variable OAUTH_CLIENT_ID'
+    );
+    return;
+  }
+  try {
+    await MarvinOAuth.signIn(oauthConfig.client_id);
+  } catch (e) {
+    alert(e.message || String(e));
+  }
 });
 </script>
 </body>

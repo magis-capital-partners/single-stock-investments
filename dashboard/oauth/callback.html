@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GitHub sign-in · Portfolio Dashboard</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .box { text-align: center; max-width: 420px; padding: 24px; }
+    .err { color: #f85149; margin-top: 12px; font-size: 14px; }
+    a { color: #58a6ff; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <p id="msg">Completing GitHub sign-in…</p>
+    <p class="err" id="err" style="display:none"></p>
+  </div>
+  <script src="../oauth.js"></script>
+  <script>
+    (async () => {
+      const msg = document.getElementById('msg');
+      const errEl = document.getElementById('err');
+      try {
+        const cfg = await MarvinOAuth.loadConfig();
+        if (!cfg.client_id) {
+          throw new Error('OAuth client_id not configured — set OAUTH_CLIENT_ID repo variable or edit dashboard/data/oauth_config.json');
+        }
+        await MarvinOAuth.handleCallback(cfg.client_id);
+      } catch (e) {
+        msg.textContent = 'Sign-in failed';
+        errEl.style.display = 'block';
+        errEl.textContent = e.message || String(e);
+        const back = document.createElement('p');
+        back.innerHTML = `<a href="${MarvinOAuth.dashboardUrl()}">Back to dashboard</a>`;
+        document.querySelector('.box').appendChild(back);
+      }
+    })();
+  </script>
+</body>
+</html>

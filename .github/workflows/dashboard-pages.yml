@@ -49,6 +49,8 @@ jobs:
           python-version: "3.12"
 
       - name: Rebuild dashboard JSON
+        env:
+          OAUTH_CLIENT_ID: ${{ vars.OAUTH_CLIENT_ID }}
         run: python _system/scripts/build_dashboard_data.py
 
       - name: Upload Pages artifact
