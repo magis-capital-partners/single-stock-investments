@@ -101,9 +101,55 @@ def propose_stance(
     moat: str,
     dhando: str,
     irr_method: str,
+    data: dict | None = None,
 ) -> dict:
     moat_bad = moat in ("eroding", "unproven")
     dhando_bad = dhando == "none"
+    results = (data or {}).get("results", {})
+    gate = (data or {}).get("optionality_gate", {})
+    valuation_mode = (data or {}).get("valuation_mode")
+
+    if valuation_mode == "optionality" and gate:
+        primary_key = gate.get("primary_metric", "base")
+        primary_return = gate.get("primary_return_pct")
+        if primary_return is None and isinstance(results.get(primary_key), dict):
+            primary_return = results[primary_key].get("return_pct")
+        if primary_return is None:
+            primary_return = base_return
+        bull_return = results.get("bull", {}).get("return_pct") if results else None
+        floor_pass = gate.get("floor_pass", False)
+        incumbent = gate.get("incumbent_sleeve", False)
+
+        if irr_method == "pending" or primary_return is None:
+            suggested = "pending"
+            band = "pending"
+        elif dhando_bad or not floor_pass:
+            suggested = "watch"
+            band = irr_band(primary_return)
+        elif primary_return > 20 and dhando in ("full", "partial"):
+            suggested = "accumulate"
+            band = ">20%"
+        elif primary_return >= 15 or (floor_pass and bull_return and bull_return >= 18):
+            suggested = "hold"
+            band = "15–20%" if primary_return and primary_return >= 15 else "optionality"
+        elif floor_pass and dhando in ("full", "partial") and (primary_return >= 7 or incumbent):
+            suggested = "hold" if incumbent else "watch"
+            band = "optionality"
+        else:
+            suggested = "watch"
+            band = irr_band(primary_return) if primary_return is not None else "optionality"
+
+        return {
+            "suggested": suggested,
+            "irr_band": band,
+            "gates": {
+                "moat_ok": not moat_bad,
+                "dhando_ok": not dhando_bad,
+                "floor_pass": floor_pass,
+                "valuation_mode": "optionality",
+            },
+            "override_reason": gate.get("override_reason"),
+        }
 
     if irr_method == "pending" or base_return is None:
         suggested = "pending"
@@ -174,16 +220,29 @@ def compute_valuation(data: dict) -> dict:
         raise ValueError(f"Unknown method: {method}")
 
     base_pct = results.get("base", {}).get("return_pct") if results else None
-    proposal = propose_stance(base_pct, moat, dhando, method)
-
     data["method"] = method
     data["results"] = {k: {"return_pct": v["return_pct"]} for k, v in results.items()}
+    proposal = propose_stance(base_pct, moat, dhando, method, data=data)
+    data["stance_proposal"] = proposal
+
+    if data.get("valuation_mode") == "optionality" and data.get("optionality_gate"):
+        gate = data["optionality_gate"]
+        primary_pct = gate.get("primary_return_pct")
+        if primary_pct is not None:
+            label = gate.get("primary_label", "primary return")
+            data["implied_return"] = {
+                "base_pct": primary_pct,
+                "lawrence_base_pct": base_pct,
+                "label": label,
+                "display": f"{primary_pct}% ({label})",
+            }
+            return data
+
     data["implied_return"] = {
         "base_pct": base_pct,
         "label": return_label,
         "display": f"{base_pct}% (base)" if base_pct is not None else "pending",
     }
-    data["stance_proposal"] = proposal
     return data
 
 

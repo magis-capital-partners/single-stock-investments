@@ -1,6 +1,7 @@
 {
   "ticker": "FRMO",
   "as_of": "2026-05-26",
+  "valuation_mode": "optionality",
   "method": "yield_curve",
   "lawrence_bucket": "other",
   "classification_inputs": {
@@ -11,27 +12,39 @@
   },
   "inputs": {
     "price": 10.0,
-    "price_source": "OTC estimate ~May 2026 (no reliable feed; confirm live)",
-    "normalization_note": "HK yield curve on NAV/share path + holdco premium; not operating FCF"
+    "price_source": "OTC estimate ~May 2026 (confirm live)",
+    "book_per_share": 8.55,
+    "normalization_note": "Optionality overlay: SOTP + catalyst stack (SSI flywheel). Lawrence base curve is secondary."
+  },
+  "optionality_gate": {
+    "framework": "holdco_sotp",
+    "floor_pass": true,
+    "floor_metric": "book_per_share",
+    "floor_value": 8.55,
+    "primary_metric": "base",
+    "primary_label": "SOTP catalyst IRR (5yr)",
+    "primary_return_pct": 12.5,
+    "incumbent_sleeve": true,
+    "notes": "No debt; ~75% insider ownership; HK/MIAX/CMSG IPO catalysts; HK stake ~$30M fair vs ~$10M book (Stahl call). Ref: SSI frictionless flywheel."
   },
   "scenarios": {
     "bear": {
       "price": 10.0,
       "payoff": 9.5,
       "years": 5,
-      "notes": "MIH lockup overhang; concentrated position marks down"
+      "notes": "Concentrated marks down; OTC discount persists"
     },
     "base": {
       "price": 10.0,
-      "payoff": 12.6,
+      "payoff": 18.0,
       "years": 5,
-      "notes": "Book $8.55 \u00d7 8% CAGR \u00d7 1.15 premium exit (Hohn NAV bridge)"
+      "notes": "HK re-mark + partial SOTP close; book compounding"
     },
     "bull": {
       "price": 10.0,
-      "payoff": 15.0,
+      "payoff": 25.0,
       "years": 5,
-      "notes": "MIH unlock + Horizon fund marks; sum-of-parts closes discount"
+      "notes": "HK + MIAX + CMSG listings; Winland control \u2192 operating earnings"
     }
   },
   "results": {
@@ -39,23 +52,26 @@
       "return_pct": -1.0
     },
     "base": {
-      "return_pct": 4.7
+      "return_pct": 12.5
     },
     "bull": {
-      "return_pct": 8.4
+      "return_pct": 20.1
     }
   },
   "implied_return": {
-    "base_pct": 4.7,
-    "label": "annualized return",
-    "display": "4.7% (base)"
+    "base_pct": 12.5,
+    "lawrence_base_pct": 12.5,
+    "label": "SOTP catalyst IRR (5yr)",
+    "display": "12.5% (SOTP catalyst IRR (5yr))"
   },
   "stance_proposal": {
-    "suggested": "watch",
-    "irr_band": "<15%",
+    "suggested": "hold",
+    "irr_band": "optionality",
     "gates": {
       "moat_ok": true,
-      "dhando_ok": true
+      "dhando_ok": true,
+      "floor_pass": true,
+      "valuation_mode": "optionality"
     },
     "override_reason": null
   }

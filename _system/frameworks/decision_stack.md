@@ -52,6 +52,16 @@ Under **Business & moat → Business mechanics (Hohn)**, every deep dive must in
 
 Reconcile Hohn base-case return with Lawrence `implied_irr` or explain in [HUMAN REVIEW].
 
+## Step 2c — Optionality overlay (when triggered)
+
+Read `_system/frameworks/optionality_valuation.md` when any trigger matches:
+
+- Holdco / SOTP (FRMO)
+- Mineral or land floor + free production option (KEWL)
+- Passive royalty trust with HK transitory + yield curve (MSB, SJT)
+
+Set `valuation_mode: optionality` in `valuation.json`. **Do not** downgrade to `watch` on Lawrence base IRR alone when `floor_pass` and primary metric clear the optionality gate.
+
 ---
 
 ## Step 3 — Expected return (one section, three methods)
@@ -145,7 +155,8 @@ python _system/scripts/build_dashboard_data.py
 
 1. `_system/frameworks/decision_stack.md` (this file)
 2. `_system/frameworks/hohn_business_analysis.md` (operating mechanics — every deep dive)
-3. `_system/memory/MEMORY.md` (approved beliefs)
+3. `_system/frameworks/optionality_valuation.md` (if FRMO / MSB / KEWL / SJT)
+4. `_system/memory/MEMORY.md` (approved beliefs)
 3. Primary docs in `{TICKER}/`
 4. `_system/prompts/deep_dive_template.md` (output shape)
 5. Appendix only if needed: `mental_models.md`, `lawrence_irr.md`

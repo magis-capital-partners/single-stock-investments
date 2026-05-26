@@ -1,6 +1,7 @@
 {
   "ticker": "MSB",
   "as_of": "2026-05-26",
+  "valuation_mode": "optionality",
   "method": "yield_curve",
   "lawrence_bucket": "other",
   "classification_inputs": {
@@ -11,51 +12,66 @@
   },
   "inputs": {
     "price": 27.0,
-    "price_source": "NYSE ~May 20, 2026 (stockanalysis.com; confirm live)",
-    "normalization_note": "HK equity-yield-curve on cumulative distributions + terminal unit value"
+    "price_source": "NYSE ~May 2026 (confirm live)",
+    "normalized_distribution_per_share": 2.16,
+    "normalization_note": "HK overlay: use normalized dist yield + equity yield curve, not depressed Q1-26 bonus=$0 run-rate alone."
+  },
+  "optionality_gate": {
+    "framework": "hk_royalty_curve",
+    "floor_pass": true,
+    "floor_metric": "normalized_distribution_yield",
+    "floor_value": 8.0,
+    "primary_metric": "base",
+    "primary_label": "normalized distribution yield",
+    "primary_return_pct": 8.0,
+    "incumbent_sleeve": true,
+    "notes": "HK Q4-2024 Mesabi case: >$2/unit/yr at ~$26 (>8% yield); 40yr TR ~9.8%; transitory bonus gap + Sep-2025 arbitration. Ref: HK Q1/Q3/Q4 commentaries."
   },
   "scenarios": {
     "bear": {
       "price": 27.0,
-      "payoff": 18.0,
+      "payoff": 30.0,
       "years": 5,
-      "notes": "Sub-threshold pricing persists; minimal bonus; legal delay"
+      "notes": "$1/unit/yr dist + terminal $25; sub-threshold pricing persists"
     },
     "base": {
       "price": 27.0,
-      "payoff": 32.0,
+      "payoff": 42.0,
       "years": 5,
-      "notes": "Normalized dist ~$1.0\u20131.2/unit/yr + modest terminal; partial arbitration"
+      "notes": "Normalized ~$2/unit/yr cumulative + terminal ~$32 (HK recovery pattern)"
     },
     "bull": {
       "price": 27.0,
-      "payoff": 48.0,
+      "payoff": 55.0,
       "years": 5,
-      "notes": "Bonus royalty restored + arbitration settlement + iron recovery"
+      "notes": "Bonus restored + partial arbitration recovery + iron recovery"
     }
   },
   "results": {
     "bear": {
-      "return_pct": -7.8
+      "return_pct": 2.1
     },
     "base": {
-      "return_pct": 3.5
+      "return_pct": 9.2
     },
     "bull": {
-      "return_pct": 12.2
+      "return_pct": 15.3
     }
   },
   "implied_return": {
-    "base_pct": 3.5,
-    "label": "annualized return",
-    "display": "3.5% (base)"
+    "base_pct": 8.0,
+    "lawrence_base_pct": 9.2,
+    "label": "normalized distribution yield",
+    "display": "8.0% (normalized distribution yield)"
   },
   "stance_proposal": {
-    "suggested": "watch",
-    "irr_band": "<15%",
+    "suggested": "hold",
+    "irr_band": "optionality",
     "gates": {
       "moat_ok": true,
-      "dhando_ok": true
+      "dhando_ok": true,
+      "floor_pass": true,
+      "valuation_mode": "optionality"
     },
     "override_reason": null
   }

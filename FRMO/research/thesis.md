@@ -9,9 +9,9 @@
 | **Archetype** (Stahl) | holding_co |
 | **Moat** (Munger) | stable |
 | **Dhando** (Pabrai) | partial |
-| **Stance** | watch |
-| **Cycle** | - |
-| **Implied 10yr IRR** (Lawrence) | 4.7% (base) |
+| **Stance** | hold |
+| **Cycle** | — |
+| **Implied 10yr IRR** (Lawrence) | 12.5% (SOTP catalyst IRR (5yr)) |
 | **IRR method** | yield_curve |
 | **Lawrence bucket** | other |
 

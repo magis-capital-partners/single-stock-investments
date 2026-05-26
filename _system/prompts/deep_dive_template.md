@@ -68,6 +68,18 @@ See `_system/frameworks/hohn_business_analysis.md`.
 
 **Returns statement:** We expect …% over … years based on …; primary risk: …
 
+### Optionality overlay (if triggered)
+
+See `_system/frameworks/optionality_valuation.md`. Skip if standard Lawrence/Hohn gate is sufficient.
+
+| Field | Value |
+|-------|-------|
+| Framework | holdco_sotp / mineral_floor_option / hk_royalty_curve |
+| Floor | … |
+| Free option / catalyst | … |
+| Primary metric | … |
+| Predictive attribute(s) | … |
+
 ### Moat (Munger)
 
 {Widening / stable / eroding — evidence from filings.}

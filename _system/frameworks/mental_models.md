@@ -91,7 +91,22 @@ Apply on **every deep dive** under Business mechanics. Full template: `_system/f
 | **Hidden / zero-valued asset** | Holdcos, conglomerates, optionality | Is value priced at zero inside the multiple? |
 | **Capital return capacity** | Cash-rich, regulated, buyback stories | What can balance sheet return without hurting moat? |
 
-**Sources:** `tci/Hohn-Analysis-Framework-extract.txt`, `tci/TCI-Letter-2007-Q4-extract.txt`, `tci/TCI-Letter-2010-Q1-extract.txt`, `tci/TCI-Q2-2018-Investor-Newsletter-extract.txt`
+**Sources:** `tci/Hohn-Analysis-Framework-extract.txt`, …
+
+### Optionality — floor + catalyst (Marvin overlay)
+
+Full template: `_system/frameworks/optionality_valuation.md`. Use when Lawrence/Hohn base IRR understates asymmetric payoffs.
+
+| Model | Trigger | Question |
+|-------|---------|----------|
+| **Holdco SOTP + catalyst stack** | FRMO; private marks below fair | What is look-through NAV vs price? Named IPO/listing catalysts and timeline? |
+| **Mineral floor + free option** | KEWL; land/royalty microcaps | What is book/cash floor if production = 0? Option yield if named project hits? |
+| **HK royalty curve (normalized)** | MSB, SJT; trust distribution gaps | What is **normalized** yield — not single depressed quarter? Equity yield curve over legal recovery? |
+| **Transitory bonus / dist gap** | Royalty trusts | Is the gap contractual/mechanical with precedent (Mesabi/SJT)? |
+| **Market structure discount** | OTC royalty trusts | Is mispricing from index/yield exclusion, not fundamentals? |
+| **Pabrai low risk / high uncertainty** | Optionality at asset floor | Is uncertainty high but fundamental risk low (cash, no debt, passive trust)? |
+
+**External refs:** [SSI FRMO flywheel](https://specialsituationinvesting.substack.com/p/frmo-corp-a-frictionless-flywheel); [SSI KEWL](https://specialsituationinvesting.substack.com/p/keweenaw-land-association-kewl); HK Q4-2024 / Q1-2025 / Q3-2025 commentaries (Mesabi).
 
 ### Munger — Compounders
 
@@ -148,6 +163,9 @@ These models extend Stahl beyond croupiers. Full extracts: `horizon-kinetics/`; 
 | Holding | Likely Tier 3 models |
 |---------|---------------------|
 | **SJT** | Equity yield curve, transitory problem, market structure discount |
+| **MSB** | Equity yield curve, transitory problem, market structure discount (HK Mesabi case) |
+| **FRMO** | Dormant asset (SOTP), holdco catalyst stack — see `optionality_valuation.md` |
+| **KEWL** | Dormant asset, mineral floor + free option (Pabrai low risk / high uncertainty) |
 | **FRMO, royalty trusts, LPs** | Market structure discount |
 | **Turnarounds with dated recovery** | Equity yield curve, transitory problem |
 | **Land / resource optionality** | Dormant asset, equity yield curve |

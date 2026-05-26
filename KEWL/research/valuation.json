@@ -1,6 +1,7 @@
 {
   "ticker": "KEWL",
   "as_of": "2026-05-26",
+  "valuation_mode": "optionality",
   "method": "yield_curve",
   "lawrence_bucket": "other",
   "classification_inputs": {
@@ -11,51 +12,67 @@
   },
   "inputs": {
     "price": 27.0,
-    "price_source": "Mgmt repurchase price Jun 2024; OTC estimate (confirm live)",
-    "normalization_note": "Scenario on intrinsic value path (book + Copperwood option), not earnings FCF"
+    "price_source": "Mgmt repurchase Jun 2024; OTC estimate (confirm live)",
+    "book_per_share": 12.7,
+    "cash_per_share_est": 6.0,
+    "normalization_note": "SSI mineral-floor + free-option: base assumes Copperwood royalties = 0; bull uses feasibility royalty math."
+  },
+  "optionality_gate": {
+    "framework": "mineral_floor_option",
+    "floor_pass": true,
+    "floor_metric": "book_plus_cash",
+    "floor_value": 12.7,
+    "primary_metric": "bull",
+    "primary_label": "Copperwood option yield (bull)",
+    "primary_return_pct": 23.4,
+    "incumbent_sleeve": false,
+    "notes": "SSI: ~$7.7M royalties at $4/lb Cu on ~$41M mkt cap; 1.1M acres @ ~$37/acre post 667k deal; burn ~$100-200k/yr. Price >2\u00d7 book weakens dhando at entry."
   },
   "scenarios": {
     "bear": {
       "price": 27.0,
-      "payoff": 12.0,
-      "years": 5,
-      "notes": "Copperwood delayed; burn erodes cash toward book"
+      "payoff": 14.0,
+      "years": 7,
+      "notes": "Copperwood delayed; drift toward book/cash; lease income only"
     },
     "base": {
       "price": 27.0,
-      "payoff": 22.0,
+      "payoff": 30.0,
       "years": 7,
-      "notes": "Lease income grows; partial Copperwood option priced"
+      "notes": "Lease income + acreage option partially priced; no production royalties"
     },
     "bull": {
       "price": 27.0,
-      "payoff": 40.0,
-      "years": 10,
-      "notes": "Copperwood production royalties; 667K-acre package leased"
+      "payoff": 65.0,
+      "years": 7,
+      "notes": "Copperwood production royalties + new leases on 1.1M acres (SSI ~24% FCF yield case)"
     }
   },
   "results": {
     "bear": {
-      "return_pct": -15.0
+      "return_pct": -9.0
     },
     "base": {
-      "return_pct": -2.9
+      "return_pct": 1.5
     },
     "bull": {
-      "return_pct": 4.0
+      "return_pct": 13.4
     }
   },
   "implied_return": {
-    "base_pct": -2.9,
-    "label": "annualized return",
-    "display": "-2.9% (base)"
+    "base_pct": 23.4,
+    "lawrence_base_pct": 1.5,
+    "label": "Copperwood option yield (bull)",
+    "display": "23.4% (Copperwood option yield (bull))"
   },
   "stance_proposal": {
-    "suggested": "watch",
-    "irr_band": "<15%",
+    "suggested": "accumulate",
+    "irr_band": ">20%",
     "gates": {
       "moat_ok": true,
-      "dhando_ok": true
+      "dhando_ok": true,
+      "floor_pass": true,
+      "valuation_mode": "optionality"
     },
     "override_reason": null
   }
