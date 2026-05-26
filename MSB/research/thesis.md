@@ -11,7 +11,7 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | hold |
 | **Cycle** | mid |
-| **Implied 10yr IRR** (Lawrence) | 8.0% (normalized distribution yield) |
+| **Implied 10yr IRR** (Lawrence) | 8.4% (normalized distribution yield) |
 | **IRR method** | yield_curve |
 | **Lawrence bucket** | other |
 

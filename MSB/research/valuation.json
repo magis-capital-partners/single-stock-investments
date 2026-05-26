@@ -11,10 +11,10 @@
     "cycle": "mid"
   },
   "inputs": {
-    "price": 27.0,
-    "price_source": "NYSE ~May 2026 (confirm live)",
+    "price": 25.68,
+    "price_source": "Stooq MSB.US close 2026-05-26",
     "normalized_distribution_per_share": 2.16,
-    "normalization_note": "HK overlay: use normalized dist yield + equity yield curve, not depressed Q1-26 bonus=$0 run-rate alone."
+    "normalization_note": "HK overlay: normalized dist yield + equity yield curve; not Q1-26 bonus=$0 run-rate alone."
   },
   "optionality_gate": {
     "framework": "hk_royalty_curve",
@@ -23,25 +23,25 @@
     "floor_value": 8.0,
     "primary_metric": "base",
     "primary_label": "normalized distribution yield",
-    "primary_return_pct": 8.0,
+    "primary_return_pct": 8.4,
     "incumbent_sleeve": true,
-    "notes": "HK Q4-2024 Mesabi case: >$2/unit/yr at ~$26 (>8% yield); 40yr TR ~9.8%; transitory bonus gap + Sep-2025 arbitration. Ref: HK Q1/Q3/Q4 commentaries."
+    "notes": ">$2/unit/yr normalized at ~$26 (HK); 40yr TR ~9.8%; transitory bonus gap + Sep-2025 arbitration."
   },
   "scenarios": {
     "bear": {
-      "price": 27.0,
+      "price": 25.68,
       "payoff": 30.0,
       "years": 5,
-      "notes": "$1/unit/yr dist + terminal $25; sub-threshold pricing persists"
+      "notes": "$1/unit/yr dist + terminal ~$25; sub-threshold pricing persists"
     },
     "base": {
-      "price": 27.0,
+      "price": 25.68,
       "payoff": 42.0,
       "years": 5,
-      "notes": "Normalized ~$2/unit/yr cumulative + terminal ~$32 (HK recovery pattern)"
+      "notes": "Normalized ~$2/unit/yr cumulative + terminal ~$32"
     },
     "bull": {
-      "price": 27.0,
+      "price": 25.68,
       "payoff": 55.0,
       "years": 5,
       "notes": "Bonus restored + partial arbitration recovery + iron recovery"
@@ -49,20 +49,20 @@
   },
   "results": {
     "bear": {
-      "return_pct": 2.1
+      "return_pct": 3.2
     },
     "base": {
-      "return_pct": 9.2
+      "return_pct": 10.3
     },
     "bull": {
-      "return_pct": 15.3
+      "return_pct": 16.5
     }
   },
   "implied_return": {
-    "base_pct": 8.0,
-    "lawrence_base_pct": 9.2,
+    "base_pct": 8.4,
+    "lawrence_base_pct": 10.3,
     "label": "normalized distribution yield",
-    "display": "8.0% (normalized distribution yield)"
+    "display": "8.4% (normalized distribution yield)"
   },
   "stance_proposal": {
     "suggested": "hold",

@@ -11,67 +11,68 @@
     "cycle": "-"
   },
   "inputs": {
-    "price": 27.0,
-    "price_source": "Mgmt repurchase Jun 2024; OTC estimate (confirm live)",
+    "price": 55.0,
+    "price_source": "Stooq KEWL.US close 2026-05-22",
     "book_per_share": 12.7,
-    "cash_per_share_est": 6.0,
-    "normalization_note": "SSI mineral-floor + free-option: base assumes Copperwood royalties = 0; bull uses feasibility royalty math."
+    "shares_outstanding": 1126284,
+    "copperwood_royalty_est_usd": 7700000,
+    "normalization_note": "SSI mineral-floor + free-option. At $55, ~4.3\u00d7 book \u2014 option yield falls vs $27 entry."
   },
   "optionality_gate": {
     "framework": "mineral_floor_option",
-    "floor_pass": true,
-    "floor_metric": "book_plus_cash",
+    "floor_pass": false,
+    "floor_metric": "book_per_share",
     "floor_value": 12.7,
     "primary_metric": "bull",
     "primary_label": "Copperwood option yield (bull)",
-    "primary_return_pct": 23.4,
+    "primary_return_pct": 12.4,
     "incumbent_sleeve": false,
-    "notes": "SSI: ~$7.7M royalties at $4/lb Cu on ~$41M mkt cap; 1.1M acres @ ~$37/acre post 667k deal; burn ~$100-200k/yr. Price >2\u00d7 book weakens dhando at entry."
+    "notes": "~$7.7M royalties / ~$62M mkt cap at $55; ~4.3\u00d7 book \u2014 dhando weak at entry; thin OTC volume (24 sh day)."
   },
   "scenarios": {
     "bear": {
-      "price": 27.0,
+      "price": 55.0,
       "payoff": 14.0,
       "years": 7,
-      "notes": "Copperwood delayed; drift toward book/cash; lease income only"
+      "notes": "Copperwood delayed; reversion toward book ~$12.70"
     },
     "base": {
-      "price": 27.0,
+      "price": 55.0,
       "payoff": 30.0,
       "years": 7,
-      "notes": "Lease income + acreage option partially priced; no production royalties"
+      "notes": "Lease income only; option largely priced in"
     },
     "bull": {
-      "price": 27.0,
+      "price": 55.0,
       "payoff": 65.0,
       "years": 7,
-      "notes": "Copperwood production royalties + new leases on 1.1M acres (SSI ~24% FCF yield case)"
+      "notes": "Copperwood royalties + acreage leases (SSI case, repriced at $55)"
     }
   },
   "results": {
     "bear": {
-      "return_pct": -9.0
+      "return_pct": -17.8
     },
     "base": {
-      "return_pct": 1.5
+      "return_pct": -8.3
     },
     "bull": {
-      "return_pct": 13.4
+      "return_pct": 2.4
     }
   },
   "implied_return": {
-    "base_pct": 23.4,
-    "lawrence_base_pct": 1.5,
+    "base_pct": 12.4,
+    "lawrence_base_pct": -8.3,
     "label": "Copperwood option yield (bull)",
-    "display": "23.4% (Copperwood option yield (bull))"
+    "display": "12.4% (Copperwood option yield (bull))"
   },
   "stance_proposal": {
-    "suggested": "accumulate",
-    "irr_band": ">20%",
+    "suggested": "watch",
+    "irr_band": "<15%",
     "gates": {
       "moat_ok": true,
       "dhando_ok": true,
-      "floor_pass": true,
+      "floor_pass": false,
       "valuation_mode": "optionality"
     },
     "override_reason": null
