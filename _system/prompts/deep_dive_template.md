@@ -10,7 +10,14 @@ Copy structure for `{TICKER}/research/deep_dive_{date}.md`. Follow `_system/fram
 **Date:** {date}
 **Agent:** Marvin
 **Prior dive:** `{TICKER}/research/deep_dive_{prior}.md` (if refresh)
-**Valuation:** `{TICKER}/research/valuation.json`
+**Valuation:** `{TICKER}/research/valuation.json`  
+**Filing evidence:** `{TICKER}/research/evidence/filing_digest_{date}.md` (run `build_filing_evidence.py` first)
+
+---
+
+## Primary sources reviewed
+
+{Required when `research/evidence/document_inventory.json` exists. Table all inventoried docs by tier; cite full-tier paths in facts below.}
 
 ---
 

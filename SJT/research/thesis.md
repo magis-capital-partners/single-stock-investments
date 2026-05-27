@@ -21,14 +21,14 @@ Passive San Juan Basin gas NPI royalty trust — **equity yield curve / time arb
 
 ## Key questions
 
-- [ ] Latest reserve report and decline rate (10-K)
-- [ ] Operator (Hilcorp) performance and cost deductions
+- [x] Latest reserve report and decline rate (FY2025 10-K filed 2026-03-27)
+- [x] Operator (Hilcorp) performance and cost deductions (FY2025 10-K; Q1 2026 10-Q)
 - [ ] Natural gas price sensitivity vs distribution run-rate
 - [ ] Trust unit price vs NPV of expected distributions
 - [ ] Tax character of distributions (royalty trust complexity)
-- [ ] **Monthly excess production cost balance** — is net deficit falling toward zero?
-- [ ] **2026–2027 Hilcorp capex plan** impact on deficit paydown timeline
-- [x] **Current unit price** ~**$4.10** (2026-05-22) — see cross-check worksheet
+- [x] **Monthly excess production cost balance** — net deficit **$4.64M** at Mar 31, 2026 (down **$1.69M** in Q1)
+- [x] **2026 Hilcorp capex plan** ~$14M (10-K); impact on deficit paydown timeline
+- [x] **Current unit price** ~**$4.15** (2026-05-26) — see `SJT/research/valuation.json`
 
 ## Archetype lenses
 
@@ -44,5 +44,5 @@ Passive San Juan Basin gas NPI royalty trust — **equity yield curve / time arb
 - Model gas price scenarios vs distribution breakeven.
 - Track monthly 8-K excess production cost balance.
 
-**Deep dive:** `SJT/research/deep_dive_2026-05-21.md`  
+**Deep dive:** `SJT/research/deep_dive_2026-05-27.md`  
 **Cross-check (HK lens):** `SJT/research/cross_check_2026-05-22.md`

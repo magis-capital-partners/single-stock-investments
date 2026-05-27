@@ -15,7 +15,7 @@
 | **IRR method** | full |
 | **Lawrence bucket** | pricing_power |
 
-**Deep dive:** `research/deep_dive_2026-05-26.md`
+**Deep dive:** `research/deep_dive_2026-05-27.md`
 
 ## One-line thesis
 

@@ -15,15 +15,16 @@
 | **IRR method** | scenario |
 | **Lawrence bucket** | pricing_power |
 
+**Deep dive:** `QDEL/research/deep_dive_2026-05-27.md`
+
 ## One-line thesis
 
 Post-merger diagnostics platform (Quidel + Ortho) with **improving adjusted margins but declining revenue** — integration and non-respiratory growth must prove out before this is a compounder again.
 
 ## Key questions
 
-- [x] Revenue trend — **FY2025 $2.73B (−1.9%); Q1 2026 down YoY**
-- [x] Margin trajectory — **adj. EBITDA 21.9% FY2025; guide ~23% FY2026**
-- [ ] Balance sheet / leverage after merger — read 10-K debt schedule
+- [x] Revenue trend — **FY2025 $2.73B (−1.9%); Q1 FY2026 $619.8M (−10.5% YoY, 10-Q)**
+- [x] Balance sheet — **equity $1.92B; LT debt $2.47B** (FY2025 10-K)
 - [ ] Organic volume by segment — labs vs POC vs molecular
 
 ## Archetype

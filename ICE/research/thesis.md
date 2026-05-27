@@ -15,7 +15,7 @@
 | **IRR method** | full |
 | **Lawrence bucket** | multi_sided |
 
-**Deep dive:** `ICE/research/deep_dive_2026-05-26.md` · `ICE/research/deep_dive_2026-05-21.md` (full business)
+**Deep dive:** `ICE/research/deep_dive_2026-05-27.md` · `ICE/research/deep_dive_2026-05-26.md`
 
 ## One-line thesis
 

@@ -37,7 +37,8 @@ DataSection is betting the **Neo Cloud** franchise on **hyperscaler-linked AI da
 
 ## [HUMAN REVIEW]
 
-- Confirm FY2026 actuals and FY2027 guide on **15 May 2026** release.
+- **Evidence build 2026-05-27: full=0** — all 505 PDFs failed text extract; metrics from prior English IR review until OCR rerun.
+- Confirm FY2026 actuals and FY2027 guide when released.
 - Model **Inzai** phased launch and **Australia** GPU delivery **Jun–Aug 2026** per Apr revision.
 
-**Deep dive:** `3905.T/research/deep_dive_2026-05-23.md`
+**Deep dive:** `3905.T/research/deep_dive_2026-05-27.md`

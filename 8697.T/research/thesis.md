@@ -28,7 +28,7 @@ Japan's dominant exchange and clearing infrastructure — a Stahl **croupier** w
 
 ## Archetype (Stahl)
 
-**Croupier / exchange** — see `8697.T/research/deep_dive_2026-05-21.md`
+**Croupier / exchange** — see `8697.T/research/deep_dive_2026-05-27.md`
 
 ## Munger — what would kill this?
 

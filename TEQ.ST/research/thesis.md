@@ -9,7 +9,7 @@
 | **Archetype** (Stahl) | serial_acquirer |
 | **Moat** (Munger) | stable |
 | **Dhando** (Pabrai) | partial |
-| **Stance** | hold |
+| **Stance** | watch |
 | **Cycle** | - |
 | **Implied 10yr IRR** (Lawrence) | 13.7% (base) |
 | **IRR method** | full |
@@ -24,11 +24,11 @@ Swedish industrial **serial acquirer** of niche subsidiaries — decentralized P
 - [x] EBITA inflection — **FY2025 EBITA +36%; Q1 2026 margin record 14.3%**
 - [x] Organic growth — **−5% FY2025 and Q1 2026 (partially deliberate exits)**
 - [ ] M&A discipline post-2025 goodwill impairment (SEK 73M)
-- [ ] Leverage and equity ratio trend (42.8% FY2025)
+- [x] Leverage and equity ratio trend — **42.8% FY2025** (full-tier annual)
 
 ## Archetype (Pabrai)
 
-**Serial acquirer / compounder** — see `TEQ.ST/research/deep_dive_2026-05-21.md`
+**Serial acquirer / compounder** — see `TEQ.ST/research/deep_dive_2026-05-27.md`
 
 ## Munger — what would kill this?
 

@@ -17,7 +17,7 @@
 
 ## One-line thesis
 
-AI data centre developer with accelerating revenue ($126.6M FQ3, +139% YoY) and 600+ MW of signed leases (CoreWeave, hyperscaler), but GAAP losses, customer concentration, and a layered debt/preferred stack require capital-structure diligence before conviction sizing.
+AI data centre developer with accelerating revenue ($126.6M FQ3, +139% YoY) and 600+ MW of signed leases (CoreWeave, hyperscaler). FQ3 GAAP net income $100.9M includes $59.7M discontinued-operation gain (Cloud held-for-sale); continuing ops still loss-making on adjusted basis. Customer concentration and layered debt/preferred stack require capital-structure diligence before conviction sizing.
 
 ## Key questions
 

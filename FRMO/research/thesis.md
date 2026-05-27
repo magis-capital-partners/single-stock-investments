@@ -15,7 +15,7 @@
 | **IRR method** | yield_curve |
 | **Lawrence bucket** | other |
 
-**Deep dive:** `FRMO/research/deep_dive_2026-05-26.md` (style reference: `report_prose.md`)
+**Deep dive:** `FRMO/research/deep_dive_2026-05-27.md` (filing-grounded refresh)
 
 ## One-line thesis
 
@@ -26,7 +26,7 @@ Horizon Kinetics–affiliated **holding company** with concentrated stakes in ex
 - [x] Not an operating croupier — croupier exposure via MIH, HKHC, Horizon funds
 - [x] Investment A = ~82% of FRMO equity ($309M / $377M, Feb 2026)
 - [x] FRMO-attributable book ~$8.55/share (Feb 28, 2026); total assets $919M
-- [ ] OTC price vs sum-of-parts — human review pending
+- [x] MIH fair value **$13.9M** (Feb 2026); HKHC investment **$27.2M**; MIH IPO Aug 2025 lockup (full-tier quarterly)
 
 ## Key risks
 

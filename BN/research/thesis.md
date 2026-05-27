@@ -21,7 +21,7 @@ Global alternative-asset compounder earning durable fee streams on $614B fee-bea
 
 ## Key questions
 
-- [ ] FRE growth sustainability and fundraising pipeline post-$67B quarter
+- [ ] **40-F full extract pending** — FY2025 40-F inventoried (2026-03-18); DE from Q1 partial tier
 - [ ] BN+BNT merger terms, accretion to DE, and timeline
 - [ ] Realization environment impact on total DE
 - [ ] DE yield vs history and vs BAM/BN relative value
@@ -41,4 +41,4 @@ Global alternative-asset compounder earning durable fee streams on $614B fee-bea
 - Confirm DE yield vs 5-year range before sizing.
 - Model BN+BNT merger impact.
 
-**Deep dive:** `BN/research/deep_dive_2026-05-21.md`
+**Deep dive:** `BN/research/deep_dive_2026-05-27.md`

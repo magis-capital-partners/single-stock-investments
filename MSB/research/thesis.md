@@ -15,13 +15,13 @@
 | **IRR method** | yield_curve |
 | **Lawrence bucket** | other |
 
-**Deep dive:** `MSB/research/deep_dive_2026-05-26.md`
+**Deep dive:** `MSB/research/deep_dive_2026-05-27.md`
 
 Predictive-attribute tag (portfolio JSON): **equity_yield_curve** — legal/pricing hiatus vs long-lived pellet royalty contract (human to confirm usefulness).
 
 ## One-line thesis
 
-Mesabi Trust is a **contractual iron‑ore pellet royalty** on Cleveland-Cliffs’ Northshore (Silver Bay, MN): cash is **cyclical commodity + bonus-tier optionality**, with **ongoing AAA arbitration** (commenced Sep 2025) layered on statutory trust simplicity—**watch** until normalized run-rate distributions and dispute outcomes are clear.
+Mesabi Trust is a **contractual iron ore pellet royalty** on Cleveland-Cliffs' Northshore (Silver Bay, MN): cash is **cyclical commodity + bonus-tier optionality**, with **ongoing AAA arbitration** (commenced Sep 2025) layered on statutory trust simplicity—**hold** at **8.4%** normalized yield for the incumbent royalty sleeve; do not downgrade on depressed Q1 bonus alone.
 
 ## Key questions
 

@@ -28,7 +28,7 @@ Essential financial intelligence — ratings, indices, and data subscriptions �
 
 ## Archetype (Stahl)
 
-**Croupier / index infrastructure** — see `SPGI/research/deep_dive_2026-05-21.md`
+**Croupier / index infrastructure** — see `SPGI/research/deep_dive_2026-05-27.md`
 
 ## Munger — what would kill this?
 

@@ -21,7 +21,7 @@ U.S. OTC market infrastructure and ATS operator — a Stahl **croupier** with su
 
 ## Key questions
 
-- [x] Stahl croupier classification — **confirmed** (see `OTCM/research/deep_dive_2026-05-21.md`)
+- [x] Stahl croupier classification — **confirmed** (see `OTCM/research/deep_dive_2026-05-27.md`)
 - [x] Revenue trajectory — **FY2025 net revenues ~$107.9M; Q1 2026 +15% YoY**
 - [ ] Valuation vs normalized EPS — **TBD before sizing**
 - [ ] Regulatory risk to OTC listing model — monitor SEC policy

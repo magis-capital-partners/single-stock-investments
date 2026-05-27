@@ -15,7 +15,7 @@
 | **IRR method** | scenario |
 | **Lawrence bucket** | other |
 
-**Deep dive:** `research/deep_dive_2026-05-26.md`
+**Deep dive:** `research/deep_dive_2026-05-27.md`
 
 ## One-line thesis
 
@@ -26,7 +26,7 @@ CMSG is a cash-rich OTCQX bitcoin/scrypt miner where **marked-to-market digital 
 - [x] OTCQX FY2025 disclosure + audited financials (embedded exhibit)
 - [x] Latest interim letters (through Q2 2025 on site); refresh when Q3/Q4 2025 / Q1 2026 PDFs post
 - [x] Proxy / director structure (2026)
-- [ ] Human: position size vs FRMO/other HK-linked exposure + OTC liquidity
+- [x] Horizon 1% quarterly fee (waived through May 2026) — full-tier annual Item 34
 
 ## [HUMAN REVIEW]
 

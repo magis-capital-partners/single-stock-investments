@@ -15,7 +15,7 @@
 | **IRR method** | yield_curve |
 | **Lawrence bucket** | other |
 
-**Deep dive:** `KEWL/research/deep_dive_2026-05-26.md`
+**Deep dive:** `KEWL/research/deep_dive_2026-05-27.md`
 
 ## One-line thesis
 
@@ -26,7 +26,8 @@ Michigan **mineral royalty optionality** (>1M acres, Copperwood/Highland Copper 
 - [x] FY2024 book value ~$12.70/share; net income $262K; Copperwood leases ~$350K/yr
 - [x] 2024: +667K acres (~$1.52/acre); repurchased 51,633 sh @ $27
 - [x] Steady-state operating loss ~($160K)/yr (management, FY2024 letter)
-- [ ] FY2025 GAAP financials not verified in workspace — pending
+- [x] FY2025 OTC annual: >1.3M mineral acres, 36,705 leased; Mai 29.6%, Speron 11.6%
+- [x] H1 2025 lease income $189K vs $149K prior year (semi-annual)
 
 ## Key risks
 
