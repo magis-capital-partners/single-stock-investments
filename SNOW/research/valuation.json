@@ -1,0 +1,117 @@
+{
+  "ticker": "SNOW",
+  "as_of": "2026-05-29",
+  "method": "full",
+  "lawrence_bucket": "multi_sided",
+  "classification_inputs": {
+    "archetype": "platform",
+    "moat": "unproven",
+    "dhando": "partial",
+    "cycle": "-"
+  },
+  "inputs": {
+    "price": 240.0,
+    "price_source": "NYSE ~May 28, 2026 post-Q1 FY27 earnings (confirm live)",
+    "fcf_per_share": 2.65,
+    "fcf_source": "FY2025 free cash flow $884M \u00f7 ~334M shares (10-K FY2025)",
+    "shares_millions": 334,
+    "normalization_note": "GAAP net loss; Lawrence uses reported FCF. Q1 FY27 FCF run-rate higher \u2014 see ai_overlay"
+  },
+  "ai_overlay": {
+    "as_of": "2026-05-29",
+    "status": "partial \u2014 AI consumption model; not hyperscaler capex",
+    "in_model": {
+      "product_revenue_growth": "Q1 FY27 +33% YoY product revenue",
+      "consolidated_growth_base": "18%/12% owner cash path",
+      "rpo_backlog": "~$6B+ RPO FY2025 \u2014 not a dated revenue schedule",
+      "ai_workloads": "Cortex / Snowflake Intelligence in narrative"
+    },
+    "not_in_model_requires_refresh": [
+      "Consumption vs capacity pricing mix",
+      "RPO to revenue conversion timing",
+      "Stock-based compensation drag on owner cash",
+      "Partner cloud (AWS/Azure/GCP) economics pass-through",
+      "Post-earnings price gap vs model price"
+    ],
+    "capex_stress_2026": {
+      "ocf_bn_assumption": 1.0,
+      "ocf_assumption_note": "[Assumption] Q1 FY27 annualized OCF ~$1B",
+      "capex_bn": 0.15,
+      "capex_source": "Low capex intensity vs hyperscalers",
+      "implied_fcf_bn": 0.85,
+      "implied_fcf_per_share": 2.5
+    },
+    "ai_inflection_bull": {
+      "fcf_per_share_y0": 4.0,
+      "fcf_y0_note": "[Assumption] FCF scales with 30%+ product growth and margin expansion",
+      "growth_y1_5": 0.22,
+      "growth_y6_10": 0.12,
+      "exit_pfcf_y10": 40,
+      "drivers": "AI Data Cloud share, RPO conversion, operating leverage",
+      "computed_return_pct": 14.9
+    }
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.1,
+      "growth_y6_10": 0.06,
+      "exit_pfcf_y10": 22,
+      "notes": "Consumption slowdown; multiple compression after rally"
+    },
+    "base": {
+      "growth_y1_5": 0.18,
+      "growth_y6_10": 0.12,
+      "exit_pfcf_y10": 35,
+      "notes": "AI workload growth; partial operating leverage"
+    },
+    "bull": {
+      "growth_y1_5": 0.22,
+      "growth_y6_10": 0.14,
+      "exit_pfcf_y10": 45,
+      "notes": "RPO conversion + margin expansion"
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -3.8
+    },
+    "base": {
+      "return_pct": 6.7
+    },
+    "bull": {
+      "return_pct": 11.9
+    }
+  },
+  "implied_return": {
+    "base_pct": 6.7,
+    "label": "10yr IRR",
+    "display": "6.7% (base)"
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "overlay_results": [
+    {
+      "case": "AI inflection",
+      "method": "full (normalized FCF)",
+      "key_inputs": "FCF\u2080=$4.0 g1=22% g2=12% exit=40\u00d7",
+      "return_pct": 14.9,
+      "stance_gate": false,
+      "notes": "[Assumption] FCF scales with 30%+ product growth and margin expansion"
+    },
+    {
+      "case": "Capex stress Y0",
+      "method": "illustrative trough",
+      "key_inputs": "OCF 1.0B \u2212 capex 0.15B",
+      "return_pct": null,
+      "display": "FCF ~$2.5/sh (not 10yr IRR)",
+      "stance_gate": false
+    }
+  ]
+}

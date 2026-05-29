@@ -464,6 +464,150 @@ def segment_build_section(val: dict, preserved: str | None) -> str:
     return "\n".join(lines)
 
 
+SEGMENT_MAP_HEADING = "#### Segment map (filings)"
+AI_INFRA_HEADING = "#### AI infrastructure — what the valuation captures vs gaps"
+
+
+def segment_map_business_block(val: dict, preserved: str | None) -> str:
+    """Business-section segment table from valuation.json (hyperscalers)."""
+    kept = extract_preserved_block(preserved, SEGMENT_MAP_HEADING)
+    if kept:
+        return kept
+    build = val.get("segment_build") or {}
+    segments = build.get("segments") or []
+    if not segments:
+        return ""
+    lines = [
+        SEGMENT_MAP_HEADING,
+        "",
+        f"Segment economics as of **{build.get('as_of', val.get('as_of', '—'))}** — see `valuation.json` → `segment_build`:",
+        "",
+        "| Segment / option | Owner cash Y0 ($/sh) | Growth Y1–5 / Y6–10 | Base-case treatment |",
+        "|------------------|----------------------|---------------------|---------------------|",
+    ]
+    for seg in segments:
+        y0 = seg.get("owner_cash_y0_per_share")
+        y0_s = f"**${y0:.2f}**" if y0 is not None else "—"
+        g1 = seg.get("growth_y1_5", 0) * 100
+        g2 = seg.get("growth_y6_10", 0) * 100
+        notes = (seg.get("notes") or seg.get("owner_cash_y0_source") or "")[:80]
+        lines.append(
+            f"| **{seg.get('label', seg.get('id', 'Segment'))}** | {y0_s} | "
+            f"**{g1:.0f}%** / **{g2:.0f}%** | {notes} |"
+        )
+    for opt in build.get("options") or []:
+        drag = opt.get("annual_drag_per_share")
+        drag_s = f"(${abs(drag):.2f})/yr drag" if drag else "$0"
+        lines.append(
+            f"| **{opt.get('label', opt.get('id', 'Option'))}** | {drag_s} | — | "
+            f"{(opt.get('notes') or 'Option; $0 terminal in base')[:80]} |"
+        )
+    corp = build.get("corporate_drag") or {}
+    if corp.get("alphabet_level_drag_per_share") is not None:
+        drag = corp["alphabet_level_drag_per_share"]
+        lines.append(
+            f"| **Corporate / Alphabet-level** | (${drag:.2f})/yr drag | — | "
+            f"{(corp.get('notes') or '')[:80]} |"
+        )
+    recon = build.get("reconciliation") or {}
+    if recon.get("sum_pv_per_share_at_explicit_discount") is not None:
+        lines += [
+            "",
+            f"**Segment sum PV:** **${recon['sum_pv_per_share_at_explicit_discount']}/sh** "
+            f"@ {recon.get('explicit_discount_rate_pct', 10):.0f}% · implied return "
+            f"**{format_overlay_return_pct(recon.get('implied_business_return_pct'))}** "
+            f"(`overlay_results`).",
+        ]
+    return "\n".join(lines)
+
+
+def ai_infrastructure_business_block(val: dict, ticker: str, preserved: str | None) -> str:
+    """Business-section AI coverage table from ai_overlay."""
+    kept = extract_preserved_block(preserved, AI_INFRA_HEADING)
+    if kept:
+        return kept
+    ai = val.get("ai_overlay") or {}
+    if not ai:
+        return ""
+    in_model = ai.get("in_model") or {}
+    gaps = ai.get("not_in_model_requires_refresh") or []
+    stress = ai.get("capex_stress_2026") or {}
+    bull = ai.get("ai_inflection_bull") or {}
+    base_pct = (val.get("results") or {}).get("base", {}).get("return_pct")
+    fcf = (val.get("inputs") or {}).get("fcf_per_share")
+    lines = [
+        AI_INFRA_HEADING,
+        "",
+        f"**Status:** {ai.get('status', 'partial')}. Lawrence base IRR **{base_pct}%** uses "
+        f"**FY owner cash ${fcf}/sh** unless noted — AI themes below are **partially** in scenarios.",
+        "",
+        "| Theme | In filings / overlay | In current math |",
+        "|-------|----------------------|-----------------|",
+    ]
+    for k, v in in_model.items():
+        lines.append(f"| **{k.replace('_', ' ').title()}** | {v} | See scenarios / segment build |")
+    for gap in gaps[:6]:
+        lines.append(f"| **Gap** | {gap} | **Not modeled** |")
+    if stress.get("implied_fcf_per_share") is not None:
+        lines.append(
+            f"| **Capex stress (2026)** | OCF ~${stress.get('ocf_bn_assumption')}B, "
+            f"capex ~${stress.get('capex_bn')}B | Implied **${stress['implied_fcf_per_share']}/sh** FCF — "
+            "illustrative, not stance gate |"
+        )
+    lines.append("")
+    if bull.get("computed_return_pct") is not None:
+        y0 = bull.get("fcf_per_share_y0", "?")
+        lines.append(
+            f"**Bull AI path** (`ai_overlay.ai_inflection_bull`): sensitivity "
+            f"**{bull['computed_return_pct']}%** per year at **${y0}** normalized FCF/sh — "
+            "**not** the stance gate."
+        )
+    lines.append("")
+    lines.append(
+        f"**[HUMAN REVIEW]:** Refresh after next 10-K/10-Q; run "
+        f"`python _system/scripts/marvin_valuation.py --ticker {ticker} --write`."
+    )
+    return "\n".join(lines)
+
+
+def inject_before_marker(body: str, marker: str, block: str) -> str:
+    if not block.strip():
+        return body
+    if marker in body:
+        return body.replace(marker, block.strip() + "\n\n" + marker, 1)
+    return body.rstrip() + "\n\n" + block.strip() + "\n"
+
+
+def enrich_business_moat(body: str, val: dict, ticker: str, preserved: str | None) -> str:
+    body = strip_valuation_from_business(body)
+    if not re.search(r"#### Segment map\b", body, re.I) and val.get("segment_build", {}).get("segments"):
+        seg = segment_map_business_block(val, preserved)
+        if "#### Thesis pillars" in body:
+            body = inject_before_marker(body, "#### Thesis pillars", seg)
+        else:
+            body = inject_before_marker(body, "**Disruption", seg) if "**Disruption" in body else body.rstrip() + "\n\n" + seg
+    if not re.search(r"#### AI infrastructure\b", body, re.I) and val.get("ai_overlay"):
+        ai = ai_infrastructure_business_block(val, ticker, preserved)
+        if "#### Thesis pillars" in body:
+            body = inject_before_marker(body, "#### Thesis pillars", ai)
+        elif "**Disruption" in body:
+            body = inject_before_marker(body, "**Disruption", ai)
+        else:
+            body = body.rstrip() + "\n\n" + ai
+    bull = (val.get("ai_overlay") or {}).get("ai_inflection_bull") or {}
+    ai_irr = bull.get("computed_return_pct")
+    if ai_irr is not None:
+        body = body.replace(
+            "**Bull AI path** in `valuation.json` → `ai_overlay.ai_inflection_bull` is a **placeholder** "
+            "($8/sh normalized FCF, higher growth) for sensitivity only — **not computed IRR yet**; "
+            "needs a filing-backed bridge from Cloud OI, depreciation on new capex, and TPU revenue if disclosed.",
+            f"**Bull AI path** (`ai_overlay.ai_inflection_bull`): sensitivity **{ai_irr}%** 10yr IRR at normalized "
+            f"${bull.get('fcf_per_share_y0', 8)}/sh FCF₀ — "
+            "**not** the stance gate; needs filing-backed bridge from Cloud OI, capex normalization, and TPU revenue if disclosed.",
+        )
+    return body
+
+
 def irr_arithmetic(val: dict, ticker: str, preserved: str | None) -> str:
     if preserved and "#### IRR arithmetic" in preserved:
         m = re.search(
@@ -651,17 +795,7 @@ def refresh_ticker(ticker: str, out_date: str) -> Path | None:
             continue
         body = sections[key]
         if key == "## Business & moat":
-            body = strip_valuation_from_business(body)
-            ai_irr = ((val.get("ai_overlay") or {}).get("ai_inflection_bull") or {}).get("computed_return_pct")
-            if ai_irr is not None:
-                body = body.replace(
-                    "**Bull AI path** in `valuation.json` → `ai_overlay.ai_inflection_bull` is a **placeholder** "
-                    "($8/sh normalized FCF, higher growth) for sensitivity only — **not computed IRR yet**; "
-                    "needs a filing-backed bridge from Cloud OI, depreciation on new capex, and TPU revenue if disclosed.",
-                    f"**Bull AI path** (`ai_overlay.ai_inflection_bull`): sensitivity **{ai_irr}%** 10yr IRR at normalized "
-                    f"${(val.get('ai_overlay') or {}).get('ai_inflection_bull', {}).get('fcf_per_share_y0', 8)}/sh FCF₀ — "
-                    "**not** the stance gate; needs filing-backed bridge from Cloud OI, capex normalization, and TPU revenue if disclosed.",
-                )
+            body = enrich_business_moat(body, val, ticker, preserved_val)
         if key == "## Payoff & return":
             body = re.sub(
                 r"#### Valuation bridge.*?#### ",

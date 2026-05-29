@@ -6,25 +6,25 @@
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
+| **Archetype** (Stahl) | platform |
 | **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | - |
-| **Implied 10yr IRR** (Lawrence) | — |
-| **IRR method** | — |
-| **Lawrence bucket** | — |
+| **Implied 10yr IRR** (Lawrence) | 6.7% (base) |
+| **IRR method** | full |
+| **Lawrence bucket** | multi_sided |
 
 ## One-line thesis
 
-Snowflake Inc — thesis pending Marvin deep dive.
+AI Data Cloud platform on consumption pricing: strong product growth and positive FCF, but **watch** at ~$240 (~6.7% base IRR) until owner cash per share proves at post-earnings run rate.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [ ] Does Q2 FY27 sustain 30%+ product revenue without margin give-back?
+- [ ] RPO conversion vs consumption volatility (budget cycles)
+- [ ] SBC drag: path to GAAP profitability vs Lawrence FCF gate
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-05-28; awaiting deep dive.
+- Post-earnings price ~$240; AI bull sensitivity 14.9% is not the stance gate.
