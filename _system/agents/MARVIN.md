@@ -35,7 +35,15 @@ Every deep dive (`deep_dive_structure.md`):
 2. **Valuation & IRR (assumption ledger) last** (after Risks) — every assumption explicit (`irr_assumption_ledger.md`)
 3. Footer: Classification, [HUMAN REVIEW], [PROPOSED MEMORY]
 
-Refresh pipeline: `build_filing_evidence.py` → `marvin_valuation.py --write` → `refresh_deep_dive_v2.py` → `lint_deep_dive.py` → Milly → `lint_adversarial.py`
+**Local / cloud mechanical pipeline** (after narrative):
+
+`python _system/scripts/marvin_cloud_refresh.py {TICKER} --date YYYY-MM-DD`
+
+Same steps as batch refresh: evidence (optional) → `marvin_valuation.py --write` → `refresh_deep_dive_v2.py` → `lint_deep_dive.py` → Milly → `sync_classification.py --fix` → `build_dashboard_data.py`.
+
+**Cloud agent:** prompt source of truth is `_system/prompts/cloud_marvin_runbook.md` (loaded by `marvin_deep_dive.mjs`). CI checks sync via `check_cloud_marvin_sync.py`.
+
+**Batch all holdings:** `python _system/scripts/batch_portfolio_refresh.py --date YYYY-MM-DD`
 
 **Prose:** `report_prose.md` (fewer abbreviations) + `archetype_valuation_prose.md` (valuation section by Stahl archetype).
 

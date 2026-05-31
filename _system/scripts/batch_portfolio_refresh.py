@@ -27,7 +27,7 @@ def tickers_from_registry() -> list[str]:
     return sorted(data.get("holdings", {}).keys())
 
 
-def run_step(label: str, cmd: list[str]) -> bool:
+def run_step(label: str, cmd: list[str], *, optional: bool = False) -> bool:
     print(f"  {label}...", flush=True)
     r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
     out = (r.stdout or "") + (r.stderr or "")
@@ -35,8 +35,8 @@ def run_step(label: str, cmd: list[str]) -> bool:
         for line in out.strip().splitlines()[-8:]:
             print(f"    {line}")
     if r.returncode != 0:
-        print(f"  FAIL {label} exit={r.returncode}")
-        return False
+        print(f"  {'WARN' if optional else 'FAIL'} {label} exit={r.returncode}")
+        return optional
     return True
 
 
@@ -82,12 +82,19 @@ def main() -> None:
         )
         lint_ok = run_step(
             "lint",
-            [PY, str(SCRIPTS / "lint_deep_dive.py"), ticker],
+            [PY, str(SCRIPTS / "lint_deep_dive.py"), ticker, "--milly"],
         )
         if steps_ok and lint_ok:
+            run_step(
+                "sync classification",
+                [PY, str(SCRIPTS / "sync_classification.py"), "--fix", "--ticker", ticker],
+                optional=True,
+            )
             ok.append(ticker)
         else:
             fail.append(ticker)
+
+    run_step("dashboard JSON", [PY, str(SCRIPTS / "build_dashboard_data.py")])
 
     print(f"\n=== Done {args.date} ===")
     print(f"OK ({len(ok)}): {', '.join(ok) or 'none'}")

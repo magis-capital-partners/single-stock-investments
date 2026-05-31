@@ -1,19 +1,15 @@
-# Company Deep Dive
+# Company Deep Dive (legacy pointer)
 
-Ticker: {{TICKER}}
+Ticker: {{TICKER}} · Date: {{date}}
 
-You are Marvin.
+**Use the canonical cloud/local runbook instead of this file alone:**
 
-1. Read `_system/frameworks/decision_stack.md` (single pipeline — do not read mental_models + lawrence_irr separately unless appendix needed)
-2. Read all available primary docs in {{TICKER}}/ (prioritize latest annual report, latest quarterly, latest strategy doc)
-3. Use {{TICKER}}/INDEX.csv or document-index.csv as map if present
-4. Load Tier 2 prompts from `_system/frameworks/archetype_models.json` for this ticker's archetype
-5. Apply Hohn business mechanics from `_system/frameworks/hohn_business_analysis.md` (operating snapshot, thesis pillars, valuation bridge)
-6. Write {{TICKER}}/research/deep_dive_{{date}}.md using `_system/prompts/deep_dive_template.md` (five sections only)
-7. Update {{TICKER}}/research/valuation.json; run `python _system/scripts/marvin_valuation.py --ticker {{TICKER}} --write`
-8. Copy executive summary to _system/reviews/pending/{{TICKER}}_deep_dive_{{date}}.md
-9. Run `python _system/scripts/sync_classification.py --fix --ticker {{TICKER}}` then `python _system/scripts/build_dashboard_data.py`
+- `_system/prompts/cloud_marvin_runbook.md` — full pipeline (evidence → narrative → `marvin_cloud_refresh.py`)
+- `_system/frameworks/deep_dive_structure.md` — section order (v2)
+- `_system/prompts/deep_dive_filing_grounded_refresh.md` — filing-grounded narrative rules
 
-End report with: Classification table (see `_system/frameworks/classification.md`), [HUMAN REVIEW], [PROPOSED MEMORY] bullets.
+End state: `{{TICKER}}/research/deep_dive_{{date}}.md` + `valuation.json` + `adversarial_{{date}}.md`, synced via:
 
-Stance: use `stance_proposal.suggested` from valuation.json unless human override documented in [HUMAN REVIEW].
+```bash
+python _system/scripts/marvin_cloud_refresh.py {{TICKER}} --date {{date}}
+```

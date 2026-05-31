@@ -197,6 +197,14 @@
   }
   .research-link:hover { text-decoration: underline; }
 
+  .human-review-banner {
+    background: rgba(234, 179, 8, 0.12); border: 1px solid rgba(234, 179, 8, 0.45);
+    border-radius: 8px; padding: 12px 14px; font-size: 12px; line-height: 1.5;
+    margin-bottom: 14px;
+  }
+  .human-review-banner strong { color: var(--accent-yellow, #eab308); }
+  .human-review-banner .hr-line { margin-top: 6px; color: var(--text-secondary); }
+
   .topbar-actions { display: flex; gap: 10px; align-items: center; }
   .btn-primary {
     background: var(--accent-blue); color: #fff; border: none; border-radius: 6px;
@@ -620,6 +628,15 @@ function selectTicker(ticker) {
     <h2>${t.ticker}</h2>
     <div class="subhead">${escapeHtml(t.company)} · ${escapeHtml(t.exchange)} · ${linkHtml(t.links?.folder, t.folder)}</div>
 
+    ${t.human_review ? `
+    <div class="human-review-banner">
+      <strong>Human review</strong>
+      ${t.human_review.approved_stance ? `<div class="hr-line">Approved stance: <strong>${escapeHtml(t.human_review.approved_stance)}</strong>${t.human_review.model_stance && t.human_review.model_stance !== t.human_review.approved_stance ? ` (model: ${escapeHtml(t.human_review.model_stance)})` : ''}</div>` : ''}
+      ${t.human_review.override_reason ? `<div class="hr-line">${escapeHtml(t.human_review.override_reason)}</div>` : ''}
+      ${t.human_review.entry_band_15pct ? `<div class="hr-line">Entry band (~15% IRR): ${escapeHtml(t.human_review.entry_band_15pct)}</div>` : ''}
+      ${t.human_review.live_price_confirmed ? `<div class="hr-line">Price confirmed: ${escapeHtml(t.human_review.live_price_confirmed)}</div>` : ''}
+    </div>` : ''}
+
     <div class="detail-section">
       <h3>Classification</h3>
       <div class="metric-grid">
@@ -652,7 +669,9 @@ function selectTicker(ticker) {
         ${t.deep_dive.executive_summary ? `<div class="summary">${t.deep_dive.executive_summary}</div>` : ''}
         <span class="badge ${STANCE_BADGE[t.deep_dive.stance] || 'badge-warn'}">${t.deep_dive.stance || t.classification?.stance || '—'}</span>
         <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:12px">
-          <a class="research-link" href="${t.deep_dive.github_url}" target="_blank" rel="noopener">Full report on GitHub →</a>
+          <a class="research-link" href="${t.deep_dive.github_url}" target="_blank" rel="noopener">Latest deep dive →</a>
+          ${t.links?.adversarial ? `<a class="research-link" href="${t.links.adversarial}" target="_blank" rel="noopener">Milly adversarial →</a>` : ''}
+          ${t.links?.valuation ? `<a class="research-link" href="${t.links.valuation}" target="_blank" rel="noopener">valuation.json →</a>` : ''}
           ${t.links?.thesis ? `<a class="research-link" href="${t.links.thesis}" target="_blank" rel="noopener">Thesis →</a>` : ''}
           ${t.links?.readme ? `<a class="research-link" href="${t.links.readme}" target="_blank" rel="noopener">README →</a>` : ''}
         </div>

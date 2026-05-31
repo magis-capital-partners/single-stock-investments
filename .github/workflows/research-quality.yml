@@ -1,0 +1,40 @@
+name: Research quality (PR)
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "**/research/**"
+      - "_system/scripts/lint_deep_dive.py"
+      - "_system/scripts/lint_adversarial.py"
+      - "_system/scripts/lint_pr_research.py"
+      - "_system/prompts/cloud_marvin_runbook.md"
+      - "_system/scripts/marvin_deep_dive.mjs"
+      - "_system/scripts/marvin_cloud_refresh.py"
+      - "_system/scripts/check_cloud_marvin_sync.py"
+
+permissions:
+  contents: read
+
+jobs:
+  cloud-prompt-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Verify cloud Marvin prompt sync
+        run: python _system/scripts/check_cloud_marvin_sync.py
+
+  research-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Lint changed ticker research
+        run: python _system/scripts/lint_pr_research.py --base origin/${{ github.base_ref }}

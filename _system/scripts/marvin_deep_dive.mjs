@@ -3,10 +3,14 @@
  * Run Marvin company deep dive via Cursor Cloud Agent.
  * Opens a PR with research outputs — human review before merge.
  *
+ * Prompt source of truth: _system/prompts/cloud_marvin_runbook.md
+ * Mechanical pipeline: _system/scripts/marvin_cloud_refresh.py
+ *
  * Env:
  *   CURSOR_API_KEY  — required (repo secret)
  *   TICKER          — required (e.g. 8697.T)
  *   GITHUB_REPOSITORY — owner/repo (set automatically in Actions)
+ *   PICK_REASON     — optional (new_documents, new_valuation_news, manual, …)
  */
 import { readFileSync } from "node:fs";
 import { Agent, CursorAgentError } from "@cursor/sdk";
@@ -31,23 +35,21 @@ if (!repo) {
 }
 
 const prefix = readFileSync("_system/prompts/_prefix.md", "utf8");
-let template = readFileSync("_system/prompts/company-deep-dive.md", "utf8");
-template = template.replaceAll("{{TICKER}}", ticker).replaceAll("{{date}}", date);
+let runbook = readFileSync("_system/prompts/cloud_marvin_runbook.md", "utf8");
+runbook = runbook
+  .replaceAll("{{TICKER}}", ticker)
+  .replaceAll("{{date}}", date)
+  .replaceAll("{{PICK_REASON}}", pickReason);
 
 const prompt = `${prefix}
 
-${template}
+${runbook}
 
-Additional instructions for this cloud run:
-- Pick reason: ${pickReason} — if "new_documents", this is a **refresh** after daily download sync; read any files newer than the prior deep_dive_*.md. If "new_valuation_news", read dashboard/data/portfolio_news.json and {ticker}/research/news/news_index.json for refresh-eligible headlines since the last deep dive; focus the write-up on **what changed for cash flows / valuation**, not a full re-read of unchanged primary docs unless needed.
-- Apply approved beliefs from _system/memory/MEMORY.md (Munger, Pabrai, Stahl sections).
-- Apply lenses from _system/reference/investment-wisdom/INDEX.md for this ticker.
-- Read `_system/frameworks/decision_stack.md` and `_system/frameworks/hohn_business_analysis.md` (Hohn mechanics required in Business & moat).
-- Follow `_system/prompts/deep_dive_template.md` — five sections: Executive summary, Business & moat (incl. Hohn mechanics), Payoff & return, Risks & inversion, Classification.
-- Update ${ticker}/research/valuation.json; run \`python _system/scripts/marvin_valuation.py --ticker ${ticker} --write\`.
-- Run \`python _system/scripts/sync_classification.py --fix --ticker ${ticker}\` then build_dashboard_data.py.
-- Use stance from valuation.json stance_proposal unless override documented in [HUMAN REVIEW].
-- End reports with Classification table, [HUMAN REVIEW], and [PROPOSED COMPANY] bullets only.
+---
+
+**Cloud agent reminder:** You MUST finish by running:
+\`python _system/scripts/marvin_cloud_refresh.py ${ticker} --date ${date}\`
+after narrative + valuation.json updates. Do not hand-merge valuation sections; \`refresh_deep_dive_v2.py\` owns structure.
 `;
 
 const repoUrl = `https://github.com/${repo}`;

@@ -63,6 +63,10 @@ def load_valuation(ticker: str) -> dict | None:
 
 def valuation_classification(val: dict) -> dict:
     out = {}
+    inputs = val.get("classification_inputs") or {}
+    for key in ("archetype", "moat", "dhando", "cycle"):
+        if inputs.get(key) and inputs[key] not in ("-", "—", "pending", "unknown"):
+            out[key] = inputs[key]
     if val.get("lawrence_bucket"):
         out["lawrence_bucket"] = val["lawrence_bucket"]
     method = val.get("method", val.get("irr_method"))
@@ -76,6 +80,11 @@ def valuation_classification(val: dict) -> dict:
     proposal = val.get("stance_proposal", {})
     if proposal.get("suggested") and proposal["suggested"] != "pending":
         out["stance_proposed"] = proposal["suggested"]
+    approved = val.get("approved_stance") or proposal.get("approved_stance")
+    if approved:
+        out["stance"] = approved
+    elif proposal.get("suggested") and proposal["suggested"] != "pending":
+        out["stance"] = proposal["suggested"]
     return out
 
 
@@ -147,15 +156,15 @@ def check_ticker(ticker: str, portfolio: dict, fix: bool) -> list[str]:
 
     if fix and val:
         updated = dict(from_json)
+        for key in ("archetype", "moat", "dhando", "cycle", "stance"):
+            if from_val.get(key):
+                updated[key] = from_val[key]
         if from_val.get("implied_irr"):
             updated["implied_irr"] = from_val["implied_irr"]
         if from_val.get("irr_method"):
             updated["irr_method"] = from_val["irr_method"]
         if from_val.get("lawrence_bucket"):
             updated["lawrence_bucket"] = from_val["lawrence_bucket"]
-        approved = val.get("approved_stance") or (val.get("stance_proposal") or {}).get("approved_stance")
-        if approved:
-            updated["stance"] = approved
         portfolio[ticker] = updated
         update_thesis(ticker, portfolio[ticker])
 

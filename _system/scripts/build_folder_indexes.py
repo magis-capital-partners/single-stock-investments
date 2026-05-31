@@ -37,6 +37,21 @@ def build_index_csv(ticker_dir: Path) -> int:
 
 
 def main() -> None:
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Build INDEX.csv per ticker folder")
+    parser.add_argument("--ticker", help="Single ticker only (recommended after downloads)")
+    args = parser.parse_args()
+
+    if args.ticker:
+        p = ROOT / args.ticker
+        if not p.is_dir():
+            print(f"ERROR: {args.ticker} not found")
+            raise SystemExit(1)
+        n = build_index_csv(p)
+        print(f"OK {args.ticker} INDEX rows={n}")
+        return
+
     for p in sorted(ROOT.iterdir()):
         if not p.is_dir() or p.name in SKIP or p.name.startswith("."):
             continue

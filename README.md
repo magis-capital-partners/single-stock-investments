@@ -56,6 +56,30 @@ You can delete the old `DASHBOARD_SYNC_TOKEN` secret and archive `single-stock-d
 | [`dashboard-pages.yml`](.github/workflows/dashboard-pages.yml) | Push to `main` (dashboard paths) + manual | Rebuild JSON → deploy `dashboard/` to GitHub Pages |
 | [`marvin-deep-dive.yml`](.github/workflows/marvin-deep-dive.yml) | Manual (ticker input) | Cursor Cloud Agent deep dive → opens PR |
 | [`marvin-daily-deep-dive.yml`](.github/workflows/marvin-daily-deep-dive.yml) | Manual only | Pick on new documents (or **force_rotate**) → cloud agent → PR |
+| [`research-quality.yml`](.github/workflows/research-quality.yml) | PRs touching `**/research/**` | Lint dives + verify cloud prompt sync |
+
+### Marvin pipeline (local = cloud)
+
+1. **Narrative** — filing-grounded write per `_system/prompts/cloud_marvin_runbook.md` and `deep_dive_structure.md`
+2. **Mechanical** — one command:
+
+```powershell
+python _system/scripts/marvin_cloud_refresh.py TICKER --date 2026-05-29
+```
+
+3. **All holdings** — `python _system/scripts/batch_portfolio_refresh.py --date 2026-05-29`
+
+**INDEX.csv:** prefer per-ticker regen: `python _system/scripts/build_folder_indexes.py --ticker SNOW` (avoid full-portfolio regen unless intentional).
+
+### Cursor models and billing
+
+| Context | Model | Notes |
+|---------|--------|--------|
+| **IDE Composer** (local Marvin chat) | Your Cursor setting (e.g. Composer 2.5) | Uses your plan’s Composer allowance |
+| **GitHub Actions cloud Marvin** | `composer-2` in `marvin_deep_dive.mjs` | `CURSOR_API_KEY`; opens PR — not IDE tokens |
+| **Python scripts** | No LLM | `marvin_valuation`, `refresh_deep_dive_v2`, dashboard build |
+
+Cloud prompt stays aligned with local refresh via `_system/prompts/cloud_marvin_runbook.md`; CI runs `check_cloud_marvin_sync.py` on PRs.
 
 Push to `main` after downloads or research triggers a Pages deploy automatically when dashboard-related paths change.
 
@@ -86,7 +110,9 @@ git commit -m "research: YOUR_MESSAGE"
 git push origin main
 ```
 
-Or run **Actions → Marvin Deep Dive** with a ticker; review and merge the PR the cloud agent opens.
+Or run **Actions → Marvin Deep Dive** with a ticker; review and merge the PR the cloud agent opens (must end with `marvin_cloud_refresh.py` per runbook).
+
+Dashboard links use **filename date** (not mtime) for latest `deep_dive_*.md` / `adversarial_*.md`.
 
 ### Public repo note
 

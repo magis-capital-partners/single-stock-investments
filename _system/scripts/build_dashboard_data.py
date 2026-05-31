@@ -25,6 +25,32 @@ def github_blob_url(rel_path: str) -> str:
 def github_tree_url(rel_path: str) -> str:
     return f"https://github.com/{GITHUB_REPO}/tree/main/{rel_path.replace(chr(92), '/').rstrip('/')}"
 
+
+DATED_MD_RE = re.compile(r"_(\d{4}-\d{2}-\d{2})\.md$")
+
+
+def file_recency(path: Path) -> datetime:
+    """Prefer YYYY-MM-DD in filename; break ties with mtime (matches marvin_pick_ticker)."""
+    mtime_dt = datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc)
+    m = DATED_MD_RE.search(path.name)
+    if not m:
+        return mtime_dt
+    name_dt = datetime.strptime(m.group(1), "%Y-%m-%d").replace(tzinfo=timezone.utc)
+    return max(name_dt, mtime_dt)
+
+
+def latest_dated_md(research: Path, prefix: str) -> Path | None:
+    files = list(research.glob(f"{prefix}_*.md"))
+    if not files:
+        return None
+    return max(files, key=file_recency)
+
+
+def dated_md_label(path: Path) -> str:
+    m = DATED_MD_RE.search(path.name)
+    return m.group(1) if m else datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc).strftime("%Y-%m-%d")
+
+
 # Known metadata fallback when holdings.md is sparse
 TICKER_META = {
     "8697.T": {"company": "Japan Exchange Group", "market": "JP", "exchange": "TSE"},
@@ -241,6 +267,10 @@ def classification_for(ticker: str, ticker_dir: Path, portfolio: dict[str, dict]
     out = {k: merged.get(k, defaults[k]) for k in defaults}
     val = load_valuation(ticker_dir)
     if val:
+        inputs = val.get("classification_inputs") or {}
+        for key in ("archetype", "moat", "dhando", "cycle"):
+            if inputs.get(key) and inputs[key] not in ("-", "—", "pending"):
+                out[key] = inputs[key]
         implied = val.get("implied_return", {})
         if implied.get("display") and out.get("implied_irr") in ("pending", "—", None):
             out["implied_irr"] = implied["display"]
@@ -255,10 +285,36 @@ def classification_for(ticker: str, ticker_dir: Path, portfolio: dict[str, dict]
             out["stance_proposed"] = proposal["suggested"]
         if proposal.get("irr_band"):
             out["irr_band"] = proposal["irr_band"]
+        approved = val.get("approved_stance") or proposal.get("approved_stance")
+        if approved:
+            out["stance"] = approved
+        elif proposal.get("suggested") and proposal["suggested"] != "pending":
+            out["stance"] = proposal["suggested"]
         if val.get("as_of"):
             out["analysis_as_of"] = val["as_of"]
         out["analysis_irr_pct"] = parse_irr_pct(out.get("implied_irr"))
     return out
+
+
+def valuation_human_review(ticker_dir: Path) -> dict | None:
+    val = load_valuation(ticker_dir)
+    if not val:
+        return None
+    approved = val.get("approved_stance")
+    proposal = val.get("stance_proposal") or {}
+    override = val.get("override_reason") or proposal.get("override_reason")
+    hr = val.get("human_review") or {}
+    if not approved and not override and not hr:
+        return None
+    return {
+        "approved_stance": approved,
+        "model_stance": proposal.get("suggested"),
+        "override_reason": override,
+        "entry_band_15pct": hr.get("entry_band_15pct"),
+        "live_price_confirmed": hr.get("live_price_confirmed"),
+        "approved_date": hr.get("approved_date"),
+        "notes": hr.get("notes"),
+    }
 
 
 def thesis_status(ticker_dir: Path) -> str:
@@ -285,14 +341,34 @@ def one_line_thesis(ticker_dir: Path) -> str | None:
     return re.sub(r"\*\*", "", m.group(1).strip())
 
 
+def _research_links(ticker: str, ticker_dir: Path) -> dict:
+    research = ticker_dir / "research"
+    links = {
+        "folder": github_tree_url(f"{ticker}/"),
+        "readme": github_blob_url(f"{ticker}/README.md") if (ticker_dir / "README.md").exists() else None,
+        "thesis": github_blob_url(f"{ticker}/research/thesis.md")
+        if (research / "thesis.md").exists()
+        else None,
+        "valuation": github_blob_url(f"{ticker}/research/valuation.json")
+        if (research / "valuation.json").exists()
+        else None,
+        "adversarial": None,
+    }
+    if research.is_dir():
+        adv = latest_dated_md(research, "adversarial")
+        if adv:
+            rel = str(adv.relative_to(ROOT)).replace("\\", "/")
+            links["adversarial"] = github_blob_url(rel)
+    return links
+
+
 def latest_deep_dive(ticker_dir: Path, classification: dict) -> dict | None:
     research = ticker_dir / "research"
     if not research.exists():
         return None
-    dives = sorted(research.glob("deep_dive_*.md"), key=lambda p: p.stat().st_mtime, reverse=True)
-    if not dives:
+    path = latest_dated_md(research, "deep_dive")
+    if not path:
         return None
-    path = dives[0]
     text = path.read_text(encoding="utf-8", errors="ignore")
     rel = str(path.relative_to(ROOT)).replace("\\", "/")
     date_m = re.search(r"deep_dive_(\d{4}-\d{2}-\d{2})\.md$", path.name)
@@ -370,11 +446,13 @@ def recent_developments(ticker_dir: Path, ticker: str) -> list[dict]:
     research = ticker_dir / "research"
     dive_paths: list[Path] = []
     if research.exists():
-        dive_paths = sorted(research.glob("deep_dive_*.md"), key=lambda p: p.stat().st_mtime, reverse=True)[:2]
+        dive_paths = sorted(
+            research.glob("deep_dive_*.md"), key=file_recency, reverse=True
+        )[:2]
         for f in dive_paths:
             rel = str(f.relative_to(ROOT)).replace("\\", "/")
             devs.append({
-                "date": datetime.fromtimestamp(f.stat().st_mtime, tz=timezone.utc).strftime("%Y-%m-%d"),
+                "date": dated_md_label(f),
                 "type": "deep_dive",
                 "label": f"Deep dive — {f.stem.replace('deep_dive_', '')}",
                 "source": "Marvin",
@@ -448,12 +526,9 @@ def build_ticker_row(ticker: str, holdings: dict[str, dict], portfolio_class: di
         "classification": classification,
         "thesis_status": classification["archetype"],
         "one_line_thesis": one_line_thesis(ticker_dir),
-        "links": {
-            "folder": github_tree_url(f"{ticker}/"),
-            "readme": github_blob_url(f"{ticker}/README.md") if (ticker_dir / "README.md").exists() else None,
-            "thesis": github_blob_url(f"{ticker}/research/thesis.md") if (ticker_dir / "research" / "thesis.md").exists() else None,
-        },
+        "links": _research_links(ticker, ticker_dir),
         "deep_dive": latest_deep_dive(ticker_dir, classification),
+        "human_review": valuation_human_review(ticker_dir),
         "recent_files": recent_files(ticker_dir),
         "developments": recent_developments(ticker_dir, ticker),
         "onboard": onboard_status(ticker_dir),
