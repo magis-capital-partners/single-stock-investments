@@ -1,32 +1,32 @@
 # Holdings
 
-Synced from `_system/portfolio/registry.json`. Last sync: 2026-05-30.
+Synced from `_system/portfolio/registry.json`. Last sync: 2026-05-31.
 
 **Classification schema:** `_system/frameworks/classification.md` · source map: `_system/portfolio/classification.json`
 
 | Ticker | Folder | Company | Market | Last download | Last research | Archetype | Stance |
 |--------|--------|---------|--------|---------------|---------------|-----------|--------|
-| 3905.T | 3905.T/ | DataSection Co., Ltd. | JP | 2026-05-30 | 2026-05-30 | compounder | watch |
-| 8697.T | 8697.T/ | Japan Exchange Group | JP | 2026-05-30 | 2026-05-30 | croupier | hold |
-| AMZN | AMZN/ | Amazon.com | US | 2026-05-30 | 2026-05-30 | compounder | hold |
-| APLD | APLD/ | Applied Digital | US | 2026-05-30 | 2026-05-30 | optionality | watch |
-| BN | BN/ | Brookfield Corporation | US | 2026-05-30 | 2026-05-30 | platform | hold |
-| CMSG | CMSG/ | Consensus Mining & Seigniorage Corp | US | 2026-05-30 | 2026-05-30 | optionality | watch |
-| CPRT | CPRT/ | Copart | US | 2026-05-30 | 2026-05-30 | compounder | core |
-| CSGP | CSGP/ | CoStar Group | US | 2026-05-30 | 2026-05-30 | platform | watch |
-| CSU | CSU/ | Constellation Software | CA | 2026-05-30 | 2026-05-30 | compounder | core |
-| DHR | DHR/ | Danaher Corporation | US | 2026-05-30 | 2026-05-30 | compounder | hold |
-| FRMO | FRMO/ | FRMO Corporation | US | 2026-05-30 | 2026-05-30 | holding_co | hold |
-| GOOGL | GOOGL/ | Alphabet Inc. | US | 2026-05-30 | 2026-05-30 | compounder | hold |
-| ICE | ICE/ | Intercontinental Exchange | US | 2026-05-30 | 2026-05-30 | croupier | hold |
-| KEWL | KEWL/ | Keweenaw Land Association | US | 2026-05-30 | 2026-05-30 | optionality | watch |
-| MSB | MSB/ | Mesabi Trust | US | 2026-05-30 | 2026-05-30 | optionality | watch |
-| OTCM | OTCM/ | OTC Markets Group | US | 2026-05-30 | 2026-05-30 | croupier | watch |
-| QDEL | QDEL/ | QuidelOrtho | US | 2026-05-30 | 2026-05-30 | turnaround | hold |
-| SJT | SJT/ | San Juan Basin Royalty Trust | US | 2026-05-30 | 2026-05-30 | optionality | watch |
-| SNOW | SNOW/ | Snowflake Inc | US | 2026-05-30 | 2026-05-30 | platform | watch |
-| SPGI | SPGI/ | S&P Global | US | 2026-05-30 | 2026-05-30 | croupier | hold |
-| TEQ.ST | TEQ.ST/ | Teqnion AB | SE | 2026-05-30 | 2026-05-30 | serial_acquirer | hold |
-| WBI | WBI/ | WaterBridge Infrastructure | US | 2026-05-30 | 2026-05-30 | infrastructure | watch |
+| 3905.T | 3905.T/ | DataSection Co., Ltd. | JP | 2026-05-31 | 2026-05-31 | compounder | watch |
+| 8697.T | 8697.T/ | Japan Exchange Group | JP | 2026-05-31 | 2026-05-31 | croupier | hold |
+| AMZN | AMZN/ | Amazon.com | US | 2026-05-31 | 2026-05-31 | compounder | hold |
+| APLD | APLD/ | Applied Digital | US | 2026-05-31 | 2026-05-31 | optionality | watch |
+| BN | BN/ | Brookfield Corporation | US | 2026-05-31 | 2026-05-31 | platform | hold |
+| CMSG | CMSG/ | Consensus Mining & Seigniorage Corp | US | 2026-05-31 | 2026-05-31 | optionality | watch |
+| CPRT | CPRT/ | Copart | US | 2026-05-31 | 2026-05-31 | compounder | core |
+| CSGP | CSGP/ | CoStar Group | US | 2026-05-31 | 2026-05-31 | platform | watch |
+| CSU | CSU/ | Constellation Software | CA | 2026-05-31 | 2026-05-31 | compounder | core |
+| DHR | DHR/ | Danaher Corporation | US | 2026-05-31 | 2026-05-31 | compounder | hold |
+| FRMO | FRMO/ | FRMO Corporation | US | 2026-05-31 | 2026-05-31 | holding_co | hold |
+| GOOGL | GOOGL/ | Alphabet Inc. | US | 2026-05-31 | 2026-05-31 | compounder | hold |
+| ICE | ICE/ | Intercontinental Exchange | US | 2026-05-31 | 2026-05-31 | croupier | hold |
+| KEWL | KEWL/ | Keweenaw Land Association | US | 2026-05-31 | 2026-05-31 | optionality | watch |
+| MSB | MSB/ | Mesabi Trust | US | 2026-05-31 | 2026-05-31 | optionality | watch |
+| OTCM | OTCM/ | OTC Markets Group | US | 2026-05-31 | 2026-05-31 | croupier | watch |
+| QDEL | QDEL/ | QuidelOrtho | US | 2026-05-31 | 2026-05-31 | turnaround | hold |
+| SJT | SJT/ | San Juan Basin Royalty Trust | US | 2026-05-31 | 2026-05-31 | optionality | watch |
+| SNOW | SNOW/ | Snowflake Inc | US | 2026-05-31 | 2026-05-31 | platform | watch |
+| SPGI | SPGI/ | S&P Global | US | 2026-05-31 | 2026-05-31 | croupier | hold |
+| TEQ.ST | TEQ.ST/ | Teqnion AB | SE | 2026-05-31 | 2026-05-31 | serial_acquirer | hold |
+| WBI | WBI/ | WaterBridge Infrastructure | US | 2026-05-31 | 2026-05-31 | infrastructure | watch |
 
 **22 holdings total.** Registry: `_system/portfolio/registry.json`
