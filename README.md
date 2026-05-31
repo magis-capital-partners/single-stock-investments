@@ -76,7 +76,7 @@ python _system/scripts/marvin_cloud_refresh.py TICKER --date 2026-05-29
 | Context | Model | Notes |
 |---------|--------|--------|
 | **IDE Composer** (local Marvin chat) | Your Cursor setting (e.g. Composer 2.5) | Uses your plan’s Composer allowance |
-| **GitHub Actions cloud Marvin** | `composer-2` in `marvin_deep_dive.mjs` | `CURSOR_API_KEY`; opens PR — not IDE tokens |
+| **GitHub Actions cloud Marvin** | `composer-2.5` in `marvin_deep_dive.mjs` | `CURSOR_API_KEY`; opens PR — not IDE tokens |
 | **Python scripts** | No LLM | `marvin_valuation`, `refresh_deep_dive_v2`, dashboard build |
 
 Cloud prompt stays aligned with local refresh via `_system/prompts/cloud_marvin_runbook.md`; CI runs `check_cloud_marvin_sync.py` on PRs.

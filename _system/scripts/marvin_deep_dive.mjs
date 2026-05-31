@@ -58,7 +58,7 @@ try {
   console.log(`Starting Marvin deep dive for ${ticker} on ${repoUrl}...`);
   const result = await Agent.prompt(prompt, {
     apiKey,
-    model: { id: "composer-2" },
+    model: { id: "composer-2.5" },
     cloud: {
       repos: [{ url: repoUrl }],
       autoCreatePR: true,
