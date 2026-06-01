@@ -464,7 +464,14 @@
         "source": "10-K/10-Q OCF; growth_explanation",
         "return_pct": -1.0,
         "weight": 0.3,
-        "type": "numeric"
+        "type": "numeric",
+        "epistemic_tier": "A (primary falsifiable)",
+        "weight_why": "Only path tied to 10-K/10-Q owner cash with growth mechanism + falsifier runner; highest refutation reach.",
+        "weight_falsifiers": [
+          "Any triggered growth falsifier forces weight cut or path removal",
+          "Theory-implied diverges from falsifier-adjusted by >2pp without documented mechanism change"
+        ],
+        "hard_to_vary": "yes: weight tracks evidence tier, not target IRR"
       },
       {
         "id": "scenario_bear",
@@ -472,7 +479,13 @@
         "source": "scenarios.bear",
         "return_pct": -5.4,
         "weight": 0.05,
-        "type": "numeric"
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
       },
       {
         "id": "scenario_bull",
@@ -480,7 +493,13 @@
         "source": "scenarios.bull",
         "return_pct": 3.4,
         "weight": 0.12,
-        "type": "numeric"
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
       },
       {
         "id": "segment_implied",
@@ -488,7 +507,14 @@
         "source": "segment_build @ explicit discount",
         "return_pct": -0.84,
         "weight": 0.2,
-        "type": "numeric"
+        "type": "numeric",
+        "epistemic_tier": "B (independent derivation)",
+        "weight_why": "Reverse DCF from segment filing data; cross-checks consolidated growth without replacing falsifier path.",
+        "weight_falsifiers": [
+          "Segment sum PV tie-out fails vs consolidated OCF",
+          "Implied return moves >1pp when segment growth matches filing falsifier-adjusted exactly (double-count signal)"
+        ],
+        "hard_to_vary": "partial: shares growth inputs with Tier A; weight kept below filing path"
       },
       {
         "id": "nav_overlay_payoff",
@@ -496,7 +522,14 @@
         "source": "nav_overlay ~$210.5/sh vs price $393.0",
         "return_pct": -6.05,
         "weight": 0.1,
-        "type": "numeric"
+        "type": "numeric",
+        "epistemic_tier": "D (alternate theory: dated asset payoff)",
+        "weight_why": "Answers a different question (NAV convergence) than 10yr cash-flow IRR; capped weight to avoid theory conflation.",
+        "weight_falsifiers": [
+          "NAV overlay base not updated when segment build or filings change >10%",
+          "floor_pass false but weight above 15% without [HUMAN REVIEW]"
+        ],
+        "hard_to_vary": "yes: separate theory type"
       },
       {
         "id": "third_party_context",
@@ -505,7 +538,14 @@
         "return_pct": 3.4,
         "weight": 0.1,
         "type": "numeric",
-        "notes": "Proxy: upside case when strategic third party has no spot IRR"
+        "notes": "Proxy: upside case when strategic third party has no spot IRR",
+        "epistemic_tier": "D (external triangulation)",
+        "weight_why": "Context-tier HK/Substacks until human promotes in third_party_sources.md; numeric proxy is weak.",
+        "weight_falsifiers": [
+          "Using bull scenario as HK proxy when cross_check synthesis says no IRR upgrade",
+          "Weight above 15% while human_approval pending"
+        ],
+        "hard_to_vary": "no: proxy return is instrumentalist; prefer qualitative pp until approved blend"
       }
     ],
     "qualitative_adjustments": [
@@ -544,6 +584,20 @@
     "qualitative_pp": 0.45,
     "total_synthesis_pct": -0.23,
     "human_approval": "pending",
+    "weight_audit": {
+      "flags": [
+        "Third-party numeric path proxies bull scenario (instrumentalist); HK cross-check says no base IRR upgrade. Prefer qualitative pp only until approved blend.",
+        "NAV overlay is a different theory (asset payoff vs cash-flow IRR); weight capped at 10% to limit theory conflation.",
+        "Segment implied approx filing falsifier-adjusted; shared growth inputs. Combined Tier A+B weight is ~54% after renormalize (watch double-count).",
+        "Qualitative \u00b1pp stack may overlap numeric paths (moat/dhando); cap \u00b13pp and require source for each row."
+      ],
+      "deutsch_checks": {
+        "hard_to_vary": false,
+        "falsifiable": true,
+        "not_instrumentalist": false,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      }
+    },
     "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
   }
 }

@@ -41,6 +41,43 @@ Weights renormalize to 100%. Override per ticker in `valuation.json` → `synthe
 
 ---
 
+## Popper / Deutsch — why these weights (not arbitrary)
+
+A weighted IRR is itself a **conjecture**: “these independent lenses, combined in these proportions, best estimate ten-year return.” Without an explicit weight theory, the blend is **unfalsifiable curve-fitting** (Popper) or a **bad explanation** (Deutsch: easy to vary, no testable claim).
+
+### Epistemic tiers (default)
+
+| Tier | Paths | Default raw weight | Why |
+|------|-------|-------------------|-----|
+| **A — primary falsifiable** | Filing falsifier-adjusted | 30% | 10-K/10-Q anchor + growth mechanism + falsifier runner; highest refutation reach |
+| **B — independent derivation** | Segment reverse DCF, theory-implied | 20% / 8% | Same filings, different math; cross-check, not replacement |
+| **C — scenario envelope** | Bear / bull | 5% / 12% | Sensitivity probes, not competing base theories; bull > bear for optionality skew |
+| **D — alternate / external** | NAV overlay, third party | 10% / 10% each | **Different question** (asset payoff) or **context tier** until human approval; capped |
+
+**Rule:** Weights encode **evidence quality**, not a desired IRR. If reweighting would flip stance without new filing facts, the scheme is instrumentalist → **[HUMAN REVIEW]**.
+
+### Weight-scheme falsifiers (required in dive)
+
+Document in `#### Why these weights (Popper / Deutsch)`:
+
+1. **Double-count:** Segment implied ≈ filing path → combined A+B weight too high
+2. **Theory conflation:** NAV payoff weighted like cash-flow IRR
+3. **Instrumentalist proxy:** Third-party row uses bull scenario when cross-check says no IRR upgrade
+4. **Qualitative overlap:** ±pp for moat/dhando already inside segment multiples or filing growth
+
+### Deutsch gate (synthesis block)
+
+| Check | Requirement |
+|-------|-------------|
+| Hard to vary | Each weight tied to tier + source type, not “felt right” |
+| Falsifiable | Each path lists observations that force weight cut |
+| Not instrumentalist | No path chosen to move synthesis toward a narrative |
+| Reach | Weights explain *why* beyond the single ticker price |
+
+Spec mirrors `growth_explanation_stress_test.md` but applies to the **blend**, not growth rate alone.
+
+---
+
 ## Formula
 
 1. **Numeric paths:** weighted average of all rows with `return_pct` (10-year comparable).
