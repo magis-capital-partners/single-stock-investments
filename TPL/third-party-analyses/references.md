@@ -17,9 +17,9 @@ Auto-scan `TPL/third-party-analyses/hk_scan_2026-06-01.md`. Mental models: predi
 
 | HK / Stahl source | Topic | Status |
 |-----------------|-------|--------|
-| `_system/reference/investment-wisdom/horizon-kinetics/HK-Q1-2025-Commentary-extract.txt` | Water scarcity index weight; TPL vs Land Bridge context | Context — not in base IRR |
-| `_system/reference/investment-wisdom/horizon-kinetics/HK-Q1-2026-Commentary-extract.txt` | Hard-asset scarcity; pipeline optionality via TPL association | Context — not in base IRR |
-| `_system/reference/investment-wisdom/horizon-kinetics/Stahl-Worth-The-Time-Predictive-Attributes-extract.txt` | Board conflict disclosure; no HK trading authority on TPL | Context — not in base IRR |
-| `_system/reference/investment-wisdom/horizon-kinetics/HK-Q3-2025-Commentary-extract.txt` | Line 1642: (“TPL”) and Miami International Holdings (“MIAX”), both of which are  | Context — not in base IRR |
-| `_system/reference/investment-wisdom/horizon-kinetics/HK-Q3-2025-Commentary-extract.txt` | Line 1644: substantial amounts of TPL and MIAX, both directly and indirectly, in | Context — not in base IRR |
-| `_system/reference/investment-wisdom/horizon-kinetics/HK-Q3-2025-Commentary-extract.txt` | Line 1646: and physical safeguards. Additionally, Mr. Stahl does not exercise in | Context — not in base IRR |
+| `_system/reference/investment-wisdom/horizon-kinetics/HK-Q1-2025-Commentary-extract.txt` | Water scarcity index weight; TPL vs Land Bridge context | Context (not in base IRR) |
+| `_system/reference/investment-wisdom/horizon-kinetics/HK-Q1-2026-Commentary-extract.txt` | Hard-asset scarcity; pipeline optionality via TPL association | Context (not in base IRR) |
+| `_system/reference/investment-wisdom/horizon-kinetics/Stahl-Worth-The-Time-Predictive-Attributes-extract.txt` | Board conflict disclosure; no HK trading authority on TPL | Context (not in base IRR) |
+| `_system/reference/investment-wisdom/horizon-kinetics/HK-Q3-2025-Commentary-extract.txt` | Line 1642: (“TPL”) and Miami International Holdings (“MIAX”), both of which are  | Context (not in base IRR) |
+| `_system/reference/investment-wisdom/horizon-kinetics/HK-Q3-2025-Commentary-extract.txt` | Line 1644: substantial amounts of TPL and MIAX, both directly and indirectly, in | Context (not in base IRR) |
+| `_system/reference/investment-wisdom/horizon-kinetics/HK-Q3-2025-Commentary-extract.txt` | Line 1646: and physical safeguards. Additionally, Mr. Stahl does not exercise in | Context (not in base IRR) |

@@ -37,8 +37,16 @@ def split_sections(text: str) -> dict[str, str]:
         title = m.group(1).strip()
         start = m.end()
         end = matches[i + 1].start() if i + 1 < len(matches) else len(text)
-        parts[title] = text[start:end].strip()
+        parts[title] = normalize_section_body(text[start:end])
     return parts
+
+
+def normalize_section_body(body: str) -> str:
+    """Strip spurious horizontal rules left by prior refresh passes."""
+    if not body.strip():
+        return ""
+    lines = [ln for ln in body.splitlines() if ln.strip() != "---"]
+    return "\n".join(lines).strip()
 
 
 def extract_irr_block(body: str) -> tuple[str, str | None]:
@@ -502,7 +510,7 @@ def assumption_ledger(val: dict) -> str:
             n += 1
         if recon.get("implied_business_return_pct") is not None:
             rows.append(
-                f"| {n} | Segment implied return | **{format_overlay_return_pct(recon['implied_business_return_pct'])}** | reverse DCF (segment PV = P₀) |"
+                f"| {n} | Segment implied return | **{format_overlay_return_pct(recon['implied_business_return_pct'])}** | reverse DCF (segment PV = price today) |"
             )
             n += 1
         blend = val.get("estimates", {}).get("blended_best")
@@ -515,10 +523,103 @@ def assumption_ledger(val: dict) -> str:
 
 def format_overlay_return_pct(pct: float | int | None) -> str:
     if pct is None:
-        return "—"
+        return "n/a"
     if isinstance(pct, (int, float)) and abs(pct) < 0.05:
         return f"~{pct:.2f}%"
     return f"{pct}%"
+
+
+def growth_explanation_stress_block(val: dict) -> str:
+    """Render Popper/Deutsch growth stress test from valuation.json growth_explanation."""
+    ge = val.get("growth_explanation") or {}
+    if not ge.get("theory_label"):
+        return ""
+    fa = ge.get("falsifier_adjusted") or {}
+    base = val.get("scenarios", {}).get("base", {})
+    g1 = fa.get("y1_5") if fa.get("y1_5") is not None else base.get("growth_y1_5")
+    g2 = fa.get("y6_10") if fa.get("y6_10") is not None else base.get("growth_y6_10")
+    if g1 is None:
+        return ""
+    g1_pct = g1 * 100
+    g2_pct = (g2 or 0) * 100
+    status = ge.get("status", "partial")
+    lines = [
+        "### Growth explanation stress test (Popper / Deutsch)",
+        "",
+        "| Field | Value |",
+        "|-------|-------|",
+        f"| Growth assumption under test | Years 1–5: **{g1_pct:.1f}%**; years 6–10: **{g2_pct:.1f}%** (falsifier-adjusted base) |",
+        f"| Theory name | {ge.get('theory_label', '')} |",
+        f"| Status | **{status}** |",
+        "",
+    ]
+    if ge.get("problem_situation"):
+        lines += [f"**Problem situation:** {ge['problem_situation']}", ""]
+    mechs = ge.get("mechanisms") or []
+    if mechs:
+        lines += [
+            "#### Explanatory theory (why this growth rate)",
+            "",
+            "| # | Mechanism | Causal chain (plain English) | Filing / evidence | Hard to vary? |",
+            "|---|-----------|------------------------------|-------------------|---------------|",
+        ]
+        for i, m in enumerate(mechs, 1):
+            lines.append(
+                f"| {i} | {m.get('id', '')} | {m.get('chain', '')[:120]} | `{m.get('evidence', '')[:60]}` | {m.get('hard_to_vary', '')} |"
+            )
+        lines.append("")
+    preds = ge.get("risky_predictions") or []
+    if preds:
+        lines += [
+            "#### Risky predictions (Popper)",
+            "",
+            "| # | Prediction | By when | If false → |",
+            "|---|------------|---------|------------|",
+        ]
+        for i, p in enumerate(preds, 1):
+            lines.append(f"| {i} | {p.get('text', '')[:100]} | {p.get('by', '')} | {p.get('falsifier_action', '')[:80]} |")
+        lines.append("")
+    fals = ge.get("falsifiers") or []
+    if fals:
+        lines += [
+            "#### Falsifiers (what would refute the theory)",
+            "",
+            "| # | Observation | Effect on growth assumption |",
+            "|---|-------------|----------------------------|",
+        ]
+        for i, f in enumerate(fals, 1):
+            lines.append(f"| {i} | {f.get('observation', '')[:100]} | {f.get('action', '')[:80]} |")
+        lines.append("")
+    banned = ge.get("ad_hoc_rescue_banned") or []
+    if banned:
+        lines += ["#### Ad hoc rescue watch (Popper)", ""]
+        for b in banned:
+            lines.append(f"- {b}")
+        lines.append("")
+    dc = ge.get("deutsch_checks") or {}
+    if dc:
+        def yn(v: object) -> str:
+            return "yes" if v is True else ("no" if v is False else str(v))
+        lines += [
+            "#### Deutsch checks",
+            "",
+            "| Check | Pass? |",
+            "|-------|-------|",
+            f"| Hard to vary | {yn(dc.get('hard_to_vary'))} |",
+            f"| Reach | {yn(dc.get('reach'))} |",
+            f"| Falsifiable | {yn(dc.get('falsifiable'))} |",
+            f"| Not instrumentalist | {yn(dc.get('not_instrumentalist'))} |",
+            "",
+        ]
+    excluded = ge.get("excluded_from_base") or []
+    if excluded:
+        lines += ["**Excluded from base growth:**"]
+        for ex in excluded:
+            item = str(ex.get("item", "")).replace("\u2014", ":")
+            treat = str(ex.get("treatment", "")).replace("\u2014", ":")
+            lines.append(f"- {item}: {treat}")
+        lines.append("")
+    return "\n".join(lines)
 
 
 def extract_preserved_block(preserved: str | None, heading: str) -> str | None:
@@ -817,7 +918,7 @@ def irr_arithmetic(val: dict, ticker: str, preserved: str | None) -> str:
             else ""
         )
         lines += [
-            "How we calculated the annual return (base case) — verify with "
+            "How we calculated the annual return (base case). Verify with "
             f"`python _system/scripts/marvin_valuation.py --ticker {ticker}`",
             "",
             f"1. **Price today:** **${price}**",
@@ -836,7 +937,7 @@ def irr_arithmetic(val: dict, ticker: str, preserved: str | None) -> str:
             )
         return "\n".join(lines)
 
-    lines.append("IRR pending — see [HUMAN REVIEW].")
+    lines.append("IRR pending. See [HUMAN REVIEW].")
     return "\n".join(lines)
 
 
@@ -847,6 +948,7 @@ def build_valuation_section(ticker: str, val: dict, preserved_val: str | None) -
     method = val.get("method", "full")
     base_pct = val.get("implied_return", {}).get("base_pct") or val.get("results", {}).get("base", {}).get("return_pct", "?")
     seg_body = segment_build_section(val, preserved_val)
+    ge_body = growth_explanation_stress_block(val)
     irr_body = irr_arithmetic(val, ticker, preserved_val)
     upside = ""
     if preserved_val:
@@ -888,6 +990,8 @@ def build_valuation_section(ticker: str, val: dict, preserved_val: str | None) -
             "",
             assumption_ledger(val),
             "",
+            ge_body,
+            "" if not ge_body else "",
             seg_body,
             "",
             irr_body,
