@@ -49,6 +49,7 @@ DEFAULT_CLASSIFICATION = {
     "stance": "watch",
     "cycle": "-",
     "moi_bucket": "pending",
+    "payoff_lens": "pending",
 }
 
 

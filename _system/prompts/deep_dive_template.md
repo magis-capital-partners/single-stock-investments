@@ -27,15 +27,7 @@ Copy structure for `{TICKER}/research/deep_dive_{date}.md`.
 
 ## Why the market might be wrong
 
-{2–3 sentences. HK predictive attribute in plain English.}
-
-**MOI lens** (`moi_lens.md`):
-
-| Question | Answer |
-|----------|--------|
-| Source of inefficiency | … |
-| Margin of safety | … |
-| Path to value creation | … |
+{2–3 sentences. Q5: predictive attribute; name inefficiency if `asset`/`event` lens; catalyst + timeline when event-driven.}
 
 ---
 
@@ -152,11 +144,7 @@ _Complete per `option_treatment.md` — every dive, every ticker._
 
 {≤3 bullets. Inversion.}
 
-### Uses & misuses (MOI)
-
-| Uses (why this bucket fits) | Misuses (how this idea type fails) |
-|-----------------------------|-------------------------------------|
-| … | … |
+**Lens failure mode:** … *(required when payoff_lens is asset / event / levered; omit for operating)*
 
 ---
 

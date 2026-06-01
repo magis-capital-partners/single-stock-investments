@@ -55,9 +55,8 @@ LOOKTHROUGH_OR_SOTP = re.compile(
     r"#### (Look-through snapshot|Sum-of-parts or NAV)", re.IGNORECASE
 )
 CATALYST_PATH = re.compile(r"#### Catalyst path", re.IGNORECASE)
-MOI_USES_MISUSES = re.compile(r"### Uses & misuses", re.IGNORECASE)
-MOI_INEFFICIENCY = re.compile(r"(source of inefficiency|margin of safety|path to value creation)", re.IGNORECASE)
-MOI_BUCKET = re.compile(r"\*\*MOI bucket\*\*", re.IGNORECASE)
+LENS_FAILURE = re.compile(r"\*\*Lens failure mode:\*\*", re.IGNORECASE)
+PAYOFF_LENS = re.compile(r"\*\*Payoff lens\*\*", re.IGNORECASE)
 
 EM_DASH = "\u2014"  # —
 EXEC_SUMMARY_MAX_WORDS = 220
@@ -184,17 +183,8 @@ def lint_file(path: Path, *, legacy: bool, strict: bool) -> tuple[list[str], lis
         errors.append(f"{rel}: missing **Primary risk:** in Risks section (Hohn essentials)")
 
     if not legacy:
-        if not MOI_INEFFICIENCY.search(text):
-            (errors if strict else warnings).append(
-                f"{rel}: missing MOI three questions under Why the market might be wrong "
-                "(inefficiency, margin of safety, path to value creation — moi_lens.md)"
-            )
-        if not MOI_USES_MISUSES.search(text):
-            (errors if strict else warnings).append(
-                f"{rel}: missing ### Uses & misuses (MOI) in Risks section (moi_lens.md)"
-            )
-        if not MOI_BUCKET.search(text):
-            warnings.append(f"{rel}: Classification missing MOI bucket (moi_lens.md)")
+        if not PAYOFF_LENS.search(text):
+            warnings.append(f"{rel}: Classification missing Payoff lens (analysis_arsenal.md)")
 
     if HOLDING_CO.search(text):
         if not LOOKTHROUGH_OR_SOTP.search(text):

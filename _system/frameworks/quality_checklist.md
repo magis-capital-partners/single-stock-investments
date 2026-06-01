@@ -21,8 +21,7 @@
 - [ ] Flag related-party transactions, dual-class shares, or concentration risk
 - [ ] List top 3 business-specific risks from primary filings
 - [ ] Munger inversion — what kills the thesis?
-- [ ] MOI uses & misuses table for `moi_bucket` (`moi_lens.md`)
-- [ ] Management invert (jockey): compensation vs owners; actions vs proxy rhetoric (`hohn_business_analysis.md`)
+- [ ] Lens failure mode if payoff_lens ≠ operating (`analysis_arsenal.md`)
 
 ## Valuation (→ Payoff & return)
 - [ ] Five-question gate complete
