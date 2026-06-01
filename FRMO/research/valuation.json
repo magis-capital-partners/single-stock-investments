@@ -13,24 +13,24 @@
   "inputs": {
     "price": 6.7,
     "price_source": "Stooq FRMO.US close 2026-05-22",
-    "book_per_share": 8.54,
+    "book_per_share": 7.47,
     "normalization_note": "Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book.",
     "book_per_share_filed": 8.56,
-    "book_per_share_current": 8.54
+    "book_per_share_current": 7.47
   },
   "optionality_gate": {
     "framework": "holdco_sotp",
     "floor_pass": true,
     "floor_metric": "book_per_share",
-    "floor_value": 8.54,
+    "floor_value": 7.47,
     "primary_metric": "lawrence_base",
     "primary_label": "annualized return",
     "primary_return_pct": 21.9,
     "incumbent_sleeve": true,
     "notes": "Trades ~22% below book ($8.55); same SOTP payoffs as prior refresh. HK/MIAX/CMSG catalysts unchanged.",
     "floor_value_filed": 8.56,
-    "floor_value_current": 8.54,
-    "discount_to_current_book_pct": 21.5
+    "floor_value_current": 7.47,
+    "discount_to_current_book_pct": 10.3
   },
   "scenarios": {
     "bear": {
@@ -170,13 +170,32 @@
           "mih_miax": {
             "uplift_per_share": 0.5,
             "gaap_fair_value_m": 13.917,
-            "miax_price_today": 51.42,
-            "implied_shares": 270563,
+            "measurement_date": "2026-02-27",
+            "miax_price_at_measurement": 42.6,
+            "miax_price_at_measurement_source": "Yahoo MIAX 2026-02-27",
+            "implied_shares": 326690,
+            "miax_price_today": null,
             "miax_price_year5": 60.0,
-            "direct_incremental_m": 2.321,
+            "direct_incremental_m": 5.69,
+            "direct_incremental_note": "326690 \u00d7 (60 \u2212 42.60) at measurement date; recalc on refresh",
             "fund_miax_shares_assumed": 380000,
             "fund_incremental_m": 3.26,
-            "exchange_rerate_m": 16.43
+            "exchange_rerate_m": 16.43,
+            "mark_date_alignment": "mark_date_alignment.md"
+          },
+          "investment_a_lookthrough": {
+            "weights_path": "FRMO/research/investment_a_weights_2026-06-01.md",
+            "parent_filing_value_m": 308.984,
+            "weights_pct": {
+              "TPL": 52,
+              "GBTC": 14,
+              "MIAX_funds": 8,
+              "WPM": 5,
+              "ICE": 4,
+              "FNV": 3,
+              "HKHC": 5,
+              "residual": 9
+            }
           },
           "winland_cmsg": {
             "uplift_per_share": 0.4,
@@ -260,11 +279,11 @@
     "filing_period_end": "2026-02-28",
     "filing_source": "investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
     "filed_book_per_share": 8.56,
-    "current_book_per_share": 8.54,
-    "delta_per_share": -0.02,
-    "delta_pct_of_filed_book": -0.24,
+    "current_book_per_share": 7.47,
+    "delta_per_share": -1.08,
+    "delta_pct_of_filed_book": -12.67,
     "discount_to_filed_book_pct": 21.7,
-    "discount_to_current_estimate_pct": 21.5,
+    "discount_to_current_estimate_pct": 10.3,
     "config_path": "FRMO/research/book_estimate_config.json",
     "output_path": "FRMO/research/book_estimate.json"
   }

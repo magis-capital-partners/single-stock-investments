@@ -3,21 +3,22 @@
   "enabled": true,
   "filing_anchor": {
     "period_end": "2026-02-28",
+    "measurement_date": "2026-02-27",
     "source": "investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
     "scope": "frmo_attributable",
     "book_equity_m": 376.704,
     "shares": 44022781
   },
+  "investment_a_weights_note": "FRMO/research/investment_a_weights_2026-06-01.md",
   "lines": [
     {
       "id": "mih_miax",
       "label": "MIH / MIAX direct stake (fair value)",
       "method": "listed_shares",
       "symbol": "MIAX.US",
-      "shares": 270563,
-      "filing_price": 51.42,
       "filing_value_m": 13.917,
-      "source": "2026-02-28_Quarterly_Report.pdf Note 4; valuation.json mih_miax"
+      "filing_price_auto": true,
+      "source": "2026-02-28_Quarterly_Report.pdf Note 4; shares implied from FV ÷ measurement-date close"
     },
     {
       "id": "cmsg_stake",
@@ -26,9 +27,11 @@
       "shares": 17417,
       "filing_price": 42.6,
       "filing_value_m": 0.742,
+      "filing_price_date": "2026-02-27",
+      "filing_price_source": "CMSG OTC ~Feb 2026; CMSG.US not on Stooq — [HUMAN REVIEW]",
       "current_price": 30.0,
-      "source": "2026-02-28_Quarterly_Report.pdf Note 4; CMSG proxy indirect FRMO 17,417 sh; CMSG.US not on Stooq",
-      "human_review": true
+      "human_review": true,
+      "source": "2026-02-28_Quarterly_Report.pdf Note 4; CMSG proxy indirect FRMO 17,417 sh"
     },
     {
       "id": "hkhc_equity",
@@ -37,43 +40,87 @@
       "symbol": "HKHC.US",
       "ownership_pct": 4.42,
       "shares_outstanding": 22400000,
-      "filing_price": 27.48,
+      "filing_price_auto": true,
       "filing_carrying_value_m": 27.187,
-      "source": "2026-02-28_Quarterly_Report.pdf; shares_out [HUMAN REVIEW]",
-      "human_review": true
+      "human_review": true,
+      "source": "2026-02-28_Quarterly_Report.pdf; HKHC shares_out [HUMAN REVIEW]"
     },
     {
       "id": "investment_a_tpl",
-      "label": "Investment A look-through — TPL (weight proxy)",
+      "label": "Investment A look-through — TPL",
       "method": "fund_weight_proxy",
       "parent_filing_value_m": 308.984,
-      "weight_pct": 35,
+      "weight_pct": 52,
       "symbol": "TPL.US",
-      "filing_price": 380.0,
-      "source": "[HUMAN REVIEW] LCI/Stahl top holding ~35% of Investment A; confirm when look-through filed",
-      "human_review": true
+      "filing_price_auto": true,
+      "source": "HK Q4 2024 Commentary: TPL 59% flagship fund; 52% consolidated Investment A proxy"
     },
     {
       "id": "investment_a_gbtc",
-      "label": "Investment A look-through — GBTC (weight proxy)",
+      "label": "Investment A look-through — GBTC / crypto sleeve",
       "method": "fund_weight_proxy",
       "parent_filing_value_m": 308.984,
-      "weight_pct": 15,
+      "weight_pct": 14,
       "symbol": "GBTC.US",
-      "filing_price": 52.0,
-      "source": "[HUMAN REVIEW] LCI crypto stack; GBTC weight estimate",
-      "human_review": true
+      "filing_price_auto": true,
+      "source": "HK Q4 2024 Commentary: crypto funds 17%; LCI HKAM crypto via GBTC"
+    },
+    {
+      "id": "investment_a_miax_funds",
+      "label": "Investment A look-through — MIAX inside Horizon funds",
+      "method": "fund_weight_proxy",
+      "parent_filing_value_m": 308.984,
+      "weight_pct": 8,
+      "symbol": "MIAX.US",
+      "filing_price_auto": true,
+      "source": "FRMO Q3 FY2026 call: MIAX strong YTD driver; fund sleeve estimate (not direct MIH line)"
+    },
+    {
+      "id": "investment_a_wpm",
+      "label": "Investment A look-through — Wheaton Precious Metals (WPM)",
+      "method": "fund_weight_proxy",
+      "parent_filing_value_m": 308.984,
+      "weight_pct": 5,
+      "symbol": "WPM.US",
+      "filing_price_auto": true,
+      "source": "LCI / fintel HKAM top holdings; WWNPX peer set"
+    },
+    {
+      "id": "investment_a_ice",
+      "label": "Investment A look-through — Intercontinental Exchange (ICE)",
+      "method": "fund_weight_proxy",
+      "parent_filing_value_m": 308.984,
+      "weight_pct": 4,
+      "symbol": "ICE.US",
+      "filing_price_auto": true,
+      "source": "LCI HKAM top holdings list"
+    },
+    {
+      "id": "investment_a_fnv",
+      "label": "Investment A look-through — Franco-Nevada (FNV)",
+      "method": "fund_weight_proxy",
+      "parent_filing_value_m": 308.984,
+      "weight_pct": 3,
+      "symbol": "FNV.US",
+      "filing_price_auto": true,
+      "source": "LCI HKAM top holdings list"
     },
     {
       "id": "investment_a_hkhc",
-      "label": "Investment A look-through — HKHC (weight proxy)",
+      "label": "Investment A look-through — HKHC listed overlap",
       "method": "fund_weight_proxy",
       "parent_filing_value_m": 308.984,
-      "weight_pct": 10,
+      "weight_pct": 5,
       "symbol": "HKHC.US",
-      "filing_price": 27.48,
-      "source": "[HUMAN REVIEW] HK ecosystem overlap inside Investment A",
-      "human_review": true
+      "filing_price_auto": true,
+      "source": "HK ecosystem overlap inside fund book; distinct from FRMO 4.42% direct line"
+    },
+    {
+      "id": "investment_a_residual",
+      "label": "Investment A — residual (cash, other names, private)",
+      "method": "static",
+      "filing_value_m": 27.808,
+      "source": "308.984 × 9% residual; static until look-through table filed"
     }
   ]
 }

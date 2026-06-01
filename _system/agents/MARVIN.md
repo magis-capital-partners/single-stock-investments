@@ -68,7 +68,7 @@ Third party: approved registry in `third_party_sources.md`; pending PDFs flagged
 
 **Land / infrastructure (TPL, KEWL):** `nav_overlay` when GAAP misstates assets; segment build for producing vs undeveloped.
 
-**Holdco / treasury book discount (FRMO, CMSG):** `book_estimate_config.json` + `python _system/scripts/current_book_estimate.py {TICKER} --write`. Reports cite **filed book** and **current book estimate** separately.
+**Holdco / treasury book discount (FRMO, CMSG):** `book_estimate_config.json` + `python _system/scripts/current_book_estimate.py {TICKER} --write`. Reports cite **filed book** and **current book estimate** separately. **`mark_date_alignment.md`** — filing fair value prices must use **measurement_date**, never a later Stooq quote.
 
 ## Peer templates
 - Best JP structure: `8697.T/`

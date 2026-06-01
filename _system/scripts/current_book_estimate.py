@@ -13,7 +13,7 @@ import json
 import sys
 import urllib.error
 import urllib.request
-from datetime import date
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -25,6 +25,104 @@ COINGECKO_URL = (
     "https://api.coingecko.com/api/v3/simple/price?ids={ids}&vs_currencies=usd"
 )
 UA = "Mozilla/5.0 (compatible; MarvinBookEstimate/1.0)"
+YAHOO_UA = "Mozilla/5.0 (compatible; MarvinBookEstimate/1.0)"
+
+
+def yahoo_ticker(symbol: str) -> str:
+    sym = symbol.upper().replace(".US", "")
+    return sym
+
+
+def measurement_date_for_period_end(period_end: str) -> str:
+    """Last calendar day on or before period_end that is Mon–Fri (NYSE proxy)."""
+    d = datetime.strptime(period_end, "%Y-%m-%d").date()
+    while d.weekday() >= 5:
+        d -= timedelta(days=1)
+    return d.isoformat()
+
+
+def fetch_yahoo_close(symbol: str, on_date: str) -> tuple[float | None, str | None]:
+    ysym = yahoo_ticker(symbol)
+    dt = datetime.strptime(on_date, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+    start = int(dt.timestamp())
+    end = start + 86400 * 7
+    url = (
+        f"https://query1.finance.yahoo.com/v8/finance/chart/{ysym}"
+        f"?period1={start}&period2={end}&interval=1d"
+    )
+    req = urllib.request.Request(url, headers={"User-Agent": YAHOO_UA})
+    try:
+        data = json.loads(urllib.request.urlopen(req, timeout=20).read())
+        result = data["chart"]["result"][0]
+        timestamps = result["timestamp"]
+        closes = result["indicators"]["quote"][0]["close"]
+        for ts, close in zip(timestamps, closes):
+            if close is None:
+                continue
+            d = datetime.fromtimestamp(ts, tz=timezone.utc).strftime("%Y-%m-%d")
+            if d >= on_date:
+                return float(close), None
+        return None, f"no close on or after {on_date}"
+    except (urllib.error.URLError, TimeoutError, KeyError, IndexError, json.JSONDecodeError) as exc:
+        return None, str(exc)
+
+
+def enrich_line_for_measurement(
+    line: dict,
+    measurement_date: str,
+    hist_cache: dict[str, tuple[float | None, str | None]],
+) -> tuple[dict, dict | None]:
+    """Resolve filing_price on measurement_date; compute implied shares when needed."""
+    enriched = dict(line)
+    alignment: dict | None = None
+    method = line.get("method", "static")
+    symbol = line.get("symbol")
+
+    if symbol and method in ("listed_shares", "fund_weight_proxy", "ownership_market_value"):
+        key = f"{symbol}|{measurement_date}"
+        if key not in hist_cache:
+            hist_cache[key] = fetch_yahoo_close(symbol, measurement_date)
+        fetched, err = hist_cache[key]
+        manual = line.get("filing_price")
+        use_auto = line.get("filing_price_auto", True)
+        if fetched is not None and (use_auto or manual is None):
+            enriched["filing_price"] = round(fetched, 4)
+            enriched["filing_price_source"] = f"Yahoo {yahoo_ticker(symbol)} {measurement_date}"
+        elif manual is not None:
+            enriched["filing_price_source"] = line.get(
+                "filing_price_source", f"manual (config); verify {measurement_date}"
+            )
+        if fetched is not None and manual is not None:
+            diff_pct = abs(fetched - manual) / manual * 100 if manual else 0
+            if diff_pct > 2:
+                alignment = {
+                    "id": line.get("id"),
+                    "symbol": symbol,
+                    "measurement_date": measurement_date,
+                    "config_filing_price": manual,
+                    "fetched_filing_price": round(fetched, 4),
+                    "diff_pct": round(diff_pct, 1),
+                    "severity": "warning" if diff_pct < 10 else "error",
+                    "note": "filing_price must match measurement_date per mark_date_alignment.md",
+                }
+        if err and fetched is None and manual is None:
+            alignment = {
+                "id": line.get("id"),
+                "symbol": symbol,
+                "measurement_date": measurement_date,
+                "severity": "error",
+                "note": f"could not fetch filing price: {err}",
+            }
+
+    if method == "listed_shares" and enriched.get("filing_value_m") and not enriched.get("shares"):
+        fp = enriched.get("filing_price")
+        if fp:
+            implied = float(enriched["filing_value_m"]) * 1_000_000 / float(fp)
+            enriched["shares"] = int(round(implied))
+            enriched["shares_implied_from_filing"] = True
+
+    enriched["filing_price_date"] = measurement_date
+    return enriched, alignment
 
 
 def load_json(path: Path) -> dict:
@@ -229,8 +327,15 @@ def compute_line(line: dict, cache: dict[str, float | None]) -> dict[str, Any]:
         out["coingecko_id"] = line["coingecko_id"]
     if current_price is not None:
         out["current_price"] = round(current_price, 4)
+        out["current_price_date"] = str(date.today())
     if line.get("filing_price") is not None:
         out["filing_price"] = line["filing_price"]
+    if line.get("filing_price_date"):
+        out["filing_price_date"] = line["filing_price_date"]
+    if line.get("filing_price_source"):
+        out["filing_price_source"] = line["filing_price_source"]
+    if line.get("shares_implied_from_filing"):
+        out["shares_implied_from_filing"] = True
     if line.get("shares") is not None:
         out["shares"] = line["shares"]
     if line.get("units") is not None:
@@ -250,12 +355,24 @@ def compute_line(line: dict, cache: dict[str, float | None]) -> dict[str, Any]:
 
 def compute_book_estimate(config: dict, as_of: str | None = None) -> dict:
     anchor = config["filing_anchor"]
+    period_end = anchor.get("period_end", "")
+    measurement_date = anchor.get("measurement_date") or measurement_date_for_period_end(period_end)
+
+    hist_cache: dict[str, tuple[float | None, str | None]] = {}
+    price_alignment: list[dict] = []
+    enriched_lines: list[dict] = []
+    for line in config.get("lines", []):
+        enriched, align = enrich_line_for_measurement(line, measurement_date, hist_cache)
+        enriched_lines.append(enriched)
+        if align:
+            price_alignment.append(align)
+
     shares = float(anchor["shares"])
     filed_equity_m = float(anchor["book_equity_m"])
     filed_book_ps = filed_equity_m * 1_000_000 / shares
 
     cache: dict[str, float | None] = {}
-    computed_lines = [compute_line(line, cache) for line in config.get("lines", [])]
+    computed_lines = [compute_line(line, cache) for line in enriched_lines]
 
     delta_sum_m = sum(
         ln["delta_m"] for ln in computed_lines if ln.get("delta_m") is not None
@@ -275,6 +392,11 @@ def compute_book_estimate(config: dict, as_of: str | None = None) -> dict:
             staleness.append(f"{ln['id']}: {ln['price_error']}")
         if ln.get("human_review"):
             staleness.append(f"{ln['id']}: [HUMAN REVIEW]")
+    for pa in price_alignment:
+        if pa.get("severity") == "error":
+            staleness.append(
+                f"{pa.get('id')}: price alignment — {pa.get('note', pa)}"
+            )
 
     price = config.get("market_price")
     price_source = config.get("market_price_source")
@@ -301,8 +423,10 @@ def compute_book_estimate(config: dict, as_of: str | None = None) -> dict:
         "ticker": config.get("ticker"),
         "as_of": as_of or str(date.today()),
         "framework": "current_book_estimate.md",
+        "mark_date_framework": "mark_date_alignment.md",
         "filing_anchor": {
             "period_end": anchor.get("period_end"),
+            "measurement_date": measurement_date,
             "source": anchor.get("source"),
             "scope": anchor.get("scope"),
             "book_equity_m": filed_equity_m,
@@ -310,6 +434,7 @@ def compute_book_estimate(config: dict, as_of: str | None = None) -> dict:
             "filed_book_per_share": round_sh(filed_book_ps),
         },
         "lines": computed_lines,
+        "price_alignment": price_alignment,
         "tie_out": {
             "markable_filing_sum_m": round_m(markable_filing_m),
             "static_residual_m": static_residual_m,

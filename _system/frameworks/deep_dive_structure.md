@@ -39,7 +39,7 @@
 | 8 | **Blended estimate** | Only if approved/pending external view cited |
 | 9 | **Payoff & return** | Gates, dhando, stance — **points to Valuation & IRR** |
 | 10 | **Risks & inversion** | Primary risk + ≤3 bullets + **lens failure mode** if non-`operating` payoff lens |
-| 11 | **Valuation & IRR (assumption ledger)** | **End of analysis** — ledger + segment build (if any) + IRR arithmetic |
+| 11 | **Valuation & IRR (assumption ledger)** | **End of analysis** — ledger + segment build (if any) + IRR arithmetic + **current book estimate** when `book_estimate_config.json` exists |
 | 12 | Footer | Classification, Terms, [HUMAN REVIEW], [PROPOSED MEMORY] |
 
 ---
