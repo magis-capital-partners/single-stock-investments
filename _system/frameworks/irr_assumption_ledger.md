@@ -5,9 +5,9 @@
 **Placement:** `## Valuation & IRR (assumption ledger)` — **last major section**, after `## Risks & inversion`, **before** `## Classification`.  
 **Not** inside Business & moat.
 
-**Companion files:** `lawrence_irr.md` § F · `deep_dive_structure.md` · `archetype_valuation_prose.md` · `growth_explanation_stress_test.md` · `{TICKER}/research/valuation.json`
+**Companion files:** `lawrence_irr.md` § F · `deep_dive_structure.md` · `archetype_valuation_prose.md` · `{TICKER}/research/valuation.json`
 
-**Readable labels:** Assumption ledger rows and bridge "Main assumptions" use **plain English** (no `P₀`, `g1`, `FCF₀`). Archetype-specific examples: `archetype_valuation_prose.md`.
+**Readable labels:** Assumption ledger rows use **plain English** (no `P₀`, `g1`, `FCF₀`). Archetype-specific examples: `archetype_valuation_prose.md`.
 
 ---
 
@@ -19,11 +19,6 @@
 **Price today:** $X (source, date)  
 **Method:** {irr_method} · **Base IRR:** Y% · `valuation.json`
 
-### Valuation bridge
-
-| Case | Method | Key inputs | Implied return | vs ~15% bar |
-|------|--------|------------|----------------|-------------|
-
 ### Assumption ledger (base case)
 
 | # | Assumption | Value | Source or judgment |
@@ -34,21 +29,7 @@
 
 {Method-specific buildup — every row must have a source or **[Assumption]** / **[HUMAN REVIEW]**}
 
-**Growth rows (3–4):** Source column must cite **`Growth theory: {theory_label}`** plus filing or **[Assumption]**. If no theory, mark **[HUMAN REVIEW]** minimum.
-
-### Growth explanation stress test (Popper / Deutsch)
-
-After the assumption ledger, before IRR arithmetic. Spec: `growth_explanation_stress_test.md`.
-
-| Required block | Content |
-|----------------|---------|
-| Explanatory theory | Mechanism table: causal chain, filing evidence, hard-to-vary |
-| Risky predictions | At least one quantitative near-term test |
-| Falsifiers | Observations that force cut or drop of the growth rate |
-| Ad hoc rescue watch | Adjustments refused without new theory |
-| Deutsch checks | Hard to vary, reach, falsifiable, not instrumentalist |
-
-Store mirror in `valuation.json` → `growth_explanation` when method is `full`, `scenario`, or segment overlay.
+**Growth rows (3–4):** Source column cites filing path, segment build, or **[Assumption]** with one-line mechanism in Business & moat — not a separate philosophy subsection.
 
 ### IRR arithmetic (show your work)
 
@@ -58,6 +39,8 @@ Store mirror in `valuation.json` → `growth_explanation` when method is `full`,
 
 **Returns statement:** … (must match base % in executive summary)
 ```
+
+**Do not include in deep dives:** valuation bridge overlay tables (theory-implied, falsifier-adjusted, Lawrence legacy, segment sum/implied rows), Popper/Deutsch stress-test subsections, or Deutsch check tables. Bear/bull sensitivity lives in `valuation.json` → `scenarios` only.
 
 ---
 
@@ -75,8 +58,8 @@ Store mirror in `valuation.json` → `growth_explanation` when method is `full`,
 3. **No silent math.** If the report says “3% per year,” show `book × (1.03^5 − 1) = $Z/sh`.
 4. **Multiples are results, not inputs.** e.g. `payoff ÷ book = 2.1×` only **after** the sum-of-parts.
 5. **Tie-out slack** — if sub-lines do not sum to the model payoff, show a **Tie-out** row (do not hide the gap).
-6. **Bear / bull** — at least one sentence each: what changes vs base (payoff, growth, or owner cash).
-7. **Growth theory** — rows 3–4 (growth years 1–5 / 6–10) must link to `### Growth explanation stress test`; no unexplained CAGR.
+6. **Bear / bull** — document in `valuation.json` scenarios; one sentence in Payoff & return on what changes vs base (payoff, growth, or owner cash). No duplicate bridge table in the markdown.
+7. **Growth** — rows 3–4 must cite filing, segment build, or **[Assumption]** with mechanism stated in Business & moat.
 
 ---
 
@@ -91,7 +74,7 @@ Store mirror in `valuation.json` → `growth_explanation` when method is `full`,
 ### `scenario` / `full` (owner cash / FCF)
 
 | # | Typical assumption |
-|---|------------------|
+|---|-------------------|
 | 1 | P₀ |
 | 2 | Owner cash or FCF₀ per share (normalization note) |
 | 3 | Growth years 1–5 |
@@ -111,8 +94,7 @@ Use **with** `method: full` (or `scenario`). Consolidated ledger rows stay; **ad
 | … | Per-segment owner cash Y0, growth, exit multiple |
 | … | Each option (base terminal $0; bull value) |
 | … | Corporate capex drag / allocation |
-| … | Sum PV/sh + implied business return at P₀ |
-| … | Tie-out vs Lawrence consolidated IRR |
+| … | Sum PV/sh (in segment build subsection, not ledger duplicate rows) |
 
 Subsections: `### Segment cash-flow build` + `#### Segment IRR arithmetic`. Spec: `segment_cashflow_valuation.md`.
 
@@ -129,7 +111,7 @@ Subsections: `### Segment cash-flow build` + `#### Segment IRR arithmetic`. Spec
 |---|---------|
 | 1–4 | Header, What, Why, Executive summary (**one** base %, no math) |
 | 5 | Primary sources reviewed |
-| 6 | Business & moat (**no** IRR block; no valuation bridge table) |
+| 6 | Business & moat (**no** IRR block) |
 | 7–8 | Approved Substack / Blended estimate (if applicable) |
 | 9 | Payoff & return (gates, dhando, stance — **points to Valuation & IRR**) |
 | 10 | Risks & inversion |

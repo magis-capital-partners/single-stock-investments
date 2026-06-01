@@ -17,8 +17,8 @@ For segment builds specifically, also read **`segment_cashflow_valuation.md`**.
 1. **Map segments** from latest 10-K/10-Q segment note—not from memory alone.
 2. **Value each operating segment** with its own owner-cash path (growth, exit multiple, capex attribution). **Sum** discounted PVs.
 3. **Model in-business options** per **`option_treatment.md`** — complete **Option scan**; **`zero`** only with `base_terminal_rationale`; use `embedded_in_segment`, `milestone_nav`, `probability_weighted`, or `nav_floor` when evidence supports.
-4. **Reverse DCF cross-check:** at **P₀ today**, state implied **business return** for explicit segment assumptions (Drew Cohen / Speedwell).
-5. **Keep Lawrence consolidated IRR** as legacy reference (`results_lawrence_legacy`); **falsifier-adjusted IRR** (`implied_return.base_pct`) is stance gate and website display.
+4. **Reverse DCF cross-check:** at **P₀ today**, state implied **business return** in segment build footer (not a separate valuation bridge row).
+5. **Lawrence consolidated IRR** (`implied_return.base_pct`) is stance gate and website display.
 6. In deep dives: **`#### Segment map`** in Business & moat; **`### Segment cash-flow build`** + **`#### Segment IRR arithmetic`** in **Valuation & IRR** (end of report).
 7. Persist assumptions in `{TICKER}/research/valuation.json` → `valuation_overlay: "segment_cashflow"` + `segment_build`.
 

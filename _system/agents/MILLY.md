@@ -64,27 +64,24 @@ When dive mentions options, hidden assets, undeveloped reserves, Other Bets, Rea
 
 YAML: `option_coverage: complete | partial | incomplete | n/a`
 
-### 2d. Growth explanation (Popper / Deutsch)
+### 2d. Growth explanation
 
 When dive uses `method: full`, `scenario`, or `segment_cashflow` overlay (not `yield_curve`-only holdco with no growth rows):
 
 | Check | Severity if failed |
 |-------|-------------------|
-| **`### Growth explanation stress test`** in Valuation & IRR (after ledger, before IRR arithmetic) | **Inference risk** |
-| Growth ledger rows cite `Growth theory:` label | **Inference risk** per orphan row |
-| At least one **risky prediction** and one **falsifier** | **Inference risk** |
-| Theory is easy-to-vary ("quality compounder grows X%") | **Inference risk** |
+| Growth ledger rows cite filing or **[Assumption]** | **Inference risk** per orphan row |
+| Mechanism stated in Business & moat when growth > filing run-rate + 300 bp | **Inference risk** |
 | Instrumentalist-only defense (growth = reverse-DCF at price) | **Inference risk** |
-| Growth > filing run-rate + 300 bp with no falsifiers | **Inference risk** |
-| `valuation.json` → `growth_explanation` present when growth material | **Warn** if missing |
+| Popper/Deutsch subsection or valuation bridge overlay rows present | **Warn** — remove on refresh |
 
-YAML: `growth_explanation: complete | partial | incomplete | n/a`
+YAML: `growth_explanation: n/a` (default; optional JSON enrichment)
 
 ### 2. Internal consistency
 
 | Check | Tool |
 |-------|------|
-| `valuation.json` ↔ exec ↔ returns ↔ classification ↔ valuation bridge | `lint_adversarial.py` |
+| `valuation.json` ↔ exec ↔ returns ↔ classification | `lint_adversarial.py` |
 | SOTP lines ↔ payoff | `lint_adversarial.py` |
 | Assumption ledger sum (holdco) | Milly manual + lint |
 | Empty `#### Look-through` / `#### Catalyst path` | `lint_adversarial.py` |
@@ -177,7 +174,7 @@ re_pass: false
 | `valuation_staleness` | pass / warn / fail — FCF₀ period vs capex guide (`ai_infrastructure_valuation.md`) |
 | `ai_coverage` | n/a / partial / complete — AI overlay completeness |
 | `option_coverage` | n/a / complete / partial / incomplete — option scan + treatment (`option_treatment.md`) |
-| `growth_explanation` | n/a / complete / partial / incomplete — Popper/Deutsch growth stress test (`growth_explanation_stress_test.md`) |
+| `growth_explanation` | n/a (default) — optional JSON; no Popper/Deutsch markdown block |
 
 After Marvin fixes: set `block_final: false`, add **Resolved in dive** section, run `milly_repass.py {TICKER}`.
 

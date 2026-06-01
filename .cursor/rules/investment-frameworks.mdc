@@ -23,7 +23,6 @@ Before writing research (`{TICKER}/research/`), deep dives, portfolio scans, or 
 | `_system/prompts/deep_dive_template.md` | Copy-paste outline |
 | `_system/frameworks/hohn_business_analysis.md` | Operating snapshot, pillars (appendix) |
 | `_system/frameworks/option_treatment.md` | **Every deep dive** — option scan; treatment ladder; no auto-zero |
-| `_system/frameworks/growth_explanation_stress_test.md` | **Every deep dive** — Popper/Deutsch why for each growth rate; falsifiers |
 | `_system/frameworks/optionality_valuation.md` | Holdco, mineral/land NAV, HK curve, `nav_overlay`, `optionality_gate` |
 | `_system/frameworks/segment_cashflow_valuation.md` | **Multi-segment compounders** (GOOGL, AMZN, META, MSFT) — Speedwell reverse DCF + Hohn segment sum |
 | `_system/frameworks/ai_infrastructure_valuation.md` | **AI hyperscalers** — capex cycle, TPU/chips, backlog, cost curve vs Lawrence FCF₀; Milly staleness |
@@ -34,16 +33,8 @@ Before writing research (`{TICKER}/research/`), deep dives, portfolio scans, or 
 | `_system/frameworks/mental_models.md` | Model catalog appendix |
 | `_system/frameworks/classification.md` | Footer field definitions |
 | `_system/frameworks/investment_process.md` | Discover → download → analyze workflow |
-| `_system/frameworks/moi_lens.md` | **Every deep dive** — MOI bucket, three questions, uses/misuses |
-| `_system/frameworks/idea_funnel.md` | Discover / onboard gate before full dive |
-| `_system/frameworks/special_situation_lens.md` | Event-driven; inefficiency registry; annualized return |
-| `_system/frameworks/equity_stub_valuation.md` | Leveraged equity; scenario IRR only |
+| `_system/frameworks/moi_lens.md` | Legacy moi_bucket → payoff_lens map only |
 | `_system/reference/investment-wisdom/INDEX.md` | PDF / HK extract map |
-| `_system/reference/philosophy/deutsch-popper/INDEX.md` | Popper falsifiability + Deutsch good explanations — growth stress test |
-
-## Philosophy library (Popper / Deutsch)
-
-`_system/reference/philosophy/deutsch-popper/` — download via `download_philosophy_refs.py`. Apply when writing growth theories, not from training memory alone.
 
 ## Wisdom library (PDFs + HK extracts)
 
@@ -76,4 +67,4 @@ Use `{TICKER}/INDEX.csv` or `{TICKER}/document-index.csv` as the document map wh
 - Download refresh → `{TICKER}/research/download_refresh_{date}.md`
 - Daily scan → `_system/reviews/pending/scan_{date}.md` (under 800 words)
 
-All deep dives follow `deep_dive_structure.md` + `deep_dive_template.md`. **Valuation & IRR** section at end with **Assumption ledger** table + **`### Growth explanation stress test`** + **`#### IRR arithmetic (show your work)`** (`irr_assumption_ledger.md`, `growth_explanation_stress_test.md`, `lawrence_irr.md` § F). Run `refresh_deep_dive_v2.py` then `lint_deep_dive.py` before handoff.
+All deep dives follow `deep_dive_structure.md` + `deep_dive_template.md`. **Valuation & IRR** section at end with **Assumption ledger** table + **`#### IRR arithmetic (show your work)`** (`irr_assumption_ledger.md`, `lawrence_irr.md` § F). No valuation bridge overlay table or Popper/Deutsch subsections. Run `refresh_deep_dive_v2.py` then `lint_deep_dive.py` before handoff.

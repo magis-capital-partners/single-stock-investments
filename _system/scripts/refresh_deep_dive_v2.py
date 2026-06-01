@@ -222,16 +222,10 @@ def primary_irr_pct(val: dict) -> float | int | str | None:
 
 
 def growth_rates_for_irr(val: dict) -> tuple[float, float, float | int]:
-    """Return (g1, g2, exit_multiple) for IRR arithmetic — falsifier-adjusted when present."""
-    ge = val.get("growth_explanation") or {}
-    fa = ge.get("falsifier_adjusted") or {}
+    """Return (g1, g2, exit_multiple) for IRR arithmetic from scenarios.base."""
     base = val.get("scenarios", {}).get("base", {})
-    if fa.get("y1_5") is not None:
-        g1 = fa["y1_5"]
-        g2 = fa.get("y6_10", base.get("growth_y6_10", 0.03))
-    else:
-        g1 = base.get("growth_y1_5", 0.05)
-        g2 = base.get("growth_y6_10", 0.03)
+    g1 = base.get("growth_y1_5", 0.05)
+    g2 = base.get("growth_y6_10", 0.03)
     ex = base.get("exit_pfcf_y10") or base.get("exit_multiple", 10)
     return g1, g2, ex
 
@@ -248,11 +242,6 @@ def patch_classification_stance(text: str, val: dict) -> str:
     display = (val.get("implied_return") or {}).get("display")
     if display:
         text = re.sub(
-            r"\*\*Implied 10yr IRR\*\* \(Lawrence\)",
-            "**Implied 10yr IRR** (falsifier-adjusted)",
-            text,
-        )
-        text = re.sub(
             r"(\|\s*\*\*Implied 10yr IRR\*\*[^|]*\|\s*)([^\|]+)(\|)",
             lambda m: f"{m.group(1)}{display}     {m.group(3)}",
             text,
@@ -265,24 +254,16 @@ def patch_exec_summary_irr(body: str, val: dict) -> str:
     base_pct = primary_irr_pct(val)
     if base_pct is None:
         return body
-    legacy = (val.get("implied_return") or {}).get("lawrence_legacy_pct")
     body = re.sub(
-        r"\*\*Lawrence consolidated base 10yr IRR is [\d.-]+%\*\*",
-        f"**falsifier-adjusted 10-year annual return is {base_pct}%**",
+        r"\*\*(?:Lawrence consolidated base|falsifier-adjusted) 10-year annual return is [\d.-]+%\*\*",
+        f"**Base 10-year annual return is {base_pct}%**",
         body,
     )
     body = re.sub(
-        r"Lawrence base 10-year annual return is \*\*[\d.-]+%\*\*",
-        f"Falsifier-adjusted 10-year annual return is **{base_pct}%**",
+        r"(?:Lawrence base|Falsifier-adjusted) 10-year annual return is \*\*[\d.-]+%\*\*",
+        f"Base 10-year annual return is **{base_pct}%**",
         body,
     )
-    if legacy is not None and legacy != base_pct and "Lawrence legacy" not in body:
-        body = re.sub(
-            rf"(\*\*falsifier-adjusted 10-year annual return is {re.escape(str(base_pct))}%\*\*)",
-            rf"\1 (Lawrence legacy {legacy}% reference only)",
-            body,
-            count=1,
-        )
     return body
 
 
@@ -292,13 +273,13 @@ def patch_payoff_expected_return(body: str, val: dict) -> str:
         return body
 
     def repl_base(m: re.Match) -> str:
-        return f"{m.group(1)}**{base_pct}%** (falsifier-adjusted){m.group(2)}"
+        return f"{m.group(1)}**{base_pct}%**{m.group(2)}"
 
     def repl_base_plain(m: re.Match) -> str:
-        return f"{m.group(1)}{base_pct}% (falsifier-adjusted){m.group(2)}"
+        return f"{m.group(1)}{base_pct}%{m.group(2)}"
 
     body = re.sub(r"(\|\s*Base\s*\|\s*)\*\*[\d.-]+%\*\*(\s*\|)", repl_base, body, count=1)
-    body = re.sub(r"(\|\s*Base\s*\|\s*)[\d.-]+%(\s*\|)", repl_base_plain, body, count=1)
+    body = re.sub(r"(\|\s*Base\s*\|\s*)[\d.-]+%(?:\s*\([^)]*\))?(\s*\|)", repl_base_plain, body, count=1)
     return body
 
 
@@ -432,24 +413,13 @@ def assumption_ledger(val: dict) -> str:
             )
             n += 1
         ge = val.get("growth_explanation") or {}
-        theory_label = ge.get("theory_label", "growth theory")
-        fa = ge.get("falsifier_adjusted") or {}
-        ti = ge.get("theory_implied") or {}
+        theory_label = ge.get("theory_label")
         base = val.get("scenarios", {}).get("base", {})
-        if fa.get("y1_5") is not None:
-            g1, g2 = fa["y1_5"], fa.get("y6_10", base.get("growth_y6_10"))
-            rows.append(
-                f"| {n} | Growth in years 1 through 5 | **{g1*100:.1f}%** per year | Falsifier-adjusted · {theory_label} |"
-            )
-            n += 1
-            rows.append(
-                f"| {n} | Growth in years 6 through 10 | **{g2*100:.1f}%** per year | Falsifier-adjusted · segment-derived |"
-            )
-            n += 1
-        elif base.get("growth_y1_5") is not None:
+        if base.get("growth_y1_5") is not None:
             g1 = base.get("growth_y1_5")
+            src = base.get("notes") or (f"Growth theory: {theory_label}" if theory_label else "[Assumption]")
             rows.append(
-                f"| {n} | Growth in years 1 through 5 | **{g1*100:.1f}%** per year | {base.get('notes', '[Assumption]')} |"
+                f"| {n} | Growth in years 1 through 5 | **{g1*100:.1f}%** per year | {src} |"
             )
             n += 1
             g2 = base.get("growth_y6_10")
@@ -458,24 +428,6 @@ def assumption_ledger(val: dict) -> str:
                     f"| {n} | Growth in years 6 through 10 | **{g2*100:.1f}%** per year | Scenario base |"
                 )
                 n += 1
-        if ti.get("y1_5") is not None and fa.get("y1_5") is not None:
-            if abs(ti["y1_5"] - fa["y1_5"]) > 0.0001:
-                rows.append(
-                    f"| {n} | Theory-implied growth Y1–5 (pre-falsifier) | **{ti['y1_5']*100:.1f}%** | {ti.get('derivation', 'segment blend')} |"
-                )
-                n += 1
-        legacy = (val.get("results_lawrence_legacy") or {}).get("base", {}).get("return_pct")
-        fa_irr = (val.get("results_growth_theory") or {}).get("falsifier_adjusted", {}).get("return_pct")
-        if fa_irr is not None:
-            rows.append(
-                f"| {n} | Falsifier-adjusted annual return | **{fa_irr}%** | Primary IRR (`implied_return.base_pct`) |"
-            )
-            n += 1
-        if legacy is not None and fa_irr is not None and legacy != fa_irr:
-            rows.append(
-                f"| {n} | Lawrence legacy annual return | **{legacy}%** | Reference only (pre-theory scenarios.base) |"
-            )
-            n += 1
         ex = base.get("exit_pfcf_y10") or base.get("exit_multiple")
         if ex is not None:
             rows.append(
@@ -500,17 +452,6 @@ def assumption_ledger(val: dict) -> str:
         if stress.get("implied_fcf_per_share") is not None:
             rows.append(
                 f"| {n} | Capex stress Y0 FCF | **${stress['implied_fcf_per_share']}/sh** | {stress.get('capex_source', 'mgmt guide')} |"
-            )
-            n += 1
-        recon = (val.get("segment_build") or {}).get("reconciliation") or {}
-        if recon.get("sum_pv_per_share_at_explicit_discount") is not None:
-            rows.append(
-                f"| {n} | Segment sum PV | **${recon['sum_pv_per_share_at_explicit_discount']}/sh** | @ {recon.get('explicit_discount_rate_pct', 10)}% discount |"
-            )
-            n += 1
-        if recon.get("implied_business_return_pct") is not None:
-            rows.append(
-                f"| {n} | Segment implied return | **{format_overlay_return_pct(recon['implied_business_return_pct'])}** | reverse DCF (segment PV = price today) |"
             )
             n += 1
         blend = val.get("estimates", {}).get("blended_best")
@@ -854,9 +795,7 @@ def enrich_business_moat(body: str, val: dict, ticker: str, preserved: str | Non
 
 
 def irr_arithmetic(val: dict, ticker: str, preserved: str | None) -> str:
-    ge = val.get("growth_explanation") or {}
-    has_theory = (ge.get("falsifier_adjusted") or {}).get("y1_5") is not None
-    if preserved and "#### IRR arithmetic" in preserved and not has_theory:
+    if preserved and "#### IRR arithmetic" in preserved:
         m = re.search(
             r"#### IRR arithmetic \(show your work\)(.*?)(?=\n\*\*Upside / downside|\n## |\Z)",
             preserved,
@@ -864,7 +803,12 @@ def irr_arithmetic(val: dict, ticker: str, preserved: str | None) -> str:
         )
         if m and len(m.group(1).strip()) > 200:
             body = m.group(1).strip()
-            if not re.search(r"P₀|FCF₀|Cash₀/sh|g1=|exit=\d", body):
+            stale = re.search(
+                r"falsifier-adjusted|Popper|Deutsch|Theory-implied",
+                body,
+                re.I,
+            )
+            if not stale and not re.search(r"P₀|FCF₀|Cash₀/sh|g1=|exit=\d", body):
                 return "#### IRR arithmetic (show your work)\n\n" + body
 
     method = val.get("method", "full")
@@ -912,11 +856,6 @@ def irr_arithmetic(val: dict, ticker: str, preserved: str | None) -> str:
     if method in ("full", "scenario"):
         fcf = inputs.get("fcf_per_share") or inputs.get("per_share")
         g1, g2, ex = growth_rates_for_irr(val)
-        growth_note = (
-            " (falsifier-adjusted, segment-derived)"
-            if has_theory
-            else ""
-        )
         lines += [
             "How we calculated the annual return (base case). Verify with "
             f"`python _system/scripts/marvin_valuation.py --ticker {ticker}`",
@@ -924,17 +863,11 @@ def irr_arithmetic(val: dict, ticker: str, preserved: str | None) -> str:
             f"1. **Price today:** **${price}**",
             f"2. **Starting free cash flow per share:** **${fcf}** "
             f"({inputs.get('per_share_source', inputs.get('fcf_source', ''))})",
-            f"3. **Growth in years 1–5:** **{g1*100:.1f}%** per year · **years 6–10:** **{g2*100:.1f}%** per year"
-            f"{growth_note}",
+            f"3. **Growth in years 1–5:** **{g1*100:.1f}%** per year · **years 6–10:** **{g2*100:.1f}%** per year",
             f"4. **Selling multiple in year 10:** **{ex} times** year-10 cash flow",
             f"5. **Annual return at today's price:** **{base_pct}%** per year over ten years "
-            "(falsifier-adjusted primary IRR in `valuation.json`)",
+            "(`implied_return.base_pct` in `valuation.json`)",
         ]
-        legacy = (val.get("implied_return") or {}).get("lawrence_legacy_pct")
-        if legacy is not None and legacy != base_pct:
-            lines.append(
-                f"6. **Lawrence legacy reference:** **{legacy}%** per year (pre-theory `scenarios.base` growth)"
-            )
         return "\n".join(lines)
 
     lines.append("IRR pending. See [HUMAN REVIEW].")
@@ -948,7 +881,6 @@ def build_valuation_section(ticker: str, val: dict, preserved_val: str | None) -
     method = val.get("method", "full")
     base_pct = val.get("implied_return", {}).get("base_pct") or val.get("results", {}).get("base", {}).get("return_pct", "?")
     seg_body = segment_build_section(val, preserved_val)
-    ge_body = growth_explanation_stress_block(val)
     irr_body = irr_arithmetic(val, ticker, preserved_val)
     upside = ""
     if preserved_val:
@@ -956,7 +888,7 @@ def build_valuation_section(ticker: str, val: dict, preserved_val: str | None) -
         if um:
             upside = um.group(0)
     if not upside:
-        upside = f"**Upside / downside from price:** Base IRR **{base_pct}%** at **${price}**; see bear/bull in bridge."
+        upside = f"**Upside / downside from price:** Base IRR **{base_pct}%** at **${price}**; see bear/bull in `valuation.json` scenarios."
 
     ret = ""
     if preserved_val:
@@ -968,39 +900,32 @@ def build_valuation_section(ticker: str, val: dict, preserved_val: str | None) -
         if fcf:
             ret = (
                 f"**Returns statement:** We expect **{base_pct}%** per year over ten years "
-                f"(falsifier-adjusted) at **~${price}** on **${fcf}/sh** starting owner cash."
+                f"at **~${price}** on **${fcf}/sh** starting owner cash."
             )
         else:
-            ret = f"**Returns statement:** We expect **{base_pct}%** per year (falsifier-adjusted) at **${price}**."
+            ret = f"**Returns statement:** We expect **{base_pct}%** per year at **${price}**."
 
-    return "\n\n".join(
-        [
-            "## Valuation & IRR (assumption ledger)",
-            "",
-            f"**Price today:** **${price}** ({src})  ",
-            f"**Method:** {method_label(method)} (`{method}`) · **Falsifier-adjusted annual return:** **{base_pct}%** per year · `{ticker}/research/valuation.json`",
-            "",
-            "### Valuation bridge (bear, base, bull)",
-            "",
-            "| Case | Method | Main assumptions | Annual return | Versus 15% target |",
-            "|------|--------|------------------|---------------|-------------------|",
-            bridge_table(val),
-            "",
-            "### Assumption ledger (base case)",
-            "",
-            assumption_ledger(val),
-            "",
-            ge_body,
-            "" if not ge_body else "",
-            seg_body,
-            "",
-            irr_body,
-            "",
-            upside,
-            "",
-            ret,
-        ]
-    )
+    parts = [
+        "## Valuation & IRR (assumption ledger)",
+        "",
+        f"**Price today:** **${price}** ({src})  ",
+        f"**Method:** {method_label(method)} (`{method}`) · **Base annual return:** **{base_pct}%** per year · `{ticker}/research/valuation.json`",
+        "",
+        "### Assumption ledger (base case)",
+        "",
+        assumption_ledger(val),
+    ]
+    if seg_body:
+        parts += ["", seg_body]
+    parts += [
+        "",
+        irr_body,
+        "",
+        upside,
+        "",
+        ret,
+    ]
+    return "\n\n".join(parts)
 
 
 def refresh_ticker(ticker: str, out_date: str) -> Path | None:

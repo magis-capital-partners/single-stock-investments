@@ -20,9 +20,8 @@
 | Third-party approval | `third_party_sources.md` |
 | Approved Substacks | `approved_substacks.md` |
 | Option treatment ladder | `option_treatment.md` |
-| Growth theory stress test | `growth_explanation_stress_test.md` |
 | MOI idea lens | `analysis_arsenal.md` (tools); `moi_lens.md` (legacy map) |
-| Cursor pointers | `.cursor/rules/investment-frameworks.mdc` + `marvin-core.mdc` + `optionality-valuation.mdc` + `growth-explanation-stress-test.mdc` |
+| Cursor pointers | `.cursor/rules/investment-frameworks.mdc` + `marvin-core.mdc` + `optionality-valuation.mdc` |
 
 ---
 
@@ -35,12 +34,12 @@
 | 3 | **Why the market might be wrong** | Q5 in prose — predictive attribute; inefficiency; catalyst when `asset`/`event` |
 | 4 | **Executive summary** | 120–180 words; **one** base IRR % — **no formulas** |
 | 5 | **Primary sources reviewed** | Inventory table only (10-K, 10-Q, IR, approved/pending third party) |
-| 6 | **Business & moat** | Stahl, mental models, Hohn mechanics — **no IRR, no valuation bridge** |
+| 6 | **Business & moat** | Stahl, mental models, Hohn mechanics — **no IRR, no valuation tables** |
 | 7 | **Approved Substack** | Only if ticker in `approved_substacks.md` |
 | 8 | **Blended estimate** | Only if approved/pending external view cited |
 | 9 | **Payoff & return** | Gates, dhando, stance — **points to Valuation & IRR** |
 | 10 | **Risks & inversion** | Primary risk + ≤3 bullets + **lens failure mode** if non-`operating` payoff lens |
-| 11 | **Valuation & IRR (assumption ledger)** | **End of analysis** — bridge + ledger + growth stress test + IRR arithmetic |
+| 11 | **Valuation & IRR (assumption ledger)** | **End of analysis** — ledger + segment build (if any) + IRR arithmetic |
 | 12 | Footer | Classification, Terms, [HUMAN REVIEW], [PROPOSED MEMORY] |
 
 ---
@@ -52,7 +51,7 @@
 | What (Stahl + Lawrence bucket) | Yes | IRR %, payoff $ |
 | Mental models | Yes | Duplicate Tier 2 + plain English |
 | Business mechanics (Hohn) | Yes | snapshot, pillars, fieldwork, disruption |
-| Moat (Munger) | Yes | Valuation bridge, assumption ledger |
+| Moat (Munger) | Yes | Assumption ledger, IRR arithmetic |
 | **Segment map** (multi-segment compounder) | If `segment_cashflow` overlay | Segment PV math — that lives in §11 |
 | **Option scan** (all tickers) | **Yes** — `option_treatment.md` | Option PV math — that lives in §11 or overlay |
 | Look-through / catalyst (holdco only) | If needed | Full SOTP math — that lives in §11 |
@@ -64,9 +63,7 @@
 | Subsection | Required |
 |------------|----------|
 | Price today + method tag | Yes |
-| **Valuation bridge** | bear / base / bull table |
-| **Assumption ledger (base case)** | Table: every input + source or **[Assumption]**; growth rows cite theory label |
-| **Growth explanation stress test** | Popper/Deutsch — mechanism, risky predictions, falsifiers, ad hoc ban, Deutsch checks |
+| **Assumption ledger (base case)** | Table: every input + source or **[Assumption]** |
 | **IRR arithmetic (show your work)** | Numbered steps; no unexplained payoffs |
 | **Upside / downside from price** | One line |
 | **Returns statement** | One sentence; = exec summary % |
@@ -75,7 +72,9 @@
 | **Option scan table** | **Every dive** — in §6; options sized in §11 or `nav_overlay` |
 | **Optionality overlay** | If `valuation_mode: optionality` or material options in scan |
 
-Spec: `irr_assumption_ledger.md` + `growth_explanation_stress_test.md`. JSON: `valuation.json` + `growth_explanation` + `sotp_build` when SOTP; + `segment_build` when segment overlay.
+**Removed from deep dives (do not regenerate):** `### Valuation bridge` tables with overlay rows; `### Growth explanation stress test (Popper / Deutsch)`; Deutsch checks; weight-scheme falsifier tables.
+
+Spec: `irr_assumption_ledger.md`. JSON: `valuation.json` + `sotp_build` when SOTP; + `segment_build` when segment overlay.
 
 ---
 
@@ -84,10 +83,10 @@ Spec: `irr_assumption_ledger.md` + `growth_explanation_stress_test.md`. JSON: `v
 | Redundant pattern | Fix |
 |-------------------|-----|
 | IRR in Business & moat + at end | **End only** |
-| Valuation bridge in two places | **End only** |
 | Exec summary shows full math | One % in exec; math in §11 |
 | Tier 2 + Mental models | **Mental models** only |
 | Pending third party in base IRR | **[PENDING APPROVAL]**; not in `valuation.json` base |
+| Bear/bull bridge table + scenarios in JSON | **JSON only** for sensitivity; one sentence in Payoff |
 
 ---
 
@@ -98,27 +97,7 @@ python _system/scripts/build_filing_evidence.py {TICKER}
 python _system/scripts/marvin_valuation.py --ticker {TICKER} --write
 python _system/scripts/refresh_deep_dive_v2.py {TICKER}
 python _system/scripts/lint_deep_dive.py {TICKER}
+python _system/scripts/lint_adversarial.py {TICKER}
 ```
 
-Batch: `python _system/scripts/refresh_deep_dive_v2.py --all`
-
----
-
-## Mental models (single format)
-
-| Model | Finding | Source |
-|-------|---------|--------|
-
-Do not restate in Substack section unless new external detail.
-
----
-
-## Payoff & return (slim)
-
-1. Five-question gate  
-2. Predictive attribute (one sentence)  
-3. Dhando table  
-4. Stance: `Scenarios and all IRR assumptions: see ## Valuation & IRR (assumption ledger) and valuation.json.`
-5. **Growth one-liner:** Base growth assumes …; falsified if … (points to stress-test subsection).
-
-No bear/base/bull table here. No IRR formulas here.
+Milly adversarial pass after narrative: `{TICKER}/research/adversarial_{date}.md`.

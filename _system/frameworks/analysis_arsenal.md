@@ -64,7 +64,7 @@ Legacy `moi_bucket` values map 1:1 → `payoff_lens` (see `moi_lens.md`).
 | Munger inversion / psychology | Risks, cross-check | `mental_models.md`, `munger/` |
 | Management invert | Gate 3 fail or jockey thesis | `hohn_business_analysis.md` § Management invert |
 | AI infrastructure overlay | Hyperscaler / `ai_overlay` | `ai_infrastructure_valuation.md` |
-| Growth explanation stress test | Every dive with growth assumptions | `growth_explanation_stress_test.md` |
+| Growth explanation stress test | Optional JSON only — not in markdown | `growth_explanation_stress_test.md` |
 
 ### Valuation & payoff
 
