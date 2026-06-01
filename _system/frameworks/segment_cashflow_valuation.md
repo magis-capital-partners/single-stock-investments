@@ -7,8 +7,9 @@
 | Source | What to borrow |
 |--------|----------------|
 | **Drew Cohen / Speedwell** | [Process & Philosophy](https://www.speedwellmemos.com/p/speedwell-research-process-and-philosophy) — reverse DCF: start at **today’s price**, model **explicit** cash-flow assumptions, output **business return** (implied discount rate). [Reverse DCF memo](https://speedwellresearch.com/2024/10/03/investing-is-just-answering-a-series-of-questions-explaining-the-reverse-dcf/) — hone in on **two key drivers** per segment; burden drag segments (Meta: Reality Labs losses, **zero** terminal value to that segment). |
-| **Chris Hohn / TCI** | `TCI-Q2-2018-Investor-Newsletter-extract.txt` — Alphabet **segment build**: Search, YouTube, Cloud (losses → inflection), Waymo **$0** in base. |
+| **Chris Hohn / TCI** | `TCI-Q2-2018-Investor-Newsletter-extract.txt` — Alphabet **segment build**: Search, YouTube, Cloud (losses → inflection), Waymo **$0 in TCI base** (explicit — not a default for all options). |
 | **Marvin Lawrence** | `lawrence_irr.md` — consolidated **10yr owner-cash IRR** remains the **stance gate**; segment sum is the **assumption ledger** and sanity check. |
+| **Option treatment** | `option_treatment.md` — mandatory option scan; **no auto-zero**; treatment ladder (`zero`, `embedded_in_segment`, `milestone_nav`, `probability_weighted`, `nav_floor`). |
 
 **Not the same as:**
 
@@ -50,7 +51,7 @@ Speedwell does **not** publish a single point “fair value.” They:
 1. **Invert** the question: at **P₀ today**, what **return** do you earn if excess cash flows are returned and assumptions hold?
 2. Model cash flows from **explicit** drivers (often revenue growth + margin, or reinvestment + ROIC)—not an opaque P/E.
 3. **Sensitize** two variables that matter; table of **business returns** across scenarios.
-4. For **embedded options / drag segments**, **fully burden** losses in the cash-flow path and assign **zero** (or separate option) terminal value—e.g. Meta Reality Labs.
+4. For **embedded options / drag segments**, **fully burden** losses in the cash-flow path and assign terminal value per **`option_treatment.md`** — not automatic zero.
 
 **Marvin segment overlay** applies the same discipline **per segment**, then **adds** present values (and options) to reconcile to total equity value per share.
 
@@ -74,8 +75,9 @@ From latest **10-K / 10-Q segment note** (not training memory):
 |------------------|---------------|
 | **Google Services** | Core owner-cash engine (Search, YouTube, Play, Android distribution) |
 | **Google Cloud** | High growth; capex-heavy; margin inflection |
-| **Other Bets** (Waymo, etc.) | **Option**: base **$0** terminal; bear = continue losses; bull = external marks / milestones |
+| **Other Bets** (Waymo, etc.) | **Option**: burden losses; terminal per **`option_treatment`** — **zero** only if no filing mark / milestone |
 | **Corporate / unallocated capex** | Allocate AI capex to Cloud vs Services or hold at corp—**[Assumption]**; document |
+| **Undeveloped acreage** (TPL-style) | **Option** row: `nav_floor` or **probability_weighted**; operating segments for producing royalties/water |
 
 ### 2. Assign owner cash per segment (Year 0)
 
@@ -105,15 +107,19 @@ Per segment, same Lawrence shape as consolidated (can differ by segment):
 
 ### 4. Options within the business
 
-Treat **material non-core bets** as separate rows:
+Treat **material non-core bets and hidden assets** as separate rows. Complete **`#### Option scan`** first (`option_treatment.md`).
 
-| Type | Base case | Bull case |
-|------|-----------|-----------|
-| **Loss drag** (Reality Labs, Other Bets) | Burden losses in CF stream; **terminal value = 0** | Reduce drag or assign milestone value |
-| **Real option** (Waymo, autonomous) | **$0** | External transaction comps or milestone NAV ÷ shares |
-| **Embedded product option** (YouTube Music, TPU sales) | Inside Services growth/margin | Separate only if it moves IRR materially |
+| Type | Loss drag | Overlay base terminal | Bull |
+|------|-----------|----------------------|------|
+| **Loss drag** (Reality Labs, Other Bets) | Burden in CF stream | **`zero`** if no mark; **`milestone_nav`** if external round/mark in filing | Full NAV or reduced drag |
+| **Real option** (Waymo, autonomous) | Burden | Per scan — not default zero | External comps ÷ shares |
+| **Embedded product** (Cloud backlog, Search AI) | — | **`embedded_in_segment`** — in segment growth | Higher growth / margin |
+| **Undeveloped reserves** (TPL acreage) | — | **`nav_floor`** or **probability_weighted** NRA/acre comp | Full development case |
+| **GAAP misstated land** | — | **`nav_floor`** SOTP line | Re-rate |
 
-Store in `segment_build.options[]`.
+Each row requires: `option_treatment`, `base_terminal_rationale`, `evidence`, `not_in_lawrence_base: true` when overlay-only.
+
+Store in `segment_build.options[]` and/or `nav_overlay`.
 
 ### 5. Discount and sum
 
@@ -184,10 +190,13 @@ Neither path alone is “truth”—divergence forces explicit assumptions (e.g.
       {
         "id": "other_bets_waymo",
         "label": "Other Bets / Waymo",
+        "option_treatment": "zero",
         "base_terminal_value_bn": 0,
+        "base_terminal_rationale": "No SEC fair-value mark; explicit zero after option scan",
         "bull_terminal_value_bn": null,
         "annual_drag_bn": null,
-        "notes": "TCI 2018: zero base; bull uses external marks [Assumption]"
+        "evidence": "10-K segment note",
+        "not_in_lawrence_base": true
       }
     ],
     "corporate_drag": {
@@ -288,10 +297,11 @@ When `valuation_overlay` is set, `lint_deep_dive.py` should eventually require `
 
 | Ticker | Segments to model | Options |
 |--------|-------------------|---------|
-| **GOOGL** | Services, Cloud | Other Bets / Waymo |
-| **AMZN** | North America, International, AWS | Advertising / Kuiper optional |
-| **META** | Family of Apps, Reality Labs | RL zero terminal base |
-| **MSFT** | Productivity, Intelligent Cloud, More Personal Computing | OpenAI stake optional |
+| **GOOGL** | Services, Cloud | Other Bets / Waymo; Cloud backlog **embedded** |
+| **AMZN** | North America, International, AWS | Advertising; optional Kuiper |
+| **META** | Family of Apps, Reality Labs | RL drag; messaging monetization **embedded** or separate |
+| **MSFT** | Productivity, Intelligent Cloud, MPC | OpenAI stake optional |
+| **TPL** | Land/Royalty, Water | Undeveloped acreage/NRA **`nav_floor`** |
 
 ---
 

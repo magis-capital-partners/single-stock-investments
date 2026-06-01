@@ -6,13 +6,15 @@ short: no_hit
 third_party: n/a
 block_final: false
 blocking_issues: []
-re_pass: false
+re_pass: true
+option_coverage: partial
+growth_explanation: complete
 ---
 
 # TPL — Adversarial review
 
 **Date:** 2026-06-01  
-**Agent:** Milly (batch pass)  
+**Agent:** Milly (growth stress test re-pass)  
 **Dive reviewed:** `TPL/research/deep_dive_2026-06-01.md`  
 **Valuation reviewed:** `TPL/research/valuation.json`  
 **Filings used:** `TPL/research/evidence/filing_facts_2026-06-01.json`
@@ -71,6 +73,20 @@ re_pass: false
 ## Short activist scan
 
 No Tier-1 forensic short in `short_scan_2026-05-28.md`; no local `short_reports/`.
+
+---
+
+## Growth explanation (Popper / Deutsch)
+
+| Check | Status |
+|-------|--------|
+| `### Growth explanation stress test` present | pass |
+| Growth ledger rows cite theory label | pass |
+| Risky predictions + falsifiers | pass |
+| Undeveloped NRA excluded from base growth | pass |
+| `valuation.json` → `growth_explanation` | pass |
+
+**Note:** Full NAV SOTP still pending — `nav_overlay` partial.
 
 ---
 

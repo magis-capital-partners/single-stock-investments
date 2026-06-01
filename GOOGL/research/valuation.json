@@ -1,6 +1,6 @@
 {
   "ticker": "GOOGL",
-  "as_of": "2026-05-29",
+  "as_of": "2026-06-01",
   "method": "full",
   "valuation_overlay": "segment_cashflow",
   "lawrence_bucket": "pricing_power",
@@ -155,6 +155,88 @@
       "dhando_ok": true
     },
     "override_reason": null
+  },
+  "growth_explanation": {
+    "as_of": "2026-06-01",
+    "status": "complete",
+    "assumption_ids": ["growth_y1_5", "growth_y6_10"],
+    "theory_label": "Cloud backlog conversion + Services Search yield (consolidated blend)",
+    "problem_situation": "Lawrence base IRR 2.1% at $386 on FY2025 FCF/sh — why 11% years 1–5 and not 6% bear or 14% bull?",
+    "consolidated_growth": {
+      "y1_5": 0.11,
+      "y6_10": 0.08
+    },
+    "mechanisms": [
+      {
+        "id": "cloud_conversion",
+        "chain": "Cloud backlog (>$460B, Q1 2026 CEO) converts to revenue at high-teens to 40%+ YoY → Cloud OI share of consolidated cash rises → lifts blended FCF growth above Services-only path",
+        "evidence": "GOOGL/investor-documents/sec-edgar/8-K_20260429_rpt20260429_acc0001652044_26_000043.htm",
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "services_search_yield",
+        "chain": "Search +19% Q1 revenue with AI Overviews rollout → Services owner cash grows high single digits; consolidated 11% embeds ~9% Services segment weight",
+        "evidence": "GOOGL/investor-documents/sec-edgar/10-Q_20260430_rpt20260331_acc0001652044_26_000048.htm",
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "capex_normalization",
+        "chain": "2026 capex guide $180–190B depresses near-term FCF; 11% consolidated assumes post-peak capex and Cloud ROIC lift owner cash per share after 2027",
+        "evidence": "GOOGL/investor-documents/sec-edgar/10-K_20260205_rpt20251231_acc0001652044_26_000018.htm",
+        "hard_to_vary": "partial"
+      }
+    ],
+    "segment_theories": [
+      {
+        "segment_id": "google_cloud",
+        "growth_y1_5": 0.25,
+        "growth_y6_10": 0.12,
+        "theory": "Q1 2026 Cloud +63% rev YoY; backlog supports 25% segment owner-cash growth unless conversion slows"
+      },
+      {
+        "segment_id": "google_services",
+        "growth_y1_5": 0.09,
+        "growth_y6_10": 0.07,
+        "theory": "Conservative vs Q1 Search burst; AI monetization inside 9% not modeled separately"
+      }
+    ],
+    "risky_predictions": [
+      {
+        "text": "Cloud revenue growth stays above 40% YoY through FY2026 if 25% segment path and 11% consolidated hold",
+        "by": "FY2026 10-K",
+        "falsifier_action": "Cut Cloud segment growth below 20%; revisit consolidated to 8% or lower"
+      },
+      {
+        "text": "Consolidated operating margin holds above 34% in 2026 despite capex step-up",
+        "by": "Q4 2026 10-K",
+        "falsifier_action": "Margin compression without Cloud mix offset → cut years 1–5 growth"
+      }
+    ],
+    "falsifiers": [
+      {
+        "observation": "Cloud revenue growth below 30% for two consecutive quarters",
+        "action": "Cut Cloud segment growth; reduce consolidated years 1–5 toward 8%"
+      },
+      {
+        "observation": "Search revenue growth below 10% for two quarters while Cloud growth also decelerates",
+        "action": "Move base case toward bear 6%/4%"
+      },
+      {
+        "observation": "2026–2027 FCF per share flat or down vs FY2025 with no capex guide reduction",
+        "action": "Falsifies capex-normalization mechanism; hold 11% only with explicit [HUMAN REVIEW]"
+      }
+    ],
+    "ad_hoc_rescue_banned": [
+      "Raising consolidated growth to 14% bull without backlog-to-revenue schedule in segment build",
+      "Using AI inflection $8/sh FCF as silent base-case FCF₀",
+      "Bumping exit multiple to save IRR while keeping growth unchanged"
+    ],
+    "deutsch_checks": {
+      "hard_to_vary": true,
+      "reach": true,
+      "falsifiable": true,
+      "not_instrumentalist": true
+    }
   },
   "overlay_results": [
     {

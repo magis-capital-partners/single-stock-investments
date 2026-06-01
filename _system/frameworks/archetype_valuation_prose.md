@@ -151,17 +151,17 @@ Read `archetype_models.json` for operating prompts. Below is **how to write the 
 
 ---
 
-### `optionality` (e.g. KEWL, MSB, SJT, APLD, CMSG)
+### `optionality` (e.g. KEWL, MSB, SJT, APLD, CMSG, TPL)
 
 | Field | Guidance |
 |-------|----------|
 | **Plain name** | "Asset with a floor plus an optional upside" |
-| **Default method** | `yield_curve` (royalties, land) or `scenario` (pre-profit) |
-| **Section title** | `### Payoff path and annual return` |
-| **Lead metric** | **Floor** (royalty, land, book) + **option** (development, litigation, index inclusion) |
-| **Bridge story** | "Base case values the floor at zero option value; bull assigns a dated payoff to the option." |
-| **Ledger must include** | **Floor value**, **Option payoff**, **Date of payoff**, **Probability or scenario weight** (if scenario method) |
-| **Stance rule** | Do not downgrade to watch on low Lawrence IRR alone when `optionality_valuation.md` gate passes — say so in plain English |
+| **Default method** | `yield_curve` (royalties, land) or `scenario` (pre-profit); **plus** `nav_overlay` when GAAP misstates land |
+| **Section title** | `### Payoff path and annual return` + `### Optionality overlay` |
+| **Lead metric** | **Fair NAV floor** (not GAAP book when misstated) + **operating cash IRR** + **option** (undeveloped reserves, litigation) |
+| **Bridge story** | "Lawrence base values current cash at price; overlay sizes hidden assets and undeveloped options per filing comps — not automatic zero." |
+| **Ledger must include** | **Option scan** rows; **Option treatment** per line; **Overlay-base** sensitivity separate from Lawrence gate |
+| **Stance rule** | Do not downgrade to watch on low Lawrence IRR alone when `optionality_gate.primary_metric` passes — say so in plain English |
 
 ---
 
@@ -177,14 +177,15 @@ Read `archetype_models.json` for operating prompts. Below is **how to write the 
 
 ---
 
-### `infrastructure` (e.g. WBI)
+### `infrastructure` (e.g. WBI, TPL)
 
 | Field | Guidance |
 |-------|----------|
 | **Plain name** | "Physical asset with contracted or regulated cash flows" |
-| **Default method** | `full` on **normalized levered free cash flow** or distribution yield + growth |
-| **Bridge story** | "Traffic or tariff × contracted life → cash to equity; compare to bond-like alternatives." |
-| **Ledger must include** | **Maintenance capital spending** vs growth capital; **Payout ratio** if relevant |
+| **Default method** | `full` on **normalized owner cash**; add **`nav_overlay`** when land/assets misstated on GAAP balance sheet |
+| **Bridge story** | "Traffic or tariff × contracted life → cash to equity; compare to bond-like alternatives. If land is off balance sheet, fair NAV is a separate overlay — not GAAP book." |
+| **Ledger must include** | **Maintenance capital spending** vs growth capital; **Option scan** for undeveloped acreage/reserves; **Segment build** (producing vs undeveloped) when applicable |
+| **TPL pattern** | Segment: Land/Royalty + Water operating; Undeveloped NRA/acres as **`nav_floor`** option row |
 
 ---
 

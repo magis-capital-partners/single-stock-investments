@@ -19,7 +19,9 @@
 | IRR formulas | `lawrence_irr.md` § F |
 | Third-party approval | `third_party_sources.md` |
 | Approved Substacks | `approved_substacks.md` |
-| Cursor pointers | `.cursor/rules/investment-frameworks.mdc` + `marvin-core.mdc` |
+| Option treatment ladder | `option_treatment.md` |
+| Growth theory stress test | `growth_explanation_stress_test.md` |
+| Cursor pointers | `.cursor/rules/investment-frameworks.mdc` + `marvin-core.mdc` + `optionality-valuation.mdc` + `growth-explanation-stress-test.mdc` |
 
 ---
 
@@ -37,7 +39,7 @@
 | 8 | **Blended estimate** | Only if approved/pending external view cited |
 | 9 | **Payoff & return** | Gates, dhando, stance — **points to Valuation & IRR** |
 | 10 | **Risks & inversion** | Primary risk + ≤3 bullets |
-| 11 | **Valuation & IRR (assumption ledger)** | **End of analysis** — bridge + ledger + IRR arithmetic |
+| 11 | **Valuation & IRR (assumption ledger)** | **End of analysis** — bridge + ledger + growth stress test + IRR arithmetic |
 | 12 | Footer | Classification, Terms, [HUMAN REVIEW], [PROPOSED MEMORY] |
 
 ---
@@ -50,8 +52,9 @@
 | Mental models | Yes | Duplicate Tier 2 + plain English |
 | Business mechanics (Hohn) | Yes | snapshot, pillars, fieldwork, disruption |
 | Moat (Munger) | Yes | Valuation bridge, assumption ledger |
-| Look-through / catalyst (holdco only) | If needed | Full SOTP math — that lives in §11 |
 | **Segment map** (multi-segment compounder) | If `segment_cashflow` overlay | Segment PV math — that lives in §11 |
+| **Option scan** (all tickers) | **Yes** — `option_treatment.md` | Option PV math — that lives in §11 or overlay |
+| Look-through / catalyst (holdco only) | If needed | Full SOTP math — that lives in §11 |
 
 ---
 
@@ -61,14 +64,17 @@
 |------------|----------|
 | Price today + method tag | Yes |
 | **Valuation bridge** | bear / base / bull table |
-| **Assumption ledger (base case)** | Table: every input + source or **[Assumption]** |
+| **Assumption ledger (base case)** | Table: every input + source or **[Assumption]**; growth rows cite theory label |
+| **Growth explanation stress test** | Popper/Deutsch — mechanism, risky predictions, falsifiers, ad hoc ban, Deutsch checks |
 | **IRR arithmetic (show your work)** | Numbered steps; no unexplained payoffs |
 | **Upside / downside from price** | One line |
 | **Returns statement** | One sentence; = exec summary % |
 | SOTP / look-through tables | If `holding_co` / `optionality` |
 | **Segment cash-flow build** | If `valuation_overlay: segment_cashflow` (GOOGL-style) |
+| **Option scan table** | **Every dive** — in §6; options sized in §11 or `nav_overlay` |
+| **Optionality overlay** | If `valuation_mode: optionality` or material options in scan |
 
-Spec: `irr_assumption_ledger.md`. JSON: `valuation.json` + `sotp_build` when SOTP; + `segment_build` when segment overlay.
+Spec: `irr_assumption_ledger.md` + `growth_explanation_stress_test.md`. JSON: `valuation.json` + `growth_explanation` + `sotp_build` when SOTP; + `segment_build` when segment overlay.
 
 ---
 
@@ -112,5 +118,6 @@ Do not restate in Substack section unless new external detail.
 2. Predictive attribute (one sentence)  
 3. Dhando table  
 4. Stance: `Scenarios and all IRR assumptions: see ## Valuation & IRR (assumption ledger) and valuation.json.`
+5. **Growth one-liner:** Base growth assumes …; falsified if … (points to stress-test subsection).
 
 No bear/base/bull table here. No IRR formulas here.

@@ -46,8 +46,39 @@ Compare deep dive **numeric claims** to:
 | 7 | Base / blended IRR in **three places** (exec, returns, classification) |
 | 8 | Stance vs `valuation.json` gates |
 | 9 | **AI / capex** — if `ai_overlay` or hyperscaler: FCF₀ year, capex guide vs modeled capex, backlog $ |
+| 10 | **Option scan** — if business has segments, land, backlog, loss bets, or GAAP≠fair value: table present? zeros justified? |
 
 Output: table **Claim in dive | Filing value | Match? | Severity**
+
+### 2c. Option coverage
+
+When dive mentions options, hidden assets, undeveloped reserves, Other Bets, Reality Labs, backlog, or `nav_overlay` / `segment_build.options`:
+
+| Check | Severity if failed |
+|-------|-------------------|
+| **`#### Option scan`** table in Business & moat | **Inference risk** |
+| Each material option has `option_treatment` + rationale in dive or `valuation.json` | **Inference risk** per unexplained zero |
+| GAAP book used as floor when filing assigns **no value** to core assets | **Factual error** |
+| Segment sum ≪ price with **all** options at $0 and no [HUMAN REVIEW] | **Inference risk** |
+| Overlay-base return shown when Lawrence base < 15% and options material | **Warn** if missing |
+
+YAML: `option_coverage: complete | partial | incomplete | n/a`
+
+### 2d. Growth explanation (Popper / Deutsch)
+
+When dive uses `method: full`, `scenario`, or `segment_cashflow` overlay (not `yield_curve`-only holdco with no growth rows):
+
+| Check | Severity if failed |
+|-------|-------------------|
+| **`### Growth explanation stress test`** in Valuation & IRR (after ledger, before IRR arithmetic) | **Inference risk** |
+| Growth ledger rows cite `Growth theory:` label | **Inference risk** per orphan row |
+| At least one **risky prediction** and one **falsifier** | **Inference risk** |
+| Theory is easy-to-vary ("quality compounder grows X%") | **Inference risk** |
+| Instrumentalist-only defense (growth = reverse-DCF at price) | **Inference risk** |
+| Growth > filing run-rate + 300 bp with no falsifiers | **Inference risk** |
+| `valuation.json` → `growth_explanation` present when growth material | **Warn** if missing |
+
+YAML: `growth_explanation: complete | partial | incomplete | n/a`
 
 ### 2. Internal consistency
 
@@ -145,6 +176,8 @@ re_pass: false
 | `blocking_issues` | machine-readable ids e.g. `returns_statement_irr` |
 | `valuation_staleness` | pass / warn / fail — FCF₀ period vs capex guide (`ai_infrastructure_valuation.md`) |
 | `ai_coverage` | n/a / partial / complete — AI overlay completeness |
+| `option_coverage` | n/a / complete / partial / incomplete — option scan + treatment (`option_treatment.md`) |
+| `growth_explanation` | n/a / complete / partial / incomplete — Popper/Deutsch growth stress test (`growth_explanation_stress_test.md`) |
 
 After Marvin fixes: set `block_final: false`, add **Resolved in dive** section, run `milly_repass.py {TICKER}`.
 
