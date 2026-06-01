@@ -9,7 +9,7 @@ SCRIPTS := _system/scripts
 
 TICKER ?=
 
-.PHONY: research-check research-check-all evidence milly-repass short-scan hk-scan hk-cross-check-all hk-extract-refresh third-party-scan-all cross-check-all
+.PHONY: research-check research-check-all evidence milly-repass book-estimate book-estimate-all short-scan hk-scan hk-cross-check-all hk-extract-refresh third-party-scan-all cross-check-all
 
 research-check:
 ifndef TICKER
@@ -36,6 +36,17 @@ ifndef TICKER
 	$(error Set TICKER=)
 endif
 	$(PYTHON) $(SCRIPTS)/milly_repass.py $(TICKER)
+
+book-estimate:
+ifndef TICKER
+	$(error Set TICKER= e.g. make book-estimate TICKER=FRMO)
+endif
+	$(PYTHON) $(SCRIPTS)/current_book_estimate.py $(TICKER) --write
+	@echo OK: $(TICKER) book-estimate
+
+book-estimate-all:
+	$(PYTHON) $(SCRIPTS)/current_book_estimate.py --all --write
+	@echo OK: book-estimate-all
 
 short-scan:
 	$(PYTHON) $(SCRIPTS)/short_scan_batch.py
