@@ -9,9 +9,9 @@
 | **Archetype** (Stahl) | compounder |
 | **Moat** (Munger) | stable |
 | **Dhando** (Pabrai) | full |
-| **Stance** | core |
+| **Stance** | watch |
 | **Cycle** | - |
-| **Implied 10yr IRR** (Lawrence) | 9.2% (base) |
+| **Implied 10yr IRR** (total synthesis) | 10.41% (total synthesis) |
 | **IRR method** | full |
 | **Lawrence bucket** | pricing_power |
 

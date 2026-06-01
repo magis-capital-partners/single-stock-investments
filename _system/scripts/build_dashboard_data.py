@@ -6,10 +6,14 @@ import csv
 import json
 import os
 import re
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "_system" / "scripts"))
+from valuation_synthesis import website_implied_irr  # noqa: E402
+
 DATA_DIR = ROOT / "dashboard" / "data"
 OUTPUT = DATA_DIR / "dashboard_data.json"
 CLASS_PATH = ROOT / "_system" / "portfolio" / "classification.json"
@@ -267,13 +271,15 @@ def classification_for(ticker: str, ticker_dir: Path, portfolio: dict[str, dict]
     out = {k: merged.get(k, defaults[k]) for k in defaults}
     val = load_valuation(ticker_dir)
     if val:
+        if not val.get("ticker"):
+            val["ticker"] = ticker_dir.name
+        irr_web = website_implied_irr(val)
         inputs = val.get("classification_inputs") or {}
         for key in ("archetype", "moat", "dhando", "cycle"):
             if inputs.get(key) and inputs[key] not in ("-", "—", "pending"):
                 out[key] = inputs[key]
-        implied = val.get("implied_return", {})
-        if implied.get("display") and out.get("implied_irr") in ("pending", "—", None):
-            out["implied_irr"] = implied["display"]
+        if irr_web.get("display"):
+            out["implied_irr"] = irr_web["display"]
         method = val.get("method", val.get("irr_method"))
         if method and out.get("irr_method") == "pending":
             out["irr_method"] = method
@@ -292,7 +298,14 @@ def classification_for(ticker: str, ticker_dir: Path, portfolio: dict[str, dict]
             out["stance"] = proposal["suggested"]
         if val.get("as_of"):
             out["analysis_as_of"] = val["as_of"]
-        out["analysis_irr_pct"] = parse_irr_pct(out.get("implied_irr"))
+        if irr_web.get("base_pct") is not None:
+            out["analysis_irr_pct"] = float(irr_web["base_pct"])
+        else:
+            out["analysis_irr_pct"] = parse_irr_pct(out.get("implied_irr"))
+        if irr_web.get("falsifier_adjusted_pct") is not None:
+            out["filing_irr_ref"] = f"{irr_web['falsifier_adjusted_pct']}% (falsifier-adjusted)"
+        if irr_web.get("synthesis_status") == "complete":
+            out["irr_source"] = "total_synthesis"
     return out
 
 

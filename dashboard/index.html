@@ -295,7 +295,7 @@
             <th data-sort="completeness">Complete</th>
             <th data-sort="last_download">Download</th>
             <th data-sort="classification.archetype">Archetype</th>
-            <th data-sort="classification.analysis_irr_pct">Analysis IRR</th>
+            <th data-sort="classification.analysis_irr_pct">Blended IRR</th>
             <th data-sort="classification.stance">Stance</th>
           </tr>
         </thead>
@@ -644,7 +644,7 @@ function selectTicker(ticker) {
         <div class="metric"><div class="k">Stance</div><div class="v"><span class="badge ${STANCE_BADGE[t.classification?.stance] || 'badge-warn'}">${t.classification?.stance || '—'}</span></div></div>
         <div class="metric"><div class="k">Moat</div><div class="v"><span class="badge ${MOAT_BADGE[t.classification?.moat] || 'badge-warn'}">${t.classification?.moat || '—'}</span></div></div>
         <div class="metric"><div class="k">Dhando</div><div class="v">${t.classification?.dhando || '—'}</div></div>
-        <div class="metric"><div class="k">Analysis IRR</div><div class="v">${renderIrrCell(t)}${t.classification?.analysis_as_of ? `<div style="font-size:10px;color:var(--text-muted);margin-top:4px">as of ${escapeHtml(t.classification.analysis_as_of)}</div>` : ''}</div></div>
+        <div class="metric"><div class="k">Blended IRR</div><div class="v">${renderIrrCell(t)}${t.classification?.filing_irr_ref && t.classification?.irr_source === 'total_synthesis' ? `<div style="font-size:10px;color:var(--text-muted);margin-top:4px">Filing ref: ${escapeHtml(t.classification.filing_irr_ref)}</div>` : ''}${t.classification?.analysis_as_of ? `<div style="font-size:10px;color:var(--text-muted);margin-top:4px">as of ${escapeHtml(t.classification.analysis_as_of)}</div>` : ''}</div></div>
         ${t.classification?.cycle && t.classification.cycle !== '-' && t.classification.cycle !== '—' ? `<div class="metric"><div class="k">Cycle</div><div class="v">${t.classification.cycle}</div></div>` : ''}
       </div>
     </div>
