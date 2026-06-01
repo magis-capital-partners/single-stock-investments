@@ -1,0 +1,67 @@
+{
+  "ticker": "LSEG",
+  "as_of": "2026-06-01",
+  "method": "full",
+  "lawrence_bucket": "multi_sided",
+  "currency": "GBP",
+  "classification_inputs": {
+    "archetype": "croupier",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid"
+  },
+  "inputs": {
+    "price": 91.26,
+    "price_source": "LSE ~9,126p close 2026-05-29 (shareprices.com)",
+    "fcf_per_share": 4.67,
+    "fcf_source": "FY2025 equity free cash flow \u00a32,445M \u00f7 524M weighted average shares",
+    "shares_millions": 524.0,
+    "normalization_note": "FY2025 mid-cycle base; Q1 2026 organic income +9.8% run-rate above trend (not inflated into starting cash flow)"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.04,
+      "growth_y6_10": 0.03,
+      "exit_pfcf_y10": 18,
+      "notes": "Trading volume mean-reversion, FX headwind, buyback pause"
+    },
+    "base": {
+      "growth_y1_5": 0.07,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 22,
+      "notes": "6.5-7.5% organic income guide; margin expansion; ~20\u00d7 spot P/FCF \u2192 22\u00d7 exit"
+    },
+    "bull": {
+      "growth_y1_5": 0.09,
+      "growth_y6_10": 0.06,
+      "exit_pfcf_y10": 26,
+      "notes": "Sustained Markets volume + AI data distribution (LSEG Everywhere)"
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 8.2
+    },
+    "base": {
+      "return_pct": 12.6
+    },
+    "bull": {
+      "return_pct": 15.7
+    }
+  },
+  "implied_return": {
+    "base_pct": 12.6,
+    "label": "10yr IRR",
+    "display": "12.6% (base)"
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "overlay_results": []
+}
