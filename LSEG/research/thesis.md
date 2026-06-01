@@ -6,22 +6,28 @@
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Archetype** (Stahl) | croupier |
+| **Moat** (Munger) | stable |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
+| **Cycle** | mid |
+| **Implied 10yr IRR** (Lawrence) | 12.6% (base) |
+| **IRR method** | full |
+| **Lawrence bucket** | multi_sided |
 
 ## One-line thesis
 
-London Stock Exchange Group — thesis pending Marvin deep dive.
+Global data/index/clearing croupier with 50%+ margins and strong cash conversion; quality franchise at **~£91** implies **12.6%** base return — **watch** below 15% bar.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest annual report (FY2025)
+- [x] Read latest quarterly update (Q1 2026 trading statement)
+- [x] Apply Stahl croupier + Munger moat lenses
+- [ ] Confirm human price and GBP vs ADR exposure
+- [ ] Track AI/LSEG Everywhere revenue disclosure in H1 2026
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-06-01; awaiting deep dive.
+- Registry lists market as US; LSEG is LSE-listed (LSEG:LON).
+- First deep dive 2026-06-01; no approved stance override.
