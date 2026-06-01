@@ -28,13 +28,86 @@ David Deutsch extends Popper: progress comes from **good explanations** (hard to
 |-------|----------|--------|
 | **1. Fact anchor** | What did filings show for owner cash and drivers? | FCF₀, segment revenue/OI, backlog, capex — cited paths |
 | **2. Explanatory theory** | *Why* should cash grow at rate G? | Mechanism table + Deutsch "hard to vary" check |
-| **3. Lawrence number** | What rate goes in the model? | Assumption ledger row with link to theory ID |
+| **3. Theory-derived number** | What rate does the mechanism imply? | **Bottom-up** segment blend → `theory_implied` |
+| **4. Falsifier-adjusted number** | After filing refutation checks? | **`falsifier_adjusted`** → **primary IRR** for display and stance |
 
-**Rule:** Layer 3 must cite Layer 2. Layer 2 must cite Layer 1. If Layer 2 is missing, growth is **[HUMAN REVIEW]** minimum; Milly flags `growth_explanation: incomplete`.
+**Rule:** Layer 4 is **`implied_return.base_pct`** (website, executive summary, Classification). Lawrence `scenarios.base` is **legacy reference** only (`results_lawrence_legacy`).
 
 ---
 
-## Mandatory section: Growth explanation stress test
+## Step A — Bottom-up derivation (mandatory when `segment_build` exists)
+
+1. Weight each operating segment's `growth_y1_5` / `growth_y6_10` by `owner_cash_y0_per_share`.
+2. Store in `growth_explanation.theory_implied` with `derivation` and `segment_weights`.
+3. Use **`scenarios.base` exit multiple** for consolidated IRR (do not blend segment exit multiples into primary path).
+4. Compute **`results_growth_theory.theory_implied.return_pct`**.
+
+If `|theory_implied − scenarios.base| > 1pp`, document in `growth_explanation.divergence` (no hard auto-revision rule).
+
+---
+
+## Step C — Deutsch gate (blocks `status: complete`)
+
+`growth_explanation.status` = **complete** only when:
+
+- `deutsch_checks.hard_to_vary` === **true**
+- `deutsch_checks.falsifiable` === **true**
+- `deutsch_checks.not_instrumentalist` === **true**
+- No mechanism has `hard_to_vary: "no"` or `false`
+
+Otherwise **partial** or **incomplete**. Milly flags incomplete on final handoff.
+
+---
+
+## Step D — Falsifier runner
+
+On every refresh with `growth_explanation`:
+
+```bash
+python3 _system/scripts/check_growth_falsifiers.py --ticker {TICKER} --write
+```
+
+Or via `marvin_valuation.py --write` (calls `enrich_growth_explanation` internally).
+
+Falsifiers may include structured `adjustment` + optional `auto_check` in JSON. When triggered, growth moves to `falsifier_adjusted` and IRR recomputes.
+
+---
+
+## Step E — Valuation bridge rows
+
+| Case | Stance gate? | Notes |
+|------|--------------|-------|
+| **Falsifier-adjusted** | **Yes** | Primary IRR |
+| Theory-implied | No | Pre-falsifier segment blend |
+| Lawrence legacy bear/base/bull | No | `results_lawrence_legacy` |
+| Segment / NAV overlays | No | Unchanged |
+
+---
+
+## valuation.json shape
+
+Marvin fills on `marvin_valuation.py --write`:
+
+```json
+"growth_explanation": {
+  "theory_implied": { "y1_5": 0.104, "y6_10": 0.075, "derivation": "segment_build owner-cash weighted blend" },
+  "falsifier_adjusted": { "y1_5": 0.104, "y6_10": 0.075, "adjustments": [], "triggered": [] },
+  "lawrence_legacy": { "y1_5": 0.11, "y6_10": 0.08, "return_pct": 2.1 },
+  "divergence": { "theory_vs_lawrence_y1_5_pp": -0.6 },
+  "status": "complete"
+},
+"results_growth_theory": {
+  "theory_implied": { "return_pct": 1.5 },
+  "falsifier_adjusted": { "return_pct": 1.5 }
+},
+"implied_return": {
+  "base_pct": 1.5,
+  "falsifier_adjusted_pct": 1.5,
+  "theory_implied_pct": 1.5,
+  "lawrence_legacy_pct": 2.1,
+  "label": "10yr IRR (falsifier-adjusted)"
+}
+```
 
 In **Valuation & IRR**, after **Assumption ledger (base case)** and **before** IRR arithmetic, add:
 

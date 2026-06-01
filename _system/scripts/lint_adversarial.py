@@ -23,7 +23,7 @@ RETURNS_BLEND = re.compile(
     re.I,
 )
 EXEC_IRR = re.compile(
-    r"(?:blended|floor|base|IRR|annual return)[^\n]{0,80}?\*\*(-?\d{1,2}(?:\.\d)?)\s*%\*\*",
+    r"(?:falsifier-adjusted|blended|floor|base case|IRR|annual return)[^\n]{0,80}?\*\*(-?\d{1,2}(?:\.\d)?)\s*%\*\*",
     re.I,
 )
 CLASS_IRR = re.compile(
