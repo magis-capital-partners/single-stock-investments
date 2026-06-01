@@ -81,7 +81,8 @@ When SOTP references GAAP fair value for a listed stake (MIAX, TPL, etc.):
 
 - **Assumption ledger** + **incremental uplift table** (book + line₁ + … = payoff).
 - Store lines in `valuation.json` → `scenarios.base.sotp_build` when possible.
-- FRMO reference: `FRMO/research/deep_dive_2026-05-27.md` Step 3g.
+- **Uplift mechanism (required):** opaque sleeves (Investment A, consolidated fund NAV) need **bottom-up sub-tables** per `holdco_uplift_explanation.md`. Blended **% higher than GAAP** is **derived output**, not an input. Run `holdco_uplift_build.py {TICKER} --write` when `components[]` exist.
+- FRMO reference: `FRMO/research/deep_dive_2026-06-01.md` Step 3g + `investment_a_weights_2026-06-01.md`.
 
 ### `scenario` / `full` (owner cash / FCF)
 

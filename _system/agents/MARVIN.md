@@ -70,6 +70,8 @@ Third party: approved registry in `third_party_sources.md`; pending PDFs flagged
 
 **Holdco / treasury book discount (FRMO, CMSG):** `book_estimate_config.json` + `python _system/scripts/current_book_estimate.py {TICKER} --write`. Reports cite **filed book** and **current book estimate** separately. **`mark_date_alignment.md`** — filing fair value prices must use **measurement_date**, never a later Stooq quote.
 
+**Holdco uplift mechanism:** Opaque fund sleeves (Investment A) require **bottom-up** holding tables per `holdco_uplift_explanation.md`. Run `holdco_uplift_build.py {TICKER} --write` when `assumption_ledger.*.components[]` exist. **Forbidden:** bare “64% higher than GAAP” without per-holding Year-5 paths and mechanisms.
+
 ## Peer templates
 - Best JP structure: `8697.T/`
 - Best US structure: `APLD/investor-documents/`

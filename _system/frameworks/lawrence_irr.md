@@ -115,7 +115,7 @@ Use **numbered steps** for the base case. Bear/bull can be shorter but must stil
 **Step 3 — Payoff price (sum-of-parts; must add to the payoff)**  
 - List **shares** from the filing (denominator).  
 - Show **GAAP $/sh** for each identifiable piece (equity ÷ shares).  
-- Add **uplift $/sh** per line with one-line math (e.g. `7.02 × 64% = 4.50`).  
+- Add **uplift $/sh** per line with one-line math from **bottom-up sub-lines** (e.g. weighted TPL/GBTC Year-5 paths sum to **~$2.00/sh**; slack to model line explicit). **Forbidden:** bare `7.02 × 64% = 4.50` without holding table — see `holdco_uplift_explanation.md`.  
 - **Running sum** must equal payoff (e.g. `8.55 + 4.50 + … = 18.00`). Store lines in `valuation.json` `sotp_build` when possible.  
 - **2.1× book** and **2.7× price** go **after** the sum as checks (`18 ÷ 8.55`, `18 ÷ 6.70`), not as drivers.  
 - Label **[Assumption]** / **[HUMAN REVIEW]** on any line not filing-derived (especially opaque buckets like FRMO “Investment A”).  

@@ -66,7 +66,7 @@
             "gaap_per_share": 7.02,
             "uplift_per_share": 4.5,
             "year5_per_share": null,
-            "math": "Incremental on book: 7.02 x 64% = 4.50. GAAP 309M/44.02M=7.02 inside book; TPL/GBTC not disclosed."
+            "math": "Bottom-up ~$2.00/sh from weighted holdings (holdco_uplift_explanation.md) + ~$2.50/sh slack until look-through filed. GAAP 309M/44.02M=7.02 inside book."
           },
           {
             "id": "hkhc",
@@ -186,6 +186,7 @@
           "investment_a_lookthrough": {
             "weights_path": "FRMO/research/investment_a_weights_2026-06-01.md",
             "parent_filing_value_m": 308.984,
+            "measurement_date": "2026-02-27",
             "weights_pct": {
               "TPL": 52,
               "GBTC": 14,
@@ -195,7 +196,101 @@
               "FNV": 3,
               "HKHC": 5,
               "residual": 9
-            }
+            },
+            "model_uplift_per_share": 4.5,
+            "components": [
+              {
+                "id": "tpl",
+                "weight_pct": 52,
+                "filing_slice_m": 160.67,
+                "ticker": "TPL",
+                "price_at_measurement": 524.29,
+                "year5_price": 680,
+                "mechanism": "Permian royalty ~8% CAGR + partial water re-rate; below HK bull",
+                "incremental_m": 47.72,
+                "per_share": 1.084
+              },
+              {
+                "id": "gbtc",
+                "weight_pct": 14,
+                "filing_slice_m": 43.26,
+                "ticker": "GBTC",
+                "price_at_measurement": 51.13,
+                "year5_price": 72,
+                "mechanism": "Crypto sleeve normalization from cycle lows; not peak bull",
+                "incremental_m": 17.66,
+                "per_share": 0.4012
+              },
+              {
+                "id": "miax_funds",
+                "weight_pct": 8,
+                "filing_slice_m": 24.72,
+                "ticker": "MIAX",
+                "price_at_measurement": 42.6,
+                "year5_price": 60,
+                "mechanism": "Exchange volume growth + listing visibility; aligns with direct MIH thesis",
+                "incremental_m": 10.1,
+                "per_share": 0.2294
+              },
+              {
+                "id": "wpm",
+                "weight_pct": 5,
+                "filing_slice_m": 15.45,
+                "ticker": "WPM",
+                "price_at_measurement": 163.65,
+                "year5_price": 198,
+                "mechanism": "Precious-metals streaming leverage on production growth",
+                "incremental_m": 3.24,
+                "per_share": 0.0736
+              },
+              {
+                "id": "ice",
+                "weight_pct": 4,
+                "filing_slice_m": 12.36,
+                "ticker": "ICE",
+                "price_at_measurement": 164.13,
+                "year5_price": 190,
+                "mechanism": "Data and clearing compounder; modest re-rate",
+                "incremental_m": 1.95,
+                "per_share": 0.0443
+              },
+              {
+                "id": "fnv",
+                "weight_pct": 3,
+                "filing_slice_m": 9.27,
+                "ticker": "FNV",
+                "price_at_measurement": 280.61,
+                "year5_price": 330,
+                "mechanism": "Royalty portfolio growth on mine expansions",
+                "incremental_m": 1.63,
+                "per_share": 0.037
+              },
+              {
+                "id": "hkhc_overlap",
+                "weight_pct": 5,
+                "filing_slice_m": 15.45,
+                "ticker": "HKHC",
+                "price_at_measurement": 33.0,
+                "year5_price": 42,
+                "mechanism": "Listed affiliate re-rate; not FRMO direct equity-method line",
+                "incremental_m": 4.21,
+                "per_share": 0.0956
+              },
+              {
+                "id": "residual",
+                "weight_pct": 9,
+                "filing_slice_m": 27.81,
+                "residual_uplift_pct": 5,
+                "mechanism": "Cash and private names; minimal mark until filed look-through",
+                "incremental_m": 1.39,
+                "per_share": 0.0316
+              }
+            ],
+            "bottom_up_incremental_m": 87.9,
+            "bottom_up_per_share": 1.9967,
+            "blended_uplift_pct_derived": 28.4,
+            "slack_per_share": 2.5033,
+            "note": "blended_uplift_pct_derived = bottom_up / parent GAAP; not an input. See holdco_uplift_explanation.md"
           },
           "winland_cmsg": {
             "uplift_per_share": 0.4,
