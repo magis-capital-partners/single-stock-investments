@@ -24,7 +24,10 @@ Do **not** use the legacy five-section-only template as the final shape — run 
 ```bash
 python _system/scripts/build_folder_indexes.py --ticker {{TICKER}}
 python _system/scripts/build_filing_evidence.py {{TICKER}}
+python _system/scripts/scan_hk_sources.py {{TICKER}} --write-references
 ```
+
+For tickers in `hk_ticker_index.json` (TPL, ICE, MSB, SJT): read `hk_cross_reference.md` and every source in `{{TICKER}}/third-party-analyses/hk_scan_{{date}}.md`. Set `HK_PDFS_ROOT` on cloud/Linux to scan the full vault.
 
 Read:
 
@@ -49,7 +52,7 @@ If **new_documents** or **new_valuation_news**: focus on what changed for owner 
 python _system/scripts/marvin_cloud_refresh.py {{TICKER}} --date {{date}}
 ```
 
-That script runs: `marvin_valuation.py --write` → `refresh_deep_dive_v2.py` → `lint_deep_dive.py` → Milly adversarial → `sync_classification.py --fix` → `build_dashboard_data.py`.
+That script runs: HK scan (indexed tickers) → `marvin_valuation.py --write` → `refresh_deep_dive_v2.py` → `lint_deep_dive.py` → Milly adversarial → `sync_classification.py --fix` → `build_dashboard_data.py`.
 
 Fix any lint errors before finishing the PR.
 

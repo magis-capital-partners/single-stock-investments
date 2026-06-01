@@ -100,6 +100,22 @@ def main() -> int:
             [PY, str(SCRIPTS / "build_filing_evidence.py"), ticker],
         )
 
+    hk_index = ROOT / "_system" / "reference" / "investment-wisdom" / "hk_ticker_index.json"
+    if hk_index.exists():
+        idx = json.loads(hk_index.read_text(encoding="utf-8"))
+        if ticker in idx.get("tickers", {}):
+            ok &= run(
+                "HK source scan",
+                [
+                    PY,
+                    str(SCRIPTS / "scan_hk_sources.py"),
+                    ticker,
+                    "--date",
+                    args.date,
+                    "--write-references",
+                ],
+            )
+
     ok &= run(
         "valuation write",
         [PY, str(SCRIPTS / "marvin_valuation.py"), "--ticker", ticker, "--write"],
