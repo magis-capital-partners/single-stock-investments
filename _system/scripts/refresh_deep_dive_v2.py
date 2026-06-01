@@ -777,7 +777,11 @@ def section_body_empty(body: str, heading: str) -> bool:
         rf"{re.escape(heading)}\s*\n+---\s*\n+(?=## |\Z)",
         re.IGNORECASE,
     )
-    return bool(pat2.search(body))
+    if pat2.search(body):
+        return True
+    # normalize_section_body strips trailing ---; heading may sit at EOF with no body
+    pat3 = re.compile(rf"{re.escape(heading)}\s*\Z", re.IGNORECASE)
+    return bool(pat3.search(body))
 
 
 def option_scan_block(val: dict) -> str:
@@ -954,21 +958,14 @@ def inject_optionality_sections(body: str, val: dict, ticker: str) -> str:
         elif section_body_empty(body, heading):
             block = builder()
             if block:
-                body = re.sub(
+                for pat in (
                     rf"{re.escape(heading)}\s*\n+(?:---\s*\n+)?(?=## |\Z)",
-                    block + "\n",
-                    body,
-                    count=1,
-                    flags=re.I,
-                )
-                if section_body_empty(body, heading):
-                    body = re.sub(
-                        rf"{re.escape(heading)}\s*\n+(?=####|\n---|\n## |\*\*Disruption|\Z)",
-                        block + "\n",
-                        body,
-                        count=1,
-                        flags=re.I,
-                    )
+                    rf"{re.escape(heading)}\s*\n+(?=####|\n---|\n## |\*\*Disruption|\Z)",
+                    rf"{re.escape(heading)}\s*\Z",
+                ):
+                    body, n = re.subn(pat, block + "\n", body, count=1, flags=re.I)
+                    if n:
+                        break
     return body
 
 
