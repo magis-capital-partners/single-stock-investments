@@ -1,0 +1,40 @@
+---
+description: Option and hidden-asset treatment — mandatory scan, no auto-zero
+globs: "**/research/**"
+alwaysApply: false
+---
+
+# Optionality valuation
+
+Read **`_system/frameworks/option_treatment.md`** on every deep dive, cross-check, and portfolio IRR review.
+
+Also read when triggered: **`optionality_valuation.md`**, **`segment_cashflow_valuation.md`**, **`ai_infrastructure_valuation.md`**.
+
+## Required behavior (Marvin)
+
+1. **Option scan** — `#### Option scan` in Business & moat for **every** ticker (table in `option_treatment.md`). Do not skip because archetype is "compounder."
+2. **Three layers** — Lawrence consolidated IRR = stance gate; overlays size options with evidence; bull = sensitivity.
+3. **No auto-zero** — `option_treatment: zero` only after scan + **`base_terminal_rationale`** in `valuation.json`. Loss segments: burden drags; terminal zero is explicit choice.
+4. **GAAP vs fair value** — If filings assign **no value** to land/royalties/stakes (TPL 1888 pattern), set `nav_overlay` and **do not** use book as dhando floor.
+5. **Segment + NAV** — Multi-segment names: `segment_build` with `options[]`; land/infrastructure: undeveloped reserves as **nav_floor** or **probability_weighted** row, not omitted.
+6. **Payoff section** — `### Optionality overlay` when any option row is non-trivial (see `option_treatment.md`).
+7. **Valuation bridge** — Show overlay-base and bull option rows separate from Lawrence base; label which is stance gate.
+
+## JSON keys
+
+| Overlay | Keys |
+|---------|------|
+| General | `option_treatment`, `nav_overlay`, `optionality_gate`, `valuation_mode: optionality` |
+| Segments | `valuation_overlay: segment_cashflow`, `segment_build.options[]` |
+| AI | `ai_overlay`, `not_in_model_requires_refresh` |
+
+## Do not
+
+- Set every in-business option terminal to **$0** without option scan and rationale.
+- Cite **book per share** as floor when core assets are off balance sheet or at historical cost.
+- Move overlay option value into Lawrence FCF₀ silently.
+- Downgrade to **watch** on Lawrence IRR alone when `optionality_gate` primary metric passes (MSB, FRMO pattern).
+
+## Milly
+
+Flag `option_coverage: incomplete` when option scan missing or zeros unexplained. See `MILLY.md` § Option coverage.

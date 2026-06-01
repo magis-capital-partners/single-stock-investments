@@ -2,7 +2,9 @@
 
 **Purpose:** Secondary valuation layer for names where **Lawrence 10yr FCF IRR** and standard **Hohn operating bridges** understate the investment case. Use when the payoff is **asymmetric** — bounded floor + open-ended or dated catalyst — not when heroic growth assumptions are required.
 
-**Do not use for:** operating compounders priced on earnings (use Lawrence `full`), or binary pre-revenue bets with no asset floor (use `scenario` with explicit failure modes).
+**Canonical option rules:** **`option_treatment.md`** — mandatory option scan, treatment ladder, no auto-zero.
+
+**Do not use for:** operating compounders priced on earnings with no hidden assets (Lawrence `full` alone is enough), or binary pre-revenue bets with no asset floor (use `scenario` with explicit failure modes).
 
 ---
 
@@ -11,10 +13,13 @@
 | Trigger | Examples |
 |---------|----------|
 | **Asset floor ≥ price risk** | Cash + book > ~50% of price; no debt; depleting trust with cash reserve |
+| **GAAP book misstates assets** | Land/royalties at zero or historical cost (TPL 1888 Assigned interests); stakes at cost |
 | **Look-through NAV / SOTP** | Holdco; private stakes marked below fair value |
-| **Dormant asset priced at zero** | Royalty not in run-rate; Copperwood option; HK stake at cost |
+| **Undeveloped reserves / dormant acreage** | Permian surface not in run-rate; NRA not yet drilled; KEWL Copperwood |
+| **Dormant asset priced at zero** | Royalty not in run-rate; HK stake at cost |
 | **HK transitory + yield curve** | Distribution suspension, bonus tier gap, legal recovery with timeline |
 | **Market structure discount** | Royalty trust / OTC / K-1 excluded from yield screens |
+| **In-business options buried in consolidated IRR** | Waymo, Reality Labs, Cloud backlog — use with `segment_cashflow` + `option_treatment.md` |
 
 Set `valuation_mode: optionality` in `{TICKER}/research/valuation.json` and document `optionality_gate` (below).
 
@@ -44,25 +49,28 @@ Set `valuation_mode: optionality` in `{TICKER}/research/valuation.json` and docu
 
 ---
 
-### B. Mineral / land floor + free option (KEWL)
+### B. Mineral / land floor + free option (KEWL, TPL)
 
-**Sources:** Special Situation Investing — [KEWL intro](https://specialsituationinvesting.substack.com/p/keweenaw-land-association-kewl), [KEWL update](https://specialsituationinvesting.substack.com/p/update-keweenaw-land-association)
+**Sources:** Special Situation Investing — [KEWL intro](https://specialsituationinvesting.substack.com/p/keweenaw-land-association-kewl), [KEWL update](https://specialsituationinvesting.substack.com/p/update-keweenaw-land-association); TPL 10-K Assigned land policy
 
 | Lens | Question |
 |------|----------|
-| **Floor** | Cash + treasuries per share; audited book; acreage $/acre vs peer transactions |
-| **Burn runway** | Pro forma cash burn ex one-offs; years of runway at bare-bones opex |
-| **Free option** | Model **zero** production royalties in base; size Copperwood (or next lease) in bull only |
-| **Patient capital** | Repurchases above/below book; Cornwall/Mai alignment |
-| **Permutations** | 667K-acre package, contiguous blocks, new lessees independent of Copperwood |
+| **GAAP vs fair value** | Does balance sheet exclude or understate land/royalties? (TPL: Assigned interests **$0** on BS) |
+| **Floor** | Fair-value NAV (per-acre, per-NRA comps, land-sale marks) — **not** GAAP book when misstated |
+| **Burn runway** | Pro forma cash burn ex one-offs (KEWL) |
+| **Undeveloped option** | Model producing cash in operating segments; **undeveloped** acreage/NRA in overlay (`nav_floor` or **probability_weighted**) |
+| **Segment build** | Land/Royalty vs Water vs Undeveloped reserves (`option_treatment.md`) |
+| **Patient capital** | Repurchases above/below fair NAV |
 
 **Primary metrics:**
 
-1. **Floor value / price** — book + cash vs market cap (flag when price **above** book — dhando weakens)  
-2. **Option yield** — royalty $ if named project hits ÷ market cap (Substack ~23–24% FCF yield best case)  
-3. **Pabrai low risk, high uncertainty** — tails bounded by liquid assets; heads = production royalties  
+1. **Fair NAV / price** — SOTP vs market cap; flag when price **above** fair NAV without growth option  
+2. **Operating cash IRR** — Lawrence `full` on current royalties/easements/water (stance gate unless human overrides)  
+3. **Option yield** — incremental royalty $ if undeveloped acreage drills ÷ market cap (bull)  
 
-**Predictive attribute:** `dormant_asset` + optional `equity_yield_curve` if construction/production date firms up
+**Predictive attribute:** `dormant_asset` + optional `equity_yield_curve` if production date firms up
+
+**TPL:** `nav_overlay` + segment build; never use **~$21/sh GAAP book** as floor.
 
 ---
 
@@ -158,6 +166,7 @@ Reference this file + external sources in `[PROPOSED MEMORY]` when promoting bel
 | Ticker | Overlay | Primary metric |
 |--------|---------|----------------|
 | **FRMO** | Holdco SOTP + catalyst stack | Look-through NAV discount; catalyst IRR |
-| **KEWL** | Mineral floor + Copperwood option | Option yield (bull); book/cash floor |
+| **KEWL** | Mineral floor + Copperwood option | Fair NAV floor; option yield (bull) |
+| **TPL** | Permian land + NRA + water; GAAP land at zero | `nav_overlay` + segment build; undeveloped reserves option |
 | **MSB** | HK royalty curve | Normalized distribution yield + arbitration timeline |
 | **SJT** | HK royalty curve (existing) | NPI deficit paydown curve |

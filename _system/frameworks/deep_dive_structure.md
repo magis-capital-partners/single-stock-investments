@@ -19,7 +19,8 @@
 | IRR formulas | `lawrence_irr.md` § F |
 | Third-party approval | `third_party_sources.md` |
 | Approved Substacks | `approved_substacks.md` |
-| Cursor pointers | `.cursor/rules/investment-frameworks.mdc` + `marvin-core.mdc` |
+| Option treatment ladder | `option_treatment.md` |
+| Cursor pointers | `.cursor/rules/investment-frameworks.mdc` + `marvin-core.mdc` + `optionality-valuation.mdc` |
 
 ---
 
@@ -50,8 +51,9 @@
 | Mental models | Yes | Duplicate Tier 2 + plain English |
 | Business mechanics (Hohn) | Yes | snapshot, pillars, fieldwork, disruption |
 | Moat (Munger) | Yes | Valuation bridge, assumption ledger |
-| Look-through / catalyst (holdco only) | If needed | Full SOTP math — that lives in §11 |
 | **Segment map** (multi-segment compounder) | If `segment_cashflow` overlay | Segment PV math — that lives in §11 |
+| **Option scan** (all tickers) | **Yes** — `option_treatment.md` | Option PV math — that lives in §11 or overlay |
+| Look-through / catalyst (holdco only) | If needed | Full SOTP math — that lives in §11 |
 
 ---
 
@@ -67,6 +69,8 @@
 | **Returns statement** | One sentence; = exec summary % |
 | SOTP / look-through tables | If `holding_co` / `optionality` |
 | **Segment cash-flow build** | If `valuation_overlay: segment_cashflow` (GOOGL-style) |
+| **Option scan table** | **Every dive** — in §6; options sized in §11 or `nav_overlay` |
+| **Optionality overlay** | If `valuation_mode: optionality` or material options in scan |
 
 Spec: `irr_assumption_ledger.md`. JSON: `valuation.json` + `sotp_build` when SOTP; + `segment_build` when segment overlay.
 

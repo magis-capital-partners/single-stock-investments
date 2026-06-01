@@ -76,7 +76,19 @@ Copy structure for `{TICKER}/research/deep_dive_{date}.md`.
 
 **Disruption / competitive watch:** …
 
-#### Look-through snapshot (holding_co / optionality only)
+#### Option scan
+
+| # | Option / hidden asset | In Lawrence base? | Overlay treatment | Evidence |
+|---|----------------------|-------------------|-------------------|----------|
+
+_Complete per `option_treatment.md` — every dive, every ticker._
+
+#### Segment map (multi-segment / land — if applicable)
+
+| Segment / option | Revenue / op income (fact) | Economic role | Base case treatment |
+|------------------|----------------------------|---------------|---------------------|
+
+#### Look-through snapshot (holding_co only)
 
 | Stake | GAAP / carrying | Economic value | Driver |
 |-------|-------------------|----------------|--------|
