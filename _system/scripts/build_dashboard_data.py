@@ -587,9 +587,40 @@ def write_oauth_config() -> None:
     OAUTH_CONFIG.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 
 
+def load_darwin_portfolio() -> dict | None:
+    path = DATA_DIR / "darwin_portfolio.json"
+    if not path.exists():
+        return None
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return None
+
+
+def build_darwin_if_missing() -> dict | None:
+    """Run Darwin pipeline when portfolio JSON absent (e.g. fresh clone)."""
+    if (DATA_DIR / "darwin_portfolio.json").exists():
+        return load_darwin_portfolio()
+    script = ROOT / "_system" / "scripts" / "build_darwin_portfolio.py"
+    if not script.exists():
+        return None
+    import subprocess
+
+    subprocess.run(
+        [sys.executable, str(script), "--fast"],
+        cwd=str(ROOT),
+        check=False,
+        timeout=600,
+    )
+    return load_darwin_portfolio()
+
+
 def main() -> None:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     payload = build()
+    darwin = load_darwin_portfolio() or build_darwin_if_missing()
+    if darwin:
+        payload["darwin"] = darwin
     OUTPUT.write_text(json.dumps(payload, indent=2), encoding="utf-8")
     write_oauth_config()
     print(f"Wrote {OUTPUT} ({payload['summary']['ticker_count']} tickers)")

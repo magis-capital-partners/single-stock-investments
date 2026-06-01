@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "approved": "2026-06-01",
+  "mandate": {
+    "long_only": true,
+    "allow_short": false,
+    "universe": "registry_holdings",
+    "min_names": 8,
+    "max_names": 15,
+    "max_weight_pct": 18.0,
+    "min_weight_pct": 2.0,
+    "rebalance_frequency": "quarterly",
+    "max_one_way_turnover_pct_per_rebalance": 15.0,
+    "max_abs_weight_change_pct_per_rebalance": 3.0,
+    "min_holding_months": 6,
+    "transaction_cost_bps": 10,
+    "turnover_penalty_kappa": 0.35,
+    "falsifier_exit": true,
+    "core_stance_max_delta_without_review_pct": 3.0
+  },
+  "regime": {
+    "falsifier_stress_threshold": 3,
+    "stressed_turnover_multiplier": 1.5
+  },
+  "training": {
+    "latent_factors": 5,
+    "encoder_epochs": 80,
+    "encoder_lr": 0.02,
+    "ga_population": 24,
+    "ga_generations": 12,
+    "ga_mutation_rate": 0.15,
+    "ppo_steps": 40,
+    "ppo_lr": 0.05,
+    "ppo_seeds": 3,
+    "backtest_quarters": 12,
+    "price_history_months": 36
+  },
+  "disclaimer": "Paper portfolio / research tool. Not investment advice. Does not replicate proprietary Darwin AI Ventures models."
+}
