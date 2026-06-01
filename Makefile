@@ -9,7 +9,7 @@ SCRIPTS := _system/scripts
 
 TICKER ?=
 
-.PHONY: research-check research-check-all evidence milly-repass short-scan
+.PHONY: research-check research-check-all evidence milly-repass short-scan hk-scan
 
 research-check:
 ifndef TICKER
@@ -39,3 +39,10 @@ endif
 
 short-scan:
 	$(PYTHON) $(SCRIPTS)/short_scan_batch.py
+
+hk-scan:
+ifndef TICKER
+	$(error Set TICKER= e.g. make hk-scan TICKER=TPL)
+endif
+	$(PYTHON) $(SCRIPTS)/scan_hk_sources.py $(TICKER) --write-references --strict
+	@echo OK: $(TICKER) hk-scan

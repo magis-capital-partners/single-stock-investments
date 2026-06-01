@@ -71,7 +71,8 @@ Partner letters (Jan annual series). Filename pattern `Pabrai-Letter-l_MMDDYY.pd
 | `Stahl-Investment-Philosophy.pdf` | Horizon Kinetics firm philosophy | Onboarding; FRMO context |
 | `Stahl-Spinoffs-Going-Separate-Ways-2015.pdf` | Spinoff value creation; separation events | BN, CSU, conglomerates |
 
-**Full vault:** `C:\Users\werdn\Documents\Investing\Horizon Kinetics\hk_pdfs\`  
+**Full vault:** `C:\Users\werdn\Documents\Investing\Horizon Kinetics\hk_pdfs\` (or `HK_PDFS_ROOT`)  
+**Ticker index:** `hk_ticker_index.json` + `scan_hk_sources.py`  
 **Manuscript chapters:** `Horizon Kinetics/hk_pdfs/book/manuscript/chapter-*.md`
 
 **Memory section:** `_system/memory/MEMORY.md` → Approved beliefs — Murray Stahl

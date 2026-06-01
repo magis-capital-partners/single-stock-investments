@@ -12,8 +12,11 @@
 | Status | Marvin may use in IRR / stance? | Where to register |
 |--------|----------------------------------|-------------------|
 | **approved** | Yes — full blend per `external_view_blend.md` | Row in **Approved registry** below |
+| **context** | No — cite for mental models / cross-check; not in base IRR | `{TICKER}/third-party-analyses/hk_scan_*.md` + `hk_ticker_index.json` |
 | **pending** | No — cite in report, flag **[PENDING APPROVAL]** | `{TICKER}/third-party-analyses/pending.md` |
 | **rejected** | No — do not cite | Note in pending file with date |
+
+**Horizon Kinetics** quarterly commentaries and Stahl shelf essays default to **context** until human adds an approved row. Workflow: `hk_cross_reference.md`.
 
 ---
 
@@ -45,7 +48,8 @@ Marvin scans `{TICKER}/investor-documents/research-notes/` and flags new files h
 
 | File | Purpose |
 |------|---------|
-| `{TICKER}/third-party-analyses/references.md` | Index of approved + pending URLs/PDFs |
+| `{TICKER}/third-party-analyses/references.md` | Index of approved + pending URLs/PDFs + HK scan |
+| `{TICKER}/third-party-analyses/hk_scan_{date}.md` | Auto HK / Stahl source map (`scan_hk_sources.py`) |
 | `{TICKER}/third-party-analyses/pending.md` | Queue for human approval |
 | `{TICKER}/research/cross_check_*` | Agreements / divergences / synthesis |
 
@@ -61,4 +65,5 @@ Marvin scans `{TICKER}/investor-documents/research-notes/` and flags new files h
 
 ## Discovery on refresh
 
-`refresh_deep_dive_v2.py` runs append new `research-notes/` PDFs to `{TICKER}/third-party-analyses/pending.md` when not in the approved registry.
+- `scan_hk_sources.py` — for tickers in `hk_ticker_index.json`, rebuild HK scan + inject Primary sources block.
+- `refresh_deep_dive_v2.py` — append new `research-notes/` PDFs to `{TICKER}/third-party-analyses/pending.md` when not in the approved registry.

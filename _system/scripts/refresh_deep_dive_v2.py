@@ -15,6 +15,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 APPROVED_THIRD_PARTY = ROOT / "_system" / "frameworks" / "third_party_sources.md"
+HK_INDEX = ROOT / "_system" / "reference" / "investment-wisdom" / "hk_ticker_index.json"
 VALUATION_BRIDGE_START = re.compile(r"#### Valuation bridge", re.IGNORECASE)
 HOLDING_CO_KEEP = re.compile(
     r"#### (Look-through snapshot|Sum-of-parts or NAV|Catalyst path)",
@@ -112,6 +113,36 @@ def scan_pending_third_party(ticker: str) -> list[dict]:
         if rel not in approved_text and status == "pending":
             pending.append({"path": rel, "name": f.name})
     return pending
+
+
+def is_hk_indexed(ticker: str) -> bool:
+    if not HK_INDEX.exists():
+        return False
+    data = json.loads(HK_INDEX.read_text(encoding="utf-8"))
+    return ticker.upper() in data.get("tickers", {})
+
+
+def inject_hk_primary_sources(body: str, ticker: str) -> str:
+    if not is_hk_indexed(ticker):
+        return body
+    import sys
+
+    scripts = Path(__file__).resolve().parent
+    if str(scripts) not in sys.path:
+        sys.path.insert(0, str(scripts))
+    from scan_hk_sources import HK_SCAN_BEGIN, HK_SCAN_END, hk_block_markdown, load_latest_scan
+
+    result = load_latest_scan(ticker)
+    if not result:
+        return body
+    block = hk_block_markdown(result)
+    if not block:
+        return body
+    if HK_SCAN_BEGIN in body and HK_SCAN_END in body:
+        pre = body[: body.index(HK_SCAN_BEGIN)]
+        post = body[body.index(HK_SCAN_END) + len(HK_SCAN_END) :]
+        return pre + block + post
+    return body.rstrip() + "\n\n" + block + "\n"
 
 
 def write_pending_md(ticker: str, items: list[dict]) -> None:
@@ -928,6 +959,8 @@ def refresh_ticker(ticker: str, out_date: str) -> Path | None:
             body = enrich_business_moat(body, val, ticker, preserved_val)
         if key == "## Executive summary":
             body = patch_exec_summary_irr(body, val)
+        if key == "## Primary sources reviewed":
+            body = inject_hk_primary_sources(body, ticker)
         if key == "## Payoff & return":
             body = re.sub(
                 r"#### Valuation bridge.*?#### ",
