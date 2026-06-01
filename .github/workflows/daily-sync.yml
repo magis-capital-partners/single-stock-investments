@@ -139,6 +139,7 @@ jobs:
         if: steps.pick.outputs.skip != 'true' && steps.pick.outputs.ticker != ''
         env:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
+          HK_PDFS_ROOT: ${{ secrets.HK_PDFS_ROOT || '/opt/cursor/hk_pdfs' }}
           TICKER: ${{ steps.pick.outputs.ticker }}
           PICK_REASON: ${{ steps.pick.outputs.reason }}
           GITHUB_REPOSITORY: ${{ github.repository }}

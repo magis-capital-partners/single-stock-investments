@@ -10,14 +10,14 @@
 
 | Type | Location | Status default |
 |------|----------|----------------|
-| **Approved registry** | `_system/frameworks/third_party_sources.md` | approved |
+| **Approved registry** | `_system/frameworks/third_party_sources.md` | approved — **human promotes only** |
 | **Approved Substacks** | `{TICKER}/third-party-analyses/references.md` | context (approved publisher) |
 | **Research notes PDFs** | `{TICKER}/investor-documents/research-notes/` | pending until approved |
 | **Horizon Kinetics / Stahl** | `hk_scan_*.md` when indexed | context |
 | **Short / activist** | `{TICKER}/third-party-analyses/short_reports/` | context |
 | **Pending queue** | `{TICKER}/third-party-analyses/pending.md` | pending |
 
-**Approved** sources may blend into IRR per `external_view_blend.md`. **Pending** and **context** sources must be cited but not folded into base IRR without human approval.
+**Approved** sources may blend into IRR per `external_view_blend.md`. **Pending** and **context** sources must be cited but not folded into base IRR without human approval. Marvin agents must **not** edit `third_party_sources.md`; Bryan promotes approved sources after review.
 
 ---
 

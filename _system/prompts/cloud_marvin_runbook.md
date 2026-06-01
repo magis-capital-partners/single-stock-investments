@@ -24,10 +24,15 @@ Do **not** use the legacy five-section-only template as the final shape — run 
 ```bash
 python _system/scripts/build_folder_indexes.py --ticker {{TICKER}}
 python _system/scripts/build_filing_evidence.py {{TICKER}}
+python _system/scripts/refresh_hk_extracts.py
 python _system/scripts/scan_third_party_sources.py {{TICKER}} --with-hk --date {{date}}
 ```
 
-Read `{TICKER}/third-party-analyses/source_inventory_{{date}}.md` and every listed source. HK-indexed tickers (TPL, ICE, MSB, SJT): also read `hk_scan_{{date}}.md`. Set `HK_PDFS_ROOT` on cloud/Linux for full vault.
+Read `{TICKER}/third-party-analyses/source_inventory_{{date}}.md` and every listed source. HK-indexed tickers (TPL, ICE, MSB, SJT): also read `hk_scan_{{date}}.md`.
+
+**Cloud HK vault:** `HK_PDFS_ROOT` defaults to `/opt/cursor/hk_pdfs` (see `.cursor/environment.json`). Set in [Cursor Dashboard → Cloud Agents → Secrets](https://cursor.com/dashboard/cloud-agents) and optionally GitHub Actions secret `HK_PDFS_ROOT`. Vault must exist on the VM (multi-repo environment, `HK_PDFS_REPO_URL` clone, or snapshot). Extracts auto-refresh from vault via `refresh_hk_extracts.py` before HK scan.
+
+**Third-party approval:** Agents cite HK and pending sources as **context** only. **You** promote sources to `_system/frameworks/third_party_sources.md`; agents never auto-approve.
 
 Read:
 

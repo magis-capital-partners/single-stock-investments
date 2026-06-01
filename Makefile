@@ -9,7 +9,7 @@ SCRIPTS := _system/scripts
 
 TICKER ?=
 
-.PHONY: research-check research-check-all evidence milly-repass short-scan hk-scan hk-cross-check-all third-party-scan-all cross-check-all
+.PHONY: research-check research-check-all evidence milly-repass short-scan hk-scan hk-cross-check-all hk-extract-refresh third-party-scan-all cross-check-all
 
 research-check:
 ifndef TICKER
@@ -51,6 +51,10 @@ endif
 hk-cross-check-all:
 	$(PYTHON) $(SCRIPTS)/check_hk_cross_checks.py
 	@echo OK: hk-cross-check-all
+
+hk-extract-refresh:
+	$(PYTHON) $(SCRIPTS)/refresh_hk_extracts.py
+	@echo OK: hk-extract-refresh
 
 third-party-scan-all:
 	$(PYTHON) $(SCRIPTS)/scan_third_party_sources.py --all --with-hk --date $(or $(DATE),$(shell date +%Y-%m-%d))

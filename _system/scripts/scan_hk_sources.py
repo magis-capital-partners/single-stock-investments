@@ -17,7 +17,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import re
 import sys
 from datetime import date
@@ -29,23 +28,15 @@ INDEX_PATH = WISDOM / "hk_ticker_index.json"
 PATHS_PATH = WISDOM / "hk_paths.json"
 HK_EXTRACTS = WISDOM / "horizon-kinetics"
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from hk_vault_paths import load_paths_cfg, resolve_vault_root  # noqa: E402
+
 HK_SCAN_BEGIN = "<!-- HK_SCAN_BEGIN -->"
 HK_SCAN_END = "<!-- HK_SCAN_END -->"
 
 
 def load_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
-
-
-def resolve_vault_root(paths_cfg: dict) -> Path | None:
-    env_key = paths_cfg.get("hk_pdfs_root_env", "HK_PDFS_ROOT")
-    if os.environ.get(env_key):
-        p = Path(os.environ[env_key])
-        return p if p.is_dir() else None
-    win = paths_cfg.get("hk_pdfs_root_windows", "")
-    if win and Path(win).is_dir():
-        return Path(win)
-    return None
 
 
 def compile_patterns(patterns: list[str], exclude: list[str]) -> tuple[list[re.Pattern], list[re.Pattern]]:

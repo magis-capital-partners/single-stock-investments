@@ -90,6 +90,7 @@ Push to `main` after downloads or research triggers a Pages deploy automatically
 | Secret | Required for | How to get |
 |--------|--------------|------------|
 | `CURSOR_API_KEY` | Marvin deep dive in CI (manual + **daily auto**) | [Cursor Dashboard → Integrations](https://cursor.com/dashboard/integrations) |
+| `HK_PDFS_ROOT` | Optional — full HK vault on cloud agent VM (default `/opt/cursor/hk_pdfs`) | [Cursor Dashboard → Cloud Agents → Secrets](https://cursor.com/dashboard/cloud-agents); see `_system/frameworks/hk_cross_reference.md` |
 
 ### Local publish
 

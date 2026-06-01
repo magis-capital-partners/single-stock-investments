@@ -101,6 +101,12 @@ def main() -> int:
         )
 
     ok &= run(
+        "HK extract refresh",
+        [PY, str(SCRIPTS / "refresh_hk_extracts.py")],
+        optional=True,
+    )
+
+    ok &= run(
         "third-party source scan",
         [
             PY,
