@@ -6,7 +6,7 @@
 
 Auto-scan `SJT/third-party-analyses/hk_scan_2026-06-01.md`. Mental models: equity_yield_curve, time_arbitrage, transitory_problem, market_structure_discount.
 
-**Cross-check:** `_system/reviews/approved/SJT_cross_check_2026-05-22.md`
+**Cross-check:** `SJT/research/cross_check_HK_2026-06-01.md`
 
 | HK / Stahl source | Topic | Status |
 |-----------------|-------|--------|

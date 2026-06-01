@@ -1,6 +1,6 @@
 # Horizon Kinetics cross-reference workflow
 
-**Purpose:** Ensure deep dives and cross-checks for HK-relevant holdings (TPL, ICE, MSB, SJT, royalty trusts, exchanges) **cite all material third-party HK / Stahl material** before stance is proposed.
+**Purpose:** HK-specific scan and mental models for indexed tickers (TPL, ICE, MSB, SJT). **Universe-wide third-party rules:** see `third_party_cross_reference.md`.
 
 **Related:** `third_party_sources.md` (approval tiers), `external_view_blend.md` (when to blend), `mental_models.md` (Tier 3 HK models).
 

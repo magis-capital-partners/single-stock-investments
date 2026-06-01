@@ -6,6 +6,8 @@
 
 Auto-scan `ICE/third-party-analyses/hk_scan_2026-06-01.md`. Mental models: croupier, exchange_economics, pecuniary_society.
 
+**Cross-check:** `ICE/research/cross_check_HK_2026-06-01.md`
+
 | HK / Stahl source | Topic | Status |
 |-----------------|-------|--------|
 | `_system/reference/investment-wisdom/horizon-kinetics/Stahl-Worth-The-Time-Predictive-Attributes-extract.txt` | Exchange ownership via Urbana; ICE alongside Cboe | Context — not in base IRR |

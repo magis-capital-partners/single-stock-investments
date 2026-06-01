@@ -65,5 +65,8 @@ Marvin scans `{TICKER}/investor-documents/research-notes/` and flags new files h
 
 ## Discovery on refresh
 
-- `scan_hk_sources.py` — for tickers in `hk_ticker_index.json`, rebuild HK scan + inject Primary sources block.
-- `refresh_deep_dive_v2.py` — append new `research-notes/` PDFs to `{TICKER}/third-party-analyses/pending.md` when not in the approved registry.
+- `scan_third_party_sources.py` — **every universe ticker**: build `source_inventory_{date}.md` (approved, pending, Substacks, HK, research-notes, shorts).
+- `scan_hk_sources.py` — HK-indexed tickers only (called via `--with-hk`).
+- `scaffold_cross_check.py` / agent narrative — **required** `cross_check_third_party_{date}.md` or named cross-check per `third_party_cross_reference.md`.
+- `check_cross_checks.py` — verify inventory + cross-check exist for registry holdings.
+- `refresh_deep_dive_v2.py` — append new `research-notes/` PDFs to `pending.md`.

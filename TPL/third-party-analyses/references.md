@@ -13,6 +13,8 @@
 
 Auto-scan `TPL/third-party-analyses/hk_scan_2026-06-01.md`. Mental models: predictive_attributes, hard_asset_scarcity, water_rights.
 
+**Cross-check:** `TPL/research/cross_check_HK_2026-06-01.md`
+
 | HK / Stahl source | Topic | Status |
 |-----------------|-------|--------|
 | `_system/reference/investment-wisdom/horizon-kinetics/HK-Q1-2025-Commentary-extract.txt` | Water scarcity index weight; TPL vs Land Bridge context | Context — not in base IRR |

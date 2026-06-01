@@ -24,10 +24,10 @@ Do **not** use the legacy five-section-only template as the final shape — run 
 ```bash
 python _system/scripts/build_folder_indexes.py --ticker {{TICKER}}
 python _system/scripts/build_filing_evidence.py {{TICKER}}
-python _system/scripts/scan_hk_sources.py {{TICKER}} --write-references
+python _system/scripts/scan_third_party_sources.py {{TICKER}} --with-hk --date {{date}}
 ```
 
-For tickers in `hk_ticker_index.json` (TPL, ICE, MSB, SJT): read `hk_cross_reference.md` and every source in `{{TICKER}}/third-party-analyses/hk_scan_{{date}}.md`. Set `HK_PDFS_ROOT` on cloud/Linux to scan the full vault.
+Read `{TICKER}/third-party-analyses/source_inventory_{{date}}.md` and every listed source. HK-indexed tickers (TPL, ICE, MSB, SJT): also read `hk_scan_{{date}}.md`. Set `HK_PDFS_ROOT` on cloud/Linux for full vault.
 
 Read:
 
@@ -44,7 +44,8 @@ If **new_documents** or **new_valuation_news**: focus on what changed for owner 
 2. Hyperscalers (`GOOGL`, `AMZN`, `META`, `MSFT`) or registry `valuation_flags`: ensure `segment_build` + `ai_overlay` exist; run `python _system/scripts/seed_hyperscaler_overlays.py {{TICKER}}` when overlays missing. Complete **Option scan** per `option_treatment.md` — no auto-zero terminals.
 3. Land / infrastructure with GAAP misstatement (e.g. `TPL`): set `nav_overlay` + `optionality_gate`; segment build for producing vs undeveloped reserves.
 4. **Growth theory:** For each material growth rate, write Popper/Deutsch stress test per `growth_explanation_stress_test.md`; fill `growth_explanation` in `valuation.json`. Philosophy refs: `_system/reference/philosophy/deutsch-popper/INDEX.md`.
-5. Write or update **`{{TICKER}}/research/deep_dive_{{date}}.md`** with filing-grounded narrative (`_system/prompts/deep_dive_filing_grounded_refresh.md`). Set header **Prior dive:** link to previous file.
+5. **Third-party cross-check (required):** write or complete **`{{TICKER}}/research/cross_check_third_party_{{date}}.md`** per `third_party_cross_reference.md` + `external_view_blend.md`. Existing named cross-checks (McIntyre, Substacks, HK) count if they cover the inventory.
+6. Write or update **`{{TICKER}}/research/deep_dive_{{date}}.md`** with filing-grounded narrative (`_system/prompts/deep_dive_filing_grounded_refresh.md`). Set header **Prior dive:** link to previous file.
 
 ## Phase 3 — Mechanical pipeline (run last; required)
 
@@ -52,11 +53,12 @@ If **new_documents** or **new_valuation_news**: focus on what changed for owner 
 python _system/scripts/marvin_cloud_refresh.py {{TICKER}} --date {{date}}
 ```
 
-That script runs: HK scan (indexed tickers) → `marvin_valuation.py --write` → `refresh_deep_dive_v2.py` → `lint_deep_dive.py` → Milly adversarial → `sync_classification.py --fix` → `build_dashboard_data.py`.
-
-Fix any lint errors before finishing the PR.
+That script runs: third-party scan (+ HK when indexed) → `marvin_valuation.py --write` → `refresh_deep_dive_v2.py` → `lint_deep_dive.py` → Milly adversarial → `sync_classification.py --fix` → `build_dashboard_data.py` → `check_cross_checks.py`.
 
 For HK-indexed tickers: `python _system/scripts/check_hk_cross_checks.py {{TICKER}}`
+For all holdings QA: `python _system/scripts/check_cross_checks.py`
+
+Fix any lint errors before finishing the PR.
 
 ## Stance
 

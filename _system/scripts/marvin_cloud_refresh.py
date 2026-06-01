@@ -100,21 +100,23 @@ def main() -> int:
             [PY, str(SCRIPTS / "build_filing_evidence.py"), ticker],
         )
 
+    ok &= run(
+        "third-party source scan",
+        [
+            PY,
+            str(SCRIPTS / "scan_third_party_sources.py"),
+            ticker,
+            "--date",
+            args.date,
+            "--with-hk",
+        ],
+    )
+
     hk_index = ROOT / "_system" / "reference" / "investment-wisdom" / "hk_ticker_index.json"
     if hk_index.exists():
         idx = json.loads(hk_index.read_text(encoding="utf-8"))
         if ticker in idx.get("tickers", {}):
-            ok &= run(
-                "HK source scan",
-                [
-                    PY,
-                    str(SCRIPTS / "scan_hk_sources.py"),
-                    ticker,
-                    "--date",
-                    args.date,
-                    "--write-references",
-                ],
-            )
+            pass  # HK scan already run via scan_third_party_sources --with-hk
 
     ok &= run(
         "valuation write",
@@ -141,6 +143,11 @@ def main() -> int:
     ok &= run(
         "dashboard JSON",
         [PY, str(SCRIPTS / "build_dashboard_data.py")],
+    )
+    ok &= run(
+        "cross-check verify",
+        [PY, str(SCRIPTS / "check_cross_checks.py"), ticker],
+        optional=True,
     )
 
     if not ok:

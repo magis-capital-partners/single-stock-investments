@@ -331,6 +331,15 @@ def onboard(args: argparse.Namespace) -> int:
     write_status(ticker_dir, "scaffold")
     write_thesis(ticker, company, classification)
 
+    run_cmd(
+        [PY, str(SCRIPTS / "scan_third_party_sources.py"), ticker, "--with-hk", "--date", today],
+        "third-party scan",
+    )
+    run_cmd(
+        [PY, str(SCRIPTS / "scaffold_cross_check.py"), ticker, "--date", today],
+        "cross-check scaffold",
+    )
+
     if not args.skip_download:
         write_status(ticker_dir, "downloading")
         ok, detail = run_download(ticker, download)
