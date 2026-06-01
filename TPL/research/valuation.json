@@ -119,6 +119,80 @@
     },
     "override_reason": null
   },
+  "growth_explanation": {
+    "as_of": "2026-06-01",
+    "status": "complete",
+    "assumption_ids": ["growth_y1_5", "growth_y6_10"],
+    "theory_label": "Permian producing toll + water infra ramp (undeveloped NRA excluded)",
+    "problem_situation": "Lawrence base IRR -1.0% at $393 on $7.91/sh OCF — why 5% years 1–5 when FY2025 OCF grew ~11% and Q1 rev +21%?",
+    "consolidated_growth": {
+      "y1_5": 0.05,
+      "y6_10": 0.03
+    },
+    "mechanisms": [
+      {
+        "id": "royalty_toll",
+        "chain": "Permian production on TPL acreage × royalty rates → $411.7M FY2025 royalties (+10% YoY) → operating cash grows low-to-mid single digits if activity holds",
+        "evidence": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+        "hard_to_vary": "yes"
+      },
+      {
+        "id": "water_infra",
+        "chain": "TPWR water sourcing/treatment volumes on scarce acreage → $307.5M FY2025 water revenue (+16% YoY) → lifts consolidated cash above royalty-only path",
+        "evidence": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+        "hard_to_vary": "yes"
+      },
+      {
+        "id": "easement_annuity",
+        "chain": "Long-dated easements with CPI escalators → $78.2M FY2025 (+24% YoY) adds stable mid-single-digit cash contribution",
+        "evidence": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+        "hard_to_vary": "partial"
+      }
+    ],
+    "excluded_from_base": [
+      {
+        "item": "Undeveloped NRA / 1888 Assigned acreage option",
+        "treatment": "nav_overlay — not smuggled into 5% consolidated growth"
+      }
+    ],
+    "risky_predictions": [
+      {
+        "text": "Water segment revenue exceeds $330M in FY2026 if 5% consolidated cash path holds",
+        "by": "FY2026 10-K",
+        "falsifier_action": "Cut consolidated years 1–5 toward 2–3%"
+      },
+      {
+        "text": "Q2–Q4 2026 consolidated revenue growth stays above 10% YoY",
+        "by": "Q4 2026 10-K",
+        "falsifier_action": "Revise growth down; activity cycle weaker than base"
+      }
+    ],
+    "falsifiers": [
+      {
+        "observation": "Permian rig count or completion intensity on TPL counties down >15% YoY for four consecutive quarters",
+        "action": "Cut years 1–5 growth to 2%; move toward bear case"
+      },
+      {
+        "observation": "Water revenue growth below 8% for two consecutive quarters while royalties flat",
+        "action": "Remove water uplift from theory; cut consolidated to 3%"
+      },
+      {
+        "observation": "FY2026 operating cash flow below $550M (~$7.95/sh) with no one-off explanation",
+        "action": "Falsifies 5% path; revisit base at 2% or bear"
+      }
+    ],
+    "ad_hoc_rescue_banned": [
+      "Raising growth to match Q1 +21% revenue burst without Permian activity bridge",
+      "Using GAAP book $21/sh as downside floor",
+      "Smuggling undeveloped-acreage NAV into consolidated FCF growth"
+    ],
+    "deutsch_checks": {
+      "hard_to_vary": true,
+      "reach": true,
+      "falsifiable": true,
+      "not_instrumentalist": true
+    }
+  },
   "overlay_results": [
     {
       "case": "GAAP book",

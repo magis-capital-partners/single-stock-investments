@@ -7,17 +7,19 @@ third_party: n/a
 block_final: false
 blocking_issues: []
 re_pass: true
-option_coverage: partial
+valuation_staleness: warn
+ai_coverage: partial
+option_coverage: complete
 growth_explanation: complete
 ---
 
-# TPL — Adversarial review
+# GOOGL — Adversarial review
 
 **Date:** 2026-06-01  
 **Agent:** Milly (growth stress test re-pass)  
-**Dive reviewed:** `TPL/research/deep_dive_2026-06-01.md`  
-**Valuation reviewed:** `TPL/research/valuation.json`  
-**Filings used:** `TPL/research/evidence/filing_facts_2026-06-01.json`
+**Dive reviewed:** `GOOGL/research/deep_dive_2026-06-01.md`  
+**Valuation reviewed:** `GOOGL/research/valuation.json`  
+**Filings used:** `GOOGL/research/evidence/filing_facts_2026-05-29.json`
 
 **Goal:** Truth-seeking QA. Not bearish for its own sake.
 
@@ -41,10 +43,10 @@ growth_explanation: complete
 
 | # | Claim in dive | Dive cites | Filing value | Match? | Severity |
 |---|---------------|------------|--------------|--------|----------|
-| 1 | Latest revenue (filing) | — | **$118.17B** vs prior $111.25B (+6.2% YoY) | spot-check dive | — |
-| — | Stockholders' equity (filing) | — | **1555946.0** | spot-check dive | — |
-| — | Net income (filing) | — | **142902.0** | spot-check dive | — |
-| — | EPS basic (filing) | — | **2.07** | spot-check dive | — |
+| 1 | Latest revenue (filing) | — | **$90.23B** vs prior $109.90B (-17.9% YoY) | spot-check dive | — |
+| — | Stockholders' equity (filing) | — | **415265.0** | spot-check dive | — |
+| — | Net income (filing) | — | **34540.0** | spot-check dive | — |
+| — | EPS basic (filing) | — | **2.84** | spot-check dive | — |
 
 ---
 
@@ -52,13 +54,12 @@ growth_explanation: complete
 
 | Check | Expected (valuation.json) | Found in dive | OK? |
 |-------|---------------------------|---------------|-----|
-| Returns statement | -1.0% | -1.0% | Yes |
-| Classification IRR | -1.0% | None% | — |
-| Valuation bridge base | -1.0% | -1.0% | Yes |
+| Returns statement | 2.1% | 2.1% | Yes |
+| Classification IRR | 2.1% | 2.1% | Yes |
+| Valuation bridge base | 2.1% | 2.1% | Yes |
 
 **Lint notes:**
-- TPL/research/deep_dive_2026-06-01.md: executive_summary_first_pct -5.4% vs valuation.json base -1.0% (tol 0.25pp)
-- TPL/research/deep_dive_2026-06-01.md: missing Implied 10yr IRR in Classification
+- GOOGL\research\deep_dive_2026-05-29.md: executive_summary_first_pct 36.1% vs valuation.json base 2.1% (tol 0.25pp)
 
 ---
 
@@ -83,10 +84,10 @@ No Tier-1 forensic short in `short_scan_2026-05-28.md`; no local `short_reports/
 | `### Growth explanation stress test` present | pass |
 | Growth ledger rows cite theory label | pass |
 | Risky predictions + falsifiers | pass |
-| Undeveloped NRA excluded from base growth | pass |
 | `valuation.json` → `growth_explanation` | pass |
+| Deutsch checks documented | pass |
 
-**Note:** Full NAV SOTP still pending — `nav_overlay` partial.
+**Note:** Cloud backlog conversion timing still **[Inference risk]** — not a dated revenue schedule in filings.
 
 ---
 
