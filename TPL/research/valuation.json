@@ -265,9 +265,11 @@
     }
   },
   "implied_return": {
-    "base_pct": -1.0,
-    "label": "10yr IRR",
-    "display": "-1.0% (base)"
+    "base_pct": -0.13,
+    "label": "10yr IRR (total synthesis)",
+    "display": "-0.13% (total synthesis)",
+    "falsifier_adjusted_pct": -1.0,
+    "synthesis_pct": -0.13
   },
   "stance_proposal": {
     "suggested": "watch",
@@ -410,5 +412,164 @@
     "falsifier_adjusted": {
       "return_pct": -1.0
     }
+  },
+  "option_scan": [
+    {
+      "q": 3,
+      "question": "In-business option: Undeveloped NRA / 1888 Assigned acreage option?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "10-K: Assigned land/RRA at zero on BS; Mar 2025 177 NRA @ $3.5M (~$19,775/NRA)"
+    },
+    {
+      "q": 3,
+      "question": "In-business option: Surface acreage (882k acres)?",
+      "answer": "Yes",
+      "treatment": "nav_floor",
+      "evidence": "10-K Item 1 ~882k surface acres; May 2025 787 ac @ $4.5M"
+    }
+  ],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Segment-derived growth (pre-falsifier)",
+        "source": "segment_build weighted blend",
+        "return_pct": -1.0,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": -5.4,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 3.4,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      },
+      {
+        "id": "segment_implied",
+        "label": "Segment cash-flow build (reverse DCF)",
+        "source": "segment_build @ explicit discount",
+        "return_pct": -0.84,
+        "weight": 0.2,
+        "type": "numeric",
+        "epistemic_tier": "B (independent derivation)",
+        "weight_why": "Reverse DCF from segment filing data; cross-checks consolidated growth without replacing falsifier path.",
+        "weight_falsifiers": [
+          "Segment sum PV tie-out fails vs consolidated OCF",
+          "Implied return moves >1pp when segment growth matches filing falsifier-adjusted exactly (double-count signal)"
+        ],
+        "hard_to_vary": "partial: shares growth inputs with Tier A; weight kept below filing path"
+      },
+      {
+        "id": "nav_overlay_payoff",
+        "label": "NAV overlay dated payoff (10yr to overlay base)",
+        "source": "nav_overlay ~$210.5/sh vs price $393.0",
+        "return_pct": -6.05,
+        "weight": 0.1,
+        "type": "numeric",
+        "epistemic_tier": "D (alternate theory: dated asset payoff)",
+        "weight_why": "Answers a different question (NAV convergence) than 10yr cash-flow IRR; capped weight to avoid theory conflation.",
+        "weight_falsifiers": [
+          "NAV overlay base not updated when segment build or filings change >10%",
+          "floor_pass false but weight above 15% without [HUMAN REVIEW]"
+        ],
+        "hard_to_vary": "yes: separate theory type"
+      },
+      {
+        "id": "third_party_context",
+        "label": "Third-party context (HK + Substacks inventory)",
+        "source": "source_inventory (8 sources); cross_check blend",
+        "return_pct": 3.4,
+        "weight": 0.1,
+        "type": "numeric",
+        "notes": "Proxy: upside case when strategic third party has no spot IRR",
+        "epistemic_tier": "D (external triangulation)",
+        "weight_why": "Context-tier HK/Substacks until human promotes in third_party_sources.md; numeric proxy is weak.",
+        "weight_falsifiers": [
+          "Using bull scenario as HK proxy when cross_check synthesis says no IRR upgrade",
+          "Weight above 15% while human_approval pending"
+        ],
+        "hard_to_vary": "no: proxy return is instrumentalist; prefer qualitative pp until approved blend"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "factor": "Competition / moat (scarce Permian acreage, no scale peer)",
+        "pp": 0.3,
+        "rationale": "Irreplaceable surface + royalty footprint limits competitive entry",
+        "sources": "10-K Item 1; Business & moat"
+      },
+      {
+        "factor": "Partial dhando (HK hard-asset / hidden NAV)",
+        "pp": 0.5,
+        "rationale": "Third-party confirms asset quality not in GAAP book; not full floor at spot price",
+        "sources": "cross_check_HK; hk_scan; HK Q1 2025/2026"
+      },
+      {
+        "factor": "Governance transition (post-Stahl)",
+        "pp": -0.4,
+        "rationale": "Capital allocation uncertainty until proven",
+        "sources": "https://lemoncakesinvesting.substack.com/p/tpl-texas-pacific-land-co-end-of"
+      },
+      {
+        "factor": "Water scarcity tailwind (SSI / HK index-weight)",
+        "pp": 0.25,
+        "rationale": "TPWR segment + index cannot replicate subsurface water exposure",
+        "sources": "https://specialsituationinvesting.substack.com/p/portfolio-update-gtx-msb-frmo-tpl"
+      },
+      {
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework"
+      }
+    ],
+    "numeric_weighted_pct": -0.58,
+    "qualitative_pp": 0.45,
+    "total_synthesis_pct": -0.13,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [
+        "Third-party numeric path proxies bull scenario (instrumentalist); HK cross-check says no base IRR upgrade. Prefer qualitative pp only until approved blend.",
+        "NAV overlay is a different theory (asset payoff vs cash-flow IRR); weight capped at 10% to limit theory conflation.",
+        "Qualitative \u00b1pp stack may overlap numeric paths (moat/dhando); cap \u00b13pp and require source for each row."
+      ],
+      "deutsch_checks": {
+        "hard_to_vary": false,
+        "falsifiable": true,
+        "not_instrumentalist": false,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
   }
 }

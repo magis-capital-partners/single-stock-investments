@@ -10,25 +10,25 @@ Documents in folder: **133** (all listed below; Tier 1–3 extracted or keyword-
 
 | Tier | Kind | File date | Path | Chars |
 |------|------|-----------|------|-------|
-| partial | 10-K | — | `investor-documents/ir-snow/Snowflake-Inc.-files-_10-K_-Basic-annual-filing_-for-period-end-31-Jan-21-_SNOW-US_.pdf` | 0 ERR:No module named 'pypdf' |
-| partial | 10-K | — | `investor-documents/ir-snow/Snowflake-Inc.-files-_10-K_-Basic-annual-filing_-for-period-end-31-Jan-22-_SNOW-US_.pdf` | 0 ERR:No module named 'pypdf' |
+| partial | 10-K | — | `investor-documents/ir-snow/Snowflake-Inc.-files-_10-K_-Basic-annual-filing_-for-period-end-31-Jan-21-_SNOW-US_.pdf` | 54412 |
+| partial | 10-K | — | `investor-documents/ir-snow/Snowflake-Inc.-files-_10-K_-Basic-annual-filing_-for-period-end-31-Jan-22-_SNOW-US_.pdf` | 53920 |
 | partial | 10-K | 2022-03-30 | `investor-documents/sec-edgar/10-K_20220330_rpt20220131_acc0001640147_22_000023.htm` | 30000 |
 | partial | 10-K | 2023-03-29 | `investor-documents/sec-edgar/10-K_20230329_rpt20230131_acc0001640147_23_000030.htm` | 30000 |
 | partial | 10-K | 2024-03-26 | `investor-documents/sec-edgar/10-K_20240326_rpt20240131_acc0001640147_24_000101.htm` | 30000 |
 | partial | 10-K | 2025-03-21 | `investor-documents/sec-edgar/10-K_20250321_rpt20250131_acc0001640147_25_000052.htm` | 30000 |
 | full | 10-K | 2026-03-20 | `investor-documents/sec-edgar/10-K_20260320_rpt20260131_acc0001640147_26_000008.htm` | 120000 |
-| partial | annual | — | `investor-documents/ir-snow/2023-Annual-Report-and-Proxy-Statementpdf.pdf` | 0 ERR:No module named 'pypdf' |
-| partial | annual | — | `investor-documents/ir-snow/2024-Annual-Report-and-Proxy-Statement.pdf` | 0 ERR:No module named 'pypdf' |
-| partial | annual | — | `investor-documents/ir-snow/SNOW2021AnnualReport.pdf` | 0 ERR:No module named 'pypdf' |
-| partial | annual | — | `investor-documents/ir-snow/Snowflake-2025-Annual-Report-and-Proxy-Web-Version.pdf` | 0 ERR:No module named 'pypdf' |
-| full | annual | — | `investor-documents/ir-snow/Snowflake-2026-Annual-Report-and-Proxy-Statement.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | 10-Q | — | `investor-documents/ir-snow/Q2-FY25-10-Q.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | 10-Q | — | `investor-documents/ir-snow/Snowflake-Inc-files-10-Q-Basic-quarterly-filing-for-period-end-30-Apr-23-SNOW-US.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | 10-Q | — | `investor-documents/ir-snow/Snowflake-Inc.-files-_10-Q_-Basic-quarterly-filing_-for-period-end-30-Apr-21-_SNOW-US_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | 10-Q | — | `investor-documents/ir-snow/Snowflake-Inc.-files-_10-Q_-Basic-quarterly-filing_-for-period-end-30-Apr-22-_SNOW-US_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | 10-Q | — | `investor-documents/ir-snow/Snowflake-Inc.-files-_10-Q_-Basic-quarterly-filing_-for-period-end-31-Jul-21-_SNOW-US_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | 10-Q | — | `investor-documents/ir-snow/Snowflake-Inc.-files-_10-Q_-Basic-quarterly-filing_-for-period-end-31-Jul-22-_SNOW-US_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | 10-Q | — | `investor-documents/ir-snow/Snowflake-Inc.-files-_10-Q_-Basic-quarterly-filing_-for-period-end-31-Oct-21-_SNOW-US_.pdf` | 0 ERR:No module named 'pypdf' |
+| partial | annual | — | `investor-documents/ir-snow/2023-Annual-Report-and-Proxy-Statementpdf.pdf` | 31270 |
+| partial | annual | — | `investor-documents/ir-snow/2024-Annual-Report-and-Proxy-Statement.pdf` | 38151 |
+| partial | annual | — | `investor-documents/ir-snow/SNOW2021AnnualReport.pdf` | 34624 |
+| partial | annual | — | `investor-documents/ir-snow/Snowflake-2025-Annual-Report-and-Proxy-Web-Version.pdf` | 38939 |
+| full | annual | — | `investor-documents/ir-snow/Snowflake-2026-Annual-Report-and-Proxy-Statement.pdf` | 398157 |
+| scan | 10-Q | — | `investor-documents/ir-snow/Q2-FY25-10-Q.pdf` | 7472 |
+| scan | 10-Q | — | `investor-documents/ir-snow/Snowflake-Inc-files-10-Q-Basic-quarterly-filing-for-period-end-30-Apr-23-SNOW-US.pdf` | 7173 |
+| scan | 10-Q | — | `investor-documents/ir-snow/Snowflake-Inc.-files-_10-Q_-Basic-quarterly-filing_-for-period-end-30-Apr-21-_SNOW-US_.pdf` | 7989 |
+| scan | 10-Q | — | `investor-documents/ir-snow/Snowflake-Inc.-files-_10-Q_-Basic-quarterly-filing_-for-period-end-30-Apr-22-_SNOW-US_.pdf` | 8081 |
+| scan | 10-Q | — | `investor-documents/ir-snow/Snowflake-Inc.-files-_10-Q_-Basic-quarterly-filing_-for-period-end-31-Jul-21-_SNOW-US_.pdf` | 7997 |
+| scan | 10-Q | — | `investor-documents/ir-snow/Snowflake-Inc.-files-_10-Q_-Basic-quarterly-filing_-for-period-end-31-Jul-22-_SNOW-US_.pdf` | 8083 |
+| scan | 10-Q | — | `investor-documents/ir-snow/Snowflake-Inc.-files-_10-Q_-Basic-quarterly-filing_-for-period-end-31-Oct-21-_SNOW-US_.pdf` | 8031 |
 | scan | 10-Q | 2021-09-02 | `investor-documents/sec-edgar/10-Q_20210902_rpt20210731_acc0001640147_21_000212.htm` | 8000 |
 | scan | 10-Q | 2021-12-03 | `investor-documents/sec-edgar/10-Q_20211203_rpt20211031_acc0001640147_21_000271.htm` | 8000 |
 | scan | 10-Q | 2022-06-03 | `investor-documents/sec-edgar/10-Q_20220603_rpt20220430_acc0001640147_22_000044.htm` | 8000 |
@@ -48,29 +48,29 @@ Documents in folder: **133** (all listed below; Tier 1–3 extracted or keyword-
 | scan | proxy | 2024-05-22 | `investor-documents/sec-edgar/DEF 14A_20240522_rpt20240131_acc0001640147_24_000123.htm` | 8000 |
 | scan | proxy | 2025-05-21 | `investor-documents/sec-edgar/DEF 14A_20250521_rpt20250702_acc0001640147_25_000096.htm` | 8000 |
 | full | proxy | 2026-05-18 | `investor-documents/sec-edgar/DEF 14A_20260518_rpt20260629_acc0001640147_26_000019.htm` | 120000 |
-| scan | earnings | — | `investor-documents/ir-snow/CORRECTED-TRANSCRIPT_-Snowflake-Inc-SNOW-US-Q1-2025-Earnings-Call-22-May-2024-5_00-PM-ET.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-snow/CORRECTED-TRANSCRIPT_-Snowflake-Inc-SNOW-US-Q1-2026-Earnings-Call-21-May-2025-5_00-PM-ET.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-snow/CORRECTED-TRANSCRIPT_-Snowflake-Inc-SNOW-US-Q1-2027-Earnings-Call-27-May-2026-5_00-PM-ET.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-snow/CORRECTED-TRANSCRIPT_-Snowflake-Inc-SNOW-US-Q2-2024-Earnings-Call-23-August-2023-5_00-PM-ET.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-snow/CORRECTED-TRANSCRIPT_-Snowflake-Inc-SNOW-US-Q2-2025-Earnings-Call-21-August-2024-5_00-PM-ET.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-snow/CORRECTED-TRANSCRIPT_-Snowflake-Inc-SNOW-US-Q2-2026-Earnings-Call-27-August-2025-5_00-PM-ET.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-snow/CORRECTED-TRANSCRIPT_-Snowflake-Inc-SNOW-US-Q3-2025-Earnings-Call-20-November-2024-5_00-PM-ET.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-snow/CORRECTED-TRANSCRIPT_-Snowflake-Inc-SNOW-US-Q3-2026-Earnings-Call-3-December-2025-5_00-PM-ET.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-snow/CORRECTED-TRANSCRIPT_-Snowflake-Inc-SNOW-US-Q4-2025-Earnings-Call-26-February-2025-5_00-PM-ET.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-snow/CORRECTED-TRANSCRIPT_-Snowflake-Inc-SNOW-US-Q4-2026-Earnings-Call-25-February-2026-5_00-PM-ET.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-snow/CORRECTED-TRANSCRIPT_-Snowflake-Inc._SNOW-US_-Q2-2023-Earnings-Call-24-August-2022-5_00-PM-ET.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-snow/CORRECTED-TRANSCRIPT_-Snowflake_-Inc._SNOW-US__-Q1-2022-Earnings-Call_-26-May-2021-5_00-PM-ET.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-snow/CORRECTED-TRANSCRIPT_-Snowflake_-Inc._SNOW-US__-Q1-2023-Earnings-Call_-25-May-2022-5_00-PM-ET-_1_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-snow/CORRECTED-TRANSCRIPT_-Snowflake_-Inc._SNOW-US__-Q2-2022-Earnings-Call_-25-August-2021-5_00-PM-ET.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-snow/CORRECTED-TRANSCRIPT_-Snowflake_-Inc._SNOW-US__-Q3-2022-Earnings-Call_-1-December-2021-5_00-PM-ET.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-snow/CORRECTED-TRANSCRIPT_-Snowflake_-Inc._SNOW-US__-Q3-2023-Earnings-Call_-30-November-2022-5_00-PM-ET-_1_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-snow/CORRECTED-TRANSCRIPT_-Snowflake_-Inc._SNOW-US__-Q4-2021-Earnings-Call_-3-March-2021-5_00-PM-ET.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-snow/CORRECTED-TRANSCRIPT_-Snowflake_-Inc._SNOW-US__-Q4-2022-Earnings-Call_-2-March-2022-5_00-PM-ET.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-snow/CORRECTED-TRANSCRIPT_-Snowflake_-Inc._SNOW-US__-Q4-2023-Earnings-Call_-1-March-2023-5_00-PM-ET.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | 2020-12-02 | `investor-documents/ir-snow/Q3-2021-Earnings-Call_2020-12-02-22-00-00_Transcript.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-snow/Q4-FY24-Earnings-Call-Transcript.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-snow/Snowflake_Earnings_Infographics_FY22Q2_Global.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-snow/TRANSCRIPT_-Snowflake-Inc-SNOW-US-Q3-2024-Earnings-Call-29-November-2023-5_00-PM-ET.pdf` | 0 ERR:No module named 'pypdf' |
+| scan | earnings | — | `investor-documents/ir-snow/CORRECTED-TRANSCRIPT_-Snowflake-Inc-SNOW-US-Q1-2025-Earnings-Call-22-May-2024-5_00-PM-ET.pdf` | 5420 |
+| scan | earnings | — | `investor-documents/ir-snow/CORRECTED-TRANSCRIPT_-Snowflake-Inc-SNOW-US-Q1-2026-Earnings-Call-21-May-2025-5_00-PM-ET.pdf` | 5470 |
+| scan | earnings | — | `investor-documents/ir-snow/CORRECTED-TRANSCRIPT_-Snowflake-Inc-SNOW-US-Q1-2027-Earnings-Call-27-May-2026-5_00-PM-ET.pdf` | 8202 |
+| scan | earnings | — | `investor-documents/ir-snow/CORRECTED-TRANSCRIPT_-Snowflake-Inc-SNOW-US-Q2-2024-Earnings-Call-23-August-2023-5_00-PM-ET.pdf` | 6133 |
+| scan | earnings | — | `investor-documents/ir-snow/CORRECTED-TRANSCRIPT_-Snowflake-Inc-SNOW-US-Q2-2025-Earnings-Call-21-August-2024-5_00-PM-ET.pdf` | 5633 |
+| scan | earnings | — | `investor-documents/ir-snow/CORRECTED-TRANSCRIPT_-Snowflake-Inc-SNOW-US-Q2-2026-Earnings-Call-27-August-2025-5_00-PM-ET.pdf` | 5646 |
+| scan | earnings | — | `investor-documents/ir-snow/CORRECTED-TRANSCRIPT_-Snowflake-Inc-SNOW-US-Q3-2025-Earnings-Call-20-November-2024-5_00-PM-ET.pdf` | 5536 |
+| scan | earnings | — | `investor-documents/ir-snow/CORRECTED-TRANSCRIPT_-Snowflake-Inc-SNOW-US-Q3-2026-Earnings-Call-3-December-2025-5_00-PM-ET.pdf` | 5301 |
+| scan | earnings | — | `investor-documents/ir-snow/CORRECTED-TRANSCRIPT_-Snowflake-Inc-SNOW-US-Q4-2025-Earnings-Call-26-February-2025-5_00-PM-ET.pdf` | 7441 |
+| scan | earnings | — | `investor-documents/ir-snow/CORRECTED-TRANSCRIPT_-Snowflake-Inc-SNOW-US-Q4-2026-Earnings-Call-25-February-2026-5_00-PM-ET.pdf` | 7287 |
+| scan | earnings | — | `investor-documents/ir-snow/CORRECTED-TRANSCRIPT_-Snowflake-Inc._SNOW-US_-Q2-2023-Earnings-Call-24-August-2022-5_00-PM-ET.pdf` | 5632 |
+| scan | earnings | — | `investor-documents/ir-snow/CORRECTED-TRANSCRIPT_-Snowflake_-Inc._SNOW-US__-Q1-2022-Earnings-Call_-26-May-2021-5_00-PM-ET.pdf` | 5273 |
+| scan | earnings | — | `investor-documents/ir-snow/CORRECTED-TRANSCRIPT_-Snowflake_-Inc._SNOW-US__-Q1-2023-Earnings-Call_-25-May-2022-5_00-PM-ET-_1_.pdf` | 5737 |
+| scan | earnings | — | `investor-documents/ir-snow/CORRECTED-TRANSCRIPT_-Snowflake_-Inc._SNOW-US__-Q2-2022-Earnings-Call_-25-August-2021-5_00-PM-ET.pdf` | 5364 |
+| scan | earnings | — | `investor-documents/ir-snow/CORRECTED-TRANSCRIPT_-Snowflake_-Inc._SNOW-US__-Q3-2022-Earnings-Call_-1-December-2021-5_00-PM-ET.pdf` | 5309 |
+| scan | earnings | — | `investor-documents/ir-snow/CORRECTED-TRANSCRIPT_-Snowflake_-Inc._SNOW-US__-Q3-2023-Earnings-Call_-30-November-2022-5_00-PM-ET-_1_.pdf` | 5397 |
+| scan | earnings | — | `investor-documents/ir-snow/CORRECTED-TRANSCRIPT_-Snowflake_-Inc._SNOW-US__-Q4-2021-Earnings-Call_-3-March-2021-5_00-PM-ET.pdf` | 5453 |
+| scan | earnings | — | `investor-documents/ir-snow/CORRECTED-TRANSCRIPT_-Snowflake_-Inc._SNOW-US__-Q4-2022-Earnings-Call_-2-March-2022-5_00-PM-ET.pdf` | 5438 |
+| scan | earnings | — | `investor-documents/ir-snow/CORRECTED-TRANSCRIPT_-Snowflake_-Inc._SNOW-US__-Q4-2023-Earnings-Call_-1-March-2023-5_00-PM-ET.pdf` | 5673 |
+| scan | earnings | 2020-12-02 | `investor-documents/ir-snow/Q3-2021-Earnings-Call_2020-12-02-22-00-00_Transcript.pdf` | 5296 |
+| scan | earnings | — | `investor-documents/ir-snow/Q4-FY24-Earnings-Call-Transcript.pdf` | 2 |
+| scan | earnings | — | `investor-documents/ir-snow/Snowflake_Earnings_Infographics_FY22Q2_Global.pdf` | 1838 |
+| scan | earnings | — | `investor-documents/ir-snow/TRANSCRIPT_-Snowflake-Inc-SNOW-US-Q3-2024-Earnings-Call-29-November-2023-5_00-PM-ET.pdf` | 5750 |
 | scan | 8-K | 2023-07-12 | `investor-documents/sec-edgar/8-K_20230712_rpt20230705_acc0001640147_23_000164.htm` | 4576 |
 | scan | 8-K | 2023-08-23 | `investor-documents/sec-edgar/8-K_20230823_rpt20230822_acc0001640147_23_000193.htm` | 7880 |
 | scan | 8-K | 2023-11-29 | `investor-documents/sec-edgar/8-K_20231129_rpt20231128_acc0001640147_23_000253.htm` | 5762 |
@@ -98,29 +98,29 @@ Documents in folder: **133** (all listed below; Tier 1–3 extracted or keyword-
 | scan | 8-K | 2026-03-31 | `investor-documents/sec-edgar/8-K_20260331_exhibit_ex991_pressreleasex033126.htm_acc0001640147_26_000013.htm` | 7745 |
 | scan | 8-K | 2026-03-31 | `investor-documents/sec-edgar/8-K_20260331_rpt20260331_acc0001640147_26_000013.htm` | 5037 |
 | scan | 8-K | 2026-05-27 | `investor-documents/sec-edgar/8-K_20260527_rpt20260527_acc0001640147_26_000027.htm` | 3747 |
-| scan | presentation | — | `investor-documents/ir-snow/Q1-FY2024-Investor-Presentation_vF-FINAL2.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-snow/Q1-FY2025-Investor-Presentation-vF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-snow/Q1-FY2026-Investor-Presentation_vF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-snow/Q1-FY2027-Investor-Presentation_vFF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-snow/Q1-FY22-Snowflake-Investor-Presentation_vFINAL.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-snow/Q1-FY23-Snowflake-Investor-PresentationvF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-snow/Q2-FY2023-Investor-Presentation_vF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-snow/Q2-FY2024-Investor-Presentation-vF1.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-snow/Q2-FY2025-Investor-Presentation_vF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-snow/Q2-FY2026-Investor-Presentation_vF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-snow/Q2-FY22-Snowflake-Investor-Presentation_Final-_2_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-snow/Q3-FY2023-Investor-Presentation_vFinal.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-snow/Q3-FY2024-Investor-Presentation-vF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-snow/Q3-FY2025-Investor-Presentation_vFF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-snow/Q3-FY2026-Investor-Presentation_vF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-snow/Q3-FY21-Snowflake-Investor-Presentation.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-snow/Q3-FY22-Snowflake-Investor-Presentation_vFINAL-_1_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-snow/Q4-FY2023-Investor-Presentation_vF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-snow/Q4-FY2024-Investor-Presentation-vF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-snow/Q4-FY2025-Investor-Presentation_vFF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-snow/Q4-FY2026-Investor-Presentation_vF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-snow/Q4-FY21-Snowflake-Investor-Presentation.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-snow/Q4-FY22-Snowflake-Investor-Presentation_vFinal.pdf` | 0 ERR:No module named 'pypdf' |
+| scan | presentation | — | `investor-documents/ir-snow/Q1-FY2024-Investor-Presentation_vF-FINAL2.pdf` | 8643 |
+| scan | presentation | — | `investor-documents/ir-snow/Q1-FY2025-Investor-Presentation-vF.pdf` | 8893 |
+| scan | presentation | — | `investor-documents/ir-snow/Q1-FY2026-Investor-Presentation_vF.pdf` | 12640 |
+| scan | presentation | — | `investor-documents/ir-snow/Q1-FY2027-Investor-Presentation_vFF.pdf` | 13987 |
+| scan | presentation | — | `investor-documents/ir-snow/Q1-FY22-Snowflake-Investor-Presentation_vFINAL.pdf` | 7418 |
+| scan | presentation | — | `investor-documents/ir-snow/Q1-FY23-Snowflake-Investor-PresentationvF.pdf` | 7145 |
+| scan | presentation | — | `investor-documents/ir-snow/Q2-FY2023-Investor-Presentation_vF.pdf` | 7280 |
+| scan | presentation | — | `investor-documents/ir-snow/Q2-FY2024-Investor-Presentation-vF1.pdf` | 9829 |
+| scan | presentation | — | `investor-documents/ir-snow/Q2-FY2025-Investor-Presentation_vF.pdf` | 10377 |
+| scan | presentation | — | `investor-documents/ir-snow/Q2-FY2026-Investor-Presentation_vF.pdf` | 12508 |
+| scan | presentation | — | `investor-documents/ir-snow/Q2-FY22-Snowflake-Investor-Presentation_Final-_2_.pdf` | 7174 |
+| scan | presentation | — | `investor-documents/ir-snow/Q3-FY2023-Investor-Presentation_vFinal.pdf` | 8066 |
+| scan | presentation | — | `investor-documents/ir-snow/Q3-FY2024-Investor-Presentation-vF.pdf` | 8491 |
+| scan | presentation | — | `investor-documents/ir-snow/Q3-FY2025-Investor-Presentation_vFF.pdf` | 11314 |
+| scan | presentation | — | `investor-documents/ir-snow/Q3-FY2026-Investor-Presentation_vF.pdf` | 12709 |
+| scan | presentation | — | `investor-documents/ir-snow/Q3-FY21-Snowflake-Investor-Presentation.pdf` | 6077 |
+| scan | presentation | — | `investor-documents/ir-snow/Q3-FY22-Snowflake-Investor-Presentation_vFINAL-_1_.pdf` | 7248 |
+| scan | presentation | — | `investor-documents/ir-snow/Q4-FY2023-Investor-Presentation_vF.pdf` | 8067 |
+| scan | presentation | — | `investor-documents/ir-snow/Q4-FY2024-Investor-Presentation-vF.pdf` | 8447 |
+| scan | presentation | — | `investor-documents/ir-snow/Q4-FY2025-Investor-Presentation_vFF.pdf` | 12548 |
+| scan | presentation | — | `investor-documents/ir-snow/Q4-FY2026-Investor-Presentation_vF.pdf` | 12943 |
+| scan | presentation | — | `investor-documents/ir-snow/Q4-FY21-Snowflake-Investor-Presentation.pdf` | 6017 |
+| scan | presentation | — | `investor-documents/ir-snow/Q4-FY22-Snowflake-Investor-Presentation_vFinal.pdf` | 7241 |
 | inventory | other | — | `investor-documents/ir-snow/0d4be772-30ac-4017-a78b-a5eaa081840e.pdf` | 0 |
 | inventory | other | — | `investor-documents/ir-snow/10q-snow.pdf` | 0 |
 | inventory | other | — | `investor-documents/ir-snow/663fb935-b123-4bbb-8827-905bcbb8953c.pdf` | 0 |
@@ -185,7 +185,42 @@ Documents in folder: **133** (all listed below; Tier 1–3 extracted or keyword-
 - StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 2,236
 
 ### `investor-documents/ir-snow/Snowflake-2026-Annual-Report-and-Proxy-Statement.pdf`
-Extract error: No module named 'pypdf'
+**Keyword snippets (related party, financials, segments):**
+- the scope and impact of our platform. Full year product revenue reached $4.47 billion, up
+- product revenue
+- Chief Executive Officer, Snowflake
+- We are pleased to invite you to attend the 2026 Annual Meeting of Stockholders (Annual Meeting) of Snowflake Inc., a Delaware
+- To elect the three nominees for Class III director named in the accompanying proxy statement (Proxy Statement),
+- To approve, on a non-binding advisory basis, the compensation of our named executive officers, as disclosed in the
+- majority vote for director elections; and
+- Our Board of Directors has fixed the close of business on May 5, 2026 as the record date for the Annual Meeting. Only stockholders of
+- By Order of the Board of Directors
+- Chief Executive Officer
+- Your vote is important. Whether or not you plan to virtually attend the Annual Meeting, please ensure that your shares
+- The Board of Directors and Corporate Governance 3
+- Director Compensation 19
+- Proposal One - Election of Directors 22
+- Proposal Two - Non-Binding Advisory Vote on the Compensation of our Named Executive Officers 23
+- Proposal Four - Stockholder Proposal Requesting Majority Vote for Director Elections 28
+- Executive Officers 32
+- Executive Compensation 34
+- Compensation Discussion and Analysis 34
+- Report of the Compensation Committee 55
+- Executive Compensation Tables 56
+- Chief Executive Officer Pay Ratio 66
+- Our Board of Directors is soliciting your proxy to vote at the 2026 Annual Meeting of Stockholders of Snowflake Inc. (Annual Meeting)
+- In this Proxy Statement, we refer to Snowflake Inc. as “Snowflake,” the “Company,” “we,” “us,” or “our” and the Board of Directors of
+- Snowflake as “our Board of Directors” or “our Board.” Our fiscal year ends on January 31.  For example, “Fiscal Year 2026” refers to
+- Ramaswamy as Class III directors, each to hold office until our
+- compensation of our named executive officers, as disclosed in
+- stockholder proposal requesting majority vote for director
+- Please refer to the section titled Additional Information about the Annual Meeting below for additional meeting information, including
+- THE BOARD OF DIRECTORS
+- The following table presents, for the Class III nominees for election at the Annual Meeting and our other directors who will continue in
+- Name and Occupation Age Independent Audit Compensation
+- Class I directors(1)
+- Executive Officer of Arista Networks
+- Class II directors(1)
 
 ### `investor-documents/sec-edgar/10-Q_20260529_rpt20260430_acc0001640147_26_000030.htm`
 **Keyword snippets (related party, financials, segments):**
@@ -323,19 +358,139 @@ Extract error: No module named 'pypdf'
 - StockholdersEquity: 155,340
 
 ### `investor-documents/ir-snow/Snowflake-Inc.-files-_10-K_-Basic-annual-filing_-for-period-end-31-Jan-22-_SNOW-US_.pdf`
-Extract error: No module named 'pypdf'
+**Keyword snippets (related party, financials, segments):**
+- (Address of principal executive offices)
+- We are a Delaware corporation with a globally distributed workforce and no corporate headquarters. Under the Securities and Exchange Commission's rules, we are required to designate a “principal executive
+- office.” For purposes of this report, we have designated our office in Bozeman, Montana as our principal executive office, as that is where our Chief Executive Officer and Chief Financial Officer are based.
+- ITEM 1A. Risk Factors.
+- ITEM 10. Directors, Executive Officers and Corporate Governance.
+- ITEM 11. Executive Compensation.
+- ITEM 13. Certain Relationships and Related Transactions, and Director Independence.
+- our expectations regarding our revenue, expenses, and other operating results, including statements relating to the
+- portion of our remaining performance obligations that we expect to be recognized as revenue in future periods;
+- assumptions, including risks described in the section titled “Risk Factors” and elsewhere in this Annual Report on Form 10-K.
+- performance. Moreover, we operate in a very competitive and rapidly changing environment. New risk factors emerge from time
+- to time, and it is not possible for our management to predict all risk factors nor can we assess the impact of all factors on our
+- webcasts, press releases, and conference calls. We use these mediums, including our website, to communicate with investors
+- risks and uncertainties set forth in the section titled “Risk Factors” included elsewhere in this Annual Report on Form 10-K.
+- We have experienced rapid revenue growth, which may not be indicative of our future performance, and we have a
+- Global 2000 list, and those customers contributed approximately 26% and 40% of our revenue, respectively, for the fiscal year
+- our platform, they typically expand their usage significantly, as evidenced by our net revenue retention rate, which was 178% as
+- of January 31, 2022. The number of customers that contributed more than $1 million in trailing 12-month product revenue
+- revenue was $1.2 billion, $592.0 million, and $264.7 million, respectively, representing year-over-year growth of 106% and
+- partner program to drive more consumption on our platform, broaden our distribution footprint, acquire new customers,
 
 ### `investor-documents/ir-snow/Snowflake-Inc.-files-_10-K_-Basic-annual-filing_-for-period-end-31-Jan-21-_SNOW-US_.pdf`
-Extract error: No module named 'pypdf'
+**Keyword snippets (related party, financials, segments):**
+- (Address of principal executive offices)
+- ITEM 1A. Risk Factors.
+- ITEM 10. Directors, Executive Officers and Corporate Governance.
+- ITEM 11. Executive Compensation.
+- ITEM 13. Certain Relationships and Related Transactions, and Director Independence.
+- our expectations regarding our revenue, expenses, and other operating results, including statements relating to the
+- portion of our remaining performance obligations that we expect to be recognized as revenue in future periods;
+- assumptions, including risks described in the section titled “Risk Factors” and elsewhere in this Annual Report on Form 10-K.
+- performance. Moreover, we operate in a very competitive and rapidly changing environment. New risk factors emerge from time
+- to time, and it is not possible for our management to predict all risk factors nor can we assess the impact of all factors on our
+- webcasts, press releases, and conference calls. We use these mediums, including our website, to communicate with investors
+- our revenue for the fiscal year ended January 31, 2021. Our Fortune 500 customer count is subject to adjustments for annual
+- significantly, as evidenced by our net revenue retention rate, which was 168% as of January 31, 2021. The number of customers
+- that contributed more than $1 million in trailing 12-month product revenue increased from 41 to 77 as of January 31, 2020 and
+- revenue was $592.0 million, $264.7 million, and $96.7 million, respectively, representing year-over-year growth of 124% and
+- to drive more consumption on our platform, broaden our distribution footprint, acquire new customers, and drive greater
+- processing. It does so by collecting data distribution information for all columns in every micro-partition.
+- segmented by customer size, region, and recently, industry. Our direct sales team is primarily focused on new customer
+- executives through our direct sales team. The substantial majority of our global sales and marketing efforts are carried out by
+- awareness of our platform, and broadening our distribution and reach to new customers. Our Snowflake Partner Network is a
 
 ### `investor-documents/ir-snow/Snowflake-2025-Annual-Report-and-Proxy-Web-Version.pdf`
-Extract error: No module named 'pypdf'
+**Keyword snippets (related party, financials, segments):**
+- customers better than ever before. This led to Snowflake delivering $3.5 billion of product revenue, representing 30% growth year-
+- Chief Executive Officer, Snowflake
+- We are pleased to invite you to virtually attend the 2025 Annual Meeting of Stockholders (Annual Meeting) of Snowflake Inc., a
+- To elect the three nominees for Class II directors named in the accompanying proxy statement (Proxy Statement), each
+- To approve, on a non-binding advisory basis, the compensation of our named executive officers, as disclosed in the
+- declassify our board of directors;
+- Our board of directors has fixed the close of business on May 8, 2025 as the record date for the Annual Meeting. Only stockholders of
+- By Order of the Board of Directors
+- Chief Executive Officer
+- Your vote is important. Whether or not you plan to virtually attend the Annual Meeting, please ensure that your shares
+- The Board of Directors and Corporate Governance 10
+- Director Compensation 26
+- Proposal One - Election of Directors 29
+- Proposal Two - Non-Binding Advisory Vote on the Compensation of our Named Executive Officers 30
+- Report of the Audit Committee of the Board of Directors 33
+- Proposal Four - Amendment to our Certificate of Incorporation to Declassify our Board of Directors 34
+- Executive Officers 39
+- Executive Compensation 41
+- Compensation Discussion and Analysis 41
+- Report of the Compensation Committee of the Board of Directors 61
 
 ### `investor-documents/ir-snow/SNOW2021AnnualReport.pdf`
-Extract error: No module named 'pypdf'
+**Keyword snippets (related party, financials, segments):**
+- Letter from our Chief Executive Officer
+- 2021, Snowflake reported revenues of $592.0 million, representing year-over-year growth of 124%. Additionally, our
+- Our revenue retention rates are world-class, and our Net Promoter Score of 71 is best-in-class. As of January 31, 2021,
+- 1 Please see our Annual Report on Form 10-K included below for definitions of remaining performance obligations, net revenue retention rate, and
+- total customers. Please see our earnings press release for the fiscal quarter ended April 30, 2021 available at investors.snowflake.com for definitions
+- We are pleased to invite you to virtually attend the 2021 Annual Meeting of Stockholders (including any
+- 1. To elect three Class I directors, Benoit Dageville, Mark S. Garrett, and Jayshree V. Ullal, each to hold
+- Our board of directors has fixed the close of business on May 14, 2021 as the record date for the Annual Meeting.
+- By Order of the Board of Directors
+- Chief Executive Officer and Chairman
+- please ensure that your shares are voted during the Annual Meeting by signing and
+- have voted by proxy, you may still vote online if you attend the Annual Meeting. Please
+- Information Regarding the Board of Directors and Corporate Governance 7
+- Director Compensation 16
+- Proposal One Election of Directors 19
+- Report of the Audit Committee of the Board of Directors 22
+- Executive Officers 23
+- Executive Compensation 24
+- Our board of directors is soliciting your proxy to vote at the 2021 Annual Meeting of Stockholders (including any
+- In this Proxy Statement, we refer to Snowflake Inc. as “Snowflake,” “we,” “us,” or “our” and the board of directors
 
 ### `investor-documents/ir-snow/2024-Annual-Report-and-Proxy-Statement.pdf`
-Extract error: No module named 'pypdf'
+**Keyword snippets (related party, financials, segments):**
+- ever before. This led to Snowflake delivering $2.8 billion of revenue, representing 36% growth year-over-year.
+- We are pleased to invite you to virtually attend the 2024 Annual Meeting of Stockholders (Annual Meeting) of Snowflake Inc., a
+- To elect the three nominees for Class I directors named in the accompanying proxy statement (Proxy Statement), each
+- To approve, on a non-binding advisory basis, the compensation of our named executive officers, as disclosed in the
+- the declassification of our board of directors; and
+- Our board of directors has fixed the close of business on May 7, 2024 as the record date for the Annual Meeting. Only stockholders of
+- By Order of the Board of Directors
+- Chief Executive Officer
+- Your vote is important. Whether or not you plan to virtually attend the Annual Meeting, please ensure that your shares
+- The Board of Directors and Corporate Governance 10
+- Director Compensation 25
+- Proposal One - Election of Directors 29
+- Proposal Two - Non-Binding Advisory Vote on the Compensation of our Named Executive Officers 30
+- Report of the Audit Committee of the Board of Directors 33
+- Proposal Four - Stockholder Proposal to Declassify Our Board of Directors 34
+- Executive Officers 37
+- Executive Compensation 39
+- Compensation Discussion and Analysis 39
+- Report of the Compensation Committee of the Board of Directors 55
+- Summary Compensation Table 56
 
 ### `investor-documents/ir-snow/2023-Annual-Report-and-Proxy-Statementpdf.pdf`
-Extract error: No module named 'pypdf'
+**Keyword snippets (related party, financials, segments):**
+- Letter from our Chief Executive Officer
+- improving productivity. In fiscal year 2023, Snowflake reported revenue of $2.1 billion, representing year-
+- Snowflake’s net revenue retention rate reached 158% for the fourth quarter of fiscal 2023. Our Net Promoter
+- customers with trailing 12-month product revenue greater than $1 million. Our customers are embracing
+- 1 Please see our earnings press release for the fiscal quarter ended April 30, 2023, filed as Exhibit 99.1 to our Current Report on
+- month product revenue greater than $1 million, net revenue retention rate, and non-GAAP free cash flow. For a full reconciliation
+- of non-GAAP free cash flow to the most directly comparable financial measures stated in accordance with GAAP, please see our
+- earnings press release for the fiscal quarter and full year ended January 31, 2023, filed as Exhibit 99.1 to our Current Report on
+- We are pleased to invite you to virtually attend the 2023 Annual Meeting of Stockholders (together with any adjournments,
+- To elect three nominees for Class III directors, Teresa Briggs, Jeremy Burton, and Mark D. McLaughlin, each to
+- To approve, on a non-binding advisory basis, the compensation of our named executive officers, as disclosed in this
+- Our board of directors has fixed the close of business on May 12, 2023 as the record date for the Annual Meeting. Only stockholders
+- By Order of the Board of Directors
+- Chief Executive Officer and Chairman
+- Your vote is important. Whether or not you plan to virtually attend the Annual Meeting, please ensure that your shares
+- system. Even if you have voted by proxy, you may still vote online if you attend the Annual Meeting. Please note,
+- Information Regarding the Board of Directors and Corporate Governance 9
+- Director Compensation 22
+- Proposal One - Election of Directors 26
+- Proposal Two - Non-Binding Advisory Vote to Approve the Compensation of our Named Executive Officers 28

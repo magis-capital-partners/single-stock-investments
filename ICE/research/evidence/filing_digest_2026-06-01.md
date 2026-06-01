@@ -10,14 +10,14 @@ Documents in folder: **444** (all listed below; Tier 1–3 extracted or keyword-
 
 | Tier | Kind | File date | Path | Chars |
 |------|------|-----------|------|-------|
-| scan | 10-K | — | `investor-documents/ir-ice/454149_10-K_A-bannerless.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | 10-K | — | `investor-documents/ir-ice/4q16-form-10-k.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | 10-K | — | `investor-documents/ir-ice/4q17-form-10-k.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | 10-K | — | `investor-documents/ir-ice/4q18-form-10-k.pdf` | 0 ERR:No module named 'pypdf' |
-| partial | 10-K | — | `investor-documents/ir-ice/4q19-form-10-k.pdf` | 0 ERR:No module named 'pypdf' |
-| partial | 10-K | — | `investor-documents/ir-ice/ICE-4Q21-10-K.pdf` | 0 ERR:No module named 'pypdf' |
-| partial | 10-K | — | `investor-documents/ir-ice/form-10-k.pdf` | 0 ERR:No module named 'pypdf' |
-| partial | 10-K | — | `investor-documents/ir-ice/ice-annual-report-2013vfinal-with-10-k.pdf` | 0 ERR:No module named 'pypdf' |
+| scan | 10-K | — | `investor-documents/ir-ice/454149_10-K_A-bannerless.pdf` | 8189 |
+| scan | 10-K | — | `investor-documents/ir-ice/4q16-form-10-k.pdf` | 4354 |
+| scan | 10-K | — | `investor-documents/ir-ice/4q17-form-10-k.pdf` | 5370 |
+| scan | 10-K | — | `investor-documents/ir-ice/4q18-form-10-k.pdf` | 5263 |
+| partial | 10-K | — | `investor-documents/ir-ice/4q19-form-10-k.pdf` | 50330 |
+| partial | 10-K | — | `investor-documents/ir-ice/ICE-4Q21-10-K.pdf` | 56252 |
+| partial | 10-K | — | `investor-documents/ir-ice/form-10-k.pdf` | 55021 |
+| partial | 10-K | — | `investor-documents/ir-ice/ice-annual-report-2013vfinal-with-10-k.pdf` | 59338 |
 | partial | 10-K | 2023-03-24 | `investor-documents/sec-edgar/10-K-A_20230324_rpt20221231_acc0001193125_23_079282.htm` | 30000 |
 | partial | 10-K | 2024-03-27 | `investor-documents/sec-edgar/10-K-A_20240327_rpt20231231_acc0001193125_24_078967.htm` | 30000 |
 | partial | 10-K | 2025-03-20 | `investor-documents/sec-edgar/10-K-A_20250320_rpt20241231_acc0001193125_25_059270.htm` | 30000 |
@@ -26,18 +26,18 @@ Documents in folder: **444** (all listed below; Tier 1–3 extracted or keyword-
 | partial | 10-K | 2024-02-08 | `investor-documents/sec-edgar/10-K_20240208_rpt20231231_acc0001571949_24_000007.htm` | 30000 |
 | partial | 10-K | 2025-02-06 | `investor-documents/sec-edgar/10-K_20250206_rpt20241231_acc0001571949_25_000003.htm` | 30000 |
 | full | 10-K | 2026-02-05 | `investor-documents/sec-edgar/10-K_20260205_rpt20251231_acc0001571949_26_000004.htm` | 120000 |
-| scan | annual | — | `investor-documents/ir-ice/2016-annual-report.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-ice/2017-annual-report.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-ice/2018-annual-report.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-ice/2019-Annual-Report_Web_BMK_vF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-ice/ice-2012-annual-report-final.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-ice/ice-annual-report-05.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-ice/ice-annual-report-06.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-ice/ice-annual-report-2014.pdf` | 0 ERR:No module named 'pypdf' |
-| full | annual | — | `investor-documents/ir-ice/ice-annual-report-2015.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | 10-Q | — | `investor-documents/ir-ice/ICE-1Q21-10-Q.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | 10-Q | — | `investor-documents/ir-ice/ICE-2Q21-10-Q.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | 10-Q | — | `investor-documents/ir-ice/ICE-3Q21-10-Q.pdf` | 0 ERR:No module named 'pypdf' |
+| scan | annual | — | `investor-documents/ir-ice/2016-annual-report.pdf` | 9797 |
+| scan | annual | — | `investor-documents/ir-ice/2017-annual-report.pdf` | 14557 |
+| scan | annual | — | `investor-documents/ir-ice/2018-annual-report.pdf` | 13203 |
+| scan | annual | — | `investor-documents/ir-ice/2019-Annual-Report_Web_BMK_vF.pdf` | 14397 |
+| scan | annual | — | `investor-documents/ir-ice/ice-2012-annual-report-final.pdf` | 9263 |
+| scan | annual | — | `investor-documents/ir-ice/ice-annual-report-05.pdf` | 2355 |
+| scan | annual | — | `investor-documents/ir-ice/ice-annual-report-06.pdf` | 144 |
+| scan | annual | — | `investor-documents/ir-ice/ice-annual-report-2014.pdf` | 9046 |
+| full | annual | — | `investor-documents/ir-ice/ice-annual-report-2015.pdf` | 541650 |
+| scan | 10-Q | — | `investor-documents/ir-ice/ICE-1Q21-10-Q.pdf` | 5522 |
+| scan | 10-Q | — | `investor-documents/ir-ice/ICE-2Q21-10-Q.pdf` | 5574 |
+| scan | 10-Q | — | `investor-documents/ir-ice/ICE-3Q21-10-Q.pdf` | 5610 |
 | scan | 10-Q | 2021-10-28 | `investor-documents/sec-edgar/10-Q_20211028_rpt20210930_acc0001571949_21_000013.htm` | 8000 |
 | scan | 10-Q | 2022-05-05 | `investor-documents/sec-edgar/10-Q_20220505_rpt20220331_acc0001571949_22_000010.htm` | 8000 |
 | scan | 10-Q | 2022-08-04 | `investor-documents/sec-edgar/10-Q_20220804_rpt20220630_acc0001571949_22_000013.htm` | 8000 |
@@ -52,160 +52,160 @@ Documents in folder: **444** (all listed below; Tier 1–3 extracted or keyword-
 | scan | 10-Q | 2025-07-31 | `investor-documents/sec-edgar/10-Q_20250731_rpt20250630_acc0001571949_25_000013.htm` | 8000 |
 | scan | 10-Q | 2025-10-30 | `investor-documents/sec-edgar/10-Q_20251030_rpt20250930_acc0001571949_25_000018.htm` | 8000 |
 | full | 10-Q | 2026-04-30 | `investor-documents/sec-edgar/10-Q_20260430_rpt20260331_acc0001571949_26_000007.htm` | 120000 |
-| scan | def 14a | 2006-03-31 | `investor-documents/ir-ice/ICE-20060331-DEF14A-20060511.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | def 14a | 2007-03-30 | `investor-documents/ir-ice/ICE-20070330-DEF14A-20070510.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | def 14a | 2008-04-03 | `investor-documents/ir-ice/ICE-20080403-DEF14A-20080515.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | def 14a | 2009-03-31 | `investor-documents/ir-ice/ICE-20090331-DEF14A-20090514.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | def 14a | 2010-04-05 | `investor-documents/ir-ice/ICE-20100405-DEF14A-20100521.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | def 14a | 2011-04-01 | `investor-documents/ir-ice/ICE-20110401-DEF14A-20110520.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | def 14a | 2012-03-30 | `investor-documents/ir-ice/ICE-20120330-DEF14A-20120518.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-ice/Notice-of-2025-Annual-Meeting-and-Proxy-Statement.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-ice/ice-proxy-statement.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-ice/proxy-2017.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-ice/proxy-statement-2016.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-ice/proxy-statement-for-2014-annual-meeting.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-ice/proxy-statement.pdf` | 0 ERR:No module named 'pypdf' |
+| scan | def 14a | 2006-03-31 | `investor-documents/ir-ice/ICE-20060331-DEF14A-20060511.pdf` | 3780 |
+| scan | def 14a | 2007-03-30 | `investor-documents/ir-ice/ICE-20070330-DEF14A-20070510.pdf` | 3690 |
+| scan | def 14a | 2008-04-03 | `investor-documents/ir-ice/ICE-20080403-DEF14A-20080515.pdf` | 3751 |
+| scan | def 14a | 2009-03-31 | `investor-documents/ir-ice/ICE-20090331-DEF14A-20090514.pdf` | 3604 |
+| scan | def 14a | 2010-04-05 | `investor-documents/ir-ice/ICE-20100405-DEF14A-20100521.pdf` | 3683 |
+| scan | def 14a | 2011-04-01 | `investor-documents/ir-ice/ICE-20110401-DEF14A-20110520.pdf` | 3683 |
+| scan | def 14a | 2012-03-30 | `investor-documents/ir-ice/ICE-20120330-DEF14A-20120518.pdf` | 3687 |
+| scan | proxy | — | `investor-documents/ir-ice/Notice-of-2025-Annual-Meeting-and-Proxy-Statement.pdf` | 2519 |
+| scan | proxy | — | `investor-documents/ir-ice/ice-proxy-statement.pdf` | 4995 |
+| scan | proxy | — | `investor-documents/ir-ice/proxy-2017.pdf` | 4701 |
+| scan | proxy | — | `investor-documents/ir-ice/proxy-statement-2016.pdf` | 5069 |
+| scan | proxy | — | `investor-documents/ir-ice/proxy-statement-for-2014-annual-meeting.pdf` | 4507 |
+| scan | proxy | — | `investor-documents/ir-ice/proxy-statement.pdf` | 4553 |
 | scan | proxy | 2023-03-31 | `investor-documents/sec-edgar/DEF 14A_20230331_rpt_acc0001193125_23_088151.htm` | 8000 |
 | scan | proxy | 2024-04-01 | `investor-documents/sec-edgar/DEF 14A_20240401_rpt20240517_acc0001193125_24_083553.htm` | 8000 |
 | scan | proxy | 2025-03-31 | `investor-documents/sec-edgar/DEF 14A_20250331_rpt20250516_acc0000950170_25_047824.htm` | 8000 |
 | full | proxy | 2026-03-31 | `investor-documents/sec-edgar/DEF 14A_20260331_rpt20260515_acc0001193125_26_134700.htm` | 120000 |
-| scan | earnings | — | `investor-documents/ir-ice/1Q20-Earnings-Presentation_vF2.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/1Q20-Earnings-Press-Release_vF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/1Q20-ICE-Earnings-Transcript.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/1Q21-Earnings-Presentation_vF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/1Q21-Earnings-Press-Release_vF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/1Q22-Earnings-Presentation_vF-2.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/1Q22-Earnings-Press-Release_vF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/1Q23-Earnings-Presentation_vFINAL.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/1Q23-Earnings-Press-Release_vF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/1Q24-Earnings-Presentation_vF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/1Q24-Earnings-Press-Release_vFINAL.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/1Q25-Earnings-Presentation_vFINAL.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/1Q25-Earnings-Press-Release_vFINAL.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/1Q26-Earnings-Presentation_Final.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/1Q26-Earnings-Press-Release_Final.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/1q-16-earnings-presentation-v2.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/1q07-ice-earnings-presentation.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/1q09-ice-earnings-presentation-050509.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/1q12-earnings-presentation-vfinal.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/1q13-earnings-presentation-final.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/1q14-earnings-call-transcript.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/1q14-earnings-presentation-final.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/1q15-earnings-presentation-v3.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/1q15-earnings-transcript.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/1q17-earnings-presentation.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/1q18-earnings-presentation.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/1q19-earnings-presentation.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/1q19-earnings-press-release.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/2Q20-Earnings-Presentation_vF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/2Q20-Earnings-Press-Release_vF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/2Q21-Earnings-Presentation_vF3.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/2Q21-Earnings-Press-Release_vF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/2Q22-Earnings-Presentation_v11.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/2Q22-Earnings-Press-Release_vF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/2Q23-Earnings-Presentation_vFINAL.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/2Q23-Earnings-Press-Release_vF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/2Q24-Earnings-Presentation_vF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/2Q24-Earnings-Press-Release_vF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/2Q25-Earnings-Presentation_vFINAL.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/2Q25-Earnings-Press-Release_vFINAL.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/2q07earningspresentation.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/2q08-ice-earnings-pres-080408.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/2q12-earnings-presentation-vfinal.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/2q13-earnings-presentation-final-update.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/2q14-earnings-presentation-final-v002-c8ptai.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/2q15-earnings-presentation.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/2q16-earnings-presentationvf.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/2q16-earnings-transcript.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/2q17-earnings-presentation.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/2q18-earnings-presentation.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/2q18-earnings-release.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/2q19-earnings-presentation.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/2q19-earnings-press-release.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/3Q14-Earnings-Presentation-FINAL.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/3Q15-Earnings-PresentationvF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/3Q19-ICE-Earnings-Transcript_Final.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/3Q20-Earnings-Presentation_vF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/3Q20-Earnings-Press-Release_vF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/3Q21-Earnings-Presentation_v3-F.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/3Q21-Earnings-Press-Release_vF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/3Q22-Earnings-Presentation_vF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/3Q22-Earnings-Press-Release_vF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/3Q23-Earnings-Presentation_vFINAL.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/3Q23-Earnings-Press-Release_vF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/3Q24-Earnings-Presentation_vFINAL.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/3Q24-Earnings-Press-Release-vF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/3Q25-Earnings-Presentation.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/3Q25-Earnings-Press-Release_FINAL.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/3q12-earnings-presentation-final.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/3q13-earnings-presentation-final.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/3q16-earnings-presentation.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/3q17-earnings-presentation-v1.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/3q18-earnings-presentation.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/3q18-earnings-release.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/4Q14-Earnings-Presentation-v1.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/4Q20-Earnings-Presentation_vF2.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/4Q20-Earnings-Press-Release_vF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/4Q21-Earnings-Presentation_vF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/4Q21-Earnings-Press-Release_vF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/4Q22-Earnings-Presentation_vF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/4Q22-Earnings-Press-Release_vF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/4Q23-Earnings-Presentation_vFINAL.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/4Q23-Earnings-Press-Release_vFINAL.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/4Q24-Earnings-Presentation_vFinal.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/4Q24-Earnings-Press-Release_vFinal.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/4Q25-Earnings-Presentation_Final.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/4Q25-Earnings-Press-Release_Final.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/4q08-ice-earnings-presentation-021009.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/4q12-earnings-presentation-final.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/4q13-earnings-presentation-final-updated.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/4q14-earnings-transcript-_1_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/4q14-earnings-transcript.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/4q15-earnings-presentation-final.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/4q16-earnings-presentation.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/4q18-earnings-presentation-v1.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/4q18-earnings-press-release.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/4q19-ice-earnings-transcript.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT-Intercontinental-Exchange-IncICEUS-Q2-2019-Earnings-Call-1August2019-830-AM-ET.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT-Intercontinental-Exchange_-Inc._ICE-US__-Q4-2017-Earnings-Call_-7-February-2018-8-30-AM-ET-_1_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange-Inc-ICE-US-Q1-2023-Earnings-Call-4-May-2023-8_30-AM-ET.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange-Inc-ICE-US-Q1-2024-Earnings-Call-2-May-2024-8_30-AM-ET.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange-Inc-ICE-US-Q1-2025-Earnings-Call-1-May-2025-8_30-AM-ET-1.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange-Inc-ICE-US-Q2-2023-Earnings-Call-3-August-2023-8_30-AM-ET-3.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange-Inc-ICE-US-Q2-2024-Earnings-Call-1-August-2024-8_30-AM-ET.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange-Inc-ICE-US-Q2-2025-Earnings-Call-31-July-2025-8_30-AM-ET-vF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange-Inc-ICE-US-Q3-2023-Earnings-Call-2-November-2023-8_30-AM-ET-1.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange-Inc-ICE-US-Q3-2024-Earnings-Call-31-October-2024-8_30-AM-ET.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange-Inc-ICE-US-Q3-2025-Earnings-Call-30-October-2025-8_30-AM-ET.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange-Inc-ICE-US-Q4-2023-Earnings-Call-8-February-2024-8_30-AM-ET.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange-Inc-ICE-US-Q4-2025-Earnings-Call-5-February-2026-8_30-AM-ET.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange-Inc-ICE-US-_Q4-2024-Earnings-Call-6-February-2025-8_30-AM-ET.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange-Inc.ICE-US-Q4-2022-Earnings-Call-2-February-2023-8_30-AM-ET.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange_-Inc._ICE-US__-Q1-2021-Earnings-Call_-29-April-2021-8_30-AM-ET.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange_-Inc._ICE-US__-Q1-2022-Earnings-Call_-5-May-2022-8_30-AM-ET.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange_-Inc._ICE-US__-Q2-2021-Earnings-Call_-29-July-2021-8_30-AM-ET-_1_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange_-Inc._ICE-US__-Q2-2022-Earnings-Call_-4-August-2022-8_30-AM-ET.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange_-Inc._ICE-US__-Q3-2020-Earnings-Call_-29-October-2020-8_30-AM-ET-_1_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange_-Inc._ICE-US__-Q3-2021-Earnings-Call_-28-October-2021-8_30-AM-ET-_1_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange_-Inc._ICE-US__-Q3-2022-Earnings-Call_-3-November-2022-8_30-AM-ET.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange_-Inc._ICE-US__-Q4-2020-Earnings-Call_-4-February-2021-8_30-AM-ET_Final.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/ICE-4Q18-Earnings-Transcript_Final_v2.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/ICE_1Q19-Earnings-Call-Transcript_Final.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/Intercontinental-Exchange-Inc-ICE-US-Q1-2026-Earnings-Call-30-April-2026-8_30-AM-ET.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/ice-1q10-earnings-presentation-050510.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/ice-1q11-earnings-presentation-final.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/ice-1st-quarter08earnings-presentation.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/ice-2q09-earnings-presentation-080409.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/ice-2q10-earnings-presentation-080410.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/ice-2q11-earnings-presentation-final.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/ice-3q08-earnings-presentation.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/ice-3q09-earnings-presentation-110309.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/ice-3q10-earnings-presentation-110110-final.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/ice-3q11-earnings-presentation-final.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/ice-4q09-earnings-presentation-021010.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/ice-4q10-earnings-presentation-final.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/ice-4q11-earnings-presentation-final.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-ice/ice-q3-earnings-transcript.pdf` | 0 ERR:No module named 'pypdf' |
+| scan | earnings | — | `investor-documents/ir-ice/1Q20-Earnings-Presentation_vF2.pdf` | 7335 |
+| scan | earnings | — | `investor-documents/ir-ice/1Q20-Earnings-Press-Release_vF.pdf` | 6400 |
+| scan | earnings | — | `investor-documents/ir-ice/1Q20-ICE-Earnings-Transcript.pdf` | 7579 |
+| scan | earnings | — | `investor-documents/ir-ice/1Q21-Earnings-Presentation_vF.pdf` | 7317 |
+| scan | earnings | — | `investor-documents/ir-ice/1Q21-Earnings-Press-Release_vF.pdf` | 5763 |
+| scan | earnings | — | `investor-documents/ir-ice/1Q22-Earnings-Presentation_vF-2.pdf` | 8286 |
+| scan | earnings | — | `investor-documents/ir-ice/1Q22-Earnings-Press-Release_vF.pdf` | 5420 |
+| scan | earnings | — | `investor-documents/ir-ice/1Q23-Earnings-Presentation_vFINAL.pdf` | 8854 |
+| scan | earnings | — | `investor-documents/ir-ice/1Q23-Earnings-Press-Release_vF.pdf` | 5371 |
+| scan | earnings | — | `investor-documents/ir-ice/1Q24-Earnings-Presentation_vF.pdf` | 9331 |
+| scan | earnings | — | `investor-documents/ir-ice/1Q24-Earnings-Press-Release_vFINAL.pdf` | 4976 |
+| scan | earnings | — | `investor-documents/ir-ice/1Q25-Earnings-Presentation_vFINAL.pdf` | 9880 |
+| scan | earnings | — | `investor-documents/ir-ice/1Q25-Earnings-Press-Release_vFINAL.pdf` | 5329 |
+| scan | earnings | — | `investor-documents/ir-ice/1Q26-Earnings-Presentation_Final.pdf` | 9434 |
+| scan | earnings | — | `investor-documents/ir-ice/1Q26-Earnings-Press-Release_Final.pdf` | 5561 |
+| scan | earnings | — | `investor-documents/ir-ice/1q-16-earnings-presentation-v2.pdf` | 6090 |
+| scan | earnings | — | `investor-documents/ir-ice/1q07-ice-earnings-presentation.pdf` | 1684 |
+| scan | earnings | — | `investor-documents/ir-ice/1q09-ice-earnings-presentation-050509.pdf` | 2856 |
+| scan | earnings | — | `investor-documents/ir-ice/1q12-earnings-presentation-vfinal.pdf` | 2499 |
+| scan | earnings | — | `investor-documents/ir-ice/1q13-earnings-presentation-final.pdf` | 8233 |
+| scan | earnings | — | `investor-documents/ir-ice/1q14-earnings-call-transcript.pdf` | 5242 |
+| scan | earnings | — | `investor-documents/ir-ice/1q14-earnings-presentation-final.pdf` | 7109 |
+| scan | earnings | — | `investor-documents/ir-ice/1q15-earnings-presentation-v3.pdf` | 6049 |
+| scan | earnings | — | `investor-documents/ir-ice/1q15-earnings-transcript.pdf` | 5117 |
+| scan | earnings | — | `investor-documents/ir-ice/1q17-earnings-presentation.pdf` | 5901 |
+| scan | earnings | — | `investor-documents/ir-ice/1q18-earnings-presentation.pdf` | 6729 |
+| scan | earnings | — | `investor-documents/ir-ice/1q19-earnings-presentation.pdf` | 6447 |
+| scan | earnings | — | `investor-documents/ir-ice/1q19-earnings-press-release.pdf` | 5843 |
+| scan | earnings | — | `investor-documents/ir-ice/2Q20-Earnings-Presentation_vF.pdf` | 7323 |
+| scan | earnings | — | `investor-documents/ir-ice/2Q20-Earnings-Press-Release_vF.pdf` | 6523 |
+| scan | earnings | — | `investor-documents/ir-ice/2Q21-Earnings-Presentation_vF3.pdf` | 7535 |
+| scan | earnings | — | `investor-documents/ir-ice/2Q21-Earnings-Press-Release_vF.pdf` | 5691 |
+| scan | earnings | — | `investor-documents/ir-ice/2Q22-Earnings-Presentation_v11.pdf` | 8438 |
+| scan | earnings | — | `investor-documents/ir-ice/2Q22-Earnings-Press-Release_vF.pdf` | 5545 |
+| scan | earnings | — | `investor-documents/ir-ice/2Q23-Earnings-Presentation_vFINAL.pdf` | 8852 |
+| scan | earnings | — | `investor-documents/ir-ice/2Q23-Earnings-Press-Release_vF.pdf` | 5141 |
+| scan | earnings | — | `investor-documents/ir-ice/2Q24-Earnings-Presentation_vF.pdf` | 10066 |
+| scan | earnings | — | `investor-documents/ir-ice/2Q24-Earnings-Press-Release_vF.pdf` | 5073 |
+| scan | earnings | — | `investor-documents/ir-ice/2Q25-Earnings-Presentation_vFINAL.pdf` | 9819 |
+| scan | earnings | — | `investor-documents/ir-ice/2Q25-Earnings-Press-Release_vFINAL.pdf` | 5402 |
+| scan | earnings | — | `investor-documents/ir-ice/2q07earningspresentation.pdf` | 2356 |
+| scan | earnings | — | `investor-documents/ir-ice/2q08-ice-earnings-pres-080408.pdf` | 1997 |
+| scan | earnings | — | `investor-documents/ir-ice/2q12-earnings-presentation-vfinal.pdf` | 2623 |
+| scan | earnings | — | `investor-documents/ir-ice/2q13-earnings-presentation-final-update.pdf` | 5745 |
+| scan | earnings | — | `investor-documents/ir-ice/2q14-earnings-presentation-final-v002-c8ptai.pdf` | 6950 |
+| scan | earnings | — | `investor-documents/ir-ice/2q15-earnings-presentation.pdf` | 6324 |
+| scan | earnings | — | `investor-documents/ir-ice/2q16-earnings-presentationvf.pdf` | 6083 |
+| scan | earnings | — | `investor-documents/ir-ice/2q16-earnings-transcript.pdf` | 6926 |
+| scan | earnings | — | `investor-documents/ir-ice/2q17-earnings-presentation.pdf` | 5987 |
+| scan | earnings | — | `investor-documents/ir-ice/2q18-earnings-presentation.pdf` | 6899 |
+| scan | earnings | — | `investor-documents/ir-ice/2q18-earnings-release.pdf` | 6733 |
+| scan | earnings | — | `investor-documents/ir-ice/2q19-earnings-presentation.pdf` | 6456 |
+| scan | earnings | — | `investor-documents/ir-ice/2q19-earnings-press-release.pdf` | 5924 |
+| scan | earnings | — | `investor-documents/ir-ice/3Q14-Earnings-Presentation-FINAL.pdf` | 6277 |
+| scan | earnings | — | `investor-documents/ir-ice/3Q15-Earnings-PresentationvF.pdf` | 6313 |
+| scan | earnings | — | `investor-documents/ir-ice/3Q19-ICE-Earnings-Transcript_Final.pdf` | 7246 |
+| scan | earnings | — | `investor-documents/ir-ice/3Q20-Earnings-Presentation_vF.pdf` | 7537 |
+| scan | earnings | — | `investor-documents/ir-ice/3Q20-Earnings-Press-Release_vF.pdf` | 7011 |
+| scan | earnings | — | `investor-documents/ir-ice/3Q21-Earnings-Presentation_v3-F.pdf` | 7578 |
+| scan | earnings | — | `investor-documents/ir-ice/3Q21-Earnings-Press-Release_vF.pdf` | 5930 |
+| scan | earnings | — | `investor-documents/ir-ice/3Q22-Earnings-Presentation_vF.pdf` | 8619 |
+| scan | earnings | — | `investor-documents/ir-ice/3Q22-Earnings-Press-Release_vF.pdf` | 5502 |
+| scan | earnings | — | `investor-documents/ir-ice/3Q23-Earnings-Presentation_vFINAL.pdf` | 8978 |
+| scan | earnings | — | `investor-documents/ir-ice/3Q23-Earnings-Press-Release_vF.pdf` | 5420 |
+| scan | earnings | — | `investor-documents/ir-ice/3Q24-Earnings-Presentation_vFINAL.pdf` | 10035 |
+| scan | earnings | — | `investor-documents/ir-ice/3Q24-Earnings-Press-Release-vF.pdf` | 5530 |
+| scan | earnings | — | `investor-documents/ir-ice/3Q25-Earnings-Presentation.pdf` | 9963 |
+| scan | earnings | — | `investor-documents/ir-ice/3Q25-Earnings-Press-Release_FINAL.pdf` | 5421 |
+| scan | earnings | — | `investor-documents/ir-ice/3q12-earnings-presentation-final.pdf` | 3039 |
+| scan | earnings | — | `investor-documents/ir-ice/3q13-earnings-presentation-final.pdf` | 5886 |
+| scan | earnings | — | `investor-documents/ir-ice/3q16-earnings-presentation.pdf` | 6010 |
+| scan | earnings | — | `investor-documents/ir-ice/3q17-earnings-presentation-v1.pdf` | 5762 |
+| scan | earnings | — | `investor-documents/ir-ice/3q18-earnings-presentation.pdf` | 6813 |
+| scan | earnings | — | `investor-documents/ir-ice/3q18-earnings-release.pdf` | 6385 |
+| scan | earnings | — | `investor-documents/ir-ice/4Q14-Earnings-Presentation-v1.pdf` | 6507 |
+| scan | earnings | — | `investor-documents/ir-ice/4Q20-Earnings-Presentation_vF2.pdf` | 7253 |
+| scan | earnings | — | `investor-documents/ir-ice/4Q20-Earnings-Press-Release_vF.pdf` | 6469 |
+| scan | earnings | — | `investor-documents/ir-ice/4Q21-Earnings-Presentation_vF.pdf` | 7715 |
+| scan | earnings | — | `investor-documents/ir-ice/4Q21-Earnings-Press-Release_vF.pdf` | 7038 |
+| scan | earnings | — | `investor-documents/ir-ice/4Q22-Earnings-Presentation_vF.pdf` | 8906 |
+| scan | earnings | — | `investor-documents/ir-ice/4Q22-Earnings-Press-Release_vF.pdf` | 6695 |
+| scan | earnings | — | `investor-documents/ir-ice/4Q23-Earnings-Presentation_vFINAL.pdf` | 9402 |
+| scan | earnings | — | `investor-documents/ir-ice/4Q23-Earnings-Press-Release_vFINAL.pdf` | 6432 |
+| scan | earnings | — | `investor-documents/ir-ice/4Q24-Earnings-Presentation_vFinal.pdf` | 10109 |
+| scan | earnings | — | `investor-documents/ir-ice/4Q24-Earnings-Press-Release_vFinal.pdf` | 6595 |
+| scan | earnings | — | `investor-documents/ir-ice/4Q25-Earnings-Presentation_Final.pdf` | 9470 |
+| scan | earnings | — | `investor-documents/ir-ice/4Q25-Earnings-Press-Release_Final.pdf` | 6995 |
+| scan | earnings | — | `investor-documents/ir-ice/4q08-ice-earnings-presentation-021009.pdf` | 3335 |
+| scan | earnings | — | `investor-documents/ir-ice/4q12-earnings-presentation-final.pdf` | 7956 |
+| scan | earnings | — | `investor-documents/ir-ice/4q13-earnings-presentation-final-updated.pdf` | 7424 |
+| scan | earnings | — | `investor-documents/ir-ice/4q14-earnings-transcript-_1_.pdf` | 5206 |
+| scan | earnings | — | `investor-documents/ir-ice/4q14-earnings-transcript.pdf` | 5206 |
+| scan | earnings | — | `investor-documents/ir-ice/4q15-earnings-presentation-final.pdf` | 6149 |
+| scan | earnings | — | `investor-documents/ir-ice/4q16-earnings-presentation.pdf` | 5902 |
+| scan | earnings | — | `investor-documents/ir-ice/4q18-earnings-presentation-v1.pdf` | 6817 |
+| scan | earnings | — | `investor-documents/ir-ice/4q18-earnings-press-release.pdf` | 7177 |
+| scan | earnings | — | `investor-documents/ir-ice/4q19-ice-earnings-transcript.pdf` | 7476 |
+| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT-Intercontinental-Exchange-IncICEUS-Q2-2019-Earnings-Call-1August2019-830-AM-ET.pdf` | 7526 |
+| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT-Intercontinental-Exchange_-Inc._ICE-US__-Q4-2017-Earnings-Call_-7-February-2018-8-30-AM-ET-_1_.pdf` | 5525 |
+| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange-Inc-ICE-US-Q1-2023-Earnings-Call-4-May-2023-8_30-AM-ET.pdf` | 7205 |
+| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange-Inc-ICE-US-Q1-2024-Earnings-Call-2-May-2024-8_30-AM-ET.pdf` | 5629 |
+| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange-Inc-ICE-US-Q1-2025-Earnings-Call-1-May-2025-8_30-AM-ET-1.pdf` | 5288 |
+| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange-Inc-ICE-US-Q2-2023-Earnings-Call-3-August-2023-8_30-AM-ET-3.pdf` | 5188 |
+| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange-Inc-ICE-US-Q2-2024-Earnings-Call-1-August-2024-8_30-AM-ET.pdf` | 7573 |
+| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange-Inc-ICE-US-Q2-2025-Earnings-Call-31-July-2025-8_30-AM-ET-vF.pdf` | 5264 |
+| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange-Inc-ICE-US-Q3-2023-Earnings-Call-2-November-2023-8_30-AM-ET-1.pdf` | 5328 |
+| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange-Inc-ICE-US-Q3-2024-Earnings-Call-31-October-2024-8_30-AM-ET.pdf` | 5172 |
+| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange-Inc-ICE-US-Q3-2025-Earnings-Call-30-October-2025-8_30-AM-ET.pdf` | 7173 |
+| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange-Inc-ICE-US-Q4-2023-Earnings-Call-8-February-2024-8_30-AM-ET.pdf` | 7603 |
+| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange-Inc-ICE-US-Q4-2025-Earnings-Call-5-February-2026-8_30-AM-ET.pdf` | 5132 |
+| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange-Inc-ICE-US-_Q4-2024-Earnings-Call-6-February-2025-8_30-AM-ET.pdf` | 5257 |
+| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange-Inc.ICE-US-Q4-2022-Earnings-Call-2-February-2023-8_30-AM-ET.pdf` | 5394 |
+| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange_-Inc._ICE-US__-Q1-2021-Earnings-Call_-29-April-2021-8_30-AM-ET.pdf` | 7625 |
+| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange_-Inc._ICE-US__-Q1-2022-Earnings-Call_-5-May-2022-8_30-AM-ET.pdf` | 7210 |
+| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange_-Inc._ICE-US__-Q2-2021-Earnings-Call_-29-July-2021-8_30-AM-ET-_1_.pdf` | 7839 |
+| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange_-Inc._ICE-US__-Q2-2022-Earnings-Call_-4-August-2022-8_30-AM-ET.pdf` | 7653 |
+| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange_-Inc._ICE-US__-Q3-2020-Earnings-Call_-29-October-2020-8_30-AM-ET-_1_.pdf` | 7985 |
+| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange_-Inc._ICE-US__-Q3-2021-Earnings-Call_-28-October-2021-8_30-AM-ET-_1_.pdf` | 7424 |
+| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange_-Inc._ICE-US__-Q3-2022-Earnings-Call_-3-November-2022-8_30-AM-ET.pdf` | 7155 |
+| scan | earnings | — | `investor-documents/ir-ice/CORRECTED-TRANSCRIPT_-Intercontinental-Exchange_-Inc._ICE-US__-Q4-2020-Earnings-Call_-4-February-2021-8_30-AM-ET_Final.pdf` | 5464 |
+| scan | earnings | — | `investor-documents/ir-ice/ICE-4Q18-Earnings-Transcript_Final_v2.pdf` | 5212 |
+| scan | earnings | — | `investor-documents/ir-ice/ICE_1Q19-Earnings-Call-Transcript_Final.pdf` | 5562 |
+| scan | earnings | — | `investor-documents/ir-ice/Intercontinental-Exchange-Inc-ICE-US-Q1-2026-Earnings-Call-30-April-2026-8_30-AM-ET.pdf` | 7711 |
+| scan | earnings | — | `investor-documents/ir-ice/ice-1q10-earnings-presentation-050510.pdf` | 2808 |
+| scan | earnings | — | `investor-documents/ir-ice/ice-1q11-earnings-presentation-final.pdf` | 7516 |
+| scan | earnings | — | `investor-documents/ir-ice/ice-1st-quarter08earnings-presentation.pdf` | 1760 |
+| scan | earnings | — | `investor-documents/ir-ice/ice-2q09-earnings-presentation-080409.pdf` | 2685 |
+| scan | earnings | — | `investor-documents/ir-ice/ice-2q10-earnings-presentation-080410.pdf` | 2928 |
+| scan | earnings | — | `investor-documents/ir-ice/ice-2q11-earnings-presentation-final.pdf` | 3002 |
+| scan | earnings | — | `investor-documents/ir-ice/ice-3q08-earnings-presentation.pdf` | 1771 |
+| scan | earnings | — | `investor-documents/ir-ice/ice-3q09-earnings-presentation-110309.pdf` | 2697 |
+| scan | earnings | — | `investor-documents/ir-ice/ice-3q10-earnings-presentation-110110-final.pdf` | 3254 |
+| scan | earnings | — | `investor-documents/ir-ice/ice-3q11-earnings-presentation-final.pdf` | 3036 |
+| scan | earnings | — | `investor-documents/ir-ice/ice-4q09-earnings-presentation-021010.pdf` | 2853 |
+| scan | earnings | — | `investor-documents/ir-ice/ice-4q10-earnings-presentation-final.pdf` | 3276 |
+| scan | earnings | — | `investor-documents/ir-ice/ice-4q11-earnings-presentation-final.pdf` | 2926 |
+| scan | earnings | — | `investor-documents/ir-ice/ice-q3-earnings-transcript.pdf` | 6772 |
 | scan | 8-K | 2023-10-27 | `investor-documents/sec-edgar/8-K_20231027_rpt20231026_acc0001104659_23_112222.htm` | 4522 |
 | scan | 8-K | 2023-11-02 | `investor-documents/sec-edgar/8-K_20231102_rpt20231102_acc0001104659_23_113586.htm` | 4183 |
 | scan | 8-K | 2023-11-08 | `investor-documents/sec-edgar/8-K_20231108_rpt20231108_acc0001193125_23_273543.htm` | 5575 |
@@ -231,9 +231,9 @@ Documents in folder: **444** (all listed below; Tier 1–3 extracted or keyword-
 | scan | 8-K | 2026-02-05 | `investor-documents/sec-edgar/8-K_20260205_rpt20260205_acc0001104659_26_010646.htm` | 4530 |
 | scan | 8-K | 2026-04-30 | `investor-documents/sec-edgar/8-K_20260430_rpt20260430_acc0001104659_26_052145.htm` | 4320 |
 | scan | 8-K | 2026-05-19 | `investor-documents/sec-edgar/8-K_20260519_rpt20260515_acc0001104659_26_063863.htm` | 6538 |
-| scan | presentation | — | `investor-documents/ir-ice/3q19-presentation.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-ice/4q17-presentation.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-ice/4q19-presentation.pdf` | 0 ERR:No module named 'pypdf' |
+| scan | presentation | — | `investor-documents/ir-ice/3q19-presentation.pdf` | 6458 |
+| scan | presentation | — | `investor-documents/ir-ice/4q17-presentation.pdf` | 5780 |
+| scan | presentation | — | `investor-documents/ir-ice/4q19-presentation.pdf` | 7051 |
 | inventory | other | — | `investor-documents/ir-ice/021319-gs-tech-conf-transcript-vf.pdf` | 0 |
 | inventory | other | — | `investor-documents/ir-ice/0bad4374-bc17-46c9-b82e-3489719ec259.pdf` | 0 |
 | inventory | other | — | `investor-documents/ir-ice/10k-2007.pdf` | 0 |
@@ -496,7 +496,25 @@ Documents in folder: **444** (all listed below; Tier 1–3 extracted or keyword-
 - StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 294
 
 ### `investor-documents/ir-ice/ice-annual-report-2015.pdf`
-Extract error: No module named 'pypdf'
+**Keyword snippets (related party, financials, segments):**
+- I am pleased to report another year of record
+- revenues in 2005, to over 5,500 employees and
+- revenues of $3.3 billion in 2015 - our drive to
+- our 10th consecutive year of both record revenue
+- net income attributable to ICE from continuing
+- and driven by $3.3 billion in revenues, which
+- revenues for our global data services and for
+- revenues and strong cash equities revenue. The
+- diverse sources of revenue growth reflect the
+- process, our revenue mix  has transformed from
+- mix, with transaction revenues now 56% of total
+- revenues in 2015.
+- NET REVENUE (2)
+- 2 Net revenue represents total revenues, less transaction-based
+- 3 These are non-GAAP figures. Please refer to page 63 of the 10-K
+- of both record revenue and adjusted
+- we provide resulted in record oil revenues,
+- 1 Adjusted figures represent non-GAAP measures. Please refer to page 63 in the company’s 2015 10-K
 
 ### `investor-documents/sec-edgar/10-Q_20260430_rpt20260331_acc0001571949_26_000007.htm`
 **Keyword snippets (related party, financials, segments):**
@@ -643,13 +661,33 @@ Extract error: No module named 'pypdf'
 - RevenueFromContractWithCustomerExcludingAssessedTax: 8,244
 
 ### `investor-documents/ir-ice/ice-annual-report-2013vfinal-with-10-k.pdf`
-Extract error: No module named 'pypdf'
+**Keyword snippets (related party, financials, segments):**
+- I am pleased to report that 2013 was a
+- revenues, trading volume and adjusted earnings for
+- For 2013, consolidated revenues, less transaction-
+- compared to 2012. Adjusted net income rose
+- Operating Income
+- Total Revenues, less Transaction-Based Expenses $1,674 $1,363 23%
+- Operating Income $790 $827 -4%
+- Adj Operating Income1 $959 $836 15%
+- Net Income Attributable to ICE $254 $552 -54%
+- Adj Net Income Attributable to ICE2 $646 $557 16%
+- 2 These are non-GAAP figures. See pages 69-70 of 2013 Annual Report on Form 10-K for reconciliation to Net Income Attributable to ICE and Diluted EPS.
+- * This represents revenues, less transaction-based expenses.
+- Chairman and Chief Executive Officer
+- our CDS clearing revenues increased 19% over the prior year.
+- (Address of principal executive offices)
+- Risk Factors   29
+- Directors, Executive Officers and Corporate Governance 133
+- Executive Compensation 136
+- Certain Relationships and Related Transactions, and Director Independence 136
+- This Annual Report on Form 10-K, including the sections entitled “Business”, “Legal Proceedings,” “Risk Factors” and
 
 ### `investor-documents/ir-ice/form-10-k.pdf`
-Extract error: No module named 'pypdf'
+- *(no keyword hits; see cached full text in `research/evidence/_text/` if tier=full)*
 
 ### `investor-documents/ir-ice/ICE-4Q21-10-K.pdf`
-Extract error: No module named 'pypdf'
+- *(no keyword hits; see cached full text in `research/evidence/_text/` if tier=full)*
 
 ### `investor-documents/ir-ice/4q19-form-10-k.pdf`
-Extract error: No module named 'pypdf'
+- *(no keyword hits; see cached full text in `research/evidence/_text/` if tier=full)*

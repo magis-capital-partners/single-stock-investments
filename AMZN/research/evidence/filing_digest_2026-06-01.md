@@ -15,27 +15,27 @@ Documents in folder: **234** (all listed below; Tier 1–3 extracted or keyword-
 | partial | 10-K | 2024-02-02 | `investor-documents/sec-edgar/10-K_20240202_rpt20231231_acc0001018724_24_000008.htm` | 30000 |
 | partial | 10-K | 2025-02-07 | `investor-documents/sec-edgar/10-K_20250207_rpt20241231_acc0001018724_25_000004.htm` | 30000 |
 | full | 10-K | 2026-02-06 | `investor-documents/sec-edgar/10-K_20260206_rpt20251231_acc0001018724_26_000004.htm` | 120000 |
-| scan | annual | — | `investor-documents/ir-amzn/2001annualreport.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-amzn/2002_Annual_Report_FINAL.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-amzn/2004_Annual_report.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-amzn/2006AnnualReport.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-amzn/2012-Annual-Report.PDF` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-amzn/2013-Annual-Report.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-amzn/2015-Annual-Report.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-amzn/2016-Annual-Report.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-amzn/2018-Annual-Report.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-amzn/2019-Annual-Report.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-amzn/AMAZON-2014-Annual-Report.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-amzn/AMZN2005AnnualReport.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-amzn/AMZN_Annual-Report-2009-_final_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-amzn/Amazon-2020-Annual-Report.pdf` | 0 ERR:No module named 'pypdf' |
-| partial | annual | — | `investor-documents/ir-amzn/Amazon-2021-Annual-Report.pdf` | 0 ERR:No module named 'pypdf' |
-| partial | annual | — | `investor-documents/ir-amzn/Amazon-2022-Annual-Report.pdf` | 0 ERR:No module named 'pypdf' |
-| partial | annual | — | `investor-documents/ir-amzn/Amazon-2024-Annual-Report.pdf` | 0 ERR:No module named 'pypdf' |
-| partial | annual | — | `investor-documents/ir-amzn/Amazon-2025-Annual-Report.pdf` | 0 ERR:No module named 'pypdf' |
-| partial | annual | — | `investor-documents/ir-amzn/Amazon-com-Inc-2023-Annual-Report.pdf` | 0 ERR:No module named 'pypdf' |
-| partial | annual | — | `investor-documents/ir-amzn/Amazon_Annual_Report_2008.pdf` | 0 ERR:No module named 'pypdf' |
-| full | annual | 2003-04-13 | `investor-documents/ir-amzn/Annual_Report_2003041304.pdf` | 0 ERR:No module named 'pypdf' |
+| scan | annual | — | `investor-documents/ir-amzn/2001annualreport.pdf` | 7567 |
+| scan | annual | — | `investor-documents/ir-amzn/2002_Annual_Report_FINAL.pdf` | 6835 |
+| scan | annual | — | `investor-documents/ir-amzn/2004_Annual_report.pdf` | 2663 |
+| scan | annual | — | `investor-documents/ir-amzn/2006AnnualReport.pdf` | 3850 |
+| scan | annual | — | `investor-documents/ir-amzn/2012-Annual-Report.PDF` | 8163 |
+| scan | annual | — | `investor-documents/ir-amzn/2013-Annual-Report.pdf` | 8170 |
+| scan | annual | — | `investor-documents/ir-amzn/2015-Annual-Report.pdf` | 8085 |
+| scan | annual | — | `investor-documents/ir-amzn/2016-Annual-Report.pdf` | 7192 |
+| scan | annual | — | `investor-documents/ir-amzn/2018-Annual-Report.pdf` | 6851 |
+| scan | annual | — | `investor-documents/ir-amzn/2019-Annual-Report.pdf` | 8289 |
+| scan | annual | — | `investor-documents/ir-amzn/AMAZON-2014-Annual-Report.pdf` | 8423 |
+| scan | annual | — | `investor-documents/ir-amzn/AMZN2005AnnualReport.pdf` | 4204 |
+| scan | annual | — | `investor-documents/ir-amzn/AMZN_Annual-Report-2009-_final_.pdf` | 3659 |
+| scan | annual | — | `investor-documents/ir-amzn/Amazon-2020-Annual-Report.pdf` | 6090 |
+| partial | annual | — | `investor-documents/ir-amzn/Amazon-2021-Annual-Report.pdf` | 56035 |
+| partial | annual | — | `investor-documents/ir-amzn/Amazon-2022-Annual-Report.pdf` | 57747 |
+| partial | annual | — | `investor-documents/ir-amzn/Amazon-2024-Annual-Report.pdf` | 50636 |
+| partial | annual | — | `investor-documents/ir-amzn/Amazon-2025-Annual-Report.pdf` | 57187 |
+| partial | annual | — | `investor-documents/ir-amzn/Amazon-com-Inc-2023-Annual-Report.pdf` | 55020 |
+| partial | annual | — | `investor-documents/ir-amzn/Amazon_Annual_Report_2008.pdf` | 39601 |
+| full | annual | 2003-04-13 | `investor-documents/ir-amzn/Annual_Report_2003041304.pdf` | 291161 |
 | scan | 10-Q | 2021-10-29 | `investor-documents/sec-edgar/10-Q_20211029_rpt20210930_acc0001018724_21_000028.htm` | 8000 |
 | scan | 10-Q | 2022-04-29 | `investor-documents/sec-edgar/10-Q_20220429_rpt20220331_acc0001018724_22_000013.htm` | 8000 |
 | scan | 10-Q | 2022-07-29 | `investor-documents/sec-edgar/10-Q_20220729_rpt20220630_acc0001018724_22_000019.htm` | 8000 |
@@ -50,91 +50,91 @@ Documents in folder: **234** (all listed below; Tier 1–3 extracted or keyword-
 | scan | 10-Q | 2025-08-01 | `investor-documents/sec-edgar/10-Q_20250801_rpt20250630_acc0001018724_25_000086.htm` | 8000 |
 | scan | 10-Q | 2025-10-31 | `investor-documents/sec-edgar/10-Q_20251031_rpt20250930_acc0001018724_25_000123.htm` | 8000 |
 | full | 10-Q | 2026-04-30 | `investor-documents/sec-edgar/10-Q_20260430_rpt20260331_acc0001018724_26_000014.htm` | 120000 |
-| scan | proxy | — | `investor-documents/ir-amzn/123780_099_bmk_proxy.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-amzn/2002_proxy.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-amzn/2003_proxy.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-amzn/2004_proxy.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-amzn/2005_proxy.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-amzn/2007Proxy.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-amzn/2008proxy.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-amzn/2013-Proxy-Statement.PDF` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-amzn/2014-Proxy-Statement.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-amzn/2016-Proxy-Statement.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-amzn/2017-Proxy-Statement.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-amzn/2019-Proxy-Statement.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-amzn/2020-Proxy-Statement.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-amzn/AMAZON-2015-Proxy-Statement.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-amzn/AMZN2006Proxy.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-amzn/AMZN_Proxy-Statement-2010-_final_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-amzn/Amazon-2021-Proxy-Statement.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-amzn/Amazon-2022-Proxy-Statement.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-amzn/Amazon-2023-Proxy-Statement.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-amzn/Amazon-2025-Proxy-Statement.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-amzn/Amazon-2026-Proxy-Statement.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-amzn/Amazon-com-Inc-2024-Proxy-Statement.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-amzn/Amazon_Proxy.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-amzn/Amazon_Proxy_2009.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-amzn/Proxy2001.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-amzn/proxy98.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-amzn/proxy99.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-amzn/proxy_00.pdf` | 0 ERR:No module named 'pypdf' |
+| scan | proxy | — | `investor-documents/ir-amzn/123780_099_bmk_proxy.pdf` | 5841 |
+| scan | proxy | — | `investor-documents/ir-amzn/2002_proxy.pdf` | 5752 |
+| scan | proxy | — | `investor-documents/ir-amzn/2003_proxy.pdf` | 2304 |
+| scan | proxy | — | `investor-documents/ir-amzn/2004_proxy.pdf` | 9482 |
+| scan | proxy | — | `investor-documents/ir-amzn/2005_proxy.pdf` | 8205 |
+| scan | proxy | — | `investor-documents/ir-amzn/2007Proxy.pdf` | 5381 |
+| scan | proxy | — | `investor-documents/ir-amzn/2008proxy.pdf` | 5546 |
+| scan | proxy | — | `investor-documents/ir-amzn/2013-Proxy-Statement.PDF` | 8386 |
+| scan | proxy | — | `investor-documents/ir-amzn/2014-Proxy-Statement.pdf` | 8762 |
+| scan | proxy | — | `investor-documents/ir-amzn/2016-Proxy-Statement.pdf` | 8657 |
+| scan | proxy | — | `investor-documents/ir-amzn/2017-Proxy-Statement.pdf` | 9521 |
+| scan | proxy | — | `investor-documents/ir-amzn/2019-Proxy-Statement.pdf` | 9460 |
+| scan | proxy | — | `investor-documents/ir-amzn/2020-Proxy-Statement.pdf` | 6333 |
+| scan | proxy | — | `investor-documents/ir-amzn/AMAZON-2015-Proxy-Statement.pdf` | 8694 |
+| scan | proxy | — | `investor-documents/ir-amzn/AMZN2006Proxy.pdf` | 4919 |
+| scan | proxy | — | `investor-documents/ir-amzn/AMZN_Proxy-Statement-2010-_final_.pdf` | 4967 |
+| scan | proxy | — | `investor-documents/ir-amzn/Amazon-2021-Proxy-Statement.pdf` | 7369 |
+| scan | proxy | — | `investor-documents/ir-amzn/Amazon-2022-Proxy-Statement.pdf` | 6220 |
+| scan | proxy | — | `investor-documents/ir-amzn/Amazon-2023-Proxy-Statement.pdf` | 5233 |
+| scan | proxy | — | `investor-documents/ir-amzn/Amazon-2025-Proxy-Statement.pdf` | 3371 |
+| scan | proxy | — | `investor-documents/ir-amzn/Amazon-2026-Proxy-Statement.pdf` | 5187 |
+| scan | proxy | — | `investor-documents/ir-amzn/Amazon-com-Inc-2024-Proxy-Statement.pdf` | 3323 |
+| scan | proxy | — | `investor-documents/ir-amzn/Amazon_Proxy.pdf` | 9459 |
+| scan | proxy | — | `investor-documents/ir-amzn/Amazon_Proxy_2009.pdf` | 5768 |
+| scan | proxy | — | `investor-documents/ir-amzn/Proxy2001.pdf` | 6169 |
+| scan | proxy | — | `investor-documents/ir-amzn/proxy98.pdf` | 6504 |
+| scan | proxy | — | `investor-documents/ir-amzn/proxy99.pdf` | 6484 |
+| scan | proxy | — | `investor-documents/ir-amzn/proxy_00.pdf` | 7577 |
 | scan | proxy | 2023-04-13 | `investor-documents/sec-edgar/DEF 14A_20230413_rpt_acc0001104659_23_044708.htm` | 8000 |
 | scan | proxy | 2024-04-11 | `investor-documents/sec-edgar/DEF 14A_20240411_rpt20240522_acc0001104659_24_045910.htm` | 8000 |
 | scan | proxy | 2025-04-10 | `investor-documents/sec-edgar/DEF 14A_20250410_rpt20250521_acc0001104659_25_033442.htm` | 8000 |
 | full | proxy | 2026-04-09 | `investor-documents/sec-edgar/DEF 14A_20260409_rpt20260520_acc0001104659_26_041026.htm` | 120000 |
-| scan | shareholder | — | `investor-documents/ir-amzn/2001_shareholderLetter.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | shareholder | — | `investor-documents/ir-amzn/2002_shareholderLetter.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | shareholder | — | `investor-documents/ir-amzn/2003_-Shareholder_-Letter041304.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | shareholder | — | `investor-documents/ir-amzn/2004_shareholderLetter.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | shareholder | — | `investor-documents/ir-amzn/2012-Shareholder-Letter.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | shareholder | — | `investor-documents/ir-amzn/2013-Letter-to-Shareholders.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | shareholder | — | `investor-documents/ir-amzn/2015-Letter-to-Shareholders.PDF` | 0 ERR:No module named 'pypdf' |
-| scan | shareholder | — | `investor-documents/ir-amzn/2016-Letter-to-Shareholders.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | shareholder | — | `investor-documents/ir-amzn/2018-Letter-to-Shareholders.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | shareholder | — | `investor-documents/ir-amzn/2019-Shareholder-Letter.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | shareholder | — | `investor-documents/ir-amzn/2021-Shareholder-Letter.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | shareholder | — | `investor-documents/ir-amzn/2022-Shareholder-Letter.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | shareholder | — | `investor-documents/ir-amzn/2024-Shareholder-Letter-Final.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | shareholder | — | `investor-documents/ir-amzn/2025-Shareholder-Letter-Final.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | shareholder | — | `investor-documents/ir-amzn/AMAZON-2014-Shareholder-Letter.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | shareholder | — | `investor-documents/ir-amzn/AMZN_Shareholder-Letter-2009-_final_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | shareholder | — | `investor-documents/ir-amzn/Amazon-2020-Shareholder-Letter-and-1997-Shareholder-Letter.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | shareholder | — | `investor-documents/ir-amzn/Amazon-com-Inc-2023-Shareholder-Letter.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | shareholder | — | `investor-documents/ir-amzn/Amazon_Shareholder_Letter.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | shareholder | — | `investor-documents/ir-amzn/Shareholderletter97.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | shareholder | — | `investor-documents/ir-amzn/Shareholderletter98.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | shareholder | — | `investor-documents/ir-amzn/Shareholderletter99.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | shareholder | — | `investor-documents/ir-amzn/shareholderletter2005.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-amzn/AMZN-Q1-2020-Earnings-Release.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-amzn/AMZN-Q1-2024-Earnings-Release.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-amzn/AMZN-Q1-2025-Earnings-Release.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-amzn/AMZN-Q1-2026-Earnings-Release.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-amzn/AMZN-Q2-2021-Earnings-Release.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-amzn/AMZN-Q2-2024-Earnings-Release.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-amzn/AMZN-Q2-2025-Earnings-Release.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-amzn/AMZN-Q3-2020-Earnings-Release.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-amzn/AMZN-Q3-2023-Earnings-Release.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-amzn/AMZN-Q3-2024-Earnings-Release.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-amzn/AMZN-Q3-2025-Earnings-Release.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-amzn/AMZN-Q4-2023-Earnings-Release.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-amzn/AMZN-Q4-2024-Earnings-Release.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-amzn/AMZN-Q4-2025-Earnings-Release.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-amzn/Amazon-Q1-2021-Earnings-Release.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-amzn/Amazon-Q2-2019-Earnings-Release.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-amzn/Amazon-Q4-2019-Earnings-Release.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-amzn/Amazon-Q4-2020-Earnings-Release.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-amzn/Q1-2022-Amazon-Earnings-Release.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-amzn/Q1-2023-Amazon-Earnings-Release.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-amzn/Q119_Amazon_Earnings_Press_Release_FINAL.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-amzn/Q2-2020-Amazon-Earnings-Release.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-amzn/Q2-2022-Amazon-Earnings-Release.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-amzn/Q2-2023-Amazon-Earnings-Release.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-amzn/Q2_2018_Earnings_Release.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-amzn/Q3-2021-Earnings-Release.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-amzn/Q3-2022-Amazon-Earnings-Release.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-amzn/Q318-Amazon-Earnings-Press-Release.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-amzn/Q4-2022-Amazon-Earnings-Release.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | 8-K | — | `investor-documents/ir-amzn/Q1_2018_-_8-K_Press_Release_FILED.pdf` | 0 ERR:No module named 'pypdf' |
+| scan | shareholder | — | `investor-documents/ir-amzn/2001_shareholderLetter.pdf` | 8215 |
+| scan | shareholder | — | `investor-documents/ir-amzn/2002_shareholderLetter.pdf` | 7070 |
+| scan | shareholder | — | `investor-documents/ir-amzn/2003_-Shareholder_-Letter041304.pdf` | 8106 |
+| scan | shareholder | — | `investor-documents/ir-amzn/2004_shareholderLetter.pdf` | 8840 |
+| scan | shareholder | — | `investor-documents/ir-amzn/2012-Shareholder-Letter.pdf` | 11429 |
+| scan | shareholder | — | `investor-documents/ir-amzn/2013-Letter-to-Shareholders.pdf` | 12515 |
+| scan | shareholder | — | `investor-documents/ir-amzn/2015-Letter-to-Shareholders.PDF` | 12897 |
+| scan | shareholder | — | `investor-documents/ir-amzn/2016-Letter-to-Shareholders.pdf` | 10753 |
+| scan | shareholder | — | `investor-documents/ir-amzn/2018-Letter-to-Shareholders.pdf` | 11301 |
+| scan | shareholder | — | `investor-documents/ir-amzn/2019-Shareholder-Letter.pdf` | 12650 |
+| scan | shareholder | — | `investor-documents/ir-amzn/2021-Shareholder-Letter.pdf` | 14891 |
+| scan | shareholder | — | `investor-documents/ir-amzn/2022-Shareholder-Letter.pdf` | 15620 |
+| scan | shareholder | — | `investor-documents/ir-amzn/2024-Shareholder-Letter-Final.pdf` | 11951 |
+| scan | shareholder | — | `investor-documents/ir-amzn/2025-Shareholder-Letter-Final.pdf` | 14063 |
+| scan | shareholder | — | `investor-documents/ir-amzn/AMAZON-2014-Shareholder-Letter.pdf` | 12814 |
+| scan | shareholder | — | `investor-documents/ir-amzn/AMZN_Shareholder-Letter-2009-_final_.pdf` | 8780 |
+| scan | shareholder | — | `investor-documents/ir-amzn/Amazon-2020-Shareholder-Letter-and-1997-Shareholder-Letter.pdf` | 9946 |
+| scan | shareholder | — | `investor-documents/ir-amzn/Amazon-com-Inc-2023-Shareholder-Letter.pdf` | 13610 |
+| scan | shareholder | — | `investor-documents/ir-amzn/Amazon_Shareholder_Letter.pdf` | 12868 |
+| scan | shareholder | — | `investor-documents/ir-amzn/Shareholderletter97.pdf` | 6976 |
+| scan | shareholder | — | `investor-documents/ir-amzn/Shareholderletter98.pdf` | 7239 |
+| scan | shareholder | — | `investor-documents/ir-amzn/Shareholderletter99.pdf` | 8424 |
+| scan | shareholder | — | `investor-documents/ir-amzn/shareholderletter2005.pdf` | 10514 |
+| scan | earnings | — | `investor-documents/ir-amzn/AMZN-Q1-2020-Earnings-Release.pdf` | 11805 |
+| scan | earnings | — | `investor-documents/ir-amzn/AMZN-Q1-2024-Earnings-Release.pdf` | 12680 |
+| scan | earnings | — | `investor-documents/ir-amzn/AMZN-Q1-2025-Earnings-Release.pdf` | 11938 |
+| scan | earnings | — | `investor-documents/ir-amzn/AMZN-Q1-2026-Earnings-Release.pdf` | 12818 |
+| scan | earnings | — | `investor-documents/ir-amzn/AMZN-Q2-2021-Earnings-Release.pdf` | 12910 |
+| scan | earnings | — | `investor-documents/ir-amzn/AMZN-Q2-2024-Earnings-Release.pdf` | 10758 |
+| scan | earnings | — | `investor-documents/ir-amzn/AMZN-Q2-2025-Earnings-Release.pdf` | 11360 |
+| scan | earnings | — | `investor-documents/ir-amzn/AMZN-Q3-2020-Earnings-Release.pdf` | 13409 |
+| scan | earnings | — | `investor-documents/ir-amzn/AMZN-Q3-2023-Earnings-Release.pdf` | 12591 |
+| scan | earnings | — | `investor-documents/ir-amzn/AMZN-Q3-2024-Earnings-Release.pdf` | 11957 |
+| scan | earnings | — | `investor-documents/ir-amzn/AMZN-Q3-2025-Earnings-Release.pdf` | 12256 |
+| scan | earnings | — | `investor-documents/ir-amzn/AMZN-Q4-2023-Earnings-Release.pdf` | 13148 |
+| scan | earnings | — | `investor-documents/ir-amzn/AMZN-Q4-2024-Earnings-Release.pdf` | 10956 |
+| scan | earnings | — | `investor-documents/ir-amzn/AMZN-Q4-2025-Earnings-Release.pdf` | 11789 |
+| scan | earnings | — | `investor-documents/ir-amzn/Amazon-Q1-2021-Earnings-Release.pdf` | 11912 |
+| scan | earnings | — | `investor-documents/ir-amzn/Amazon-Q2-2019-Earnings-Release.pdf` | 15939 |
+| scan | earnings | — | `investor-documents/ir-amzn/Amazon-Q4-2019-Earnings-Release.pdf` | 15505 |
+| scan | earnings | — | `investor-documents/ir-amzn/Amazon-Q4-2020-Earnings-Release.pdf` | 11268 |
+| scan | earnings | — | `investor-documents/ir-amzn/Q1-2022-Amazon-Earnings-Release.pdf` | 14097 |
+| scan | earnings | — | `investor-documents/ir-amzn/Q1-2023-Amazon-Earnings-Release.pdf` | 12486 |
+| scan | earnings | — | `investor-documents/ir-amzn/Q119_Amazon_Earnings_Press_Release_FINAL.pdf` | 13882 |
+| scan | earnings | — | `investor-documents/ir-amzn/Q2-2020-Amazon-Earnings-Release.pdf` | 13096 |
+| scan | earnings | — | `investor-documents/ir-amzn/Q2-2022-Amazon-Earnings-Release.pdf` | 14306 |
+| scan | earnings | — | `investor-documents/ir-amzn/Q2-2023-Amazon-Earnings-Release.pdf` | 12374 |
+| scan | earnings | — | `investor-documents/ir-amzn/Q2_2018_Earnings_Release.pdf` | 16250 |
+| scan | earnings | — | `investor-documents/ir-amzn/Q3-2021-Earnings-Release.pdf` | 14157 |
+| scan | earnings | — | `investor-documents/ir-amzn/Q3-2022-Amazon-Earnings-Release.pdf` | 12960 |
+| scan | earnings | — | `investor-documents/ir-amzn/Q318-Amazon-Earnings-Press-Release.pdf` | 13488 |
+| scan | earnings | — | `investor-documents/ir-amzn/Q4-2022-Amazon-Earnings-Release.pdf` | 12007 |
+| scan | 8-K | — | `investor-documents/ir-amzn/Q1_2018_-_8-K_Press_Release_FILED.pdf` | 14853 |
 | scan | 8-K | 2023-09-13 | `investor-documents/sec-edgar/8-K_20230913_rpt20230913_acc0001018724_23_000014.htm` | 4221 |
 | scan | 8-K | 2023-10-26 | `investor-documents/sec-edgar/8-K_20231026_rpt20231026_acc0001018724_23_000016.htm` | 3791 |
 | scan | 8-K | 2023-11-01 | `investor-documents/sec-edgar/8-K_20231101_rpt20231101_acc0001104659_23_113444.htm` | 8000 |
@@ -286,7 +286,42 @@ Documents in folder: **234** (all listed below; Tier 1–3 extracted or keyword-
 - NumberOfOperatingSegments: three
 
 ### `investor-documents/ir-amzn/Annual_Report_2003041304.pdf`
-Extract error: No module named 'pypdf'
+**Keyword snippets (related party, financials, segments):**
+- Founder and Chief Executive Officer
+- yielding 838% revenue growth to $147.8 million, and extended our market leadership despite aggressive
+- risk: it requires serious investment and crisp execution against established franchise leaders.
+- directly to higher revenue, higher profitability, greater capital velocity, and correspondingly stronger returns on
+- indicative of our market leadership: customer and revenue growth, the degree to which our customers continue to
+- approach so that you, our shareholders, may confirm that it is consistent with your investment philosophy:
+- • We will continue to make investment decisions in light of long-term market leadership considerations
+- jettison those that do not provide acceptable returns, and to step up our investment in those that work
+- • We will make bold rather than timid investment decisions where we see a sufficient probability of
+- weight their compensation to stock options rather than cash. We know our success will be largely
+- We aren’t so bold as to claim that the above is the “right” investment philosophy, but it’s ours, and we
+- outlook for the future.
+- • Distribution center capacity grew from 50,000 to 285,000 square feet, including a 70% expansion of our
+- Seattle facilities and the launch of our second distribution center in Delaware in November.
+- • Our cash and investment balances at year-end were $125 million, thanks to our initial public offering in
+- This requires sustained investment in systems and infrastructure to support outstanding customer convenience,
+- (Address and telephone number, including area code, of registrant’s principal executive offices)
+- Item 10. Directors and Executive Officers of the Registrant .................................... 7 9
+- Item 11. Executive Compensation ........................................................ 7 9
+- www.amazon.co.jp, and www.amazon.ca. We have organized our operations into two principal segments: North
+- America and International. The North America segment includes the operating results of www.amazon.com and
+- www.amazon.ca. The International segment includes the operating results of www.amazon.co.uk,
+- Supplementary Data—Note 15—Segment Information.”
+- purchases, and develop incremental product and service revenue opportunities. First and foremost, our best
+- segments include selection, price, availability, convenience, information, discovery, brand recognition,
+- services. As the market segments in which we operate continue to grow, other companies may also enter into
+- The following risk factors and other information included in this Annual Report should be carefully
+- incurred substantial operating losses since our inception, and although we earned a small amount of net income
+- The market segments in which we compete are rapidly evolving and intensely competitive, and we have
+- As various Internet market segments obtain large, loyal customer bases, participants in those segments may
+- expand into the market segments in which we operate. In addition, new and expanded Web technologies may
+- initiatives may not be viable. The amount of compensation we receive under certain of these agreements is
+- product or services offering is not successful, we may not receive all of the compensation we are otherwise due
+- • variability in revenue and income from entering into, amending, or terminating such agreements or
+- securities of these companies, and/or additional benefits, such as website traffic. The amount of compensation we
 
 ### `investor-documents/sec-edgar/10-Q_20260430_rpt20260331_acc0001018724_26_000014.htm`
 **Keyword snippets (related party, financials, segments):**
@@ -424,19 +459,139 @@ Extract error: No module named 'pypdf'
 - StockholdersEquity: 19,625
 
 ### `investor-documents/ir-amzn/Amazon_Annual_Report_2008.pdf`
-Extract error: No module named 'pypdf'
+**Keyword snippets (related party, financials, segments):**
+- Founder and Chief Executive Officer
+- yielding 838% revenue growth to $147.8 million, and extended our market leadership despite aggressive
+- risk: it requires serious investment and crisp execution against established franchise leaders.
+- directly to higher revenue, higher profitability, greater capital velocity, and correspondingly stronger returns on
+- indicative of our market leadership: customer and revenue growth, the degree to which our customers continue to
+- approach so that you, our shareholders, may confirm that it is consistent with your investment philosophy:
+- • We will continue to make investment decisions in light of long-term market leadership considerations
+- jettison those that do not provide acceptable returns, and to step up our investment in those that work
+- • We will make bold rather than timid investment decisions where we see a sufficient probability of
+- weight their compensation to stock options rather than cash. We know our success will be largely
+- We aren’t so bold as to claim that the above is the “right” investment philosophy, but it’s ours, and we
+- outlook for the future.
+- • Distribution center capacity grew from 50,000 to 285,000 square feet, including a 70% expansion of our
+- Seattle facilities and the launch of our second distribution center in Delaware in November.
+- • Our cash and investment balances at year-end were $125 million, thanks to our initial public offering in
+- This requires sustained investment in systems and infrastructure to support outstanding customer convenience,
+- (Address and telephone number, including area code, of registrant’s principal executive offices)
+- Item 1A. Risk Factors .................................................................. 6
+- Item 10. Directors and Executive Officers of the Registrant .................................... 7 9
+- Item 11. Executive Compensation ........................................................ 7 9
 
 ### `investor-documents/ir-amzn/Amazon-com-Inc-2023-Annual-Report.pdf`
-Extract error: No module named 'pypdf'
+**Keyword snippets (related party, financials, segments):**
+- In 2023, Amazon’s total revenue grew 12% year-over-year (“Y oY”) from $514B to $575B. By segment, North
+- America revenue increased 12% Y oY from $316B to $353B, International revenue grew 11% Y oY from
+- $118B to $131B, and A WS revenue increased 13% Y oY from $80B to $91B.
+- Further, Amazon’s operating income and Free Cash Flow (“FCF”) dramatically improved. Operating
+- margin of 6.4%). Trailing Twelve Month FCF adjusted for equipment finance leases improved from -$12.8B
+- While we’ve made meaningful progress on our financial measures, what we’re most pleased about is the
+- that became our largest revenue event ever. For all of 2023, customers saved nearly $24B across millions of
+- commitments). This work diminished short-term revenue, but was best for customers, much appreciated,
+- and enterprises seeking better connectivity and performance in more remote areas), and is a very large revenue
+- tick. W e operate in a diverse number of market segments, but what ties Amazon together is our joint mission
+- to make customers’ lives better and easier every day . This is true across every customer segment we serve
+- we’ve opened our upstream Amazon Warehousing and Distribution facilities to sellers (along with
+- paid applications as we have with FBA, Buy with Prime, or Supply Chain by Amazon (a recently released
+- from Anthropic (their newly-released Claude 3 is the best performing large language model in the world),
+- about 80% of the worldwide retail market segment still resides in physical stores. Similarly, with a cloud
+- computing business at nearly a $100B revenue run rate, more than 85% of the global IT spend is still
+- President and Chief Executive Officer
+- yielding 838% revenue growth to $147.8 million, and extended our market leadership despite aggressive
+- risk: it requires serious investment and crisp execution against established franchise leaders.
+- directly to higher revenue, higher profitability, greater capital velocity, and correspondingly stronger returns on
 
 ### `investor-documents/ir-amzn/Amazon-2025-Annual-Report.pdf`
-Extract error: No module named 'pypdf'
+**Keyword snippets (related party, financials, segments):**
+- After deciding these businesses weren’t my calling, I tried short stints in sales and investment banking,
+- thought-provoking lyrics. I eagerly await their new releases, and when their latest album dropped last summer
+- While Amazon Leo is officially scheduled to launch in mid-2026, we already have meaningful revenue
+- investment spikes that will invite scrutiny, but the game-changers don’t typically accommodate smoother
+- investment horizons.
+- revenue run rates reportedly approaching $30 billion. These are breathtaking numbers for companies this
+- after A WS launched commercially, it had a $58 million revenue run rate. Three years into this AI wave, A WS’s
+- AI revenue run rate is over $15 billion in Q1 2026 (nearly 260 times larger than A WS at that same point)—
+- installed. In Q4 2025, A WS reported 24% Y oY growth with a $142 billion dollar revenue run rate. That’s a
+- Our annual revenue run rate for our chips business (inclusive of Graviton, Trainium, and Nitro—our EC2
+- capex growth meaningfully outpaces the revenue growth, the early-years FCF is challenged until these initial
+- tranches of capacity are being monetized and revenue growth out-paces capex growth. W e’ve been through
+- wave, with much larger potential downstream revenue and FCF .
+- functionality, strongest security and operational performance, largest share of customers and revenue,
+- meaningful leader, and our future business, operating income, and FCF will be much larger because of it.
+- organization the last year, and we’re pleased with the improved speed of decision-making and delivery .
+- Amazon’s revenue in 2025 grew 12% year-over-year (“Y oY”) from $638 billion to $717 billion. By segment,
+- North America revenue increased 10% Y oY from $387 billion to $426 billion, International revenue grew
+- 13% Y oY from $143 billion to $162 billion, and A WS revenue increased 20% Y oY , from $108 billion to
+- Amazon’s operating income in 2025 improved 17% Y oY , from $69 billion (an operating margin of 10.8%) to
 
 ### `investor-documents/ir-amzn/Amazon-2024-Annual-Report.pdf`
-Extract error: No module named 'pypdf'
+**Keyword snippets (related party, financials, segments):**
+- Our total revenue grew 11% year-over-year (“Y oY”) from $575B to $638B. By segment, North America
+- revenue increased 10% Y oY from $353B to $387B, International revenue grew 9% Y oY from $131B to $143B,
+- and A WS revenue increased 19% Y oY , from $91B to $108B. For perspective, just 10 years ago, A WS
+- revenue was $4.6B; and in that same year, Amazon’s total revenue was $89B.
+- Amazon’s operating income in 2024 improved 86% Y oY , from $36.9B (an operating margin of 6.4%) to
+- $68.6B (an operating margin of 10.8%). Free Cash Flow, adjusted for equipment finance leases improved
+- Release and Frequently Asked Questions (“F AQ”) documents. The Press Release is intended to ensure that
+- architectural decisions we have. The Press Release and F AQ are how we work backwards from customers, and
+- segments, with highly talented, well-funded, ambitious companies at every turn. Customers are always looking
+- There is also substantial capital investment required. In A WS, the faster demand grows, the more datacenters,
+- at least 15-20 years). W e only start monetizing this capital investment many months after we spend the
+- A WS over the last several years). But in periods, like now, of unusually high demand (our AI revenue is
+- growing at triple digit Y oY percentages and represents a multi-billion-dollar annual revenue run rate), you’re
+- intensive to launch, we believe Kuiper will be a meaningful operating income and ROIC business for us.
+- President and Chief Executive Officer
+- yielding 838% revenue growth to $147.8 million, and extended our market leadership despite aggressive
+- risk: it requires serious investment and crisp execution against established franchise leaders.
+- directly to higher revenue, higher profitability, greater capital velocity, and correspondingly stronger returns on
+- indicative of our market leadership: customer and revenue growth, the degree to which our customers continue to
+- approach so that you, our shareholders, may confirm that it is consistent with your investment philosophy:
 
 ### `investor-documents/ir-amzn/Amazon-2022-Annual-Report.pdf`
-Extract error: No module named 'pypdf'
+**Keyword snippets (related party, financials, segments):**
+- adjustments in our investment decisions and the way in which we’ll invent moving forward, while still
+- operate in large, dynamic, global market segments with many capable and well-funded competitors (the
+- When I joined Amazon in 1997, we had booked $15M in revenue in 1996, were a books-only retailer, did
+- balanced this streamlining with investment in customer experiences that we believed could be substantial
+- continue investing in A WS. Fifteen years later, A WS is now an $85B annual revenue run rate business, with
+- we’d slowed investment in A WS during that 2008-2009 period.
+- enough revenue, operating income, free cash flow, and return on invested capital. In some cases, it led to us
+- at an extraordinary clip, with annual revenue increasing from $245B in 2019 to $434B in 2022. This meant that
+- more work to do, but we’re pleased with our trajectory and the meaningful upside in front of us.
+- AWS has an $85B annualized revenue run rate, is still early in its adoption curve, but at a juncture where it’s
+- year (“Y oY”) in 2022 on a $62B revenue base, A WS faces short-term headwinds right now as companies
+- Chip development is a good example. In last year’s letter, I mentioned the investment we were making in our
+- and this long-term investment should prove fruitful for both customers and A WS. A WS is still in the early
+- about shopping behaviors and our very deep investment in machine learning algorithms. This leads to
+- our Advertising revenue has continued to grow rapidly (23% Y oY in Q4 2022, 25% Y oY overall for 2022
+- on a $31B revenue base), even as most large advertising-focused businesses’ growth have slowed over the last
+- When we look at new investment opportunities, we ask ourselves a few questions:
+- The same could be said for our international Stores expansion. In 2022, our international consumer segment
+- drove $118B of revenue. In our larger, established international consumer businesses, we’re big enough to
+- parts of Africa. These new countries take a certain amount of fixed investment to get started and to scale, but
 
 ### `investor-documents/ir-amzn/Amazon-2021-Annual-Report.pdf`
-Extract error: No module named 'pypdf'
+**Keyword snippets (related party, financials, segments):**
+- first year of the pandemic, A WS revenue continued to grow at a rapid clip—30% year over year (“Y oY”) in
+- 2020 on a $35 billion annual revenue base in 2019—but slower than the 37% Y oY growth in 2019. This
+- recovering) helped re-accelerate A WS’s revenue growth to 37% Y oY in 2021.
+- Conversely, our Consumer revenue grew dramatically in 2020. In 2020, Amazon’s North America and
+- International Consumer revenue grew 39% Y oY on the very large 2019 revenue base of $245 billion; and,
+- this extraordinary growth extended into 2021 with revenue increasing 43% Y oY in Q1 2021. These are
+- investment of over $100 billion and countless iterations and small process improvements by over a million
+- out). This type of iterative innovation is never finished and has periodic peaks in investment years, but leads
+- Devices: Our first foray into devices was the Kindle, released in 2007. It was not the most sophisticated
+- continued to increase compensation such that our average starting hourly salary is currently over $18.
+- Along with this compensation, we offer very robust benefits, including full health insurance, a 401K plan,
+- development process of working backwards from the customer where having to write a Press Release (to
+- opportunity to build mindshare in fast-moving market segments before well-executing peers get too far
+- it a “Minimum Loveable Product” vs. a “Minimum Viable Product”), but in newer market segments,
+- President and Chief Executive Officer
+- yielding 838% revenue growth to $147.8 million, and extended our market leadership despite aggressive
+- risk: it requires serious investment and crisp execution against established franchise leaders.
+- directly to higher revenue, higher profitability, greater capital velocity, and correspondingly stronger returns on
+- indicative of our market leadership: customer and revenue growth, the degree to which our customers continue to
+- approach so that you, our shareholders, may confirm that it is consistent with your investment philosophy:

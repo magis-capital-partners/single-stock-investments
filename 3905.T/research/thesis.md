@@ -11,7 +11,7 @@
 | **Dhando** (Pabrai) | none |
 | **Stance** | watch |
 | **Cycle** | - |
-| **Implied 10yr IRR** (base) | 5.7% (base) |
+| **Implied 10yr IRR** (base) | 6.46% (total synthesis) |
 | **IRR method** | scenario |
 | **Lawrence bucket** | other |
 | **Payoff lens** | — |

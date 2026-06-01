@@ -15,61 +15,61 @@ Documents in folder: **518** (all listed below; Tier 1–3 extracted or keyword-
 | partial | 10-K | 2024-02-09 | `investor-documents/sec-edgar/10-K_20240209_rpt20231231_acc0000064040_24_000071.htm` | 30000 |
 | partial | 10-K | 2025-02-11 | `investor-documents/sec-edgar/10-K_20250211_rpt20241231_acc0000064040_25_000052.htm` | 30000 |
 | full | 10-K | 2026-02-11 | `investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000064040_26_000013.htm` | 120000 |
-| scan | annual | — | `investor-documents/ir-spgi/2007-Annual-Shareholders-Prepared-Remarks.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/2008-Annual-Shareholders-Prepared-Remarks.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/2011-Annual.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/2012-Annual.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/2013-Annual.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/2014-Annual.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/2015-Annual.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/2016-Annual.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/2017-Annual.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/2018-Annual.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/2019-Annual.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/Download-Prepared-Remarks-MHP-2011-Annual-Shareholders-Meeting-_9-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/IHS-Markit-Ltd-2018-Annual-Report.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/IHS-Markit-Ltd-2019-Annual-Report.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/IHS-Markit-Ltd-2020-Annual-Report.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/Prepared-Remarks-Bear-Stearns-20th-Annual-Media-Conference.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/Prepared-Remarks-Citigroup-17th-Annual-Entertainment-Media-and-Telecommunications-Conference.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/Prepared-Remarks-Citigroup-18th-Annual-Entertainment-Media-and-Telecommunications-Conference.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/Prepared-Remarks-Credit-Suisse-9th-Annual-Global-Services-Growth-Conference.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/Prepared-Remarks-J.P.-Morgan-38th-Annual-Technology-Media-and-Telecom-Conference.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/Prepared-Remarks-Lazard-Capital-Markets-Annual-Technology-Media-Conference.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/Prepared-Remarks-MHP-Annual-Meeting-of-Shareholders.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/Prepared-Remarks-MHP-at-Bear-Stearns-21st-Annual-Media-Conference.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/Prepared-Remarks-MHP-at-Jefferies-5th-Annual-Internet-Media-Conference.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/Prepared-Remarks-S-P-Global-2017-Annual-Meeting-_6-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/Prepared-Remarks-UBS-34th-Annual-Global-Media-Conference.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/Prepared-Remarks-UBS-35th-Annual-Global-Media-Communications-Conference.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/S-P-Global-2020-Annual-Report.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/S-P-Global-2021-Annual-Report.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/S-P-Global-2022-Annual-Report.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/S-P-Global-2024-Annual-Report.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/S-P-Global-2024-Annual-Shareholders-Meeting-Slides-5-1-2024.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/Slides-2020-Annual-Meeting-of-Shareholders.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/Slides-Annual-Shareholders-Meeting-2019-_13-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/Slides-Raymond-James-34th-Annual-Institutional-Investors-Conference.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/Slides-Raymond-James-35th-Annual-Institutional-Investors-Conference.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/Slides-S-P-Global-2017-Annual-Meeting-_10-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/Slides-S-P-Global-at-Bernstein_s-36th-Annual-Strategic-Decisions-Conference-5-27-2020-_36-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/Slides-S-P-Global-at-Credit-Suisse-19th-Annual-Financial-Services-Forum-2-14-2018-_14-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/Slides-S-P-Global-at-Raymond-James-Associates_-41st-Annual-Institutional-Conference-3-2-2020-_34-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/Slides-S-P-Global-at-Virtual-William-Blair-40th-Annual-Growth-Stock-Conference-on-June-10-2020-_36-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/Slides-_printer-friendly-13-pages_-MHP-2011-Annual-Shareholders-Meeting.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-Bear-Stearns-20th-Annual-Media-Conference.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-Citigroup-17th-Annual-Entertainment-Media-and-Telecommunications-Conference.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-Citigroup-18th-Annual-Entertainment-Media-and-Telecommunications-Conference.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-J.P.-Morgan-38th-Annual-Technology-Media-and-Telecom-Conference.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-Lazard-Capital-Markets-Annual-Technology-Media-Conference.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-MHP-at-Bear-Stearns-21st-Annual-Media-Conference.pdf` | 0 ERR:No module named 'pypdf' |
-| partial | annual | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-MHP-at-Jefferies-5th-Annual-Internet-Media-Conference.pdf` | 0 ERR:No module named 'pypdf' |
-| partial | annual | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-UBS-34th-Annual-Global-Media-Communications-Conference.pdf` | 0 ERR:No module named 'pypdf' |
-| partial | annual | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-UBS-35th-Annual-Global-Media-Communications-Conference.pdf` | 0 ERR:No module named 'pypdf' |
-| partial | annual | — | `investor-documents/ir-spgi/Summary-of-Voting-Results-2015-Annual-Meeting.pdf` | 0 ERR:No module named 'pypdf' |
-| partial | annual | — | `investor-documents/ir-spgi/Summary-of-Voting-Results-2016-Annual-Meeting.pdf` | 0 ERR:No module named 'pypdf' |
-| partial | annual | — | `investor-documents/ir-spgi/The-McGraw-Hill-Companies-to-Present-at-the-Bear-Stearns-21st-Annual-Media-Conference.pdf` | 0 ERR:No module named 'pypdf' |
-| full | annual | — | `investor-documents/ir-spgi/The-McGraw-Hill-Companies-to-Present-at-the-UBS-37th-Annual-Global-Media-and-Communications-Conference-on-December-7.pdf` | 0 ERR:No module named 'pypdf' |
+| scan | annual | — | `investor-documents/ir-spgi/2007-Annual-Shareholders-Prepared-Remarks.pdf` | 10260 |
+| scan | annual | — | `investor-documents/ir-spgi/2008-Annual-Shareholders-Prepared-Remarks.pdf` | 7944 |
+| scan | annual | — | `investor-documents/ir-spgi/2011-Annual.pdf` | 7449 |
+| scan | annual | — | `investor-documents/ir-spgi/2012-Annual.pdf` | 8477 |
+| scan | annual | — | `investor-documents/ir-spgi/2013-Annual.pdf` | 8072 |
+| scan | annual | — | `investor-documents/ir-spgi/2014-Annual.pdf` | 7625 |
+| scan | annual | — | `investor-documents/ir-spgi/2015-Annual.pdf` | 7907 |
+| scan | annual | — | `investor-documents/ir-spgi/2016-Annual.pdf` | 3112 |
+| scan | annual | — | `investor-documents/ir-spgi/2017-Annual.pdf` | 4820 |
+| scan | annual | — | `investor-documents/ir-spgi/2018-Annual.pdf` | 3074 |
+| scan | annual | — | `investor-documents/ir-spgi/2019-Annual.pdf` | 2680 |
+| scan | annual | — | `investor-documents/ir-spgi/Download-Prepared-Remarks-MHP-2011-Annual-Shareholders-Meeting-_9-pages_.pdf` | 8925 |
+| scan | annual | — | `investor-documents/ir-spgi/IHS-Markit-Ltd-2018-Annual-Report.pdf` | 4174 |
+| scan | annual | — | `investor-documents/ir-spgi/IHS-Markit-Ltd-2019-Annual-Report.pdf` | 3418 |
+| scan | annual | — | `investor-documents/ir-spgi/IHS-Markit-Ltd-2020-Annual-Report.pdf` | 3925 |
+| scan | annual | — | `investor-documents/ir-spgi/Prepared-Remarks-Bear-Stearns-20th-Annual-Media-Conference.pdf` | 10069 |
+| scan | annual | — | `investor-documents/ir-spgi/Prepared-Remarks-Citigroup-17th-Annual-Entertainment-Media-and-Telecommunications-Conference.pdf` | 10352 |
+| scan | annual | — | `investor-documents/ir-spgi/Prepared-Remarks-Citigroup-18th-Annual-Entertainment-Media-and-Telecommunications-Conference.pdf` | 9435 |
+| scan | annual | — | `investor-documents/ir-spgi/Prepared-Remarks-Credit-Suisse-9th-Annual-Global-Services-Growth-Conference.pdf` | 9717 |
+| scan | annual | — | `investor-documents/ir-spgi/Prepared-Remarks-J.P.-Morgan-38th-Annual-Technology-Media-and-Telecom-Conference.pdf` | 9767 |
+| scan | annual | — | `investor-documents/ir-spgi/Prepared-Remarks-Lazard-Capital-Markets-Annual-Technology-Media-Conference.pdf` | 9063 |
+| scan | annual | — | `investor-documents/ir-spgi/Prepared-Remarks-MHP-Annual-Meeting-of-Shareholders.pdf` | 9422 |
+| scan | annual | — | `investor-documents/ir-spgi/Prepared-Remarks-MHP-at-Bear-Stearns-21st-Annual-Media-Conference.pdf` | 9504 |
+| scan | annual | — | `investor-documents/ir-spgi/Prepared-Remarks-MHP-at-Jefferies-5th-Annual-Internet-Media-Conference.pdf` | 9623 |
+| scan | annual | — | `investor-documents/ir-spgi/Prepared-Remarks-S-P-Global-2017-Annual-Meeting-_6-pages_.pdf` | 6849 |
+| scan | annual | — | `investor-documents/ir-spgi/Prepared-Remarks-UBS-34th-Annual-Global-Media-Conference.pdf` | 10572 |
+| scan | annual | — | `investor-documents/ir-spgi/Prepared-Remarks-UBS-35th-Annual-Global-Media-Communications-Conference.pdf` | 9172 |
+| scan | annual | — | `investor-documents/ir-spgi/S-P-Global-2020-Annual-Report.pdf` | 2753 |
+| scan | annual | — | `investor-documents/ir-spgi/S-P-Global-2021-Annual-Report.pdf` | 3643 |
+| scan | annual | — | `investor-documents/ir-spgi/S-P-Global-2022-Annual-Report.pdf` | 2331 |
+| scan | annual | — | `investor-documents/ir-spgi/S-P-Global-2024-Annual-Report.pdf` | 2495 |
+| scan | annual | — | `investor-documents/ir-spgi/S-P-Global-2024-Annual-Shareholders-Meeting-Slides-5-1-2024.pdf` | 603 |
+| scan | annual | — | `investor-documents/ir-spgi/Slides-2020-Annual-Meeting-of-Shareholders.pdf` | 867 |
+| scan | annual | — | `investor-documents/ir-spgi/Slides-Annual-Shareholders-Meeting-2019-_13-pages_.pdf` | 8573 |
+| scan | annual | — | `investor-documents/ir-spgi/Slides-Raymond-James-34th-Annual-Institutional-Investors-Conference.pdf` | 5469 |
+| scan | annual | — | `investor-documents/ir-spgi/Slides-Raymond-James-35th-Annual-Institutional-Investors-Conference.pdf` | 5136 |
+| scan | annual | — | `investor-documents/ir-spgi/Slides-S-P-Global-2017-Annual-Meeting-_10-pages_.pdf` | 6554 |
+| scan | annual | — | `investor-documents/ir-spgi/Slides-S-P-Global-at-Bernstein_s-36th-Annual-Strategic-Decisions-Conference-5-27-2020-_36-pages_.pdf` | 7805 |
+| scan | annual | — | `investor-documents/ir-spgi/Slides-S-P-Global-at-Credit-Suisse-19th-Annual-Financial-Services-Forum-2-14-2018-_14-pages_.pdf` | 7549 |
+| scan | annual | — | `investor-documents/ir-spgi/Slides-S-P-Global-at-Raymond-James-Associates_-41st-Annual-Institutional-Conference-3-2-2020-_34-pages_.pdf` | 6940 |
+| scan | annual | — | `investor-documents/ir-spgi/Slides-S-P-Global-at-Virtual-William-Blair-40th-Annual-Growth-Stock-Conference-on-June-10-2020-_36-pages_.pdf` | 7803 |
+| scan | annual | — | `investor-documents/ir-spgi/Slides-_printer-friendly-13-pages_-MHP-2011-Annual-Shareholders-Meeting.pdf` | 3416 |
+| scan | annual | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-Bear-Stearns-20th-Annual-Media-Conference.pdf` | 7103 |
+| scan | annual | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-Citigroup-17th-Annual-Entertainment-Media-and-Telecommunications-Conference.pdf` | 6768 |
+| scan | annual | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-Citigroup-18th-Annual-Entertainment-Media-and-Telecommunications-Conference.pdf` | 6895 |
+| scan | annual | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-J.P.-Morgan-38th-Annual-Technology-Media-and-Telecom-Conference.pdf` | 8826 |
+| scan | annual | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-Lazard-Capital-Markets-Annual-Technology-Media-Conference.pdf` | 7599 |
+| scan | annual | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-MHP-at-Bear-Stearns-21st-Annual-Media-Conference.pdf` | 8078 |
+| partial | annual | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-MHP-at-Jefferies-5th-Annual-Internet-Media-Conference.pdf` | 13041 |
+| partial | annual | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-UBS-34th-Annual-Global-Media-Communications-Conference.pdf` | 20760 |
+| partial | annual | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-UBS-35th-Annual-Global-Media-Communications-Conference.pdf` | 21043 |
+| partial | annual | — | `investor-documents/ir-spgi/Summary-of-Voting-Results-2015-Annual-Meeting.pdf` | 5379 |
+| partial | annual | — | `investor-documents/ir-spgi/Summary-of-Voting-Results-2016-Annual-Meeting.pdf` | 37191 |
+| partial | annual | — | `investor-documents/ir-spgi/The-McGraw-Hill-Companies-to-Present-at-the-Bear-Stearns-21st-Annual-Media-Conference.pdf` | 32377 |
+| full | annual | — | `investor-documents/ir-spgi/The-McGraw-Hill-Companies-to-Present-at-the-UBS-37th-Annual-Global-Media-and-Communications-Conference-on-December-7.pdf` | 2802 |
 | scan | 10-Q | 2021-10-26 | `investor-documents/sec-edgar/10-Q_20211026_rpt20210930_acc0001628280_21_020543.htm` | 8000 |
 | scan | 10-Q | 2022-05-04 | `investor-documents/sec-edgar/10-Q_20220504_rpt20220331_acc0000064040_22_000113.htm` | 8000 |
 | scan | 10-Q | 2022-08-03 | `investor-documents/sec-edgar/10-Q_20220803_rpt20220630_acc0000064040_22_000143.htm` | 8000 |
@@ -84,210 +84,210 @@ Documents in folder: **518** (all listed below; Tier 1–3 extracted or keyword-
 | scan | 10-Q | 2025-08-01 | `investor-documents/sec-edgar/10-Q_20250801_rpt20250630_acc0000064040_25_000147.htm` | 8000 |
 | scan | 10-Q | 2025-10-30 | `investor-documents/sec-edgar/10-Q_20251030_rpt20250930_acc0000064040_25_000167.htm` | 8000 |
 | full | 10-Q | 2026-04-28 | `investor-documents/sec-edgar/10-Q_20260428_rpt20260331_acc0000064040_26_000024.htm` | 120000 |
-| scan | proxy | — | `investor-documents/ir-spgi/2015-Proxy.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-spgi/2016-Proxy.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-spgi/2017-Proxy.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-spgi/2018-Proxy.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-spgi/2019-Proxy.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-spgi/2020-Proxy.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-spgi/2021-SPGI-IHS-Markit-Prospectus-Proxy-Statement.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-spgi/IHS-Markit-Ltd-2019-Proxy-Statement.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-spgi/IHS-Markit-Ltd-2020-Proxy-Statement.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-spgi/S-P-Global-2022-Proxy-Statement.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-spgi/S-P-Global-2023-Proxy-Statement.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-spgi/S-P-Global-2024-Proxy-Statement.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-spgi/S-P-Global-Inc-2026-Proxy-Statement.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-spgi/S-P-Global-Inc.-2021-Proxy-Statement.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-spgi/S-P-Global_2025-Proxy-Statement.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-spgi/ihs-markit-ltd-2021-proxy-statement.pdf` | 0 ERR:No module named 'pypdf' |
+| scan | proxy | — | `investor-documents/ir-spgi/2015-Proxy.pdf` | 2940 |
+| scan | proxy | — | `investor-documents/ir-spgi/2016-Proxy.pdf` | 4153 |
+| scan | proxy | — | `investor-documents/ir-spgi/2017-Proxy.pdf` | 1224 |
+| scan | proxy | — | `investor-documents/ir-spgi/2018-Proxy.pdf` | 3988 |
+| scan | proxy | — | `investor-documents/ir-spgi/2019-Proxy.pdf` | 3699 |
+| scan | proxy | — | `investor-documents/ir-spgi/2020-Proxy.pdf` | 3653 |
+| scan | proxy | — | `investor-documents/ir-spgi/2021-SPGI-IHS-Markit-Prospectus-Proxy-Statement.pdf` | 7009 |
+| scan | proxy | — | `investor-documents/ir-spgi/IHS-Markit-Ltd-2019-Proxy-Statement.pdf` | 5313 |
+| scan | proxy | — | `investor-documents/ir-spgi/IHS-Markit-Ltd-2020-Proxy-Statement.pdf` | 2626 |
+| scan | proxy | — | `investor-documents/ir-spgi/S-P-Global-2022-Proxy-Statement.pdf` | 3593 |
+| scan | proxy | — | `investor-documents/ir-spgi/S-P-Global-2023-Proxy-Statement.pdf` | 3797 |
+| scan | proxy | — | `investor-documents/ir-spgi/S-P-Global-2024-Proxy-Statement.pdf` | 3717 |
+| scan | proxy | — | `investor-documents/ir-spgi/S-P-Global-Inc-2026-Proxy-Statement.pdf` | 5268 |
+| scan | proxy | — | `investor-documents/ir-spgi/S-P-Global-Inc.-2021-Proxy-Statement.pdf` | 4799 |
+| scan | proxy | — | `investor-documents/ir-spgi/S-P-Global_2025-Proxy-Statement.pdf` | 5043 |
+| scan | proxy | — | `investor-documents/ir-spgi/ihs-markit-ltd-2021-proxy-statement.pdf` | 2201 |
 | scan | proxy | 2023-03-23 | `investor-documents/sec-edgar/DEF 14A_20230323_rpt_acc0001104659_23_035844.htm` | 8000 |
 | scan | proxy | 2024-03-19 | `investor-documents/sec-edgar/DEF 14A_20240319_rpt20240501_acc0001104659_24_035901.htm` | 8000 |
 | scan | proxy | 2025-03-25 | `investor-documents/sec-edgar/DEF 14A_20250325_rpt20250507_acc0001104659_25_027558.htm` | 8000 |
 | full | proxy | 2026-03-31 | `investor-documents/sec-edgar/DEF 14A_20260331_rpt20260520_acc0001104659_26_037380.htm` | 120000 |
-| scan | earnings | — | `investor-documents/ir-spgi/20-Q1-Earnings-Release-PDF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/2Q-2020-Earnings-Release-PDF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/3Q-Earnings-Release-PDF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Earnings-Release-3Q-2016-_14-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Earnings-Release-4Q-2016-_16-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Earnings-Release-McGraw-Hill-Reports-4th-Quarter-and-Full-Year-2012-Results-_20-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Earnings-Release-PDF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Earnings-Release-The-McGraw-Hill-Companies-Reports-17-Increase-in-Adjusted-Diluted.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/NEW-PDF-S-P-Global-1Q-2026-Earnings-Call-Slides-4-28-2026r.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-1Q-2011-MHP-Earnings-_12-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-1Q-2012-MHP-Earnings-_10-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-1Q-2013-Earnings-McGraw-Hill-Financial-_10-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-1Q-2014-MHFI-Earnings-_9-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-1Q-2015-MHFI-Earnings-_10pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-1Q-2016-MHFI-Earnings-_9-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-1Q-2017-S-P-Global-Earnings-_10-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-1st-Quarter-2007-MHP-Earnings.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-1st-Quarter-2008-MHP-Earnings.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-1st-Quarter-2010-MHP-Earnings.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-2Q-2011-MHP-Earnings-_11-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-2Q-2012-MHP-Earnings-_12-Pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-2Q-2013-Earnings-McGraw-Hill-Financial-_12-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-2Q-2014-MHFI-Earnings.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-2Q-2015-MHFI-Earnings-_14-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-2Q-2016-S-P-Global-Earnings-_11-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-2nd-Quarter-2006-MHP-Earnings.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-2nd-Quarter-2007-MHP-Earnings.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-2nd-Quarter-2008-MHP-Earnings.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-2nd-Quarter-2009-MHP-Earnings.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-2nd-Quarter-2010-MHP-Earnings.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-3Q-2011-MHP-Earnings-_13-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-3Q-2012-MHP-Earnings.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-3Q-2013-Earnings-McGraw-Hill-Financial-_11-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-3Q-2015-MHFI-Earnings-_11-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-3Q-2016-S-P-Global-Earnings-_10-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-3rd-Quarter-2006-MHP-Earnings.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-3rd-Quarter-2007-MHP-Earnings.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-3rd-Quarter-2008-MHP-Earnings.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-3rd-Quarter-2009-MHP-Earnings.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-3rd-Quarter-2010-MHP-Earnings.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-4Q-2010-MHP-Earnings-_14-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-4Q-2011-MHP-Earnings-_13-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-4Q-2012-MHP-Earnings-_14-Pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-4Q-2013-Earnings-McGraw-Hill-Financial-_10-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-4Q-2015-MHFI-Earnings-_13-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-4Q-and-Full-Year-2014-MHFI-Earnings-_11-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-4Q-and-Full-Year-2016-S-P-Global-Earnings-_11-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-4th-Quarter-2006-MHP-Earnings.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-4th-Quarter-2007-MHP-Earnings.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-4th-Quarter-2009-MHP-Earnings.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Q1-2011-Earnings-Release-PDF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Q1-2012-Earnings-Release-PDF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Q1-2013-Earnings-Release-PDF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Q1-2014-Earnings-Release-PDF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Q1-2015-Earnings-Release-PDF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Q1-2016-Earnings-Release-PDF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Q1-2017-Earnings-Release-PDF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Q1-2018-Earnings-Release-PDF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Q1-2019-Earnings-Release-PDF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Q2-2011-Earnings-Release-PDF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Q2-2012-Earnings-Release-PDF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Q2-2013-Earnings-Release.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Q2-2014-Earnings-Release-PDF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Q2-2015-Earnings-Release-PDF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Q2-2016-Earnings-Release-PDF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Q2-2017-Earnings-Release-PDF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Q2-2018-Earnings-Release-PDF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Q2-2019-Earnings-Release-PDF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Q3-2011-Earnings-Release-PDF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Q3-2012-Earnings-Release-PDF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Q3-2013-Earnings-Release-PDF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Q3-2014-Earnings-Release-PDF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Q3-2015-Earnings-Release-PDF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Q3-2016-Earnings-Release-PDF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Q3-2017-Earnings-Release-PDF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Q3-2018-Earnings-Release-PDF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Q3-2019-Earnings-Release-PDF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Q4-2011-Earnings-Release-PDF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Q4-2012-Earnings-Release-PDF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Q4-2013-Earnings-Release-PDF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Q4-2014-Earnings-Release-PDF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Q4-2015-Earnings-Release-PDF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Q4-2016-Earnings-Release-PDF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Q4-2017-Earnings-Release-PDF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Q4-2018-Earnings-Release-PDF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Q4-2019-Earnings-Release-PDF.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-GIobal-2Q-2024-Earnings-Release-Exhibits-7-30-2024.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-1Q-2021-Earnings-Call-Slides-4-29-2021.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-1Q-2021-Earnings-Release-Exhibits-4-29-2021.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-1Q-2022-Earnings-Release-and-Exhibits-5-3-2022.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-1Q-2023-Earnings-Call-Slides-4-27-2023.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-1Q-2023-Earnings-Call-Supplemental-Disclosure-4-27-2023.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-1Q-2023-Earnings-Release-and-Exhibits-4-27-2023.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-1Q-2025-Earnings-Call-Slides-4-29-2025.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-1Q-2025-Earnings-Release-4-29-2025.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-1Q-2025-Earnings-Supplemental-Disclosure-4-29-2025.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-1Q-2026-Earnings-Release-Exhibits-4-28-2026.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-1Q-2026-Earnings-Supplemental-Disclosure-4-28-2026.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-2Q-2021-Earnings-Call-Slides-7-29-2021.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-2Q-2021-Earnings-Release-and-Exhibits-7-29-2021.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-2Q-2022-Earnings-Release-and-Exhibits-8-2-2022.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-2Q-2023-Earnings-Release-Exhibits-7-27-2023e.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-2Q-2024-Earnings-Call-Slides-7-30-2024.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-2Q-2024-Earnings-Supplemental-Disclosure-7-30-2024.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-2Q-2025-Earnings-Call-Slides-7-31-2025.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-2Q-2025-Earnings-Release-and-Exhibits-7-31-2025.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-2Q-2025-Earnings-Supplemental-Disclosure-7-31-2025.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-3Q-2021-Earnings-Release-and-Tables-10-26-2021.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-3Q-2022-Earnings-Call-Slides-10-27-2022.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-3Q-2022-Earnings-Release-and-Exhibits-10-27-2022.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-3Q-2023-Earnings-Call-Slides-11-2-2023.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-3Q-2023-Earnings-Release-Exhibits-11-2-2023.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-3Q-2024-Earnings-Call-Slides-10-24-2024.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-3Q-2024-Earnings-Release-Exhibits-10-24-2024.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-3Q-2024-Earnings-Supplemental-Disclosure-10-24-2024.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-3Q-2025-Earnings-Call-Slides-10-30-2025.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-3Q-2025-Earnings-Release-Exhibits-10-30-2025.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-3Q-2025-Earnings-Supplemental-Disclosure-10-30-2025.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-4Q-FY-2023-Earnings-Call-Slides.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-4Q-FY-2025-Earnings-Call-Slides-2-10-2026.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-4Q-FY-2025-Earnings-Release-Exhibits-2-10-2026.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-4Q-FY-2025-Earnings-Supplemental-Disclosure-2-10-2026.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-4Q-Full-Year-2022-Earnings-Release-and-Exhibits.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-4Q-and-FY-2023-Earnings-Release-and-Exhibits-2-8-2024.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-4Q-and-FY-2023-Earnings-Supplemental-Disclosure-2-8-2024.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-4Q-and-Full-Year-2021-Earnings-Call-Slides.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-4Q-and-Full-Year-2021-Earnings-Release-and-Tables.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-4Q-and-Full-Year-2022-Earnings-Call-Slides-2-9-2023.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-4Q-and-Full-Year-2024-Earnings-Call-Slides-2-11-2025.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-4Q-and-Full-Year-2024-Earnings-Release-Exhibits-2-11-2025.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-4Q-and-Full-Year-2024-Earnings-Supplemental-Disclosure-2-11-2025.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/SP-Global-1Q22-Earnings-Slides-5-3-2022.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/SPGI-2Q-2022-Earnings-Call-Slides-8-2-2022.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/SPGI-2Q-2023-Earnings-Supplemental-Disclosure-7-27-2023.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/SPGI-3Q-2021-Earnings-Call-Slides-10-26-2021.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/SPGI-3Q-2023-Earnings-Supplemental-Disclosure-11-2-2023.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-1Q-2011-MHP-Earnings-_38-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-1Q-2012-MHP-Earnings-_23-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-1Q-2013-Earnings-McGraw-Hill-Financial-_20-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-1Q-2014-MHP-Earnings-_18-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-1Q-2016-MHFI-Earnings-_16-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-1Q-2017-S-P-Global-Earnings-_21-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-2Q-2011-MHP-Earnings-_35-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-2Q-2012-MHP-Earnings-_22-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-2Q-2013-MHP-Earnings-_20-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-2Q-2014-MHP-Earnings-_18-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-2Q-2015-MHFI-Earnings-_24-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-2Q-2016-S-P-Global-Earnings-_18-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-2Q-2017-S-P-Global-Earnings-_21-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-3Q-2011-MHP-Earnings-_35-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-3Q-2012-MHP-Earnings-_24-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-3Q-2013-MHP-Earnings-_17-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-3Q-2014-MHFI-Earnings-_16-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-3Q-2015-MHFI-Earnings-_19-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-3Q-2016-S-P-Global-Earnings-_18-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-3Q-2017-S-P-Global-Earnings-_21-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-4Q-2010-MHP-Earnings-_41-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-4Q-2011-MHP-Earnings-_30-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-4Q-2012-MHP-Earnings-_20-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-4Q-2013-MHFI-Earnings-_17-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-4Q-2014-MHFI-Earnings-_20-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-4Q-2015-MHFI-Earnings-_21-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-4Q-2016-S-P-Global-Earnings-_21-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-4Q-and-Full-Year-2017-S-P-Global-Earnings-_25-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-1st-Quarter-2008-MHP-Earnings.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-1st-Quarter-2010-MHP-Earnings.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-2nd-Quarter-2006-MHP-Earnings.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-2nd-Quarter-2007-MHP-Earnings.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-2nd-Quarter-2008-MHP-Earnings.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-2nd-Quarter-2009-MHP-Earnings.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-2nd-Quarter-2010-MHP-Earnings.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-3rd-Quarter-2006-MHP-Earnings.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-3rd-Quarter-2007-MHP-Earnings.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-3rd-Quarter-2008-MHP-Earnings.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-3rd-Quarter-2009-MHP-Earnings.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-3rd-Quarter-2010-MHP-Earnings.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-4th-Quarter-2006-MHP-Earnings.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-4th-Quarter-2007-MHP-Earnings.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-4th-Quarter-2009-MHP-Earnings.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/The-McGraw-Hill-Companies-Reports-11.9-Growth-in-2Q-EPS-_0.68-Diluted-Earnings-per-Share-in-2Q-2011-_14-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/new-s-p-global-2q-2023-earnings-call-slides-7-27-2023.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/s-p-global-1q-2024-earnings-call-slides-4-25-2024r.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/s-p-global-1q-2024-earnings-supplemental-disclosure-4-25-2024.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-spgi/sp-global-1q-2024-earnings-release-exhibits-4-25-2024.pdf` | 0 ERR:No module named 'pypdf' |
+| scan | earnings | — | `investor-documents/ir-spgi/20-Q1-Earnings-Release-PDF.pdf` | 9237 |
+| scan | earnings | — | `investor-documents/ir-spgi/2Q-2020-Earnings-Release-PDF.pdf` | 9597 |
+| scan | earnings | — | `investor-documents/ir-spgi/3Q-Earnings-Release-PDF.pdf` | 10699 |
+| scan | earnings | — | `investor-documents/ir-spgi/Earnings-Release-3Q-2016-_14-pages_.pdf` | 10405 |
+| scan | earnings | — | `investor-documents/ir-spgi/Earnings-Release-4Q-2016-_16-pages_.pdf` | 8739 |
+| scan | earnings | — | `investor-documents/ir-spgi/Earnings-Release-McGraw-Hill-Reports-4th-Quarter-and-Full-Year-2012-Results-_20-pages_.pdf` | 10192 |
+| scan | earnings | — | `investor-documents/ir-spgi/Earnings-Release-PDF.pdf` | 9549 |
+| scan | earnings | — | `investor-documents/ir-spgi/Earnings-Release-The-McGraw-Hill-Companies-Reports-17-Increase-in-Adjusted-Diluted.pdf` | 8830 |
+| scan | earnings | — | `investor-documents/ir-spgi/NEW-PDF-S-P-Global-1Q-2026-Earnings-Call-Slides-4-28-2026r.pdf` | 11180 |
+| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-1Q-2011-MHP-Earnings-_12-pages_.pdf` | 8567 |
+| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-1Q-2012-MHP-Earnings-_10-pages_.pdf` | 9230 |
+| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-1Q-2013-Earnings-McGraw-Hill-Financial-_10-pages_.pdf` | 10560 |
+| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-1Q-2014-MHFI-Earnings-_9-pages_.pdf` | 8462 |
+| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-1Q-2015-MHFI-Earnings-_10pages_.pdf` | 8251 |
+| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-1Q-2016-MHFI-Earnings-_9-pages_.pdf` | 8380 |
+| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-1Q-2017-S-P-Global-Earnings-_10-pages_.pdf` | 9021 |
+| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-1st-Quarter-2007-MHP-Earnings.pdf` | 8741 |
+| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-1st-Quarter-2008-MHP-Earnings.pdf` | 8017 |
+| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-1st-Quarter-2010-MHP-Earnings.pdf` | 8715 |
+| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-2Q-2011-MHP-Earnings-_11-pages_.pdf` | 9533 |
+| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-2Q-2012-MHP-Earnings-_12-Pages_.pdf` | 9086 |
+| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-2Q-2013-Earnings-McGraw-Hill-Financial-_12-pages_.pdf` | 9450 |
+| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-2Q-2014-MHFI-Earnings.pdf` | 9031 |
+| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-2Q-2015-MHFI-Earnings-_14-pages_.pdf` | 9351 |
+| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-2Q-2016-S-P-Global-Earnings-_11-pages_.pdf` | 8301 |
+| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-2nd-Quarter-2006-MHP-Earnings.pdf` | 8568 |
+| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-2nd-Quarter-2007-MHP-Earnings.pdf` | 8438 |
+| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-2nd-Quarter-2008-MHP-Earnings.pdf` | 8038 |
+| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-2nd-Quarter-2009-MHP-Earnings.pdf` | 8036 |
+| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-2nd-Quarter-2010-MHP-Earnings.pdf` | 9059 |
+| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-3Q-2011-MHP-Earnings-_13-pages_.pdf` | 8425 |
+| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-3Q-2012-MHP-Earnings.pdf` | 10577 |
+| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-3Q-2013-Earnings-McGraw-Hill-Financial-_11-pages_.pdf` | 9191 |
+| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-3Q-2015-MHFI-Earnings-_11-pages_.pdf` | 9109 |
+| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-3Q-2016-S-P-Global-Earnings-_10-pages_.pdf` | 8091 |
+| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-3rd-Quarter-2006-MHP-Earnings.pdf` | 9286 |
+| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-3rd-Quarter-2007-MHP-Earnings.pdf` | 9030 |
+| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-3rd-Quarter-2008-MHP-Earnings.pdf` | 8553 |
+| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-3rd-Quarter-2009-MHP-Earnings.pdf` | 8538 |
+| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-3rd-Quarter-2010-MHP-Earnings.pdf` | 8184 |
+| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-4Q-2010-MHP-Earnings-_14-pages_.pdf` | 9593 |
+| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-4Q-2011-MHP-Earnings-_13-pages_.pdf` | 9528 |
+| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-4Q-2012-MHP-Earnings-_14-Pages_.pdf` | 8862 |
+| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-4Q-2013-Earnings-McGraw-Hill-Financial-_10-pages_.pdf` | 8520 |
+| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-4Q-2015-MHFI-Earnings-_13-pages_.pdf` | 8087 |
+| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-4Q-and-Full-Year-2014-MHFI-Earnings-_11-pages_.pdf` | 7732 |
+| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-4Q-and-Full-Year-2016-S-P-Global-Earnings-_11-pages_.pdf` | 9156 |
+| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-4th-Quarter-2006-MHP-Earnings.pdf` | 8531 |
+| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-4th-Quarter-2007-MHP-Earnings.pdf` | 8318 |
+| scan | earnings | — | `investor-documents/ir-spgi/Prepared-Remarks-4th-Quarter-2009-MHP-Earnings.pdf` | 8540 |
+| scan | earnings | — | `investor-documents/ir-spgi/Q1-2011-Earnings-Release-PDF.pdf` | 3926 |
+| scan | earnings | — | `investor-documents/ir-spgi/Q1-2012-Earnings-Release-PDF.pdf` | 7217 |
+| scan | earnings | — | `investor-documents/ir-spgi/Q1-2013-Earnings-Release-PDF.pdf` | 7700 |
+| scan | earnings | — | `investor-documents/ir-spgi/Q1-2014-Earnings-Release-PDF.pdf` | 9759 |
+| scan | earnings | — | `investor-documents/ir-spgi/Q1-2015-Earnings-Release-PDF.pdf` | 7578 |
+| scan | earnings | — | `investor-documents/ir-spgi/Q1-2016-Earnings-Release-PDF.pdf` | 7162 |
+| scan | earnings | — | `investor-documents/ir-spgi/Q1-2017-Earnings-Release-PDF.pdf` | 10644 |
+| scan | earnings | — | `investor-documents/ir-spgi/Q1-2018-Earnings-Release-PDF.pdf` | 10918 |
+| scan | earnings | — | `investor-documents/ir-spgi/Q1-2019-Earnings-Release-PDF.pdf` | 9628 |
+| scan | earnings | — | `investor-documents/ir-spgi/Q2-2011-Earnings-Release-PDF.pdf` | 3833 |
+| scan | earnings | — | `investor-documents/ir-spgi/Q2-2012-Earnings-Release-PDF.pdf` | 7310 |
+| scan | earnings | — | `investor-documents/ir-spgi/Q2-2013-Earnings-Release.pdf` | 8958 |
+| scan | earnings | — | `investor-documents/ir-spgi/Q2-2014-Earnings-Release-PDF.pdf` | 9214 |
+| scan | earnings | — | `investor-documents/ir-spgi/Q2-2015-Earnings-Release-PDF.pdf` | 7472 |
+| scan | earnings | — | `investor-documents/ir-spgi/Q2-2016-Earnings-Release-PDF.pdf` | 10133 |
+| scan | earnings | — | `investor-documents/ir-spgi/Q2-2017-Earnings-Release-PDF.pdf` | 10399 |
+| scan | earnings | — | `investor-documents/ir-spgi/Q2-2018-Earnings-Release-PDF.pdf` | 8971 |
+| scan | earnings | — | `investor-documents/ir-spgi/Q2-2019-Earnings-Release-PDF.pdf` | 11061 |
+| scan | earnings | — | `investor-documents/ir-spgi/Q3-2011-Earnings-Release-PDF.pdf` | 3914 |
+| scan | earnings | — | `investor-documents/ir-spgi/Q3-2012-Earnings-Release-PDF.pdf` | 8740 |
+| scan | earnings | — | `investor-documents/ir-spgi/Q3-2013-Earnings-Release-PDF.pdf` | 9623 |
+| scan | earnings | — | `investor-documents/ir-spgi/Q3-2014-Earnings-Release-PDF.pdf` | 8252 |
+| scan | earnings | — | `investor-documents/ir-spgi/Q3-2015-Earnings-Release-PDF.pdf` | 7194 |
+| scan | earnings | — | `investor-documents/ir-spgi/Q3-2016-Earnings-Release-PDF.pdf` | 10405 |
+| scan | earnings | — | `investor-documents/ir-spgi/Q3-2017-Earnings-Release-PDF.pdf` | 10727 |
+| scan | earnings | — | `investor-documents/ir-spgi/Q3-2018-Earnings-Release-PDF.pdf` | 8955 |
+| scan | earnings | — | `investor-documents/ir-spgi/Q3-2019-Earnings-Release-PDF.pdf` | 9769 |
+| scan | earnings | — | `investor-documents/ir-spgi/Q4-2011-Earnings-Release-PDF.pdf` | 8830 |
+| scan | earnings | — | `investor-documents/ir-spgi/Q4-2012-Earnings-Release-PDF.pdf` | 10192 |
+| scan | earnings | — | `investor-documents/ir-spgi/Q4-2013-Earnings-Release-PDF.pdf` | 10124 |
+| scan | earnings | — | `investor-documents/ir-spgi/Q4-2014-Earnings-Release-PDF.pdf` | 8188 |
+| scan | earnings | — | `investor-documents/ir-spgi/Q4-2015-Earnings-Release-PDF.pdf` | 7110 |
+| scan | earnings | — | `investor-documents/ir-spgi/Q4-2016-Earnings-Release-PDF.pdf` | 8739 |
+| scan | earnings | — | `investor-documents/ir-spgi/Q4-2017-Earnings-Release-PDF.pdf` | 10464 |
+| scan | earnings | — | `investor-documents/ir-spgi/Q4-2018-Earnings-Release-PDF.pdf` | 10201 |
+| scan | earnings | — | `investor-documents/ir-spgi/Q4-2019-Earnings-Release-PDF.pdf` | 8648 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-GIobal-2Q-2024-Earnings-Release-Exhibits-7-30-2024.pdf` | 7366 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-1Q-2021-Earnings-Call-Slides-4-29-2021.pdf` | 13066 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-1Q-2021-Earnings-Release-Exhibits-4-29-2021.pdf` | 11128 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-1Q-2022-Earnings-Release-and-Exhibits-5-3-2022.pdf` | 14025 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-1Q-2023-Earnings-Call-Slides-4-27-2023.pdf` | 9539 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-1Q-2023-Earnings-Call-Supplemental-Disclosure-4-27-2023.pdf` | 13641 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-1Q-2023-Earnings-Release-and-Exhibits-4-27-2023.pdf` | 14347 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-1Q-2025-Earnings-Call-Slides-4-29-2025.pdf` | 11083 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-1Q-2025-Earnings-Release-4-29-2025.pdf` | 7686 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-1Q-2025-Earnings-Supplemental-Disclosure-4-29-2025.pdf` | 13097 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-1Q-2026-Earnings-Release-Exhibits-4-28-2026.pdf` | 6070 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-1Q-2026-Earnings-Supplemental-Disclosure-4-28-2026.pdf` | 14230 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-2Q-2021-Earnings-Call-Slides-7-29-2021.pdf` | 13203 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-2Q-2021-Earnings-Release-and-Exhibits-7-29-2021.pdf` | 11160 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-2Q-2022-Earnings-Release-and-Exhibits-8-2-2022.pdf` | 13720 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-2Q-2023-Earnings-Release-Exhibits-7-27-2023e.pdf` | 6709 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-2Q-2024-Earnings-Call-Slides-7-30-2024.pdf` | 8126 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-2Q-2024-Earnings-Supplemental-Disclosure-7-30-2024.pdf` | 11236 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-2Q-2025-Earnings-Call-Slides-7-31-2025.pdf` | 11058 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-2Q-2025-Earnings-Release-and-Exhibits-7-31-2025.pdf` | 6499 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-2Q-2025-Earnings-Supplemental-Disclosure-7-31-2025.pdf` | 13095 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-3Q-2021-Earnings-Release-and-Tables-10-26-2021.pdf` | 11130 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-3Q-2022-Earnings-Call-Slides-10-27-2022.pdf` | 13219 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-3Q-2022-Earnings-Release-and-Exhibits-10-27-2022.pdf` | 13729 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-3Q-2023-Earnings-Call-Slides-11-2-2023.pdf` | 9405 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-3Q-2023-Earnings-Release-Exhibits-11-2-2023.pdf` | 6889 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-3Q-2024-Earnings-Call-Slides-10-24-2024.pdf` | 8590 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-3Q-2024-Earnings-Release-Exhibits-10-24-2024.pdf` | 6645 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-3Q-2024-Earnings-Supplemental-Disclosure-10-24-2024.pdf` | 11242 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-3Q-2025-Earnings-Call-Slides-10-30-2025.pdf` | 11064 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-3Q-2025-Earnings-Release-Exhibits-10-30-2025.pdf` | 7278 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-3Q-2025-Earnings-Supplemental-Disclosure-10-30-2025.pdf` | 14037 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-4Q-FY-2023-Earnings-Call-Slides.pdf` | 8850 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-4Q-FY-2025-Earnings-Call-Slides-2-10-2026.pdf` | 11197 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-4Q-FY-2025-Earnings-Release-Exhibits-2-10-2026.pdf` | 6924 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-4Q-FY-2025-Earnings-Supplemental-Disclosure-2-10-2026.pdf` | 12805 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-4Q-Full-Year-2022-Earnings-Release-and-Exhibits.pdf` | 13294 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-4Q-and-FY-2023-Earnings-Release-and-Exhibits-2-8-2024.pdf` | 5992 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-4Q-and-FY-2023-Earnings-Supplemental-Disclosure-2-8-2024.pdf` | 11970 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-4Q-and-Full-Year-2021-Earnings-Call-Slides.pdf` | 13206 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-4Q-and-Full-Year-2021-Earnings-Release-and-Tables.pdf` | 12091 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-4Q-and-Full-Year-2022-Earnings-Call-Slides-2-9-2023.pdf` | 13033 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-4Q-and-Full-Year-2024-Earnings-Call-Slides-2-11-2025.pdf` | 8369 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-4Q-and-Full-Year-2024-Earnings-Release-Exhibits-2-11-2025.pdf` | 5047 |
+| scan | earnings | — | `investor-documents/ir-spgi/S-P-Global-4Q-and-Full-Year-2024-Earnings-Supplemental-Disclosure-2-11-2025.pdf` | 11326 |
+| scan | earnings | — | `investor-documents/ir-spgi/SP-Global-1Q22-Earnings-Slides-5-3-2022.pdf` | 10036 |
+| scan | earnings | — | `investor-documents/ir-spgi/SPGI-2Q-2022-Earnings-Call-Slides-8-2-2022.pdf` | 13006 |
+| scan | earnings | — | `investor-documents/ir-spgi/SPGI-2Q-2023-Earnings-Supplemental-Disclosure-7-27-2023.pdf` | 12638 |
+| scan | earnings | — | `investor-documents/ir-spgi/SPGI-3Q-2021-Earnings-Call-Slides-10-26-2021.pdf` | 13321 |
+| scan | earnings | — | `investor-documents/ir-spgi/SPGI-3Q-2023-Earnings-Supplemental-Disclosure-11-2-2023.pdf` | 12470 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-1Q-2011-MHP-Earnings-_38-pages_.pdf` | 4151 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-1Q-2012-MHP-Earnings-_23-pages_.pdf` | 4929 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-1Q-2013-Earnings-McGraw-Hill-Financial-_20-pages_.pdf` | 4855 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-1Q-2014-MHP-Earnings-_18-pages_.pdf` | 5831 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-1Q-2016-MHFI-Earnings-_16-pages_.pdf` | 9104 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-1Q-2017-S-P-Global-Earnings-_21-pages_.pdf` | 7841 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-2Q-2011-MHP-Earnings-_35-pages_.pdf` | 4099 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-2Q-2012-MHP-Earnings-_22-pages_.pdf` | 5424 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-2Q-2013-MHP-Earnings-_20-pages_.pdf` | 5660 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-2Q-2014-MHP-Earnings-_18-pages_.pdf` | 5891 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-2Q-2015-MHFI-Earnings-_24-pages_.pdf` | 9769 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-2Q-2016-S-P-Global-Earnings-_18-pages_.pdf` | 7683 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-2Q-2017-S-P-Global-Earnings-_21-pages_.pdf` | 8101 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-3Q-2011-MHP-Earnings-_35-pages_.pdf` | 4807 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-3Q-2012-MHP-Earnings-_24-pages_.pdf` | 5379 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-3Q-2013-MHP-Earnings-_17-pages_.pdf` | 5503 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-3Q-2014-MHFI-Earnings-_16-pages_.pdf` | 7831 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-3Q-2015-MHFI-Earnings-_19-pages_.pdf` | 8759 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-3Q-2016-S-P-Global-Earnings-_18-pages_.pdf` | 8162 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-3Q-2017-S-P-Global-Earnings-_21-pages_.pdf` | 8153 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-4Q-2010-MHP-Earnings-_41-pages_.pdf` | 4349 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-4Q-2011-MHP-Earnings-_30-pages_.pdf` | 5213 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-4Q-2012-MHP-Earnings-_20-pages_.pdf` | 5374 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-4Q-2013-MHFI-Earnings-_17-pages_.pdf` | 5689 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-4Q-2014-MHFI-Earnings-_20-pages_.pdf` | 8363 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-4Q-2015-MHFI-Earnings-_21-pages_.pdf` | 8525 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-4Q-2016-S-P-Global-Earnings-_21-pages_.pdf` | 7529 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-4Q-and-Full-Year-2017-S-P-Global-Earnings-_25-pages_.pdf` | 7810 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-1st-Quarter-2008-MHP-Earnings.pdf` | 3807 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-1st-Quarter-2010-MHP-Earnings.pdf` | 4006 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-2nd-Quarter-2006-MHP-Earnings.pdf` | 7105 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-2nd-Quarter-2007-MHP-Earnings.pdf` | 7773 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-2nd-Quarter-2008-MHP-Earnings.pdf` | 3964 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-2nd-Quarter-2009-MHP-Earnings.pdf` | 4109 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-2nd-Quarter-2010-MHP-Earnings.pdf` | 3855 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-3rd-Quarter-2006-MHP-Earnings.pdf` | 7981 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-3rd-Quarter-2007-MHP-Earnings.pdf` | 8232 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-3rd-Quarter-2008-MHP-Earnings.pdf` | 3969 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-3rd-Quarter-2009-MHP-Earnings.pdf` | 4152 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-3rd-Quarter-2010-MHP-Earnings.pdf` | 4005 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-4th-Quarter-2006-MHP-Earnings.pdf` | 7011 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-4th-Quarter-2007-MHP-Earnings.pdf` | 8582 |
+| scan | earnings | — | `investor-documents/ir-spgi/Slides-_printer-friendly_-4th-Quarter-2009-MHP-Earnings.pdf` | 4160 |
+| scan | earnings | — | `investor-documents/ir-spgi/The-McGraw-Hill-Companies-Reports-11.9-Growth-in-2Q-EPS-_0.68-Diluted-Earnings-per-Share-in-2Q-2011-_14-pages_.pdf` | 3833 |
+| scan | earnings | — | `investor-documents/ir-spgi/new-s-p-global-2q-2023-earnings-call-slides-7-27-2023.pdf` | 9473 |
+| scan | earnings | — | `investor-documents/ir-spgi/s-p-global-1q-2024-earnings-call-slides-4-25-2024r.pdf` | 8471 |
+| scan | earnings | — | `investor-documents/ir-spgi/s-p-global-1q-2024-earnings-supplemental-disclosure-4-25-2024.pdf` | 11519 |
+| scan | earnings | — | `investor-documents/ir-spgi/sp-global-1q-2024-earnings-release-exhibits-4-25-2024.pdf` | 6382 |
 | scan | 8-K | 2024-04-25 | `investor-documents/sec-edgar/8-K_20240425_rpt20240425_acc0000064040_24_000121.htm` | 4368 |
 | scan | 8-K | 2024-05-06 | `investor-documents/sec-edgar/8-K_20240506_rpt20240501_acc0000064040_24_000130.htm` | 4800 |
 | scan | 8-K | 2024-06-27 | `investor-documents/sec-edgar/8-K_20240627_rpt20240627_acc0000064040_24_000141.htm` | 7138 |
@@ -315,33 +315,33 @@ Documents in folder: **518** (all listed below; Tier 1–3 extracted or keyword-
 | scan | 8-K | 2026-05-21 | `investor-documents/sec-edgar/8-K_20260521_rpt20260520_acc0000064040_26_000028.htm` | 4820 |
 | scan | 8-K | 2026-05-21 | `investor-documents/sec-edgar/8-K_20260521_rpt20260520_acc0001104659_26_064848.htm` | 4876 |
 | scan | 8-K | 2026-05-26 | `investor-documents/sec-edgar/8-K_20260526_rpt20260519_acc0000064040_26_000031.htm` | 4199 |
-| scan | supplemental | — | `investor-documents/ir-spgi/2020-Guidance-Supplemental-Materials.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | supplemental | — | `investor-documents/ir-spgi/Q1-19-Supplemental-Information-3-25-FINAL.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | supplemental | — | `investor-documents/ir-spgi/Q1-20-Supplemental-Information-FINAL.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | supplemental | — | `investor-documents/ir-spgi/Q1-21-Supplemental-Information-FINAL-PPoint-v3.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | supplemental | — | `investor-documents/ir-spgi/Q2-19-Supplemental-Information-FINAL.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | supplemental | — | `investor-documents/ir-spgi/Q2-20-Supplemental-Information.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | supplemental | — | `investor-documents/ir-spgi/Q2-21-Supplemental-Information-6-22-21.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | supplemental | — | `investor-documents/ir-spgi/Q3-19-Supplemental-Information-FINAL.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | supplemental | — | `investor-documents/ir-spgi/Q3-20-Supplemental-Information.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | supplemental | — | `investor-documents/ir-spgi/Q3-21-Supplemental-Information.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | supplemental | — | `investor-documents/ir-spgi/Q4-19-Supplemental-Information-vF-1-13-2020-2.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | supplemental | — | `investor-documents/ir-spgi/Q4-20-Supplemental-Information-v1.6-Final.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | supplemental | — | `investor-documents/ir-spgi/Q4-21-Supplemental-Information-vF-1.20.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-spgi/IHS-Markit-Investor-Presentation-May-2020-5-12-20.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-spgi/MHFI-Investor-Presentation-2012-Non-GAAP-Reconciliation.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-spgi/Mobility-Global-2026-Investor-Day-Presentation-Slides-5-12-2026.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-spgi/S-P-Global-IHS-Markit-Investor-Presentation-11-30-2020-Slides.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-spgi/Slide-Presentation-Newspaper-Association-of-America-2006-Mid-Year-Media-Review-Conference.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-spgi/Slides-Barclays-Global-Technology-Conference-Presentation.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-spgi/Slides-Goldman-Sachs-U.S.-Financial-Services-Conference-Presentation.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-spgi/Slides-MHP-at-Stifel-Nicolaus-2012-Internet-Media-Conference-Presentation.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-spgi/Slides-Raymond-James-Conference-Presentation.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-spgi/Slides-S-P-Global-ESG-Presentation.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-spgi/Slides-S-P-Global-Presentation-at-William-Blair-Conference-6-13-2018-_14-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-spgi/Slides-S-P-Global-Presentation-at-William-Blair-Conference-6-5-2019-_11-pages_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-spgi/Slides-UBS-Best-of-Americas-2014-Conference-Presentation.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-spgi/Slides-Wells-Fargo-Securities-Technology-Media-Telecom-Conference-Presentation.pdf` | 0 ERR:No module named 'pypdf' |
+| scan | supplemental | — | `investor-documents/ir-spgi/2020-Guidance-Supplemental-Materials.pdf` | 7553 |
+| scan | supplemental | — | `investor-documents/ir-spgi/Q1-19-Supplemental-Information-3-25-FINAL.pdf` | 7756 |
+| scan | supplemental | — | `investor-documents/ir-spgi/Q1-20-Supplemental-Information-FINAL.pdf` | 8190 |
+| scan | supplemental | — | `investor-documents/ir-spgi/Q1-21-Supplemental-Information-FINAL-PPoint-v3.pdf` | 9345 |
+| scan | supplemental | — | `investor-documents/ir-spgi/Q2-19-Supplemental-Information-FINAL.pdf` | 7820 |
+| scan | supplemental | — | `investor-documents/ir-spgi/Q2-20-Supplemental-Information.pdf` | 7899 |
+| scan | supplemental | — | `investor-documents/ir-spgi/Q2-21-Supplemental-Information-6-22-21.pdf` | 9552 |
+| scan | supplemental | — | `investor-documents/ir-spgi/Q3-19-Supplemental-Information-FINAL.pdf` | 7748 |
+| scan | supplemental | — | `investor-documents/ir-spgi/Q3-20-Supplemental-Information.pdf` | 8088 |
+| scan | supplemental | — | `investor-documents/ir-spgi/Q3-21-Supplemental-Information.pdf` | 9273 |
+| scan | supplemental | — | `investor-documents/ir-spgi/Q4-19-Supplemental-Information-vF-1-13-2020-2.pdf` | 7637 |
+| scan | supplemental | — | `investor-documents/ir-spgi/Q4-20-Supplemental-Information-v1.6-Final.pdf` | 9320 |
+| scan | supplemental | — | `investor-documents/ir-spgi/Q4-21-Supplemental-Information-vF-1.20.pdf` | 9023 |
+| scan | presentation | — | `investor-documents/ir-spgi/IHS-Markit-Investor-Presentation-May-2020-5-12-20.pdf` | 9282 |
+| scan | presentation | — | `investor-documents/ir-spgi/MHFI-Investor-Presentation-2012-Non-GAAP-Reconciliation.pdf` | 1746 |
+| scan | presentation | — | `investor-documents/ir-spgi/Mobility-Global-2026-Investor-Day-Presentation-Slides-5-12-2026.pdf` | 8745 |
+| scan | presentation | — | `investor-documents/ir-spgi/S-P-Global-IHS-Markit-Investor-Presentation-11-30-2020-Slides.pdf` | 11800 |
+| scan | presentation | — | `investor-documents/ir-spgi/Slide-Presentation-Newspaper-Association-of-America-2006-Mid-Year-Media-Review-Conference.pdf` | 6893 |
+| scan | presentation | — | `investor-documents/ir-spgi/Slides-Barclays-Global-Technology-Conference-Presentation.pdf` | 6924 |
+| scan | presentation | — | `investor-documents/ir-spgi/Slides-Goldman-Sachs-U.S.-Financial-Services-Conference-Presentation.pdf` | 6918 |
+| scan | presentation | — | `investor-documents/ir-spgi/Slides-MHP-at-Stifel-Nicolaus-2012-Internet-Media-Conference-Presentation.pdf` | 6053 |
+| scan | presentation | — | `investor-documents/ir-spgi/Slides-Raymond-James-Conference-Presentation.pdf` | 7566 |
+| scan | presentation | — | `investor-documents/ir-spgi/Slides-S-P-Global-ESG-Presentation.pdf` | 2378 |
+| scan | presentation | — | `investor-documents/ir-spgi/Slides-S-P-Global-Presentation-at-William-Blair-Conference-6-13-2018-_14-pages_.pdf` | 7973 |
+| scan | presentation | — | `investor-documents/ir-spgi/Slides-S-P-Global-Presentation-at-William-Blair-Conference-6-5-2019-_11-pages_.pdf` | 8162 |
+| scan | presentation | — | `investor-documents/ir-spgi/Slides-UBS-Best-of-Americas-2014-Conference-Presentation.pdf` | 4857 |
+| scan | presentation | — | `investor-documents/ir-spgi/Slides-Wells-Fargo-Securities-Technology-Media-Telecom-Conference-Presentation.pdf` | 6754 |
 | inventory | other | — | `investor-documents/ir-spgi/1Q-2020-Slides.pdf` | 0 |
 | inventory | other | 2020-11-30 | `investor-documents/ir-spgi/2020-11-30-S-P-Global-IHS-Market-Investor-Conference-Call-Webcast-Slides.pdf` | 0 |
 | inventory | other | 2020-11-30 | `investor-documents/ir-spgi/2020-11-30-S-P-Global-and-IHS-Markit-to-Merge-in-All-Stock-Transaction-Valuing-IHS-Markit-at-44-Billion-Powering-the-Markets-of-the-Future.pdf` | 0 |
@@ -570,7 +570,11 @@ Documents in folder: **518** (all listed below; Tier 1–3 extracted or keyword-
 - StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 34,300
 
 ### `investor-documents/ir-spgi/The-McGraw-Hill-Companies-to-Present-at-the-UBS-37th-Annual-Global-Media-and-Communications-Conference-on-December-7.pdf`
-Extract error: No module named 'pypdf'
+**Keyword snippets (related party, financials, segments):**
+- 6/2/2016 News Release ­ S&P Global
+- http://phx.corporate­ir.net/phoenix.zhtml?p=irol­eventDetails&c=96562&eventID=2573950. (Please
+- Release issued: November 24, 2009
+- Director, Corporate Media Relations
 
 ### `investor-documents/sec-edgar/10-Q_20260428_rpt20260331_acc0000064040_26_000024.htm`
 **Keyword snippets (related party, financials, segments):**
@@ -708,19 +712,117 @@ Extract error: No module named 'pypdf'
 - OperatingLeaseImpairmentLoss: 120
 
 ### `investor-documents/ir-spgi/The-McGraw-Hill-Companies-to-Present-at-the-Bear-Stearns-21st-Annual-Media-Conference.pdf`
-Extract error: No module named 'pypdf'
+**Keyword snippets (related party, financials, segments):**
+- Before we get started, please note the “Safe Harbor” Statement on the screen and the caution about
+- The first step was the Board of Directors’ decision in January to increase the cash dividend by 7.3%
+- way. That’s important to The McGraw-Hill Companies since our international revenue grew by more
+- in international markets from all three of our operating segments.
+- With that as background, let’s take a look at the individual operating segments.
+- Let’s start with the outlook for Financial Services.
+- Our guidance for this segment in 2008 has been that we were going to expect revenue growth of 2%
+- is probably unlikely that we will achieve this performance. It is also very difficult to update guidance
+- In 2007, Standard & Poor’s had the best first quarter in its history as revenue grew by 21.5%. The
+- Transaction volume accounted for 46% of S&P’s ratings revenue in 2007 and 49% in the first quarter,
+- some consensus on fair values, credit spreads will realign. Deals now hung in the pipeline will get
+- Financial Services starts the year with $793 million in deferred revenue, most of which will be
+- recognized this year. This is a durable stream of revenue and even under current market conditions,
+- In 2007, 26% of Financial Services revenue came from S&P Investment Services—this is a non-
+- The demand for new investable products and investment strategies will help keep our index services
+- We expect more growth overseas this year. In 2007, international revenue represented 40% of ratings
+- since 2004 and had revenue of about $100 million in 2007. We acquired majority interest in CRISIL
+- Ratings’ non-transaction revenue—54% of the mix in 2007—will make a bigger contribution in 2008.
+- little under that—of ratings revenue in 2007 and should continue to contribute in 2008.
+- Now, let’s review the McGraw-Hill Education segment.
 
 ### `investor-documents/ir-spgi/Summary-of-Voting-Results-2016-Annual-Meeting.pdf`
-Extract error: No module named 'pypdf'
+**Keyword snippets (related party, financials, segments):**
+- (Address of Principal Executive Offices) (Zip Code)
+- Company’s Restated Certificate of Incorporation to provide that the Company's Board of Directors shall consist
+- Effective April 27, 2016, the Board of Directors of the Company voted to amend and restate the Company's By-
+- Laws to conform the size range of the Board of Directors to the Amended and Restated Certificate of
+- the Board of Directors shall have power from time to time and at any time, by vote of a majority of the total
+- number of directors which the Company would have if there were no vacancies on the Board, to increase or
+- reduce the number of directors constituting the Board of Directors to such number (subject to any limits
+- contained in the certificate of incorporation) as the Board of Directors shall determine, but in no event to less
+- Proposal 1: Election of Directors
+- The Company’s shareholders elected the persons nominated as Directors of the Company as set forth
+- provide that the Company's Board of Directors shall consist of not less than 8 persons:
+- Proposal 4: Proposal to approve, on an advisory basis, the executive compensation program for the
+- Company’s named executive officers:
+- and for such purpose to purchase or lease or otherwise acquire, build, construct, maintain and operate and in any
+- To acquire, hold, use, sell, assign, lease, grant licenses in respect of, mortgage, or otherwise
+- declared by the Board of Directors, out of funds legally available for the payment of dividends, cumulative cash
+- any distribution be made upon, any junior stock, nor shall any shares of junior stock be purchased or redeemed
+- junior stock as and when declared by the Board of Directors out of any funds of the Corporation legally
+- Redemption. The Corporation, at the option of the Board of Directors, at any time after January 1,
+- rata in such manner as the Board of Directors shall determine from among the outstanding shares of Convertible
 
 ### `investor-documents/ir-spgi/Summary-of-Voting-Results-2015-Annual-Meeting.pdf`
-Extract error: No module named 'pypdf'
+**Keyword snippets (related party, financials, segments):**
+- (Address of Principal Executive Offices) (Zip Code)
+- Proposal 1: Election of Directors
+- The Company’s shareholders elected the persons nominated as Directors of the Company as set forth below:
+- Proposal 3: Proposal to approve, on an advisory basis, the executive compensation program for the Company’s
+- named executive officers:
 
 ### `investor-documents/ir-spgi/Slides-_printer-friendly_-UBS-35th-Annual-Global-Media-Communications-Conference.pdf`
-Extract error: No module named 'pypdf'
+**Keyword snippets (related party, financials, segments):**
+- levels, product-related manufacturing expenses, distribution expenses, prepublication, amortization and
+- internationally); the pace of recovery in advertising; continued investment by the construction, computer
+- Key questions about MHP’s outlook
+- – What is the outlook for el-hi and higher education
+- – Progress segment is making in harnessing Internet to
+- – Outlook for debt, interest expense and
+- International revenue to grow
+- revenue in 2008
+- • Creates three revenue opportunities
+- revenue stream for Financial Services
+- – Represents about 25% of ratings revenue
+- – Should help mitigate risks to transaction revenue
+- – Represented 48% of ratings revenue in first nine
+- • Contributors to MHP’s unearned revenue:
+- revenue at end of 3Q 2007
+- Outlook for 2008
+- Services’ revenue
+- • Focused on building revenue from primary
+- The regulatory outlook
+- Thomas Huertas, acting managing director of wholesale and
 
 ### `investor-documents/ir-spgi/Slides-_printer-friendly_-UBS-34th-Annual-Global-Media-Communications-Conference.pdf`
-Extract error: No module named 'pypdf'
+**Keyword snippets (related party, financials, segments):**
+- cash flow, debt levels, product-related manufacturing expenses, pension expense, distribution expenses,
+- pace of recovery in advertising; continued investment by the construction, computer and aviation
+- The outlook for
+- – Renewable revenue streams
+- No change in 2006 guidance
+- compensation
+- Guidance for 4Q 2006: $0.53 to $0.55
+- – $0.02 for incremental stock-based compensation
+- • Board of Directors will revisit dividend and
+- Outlook for the U.S. economy
+- produce incremental, renewable revenue
+- – Monetizing indexes for investment and
+- resilient revenue stream for ratings
+- • Off-shore revenue accounted for 37% of ratings’
+- were 22% of ratings revenue. In 1994, only 8%
+- ratings revenue in 2005. In 1994, it was 60%
+- • Solid outlook for ratings markets in 2007
+- alternative investment products
+- an index for every type of investment style
+- The regulatory outlook
 
 ### `investor-documents/ir-spgi/Slides-_printer-friendly_-MHP-at-Jefferies-5th-Annual-Internet-Media-Conference.pdf`
-Extract error: No module named 'pypdf'
+**Keyword snippets (related party, financials, segments):**
+- manufacturing expenses, distribution expenses, prepublication, amortization and depreciation expense, income tax
+- internationally); the pace of recovery in advertising; continued investment by the construction, automotive, computer
+- The American Recovery and Reinvestment Act
+- Improved outlook
+- Investment Act: $3.95B
+- Distribution becomes
+- Workforce Investment Act (WIA)
+- promises swift distribution of funds
+- Outlook for 2009
+- – Confluence of content, te chnology and distribution is
+- • Leveraging content and distribution
+- • For the segment in 2009:
+- – Low single-digit decline in revenue

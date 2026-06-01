@@ -764,8 +764,302 @@ def inject_before_marker(body: str, marker: str, block: str) -> str:
     return body.rstrip() + "\n\n" + block.strip() + "\n"
 
 
+def section_body_empty(body: str, heading: str) -> bool:
+    """True if heading exists but has no content before the next #### or ##."""
+    pat = re.compile(
+        rf"{re.escape(heading)}\s*\n+(?=####|\n---|\n## |\*\*Disruption|\Z)",
+        re.IGNORECASE,
+    )
+    if pat.search(body):
+        return True
+    # Heading followed only by horizontal rule before next section
+    pat2 = re.compile(
+        rf"{re.escape(heading)}\s*\n+---\s*\n+(?=## |\Z)",
+        re.IGNORECASE,
+    )
+    if pat2.search(body):
+        return True
+    # normalize_section_body strips trailing ---; heading may sit at EOF with no body
+    pat3 = re.compile(rf"{re.escape(heading)}\s*\Z", re.IGNORECASE)
+    return bool(pat3.search(body))
+
+
+def option_scan_block(val: dict) -> str:
+    rows = val.get("option_scan") or []
+    if not rows:
+        return ""
+    lines = [
+        "#### Option scan",
+        "",
+        "| # | Question | Answer | Treatment | Evidence |",
+        "|---|----------|--------|-----------|----------|",
+    ]
+    for r in rows:
+        qn = r.get("q", "")
+        q = (r.get("question") or "")[:70]
+        lines.append(
+            f"| {qn} | {q} | {r.get('answer', '')} | {r.get('treatment', '')} | "
+            f"{(r.get('evidence') or '')[:80]} |"
+        )
+    return "\n".join(lines)
+
+
+def look_through_block(val: dict, ticker: str) -> str:
+    base = (val.get("scenarios") or {}).get("base", {})
+    sotp = base.get("sotp_build") or {}
+    lines_data = sotp.get("lines") or []
+    nav = val.get("nav_overlay") or {}
+    inputs = val.get("inputs") or {}
+    if not lines_data and not nav:
+        return ""
+    lines = [
+        "#### Look-through snapshot",
+        "",
+        "| Piece | Carrying / GAAP | Economic value (if different) | Driver |",
+        "|-------|-----------------|-------------------------------|--------|",
+    ]
+    for row in lines_data:
+        if row.get("id") == "book":
+            gaap = row.get("gaap_per_share")
+            lines.append(
+                f"| {row.get('label', 'Book')} | **${gaap}/sh** | Anchor | Filing equity ÷ shares |"
+            )
+        elif row.get("uplift_per_share"):
+            uplift = row.get("uplift_per_share")
+            lines.append(
+                f"| {row.get('label', row.get('id', ''))} | In book or $0 | **+${uplift}/sh** uplift | "
+                f"{(row.get('math') or '[Assumption]')[:60]} |"
+            )
+    if nav.get("overlay_nav_per_share"):
+        lines.append(
+            f"| NAV overlay (fair value) | GAAP **${nav.get('gaap_book_per_share', inputs.get('book_per_share', '?'))}/sh** | "
+            f"**~${nav['overlay_nav_per_share']}/sh** | {nav.get('notes', 'nav_overlay')[:60]} |"
+        )
+    lines.append("")
+    return "\n".join(lines)
+
+
+def sotp_nav_block(val: dict) -> str:
+    base = (val.get("scenarios") or {}).get("base", {})
+    sotp = base.get("sotp_build") or {}
+    lines_data = sotp.get("lines") or []
+    payoff = base.get("payoff") or sotp.get("year5_economic_nav_per_share")
+    if not lines_data or payoff is None:
+        return ""
+    anchor = next((l.get("gaap_per_share") for l in lines_data if l.get("id") == "book"), None)
+    lines = [
+        "#### Sum-of-parts or NAV",
+        "",
+        f"**Base case Year-{base.get('years', sotp.get('years', 5))} economic NAV = ${payoff}/sh** — see Valuation & IRR assumption ledger.",
+        "",
+        "| Piece | $/sh (today) | + Incremental uplift | In book? |",
+        "|-------|--------------|----------------------|----------|",
+    ]
+    running = anchor or 0
+    for row in lines_data:
+        if row.get("id") == "book":
+            lines.append(f"| {row.get('label', 'Anchor')} | **${row.get('gaap_per_share')}** | — | Yes |")
+            continue
+        uplift = row.get("uplift_per_share") or 0
+        if uplift:
+            lines.append(
+                f"| {row.get('label', row.get('id', ''))} | (in anchor) | **+${uplift}** | Partial |"
+            )
+            running += uplift
+    lines += [
+        "",
+        f"**Sum check:** **${_round_payoff(running)}** ≈ **${payoff}** payoff (`valuation.json` → `scenarios.base.sotp_build`).",
+        "",
+    ]
+    return "\n".join(lines)
+
+
+def _round_payoff(x: float) -> str:
+    return f"{x:.2f}".rstrip("0").rstrip(".")
+
+
+def catalyst_path_block(val: dict) -> str:
+    paths = val.get("catalyst_paths") or []
+    if not paths:
+        base = (val.get("scenarios") or {}).get("base", {})
+        if base.get("notes"):
+            paths = [{"event": "Base catalyst", "timing": f"{base.get('years', '?')} years", "impact": base["notes"]}]
+        else:
+            return ""
+    lines = ["#### Catalyst path", ""]
+    for p in paths:
+        lines.append(f"- **{p.get('event', 'Event')}** ({p.get('timing', 'timing TBD')}): {p.get('impact', '')}")
+    lines.append("")
+    return "\n".join(lines)
+
+
+def optionality_overlay_block(val: dict) -> str:
+    arch = (val.get("classification_inputs") or {}).get("archetype", "")
+    mode = val.get("valuation_mode", "")
+    nav = val.get("nav_overlay") or {}
+    gate = val.get("optionality_gate") or {}
+    if arch not in ("optionality", "holding_co") and mode != "optionality":
+        return ""
+    base_pct = primary_irr_pct(val)
+    lines = [
+        "### Optionality overlay",
+        "",
+        f"**Primary metric (stance gate):** Lawrence base **{base_pct}%** per year. "
+        f"Overlay framework: **{gate.get('framework', 'optionality')}** · floor_pass **{gate.get('floor_pass', 'n/a')}**.",
+        "",
+    ]
+    if nav.get("overlay_nav_per_share"):
+        lines.append(
+            f"**NAV overlay:** economic **~${nav['overlay_nav_per_share']}/sh** vs GAAP book "
+            f"**${nav.get('gaap_book_per_share', '?')}/sh** — not used as silent Lawrence FCF."
+        )
+        lines.append("")
+    bull = (val.get("results") or {}).get("bull", {}).get("return_pct")
+    if bull is not None:
+        lines.append(f"**Bull sensitivity:** **{bull}%** per year (`scenarios.bull`).")
+        lines.append("")
+    return "\n".join(lines)
+
+
+def inject_optionality_sections(body: str, val: dict, ticker: str) -> str:
+    """Fill empty option scan / look-through / SOTP / catalyst blocks from valuation.json."""
+    if not re.search(r"#### Option scan\b", body, re.I):
+        block = option_scan_block(val)
+        if block:
+            if "#### Thesis pillars" in body:
+                body = inject_before_marker(body, "#### Thesis pillars", block)
+            elif "#### Operating snapshot" in body:
+                body = inject_before_marker(body, "#### Operating snapshot", block)
+            else:
+                body = body.rstrip() + "\n\n" + block
+    elif section_body_empty(body, "#### Option scan"):
+        body = re.sub(
+            r"#### Option scan\s*\n+(?=####|\n---|\n## |\*\*Disruption|\Z)",
+            option_scan_block(val) + "\n\n",
+            body,
+            count=1,
+            flags=re.I,
+        )
+
+    for heading, builder in (
+        ("#### Look-through snapshot", lambda: look_through_block(val, ticker)),
+        ("#### Sum-of-parts or NAV", lambda: sotp_nav_block(val)),
+        ("#### Catalyst path", lambda: catalyst_path_block(val)),
+    ):
+        if heading.lower() not in body.lower():
+            block = builder()
+            if block:
+                if "#### Look-through snapshot" in body or "#### Sum-of-parts" in body:
+                    body = body.rstrip() + "\n\n" + block
+                elif "**Disruption" in body:
+                    body = inject_before_marker(body, "**Disruption", block)
+                else:
+                    body = body.rstrip() + "\n\n" + block
+        elif section_body_empty(body, heading):
+            block = builder()
+            if block:
+                for pat in (
+                    rf"{re.escape(heading)}\s*\n+(?:---\s*\n+)?(?=## |\Z)",
+                    rf"{re.escape(heading)}\s*\n+(?=####|\n---|\n## |\*\*Disruption|\Z)",
+                    rf"{re.escape(heading)}\s*\Z",
+                ):
+                    body, n = re.subn(pat, block + "\n", body, count=1, flags=re.I)
+                    if n:
+                        break
+    return body
+
+
+def yield_curve_sotp_irr(val: dict, ticker: str) -> str:
+    """Detailed yield_curve IRR when sotp_build lines exist."""
+    method = val.get("method", "")
+    if method != "yield_curve":
+        return ""
+    base = (val.get("scenarios") or {}).get("base", {})
+    sotp = base.get("sotp_build") or {}
+    lines_data = sotp.get("lines") or []
+    if len(lines_data) < 2:
+        return ""
+    inputs = val.get("inputs") or {}
+    price = inputs.get("price", 0)
+    payoff = base.get("payoff", 0)
+    years = base.get("years", 5)
+    base_pct = primary_irr_pct(val)
+    book = inputs.get("book_per_share") or next(
+        (l.get("gaap_per_share") for l in lines_data if l.get("id") == "book"), None
+    )
+
+    out = [
+        "#### IRR arithmetic (show your work)",
+        "",
+        f"**Base case** (dated payoff / sum-of-parts; `irr_method`: yield_curve). "
+        f"Payoff **${payoff}** and horizon **{years} years** are model assumptions in `valuation.json`.",
+        "",
+        "**Step 1 — Price today**",
+        f"- **${price}** ({inputs.get('price_source', 'market')})",
+        "",
+    ]
+    if book:
+        if price < book:
+            disc = (book - price) / book * 100
+            out += [
+                "**Step 2 — Filing anchor (book)**",
+                f"- Book **${book}/sh** · Price **{disc:.0f}%** below book",
+                "",
+            ]
+        else:
+            prem = (price - book) / book * 100 if book else 0
+            out += [
+                "**Step 2 — Filing anchor (book)**",
+                f"- Book **${book}/sh** · Price **{prem:.0f}%** above book (option priced in)",
+                "",
+            ]
+    out += [
+        "**Step 3 — Build payoff by adding incremental lines**",
+        "",
+        "```",
+        f"  {book or price}  anchor (GAAP book or price)",
+    ]
+    running = book or price
+    for row in lines_data:
+        if row.get("id") == "book":
+            continue
+        uplift = row.get("uplift_per_share") or 0
+        if uplift:
+            out.append(f"+ {uplift:>5}  {row.get('label', row.get('id', ''))[:50]}")
+            running += uplift
+    out += [
+        "───────",
+        f"  {payoff}  = base-case payoff per share",
+        "```",
+        "",
+        f"Same build in `{ticker}/research/valuation.json` → `scenarios.base.sotp_build`.",
+        "",
+        f"**Step 4 — Horizon: {years} years** (model choice; not company guidance)",
+        "",
+        "**Step 5 — Total return**",
+        f"- ${payoff} ÷ ${price} − 1 = **{(payoff / price - 1) * 100:.1f}%** total" if price else "",
+        "",
+        "**Step 6 — Annualized return**",
+        f"- (${payoff} ÷ ${price})^(1/{years}) − 1 = **{base_pct}%** per year"
+        if price and payoff and base_pct is not None
+        else "",
+    ]
+    bear = (val.get("scenarios") or {}).get("bear", {})
+    bull = (val.get("scenarios") or {}).get("bull", {})
+    if bear.get("payoff") and bear.get("return_pct") is not None:
+        out.append(
+            f"\n**Bear (payoff ${bear['payoff']}):** **{bear['return_pct']}%**/year — {bear.get('notes', '')[:80]}"
+        )
+    if bull.get("payoff") and bull.get("return_pct") is not None:
+        out.append(
+            f"**Bull (payoff ${bull['payoff']}):** **{bull['return_pct']}%**/year — {bull.get('notes', '')[:80]}"
+        )
+    return "\n".join(out)
+
+
 def enrich_business_moat(body: str, val: dict, ticker: str, preserved: str | None) -> str:
     body = strip_valuation_from_business(body)
+    body = inject_optionality_sections(body, val, ticker)
     if not re.search(r"#### Segment map\b", body, re.I) and val.get("segment_build", {}).get("segments"):
         seg = segment_map_business_block(val, preserved)
         if "#### Thesis pillars" in body:
@@ -795,6 +1089,11 @@ def enrich_business_moat(body: str, val: dict, ticker: str, preserved: str | Non
 
 
 def irr_arithmetic(val: dict, ticker: str, preserved: str | None) -> str:
+    base_pct = primary_irr_pct(val)
+    sotp_irr = yield_curve_sotp_irr(val, ticker)
+    if sotp_irr:
+        return sotp_irr
+
     if preserved and "#### IRR arithmetic" in preserved:
         m = re.search(
             r"#### IRR arithmetic \(show your work\)(.*?)(?=\n\*\*Upside / downside|\n## |\Z)",
@@ -808,7 +1107,15 @@ def irr_arithmetic(val: dict, ticker: str, preserved: str | None) -> str:
                 body,
                 re.I,
             )
-            if not stale and not re.search(r"P₀|FCF₀|Cash₀/sh|g1=|exit=\d", body):
+            pct_in_body = re.findall(r"\*\*(-?\d+\.?\d*)%?\*\*/yr", body)
+            pct_mismatch = base_pct is not None and pct_in_body and not any(
+                abs(float(p) - float(base_pct)) < 0.15 for p in pct_in_body
+            )
+            if (
+                not stale
+                and not re.search(r"P₀|FCF₀|Cash₀/sh|g1=|exit=\d", body)
+                and not pct_mismatch
+            ):
                 return "#### IRR arithmetic (show your work)\n\n" + body
 
     method = val.get("method", "full")
@@ -874,7 +1181,57 @@ def irr_arithmetic(val: dict, ticker: str, preserved: str | None) -> str:
     return "\n".join(lines)
 
 
+def book_estimate_section(ticker: str) -> str:
+    """Render ### Current book value estimate from book_estimate.json."""
+    be_path = ROOT / ticker / "research" / "book_estimate.json"
+    if not be_path.exists():
+        return ""
+    be = json.loads(be_path.read_text(encoding="utf-8"))
+    anchor = be.get("filing_anchor") or {}
+    summary = be.get("summary") or {}
+    comp = be.get("price_comparison") or {}
+    lines = [
+        "### Current book value estimate (mark-to-market)",
+        "",
+        f"**Filed book:** **${anchor.get('filed_book_per_share', '?')}/sh** "
+        f"(period end **{anchor.get('period_end', '?')}**, `{anchor.get('source', '')}`).",
+        "",
+        "| Line | Filing ($M) | Current ($M) | Δ ($M) | Δ $/sh | Source |",
+        "|------|-------------|--------------|--------|--------|--------|",
+    ]
+    for row in be.get("lines") or []:
+        lines.append(
+            f"| {row.get('label', row.get('id', ''))[:40]} | "
+            f"{row.get('filing_value_m', '—')} | {row.get('current_value_m', '—')} | "
+            f"{row.get('delta_m', '—')} | "
+            f"{(row.get('delta_m', 0) / anchor.get('shares', 1) * 1e6) if row.get('delta_m') and anchor.get('shares') else '—'} | "
+            f"{(row.get('price_source', '') or row.get('source', ''))[:30]} |"
+        )
+    lines += [
+        "",
+        f"**Current best estimate:** **${summary.get('current_book_per_share', '?')}/sh** "
+        f"(Δ **${summary.get('delta_per_share', '?')}/sh**, **{summary.get('delta_pct_of_filed_book', '?')}%** vs filed).",
+        "",
+        f"**Price comparison:** market **${comp.get('market_price', '?')}** · "
+        f"discount to filed book **{comp.get('discount_to_filed_book_pct', '?')}%** · "
+        f"discount to current estimate **{comp.get('discount_to_current_estimate_pct', '?')}%**.",
+        "",
+    ]
+    flags = be.get("staleness_flags") or []
+    if flags:
+        lines.append("**Staleness / gaps:** " + "; ".join(flags[:5]))
+        lines.append("")
+    return "\n".join(lines)
+
+
 def build_valuation_section(ticker: str, val: dict, preserved_val: str | None) -> str:
+    import sys
+
+    scripts = Path(__file__).resolve().parent
+    if str(scripts) not in sys.path:
+        sys.path.insert(0, str(scripts))
+    from valuation_synthesis import synthesis_markdown
+
     inputs = val.get("inputs", {})
     price = inputs.get("price", "?")
     src = inputs.get("price_source", "")
@@ -921,6 +1278,14 @@ def build_valuation_section(ticker: str, val: dict, preserved_val: str | None) -
         "",
         irr_body,
         "",
+    ]
+    syn_body = synthesis_markdown(val)
+    if syn_body:
+        parts += [syn_body, ""]
+    be_body = book_estimate_section(ticker)
+    if be_body and "### Current book value estimate" not in (preserved_val or ""):
+        parts += [be_body, ""]
+    parts += [
         upside,
         "",
         ret,
@@ -997,6 +1362,9 @@ def refresh_ticker(ticker: str, out_date: str) -> Path | None:
                 body,
                 flags=re.DOTALL,
             )
+            overlay = optionality_overlay_block(val)
+            if overlay and "### Optionality overlay" not in body:
+                body = body.rstrip() + "\n\n" + overlay
             body = patch_payoff_expected_return(body, val)
             body = re.sub(
                 r"### Stance proposal.*?(?=\n---|\n## |\Z)",

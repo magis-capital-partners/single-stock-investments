@@ -14,8 +14,8 @@ Documents in folder: **60** (all listed below; Tier 1–3 extracted or keyword-s
 | partial | 10-K | 2024-02-21 | `investor-documents/sec-edgar/10-K_20240221_rpt20231231_acc0001811074_24_000015.htm` | 30000 |
 | partial | 10-K | 2025-02-19 | `investor-documents/sec-edgar/10-K_20250219_rpt20241231_acc0001811074_25_000044.htm` | 30000 |
 | full | 10-K | 2026-02-18 | `investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm` | 120000 |
-| partial | annual | — | `investor-documents/ir-tpl/TPL_2024_ANNUAL_REPORT_-_TPL_WebPage_Version.pdf` | 0 ERR:No module named 'pypdf' |
-| full | annual | — | `investor-documents/ir-tpl/TPL_Rules_of_Conduct_2025_Annual_Meeting.pdf` | 0 ERR:No module named 'pypdf' |
+| partial | annual | — | `investor-documents/ir-tpl/TPL_2024_ANNUAL_REPORT_-_TPL_WebPage_Version.pdf` | 50705 |
+| full | annual | — | `investor-documents/ir-tpl/TPL_Rules_of_Conduct_2025_Annual_Meeting.pdf` | 5719 |
 | scan | 10-Q | 2023-05-03 | `investor-documents/sec-edgar/10-Q_20230503_rpt20230331_acc0001811074_23_000025.htm` | 8000 |
 | scan | 10-Q | 2023-08-02 | `investor-documents/sec-edgar/10-Q_20230802_rpt20230630_acc0001811074_23_000041.htm` | 8000 |
 | scan | 10-Q | 2023-11-01 | `investor-documents/sec-edgar/10-Q_20231101_rpt20230930_acc0001811074_23_000053.htm` | 8000 |
@@ -26,7 +26,7 @@ Documents in folder: **60** (all listed below; Tier 1–3 extracted or keyword-s
 | partial | 10-Q | 2025-08-06 | `investor-documents/sec-edgar/10-Q_20250806_rpt20250630_acc0001811074_25_000077.htm` | 30000 |
 | partial | 10-Q | 2025-11-05 | `investor-documents/sec-edgar/10-Q_20251105_rpt20250930_acc0001811074_25_000096.htm` | 30000 |
 | full | 10-Q | 2026-05-06 | `investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0001811074_26_000035.htm` | 120000 |
-| scan | proxy | — | `investor-documents/ir-tpl/TPL_PROXY_STATEMENT_2025_-_FINAL.pdf` | 0 ERR:No module named 'pypdf' |
+| scan | proxy | — | `investor-documents/ir-tpl/TPL_PROXY_STATEMENT_2025_-_FINAL.pdf` | 2416 |
 | scan | proxy | 2023-10-10 | `investor-documents/sec-edgar/DEF 14A_20231010_rpt20231110_acc0001140361_23_047453.htm` | 8000 |
 | scan | proxy | 2024-09-24 | `investor-documents/sec-edgar/DEF 14A_20240924_rpt20241108_acc0001104659_24_102208.htm` | 8000 |
 | full | proxy | 2025-09-26 | `investor-documents/sec-edgar/DEF 14A_20250926_rpt20251106_acc0001104659_25_093848.htm` | 120000 |
@@ -65,7 +65,7 @@ Documents in folder: **60** (all listed below; Tier 1–3 extracted or keyword-s
 | scan | 8-K | 2026-04-09 | `investor-documents/sec-edgar/8-K_20260409_rpt20260409_acc0001104659_26_041495.htm` | 4188 |
 | scan | 8-K | 2026-05-06 | `investor-documents/sec-edgar/8-K_20260506_rpt20260505_acc0001811074_26_000033.htm` | 7933 |
 | scan | 8-K | 2026-05-18 | `investor-documents/sec-edgar/8-K_20260518_rpt20260518_acc0001811074_26_000040.htm` | 4257 |
-| scan | presentation | — | `investor-documents/ir-tpl/TPL_Midland_Day_Investor_Presentation__28May_2026_29_vFINAL.pdf` | 0 ERR:No module named 'pypdf' |
+| scan | presentation | — | `investor-documents/ir-tpl/TPL_Midland_Day_Investor_Presentation__28May_2026_29_vFINAL.pdf` | 7580 |
 | inventory | other | — | `investor-documents/ir-tpl/0001811074-26-000018.pdf` | 0 |
 | inventory | other | — | `investor-documents/ir-tpl/Tear_Sheet.pdf` | 0 |
 | inventory | other | 2024-09-13 | `investor-documents/sec-edgar/PRE 14A_20240913_rpt20241108_acc0001104659_24_099844.htm` | 0 |
@@ -112,7 +112,9 @@ Documents in folder: **60** (all listed below; Tier 1–3 extracted or keyword-s
 - StockholdersEquity: 1,831
 
 ### `investor-documents/ir-tpl/TPL_Rules_of_Conduct_2025_Annual_Meeting.pdf`
-Extract error: No module named 'pypdf'
+**Keyword snippets (related party, financials, segments):**
+- the board of directors of the Company will preside as the Chair of the Annual Meeting (the
+- permission of the Company. The redistribution of meeting materials is also prohibited without
 
 ### `investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0001811074_26_000035.htm`
 **Keyword snippets (related party, financials, segments):**
@@ -227,7 +229,27 @@ Extract error: No module named 'pypdf'
 - RevenueFromContractWithCustomerExcludingAssessedTax: 41,398
 
 ### `investor-documents/ir-tpl/TPL_2024_ANNUAL_REPORT_-_TPL_WebPage_Version.pdf`
-Extract error: No module named 'pypdf'
+**Keyword snippets (related party, financials, segments):**
+- maximum value from TPL’s vast royalty, water, and surface assets across the core
+- Financially, 2024 was outstanding. Total revenues reached $706 million, a 12% increase
+- from 2023, driven by robust contributions across all of TPL’s segments. TPL’s business
+- continues to operate efficiently with fiscal year 2024 adjusted EBITDA and net income
+- In addition, in 2024, we completed two significant acquisitions of mineral and royalty
+- net royalty acres to our portfolio. We also acquired over four thousand surface acres in
+- OUR BUSINESS SEGMENTS
+- For the full-year 2024, total segment revenues were approximately $441 million,
+- comprised of oil and gas royalty revenue of approximately $373 million, easements
+- approximately $4 million. Oil and gas royalty revenues were supported by record royalty
+- from a combination of robust development activity on our royalty acreage and high-
+- quality mineral and royalty acquisitions. TPL realized an average price of $39.87 per
+- driven primarily by pipeline easements, caliche and other sales, and commercial leases.
+- Our Water Services and Operations segment provides critical water solutions
+- For the full-year 2024, our Water Service and Operations segment set new
+- records with revenues of $265 million and net income of $139 million. Both
+- water sales and produced water royalties each attained record revenues
+- and pore space access drove our produced water royalties revenues to $104
+- With a leading royalties, water, and surface footprint overlapping core
+- Address of principal executive offices:
 
 ### `investor-documents/sec-edgar/10-Q_20251105_rpt20250930_acc0001811074_25_000096.htm`
 **Keyword snippets (related party, financials, segments):**

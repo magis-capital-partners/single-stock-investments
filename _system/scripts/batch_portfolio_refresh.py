@@ -69,12 +69,22 @@ def main() -> None:
 
         steps_ok = True
         steps_ok &= run_step(
+            "seed dive overlays",
+            [PY, str(SCRIPTS / "seed_dive_overlays.py"), ticker, "--write"],
+            optional=True,
+        )
+        steps_ok &= run_step(
             "filing evidence",
             [PY, str(SCRIPTS / "build_filing_evidence.py"), ticker],
         )
         steps_ok &= run_step(
             "valuation",
             [PY, str(SCRIPTS / "marvin_valuation.py"), "--ticker", ticker, "--write"],
+        )
+        run_step(
+            "book estimate",
+            [PY, str(SCRIPTS / "current_book_estimate.py"), ticker, "--write"],
+            optional=True,
         )
         steps_ok &= run_step(
             "deep dive refresh",
@@ -83,6 +93,11 @@ def main() -> None:
         lint_ok = run_step(
             "lint",
             [PY, str(SCRIPTS / "lint_deep_dive.py"), ticker, "--milly"],
+        )
+        run_step(
+            "fill cross-check",
+            [PY, str(SCRIPTS / "fill_cross_check.py"), ticker, "--date", args.date, "--write"],
+            optional=True,
         )
         if steps_ok and lint_ok:
             run_step(

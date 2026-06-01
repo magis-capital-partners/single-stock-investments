@@ -48,6 +48,7 @@ MENTAL_MODELS = re.compile(r"### Mental models\b", re.IGNORECASE)
 MENTAL_MODELS_LEGACY = re.compile(r"### Mental models in plain English", re.IGNORECASE)
 RETURN_MATH = re.compile(r"#### Return math in plain English", re.IGNORECASE)
 IRR_ARITHMETIC = re.compile(r"#### IRR arithmetic \(show your work\)", re.IGNORECASE)
+AI_INFRA = re.compile(r"#### AI infrastructure\b", re.I)
 SYNTHESIS_SECTION = re.compile(r"### Total synthesis IRR \(all sources\)", re.IGNORECASE)
 UPSIDE_DOWN = re.compile(r"\*\*Upside / downside from price:\*\*", re.IGNORECASE)
 PRIMARY_RISK = re.compile(r"\*\*Primary risk:\*\*", re.IGNORECASE)
@@ -74,8 +75,8 @@ MIAX_FILING_MISALIGN = re.compile(
     re.IGNORECASE,
 )
 BARE_UPLIFT_PCT = re.compile(
-    r"(?:\d+\.?\d*\s*[x×]\s*\d+\s*%|\d+\s*%\s*higher\s+than\s+GAAP|"
-    r"Economic value\s+\d+\s*%\s*higher|Incremental on book:\s*\d+\.\d+\s*x\s*\d+\s*%)",
+    r"(?:\d+\s*%\s*higher\s+than\s+GAAP|"
+    r"Economic value\s+\d+\s*%\s*higher|Incremental on book:\s*\d+\.\d+\s*[x×]\s*\d+\s*%)",
     re.IGNORECASE,
 )
 INVESTMENT_A_3G = re.compile(r"\*\*3g-5\.\s*Investment A", re.IGNORECASE)

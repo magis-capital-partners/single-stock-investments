@@ -96,6 +96,11 @@ def main() -> int:
         )
     if not args.skip_evidence:
         ok &= run(
+            "seed dive overlays",
+            [PY, str(SCRIPTS / "seed_dive_overlays.py"), ticker, "--write"],
+            optional=True,
+        )
+        ok &= run(
             "filing evidence",
             [PY, str(SCRIPTS / "build_filing_evidence.py"), ticker],
         )
@@ -156,6 +161,11 @@ def main() -> int:
     ok &= run(
         "dashboard JSON",
         [PY, str(SCRIPTS / "build_dashboard_data.py")],
+    )
+    ok &= run(
+        "fill cross-check",
+        [PY, str(SCRIPTS / "fill_cross_check.py"), ticker, "--date", args.date, "--write"],
+        optional=True,
     )
     ok &= run(
         "cross-check verify",

@@ -10,18 +10,18 @@ Documents in folder: **41** (all listed below; Tier 1–3 extracted or keyword-s
 
 | Tier | Kind | File date | Path | Chars |
 |------|------|-----------|------|-------|
-| partial | annual | 2017-03-14 | `official-reports/annual-reports/2017-03-14 - Årsredovisning 2016.pdf` | 0 ERR:No module named 'pypdf' |
-| partial | annual | 2018-03-09 | `official-reports/annual-reports/2018-03-09 - Årsredovisning 2017.pdf` | 0 ERR:No module named 'pypdf' |
-| partial | annual | 2019-02-23 | `official-reports/annual-reports/2019-02-23 - Årsredovisning 2018.pdf` | 0 ERR:No module named 'pypdf' |
-| partial | annual | 2020-03-26 | `official-reports/annual-reports/2020-03-26 - Årsredovisning 2019 Teqnion AB.pdf` | 0 ERR:No module named 'pypdf' |
-| partial | annual | 2021-03-29 | `official-reports/annual-reports/2021-03-29 - Årsredovisning 2020.pdf` | 0 ERR:No module named 'pypdf' |
-| partial | annual | 2022-03-31 | `official-reports/annual-reports/2022-03-31 - Årsredovisning 2021.pdf` | 0 ERR:No module named 'pypdf' |
-| partial | annual | 2023-03-21 | `official-reports/annual-reports/2023-03-21 - Årsredovisning 2022.pdf` | 0 ERR:No module named 'pypdf' |
-| partial | annual | 2024-03-21 | `official-reports/annual-reports/2024-03-21 - Årsredovisning 2023.pdf` | 0 ERR:No module named 'pypdf' |
-| partial | annual | 2025-03-22 | `official-reports/annual-reports/2025-03-22 - Annual report 2024.pdf` | 0 ERR:No module named 'pypdf' |
-| partial | annual | 2025-03-22 | `official-reports/annual-reports/2025-03-22 - Årsredovisning 2024.pdf` | 0 ERR:No module named 'pypdf' |
-| partial | annual | 2026-03-21 | `official-reports/annual-reports/2026-03-21 - Annual report 2025.pdf` | 0 ERR:No module named 'pypdf' |
-| full | annual | 2026-03-21 | `official-reports/annual-reports/2026-03-21 - Årsredovisning 2025.pdf` | 0 ERR:No module named 'pypdf' |
+| partial | annual | 2017-03-14 | `official-reports/annual-reports/2017-03-14 - Årsredovisning 2016.pdf` | 14 |
+| partial | annual | 2018-03-09 | `official-reports/annual-reports/2018-03-09 - Årsredovisning 2017.pdf` | 14 |
+| partial | annual | 2019-02-23 | `official-reports/annual-reports/2019-02-23 - Årsredovisning 2018.pdf` | 14 |
+| partial | annual | 2020-03-26 | `official-reports/annual-reports/2020-03-26 - Årsredovisning 2019 Teqnion AB.pdf` | 35989 |
+| partial | annual | 2021-03-29 | `official-reports/annual-reports/2021-03-29 - Årsredovisning 2020.pdf` | 30387 |
+| partial | annual | 2022-03-31 | `official-reports/annual-reports/2022-03-31 - Årsredovisning 2021.pdf` | 30804 |
+| partial | annual | 2023-03-21 | `official-reports/annual-reports/2023-03-21 - Årsredovisning 2022.pdf` | 28125 |
+| partial | annual | 2024-03-21 | `official-reports/annual-reports/2024-03-21 - Årsredovisning 2023.pdf` | 29474 |
+| partial | annual | 2025-03-22 | `official-reports/annual-reports/2025-03-22 - Annual report 2024.pdf` | 31557 |
+| partial | annual | 2025-03-22 | `official-reports/annual-reports/2025-03-22 - Årsredovisning 2024.pdf` | 30566 |
+| partial | annual | 2026-03-21 | `official-reports/annual-reports/2026-03-21 - Annual report 2025.pdf` | 28369 |
+| full | annual | 2026-03-21 | `official-reports/annual-reports/2026-03-21 - Årsredovisning 2025.pdf` | 204393 |
 | inventory | other | 2019-03-18 | `corporate-documents/ipo-2019/2019-03-18 - Prospekt.pdf` | 0 |
 | inventory | other | 2019-04-04 | `corporate-documents/ipo-2019/2019-04-04 - Tillaggsdokument notering.pdf` | 0 |
 | inventory | other | 2019-08-21 | `official-reports/interim-reports/2019/2019-08-21 - Delårsrapport 1 januari - 30 juni 2019.pdf` | 0 |
@@ -55,39 +55,100 @@ Documents in folder: **41** (all listed below; Tier 1–3 extracted or keyword-s
 ## Tier: full — extracts
 
 ### `official-reports/annual-reports/2026-03-21 - Årsredovisning 2025.pdf`
-Extract error: No module named 'pypdf'
+**Keyword snippets (related party, financials, segments):**
+- Please tell us about your background and about MSF?
+- After careful consideration the directors all unanimously agreed to sell MSF to a suitable home. We were in
+- Please tell us about your background and about Awarded 2U?
+- Please tell us about your background and about HT Servo?
+- outlook on life, family, and business integrity. Teqnion's commitment to supporting our existing staff and customer base
+- Investment Aktiebolaget Spiltan 1 958 100 11,41%
+- Bakgrund: Investment manager på
+- Kent Söderström Investment AB Spiltan 11,41%
+- maintain biodiversity in the world.” - Dave Wood, Managing Director
+- eller följer dem som delar av segment. För att du som tar del av våra finansiella rapporter
+- Not 2 Segment
+- Sverige inom det nischade segmentet av den dimensionerade stenindustrin. Bolaget
 
 ## Tier: partial — extracts
 
 ### `official-reports/annual-reports/2026-03-21 - Annual report 2025.pdf`
-Extract error: No module named 'pypdf'
+**Keyword snippets (related party, financials, segments):**
+- Board of Directors, auditor and TEQ management 16
+- The Board of Directors proposes that no dividend be
+- - A third segment, which in recent years has been too large, comprising
+- for us, please call or email.
+- Please tell us about your background and about MSF?
+- After careful consideration the directors all unanimously agreed to sell MSF to a suitable home. We were in
+- Please tell us about your background and about Awarded 2U?
+- Please tell us about your background and about HT Servo?
+- outlook on life, family, and business integrity. Teqnion's commitment to supporting our existing staff and customer base
 
 ### `official-reports/annual-reports/2025-03-22 - Årsredovisning 2024.pdf`
-Extract error: No module named 'pypdf'
+**Keyword snippets (related party, financials, segments):**
+- Vår företagsgrupp kan beskrivas som om den består av tre segment. Det första
+- och största segmentet är den del av befintlig bolagsportfölj som fungerar väl,
+- segmentet är den mindre del av vår befintliga grupp som visar på tydlig
+- oss på huvudkontoret. Detta segment kommer aldrig helt komma att utplånas,
+- Det viktiga tredje segmentet är vår långsiktiga tillväxtmotor,
+- förvärvssegmentet. Vi förvärvar lönsamma bolag med stabil historik och med
+- Please tell us about your background and about Nubis Solutions?
+- During the initial meeting with Teqnion, we were pleased to hear that they had plans to maintain the business in its
+- Please tell us about your background and about Avelair?
+- Please tell us about your background and about UKLM?
+- distribution, international sales & purchasing, finance and board level general management. I then set-up a
 
 ### `official-reports/annual-reports/2025-03-22 - Annual report 2024.pdf`
-Extract error: No module named 'pypdf'
+**Keyword snippets (related party, financials, segments):**
+- Board of Directors, auditor and TEQ management 17
+- The Board of Directors proposes that no dividend be
+- Buffett releases
+- Our corporate group can be described as consisting of three segments. The
+- first and largest segment is the part of our existing portfolio that is performing
+- allocation and growth. The second segment is the smaller part of our existing
+- require more direct guidance from us at headquarters. This segment will never
+- The vital third segment is our long-term growth engine: the acquisition
+- segment. We acquire profitable companies with stable track records,
+- for us, please call or email.
+- Please tell us about your background and about Nubis Solutions?
+- During the initial meeting with Teqnion, we were pleased to hear that they had plans to maintain the business in its
+- Please tell us about your background and about Avelair?
+- Please tell us about your background and about UKLM?
+- distribution, international sales & purchasing, finance and board level general management. I then set-up a
+- Please tell us about your background and about Vicky?
 
 ### `official-reports/annual-reports/2024-03-21 - Årsredovisning 2023.pdf`
-Extract error: No module named 'pypdf'
+**Keyword snippets (related party, financials, segments):**
+- Please tell us about your background and about Stanwell Technic?
+- team will allow a focus on strengthening and growing our sales revenue.
+- Please tell us about your background and about Surge Protection Devices?
+- Managing director, previous owner of Surge Protection Devices, UK
 
 ### `official-reports/annual-reports/2023-03-21 - Årsredovisning 2022.pdf`
-Extract error: No module named 'pypdf'
+**Keyword snippets (related party, financials, segments):**
+- our market is completely Domestic so this would add a large new revenue stream.
 
 ### `official-reports/annual-reports/2022-03-31 - Årsredovisning 2021.pdf`
-Extract error: No module named 'pypdf'
+**Keyword snippets (related party, financials, segments):**
+- segmentet. Det innefattar design, försäljning, tillverkning och
 
 ### `official-reports/annual-reports/2021-03-29 - Årsredovisning 2020.pdf`
-Extract error: No module named 'pypdf'
+**Keyword snippets (related party, financials, segments):**
+- profilering, lagerhållning och distribution
+- segmentet. Det innefattar design, försäljning, tillverkning och projekt -
 
 ### `official-reports/annual-reports/2020-03-26 - Årsredovisning 2019 Teqnion AB.pdf`
-Extract error: No module named 'pypdf'
+**Keyword snippets (related party, financials, segments):**
+- HEM1 erbjuder totalentreprenad inom bostadsbyggnadssegmentet. Detta innebär design, försäljning,
+- och distribution av bland annat kylskåp inom dryckesindustrin. Profileringen av kylskåpen hanteras av
+- profilering, lagerhållning och distribution
+- segmentet. Det innefattar design, försäljning, tillverkning och projekt -
+- – I dag verkar vi inom ett relativt nischat segment av hälso- och
 
 ### `official-reports/annual-reports/2019-02-23 - Årsredovisning 2018.pdf`
-Extract error: No module named 'pypdf'
+- *(no keyword hits; see cached full text in `research/evidence/_text/` if tier=full)*
 
 ### `official-reports/annual-reports/2018-03-09 - Årsredovisning 2017.pdf`
-Extract error: No module named 'pypdf'
+- *(no keyword hits; see cached full text in `research/evidence/_text/` if tier=full)*
 
 ### `official-reports/annual-reports/2017-03-14 - Årsredovisning 2016.pdf`
-Extract error: No module named 'pypdf'
+- *(no keyword hits; see cached full text in `research/evidence/_text/` if tier=full)*

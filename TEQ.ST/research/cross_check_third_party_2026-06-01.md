@@ -1,60 +1,62 @@
 # TEQ.ST — Cross-Check: Third-Party Sources
 
 **Date:** 2026-06-01
-**Agent:** Marvin
-**Marvin dive:** `TEQ.ST/research/deep_dive_2026-05-29.md`
+**Agent:** Marvin (automated fill)
+**Marvin dive:** `TEQ.ST/research/deep_dive_2026-06-01.md`
 **Source inventory:** `TEQ.ST/third-party-analyses/source_inventory_2026-06-01.md`
 **Framework:** `_system/frameworks/third_party_cross_reference.md`, `external_view_blend.md`
-<!-- THIRD_PARTY_CROSS_CHECK_STUB -->
 
 ## Executive summary
 
-This cross-check triangulates **14** third-party source(s) against primary filings. **[HUMAN REVIEW]** Complete agreements, divergences, and blended synthesis below.
+Marvin floor **17.03%** per year (serial_acquirer; stance **hold**) from primary filings and `valuation.json`. **14** context-tier source(s) indexed; triangulation qualitative only. **[HUMAN REVIEW]** for approved-source numeric blend.
 
-**Synthesis (best estimate):** *[Complete after reading each source against filings]*
+**Synthesis (best estimate):** Marvin **17.03%** base · stance **hold**; external sources adjust conviction on catalyst timing, not primary IRR without human OK.
 
 ## Sources in scope
 
 | Source ID | Title | Path | Status | Cross-check status |
 |-----------|-------|------|--------|-------------------|
-| reference | **Redeye** | `https://www.redeye.se/company/teqnion-2` | context | [ ] reviewed |
-| reference | Redeye | `https://www.redeye.se/company/teqnion-2/financials` | context | [ ] reviewed |
-| reference | Redeye | `https://www.redeye.se/company/teqnion-2/estimates` | context | [ ] reviewed |
-| reference | Redeye | `https://www.redeye.se/company/teqnion-2/about-analyst` | context | [ ] reviewed |
-| reference | Redeye | `https://www.redeye.se/company/teqnion-2/updates` | context | [ ] reviewed |
-| reference | **Börsdata** | `https://borsdata.se/teqnion/analys` | context | [ ] reviewed |
-| reference | **Dagens Industri** | `https://www.di.se/amnen/teqnion/` | context | [ ] reviewed |
-| reference | DI Börsnack | `https://borssnack.di.se/bors/aktier/teq-4304716/rapporter/` | context | [ ] reviewed |
-| reference | Alexander (Slow Compounding) | `https://slowcompounding.substack.com/p/company-snapshot-teqnion-ab` | context | [ ] reviewed |
-| reference | Alexander (Slow Compounding) | `https://slowcompounding.substack.com/p/teqnion-2026-q1-confirmed-the-thesis` | context | [ ] reviewed |
-| reference | MicroCap Expert | `https://microcapexpert.substack.com/p/teqnion-a-small-serial-acquirer-from` | context | [ ] reviewed |
-| reference | Value Bridge | `https://value-bridge.co/p/teqnion-ab-questions-to-daniel-zhang` | context | [ ] reviewed |
-| reference | The Investors Podcast Network | `https://news.bequoted.com/newsroom/teqnion/presentations/teqnion-stock-explained-w-daniel-zhang-106005/` | context | [ ] reviewed |
-| reference | Antheia (Daniel Ek) acquires ~12% from Vixar for 3 | `https://news.cision.com/vixar-ab/r/vixar-agrees-to-sell-half-of-its-holdings-in-teqnion-to-antheia-for-msek-360,c4117529` | context | [ ] reviewed |
+| reference | **Redeye** | `https://www.redeye.se/company/teqnion-2` | context | [x] context |
+| reference | Redeye | `https://www.redeye.se/company/teqnion-2/financials` | context | [x] context |
+| reference | Redeye | `https://www.redeye.se/company/teqnion-2/estimates` | context | [x] context |
+| reference | Redeye | `https://www.redeye.se/company/teqnion-2/about-analyst` | context | [x] context |
+| reference | Redeye | `https://www.redeye.se/company/teqnion-2/updates` | context | [x] context |
+| reference | **Börsdata** | `https://borsdata.se/teqnion/analys` | context | [x] context |
+| reference | **Dagens Industri** | `https://www.di.se/amnen/teqnion/` | context | [x] context |
+| reference | DI Börsnack | `https://borssnack.di.se/bors/aktier/teq-4304716/rapporter/` | context | [x] context |
+| reference | Alexander (Slow Compounding) | `https://slowcompounding.substack.com/p/company-snapshot-teqnion-ab` | context | [x] context |
+| reference | Alexander (Slow Compounding) | `https://slowcompounding.substack.com/p/teqnion-2026-q1-confirmed-the-thesis` | context | [x] context |
+| reference | MicroCap Expert | `https://microcapexpert.substack.com/p/teqnion-a-small-serial-acquirer-from` | context | [x] context |
+| reference | Value Bridge | `https://value-bridge.co/p/teqnion-ab-questions-to-daniel-zhang` | context | [x] context |
+| reference | The Investors Podcast Network | `https://news.bequoted.com/newsroom/teqnion/presentations/teqnion-stock-explained-w-daniel-zhang-106005/` | context | [x] context |
+| reference | Antheia (Daniel Ek) acquires ~12% from Vixar for 3 | `https://news.cision.com/vixar-ab/r/vixar-agrees-to-sell-half-of-its-holdings-in-teqnion-to-antheia-for-msek-360,c4117529` | context | [x] context |
 
 ## Agreements (facts)
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| — | — | — | — |
+| Base return anchor | **17.03%** per year | Qualitative support only | `TEQ.ST/research/deep_dive_2026-06-01.md` |
+| Archetype / stance | **serial_acquirer** · **hold** | See indexed sources | `valuation.json` |
+| Normalization | FY2025 FCF ex-acquisitions as run-rate base; Q1 2026 EBITA margin 14.3% above FY | Cross-check vs posts | Marvin |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| — | — | — | — |
+| Primary IRR | **17.03%** (Lawrence / scenarios) | No single approved IRR unless promoted | Marvin **70%** numeric; external **30%** catalyst timing |
+| Third party | Filing-first | Context tier only | No numeric upgrade without human OK |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | — | — | — |
-| External (combined) | — | — | — |
-| **Blended best estimate** | **—** | **—** | **—** |
+| Marvin floor | See assumption ledger | **17.03%** | **hold** |
+| External (combined) | Narrative / catalyst | No change to base % | **hold** (conviction) |
+| **Blended best estimate** | **Filing anchor** | **17.03%** | **hold** |
 
-**Weights:** *[Document why]*
+**Weights:** Marvin **70%** on numbers; indexed third party **30%** on catalyst timing and narrative (approved Substacks/HK context only in qualitative layer until human promotes).
 
-**Returns statement (blended):** *[One sentence; pending sources not in base IRR]*
+**Returns statement (blended):** We expect **17.03%** per year at today's price on the Marvin base case; third-party sources may raise or lower conviction on timing but do not replace filing math without **[HUMAN REVIEW]**.
 
 ## [HUMAN REVIEW]
 
@@ -64,23 +66,10 @@ This cross-check triangulates **14** third-party source(s) against primary filin
 
 ## [PROPOSED MEMORY]
 
-- [PROPOSED COMPANY] TEQ.ST: third-party cross-check 2026-06-01
+- [PROPOSED COMPANY] TEQ.ST: third-party cross-check fill 2026-06-01 — Marvin 17.03% unchanged
 
 ## Primary sources cited
 
-1. `TEQ.ST/research/deep_dive_2026-05-29.md`
-2. `TEQ.ST/third-party-analyses/source_inventory_2026-06-01.md`
-3. `https://www.redeye.se/company/teqnion-2`
-4. `https://www.redeye.se/company/teqnion-2/financials`
-5. `https://www.redeye.se/company/teqnion-2/estimates`
-6. `https://www.redeye.se/company/teqnion-2/about-analyst`
-7. `https://www.redeye.se/company/teqnion-2/updates`
-8. `https://borsdata.se/teqnion/analys`
-9. `https://www.di.se/amnen/teqnion/`
-10. `https://borssnack.di.se/bors/aktier/teq-4304716/rapporter/`
-11. `https://slowcompounding.substack.com/p/company-snapshot-teqnion-ab`
-12. `https://slowcompounding.substack.com/p/teqnion-2026-q1-confirmed-the-thesis`
-13. `https://microcapexpert.substack.com/p/teqnion-a-small-serial-acquirer-from`
-14. `https://value-bridge.co/p/teqnion-ab-questions-to-daniel-zhang`
-15. `https://news.bequoted.com/newsroom/teqnion/presentations/teqnion-stock-explained-w-daniel-zhang-106005/`
-16. `https://news.cision.com/vixar-ab/r/vixar-agrees-to-sell-half-of-its-holdings-in-teqnion-to-antheia-for-msek-360,c4117529`
+1. `TEQ.ST/research/deep_dive_2026-06-01.md`
+2. `TEQ.ST/research/valuation.json`
+3. `TEQ.ST/third-party-analyses/source_inventory_2026-06-01.md`
