@@ -29,12 +29,13 @@
     "floor_metric": "nav_per_share",
     "floor_value": 106.2,
     "floor_value_note": "Conservative asset floor: Q1 2026 cash $3.59/sh + NRA acquisition comp $64.2/sh (royalty asset mark); excludes surface and producing PV to avoid double-count with segment build",
-    "primary_metric": "lawrence_base",
-    "primary_label": "10yr cash-flow IRR (operating)",
+    "primary_metric": "falsifier_adjusted",
+    "primary_label": "10yr IRR (falsifier-adjusted)",
     "primary_return_pct": -1.0,
     "overlay_nav_per_share": 210.5,
     "overlay_nav_note": "Segment operating PV $162 + cash $3.6 + undeveloped NRA option $16 + surface $32 [Assumption]; price $393 embeds ~87% premium to overlay base",
-    "notes": "GAAP book ~$21/sh is retained earnings + PPE/water + acquired royalties only. Price well above filing-backed NAV overlay; Lawrence IRR remains stance gate."
+    "notes": "GAAP book ~$21/sh is retained earnings + PPE/water + acquired royalties only. Price well above filing-backed NAV overlay; Lawrence IRR remains stance gate.",
+    "lawrence_legacy_pct": -1.0
   },
   "nav_overlay": {
     "as_of": "2026-06-01",
@@ -222,7 +223,7 @@
     ],
     "reconciliation": {
       "sum_pv_per_share_at_10pct": 161.8,
-      "sum_pv_per_share_at_explicit_discount": 161.8,
+      "sum_pv_per_share_at_explicit_discount": 161.9,
       "explicit_discount_rate_pct": 10.0,
       "nav_options_add_per_share": 48.0,
       "overlay_base_per_share": 210.5,
@@ -265,9 +266,11 @@
   },
   "implied_return": {
     "base_pct": -1.0,
-    "lawrence_base_pct": -1.0,
-    "label": "10yr cash-flow IRR (operating)",
-    "display": "-1.0% (10yr cash-flow IRR (operating))"
+    "falsifier_adjusted_pct": -1.0,
+    "theory_implied_pct": -1.0,
+    "lawrence_legacy_pct": -1.0,
+    "label": "10yr IRR (falsifier-adjusted)",
+    "display": "-1.0% (falsifier-adjusted)"
   },
   "stance_proposal": {
     "suggested": "watch",
@@ -355,52 +358,100 @@
       "reach": true,
       "falsifiable": true,
       "not_instrumentalist": true
+    },
+    "theory_implied": {
+      "y1_5": 0.0477,
+      "y6_10": 0.0339,
+      "exit_pfcf_y10_segment_blend": 22.5,
+      "derivation": "segment_build owner-cash weighted blend (growth only; exit from scenarios.base)",
+      "segment_weights": [
+        {
+          "id": "land_resource",
+          "weight_pct": 61.4
+        },
+        {
+          "id": "water",
+          "weight_pct": 38.6
+        }
+      ]
+    },
+    "lawrence_legacy": {
+      "y1_5": 0.05,
+      "y6_10": 0.03,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.0477,
+      "y6_10": 0.0339,
+      "exit_pfcf_y10": 22.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": 0.0622,
+      "as_of_filing_facts": "evidence/_text/10-Q_20260506_rpt20260331_acc0001811074_26_000035.htm.txt"
+    },
+    "divergence": {
+      "theory_vs_lawrence_y1_5_pp": -0.2,
+      "falsifier_vs_theory_y1_5_pp": 0.0
     }
   },
   "overlay_results": [
     {
-      "case": "GAAP book",
-      "method": "balance sheet",
-      "key_inputs": "Equity $1.46B \u00f7 69M sh \u2248 $21/sh; Assigned land/RRA at zero",
-      "return_pct": null,
-      "display": "Not a fair-value floor",
+      "case": "Theory-implied",
+      "method": "segment-derived growth",
+      "key_inputs": "Y1-5 4.8% Y6-10 3.4% (segment_build owner-cash weighted blend (growth only; exit from scenarios.base))",
+      "return_pct": -1.0,
       "stance_gate": false,
-      "notes": "10-K: no value assigned to 1888 Assigned land and royalty interests"
+      "notes": "Bottom-up from segment_build"
     },
     {
-      "case": "Asset floor (cash + NRA comp)",
-      "method": "nav (conservative)",
-      "key_inputs": "Cash $3.6/sh + 224k NRA \u00d7 $19,775",
-      "return_pct": null,
-      "display": "~$68/sh asset floor",
+      "case": "Falsifier-adjusted",
+      "method": "theory + filing falsifiers",
+      "key_inputs": "Y1-5 4.8% Y6-10 3.4%; 0 triggered",
+      "return_pct": -1.0,
+      "stance_gate": true,
+      "notes": "Primary IRR for display and stance"
+    },
+    {
+      "case": "Lawrence legacy",
+      "method": "historical scenarios.base",
+      "key_inputs": "Pre-theory-derivation ledger",
+      "return_pct": -1.0,
       "stance_gate": false,
-      "notes": "Royalty asset mark only; excludes surface and producing PV"
+      "notes": "Reference only"
     },
     {
       "case": "Segment sum",
       "method": "segment @ 10%",
-      "key_inputs": "Land $99 + Water $63 operating PV",
+      "key_inputs": "PV $161.9/sh vs P\u2080 $393.0",
       "return_pct": null,
-      "display": "~$162/sh",
-      "stance_gate": false,
-      "notes": "Producing cash flows only; see segment_build"
+      "display": "$161.9/sh",
+      "stance_gate": false
     },
     {
       "case": "Segment implied",
       "method": "reverse DCF (segments)",
-      "key_inputs": "Land 4%/3% 24\u00d7 + Water 6%/4% 20\u00d7",
+      "key_inputs": "Land & Resource (royalties + easements + land sales) + Water Services and Operations (TPWR) + drags; options at base zero",
       "return_pct": -0.84,
-      "stance_gate": false,
-      "notes": "Tie-out to Lawrence -1.0% within 0.2pp"
-    },
-    {
-      "case": "NAV overlay base",
-      "method": "SOTP + segment PV",
-      "key_inputs": "Operating PV $162 + cash $3.6 + NRA option $16 + surface $32",
-      "return_pct": null,
-      "display": "~$211/sh vs price $393",
-      "stance_gate": false,
-      "notes": "Price ~87% above overlay base; watch stance"
+      "stance_gate": false
     }
-  ]
+  ],
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -5.4
+    },
+    "base": {
+      "return_pct": -1.0
+    },
+    "bull": {
+      "return_pct": 3.4
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": -1.0
+    },
+    "falsifier_adjusted": {
+      "return_pct": -1.0
+    }
+  }
 }

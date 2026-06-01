@@ -11,13 +11,13 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | mid |
-| **Implied 10yr IRR** (Lawrence) | -1.0% (base) |
+| **Implied 10yr IRR** (falsifier-adjusted) | -1.0% (falsifier-adjusted) |
 | **IRR method** | full |
 | **Lawrence bucket** | pricing_power |
 
 ## One-line thesis
 
-Permian land, royalty, and water toll at **~$393**: durable moat, Lawrence base **-1.0%**, NAV overlay **~$211/sh** vs price — **watch** for better entry.
+Permian land, royalty, and water toll at **~$393**: durable moat, falsifier-adjusted base **-1.0%**, NAV overlay **~$211/sh** vs price — **watch** for better entry.
 
 ## Key questions
 

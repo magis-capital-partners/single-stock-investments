@@ -143,9 +143,12 @@
     }
   },
   "implied_return": {
-    "base_pct": 2.1,
-    "label": "10yr IRR",
-    "display": "2.1% (base)"
+    "base_pct": 1.6,
+    "falsifier_adjusted_pct": 1.6,
+    "theory_implied_pct": 1.6,
+    "lawrence_legacy_pct": 2.1,
+    "label": "10yr IRR (falsifier-adjusted)",
+    "display": "1.6% (falsifier-adjusted)"
   },
   "stance_proposal": {
     "suggested": "watch",
@@ -159,9 +162,12 @@
   "growth_explanation": {
     "as_of": "2026-06-01",
     "status": "complete",
-    "assumption_ids": ["growth_y1_5", "growth_y6_10"],
+    "assumption_ids": [
+      "growth_y1_5",
+      "growth_y6_10"
+    ],
     "theory_label": "Cloud backlog conversion + Services Search yield (consolidated blend)",
-    "problem_situation": "Lawrence base IRR 2.1% at $386 on FY2025 FCF/sh — why 11% years 1–5 and not 6% bear or 14% bull?",
+    "problem_situation": "Lawrence base IRR 2.1% at $386 on FY2025 FCF/sh \u2014 why 11% years 1\u20135 and not 6% bear or 14% bull?",
     "consolidated_growth": {
       "y1_5": 0.11,
       "y6_10": 0.08
@@ -169,19 +175,19 @@
     "mechanisms": [
       {
         "id": "cloud_conversion",
-        "chain": "Cloud backlog (>$460B, Q1 2026 CEO) converts to revenue at high-teens to 40%+ YoY → Cloud OI share of consolidated cash rises → lifts blended FCF growth above Services-only path",
+        "chain": "Cloud backlog (>$460B, Q1 2026 CEO) converts to revenue at high-teens to 40%+ YoY \u2192 Cloud OI share of consolidated cash rises \u2192 lifts blended FCF growth above Services-only path",
         "evidence": "GOOGL/investor-documents/sec-edgar/8-K_20260429_rpt20260429_acc0001652044_26_000043.htm",
         "hard_to_vary": "partial"
       },
       {
         "id": "services_search_yield",
-        "chain": "Search +19% Q1 revenue with AI Overviews rollout → Services owner cash grows high single digits; consolidated 11% embeds ~9% Services segment weight",
+        "chain": "Search +19% Q1 revenue with AI Overviews rollout \u2192 Services owner cash grows high single digits; consolidated 11% embeds ~9% Services segment weight",
         "evidence": "GOOGL/investor-documents/sec-edgar/10-Q_20260430_rpt20260331_acc0001652044_26_000048.htm",
         "hard_to_vary": "partial"
       },
       {
         "id": "capex_normalization",
-        "chain": "2026 capex guide $180–190B depresses near-term FCF; 11% consolidated assumes post-peak capex and Cloud ROIC lift owner cash per share after 2027",
+        "chain": "2026 capex guide $180\u2013190B depresses near-term FCF; 11% consolidated assumes post-peak capex and Cloud ROIC lift owner cash per share after 2027",
         "evidence": "GOOGL/investor-documents/sec-edgar/10-K_20260205_rpt20251231_acc0001652044_26_000018.htm",
         "hard_to_vary": "partial"
       }
@@ -209,26 +215,26 @@
       {
         "text": "Consolidated operating margin holds above 34% in 2026 despite capex step-up",
         "by": "Q4 2026 10-K",
-        "falsifier_action": "Margin compression without Cloud mix offset → cut years 1–5 growth"
+        "falsifier_action": "Margin compression without Cloud mix offset \u2192 cut years 1\u20135 growth"
       }
     ],
     "falsifiers": [
       {
         "observation": "Cloud revenue growth below 30% for two consecutive quarters",
-        "action": "Cut Cloud segment growth; reduce consolidated years 1–5 toward 8%"
+        "action": "Cut Cloud segment growth; reduce consolidated years 1\u20135 toward 8%"
       },
       {
         "observation": "Search revenue growth below 10% for two quarters while Cloud growth also decelerates",
         "action": "Move base case toward bear 6%/4%"
       },
       {
-        "observation": "2026–2027 FCF per share flat or down vs FY2025 with no capex guide reduction",
+        "observation": "2026\u20132027 FCF per share flat or down vs FY2025 with no capex guide reduction",
         "action": "Falsifies capex-normalization mechanism; hold 11% only with explicit [HUMAN REVIEW]"
       }
     ],
     "ad_hoc_rescue_banned": [
       "Raising consolidated growth to 14% bull without backlog-to-revenue schedule in segment build",
-      "Using AI inflection $8/sh FCF as silent base-case FCF₀",
+      "Using AI inflection $8/sh FCF as silent base-case FCF\u2080",
       "Bumping exit multiple to save IRR while keeping growth unchanged"
     ],
     "deutsch_checks": {
@@ -236,9 +242,67 @@
       "reach": true,
       "falsifiable": true,
       "not_instrumentalist": true
+    },
+    "theory_implied": {
+      "y1_5": 0.1045,
+      "y6_10": 0.0745,
+      "exit_pfcf_y10_segment_blend": 21.6,
+      "derivation": "segment_build owner-cash weighted blend (growth only; exit from scenarios.base)",
+      "segment_weights": [
+        {
+          "id": "google_services",
+          "weight_pct": 90.9
+        },
+        {
+          "id": "google_cloud",
+          "weight_pct": 9.1
+        }
+      ]
+    },
+    "lawrence_legacy": {
+      "y1_5": 0.11,
+      "y6_10": 0.08,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.1045,
+      "y6_10": 0.0745,
+      "exit_pfcf_y10": 25.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": -0.1789,
+      "as_of_filing_facts": "evidence/_text/10-Q_20260430_rpt20260331_acc0001652044_26_000048.htm.txt"
+    },
+    "divergence": {
+      "theory_vs_lawrence_y1_5_pp": -0.6,
+      "falsifier_vs_theory_y1_5_pp": 0.0
     }
   },
   "overlay_results": [
+    {
+      "case": "Theory-implied",
+      "method": "segment-derived growth",
+      "key_inputs": "Y1-5 10.4% Y6-10 7.4% (segment_build owner-cash weighted blend (growth only; exit from scenarios.base))",
+      "return_pct": 1.6,
+      "stance_gate": false,
+      "notes": "Bottom-up from segment_build"
+    },
+    {
+      "case": "Falsifier-adjusted",
+      "method": "theory + filing falsifiers",
+      "key_inputs": "Y1-5 10.4% Y6-10 7.4%; 0 triggered",
+      "return_pct": 1.6,
+      "stance_gate": true,
+      "notes": "Primary IRR for display and stance"
+    },
+    {
+      "case": "Lawrence legacy",
+      "method": "historical scenarios.base",
+      "key_inputs": "Pre-theory-derivation ledger",
+      "return_pct": 2.1,
+      "stance_gate": false,
+      "notes": "Reference only"
+    },
     {
       "case": "AI inflection",
       "method": "full (normalized FCF)",
@@ -266,9 +330,28 @@
     {
       "case": "Segment implied",
       "method": "reverse DCF (segments)",
-      "key_inputs": "Services + Cloud + drags; options $0",
+      "key_inputs": "Google Services (Search, YouTube, Play, Android) + Google Cloud + drags; options at base zero",
       "return_pct": 0.01,
       "stance_gate": false
     }
-  ]
+  ],
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -4.8
+    },
+    "base": {
+      "return_pct": 2.1
+    },
+    "bull": {
+      "return_pct": 5.4
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": 1.6
+    },
+    "falsifier_adjusted": {
+      "return_pct": 1.6
+    }
+  }
 }

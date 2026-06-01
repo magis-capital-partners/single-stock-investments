@@ -11,10 +11,14 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import sys
 from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "_system" / "scripts"))
+
+from growth_theory import enrich_growth_explanation, load_filing_facts, theory_scenario  # noqa: E402
 CLASS_PATH = ROOT / "_system" / "portfolio" / "classification.json"
 AI_HYPERSCALERS = frozenset({"GOOGL", "AMZN", "META", "MSFT"})
 SEGMENT_DISCOUNT_DEFAULT = 0.10
@@ -347,16 +351,115 @@ def compute_ai_overlay_rows(data: dict, lawrence_results: dict) -> list[dict]:
                 "stance_gate": False,
             }
         )
+        seg_labels = [
+            s.get("label", s.get("id", "segment"))
+            for s in (data.get("segment_build") or {}).get("segments", [])
+        ]
+        seg_key = " + ".join(seg_labels[:3]) if seg_labels else "Operating segments"
+        if (data.get("segment_build") or {}).get("options"):
+            seg_key += " + drags; options at base zero"
         rows.append(
             {
                 "case": "Segment implied",
                 "method": "reverse DCF (segments)",
-                "key_inputs": "Services + Cloud + drags; options $0",
+                "key_inputs": seg_key,
                 "return_pct": seg["implied_business_return_pct"],
                 "stance_gate": False,
             }
         )
 
+    return rows
+
+
+def compute_growth_theory_results(data: dict, price: float, fcf0: float) -> dict:
+    """Popper/Deutsch path: theory-implied + falsifier-adjusted IRR (primary display)."""
+    ge = data.get("growth_explanation")
+    if not ge or data.get("method") not in ("full", "scenario"):
+        return {}
+
+    enrich_growth_explanation(data, load_filing_facts(data.get("ticker", "")))
+    out: dict[str, dict] = {}
+
+    for path_key in ("theory_implied", "falsifier_adjusted"):
+        sc = theory_scenario(data, path_key)
+        if price and fcf0 is not None:
+            out[path_key] = run_full_scenario(price, fcf0, sc)
+
+    if out:
+        data["results_growth_theory"] = {k: {"return_pct": v["return_pct"]} for k, v in out.items()}
+    return out
+
+
+def apply_primary_implied_return(data: dict, lawrence_base_pct: float | None) -> None:
+    """Website / dive primary IRR = falsifier-adjusted; Lawrence kept as legacy."""
+    gt = data.get("results_growth_theory") or {}
+    fa_pct = gt.get("falsifier_adjusted", {}).get("return_pct")
+    ti_pct = gt.get("theory_implied", {}).get("return_pct")
+    primary = fa_pct if fa_pct is not None else ti_pct if ti_pct is not None else lawrence_base_pct
+
+    data["implied_return"] = {
+        "base_pct": primary,
+        "falsifier_adjusted_pct": fa_pct,
+        "theory_implied_pct": ti_pct,
+        "lawrence_legacy_pct": lawrence_base_pct,
+        "label": "10yr IRR (falsifier-adjusted)",
+        "display": f"{primary}% (falsifier-adjusted)" if primary is not None else "pending",
+    }
+
+    gate = data.get("optionality_gate")
+    if gate:
+        gate["primary_metric"] = "falsifier_adjusted"
+        gate["primary_label"] = "10yr IRR (falsifier-adjusted)"
+        gate["primary_return_pct"] = primary
+        gate["lawrence_legacy_pct"] = lawrence_base_pct
+
+
+def growth_theory_bridge_rows(data: dict) -> list[dict]:
+    gt = data.get("results_growth_theory") or {}
+    ge = data.get("growth_explanation") or {}
+    rows: list[dict] = []
+    ti = gt.get("theory_implied", {}).get("return_pct")
+    fa = gt.get("falsifier_adjusted", {}).get("return_pct")
+    legacy = data.get("implied_return", {}).get("lawrence_legacy_pct")
+    theory = ge.get("theory_implied") or {}
+    fals = ge.get("falsifier_adjusted") or {}
+
+    if ti is not None and theory:
+        g1, g2 = theory.get("y1_5", 0) * 100, theory.get("y6_10", 0) * 100
+        rows.append(
+            {
+                "case": "Theory-implied",
+                "method": "segment-derived growth",
+                "key_inputs": f"Y1-5 {g1:.1f}% Y6-10 {g2:.1f}% ({theory.get('derivation', '')})",
+                "return_pct": ti,
+                "stance_gate": False,
+                "notes": "Bottom-up from segment_build",
+            }
+        )
+    if fa is not None and fals:
+        g1, g2 = fals.get("y1_5", 0) * 100, fals.get("y6_10", 0) * 100
+        trig = len(fals.get("triggered") or [])
+        rows.append(
+            {
+                "case": "Falsifier-adjusted",
+                "method": "theory + filing falsifiers",
+                "key_inputs": f"Y1-5 {g1:.1f}% Y6-10 {g2:.1f}%; {trig} triggered",
+                "return_pct": fa,
+                "stance_gate": True,
+                "notes": "Primary IRR for display and stance",
+            }
+        )
+    if legacy is not None:
+        rows.append(
+            {
+                "case": "Lawrence legacy",
+                "method": "historical scenarios.base",
+                "key_inputs": "Pre-theory-derivation ledger",
+                "return_pct": legacy,
+                "stance_gate": False,
+                "notes": "Reference only",
+            }
+        )
     return rows
 
 
@@ -403,30 +506,27 @@ def compute_valuation(data: dict) -> dict:
 
     base_pct = results.get("base", {}).get("return_pct") if results else None
     data["method"] = method
-    data["results"] = {k: {"return_pct": v["return_pct"]} for k, v in results.items()}
-    proposal = propose_stance(base_pct, moat, dhando, method, data=data)
-    data["stance_proposal"] = proposal
+    data["results_lawrence_legacy"] = {k: {"return_pct": v["return_pct"]} for k, v in results.items()}
+    data["results"] = dict(data["results_lawrence_legacy"])
 
-    if data.get("valuation_mode") == "optionality" and data.get("optionality_gate"):
-        gate = data["optionality_gate"]
-        primary_pct = gate.get("primary_return_pct")
-        if primary_pct is not None:
-            label = gate.get("primary_label", "primary return")
-            data["implied_return"] = {
-                "base_pct": primary_pct,
-                "lawrence_base_pct": base_pct,
-                "label": label,
-                "display": f"{primary_pct}% ({label})",
-            }
-            return data
+    fcf0 = inputs.get("fcf_per_share") or inputs.get("per_share")
+    if method in ("full", "scenario") and data.get("growth_explanation"):
+        compute_growth_theory_results(data, float(price) if price else 0, float(fcf0) if fcf0 else 0)
+        apply_primary_implied_return(data, base_pct)
+        primary_pct = data.get("implied_return", {}).get("base_pct")
+        data["stance_proposal"] = propose_stance(primary_pct, moat, dhando, method, data=data)
+    else:
+        data["implied_return"] = {
+            "base_pct": base_pct,
+            "label": return_label,
+            "display": f"{base_pct}% (base)" if base_pct is not None else "pending",
+        }
+        data["stance_proposal"] = propose_stance(base_pct, moat, dhando, method, data=data)
 
-    data["implied_return"] = {
-        "base_pct": base_pct,
-        "label": return_label,
-        "display": f"{base_pct}% (base)" if base_pct is not None else "pending",
-    }
+    overlay = compute_ai_overlay_rows(data, results)
+    overlay = growth_theory_bridge_rows(data) + overlay
+    data["overlay_results"] = overlay
 
-    data["overlay_results"] = compute_ai_overlay_rows(data, results)
     ticker = data.get("ticker", "")
     if ticker in AI_HYPERSCALERS and not data.get("ai_overlay"):
         data.setdefault("ai_overlay", {})["status"] = "missing — run ai_infrastructure_valuation.md"

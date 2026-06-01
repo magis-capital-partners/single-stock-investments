@@ -1,5 +1,5 @@
 ---
-description: Popper/Deutsch stress test for FCF growth assumptions — always ask why
+description: Popper/Deutsch stress test — theory-derived growth; falsifier-adjusted IRR is primary
 globs: "**/research/**"
 alwaysApply: false
 ---
@@ -12,22 +12,21 @@ Philosophy sources: `_system/reference/philosophy/deutsch-popper/INDEX.md`
 
 ## Required behavior (Marvin)
 
-1. **Three layers** — Fact anchor (filings) → Explanatory theory (why G%) → Lawrence number in ledger. Layer 3 must cite Layer 2.
-2. **Mandatory subsection** — `### Growth explanation stress test (Popper / Deutsch)` in **Valuation & IRR**, after **Assumption ledger** and **before** IRR arithmetic.
-3. **Growth ledger rows** — Source column for years 1–5 / 6–10 growth: `Growth theory: {theory_label}` + filing path or **[Assumption]**.
-4. **Popper table** — Mechanism chain, at least one **risky prediction**, at least one **falsifier**, **ad hoc rescue** ban list.
-5. **Deutsch checks** — Hard to vary, reach, falsifiable, not instrumentalist-only.
-6. **Segment growth** — One stress-test block per segment rate that moves consolidated IRR materially (or one consolidated theory with segment sub-rows).
-7. **Payoff section** — One sentence: base growth assumes …; falsified if …
-8. **JSON** — Fill `growth_explanation` in `valuation.json` on refresh when method is `full` / `scenario` / `segment_cashflow`.
+1. **Step A — Bottom-up derivation** — When `segment_build` exists, compute `growth_explanation.theory_implied` from owner-cash-weighted segment growth. Exit multiple from `scenarios.base`.
+2. **Step C — Deutsch gate** — `status: complete` only if `deutsch_checks.hard_to_vary`, `falsifiable`, and `not_instrumentalist` are all **true** and no mechanism is `hard_to_vary: no`.
+3. **Step D — Falsifiers** — Run `check_growth_falsifiers.py --write` or `marvin_valuation.py --write`; populate `falsifier_adjusted` and `triggered[]`.
+4. **Primary IRR** — **`implied_return.base_pct`** = **falsifier-adjusted** return. Lawrence `scenarios.base` → `results_lawrence_legacy` (reference only).
+5. **Mandatory subsection** — `### Growth explanation stress test` + **Growth derivation** table (theory-implied vs falsifier-adjusted vs legacy).
+6. **Valuation bridge** — Rows for Falsifier-adjusted (stance gate), Theory-implied, Lawrence legacy.
+7. **Executive summary / Classification** — One **falsifier-adjusted** % only.
 
 ## Do not
 
-- Use historical CAGR or mgmt guidance alone as the theory.
+- Use `scenarios.base` growth as primary display IRR when `growth_explanation` exists.
+- Mark `status: complete` when Deutsch gate fails.
 - Choose growth to hit 15% IRR without an operating mechanism (instrumentalism).
-- Defend "quality compounder grows X%" without segment or driver bridge.
-- Skip falsifiers when growth exceeds filing run-rate by **>300 bp**.
+- Blend segment exit multiples into consolidated primary IRR.
 
 ## Milly
 
-Flag `growth_explanation: incomplete` when stress-test section missing or growth rows lack theory reference. See `MILLY.md` § Growth explanation.
+Flag `growth_explanation: incomplete` when Deutsch gate fails or primary IRR ≠ falsifier-adjusted. See `MILLY.md` § Growth explanation.

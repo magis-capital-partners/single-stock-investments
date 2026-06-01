@@ -9,13 +9,13 @@
 | **Archetype** (Stahl) | compounder |
 | **Moat** (Munger) | widening |
 | **Dhando** (Pabrai) | partial |
-| **Stance** | hold |
+| **Stance** | watch |
 | **Cycle** | - |
-| **Implied 10yr IRR** (Lawrence) | 2.1% (base) |
+| **Implied 10yr IRR** (falsifier-adjusted) | 1.6% (falsifier-adjusted) |
 | **IRR method** | full |
 | **Lawrence bucket** | pricing_power |
 
-**Deep dive:** `GOOGL/research/deep_dive_2026-05-26.md`
+**Deep dive:** `GOOGL/research/deep_dive_2026-06-01.md`
 
 ## One-line thesis
 

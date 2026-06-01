@@ -104,7 +104,7 @@ def classification_table(row: dict) -> str:
         cell("dhando", "Dhando", "Pabrai"),
         cell("stance", "Stance"),
         cell("cycle", "Cycle"),
-        cell("implied_irr", "Implied 10yr IRR", "Lawrence"),
+        cell("implied_irr", "Implied 10yr IRR", "falsifier-adjusted"),
         cell("irr_method", "IRR method"),
         cell("lawrence_bucket", "Lawrence bucket"),
         "",
