@@ -12,7 +12,15 @@ See [`_system/portfolio/holdings.md`](_system/portfolio/holdings.md).
 
 Static portfolio dashboard (etf-dashboard styling) in [`dashboard/`](dashboard/).
 
-**Planned:** [Darwin adaptive portfolio tab](_system/frameworks/darwin_portfolio_tab_proposal.md) — neural + evolutionary allocation on top of Marvin research (low turnover). Reference PDFs: [`_system/reference/quant-evolution/`](_system/reference/quant-evolution/).
+**Darwin tab:** [Adaptive portfolio layer](_system/frameworks/darwin_portfolio_tab_proposal.md) — Holdings | **Darwin** on the dashboard. Rebuild:
+
+```powershell
+pip install -r _system/scripts/requirements-darwin.txt
+python3 _system/scripts/build_darwin_portfolio.py
+python3 _system/scripts/build_dashboard_data.py
+```
+
+Use `--fast` for CI-speed training. Reference PDFs: [`_system/reference/quant-evolution/`](_system/reference/quant-evolution/).
 
 **Local preview:**
 

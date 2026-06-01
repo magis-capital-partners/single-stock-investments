@@ -245,6 +245,31 @@
     padding: 4px 10px; font-size: 12px; cursor: pointer;
   }
   .watch-chip:hover { border-color: var(--accent-blue); }
+  .view-tabs {
+    display: flex; gap: 6px; padding: 10px 24px 0;
+    background: var(--bg-secondary); border-bottom: 1px solid var(--border);
+  }
+  .view-tab {
+    padding: 8px 16px; border-radius: 6px 6px 0 0; font-size: 12px; font-weight: 700;
+    border: 1px solid transparent; border-bottom: none; background: transparent;
+    color: var(--text-muted); cursor: pointer;
+  }
+  .view-tab.active {
+    background: var(--bg-primary); color: var(--accent-cyan);
+    border-color: var(--border); border-bottom: 1px solid var(--bg-primary); margin-bottom: -1px;
+  }
+  .darwin-panel { padding: 16px 24px 32px; display: none; flex: 1; overflow: auto; }
+  .darwin-panel.active { display: block; }
+  .darwin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 18px; }
+  .darwin-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 8px; }
+  .darwin-table th, .darwin-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: left; }
+  .darwin-table th { font-size: 10px; text-transform: uppercase; color: var(--text-muted); }
+  .conflict-banner {
+    background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.4);
+    border-radius: 8px; padding: 12px; margin-bottom: 14px; font-size: 12px;
+  }
+  .holdings-view { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+  .holdings-view.hidden { display: none; }
   .onboard-badge { font-size: 10px; margin-left: 6px; color: var(--accent-amber); }
   .device-code-box { margin: 16px 0; line-height: 1.6; }
   .device-code {
@@ -272,8 +297,14 @@
     <div class="watchlist-chips" id="watchlist-chips"></div>
   </section>
 
+  <nav class="view-tabs" id="view-tabs">
+    <button type="button" class="view-tab active" data-view="holdings">Holdings</button>
+    <button type="button" class="view-tab" data-view="darwin">Darwin</button>
+  </nav>
+
   <section class="summary-strip" id="summary"></section>
 
+  <div class="holdings-view" id="holdings-view">
   <div class="toolbar">
     <input class="search" id="search" placeholder="Search ticker or company…" />
     <button class="filter-btn active" data-market="ALL">All</button>
@@ -307,6 +338,12 @@
       <div class="loading">Select a ticker</div>
     </aside>
   </div>
+  </div>
+
+  <section class="darwin-panel" id="darwin-panel">
+    <div class="loading" id="darwin-loading">Loading Darwin portfolio…</div>
+    <div id="darwin-content" style="display:none"></div>
+  </section>
 </div>
 
 <div class="modal-backdrop" id="modal-backdrop">
@@ -390,6 +427,7 @@ let sortKey = 'ticker';
 let sortAsc = true;
 let marketFilter = 'ALL';
 let needsWork = false;
+let activeView = 'holdings';
 
 function linkHtml(url, label, className = '') {
   if (!url) return label;
@@ -447,7 +485,80 @@ async function load() {
   renderSummary();
   renderWatchlist();
   renderTable();
+  renderDarwin();
   if (data.tickers.length) selectTicker(data.tickers[0].ticker);
+}
+
+function setView(view) {
+  activeView = view;
+  document.querySelectorAll('.view-tab').forEach(b => {
+    b.classList.toggle('active', b.dataset.view === view);
+  });
+  document.getElementById('holdings-view').classList.toggle('hidden', view !== 'holdings');
+  document.getElementById('darwin-panel').classList.toggle('active', view === 'darwin');
+  document.getElementById('summary').style.display = view === 'holdings' ? '' : 'none';
+  document.getElementById('watchlist-wrap').style.display =
+    view === 'holdings' && (data.watchlist || []).length ? 'block' : 'none';
+}
+
+function renderDarwin() {
+  const d = data.darwin;
+  const loading = document.getElementById('darwin-loading');
+  const content = document.getElementById('darwin-content');
+  if (!d) {
+    loading.textContent = 'Darwin portfolio not built. Run: python _system/scripts/build_darwin_portfolio.py';
+    content.style.display = 'none';
+    return;
+  }
+  loading.style.display = 'none';
+  content.style.display = 'block';
+  const champ = d.benchmarks?.champion || {};
+  const conflicts = d.conflicts || [];
+  content.innerHTML = `
+    <h2 style="font-size:18px;margin-bottom:6px">Darwin adaptive allocation</h2>
+    <p class="subhead" style="margin-bottom:14px">Paper portfolio · ${escapeHtml(d.generated_at || '')} · policy <span class="mono">${escapeHtml(d.policy_id || '—')}</span></p>
+    ${conflicts.length ? `<div class="conflict-banner"><strong>Marvin conflicts</strong><ul style="margin-top:8px;padding-left:18px">${conflicts.map(c => `<li>${escapeHtml(c.ticker)}: ${escapeHtml(c.reason || '')} (${c.weight_pct || '?'}%)</li>`).join('')}</ul></div>` : ''}
+    <div class="darwin-grid">
+      <div class="summary-card"><div class="label">Regime</div><div class="value" style="font-size:16px">${escapeHtml(d.regime || '—')}</div><div class="sub">${escapeHtml(d.rebalance_frequency || '')} rebalance</div></div>
+      <div class="summary-card"><div class="label">Turnover</div><div class="value" style="font-size:16px">${d.turnover_used_pct ?? '—'}%</div><div class="sub">budget ${d.turnover_budget_pct ?? 15}%</div></div>
+      <div class="summary-card"><div class="label">Sharpe (OOS)</div><div class="value" style="font-size:16px">${champ.sharpe_annualized ?? '—'}</div><div class="sub">champion backtest</div></div>
+      <div class="summary-card"><div class="label">Cumulative</div><div class="value" style="font-size:16px">${champ.cumulative_return != null ? (champ.cumulative_return * 100).toFixed(1) + '%' : '—'}</div><div class="sub">log compounding</div></div>
+    </div>
+    <div class="detail-section">
+      <h3>Target weights</h3>
+      <table class="darwin-table">
+        <thead><tr><th>Ticker</th><th>Weight</th><th>Δ</th><th>Stance</th><th>IRR</th><th>Trade?</th></tr></thead>
+        <tbody>${(d.weights || []).map(w => `<tr>
+          <td class="mono ticker-cell">${escapeHtml(w.ticker)}</td>
+          <td class="mono">${w.weight_pct}%</td>
+          <td class="mono">${w.delta >= 0 ? '+' : ''}${(w.delta * 100).toFixed(1)}%</td>
+          <td><span class="badge ${STANCE_BADGE[w.stance] || 'badge-warn'}">${escapeHtml(w.stance || '—')}</span></td>
+          <td class="mono">${w.irr_base_pct != null ? w.irr_base_pct + '%' : '—'}</td>
+          <td>${w.trade_suggested ? '<span class="badge badge-warn">review</span>' : '—'}</td>
+        </tr>`).join('')}</tbody>
+      </table>
+    </div>
+    <div class="detail-section">
+      <h3>Benchmarks (walk-forward)</h3>
+      <table class="darwin-table">
+        <thead><tr><th>Policy</th><th>Sharpe</th><th>Cum ret</th><th>Avg turnover</th></tr></thead>
+        <tbody>${['equal_weight','irr_ranked','genetic','ppo','champion'].map(k => {
+          const b = d.benchmarks?.[k] || {};
+          if (b.error) return '';
+          return `<tr><td class="mono">${k}</td><td>${b.sharpe_annualized ?? '—'}</td><td>${b.cumulative_return != null ? (b.cumulative_return*100).toFixed(1)+'%' : '—'}</td><td>${b.avg_turnover_one_way != null ? (b.avg_turnover_one_way*100).toFixed(1)+'%' : '—'}</td></tr>`;
+        }).join('')}</tbody>
+      </table>
+    </div>
+    <div class="detail-section">
+      <h3>Factor attribution</h3>
+      <ul class="dev-list">${(d.attribution || []).slice(0, 8).map(a => `<li><div class="dev-label">${escapeHtml(a.factor)}</div><div class="dev-date mono">shap ${a.shap}</div></li>`).join('')}</ul>
+    </div>
+    <div class="detail-section">
+      <h3>Evolution log</h3>
+      <ul class="dev-list">${(d.evolution_log || []).map(e => `<li><div class="dev-date">${escapeHtml(e.date || '')}</div><div class="dev-label">${escapeHtml(e.note || e.event || '')}</div></li>`).join('')}</ul>
+    </div>
+    <p class="form-hint" style="margin-top:16px">${escapeHtml(d.disclaimer || '')}</p>
+  `;
 }
 
 function renderWatchlist() {
@@ -806,6 +917,10 @@ function startDevicePoll(intervalSec) {
 }
 
 document.getElementById('device-cancel').addEventListener('click', closeDeviceModal);
+
+document.querySelectorAll('.view-tab').forEach(btn => {
+  btn.addEventListener('click', () => setView(btn.dataset.view));
+});
 </script>
 </body>
 </html>

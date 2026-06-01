@@ -1,0 +1,100 @@
+"""Apply mandate constraints to raw weights."""
+from __future__ import annotations
+
+import math
+
+
+def apply_constraints(
+    tickers: list[str],
+    raw: dict[str, float],
+    prev: dict[str, float] | None,
+    mandate: dict,
+    falsifier_counts: dict[str, int] | None = None,
+) -> tuple[dict[str, float], dict]:
+    m = mandate.get("mandate") or mandate
+    max_w = m.get("max_weight_pct", 18.0) / 100.0
+    min_w = m.get("min_weight_pct", 2.0) / 100.0
+    max_names = m.get("max_names", 15)
+    min_names = m.get("min_names", 8)
+    max_delta = m.get("max_abs_weight_change_pct_per_rebalance", 3.0) / 100.0
+    max_turn = m.get("max_one_way_turnover_pct_per_rebalance", 15.0) / 100.0
+
+    falsifier_counts = falsifier_counts or {}
+    scores = {}
+    for t in tickers:
+        w = max(raw.get(t, 0.0), 0.0)
+        if falsifier_counts.get(t, 0) > 0 and m.get("falsifier_exit"):
+            w *= 0.25
+        scores[t] = w
+
+    ranked = sorted(scores.items(), key=lambda x: -x[1])
+    keep = [t for t, s in ranked if s > 1e-9][:max_names]
+    if len(keep) < min_names:
+        keep = [t for t, _ in ranked[: min(min_names, len(tickers))]]
+
+    total = sum(scores.get(t, 0.0) for t in keep) or 1.0
+    out = {t: scores.get(t, 0.0) / total for t in keep}
+    for _ in range(3):
+        for t in list(out):
+            out[t] = min(max(out.get(t, 0.0), 0.0), max_w)
+        s = sum(out.values()) or 1.0
+        out = {t: out[t] / s for t in out}
+
+    for t in list(out):
+        if out[t] < min_w and len(out) > min_names:
+            del out[t]
+    s = sum(out.values()) or 1.0
+    out = {t: out[t] / s for t in out}
+
+    notes: dict = {"trimmed_names": len(tickers) - len(out)}
+    if prev:
+        for t in list(out):
+            p = prev.get(t, 0.0)
+            lo, hi = p - max_delta, p + max_delta
+            if p > 0:
+                out[t] = min(max(out[t], lo), hi)
+        s = sum(out.values()) or 1.0
+        out = {t: out[t] / s for t in out}
+        turnover = 0.5 * sum(abs(out.get(t, 0.0) - prev.get(t, 0.0)) for t in set(out) | set(prev))
+        notes["turnover_one_way"] = round(turnover, 4)
+        if turnover > max_turn:
+            alpha = max_turn / turnover
+            blended = {}
+            for t in out:
+                blended[t] = prev.get(t, 0.0) * (1 - alpha) + out[t] * alpha
+            s = sum(blended.values()) or 1.0
+            out = {t: blended[t] / s for t in blended}
+            notes["turnover_capped"] = True
+            # Re-apply cap after blend
+            ranked2 = sorted(out.items(), key=lambda x: -x[1])
+            out = dict(ranked2[:max_names])
+            s = sum(out.values()) or 1.0
+            out = {t: out[t] / s for t in out}
+
+    return out, notes
+
+
+def weights_to_list(
+    weights: dict[str, float],
+    features_by_ticker: dict[str, dict],
+    prev: dict[str, float] | None,
+) -> list[dict]:
+    prev = prev or {}
+    rows = []
+    for t, w in sorted(weights.items(), key=lambda x: -x[1]):
+        f = features_by_ticker.get(t, {})
+        cl = f.get("classification") or {}
+        rows.append(
+            {
+                "ticker": t,
+                "company": f.get("company", t),
+                "weight": round(w, 4),
+                "weight_pct": round(w * 100, 2),
+                "delta": round(w - prev.get(t, 0.0), 4),
+                "stance": cl.get("stance"),
+                "irr_base_pct": f.get("irr_base_pct"),
+                "falsifier_count": f.get("falsifier_count", 0),
+                "trade_suggested": abs(w - prev.get(t, 0.0)) >= 0.005,
+            }
+        )
+    return rows

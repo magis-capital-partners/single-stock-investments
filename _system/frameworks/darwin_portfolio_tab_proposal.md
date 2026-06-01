@@ -1,6 +1,10 @@
 # Darwin tab — proposal for adaptive portfolio layer on Single Stock Dashboard
 
-**Status:** Draft for review (2026-06-01)  
+**Status:** Implemented (phases 0–3) — 2026-06-01
+
+Run: `pip install -r _system/scripts/requirements-darwin.txt && python3 _system/scripts/build_darwin_portfolio.py`
+
+Dashboard: **Holdings | Darwin** tab on [single-stock-investments](https://goldmandrew.github.io/single-stock-investments/).  
 **Goal:** Replicate the *spirit* of [Darwin AI Ventures](https://darwinaiventures.com/) — adaptive, neural, reinforcement-learning-aware portfolio construction — using **our compounded ticker knowledge** (Marvin deep dives, filings, Lawrence IRR, falsifiers) rather than black-box high-frequency trading. Target **excess return with low turnover** (annual or quarterly rebalance, not daily churn).
 
 **User source:** `Darwin AI Investments - 1Q26.pdf` (place copy at `_system/reference/quant-evolution/Darwin_AI_Investments_1Q26.pdf`). This proposal is informed by the public website, academic/industry RL-factor literature, SFI complexity economics, and the existing `single-stock-investments` stack — **not** by reproducing proprietary Darwin model weights.
