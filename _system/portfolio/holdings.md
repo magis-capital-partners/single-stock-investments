@@ -20,7 +20,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-06-01.
 | GOOGL | GOOGL/ | Alphabet Inc. | US | 2026-05-31 | 2026-06-01 | compounder | hold |
 | ICE | ICE/ | Intercontinental Exchange | US | 2026-05-31 | 2026-06-01 | croupier | hold |
 | KEWL | KEWL/ | Keweenaw Land Association | US | 2026-05-31 | 2026-06-01 | optionality | watch |
-| LSEG | LSEG/ | London Stock Exchange Group | US | — | — | unknown | watch |
+| LSEG | LSEG/ | London Stock Exchange Group | US | 2026-06-01 | 2026-06-01 | unknown | watch |
 | META | META/ | Meta Platforms Inc | US | 2026-06-01 | 2026-06-01 | unknown | watch |
 | MSB | MSB/ | Mesabi Trust | US | 2026-05-31 | 2026-06-01 | optionality | watch |
 | OTCM | OTCM/ | OTC Markets Group | US | 2026-05-31 | 2026-06-01 | croupier | watch |
@@ -29,6 +29,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-06-01.
 | SNOW | SNOW/ | Snowflake Inc | US | 2026-05-31 | 2026-06-01 | platform | watch |
 | SPGI | SPGI/ | S&P Global | US | 2026-05-31 | 2026-06-01 | croupier | hold |
 | TEQ.ST | TEQ.ST/ | Teqnion AB | SE | 2026-05-31 | 2026-06-01 | serial_acquirer | hold |
+| TPL | TPL/ | Texas Pacific Land Corporation | US | — | — | unknown | watch |
 | WBI | WBI/ | WaterBridge Infrastructure | US | 2026-05-31 | 2026-06-01 | infrastructure | watch |
 
-**24 holdings total.** Registry: `_system/portfolio/registry.json`
+**25 holdings total.** Registry: `_system/portfolio/registry.json`

@@ -47,4 +47,5 @@ One row per adversarial or consistency re-pass. Append via `milly_repass.py` or 
 | 2026-05-29 | TEQ.ST | standard_batch | OK | batch pass |
 | 2026-05-29 | WBI | standard_batch | OK | batch pass |
 | 2026-05-29 | SNOW | standard_batch | OK | SNOW onboard |
+| 2026-06-01 | META | standard_batch | OK | marvin_cloud_refresh |
 | 2026-06-01 | LSEG | standard_batch | OK | marvin_cloud_refresh |
