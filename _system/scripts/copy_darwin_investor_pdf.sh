@@ -2,32 +2,21 @@
 # Copy Darwin 1Q26 PDF into research vault (Linux/macOS/CI).
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
-DEST="$ROOT/_system/reference/quant-evolution/Darwin_AI_Investments_1Q26.pdf"
-INCOMING="$ROOT/_system/reference/quant-evolution/INCOMING"
+export PYTHONPATH="${ROOT}/_system/scripts${PYTHONPATH:+:$PYTHONPATH}"
+python3 - <<'PY'
+from darwin_pdf_paths import DEST, ensure_vault_copy, find_darwin_pdf
 
-if [[ -n "${DARWIN_PDF_SOURCE:-}" && -f "$DARWIN_PDF_SOURCE" ]]; then
-  cp "$DARWIN_PDF_SOURCE" "$DEST"
-  echo "Copied from DARWIN_PDF_SOURCE → $DEST"
-  exit 0
-fi
-
-CANDIDATES=(
-  "$INCOMING/Darwin AI Investments - 1Q26.pdf"
-  "$INCOMING/Darwin_AI_Investments_1Q26.pdf"
-  "/mnt/c/Users/werdn/Downloads/Darwin AI Investments - 1Q26.pdf"
-  "$HOME/Downloads/Darwin AI Investments - 1Q26.pdf"
-)
-
-for src in "${CANDIDATES[@]}"; do
-  if [[ -f "$src" ]]; then
-    mkdir -p "$(dirname "$DEST")"
-    cp "$src" "$DEST"
-    echo "Copied $src → $DEST"
-    exit 0
-  fi
-done
-
-echo "ERROR: Darwin PDF not found." >&2
-echo "Drop file at: $INCOMING/Darwin AI Investments - 1Q26.pdf" >&2
-echo "Or set: export DARWIN_PDF_SOURCE=/path/to/file.pdf" >&2
-exit 1
+src = find_darwin_pdf()
+if src is None:
+    raise SystemExit(
+        "ERROR: Darwin PDF not found.\n"
+        "  Drop at: _system/frameworks/Darwin AI Investments - 1Q26.pdf\n"
+        "  Or: _system/reference/quant-evolution/INCOMING/\n"
+        "  Or: export DARWIN_PDF_SOURCE=/path/to/file.pdf"
+    )
+dest = ensure_vault_copy()
+if src.resolve() == dest.resolve():
+    print(f"Already at vault: {dest}")
+else:
+    print(f"Copied {src} → {dest}")
+PY

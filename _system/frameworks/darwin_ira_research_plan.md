@@ -11,7 +11,7 @@
 
 | Step | Action | Output path |
 |------|--------|-------------|
-| 1 | **Drop PDF in repo** at `_system/reference/quant-evolution/INCOMING/` **or** run `copy_darwin_investor_pdf.ps1` on Windows | `Darwin_AI_Investments_1Q26.pdf` |
+| 1 | **Drop PDF in repo** at `_system/frameworks/` (recommended), `quant-evolution/INCOMING/`, or run `copy_darwin_investor_pdf.ps1` | `Darwin_AI_Investments_1Q26.pdf` |
 | 2 | `bash _system/scripts/copy_darwin_investor_pdf.sh` (from repo root) | copies from INCOMING or `DARWIN_PDF_SOURCE` |
 | 3 | `pip install pypdf && python3 _system/scripts/ingest_darwin_investor_pdf.py` | `darwin_source_notes.md` + extract |
 | 4 | Map PDF claims → `darwin_mandate.json` `source_overrides` | Human review |

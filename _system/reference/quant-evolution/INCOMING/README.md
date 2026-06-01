@@ -1,8 +1,10 @@
-# Drop Darwin PDF here
+# Drop Darwin PDF here (or in `_system/frameworks/`)
 
 Copy or save:
 
 `Darwin AI Investments - 1Q26.pdf`
+
+**Also accepted:** `_system/frameworks/Darwin AI Investments - 1Q26.pdf` (or any `*Darwin*.pdf` in frameworks).
 
 Then from repo root:
 

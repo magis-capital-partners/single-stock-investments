@@ -6,15 +6,19 @@
 - **Reinforcement learning** on complex financial markets
 - Private; offerings only via confidential documents to qualified investors
 
-**Local investor letter (run on your PC):**
+**Local investor letter:**
 
-```powershell
-powershell -ExecutionPolicy Bypass -File _system/scripts/copy_darwin_investor_pdf.ps1
+Drop `Darwin AI Investments - 1Q26.pdf` in **`_system/frameworks/`** (recommended), `INCOMING/`, or Downloads, then:
+
+```bash
+bash _system/scripts/copy_darwin_investor_pdf.sh
 pip install pypdf
 python3 _system/scripts/ingest_darwin_investor_pdf.py
 ```
 
-Saves to `Darwin_AI_Investments_1Q26.pdf` (gitignored). Cloud agents cannot read `C:\Users\werdn\Downloads\`.
+Windows: `copy_darwin_investor_pdf.ps1` checks frameworks before Downloads.
+
+Vault copy: `Darwin_AI_Investments_1Q26.pdf` (gitignored under `quant-evolution/`).
 
 ## Claims extracted (fill from PDF)
 

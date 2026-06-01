@@ -8,14 +8,18 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-PDF = ROOT / "_system" / "reference" / "quant-evolution" / "Darwin_AI_Investments_1Q26.pdf"
+sys.path.insert(0, str(ROOT / "_system" / "scripts"))
+from darwin_pdf_paths import DEST as PDF, ensure_vault_copy  # noqa: E402
 OUT = ROOT / "_system" / "reference" / "quant-evolution" / "darwin_source_notes.md"
 EXTRACT = ROOT / "_system" / "reference" / "quant-evolution" / "Darwin_AI_Investments_1Q26_extract.txt"
 
 
 def extract_text() -> str:
-    if not PDF.exists():
-        print(f"Missing PDF. Run copy_darwin_investor_pdf.ps1 first.\n  Expected: {PDF}", file=sys.stderr)
+    try:
+        ensure_vault_copy()
+    except FileNotFoundError as e:
+        print(str(e), file=sys.stderr)
+        print("Run: bash _system/scripts/copy_darwin_investor_pdf.sh", file=sys.stderr)
         sys.exit(1)
     try:
         import pypdf  # type: ignore
