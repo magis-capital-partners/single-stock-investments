@@ -9,11 +9,13 @@
 | **Archetype** (Stahl) | holding_co |
 | **Moat** (Munger) | stable |
 | **Dhando** (Pabrai) | partial |
-| **Stance** | hold |
+| **Stance** | accumulate |
 | **Cycle** | - |
-| **Implied 10yr IRR** (Lawrence) | 21.9% (SOTP catalyst IRR (5yr)) |
+| **Implied 10yr IRR** (base) | 21.9% (base) |
 | **IRR method** | yield_curve |
 | **Lawrence bucket** | other |
+| **Payoff lens** | — |
+| **MOI bucket** | — |
 
 **Deep dive:** `FRMO/research/deep_dive_2026-05-27.md` (filing-grounded refresh)
 

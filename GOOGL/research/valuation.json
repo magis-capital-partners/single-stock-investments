@@ -143,12 +143,9 @@
     }
   },
   "implied_return": {
-    "base_pct": 1.6,
-    "falsifier_adjusted_pct": 1.6,
-    "theory_implied_pct": 1.6,
-    "lawrence_legacy_pct": 2.1,
-    "label": "10yr IRR (falsifier-adjusted)",
-    "display": "1.6% (falsifier-adjusted)"
+    "base_pct": 2.1,
+    "label": "10yr IRR",
+    "display": "2.1% (base)"
   },
   "stance_proposal": {
     "suggested": "watch",
@@ -280,30 +277,6 @@
   },
   "overlay_results": [
     {
-      "case": "Theory-implied",
-      "method": "segment-derived growth",
-      "key_inputs": "Y1-5 10.4% Y6-10 7.4% (segment_build owner-cash weighted blend (growth only; exit from scenarios.base))",
-      "return_pct": 1.6,
-      "stance_gate": false,
-      "notes": "Bottom-up from segment_build"
-    },
-    {
-      "case": "Falsifier-adjusted",
-      "method": "theory + filing falsifiers",
-      "key_inputs": "Y1-5 10.4% Y6-10 7.4%; 0 triggered",
-      "return_pct": 1.6,
-      "stance_gate": true,
-      "notes": "Primary IRR for display and stance"
-    },
-    {
-      "case": "Lawrence legacy",
-      "method": "historical scenarios.base",
-      "key_inputs": "Pre-theory-derivation ledger",
-      "return_pct": 2.1,
-      "stance_gate": false,
-      "notes": "Reference only"
-    },
-    {
       "case": "AI inflection",
       "method": "full (normalized FCF)",
       "key_inputs": "FCF\u2080=$8.0 g1=18% g2=10% exit=28\u00d7",
@@ -317,21 +290,6 @@
       "key_inputs": "OCF 144B \u2212 capex 185B",
       "return_pct": null,
       "display": "FCF ~$-3.3/sh (not 10yr IRR)",
-      "stance_gate": false
-    },
-    {
-      "case": "Segment sum",
-      "method": "segment @ 10%",
-      "key_inputs": "PV $163.7/sh vs P\u2080 $386.0",
-      "return_pct": null,
-      "display": "$163.7/sh",
-      "stance_gate": false
-    },
-    {
-      "case": "Segment implied",
-      "method": "reverse DCF (segments)",
-      "key_inputs": "Google Services (Search, YouTube, Play, Android) + Google Cloud + drags; options at base zero",
-      "return_pct": 0.01,
       "stance_gate": false
     }
   ],

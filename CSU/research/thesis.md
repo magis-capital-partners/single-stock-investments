@@ -9,11 +9,13 @@
 | **Archetype** (Stahl) | compounder |
 | **Moat** (Munger) | stable |
 | **Dhando** (Pabrai) | partial |
-| **Stance** | core |
+| **Stance** | hold |
 | **Cycle** | - |
-| **Implied 10yr IRR** (Lawrence) | 16.0% (base) |
+| **Implied 10yr IRR** (base) | 16.0% (base) |
 | **IRR method** | full |
 | **Lawrence bucket** | pricing_power |
+| **Payoff lens** | — |
+| **MOI bucket** | — |
 
 **Deep dive:** `research/deep_dive_2026-05-27.md`
 

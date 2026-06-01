@@ -29,8 +29,8 @@
     "floor_metric": "nav_per_share",
     "floor_value": 106.2,
     "floor_value_note": "Conservative asset floor: Q1 2026 cash $3.59/sh + NRA acquisition comp $64.2/sh (royalty asset mark); excludes surface and producing PV to avoid double-count with segment build",
-    "primary_metric": "falsifier_adjusted",
-    "primary_label": "10yr IRR (falsifier-adjusted)",
+    "primary_metric": "lawrence_base",
+    "primary_label": "10yr IRR",
     "primary_return_pct": -1.0,
     "overlay_nav_per_share": 210.5,
     "overlay_nav_note": "Segment operating PV $162 + cash $3.6 + undeveloped NRA option $16 + surface $32 [Assumption]; price $393 embeds ~87% premium to overlay base",
@@ -266,11 +266,8 @@
   },
   "implied_return": {
     "base_pct": -1.0,
-    "falsifier_adjusted_pct": -1.0,
-    "theory_implied_pct": -1.0,
-    "lawrence_legacy_pct": -1.0,
-    "label": "10yr IRR (falsifier-adjusted)",
-    "display": "-1.0% (falsifier-adjusted)"
+    "label": "10yr IRR",
+    "display": "-1.0% (base)"
   },
   "stance_proposal": {
     "suggested": "watch",
@@ -394,47 +391,7 @@
       "falsifier_vs_theory_y1_5_pp": 0.0
     }
   },
-  "overlay_results": [
-    {
-      "case": "Theory-implied",
-      "method": "segment-derived growth",
-      "key_inputs": "Y1-5 4.8% Y6-10 3.4% (segment_build owner-cash weighted blend (growth only; exit from scenarios.base))",
-      "return_pct": -1.0,
-      "stance_gate": false,
-      "notes": "Bottom-up from segment_build"
-    },
-    {
-      "case": "Falsifier-adjusted",
-      "method": "theory + filing falsifiers",
-      "key_inputs": "Y1-5 4.8% Y6-10 3.4%; 0 triggered",
-      "return_pct": -1.0,
-      "stance_gate": true,
-      "notes": "Primary IRR for display and stance"
-    },
-    {
-      "case": "Lawrence legacy",
-      "method": "historical scenarios.base",
-      "key_inputs": "Pre-theory-derivation ledger",
-      "return_pct": -1.0,
-      "stance_gate": false,
-      "notes": "Reference only"
-    },
-    {
-      "case": "Segment sum",
-      "method": "segment @ 10%",
-      "key_inputs": "PV $161.9/sh vs P\u2080 $393.0",
-      "return_pct": null,
-      "display": "$161.9/sh",
-      "stance_gate": false
-    },
-    {
-      "case": "Segment implied",
-      "method": "reverse DCF (segments)",
-      "key_inputs": "Land & Resource (royalties + easements + land sales) + Water Services and Operations (TPWR) + drags; options at base zero",
-      "return_pct": -0.84,
-      "stance_gate": false
-    }
-  ],
+  "overlay_results": [],
   "results_lawrence_legacy": {
     "bear": {
       "return_pct": -5.4

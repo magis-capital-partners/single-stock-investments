@@ -9,11 +9,13 @@
 | **Archetype** (Stahl) | serial_acquirer |
 | **Moat** (Munger) | stable |
 | **Dhando** (Pabrai) | partial |
-| **Stance** | hold |
+| **Stance** | watch |
 | **Cycle** | - |
-| **Implied 10yr IRR** (Lawrence) | 13.7% (base) |
+| **Implied 10yr IRR** (base) | 13.7% (base) |
 | **IRR method** | full |
 | **Lawrence bucket** | pricing_power |
+| **Payoff lens** | — |
+| **MOI bucket** | — |
 
 ## One-line thesis
 

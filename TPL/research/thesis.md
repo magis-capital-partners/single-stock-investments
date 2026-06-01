@@ -11,9 +11,11 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | mid |
-| **Implied 10yr IRR** (falsifier-adjusted) | -1.0% (falsifier-adjusted) |
+| **Implied 10yr IRR** (base) | -1.0% (base) |
 | **IRR method** | full |
 | **Lawrence bucket** | pricing_power |
+| **Payoff lens** | — |
+| **MOI bucket** | — |
 
 ## One-line thesis
 
