@@ -1,13 +1,15 @@
 # John Mihaljevic — Manual of Ideas
 
-**Primary:** `Manual-of-Ideas-2nd-Edition.pdf` (Wiley, ISBN 978-1-119-27032-4)  
-**Workspace extract:** `Manual-of-Ideas-chapter-reference.txt` — chapter map + key takeaways for Marvin agents  
-**Framework:** `_system/frameworks/moi_lens.md`, `idea_funnel.md`, `special_situation_lens.md`, `equity_stub_valuation.md`
+**Primary (licensed):** `Manual-of-Ideas-1st-Edition-2013.epub` or `Manual-of-Ideas-2nd-Edition.pdf`  
+**Full text (after EPUB install):** `Manual-of-Ideas-full-text.txt`  
+**Workspace extract:** `Manual-of-Ideas-chapter-reference.txt` — chapter map + key takeaways  
+**Comprehensive rules:** `_system/frameworks/moi_company_evaluation.md`  
+**Framework pointers:** `moi_lens.md`, `idea_funnel.md`, `special_situation_lens.md`, `equity_stub_valuation.md`
 
-## Install licensed PDF
+## Install licensed EPUB or PDF
 
 1. Purchase from [Wiley](https://www.wiley.com/en-us/The+Manual+of+Ideas%3A+The+Proven+Framework+for+Finding+the+Best+Value+Investments%2C+2nd+Edition-p-9781119270324) or your retailer.
-2. Copy or symlink to this folder **or** set `MOI_PDF_SOURCE` to the file path.
+2. Copy to `.source/` **or** set `MOI_EPUB_SOURCE` / `MOI_PDF_SOURCE`.
 3. Run:
 
 ```bash
@@ -15,7 +17,7 @@ python _system/scripts/download_moi_book.py
 python _system/scripts/build_wisdom_manifest.py
 ```
 
-The script copies the licensed file to `Manual-of-Ideas-2nd-Edition.pdf`. If no source is found, it builds `Manual-of-Ideas-Marvin-Reference.pdf` from the chapter extract (not a substitute for the book).
+EPUB install also writes `Manual-of-Ideas-full-text.txt` for agent full-text read. If no source is found, the script builds `Manual-of-Ideas-Marvin-Reference.pdf` from the chapter extract (not a substitute for the book).
 
 ## Apply in Marvin
 
