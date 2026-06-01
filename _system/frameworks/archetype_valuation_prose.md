@@ -145,6 +145,7 @@ Read `archetype_models.json` for operating prompts. Below is **how to write the 
 | **Default method** | `yield_curve` — **dated payoff**, not ten-year DCF on parent GAAP earnings |
 | **Section title** | `### Sum of the parts (how we get to payoff per share)` |
 | **Lead metric** | Book or look-through value + **line-by-line uplifts**; **current book estimate** vs filed book when `book_estimate.json` exists |
+| **Uplift % rule** | Every opaque sleeve (Investment A, fund NAV): **bottom-up** holding table → dollars → blended % is **output** only (`holdco_uplift_explanation.md`) |
 | **Bridge story** | "We add carrying value, listed stakes, and dated catalysts to a payoff price in year N, then annualize versus price today. Separately, roll forward filed book for today's discount to economic book." |
 | **Arithmetic steps** | Running sum table: book + line 1 + line 2 = payoff; then `(payoff ÷ price)^(1/years) − 1` in words |
 | **Avoid** | Parent P/E or consolidated EPS as the only anchor |

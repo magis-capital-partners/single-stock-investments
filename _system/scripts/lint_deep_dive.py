@@ -73,6 +73,16 @@ MIAX_FILING_MISALIGN = re.compile(
     r"13,917,000.*51\.42|51\.42.*13,917|270,563.*51\.42|fair value.*51\.42.*2026-05",
     re.IGNORECASE,
 )
+BARE_UPLIFT_PCT = re.compile(
+    r"(?:\d+\.?\d*\s*[x×]\s*\d+\s*%|\d+\s*%\s*higher\s+than\s+GAAP|"
+    r"Economic value\s+\d+\s*%\s*higher|Incremental on book:\s*\d+\.\d+\s*x\s*\d+\s*%)",
+    re.IGNORECASE,
+)
+INVESTMENT_A_3G = re.compile(r"\*\*3g-5\.\s*Investment A", re.IGNORECASE)
+BOTTOM_UP_UPLIFT = re.compile(
+    r"bottom-up|Bottom-up|derived blended|holdco_uplift|Why the model uses",
+    re.IGNORECASE,
+)
 
 
 def ticker_from_dive_path(path: Path) -> str | None:
@@ -215,6 +225,24 @@ def lint_file(path: Path, *, legacy: bool, strict: bool) -> tuple[list[str], lis
             f"{rel}: MIAX fair value tied to post-quarter price (~$51.42 / May 2026) — "
             "use measurement-date price ~$42.60 on 2026-02-27 (mark_date_alignment.md)"
         )
+
+    if BARE_UPLIFT_PCT.search(text):
+        has_bottom_up = BOTTOM_UP_UPLIFT.search(text)
+        val = load_valuation(ticker) if ticker else {}
+        sotp = ((val.get("scenarios") or {}).get("base") or {}).get("sotp_build") or {}
+        ledger = sotp.get("assumption_ledger") or {}
+        ia = ledger.get("investment_a_lookthrough") or {}
+        has_components = bool(ia.get("components"))
+        if not has_bottom_up and not has_components:
+            errors.append(
+                f"{rel}: bare % uplift on opaque sleeve (e.g. 64% higher than GAAP) — "
+                "require bottom-up 3g sub-table per holdco_uplift_explanation.md"
+            )
+        elif has_components and INVESTMENT_A_3G.search(text) and not has_bottom_up:
+            errors.append(
+                f"{rel}: Investment A 3g-5 missing bottom-up sub-table — "
+                "valuation.json has components[]; render per holdco_uplift_explanation.md"
+            )
 
     em_count = body.count(EM_DASH)
     if em_count > EM_DASH_MAX:

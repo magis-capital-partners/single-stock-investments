@@ -9,7 +9,7 @@ SCRIPTS := _system/scripts
 
 TICKER ?=
 
-.PHONY: research-check research-check-all evidence milly-repass book-estimate book-estimate-all short-scan hk-scan hk-cross-check-all hk-extract-refresh third-party-scan-all cross-check-all
+.PHONY: research-check research-check-all evidence milly-repass book-estimate book-estimate-all holdco-uplift short-scan hk-scan hk-cross-check-all hk-extract-refresh third-party-scan-all cross-check-all
 
 research-check:
 ifndef TICKER
@@ -47,6 +47,13 @@ endif
 book-estimate-all:
 	$(PYTHON) $(SCRIPTS)/current_book_estimate.py --all --write
 	@echo OK: book-estimate-all
+
+holdco-uplift:
+ifndef TICKER
+	$(error Set TICKER= e.g. make holdco-uplift TICKER=FRMO)
+endif
+	$(PYTHON) $(SCRIPTS)/holdco_uplift_build.py $(TICKER) --write
+	@echo OK: $(TICKER) holdco-uplift
 
 short-scan:
 	$(PYTHON) $(SCRIPTS)/short_scan_batch.py

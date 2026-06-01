@@ -69,6 +69,7 @@
 | **Returns statement** | One sentence; = exec summary % |
 | **Total synthesis IRR (all sources)** | **Capstone** — weighted blend of filings, segments, scenarios, third party, qualitative; last block in §11 |
 | SOTP / look-through tables | If `holding_co` / `optionality` |
+| **3g uplift sub-tables** | Opaque sleeves: bottom-up holding paths per `holdco_uplift_explanation.md`; blended % is output only |
 | **Segment cash-flow build** | If `valuation_overlay: segment_cashflow` (GOOGL-style) |
 | **Option scan table** | **Every dive** — in §6; options sized in §11 or `nav_overlay` |
 | **Optionality overlay** | If `valuation_mode: optionality` or material options in scan |
