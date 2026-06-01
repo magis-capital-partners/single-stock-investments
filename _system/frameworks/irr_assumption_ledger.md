@@ -5,7 +5,7 @@
 **Placement:** `## Valuation & IRR (assumption ledger)` — **last major section**, after `## Risks & inversion`, **before** `## Classification`.  
 **Not** inside Business & moat.
 
-**Companion files:** `lawrence_irr.md` § F · `deep_dive_structure.md` · `archetype_valuation_prose.md` · `{TICKER}/research/valuation.json`
+**Companion files:** `lawrence_irr.md` § F · `deep_dive_structure.md` · `archetype_valuation_prose.md` · `growth_explanation_stress_test.md` · `{TICKER}/research/valuation.json`
 
 **Readable labels:** Assumption ledger rows and bridge "Main assumptions" use **plain English** (no `P₀`, `g1`, `FCF₀`). Archetype-specific examples: `archetype_valuation_prose.md`.
 
@@ -34,6 +34,22 @@
 
 {Method-specific buildup — every row must have a source or **[Assumption]** / **[HUMAN REVIEW]**}
 
+**Growth rows (3–4):** Source column must cite **`Growth theory: {theory_label}`** plus filing or **[Assumption]**. If no theory, mark **[HUMAN REVIEW]** minimum.
+
+### Growth explanation stress test (Popper / Deutsch)
+
+After the assumption ledger, before IRR arithmetic. Spec: `growth_explanation_stress_test.md`.
+
+| Required block | Content |
+|----------------|---------|
+| Explanatory theory | Mechanism table: causal chain, filing evidence, hard-to-vary |
+| Risky predictions | At least one quantitative near-term test |
+| Falsifiers | Observations that force cut or drop of the growth rate |
+| Ad hoc rescue watch | Adjustments refused without new theory |
+| Deutsch checks | Hard to vary, reach, falsifiable, not instrumentalist |
+
+Store mirror in `valuation.json` → `growth_explanation` when method is `full`, `scenario`, or segment overlay.
+
 ### IRR arithmetic (show your work)
 
 {Numbered steps; running sum for SOTP; formula for scenario/full}
@@ -60,6 +76,7 @@
 4. **Multiples are results, not inputs.** e.g. `payoff ÷ book = 2.1×` only **after** the sum-of-parts.
 5. **Tie-out slack** — if sub-lines do not sum to the model payoff, show a **Tie-out** row (do not hide the gap).
 6. **Bear / bull** — at least one sentence each: what changes vs base (payoff, growth, or owner cash).
+7. **Growth theory** — rows 3–4 (growth years 1–5 / 6–10) must link to `### Growth explanation stress test`; no unexplained CAGR.
 
 ---
 

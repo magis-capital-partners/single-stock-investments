@@ -64,6 +64,22 @@ When dive mentions options, hidden assets, undeveloped reserves, Other Bets, Rea
 
 YAML: `option_coverage: complete | partial | incomplete | n/a`
 
+### 2d. Growth explanation (Popper / Deutsch)
+
+When dive uses `method: full`, `scenario`, or `segment_cashflow` overlay (not `yield_curve`-only holdco with no growth rows):
+
+| Check | Severity if failed |
+|-------|-------------------|
+| **`### Growth explanation stress test`** in Valuation & IRR (after ledger, before IRR arithmetic) | **Inference risk** |
+| Growth ledger rows cite `Growth theory:` label | **Inference risk** per orphan row |
+| At least one **risky prediction** and one **falsifier** | **Inference risk** |
+| Theory is easy-to-vary ("quality compounder grows X%") | **Inference risk** |
+| Instrumentalist-only defense (growth = reverse-DCF at price) | **Inference risk** |
+| Growth > filing run-rate + 300 bp with no falsifiers | **Inference risk** |
+| `valuation.json` → `growth_explanation` present when growth material | **Warn** if missing |
+
+YAML: `growth_explanation: complete | partial | incomplete | n/a`
+
 ### 2. Internal consistency
 
 | Check | Tool |
@@ -161,6 +177,7 @@ re_pass: false
 | `valuation_staleness` | pass / warn / fail — FCF₀ period vs capex guide (`ai_infrastructure_valuation.md`) |
 | `ai_coverage` | n/a / partial / complete — AI overlay completeness |
 | `option_coverage` | n/a / complete / partial / incomplete — option scan + treatment (`option_treatment.md`) |
+| `growth_explanation` | n/a / complete / partial / incomplete — Popper/Deutsch growth stress test (`growth_explanation_stress_test.md`) |
 
 After Marvin fixes: set `block_final: false`, add **Resolved in dive** section, run `milly_repass.py {TICKER}`.
 

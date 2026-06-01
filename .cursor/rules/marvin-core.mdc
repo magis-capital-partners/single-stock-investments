@@ -47,7 +47,7 @@ Discover → Onboard → Download → Research → Cross-check → **Milly adver
 Every report follows `_system/frameworks/deep_dive_structure.md`, `irr_assumption_ledger.md`, `archetype_valuation_prose.md`, `decision_stack.md`, `report_prose.md`, and `deep_dive_template.md`:
 
 - **Order:** company overview first (What → Why → Exec → Sources → Business); **Valuation & IRR (assumption ledger)** last (after Risks)
-- **IRR:** every assumption in the ledger table + `#### IRR arithmetic (show your work)` per `lawrence_irr.md` § F
+- **IRR:** every assumption in the ledger table + **`### Growth explanation stress test (Popper / Deutsch)`** + `#### IRR arithmetic (show your work)` per `lawrence_irr.md` § F
 - **Third party:** approved only in base IRR (`third_party_sources.md`); else **[PENDING APPROVAL]**
 - Refresh: `build_filing_evidence.py` → `marvin_valuation.py --write` → `refresh_deep_dive_v2.py` → `lint_deep_dive.py {TICKER} --milly` → Milly `adversarial_{date}.md` → `lint_adversarial.py`
 - One-shot QA: `make research-check TICKER={TICKER}`
@@ -56,6 +56,7 @@ Every report follows `_system/frameworks/deep_dive_structure.md`, `irr_assumptio
 - **Classification** table — archetype, moat, dhando, stance, cycle, implied_irr, irr_method, lawrence_bucket — see `_system/frameworks/classification.md`
 - Valuation: `{TICKER}/research/valuation.json` + `marvin_valuation.py --write`
 - **Multi-segment compounders:** `segment_cashflow_valuation.md` + `option_treatment.md` — per-segment owner cash, options per treatment ladder, sum PV
+- **Growth assumptions:** `growth_explanation_stress_test.md` — mechanism + falsifiers before any growth rate in ledger; `growth_explanation` in `valuation.json`
 - **Hidden assets / land / NAV:** `option_treatment.md` + `optionality_valuation.md` — `nav_overlay`, fair-value floor (not GAAP book when misstated)
 - **AI hyperscalers:** `ai_infrastructure_valuation.md` — `ai_overlay`; backlog **embedded_in_segment** where appropriate; Waymo/RL per option scan
 - **[HUMAN REVIEW]** items

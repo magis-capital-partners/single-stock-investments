@@ -12,7 +12,7 @@ Follow `_system/frameworks/deep_dive_structure.md` (v2 layout):
 2. Business & moat (Hohn mechanics; **Option scan** every ticker — `option_treatment.md`; segment map + AI infrastructure when overlays apply)
 3. Payoff & return (five-question gate, dhando, stance proposal — **no** full valuation math here)
 4. Risks & inversion
-5. **## Valuation & IRR (assumption ledger)** — bridge, assumption ledger, segment build, IRR arithmetic
+5. **## Valuation & IRR (assumption ledger)** — bridge, assumption ledger, **Growth explanation stress test** (`growth_explanation_stress_test.md`), segment build, IRR arithmetic
 6. Classification · [HUMAN REVIEW] · [PROPOSED MEMORY]
 
 **Prose:** `_system/frameworks/report_prose.md`, `archetype_valuation_prose.md`, `valuation-plain-english` rules.
@@ -38,8 +38,10 @@ If **new_documents** or **new_valuation_news**: focus on what changed for owner 
 ## Phase 2 — Narrative + valuation inputs (you write)
 
 1. Update `{{TICKER}}/research/valuation.json` inputs (price, FCF/sh, scenarios) from filings — preserve `approved_stance`, `override_reason`, `human_review` if present.
-2. Hyperscalers (`GOOGL`, `AMZN`, `META`, `MSFT`) or registry `valuation_flags`: ensure `segment_build` + `ai_overlay` exist; run `python _system/scripts/seed_hyperscaler_overlays.py {{TICKER}}` when overlays missing.
-3. Write or update **`{{TICKER}}/research/deep_dive_{{date}}.md`** with filing-grounded narrative (`_system/prompts/deep_dive_filing_grounded_refresh.md`). Set header **Prior dive:** link to previous file.
+2. Hyperscalers (`GOOGL`, `AMZN`, `META`, `MSFT`) or registry `valuation_flags`: ensure `segment_build` + `ai_overlay` exist; run `python _system/scripts/seed_hyperscaler_overlays.py {{TICKER}}` when overlays missing. Complete **Option scan** per `option_treatment.md` — no auto-zero terminals.
+3. Land / infrastructure with GAAP misstatement (e.g. `TPL`): set `nav_overlay` + `optionality_gate`; segment build for producing vs undeveloped reserves.
+4. **Growth theory:** For each material growth rate, write Popper/Deutsch stress test per `growth_explanation_stress_test.md`; fill `growth_explanation` in `valuation.json`. Philosophy refs: `_system/reference/philosophy/deutsch-popper/INDEX.md`.
+5. Write or update **`{{TICKER}}/research/deep_dive_{{date}}.md`** with filing-grounded narrative (`_system/prompts/deep_dive_filing_grounded_refresh.md`). Set header **Prior dive:** link to previous file.
 
 ## Phase 3 — Mechanical pipeline (run last; required)
 

@@ -134,6 +134,8 @@ _Complete per `option_treatment.md` — every dive, every ticker._
 
 **Method:** {irr_method}. **Scenarios and every IRR assumption:** see **## Valuation & IRR (assumption ledger)** and `valuation.json`. Base **X%** → **{stance}**.
 
+**Growth one-liner:** Base growth assumes …; falsified if … (see Growth explanation stress test).
+
 ---
 
 ## Risks & inversion
@@ -167,7 +169,44 @@ Use `archetype_valuation_prose.md` for archetype-specific subsection titles and 
 | 2 | Starting free cash flow per share | … | … |
 | … | … | … | … |
 
-{Every input. **[Assumption]** or filing path. SOTP: running sum to payoff.}
+{Every input. **[Assumption]** or filing path. Growth rows: `Growth theory: {label}`. SOTP: running sum to payoff.}
+
+### Growth explanation stress test (Popper / Deutsch)
+
+| Field | Value |
+|-------|-------|
+| Growth assumption under test | Years 1–5: …%; years 6–10: …% |
+| Theory name | … |
+
+#### Explanatory theory (why this growth rate)
+
+| # | Mechanism | Causal chain (plain English) | Filing / evidence | Hard to vary? |
+|---|-----------|------------------------------|-------------------|---------------|
+
+#### Risky predictions (Popper)
+
+| # | Prediction | By when | If false → |
+|---|------------|---------|------------|
+
+#### Falsifiers (what would refute the theory)
+
+| # | Observation | Effect on growth assumption |
+|---|-------------|----------------------------|
+
+#### Ad hoc rescue watch (Popper)
+
+- …
+
+#### Deutsch checks
+
+| Check | Pass? | Notes |
+|-------|-------|-------|
+| Hard to vary | | |
+| Reach | | |
+| Falsifiable | | |
+| Not instrumentalist | | |
+
+Spec: `growth_explanation_stress_test.md`. Mirror in `valuation.json` → `growth_explanation`.
 
 {If `valuation_overlay: segment_cashflow` — see `segment_cashflow_valuation.md`:}
 

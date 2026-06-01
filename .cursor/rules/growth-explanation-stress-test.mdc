@@ -1,0 +1,33 @@
+---
+description: Popper/Deutsch stress test for FCF growth assumptions — always ask why
+globs: "**/research/**"
+alwaysApply: false
+---
+
+# Growth explanation stress test
+
+Read **`_system/frameworks/growth_explanation_stress_test.md`** on every deep dive, cross-check, and IRR refresh where growth rates move the model.
+
+Philosophy sources: `_system/reference/philosophy/deutsch-popper/INDEX.md`
+
+## Required behavior (Marvin)
+
+1. **Three layers** — Fact anchor (filings) → Explanatory theory (why G%) → Lawrence number in ledger. Layer 3 must cite Layer 2.
+2. **Mandatory subsection** — `### Growth explanation stress test (Popper / Deutsch)` in **Valuation & IRR**, after **Assumption ledger** and **before** IRR arithmetic.
+3. **Growth ledger rows** — Source column for years 1–5 / 6–10 growth: `Growth theory: {theory_label}` + filing path or **[Assumption]**.
+4. **Popper table** — Mechanism chain, at least one **risky prediction**, at least one **falsifier**, **ad hoc rescue** ban list.
+5. **Deutsch checks** — Hard to vary, reach, falsifiable, not instrumentalist-only.
+6. **Segment growth** — One stress-test block per segment rate that moves consolidated IRR materially (or one consolidated theory with segment sub-rows).
+7. **Payoff section** — One sentence: base growth assumes …; falsified if …
+8. **JSON** — Fill `growth_explanation` in `valuation.json` on refresh when method is `full` / `scenario` / `segment_cashflow`.
+
+## Do not
+
+- Use historical CAGR or mgmt guidance alone as the theory.
+- Choose growth to hit 15% IRR without an operating mechanism (instrumentalism).
+- Defend "quality compounder grows X%" without segment or driver bridge.
+- Skip falsifiers when growth exceeds filing run-rate by **>300 bp**.
+
+## Milly
+
+Flag `growth_explanation: incomplete` when stress-test section missing or growth rows lack theory reference. See `MILLY.md` § Growth explanation.

@@ -57,10 +57,11 @@ Third party: approved registry in `third_party_sources.md`; pending PDFs flagged
 | **Segment cash-flow** | `segment_cashflow_valuation.md` | `valuation_overlay`, `segment_build`, `options[]` | `#### Segment map`; `### Segment cash-flow build` |
 | **AI infrastructure** | `ai_infrastructure_valuation.md` | `ai_overlay` | `#### AI infrastructure — model coverage` |
 | **Holdco / land / NAV** | `optionality_valuation.md` | `valuation_mode`, `optionality_gate`, `nav_overlay` | `### Optionality overlay`; SOTP / NAV tables |
+| **Growth theory** | `growth_explanation_stress_test.md` | `growth_explanation` | `### Growth explanation stress test`; Payoff growth one-liner |
 
 **Lawrence consolidated IRR** remains stance gate unless human sets `optionality_gate.primary_metric` or overrides. Overlays **must size options with evidence** — see treatment ladder; **no auto-zero**.
 
-**Every deep dive:** complete **Option scan** (`option_treatment.md`) before valuation final.
+**Every deep dive:** complete **Option scan** (`option_treatment.md`) and **Growth explanation stress test** (`growth_explanation_stress_test.md`) before valuation final.
 
 **AI hyperscalers (GOOGL, AMZN, META, MSFT):** segment overlay + `ai_overlay` + option scan on backlog, loss segments, chips.
 
