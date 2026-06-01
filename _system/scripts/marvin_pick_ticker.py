@@ -63,20 +63,16 @@ def latest_deep_dive(ticker: str) -> tuple[datetime | None, Path | None]:
     research = ROOT / ticker / "research"
     if not research.is_dir():
         return None, None
-    best: datetime | None = None
-    best_path: Path | None = None
-    for path in research.glob("deep_dive_*.md"):
-        m = DATE_RE.search(path.name)
-        if m:
-            dt = datetime.strptime(m.group(1), "%Y-%m-%d").replace(tzinfo=timezone.utc)
-        else:
-            dt = datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc)
-        file_dt = datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc)
-        candidate = max(dt, file_dt)
-        if best is None or candidate > best:
-            best = candidate
-            best_path = path
-    return best, best_path
+    sys.path.insert(0, str(ROOT / "_system" / "scripts"))
+    from dated_md import filename_date, latest_dated_md
+
+    path = latest_dated_md(research, "deep_dive")
+    if not path:
+        return None, None
+    dt = filename_date(path)
+    if dt is None:
+        dt = datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc)
+    return dt, path
 
 
 def _max_dt(current: datetime | None, candidate: datetime | None) -> datetime | None:

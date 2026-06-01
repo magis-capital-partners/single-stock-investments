@@ -12,6 +12,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "_system" / "scripts"))
+from dated_md import dated_md_label, dated_md_sort_key, latest_dated_md  # noqa: E402
 from valuation_synthesis import website_implied_irr  # noqa: E402
 
 DATA_DIR = ROOT / "dashboard" / "data"
@@ -31,28 +32,6 @@ def github_tree_url(rel_path: str) -> str:
 
 
 DATED_MD_RE = re.compile(r"_(\d{4}-\d{2}-\d{2})\.md$")
-
-
-def file_recency(path: Path) -> datetime:
-    """Prefer YYYY-MM-DD in filename; break ties with mtime (matches marvin_pick_ticker)."""
-    mtime_dt = datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc)
-    m = DATED_MD_RE.search(path.name)
-    if not m:
-        return mtime_dt
-    name_dt = datetime.strptime(m.group(1), "%Y-%m-%d").replace(tzinfo=timezone.utc)
-    return max(name_dt, mtime_dt)
-
-
-def latest_dated_md(research: Path, prefix: str) -> Path | None:
-    files = list(research.glob(f"{prefix}_*.md"))
-    if not files:
-        return None
-    return max(files, key=file_recency)
-
-
-def dated_md_label(path: Path) -> str:
-    m = DATED_MD_RE.search(path.name)
-    return m.group(1) if m else datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc).strftime("%Y-%m-%d")
 
 
 # Known metadata fallback when holdings.md is sparse
@@ -460,7 +439,7 @@ def recent_developments(ticker_dir: Path, ticker: str) -> list[dict]:
     dive_paths: list[Path] = []
     if research.exists():
         dive_paths = sorted(
-            research.glob("deep_dive_*.md"), key=file_recency, reverse=True
+            research.glob("deep_dive_*.md"), key=dated_md_sort_key, reverse=True
         )[:2]
         for f in dive_paths:
             rel = str(f.relative_to(ROOT)).replace("\\", "/")

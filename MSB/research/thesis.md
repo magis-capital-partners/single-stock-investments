@@ -11,11 +11,13 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | hold |
 | **Cycle** | mid |
-| **Implied 10yr IRR** (total synthesis) | 14.34% (total synthesis) |
+| **Implied 10yr IRR** (base) | 10.3% (base) |
 | **IRR method** | yield_curve |
 | **Lawrence bucket** | other |
+| **Payoff lens** | — |
+| **MOI bucket** | — |
 
-**Deep dive:** `MSB/research/deep_dive_2026-05-27.md`
+**Deep dive:** `MSB/research/deep_dive_2026-06-01.md` (auto-sync)
 
 Predictive-attribute tag (portfolio JSON): **equity_yield_curve** — legal/pricing hiatus vs long-lived pellet royalty contract (human to confirm usefulness).
 

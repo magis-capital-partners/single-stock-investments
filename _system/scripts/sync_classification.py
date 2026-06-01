@@ -14,6 +14,9 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "_system" / "scripts"))
+from dated_md import latest_dated_md  # noqa: E402
+
 CLASS_PATH = ROOT / "_system" / "portfolio" / "classification.json"
 
 CLASS_FIELDS = [
@@ -118,6 +121,14 @@ def classification_table(row: dict) -> str:
     return "\n".join(lines)
 
 
+def latest_deep_dive_rel(ticker: str) -> str | None:
+    research = ROOT / ticker / "research"
+    path = latest_dated_md(research, "deep_dive")
+    if not path:
+        return None
+    return str(path.relative_to(ROOT)).replace("\\", "/")
+
+
 def update_thesis(ticker: str, row: dict) -> bool:
     thesis_path = ROOT / ticker / "research" / "thesis.md"
     if not thesis_path.exists():
@@ -133,6 +144,17 @@ def update_thesis(ticker: str, row: dict) -> bool:
         return False
     rest = text[len(title_m.group(1)) :]
     rest = re.sub(r"\*\*Last updated:\*\*[^\n]*\n", "", rest)
+    dive_rel = latest_deep_dive_rel(ticker)
+    if dive_rel:
+        if re.search(r"\*\*Deep dive:\*\*", rest):
+            rest = re.sub(
+                r"\*\*Deep dive:\*\*\s*`[^`]+`[^\n]*",
+                f"**Deep dive:** `{dive_rel}` (auto-sync)",
+                rest,
+                count=1,
+            )
+        else:
+            rest = f"**Deep dive:** `{dive_rel}` (auto-sync)\n\n{rest.lstrip()}"
     header = f"{title_m.group(1)}**Last updated:** auto-sync\n\n{classification_table(row)}\n"
     thesis_path.write_text(header + rest.lstrip(), encoding="utf-8")
     return True

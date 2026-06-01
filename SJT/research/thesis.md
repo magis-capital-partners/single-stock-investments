@@ -46,5 +46,5 @@ Passive San Juan Basin gas NPI royalty trust — **equity yield curve / time arb
 - Model gas price scenarios vs distribution breakeven.
 - Track monthly 8-K excess production cost balance.
 
-**Deep dive:** `SJT/research/deep_dive_2026-05-27.md`  
+**Deep dive:** `SJT/research/deep_dive_2026-06-01.md` (auto-sync)
 **Cross-check (HK lens):** `SJT/research/cross_check_2026-05-22.md`

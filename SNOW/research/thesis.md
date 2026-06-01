@@ -17,6 +17,8 @@
 | **Payoff lens** | — |
 | **MOI bucket** | — |
 
+**Deep dive:** `SNOW/research/deep_dive_2026-06-01.md` (auto-sync)
+
 ## One-line thesis
 
 AI Data Cloud platform on consumption pricing: strong product growth and positive FCF, but **watch** at ~$240 (~6.7% base IRR) until owner cash per share proves at post-earnings run rate.
