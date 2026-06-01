@@ -48,6 +48,7 @@ DEFAULT_CLASSIFICATION = {
     "dhando": "pending",
     "stance": "watch",
     "cycle": "-",
+    "moi_bucket": "pending",
 }
 
 

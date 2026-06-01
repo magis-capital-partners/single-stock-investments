@@ -25,6 +25,8 @@ CLASS_FIELDS = [
     "implied_irr",
     "irr_method",
     "lawrence_bucket",
+    "moi_bucket",
+    "moi_inefficiency",
 ]
 
 LABEL_MAP = {
@@ -36,6 +38,8 @@ LABEL_MAP = {
     "implied_irr": "Implied 10yr IRR",
     "irr_method": "IRR method",
     "lawrence_bucket": "Lawrence bucket",
+    "moi_bucket": "MOI bucket",
+    "moi_inefficiency": "MOI inefficiency",
 }
 
 
@@ -64,7 +68,7 @@ def load_valuation(ticker: str) -> dict | None:
 def valuation_classification(val: dict) -> dict:
     out = {}
     inputs = val.get("classification_inputs") or {}
-    for key in ("archetype", "moat", "dhando", "cycle"):
+    for key in ("archetype", "moat", "dhando", "cycle", "moi_bucket", "moi_inefficiency"):
         if inputs.get(key) and inputs[key] not in ("-", "—", "pending", "unknown"):
             out[key] = inputs[key]
     if val.get("lawrence_bucket"):
@@ -107,6 +111,8 @@ def classification_table(row: dict) -> str:
         cell("implied_irr", "Implied 10yr IRR", "falsifier-adjusted"),
         cell("irr_method", "IRR method"),
         cell("lawrence_bucket", "Lawrence bucket"),
+        cell("moi_bucket", "MOI bucket", "Mihaljevic"),
+        cell("moi_inefficiency", "MOI inefficiency"),
         "",
     ]
     return "\n".join(lines)
@@ -156,7 +162,7 @@ def check_ticker(ticker: str, portfolio: dict, fix: bool) -> list[str]:
 
     if fix and val:
         updated = dict(from_json)
-        for key in ("archetype", "moat", "dhando", "cycle", "stance"):
+        for key in ("archetype", "moat", "dhando", "cycle", "stance", "moi_bucket", "moi_inefficiency"):
             if from_val.get(key):
                 updated[key] = from_val[key]
         if from_val.get("implied_irr"):

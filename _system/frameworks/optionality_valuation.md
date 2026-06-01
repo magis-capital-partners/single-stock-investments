@@ -74,6 +74,18 @@ Set `valuation_mode: optionality` in `{TICKER}/research/valuation.json` and docu
 
 ---
 
+## Discount magnitude (MOI Ch 3)
+
+When SOTP or NAV overlay exists, report in Valuation & IRR:
+
+| Field | Rule |
+|-------|------|
+| Premium or discount | As **% of current price** (not only % of NAV) |
+| MOI framing | Distinguish compelling (~50% off) vs thin discount |
+| Compensating factors | "Discount is / is not large enough for [no catalyst / illiquidity / governance]." |
+
+---
+
 ### C. Passive royalty trust — HK curve (MSB)
 
 **Sources:** `_system/reference/investment-wisdom/horizon-kinetics/HK-Q4-2024-Commentary-extract.txt` (Mesabi case study); `HK-Q1-2025-Commentary-extract.txt`; `HK-Q3-2025-Commentary-extract.txt`

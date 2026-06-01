@@ -1,6 +1,6 @@
 # Investment Wisdom — Index
 
-Last updated: 2026-05-26 — added Chris Hohn / TCI letters + hohn_business_analysis framework
+Last updated: 2026-06-01 — added John Mihaljevic / Manual of Ideas + moi_lens framework
 
 | Genius | Folder | Count | Primary use in Marvin |
 |--------|--------|-------|------------------------|
@@ -9,6 +9,7 @@ Last updated: 2026-05-26 — added Chris Hohn / TCI letters + hohn_business_anal
 | Murray Stahl | `stahl/` | 6 PDFs | Croupiers, exchanges, diversification, spinoffs, philosophy |
 | Horizon Kinetics | `horizon-kinetics/` | 5 extracts | Equity yield curve, predictive attributes, time arbitrage |
 | Chris Hohn / TCI | `tci/` | 32 letters + extract | Operating mechanics, thesis pillars, valuation bridge |
+| John Mihaljevic / MOI | `mihaljevic/` | 1 PDF + extract | Idea generation, uses/misuses, special situations |
 
 **Mental models catalog:** `_system/frameworks/mental_models.md`
 
@@ -110,6 +111,22 @@ Curated **text extracts** from `C:\Users\werdn\Documents\Investing\Horizon Kinet
 **Framework doc:** `_system/frameworks/hohn_business_analysis.md`
 
 **Memory section:** `_system/memory/MEMORY.md` → Approved beliefs — Chris Hohn (after human promotion)
+
+---
+
+## John Mihaljevic / Manual of Ideas (`mihaljevic/`)
+
+| File | Theme | Apply when |
+|------|-------|------------|
+| `Manual-of-Ideas-2nd-Edition.pdf` | Full book (licensed Wiley PDF when installed) | Idea funnel; strategy selection; case studies |
+| `Manual-of-Ideas-chapter-reference.txt` | Chapter map + key takeaways | Agent quick reference; until licensed PDF installed |
+| `README.md` | Install + chapter map | Onboard; `download_moi_book.py` |
+
+**Framework docs:** `_system/frameworks/moi_lens.md`, `idea_funnel.md`, `special_situation_lens.md`, `equity_stub_valuation.md`
+
+**Install licensed PDF:** `MOI_PDF_SOURCE=/path/to/book.pdf python _system/scripts/download_moi_book.py`
+
+**Memory section:** `[PROPOSED MOI]` in daily log until human promotes
 
 ---
 
