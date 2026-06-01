@@ -1,6 +1,7 @@
-"""Fetch monthly return panels for backtest (Stooq / Yahoo)."""
+"""Fetch monthly return panels for backtest (CSV vault / Yahoo)."""
 from __future__ import annotations
 
+import csv
 import json
 import urllib.error
 import urllib.request
@@ -8,6 +9,8 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from .config import ROOT
+
+RETURNS_DIR = ROOT / "_system" / "reference" / "market-data" / "returns"
 
 UA = "Mozilla/5.0 (compatible; DarwinPortfolio/1.0)"
 YAHOO_UA = UA
@@ -72,6 +75,33 @@ def fetch_yahoo_monthly(ticker: str, months: int = 36) -> tuple[list[str], list[
     return dates, rets, "yahoo"
 
 
+def load_returns_csv(ticker: str) -> tuple[list[str], list[float], str] | None:
+    """Load Tier A monthly returns if present."""
+    key = ticker.replace(".", "_")
+    path = RETURNS_DIR / f"{key}.csv"
+    if not path.exists():
+        path = RETURNS_DIR / f"{ticker}.csv"
+    if not path.exists():
+        return None
+    dates: list[str] = []
+    rets: list[float] = []
+    with path.open(encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            d = row.get("date", "").strip()
+            try:
+                r = float(row.get("monthly_return", ""))
+            except ValueError:
+                continue
+            if d:
+                dates.append(d)
+                rets.append(r)
+    if len(rets) < 6:
+        return None
+    src = "csv_vault"
+    return dates, rets, src
+
+
 def build_return_panel(tickers: list[dict], months: int = 36) -> dict:
     """tickers: list of {ticker, market, irr_base_pct}."""
     panel: dict[str, dict] = {}
@@ -79,10 +109,14 @@ def build_return_panel(tickers: list[dict], months: int = 36) -> dict:
 
     for row in tickers:
         sym = stooq_symbol(row["ticker"], row.get("market", "US"))
-        yahoo_sym = row["ticker"].replace(".T", ".T")  # Yahoo uses 8697.T
-        if row.get("market") == "US":
-            yahoo_sym = row["ticker"].split(".")[0]
-        dates, rets, src = fetch_yahoo_monthly(yahoo_sym, months=months)
+        from .symbols import yahoo_for_ticker
+
+        yahoo_sym = yahoo_for_ticker(row["ticker"], row.get("market", "US"))
+        loaded = load_returns_csv(row["ticker"])
+        if loaded:
+            dates, rets, src = loaded
+        else:
+            dates, rets, src = fetch_yahoo_monthly(yahoo_sym, months=months)
         if len(rets) < 6:
             # Synthetic from IRR prior (monthly drift)
             irr = (row.get("irr_base_pct") or 8.0) / 100.0

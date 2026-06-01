@@ -4,6 +4,28 @@ from __future__ import annotations
 import math
 
 
+def enforce_max_weight_sum(weights: dict[str, float], max_w: float) -> dict[str, float]:
+    """Cap each name at max_w then renormalize (iterative)."""
+    w = {t: max(v, 0.0) for t, v in weights.items() if v > 1e-9}
+    if not w:
+        return weights
+    for _ in range(24):
+        over = [t for t in w if w[t] > max_w + 1e-9]
+        if not over:
+            break
+        extra = sum(w[t] - max_w for t in over)
+        for t in over:
+            w[t] = max_w
+        under = [t for t in w if w[t] < max_w - 1e-9]
+        if not under:
+            break
+        add = extra / len(under)
+        for t in under:
+            w[t] += add
+    s = sum(w.values()) or 1.0
+    return {t: w[t] / s for t in w}
+
+
 def apply_constraints(
     tickers: list[str],
     raw: dict[str, float],
@@ -34,20 +56,7 @@ def apply_constraints(
 
     total = sum(scores.get(t, 0.0) for t in keep) or 1.0
     out = {t: scores.get(t, 0.0) / total for t in keep}
-    for _ in range(5):
-        excess = 0.0
-        for t in list(out):
-            if out[t] > max_w:
-                excess += out[t] - max_w
-                out[t] = max_w
-        if excess > 1e-9:
-            below = [t for t in out if out[t] < max_w - 1e-9]
-            if below:
-                add = excess / len(below)
-                for t in below:
-                    out[t] = min(out[t] + add, max_w)
-        s = sum(out.values()) or 1.0
-        out = {t: out[t] / s for t in out}
+    out = enforce_max_weight_sum(out, max_w)
 
     for t in list(out):
         if out[t] < min_w and len(out) > min_names:
@@ -80,7 +89,47 @@ def apply_constraints(
             s = sum(out.values()) or 1.0
             out = {t: out[t] / s for t in out}
 
+    n = len(out)
+    if n > 0 and n * max_w < 1.0 - 1e-6:
+        max_w = min(max_w, 1.0 / n)
+    out = enforce_max_weight_sum(out, max_w)
+    out = {t: v for t, v in out.items() if v > 1e-4}
+    s = sum(out.values()) or 1.0
+    out = {t: out[t] / s for t in out}
     return out, notes
+
+
+def apply_ira_stance_caps(
+    weights: dict[str, float],
+    features_by_ticker: dict[str, dict],
+    mandate: dict,
+) -> dict[str, float]:
+    """Cap watch/trim names; boost redistribution to hold+."""
+    m = mandate.get("mandate") or mandate
+    max_watch = m.get("max_weight_pct_watch", 5.0) / 100.0
+    allow_watch = set(m.get("allow_watch_stances") or [])
+    if not max_watch:
+        return weights
+    excess = 0.0
+    out = dict(weights)
+    receivers = []
+    for t, w in list(out.items()):
+        f = features_by_ticker.get(t, {})
+        stance = ((f.get("classification") or {}).get("stance") or "watch").lower()
+        if stance in ("watch", "trim") and stance not in allow_watch and w > max_watch:
+            excess += w - max_watch
+            out[t] = max_watch
+        elif stance in ("core", "accumulate", "hold"):
+            receivers.append(t)
+    if excess > 0 and receivers:
+        add = excess / len(receivers)
+        for t in receivers:
+            out[t] = out.get(t, 0.0) + add
+    s = sum(out.values()) or 1.0
+    out = {t: out[t] / s for t in out}
+    max_w = m.get("max_weight_pct", 15.0) / 100.0
+    out = enforce_max_weight_sum(out, max_w)
+    return {t: v for t, v in out.items() if v > 1e-4}
 
 
 def weights_to_list(

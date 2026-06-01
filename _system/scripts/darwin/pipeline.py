@@ -10,7 +10,7 @@ import numpy as np
 from .attribution import factor_attribution
 from .backtest import simulate
 from .config import DATA_DIR, FEATURES_PATH, PORTFOLIO_PATH, load_mandate
-from .constraints import apply_constraints, weights_to_list
+from .constraints import apply_constraints, apply_ira_stance_caps, weights_to_list
 from .encoder import train_encoder
 from .features import build_features
 from .genetic import run_ga
@@ -173,6 +173,14 @@ def run_pipeline(write_features: bool = True, fast: bool = False) -> dict:
 
     prev_w = irr_w if irr_w else prev_equal
     target_w, c_notes = apply_constraints(tickers, target_w, prev_w, mandate_doc, falsifier_map)
+    if mandate_doc.get("account_profile") == "ira":
+        target_w = apply_ira_stance_caps(target_w, features_by_ticker, mandate_doc)
+        m = mandate_doc.get("mandate") or {}
+        max_w = m.get("max_weight_pct", 15.0) / 100.0
+        for t in list(target_w):
+            target_w[t] = min(target_w[t], max_w)
+        s = sum(target_w.values()) or 1.0
+        target_w = {t: target_w[t] / s for t in target_w}
     turnover_used = c_notes.get("turnover_one_way", 0.0)
 
     attribution = factor_attribution(

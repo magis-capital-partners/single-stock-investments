@@ -82,7 +82,12 @@ def parse_classification_from_thesis(ticker_dir: Path) -> dict | None:
 def classification_for(ticker: str, ticker_dir: Path, portfolio: dict[str, dict]) -> dict:
     from_thesis = parse_classification_from_thesis(ticker_dir)
     from_json = portfolio.get(ticker, {})
-    merged = {**from_json, **(from_thesis or {})}
+    merged = {**(from_thesis or {}), **from_json}
+    # Registry stance (hold/core) wins over stale thesis watch when both exist
+    reg = load_registry().get("holdings", {}).get(ticker, {}).get("classification") or {}
+    for key in ("stance", "archetype", "moat", "dhando", "cycle"):
+        if reg.get(key) and reg[key] not in ("-", "—", "pending"):
+            merged[key] = reg[key]
     defaults = {
         "archetype": "unknown",
         "moat": "unproven",

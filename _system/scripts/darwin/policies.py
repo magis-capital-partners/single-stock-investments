@@ -123,6 +123,8 @@ def policy_ira_marvin(rows: list[dict], genome: dict | None = None) -> dict[str,
             continue
         if irr < min_irr and stance not in allow_stances:
             continue
+        if stance in ("watch", "trim", "exit") and stance not in allow_stances:
+            continue
         score = max(float(irr), 0.1)
         score *= stance_m.get(stance, 0.5)
         score *= dhando_m.get((cl.get("dhando") or "pending").lower(), 0.9)
@@ -140,6 +142,11 @@ def policy_ira_marvin(rows: list[dict], genome: dict | None = None) -> dict[str,
 
     scored.sort(key=lambda x: -x[1])
     keep = scored[:top_k]
+    min_names = int(g.get("min_names", 8))
+    if len(keep) < min_names and len(scored) >= min_names:
+        keep = scored[:min_names]
+    elif len(keep) < min_names:
+        keep = scored
     total = sum(s for _, s in keep) or 1.0
     return {t: s / total for t, s in keep}
 
