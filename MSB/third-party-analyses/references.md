@@ -6,6 +6,8 @@
 
 Auto-scan `MSB/third-party-analyses/hk_scan_2026-06-01.md`. Mental models: equity_yield_curve, time_arbitrage, predictive_attributes.
 
+**Cross-check:** `MSB/research/cross_check_HK_2026-06-01.md`
+
 | HK / Stahl source | Topic | Status |
 |-----------------|-------|--------|
 | `_system/reference/investment-wisdom/horizon-kinetics/Stahl-Worth-The-Time-Predictive-Attributes-extract.txt` | Full MSB case study; dividend suspension / time arbitrage | Context — not in base IRR |
