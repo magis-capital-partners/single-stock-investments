@@ -3,6 +3,7 @@
   "as_of": "2026-06-01",
   "method": "full",
   "valuation_mode": "optionality",
+  "valuation_overlay": "segment_cashflow",
   "lawrence_bucket": "pricing_power",
   "classification_inputs": {
     "archetype": "infrastructure",
@@ -24,26 +25,30 @@
   },
   "optionality_gate": {
     "framework": "mineral_floor_option",
-    "floor_pass": null,
+    "floor_pass": false,
     "floor_metric": "nav_per_share",
-    "floor_value": null,
+    "floor_value": 106.2,
+    "floor_value_note": "Conservative asset floor: Q1 2026 cash $3.59/sh + NRA acquisition comp $64.2/sh (royalty asset mark); excludes surface and producing PV to avoid double-count with segment build",
     "primary_metric": "lawrence_base",
     "primary_label": "10yr cash-flow IRR (operating)",
     "primary_return_pct": -1.0,
-    "notes": "GAAP book ~$21/sh is retained earnings + PPE/water + acquired royalties only. ~882k surface acres and ~224k NRA from 1888 Trust carry zero on balance sheet per 10-K. NAV overlay required before book-based dhando."
+    "overlay_nav_per_share": 210.5,
+    "overlay_nav_note": "Segment operating PV $162 + cash $3.6 + undeveloped NRA option $16 + surface $32 [Assumption]; price $393 embeds ~87% premium to overlay base",
+    "notes": "GAAP book ~$21/sh is retained earnings + PPE/water + acquired royalties only. Price well above filing-backed NAV overlay; Lawrence IRR remains stance gate."
   },
   "nav_overlay": {
     "as_of": "2026-06-01",
-    "status": "partial — filing facts + one acquisition comp; full SOTP pending",
+    "status": "complete",
     "gaap_vs_fair_value": {
       "assigned_land_and_royalties_on_balance_sheet": 0,
       "policy_source": "10-K FY2025: fair market value not determined in 1888; no value assigned to Assigned land and royalty interests",
-      "land_line_item": "— (zero)",
+      "land_line_item": "\u2014 (zero)",
       "stockholders_equity_m": 1458.9,
       "stockholders_equity_note": "Mostly accumulated operating earnings; not land mark-to-market",
       "total_assets_m": 1623.3,
       "property_plant_equipment_net_m": 164.5,
-      "cash_m": 144.8
+      "cash_m": 144.8,
+      "cash_q1_2026_m": 247.6
     },
     "asset_inventory_filing": {
       "surface_acres_approx": 882000,
@@ -52,14 +57,14 @@
     },
     "in_model": {
       "lawrence_irr_on_operating_cash": true,
-      "gaap_book_in_dhando": false
+      "gaap_book_in_dhando": false,
+      "segment_operating_pv": true,
+      "undeveloped_nra_in_lawrence_growth": false
     },
     "not_in_model_requires_refresh": [
-      "Fair-value NAV: surface acres ($/acre comps or land-sale marks)",
-      "NRA fair value roll-up (assigned + acquired; not only marginal purchase comp)",
-      "Undeveloped-acreage royalty option (future drilling not in 5% base growth)",
-      "Water infrastructure replacement cost vs PPE net $164.5M",
-      "Segment cash-flow build (Land/Royalty vs Water)"
+      "Water infrastructure replacement cost vs PPE net $164.5M \u2014 book used in SOTP; RC uplift [HUMAN REVIEW]",
+      "Full NRA roll-up separating producing vs undeveloped acres \u2014 marginal comp only",
+      "Permian $/acre marks beyond May 2025 787-acre sale"
     ],
     "illustrative_comps": {
       "mar_2025_nra_acquisition": {
@@ -69,9 +74,162 @@
         "source": "10-K FY2025 acquisition note",
         "caveat": "Marginal proved/acquired NRA only; assigned 1888 interests still at zero on BS"
       },
+      "may_2025_land_sale": {
+        "acres": 787,
+        "price_m": 4.5,
+        "implied_per_acre": 5718,
+        "source": "10-K FY2025 / FY2025 activity",
+        "caveat": "Single transaction; not representative of full 882k surface portfolio"
+      },
       "nra_at_acquisition_comp_m": 4426,
-      "nra_at_acquisition_comp_per_share": 64.1,
-      "nra_comp_note": "[Assumption] 224k NRA × $19,775 — royalty slice only; excludes 882k surface acres and water PPE"
+      "nra_at_acquisition_comp_per_share": 64.2
+    },
+    "segments_or_options": [
+      {
+        "id": "undeveloped_nra",
+        "label": "Undeveloped / incremental NRA royalty option",
+        "option_treatment": "probability_weighted",
+        "p_base": 0.25,
+        "nav_per_share_full": 64.2,
+        "overlay_value_per_share": 16.0,
+        "evidence": "224k NRA \u00d7 $19,775 Mar 2025 comp; P=25% for incremental drilling not in FY2025 run-rate",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "surface_acres",
+        "label": "Surface acreage (882k acres)",
+        "option_treatment": "nav_floor",
+        "nav_per_share": 31.9,
+        "nav_assumption": "882k \u00d7 $2,500/ac [Assumption]; filing comp May 2025 $5,718/ac on 787 acres",
+        "not_in_lawrence_base": true
+      }
+    ],
+    "sotp_build": {
+      "shares": 69027492,
+      "shares_source": "10-K FY2025 diluted",
+      "price_per_share": 393.0,
+      "double_count_note": "Producing royalties/easements/water are in segment PV; NRA comp and surface are incremental asset marks \u2014 do not add segment PV + full NRA comp without adjustment",
+      "lines": [
+        {
+          "id": "cash",
+          "label": "Cash (Mar 31, 2026)",
+          "value_m": 247.6,
+          "per_share": 3.6,
+          "source": "10-Q_20260506",
+          "treatment": "filing"
+        },
+        {
+          "id": "water_ppe",
+          "label": "Water PPE (net book)",
+          "value_m": 164.5,
+          "per_share": 2.4,
+          "source": "10-K FY2025 balance sheet",
+          "treatment": "filing",
+          "caveat": "Replacement cost likely higher [HUMAN REVIEW]"
+        },
+        {
+          "id": "land_resource_pv",
+          "label": "Land & Resource operating PV (royalties + easements)",
+          "per_share": 99.2,
+          "source": "segment_build @ 10% discount; 4%/3% growth; 24\u00d7 exit",
+          "treatment": "segment_cashflow"
+        },
+        {
+          "id": "water_pv",
+          "label": "Water Services operating PV",
+          "per_share": 62.6,
+          "source": "segment_build @ 10% discount; 6%/4% growth; 20\u00d7 exit",
+          "treatment": "segment_cashflow"
+        },
+        {
+          "id": "undeveloped_nra_option",
+          "label": "Undeveloped NRA option (P=25%)",
+          "per_share": 16.0,
+          "source": "224k NRA \u00d7 $19,775 \u00d7 25% [Assumption]",
+          "treatment": "probability_weighted"
+        },
+        {
+          "id": "surface_acres",
+          "label": "Surface acreage mark",
+          "per_share": 31.9,
+          "source": "882k acres \u00d7 $2,500/ac [Assumption]",
+          "treatment": "nav_floor"
+        }
+      ],
+      "subtotals": {
+        "operating_pv_only": 161.8,
+        "asset_floor_cash_plus_nra": 67.8,
+        "overlay_base_operating_plus_options": 210.5,
+        "premium_to_overlay_pct": 86.9
+      },
+      "tie_out": "Price $393 vs overlay base ~$211/sh \u2192 market embeds Permian scarcity premium and growth beyond filing-backed marks; Lawrence base -1.0% on current OCF remains stance gate."
+    }
+  },
+  "segment_build": {
+    "framework": "speedwell_reverse_dcf",
+    "as_of": "2026-06-01",
+    "horizon_years": 10,
+    "discount_rate_explicit": 0.1,
+    "allocation_method": "FY2025 segment revenue share of consolidated OCF $545.9M",
+    "segments": [
+      {
+        "id": "land_resource",
+        "label": "Land & Resource (royalties + easements + land sales)",
+        "type": "operating",
+        "revenue_share_fy2025": 0.615,
+        "owner_cash_y0_per_share": 4.86,
+        "owner_cash_y0_source": "FY2025 OCF $7.91/sh \u00d7 61.5% Land & Resource revenue share [Assumption]",
+        "growth_y1_5": 0.04,
+        "growth_y6_10": 0.03,
+        "exit_pfcf_y10": 24,
+        "pv_per_share_at_10pct": 99.2,
+        "notes": "FY2025 segment $490.7M: royalties $411.7M, easements $78.2M; cyclical Permian toll"
+      },
+      {
+        "id": "water",
+        "label": "Water Services and Operations (TPWR)",
+        "type": "operating",
+        "revenue_share_fy2025": 0.385,
+        "owner_cash_y0_per_share": 3.05,
+        "owner_cash_y0_source": "FY2025 OCF $7.91/sh \u00d7 38.5% Water revenue share [Assumption]",
+        "growth_y1_5": 0.06,
+        "growth_y6_10": 0.04,
+        "exit_pfcf_y10": 20,
+        "pv_per_share_at_10pct": 62.6,
+        "notes": "FY2025 Water $307.5M (+16% YoY); embedded_in_segment for water ramp \u2014 not separate zero terminal"
+      }
+    ],
+    "options": [
+      {
+        "id": "undeveloped_nra",
+        "label": "Undeveloped NRA / 1888 Assigned acreage option",
+        "option_treatment": "probability_weighted",
+        "p_base": 0.25,
+        "overlay_value_per_share": 16.0,
+        "base_terminal_rationale": "Producing royalties in Land segment; incremental undeveloped drilling valued at P=25% \u00d7 NRA comp \u2014 not in Lawrence 5% growth",
+        "evidence": "10-K: Assigned land/RRA at zero on BS; Mar 2025 177 NRA @ $3.5M (~$19,775/NRA)",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "surface_acres",
+        "label": "Surface acreage (882k acres)",
+        "option_treatment": "nav_floor",
+        "overlay_value_per_share": 31.9,
+        "base_terminal_rationale": "Surface rights separate from royalty cash flow; $2,500/ac [Assumption] vs May 2025 sale $5,718/ac",
+        "evidence": "10-K Item 1 ~882k surface acres; May 2025 787 ac @ $4.5M",
+        "not_in_lawrence_base": true
+      }
+    ],
+    "reconciliation": {
+      "sum_pv_per_share_at_10pct": 161.8,
+      "sum_pv_per_share_at_explicit_discount": 161.8,
+      "explicit_discount_rate_pct": 10.0,
+      "nav_options_add_per_share": 48.0,
+      "overlay_base_per_share": 210.5,
+      "implied_business_return_pct": -0.84,
+      "lawrence_base_irr_pct": -1.0,
+      "price_per_share": 393.0,
+      "slack_notes": "Segment operating PV $162 @ 10% vs $393 price \u2014 gap is scarcity premium + undeveloped optionality; segment implied return -0.8% vs Lawrence -1.0% (tie-out within 0.2pp)"
     }
   },
   "scenarios": {
@@ -107,24 +265,30 @@
   },
   "implied_return": {
     "base_pct": -1.0,
-    "label": "10yr IRR",
-    "display": "-1.0% (base)"
+    "lawrence_base_pct": -1.0,
+    "label": "10yr cash-flow IRR (operating)",
+    "display": "-1.0% (10yr cash-flow IRR (operating))"
   },
   "stance_proposal": {
     "suggested": "watch",
     "irr_band": "<15%",
     "gates": {
       "moat_ok": true,
-      "dhando_ok": true
+      "dhando_ok": true,
+      "floor_pass": false,
+      "valuation_mode": "optionality"
     },
     "override_reason": null
   },
   "growth_explanation": {
     "as_of": "2026-06-01",
     "status": "complete",
-    "assumption_ids": ["growth_y1_5", "growth_y6_10"],
+    "assumption_ids": [
+      "growth_y1_5",
+      "growth_y6_10"
+    ],
     "theory_label": "Permian producing toll + water infra ramp (undeveloped NRA excluded)",
-    "problem_situation": "Lawrence base IRR -1.0% at $393 on $7.91/sh OCF — why 5% years 1–5 when FY2025 OCF grew ~11% and Q1 rev +21%?",
+    "problem_situation": "Lawrence base IRR -1.0% at $393 on $7.91/sh OCF \u2014 why 5% years 1\u20135 when FY2025 OCF grew ~11% and Q1 rev +21%?",
     "consolidated_growth": {
       "y1_5": 0.05,
       "y6_10": 0.03
@@ -132,19 +296,19 @@
     "mechanisms": [
       {
         "id": "royalty_toll",
-        "chain": "Permian production on TPL acreage × royalty rates → $411.7M FY2025 royalties (+10% YoY) → operating cash grows low-to-mid single digits if activity holds",
+        "chain": "Permian production on TPL acreage \u00d7 royalty rates \u2192 $411.7M FY2025 royalties (+10% YoY) \u2192 operating cash grows low-to-mid single digits if activity holds",
         "evidence": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
         "hard_to_vary": "yes"
       },
       {
         "id": "water_infra",
-        "chain": "TPWR water sourcing/treatment volumes on scarce acreage → $307.5M FY2025 water revenue (+16% YoY) → lifts consolidated cash above royalty-only path",
+        "chain": "TPWR water sourcing/treatment volumes on scarce acreage \u2192 $307.5M FY2025 water revenue (+16% YoY) \u2192 lifts consolidated cash above royalty-only path",
         "evidence": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
         "hard_to_vary": "yes"
       },
       {
         "id": "easement_annuity",
-        "chain": "Long-dated easements with CPI escalators → $78.2M FY2025 (+24% YoY) adds stable mid-single-digit cash contribution",
+        "chain": "Long-dated easements with CPI escalators \u2192 $78.2M FY2025 (+24% YoY) adds stable mid-single-digit cash contribution",
         "evidence": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
         "hard_to_vary": "partial"
       }
@@ -152,17 +316,17 @@
     "excluded_from_base": [
       {
         "item": "Undeveloped NRA / 1888 Assigned acreage option",
-        "treatment": "nav_overlay — not smuggled into 5% consolidated growth"
+        "treatment": "nav_overlay \u2014 not smuggled into 5% consolidated growth"
       }
     ],
     "risky_predictions": [
       {
         "text": "Water segment revenue exceeds $330M in FY2026 if 5% consolidated cash path holds",
         "by": "FY2026 10-K",
-        "falsifier_action": "Cut consolidated years 1–5 toward 2–3%"
+        "falsifier_action": "Cut consolidated years 1\u20135 toward 2\u20133%"
       },
       {
-        "text": "Q2–Q4 2026 consolidated revenue growth stays above 10% YoY",
+        "text": "Q2\u2013Q4 2026 consolidated revenue growth stays above 10% YoY",
         "by": "Q4 2026 10-K",
         "falsifier_action": "Revise growth down; activity cycle weaker than base"
       }
@@ -170,7 +334,7 @@
     "falsifiers": [
       {
         "observation": "Permian rig count or completion intensity on TPL counties down >15% YoY for four consecutive quarters",
-        "action": "Cut years 1–5 growth to 2%; move toward bear case"
+        "action": "Cut years 1\u20135 growth to 2%; move toward bear case"
       },
       {
         "observation": "Water revenue growth below 8% for two consecutive quarters while royalties flat",
@@ -197,20 +361,46 @@
     {
       "case": "GAAP book",
       "method": "balance sheet",
-      "key_inputs": "Equity $1.46B ÷ 69M sh ≈ $21/sh; Assigned land/RRA at zero",
+      "key_inputs": "Equity $1.46B \u00f7 69M sh \u2248 $21/sh; Assigned land/RRA at zero",
       "return_pct": null,
       "display": "Not a fair-value floor",
       "stance_gate": false,
       "notes": "10-K: no value assigned to 1888 Assigned land and royalty interests"
     },
     {
-      "case": "NRA acquisition comp",
-      "method": "nav (illustrative)",
-      "key_inputs": "224k NRA × $19,775 (Mar 2025 purchase)",
+      "case": "Asset floor (cash + NRA comp)",
+      "method": "nav (conservative)",
+      "key_inputs": "Cash $3.6/sh + 224k NRA \u00d7 $19,775",
       "return_pct": null,
-      "display": "~$64/sh royalty slice only",
+      "display": "~$68/sh asset floor",
       "stance_gate": false,
-      "notes": "[Assumption] Does not value surface acres or water infra; not stance gate"
+      "notes": "Royalty asset mark only; excludes surface and producing PV"
+    },
+    {
+      "case": "Segment sum",
+      "method": "segment @ 10%",
+      "key_inputs": "Land $99 + Water $63 operating PV",
+      "return_pct": null,
+      "display": "~$162/sh",
+      "stance_gate": false,
+      "notes": "Producing cash flows only; see segment_build"
+    },
+    {
+      "case": "Segment implied",
+      "method": "reverse DCF (segments)",
+      "key_inputs": "Land 4%/3% 24\u00d7 + Water 6%/4% 20\u00d7",
+      "return_pct": -0.84,
+      "stance_gate": false,
+      "notes": "Tie-out to Lawrence -1.0% within 0.2pp"
+    },
+    {
+      "case": "NAV overlay base",
+      "method": "SOTP + segment PV",
+      "key_inputs": "Operating PV $162 + cash $3.6 + NRA option $16 + surface $32",
+      "return_pct": null,
+      "display": "~$211/sh vs price $393",
+      "stance_gate": false,
+      "notes": "Price ~87% above overlay base; watch stance"
     }
   ]
 }

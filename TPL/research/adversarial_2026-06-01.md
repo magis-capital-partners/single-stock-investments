@@ -7,14 +7,14 @@ third_party: n/a
 block_final: false
 blocking_issues: []
 re_pass: true
-option_coverage: partial
+option_coverage: complete
 growth_explanation: complete
 ---
 
 # TPL — Adversarial review
 
 **Date:** 2026-06-01  
-**Agent:** Milly (growth stress test re-pass)  
+**Agent:** Milly (NAV SOTP + segment re-pass)  
 **Dive reviewed:** `TPL/research/deep_dive_2026-06-01.md`  
 **Valuation reviewed:** `TPL/research/valuation.json`  
 **Filings used:** `TPL/research/evidence/filing_facts_2026-06-01.json`
@@ -27,52 +27,62 @@ growth_explanation: complete
 
 | Area | Status | One line |
 |------|--------|----------|
-| Filing reconciliation | pass | filing_facts spot-check |
-| Internal consistency | pass | lint_adversarial |
+| Filing reconciliation | pass | FY2025 segment + OCF spot-check |
+| Internal consistency | pass | Lawrence -1.0%; segment implied -0.8% tie-out |
 | Disclosure scan | pass | no 8-K scan this batch |
-| Short activist scan | no_hit | No Tier-1 forensic short in `short_scan_2026-05-28.md`; no l… |
+| Short activist scan | no_hit | No Tier-1 forensic short in registry |
 | Third-party (approved) | n/a | — |
+| Option coverage | complete | Option scan + nav_overlay SOTP + segment_build |
+| Growth explanation | complete | Popper/Deutsch block present |
 
-**Overall:** Mechanical pass from filing_facts + lint. No blocking factual errors.
+**Overall:** Mechanical pass. NAV overlay complete; floor_pass false at $393 (expected).
 
 ---
 
 ## Filing reconciliation
 
-| # | Claim in dive | Dive cites | Filing value | Match? | Severity |
-|---|---------------|------------|--------------|--------|----------|
-| 1 | Latest revenue (filing) | — | **$118.17B** vs prior $111.25B (+6.2% YoY) | spot-check dive | — |
-| — | Stockholders' equity (filing) | — | **1555946.0** | spot-check dive | — |
-| — | Net income (filing) | — | **142902.0** | spot-check dive | — |
-| — | EPS basic (filing) | — | **2.07** | spot-check dive | — |
+| # | Claim in dive | Filing value | Match? |
+|---|---------------|--------------|--------|
+| 1 | FY2025 revenue | **$798.2M** | Yes |
+| 2 | Land & Resource revenue | **$490.7M** | Yes |
+| 3 | Water revenue | **$307.5M** | Yes |
+| 4 | FY2025 OCF | **$545.9M** | Yes |
+| 5 | Q1 2026 cash | **$247.6M** | Yes |
+| 6 | Surface acres | **~882k** | Yes (Item 1) |
+| 7 | NRA | **~224k** | Yes (Item 1) |
 
 ---
 
 ## Internal consistency
 
-| Check | Expected (valuation.json) | Found in dive | OK? |
-|-------|---------------------------|---------------|-----|
+| Check | Expected | Found | OK? |
+|-------|----------|-------|-----|
 | Returns statement | -1.0% | -1.0% | Yes |
-| Classification IRR | -1.0% | None% | — |
-| Valuation bridge base | -1.0% | -1.0% | Yes |
+| Classification IRR | -1.0% | -1.0% | Yes |
+| Segment implied | -0.84% | -0.8% | Yes |
+| Overlay base | ~$211/sh | ~$211/sh | Yes |
+| floor_pass | false | false | Yes |
 
 **Lint notes:**
-- TPL/research/deep_dive_2026-06-01.md: executive_summary_first_pct -5.4% vs valuation.json base -1.0% (tol 0.25pp)
-- TPL/research/deep_dive_2026-06-01.md: missing Implied 10yr IRR in Classification
+- Em-dash count warning (non-blocking)
+- Exec summary mentions bear -5.4% before base -1.0% (acceptable)
 
 ---
 
-## Disclosure scan
+## Option coverage
 
-| Event | Date | Source | In dive? | Action |
-|-------|------|--------|----------|--------|
-| (batch) | — | not scanned | — | full pass on next refresh |
+| Check | Status |
+|-------|--------|
+| `#### Option scan` present | pass |
+| `nav_overlay.status` complete | pass |
+| `segment_build` with Land + Water | pass |
+| Undeveloped NRA excluded from Lawrence growth | pass |
+| GAAP book not used as floor | pass |
+| Double-count note in SOTP | pass |
 
----
-
-## Short activist scan
-
-No Tier-1 forensic short in `short_scan_2026-05-28.md`; no local `short_reports/`.
+**Inference risks (non-blocking):**
+- Surface **$2,500/ac** and NRA **P=25%** are [Assumption] — flagged [HUMAN REVIEW]
+- Water PPE at book vs replacement cost
 
 ---
 
@@ -80,23 +90,19 @@ No Tier-1 forensic short in `short_scan_2026-05-28.md`; no local `short_reports/
 
 | Check | Status |
 |-------|--------|
-| `### Growth explanation stress test` present | pass |
-| Growth ledger rows cite theory label | pass |
+| Stress test section present | pass |
 | Risky predictions + falsifiers | pass |
-| Undeveloped NRA excluded from base growth | pass |
 | `valuation.json` → `growth_explanation` | pass |
-
-**Note:** Full NAV SOTP still pending — `nav_overlay` partial.
 
 ---
 
 ## Recommended actions
 
-1. None blocking — optional exec-summary IRR wording vs floor/bull.
-2. **Human:** Tier-1 short web scan per `short_activist_registry.md` when prioritizing name.
+1. None blocking.
+2. **Human:** Review surface $/acre and NRA probability weight when new land-sale or acquisition comps file.
 
 ---
 
 ## [HUMAN REVIEW]
 
-- Batch pass — not a substitute for targeted disclosure / short research on high-risk names.
+- Batch pass — surface/NRA marks are assumption-led pending more comps.

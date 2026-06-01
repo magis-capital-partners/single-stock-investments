@@ -17,7 +17,7 @@
 
 ## One-line thesis
 
-Permian land, royalty, and water toll at **~$393**: durable moat, but Lawrence base **-1.0%** at **~50×** owner cash — **watch** for a better entry.
+Permian land, royalty, and water toll at **~$393**: durable moat, Lawrence base **-1.0%**, NAV overlay **~$211/sh** vs price — **watch** for better entry.
 
 ## Key questions
 
@@ -27,4 +27,4 @@ Permian land, royalty, and water toll at **~$393**: durable moat, but Lawrence b
 
 ## [HUMAN REVIEW]
 
-- Post-HK governance (LCI 2026); infrastructure vs optionality archetype.
+- Surface **$/acre** mark (**$2,500/ac** base vs **$5,718/ac** May 2025 sale comp) and NRA **P=25%** weight.
