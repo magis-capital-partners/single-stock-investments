@@ -13,19 +13,24 @@
   "inputs": {
     "price": 6.7,
     "price_source": "Stooq FRMO.US close 2026-05-22",
-    "book_per_share": 8.55,
-    "normalization_note": "Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book."
+    "book_per_share": 8.54,
+    "normalization_note": "Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book.",
+    "book_per_share_filed": 8.56,
+    "book_per_share_current": 8.54
   },
   "optionality_gate": {
     "framework": "holdco_sotp",
     "floor_pass": true,
     "floor_metric": "book_per_share",
-    "floor_value": 8.55,
+    "floor_value": 8.54,
     "primary_metric": "lawrence_base",
     "primary_label": "annualized return",
     "primary_return_pct": 21.9,
     "incumbent_sleeve": true,
-    "notes": "Trades ~22% below book ($8.55); same SOTP payoffs as prior refresh. HK/MIAX/CMSG catalysts unchanged."
+    "notes": "Trades ~22% below book ($8.55); same SOTP payoffs as prior refresh. HK/MIAX/CMSG catalysts unchanged.",
+    "floor_value_filed": 8.56,
+    "floor_value_current": 8.54,
+    "discount_to_current_book_pct": 21.5
   },
   "scenarios": {
     "bear": {
@@ -249,5 +254,18 @@
       "return_pct": 30.1
     }
   },
-  "overlay_results": []
+  "overlay_results": [],
+  "book_estimate": {
+    "as_of": "2026-06-01",
+    "filing_period_end": "2026-02-28",
+    "filing_source": "investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
+    "filed_book_per_share": 8.56,
+    "current_book_per_share": 8.54,
+    "delta_per_share": -0.02,
+    "delta_pct_of_filed_book": -0.24,
+    "discount_to_filed_book_pct": 21.7,
+    "discount_to_current_estimate_pct": 21.5,
+    "config_path": "FRMO/research/book_estimate_config.json",
+    "output_path": "FRMO/research/book_estimate.json"
+  }
 }

@@ -17,6 +17,8 @@
 | **Payoff lens** | — |
 | **MOI bucket** | — |
 
+**Deep dive:** `TPL/research/deep_dive_2026-06-01.md` (auto-sync)
+
 ## One-line thesis
 
 Permian land, royalty, and water toll at **~$393**: durable moat, falsifier-adjusted base **-1.0%**, NAV overlay **~$211/sh** vs price — **watch** for better entry.

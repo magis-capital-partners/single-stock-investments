@@ -48,6 +48,7 @@ MENTAL_MODELS = re.compile(r"### Mental models\b", re.IGNORECASE)
 MENTAL_MODELS_LEGACY = re.compile(r"### Mental models in plain English", re.IGNORECASE)
 RETURN_MATH = re.compile(r"#### Return math in plain English", re.IGNORECASE)
 IRR_ARITHMETIC = re.compile(r"#### IRR arithmetic \(show your work\)", re.IGNORECASE)
+SYNTHESIS_SECTION = re.compile(r"### Total synthesis IRR \(all sources\)", re.IGNORECASE)
 UPSIDE_DOWN = re.compile(r"\*\*Upside / downside from price:\*\*", re.IGNORECASE)
 PRIMARY_RISK = re.compile(r"\*\*Primary risk:\*\*", re.IGNORECASE)
 HOLDING_CO = re.compile(r"\*\*Archetype\*\*.*holding_co", re.IGNORECASE)
@@ -236,6 +237,21 @@ def lint_file(path: Path, *, legacy: bool, strict: bool) -> tuple[list[str], lis
                 "#### AI infrastructure — model coverage (ai_infrastructure_valuation.md)"
             )
             (errors if strict else warnings).append(msg)
+
+        syn = val.get("synthesis") or {}
+        if syn.get("status") == "complete":
+            if not SYNTHESIS_SECTION.search(text):
+                errors.append(
+                    f"{rel}: valuation.json synthesis complete — missing "
+                    "### Total synthesis IRR (all sources) (total_synthesis_irr.md)"
+                )
+            elif IRR_ARITHMETIC.search(text) and SYNTHESIS_SECTION.search(text):
+                irr_pos = IRR_ARITHMETIC.search(text).start()
+                syn_pos = SYNTHESIS_SECTION.search(text).start()
+                if syn_pos < irr_pos:
+                    errors.append(
+                        f"{rel}: Total synthesis IRR must follow #### IRR arithmetic (total_synthesis_irr.md)"
+                    )
 
     return errors, warnings
 

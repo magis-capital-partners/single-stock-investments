@@ -17,6 +17,8 @@
 | **Payoff lens** | — |
 | **MOI bucket** | — |
 
+**Deep dive:** `OTCM/research/deep_dive_2026-06-01.md` (auto-sync)
+
 ## One-line thesis
 
 U.S. OTC market infrastructure and ATS operator — a Stahl **croupier** with subscription-heavy fees and expanding disclosure tiers (OTCID) and extended-hours trading — earnings scale with issuer count and activity, not balance-sheet risk.

@@ -17,6 +17,8 @@
 | **Payoff lens** | — |
 | **MOI bucket** | — |
 
+**Deep dive:** `SPGI/research/deep_dive_2026-06-01.md` (auto-sync)
+
 ## One-line thesis
 
 Essential financial intelligence — ratings, indices, and data subscriptions — a Stahl **croupier / index infrastructure** compounder with extraordinary margins; earnings leverage to issuance and AUM with cyclicality at the margin.

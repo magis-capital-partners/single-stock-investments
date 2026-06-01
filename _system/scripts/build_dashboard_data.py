@@ -6,10 +6,15 @@ import csv
 import json
 import os
 import re
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "_system" / "scripts"))
+from dated_md import dated_md_label, dated_md_sort_key, latest_dated_md  # noqa: E402
+from valuation_synthesis import website_implied_irr  # noqa: E402
+
 DATA_DIR = ROOT / "dashboard" / "data"
 OUTPUT = DATA_DIR / "dashboard_data.json"
 CLASS_PATH = ROOT / "_system" / "portfolio" / "classification.json"
@@ -27,28 +32,6 @@ def github_tree_url(rel_path: str) -> str:
 
 
 DATED_MD_RE = re.compile(r"_(\d{4}-\d{2}-\d{2})\.md$")
-
-
-def file_recency(path: Path) -> datetime:
-    """Prefer YYYY-MM-DD in filename; break ties with mtime (matches marvin_pick_ticker)."""
-    mtime_dt = datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc)
-    m = DATED_MD_RE.search(path.name)
-    if not m:
-        return mtime_dt
-    name_dt = datetime.strptime(m.group(1), "%Y-%m-%d").replace(tzinfo=timezone.utc)
-    return max(name_dt, mtime_dt)
-
-
-def latest_dated_md(research: Path, prefix: str) -> Path | None:
-    files = list(research.glob(f"{prefix}_*.md"))
-    if not files:
-        return None
-    return max(files, key=file_recency)
-
-
-def dated_md_label(path: Path) -> str:
-    m = DATED_MD_RE.search(path.name)
-    return m.group(1) if m else datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc).strftime("%Y-%m-%d")
 
 
 # Known metadata fallback when holdings.md is sparse
@@ -267,13 +250,15 @@ def classification_for(ticker: str, ticker_dir: Path, portfolio: dict[str, dict]
     out = {k: merged.get(k, defaults[k]) for k in defaults}
     val = load_valuation(ticker_dir)
     if val:
+        if not val.get("ticker"):
+            val["ticker"] = ticker_dir.name
+        irr_web = website_implied_irr(val)
         inputs = val.get("classification_inputs") or {}
         for key in ("archetype", "moat", "dhando", "cycle"):
             if inputs.get(key) and inputs[key] not in ("-", "—", "pending"):
                 out[key] = inputs[key]
-        implied = val.get("implied_return", {})
-        if implied.get("display") and out.get("implied_irr") in ("pending", "—", None):
-            out["implied_irr"] = implied["display"]
+        if irr_web.get("display"):
+            out["implied_irr"] = irr_web["display"]
         method = val.get("method", val.get("irr_method"))
         if method and out.get("irr_method") == "pending":
             out["irr_method"] = method
@@ -292,7 +277,14 @@ def classification_for(ticker: str, ticker_dir: Path, portfolio: dict[str, dict]
             out["stance"] = proposal["suggested"]
         if val.get("as_of"):
             out["analysis_as_of"] = val["as_of"]
-        out["analysis_irr_pct"] = parse_irr_pct(out.get("implied_irr"))
+        if irr_web.get("base_pct") is not None:
+            out["analysis_irr_pct"] = float(irr_web["base_pct"])
+        else:
+            out["analysis_irr_pct"] = parse_irr_pct(out.get("implied_irr"))
+        if irr_web.get("falsifier_adjusted_pct") is not None:
+            out["filing_irr_ref"] = f"{irr_web['falsifier_adjusted_pct']}% (falsifier-adjusted)"
+        if irr_web.get("synthesis_status") == "complete":
+            out["irr_source"] = "total_synthesis"
     return out
 
 
@@ -447,7 +439,7 @@ def recent_developments(ticker_dir: Path, ticker: str) -> list[dict]:
     dive_paths: list[Path] = []
     if research.exists():
         dive_paths = sorted(
-            research.glob("deep_dive_*.md"), key=file_recency, reverse=True
+            research.glob("deep_dive_*.md"), key=dated_md_sort_key, reverse=True
         )[:2]
         for f in dive_paths:
             rel = str(f.relative_to(ROOT)).replace("\\", "/")

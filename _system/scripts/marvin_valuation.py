@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 
 from growth_theory import enrich_growth_explanation, load_filing_facts, theory_scenario  # noqa: E402
+from valuation_synthesis import compute_synthesis  # noqa: E402
 CLASS_PATH = ROOT / "_system" / "portfolio" / "classification.json"
 AI_HYPERSCALERS = frozenset({"GOOGL", "AMZN", "META", "MSFT"})
 SEGMENT_DISCOUNT_DEFAULT = 0.10
@@ -479,6 +480,11 @@ def compute_valuation(data: dict) -> dict:
     data["stance_proposal"] = propose_stance(base_pct, moat, dhando, method, data=data)
 
     data["overlay_results"] = compute_ai_overlay_rows(data, results)
+
+    compute_synthesis(data)
+    synthesis_pct = (data.get("synthesis") or {}).get("total_synthesis_pct")
+    if synthesis_pct is not None:
+        data["stance_proposal"] = propose_stance(synthesis_pct, moat, dhando, method, data=data)
 
     ticker = data.get("ticker", "")
     if ticker in AI_HYPERSCALERS and not data.get("ai_overlay"):

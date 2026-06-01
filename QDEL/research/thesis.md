@@ -17,7 +17,7 @@
 | **Payoff lens** | — |
 | **MOI bucket** | — |
 
-**Deep dive:** `QDEL/research/deep_dive_2026-05-27.md`
+**Deep dive:** `QDEL/research/deep_dive_2026-06-01.md` (auto-sync)
 
 ## One-line thesis
 

@@ -17,6 +17,8 @@
 | **Payoff lens** | — |
 | **MOI bucket** | — |
 
+**Deep dive:** `TEQ.ST/research/deep_dive_2026-06-01.md` (auto-sync)
+
 ## One-line thesis
 
 Swedish industrial **serial acquirer** of niche subsidiaries — decentralized Pabrai-style model with 2025–2026 **margin/FCF turnaround** underway; organic sales still negative while unprofitable units are pruned.

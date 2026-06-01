@@ -43,4 +43,4 @@ Dominant e-commerce + AWS platform compounding at scale (FY2025 $717B sales, $78
 - Model capex vs. AWS/chips ROI through 2028.
 - Confirm valuation vs 5-year range before sizing.
 
-**Deep dive:** `AMZN/research/deep_dive_2026-05-21.md`
+**Deep dive:** `AMZN/research/deep_dive_2026-06-01.md` (auto-sync)

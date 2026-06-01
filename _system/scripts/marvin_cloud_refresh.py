@@ -128,6 +128,13 @@ def main() -> int:
         "valuation write",
         [PY, str(SCRIPTS / "marvin_valuation.py"), "--ticker", ticker, "--write"],
     )
+    book_cfg = research / "book_estimate_config.json"
+    if book_cfg.exists():
+        ok &= run(
+            "book estimate",
+            [PY, str(SCRIPTS / "current_book_estimate.py"), ticker, "--write"],
+            optional=True,
+        )
     ok &= run(
         "deep dive v2 refresh",
         [PY, str(SCRIPTS / "refresh_deep_dive_v2.py"), ticker, "--date", args.date],

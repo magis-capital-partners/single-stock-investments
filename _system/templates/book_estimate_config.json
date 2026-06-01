@@ -1,0 +1,44 @@
+{
+  "ticker": "TICKER",
+  "enabled": true,
+  "filing_anchor": {
+    "period_end": "YYYY-MM-DD",
+    "source": "path/to/latest/quarterly_or_annual.pdf",
+    "scope": "frmo_attributable | consolidated",
+    "book_equity_m": 0.0,
+    "shares": 0
+  },
+  "lines": [
+    {
+      "id": "example_listed",
+      "label": "Listed stake — mark to market",
+      "method": "listed_shares",
+      "symbol": "SYMBOL.US",
+      "shares": 0,
+      "filing_price": 0.0,
+      "filing_value_m": 0.0,
+      "source": "filing note or page"
+    },
+    {
+      "id": "example_fund_lookthrough",
+      "label": "Fund look-through — weight proxy",
+      "method": "fund_weight_proxy",
+      "parent_filing_value_m": 0.0,
+      "weight_pct": 0,
+      "symbol": "CHILD.US",
+      "filing_price": 0.0,
+      "source": "[HUMAN REVIEW] weight until look-through table filed",
+      "human_review": true
+    },
+    {
+      "id": "example_crypto",
+      "label": "Crypto treasury",
+      "method": "crypto_units",
+      "coingecko_id": "bitcoin",
+      "units": 0,
+      "filing_unit_price": 0.0,
+      "filing_value_m": 0.0,
+      "source": "digital asset table in filing"
+    }
+  ]
+}

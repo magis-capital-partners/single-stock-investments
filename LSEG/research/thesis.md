@@ -17,6 +17,8 @@
 | **Payoff lens** | — |
 | **MOI bucket** | — |
 
+**Deep dive:** `LSEG/research/deep_dive_2026-06-01.md` (auto-sync)
+
 ## One-line thesis
 
 Global data/index/clearing croupier with 50%+ margins and strong cash conversion; quality franchise at **~£91** implies **12.6%** base return — **watch** below 15% bar.

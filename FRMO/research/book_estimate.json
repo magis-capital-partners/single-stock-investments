@@ -1,0 +1,129 @@
+{
+  "ticker": "FRMO",
+  "as_of": "2026-06-01",
+  "framework": "current_book_estimate.md",
+  "filing_anchor": {
+    "period_end": "2026-02-28",
+    "source": "investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
+    "scope": "frmo_attributable",
+    "book_equity_m": 376.704,
+    "shares": 44022781,
+    "filed_book_per_share": 8.56
+  },
+  "lines": [
+    {
+      "id": "mih_miax",
+      "label": "MIH / MIAX direct stake (fair value)",
+      "method": "listed_shares",
+      "source": "2026-02-28_Quarterly_Report.pdf Note 4; valuation.json mih_miax",
+      "filing_value_m": 13.917,
+      "current_value_m": 12.972,
+      "delta_m": -0.945,
+      "price_source": "stooq",
+      "symbol": "MIAX.US",
+      "current_price": 47.945,
+      "filing_price": 51.42,
+      "shares": 270563
+    },
+    {
+      "id": "cmsg_stake",
+      "label": "CMSG stake (fair value method from Jul 2025)",
+      "method": "manual_price",
+      "source": "2026-02-28_Quarterly_Report.pdf Note 4; CMSG proxy indirect FRMO 17,417 sh; CMSG.US not on Stooq",
+      "filing_value_m": 0.742,
+      "current_value_m": 0.523,
+      "delta_m": -0.219,
+      "price_source": "manual",
+      "current_price": 30.0,
+      "filing_price": 42.6,
+      "shares": 17417,
+      "human_review": true
+    },
+    {
+      "id": "hkhc_equity",
+      "label": "HKHC 4.42% economic stake (equity method carrying \u2192 market)",
+      "method": "ownership_market_value",
+      "source": "2026-02-28_Quarterly_Report.pdf; shares_out [HUMAN REVIEW]",
+      "filing_value_m": 27.187,
+      "current_value_m": 26.633,
+      "delta_m": -0.554,
+      "price_source": "stooq",
+      "symbol": "HKHC.US",
+      "current_price": 26.9,
+      "filing_price": 27.48,
+      "filing_carrying_value_m": 27.187,
+      "human_review": true
+    },
+    {
+      "id": "investment_a_tpl",
+      "label": "Investment A look-through \u2014 TPL (weight proxy)",
+      "method": "fund_weight_proxy",
+      "source": "[HUMAN REVIEW] LCI/Stahl top holding ~35% of Investment A; confirm when look-through filed",
+      "filing_value_m": 108.144,
+      "current_value_m": 106.354,
+      "delta_m": -1.79,
+      "price_source": "stooq",
+      "symbol": "TPL.US",
+      "current_price": 373.71,
+      "filing_price": 380.0,
+      "weight_pct": 35,
+      "human_review": true
+    },
+    {
+      "id": "investment_a_gbtc",
+      "label": "Investment A look-through \u2014 GBTC (weight proxy)",
+      "method": "fund_weight_proxy",
+      "source": "[HUMAN REVIEW] LCI crypto stack; GBTC weight estimate",
+      "filing_value_m": 46.348,
+      "current_value_m": 49.592,
+      "delta_m": 3.244,
+      "price_source": "stooq",
+      "symbol": "GBTC.US",
+      "current_price": 55.64,
+      "filing_price": 52.0,
+      "weight_pct": 15,
+      "human_review": true
+    },
+    {
+      "id": "investment_a_hkhc",
+      "label": "Investment A look-through \u2014 HKHC (weight proxy)",
+      "method": "fund_weight_proxy",
+      "source": "[HUMAN REVIEW] HK ecosystem overlap inside Investment A",
+      "filing_value_m": 30.898,
+      "current_value_m": 30.246,
+      "delta_m": -0.652,
+      "price_source": "stooq",
+      "symbol": "HKHC.US",
+      "current_price": 26.9,
+      "filing_price": 27.48,
+      "weight_pct": 10,
+      "human_review": true
+    }
+  ],
+  "tie_out": {
+    "markable_filing_sum_m": 227.236,
+    "static_residual_m": 149.468,
+    "note": "static_residual = filed equity minus sum of line filing values; should be >= 0"
+  },
+  "summary": {
+    "delta_equity_m": -0.916,
+    "delta_per_share": -0.02,
+    "delta_pct_of_filed_book": -0.24,
+    "current_book_equity_m": 375.788,
+    "current_book_per_share": 8.54
+  },
+  "price_comparison": {
+    "market_price": 6.7,
+    "market_price_source": "Stooq FRMO.US close 2026-05-22",
+    "discount_to_filed_book_pct": 21.7,
+    "discount_to_current_estimate_pct": 21.5,
+    "premium_to_filed_book_pct": null
+  },
+  "staleness_flags": [
+    "cmsg_stake: [HUMAN REVIEW]",
+    "hkhc_equity: [HUMAN REVIEW]",
+    "investment_a_tpl: [HUMAN REVIEW]",
+    "investment_a_gbtc: [HUMAN REVIEW]",
+    "investment_a_hkhc: [HUMAN REVIEW]"
+  ]
+}

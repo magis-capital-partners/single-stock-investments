@@ -17,7 +17,7 @@
 | **Payoff lens** | — |
 | **MOI bucket** | — |
 
-**Deep dive:** `FRMO/research/deep_dive_2026-05-27.md` (filing-grounded refresh)
+**Deep dive:** `FRMO/research/deep_dive_2026-06-01.md` (auto-sync)
 
 ## One-line thesis
 

@@ -57,6 +57,7 @@ Third party: approved registry in `third_party_sources.md`; pending PDFs flagged
 | **Segment cash-flow** | `segment_cashflow_valuation.md` | `valuation_overlay`, `segment_build`, `options[]` | `#### Segment map`; `### Segment cash-flow build` |
 | **AI infrastructure** | `ai_infrastructure_valuation.md` | `ai_overlay` | `#### AI infrastructure — model coverage` |
 | **Holdco / land / NAV** | `optionality_valuation.md` | `valuation_mode`, `optionality_gate`, `nav_overlay` | `### Optionality overlay`; SOTP / NAV tables |
+| **Current book estimate** | `current_book_estimate.md` | `book_estimate_config.json`, `book_estimate.json` | `### Current book value estimate (mark-to-market)` |
 | **Growth theory** | `growth_explanation_stress_test.md` | `growth_explanation` | `### Growth explanation stress test`; Payoff growth one-liner |
 
 **Lawrence consolidated IRR** remains stance gate unless human sets `optionality_gate.primary_metric` or overrides. Overlays **must size options with evidence** — see treatment ladder; **no auto-zero**.
@@ -66,6 +67,8 @@ Third party: approved registry in `third_party_sources.md`; pending PDFs flagged
 **AI hyperscalers (GOOGL, AMZN, META, MSFT):** segment overlay + `ai_overlay` + option scan on backlog, loss segments, chips.
 
 **Land / infrastructure (TPL, KEWL):** `nav_overlay` when GAAP misstates assets; segment build for producing vs undeveloped.
+
+**Holdco / treasury book discount (FRMO, CMSG):** `book_estimate_config.json` + `python _system/scripts/current_book_estimate.py {TICKER} --write`. Reports cite **filed book** and **current book estimate** separately.
 
 ## Peer templates
 - Best JP structure: `8697.T/`

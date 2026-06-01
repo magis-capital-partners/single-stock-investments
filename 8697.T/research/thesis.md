@@ -17,6 +17,8 @@
 | **Payoff lens** | — |
 | **MOI bucket** | — |
 
+**Deep dive:** `8697.T/research/deep_dive_2026-06-01.md` (auto-sync)
+
 ## One-line thesis
 
 Japan's dominant exchange and clearing infrastructure — a Stahl **croupier** with ~58% operating margins and volume leverage — but earnings are cyclical with market turnover; do not treat FY2025 peak activity as a permanent baseline.

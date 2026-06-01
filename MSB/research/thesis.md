@@ -9,13 +9,15 @@
 | **Archetype** (Stahl) | optionality |
 | **Moat** (Munger) | n/a |
 | **Dhando** (Pabrai) | partial |
-| **Stance** | watch |
+| **Stance** | hold |
 | **Cycle** | mid |
-| **Implied 10yr IRR** (Lawrence) | 8.4% (normalized distribution yield) |
+| **Implied 10yr IRR** (base) | 10.3% (base) |
 | **IRR method** | yield_curve |
 | **Lawrence bucket** | other |
+| **Payoff lens** | — |
+| **MOI bucket** | — |
 
-**Deep dive:** `MSB/research/deep_dive_2026-05-27.md`
+**Deep dive:** `MSB/research/deep_dive_2026-06-01.md` (auto-sync)
 
 Predictive-attribute tag (portfolio JSON): **equity_yield_curve** — legal/pricing hiatus vs long-lived pellet royalty contract (human to confirm usefulness).
 

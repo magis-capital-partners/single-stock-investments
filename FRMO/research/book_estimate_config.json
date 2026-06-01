@@ -1,0 +1,79 @@
+{
+  "ticker": "FRMO",
+  "enabled": true,
+  "filing_anchor": {
+    "period_end": "2026-02-28",
+    "source": "investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
+    "scope": "frmo_attributable",
+    "book_equity_m": 376.704,
+    "shares": 44022781
+  },
+  "lines": [
+    {
+      "id": "mih_miax",
+      "label": "MIH / MIAX direct stake (fair value)",
+      "method": "listed_shares",
+      "symbol": "MIAX.US",
+      "shares": 270563,
+      "filing_price": 51.42,
+      "filing_value_m": 13.917,
+      "source": "2026-02-28_Quarterly_Report.pdf Note 4; valuation.json mih_miax"
+    },
+    {
+      "id": "cmsg_stake",
+      "label": "CMSG stake (fair value method from Jul 2025)",
+      "method": "manual_price",
+      "shares": 17417,
+      "filing_price": 42.6,
+      "filing_value_m": 0.742,
+      "current_price": 30.0,
+      "source": "2026-02-28_Quarterly_Report.pdf Note 4; CMSG proxy indirect FRMO 17,417 sh; CMSG.US not on Stooq",
+      "human_review": true
+    },
+    {
+      "id": "hkhc_equity",
+      "label": "HKHC 4.42% economic stake (equity method carrying → market)",
+      "method": "ownership_market_value",
+      "symbol": "HKHC.US",
+      "ownership_pct": 4.42,
+      "shares_outstanding": 22400000,
+      "filing_price": 27.48,
+      "filing_carrying_value_m": 27.187,
+      "source": "2026-02-28_Quarterly_Report.pdf; shares_out [HUMAN REVIEW]",
+      "human_review": true
+    },
+    {
+      "id": "investment_a_tpl",
+      "label": "Investment A look-through — TPL (weight proxy)",
+      "method": "fund_weight_proxy",
+      "parent_filing_value_m": 308.984,
+      "weight_pct": 35,
+      "symbol": "TPL.US",
+      "filing_price": 380.0,
+      "source": "[HUMAN REVIEW] LCI/Stahl top holding ~35% of Investment A; confirm when look-through filed",
+      "human_review": true
+    },
+    {
+      "id": "investment_a_gbtc",
+      "label": "Investment A look-through — GBTC (weight proxy)",
+      "method": "fund_weight_proxy",
+      "parent_filing_value_m": 308.984,
+      "weight_pct": 15,
+      "symbol": "GBTC.US",
+      "filing_price": 52.0,
+      "source": "[HUMAN REVIEW] LCI crypto stack; GBTC weight estimate",
+      "human_review": true
+    },
+    {
+      "id": "investment_a_hkhc",
+      "label": "Investment A look-through — HKHC (weight proxy)",
+      "method": "fund_weight_proxy",
+      "parent_filing_value_m": 308.984,
+      "weight_pct": 10,
+      "symbol": "HKHC.US",
+      "filing_price": 27.48,
+      "source": "[HUMAN REVIEW] HK ecosystem overlap inside Investment A",
+      "human_review": true
+    }
+  ]
+}

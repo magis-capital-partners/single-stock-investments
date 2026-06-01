@@ -43,4 +43,4 @@ Global alternative-asset compounder earning durable fee streams on $614B fee-bea
 - Confirm DE yield vs 5-year range before sizing.
 - Model BN+BNT merger impact.
 
-**Deep dive:** `BN/research/deep_dive_2026-05-27.md`
+**Deep dive:** `BN/research/deep_dive_2026-06-01.md` (auto-sync)

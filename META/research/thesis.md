@@ -17,6 +17,8 @@
 | **Payoff lens** | — |
 | **MOI bucket** | — |
 
+**Deep dive:** `META/research/deep_dive_2026-06-01.md` (auto-sync)
+
 ## One-line thesis
 
 At ~$633, Meta's Family of Apps funds AI capex and Reality Labs; Lawrence base annual return **5.9%** (watch stance) pending proof that **$125–145B** 2026 capex earns owner cash.
