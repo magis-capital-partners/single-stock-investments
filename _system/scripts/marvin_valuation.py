@@ -340,40 +340,11 @@ def compute_ai_overlay_rows(data: dict, lawrence_results: dict) -> list[dict]:
             }
         )
 
-    seg = compute_segment_overlay(data)
-    if seg and price:
-        rows.append(
-            {
-                "case": "Segment sum",
-                "method": f"segment @ {seg['explicit_discount_rate_pct']:.0f}%",
-                "key_inputs": f"PV ${seg['sum_pv_per_share_at_explicit_discount']}/sh vs P₀ ${price}",
-                "return_pct": None,
-                "display": f"${seg['sum_pv_per_share_at_explicit_discount']}/sh",
-                "stance_gate": False,
-            }
-        )
-        seg_labels = [
-            s.get("label", s.get("id", "segment"))
-            for s in (data.get("segment_build") or {}).get("segments", [])
-        ]
-        seg_key = " + ".join(seg_labels[:3]) if seg_labels else "Operating segments"
-        if (data.get("segment_build") or {}).get("options"):
-            seg_key += " + drags; options at base zero"
-        rows.append(
-            {
-                "case": "Segment implied",
-                "method": "reverse DCF (segments)",
-                "key_inputs": seg_key,
-                "return_pct": seg["implied_business_return_pct"],
-                "stance_gate": False,
-            }
-        )
-
     return rows
 
 
 def compute_growth_theory_results(data: dict, price: float, fcf0: float) -> dict:
-    """Popper/Deutsch path: theory-implied + falsifier-adjusted IRR (primary display)."""
+    """Optional JSON reference: theory-implied + falsifier-adjusted IRR (not primary display)."""
     ge = data.get("growth_explanation")
     if not ge or data.get("method") not in ("full", "scenario"):
         return {}
@@ -391,28 +362,19 @@ def compute_growth_theory_results(data: dict, price: float, fcf0: float) -> dict
     return out
 
 
-def apply_primary_implied_return(data: dict, lawrence_base_pct: float | None) -> None:
-    """Website / dive primary IRR = falsifier-adjusted; Lawrence kept as legacy."""
-    gt = data.get("results_growth_theory") or {}
-    fa_pct = gt.get("falsifier_adjusted", {}).get("return_pct")
-    ti_pct = gt.get("theory_implied", {}).get("return_pct")
-    primary = fa_pct if fa_pct is not None else ti_pct if ti_pct is not None else lawrence_base_pct
-
+def apply_primary_implied_return(data: dict, lawrence_base_pct: float | None, return_label: str) -> None:
+    """Primary IRR = Lawrence scenarios.base (display and stance)."""
     data["implied_return"] = {
-        "base_pct": primary,
-        "falsifier_adjusted_pct": fa_pct,
-        "theory_implied_pct": ti_pct,
-        "lawrence_legacy_pct": lawrence_base_pct,
-        "label": "10yr IRR (falsifier-adjusted)",
-        "display": f"{primary}% (falsifier-adjusted)" if primary is not None else "pending",
+        "base_pct": lawrence_base_pct,
+        "label": return_label,
+        "display": f"{lawrence_base_pct}% (base)" if lawrence_base_pct is not None else "pending",
     }
 
     gate = data.get("optionality_gate")
     if gate:
-        gate["primary_metric"] = "falsifier_adjusted"
-        gate["primary_label"] = "10yr IRR (falsifier-adjusted)"
-        gate["primary_return_pct"] = primary
-        gate["lawrence_legacy_pct"] = lawrence_base_pct
+        gate["primary_metric"] = "lawrence_base"
+        gate["primary_label"] = return_label
+        gate["primary_return_pct"] = lawrence_base_pct
 
 
 def growth_theory_bridge_rows(data: dict) -> list[dict]:
@@ -513,20 +475,11 @@ def compute_valuation(data: dict) -> dict:
     fcf0 = inputs.get("fcf_per_share") or inputs.get("per_share")
     if method in ("full", "scenario") and data.get("growth_explanation"):
         compute_growth_theory_results(data, float(price) if price else 0, float(fcf0) if fcf0 else 0)
-        apply_primary_implied_return(data, base_pct)
-        primary_pct = data.get("implied_return", {}).get("base_pct")
-        data["stance_proposal"] = propose_stance(primary_pct, moat, dhando, method, data=data)
-    else:
-        data["implied_return"] = {
-            "base_pct": base_pct,
-            "label": return_label,
-            "display": f"{base_pct}% (base)" if base_pct is not None else "pending",
-        }
-        data["stance_proposal"] = propose_stance(base_pct, moat, dhando, method, data=data)
 
-    overlay = compute_ai_overlay_rows(data, results)
-    overlay = growth_theory_bridge_rows(data) + overlay
-    data["overlay_results"] = overlay
+    apply_primary_implied_return(data, base_pct, return_label)
+    data["stance_proposal"] = propose_stance(base_pct, moat, dhando, method, data=data)
+
+    data["overlay_results"] = compute_ai_overlay_rows(data, results)
 
     compute_synthesis(data)
     synthesis_pct = (data.get("synthesis") or {}).get("total_synthesis_pct")

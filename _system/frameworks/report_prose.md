@@ -63,17 +63,18 @@ Spell out jargon once in the body; the footer may keep short codes.
 | PV | present value |
 | approx., est. | approximately, estimate (or drop) |
 
-**IRR:** In executive summary and returns statement, prefer **"X% per year"** or **"annual return"**. First use in Valuation section: **"annual return at today's price"**; then IRR in the bridge table column is fine.
+**IRR:** In executive summary and returns statement, prefer **"X% per year"** or **"annual return"**. First use in Valuation section: **"annual return at today's price"**.
 
-**Archetype-specific valuation layout:** `_system/frameworks/archetype_valuation_prose.md` — section titles, ledger row labels, and bridge wording per Stahl archetype (`compounder`, `croupier`, `holding_co`, etc.).
+**Archetype-specific valuation layout:** `_system/frameworks/archetype_valuation_prose.md` — section titles and ledger row labels per Stahl archetype (`compounder`, `croupier`, `holding_co`, etc.).
 
 ### Readable valuation headings
 
 | Internal / lint name | Reader-facing title in prose |
 |----------------------|------------------------------|
-| Valuation bridge | **Valuation bridge (bear, base, bull)** — columns: Case · Method · Main assumptions · Annual return · Versus 15% target |
 | Assumption ledger | **Assumption ledger (base case)** — Assumption column = full phrases, not codes |
 | IRR arithmetic | Open with: **"How we calculated the annual return"** (keep `#### IRR arithmetic` for lint) |
+
+**Do not include:** valuation bridge overlay tables, Popper/Deutsch stress-test subsections, or Deutsch check tables.
 
 ---
 
@@ -89,12 +90,12 @@ From `_system/frameworks/hohn_business_analysis.md`. **Narrative uses plain Engl
 
 | Must have | Where |
 |-----------|--------|
-| IRR arithmetic | `#### IRR arithmetic (show your work)` after valuation bridge — **required** (`lawrence_irr.md` § F) |
+| IRR arithmetic | `#### IRR arithmetic (show your work)` after assumption ledger — **required** (`lawrence_irr.md` § F) |
 | Upside / downside from price | One line **after** IRR arithmetic |
 | Quantified pillars + structural/cyclical | Thesis pillars table + one prose paragraph |
 | One primary risk | Returns statement + first line under `## Risks & inversion` |
 | Fieldwork or gap | Under Business mechanics only (not Primary sources) |
-| Show the math | Step-by-step in IRR arithmetic; valuation bridge table is summary only |
+| Show the math | Step-by-step in IRR arithmetic; assumption ledger lists every input |
 
 **Operating companies:** % changes on volume, price, margin; name one peer when relevant.
 
@@ -162,7 +163,7 @@ Skip if every term was spelled out on first use in the body.
 
 ## Cross-checks and refreshes
 
-- **Quarterly refresh:** update What / Why mispriced / executive summary / Hohn snapshot / bridge / Payoff blocks.
+- **Quarterly refresh:** update What / Why mispriced / executive summary / Hohn snapshot / Payoff blocks.
 - **Cross-check:** same prose rules; re-derive from primary PDFs; no em-dash pileups when quoting external docs.
 
 ---

@@ -1,295 +1,58 @@
-# Growth explanation stress test (Popper / Deutsch)
+# Growth explanation (internal JSON — not in deep dives)
 
-**Purpose:** Every **cash-flow growth rate** in a Lawrence model is a **conjecture** about how the business works. Before accepting it in the assumption ledger, Marvin must **stress-test the explanatory theory** behind the number: state it clearly, derive risky predictions, and document what would **falsify** it.
+**Status:** Optional enrichment in `valuation.json` only. **Do not** render Popper/Deutsch subsections, Deutsch check tables, weight-scheme falsifier tables, or valuation-bridge overlay rows in `{TICKER}/research/deep_dive_*.md`.
 
-**Companions:** `irr_assumption_ledger.md` · `option_treatment.md` · `decision_stack.md` · `report_prose.md`
+**Where growth reasoning lives in reports:**
+- **Business & moat** — operating mechanism in plain English
+- **Assumption ledger** — growth rows with filing path or **[Assumption]**
+- **Payoff & return** — one sentence on what would break the growth path
 
-**Philosophy sources:** `_system/reference/philosophy/deutsch-popper/INDEX.md`
+**Primary IRR:** Lawrence `scenarios.base` → `implied_return.base_pct` (same as executive summary).
 
----
-
-## Why this exists
-
-A growth assumption such as "11% per year years 1–5" is not a fact from filings. It is a **theory** about:
-
-- Which causal mechanisms will drive owner cash (volume, price, mix, capex normalization, segment shift)
-- Over what horizon those mechanisms dominate
-- What would have to be true in the world for that rate to be **approximately** right
-
-Without an explicit theory, growth rates become **unfalsifiable curve-fitting** — the Popperian hallmark of bad science.
-
-David Deutsch extends Popper: progress comes from **good explanations** (hard to vary, testable, reach beyond the data used to invent them). A growth rate tied only to "management guidance" or "historical CAGR" is usually a **bad explanation** unless the mechanism is spelled out and exposed to refutation.
+**Companions:** `irr_assumption_ledger.md` · `decision_stack.md` · `report_prose.md`
 
 ---
 
-## Three layers (do not conflate)
+## Optional `valuation.json` block
 
-| Layer | Question | Output |
-|-------|----------|--------|
-| **1. Fact anchor** | What did filings show for owner cash and drivers? | FCF₀, segment revenue/OI, backlog, capex — cited paths |
-| **2. Explanatory theory** | *Why* should cash grow at rate G? | Mechanism table + Deutsch "hard to vary" check |
-| **3. Theory-derived number** | What rate does the mechanism imply? | **Bottom-up** segment blend → `theory_implied` |
-| **4. Falsifier-adjusted number** | After filing refutation checks? | **`falsifier_adjusted`** → **primary IRR** for display and stance |
-
-**Rule:** Layer 4 is **`implied_return.base_pct`** (website, executive summary, Classification). Lawrence `scenarios.base` is **legacy reference** only (`results_lawrence_legacy`).
-
----
-
-## Step A — Bottom-up derivation (mandatory when `segment_build` exists)
-
-1. Weight each operating segment's `growth_y1_5` / `growth_y6_10` by `owner_cash_y0_per_share`.
-2. Store in `growth_explanation.theory_implied` with `derivation` and `segment_weights`.
-3. Use **`scenarios.base` exit multiple** for consolidated IRR (do not blend segment exit multiples into primary path).
-4. Compute **`results_growth_theory.theory_implied.return_pct`**.
-
-If `|theory_implied − scenarios.base| > 1pp`, document in `growth_explanation.divergence` (no hard auto-revision rule).
-
----
-
-## Step C — Deutsch gate (blocks `status: complete`)
-
-`growth_explanation.status` = **complete** only when:
-
-- `deutsch_checks.hard_to_vary` === **true**
-- `deutsch_checks.falsifiable` === **true**
-- `deutsch_checks.not_instrumentalist` === **true**
-- No mechanism has `hard_to_vary: "no"` or `false`
-
-Otherwise **partial** or **incomplete**. Milly flags incomplete on final handoff.
-
----
-
-## Step D — Falsifier runner
-
-On every refresh with `growth_explanation`:
+When Marvin runs `marvin_valuation.py --write`, `growth_explanation` may be populated for segment-derived growth checks and falsifier scripts. This stays in JSON; it is **not** copied into markdown.
 
 ```bash
 python3 _system/scripts/check_growth_falsifiers.py --ticker {TICKER} --write
 ```
 
-Or via `marvin_valuation.py --write` (calls `enrich_growth_explanation` internally).
+---
 
-Falsifiers may include structured `adjustment` + optional `auto_check` in JSON. When triggered, growth moves to `falsifier_adjusted` and IRR recomputes.
+## Removed from reports (2026-06-01)
+
+The following are **deprecated in deep-dive markdown** (refresh script no longer generates them):
+
+| Removed block | Reason |
+|---------------|--------|
+| `### Valuation bridge` with Theory-implied, Falsifier-adjusted, Lawrence legacy, Segment sum, Segment implied | Duplicate of ledger + JSON scenarios |
+| `### Growth explanation stress test (Popper / Deutsch)` | Bloat; mechanism belongs in Business & moat |
+| Risky predictions / Falsifiers / Ad hoc rescue tables | Same |
+| Deutsch checks (Hard to vary, Reach, Falsifiable, Not instrumentalist) | Same |
+| Weight-scheme falsifiers (Popper) / Why these weights | Same |
+
+Philosophy references remain in `_system/reference/philosophy/deutsch-popper/` for human study — not mandatory report sections.
 
 ---
 
-## Step E — Valuation bridge rows
-
-| Case | Stance gate? | Notes |
-|------|--------------|-------|
-| **Falsifier-adjusted** | **Yes** | Primary IRR |
-| Theory-implied | No | Pre-falsifier segment blend |
-| Lawrence legacy bear/base/bull | No | `results_lawrence_legacy` |
-| Segment / NAV overlays | No | Unchanged |
-
----
-
-## valuation.json shape
-
-Marvin fills on `marvin_valuation.py --write`:
-
-```json
-"growth_explanation": {
-  "theory_implied": { "y1_5": 0.104, "y6_10": 0.075, "derivation": "segment_build owner-cash weighted blend" },
-  "falsifier_adjusted": { "y1_5": 0.104, "y6_10": 0.075, "adjustments": [], "triggered": [] },
-  "lawrence_legacy": { "y1_5": 0.11, "y6_10": 0.08, "return_pct": 2.1 },
-  "divergence": { "theory_vs_lawrence_y1_5_pp": -0.6 },
-  "status": "complete"
-},
-"results_growth_theory": {
-  "theory_implied": { "return_pct": 1.5 },
-  "falsifier_adjusted": { "return_pct": 1.5 }
-},
-"implied_return": {
-  "base_pct": 1.5,
-  "falsifier_adjusted_pct": 1.5,
-  "theory_implied_pct": 1.5,
-  "lawrence_legacy_pct": 2.1,
-  "label": "10yr IRR (falsifier-adjusted)"
-}
-```
-
-In **Valuation & IRR**, after **Assumption ledger (base case)** and **before** IRR arithmetic, add:
-
-```markdown
-### Growth explanation stress test (Popper / Deutsch)
-
-| Field | Value |
-|-------|-------|
-| Growth assumption under test | Years 1–5: X%; years 6–10: Y% (base case) |
-| Theory name | One-line label (e.g. "Cloud backlog conversion + Services AI yield") |
-
-#### Explanatory theory (why this growth rate)
-
-| # | Mechanism | Causal chain (plain English) | Filing / evidence | Hard to vary? |
-|---|-----------|------------------------------|-------------------|---------------|
-| 1 | … | If A then B then cash ↑ | `{TICKER}/path` | yes / partial / no |
-
-#### Risky predictions (Popper)
-
-Predictions that follow from the theory and would **surprise** us if false:
-
-| # | Prediction | By when | If false → |
-|---|------------|---------|------------|
-| 1 | … | Q2 2026 10-Q | Revise growth down / falsify theory |
-
-#### Falsifiers (what would refute the theory)
-
-| # | Observation | Effect on growth assumption |
-|---|-------------|----------------------------|
-| 1 | Cloud rev growth <20% for 2 quarters | Cut Cloud contribution; revisit 11% consolidated |
-| 2 | … | … |
-
-#### Ad hoc rescue watch (Popper)
-
-List adjustments we **refuse** to make without new theory:
-
-- "Search is fine because AI" with no query/revenue bridge
-- Lowering growth while raising exit multiple with no mechanism
-- Using GAAP book as floor when assets are off balance sheet
-
-#### Deutsch checks
-
-| Check | Pass? | Notes |
-|-------|-------|-------|
-| **Hard to vary** — details matter; small change breaks the story | | |
-| **Reach** — theory explains more than the single CAGR used to derive it | | |
-| **Falsifiable** — at least one filing-observable falsifier above | | |
-| **Not instrumentalist** — rate is not "what the market prices" alone | | |
-```
-
-For **segment overlays**, run one stress-test block **per segment growth rate** that moves consolidated IRR materially (or one consolidated theory with segment sub-rows).
-
----
-
-## Popper framework (applied to growth)
-
-| Popper idea | Investment translation |
-|-------------|------------------------|
-| **Conjecture and refutation** | Growth rate is a conjecture; filings + events refute or corroborate |
-| **Falsifiability** | Name observations that would force you to **drop or cut** the rate |
-| **Risky prediction** | Derive at least one **quantitative** near-term implication (not vague "AI tailwind") |
-| **Ad hoc rescue** | Flag raising growth to match price, or lowering multiple to save IRR, without mechanism |
-| **Corroboration ≠ proof** | One good quarter does not verify 10-year growth; note what would still falsify |
-| **Problem-situation** | Start from **problem**: "Why is Lawrence IRR only 2% at $386?" not from a default CAGR |
-
-Source: `Popper-Science-Conjectures-and-Refutations-essay.pdf`; `Popper-Science-Conjectures-Refutations-excerpt-1962.pdf`; SEP Popper extract.
-
----
-
-## Deutsch framework (applied to growth)
-
-| Deutsch idea | Investment translation |
-|--------------|------------------------|
-| **Good explanation** | Mechanism is **hard to vary**: "Cloud 25% because backlog >$460B converts at X% per year" beats "Cloud grows 25%" |
-| **Bad explanation** | Easy to vary: "11% because quality compounder" (works for any ticker) |
-| **Reach** | Theory should imply **other** testable claims (margin path, capex/revenue, segment mix) |
-| **Fallibilism** | State what you might be wrong about; no "management will execute" without tests |
-| **Conjecture source** | Theories come from **problem + creativity**, not from extrapolating one historical CAGR |
-| **Instrumentalism ban** | Do not defend growth solely as "what reverse DCF requires at this price" without operating mechanism |
-
-Source: Deutsch `Constructor-Theory-2012.pdf`; `Physics-Philosophy-Quantum-Technology.pdf`; *Beginning of Infinity* (purchase / library — see INDEX).
-
----
-
-## Worked pattern: GOOGL 11% years 1–5 (illustrative)
-
-| Step | Content |
-|------|---------|
-| **Fact anchor** | FY2025 FCF $5.85/sh; Cloud +63% Q1 rev; backlog >$460B (8-K) |
-| **Theory** | "Cloud OI share rises; Services grows high single digits; corp capex peaks then normalizes" |
-| **Hard to vary?** | Partial — must specify backlog conversion % and Services Search yield |
-| **Risky prediction** | Cloud rev >50% YoY in 2026 if theory holds at 25% segment growth |
-| **Falsifier** | Two consecutive quarters Cloud rev growth <30% → cut Cloud segment growth |
-| **Ad hoc ban** | Do not bump to 14% bull without backlog schedule in segment build |
-
----
-
-## Worked pattern: TPL 5% years 1–5 (illustrative)
-
-| Step | Content |
-|------|---------|
-| **Fact anchor** | FY2025 OCF $545.9M; water +16%; royalties +10%; Q1 +21% rev |
-| **Theory** | "Producing acreage toll + water infra ramp; undeveloped NRA **not** in base rate" |
-| **Hard to vary?** | Yes if tied to Permian completion counts on TPL acreage |
-| **Risky prediction** | Water revenue >$330M FY2026 if 5% consolidated path holds |
-| **Falsifier** | Permian rig count on TPL counties down >15% YoY for 4 quarters → cut to 2% |
-| **Overlay** | Undeveloped acreage option in `nav_overlay`, **not** smuggled into 5% |
-
----
-
-## valuation.json shape
-
-Add optional block (Marvin fills on refresh):
-
-```json
-"growth_explanation": {
-  "as_of": "2026-06-01",
-  "assumption_ids": ["growth_y1_5", "growth_y6_10"],
-  "theory_label": "Cloud backlog + Services yield",
-  "mechanisms": [
-    {
-      "id": "cloud_conversion",
-      "chain": "Backlog drawdown → Cloud rev → segment OI → consolidated FCF",
-      "evidence": "GOOGL/10-Q_20260430",
-      "hard_to_vary": "partial"
-    }
-  ],
-  "risky_predictions": [
-    { "text": "Cloud rev >50% YoY 2026", "by": "FY2026", "falsifier_action": "cut cloud growth" }
-  ],
-  "falsifiers": [
-    { "observation": "Cloud rev growth <30% for 2 Qs", "action": "revise segment build" }
-  ],
-  "ad_hoc_rescue_banned": ["Price-implied CAGR without segment bridge"],
-  "deutsch_checks": {
-    "hard_to_vary": true,
-    "reach": true,
-    "falsifiable": true,
-    "not_instrumentalist": true
-  }
-}
-```
-
----
-
-## Report integration
-
-| Location | Requirement |
-|----------|-------------|
-| Assumption ledger rows 3–4 (growth) | Source column: `Growth theory: {theory_label}` + filing or **[Assumption]** |
-| Valuation & IRR | `### Growth explanation stress test` subsection |
-| Payoff & return | One sentence: "Base growth assumes …; falsified if …" |
-| Executive summary | **No** mechanism essay — one outcome % only |
-
----
-
-## Milly checks
+## Milly (light touch)
 
 | Check | Severity |
 |-------|----------|
-| Growth rows in ledger without theory reference | **Inference risk** |
-| No falsifiers listed when growth > historical run-rate + 300 bp | **Inference risk** |
-| Theory is easy-to-vary ("quality compounder grows 10%") | **Inference risk** |
-| Instrumentalist-only defense ("market prices X") | **Inference risk** |
-| Ad hoc: growth and multiple both raised in same refresh without new filings | **Warn** |
+| Growth rows in ledger with no filing or **[Assumption]** cite | **Inference risk** |
+| Growth > filing run-rate + 300 bp with no mechanism in Business & moat | **Inference risk** |
+| Instrumentalist-only defense ("market prices X") with no operating story | **Inference risk** |
 
-YAML: `growth_explanation: complete | partial | incomplete | n/a`
+YAML: `growth_explanation: n/a` (default for new dives; JSON block optional).
 
 ---
 
 ## Anti-patterns
 
-- **Historical CAGR as theory** — "grew 15% last 5 years so 11% forward" without mechanism
-- **Guidance copy-paste** — "mgmt says mid-teens" without bridge to **owner cash per share**
-- **Reverse-DCF smuggle** — growth chosen to hit 15% IRR with no operating story
-- **Segment growth without segment theory** — Cloud 25% with no backlog/margin path
-- **Unfalsifiable bull** — "AI changes everything" with no quarterly test
-
----
-
-## Maintenance
-
-- Re-run stress test every **10-Q** when growth assumptions change.
-- When theory falsified, log in `_system/memory/daily/{date}.md` as **[PROPOSED]** — not MEMORY.md.
-- Cite philosophy PDFs in `[PROPOSED MEMORY]` when promoting stable patterns after human review.
+- Historical CAGR as sole justification — state mechanism in Business & moat
+- Reverse-DCF smuggle — growth chosen to hit 15% IRR with no operating story
+- Re-adding valuation bridge overlay rows or Popper/Deutsch subsections after refresh
