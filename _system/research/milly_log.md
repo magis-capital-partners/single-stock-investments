@@ -51,3 +51,5 @@ One row per adversarial or consistency re-pass. Append via `milly_repass.py` or 
 | 2026-06-01 | LSEG | standard_batch | OK | marvin_cloud_refresh |
 | 2026-06-01 | TPL | standard_batch | OK | marvin_cloud_refresh |
 | 2026-06-01 | TPL | standard_batch | OK | marvin_cloud_refresh |
+| 2026-06-01 | TPL | standard_batch | OK | marvin_cloud_refresh |
+| 2026-06-01 | TPL | consistency_repass | OK | — |

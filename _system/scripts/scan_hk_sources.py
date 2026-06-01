@@ -255,7 +255,7 @@ def hk_block_markdown(result: dict) -> str:
     rows = []
     for s in result["sources"][:12]:
         topic = (s.get("topic") or "")[:80]
-        rows.append(f"| `{s['path']}` | {topic} | Context — not in base IRR |")
+        rows.append(f"| `{s['path']}` | {topic} | Context (not in base IRR) |")
     cc = result.get("cross_check")
     cc_line = f"\n**Cross-check:** `{cc}`\n" if cc else ""
     models = ", ".join(result.get("mental_models") or [])
