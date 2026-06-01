@@ -5,7 +5,7 @@
 **Placement:** `## Valuation & IRR (assumption ledger)` — **last major section**, after `## Risks & inversion`, **before** `## Classification`.  
 **Not** inside Business & moat.
 
-**Companion files:** `lawrence_irr.md` § F · `deep_dive_structure.md` · `archetype_valuation_prose.md` · `growth_explanation_stress_test.md` · `{TICKER}/research/valuation.json`
+**Companion files:** `lawrence_irr.md` § F · `deep_dive_structure.md` · `archetype_valuation_prose.md` · `growth_explanation_stress_test.md` · `total_synthesis_irr.md` · `{TICKER}/research/valuation.json`
 
 **Readable labels:** Assumption ledger rows and bridge "Main assumptions" use **plain English** (no `P₀`, `g1`, `FCF₀`). Archetype-specific examples: `archetype_valuation_prose.md`.
 
@@ -57,6 +57,10 @@ Store mirror in `valuation.json` → `growth_explanation` when method is `full`,
 **Upside / downside from price:** …
 
 **Returns statement:** … (must match base % in executive summary)
+
+### Total synthesis IRR (all sources)
+
+**Last block** in Valuation & IRR — after filing-path IRR arithmetic and upside/downside line. Spec: `total_synthesis_irr.md`. When `valuation.json` → `synthesis.status === complete`, executive summary and Classification use **`total_synthesis_pct`**; filing-only falsifier-adjusted stays as audit reference.
 ```
 
 ---
