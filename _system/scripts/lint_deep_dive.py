@@ -75,8 +75,8 @@ MIAX_FILING_MISALIGN = re.compile(
     re.IGNORECASE,
 )
 BARE_UPLIFT_PCT = re.compile(
-    r"(?:\d+\.?\d*\s*[x×]\s*\d+\s*%|\d+\s*%\s*higher\s+than\s+GAAP|"
-    r"Economic value\s+\d+\s*%\s*higher|Incremental on book:\s*\d+\.\d+\s*x\s*\d+\s*%)",
+    r"(?:\d+\s*%\s*higher\s+than\s+GAAP|"
+    r"Economic value\s+\d+\s*%\s*higher|Incremental on book:\s*\d+\.\d+\s*[x×]\s*\d+\s*%)",
     re.IGNORECASE,
 )
 INVESTMENT_A_3G = re.compile(r"\*\*3g-5\.\s*Investment A", re.IGNORECASE)

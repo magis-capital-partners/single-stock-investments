@@ -27,7 +27,8 @@
     "primary_label": "annualized return",
     "primary_return_pct": -8.3,
     "incumbent_sleeve": false,
-    "notes": "~$7.7M royalties / ~$62M mkt cap at $55; ~4.3\u00d7 book \u2014 dhando weak at entry; thin OTC volume (24 sh day)."
+    "notes": "~$7.7M royalties / ~$62M mkt cap at $55; ~4.3\u00d7 book \u2014 dhando weak at entry; thin OTC volume (24 sh day).",
+    "overlay_nav_per_share": 16.12
   },
   "scenarios": {
     "bear": {
@@ -40,7 +41,52 @@
       "price": 55.0,
       "payoff": 30.0,
       "years": 7,
-      "notes": "Lease income only; option largely priced in"
+      "notes": "Lease income only; option largely priced in",
+      "sotp_build": {
+        "shares": 1126284,
+        "book_per_share": 12.7,
+        "lines": [
+          {
+            "id": "book",
+            "label": "GAAP book / price anchor",
+            "gaap_per_share": 12.7,
+            "uplift_per_share": 0.0,
+            "math": "Anchor $12.7/sh"
+          },
+          {
+            "id": "lease_cap",
+            "label": "Mineral lease run-rate capitalized",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 2.3,
+            "math": "[Assumption] \u2014 see scenario notes in valuation.json"
+          },
+          {
+            "id": "copperwood_partial",
+            "label": "Copperwood royalty option (partially in price @ entry)",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 2.39,
+            "math": "[Assumption] \u2014 see scenario notes in valuation.json"
+          },
+          {
+            "id": "acreage",
+            "label": "667K-acre expansion + secondary lessee option",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 2.5,
+            "math": "[Assumption] \u2014 see scenario notes in valuation.json"
+          },
+          {
+            "id": "tie_out",
+            "label": "Tie-out to payoff",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 10.11,
+            "math": "Running sum + 10.11 = $30.0 payoff"
+          }
+        ],
+        "year5_economic_nav_per_share": 30.0,
+        "sum_check": "12.7 + uplifts = 30.0",
+        "years": 7,
+        "notes": "SSI ~$7.7M/yr royalty at $4/lb Cu; base assumes lease-only Lawrence path"
+      }
     },
     "bull": {
       "price": 55.0,
@@ -87,5 +133,189 @@
       "return_pct": 2.4
     }
   },
-  "overlay_results": []
+  "overlay_results": [],
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Yes",
+      "treatment": "nav_overlay",
+      "evidence": "Mineral rights at historical cost; fair value in Copperwood royalties [Assumption]"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / acreage / dormant royalty?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "Copperwood lease + >1M acres; SSI mineral-floor framing"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No operating segments; lease income only"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF path?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Royalty option not in Lawrence base cash flow"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Single mineral estate"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "\u2014"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "\u2014"
+    }
+  ],
+  "nav_overlay": {
+    "status": "partial",
+    "gaap_book_per_share": 12.7,
+    "overlay_nav_per_share": 16.12,
+    "method": "probability_weighted",
+    "components": [
+      {
+        "id": "copperwood_royalty",
+        "label": "Copperwood production royalty",
+        "probability_pct": 50,
+        "payoff_per_share": 6.84,
+        "source": "SSI @ $4/lb Cu [Assumption]"
+      }
+    ],
+    "notes": "Do not use GAAP book as dhando floor; mineral estate off fair value"
+  },
+  "catalyst_paths": [
+    {
+      "event": "Highland Copper Copperwood production start",
+      "timing": "3\u20137 years",
+      "impact": "Royalty cash flow"
+    },
+    {
+      "event": "Michigan mining infrastructure grant",
+      "timing": "uncertain",
+      "impact": "Project acceleration"
+    },
+    {
+      "event": "Secondary lessee on 667K-acre package",
+      "timing": "medium term",
+      "impact": "Lease income diversification"
+    },
+    {
+      "event": "Failure mode",
+      "timing": "\u2014",
+      "impact": "Reversion toward book ~$12.70"
+    }
+  ],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": -17.8,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 2.4,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      },
+      {
+        "id": "nav_overlay_payoff",
+        "label": "NAV overlay dated payoff (10yr to overlay base)",
+        "source": "nav_overlay ~$16.12/sh vs price $55.0",
+        "return_pct": -11.55,
+        "weight": 0.1,
+        "type": "numeric",
+        "epistemic_tier": "D (alternate theory: dated asset payoff)",
+        "weight_why": "Answers a different question (NAV convergence) than 10yr cash-flow IRR; capped weight to avoid theory conflation.",
+        "weight_falsifiers": [
+          "NAV overlay base not updated when segment build or filings change >10%",
+          "floor_pass false but weight above 15% without [HUMAN REVIEW]"
+        ],
+        "hard_to_vary": "yes: separate theory type"
+      },
+      {
+        "id": "third_party_context",
+        "label": "Third-party context (HK + Substacks inventory)",
+        "source": "source_inventory (2 sources); cross_check blend",
+        "return_pct": 2.4,
+        "weight": 0.1,
+        "type": "numeric",
+        "notes": "Proxy: upside case when strategic third party has no spot IRR",
+        "epistemic_tier": "D (external triangulation)",
+        "weight_why": "Context-tier HK/Substacks until human promotes in third_party_sources.md; numeric proxy is weak.",
+        "weight_falsifiers": [
+          "Using bull scenario as HK proxy when cross_check synthesis says no IRR upgrade",
+          "Weight above 15% while human_approval pending"
+        ],
+        "hard_to_vary": "no: proxy return is instrumentalist; prefer qualitative pp until approved blend"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "factor": "Partial dhando (HK hard-asset / hidden NAV)",
+        "pp": 0.5,
+        "rationale": "Third-party confirms asset quality not in GAAP book; not full floor at spot price",
+        "sources": "cross_check_HK; hk_scan; HK Q1 2025/2026"
+      },
+      {
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework"
+      }
+    ],
+    "numeric_weighted_pct": -4.1,
+    "qualitative_pp": 0.3,
+    "total_synthesis_pct": -3.8,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [
+        "Third-party numeric path proxies bull scenario (instrumentalist); HK cross-check says no base IRR upgrade. Prefer qualitative pp only until approved blend.",
+        "NAV overlay is a different theory (asset payoff vs cash-flow IRR); weight capped at 10% to limit theory conflation."
+      ],
+      "deutsch_checks": {
+        "hard_to_vary": false,
+        "falsifiable": true,
+        "not_instrumentalist": false,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
 }

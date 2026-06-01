@@ -81,6 +81,11 @@ def main() -> None:
             "valuation",
             [PY, str(SCRIPTS / "marvin_valuation.py"), "--ticker", ticker, "--write"],
         )
+        run_step(
+            "book estimate",
+            [PY, str(SCRIPTS / "current_book_estimate.py"), ticker, "--write"],
+            optional=True,
+        )
         steps_ok &= run_step(
             "deep dive refresh",
             [PY, str(SCRIPTS / "refresh_deep_dive_v2.py"), ticker, "--date", args.date],

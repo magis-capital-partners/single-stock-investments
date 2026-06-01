@@ -27,7 +27,35 @@
       "price": 4.15,
       "payoff": 6.5,
       "years": 8,
-      "notes": "Royalties resume ~2028; ~$0.80/yr avg distribution + terminal"
+      "notes": "Royalties resume ~2028; ~$0.80/yr avg distribution + terminal",
+      "sotp_build": {
+        "lines": [
+          {
+            "id": "book",
+            "label": "GAAP book / price anchor",
+            "gaap_per_share": 4.15,
+            "uplift_per_share": 0.0,
+            "math": "Anchor $4.15/sh"
+          },
+          {
+            "id": "recovery_dist",
+            "label": "Royalties resume ~2028; avg ~$0.80/yr distributions NPV",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 1.85,
+            "math": "[Assumption] \u2014 see scenario notes in valuation.json"
+          },
+          {
+            "id": "terminal_trust",
+            "label": "Terminal trust value on gas recovery",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 0.5,
+            "math": "[Assumption] \u2014 see scenario notes in valuation.json"
+          }
+        ],
+        "year5_economic_nav_per_share": 6.5,
+        "years": 8,
+        "notes": "Royalties resume ~2028; ~$0.80/yr avg distribution + terminal"
+      }
     },
     "bull": {
       "price": 4.15,
@@ -72,5 +100,111 @@
     "bull": {
       "return_pct": 19.4
     }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "yield_curve",
+      "evidence": "Trust/royalty; distributions not steady-state GAAP earnings"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / acreage / dormant royalty?",
+      "answer": "Yes",
+      "treatment": "yield_curve",
+      "evidence": "HK equity yield curve on recovery path"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "Yes",
+      "treatment": "yield_curve",
+      "evidence": "Bonus gap / arbitration / excess-cost recovery [Assumption]"
+    }
+  ],
+  "catalyst_paths": [
+    {
+      "event": "Excess-cost recovery complete",
+      "timing": "2028+",
+      "impact": "Distributions resume"
+    },
+    {
+      "event": "Natural gas price spike",
+      "timing": "uncertain",
+      "impact": "Bull distribution path"
+    },
+    {
+      "event": "Trust wind-down",
+      "timing": "bear case",
+      "impact": "Capital loss"
+    }
+  ],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": -7.0,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 19.4,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      },
+      {
+        "id": "third_party_context",
+        "label": "Third-party context (HK + Substacks inventory)",
+        "source": "source_inventory (3 sources); cross_check blend",
+        "return_pct": 19.4,
+        "weight": 0.1,
+        "type": "numeric",
+        "notes": "Proxy: upside case when strategic third party has no spot IRR",
+        "epistemic_tier": "D (external triangulation)",
+        "weight_why": "Context-tier HK/Substacks until human promotes in third_party_sources.md; numeric proxy is weak.",
+        "weight_falsifiers": [
+          "Using bull scenario as HK proxy when cross_check synthesis says no IRR upgrade",
+          "Weight above 15% while human_approval pending"
+        ],
+        "hard_to_vary": "no: proxy return is instrumentalist; prefer qualitative pp until approved blend"
+      }
+    ],
+    "qualitative_adjustments": [],
+    "numeric_weighted_pct": 14.51,
+    "qualitative_pp": 0,
+    "total_synthesis_pct": 14.51,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [
+        "Third-party numeric path proxies bull scenario (instrumentalist); HK cross-check says no base IRR upgrade. Prefer qualitative pp only until approved blend."
+      ],
+      "deutsch_checks": {
+        "hard_to_vary": false,
+        "falsifiable": true,
+        "not_instrumentalist": false,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
   }
 }

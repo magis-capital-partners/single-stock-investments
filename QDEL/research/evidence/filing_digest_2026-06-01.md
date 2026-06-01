@@ -10,25 +10,25 @@ Documents in folder: **188** (all listed below; Tier 1–3 extracted or keyword-
 
 | Tier | Kind | File date | Path | Chars |
 |------|------|-----------|------|-------|
-| partial | 10-K | — | `investor-documents/ir-quidelortho/2020-Annual-Report-and-10-K.pdf` | 0 ERR:No module named 'pypdf' |
-| partial | 10-K | — | `investor-documents/ir-quidelortho/QUIDEL_10-K_WEBREADY.pdf` | 0 ERR:No module named 'pypdf' |
-| partial | 10-K | — | `investor-documents/ir-quidelortho/QuidelOrtho-2024-Form-10-K.pdf` | 0 ERR:No module named 'pypdf' |
+| partial | 10-K | — | `investor-documents/ir-quidelortho/2020-Annual-Report-and-10-K.pdf` | 17178 |
+| partial | 10-K | — | `investor-documents/ir-quidelortho/QUIDEL_10-K_WEBREADY.pdf` | 52341 |
+| partial | 10-K | — | `investor-documents/ir-quidelortho/QuidelOrtho-2024-Form-10-K.pdf` | 54950 |
 | partial | 10-K | 2024-08-01 | `investor-documents/sec-edgar/10-K-A_20240801_rpt20231231_acc0001906324_24_000043.htm` | 30000 |
 | partial | 10-K | 2023-02-23 | `investor-documents/sec-edgar/10-K_20230223_rpt20230101_acc0001906324_23_000014.htm` | 30000 |
 | partial | 10-K | 2024-02-29 | `investor-documents/sec-edgar/10-K_20240229_rpt20231231_acc0001906324_24_000011.htm` | 30000 |
 | partial | 10-K | 2025-02-27 | `investor-documents/sec-edgar/10-K_20250227_rpt20241229_acc0001906324_25_000035.htm` | 30000 |
 | full | 10-K | 2026-02-19 | `investor-documents/sec-edgar/10-K_20260219_rpt20251228_acc0001906324_26_000008.htm` | 120000 |
-| scan | annual | — | `investor-documents/ir-quidelortho/2017-Annual-Report.PDF` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-quidelortho/Annual-Report-FINAL.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-quidelortho/QDEL-2011_annual_report.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-quidelortho/QDEL-2012_annual_report.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | annual | — | `investor-documents/ir-quidelortho/Quidel-Corp-2021-Annual-Report_bmk1.pdf` | 0 ERR:No module named 'pypdf' |
-| partial | annual | — | `investor-documents/ir-quidelortho/QuidelOrtho-2024-Annual-Report.pdf` | 0 ERR:No module named 'pypdf' |
-| partial | annual | — | `investor-documents/ir-quidelortho/QuidelOrtho-Annual-Report-Digital-FINAL.pdf` | 0 ERR:No module named 'pypdf' |
-| partial | annual | — | `investor-documents/ir-quidelortho/QuidelOrtho-William-Blair-45th-Annual-Growth-Stock-Conference_060425_vfinal.pdf` | 0 ERR:No module named 'pypdf' |
-| full | annual | — | `investor-documents/ir-quidelortho/QuidelOrtho_2023-Annual-Report_vfinal.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | 10-Q | — | `investor-documents/ir-quidelortho/10-Q_Q3_Quidel-Corporation.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | 10-Q | — | `investor-documents/ir-quidelortho/QuidelOrtho-Corp-10-Q-11-8-2024.pdf` | 0 ERR:No module named 'pypdf' |
+| scan | annual | — | `investor-documents/ir-quidelortho/2017-Annual-Report.PDF` | 11061 |
+| scan | annual | — | `investor-documents/ir-quidelortho/Annual-Report-FINAL.pdf` | 3908 |
+| scan | annual | — | `investor-documents/ir-quidelortho/QDEL-2011_annual_report.pdf` | 3010 |
+| scan | annual | — | `investor-documents/ir-quidelortho/QDEL-2012_annual_report.pdf` | 2994 |
+| scan | annual | — | `investor-documents/ir-quidelortho/Quidel-Corp-2021-Annual-Report_bmk1.pdf` | 2 |
+| partial | annual | — | `investor-documents/ir-quidelortho/QuidelOrtho-2024-Annual-Report.pdf` | 34043 |
+| partial | annual | — | `investor-documents/ir-quidelortho/QuidelOrtho-Annual-Report-Digital-FINAL.pdf` | 20064 |
+| partial | annual | — | `investor-documents/ir-quidelortho/QuidelOrtho-William-Blair-45th-Annual-Growth-Stock-Conference_060425_vfinal.pdf` | 14641 |
+| full | annual | — | `investor-documents/ir-quidelortho/QuidelOrtho_2023-Annual-Report_vfinal.pdf` | 476929 |
+| scan | 10-Q | — | `investor-documents/ir-quidelortho/10-Q_Q3_Quidel-Corporation.pdf` | 6186 |
+| scan | 10-Q | — | `investor-documents/ir-quidelortho/QuidelOrtho-Corp-10-Q-11-8-2024.pdf` | 4696 |
 | scan | 10-Q | 2022-08-05 | `investor-documents/sec-edgar/10-Q_20220805_rpt20220703_acc0001906324_22_000011.htm` | 8000 |
 | scan | 10-Q | 2022-11-04 | `investor-documents/sec-edgar/10-Q_20221104_rpt20221002_acc0001906324_22_000033.htm` | 8000 |
 | scan | 10-Q | 2023-05-04 | `investor-documents/sec-edgar/10-Q_20230504_rpt20230402_acc0001906324_23_000033.htm` | 8000 |
@@ -41,48 +41,48 @@ Documents in folder: **188** (all listed below; Tier 1–3 extracted or keyword-
 | scan | 10-Q | 2025-08-06 | `investor-documents/sec-edgar/10-Q_20250806_rpt20250629_acc0001906324_25_000151.htm` | 8000 |
 | scan | 10-Q | 2025-11-06 | `investor-documents/sec-edgar/10-Q_20251106_rpt20250928_acc0001906324_25_000160.htm` | 8000 |
 | full | 10-Q | 2026-05-06 | `investor-documents/sec-edgar/10-Q_20260506_rpt20260329_acc0001906324_26_000024.htm` | 120000 |
-| scan | proxy | — | `investor-documents/ir-quidelortho/Proxy-Statement-FINAL.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-quidelortho/Proxy-Statement.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-quidelortho/QDEL-2020-Proxy.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-quidelortho/QDEL-2023-Proxy-Final.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | proxy | — | `investor-documents/ir-quidelortho/QDEL-Proxy-Statement.pdf` | 0 ERR:No module named 'pypdf' |
+| scan | proxy | — | `investor-documents/ir-quidelortho/Proxy-Statement-FINAL.pdf` | 5482 |
+| scan | proxy | — | `investor-documents/ir-quidelortho/Proxy-Statement.pdf` | 1899 |
+| scan | proxy | — | `investor-documents/ir-quidelortho/QDEL-2020-Proxy.pdf` | 4229 |
+| scan | proxy | — | `investor-documents/ir-quidelortho/QDEL-2023-Proxy-Final.pdf` | 2227 |
+| scan | proxy | — | `investor-documents/ir-quidelortho/QDEL-Proxy-Statement.pdf` | 1520 |
 | scan | proxy | 2023-04-05 | `investor-documents/sec-edgar/DEF 14A_20230405_rpt_acc0001906324_23_000020.htm` | 8000 |
 | scan | proxy | 2024-04-02 | `investor-documents/sec-edgar/DEF 14A_20240402_rpt20240402_acc0001906324_24_000018.htm` | 8000 |
 | scan | proxy | 2025-04-08 | `investor-documents/sec-edgar/DEF 14A_20250408_rpt20250520_acc0001906324_25_000045.htm` | 8000 |
 | full | proxy | 2026-04-27 | `investor-documents/sec-edgar/DEF 14A_20260427_rpt20260616_acc0001906324_26_000018.htm` | 120000 |
-| scan | shareholder | — | `investor-documents/ir-quidelortho/QuidelOrtho-Q3-25-Shareholder-Letter_110925_vfinal.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-quidelortho/QDEL-03.31.2020-Earnings-Call-Script-_1_.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-quidelortho/QDEL-03.31.2021-Earnings-Call-Script-Website-FINAL.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-quidelortho/QDEL-03.31.2022-Earnings-Call-Script-FINAL.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-quidelortho/QDEL-06.30.2020-Earnings-Call-Script-FINAL.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-quidelortho/QDEL-06.30.2021-Earnings-Call-Script-Website.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-quidelortho/QDEL-09.30.2021-Earnings-Call-Script-FINAL.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-quidelortho/QDEL-12.31.2019-Earnings-Call-Script-FINAL.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-quidelortho/QDEL-12.31.2020-Earnings-Call-Script-FINAL.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-quidelortho/QDEL-12.31.2021-Earnings-Call-Script-FINAL.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-quidelortho/QDEL-2016.06.30-Earnings-Call-Script-v6-Website.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-quidelortho/QDEL-Earnings-Call-Script-Q3-2020.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-quidelortho/QDEL-Q2-2019-Earnings-Script-Website-1.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-quidelortho/QDEL-Q3-2019-Earnings-Script-FINAL.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-quidelortho/QDEL-Third-Quarter-2024-Earnings-Presentation_110724_vfinal.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-quidelortho/QuidelOrtho-First-Quarter-2025-Earnings-Presentation_vfinal.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-quidelortho/QuidelOrtho-First-Quarter-2026-Earnings-Presentation_050526_vfinal.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-quidelortho/QuidelOrtho-Q2-25-Earnings-Presentation_080525_vfinal.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-quidelortho/QuidelOrtho-Q3-2023-Earnings-Presentation_110123_vfinal.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-quidelortho/QuidelOrtho-Q4-FY24-Earnings-Release_022725_vfinal-1.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-quidelortho/QuidelOrtho-Q4-FY25-CEO-Earnings-Summary_vfinal.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-quidelortho/QuidelOrtho_-Q1-2024-Earnings-Presentation_050824_vfinal.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-quidelortho/QuidelOrtho_-Q1-23-Earnings-Presentation-Final.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-quidelortho/QuidelOrtho_-Q2-23-Earnings-Presentation-Final2.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-quidelortho/QuidelOrtho_-Q2-24-Earnings-Presentation_073124_vfinal.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-quidelortho/QuidelOrtho_-Q2_22-Earnings-Presentation-Final2.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-quidelortho/QuidelOrtho_-Q3_22-Earnings-Presentation-Final3.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-quidelortho/QuidelOrtho_-Q4-FY-24-Earnings-Presentation_022725.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-quidelortho/QuidelOrtho_-Q4-FY23-Earnings-Presentation_Updated_021624_vfinal.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-quidelortho/QuidelOrtho_-Q4-FY25-Earnings-Presentation_021126_vFinal.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-quidelortho/QuidelOrtho_-Third-Quarter-2025-Earnings-Presentation_vFinal.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | — | `investor-documents/ir-quidelortho/QuidelOrtho_Q4-22-Earnings-Presentation-Final-Final.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | earnings | 2016-09-30 | `investor-documents/ir-quidelortho/Website-Script-QDEL-2016-09-30-Earnings-Call-Script-10-26-16-1105AM.pdf` | 0 ERR:No module named 'pypdf' |
+| scan | shareholder | — | `investor-documents/ir-quidelortho/QuidelOrtho-Q3-25-Shareholder-Letter_110925_vfinal.pdf` | 7442 |
+| scan | earnings | — | `investor-documents/ir-quidelortho/QDEL-03.31.2020-Earnings-Call-Script-_1_.pdf` | 3506 |
+| scan | earnings | — | `investor-documents/ir-quidelortho/QDEL-03.31.2021-Earnings-Call-Script-Website-FINAL.pdf` | 2886 |
+| scan | earnings | — | `investor-documents/ir-quidelortho/QDEL-03.31.2022-Earnings-Call-Script-FINAL.pdf` | 2967 |
+| scan | earnings | — | `investor-documents/ir-quidelortho/QDEL-06.30.2020-Earnings-Call-Script-FINAL.pdf` | 3804 |
+| scan | earnings | — | `investor-documents/ir-quidelortho/QDEL-06.30.2021-Earnings-Call-Script-Website.pdf` | 3430 |
+| scan | earnings | — | `investor-documents/ir-quidelortho/QDEL-09.30.2021-Earnings-Call-Script-FINAL.pdf` | 3015 |
+| scan | earnings | — | `investor-documents/ir-quidelortho/QDEL-12.31.2019-Earnings-Call-Script-FINAL.pdf` | 3083 |
+| scan | earnings | — | `investor-documents/ir-quidelortho/QDEL-12.31.2020-Earnings-Call-Script-FINAL.pdf` | 2917 |
+| scan | earnings | — | `investor-documents/ir-quidelortho/QDEL-12.31.2021-Earnings-Call-Script-FINAL.pdf` | 3049 |
+| scan | earnings | — | `investor-documents/ir-quidelortho/QDEL-2016.06.30-Earnings-Call-Script-v6-Website.pdf` | 2650 |
+| scan | earnings | — | `investor-documents/ir-quidelortho/QDEL-Earnings-Call-Script-Q3-2020.pdf` | 3761 |
+| scan | earnings | — | `investor-documents/ir-quidelortho/QDEL-Q2-2019-Earnings-Script-Website-1.pdf` | 2768 |
+| scan | earnings | — | `investor-documents/ir-quidelortho/QDEL-Q3-2019-Earnings-Script-FINAL.pdf` | 2789 |
+| scan | earnings | — | `investor-documents/ir-quidelortho/QDEL-Third-Quarter-2024-Earnings-Presentation_110724_vfinal.pdf` | 7839 |
+| scan | earnings | — | `investor-documents/ir-quidelortho/QuidelOrtho-First-Quarter-2025-Earnings-Presentation_vfinal.pdf` | 7709 |
+| scan | earnings | — | `investor-documents/ir-quidelortho/QuidelOrtho-First-Quarter-2026-Earnings-Presentation_050526_vfinal.pdf` | 8388 |
+| scan | earnings | — | `investor-documents/ir-quidelortho/QuidelOrtho-Q2-25-Earnings-Presentation_080525_vfinal.pdf` | 7458 |
+| scan | earnings | — | `investor-documents/ir-quidelortho/QuidelOrtho-Q3-2023-Earnings-Presentation_110123_vfinal.pdf` | 8043 |
+| scan | earnings | — | `investor-documents/ir-quidelortho/QuidelOrtho-Q4-FY24-Earnings-Release_022725_vfinal-1.pdf` | 8618 |
+| scan | earnings | — | `investor-documents/ir-quidelortho/QuidelOrtho-Q4-FY25-CEO-Earnings-Summary_vfinal.pdf` | 4910 |
+| scan | earnings | — | `investor-documents/ir-quidelortho/QuidelOrtho_-Q1-2024-Earnings-Presentation_050824_vfinal.pdf` | 5124 |
+| scan | earnings | — | `investor-documents/ir-quidelortho/QuidelOrtho_-Q1-23-Earnings-Presentation-Final.pdf` | 7954 |
+| scan | earnings | — | `investor-documents/ir-quidelortho/QuidelOrtho_-Q2-23-Earnings-Presentation-Final2.pdf` | 8008 |
+| scan | earnings | — | `investor-documents/ir-quidelortho/QuidelOrtho_-Q2-24-Earnings-Presentation_073124_vfinal.pdf` | 5692 |
+| scan | earnings | — | `investor-documents/ir-quidelortho/QuidelOrtho_-Q2_22-Earnings-Presentation-Final2.pdf` | 7624 |
+| scan | earnings | — | `investor-documents/ir-quidelortho/QuidelOrtho_-Q3_22-Earnings-Presentation-Final3.pdf` | 7843 |
+| scan | earnings | — | `investor-documents/ir-quidelortho/QuidelOrtho_-Q4-FY-24-Earnings-Presentation_022725.pdf` | 7022 |
+| scan | earnings | — | `investor-documents/ir-quidelortho/QuidelOrtho_-Q4-FY23-Earnings-Presentation_Updated_021624_vfinal.pdf` | 8206 |
+| scan | earnings | — | `investor-documents/ir-quidelortho/QuidelOrtho_-Q4-FY25-Earnings-Presentation_021126_vFinal.pdf` | 7338 |
+| scan | earnings | — | `investor-documents/ir-quidelortho/QuidelOrtho_-Third-Quarter-2025-Earnings-Presentation_vFinal.pdf` | 7573 |
+| scan | earnings | — | `investor-documents/ir-quidelortho/QuidelOrtho_Q4-22-Earnings-Presentation-Final-Final.pdf` | 7978 |
+| scan | earnings | 2016-09-30 | `investor-documents/ir-quidelortho/Website-Script-QDEL-2016-09-30-Earnings-Call-Script-10-26-16-1105AM.pdf` | 2887 |
 | scan | 8-K | 2024-11-07 | `investor-documents/sec-edgar/8-K_20241107_rpt20241107_acc0001906324_24_000048.htm` | 4048 |
 | scan | 8-K | 2024-11-08 | `investor-documents/sec-edgar/8-K_20241108_rpt20241107_acc0001906324_24_000051.htm` | 4868 |
 | scan | 8-K | 2024-11-18 | `investor-documents/sec-edgar/8-K_20241118_rpt20241118_acc0001906324_24_000059.htm` | 3293 |
@@ -103,15 +103,15 @@ Documents in folder: **188** (all listed below; Tier 1–3 extracted or keyword-
 | scan | 8-K | 2026-03-24 | `investor-documents/sec-edgar/8-K_20260324_rpt20260318_acc0001193125_26_120684.htm` | 5884 |
 | scan | 8-K | 2026-04-15 | `investor-documents/sec-edgar/8-K_20260415_rpt20260415_acc0001906324_26_000013.htm` | 4798 |
 | scan | 8-K | 2026-05-05 | `investor-documents/sec-edgar/8-K_20260505_rpt20260505_acc0001906324_26_000023.htm` | 4019 |
-| scan | presentation | — | `investor-documents/ir-quidelortho/QDEL-JPM-Presentation-Final2-2023.01.09.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-quidelortho/QDEL-Wm-Blair-Presentation_060524_vfinal_6-am-CT.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-quidelortho/QDEL_JPM-2024-Presentation_vfinal_010824_-9-am-PT.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-quidelortho/Quidel-Investor-Presentation-Q219-v4.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-quidelortho/Quidel-Investor-Presentation-Q319-v2.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-quidelortho/QuidelOrtho-Investor-Presentation-Final2.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-quidelortho/QuidelOrtho-JP-Morgan-2025-Presentation_011325_FINAL.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-quidelortho/QuidelOrtho-Molecular-Strategy-Presentation_060325_vfinal.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-quidelortho/QuidelOrtho-Raymond-James-Presentation_030525_vfinal.pdf` | 0 ERR:No module named 'pypdf' |
+| scan | presentation | — | `investor-documents/ir-quidelortho/QDEL-JPM-Presentation-Final2-2023.01.09.pdf` | 7957 |
+| scan | presentation | — | `investor-documents/ir-quidelortho/QDEL-Wm-Blair-Presentation_060524_vfinal_6-am-CT.pdf` | 5373 |
+| scan | presentation | — | `investor-documents/ir-quidelortho/QDEL_JPM-2024-Presentation_vfinal_010824_-9-am-PT.pdf` | 8205 |
+| scan | presentation | — | `investor-documents/ir-quidelortho/Quidel-Investor-Presentation-Q219-v4.pdf` | 6747 |
+| scan | presentation | — | `investor-documents/ir-quidelortho/Quidel-Investor-Presentation-Q319-v2.pdf` | 6747 |
+| scan | presentation | — | `investor-documents/ir-quidelortho/QuidelOrtho-Investor-Presentation-Final2.pdf` | 5129 |
+| scan | presentation | — | `investor-documents/ir-quidelortho/QuidelOrtho-JP-Morgan-2025-Presentation_011325_FINAL.pdf` | 6039 |
+| scan | presentation | — | `investor-documents/ir-quidelortho/QuidelOrtho-Molecular-Strategy-Presentation_060325_vfinal.pdf` | 5518 |
+| scan | presentation | — | `investor-documents/ir-quidelortho/QuidelOrtho-Raymond-James-Presentation_030525_vfinal.pdf` | 5526 |
 | inventory | other | — | `investor-documents/ir-quidelortho/00329f41-027f-448e-9fdb-a5ad469084e8.pdf` | 0 |
 | inventory | other | — | `investor-documents/ir-quidelortho/01a3c07a-29bd-4063-b28f-45be2397b9d6.pdf` | 0 |
 | inventory | other | — | `investor-documents/ir-quidelortho/029d3460-ec7d-49de-a7ec-279861a59040.pdf` | 0 |
@@ -240,7 +240,42 @@ Documents in folder: **188** (all listed below; Tier 1–3 extracted or keyword-
 - DeferredRevenueRevenueRecognized1: 30.0
 
 ### `investor-documents/ir-quidelortho/QuidelOrtho_2023-Annual-Report_vfinal.pdf`
-Extract error: No module named 'pypdf'
+**Keyword snippets (related party, financials, segments):**
+- Company, we are pleased to share that our
+- segments in the $48 billion in vitro diagnostics
+- For the full year 2023, reported revenue was
+- reported revenue was down from $3.3 billion
+- increase in our non-respiratory reported revenues
+- for 2023, including an impressive 8% revenue
+- Directors recognized the need to restructure
+- created the Office of the Chief Executive Officer
+- Executive Officer, Executive Vice President
+- Interim President, Executive Vice President
+- Office of the Chief Executive Officer
+- logistics, distribution and labor disruptions and challenges; the challenges and costs of integrating, restructuring and achieving anticipated
+- those discussed under “Risk Factors” in QuidelOrtho’s Annual Report on Form 10-K for the fiscal year ended December 31, 2023 and
+- Reconciliation of Non-GAAP Financial Information – Adjusted Net Income
+- Incremental depreciation on PP&E fair value adjustment  33.5
+- Adjusted net income $ 277.7 $ 4.13
+- (Address of principal executive offices, including zip code)
+- Indicate by check mark whether any of those error corrections are restatements that required a recovery analysis of incentive-based compensation received by
+- any of the registrant’s executive officers during the relevant recovery period pursuant to §240.10D-1(b).    ☐
+- Item 1A. Risk Factors 26
+- Item 10. Directors, Executive Officers and Corporate Governance 113
+- Item 11. Executive Compensation 113
+- Item 13. Certain Relationships and Related Transactions, and Director Independence 113
+- Part I, Item 1A, “Risk Factors,” and Part II, Item 7, “Management’s Discussion and Analysis of Financial Condition and
+- differ from those set forth or implied in the forward-looking statements: supply chain, production, logistics, distribution and
+- we operate, with our reportable segments being North America, Europe, the Middle East and Africa (“EMEA”), and China.
+- Latin America, Japan and Asia Pacific are immaterial operating segments that are not considered reportable segments and are
+- included in “Other.” We generate our revenue primarily in the following business units: Labs, Transfusion Medicine, Point of
+- Care and Molecular Diagnostics. Information concerning revenues attributable to our reportable segments and business units is
+- set forth in Part II, Item 8, “Financial Statements and Supplementary Data—Note 4. Revenue” and “Financial Statements and
+- Supplementary Data—Note 5. Segment and Geographic Information.”
+- We generate product revenue in the following business units:
+- Other product revenues primarily from contract manufacturing
+- collaboration and royalty revenues
+- addresses the lower-volume segment of the diagnostic testing market
 
 ### `investor-documents/sec-edgar/10-Q_20260506_rpt20260329_acc0001906324_26_000024.htm`
 **Keyword snippets (related party, financials, segments):**
@@ -378,19 +413,92 @@ Extract error: No module named 'pypdf'
 - StockholdersEquity: 945.0
 
 ### `investor-documents/ir-quidelortho/QuidelOrtho-2024-Form-10-K.pdf`
-Extract error: No module named 'pypdf'
+**Keyword snippets (related party, financials, segments):**
+- (Address of principal executive offices, including zip code)
+- Indicate by check mark whether any of those error corrections are restatements that required a recovery analysis of incentive -based compensation received by
+- any of the registrant’s executive officers during the relevant recovery period pursuant to §240.10D-1(b).    ☐
+- Item 1A. Risk Factors 26
+- Item 10. Directors, Executive Officers and Corporate Governance 117
+- Item 11. Executive Compensation 117
+- Item 13. Certain Relationships and Related Transactions, and Director Independence 117
+- 1A, “Risk Factors,” and Part II, Item 7, “Management’s Discussion and Analysis of Financial Condition and Results of
+- our non -respiratory and respiratory products; supply chain, production, logistics, distribution and labor disruptions and
+- business generally, including those discussed under Part I, Item 1A, “Risk Factors” of this Annual Report. Investors should n ot
+- we operate. Effective January 1, 2024, Japan and Asia Pacific operating segments were combined into one operating segment:
+- JPAC. North America, EMEA and China are the Company’s reportable segments; Latin America and JPAC are immaterial
+- operating segments that are not considered reportable segments and are included in “Other.” We generate our revenue in the
+- Care and Molecular Diagnostics. We also generate non -core revenue, including through our contract manufacturing business
+- and margin profile. Information concerning revenues attributable to our reportable segments and business units is set forth i n
+- Part II, Item 8, “Financial Statements and Supplementary Data —Note 4. Revenue ” and “ —Note 5. Segment and Geographic
+- We generate product revenue in the following business units:
+- Other product revenues primarily from contract manufacturing  (1)
+- collaboration and royalty revenues (1)
+- (1) Represents our non-core revenue. All non-core revenue is recorded in the North America segment.
 
 ### `investor-documents/ir-quidelortho/QUIDEL_10-K_WEBREADY.pdf`
-Extract error: No module named 'pypdf'
+**Keyword snippets (related party, financials, segments):**
+- brand became firmly entrenched in the rapid point of care diagnostic segment, and a favorite
+- a broader based diagnostic company capable of delivering greater revenue and margin more
+- for revenue generating placements remains at 10,000. CLIA waivers for Strep A, RSV , and hCG
+- March 2013Annual Revenue
+- Annual Operating Income
+- (Address of principal executive offices)
+- anticipated market penetration of our products, the quantity of our product in our distributors’ inventory or distribution channels,
+- combinations or the election of directors. Forward-looking statements typically are identified by the use of terms such as “may,”
+- include, among others, statements concerning: our outlook for the upcoming fiscal year, including projections about our revenue,
+- distributors; that influenza test revenues will continue to be a significant portion of our total revenue; industry consolidation and
+- sharing arrangements; that the price of our common stock will continue to fluctuate; our intentions to not renew our Santa Clara lease
+- and our plans to move our administrative functions to a new lease location; our exposure to claims and litigation; our intention to not
+- pay dividends; expectations regarding grant revenues and expenditures in 2014; that we will continue to incur substantial royalty and
+- opportunities. The risks described under “Risk Factors” in Item 1A of this Annual Report and elsewhere herein and in reports and
+- Statements and Notes thereto beginning on page F-1 of this Annual Report. We undertake no obligation to publicly release the results
+- We are a corporation, incorporated in the State of Delaware. Our executive offices are located at 10165 McKellar Court, San
+- Our primary objective is to build a broader-based diagnostic company, with products in market segments that are growing, and
+- •  molecular diagnostic tests across a number of laboratory segments.
+- professional POC market is comprised of two general segments: decentralized testing in non-institutional settings, such as physicians’
+- select distributors throughout the world under the Quidel® and MicroVue™ brands. The SPG revenues, income and assets are less than
 
 ### `investor-documents/ir-quidelortho/2020-Annual-Report-and-10-K.pdf`
-Extract error: No module named 'pypdf'
+- *(no keyword hits; see cached full text in `research/evidence/_text/` if tier=full)*
 
 ### `investor-documents/ir-quidelortho/QuidelOrtho-William-Blair-45th-Annual-Growth-Stock-Conference_060425_vfinal.pdf`
-Extract error: No module named 'pypdf'
+**Keyword snippets (related party, financials, segments):**
+- President & Chief Executive Officer
+- other strategic goals, financial guidance and related assumptions and other future financial condition and operating results, including expected results of
+- production, logistics, distribution and labor disruptions and challenges; the challenges and costs of integrating, restructuring and achieving anticipated synergies
+- subsequent reports filed with the Securities and Exchange Commission (the “Commission”), including under Part I, Item 1A, “Risk Factors” of the Form 10-K. You
+- Commission, including but not limited to “constant currency revenue changes,” “adjusted EBITDA,” “adjusted EBITDA margin,” “adjusted diluted
+- Manufacturing and Distribution
+- 1. Total FY’24 reported revenue percentage by
+- Executive Vice President of R&D & Chief Technology Officer
+- President and Chief Executive Officer
+-  Originally invested in LEX Diagnostics in December 2023, comprised of an initial investment of
+- $20 million and an additional milestone-related investment of $10 million in 2024
+-  Investment terms included the exclusive option to acquire LEX Diagnostics up to or shortly
+- fastest-growing segments
 
 ### `investor-documents/ir-quidelortho/QuidelOrtho-Annual-Report-Digital-FINAL.pdf`
-Extract error: No module named 'pypdf'
+- *(no keyword hits; see cached full text in `research/evidence/_text/` if tier=full)*
 
 ### `investor-documents/ir-quidelortho/QuidelOrtho-2024-Annual-Report.pdf`
-Extract error: No module named 'pypdf'
+**Keyword snippets (related party, financials, segments):**
+- in revenue. We saw considerable strength in
+- revenue, demonstrated solid underlying mid-single
+- * Excludes COVID-19 and non-core revenues, on a constant-currency basis. Please
+- recurring revenue of over 90% in 2024.
+- as our Executive Vice President of Research and
+- I am pleased to report that we expect to realize
+- with our strong board of directors.
+- QuidelOrtho President & Chief Executive Officer
+- 1 Revenue growth rates are shown on a constant currency basis; the term “constant currency” means we have translated local currency revenues for all reporting periods to
+- in isolation from or as a substitute for financial information prepared in accordance with GAAP. Please see reconciliation of non-GAAP measures included in this report for
+- 2 Please see reconciliation of non-GAAP measures included in this report for reconciliation to the closest GAAP metric.
+- 3 Recurring revenue means revenues from sales of our assays, reagents, consumables and services, and excludes instruments.
+- Adjusted Net Income
+- Incremental depreciation on PP&E fair value adjustment   35.1   33.5
+- Employee compensation charges   5.6  —
+- Adjusted net income $ 125.0 $ 1.85  $ 27 7.7  $ 4.13
+- Full-Year 2024 Revenue
+- Respiratory revenues $ 503.9  $ 714.6 (29.5)% — % (29.5)%
+- Non-Respiratory revenues  2,279.0  2,283.2 (0.2)% (0.8)% 0.6%
+- Total revenues(b) $ 2,782.9  $ 2,997.8 (7.2)% (0.6)% (6.6)%

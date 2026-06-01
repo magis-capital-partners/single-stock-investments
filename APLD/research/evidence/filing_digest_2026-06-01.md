@@ -58,8 +58,8 @@ Documents in folder: **70** (all listed below; Tier 1–3 extracted or keyword-s
 | scan | 8-K | 2026-04-16 | `investor-documents/sec-edgar/8-K_20260416_rpt20260410_acc0001493152_26_017092.htm` | 4719 |
 | scan | 8-K | 2026-04-23 | `investor-documents/sec-edgar/8-K_20260423_rpt20260423_acc0001144879_26_000036.htm` | 4069 |
 | scan | 8-K | 2026-05-05 | `investor-documents/sec-edgar/8-K_20260505_rpt20260501_acc0001493152_26_021333.htm` | 8000 |
-| scan | presentation | — | `investor-documents/ir-apld/APLD_INV_InvestorPresentation_Final_04.24.26.pdf` | 0 ERR:No module named 'pypdf' |
-| scan | presentation | — | `investor-documents/ir-applieddigital/APLD_INV_InvestorPresentation_Final_04.24.26.pdf` | 0 ERR:No module named 'pypdf' |
+| scan | presentation | — | `investor-documents/ir-apld/APLD_INV_InvestorPresentation_Final_04.24.26.pdf` | 6417 |
+| scan | presentation | — | `investor-documents/ir-applieddigital/APLD_INV_InvestorPresentation_Final_04.24.26.pdf` | 6417 |
 | inventory | other | — | `investor-documents/ir-apld/0001144879-25-000021.pdf` | 0 |
 | inventory | other | — | `investor-documents/ir-apld/0001144879-26-000030.pdf` | 0 |
 | inventory | other | 2026-04-08 | `investor-documents/ir-apld/2026-04-08_Applied_Digital_Reports_Fiscal_Third_Quarter_2026__148.pdf` | 0 |

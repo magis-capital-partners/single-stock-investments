@@ -1184,6 +1184,49 @@ def irr_arithmetic(val: dict, ticker: str, preserved: str | None) -> str:
     return "\n".join(lines)
 
 
+def book_estimate_section(ticker: str) -> str:
+    """Render ### Current book value estimate from book_estimate.json."""
+    be_path = ROOT / ticker / "research" / "book_estimate.json"
+    if not be_path.exists():
+        return ""
+    be = json.loads(be_path.read_text(encoding="utf-8"))
+    anchor = be.get("filing_anchor") or {}
+    summary = be.get("summary") or {}
+    comp = be.get("price_comparison") or {}
+    lines = [
+        "### Current book value estimate (mark-to-market)",
+        "",
+        f"**Filed book:** **${anchor.get('filed_book_per_share', '?')}/sh** "
+        f"(period end **{anchor.get('period_end', '?')}**, `{anchor.get('source', '')}`).",
+        "",
+        "| Line | Filing ($M) | Current ($M) | Δ ($M) | Δ $/sh | Source |",
+        "|------|-------------|--------------|--------|--------|--------|",
+    ]
+    for row in be.get("lines") or []:
+        lines.append(
+            f"| {row.get('label', row.get('id', ''))[:40]} | "
+            f"{row.get('filing_value_m', '—')} | {row.get('current_value_m', '—')} | "
+            f"{row.get('delta_m', '—')} | "
+            f"{(row.get('delta_m', 0) / anchor.get('shares', 1) * 1e6) if row.get('delta_m') and anchor.get('shares') else '—'} | "
+            f"{(row.get('price_source', '') or row.get('source', ''))[:30]} |"
+        )
+    lines += [
+        "",
+        f"**Current best estimate:** **${summary.get('current_book_per_share', '?')}/sh** "
+        f"(Δ **${summary.get('delta_per_share', '?')}/sh**, **{summary.get('delta_pct_of_filed_book', '?')}%** vs filed).",
+        "",
+        f"**Price comparison:** market **${comp.get('market_price', '?')}** · "
+        f"discount to filed book **{comp.get('discount_to_filed_book_pct', '?')}%** · "
+        f"discount to current estimate **{comp.get('discount_to_current_estimate_pct', '?')}%**.",
+        "",
+    ]
+    flags = be.get("staleness_flags") or []
+    if flags:
+        lines.append("**Staleness / gaps:** " + "; ".join(flags[:5]))
+        lines.append("")
+    return "\n".join(lines)
+
+
 def build_valuation_section(ticker: str, val: dict, preserved_val: str | None) -> str:
     import sys
 
@@ -1242,6 +1285,9 @@ def build_valuation_section(ticker: str, val: dict, preserved_val: str | None) -
     syn_body = synthesis_markdown(val)
     if syn_body:
         parts += [syn_body, ""]
+    be_body = book_estimate_section(ticker)
+    if be_body and "### Current book value estimate" not in (preserved_val or ""):
+        parts += [be_body, ""]
     parts += [
         upside,
         "",

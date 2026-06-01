@@ -13,24 +13,24 @@
   "inputs": {
     "price": 6.7,
     "price_source": "Stooq FRMO.US close 2026-05-22",
-    "book_per_share": 7.47,
+    "book_per_share": 7.42,
     "normalization_note": "Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book.",
     "book_per_share_filed": 8.56,
-    "book_per_share_current": 7.47
+    "book_per_share_current": 7.42
   },
   "optionality_gate": {
     "framework": "holdco_sotp",
     "floor_pass": true,
     "floor_metric": "book_per_share",
-    "floor_value": 7.47,
+    "floor_value": 7.42,
     "primary_metric": "lawrence_base",
     "primary_label": "annualized return",
     "primary_return_pct": 21.9,
     "incumbent_sleeve": true,
     "notes": "Trades ~22% below book ($8.55); same SOTP payoffs as prior refresh. HK/MIAX/CMSG catalysts unchanged.",
     "floor_value_filed": 8.56,
-    "floor_value_current": 7.47,
-    "discount_to_current_book_pct": 10.3
+    "floor_value_current": 7.42,
+    "discount_to_current_book_pct": 9.6
   },
   "scenarios": {
     "bear": {
@@ -374,12 +374,132 @@
     "filing_period_end": "2026-02-28",
     "filing_source": "investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
     "filed_book_per_share": 8.56,
-    "current_book_per_share": 7.47,
-    "delta_per_share": -1.08,
-    "delta_pct_of_filed_book": -12.67,
+    "current_book_per_share": 7.42,
+    "delta_per_share": -1.14,
+    "delta_pct_of_filed_book": -13.34,
     "discount_to_filed_book_pct": 21.7,
-    "discount_to_current_estimate_pct": 10.3,
+    "discount_to_current_estimate_pct": 9.6,
     "config_path": "FRMO/research/book_estimate_config.json",
     "output_path": "FRMO/research/book_estimate.json"
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Yes",
+      "treatment": "nav_floor",
+      "evidence": "Private exchange stakes below economic value"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "Yes",
+      "treatment": "milestone_nav",
+      "evidence": "MIH, HKHC, Investment A look-through"
+    }
+  ],
+  "catalyst_paths": [
+    {
+      "event": "Base catalyst path",
+      "timing": "5 years",
+      "impact": "HK re-mark + partial SOTP close; book compounding"
+    },
+    {
+      "event": "Failure mode",
+      "timing": "bear scenario",
+      "impact": "Modest recovery toward book; marks flat"
+    }
+  ],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": 7.2,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 30.1,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      },
+      {
+        "id": "third_party_context",
+        "label": "Third-party context (HK + Substacks inventory)",
+        "source": "source_inventory (8 sources); cross_check blend",
+        "return_pct": 30.1,
+        "weight": 0.1,
+        "type": "numeric",
+        "notes": "Proxy: upside case when strategic third party has no spot IRR",
+        "epistemic_tier": "D (external triangulation)",
+        "weight_why": "Context-tier HK/Substacks until human promotes in third_party_sources.md; numeric proxy is weak.",
+        "weight_falsifiers": [
+          "Using bull scenario as HK proxy when cross_check synthesis says no IRR upgrade",
+          "Weight above 15% while human_approval pending"
+        ],
+        "hard_to_vary": "no: proxy return is instrumentalist; prefer qualitative pp until approved blend"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "factor": "Partial dhando (HK hard-asset / hidden NAV)",
+        "pp": 0.5,
+        "rationale": "Third-party confirms asset quality not in GAAP book; not full floor at spot price",
+        "sources": "cross_check_HK; hk_scan; HK Q1 2025/2026"
+      },
+      {
+        "factor": "Governance transition (post-Stahl)",
+        "pp": -0.4,
+        "rationale": "Capital allocation uncertainty until proven",
+        "sources": "https://lemoncakesinvesting.substack.com/p/tpl-texas-pacific-land-co-end-of"
+      },
+      {
+        "factor": "Water scarcity tailwind (SSI / HK index-weight)",
+        "pp": 0.25,
+        "rationale": "TPWR segment + index cannot replicate subsurface water exposure",
+        "sources": "https://specialsituationinvesting.substack.com/p/portfolio-update-gtx-msb-frmo-tpl"
+      },
+      {
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework"
+      }
+    ],
+    "numeric_weighted_pct": 25.86,
+    "qualitative_pp": 0.15,
+    "total_synthesis_pct": 26.01,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [
+        "Third-party numeric path proxies bull scenario (instrumentalist); HK cross-check says no base IRR upgrade. Prefer qualitative pp only until approved blend.",
+        "Qualitative \u00b1pp stack may overlap numeric paths (moat/dhando); cap \u00b13pp and require source for each row."
+      ],
+      "deutsch_checks": {
+        "hard_to_vary": false,
+        "falsifiable": true,
+        "not_instrumentalist": false,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
   }
 }
