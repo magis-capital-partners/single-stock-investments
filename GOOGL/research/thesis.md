@@ -11,7 +11,7 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | - |
-| **Implied 10yr IRR** (falsifier-adjusted) | 1.6% (falsifier-adjusted) |
+| **Implied 10yr IRR** (total synthesis) | 1.63% (total synthesis) |
 | **IRR method** | full |
 | **Lawrence bucket** | pricing_power |
 

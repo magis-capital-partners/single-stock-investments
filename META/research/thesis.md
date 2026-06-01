@@ -1,6 +1,6 @@
 # META — Investment Thesis
 
-**Last updated:** 2026-06-01
+**Last updated:** auto-sync
 
 ## Classification
 
@@ -11,7 +11,7 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | - |
-| **Implied 10yr IRR** (Lawrence) | 5.9% (base) |
+| **Implied 10yr IRR** (total synthesis) | 10.44% (total synthesis) |
 | **IRR method** | full |
 | **Lawrence bucket** | pricing_power |
 

@@ -400,6 +400,28 @@ def compute_synthesis(data: dict) -> dict:
     return synthesis
 
 
+def website_implied_irr(data: dict) -> dict:
+    """Compute total synthesis when possible; return fields for dashboard / thesis sync."""
+    compute_synthesis(data)
+    ir = data.get("implied_return") or {}
+    syn = data.get("synthesis") or {}
+    base = ir.get("base_pct")
+    if syn.get("status") == "complete" and syn.get("total_synthesis_pct") is not None:
+        base = syn["total_synthesis_pct"]
+    display = ir.get("display")
+    if syn.get("status") == "complete" and base is not None:
+        display = f"{base}% (total synthesis)"
+    elif base is not None and not display:
+        display = f"{base}%"
+    return {
+        "display": display,
+        "base_pct": base,
+        "falsifier_adjusted_pct": ir.get("falsifier_adjusted_pct"),
+        "synthesis_status": syn.get("status"),
+        "synthesis_pct": syn.get("total_synthesis_pct"),
+    }
+
+
 def synthesis_markdown(data: dict) -> str:
     syn = data.get("synthesis") or {}
     if syn.get("status") != "complete":

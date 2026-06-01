@@ -1,6 +1,6 @@
 # LSEG — Investment Thesis
 
-**Last updated:** 2026-06-01
+**Last updated:** auto-sync
 
 ## Classification
 
@@ -11,7 +11,7 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | mid |
-| **Implied 10yr IRR** (Lawrence) | 12.6% (base) |
+| **Implied 10yr IRR** (total synthesis) | 13.79% (total synthesis) |
 | **IRR method** | full |
 | **Lawrence bucket** | multi_sided |
 

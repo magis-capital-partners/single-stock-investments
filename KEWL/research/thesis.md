@@ -11,7 +11,7 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | - |
-| **Implied 10yr IRR** (Lawrence) | 12.4% (Copperwood option yield (bull)) |
+| **Implied 10yr IRR** (total synthesis) | -1.04% (total synthesis) |
 | **IRR method** | yield_curve |
 | **Lawrence bucket** | other |
 

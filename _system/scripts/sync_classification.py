@@ -14,6 +14,9 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "_system" / "scripts"))
+from valuation_synthesis import website_implied_irr  # noqa: E402
+
 CLASS_PATH = ROOT / "_system" / "portfolio" / "classification.json"
 
 CLASS_FIELDS = [
@@ -72,9 +75,9 @@ def valuation_classification(val: dict) -> dict:
     method = val.get("method", val.get("irr_method"))
     if method:
         out["irr_method"] = method
-    implied = val.get("implied_return", {})
-    if implied.get("display"):
-        out["implied_irr"] = implied["display"]
+    irr_web = website_implied_irr(val)
+    if irr_web.get("display"):
+        out["implied_irr"] = irr_web["display"]
     elif val.get("results", {}).get("base", {}).get("return_pct") is not None:
         out["implied_irr"] = f"{val['results']['base']['return_pct']}% (base)"
     proposal = val.get("stance_proposal", {})
@@ -104,7 +107,7 @@ def classification_table(row: dict) -> str:
         cell("dhando", "Dhando", "Pabrai"),
         cell("stance", "Stance"),
         cell("cycle", "Cycle"),
-        cell("implied_irr", "Implied 10yr IRR", "falsifier-adjusted"),
+        cell("implied_irr", "Implied 10yr IRR", "total synthesis"),
         cell("irr_method", "IRR method"),
         cell("lawrence_bucket", "Lawrence bucket"),
         "",
@@ -138,6 +141,8 @@ def check_ticker(ticker: str, portfolio: dict, fix: bool) -> list[str]:
     from_json = portfolio.get(ticker, {})
     from_thesis = parse_thesis_classification(ticker_dir)
     val = load_valuation(ticker)
+    if val and not val.get("ticker"):
+        val["ticker"] = ticker
     from_val = valuation_classification(val) if val else {}
 
     merged = {**from_json, **from_thesis}
