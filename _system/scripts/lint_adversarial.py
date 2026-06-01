@@ -17,13 +17,21 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 
-IRR_PCT = re.compile(r"\*\*(-?\d{1,2}(?:\.\d)?)\s*%\*\*")
+IRR_PCT = re.compile(r"\*\*(-?\d+(?:\.\d+)?)\s*%\*\*")
+RETURNS_SYNTHESIS = re.compile(
+    r"\*\*Returns statement \(synthesis\):\*\*[^\n]*?\*\*(-?\d+(?:\.\d+)?)\s*%\*\*",
+    re.I,
+)
 RETURNS_BLEND = re.compile(
-    r"\*\*Returns statement(?: \(blended\))?:\*\*[^\n]*?\*\*(-?\d{1,2}(?:\.\d)?)\s*%\*\*",
+    r"\*\*Returns statement(?: \(blended\))?:\*\*[^\n]*?\*\*(-?\d+(?:\.\d+)?)\s*%\*\*",
     re.I,
 )
 EXEC_IRR = re.compile(
-    r"(?:falsifier-adjusted|blended|floor|base case|IRR|annual return)[^\n]{0,80}?\*\*(-?\d{1,2}(?:\.\d)?)\s*%\*\*",
+    r"(?:total synthesis|falsifier-adjusted|blended|floor|base case|IRR|annual return)[^\n]{0,100}?\*\*(-?\d+(?:\.\d+)?)\s*%\*\*",
+    re.I,
+)
+EXEC_SYNTHESIS = re.compile(
+    r"Total synthesis[^\n]{0,120}?\*\*(-?\d+(?:\.\d+)?)\s*%\*\*",
     re.I,
 )
 CLASS_IRR = re.compile(
@@ -121,7 +129,7 @@ def expected_base_irr(val: dict) -> float | None:
 
 
 def extract_pct_from_class_row(row: str) -> float | None:
-    m = re.search(r"(-?\d{1,2}(?:\.\d)?)\s*%", row)
+    m = re.search(r"(-?\d+(?:\.\d+)?)\s*%", row)
     return float(m.group(1)) if m else None
 
 
@@ -131,16 +139,16 @@ def collect_dive_irrs(text: str) -> dict[str, float | None]:
     if m:
         exec_sum = m.group(1)
     exec_irrs = [float(x) for x in IRR_PCT.findall(exec_sum)]
-    exec_base_m = EXEC_IRR.search(exec_sum)
+    exec_base_m = EXEC_SYNTHESIS.search(exec_sum) or EXEC_IRR.search(exec_sum)
     if exec_base_m:
         exec_base = float(exec_base_m.group(1))
     else:
         exec_base = exec_irrs[0] if exec_irrs else None
-    ret_m = RETURNS_BLEND.search(text)
+    ret_m = RETURNS_SYNTHESIS.search(text) or RETURNS_BLEND.search(text)
     ret_pct = float(ret_m.group(1)) if ret_m else None
     if ret_pct is None:
         m2 = re.search(
-            r"\*\*Returns statement:\*\*[^\n]*?\*\*~?(-?\d{1,2}(?:\.\d)?)\s*%\*\*",
+            r"\*\*Returns statement:\*\*[^\n]*?\*\*~?(-?\d+(?:\.\d+)?)\s*%\*\*",
             text,
             re.I,
         )
@@ -236,7 +244,7 @@ def lint_ticker(
         m_ret = re.search(r"\*\*Returns statement[^*]*\*\*[^\n]+", text, re.I)
         if m_ret:
             ret_line = m_ret.group(0).lower()
-        blended_returns = "blended" in ret_line
+        blended_returns = "blended" in ret_line or "synthesis" in ret_line
         for label, pct in found.items():
             if pct is None:
                 continue

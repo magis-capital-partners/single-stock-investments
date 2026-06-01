@@ -14,6 +14,8 @@ from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+from valuation_synthesis import synthesis_markdown
+
 APPROVED_THIRD_PARTY = ROOT / "_system" / "frameworks" / "third_party_sources.md"
 HK_INDEX = ROOT / "_system" / "reference" / "investment-wisdom" / "hk_ticker_index.json"
 VALUATION_BRIDGE_START = re.compile(r"#### Valuation bridge", re.IGNORECASE)
@@ -215,10 +217,24 @@ def stance_proposal_block(val: dict) -> str:
     return "\n".join(lines)
 
 
-def primary_irr_pct(val: dict) -> float | int | str | None:
-    return val.get("implied_return", {}).get("base_pct") or (val.get("results") or {}).get("base", {}).get(
-        "return_pct"
+def synthesis_complete(val: dict) -> bool:
+    return (val.get("synthesis") or {}).get("status") == "complete"
+
+
+def filing_irr_pct(val: dict) -> float | int | str | None:
+    ir = val.get("implied_return") or {}
+    return (
+        ir.get("falsifier_adjusted_pct")
+        or (val.get("results_growth_theory") or {}).get("falsifier_adjusted", {}).get("return_pct")
+        or (val.get("results") or {}).get("base", {}).get("return_pct")
     )
+
+
+def primary_irr_pct(val: dict) -> float | int | str | None:
+    if synthesis_complete(val):
+        return (val.get("synthesis") or {}).get("total_synthesis_pct")
+    ir = val.get("implied_return") or {}
+    return ir.get("base_pct") or (val.get("results") or {}).get("base", {}).get("return_pct")
 
 
 def growth_rates_for_irr(val: dict) -> tuple[float, float, float | int]:
@@ -247,9 +263,15 @@ def patch_classification_stance(text: str, val: dict) -> str:
         )
     display = (val.get("implied_return") or {}).get("display")
     if display:
+        label = "total synthesis" if synthesis_complete(val) else "falsifier-adjusted"
         text = re.sub(
             r"\*\*Implied 10yr IRR\*\* \(Lawrence\)",
-            "**Implied 10yr IRR** (falsifier-adjusted)",
+            f"**Implied 10yr IRR** ({label})",
+            text,
+        )
+        text = re.sub(
+            r"\*\*Implied 10yr IRR\*\* \(falsifier-adjusted\)",
+            f"**Implied 10yr IRR** ({label})",
             text,
         )
         text = re.sub(
@@ -266,23 +288,48 @@ def patch_exec_summary_irr(body: str, val: dict) -> str:
     if base_pct is None:
         return body
     legacy = (val.get("implied_return") or {}).get("lawrence_legacy_pct")
-    body = re.sub(
-        r"\*\*Lawrence consolidated base 10yr IRR is [\d.-]+%\*\*",
-        f"**falsifier-adjusted 10-year annual return is {base_pct}%**",
-        body,
-    )
-    body = re.sub(
-        r"Lawrence base 10-year annual return is \*\*[\d.-]+%\*\*",
-        f"Falsifier-adjusted 10-year annual return is **{base_pct}%**",
-        body,
-    )
-    if legacy is not None and legacy != base_pct and "Lawrence legacy" not in body:
+    fa_pct = filing_irr_pct(val)
+    if synthesis_complete(val):
         body = re.sub(
-            rf"(\*\*falsifier-adjusted 10-year annual return is {re.escape(str(base_pct))}%\*\*)",
-            rf"\1 (Lawrence legacy {legacy}% reference only)",
+            r"\*\*Lawrence consolidated base 10yr IRR is [\d.-]+%\*\*",
+            f"**total synthesis 10-year annual return is {base_pct}%**",
             body,
-            count=1,
         )
+        body = re.sub(
+            r"Lawrence base 10-year annual return is \*\*[\d.-]+%\*\*",
+            f"Total synthesis 10-year annual return is **{base_pct}%**",
+            body,
+        )
+        body = re.sub(
+            r"Falsifier-adjusted 10-year annual return is \*\*[\d.-]+%\*\*",
+            f"Total synthesis 10-year annual return is **{base_pct}%**",
+            body,
+        )
+        if fa_pct is not None and str(fa_pct) != str(base_pct) and "filing-only" not in body.lower():
+            body = re.sub(
+                rf"(Total synthesis 10-year annual return is \*\*{re.escape(str(base_pct))}%\*\*)",
+                rf"\1 (filing-only falsifier-adjusted **{fa_pct}%** reference)",
+                body,
+                count=1,
+            )
+    else:
+        body = re.sub(
+            r"\*\*Lawrence consolidated base 10yr IRR is [\d.-]+%\*\*",
+            f"**falsifier-adjusted 10-year annual return is {base_pct}%**",
+            body,
+        )
+        body = re.sub(
+            r"Lawrence base 10-year annual return is \*\*[\d.-]+%\*\*",
+            f"Falsifier-adjusted 10-year annual return is **{base_pct}%**",
+            body,
+        )
+        if legacy is not None and legacy != base_pct and "Lawrence legacy" not in body:
+            body = re.sub(
+                rf"(\*\*falsifier-adjusted 10-year annual return is {re.escape(str(base_pct))}%\*\*)",
+                rf"\1 (Lawrence legacy {legacy}% reference only)",
+                body,
+                count=1,
+            )
     return body
 
 
@@ -290,15 +337,33 @@ def patch_payoff_expected_return(body: str, val: dict) -> str:
     base_pct = primary_irr_pct(val)
     if base_pct is None:
         return body
+    label = "total synthesis" if synthesis_complete(val) else "falsifier-adjusted"
 
     def repl_base(m: re.Match) -> str:
-        return f"{m.group(1)}**{base_pct}%** (falsifier-adjusted){m.group(2)}"
+        return f"{m.group(1)}**{base_pct}%** ({label}){m.group(2)}"
 
     def repl_base_plain(m: re.Match) -> str:
-        return f"{m.group(1)}{base_pct}% (falsifier-adjusted){m.group(2)}"
+        return f"{m.group(1)}{base_pct}% ({label}){m.group(2)}"
 
     body = re.sub(r"(\|\s*Base\s*\|\s*)\*\*[\d.-]+%\*\*(\s*\|)", repl_base, body, count=1)
+    body = re.sub(
+        r"(\|\s*Base\s*\|\s*)[\d.-]+% \([^)]+\)(\s*\|)",
+        repl_base_plain,
+        body,
+        count=1,
+    )
     body = re.sub(r"(\|\s*Base\s*\|\s*)[\d.-]+%(\s*\|)", repl_base_plain, body, count=1)
+
+    if synthesis_complete(val):
+        body = re.sub(
+            r"\*\*Returns statement:\*\*[^\n]+",
+            (
+                f"**Returns statement:** At today's price, we expect about **{base_pct}%** per year "
+                f"over ten years (total synthesis; see capstone in Valuation & IRR)."
+            ),
+            body,
+            count=1,
+        )
     return body
 
 
@@ -467,9 +532,19 @@ def assumption_ledger(val: dict) -> str:
         legacy = (val.get("results_lawrence_legacy") or {}).get("base", {}).get("return_pct")
         fa_irr = (val.get("results_growth_theory") or {}).get("falsifier_adjusted", {}).get("return_pct")
         if fa_irr is not None:
-            rows.append(
-                f"| {n} | Falsifier-adjusted annual return | **{fa_irr}%** | Primary IRR (`implied_return.base_pct`) |"
-            )
+            syn = (val.get("synthesis") or {}).get("total_synthesis_pct")
+            if synthesis_complete(val) and syn is not None:
+                rows.append(
+                    f"| {n} | Falsifier-adjusted annual return (filing path) | **{fa_irr}%** | Audit reference; capstone in Total synthesis IRR |"
+                )
+                n += 1
+                rows.append(
+                    f"| {n} | Total synthesis annual return | **{syn}%** | `implied_return.base_pct` (all sources) |"
+                )
+            else:
+                rows.append(
+                    f"| {n} | Falsifier-adjusted annual return | **{fa_irr}%** | Primary IRR (`implied_return.base_pct`) |"
+                )
             n += 1
         if legacy is not None and fa_irr is not None and legacy != fa_irr:
             rows.append(
@@ -870,6 +945,7 @@ def irr_arithmetic(val: dict, ticker: str, preserved: str | None) -> str:
     method = val.get("method", "full")
     inputs = val.get("inputs", {})
     price = inputs.get("price", 0)
+    filing_pct = filing_irr_pct(val)
     base_pct = primary_irr_pct(val)
     lines = ["#### IRR arithmetic (show your work)", ""]
 
@@ -927,13 +1003,17 @@ def irr_arithmetic(val: dict, ticker: str, preserved: str | None) -> str:
             f"3. **Growth in years 1–5:** **{g1*100:.1f}%** per year · **years 6–10:** **{g2*100:.1f}%** per year"
             f"{growth_note}",
             f"4. **Selling multiple in year 10:** **{ex} times** year-10 cash flow",
-            f"5. **Annual return at today's price:** **{base_pct}%** per year over ten years "
-            "(falsifier-adjusted primary IRR in `valuation.json`)",
+            f"5. **Annual return at today's price:** **{filing_pct}%** per year over ten years "
+            "(filing-only falsifier-adjusted path in `valuation.json`)",
         ]
         legacy = (val.get("implied_return") or {}).get("lawrence_legacy_pct")
-        if legacy is not None and legacy != base_pct:
+        if legacy is not None and legacy != filing_pct:
             lines.append(
                 f"6. **Lawrence legacy reference:** **{legacy}%** per year (pre-theory `scenarios.base` growth)"
+            )
+        if synthesis_complete(val) and base_pct is not None and base_pct != filing_pct:
+            lines.append(
+                f"7. **Total synthesis IRR (all sources):** **{base_pct}%** per year — see capstone section below"
             )
         return "\n".join(lines)
 
@@ -946,61 +1026,83 @@ def build_valuation_section(ticker: str, val: dict, preserved_val: str | None) -
     price = inputs.get("price", "?")
     src = inputs.get("price_source", "")
     method = val.get("method", "full")
-    base_pct = val.get("implied_return", {}).get("base_pct") or val.get("results", {}).get("base", {}).get("return_pct", "?")
+    syn_pct = primary_irr_pct(val)
+    fa_pct = filing_irr_pct(val)
+    has_syn = synthesis_complete(val)
     seg_body = segment_build_section(val, preserved_val)
     ge_body = growth_explanation_stress_block(val)
     irr_body = irr_arithmetic(val, ticker, preserved_val)
+    syn_body = synthesis_markdown(val)
     upside = ""
-    if preserved_val:
+    if preserved_val and not has_syn:
         um = re.search(r"\*\*Upside / downside from price:\*\*.*", preserved_val)
         if um:
             upside = um.group(0)
     if not upside:
-        upside = f"**Upside / downside from price:** Base IRR **{base_pct}%** at **${price}**; see bear/bull in bridge."
+        label = "Total synthesis IRR" if has_syn else "Base IRR"
+        upside = f"**Upside / downside from price:** {label} **{syn_pct}%** at **${price}**; see bear/bull in bridge."
 
     ret = ""
-    if preserved_val:
+    if has_syn:
+        ret = (
+            f"**Returns statement (filing path):** Filing-only falsifier-adjusted return **{fa_pct}%** per year "
+            f"at **~${price}**. Authoritative capstone: **Total synthesis IRR** below."
+        )
+    elif preserved_val:
         rm = re.search(r"\*\*Returns statement:\*\*.*", preserved_val)
-        if rm and str(base_pct) in rm.group(0):
+        if rm and str(syn_pct) in rm.group(0):
             ret = rm.group(0)
     if not ret:
         fcf = inputs.get("fcf_per_share") or inputs.get("per_share")
         if fcf:
             ret = (
-                f"**Returns statement:** We expect **{base_pct}%** per year over ten years "
+                f"**Returns statement:** We expect **{syn_pct}%** per year over ten years "
                 f"(falsifier-adjusted) at **~${price}** on **${fcf}/sh** starting owner cash."
             )
         else:
-            ret = f"**Returns statement:** We expect **{base_pct}%** per year (falsifier-adjusted) at **${price}**."
+            ret = f"**Returns statement:** We expect **{syn_pct}%** per year (falsifier-adjusted) at **${price}**."
 
-    return "\n\n".join(
-        [
-            "## Valuation & IRR (assumption ledger)",
-            "",
-            f"**Price today:** **${price}** ({src})  ",
-            f"**Method:** {method_label(method)} (`{method}`) · **Falsifier-adjusted annual return:** **{base_pct}%** per year · `{ticker}/research/valuation.json`",
-            "",
-            "### Valuation bridge (bear, base, bull)",
-            "",
-            "| Case | Method | Main assumptions | Annual return | Versus 15% target |",
-            "|------|--------|------------------|---------------|-------------------|",
-            bridge_table(val),
-            "",
-            "### Assumption ledger (base case)",
-            "",
-            assumption_ledger(val),
-            "",
-            ge_body,
-            "" if not ge_body else "",
-            seg_body,
-            "",
-            irr_body,
-            "",
-            upside,
-            "",
-            ret,
-        ]
-    )
+    if has_syn:
+        method_hdr = (
+            f"**Method:** {method_label(method)} (`{method}`) · "
+            f"**Filing-only (falsifier-adjusted):** **{fa_pct}%** · "
+            f"**Total synthesis IRR:** **{syn_pct}%** per year · `{ticker}/research/valuation.json`"
+        )
+    else:
+        method_hdr = (
+            f"**Method:** {method_label(method)} (`{method}`) · "
+            f"**Falsifier-adjusted annual return:** **{syn_pct}%** per year · `{ticker}/research/valuation.json`"
+        )
+
+    parts = [
+        "## Valuation & IRR (assumption ledger)",
+        "",
+        f"**Price today:** **${price}** ({src})  ",
+        method_hdr,
+        "",
+        "### Valuation bridge (bear, base, bull)",
+        "",
+        "| Case | Method | Main assumptions | Annual return | Versus 15% target |",
+        "|------|--------|------------------|---------------|-------------------|",
+        bridge_table(val),
+        "",
+        "### Assumption ledger (base case)",
+        "",
+        assumption_ledger(val),
+        "",
+        ge_body,
+        "" if not ge_body else "",
+        seg_body,
+        "",
+        irr_body,
+        "",
+        upside,
+        "",
+        ret,
+    ]
+    if syn_body:
+        parts += ["", syn_body]
+    return "\n\n".join(parts)
 
 
 def refresh_ticker(ticker: str, out_date: str) -> Path | None:

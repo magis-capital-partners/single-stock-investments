@@ -70,6 +70,7 @@
 | **IRR arithmetic (show your work)** | Numbered steps; no unexplained payoffs |
 | **Upside / downside from price** | One line |
 | **Returns statement** | One sentence; = exec summary % |
+| **Total synthesis IRR (all sources)** | **Capstone** — weighted blend of filings, segments, scenarios, third party, qualitative; last block in §11 |
 | SOTP / look-through tables | If `holding_co` / `optionality` |
 | **Segment cash-flow build** | If `valuation_overlay: segment_cashflow` (GOOGL-style) |
 | **Option scan table** | **Every dive** — in §6; options sized in §11 or `nav_overlay` |
