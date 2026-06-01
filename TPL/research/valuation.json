@@ -2,6 +2,7 @@
   "ticker": "TPL",
   "as_of": "2026-06-01",
   "method": "full",
+  "valuation_mode": "optionality",
   "lawrence_bucket": "pricing_power",
   "classification_inputs": {
     "archetype": "infrastructure",
@@ -17,8 +18,61 @@
     "fcf_source": "FY2025 cash from operations $545.9M \u00f7 ~69.0M diluted shares (10-K FY2025); asset-light, minimal maintenance capital spending",
     "shares_outstanding": 69027492,
     "book_per_share": 21.14,
+    "book_per_share_caveat": "GAAP book excludes Assigned 1888 land and royalty interests (zero on balance sheet); not a fair-value or dhando floor",
     "dividend_per_share_fy2025": 2.13,
     "normalization_note": "Lawrence base on reported operating cash flow per share; FY2025 included $50M equity-method investment (non-recurring scale) not deducted from base."
+  },
+  "optionality_gate": {
+    "framework": "mineral_floor_option",
+    "floor_pass": null,
+    "floor_metric": "nav_per_share",
+    "floor_value": null,
+    "primary_metric": "lawrence_base",
+    "primary_label": "10yr cash-flow IRR (operating)",
+    "primary_return_pct": -1.0,
+    "notes": "GAAP book ~$21/sh is retained earnings + PPE/water + acquired royalties only. ~882k surface acres and ~224k NRA from 1888 Trust carry zero on balance sheet per 10-K. NAV overlay required before book-based dhando."
+  },
+  "nav_overlay": {
+    "as_of": "2026-06-01",
+    "status": "partial — filing facts + one acquisition comp; full SOTP pending",
+    "gaap_vs_fair_value": {
+      "assigned_land_and_royalties_on_balance_sheet": 0,
+      "policy_source": "10-K FY2025: fair market value not determined in 1888; no value assigned to Assigned land and royalty interests",
+      "land_line_item": "— (zero)",
+      "stockholders_equity_m": 1458.9,
+      "stockholders_equity_note": "Mostly accumulated operating earnings; not land mark-to-market",
+      "total_assets_m": 1623.3,
+      "property_plant_equipment_net_m": 164.5,
+      "cash_m": 144.8
+    },
+    "asset_inventory_filing": {
+      "surface_acres_approx": 882000,
+      "net_royalty_acres_nra_approx": 224000,
+      "source": "10-K FY2025 Item 1 Business"
+    },
+    "in_model": {
+      "lawrence_irr_on_operating_cash": true,
+      "gaap_book_in_dhando": false
+    },
+    "not_in_model_requires_refresh": [
+      "Fair-value NAV: surface acres ($/acre comps or land-sale marks)",
+      "NRA fair value roll-up (assigned + acquired; not only marginal purchase comp)",
+      "Undeveloped-acreage royalty option (future drilling not in 5% base growth)",
+      "Water infrastructure replacement cost vs PPE net $164.5M",
+      "Segment cash-flow build (Land/Royalty vs Water)"
+    ],
+    "illustrative_comps": {
+      "mar_2025_nra_acquisition": {
+        "nra": 177,
+        "price_m": 3.5,
+        "implied_per_nra": 19775,
+        "source": "10-K FY2025 acquisition note",
+        "caveat": "Marginal proved/acquired NRA only; assigned 1888 interests still at zero on BS"
+      },
+      "nra_at_acquisition_comp_m": 4426,
+      "nra_at_acquisition_comp_per_share": 64.1,
+      "nra_comp_note": "[Assumption] 224k NRA × $19,775 — royalty slice only; excludes 882k surface acres and water PPE"
+    }
   },
   "scenarios": {
     "bear": {
@@ -65,5 +119,24 @@
     },
     "override_reason": null
   },
-  "overlay_results": []
+  "overlay_results": [
+    {
+      "case": "GAAP book",
+      "method": "balance sheet",
+      "key_inputs": "Equity $1.46B ÷ 69M sh ≈ $21/sh; Assigned land/RRA at zero",
+      "return_pct": null,
+      "display": "Not a fair-value floor",
+      "stance_gate": false,
+      "notes": "10-K: no value assigned to 1888 Assigned land and royalty interests"
+    },
+    {
+      "case": "NRA acquisition comp",
+      "method": "nav (illustrative)",
+      "key_inputs": "224k NRA × $19,775 (Mar 2025 purchase)",
+      "return_pct": null,
+      "display": "~$64/sh royalty slice only",
+      "stance_gate": false,
+      "notes": "[Assumption] Does not value surface acres or water infra; not stance gate"
+    }
+  ]
 }

@@ -76,40 +76,42 @@ Of **25** holdings, **14** have Lawrence base annual return below **10%**; **22*
 
 ---
 
-## TPL — why -1.0% and what is missing
+## TPL (-1.0% base) — GAAP book misstates land; NAV overlay required
 
 **What the model does today**
 
 - Single consolidated Lawrence path: **$7.91/sh** FY2025 OCF, **5%/3%** growth, **22×** exit at **~$393**.
-- Implied **~50×** year-0 cash flow; **~19×** book (**$21/sh**). No book floor.
-- Archetype **infrastructure**; no `segment_build`, no `optionality_gate`.
+- Implied **~50×** year-0 cash flow.
+- `valuation_mode: optionality` with partial `nav_overlay` added 2026-06-01.
+
+**Correction: GAAP book is not a fair-value floor**
+
+**[Fact]** FY2025 10-K accounting policy: Assigned land and royalty interests from the **1888** Declaration of Trust carry **no value** on the balance sheet (fair market value never determined at formation). Balance sheet **Land**: **—**. **~882k** surface acres + **~224k** NRA are off balance sheet at zero. **Equity ~$21/sh** is mostly retained earnings + water PPE (**$164.5M**), not acreage mark-to-market.
+
+Prior audit language ("**~19× book**", "**no book floor**") was **misleading** — book is **irrelevant**, not merely too low.
 
 **Hidden value not quantified**
 
 | Theme | Filing fact | In base IRR? |
 |-------|-------------|--------------|
+| **Assigned land/RRA (1888)** | **$0** on BS; ~882k acres + ~224k NRA | Cash flow only; no NAV terminal |
 | **Water segment acceleration** | **$307.5M** FY2025 (+16% YoY); **38%** of revenue | Blended **5%** growth only |
-| **Easement annuity** | **$78.2M**; 30+ yr terms, CPI escalators | Not modeled as separate lower-discount stream |
-| **Q1 2026 run-rate** | OCF **$162M** Q1 (+21% rev YoY) | Uses FY2025 **$545.9M**, not **~$648M** annualized |
-| **Undeveloped acreage option** | **~880k** acres; royalties on future drilling | Zero — correct for base, but no bull overlay |
-| **Regulatory / water tailwind** | SSI approved note | Qualitative only |
+| **Easement annuity** | **$78.2M**; 30+ yr terms, CPI escalators | Not separate stream |
+| **Q1 2026 run-rate** | OCF **$162M** Q1 | Uses FY2025 **$7.91/sh**, not **~$9.4/sh** annualized |
+| **Undeveloped-acreage option** | Future royalties/water on undeveloped tracts | Zero in base; no bull NAV |
+| **Marginal NRA comp** | Mar 2025: **177 NRA** @ **$3.5M** (~**$19,800/NRA**) | Not full NRA roll-up |
 | **Governance catalyst** | LCI post-HK note | **[HUMAN REVIEW]** only |
-| **Hard-asset floor** | Book **$21/sh** vs **$393** price | **floor_pass: false** — no dhando floor |
 
-**Run-rate sensitivity (illustrative, not in valuation.json)**
+**Illustrative NAV (partial):** 224k NRA × ~$19,800 ≈ **$4.4B ≈ $64/sh** — royalty slice only; excludes surface acres. Market cap **~$27B** already prices hidden assets GAAP omits.
 
-- Q1 2026 OCF **$162M** × 4 ≈ **$9.4/sh** starting cash (+**19%** vs **$7.91**).
-- Same growth/multiple assumptions → rough IRR **~2–4%** (still below **15%**).
-- To reach **15%** at **$393** requires either **~10%+** sustained cash growth for a decade or **multiple expansion** beyond **22×** from an already premium **50×**.
-
-**Synthesis:** TPL low IRR reflects **paying up for a scarce toll**, not a failure to see water/royalty quality. The **analysis gap** is structural: no **segment cash-flow build** (water vs land), no **optionality overlay** for undeveloped reserves, and no **run-rate bridge**. Even with those, **15%** at spot is **heroic** unless Permian super-cycle persists.
+**Synthesis:** Lawrence **-1.0%** measures **operating cash yield at price**. Hidden land value affects **NAV and terminal optionality**, not near-term IRR unless modeled. Full NAV SOTP still pending. Even with NAV work, **15%** cash-flow IRR at **~$393** may remain elusive.
 
 **Recommended refresh**
 
-- [ ] Add `valuation_overlay: segment_cashflow` — Land/Royalty vs Water paths  
-- [ ] Evaluate `valuation_mode: optionality` for undeveloped-acreage bull (zero in base)  
-- [ ] Run-rate sensitivity row in assumption ledger (Q1 OCF annualized)  
-- [ ] Clarify archetype: **infrastructure** vs **optionality** per deep dive [HUMAN REVIEW]
+- [x] Partial `nav_overlay` + `optionality_gate` in `valuation.json` (2026-06-01)
+- [ ] Full NAV SOTP: surface **$/acre**, NRA roll-up, water PPE
+- [ ] Segment cash-flow build (Land/Royalty vs Water)
+- [ ] **Stop using GAAP book in dhando analysis**
 
 ---
 
@@ -153,5 +155,5 @@ Of **25** holdings, **14** have Lawrence base annual return below **10%**; **22*
 
 ## [PROPOSED MEMORY]
 
-- [PROPOSED PABRAI] Low Lawrence IRR often means **no dhando at spot**, not missing research. TPL **~50×** OCF and GOOGL **~66×** FCF are fat-pitch failures by definition; AI inflection **11%** and segment overlays are the honest bull case.
-- [PROPOSED COMPANY] Portfolio low-IRR audit 2026-06-01: **14** names **<10%** base; largest gaps **TPL** (no segment/optionality overlay) and **GOOGL** (capex staleness + zeroed Waymo/TPU in base).
+- [PROPOSED PABRAI] Low Lawrence IRR often means **no dhando at spot**, not missing research. TPL **~50×** OCF and GOOGL **~66×** FCF are fat-pitch failures by definition; AI inflection **11%** and segment overlays are the honest bull case. **TPL GAAP book is not a floor** — Assigned 1888 land/RRA at zero on balance sheet.
+- [PROPOSED COMPANY] Portfolio low-IRR audit 2026-06-01: **14** names **<10%** base; largest gaps **TPL** (NAV/optionality overlay; book misstated) and **GOOGL** (capex staleness + zeroed Waymo/TPU in base).
