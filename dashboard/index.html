@@ -516,7 +516,7 @@ function renderDarwin() {
   const conflicts = d.conflicts || [];
   content.innerHTML = `
     <h2 style="font-size:18px;margin-bottom:6px">Darwin adaptive allocation</h2>
-    <p class="subhead" style="margin-bottom:14px">Paper portfolio · ${escapeHtml(d.generated_at || '')} · policy <span class="mono">${escapeHtml(d.policy_id || '—')}</span></p>
+    <p class="subhead" style="margin-bottom:14px">Paper portfolio · ${escapeHtml(d.generated_at || '')} · <span class="badge badge-purple">${escapeHtml(d.account_profile || 'taxable')}</span> · policy <span class="mono">${escapeHtml(d.policy_id || '—')}</span>${d.benchmarks?.ml_selected === false ? ' · <span class="badge badge-warn">ML deferred (thin history)</span>' : ''}</p>
     ${conflicts.length ? `<div class="conflict-banner"><strong>Marvin conflicts</strong><ul style="margin-top:8px;padding-left:18px">${conflicts.map(c => `<li>${escapeHtml(c.ticker)}: ${escapeHtml(c.reason || '')} (${c.weight_pct || '?'}%)</li>`).join('')}</ul></div>` : ''}
     <div class="darwin-grid">
       <div class="summary-card"><div class="label">Regime</div><div class="value" style="font-size:16px">${escapeHtml(d.regime || '—')}</div><div class="sub">${escapeHtml(d.rebalance_frequency || '')} rebalance</div></div>
@@ -542,7 +542,7 @@ function renderDarwin() {
       <h3>Benchmarks (walk-forward)</h3>
       <table class="darwin-table">
         <thead><tr><th>Policy</th><th>Sharpe</th><th>Cum ret</th><th>Avg turnover</th></tr></thead>
-        <tbody>${['equal_weight','irr_ranked','genetic','ppo','champion'].map(k => {
+        <tbody>${['ira_marvin','equal_weight','irr_ranked','genetic','ppo','champion'].map(k => {
           const b = d.benchmarks?.[k] || {};
           if (b.error) return '';
           return `<tr><td class="mono">${k}</td><td>${b.sharpe_annualized ?? '—'}</td><td>${b.cumulative_return != null ? (b.cumulative_return*100).toFixed(1)+'%' : '—'}</td><td>${b.avg_turnover_one_way != null ? (b.avg_turnover_one_way*100).toFixed(1)+'%' : '—'}</td></tr>`;

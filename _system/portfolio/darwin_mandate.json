@@ -1,22 +1,57 @@
 {
-  "version": 1,
+  "version": 2,
   "approved": "2026-06-01",
+  "account_profile": "ira",
+  "account_notes": "Simple tax-advantaged IRA — optimize compound return inside the account; minimize turnover and custody friction; no shorting.",
   "mandate": {
     "long_only": true,
     "allow_short": false,
     "universe": "registry_holdings",
     "min_names": 8,
-    "max_names": 15,
-    "max_weight_pct": 18.0,
-    "min_weight_pct": 2.0,
-    "rebalance_frequency": "quarterly",
-    "max_one_way_turnover_pct_per_rebalance": 15.0,
-    "max_abs_weight_change_pct_per_rebalance": 3.0,
-    "min_holding_months": 6,
-    "transaction_cost_bps": 10,
-    "turnover_penalty_kappa": 0.35,
+    "max_names": 12,
+    "max_weight_pct": 15.0,
+    "min_weight_pct": 3.0,
+    "rebalance_frequency": "semiannual",
+    "max_one_way_turnover_pct_per_rebalance": 10.0,
+    "max_abs_weight_change_pct_per_rebalance": 2.5,
+    "min_holding_months": 12,
+    "transaction_cost_bps": 5,
+    "turnover_penalty_kappa": 0.85,
     "falsifier_exit": true,
-    "core_stance_max_delta_without_review_pct": 3.0
+    "core_stance_max_delta_without_review_pct": 2.5,
+    "min_irr_pct_for_weight": 6.0,
+    "exclude_negative_irr_unless_stance": ["core", "accumulate"],
+    "preferred_policy": "ira_marvin",
+    "ml_champion_min_sharpe": 0.3,
+    "ml_champion_min_periods": 12
+  },
+  "ira_scoring": {
+    "stance_multipliers": {
+      "core": 1.25,
+      "accumulate": 1.15,
+      "hold": 1.0,
+      "watch": 0.45,
+      "trim": 0.2,
+      "exit": 0.0
+    },
+    "dhando_multipliers": {
+      "full": 1.12,
+      "partial": 1.05,
+      "none": 0.85,
+      "pending": 0.9
+    },
+    "market_multipliers": {
+      "US": 1.05,
+      "CA": 1.0,
+      "JP": 0.92,
+      "SE": 0.9,
+      "OTC": 0.88,
+      "EU": 0.95
+    },
+    "moat_bonus": 0.12,
+    "staleness_penalty_per_year": 0.04,
+    "falsifier_penalty": 0.6,
+    "human_review_discount": 0.25
   },
   "regime": {
     "falsifier_stress_threshold": 3,
@@ -24,16 +59,17 @@
   },
   "training": {
     "latent_factors": 5,
-    "encoder_epochs": 80,
-    "encoder_lr": 0.02,
-    "ga_population": 24,
-    "ga_generations": 12,
-    "ga_mutation_rate": 0.15,
-    "ppo_steps": 40,
-    "ppo_lr": 0.05,
-    "ppo_seeds": 3,
-    "backtest_quarters": 12,
-    "price_history_months": 36
+    "encoder_epochs": 100,
+    "encoder_lr": 0.015,
+    "ga_population": 32,
+    "ga_generations": 16,
+    "ga_mutation_rate": 0.12,
+    "ppo_steps": 50,
+    "ppo_lr": 0.04,
+    "ppo_seeds": 5,
+    "backtest_quarters": 20,
+    "price_history_months": 60
   },
-  "disclaimer": "Paper portfolio / research tool. Not investment advice. Does not replicate proprietary Darwin AI Ventures models."
+  "source_overrides": {},
+  "disclaimer": "IRA paper portfolio / research tool. Not tax or investment advice. Does not replicate proprietary Darwin AI Ventures models."
 }

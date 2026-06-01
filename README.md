@@ -12,6 +12,8 @@ See [`_system/portfolio/holdings.md`](_system/portfolio/holdings.md).
 
 Static portfolio dashboard (etf-dashboard styling) in [`dashboard/`](dashboard/).
 
+**Darwin IRA:** [Research download plan](_system/frameworks/darwin_ira_research_plan.md) · copy PDF: `_system/scripts/copy_darwin_investor_pdf.ps1`
+
 **Darwin tab:** [Adaptive portfolio layer](_system/frameworks/darwin_portfolio_tab_proposal.md) — Holdings | **Darwin** on the dashboard. Rebuild:
 
 ```powershell

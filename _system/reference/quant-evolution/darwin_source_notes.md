@@ -6,7 +6,15 @@
 - **Reinforcement learning** on complex financial markets
 - Private; offerings only via confidential documents to qualified investors
 
-**Local investor letter:** place `Darwin_AI_Investments_1Q26.pdf` in this folder (gitignored). After adding, append bullet claims below with page refs.
+**Local investor letter (run on your PC):**
+
+```powershell
+powershell -ExecutionPolicy Bypass -File _system/scripts/copy_darwin_investor_pdf.ps1
+pip install pypdf
+python3 _system/scripts/ingest_darwin_investor_pdf.py
+```
+
+Saves to `Darwin_AI_Investments_1Q26.pdf` (gitignored). Cloud agents cannot read `C:\Users\werdn\Downloads\`.
 
 ## Claims extracted (fill from PDF)
 
@@ -18,4 +26,4 @@
 
 ## Mandate alignment
 
-See `_system/portfolio/darwin_mandate.json` — long-only, quarterly rebalance, 15% turnover cap, Marvin stance gate preserved.
+See `_system/portfolio/darwin_mandate.json` — **IRA profile**: semiannual rebalance, 10% turnover cap, 12 names, 15% max weight, `ira_marvin` policy. Full download plan: `_system/frameworks/darwin_ira_research_plan.md`.

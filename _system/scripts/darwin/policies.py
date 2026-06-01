@@ -89,10 +89,66 @@ def policy_softmax_latent(
     return {tickers[i]: exps[i] / s for i in range(len(tickers))}
 
 
+def policy_ira_marvin(rows: list[dict], genome: dict | None = None) -> dict[str, float]:
+    """IRA: Marvin IRR × stance × dhando; drop negative IRR watch names."""
+    g = genome or {}
+    mandate_scoring = g.get("ira_scoring") or {}
+    stance_m = mandate_scoring.get("stance_multipliers") or {
+        "core": 1.25,
+        "accumulate": 1.15,
+        "hold": 1.0,
+        "watch": 0.45,
+        "trim": 0.2,
+        "exit": 0.0,
+    }
+    dhando_m = mandate_scoring.get("dhando_multipliers") or {
+        "full": 1.12,
+        "partial": 1.05,
+        "none": 0.85,
+        "pending": 0.9,
+    }
+    market_m = mandate_scoring.get("market_multipliers") or {}
+    min_irr = g.get("min_irr_pct_for_weight", 6.0)
+    allow_stances = set(g.get("exclude_negative_irr_unless_stance") or ["core", "accumulate"])
+    top_k = int(g.get("top_k", 12))
+
+    scored: list[tuple[str, float]] = []
+    for r in rows:
+        irr = r.get("irr_falsifier_pct") or r.get("irr_base_pct")
+        if irr is None:
+            continue
+        cl = r.get("classification") or {}
+        stance = (cl.get("stance") or "watch").lower()
+        if irr < 0 and stance not in allow_stances:
+            continue
+        if irr < min_irr and stance not in allow_stances:
+            continue
+        score = max(float(irr), 0.1)
+        score *= stance_m.get(stance, 0.5)
+        score *= dhando_m.get((cl.get("dhando") or "pending").lower(), 0.9)
+        score *= market_m.get(r.get("market", "US"), 1.0)
+        moat = (cl.get("moat") or "").lower()
+        if moat in ("widening", "stable"):
+            score *= 1.0 + mandate_scoring.get("moat_bonus", 0.12)
+        score -= mandate_scoring.get("staleness_penalty_per_year", 0.04) * (
+            (r.get("days_since_deep_dive") or 0) / 365.0
+        )
+        score -= mandate_scoring.get("falsifier_penalty", 0.6) * (r.get("falsifier_count") or 0)
+        if r.get("human_review_pending"):
+            score *= 1.0 - mandate_scoring.get("human_review_discount", 0.25)
+        scored.append((r["ticker"], max(score, 1e-6)))
+
+    scored.sort(key=lambda x: -x[1])
+    keep = scored[:top_k]
+    total = sum(s for _, s in keep) or 1.0
+    return {t: s / total for t, s in keep}
+
+
 POLICY_FNS = {
     "equal_weight": policy_equal_weight,
     "irr_ranked": policy_irr_ranked,
     "archetype_risk_parity": policy_archetype_risk_parity,
+    "ira_marvin": policy_ira_marvin,
 }
 
 

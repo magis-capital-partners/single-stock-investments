@@ -34,9 +34,18 @@ def apply_constraints(
 
     total = sum(scores.get(t, 0.0) for t in keep) or 1.0
     out = {t: scores.get(t, 0.0) / total for t in keep}
-    for _ in range(3):
+    for _ in range(5):
+        excess = 0.0
         for t in list(out):
-            out[t] = min(max(out.get(t, 0.0), 0.0), max_w)
+            if out[t] > max_w:
+                excess += out[t] - max_w
+                out[t] = max_w
+        if excess > 1e-9:
+            below = [t for t in out if out[t] < max_w - 1e-9]
+            if below:
+                add = excess / len(below)
+                for t in below:
+                    out[t] = min(out[t] + add, max_w)
         s = sum(out.values()) or 1.0
         out = {t: out[t] / s for t in out}
 

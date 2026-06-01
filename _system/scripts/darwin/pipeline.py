@@ -69,6 +69,20 @@ def run_pipeline(write_features: bool = True, fast: bool = False) -> dict:
     falsifier_map = {r["ticker"]: r.get("falsifier_count", 0) for r in rows}
     features_by_ticker = {r["ticker"]: r for r in rows}
 
+    ira_scoring = mandate_doc.get("ira_scoring") or {}
+    ira_genome = {
+        **(mandate_doc.get("mandate") or {}),
+        "ira_scoring": ira_scoring,
+        "top_k": (mandate_doc.get("mandate") or {}).get("max_names", 12),
+    }
+    ira_raw = apply_policy("ira_marvin", rows, ira_genome)
+    ira_w, _ = apply_constraints(tickers, ira_raw, None, mandate_doc, falsifier_map)
+
+    def ira_fn(ts, _i):
+        return apply_policy("ira_marvin", rows, ira_genome)
+
+    bt_ira = simulate(tickers, panel["dates"], panel["returns_by_ticker"], ira_fn, mandate_doc, falsifier_map)
+
     # Phase 1 baselines
     eq = policy_equal_weight(rows)
     eq_w, eq_notes = apply_constraints(tickers, eq, None, mandate_doc, falsifier_map)
@@ -134,14 +148,28 @@ def run_pipeline(write_features: bool = True, fast: bool = False) -> dict:
             return -1e9
         return bt.get("sharpe_annualized", 0) - kappa * bt.get("avg_turnover_one_way", 0)
 
-    candidates = [
+    m = mandate_doc.get("mandate") or {}
+    min_sharpe = m.get("ml_champion_min_sharpe", 0.3)
+    min_periods = m.get("ml_champion_min_periods", 12)
+    preferred = m.get("preferred_policy", "ira_marvin")
+
+    ml_candidates = [
         ("ppo", ppo_w, bt_ppo),
         ("genetic", genome_w, bt_ga),
         ("irr_ranked", irr_w, bt_irr),
         ("equal_weight", eq_w, bt_eq),
     ]
-    champion = max(candidates, key=lambda x: score_bt(x[2]))
-    policy_id, target_w, champion_bt = champion
+    ml_best = max(ml_candidates, key=lambda x: score_bt(x[2]))
+    ml_bt = ml_best[2]
+    use_ml = (
+        not ml_bt.get("error")
+        and (ml_bt.get("periods") or 0) >= min_periods
+        and (ml_bt.get("sharpe_annualized") or -999) >= min_sharpe
+    )
+    if use_ml:
+        policy_id, target_w, champion_bt = ml_best
+    else:
+        policy_id, target_w, champion_bt = preferred, ira_w, bt_ira
 
     prev_w = irr_w if irr_w else prev_equal
     target_w, c_notes = apply_constraints(tickers, target_w, prev_w, mandate_doc, falsifier_map)
@@ -186,12 +214,16 @@ def run_pipeline(write_features: bool = True, fast: bool = False) -> dict:
             "ppo_metrics": ppo_metrics,
         },
         "weights": weights_to_list(target_w, features_by_ticker, prev_w),
+        "account_profile": mandate_doc.get("account_profile", "taxable"),
         "benchmarks": {
+            "ira_marvin": bt_ira,
             "equal_weight": bt_eq,
             "irr_ranked": bt_irr,
             "genetic": bt_ga,
             "ppo": bt_ppo,
             "champion": champion_bt,
+            "ml_best": ml_best[2],
+            "ml_selected": use_ml,
         },
         "attribution": attribution,
         "latent_factors": {
