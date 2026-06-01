@@ -770,7 +770,14 @@ def section_body_empty(body: str, heading: str) -> bool:
         rf"{re.escape(heading)}\s*\n+(?=####|\n---|\n## |\*\*Disruption|\Z)",
         re.IGNORECASE,
     )
-    return bool(pat.search(body))
+    if pat.search(body):
+        return True
+    # Heading followed only by horizontal rule before next section
+    pat2 = re.compile(
+        rf"{re.escape(heading)}\s*\n+---\s*\n+(?=## |\Z)",
+        re.IGNORECASE,
+    )
+    return bool(pat2.search(body))
 
 
 def option_scan_block(val: dict) -> str:
@@ -948,12 +955,20 @@ def inject_optionality_sections(body: str, val: dict, ticker: str) -> str:
             block = builder()
             if block:
                 body = re.sub(
-                    rf"{re.escape(heading)}\s*\n+(?=####|\n---|\n## |\*\*Disruption|\Z)",
+                    rf"{re.escape(heading)}\s*\n+(?:---\s*\n+)?(?=## |\Z)",
                     block + "\n",
                     body,
                     count=1,
                     flags=re.I,
                 )
+                if section_body_empty(body, heading):
+                    body = re.sub(
+                        rf"{re.escape(heading)}\s*\n+(?=####|\n---|\n## |\*\*Disruption|\Z)",
+                        block + "\n",
+                        body,
+                        count=1,
+                        flags=re.I,
+                    )
     return body
 
 
@@ -1170,6 +1185,13 @@ def irr_arithmetic(val: dict, ticker: str, preserved: str | None) -> str:
 
 
 def build_valuation_section(ticker: str, val: dict, preserved_val: str | None) -> str:
+    import sys
+
+    scripts = Path(__file__).resolve().parent
+    if str(scripts) not in sys.path:
+        sys.path.insert(0, str(scripts))
+    from valuation_synthesis import synthesis_markdown
+
     inputs = val.get("inputs", {})
     price = inputs.get("price", "?")
     src = inputs.get("price_source", "")
@@ -1216,6 +1238,11 @@ def build_valuation_section(ticker: str, val: dict, preserved_val: str | None) -
         "",
         irr_body,
         "",
+    ]
+    syn_body = synthesis_markdown(val)
+    if syn_body:
+        parts += [syn_body, ""]
+    parts += [
         upside,
         "",
         ret,

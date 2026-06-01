@@ -481,10 +481,12 @@ def compute_valuation(data: dict) -> dict:
 
     data["overlay_results"] = compute_ai_overlay_rows(data, results)
 
-    compute_synthesis(data)
-    synthesis_pct = (data.get("synthesis") or {}).get("total_synthesis_pct")
-    if synthesis_pct is not None:
-        data["stance_proposal"] = propose_stance(synthesis_pct, moat, dhando, method, data=data)
+    # Lawrence yield_curve / holdco dated payoffs keep scenarios.base as stance gate.
+    if method not in ("yield_curve",):
+        compute_synthesis(data)
+        synthesis_pct = (data.get("synthesis") or {}).get("total_synthesis_pct")
+        if synthesis_pct is not None:
+            data["stance_proposal"] = propose_stance(synthesis_pct, moat, dhando, method, data=data)
 
     ticker = data.get("ticker", "")
     if ticker in AI_HYPERSCALERS and not data.get("ai_overlay"):
