@@ -17,6 +17,7 @@
 | **3. Payoff shape** | Pabrai | `dhando` | Is the bear case bounded? |
 | **4. Return at price** | Lawrence / HK | `implied_irr`, `irr_method` | Expected return at today's price? |
 | **5. Action** | Pabrai + Lawrence | `stance` | What do we do with capital? |
+| **1c. Idea lens** | Mihaljevic | `moi_bucket` | Which MOI strategy bucket fits? (`moi_lens.md`) |
 
 **Rule:** Layer 5 is **proposed** from layer 4, **gated** by layers 2–3, **approved** by human. Document overrides explicitly.
 
@@ -32,7 +33,7 @@ One table — maps to all geniuses; do not duplicate elsewhere in the report.
 | 2 | **Durable cash flow?** | Munger moat | Downgrade moat; cap terminal multiple |
 | 3 | **Aligned management?** | Munger incentives | Flag in [HUMAN REVIEW] |
 | 4 | **Cheap vs normalized cash flow?** | Lawrence input | Drives layer 4 model |
-| 5 | **Why mispriced / bounded recovery?** | HK predictive attribute | Chooses `irr_method` |
+| 5 | **Why mispriced / bounded recovery?** | HK predictive attribute + MOI inefficiency | Chooses `irr_method`; sets `moi_inefficiency` when event-driven |
 
 ---
 
@@ -63,6 +64,20 @@ Read `_system/frameworks/optionality_valuation.md` when any trigger matches:
 - Passive royalty trust with HK transitory + yield curve (MSB, SJT)
 
 Set `valuation_mode: optionality` in `valuation.json`. **Do not** downgrade to `watch` on Lawrence base IRR alone when `floor_pass` and primary metric clear the optionality gate.
+
+---
+
+## Step 2d — MOI lens (every deep dive)
+
+Read `_system/frameworks/moi_lens.md`.
+
+1. Set `classification_inputs.moi_bucket` in `valuation.json`  
+2. Answer **MOI three questions** under Why the market might be wrong  
+3. Add **Uses & misuses (MOI)** under Risks  
+4. If `sotp_hidden` or `optionality`: discount magnitude line in Valuation (`optionality_valuation.md`)  
+5. If `special_situation`: read `special_situation_lens.md`; annualized return when dated catalyst  
+6. If `equity_stub`: read `equity_stub_valuation.md`; force `irr_method: scenario`  
+7. On pass/watch/reject: append `{TICKER}/research/decision_log.md`
 
 ---
 
@@ -160,10 +175,11 @@ python _system/scripts/build_dashboard_data.py
 ## Read order for agents (deep dive)
 
 1. `_system/frameworks/decision_stack.md` (this file)
-2. `_system/frameworks/report_prose.md` (voice and structure)
-3. `_system/frameworks/hohn_business_analysis.md` (operating mechanics — every deep dive)
-4. `_system/frameworks/optionality_valuation.md` (if FRMO / MSB / KEWL / SJT)
-5. `_system/memory/MEMORY.md` (approved beliefs)
-6. Primary docs in `{TICKER}/`
-7. `_system/prompts/deep_dive_template.md` (output shape)
-8. Appendix only if needed: `mental_models.md`, `lawrence_irr.md`
+2. `_system/frameworks/moi_lens.md` (idea bucket + three questions + misuses)
+3. `_system/frameworks/report_prose.md` (voice and structure)
+4. `_system/frameworks/hohn_business_analysis.md` (operating mechanics — every deep dive)
+5. `_system/frameworks/optionality_valuation.md` (if FRMO / MSB / KEWL / SJT / TPL)
+6. `_system/memory/MEMORY.md` (approved beliefs)
+7. Primary docs in `{TICKER}/`
+8. `_system/prompts/deep_dive_template.md` (output shape)
+9. Appendix only if needed: `mental_models.md`, `lawrence_irr.md`, `idea_funnel.md`, `special_situation_lens.md`

@@ -1,6 +1,6 @@
 # Investment Wisdom Library
 
-Curated PDF writings for Marvin's mental-model layer: **Charlie Munger**, **Mohnish Pabrai**, **Murray Stahl**, **Horizon Kinetics**, and **Chris Hohn / TCI** extracts.
+Curated PDF writings for Marvin's mental-model layer: **Charlie Munger**, **Mohnish Pabrai**, **Murray Stahl**, **Horizon Kinetics**, **Chris Hohn / TCI**, and **John Mihaljevic / Manual of Ideas** extracts.
 
 **Path:** `_system/reference/investment-wisdom/`
 
@@ -19,7 +19,8 @@ investment-wisdom/
 ├── pabrai/             ← Dhando, partner letters, capital allocation
 ├── stahl/              ← croupiers, exchanges, diversification, spinoffs
 ├── horizon-kinetics/   ← equity yield curve, quarterly commentary extracts (.txt)
-└── tci/                ← Chris Hohn letters; operating mechanics + valuation bridge
+├── tci/                ← Chris Hohn letters; operating mechanics + valuation bridge
+└── mihaljevic/         ← Manual of Ideas; idea generation, uses/misuses
 ```
 
 ## Stahl source vault
@@ -53,3 +54,14 @@ https://pabraifunds.com/pdf/web/l_MMDDYY.pdf
 Example: `l_010124.pdf` = Jan 2024 letter. Index of filenames: scrape `https://pabraifunds.com/letter-to-partner/` for `file=l_*.pdf` links.
 
 Pre-2021 Jan letters: `https://snowballing-co.s3.amazonaws.com/media/l_MMDDYY.pdf` (may 403 on newer requests).
+
+### Manual of Ideas (Mihaljevic)
+
+Purchase Wiley ISBN 978-1-119-27032-4, then:
+
+```bash
+MOI_PDF_SOURCE=/path/to/purchased.pdf python _system/scripts/download_moi_book.py
+python _system/scripts/build_wisdom_manifest.py
+```
+
+Or drop PDF in `mihaljevic/.source/` and run `download_moi_book.py`.

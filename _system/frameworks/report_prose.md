@@ -15,11 +15,11 @@
 | # | Section | Content |
 |---|---------|---------|
 | 1 | `## What this business is` | Five sentences max: customers, revenue engine, segments, geography if relevant. **No** archetype/moat/dhando codes. |
-| 2 | `## Why the market might be wrong` | 2–3 sentences. HK predictive attribute in plain English, or explicit "no dated payoff / no clear mispricing signal." |
+| 2 | **Why the market might be wrong** | 2–3 sentences. HK predictive attribute in plain English, or explicit "no dated payoff / no clear mispricing signal." **MOI three questions** table (`moi_lens.md`). |
 | 3 | `## Executive summary` | 120–180 words: synthesize 1–2 + base return + stance. **Do not** open with `**Stahl**` / `**Archetype**` labels. |
 | 4 | `## Business & moat` | Stahl + Hohn mechanics + **Mental models** — **no IRR math** |
 | 5 | `## Payoff & return` | Gates, dhando, stance — points to Valuation & IRR |
-| 6 | `## Risks & inversion` | Primary risk + inversion |
+| 6 | `## Risks & inversion` | Primary risk + inversion + **Uses & misuses (MOI)** |
 | 7 | `## Valuation & IRR (assumption ledger)` | Bridge + **every assumption** + IRR arithmetic |
 | 8 | Footer | Classification → Terms → [HUMAN REVIEW] → [PROPOSED MEMORY] |
 

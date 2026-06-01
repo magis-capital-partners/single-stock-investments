@@ -44,6 +44,22 @@ Distilled from TCI letters. **Do these in prose + numbers;** do not add framewor
 
 ---
 
+## Management invert (MOI Ch 5 + Munger)
+
+Apply at gate 3 (aligned management) and in Business mechanics when `moi_bucket` is `jockey` or management is thesis-critical:
+
+| Check | Rule |
+|-------|------|
+| Invert first | Eliminate bad actors via compensation acid test before seeking star CEOs |
+| Blank-check inference | What would mgmt do with $1B / $10M? Infer from buybacks, M&A, capex — not proxy rhetoric |
+| Celebrity premium | Flag when narrative exceeds track record |
+| Performance vs price | Separate business results from stock performance in operating snapshot |
+| Communication | Open, honest shareholder letters; conservative accounting |
+
+Judge management by **actions**, not words.
+
+---
+
 ## Entry criteria (Hohn screen — use at onboard / stance)
 
 From TCI Q1 2004 and recurring letters:

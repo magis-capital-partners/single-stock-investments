@@ -1,6 +1,7 @@
 # Manual of Ideas — framework suggestions for Marvin
 
 **Date:** 2026-06-01  
+**Status:** **Implemented** 2026-06-01 — see `_system/frameworks/moi_lens.md` and wisdom `mihaljevic/`
 **Source:** John Mihaljevic, *The Manual of Ideas: The Proven Framework for Finding the Best Value Investments* (Wiley, 1st ed. 2013; 2nd ed. 2023/2025)  
 **Method:** Full chapter map + key takeaways synthesized from CFA Institute review, Rational Walk, O'Reilly TOC, and detailed chapter summaries (Jeremy Silva, 2020). **The copyrighted PDF was not downloaded** — purchase via [Wiley](https://www.wiley.com/en-us/The+Manual+of+Ideas%3A+The+Proven+Framework+for+Finding+the+Best+Value+Investments%2C+2nd+Edition-p-9781119270324) or add to `_system/reference/investment-wisdom/mihaljevic/` when licensed.
 
