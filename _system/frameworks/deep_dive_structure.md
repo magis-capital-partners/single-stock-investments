@@ -21,7 +21,7 @@
 | Approved Substacks | `approved_substacks.md` |
 | Option treatment ladder | `option_treatment.md` |
 | Growth theory stress test | `growth_explanation_stress_test.md` |
-| MOI idea lens | `moi_lens.md`, `idea_funnel.md`, `special_situation_lens.md`, `equity_stub_valuation.md` |
+| MOI idea lens | `analysis_arsenal.md` (tools); `moi_lens.md` (legacy map) |
 | Cursor pointers | `.cursor/rules/investment-frameworks.mdc` + `marvin-core.mdc` + `optionality-valuation.mdc` + `growth-explanation-stress-test.mdc` |
 
 ---
@@ -32,14 +32,14 @@
 |---|---------|----------|
 | 1 | Header links | date, prior dive, `valuation.json`, evidence digest, third-party index, **`adversarial_{date}.md` (Milly, required)** |
 | 2 | **What this business is** | ≤5 sentences — **company overview starts here** |
-| 3 | **Why the market might be wrong** | 2–3 sentences + predictive attribute + MOI three questions |
+| 3 | **Why the market might be wrong** | Q5 in prose — predictive attribute; inefficiency; catalyst when `asset`/`event` |
 | 4 | **Executive summary** | 120–180 words; **one** base IRR % — **no formulas** |
 | 5 | **Primary sources reviewed** | Inventory table only (10-K, 10-Q, IR, approved/pending third party) |
 | 6 | **Business & moat** | Stahl, mental models, Hohn mechanics — **no IRR, no valuation bridge** |
 | 7 | **Approved Substack** | Only if ticker in `approved_substacks.md` |
 | 8 | **Blended estimate** | Only if approved/pending external view cited |
 | 9 | **Payoff & return** | Gates, dhando, stance — **points to Valuation & IRR** |
-| 10 | **Risks & inversion** | Primary risk + ≤3 bullets + **Uses & misuses (MOI)** |
+| 10 | **Risks & inversion** | Primary risk + ≤3 bullets + **lens failure mode** if non-`operating` payoff lens |
 | 11 | **Valuation & IRR (assumption ledger)** | **End of analysis** — bridge + ledger + growth stress test + IRR arithmetic |
 | 12 | Footer | Classification, Terms, [HUMAN REVIEW], [PROPOSED MEMORY] |
 

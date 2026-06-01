@@ -17,8 +17,8 @@ Replace the old single **thesis status** (intact / weakening / strengthening / u
 | **IRR method** | Lawrence | `full`, `yield_curve`, `scenario`, `pending` | How IRR was computed |
 | **Lawrence bucket** | Lawrence | `pricing_power`, `multi_sided`, `low_cost`, `other` | Oakcliff business taxonomy |
 | **Valuation overlay** | Speedwell / Hohn | `—`, `segment_cashflow` | Per-segment cash-flow sum + reverse DCF cross-check (`segment_cashflow_valuation.md`) |
-| **MOI bucket** | Mihaljevic | `compounder_core`, `deep_value`, `sotp_hidden`, `good_cheap`, `jockey`, `superinvestor_signal`, `small_cap_inflection`, `special_situation`, `equity_stub`, `international_value`, `pending` | Primary idea-generation lens (`moi_lens.md`) |
-| **MOI inefficiency** | Mihaljevic | optional tag | When `special_situation`: index_deletion, spinoff, dividend_cancellation, etc. (`special_situation_lens.md`) |
+| **Payoff lens** | Decision stack Q5 | `operating`, `asset`, `event`, `levered`, `pending` | Which toolkit applies (`analysis_arsenal.md`) |
+| **MOI bucket** | Mihaljevic | optional legacy audit tag | Deprecated — map to `payoff_lens`; see `moi_lens.md` |
 
 ## Source of truth
 
@@ -47,8 +47,8 @@ Every deep dive and thesis update ends with:
 | **IRR method** | … |
 | **Lawrence bucket** | … |
 | **Valuation overlay** | … |
-| **MOI bucket** (Mihaljevic) | … |
-| **MOI inefficiency** | … (optional) |
+| **Payoff lens** | … |
+| **MOI bucket** | … (optional legacy) |
 
 ## [HUMAN REVIEW]
 …

@@ -6,7 +6,7 @@ Single-stock research workflow for this workspace.
 - List all ticker folders at workspace root
 - Read README, INDEX.csv, or document-index.csv per holding
 - Check `_download_log.txt` for freshness
-- **New / watchlist names:** run `idea_funnel.md` gate (MOI bucket + three questions) before full deep dive
+- **New / watchlist names:** `idea_funnel.md` gate before full deep dive (see `analysis_arsenal.md`)
 
 ## 2. Download
 - Run or author market-appropriate download scripts
@@ -19,8 +19,8 @@ Single-stock research workflow for this workspace.
 - Proxy / governance docs for US holdings
 
 ## 4. Analyze
-- Apply `_system/frameworks/decision_stack.md` (single pipeline: what → durable → payoff → return → stance)
-- Apply `_system/frameworks/moi_lens.md` (MOI bucket, three questions, uses & misuses)
+- Apply `_system/frameworks/decision_stack.md` (six orthogonal questions)
+- Triggered tools from `_system/frameworks/analysis_arsenal.md` only when payoff lens or archetype requires
 - Write prose per `_system/frameworks/report_prose.md` (Hohn/HK voice; spell out mental models; no em dashes)
 - Tier 2 prompts from `archetype_models.json`; appendix detail in `mental_models.md` / `lawrence_irr.md` only if needed
 - Apply `ai_disruption_lens.md` where relevant

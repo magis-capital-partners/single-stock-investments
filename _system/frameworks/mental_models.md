@@ -46,10 +46,8 @@ Each model has: **Trigger** (when to apply), **Question** (what to ask), **Tier*
 | **10-year IRR** | Lawrence | Modelable FCF / owner earnings | What IRR does today's price imply on a 10-year base case? |
 | **IRR vs price** | Lawrence | After material price move | Did implied IRR cross 15% or 20%? Update stance? |
 | **New idea bar** | Lawrence | Watchlist → onboard | Is IRR clearly above portfolio median *and* above weakest incumbent? |
-| **MOI three questions** | Mihaljevic | Every deep dive | Inefficiency source, margin of safety, path to value creation named? |
-| **Uses & misuses** | Mihaljevic | Every deep dive | Characteristic failure modes for this `moi_bucket` documented? |
 
-**Sources:** `munger/Munger-1994-Elementary-Worldly-Wisdom.pdf`, `munger/Psychology-of-Human-Misjudgment.pdf`, `pabrai/` partner letters; `mihaljevic/Manual-of-Ideas-chapter-reference.txt`; `_system/frameworks/lawrence_irr.md` (Oakcliff / Bryan Lawrence).
+**Sources:** `munger/`, `pabrai/`, `mihaljevic/`; `_system/frameworks/analysis_arsenal.md` for triggered tools; `_system/frameworks/lawrence_irr.md`.
 
 ---
 
@@ -122,7 +120,7 @@ Full template: `_system/frameworks/optionality_valuation.md`. Use when Lawrence/
 | Model | Trigger | Question |
 |-------|---------|----------|
 | **Cloning + verify** | Idea from another investor | Did I independently verify from primary sources before capital? |
-| **Cloning conviction score** | `superinvestor_signal` moi_bucket | Position size, style congruence, letter commentary, turnover lag — macro basket disqualifies endorsement |
+| **Cloning conviction score** | Clone / 13F idea | Position size, style congruence, letter commentary — macro basket ≠ endorsement |
 | **Concentration vs capacity** | Portfolio sizing | Is this high-conviction enough for concentration given fund/portfolio constraints? |
 | **One-decision stock** | `core` stance on compounders | Could we hold 10–20 years — pricing power above inflation, minimal obsolescence? (MOI / Tarasoff) |
 

@@ -1,67 +1,19 @@
-# Special Situation Lens (MOI Ch 8)
+# Special Situation Lens
 
-**Trigger:** `moi_bucket == special_situation` OR spinoff / index / dividend / rights / distressed seller in thesis.
+**Appendix — trigger:** `payoff_lens == event`.
 
-**Source:** Mihaljevic, *Manual of Ideas* Ch 8; Stahl spinoffs (`stahl/Stahl-Spinoffs-Going-Separate-Ways-2015.pdf`).
+**Core Q5** already requires inefficiency + catalyst in prose. This doc adds event-specific tools.
 
----
+## Inefficiency types
 
-## Definition
+`index_deletion`, `dividend_cancellation`, `tax_loss_selling`, `spinoff`, `rights_offering`, `growth_disappointment`, `distressed_seller`, behavioral fear/greed.
 
-Equities whose **near- to medium-term** return is largely **independent of broad market beta** — event, mechanical selling, or bounded recovery drives price.
+Map to HK predictive attributes where applicable (`special_situation_lens.md` table in git history; full list in `analysis_arsenal.md`).
 
-Not buy-and-hold forever: successful situations **end**; capital recycles.
+## Event-specific rules
 
----
+- **Annualized return** when catalyst is dated  
+- Situation **ends** — log exit in `decision_log.md`  
+- Cross-ref `portfolio_news` spinoff tags  
 
-## Inefficiency registry
-
-Name the driver in "Why the market might be wrong" and Classification optional field `moi_inefficiency`:
-
-| Inefficiency | Mechanism | HK / Marvin hook |
-|--------------|-----------|------------------|
-| `index_deletion` | Index funds must sell | `market_structure_discount` |
-| `dividend_cancellation` | Income funds sell | `transitory_problem` |
-| `tax_loss_selling` | Calendar Q4 | daily scan |
-| `spinoff` | Orphan + index + complexity | Stahl; news tag `spinoff` |
-| `rights_offering` | Complexity discount | — |
-| `growth_disappointment` | Fear overshoot | Hohn reversion |
-| `distressed_seller` | Non-fundamental flow | — |
-| `high_fear` / `high_greed` | Behavioral | Munger psychology |
-
-If **no** identifiable inefficiency, higher probability the valuation has a flaw — re-check work.
-
----
-
-## Required analysis
-
-| Item | Rule |
-|------|------|
-| MOI three questions | All three; **path to value creation** mandatory |
-| **Annualized return** | Report alongside absolute $ upside (time matters) |
-| Catalyst timeline | Dated where possible |
-| Uses & misuses | Passive event-driven ≠ passive index; niche crowding lowers edge |
-
----
-
-## Annualized return (plain English)
-
-For dated catalysts:
-
-```
-Annualized return ≈ (Payoff / Price)^(1/years) − 1
-```
-
-State in Payoff & return and assumption ledger when `irr_method` is `yield_curve` or `scenario`.
-
----
-
-## Portfolio news alignment
-
-`portfolio_news_common.py` tags: `spinoff`, etc. — cross-check filing when news triggers refresh.
-
----
-
-## Decision diary
-
-Event-driven names: log entry/exit thesis in `decision_log.md` when situation resolves.
+Source: MOI Ch 8; Stahl spinoffs PDF.

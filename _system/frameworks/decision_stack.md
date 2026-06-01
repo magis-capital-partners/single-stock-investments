@@ -1,185 +1,121 @@
 # Decision Stack
 
-**Purpose:** Single pipeline for Marvin deep dives. Replaces reading four separate framework docs on every run.
+**Purpose:** Single pipeline for Marvin deep dives. Six orthogonal questions → triggered tools from `analysis_arsenal.md`.
 
-**Report shape (dedup):** `deep_dive_structure.md` — sections and what not to repeat.  
-**Appendix references (detail only):** `mental_models.md`, `lawrence_irr.md` § F (IRR arithmetic), `classification.md`, `quality_checklist.md`
-
----
-
-## The stack (one direction of flow)
-
-| Layer | Genius | Fields | Question |
-|-------|--------|--------|----------|
-| **1. What** | Stahl + Lawrence | `archetype`, `cycle`, `lawrence_bucket` | What business type; normalize earnings? |
-| **1b. Mechanics** | Hohn | — (in report body) | How does it earn; thesis pillars; valuation bridge? |
-| **2. Durable** | Munger | `moat` | Will it last 10 years? |
-| **3. Payoff shape** | Pabrai | `dhando` | Is the bear case bounded? |
-| **4. Return at price** | Lawrence / HK | `implied_irr`, `irr_method` | Expected return at today's price? |
-| **5. Action** | Pabrai + Lawrence | `stance` | What do we do with capital? |
-| **1c. Idea lens** | Mihaljevic | `moi_bucket` | Which MOI strategy bucket fits? (`moi_lens.md`) |
-
-**Rule:** Layer 5 is **proposed** from layer 4, **gated** by layers 2–3, **approved** by human. Document overrides explicitly.
+**Report shape:** `deep_dive_structure.md`  
+**Appendix (triggered only):** `analysis_arsenal.md`, `mental_models.md`, `lawrence_irr.md` § F
 
 ---
 
-## Step 1 — Five-question gate (before quant)
+## Six orthogonal questions
 
-One table — maps to all geniuses; do not duplicate elsewhere in the report.
+| # | Question | Genius | Fields / outputs |
+|---|----------|--------|------------------|
+| 1 | **What is it?** | Stahl + Hohn | `archetype`, `cycle`, `lawrence_bucket`, operating snapshot |
+| 2 | **Will it last?** | Munger | `moat` |
+| 3 | **Is the bear bounded?** | Pabrai | `dhando`, bear case |
+| 4 | **What return at this price?** | Lawrence / HK | `implied_irr`, `irr_method` |
+| 5 | **Why mispriced?** | HK + MOI | Predictive attribute; inefficiency; catalyst if `asset`/`event` |
+| 6 | **What do we do?** | Pabrai + Lawrence | `stance` |
 
-| # | Gate | Maps to | Fail → |
-|---|------|---------|--------|
-| 1 | **Understand?** | Munger circle of competence | `stance: watch`; stop or defer |
-| 2 | **Durable cash flow?** | Munger moat | Downgrade moat; cap terminal multiple |
-| 3 | **Aligned management?** | Munger incentives | Flag in [HUMAN REVIEW] |
-| 4 | **Cheap vs normalized cash flow?** | Lawrence input | Drives layer 4 model |
-| 5 | **Why mispriced / bounded recovery?** | HK predictive attribute + MOI inefficiency | Chooses `irr_method`; sets `moi_inefficiency` when event-driven |
+**Flow:** Q4 proposed from model · Q6 proposed from Q4 · **gated** by Q2–3 · **approved** by human.
 
----
-
-## Step 2 — Archetype prompts (Tier 2)
-
-Load `_system/frameworks/archetype_models.json`. When `archetype` is set, answer listed models inline under **Business & moat** — not as separate report sections.
-
-## Step 2b — Business mechanics (Hohn)
-
-Read `_system/frameworks/hohn_business_analysis.md` (or `tci/Hohn-Analysis-Framework-extract.txt` for quick reference).
-
-Under **Business & moat → Business mechanics (Hohn)**, every deep dive must include (`hohn_business_analysis.md` § Hohn essentials):
-
-1. **Operating snapshot** (or **look-through** for holding_co / optionality)  
-2. **Thesis pillars** — 2–4 drivers, quantified; structural vs cyclical in prose  
-3. **Business overview** (no IRR in body) → **Payoff & return** (gates only) → **`## Valuation & IRR (assumption ledger)`** at end (`irr_assumption_ledger.md`)  
-4. **SOTP/NAV + catalyst path** when holding_co or optionality (no duplicate Optionality overlay table)  
-5. **Primary risk** — one dominant failure mode (max 3 secondary in Risks)  
-
-Reconcile base IRR in arithmetic with `valuation.json` and footer `implied_irr`.
-
-## Step 2c — Optionality overlay (when triggered)
-
-Read `_system/frameworks/optionality_valuation.md` when any trigger matches:
-
-- Holdco / SOTP (FRMO)
-- Mineral or land floor + free production option (KEWL)
-- Passive royalty trust with HK transitory + yield curve (MSB, SJT)
-
-Set `valuation_mode: optionality` in `valuation.json`. **Do not** downgrade to `watch` on Lawrence base IRR alone when `floor_pass` and primary metric clear the optionality gate.
+**Payoff lens:** tag `payoff_lens` (`operating` | `asset` | `event` | `levered`) to pick toolkit — see `analysis_arsenal.md`.
 
 ---
 
-## Step 2d — MOI lens (every deep dive)
+## Step 1 — Gate table (maps to six questions)
 
-Read `_system/frameworks/moi_lens.md`.
+One table in **Payoff & return**. Do not duplicate elsewhere.
 
-1. Set `classification_inputs.moi_bucket` in `valuation.json`  
-2. Answer **MOI three questions** under Why the market might be wrong  
-3. Add **Uses & misuses (MOI)** under Risks  
-4. If `sotp_hidden` or `optionality`: discount magnitude line in Valuation (`optionality_valuation.md`)  
-5. If `special_situation`: read `special_situation_lens.md`; annualized return when dated catalyst  
-6. If `equity_stub`: read `equity_stub_valuation.md`; force `irr_method: scenario`  
-7. On pass/watch/reject: append `{TICKER}/research/decision_log.md`
+| # | Gate | Question | Fail → |
+|---|------|----------|--------|
+| 1 | **Understand?** | Q1 | `watch`; defer |
+| 2 | **Durable cash flow?** | Q2 | Downgrade moat; cap terminal multiple |
+| 3 | **Bounded bear?** | Q3 | `dhando: none`; cap stance |
+| 4 | **Aligned management?** | Q2/Q3 sub-check | `[HUMAN REVIEW]` |
+| 5 | **Cheap vs normalized?** | Q4 input | Drives valuation model |
+| 6 | **Why mispriced?** | Q5 | Name inefficiency + predictive attribute; catalyst if `asset`/`event` |
+
+Gate 6 for `operating` lens may be "no dated edge; own for quality + IRR at price."
 
 ---
 
-## Step 3 — Expected return (one section, three methods)
+## Step 2 — Business mechanics (Hohn)
+
+`hohn_business_analysis.md` — under **Business & moat**:
+
+1. Operating snapshot (or look-through for holdco)  
+2. Thesis pillars — 2–4, quantified  
+3. Option scan — `option_treatment.md`  
+4. SOTP / catalyst bullets when `payoff_lens` is `asset` or `event`  
+
+No IRR in this section.
+
+---
+
+## Step 3 — Triggered overlays (not every dive)
+
+| Trigger | Read |
+|---------|------|
+| `payoff_lens: asset` or holdco / optionality | `optionality_valuation.md` |
+| `payoff_lens: event` | `special_situation_lens.md` |
+| `payoff_lens: levered` | `equity_stub_valuation.md`; `irr_method: scenario` |
+| Multi-segment compounder | `segment_cashflow_valuation.md` |
+| AI hyperscaler | `ai_infrastructure_valuation.md` |
+| Watchlist / onboard | `idea_funnel.md` |
+
+Full index: `analysis_arsenal.md`.
+
+---
+
+## Step 4 — Expected return
 
 | Trigger | `irr_method` | Tool |
 |---------|--------------|------|
-| Modelable FCF / owner earnings | `full` | Lawrence 10yr — `marvin_valuation.py` |
-| Dated contractual payoff | `yield_curve` | HK equity yield curve — manual + `marvin_valuation.py` |
-| Binary / pre-revenue | `scenario` | Bear/base/bull scenarios — `marvin_valuation.py` |
-| Cannot model | `pending` | Skip numeric; explain why |
-
-**Output file:** `{TICKER}/research/valuation.json` (source of truth for assumptions + computed returns)
-
-```bash
-python _system/scripts/marvin_valuation.py --ticker ICE
-python _system/scripts/marvin_valuation.py --file ICE/research/valuation.json
-```
-
-`implied_irr` in classification = **base-case expected return** at current price (label: 10yr IRR, yield-curve annualized, or scenario IRR).
+| Modelable FCF | `full` | `marvin_valuation.py` |
+| Dated payoff | `yield_curve` | HK curve + valuation.json |
+| Binary / levered | `scenario` | Bear/base/bull |
+| Cannot model | `pending` | Explain why |
 
 ---
 
-## Step 4 — Stance proposal (automated)
+## Step 5 — Stance proposal
 
-Script computes `stance_proposal` in `valuation.json`. Logic:
-
-```
-if moat in (eroding, unproven) or dhando == none:
-    suggested = watch
-elif base_return > 20% and dhando in (full, partial):
-    suggested = accumulate
-elif base_return >= 15%:
-    suggested = hold
-elif base_return < 15%:
-    suggested = watch
-else:
-    suggested = pending  # irr_method pending or missing
-```
-
-**Override reasons** (human sets `override_reason` in valuation.json or documents in [HUMAN REVIEW]):
-
-| Override | When allowed |
-|----------|--------------|
-| `hold` despite return < 15% | Incumbent core; tax; strategic sleeve (e.g. croupier basket) |
-| `accumulate` despite return 15–18% | Dhando full + moat widening + cycle trough |
-| `watch` despite return > 20% | Moat unproven, binary risk, going-concern |
-
-Approved `stance` lives in `classification.json` + `thesis.md`. Run `sync_classification.py` to detect drift.
+Script logic in `valuation.json` (unchanged). Override in `[HUMAN REVIEW]`.
 
 ---
 
-## Step 5 — Report template
+## Step 6 — Report template
 
-Use `_system/prompts/deep_dive_template.md` and `_system/frameworks/report_prose.md`. Reader-first order:
+`deep_dive_template.md` + `report_prose.md`:
 
-1. **What this business is** — five plain sentences (no framework codes)
-2. **Why the market might be wrong** — HK predictive attribute in prose
-3. **Executive summary** — 120–180 words; synthesize 1–2 + return + stance
-4. **Business & moat** — Stahl + Tier 2 + **Mental models in plain English** + **Hohn mechanics** + Munger
-5. **Payoff & return** — five-question gate + dhando + expected return (Hohn bridge aligns with Lawrence/HK)
-6. **Risks & inversion**
-7. **Classification** + optional **Terms** + **[HUMAN REVIEW]** + **[PROPOSED MEMORY]**
-
-Cross-checks / refreshes: update sections 1–5 when new filings arrive; full pillar rewrite only if thesis changed.
-
-Lint: `python _system/scripts/lint_deep_dive.py {TICKER}` (`--legacy` for pre-refresh dives).
+1. What this business is (Q1)  
+2. Why the market might be wrong (Q5 prose — not a separate MOI table)  
+3. Executive summary — one base return %  
+4. Business & moat (Q1–2)  
+5. Payoff & return — gate table (Q3–4–6)  
+6. Risks — primary risk + **lens failure mode** if non-operating lens  
+7. Valuation & IRR — assumption ledger last  
 
 ---
 
-## Lawrence bucket ↔ archetype (hints)
+## Read order (deep dive)
 
-| Archetype | Typical bucket |
-|-----------|----------------|
-| `croupier`, `platform` | `multi_sided` |
-| `compounder`, `serial_acquirer` | `pricing_power` |
-| `infrastructure`, `holding_co` | `low_cost` or `other` |
-| `optionality`, `turnaround` | `other` + `irr_method: scenario` |
-
-Not mandatory match — document when they diverge.
+1. This file  
+2. `analysis_arsenal.md` — skim triggers for this ticker  
+3. `report_prose.md`  
+4. `hohn_business_analysis.md`  
+5. Triggered overlay from Step 3 only  
+6. `{TICKER}/` primary docs  
+7. `deep_dive_template.md`  
 
 ---
 
 ## Sync & lint
 
 ```bash
-python _system/scripts/marvin_valuation.py --ticker ICE    # compute + write valuation.json
-python _system/scripts/sync_classification.py              # check thesis ↔ json ↔ valuation
-python _system/scripts/lint_deep_dive.py ICE               # required sections
-python _system/scripts/build_dashboard_data.py
+python _system/scripts/marvin_valuation.py --ticker ICE --write
+python _system/scripts/sync_classification.py
+python _system/scripts/lint_deep_dive.py ICE
 ```
-
----
-
-## Read order for agents (deep dive)
-
-1. `_system/frameworks/decision_stack.md` (this file)
-2. `_system/frameworks/moi_lens.md` (idea bucket + three questions + misuses)
-3. `_system/frameworks/report_prose.md` (voice and structure)
-4. `_system/frameworks/hohn_business_analysis.md` (operating mechanics — every deep dive)
-5. `_system/frameworks/optionality_valuation.md` (if FRMO / MSB / KEWL / SJT / TPL)
-6. `_system/memory/MEMORY.md` (approved beliefs)
-7. Primary docs in `{TICKER}/`
-8. `_system/prompts/deep_dive_template.md` (output shape)
-9. Appendix only if needed: `mental_models.md`, `lawrence_irr.md`, `idea_funnel.md`, `special_situation_lens.md`
