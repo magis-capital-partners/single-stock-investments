@@ -11,9 +11,11 @@
 | **Dhando** (Pabrai) | full |
 | **Stance** | watch |
 | **Cycle** | - |
-| **Implied 10yr IRR** (total synthesis) | 10.41% (total synthesis) |
+| **Implied 10yr IRR** (base) | 9.2% (base) |
 | **IRR method** | full |
 | **Lawrence bucket** | pricing_power |
+| **Payoff lens** | — |
+| **MOI bucket** | — |
 
 **Deep dive:** `research/deep_dive_2026-05-26.md`
 
