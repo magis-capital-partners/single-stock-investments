@@ -17,13 +17,13 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 
-IRR_PCT = re.compile(r"\*\*(\d{1,2}(?:\.\d)?)\s*%\*\*")
+IRR_PCT = re.compile(r"\*\*(-?\d{1,2}(?:\.\d)?)\s*%\*\*")
 RETURNS_BLEND = re.compile(
-    r"\*\*Returns statement(?: \(blended\))?:\*\*[^\n]*?\*\*(\d{1,2}(?:\.\d)?)\s*%\*\*",
+    r"\*\*Returns statement(?: \(blended\))?:\*\*[^\n]*?\*\*(-?\d{1,2}(?:\.\d)?)\s*%\*\*",
     re.I,
 )
 EXEC_IRR = re.compile(
-    r"(?:blended|floor|base|IRR)[^\n]{0,80}?\*\*(\d{1,2}(?:\.\d)?)\s*%\*\*",
+    r"(?:blended|floor|base|IRR|annual return)[^\n]{0,80}?\*\*(-?\d{1,2}(?:\.\d)?)\s*%\*\*",
     re.I,
 )
 CLASS_IRR = re.compile(
@@ -31,7 +31,7 @@ CLASS_IRR = re.compile(
     re.I,
 )
 VAL_BRIDGE_BASE = re.compile(
-    r"\|\s*Base\s*\|[^\n]*\|\s*\*\*(\d{1,2}(?:\.\d)?)\s*%\*\*",
+    r"\|\s*Base\s*\|[^\n]*\|\s*\*\*(-?\d{1,2}(?:\.\d)?)\s*%\*\*",
     re.I,
 )
 ADVERSARIAL_LINK = re.compile(r"\*\*Adversarial(?: review)?:\*\*", re.I)
@@ -121,7 +121,7 @@ def expected_base_irr(val: dict) -> float | None:
 
 
 def extract_pct_from_class_row(row: str) -> float | None:
-    m = re.search(r"(\d{1,2}(?:\.\d)?)\s*%", row)
+    m = re.search(r"(-?\d{1,2}(?:\.\d)?)\s*%", row)
     return float(m.group(1)) if m else None
 
 
@@ -131,11 +131,16 @@ def collect_dive_irrs(text: str) -> dict[str, float | None]:
     if m:
         exec_sum = m.group(1)
     exec_irrs = [float(x) for x in IRR_PCT.findall(exec_sum)]
+    exec_base_m = EXEC_IRR.search(exec_sum)
+    if exec_base_m:
+        exec_base = float(exec_base_m.group(1))
+    else:
+        exec_base = exec_irrs[0] if exec_irrs else None
     ret_m = RETURNS_BLEND.search(text)
     ret_pct = float(ret_m.group(1)) if ret_m else None
     if ret_pct is None:
         m2 = re.search(
-            r"\*\*Returns statement:\*\*[^\n]*?\*\*~?(\d{1,2}(?:\.\d)?)\s*%\*\*",
+            r"\*\*Returns statement:\*\*[^\n]*?\*\*~?(-?\d{1,2}(?:\.\d)?)\s*%\*\*",
             text,
             re.I,
         )
@@ -144,8 +149,6 @@ def collect_dive_irrs(text: str) -> dict[str, float | None]:
     class_pct = extract_pct_from_class_row(class_m.group(1)) if class_m else None
     bridge_m = VAL_BRIDGE_BASE.search(text)
     bridge_pct = float(bridge_m.group(1)) if bridge_m else None
-    # Prefer blended/base in exec (often multiple; take most cited base ~12-22)
-    exec_base = exec_irrs[0] if exec_irrs else None
     return {
         "executive_summary_first_pct": exec_base,
         "returns_statement": ret_pct,

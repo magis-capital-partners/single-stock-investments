@@ -1,27 +1,30 @@
 # TPL — Investment Thesis
 
-**Last updated:** 2026-06-01
+**Last updated:** auto-sync
 
 ## Classification
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Archetype** (Stahl) | infrastructure |
+| **Moat** (Munger) | durable |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
+| **Cycle** | mid |
+| **Implied 10yr IRR** (Lawrence) | -1.0% (base) |
+| **IRR method** | full |
+| **Lawrence bucket** | pricing_power |
 
 ## One-line thesis
 
-Texas Pacific Land Corporation — thesis pending Marvin deep dive.
+Permian land, royalty, and water toll at **~$393**: durable moat, but Lawrence base **-1.0%** at **~50×** owner cash — **watch** for a better entry.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest annual report
+- [x] Read latest quarterly report
+- [x] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-06-01; awaiting deep dive.
+- Post-HK governance (LCI 2026); infrastructure vs optionality archetype.
