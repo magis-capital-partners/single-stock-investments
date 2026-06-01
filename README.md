@@ -12,6 +12,8 @@ See [`_system/portfolio/holdings.md`](_system/portfolio/holdings.md).
 
 Static portfolio dashboard (etf-dashboard styling) in [`dashboard/`](dashboard/).
 
+**Planned:** [Darwin adaptive portfolio tab](_system/frameworks/darwin_portfolio_tab_proposal.md) — neural + evolutionary allocation on top of Marvin research (low turnover). Reference PDFs: [`_system/reference/quant-evolution/`](_system/reference/quant-evolution/).
+
 **Local preview:**
 
 ```powershell
