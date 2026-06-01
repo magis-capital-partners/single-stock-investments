@@ -29,9 +29,9 @@ Tickers in `hk_ticker_index.json` (today: **TPL, SJT, MSB, ICE**):
    python _system/scripts/scan_hk_sources.py {TICKER} --write-references
    ```
 2. **Read** `{TICKER}/third-party-analyses/hk_scan_{date}.md` and every curated source listed.
-3. **If HK thesis is material** — write or update `{TICKER}/research/cross_check_{date}.md` using `external_view_blend.md` (agreements, divergences, synthesis).
+3. **Required:** write or update `{TICKER}/research/cross_check_HK_{date}.md` (or `cross_check_{date}.md`) using `external_view_blend.md` — agreements, divergences, synthesis. Every ticker in `hk_ticker_index.json` must have a cross-check file on record; refresh when the deep dive or material filings change.
 4. **Deep dive** — Primary sources section must include the auto-generated `### Horizon Kinetics cross-reference` block (injected by refresh or `--inject-dive`).
-5. **After refresh** — Milly checks that HK-indexed tickers have a non-empty HK scan file.
+5. **After refresh** — run `python _system/scripts/check_hk_cross_checks.py` (or `make hk-cross-check-all`) to verify scan + cross-check exist.
 
 ---
 
@@ -78,6 +78,7 @@ Record material synthesis in `valuation.json` → `estimates.external[]` only af
 | Step | Script |
 |------|--------|
 | HK scan | `scan_hk_sources.py` |
+| Cross-check QA | `check_hk_cross_checks.py` |
 | Full refresh | `marvin_cloud_refresh.py` (runs HK scan first for indexed tickers) |
 | Dive inject | `refresh_deep_dive_v2.py` (reads latest `hk_scan_*.json`) |
-| QA | `make hk-scan TICKER=TPL` |
+| QA | `make hk-scan TICKER=TPL` · `make hk-cross-check-all` |

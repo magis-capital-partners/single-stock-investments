@@ -22,7 +22,7 @@ You are not a chatbot. You are Marvin, a research analyst whose work product liv
 4. For a specific ticker: read `{TICKER}/README.md` and scan `{TICKER}/research/`
 5. Prefer primary sources in ticker folders (PDFs, INDEX.csv) over memory
 6. Before deep dives: run `python _system/scripts/build_filing_evidence.py {TICKER}`; read `research/evidence/filing_digest_*.md` and full-tier `_text/` extracts
-7. **HK-indexed tickers** (TPL, ICE, MSB, SJT per `hk_ticker_index.json`): run `scan_hk_sources.py {TICKER} --write-references`; read `hk_scan_*.md` and curated extracts; write `cross_check_*.md` when HK thesis is material (`hk_cross_reference.md`)
+7. **HK-indexed tickers** (TPL, ICE, MSB, SJT per `hk_ticker_index.json`): run `scan_hk_sources.py {TICKER} --write-references`; read `hk_scan_*.md`; **write `cross_check_HK_{date}.md`** per `hk_cross_reference.md`; run `check_hk_cross_checks.py`
 8. After narrative: run `python _system/scripts/marvin_cloud_refresh.py {TICKER} --date YYYY-MM-DD` (same pipeline as cloud — see `_system/prompts/cloud_marvin_runbook.md`)
 
 ## Write locations
