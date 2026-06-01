@@ -9,7 +9,7 @@ This file is the **single source of truth** for Cursor Cloud Agent runs (`marvin
 Follow `_system/frameworks/deep_dive_structure.md` (v2 layout):
 
 1. What this business is → Why the market might be wrong → Executive summary → Primary sources reviewed
-2. Business & moat (Hohn mechanics; segment map + AI infrastructure when `valuation.json` has overlays)
+2. Business & moat (Hohn mechanics; **Option scan** every ticker — `option_treatment.md`; segment map + AI infrastructure when overlays apply)
 3. Payoff & return (five-question gate, dhando, stance proposal — **no** full valuation math here)
 4. Risks & inversion
 5. **## Valuation & IRR (assumption ledger)** — bridge, assumption ledger, segment build, IRR arithmetic

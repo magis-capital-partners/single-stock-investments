@@ -192,7 +192,7 @@ Use `archetype_valuation_prose.md` for archetype-specific subsection titles and 
 
 #### Segment IRR arithmetic (show your work)
 
-{Steps 1–5: segment map → Y0 → project → options (base $0) → sum + tie-out.}
+{Steps 1–5: segment map → Y0 → project → options per `option_treatment.md` (not auto-zero) → sum + tie-out.}
 
 ### IRR arithmetic (show your work)
 
