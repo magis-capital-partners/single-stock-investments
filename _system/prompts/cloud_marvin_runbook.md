@@ -56,6 +56,8 @@ That script runs: HK scan (indexed tickers) â†’ `marvin_valuation.py --write` â†
 
 Fix any lint errors before finishing the PR.
 
+For HK-indexed tickers: `python _system/scripts/check_hk_cross_checks.py {{TICKER}}`
+
 ## Stance
 
 - Gate stance: `stance_proposal.suggested` in `valuation.json`
