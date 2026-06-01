@@ -44,6 +44,7 @@ def maybe_hk_scan(ticker: str, out_date: str) -> None:
     idx = json.loads(HK_INDEX.read_text(encoding="utf-8"))
     if ticker.upper() not in idx.get("tickers", {}):
         return
+    subprocess.run([PY, str(SCRIPTS / "refresh_hk_extracts.py")], cwd=ROOT, check=False)
     subprocess.run(
         [PY, str(SCRIPTS / "scan_hk_sources.py"), ticker, "--date", out_date, "--write-references"],
         cwd=ROOT,

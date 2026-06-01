@@ -46,16 +46,29 @@ Tickers in `hk_ticker_index.json` (today: **TPL, SJT, MSB, ICE**):
 
 ## Full vault on cloud / Linux
 
-Set environment variable before scan or refresh:
+**Default cloud path:** `/opt/cursor/hk_pdfs` (`hk_paths.json` → `hk_pdfs_root_cloud_default`).
+
+### One-time setup (Cursor Cloud Agents)
+
+1. [Cursor Dashboard → Cloud Agents → Secrets](https://cursor.com/dashboard/cloud-agents): set **`HK_PDFS_ROOT=/opt/cursor/hk_pdfs`** (or your mount path).
+2. Optional: set **`HK_PDFS_REPO_URL`** if the vault lives in a private git repo (cloned by `.cursor/environment.json` install).
+3. Or attach the vault via **multi-repo environment** so `hk_pdfs` is on the VM at the path above.
+4. Optional GitHub Actions secret **`HK_PDFS_ROOT`** — forwarded to the agent via `marvin_deep_dive.mjs` `envVars`.
+
+Repo wiring: `.cursor/environment.json`, `_system/scripts/cloud_setup_hk_vault.sh`, `marvin_deep_dive.mjs`.
+
+### Scan + auto extract refresh
 
 ```bash
-export HK_PDFS_ROOT="/path/to/Horizon Kinetics/hk_pdfs"
+python _system/scripts/refresh_hk_extracts.py   # copies newer vault text → horizon-kinetics/
 python _system/scripts/scan_hk_sources.py TPL MSB SJT ICE --write-references
 ```
 
+`refresh_hk_extracts.py` runs automatically in `marvin_cloud_refresh.py` and `scan_third_party_sources.py --with-hk`. Mapping: `hk_extract_manifest.json`. Status: `horizon-kinetics/extract_refresh_status.json`.
+
 On Windows workspace the default path in `hk_paths.json` is used automatically.
 
-**Refresh extracts** when new commentaries land in the vault (see `horizon-kinetics/README.md`).
+**Approval:** You promote HK blends to `third_party_sources.md`. Agents cite HK as context only.
 
 ---
 
