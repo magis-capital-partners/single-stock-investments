@@ -60,8 +60,20 @@
 5. **Tie-out slack** — if sub-lines do not sum to the model payoff, show a **Tie-out** row (do not hide the gap).
 6. **Bear / bull** — document in `valuation.json` scenarios; one sentence in Payoff & return on what changes vs base (payoff, growth, or owner cash). No duplicate bridge table in the markdown.
 7. **Growth** — rows 3–4 must cite filing, segment build, or **[Assumption]** with mechanism stated in Business & moat.
+8. **Mark date alignment** — any row pairing **fair value** from a filing with a **listed price** must cite **measurement date** (last session on or before `period_end`). See `mark_date_alignment.md`. **Forbidden:** deriving share count from fair value using a quote dated after `period_end` (e.g. MIAX $51.42 on 2026-05-22 vs Feb 2026 quarterly FV).
 
----
+### Holdco / fair-value stakes
+
+When `book_estimate_config.json` exists, add **`### Current book value estimate (mark-to-market)`** per `current_book_estimate.md` after IRR arithmetic.
+
+When SOTP references GAAP fair value for a listed stake (MIAX, TPL, etc.):
+
+| Required | Example |
+|----------|---------|
+| Filing measurement date | 2026-02-27 for period_end 2026-02-28 |
+| Price on measurement date | MIAX **~$42.60** (not May Stooq) |
+| Implied shares check | $13.917M ÷ $42.60 ≈ **326,700** sh |
+| Price today (separate date) | Stooq/Yahoo on refresh date |
 
 ## Method templates
 

@@ -90,6 +90,8 @@ make book-estimate TICKER=FRMO
 
 Runs automatically in `marvin_cloud_refresh.py` when config exists.
 
+**Mark dates:** Every `filing_price` must be on **`measurement_date`** (last US session on or before `period_end`). See **`mark_date_alignment.md`**. Script auto-fetches via Yahoo when `filing_price_auto: true`.
+
 ---
 
 ## Config schema (summary)

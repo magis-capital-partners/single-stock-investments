@@ -66,7 +66,13 @@ EM_DASH_MAX = 1
 AI_HYPERSCALERS = frozenset({"GOOGL", "AMZN", "META", "MSFT"})
 SEGMENT_MAP = re.compile(r"#### Segment map\b", re.IGNORECASE)
 SEGMENT_BUILD = re.compile(r"### Segment cash-flow build\b", re.IGNORECASE)
-AI_INFRA = re.compile(r"#### AI infrastructure\b", re.IGNORECASE)
+BOOK_ESTIMATE_SECTION = re.compile(
+    r"### Current book value estimate \(mark-to-market\)", re.IGNORECASE
+)
+MIAX_FILING_MISALIGN = re.compile(
+    r"13,917,000.*51\.42|51\.42.*13,917|270,563.*51\.42|fair value.*51\.42.*2026-05",
+    re.IGNORECASE,
+)
 
 
 def ticker_from_dive_path(path: Path) -> str | None:
@@ -196,6 +202,19 @@ def lint_file(path: Path, *, legacy: bool, strict: bool) -> tuple[list[str], lis
             (errors if strict else warnings).append(
                 f"{rel}: holding_co — missing #### Catalyst path (dated events)"
             )
+
+    ticker = ticker_from_dive_path(path)
+    if ticker and (ROOT / ticker / "research" / "book_estimate_config.json").exists():
+        if not BOOK_ESTIMATE_SECTION.search(text):
+            errors.append(
+                f"{rel}: missing ### Current book value estimate (mark-to-market) — "
+                "required when book_estimate_config.json exists (current_book_estimate.md)"
+            )
+    if MIAX_FILING_MISALIGN.search(text):
+        errors.append(
+            f"{rel}: MIAX fair value tied to post-quarter price (~$51.42 / May 2026) — "
+            "use measurement-date price ~$42.60 on 2026-02-27 (mark_date_alignment.md)"
+        )
 
     em_count = body.count(EM_DASH)
     if em_count > EM_DASH_MAX:
