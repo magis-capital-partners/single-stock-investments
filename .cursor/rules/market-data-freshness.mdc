@@ -1,0 +1,13 @@
+---
+description: Refresh commodity and macro spot prices before valuation; no stale third-party $/unit.
+globs:
+  - "**/research/valuation.json"
+  - "**/research/deep_dive_*.md"
+  - _system/scripts/fetch_market_inputs.py
+  - _system/scripts/marvin_cloud_refresh.py
+alwaysApply: false
+---
+
+# Market data freshness
+
+Read `_system/frameworks/market_inputs_freshness.md`. Run `fetch_market_inputs.py {TICKER} --merge` before `marvin_valuation.py --write` when commodities affect IRR or option yield.

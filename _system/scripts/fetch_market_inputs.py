@@ -1,0 +1,159 @@
+#!/usr/bin/env python3
+"""Fetch fresh commodity / macro spot inputs for valuation overlays."""
+from __future__ import annotations
+
+import argparse
+import json
+import urllib.request
+from datetime import date, datetime, timezone
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[2]
+COMMODITY_DIR = ROOT / "_system" / "reference" / "market-data" / "commodities"
+UA = "MarvinResearch/1.0 (market-inputs)"
+STOOQ_URL = "https://stooq.com/q/l/?s={symbol}&f=sd2t2ohlcv&h&e=csv"
+TODAY = date.today().isoformat()
+
+DEFAULT_SYMBOLS = {
+    "copper": {"stooq": "hg.f", "cents_if_close_gt": 50},
+}
+
+TICKER_SYMBOLS: dict[str, list[str]] = {
+    "KEWL": ["copper"],
+    "MSB": ["copper"],
+}
+
+
+def fetch_stooq(symbol: str) -> tuple[float | None, str | None, str | None]:
+    url = STOOQ_URL.format(symbol=symbol.lower())
+    req = urllib.request.Request(url, headers={"User-Agent": UA})
+    try:
+        raw = urllib.request.urlopen(req, timeout=25).read().decode("utf-8", errors="ignore")
+    except Exception as exc:
+        return None, None, str(exc)
+    lines = [ln.strip() for ln in raw.strip().splitlines() if ln.strip()]
+    if len(lines) < 2:
+        return None, None, "empty"
+    parts = lines[1].split(",")
+    if len(parts) < 7:
+        return None, None, "bad csv"
+    quote_date = parts[1] if len(parts) > 1 else TODAY
+    try:
+        close = float(parts[6].strip())
+    except ValueError:
+        return None, None, "no close"
+    return close, quote_date, None
+
+
+def spot_usd_per_lb(cid: str, close: float, meta: dict) -> float:
+    if cid == "copper" and close > meta.get("cents_if_close_gt", 50):
+        return round(close / 100.0, 4)
+    return round(close, 4)
+
+
+def scenario_grid(spot: float) -> dict:
+    return {
+        "bear": {"copper_usd_per_lb": round(spot * 0.72, 2), "label": "trough (~28% below spot)"},
+        "base": {"copper_usd_per_lb": None, "label": "spot at compute"},
+        "bull": {"copper_usd_per_lb": round(spot * 1.08, 2), "label": "cycle high (~8% above spot)"},
+    }
+
+
+def royalty_at_price(base_usd: float, base_lb: float, spot_lb: float) -> float:
+    if base_lb <= 0:
+        return base_usd
+    return round(base_usd * (spot_lb / base_lb), 0)
+
+
+def merge_ticker(ticker: str, fetched: dict[str, dict]) -> None:
+    research = ROOT / ticker / "research"
+    research.mkdir(parents=True, exist_ok=True)
+    mi: dict = {}
+    for cid, row in fetched.items():
+        if row.get("spot") is None:
+            continue
+        mi[cid] = {
+            "spot": row["spot"],
+            "as_of": row.get("as_of"),
+            "source": row.get("source"),
+            "fetched_at": row.get("fetched_at"),
+            "stooq_symbol": row.get("stooq_symbol"),
+        }
+        if cid == "copper":
+            mi["scenario_grid"] = scenario_grid(row["spot"])
+    payload = {"ticker": ticker, "as_of": TODAY, "market_inputs": mi, "staleness_max_days": 7}
+    (research / "market_inputs.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    val_path = research / "valuation.json"
+    if not val_path.exists():
+        return
+    val = json.loads(val_path.read_text(encoding="utf-8"))
+    val["market_inputs"] = mi
+    val["market_inputs_as_of"] = TODAY
+    inputs = val.setdefault("inputs", {})
+    if "copper" in mi:
+        spot = mi["copper"]["spot"]
+        inputs["copper_spot_usd_per_lb"] = spot
+        inputs["copper_spot_as_of"] = mi["copper"].get("as_of")
+        inputs["copper_spot_source"] = mi["copper"].get("source")
+        ssi_ref = 4.0
+        ssi_royalty = inputs.get("copperwood_royalty_est_usd", 7_700_000)
+        inputs["copperwood_royalty_est_usd_ssi_ref"] = ssi_royalty
+        inputs["copperwood_royalty_est_usd_at_spot"] = royalty_at_price(float(ssi_royalty), ssi_ref, spot)
+        inputs["copperwood_royalty_note"] = (
+            f"SSI ~$7.7M/yr @ ${ssi_ref}/lb scaled linearly to spot ${spot}/lb [Assumption]"
+        )
+        sh = inputs.get("shares_outstanding", 1_126_284)
+        price = inputs.get("price", 55.0)
+        mcap = price * sh
+        roy_spot = inputs["copperwood_royalty_est_usd_at_spot"]
+        if mcap > 0:
+            val.setdefault("optionality_gate", {})["copperwood_option_yield_pct"] = round(
+                100.0 * roy_spot / mcap, 2
+            )
+    val_path.write_text(json.dumps(val, indent=2), encoding="utf-8")
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("tickers", nargs="*", help="Tickers to merge into valuation.json")
+    parser.add_argument("--merge", action="store_true")
+    args = parser.parse_args()
+
+    COMMODITY_DIR.mkdir(parents=True, exist_ok=True)
+    fetched: dict[str, dict] = {}
+    ok = True
+    for cid, meta in DEFAULT_SYMBOLS.items():
+        close, qd, err = fetch_stooq(meta["stooq"])
+        row = {
+            "id": cid,
+            "stooq_symbol": meta["stooq"],
+            "as_of": qd,
+            "source": STOOQ_URL.format(symbol=meta["stooq"]),
+            "fetched_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "error": err,
+        }
+        if close is not None:
+            row["raw_close"] = close
+            row["spot"] = spot_usd_per_lb(cid, close, meta)
+        else:
+            ok = False
+        fetched[cid] = row
+        (COMMODITY_DIR / f"{cid}.json").write_text(json.dumps(row, indent=2), encoding="utf-8")
+        print(f"  {cid}: spot={row.get('spot')} as_of={qd} err={err}")
+
+    manifest = {"as_of": TODAY, "commodities": {k: {"spot": v.get("spot"), "as_of": v.get("as_of")} for k, v in fetched.items()}}
+    (COMMODITY_DIR / "manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+
+    tickers = [t.upper() for t in args.tickers] if args.tickers else []
+    if args.merge and not tickers:
+        tickers = list(TICKER_SYMBOLS.keys())
+    for t in tickers:
+        subset = {k: v for k, v in fetched.items() if k in TICKER_SYMBOLS.get(t, ["copper"])}
+        merge_ticker(t, subset)
+        print(f"OK merged {t}")
+
+    return 0 if ok else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

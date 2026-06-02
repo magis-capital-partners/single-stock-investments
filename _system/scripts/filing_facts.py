@@ -131,5 +131,20 @@ def write_filing_facts_json(ticker_dir: Path, as_of: str) -> Path | None:
     if not evidence_dir.exists():
         return None
     evidence_dir.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(facts, indent=2), encoding="utf-8")
+    if not facts.get("metrics"):
+        candidates = [out] if out.exists() else []
+        candidates.extend(sorted(evidence_dir.glob("filing_facts_*.json"), reverse=True))
+        for p in candidates:
+            if not p.exists():
+                continue
+            try:
+                old = json.loads(p.read_text(encoding="utf-8"))
+            except json.JSONDecodeError:
+                continue
+            if old.get("metrics"):
+                facts["metrics"] = old["metrics"]
+                if p != out:
+                    facts["metrics_preserved_from"] = p.name
+                break
+    out.write_text(json.dumps(facts, indent=2) + "\n", encoding="utf-8")
     return out
