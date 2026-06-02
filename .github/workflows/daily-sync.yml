@@ -28,7 +28,15 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Install transcript pipeline dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tesseract-ocr poppler-utils
+          pip install -r _system/scripts/requirements.txt -r _system/scripts/requirements-transcripts.txt
+
       - name: Run portfolio downloads
+        env:
+          POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY || secrets.POLYGON_IO_API_KEY }}
         run: python _system/scripts/download_all_holdings.py
 
       - name: Commit and push workspace

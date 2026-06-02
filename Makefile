@@ -3,13 +3,15 @@
 #   make research-check TICKER=QDEL
 #   make research-check-all
 #   make milly-repass TICKER=QDEL
+#   make batch-refresh DATE=2026-06-02
 
 PYTHON ?= python3
 SCRIPTS := _system/scripts
+DATE ?= $(shell date +%Y-%m-%d)
 
 TICKER ?=
 
-.PHONY: research-check research-check-all evidence milly-repass book-estimate book-estimate-all holdco-uplift short-scan hk-scan hk-cross-check-all hk-extract-refresh third-party-scan-all cross-check-all darwin-pit-check darwin-build darwin-pit-audit
+.PHONY: research-check research-check-all evidence milly-repass book-estimate book-estimate-all holdco-uplift short-scan hk-scan hk-cross-check-all hk-extract-refresh third-party-scan-all cross-check-all transcript-sync batch-refresh evidence-check darwin-pit-check darwin-build darwin-pit-audit
 
 darwin-build:
 	$(PYTHON) $(SCRIPTS)/build_darwin_portfolio.py --fast
@@ -25,15 +27,24 @@ research-check:
 ifndef TICKER
 	$(error Set TICKER= e.g. make research-check TICKER=QDEL)
 endif
-	$(PYTHON) $(SCRIPTS)/build_filing_evidence.py $(TICKER)
-	$(PYTHON) $(SCRIPTS)/lint_deep_dive.py $(TICKER) --milly
+	$(PYTHON) $(SCRIPTS)/marvin_cloud_refresh.py $(TICKER) --date $(DATE) --skip-milly --strict-evidence
 	@echo OK: $(TICKER) research-check
 
 research-check-all:
-	$(PYTHON) $(SCRIPTS)/build_filing_evidence.py
-	$(PYTHON) $(SCRIPTS)/lint_deep_dive.py --milly
+	$(PYTHON) $(SCRIPTS)/batch_portfolio_refresh.py --date $(DATE) --strict-evidence
 	$(PYTHON) $(SCRIPTS)/lint_adversarial.py
 	@echo OK: portfolio research-check-all
+
+batch-refresh:
+	$(PYTHON) $(SCRIPTS)/batch_portfolio_refresh.py --date $(DATE) --strict-evidence
+	@echo OK: batch-refresh $(DATE)
+
+evidence-check:
+ifndef TICKER
+	$(error Set TICKER=)
+endif
+	$(PYTHON) $(SCRIPTS)/check_evidence_completeness.py $(TICKER)
+	@echo OK: $(TICKER) evidence-check
 
 evidence:
 ifndef TICKER
@@ -91,3 +102,8 @@ third-party-scan-all:
 cross-check-all:
 	$(PYTHON) $(SCRIPTS)/check_cross_checks.py $(if $(STRICT),--strict,)
 	@echo OK: cross-check-all
+
+transcript-sync:
+	$(PYTHON) $(SCRIPTS)/download_transcripts.py --register-legacy $(if $(TICKER),$(TICKER),)
+	$(PYTHON) $(SCRIPTS)/transcript_gap_report.py
+	@echo OK: transcript-sync

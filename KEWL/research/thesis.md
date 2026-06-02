@@ -11,13 +11,13 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | - |
-| **Implied 10yr IRR** (base) | -8.3% (base) |
+| **Implied 10yr IRR** (base) | -8.29% (base) |
 | **IRR method** | yield_curve |
 | **Lawrence bucket** | other |
-| **Payoff lens** | — |
-| **MOI bucket** | — |
+| **Payoff lens** | asset |
+| **MOI bucket** | pending |
 
-**Deep dive:** `KEWL/research/deep_dive_2026-06-01.md` (auto-sync)
+**Deep dive:** `KEWL/research/deep_dive_2026-06-02.md` (auto-sync)
 
 ## One-line thesis
 
@@ -30,6 +30,9 @@ Michigan **mineral royalty optionality** (>1M acres, Copperwood/Highland Copper 
 - [x] Steady-state operating loss ~($160K)/yr (management, FY2024 letter)
 - [x] FY2025 OTC annual: >1.3M mineral acres, 36,705 leased; Mai 29.6%, Speron 11.6%
 - [x] H1 2025 lease income $189K vs $149K prior year (semi-annual)
+- [x] 2025 shareholder meeting: mgmt expects CF positive from 2026 **[Management statement]** (see transcript MD)
+- [x] Copper spot ~$6.67/lb (2026-06-02); royalty bridge ~$12.8M/yr at spot vs $7.7M @ $4/lb SSI
+- [x] Economic floor ~$21/sh (not GAAP $12.70); option yield ~20.7% at $55
 
 ## Key risks
 
@@ -40,4 +43,5 @@ Michigan **mineral royalty optionality** (>1M acres, Copperwood/Highland Copper 
 ## [HUMAN REVIEW]
 
 - Verify FY2025 machine-readable financials in annual PDF
-- Track Copperwood milestones and market price vs $27 repurchase
+- Replace attested shareholder meeting MD with official IR transcript PDF
+- Track Copperwood milestones; confirm FY2026 CF-positive claim in filings

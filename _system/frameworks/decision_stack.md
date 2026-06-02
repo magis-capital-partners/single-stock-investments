@@ -58,7 +58,7 @@ No IRR in this section.
 
 | Trigger | Read |
 |---------|------|
-| `payoff_lens: asset` or holdco / optionality | `optionality_valuation.md` |
+| `payoff_lens: asset` or holdco / optionality | `optionality_valuation.md` (prose + § Mechanical refresh if `evidence_refresh` set) |
 | `payoff_lens: event` | `special_situation_lens.md` |
 | `payoff_lens: levered` | `equity_stub_valuation.md`; `irr_method: scenario` |
 | Multi-segment compounder | `segment_cashflow_valuation.md` |
@@ -103,12 +103,16 @@ Script logic in `valuation.json` (unchanged). Override in `[HUMAN REVIEW]`.
 ## Read order (deep dive)
 
 1. This file  
-2. `analysis_arsenal.md` — skim triggers for this ticker  
-3. `report_prose.md`  
-4. `hohn_business_analysis.md`  
-5. Triggered overlay from Step 3 only  
-6. `{TICKER}/` primary docs  
-7. `deep_dive_template.md`  
+2. `{TICKER}/research/valuation.json` + **trigger map** in `classification.md` (open only listed frameworks)  
+3. `report_prose.md` + `deep_dive_structure.md`  
+4. `option_treatment.md` (every dive)  
+5. `hohn_business_analysis.md` when operating or mixed mechanics  
+6. Triggered overlays from Step 3 only (not the full arsenal index)  
+7. `{TICKER}/` primary docs  
+8. `deep_dive_template.md`  
+9. Mechanical close: **`marvin_cloud_refresh.py` only** (see `cloud_marvin_runbook.md` Phase 3)  
+
+New frameworks: see `framework_governance.md`.
 
 ---
 

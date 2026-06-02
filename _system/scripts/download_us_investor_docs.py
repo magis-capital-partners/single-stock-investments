@@ -264,7 +264,7 @@ def ir_dest(ir_dir: Path, url: str) -> Path:
 def install_wrapper(ticker: str) -> Path:
     inv = ROOT / ticker / "investor-documents"
     inv.mkdir(parents=True, exist_ok=True)
-    for sub in ("sec-edgar", f"ir-{ticker.lower()}", "research-notes"):
+    for sub in ("sec-edgar", f"ir-{ticker.lower()}", "transcripts", "research-notes"):
         (inv / sub).mkdir(parents=True, exist_ok=True)
     script = inv / f"download_{ticker.lower()}_investor_docs.py"
     if not script.exists():
