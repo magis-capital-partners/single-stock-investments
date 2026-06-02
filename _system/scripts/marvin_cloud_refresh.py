@@ -173,6 +173,17 @@ def main() -> int:
         optional=True,
     )
 
+    status_path = ROOT / ticker / ".onboard_status.json"
+    if status_path.exists():
+        try:
+            st = json.loads(status_path.read_text(encoding="utf-8"))
+            if st.get("deep_dive_pending"):
+                st["deep_dive_pending"] = False
+                st["deep_dive_completed"] = args.date
+                status_path.write_text(json.dumps(st, indent=2) + "\n", encoding="utf-8")
+        except json.JSONDecodeError:
+            pass
+
     if not ok:
         print("DONE with failures — fix lint/errors before merge")
         return 1
