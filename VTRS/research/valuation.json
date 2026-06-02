@@ -8,7 +8,7 @@
     "moat": "unproven",
     "dhando": "partial",
     "cycle": "transition",
-    "payoff_lens": "operating"
+    "payoff_lens": "event"
   },
   "inputs": {
     "price": 15.69,
@@ -16,7 +16,13 @@
     "fcf_per_share": 1.38,
     "fcf_source": "FY2025 OCF $2,316M minus ~$450M capex [Assumption] on 1,151M diluted shares; haircut for divestiture-year noise (10-K FY2025)",
     "shares_millions": 1151.4,
-    "normalization_note": "Use operating cash flow not GAAP net income; FY2025 EPS inflated by portfolio gains"
+    "normalization_note": "Use operating cash flow not GAAP net income; FY2025 EPS inflated by portfolio gains",
+    "copper_spot_usd_per_lb": 6.6755,
+    "copper_spot_as_of": "2026-06-03",
+    "copper_spot_source": "https://stooq.com/q/l/?s=hg.f&f=sd2t2ohlcv&h&e=csv",
+    "copperwood_royalty_est_usd_ssi_ref": 7700000,
+    "copperwood_royalty_est_usd_at_spot": 12850338.0,
+    "copperwood_royalty_note": "SSI ~$7.7M/yr @ $4.0/lb scaled linearly to spot $6.6755/lb [Assumption]"
   },
   "scenarios": {
     "bear": {
@@ -35,7 +41,7 @@
       "growth_y1_5": 0.04,
       "growth_y6_10": 0.025,
       "exit_pfcf_y10": 11,
-      "notes": "Mix shift to higher-margin brands + successful complex generics launches"
+      "notes": "Mix shift + Idorsia Phase III readouts (selatogrel, cenerimod); not in Lawrence base FCF"
     }
   },
   "stance_proposal": {
@@ -97,8 +103,40 @@
       "answer": "Yes",
       "treatment": "embedded_in_segment",
       "evidence": "Biosimilar pipeline economics flow through Generics segment over time"
+    },
+    {
+      "q": 8,
+      "question": "Idorsia Phase III assets (selatogrel, cenerimod)?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "Global R&D collaboration; exclusive rights; Phase III per DEF 14A_20241025 and 10-K",
+      "base_terminal_rationale": "Not in normalized owner cash; catalyst overlay only until readouts and approval path clear"
     }
   ],
+  "estimates": {
+    "marvin_floor": {
+      "per_share": 1.38,
+      "return_pct": 9.2,
+      "notes": "FY2025 OCF minus capex assumption; ex divestiture gains"
+    },
+    "external": [
+      {
+        "source": "David Rosen / Rubric Capital \u2014 Sohn Digging Deeper panel",
+        "path": "VTRS/investor-documents/research-notes/2026-05-27_Sohn_Digging_Deeper_VTRS_excerpt.md",
+        "status": "pending_approval",
+        "return_pct": null,
+        "horizon_years": 1,
+        "price_target": null,
+        "notes": "Speaker cites 7x/6x P/E, 50% cash return, Phase III double thesis; not adopted as 10yr owner-cash path"
+      }
+    ],
+    "blended_best": {
+      "per_share": 1.38,
+      "return_pct": 9.2,
+      "weights": "100% marvin_floor (external pending; pipeline option in bull/catalyst only)",
+      "notes": "Stance gate unchanged; Rosen confirms filing-backed Idorsia optionality"
+    }
+  },
   "human_review": [],
   "results_lawrence_legacy": {
     "bear": {
@@ -123,11 +161,11 @@
     }
   },
   "implied_return": {
-    "base_pct": 9.5,
-    "label": "10yr IRR (total synthesis)",
-    "display": "9.5% (total synthesis)",
+    "base_pct": 9.2,
+    "label": "10yr IRR (Lawrence base)",
+    "display": "9.2% (Lawrence base)",
     "falsifier_adjusted_pct": 9.2,
-    "synthesis_pct": 9.5
+    "synthesis_pct": 9.2
   },
   "overlay_results": [],
   "synthesis": {
@@ -141,28 +179,15 @@
         "weight": 1.0,
         "type": "numeric",
         "epistemic_tier": "A (primary filings)",
-        "weight_why": "No approved third-party sources; stance gate is filing-based owner cash only.",
+        "weight_why": "Lawrence base is stance gate; Sohn Rosen excerpt is pending approval (context only).",
         "weight_falsifiers": [],
         "hard_to_vary": "yes"
       }
     ],
-    "qualitative_adjustments": [
-      {
-        "factor": "Partial dhando (HK hard-asset / hidden NAV)",
-        "pp": 0.5,
-        "rationale": "Third-party confirms asset quality not in GAAP book; not full floor at spot price",
-        "sources": "cross_check_HK; hk_scan; HK Q1 2025/2026"
-      },
-      {
-        "factor": "No dated predictive attribute at spot",
-        "pp": -0.2,
-        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
-        "sources": "HK predictive attributes framework"
-      }
-    ],
+    "qualitative_adjustments": [],
     "numeric_weighted_pct": 9.2,
-    "qualitative_pp": 0.3,
-    "total_synthesis_pct": 9.5,
+    "qualitative_pp": 0.0,
+    "total_synthesis_pct": 9.2,
     "human_approval": "pending",
     "weight_audit": {
       "flags": [],
@@ -173,6 +198,36 @@
         "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
       }
     },
-    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+    "notes": "Filings-only Lawrence base; Sohn Rosen pending; no HK/copper qualitative for VTRS"
+  },
+  "market_inputs": {
+    "copper": {
+      "spot": 6.6755,
+      "as_of": "2026-06-03",
+      "source": "https://stooq.com/q/l/?s=hg.f&f=sd2t2ohlcv&h&e=csv",
+      "fetched_at": "2026-06-02T22:04:44Z",
+      "stooq_symbol": "hg.f"
+    },
+    "scenario_grid": {
+      "bear": {
+        "copper_usd_per_lb": 4.81,
+        "label": "trough (~28% below spot)"
+      },
+      "base": {
+        "copper_usd_per_lb": null,
+        "label": "spot at compute"
+      },
+      "bull": {
+        "copper_usd_per_lb": 7.21,
+        "label": "cycle high (~8% above spot)"
+      }
+    }
+  },
+  "market_inputs_as_of": "2026-06-02",
+  "optionality_gate": {
+    "copperwood_option_yield_pct": 72.72,
+    "primary_metric": "lawrence_base",
+    "primary_label": "10yr IRR",
+    "primary_return_pct": 9.2
   }
 }

@@ -11,17 +11,17 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | transition |
-| **Implied 10yr IRR** (base) | 9.5% (total synthesis) |
+| **Implied 10yr IRR** (base) | 9.2% (Lawrence base) |
 | **IRR method** | full |
 | **Lawrence bucket** | low_cost |
-| **Payoff lens** | operating |
+| **Payoff lens** | event |
 | **MOI bucket** | pending |
 
 **Deep dive:** `VTRS/research/deep_dive_2026-06-02.md` (auto-sync)
 
 ## One-line thesis
 
-Post-EWSR generic pharma cash generator at ~9% FCF yield, but ~$14B net debt and unproven moat keep stance **watch** until deleveraging and base-business growth confirm in filings (9.5% Lawrence base IRR at $15.69).
+Post-EWSR generic pharma cash generator at ~9% owner-cash yield; Idorsia Phase III (selatogrel, cenerimod) is filing-backed event optionality [PENDING APPROVAL] per Sohn Rosen. ~$14B net debt and unproven moat keep **watch** (9.2% Lawrence base at $15.69).
 
 ## Key questions
 
