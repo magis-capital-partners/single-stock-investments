@@ -11,12 +11,13 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-06-02.
 | AMZN | AMZN/ | Amazon.com | US | 2026-06-02 | 2026-06-02 | compounder | hold |
 | APLD | APLD/ | Applied Digital | US | 2026-06-02 | 2026-06-02 | optionality | watch |
 | BN | BN/ | Brookfield Corporation | US | 2026-06-02 | 2026-06-02 | platform | hold |
-| BWEL | BWEL/ | J.G. Boswell Company | US | — | — | unknown | watch |
+| BWEL | BWEL/ | J.G. Boswell Company | US | 2026-06-02 | 2026-06-02 | unknown | watch |
 | CMSG | CMSG/ | Consensus Mining & Seigniorage Corp | US | 2026-06-02 | 2026-06-02 | optionality | watch |
 | CPRT | CPRT/ | Copart | US | 2026-06-02 | 2026-06-02 | compounder | core |
 | CSGP | CSGP/ | CoStar Group | US | 2026-06-02 | 2026-06-02 | platform | watch |
 | CSU | CSU/ | Constellation Software | CA | 2026-06-02 | 2026-06-02 | compounder | core |
 | DHR | DHR/ | Danaher Corporation | US | 2026-06-02 | 2026-06-02 | compounder | hold |
+| DRR.AX | DRR.AX/ | Deterra Royalties Limited | US | — | — | unknown | watch |
 | FRMO | FRMO/ | FRMO Corporation | US | 2026-06-02 | 2026-06-02 | holding_co | hold |
 | GOOGL | GOOGL/ | Alphabet Inc. | US | 2026-06-02 | 2026-06-02 | compounder | hold |
 | ICE | ICE/ | Intercontinental Exchange | US | 2026-06-02 | 2026-06-02 | croupier | hold |
@@ -33,4 +34,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-06-02.
 | TPL | TPL/ | Texas Pacific Land Corporation | US | 2026-06-02 | 2026-06-02 | unknown | watch |
 | WBI | WBI/ | WaterBridge Infrastructure | US | 2026-06-02 | 2026-06-02 | infrastructure | watch |
 
-**26 holdings total.** Registry: `_system/portfolio/registry.json`
+**27 holdings total.** Registry: `_system/portfolio/registry.json`
