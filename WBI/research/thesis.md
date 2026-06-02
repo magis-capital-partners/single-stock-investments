@@ -14,10 +14,10 @@
 | **Implied 10yr IRR** (base) | 13.92% (total synthesis) |
 | **IRR method** | full |
 | **Lawrence bucket** | low_cost |
-| **Payoff lens** | — |
-| **MOI bucket** | — |
+| **Payoff lens** | pending |
+| **MOI bucket** | pending |
 
-**Deep dive:** `WBI/research/deep_dive_2026-06-01.md` (auto-sync)
+**Deep dive:** `WBI/research/deep_dive_2026-06-02.md` (auto-sync)
 
 ## One-line thesis
 
