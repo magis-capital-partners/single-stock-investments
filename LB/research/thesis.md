@@ -1,29 +1,36 @@
 # LB — Investment Thesis
 
-**Last updated:** 2026-06-02
+**Last updated:** auto-sync
 
 ## Classification
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
+| **Archetype** (Stahl) | infrastructure |
 | **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Cycle** | mid |
+| **Implied 10yr IRR** (base) | 1.83% (total synthesis) |
+| **IRR method** | full |
+| **Lawrence bucket** | pricing_power |
+| **Payoff lens** | asset |
+| **MOI bucket** | pending |
+
+**Deep dive:** `LB/research/deep_dive_2026-06-02.md` (auto-sync)
 
 ## One-line thesis
 
-LandBridge Company LLC — thesis pending Marvin deep dive.
+Delaware Basin land toll with strong FY2025 cash proof, but Class A-attributable owner cash at **~$73** yields **~1.8%** Lawrence base — watch for price or governance/cash-attribution improvement.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest annual report (FY2025 10-K)
+- [x] Read latest quarterly report (Q1 2026 10-Q)
+- [ ] Verify Class A cash attribution vs distributions through Up-C
+- [ ] Track digital infrastructure contracts in SEC filings
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-06-02; awaiting deep dive.
+- Sponsor control and related-party revenue with WaterBridge (WBI)
+- Portfolio overlap context: TPL Stateline, WBI produced-water infrastructure

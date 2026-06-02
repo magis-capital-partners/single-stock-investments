@@ -14,8 +14,8 @@
 | **Implied 10yr IRR** (base) | 13.15% (total synthesis) |
 | **IRR method** | full |
 | **Lawrence bucket** | multi_sided |
-| **Payoff lens** | — |
-| **MOI bucket** | — |
+| **Payoff lens** | pending |
+| **MOI bucket** | pending |
 
 ## One-line thesis
 

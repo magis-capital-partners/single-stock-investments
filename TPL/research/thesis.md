@@ -14,8 +14,8 @@
 | **Implied 10yr IRR** (base) | -0.13% (total synthesis) |
 | **IRR method** | full |
 | **Lawrence bucket** | pricing_power |
-| **Payoff lens** | — |
-| **MOI bucket** | — |
+| **Payoff lens** | pending |
+| **MOI bucket** | pending |
 
 **Deep dive:** `TPL/research/deep_dive_2026-06-01.md` (auto-sync)
 

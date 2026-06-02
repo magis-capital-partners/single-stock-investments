@@ -14,8 +14,8 @@
 | **Implied 10yr IRR** (base) | 5.8% (base) |
 | **IRR method** | yield_curve |
 | **Lawrence bucket** | other |
-| **Payoff lens** | — |
-| **MOI bucket** | — |
+| **Payoff lens** | pending |
+| **MOI bucket** | pending |
 
 ## One-line thesis
 
