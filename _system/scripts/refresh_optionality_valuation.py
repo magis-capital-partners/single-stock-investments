@@ -7,10 +7,16 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+SCRIPTS = Path(__file__).resolve().parent
+sys.path.insert(0, str(SCRIPTS))
+
+from marvin_pipeline_common import has_evidence_refresh_config  # noqa: E402
+
 TODAY = date.today().isoformat()
 
 
@@ -50,6 +56,7 @@ def refresh_commodity_nav(ticker: str, val: dict, cfg: dict) -> dict:
     acreage_uplift = float(cfg.get("acreage_uplift_per_share", 0))
     cash_floor = float(cfg.get("cash_floor_per_share", 0))
     horizon = float(cfg.get("horizon_years", 7))
+    mode = cfg.get("base_payoff_mode", "fixed_stance_gate")
     base_payoff = float(cfg.get("base_payoff", (val.get("scenarios") or {}).get("base", {}).get("payoff", 30)))
     bear_payoff = float(cfg.get("bear_payoff", (val.get("scenarios") or {}).get("bear", {}).get("payoff", 14)))
     overlay_slack = float(cfg.get("overlay_slack_per_share", 4.0))
@@ -139,19 +146,25 @@ def refresh_commodity_nav(ticker: str, val: dict, cfg: dict) -> dict:
         },
     ]
     running = book + sum(l["uplift_per_share"] for l in lines[1:])
-    slack = round(base_payoff - running, 2)
-    if abs(slack) > 0.05:
-        lines.append(
-            {
-                "id": "residual",
-                "label": "Residual to Lawrence base payoff",
-                "gaap_per_share": 0.0,
-                "uplift_per_share": slack,
-                "math": f"Tie to ${base_payoff} path",
-            }
-        )
+
+    if mode == "sum_lines":
+        base_payoff = round(running, 2)
+    else:
+        slack = round(base_payoff - running, 2)
+        if abs(slack) > 0.05:
+            lines.append(
+                {
+                    "id": "residual",
+                    "label": "Residual to Lawrence base payoff",
+                    "gaap_per_share": 0.0,
+                    "uplift_per_share": slack,
+                    "math": f"Tie to ${base_payoff} path",
+                }
+            )
 
     base = val.setdefault("scenarios", {}).setdefault("base", {})
+    base["payoff"] = base_payoff
+    base["years"] = int(horizon)
     base["sotp_build"] = {
         "shares": int(shares),
         "book_per_share": book,
@@ -165,10 +178,10 @@ def refresh_commodity_nav(ticker: str, val: dict, cfg: dict) -> dict:
     bull["payoff"] = float(cfg.get("bull_payoff", price * 1.18))
     bull["notes"] = cfg.get("bull_notes", f"Production at spot ${spot}")
 
-    val.setdefault("results", {})["base"] = {"return_pct": irr(price, base_payoff, horizon)}
+    base_ret = irr(price, base_payoff, horizon)
+    val.setdefault("results", {})["base"] = {"return_pct": base_ret}
     val["results"]["bear"] = {"return_pct": irr(price, bear_payoff, horizon)}
     val["results"]["bull"] = {"return_pct": irr(price, bull["payoff"], horizon)}
-    base_ret = val["results"]["base"]["return_pct"]
     val["implied_return"] = {
         "base_pct": base_ret,
         "label": "annualized return",
@@ -217,6 +230,8 @@ def seed_filing_facts_from_inputs(ticker: str, val: dict, as_of: str) -> None:
 
 
 def refresh_ticker(ticker: str) -> bool:
+    from valuation_synthesis import post_optionality_valuation_pass
+
     ticker = ticker.upper()
     val_path = ROOT / ticker / "research" / "valuation.json"
     if not val_path.exists():
@@ -235,11 +250,12 @@ def refresh_ticker(ticker: str) -> bool:
         return False
     if cfg.get("seed_filing_facts", True):
         seed_filing_facts_from_inputs(ticker, val, TODAY)
+    post_optionality_valuation_pass(val)
     val_path.write_text(json.dumps(val, indent=2) + "\n", encoding="utf-8")
     og = val.get("optionality_gate") or {}
     print(
         f"OK {ticker} optionality refresh as_of={TODAY} "
-        f"floor={og.get('floor_value')} overlay_irr={og.get('overlay_implied_return_pct')}%"
+        f"floor={og.get('floor_value')} overlay_nav={og.get('overlay_nav_per_share')}"
     )
     return True
 
@@ -258,7 +274,7 @@ def main() -> int:
         if not vp.exists():
             continue
         val = json.loads(vp.read_text(encoding="utf-8"))
-        if (val.get("evidence_refresh") or {}).get("type"):
+        if has_evidence_refresh_config(val):
             if not refresh_ticker(td.name):
                 rc = 1
     return rc
