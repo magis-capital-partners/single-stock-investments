@@ -14,8 +14,8 @@
 | **Implied 10yr IRR** (base) | 7.58% (total synthesis) |
 | **IRR method** | full |
 | **Lawrence bucket** | multi_sided |
-| **Payoff lens** | — |
-| **MOI bucket** | — |
+| **Payoff lens** | pending |
+| **MOI bucket** | pending |
 
 **Deep dive:** `SNOW/research/deep_dive_2026-06-01.md` (auto-sync)
 

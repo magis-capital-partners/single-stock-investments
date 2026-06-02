@@ -1,6 +1,6 @@
 # LB — Investment Thesis
 
-**Last updated:** 2026-06-02
+**Last updated:** auto-sync
 
 ## Classification
 
@@ -11,8 +11,13 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | mid |
+| **Implied 10yr IRR** (base) | 1.83% (total synthesis) |
+| **IRR method** | full |
+| **Lawrence bucket** | pricing_power |
 | **Payoff lens** | asset |
-| **Predictive attribute** | ipo_spinoff_complexity |
+| **MOI bucket** | pending |
+
+**Deep dive:** `LB/research/deep_dive_2026-06-02.md` (auto-sync)
 
 ## One-line thesis
 

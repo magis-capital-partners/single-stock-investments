@@ -14,8 +14,8 @@
 | **Implied 10yr IRR** (base) | 10.3% (base) |
 | **IRR method** | yield_curve |
 | **Lawrence bucket** | other |
-| **Payoff lens** | — |
-| **MOI bucket** | — |
+| **Payoff lens** | pending |
+| **MOI bucket** | pending |
 
 **Deep dive:** `MSB/research/deep_dive_2026-06-01.md` (auto-sync)
 
