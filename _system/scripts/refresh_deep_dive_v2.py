@@ -784,6 +784,20 @@ def section_body_empty(body: str, heading: str) -> bool:
     return bool(pat3.search(body))
 
 
+def replace_h4_section(body: str, heading: str, new_block: str) -> str:
+    """Replace a #### section through the next ####, ##, **Disruption, or EOF."""
+    if not new_block.strip():
+        return body
+    esc = re.escape(heading)
+    pat = re.compile(
+        rf"({esc}\s*\n)(.*?)(?=\n#### |\n## |\n\*\*Disruption|\Z)",
+        re.IGNORECASE | re.DOTALL,
+    )
+    if pat.search(body):
+        return pat.sub(lambda m: new_block.rstrip() + "\n\n", body, count=1)
+    return body
+
+
 def option_scan_block(val: dict) -> str:
     rows = val.get("option_scan") or []
     if not rows:
@@ -922,7 +936,15 @@ def optionality_overlay_block(val: dict) -> str:
 
 
 def inject_optionality_sections(body: str, val: dict, ticker: str) -> str:
-    """Fill empty option scan / look-through / SOTP / catalyst blocks from valuation.json."""
+    """Fill option scan / look-through / SOTP / catalyst blocks from valuation.json."""
+    import sys
+
+    _scripts = Path(__file__).resolve().parent
+    if str(_scripts) not in sys.path:
+        sys.path.insert(0, str(_scripts))
+    from optionality_evidence_common import has_evidence_refresh_config
+
+    force_sotp = has_evidence_refresh_config(val)
     if not re.search(r"#### Option scan\b", body, re.I):
         block = option_scan_block(val)
         if block:
@@ -946,26 +968,28 @@ def inject_optionality_sections(body: str, val: dict, ticker: str) -> str:
         ("#### Sum-of-parts or NAV", lambda: sotp_nav_block(val)),
         ("#### Catalyst path", lambda: catalyst_path_block(val)),
     ):
+        block = builder()
+        if not block:
+            continue
+        if force_sotp and heading.lower() in body.lower():
+            body = replace_h4_section(body, heading, block)
+            continue
         if heading.lower() not in body.lower():
-            block = builder()
-            if block:
-                if "#### Look-through snapshot" in body or "#### Sum-of-parts" in body:
-                    body = body.rstrip() + "\n\n" + block
-                elif "**Disruption" in body:
-                    body = inject_before_marker(body, "**Disruption", block)
-                else:
-                    body = body.rstrip() + "\n\n" + block
+            if "#### Look-through snapshot" in body or "#### Sum-of-parts" in body:
+                body = body.rstrip() + "\n\n" + block
+            elif "**Disruption" in body:
+                body = inject_before_marker(body, "**Disruption", block)
+            else:
+                body = body.rstrip() + "\n\n" + block
         elif section_body_empty(body, heading):
-            block = builder()
-            if block:
-                for pat in (
-                    rf"{re.escape(heading)}\s*\n+(?:---\s*\n+)?(?=## |\Z)",
-                    rf"{re.escape(heading)}\s*\n+(?=####|\n---|\n## |\*\*Disruption|\Z)",
-                    rf"{re.escape(heading)}\s*\Z",
-                ):
-                    body, n = re.subn(pat, block + "\n", body, count=1, flags=re.I)
-                    if n:
-                        break
+            for pat in (
+                rf"{re.escape(heading)}\s*\n+(?:---\s*\n+)?(?=## |\Z)",
+                rf"{re.escape(heading)}\s*\n+(?=####|\n---|\n## |\*\*Disruption|\Z)",
+                rf"{re.escape(heading)}\s*\Z",
+            ):
+                body, n = re.subn(pat, block + "\n", body, count=1, flags=re.I)
+                if n:
+                    break
     return body
 
 
@@ -1230,6 +1254,7 @@ def build_valuation_section(ticker: str, val: dict, preserved_val: str | None) -
     scripts = Path(__file__).resolve().parent
     if str(scripts) not in sys.path:
         sys.path.insert(0, str(scripts))
+    from optionality_evidence_common import synthesis_in_dive
     from valuation_synthesis import synthesis_markdown
 
     inputs = val.get("inputs", {})
@@ -1279,9 +1304,10 @@ def build_valuation_section(ticker: str, val: dict, preserved_val: str | None) -
         irr_body,
         "",
     ]
-    syn_body = synthesis_markdown(val)
-    if syn_body:
-        parts += [syn_body, ""]
+    if synthesis_in_dive(val):
+        syn_body = synthesis_markdown(val)
+        if syn_body:
+            parts += [syn_body, ""]
     be_body = book_estimate_section(ticker)
     if be_body and "### Current book value estimate" not in (preserved_val or ""):
         parts += [be_body, ""]

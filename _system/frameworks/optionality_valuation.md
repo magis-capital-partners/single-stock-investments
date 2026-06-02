@@ -182,3 +182,20 @@ Reference this file + external sources in `[PROPOSED MEMORY]` when promoting bel
 | **TPL** | Permian land + NRA + water; GAAP land at zero | `nav_overlay` + segment build; undeveloped reserves option |
 | **MSB** | HK royalty curve | Normalized distribution yield + arbitration timeline |
 | **SJT** | HK royalty curve (existing) | NPI deficit paydown curve |
+
+---
+
+## Mechanical refresh QA gates
+
+After `marvin_valuation.py --write`, run `refresh_optionality_valuation.py` when `evidence_refresh.type` is set (inside `marvin_cloud_refresh.py`).
+
+| `evidence_refresh` key | Role |
+|------------------------|------|
+| `base_payoff_mode` | `fixed_stance_gate` (default) pins payoff; `sum_lines` derives payoff from SOTP sum |
+| `max_residual_uplift_per_share` | `check_evidence_completeness.py` fails if residual/tie_out slack exceeds cap (default 5) |
+| `synthesis_in_dive` | Default **false** for `yield_curve` — Lawrence base is sole headline IRR in deep dive |
+| `synthesis_in_dive: true` | Enables Total synthesis IRR block in markdown |
+
+**Post-pass:** `post_optionality_valuation_pass` syncs `implied_return.base_pct` to Lawrence results and refreshes synthesis NAV path from `optionality_gate.overlay_nav_per_share`.
+
+**Pipeline:** `marvin_cloud_refresh.py {TICKER} --date YYYY-MM-DD --strict-evidence` runs optionality refresh before deep dive v2, forces SOTP/look-through replace, lint, evidence completeness, and cross-check verify.

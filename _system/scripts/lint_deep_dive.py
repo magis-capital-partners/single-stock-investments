@@ -50,6 +50,20 @@ RETURN_MATH = re.compile(r"#### Return math in plain English", re.IGNORECASE)
 IRR_ARITHMETIC = re.compile(r"#### IRR arithmetic \(show your work\)", re.IGNORECASE)
 AI_INFRA = re.compile(r"#### AI infrastructure\b", re.I)
 SYNTHESIS_SECTION = re.compile(r"### Total synthesis IRR \(all sources\)", re.IGNORECASE)
+RETURNS_STATEMENT = re.compile(
+    r"\*\*Returns statement:\*\*[^\n]*?\*\*(-?\d+(?:\.\d+)?)\s*%\*\*",
+    re.IGNORECASE,
+)
+SYNTHESIS_RETURNS = re.compile(
+    r"\*\*Returns statement \(synthesis\):\*\*[^\n]*?\*\*(-?\d+(?:\.\d+)?)\s*%\*\*",
+    re.IGNORECASE,
+)
+EXEC_SUMMARY_IRR = re.compile(
+    r"## Executive summary\s*\n+"
+    r"(?:.*?\n)*?"
+    r".*?(?:expect|annual|return|IRR|per year)[^\n]{0,120}?\*\*(-?\d+(?:\.\d+)?)\s*%\*\*",
+    re.IGNORECASE | re.DOTALL,
+)
 UPSIDE_DOWN = re.compile(r"\*\*Upside / downside from price:\*\*", re.IGNORECASE)
 PRIMARY_RISK = re.compile(r"\*\*Primary risk:\*\*", re.IGNORECASE)
 HOLDING_CO = re.compile(r"\*\*Archetype\*\*.*holding_co", re.IGNORECASE)
@@ -286,8 +300,47 @@ def lint_file(path: Path, *, legacy: bool, strict: bool) -> tuple[list[str], lis
             )
             (errors if strict else warnings).append(msg)
 
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        from optionality_evidence_common import has_evidence_refresh_config, synthesis_in_dive
+
+        base_pct = (val.get("implied_return") or {}).get("base_pct")
+        if base_pct is not None:
+            tol = 0.25
+            rs = RETURNS_STATEMENT.search(text)
+            if rs and abs(float(rs.group(1)) - float(base_pct)) > tol:
+                errors.append(
+                    f"{rel}: Returns statement {rs.group(1)}% vs valuation.json base {base_pct}% (tol {tol}pp)"
+                )
+            exec_body = extract_executive_summary(text) or ""
+            es = EXEC_SUMMARY_IRR.search(exec_body) if exec_body else None
+            if not es:
+                m = re.search(
+                    r"(?:Lawrence|base is|expect)[^\n]{0,80}?(-?\d+(?:\.\d+)?)\s*%\s*(?:\(|per year)",
+                    exec_body,
+                    re.I,
+                )
+                if m:
+                    es_pct = float(m.group(1))
+                    if abs(es_pct - float(base_pct)) > tol:
+                        errors.append(
+                            f"{rel}: Executive summary ~{es_pct}% vs valuation.json base {base_pct}% (tol {tol}pp)"
+                        )
+            elif abs(float(es.group(1)) - float(base_pct)) > tol:
+                errors.append(
+                    f"{rel}: Executive summary {es.group(1)}% vs valuation.json base {base_pct}% (tol {tol}pp)"
+                )
+
         syn = val.get("synthesis") or {}
-        if syn.get("status") == "complete":
+        if val.get("method") == "yield_curve" and has_evidence_refresh_config(val):
+            if SYNTHESIS_RETURNS.search(text) and not synthesis_in_dive(val):
+                errors.append(
+                    f"{rel}: synthesis returns statement present but evidence_refresh.synthesis_in_dive is false"
+                )
+            if SYNTHESIS_SECTION.search(text) and not synthesis_in_dive(val):
+                errors.append(
+                    f"{rel}: Total synthesis IRR section must not appear when synthesis_in_dive is false (yield_curve)"
+                )
+        elif syn.get("status") == "complete" and synthesis_in_dive(val):
             if not SYNTHESIS_SECTION.search(text):
                 errors.append(
                     f"{rel}: valuation.json synthesis complete — missing "
