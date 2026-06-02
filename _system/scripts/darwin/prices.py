@@ -102,7 +102,11 @@ def load_returns_csv(ticker: str) -> tuple[list[str], list[float], str] | None:
     return dates, rets, src
 
 
-def build_return_panel(tickers: list[dict], months: int = 36) -> dict:
+def build_return_panel(
+    tickers: list[dict],
+    months: int = 36,
+    allow_synthetic: bool = True,
+) -> dict:
     """tickers: list of {ticker, market, irr_base_pct}."""
     panel: dict[str, dict] = {}
     common_dates: set[str] | None = None
@@ -118,7 +122,9 @@ def build_return_panel(tickers: list[dict], months: int = 36) -> dict:
         else:
             dates, rets, src = fetch_yahoo_monthly(yahoo_sym, months=months)
         if len(rets) < 6:
-            # Synthetic from IRR prior (monthly drift)
+            if not allow_synthetic:
+                panel[row["ticker"]] = {"dates": [], "returns": [], "source": "missing_returns"}
+                continue
             irr = (row.get("irr_base_pct") or 8.0) / 100.0
             monthly = (1 + irr) ** (1 / 12) - 1
             n = max(months - 1, 12)
@@ -130,6 +136,8 @@ def build_return_panel(tickers: list[dict], months: int = 36) -> dict:
                 dates.append(d)
                 rets.append(monthly)
             src = "synthetic_irr_prior"
+        if len(rets) < 6 and not allow_synthetic:
+            continue
         panel[row["ticker"]] = {"dates": dates, "returns": rets, "source": src}
         ds = set(dates)
         common_dates = ds if common_dates is None else common_dates & ds

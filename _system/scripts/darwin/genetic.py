@@ -20,14 +20,32 @@ def fitness(
     falsifier_map: dict[str, int],
     kappa: float,
     use_adversary: bool = True,
+    pit_mode: bool = False,
+    rows_provider=None,
+    use_latent_in_fitness: bool | None = None,
 ) -> float:
     policy_name = genome.get("policy", "irr_ranked")
-    g = {**genome, "use_latent": True} if latent else dict(genome)
+    if use_latent_in_fitness is None:
+        use_latent_in_fitness = bool(latent) and not pit_mode
+    g = {**genome, "use_latent": use_latent_in_fitness} if latent and use_latent_in_fitness else dict(genome)
 
-    def policy_fn(_ts: list[str], _qi: int) -> dict[str, float]:
-        return apply_policy(policy_name, rows, g, latent)
+    def policy_fn(active: list[str], _qi: int) -> dict[str, float]:
+        if rows_provider:
+            as_of = dates[_qi] if _qi < len(dates) else dates[-1]
+            rrows = rows_provider(as_of, _qi)
+            return apply_policy(policy_name, rrows, g, latent if use_latent_in_fitness else None)
+        sub = [r for r in rows if r["ticker"] in active] if active else rows
+        return apply_policy(policy_name, sub, g, latent if use_latent_in_fitness else None)
 
-    res = simulate(tickers, dates, returns_by_ticker, policy_fn, mandate, falsifier_map)
+    res = simulate(
+        tickers,
+        dates,
+        returns_by_ticker,
+        policy_fn,
+        mandate,
+        falsifier_map,
+        rows_provider=rows_provider,
+    )
     if res.get("error"):
         return -1e6
     sharpe = res.get("sharpe_annualized", 0.0)
@@ -38,7 +56,15 @@ def fitness(
         return normal
 
     stressed_panel = stress_returns(returns_by_ticker)
-    res_s = simulate(tickers, dates, stressed_panel, policy_fn, mandate, falsifier_map)
+    res_s = simulate(
+        tickers,
+        dates,
+        stressed_panel,
+        policy_fn,
+        mandate,
+        falsifier_map,
+        rows_provider=rows_provider,
+    )
     if res_s.get("error"):
         return normal * 0.5
     stressed = res_s.get("sharpe_annualized", 0.0) - kappa * res_s.get("avg_turnover_one_way", 0.0)
@@ -52,6 +78,8 @@ def run_ga(
     mandate: dict,
     latent: dict[str, list[float]] | None,
     training: dict,
+    pit_mode: bool = False,
+    rows_provider=None,
 ) -> tuple[dict, list[dict], list[dict]]:
     tickers = [r["ticker"] for r in rows]
     dates = panel["dates"]
@@ -89,6 +117,8 @@ def run_ga(
                 falsifier_map,
                 kappa,
                 use_adversary=use_adv,
+                pit_mode=pit_mode,
+                rows_provider=rows_provider,
             )
             scored.append((f, g))
             if f > best_f:

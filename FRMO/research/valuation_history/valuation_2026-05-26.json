@@ -1,0 +1,505 @@
+{
+  "ticker": "FRMO",
+  "as_of": "2026-05-26",
+  "valuation_mode": "optionality",
+  "method": "yield_curve",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "holding_co",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "-"
+  },
+  "inputs": {
+    "price": 6.7,
+    "price_source": "Stooq FRMO.US close 2026-05-22",
+    "book_per_share": 7.42,
+    "normalization_note": "Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book.",
+    "book_per_share_filed": 8.56,
+    "book_per_share_current": 7.42
+  },
+  "optionality_gate": {
+    "framework": "holdco_sotp",
+    "floor_pass": true,
+    "floor_metric": "book_per_share",
+    "floor_value": 7.42,
+    "primary_metric": "lawrence_base",
+    "primary_label": "annualized return",
+    "primary_return_pct": 21.9,
+    "incumbent_sleeve": true,
+    "notes": "Trades ~22% below book ($8.55); same SOTP payoffs as prior refresh. HK/MIAX/CMSG catalysts unchanged.",
+    "floor_value_filed": 8.56,
+    "floor_value_current": 7.42,
+    "discount_to_current_book_pct": 9.6
+  },
+  "scenarios": {
+    "bear": {
+      "price": 6.7,
+      "payoff": 9.5,
+      "years": 5,
+      "notes": "Modest recovery toward book; marks flat"
+    },
+    "base": {
+      "price": 6.7,
+      "payoff": 18.0,
+      "years": 5,
+      "payoff_logic": "Sum of parts in valuation.json sotp_build + deep_dive IRR Step 3; sums to $18.00/sh. Multiples 2.1x book and 2.7x price are results, not inputs.",
+      "years_logic": "Model assumption: 5yr mid-point of 3-7yr catalyst window; not 10yr Lawrence; not company guidance.",
+      "notes": "HK re-mark + partial SOTP close; book compounding",
+      "sotp_build": {
+        "shares": 44022781,
+        "shares_source": "2026-02-28_Quarterly_Report.pdf",
+        "book_equity_m": 376.704,
+        "book_per_share": 8.55,
+        "lines": [
+          {
+            "id": "book",
+            "label": "GAAP book (anchor)",
+            "gaap_per_share": 8.55,
+            "uplift_per_share": 0.0,
+            "year5_per_share": 8.55,
+            "math": "376,704,000 / 44,022,781"
+          },
+          {
+            "id": "investment_a",
+            "label": "Investment A look-through (82% of equity)",
+            "gaap_per_share": 7.02,
+            "uplift_per_share": 4.5,
+            "year5_per_share": null,
+            "math": "Bottom-up ~$2.00/sh from weighted holdings (holdco_uplift_explanation.md) + ~$2.50/sh slack until look-through filed. GAAP 309M/44.02M=7.02 inside book."
+          },
+          {
+            "id": "hkhc",
+            "label": "HKHC 4.42% + royalty + subsidiary marks",
+            "gaap_per_share": 0.85,
+            "uplift_per_share": 2.0,
+            "year5_per_share": null,
+            "math": "Incremental: +2.00/sh (~88M). GAAP 37.4M/44.02M=0.85 inside book. SSI HK gap illustrative; HUMAN REVIEW."
+          },
+          {
+            "id": "mih",
+            "label": "MIH/MIAX direct stake",
+            "gaap_per_share": 0.32,
+            "uplift_per_share": 0.5,
+            "year5_per_share": null,
+            "math": "Incremental +0.50/sh. GAAP 13.9M/44.02M=0.32; ~271k MIAX sh at ~$51; price + fund look-through"
+          },
+          {
+            "id": "winland_cmsg",
+            "label": "Winland + CMSG + small options",
+            "gaap_per_share": 0.15,
+            "uplift_per_share": 0.4,
+            "year5_per_share": null,
+            "math": "Incremental +0.40/sh option value; Winland 5.5M + CMSG 0.7M in/near book"
+          },
+          {
+            "id": "investment_b",
+            "label": "Investment B LP sleeve",
+            "gaap_per_share": 0.76,
+            "uplift_per_share": 0.25,
+            "year5_per_share": null,
+            "math": "Incremental: 0.76 x 33% = 0.25/sh. GAAP 33.4M/44.02M inside book"
+          },
+          {
+            "id": "book_growth",
+            "label": "Organic book growth (non-catalyst)",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 1.36,
+            "year5_per_share": null,
+            "math": "8.55 x (1.03^5 - 1) = 1.36/sh. Exactly 3%/yr; not 1.80 (that implied ~3.9%/yr)."
+          },
+          {
+            "id": "tie_out",
+            "label": "Tie-out to $18 payoff (slack / Investment A marks via HKHC)",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 0.44,
+            "year5_per_share": null,
+            "math": "17.56 subtotal + 0.44 = 18.00; replace when Investment A look-through filed"
+          }
+        ],
+        "incremental_uplifts_sum": 9.45,
+        "year5_economic_nav_per_share": 18.0,
+        "sum_check": "8.55 + 4.50 + 2.00 + 0.50 + 0.40 + 0.25 + 1.36 + 0.44 = 18.00",
+        "payoff_equals": "See assumption_ledger in valuation.json; deep_dive Step 3g",
+        "assumption_ledger": {
+          "hkhc": {
+            "uplift_per_share": 2.0,
+            "components": [
+              {
+                "name": "royalty_participation",
+                "today_m": 10.2,
+                "year5_m": 32.0,
+                "incremental_m": 21.8,
+                "per_share": 0.49,
+                "source": "2026-02-28_Quarterly_Report.pdf"
+              },
+              {
+                "name": "ssi_hk_gap_haircut",
+                "gap_m": 20.0,
+                "haircut_pct": 40,
+                "incremental_m": 8.0,
+                "per_share": 0.18,
+                "source": "cross_check_approved_substacks_2026-05-26.md (SSI illustrative; not filing)"
+              },
+              {
+                "name": "hkhc_equity_method",
+                "today_m": 27.187,
+                "year5_m": 43.187,
+                "incremental_m": 16.0,
+                "per_share": 0.36,
+                "source": "2026-02-28_Quarterly_Report.pdf"
+              },
+              {
+                "name": "hkhc_equity_cagr",
+                "hkhc_equity_m_mar2025": 361.018,
+                "cagr_pct": 7,
+                "years": 5,
+                "frmo_pct": 4.42,
+                "incremental_m": 6.4,
+                "per_share": 0.15,
+                "source": "2025-05-31_Annual_Report.pdf HKHC financials"
+              },
+              {
+                "name": "investment_a_hkhc_marks_slack",
+                "incremental_m": 35.8,
+                "per_share": 0.81,
+                "note": "Brings HKHC line to 2.00/sh; HUMAN REVIEW"
+              }
+            ]
+          },
+          "mih_miax": {
+            "uplift_per_share": 0.5,
+            "gaap_fair_value_m": 13.917,
+            "measurement_date": "2026-02-27",
+            "miax_price_at_measurement": 42.6,
+            "miax_price_at_measurement_source": "Yahoo MIAX 2026-02-27",
+            "implied_shares": 326690,
+            "miax_price_today": null,
+            "miax_price_year5": 60.0,
+            "direct_incremental_m": 5.69,
+            "direct_incremental_note": "326690 \u00d7 (60 \u2212 42.60) at measurement date; recalc on refresh",
+            "fund_miax_shares_assumed": 380000,
+            "fund_incremental_m": 3.26,
+            "exchange_rerate_m": 16.43,
+            "mark_date_alignment": "mark_date_alignment.md"
+          },
+          "investment_a_lookthrough": {
+            "weights_path": "FRMO/research/investment_a_weights_2026-06-01.md",
+            "parent_filing_value_m": 308.984,
+            "measurement_date": "2026-02-27",
+            "weights_pct": {
+              "TPL": 52,
+              "GBTC": 14,
+              "MIAX_funds": 8,
+              "WPM": 5,
+              "ICE": 4,
+              "FNV": 3,
+              "HKHC": 5,
+              "residual": 9
+            },
+            "model_uplift_per_share": 4.5,
+            "components": [
+              {
+                "id": "tpl",
+                "weight_pct": 52,
+                "filing_slice_m": 160.67,
+                "ticker": "TPL",
+                "price_at_measurement": 524.29,
+                "year5_price": 680,
+                "mechanism": "Permian royalty ~8% CAGR + partial water re-rate; below HK bull",
+                "incremental_m": 47.72,
+                "per_share": 1.084
+              },
+              {
+                "id": "gbtc",
+                "weight_pct": 14,
+                "filing_slice_m": 43.26,
+                "ticker": "GBTC",
+                "price_at_measurement": 51.13,
+                "year5_price": 72,
+                "mechanism": "Crypto sleeve normalization from cycle lows; not peak bull",
+                "incremental_m": 17.66,
+                "per_share": 0.4012
+              },
+              {
+                "id": "miax_funds",
+                "weight_pct": 8,
+                "filing_slice_m": 24.72,
+                "ticker": "MIAX",
+                "price_at_measurement": 42.6,
+                "year5_price": 60,
+                "mechanism": "Exchange volume growth + listing visibility; aligns with direct MIH thesis",
+                "incremental_m": 10.1,
+                "per_share": 0.2294
+              },
+              {
+                "id": "wpm",
+                "weight_pct": 5,
+                "filing_slice_m": 15.45,
+                "ticker": "WPM",
+                "price_at_measurement": 163.65,
+                "year5_price": 198,
+                "mechanism": "Precious-metals streaming leverage on production growth",
+                "incremental_m": 3.24,
+                "per_share": 0.0736
+              },
+              {
+                "id": "ice",
+                "weight_pct": 4,
+                "filing_slice_m": 12.36,
+                "ticker": "ICE",
+                "price_at_measurement": 164.13,
+                "year5_price": 190,
+                "mechanism": "Data and clearing compounder; modest re-rate",
+                "incremental_m": 1.95,
+                "per_share": 0.0443
+              },
+              {
+                "id": "fnv",
+                "weight_pct": 3,
+                "filing_slice_m": 9.27,
+                "ticker": "FNV",
+                "price_at_measurement": 280.61,
+                "year5_price": 330,
+                "mechanism": "Royalty portfolio growth on mine expansions",
+                "incremental_m": 1.63,
+                "per_share": 0.037
+              },
+              {
+                "id": "hkhc_overlap",
+                "weight_pct": 5,
+                "filing_slice_m": 15.45,
+                "ticker": "HKHC",
+                "price_at_measurement": 33.0,
+                "year5_price": 42,
+                "mechanism": "Listed affiliate re-rate; not FRMO direct equity-method line",
+                "incremental_m": 4.21,
+                "per_share": 0.0956
+              },
+              {
+                "id": "residual",
+                "weight_pct": 9,
+                "filing_slice_m": 27.81,
+                "residual_uplift_pct": 5,
+                "mechanism": "Cash and private names; minimal mark until filed look-through",
+                "incremental_m": 1.39,
+                "per_share": 0.0316
+              }
+            ],
+            "bottom_up_incremental_m": 87.9,
+            "bottom_up_per_share": 1.9967,
+            "blended_uplift_pct_derived": 28.4,
+            "slack_per_share": 2.5033,
+            "note": "blended_uplift_pct_derived = bottom_up / parent GAAP; not an input. See holdco_uplift_explanation.md"
+          },
+          "winland_cmsg": {
+            "uplift_per_share": 0.4,
+            "winland_shares": 2262,
+            "winland_gaap_m": 5.542,
+            "winland_economic_m": 12.0,
+            "cmsg_gaap_m": 0.742,
+            "cmsg_economic_m": 3.0,
+            "platform_option_m": 10.0
+          },
+          "investment_b": {
+            "uplift_per_share": 0.25,
+            "gaap_m": 33.426,
+            "mark_up_pct": 33,
+            "south_lasalle_fair_m": 26.287,
+            "source": "2026-02-28_Quarterly_Report.pdf concentration + Note 4"
+          },
+          "book_growth": {
+            "uplift_per_share": 1.36,
+            "rate_pct": 3.0,
+            "years": 5,
+            "formula": "8.55 * (1.03^5 - 1)",
+            "historical_book_per_share": {
+              "2024-05-31": 5.09,
+              "2025-05-31": 7.26,
+              "2026-02-28": 8.55
+            },
+            "note": "Below recent mark-driven growth; conservative residual"
+          }
+        }
+      }
+    },
+    "bull": {
+      "price": 6.7,
+      "payoff": 25.0,
+      "years": 5,
+      "notes": "HK + MIAX + CMSG listings; Winland control"
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 7.2
+    },
+    "base": {
+      "return_pct": 21.9
+    },
+    "bull": {
+      "return_pct": 30.1
+    }
+  },
+  "implied_return": {
+    "base_pct": 21.9,
+    "label": "annualized return",
+    "display": "21.9% (base)"
+  },
+  "stance_proposal": {
+    "suggested": "accumulate",
+    "irr_band": ">20%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true,
+      "floor_pass": true,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": null
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 7.2
+    },
+    "base": {
+      "return_pct": 21.9
+    },
+    "bull": {
+      "return_pct": 30.1
+    }
+  },
+  "overlay_results": [],
+  "book_estimate": {
+    "as_of": "2026-06-01",
+    "filing_period_end": "2026-02-28",
+    "filing_source": "investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
+    "filed_book_per_share": 8.56,
+    "current_book_per_share": 7.42,
+    "delta_per_share": -1.14,
+    "delta_pct_of_filed_book": -13.34,
+    "discount_to_filed_book_pct": 21.7,
+    "discount_to_current_estimate_pct": 9.6,
+    "config_path": "FRMO/research/book_estimate_config.json",
+    "output_path": "FRMO/research/book_estimate.json"
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Yes",
+      "treatment": "nav_floor",
+      "evidence": "Private exchange stakes below economic value"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "Yes",
+      "treatment": "milestone_nav",
+      "evidence": "MIH, HKHC, Investment A look-through"
+    }
+  ],
+  "catalyst_paths": [
+    {
+      "event": "Base catalyst path",
+      "timing": "5 years",
+      "impact": "HK re-mark + partial SOTP close; book compounding"
+    },
+    {
+      "event": "Failure mode",
+      "timing": "bear scenario",
+      "impact": "Modest recovery toward book; marks flat"
+    }
+  ],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": 7.2,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 30.1,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      },
+      {
+        "id": "third_party_context",
+        "label": "Third-party context (HK + Substacks inventory)",
+        "source": "source_inventory (8 sources); cross_check blend",
+        "return_pct": 30.1,
+        "weight": 0.1,
+        "type": "numeric",
+        "notes": "Proxy: upside case when strategic third party has no spot IRR",
+        "epistemic_tier": "D (external triangulation)",
+        "weight_why": "Context-tier HK/Substacks until human promotes in third_party_sources.md; numeric proxy is weak.",
+        "weight_falsifiers": [
+          "Using bull scenario as HK proxy when cross_check synthesis says no IRR upgrade",
+          "Weight above 15% while human_approval pending"
+        ],
+        "hard_to_vary": "no: proxy return is instrumentalist; prefer qualitative pp until approved blend"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "factor": "Partial dhando (HK hard-asset / hidden NAV)",
+        "pp": 0.5,
+        "rationale": "Third-party confirms asset quality not in GAAP book; not full floor at spot price",
+        "sources": "cross_check_HK; hk_scan; HK Q1 2025/2026"
+      },
+      {
+        "factor": "Governance transition (post-Stahl)",
+        "pp": -0.4,
+        "rationale": "Capital allocation uncertainty until proven",
+        "sources": "https://lemoncakesinvesting.substack.com/p/tpl-texas-pacific-land-co-end-of"
+      },
+      {
+        "factor": "Water scarcity tailwind (SSI / HK index-weight)",
+        "pp": 0.25,
+        "rationale": "TPWR segment + index cannot replicate subsurface water exposure",
+        "sources": "https://specialsituationinvesting.substack.com/p/portfolio-update-gtx-msb-frmo-tpl"
+      },
+      {
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework"
+      }
+    ],
+    "numeric_weighted_pct": 25.86,
+    "qualitative_pp": 0.15,
+    "total_synthesis_pct": 26.01,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [
+        "Third-party numeric path proxies bull scenario (instrumentalist); HK cross-check says no base IRR upgrade. Prefer qualitative pp only until approved blend.",
+        "Qualitative \u00b1pp stack may overlap numeric paths (moat/dhando); cap \u00b13pp and require source for each row."
+      ],
+      "deutsch_checks": {
+        "hard_to_vary": false,
+        "falsifiable": true,
+        "not_instrumentalist": false,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}

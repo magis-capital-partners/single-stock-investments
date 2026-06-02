@@ -12,6 +12,8 @@ PORTFOLIO_PATH = DATA_DIR / "darwin_portfolio.json"
 MODEL_DIR = DATA_DIR / "darwin_models"
 IRA_WEIGHTS_PATH = ROOT / "_system" / "portfolio" / "ira_target_weights.json"
 BACKTEST_REPORT_PATH = DATA_DIR / "darwin_backtest_report.md"
+PIT_STATUS_PATH = DATA_DIR / "darwin_pit_status.json"
+PIT_BACKTEST_PATH = DATA_DIR / "darwin_backtest_pit.json"
 
 
 def load_mandate() -> dict:

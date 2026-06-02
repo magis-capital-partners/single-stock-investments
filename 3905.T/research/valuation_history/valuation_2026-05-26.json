@@ -1,0 +1,142 @@
+{
+  "ticker": "3905.T",
+  "as_of": "2026-05-26",
+  "method": "scenario",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "compounder",
+    "moat": "unproven",
+    "dhando": "none",
+    "cycle": "-"
+  },
+  "inputs": {
+    "price": 4490,
+    "price_source": "Stooq close 2026-05-25 JPY (confirm live)",
+    "per_share": 90,
+    "fcf_source": "Normalized owner earnings bridge: FY2026 guided EPS \u00a5115.57 discounted for ramp/execution risk",
+    "normalization_note": "Scenario IRR on owner earnings, not reported FY2025 loss base"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.02,
+      "growth_y6_10": 0.03,
+      "exit_pfcf_y10": 12,
+      "notes": "DC delays persist; Giga overhang; financing stress"
+    },
+    "base": {
+      "growth_y1_5": 0.15,
+      "growth_y6_10": 0.07,
+      "exit_pfcf_y10": 22,
+      "notes": "FY2026 guide achieved with Inzai phased ops May\u2013Jul 2026"
+    },
+    "bull": {
+      "growth_y1_5": 0.2,
+      "growth_y6_10": 0.1,
+      "exit_pfcf_y10": 30,
+      "notes": "Hyperscaler utilization + second DC wave on schedule"
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -7.1
+    },
+    "base": {
+      "return_pct": 5.7
+    },
+    "bull": {
+      "return_pct": 12.4
+    }
+  },
+  "implied_return": {
+    "base_pct": 6.46,
+    "label": "10yr IRR (total synthesis)",
+    "display": "6.46% (total synthesis)",
+    "falsifier_adjusted_pct": 5.7,
+    "synthesis_pct": 6.46
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": false
+    },
+    "override_reason": null
+  },
+  "overlay_results": [],
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -7.1
+    },
+    "base": {
+      "return_pct": 5.7
+    },
+    "bull": {
+      "return_pct": 12.4
+    }
+  },
+  "option_scan": [
+    {
+      "q": 0,
+      "question": "Material options after scan?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating compounder / croupier \u2014 Lawrence full cash-flow path sufficient"
+    }
+  ],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": -7.1,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 12.4,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework"
+      }
+    ],
+    "numeric_weighted_pct": 6.66,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 6.46,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}

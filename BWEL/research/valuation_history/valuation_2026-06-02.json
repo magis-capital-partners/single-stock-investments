@@ -1,0 +1,277 @@
+{
+  "ticker": "BWEL",
+  "as_of": "2026-06-02",
+  "valuation_mode": "optionality",
+  "method": "full",
+  "lawrence_bucket": "low_cost",
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "narrow",
+    "dhando": "partial",
+    "cycle": "trough"
+  },
+  "inputs": {
+    "price": 548.5,
+    "price_source": "Stooq BWEL.US close 2026-06-01",
+    "fcf_per_share": 22.0,
+    "fcf_source": "Mid-cycle owner cash: FY2024 dividend $20/sh and FY2025 $17.50/sh despite loss; normalized below peak $47.83 EPS",
+    "shares_outstanding": 964210,
+    "book_per_share": 783.2,
+    "book_source": "FY2025 equity $755.1M / 964,210 shares (investor-documents/ir-bwel/2025-06-30_Annual_Report.pdf)",
+    "normalization_note": "FY2025 trough: net loss ($28.9M), NRV/flood charges; Lawrence uses mid-cycle distributable cash not spot loss year."
+  },
+  "nav_overlay": {
+    "enabled": true,
+    "gaap_book_per_share": 783.2,
+    "land_carrying_thousands": 106048,
+    "notes": "Land and water at historical cost; subsurface minerals in CA/OR not separately fair-valued. Do not treat GAAP book as full economic NAV.",
+    "overlay_nav_per_share": 850.0,
+    "overlay_rationale": "[Assumption] Operating PPE + working capital at book; land/water/minerals modest uplift vs $106M land line only; pending human land appraisal."
+  },
+  "optionality_gate": {
+    "framework": "land_mineral_option",
+    "floor_pass": true,
+    "floor_metric": "price_to_book",
+    "floor_value": 783.2,
+    "primary_metric": "lawrence_base",
+    "primary_label": "10yr IRR",
+    "primary_return_pct": 1.1,
+    "incumbent_sleeve": false,
+    "notes": "Price ~0.70x GAAP book; thin OTC liquidity; family control; mineral rights option not in Lawrence FCF path.",
+    "overlay_nav_per_share": 850.0
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.0,
+      "growth_y6_10": 0.0,
+      "exit_pfcf_y10": 10,
+      "notes": "Sustained crop stress, lower dividends, leverage on $280M credit lines"
+    },
+    "base": {
+      "growth_y1_5": 0.025,
+      "growth_y6_10": 0.015,
+      "exit_pfcf_y10": 13,
+      "notes": "Mid-cycle owner cash $22/sh, cotton/tomato normalization after FY2025 NRV/flood charges",
+      "sotp_build": {
+        "shares": 964210,
+        "book_per_share": 783.2,
+        "lines": [
+          {
+            "id": "book",
+            "label": "GAAP equity anchor",
+            "gaap_per_share": 783.2,
+            "uplift_per_share": 0.0,
+            "math": "FY2025 stockholders equity / shares"
+          },
+          {
+            "id": "land_water",
+            "label": "Land, water, and mineral rights above carrying",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 40.0,
+            "math": "[Assumption] Historical cost understates San Joaquin Valley farm estate and subsurface rights"
+          },
+          {
+            "id": "operating_midcycle",
+            "label": "Mid-cycle operating franchise (cotton, processing)",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 26.8,
+            "math": "[Assumption] Normalized earnings power not captured at trough FY2025"
+          },
+          {
+            "id": "tie_out",
+            "label": "Tie-out to economic NAV",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 0.0,
+            "math": "783.2 + 40 + 26.8 = 850"
+          }
+        ],
+        "year5_economic_nav_per_share": 850.0,
+        "sum_check": "783.2 + uplifts = 850",
+        "years": 10,
+        "notes": "Yield-curve cross-check separate from Lawrence FCF path"
+      }
+    },
+    "bull": {
+      "growth_y1_5": 0.04,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 15,
+      "notes": "Strong cotton/pricing, insurance tailwinds repeat, buybacks accretive",
+      "price": 548.5,
+      "payoff": 950.0,
+      "years": 10
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -2.8
+    },
+    "base": {
+      "return_pct": 1.1
+    },
+    "bull": {
+      "return_pct": 3.2
+    }
+  },
+  "implied_return": {
+    "base_pct": 1.1,
+    "label": "annualized return",
+    "display": "1.1% (base)",
+    "falsifier_adjusted_pct": 1.1,
+    "synthesis_pct": 2.86
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true,
+      "floor_pass": true,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": null
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Yes",
+      "treatment": "nav_overlay",
+      "evidence": "Land and related water investments $106M at cost; subsurface oil/gas/mineral interests (FY2025 annual report note 1)"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / acreage / dormant royalty?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "Fractional mineral interests CA/OR; not separately quantified in filings"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Single reportable segment; FY2025 operating loss is cyclical not structural split"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Bill-and-hold $7.08M at June 30, 2025; crop insurance recoveries episodic"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Wholly owned operating agribusiness"
+    },
+    {
+      "q": 6,
+      "question": "Transitory legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Insurance recoveries flow through revenue, not litigation lump sum"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Commodity agriculture and ginning services"
+    }
+  ],
+  "human_review": [],
+  "payoff_lens": "asset",
+  "moi_bucket": "asset",
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -2.8
+    },
+    "base": {
+      "return_pct": 1.1
+    },
+    "bull": {
+      "return_pct": 3.2
+    }
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": -2.8,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 3.2,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      },
+      {
+        "id": "nav_overlay_payoff",
+        "label": "NAV overlay dated payoff (10yr to overlay base)",
+        "source": "nav_overlay ~$850.0/sh vs price $548.5",
+        "return_pct": 4.48,
+        "weight": 0.1,
+        "type": "numeric",
+        "epistemic_tier": "D (alternate theory: dated asset payoff)",
+        "weight_why": "Answers a different question (NAV convergence) than 10yr cash-flow IRR; capped weight to avoid theory conflation.",
+        "weight_falsifiers": [
+          "NAV overlay base not updated when segment build or filings change >10%",
+          "floor_pass false but weight above 15% without [HUMAN REVIEW]"
+        ],
+        "hard_to_vary": "yes: separate theory type"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "factor": "Partial dhando (HK hard-asset / hidden NAV)",
+        "pp": 0.5,
+        "rationale": "Third-party confirms asset quality not in GAAP book; not full floor at spot price",
+        "sources": "cross_check_HK; hk_scan; HK Q1 2025/2026"
+      },
+      {
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework"
+      }
+    ],
+    "numeric_weighted_pct": 2.56,
+    "qualitative_pp": 0.3,
+    "total_synthesis_pct": 2.86,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [
+        "NAV overlay is a different theory (asset payoff vs cash-flow IRR); weight capped at 10% to limit theory conflation."
+      ],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}

@@ -6,6 +6,8 @@ from typing import Callable
 
 from .constraints import apply_constraints
 
+RowsProvider = Callable[[str, int], list[dict]]
+
 
 def rebalance_points(dates: list[str], frequency: str = "quarterly") -> list[int]:
     if not dates:
@@ -42,6 +44,8 @@ def simulate(
     mandate: dict,
     falsifier_by_ticker: dict[str, int] | None = None,
     rebalance_frequency: str | None = None,
+    rows_provider: RowsProvider | None = None,
+    dynamic_tickers: bool = False,
 ) -> dict:
     m = mandate.get("mandate") or mandate
     freq = rebalance_frequency or m.get("rebalance_frequency", "quarterly")
@@ -57,13 +61,21 @@ def simulate(
 
     for ri in range(len(rebals) - 1):
         start, end = rebals[ri], rebals[ri + 1]
-        w = policy_fn(tickers, start)
+        as_of = dates[start] if start < len(dates) else dates[-1]
+        active = tickers
+        fmap = falsifier_by_ticker or {}
+        if rows_provider:
+            rows = rows_provider(as_of, start)
+            active = [r["ticker"] for r in rows]
+            fmap = {r["ticker"]: r.get("falsifier_count", 0) for r in rows}
+
+        w = policy_fn(active, start)
         w, _ = apply_constraints(
-            tickers,
+            active,
             w,
             prev,
             mandate,
-            falsifier_counts=falsifier_by_ticker,
+            falsifier_counts=fmap,
         )
         if prev:
             turnovers.append(
@@ -75,8 +87,8 @@ def simulate(
         for mi in range(start, end):
             r_row = {
                 t: returns_by_ticker[t][mi]
-                for t in tickers
-                if mi < len(returns_by_ticker.get(t, []))
+                for t in active
+                if t in returns_by_ticker and mi < len(returns_by_ticker.get(t, []))
             }
             pr = portfolio_return(w, r_row)
             if mi == start:

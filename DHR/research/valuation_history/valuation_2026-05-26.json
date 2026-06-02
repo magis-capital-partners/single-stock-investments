@@ -1,0 +1,149 @@
+{
+  "ticker": "DHR",
+  "as_of": "2026-05-26",
+  "method": "full",
+  "lawrence_bucket": "pricing_power",
+  "classification_inputs": {
+    "archetype": "compounder",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "-"
+  },
+  "inputs": {
+    "price": 172.29,
+    "price_source": "NYSE close ~May 26, 2026 (Yahoo Finance)",
+    "fcf_per_share": 7.34,
+    "fcf_source": "FY2025 OCF $6.42B \u2212 capex $1.16B \u00f7 ~716M diluted shares (10-K FY2025)",
+    "shares_millions": 716.1,
+    "normalization_note": "Mid-cycle biotech/tools base; diagnostics China weakness in FY2025 not assumed permanent"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.04,
+      "growth_y6_10": 0.03,
+      "exit_pfcf_y10": 18,
+      "notes": "Multi-year biopharma funding slump; diagnostics drag persists"
+    },
+    "base": {
+      "growth_y1_5": 0.07,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 22,
+      "notes": "Core sales modest recovery per FY2025 MD&A; DBS sustains margins"
+    },
+    "bull": {
+      "growth_y1_5": 0.1,
+      "growth_y6_10": 0.07,
+      "exit_pfcf_y10": 26,
+      "notes": "Bioprocessing re-acceleration + China diagnostics normalize"
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 5.8
+    },
+    "base": {
+      "return_pct": 10.1
+    },
+    "bull": {
+      "return_pct": 14.2
+    }
+  },
+  "implied_return": {
+    "base_pct": 12.03,
+    "label": "10yr IRR (total synthesis)",
+    "display": "12.03% (total synthesis)",
+    "falsifier_adjusted_pct": 10.1,
+    "synthesis_pct": 12.03
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "overlay_results": [],
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 5.8
+    },
+    "base": {
+      "return_pct": 10.1
+    },
+    "bull": {
+      "return_pct": 14.2
+    }
+  },
+  "option_scan": [
+    {
+      "q": 0,
+      "question": "Material options after scan?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating compounder / croupier \u2014 Lawrence full cash-flow path sufficient"
+    }
+  ],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": 5.8,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 14.2,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "factor": "Partial dhando (HK hard-asset / hidden NAV)",
+        "pp": 0.5,
+        "rationale": "Third-party confirms asset quality not in GAAP book; not full floor at spot price",
+        "sources": "cross_check_HK; hk_scan; HK Q1 2025/2026"
+      },
+      {
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework"
+      }
+    ],
+    "numeric_weighted_pct": 11.73,
+    "qualitative_pp": 0.3,
+    "total_synthesis_pct": 12.03,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}

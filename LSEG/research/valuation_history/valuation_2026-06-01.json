@@ -1,0 +1,150 @@
+{
+  "ticker": "LSEG",
+  "as_of": "2026-06-01",
+  "method": "full",
+  "lawrence_bucket": "multi_sided",
+  "currency": "GBP",
+  "classification_inputs": {
+    "archetype": "croupier",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid"
+  },
+  "inputs": {
+    "price": 91.26,
+    "price_source": "LSE ~9,126p close 2026-05-29 (shareprices.com)",
+    "fcf_per_share": 4.67,
+    "fcf_source": "FY2025 equity free cash flow \u00a32,445M \u00f7 524M weighted average shares",
+    "shares_millions": 524.0,
+    "normalization_note": "FY2025 mid-cycle base; Q1 2026 organic income +9.8% run-rate above trend (not inflated into starting cash flow)"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.04,
+      "growth_y6_10": 0.03,
+      "exit_pfcf_y10": 18,
+      "notes": "Trading volume mean-reversion, FX headwind, buyback pause"
+    },
+    "base": {
+      "growth_y1_5": 0.07,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 22,
+      "notes": "6.5-7.5% organic income guide; margin expansion; ~20\u00d7 spot P/FCF \u2192 22\u00d7 exit"
+    },
+    "bull": {
+      "growth_y1_5": 0.09,
+      "growth_y6_10": 0.06,
+      "exit_pfcf_y10": 26,
+      "notes": "Sustained Markets volume + AI data distribution (LSEG Everywhere)"
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 8.2
+    },
+    "base": {
+      "return_pct": 12.6
+    },
+    "bull": {
+      "return_pct": 15.7
+    }
+  },
+  "implied_return": {
+    "base_pct": 13.79,
+    "label": "10yr IRR (total synthesis)",
+    "display": "13.79% (total synthesis)",
+    "falsifier_adjusted_pct": 12.6,
+    "synthesis_pct": 13.79
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "overlay_results": [],
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 8.2
+    },
+    "base": {
+      "return_pct": 12.6
+    },
+    "bull": {
+      "return_pct": 15.7
+    }
+  },
+  "option_scan": [
+    {
+      "q": 0,
+      "question": "Material options after scan?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating compounder / croupier \u2014 Lawrence full cash-flow path sufficient"
+    }
+  ],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": 8.2,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 15.7,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "factor": "Partial dhando (HK hard-asset / hidden NAV)",
+        "pp": 0.5,
+        "rationale": "Third-party confirms asset quality not in GAAP book; not full floor at spot price",
+        "sources": "cross_check_HK; hk_scan; HK Q1 2025/2026"
+      },
+      {
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework"
+      }
+    ],
+    "numeric_weighted_pct": 13.49,
+    "qualitative_pp": 0.3,
+    "total_synthesis_pct": 13.79,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}

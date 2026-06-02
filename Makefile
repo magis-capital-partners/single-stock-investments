@@ -4,12 +4,22 @@
 #   make research-check-all
 #   make milly-repass TICKER=QDEL
 
-PYTHON ?= python
+PYTHON ?= python3
 SCRIPTS := _system/scripts
 
 TICKER ?=
 
-.PHONY: research-check research-check-all evidence milly-repass book-estimate book-estimate-all holdco-uplift short-scan hk-scan hk-cross-check-all hk-extract-refresh third-party-scan-all cross-check-all
+.PHONY: research-check research-check-all evidence milly-repass book-estimate book-estimate-all holdco-uplift short-scan hk-scan hk-cross-check-all hk-extract-refresh third-party-scan-all cross-check-all darwin-pit-check darwin-build darwin-pit-audit
+
+darwin-build:
+	$(PYTHON) $(SCRIPTS)/build_darwin_portfolio.py --fast
+
+darwin-pit-audit:
+	$(PYTHON) $(SCRIPTS)/build_darwin_portfolio.py --pit-audit --fast
+
+darwin-pit-check:
+	$(PYTHON) $(SCRIPTS)/build_darwin_portfolio.py --fast
+	$(PYTHON) $(SCRIPTS)/check_darwin_pit.py
 
 research-check:
 ifndef TICKER

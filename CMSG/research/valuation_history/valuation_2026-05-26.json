@@ -1,0 +1,218 @@
+{
+  "ticker": "CMSG",
+  "as_of": "2026-05-26",
+  "method": "scenario",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "unproven",
+    "dhando": "partial",
+    "cycle": "-"
+  },
+  "inputs": {
+    "price": 30.0,
+    "price_source": "OTCQX quote ~May 26, 2026 (Yahoo Finance)",
+    "per_share": 1.45,
+    "fcf_source": "Blended best estimate (65% Marvin $1.35 / 35% partial LCI seigniorage-treasury credit)",
+    "shares_millions": 2.25,
+    "normalization_note": "Primary metric = blended_best; marvin_floor retained for stress"
+  },
+  "estimates": {
+    "marvin_floor": {
+      "per_share": 1.35,
+      "return_pct": 7.7,
+      "exit_multiple": 14,
+      "growth_y1_5": 0.08,
+      "growth_y6_10": 0.05,
+      "notes": "Interest + breakeven mining; marks excluded"
+    },
+    "external": [
+      {
+        "source_id": "lci",
+        "source": "Lemon Cakes: FRMO crypto conglomerate + seigniorage",
+        "path": "CMSG/third-party-analyses/references.md",
+        "per_share": null,
+        "return_pct_approx": 18.8,
+        "horizon_years": 10,
+        "notes": "Treasury accrual framing; bull path if BTC re-rates"
+      },
+      {
+        "source_id": "ssi",
+        "source": "SSI: FRMO flywheel (CMSC listing)",
+        "path": "CMSG/third-party-analyses/references.md",
+        "per_share": null,
+        "return_pct_approx": null,
+        "notes": "Catalyst narrative; listing timeline stale vs OTCQX status"
+      }
+    ],
+    "blended_best": {
+      "per_share": 1.45,
+      "return_pct": 8.7,
+      "exit_multiple": 14,
+      "growth_y1_5": 0.08,
+      "growth_y6_10": 0.05,
+      "weights": "65% marvin_floor / 35% approved Substack (LCI/SSI)",
+      "notes": "approved_substacks.md; still below 15% bar"
+    }
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": -0.05,
+      "growth_y6_10": 0.0,
+      "exit_multiple": 8,
+      "notes": "BTC flat; hash-share erosion; related-party fees post-waiver"
+    },
+    "base": {
+      "growth_y1_5": 0.08,
+      "growth_y6_10": 0.05,
+      "exit_multiple": 14,
+      "notes": "Treasury marks normalize; modest scrypt offset; trading toward book value"
+    },
+    "bull": {
+      "growth_y1_5": 0.2,
+      "growth_y6_10": 0.1,
+      "exit_multiple": 18,
+      "notes": "BTC cycle recovery + network-share stabilization; NAV premium restored"
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -4.7
+    },
+    "base": {
+      "return_pct": 8.7
+    },
+    "bull": {
+      "return_pct": 19.9
+    }
+  },
+  "implied_return": {
+    "base_pct": 15.64,
+    "label": "10yr IRR (total synthesis)",
+    "display": "15.64% (total synthesis)",
+    "falsifier_adjusted_pct": 8.7,
+    "synthesis_pct": 15.64
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "15\u201320%",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "overlay_results": [],
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -4.7
+    },
+    "base": {
+      "return_pct": 8.7
+    },
+    "bull": {
+      "return_pct": 19.9
+    }
+  },
+  "book_estimate": {
+    "as_of": "2026-06-01",
+    "filing_period_end": "2025-12-31",
+    "filing_source": "investor-documents/otcmarkets/CMSG_OTCQX_Annual_Disclosure_2025-12-31.pdf",
+    "filed_book_per_share": 41.28,
+    "current_book_per_share": 38.68,
+    "delta_per_share": -2.6,
+    "delta_pct_of_filed_book": -6.3,
+    "discount_to_filed_book_pct": 27.3,
+    "discount_to_current_estimate_pct": 22.4,
+    "config_path": "CMSG/research/book_estimate_config.json",
+    "output_path": "CMSG/research/book_estimate.json"
+  },
+  "option_scan": [
+    {
+      "q": 0,
+      "question": "Material options after scan?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating compounder / croupier \u2014 Lawrence full cash-flow path sufficient"
+    }
+  ],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": -4.7,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 19.9,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      },
+      {
+        "id": "third_party_context",
+        "label": "Third-party context (HK + Substacks inventory)",
+        "source": "source_inventory (6 sources); cross_check blend",
+        "return_pct": 19.9,
+        "weight": 0.1,
+        "type": "numeric",
+        "notes": "Proxy: upside case when strategic third party has no spot IRR",
+        "epistemic_tier": "D (external triangulation)",
+        "weight_why": "Context-tier HK/Substacks until human promotes in third_party_sources.md; numeric proxy is weak.",
+        "weight_falsifiers": [
+          "Using bull scenario as HK proxy when cross_check synthesis says no IRR upgrade",
+          "Weight above 15% while human_approval pending"
+        ],
+        "hard_to_vary": "no: proxy return is instrumentalist; prefer qualitative pp until approved blend"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "factor": "Partial dhando (HK hard-asset / hidden NAV)",
+        "pp": 0.5,
+        "rationale": "Third-party confirms asset quality not in GAAP book; not full floor at spot price",
+        "sources": "cross_check_HK; hk_scan; HK Q1 2025/2026"
+      },
+      {
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework"
+      }
+    ],
+    "numeric_weighted_pct": 15.34,
+    "qualitative_pp": 0.3,
+    "total_synthesis_pct": 15.64,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [
+        "Third-party numeric path proxies bull scenario (instrumentalist); HK cross-check says no base IRR upgrade. Prefer qualitative pp only until approved blend."
+      ],
+      "deutsch_checks": {
+        "hard_to_vary": false,
+        "falsifiable": true,
+        "not_instrumentalist": false,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}

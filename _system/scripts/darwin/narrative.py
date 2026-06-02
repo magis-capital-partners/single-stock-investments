@@ -22,14 +22,22 @@ def _hash_embed(text: str, dim: int = 8) -> list[float]:
     return [round(x / norm, 4) for x in vec]
 
 
-def executive_summary_snippet(ticker_dir: Path) -> str:
+def executive_summary_snippet(ticker_dir: Path, as_of: str | None = None) -> str:
     research = ticker_dir / "research"
     if not research.exists():
         return ""
-    dives = sorted(research.glob("deep_dive_*.md"), reverse=True)
-    if not dives:
-        return ""
-    text = dives[0].read_text(encoding="utf-8", errors="ignore")
+    if as_of:
+        from .pit import latest_dated_md_as_of
+
+        dive_path = latest_dated_md_as_of(research, "deep_dive", as_of)
+        if not dive_path:
+            return ""
+        text = dive_path.read_text(encoding="utf-8", errors="ignore")
+    else:
+        dives = sorted(research.glob("deep_dive_*.md"), reverse=True)
+        if not dives:
+            return ""
+        text = dives[0].read_text(encoding="utf-8", errors="ignore")
     for heading in ("Executive summary", "## Executive summary", "### Executive summary"):
         idx = text.find(heading)
         if idx >= 0:
@@ -39,9 +47,9 @@ def executive_summary_snippet(ticker_dir: Path) -> str:
     return text[:600]
 
 
-def narrative_features_for_row(ticker: str, one_line: str | None) -> dict:
+def narrative_features_for_row(ticker: str, one_line: str | None, as_of: str | None = None) -> dict:
     ticker_dir = ROOT / ticker
-    snippet = executive_summary_snippet(ticker_dir)
+    snippet = executive_summary_snippet(ticker_dir, as_of=as_of)
     combined = " ".join(filter(None, [one_line or "", snippet]))
     emb = _hash_embed(combined, dim=8)
     return {
