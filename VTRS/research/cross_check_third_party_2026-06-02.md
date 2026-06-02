@@ -9,13 +9,15 @@
 
 ## Executive summary
 
-No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (10-K, 10-Q, IR). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (FY2025 10-K, Q1 2026 10-Q, proxy). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
 
-**Synthesis:** Marvin floor only; no external blend.
+**Synthesis:** Marvin floor only; no external blend. Base IRR ~8% at $15.69 on normalized owner cash.
 
 ## Sources in scope
 
-| (none) | Primary filings only | — | — | n/a |
+| ID | Source | Status | Path |
+|----|--------|--------|------|
+| — | Primary filings only | n/a | `VTRS/investor-documents/sec-edgar/` |
 
 ## Agreements (facts)
 
@@ -33,13 +35,13 @@ No third-party sources are indexed for this ticker as of this scan. Marvin stanc
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | — | — | — |
+| Marvin floor | ~$1.38/sh normalized FCF | ~8% / 10yr | watch |
 | External (combined) | — | — | — |
-| **Blended best estimate** | **—** | **—** | **—** |
+| **Blended best estimate** | **~$1.38/sh** | **~8%** | **watch** |
 
-**Weights:** *[Document why]*
+**Weights:** 100% Marvin (no approved external).
 
-**Returns statement (blended):** *[One sentence; pending sources not in base IRR]*
+**Returns statement (blended):** At today's price, filings-only normalized cash flow supports about **8%** per year, below the 15% accumulate band.
 
 ## [HUMAN REVIEW]
 

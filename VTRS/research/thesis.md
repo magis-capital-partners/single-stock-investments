@@ -6,24 +6,25 @@
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
+| **Archetype** (Stahl) | turnaround |
 | **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Cycle** | transition |
+| **MOI bucket** (legacy) | complexity_discount |
+| **Payoff lens** | operating |
 
 ## One-line thesis
 
-Viatris Inc — thesis pending Marvin deep dive.
+Post-EWSR generic pharma cash generator at ~9% FCF yield, but ~$14B net debt and unproven moat keep stance **watch** until deleveraging and base-business growth confirm in filings (~8% Lawrence base IRR at $15.69).
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest annual report (FY2025 10-K)
+- [x] Read latest quarterly report (Q1 2026 10-Q)
+- [ ] Verify maintenance capex in cash flow statement
+- [ ] Harvest IR PDFs / earnings deck via Vicki
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-06-02; awaiting deep dive.
+- Capex normalization assumption ($450M) pending human OK.
