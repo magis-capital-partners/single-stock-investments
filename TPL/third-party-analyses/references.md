@@ -6,6 +6,9 @@
 | Lessons from Murray Stahl | ~2022+ | https://lemoncakesinvesting.substack.com/p/lessons-from-murray-stahl | **Approved (LCI)** — structural ownership / TPL concentration via HK; context |
 | FRMO: The Most Important Things — Part 1 | 2022-07 | https://lemoncakesinvesting.substack.com/p/frmo-the-most-important-things-part | **Approved (LCI)** — commodity / TPL weight in FRMO book; context |
 | $TPL: End of an era and opportunity for change | 2026 | https://lemoncakesinvesting.substack.com/p/tpl-texas-pacific-land-co-end-of | **Approved (LCI)** — post-Stahl governance; **[HUMAN REVIEW]** for stance, not in base IRR |
+| Water rights: the hidden asset | 2026-05-21 | https://groundbreakerre.substack.com/p/water-rights-the-hidden-asset-the | **Approved (Groundbreaker)** — macro water scarcity + power–water lag; TPL in water complex; **context**, not base IRR |
+
+**Cross-check (Groundbreaker):** `TPL/research/cross_check_groundbreaker_2026-06-02.md`
 
 ## Horizon Kinetics (HK scan)
 

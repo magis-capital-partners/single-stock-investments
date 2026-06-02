@@ -2,7 +2,7 @@
 
 **Purpose:** Marvin may **blend** only human-approved external research into IRR and stance. Everything else is cited as **pending** until you approve.
 
-**Approved today:** See `approved_substacks.md` (SSI, Lemon Cakes).  
+**Approved today:** See `approved_substacks.md` (SSI, Lemon Cakes, Groundbreaker RE).  
 **This file:** Proprietary letters, sell-side notes, fund letters, and other PDFs in ticker folders.
 
 ---
@@ -26,6 +26,7 @@
 |----|-----------|---------|------|----------|
 | `ssi` | Special Situation Investing | FRMO, CMSG, KEWL, … | `approved_substacks.md` | 2026-05-26 |
 | `lci` | Lemon Cakes Investing | FRMO, CMSG, … | `approved_substacks.md` | 2026-05-26 |
+| `groundbreaker` | Groundbreaker RE (Substack) | BWEL, TPL, WBI | `approved_substacks.md` | **2026-06-02** (human: yes — water-rights lens; context tier for unverified acre-foot NAV until filings) |
 | `mcintyre` | McIntyre Partnerships | QDEL | `QDEL/investor-documents/research-notes/McIntyre_Partnerships_Q1_2026_Letter.pdf` | **2026-05-28** (human: yes — QDEL blend) |
 | `apld_pf3_summary` | Applied Digital / Marvin shop summary (PF3 PR) | APLD | `APLD/investor-documents/research-notes/2026-05-20_Polaris_Forge_3_lease_summary.md` | **2026-05-28** (human: yes) |
 | `apld_reiterate_buy` | Research note (run-the-table bull case) | APLD | `APLD/investor-documents/research-notes/What Would A Run The Table Scenario Look Like_ Reiterate BUY.pdf` | **2026-05-28** (human: yes — catalyst / bull framing; not sole IRR anchor) |
