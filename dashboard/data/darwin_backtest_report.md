@@ -1,6 +1,6 @@
 # Darwin backtest report
 
-Generated: 2026-06-02T21:01:58Z
+Generated: 2026-06-02T22:21:03Z
 Policy: **ensemble** · Regime: **calm**
 
 ## Champion vs baselines
@@ -10,10 +10,10 @@ Policy: **ensemble** · Regime: **calm**
 | ira_marvin | -4.634 | -19.2% | 0.0% |
 | equal_weight | 0.672 | 13.2% | 0.0% |
 | irr_ranked | -3.273 | -11.3% | 0.0% |
-| genetic | 0.89 | 9.4% | 0.0% |
-| ppo | 0.964 | 32.7% | 0.0% |
-| ensemble | 1.121 | 30.4% | 0.0% |
-| champion | 1.121 | 30.4% | 0.0% |
+| genetic | 1.082 | 11.6% | 0.0% |
+| ppo | 1.092 | 33.7% | 0.0% |
+| ensemble | 1.249 | 30.4% | 0.0% |
+| champion | 1.249 | 30.4% | 0.0% |
 | spy | 0.656 | 5.4% | 0.0% |
 
 ## PIT discipline
@@ -25,9 +25,15 @@ Policy: **ensemble** · Regime: **calm**
 
 ## Human review
 
+- **3905.T**: human_review_pending (review)
+- **3905.T**: high_weight_low_stance (review)
 - **8697.T**: human_review_pending (review)
 - **AMZN**: human_review_pending (review)
 - **GOOGL**: human_review_pending (review)
+- **KEWL**: human_review_pending (review)
+- **KEWL**: high_weight_low_stance (review)
 - **SPGI**: human_review_pending (review)
+- **TPL**: human_review_pending (review)
+- **TPL**: high_weight_low_stance (review)
 
 IRA paper portfolio / research tool. Not tax or investment advice. Inspired by Darwin AI Ventures public positioning and 1Q26 letter themes; does not replicate proprietary models.
