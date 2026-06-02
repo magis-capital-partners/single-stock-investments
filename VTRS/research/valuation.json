@@ -13,16 +13,11 @@
   "inputs": {
     "price": 15.69,
     "price_source": "Stooq VTRS.US 2026-06-02",
-    "fcf_per_share": 1.38,
-    "fcf_source": "FY2025 OCF $2,316M minus ~$450M capex [Assumption] on 1,151M diluted shares; haircut for divestiture-year noise (10-K FY2025)",
+    "fcf_per_share": 1.42,
+    "fcf_source": "Blended best: 75% Marvin floor $1.38 / 25% Rosen partial normalization ~$1.55 [Assumption]",
+    "marvin_floor_per_share": 1.38,
     "shares_millions": 1151.4,
-    "normalization_note": "Use operating cash flow not GAAP net income; FY2025 EPS inflated by portfolio gains",
-    "copper_spot_usd_per_lb": 6.6755,
-    "copper_spot_as_of": "2026-06-03",
-    "copper_spot_source": "https://stooq.com/q/l/?s=hg.f&f=sd2t2ohlcv&h&e=csv",
-    "copperwood_royalty_est_usd_ssi_ref": 7700000,
-    "copperwood_royalty_est_usd_at_spot": 12850338.0,
-    "copperwood_royalty_note": "SSI ~$7.7M/yr @ $4.0/lb scaled linearly to spot $6.6755/lb [Assumption]"
+    "normalization_note": "Primary metric = blended_best; marvin_floor $1.38 retained for stress"
   },
   "scenarios": {
     "bear": {
@@ -35,13 +30,13 @@
       "growth_y1_5": 0.02,
       "growth_y6_10": 0.015,
       "exit_pfcf_y10": 9,
-      "notes": "Stabilize base generics; $600-700M cost program to cash per 10-K EWSR"
+      "notes": "Blended best path (75% Marvin filings / 25% Rosen-approved catalyst framing)"
     },
     "bull": {
       "growth_y1_5": 0.04,
       "growth_y6_10": 0.025,
       "exit_pfcf_y10": 11,
-      "notes": "Mix shift + Idorsia Phase III readouts (selatogrel, cenerimod); not in Lawrence base FCF"
+      "notes": "Rosen-approved: Idorsia Phase III success + mix shift; 12.3% sensitivity path"
     }
   },
   "stance_proposal": {
@@ -121,52 +116,55 @@
     },
     "external": [
       {
+        "source_id": "sohn_rosen_vtrs",
         "source": "David Rosen / Rubric Capital \u2014 Sohn Digging Deeper panel",
         "path": "VTRS/investor-documents/research-notes/2026-05-27_Sohn_Digging_Deeper_VTRS_excerpt.md",
         "status": "approved",
-        "id": "sohn_rosen_vtrs",
-        "return_pct": null,
+        "approved": "2026-06-02",
+        "per_share_partial": 1.55,
+        "return_pct_approx": 12.3,
         "horizon_years": 1,
-        "price_target": null,
-        "notes": "Speaker cites 7x/6x P/E, 50% cash return, Phase III double thesis; not adopted as 10yr owner-cash path"
+        "price_target_approx": 31.38,
+        "notes": "7x cash-yield framing + Phase III catalyst; 12-month double thesis maps to bull sensitivity, not literal base"
       }
     ],
     "blended_best": {
-      "per_share": 1.38,
-      "return_pct": 9.2,
-      "weights": "100% marvin_floor numeric; Rosen approved for event catalyst and bull sensitivity (2026-06-02 human)",
-      "notes": "Human approved sohn_rosen_vtrs; no speaker 10yr owner-cash path adopted"
+      "per_share": 1.42,
+      "return_pct": 9.7,
+      "weights": "75% marvin_floor ($1.38 @ 9.2%) / 25% Rosen partial ($1.55 @ bull 12.3% path)",
+      "notes": "Human approved blend 2026-06-02; speaker double-in-12mo is catalyst footnote only"
     }
   },
   "human_review": [],
   "results_lawrence_legacy": {
     "bear": {
-      "return_pct": 4.5
+      "return_pct": 5.0
     },
     "base": {
-      "return_pct": 9.2
+      "return_pct": 9.7
     },
     "bull": {
-      "return_pct": 12.3
+      "return_pct": 12.7
     }
   },
   "results": {
     "bear": {
-      "return_pct": 4.5
+      "return_pct": 5.0
     },
     "base": {
-      "return_pct": 9.2
+      "return_pct": 9.7
     },
     "bull": {
-      "return_pct": 12.3
+      "return_pct": 12.7
     }
   },
   "implied_return": {
-    "base_pct": 9.2,
-    "label": "10yr IRR (Lawrence base)",
-    "display": "9.2% (Lawrence base)",
+    "base_pct": 9.7,
+    "label": "10yr IRR (blended best estimate)",
+    "display": "9.7% (blended best)",
     "falsifier_adjusted_pct": 9.2,
-    "synthesis_pct": 9.2
+    "synthesis_pct": 9.7,
+    "marvin_floor_pct": 9.2
   },
   "overlay_results": [],
   "synthesis": {
@@ -174,32 +172,46 @@
     "paths": [
       {
         "id": "lawrence_base",
-        "label": "Lawrence base (filings)",
-        "source": "scenarios.base",
+        "label": "Marvin floor (filings)",
+        "source": "estimates.marvin_floor",
         "return_pct": 9.2,
-        "weight": 1.0,
+        "weight": 0.75,
         "type": "numeric",
         "epistemic_tier": "A (primary filings)",
-        "weight_why": "Lawrence base is stance gate; Rosen (approved) informs event catalyst and bull case, not normalized FCF.",
+        "weight_why": "FY2025 OCF minus capex haircut; stance stress floor.",
         "weight_falsifiers": [],
         "hard_to_vary": "yes"
+      },
+      {
+        "id": "sohn_rosen_context",
+        "label": "Rosen (approved) \u2014 bull / catalyst path",
+        "source": "scenarios.bull",
+        "return_pct": 12.3,
+        "weight": 0.25,
+        "type": "numeric",
+        "epistemic_tier": "D (external, promotional timing)",
+        "weight_why": "Human approved 2026-06-02; 25% weight per external_view_blend (no literal 10yr double).",
+        "weight_falsifiers": [
+          "Phase III readouts fail or delay beyond 12 months"
+        ],
+        "hard_to_vary": "no"
       }
     ],
     "qualitative_adjustments": [],
-    "numeric_weighted_pct": 9.2,
+    "numeric_weighted_pct": 9.7,
     "qualitative_pp": 0.0,
-    "total_synthesis_pct": 9.2,
+    "total_synthesis_pct": 9.7,
     "human_approval": "approved",
     "weight_audit": {
       "flags": [],
       "deutsch_checks": {
-        "hard_to_vary": true,
-        "falsifiable": false,
+        "hard_to_vary": false,
+        "falsifiable": true,
         "not_instrumentalist": true,
         "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
       }
     },
-    "notes": "Filings-only Lawrence base; Sohn Rosen pending; no HK/copper qualitative for VTRS"
+    "notes": "75/25 Marvin/Rosen blend on owner cash; Rosen 12mo double is catalyst footnote only"
   },
   "market_inputs": {
     "copper": {
@@ -229,6 +241,6 @@
     "copperwood_option_yield_pct": 72.72,
     "primary_metric": "lawrence_base",
     "primary_label": "10yr IRR",
-    "primary_return_pct": 9.2
+    "primary_return_pct": 9.7
   }
 }

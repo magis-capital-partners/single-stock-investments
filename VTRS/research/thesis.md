@@ -11,7 +11,7 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | transition |
-| **Implied 10yr IRR** (base) | 9.2% (Lawrence base) |
+| **Implied 10yr IRR** (base) | 9.7% (blended best; Marvin floor 9.2%) |
 | **IRR method** | full |
 | **Lawrence bucket** | low_cost |
 | **Payoff lens** | event |
@@ -21,7 +21,7 @@
 
 ## One-line thesis
 
-Post-EWSR generic pharma cash generator at ~9% owner-cash yield; Idorsia Phase III (selatogrel, cenerimod) is filing-backed event optionality; Sohn Rosen (approved) flags 6–9 month readout catalyst. ~$14B net debt and unproven moat keep **watch** (9.2% Lawrence base at $15.69).
+Post-EWSR generic pharma; **9.7%** blended IRR ($1.42/sh, 75% Marvin / 25% Rosen approved); Marvin floor **9.2%** on $1.38. Idorsia Phase III catalyst per Rosen. ~$14B net debt; **watch**.
 
 ## Key questions
 

@@ -8,7 +8,7 @@
 
 ## Executive summary
 
-**Approved** external: Sohn 2026 panel excerpt (`sohn_rosen_vtrs`, David Rosen / Rubric Capital). Marvin stance remains **filings-first** for numeric IRR; Rosen adds **event** catalyst framing for Idorsia Phase III (filing-confirmed). Base IRR **9.2%** at $15.69 (human approved **2026-06-02**; not speaker P/E path).
+**Approved** external: Sohn 2026 panel excerpt (`sohn_rosen_vtrs`, David Rosen / Rubric Capital). Marvin stance remains **filings-first** for numeric IRR; Rosen adds **event** catalyst framing for Idorsia Phase III (filing-confirmed). Blended IRR **9.7%** at $15.69 (75/25 Marvin/Rosen; human approved **2026-06-02**).
 
 **Synthesis:** Marvin floor 100% for 10yr owner-cash gate; Rosen approved for pipeline readout monitor and bull sensitivity.
 
@@ -43,15 +43,15 @@
 |------|-------------------|------------------|-------------|
 | Marvin floor | ~$1.38/sh normalized FCF | 9.2% / 10yr | watch |
 | External (Rosen, approved) | P/E + pipeline option | 6 to 9 mo readouts (speaker) | catalyst monitor |
-| **Blended best estimate** | **~$1.38/sh** | **9.2%** | **watch** |
+| **Blended best estimate** | **~$1.42/sh** | **9.7%** | **watch** |
 
-**Weights:** 100% Marvin numeric path; Rosen approved **2026-06-02** for event lens (no speaker 10yr owner-cash adopted).
+**Weights:** **75% Marvin** / **25% Rosen** (approved **2026-06-02**); speaker 12-month double is catalyst footnote only.
 
-**Returns statement (blended):** At today's price, filings-only normalized cash flow supports about **9.2%** per year, below the 15% accumulate band.
+**Returns statement (blended):** About **9.7%** per year on **$1.42** blended owner cash; Marvin floor **9.2%** on **$1.38**.
 
 ## Synthesis (best estimate)
 
-Rosen and Marvin **agree** that Viatris owns valuable, filing-disclosed Phase III optionality from Idorsia (**selatogrel**, **cenerimod**). They **disagree** on how much of that is already in the stock: Rosen argues residual-volatility deep value with near-term doubling potential; Marvin keeps normalized owner cash on **~$2.3 billion** operating cash flow with **~$14 billion** net debt and does not move base IRR until trials and capital allocation prove out. **Best estimate:** same **9.2%** ten-year return and **watch** stance; treat Rosen as a **catalyst monitor** for Phase III readouts, not as base-case cash flow.
+Rosen and Marvin **agree** that Viatris owns valuable, filing-disclosed Phase III optionality from Idorsia (**selatogrel**, **cenerimod**). They **disagree** on how much of that is already in the stock: Rosen argues residual-volatility deep value with near-term doubling potential; Marvin keeps normalized owner cash on **~$2.3 billion** operating cash flow with **~$14 billion** net debt and does not move base IRR until trials and capital allocation prove out. **Best estimate:** **9.7%** blended ten-year return (up from **9.2%** Marvin-only) and **watch** stance; Rosen raises owner-cash credit modestly via catalyst path without adopting a full double in twelve months.
 
 ## [HUMAN REVIEW]
 

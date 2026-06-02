@@ -46,4 +46,4 @@
 
 ## Synthesis note (Marvin)
 
-Rosen frames **residual-volatility / deep-value** mispricing plus **Idorsia Phase III optionality** (selatogrel, cenerimod). That supports **watch** with **event** payoff lens on pipeline readouts; does **not** by itself clear 15% Lawrence hurdle at $15.69 without human approval of external blend.
+Rosen frames **residual-volatility / deep-value** mispricing plus **Idorsia Phase III optionality** (selatogrel, cenerimod). **Incorporated (2026-06-02):** 75% Marvin floor / 25% Rosen partial normalization in blended owner cash (**$1.42/sh**, **9.7%** 10yr); 12-month double remains catalyst footnote only.
