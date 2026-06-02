@@ -22,6 +22,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-06-02.
 | GOOGL | GOOGL/ | Alphabet Inc. | US | 2026-06-02 | 2026-06-02 | compounder | hold |
 | ICE | ICE/ | Intercontinental Exchange | US | 2026-06-02 | 2026-06-02 | croupier | hold |
 | KEWL | KEWL/ | Keweenaw Land Association | US | 2026-06-02 | 2026-06-02 | optionality | watch |
+| LB | LB/ | LandBridge Company LLC | US | — | — | unknown | watch |
 | LSEG | LSEG/ | London Stock Exchange Group | US | 2026-06-02 | 2026-06-02 | unknown | watch |
 | META | META/ | Meta Platforms Inc | US | 2026-06-02 | 2026-06-02 | unknown | watch |
 | MSB | MSB/ | Mesabi Trust | US | 2026-06-02 | 2026-06-02 | optionality | watch |
@@ -35,4 +36,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-06-02.
 | VTRS | VTRS/ | Viatris Inc | US | 2026-06-02 | 2026-06-02 | turnaround | watch |
 | WBI | WBI/ | WaterBridge Infrastructure | US | 2026-06-02 | 2026-06-02 | infrastructure | watch |
 
-**28 holdings total.** Registry: `_system/portfolio/registry.json`
+**29 holdings total.** Registry: `_system/portfolio/registry.json`
