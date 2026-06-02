@@ -23,10 +23,15 @@ Do **not** use the legacy five-section-only template as the final shape — run 
 
 ```bash
 python _system/scripts/build_folder_indexes.py --ticker {{TICKER}}
+python _system/scripts/download_transcripts.py {{TICKER}} --register-legacy
 python _system/scripts/build_filing_evidence.py {{TICKER}}
+python _system/scripts/build_management_evidence.py {{TICKER}}
+python _system/scripts/fetch_market_inputs.py {{TICKER}} --merge
 python _system/scripts/refresh_hk_extracts.py
 python _system/scripts/scan_third_party_sources.py {{TICKER}} --with-hk --date {{date}}
 ```
+
+If `valuation.json` has `evidence_refresh`, read `_system/frameworks/evidence_refresh.md`.
 
 Read `{TICKER}/third-party-analyses/source_inventory_{{date}}.md` and every listed source. HK-indexed tickers (TPL, ICE, MSB, SJT): also read `hk_scan_{{date}}.md`.
 
@@ -58,7 +63,9 @@ If **new_documents** or **new_valuation_news**: focus on what changed for owner 
 python _system/scripts/marvin_cloud_refresh.py {{TICKER}} --date {{date}}
 ```
 
-That script runs: third-party scan (+ HK when indexed) → `marvin_valuation.py --write` → `refresh_deep_dive_v2.py` → `lint_deep_dive.py` → Milly adversarial → `sync_classification.py --fix` → `build_dashboard_data.py` → `check_cross_checks.py`.
+That script runs the **full mechanical pipeline**: transcripts → filing + management evidence → market inputs → third-party scan → `marvin_valuation.py --write` → `refresh_optionality_valuation.py` (when `evidence_refresh` set) → `refresh_deep_dive_v2.py` → lint → Milly → `check_evidence_completeness.py` (strict when configured) → classification sync → dashboard → cross-checks.
+
+Batch all holdings: `python _system/scripts/batch_portfolio_refresh.py --date {{date}}` (add `--milly` for adversarial on every ticker). Local QA: `make research-check TICKER={{TICKER}} DATE={{date}}`.
 
 For HK-indexed tickers: `python _system/scripts/check_hk_cross_checks.py {{TICKER}}`
 For all holdings QA: `python _system/scripts/check_cross_checks.py`

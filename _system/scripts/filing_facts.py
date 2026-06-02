@@ -92,13 +92,61 @@ def latest_full_text_path(evidence_dir: Path) -> Path | None:
     text_dir = evidence_dir / "_text"
     if not text_dir.is_dir():
         return None
-    files = sorted(text_dir.glob("*.txt"), key=lambda p: p.stat().st_mtime, reverse=True)
-    # Prefer 10-Q / 10-K in name
-    for pref in ("10-Q", "10_Q", "10-Q", "10-K", "10_K", "Quarterly", "Annual"):
+    files = sorted(text_dir.glob("*.txt"), key=lambda p: p.name, reverse=True)
+    prefs = (
+        "Annual_Report",
+        "annual",
+        "10-K",
+        "10_K",
+        "Semi-Annual",
+        "10-Q",
+        "10_Q",
+        "Quarterly",
+        "Interim",
+    )
+    for pref in prefs:
         for f in files:
-            if pref.lower() in f.name.lower():
+            if pref.lower() in f.name.lower() and "mgmt" not in f.parts:
                 return f
     return files[0] if files else None
+
+
+def parse_otc_prose_metrics(text: str) -> dict:
+    """Extract disclosure-form metrics from OTC / IR PDF text extracts."""
+    metrics: dict = {}
+    m = re.search(r"Total shares outstanding:\s*([\d,]+)", text, re.I)
+    if m:
+        metrics["shares_outstanding"] = {
+            "current": int(m.group(1).replace(",", "")),
+            "source": "otc_disclosure_form",
+        }
+    m = re.search(r"over\s+([\d.]+)\s+million\s+acres", text, re.I)
+    if m:
+        metrics["mineral_acres_gross"] = {
+            "current": f">{m.group(1)}M",
+            "source": "otc_disclosure_form",
+        }
+    m = re.search(r"agreement on\s+([\d,]+)\s+acres", text, re.I)
+    if m:
+        metrics["leased_acres"] = {
+            "current": int(m.group(1).replace(",", "")),
+            "source": "otc_disclosure_form",
+        }
+    for label, key in (
+        (r"Net income[^\d$]*\$?\s*([\d,]+)", "net_income"),
+        (r"Mineral lease[^\d$]*\$?\s*([\d,]+)", "mineral_lease_income"),
+        (r"book value[^\d$]*\$?\s*([\d,.]+)\s*per share", "book_value_per_share"),
+        (r"Total stockholders[^\']*equity[^\d$]*\$?\s*([\d,]+)", "stockholders_equity"),
+    ):
+        m = re.search(label, text, re.I)
+        if m and key not in metrics:
+            raw = m.group(1).replace(",", "")
+            try:
+                val = float(raw)
+            except ValueError:
+                continue
+            metrics[key] = {"current": val, "source": "otc_prose_regex"}
+    return metrics
 
 
 def build_filing_facts(ticker: str, evidence_dir: Path, source_path: Path | None) -> dict:
@@ -110,16 +158,25 @@ def build_filing_facts(ticker: str, evidence_dir: Path, source_path: Path | None
         }
     text = source_path.read_text(encoding="utf-8", errors="ignore")[:250_000]
     ix = parse_ix_fact_lines(text)
+    metrics = canonical_metrics(ix)
+    parser = "ix_facts"
+    if not metrics:
+        otc = parse_otc_prose_metrics(text)
+        if otc:
+            metrics = otc
+            parser = "otc_prose"
     try:
         rel_src = source_path.relative_to(evidence_dir.parent)
     except ValueError:
         rel_src = source_path.name
-    return {
+    out = {
         "ticker": ticker,
         "source_text": str(rel_src).replace("\\", "/"),
-        "metrics": canonical_metrics(ix),
+        "metrics": metrics,
         "raw_tag_count": len(ix),
+        "parser": parser,
     }
+    return out
 
 
 def write_filing_facts_json(ticker_dir: Path, as_of: str) -> Path | None:

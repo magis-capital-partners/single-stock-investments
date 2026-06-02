@@ -43,7 +43,9 @@ Same steps as batch refresh: evidence (optional) → `marvin_valuation.py --writ
 
 **Cloud agent:** prompt source of truth is `_system/prompts/cloud_marvin_runbook.md` (loaded by `marvin_deep_dive.mjs`). CI checks sync via `check_cloud_marvin_sync.py`.
 
-**Batch all holdings:** `python _system/scripts/batch_portfolio_refresh.py --date YYYY-MM-DD`
+**Batch all holdings:** `python _system/scripts/batch_portfolio_refresh.py --date YYYY-MM-DD` (wraps `marvin_cloud_refresh.py`; add `--milly` for full adversarial pass)
+
+**Single ticker mechanical:** `python _system/scripts/marvin_cloud_refresh.py {TICKER} --date YYYY-MM-DD`
 
 **Prose:** `report_prose.md` (fewer abbreviations) + `archetype_valuation_prose.md` (valuation section by Stahl archetype).
 

@@ -8,6 +8,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import json
 import re
 import subprocess
 import sys
@@ -17,6 +18,9 @@ ROOT = Path(__file__).resolve().parents[2]
 SCRIPTS = Path(__file__).resolve().parent
 PY = sys.executable
 TICKER_RE = re.compile(r"^([^/]+)/research/")
+
+sys.path.insert(0, str(SCRIPTS))
+from marvin_pipeline_common import has_evidence_refresh_config  # noqa: E402
 
 
 def tickers_from_diff(base: str) -> list[str]:
@@ -71,6 +75,19 @@ def main() -> int:
             r = subprocess.run(cmd, cwd=ROOT)
             if r.returncode != 0:
                 failed += 1
+        val_path = ROOT / ticker / "research" / "valuation.json"
+        if val_path.exists():
+            try:
+                val = json.loads(val_path.read_text(encoding="utf-8"))
+            except json.JSONDecodeError:
+                val = {}
+            if has_evidence_refresh_config(val) or val.get("valuation_mode") == "optionality":
+                r = subprocess.run(
+                    [PY, str(SCRIPTS / "check_evidence_completeness.py"), ticker],
+                    cwd=ROOT,
+                )
+                if r.returncode != 0:
+                    failed += 1
 
     if failed:
         print(f"\nFAIL: {failed} lint invocation(s)")
