@@ -1,6 +1,6 @@
 # Research QA pipeline (Marvin + Milly)
 # Usage:
-#   make research-check TICKER=QDEL
+#   make research-check TICKER=KEWL DATE=2026-06-01
 #   make research-check-all
 #   make milly-repass TICKER=QDEL
 #   make batch-refresh DATE=2026-06-02
@@ -10,6 +10,7 @@ SCRIPTS := _system/scripts
 DATE ?= $(shell date +%Y-%m-%d)
 
 TICKER ?=
+DATE ?= $(shell date +%Y-%m-%d)
 
 .PHONY: research-check research-check-all evidence milly-repass book-estimate book-estimate-all holdco-uplift short-scan hk-scan hk-cross-check-all hk-extract-refresh third-party-scan-all cross-check-all transcript-sync batch-refresh evidence-check darwin-pit-check darwin-build darwin-pit-audit
 
@@ -25,7 +26,7 @@ darwin-pit-check:
 
 research-check:
 ifndef TICKER
-	$(error Set TICKER= e.g. make research-check TICKER=QDEL)
+	$(error Set TICKER= e.g. make research-check TICKER=KEWL DATE=2026-06-01)
 endif
 	$(PYTHON) $(SCRIPTS)/marvin_cloud_refresh.py $(TICKER) --date $(DATE) --skip-milly --strict-evidence
 	@echo OK: $(TICKER) research-check

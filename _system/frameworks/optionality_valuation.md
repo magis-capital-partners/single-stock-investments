@@ -187,9 +187,9 @@ Reference this file + external sources in `[PROPOSED MEMORY]` when promoting bel
 
 ## Mechanical refresh and market inputs
 
-**Purpose:** Machine layer after `marvin_valuation.py --write`. Config lives in **`valuation.json`**; prose and option scan stay in **`option_treatment.md`**. Do not add a separate framework file for each overlay type.
+**Purpose:** Machine layer after `marvin_valuation.py --write`. Config lives in **`valuation.json`**; prose and option scan stay in **`option_treatment.md`**.
 
-**Single runner:** `python _system/scripts/marvin_cloud_refresh.py {TICKER} --date YYYY-MM-DD` (batch: `batch_portfolio_refresh.py`). Do not maintain parallel mechanical checklists in runbooks.
+**Single runner:** `python _system/scripts/marvin_cloud_refresh.py {TICKER} --date YYYY-MM-DD --strict-evidence` (batch: `batch_portfolio_refresh.py`).
 
 ### When to set `evidence_refresh`
 
@@ -203,30 +203,18 @@ Reference this file + external sources in `[PROPOSED MEMORY]` when promoting bel
 
 - Run `fetch_market_inputs.py {TICKER} --merge` when `evidence_refresh` or commodity keys in `inputs` affect IRR or option yield.
 - Store `as_of`, `source`, `fetched_at` in `{TICKER}/research/market_inputs.json`.
-- **Staleness:** commodity spot must be ≤ **7 days** old at refresh; `check_evidence_completeness.py` and Milly flag older spots.
-- Do not use stale third-party $/lb (e.g. SSI at $4/lb) without scaling to current spot in the assumption ledger.
+- **Staleness:** commodity spot must be ≤ **7 days** old; `check_evidence_completeness.py` flags older spots.
 
-### `evidence_refresh.type: commodity_nav` (example: KEWL)
+### QA gates (`evidence_refresh` keys)
 
-```json
-"evidence_refresh": {
-  "type": "commodity_nav",
-  "commodity": "copper",
-  "royalty_usd_at_ref_lb": {"amount": 7700000, "ref_lb": 4.0, "source": "SSI"},
-  "probability_pct": 35,
-  "lease_annual_usd": 365000,
-  "lease_cap_multiple": 10,
-  "acreage_uplift_per_share": 1.0,
-  "cash_floor_per_share": 3.6,
-  "base_payoff": 30,
-  "bear_payoff": 14,
-  "horizon_years": 7,
-  "payoff_lens": "asset",
-  "seed_filing_facts": true
-}
-```
+| Key | Role |
+|-----|------|
+| `base_payoff_mode` | `fixed_stance_gate` (default) pins payoff; `sum_lines` derives payoff from SOTP sum |
+| `max_residual_uplift_per_share` | Strict run fails if residual/tie_out slack exceeds cap (default 5) |
+| `synthesis_in_dive` | Default **false** for `yield_curve` — Lawrence base is sole headline IRR in deep dive |
+| `synthesis_in_dive: true` | Enables Total synthesis IRR block in markdown |
 
-**Handler:** `refresh_optionality_valuation.py {TICKER}` (invoked automatically inside `marvin_cloud_refresh` after valuation write). New tickers = JSON block only; no `refresh_{TICKER}_valuation.py`.
+**Post-pass:** `post_optionality_valuation_pass` (in `refresh_optionality_valuation.py`) syncs `implied_return.base_pct` to Lawrence results and disables or refreshes synthesis paths.
 
 ### Order inside `marvin_cloud_refresh`
 
@@ -234,9 +222,10 @@ Reference this file + external sources in `[PROPOSED MEMORY]` when promoting bel
 2. `fetch_market_inputs.py --merge`
 3. `marvin_valuation.py --write`
 4. `refresh_optionality_valuation.py` when `evidence_refresh.type` is set
-5. `refresh_deep_dive_v2.py`
-6. Lint + Milly + `check_evidence_completeness.py` (strict when `evidence_refresh` or optionality NAV gate applies)
+5. `fill_cross_check.py` (required when `--strict-evidence`)
+6. `refresh_deep_dive_v2.py` (force-replaces look-through / SOTP when `evidence_refresh` set)
+7. Lint + Milly + `check_evidence_completeness.py --date {date}` (+ second lint when strict)
 
 ### OTC filing facts
 
-When XBRL/IX tags are absent, `filing_facts.py` uses `parse_otc_prose_metrics()` on full-tier `_text/` (shares, acres, lease income). Preserves existing metrics if a new parse is empty. Prefer **Annual_Report** extracts in the evidence tier order.
+When XBRL/IX tags are absent, `filing_facts.py` uses `parse_otc_prose_metrics()` on full-tier `_text/`. Preserves existing metrics if a new parse is empty.

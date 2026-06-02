@@ -349,8 +349,57 @@ def _weight_stress_markdown(paths: list[dict], flags: dict) -> str:
     return "\n".join(lines)
 
 
+def post_optionality_valuation_pass(data: dict) -> None:
+    """After refresh_optionality_valuation: sync synthesis paths; keep Lawrence base for yield_curve."""
+    from optionality_evidence_common import lawrence_base_return_pct, synthesis_in_dive
+
+    method = data.get("method", "")
+    base_lawrence = lawrence_base_return_pct(data)
+    if base_lawrence is not None:
+        ir = data.setdefault("implied_return", {})
+        ir["base_pct"] = base_lawrence
+        ir["label"] = "annualized return"
+        ir["display"] = f"{base_lawrence:.2f}% (base)"
+
+    if method == "yield_curve" and not synthesis_in_dive(data):
+        data["synthesis"] = {
+            "status": "n/a",
+            "reason": "Lawrence yield_curve is stance gate; set evidence_refresh.synthesis_in_dive true to enable capstone blend",
+            "human_approval": "n/a",
+        }
+        return
+
+    existing = data.get("synthesis") or {}
+    paths = list(existing.get("paths") or _default_paths(data))
+    gate = data.get("optionality_gate") or {}
+    overlay_nav = gate.get("overlay_nav_per_share")
+    price = (data.get("inputs") or {}).get("price")
+    for i, p in enumerate(paths):
+        if p.get("id") == "nav_overlay_payoff" and overlay_nav and price and overlay_nav > 0:
+            years = 10
+            nav_irr = ((float(overlay_nav) / float(price)) ** (1 / years) - 1) * 100
+            paths[i] = {
+                **p,
+                "source": f"nav_overlay ~${overlay_nav}/sh vs price ${price}",
+                "return_pct": _round_pct(nav_irr),
+            }
+            break
+    data["synthesis"] = {**existing, "paths": paths}
+    compute_synthesis(data)
+
+
 def compute_synthesis(data: dict) -> dict:
     """Populate data['synthesis'] and update implied_return when complete."""
+    from optionality_evidence_common import synthesis_in_dive
+
+    if data.get("method") == "yield_curve" and not synthesis_in_dive(data):
+        data["synthesis"] = {
+            "status": "n/a",
+            "reason": "Lawrence yield_curve stance gate",
+            "human_approval": "n/a",
+        }
+        return data["synthesis"]
+
     ticker = data.get("ticker", "")
     existing = data.get("synthesis") or {}
     raw_paths = existing.get("paths") or _default_paths(data)
@@ -404,9 +453,10 @@ def compute_synthesis(data: dict) -> dict:
         fa_ref = ir.get("base_pct")
     ir["falsifier_adjusted_pct"] = fa_ref
     ir["synthesis_pct"] = total
-    ir["base_pct"] = total
-    ir["label"] = "10yr IRR (total synthesis)"
-    ir["display"] = f"{total}% (total synthesis)"
+    if data.get("method") != "yield_curve":
+        ir["base_pct"] = total
+        ir["label"] = "10yr IRR (total synthesis)"
+        ir["display"] = f"{total}% (total synthesis)"
     return synthesis
 
 
