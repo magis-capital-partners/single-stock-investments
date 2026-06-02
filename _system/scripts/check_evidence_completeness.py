@@ -4,20 +4,16 @@ from __future__ import annotations
 
 import argparse
 import json
-import re
+import sys
 from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPTS = Path(__file__).resolve().parent
-import sys
-
 sys.path.insert(0, str(SCRIPTS))
-from optionality_evidence_common import (  # noqa: E402
-    has_evidence_refresh_config,
-    max_residual_allowed,
-    residual_slack_per_share,
-)
+
+from marvin_pipeline_common import has_evidence_refresh_config  # noqa: E402
+from optionality_evidence_common import max_residual_allowed, residual_slack_per_share  # noqa: E402
 
 
 def days_old(iso: str | None) -> int | None:
@@ -52,19 +48,23 @@ def check(ticker: str, *, dive_date: str | None = None, strict: bool = False) ->
         if not (data.get("metrics") or data.get("claims")):
             errs.append("filing_facts empty metrics")
         if strict and has_evidence_refresh_config(val) and data.get("parser") == "evidence_refresh_seed":
-            if not any(m.get("source", "").startswith("filing") for m in (data.get("metrics") or {}).values() if isinstance(m, dict)):
+            if not any(
+                isinstance(m, dict) and str(m.get("source", "")).startswith("filing")
+                for m in (data.get("metrics") or {}).values()
+            ):
                 errs.append("filing_facts only evidence_refresh_seed — re-parse latest annual PDF")
 
+    mgmt = list(evidence.glob("management_facts_*.json"))
     tx = list((td / "investor-documents" / "transcripts").glob("*")) if (td / "investor-documents" / "transcripts").exists() else []
-    if tx and not list(evidence.glob("management_facts_*.json")):
+    if tx and not mgmt:
         errs.append("transcripts present but no management_facts")
 
     mi = research / "market_inputs.json"
+    commodity = cfg.get("commodity", "copper")
     if arch == "optionality" or val.get("inputs", {}).get("copperwood_royalty_est_usd") or cfg.get("commodity"):
         if not mi.exists():
             errs.append("missing market_inputs.json for commodity name")
         else:
-            commodity = cfg.get("commodity", "copper")
             cu = (json.loads(mi.read_text(encoding="utf-8")).get("market_inputs") or {}).get(commodity) or {}
             age = days_old(cu.get("as_of"))
             if age is not None and age > 7:
@@ -82,6 +82,11 @@ def check(ticker: str, *, dive_date: str | None = None, strict: bool = False) ->
     if slack is not None and slack > max_residual_allowed(val):
         errs.append(f"residual SOTP slack ${slack}/sh exceeds max {max_residual_allowed(val)}")
 
+    sotp = (val.get("scenarios") or {}).get("base", {}).get("sotp_build", {})
+    for line in sotp.get("lines") or []:
+        if line.get("id") in ("tie_out", "residual") and (line.get("uplift_per_share") or 0) > max_residual_allowed(val):
+            errs.append(f"large {line.get('id')} slack in sotp_build")
+
     if has_evidence_refresh_config(val):
         og = val.get("optionality_gate") or {}
         syn = val.get("synthesis") or {}
@@ -96,13 +101,11 @@ def check(ticker: str, *, dive_date: str | None = None, strict: bool = False) ->
             cc = research / f"cross_check_third_party_{dive_date}.md"
             if not cc.exists():
                 errs.append(f"missing cross_check_third_party_{dive_date}.md")
-            elif "Marvin **" in cc.read_text(encoding="utf-8") and dive_date < "2099":
+            elif strict:
                 base_pct = (val.get("implied_return") or {}).get("base_pct")
                 if base_pct is not None and f"**{base_pct}" not in cc.read_text(encoding="utf-8"):
-                    if strict:
-                        errs.append(f"cross_check stale vs implied_return.base_pct {base_pct}")
+                    errs.append(f"cross_check stale vs implied_return.base_pct {base_pct}")
 
-        syn = val.get("synthesis") or {}
         for q in syn.get("qualitative_adjustments") or []:
             src = str(q.get("sources", ""))
             if "cross_check_HK" in src or "hk_scan" in src:

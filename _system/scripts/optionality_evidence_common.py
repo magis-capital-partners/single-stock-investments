@@ -3,11 +3,7 @@ from __future__ import annotations
 
 from typing import Any
 
-
-def has_evidence_refresh_config(val: dict | None) -> bool:
-    if not val:
-        return False
-    return bool((val.get("evidence_refresh") or {}).get("type"))
+from marvin_pipeline_common import has_evidence_refresh_config  # noqa: F401
 
 
 def synthesis_in_dive(val: dict) -> bool:

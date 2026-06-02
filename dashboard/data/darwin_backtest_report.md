@@ -1,20 +1,27 @@
 # Darwin backtest report
 
-Generated: 2026-06-02T18:00:29Z
-Policy: **ira_marvin** · Regime: **calm**
+Generated: 2026-06-02T21:01:58Z
+Policy: **ensemble** · Regime: **calm**
 
 ## Champion vs baselines
 
 | Policy | Sharpe | Cumulative | Turnover |
 |--------|--------|------------|----------|
 | ira_marvin | -4.634 | -19.2% | 0.0% |
-| equal_weight | 0.633 | 12.6% | 0.0% |
+| equal_weight | 0.672 | 13.2% | 0.0% |
 | irr_ranked | -3.273 | -11.3% | 0.0% |
-| genetic | 0.884 | 9.1% | 0.0% |
-| ppo | -1.675 | -9.8% | 0.0% |
-| ensemble | 0.612 | 6.0% | 0.0% |
-| champion | -4.634 | -19.2% | 0.0% |
+| genetic | 0.89 | 9.4% | 0.0% |
+| ppo | 0.964 | 32.7% | 0.0% |
+| ensemble | 1.121 | 30.4% | 0.0% |
+| champion | 1.121 | 30.4% | 0.0% |
 | spy | 0.656 | 5.4% | 0.0% |
+
+## PIT discipline
+
+- Audit pass: **True** (leakage 0)
+- OOS genetic Sharpe: **0.0** (6 periods)
+- ML OOS eligible: **False**
+
 
 ## Human review
 

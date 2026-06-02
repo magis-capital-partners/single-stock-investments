@@ -17,7 +17,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-06-02.
 | CSGP | CSGP/ | CoStar Group | US | 2026-06-02 | 2026-06-02 | platform | watch |
 | CSU | CSU/ | Constellation Software | CA | 2026-06-02 | 2026-06-02 | compounder | core |
 | DHR | DHR/ | Danaher Corporation | US | 2026-06-02 | 2026-06-02 | compounder | hold |
-| DRR.AX | DRR.AX/ | Deterra Royalties Limited | US | — | — | unknown | watch |
+| DRR.AX | DRR.AX/ | Deterra Royalties Limited | US | 2026-06-02 | 2026-06-02 | unknown | watch |
 | FRMO | FRMO/ | FRMO Corporation | US | 2026-06-02 | 2026-06-02 | holding_co | hold |
 | GOOGL | GOOGL/ | Alphabet Inc. | US | 2026-06-02 | 2026-06-02 | compounder | hold |
 | ICE | ICE/ | Intercontinental Exchange | US | 2026-06-02 | 2026-06-02 | croupier | hold |
@@ -32,6 +32,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-06-02.
 | SPGI | SPGI/ | S&P Global | US | 2026-06-02 | 2026-06-02 | croupier | hold |
 | TEQ.ST | TEQ.ST/ | Teqnion AB | SE | 2026-06-02 | 2026-06-02 | serial_acquirer | hold |
 | TPL | TPL/ | Texas Pacific Land Corporation | US | 2026-06-02 | 2026-06-02 | unknown | watch |
+| VTRS | VTRS/ | Viatris Inc | US | 2026-06-02 | 2026-06-02 | turnaround | watch |
 | WBI | WBI/ | WaterBridge Infrastructure | US | 2026-06-02 | 2026-06-02 | infrastructure | watch |
 
-**27 holdings total.** Registry: `_system/portfolio/registry.json`
+**28 holdings total.** Registry: `_system/portfolio/registry.json`

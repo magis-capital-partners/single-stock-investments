@@ -1,0 +1,192 @@
+{
+  "ticker": "DRR.AX",
+  "as_of": "2026-06-02",
+  "valuation_mode": "optionality",
+  "method": "yield_curve",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "asset"
+  },
+  "inputs": {
+    "price": 4.43,
+    "price_source": "Yahoo Finance DRR.AX close 2026-06-02 (AUD)",
+    "normalized_distribution_per_share": 0.24,
+    "normalization_note": "FY25 total dividend 22c/sh; base uses 24c run-rate (75% NPAT target on ~32c underlying EPS). 1H25 interim cut to 9c reflects iron ore price trough, not normalized MAC volume."
+  },
+  "optionality_gate": {
+    "framework": "royalty_yield_floor",
+    "floor_pass": true,
+    "floor_metric": "dividend_yield",
+    "floor_value": 5.0,
+    "primary_metric": "lawrence_base",
+    "primary_label": "annualized return",
+    "primary_return_pct": 8.0,
+    "incumbent_sleeve": false,
+    "notes": "FY25 dividend yield ~5.0% at AUD 4.43; Lawrence 5yr curve base 8.0%; Thacker Pass and development royalties in overlay bull only."
+  },
+  "scenarios": {
+    "bear": {
+      "price": 4.43,
+      "payoff": 5.2,
+      "years": 5,
+      "notes": "Iron ore price stays weak; dividends 18c/yr; no Thacker milestone; terminal flat"
+    },
+    "base": {
+      "price": 4.43,
+      "payoff": 6.5,
+      "years": 5,
+      "notes": "24c/yr dividends + partial Thacker buyback milestone + MAC volume offset",
+      "sotp_build": {
+        "lines": [
+          {
+            "id": "anchor",
+            "label": "Price anchor today",
+            "gaap_per_share": 4.43,
+            "uplift_per_share": 0.0,
+            "math": "Anchor AUD 4.43/sh"
+          },
+          {
+            "id": "div_cumulative",
+            "label": "Cumulative dividends years 1-5 (~24c/yr)",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 1.2,
+            "math": "5 x AUD 0.24 from FY25 75% payout policy"
+          },
+          {
+            "id": "thacker_milestone",
+            "label": "Thacker Pass buyback milestone (probability-weighted)",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 0.35,
+            "math": "US$13.2m buyback entitlement; first production late 2027 [Assumption]"
+          },
+          {
+            "id": "terminal_rerate",
+            "label": "Terminal re-rate on normalized royalty yield",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 0.52,
+            "math": "MAC hub ramp + gold offtake margin persistence [Assumption]"
+          }
+        ],
+        "year5_economic_nav_per_share": 6.5,
+        "years": 5,
+        "notes": "GAAP net assets 19.1c/sh (Dec-24); intangible royalties drive economic value"
+      }
+    },
+    "bull": {
+      "price": 4.43,
+      "payoff": 8.5,
+      "years": 5,
+      "notes": "Thacker Pass production from late 2027; MAC 145mtpa hub ramp; gold offtakes sustained; dividend re-rating"
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 3.3
+    },
+    "base": {
+      "return_pct": 8.0
+    },
+    "bull": {
+      "return_pct": 13.9
+    }
+  },
+  "implied_return": {
+    "base_pct": 8.0,
+    "label": "annualized return",
+    "display": "8.0% (base)"
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "optionality",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true,
+      "floor_pass": true,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": null
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 3.3
+    },
+    "base": {
+      "return_pct": 8.0
+    },
+    "bull": {
+      "return_pct": 13.9
+    }
+  },
+  "overlay_results": [],
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Yes",
+      "treatment": "nav_overlay",
+      "evidence": "Net tangible assets (42.1)c/sh Dec-24; net assets 19.1c/sh; royalty intangibles carry economic value"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "Thacker Pass GRR 1.05% post buyback; first production late 2027 (FY25 presentation)"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Development-stage royalties in portfolio; Trident acquisition expanded gold offtake book"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option already in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Gold offtake net revenue margin AUD 21.5M FY25 in consolidated revenue"
+    }
+  ],
+  "nav_overlay": {
+    "gaap_net_assets_per_share_aud": 0.191,
+    "gaap_nta_per_share_aud": -0.421,
+    "preferred_measure": "net_assets",
+    "note": "Company states net assets preferred over NTA because NTA excludes royalty intangibles"
+  },
+  "nav_overlay_options": [
+    {
+      "id": "thacker_pass",
+      "label": "Thacker Pass lithium royalty",
+      "option_treatment": "probability_weighted",
+      "base_terminal_value_aud_per_share": 0.35,
+      "base_terminal_rationale": "US$13.2m buyback + 1.05% GRR from late 2027; probability-weighted not in Lawrence FCF0",
+      "evidence": "DRR.AX/investor-documents/asx-announcements/2931000.pdf"
+    },
+    {
+      "id": "development_royalties",
+      "label": "Development and exploration royalty book",
+      "option_treatment": "zero",
+      "base_terminal_value_aud_per_share": 0.0,
+      "base_terminal_rationale": "No filing-level NAV for pre-production assets; zero in base overlay after scan",
+      "evidence": "Corporate presentation portfolio slide; no audited fair values"
+    }
+  ],
+  "human_review": [],
+  "catalyst_paths": [
+    {
+      "event": "Base catalyst path",
+      "timing": "5 years",
+      "impact": "24c/yr dividends + partial Thacker buyback milestone + MAC volume offset"
+    },
+    {
+      "event": "Failure mode",
+      "timing": "bear scenario",
+      "impact": "Iron ore price stays weak; dividends 18c/yr; no Thacker milestone; terminal flat"
+    }
+  ]
+}

@@ -22,7 +22,10 @@ from .features import build_features
 from .gates import human_review_flags
 from .genetic import run_ga
 from .persistence import append_lineage, load_population
-from .pit_snapshot import save_snapshot
+from .pit_audit import run_pit_audit
+from .pit_backtest import run_pit_backtest
+from .pit_snapshot import append_pit_status, save_registry_snapshot, save_snapshot
+from .research_events import rebuild_events_log
 from .policies import apply_policy, policy_equal_weight, policy_irr_ranked
 from .ppo import ppo_weights, train_ppo
 from .prices import build_return_panel, load_returns_csv
@@ -114,6 +117,19 @@ def write_backtest_report(out: dict) -> None:
             f"{(row.get('cumulative_return') or 0) * 100:.1f}% | "
             f"{(row.get('avg_turnover_one_way') or 0) * 100:.1f}% |"
         )
+    pit = out.get("pit") or {}
+    if pit:
+        lines.extend(
+            [
+                "",
+                "## PIT discipline",
+                "",
+                f"- Audit pass: **{pit.get('audit_pass')}** (leakage {pit.get('leakage_count', 0)})",
+                f"- OOS genetic Sharpe: **{pit.get('oos_sharpe_genetic', '—')}** ({pit.get('oos_periods', 0)} periods)",
+                f"- ML OOS eligible: **{pit.get('ml_oos_eligible')}**",
+                "",
+            ]
+        )
     lines.extend(
         [
             "",
@@ -130,8 +146,37 @@ def write_backtest_report(out: dict) -> None:
     BACKTEST_REPORT_PATH.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
-def run_pipeline(write_features: bool = True, fast: bool = False) -> dict:
+def run_pipeline(
+    write_features: bool = True,
+    fast: bool = False,
+    pit_audit_only: bool = False,
+    pit_backtest_only: bool = False,
+    sync_events: bool = False,
+) -> dict:
     mandate_doc = load_mandate()
+    if sync_events:
+        n = rebuild_events_log()
+        return {"sync_events": n}
+
+    if pit_audit_only:
+        audit = run_pit_audit(fast=fast)
+        status = {
+            "generated_at": audit.get("generated_at"),
+            "audit_pass": audit.get("pass"),
+            "leakage_count": audit.get("leakage_count", 0),
+            "synthetic_tickers": audit.get("synthetic_tickers", []),
+            "mode": "audit_only",
+        }
+        append_pit_status(status)
+        return {"pit_audit": audit, "pit_status": status}
+
+    if pit_backtest_only:
+        pit_bt = run_pit_backtest(fast=fast)
+        audit = run_pit_audit(fast=fast)
+        status = _pit_status_from_runs(audit, pit_bt)
+        append_pit_status(status)
+        return {"pit_backtest": pit_bt, "pit_audit": audit, "pit_status": status}
+
     training = dict(mandate_doc.get("training") or {})
     if fast:
         training.update(
@@ -147,6 +192,12 @@ def run_pipeline(write_features: bool = True, fast: bool = False) -> dict:
 
     features = build_features()
     save_snapshot(features)
+    save_registry_snapshot()
+    from .features import holdings_universe
+    from .pit import bootstrap_valuation_history
+
+    rebuild_events_log()
+    bootstrap_valuation_history(holdings_universe())
     if write_features:
         DATA_DIR.mkdir(parents=True, exist_ok=True)
         FEATURES_PATH.write_text(json.dumps(features, indent=2) + "\n", encoding="utf-8")
@@ -313,6 +364,16 @@ def run_pipeline(write_features: bool = True, fast: bool = False) -> dict:
         and (ml_bt.get("periods") or 0) >= min_periods
         and (ml_bt.get("sharpe_annualized") or -999) >= min_sharpe
     )
+    pit_bt: dict = {}
+    pit_audit: dict = {}
+    try:
+        pit_audit = run_pit_audit(fast=fast)
+        pit_bt = run_pit_backtest(fast=fast)
+        if mandate_doc.get("pit", {}).get("require_oos_for_ml", True):
+            use_ml = use_ml and pit_bt.get("ml_oos_eligible", False)
+    except Exception as exc:
+        pit_audit = {"error": str(exc)}
+        pit_bt = {"error": str(exc)}
 
     if use_ensemble and not bt_ens.get("error") and score_bt(bt_ens) >= score_bt(ml_bt) - 0.02:
         policy_id, target_w, champion_bt = ensemble_policy_id, ens_w, bt_ens
@@ -445,9 +506,41 @@ def run_pipeline(write_features: bool = True, fast: bool = False) -> dict:
         "lineage": lineage[-5:],
         "source_alignment_version": (mandate_doc.get("source_overrides") or {}).get("version"),
         "disclaimer": mandate_doc.get("disclaimer"),
+        "pit": {
+            "audit_pass": pit_audit.get("pass"),
+            "leakage_count": pit_audit.get("leakage_count"),
+            "oos_sharpe_genetic": pit_bt.get("oos_sharpe_genetic"),
+            "oos_periods": pit_bt.get("oos_periods"),
+            "ml_oos_eligible": pit_bt.get("ml_oos_eligible"),
+            "synthetic_count": (pit_bt.get("price_panel") or {}).get("synthetic_count"),
+        },
     }
+
+    pit_status = _pit_status_from_runs(pit_audit, pit_bt, production=out)
+    append_pit_status(pit_status)
+    out["pit_status"] = pit_status
 
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     PORTFOLIO_PATH.write_text(json.dumps(out, indent=2) + "\n", encoding="utf-8")
     write_backtest_report(out)
     return out
+
+
+def _pit_status_from_runs(audit: dict, pit_bt: dict, production: dict | None = None) -> dict:
+    return {
+        "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "audit_pass": audit.get("pass"),
+        "leakage_count": audit.get("leakage_count", 0),
+        "synthetic_tickers": audit.get("synthetic_tickers", []),
+        "oos_sharpe_genetic": pit_bt.get("oos_sharpe_genetic"),
+        "oos_sharpe_ira_marvin": (pit_bt.get("benchmarks") or {}).get("oos", {}).get("ira_marvin", {}).get(
+            "sharpe_annualized"
+        ),
+        "oos_periods": pit_bt.get("oos_periods"),
+        "ml_oos_eligible": pit_bt.get("ml_oos_eligible"),
+        "production_policy": (production or {}).get("policy_id"),
+        "production_sharpe_insample": (production or {}).get("benchmarks", {}).get("genetic", {}).get(
+            "sharpe_annualized"
+        ),
+        "pit_error": pit_bt.get("error") or audit.get("error"),
+    }

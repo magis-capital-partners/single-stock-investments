@@ -175,10 +175,28 @@ def load_valuation(ticker_dir: Path) -> dict | None:
     return None
 
 
-def feature_row(ticker: str, holdings_meta: dict, portfolio_class: dict) -> dict:
+def feature_row(
+    ticker: str,
+    holdings_meta: dict,
+    portfolio_class: dict,
+    as_of: str | None = None,
+    registry: dict | None = None,
+) -> dict:
     ticker_dir = ROOT / ticker
     classification = classification_for(ticker, ticker_dir, portfolio_class)
-    val = load_valuation(ticker_dir) or {}
+    if as_of:
+        from .pit import effective_as_of, load_valuation_as_of
+
+        eff = effective_as_of(as_of, 0)
+        val = load_valuation_as_of(ticker_dir, eff) or {}
+        if registry:
+            h = (registry.get("holdings") or {}).get(ticker, {})
+            cl = h.get("classification") or {}
+            for key in ("stance", "archetype", "moat", "dhando", "cycle"):
+                if cl.get(key) and cl[key] not in ("-", "—", "pending"):
+                    classification[key] = cl[key]
+    else:
+        val = load_valuation(ticker_dir) or {}
     ge = val.get("growth_explanation") or {}
     fa = ge.get("falsifier_adjusted") or {}
     triggered = fa.get("triggered") or ge.get("falsifiers_triggered") or []
@@ -206,7 +224,13 @@ def feature_row(ticker: str, holdings_meta: dict, portfolio_class: dict) -> dict
         irr_bull = ir.get("bull_pct")
     irr_fals = fa.get("irr_pct") or ir.get("falsifier_adjusted_pct")
 
-    dive = latest_dated_md(ticker_dir / "research", "deep_dive") if (ticker_dir / "research").exists() else None
+    research = ticker_dir / "research"
+    if as_of and research.exists():
+        from .pit import latest_dated_md_as_of
+
+        dive = latest_dated_md_as_of(research, "deep_dive", as_of)
+    else:
+        dive = latest_dated_md(research, "deep_dive") if research.exists() else None
     dive_date = dated_md_label(dive) if dive else None
 
     completeness = _completeness_stub(ticker_dir)
@@ -219,7 +243,7 @@ def feature_row(ticker: str, holdings_meta: dict, portfolio_class: dict) -> dict
     meta = holdings_meta.get(ticker, {})
     from .narrative import narrative_features_for_row
 
-    narr = narrative_features_for_row(ticker, one_line_thesis(ticker_dir))
+    narr = narrative_features_for_row(ticker, one_line_thesis(ticker_dir), as_of=as_of)
 
     vector = (
         [irr_base or 0.0, irr_bear or irr_base or 0.0, irr_bull or irr_base or 0.0, irr_fals or irr_base or 0.0]
@@ -261,6 +285,7 @@ def feature_row(ticker: str, holdings_meta: dict, portfolio_class: dict) -> dict
         "completeness": completeness,
         "days_since_deep_dive": _days_since(dive_date),
         "deep_dive_date": dive_date,
+        "feature_as_of": as_of,
         "one_line_thesis": one_line_thesis(ticker_dir),
         "human_review_pending": human_pending,
         "narrative_embedding": narr["narrative_embedding"],
@@ -279,17 +304,48 @@ def holdings_universe() -> list[str]:
 
 
 def build_features() -> dict:
+    return build_features_as_of(None)
+
+
+def build_features_as_of(as_of: str | None) -> dict:
     holdings_meta = parse_holdings()
     reg = load_registry()
     for t, h in (reg.get("holdings") or {}).items():
         holdings_meta.setdefault(t, {"company": h.get("company", t), "market": h.get("market", "—")})
     portfolio_class = load_classification()
-    tickers = holdings_universe()
-    rows = [feature_row(t, holdings_meta, portfolio_class) for t in tickers]
+    if as_of:
+        from .pit import effective_as_of, holdings_universe_as_of, load_registry_snapshot_as_of
+
+        eff = effective_as_of(as_of, 0)
+        snap_reg = load_registry_snapshot_as_of(eff) or reg
+        tickers = holdings_universe_as_of(eff, snap_reg)
+        reg = snap_reg
+    else:
+        tickers = holdings_universe()
+    rows = [feature_row(t, holdings_meta, portfolio_class, as_of=as_of, registry=reg) for t in tickers]
     return {
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "as_of": as_of,
         "ticker_count": len(rows),
         "feature_dim": len(rows[0]["feature_vector"]) if rows else 0,
         "feature_names": rows[0]["feature_names"] if rows else [],
         "tickers": rows,
     }
+
+
+def rows_at_rebalance(
+    rebalance_date: str,
+    lag_days: int = 0,
+    prefer_snapshot: bool = True,
+) -> list[dict]:
+    """PIT feature rows for one rebalance date."""
+    from .pit import effective_as_of, load_features_snapshot_as_of
+
+    eff = effective_as_of(rebalance_date, lag_days)
+    if prefer_snapshot:
+        snap = load_features_snapshot_as_of(eff)
+        if snap and snap.get("tickers"):
+            snap_day = (snap.get("generated_at") or "")[:10]
+            if snap_day and snap_day <= eff:
+                return snap["tickers"]
+    return build_features_as_of(eff)["tickers"]

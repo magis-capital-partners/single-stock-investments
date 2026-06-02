@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Config-driven optionality / commodity NAV refresh (after marvin_valuation --write).
+"""Config-driven optionality / commodity NAV refresh (post marvin_valuation --write).
 
-Reads valuation.json → evidence_refresh (type commodity_nav). Invoked by marvin_cloud_refresh.
+Reads valuation.json → evidence_refresh (type commodity_nav). Used by marvin_cloud_refresh.
 """
 from __future__ import annotations
 
@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[2]
 SCRIPTS = Path(__file__).resolve().parent
 sys.path.insert(0, str(SCRIPTS))
 
-from optionality_evidence_common import has_evidence_refresh_config  # noqa: E402
+from marvin_pipeline_common import has_evidence_refresh_config  # noqa: E402
 
 TODAY = date.today().isoformat()
 
@@ -122,13 +122,7 @@ def refresh_commodity_nav(ticker: str, val: dict, cfg: dict) -> dict:
     }
 
     lines = [
-        {
-            "id": "book",
-            "label": "GAAP book / price anchor",
-            "gaap_per_share": book,
-            "uplift_per_share": 0.0,
-            "math": f"Anchor ${book}/sh",
-        },
+        {"id": "book", "label": "GAAP book / price anchor", "gaap_per_share": book, "uplift_per_share": 0.0, "math": f"Anchor ${book}/sh"},
         {
             "id": "lease_cap",
             "label": "Mineral lease run-rate capitalized",
@@ -202,6 +196,7 @@ def refresh_commodity_nav(ticker: str, val: dict, cfg: dict) -> dict:
 
 
 def seed_filing_facts_from_inputs(ticker: str, val: dict, as_of: str) -> None:
+    """Write filing_facts metrics from valuation inputs when OTC parse is thin."""
     inp = val.get("inputs") or {}
     book = inp.get("book_per_share")
     if book is None:

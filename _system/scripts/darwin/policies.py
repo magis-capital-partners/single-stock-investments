@@ -186,6 +186,8 @@ def mutate_genome(genome: dict, rng, rate: float) -> dict:
         g["irr_power"] = float(rng.uniform(0.6, 2.0))
     if rng.random() < rate:
         g["policy"] = rng.choice(list(POLICY_FNS.keys()))
+    if rng.random() < rate:
+        g["temperature"] = float(rng.uniform(0.2, 1.2))
     return g
 
 

@@ -576,6 +576,23 @@ def main() -> None:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(computed, indent=2) + "\n", encoding="utf-8")
         print(f"Wrote {path.relative_to(ROOT)}")
+        ticker_name = computed.get("ticker") or (path.parent.parent.name if path.parent.name == "research" else "")
+        if ticker_name:
+            sys.path.insert(0, str(ROOT / "_system" / "scripts"))
+            try:
+                from darwin.pit import archive_valuation_on_write
+                from darwin.research_events import append_event
+
+                archive_valuation_on_write(path.parent.parent, computed)
+                if computed.get("as_of"):
+                    append_event(
+                        ticker_name,
+                        "valuation_refresh",
+                        str(computed["as_of"])[:10],
+                        str(path.relative_to(ROOT)),
+                    )
+            except ImportError:
+                pass
 
     if args.json or not args.write:
         print(json.dumps(computed, indent=2))

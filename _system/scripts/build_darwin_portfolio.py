@@ -24,6 +24,9 @@ def main() -> None:
         action="store_true",
         help="Run Tier A/B market-data download before build",
     )
+    parser.add_argument("--pit-audit", action="store_true", help="Leakage audit only")
+    parser.add_argument("--pit-backtest", action="store_true", help="PIT walk-forward backtest only")
+    parser.add_argument("--sync-events", action="store_true", help="Rebuild research_events.jsonl")
     args = parser.parse_args()
     if args.download:
         import subprocess
@@ -31,13 +34,28 @@ def main() -> None:
         script = ROOT / "_system" / "scripts" / "download_ira_research.py"
         subprocess.run([sys.executable, str(script), "--tier", "A"], check=False)
         subprocess.run([sys.executable, str(script), "--tier", "B"], check=False)
-    out = run_pipeline(fast=args.fast)
+    out = run_pipeline(
+        fast=args.fast,
+        pit_audit_only=args.pit_audit,
+        pit_backtest_only=args.pit_backtest,
+        sync_events=args.sync_events,
+    )
+    if out.get("sync_events") is not None:
+        print(f"Synced {out['sync_events']} research events")
+        return
+    if out.get("pit_audit"):
+        print(f"PIT audit: pass={out.get('pit_status', {}).get('audit_pass')} leakage={out.get('pit_status', {}).get('leakage_count')}")
+        return
+    if out.get("pit_backtest"):
+        print(f"PIT backtest: oos_sharpe={out.get('pit_status', {}).get('oos_sharpe_genetic')} ml_oos={out.get('pit_status', {}).get('ml_oos_eligible')}")
+        return
     if out.get("error"):
         print(f"Darwin pipeline error: {out['error']}", file=sys.stderr)
         sys.exit(1)
     print(
         f"Darwin portfolio: policy={out.get('policy_id')} "
-        f"regime={out.get('regime')} weights={len(out.get('weights') or [])}"
+        f"regime={out.get('regime', {}).get('label') if isinstance(out.get('regime'), dict) else out.get('regime')} "
+        f"weights={len(out.get('weights') or [])} pit_audit={out.get('pit', {}).get('audit_pass')}"
     )
 
 

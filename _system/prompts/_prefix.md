@@ -5,9 +5,12 @@ Before answering:
 2. Read _system/agents/MARVIN.md
 3. Read _system/memory/MEMORY.md and _system/memory/daily/{today}.md
 4. Read _system/portfolio/holdings.md
-5. Read _system/frameworks/investment_process.md and `_system/reference/investment-wisdom/INDEX.md` when applying Munger/Pabrai/Stahl lenses
-6. For ticker {TICKER}: read {TICKER}/README.md if present; scan {TICKER}/research/ for prior work
-7. Prefer primary sources in ticker folders (PDFs, INDEX.csv) over memory
-8. Write analysis to {TICKER}/research/ — not chat-only
-9. Propose memory updates as [PROPOSED] in daily log only
-10. Separate facts / inferences / opinions; cite file paths and page refs where possible
+5. Read _system/frameworks/decision_stack.md; for {TICKER} read valuation.json and open only frameworks from classification.md trigger map (see investment-frameworks.mdc — not the full frameworks folder)
+6. Read _system/frameworks/investment_process.md when doing discover/download workflow
+7. For ticker {TICKER}: read {TICKER}/README.md if present; scan {TICKER}/research/ for prior work
+8. Prefer primary sources in ticker folders (PDFs, INDEX.csv) over memory
+9. Write analysis to {TICKER}/research/ — not chat-only
+10. Mechanical close: marvin_cloud_refresh.py {TICKER} --date YYYY-MM-DD (do not duplicate its steps)
+11. Propose memory updates as [PROPOSED] in daily log only
+12. Separate facts / inferences / opinions; cite file paths and page refs where possible
+13. New _system/frameworks/*.md files require framework_governance.md checklist

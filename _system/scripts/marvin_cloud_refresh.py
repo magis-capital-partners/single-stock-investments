@@ -19,15 +19,7 @@ SCRIPTS = Path(__file__).resolve().parent
 PY = sys.executable
 
 sys.path.insert(0, str(SCRIPTS))
-from optionality_evidence_common import has_evidence_refresh_config  # noqa: E402
-
-
-def run_script(label: str, script: str, script_args: list[str], *, optional: bool = False) -> bool:
-    path = SCRIPTS / script
-    if not path.exists():
-        print(f"  SKIP {label}: {script} not in repo")
-        return True
-    return run(label, [PY, str(path), *script_args], optional=optional)
+from marvin_pipeline_common import has_evidence_refresh_config, latest_deep_dive_date  # noqa: E402
 
 
 def run(label: str, cmd: list[str], *, optional: bool = False) -> bool:
@@ -43,14 +35,12 @@ def run(label: str, cmd: list[str], *, optional: bool = False) -> bool:
     return True
 
 
-def latest_deep_dive_date(research: Path) -> str | None:
-    dives = sorted(research.glob("deep_dive_*.md"))
-    if not dives:
-        return None
-    name = dives[-1].stem
-    if name.startswith("deep_dive_"):
-        return name.replace("deep_dive_", "", 1)
-    return None
+def run_script(label: str, script: str, script_args: list[str], *, optional: bool = False) -> bool:
+    path = SCRIPTS / script
+    if not path.exists():
+        print(f"  SKIP {label}: {script} not in repo")
+        return True
+    return run(label, [PY, str(path), *script_args], optional=optional)
 
 
 def needs_evidence_gate(val: dict) -> bool:
@@ -70,7 +60,7 @@ ROOT = Path({repr(str(ROOT))})
 sys.path.insert(0, str(ROOT / '_system/scripts'))
 from milly_batch_pass import write_adversarial, add_dive_header_link, append_milly_log, latest_filing_facts
 from lint_adversarial import lint_ticker, latest_dive
-from optionality_evidence_common import has_evidence_refresh_config
+from marvin_pipeline_common import has_evidence_refresh_config
 
 ticker = {repr(ticker)}
 strict_evidence = {strict_evidence}
@@ -103,7 +93,7 @@ def main() -> int:
     parser.add_argument(
         "--strict-evidence",
         action="store_true",
-        help="Fail on check_evidence_completeness and stricter Milly block",
+        help="Fail on check_evidence_completeness; stricter Milly when evidence_refresh set",
     )
     args = parser.parse_args()
 
@@ -145,36 +135,31 @@ def main() -> int:
             [PY, str(SCRIPTS / "seed_dive_overlays.py"), ticker, "--write"],
             optional=True,
         )
-        ok &= run_script(
+        ok &= run(
             "download transcripts",
-            "download_transcripts.py",
-            [ticker, "--register-legacy"],
+            [PY, str(SCRIPTS / "download_transcripts.py"), ticker, "--register-legacy"],
             optional=True,
         )
         ok &= run(
             "filing evidence",
             [PY, str(SCRIPTS / "build_filing_evidence.py"), ticker],
         )
-        ok &= run_script(
+        ok &= run(
             "management evidence",
-            "build_management_evidence.py",
-            [ticker],
+            [PY, str(SCRIPTS / "build_management_evidence.py"), ticker],
             optional=True,
         )
 
-    ok &= run_script(
+    ok &= run(
         "market inputs",
-        "fetch_market_inputs.py",
-        [ticker, "--merge"],
-        optional=True,
+        [PY, str(SCRIPTS / "fetch_market_inputs.py"), ticker, "--merge"],
+        optional=not has_evidence_refresh_config(val),
     )
-
     ok &= run(
         "HK extract refresh",
         [PY, str(SCRIPTS / "refresh_hk_extracts.py")],
         optional=True,
     )
-
     ok &= run(
         "third-party source scan",
         [
@@ -186,16 +171,14 @@ def main() -> int:
             "--with-hk",
         ],
     )
-
     ok &= run(
         "valuation write",
         [PY, str(SCRIPTS / "marvin_valuation.py"), "--ticker", ticker, "--write"],
     )
     if has_evidence_refresh_config(val):
-        ok &= run_script(
+        ok &= run(
             "optionality evidence refresh",
-            "refresh_optionality_valuation.py",
-            [ticker],
+            [PY, str(SCRIPTS / "refresh_optionality_valuation.py"), ticker],
         )
     book_cfg = research / "book_estimate_config.json"
     if book_cfg.exists():
@@ -204,13 +187,11 @@ def main() -> int:
             [PY, str(SCRIPTS / "current_book_estimate.py"), ticker, "--write"],
             optional=True,
         )
-
     ok &= run(
         "fill cross-check (pre-dive)",
         [PY, str(SCRIPTS / "fill_cross_check.py"), ticker, "--date", args.date, "--write"],
         optional=not strict_evidence,
     )
-
     ok &= run(
         "deep dive v2 refresh",
         [PY, str(SCRIPTS / "refresh_deep_dive_v2.py"), ticker, "--date", args.date],
@@ -224,13 +205,12 @@ def main() -> int:
     if not args.skip_milly:
         ok &= run_milly(ticker, args.date, strict_evidence=strict_evidence)
 
-    ok &= run_script(
+    ok &= run(
         "evidence completeness",
-        "check_evidence_completeness.py",
-        [ticker, "--date", args.date] + (["--strict"] if strict_evidence else []),
+        [PY, str(SCRIPTS / "check_evidence_completeness.py"), ticker, "--date", args.date]
+        + (["--strict"] if strict_evidence else []),
         optional=not strict_evidence,
     )
-
     ok &= run(
         "sync classification",
         [PY, str(SCRIPTS / "sync_classification.py"), "--fix", "--ticker", ticker],
@@ -242,13 +222,11 @@ def main() -> int:
             [PY, str(SCRIPTS / "build_dashboard_data.py")],
             optional=True,
         )
-
     ok &= run(
         "cross-check verify",
         [PY, str(SCRIPTS / "check_cross_checks.py"), ticker],
         optional=not strict_evidence,
     )
-
     if strict_evidence:
         ok &= run(
             "lint deep dive (post-check)",
