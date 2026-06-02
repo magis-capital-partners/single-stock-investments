@@ -29,6 +29,7 @@
 | `mcintyre` | McIntyre Partnerships | QDEL | `QDEL/investor-documents/research-notes/McIntyre_Partnerships_Q1_2026_Letter.pdf` | **2026-05-28** (human: yes — QDEL blend) |
 | `apld_pf3_summary` | Applied Digital / Marvin shop summary (PF3 PR) | APLD | `APLD/investor-documents/research-notes/2026-05-20_Polaris_Forge_3_lease_summary.md` | **2026-05-28** (human: yes) |
 | `apld_reiterate_buy` | Research note (run-the-table bull case) | APLD | `APLD/investor-documents/research-notes/What Would A Run The Table Scenario Look Like_ Reiterate BUY.pdf` | **2026-05-28** (human: yes — catalyst / bull framing; not sole IRR anchor) |
+| `sohn_rosen_vtrs` | Sohn Conference Foundation / David Rosen (Rubric Capital) | VTRS | `VTRS/investor-documents/research-notes/2026-05-27_Sohn_Digging_Deeper_VTRS_excerpt.md` | **2026-06-02** (human: yes — Idorsia Phase III catalyst / deep-value framing; not sole IRR anchor) |
 
 ---
 

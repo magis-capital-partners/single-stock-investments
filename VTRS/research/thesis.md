@@ -21,7 +21,7 @@
 
 ## One-line thesis
 
-Post-EWSR generic pharma cash generator at ~9% owner-cash yield; Idorsia Phase III (selatogrel, cenerimod) is filing-backed event optionality [PENDING APPROVAL] per Sohn Rosen. ~$14B net debt and unproven moat keep **watch** (9.2% Lawrence base at $15.69).
+Post-EWSR generic pharma cash generator at ~9% owner-cash yield; Idorsia Phase III (selatogrel, cenerimod) is filing-backed event optionality; Sohn Rosen (approved) flags 6–9 month readout catalyst. ~$14B net debt and unproven moat keep **watch** (9.2% Lawrence base at $15.69).
 
 ## Key questions
 

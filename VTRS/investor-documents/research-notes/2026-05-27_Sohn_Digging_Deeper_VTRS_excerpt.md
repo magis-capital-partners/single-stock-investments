@@ -4,7 +4,7 @@
 **Channel:** Sohn Conference Foundation  
 **Published:** 2026-05-27  
 **Speaker (VTRS segment):** David Rosen, Rubric Capital (deep value)  
-**Status:** **[PENDING APPROVAL]** — context only; not in base IRR until human promotes in `third_party_sources.md`  
+**Status:** **approved** (`sohn_rosen_vtrs` in `_system/frameworks/third_party_sources.md`, **2026-06-02**) — catalyst / event lens and cross-check; not sole 10yr IRR anchor  
 **Transcript method:** Web fetch of YouTube watch page (cloud IP blocked for `youtube-transcript-api` / `yt-dlp`)
 
 ---
