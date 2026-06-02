@@ -8,15 +8,15 @@
 
 ## Executive summary
 
-One **pending** external source: Sohn 2026 panel excerpt (David Rosen / Rubric Capital on VTRS). Marvin stance remains **filings-first**; Rosen adds **event** catalyst framing for Idorsia Phase III assets already disclosed in SEC text. Base IRR **9.2%** at $15.69 unchanged until human approval.
+**Approved** external: Sohn 2026 panel excerpt (`sohn_rosen_vtrs`, David Rosen / Rubric Capital). Marvin stance remains **filings-first** for numeric IRR; Rosen adds **event** catalyst framing for Idorsia Phase III (filing-confirmed). Blended IRR **9.7%** at $15.69 (75/25 Marvin/Rosen; human approved **2026-06-02**).
 
-**Synthesis:** Marvin floor 100% for stance gate; Rosen is context for pipeline readouts, not owner-cash normalization.
+**Synthesis:** Marvin floor 100% for 10yr owner-cash gate; Rosen approved for pipeline readout monitor and bull sensitivity.
 
 ## Sources in scope
 
 | ID | Source | Status | Path |
 |----|--------|--------|------|
-| sohn-2026-05-27 | Rosen / Rubric — Sohn *Digging Deeper* | **[PENDING APPROVAL]** | `VTRS/investor-documents/research-notes/2026-05-27_Sohn_Digging_Deeper_VTRS_excerpt.md` |
+| sohn-2026-05-27 | Rosen / Rubric — Sohn *Digging Deeper* | **approved** (`sohn_rosen_vtrs`) | `VTRS/investor-documents/research-notes/2026-05-27_Sohn_Digging_Deeper_VTRS_excerpt.md` |
 | filings | FY2025 10-K, Q1 2026 10-Q, proxy | primary | `VTRS/investor-documents/sec-edgar/` |
 
 ## Agreements (facts)
@@ -42,26 +42,26 @@ One **pending** external source: Sohn 2026 panel excerpt (David Rosen / Rubric C
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
 | Marvin floor | ~$1.38/sh normalized FCF | 9.2% / 10yr | watch |
-| External (Rosen) | P/E + pipeline option | 6 to 9 mo readouts (speaker) | pending |
-| **Blended best estimate** | **~$1.38/sh** | **9.2%** | **watch** |
+| External (Rosen, approved) | P/E + pipeline option | 6 to 9 mo readouts (speaker) | catalyst monitor |
+| **Blended best estimate** | **~$1.42/sh** | **9.7%** | **watch** |
 
-**Weights:** 100% Marvin (external pending). If approved later, re-weight per `external_view_blend.md` (likely 75% Marvin / 25% external for promotional timing claims).
+**Weights:** **75% Marvin** / **25% Rosen** (approved **2026-06-02**); speaker 12-month double is catalyst footnote only.
 
-**Returns statement (blended):** At today's price, filings-only normalized cash flow supports about **9.2%** per year, below the 15% accumulate band.
+**Returns statement (blended):** About **9.7%** per year on **$1.42** blended owner cash; Marvin floor **9.2%** on **$1.38**.
 
 ## Synthesis (best estimate)
 
-Rosen and Marvin **agree** that Viatris owns valuable, filing-disclosed Phase III optionality from Idorsia (**selatogrel**, **cenerimod**). They **disagree** on how much of that is already in the stock: Rosen argues residual-volatility deep value with near-term doubling potential; Marvin keeps normalized owner cash on **~$2.3 billion** operating cash flow with **~$14 billion** net debt and does not move base IRR until trials and capital allocation prove out. **Best estimate:** same **9.2%** ten-year return and **watch** stance; treat Rosen as a **catalyst monitor** for Phase III readouts, not as base-case cash flow.
+Rosen and Marvin **agree** that Viatris owns valuable, filing-disclosed Phase III optionality from Idorsia (**selatogrel**, **cenerimod**). They **disagree** on how much of that is already in the stock: Rosen argues residual-volatility deep value with near-term doubling potential; Marvin keeps normalized owner cash on **~$2.3 billion** operating cash flow with **~$14 billion** net debt and does not move base IRR until trials and capital allocation prove out. **Best estimate:** **9.7%** blended ten-year return (up from **9.2%** Marvin-only) and **watch** stance; Rosen raises owner-cash credit modestly via catalyst path without adopting a full double in twelve months.
 
 ## [HUMAN REVIEW]
 
-- [ ] Approve `2026-05-27_Sohn_Digging_Deeper_VTRS_excerpt.md` in `third_party_sources.md` if used in base IRR
+- [x] Approve `2026-05-27_Sohn_Digging_Deeper_VTRS_excerpt.md` — **done 2026-06-02** (`sohn_rosen_vtrs`)
 - [ ] Verify 35% / 65% revenue mix vs 10-K segment note
 - [ ] Confirm Phase III readout calendar from company IR / clinical registry
 
 ## [PROPOSED MEMORY]
 
-- [PROPOSED COMPANY] VTRS: Sohn Rosen excerpt pending; Idorsia Phase III aligns with proxy; base IRR 9.2% unchanged; payoff lens event.
+- [PROPOSED COMPANY] VTRS: Sohn Rosen approved 2026-06-02; Idorsia Phase III aligns with proxy; base IRR 9.2%; payoff lens event.
 
 ## Primary sources cited
 

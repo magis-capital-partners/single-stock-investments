@@ -221,6 +221,14 @@ def primary_irr_pct(val: dict) -> float | int | str | None:
     )
 
 
+def format_headline_pct(base_pct: float | int | str) -> str:
+    if isinstance(base_pct, float):
+        if base_pct == int(base_pct):
+            return str(int(base_pct))
+        return f"{base_pct:.2f}".rstrip("0").rstrip(".")
+    return str(base_pct)
+
+
 def growth_rates_for_irr(val: dict) -> tuple[float, float, float | int]:
     """Return (g1, g2, exit_multiple) for IRR arithmetic from scenarios.base."""
     base = val.get("scenarios", {}).get("base", {})
@@ -254,15 +262,115 @@ def patch_exec_summary_irr(body: str, val: dict) -> str:
     base_pct = primary_irr_pct(val)
     if base_pct is None:
         return body
+    pct = format_headline_pct(base_pct)
     body = re.sub(
         r"\*\*(?:Lawrence consolidated base|falsifier-adjusted) 10-year annual return is [\d.-]+%\*\*",
-        f"**Base 10-year annual return is {base_pct}%**",
+        f"**Base 10-year annual return is {pct}%**",
         body,
     )
     body = re.sub(
         r"(?:Lawrence base|Falsifier-adjusted) 10-year annual return is \*\*[\d.-]+%\*\*",
-        f"Base 10-year annual return is **{base_pct}%**",
+        f"Base 10-year annual return is **{pct}%**",
         body,
+    )
+    body = re.sub(
+        r"Base 10-year annual return is \*\*[\d.-]+%\*\*",
+        f"Base 10-year annual return is **{pct}%**",
+        body,
+        count=1,
+    )
+    body = re.sub(
+        r"implies about [\d.-]+% annualized return",
+        f"implies about **{pct}%** per year (total synthesis headline)",
+        body,
+        count=1,
+    )
+    body = re.sub(
+        r"about [\d.-]+% annualized return",
+        f"about **{pct}%** per year (total synthesis headline)",
+        body,
+        count=1,
+    )
+    body = re.sub(
+        r"base expected annual return[^.]{0,120}\*\*[\d.-]+%\*\*",
+        lambda m: re.sub(r"\*\*[\d.-]+%\*\*", f"**{pct}%**", m.group(0), count=1),
+        body,
+        count=1,
+        flags=re.IGNORECASE,
+    )
+    body = re.sub(
+        r"we expect about \*\*[\d.]+% per year\*\*",
+        f"we expect about **{pct}% per year**",
+        body,
+        count=1,
+        flags=re.IGNORECASE,
+    )
+    body = re.sub(
+        r"We expect \*\*[\d.-]+%\*\* per year on the Lawrence[^.]+\.",
+        f"We expect **{pct}%** per year (total synthesis at today's price).",
+        body,
+        count=1,
+    )
+    body = re.sub(
+        r"equity-yield-curve base is \*\*[\d.-]+%\*\*",
+        f"total synthesis headline is **{pct}%**",
+        body,
+        count=1,
+    )
+    body = re.sub(
+        r"base equity-yield-curve return is \*\*[\d.-]+%\*\*",
+        f"total synthesis headline is **{pct}%**",
+        body,
+        count=1,
+    )
+    return body
+
+
+def patch_blended_estimate_irr(body: str, val: dict) -> str:
+    base_pct = primary_irr_pct(val)
+    if base_pct is None:
+        return body
+    pct = format_headline_pct(base_pct)
+    # 4-column (owner cash + return): CMSG-style
+    body = re.sub(
+        r"(\|\s*\*\*Blended best estimate\*\*\s*\|\s*[^|]+\|\s*)\*\*[^*|~]+?\*\*(\s*\|)",
+        lambda m: f"{m.group(1)}**{pct}%** (total synthesis){m.group(2)}",
+        body,
+        count=1,
+    )
+    # 3-column (return anchor only): FRMO-style
+    body = re.sub(
+        r"(\|\s*\*\*Blended best estimate\*\*\s*\|\s*)\*\*[\d.-]+%\*\*[^|]*(\|)",
+        lambda m: f"{m.group(1)}**{pct}%** (total synthesis)     {m.group(2)}",
+        body,
+        count=1,
+    )
+    body = re.sub(
+        r"\*\*Returns statement \(blend\):\*\* We expect about \*\*[\d.]+%\*\*",
+        f"**Returns statement (blend):** We expect about **{pct}%**",
+        body,
+        count=1,
+    )
+    body = re.sub(
+        r"numeric anchor unchanged \(\*\*[\d.-]+%\*\*",
+        f"headline is total synthesis (**{pct}%**",
+        body,
+        count=1,
+    )
+    return body
+
+
+def patch_payoff_returns_statement(body: str, val: dict) -> str:
+    """Early payoff returns lines before synthesis block."""
+    base_pct = primary_irr_pct(val)
+    if base_pct is None:
+        return body
+    pct = format_headline_pct(base_pct)
+    body = re.sub(
+        r"\*\*Returns statement:\*\* At [^.]+\*\*[\d.-]+%\*\* per year",
+        f"**Returns statement:** At today's price, we expect about **{pct}%** per year",
+        body,
+        count=1,
     )
     return body
 
@@ -1379,6 +1487,8 @@ def refresh_ticker(ticker: str, out_date: str) -> Path | None:
             body = enrich_business_moat(body, val, ticker, preserved_val)
         if key == "## Executive summary":
             body = patch_exec_summary_irr(body, val)
+        if key in ("## Blended estimate (best judgment)", "## Blended estimate"):
+            body = patch_blended_estimate_irr(body, val)
         if key == "## Primary sources reviewed":
             body = inject_hk_primary_sources(body, ticker)
         if key == "## Payoff & return":
@@ -1392,6 +1502,7 @@ def refresh_ticker(ticker: str, out_date: str) -> Path | None:
             if overlay and "### Optionality overlay" not in body:
                 body = body.rstrip() + "\n\n" + overlay
             body = patch_payoff_expected_return(body, val)
+            body = patch_payoff_returns_statement(body, val)
             body = re.sub(
                 r"### Stance proposal.*?(?=\n---|\n## |\Z)",
                 stance_proposal_block(val) + "\n**Scenarios and every IRR assumption:** see **## Valuation & IRR (assumption ledger)** and `valuation.json`.\n",

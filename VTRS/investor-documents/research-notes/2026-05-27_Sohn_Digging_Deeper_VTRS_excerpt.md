@@ -4,7 +4,7 @@
 **Channel:** Sohn Conference Foundation  
 **Published:** 2026-05-27  
 **Speaker (VTRS segment):** David Rosen, Rubric Capital (deep value)  
-**Status:** **[PENDING APPROVAL]** — context only; not in base IRR until human promotes in `third_party_sources.md`  
+**Status:** **approved** (`sohn_rosen_vtrs` in `_system/frameworks/third_party_sources.md`, **2026-06-02**) — catalyst / event lens and cross-check; not sole 10yr IRR anchor  
 **Transcript method:** Web fetch of YouTube watch page (cloud IP blocked for `youtube-transcript-api` / `yt-dlp`)
 
 ---
@@ -46,4 +46,4 @@
 
 ## Synthesis note (Marvin)
 
-Rosen frames **residual-volatility / deep-value** mispricing plus **Idorsia Phase III optionality** (selatogrel, cenerimod). That supports **watch** with **event** payoff lens on pipeline readouts; does **not** by itself clear 15% Lawrence hurdle at $15.69 without human approval of external blend.
+Rosen frames **residual-volatility / deep-value** mispricing plus **Idorsia Phase III optionality** (selatogrel, cenerimod). **Incorporated (2026-06-02):** 75% Marvin floor / 25% Rosen partial normalization in blended owner cash (**$1.42/sh**, **9.7%** 10yr); 12-month double remains catalyst footnote only.

@@ -13,24 +13,24 @@
   "inputs": {
     "price": 6.7,
     "price_source": "Stooq FRMO.US close 2026-05-22",
-    "book_per_share": 7.42,
+    "book_per_share": 7.29,
     "normalization_note": "Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book.",
     "book_per_share_filed": 8.56,
-    "book_per_share_current": 7.42
+    "book_per_share_current": 7.29
   },
   "optionality_gate": {
     "framework": "holdco_sotp",
     "floor_pass": true,
     "floor_metric": "book_per_share",
-    "floor_value": 7.42,
+    "floor_value": 7.29,
     "primary_metric": "lawrence_base",
     "primary_label": "annualized return",
     "primary_return_pct": 21.9,
     "incumbent_sleeve": true,
     "notes": "Trades ~22% below book ($8.55); same SOTP payoffs as prior refresh. HK/MIAX/CMSG catalysts unchanged.",
     "floor_value_filed": 8.56,
-    "floor_value_current": 7.42,
-    "discount_to_current_book_pct": 9.6
+    "floor_value_current": 7.29,
+    "discount_to_current_book_pct": 8.0
   },
   "scenarios": {
     "bear": {
@@ -342,9 +342,10 @@
     }
   },
   "implied_return": {
-    "base_pct": 21.9,
-    "label": "annualized return",
-    "display": "21.9% (base)"
+    "base_pct": 26.01,
+    "label": "10yr IRR (total synthesis)",
+    "display": "26.01% (total synthesis)",
+    "synthesis_pct": 26.01
   },
   "stance_proposal": {
     "suggested": "accumulate",
@@ -370,15 +371,15 @@
   },
   "overlay_results": [],
   "book_estimate": {
-    "as_of": "2026-06-01",
+    "as_of": "2026-06-02",
     "filing_period_end": "2026-02-28",
     "filing_source": "investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
     "filed_book_per_share": 8.56,
-    "current_book_per_share": 7.42,
-    "delta_per_share": -1.14,
-    "delta_pct_of_filed_book": -13.34,
+    "current_book_per_share": 7.29,
+    "delta_per_share": -1.27,
+    "delta_pct_of_filed_book": -14.86,
     "discount_to_filed_book_pct": 21.7,
-    "discount_to_current_estimate_pct": 9.6,
+    "discount_to_current_estimate_pct": 8.0,
     "config_path": "FRMO/research/book_estimate_config.json",
     "output_path": "FRMO/research/book_estimate.json"
   },
@@ -487,7 +488,7 @@
     "numeric_weighted_pct": 25.86,
     "qualitative_pp": 0.15,
     "total_synthesis_pct": 26.01,
-    "human_approval": "pending",
+    "human_approval": "approved",
     "weight_audit": {
       "flags": [
         "Third-party numeric path proxies bull scenario (instrumentalist); HK cross-check says no base IRR upgrade. Prefer qualitative pp only until approved blend.",

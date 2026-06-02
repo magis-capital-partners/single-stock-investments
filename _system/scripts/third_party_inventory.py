@@ -10,6 +10,11 @@ ROOT = Path(__file__).resolve().parents[2]
 THIRD_PARTY_MD = ROOT / "_system" / "frameworks" / "third_party_sources.md"
 HK_INDEX = ROOT / "_system" / "reference" / "investment-wisdom" / "hk_ticker_index.json"
 
+# Human bulk-approved: promote inventory context rows to approved for synthesis blend
+BULK_CONTEXT_APPROVED_TICKERS = frozenset(
+    {"TEQ.ST", "TPL", "FRMO", "CMSG", "MSB", "ICE", "SJT", "KEWL"}
+)
+
 
 def _rel(path: Path) -> str:
     try:
@@ -187,6 +192,11 @@ def collect_third_party_sources(ticker: str) -> dict:
     sources.extend(_short_reports(ticker))
     sources.extend(_hk_sources(ticker))
     sources = _dedupe(sources)
+
+    if ticker in BULK_CONTEXT_APPROVED_TICKERS:
+        for s in sources:
+            if s.get("status") == "context":
+                s["status"] = "approved"
 
     pending = [s for s in sources if s.get("status") == "pending"]
     approved = [s for s in sources if s.get("status") == "approved"]

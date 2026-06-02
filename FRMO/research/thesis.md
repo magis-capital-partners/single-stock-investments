@@ -11,7 +11,7 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | accumulate |
 | **Cycle** | - |
-| **Implied 10yr IRR** (base) | 21.9% (base) |
+| **Implied 10yr IRR** (base) | 26.01% (total synthesis) |
 | **IRR method** | yield_curve |
 | **Lawrence bucket** | other |
 | **Payoff lens** | pending |
