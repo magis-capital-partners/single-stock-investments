@@ -29,6 +29,13 @@ def main() -> int:
             [PY, str(SCRIPTS / "scan_third_party_sources.py"), ticker, "--with-hk"],
             cwd=ROOT,
         )
+        book_cfg = research / "book_estimate_config.json"
+        if book_cfg.exists():
+            subprocess.run(
+                [PY, str(SCRIPTS / "current_book_estimate.py"), ticker, "--write"],
+                cwd=ROOT,
+                check=False,
+            )
         subprocess.check_call(
             [PY, str(SCRIPTS / "marvin_valuation.py"), "--ticker", ticker, "--write"],
             cwd=ROOT,
