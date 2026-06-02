@@ -1,0 +1,50 @@
+name: Darwin Portfolio Refresh
+
+on:
+  schedule:
+    - cron: "0 12 * * 1"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "_system/scripts/darwin/**"
+      - "_system/portfolio/darwin_mandate.json"
+      - "**/research/valuation.json"
+      - "_system/portfolio/registry.json"
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r _system/scripts/requirements-darwin.txt
+
+      - name: Download market data
+        run: |
+          python3 _system/scripts/download_ira_research.py --tier A
+          python3 _system/scripts/download_ira_research.py --tier B
+
+      - name: Build Darwin portfolio
+        run: python3 _system/scripts/build_darwin_portfolio.py
+
+      - name: Rebuild dashboard data
+        run: python3 _system/scripts/build_dashboard_data.py
+
+      - name: Commit artifacts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add dashboard/data/darwin_*.json dashboard/data/darwin_models/ \
+            _system/reference/market-data/returns/ _system/portfolio/ira_target_weights.json \
+            dashboard/data/darwin_backtest_report.md 2>/dev/null || true
+          git diff --staged --quiet || git commit -m "chore(darwin): refresh portfolio and market data"
+          git push || true

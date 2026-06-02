@@ -5,7 +5,7 @@ import math
 
 import numpy as np
 
-from .backtest import portfolio_return, quarterly_rebalance_points
+from .backtest import portfolio_return, rebalance_points
 from .constraints import apply_constraints
 from .policies import policy_softmax_latent
 
@@ -58,7 +58,8 @@ def train_ppo(
     kappa = (mandate.get("mandate") or {}).get("turnover_penalty_kappa", 0.35)
     falsifier_map = {r["ticker"]: r.get("falsifier_count", 0) for r in rows}
 
-    q_idx = quarterly_rebalance_points(dates)
+    freq = (mandate.get("mandate") or mandate).get("rebalance_frequency", "semiannual")
+    q_idx = rebalance_points(dates, freq)
     best_policy = None
     best_sharpe = -1e9
     metrics: dict = {}

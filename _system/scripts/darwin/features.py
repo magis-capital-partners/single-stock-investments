@@ -217,8 +217,13 @@ def feature_row(ticker: str, holdings_meta: dict, portfolio_class: dict) -> dict
     )
 
     meta = holdings_meta.get(ticker, {})
+    from .narrative import narrative_features_for_row
+
+    narr = narrative_features_for_row(ticker, one_line_thesis(ticker_dir))
+
     vector = (
         [irr_base or 0.0, irr_bear or irr_base or 0.0, irr_bull or irr_base or 0.0, irr_fals or irr_base or 0.0]
+        + narr["narrative_embedding"]
         + _one_hot(classification.get("archetype"), ARCHETYPES)
         + _one_hot(classification.get("moat"), MOATS)
         + _one_hot(classification.get("dhando"), DHANDO)
@@ -234,6 +239,7 @@ def feature_row(ticker: str, holdings_meta: dict, portfolio_class: dict) -> dict
 
     names = (
         ["irr_base", "irr_bear", "irr_bull", "irr_falsifier"]
+        + [f"narr_{i}" for i in range(len(narr["narrative_embedding"]))]
         + [f"archetype_{a}" for a in ARCHETYPES]
         + [f"moat_{m}" for m in MOATS]
         + [f"dhando_{d}" for d in DHANDO]
@@ -257,6 +263,8 @@ def feature_row(ticker: str, holdings_meta: dict, portfolio_class: dict) -> dict
         "deep_dive_date": dive_date,
         "one_line_thesis": one_line_thesis(ticker_dir),
         "human_review_pending": human_pending,
+        "narrative_embedding": narr["narrative_embedding"],
+        "narrative_snippet_len": narr["narrative_snippet_len"],
         "feature_names": names,
         "feature_vector": vector,
     }
