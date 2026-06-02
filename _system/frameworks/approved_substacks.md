@@ -41,11 +41,11 @@ These are **not** generic Substacks. Marvin may cite and blend only sources list
 | Horizon Kinetics (firm) | **FRMO**, **CMSG** | LCI Stahl lessons; SSI flywheel § HK 4.95% + revenue share; HK commentaries in `horizon-kinetics/` |
 | Commodity / TPL structural | **FRMO** | [LCI: Most Important Things Part 1](https://lemoncakesinvesting.substack.com/p/frmo-the-most-important-things-part) |
 | KEWL (mineral floor) | **KEWL** | [SSI: KEWL intro](https://specialsituationinvesting.substack.com/p/keweenaw-land-association-kewl); [SSI: KEWL update](https://specialsituationinvesting.substack.com/p/update-keweenaw-land-association) |
-| Water rights / SGMA / power–water lag | **BWEL**, **TPL**, **WBI** (context); **LMNR**, **PCYO** (peers in post) | [Groundbreaker: Water rights — hidden asset](https://groundbreakerre.substack.com/p/water-rights-the-hidden-asset-the) (2026-05-21) |
+| Water rights / SGMA / power–water lag | **BWEL**, **LB**, **TPL**, **WBI** (context); **LMNR**, **PCYO** (peers in post) | [Groundbreaker: Water rights — hidden asset](https://groundbreakerre.substack.com/p/water-rights-the-hidden-asset-the) (2026-05-21) |
 
 **Note:** Winland trades as **WELX** (not a separate portfolio ticker). Analyze Winland inside **FRMO** look-through and catalyst stack.
 
-**Note:** **Land Bridge** (private) appears in macro water narrative (HK/TPL ecosystem); no ticker folder until onboarded. **LMNR** cited in Groundbreaker post; add cross-check when ticker is in portfolio.
+**Note:** **LMNR** cited in Groundbreaker post; add cross-check when ticker is in portfolio.
 
 ---
 
