@@ -54,7 +54,7 @@ Marvin floor **13.92%** per year (infrastructure; stance **watch**) from primary
 
 ## [PROPOSED MEMORY]
 
-- [PROPOSED COMPANY] WBI: third-party cross-check fill 2026-06-02 — Marvin 13.92% unchanged; filings-only
+- [PROPOSED COMPANY] WBI: third-party cross-check 2026-06-02 — Groundbreaker context; Marvin 13.92% unchanged
 
 ## Primary sources cited
 
