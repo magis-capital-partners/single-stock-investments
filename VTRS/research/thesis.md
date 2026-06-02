@@ -1,6 +1,6 @@
 # VTRS — Investment Thesis
 
-**Last updated:** 2026-06-02
+**Last updated:** auto-sync
 
 ## Classification
 
@@ -11,12 +11,17 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | transition |
-| **MOI bucket** (legacy) | complexity_discount |
+| **Implied 10yr IRR** (base) | 9.5% (total synthesis) |
+| **IRR method** | full |
+| **Lawrence bucket** | low_cost |
 | **Payoff lens** | operating |
+| **MOI bucket** | pending |
+
+**Deep dive:** `VTRS/research/deep_dive_2026-06-02.md` (auto-sync)
 
 ## One-line thesis
 
-Post-EWSR generic pharma cash generator at ~9% FCF yield, but ~$14B net debt and unproven moat keep stance **watch** until deleveraging and base-business growth confirm in filings (~8% Lawrence base IRR at $15.69).
+Post-EWSR generic pharma cash generator at ~9% FCF yield, but ~$14B net debt and unproven moat keep stance **watch** until deleveraging and base-business growth confirm in filings (9.5% Lawrence base IRR at $15.69).
 
 ## Key questions
 

@@ -32,7 +32,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-06-02.
 | SPGI | SPGI/ | S&P Global | US | 2026-06-02 | 2026-06-02 | croupier | hold |
 | TEQ.ST | TEQ.ST/ | Teqnion AB | SE | 2026-06-02 | 2026-06-02 | serial_acquirer | hold |
 | TPL | TPL/ | Texas Pacific Land Corporation | US | 2026-06-02 | 2026-06-02 | unknown | watch |
-| VTRS | VTRS/ | Viatris Inc | US | — | — | unknown | watch |
+| VTRS | VTRS/ | Viatris Inc | US | 2026-06-02 | 2026-06-02 | turnaround | watch |
 | WBI | WBI/ | WaterBridge Infrastructure | US | 2026-06-02 | 2026-06-02 | infrastructure | watch |
 
 **28 holdings total.** Registry: `_system/portfolio/registry.json`

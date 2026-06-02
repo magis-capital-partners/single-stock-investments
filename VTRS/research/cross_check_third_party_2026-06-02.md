@@ -5,13 +5,12 @@
 **Marvin dive:** `VTRS/research/deep_dive_2026-06-02.md`
 **Source inventory:** `VTRS/third-party-analyses/source_inventory_2026-06-02.md`
 **Framework:** `_system/frameworks/third_party_cross_reference.md`, `external_view_blend.md`
-<!-- THIRD_PARTY_CROSS_CHECK_STUB -->
 
 ## Executive summary
 
 No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (FY2025 10-K, Q1 2026 10-Q, proxy). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
 
-**Synthesis:** Marvin floor only; no external blend. Base IRR ~8% at $15.69 on normalized owner cash.
+**Synthesis:** Marvin floor only; no external blend. Base IRR **9.5%** at $15.69; stance **watch**.
 
 ## Sources in scope
 
@@ -35,13 +34,13 @@ No third-party sources are indexed for this ticker as of this scan. Marvin stanc
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | ~$1.38/sh normalized FCF | ~8% / 10yr | watch |
+| Marvin floor | ~$1.38/sh normalized FCF | 9.5% / 10yr | watch |
 | External (combined) | — | — | — |
-| **Blended best estimate** | **~$1.38/sh** | **~8%** | **watch** |
+| **Blended best estimate** | **~$1.38/sh** | **9.5%** | **watch** |
 
 **Weights:** 100% Marvin (no approved external).
 
-**Returns statement (blended):** At today's price, filings-only normalized cash flow supports about **8%** per year, below the 15% accumulate band.
+**Returns statement (blended):** At today's price, filings-only normalized cash flow supports about **9.5%** per year, below the 15% accumulate band.
 
 ## [HUMAN REVIEW]
 
@@ -51,7 +50,7 @@ No third-party sources are indexed for this ticker as of this scan. Marvin stanc
 
 ## [PROPOSED MEMORY]
 
-- [PROPOSED COMPANY] VTRS: third-party cross-check 2026-06-02
+- [PROPOSED COMPANY] VTRS: third-party cross-check 2026-06-02 — Marvin 9.5% unchanged
 
 ## Primary sources cited
 
