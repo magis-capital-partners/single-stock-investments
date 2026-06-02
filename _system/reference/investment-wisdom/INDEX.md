@@ -118,13 +118,21 @@ Curated **text extracts** from `C:\Users\werdn\Documents\Investing\Horizon Kinet
 
 | File | Theme | Apply when |
 |------|-------|------------|
-| `Manual-of-Ideas-2nd-Edition.pdf` | Full book (licensed Wiley PDF when installed) | Idea funnel; strategy selection; case studies |
-| `Manual-of-Ideas-chapter-reference.txt` | Chapter map + key takeaways | Agent quick reference; until licensed PDF installed |
-| `README.md` | Install + chapter map | Onboard; `download_moi_book.py` |
+| `Manual-of-Ideas-full-text.txt` | **Full book text** (after local EPUB install + `download_moi_book.py`) | MOI-driven evaluation; cite by path |
+| `Manual-of-Ideas-1st-Edition-2013.epub` | Licensed source (local only; gitignored) | Human archive |
+| `Manual-of-Ideas-chapter-reference.txt` | Chapter map + key takeaways | Quick reference |
+| `README.md` | Install + chapter map | Onboard |
 
-**Framework docs:** `_system/frameworks/moi_lens.md`, `idea_funnel.md`, `special_situation_lens.md`, `equity_stub_valuation.md`
+**Framework docs:** `_system/frameworks/moi_company_evaluation.md` (comprehensive Ch 1–10 rules), `moi_lens.md`, `idea_funnel.md`, `special_situation_lens.md`, `equity_stub_valuation.md`
 
-**Install licensed PDF:** `MOI_PDF_SOURCE=/path/to/book.pdf python _system/scripts/download_moi_book.py`
+**Install (local Marvin workspace):** Drop licensed EPUB in `mihaljevic/.source/`, then:
+
+```bash
+python _system/scripts/download_moi_book.py
+python _system/scripts/build_wisdom_manifest.py
+```
+
+EPUB is **not committed to git** (copyright). `Manual-of-Ideas-full-text.txt` is generated locally for agent read.
 
 **Memory section:** `[PROPOSED MOI]` in daily log until human promotes
 

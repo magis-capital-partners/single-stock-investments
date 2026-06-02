@@ -54,7 +54,7 @@ def fetch_url(url: str, dest: Path) -> tuple[bool, str]:
     dest.parent.mkdir(parents=True, exist_ok=True)
     req = urllib.request.Request(url, headers={"User-Agent": UA})
     try:
-        data = urllib.request.urlopen(req, timeout=120).read()
+        data = urllib.request.urlopen(req, timeout=180).read()
         dest.write_bytes(data)
         return True, str(dest.relative_to(ROOT))
     except Exception as exc:
@@ -86,6 +86,8 @@ def tier_a(tickers: list[str] | None, with_sec: bool = False) -> list[dict]:
     holdings = reg.get("holdings") or {}
     universe = tickers or load_registry_holdings()
     log: list[dict] = []
+    ok, msg = download_ticker_returns("SPY", "US")
+    log.append({"ticker": "SPY", "tier": "A", "type": "benchmark_returns", "ok": ok, "path": msg})
     for t in universe:
         m = (holdings.get(t) or {}).get("market", "US")
         ok, msg = download_ticker_returns(t, m)

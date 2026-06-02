@@ -46,7 +46,32 @@ def main() -> None:
     bullet_md = "\n".join(f"- {b}" for b in bullets[:25]) or "- _(no auto bullets — review extract file)_"
 
     header = OUT.read_text(encoding="utf-8") if OUT.exists() else ""
-    if "## Claims extracted (fill from PDF)" in header:
+    alignment_table = """| # | Claim (ingest) | Module | Action |
+|---|----------------|--------|--------|
+| 1 | Neural adaptive strategies | encoder + ppo | replicate |
+| 2 | RL turnover-aware reward | ppo + mandate kappa | replicate |
+| 3 | Evolutionary population | genetic + persistence | replicate |
+| 4 | Regime / stress adaptation | regime + adversary | replicate |
+| 5 | Low turnover concentrated book | constraints + ira_marvin | replicate |
+| 6 | Proprietary weights | — | skip |
+"""
+    if "## Claims extracted" in header:
+        new_section = f"""## Claims extracted (auto-ingest)
+
+{bullet_md}
+
+{alignment_table}
+
+Full text: `Darwin_AI_Investments_1Q26_extract.txt` ({len(text)} chars).  
+See `_system/frameworks/darwin_source_alignment.md` and `darwin_mandate.json` `source_overrides`.
+"""
+        header = re.sub(
+            r"## Claims extracted.*?(?=\n## |\Z)",
+            new_section + "\n",
+            header,
+            flags=re.DOTALL,
+        )
+    elif "## Claims extracted (fill from PDF)" in header:
         new_section = f"""## Claims extracted (auto-ingest)
 
 {bullet_md}

@@ -1,8 +1,8 @@
 {
-  "version": 2,
-  "approved": "2026-06-01",
+  "version": 3,
+  "approved": "2026-06-02",
   "account_profile": "ira",
-  "account_notes": "Simple tax-advantaged IRA — optimize compound return inside the account; minimize turnover and custody friction; no shorting.",
+  "account_notes": "Simple tax-advantaged IRA — compound return inside the account; semiannual rebalance; Marvin epistemic gate + Darwin allocation engine.",
   "mandate": {
     "long_only": true,
     "allow_short": false,
@@ -24,8 +24,10 @@
     "allow_watch_stances": [],
     "exclude_negative_irr_unless_stance": ["core", "accumulate"],
     "preferred_policy": "ira_marvin",
-    "ml_champion_min_sharpe": 0.3,
-    "ml_champion_min_periods": 12
+    "ml_champion_min_sharpe": 0.25,
+    "ml_champion_min_periods": 12,
+    "stale_dive_days_for_review": 120,
+    "stale_dive_weight_threshold": 0.08
   },
   "ira_scoring": {
     "stance_multipliers": {
@@ -57,7 +59,16 @@
   },
   "regime": {
     "falsifier_stress_threshold": 3,
-    "stressed_turnover_multiplier": 1.5
+    "stressed_turnover_multiplier": 1.5,
+    "adapting_turnover_multiplier": 1.2
+  },
+  "evolution": {
+    "adversarial_fitness": true,
+    "adversarial_blend": 0.45,
+    "ensemble_champion": true,
+    "ensemble_top_k": 3,
+    "policy_trials": 8,
+    "persist_population": true
   },
   "training": {
     "latent_factors": 5,
@@ -72,6 +83,47 @@
     "backtest_quarters": 20,
     "price_history_months": 60
   },
-  "source_overrides": {},
-  "disclaimer": "IRA paper portfolio / research tool. Not tax or investment advice. Does not replicate proprietary Darwin AI Ventures models."
+  "source_overrides": {
+    "version": "1Q26-ingest",
+    "claims": [
+      {
+        "id": 1,
+        "claim": "Adaptive neural network strategies on real-world markets",
+        "action": "replicate",
+        "module": "darwin/encoder.py + darwin/ppo.py"
+      },
+      {
+        "id": 2,
+        "claim": "Reinforcement learning with turnover-aware reward",
+        "action": "replicate",
+        "module": "darwin/ppo.py",
+        "knob": "turnover_penalty_kappa"
+      },
+      {
+        "id": 3,
+        "claim": "Population-based policy search and selection",
+        "action": "replicate",
+        "module": "darwin/genetic.py + darwin/persistence.py"
+      },
+      {
+        "id": 4,
+        "claim": "Regime adaptation (macro + research stress)",
+        "action": "replicate",
+        "module": "darwin/regime.py"
+      },
+      {
+        "id": 5,
+        "claim": "Concentrated high-conviction book, low turnover",
+        "action": "replicate",
+        "module": "darwin/constraints.py + ira_marvin policy"
+      },
+      {
+        "id": 6,
+        "claim": "Proprietary model weights and execution stack",
+        "action": "skip",
+        "note": "Not replicable; Marvin IRR is our alpha prior"
+      }
+    ]
+  },
+  "disclaimer": "IRA paper portfolio / research tool. Not tax or investment advice. Inspired by Darwin AI Ventures public positioning and 1Q26 letter themes; does not replicate proprietary models."
 }

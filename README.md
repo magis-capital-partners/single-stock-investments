@@ -14,11 +14,11 @@ Static portfolio dashboard (etf-dashboard styling) in [`dashboard/`](dashboard/)
 
 **Darwin IRA:** [Research download plan](_system/frameworks/darwin_ira_research_plan.md) · copy PDF: `_system/scripts/copy_darwin_investor_pdf.ps1`
 
-**Darwin tab:** [Adaptive portfolio layer](_system/frameworks/darwin_portfolio_tab_proposal.md) — Holdings | **Darwin** on the dashboard. Rebuild:
+**Darwin tab (phases 0–4):** [Adaptive portfolio layer](_system/frameworks/darwin_portfolio_tab_proposal.md) · [Source alignment](_system/frameworks/darwin_source_alignment.md) — Holdings | **Darwin** on the dashboard. Rebuild:
 
 ```powershell
 pip install -r _system/scripts/requirements-darwin.txt
-python3 _system/scripts/build_darwin_portfolio.py
+python3 _system/scripts/build_darwin_portfolio.py --download
 python3 _system/scripts/build_dashboard_data.py
 ```
 
