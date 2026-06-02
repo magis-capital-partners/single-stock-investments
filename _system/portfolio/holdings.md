@@ -11,6 +11,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-06-02.
 | AMZN | AMZN/ | Amazon.com | US | 2026-06-02 | 2026-06-02 | compounder | hold |
 | APLD | APLD/ | Applied Digital | US | 2026-06-02 | 2026-06-02 | optionality | watch |
 | BN | BN/ | Brookfield Corporation | US | 2026-06-02 | 2026-06-02 | platform | hold |
+| BWEL | BWEL/ | J.G. Boswell Company | US | — | — | unknown | watch |
 | CMSG | CMSG/ | Consensus Mining & Seigniorage Corp | US | 2026-06-02 | 2026-06-02 | optionality | watch |
 | CPRT | CPRT/ | Copart | US | 2026-06-02 | 2026-06-02 | compounder | core |
 | CSGP | CSGP/ | CoStar Group | US | 2026-06-02 | 2026-06-02 | platform | watch |
@@ -32,4 +33,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-06-02.
 | TPL | TPL/ | Texas Pacific Land Corporation | US | 2026-06-02 | 2026-06-02 | unknown | watch |
 | WBI | WBI/ | WaterBridge Infrastructure | US | 2026-06-02 | 2026-06-02 | infrastructure | watch |
 
-**25 holdings total.** Registry: `_system/portfolio/registry.json`
+**26 holdings total.** Registry: `_system/portfolio/registry.json`
