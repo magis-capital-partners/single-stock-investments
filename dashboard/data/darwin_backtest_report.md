@@ -1,6 +1,6 @@
 # Darwin backtest report
 
-Generated: 2026-06-02T22:21:03Z
+Generated: 2026-06-02T22:34:21Z
 Policy: **ensemble** · Regime: **calm**
 
 ## Champion vs baselines
@@ -29,11 +29,10 @@ Policy: **ensemble** · Regime: **calm**
 - **3905.T**: high_weight_low_stance (review)
 - **8697.T**: human_review_pending (review)
 - **AMZN**: human_review_pending (review)
+- **BN**: human_review_pending (review)
 - **GOOGL**: human_review_pending (review)
 - **KEWL**: human_review_pending (review)
 - **KEWL**: high_weight_low_stance (review)
 - **SPGI**: human_review_pending (review)
-- **TPL**: human_review_pending (review)
-- **TPL**: high_weight_low_stance (review)
 
 IRA paper portfolio / research tool. Not tax or investment advice. Inspired by Darwin AI Ventures public positioning and 1Q26 letter themes; does not replicate proprietary models.
