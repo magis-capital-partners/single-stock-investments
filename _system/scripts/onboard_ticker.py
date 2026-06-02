@@ -355,7 +355,11 @@ def onboard(args: argparse.Namespace) -> int:
         ok, detail = True, "skipped"
 
     run_cmd([PY, str(SCRIPTS / "build_folder_indexes.py")], "indexes")
-    write_status(ticker_dir, "complete", extra={"download_detail": detail})
+    write_status(
+        ticker_dir,
+        "complete",
+        extra={"download_detail": detail, "deep_dive_pending": True},
+    )
     review_path = write_pending_review(ticker, company, market, ok, detail)
     run_cmd([PY, str(SCRIPTS / "build_dashboard_data.py")], "dashboard")
     log(f"Onboard complete: {ticker}")

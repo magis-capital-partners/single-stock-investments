@@ -95,7 +95,9 @@ Cloud prompt stays aligned with local refresh via `_system/prompts/cloud_marvin_
 
 Push to `main` after downloads or research triggers a Pages deploy automatically when dashboard-related paths change.
 
-**Daily analysis loop:** `daily-sync` (12:00 UTC) downloads new SEC/IR files → on success, `marvin-daily-deep-dive` runs → picks tickers whose primary documents are **newer than their latest deep dive** → opens a Cursor PR. If nothing new, the deep dive workflow **skips** (use manual run + **force_rotate** to refresh the oldest dive anyway).
+**Onboard → research:** Dashboard **+ Add holding** triggers `marvin-onboard.yml` (scaffold + download on `main`, then Cloud Marvin PR if `CURSOR_API_KEY` is set). See `_system/frameworks/onboard_research_automation.md`.
+
+**Daily analysis loop:** `daily-sync` (12:00 UTC) downloads holdings → `marvin-refresh` picks one holding (onboard-pending first, then no dive, then new filings/news) → Cursor PR. Skips when caught up (manual **force_rotate** optional).
 
 ### Secrets (Settings → Secrets → Actions)
 
