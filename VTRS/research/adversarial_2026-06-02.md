@@ -54,6 +54,9 @@ re_pass: false
 | Classification IRR | 9.5% | 9.5% | Yes |
 | Valuation bridge base | 9.5% | 9.5% | Yes |
 
+**Lint notes:**
+- VTRS/research/deep_dive_2026-06-02.md: executive_summary_first_pct 9.2% vs valuation.json base 9.5% (tol 0.25pp)
+
 ---
 
 ## Disclosure scan
