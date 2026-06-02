@@ -37,6 +37,8 @@ TYPE_SCORE = {
     "def 14a": 88,
     "8-k": 75,
     "earnings": 80,
+    "transcript": 82,
+    "earnings_transcript": 85,
     "supplemental": 70,
     "presentation": 65,
     "otcqx": 90,
@@ -82,6 +84,12 @@ def classify_path(rel: str) -> tuple[int, str]:
         return 88, "proxy"
     if "8-k" in low or "8_k" in low:
         return 75, "8-K"
+    if "corrected-transcript" in low or "corrected_transcript" in low:
+        return 85, "earnings_transcript"
+    if "/transcripts/" in low or "\\transcripts\\" in low or "03_events/transcripts" in low:
+        return 82, "transcript"
+    if "transcript" in low:
+        return 82, "transcript"
     if "earnings" in low or "earning" in low:
         return 80, "earnings"
     return best, label
@@ -166,11 +174,10 @@ def extract_html(path: Path, max_chars: int = 120_000) -> str:
 
 
 def extract_pdf(path: Path, max_pages: int) -> str:
-    from pypdf import PdfReader
+    from pdf_ocr import extract_pdf_text
 
-    reader = PdfReader(path)
-    pages = reader.pages[:max_pages]
-    return "\n".join((p.extract_text() or "") for p in pages)
+    result = extract_pdf_text(path, max_pages=max_pages)
+    return result.get("text") or ""
 
 
 def keyword_snippets(text: str, limit: int = 40) -> list[str]:
@@ -237,6 +244,8 @@ def build_ticker(ticker: str) -> int:
             kind_latest[k] = d
 
     full_kinds = {"10-K", "10-Q", "annual", "quarterly", "proxy", "otcqx", "10-k", "10-q"}
+    transcript_kinds = {"transcript", "earnings_transcript"}
+    transcript_latest: list[dict] = []
     full_count = 0
     partial_count = 0
     for d in docs:
@@ -245,6 +254,8 @@ def build_ticker(ticker: str) -> int:
         if d["kind"] in full_kinds and d is kind_latest.get(d["kind"]):
             d["tier"] = "full"
             full_count += 1
+        elif d["kind"] in transcript_kinds:
+            transcript_latest.append(d)
         elif d["score"] >= 70 and full_count + partial_count < 12:
             d["tier"] = "partial"
             partial_count += 1
@@ -252,6 +263,16 @@ def build_ticker(ticker: str) -> int:
             d["tier"] = "scan"
         else:
             d["tier"] = "inventory"
+
+    transcript_latest.sort(
+        key=lambda d: (d.get("file_date") or "", d.get("filename") or ""), reverse=True
+    )
+    for i, d in enumerate(transcript_latest):
+        if i < 2 and d.get("tier") != "full":
+            d["tier"] = "partial"
+            partial_count += 1
+        elif d.get("tier") not in ("full", "partial"):
+            d["tier"] = "scan"
 
     evidence_dir = ticker_dir / "research" / "evidence"
     evidence_dir.mkdir(parents=True, exist_ok=True)
@@ -282,11 +303,20 @@ def build_ticker(ticker: str) -> int:
         f"",
         f"Documents in folder: **{len(processed)}** (all listed below; Tier 1–3 extracted or keyword-scanned).",
         f"",
-        f"## Document inventory",
-        f"",
-        f"| Tier | Kind | File date | Path | Chars |",
-        f"|------|------|-----------|------|-------|",
     ]
+    latest_tx = next((p for p in processed if p.get("kind") in transcript_kinds and p.get("tier") in ("full", "partial", "scan")), None)
+    if latest_tx:
+        lines.append(
+            f"**Latest earnings transcript:** `{latest_tx['path']}` "
+            f"({latest_tx.get('file_date') or 'date unknown'}, tier {latest_tx.get('tier')})."
+        )
+        lines.append("")
+    lines.extend([
+        "## Document inventory",
+        "",
+        "| Tier | Kind | File date | Path | Chars |",
+        "|------|------|-----------|------|-------|",
+    ])
     for p in sorted(processed, key=lambda x: (-x["score"], x["path"])):
         err = f" ERR:{p['error'][:30]}" if p.get("error") else ""
         lines.append(

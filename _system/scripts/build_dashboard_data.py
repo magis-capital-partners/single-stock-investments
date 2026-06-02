@@ -495,6 +495,57 @@ def has_index(ticker_dir: Path) -> bool:
     return (ticker_dir / "INDEX.csv").exists() or (ticker_dir / "document-index.csv").exists()
 
 
+def transcript_summary(ticker: str, ticker_dir: Path) -> dict:
+    """Verified transcript + earnings fields for dashboard (no unverified projections)."""
+    manifest_path = ticker_dir / "investor-documents" / "TRANSCRIPT_MANIFEST.json"
+    entries: list[dict] = []
+    if manifest_path.exists():
+        try:
+            entries = json.loads(manifest_path.read_text(encoding="utf-8")).get("entries") or []
+        except json.JSONDecodeError:
+            entries = []
+
+    earnings_path = ticker_dir / "research" / "evidence" / "earnings_calendar.json"
+    earnings_events: list[dict] = []
+    if earnings_path.exists():
+        try:
+            earnings_events = json.loads(earnings_path.read_text(encoding="utf-8")).get("events") or []
+        except json.JSONDecodeError:
+            earnings_events = []
+
+    tx_sorted = sorted(
+        [e for e in entries if e.get("event_type") in ("earnings", "other")],
+        key=lambda e: (e.get("call_date") or "", e.get("downloaded_at") or ""),
+        reverse=True,
+    )
+    latest_tx = tx_sorted[0] if tx_sorted else None
+
+    reported = [e for e in earnings_events if e.get("reported") and e.get("verified")]
+    reported.sort(key=lambda e: e.get("date") or "", reverse=True)
+    latest_er = reported[0] if reported else None
+
+    gap = False
+    if latest_er and latest_tx:
+        gap = (
+            latest_er.get("fiscal_period")
+            and latest_tx.get("fiscal_period")
+            and latest_er.get("fiscal_period") != latest_tx.get("fiscal_period")
+            and (latest_er.get("date") or "") > (latest_tx.get("call_date") or "")
+        )
+    elif latest_er and not latest_tx:
+        gap = True
+
+    return {
+        "transcript_count": len(entries),
+        "latest_transcript_date": latest_tx.get("call_date") if latest_tx else None,
+        "latest_transcript_path": latest_tx.get("canonical_path") if latest_tx else None,
+        "latest_reported_earnings_date": latest_er.get("date") if latest_er else None,
+        "latest_reported_fiscal_period": latest_er.get("fiscal_period") if latest_er else None,
+        "earnings_verified": bool(latest_er),
+        "transcript_gap": gap,
+    }
+
+
 def build_ticker_row(ticker: str, holdings: dict[str, dict], portfolio_class: dict[str, dict]) -> dict:
     ticker_dir = ROOT / ticker
     meta = {**TICKER_META.get(ticker, {}), **holdings.get(ticker, {})}
@@ -524,6 +575,7 @@ def build_ticker_row(ticker: str, holdings: dict[str, dict], portfolio_class: di
         "recent_files": recent_files(ticker_dir),
         "developments": recent_developments(ticker_dir, ticker),
         "onboard": onboard_status(ticker_dir),
+        "transcripts": transcript_summary(ticker, ticker_dir),
     }
     row["completeness"] = completeness_score(row)
     return row
