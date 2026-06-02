@@ -1,29 +1,35 @@
 # DRR.AX — Investment Thesis
 
-**Last updated:** 2026-06-02
+**Last updated:** auto-sync
 
 ## Classification
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Archetype** (Stahl) | optionality |
+| **Moat** (Munger) | stable |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Cycle** | mid |
+| **Implied 10yr IRR** (base) | 8.0% (base) |
+| **IRR method** | yield_curve |
+| **Lawrence bucket** | other |
+| **Payoff lens** | asset |
+| **MOI bucket** | pending |
+
+**Deep dive:** `DRR.AX/research/deep_dive_2026-06-02.md` (auto-sync)
 
 ## One-line thesis
 
-Deterra Royalties Limited — thesis pending Marvin deep dive.
+MAC-anchored ASX royalty at ~5% yield with Thacker Pass lithium option; **8.0%** base five-year return at **A$4.43**; **watch** pending ASX doc pipeline and iron ore cycle.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest half-year and FY25 results presentations
+- [ ] Harvest FY2025 annual report PDF and March 2026 portfolio update
+- [ ] Confirm ASX market tag in registry (currently US)
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-06-02; awaiting deep dive.
+- Confirm ASX market classification in registry.
+- Vicki: ASX download script / March 2026 portfolio update (see shopbot brief).
