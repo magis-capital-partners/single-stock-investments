@@ -14,7 +14,7 @@
 | **Implied 10yr IRR** (base) | 1.1% (base) |
 | **IRR method** | full |
 | **Lawrence bucket** | low_cost |
-| **Payoff lens** | pending |
+| **Payoff lens** | asset |
 | **MOI bucket** | pending |
 
 **Deep dive:** `BWEL/research/deep_dive_2026-06-02.md` (auto-sync)
