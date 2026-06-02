@@ -1,6 +1,6 @@
 # Darwin tab — proposal for adaptive portfolio layer on Single Stock Dashboard
 
-**Status:** Implemented (phases 0–3) — 2026-06-01
+**Status:** Implemented (phases 0–4) — 2026-06-02
 
 Run: `pip install -r _system/scripts/requirements-darwin.txt && python3 _system/scripts/build_darwin_portfolio.py`
 

@@ -19,7 +19,18 @@ from darwin.pipeline import run_pipeline  # noqa: E402
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--fast", action="store_true", help="Reduced training for CI")
+    parser.add_argument(
+        "--download",
+        action="store_true",
+        help="Run Tier A/B market-data download before build",
+    )
     args = parser.parse_args()
+    if args.download:
+        import subprocess
+
+        script = ROOT / "_system" / "scripts" / "download_ira_research.py"
+        subprocess.run([sys.executable, str(script), "--tier", "A"], check=False)
+        subprocess.run([sys.executable, str(script), "--tier", "B"], check=False)
     out = run_pipeline(fast=args.fast)
     if out.get("error"):
         print(f"Darwin pipeline error: {out['error']}", file=sys.stderr)
