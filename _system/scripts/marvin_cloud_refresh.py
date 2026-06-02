@@ -101,10 +101,25 @@ def main() -> int:
             optional=True,
         )
         ok &= run(
+            "download transcripts",
+            [PY, str(SCRIPTS / "download_transcripts.py"), ticker, "--register-legacy"],
+            optional=True,
+        )
+        ok &= run(
             "filing evidence",
             [PY, str(SCRIPTS / "build_filing_evidence.py"), ticker],
         )
+        ok &= run(
+            "management evidence",
+            [PY, str(SCRIPTS / "build_management_evidence.py"), ticker],
+            optional=True,
+        )
 
+    ok &= run(
+        "market inputs",
+        [PY, str(SCRIPTS / "fetch_market_inputs.py"), ticker, "--merge"],
+        optional=True,
+    )
     ok &= run(
         "HK extract refresh",
         [PY, str(SCRIPTS / "refresh_hk_extracts.py")],
@@ -133,6 +148,12 @@ def main() -> int:
         "valuation write",
         [PY, str(SCRIPTS / "marvin_valuation.py"), "--ticker", ticker, "--write"],
     )
+    if ticker == "KEWL":
+        ok &= run(
+            "KEWL valuation refresh",
+            [PY, str(SCRIPTS / "refresh_kewl_valuation.py")],
+            optional=True,
+        )
     book_cfg = research / "book_estimate_config.json"
     if book_cfg.exists():
         ok &= run(
@@ -152,6 +173,12 @@ def main() -> int:
 
     if not args.skip_milly:
         ok &= run_milly(ticker, args.date)
+
+    ok &= run(
+        "evidence completeness",
+        [PY, str(SCRIPTS / "check_evidence_completeness.py"), ticker],
+        optional=True,
+    )
 
     ok &= run(
         "sync classification",
