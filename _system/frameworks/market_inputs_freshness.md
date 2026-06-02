@@ -1,3 +1,5 @@
 # Market inputs freshness
 
-See `_system/proposals/valuation_evidence_pipeline_plan_2026-06-02.md`. Mandatory: refresh commodity spot within **7 days** via `fetch_market_inputs.py`; store `as_of`, `source`, `fetched_at` in `market_inputs.json`. Milly checks `market_inputs_freshness` per `MILLY.md` §2f.
+**Moved.** Commodity spot staleness (7-day gate), `fetch_market_inputs.py`, and Milly checks are documented in:
+
+**`_system/frameworks/optionality_valuation.md`** → section **Mechanical refresh and market inputs** (subsection **Market inputs freshness**).

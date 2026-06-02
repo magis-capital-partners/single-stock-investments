@@ -4,6 +4,12 @@
 
 This file is the **single source of truth** for Cursor Cloud Agent runs (`marvin_deep_dive.mjs`). Local Marvin uses the same pipeline via `marvin_cloud_refresh.py`.
 
+## Framework read order (before writing)
+
+1. `_system/frameworks/decision_stack.md`
+2. `{{TICKER}}/research/valuation.json` → open **only** frameworks listed in `_system/frameworks/classification.md` **valuation.json trigger map**
+3. Do **not** read moved stubs (`evidence_refresh.md`, `market_inputs_freshness.md`); use `optionality_valuation.md` § Mechanical refresh when `evidence_refresh` is set
+
 ## Structure (mandatory)
 
 Follow `_system/frameworks/deep_dive_structure.md` (v2 layout):
@@ -19,21 +25,20 @@ Follow `_system/frameworks/deep_dive_structure.md` (v2 layout):
 
 Do **not** use the legacy five-section-only template as the final shape — run `refresh_deep_dive_v2.py` after narrative work.
 
-## Phase 1 — Evidence (run first)
+## Phase 1 — Evidence and sources (agent work)
+
+**Optional index:** `python _system/scripts/build_folder_indexes.py --ticker {{TICKER}}`
+
+**Mechanical evidence** runs in Phase 3 via `marvin_cloud_refresh.py`. For manual prep or debugging only:
 
 ```bash
-python _system/scripts/build_folder_indexes.py --ticker {{TICKER}}
-python _system/scripts/download_transcripts.py {{TICKER}} --register-legacy
 python _system/scripts/build_filing_evidence.py {{TICKER}}
-python _system/scripts/build_management_evidence.py {{TICKER}}
-python _system/scripts/fetch_market_inputs.py {{TICKER}} --merge
-python _system/scripts/refresh_hk_extracts.py
 python _system/scripts/scan_third_party_sources.py {{TICKER}} --with-hk --date {{date}}
 ```
 
-If `valuation.json` has `evidence_refresh`, read `_system/frameworks/evidence_refresh.md`.
+Read `{TICKER}/research/evidence/filing_digest_*.md` (latest), `document_inventory.json`, full-tier `_text/`, and `{TICKER}/third-party-analyses/source_inventory_{{date}}.md`. HK-indexed tickers (TPL, ICE, MSB, SJT): `hk_scan_{{date}}.md` when present.
 
-Read `{TICKER}/third-party-analyses/source_inventory_{{date}}.md` and every listed source. HK-indexed tickers (TPL, ICE, MSB, SJT): also read `hk_scan_{{date}}.md`.
+If `evidence_refresh` is set: read `optionality_valuation.md` § **Mechanical refresh and market inputs** (not a separate framework file).
 
 **Cloud HK vault:** `HK_PDFS_ROOT` defaults to `/opt/cursor/hk_pdfs` (see `.cursor/environment.json`). Set in [Cursor Dashboard → Cloud Agents → Secrets](https://cursor.com/dashboard/cloud-agents) and optionally GitHub Actions secret `HK_PDFS_ROOT`. Vault must exist on the VM (multi-repo environment, `HK_PDFS_REPO_URL` clone, or snapshot). Extracts auto-refresh from vault via `refresh_hk_extracts.py` before HK scan.
 
@@ -59,13 +64,19 @@ If **new_documents** or **new_valuation_news**: focus on what changed for owner 
 
 ## Phase 3 — Mechanical pipeline (run last; required)
 
+**One command** (do not re-list substeps unless debugging):
+
 ```bash
 python _system/scripts/marvin_cloud_refresh.py {{TICKER}} --date {{date}}
 ```
 
-That script runs the **full mechanical pipeline**: transcripts → filing + management evidence → market inputs → third-party scan → `marvin_valuation.py --write` → `refresh_optionality_valuation.py` (when `evidence_refresh` set) → `refresh_deep_dive_v2.py` → lint → Milly → `check_evidence_completeness.py` (strict when configured) → classification sync → dashboard → cross-checks.
+Includes: transcripts, filing + management evidence, market inputs, third-party scan, valuation write, `refresh_optionality_valuation` when `evidence_refresh.type` is set, deep dive v2 sync, lint, Milly, evidence completeness (strict when triggers apply), classification sync, dashboard, cross-check fill/verify.
 
-Batch all holdings: `python _system/scripts/batch_portfolio_refresh.py --date {{date}}` (add `--milly` for adversarial on every ticker). Local QA: `make research-check TICKER={{TICKER}} DATE={{date}}`.
+| Also | Command |
+|------|---------|
+| Batch all holdings | `batch_portfolio_refresh.py --date {{date}}` (add `--milly` for Milly on each) |
+| Local QA | `make research-check TICKER={{TICKER}} DATE={{date}}` |
+| Strict evidence gate | `marvin_cloud_refresh.py ... --strict-evidence` |
 
 For HK-indexed tickers: `python _system/scripts/check_hk_cross_checks.py {{TICKER}}`
 For all holdings QA: `python _system/scripts/check_cross_checks.py`

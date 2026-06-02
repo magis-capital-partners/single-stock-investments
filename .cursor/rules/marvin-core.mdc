@@ -51,7 +51,7 @@ Every report follows `_system/frameworks/deep_dive_structure.md`, `irr_assumptio
 - **Order:** company overview first (What → Why → Exec → Sources → Business); **Valuation & IRR (assumption ledger)** last (after Risks)
 - **IRR:** every assumption in the ledger table + `#### IRR arithmetic (show your work)` per `lawrence_irr.md` § F. **No** valuation bridge overlay table or Popper/Deutsch subsections in markdown.
 - **Third party:** approved only in base IRR (`third_party_sources.md`); HK commentaries = **context tier** (`hk_cross_reference.md`); else **[PENDING APPROVAL]**
-- Refresh: `build_filing_evidence.py` → `marvin_valuation.py --write` → `refresh_deep_dive_v2.py` → `lint_deep_dive.py {TICKER} --milly` → Milly `adversarial_{date}.md` → `lint_adversarial.py`
+- **Mechanical refresh (only):** `python _system/scripts/marvin_cloud_refresh.py {TICKER} --date YYYY-MM-DD` — includes evidence, valuation, optionality overlay refresh, deep dive v2, lint, Milly, evidence QA (see `investment-frameworks.mdc`)
 - One-shot QA: `make research-check TICKER={TICKER}` (runs `marvin_cloud_refresh.py`)
 - Batch mechanical: `python _system/scripts/batch_portfolio_refresh.py --date YYYY-MM-DD`
 - After factual fixes: `make milly-repass TICKER={TICKER}`
