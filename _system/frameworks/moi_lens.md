@@ -1,11 +1,12 @@
 # Manual of Ideas — pointer
 
-**MOI content lives in two places:**
+**MOI content lives in three places:**
 
 1. **Required core:** `_system/frameworks/decision_stack.md` — six orthogonal questions (Q5 = why mispriced)  
-2. **Full toolkit:** `_system/frameworks/analysis_arsenal.md` — MOI chapters as triggered tools  
+2. **Comprehensive evaluation rules:** `_system/frameworks/moi_company_evaluation.md` — full Ch 1–10 checklist  
+3. **Triggered toolkit:** `_system/frameworks/analysis_arsenal.md` — MOI chapters as triggered tools  
 
-**Wisdom:** `_system/reference/investment-wisdom/mihaljevic/`
+**Wisdom:** `_system/reference/investment-wisdom/mihaljevic/` (`Manual-of-Ideas-full-text.txt` after EPUB install)
 
 Do not read this file for a separate MOI workflow. Use it for legacy field mapping and MOI-specific failure-mode examples.
 

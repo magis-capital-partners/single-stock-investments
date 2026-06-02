@@ -3,6 +3,7 @@
 **Purpose:** Full toolkit — every lens Marvin *can* apply. **Not** every tool on every dive.
 
 **Core (always):** `_system/frameworks/decision_stack.md` — six orthogonal questions.  
+**MOI comprehensive rules:** `_system/frameworks/moi_company_evaluation.md` — full Ch 1–10 evaluation checklist.  
 **This file:** triggered tools keyed by `payoff_lens` or situation.
 
 ---
