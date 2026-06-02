@@ -72,6 +72,9 @@ def main() -> None:
     if any(t in holdings for t in ("OTCM", "FRMO", "KEWL")):
         run([PY, str(SCRIPTS / "download_otc_api.py")], "OTC tickers (OTCM/FRMO/KEWL)")
 
+    run([PY, str(SCRIPTS / "download_transcripts.py"), "--register-legacy"], "Transcript harvest (IR + Polygon timing)")
+    run([PY, str(SCRIPTS / "transcript_gap_report.py")], "Transcript coverage report")
+
     run([PY, str(SCRIPTS / "build_folder_indexes.py")], "Build INDEX.csv files")
     run([PY, str(SCRIPTS / "sync_portfolio_from_registry.py")], "Sync portfolio from registry")
     run([PY, str(SCRIPTS / "build_dashboard_data.py")], "Rebuild dashboard JSON")
