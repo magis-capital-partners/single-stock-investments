@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Single-ticker Marvin pipeline for cloud and local refresh (same as batch_portfolio_refresh).
+"""Single-ticker Marvin pipeline for cloud, batch, and local refresh.
 
 Usage:
   python _system/scripts/marvin_cloud_refresh.py AMZN --date 2026-05-29
   python _system/scripts/marvin_cloud_refresh.py SNOW --date 2026-05-29 --reindex
   python _system/scripts/marvin_cloud_refresh.py ICE --date 2026-05-29 --skip-milly
+  python _system/scripts/marvin_cloud_refresh.py KEWL --date 2026-06-02 --strict-evidence
 """
 from __future__ import annotations
 
@@ -17,6 +18,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPTS = Path(__file__).resolve().parent
 PY = sys.executable
+
+sys.path.insert(0, str(SCRIPTS))
+from marvin_pipeline_common import has_evidence_refresh_config, latest_deep_dive_date  # noqa: E402
 
 
 def run(label: str, cmd: list[str], *, optional: bool = False) -> bool:
@@ -58,6 +62,15 @@ print('OK', out)
     return run("Milly adversarial", [PY, "-c", code])
 
 
+def needs_evidence_gate(val: dict) -> bool:
+    if has_evidence_refresh_config(val):
+        return True
+    if val.get("valuation_mode") == "optionality" and val.get("nav_overlay"):
+        return True
+    inp = val.get("inputs") or {}
+    return bool(inp.get("copperwood_royalty_est_usd") or inp.get("copper_spot_usd_per_lb"))
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Marvin cloud/local mechanical pipeline")
     parser.add_argument("ticker", help="Ticker symbol")
@@ -65,6 +78,12 @@ def main() -> int:
     parser.add_argument("--reindex", action="store_true", help="Rebuild INDEX.csv for this ticker")
     parser.add_argument("--skip-milly", action="store_true", help="Skip adversarial pass")
     parser.add_argument("--skip-evidence", action="store_true", help="Skip build_filing_evidence")
+    parser.add_argument("--skip-dashboard", action="store_true", help="Skip dashboard JSON rebuild")
+    parser.add_argument(
+        "--strict-evidence",
+        action="store_true",
+        help="Fail if check_evidence_completeness fails (auto for evidence_refresh tickers)",
+    )
     args = parser.parse_args()
 
     ticker = args.ticker.upper()
@@ -72,19 +91,24 @@ def main() -> int:
     if not research.is_dir():
         print(f"ERROR: {ticker}/research/ missing")
         return 1
-    if not (research / "valuation.json").exists():
+    val_path = research / "valuation.json"
+    if not val_path.exists():
         print(f"ERROR: {ticker}/research/valuation.json missing — create inputs before pipeline")
         return 1
+    val = json.loads(val_path.read_text(encoding="utf-8"))
+    strict_evidence = args.strict_evidence or needs_evidence_gate(val)
+
     dive = research / f"deep_dive_{args.date}.md"
     if not dive.exists():
-        alt = sorted(research.glob("deep_dive_*.md"))
-        if not alt:
+        latest = latest_deep_dive_date(research)
+        if not latest:
             print(
                 f"ERROR: no deep_dive_{args.date}.md — write narrative first "
                 f"(see _system/prompts/cloud_marvin_runbook.md)"
             )
             return 1
-        print(f"WARN: using latest dive for refresh; expected deep_dive_{args.date}.md")
+        print(f"WARN: using deep_dive_{latest}.md; expected deep_dive_{args.date}.md")
+        args.date = latest
 
     print(f"=== marvin_cloud_refresh {ticker} {args.date} ===")
     ok = True
@@ -118,7 +142,7 @@ def main() -> int:
     ok &= run(
         "market inputs",
         [PY, str(SCRIPTS / "fetch_market_inputs.py"), ticker, "--merge"],
-        optional=True,
+        optional=not has_evidence_refresh_config(val),
     )
     ok &= run(
         "HK extract refresh",
@@ -138,21 +162,14 @@ def main() -> int:
         ],
     )
 
-    hk_index = ROOT / "_system" / "reference" / "investment-wisdom" / "hk_ticker_index.json"
-    if hk_index.exists():
-        idx = json.loads(hk_index.read_text(encoding="utf-8"))
-        if ticker in idx.get("tickers", {}):
-            pass  # HK scan already run via scan_third_party_sources --with-hk
-
     ok &= run(
         "valuation write",
         [PY, str(SCRIPTS / "marvin_valuation.py"), "--ticker", ticker, "--write"],
     )
-    if ticker == "KEWL":
+    if has_evidence_refresh_config(val):
         ok &= run(
-            "KEWL valuation refresh",
-            [PY, str(SCRIPTS / "refresh_kewl_valuation.py")],
-            optional=True,
+            "optionality evidence refresh",
+            [PY, str(SCRIPTS / "refresh_optionality_valuation.py"), ticker],
         )
     book_cfg = research / "book_estimate_config.json"
     if book_cfg.exists():
@@ -177,7 +194,7 @@ def main() -> int:
     ok &= run(
         "evidence completeness",
         [PY, str(SCRIPTS / "check_evidence_completeness.py"), ticker],
-        optional=True,
+        optional=not strict_evidence,
     )
 
     ok &= run(
@@ -185,10 +202,11 @@ def main() -> int:
         [PY, str(SCRIPTS / "sync_classification.py"), "--fix", "--ticker", ticker],
         optional=True,
     )
-    ok &= run(
-        "dashboard JSON",
-        [PY, str(SCRIPTS / "build_dashboard_data.py")],
-    )
+    if not args.skip_dashboard:
+        ok &= run(
+            "dashboard JSON",
+            [PY, str(SCRIPTS / "build_dashboard_data.py")],
+        )
     ok &= run(
         "fill cross-check",
         [PY, str(SCRIPTS / "fill_cross_check.py"), ticker, "--date", args.date, "--write"],

@@ -4,6 +4,31 @@
   "valuation_mode": "optionality",
   "method": "yield_curve",
   "lawrence_bucket": "other",
+  "evidence_refresh": {
+    "type": "commodity_nav",
+    "commodity": "copper",
+    "royalty_usd_at_ref_lb": {
+      "amount": 7700000,
+      "ref_lb": 4.0,
+      "source": "SSI May 2024"
+    },
+    "probability_pct": 35,
+    "lease_annual_usd": 365000,
+    "lease_cap_multiple": 10,
+    "acreage_uplift_per_share": 1.0,
+    "cash_floor_per_share": 3.6,
+    "base_payoff": 30,
+    "bear_payoff": 14,
+    "horizon_years": 7,
+    "overlay_slack_per_share": 4.0,
+    "payoff_lens": "asset",
+    "seed_filing_facts": true,
+    "gaap_vs_fair_value": {
+      "mineral_rights_balance_sheet_m": 7.98,
+      "acres_disclosed": ">1.3M gross",
+      "policy": "Minerals at historical cost; production royalties off balance sheet until production"
+    }
+  },
   "classification_inputs": {
     "archetype": "optionality",
     "moat": "n/a",
@@ -18,13 +43,13 @@
     "shares_outstanding": 1126284,
     "copperwood_royalty_est_usd": 7700000,
     "normalization_note": "SSI mineral-floor + free-option. At $55, ~4.3\u00d7 book \u2014 option yield falls vs $27 entry.",
-    "copper_spot_usd_per_lb": 6.666,
+    "copper_spot_usd_per_lb": 6.6673,
     "copper_spot_as_of": "2026-06-02",
     "copper_spot_source": "https://stooq.com/q/l/?s=hg.f&f=sd2t2ohlcv&h&e=csv",
     "copperwood_royalty_est_usd_ssi_ref": 7700000,
-    "copperwood_royalty_est_usd_at_spot": 12832050.0,
-    "copperwood_royalty_note": "SSI ~$7.7M/yr @ $4.0/lb scaled linearly to spot $6.666/lb [Assumption]",
-    "lease_income_annual_usd": 365000,
+    "copperwood_royalty_est_usd_at_spot": 12834552.0,
+    "copperwood_royalty_note": "SSI ~$7.7M/yr @ $4.0/lb scaled linearly to spot $6.6673/lb [Assumption]",
+    "lease_income_annual_usd": 365000.0,
     "lease_income_source": "FY2024 annual; H1 2025 semi-annual trend"
   },
   "optionality_gate": {
@@ -36,7 +61,7 @@
     "primary_label": "annualized return",
     "primary_return_pct": -8.3,
     "incumbent_sleeve": false,
-    "notes": "Economic floor ~$20.93/sh (not GAAP book); spot Cu $6.666/lb; Copperwood option yield ~20.72% at spot royalty",
+    "notes": "Economic floor ~$20.93/sh (not GAAP book); spot copper $6.6673/unit; option yield ~20.72%",
     "overlay_nav_per_share": 22.73,
     "copperwood_option_yield_pct": 20.72,
     "overlay_implied_return_pct": -10.69
@@ -72,38 +97,38 @@
             "math": "~$365K/yr x 10.0x / shares"
           },
           {
-            "id": "copperwood_partial",
-            "label": "Copperwood option (priced in @ entry)",
+            "id": "production_partial",
+            "label": "Production option (partially in price)",
             "gaap_per_share": 0.0,
             "uplift_per_share": 3.99,
             "math": "P=35% x spot royalty $12.8M/yr"
           },
           {
             "id": "acreage",
-            "label": "667K-acre + secondary lessee",
+            "label": "Acreage + secondary lessee",
             "gaap_per_share": 0.0,
             "uplift_per_share": 1.0,
-            "math": "Filing transaction + option [Assumption]"
+            "math": "Filing + option [Assumption]"
           },
           {
             "id": "residual",
             "label": "Residual to Lawrence base payoff",
             "gaap_per_share": 0.0,
             "uplift_per_share": 9.07,
-            "math": "Tie to $30.0 lease-heavy path"
+            "math": "Tie to $30.0 path"
           }
         ],
         "year5_economic_nav_per_share": 30.0,
         "sum_check": "lines sum to 30.0",
         "years": 7,
-        "notes": "Lawrence base: lease path; copper partial via P x spot royalty"
+        "notes": "Lawrence base with partial production option"
       }
     },
     "bull": {
       "price": 55.0,
-      "payoff": 64.9,
+      "payoff": 64.89999999999999,
       "years": 7,
-      "notes": "Copperwood at spot $6.666/lb + diversification; royalty ~$12.8M/yr"
+      "notes": "Production at spot $6.6673"
     }
   },
   "results": {
@@ -215,7 +240,7 @@
         "id": "gaap_book",
         "label": "GAAP equity per share",
         "per_share": 12.7,
-        "source": "FY2024"
+        "source": "filing"
       },
       {
         "id": "lease_cap",
@@ -224,35 +249,16 @@
         "source": "[Assumption] 10.0x on ~$365K/yr"
       },
       {
-        "id": "copperwood_pw",
-        "label": "Copperwood royalty P=35% @ spot Cu",
+        "id": "production_pw",
+        "label": "Production royalty P=35% @ spot",
         "per_share": 3.99,
-        "source": "SSI bridge scaled to $6.666/lb"
+        "source": "Scaled to spot $6.6673"
       },
       {
         "id": "acreage",
-        "label": "667K-acre package (transaction cost)",
+        "label": "Acreage / secondary option",
         "per_share": 1.0,
-        "source": "FY2024 acquisition"
-      }
-    ],
-    "components": [
-      {
-        "id": "copperwood_royalty",
-        "label": "Copperwood production royalty",
-        "option_treatment": "probability_weighted",
-        "probability_pct": 35,
-        "payoff_per_share_full": 11.39,
-        "payoff_per_share_overlay": 3.99,
-        "source": "SSI @ $4/lb scaled to spot $6.666/lb; Highland feasibility [Assumption]"
-      },
-      {
-        "id": "secondary_lessee",
-        "label": "Secondary lessee / diversification",
-        "option_treatment": "probability_weighted",
-        "probability_pct": 20,
-        "payoff_per_share_overlay": 1.5,
-        "source": "FY2024 MD&A diversification; solar/recycling leases [Assumption]"
+        "source": "filing"
       }
     ],
     "premium_to_economic_floor_pct": 162.8,
@@ -389,10 +395,10 @@
   },
   "market_inputs": {
     "copper": {
-      "spot": 6.666,
+      "spot": 6.6673,
       "as_of": "2026-06-02",
       "source": "https://stooq.com/q/l/?s=hg.f&f=sd2t2ohlcv&h&e=csv",
-      "fetched_at": "2026-06-02T19:35:43Z",
+      "fetched_at": "2026-06-02T19:44:33Z",
       "stooq_symbol": "hg.f"
     },
     "scenario_grid": {

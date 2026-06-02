@@ -39,6 +39,28 @@
 - `make research-check TICKER={TICKER}` (PYTHON=python3)
 - Milly `adversarial_{date}.md`
 
+## Phase 7 — Unified pipeline (2026-06-02)
+
+- `batch_portfolio_refresh.py` → delegates to `marvin_cloud_refresh.py` per ticker
+- `make research-check` → `marvin_cloud_refresh` + `--strict-evidence`
+- `Makefile` defaults `PYTHON=python3`
+
+## Phase 8 — Config-driven optionality refresh
+
+- `refresh_optionality_valuation.py` reads `valuation.json` → `evidence_refresh`
+- KEWL: `evidence_refresh.type: commodity_nav` (replaces hardcoded `if ticker == KEWL`)
+- `refresh_kewl_valuation.py` thin wrapper for backward compatibility
+
+## Phase 4b — OTC filing_facts
+
+- `filing_facts.parse_otc_prose_metrics()` on full-tier `_text/` when IX tags empty
+- Prefer `Annual_Report` extracts in `latest_full_text_path()`
+
+## CI + daily download
+
+- `lint_pr_research.py`: evidence completeness for optionality / `evidence_refresh` tickers in PR diff
+- `download_all_holdings.py`: post-transcript `fetch_market_inputs` + `build_management_evidence` per holding
+
 ## KEWL checklist (2026-06-02)
 
 | Step | Status |
@@ -49,4 +71,4 @@
 | Lawrence base stance gate | -8.3% @ $55 |
 | Deep dive + adversarial | 2026-06-02 |
 | Cross-check verify | 2026-06-01 on file |
-| Evidence completeness | After refresh_kewl filing_facts seed |
+| Evidence completeness | Strict via `marvin_cloud_refresh --strict-evidence` |

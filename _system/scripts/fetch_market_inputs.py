@@ -24,6 +24,29 @@ TICKER_SYMBOLS: dict[str, list[str]] = {
 }
 
 
+def tickers_for_market_merge(explicit: list[str] | None = None) -> list[str]:
+    """Registry tickers that need commodity market_inputs merge."""
+    if explicit:
+        return [t.upper() for t in explicit]
+    out: set[str] = set(TICKER_SYMBOLS.keys())
+    for td in ROOT.iterdir():
+        if not td.is_dir() or td.name.startswith(("_", ".")):
+            continue
+        vp = td / "research" / "valuation.json"
+        if not vp.exists():
+            continue
+        try:
+            val = json.loads(vp.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            continue
+        er = val.get("evidence_refresh") or {}
+        if er.get("type") == "commodity_nav":
+            out.add(td.name.upper())
+            commodity = er.get("commodity", "copper")
+            TICKER_SYMBOLS.setdefault(td.name.upper(), [commodity])
+    return sorted(out)
+
+
 def fetch_stooq(symbol: str) -> tuple[float | None, str | None, str | None]:
     url = STOOQ_URL.format(symbol=symbol.lower())
     req = urllib.request.Request(url, headers={"User-Agent": UA})
@@ -144,9 +167,12 @@ def main() -> int:
     manifest = {"as_of": TODAY, "commodities": {k: {"spot": v.get("spot"), "as_of": v.get("as_of")} for k, v in fetched.items()}}
     (COMMODITY_DIR / "manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
 
-    tickers = [t.upper() for t in args.tickers] if args.tickers else []
-    if args.merge and not tickers:
-        tickers = list(TICKER_SYMBOLS.keys())
+    if args.tickers:
+        tickers = [t.upper() for t in args.tickers]
+    elif args.merge:
+        tickers = tickers_for_market_merge()
+    else:
+        tickers = []
     for t in tickers:
         subset = {k: v for k, v in fetched.items() if k in TICKER_SYMBOLS.get(t, ["copper"])}
         merge_ticker(t, subset)

@@ -75,6 +75,27 @@ def main() -> None:
     run([PY, str(SCRIPTS / "download_transcripts.py"), "--register-legacy"], "Transcript harvest (IR + Polygon timing)")
     run([PY, str(SCRIPTS / "transcript_gap_report.py")], "Transcript coverage report")
 
+    for ticker in sorted(holdings.keys()):
+        val_path = ROOT / ticker / "research" / "valuation.json"
+        if not val_path.exists():
+            continue
+        try:
+            val = json.loads(val_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            continue
+        er = val.get("evidence_refresh") or {}
+        if er.get("type") == "commodity_nav" or ticker in ("KEWL", "MSB"):
+            run(
+                [PY, str(SCRIPTS / "fetch_market_inputs.py"), ticker, "--merge"],
+                f"{ticker} market inputs",
+            )
+        tx_dir = ROOT / ticker / "investor-documents" / "transcripts"
+        if tx_dir.is_dir() and any(tx_dir.iterdir()):
+            run(
+                [PY, str(SCRIPTS / "build_management_evidence.py"), ticker],
+                f"{ticker} management evidence",
+            )
+
     run([PY, str(SCRIPTS / "build_folder_indexes.py")], "Build INDEX.csv files")
     run([PY, str(SCRIPTS / "sync_portfolio_from_registry.py")], "Sync portfolio from registry")
     run([PY, str(SCRIPTS / "build_dashboard_data.py")], "Rebuild dashboard JSON")
