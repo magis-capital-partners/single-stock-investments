@@ -1,29 +1,35 @@
 # VTRS — Investment Thesis
 
-**Last updated:** 2026-06-02
+**Last updated:** auto-sync
 
 ## Classification
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
+| **Archetype** (Stahl) | turnaround |
 | **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Cycle** | transition |
+| **Implied 10yr IRR** (base) | 9.5% (total synthesis) |
+| **IRR method** | full |
+| **Lawrence bucket** | low_cost |
+| **Payoff lens** | operating |
+| **MOI bucket** | pending |
+
+**Deep dive:** `VTRS/research/deep_dive_2026-06-02.md` (auto-sync)
 
 ## One-line thesis
 
-Viatris Inc — thesis pending Marvin deep dive.
+Post-EWSR generic pharma cash generator at ~9% FCF yield, but ~$14B net debt and unproven moat keep stance **watch** until deleveraging and base-business growth confirm in filings (9.5% Lawrence base IRR at $15.69).
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest annual report (FY2025 10-K)
+- [x] Read latest quarterly report (Q1 2026 10-Q)
+- [ ] Verify maintenance capex in cash flow statement
+- [ ] Harvest IR PDFs / earnings deck via Vicki
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-06-02; awaiting deep dive.
+- Capex normalization assumption ($450M) pending human OK.

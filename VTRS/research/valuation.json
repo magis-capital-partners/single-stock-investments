@@ -1,0 +1,178 @@
+{
+  "ticker": "VTRS",
+  "as_of": "2026-06-02",
+  "method": "full",
+  "lawrence_bucket": "low_cost",
+  "classification_inputs": {
+    "archetype": "turnaround",
+    "moat": "unproven",
+    "dhando": "partial",
+    "cycle": "transition",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 15.69,
+    "price_source": "Stooq VTRS.US 2026-06-02",
+    "fcf_per_share": 1.38,
+    "fcf_source": "FY2025 OCF $2,316M minus ~$450M capex [Assumption] on 1,151M diluted shares; haircut for divestiture-year noise (10-K FY2025)",
+    "shares_millions": 1151.4,
+    "normalization_note": "Use operating cash flow not GAAP net income; FY2025 EPS inflated by portfolio gains"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": -0.02,
+      "growth_y6_10": 0.0,
+      "exit_pfcf_y10": 7,
+      "notes": "Revenue erosion + refinancing stress; EWSR savings delayed"
+    },
+    "base": {
+      "growth_y1_5": 0.02,
+      "growth_y6_10": 0.015,
+      "exit_pfcf_y10": 9,
+      "notes": "Stabilize base generics; $600-700M cost program to cash per 10-K EWSR"
+    },
+    "bull": {
+      "growth_y1_5": 0.04,
+      "growth_y6_10": 0.025,
+      "exit_pfcf_y10": 11,
+      "notes": "Mix shift to higher-margin brands + successful complex generics launches"
+    }
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": true
+    },
+    "override_reason": "Leveraged balance sheet and unproven post-portfolio moat cap stance despite partial dhando on cash yield"
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Intangibles marked; equity low vs debt not hidden-asset pattern"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating pharma, not resource royalty"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Eye Care and complex brands in segment mix; 10-K segment note"
+    },
+    {
+      "q": 4,
+      "question": "Backlog not in FCF path?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Generic pharma revenue recognized on shipment"
+    },
+    {
+      "q": 5,
+      "question": "Private / illiquid stakes below fair value?",
+      "answer": "Yes",
+      "treatment": "milestone_nav",
+      "evidence": "Biocon Biologics collaboration stake post-2022 biosimilars contribution (10-K definitions)"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "Yes",
+      "treatment": "zero",
+      "evidence": "FY2025 divestiture gains in other income; excluded from normalized owner cash",
+      "base_terminal_rationale": "One-time portfolio sales not in 10-year run rate"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Biosimilar pipeline economics flow through Generics segment over time"
+    }
+  ],
+  "human_review": [],
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 4.5
+    },
+    "base": {
+      "return_pct": 9.2
+    },
+    "bull": {
+      "return_pct": 12.3
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 4.5
+    },
+    "base": {
+      "return_pct": 9.2
+    },
+    "bull": {
+      "return_pct": 12.3
+    }
+  },
+  "implied_return": {
+    "base_pct": 9.5,
+    "label": "10yr IRR (total synthesis)",
+    "display": "9.5% (total synthesis)",
+    "falsifier_adjusted_pct": 9.2,
+    "synthesis_pct": 9.5
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "lawrence_base",
+        "label": "Lawrence base (filings)",
+        "source": "scenarios.base",
+        "return_pct": 9.2,
+        "weight": 1.0,
+        "type": "numeric",
+        "epistemic_tier": "A (primary filings)",
+        "weight_why": "No approved third-party sources; stance gate is filing-based owner cash only.",
+        "weight_falsifiers": [],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "factor": "Partial dhando (HK hard-asset / hidden NAV)",
+        "pp": 0.5,
+        "rationale": "Third-party confirms asset quality not in GAAP book; not full floor at spot price",
+        "sources": "cross_check_HK; hk_scan; HK Q1 2025/2026"
+      },
+      {
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework"
+      }
+    ],
+    "numeric_weighted_pct": 9.2,
+    "qualitative_pp": 0.3,
+    "total_synthesis_pct": 9.5,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": false,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}
