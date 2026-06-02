@@ -7,6 +7,12 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+SCRIPTS = ROOT / "_system" / "scripts"
+import sys
+
+sys.path.insert(0, str(SCRIPTS))
+from lawrence_horizon import IMPLIED_IRR_LABEL  # noqa: E402
+
 CLASS_PATH = ROOT / "_system" / "portfolio" / "classification.json"
 DATE = "2026-05-21"
 
@@ -25,7 +31,7 @@ def classification_table(row: dict) -> str:
 | **Dhando** (Pabrai) | {row['dhando']} |
 | **Stance** | {row['stance']} |
 | **Cycle** | {cycle} |
-| **Implied 10yr IRR** (Lawrence) | {implied_irr} |
+| **{IMPLIED_IRR_LABEL}** (Lawrence) | {implied_irr} |
 | **IRR method** | {irr_method} |
 | **Lawrence bucket** | {lawrence_bucket} |
 """

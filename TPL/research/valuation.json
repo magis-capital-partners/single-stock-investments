@@ -30,8 +30,8 @@
     "floor_value": 106.2,
     "floor_value_note": "Conservative asset floor: Q1 2026 cash $3.59/sh + NRA acquisition comp $64.2/sh (royalty asset mark); excludes surface and producing PV to avoid double-count with segment build",
     "primary_metric": "lawrence_base",
-    "primary_label": "10yr IRR",
-    "primary_return_pct": -1.0,
+    "primary_label": "7yr IRR",
+    "primary_return_pct": -4.0,
     "overlay_nav_per_share": 210.5,
     "overlay_nav_note": "Segment operating PV $162 + cash $3.6 + undeveloped NRA option $16 + surface $32 [Assumption]; price $393 embeds ~87% premium to overlay base",
     "notes": "GAAP book ~$21/sh is retained earnings + PPE/water + acquired royalties only. Price well above filing-backed NAV overlay; Lawrence IRR remains stance gate.",
@@ -169,7 +169,7 @@
   "segment_build": {
     "framework": "speedwell_reverse_dcf",
     "as_of": "2026-06-01",
-    "horizon_years": 10,
+    "horizon_years": 7,
     "discount_rate_explicit": 0.1,
     "allocation_method": "FY2025 segment revenue share of consolidated OCF $545.9M",
     "segments": [
@@ -255,20 +255,20 @@
   },
   "results": {
     "bear": {
-      "return_pct": -5.4
+      "return_pct": -9.0
     },
     "base": {
-      "return_pct": -1.0
+      "return_pct": -4.0
     },
     "bull": {
-      "return_pct": 3.4
+      "return_pct": 1.5
     }
   },
   "implied_return": {
     "base_pct": -0.13,
-    "label": "10yr IRR (total synthesis)",
+    "label": "7yr IRR (total synthesis)",
     "display": "-0.13% (total synthesis)",
-    "falsifier_adjusted_pct": -1.0,
+    "falsifier_adjusted_pct": -4.0,
     "synthesis_pct": -0.13
   },
   "stance_proposal": {
@@ -396,21 +396,21 @@
   "overlay_results": [],
   "results_lawrence_legacy": {
     "bear": {
-      "return_pct": -5.4
+      "return_pct": -9.0
     },
     "base": {
-      "return_pct": -1.0
+      "return_pct": -4.0
     },
     "bull": {
-      "return_pct": 3.4
+      "return_pct": 1.5
     }
   },
   "results_growth_theory": {
     "theory_implied": {
-      "return_pct": -1.0
+      "return_pct": -4.0
     },
     "falsifier_adjusted": {
-      "return_pct": -1.0
+      "return_pct": -4.0
     }
   },
   "option_scan": [
@@ -497,7 +497,7 @@
         "weight": 0.1,
         "type": "numeric",
         "epistemic_tier": "D (alternate theory: dated asset payoff)",
-        "weight_why": "Answers a different question (NAV convergence) than 10yr cash-flow IRR; capped weight to avoid theory conflation.",
+        "weight_why": "Answers a different question (NAV convergence) than 7yr cash-flow IRR; capped weight to avoid theory conflation.",
         "weight_falsifiers": [
           "NAV overlay base not updated when segment build or filings change >10%",
           "floor_pass false but weight above 15% without [HUMAN REVIEW]"
@@ -571,5 +571,6 @@
       }
     },
     "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
-  }
+  },
+  "lawrence_horizon_years": 7
 }

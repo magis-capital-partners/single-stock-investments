@@ -4,7 +4,9 @@
 
 **Purpose:** Quantitative expected-return discipline for Marvin deep dives. Complements Munger (quality), Pabrai (dhando / stance), Stahl (archetype / cycle), and Horizon Kinetics (equity yield curve for dated payoffs).
 
-**Reference:** [Bryan Lawrence, Oakcliff Capital](https://moiglobal.com/bryan-lawrence-oakcliff-capital/) — 10-year IRR model, five questions, three business buckets.
+**Reference:** [Bryan Lawrence, Oakcliff Capital](https://moiglobal.com/bryan-lawrence-oakcliff-capital/) — owner-cash IRR model (Marvin default **7-year** horizon; Lawrence original often cited as 10-year), five questions, three business buckets.
+
+**Horizon constant:** `_system/scripts/lawrence_horizon.py` (`LAWRENCE_HORIZON_YEARS = 7`). JSON keys `growth_y6_10` and `exit_pfcf_y10` are legacy names; terminal value is at year **7**.
 
 ---
 
@@ -12,7 +14,7 @@
 
 | Situation | Method | Tag |
 |-----------|--------|-----|
-| Modelable operating FCF / owner earnings | Full 10-year Lawrence IRR | `full` |
+| Modelable operating FCF / owner earnings | Full Lawrence IRR (`full`, 7-year default) | `full` |
 | Dated contractual recovery (NPI deficit, callable preferred, bankruptcy plan) | HK equity yield curve instead | `yield_curve` |
 | Pre-revenue optionality, binary turnarounds | Scenario IRR table (bear/base/bull) | `scenario` |
 | No credible cash-flow forecast | Skip numeric IRR; document why | `pending` |
@@ -46,7 +48,7 @@ If any answer is a clear **no**, fix the thesis or downgrade stance before optim
 
 ---
 
-## C. Base case model (10-year)
+## C. Base case model (7-year default)
 
 **Metric:** Prefer **adj. FCF per share** or **owner earnings per share** (not GAAP EPS distorted by fair-value marks or amortization).
 
@@ -54,10 +56,10 @@ If any answer is a clear **no**, fix the thesis or downgrade stance before optim
 
 1. Set **Year 0 price** (current quote; cite date).
 2. Set **starting FCF/sh** — normalize for cycle if Stahl `Cycle` = peak or trough.
-3. Project FCF/sh for years 1–10 (growth can step down after year 5).
+3. Project FCF/sh for years 1–**7** (growth years 1–5 use `growth_y1_5`; years 6–7 use `growth_y6_10`).
 4. Assume **100% of FCF** returns to shareholders (dividends + buybacks) unless reinvestment clearly compounds at high ROIC — then reduce payout assumption and document.
-5. **Terminal value at year 10:** `FCF_10 × exit_multiple` (P/FCF or EV/FCF equivalent).
-6. Solve **IRR** on cash-flow stream: `CF0 = −price`, `CF1…CF9 = FCF_t`, `CF10 = FCF_10 + terminal`.
+5. **Terminal value at horizon year:** `FCF_N × exit_multiple` (P/FCF or EV/FCF equivalent; default N=7).
+6. Solve **IRR** on cash-flow stream: `CF0 = −price`, `CF1…CF(N−1) = FCF_t`, `CFN = FCF_N + terminal`.
 
 **Tool:** `python _system/scripts/marvin_valuation.py --ticker {TICKER} --write`  
 Machine-readable assumptions live in `{TICKER}/research/valuation.json`.
@@ -69,7 +71,7 @@ Machine-readable assumptions live in `{TICKER}/research/valuation.json`.
 Report **bear / base / bull** with different:
 
 - FCF growth (years 1–5 and 6–10)
-- Exit multiple at year 10
+- Exit multiple at horizon year (default year 7)
 - Optional: starting FCF normalization (mid vs peak cycle)
 
 Show implied IRR at **current price** for each scenario.
@@ -78,7 +80,7 @@ Show implied IRR at **current price** for each scenario.
 
 ## E. Stance mapping (Marvin proposes — human approves)
 
-| Implied 10yr IRR (base) | Suggested stance | Notes |
+| Implied 7yr IRR (base) | Suggested stance | Notes |
 |-------------------------|------------------|-------|
 | **>20%** | accumulate / core | Fat pitch; size up if dhando + moat confirm |
 | **15–20%** | hold | Adequate return; monitor IRR vs price |
@@ -188,7 +190,7 @@ Add to the standard Classification table:
 
 | Field | Values |
 |-------|--------|
-| **Implied 10yr IRR** (Lawrence) | e.g. `17% (base)` or `pending` |
+| **Implied 7yr IRR** (Lawrence) | e.g. `17% (base)` or `pending` |
 | **IRR method** | `full`, `yield_curve`, `scenario`, `pending` |
 | **Lawrence bucket** | `pricing_power`, `multi_sided`, `low_cost`, `other` |
 

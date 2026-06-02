@@ -11,7 +11,7 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | transition |
-| **Implied 10yr IRR** (base) | 9.7% (blended best; Marvin floor 9.2%) |
+| **Implied 7yr IRR** (base) | 10.28% (total synthesis) |
 | **IRR method** | full |
 | **Lawrence bucket** | low_cost |
 | **Payoff lens** | event |

@@ -2,6 +2,8 @@
 
 **Updated:** 2026-06-02
 
+Approve in `_system/frameworks/third_party_sources.md` before using in base IRR.
+
 | File | Status |
 |------|--------|
-| (none) | Groundbreaker RE **approved** 2026-06-02 — see `references.md` |
+| (none) | — |

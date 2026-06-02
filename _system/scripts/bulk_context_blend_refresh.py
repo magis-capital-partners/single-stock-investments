@@ -11,9 +11,11 @@ ROOT = Path(__file__).resolve().parents[2]
 SCRIPTS = ROOT / "_system/scripts"
 PY = sys.executable
 
+sys.path.insert(0, str(SCRIPTS))
+from lawrence_horizon import SYNTHESIS_LABEL  # noqa: E402
+
 TICKERS = ["TEQ.ST", "TPL", "FRMO", "CMSG", "MSB", "ICE", "SJT", "KEWL"]
 
-sys.path.insert(0, str(SCRIPTS))
 from marvin_pipeline_common import latest_deep_dive_date  # noqa: E402
 
 
@@ -50,7 +52,7 @@ def main() -> int:
             ir = data.setdefault("implied_return", {})
             ir["base_pct"] = total
             ir["synthesis_pct"] = total
-            ir["label"] = "10yr IRR (total synthesis)"
+            ir["label"] = SYNTHESIS_LABEL
             ir["display"] = f"{total}% (total synthesis)"
         val_path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
         subprocess.check_call(

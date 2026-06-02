@@ -11,7 +11,7 @@
 | **Dhando** (Pabrai) | none |
 | **Stance** | watch |
 | **Cycle** | trough |
-| **Implied 10yr IRR** (base) | 14.51% (total synthesis) |
+| **Implied 7yr IRR** (base) | 5.8% (base) |
 | **IRR method** | yield_curve |
 | **Lawrence bucket** | other |
 | **Payoff lens** | pending |
@@ -46,5 +46,5 @@ Passive San Juan Basin gas NPI royalty trust — **equity yield curve / time arb
 - Model gas price scenarios vs distribution breakeven.
 - Track monthly 8-K excess production cost balance.
 
-**Deep dive:** `SJT/research/deep_dive_2026-06-01.md` (auto-sync)
+**Deep dive:** `SJT/research/deep_dive_2026-06-02.md` (auto-sync)
 **Cross-check (HK lens):** `SJT/research/cross_check_2026-05-22.md`

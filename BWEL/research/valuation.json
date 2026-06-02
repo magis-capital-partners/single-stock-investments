@@ -24,7 +24,7 @@
     "enabled": true,
     "gaap_book_per_share": 783.2,
     "land_carrying_thousands": 106048,
-    "notes": "Land and water at historical cost; subsurface minerals in CA/OR not separately fair-valued. Do not treat GAAP book as full economic NAV. Groundbreaker (2026-05-21) cites unverified ~400k AF and $2B-$6B water NAV — context only; see cross_check_groundbreaker_2026-06-02.md.",
+    "notes": "Land and water at historical cost; subsurface minerals in CA/OR not separately fair-valued. Do not treat GAAP book as full economic NAV. Groundbreaker (2026-05-21) cites unverified ~400k AF and $2B-$6B water NAV \u2014 context only; see cross_check_groundbreaker_2026-06-02.md.",
     "overlay_nav_per_share": 850.0,
     "overlay_rationale": "[Assumption] Operating PPE + working capital at book; land/water/minerals modest uplift vs $106M land line only; pending human land appraisal.",
     "external_bull_nav_notes": "Groundbreaker: $5k-$15k/AF on ~400k AF (unverified) vs ~$516M mcap; not in base IRR"
@@ -60,8 +60,8 @@
     "floor_metric": "price_to_book",
     "floor_value": 783.2,
     "primary_metric": "lawrence_base",
-    "primary_label": "10yr IRR",
-    "primary_return_pct": 1.1,
+    "primary_label": "7yr IRR",
+    "primary_return_pct": -1.4,
     "incumbent_sleeve": false,
     "notes": "Price ~0.70x GAAP book; thin OTC liquidity; family control; mineral rights option not in Lawrence FCF path.",
     "overlay_nav_per_share": 850.0
@@ -129,20 +129,20 @@
   },
   "results": {
     "bear": {
-      "return_pct": -2.8
+      "return_pct": -6.3
     },
     "base": {
-      "return_pct": 1.1
+      "return_pct": -1.4
     },
     "bull": {
-      "return_pct": 3.2
+      "return_pct": 1.4
     }
   },
   "implied_return": {
-    "base_pct": 1.1,
-    "label": "annualized return",
-    "display": "1.1% (base)",
-    "falsifier_adjusted_pct": 1.1,
+    "base_pct": 2.86,
+    "label": "7yr IRR (total synthesis)",
+    "display": "2.86% (total synthesis)",
+    "falsifier_adjusted_pct": -1.4,
     "synthesis_pct": 2.86
   },
   "stance_proposal": {
@@ -212,13 +212,13 @@
   "moi_bucket": "asset",
   "results_lawrence_legacy": {
     "bear": {
-      "return_pct": -2.8
+      "return_pct": -6.3
     },
     "base": {
-      "return_pct": 1.1
+      "return_pct": -1.4
     },
     "bull": {
-      "return_pct": 3.2
+      "return_pct": 1.4
     }
   },
   "overlay_results": [],
@@ -261,7 +261,7 @@
         "weight": 0.1,
         "type": "numeric",
         "epistemic_tier": "D (alternate theory: dated asset payoff)",
-        "weight_why": "Answers a different question (NAV convergence) than 10yr cash-flow IRR; capped weight to avoid theory conflation.",
+        "weight_why": "Answers a different question (NAV convergence) than 7yr cash-flow IRR; capped weight to avoid theory conflation.",
         "weight_falsifiers": [
           "NAV overlay base not updated when segment build or filings change >10%",
           "floor_pass false but weight above 15% without [HUMAN REVIEW]"
@@ -299,5 +299,6 @@
       }
     },
     "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
-  }
+  },
+  "lawrence_horizon_years": 7
 }
