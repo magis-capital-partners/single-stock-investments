@@ -8,15 +8,16 @@
 
 ## Executive summary
 
-Marvin floor **13.92%** per year (infrastructure; stance **watch**) from primary filings and `valuation.json`. No third-party sources indexed; filings-only stance. **[HUMAN REVIEW]** for approved-source numeric blend.
+Marvin floor **13.92%** per year (infrastructure; stance **watch**) from primary filings and `valuation.json`. **Groundbreaker RE** approved 2026-06-02 (context: basin water scarcity; not a direct WBI thesis in post).
 
-**Synthesis (best estimate):** Marvin **13.92%** base · stance **watch**; external sources adjust conviction on catalyst timing, not primary IRR without human OK.
+**Synthesis (best estimate):** Marvin **13.92%** base · stance **watch**; Groundbreaker supports thematic water-risk monitoring only.
 
 ## Sources in scope
 
 | Source ID | Title | Path | Status | Cross-check status |
 |-----------|-------|------|--------|-------------------|
-| (none) | Primary filings only | — | — | n/a |
+| `groundbreaker` | Water rights — hidden asset | `WBI/research/cross_check_groundbreaker_2026-06-02.md` | approved | context |
+| — | Primary filings | — | — | base IRR |
 
 ## Agreements (facts)
 

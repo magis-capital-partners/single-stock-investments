@@ -1,6 +1,6 @@
 # Human-approved Substacks (external lenses)
 
-**Status:** Approved by human for Marvin triangulation (2026-05-26).  
+**Status:** Approved by human for Marvin triangulation (2026-05-26; **Groundbreaker RE** 2026-06-02).  
 **Use with:** `_system/frameworks/external_view_blend.md`, Tier 1 **Triangulated estimate** in `mental_models.md`.
 
 These are **not** generic Substacks. Marvin may cite and blend only sources listed here (or newly added after explicit human approval).
@@ -13,6 +13,7 @@ These are **not** generic Substacks. Marvin may cite and blend only sources list
 |----|-------------|-----|---------|--------|
 | `ssi` | **Special Situation Investing** | https://specialsituationinvesting.substack.com | Six Bravo et al. | Special situations, microcap/OTC, Murray Stahl / Horizon ecosystem |
 | `lci` | **Lemon Cakes Investing** | https://lemoncakesinvesting.substack.com | RV | Long-form FRMO / HK / Stahl thesis notes, crypto stack, commodities |
+| `groundbreaker` | **Groundbreaker RE** | https://groundbreakerre.substack.com | — | Western U.S. water rights, SGMA, data-center marginal demand; land/water NAV peers |
 
 ---
 
@@ -21,7 +22,7 @@ These are **not** generic Substacks. Marvin may cite and blend only sources list
 1. **Index** — Add post to `{TICKER}/third-party-analyses/references.md` (title, date, URL, 1-line thesis).
 2. **Cross-check** — `{TICKER}/research/cross_check_{source}_{date}.md` or `cross_check_approved_substacks_{date}.md` with agreements / divergences / **Synthesis (best estimate)**.
 3. **Deep dive** — Section `## Approved Substack context` + optional `## Blended estimate` if numbers move stance.
-4. **JSON** — `valuation.json` → `estimates.external[]` with `source_id`: `ssi` | `lci` and `path` to references or cross-check file.
+4. **JSON** — `valuation.json` → `estimates.external[]` with `source_id`: `ssi` | `lci` | `groundbreaker` and `path` to references or cross-check file.
 5. **Mental models** — Tag findings under **Approved Substack lens** (below); do not replace Stahl PDF / HK extract primacy for predictive attributes.
 
 **Weighting default** (see `external_view_blend.md`): thoughtful Substack with filing cites → **55–65% Marvin / 35–45% external**; promotional or stale → **75%+ Marvin**.
@@ -40,8 +41,11 @@ These are **not** generic Substacks. Marvin may cite and blend only sources list
 | Horizon Kinetics (firm) | **FRMO**, **CMSG** | LCI Stahl lessons; SSI flywheel § HK 4.95% + revenue share; HK commentaries in `horizon-kinetics/` |
 | Commodity / TPL structural | **FRMO** | [LCI: Most Important Things Part 1](https://lemoncakesinvesting.substack.com/p/frmo-the-most-important-things-part) |
 | KEWL (mineral floor) | **KEWL** | [SSI: KEWL intro](https://specialsituationinvesting.substack.com/p/keweenaw-land-association-kewl); [SSI: KEWL update](https://specialsituationinvesting.substack.com/p/update-keweenaw-land-association) |
+| Water rights / SGMA / power–water lag | **BWEL**, **TPL**, **WBI** (context); **LMNR**, **PCYO** (peers in post) | [Groundbreaker: Water rights — hidden asset](https://groundbreakerre.substack.com/p/water-rights-the-hidden-asset-the) (2026-05-21) |
 
 **Note:** Winland trades as **WELX** (not a separate portfolio ticker). Analyze Winland inside **FRMO** look-through and catalyst stack.
+
+**Note:** **Land Bridge** (private) appears in macro water narrative (HK/TPL ecosystem); no ticker folder until onboarded. **LMNR** cited in Groundbreaker post; add cross-check when ticker is in portfolio.
 
 ---
 
@@ -57,6 +61,9 @@ Apply when an approved post is cited on a covered ticker.
 | **Seigniorage / accrual** (LCI) | CMSG | Is the business modeled to **accrue** coin and treasury, not optimize quarterly mining EPS? |
 | **Operating-coalescence catalyst** (SSI) | FRMO → WELX control | Does >50% Winland control unlock consolidated operating earnings and clearer market narrative? |
 | **Private-mark re-rate** (SSI) | FRMO, CMSG listings | Which private marks (HK, MIAX, CMSC) have a path to public comparables? |
+| **Power–water second derivative** (Groundbreaker) | BWEL, TPL, WBI, data-center basins | Does marginal thermoelectric + DC load reprice **watershed-local** rights before national averages move? |
+| **SGMA seniority floor** (Groundbreaker) | BWEL, California ag | Do pre-SGMA **surface** rights gain vs groundwater-only neighbors as basins cap pumping? |
+| **Opaque rights / GAAP gap** (Groundbreaker) | BWEL, TPL, PCYO, LMNR | Is economic water NAV >> book with no public transaction feed? |
 
 Spell out in **Mental models in plain English** when used; link `third-party-analyses/references.md`.
 
