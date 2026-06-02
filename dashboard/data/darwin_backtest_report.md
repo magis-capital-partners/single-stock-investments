@@ -1,6 +1,6 @@
 # Darwin backtest report
 
-Generated: 2026-06-02T19:57:22Z
+Generated: 2026-06-02T19:57:45Z
 Policy: **ensemble** · Regime: **calm**
 
 ## Champion vs baselines
