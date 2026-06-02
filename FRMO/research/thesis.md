@@ -11,13 +11,13 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | accumulate |
 | **Cycle** | - |
-| **Implied 10yr IRR** (base) | 26.01% (total synthesis) |
+| **Implied 7yr IRR** (base) | 21.9% (base) |
 | **IRR method** | yield_curve |
 | **Lawrence bucket** | other |
 | **Payoff lens** | pending |
 | **MOI bucket** | pending |
 
-**Deep dive:** `FRMO/research/deep_dive_2026-06-01.md` (auto-sync)
+**Deep dive:** `FRMO/research/deep_dive_2026-06-02.md` (auto-sync)
 
 ## One-line thesis
 

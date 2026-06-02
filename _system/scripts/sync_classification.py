@@ -16,6 +16,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 from dated_md import latest_dated_md  # noqa: E402
+from lawrence_horizon import IMPLIED_IRR_LABEL  # noqa: E402
 
 CLASS_PATH = ROOT / "_system" / "portfolio" / "classification.json"
 
@@ -38,7 +39,7 @@ LABEL_MAP = {
     "dhando": "Dhando",
     "stance": "Stance",
     "cycle": "Cycle",
-    "implied_irr": "Implied 10yr IRR",
+    "implied_irr": IMPLIED_IRR_LABEL,
     "irr_method": "IRR method",
     "lawrence_bucket": "Lawrence bucket",
     "payoff_lens": "Payoff lens",
@@ -111,7 +112,7 @@ def classification_table(row: dict) -> str:
         cell("dhando", "Dhando", "Pabrai"),
         cell("stance", "Stance"),
         cell("cycle", "Cycle"),
-        cell("implied_irr", "Implied 10yr IRR", "base"),
+        cell("implied_irr", IMPLIED_IRR_LABEL, "base"),
         cell("irr_method", "IRR method"),
         cell("lawrence_bucket", "Lawrence bucket"),
         cell("payoff_lens", "Payoff lens"),

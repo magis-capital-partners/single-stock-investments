@@ -35,7 +35,7 @@ EXEC_SYNTHESIS = re.compile(
     re.I,
 )
 CLASS_IRR = re.compile(
-    r"\|\s*\*\*Implied 10yr IRR\*\*[^\|]*\|\s*([^\|]+)\|",
+    r"\|\s*\*\*Implied \d+yr IRR\*\*[^\|]*\|\s*([^\|]+)\|",
     re.I,
 )
 VAL_BRIDGE_BASE = re.compile(
@@ -264,7 +264,7 @@ def lint_ticker(
         if found["returns_statement"] is None:
             warnings.append(f"{rel_dive}: missing parseable Returns statement IRR")
         if found["classification"] is None:
-            warnings.append(f"{rel_dive}: missing Implied 10yr IRR in Classification")
+            warnings.append(f"{rel_dive}: missing Implied 7yr IRR in Classification")
 
     ok, msg = sotp_sum_check(val)
     if not ok:

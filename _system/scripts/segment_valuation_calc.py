@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 
-def cashflows_from_fcf0(fcf0: float, g1: float, g2: float, exit_mult: float, years: int = 10) -> list[float]:
+from lawrence_horizon import LAWRENCE_HORIZON_YEARS
+
+def cashflows_from_fcf0(fcf0: float, g1: float, g2: float, exit_mult: float, years: int = LAWRENCE_HORIZON_YEARS) -> list[float]:
     stream: list[float] = []
     fcf = fcf0
     for year in range(1, years + 1):
@@ -14,14 +16,14 @@ def cashflows_from_fcf0(fcf0: float, g1: float, g2: float, exit_mult: float, yea
     return stream, terminal
 
 
-def pv_stream(fcf0: float, g1: float, g2: float, exit_mult: float, r: float, years: int = 10) -> float:
+def pv_stream(fcf0: float, g1: float, g2: float, exit_mult: float, r: float, years: int = LAWRENCE_HORIZON_YEARS) -> float:
     cfs, terminal = cashflows_from_fcf0(fcf0, g1, g2, exit_mult, years)
     pv = sum(cf / (1 + r) ** y for y, cf in enumerate(cfs, start=1))
     pv += terminal / (1 + r) ** years
     return pv
 
 
-def irr_on_price(price: float, equity_pv: float, years: int = 10) -> float:
+def irr_on_price(price: float, equity_pv: float, years: int = LAWRENCE_HORIZON_YEARS) -> float:
     """Solve r such that PV of equity cash = price (simplified: single terminal)."""
     rate = 0.10
     for _ in range(300):
@@ -34,7 +36,7 @@ def irr_on_price(price: float, equity_pv: float, years: int = 10) -> float:
     return rate
 
 
-def cashflows_full(price: float, fcf0: float, g1: float, g2: float, exit_mult: float, years: int = 10) -> list[float]:
+def cashflows_full(price: float, fcf0: float, g1: float, g2: float, exit_mult: float, years: int = LAWRENCE_HORIZON_YEARS) -> list[float]:
     stream = [-price]
     fcf = fcf0
     for year in range(1, years + 1):

@@ -138,33 +138,32 @@
   "human_review": [],
   "results_lawrence_legacy": {
     "bear": {
-      "return_pct": 5.0
+      "return_pct": 2.8
     },
     "base": {
-      "return_pct": 9.7
+      "return_pct": 8.9
     },
     "bull": {
-      "return_pct": 12.7
+      "return_pct": 13.0
     }
   },
   "results": {
     "bear": {
-      "return_pct": 5.0
+      "return_pct": 2.8
     },
     "base": {
-      "return_pct": 9.7
+      "return_pct": 8.9
     },
     "bull": {
-      "return_pct": 12.7
+      "return_pct": 13.0
     }
   },
   "implied_return": {
-    "base_pct": 9.7,
-    "label": "10yr IRR (blended best estimate)",
-    "display": "9.7% (blended best)",
-    "falsifier_adjusted_pct": 9.2,
-    "synthesis_pct": 9.7,
-    "marvin_floor_pct": 9.2
+    "base_pct": 10.28,
+    "label": "7yr IRR (total synthesis)",
+    "display": "10.28% (total synthesis)",
+    "falsifier_adjusted_pct": 8.9,
+    "synthesis_pct": 10.28
   },
   "overlay_results": [],
   "synthesis": {
@@ -197,10 +196,23 @@
         "hard_to_vary": "no"
       }
     ],
-    "qualitative_adjustments": [],
-    "numeric_weighted_pct": 9.7,
-    "qualitative_pp": 0.0,
-    "total_synthesis_pct": 9.7,
+    "qualitative_adjustments": [
+      {
+        "factor": "Partial dhando (HK hard-asset / hidden NAV)",
+        "pp": 0.5,
+        "rationale": "Third-party confirms asset quality not in GAAP book; not full floor at spot price",
+        "sources": "cross_check_HK; hk_scan; HK Q1 2025/2026"
+      },
+      {
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework"
+      }
+    ],
+    "numeric_weighted_pct": 9.97,
+    "qualitative_pp": 0.3,
+    "total_synthesis_pct": 10.28,
     "human_approval": "approved",
     "weight_audit": {
       "flags": [],
@@ -211,6 +223,7 @@
         "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
       }
     },
-    "notes": "75/25 Marvin/Rosen blend on owner cash; Rosen 12mo double is catalyst footnote only"
-  }
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  },
+  "lawrence_horizon_years": 7
 }

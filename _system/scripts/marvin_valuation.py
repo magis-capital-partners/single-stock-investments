@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 
 from growth_theory import enrich_growth_explanation, load_filing_facts, theory_scenario  # noqa: E402
+from lawrence_horizon import LAWRENCE_HORIZON_YEARS, RETURN_LABEL, SYNTHESIS_LABEL  # noqa: E402
 from valuation_synthesis import compute_synthesis  # noqa: E402
 CLASS_PATH = ROOT / "_system" / "portfolio" / "classification.json"
 AI_HYPERSCALERS = frozenset({"GOOGL", "AMZN", "META", "MSFT"})
@@ -31,12 +32,12 @@ def cashflows_full(
     growth1: float,
     growth2: float,
     exit_mult: float,
-    years: int = 10,
+    years: int = LAWRENCE_HORIZON_YEARS,
 ) -> list[float]:
     stream = [-price]
     fcf = fcf0
     for year in range(1, years + 1):
-        g = growth1 if year <= 5 else growth2
+        g = growth1 if year <= min(5, years) else growth2
         fcf *= 1 + g
         if year < years:
             stream.append(fcf)
@@ -59,13 +60,19 @@ def irr(cfs: list[float], guess: float = 0.12, tol: float = 1e-7, max_iter: int 
     return rate
 
 
-def run_full_scenario(price: float, fcf0: float, scenario: dict) -> dict:
+def run_full_scenario(
+    price: float,
+    fcf0: float,
+    scenario: dict,
+    years: int = LAWRENCE_HORIZON_YEARS,
+) -> dict:
     cfs = cashflows_full(
         price=price,
         fcf0=fcf0,
         growth1=scenario["growth_y1_5"],
         growth2=scenario["growth_y6_10"],
         exit_mult=scenario["exit_pfcf_y10"],
+        years=years,
     )
     rate = irr(cfs)
     return {"return_pct": round(rate * 100, 1), "cashflows": [round(x, 2) for x in cfs]}
@@ -77,7 +84,7 @@ def run_scenario_method(price: float, per_share0: float, scenario: dict) -> dict
     g1 = scenario.get("growth_y1_5", scenario.get("growth", 0.05))
     g2 = scenario.get("growth_y6_10", g1 * 0.75)
     exit_mult = scenario.get("exit_multiple", scenario.get("exit_pfcf_y10", 15))
-    cfs = cashflows_full(price, per_share0, g1, g2, exit_mult)
+    cfs = cashflows_full(price, per_share0, g1, g2, exit_mult, years=LAWRENCE_HORIZON_YEARS)
     return {"return_pct": round(irr(cfs) * 100, 1)}
 
 
@@ -191,12 +198,12 @@ def pv_stream(
     g2: float,
     exit_mult: float,
     r: float,
-    years: int = 10,
+    years: int = LAWRENCE_HORIZON_YEARS,
 ) -> float:
     fcf = fcf0
     pv = 0.0
     for year in range(1, years + 1):
-        g = g1 if year <= 5 else g2
+        g = g1 if year <= min(5, years) else g2
         fcf *= 1 + g
         pv += fcf / (1 + r) ** year
     pv += (fcf * exit_mult) / (1 + r) ** years
@@ -207,7 +214,7 @@ def solve_segment_implied_rate(
     price: float,
     segments: list[dict],
     drags: list[float],
-    years: int = 10,
+    years: int = LAWRENCE_HORIZON_YEARS,
 ) -> float:
     """Discount rate where sum of segment PVs + drags = price."""
     rate = 0.10
@@ -244,7 +251,7 @@ def compute_segment_overlay(data: dict) -> dict | None:
     price = (data.get("inputs") or {}).get("price")
     if not price:
         return None
-    years = int(build.get("horizon_years", 10))
+    years = int(build.get("horizon_years", LAWRENCE_HORIZON_YEARS))
     r_explicit = float(build.get("discount_rate_explicit", SEGMENT_DISCOUNT_DEFAULT))
 
     segments = []
@@ -312,7 +319,7 @@ def compute_ai_overlay_rows(data: dict, lawrence_results: dict) -> list[dict]:
             "growth_y6_10": bull.get("growth_y6_10", 0.10),
             "exit_pfcf_y10": bull.get("exit_pfcf_y10", 28),
         }
-        pct = run_full_scenario(float(price), float(fcf0), sc)["return_pct"]
+        pct = run_full_scenario(float(price), float(fcf0), sc, years=LAWRENCE_HORIZON_YEARS)["return_pct"]
         g1, g2, ex = sc["growth_y1_5"], sc["growth_y6_10"], sc["exit_pfcf_y10"]
         rows.append(
             {
@@ -335,7 +342,7 @@ def compute_ai_overlay_rows(data: dict, lawrence_results: dict) -> list[dict]:
                 "method": "illustrative trough",
                 "key_inputs": f"OCF {stress.get('ocf_bn_assumption')}B − capex {stress.get('capex_bn')}B",
                 "return_pct": None,
-                "display": f"FCF ~${trough}/sh (not 10yr IRR)",
+                "display": f"FCF ~${trough}/sh (not {RETURN_LABEL})",
                 "stance_gate": False,
             }
         )
@@ -355,7 +362,7 @@ def compute_growth_theory_results(data: dict, price: float, fcf0: float) -> dict
     for path_key in ("theory_implied", "falsifier_adjusted"):
         sc = theory_scenario(data, path_key)
         if price and fcf0 is not None:
-            out[path_key] = run_full_scenario(price, fcf0, sc)
+            out[path_key] = run_full_scenario(price, fcf0, sc, years=LAWRENCE_HORIZON_YEARS)
 
     if out:
         data["results_growth_theory"] = {k: {"return_pct": v["return_pct"]} for k, v in out.items()}
@@ -449,14 +456,16 @@ def compute_valuation(data: dict) -> dict:
             raise ValueError("full method requires inputs.price and inputs.fcf_per_share")
         for name, sc in data.get("scenarios", {}).items():
             results[name] = run_full_scenario(price, fcf0, sc)
-        return_label = "10yr IRR"
+        return_label = RETURN_LABEL
+        data["lawrence_horizon_years"] = LAWRENCE_HORIZON_YEARS
     elif method == "scenario":
         ps = inputs.get("per_share") or inputs.get("fcf_per_share")
         if price is None or ps is None:
             raise ValueError("scenario method requires inputs.price and inputs.per_share")
         for name, sc in data.get("scenarios", {}).items():
             results[name] = run_scenario_method(price, ps, sc)
-        return_label = "scenario IRR"
+        return_label = RETURN_LABEL
+        data["lawrence_horizon_years"] = LAWRENCE_HORIZON_YEARS
     elif method == "yield_curve":
         for name, sc in data.get("scenarios", {}).items():
             results[name] = run_yield_curve(sc)
@@ -476,6 +485,11 @@ def compute_valuation(data: dict) -> dict:
     if method in ("full", "scenario") and data.get("growth_explanation"):
         compute_growth_theory_results(data, float(price) if price else 0, float(fcf0) if fcf0 else 0)
 
+    if method in ("full", "scenario"):
+        sb = data.get("segment_build")
+        if isinstance(sb, dict):
+            sb["horizon_years"] = LAWRENCE_HORIZON_YEARS
+
     apply_primary_implied_return(data, base_pct, return_label)
     data["stance_proposal"] = propose_stance(base_pct, moat, dhando, method, data=data)
 
@@ -486,6 +500,11 @@ def compute_valuation(data: dict) -> dict:
         compute_synthesis(data)
         synthesis_pct = (data.get("synthesis") or {}).get("total_synthesis_pct")
         if synthesis_pct is not None:
+            ir = data.setdefault("implied_return", {})
+            ir["base_pct"] = synthesis_pct
+            ir["synthesis_pct"] = synthesis_pct
+            ir["label"] = SYNTHESIS_LABEL
+            ir["display"] = f"{synthesis_pct}% (total synthesis)"
             data["stance_proposal"] = propose_stance(synthesis_pct, moat, dhando, method, data=data)
 
     ticker = data.get("ticker", "")

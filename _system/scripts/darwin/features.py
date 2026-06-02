@@ -69,7 +69,7 @@ def parse_classification_from_thesis(ticker_dir: Path) -> dict | None:
         ("dhando", r"Dhando"),
         ("stance", r"Stance"),
         ("cycle", r"Cycle"),
-        ("implied_irr", r"Implied 10yr IRR"),
+        ("implied_irr", r"Implied 7yr IRR"),
         ("irr_method", r"IRR method"),
         ("lawrence_bucket", r"Lawrence bucket"),
     ]:

@@ -10,6 +10,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 
+import sys
+
+sys.path.insert(0, str(ROOT / "_system" / "scripts"))
+from lawrence_horizon import LAWRENCE_HORIZON_YEARS, SYNTHESIS_LABEL  # noqa: E402
+
 # Epistemic tiers for synthesis weights (see total_synthesis_irr.md § Popper / Deutsch)
 WEIGHT_THEORY: dict[str, dict] = {
     "filing_falsifier": {
@@ -49,7 +54,7 @@ WEIGHT_THEORY: dict[str, dict] = {
     "nav_overlay_payoff": {
         "tier": "D (alternate theory: dated asset payoff)",
         "default_weight": 0.10,
-        "why": "Answers a different question (NAV convergence) than 10yr cash-flow IRR; capped weight to avoid theory conflation.",
+        "why": f"Answers a different question (NAV convergence) than {LAWRENCE_HORIZON_YEARS}yr cash-flow IRR; capped weight to avoid theory conflation.",
         "falsifiers": [
             "NAV overlay base not updated when segment build or filings change >10%",
             "floor_pass false but weight above 15% without [HUMAN REVIEW]",
@@ -166,12 +171,12 @@ def _default_paths(data: dict) -> list[dict]:
     overlay_nav = gate.get("overlay_nav_per_share")
     price = (data.get("inputs") or {}).get("price")
     if overlay_nav and price and overlay_nav > 0:
-        years = 10
+        years = LAWRENCE_HORIZON_YEARS
         nav_irr = ((overlay_nav / price) ** (1 / years) - 1) * 100
         paths.append(
             {
                 "id": "nav_overlay_payoff",
-                "label": "NAV overlay dated payoff (10yr to overlay base)",
+                "label": f"NAV overlay dated payoff ({LAWRENCE_HORIZON_YEARS}yr to overlay base)",
                 "source": f"nav_overlay ~${overlay_nav}/sh vs price ${price}",
                 "return_pct": _round_pct(nav_irr),
                 "weight": 0.10,
@@ -376,7 +381,7 @@ def post_optionality_valuation_pass(data: dict) -> None:
     price = (data.get("inputs") or {}).get("price")
     for i, p in enumerate(paths):
         if p.get("id") == "nav_overlay_payoff" and overlay_nav and price and overlay_nav > 0:
-            years = 10
+            years = LAWRENCE_HORIZON_YEARS
             nav_irr = ((float(overlay_nav) / float(price)) ** (1 / years) - 1) * 100
             paths[i] = {
                 **p,
@@ -455,7 +460,7 @@ def compute_synthesis(data: dict) -> dict:
     ir["synthesis_pct"] = total
     if data.get("method") != "yield_curve":
         ir["base_pct"] = total
-        ir["label"] = "10yr IRR (total synthesis)"
+        ir["label"] = SYNTHESIS_LABEL
         ir["display"] = f"{total}% (total synthesis)"
     return synthesis
 
@@ -492,7 +497,7 @@ def synthesis_markdown(data: dict) -> str:
         "Capstone return combining **filings**, **segment/NAV overlays**, **growth theory**, "
         "**third-party cross-checks**, and **qualitative** moat/competition/governance judgments.",
         "",
-        "| # | Source / lens | Type | Return (10yr) | Weight | Role in synthesis |",
+        f"| # | Source / lens | Type | Return ({LAWRENCE_HORIZON_YEARS}yr) | Weight | Role in synthesis |",
         "|---|---------------|------|---------------|--------|-------------------|",
     ]
     for i, p in enumerate(syn.get("paths", []), 1):
@@ -529,7 +534,8 @@ def synthesis_markdown(data: dict) -> str:
         f"2. **Qualitative adjustments:** {' + '.join(_qual_terms(syn.get('qualitative_adjustments', [])))} = **{qpp}** pp",
         f"3. **Total synthesis IRR:** {n}% + {qpp}pp = **{t}%** per year",
         "",
-        f"**Returns statement (synthesis):** At today's price, we expect about **{t}%** per year over ten years "
+        f"**Returns statement (synthesis):** At today's price, we expect about **{t}%** per year over "
+        f"{LAWRENCE_HORIZON_YEARS} years "
         f"after weighting filings, segment build, scenarios, NAV overlay, third-party context, and qualitative moat/governance factors.",
         "",
         f"**[HUMAN REVIEW]:** Synthesis weights and qualitative pp default to auto-build; "

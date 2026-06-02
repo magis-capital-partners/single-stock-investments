@@ -37,7 +37,7 @@ RETURNS_PAT = re.compile(
     re.I,
 )
 CLASS_PAT = re.compile(
-    r"(\|\s*\*\*Implied 10yr IRR\*\*[^\|]*\|\s*)([^\|]+)(\|)",
+    r"(\|\s*\*\*Implied \d+yr IRR\*\*[^\|]*\|\s*)([^\|]+)(\|)",
     re.I,
 )
 HEADER_THIRD = re.compile(r"^\*\*Third party:\*\*.*$", re.M)
