@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """Pick the next ticker for Marvin's daily deep dive.
 
-Priority:
+Priority (registry holdings only):
   1. Explicit ticker (CLI arg) — always runs
-  2. Holdings with no deep dive yet
-  3. Holdings with primary documents newer than the latest deep dive
-  4. Holdings with refresh-eligible valuation news newer than the latest deep dive
-  5. Optional --force-rotate: oldest deep dive when nothing new (--require-new skips instead)
+  2. Recently onboarded holding with no deep dive yet (`onboard_pending`)
+  3. Any holding with no deep dive yet (`no_deep_dive`)
+  4. Holdings with primary documents newer than the latest deep dive
+  5. Holdings with refresh-eligible valuation news newer than the latest deep dive
+  6. Optional --force-rotate: oldest deep dive when nothing new (--require-new skips instead)
 """
 from __future__ import annotations
 
@@ -22,6 +23,7 @@ SCRIPTS = Path(__file__).resolve().parent
 sys.path.insert(0, str(SCRIPTS))
 
 from portfolio_news_common import latest_refresh_news_activity  # noqa: E402
+from portfolio_registry import load_registry  # noqa: E402
 
 SKIP = {"_system", "dashboard", ".git", ".github", ".cursor"}
 DATE_RE = re.compile(r"deep_dive_(\d{4}-\d{2}-\d{2})\.md$")
@@ -44,6 +46,45 @@ def list_tickers() -> list[str]:
         if p.is_dir() and p.name not in SKIP and not p.name.startswith("."):
             tickers.append(p.name)
     return sorted(tickers)
+
+
+def holdings_tickers() -> list[str]:
+    """Portfolio holdings from registry (source of truth for refresh queue)."""
+    reg = load_registry()
+    return sorted((reg.get("holdings") or {}).keys())
+
+
+def _parse_status_updated(iso: str | None) -> datetime:
+    if not iso:
+        return datetime.min.replace(tzinfo=timezone.utc)
+    try:
+        raw = iso.replace("Z", "+00:00")
+        return datetime.fromisoformat(raw)
+    except ValueError:
+        return datetime.min.replace(tzinfo=timezone.utc)
+
+
+def onboard_pending_holdings() -> list[tuple[datetime, str]]:
+    """Holdings onboarded (phase=complete) but still missing a deep dive — newest first."""
+    pending: list[tuple[datetime, str]] = []
+    for ticker in holdings_tickers():
+        dive_dt, _ = latest_deep_dive(ticker)
+        if dive_dt is not None:
+            continue
+        status_path = ROOT / ticker / ".onboard_status.json"
+        if not status_path.exists():
+            continue
+        try:
+            st = json.loads(status_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            continue
+        if st.get("phase") != "complete":
+            continue
+        if st.get("deep_dive_pending") is False:
+            continue
+        pending.append((_parse_status_updated(st.get("updated")), ticker))
+    pending.sort(key=lambda x: (-x[0].timestamp(), x[1]))
+    return pending
 
 
 def _parse_iso(line: str) -> datetime | None:
@@ -197,10 +238,24 @@ def pick_ticker(
             **{k: v for k, v in snap.items() if k != "reason"},
         }
 
+    pending_onboard = onboard_pending_holdings()
+    if pending_onboard:
+        _, t = pending_onboard[0]
+        snap = _activity_snapshot(t)
+        return {
+            "ticker": t,
+            "skip": False,
+            "reason": "onboard_pending",
+            "deep_dive_at": snap["deep_dive_at"],
+            "document_at": snap["document_at"],
+            "news_at": snap["news_at"],
+        }
+
+    universe = holdings_tickers()
     no_dive: list[str] = []
     stale: list[tuple[datetime, str, str]] = []
 
-    for ticker in list_tickers():
+    for ticker in universe:
         snap = _activity_snapshot(ticker)
         dive_dt = snap["deep_dive_at"]
         if dive_dt is None:
@@ -239,7 +294,7 @@ def pick_ticker(
 
     if force_rotate and not require_new_documents:
         ranked: list[tuple[datetime, str]] = []
-        for ticker in list_tickers():
+        for ticker in universe:
             dive_dt, _ = latest_deep_dive(ticker)
             if dive_dt:
                 ranked.append((dive_dt, ticker))
