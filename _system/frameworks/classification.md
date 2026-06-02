@@ -20,9 +20,31 @@ Replace the old single **thesis status** (intact / weakening / strengthening / u
 | **Payoff lens** | Decision stack Q5 | `operating`, `asset`, `event`, `levered`, `pending` | Which toolkit applies (`analysis_arsenal.md`) |
 | **MOI bucket** | Mihaljevic | optional legacy audit tag | Deprecated — map to `payoff_lens`; see `moi_lens.md` |
 
+## valuation.json trigger map (machine + agent)
+
+Read `{TICKER}/research/valuation.json` **before** opening optional frameworks. Open **only** the docs listed for triggers that are set (non-null / non-empty).
+
+| JSON trigger | Open (normative) | Mechanical (do not re-list substeps) |
+|--------------|------------------|--------------------------------------|
+| Always | `decision_stack.md`, `deep_dive_structure.md`, `report_prose.md`, `option_treatment.md` | — |
+| `classification_inputs.payoff_lens: operating` | `hohn_business_analysis.md`; Lawrence path | `marvin_valuation.py` via cloud refresh |
+| `payoff_lens: asset` or `valuation_mode: optionality` | `optionality_valuation.md` (incl. mechanical refresh §) | `marvin_cloud_refresh.py` |
+| `payoff_lens: event` | `special_situation_lens.md` | cloud refresh |
+| `payoff_lens: levered` | `equity_stub_valuation.md` | cloud refresh |
+| `segment_build` or `valuation_overlay: segment_cashflow` | `segment_cashflow_valuation.md` | cloud refresh |
+| `ai_overlay` (keys present) | `ai_infrastructure_valuation.md` | cloud refresh |
+| `nav_overlay` or `optionality_gate` | `optionality_valuation.md` | cloud refresh |
+| `evidence_refresh.type` (e.g. `commodity_nav`) | `optionality_valuation.md` § Mechanical refresh | `fetch_market_inputs` + `refresh_optionality_valuation` inside cloud refresh |
+| `book_estimate_config.json` exists | `current_book_estimate.md` | `current_book_estimate.py --write` |
+| HK index ticker (TPL, ICE, MSB, SJT) | `hk_cross_reference.md` | `scan_third_party_sources --with-hk` |
+| Every listed ticker | `third_party_cross_reference.md` | `fill_cross_check` + `check_cross_checks` |
+
+**Do not** read the full `analysis_arsenal.md` unless onboarding or resolving a missing trigger.
+
 ## Source of truth
 
 - Pipeline: `_system/frameworks/decision_stack.md`
+- Framework rules: `_system/frameworks/framework_governance.md`
 - Portfolio map: `_system/portfolio/classification.json`
 - Per-ticker copy: `{TICKER}/research/thesis.md` → `## Classification` table
 - Valuation + stance proposal: `{TICKER}/research/valuation.json`

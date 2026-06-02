@@ -12,7 +12,7 @@
 ## Phase 1 — Market inputs
 
 - `fetch_market_inputs.py {TICKER} --merge` → `research/market_inputs.json`
-- Rule: `_system/frameworks/market_inputs_freshness.md` (spot within 7 days)
+- Rule: `optionality_valuation.md` § Market inputs freshness (spot within 7 days)
 
 ## Phase 2 — Economic NAV / GAAP vs fair value
 
@@ -60,6 +60,12 @@
 
 - `lint_pr_research.py`: evidence completeness for optionality / `evidence_refresh` tickers in PR diff
 - `download_all_holdings.py`: post-transcript `fetch_market_inputs` + `build_management_evidence` per holding
+
+## Framework consolidation (2026-06-02)
+
+- Merged `evidence_refresh.md` + `market_inputs_freshness.md` → `optionality_valuation.md` § Mechanical refresh
+- `classification.md` trigger map; `framework_governance.md`; `investment-frameworks.mdc` decision tree
+- `architecture_review_template.md` for future changes
 
 ## KEWL checklist (2026-06-02)
 

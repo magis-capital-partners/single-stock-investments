@@ -3,73 +3,52 @@ description: Read investment frameworks before research tasks
 alwaysApply: true
 ---
 
-# Investment Frameworks
+# Investment Frameworks (decision tree)
 
-Before writing research (`{TICKER}/research/`), deep dives, portfolio scans, or cross-checks, read:
+Do **not** read every file under `_system/frameworks/`. Use the tree below.
 
-| File | Use when |
-|------|----------|
-| `_system/frameworks/deep_dive_structure.md` | **Every deep dive** — section order (overview first, valuation last) |
-| `_system/frameworks/irr_assumption_ledger.md` | **Every deep dive** — assumption table + IRR at end of report |
-| `_system/frameworks/third_party_sources.md` | Approve / pending proprietary reports before IRR blend |
-| `_system/agents/MILLY.md` | Adversarial pass after deep dive (filing QA + short scan) |
-| `_system/frameworks/short_activist_registry.md` | Muddy Waters, Hindenburg, etc. — Milly cross-ref |
-| `_system/proposals/milly_adversarial_pipeline_2026-05-28.md` | Implementation proposal |
-| `_system/frameworks/decision_stack.md` | **Any research task** — six orthogonal questions |
-| `_system/frameworks/analysis_arsenal.md` | **Triggered tools** — full toolkit index (MOI, Hohn, HK, Lawrence, …) |
-| `_system/frameworks/report_prose.md` | Voice, plain English, abbreviations, em dashes |
-| `_system/frameworks/archetype_valuation_prose.md` | **Valuation section** readable by archetype (compounder, holdco, optionality, …) |
-| `_system/frameworks/lawrence_irr.md` | **§ F IRR arithmetic** — formulas after assumption ledger |
-| `_system/prompts/deep_dive_template.md` | Copy-paste outline |
-| `_system/frameworks/hohn_business_analysis.md` | Operating snapshot, pillars (appendix) |
-| `_system/frameworks/option_treatment.md` | **Every deep dive** — option scan; treatment ladder; no auto-zero |
-| `_system/frameworks/optionality_valuation.md` | Holdco, mineral/land NAV, HK curve, `nav_overlay`, `optionality_gate` |
-| `_system/frameworks/current_book_estimate.md` | **Holdco / treasury book discount** — current book roll-forward from last filing | `book_estimate.json` |
-| `_system/frameworks/evidence_refresh.md` | **`evidence_refresh` in valuation.json** — commodity NAV refresh after `marvin_valuation` | KEWL-style optionality + `marvin_cloud_refresh` |
-| `_system/frameworks/mark_date_alignment.md` | **Fair value vs market quote dates** — measurement date = last session ≤ period_end | every listed-stake / IRR row |
-| `_system/frameworks/holdco_uplift_explanation.md` | **Holdco SOTP uplifts** — bottom-up holding paths; blended % is output, not input | Investment A, opaque fund sleeves, 3g assumption ledger |
-| `_system/frameworks/segment_cashflow_valuation.md` | **Multi-segment compounders** (GOOGL, AMZN, META, MSFT) — Speedwell reverse DCF + Hohn segment sum |
-| `_system/frameworks/ai_infrastructure_valuation.md` | **AI hyperscalers** — capex cycle, TPU/chips, backlog, cost curve vs Lawrence FCF₀; Milly staleness |
-| `_system/frameworks/approved_substacks.md` | SSI + Lemon Cakes when cited |
-| `_system/frameworks/external_view_blend.md` | External triangulation when cited |
-| `_system/frameworks/third_party_cross_reference.md` | **Every universe ticker** — scan all third-party + mandatory cross-check |
-| `_system/frameworks/hk_cross_reference.md` | **TPL, ICE, MSB, SJT** — HK vault + extract scan |
-| `_system/frameworks/mental_models.md` | Model catalog appendix |
-| `_system/frameworks/classification.md` | Footer field definitions |
-| `_system/frameworks/investment_process.md` | Discover → download → analyze workflow |
-| `_system/frameworks/moi_company_evaluation.md` | **MOI Ch 1–10** — comprehensive company evaluation rules |
-| `_system/frameworks/moi_lens.md` | Legacy moi_bucket → payoff_lens map only |
-| `_system/reference/investment-wisdom/INDEX.md` | PDF / HK extract map |
+## Always (every research task)
 
-## Wisdom library (PDFs + HK extracts)
+1. `_system/frameworks/decision_stack.md` — six questions; stance flow  
+2. `_system/frameworks/deep_dive_structure.md` — section order  
+3. `_system/frameworks/report_prose.md` — plain English, ledger at end  
+4. `_system/frameworks/option_treatment.md` — option scan; no auto-zero  
+5. `{TICKER}/research/valuation.json` + trigger map in `_system/frameworks/classification.md`  
 
-`_system/reference/investment-wisdom/` — Munger, Pabrai, Stahl, Horizon Kinetics. Cite by path when applying mental models.
+## Triggered only (from valuation.json / classification)
 
-| Genius | Folder | Apply when |
-|--------|--------|------------|
-| **Munger** | `munger/` | Inversion, psychology, moats, circle of competence |
-| **Pabrai** | `pabrai/` | Dhando payoff, bet sizing, simplicity, partner-letter discipline |
-| **Stahl** | `stahl/` | Croupiers, exchanges, real diversification, spinoffs |
-| **Horizon Kinetics** | `horizon-kinetics/` | Equity yield curve, predictive attributes, time arbitrage |
-| **Chris Hohn / TCI** | `tci/` | Operating mechanics, thesis pillars, valuation bridge |
-| **Mihaljevic / MOI** | `mihaljevic/` | Idea generation, uses/misuses, special situations, cloning discipline |
+Open **only** rows that apply — index in `_system/frameworks/analysis_arsenal.md`:
 
-Read relevant PDFs/extracts (or `_system/memory/MEMORY.md` approved beliefs for that genius) before deep dives — not from training memory alone.
+| Trigger | Read |
+|---------|------|
+| `payoff_lens: asset` or `valuation_mode: optionality` | `optionality_valuation.md` |
+| `evidence_refresh.type` set | Same file → § **Mechanical refresh and market inputs** |
+| `segment_build` / segment overlay | `segment_cashflow_valuation.md` |
+| `ai_overlay` | `ai_infrastructure_valuation.md` |
+| `payoff_lens: event` | `special_situation_lens.md` |
+| `payoff_lens: levered` | `equity_stub_valuation.md` |
+| Holdco book roll-forward | `current_book_estimate.md` |
+| HK-indexed ticker | `hk_cross_reference.md` |
+| Third party / cross-check | `third_party_cross_reference.md`, `third_party_sources.md` |
+| Valuation section prose | `archetype_valuation_prose.md`, `irr_assumption_ledger.md`, `lawrence_irr.md` § F |
+| MOI comprehensive pass | `moi_company_evaluation.md` (onboard / idea funnel only) |
 
-## Read order for primary sources
+## Mechanical pipeline (one command)
 
-1. Latest annual report
-2. Latest quarterly / interim report
-3. Latest strategy or investor presentation
-4. Proxy / governance docs (US holdings)
+```bash
+python _system/scripts/marvin_cloud_refresh.py {TICKER} --date YYYY-MM-DD
+```
 
-Use `{TICKER}/INDEX.csv` or `{TICKER}/document-index.csv` as the document map when present.
+Batch: `batch_portfolio_refresh.py`. QA: `make research-check TICKER={TICKER}`.
 
-## Research outputs
+Do **not** duplicate substeps from `cloud_marvin_runbook.md` unless debugging.
 
-- Deep dive → `{TICKER}/research/deep_dive_{date}.md` + pending review copy
-- Cross-check → `{TICKER}/research/cross_check_{date}.md`
-- Download refresh → `{TICKER}/research/download_refresh_{date}.md`
-- Daily scan → `_system/reviews/pending/scan_{date}.md` (under 800 words)
+## Wisdom library
 
-All deep dives follow `deep_dive_structure.md` + `deep_dive_template.md`. **Valuation & IRR** section at end with **Assumption ledger** table + **`#### IRR arithmetic (show your work)`** (`irr_assumption_ledger.md`, `lawrence_irr.md` § F). No valuation bridge overlay table or Popper/Deutsch subsections. Run `refresh_deep_dive_v2.py` then `lint_deep_dive.py` before handoff.
+`_system/reference/investment-wisdom/` — cite PDFs when applying a triggered mental model; not a mandatory read list.
+
+## New framework files
+
+Forbidden without `framework_governance.md` checklist + `_system/prompts/architecture_review_template.md` proposal.
+
+Moved stubs: `evidence_refresh.md`, `market_inputs_freshness.md` → `optionality_valuation.md` § Mechanical refresh.
