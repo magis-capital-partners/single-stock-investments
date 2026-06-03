@@ -1,0 +1,173 @@
+{
+  "ticker": "HE",
+  "as_of": "2026-06-03",
+  "method": "full",
+  "lawrence_bucket": "regulated_utility",
+  "classification_inputs": {
+    "archetype": "infrastructure",
+    "moat": "narrow",
+    "dhando": "partial",
+    "cycle": "recovery",
+    "payoff_lens": "event"
+  },
+  "inputs": {
+    "price": 13.37,
+    "price_source": "Stooq HE.US close 2026-06-03",
+    "fcf_per_share": 0.95,
+    "fcf_source": "Marvin floor $0.55 (FY2025 OCF $391M less est. capex $320M, 172.6M shares) blended 50% with normalized recovery $1.35 [Assumption] as wildfire cash burden eases",
+    "marvin_floor_per_share": 0.55,
+    "normalized_recovery_per_share": 1.35,
+    "shares_millions": 172.6,
+    "normalization_note": "FY2025 trough owner cash ~$0.41-0.64/sh; base uses mid-cycle utility cash once Maui liabilities and dividend path clarify. Bank stake sold Dec 2024 (HK Q1 2025)."
+  },
+  "growth_explanation": {
+    "years_1_5": "Hawaii PUC rate-base growth and wildfire settlement cash relief; EPS trough $0.71 FY2025 vs recovery toward allowed ROE.",
+    "years_6_7": "Regulated utility growth cap; dividend reinstatement lifts total return.",
+    "source": "10-K FY2025; HK Q1 2025 HE section (context); [Assumption] on normalized cash",
+    "status": "partial"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.02,
+      "growth_y6_10": 0.01,
+      "exit_pfcf_y10": 10,
+      "notes": "Additional wildfire liability, delayed dividend, capex overhang"
+    },
+    "base": {
+      "growth_y1_5": 0.06,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 14,
+      "notes": "Normalized owner cash recovery; regulated earnings path"
+    },
+    "bull": {
+      "growth_y1_5": 0.08,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 16,
+      "notes": "Dividend reinstated; credit upgrades; HK-style equity yield curve payoff"
+    }
+  },
+  "catalyst_scenarios": {
+    "dividend_reinstatement": {
+      "price": 13.37,
+      "payoff": 22.0,
+      "years": 4.0,
+      "notes": "HK context: recovery + yield on cost; not in Lawrence FCF0 [Assumption]"
+    }
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": "Lawrence base ~13% at trough-normalized blend; event tail and dividend timing need human sizing"
+  },
+  "optionality_gate": {
+    "primary_metric": "lawrence_base",
+    "options": [
+      {
+        "id": "dividend_reinstatement",
+        "label": "Common dividend reinstatement",
+        "option_treatment": "yield_curve",
+        "probability_base": 0.65,
+        "timing_years": 4,
+        "payoff_per_share": 22.0,
+        "evidence": "HK Q1 2025/Q1 2026 commentary (context); dividend suspended since Q3 2023 per HK",
+        "notes": "Not in Lawrence starting cash; sensitivity only until approved"
+      },
+      {
+        "id": "wildfire_tail",
+        "label": "Residual Maui wildfire liability",
+        "option_treatment": "probability_weighted",
+        "probability_base": 0.25,
+        "incremental_drag_per_share": 2.0,
+        "timing_years": 3,
+        "evidence": "10-K FY2025 legal/contingency disclosures",
+        "notes": "Bear case drag [Assumption]; bounded by settlements already booked"
+      }
+    ],
+    "primary_label": "7yr IRR",
+    "primary_return_pct": null
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Regulated utility RAB on balance sheet; no hidden land NAV pattern"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Electric utility + other segments per 10-K"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "FY2025 consolidated net income $126M depressed vs $1.4B FY2024 settlement year"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Regulated revenue recognized with rate cases"
+    },
+    {
+      "q": 5,
+      "question": "Private stakes below fair value?",
+      "answer": "No (resolved)",
+      "treatment": "milestone_nav",
+      "evidence": "American Savings Bank 90.1% sold Dec 2024 (HK Q1 2025); cash proceeds in 10-K"
+    },
+    {
+      "q": 6,
+      "question": "Transitory legal recovery?",
+      "answer": "Yes",
+      "treatment": "yield_curve",
+      "evidence": "Maui wildfire settlements; dividend reinstatement catalyst"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Pure regulated utility post bank sale"
+    }
+  ],
+  "estimates": {
+    "marvin_floor": {
+      "per_share": 0.55,
+      "return_pct": null,
+      "notes": "FY2025 OCF $391M less est. capex $320M on 172.6M shares"
+    },
+    "external": [
+      {
+        "source_id": "hk_q1_2026_he",
+        "source": "Horizon Kinetics Q1 2026 Commentary (context)",
+        "path": "_system/reference/investment-wisdom/horizon-kinetics/HK-Q1-2026-Commentary-extract.txt",
+        "approved": false,
+        "return_pct_approx": null,
+        "notes": "Regulated recovery + future dividend yield on cost; not blended into base IRR"
+      }
+    ],
+    "blended_best": {
+      "per_share": 0.95,
+      "weights": "50% marvin_floor / 50% normalized recovery [Assumption]",
+      "notes": "Pending human approval for HK context in synthesis"
+    }
+  },
+  "human_review": {
+    "items": [
+      "Registry CIK 354707 is HEICO; filings in folder are Hawaiian Electric (CIK 0000046207). Fix download config.",
+      "Normalized owner cash $1.35/sh is assumption until post-wildfire run-rate disclosed",
+      "HK commentary is context tier only"
+    ]
+  }
+}
