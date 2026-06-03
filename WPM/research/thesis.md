@@ -1,6 +1,6 @@
 # WPM — Investment Thesis
 
-**Last updated:** 2026-06-03
+**Last updated:** auto-sync
 
 ## Classification
 
@@ -17,7 +17,7 @@
 | **Payoff lens** | operating |
 | **MOI bucket** | pending |
 
-**Deep dive:** `WPM/research/deep_dive_2026-06-03.md`
+**Deep dive:** `WPM/research/deep_dive_2026-06-03.md` (auto-sync)
 
 ## One-line thesis
 
