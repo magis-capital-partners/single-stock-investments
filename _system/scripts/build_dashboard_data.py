@@ -281,7 +281,10 @@ def classification_for(ticker: str, ticker_dir: Path, portfolio: dict[str, dict]
             out["analysis_irr_pct"] = float(irr_web["base_pct"])
         else:
             out["analysis_irr_pct"] = parse_irr_pct(out.get("implied_irr"))
-        if irr_web.get("falsifier_adjusted_pct") is not None:
+        gate_pct = irr_web.get("lawrence_stance_gate_pct")
+        if gate_pct is not None:
+            out["filing_irr_ref"] = f"{gate_pct}% (stance gate)"
+        elif irr_web.get("falsifier_adjusted_pct") is not None:
             out["filing_irr_ref"] = f"{irr_web['falsifier_adjusted_pct']}% (falsifier-adjusted)"
         if irr_web.get("synthesis_status") == "complete":
             out["irr_source"] = "total_synthesis"

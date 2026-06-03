@@ -108,10 +108,19 @@ def check(ticker: str, *, dive_date: str | None = None, strict: bool = False) ->
                 if base_pct is not None and f"**{base_pct}" not in cc.read_text(encoding="utf-8"):
                     errs.append(f"cross_check stale vs implied_return.base_pct {base_pct}")
 
+        tp = ROOT / ticker / "third-party-analyses"
+        hk_on_disk = list(research.glob("hk_scan_*")) + list(research.glob("cross_check*HK*"))
+        if tp.is_dir():
+            hk_on_disk += list(tp.glob("hk_scan_*")) + list(tp.glob("cross_check*HK*"))
         for q in syn.get("qualitative_adjustments") or []:
+            qid = q.get("id", "")
+            if not qid:
+                errs.append("qualitative_adjustments row missing id (see total_synthesis_irr.md ladder)")
+            if qid == "partial_dhando_hk_nav" and not hk_on_disk:
+                errs.append("partial_dhando_hk_nav qual row without hk_scan or cross_check_HK file")
             src = str(q.get("sources", ""))
             if "cross_check_HK" in src or "hk_scan" in src:
-                if not list(research.glob("hk_scan_*.md")) and not list(research.glob("cross_check*HK*.md")):
+                if not hk_on_disk:
                     errs.append("synthesis cites HK without hk_scan or cross_check_HK file")
 
     return errs

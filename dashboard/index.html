@@ -264,6 +264,28 @@
   .darwin-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 8px; }
   .darwin-table th, .darwin-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: left; }
   .darwin-table th { font-size: 10px; text-transform: uppercase; color: var(--text-muted); }
+
+  .darwin-charts { display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 20px; }
+  @media (min-width: 900px) { .darwin-charts.split { grid-template-columns: 1fr 1fr; } }
+  .chart-card {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 14px;
+  }
+  .chart-card h4 { font-size: 12px; text-transform: uppercase; letter-spacing: .5px; color: var(--text-muted); margin-bottom: 10px; }
+  .chart-wrap { position: relative; height: 260px; }
+  .chart-toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 10px; }
+  .chart-toolbar select {
+    background: var(--bg-input); border: 1px solid var(--border); color: var(--text-primary);
+    border-radius: 6px; padding: 6px 10px; font-size: 12px;
+  }
+  .deutsch-box {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+    padding: 14px; font-size: 13px; line-height: 1.55; margin-bottom: 18px;
+  }
+  .deutsch-box .lead { color: var(--text-secondary); margin-bottom: 12px; }
+  .deutsch-checks { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; margin-top: 10px; }
+  .deutsch-check { font-size: 11px; padding: 8px; border-radius: 6px; border: 1px solid var(--border); }
+  .deutsch-check.pass { border-color: rgba(16,185,129,0.4); color: var(--accent-green); }
+  .deutsch-check.fail { border-color: rgba(245,158,11,0.4); color: var(--accent-amber); }
   .conflict-banner {
     background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.4);
     border-radius: 8px; padding: 12px; margin-bottom: 14px; font-size: 12px;
@@ -391,6 +413,8 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="darwin-viz.js"></script>
 <script src="oauth.js"></script>
 <script>
 const GH_REPO = 'GoldmanDrew/single-stock-investments';
@@ -433,6 +457,29 @@ let marketFilter = 'ALL';
 let needsWork = false;
 let activeView = 'holdings';
 let activeDarwinAccount = 'roth';
+let darwinEquityChart = null;
+let darwinHoldingsChart = null;
+
+const DARWIN_METHOD_LABELS = {
+  ira_marvin: 'IRA Marvin',
+  equal_weight: 'Equal weight',
+  irr_ranked: 'IRR ranked',
+  risk_parity_vol: 'Risk parity',
+  genetic: 'Genetic',
+  ppo: 'PPO',
+  ensemble: 'Ensemble',
+  champion: 'Champion (live)',
+  spy: 'SPY',
+};
+
+const CHART_COLORS = [
+  '#3b82f6', '#06b6d4', '#10b981', '#8b5cf6', '#f59e0b', '#ef4444',
+  '#ec4899', '#14b8a6', '#a855f7', '#84cc16', '#f97316', '#6366f1', '#64748b',
+];
+
+function stripMd(s) {
+  return String(s || '').replace(/\*\*/g, '');
+}
 
 function linkHtml(url, label, className = '') {
   if (!url) return label;
@@ -515,6 +562,7 @@ function setView(view) {
 }
 
 function renderDarwin() {
+  if (window.DarwinViz) DarwinViz.destroyCharts();
   const serving = data.darwin_serving || {};
   const bundle = data.darwin_accounts || {};
   const acctRow = (serving.accounts || {})[activeDarwinAccount] || {};
@@ -567,8 +615,11 @@ function renderDarwin() {
           <tr><td class="mono">Backtest at paper start</td><td>${btInception.cumulative_return_pct != null ? btInception.cumulative_return_pct+'%' : '—'}</td><td>${btInception.sharpe_annualized ?? '—'}</td><td>Reference when paper opened</td></tr>
         </tbody>
       </table>
-      <p class="subhead" style="margin-top:8px">Paper positions marked daily via Yahoo. Re-run <span class="mono">make darwin-build</span> after Marvin refreshes to adapt weights.</p>
+      <p class="subhead" style="margin-top:8px">Paper NAV from returns panel. Re-run <span class="mono">make darwin-build</span> after Marvin refreshes to adapt weights.</p>
     </div>
+    ${d.portfolio_explanation && window.DarwinViz ? DarwinViz.renderExplanation(d.portfolio_explanation, escapeHtml) : ''}
+    ${d.visualization && window.DarwinViz ? DarwinViz.renderPerfTable(d.visualization, escapeHtml) : ''}
+    ${d.visualization && window.DarwinViz ? DarwinViz.renderChartsHtml() : ''}
     <div class="darwin-grid">
       <div class="summary-card"><div class="label">Regime</div><div class="value" style="font-size:16px">${escapeHtml(regime.label || '—')}</div><div class="sub">research ${escapeHtml(regime.research || '—')} · macro ${escapeHtml(regime.macro || '—')}</div></div>
       <div class="summary-card"><div class="label">Turnover</div><div class="value" style="font-size:16px;color:${turnoverOk ? 'var(--accent-green)' : 'var(--accent-amber)'}">${d.turnover_used_pct ?? '—'}%</div><div class="sub">budget ${d.turnover_budget_pct ?? 15}% · ${escapeHtml(d.rebalance_frequency || '')}</div></div>
@@ -628,6 +679,9 @@ function renderDarwin() {
     </div>
     <p class="form-hint" style="margin-top:16px">${escapeHtml(d.disclaimer || '')}</p>
   `;
+  if (d.visualization && window.DarwinViz) {
+    requestAnimationFrame(() => DarwinViz.mountCharts(d.visualization, d.policy_id || 'champion'));
+  }
 }
 
 function renderWatchlist() {

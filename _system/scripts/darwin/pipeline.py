@@ -30,7 +30,9 @@ from .scorecard import append_scorecard
 from .simulation import run_stress_simulation
 from .ppo import ppo_weights, train_ppo
 from .prices import build_return_panel, load_returns_csv
+from .explanation import build_portfolio_explanation
 from .regime import latest_macro_state, merge_regime, regime_constraint_overrides
+from .visualization import build_method_visualizations
 
 
 def _research_regime_label(rows: list[dict], mandate: dict) -> str:
@@ -331,6 +333,12 @@ def run_pipeline(
     genome_w: dict = {}
     ppo_w: dict = {}
 
+    def ga_policy_fn(_ts, _i):
+        return dict(genome_w) if genome_w else dict(irr_w)
+
+    def ppo_policy_fn(_ts, _i):
+        return dict(ppo_w) if ppo_w else dict(irr_w)
+
     if use_ml_stack:
         _, latent, enc_meta = train_encoder(
             rows,
@@ -353,7 +361,7 @@ def run_pipeline(
                 falsifier_map,
             )
 
-            def ga_fn(ts, _i):
+            def ga_policy_fn(ts, _i):
                 return apply_policy(
                     best_genome.get("policy", "irr_ranked"),
                     rows,
@@ -362,7 +370,12 @@ def run_pipeline(
                 )
 
             bt_ga = simulate(
-                tickers, panel["dates"], panel["returns_by_ticker"], ga_fn, mandate_effective, falsifier_map
+                tickers,
+                panel["dates"],
+                panel["returns_by_ticker"],
+                ga_policy_fn,
+                mandate_effective,
+                falsifier_map,
             )
         if evo_cfg.get("enable_ppo", True):
             ppo_policy, ppo_metrics = train_ppo(rows, panel, latent, mandate_effective, training)
@@ -371,11 +384,16 @@ def run_pipeline(
             prev_equal = {t: prev_equal.get(t, 0.0) / s_eq for t in prev_equal}
             ppo_w = ppo_weights(ppo_policy, rows, latent, mandate_effective, prev_equal)
 
-            def ppo_fn(ts, _i):
+            def ppo_policy_fn(ts, _i):
                 return ppo_weights(ppo_policy, rows, latent, mandate_effective, prev_equal)
 
             bt_ppo = simulate(
-                tickers, panel["dates"], panel["returns_by_ticker"], ppo_fn, mandate_effective, falsifier_map
+                tickers,
+                panel["dates"],
+                panel["returns_by_ticker"],
+                ppo_policy_fn,
+                mandate_effective,
+                falsifier_map,
             )
 
     prev_equal = {t: 1.0 / min(len(tickers), 15) for t in tickers[:15]}
@@ -519,10 +537,54 @@ def run_pipeline(
     conflicts = [f for f in review_flags if f.get("severity") == "review"]
 
     spy_rets = _spy_panel(panel["dates"])
-    bt_spy = benchmark_buy_hold(
-        panel["dates"],
-        spy_rets,
-        (mandate_doc.get("mandate") or {}).get("rebalance_frequency", "semiannual"),
+    rebalance_freq = (mandate_doc.get("mandate") or {}).get("rebalance_frequency", "semiannual")
+    bt_spy = benchmark_buy_hold(panel["dates"], spy_rets, rebalance_freq)
+
+    champion_selection = "ira_default"
+    if exploration_on and explore.get("champion_mode") == "best_insample":
+        champion_selection = "exploration"
+    elif use_ensemble and policy_id == "ensemble":
+        champion_selection = "ensemble"
+    elif use_ml:
+        champion_selection = "ml_oos" if pit_bt.get("ml_oos_eligible") else "ml_insample_pending_oos"
+    elif policy_id == preferred:
+        champion_selection = "ira_default"
+    else:
+        champion_selection = "champion_other"
+
+    policy_fns: dict = {
+        "ira_marvin": ira_fn,
+        "equal_weight": eq_fn,
+        "irr_ranked": irr_fn,
+        "risk_parity_vol": rp_fn,
+    }
+    if not tier0:
+        policy_fns["genetic"] = ga_policy_fn
+        policy_fns["ppo"] = ppo_policy_fn
+    if use_ensemble and ens_w:
+        policy_fns["ensemble"] = lambda _ts, _i: ens_w
+    policy_fns["champion"] = lambda _ts, _i: dict(target_w)
+
+    viz = build_method_visualizations(
+        tickers=tickers,
+        dates=panel["dates"],
+        returns_by_ticker=panel["returns_by_ticker"],
+        spy_returns=spy_rets,
+        mandate_effective=mandate_effective,
+        falsifier_map=falsifier_map,
+        policy_fns=policy_fns,
+        rebalance_frequency=rebalance_freq,
+    )
+
+    portfolio_explanation = build_portfolio_explanation(
+        policy_id=policy_id,
+        target_w=target_w,
+        rows=rows,
+        regime=regime,
+        mandate=m,
+        constraints_notes=c_notes,
+        ensemble_detail=ens_detail if use_ensemble else None,
+        champion_selection=champion_selection,
     )
 
     pop = load_population()
@@ -602,6 +664,8 @@ def run_pipeline(
         "lineage": lineage[-5:],
         "source_alignment_version": (mandate_doc.get("source_overrides") or {}).get("version"),
         "disclaimer": mandate_doc.get("disclaimer"),
+        "visualization": viz,
+        "portfolio_explanation": portfolio_explanation,
         "pit": {
             "audit_pass": pit_audit.get("pass"),
             "leakage_count": pit_audit.get("leakage_count"),

@@ -36,6 +36,46 @@ def portfolio_return(weights: dict[str, float], rets: dict[str, float]) -> float
     return sum(weights.get(t, 0.0) * rets.get(t, 0.0) for t in weights)
 
 
+def _stats_from_series(period_rets: list[float], log_equity: list[float]) -> dict:
+    if not period_rets:
+        return {"error": "no_returns", "periods": 0}
+    mean_r = sum(period_rets) / len(period_rets)
+    var = sum((x - mean_r) ** 2 for x in period_rets) / max(len(period_rets) - 1, 1)
+    std = math.sqrt(var) + 1e-9
+    sharpe = (mean_r / std) * math.sqrt(12)
+    cum = math.exp(log_equity[-1]) - 1.0
+    max_dd = 0.0
+    peak = 0.0
+    for le in log_equity:
+        peak = max(peak, le)
+        max_dd = max(max_dd, peak - le)
+    eq_index = [round(math.exp(le), 6) for le in log_equity]
+    peak_idx = eq_index[0]
+    max_dd_pct = 0.0
+    for v in eq_index:
+        peak_idx = max(peak_idx, v)
+        if peak_idx > 0:
+            max_dd_pct = max(max_dd_pct, (peak_idx - v) / peak_idx)
+    return {
+        "periods": len(period_rets),
+        "mean_monthly_return": round(mean_r, 6),
+        "volatility_annualized": round(std * math.sqrt(12), 4),
+        "sharpe_annualized": round(sharpe, 3),
+        "cumulative_return": round(cum, 4),
+        "max_drawdown_log": round(max_dd, 4),
+        "max_drawdown_pct": round(max_dd_pct, 4),
+    }
+
+
+def _snapshot_weights(weights: dict[str, float], top_n: int = 14) -> list[dict]:
+    ranked = sorted(weights.items(), key=lambda x: -x[1])[:top_n]
+    return [
+        {"ticker": t, "weight_pct": round(w * 100, 2)}
+        for t, w in ranked
+        if w >= 0.001
+    ]
+
+
 def simulate(
     tickers: list[str],
     dates: list[str],
@@ -46,6 +86,7 @@ def simulate(
     rebalance_frequency: str | None = None,
     rows_provider: RowsProvider | None = None,
     dynamic_tickers: bool = False,
+    track_series: bool = False,
 ) -> dict:
     m = mandate.get("mandate") or mandate
     freq = rebalance_frequency or m.get("rebalance_frequency", "quarterly")
@@ -58,6 +99,9 @@ def simulate(
     turnovers: list[float] = []
     log_equity = [0.0]
     cost_bps = m.get("transaction_cost_bps", 10)
+    series_dates: list[str] = []
+    series_equity: list[float] = []
+    holdings_snapshots: list[dict] = []
 
     for ri in range(len(rebals) - 1):
         start, end = rebals[ri], rebals[ri + 1]
@@ -84,6 +128,11 @@ def simulate(
         else:
             turnovers.append(0.0)
         prev = w
+        if track_series:
+            snap_date = dates[start] if start < len(dates) else dates[-1]
+            holdings_snapshots.append(
+                {"date": snap_date, "weights": _snapshot_weights(w)}
+            )
         for mi in range(start, end):
             r_row = {
                 t: returns_by_ticker[t][mi]
@@ -95,36 +144,31 @@ def simulate(
                 pr -= turnovers[-1] * (cost_bps / 10000.0)
             period_rets.append(pr)
             log_equity.append(log_equity[-1] + math.log1p(pr))
+            if track_series:
+                d = dates[mi] if mi < len(dates) else dates[-1]
+                series_dates.append(d)
+                series_equity.append(round(math.exp(log_equity[-1]), 6))
 
     if not period_rets:
         return {"error": "no_returns", "periods": 0}
 
-    mean_r = sum(period_rets) / len(period_rets)
-    var = sum((x - mean_r) ** 2 for x in period_rets) / max(len(period_rets) - 1, 1)
-    std = math.sqrt(var) + 1e-9
-    sharpe = (mean_r / std) * math.sqrt(12)
-    cum = math.exp(log_equity[-1]) - 1.0
-    max_dd = 0.0
-    peak = 0.0
-    for le in log_equity:
-        peak = max(peak, le)
-        max_dd = max(max_dd, peak - le)
-
-    return {
-        "periods": len(period_rets),
-        "mean_monthly_return": round(mean_r, 6),
-        "sharpe_annualized": round(sharpe, 3),
-        "cumulative_return": round(cum, 4),
-        "max_drawdown_log": round(max_dd, 4),
-        "avg_turnover_one_way": round(sum(turnovers) / len(turnovers), 4) if turnovers else 0.0,
-        "rebalance_frequency": freq,
-    }
+    out = _stats_from_series(period_rets, log_equity)
+    out["avg_turnover_one_way"] = round(sum(turnovers) / len(turnovers), 4) if turnovers else 0.0
+    out["rebalance_frequency"] = freq
+    if track_series:
+        out["series"] = {
+            "dates": series_dates,
+            "equity_index": series_equity,
+            "holdings_snapshots": holdings_snapshots,
+        }
+    return out
 
 
 def benchmark_buy_hold(
     dates: list[str],
     returns_series: list[float],
     rebalance_frequency: str = "semiannual",
+    track_series: bool = False,
 ) -> dict:
     """SPY or equal-weight benchmark on same calendar."""
     if len(returns_series) < 4:
@@ -132,6 +176,8 @@ def benchmark_buy_hold(
     rebals = rebalance_points(dates, rebalance_frequency)
     period_rets: list[float] = []
     log_equity = [0.0]
+    series_dates: list[str] = []
+    series_equity: list[float] = []
     for ri in range(len(rebals) - 1):
         start, end = rebals[ri], rebals[ri + 1]
         for mi in range(start, end):
@@ -139,15 +185,21 @@ def benchmark_buy_hold(
                 r = returns_series[mi]
                 period_rets.append(r)
                 log_equity.append(log_equity[-1] + math.log1p(r))
+                if track_series:
+                    d = dates[mi] if mi < len(dates) else dates[-1]
+                    series_dates.append(d)
+                    series_equity.append(round(math.exp(log_equity[-1]), 6))
     if not period_rets:
         return {"error": "no_returns", "periods": 0}
-    mean_r = sum(period_rets) / len(period_rets)
-    var = sum((x - mean_r) ** 2 for x in period_rets) / max(len(period_rets) - 1, 1)
-    std = math.sqrt(var) + 1e-9
-    sharpe = (mean_r / std) * math.sqrt(12)
-    return {
-        "periods": len(period_rets),
-        "sharpe_annualized": round(sharpe, 3),
-        "cumulative_return": round(math.exp(log_equity[-1]) - 1.0, 4),
-        "label": "spy_buy_hold",
-    }
+    out = _stats_from_series(period_rets, log_equity)
+    out["label"] = "spy_buy_hold"
+    out["rebalance_frequency"] = rebalance_frequency
+    if track_series:
+        out["series"] = {
+            "dates": series_dates,
+            "equity_index": series_equity,
+            "holdings_snapshots": [
+                {"date": dates[0] if dates else "", "weights": [{"ticker": "SPY", "weight_pct": 100.0}]}
+            ],
+        }
+    return out
