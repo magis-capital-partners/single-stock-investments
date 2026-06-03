@@ -10,4 +10,4 @@
 
 | Source | Path | Use |
 |--------|------|-----|
-| *The King of California* (Arax & Wartzman, 2003) | `investor-documents/research-notes/` — see `README.md` | **Context** — Boswell history, basin water; PDF via Archive borrow or manual place |
+| *The King of California* (Arax & Wartzman, 2003) | `investor-documents/research-notes/King_of_California_OL_search_excerpts.md` | **Context** — OL FTS excerpts (~3.4k); full PDF via borrow + `scrape_king_of_california.py --pdf` |
