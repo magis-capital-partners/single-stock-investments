@@ -6,24 +6,28 @@
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Archetype** (Stahl) | compounder |
+| **Moat** (Munger) | narrow |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
+| **Cycle** | mid |
 | **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Payoff lens** | operating |
 
 ## One-line thesis
 
-Royal Gold Inc. — thesis pending Marvin deep dive.
+Royal Gold is a high-margin precious-metals royalty franchise enlarged by the 2025 Sandstorm combination; at today’s price the base 7-year owner-cash return is below our accumulate bar — **watch**.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest annual report (FY2025 10-K)
+- [x] Read latest quarterly report (Q1 FY2026 10-Q)
+- [ ] Revisit after metal price normalization or ≥15% base IRR at price
+
+## Deep dive
+
+`RGLD/research/deep_dive_2026-06-03.md`
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-06-03; awaiting deep dive.
+- Mechanical IRR and Milly adversarial pass pending `marvin_cloud_refresh.py` 2026-06-03.

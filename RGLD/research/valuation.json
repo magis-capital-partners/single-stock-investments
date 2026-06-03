@@ -1,0 +1,80 @@
+{
+  "ticker": "RGLD",
+  "as_of": "2026-06-03",
+  "method": "full",
+  "lawrence_bucket": "fee_based",
+  "classification_inputs": {
+    "archetype": "compounder",
+    "moat": "narrow",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating",
+    "moi_bucket": "pending"
+  },
+  "inputs": {
+    "price": 0,
+    "price_source": "Mechanical refresh via fetch_market_inputs.py",
+    "fcf_per_share": 9.0,
+    "fcf_source": "FY2025 cash from operations $704.8M minus immaterial capital spending, divided by ~78M diluted shares (pre-full Sandstorm weighting); Q1 2026 run-rate ~$8.3/sh on ~85M shares",
+    "shares_millions": 84.9,
+    "shares_source": "Q1 2026 net income $281.1M / diluted EPS $3.30 (10-Q filed 2026-05-07)",
+    "book_per_share": 87.2,
+    "book_source": "Q1 2026 stockholders equity $7,415M / ~85M shares",
+    "normalization_note": "FY2025 revenue +43% YoY includes Sandstorm Gold combination and elevated metal prices; Lawrence uses run-rate owner cash near $9/sh, not peak spot-year heroics."
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.0,
+      "growth_y6_10": -0.02,
+      "exit_pfcf_y10": 18,
+      "notes": "Gold price mean-reversion, slower development contributions"
+    },
+    "base": {
+      "growth_y1_5": 0.04,
+      "growth_y6_10": 0.025,
+      "exit_pfcf_y10": 22,
+      "notes": "Combined portfolio growth near inflation plus modest development ramp; exit ~22x cash flow"
+    },
+    "bull": {
+      "growth_y1_5": 0.07,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 28,
+      "notes": "Sustained gold/silver prices plus Sandstorm synergy and new stream deliveries"
+    }
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    }
+  },
+  "option_scan": [
+    {
+      "id": "gaap_goodwill",
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Sandstorm acquisition added ~$4.1B purchase accounting and $1.19B deferred tax liability; economic value is royalty cash flows, not goodwill line"
+    },
+    {
+      "id": "undeveloped_royalties",
+      "question": "Undeveloped reserves / development royalties?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Portfolio includes development-stage streams; growth years 1-5 cite filing pipeline [Assumption] for conversion timing"
+    },
+    {
+      "id": "equity_stakes",
+      "question": "Equity method / listed stakes?",
+      "answer": "Yes",
+      "treatment": "milestone_nav",
+      "evidence": "Equity method investments $300.9M at 12/31/2025 (10-K); fair value marks in other income"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "Revenue scales with attributable production on existing royalties/streams plus new deliveries from development assets; Sandstorm combination enlarged metal exposure.",
+    "source": "FY2025 revenue $1,030M vs $719M prior year (10-K XBRL); operating margin ~62%"
+  }
+}
