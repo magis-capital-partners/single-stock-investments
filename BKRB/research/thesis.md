@@ -1,29 +1,34 @@
 # BKRB — Investment Thesis
 
-**Last updated:** 2026-06-03
+**Last updated:** auto-sync
 
 ## Classification
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Archetype** (Stahl) | holding_co |
+| **Moat** (Munger) | stable |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Cycle** | mid |
+| **Implied 7yr IRR** (base) | 6.02% (total synthesis) |
+| **IRR method** | full |
+| **Lawrence bucket** | multi_sided |
+| **Payoff lens** | operating |
+| **MOI bucket** | pending |
+
+**Deep dive:** `BKRB/research/deep_dive_2026-06-03.md` (auto-sync)
 
 ## One-line thesis
 
-Berkshire Hathaway Inc. (Class B) — thesis pending Marvin deep dive.
+Berkshire Hathaway Class B (BRK.B): fortress float and operating conglomerate at ~0.91x book, but ~6% Lawrence return on FY2025 operating earnings at $475 — **watch** until cheaper or faster capital deployment.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest 10-K and earnings release (operating vs GAAP)
+- [ ] Track 2026 buyback pace and cash pile deployment
+- [ ] Revisit if operating earnings per B share re-accelerates above $22
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-06-03; awaiting deep dive.
+- Folder symbol **BKRB** vs NYSE **BRK.B** — confirm dashboard price feed mapping.

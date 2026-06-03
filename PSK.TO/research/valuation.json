@@ -1,0 +1,224 @@
+{
+  "ticker": "PSK.TO",
+  "as_of": "2026-06-03",
+  "valuation_mode": "optionality",
+  "method": "full",
+  "lawrence_bucket": "pricing_power",
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 34.46,
+    "price_source": "Yahoo Finance PSK.TO close 2026-06-03 (CAD)",
+    "fcf_per_share": 1.5,
+    "fcf_source": "FY2025 funds from operations $1.50/sh per PSK-2025-YE-MDA.pdf; Q1 2026 run-rate $0.41/sh ($1.64 annualized)",
+    "shares_millions": 232.4,
+    "normalization_note": "Canadian royalty owner cash = funds from operations (no operating capex; acquisition capex discretionary). Base uses FY2025 filing rate, not Q1 2026 peak."
+  },
+  "optionality_gate": {
+    "framework": "royalty_ffo_yield",
+    "floor_pass": true,
+    "floor_metric": "dividend_yield",
+    "floor_value": 3.0,
+    "primary_metric": "lawrence_base",
+    "primary_label": "7yr IRR",
+    "primary_return_pct": 5.2,
+    "incumbent_sleeve": false,
+    "notes": "Sustainable dividend $1.06/sh (presentation); FY25 paid $1.04; FFO yield ~4.4% at C$34.46; undeveloped fee-land option not in Lawrence FCF0."
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.0,
+      "growth_y6_10": 0.0,
+      "exit_pfcf_y10": 14,
+      "notes": "Flat FFO; WCS/WTI weakness persists; exit 14x owner cash"
+    },
+    "base": {
+      "growth_y1_5": 0.04,
+      "growth_y6_10": 0.03,
+      "exit_pfcf_y10": 18,
+      "notes": "4% per-share FFO growth (6% oil royalty CAGR offset by commodity mix); exit 18x; dividend $1.06 sustained"
+    },
+    "bull": {
+      "growth_y1_5": 0.06,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 22,
+      "notes": "Clearwater/Duvernay/Mannville ramp + lease bonus; commodity recovery; exit 22x"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "nav_overlay",
+      "evidence": "Exploration & evaluation assets $1,468M vs shareholders equity $2,528M; undeveloped fee lands carry accounting value not full option NAV"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / acreage / dormant royalty?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "18.6M royalty acres; 9.9M fee simple mineral title; perpetual undeveloped zones per AIF and April 2026 presentation"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF path?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Lease bonus $12.3M Q1 2026 (48 leases); lumpy vs production royalty"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option already in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Clearwater +21% y/y, Duvernay +95% y/y, Mannville Stack +16% y/y Q1 2026 presentation"
+    }
+  ],
+  "nav_overlay_options": [
+    {
+      "id": "undeveloped_fee_lands",
+      "label": "Undeveloped fee-simple mineral title (11M+ stratified acres)",
+      "option_treatment": "zero",
+      "base_terminal_value_cad_per_share": 0.0,
+      "base_terminal_rationale": "Perpetual option on third-party drilling; no audited fair-value mark; explicit zero in Lawrence base after scan",
+      "evidence": "PSK-AIF-2025; Corporate Presentation April 2026"
+    },
+    {
+      "id": "lease_bonus_pipeline",
+      "label": "Lease issuance bonus (lumpy)",
+      "option_treatment": "embedded_in_segment",
+      "base_terminal_value_cad_per_share": 0.0,
+      "base_terminal_rationale": "Modeled via FFO growth assumption, not separate terminal",
+      "evidence": "2026-Q1-MDA: $12.3M bonus Q1 2026"
+    }
+  ],
+  "catalyst_paths": [
+    {
+      "event": "Third-party drilling on fee lands (Clearwater, Mannville Stack, Duvernay)",
+      "timing": "ongoing",
+      "impact": "Oil royalty volume CAGR 6% per share since Q1 2022"
+    },
+    {
+      "event": "Commodity price recovery (WTI, AECO)",
+      "timing": "cyclical",
+      "impact": "Realized $/BOE and FFO per share"
+    }
+  ],
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -1.5
+    },
+    "base": {
+      "return_pct": 5.2
+    },
+    "bull": {
+      "return_pct": 9.5
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -1.5
+    },
+    "base": {
+      "return_pct": 5.2
+    },
+    "bull": {
+      "return_pct": 9.5
+    }
+  },
+  "implied_return": {
+    "base_pct": 6.06,
+    "label": "7yr IRR (total synthesis)",
+    "display": "6.06% (total synthesis)",
+    "lawrence_stance_gate_pct": 5.2,
+    "falsifier_adjusted_pct": 5.2,
+    "synthesis_pct": 6.06
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true,
+      "floor_pass": true,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": null
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": -1.5,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 9.5,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 6.26,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 6.06,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}

@@ -1,29 +1,35 @@
 # FNV — Investment Thesis
 
-**Last updated:** 2026-06-03
+**Last updated:** auto-sync
 
 ## Classification
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Archetype** (Stahl) | optionality |
+| **Moat** (Munger) | stable |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Cycle** | peak |
+| **Implied 7yr IRR** (base) | 6.12% (total synthesis) |
+| **IRR method** | full |
+| **Lawrence bucket** | pricing_power |
+| **Payoff lens** | asset |
+| **MOI bucket** | pending |
+
+**Deep dive:** `FNV/research/deep_dive_2026-06-03.md` (auto-sync)
 
 ## One-line thesis
 
-Franco-Nevada Corporation — thesis pending Marvin deep dive.
+Franco-Nevada: zero-debt gold royalty compounder at a quality premium; **4.5%** base owner-cash return at **$229** — watch for better entry or Cobre Panamá / commodity upside in overlay.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read FY2025 annual report and Q1 2026 news release
+- [ ] Add SEC EDGAR filings to folder
+- [ ] Human review Cobre Panamá overlay assumptions
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-06-03; awaiting deep dive.
+- Deep dive: `FNV/research/deep_dive_2026-06-03.md`
+- Lawrence stance gate **4.5%**; synthesis **6.12%** pending approval

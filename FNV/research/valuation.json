@@ -1,0 +1,355 @@
+{
+  "ticker": "FNV",
+  "as_of": "2026-06-03",
+  "valuation_mode": "optionality",
+  "method": "full",
+  "lawrence_bucket": "pricing_power",
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "peak",
+    "payoff_lens": "asset",
+    "predictive_attribute": "quality_premium_compression"
+  },
+  "inputs": {
+    "price": 229.28,
+    "price_source": "NYSE FNV.US Stooq close 2026-06-03",
+    "fcf_per_share": 7.75,
+    "fcf_source": "FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A)",
+    "shares_millions": 192.7,
+    "normalization_note": "Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth.",
+    "copper_spot_usd_per_lb": 6.4798,
+    "copper_spot_as_of": "2026-06-04",
+    "copper_spot_source": "https://stooq.com/q/l/?s=hg.f&f=sd2t2ohlcv&h&e=csv",
+    "copperwood_royalty_est_usd_ssi_ref": 7700000,
+    "copperwood_royalty_est_usd_at_spot": 12473615.0,
+    "copperwood_royalty_note": "SSI ~$7.7M/yr @ $4.0/lb scaled linearly to spot $6.4798/lb [Assumption]"
+  },
+  "optionality_gate": {
+    "framework": "royalty_floor_no_debt",
+    "floor_pass": true,
+    "floor_metric": "balance_sheet",
+    "floor_value": "no_debt_3.4bn_available_capital",
+    "primary_metric": "lawrence_base",
+    "primary_label": "7yr IRR",
+    "primary_return_pct": 4.5,
+    "incumbent_sleeve": false,
+    "notes": "No debt; $3.4B available capital Q1 2026. Dividend yield ~0.8% at spot price is not a dhando floor; partial dhando from zero recourse leverage and portfolio optionality.",
+    "copperwood_option_yield_pct": 4.83
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.0,
+      "growth_y6_10": 0.0,
+      "exit_pfcf_y10": 20,
+      "notes": "Gold/silver mean-revert from record prices; GEO volumes flat; Cobre Panam\u00e1 stays limited; multiple compresses"
+    },
+    "base": {
+      "growth_y1_5": 0.04,
+      "growth_y6_10": 0.03,
+      "exit_pfcf_y10": 24,
+      "notes": "2026 GEO guidance 510-570k; fixed conversion ratios; dividend $1.76/yr; mid-single-digit cash flow growth [Assumption] off FY2025 record"
+    },
+    "bull": {
+      "growth_y1_5": 0.07,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 28,
+      "notes": "Cobre Panam\u00e1 full restart; oil price tailwind; new acquisitions plus exploration optionality"
+    }
+  },
+  "valuation_overlay": "segment_cashflow",
+  "segment_build": {
+    "segments": [
+      {
+        "id": "precious_metals",
+        "label": "Precious metal royalties & streams",
+        "fcf_per_share_y0": 6.85,
+        "growth_y1_5": 0.05,
+        "growth_y6_10": 0.03,
+        "exit_pfcf_y10": 26,
+        "evidence": "FY2025 ~88% of GEOs from gold/silver/PGM; 2026 guidance ~90% precious"
+      },
+      {
+        "id": "diversified",
+        "label": "Diversified (oil, gas, iron ore, other mining)",
+        "fcf_per_share_y0": 0.9,
+        "growth_y1_5": 0.03,
+        "growth_y6_10": 0.02,
+        "exit_pfcf_y10": 18,
+        "evidence": "FY2025 diversified ~12% of GEOs; Q1 2026 oil price sensitivity per CEO"
+      }
+    ],
+    "options": [
+      {
+        "id": "cobre_panama",
+        "label": "Cobre Panam\u00e1 restart / stockpile processing",
+        "option_treatment": "probability_weighted",
+        "annual_drag_per_share": 0.0,
+        "base_terminal_value_bn": 0.8,
+        "base_terminal_rationale": "11,208 GEOs in FY2025; GOP stockpile approval positive; full restart not in 2026 guidance \u2014 P-weighted overlay only",
+        "overlay_base_terminal_bn": 0.8,
+        "bull_terminal_value_bn": 2.5,
+        "evidence": "NR-Franco-Nevada-Reports-Record-2025-Results-vF-2026-03-10.pdf; First Quantum awaiting formal approval",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "development_royalties",
+        "label": "Development & exploration royalty book",
+        "option_treatment": "zero",
+        "base_terminal_value_bn": 0.0,
+        "base_terminal_rationale": "No audited fair values for pre-production portfolio; exploration upside in bull scenario growth only",
+        "evidence": "2025 annual report \u2014 deep portfolio; operator exploration spend not capitalized as FNV asset",
+        "not_in_lawrence_base": true
+      }
+    ],
+    "corporate_drag_per_share": 0.0,
+    "horizon_years": 7
+  },
+  "nav_overlay_options": [
+    {
+      "id": "cobre_panama",
+      "label": "Cobre Panam\u00e1",
+      "option_treatment": "probability_weighted",
+      "base_terminal_value_usd_per_share": 4.0,
+      "base_terminal_rationale": "~$0.8B enterprise value / 192.8M shares; partial restart probability [Assumption]",
+      "evidence": "investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-2025-Results-vF-2026-03-10.pdf"
+    }
+  ],
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "nav_overlay",
+      "evidence": "Shareholders equity $7.6B vs economic royalty portfolio; intangibles carry contractual cash flows not fully marked to spot commodity prices"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "Cobre Panam\u00e1; Tocantinzinho stream; development assets per corporate presentations"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No operating mines; corporate G&A modest vs revenue"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF path?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Royalties recognized as operators produce and sell"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Equity investments in available capital ($1.1B+ Q1 2026); marks in financials"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Q1 2026 CRA refund $49.5M in operating cash flow \u2014 one-time, excluded from normalized growth [Assumption]"
+    },
+    {
+      "q": 7,
+      "question": "Embedded option already in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Record gold/silver prices in FY2025-Q1 2026 revenue; oil exposure in diversified segment"
+    }
+  ],
+  "evidence_refresh": {
+    "synthesis_in_dive": true,
+    "base_payoff_mode": "fixed_stance_gate"
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true,
+      "floor_pass": true,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": null
+  },
+  "human_review": [],
+  "catalyst_paths": [
+    {
+      "event": "Cobre Panam\u00e1 formal restart / stockpile processing",
+      "timing": "2026-2027",
+      "impact": "Incremental GEOs above 2026 guidance band"
+    },
+    {
+      "event": "Commodity price normalization",
+      "timing": "bear scenario",
+      "impact": "Flat cash flow; multiple compression"
+    }
+  ],
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -1.5
+    },
+    "base": {
+      "return_pct": 4.5
+    },
+    "bull": {
+      "return_pct": 9.3
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -1.5
+    },
+    "base": {
+      "return_pct": 4.5
+    },
+    "bull": {
+      "return_pct": 9.3
+    }
+  },
+  "implied_return": {
+    "base_pct": 6.12,
+    "label": "7yr IRR (total synthesis)",
+    "display": "6.12% (total synthesis)",
+    "lawrence_stance_gate_pct": 4.5,
+    "falsifier_adjusted_pct": 4.5,
+    "synthesis_pct": 6.12
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": -1.5,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 9.3,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 6.12,
+    "qualitative_pp": 0,
+    "total_synthesis_pct": 6.12,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  },
+  "market_inputs": {
+    "copper": {
+      "spot": 6.4798,
+      "as_of": "2026-06-04",
+      "source": "https://stooq.com/q/l/?s=hg.f&f=sd2t2ohlcv&h&e=csv",
+      "fetched_at": "2026-06-03T22:44:23Z",
+      "stooq_symbol": "hg.f"
+    },
+    "scenario_grid": {
+      "bear": {
+        "copper_usd_per_lb": 4.67,
+        "label": "trough (~28% below spot)"
+      },
+      "base": {
+        "copper_usd_per_lb": null,
+        "label": "spot at compute"
+      },
+      "bull": {
+        "copper_usd_per_lb": 7.0,
+        "label": "cycle high (~8% above spot)"
+      }
+    }
+  },
+  "market_inputs_as_of": "2026-06-03",
+  "nav_overlay": {
+    "status": "complete",
+    "as_of": "2026-06-03",
+    "gaap_vs_fair_value": {},
+    "gaap_book_per_share": 0.0,
+    "economic_floor_per_share": 0.0,
+    "overlay_nav_per_share": 0.0,
+    "method": "probability_weighted",
+    "lines": [
+      {
+        "id": "gaap_book",
+        "label": "GAAP equity per share",
+        "per_share": 0.0,
+        "source": "filing"
+      },
+      {
+        "id": "lease_cap",
+        "label": "Lease run-rate capitalized",
+        "per_share": 0.0,
+        "source": "[Assumption] 10.0x on ~$0K/yr"
+      },
+      {
+        "id": "production_pw",
+        "label": "Production royalty P=35% @ spot",
+        "per_share": 0.0,
+        "source": "Scaled to spot $6.4793"
+      },
+      {
+        "id": "acreage",
+        "label": "Acreage / secondary option",
+        "per_share": 0.0,
+        "source": "filing"
+      }
+    ],
+    "premium_to_economic_floor_pct": null,
+    "notes": "Do not use GAAP book as dhando floor"
+  },
+  "overlay_options": {
+    "lawrence_base": "lease_income_only_zero_production_royalty",
+    "overlay_base_payoff_7yr": 4.0,
+    "overlay_implied_return_pct": -43.92
+  }
+}
