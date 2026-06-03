@@ -350,6 +350,21 @@ def patch_horizon_year_prose(body: str) -> str:
     return body
 
 
+def blended_estimate_section(val: dict) -> str | None:
+    """JSON-driven blended estimate; replaces regex patches when estimates exist."""
+    import sys
+
+    scripts = Path(__file__).resolve().parent
+    if str(scripts) not in sys.path:
+        sys.path.insert(0, str(scripts))
+    from valuation_synthesis import blended_estimate_markdown, has_blended_estimates
+
+    if not has_blended_estimates(val):
+        return None
+    body = blended_estimate_markdown(val)
+    return body.strip() if body else None
+
+
 def patch_blended_estimate_irr(body: str, val: dict) -> str:
     base_pct = primary_irr_pct(val)
     if base_pct is None:
@@ -1408,19 +1423,15 @@ def build_valuation_section(ticker: str, val: dict, preserved_val: str | None) -
         upside = f"**Upside / downside from price:** Base IRR **{base_pct}%** at **${price}**; see bear/bull in `valuation.json` scenarios."
 
     ret = ""
-    if preserved_val:
-        rm = re.search(r"\*\*Returns statement:\*\*.*", preserved_val)
-        if rm and str(base_pct) in rm.group(0) and "ten years" not in rm.group(0).lower():
-            ret = rm.group(0)
-    if not ret:
-        fcf = inputs.get("fcf_per_share") or inputs.get("per_share")
-        if fcf:
-            ret = (
-                f"**Returns statement:** We expect **{base_pct}%** per year over {LAWRENCE_HORIZON_YEARS} years "
-                f"at **~${price}** on **${fcf}/sh** starting owner cash."
-            )
-        else:
-            ret = f"**Returns statement:** We expect **{base_pct}%** per year at **${price}**."
+    headline = primary_irr_pct(val) or base_pct
+    fcf = inputs.get("fcf_per_share") or inputs.get("per_share")
+    if fcf:
+        ret = (
+            f"**Returns statement:** We expect **{headline}%** per year over {LAWRENCE_HORIZON_YEARS} years "
+            f"at **~${price}** on **${fcf}/sh** starting owner cash."
+        )
+    else:
+        ret = f"**Returns statement:** We expect **{headline}%** per year at **${price}**."
 
     parts = [
         "## Valuation & IRR (assumption ledger)",
@@ -1515,7 +1526,12 @@ def refresh_ticker(ticker: str, out_date: str) -> Path | None:
         if key == "## Executive summary":
             body = patch_exec_summary_irr(body, val)
         if key in ("## Blended estimate (best judgment)", "## Blended estimate"):
-            body = patch_blended_estimate_irr(body, val)
+            rendered = blended_estimate_section(val)
+            if rendered:
+                lines = rendered.splitlines()
+                body = "\n".join(lines[1:]).strip() if lines and lines[0].startswith("## ") else rendered
+            else:
+                body = patch_blended_estimate_irr(body, val)
         if key == "## Primary sources reviewed":
             body = inject_hk_primary_sources(body, ticker)
         if key == "## Payoff & return":

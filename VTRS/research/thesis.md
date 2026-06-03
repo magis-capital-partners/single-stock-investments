@@ -11,7 +11,7 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | transition |
-| **Implied 7yr IRR** (base) | 10.28% (total synthesis) |
+| **Implied 7yr IRR** (base) | 13.61% (total synthesis) |
 | **IRR method** | full |
 | **Lawrence bucket** | low_cost |
 | **Payoff lens** | event |
@@ -21,7 +21,7 @@
 
 ## One-line thesis
 
-Post-EWSR generic pharma; **9.7%** blended IRR ($1.42/sh, 75% Marvin / 25% Rosen approved); Marvin floor **9.2%** on $1.38. Idorsia Phase III catalyst per Rosen. ~$14B net debt; **watch**.
+Post-EWSR generic pharma; **13.61%** synthesis IRR ($1.50/sh 50/50 Marvin/Rosen); floor **9.9%** on $1.45. Rosen Sohn: Idorsia Phase III + cash-yield re-rating (catalyst capped, not 12mo double in base). ~$14B net debt; **watch**.
 
 ## Key questions
 
