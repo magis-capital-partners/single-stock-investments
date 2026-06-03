@@ -6,24 +6,26 @@
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Archetype** (Stahl) | infrastructure |
+| **Moat** (Munger) | narrow |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Cycle** | mid |
+| **MOI bucket** (legacy) | — |
+| **Payoff lens** | operating |
 
 ## One-line thesis
 
-Pure Cycle Corporation — thesis pending Marvin deep dive.
+Pure Cycle: exclusive Denver-area water rights plus phased Sky Ranch lot economics; watch until Lawrence return clears 15% or overlay NAV is human-approved.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest annual report (`0001104659-25-110312.pdf`)
+- [x] Read latest quarterly report (`0001104659-26-040879.pdf`)
+- [ ] Full PDF text tier for shareholder letter and earnings call
+- [ ] Proxy / governance review (district dual roles)
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-06-03; awaiting deep dive.
+- `nav_overlay` draft marks in `valuation.json`
+- CAB reimbursement timeline vs $56M receivable
