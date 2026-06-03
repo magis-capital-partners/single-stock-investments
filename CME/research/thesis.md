@@ -6,24 +6,25 @@
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Archetype** (Stahl) | croupier |
+| **Moat** (Munger) | stable |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Cycle** | mid |
+| **MOI bucket** (legacy) | — |
+| **Payoff lens** | operating |
 
 ## One-line thesis
 
-CME Group Inc. — thesis pending Marvin deep dive.
+CME Group is the dominant listed derivatives croupier; at **$252.65** the base case delivers **11.2%** per year on mid-cycle owner cash (**watch** until ~**$210–220** for ~15%).
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest annual report (FY2025 10-K)
+- [x] Read latest quarterly report (Q1 2026 10-Q)
+- [x] Lawrence valuation and deep dive (`deep_dive_2026-06-03.md`)
+- [ ] Human review of entry band and FCF tie-out
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-06-03; awaiting deep dive.
+- Illustrative add band **$210–220** for ~15% base; not approved entry.

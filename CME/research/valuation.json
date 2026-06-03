@@ -1,0 +1,128 @@
+{
+  "ticker": "CME",
+  "as_of": "2026-06-03",
+  "method": "full",
+  "lawrence_bucket": "multi_sided",
+  "payoff_lens": "operating",
+  "classification_inputs": {
+    "archetype": "croupier",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 252.65,
+    "price_source": "Stooq CME.US close 2026-06-03",
+    "fcf_per_share": 11.4,
+    "fcf_source": "FY2025 cash from operations $4,277.1M minus ~$200M capital spending, divided by ~359M diluted shares (10-K FY2025)",
+    "shares_millions": 359.0,
+    "normalization_note": "FY2025 mid-cycle base; Q1 2026 revenue and operating income run above trend and are not inflated into starting cash flow"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 18,
+      "notes": "Volume mean-reversion, regulatory fee pressure, lower exit multiple"
+    },
+    "base": {
+      "growth_y1_5": 0.07,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 22,
+      "notes": "Mid-cycle owner cash; exit near current ~22x cash flow multiple"
+    },
+    "bull": {
+      "growth_y1_5": 0.09,
+      "growth_y6_10": 0.06,
+      "exit_pfcf_y10": 26,
+      "notes": "Sustained rates and volatility, event-contract and international volume tailwind"
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 4.8
+    },
+    "base": {
+      "return_pct": 11.2
+    },
+    "bull": {
+      "return_pct": 15.3
+    }
+  },
+  "implied_return": {
+    "base_pct": 11.2,
+    "label": "7yr IRR (Lawrence base)",
+    "display": "11.2% (Lawrence base)",
+    "lawrence_stance_gate_pct": 11.2
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Clearing balances are liabilities, not hidden NAV; equity $28.7B FY2025 10-K"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Exchange franchise, not resource royalty"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "FY2025 operating income $4,229.5M on $6,520.6M revenue"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in cash path?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Transaction fees recognized with activity"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "Immaterial",
+      "treatment": "n/a",
+      "evidence": "Investment securities marked in filings; not thesis driver"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Regular dividend program; no dated legal recovery"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Crypto, event contracts, and international volume in transaction and clearing fees (10-K MD&A)"
+    },
+    {
+      "q": 0,
+      "question": "Material separate option terminals required?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Lawrence full cash-flow path sufficient after scan"
+    }
+  ],
+  "overlay_results": [],
+  "lawrence_horizon_years": 7
+}

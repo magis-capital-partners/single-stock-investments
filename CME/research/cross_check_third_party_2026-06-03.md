@@ -11,7 +11,7 @@
 
 No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (10-K, 10-Q, IR). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
 
-**Synthesis:** Marvin floor only; no external blend.
+**Synthesis:** Marvin floor only; no external blend. Base Lawrence return **11.2%** per year at **$252.65** on FY2025 owner cash **$11.40** per share (`valuation.json`).
 
 ## Sources in scope
 
@@ -33,13 +33,13 @@ No third-party sources are indexed for this ticker as of this scan. Marvin stanc
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | — | — | — |
+| Marvin floor | $11.40/sh owner cash | 11.2% / 7yr | watch |
 | External (combined) | — | — | — |
-| **Blended best estimate** | **—** | **—** | **—** |
+| **Blended best estimate** | **$11.40/sh** | **11.2%** | **watch** |
 
 **Weights:** *[Document why]*
 
-**Returns statement (blended):** *[One sentence; pending sources not in base IRR]*
+**Returns statement (blended):** At **$252.65** per share, we expect about **11.2%** per year over 7 years on filing-based owner cash; no approved third party in the blend.
 
 ## [HUMAN REVIEW]
 
