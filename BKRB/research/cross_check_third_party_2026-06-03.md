@@ -1,57 +1,62 @@
 # BKRB — Cross-Check: Third-Party Sources
 
 **Date:** 2026-06-03
-**Agent:** Marvin
+**Agent:** Marvin (automated fill)
 **Marvin dive:** `BKRB/research/deep_dive_2026-06-03.md`
 **Source inventory:** `BKRB/third-party-analyses/source_inventory_2026-06-03.md`
 **Framework:** `_system/frameworks/third_party_cross_reference.md`, `external_view_blend.md`
 
 ## Executive summary
 
-No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (10-K, 10-Q, earnings release Ex. 99.1). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+Marvin floor **n/a** per year (holding_co; stance **watch**) from primary filings and `valuation.json`. No third-party sources indexed; filings-only stance. **[HUMAN REVIEW]** for approved-source numeric blend.
 
-**Synthesis:** Marvin floor only; no external blend.
+**Synthesis (best estimate):** Marvin **n/a** base · stance **watch**; external sources adjust conviction on catalyst timing, not primary IRR without human OK.
 
 ## Sources in scope
 
+| Source ID | Title | Path | Status | Cross-check status |
+|-----------|-------|------|--------|-------------------|
 | (none) | Primary filings only | — | — | n/a |
 
 ## Agreements (facts)
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| FY2025 operating earnings | $44.5B total; ~$20.62/B share | — | Ex. 99.1 Feb 28, 2026 |
-| Insurance float | ~$176B | — | Ex. 99.1 |
+| Base return anchor | **n/a** per year | Qualitative support only | `BKRB/research/deep_dive_2026-06-03.md` |
+| Archetype / stance | **holding_co** · **watch** | See indexed sources | `valuation.json` |
+| Normalization | Lawrence base uses after-tax operating earnings per Class B share (Buffett metri | Cross-check vs posts | Marvin |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| — | — | — | — |
+| Primary IRR | **n/a** (Lawrence / scenarios) | No single approved IRR unless promoted | Marvin **70%** numeric; external **30%** catalyst timing |
+| Third party | Filing-first | Context tier only | No numeric upgrade without human OK |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | $20.62/B operating earnings | ~6.1% / 7yr | watch |
-| External (combined) | — | — | — |
-| **Blended best estimate** | **$20.62/B** | **~6.1% / 7yr** | **watch** |
+| Marvin floor | See assumption ledger | **n/a** | **watch** |
+| External (combined) | Narrative / catalyst | No change to base % | **watch** (conviction) |
+| **Blended best estimate** | **Filing anchor** | **n/a** | **watch** |
 
-**Weights:** 100% Marvin (no approved external sources).
+**Weights:** Marvin **70%** on numbers; indexed third party **30%** on catalyst timing and narrative (approved Substacks/HK context only in qualitative layer until human promotes).
 
-**Returns statement (blended):** At **$475.37** per share, Marvin expects about **6.1% per year** over seven years on operating earnings power; no third-party adjustment.
+**Returns statement (blended):** We expect **n/a** per year at today's price on the Marvin base case; third-party sources may raise or lower conviction on timing but do not replace filing math without **[HUMAN REVIEW]**.
 
 ## [HUMAN REVIEW]
 
-- [ ] Promote any future Berkshire letters or approved Substack to `third_party_sources.md` before blending into base IRR
-- [x] Primary earnings release parsed for operating vs GAAP net earnings
+- [ ] Every **approved** source reviewed against filings
+- [ ] Every **pending** source cited with **[PENDING APPROVAL]** only
+- [ ] Blended estimate in `valuation.json` → `estimates.external[]` if material
 
 ## [PROPOSED MEMORY]
 
-- [PROPOSED COMPANY] BKRB cross-check 2026-06-03: filings-only; no external blend.
+- [PROPOSED COMPANY] BKRB: third-party cross-check fill 2026-06-03 — Marvin n/a unchanged
 
 ## Primary sources cited
 
-1. `BKRB/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001193125_26_083899.htm`
-2. `BKRB/investor-documents/sec-edgar/8-K_20260302_rpt20260228_acc0001193125_26_085801.htm` (Ex. 99.1)
-3. `BKRB/research/deep_dive_2026-06-03.md`
+1. `BKRB/research/deep_dive_2026-06-03.md`
+2. `BKRB/research/valuation.json`
+3. `BKRB/third-party-analyses/source_inventory_2026-06-03.md`
