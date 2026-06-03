@@ -1,24 +1,33 @@
 #!/usr/bin/env python3
-"""Build Darwin portfolio JSON (phases 0–3).
+"""Build Darwin portfolio JSON for Roth IRA + taxable paper accounts.
 
-  python _system/scripts/build_darwin_portfolio.py
-  python _system/scripts/build_darwin_portfolio.py --fast
+  python3 _system/scripts/build_darwin_portfolio.py
+  python3 _system/scripts/build_darwin_portfolio.py --fast
+  python3 _system/scripts/build_darwin_portfolio.py --account roth
 """
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 
-from darwin.pipeline import run_pipeline  # noqa: E402
+from darwin.accounts import ACCOUNT_IDS  # noqa: E402
+from darwin.pipeline import run_all_accounts, run_pipeline  # noqa: E402
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--fast", action="store_true", help="Reduced training for CI")
+    parser.add_argument(
+        "--account",
+        choices=list(ACCOUNT_IDS) + ["all"],
+        default="all",
+        help="Which paper account to build (default: all)",
+    )
     parser.add_argument(
         "--download",
         action="store_true",
@@ -39,7 +48,37 @@ def main() -> None:
         script = ROOT / "_system" / "scripts" / "download_ira_research.py"
         subprocess.run([sys.executable, str(script), "--tier", "A"], check=False)
         subprocess.run([sys.executable, str(script), "--tier", "B"], check=False)
+
+    if args.account == "all" and not any(
+        [args.pit_audit, args.pit_backtest, args.sync_events, args.sync_external]
+    ):
+        bundle = run_all_accounts(fast=args.fast)
+        s = bundle["serving"]
+        print(json.dumps(
+            {
+                aid: {
+                    "policy_id": (s.get("accounts") or {}).get(aid, {}).get("policy_id"),
+                    "backtest_cumulative_pct": (s.get("accounts") or {}).get(aid, {}).get("backtest_cumulative_pct"),
+                    "paper_cumulative_pct": ((s.get("accounts") or {}).get(aid, {}).get("paper") or {}).get(
+                        "cumulative_return_pct"
+                    ),
+                    "paper_inception": (s.get("accounts") or {}).get(aid, {}).get("paper_inception"),
+                }
+                for aid in ("roth", "taxable")
+            },
+            indent=2,
+        ))
+        for aid, row in (s.get("accounts") or {}).items():
+            paper = row.get("paper") or {}
+            print(
+                f"{aid}: policy={row.get('policy_id')} "
+                f"backtest_cum={row.get('backtest_cumulative_pct')}% "
+                f"paper_cum={paper.get('cumulative_return_pct')}% (since {row.get('paper_inception')})"
+            )
+        return
+
     out = run_pipeline(
+        account_id=args.account if args.account != "all" else "roth",
         fast=args.fast,
         pit_audit_only=args.pit_audit,
         pit_backtest_only=args.pit_backtest,
@@ -57,18 +96,29 @@ def main() -> None:
         print(f"Synced {out['sync_events']} research events")
         return
     if out.get("pit_audit"):
-        print(f"PIT audit: pass={out.get('pit_status', {}).get('audit_pass')} leakage={out.get('pit_status', {}).get('leakage_count')}")
+        print(
+            f"PIT audit: pass={out.get('pit_status', {}).get('audit_pass')} "
+            f"leakage={out.get('pit_status', {}).get('leakage_count')}"
+        )
         return
     if out.get("pit_backtest"):
-        print(f"PIT backtest: oos_sharpe={out.get('pit_status', {}).get('oos_sharpe_genetic')} ml_oos={out.get('pit_status', {}).get('ml_oos_eligible')}")
+        print(
+            f"PIT backtest: oos_sharpe={out.get('pit_status', {}).get('oos_sharpe_genetic')} "
+            f"ml_oos={out.get('pit_status', {}).get('ml_oos_eligible')}"
+        )
         return
     if out.get("error"):
         print(f"Darwin pipeline error: {out['error']}", file=sys.stderr)
         sys.exit(1)
+    paper = out.get("paper_portfolio") or {}
+    champ = (out.get("benchmarks") or {}).get("champion") or {}
     print(
-        f"Darwin portfolio: policy={out.get('policy_id')} "
+        f"Darwin [{out.get('account_id')}]: policy={out.get('policy_id')} "
         f"regime={out.get('regime', {}).get('label') if isinstance(out.get('regime'), dict) else out.get('regime')} "
-        f"weights={len(out.get('weights') or [])} pit_audit={out.get('pit', {}).get('audit_pass')}"
+        f"weights={len(out.get('weights') or [])} "
+        f"backtest_cum={(champ.get('cumulative_return') or 0)*100:.1f}% "
+        f"paper_nav={paper.get('last_mark', {}).get('nav_usd')} "
+        f"paper_cum={paper.get('last_mark', {}).get('cumulative_return_pct')}%"
     )
 
 
