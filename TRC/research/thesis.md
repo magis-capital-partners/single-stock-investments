@@ -1,29 +1,36 @@
 # TRC — Investment Thesis
 
-**Last updated:** 2026-06-03
+**Last updated:** auto-sync
 
 ## Classification
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Archetype** (Stahl) | optionality |
+| **Moat** (Munger) | stable |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Cycle** | mid |
+| **Implied 7yr IRR** (base) | 5.8% (base) |
+| **IRR method** | yield_curve |
+| **Lawrence bucket** | other |
+| **Payoff lens** | asset |
+| **MOI bucket** | pending |
+
+**Deep dive:** `TRC/research/deep_dive_2026-06-03.md` (auto-sync)
 
 ## One-line thesis
 
-Tejon Ranch Co. — thesis pending Marvin deep dive.
+**~270,000** California acres and entitlements (Centennial, Grapevine, TRCC) at **~$18.84** near GAAP book; base **5.8%** per year on 7-year dated NAV payoff — **watch** until IRR or catalyst tightens.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest annual report (10-K FY2025)
+- [x] Read latest quarterly report (10-Q Q1 2026)
+- [ ] Per-acre NAV comps and developable acreage (human)
+- [ ] Centennial / Grapevine litigation and timing
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-06-03; awaiting deep dive.
+- Deep dive `TRC/research/deep_dive_2026-06-03.md`
+- CIK fix **96869** applied 2026-06-03 (onboard had **96835**)
