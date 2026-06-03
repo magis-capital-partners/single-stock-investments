@@ -108,6 +108,27 @@ TEMPLATE_PATH_IDS = frozenset(
     }
 )
 
+PRIMARY_ANCHOR_PATH_IDS = frozenset(
+    {
+        "filing_falsifier",
+        "yield_curve_gate",
+        "marvin_floor",
+        "blended_lawrence_primary",
+        "blended_best_primary",
+    }
+)
+
+AUTO_QUAL_PP_CAP = 1.0
+HUMAN_QUAL_PP_CAP = 3.0
+
+HK_BLOCK_PHRASES = (
+    "no base irr upgrade",
+    "no irr upgrade",
+    "no numeric upgrade",
+    "does not upgrade base",
+    "not a base irr upgrade",
+)
+
 
 def _has_custom_synthesis_paths(paths: list[dict]) -> bool:
     """Human-curated synthesis (e.g. VTRS Rosen weights) must not be replaced."""
@@ -333,9 +354,29 @@ def resolve_synthesis_paths(data: dict) -> list[dict]:
 
     if not paths:
         paths = _default_paths(data)
+    elif _needs_primary_path_rebuild(paths, data):
+        paths = _default_paths(data)
     elif has_estimates:
         paths = _sync_path_returns(paths, data)
     return paths
+
+
+def _needs_primary_path_rebuild(paths: list[dict], data: dict) -> bool:
+    existing = data.get("synthesis") or {}
+    if existing.get("lock_paths"):
+        return False
+    ir = data.get("implied_return") or {}
+    legacy = data.get("results_lawrence_legacy") or data.get("results") or {}
+    base_ret = (legacy.get("base") or {}).get("return_pct")
+    need_anchor = (
+        ir.get("falsifier_adjusted_pct") is not None
+        or ir.get("lawrence_stance_gate_pct") is not None
+        or base_ret is not None
+        or data.get("method") == "yield_curve"
+    )
+    if not need_anchor:
+        return False
+    return not any(p.get("id") in PRIMARY_ANCHOR_PATH_IDS for p in paths)
 
 
 def _load_inventory(ticker: str) -> dict | None:
@@ -508,28 +549,74 @@ def _default_paths(data: dict) -> list[dict]:
     return _attach_weight_theory(paths)
 
 
-def _default_qualitative(data: dict, ticker: str) -> list[dict]:
-    """Qualitative ±pp from moat, dhando, cross-check themes."""
+def _ticker_research_dir(ticker: str) -> Path:
+    return ROOT / ticker / "research"
+
+
+def _hk_evidence_paths(ticker: str) -> list[Path]:
+    research = _ticker_research_dir(ticker)
+    tp = ROOT / ticker / "third-party-analyses"
+    found: list[Path] = []
+    for base in (research, tp):
+        if not base.is_dir():
+            continue
+        found.extend(base.glob("cross_check*HK*.md"))
+        found.extend(base.glob("hk_scan_*.md"))
+        found.extend(base.glob("hk_scan_*.json"))
+    return sorted(set(found), key=lambda p: p.name, reverse=True)
+
+
+def _cross_check_blocks_hk_qual(ticker: str) -> bool:
+    research = _ticker_research_dir(ticker)
+    if not research.is_dir():
+        return False
+    for path in research.glob("cross_check*.md"):
+        text = path.read_text(encoding="utf-8", errors="replace").lower()
+        if any(phrase in text for phrase in HK_BLOCK_PHRASES):
+            return True
+    return False
+
+
+def _has_primary_anchor(paths: list[dict]) -> bool:
+    return any(p.get("id") in PRIMARY_ANCHOR_PATH_IDS for p in paths)
+
+
+def _default_qualitative(data: dict, ticker: str, paths: list[dict] | None = None) -> list[dict]:
+    """Qualitative ±pp from documented ladder (total_synthesis_irr.md)."""
+    paths = paths or []
     adj: list[dict] = []
     ci = data.get("classification_inputs") or {}
     moat = ci.get("moat", "")
     dhando = ci.get("dhando", "")
-    if moat == "durable":
+    payoff_lens = (ci.get("payoff_lens") or "").lower()
+    allow_positive = _has_primary_anchor(paths)
+    hk_files = _hk_evidence_paths(ticker)
+
+    if moat == "durable" and data.get("segment_build") and allow_positive:
         adj.append(
             {
-                "factor": "Competition / moat (scarce Permian acreage, no scale peer)",
+                "id": "scarce_moat_segment",
+                "factor": "Competition / moat (scarce acreage / segment footprint)",
                 "pp": 0.3,
-                "rationale": "Irreplaceable surface + royalty footprint limits competitive entry",
-                "sources": "10-K Item 1; Business & moat",
+                "rationale": "Segment build shows irreplaceable surface or royalty footprint",
+                "sources": "10-K Item 1; segment_build",
+                "falsifier": "Segment build removed or moat downgraded below durable",
             }
         )
-    if dhando == "partial":
+    if (
+        dhando == "partial"
+        and allow_positive
+        and hk_files
+        and not _cross_check_blocks_hk_qual(ticker)
+    ):
         adj.append(
             {
+                "id": "partial_dhando_hk_nav",
                 "factor": "Partial dhando (HK hard-asset / hidden NAV)",
                 "pp": 0.5,
-                "rationale": "Third-party confirms asset quality not in GAAP book; not full floor at spot price",
-                "sources": "cross_check_HK; hk_scan; HK Q1 2025/2026",
+                "rationale": "HK cross-check supports asset quality not in GAAP book; not a full floor at spot",
+                "sources": "; ".join(p.relative_to(ROOT).as_posix() for p in hk_files[:3]),
+                "falsifier": "HK cross-check says no base IRR upgrade, or hk_scan removed",
             }
         )
     inv = _load_inventory(ticker)
@@ -539,36 +626,74 @@ def _default_qualitative(data: dict, ticker: str) -> list[dict]:
             if "governance" in title or "end of an era" in title:
                 adj.append(
                     {
+                        "id": "governance_transition",
                         "factor": "Governance transition (post-Stahl)",
                         "pp": -0.4,
                         "rationale": "Capital allocation uncertainty until proven",
                         "sources": s.get("path", "LCI Substack"),
+                        "falsifier": "Proxy/filings show stable capital allocation for 4+ quarters",
                     }
                 )
                 break
         for s in inv.get("sources", []):
             if "water" in (s.get("use") or "").lower() or "water" in title:
-                adj.append(
-                    {
-                        "factor": "Water scarcity tailwind (SSI / HK index-weight)",
-                        "pp": 0.25,
-                        "rationale": "TPWR segment + index cannot replicate subsurface water exposure",
-                        "sources": s.get("path", "SSI/HK"),
-                    }
-                )
+                if allow_positive:
+                    adj.append(
+                        {
+                            "id": "water_scarcity_index",
+                            "factor": "Water scarcity tailwind (SSI / HK index-weight)",
+                            "pp": 0.25,
+                            "rationale": "Water segment or index cannot replicate subsurface exposure",
+                            "sources": s.get("path", "SSI/HK"),
+                            "falsifier": "Water economics fully in segment exit multiple",
+                        }
+                    )
                 break
     pred = ci.get("predictive_attribute", "none")
-    if pred in (None, "", "none"):
+    if pred in (None, "", "none") and payoff_lens != "event":
         adj.append(
             {
+                "id": "no_predictive_attribute",
                 "factor": "No dated predictive attribute at spot",
                 "pp": -0.2,
                 "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
                 "sources": "HK predictive attributes framework",
+                "falsifier": "Cross-check names dated catalyst with timeline",
             }
         )
     return adj
 
+
+def _qualitative_pp_cap(data: dict, qual_pp: float) -> tuple[float, bool]:
+    syn = data.get("synthesis") or {}
+    approved = (syn.get("human_approval") or "").lower() == "approved"
+    cap = HUMAN_QUAL_PP_CAP if approved else AUTO_QUAL_PP_CAP
+    clamped = max(-cap, min(cap, qual_pp))
+    return clamped, clamped != qual_pp
+
+
+def _qualitative_audit(paths: list[dict], qual: list[dict], qual_pp: float, cap_applied: bool) -> dict:
+    has_anchor = _has_primary_anchor(paths)
+    positive = [q for q in qual if float(q.get("pp", 0)) > 0]
+    flags: list[str] = []
+    if positive and not has_anchor:
+        flags.append("Positive qualitative pp requires Tier A anchor path in synthesis.")
+    if cap_applied:
+        flags.append(
+            f"Net qualitative_pp clamped to ±{AUTO_QUAL_PP_CAP}pp auto cap; human_approval approved allows ±{HUMAN_QUAL_PP_CAP}pp."
+        )
+    if len(qual) >= 3:
+        flags.append("Three or more qual rows: check overlap with segment multiples / NAV path weights.")
+    hard = all(q.get("id") for q in qual) and (not positive or has_anchor)
+    return {
+        "flags": flags,
+        "deutsch_checks": {
+            "hard_to_vary": hard,
+            "falsifiable": all(q.get("falsifier") for q in qual) if qual else True,
+            "not_double_count": len(qual) < 3,
+            "small_band": abs(qual_pp) <= AUTO_QUAL_PP_CAP + 0.001 or cap_applied,
+        },
+    }
 
 def _synthesis_weight_flags(paths: list[dict], qual: list[dict]) -> dict:
     """Popper/Deutsch audit flags for the weight scheme itself."""
@@ -589,10 +714,6 @@ def _synthesis_weight_flags(paths: list[dict], qual: list[dict]) -> dict:
     if seg and fil and abs(float(seg.get("return_pct", 0)) - float(fil.get("return_pct", 0))) < 0.5:
         flags.append(
             "Segment implied approx filing falsifier-adjusted; shared growth inputs. Combined Tier A+B weight is ~54% after renormalize (watch double-count)."
-        )
-    if len(qual) >= 3:
-        flags.append(
-            "Qualitative ±pp stack may overlap numeric paths (moat/dhando); cap ±3pp and require source for each row."
         )
     htv_bad = any(str(p.get("hard_to_vary", "")).startswith("no") for p in paths)
     return {
@@ -727,11 +848,15 @@ def compute_synthesis(data: dict) -> dict:
         w = p.get("weight", 0) / total_w
         numeric += w * float(p["return_pct"])
 
-    qual = existing.get("qualitative_adjustments") or _default_qualitative(data, ticker)
-    qual_pp = sum(float(q.get("pp", 0)) for q in qual)
-    qual_pp = max(-3.0, min(3.0, qual_pp))
+    if existing.get("qualitative_manual"):
+        qual = existing.get("qualitative_adjustments") or []
+    else:
+        qual = _default_qualitative(data, ticker, paths)
+    qual_pp_raw = sum(float(q.get("pp", 0)) for q in qual)
+    qual_pp, cap_applied = _qualitative_pp_cap(data, qual_pp_raw)
 
     weight_audit = _synthesis_weight_flags(paths, qual)
+    weight_audit["qualitative_audit"] = _qualitative_audit(paths, qual, qual_pp, cap_applied)
 
     total = _round_pct(numeric + qual_pp)
     numeric_r = _round_pct(numeric)
@@ -740,6 +865,8 @@ def compute_synthesis(data: dict) -> dict:
         "status": "complete",
         "paths": paths,
         "qualitative_adjustments": qual,
+        "qualitative_manual": bool(existing.get("qualitative_manual")),
+        "qualitative_pp_cap_applied": cap_applied,
         "numeric_weighted_pct": numeric_r,
         "qualitative_pp": _round_pct(qual_pp),
         "total_synthesis_pct": total,
@@ -909,18 +1036,45 @@ def synthesis_markdown(data: dict) -> str:
         )
     lines.append("")
     lines.append(_weight_stress_markdown(syn.get("paths", []), syn.get("weight_audit") or {}))
+    qa = syn.get("weight_audit") or {}
+    qaudit = qa.get("qualitative_audit") or {}
     lines += [
         "",
         "#### Qualitative adjustments (competition, moat, governance)",
         "",
-        "| Factor | ±pp | Rationale | Sources |",
-        "|--------|-----|-----------|---------|",
+        "Small **linear pp band** on the numeric weighted return (same horizon). "
+        f"Auto net cap **±{AUTO_QUAL_PP_CAP}pp**; ladder in `total_synthesis_irr.md`.",
+        "",
+        "| id | Factor | ±pp | Rationale | Sources |",
+        "|----|--------|-----|-----------|---------|",
     ]
     for q in syn.get("qualitative_adjustments", []):
         pp = q.get("pp", 0)
         sign = "+" if pp >= 0 else ""
         lines.append(
-            f"| {q.get('factor', '')} | {sign}{pp} | {q.get('rationale', '')[:80]} | {q.get('sources', '')[:60]} |"
+            f"| {q.get('id', '')} | {q.get('factor', '')} | {sign}{pp} | "
+            f"{q.get('rationale', '')[:70]} | {q.get('sources', '')[:50]} |"
+        )
+    if not syn.get("qualitative_adjustments"):
+        lines.append("| — | (none) | 0 | — | — |")
+    qdc = qaudit.get("deutsch_checks") or {}
+    lines += [
+        "",
+        "#### Deutsch checks (qualitative ±pp)",
+        "",
+        "| Check | Pass? | Notes |",
+        "|-------|-------|-------|",
+        f"| Hard to vary | {'yes' if qdc.get('hard_to_vary') else 'no'} | Ladder id + on-disk source per row |",
+        f"| Falsifiable | {'yes' if qdc.get('falsifiable') else 'no'} | Each row has a falsifier |",
+        f"| Not double-count | {'yes' if qdc.get('not_double_count') else 'partial'} | Watch overlap with NAV/segment paths |",
+        f"| Small band | {'yes' if qdc.get('small_band') else 'no'} | Net qual within auto cap or human-approved |",
+    ]
+    for f in qaudit.get("flags") or []:
+        lines.append(f"- **[Qual audit]:** {f}")
+    if syn.get("qualitative_pp_cap_applied"):
+        lines.append(
+            f"- **[Qual audit]:** Net qualitative_pp clamped to ±{AUTO_QUAL_PP_CAP}pp (auto); "
+            "promote human_approval to widen band."
         )
     n = syn.get("numeric_weighted_pct")
     qpp = syn.get("qualitative_pp")
@@ -930,8 +1084,9 @@ def synthesis_markdown(data: dict) -> str:
         "#### Synthesis arithmetic (show your work)",
         "",
         f"1. **Numeric weighted return:** {_fmt_paths_sum(syn.get('paths', []))} = **{n}%** per year",
-        f"2. **Qualitative adjustments:** {' + '.join(_qual_terms(syn.get('qualitative_adjustments', [])))} = **{qpp}** pp",
-        f"3. **Total synthesis IRR:** {n}% + {qpp}pp = **{t}%** per year",
+        f"2. **Qualitative adjustments (linear pp on annualized %):** "
+        f"{' + '.join(_qual_terms(syn.get('qualitative_adjustments', [])))} = **{qpp}** pp",
+        f"3. **Total synthesis IRR:** {n}% + ({qpp}pp) = **{t}%** per year",
         "",
         f"**Returns statement (synthesis):** At today's price, we expect about **{t}%** per year over "
         f"{LAWRENCE_HORIZON_YEARS} years "
