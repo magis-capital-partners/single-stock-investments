@@ -8,7 +8,7 @@
 
 ## Executive summary
 
-Marvin floor **-8.29%** per year (optionality; stance **watch**) from primary filings and `valuation.json`. **2** context-tier source(s) indexed; triangulation qualitative only. **[HUMAN REVIEW]** for approved-source numeric blend.
+Marvin floor **-8.29%** per year (optionality; stance **watch**) from primary filings and `valuation.json`. **3** approved third-party source(s) support narrative timing; numeric anchor unchanged unless human promotes blend into base IRR. **[HUMAN REVIEW]** for approved-source numeric blend.
 
 **Synthesis (best estimate):** Marvin **-8.29%** base · stance **watch**; external sources adjust conviction on catalyst timing, not primary IRR without human OK.
 
@@ -16,8 +16,9 @@ Marvin floor **-8.29%** per year (optionality; stance **watch**) from primary fi
 
 | Source ID | Title | Path | Status | Cross-check status |
 |-----------|-------|------|--------|-------------------|
-| reference | Keweenaw Land Association (KEWL) | `https://specialsituationinvesting.substack.com/p/keweenaw-land-association-kewl` | context | [x] context |
-| reference | Update: Keweenaw Land Association (KEWL) | `https://specialsituationinvesting.substack.com/p/update-keweenaw-land-association` | context | [x] context |
+| hk_context_kewl | HK + SSI context (KEWL) | `KEWL/third-party-analyses/references.md` | approved | [x] approved |
+| reference | Keweenaw Land Association (KEWL) | `https://specialsituationinvesting.substack.com/p/keweenaw-land-association-kewl` | approved | [x] approved |
+| reference | Update: Keweenaw Land Association (KEWL) | `https://specialsituationinvesting.substack.com/p/update-keweenaw-land-association` | approved | [x] approved |
 
 ## Agreements (facts)
 
@@ -26,6 +27,9 @@ Marvin floor **-8.29%** per year (optionality; stance **watch**) from primary fi
 | Base return anchor | **-8.29%** per year | Qualitative support only | `KEWL/research/deep_dive_2026-06-02.md` |
 | Archetype / stance | **optionality** · **watch** | See indexed sources | `valuation.json` |
 | Normalization | SSI mineral-floor + free-option. At $55, ~4.3× book — option yield falls vs $27  | Cross-check vs posts | Marvin |
+| Theme | Filing-grounded thesis | HK + SSI context (KEWL) | `KEWL/third-party-analyses/references.md` |
+| Theme | Filing-grounded thesis | Keweenaw Land Association (KEWL) | `https://specialsituationinvesting.substack.com/p/keweenaw-land-association-kewl` |
+| Theme | Filing-grounded thesis | Update: Keweenaw Land Association (KEWL) | `https://specialsituationinvesting.substack.com/p/update-keweenaw-land-association` |
 
 ## Divergences (normalization / stance)
 

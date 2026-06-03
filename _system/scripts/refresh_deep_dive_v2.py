@@ -1014,7 +1014,8 @@ def sotp_nav_block(val: dict) -> str:
     lines = [
         "#### Sum-of-parts or NAV",
         "",
-        f"**Base case Year-{base.get('years', sotp.get('years', 5))} economic NAV = ${payoff}/sh** — see Valuation & IRR assumption ledger.",
+        f"**Base case Year-{base.get('years', sotp.get('years', 5))} economic NAV = ${payoff}/sh**. "
+        "See Valuation & IRR assumption ledger.",
         "",
         "| Piece | $/sh (today) | + Incremental uplift | In book? |",
         "|-------|--------------|----------------------|----------|",
@@ -1022,7 +1023,7 @@ def sotp_nav_block(val: dict) -> str:
     running = anchor or 0
     for row in lines_data:
         if row.get("id") == "book":
-            lines.append(f"| {row.get('label', 'Anchor')} | **${row.get('gaap_per_share')}** | — | Yes |")
+            lines.append(f"| {row.get('label', 'Anchor')} | **${row.get('gaap_per_share')}** | n/a | Yes |")
             continue
         uplift = row.get("uplift_per_share") or 0
         if uplift:
@@ -1168,7 +1169,7 @@ def yield_curve_sotp_irr(val: dict, ticker: str) -> str:
         f"**Base case** (dated payoff / sum-of-parts; `irr_method`: yield_curve). "
         f"Payoff **${payoff}** and horizon **{years} years** are model assumptions in `valuation.json`.",
         "",
-        "**Step 1 — Price today**",
+        "**Step 1: Price today**",
         f"- **${price}** ({inputs.get('price_source', 'market')})",
         "",
     ]
@@ -1176,19 +1177,19 @@ def yield_curve_sotp_irr(val: dict, ticker: str) -> str:
         if price < book:
             disc = (book - price) / book * 100
             out += [
-                "**Step 2 — Filing anchor (book)**",
+                "**Step 2: Filing anchor (book)**",
                 f"- Book **${book}/sh** · Price **{disc:.0f}%** below book",
                 "",
             ]
         else:
             prem = (price - book) / book * 100 if book else 0
             out += [
-                "**Step 2 — Filing anchor (book)**",
+                "**Step 2: Filing anchor (book)**",
                 f"- Book **${book}/sh** · Price **{prem:.0f}%** above book (option priced in)",
                 "",
             ]
     out += [
-        "**Step 3 — Build payoff by adding incremental lines**",
+        "**Step 3: Build payoff by adding incremental lines**",
         "",
         "```",
         f"  {book or price}  anchor (GAAP book or price)",
@@ -1208,12 +1209,12 @@ def yield_curve_sotp_irr(val: dict, ticker: str) -> str:
         "",
         f"Same build in `{ticker}/research/valuation.json` → `scenarios.base.sotp_build`.",
         "",
-        f"**Step 4 — Horizon: {years} years** (model choice; not company guidance)",
+        f"**Step 4: Horizon: {years} years** (model choice; not company guidance)",
         "",
-        "**Step 5 — Total return**",
+        "**Step 5: Total return**",
         f"- ${payoff} ÷ ${price} − 1 = **{(payoff / price - 1) * 100:.1f}%** total" if price else "",
         "",
-        "**Step 6 — Annualized return**",
+        "**Step 6: Annualized return**",
         f"- (${payoff} ÷ ${price})^(1/{years}) − 1 = **{base_pct}%** per year"
         if price and payoff and base_pct is not None
         else "",
@@ -1306,28 +1307,28 @@ def irr_arithmetic(val: dict, ticker: str, preserved: str | None) -> str:
         lines += [
             f"**Base case** (`irr_method`: {method}). See assumption ledger and `sotp_build` in valuation.json.",
             "",
-            "**Step 1 — Price today**",
+            "**Step 1: Price today**",
             f"- **${price}** ({inputs.get('price_source', 'market')})",
             "",
         ]
         if book:
             disc = (book - price) / book * 100 if book else 0
             lines += [
-                "**Step 2 — Filing anchor (book)**",
+                "**Step 2: Filing anchor (book)**",
                 f"- Book **${book}/sh** · Price is **{disc:.0f}%** below book" if price < book else f"- Book **${book}/sh**",
                 "",
             ]
         lines += [
-            "**Step 3 — Payoff (sum of parts)**",
+            "**Step 3: Payoff (sum of parts)**",
             f"- Build incremental lines in assumption ledger; payoff **${payoff}** must equal running sum.",
             "",
-            f"**Step 4 — Horizon: {years} years**",
+            f"**Step 4: Horizon: {years} years**",
             "- Model choice in valuation.json; not company guidance.",
             "",
-            "**Step 5 — Total return**",
+            "**Step 5: Total return**",
             f"- ${payoff} ÷ ${price} − 1 = **{(payoff/price - 1)*100:.1f}%** total" if price else "",
             "",
-            "**Step 6 — Annualized IRR**",
+            "**Step 6: Annualized IRR**",
             f"- (${payoff} ÷ ${price})^(1/{years}) − 1 = **{base_pct}%**/yr"
             if price and payoff and base_pct
             else "",

@@ -11,7 +11,7 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | - |
-| **Implied 7yr IRR** (base) | -8.3% (base) |
+| **Implied 7yr IRR** (base) | -8.29% (base) |
 | **IRR method** | yield_curve |
 | **Lawrence bucket** | other |
 | **Payoff lens** | asset |
