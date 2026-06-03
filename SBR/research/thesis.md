@@ -1,6 +1,6 @@
 # SBR — Investment Thesis
 
-**Last updated:** 2026-06-03
+**Last updated:** auto-sync
 
 ## Classification
 
@@ -11,8 +11,11 @@
 | **Dhando** (Pabrai) | pending |
 | **Stance** | watch |
 | **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
+| **Implied 7yr IRR** (base) | — |
+| **IRR method** | — |
+| **Lawrence bucket** | — |
 | **Payoff lens** | pending |
+| **MOI bucket** | pending |
 
 ## One-line thesis
 
