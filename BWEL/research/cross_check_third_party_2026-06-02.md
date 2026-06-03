@@ -31,7 +31,8 @@
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| Water NAV | +$40/sh overlay [Assumption] | $2B–$6B system value | External **bull only**; not in Lawrence base |
+| Water NAV | +$485/sh PW overlay; E[water] ~$846M | $2B–$6B system value | Marvin fact-check; external **bull** 5% weight |
+| Economic NAV | **~$1,480/sh** | Bull **~$2,200/sh** | `fact_check_water_nav_2026-06-02.md` |
 | Base IRR | **1.1%** | Generational NAV | **Unchanged** stance gate |
 
 ## Blended estimate (best judgment)
