@@ -50,6 +50,29 @@ def policy_irr_ranked(rows: list[dict], genome: dict | None = None) -> dict[str,
     return {t: s / total for t, s in keep}
 
 
+def policy_risk_parity_vol(rows: list[dict], genome: dict | None = None) -> dict[str, float]:
+    """Inverse-vol style weights using archetype risk + IRR tilt."""
+    g = genome or {}
+    irr_power = g.get("irr_power", 0.5)
+    scored: list[tuple[str, float]] = []
+    risk = {
+        "compounder": 1.0,
+        "croupier": 1.05,
+        "platform": 1.08,
+        "holding_co": 1.15,
+        "optionality": 1.35,
+        "turnaround": 1.45,
+        "unknown": 1.25,
+    }
+    for r in rows:
+        arch = (r.get("classification") or {}).get("archetype", "unknown")
+        irr = max(float(r.get("irr_base_pct") or 1.0), 0.5)
+        inv = (1.0 / risk.get(arch, 1.2)) * (irr ** irr_power)
+        scored.append((r["ticker"], inv))
+    total = sum(s for _, s in scored) or 1.0
+    return {t: s / total for t, s in scored}
+
+
 def policy_archetype_risk_parity(rows: list[dict], genome: dict | None = None) -> dict[str, float]:
     g = genome or {}
     risk = {
@@ -155,13 +178,14 @@ POLICY_FNS = {
     "equal_weight": policy_equal_weight,
     "irr_ranked": policy_irr_ranked,
     "archetype_risk_parity": policy_archetype_risk_parity,
+    "risk_parity_vol": policy_risk_parity_vol,
     "ira_marvin": policy_ira_marvin,
 }
 
 
 def random_genome(rng) -> dict[str, Any]:
     return {
-        "policy": rng.choice(["irr_ranked", "irr_ranked", "archetype_risk_parity"]),
+        "policy": rng.choice(["irr_ranked", "risk_parity_vol", "archetype_risk_parity", "equal_weight"]),
         "top_k": int(rng.integers(8, 16)),
         "irr_power": float(rng.uniform(0.6, 2.0)),
         "moat_bonus": float(rng.uniform(0.05, 0.25)),

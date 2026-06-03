@@ -527,7 +527,8 @@ function renderDarwin() {
       Biological hedge fund layer · ${escapeHtml(d.generated_at || '')} · phase ${escapeHtml(d.phase || '—')}
       · <span class="badge badge-purple">${escapeHtml(d.account_profile || 'taxable')}</span>
       · policy <span class="mono">${escapeHtml(d.policy_id || '—')}</span>
-      ${d.benchmarks?.ml_selected === false ? ' · <span class="badge badge-warn">ML gated</span>' : ''}
+      ${d.exploration?.enabled ? ' · <span class="badge badge-purple">exploration</span>' : ''}
+      ${d.benchmarks?.ml_selected === false && !d.exploration?.enabled ? ' · <span class="badge badge-warn">ML gated</span>' : ''}
       ${d.pit?.audit_pass === false ? ' · <span class="badge badge-warn">PIT leak</span>' : (d.pit?.audit_pass ? ' · <span class="badge badge-ok">PIT ok</span>' : '')}
       ${d.pit?.ml_oos_eligible ? ' · <span class="badge badge-ok">OOS ML</span>' : ''}
       ${d.policy_detail?.ensemble ? ' · <span class="badge badge-ok">ensemble</span>' : ''}
@@ -559,11 +560,23 @@ function renderDarwin() {
     </div>
     ${d.policy_detail?.ensemble ? `<div class="detail-section"><h3>Ensemble blend</h3><table class="darwin-table"><thead><tr><th>Policy</th><th>Blend weight</th><th>Score</th></tr></thead><tbody>${d.policy_detail.ensemble.map(e => `<tr><td class="mono">${escapeHtml(e.policy)}</td><td>${(e.weight_in_ensemble * 100).toFixed(0)}%</td><td>${e.score}</td></tr>`).join('')}</tbody></table></div>` : ''}
     ${d.pit_status ? `<div class="detail-section"><h3>PIT discipline</h3><p class="subhead">Audit ${d.pit_status.audit_pass ? 'pass' : 'fail'} · leakage ${d.pit_status.leakage_count ?? 0} · track <span class="mono">darwin_pit_status_history.jsonl</span></p></div>` : ''}
+    ${d.observatory ? `<div class="detail-section"><h3>Market observatory</h3>
+      <p class="subhead">Regime ${escapeHtml((d.observatory.regime || {}).label || '—')} · stale research ${((d.observatory.research_stress || {}).stale_research_pct || 0) * 100}% · falsifiers ${(d.observatory.research_stress || {}).falsifier_count_total ?? 0}</p>
+      ${(d.observatory.magis_risk_book || {}).gross_exposure_pct_nav != null ? `<p class="subhead">MAGIS book: gross ${d.observatory.magis_risk_book.gross_exposure_pct_nav}% NAV · net ${d.observatory.magis_risk_book.net_exposure_pct_nav}% · breaches ${d.observatory.magis_risk_book.breach_count ?? 0}</p>` : '<p class="subhead">Link ls-algo risk dashboard via DARWIN_LS_ALGO_ROOT</p>'}
+      ${d.regime_brief ? `<p class="subhead">Brief: <span class="mono">${escapeHtml(d.regime_brief)}</span></p>` : ''}
+    </div>` : ''}
+    ${d.bias_scan && (d.bias_scan.flags || []).length ? `<div class="detail-section"><h3>Bias scan</h3>
+      <p class="subhead">${d.bias_scan.flag_count} flags · pass ${d.bias_scan.pass ? 'yes' : 'no'}</p>
+      <ul class="dev-list">${(d.bias_scan.flags || []).slice(0, 12).map(f => `<li><span class="mono">${escapeHtml(f.ticker)}</span> · ${escapeHtml(f.bias)} (${escapeHtml(f.severity)})</li>`).join('')}</ul>
+    </div>` : ''}
+    ${d.stress_simulation ? `<div class="detail-section"><h3>Stress simulation</h3>
+      ${d.stress_simulation.error ? `<p class="subhead">${escapeHtml(d.stress_simulation.error)} (${d.stress_simulation.months ?? 0} mo history — need longer panel)</p>` : `<p class="subhead">Bootstrap ${d.stress_simulation.n_paths} paths · p10 ${(d.stress_simulation.p10_cumulative * 100).toFixed(1)}% · p50 ${(d.stress_simulation.p50_cumulative * 100).toFixed(1)}% · p90 ${(d.stress_simulation.p90_cumulative * 100).toFixed(1)}%</p>`}
+    </div>` : ''}
     <div class="detail-section">
       <h3>Benchmarks (in-sample production sim)</h3>
       <table class="darwin-table">
         <thead><tr><th>Policy</th><th>Sharpe</th><th>Cum ret</th><th>Turnover</th></tr></thead>
-        <tbody>${['ira_marvin','equal_weight','irr_ranked','genetic','ppo','ensemble','champion','spy'].map(k => {
+        <tbody>${['ira_marvin','equal_weight','irr_ranked','risk_parity_vol','genetic','ppo','ensemble','champion','spy'].map(k => {
           const b = d.benchmarks?.[k] || {};
           if (b.error) return '';
           const hi = k === (d.policy_id === 'ensemble' ? 'ensemble' : d.policy_id) || k === 'champion';
