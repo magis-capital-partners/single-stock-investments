@@ -1,0 +1,237 @@
+{
+  "ticker": "MRSH",
+  "as_of": "2026-06-03",
+  "method": "full",
+  "lawrence_bucket": "pricing_power",
+  "classification_inputs": {
+    "archetype": "compounder",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 157.36,
+    "price_source": "Stooq NYSE close 2026-06-03 (MRSH)",
+    "fcf_per_share": 10.12,
+    "fcf_source": "FY2025 OCF $5,292M minus capex $291M, divided by 494M diluted shares (10-K FY2025)",
+    "shares_millions": 494,
+    "normalization_note": "FY2025 GAAP free cash flow; 2024 included ~$8.5B Thrive acquisition cash outflow (not in FY2025 run rate)",
+    "copper_spot_usd_per_lb": 6.477,
+    "copper_spot_as_of": "2026-06-04",
+    "copper_spot_source": "https://stooq.com/q/l/?s=hg.f&f=sd2t2ohlcv&h&e=csv",
+    "copperwood_royalty_est_usd_ssi_ref": 7700000,
+    "copperwood_royalty_est_usd_at_spot": 12468225.0,
+    "copperwood_royalty_note": "SSI ~$7.7M/yr @ $4.0/lb scaled linearly to spot $6.477/lb [Assumption]"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.04,
+      "growth_y6_10": 0.03,
+      "exit_pfcf_y10": 18,
+      "notes": "Soft commercial insurance pricing, consulting slowdown, multiple compression to ~18x free cash flow"
+    },
+    "base": {
+      "growth_y1_5": 0.06,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 22,
+      "notes": "Mid-single-digit organic revenue; spot ~15.5x P/FCF re-rates modestly to 22x in year 10"
+    },
+    "bull": {
+      "growth_y1_5": 0.08,
+      "growth_y6_10": 0.06,
+      "exit_pfcf_y10": 26,
+      "notes": "Hard market persists, Mercer and Oliver Wyman accelerate, buybacks continue"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 0,
+      "question": "Material options after scan?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating compounder; fiduciary float and interest income are not owner cash in Lawrence base"
+    }
+  ],
+  "lawrence_horizon_years": 7,
+  "payoff_lens": "operating",
+  "growth_explanation": {
+    "mechanism": "Brokerage and consulting fee growth from insured exposure, policy rate, and Mercer/Oliver Wyman project demand; margin from scale and mix.",
+    "source": "10-K FY2025 segment revenue growth; management organic commentary in earnings 8-Ks",
+    "lawrence_legacy": {
+      "y1_5": 0.06,
+      "y6_10": 0.05,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.06,
+      "y6_10": 0.05,
+      "exit_pfcf_y10": 22.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": 0.1032,
+      "as_of_filing_facts": "evidence/_text/10-K_20260209_rpt20251231_acc0000062709_26_000022.htm.txt"
+    },
+    "status": "partial"
+  },
+  "market_inputs": {
+    "copper": {
+      "spot": 6.477,
+      "as_of": "2026-06-04",
+      "source": "https://stooq.com/q/l/?s=hg.f&f=sd2t2ohlcv&h&e=csv",
+      "fetched_at": "2026-06-03T22:14:49Z",
+      "stooq_symbol": "hg.f"
+    },
+    "scenario_grid": {
+      "bear": {
+        "copper_usd_per_lb": 4.66,
+        "label": "trough (~28% below spot)"
+      },
+      "base": {
+        "copper_usd_per_lb": null,
+        "label": "spot at compute"
+      },
+      "bull": {
+        "copper_usd_per_lb": 7.0,
+        "label": "cycle high (~8% above spot)"
+      }
+    }
+  },
+  "market_inputs_as_of": "2026-06-03",
+  "optionality_gate": {
+    "copperwood_option_yield_pct": 7.03,
+    "primary_metric": "lawrence_base",
+    "primary_label": "7yr IRR",
+    "primary_return_pct": 17.1
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 12.2
+    },
+    "base": {
+      "return_pct": 17.1
+    },
+    "bull": {
+      "return_pct": 21.4
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 12.2
+    },
+    "base": {
+      "return_pct": 17.1
+    },
+    "bull": {
+      "return_pct": 21.4
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": 17.1
+    },
+    "falsifier_adjusted": {
+      "return_pct": 17.1
+    }
+  },
+  "implied_return": {
+    "base_pct": 17.98,
+    "label": "7yr IRR (total synthesis)",
+    "display": "17.98% (total synthesis)",
+    "lawrence_stance_gate_pct": 17.1,
+    "falsifier_adjusted_pct": 17.1,
+    "synthesis_pct": 17.98
+  },
+  "stance_proposal": {
+    "suggested": "hold",
+    "irr_band": "15\u201320%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Segment-derived growth (pre-falsifier)",
+        "source": "segment_build weighted blend",
+        "return_pct": 17.1,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": 12.2,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 21.4,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 18.18,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 17.98,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}
