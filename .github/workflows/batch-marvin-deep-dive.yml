@@ -1,0 +1,114 @@
+name: Batch Marvin Deep Dive
+
+# Dispatches one Cloud Agent deep dive per ticker (matrix).
+# Trigger: push updated queue file to main, or manual workflow_dispatch.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tickers:
+        description: "Optional comma-separated tickers (empty = queue file or onboard pending)"
+        required: false
+        type: string
+      max_parallel:
+        description: "Max concurrent deep dive jobs"
+        required: false
+        default: "3"
+        type: string
+  push:
+    branches: [main]
+    paths:
+      - _system/data/deep_dive_dispatch_queue.json
+
+permissions:
+  contents: read
+
+concurrency:
+  group: batch-marvin-deep-dive
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      tickers: ${{ steps.matrix.outputs.tickers }}
+      max_parallel: ${{ steps.matrix.outputs.max_parallel }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build matrix
+        id: matrix
+        env:
+          TICKERS_INPUT: ${{ github.event.inputs.tickers }}
+        run: |
+          if [ -n "$TICKERS_INPUT" ]; then
+            TICKERS_JSON=$(python _system/scripts/build_deep_dive_dispatch_matrix.py --tickers "$TICKERS_INPUT")
+          else
+            TICKERS_JSON=$(python _system/scripts/build_deep_dive_dispatch_matrix.py --use-queue)
+          fi
+          echo "tickers=$TICKERS_JSON" >> "$GITHUB_OUTPUT"
+          MAXP="${{ github.event.inputs.max_parallel }}"
+          if [ -z "$MAXP" ] && [ -f _system/data/deep_dive_dispatch_queue.json ]; then
+            MAXP=$(python -c "import json; print(json.load(open('_system/data/deep_dive_dispatch_queue.json')).get('max_parallel') or 3)")
+          fi
+          MAXP="${MAXP:-3}"
+          echo "max_parallel=$MAXP" >> "$GITHUB_OUTPUT"
+          echo "Batch tickers: $TICKERS_JSON (max_parallel=$MAXP)"
+
+      - name: Skip if empty
+        if: steps.matrix.outputs.tickers == '[]'
+        run: |
+          echo "No tickers to process."
+          exit 0
+
+  deep-dive:
+    needs: prepare
+    if: needs.prepare.outputs.tickers != '[]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      max-parallel: ${{ fromJson(needs.prepare.outputs.max_parallel) }}
+      matrix:
+        ticker: ${{ fromJson(needs.prepare.outputs.tickers) }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check Cursor API key
+        env:
+          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
+        run: |
+          if [ -z "$CURSOR_API_KEY" ]; then
+            echo "::error::CURSOR_API_KEY secret is not set."
+            exit 1
+          fi
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Cursor SDK
+        working-directory: _system/scripts
+        run: npm install --no-save @cursor/sdk
+
+      - name: Run Marvin deep dive (${{ matrix.ticker }})
+        env:
+          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
+          HK_PDFS_ROOT: ${{ secrets.HK_PDFS_ROOT || '/opt/cursor/hk_pdfs' }}
+          TICKER: ${{ matrix.ticker }}
+          PICK_REASON: batch_onboard_pending
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: node _system/scripts/marvin_deep_dive.mjs
+
+      - name: Summary
+        if: success()
+        run: echo "Deep dive PR started for ${{ matrix.ticker }}."
