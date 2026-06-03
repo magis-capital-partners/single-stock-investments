@@ -11,7 +11,7 @@
 
 No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (10-K, 10-Q, IR). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
 
-**Synthesis:** Marvin floor only; no external blend.
+**Synthesis:** Marvin floor only; no external blend. Filing anchors: **762,099 BTC** / **$64.0B** fair value (Q1 2026 10-Q); FY2025 software revenue **$463.5M**, OCF **$67.2M**; look-through yield-curve scenarios in `valuation.json` (software floor ~**$0.26/sh**, normalized **$0.65/sh**).
 
 ## Sources in scope
 
@@ -33,13 +33,13 @@ No third-party sources are indexed for this ticker as of this scan. Marvin stanc
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | — | — | — |
+| Marvin floor | ~$0.26/sh software OCF | Software path fails at ~$390/sh | watch |
 | External (combined) | — | — | — |
-| **Blended best estimate** | **—** | **—** | **—** |
+| **Blended best estimate** | **Look-through BTC curve** | **pending refresh** | **watch** |
 
-**Weights:** *[Document why]*
+**Weights:** 100% Marvin floor (no approved external sources).
 
-**Returns statement (blended):** *[One sentence; pending sources not in base IRR]*
+**Returns statement (blended):** At ~**$390** per share, base **7-year look-through payoff** annual return is **pending mechanical refresh**; software-only owner cash is not the primary gate for this levered BTC treasury name.
 
 ## [HUMAN REVIEW]
 

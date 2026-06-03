@@ -1,0 +1,190 @@
+{
+  "ticker": "MSTR",
+  "as_of": "2026-06-03",
+  "valuation_mode": "optionality",
+  "valuation_overlay": "segment_cashflow",
+  "method": "yield_curve",
+  "irr_method": "yield_curve",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "unproven",
+    "dhando": "partial",
+    "cycle": "-",
+    "payoff_lens": "levered"
+  },
+  "inputs": {
+    "price": 390.0,
+    "price_source": "Placeholder ~June 2026; marvin_cloud_refresh fetch_market_inputs",
+    "shares_millions": 330.8,
+    "shares_source": "EntityCommonStockSharesOutstanding 330,807,622 at 2026-03-31 (10-Q)",
+    "per_share": 0.65,
+    "fcf_source": "Marvin floor: normalized software owner cash excluding BTC fair-value marks",
+    "normalization_note": "FY2025 operating cash flow $67.2M on 256.5M weighted-average shares ≈ $0.26/sh; base uses $0.65/sh for cloud subscription run-rate [Assumption]. BTC marks excluded from Lawrence software path."
+  },
+  "estimates": {
+    "marvin_floor": {
+      "per_share": 0.26,
+      "return_pct": null,
+      "notes": "FY2025 NetCashProvidedByUsedInOperatingActivities $67.2M ÷ 256.5M WA shares; software only"
+    },
+    "blended_best": {
+      "per_share": 0.65,
+      "return_pct": null,
+      "notes": "Normalized subscription owner cash; refresh computes return"
+    }
+  },
+  "optionality_gate": {
+    "framework": "btc_treasury_levered",
+    "floor_pass": false,
+    "floor_metric": "software_owner_cash_per_share",
+    "floor_value": 0.26,
+    "primary_metric": "lawrence_base",
+    "primary_label": "7yr look-through payoff (yield curve)",
+    "primary_return_pct": null,
+    "incumbent_sleeve": false,
+    "notes": "Software cash is not a dhando floor at spot price; levered BTC look-through drives overlay scenarios. mNAV premium at ~$390 vs ~$150/sh filing look-through [Inference]."
+  },
+  "nav_overlay": {
+    "gaap_vs_fair_value": {
+      "btc_fair_value_bn": 64.04,
+      "btc_cost_bn": 57.69,
+      "measurement_date": "2026-03-31",
+      "source": "10-Q FY2026 Q1 CryptoAssetFairValue / CryptoAssetCost"
+    },
+    "asset_inventory_filing": {
+      "btc_units": 762099,
+      "btc_per_share": 2.304,
+      "cash_bn": 2.21,
+      "source": "10-Q 2026-03-31; EntityCommonStockSharesOutstanding 330,807,622"
+    },
+    "segments_or_options": [
+      {
+        "id": "btc_treasury",
+        "label": "Bitcoin treasury (fair value)",
+        "option_treatment": "nav_floor",
+        "notes": "Primary asset; marks flow through operating income under ASU 2023-08"
+      }
+    ],
+    "not_in_model_requires_refresh": [
+      "Current BTC spot vs Q1 measurement date for mark-to-market overlay"
+    ]
+  },
+  "segment_build": {
+    "segments": [
+      {
+        "id": "software",
+        "label": "Enterprise analytics software (Strategy)",
+        "type": "operating",
+        "owner_cash_y0_per_share": 0.65,
+        "growth_y1_5": 0.06,
+        "growth_y6_10": 0.04,
+        "exit_multiple": 12,
+        "evidence": "FY2025 revenue $463.5M; RPO $588M (10-K); cloud mix shift"
+      },
+      {
+        "id": "corporate_drag",
+        "label": "Preferred dividends + interest on convertibles",
+        "type": "corporate_drag",
+        "annual_drag_per_share": 0.85,
+        "evidence": "FY2025 preferred dividends $408M; interest expense $35M (10-K)"
+      }
+    ],
+    "options": [
+      {
+        "id": "btc_accumulation",
+        "label": "Continued BTC purchases via equity/preferred issuance",
+        "option_treatment": "embedded_in_segment",
+        "annual_drag_per_share": 0,
+        "base_terminal_value_bn": 0,
+        "base_terminal_rationale": "Modeled via yield-curve look-through payoff, not separate terminal row",
+        "evidence": "Q1 2026 PaymentForAcquisitionCryptoAsset $7.66B (10-Q); ATM/preferred 8-K cadence",
+        "not_in_lawrence_base": true
+      }
+    ]
+  },
+  "scenarios": {
+    "bear": {
+      "price": 390,
+      "payoff": 240,
+      "years": 7,
+      "notes": "BTC −35% from Q1 marks; dilution from converts/preferred; mNAV compresses toward 1.0×"
+    },
+    "base": {
+      "price": 390,
+      "payoff": 520,
+      "years": 7,
+      "notes": "BTC +6%/yr; modest stacking; mNAV premium narrows but positive",
+      "sotp_build": {
+        "lines": [
+          {
+            "id": "btc_nav",
+            "label": "BTC fair value net of debt/preferred (look-through)",
+            "gaap_per_share": 110.8,
+            "uplift_per_share": 39.2,
+            "math": "Q1 equity $36.7B / 330.8M sh = $110.8; overlay adds BTC appreciation + stacking to $150/sh today [Inference]"
+          },
+          {
+            "id": "software",
+            "label": "Software franchise (12× normalized cash)",
+            "gaap_per_share": 0,
+            "uplift_per_share": 8.0,
+            "math": "$0.65/sh × 12× ≈ $8/sh terminal software value [Assumption]"
+          },
+          {
+            "id": "premium_close",
+            "label": "Premium compression / dilution offset",
+            "gaap_per_share": 0,
+            "uplift_per_share": 362,
+            "math": "Year-7 payoff $520/sh vs price $390 — BTC path + partial premium retention"
+          }
+        ],
+        "year5_economic_nav_per_share": 520,
+        "years": 7,
+        "notes": "Look-through equity; not GAAP book floor"
+      }
+    },
+    "bull": {
+      "price": 390,
+      "payoff": 850,
+      "years": 7,
+      "notes": "BTC cycle re-rating + sustained premium; convert stack refinanced favorably"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No — BTC marked to fair value under ASU 2023-08",
+      "treatment": "n/a",
+      "evidence": "10-K FY2025 CryptoAssetFairValue $58.9B"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant asset?",
+      "answer": "Yes — BTC treasury + accumulation engine",
+      "treatment": "nav_floor",
+      "evidence": "762,099 BTC at 2026-03-31 (10-Q)"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Partial — software profitable; marks dominate GAAP",
+      "treatment": "embedded_in_segment",
+      "evidence": "FY2025 software revenue $463M; CryptoAssetUnrealizedLossOperating $5.4B"
+    },
+    {
+      "q": 5,
+      "question": "Private / illiquid stakes below fair value?",
+      "answer": "No material private stakes",
+      "treatment": "zero",
+      "evidence": "10-K segment note — enterprise software + digital assets only"
+    }
+  ],
+  "evidence_refresh": {
+    "type": "commodity_nav",
+    "commodity": "BTC",
+    "synthesis_in_dive": true
+  },
+  "lawrence_horizon_years": 7
+}
