@@ -20,11 +20,11 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-06-03.
 | CMSG | CMSG/ | Consensus Mining & Seigniorage Corp | US | 2026-06-02 | 2026-06-03 | optionality | watch |
 | CPRT | CPRT/ | Copart | US | 2026-06-02 | 2026-06-03 | compounder | core |
 | CSGP | CSGP/ | CoStar Group | US | 2026-06-02 | 2026-06-03 | platform | watch |
-| CSU | CSU/ | Constellation Software | CA | 2026-06-03 | 2026-06-03 | compounder | core |
+| CSU | CSU/ | Constellation Software | CA | 2026-06-02 | 2026-06-03 | compounder | core |
 | DHR | DHR/ | Danaher Corporation | US | 2026-06-02 | 2026-06-03 | compounder | hold |
 | DMLP | DMLP/ | Dorchester Minerals LP | US | 2026-06-03 | 2026-06-03 | unknown | watch |
 | DRR.AX | DRR.AX/ | Deterra Royalties Limited | US | 2026-06-02 | 2026-06-03 | unknown | watch |
-| FNV | FNV/ | Franco-Nevada Corporation | US | 2026-06-03 | 2026-06-03 | unknown | watch |
+| FNV | FNV/ | Franco-Nevada Corporation | US | 2026-06-03 | 2026-06-03 | optionality | watch |
 | FRMO | FRMO/ | FRMO Corporation | US | 2026-06-02 | 2026-06-03 | holding_co | hold |
 | GLXY | GLXY/ | Galaxy Digital Inc. | US | 2026-06-03 | 2026-06-03 | unknown | watch |
 | GOOGL | GOOGL/ | Alphabet Inc. | US | 2026-06-02 | 2026-06-03 | compounder | hold |
@@ -43,7 +43,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-06-03.
 | OTCM | OTCM/ | OTC Markets Group | US | 2026-06-02 | 2026-06-03 | croupier | watch |
 | PBT | PBT/ | Permian Basin Royalty Trust | US | 2026-06-03 | 2026-06-03 | unknown | watch |
 | PCYO | PCYO/ | Pure Cycle Corporation | US | 2026-06-03 | 2026-06-03 | unknown | watch |
-| PSK.TO | PSK.TO/ | PrairieSky Royalty Ltd. | CA | — | — | unknown | watch |
+| PSK.TO | PSK.TO/ | PrairieSky Royalty Ltd. | CA | — | 2026-06-03 | unknown | watch |
 | QDEL | QDEL/ | QuidelOrtho | US | 2026-06-02 | 2026-06-03 | turnaround | hold |
 | RGLD | RGLD/ | Royal Gold Inc. | US | 2026-06-03 | 2026-06-03 | unknown | watch |
 | RPRX | RPRX/ | Royalty Pharma plc | US | 2026-06-03 | 2026-06-03 | unknown | watch |
