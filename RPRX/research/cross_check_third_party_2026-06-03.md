@@ -9,9 +9,9 @@
 
 ## Executive summary
 
-No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (10-K, 10-Q, IR). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (10-K FY2025, 10-Q Q1 2026, proxy). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
 
-**Synthesis:** Marvin floor only; no external blend.
+**Synthesis:** Marvin floor only; no external blend. Base Lawrence return **-0.9% per year** (7-year) at $54.97; stance **watch**.
 
 ## Sources in scope
 
@@ -21,25 +21,25 @@ No third-party sources are indexed for this ticker as of this scan. Marvin stanc
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| — | — | — | — |
+| Stance / IRR | Primary filings | No external | `deep_dive_2026-06-03.md` |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| — | — | — | — |
+| Stance / IRR | Primary filings | No external | `deep_dive_2026-06-03.md` |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | — | — | — |
-| External (combined) | — | — | — |
-| **Blended best estimate** | **—** | **—** | **—** |
+| Marvin floor | $1.65/sh owner cash start | -0.9% / 7yr | watch |
+| External (combined) | n/a | n/a | n/a |
+| **Blended best estimate** | **$1.65/sh** | **-0.9%** | **watch** |
 
-**Weights:** *[Document why]*
+**Weights:** 100% Marvin (no approved external sources).
 
-**Returns statement (blended):** *[One sentence; pending sources not in base IRR]*
+**Returns statement (blended):** At $54.97, blended best estimate is about **-0.9% per year** over seven years on filing-based owner cash; no third-party adjustment.
 
 ## [HUMAN REVIEW]
 
