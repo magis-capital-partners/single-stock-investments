@@ -1,7 +1,7 @@
 # Darwin backtest report
 
-Generated: 2026-06-03T02:38:45Z
-Policy: **ira_marvin** · Regime: **calm**
+Generated: 2026-06-03T14:46:54Z
+Policy: **ensemble** · Regime: **calm**
 
 ## Champion vs baselines
 
@@ -9,11 +9,11 @@ Policy: **ira_marvin** · Regime: **calm**
 |--------|--------|------------|----------|
 | ira_marvin | -4.632 | -19.4% | 0.0% |
 | equal_weight | 0.672 | 13.2% | 0.0% |
-| irr_ranked | -2.327 | -9.0% | 0.0% |
-| genetic | 1.814 | 34.8% | 0.0% |
-| ppo | 1.033 | 38.0% | 0.0% |
-| ensemble | 1.528 | 44.6% | 0.0% |
-| champion | -4.632 | -19.4% | 0.0% |
+| irr_ranked | -2.307 | -9.0% | 0.0% |
+| genetic | 1.423 | 15.7% | 0.0% |
+| ppo | 0.089 | 0.2% | 0.0% |
+| ensemble | 1.447 | 16.4% | 0.0% |
+| champion | 1.447 | 16.4% | 0.0% |
 | spy | 0.656 | 5.4% | 0.0% |
 
 ## PIT discipline
