@@ -1,6 +1,6 @@
 # BUR — Investment Thesis
 
-**Last updated:** 2026-06-03
+**Last updated:** auto-sync
 
 ## Classification
 
@@ -9,10 +9,15 @@
 | **Archetype** (Stahl) | optionality |
 | **Moat** (Munger) | narrow |
 | **Dhando** (Pabrai) | partial |
-| **Stance** | watch |
+| **Stance** | hold |
 | **Cycle** | trough |
-| **MOI bucket** (legacy) | market_structure_discount |
+| **Implied 7yr IRR** (base) | 17.56% (total synthesis) |
+| **IRR method** | scenario |
+| **Lawrence bucket** | other |
 | **Payoff lens** | asset |
+| **MOI bucket** | pending |
+
+**Deep dive:** `BUR/research/deep_dive_2026-06-03.md` (auto-sync)
 
 ## One-line thesis
 
