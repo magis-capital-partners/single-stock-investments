@@ -14,6 +14,7 @@ IX_LINE = re.compile(r"^([A-Za-z][A-Za-z0-9]*(?:\.[A-Za-z0-9]+)*):\s*([\d,.\-]+|
 CANONICAL = {
     "revenues": (
         "Revenues",
+        "Revenue",
         "RevenueFromContractWithCustomerExcludingAssessedTax",
         "RevenueFromContractWithCustomerIncludingAssessedTax",
         "SalesRevenueNet",
@@ -94,10 +95,12 @@ def latest_full_text_path(evidence_dir: Path) -> Path | None:
         return None
     files = sorted(text_dir.glob("*.txt"), key=lambda p: p.name, reverse=True)
     prefs = (
+        "exhibit99-2",
         "Annual_Report",
         "annual",
         "10-K",
         "10_K",
+        "40-F",
         "Semi-Annual",
         "10-Q",
         "10_Q",

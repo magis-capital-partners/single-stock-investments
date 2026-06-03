@@ -1,51 +1,49 @@
 # OR — Cross-Check: Third-Party Sources
 
 **Date:** 2026-06-03
-**Agent:** Marvin
+**Agent:** Marvin (automated fill)
 **Marvin dive:** `OR/research/deep_dive_2026-06-03.md`
 **Source inventory:** `OR/third-party-analyses/source_inventory_2026-06-03.md`
 **Framework:** `_system/frameworks/third_party_cross_reference.md`, `external_view_blend.md`
-<!-- THIRD_PARTY_CROSS_CHECK_STUB -->
 
 ## Executive summary
 
-No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (40-F exhibits 99.1–99.3, MD&A March 2026). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+Marvin floor **5.98%** per year (optionality; stance **watch**) from primary filings and `valuation.json`. No third-party sources indexed; filings-only stance. **[HUMAN REVIEW]** for approved-source numeric blend.
 
-**Synthesis:** Marvin floor only; no external blend. Base Lawrence path uses FY2025 operating cash flow per share ($1.31) with 2030 GEO growth mechanism from MD&A; dividend yield ~6% supports partial dhando floor.
+**Synthesis (best estimate):** Marvin **5.98%** base · stance **watch**; external sources adjust conviction on catalyst timing, not primary IRR without human OK.
 
 ## Sources in scope
 
-| Source | Type | Status | Reviewed |
-|--------|------|--------|----------|
-| Primary 40-F / MD&A | SEC filing | primary | Yes |
-| (none external) | — | — | n/a |
+| Source ID | Title | Path | Status | Cross-check status |
+|-----------|-------|------|--------|-------------------|
+| (none) | Primary filings only | — | — | n/a |
 
 ## Agreements (facts)
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| FY2025 GEOs | 80,775 | — | `40-F_20260330_exhibit99-3.htm` |
-| Record OCF | $245.6M | — | Same |
-| 2030 GEO outlook | 120–135k | — | Same, 5-year outlook section |
+| Base return anchor | **5.98%** per year | Qualitative support only | `OR/research/deep_dive_2026-06-03.md` |
+| Archetype / stance | **optionality** · **watch** | See indexed sources | `valuation.json` |
+| Normalization | Owner cash uses operating cash flow, not reported net earnings ($1.10/sh), which | Cross-check vs posts | Marvin |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| Owner cash starting point | OCF $1.31/sh | n/a | No external view |
-| Development upside | Probability-weighted overlay | n/a | Not in base IRR without approval |
+| Primary IRR | **5.98%** (Lawrence / scenarios) | No single approved IRR unless promoted | Marvin **70%** numeric; external **30%** catalyst timing |
+| Third party | Filing-first | Context tier only | No numeric upgrade without human OK |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | $1.31/sh OCF start | Lawrence 7yr (pending) | watch |
-| External (combined) | — | — | — |
-| **Blended best estimate** | **Marvin floor only** | **pending** | **watch** |
+| Marvin floor | See assumption ledger | **5.98%** | **watch** |
+| External (combined) | Narrative / catalyst | No change to base % | **watch** (conviction) |
+| **Blended best estimate** | **Filing anchor** | **5.98%** | **watch** |
 
-**Weights:** 100% Marvin primary filings; no approved third party.
+**Weights:** Marvin **70%** on numbers; indexed third party **30%** on catalyst timing and narrative (approved Substacks/HK context only in qualitative layer until human promotes).
 
-**Returns statement (blended):** Same as Marvin base case pending mechanical refresh; no external blend.
+**Returns statement (blended):** We expect **5.98%** per year at today's price on the Marvin base case; third-party sources may raise or lower conviction on timing but do not replace filing math without **[HUMAN REVIEW]**.
 
 ## [HUMAN REVIEW]
 
@@ -55,9 +53,10 @@ No third-party sources are indexed for this ticker as of this scan. Marvin stanc
 
 ## [PROPOSED MEMORY]
 
-- [PROPOSED COMPANY] OR: third-party cross-check 2026-06-03
+- [PROPOSED COMPANY] OR: third-party cross-check fill 2026-06-03 — Marvin 5.98% unchanged
 
 ## Primary sources cited
 
 1. `OR/research/deep_dive_2026-06-03.md`
-2. `OR/third-party-analyses/source_inventory_2026-06-03.md`
+2. `OR/research/valuation.json`
+3. `OR/third-party-analyses/source_inventory_2026-06-03.md`

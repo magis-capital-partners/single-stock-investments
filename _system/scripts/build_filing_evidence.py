@@ -77,6 +77,18 @@ def classify_path(rel: str) -> tuple[int, str]:
         return 100, "10-K"
     if "10-q" in low or "10_q" in low:
         return 95, "10-Q"
+    if "exhibit99-2" in low or "financial_statement" in low:
+        return 98, "annual"
+    if "exhibit99-3" in low or "md&a" in low or "mda" in low:
+        return 98, "md&a"
+    if "40-f" in low or "40_f" in low:
+        if "exhibit" not in low and "_rpt" in low:
+            return 75, "40-F-cover"
+        if "exhibit" in low:
+            return 70, "40-F-exhibit"
+        return 100, "40-F"
+    if "20-f" in low or "20_f" in low:
+        return 100, "20-F"
     if "annual_report" in low or "annual-report" in low or "_annual_" in low:
         return 98, "annual"
     if "quarterly_report" in low or "quarterly" in low:
@@ -244,7 +256,7 @@ def build_ticker(ticker: str) -> int:
         ):
             kind_latest[k] = d
 
-    full_kinds = {"10-K", "10-Q", "annual", "quarterly", "proxy", "otcqx", "10-k", "10-q"}
+    full_kinds = {"10-K", "10-Q", "20-F", "40-F", "annual", "quarterly", "proxy", "otcqx", "10-k", "10-q", "20-f", "40-f", "md&a"}
     transcript_kinds = {"transcript", "earnings_transcript"}
     transcript_latest: list[dict] = []
     full_count = 0
