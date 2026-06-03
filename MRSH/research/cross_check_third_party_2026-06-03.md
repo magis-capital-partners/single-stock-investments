@@ -11,7 +11,7 @@
 
 No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (10-K, 10-Q, IR). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
 
-**Synthesis:** Marvin floor only; no external blend.
+**Synthesis:** Marvin floor only; no external blend. Lawrence base **~17.1%** per year at **$157.36** (FY2025 owner cash **~$10.12** per share) supports **hold** on IRR band; dhando **partial** due to leverage and cycle.
 
 ## Sources in scope
 
@@ -33,9 +33,9 @@ No third-party sources are indexed for this ticker as of this scan. Marvin stanc
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | — | — | — |
+| Marvin floor | ~$10.12/sh FCF | **~17.1%** / 7yr | hold |
 | External (combined) | — | — | — |
-| **Blended best estimate** | **—** | **—** | **—** |
+| **Blended best estimate** | **~$10.12/sh** | **~17.1%** / 7yr | **hold** (filings only) |
 
 **Weights:** *[Document why]*
 

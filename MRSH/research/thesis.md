@@ -6,24 +6,26 @@
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
-| **Stance** | watch |
-| **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Archetype** (Stahl) | compounder |
+| **Moat** (Munger) | stable |
+| **Dhando** (Pabrai) | partial |
+| **Stance** | hold |
+| **Cycle** | mid |
+| **MOI bucket** (legacy) | — |
+| **Payoff lens** | operating |
 
 ## One-line thesis
 
-Marsh & McLennan Companies — thesis pending Marvin deep dive.
+Global insurance broker and consulting compounder: FY2025 revenue $27B, ~23% operating margin; at ~$157 Lawrence base ~17% annual return supports hold; dhando partial on leverage and cycle.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest annual report (10-K FY2025)
+- [x] Read latest quarterly report (10-Q Q1 FY2026)
+- [x] Apply mental models (Stahl, Munger, Hohn) in deep dive
+- [ ] Validate adjusted free cash flow vs GAAP OCF in next earnings
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-06-03; awaiting deep dive.
+- Confirm owner-cash starting point vs company adjusted FCF.
+- MMC → MRSH ticker change (Feb 2026).

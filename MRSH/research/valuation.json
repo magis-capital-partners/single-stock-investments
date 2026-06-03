@@ -1,0 +1,55 @@
+{
+  "ticker": "MRSH",
+  "as_of": "2026-06-03",
+  "method": "full",
+  "lawrence_bucket": "pricing_power",
+  "classification_inputs": {
+    "archetype": "compounder",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 157.36,
+    "price_source": "Stooq NYSE close 2026-06-03 (MRSH)",
+    "fcf_per_share": 10.12,
+    "fcf_source": "FY2025 OCF $5,292M minus capex $291M, divided by 494M diluted shares (10-K FY2025)",
+    "shares_millions": 494,
+    "normalization_note": "FY2025 GAAP free cash flow; 2024 included ~$8.5B Thrive acquisition cash outflow (not in FY2025 run rate)"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.04,
+      "growth_y6_10": 0.03,
+      "exit_pfcf_y10": 18,
+      "notes": "Soft commercial insurance pricing, consulting slowdown, multiple compression to ~18x free cash flow"
+    },
+    "base": {
+      "growth_y1_5": 0.06,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 22,
+      "notes": "Mid-single-digit organic revenue; spot ~15.5x P/FCF re-rates modestly to 22x in year 10"
+    },
+    "bull": {
+      "growth_y1_5": 0.08,
+      "growth_y6_10": 0.06,
+      "exit_pfcf_y10": 26,
+      "notes": "Hard market persists, Mercer and Oliver Wyman accelerate, buybacks continue"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 0,
+      "question": "Material options after scan?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating compounder; fiduciary float and interest income are not owner cash in Lawrence base"
+    }
+  ],
+  "lawrence_horizon_years": 7,
+  "payoff_lens": "operating",
+  "growth_explanation": {
+    "mechanism": "Brokerage and consulting fee growth from insured exposure, policy rate, and Mercer/Oliver Wyman project demand; margin from scale and mix.",
+    "source": "10-K FY2025 segment revenue growth; management organic commentary in earnings 8-Ks"
+  }
