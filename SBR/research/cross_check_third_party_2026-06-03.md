@@ -9,9 +9,9 @@
 
 ## Executive summary
 
-No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (10-K, 10-Q, IR). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+No sources are in the **approved** registry for SBR. Marvin stance rests on **primary filings** (10-K, 10-Q, monthly 8-K). Horizon Kinetics Q3-2025 commentary discusses Sabine as a long-run oil-royalty inflation hedge (**[PENDING APPROVAL]**; context only, not in base IRR).
 
-**Synthesis:** Marvin floor only; no external blend.
+**Synthesis:** Marvin floor only; HK extract agrees directionally on distribution pass-through and reserve engineering uplift but is not weighted in `valuation.json` base case.
 
 ## Sources in scope
 
@@ -21,7 +21,9 @@ No third-party sources are indexed for this ticker as of this scan. Marvin stanc
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| — | — | — | — |
+| Business model | Passive royalty; monthly dist | Same; 0.7% admin cite | HK Q3-2025 extract (context) |
+| Long-term record | FY2025 ~$5.16/unit dist | 1999–2025 price + dividend math | HK Q3-2025 extract (context) |
+| Reserve life | Proved reserves in 10-K | Higher 2024 vs 1999 despite production | HK Q3-2025 extract (context) |
 
 ## Divergences (normalization / stance)
 
@@ -33,13 +35,13 @@ No third-party sources are indexed for this ticker as of this scan. Marvin stanc
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | — | — | — |
-| External (combined) | — | — | — |
-| **Blended best estimate** | **—** | **—** | **—** |
+| Marvin floor | ~$4.75/unit normalized dist | — | 8-K / 10-Q |
+| External (combined) | — | HK case study (not approved) | HK Q3-2025 extract |
+| **Blended best estimate** | **7.2%** base IRR | No external weight | `valuation.json` |
 
 **Weights:** *[Document why]*
 
-**Returns statement (blended):** *[One sentence; pending sources not in base IRR]*
+**Returns statement (blended):** At **$77.23**, Marvin base case is **7.2%** per year (filings only); HK views are context until human approval.
 
 ## [HUMAN REVIEW]
 
