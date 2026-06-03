@@ -6,30 +6,27 @@
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | optionality |
-| **Moat** (Munger) | stable |
-| **Dhando** (Pabrai) | partial |
+| **Archetype** (Stahl) | unknown |
+| **Moat** (Munger) | unproven |
+| **Dhando** (Pabrai) | pending |
 | **Stance** | watch |
-| **Cycle** | mid |
-| **Implied 7yr IRR** (base) | 6.06% (total synthesis) |
-| **IRR method** | full |
-| **Lawrence bucket** | pricing_power |
-| **Payoff lens** | operating |
+| **Cycle** | - |
+| **Implied 7yr IRR** (base) | — |
+| **IRR method** | — |
+| **Lawrence bucket** | — |
+| **Payoff lens** | pending |
 | **MOI bucket** | pending |
-
-**Deep dive:** `PSK.TO/research/deep_dive_2026-06-03.md` (auto-sync)
 
 ## One-line thesis
 
-Canada's largest passive oil and gas royalty land bank (**18.6M** acres) throws off filing-based owner cash (**$1.50**/sh FY2025) and a **~3%** dividend at C$34.46, but base Lawrence return (**~6%**) sits below accumulate bar; watch for commodity recovery or cheaper entry.
+PrairieSky Royalty Ltd. — thesis pending Marvin deep dive.
 
 ## Key questions
 
-- [x] Read latest annual report (FY2025 MD&A + FS)
-- [x] Read latest quarterly report (Q1 2026)
-- [ ] Size undeveloped acreage NAV overlay with human approval
+- [ ] Read latest annual report
+- [ ] Read latest quarterly report
+- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
 
 ## [HUMAN REVIEW]
 
-- Deep dive: `PSK.TO/research/deep_dive_2026-06-03.md`
-- PFIC / US withholding for cross-border holders
+- Onboarded 2026-06-03; awaiting deep dive.
