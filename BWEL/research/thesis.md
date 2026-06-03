@@ -1,6 +1,6 @@
 # BWEL — Investment Thesis
 
-**Last updated:** 2026-05-21
+**Last updated:** auto-sync
 
 ## Classification
 
@@ -11,11 +11,13 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | trough |
-| **Implied 7yr IRR** (Lawrence) | pending |
-| **IRR method** | pending |
-| **Lawrence bucket** | — |
+| **Implied 7yr IRR** (base) | 3.07% (total synthesis) |
+| **IRR method** | full |
+| **Lawrence bucket** | low_cost |
+| **Payoff lens** | asset |
+| **MOI bucket** | pending |
 
-**Deep dive:** `BWEL/research/deep_dive_2026-06-03.md`  
+**Deep dive:** `BWEL/research/deep_dive_2026-06-03.md` (auto-sync)
 **Fact-check:** `BWEL/research/fact_check_water_nav_2026-06-02.md`
 
 ## One-line thesis

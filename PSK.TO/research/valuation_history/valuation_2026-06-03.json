@@ -17,7 +17,13 @@
     "fcf_per_share": 1.5,
     "fcf_source": "FY2025 funds from operations $1.50/sh per PSK-2025-YE-MDA.pdf; Q1 2026 run-rate $0.41/sh ($1.64 annualized)",
     "shares_millions": 232.4,
-    "normalization_note": "Canadian royalty owner cash = funds from operations (no operating capex; acquisition capex discretionary). Base uses FY2025 filing rate, not Q1 2026 peak."
+    "normalization_note": "Canadian royalty owner cash = funds from operations (no operating capex; acquisition capex discretionary). Base uses FY2025 filing rate, not Q1 2026 peak.",
+    "copper_spot_usd_per_lb": 6.484,
+    "copper_spot_as_of": "2026-06-03",
+    "copper_spot_source": "https://stooq.com/q/l/?s=hg.f&f=sd2t2ohlcv&h&e=csv",
+    "copperwood_royalty_est_usd_ssi_ref": 7700000,
+    "copperwood_royalty_est_usd_at_spot": 12481700.0,
+    "copperwood_royalty_note": "SSI ~$7.7M/yr @ $4.0/lb scaled linearly to spot $6.484/lb [Assumption]"
   },
   "optionality_gate": {
     "framework": "royalty_ffo_yield",
@@ -28,7 +34,8 @@
     "primary_label": "7yr IRR",
     "primary_return_pct": 5.2,
     "incumbent_sleeve": false,
-    "notes": "Sustainable dividend $1.06/sh (presentation); FY25 paid $1.04; FFO yield ~4.4% at C$34.46; undeveloped fee-land option not in Lawrence FCF0."
+    "notes": "Sustainable dividend $1.06/sh (presentation); FY25 paid $1.04; FFO yield ~4.4% at C$34.46; undeveloped fee-land option not in Lawrence FCF0.",
+    "copperwood_option_yield_pct": 32.16
   },
   "scenarios": {
     "bear": {
@@ -110,6 +117,33 @@
       "impact": "Realized $/BOE and FFO per share"
     }
   ],
+  "evidence_refresh": {
+    "synthesis_in_dive": true
+  },
+  "market_inputs": {
+    "copper": {
+      "spot": 6.484,
+      "as_of": "2026-06-03",
+      "source": "https://stooq.com/q/l/?s=hg.f&f=sd2t2ohlcv&h&e=csv",
+      "fetched_at": "2026-06-03T21:53:50Z",
+      "stooq_symbol": "hg.f"
+    },
+    "scenario_grid": {
+      "bear": {
+        "copper_usd_per_lb": 4.67,
+        "label": "trough (~28% below spot)"
+      },
+      "base": {
+        "copper_usd_per_lb": null,
+        "label": "spot at compute"
+      },
+      "bull": {
+        "copper_usd_per_lb": 7.0,
+        "label": "cycle high (~8% above spot)"
+      }
+    }
+  },
+  "market_inputs_as_of": "2026-06-03",
   "lawrence_horizon_years": 7,
   "results_lawrence_legacy": {
     "bear": {
