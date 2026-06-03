@@ -13,30 +13,59 @@
   "inputs": {
     "price": 15.69,
     "price_source": "Stooq VTRS.US 2026-06-02",
-    "fcf_per_share": 1.42,
-    "fcf_source": "Blended best: 75% Marvin floor $1.38 / 25% Rosen partial normalization ~$1.55 [Assumption]",
-    "marvin_floor_per_share": 1.38,
+    "fcf_per_share": 1.5,
+    "fcf_source": "50% Marvin floor $1.45 (FY2025 OCF less capex) / 50% Rosen cash-yield normalization $1.55 (`sohn_rosen_vtrs`)",
+    "marvin_floor_per_share": 1.45,
+    "rosen_normalized_per_share": 1.55,
     "shares_millions": 1151.4,
-    "normalization_note": "Primary metric = blended_best; marvin_floor $1.38 retained for stress"
+    "normalization_note": "Primary Lawrence path uses blended owner cash; Idorsia Phase III in synthesis + option overlay"
+  },
+  "growth_explanation": {
+    "years_1_5": "Rosen low\u2013mid single-digit growth (Sohn 2026) plus EWSR $600\u2013700M savings to cash and Q1 2026 revenue +8% YoY (10-Q); offsets legacy revenue decline.",
+    "years_6_7": "Step-down after cost program matures; branded mix lift if Idorsia readouts succeed.",
+    "source": "Rosen excerpt + 10-K EWSR + Q1 2026 10-Q; not trailing revenue CAGR alone",
+    "lawrence_legacy": {
+      "y1_5": 0.035,
+      "y6_10": 0.025,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.035,
+      "y6_10": 0.025,
+      "exit_pfcf_y10": 10.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": -0.0298,
+      "as_of_filing_facts": "evidence/_text/10-K_20260226_rpt20251231_acc0001792044_26_000013.htm.txt"
+    },
+    "status": "partial"
   },
   "scenarios": {
     "bear": {
-      "growth_y1_5": -0.02,
+      "growth_y1_5": -0.01,
       "growth_y6_10": 0.0,
       "exit_pfcf_y10": 7,
-      "notes": "Revenue erosion + refinancing stress; EWSR savings delayed"
+      "notes": "Generic price erosion; EWSR delayed; Idorsia fails"
     },
     "base": {
-      "growth_y1_5": 0.02,
-      "growth_y6_10": 0.015,
-      "exit_pfcf_y10": 9,
-      "notes": "Blended best path (75% Marvin filings / 25% Rosen-approved catalyst framing)"
+      "growth_y1_5": 0.035,
+      "growth_y6_10": 0.025,
+      "exit_pfcf_y10": 10,
+      "notes": "Blended operating path: Rosen growth + re-rating toward 7x cash-yield on normalized earnings"
     },
     "bull": {
-      "growth_y1_5": 0.04,
-      "growth_y6_10": 0.025,
-      "exit_pfcf_y10": 11,
-      "notes": "Rosen-approved: Idorsia Phase III success + mix shift; 12.3% sensitivity path"
+      "growth_y1_5": 0.045,
+      "growth_y6_10": 0.03,
+      "exit_pfcf_y10": 12,
+      "notes": "Idorsia Phase III success + mix shift; Rosen 6x forward framing"
+    }
+  },
+  "catalyst_scenarios": {
+    "idorsia_readout": {
+      "price": 15.69,
+      "payoff": 24.0,
+      "years": 2.0,
+      "notes": "Capped event path: partial re-rating on readouts (~$24/sh); speaker 12mo double is bull-only (`sohn_rosen_vtrs`)"
     }
   },
   "stance_proposal": {
@@ -46,7 +75,24 @@
       "moat_ok": false,
       "dhando_ok": true
     },
-    "override_reason": "Leveraged balance sheet and unproven post-portfolio moat cap stance despite partial dhando on cash yield"
+    "override_reason": "Blended synthesis ~14% approaches hold band; leverage and unproven moat keep watch until readouts or deleveraging"
+  },
+  "optionality_gate": {
+    "primary_metric": "lawrence_base",
+    "options": [
+      {
+        "id": "idorsia_phase3",
+        "label": "Selatogrel + cenerimod (Phase III)",
+        "option_treatment": "probability_weighted",
+        "probability_base": 0.3,
+        "incremental_value_per_share": 6.0,
+        "timing_years": 0.75,
+        "evidence": "DEF 14A_20241025; Rosen Sohn 2026; 6\u20139 month readout timing",
+        "notes": "30% P_base on $6/sh incremental [Assumption]; not in Lawrence FCF0"
+      }
+    ],
+    "primary_label": "7yr IRR",
+    "primary_return_pct": 12.7
   },
   "option_scan": [
     {
@@ -90,7 +136,7 @@
       "answer": "Yes",
       "treatment": "zero",
       "evidence": "FY2025 divestiture gains in other income; excluded from normalized owner cash",
-      "base_terminal_rationale": "One-time portfolio sales not in 10-year run rate"
+      "base_terminal_rationale": "One-time portfolio sales not in 7-year run rate"
     },
     {
       "q": 7,
@@ -105,14 +151,14 @@
       "answer": "Yes",
       "treatment": "probability_weighted",
       "evidence": "Global R&D collaboration; exclusive rights; Phase III per DEF 14A_20241025 and 10-K",
-      "base_terminal_rationale": "Not in normalized owner cash; catalyst overlay only until readouts and approval path clear"
+      "base_terminal_rationale": "Sized in synthesis path + optionality_gate; not fully in Lawrence FCF0"
     }
   ],
   "estimates": {
     "marvin_floor": {
-      "per_share": 1.38,
-      "return_pct": 9.2,
-      "notes": "FY2025 OCF minus capex assumption; ex divestiture gains"
+      "per_share": 1.45,
+      "return_pct": 9.9,
+      "notes": "FY2025 OCF $2.32B less $400M maintenance capex [Assumption]; ex divestiture gains"
     },
     "external": [
       {
@@ -121,75 +167,99 @@
         "path": "VTRS/investor-documents/research-notes/2026-05-27_Sohn_Digging_Deeper_VTRS_excerpt.md",
         "status": "approved",
         "approved": "2026-06-02",
-        "per_share_partial": 1.55,
-        "return_pct_approx": 12.3,
-        "horizon_years": 1,
-        "price_target_approx": 31.38,
-        "notes": "7x cash-yield framing + Phase III catalyst; 12-month double thesis maps to bull sensitivity, not literal base"
+        "per_share_normalized": 1.55,
+        "return_pct_7yr": 14.4,
+        "return_pct_catalyst_capped": 17.0,
+        "horizon_years_catalyst": 2.0,
+        "price_target_speaker": 31.38,
+        "notes": "7x cash-yield owner cash; low\u2013mid single-digit growth; Idorsia readouts 6\u20139mo; 12mo double is bull-only"
       }
     ],
     "blended_best": {
-      "per_share": 1.42,
-      "return_pct": 9.7,
-      "weights": "75% marvin_floor ($1.38 @ 9.2%) / 25% Rosen partial ($1.55 @ bull 12.3% path)",
-      "notes": "Human approved blend 2026-06-02; speaker double-in-12mo is catalyst footnote only"
+      "per_share": 1.5,
+      "return_pct": 12.7,
+      "weights": "50% marvin_floor ($1.45) / 50% Rosen normalized ($1.55); synthesis adds Idorsia catalyst path",
+      "notes": "Revised 2026-06-02: incorporate Rosen operating + capped catalyst per approved Sohn excerpt"
     }
   },
-  "human_review": [],
-  "results_lawrence_legacy": {
-    "bear": {
-      "return_pct": 2.8
-    },
-    "base": {
-      "return_pct": 8.9
-    },
-    "bull": {
-      "return_pct": 13.0
-    }
+  "human_review": {
+    "notes": [
+      "Idorsia P_base 30% and $6/sh incremental are [Assumption] until readout data",
+      "Rosen 12-month double not in base IRR; capped 2-year $24 payoff path in synthesis only"
+    ]
   },
   "results": {
     "bear": {
-      "return_pct": 2.8
+      "return_pct": 4.7
     },
     "base": {
-      "return_pct": 8.9
+      "return_pct": 12.7
     },
     "bull": {
-      "return_pct": 13.0
+      "return_pct": 15.7
     }
   },
   "implied_return": {
-    "base_pct": 10.28,
+    "base_pct": 13.61,
     "label": "7yr IRR (total synthesis)",
-    "display": "10.28% (total synthesis)",
-    "falsifier_adjusted_pct": 8.9,
-    "synthesis_pct": 10.28
+    "display": "13.61% (total synthesis)",
+    "falsifier_adjusted_pct": 12.7,
+    "synthesis_pct": 13.61
   },
   "overlay_results": [],
   "synthesis": {
     "status": "complete",
     "paths": [
       {
-        "id": "lawrence_base",
-        "label": "Marvin floor (filings)",
+        "id": "marvin_floor",
+        "label": "Marvin floor (filings OCF)",
         "source": "estimates.marvin_floor",
-        "return_pct": 9.2,
-        "weight": 0.75,
+        "return_pct": 9.9,
+        "weight": 0.25,
         "type": "numeric",
         "epistemic_tier": "A (primary filings)",
-        "weight_why": "FY2025 OCF minus capex haircut; stance stress floor.",
+        "weight_why": "Stress floor: OCF minus capex; excludes divestiture gains and pipeline.",
+        "weight_falsifiers": [
+          "EWSR savings miss",
+          "OCF falls below $2B run-rate"
+        ],
+        "hard_to_vary": "yes"
+      },
+      {
+        "id": "rosen_operating_7yr",
+        "label": "Rosen normalized owner cash (7yr Lawrence)",
+        "source": "estimates.external[sohn_rosen_vtrs]",
+        "return_pct": 14.4,
+        "weight": 0.4,
+        "type": "numeric",
+        "epistemic_tier": "C (approved external, filing-backed)",
+        "weight_why": "Rosen 7x cash-yield on $1.55/sh + low\u2013mid single-digit growth; Idorsia rights confirmed in 10-K.",
+        "weight_falsifiers": [
+          "GAAP screens prove correct; no re-rating after readouts"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "blended_lawrence_primary",
+        "label": "Blended operating (50/50 floor + Rosen)",
+        "source": "scenarios.base @ $1.50/sh",
+        "return_pct": 12.7,
+        "weight": 0.25,
+        "type": "numeric",
+        "epistemic_tier": "B (blend of A + C)",
+        "weight_why": "Primary 7yr path at today's price on blended owner cash.",
         "weight_falsifiers": [],
         "hard_to_vary": "yes"
       },
       {
-        "id": "sohn_rosen_context",
-        "label": "Rosen (approved) \u2014 bull / catalyst path",
-        "source": "scenarios.bull",
-        "return_pct": 12.3,
-        "weight": 0.25,
+        "id": "idorsia_catalyst_capped",
+        "label": "Idorsia Phase III catalyst (capped event)",
+        "source": "catalyst_scenarios.idorsia_readout + optionality_gate",
+        "return_pct": 17.0,
+        "weight": 0.1,
         "type": "numeric",
-        "epistemic_tier": "D (external, promotional timing)",
-        "weight_why": "Human approved 2026-06-02; 25% weight per external_view_blend (no literal 10yr double).",
+        "epistemic_tier": "D (event, promotional timing)",
+        "weight_why": "Rosen 6\u20139mo readouts; capped vs literal 12mo double \u2014 partial $24/sh in ~2yr proxy.",
         "weight_falsifiers": [
           "Phase III readouts fail or delay beyond 12 months"
         ],
@@ -198,24 +268,32 @@
     ],
     "qualitative_adjustments": [
       {
-        "factor": "Partial dhando (HK hard-asset / hidden NAV)",
+        "factor": "Idorsia optionality under-credited in GAAP screens",
         "pp": 0.5,
-        "rationale": "Third-party confirms asset quality not in GAAP book; not full floor at spot price",
-        "sources": "cross_check_HK; hk_scan; HK Q1 2025/2026"
+        "rationale": "Filing-confirmed Phase III assets; Rosen deep-value framing",
+        "sources": "sohn_rosen_vtrs; DEF 14A; 10-K"
       },
       {
-        "factor": "No dated predictive attribute at spot",
-        "pp": -0.2,
-        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
-        "sources": "HK predictive attributes framework"
+        "factor": "Residual-volatility / complexity discount",
+        "pp": 0.3,
+        "rationale": "Rosen thesis: few buyers on fallen compounders with binary catalyst",
+        "sources": "sohn_rosen_vtrs"
+      },
+      {
+        "factor": "Net debt ~$14B",
+        "pp": -0.3,
+        "rationale": "Refinancing and leverage cap vs pure deep-value floor",
+        "sources": "10-K; filing_facts"
       }
     ],
-    "numeric_weighted_pct": 9.97,
-    "qualitative_pp": 0.3,
-    "total_synthesis_pct": 10.28,
+    "numeric_weighted_pct": 13.11,
+    "qualitative_pp": 0.5,
+    "total_synthesis_pct": 13.61,
     "human_approval": "approved",
     "weight_audit": {
-      "flags": [],
+      "flags": [
+        "Qualitative \u00b1pp stack may overlap numeric paths (moat/dhando); cap \u00b13pp and require source for each row."
+      ],
       "deutsch_checks": {
         "hard_to_vary": false,
         "falsifiable": true,
@@ -225,5 +303,24 @@
     },
     "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
   },
-  "lawrence_horizon_years": 7
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 4.7
+    },
+    "base": {
+      "return_pct": 12.7
+    },
+    "bull": {
+      "return_pct": 15.7
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": 12.7
+    },
+    "falsifier_adjusted": {
+      "return_pct": 12.7
+    }
+  }
 }
