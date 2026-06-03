@@ -5,7 +5,8 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
-MANDATE_PATH = ROOT / "_system" / "portfolio" / "darwin_mandate.json"
+PORTFOLIO_DIR = ROOT / "_system" / "portfolio"
+MANDATE_PATH = PORTFOLIO_DIR / "darwin_mandate.json"
 DATA_DIR = ROOT / "dashboard" / "data"
 FEATURES_PATH = DATA_DIR / "darwin_features.json"
 PORTFOLIO_PATH = DATA_DIR / "darwin_portfolio.json"
@@ -17,4 +18,8 @@ PIT_BACKTEST_PATH = DATA_DIR / "darwin_backtest_pit.json"
 
 
 def load_mandate() -> dict:
-    return json.loads(MANDATE_PATH.read_text(encoding="utf-8"))
+    """Legacy default: Roth mandate."""
+    path = MANDATE_PATH
+    if not path.exists():
+        path = PORTFOLIO_DIR / "darwin_mandate_roth.json"
+    return json.loads(path.read_text(encoding="utf-8"))

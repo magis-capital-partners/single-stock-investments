@@ -17,9 +17,11 @@ def append_scorecard(
     bias: dict,
     policy_id: str,
     exploration: bool,
+    account_id: str = "roth",
 ) -> dict:
     row = {
         "ts": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "account_id": account_id,
         "policy_id": policy_id,
         "exploration_mode": exploration,
         "audit_pass": pit_audit.get("pass"),

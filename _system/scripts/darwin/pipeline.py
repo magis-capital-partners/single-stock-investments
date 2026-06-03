@@ -7,14 +7,9 @@ from pathlib import Path
 
 from .attribution import factor_attribution
 from .backtest import benchmark_buy_hold, simulate
-from .config import (
-    BACKTEST_REPORT_PATH,
-    DATA_DIR,
-    FEATURES_PATH,
-    IRA_WEIGHTS_PATH,
-    PORTFOLIO_PATH,
-    load_mandate,
-)
+from .accounts import AccountCtx, account_ctx, load_mandate_for, tax_advantaged, tier0_production
+from .config import DATA_DIR, FEATURES_PATH, load_mandate
+from .paper_portfolio import update_paper_portfolio
 from .constraints import apply_constraints, apply_ira_stance_caps, weights_to_list
 from .encoder import train_encoder
 from .ensemble import blend_weights, deflated_sharpe
@@ -49,11 +44,11 @@ def _research_regime_label(rows: list[dict], mandate: dict) -> str:
     return "calm"
 
 
-def load_previous_weights() -> dict[str, float]:
-    if not IRA_WEIGHTS_PATH.exists():
+def load_previous_weights(ctx: AccountCtx) -> dict[str, float]:
+    if not ctx.target_weights_path.exists():
         return {}
     try:
-        data = json.loads(IRA_WEIGHTS_PATH.read_text(encoding="utf-8"))
+        data = json.loads(ctx.target_weights_path.read_text(encoding="utf-8"))
     except json.JSONDecodeError:
         return {}
     out: dict[str, float] = {}
@@ -75,7 +70,9 @@ def _spy_panel(dates: list[str]) -> list[float]:
     return [d2r.get(d, 0.0) for d in dates]
 
 
-def sync_ira_target_weights(
+def sync_target_weights(
+    ctx: AccountCtx,
+    mandate_doc: dict,
     target_w: dict[str, float],
     features_by_ticker: dict[str, dict],
     policy_id: str,
@@ -83,11 +80,13 @@ def sync_ira_target_weights(
 ) -> None:
     payload = {
         "as_of": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
-        "account_profile": "ira",
+        "account_id": ctx.account_id,
+        "account_profile": mandate_doc.get("account_profile"),
         "policy": policy_id,
         "status": "proposed",
-        "rebalance": "semiannual",
+        "rebalance": (mandate_doc.get("mandate") or {}).get("rebalance_frequency", "semiannual"),
         "regime": regime.get("label"),
+        "tier": mandate_doc.get("tier", 0),
         "note": "Auto-synced from Darwin pipeline. Approve before trading.",
         "weights": [
             {
@@ -98,13 +97,14 @@ def sync_ira_target_weights(
             for t, w in sorted(target_w.items(), key=lambda x: -x[1])
         ],
     }
-    IRA_WEIGHTS_PATH.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    ctx.target_weights_path.parent.mkdir(parents=True, exist_ok=True)
+    ctx.target_weights_path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 
 
-def write_backtest_report(out: dict) -> None:
+def write_backtest_report(out: dict, ctx: AccountCtx) -> None:
     b = out.get("benchmarks") or {}
     lines = [
-        "# Darwin backtest report",
+        f"# Darwin backtest report — {ctx.account_id}",
         "",
         f"Generated: {out.get('generated_at', '')}",
         f"Policy: **{out.get('policy_id')}** · Regime: **{out.get('regime', {}).get('label', out.get('regime'))}**",
@@ -159,18 +159,24 @@ def write_backtest_report(out: dict) -> None:
         lines.append("- None flagged")
     lines.append("")
     lines.append(out.get("disclaimer", ""))
-    BACKTEST_REPORT_PATH.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    ctx.backtest_report_path.parent.mkdir(parents=True, exist_ok=True)
+    ctx.backtest_report_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
 def run_pipeline(
+    account_id: str = "roth",
     write_features: bool = True,
     fast: bool = False,
     pit_audit_only: bool = False,
     pit_backtest_only: bool = False,
     sync_events: bool = False,
     sync_external_only: bool = False,
+    run_pit: bool = True,
+    shared_features: dict | None = None,
 ) -> dict:
-    mandate_doc = load_mandate()
+    ctx = account_ctx(account_id)
+    mandate_doc = load_mandate_for(account_id)
+    tier0 = tier0_production(mandate_doc)
     if sync_events:
         n = rebuild_events_log()
         return {"sync_events": n}
@@ -210,19 +216,22 @@ def run_pipeline(
             }
         )
 
-    features = build_features()
-    save_snapshot(features)
-    save_registry_snapshot()
+    if shared_features is not None:
+        features = shared_features
+    else:
+        features = build_features()
+        save_snapshot(features)
+        save_registry_snapshot()
     from .features import holdings_universe
     from .pit import bootstrap_valuation_history
 
     external_sync: dict = {}
-    try:
-        external_sync = sync_external_market_data()
-    except Exception as exc:
-        external_sync = {"error": str(exc)}
-
-    rebuild_events_log()
+    if shared_features is None:
+        try:
+            external_sync = sync_external_market_data()
+        except Exception as exc:
+            external_sync = {"error": str(exc)}
+        rebuild_events_log()
     bootstrap_valuation_history(holdings_universe())
     if write_features:
         DATA_DIR.mkdir(parents=True, exist_ok=True)
@@ -304,48 +313,74 @@ def run_pipeline(
         tickers, panel["dates"], panel["returns_by_ticker"], rp_fn, mandate_effective, falsifier_map
     )
 
+    evo_cfg = mandate_doc.get("evolution") or {}
+    use_ml_stack = not tier0 and (
+        evo_cfg.get("enable_encoder", True)
+        or evo_cfg.get("enable_ga", True)
+        or evo_cfg.get("enable_ppo", True)
+    )
     n_factors = training.get("latent_factors", 5)
-    _, latent, enc_meta = train_encoder(
-        rows,
-        n_factors=n_factors,
-        epochs=training.get("encoder_epochs", 80),
-        lr=training.get("encoder_lr", 0.02),
-    )
+    latent: dict = {}
+    enc_meta: dict = {"factor_labels": []}
+    best_genome: dict = {}
+    ga_hist: list = []
+    ga_survivors: list = []
+    ppo_metrics: dict = {}
+    bt_ga: dict = {"error": "tier0_disabled"}
+    bt_ppo: dict = {"error": "tier0_disabled"}
+    genome_w: dict = {}
+    ppo_w: dict = {}
 
-    best_genome, ga_hist, ga_survivors = run_ga(rows, panel, mandate_effective, latent, training)
-    ppo_policy, ppo_metrics = train_ppo(rows, panel, latent, mandate_effective, training)
-
-    genome_w, _ = apply_constraints(
-        tickers,
-        apply_policy(best_genome.get("policy", "irr_ranked"), rows, {**best_genome, "use_latent": True}, latent),
-        None,
-        mandate_effective,
-        falsifier_map,
-    )
-
-    def ga_fn(ts, _i):
-        return apply_policy(
-            best_genome.get("policy", "irr_ranked"),
+    if use_ml_stack:
+        _, latent, enc_meta = train_encoder(
             rows,
-            {**best_genome, "use_latent": True},
-            latent,
+            n_factors=n_factors,
+            epochs=training.get("encoder_epochs", 80),
+            lr=training.get("encoder_lr", 0.02),
         )
+        if evo_cfg.get("enable_ga", True):
+            best_genome, ga_hist, ga_survivors = run_ga(rows, panel, mandate_effective, latent, training)
+            genome_w, _ = apply_constraints(
+                tickers,
+                apply_policy(
+                    best_genome.get("policy", "irr_ranked"),
+                    rows,
+                    {**best_genome, "use_latent": True},
+                    latent,
+                ),
+                None,
+                mandate_effective,
+                falsifier_map,
+            )
 
-    bt_ga = simulate(
-        tickers, panel["dates"], panel["returns_by_ticker"], ga_fn, mandate_effective, falsifier_map
-    )
+            def ga_fn(ts, _i):
+                return apply_policy(
+                    best_genome.get("policy", "irr_ranked"),
+                    rows,
+                    {**best_genome, "use_latent": True},
+                    latent,
+                )
+
+            bt_ga = simulate(
+                tickers, panel["dates"], panel["returns_by_ticker"], ga_fn, mandate_effective, falsifier_map
+            )
+        if evo_cfg.get("enable_ppo", True):
+            ppo_policy, ppo_metrics = train_ppo(rows, panel, latent, mandate_effective, training)
+            prev_equal = {t: 1.0 / min(len(tickers), 15) for t in tickers[:15]}
+            s_eq = sum(prev_equal.values()) or 1.0
+            prev_equal = {t: prev_equal.get(t, 0.0) / s_eq for t in prev_equal}
+            ppo_w = ppo_weights(ppo_policy, rows, latent, mandate_effective, prev_equal)
+
+            def ppo_fn(ts, _i):
+                return ppo_weights(ppo_policy, rows, latent, mandate_effective, prev_equal)
+
+            bt_ppo = simulate(
+                tickers, panel["dates"], panel["returns_by_ticker"], ppo_fn, mandate_effective, falsifier_map
+            )
 
     prev_equal = {t: 1.0 / min(len(tickers), 15) for t in tickers[:15]}
     s_eq = sum(prev_equal.values()) or 1.0
     prev_equal = {t: prev_equal.get(t, 0.0) / s_eq for t in prev_equal}
-    ppo_w = ppo_weights(ppo_policy, rows, latent, mandate_effective, prev_equal)
-
-    def ppo_fn(ts, _i):
-        return ppo_weights(ppo_policy, rows, latent, mandate_effective, prev_equal)
-
-    bt_ppo = simulate(
-        tickers, panel["dates"], panel["returns_by_ticker"], ppo_fn, mandate_effective, falsifier_map
-    )
 
     kappa = (mandate_doc.get("mandate") or {}).get("turnover_penalty_kappa", 0.35)
     n_trials = (mandate_doc.get("evolution") or {}).get("policy_trials", 8)
@@ -358,17 +393,22 @@ def run_pipeline(
 
     policy_candidates = [
         ("ira_marvin", ira_w, bt_ira),
-        ("ppo", ppo_w, bt_ppo),
-        ("genetic", genome_w, bt_ga),
         ("irr_ranked", irr_w, bt_irr),
         ("equal_weight", eq_w, bt_eq),
-        ("risk_parity_vol", rp_w, bt_rp),
     ]
+    if not tier0:
+        policy_candidates.extend(
+            [
+                ("ppo", ppo_w, bt_ppo),
+                ("genetic", genome_w, bt_ga),
+                ("risk_parity_vol", rp_w, bt_rp),
+            ]
+        )
     bt_by_policy = {n: bt for n, _, bt in policy_candidates}
     scored_candidates = [(n, w, score_bt(bt)) for n, w, bt in policy_candidates]
 
     evo_cfg = mandate_doc.get("evolution") or {}
-    use_ensemble = evo_cfg.get("ensemble_champion", True)
+    use_ensemble = evo_cfg.get("ensemble_champion", True) and not tier0
     ensemble_k = evo_cfg.get("ensemble_top_k", 3)
 
     if use_ensemble:
@@ -397,25 +437,27 @@ def run_pipeline(
     preferred = m.get("preferred_policy", "ira_marvin")
 
     explore = mandate_doc.get("exploration") or {}
-    exploration_on = bool(explore.get("enabled", False))
+    exploration_on = bool(explore.get("enabled", False)) and not tier0
 
     ml_names = {"ppo", "genetic", "irr_ranked", "equal_weight", "risk_parity_vol"}
     use_ml = (
-        ml_best[0] in ml_names
+        not tier0
+        and ml_best[0] in ml_names
         and not ml_bt.get("error")
         and (ml_bt.get("periods") or 0) >= min_periods
         and (ml_bt.get("sharpe_annualized") or -999) >= min_sharpe
     )
     pit_bt: dict = {}
     pit_audit: dict = {}
-    try:
-        pit_audit = run_pit_audit(fast=fast)
-        pit_bt = run_pit_backtest(fast=fast)
-        if mandate_doc.get("pit", {}).get("require_oos_for_ml", True) and not explore.get("allow_ml_without_oos"):
-            use_ml = use_ml and pit_bt.get("ml_oos_eligible", False)
-    except Exception as exc:
-        pit_audit = {"error": str(exc)}
-        pit_bt = {"error": str(exc)}
+    if run_pit:
+        try:
+            pit_audit = run_pit_audit(fast=fast)
+            pit_bt = run_pit_backtest(fast=fast)
+            if mandate_doc.get("pit", {}).get("require_oos_for_ml", True) and not explore.get("allow_ml_without_oos"):
+                use_ml = use_ml and pit_bt.get("ml_oos_eligible", False)
+        except Exception as exc:
+            pit_audit = {"error": str(exc)}
+            pit_bt = {"error": str(exc)}
 
     if exploration_on and explore.get("champion_mode") == "best_insample":
         all_scored = list(scored_candidates)
@@ -433,7 +475,7 @@ def run_pipeline(
     else:
         policy_id, target_w, champion_bt = preferred, ira_w, bt_ira
 
-    prev_w = load_previous_weights()
+    prev_w = load_previous_weights(ctx)
     if not prev_w:
         prev_w = irr_w if irr_w else prev_equal
 
@@ -450,9 +492,9 @@ def run_pipeline(
         target_w, _ = apply_constraints(tickers, target_w, prev_w, mandate_effective, falsifier_map)
         c_notes["turnover_capped_output"] = True
         c_notes["turnover_one_way"] = round(max_turn, 4)
-    if mandate_doc.get("account_profile") == "ira":
-        target_w = apply_ira_stance_caps(target_w, features_by_ticker, mandate_doc)
-        max_w = m.get("max_weight_pct", 15.0) / 100.0
+    target_w = apply_ira_stance_caps(target_w, features_by_ticker, mandate_doc)
+    max_w = m.get("max_weight_pct", 15.0) / 100.0
+    if max_w:
         for t in list(target_w):
             target_w[t] = min(target_w[t], max_w)
         s = sum(target_w.values()) or 1.0
@@ -495,11 +537,13 @@ def run_pipeline(
         }
     )
 
-    sync_ira_target_weights(target_w, features_by_ticker, policy_id, regime)
+    sync_target_weights(ctx, mandate_doc, target_w, features_by_ticker, policy_id, regime)
 
     out = {
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "phase": "0-4",
+        "account_id": ctx.account_id,
+        "tier": mandate_doc.get("tier", 0),
+        "phase": "0-tier0" if tier0 else "0-4",
         "mandate": mandate_doc.get("mandate"),
         "regime": regime,
         "rebalance_frequency": mandate_doc.get("mandate", {}).get("rebalance_frequency", "semiannual"),
@@ -568,18 +612,24 @@ def run_pipeline(
         },
     }
 
-    pit_status = _pit_status_from_runs(pit_audit, pit_bt, production=out)
-    append_pit_status(pit_status)
-    out["pit_status"] = pit_status
+    if run_pit:
+        pit_status = _pit_status_from_runs(pit_audit, pit_bt, production=out)
+        append_pit_status(pit_status)
+        out["pit_status"] = pit_status
+        append_scorecard(pit_status, pit_audit, pit_bt, bias := run_bias_scan(rows, target_w), policy_id, exploration_on, ctx.account_id)
+    else:
+        out["pit_status"] = {}
+        bias = run_bias_scan(rows, target_w)
+        append_scorecard({}, {}, {}, bias, policy_id, exploration_on, ctx.account_id)
 
-    observatory = build_observatory(rows, regime)
-    save_observatory(observatory)
-    brief_path = write_regime_brief(observatory, rows)
-    out["observatory"] = observatory
-    out["regime_brief"] = str(brief_path.relative_to(Path(__file__).resolve().parents[3]))
-
-    bias = run_bias_scan(rows, target_w)
     out["bias_scan"] = bias
+
+    if run_pit and account_id == "roth":
+        observatory = build_observatory(rows, regime)
+        save_observatory(observatory)
+        brief_path = write_regime_brief(observatory, rows)
+        out["observatory"] = observatory
+        out["regime_brief"] = str(brief_path.relative_to(Path(__file__).resolve().parents[3]))
 
     questions = scaffold_all_questions(tickers)
     out["open_questions"] = questions
@@ -590,14 +640,72 @@ def run_pipeline(
     stress = run_stress_simulation(panel, _w_fn, mandate_effective, n_paths=120 if fast else 250)
     out["stress_simulation"] = stress
 
-    append_scorecard(pit_status, pit_audit, pit_bt, bias, policy_id, exploration_on)
     out["exploration"] = {"enabled": exploration_on, "champion_mode": explore.get("champion_mode")}
-    out["external_sync"] = external_sync
+    out["external_sync"] = external_sync if account_id == "roth" else {}
+
+    paper = update_paper_portfolio(ctx, mandate_doc, target_w, features_by_ticker, policy_id, regime, out)
+    out["paper_portfolio"] = paper
 
     DATA_DIR.mkdir(parents=True, exist_ok=True)
-    PORTFOLIO_PATH.write_text(json.dumps(out, indent=2) + "\n", encoding="utf-8")
-    write_backtest_report(out)
+    ctx.portfolio_path.write_text(json.dumps(out, indent=2) + "\n", encoding="utf-8")
+    write_backtest_report(out, ctx)
+
+    # Legacy single-file alias for older dashboard paths
+    if account_id == "roth":
+        legacy = DATA_DIR / "darwin_portfolio.json"
+        legacy.write_text(json.dumps(out, indent=2) + "\n", encoding="utf-8")
+        # Legacy IRA weights filename
+        legacy_weights = ctx.target_weights_path.parent / "ira_target_weights.json"
+        legacy_weights.write_text(
+            ctx.target_weights_path.read_text(encoding="utf-8"), encoding="utf-8"
+        )
+
     return out
+
+
+def run_all_accounts(fast: bool = False, write_features: bool = True) -> dict:
+    """Build Roth + taxable Tier 0 books and paper trackers."""
+    from .features import build_features as _build
+
+    features = _build()
+    results: dict = {}
+    for i, aid in enumerate(("roth", "taxable")):
+        results[aid] = run_pipeline(
+            account_id=aid,
+            fast=fast,
+            write_features=write_features and i == 0,
+            shared_features=features,
+            run_pit=(aid == "roth"),
+        )
+    summary = {
+        "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "accounts": {
+            aid: {
+                "policy_id": results[aid].get("policy_id"),
+                "regime": (results[aid].get("regime") or {}).get("label"),
+                "backtest_cumulative_pct": (
+                    (results[aid].get("benchmarks") or {})
+                    .get("champion", {})
+                    .get("cumulative_return", 0)
+                    * 100
+                ),
+                "backtest_sharpe": (results[aid].get("benchmarks") or {}).get("champion", {}).get(
+                    "sharpe_annualized"
+                ),
+                "paper_nav_usd": (results[aid].get("paper_portfolio") or {}).get("last_mark", {}).get(
+                    "nav_usd"
+                ),
+                "paper_cumulative_pct": (results[aid].get("paper_portfolio") or {}).get("last_mark", {}).get(
+                    "cumulative_return_pct"
+                ),
+                "paper_inception": (results[aid].get("paper_portfolio") or {}).get("inception_date"),
+            }
+            for aid in results
+        },
+    }
+    path = DATA_DIR / "darwin_accounts.json"
+    path.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
+    return {"summary": summary, "portfolios": results}
 
 
 def _pit_status_from_runs(audit: dict, pit_bt: dict, production: dict | None = None) -> dict:

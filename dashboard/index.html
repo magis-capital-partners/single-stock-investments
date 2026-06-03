@@ -341,6 +341,10 @@
   </div>
 
   <section class="darwin-panel" id="darwin-panel">
+    <nav class="view-tabs" id="darwin-account-tabs" style="margin-bottom:12px">
+      <button type="button" class="view-tab active" data-darwin-account="roth">Roth IRA (paper)</button>
+      <button type="button" class="view-tab" data-darwin-account="taxable">Taxable (paper)</button>
+    </nav>
     <div class="loading" id="darwin-loading">Loading Darwin portfolio…</div>
     <div id="darwin-content" style="display:none"></div>
   </section>
@@ -428,6 +432,7 @@ let sortAsc = true;
 let marketFilter = 'ALL';
 let needsWork = false;
 let activeView = 'holdings';
+let activeDarwinAccount = 'roth';
 
 function linkHtml(url, label, className = '') {
   if (!url) return label;
@@ -489,9 +494,17 @@ async function load() {
   if (data.tickers.length) selectTicker(data.tickers[0].ticker);
 }
 
+function setDarwinAccount(aid) {
+  activeDarwinAccount = aid;
+  document.querySelectorAll('#darwin-account-tabs .view-tab').forEach(b => {
+    b.classList.toggle('active', b.dataset.darwinAccount === aid);
+  });
+  renderDarwin();
+}
+
 function setView(view) {
   activeView = view;
-  document.querySelectorAll('.view-tab').forEach(b => {
+  document.querySelectorAll('#view-tabs .view-tab').forEach(b => {
     b.classList.toggle('active', b.dataset.view === view);
   });
   document.getElementById('holdings-view').classList.toggle('hidden', view !== 'holdings');
@@ -502,17 +515,22 @@ function setView(view) {
 }
 
 function renderDarwin() {
-  const d = data.darwin;
+  const bundle = data.darwin_accounts || {};
+  const d = bundle[activeDarwinAccount] || data.darwin;
+  const paper = bundle['paper_' + activeDarwinAccount] || {};
   const loading = document.getElementById('darwin-loading');
   const content = document.getElementById('darwin-content');
   if (!d) {
-    loading.textContent = 'Darwin portfolio not built. Run: python _system/scripts/build_darwin_portfolio.py --download';
+    loading.textContent = 'Darwin portfolio not built. Run: make darwin-build';
     content.style.display = 'none';
     return;
   }
   loading.style.display = 'none';
   content.style.display = 'block';
   const champ = d.benchmarks?.champion || {};
+  const paperMark = paper.last_mark || d.paper_portfolio?.last_mark || {};
+  const btInception = paper.backtest_at_inception || d.paper_portfolio?.backtest_at_inception || {};
+  const acctLabel = activeDarwinAccount === 'roth' ? 'Roth IRA' : 'Taxable';
   const spy = d.benchmarks?.spy || {};
   const regime = typeof d.regime === 'object' ? d.regime : { label: d.regime };
   const macro = regime.macro_detail || {};
@@ -522,10 +540,10 @@ function renderDarwin() {
   const excessVsSpy = champ.cumulative_return != null && spy.cumulative_return != null
     ? ((champ.cumulative_return - spy.cumulative_return) * 100).toFixed(1) : null;
   content.innerHTML = `
-    <h2 style="font-size:18px;margin-bottom:6px">Darwin adaptive allocation</h2>
+    <h2 style="font-size:18px;margin-bottom:6px">Darwin · ${escapeHtml(acctLabel)} paper book</h2>
     <p class="subhead" style="margin-bottom:14px">
-      Biological hedge fund layer · ${escapeHtml(d.generated_at || '')} · phase ${escapeHtml(d.phase || '—')}
-      · <span class="badge badge-purple">${escapeHtml(d.account_profile || 'taxable')}</span>
+      Tier ${escapeHtml(String(d.tier ?? '0'))} · ${escapeHtml(d.generated_at || '')} · phase ${escapeHtml(d.phase || '—')}
+      · <span class="badge badge-purple">${escapeHtml(d.account_profile || activeDarwinAccount)}</span>
       · policy <span class="mono">${escapeHtml(d.policy_id || '—')}</span>
       ${d.exploration?.enabled ? ' · <span class="badge badge-purple">exploration</span>' : ''}
       ${d.benchmarks?.ml_selected === false && !d.exploration?.enabled ? ' · <span class="badge badge-warn">ML gated</span>' : ''}
@@ -535,6 +553,18 @@ function renderDarwin() {
     </p>
     ${conflicts.length ? `<div class="conflict-banner"><strong>Marvin conflicts — review before trade</strong><ul style="margin-top:8px;padding-left:18px">${conflicts.map(c => `<li>${escapeHtml(c.ticker)}: ${escapeHtml(c.reason || '')} (${c.weight_pct || '?'}%)</li>`).join('')}</ul></div>` : ''}
     ${reviews.filter(r => r.severity === 'warn').length ? `<div class="conflict-banner" style="border-color:rgba(245,158,11,0.4);background:rgba(245,158,11,0.08)"><strong>Warnings</strong><ul style="margin-top:8px;padding-left:18px">${reviews.filter(r => r.severity === 'warn').map(r => `<li>${escapeHtml(r.ticker)}: ${escapeHtml(r.reason)}</li>`).join('')}</ul></div>` : ''}
+    <div class="detail-section">
+      <h3>Backtest vs paper (live tracking)</h3>
+      <table class="darwin-table">
+        <thead><tr><th>Track</th><th>Cumulative</th><th>Sharpe</th><th>Note</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">In-sample backtest</td><td>${champ.cumulative_return != null ? (champ.cumulative_return*100).toFixed(1)+'%' : '—'}</td><td>${champ.sharpe_annualized ?? '—'}</td><td>Walk-forward sim on monthly returns</td></tr>
+          <tr style="background:var(--bg-card)"><td class="mono">Paper book</td><td>${paperMark.cumulative_return_pct != null ? paperMark.cumulative_return_pct+'%' : '0%'}</td><td>—</td><td>Since ${escapeHtml(paper.inception_date || paperMark.date || 'inception')} · NAV $${paperMark.nav_usd != null ? Number(paperMark.nav_usd).toLocaleString() : '—'}</td></tr>
+          <tr><td class="mono">Backtest at paper start</td><td>${btInception.cumulative_return_pct != null ? btInception.cumulative_return_pct+'%' : '—'}</td><td>${btInception.sharpe_annualized ?? '—'}</td><td>Reference when paper opened</td></tr>
+        </tbody>
+      </table>
+      <p class="subhead" style="margin-top:8px">Paper positions marked daily via Yahoo. Re-run <span class="mono">make darwin-build</span> after Marvin refreshes to adapt weights.</p>
+    </div>
     <div class="darwin-grid">
       <div class="summary-card"><div class="label">Regime</div><div class="value" style="font-size:16px">${escapeHtml(regime.label || '—')}</div><div class="sub">research ${escapeHtml(regime.research || '—')} · macro ${escapeHtml(regime.macro || '—')}</div></div>
       <div class="summary-card"><div class="label">Turnover</div><div class="value" style="font-size:16px;color:${turnoverOk ? 'var(--accent-green)' : 'var(--accent-amber)'}">${d.turnover_used_pct ?? '—'}%</div><div class="sub">budget ${d.turnover_budget_pct ?? 15}% · ${escapeHtml(d.rebalance_frequency || '')}</div></div>
@@ -576,7 +606,7 @@ function renderDarwin() {
       <h3>Benchmarks (in-sample production sim)</h3>
       <table class="darwin-table">
         <thead><tr><th>Policy</th><th>Sharpe</th><th>Cum ret</th><th>Turnover</th></tr></thead>
-        <tbody>${['ira_marvin','equal_weight','irr_ranked','risk_parity_vol','genetic','ppo','ensemble','champion','spy'].map(k => {
+        <tbody>${['ira_marvin','equal_weight','irr_ranked','champion','spy'].concat(d.tier === 0 ? [] : ['risk_parity_vol','genetic','ppo','ensemble']).map(k => {
           const b = d.benchmarks?.[k] || {};
           if (b.error) return '';
           const hi = k === (d.policy_id === 'ensemble' ? 'ensemble' : d.policy_id) || k === 'champion';
@@ -953,8 +983,11 @@ function startDevicePoll(intervalSec) {
 
 document.getElementById('device-cancel').addEventListener('click', closeDeviceModal);
 
-document.querySelectorAll('.view-tab').forEach(btn => {
+document.querySelectorAll('#view-tabs .view-tab').forEach(btn => {
   btn.addEventListener('click', () => setView(btn.dataset.view));
+});
+document.querySelectorAll('#darwin-account-tabs .view-tab').forEach(btn => {
+  btn.addEventListener('click', () => setDarwinAccount(btn.dataset.darwinAccount));
 });
 </script>
 </body>
