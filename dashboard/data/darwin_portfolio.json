@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-03T15:53:43Z",
+  "generated_at": "2026-06-03T18:01:11Z",
   "phase": "0-4",
   "mandate": {
     "long_only": true,
@@ -47,32 +47,47 @@
   "rebalance_frequency": "semiannual",
   "turnover_budget_pct": 10.0,
   "turnover_used_pct": 10.0,
-  "policy_id": "ensemble",
+  "policy_id": "genetic",
   "policy_detail": {
-    "champion": "ensemble",
-    "genome": null,
+    "champion": "genetic",
+    "genome": {
+      "policy": "risk_parity_vol",
+      "top_k": 14,
+      "irr_power": 1.2207798783582635,
+      "moat_bonus": 0.09544774435695538,
+      "dhando_bonus": 0.08318771805237522,
+      "staleness_penalty": 0.013190862805208765,
+      "falsifier_penalty": 0.6965787031955493,
+      "human_review_discount": 0.2579160997805162,
+      "temperature": 0.9580877400853738,
+      "archetype_weights": {
+        "optionality": 0.8418103872519473,
+        "turnaround": 0.9882792097579614,
+        "compounder": 1.1679363363966593
+      }
+    },
     "ga_generations": [
       {
         "generation": 0,
-        "best_fitness": -0.0658
+        "best_fitness": 0.6959
       },
       {
         "generation": 1,
-        "best_fitness": -0.0658
+        "best_fitness": 0.6959
       },
       {
         "generation": 2,
-        "best_fitness": -0.0658
+        "best_fitness": 0.6959
       },
       {
         "generation": 3,
-        "best_fitness": -0.0658
+        "best_fitness": 0.6959
       }
     ],
     "ga_survivors": [
       {
         "generation": 0,
-        "fitness": -0.0658,
+        "fitness": 0.6959,
         "genome": {
           "policy": "risk_parity_vol",
           "top_k": 14,
@@ -92,7 +107,7 @@
       },
       {
         "generation": 0,
-        "fitness": -0.0658,
+        "fitness": 0.6959,
         "genome": {
           "policy": "risk_parity_vol",
           "top_k": 14,
@@ -112,7 +127,7 @@
       },
       {
         "generation": 0,
-        "fitness": -0.0658,
+        "fitness": 0.6959,
         "genome": {
           "policy": "risk_parity_vol",
           "top_k": 14,
@@ -132,7 +147,7 @@
       },
       {
         "generation": 1,
-        "fitness": -0.0658,
+        "fitness": 0.6959,
         "genome": {
           "policy": "risk_parity_vol",
           "top_k": 14,
@@ -152,7 +167,7 @@
       },
       {
         "generation": 1,
-        "fitness": -0.0658,
+        "fitness": 0.6959,
         "genome": {
           "policy": "risk_parity_vol",
           "top_k": 14,
@@ -176,47 +191,60 @@
       "seed": 0,
       "res": {
         "periods": 7,
-        "mean_monthly_return": 0.006695,
+        "mean_monthly_return": 0.00668,
+        "volatility_annualized": 0.3444,
         "sharpe_annualized": 0.233,
-        "cumulative_return": 0.0207,
-        "max_drawdown_log": 0.1585,
+        "cumulative_return": 0.0206,
+        "max_drawdown_log": 0.1586,
+        "max_drawdown_pct": 0.1466,
         "avg_turnover_one_way": 0.0,
         "rebalance_frequency": "semiannual"
       },
       "rewards": [
-        0.0731511970119962,
-        0.07315113107021151,
-        0.07315106512547093,
-        0.07315099917777439,
-        0.07315093322712161
+        0.07305052796373476,
+        0.0730504570799258,
+        0.07305038619292921,
+        0.07305031530274482,
+        0.07305024440937245
       ]
     },
     "ensemble": [
       {
+        "policy": "genetic",
+        "weight_in_ensemble": 0.472,
+        "score": 1.0279
+      },
+      {
         "policy": "equal_weight",
-        "weight_in_ensemble": 0.376,
+        "weight_in_ensemble": 0.29,
         "score": 0.6317
       },
       {
-        "policy": "genetic",
-        "weight_in_ensemble": 0.363,
-        "score": 0.6095
-      },
-      {
         "policy": "ppo",
-        "weight_in_ensemble": 0.261,
-        "score": 0.4378
+        "weight_in_ensemble": 0.237,
+        "score": 0.5163
       }
     ],
     "population_loaded": 8
   },
   "weights": [
     {
+      "ticker": "ICE",
+      "company": "Intercontinental Exchange",
+      "weight": 0.122,
+      "weight_pct": 12.2,
+      "delta": 0.0041,
+      "stance": "hold",
+      "irr_base_pct": 13.79,
+      "falsifier_count": 0,
+      "trade_suggested": false
+    },
+    {
       "ticker": "8697.T",
       "company": "Japan Exchange Group",
-      "weight": 0.15,
-      "weight_pct": 15.0,
-      "delta": 0.0,
+      "weight": 0.1164,
+      "weight_pct": 11.64,
+      "delta": -0.0009,
       "stance": "hold",
       "irr_base_pct": 5.26,
       "falsifier_count": 0,
@@ -225,9 +253,9 @@
     {
       "ticker": "AMZN",
       "company": "Amazon.com",
-      "weight": 0.15,
-      "weight_pct": 15.0,
-      "delta": 0.0,
+      "weight": 0.1164,
+      "weight_pct": 11.64,
+      "delta": -0.0009,
       "stance": "hold",
       "irr_base_pct": 4.7,
       "falsifier_count": 0,
@@ -236,31 +264,20 @@
     {
       "ticker": "BN",
       "company": "Brookfield Corporation",
-      "weight": 0.15,
-      "weight_pct": 15.0,
-      "delta": 0.0,
+      "weight": 0.1164,
+      "weight_pct": 11.64,
+      "delta": -0.0009,
       "stance": "hold",
       "irr_base_pct": 13.15,
       "falsifier_count": 0,
       "trade_suggested": false
     },
     {
-      "ticker": "ICE",
-      "company": "Intercontinental Exchange",
-      "weight": 0.15,
-      "weight_pct": 15.0,
-      "delta": 0.0,
-      "stance": "hold",
-      "irr_base_pct": 13.79,
-      "falsifier_count": 0,
-      "trade_suggested": false
-    },
-    {
       "ticker": "GOOGL",
       "company": "Alphabet Inc.",
-      "weight": 0.1434,
-      "weight_pct": 14.34,
-      "delta": -0.0032,
+      "weight": 0.1144,
+      "weight_pct": 11.44,
+      "delta": -0.0008,
       "stance": "hold",
       "irr_base_pct": 1.5,
       "falsifier_count": 0,
@@ -269,35 +286,79 @@
     {
       "ticker": "SPGI",
       "company": "S&P Global",
-      "weight": 0.1434,
-      "weight_pct": 14.34,
-      "delta": -0.0032,
+      "weight": 0.1144,
+      "weight_pct": 11.44,
+      "delta": -0.0008,
       "stance": "hold",
       "irr_base_pct": 11.25,
       "falsifier_count": 0,
       "trade_suggested": false
     },
     {
+      "ticker": "3905.T",
+      "company": "DataSection Co., Ltd.",
+      "weight": 0.05,
+      "weight_pct": 5.0,
+      "delta": 0.0,
+      "stance": "watch",
+      "irr_base_pct": 6.46,
+      "falsifier_count": 0,
+      "trade_suggested": false
+    },
+    {
+      "ticker": "APLD",
+      "company": "Applied Digital",
+      "weight": 0.05,
+      "weight_pct": 5.0,
+      "delta": 0.0,
+      "stance": "watch",
+      "irr_base_pct": 12.09,
+      "falsifier_count": 0,
+      "trade_suggested": false
+    },
+    {
+      "ticker": "CSGP",
+      "company": "CoStar Group",
+      "weight": 0.05,
+      "weight_pct": 5.0,
+      "delta": 0.0,
+      "stance": "watch",
+      "irr_base_pct": 10.59,
+      "falsifier_count": 0,
+      "trade_suggested": false
+    },
+    {
       "ticker": "KEWL",
       "company": "Keweenaw Land Association",
-      "weight": 0.0566,
-      "weight_pct": 5.66,
-      "delta": -0.0003,
+      "weight": 0.05,
+      "weight_pct": 5.0,
+      "delta": 0.0,
       "stance": "watch",
       "irr_base_pct": -8.29,
       "falsifier_count": 0,
       "trade_suggested": false
     },
     {
+      "ticker": "SNOW",
+      "company": "Snowflake Inc",
+      "weight": 0.05,
+      "weight_pct": 5.0,
+      "delta": 0.0,
+      "stance": "watch",
+      "irr_base_pct": 7.58,
+      "falsifier_count": 0,
+      "trade_suggested": false
+    },
+    {
       "ticker": "TPL",
       "company": "Texas Pacific Land Corporation",
-      "weight": 0.0566,
-      "weight_pct": 5.66,
-      "delta": 0.0067,
+      "weight": 0.05,
+      "weight_pct": 5.0,
+      "delta": 0.0,
       "stance": "watch",
-      "irr_base_pct": -0.13,
+      "irr_base_pct": -0.51,
       "falsifier_count": 0,
-      "trade_suggested": true
+      "trade_suggested": false
     }
   ],
   "account_profile": "ira",
@@ -305,87 +366,110 @@
     "ira_marvin": {
       "periods": 7,
       "mean_monthly_return": -0.028383,
+      "volatility_annualized": 0.1029,
       "sharpe_annualized": -3.31,
       "cumulative_return": -0.1848,
       "max_drawdown_log": 0.2159,
+      "max_drawdown_pct": 0.1941,
       "avg_turnover_one_way": 0.0,
       "rebalance_frequency": "semiannual"
     },
     "equal_weight": {
       "periods": 7,
       "mean_monthly_return": 0.027078,
+      "volatility_annualized": 0.4748,
       "sharpe_annualized": 0.684,
       "cumulative_return": 0.1492,
       "max_drawdown_log": 0.1598,
+      "max_drawdown_pct": 0.1477,
       "avg_turnover_one_way": 0.0,
       "rebalance_frequency": "semiannual"
     },
     "irr_ranked": {
       "periods": 7,
       "mean_monthly_return": -0.008231,
+      "volatility_annualized": 0.0977,
       "sharpe_annualized": -1.011,
       "cumulative_return": -0.0585,
       "max_drawdown_log": 0.1035,
+      "max_drawdown_pct": 0.0983,
       "avg_turnover_one_way": 0.0,
       "rebalance_frequency": "semiannual"
     },
     "genetic": {
       "periods": 7,
-      "mean_monthly_return": 0.013273,
-      "sharpe_annualized": 0.66,
-      "cumulative_return": 0.081,
-      "max_drawdown_log": 0.1321,
+      "mean_monthly_return": 0.045113,
+      "volatility_annualized": 0.4864,
+      "sharpe_annualized": 1.113,
+      "cumulative_return": 0.296,
+      "max_drawdown_log": 0.1212,
+      "max_drawdown_pct": 0.1142,
       "avg_turnover_one_way": 0.0,
       "rebalance_frequency": "semiannual"
     },
     "ppo": {
       "periods": 7,
-      "mean_monthly_return": 0.024104,
-      "sharpe_annualized": 0.474,
-      "cumulative_return": 0.096,
-      "max_drawdown_log": 0.2051,
+      "mean_monthly_return": 0.028011,
+      "volatility_annualized": 0.6015,
+      "sharpe_annualized": 0.559,
+      "cumulative_return": 0.1277,
+      "max_drawdown_log": 0.1536,
+      "max_drawdown_pct": 0.1424,
       "avg_turnover_one_way": 0.0,
       "rebalance_frequency": "semiannual"
     },
     "risk_parity_vol": {
       "periods": 7,
-      "mean_monthly_return": -0.008944,
-      "sharpe_annualized": -1.017,
-      "cumulative_return": -0.0636,
-      "max_drawdown_log": 0.1203,
+      "mean_monthly_return": -0.019287,
+      "volatility_annualized": 0.0537,
+      "sharpe_annualized": -4.307,
+      "cumulative_return": -0.1281,
+      "max_drawdown_log": 0.1412,
+      "max_drawdown_pct": 0.1317,
       "avg_turnover_one_way": 0.0,
       "rebalance_frequency": "semiannual"
     },
     "ensemble": {
       "periods": 7,
-      "mean_monthly_return": 0.028593,
-      "sharpe_annualized": 0.706,
-      "cumulative_return": 0.1582,
-      "max_drawdown_log": 0.1412,
+      "mean_monthly_return": 0.044335,
+      "volatility_annualized": 0.6618,
+      "sharpe_annualized": 0.804,
+      "cumulative_return": 0.2417,
+      "max_drawdown_log": 0.1695,
+      "max_drawdown_pct": 0.1559,
       "avg_turnover_one_way": 0.0,
       "rebalance_frequency": "semiannual"
     },
     "champion": {
       "periods": 7,
-      "mean_monthly_return": 0.028593,
-      "sharpe_annualized": 0.706,
-      "cumulative_return": 0.1582,
-      "max_drawdown_log": 0.1412,
+      "mean_monthly_return": 0.045113,
+      "volatility_annualized": 0.4864,
+      "sharpe_annualized": 1.113,
+      "cumulative_return": 0.296,
+      "max_drawdown_log": 0.1212,
+      "max_drawdown_pct": 0.1142,
       "avg_turnover_one_way": 0.0,
       "rebalance_frequency": "semiannual"
     },
     "spy": {
       "periods": 7,
-      "sharpe_annualized": 1.176,
-      "cumulative_return": 0.0389,
-      "label": "spy_buy_hold"
+      "mean_monthly_return": 0.015943,
+      "volatility_annualized": 0.1734,
+      "sharpe_annualized": 1.104,
+      "cumulative_return": 0.1091,
+      "max_drawdown_log": 0.062,
+      "max_drawdown_pct": 0.0602,
+      "label": "spy_buy_hold",
+      "rebalance_frequency": "semiannual"
     },
     "ml_best": {
       "periods": 7,
-      "mean_monthly_return": 0.027078,
-      "sharpe_annualized": 0.684,
-      "cumulative_return": 0.1492,
-      "max_drawdown_log": 0.1598,
+      "mean_monthly_return": 0.045113,
+      "volatility_annualized": 0.4864,
+      "sharpe_annualized": 1.113,
+      "cumulative_return": 0.296,
+      "max_drawdown_log": 0.1212,
+      "max_drawdown_pct": 0.1142,
       "avg_turnover_one_way": 0.0,
       "rebalance_frequency": "semiannual"
     },
@@ -393,43 +477,43 @@
   },
   "attribution": [
     {
-      "factor": "owner_cash_irr",
-      "shap": -0.4541,
-      "portfolio_weighted": false
-    },
-    {
       "factor": "moat_quality",
       "shap": 0.4483,
       "portfolio_weighted": false
     },
     {
-      "factor": "factor_3",
-      "shap": 0.235,
-      "portfolio_weighted": true
+      "factor": "owner_cash_irr",
+      "shap": -0.4286,
+      "portfolio_weighted": false
     },
     {
       "factor": "factor_1",
-      "shap": 0.2231,
+      "shap": 0.2257,
       "portfolio_weighted": true
     },
     {
-      "factor": "factor_4",
-      "shap": 0.1087,
+      "factor": "factor_3",
+      "shap": 0.2241,
       "portfolio_weighted": true
     },
     {
       "factor": "factor_2",
-      "shap": 0.073,
+      "shap": 0.0841,
+      "portfolio_weighted": true
+    },
+    {
+      "factor": "factor_4",
+      "shap": 0.072,
       "portfolio_weighted": true
     },
     {
       "factor": "factor_5",
-      "shap": -0.0123,
+      "shap": -0.0215,
       "portfolio_weighted": true
     },
     {
       "factor": "research_staleness",
-      "shap": 0.0027,
+      "shap": 0.0197,
       "portfolio_weighted": false
     },
     {
@@ -448,207 +532,207 @@
     ],
     "by_ticker": {
       "3905.T": [
-        0.3151698825473361,
-        0.1993055957859813,
-        0.02630281821301709,
-        -0.27989460644460507,
-        -0.05992539730137002
+        0.3315549477492754,
+        0.18865834369003234,
+        0.05187476382199171,
+        -0.2858939226802361,
+        -0.04912792118335801
       ],
       "8697.T": [
-        0.0014073946432771843,
-        -0.029128609346810327,
-        0.29023324801994105,
-        0.2628493791146962,
-        0.06720943885008292
+        0.004204577849212122,
+        -0.022029428519865224,
+        0.2994009607633134,
+        0.26314780367518203,
+        0.06238166423414108
       ],
       "AMZN": [
-        0.10984268442432044,
-        0.05009128413749643,
-        0.12179895987871991,
-        0.0484721102496202,
-        -0.09297051033505663
+        0.12729824103059204,
+        0.05623212147328314,
+        0.14052978321768886,
+        0.03631736955058263,
+        -0.08763997185468762
       ],
       "APLD": [
-        0.2793866083007466,
-        0.24115601030737246,
-        -0.004381021474545751,
-        -0.15930318705901614,
-        -0.11901590493034424
+        0.34078586272299255,
+        0.22336024464320625,
+        0.05087201800219852,
+        -0.12084218374639188,
+        -0.1003383844304047
       ],
       "BN": [
-        0.12077779249020332,
-        -0.058313641736121496,
-        0.4242646144338765,
-        0.1988852550459892,
-        -0.00447895385895325
+        0.12687995662138382,
+        -0.05449988658405836,
+        0.43827073438054565,
+        0.20346570151897317,
+        0.0105763579279556
       ],
       "BWEL": [
-        0.32754552094192785,
-        -0.0014360129541504119,
-        -0.13170926304810798,
-        -0.05544169734419581,
-        0.16071294221483376
+        0.22412949556162573,
+        -0.0032259640544747992,
+        -0.29155051926784376,
+        -0.10955243704979395,
+        -0.1393381403857223
       ],
       "CMSG": [
-        -0.10422943880325625,
-        -0.05808288455504644,
-        -0.014196395024936994,
-        -0.01751296777106133,
-        -0.06635057123798398
+        -0.07684173878606199,
+        -0.034132192687374094,
+        -0.015509663946686344,
+        -0.04436627583466096,
+        -0.016574910634001468
       ],
       "CPRT": [
-        0.42482188825100603,
-        -0.054215529564462,
-        0.11889208359011638,
-        -0.6326037078940875,
-        -0.39543008746901964
+        0.43769498527012796,
+        -0.057776108267523316,
+        0.13435126790996246,
+        -0.6362634972727097,
+        -0.385993972454813
       ],
       "CSGP": [
-        0.040151368332795194,
-        0.09568107721074345,
-        0.25131567521669795,
-        0.06770384478937404,
-        0.012430873859892782
+        0.04063777666236433,
+        0.11147491855524969,
+        0.2616709726561224,
+        0.06566866865698263,
+        0.038623595025549434
       ],
       "CSU": [
-        0.10976422345061879,
-        0.09404238153242218,
-        -0.02341405274937275,
-        -0.7111559358296536,
-        -0.22491913366096128
+        0.10692640947349527,
+        0.07514487777852205,
+        -0.01060552194919625,
+        -0.6809461289261486,
+        -0.2170910649663395
       ],
       "DHR": [
-        0.03785681446974563,
-        -0.012015417500344988,
-        0.0006462074888106163,
-        0.0981548934804284,
-        0.04874882787998336
+        0.035020744821930724,
+        -0.003397652300091293,
+        0.005103864532146575,
+        0.10328752165719035,
+        0.05854243545572761
       ],
       "DRR.AX": [
-        -0.044653816270307733,
-        0.07879235989993588,
-        0.11882031636417834,
-        0.03597833299049419,
-        -0.07905625047908321
+        -0.0487191381103945,
+        0.07566749329845668,
+        0.12348357267579356,
+        0.03852499864003421,
+        -0.0724092744972598
       ],
       "FRMO": [
-        -0.12423921443440872,
-        0.1283436330512122,
-        -0.34281785607694937,
-        -0.3271536899334656,
-        0.006920845050042212
+        -0.13223641672992226,
+        0.12285178186453502,
+        -0.3559933208493341,
+        -0.32912292327721926,
+        -0.04332441438658001
       ],
       "GOOGL": [
-        0.8462679388899144,
-        0.11563999855576165,
-        0.34375611054018057,
-        -0.47982402301447913,
-        -0.12192413414864271
+        0.8388015927318315,
+        0.1055386904864109,
+        0.3361445613028056,
+        -0.48795071710001453,
+        -0.17808661580433405
       ],
       "ICE": [
-        0.2784834220337136,
-        0.30321365446662546,
-        0.22637628722853756,
-        0.553720113978398,
-        0.02530132014861102
+        0.3102874360814691,
+        0.29367171339558756,
+        0.23337284142132345,
+        0.5472740565143158,
+        0.029193371215089862
       ],
       "KEWL": [
-        0.4147725872387853,
-        0.04512726078771119,
-        0.15878486630046676,
-        -0.03119903428760403,
-        0.004809361768551481
+        0.38672810259307644,
+        0.04121229564284059,
+        0.16997359111270155,
+        -0.058764464194275806,
+        -0.02849073281297676
       ],
       "LB": [
-        0.0726517563607473,
-        0.110350554846901,
-        -0.10541128375739119,
-        -0.10805379876940117,
-        0.02195314635798436
+        0.07817432416311566,
+        0.10350658839047697,
+        -0.09769065705303215,
+        -0.10494108538157008,
+        0.028311035486029687
       ],
       "LSEG": [
-        -0.06236545601850478,
-        0.012916133041064832,
-        0.015148037558515808,
-        -0.14515235017088834,
-        -0.14655226014131434
+        -0.0483310971411579,
+        0.025015950329125798,
+        0.016300178562462964,
+        -0.14825823140301717,
+        -0.08792157092045134
       ],
       "META": [
-        -0.030665391702669038,
-        0.11014368331227085,
-        -0.02453694367511085,
-        -0.09878972313838086,
-        -0.13672131257570502
+        -0.017318430225891048,
+        0.11045866173914728,
+        -0.02559973126529727,
+        -0.09095860426348307,
+        -0.10252254485402068
       ],
       "MSB": [
-        0.13293360954619304,
-        -0.04829743652246539,
-        -0.0673099792134181,
-        0.11247718729109933,
-        0.1053531052925653
+        0.0532535844962817,
+        -0.039331631183067595,
+        -0.11426625849358418,
+        0.09898776509012963,
+        0.0024115644496090485
       ],
       "OTCM": [
-        -0.15834495761681924,
-        -0.03163480088517709,
-        0.027479821333200122,
-        0.056267003492446864,
-        -0.1183528168318594
+        -0.141935435527645,
+        -0.020396020027621267,
+        0.03189948529549613,
+        0.0469660343380814,
+        -0.10435681663590178
       ],
       "QDEL": [
-        -0.20439632077774345,
-        -0.10503350213125807,
-        0.3425630009648741,
-        -0.016296631388168635,
-        -0.4942263909063862
+        -0.20681676047341482,
+        -0.0954131411795664,
+        0.3791281459850248,
+        -0.034401876915422125,
+        -0.5096756705707867
       ],
       "SJT": [
-        0.23045393191277683,
-        0.011204709953640514,
-        -0.1283775433750011,
-        -0.1970704060725661,
-        -0.04467009301683875
+        0.055384758389939545,
+        -0.026150584832245624,
+        -0.25741101778660785,
+        -0.1606587805150894,
+        -0.1449962417761873
       ],
       "SNOW": [
-        0.06884722622856185,
-        -0.07459919356951109,
-        0.25301093150226095,
-        0.14923348258300373,
-        -0.09171324493541103
+        0.07644248857639362,
+        -0.06920895413831873,
+        0.26303334907927584,
+        0.15409451740060467,
+        -0.09130232206667385
       ],
       "SPGI": [
-        -0.011148971019956417,
-        0.0010363948389758692,
-        0.16544211990296143,
-        0.17624273517154804,
-        -0.007135481191776011
+        -0.001615561830370045,
+        0.012231465197226662,
+        0.1755221207963432,
+        0.17082045460225403,
+        0.01683087546787261
       ],
       "TEQ.ST": [
-        0.006521947669500844,
-        0.47889968395779203,
-        0.0022097687439810824,
-        -1.2257862437785918,
-        -0.4242602047368025
+        0.012642803530638565,
+        0.4591319826494631,
+        0.010838299301381188,
+        -1.1794345468284129,
+        -0.4118855976502934
       ],
       "TPL": [
-        0.058056533699468386,
-        0.24430637040120692,
-        -0.11260809845611994,
-        -0.09943209607365881,
-        0.11747941698485255
+        0.06527231463689932,
+        0.24837325535581406,
+        -0.10103186184080747,
+        -0.09462024944507308,
+        0.13247524287248932
       ],
       "VTRS": [
-        -0.13139497983219442,
-        0.021612942678972995,
-        -0.02969992542986269,
-        -0.10421443380768326,
-        -0.17247054965319256
+        -0.12530593694871234,
+        0.01707380480278567,
+        -0.01567275508182545,
+        -0.08449758257373388,
+        -0.15542784652857727
       ],
       "WBI": [
-        -0.3951291498180043,
-        0.03712201463840907,
-        -0.13829570706923033,
-        0.014918912658754023,
-        0.18265014702657784
+        -0.36713616772499963,
+        0.038097262463545396,
+        -0.13721398685628874,
+        0.021487637461327286,
+        0.19532814661554565
       ]
     }
   },
@@ -691,31 +775,31 @@
       "ticker": "8697.T",
       "severity": "review",
       "reason": "human_review_pending",
-      "weight_pct": 15.0
+      "weight_pct": 11.64
     },
     {
       "ticker": "AMZN",
       "severity": "review",
       "reason": "human_review_pending",
-      "weight_pct": 15.0
+      "weight_pct": 11.64
     },
     {
       "ticker": "BN",
       "severity": "review",
       "reason": "human_review_pending",
-      "weight_pct": 15.0
+      "weight_pct": 11.64
     },
     {
       "ticker": "GOOGL",
       "severity": "review",
       "reason": "human_review_pending",
-      "weight_pct": 14.34
+      "weight_pct": 11.44
     },
     {
       "ticker": "SPGI",
       "severity": "review",
       "reason": "human_review_pending",
-      "weight_pct": 14.34
+      "weight_pct": 11.44
     }
   ],
   "human_review": [
@@ -723,91 +807,1302 @@
       "ticker": "8697.T",
       "severity": "review",
       "reason": "human_review_pending",
-      "weight_pct": 15.0
+      "weight_pct": 11.64
     },
     {
       "ticker": "AMZN",
       "severity": "review",
       "reason": "human_review_pending",
-      "weight_pct": 15.0
+      "weight_pct": 11.64
     },
     {
       "ticker": "BN",
       "severity": "review",
       "reason": "human_review_pending",
-      "weight_pct": 15.0
+      "weight_pct": 11.64
     },
     {
       "ticker": "GOOGL",
       "severity": "review",
       "reason": "human_review_pending",
-      "weight_pct": 14.34
+      "weight_pct": 11.44
     },
     {
       "ticker": "SPGI",
       "severity": "review",
       "reason": "human_review_pending",
-      "weight_pct": 14.34
+      "weight_pct": 11.44
     }
   ],
   "evolution_log": [
     {
       "date": "2026-06-03",
       "event": "rebalance",
-      "policy": "ensemble",
+      "policy": "genetic",
       "turnover_pct": 10.0,
-      "note": "Champion ensemble Sharpe 0.706 regime calm"
+      "note": "Champion genetic Sharpe 1.113 regime calm"
     }
   ],
   "lineage": [
     {
       "event": "rebalance",
-      "policy": "ira_marvin",
+      "policy": "genetic",
       "regime": "calm",
       "turnover_pct": 10.0,
-      "champion_sharpe": -4.632,
+      "champion_sharpe": 1.113,
       "population_size": 8,
-      "ts": "2026-06-02T23:24:27Z"
+      "ts": "2026-06-03T17:58:27Z"
     },
     {
       "event": "rebalance",
-      "policy": "ira_marvin",
+      "policy": "genetic",
       "regime": "calm",
-      "turnover_pct": 10.0,
-      "champion_sharpe": -4.632,
+      "turnover_pct": 9.23,
+      "champion_sharpe": 1.113,
       "population_size": 8,
-      "ts": "2026-06-03T02:38:45Z"
+      "ts": "2026-06-03T17:58:39Z"
     },
     {
       "event": "rebalance",
-      "policy": "ensemble",
+      "policy": "genetic",
       "regime": "calm",
-      "turnover_pct": 10.0,
-      "champion_sharpe": 1.447,
+      "turnover_pct": 6.66,
+      "champion_sharpe": 1.113,
       "population_size": 8,
-      "ts": "2026-06-03T14:46:54Z"
+      "ts": "2026-06-03T17:58:56Z"
     },
     {
       "event": "rebalance",
-      "policy": "ensemble",
+      "policy": "genetic",
       "regime": "calm",
       "turnover_pct": 10.0,
-      "champion_sharpe": 0.706,
+      "champion_sharpe": 1.113,
       "population_size": 8,
-      "ts": "2026-06-03T15:53:30Z"
+      "ts": "2026-06-03T17:59:40Z"
     },
     {
       "event": "rebalance",
-      "policy": "ensemble",
+      "policy": "genetic",
       "regime": "calm",
       "turnover_pct": 10.0,
-      "champion_sharpe": 0.706,
+      "champion_sharpe": 1.113,
       "population_size": 8,
-      "ts": "2026-06-03T15:53:43Z"
+      "ts": "2026-06-03T18:01:11Z"
     }
   ],
   "source_alignment_version": "1Q26-ingest",
   "disclaimer": "IRA paper portfolio / research tool. Not tax or investment advice. Inspired by Darwin AI Ventures public positioning and 1Q26 letter themes; does not replicate proprietary models.",
+  "visualization": {
+    "calendar_start": "2025-11-01",
+    "calendar_end": "2026-06-01",
+    "rebalance_frequency": "semiannual",
+    "methods": {
+      "ira_marvin": {
+        "stats": {
+          "periods": 7,
+          "mean_monthly_return": -0.028383,
+          "volatility_annualized": 0.1029,
+          "sharpe_annualized": -3.31,
+          "cumulative_return": -0.1848,
+          "max_drawdown_log": 0.2159,
+          "max_drawdown_pct": 0.1941,
+          "avg_turnover_one_way": 0.0,
+          "rebalance_frequency": "semiannual"
+        },
+        "dates": [
+          "2025-11-01",
+          "2025-12-01",
+          "2026-01-01",
+          "2026-02-01",
+          "2026-03-01",
+          "2026-04-01",
+          "2026-05-01"
+        ],
+        "equity_index": [
+          0.991953,
+          0.986839,
+          0.948199,
+          0.904079,
+          0.835534,
+          0.805851,
+          0.815159
+        ],
+        "holdings_snapshots": [
+          {
+            "date": "2025-11-01",
+            "weights": [
+              {
+                "ticker": "FRMO",
+                "weight_pct": 15.0
+              },
+              {
+                "ticker": "CSU",
+                "weight_pct": 15.0
+              },
+              {
+                "ticker": "QDEL",
+                "weight_pct": 13.25
+              },
+              {
+                "ticker": "ICE",
+                "weight_pct": 11.71
+              },
+              {
+                "ticker": "TEQ.ST",
+                "weight_pct": 9.74
+              },
+              {
+                "ticker": "CPRT",
+                "weight_pct": 9.68
+              },
+              {
+                "ticker": "BN",
+                "weight_pct": 9.4
+              },
+              {
+                "ticker": "DHR",
+                "weight_pct": 8.11
+              },
+              {
+                "ticker": "SPGI",
+                "weight_pct": 8.11
+              }
+            ]
+          },
+          {
+            "date": "2025-12-01",
+            "weights": [
+              {
+                "ticker": "FRMO",
+                "weight_pct": 15.0
+              },
+              {
+                "ticker": "CSU",
+                "weight_pct": 15.0
+              },
+              {
+                "ticker": "QDEL",
+                "weight_pct": 13.25
+              },
+              {
+                "ticker": "ICE",
+                "weight_pct": 11.71
+              },
+              {
+                "ticker": "TEQ.ST",
+                "weight_pct": 9.74
+              },
+              {
+                "ticker": "CPRT",
+                "weight_pct": 9.68
+              },
+              {
+                "ticker": "BN",
+                "weight_pct": 9.4
+              },
+              {
+                "ticker": "DHR",
+                "weight_pct": 8.11
+              },
+              {
+                "ticker": "SPGI",
+                "weight_pct": 8.11
+              }
+            ]
+          }
+        ]
+      },
+      "equal_weight": {
+        "stats": {
+          "periods": 7,
+          "mean_monthly_return": 0.027078,
+          "volatility_annualized": 0.4748,
+          "sharpe_annualized": 0.684,
+          "cumulative_return": 0.1492,
+          "max_drawdown_log": 0.1598,
+          "max_drawdown_pct": 0.1477,
+          "avg_turnover_one_way": 0.0,
+          "rebalance_frequency": "semiannual"
+        },
+        "dates": [
+          "2025-11-01",
+          "2025-12-01",
+          "2026-01-01",
+          "2026-02-01",
+          "2026-03-01",
+          "2026-04-01",
+          "2026-05-01"
+        ],
+        "equity_index": [
+          0.949127,
+          0.935615,
+          0.96726,
+          0.869122,
+          0.852325,
+          1.125624,
+          1.149228
+        ],
+        "holdings_snapshots": [
+          {
+            "date": "2025-11-01",
+            "weights": [
+              {
+                "ticker": "3905.T",
+                "weight_pct": 8.33
+              },
+              {
+                "ticker": "8697.T",
+                "weight_pct": 8.33
+              },
+              {
+                "ticker": "AMZN",
+                "weight_pct": 8.33
+              },
+              {
+                "ticker": "APLD",
+                "weight_pct": 8.33
+              },
+              {
+                "ticker": "BN",
+                "weight_pct": 8.33
+              },
+              {
+                "ticker": "BWEL",
+                "weight_pct": 8.33
+              },
+              {
+                "ticker": "CMSG",
+                "weight_pct": 8.33
+              },
+              {
+                "ticker": "CPRT",
+                "weight_pct": 8.33
+              },
+              {
+                "ticker": "CSGP",
+                "weight_pct": 8.33
+              },
+              {
+                "ticker": "CSU",
+                "weight_pct": 8.33
+              },
+              {
+                "ticker": "DHR",
+                "weight_pct": 8.33
+              },
+              {
+                "ticker": "DRR.AX",
+                "weight_pct": 8.33
+              }
+            ]
+          },
+          {
+            "date": "2025-12-01",
+            "weights": [
+              {
+                "ticker": "3905.T",
+                "weight_pct": 8.33
+              },
+              {
+                "ticker": "8697.T",
+                "weight_pct": 8.33
+              },
+              {
+                "ticker": "AMZN",
+                "weight_pct": 8.33
+              },
+              {
+                "ticker": "APLD",
+                "weight_pct": 8.33
+              },
+              {
+                "ticker": "BN",
+                "weight_pct": 8.33
+              },
+              {
+                "ticker": "BWEL",
+                "weight_pct": 8.33
+              },
+              {
+                "ticker": "CMSG",
+                "weight_pct": 8.33
+              },
+              {
+                "ticker": "CPRT",
+                "weight_pct": 8.33
+              },
+              {
+                "ticker": "CSGP",
+                "weight_pct": 8.33
+              },
+              {
+                "ticker": "CSU",
+                "weight_pct": 8.33
+              },
+              {
+                "ticker": "DHR",
+                "weight_pct": 8.33
+              },
+              {
+                "ticker": "DRR.AX",
+                "weight_pct": 8.33
+              }
+            ]
+          }
+        ]
+      },
+      "irr_ranked": {
+        "stats": {
+          "periods": 7,
+          "mean_monthly_return": -0.008231,
+          "volatility_annualized": 0.0977,
+          "sharpe_annualized": -1.011,
+          "cumulative_return": -0.0585,
+          "max_drawdown_log": 0.1035,
+          "max_drawdown_pct": 0.0983,
+          "avg_turnover_one_way": 0.0,
+          "rebalance_frequency": "semiannual"
+        },
+        "dates": [
+          "2025-11-01",
+          "2025-12-01",
+          "2026-01-01",
+          "2026-02-01",
+          "2026-03-01",
+          "2026-04-01",
+          "2026-05-01"
+        ],
+        "equity_index": [
+          0.98166,
+          0.974188,
+          0.969036,
+          0.957633,
+          0.901672,
+          0.910151,
+          0.941482
+        ],
+        "holdings_snapshots": [
+          {
+            "date": "2025-11-01",
+            "weights": [
+              {
+                "ticker": "FRMO",
+                "weight_pct": 13.44
+              },
+              {
+                "ticker": "QDEL",
+                "weight_pct": 10.84
+              },
+              {
+                "ticker": "CSU",
+                "weight_pct": 10.74
+              },
+              {
+                "ticker": "TEQ.ST",
+                "weight_pct": 8.84
+              },
+              {
+                "ticker": "ICE",
+                "weight_pct": 8.59
+              },
+              {
+                "ticker": "LSEG",
+                "weight_pct": 7.34
+              },
+              {
+                "ticker": "BN",
+                "weight_pct": 7.3
+              },
+              {
+                "ticker": "VTRS",
+                "weight_pct": 7.25
+              },
+              {
+                "ticker": "WBI",
+                "weight_pct": 7.07
+              },
+              {
+                "ticker": "DHR",
+                "weight_pct": 6.26
+              },
+              {
+                "ticker": "SPGI",
+                "weight_pct": 6.26
+              },
+              {
+                "ticker": "APLD",
+                "weight_pct": 6.09
+              }
+            ]
+          },
+          {
+            "date": "2025-12-01",
+            "weights": [
+              {
+                "ticker": "FRMO",
+                "weight_pct": 13.44
+              },
+              {
+                "ticker": "QDEL",
+                "weight_pct": 10.84
+              },
+              {
+                "ticker": "CSU",
+                "weight_pct": 10.74
+              },
+              {
+                "ticker": "TEQ.ST",
+                "weight_pct": 8.84
+              },
+              {
+                "ticker": "ICE",
+                "weight_pct": 8.59
+              },
+              {
+                "ticker": "LSEG",
+                "weight_pct": 7.34
+              },
+              {
+                "ticker": "BN",
+                "weight_pct": 7.3
+              },
+              {
+                "ticker": "VTRS",
+                "weight_pct": 7.25
+              },
+              {
+                "ticker": "WBI",
+                "weight_pct": 7.07
+              },
+              {
+                "ticker": "DHR",
+                "weight_pct": 6.26
+              },
+              {
+                "ticker": "SPGI",
+                "weight_pct": 6.26
+              },
+              {
+                "ticker": "APLD",
+                "weight_pct": 6.09
+              }
+            ]
+          }
+        ]
+      },
+      "risk_parity_vol": {
+        "stats": {
+          "periods": 7,
+          "mean_monthly_return": -0.019287,
+          "volatility_annualized": 0.0537,
+          "sharpe_annualized": -4.307,
+          "cumulative_return": -0.1281,
+          "max_drawdown_log": 0.1412,
+          "max_drawdown_pct": 0.1317,
+          "avg_turnover_one_way": 0.0,
+          "rebalance_frequency": "semiannual"
+        },
+        "dates": [
+          "2025-11-01",
+          "2025-12-01",
+          "2026-01-01",
+          "2026-02-01",
+          "2026-03-01",
+          "2026-04-01",
+          "2026-05-01"
+        ],
+        "equity_index": [
+          0.983924,
+          0.969796,
+          0.945454,
+          0.930805,
+          0.886302,
+          0.868349,
+          0.8719
+        ],
+        "holdings_snapshots": [
+          {
+            "date": "2025-11-01",
+            "weights": [
+              {
+                "ticker": "FRMO",
+                "weight_pct": 12.57
+              },
+              {
+                "ticker": "CSU",
+                "weight_pct": 10.54
+              },
+              {
+                "ticker": "QDEL",
+                "weight_pct": 8.98
+              },
+              {
+                "ticker": "TEQ.ST",
+                "weight_pct": 8.58
+              },
+              {
+                "ticker": "ICE",
+                "weight_pct": 8.28
+              },
+              {
+                "ticker": "DHR",
+                "weight_pct": 7.8
+              },
+              {
+                "ticker": "BN",
+                "weight_pct": 7.75
+              },
+              {
+                "ticker": "WBI",
+                "weight_pct": 7.3
+              },
+              {
+                "ticker": "OTCM",
+                "weight_pct": 7.24
+              },
+              {
+                "ticker": "SPGI",
+                "weight_pct": 7.04
+              },
+              {
+                "ticker": "LSEG",
+                "weight_pct": 6.96
+              },
+              {
+                "ticker": "CPRT",
+                "weight_pct": 6.95
+              }
+            ]
+          },
+          {
+            "date": "2025-12-01",
+            "weights": [
+              {
+                "ticker": "FRMO",
+                "weight_pct": 12.57
+              },
+              {
+                "ticker": "CSU",
+                "weight_pct": 10.54
+              },
+              {
+                "ticker": "QDEL",
+                "weight_pct": 8.98
+              },
+              {
+                "ticker": "TEQ.ST",
+                "weight_pct": 8.58
+              },
+              {
+                "ticker": "ICE",
+                "weight_pct": 8.28
+              },
+              {
+                "ticker": "DHR",
+                "weight_pct": 7.8
+              },
+              {
+                "ticker": "BN",
+                "weight_pct": 7.75
+              },
+              {
+                "ticker": "WBI",
+                "weight_pct": 7.3
+              },
+              {
+                "ticker": "OTCM",
+                "weight_pct": 7.24
+              },
+              {
+                "ticker": "SPGI",
+                "weight_pct": 7.04
+              },
+              {
+                "ticker": "LSEG",
+                "weight_pct": 6.96
+              },
+              {
+                "ticker": "CPRT",
+                "weight_pct": 6.95
+              }
+            ]
+          }
+        ]
+      },
+      "genetic": {
+        "stats": {
+          "periods": 7,
+          "mean_monthly_return": 0.045113,
+          "volatility_annualized": 0.4864,
+          "sharpe_annualized": 1.113,
+          "cumulative_return": 0.296,
+          "max_drawdown_log": 0.1212,
+          "max_drawdown_pct": 0.1142,
+          "avg_turnover_one_way": 0.0,
+          "rebalance_frequency": "semiannual"
+        },
+        "dates": [
+          "2025-11-01",
+          "2025-12-01",
+          "2026-01-01",
+          "2026-02-01",
+          "2026-03-01",
+          "2026-04-01",
+          "2026-05-01"
+        ],
+        "equity_index": [
+          0.960877,
+          0.942619,
+          1.041748,
+          0.955917,
+          0.922801,
+          1.226592,
+          1.295994
+        ],
+        "holdings_snapshots": [
+          {
+            "date": "2025-11-01",
+            "weights": [
+              {
+                "ticker": "ICE",
+                "weight_pct": 10.02
+              },
+              {
+                "ticker": "BN",
+                "weight_pct": 8.68
+              },
+              {
+                "ticker": "GOOGL",
+                "weight_pct": 8.48
+              },
+              {
+                "ticker": "8697.T",
+                "weight_pct": 8.47
+              },
+              {
+                "ticker": "CSGP",
+                "weight_pct": 8.31
+              },
+              {
+                "ticker": "KEWL",
+                "weight_pct": 8.3
+              },
+              {
+                "ticker": "APLD",
+                "weight_pct": 8.1
+              },
+              {
+                "ticker": "SPGI",
+                "weight_pct": 8.06
+              },
+              {
+                "ticker": "SNOW",
+                "weight_pct": 8.0
+              },
+              {
+                "ticker": "AMZN",
+                "weight_pct": 7.9
+              },
+              {
+                "ticker": "TPL",
+                "weight_pct": 7.86
+              },
+              {
+                "ticker": "3905.T",
+                "weight_pct": 7.84
+              }
+            ]
+          },
+          {
+            "date": "2025-12-01",
+            "weights": [
+              {
+                "ticker": "ICE",
+                "weight_pct": 10.02
+              },
+              {
+                "ticker": "BN",
+                "weight_pct": 8.68
+              },
+              {
+                "ticker": "GOOGL",
+                "weight_pct": 8.48
+              },
+              {
+                "ticker": "8697.T",
+                "weight_pct": 8.47
+              },
+              {
+                "ticker": "CSGP",
+                "weight_pct": 8.31
+              },
+              {
+                "ticker": "KEWL",
+                "weight_pct": 8.3
+              },
+              {
+                "ticker": "APLD",
+                "weight_pct": 8.1
+              },
+              {
+                "ticker": "SPGI",
+                "weight_pct": 8.06
+              },
+              {
+                "ticker": "SNOW",
+                "weight_pct": 8.0
+              },
+              {
+                "ticker": "AMZN",
+                "weight_pct": 7.9
+              },
+              {
+                "ticker": "TPL",
+                "weight_pct": 7.86
+              },
+              {
+                "ticker": "3905.T",
+                "weight_pct": 7.84
+              }
+            ]
+          }
+        ]
+      },
+      "ppo": {
+        "stats": {
+          "periods": 7,
+          "mean_monthly_return": 0.028011,
+          "volatility_annualized": 0.6015,
+          "sharpe_annualized": 0.559,
+          "cumulative_return": 0.1277,
+          "max_drawdown_log": 0.1536,
+          "max_drawdown_pct": 0.1424,
+          "avg_turnover_one_way": 0.0,
+          "rebalance_frequency": "semiannual"
+        },
+        "dates": [
+          "2025-11-01",
+          "2025-12-01",
+          "2026-01-01",
+          "2026-02-01",
+          "2026-03-01",
+          "2026-04-01",
+          "2026-05-01"
+        ],
+        "equity_index": [
+          0.971711,
+          0.965004,
+          0.982171,
+          0.880622,
+          0.85758,
+          1.210304,
+          1.12768
+        ],
+        "holdings_snapshots": [
+          {
+            "date": "2025-11-01",
+            "weights": [
+              {
+                "ticker": "FRMO",
+                "weight_pct": 13.93
+              },
+              {
+                "ticker": "CPRT",
+                "weight_pct": 13.89
+              },
+              {
+                "ticker": "3905.T",
+                "weight_pct": 13.83
+              },
+              {
+                "ticker": "ICE",
+                "weight_pct": 13.83
+              },
+              {
+                "ticker": "CSGP",
+                "weight_pct": 13.82
+              },
+              {
+                "ticker": "DRR.AX",
+                "weight_pct": 13.82
+              },
+              {
+                "ticker": "DHR",
+                "weight_pct": 13.81
+              },
+              {
+                "ticker": "KEWL",
+                "weight_pct": 3.07
+              }
+            ]
+          },
+          {
+            "date": "2025-12-01",
+            "weights": [
+              {
+                "ticker": "FRMO",
+                "weight_pct": 13.93
+              },
+              {
+                "ticker": "CPRT",
+                "weight_pct": 13.89
+              },
+              {
+                "ticker": "3905.T",
+                "weight_pct": 13.83
+              },
+              {
+                "ticker": "ICE",
+                "weight_pct": 13.83
+              },
+              {
+                "ticker": "CSGP",
+                "weight_pct": 13.82
+              },
+              {
+                "ticker": "DRR.AX",
+                "weight_pct": 13.82
+              },
+              {
+                "ticker": "DHR",
+                "weight_pct": 13.81
+              },
+              {
+                "ticker": "KEWL",
+                "weight_pct": 3.07
+              }
+            ]
+          }
+        ]
+      },
+      "ensemble": {
+        "stats": {
+          "periods": 7,
+          "mean_monthly_return": 0.044335,
+          "volatility_annualized": 0.6618,
+          "sharpe_annualized": 0.804,
+          "cumulative_return": 0.2417,
+          "max_drawdown_log": 0.1695,
+          "max_drawdown_pct": 0.1559,
+          "avg_turnover_one_way": 0.0,
+          "rebalance_frequency": "semiannual"
+        },
+        "dates": [
+          "2025-11-01",
+          "2025-12-01",
+          "2026-01-01",
+          "2026-02-01",
+          "2026-03-01",
+          "2026-04-01",
+          "2026-05-01"
+        ],
+        "equity_index": [
+          0.961135,
+          0.948877,
+          1.02865,
+          0.890899,
+          0.868241,
+          1.261503,
+          1.241696
+        ],
+        "holdings_snapshots": [
+          {
+            "date": "2025-11-01",
+            "weights": [
+              {
+                "ticker": "CSGP",
+                "weight_pct": 12.21
+              },
+              {
+                "ticker": "3905.T",
+                "weight_pct": 11.91
+              },
+              {
+                "ticker": "ICE",
+                "weight_pct": 10.08
+              },
+              {
+                "ticker": "BN",
+                "weight_pct": 8.59
+              },
+              {
+                "ticker": "8697.T",
+                "weight_pct": 8.46
+              },
+              {
+                "ticker": "APLD",
+                "weight_pct": 8.23
+              },
+              {
+                "ticker": "AMZN",
+                "weight_pct": 8.1
+              },
+              {
+                "ticker": "CPRT",
+                "weight_pct": 7.05
+              },
+              {
+                "ticker": "DRR.AX",
+                "weight_pct": 7.03
+              },
+              {
+                "ticker": "DHR",
+                "weight_pct": 7.03
+              },
+              {
+                "ticker": "KEWL",
+                "weight_pct": 6.02
+              },
+              {
+                "ticker": "GOOGL",
+                "weight_pct": 5.28
+              }
+            ]
+          },
+          {
+            "date": "2025-12-01",
+            "weights": [
+              {
+                "ticker": "CSGP",
+                "weight_pct": 12.21
+              },
+              {
+                "ticker": "3905.T",
+                "weight_pct": 11.91
+              },
+              {
+                "ticker": "ICE",
+                "weight_pct": 10.08
+              },
+              {
+                "ticker": "BN",
+                "weight_pct": 8.59
+              },
+              {
+                "ticker": "8697.T",
+                "weight_pct": 8.46
+              },
+              {
+                "ticker": "APLD",
+                "weight_pct": 8.23
+              },
+              {
+                "ticker": "AMZN",
+                "weight_pct": 8.1
+              },
+              {
+                "ticker": "CPRT",
+                "weight_pct": 7.05
+              },
+              {
+                "ticker": "DRR.AX",
+                "weight_pct": 7.03
+              },
+              {
+                "ticker": "DHR",
+                "weight_pct": 7.03
+              },
+              {
+                "ticker": "KEWL",
+                "weight_pct": 6.02
+              },
+              {
+                "ticker": "GOOGL",
+                "weight_pct": 5.28
+              }
+            ]
+          }
+        ]
+      },
+      "champion": {
+        "stats": {
+          "periods": 7,
+          "mean_monthly_return": 0.033303,
+          "volatility_annualized": 0.3943,
+          "sharpe_annualized": 1.014,
+          "cumulative_return": 0.2155,
+          "max_drawdown_log": 0.1275,
+          "max_drawdown_pct": 0.1197,
+          "avg_turnover_one_way": 0.0,
+          "rebalance_frequency": "semiannual"
+        },
+        "dates": [
+          "2025-11-01",
+          "2025-12-01",
+          "2026-01-01",
+          "2026-02-01",
+          "2026-03-01",
+          "2026-04-01",
+          "2026-05-01"
+        ],
+        "equity_index": [
+          0.984375,
+          0.97297,
+          1.063813,
+          0.968554,
+          0.93646,
+          1.177497,
+          1.215479
+        ],
+        "holdings_snapshots": [
+          {
+            "date": "2025-11-01",
+            "weights": [
+              {
+                "ticker": "ICE",
+                "weight_pct": 12.2
+              },
+              {
+                "ticker": "8697.T",
+                "weight_pct": 11.64
+              },
+              {
+                "ticker": "AMZN",
+                "weight_pct": 11.64
+              },
+              {
+                "ticker": "BN",
+                "weight_pct": 11.64
+              },
+              {
+                "ticker": "GOOGL",
+                "weight_pct": 11.44
+              },
+              {
+                "ticker": "SPGI",
+                "weight_pct": 11.44
+              },
+              {
+                "ticker": "3905.T",
+                "weight_pct": 5.0
+              },
+              {
+                "ticker": "APLD",
+                "weight_pct": 5.0
+              },
+              {
+                "ticker": "CSGP",
+                "weight_pct": 5.0
+              },
+              {
+                "ticker": "KEWL",
+                "weight_pct": 5.0
+              },
+              {
+                "ticker": "SNOW",
+                "weight_pct": 5.0
+              },
+              {
+                "ticker": "TPL",
+                "weight_pct": 5.0
+              }
+            ]
+          },
+          {
+            "date": "2025-12-01",
+            "weights": [
+              {
+                "ticker": "ICE",
+                "weight_pct": 12.2
+              },
+              {
+                "ticker": "8697.T",
+                "weight_pct": 11.64
+              },
+              {
+                "ticker": "AMZN",
+                "weight_pct": 11.64
+              },
+              {
+                "ticker": "BN",
+                "weight_pct": 11.64
+              },
+              {
+                "ticker": "GOOGL",
+                "weight_pct": 11.44
+              },
+              {
+                "ticker": "SPGI",
+                "weight_pct": 11.44
+              },
+              {
+                "ticker": "3905.T",
+                "weight_pct": 5.0
+              },
+              {
+                "ticker": "APLD",
+                "weight_pct": 5.0
+              },
+              {
+                "ticker": "CSGP",
+                "weight_pct": 5.0
+              },
+              {
+                "ticker": "KEWL",
+                "weight_pct": 5.0
+              },
+              {
+                "ticker": "SNOW",
+                "weight_pct": 5.0
+              },
+              {
+                "ticker": "TPL",
+                "weight_pct": 5.0
+              }
+            ]
+          }
+        ]
+      },
+      "spy": {
+        "stats": {
+          "periods": 7,
+          "mean_monthly_return": 0.015943,
+          "volatility_annualized": 0.1734,
+          "sharpe_annualized": 1.104,
+          "cumulative_return": 0.1091,
+          "max_drawdown_log": 0.062,
+          "max_drawdown_pct": 0.0602,
+          "rebalance_frequency": "semiannual",
+          "label": "spy_buy_hold"
+        },
+        "dates": [
+          "2025-11-01",
+          "2025-12-01",
+          "2026-01-01",
+          "2026-02-01",
+          "2026-03-01",
+          "2026-04-01",
+          "2026-05-01"
+        ],
+        "equity_index": [
+          1.00195,
+          0.999795,
+          1.014529,
+          1.005762,
+          0.953494,
+          1.053661,
+          1.109111
+        ],
+        "holdings_snapshots": [
+          {
+            "date": "2025-11-01",
+            "weights": [
+              {
+                "ticker": "SPY",
+                "weight_pct": 100.0
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "portfolio_explanation": {
+    "summary": "We hold 12 names under **genetic** in a **calm** regime. Genetic search picked a genome that blends policy type and scoring knobs on in-sample history. Largest positions: ICE 12.2%, 8697.T 11.64%, AMZN 11.64%.",
+    "mechanism": "Genetic search picked a genome that blends policy type and scoring knobs on in-sample history.",
+    "champion_selection": "exploration",
+    "regime": "calm",
+    "top_holdings": [
+      {
+        "ticker": "ICE",
+        "weight_pct": 12.2,
+        "stance": "hold",
+        "irr_base_pct": 13.79,
+        "archetype": "croupier",
+        "moat": "stable",
+        "dhando": "partial"
+      },
+      {
+        "ticker": "8697.T",
+        "weight_pct": 11.64,
+        "stance": "hold",
+        "irr_base_pct": 5.26,
+        "archetype": "croupier",
+        "moat": "stable",
+        "dhando": "partial"
+      },
+      {
+        "ticker": "AMZN",
+        "weight_pct": 11.64,
+        "stance": "hold",
+        "irr_base_pct": 4.7,
+        "archetype": "compounder",
+        "moat": "stable",
+        "dhando": "partial"
+      },
+      {
+        "ticker": "BN",
+        "weight_pct": 11.64,
+        "stance": "hold",
+        "irr_base_pct": 13.15,
+        "archetype": "platform",
+        "moat": "stable",
+        "dhando": "partial"
+      },
+      {
+        "ticker": "GOOGL",
+        "weight_pct": 11.44,
+        "stance": "hold",
+        "irr_base_pct": 1.5,
+        "archetype": "compounder",
+        "moat": "widening",
+        "dhando": "partial"
+      }
+    ],
+    "excluded_count": 17,
+    "excluded_sample": [
+      "BWEL",
+      "CMSG",
+      "CPRT",
+      "CSU",
+      "DHR",
+      "DRR.AX",
+      "FRMO",
+      "LB"
+    ],
+    "drivers": [
+      {
+        "factor": "Marvin IRR (base)",
+        "role": "Primary rank input for IRA / IRR policies"
+      },
+      {
+        "factor": "Moat / dhando",
+        "role": "Score multipliers in policy genomes"
+      },
+      {
+        "factor": "Falsifiers",
+        "role": "Book total 0; per-name penalties"
+      },
+      {
+        "factor": "Staleness",
+        "role": "0 names with deep dive older than review threshold"
+      },
+      {
+        "factor": "Mandate caps",
+        "role": "Max weight, min names, turnover, stance caps"
+      },
+      {
+        "factor": "Macro regime",
+        "role": "Label calm adjusts constraint overrides"
+      }
+    ],
+    "popper_falsifiers": [
+      "If OOS Sharpe for ML policies falls below gate, champion reverts to IRA Marvin.",
+      "If turnover budget is breached, next rebalance scales trades toward prior weights.",
+      "If regime shifts to stressed, turnover multiplier and caps tighten automatically."
+    ],
+    "flags": [
+      "Exploration mode: champion may not be production-safe ML.",
+      "Turnover cap applied: one-way trade limited to about 10.0%.",
+      "Names below min IRR gate (6.0%) still held at small weights: 8697.T, AMZN, GOOGL, KEWL, TPL"
+    ],
+    "deutsch_checks": {
+      "hard_to_vary": false,
+      "falsifiable": true,
+      "not_instrumentalist": true,
+      "reach": "Weights follow published mandate rules and Marvin research inputs, not a fitted price target."
+    }
+  },
   "pit": {
     "audit_pass": true,
     "leakage_count": 0,
@@ -817,7 +2112,7 @@
     "synthetic_count": 0
   },
   "pit_status": {
-    "generated_at": "2026-06-03T15:53:43Z",
+    "generated_at": "2026-06-03T18:01:11Z",
     "audit_pass": true,
     "leakage_count": 0,
     "synthetic_tickers": [
@@ -827,12 +2122,12 @@
     "oos_sharpe_ira_marvin": 0.0,
     "oos_periods": 6,
     "ml_oos_eligible": false,
-    "production_policy": "ensemble",
-    "production_sharpe_insample": 0.66,
+    "production_policy": "genetic",
+    "production_sharpe_insample": 1.113,
     "pit_error": null
   },
   "observatory": {
-    "generated_at": "2026-06-03T15:53:43Z",
+    "generated_at": "2026-06-03T18:01:11Z",
     "regime": {
       "label": "calm",
       "research": "calm",
@@ -11809,10 +13104,10 @@
   },
   "regime_brief": "_system/reviews/pending/darwin_regime_brief_2026-06-03.md",
   "bias_scan": {
-    "generated_at": "2026-06-03T15:53:43Z",
-    "flag_count": 7,
+    "generated_at": "2026-06-03T18:01:11Z",
+    "flag_count": 5,
     "by_severity": {
-      "review": 7,
+      "review": 5,
       "warn": 0,
       "info": 0
     },
@@ -11821,43 +13116,31 @@
         "ticker": "8697.T",
         "bias": "human_review_with_weight",
         "severity": "review",
-        "weight_pct": 15.0
+        "weight_pct": 11.64
       },
       {
         "ticker": "AMZN",
         "bias": "human_review_with_weight",
         "severity": "review",
-        "weight_pct": 15.0
+        "weight_pct": 11.64
       },
       {
         "ticker": "BN",
         "bias": "human_review_with_weight",
         "severity": "review",
-        "weight_pct": 15.0
+        "weight_pct": 11.64
       },
       {
         "ticker": "GOOGL",
         "bias": "human_review_with_weight",
         "severity": "review",
-        "weight_pct": 14.34
-      },
-      {
-        "ticker": "KEWL",
-        "bias": "human_review_with_weight",
-        "severity": "review",
-        "weight_pct": 5.66
+        "weight_pct": 11.44
       },
       {
         "ticker": "SPGI",
         "bias": "human_review_with_weight",
         "severity": "review",
-        "weight_pct": 14.34
-      },
-      {
-        "ticker": "TPL",
-        "bias": "human_review_with_weight",
-        "severity": "review",
-        "weight_pct": 5.66
+        "weight_pct": 11.44
       }
     ],
     "pass": false
@@ -11906,31 +13189,31 @@
     "champion_mode": "best_insample"
   },
   "external_sync": {
-    "generated_at": "2026-06-03T15:53:36Z",
+    "generated_at": "2026-06-03T18:01:10Z",
     "returns_written": [
       {
         "ticker": "SPY",
         "path": "_system/reference/market-data/returns/SPY.csv",
-        "months": 211,
-        "source": "etf_proxy_SPXL"
+        "months": 61,
+        "source": "yahoo"
       },
       {
         "ticker": "QQQ",
         "path": "_system/reference/market-data/returns/QQQ.csv",
-        "months": 196,
-        "source": "etf_proxy_TQQQ"
+        "months": 61,
+        "source": "yahoo"
       },
       {
         "ticker": "IWM",
         "path": "_system/reference/market-data/returns/IWM.csv",
-        "months": 211,
-        "source": "etf_proxy_TZA"
+        "months": 61,
+        "source": "yahoo"
       },
       {
         "ticker": "TLT",
         "path": "_system/reference/market-data/returns/TLT.csv",
-        "months": 217,
-        "source": "etf_proxy_TBT"
+        "months": 61,
+        "source": "yahoo"
       },
       {
         "ticker": "GLD",
@@ -11951,32 +13234,9 @@
         "source": "yahoo"
       }
     ],
-    "errors": [],
-    "risk_dashboard": {
-      "run_date": "2026-06-02",
-      "nav_usd": 800000.0,
-      "gross_exposure_pct_nav": 4.532908458844346,
-      "net_exposure_pct_nav": -0.0015921669320070396,
-      "pnl_today_pct_nav": 0.12263721102320008,
-      "breach_count": 1,
-      "breaches": [
-        {
-          "metric": "gross_exposure_pct_nav",
-          "label": "Gross exposure % NAV",
-          "value": 4.532908458844346,
-          "status": "hard",
-          "limit": {
-            "warn": 4.0,
-            "hard": 4.5
-          },
-          "source": "Risk limits \u2014 book gross cap",
-          "action": "Reduce gross or explicitly approve temporary breach before adding risk.",
-          "category": "book_exposure",
-          "category_label": "Book exposure & leverage"
-        }
-      ],
-      "scenario_horizons": null,
-      "vix_shocks_pts": null
-    }
+    "errors": [
+      "etf_metrics_daily.csv not found (yahoo-only path)",
+      "ls-algo risk_dashboard latest.json not found"
+    ]
   }
 }
