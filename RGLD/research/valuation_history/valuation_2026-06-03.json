@@ -12,8 +12,8 @@
     "moi_bucket": "pending"
   },
   "inputs": {
-    "price": 216.755,
-    "price_source": "Stooq RGLD.US close 2026-06-03",
+    "price": 0,
+    "price_source": "Mechanical refresh via fetch_market_inputs.py",
     "fcf_per_share": 9.0,
     "fcf_source": "FY2025 cash from operations $704.8M minus immaterial capital spending, divided by ~78M diluted shares (pre-full Sandstorm weighting); Q1 2026 run-rate ~$8.3/sh on ~85M shares",
     "shares_millions": 84.9,
@@ -49,8 +49,8 @@
     }
   },
   "stance_proposal": {
-    "suggested": "watch",
-    "irr_band": "<15%",
+    "suggested": "accumulate",
+    "irr_band": ">20%",
     "gates": {
       "moat_ok": true,
       "dhando_ok": true
@@ -126,57 +126,43 @@
   "lawrence_horizon_years": 7,
   "results_lawrence_legacy": {
     "bear": {
-      "return_pct": 0.1
+      "return_pct": 360668932.7
     },
     "base": {
-      "return_pct": 6.7
+      "return_pct": 562735482.1
     },
     "bull": {
-      "return_pct": 12.7
+      "return_pct": 451020292.2
     }
   },
   "results": {
     "bear": {
-      "return_pct": 0.1
+      "return_pct": 360668932.7
     },
     "base": {
-      "return_pct": 6.7
+      "return_pct": 562735482.1
     },
     "bull": {
-      "return_pct": 12.7
+      "return_pct": 451020292.2
     }
   },
   "implied_return": {
-    "base_pct": 8.06,
+    "base_pct": 424446362.74,
     "label": "7yr IRR (total synthesis)",
-    "display": "8.06% (total synthesis)",
-    "lawrence_stance_gate_pct": 6.7,
-    "falsifier_adjusted_pct": 6.7,
-    "synthesis_pct": 8.06
+    "display": "424446362.74% (total synthesis)",
+    "lawrence_stance_gate_pct": 562735482.1,
+    "falsifier_adjusted_pct": 562735482.1,
+    "synthesis_pct": 424446362.74
   },
   "overlay_results": [],
   "synthesis": {
     "status": "complete",
     "paths": [
       {
-        "id": "theory_implied",
-        "label": "Segment-derived growth (pre-falsifier)",
-        "source": "segment_build weighted blend",
-        "return_pct": 6.7,
-        "weight": 0.08,
-        "type": "numeric",
-        "epistemic_tier": "B (pre-falsifier derivation)",
-        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
-        "weight_falsifiers": [
-          "Included at full weight alongside falsifier-adjusted without divergence note"
-        ],
-        "hard_to_vary": "partial"
-      },
-      {
         "id": "scenario_bear",
         "label": "Bear scenario (Lawrence)",
         "source": "scenarios.bear",
-        "return_pct": 0.1,
+        "return_pct": 360668932.7,
         "weight": 0.05,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
@@ -190,7 +176,7 @@
         "id": "scenario_bull",
         "label": "Bull scenario (Lawrence)",
         "source": "scenarios.bull",
-        "return_pct": 12.7,
+        "return_pct": 451020292.2,
         "weight": 0.12,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
@@ -213,9 +199,9 @@
     ],
     "qualitative_manual": false,
     "qualitative_pp_cap_applied": false,
-    "numeric_weighted_pct": 8.26,
+    "numeric_weighted_pct": 424446362.94,
     "qualitative_pp": -0.2,
-    "total_synthesis_pct": 8.06,
+    "total_synthesis_pct": 424446362.74,
     "human_approval": "pending",
     "weight_audit": {
       "flags": [],
@@ -236,13 +222,5 @@
       }
     },
     "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
-  },
-  "results_growth_theory": {
-    "theory_implied": {
-      "return_pct": 6.7
-    },
-    "falsifier_adjusted": {
-      "return_pct": 6.7
-    }
   }
 }
