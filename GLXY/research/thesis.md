@@ -6,24 +6,25 @@
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
+| **Archetype** (Stahl) | platform |
 | **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
+| **Cycle** | trough |
 | **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Payoff lens** | levered |
 
 ## One-line thesis
 
-Galaxy Digital Inc. — thesis pending Marvin deep dive.
+Galaxy Digital is an institutional crypto platform with growing fee lines and a Helios HPC option; at $28.48 the synthesis return is 3.4% per year (watch) until normalized owner cash clears a 15% bar.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest annual report (FY2025 10-K)
+- [x] Read latest quarterly report (Q1 2026 10-Q)
+- [ ] Track Helios in-service and CoreWeave rent recognition
+- [ ] Add third-party cross-check when sources are approved
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-06-03; awaiting deep dive.
+- First Marvin deep dive 2026-06-03; synthesis weights pending human approval.

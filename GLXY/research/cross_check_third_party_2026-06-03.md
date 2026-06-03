@@ -9,9 +9,9 @@
 
 ## Executive summary
 
-No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (10-K, 10-Q, IR). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (FY2025 10-K, Q1 2026 10-Q). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
 
-**Synthesis:** Marvin floor only; no external blend.
+**Synthesis:** Filings-only. Marvin normalized base **6.2%** per year (7-year scenario); total synthesis **3.4%** per year after trough EBITDA floor weighting. No external blend.
 
 ## Sources in scope
 
@@ -33,13 +33,14 @@ No third-party sources are indexed for this ticker as of this scan. Marvin stanc
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | — | — | — |
+| Marvin floor | $0.18/sh owner cash (FY2025 adj EBITDA) | — | 10-K |
+| Marvin normalized base | $1.05/sh; **6.2%** / 7yr | — | `valuation.json` scenarios.base |
 | External (combined) | — | — | — |
-| **Blended best estimate** | **—** | **—** | **—** |
+| **Blended best estimate** | **$1.05/sh** | **3.4%** synthesis / 7yr | 100% filings |
 
-**Weights:** *[Document why]*
+**Weights:** 100% primary filings; synthesis auto-weights trough floor vs scenario envelope.
 
-**Returns statement (blended):** *[One sentence; pending sources not in base IRR]*
+**Returns statement (blended):** At **$28.48**, filings-only synthesis implies **3.4%** per year over 7 years; no approved third party in base IRR.
 
 ## [HUMAN REVIEW]
 

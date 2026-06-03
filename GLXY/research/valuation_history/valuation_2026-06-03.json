@@ -1,0 +1,297 @@
+{
+  "ticker": "GLXY",
+  "as_of": "2026-06-03",
+  "method": "scenario",
+  "payoff_lens": "levered",
+  "valuation_mode": "optionality",
+  "valuation_overlay": "segment_cashflow",
+  "lawrence_bucket": "multi_sided",
+  "classification_inputs": {
+    "archetype": "platform",
+    "moat": "unproven",
+    "dhando": "partial",
+    "cycle": "trough",
+    "payoff_lens": "levered"
+  },
+  "inputs": {
+    "price": 28.48,
+    "price_source": "Stooq GLXY.US close 2026-06-03",
+    "per_share": 1.05,
+    "fcf_source": "Mid-cycle fee + infrastructure owner cash ex treasury marks; marvin_floor = FY2025 adj EBITDA",
+    "shares_millions": 191,
+    "normalization_note": "FY2025 adj EBITDA $33.7M ($0.18/sh); base normalizes fee/AUM growth and partial HPC cash flow"
+  },
+  "estimates": {
+    "marvin_floor": {
+      "per_share": 0.18,
+      "return_pct": null,
+      "exit_multiple": 8,
+      "growth_y1_5": 0.05,
+      "growth_y6_10": 0.03,
+      "notes": "FY2025 Adjusted EBITDA $33.7M on ~191M Class A shares (10-K)"
+    },
+    "blended_best": {
+      "per_share": 1.05,
+      "return_pct": null,
+      "exit_multiple": 14,
+      "growth_y1_5": 0.12,
+      "growth_y6_10": 0.07,
+      "weights": "100% Marvin normalized base (no approved third party)",
+      "notes": "Filings-only blend; treasury marks excluded from owner-cash start"
+    }
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.0,
+      "growth_y6_10": 0.0,
+      "exit_pfcf_y10": 9,
+      "notes": "Crypto volume slump; HPC delays; treasury marks drag earnings"
+    },
+    "base": {
+      "growth_y1_5": 0.12,
+      "growth_y6_10": 0.07,
+      "exit_pfcf_y10": 14,
+      "notes": "Fee + staking revenue grow; Helios Phase I cash flow from H2 2026; marks neutral"
+    },
+    "bull": {
+      "growth_y1_5": 0.2,
+      "growth_y6_10": 0.1,
+      "exit_pfcf_y10": 18,
+      "notes": "Crypto cycle recovery + CoreWeave Phase II; GalaxyOne retail scale"
+    }
+  },
+  "segment_build": {
+    "horizon_years": 7,
+    "segments": [
+      {
+        "id": "digital_assets",
+        "label": "Digital Assets (Global Markets + Asset Management)",
+        "owner_cash_start_m": 95,
+        "growth_y1_5": 0.14,
+        "growth_y6_10": 0.08,
+        "exit_multiple": 14,
+        "evidence": "FY2025 fees $159M + blockchain rewards $220M; Q1 2026 fees $22M annualizing; AUM $12.3B (10-K)"
+      },
+      {
+        "id": "data_centers",
+        "label": "Data Centers (Helios / HPC)",
+        "owner_cash_start_m": 0,
+        "growth_y1_5": 0.35,
+        "growth_y6_10": 0.12,
+        "exit_multiple": 12,
+        "evidence": "No segment revenue FY2025; CoreWeave lease 133 MW IT load by H1 2026 (10-K)"
+      },
+      {
+        "id": "treasury_corporate",
+        "label": "Treasury and Corporate",
+        "owner_cash_start_m": -40,
+        "growth_y1_5": 0.0,
+        "growth_y6_10": 0.0,
+        "exit_multiple": 0,
+        "evidence": "Net loss on digital assets marks; corporate drag per segment note (10-K Note 24)"
+      }
+    ],
+    "options": [
+      {
+        "id": "helios_phase2",
+        "label": "Helios Phase II (393 MW IT load)",
+        "option_treatment": "probability_weighted",
+        "annual_drag_per_share": 0.0,
+        "base_terminal_value_bn": 0.4,
+        "base_terminal_rationale": "P_base 40% on ERCOT-approved capacity + CoreWeave Phase II lease; not in Lawrence FCF start",
+        "overlay_base_terminal_bn": 0.4,
+        "bull_terminal_value_bn": 1.2,
+        "evidence": "10-K: 600 MW gross for incremental 393 MW leased to CoreWeave",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "treasury_digital_assets",
+        "label": "Treasury digital asset portfolio",
+        "option_treatment": "nav_floor",
+        "annual_drag_per_share": 0.0,
+        "base_terminal_value_bn": 0.0,
+        "base_terminal_rationale": "Marks flow through earnings; excluded from Lawrence owner-cash \u2014 overlay uses fair-value sensitivity only",
+        "overlay_base_terminal_bn": 0.0,
+        "bull_terminal_value_bn": 0.5,
+        "evidence": "Q1 2026 digital assets $3.7B (10-Q); net gain/loss volatile",
+        "not_in_lawrence_base": true
+      }
+    ]
+  },
+  "nav_overlay": {
+    "gaap_book_per_share": 10.2,
+    "fair_nav_per_share": null,
+    "notes": "Total equity $3.0B includes treasury marks; not used as dhando floor"
+  },
+  "optionality_gate": {
+    "primary_metric": "lawrence_base",
+    "secondary_metric": "segment_overlay",
+    "notes": "Low Lawrence IRR valid if HPC option matures; watch until fee path clears 15% bar",
+    "primary_label": "7yr IRR",
+    "primary_return_pct": 6.2
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "nav_floor",
+      "evidence": "Treasury digital assets marked to market; operating franchise not on balance sheet at fair value"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Yes",
+      "treatment": "zero",
+      "evidence": "Data Centers pre-revenue FY2025; HPC capex drag until CoreWeave ramp"
+    },
+    {
+      "q": 5,
+      "question": "Private stakes below fair value?",
+      "answer": "Yes",
+      "treatment": "milestone_nav",
+      "evidence": "Venture and fund stakes in Treasury segment; marks in digital asset gains"
+    }
+  ],
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": true,
+      "floor_pass": false,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": null
+  },
+  "growth_explanation": {
+    "mechanism": "Fee and staking revenue scale with institutional crypto activity and $12.3B platform AUM; Helios HPC adds recurring lease cash from 2026; treasury marks excluded from base owner-cash path",
+    "sources": [
+      "GLXY/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001859392_26_000016.htm",
+      "GLXY/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001859392_26_000054.htm"
+    ],
+    "lawrence_legacy": {
+      "y1_5": 0.12,
+      "y6_10": 0.07,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.12,
+      "y6_10": 0.07,
+      "exit_pfcf_y10": 14.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": 0.4181,
+      "as_of_filing_facts": "evidence/_text/10-K_20260226_rpt20251231_acc0001859392_26_000016.htm.txt"
+    },
+    "status": "partial"
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -8.6
+    },
+    "base": {
+      "return_pct": 6.2
+    },
+    "bull": {
+      "return_pct": 15.8
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -8.6
+    },
+    "base": {
+      "return_pct": 6.2
+    },
+    "bull": {
+      "return_pct": 15.8
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": 6.2
+    },
+    "falsifier_adjusted": {
+      "return_pct": 6.2
+    }
+  },
+  "implied_return": {
+    "base_pct": 3.4,
+    "label": "7yr IRR (total synthesis)",
+    "display": "3.4% (total synthesis)",
+    "lawrence_stance_gate_pct": 6.2,
+    "falsifier_adjusted_pct": 6.2,
+    "synthesis_pct": 3.4
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence envelope)",
+        "source": "scenarios.bear",
+        "return_pct": -8.6,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "hard_to_vary": "yes: asymmetric low weight is structural",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ]
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence envelope)",
+        "source": "scenarios.bull",
+        "return_pct": 15.8,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "hard_to_vary": "yes",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ]
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 3.6,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 3.4,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}
