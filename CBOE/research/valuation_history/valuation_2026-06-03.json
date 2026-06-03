@@ -1,0 +1,211 @@
+{
+  "ticker": "CBOE",
+  "as_of": "2026-06-03",
+  "method": "full",
+  "lawrence_bucket": "multi_sided",
+  "classification_inputs": {
+    "archetype": "croupier",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 285.23,
+    "price_source": "Stooq CBOE.US close 2026-06-03",
+    "fcf_per_share": 16.0,
+    "fcf_source": "FY2025 OCF $1,752.6M minus capex $71.0M divided by ~105.1M diluted shares",
+    "shares_millions": 105.1,
+    "normalization_note": "FY2025 mid-cycle base; Q1 2026 net revenues $1,272.8M (+6% YoY) above trend but not inflated into starting cash flow"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 16,
+      "notes": "Volatility mean-reversion; equity share loss; fee pressure"
+    },
+    "base": {
+      "growth_y1_5": 0.06,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 20,
+      "notes": "Mid-cycle FCF growth; Data Vantage mix shift; exit ~20x cash flow"
+    },
+    "bull": {
+      "growth_y1_5": 0.08,
+      "growth_y6_10": 0.06,
+      "exit_pfcf_y10": 22,
+      "notes": "Sustained index/options activity plus recurring data growth"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Exchange intangible assets on balance sheet; no land/NAV misstatement pattern"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Asset-light croupier model"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "All three reportable product lines profitable FY2025 10-K"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / RPO not in FCF path?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Transaction and subscription revenue recognized with activity"
+    },
+    {
+      "q": 5,
+      "question": "Private stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No material holdco stakes in filings"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating croupier, not yield-curve royalty trust"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "SPX/VIX franchise growth embedded in Derivatives segment revenue path"
+    },
+    {
+      "q": 0,
+      "question": "Material options after scan?",
+      "answer": "No separate overlay",
+      "treatment": "n/a",
+      "evidence": "Lawrence full cash-flow path sufficient; index franchise in segment growth"
+    }
+  ],
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "lawrence_horizon_years": 7,
+  "evidence_refresh": {
+    "synthesis_in_dive": true
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 7.2
+    },
+    "base": {
+      "return_pct": 13.2
+    },
+    "bull": {
+      "return_pct": 16.3
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 7.2
+    },
+    "base": {
+      "return_pct": 13.2
+    },
+    "bull": {
+      "return_pct": 16.3
+    }
+  },
+  "implied_return": {
+    "base_pct": 13.42,
+    "label": "7yr IRR (total synthesis)",
+    "display": "13.42% (total synthesis)",
+    "lawrence_stance_gate_pct": 13.2,
+    "falsifier_adjusted_pct": 13.2,
+    "synthesis_pct": 13.42
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": 7.2,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 16.3,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 13.62,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 13.42,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}
