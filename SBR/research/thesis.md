@@ -1,6 +1,6 @@
 # SBR — Investment Thesis
 
-**Last updated:** 2026-06-03
+**Last updated:** auto-sync
 
 ## Classification
 
@@ -11,12 +11,17 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | mid |
-| **MOI bucket** (legacy) | equity_yield_curve |
-| **Payoff lens** | asset |
+| **Implied 7yr IRR** (base) | 7.3% (base) |
+| **IRR method** | yield_curve |
+| **Lawrence bucket** | other |
+| **Payoff lens** | pending |
+| **MOI bucket** | pending |
+
+**Deep dive:** `SBR/research/deep_dive_2026-06-03.md` (auto-sync)
 
 ## One-line thesis
 
-Sabine Royalty Trust passes through monthly oil and gas royalties with minimal overhead; at ~$77 we see ~6% trailing yield and **7.2%** base annual return on a five-year distribution curve, **watch** below the **~15%** bar.
+Sabine Royalty Trust passes through monthly oil and gas royalties with minimal overhead; at ~$77 we see ~6% trailing yield and **7.3%** base annual return on a five-year distribution curve, **watch** below the **~15%** bar.
 
 ## Key facts
 

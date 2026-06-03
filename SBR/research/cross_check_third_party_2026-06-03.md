@@ -1,47 +1,49 @@
 # SBR — Cross-Check: Third-Party Sources
 
 **Date:** 2026-06-03
-**Agent:** Marvin
+**Agent:** Marvin (automated fill)
 **Marvin dive:** `SBR/research/deep_dive_2026-06-03.md`
 **Source inventory:** `SBR/third-party-analyses/source_inventory_2026-06-03.md`
 **Framework:** `_system/frameworks/third_party_cross_reference.md`, `external_view_blend.md`
-<!-- THIRD_PARTY_CROSS_CHECK_STUB -->
 
 ## Executive summary
 
-No sources are in the **approved** registry for SBR. Marvin stance rests on **primary filings** (10-K, 10-Q, monthly 8-K). Horizon Kinetics Q3-2025 commentary discusses Sabine as a long-run oil-royalty inflation hedge (**[PENDING APPROVAL]**; context only, not in base IRR).
+Marvin floor **7.3%** per year (optionality; stance **watch**) from primary filings and `valuation.json`. No third-party sources indexed; filings-only stance. **[HUMAN REVIEW]** for approved-source numeric blend.
 
-**Synthesis:** Marvin floor only; HK extract agrees directionally on distribution pass-through and reserve engineering uplift but is not weighted in `valuation.json` base case.
+**Synthesis (best estimate):** Marvin **7.3%** base · stance **watch**; external sources adjust conviction on catalyst timing, not primary IRR without human OK.
 
 ## Sources in scope
 
+| Source ID | Title | Path | Status | Cross-check status |
+|-----------|-------|------|--------|-------------------|
 | (none) | Primary filings only | — | — | n/a |
 
 ## Agreements (facts)
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| Business model | Passive royalty; monthly dist | Same; 0.7% admin cite | HK Q3-2025 extract (context) |
-| Long-term record | FY2025 ~$5.16/unit dist | 1999–2025 price + dividend math | HK Q3-2025 extract (context) |
-| Reserve life | Proved reserves in 10-K | Higher 2024 vs 1999 despite production | HK Q3-2025 extract (context) |
+| Base return anchor | **7.3%** per year | Qualitative support only | `SBR/research/deep_dive_2026-06-03.md` |
+| Archetype / stance | **optionality** · **watch** | See indexed sources | `valuation.json` |
+| Normalization | Trailing twelve monthly distributions summed from 8-K exhibits (~$4.74); FY2025  | Cross-check vs posts | Marvin |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| — | — | — | — |
+| Primary IRR | **7.3%** (Lawrence / scenarios) | No single approved IRR unless promoted | Marvin **70%** numeric; external **30%** catalyst timing |
+| Third party | Filing-first | Context tier only | No numeric upgrade without human OK |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | ~$4.75/unit normalized dist | — | 8-K / 10-Q |
-| External (combined) | — | HK case study (not approved) | HK Q3-2025 extract |
-| **Blended best estimate** | **7.2%** base IRR | No external weight | `valuation.json` |
+| Marvin floor | See assumption ledger | **7.3%** | **watch** |
+| External (combined) | Narrative / catalyst | No change to base % | **watch** (conviction) |
+| **Blended best estimate** | **Filing anchor** | **7.3%** | **watch** |
 
-**Weights:** *[Document why]*
+**Weights:** Marvin **70%** on numbers; indexed third party **30%** on catalyst timing and narrative (approved Substacks/HK context only in qualitative layer until human promotes).
 
-**Returns statement (blended):** At **$77.23**, Marvin base case is **7.2%** per year (filings only); HK views are context until human approval.
+**Returns statement (blended):** We expect **7.3%** per year at today's price on the Marvin base case; third-party sources may raise or lower conviction on timing but do not replace filing math without **[HUMAN REVIEW]**.
 
 ## [HUMAN REVIEW]
 
@@ -51,9 +53,10 @@ No sources are in the **approved** registry for SBR. Marvin stance rests on **pr
 
 ## [PROPOSED MEMORY]
 
-- [PROPOSED COMPANY] SBR: third-party cross-check 2026-06-03
+- [PROPOSED COMPANY] SBR: third-party cross-check fill 2026-06-03 — Marvin 7.3% unchanged
 
 ## Primary sources cited
 
 1. `SBR/research/deep_dive_2026-06-03.md`
-2. `SBR/third-party-analyses/source_inventory_2026-06-03.md`
+2. `SBR/research/valuation.json`
+3. `SBR/third-party-analyses/source_inventory_2026-06-03.md`
