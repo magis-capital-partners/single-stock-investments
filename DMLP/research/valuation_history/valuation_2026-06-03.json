@@ -1,0 +1,180 @@
+{
+  "ticker": "DMLP",
+  "as_of": "2026-06-03",
+  "method": "full",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "infrastructure",
+    "moat": "narrow",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating",
+    "predictive_attribute": "distribution_yield_vs_commodity"
+  },
+  "inputs": {
+    "price": 28.0,
+    "price_source": "Placeholder pre-fetch; marvin_cloud_refresh updates Stooq",
+    "fcf_per_share": 2.78,
+    "fcf_source": "FY2025 declared distributions $2.775346/unit (cash basis owner yield; 10-K_20260224)",
+    "units_outstanding_m": 48.255,
+    "book_per_share": 6.42,
+    "book_source": "FY2025 total assets $309.554M / 48.255M units (approx.; GAAP not fair-value floor)",
+    "normalization_note": "Distributions exceed accrual net income ($1.16/unit FY2025) by design; Lawrence uses declared cash distributions not GAAP EPS.",
+    "copper_spot_usd_per_lb": 6.483,
+    "copper_spot_as_of": "2026-06-04",
+    "copper_spot_source": "https://stooq.com/q/l/?s=hg.f&f=sd2t2ohlcv&h&e=csv",
+    "copperwood_royalty_est_usd_ssi_ref": 7700000,
+    "copperwood_royalty_est_usd_at_spot": 12479775.0,
+    "copperwood_royalty_note": "SSI ~$7.7M/yr @ $4.0/lb scaled linearly to spot $6.483/lb [Assumption]"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.0,
+      "growth_y6_10": -0.02,
+      "exit_pfcf_y10": 10,
+      "notes": "Oil/gas price trough; distribution flat to down; depletion without offsetting acquisitions"
+    },
+    "base": {
+      "growth_y1_5": 0.02,
+      "growth_y6_10": 0.01,
+      "exit_pfcf_y10": 12,
+      "notes": "Mid-cycle distributions; 2024-2025 unit-funded royalty acquisitions add low single-digit growth"
+    },
+    "bull": {
+      "growth_y1_5": 0.05,
+      "growth_y6_10": 0.03,
+      "exit_pfcf_y10": 14,
+      "notes": "Commodity up-cycle + continued accretive mineral deals via Form S-4 units"
+    }
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Royalty/mineral interests carried on balance sheet; fair value tied to commodity cash flows not separate NAV mark (10-K)"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / acreage / dormant royalty?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "2024-2025 acquisitions include non-producing acres (e.g. ~14,225 net mineral acres Sep 2024 exchange); production conversion in growth path [Assumption]"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Public MLP; no holdco sleeve"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option already in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Producing royalty cash flows in operating revenues; acquisitions funded with units"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "Base growth assumes modest distribution increases from 2024-2025 royalty exchanges (Colorado, Permian) offsetting base decline on legacy properties.",
+    "bear_trigger": "Sustained sub-$60 WTI equivalent realized prices cut distributions below $2.50/unit for four quarters.",
+    "bull_trigger": "Distribution run-rate above $3.20/unit sustained with continued accretive unit-for-mineral deals.",
+    "lawrence_legacy": {
+      "y1_5": 0.02,
+      "y6_10": 0.01,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.02,
+      "y6_10": 0.01,
+      "exit_pfcf_y10": 12.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": -0.0701,
+      "as_of_filing_facts": "evidence/_text/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm.txt"
+    },
+    "status": "partial"
+  },
+  "synthesis": {
+    "status": "incomplete",
+    "reason": "zero weights"
+  },
+  "market_inputs": {
+    "copper": {
+      "spot": 6.483,
+      "as_of": "2026-06-04",
+      "source": "https://stooq.com/q/l/?s=hg.f&f=sd2t2ohlcv&h&e=csv",
+      "fetched_at": "2026-06-03T22:34:42Z",
+      "stooq_symbol": "hg.f"
+    },
+    "scenario_grid": {
+      "bear": {
+        "copper_usd_per_lb": 4.67,
+        "label": "trough (~28% below spot)"
+      },
+      "base": {
+        "copper_usd_per_lb": null,
+        "label": "spot at compute"
+      },
+      "bull": {
+        "copper_usd_per_lb": 7.0,
+        "label": "cycle high (~8% above spot)"
+      }
+    }
+  },
+  "market_inputs_as_of": "2026-06-03",
+  "optionality_gate": {
+    "copperwood_option_yield_pct": 39.57,
+    "primary_metric": "lawrence_base",
+    "primary_label": "7yr IRR",
+    "primary_return_pct": 13.8
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 9.4
+    },
+    "base": {
+      "return_pct": 13.8
+    },
+    "bull": {
+      "return_pct": 18.8
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 9.4
+    },
+    "base": {
+      "return_pct": 13.8
+    },
+    "bull": {
+      "return_pct": 18.8
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": 13.8
+    },
+    "falsifier_adjusted": {
+      "return_pct": 13.8
+    }
+  },
+  "implied_return": {
+    "base_pct": 13.8,
+    "label": "7yr IRR",
+    "display": "13.8% (base)"
+  },
+  "overlay_results": []
+}

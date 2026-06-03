@@ -6,27 +6,34 @@
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Archetype** (Stahl) | infrastructure |
+| **Moat** (Munger) | narrow |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **Implied 7yr IRR** (base) | — |
-| **IRR method** | — |
-| **Lawrence bucket** | — |
-| **Payoff lens** | pending |
+| **Cycle** | mid |
+| **Implied 7yr IRR** (base) | 13.8% (base) |
+| **IRR method** | full |
+| **Lawrence bucket** | other |
+| **Payoff lens** | operating |
 | **MOI bucket** | pending |
+
+**Deep dive:** `DMLP/research/deep_dive_2026-06-03.md` (auto-sync)
 
 ## One-line thesis
 
-Dorchester Minerals LP — thesis pending Marvin deep dive.
+Passive oil and gas royalty MLP distributing ~100% of cash; **13.8%** base IRR at **$28**/unit on FY2025 **$2.78** distributions; watch below **~15%** bar.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest annual report (FY2025 10-K)
+- [x] Read latest quarterly report (Q1 2026 10-Q)
+- [ ] Confirm live unit price vs **$28** placeholder in valuation.json
+
+## Deep dive
+
+`DMLP/research/deep_dive_2026-06-03.md`
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-06-03; awaiting deep dive.
+- CIK corrected to **1172358** (onboard had **1178660**).
+- Copperwood option yield in `optionality_gate` is context only; not in Lawrence base cash path.
