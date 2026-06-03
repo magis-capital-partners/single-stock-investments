@@ -6,27 +6,32 @@
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Archetype** (Stahl) | platform |
+| **Moat** (Munger) | stable |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **Implied 7yr IRR** (base) | — |
-| **IRR method** | — |
-| **Lawrence bucket** | — |
+| **Cycle** | mid |
+| **Implied 7yr IRR** (base) | -4.81% (total synthesis) |
+| **IRR method** | full |
+| **Lawrence bucket** | other |
 | **Payoff lens** | pending |
 | **MOI bucket** | pending |
 
+**Deep dive:** `HKHC/research/deep_dive_2026-06-03.md` (auto-sync)
+
 ## One-line thesis
 
-Horizon Kinetics Holding Corporation — thesis pending Marvin deep dive.
+Horizon Kinetics listed advisory parent: fee growth and book value, but spot price embeds a franchise premium; synthesis ~-4.81% at $27.50 — watch; size via FRMO look-through instead.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest annual report (`10-K_20260312`)
+- [x] Read latest quarterly report (`10-Q_20260515`)
+- [ ] Proxy comp and insider ownership (DEF 14A 2026)
+- [ ] Human review related-party FRMO/HKHA economics
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-06-03; awaiting deep dive.
+- Internal control weakness (related-party accounts) per FY2025 10-K.
+- TPL 65% AUM concentration — confirm risk tolerance.
+- No approved third party in base IRR.
