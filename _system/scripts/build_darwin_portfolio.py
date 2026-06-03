@@ -53,13 +53,27 @@ def main() -> None:
         [args.pit_audit, args.pit_backtest, args.sync_events, args.sync_external]
     ):
         bundle = run_all_accounts(fast=args.fast)
-        s = bundle["summary"]
-        print(json.dumps(s.get("accounts") or {}, indent=2))
+        s = bundle["serving"]
+        print(json.dumps(
+            {
+                aid: {
+                    "policy_id": (s.get("accounts") or {}).get(aid, {}).get("policy_id"),
+                    "backtest_cumulative_pct": (s.get("accounts") or {}).get(aid, {}).get("backtest_cumulative_pct"),
+                    "paper_cumulative_pct": ((s.get("accounts") or {}).get(aid, {}).get("paper") or {}).get(
+                        "cumulative_return_pct"
+                    ),
+                    "paper_inception": (s.get("accounts") or {}).get(aid, {}).get("paper_inception"),
+                }
+                for aid in ("roth", "taxable")
+            },
+            indent=2,
+        ))
         for aid, row in (s.get("accounts") or {}).items():
+            paper = row.get("paper") or {}
             print(
                 f"{aid}: policy={row.get('policy_id')} "
                 f"backtest_cum={row.get('backtest_cumulative_pct')}% "
-                f"paper_cum={row.get('paper_cumulative_pct')}% (since {row.get('paper_inception')})"
+                f"paper_cum={paper.get('cumulative_return_pct')}% (since {row.get('paper_inception')})"
             )
         return
 

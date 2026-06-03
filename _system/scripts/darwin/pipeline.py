@@ -7,7 +7,7 @@ from pathlib import Path
 
 from .attribution import factor_attribution
 from .backtest import benchmark_buy_hold, simulate
-from .accounts import AccountCtx, account_ctx, load_mandate_for, tax_advantaged, tier0_production
+from .accounts import AccountCtx, account_ctx, build_serving, load_mandate_for, tier0_production
 from .config import DATA_DIR, FEATURES_PATH, load_mandate
 from .paper_portfolio import update_paper_portfolio
 from .constraints import apply_constraints, apply_ira_stance_caps, weights_to_list
@@ -631,40 +631,31 @@ def run_pipeline(
         out["observatory"] = observatory
         out["regime_brief"] = str(brief_path.relative_to(Path(__file__).resolve().parents[3]))
 
-    questions = scaffold_all_questions(tickers)
-    out["open_questions"] = questions
+    if not tier0:
+        out["open_questions"] = scaffold_all_questions(tickers)
 
-    def _w_fn(active, qi):
-        return target_w
+        def _w_fn(active, qi):
+            return target_w
 
-    stress = run_stress_simulation(panel, _w_fn, mandate_effective, n_paths=120 if fast else 250)
-    out["stress_simulation"] = stress
+        out["stress_simulation"] = run_stress_simulation(
+            panel, _w_fn, mandate_effective, n_paths=120 if fast else 250
+        )
+        write_backtest_report(out, ctx)
 
     out["exploration"] = {"enabled": exploration_on, "champion_mode": explore.get("champion_mode")}
     out["external_sync"] = external_sync if account_id == "roth" else {}
 
-    paper = update_paper_portfolio(ctx, mandate_doc, target_w, features_by_ticker, policy_id, regime, out)
+    paper = update_paper_portfolio(ctx, mandate_doc, target_w, policy_id, regime, out)
     out["paper_portfolio"] = paper
 
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     ctx.portfolio_path.write_text(json.dumps(out, indent=2) + "\n", encoding="utf-8")
-    write_backtest_report(out, ctx)
-
-    # Legacy single-file alias for older dashboard paths
-    if account_id == "roth":
-        legacy = DATA_DIR / "darwin_portfolio.json"
-        legacy.write_text(json.dumps(out, indent=2) + "\n", encoding="utf-8")
-        # Legacy IRA weights filename
-        legacy_weights = ctx.target_weights_path.parent / "ira_target_weights.json"
-        legacy_weights.write_text(
-            ctx.target_weights_path.read_text(encoding="utf-8"), encoding="utf-8"
-        )
 
     return out
 
 
 def run_all_accounts(fast: bool = False, write_features: bool = True) -> dict:
-    """Build Roth + taxable Tier 0 books and paper trackers."""
+    """Build Roth + taxable Tier 0 books, paper trackers, and L4 serving bundle."""
     from .features import build_features as _build
 
     features = _build()
@@ -677,35 +668,8 @@ def run_all_accounts(fast: bool = False, write_features: bool = True) -> dict:
             shared_features=features,
             run_pit=(aid == "roth"),
         )
-    summary = {
-        "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "accounts": {
-            aid: {
-                "policy_id": results[aid].get("policy_id"),
-                "regime": (results[aid].get("regime") or {}).get("label"),
-                "backtest_cumulative_pct": (
-                    (results[aid].get("benchmarks") or {})
-                    .get("champion", {})
-                    .get("cumulative_return", 0)
-                    * 100
-                ),
-                "backtest_sharpe": (results[aid].get("benchmarks") or {}).get("champion", {}).get(
-                    "sharpe_annualized"
-                ),
-                "paper_nav_usd": (results[aid].get("paper_portfolio") or {}).get("last_mark", {}).get(
-                    "nav_usd"
-                ),
-                "paper_cumulative_pct": (results[aid].get("paper_portfolio") or {}).get("last_mark", {}).get(
-                    "cumulative_return_pct"
-                ),
-                "paper_inception": (results[aid].get("paper_portfolio") or {}).get("inception_date"),
-            }
-            for aid in results
-        },
-    }
-    path = DATA_DIR / "darwin_accounts.json"
-    path.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
-    return {"summary": summary, "portfolios": results}
+    serving = build_serving(results)
+    return {"serving": serving, "portfolios": results}
 
 
 def _pit_status_from_runs(audit: dict, pit_bt: dict, production: dict | None = None) -> dict:

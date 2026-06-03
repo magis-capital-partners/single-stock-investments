@@ -515,9 +515,13 @@ function setView(view) {
 }
 
 function renderDarwin() {
+  const serving = data.darwin_serving || {};
   const bundle = data.darwin_accounts || {};
-  const d = bundle[activeDarwinAccount] || data.darwin;
-  const paper = bundle['paper_' + activeDarwinAccount] || {};
+  const acctRow = (serving.accounts || {})[activeDarwinAccount] || {};
+  const d = acctRow.portfolio || bundle[activeDarwinAccount] || data.darwin;
+  const paper = acctRow.paper
+    ? { last_mark: acctRow.paper, inception_date: acctRow.paper_inception }
+    : (bundle['paper_' + activeDarwinAccount] || {});
   const loading = document.getElementById('darwin-loading');
   const content = document.getElementById('darwin-content');
   if (!d) {

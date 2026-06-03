@@ -21,7 +21,7 @@
 - **AMZN**: see `AMZN/research/open_questions.md`
 - **APLD**: see `APLD/research/open_questions.md`
 - **BN**: see `BN/research/open_questions.md`
-- **BWEL**: see `BWEL/research/open_questions.md`
 - **CMSG**: see `CMSG/research/open_questions.md`
 - **CPRT**: see `CPRT/research/open_questions.md`
+- **CSGP**: see `CSGP/research/open_questions.md`
 

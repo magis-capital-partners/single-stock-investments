@@ -654,31 +654,41 @@ def load_darwin_portfolio() -> dict | None:
     )
 
 
+def load_darwin_serving() -> dict | None:
+    return _load_json(DATA_DIR / "darwin_serving.json")
+
+
 def load_darwin_bundle() -> dict:
-    """Roth + taxable portfolios, account summary, paper books."""
-    bundle: dict = {}
-    accounts_path = DATA_DIR / "darwin_accounts.json"
-    if accounts_path.exists():
-        bundle["summary"] = _load_json(accounts_path)
+    """Prefer L4 serving; fallback to per-account portfolio files."""
+    serving = load_darwin_serving()
+    if serving and serving.get("accounts"):
+        bundle = {
+            "serving": serving,
+            "default_account": serving.get("default_account", "roth"),
+        }
+        for aid, row in serving["accounts"].items():
+            if row.get("portfolio"):
+                bundle[aid] = row["portfolio"]
+            if row.get("paper"):
+                bundle[f"paper_{aid}"] = {
+                    "last_mark": row["paper"],
+                    "inception_date": row.get("paper_inception"),
+                }
+        return bundle
+    bundle: dict = {"default_account": "roth"}
     for aid in ("roth", "taxable"):
         p = _load_json(DATA_DIR / f"darwin_portfolio_{aid}.json")
         if p:
             bundle[aid] = p
-        paper = _load_json(ROOT / "_system" / "portfolio" / "paper" / f"{aid}.json")
-        if paper:
-            bundle[f"paper_{aid}"] = paper
     roth = bundle.get("roth") or load_darwin_portfolio()
     if roth:
         bundle["roth"] = roth
-        bundle.setdefault("default_account", "roth")
     return bundle
 
 
 def build_darwin_if_missing() -> dict | None:
     """Run Darwin pipeline when portfolio JSON absent (e.g. fresh clone)."""
-    if (DATA_DIR / "darwin_portfolio_roth.json").exists() or (
-        DATA_DIR / "darwin_portfolio.json"
-    ).exists():
+    if (DATA_DIR / "darwin_serving.json").exists() or (DATA_DIR / "darwin_portfolio_roth.json").exists():
         return load_darwin_bundle()
     script = ROOT / "_system" / "scripts" / "build_darwin_portfolio.py"
     if not script.exists():
@@ -698,6 +708,9 @@ def main() -> None:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     payload = build()
     bundle = load_darwin_bundle() or build_darwin_if_missing() or {}
+    serving = bundle.get("serving") or load_darwin_serving()
+    if serving:
+        payload["darwin_serving"] = serving
     if bundle.get("roth"):
         payload["darwin"] = bundle["roth"]
     if bundle:
