@@ -13,7 +13,6 @@ sys.path.insert(0, str(SCRIPTS))
 
 from valuation_synthesis import (  # noqa: E402
     _has_custom_synthesis_paths,
-    _third_party_proxies_bull,
     compute_synthesis,
     resolve_synthesis_paths,
 )
@@ -32,13 +31,25 @@ def test_vtrs_custom_paths_preserved() -> None:
     assert any(p.get("id") == "rosen_operating_7yr" for p in data["synthesis"]["paths"])
 
 
-def test_cmsg_no_bull_proxy_after_refresh() -> None:
+def test_cmsg_estimates_drive_synthesis_not_bull_proxy() -> None:
     path = ROOT / "CMSG" / "research" / "valuation.json"
     data = json.loads(path.read_text(encoding="utf-8"))
-    paths = data.get("synthesis", {}).get("paths", [])
-    assert any(p.get("id") == "third_party_context" for p in paths)
+    # Simulate stale auto-template before rebuild
+    legacy = data.get("results_lawrence_legacy") or data.get("results") or {}
+    bull = (legacy.get("bull") or {}).get("return_pct")
+    stale = {
+        "paths": [
+            {
+                "id": "third_party_context",
+                "return_pct": bull,
+                "weight": 0.1,
+                "notes": "Proxy: upside case when strategic third party has no spot IRR",
+            }
+        ]
+    }
+    data["synthesis"] = stale
     resolved = resolve_synthesis_paths(data)
-    assert not _third_party_proxies_bull(resolved, data)
+    assert not any(p.get("id") == "third_party_context" for p in resolved)
     assert any(p.get("id") == "blended_best_primary" for p in resolved)
     data["synthesis"] = {**(data.get("synthesis") or {}), "paths": resolved}
     compute_synthesis(data)
@@ -50,7 +61,7 @@ def test_cmsg_no_bull_proxy_after_refresh() -> None:
 
 def main() -> int:
     test_vtrs_custom_paths_preserved()
-    test_cmsg_no_bull_proxy_after_refresh()
+    test_cmsg_estimates_drive_synthesis_not_bull_proxy()
     print("OK test_third_party_synthesis_preserve")
     return 0
 
