@@ -1,0 +1,222 @@
+{
+  "ticker": "BUR",
+  "as_of": "2026-06-03",
+  "method": "scenario",
+  "valuation_mode": "optionality",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "narrow",
+    "dhando": "partial",
+    "cycle": "trough",
+    "payoff_lens": "asset"
+  },
+  "inputs": {
+    "price": 4.31,
+    "price_source": "Stooq BUR.US close 2026-06-03",
+    "per_share": 0.38,
+    "fcf_source": "Distributable cash proxy: ~25% of 3-year average surplus (receipts $573M minus cash costs $253M) after portfolio reinvestment and de-leveraging; not headline surplus per share",
+    "shares_millions": 219,
+    "normalization_note": "1Q26 YPF non-cash write-down; cash receipts $90M in quarter; sight of ~$280M YTD portfolio cash"
+  },
+  "estimates": {
+    "marvin_floor": {
+      "per_share": 0.85,
+      "return_pct": null,
+      "exit_multiple": 10,
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.02,
+      "notes": "Trough receipts after YPF shock; elevated leverage"
+    },
+    "blended_best": {
+      "per_share": 0.38,
+      "return_pct": null,
+      "exit_multiple": 12,
+      "growth_y1_5": 0.06,
+      "growth_y6_10": 0.04,
+      "weights": "Marvin floor only (no approved third party)",
+      "notes": "Normalized distributable cash, not GAAP earnings"
+    }
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.0,
+      "growth_y6_10": 0.0,
+      "exit_multiple": 8,
+      "notes": "Slower realizations; de-leveraging absorbs cash; litigation losses rise"
+    },
+    "base": {
+      "growth_y1_5": 0.05,
+      "growth_y6_10": 0.03,
+      "exit_multiple": 11,
+      "notes": "Receipts track 3-year average surplus; portfolio ex-YPF fair value mark stable"
+    },
+    "bull": {
+      "growth_y1_5": 0.12,
+      "growth_y6_10": 0.06,
+      "exit_multiple": 14,
+      "notes": "Higher realization cadence; YPF arbitration partial recovery [Assumption]"
+    }
+  },
+  "optionality_gate": {
+    "framework": "litigation_portfolio_floor_option",
+    "floor_pass": true,
+    "floor_metric": "tangible_book_per_share",
+    "floor_value": 3.17,
+    "primary_metric": "lawrence_base",
+    "primary_return_pct": 13.4,
+    "notes": "Lawrence base uses cash-receipts path; portfolio fair value overlay separate; do not use pre-YPF book as floor",
+    "primary_label": "7yr IRR"
+  },
+  "nav_overlay": {
+    "as_of": "2026-03-31",
+    "source": "investor-documents/ir-bur/2026-05-08-Burford-Capital-1Q26-Earnings-Presentation-FINAL-1631676-1.pdf",
+    "principal_finance_fair_value_bn": 2.137,
+    "principal_finance_deployed_bn": 1.747,
+    "cash_and_securities_bn": 0.74,
+    "debt_bn": 2.402,
+    "shares_millions": 219,
+    "tbvps": 3.17,
+    "options": [
+      {
+        "id": "ypf_arbitration",
+        "label": "YPF-related assets (arbitration path)",
+        "option_treatment": "probability_weighted",
+        "base_terminal_value_bn": 0.5,
+        "base_terminal_rationale": "Post write-down option value per management; low US court probability, multi-year arbitration [Assumption]",
+        "evidence": "1Q26 presentation YPF section; $236M cash already collected",
+        "not_in_lawrence_base": true
+      }
+    ]
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "nav_overlay",
+      "evidence": "Principal Finance marked at fair value; TBVPS fell to $3.17 after YPF write-down"
+    },
+    {
+      "q": 6,
+      "question": "Transitory legal recovery?",
+      "answer": "Yes",
+      "treatment": "yield_curve",
+      "evidence": "YPF arbitration; en banc / ICSID path"
+    }
+  ],
+  "stance_proposal": {
+    "suggested": "hold",
+    "irr_band": "optionality",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true,
+      "floor_pass": true,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": null
+  },
+  "lawrence_horizon_years": 7,
+  "evidence_refresh": {
+    "synthesis_in_dive": true
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 5.2
+    },
+    "base": {
+      "return_pct": 13.4
+    },
+    "bull": {
+      "return_pct": 23.0
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 5.2
+    },
+    "base": {
+      "return_pct": 13.4
+    },
+    "bull": {
+      "return_pct": 23.0
+    }
+  },
+  "implied_return": {
+    "base_pct": 17.56,
+    "label": "7yr IRR (total synthesis)",
+    "display": "17.56% (total synthesis)",
+    "lawrence_stance_gate_pct": 13.4,
+    "falsifier_adjusted_pct": 13.4,
+    "synthesis_pct": 17.56
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": 5.2,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 23.0,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 17.76,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 17.56,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}

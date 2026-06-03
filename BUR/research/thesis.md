@@ -6,24 +6,26 @@
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Archetype** (Stahl) | optionality |
+| **Moat** (Munger) | narrow |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Cycle** | trough |
+| **MOI bucket** (legacy) | market_structure_discount |
+| **Payoff lens** | asset |
 
 ## One-line thesis
 
-Burford Capital Limited — thesis pending Marvin deep dive.
+Leading litigation finance platform: post-YPF mark-down leaves shares near tangible book while ex-YPF portfolio still generates cash; watch until leverage normalizes and FY annual filing is on file.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest quarterly IR (1Q26)
+- [ ] Read FY2025 20-F / annual report
+- [ ] Track YPF arbitration milestones
+- [ ] Re-run when third-party coverage indexed
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-06-03; awaiting deep dive.
+- SEC 20-F download failed at onboard; need full annual.
+- Synthesis weights pending (17.6% mechanical vs 13.4% Lawrence base).
