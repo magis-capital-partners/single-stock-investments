@@ -1,0 +1,137 @@
+{
+  "ticker": "OR",
+  "as_of": "2026-06-03",
+  "method": "full",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 35.31,
+    "price_source": "Yahoo Finance OR NYSE close 2026-06-03",
+    "fcf_per_share": 1.31,
+    "fcf_source": "FY2025 operating cash flow $245.6M ÷ 187.775M weighted average shares",
+    "shares_millions": 187.5,
+    "normalization_note": "Owner cash uses operating cash flow, not reported net earnings ($1.10/sh), which includes $54.4M one-time gain on deemed disposal of Osisko Development associate (MD&A). Adjusted earnings $0.88/sh shown as cross-check. Minimal sustaining capex at royalty holding company."
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 14,
+      "notes": "Gold price weakens; Eagle-style operator failures; GEO growth stalls near 85k; multiple compression"
+    },
+    "base": {
+      "growth_y1_5": 0.07,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 18,
+      "notes": "GEO volume toward 120k by 2030 per filing 5-year outlook; 97% cash margin; dividend growth modest"
+    },
+    "bull": {
+      "growth_y1_5": 0.10,
+      "growth_y6_10": 0.06,
+      "exit_pfcf_y10": 22,
+      "notes": "Windfall, Cariboo, South Railroad and Namdini ramps on schedule; gold price sustained; accretive M&A continues"
+    }
+  },
+  "optionality_gate": {
+    "framework": "royalty_yield_floor",
+    "floor_pass": true,
+    "floor_metric": "dividend_yield",
+    "floor_value": 6.0,
+    "primary_metric": "lawrence_base",
+    "primary_label": "annualized return",
+    "primary_return_pct": null,
+    "incumbent_sleeve": false,
+    "notes": "FY2025 dividends declared $0.211/sh (~6.0% yield at $35.31); Lawrence owner-cash path is stance gate; development GEO pipeline sized in option scan only."
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "nav_overlay",
+      "evidence": "Royalty and stream interests carried at cost/amortized cost; economic value tied to metal prices and reserves, not marked to market on balance sheet (40-F exhibit 99.2 accounting policies)"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "5-year outlook 120–135k GEOs by 2030 vs 80,775 in 2025; assumes Windfall, Hermosa/Taylor, Cariboo, Spring Valley, Amulsar, South Railroad start (MD&A); Eagle Gold excluded (receivership)"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Single royalty/stream operating model; 97% cash margin on revenues"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "Partial",
+      "treatment": "milestone_nav",
+      "evidence": "Listed equity stakes in miners (Osisko Development stake reduced to 13.97% Aug 2025); fair value through profit or loss on remaining portfolio"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Regular quarterly dividend program since 2014"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option already in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Producing royalties and streams (Canadian Malartic, Mantos Blancos, Namdini ramp) already in GEO and revenue path"
+    }
+  ],
+  "nav_overlay_options": [
+    {
+      "id": "development_geo_pipeline",
+      "label": "Development-stage royalty book (2030 GEO uplift)",
+      "option_treatment": "probability_weighted",
+      "base_terminal_value_usd_per_share": 4.0,
+      "base_terminal_rationale": "Filing 5-year outlook adds ~40–55k GEOs; not fully in FY2025 OCF; probability-weighted overlay only, not in Lawrence FCF₀",
+      "evidence": "OR/investor-documents/sec-edgar/40-F_20260330_exhibit99-3.htm — 2026 Guidance and 5-Year Outlook"
+    },
+    {
+      "id": "eagle_gold_impairment",
+      "label": "Eagle Gold mine royalty (receivership)",
+      "option_treatment": "zero",
+      "base_terminal_value_usd_per_share": 0.0,
+      "base_terminal_rationale": "Operations stopped June 2024; impairment taken; no GEO contribution in 5-year outlook",
+      "evidence": "MD&A portfolio section; Q2 2024 impairment $49.6M pre-tax on Eagle royalty"
+    }
+  ],
+  "growth_explanation": {
+    "base_mechanism": "Producing mine ramps (Namdini, San Gabriel, Dalgaranga) plus 2030 development starts per company 5-year GEO outlook",
+    "bear_falsifier": "Sustained gold price decline or major operator failure on top-tier assets",
+    "bull_falsifier": "Faster-than-guided ramp at Windfall and Cariboo with accretive M&A at sub-15% IRR"
+  },
+  "human_review": [],
+  "catalyst_paths": [
+    {
+      "event": "2030 GEO outlook delivery",
+      "timing": "2027–2030",
+      "impact": "Volume toward 120–135k GEOs from development royalties"
+    },
+    {
+      "event": "Gold Fields portfolio close",
+      "timing": "2026",
+      "impact": "$115M San Gabriel anchor royalty plus seven-asset package"
+    },
+    {
+      "event": "Failure mode",
+      "timing": "bear scenario",
+      "impact": "Commodity downturn plus operator delays; dividend flat, multiple compresses"
+    }
+  ]
+}

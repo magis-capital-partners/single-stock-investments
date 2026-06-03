@@ -9,37 +9,43 @@
 
 ## Executive summary
 
-No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (10-K, 10-Q, IR). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (40-F exhibits 99.1–99.3, MD&A March 2026). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
 
-**Synthesis:** Marvin floor only; no external blend.
+**Synthesis:** Marvin floor only; no external blend. Base Lawrence path uses FY2025 operating cash flow per share ($1.31) with 2030 GEO growth mechanism from MD&A; dividend yield ~6% supports partial dhando floor.
 
 ## Sources in scope
 
-| (none) | Primary filings only | — | — | n/a |
+| Source | Type | Status | Reviewed |
+|--------|------|--------|----------|
+| Primary 40-F / MD&A | SEC filing | primary | Yes |
+| (none external) | — | — | n/a |
 
 ## Agreements (facts)
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| — | — | — | — |
+| FY2025 GEOs | 80,775 | — | `40-F_20260330_exhibit99-3.htm` |
+| Record OCF | $245.6M | — | Same |
+| 2030 GEO outlook | 120–135k | — | Same, 5-year outlook section |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| — | — | — | — |
+| Owner cash starting point | OCF $1.31/sh | n/a | No external view |
+| Development upside | Probability-weighted overlay | n/a | Not in base IRR without approval |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | — | — | — |
+| Marvin floor | $1.31/sh OCF start | Lawrence 7yr (pending) | watch |
 | External (combined) | — | — | — |
-| **Blended best estimate** | **—** | **—** | **—** |
+| **Blended best estimate** | **Marvin floor only** | **pending** | **watch** |
 
-**Weights:** *[Document why]*
+**Weights:** 100% Marvin primary filings; no approved third party.
 
-**Returns statement (blended):** *[One sentence; pending sources not in base IRR]*
+**Returns statement (blended):** Same as Marvin base case pending mechanical refresh; no external blend.
 
 ## [HUMAN REVIEW]
 

@@ -31,6 +31,7 @@ TYPE_SCORE = {
     "10-k": 100,
     "10-q": 95,
     "20-f": 100,
+    "40-f": 100,
     "annual": 98,
     "quarterly": 92,
     "proxy": 88,
