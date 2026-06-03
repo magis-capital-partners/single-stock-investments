@@ -36,13 +36,13 @@ No third-party sources are indexed for PBT as of this scan. Marvin stance rests 
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | Yield curve base **-17.7%**/yr | 6 years | watch |
+| Marvin floor | Yield curve base **-15.4%**/yr | 7 years | watch |
 | External (combined) | — | — | — |
-| **Blended best estimate** | **Marvin only** | **-17.7%** base | **watch** |
+| **Blended best estimate** | **Marvin only** | **-15.4%** base | **watch** |
 
 **Weights:** 100% Marvin primary filings (no approved third party).
 
-**Returns statement (blended):** At **$28.94**, Marvin base equity-yield-curve return is **-17.7%** per year over six years; no external adjustment.
+**Returns statement (blended):** At **$28.94**, Marvin base equity-yield-curve return is **-15.4%** per year over seven years; no external adjustment.
 
 ## [HUMAN REVIEW]
 
