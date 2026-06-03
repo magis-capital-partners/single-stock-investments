@@ -1,6 +1,6 @@
 # QDEL — Investment Thesis
 
-**Last updated:** auto-sync
+**Last updated:** 2026-05-21
 
 ## Classification
 
@@ -9,13 +9,11 @@
 | **Archetype** (Stahl) | turnaround |
 | **Moat** (Munger) | unproven |
 | **Dhando** (Pabrai) | partial |
-| **Stance** | watch |
+| **Stance** | hold |
 | **Cycle** | - |
-| **Implied 7yr IRR** (base) | 18.39% (total synthesis) |
-| **IRR method** | scenario |
-| **Lawrence bucket** | pricing_power |
-| **Payoff lens** | pending |
-| **MOI bucket** | pending |
+| **Implied 7yr IRR** (Lawrence) | pending |
+| **IRR method** | pending |
+| **Lawrence bucket** | — |
 
 **Deep dive:** `QDEL/research/deep_dive_2026-06-02.md` (auto-sync)
 

@@ -13,7 +13,7 @@
 
 Groundbreaker frames J.G. Boswell as a **water-rights option** inside an operating farm: ~150k California acres, **~400k acre-feet** of senior surface rights (claimed), water NAV **$2B–$6B** vs **~$516M** market cap, catalyst via **SGMA** fallowing of junior neighbors. Marvin filings agree on **historical-cost land ($106M)**, **subsurface minerals**, and **San Joaquin operating risk**, but do **not** disclose acre-feet or $/AF. Lawrence base **1.1%** per year on **mid-cycle owner cash** remains the stance gate; Groundbreaker does **not** change base IRR until water quantities are filing-backed or independently appraised.
 
-**Synthesis (best estimate):** Keep **watch** on Lawrence; upgrade **optionality / partial dhando** narrative. Blended economic NAV band widens to **~$850/sh (Marvin overlay) – $2,000+/sh (external bull, unverified)** — **not** in base IRR.
+**Synthesis (best estimate):** Keep **watch** on Lawrence **1.1%**; Marvin fact-check (`fact_check_water_nav_2026-06-02.md`) sets probability-weighted **economic NAV ~$1,480/sh** (bull **~$2,200/sh**). Groundbreaker **$2B–$6B** water remains **5% scenario weight** (400k AF unverified in filings).
 
 ---
 
@@ -42,8 +42,8 @@ Groundbreaker frames J.G. Boswell as a **water-rights option** inside an operati
 
 | Topic | Marvin floor | Groundbreaker | Blend logic |
 |-------|--------------|---------------|-------------|
-| Water quantity | **Not disclosed** in annual | **~400k AF** senior surface | **[HUMAN REVIEW]** — request/shareholder verification; do not put AF in base IRR |
-| Water $/AF | **+$40/sh** overlay uplift [Assumption] | **$5k–$15k/AF** → **$2B–$6B** | External sets **bull band** only; Marvin keeps modest overlay until appraisal |
+| Water quantity | **Not disclosed** in annual | **~400k AF** senior surface | Marvin: **102k+ AF** transfers **verified** (GV Wire); **400k** = **5%** scenario weight |
+| Water $/AF | **+$485/sh** PW uplift (E[water] ~$846M) | **$5k–$15k/AF** → **$2B–$6B** | Marvin expected below Groundbreaker mid; bull in **$2,200/sh** overlay |
 | Catalyst | Crop normalization, dividends | SGMA repricing without family sale | External is **generational**; Marvin needs dated mispricing attribute |
 | Return metric | 10yr Lawrence on **$22/sh** owner cash | Implicit deep discount to water NAV | **100% weight on Lawrence for stance**; external weights **NAV optionality** |
 
@@ -55,7 +55,7 @@ Groundbreaker frames J.G. Boswell as a **water-rights option** inside an operati
 |------|--------|------------------|-------------|
 | Marvin floor | Mid-cycle **$22/sh** owner cash | **1.1%** (10yr Lawrence) | **watch** |
 | Groundbreaker | Water NAV **$2B–$6B** vs **~$516M** cap | Generational / NAV convergence | **accumulate** on asset only, not on Lawrence gate |
-| **Blended best estimate** | Lawrence unchanged; NAV option **widened** | **1.1%** base · bull NAV path **not in IRR** | **watch** (dhando **partial** strengthened) |
+| **Blended best estimate** | Lawrence unchanged; economic NAV **~$1,480/sh** | **1.1%** base · overlay **not in IRR** | **watch** (dhando **partial**; asset option sized) |
 
 **Weights:** Marvin **70%** on IRR (filings-backed cash); Groundbreaker **30%** on hidden-asset thesis (thoughtful macro, **weak primary cites** on Boswell acre-feet).
 
@@ -66,8 +66,8 @@ Groundbreaker frames J.G. Boswell as a **water-rights option** inside an operati
 ## [HUMAN REVIEW]
 
 - [x] Publisher approved 2026-06-02
-- [ ] Verify **acre-feet** and seniority from company or water-district records (not in FY2025 annual)
-- [ ] Optional: promote bull NAV row into `valuation.json` base after appraisal
+- [x] Marvin probability-weighted overlay in `valuation.json` (2026-06-02)
+- [ ] Verify **total acre-feet** and seniority from company or water-district records (not in FY2025 annual)
 
 ## [PROPOSED MEMORY]
 

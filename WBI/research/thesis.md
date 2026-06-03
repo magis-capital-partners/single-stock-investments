@@ -1,6 +1,6 @@
 # WBI — Investment Thesis
 
-**Last updated:** auto-sync
+**Last updated:** 2026-05-21
 
 ## Classification
 
@@ -10,12 +10,10 @@
 | **Moat** (Munger) | unproven |
 | **Dhando** (Pabrai) | pending |
 | **Stance** | watch |
-| **Cycle** | mid |
-| **Implied 7yr IRR** (base) | 13.92% (total synthesis) |
-| **IRR method** | full |
-| **Lawrence bucket** | low_cost |
-| **Payoff lens** | pending |
-| **MOI bucket** | pending |
+| **Cycle** | - |
+| **Implied 7yr IRR** (Lawrence) | pending |
+| **IRR method** | pending |
+| **Lawrence bucket** | — |
 
 **Deep dive:** `WBI/research/deep_dive_2026-06-02.md` (auto-sync)
 

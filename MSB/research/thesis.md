@@ -1,6 +1,6 @@
 # MSB — Investment Thesis
 
-**Last updated:** auto-sync
+**Last updated:** 2026-05-21
 
 ## Classification
 
@@ -9,13 +9,11 @@
 | **Archetype** (Stahl) | optionality |
 | **Moat** (Munger) | n/a |
 | **Dhando** (Pabrai) | partial |
-| **Stance** | hold |
+| **Stance** | watch |
 | **Cycle** | mid |
-| **Implied 7yr IRR** (base) | 10.3% (base) |
-| **IRR method** | yield_curve |
-| **Lawrence bucket** | other |
-| **Payoff lens** | pending |
-| **MOI bucket** | pending |
+| **Implied 7yr IRR** (Lawrence) | pending |
+| **IRR method** | pending |
+| **Lawrence bucket** | — |
 
 **Deep dive:** `MSB/research/deep_dive_2026-06-02.md` (auto-sync)
 

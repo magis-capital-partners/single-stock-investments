@@ -1,21 +1,19 @@
 # TPL — Investment Thesis
 
-**Last updated:** auto-sync
+**Last updated:** 2026-05-21
 
 ## Classification
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | infrastructure |
-| **Moat** (Munger) | durable |
-| **Dhando** (Pabrai) | partial |
+| **Archetype** (Stahl) | unknown |
+| **Moat** (Munger) | unproven |
+| **Dhando** (Pabrai) | pending |
 | **Stance** | watch |
-| **Cycle** | mid |
-| **Implied 7yr IRR** (base) | -0.13% (total synthesis) |
-| **IRR method** | full |
-| **Lawrence bucket** | pricing_power |
-| **Payoff lens** | pending |
-| **MOI bucket** | pending |
+| **Cycle** | - |
+| **Implied 7yr IRR** (Lawrence) | pending |
+| **IRR method** | pending |
+| **Lawrence bucket** | — |
 
 **Deep dive:** `TPL/research/deep_dive_2026-06-02.md` (auto-sync)
 
