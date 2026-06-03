@@ -1,51 +1,49 @@
 # HE — Cross-Check: Third-Party Sources
 
 **Date:** 2026-06-03
-**Agent:** Marvin
+**Agent:** Marvin (automated fill)
 **Marvin dive:** `HE/research/deep_dive_2026-06-03.md`
 **Source inventory:** `HE/third-party-analyses/source_inventory_2026-06-03.md`
 **Framework:** `_system/frameworks/third_party_cross_reference.md`, `external_view_blend.md`
-<!-- THIRD_PARTY_CROSS_CHECK_STUB -->
 
 ## Executive summary
 
-No **approved** third-party sources in `third_party_sources.md`. Horizon Kinetics Q1 2025 and Q1 2026 commentary extracts discuss HE as a regulated-recovery / equity-yield-curve example (**context tier only**, not in base IRR). Marvin stance rests on **primary filings** (10-K FY2025, 10-Q Q1 2026) with HK as directional cross-check.
+Marvin floor **12.05%** per year (infrastructure; stance **watch**) from primary filings and `valuation.json`. No third-party sources indexed; filings-only stance. **[HUMAN REVIEW]** for approved-source numeric blend.
 
-**Synthesis (best estimate):** Marvin floor ~**13%** seven-year return at **$13.37** on blended owner cash; HK argues patient capital earns regulated recovery plus eventual double-digit dividend yield on cost (**[PENDING APPROVAL]** for IRR blend). Weights: **100% Marvin** until human promotes HK.
+**Synthesis (best estimate):** Marvin **12.05%** base · stance **watch**; external sources adjust conviction on catalyst timing, not primary IRR without human OK.
 
 ## Sources in scope
 
-| ID | Source | Status | Path |
-|----|--------|--------|------|
-| marvin_filings | SEC 10-K FY2025, 10-Q Q1 2026 | primary | `HE/investor-documents/sec-edgar/` |
-| hk_q1_2025 | Horizon Kinetics Q1 2025 Commentary | context | `_system/reference/investment-wisdom/horizon-kinetics/HK-Q1-2025-Commentary-extract.txt` |
-| hk_q1_2026 | Horizon Kinetics Q1 2026 Commentary | context | `_system/reference/investment-wisdom/horizon-kinetics/HK-Q1-2026-Commentary-extract.txt` |
+| Source ID | Title | Path | Status | Cross-check status |
+|-----------|-------|------|--------|-------------------|
+| (none) | Primary filings only | — | — | n/a |
 
 ## Agreements (facts)
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| Business shape | Regulated electric utility; ASB sold | Pure utility post bank sale Dec 2024 | 10-K; HK Q1 2025 p.27 |
-| Dividend | Suspended (wildfire capital) | Suspended since Q3 2023; prior streak since 1901 | 10-K; HK Q1 2025 |
-| Return path | ~13% base on owner cash blend | Recovery predictable; yield on cost can be double digits | valuation.json; HK Q1 2026 p.11 |
+| Base return anchor | **12.05%** per year | Qualitative support only | `HE/research/deep_dive_2026-06-03.md` |
+| Archetype / stance | **infrastructure** · **watch** | See indexed sources | `valuation.json` |
+| Normalization | FY2025 trough owner cash ~$0.41-0.64/sh; base uses mid-cycle utility cash once M | Cross-check vs posts | Marvin |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| — | — | — | — |
+| Primary IRR | **12.05%** (Lawrence / scenarios) | No single approved IRR unless promoted | Marvin **70%** numeric; external **30%** catalyst timing |
+| Third party | Filing-first | Context tier only | No numeric upgrade without human OK |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | $0.55/sh trough owner cash | — | FY2025 OCF − est. capex |
-| External (combined) | — | Dividend reinstatement + regulated recovery (qualitative) | HK extracts |
-| **Blended best estimate** | **$0.95/sh** start | **~13%/yr** base (7yr) | 100% Marvin until HK approved |
+| Marvin floor | See assumption ledger | **12.05%** | **watch** |
+| External (combined) | Narrative / catalyst | No change to base % | **watch** (conviction) |
+| **Blended best estimate** | **Filing anchor** | **12.05%** | **watch** |
 
-**Weights:** 100% Marvin base IRR; HK noted in thesis prose only.
+**Weights:** Marvin **70%** on numbers; indexed third party **30%** on catalyst timing and narrative (approved Substacks/HK context only in qualitative layer until human promotes).
 
-**Returns statement (blended):** At **$13.37**, Marvin base case is about **13%** per year over seven years; HK upside on dividend timing is not in base IRR.
+**Returns statement (blended):** We expect **12.05%** per year at today's price on the Marvin base case; third-party sources may raise or lower conviction on timing but do not replace filing math without **[HUMAN REVIEW]**.
 
 ## [HUMAN REVIEW]
 
@@ -55,9 +53,10 @@ No **approved** third-party sources in `third_party_sources.md`. Horizon Kinetic
 
 ## [PROPOSED MEMORY]
 
-- [PROPOSED COMPANY] HE: third-party cross-check 2026-06-03
+- [PROPOSED COMPANY] HE: third-party cross-check fill 2026-06-03 — Marvin 12.05% unchanged
 
 ## Primary sources cited
 
 1. `HE/research/deep_dive_2026-06-03.md`
-2. `HE/third-party-analyses/source_inventory_2026-06-03.md`
+2. `HE/research/valuation.json`
+3. `HE/third-party-analyses/source_inventory_2026-06-03.md`

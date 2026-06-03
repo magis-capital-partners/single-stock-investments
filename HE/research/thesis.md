@@ -1,6 +1,6 @@
 # HE — Investment Thesis
 
-**Last updated:** 2026-06-03
+**Last updated:** auto-sync
 
 ## Classification
 
@@ -11,10 +11,13 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | recovery |
-| **Implied 7yr IRR** (Lawrence) | ~13% |
+| **Implied 7yr IRR** (base) | 12.05% (total synthesis) |
 | **IRR method** | full |
 | **Lawrence bucket** | regulated_utility |
 | **Payoff lens** | event |
+| **MOI bucket** | pending |
+
+**Deep dive:** `HE/research/deep_dive_2026-06-03.md` (auto-sync)
 
 ## One-line thesis
 
