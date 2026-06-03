@@ -9,9 +9,9 @@
 
 ## Executive summary
 
-No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (10-K, 10-Q, IR). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary IR filings** (2025 annual report, FY2025 and Q1 2026 news releases). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
 
-**Synthesis:** Marvin floor only; no external blend.
+**Synthesis (best estimate):** Marvin Lawrence base **4.5%** at **$229.28** (FY2025 operating cash **$7.75/sh**); no external blend. Bull **9.3%** if Cobre Panamá and commodity tailwinds materialize.
 
 ## Sources in scope
 
@@ -33,13 +33,13 @@ No third-party sources are indexed for this ticker as of this scan. Marvin stanc
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | — | — | — |
+| Marvin floor | **$7.75/sh** owner cash | **4.5%** / 7yr | watch |
 | External (combined) | — | — | — |
-| **Blended best estimate** | **—** | **—** | **—** |
+| **Blended best estimate** | **$7.75/sh** normalized OCF | **4.5%** | watch |
 
-**Weights:** *[Document why]*
+**Weights:** 100% Marvin (no approved external sources).
 
-**Returns statement (blended):** *[One sentence; pending sources not in base IRR]*
+**Returns statement (blended):** With no approved third-party inputs, the blended view equals the Marvin base: **4.5%** per year at **$229.28** from FY2025 operating cash per share.
 
 ## [HUMAN REVIEW]
 
