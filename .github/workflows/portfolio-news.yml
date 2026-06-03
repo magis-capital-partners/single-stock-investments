@@ -87,13 +87,6 @@ jobs:
 
       - name: Commit news artifacts
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add dashboard/data/portfolio_news.json _system/data/news_seen.json _system/reviews/pending/news_*.md
           git add '*/research/news/news_index.json' 2>/dev/null || true
-          if git diff --staged --quiet; then
-            echo "No news changes to commit."
-          else
-            git commit -m "chore: refresh portfolio news $(date -u +%Y-%m-%d)"
-            git push
-          fi
+          bash _system/scripts/ci_push_main.sh "chore: refresh portfolio news $(date -u +%Y-%m-%d)"

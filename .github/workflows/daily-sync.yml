@@ -41,15 +41,8 @@ jobs:
 
       - name: Commit and push workspace
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          if git diff --staged --quiet; then
-            echo "No workspace changes to commit."
-          else
-            git commit -m "chore: daily download sync $(date -u +%Y-%m-%d)"
-            git push
-          fi
+          bash _system/scripts/ci_push_main.sh "chore: daily download sync $(date -u +%Y-%m-%d)"
 
   portfolio-news:
     needs: download-and-sync
