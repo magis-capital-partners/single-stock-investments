@@ -9,37 +9,41 @@
 
 ## Executive summary
 
-No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (10-K, 10-Q, IR). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (FY2025 10-K, Q1 FY2026 10-Q). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
 
-**Synthesis:** Marvin floor only; no external blend.
+**Synthesis:** Marvin floor only; no external blend. Lawrence base about **-5.8% per year** at $27.50 (Stooq 2026-06-02) on normalized operating owner cash.
 
 ## Sources in scope
 
-| (none) | Primary filings only | — | — | n/a |
+| ID | Source | Path | Status | Use |
+|----|--------|------|--------|-----|
+| filings | SEC 10-K / 10-Q | `HKHC/investor-documents/sec-edgar/` | primary | Marvin floor |
 
 ## Agreements (facts)
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| — | — | — | — |
+| TPL AUM weight | 65% of AUM Dec 2025 | n/a | `10-K_20260312_*.htm` |
+| Revenue growth | +31% YoY FY2025 | n/a | Same |
+| Book value | ~$18.85/sh Dec 2025 | n/a | Same |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| — | — | — | — |
+| — | — | — | No external views to blend |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | — | — | — |
-| External (combined) | — | — | — |
-| **Blended best estimate** | **—** | **—** | **—** |
+| Marvin floor | $0.59/sh operating owner cash | -5.8% / 7yr Lawrence | watch |
+| External (combined) | n/a | n/a | n/a |
+| **Blended best estimate** | **Same as Marvin** | **-5.8%** | **watch** |
 
-**Weights:** *[Document why]*
+**Weights:** 100% Marvin (no approved external).
 
-**Returns statement (blended):** *[One sentence; pending sources not in base IRR]*
+**Returns statement (blended):** With no approved third-party inputs, the blended view equals the filing-based Lawrence base of about **-5.8% per year** at today's price; stance **watch**.
 
 ## [HUMAN REVIEW]
 
