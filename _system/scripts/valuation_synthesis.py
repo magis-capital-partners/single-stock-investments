@@ -17,6 +17,16 @@ from lawrence_horizon import LAWRENCE_HORIZON_YEARS, SYNTHESIS_LABEL  # noqa: E4
 
 # Epistemic tiers for synthesis weights (see total_synthesis_irr.md § Popper / Deutsch)
 WEIGHT_THEORY: dict[str, dict] = {
+    "yield_curve_gate": {
+        "tier": "A (primary falsifiable)",
+        "default_weight": 0.30,
+        "why": "Lawrence yield-curve or optionality_gate primary return; stance bar for accumulate.",
+        "falsifiers": [
+            "Gate return not updated when scenarios.base payoff/years change",
+            "Dated NAV path double-counts dividends already in yield gate",
+        ],
+        "hard_to_vary": "yes",
+    },
     "filing_falsifier": {
         "tier": "A (primary falsifiable)",
         "default_weight": 0.30,
@@ -354,9 +364,57 @@ def _attach_weight_theory(paths: list[dict]) -> list[dict]:
     return out
 
 
+def _scenario_dated_return_pct(data: dict, case: str = "base") -> float | None:
+    """IRR from price to scenario payoff over scenario years (royalty / SOTP paths)."""
+    sc = (data.get("scenarios") or {}).get(case) or {}
+    price = sc.get("price") or (data.get("inputs") or {}).get("price")
+    payoff = sc.get("payoff")
+    years = sc.get("years")
+    sotp = sc.get("sotp_build") or {}
+    if payoff is None:
+        payoff = sotp.get("year5_economic_nav_per_share") or sotp.get("year10_economic_nav_per_share")
+    if years is None:
+        years = sotp.get("years")
+    if price and payoff and years and float(price) > 0 and float(years) > 0:
+        return _round_pct(((float(payoff) / float(price)) ** (1 / float(years)) - 1) * 100)
+    return None
+
+
 def _default_paths(data: dict) -> list[dict]:
     """Auto-build synthesis paths from valuation.json results."""
     paths: list[dict] = []
+    if data.get("method") == "yield_curve":
+        gate = data.get("optionality_gate") or {}
+        legacy = data.get("results_lawrence_legacy") or data.get("results") or {}
+        gate_pct = gate.get("primary_return_pct")
+        if gate_pct is None:
+            gate_pct = (legacy.get("base") or {}).get("return_pct")
+        if gate_pct is not None:
+            paths.append(
+                {
+                    "id": "yield_curve_gate",
+                    "label": "Lawrence yield-curve / stance gate",
+                    "source": gate.get("primary_label") or "optionality_gate.primary_return_pct",
+                    "return_pct": _round_pct(float(gate_pct)),
+                    "weight": 0.30,
+                    "type": "numeric",
+                }
+            )
+        econ = _scenario_dated_return_pct(data, "base")
+        price = (data.get("inputs") or {}).get("price")
+        base_sc = (data.get("scenarios") or {}).get("base") or {}
+        payoff = base_sc.get("payoff") or (base_sc.get("sotp_build") or {}).get("year5_economic_nav_per_share")
+        if econ is not None and price and payoff:
+            paths.append(
+                {
+                    "id": "nav_overlay_payoff",
+                    "label": f"Economic payoff dated ({base_sc.get('years') or LAWRENCE_HORIZON_YEARS}yr)",
+                    "source": f"scenarios.base payoff ~${payoff}/sh vs price ${price}",
+                    "return_pct": econ,
+                    "weight": 0.15,
+                    "type": "numeric",
+                }
+            )
     ir = data.get("implied_return") or {}
     fa = ir.get("falsifier_adjusted_pct")
     if fa is not None:
@@ -598,18 +656,19 @@ def _weight_stress_markdown(paths: list[dict], flags: dict) -> str:
 
 
 def post_optionality_valuation_pass(data: dict) -> None:
-    """After refresh_optionality_valuation: sync synthesis paths; keep Lawrence base for yield_curve."""
+    """After refresh_optionality_valuation: sync synthesis paths; keep Lawrence gate when blending."""
     from optionality_evidence_common import lawrence_base_return_pct, synthesis_in_dive
 
     method = data.get("method", "")
     base_lawrence = lawrence_base_return_pct(data)
-    if base_lawrence is not None:
+    blend = synthesis_in_dive(data)
+    if base_lawrence is not None and not blend:
         ir = data.setdefault("implied_return", {})
         ir["base_pct"] = base_lawrence
         ir["label"] = "annualized return"
         ir["display"] = f"{base_lawrence:.2f}% (base)"
 
-    if method == "yield_curve" and not synthesis_in_dive(data):
+    if method == "yield_curve" and not blend:
         data["synthesis"] = {
             "status": "n/a",
             "reason": "Lawrence yield_curve is stance gate; set evidence_refresh.synthesis_in_dive true to enable capstone blend",
@@ -695,13 +754,17 @@ def compute_synthesis(data: dict) -> dict:
     }
     data["synthesis"] = synthesis
 
+    from optionality_evidence_common import lawrence_base_return_pct, synthesis_in_dive
+
     ir = data.setdefault("implied_return", {})
-    fa_ref = ir.get("falsifier_adjusted_pct")
-    if fa_ref is None:
-        fa_ref = ir.get("base_pct")
-    ir["falsifier_adjusted_pct"] = fa_ref
+    gate_pct = lawrence_base_return_pct(data)
+    if gate_pct is not None:
+        ir["lawrence_stance_gate_pct"] = gate_pct
+        ir["falsifier_adjusted_pct"] = gate_pct
+    elif ir.get("falsifier_adjusted_pct") is None:
+        ir["falsifier_adjusted_pct"] = ir.get("base_pct")
     ir["synthesis_pct"] = total
-    if data.get("method") != "yield_curve":
+    if synthesis.get("status") == "complete" and synthesis_in_dive(data):
         ir["base_pct"] = total
         ir["label"] = SYNTHESIS_LABEL
         ir["display"] = f"{total}% (total synthesis)"
@@ -721,10 +784,12 @@ def website_implied_irr(data: dict) -> dict:
         display = f"{base}% (total synthesis)"
     elif base is not None and not display:
         display = f"{base}%"
+    gate = ir.get("lawrence_stance_gate_pct") or ir.get("lawrence_owner_cash_pct")
     return {
         "display": display,
         "base_pct": base,
         "falsifier_adjusted_pct": ir.get("falsifier_adjusted_pct"),
+        "lawrence_stance_gate_pct": gate,
         "synthesis_status": syn.get("status"),
         "synthesis_pct": syn.get("total_synthesis_pct"),
     }

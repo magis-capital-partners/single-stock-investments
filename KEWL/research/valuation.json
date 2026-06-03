@@ -23,7 +23,7 @@
     "overlay_slack_per_share": 4.0,
     "base_payoff_mode": "fixed_stance_gate",
     "max_residual_uplift_per_share": 5,
-    "synthesis_in_dive": false,
+    "synthesis_in_dive": true,
     "floor_metric": "nav_per_share",
     "payoff_lens": "asset",
     "seed_filing_facts": true,
@@ -147,9 +147,12 @@
     }
   },
   "implied_return": {
-    "base_pct": -8.29,
-    "label": "annualized return",
-    "display": "-8.29% (base)"
+    "base_pct": -6.81,
+    "label": "7yr IRR (total synthesis)",
+    "display": "-6.81% (total synthesis)",
+    "lawrence_stance_gate_pct": -8.29,
+    "falsifier_adjusted_pct": -8.29,
+    "synthesis_pct": -6.81
   },
   "stance_proposal": {
     "suggested": "watch",
@@ -303,9 +306,129 @@
     }
   ],
   "synthesis": {
-    "status": "n/a",
-    "reason": "Lawrence yield_curve is stance gate; set evidence_refresh.synthesis_in_dive true to enable capstone blend",
-    "human_approval": "n/a"
+    "status": "complete",
+    "paths": [
+      {
+        "id": "yield_curve_gate",
+        "label": "Lawrence yield-curve / stance gate",
+        "source": "annualized return",
+        "return_pct": -8.3,
+        "weight": 0.3,
+        "type": "numeric",
+        "epistemic_tier": "A (primary falsifiable)",
+        "weight_why": "Lawrence yield-curve or optionality_gate primary return; stance bar for accumulate.",
+        "weight_falsifiers": [
+          "Gate return not updated when scenarios.base payoff/years change",
+          "Dated NAV path double-counts dividends already in yield gate"
+        ],
+        "hard_to_vary": "yes"
+      },
+      {
+        "id": "nav_overlay_payoff",
+        "label": "Economic payoff dated (7yr)",
+        "source": "nav_overlay ~$22.65/sh vs price $55.0",
+        "return_pct": -11.9,
+        "weight": 0.15,
+        "type": "numeric",
+        "epistemic_tier": "D (alternate theory: dated asset payoff)",
+        "weight_why": "Answers a different question (NAV convergence) than 7yr cash-flow IRR; capped weight to avoid theory conflation.",
+        "weight_falsifiers": [
+          "NAV overlay base not updated when segment build or filings change >10%",
+          "floor_pass false but weight above 15% without [HUMAN REVIEW]"
+        ],
+        "hard_to_vary": "yes: separate theory type"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": -17.8,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 2.4,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      },
+      {
+        "id": "nav_overlay_payoff",
+        "label": "NAV overlay dated payoff (7yr to overlay base)",
+        "source": "nav_overlay ~$22.65/sh vs price $55.0",
+        "return_pct": -11.9,
+        "weight": 0.1,
+        "type": "numeric",
+        "epistemic_tier": "D (alternate theory: dated asset payoff)",
+        "weight_why": "Answers a different question (NAV convergence) than 7yr cash-flow IRR; capped weight to avoid theory conflation.",
+        "weight_falsifiers": [
+          "NAV overlay base not updated when segment build or filings change >10%",
+          "floor_pass false but weight above 15% without [HUMAN REVIEW]"
+        ],
+        "hard_to_vary": "yes: separate theory type"
+      },
+      {
+        "id": "third_party_context",
+        "label": "Third-party approved (HK + Substacks + inventory)",
+        "source": "source_inventory (2 sources); cross_check blend",
+        "return_pct": 2.4,
+        "weight": 0.1,
+        "type": "numeric",
+        "notes": "Proxy: upside case when strategic third party has no spot IRR",
+        "epistemic_tier": "D (external triangulation)",
+        "weight_why": "Context-tier HK/Substacks until human promotes in third_party_sources.md; numeric proxy is weak.",
+        "weight_falsifiers": [
+          "Using bull scenario as HK proxy when cross_check synthesis says no IRR upgrade",
+          "Weight above 15% while human_approval pending"
+        ],
+        "hard_to_vary": "no: proxy return is instrumentalist; prefer qualitative pp until approved blend"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "factor": "Partial dhando (HK hard-asset / hidden NAV)",
+        "pp": 0.5,
+        "rationale": "Third-party confirms asset quality not in GAAP book; not full floor at spot price",
+        "sources": "cross_check_HK; hk_scan; HK Q1 2025/2026"
+      },
+      {
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework"
+      }
+    ],
+    "numeric_weighted_pct": -7.11,
+    "qualitative_pp": 0.3,
+    "total_synthesis_pct": -6.81,
+    "human_approval": "n/a",
+    "weight_audit": {
+      "flags": [
+        "Third-party numeric path proxies bull scenario (instrumentalist); HK cross-check says no base IRR upgrade. Prefer qualitative pp only until approved blend.",
+        "NAV overlay is a different theory (asset payoff vs cash-flow IRR); weight capped at 10% to limit theory conflation."
+      ],
+      "deutsch_checks": {
+        "hard_to_vary": false,
+        "falsifiable": true,
+        "not_instrumentalist": false,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
   },
   "market_inputs": {
     "copper": {
