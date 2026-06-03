@@ -196,7 +196,7 @@ def refresh_commodity_nav(ticker: str, val: dict, cfg: dict) -> dict:
 
 
 def seed_filing_facts_from_inputs(ticker: str, val: dict, as_of: str) -> None:
-    """Write filing_facts metrics from valuation inputs when OTC parse is thin."""
+    """Merge valuation inputs into filing_facts without clobbering OTC/IX parse."""
     inp = val.get("inputs") or {}
     book = inp.get("book_per_share")
     if book is None:
@@ -204,13 +204,13 @@ def seed_filing_facts_from_inputs(ticker: str, val: dict, as_of: str) -> None:
     evidence = ROOT / ticker / "research" / "evidence"
     evidence.mkdir(parents=True, exist_ok=True)
     out = evidence / f"filing_facts_{as_of}.json"
-    metrics: dict = {}
+    old: dict = {}
     if out.exists():
         try:
             old = json.loads(out.read_text(encoding="utf-8"))
-            metrics.update(old.get("metrics") or {})
         except json.JSONDecodeError:
             pass
+    metrics: dict = dict(old.get("metrics") or {})
     metrics["book_value_per_share"] = {"current": book, "source": "valuation.json inputs"}
     if inp.get("shares_outstanding"):
         metrics["shares_outstanding"] = {"current": int(inp["shares_outstanding"]), "source": "valuation.json"}
@@ -219,12 +219,21 @@ def seed_filing_facts_from_inputs(ticker: str, val: dict, as_of: str) -> None:
             "current": inp["lease_income_annual_usd"],
             "source": inp.get("lease_income_source", "filing"),
         }
+    parser = old.get("parser") or "evidence_refresh_seed"
+    if parser == "evidence_refresh_seed":
+        has_filing = any(
+            isinstance(m, dict) and str(m.get("source", "")).startswith(("filing", "otc", "ix"))
+            for m in metrics.values()
+        )
+        if has_filing:
+            parser = "otc_prose"
+    source_text = old.get("source_text") or "valuation.json evidence_refresh seed"
     payload = {
         "ticker": ticker,
-        "source_text": metrics.get("shares_outstanding", {}).get("source", "valuation.json evidence_refresh seed"),
+        "source_text": source_text,
         "as_of": as_of,
         "metrics": metrics,
-        "parser": "evidence_refresh_seed",
+        "parser": parser,
     }
     out.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 
