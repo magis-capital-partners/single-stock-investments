@@ -26,8 +26,17 @@ python3 _system/scripts/download_otc_api.py   # includes BWEL
 
 ```
 BWEL/
-├── investor-documents/ir-bwel/   # OTC annual reports (PDF)
-├── research/                     # Marvin analysis
+├── investor-documents/ir-bwel/        # OTC annual reports (PDF)
+├── investor-documents/research-notes/ # Books (e.g. The King of California)
+├── research/                          # Marvin analysis
 ├── third-party-analyses/
 └── INDEX.csv
+```
+
+## Reference book
+
+*The King of California* (Arax & Wartzman, 2003) — see `investor-documents/research-notes/README.md`. Run:
+
+```bash
+python3 BWEL/investor-documents/download_king_of_california.py
 ```

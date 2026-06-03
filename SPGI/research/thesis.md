@@ -1,6 +1,6 @@
 # SPGI — Investment Thesis
 
-**Last updated:** auto-sync
+**Last updated:** 2026-05-21
 
 ## Classification
 
@@ -9,13 +9,11 @@
 | **Archetype** (Stahl) | croupier |
 | **Moat** (Munger) | stable |
 | **Dhando** (Pabrai) | partial |
-| **Stance** | watch |
+| **Stance** | hold |
 | **Cycle** | mid |
-| **Implied 7yr IRR** (base) | 11.25% (total synthesis) |
-| **IRR method** | full |
-| **Lawrence bucket** | multi_sided |
-| **Payoff lens** | pending |
-| **MOI bucket** | pending |
+| **Implied 7yr IRR** (Lawrence) | pending |
+| **IRR method** | pending |
+| **Lawrence bucket** | — |
 
 **Deep dive:** `SPGI/research/deep_dive_2026-06-02.md` (auto-sync)
 

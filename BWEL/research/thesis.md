@@ -1,6 +1,6 @@
 # BWEL — Investment Thesis
 
-**Last updated:** auto-sync
+**Last updated:** 2026-05-21
 
 ## Classification
 
@@ -11,24 +11,24 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | trough |
-| **Implied 7yr IRR** (base) | 2.86% (total synthesis) |
-| **IRR method** | full |
-| **Lawrence bucket** | low_cost |
-| **Payoff lens** | asset |
-| **MOI bucket** | pending |
+| **Implied 7yr IRR** (Lawrence) | pending |
+| **IRR method** | pending |
+| **Lawrence bucket** | — |
 
-**Deep dive:** `BWEL/research/deep_dive_2026-06-02.md` (auto-sync)
+**Deep dive:** `BWEL/research/deep_dive_2026-06-03.md`  
+**Fact-check:** `BWEL/research/fact_check_water_nav_2026-06-02.md`
 
 ## One-line thesis
 
-Family-owned California farm franchise trading below GAAP book after a loss year; Lawrence return too low for accumulate, but land/mineral optionality warrants monitoring.
+At ~$549, headline **3.07%** per year (7yr blend) combines owner cash, scenarios, and NAV optionality; Lawrence cash alone is **-1.4%** while probability-weighted economic NAV is **~$1,480/sh**.
 
 ## Key questions
 
-- [x] Read latest annual report (FY2025 OTC annual)
-- [ ] Economic appraisal of land/water/minerals
+- [x] Marvin probability-weighted water/land NAV (approved 2026-06-03)
+- [x] Total synthesis headline IRR with documented weights
+- [ ] Company or district confirmation of total acre-feet
 - [ ] Mid-cycle owner cash through next crop cycle
 
 ## [HUMAN REVIEW]
 
-- First Marvin deep dive 2026-06-02; OTC-only disclosure.
+- Synthesis weights and economic NAV assumptions approved 2026-06-03.

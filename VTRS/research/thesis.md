@@ -1,6 +1,6 @@
 # VTRS — Investment Thesis
 
-**Last updated:** auto-sync
+**Last updated:** 2026-05-21
 
 ## Classification
 
@@ -11,11 +11,9 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | transition |
-| **Implied 7yr IRR** (base) | 13.61% (total synthesis) |
+| **Implied 7yr IRR** (Lawrence) | 9.5% (total synthesis) |
 | **IRR method** | full |
 | **Lawrence bucket** | low_cost |
-| **Payoff lens** | event |
-| **MOI bucket** | pending |
 
 **Deep dive:** `VTRS/research/deep_dive_2026-06-02.md` (auto-sync)
 

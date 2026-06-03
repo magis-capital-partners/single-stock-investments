@@ -1,6 +1,6 @@
 # CMSG — Investment Thesis
 
-**Last updated:** auto-sync
+**Last updated:** 2026-05-21
 
 ## Classification
 
@@ -11,11 +11,9 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | - |
-| **Implied 7yr IRR** (base) | 15.64% (total synthesis) |
-| **IRR method** | scenario |
-| **Lawrence bucket** | other |
-| **Payoff lens** | pending |
-| **MOI bucket** | pending |
+| **Implied 7yr IRR** (Lawrence) | pending |
+| **IRR method** | pending |
+| **Lawrence bucket** | — |
 
 **Deep dive:** `CMSG/research/deep_dive_2026-06-02.md` (auto-sync)
 

@@ -178,8 +178,8 @@
     "floor_metric": "price_to_book",
     "floor_value": 783.2,
     "primary_metric": "lawrence_base",
-    "primary_label": "7yr IRR",
-    "primary_return_pct": -1.4,
+    "primary_label": "10yr IRR",
+    "primary_return_pct": 1.1,
     "incumbent_sleeve": false,
     "notes": "Price ~0.70x GAAP book; thin OTC liquidity; family control; mineral rights option not in Lawrence FCF path.",
     "overlay_nav_per_share": 1480.0,
@@ -268,24 +268,21 @@
   },
   "results": {
     "bear": {
-      "return_pct": -6.3
+      "return_pct": -2.8
     },
     "base": {
-      "return_pct": -1.4
+      "return_pct": 1.1
     },
     "bull": {
-      "return_pct": 1.4
+      "return_pct": 3.2
     }
   },
   "implied_return": {
-    "base_pct": 3.07,
-    "label": "7yr IRR (total synthesis)",
-    "display": "3.07% (total synthesis); Lawrence cash -1.4%",
-    "lawrence_owner_cash_pct": -1.4,
-    "falsifier_adjusted_pct": -1.4,
-    "nav_overlay_dated_pct": 10.5,
-    "synthesis_pct": 3.07,
-    "headline_note": "Human approved NAV/synthesis weights 2026-06-03; recalc on 7yr Lawrence horizon merge"
+    "base_pct": 1.1,
+    "label": "10yr IRR (total synthesis)",
+    "display": "5.09% (total synthesis)",
+    "falsifier_adjusted_pct": 1.1,
+    "synthesis_pct": 5.09
   },
   "stance_proposal": {
     "suggested": "watch",
@@ -350,24 +347,19 @@
     }
   ],
   "human_review": {
-    "approved": true,
-    "approved_date": "2026-06-03",
-    "approval_channel": "cursor_chat",
-    "notes": "Economic NAV ~$1,480/sh and synthesis weights approved 2026-06-03; headline 2.91% (7yr blend); Lawrence cash -1.4% is accumulate bar.",
-    "economic_nav_water_af": "Approved 2026-06-03; overlay ~$1,480/sh; 400k AF press claim still unverified",
-    "synthesis_weights": "approved 2026-06-03; NAV path 15% weight"
+    "economic_nav_water_af": "Marvin probability-weighted overlay ~$1,480/sh; 400k AF unverified in filings \u2014 BWEL/research/fact_check_water_nav_2026-06-02.md"
   },
   "payoff_lens": "asset",
   "moi_bucket": "asset",
   "results_lawrence_legacy": {
     "bear": {
-      "return_pct": -6.3
+      "return_pct": -2.8
     },
     "base": {
-      "return_pct": -1.4
+      "return_pct": 1.1
     },
     "bull": {
-      "return_pct": 1.4
+      "return_pct": 3.2
     }
   },
   "overlay_results": [],
@@ -375,25 +367,10 @@
     "status": "complete",
     "paths": [
       {
-        "id": "filing_falsifier",
-        "label": "Lawrence owner cash (mid-cycle)",
-        "source": "scenarios.base; FY2025 annual owner cash",
-        "return_pct": -1.4,
-        "weight": 0.3,
-        "type": "numeric",
-        "epistemic_tier": "A (primary falsifiable)",
-        "weight_why": "Only path tied to 10-K/10-Q owner cash with growth mechanism + falsifier runner; highest refutation reach.",
-        "weight_falsifiers": [
-          "Any triggered growth falsifier forces weight cut or path removal",
-          "Theory-implied diverges from falsifier-adjusted by >2pp without documented mechanism change"
-        ],
-        "hard_to_vary": "yes: weight tracks evidence tier, not target IRR"
-      },
-      {
         "id": "scenario_bear",
         "label": "Bear scenario (Lawrence)",
         "source": "scenarios.bear",
-        "return_pct": -6.3,
+        "return_pct": -2.8,
         "weight": 0.05,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
@@ -407,7 +384,7 @@
         "id": "scenario_bull",
         "label": "Bull scenario (Lawrence)",
         "source": "scenarios.bull",
-        "return_pct": 1.4,
+        "return_pct": 3.2,
         "weight": 0.12,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
@@ -421,11 +398,11 @@
         "id": "nav_overlay_payoff",
         "label": "NAV overlay dated payoff (10yr to overlay base)",
         "source": "nav_overlay ~$1480.0/sh vs price $548.5",
-        "return_pct": 15.23,
-        "weight": 0.15,
+        "return_pct": 10.5,
+        "weight": 0.1,
         "type": "numeric",
         "epistemic_tier": "D (alternate theory: dated asset payoff)",
-        "weight_why": "Answers a different question (NAV convergence) than 7yr cash-flow IRR; capped weight to avoid theory conflation.",
+        "weight_why": "Answers a different question (NAV convergence) than 10yr cash-flow IRR; capped weight to avoid theory conflation.",
         "weight_falsifiers": [
           "NAV overlay base not updated when segment build or filings change >10%",
           "floor_pass false but weight above 15% without [HUMAN REVIEW]"
@@ -435,10 +412,10 @@
     ],
     "qualitative_adjustments": [
       {
-        "factor": "Partial dhando (verified water transfers + PW NAV)",
+        "factor": "Partial dhando (HK hard-asset / hidden NAV)",
         "pp": 0.5,
-        "rationale": "102k+ AF Kings transfers verified; economic NAV >> price; not full floor at spot",
-        "sources": "fact_check_water_nav_2026-06-02.md; cross_check_groundbreaker_2026-06-02.md"
+        "rationale": "Third-party confirms asset quality not in GAAP book; not full floor at spot price",
+        "sources": "cross_check_HK; hk_scan; HK Q1 2025/2026"
       },
       {
         "factor": "No dated predictive attribute at spot",
@@ -447,10 +424,10 @@
         "sources": "HK predictive attributes framework"
       }
     ],
-    "numeric_weighted_pct": 2.77,
+    "numeric_weighted_pct": 4.79,
     "qualitative_pp": 0.3,
-    "total_synthesis_pct": 3.07,
-    "human_approval": "approved",
+    "total_synthesis_pct": 5.09,
+    "human_approval": "pending",
     "weight_audit": {
       "flags": [
         "NAV overlay is a different theory (asset payoff vs cash-flow IRR); weight capped at 10% to limit theory conflation."
@@ -463,6 +440,5 @@
       }
     },
     "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
-  },
-  "lawrence_horizon_years": 7
+  }
 }
