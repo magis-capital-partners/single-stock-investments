@@ -19,7 +19,13 @@
     "per_share": 1.05,
     "fcf_source": "Mid-cycle fee + infrastructure owner cash ex treasury marks; marvin_floor = FY2025 adj EBITDA",
     "shares_millions": 191,
-    "normalization_note": "FY2025 adj EBITDA $33.7M ($0.18/sh); base normalizes fee/AUM growth and partial HPC cash flow"
+    "normalization_note": "FY2025 adj EBITDA $33.7M ($0.18/sh); base normalizes fee/AUM growth and partial HPC cash flow",
+    "copper_spot_usd_per_lb": 6.4773,
+    "copper_spot_as_of": "2026-06-04",
+    "copper_spot_source": "https://stooq.com/q/l/?s=hg.f&f=sd2t2ohlcv&h&e=csv",
+    "copperwood_royalty_est_usd_ssi_ref": 7700000,
+    "copperwood_royalty_est_usd_at_spot": 12468802.0,
+    "copperwood_royalty_note": "SSI ~$7.7M/yr @ $4.0/lb scaled linearly to spot $6.4773/lb [Assumption]"
   },
   "estimates": {
     "marvin_floor": {
@@ -119,8 +125,13 @@
     ]
   },
   "nav_overlay": {
+    "as_of": "2026-06-03",
+    "status": "complete",
+    "enabled": true,
+    "method": "mark_to_market_treasury",
     "gaap_book_per_share": 10.2,
-    "fair_nav_per_share": null,
+    "digital_assets_billions": 3.7,
+    "overlay_rationale": "Treasury digital assets marked to market on balance sheet; operating franchise valued separately in segment build; book not used as dhando floor",
     "notes": "Total equity $3.0B includes treasury marks; not used as dhando floor"
   },
   "optionality_gate": {
@@ -128,7 +139,8 @@
     "secondary_metric": "segment_overlay",
     "notes": "Low Lawrence IRR valid if HPC option matures; watch until fee path clears 15% bar",
     "primary_label": "7yr IRR",
-    "primary_return_pct": 6.2
+    "primary_return_pct": 6.2,
+    "copperwood_option_yield_pct": 38.87
   },
   "option_scan": [
     {
@@ -218,44 +230,58 @@
     }
   },
   "implied_return": {
-    "base_pct": 3.4,
+    "base_pct": 7.65,
     "label": "7yr IRR (total synthesis)",
-    "display": "3.4% (total synthesis)",
+    "display": "7.65% (total synthesis)",
     "lawrence_stance_gate_pct": 6.2,
     "falsifier_adjusted_pct": 6.2,
-    "synthesis_pct": 3.4
+    "synthesis_pct": 7.65
   },
   "overlay_results": [],
   "synthesis": {
     "status": "complete",
     "paths": [
       {
+        "id": "theory_implied",
+        "label": "Segment-derived growth (pre-falsifier)",
+        "source": "segment_build weighted blend",
+        "return_pct": 6.2,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
         "id": "scenario_bear",
-        "label": "Bear scenario (Lawrence envelope)",
+        "label": "Bear scenario (Lawrence)",
         "source": "scenarios.bear",
         "return_pct": -8.6,
         "weight": 0.05,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
         "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
-        "hard_to_vary": "yes: asymmetric low weight is structural",
         "weight_falsifiers": [
           "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
-        ]
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
       },
       {
         "id": "scenario_bull",
-        "label": "Bull scenario (Lawrence envelope)",
+        "label": "Bull scenario (Lawrence)",
         "source": "scenarios.bull",
         "return_pct": 15.8,
-        "weight": 0.05,
+        "weight": 0.12,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
         "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
-        "hard_to_vary": "yes",
         "weight_falsifiers": [
           "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
-        ]
+        ],
+        "hard_to_vary": "yes"
       }
     ],
     "qualitative_adjustments": [
@@ -270,9 +296,9 @@
     ],
     "qualitative_manual": false,
     "qualitative_pp_cap_applied": false,
-    "numeric_weighted_pct": 3.6,
+    "numeric_weighted_pct": 7.85,
     "qualitative_pp": -0.2,
-    "total_synthesis_pct": 3.4,
+    "total_synthesis_pct": 7.65,
     "human_approval": "pending",
     "weight_audit": {
       "flags": [],
@@ -293,5 +319,29 @@
       }
     },
     "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
-  }
+  },
+  "market_inputs": {
+    "copper": {
+      "spot": 6.4773,
+      "as_of": "2026-06-04",
+      "source": "https://stooq.com/q/l/?s=hg.f&f=sd2t2ohlcv&h&e=csv",
+      "fetched_at": "2026-06-03T22:17:53Z",
+      "stooq_symbol": "hg.f"
+    },
+    "scenario_grid": {
+      "bear": {
+        "copper_usd_per_lb": 4.66,
+        "label": "trough (~28% below spot)"
+      },
+      "base": {
+        "copper_usd_per_lb": null,
+        "label": "spot at compute"
+      },
+      "bull": {
+        "copper_usd_per_lb": 7.0,
+        "label": "cycle high (~8% above spot)"
+      }
+    }
+  },
+  "market_inputs_as_of": "2026-06-03"
 }

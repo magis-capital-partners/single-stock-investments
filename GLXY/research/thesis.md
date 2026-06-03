@@ -1,6 +1,6 @@
 # GLXY — Investment Thesis
 
-**Last updated:** 2026-06-03
+**Last updated:** auto-sync
 
 ## Classification
 
@@ -11,12 +11,17 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | trough |
-| **MOI bucket** (legacy) | pending |
+| **Implied 7yr IRR** (base) | 7.65% (total synthesis) |
+| **IRR method** | scenario |
+| **Lawrence bucket** | multi_sided |
 | **Payoff lens** | levered |
+| **MOI bucket** | pending |
+
+**Deep dive:** `GLXY/research/deep_dive_2026-06-03.md` (auto-sync)
 
 ## One-line thesis
 
-Galaxy Digital is an institutional crypto platform with growing fee lines and a Helios HPC option; at $28.48 the synthesis return is 3.4% per year (watch) until normalized owner cash clears a 15% bar.
+Galaxy Digital is an institutional crypto platform with growing fee lines and a Helios HPC option; at $28.48 the synthesis return is 7.65% per year (watch) until owner cash clears a 15% accumulate bar.
 
 ## Key questions
 
