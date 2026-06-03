@@ -1,0 +1,312 @@
+{
+  "ticker": "TRC",
+  "as_of": "2026-06-03",
+  "valuation_mode": "optionality",
+  "valuation_overlay": "segment_cashflow",
+  "method": "full",
+  "lawrence_bucket": "other",
+  "evidence_refresh": {
+    "type": "land_nav",
+    "acres_disclosed": 270000,
+    "probability_pct": 25,
+    "base_payoff": 28,
+    "bear_payoff": 16,
+    "horizon_years": 7,
+    "overlay_slack_per_share": 3.0,
+    "payoff_lens": "asset",
+    "seed_filing_facts": true,
+    "gaap_vs_fair_value": {
+      "land_policy": "Land and development property carried at cost; 270k acres not marked to fair value each quarter",
+      "source": "10-K FY2025 Item 1; SEC company facts CY2025"
+    }
+  },
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "asset",
+    "predictive_attribute": "land_optionality_entitlements"
+  },
+  "inputs": {
+    "price": 18.84,
+    "price_source": "Stooq TRC.US close 2026-06-03",
+    "fcf_per_share": 0.2,
+    "fcf_source": "3-year average cash from operations ($11.4M) minus maintenance capital spending ($6.0M), divided by 26.916M shares; excludes $46.6M land-bank purchases per 10-K FY2025 investing cash flows",
+    "shares_outstanding": 26916837,
+    "shares_source": "10-K FY2025 filed 2026-03-19 (SEC XBRL)",
+    "book_per_share": 17.65,
+    "book_per_share_caveat": "GAAP stockholders equity $475.2M / shares; land at historical cost \u2014 not a fair-value dhando floor for 270k acres",
+    "dividend_per_share_annual": 0.0,
+    "normalization_note": "FY2025 cash from operations fell to $6.1M (water timing, development spend); Lawrence base uses 2023\u20132025 average owner cash, not land-acquisition investing outflows."
+  },
+  "optionality_gate": {
+    "framework": "land_floor_option",
+    "floor_pass": true,
+    "floor_metric": "nav_per_share",
+    "floor_value": 22.0,
+    "floor_value_note": "Illustrative $8,000/acre on 25% of 270k developable acres [Assumption]; Tejon Conservancy and entitlement risk cap upside",
+    "primary_metric": "lawrence_base",
+    "primary_label": "7yr IRR",
+    "primary_return_pct": -78616995800630.3,
+    "overlay_nav_per_share": 32.0,
+    "overlay_nav_note": "Illustrative $12,000/acre on 30% of acreage + book-adjacent operating value [Assumption]",
+    "notes": "Price ~$18.84 near GAAP book; Lawrence cash IRR weak; optionality gate uses conservative acre NAV not book."
+  },
+  "nav_overlay": {
+    "as_of": "2026-06-03",
+    "status": "complete",
+    "gaap_vs_fair_value": {
+      "stockholders_equity_m": 475.2,
+      "total_assets_m": 630.5,
+      "acres_disclosed": 270000,
+      "policy_source": "10-K FY2025: approximately 270,000 acres contiguous; land carried at cost",
+      "land_line_item": "Land and development property (cost)",
+      "source": "investor-documents/sec-edgar/10-K_20260319_rpt20251231_acc0001628280_26_019685.htm"
+    },
+    "in_model": {
+      "lawrence_irr_on_operating_cash": true,
+      "gaap_book_in_dhando": false,
+      "segment_operating_pv": true,
+      "undeveloped_acreage_in_lawrence_growth": false
+    },
+    "not_in_model_requires_refresh": [
+      "Centennial / Grapevine master-planned community timing and homebuilder economics",
+      "Per-acre marks on FY2025 $46.6M real-estate acquisitions",
+      "Water-bank contract monetization beyond run-rate farming/mineral cash"
+    ],
+    "segments_or_options": [
+      {
+        "id": "centennial_grapevine",
+        "label": "Centennial & Grapevine entitled residential (pre-revenue)",
+        "option_treatment": "probability_weighted",
+        "p_base": 0.15,
+        "nav_per_share_full": 25.0,
+        "overlay_value_per_share": 3.75,
+        "evidence": "10-K FY2025 resort/residential segment; long-term entitlements; no segment revenue in period",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "trcc_industrial",
+        "label": "TRCC commercial/industrial build-out",
+        "option_treatment": "embedded_in_segment",
+        "evidence": "10-K FY2025: Commercial/Industrial segment $15.4M operating income incl. JV equity earnings",
+        "not_in_lawrence_base": false
+      },
+      {
+        "id": "water_bank",
+        "label": "Long-term water assets & banking",
+        "option_treatment": "milestone_nav",
+        "nav_per_share_full": 8.0,
+        "overlay_value_per_share": 2.0,
+        "evidence": "10-K FY2025 water asset volumes; tangible water assets $44.9M on balance sheet (XBRL)",
+        "not_in_lawrence_base": true
+      }
+    ]
+  },
+  "segment_build": {
+    "as_of": "2026-06-03",
+    "shares": 26916837,
+    "discount_rate": 0.1,
+    "segments": [
+      {
+        "id": "commercial_industrial",
+        "label": "Commercial / industrial real estate & JVs",
+        "revenue_m": 18.7,
+        "revenue_source": "10-K FY2025 segment revenue (Commercial/Industrial member, XBRL partial)",
+        "fcf_margin": 0.35,
+        "growth_y1_5": 0.05,
+        "growth_y6_10": 0.03,
+        "exit_pfcf_y10": 12
+      },
+      {
+        "id": "farming",
+        "label": "Farming & agriculture",
+        "revenue_m": 14.0,
+        "revenue_source": "10-K FY2025 Farming segment revenue ~$13.9M (XBRL)",
+        "fcf_margin": 0.15,
+        "growth_y1_5": 0.02,
+        "growth_y6_10": 0.02,
+        "exit_pfcf_y10": 10
+      },
+      {
+        "id": "mineral",
+        "label": "Mineral resources",
+        "revenue_m": 5.5,
+        "revenue_source": "10-K FY2025 Mineral Resources segment (XBRL)",
+        "fcf_margin": 0.4,
+        "growth_y1_5": 0.03,
+        "growth_y6_10": 0.02,
+        "exit_pfcf_y10": 10
+      },
+      {
+        "id": "ranch",
+        "label": "Ranch operations",
+        "revenue_m": 5.2,
+        "revenue_source": "10-K FY2025 Ranch Operations segment (XBRL)",
+        "fcf_margin": 0.1,
+        "growth_y1_5": 0.02,
+        "growth_y6_10": 0.02,
+        "exit_pfcf_y10": 8
+      }
+    ],
+    "options": [
+      {
+        "id": "resort_residential",
+        "label": "Resort / residential entitlements (Centennial, Grapevine)",
+        "option_treatment": "probability_weighted",
+        "p_base": 0.15,
+        "base_terminal_value_bn": 0.4,
+        "base_terminal_rationale": "Pre-revenue entitled land; P=15% x illustrative $400M community NAV / shares",
+        "overlay_base_terminal_bn": 0.06,
+        "bull_terminal_value_bn": 1.2,
+        "evidence": "10-K FY2025 Item 1; resort/residential segment no revenue in period",
+        "not_in_lawrence_base": true
+      }
+    ],
+    "slack_notes": "Segment revenues sum below consolidated $49.6M (intersegment eliminations); Lawrence consolidated uses normalized $0.20/sh owner cash.",
+    "horizon_years": 7
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.0,
+      "growth_y6_10": 0.0,
+      "exit_pfcf_y10": 8,
+      "notes": "Entitlement delays; OCF stays at FY2025 trough"
+    },
+    "base": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 12,
+      "notes": "Normalized run-rate farming/mineral/industrial cash; no residential lift"
+    },
+    "bull": {
+      "growth_y1_5": 0.08,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 15,
+      "notes": "TRCC lease-up + water sales; still excludes full Centennial NAV in Lawrence path"
+    }
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true,
+      "floor_pass": true,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": null
+  },
+  "estimates": {
+    "external": []
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -570631686715.2
+    },
+    "base": {
+      "return_pct": -78616995800630.3
+    },
+    "bull": {
+      "return_pct": -14.8
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -570631686715.2
+    },
+    "base": {
+      "return_pct": -78616995800630.3
+    },
+    "bull": {
+      "return_pct": -14.8
+    }
+  },
+  "implied_return": {
+    "base_pct": -105672534580.56,
+    "label": "7yr IRR (total synthesis)",
+    "display": "-105672534580.56% (total synthesis)",
+    "lawrence_stance_gate_pct": -78616995800630.3,
+    "falsifier_adjusted_pct": -78616995800630.3,
+    "synthesis_pct": -105672534580.56
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": -570631686715.2,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": -14.8,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      },
+      {
+        "id": "nav_overlay_payoff",
+        "label": "NAV overlay dated payoff (7yr to overlay base)",
+        "source": "nav_overlay ~$32.0/sh vs price $18.84",
+        "return_pct": 7.86,
+        "weight": 0.1,
+        "type": "numeric",
+        "epistemic_tier": "D (alternate theory: dated asset payoff)",
+        "weight_why": "Answers a different question (NAV convergence) than 7yr cash-flow IRR; capped weight to avoid theory conflation.",
+        "weight_falsifiers": [
+          "NAV overlay base not updated when segment build or filings change >10%",
+          "floor_pass false but weight above 15% without [HUMAN REVIEW]"
+        ],
+        "hard_to_vary": "yes: separate theory type"
+      }
+    ],
+    "qualitative_adjustments": [],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": -105672534580.56,
+    "qualitative_pp": 0,
+    "total_synthesis_pct": -105672534580.56,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [
+        "NAV overlay is a different theory (asset payoff vs cash-flow IRR); weight capped at 10% to limit theory conflation."
+      ],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}
