@@ -1,0 +1,248 @@
+{
+  "ticker": "RGLD",
+  "as_of": "2026-06-03",
+  "method": "full",
+  "lawrence_bucket": "fee_based",
+  "classification_inputs": {
+    "archetype": "compounder",
+    "moat": "narrow",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating",
+    "moi_bucket": "pending"
+  },
+  "inputs": {
+    "price": 216.755,
+    "price_source": "Stooq RGLD.US close 2026-06-03",
+    "fcf_per_share": 9.0,
+    "fcf_source": "FY2025 cash from operations $704.8M minus immaterial capital spending, divided by ~78M diluted shares (pre-full Sandstorm weighting); Q1 2026 run-rate ~$8.3/sh on ~85M shares",
+    "shares_millions": 84.9,
+    "shares_source": "Q1 2026 net income $281.1M / diluted EPS $3.30 (10-Q filed 2026-05-07)",
+    "book_per_share": 87.2,
+    "book_source": "Q1 2026 stockholders equity $7,415M / ~85M shares",
+    "normalization_note": "FY2025 revenue +43% YoY includes Sandstorm Gold combination and elevated metal prices; Lawrence uses run-rate owner cash near $9/sh, not peak spot-year heroics.",
+    "copper_spot_usd_per_lb": 6.4808,
+    "copper_spot_as_of": "2026-06-04",
+    "copper_spot_source": "https://stooq.com/q/l/?s=hg.f&f=sd2t2ohlcv&h&e=csv",
+    "copperwood_royalty_est_usd_ssi_ref": 7700000,
+    "copperwood_royalty_est_usd_at_spot": 12475540.0,
+    "copperwood_royalty_note": "SSI ~$7.7M/yr @ $4.0/lb scaled linearly to spot $6.4808/lb [Assumption]"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.0,
+      "growth_y6_10": -0.02,
+      "exit_pfcf_y10": 18,
+      "notes": "Gold price mean-reversion, slower development contributions"
+    },
+    "base": {
+      "growth_y1_5": 0.04,
+      "growth_y6_10": 0.025,
+      "exit_pfcf_y10": 22,
+      "notes": "Combined portfolio growth near inflation plus modest development ramp; exit ~22x cash flow"
+    },
+    "bull": {
+      "growth_y1_5": 0.07,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 28,
+      "notes": "Sustained gold/silver prices plus Sandstorm synergy and new stream deliveries"
+    }
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "option_scan": [
+    {
+      "id": "gaap_goodwill",
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Sandstorm acquisition added ~$4.1B purchase accounting and $1.19B deferred tax liability; economic value is royalty cash flows, not goodwill line"
+    },
+    {
+      "id": "undeveloped_royalties",
+      "question": "Undeveloped reserves / development royalties?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Portfolio includes development-stage streams; growth years 1-5 cite filing pipeline [Assumption] for conversion timing"
+    },
+    {
+      "id": "equity_stakes",
+      "question": "Equity method / listed stakes?",
+      "answer": "Yes",
+      "treatment": "milestone_nav",
+      "evidence": "Equity method investments $300.9M at 12/31/2025 (10-K); fair value marks in other income"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "Revenue scales with attributable production on existing royalties/streams plus new deliveries from development assets; Sandstorm combination enlarged metal exposure.",
+    "source": "FY2025 revenue $1,030M vs $719M prior year (10-K XBRL); operating margin ~62%",
+    "lawrence_legacy": {
+      "y1_5": 0.04,
+      "y6_10": 0.025,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.04,
+      "y6_10": 0.025,
+      "exit_pfcf_y10": 22.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": 0.4324,
+      "as_of_filing_facts": "evidence/_text/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm.txt"
+    },
+    "status": "partial"
+  },
+  "market_inputs": {
+    "copper": {
+      "spot": 6.4808,
+      "as_of": "2026-06-04",
+      "source": "https://stooq.com/q/l/?s=hg.f&f=sd2t2ohlcv&h&e=csv",
+      "fetched_at": "2026-06-03T22:02:20Z",
+      "stooq_symbol": "hg.f"
+    },
+    "scenario_grid": {
+      "bear": {
+        "copper_usd_per_lb": 4.67,
+        "label": "trough (~28% below spot)"
+      },
+      "base": {
+        "copper_usd_per_lb": null,
+        "label": "spot at compute"
+      },
+      "bull": {
+        "copper_usd_per_lb": 7.0,
+        "label": "cycle high (~8% above spot)"
+      }
+    }
+  },
+  "market_inputs_as_of": "2026-06-03",
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 0.1
+    },
+    "base": {
+      "return_pct": 6.7
+    },
+    "bull": {
+      "return_pct": 12.7
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 0.1
+    },
+    "base": {
+      "return_pct": 6.7
+    },
+    "bull": {
+      "return_pct": 12.7
+    }
+  },
+  "implied_return": {
+    "base_pct": 8.06,
+    "label": "7yr IRR (total synthesis)",
+    "display": "8.06% (total synthesis)",
+    "lawrence_stance_gate_pct": 6.7,
+    "falsifier_adjusted_pct": 6.7,
+    "synthesis_pct": 8.06
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Segment-derived growth (pre-falsifier)",
+        "source": "segment_build weighted blend",
+        "return_pct": 6.7,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": 0.1,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 12.7,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 8.26,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 8.06,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": 6.7
+    },
+    "falsifier_adjusted": {
+      "return_pct": 6.7
+    }
+  }
+}
