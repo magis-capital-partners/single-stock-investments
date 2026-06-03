@@ -1,6 +1,6 @@
 # HKHC — Investment Thesis
 
-**Last updated:** 2026-06-03
+**Last updated:** auto-sync
 
 ## Classification
 
@@ -11,13 +11,17 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | mid |
-| **MOI bucket** (legacy) | operating |
-| **Payoff lens** | operating |
-| **Implied IRR** | -5.8% (Lawrence base) |
+| **Implied 7yr IRR** (base) | -4.81% (total synthesis) |
+| **IRR method** | full |
+| **Lawrence bucket** | other |
+| **Payoff lens** | pending |
+| **MOI bucket** | pending |
+
+**Deep dive:** `HKHC/research/deep_dive_2026-06-03.md` (auto-sync)
 
 ## One-line thesis
 
-Horizon Kinetics listed advisory parent: fee growth and book value, but spot price embeds a franchise premium; Lawrence base ~-5.8% at $27.50 — watch; size via FRMO look-through instead.
+Horizon Kinetics listed advisory parent: fee growth and book value, but spot price embeds a franchise premium; synthesis ~-4.81% at $27.50 — watch; size via FRMO look-through instead.
 
 ## Key questions
 
