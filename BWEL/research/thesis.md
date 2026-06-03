@@ -11,7 +11,8 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | trough |
-| **Implied 10yr IRR** (base) | 1.1% |
+| **Implied 10yr IRR** (headline) | 3.77% (total synthesis) |
+| **Lawrence owner cash** | 1.1% |
 | **Economic NAV (overlay)** | ~$1,480/sh |
 | **IRR method** | full |
 | **Lawrence bucket** | low_cost |
@@ -23,15 +24,15 @@
 
 ## One-line thesis
 
-Family-controlled Tulare Lake farm operator: **1.1%** Lawrence cash IRR at ~$549, but probability-weighted **economic NAV ~$1,480/sh** on senior water and land optionality below GAAP book.
+At ~$549, headline **3.77%** per year blends owner cash, scenarios, and NAV optionality; Lawrence cash alone is **1.1%** while probability-weighted economic NAV is **~$1,480/sh**.
 
 ## Key questions
 
-- [x] Read latest annual report (FY2025 OTC annual)
-- [x] Marvin probability-weighted water/land NAV (2026-06-02 fact-check)
+- [x] Marvin probability-weighted water/land NAV (approved 2026-06-03)
+- [x] Total synthesis headline IRR with documented weights
 - [ ] Company or district confirmation of total acre-feet
 - [ ] Mid-cycle owner cash through next crop cycle
 
 ## [HUMAN REVIEW]
 
-- 400k AF press claim still unverified in filings; overlay uses weighted scenarios.
+- Synthesis weights and economic NAV assumptions approved 2026-06-03.

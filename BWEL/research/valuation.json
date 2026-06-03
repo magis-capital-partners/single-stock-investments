@@ -278,11 +278,14 @@
     }
   },
   "implied_return": {
-    "base_pct": 1.1,
+    "base_pct": 3.77,
     "label": "10yr IRR (total synthesis)",
-    "display": "5.09% (total synthesis)",
+    "display": "3.77% (total synthesis); Lawrence cash 1.1%",
+    "lawrence_owner_cash_pct": 1.1,
     "falsifier_adjusted_pct": 1.1,
-    "synthesis_pct": 5.09
+    "nav_overlay_dated_pct": 10.5,
+    "synthesis_pct": 3.77,
+    "headline_note": "Human approved economic NAV assumptions 2026-06-03; NAV path weight 15% in synthesis"
   },
   "stance_proposal": {
     "suggested": "watch",
@@ -347,7 +350,8 @@
     }
   ],
   "human_review": {
-    "economic_nav_water_af": "Marvin probability-weighted overlay ~$1,480/sh; 400k AF unverified in filings \u2014 BWEL/research/fact_check_water_nav_2026-06-02.md"
+    "economic_nav_water_af": "Approved 2026-06-03; overlay ~$1,480/sh; 400k AF press claim still unverified",
+    "synthesis_weights": "approved 2026-06-03; NAV path 15% weight"
   },
   "payoff_lens": "asset",
   "moi_bucket": "asset",
@@ -366,6 +370,20 @@
   "synthesis": {
     "status": "complete",
     "paths": [
+      {
+        "id": "filing_falsifier",
+        "label": "Lawrence owner cash (mid-cycle)",
+        "source": "scenarios.base; FY2025 annual owner cash",
+        "return_pct": 1.1,
+        "weight": 0.3,
+        "type": "numeric",
+        "epistemic_tier": "A (primary falsifiable)",
+        "weight_why": "Filing-based 10yr owner cash; stance gate for 15% accumulate bar.",
+        "weight_falsifiers": [
+          "FY2025 loss year becomes permanent base case without normalization"
+        ],
+        "hard_to_vary": "yes"
+      },
       {
         "id": "scenario_bear",
         "label": "Bear scenario (Lawrence)",
@@ -399,10 +417,10 @@
         "label": "NAV overlay dated payoff (10yr to overlay base)",
         "source": "nav_overlay ~$1480.0/sh vs price $548.5",
         "return_pct": 10.5,
-        "weight": 0.1,
+        "weight": 0.15,
         "type": "numeric",
         "epistemic_tier": "D (alternate theory: dated asset payoff)",
-        "weight_why": "Answers a different question (NAV convergence) than 10yr cash-flow IRR; capped weight to avoid theory conflation.",
+        "weight_why": "Economic NAV ~$1,480/sh probability-weighted (human approved 2026-06-03); separate theory from owner cash.",
         "weight_falsifiers": [
           "NAV overlay base not updated when segment build or filings change >10%",
           "floor_pass false but weight above 15% without [HUMAN REVIEW]"
@@ -412,10 +430,10 @@
     ],
     "qualitative_adjustments": [
       {
-        "factor": "Partial dhando (HK hard-asset / hidden NAV)",
+        "factor": "Partial dhando (verified water transfers + PW NAV)",
         "pp": 0.5,
-        "rationale": "Third-party confirms asset quality not in GAAP book; not full floor at spot price",
-        "sources": "cross_check_HK; hk_scan; HK Q1 2025/2026"
+        "rationale": "102k+ AF Kings transfers verified; economic NAV >> price; not full floor at spot",
+        "sources": "fact_check_water_nav_2026-06-02.md; cross_check_groundbreaker_2026-06-02.md"
       },
       {
         "factor": "No dated predictive attribute at spot",
@@ -424,13 +442,15 @@
         "sources": "HK predictive attributes framework"
       }
     ],
-    "numeric_weighted_pct": 4.79,
+    "numeric_weighted_pct": 3.47,
     "qualitative_pp": 0.3,
-    "total_synthesis_pct": 5.09,
-    "human_approval": "pending",
+    "total_synthesis_pct": 3.77,
+    "human_approval": "approved",
+    "human_approval_date": "2026-06-03",
+    "human_approval_note": "Probability-weighted water/land NAV and synthesis weights approved by Bryan Lawrence",
     "weight_audit": {
       "flags": [
-        "NAV overlay is a different theory (asset payoff vs cash-flow IRR); weight capped at 10% to limit theory conflation."
+        "NAV overlay is a different theory (asset payoff vs cash-flow IRR); weight 15% after human approval 2026-06-03 (still below primary filing path)."
       ],
       "deutsch_checks": {
         "hard_to_vary": true,
