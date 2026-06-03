@@ -1,0 +1,278 @@
+{
+  "ticker": "WPM",
+  "as_of": "2026-06-03",
+  "method": "full",
+  "lawrence_bucket": "pricing_power",
+  "classification_inputs": {
+    "archetype": "compounder",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "peak",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 124.99,
+    "price_source": "NYSE via Stooq 2026-06-03",
+    "fcf_per_share": 3.0,
+    "fcf_source": "Mid-cycle owner cash: between FY2024 ops CF/sh $2.266 and FY2025 $4.197 (EX-99.1); haircut from peak gold/silver prices",
+    "shares_millions": 454.0,
+    "normalization_note": "FY2025 record $4.197/sh operating cash flow reflects cycle-high metal prices; base uses ~$3.00/sh sustainable owner cash",
+    "copper_spot_usd_per_lb": 6.4805,
+    "copper_spot_as_of": "2026-06-04",
+    "copper_spot_source": "https://stooq.com/q/l/?s=hg.f&f=sd2t2ohlcv&h&e=csv",
+    "copperwood_royalty_est_usd_ssi_ref": 7700000,
+    "copperwood_royalty_est_usd_at_spot": 12474962.0,
+    "copperwood_royalty_note": "SSI ~$7.7M/yr @ $4.0/lb scaled linearly to spot $6.4805/lb [Assumption]"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.02,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 14,
+      "notes": "Metal prices mean-revert; Antamina integration slower"
+    },
+    "base": {
+      "growth_y1_5": 0.06,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 18,
+      "notes": "Portfolio growth from PMPA pipeline; mid-cycle metal prices"
+    },
+    "bull": {
+      "growth_y1_5": 0.08,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 22,
+      "notes": "Sustained precious-metal strength + new stream deliveries"
+    }
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Streaming contracts and investments carried per IFRS; not land-at-cost pattern"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / pipeline streams?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "40-F / AIF: PMPA portfolio with mines under construction; growth in Lawrence base cites pipeline, not separate terminal"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Asset-light model; no material loss drag segment in FY2025 EX-99.1"
+    },
+    {
+      "q": 4,
+      "question": "Backlog not in cash path?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Antamina silver stream ($4.3B consideration per 40-F) ramps in production mix; not separate option row"
+    },
+    {
+      "q": 5,
+      "question": "Private stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Public streaming company; no holdco-style opaque sleeves"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Regular dividend $0.66/sh FY2025; not yield-curve setup"
+    },
+    {
+      "q": 7,
+      "question": "Embedded option in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "FY2025 revenue $2.3B driven by higher gold/silver prices (EX-99.1); commodity lever already in owner-cash normalization"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "New PMPA deliveries (including Antamina) and attributable GEO growth; partially offset if metal prices revert from 2025 peaks",
+    "base_growth_source": "[Assumption] mid-cycle: 6% years 1-5 from portfolio ramp, not peak $4.20/sh cash flow",
+    "lawrence_legacy": {
+      "y1_5": 0.06,
+      "y6_10": 0.04,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.06,
+      "y6_10": 0.04,
+      "exit_pfcf_y10": 18.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": null,
+      "as_of_filing_facts": null
+    },
+    "status": "partial"
+  },
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Segment-derived growth (pre-falsifier)",
+        "source": "segment_build weighted blend",
+        "return_pct": -2.8,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": -8.7,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 1.3,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": -2.01,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": -2.21,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  },
+  "market_inputs": {
+    "copper": {
+      "spot": 6.4805,
+      "as_of": "2026-06-04",
+      "source": "https://stooq.com/q/l/?s=hg.f&f=sd2t2ohlcv&h&e=csv",
+      "fetched_at": "2026-06-03T22:41:16Z",
+      "stooq_symbol": "hg.f"
+    },
+    "scenario_grid": {
+      "bear": {
+        "copper_usd_per_lb": 4.67,
+        "label": "trough (~28% below spot)"
+      },
+      "base": {
+        "copper_usd_per_lb": null,
+        "label": "spot at compute"
+      },
+      "bull": {
+        "copper_usd_per_lb": 7.0,
+        "label": "cycle high (~8% above spot)"
+      }
+    }
+  },
+  "market_inputs_as_of": "2026-06-03",
+  "optionality_gate": {
+    "copperwood_option_yield_pct": 8.86,
+    "primary_metric": "lawrence_base",
+    "primary_label": "7yr IRR",
+    "primary_return_pct": -2.8
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -8.7
+    },
+    "base": {
+      "return_pct": -2.8
+    },
+    "bull": {
+      "return_pct": 1.3
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -8.7
+    },
+    "base": {
+      "return_pct": -2.8
+    },
+    "bull": {
+      "return_pct": 1.3
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": -2.8
+    },
+    "falsifier_adjusted": {
+      "return_pct": -2.8
+    }
+  },
+  "implied_return": {
+    "base_pct": -2.21,
+    "label": "7yr IRR (total synthesis)",
+    "display": "-2.21% (total synthesis)",
+    "lawrence_stance_gate_pct": -2.8,
+    "falsifier_adjusted_pct": -2.8,
+    "synthesis_pct": -2.21
+  },
+  "overlay_results": []
+}
