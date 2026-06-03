@@ -74,15 +74,38 @@ Document in `#### Why these weights (Popper / Deutsch)`:
 | Not instrumentalist | No path chosen to move synthesis toward a narrative |
 | Reach | Weights explain *why* beyond the single ticker price |
 
-Spec mirrors `growth_explanation_stress_test.md` but applies to the **blend**, not growth rate alone.
+Spec mirrors `growth_explanation_stress_test.md` but applies to the **numeric path blend**, not qualitative ±pp.
+
+### Qualitative ±pp (separate Deutsch gate)
+
+Qualitative rows are **not** weighted IRR paths. They are a **small conviction band** on top of the numeric blend. The weight-table “Hard to vary” checks **do not** apply to ±pp; use the qual gate below.
+
+| `id` | Default ±pp | Auto-apply when | Falsifier (drop or cut pp) |
+|------|-------------|-----------------|----------------------------|
+| `partial_dhando_hk_nav` | **+0.5** | `dhando == partial` **and** HK cross-check or `hk_scan` on disk **and** cross-check does **not** say “no base IRR upgrade” **and** a **Tier A** numeric path is in the blend | HK file removed; cross-check blocks upgrade; only bear/bull in synthesis |
+| `scarce_moat_segment` | **+0.3** | `moat == durable` **and** `segment_build` present (infrastructure / scarce surface) | Segment build removed or moat downgraded |
+| `governance_transition` | **−0.4** | Approved inventory cites governance / “end of an era” | Governance risk resolved in proxy/filings |
+| `water_scarcity_index` | **+0.25** | Inventory row tagged water / HK water thesis | Thesis withdrawn or priced in segment multiples |
+| `no_predictive_attribute` | **−0.2** | `predictive_attribute` is `none` / empty **and** `payoff_lens` is not `event` | Dated catalyst named in cross-check |
+
+**Auto-build rules (`valuation_synthesis.py`):**
+
+- **No positive ±pp** unless a **Tier A** anchor path exists (`filing_falsifier`, `yield_curve_gate`, `marvin_floor`, or approved blend primary).
+- **No `partial_dhando_hk_nav`** without `cross_check*HK*.md` or `hk_scan_*` under `{TICKER}/research/` or `third-party-analyses/`.
+- Recompute template qual rows on every `compute_synthesis` unless `synthesis.qualitative_manual: true`.
+- Net auto cap: **±1.0 pp** (clamp + flag). **±3.0 pp** net only after human sets `human_approval: approved` on qual.
 
 ---
 
 ## Formula
 
-1. **Numeric paths:** weighted average of all rows with `return_pct` (10-year comparable).
-2. **Qualitative adjustments:** sum of documented ±pp (cap **±3pp** total without **[HUMAN REVIEW]**).
-3. **Total synthesis IRR** = numeric weighted average + qualitative adjustments.
+1. **Numeric paths:** weighted average of all rows with `return_pct` (same horizon as Lawrence gate).
+2. **Qualitative adjustments:** sum of documented ±pp (see ladder above).
+3. **Total synthesis IRR** = numeric weighted average **+** qualitative net pp.
+
+**Arithmetic (linear pp add):** Treat each ±pp as an adjustment to the **annualized percent** already computed from numeric paths, not as a multiplicative return factor. Valid only when `|qualitative_pp| ≤ 1.0` after auto rules (small band). If qual would move synthesis more than 1 pp vs the Lawrence stance gate, use a **numeric path** or **[HUMAN REVIEW]** instead of stacking pp.
+
+**Primary anchor:** Synthesis must include a Tier A path when `implied_return.falsifier_adjusted_pct` or `lawrence_stance_gate_pct` exists. Bear/bull-only blends are incomplete; refresh must rebuild paths from `_default_paths`.
 
 Store in `valuation.json`:
 
@@ -90,11 +113,13 @@ Store in `valuation.json`:
 "synthesis": {
   "status": "complete",
   "paths": [ { "id", "label", "source", "return_pct", "weight", "type" } ],
-  "qualitative_adjustments": [ { "factor", "pp", "rationale", "sources" } ],
-  "numeric_weighted_pct": -0.9,
+  "qualitative_adjustments": [ { "id", "factor", "pp", "rationale", "sources", "falsifier" } ],
   "qualitative_pp": 0.4,
+  "qualitative_pp_cap_applied": false,
+  "numeric_weighted_pct": -0.9,
   "total_synthesis_pct": -0.5,
-  "human_approval": "pending"
+  "human_approval": "pending",
+  "qualitative_manual": false
 }
 ```
 
