@@ -1,0 +1,108 @@
+{
+  "ticker": "WPM",
+  "as_of": "2026-06-03",
+  "method": "full",
+  "lawrence_bucket": "pricing_power",
+  "classification_inputs": {
+    "archetype": "compounder",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "peak",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 124.99,
+    "price_source": "NYSE via Stooq 2026-06-03",
+    "fcf_per_share": 3.0,
+    "fcf_source": "Mid-cycle owner cash: between FY2024 ops CF/sh $2.266 and FY2025 $4.197 (EX-99.1); haircut from peak gold/silver prices",
+    "shares_millions": 454.0,
+    "normalization_note": "FY2025 record $4.197/sh operating cash flow reflects cycle-high metal prices; base uses ~$3.00/sh sustainable owner cash"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.02,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 14,
+      "notes": "Metal prices mean-revert; Antamina integration slower"
+    },
+    "base": {
+      "growth_y1_5": 0.06,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 18,
+      "notes": "Portfolio growth from PMPA pipeline; mid-cycle metal prices"
+    },
+    "bull": {
+      "growth_y1_5": 0.08,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 22,
+      "notes": "Sustained precious-metal strength + new stream deliveries"
+    }
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Streaming contracts and investments carried per IFRS; not land-at-cost pattern"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / pipeline streams?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "40-F / AIF: PMPA portfolio with mines under construction; growth in Lawrence base cites pipeline, not separate terminal"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Asset-light model; no material loss drag segment in FY2025 EX-99.1"
+    },
+    {
+      "q": 4,
+      "question": "Backlog not in cash path?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Antamina silver stream ($4.3B consideration per 40-F) ramps in production mix; not separate option row"
+    },
+    {
+      "q": 5,
+      "question": "Private stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Public streaming company; no holdco-style opaque sleeves"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Regular dividend $0.66/sh FY2025; not yield-curve setup"
+    },
+    {
+      "q": 7,
+      "question": "Embedded option in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "FY2025 revenue $2.3B driven by higher gold/silver prices (EX-99.1); commodity lever already in owner-cash normalization"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "New PMPA deliveries (including Antamina) and attributable GEO growth; partially offset if metal prices revert from 2025 peaks",
+    "base_growth_source": "[Assumption] mid-cycle: 6% years 1-5 from portfolio ramp, not peak $4.20/sh cash flow"
+  },
+  "synthesis": {
+    "status": "pending",
+    "note": "Marvin floor only until third-party sources indexed"
+  }
+}

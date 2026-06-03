@@ -9,9 +9,9 @@
 
 ## Executive summary
 
-No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (10-K, 10-Q, IR). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+No third-party sources are indexed for WPM as of 2026-06-03. Marvin stance rests on **primary SEC filings** (40-F, EX-99.1 FY2025 results). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
 
-**Synthesis:** Marvin floor only; no external blend.
+**Synthesis (best estimate):** Marvin floor only; no external blend. Base 7-year return on mid-cycle owner cash (~**-2.8%** per year at **~$125**) from `valuation.json`; stance **watch**.
 
 ## Sources in scope
 
@@ -33,13 +33,13 @@ No third-party sources are indexed for this ticker as of this scan. Marvin stanc
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | — | — | — |
+| Marvin floor | ~$3.00/sh mid-cycle owner cash | ~-2.8% / 7yr | watch |
 | External (combined) | — | — | — |
-| **Blended best estimate** | **—** | **—** | **—** |
+| **Blended best estimate** | **~$3.00/sh** | **~-2.8% / 7yr** | **watch** |
 
-**Weights:** *[Document why]*
+**Weights:** 100% Marvin (no approved external).
 
-**Returns statement (blended):** *[One sentence; pending sources not in base IRR]*
+**Returns statement (blended):** With no approved external views, the blended estimate equals Marvin: at about **$125** per share, roughly **-2.8%** per year over seven years on **$3.00** mid-cycle owner cash; **watch**.
 
 ## [HUMAN REVIEW]
 
