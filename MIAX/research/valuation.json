@@ -1,0 +1,208 @@
+{
+  "ticker": "MIAX",
+  "as_of": "2026-06-03",
+  "method": "full",
+  "lawrence_bucket": "multi_sided",
+  "classification_inputs": {
+    "archetype": "croupier",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 40.32,
+    "price_source": "Stooq MIAX.US close 2026-06-03",
+    "fcf_per_share": 2.08,
+    "fcf_source": "FY2025 OCF $167.8M minus capex $22.8M, divided by ~69.8M diluted shares (10-K)",
+    "shares_millions": 69.84,
+    "normalization_note": "FY2025 mid-cycle; exclude FY2024 debt-extinguishment and intangible-sale gains from owner-cash start; Q1 2026 EPS spike not in base FCF"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 14,
+      "notes": "Options volume share loss, futures ramp delays, multiple compression"
+    },
+    "base": {
+      "growth_y1_5": 0.07,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 18,
+      "notes": "MIAX Futures OCC clearing, Pearl/Emerald share gains; mid-cycle toll growth"
+    },
+    "bull": {
+      "growth_y1_5": 0.11,
+      "growth_y6_10": 0.07,
+      "exit_pfcf_y10": 22,
+      "notes": "Sustained U.S. options activity + international/Bermuda expansion"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Exchange intangibles capitalized; no land/NAV floor pattern"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating exchange fees, not resource royalty"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "MIAX Futures and Bermuda ramp in segment revenue; consolidated op margin ~7% FY2025"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Transaction and access fees recognized with volume"
+    },
+    {
+      "q": 5,
+      "question": "Private stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No material holdco sleeve in 10-K"
+    },
+    {
+      "q": 6,
+      "question": "Transitory legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No dated yield-curve catalyst"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Futures OCC agreement (May 2026 press) embedded in futures segment growth, not separate terminal"
+    },
+    {
+      "q": 0,
+      "question": "Material options after scan?",
+      "answer": "No separate overlay",
+      "treatment": "n/a",
+      "evidence": "Futures/Bermuda in Lawrence growth; LedgerX sold Jan 2026 \u2014 no double count"
+    }
+  ],
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 4.1
+    },
+    "base": {
+      "return_pct": 11.0
+    },
+    "bull": {
+      "return_pct": 17.4
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 4.1
+    },
+    "base": {
+      "return_pct": 11.0
+    },
+    "bull": {
+      "return_pct": 17.4
+    }
+  },
+  "implied_return": {
+    "base_pct": 13.29,
+    "label": "7yr IRR (total synthesis)",
+    "display": "13.29% (total synthesis)",
+    "lawrence_stance_gate_pct": 11.0,
+    "falsifier_adjusted_pct": 11.0,
+    "synthesis_pct": 13.29
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": 4.1,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 17.4,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 13.49,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 13.29,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}
