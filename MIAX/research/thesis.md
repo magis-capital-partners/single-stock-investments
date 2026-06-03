@@ -1,6 +1,6 @@
 # MIAX — Investment Thesis
 
-**Last updated:** 2026-06-03
+**Last updated:** auto-sync
 
 ## Classification
 
@@ -11,8 +11,13 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | mid |
-| **MOI bucket** (legacy) | operating |
+| **Implied 7yr IRR** (base) | 13.29% (total synthesis) |
+| **IRR method** | full |
+| **Lawrence bucket** | multi_sided |
 | **Payoff lens** | operating |
+| **MOI bucket** | pending |
+
+**Deep dive:** `MIAX/research/deep_dive_2026-06-03.md` (auto-sync)
 
 ## One-line thesis
 
