@@ -1,0 +1,208 @@
+{
+  "ticker": "PBT",
+  "as_of": "2026-06-03",
+  "valuation_mode": "optionality",
+  "method": "yield_curve",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "n/a",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "asset",
+    "predictive_attribute": "market_structure_discount"
+  },
+  "inputs": {
+    "price": 28.94,
+    "price_source": "Stooq PBT.US close 2026-06-03",
+    "units_outstanding_m": 46.608796,
+    "normalized_distribution_per_share": 0.45,
+    "standardized_measure_per_share": 11.76,
+    "normalization_note": "2025 distributable $0.31/unit includes $4.5M Blackbeard settlement; organic ~$0.21. Base curve uses mid-cycle ~$0.45/unit before Waddell excess-cost drag.",
+    "copper_spot_usd_per_lb": 6.4808,
+    "copper_spot_as_of": "2026-06-04",
+    "copper_spot_source": "https://stooq.com/q/l/?s=hg.f&f=sd2t2ohlcv&h&e=csv",
+    "copperwood_royalty_est_usd_ssi_ref": 7700000,
+    "copperwood_royalty_est_usd_at_spot": 12475540.0,
+    "copperwood_royalty_note": "SSI ~$7.7M/yr @ $4.0/lb scaled linearly to spot $6.4808/lb [Assumption]"
+  },
+  "optionality_gate": {
+    "framework": "hk_royalty_curve",
+    "floor_pass": false,
+    "floor_metric": "standardized_measure_per_share",
+    "floor_value": 11.76,
+    "primary_metric": "lawrence_base",
+    "primary_label": "annualized return",
+    "primary_return_pct": -17.7,
+    "normalized_distribution_yield_pct": 1.9,
+    "incumbent_sleeve": false,
+    "notes": "Price ~$29 exceeds SEC standardized-measure floor ~$12/unit; Waddell Ranch in excess-cost position May 2026.",
+    "copperwood_option_yield_pct": 38.27
+  },
+  "nav_overlay": {
+    "gaap_vs_fair_value": {
+      "gaap_trust_corpus_per_share": 0.0035,
+      "standardized_measure_per_share": 11.76,
+      "price_premium_to_sm_pct": 146
+    },
+    "asset_inventory_filing": {
+      "source": "10-K FY2025 reserve summary",
+      "waddell_npi_pct": 75,
+      "texas_royalty_npi_pct": 95,
+      "proved_boe_m": 19.668,
+      "sm_total_m": 547922
+    },
+    "not_in_model_requires_refresh": [
+      "Waddell excess-cost recovery timing",
+      "SoftVest conversion outcome"
+    ]
+  },
+  "scenarios": {
+    "bear": {
+      "price": 28.94,
+      "payoff": 5.0,
+      "years": 6,
+      "notes": "Waddell stays in excess cost; Texas-only distributions decline; terminal near zero"
+    },
+    "base": {
+      "price": 28.94,
+      "payoff": 9.0,
+      "years": 6,
+      "notes": "Partial Waddell recovery; ~$0.35/unit avg distributions + terminal ~$3 on depletion path",
+      "sotp_build": {
+        "lines": [
+          {
+            "id": "cumulative_dist",
+            "label": "Cumulative distributions years 1-6 (declining)",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 6.0,
+            "math": "[Assumption] mid-cycle dist path net of excess-cost risk"
+          },
+          {
+            "id": "terminal_residual",
+            "label": "Terminal unit value on reserve depletion",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 3.0,
+            "math": "[Assumption] fraction of year-6 standardized measure"
+          }
+        ],
+        "year5_economic_nav_per_share": 9.0,
+        "years": 6,
+        "notes": "HK yield curve on depleting royalty trust"
+      }
+    },
+    "bull": {
+      "price": 28.94,
+      "payoff": 16.0,
+      "years": 5,
+      "notes": "Waddell recovers; oil ~$93 NYMEX Mar-2026 vs $65.34 SEC price; Blackbeard settlement tail + higher dist run-rate"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Yes",
+      "treatment": "nav_floor",
+      "evidence": "Trust corpus ~$162k vs standardized measure ~$548M (10-K FY2025)"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / acreage / dormant royalty?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Proved developed producing; Waddell capex $154M gross FY2025"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "Yes",
+      "treatment": "yield_curve",
+      "evidence": "Blackbeard $4.5M settlement 2025; SoftVest indenture modification May 2026"
+    }
+  ],
+  "catalyst_paths": [
+    {
+      "event": "Waddell Ranch exits excess-cost position",
+      "timing": "uncertain",
+      "impact": "Restores largest royalty stream"
+    },
+    {
+      "event": "SoftVest trust conversion / reorganization",
+      "timing": "2026+",
+      "impact": "Governance and tax structure change [Assumption]"
+    },
+    {
+      "event": "Oil price above SEC reserve price",
+      "timing": "cyclical",
+      "impact": "Higher distributions; Mar-2026 NYMEX ~$93 vs $65.34 SEC"
+    }
+  ],
+  "evidence_refresh": {
+    "type": "commodity_nav",
+    "synthesis_in_dive": false
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true,
+      "floor_pass": false,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": null
+  },
+  "market_inputs": {
+    "copper": {
+      "spot": 6.4808,
+      "as_of": "2026-06-04",
+      "source": "https://stooq.com/q/l/?s=hg.f&f=sd2t2ohlcv&h&e=csv",
+      "fetched_at": "2026-06-03T22:38:14Z",
+      "stooq_symbol": "hg.f"
+    },
+    "scenario_grid": {
+      "bear": {
+        "copper_usd_per_lb": 4.67,
+        "label": "trough (~28% below spot)"
+      },
+      "base": {
+        "copper_usd_per_lb": null,
+        "label": "spot at compute"
+      },
+      "bull": {
+        "copper_usd_per_lb": 7.0,
+        "label": "cycle high (~8% above spot)"
+      }
+    }
+  },
+  "market_inputs_as_of": "2026-06-03",
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -25.4
+    },
+    "base": {
+      "return_pct": -17.7
+    },
+    "bull": {
+      "return_pct": -11.2
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -25.4
+    },
+    "base": {
+      "return_pct": -17.7
+    },
+    "bull": {
+      "return_pct": -11.2
+    }
+  },
+  "implied_return": {
+    "base_pct": -17.7,
+    "label": "annualized return",
+    "display": "-17.7% (base)"
+  },
+  "overlay_results": []
+}

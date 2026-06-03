@@ -6,27 +6,30 @@
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Archetype** (Stahl) | optionality |
+| **Moat** (Munger) | n/a |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **Implied 7yr IRR** (base) | — |
-| **IRR method** | — |
-| **Lawrence bucket** | — |
-| **Payoff lens** | pending |
+| **Cycle** | mid |
+| **Implied 7yr IRR** (base) | -15.4% (base) |
+| **IRR method** | yield_curve |
+| **Lawrence bucket** | other |
+| **Payoff lens** | asset |
 | **MOI bucket** | pending |
+
+**Deep dive:** `PBT/research/deep_dive_2026-06-03.md` (auto-sync)
 
 ## One-line thesis
 
-Permian Basin Royalty Trust — thesis pending Marvin deep dive.
+Passive Permian royalty trust trading ~2.5× SEC reserve floor; Waddell Ranch in excess cost; base yield-curve path **-15.4%** over seven years — **watch** for cost recovery or conversion catalyst, not a yield buy at **~$29**.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read FY2025 10-K and Q1 2026 trust report
+- [ ] Track Waddell excess-cost recovery vs oil price
+- [ ] Monitor SoftVest indenture-amendment / conversion path
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-06-03; awaiting deep dive.
+- Onboard CIK corrected 842518 → 319654 (2026-06-03).
+- Horizon Kinetics ~12.5% holder cited as context only (not approved third party).

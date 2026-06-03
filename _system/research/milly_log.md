@@ -63,5 +63,6 @@ One row per adversarial or consistency re-pass. Append via `milly_repass.py` or 
 | 2026-06-02 | VTRS | standard_batch | BLOCKED | batch pass |
 | 2026-06-02 | VTRS | standard_batch | OK | batch pass |
 | 2026-06-03 | KEWL | consistency_repass | OK | — |
-| 2026-06-03 | CBOE | standard_batch | OK | marvin_cloud_refresh |
-| 2026-06-03 | CBOE | standard_batch | OK | marvin_cloud_refresh |
+| 2026-06-03 | PBT | standard_batch | BLOCKED | marvin_cloud_refresh |
+| 2026-06-03 | PBT | standard_batch | OK | marvin_cloud_refresh |
+| 2026-06-03 | PBT | standard_batch | OK | marvin_cloud_refresh |
