@@ -7,15 +7,15 @@ from marvin_pipeline_common import has_evidence_refresh_config  # noqa: F401
 
 
 def synthesis_in_dive(val: dict) -> bool:
-    """Whether deep dive should render Total synthesis IRR block."""
+    """Whether deep dive should render Total synthesis IRR block and headline blend."""
     cfg = val.get("evidence_refresh") or {}
     if "synthesis_in_dive" in cfg:
         return bool(cfg.get("synthesis_in_dive"))
-    # Default: yield_curve stance gate uses Lawrence base only in markdown
-    if val.get("method") == "yield_curve" and has_evidence_refresh_config(val):
-        return False
+    # Portfolio default: capstone blend for all methods (yield_curve keeps stance gate separate)
+    if val.get("method") == "yield_curve":
+        return True
     syn = val.get("synthesis") or {}
-    return syn.get("status") == "complete" and val.get("method") != "yield_curve"
+    return syn.get("status") == "complete" or val.get("method") == "full"
 
 
 def lawrence_base_return_pct(val: dict) -> float | None:
