@@ -1,6 +1,6 @@
 # FNV — Investment Thesis
 
-**Last updated:** 2026-06-03
+**Last updated:** auto-sync
 
 ## Classification
 
@@ -11,8 +11,13 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | peak |
-| **MOI bucket** (legacy) | pending |
+| **Implied 7yr IRR** (base) | 6.12% (total synthesis) |
+| **IRR method** | full |
+| **Lawrence bucket** | pricing_power |
 | **Payoff lens** | asset |
+| **MOI bucket** | pending |
+
+**Deep dive:** `FNV/research/deep_dive_2026-06-03.md` (auto-sync)
 
 ## One-line thesis
 
