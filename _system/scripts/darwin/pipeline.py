@@ -26,7 +26,13 @@ from .pit_audit import run_pit_audit
 from .pit_backtest import run_pit_backtest
 from .pit_snapshot import append_pit_status, save_registry_snapshot, save_snapshot
 from .research_events import rebuild_events_log
-from .policies import apply_policy, policy_equal_weight, policy_irr_ranked
+from .bias_scan import run_bias_scan
+from .import_external_data import sync_external_market_data
+from .observatory import build_observatory, save_observatory, write_regime_brief
+from .policies import apply_policy, policy_equal_weight, policy_irr_ranked, policy_risk_parity_vol
+from .questions import scaffold_all_questions
+from .scorecard import append_scorecard
+from .simulation import run_stress_simulation
 from .ppo import ppo_weights, train_ppo
 from .prices import build_return_panel, load_returns_csv
 from .regime import latest_macro_state, merge_regime, regime_constraint_overrides
@@ -108,7 +114,17 @@ def write_backtest_report(out: dict) -> None:
         "| Policy | Sharpe | Cumulative | Turnover |",
         "|--------|--------|------------|----------|",
     ]
-    for k in ("ira_marvin", "equal_weight", "irr_ranked", "genetic", "ppo", "ensemble", "champion", "spy"):
+    for k in (
+        "ira_marvin",
+        "equal_weight",
+        "irr_ranked",
+        "genetic",
+        "ppo",
+        "risk_parity_vol",
+        "ensemble",
+        "champion",
+        "spy",
+    ):
         row = b.get(k) or {}
         if row.get("error"):
             continue
@@ -152,11 +168,15 @@ def run_pipeline(
     pit_audit_only: bool = False,
     pit_backtest_only: bool = False,
     sync_events: bool = False,
+    sync_external_only: bool = False,
 ) -> dict:
     mandate_doc = load_mandate()
     if sync_events:
         n = rebuild_events_log()
         return {"sync_events": n}
+
+    if sync_external_only:
+        return {"external_sync": sync_external_market_data()}
 
     if pit_audit_only:
         audit = run_pit_audit(fast=fast)
@@ -196,6 +216,12 @@ def run_pipeline(
     from .features import holdings_universe
     from .pit import bootstrap_valuation_history
 
+    external_sync: dict = {}
+    try:
+        external_sync = sync_external_market_data()
+    except Exception as exc:
+        external_sync = {"error": str(exc)}
+
     rebuild_events_log()
     bootstrap_valuation_history(holdings_universe())
     if write_features:
@@ -216,6 +242,7 @@ def run_pipeline(
             for r in rows
         ],
         months=training.get("price_history_months", 60),
+        allow_synthetic=not (mandate_doc.get("pit") or {}).get("allow_synthetic_returns") is False,
     )
 
     tickers = [r["ticker"] for r in rows]
@@ -265,6 +292,16 @@ def run_pipeline(
     )
     bt_irr = simulate(
         tickers, panel["dates"], panel["returns_by_ticker"], irr_fn, mandate_effective, falsifier_map
+    )
+
+    rp_raw = apply_policy("risk_parity_vol", rows, {"top_k": 12, "irr_power": 0.8})
+    rp_w, _ = apply_constraints(tickers, rp_raw, None, mandate_effective, falsifier_map)
+
+    def rp_fn(ts, _i):
+        return apply_policy("risk_parity_vol", rows, {"irr_power": 0.8})
+
+    bt_rp = simulate(
+        tickers, panel["dates"], panel["returns_by_ticker"], rp_fn, mandate_effective, falsifier_map
     )
 
     n_factors = training.get("latent_factors", 5)
@@ -325,7 +362,9 @@ def run_pipeline(
         ("genetic", genome_w, bt_ga),
         ("irr_ranked", irr_w, bt_irr),
         ("equal_weight", eq_w, bt_eq),
+        ("risk_parity_vol", rp_w, bt_rp),
     ]
+    bt_by_policy = {n: bt for n, _, bt in policy_candidates}
     scored_candidates = [(n, w, score_bt(bt)) for n, w, bt in policy_candidates]
 
     evo_cfg = mandate_doc.get("evolution") or {}
@@ -357,7 +396,10 @@ def run_pipeline(
     min_periods = m.get("ml_champion_min_periods", 12)
     preferred = m.get("preferred_policy", "ira_marvin")
 
-    ml_names = {"ppo", "genetic", "irr_ranked", "equal_weight"}
+    explore = mandate_doc.get("exploration") or {}
+    exploration_on = bool(explore.get("enabled", False))
+
+    ml_names = {"ppo", "genetic", "irr_ranked", "equal_weight", "risk_parity_vol"}
     use_ml = (
         ml_best[0] in ml_names
         and not ml_bt.get("error")
@@ -369,13 +411,22 @@ def run_pipeline(
     try:
         pit_audit = run_pit_audit(fast=fast)
         pit_bt = run_pit_backtest(fast=fast)
-        if mandate_doc.get("pit", {}).get("require_oos_for_ml", True):
+        if mandate_doc.get("pit", {}).get("require_oos_for_ml", True) and not explore.get("allow_ml_without_oos"):
             use_ml = use_ml and pit_bt.get("ml_oos_eligible", False)
     except Exception as exc:
         pit_audit = {"error": str(exc)}
         pit_bt = {"error": str(exc)}
 
-    if use_ensemble and not bt_ens.get("error") and score_bt(bt_ens) >= score_bt(ml_bt) - 0.02:
+    if exploration_on and explore.get("champion_mode") == "best_insample":
+        all_scored = list(scored_candidates)
+        if use_ensemble and not bt_ens.get("error"):
+            bt_by_policy[ensemble_policy_id] = bt_ens
+            all_scored.append((ensemble_policy_id, ens_w, score_bt(bt_ens)))
+        best = max(all_scored, key=lambda x: x[2])
+        policy_id = best[0]
+        target_w = best[1]
+        champion_bt = bt_by_policy.get(policy_id, bt_ira)
+    elif use_ensemble and not bt_ens.get("error") and score_bt(bt_ens) >= score_bt(ml_bt) - 0.02:
         policy_id, target_w, champion_bt = ensemble_policy_id, ens_w, bt_ens
     elif use_ml:
         policy_id, target_w, champion_bt = ml_best
@@ -474,11 +525,12 @@ def run_pipeline(
             "irr_ranked": bt_irr,
             "genetic": bt_ga,
             "ppo": bt_ppo,
+            "risk_parity_vol": bt_rp,
             "ensemble": bt_ens,
             "champion": champion_bt,
             "spy": bt_spy,
             "ml_best": ml_best[2],
-            "ml_selected": use_ml,
+            "ml_selected": use_ml and not exploration_on,
         },
         "attribution": attribution,
         "latent_factors": {
@@ -519,6 +571,28 @@ def run_pipeline(
     pit_status = _pit_status_from_runs(pit_audit, pit_bt, production=out)
     append_pit_status(pit_status)
     out["pit_status"] = pit_status
+
+    observatory = build_observatory(rows, regime)
+    save_observatory(observatory)
+    brief_path = write_regime_brief(observatory, rows)
+    out["observatory"] = observatory
+    out["regime_brief"] = str(brief_path.relative_to(Path(__file__).resolve().parents[3]))
+
+    bias = run_bias_scan(rows, target_w)
+    out["bias_scan"] = bias
+
+    questions = scaffold_all_questions(tickers)
+    out["open_questions"] = questions
+
+    def _w_fn(active, qi):
+        return target_w
+
+    stress = run_stress_simulation(panel, _w_fn, mandate_effective, n_paths=120 if fast else 250)
+    out["stress_simulation"] = stress
+
+    append_scorecard(pit_status, pit_audit, pit_bt, bias, policy_id, exploration_on)
+    out["exploration"] = {"enabled": exploration_on, "champion_mode": explore.get("champion_mode")}
+    out["external_sync"] = external_sync
 
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     PORTFOLIO_PATH.write_text(json.dumps(out, indent=2) + "\n", encoding="utf-8")

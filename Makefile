@@ -12,10 +12,18 @@ DATE ?= $(shell date +%Y-%m-%d)
 TICKER ?=
 DATE ?= $(shell date +%Y-%m-%d)
 
-.PHONY: research-check research-check-all evidence milly-repass book-estimate book-estimate-all holdco-uplift short-scan hk-scan hk-cross-check-all hk-extract-refresh third-party-scan-all cross-check-all transcript-sync batch-refresh evidence-check darwin-pit-check darwin-build darwin-pit-audit
+.PHONY: research-check research-check-all evidence milly-repass book-estimate book-estimate-all holdco-uplift short-scan hk-scan hk-cross-check-all hk-extract-refresh third-party-scan-all cross-check-all transcript-sync batch-refresh evidence-check darwin-pit-check darwin-build darwin-pit-audit darwin-sync-external darwin-explore
 
 darwin-build:
 	$(PYTHON) $(SCRIPTS)/build_darwin_portfolio.py --fast
+	$(PYTHON) $(SCRIPTS)/build_dashboard_data.py
+
+darwin-sync-external:
+	$(PYTHON) $(SCRIPTS)/build_darwin_portfolio.py --sync-external
+
+darwin-explore:
+	$(PYTHON) $(SCRIPTS)/build_darwin_portfolio.py --fast
+	$(PYTHON) $(SCRIPTS)/build_dashboard_data.py
 
 darwin-pit-audit:
 	$(PYTHON) $(SCRIPTS)/build_darwin_portfolio.py --pit-audit --fast

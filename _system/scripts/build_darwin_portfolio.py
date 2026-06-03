@@ -27,6 +27,11 @@ def main() -> None:
     parser.add_argument("--pit-audit", action="store_true", help="Leakage audit only")
     parser.add_argument("--pit-backtest", action="store_true", help="PIT walk-forward backtest only")
     parser.add_argument("--sync-events", action="store_true", help="Rebuild research_events.jsonl")
+    parser.add_argument(
+        "--sync-external",
+        action="store_true",
+        help="Sync etf-dashboard / ls-algo context into market-data/external",
+    )
     args = parser.parse_args()
     if args.download:
         import subprocess
@@ -39,7 +44,15 @@ def main() -> None:
         pit_audit_only=args.pit_audit,
         pit_backtest_only=args.pit_backtest,
         sync_events=args.sync_events,
+        sync_external_only=args.sync_external,
     )
+    if out.get("external_sync") is not None and args.sync_external:
+        rep = out["external_sync"]
+        print(
+            f"External sync: returns={len(rep.get('returns_written') or [])} "
+            f"errors={len(rep.get('errors') or [])}"
+        )
+        return
     if out.get("sync_events") is not None:
         print(f"Synced {out['sync_events']} research events")
         return
