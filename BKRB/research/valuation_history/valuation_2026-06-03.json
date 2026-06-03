@@ -1,0 +1,405 @@
+{
+  "ticker": "BKRB",
+  "as_of": "2026-06-03",
+  "valuation_mode": "optionality",
+  "method": "full",
+  "lawrence_bucket": "multi_sided",
+  "classification_inputs": {
+    "archetype": "holding_co",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 475.37,
+    "price_source": "Stooq BRK-B.US close 2026-06-03 (portfolio folder BKRB; NYSE symbol BRK.B)",
+    "shares_outstanding": 1389605139,
+    "shares_source": "10-K 2026-03-02 Item 5, 1,389,605,139 Class B shares Jan 31, 2026",
+    "fcf_per_share": 20.62,
+    "fcf_per_share_source": "FY2025 operating earnings per Class B share (Buffett metric), not GAAP net earnings",
+    "book_per_share": 519.98,
+    "book_per_share_filed": 519.98,
+    "book_source": "Shareholders equity Dec 31, 2025 / Class B shares; aligns with earnings release book discussion",
+    "operating_earnings_per_share": 20.62,
+    "operating_earnings_year": 2025,
+    "operating_earnings_source": "FY2025 operating earnings $44,486M / avg Class B shares 2,157,335,139, EX-99.1 Feb 28, 2026",
+    "ocf_per_share": 21.28,
+    "ocf_source": "FY2025 net cash from operating activities ~$46B / Class B shares [Fact] 2025 annual report letter",
+    "normalization_note": "Lawrence base uses after-tax operating earnings per Class B share (Buffett metric), not GAAP net earnings including unrealized investment gains.",
+    "insurance_float_bn": 176,
+    "cash_treasury_floor_bn": 30
+  },
+  "optionality_gate": {
+    "framework": "holdco_operating_plus_book",
+    "floor_pass": true,
+    "floor_metric": "book_per_share",
+    "floor_value": 519.98,
+    "primary_metric": "lawrence_base",
+    "primary_label": "7yr IRR",
+    "primary_return_pct": 6.1,
+    "notes": "Trades below Dec 2025 book (~$520/B) but Lawrence return on normalized operating earnings is below accumulate bar.",
+    "discount_to_book_pct": 8.6
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.03,
+      "exit_pfcf_y10": 15,
+      "notes": "GEICO competition, catastrophe years, slower industrial volumes"
+    },
+    "base": {
+      "growth_y1_5": 0.05,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 18,
+      "metric_key": "operating_earnings_per_share",
+      "per_share0": 20.62,
+      "notes": "Mid-single-digit growth on $20.62 operating earnings; exit 18x year-10 earnings power"
+    },
+    "bull": {
+      "growth_y1_5": 0.06,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 20,
+      "notes": "Insurance underwriting tailwind persists; BNSF pricing holds"
+    }
+  },
+  "sensitivity": {
+    "book_convergence_7yr": {
+      "price": 475.37,
+      "payoff": 520,
+      "years": 7,
+      "annual_return_pct": 1.3,
+      "notes": "Re-rate to Dec 2025 book per B share with no operating uplift [Assumption]"
+    }
+  },
+  "sotp_build": {
+    "shares": 1389605139,
+    "lines": [
+      {
+        "id": "book",
+        "label": "GAAP book value per Class B share (Dec 2025)",
+        "gaap_per_share": 519.98,
+        "uplift_per_share": 0,
+        "year5_per_share": 519.98,
+        "math": "Filed equity / Class B shares"
+      },
+      {
+        "id": "operating_power",
+        "label": "Capitalized operating earnings (18x FY2025 op. earnings)",
+        "gaap_per_share": 0,
+        "uplift_per_share": 371.16,
+        "year5_per_share": null,
+        "math": "18 x $20.62 = $371 incremental vs book-only story; illustrative cross-check only"
+      }
+    ],
+    "incremental_uplifts_sum": 371.16,
+    "payoff_per_share_overlay": 520,
+    "notes": "Overlay uses book anchor; operating capitalization is sensitivity not primary stance gate"
+  },
+  "segment_build": {
+    "valuation_overlay": "segment_cashflow",
+    "segments": [
+      {
+        "id": "insurance",
+        "label": "Insurance (underwriting + investment income)",
+        "owner_cash_y0_per_share": 8.5,
+        "growth_y1_5": 0.04,
+        "growth_y6_10": 0.03,
+        "exit_pfcf_y10": 12,
+        "evidence": "FY2025 underwriting $7.3B + investment income $12.5B after-tax; EX-99.1 Feb 2026"
+      },
+      {
+        "id": "bnsf",
+        "label": "BNSF railroad",
+        "owner_cash_y0_per_share": 2.5,
+        "growth_y1_5": 0.03,
+        "growth_y6_10": 0.025,
+        "exit_pfcf_y10": 14,
+        "evidence": "FY2025 railroad operating earnings $5.5B after-tax; EX-99.1"
+      },
+      {
+        "id": "bhe",
+        "label": "Berkshire Hathaway Energy",
+        "owner_cash_y0_per_share": 1.8,
+        "growth_y1_5": 0.04,
+        "growth_y6_10": 0.035,
+        "exit_pfcf_y10": 14,
+        "evidence": "FY2025 utilities/energy operating earnings $4.0B after-tax; EX-99.1"
+      },
+      {
+        "id": "msr",
+        "label": "Manufacturing, service, retailing",
+        "owner_cash_y0_per_share": 6.3,
+        "growth_y1_5": 0.05,
+        "growth_y6_10": 0.04,
+        "exit_pfcf_y10": 16,
+        "evidence": "FY2025 MSR operating earnings $13.6B after-tax; EX-99.1"
+      },
+      {
+        "id": "other_ops",
+        "label": "Pilot, McLane, other",
+        "owner_cash_y0_per_share": 1.5,
+        "growth_y1_5": 0.04,
+        "growth_y6_10": 0.03,
+        "exit_pfcf_y10": 14,
+        "evidence": "FY2025 other operating earnings $1.6B after-tax; EX-99.1"
+      }
+    ],
+    "options": [
+      {
+        "id": "equity_portfolio",
+        "label": "Listed equity portfolio (fair value marks)",
+        "option_treatment": "embedded_in_segment",
+        "annual_drag_per_share": 0,
+        "base_terminal_value_bn": 0,
+        "base_terminal_rationale": "Marks flow through GAAP net earnings, not operating earnings; already in book via equity securities",
+        "evidence": "10-K 2026-03-02 investment footnotes; Apple/Bank of America/Coca-Cola concentration",
+        "not_in_lawrence_base": false
+      },
+      {
+        "id": "cash_optionality",
+        "label": "Cash, T-bills, repurchase option",
+        "option_treatment": "embedded_in_segment",
+        "annual_drag_per_share": 0,
+        "base_terminal_value_bn": 0,
+        "base_terminal_rationale": "Parent liquidity and buybacks support per-share book; not separate terminal",
+        "evidence": "Repurchase program; $30B minimum cash policy \u2014 10-K 2025",
+        "not_in_lawrence_base": false
+      }
+    ],
+    "horizon_years": 7
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true,
+      "floor_pass": true,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": null
+  },
+  "growth_explanation": {
+    "consolidated_growth": {
+      "y1_5": 0.05,
+      "y6_10": 0.04,
+      "mechanism": "Insurance float redeployed at modest real returns; MSR pricing power; BNSF volume/pricing mid-cycle"
+    },
+    "theory_implied": {
+      "y1_5": 0.0418,
+      "y6_10": 0.0329,
+      "exit_pfcf_y10_segment_blend": 13.8,
+      "derivation": "segment_build owner-cash weighted blend (growth only; exit from scenarios.base)",
+      "segment_weights": [
+        {
+          "id": "insurance",
+          "weight_pct": 41.3
+        },
+        {
+          "id": "bnsf",
+          "weight_pct": 12.1
+        },
+        {
+          "id": "bhe",
+          "weight_pct": 8.7
+        },
+        {
+          "id": "msr",
+          "weight_pct": 30.6
+        },
+        {
+          "id": "other_ops",
+          "weight_pct": 7.3
+        }
+      ]
+    },
+    "lawrence_legacy": {
+      "y1_5": 0.05,
+      "y6_10": 0.04,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.0418,
+      "y6_10": 0.0329,
+      "exit_pfcf_y10": 18.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": 0.0002,
+      "as_of_filing_facts": "evidence/_text/10-K_20260302_rpt20251231_acc0001193125_26_083899.htm.txt"
+    },
+    "status": "partial",
+    "divergence": {
+      "theory_vs_lawrence_y1_5_pp": -0.8,
+      "falsifier_vs_theory_y1_5_pp": 0.0
+    }
+  },
+  "estimates": {
+    "external": []
+  },
+  "human_review": {
+    "approved": false
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Yes",
+      "treatment": "nav_floor",
+      "evidence": "Private exchange stakes below economic value"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "Yes",
+      "treatment": "milestone_nav",
+      "evidence": "MIH, HKHC, Investment A look-through"
+    }
+  ],
+  "market_inputs": {
+    "copper": {
+      "spot": 6.4785,
+      "as_of": "2026-06-04",
+      "source": "https://stooq.com/q/l/?s=hg.f&f=sd2t2ohlcv&h&e=csv",
+      "fetched_at": "2026-06-03T22:08:44Z",
+      "stooq_symbol": "hg.f"
+    },
+    "scenario_grid": {
+      "bear": {
+        "copper_usd_per_lb": 4.66,
+        "label": "trough (~28% below spot)"
+      },
+      "base": {
+        "copper_usd_per_lb": null,
+        "label": "spot at compute"
+      },
+      "bull": {
+        "copper_usd_per_lb": 7.0,
+        "label": "cycle high (~8% above spot)"
+      }
+    }
+  },
+  "market_inputs_as_of": "2026-06-03",
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 2.2
+    },
+    "base": {
+      "return_pct": 6.1
+    },
+    "bull": {
+      "return_pct": 8.5
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 2.2
+    },
+    "base": {
+      "return_pct": 6.1
+    },
+    "bull": {
+      "return_pct": 8.5
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": 5.3
+    },
+    "falsifier_adjusted": {
+      "return_pct": 5.3
+    }
+  },
+  "implied_return": {
+    "base_pct": 6.02,
+    "label": "7yr IRR (total synthesis)",
+    "display": "6.02% (total synthesis)",
+    "lawrence_stance_gate_pct": 6.1,
+    "falsifier_adjusted_pct": 6.1,
+    "synthesis_pct": 6.02
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Segment-derived growth (pre-falsifier)",
+        "source": "segment_build weighted blend",
+        "return_pct": 5.3,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": 2.2,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 8.5,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 6.22,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 6.02,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}
