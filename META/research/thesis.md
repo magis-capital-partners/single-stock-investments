@@ -1,23 +1,21 @@
 # META — Investment Thesis
 
-**Last updated:** auto-sync
+**Last updated:** 2026-05-21
 
 ## Classification
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | compounder |
-| **Moat** (Munger) | stable |
-| **Dhando** (Pabrai) | partial |
+| **Archetype** (Stahl) | unknown |
+| **Moat** (Munger) | unproven |
+| **Dhando** (Pabrai) | pending |
 | **Stance** | watch |
 | **Cycle** | - |
-| **Implied 10yr IRR** (base) | 10.44% (total synthesis) |
-| **IRR method** | full |
-| **Lawrence bucket** | pricing_power |
-| **Payoff lens** | pending |
-| **MOI bucket** | pending |
+| **Implied 7yr IRR** (Lawrence) | pending |
+| **IRR method** | pending |
+| **Lawrence bucket** | — |
 
-**Deep dive:** `META/research/deep_dive_2026-06-01.md` (auto-sync)
+**Deep dive:** `META/research/deep_dive_2026-06-02.md` (auto-sync)
 
 ## One-line thesis
 

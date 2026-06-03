@@ -10,6 +10,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 
+import sys
+
+sys.path.insert(0, str(ROOT / "_system" / "scripts"))
+from lawrence_horizon import LAWRENCE_HORIZON_YEARS, SYNTHESIS_LABEL  # noqa: E402
+
 # Epistemic tiers for synthesis weights (see total_synthesis_irr.md § Popper / Deutsch)
 WEIGHT_THEORY: dict[str, dict] = {
     "filing_falsifier": {
@@ -49,7 +54,7 @@ WEIGHT_THEORY: dict[str, dict] = {
     "nav_overlay_payoff": {
         "tier": "D (alternate theory: dated asset payoff)",
         "default_weight": 0.10,
-        "why": "Answers a different question (NAV convergence) than 10yr cash-flow IRR; capped weight to avoid theory conflation.",
+        "why": f"Answers a different question (NAV convergence) than {LAWRENCE_HORIZON_YEARS}yr cash-flow IRR; capped weight to avoid theory conflation.",
         "falsifiers": [
             "NAV overlay base not updated when segment build or filings change >10%",
             "floor_pass false but weight above 15% without [HUMAN REVIEW]",
@@ -78,6 +83,249 @@ WEIGHT_THEORY: dict[str, dict] = {
 
 def _round_pct(x: float) -> float:
     return round(x, 2)
+
+
+# Auto-template path ids (safe to replace when estimates.external / blended_best exist)
+TEMPLATE_PATH_IDS = frozenset(
+    {
+        "filing_falsifier",
+        "theory_implied",
+        "scenario_bear",
+        "scenario_bull",
+        "segment_implied",
+        "nav_overlay_payoff",
+        "third_party_context",
+    }
+)
+
+
+def _has_custom_synthesis_paths(paths: list[dict]) -> bool:
+    """Human-curated synthesis (e.g. VTRS Rosen weights) must not be replaced."""
+    return any(p.get("id") not in TEMPLATE_PATH_IDS for p in paths)
+
+
+def _third_party_proxies_bull(paths: list[dict], data: dict) -> bool:
+    """Detect instrumentalist third_party_context row (bull proxy or stale upside)."""
+    legacy = data.get("results_lawrence_legacy") or data.get("results") or {}
+    bull = (legacy.get("bull") or {}).get("return_pct")
+    for p in paths:
+        if p.get("id") != "third_party_context":
+            continue
+        notes = (p.get("notes") or "").lower()
+        if "proxy" in notes and "bull" in notes:
+            return True
+        if bull is not None and p.get("return_pct") == bull:
+            return True
+        if bull is not None and p.get("return_pct") is not None:
+            if abs(float(p["return_pct"]) - float(bull)) < 0.25:
+                return True
+    return False
+
+
+def _should_rebuild_paths_from_estimates(paths: list[dict], data: dict) -> bool:
+    est = data.get("estimates") or {}
+    if not (est.get("blended_best") or est.get("external") or est.get("marvin_floor")):
+        return False
+    if not paths:
+        return True
+    if any(p.get("id") == "third_party_context" for p in paths):
+        return True
+    return _third_party_proxies_bull(paths, data)
+
+
+def _external_return_pct(ext: dict) -> float | None:
+    for key in (
+        "return_pct_7yr",
+        "return_pct",
+        "return_pct_approx",
+        "return_pct_catalyst_capped",
+    ):
+        if ext.get(key) is not None:
+            return _round_pct(float(ext[key]))
+    return None
+
+
+def _catalyst_return_pct(cid: str, cs: dict, price: float | None) -> float | None:
+    if cs.get("return_pct") is not None:
+        return _round_pct(float(cs["return_pct"]))
+    payoff = cs.get("payoff")
+    years = cs.get("years")
+    if payoff and years and price and price > 0:
+        return _round_pct(((float(payoff) / float(price)) ** (1 / float(years)) - 1) * 100)
+    return None
+
+
+def _paths_from_estimates(data: dict) -> list[dict]:
+    """Build synthesis paths from estimates.* (triangulated blend, not bull proxy)."""
+    est = data.get("estimates") or {}
+    paths: list[dict] = []
+    mf = est.get("marvin_floor") or {}
+    if mf.get("return_pct") is not None:
+        paths.append(
+            {
+                "id": "marvin_floor",
+                "label": "Marvin floor (filings stress)",
+                "source": "estimates.marvin_floor",
+                "return_pct": _round_pct(float(mf["return_pct"])),
+                "weight": 0.25,
+                "type": "numeric",
+                "epistemic_tier": "A (primary filings)",
+                "weight_why": "Stress floor from primary docs; anchors pessimistic bound.",
+                "hard_to_vary": "yes",
+            }
+        )
+    bb = est.get("blended_best") or {}
+    if bb.get("return_pct") is not None:
+        ps = bb.get("per_share")
+        src = f"estimates.blended_best @ ${ps}/sh" if ps is not None else "estimates.blended_best"
+        paths.append(
+            {
+                "id": "blended_best_primary",
+                "label": "Blended best estimate (Marvin + external)",
+                "source": src,
+                "return_pct": _round_pct(float(bb["return_pct"])),
+                "weight": 0.5,
+                "type": "numeric",
+                "notes": (bb.get("weights") or bb.get("notes") or "")[:120],
+                "epistemic_tier": "B (triangulated best judgment)",
+                "weight_why": "Primary holding-period path after partial credit for approved external normalization.",
+                "hard_to_vary": "yes",
+            }
+        )
+    for ext in est.get("external") or []:
+        ret = _external_return_pct(ext)
+        if ret is None:
+            continue
+        sid = ext.get("source_id") or "external"
+        approved = (ext.get("status") or "").lower() == "approved"
+        paths.append(
+            {
+                "id": f"external_{sid}",
+                "label": (ext.get("source") or sid)[:60],
+                "source": ext.get("path") or f"estimates.external[{sid}]",
+                "return_pct": ret,
+                "weight": 0.12 if approved else 0.08,
+                "type": "numeric",
+                "notes": (ext.get("notes") or "")[:100],
+                "epistemic_tier": "C (approved external)" if approved else "D (external context)",
+                "weight_why": "Triangulation lane; capped when already in blended_best to avoid double-count.",
+                "hard_to_vary": "partial",
+            }
+        )
+    price = (data.get("inputs") or {}).get("price")
+    for cid, cs in (data.get("catalyst_scenarios") or {}).items():
+        ret = _catalyst_return_pct(cid, cs, float(price) if price else None)
+        if ret is None:
+            continue
+        paths.append(
+            {
+                "id": f"catalyst_{cid}",
+                "label": f"Catalyst: {cid.replace('_', ' ')}",
+                "source": f"catalyst_scenarios.{cid}",
+                "return_pct": ret,
+                "weight": 0.1,
+                "type": "numeric",
+                "notes": (cs.get("notes") or "")[:100],
+                "epistemic_tier": "D (event path)",
+                "weight_why": "Capped catalyst; not Lawrence operating base.",
+                "hard_to_vary": "no",
+            }
+        )
+    legacy = data.get("results_lawrence_legacy") or data.get("results") or {}
+    for case, w in (("bear", 0.05), ("bull", 0.05)):
+        pct = (legacy.get(case) or {}).get("return_pct")
+        if pct is not None:
+            paths.append(
+                {
+                    "id": f"scenario_{case}",
+                    "label": f"{case.capitalize()} scenario (Lawrence envelope)",
+                    "source": f"scenarios.{case}",
+                    "return_pct": _round_pct(float(pct)),
+                    "weight": w,
+                    "type": "numeric",
+                    "epistemic_tier": "C (scenario envelope)",
+                    "weight_why": "Sensitivity only; not a competing explanation of base mechanics.",
+                    "hard_to_vary": "yes",
+                }
+            )
+    if not paths:
+        return _default_paths(data)
+    return paths
+
+
+def _sync_path_returns(paths: list[dict], data: dict) -> list[dict]:
+    """Refresh numeric returns on preserved paths without changing weights or labels."""
+    est = data.get("estimates") or {}
+    mf = est.get("marvin_floor") or {}
+    bb = est.get("blended_best") or {}
+    legacy = data.get("results_lawrence_legacy") or data.get("results") or {}
+    base_ret = (legacy.get("base") or {}).get("return_pct")
+    ir = data.get("implied_return") or {}
+    fa = ir.get("falsifier_adjusted_pct")
+    price = (data.get("inputs") or {}).get("price")
+    ext_by_id = {e.get("source_id"): e for e in est.get("external") or [] if e.get("source_id")}
+
+    out: list[dict] = []
+    for p in paths:
+        pid = p.get("id", "")
+        updated = dict(p)
+        if pid == "marvin_floor" and mf.get("return_pct") is not None:
+            updated["return_pct"] = _round_pct(float(mf["return_pct"]))
+        elif pid in ("blended_best_primary", "blended_lawrence_primary") and bb.get("return_pct") is not None:
+            updated["return_pct"] = _round_pct(float(bb["return_pct"]))
+        elif pid == "blended_lawrence_primary" and base_ret is not None:
+            updated["return_pct"] = _round_pct(float(base_ret))
+        elif pid == "filing_falsifier" and fa is not None:
+            updated["return_pct"] = _round_pct(float(fa))
+        elif pid.startswith("external_"):
+            sid = pid.replace("external_", "", 1)
+            ext = ext_by_id.get(sid)
+            if ext:
+                ret = _external_return_pct(ext)
+                if ret is not None:
+                    updated["return_pct"] = ret
+        elif pid.startswith("catalyst_"):
+            cid = pid.replace("catalyst_", "", 1)
+            cs = (data.get("catalyst_scenarios") or {}).get(cid) or {}
+            ret = _catalyst_return_pct(cid, cs, float(price) if price else None)
+            if ret is not None:
+                updated["return_pct"] = ret
+        elif pid == "rosen_operating_7yr":
+            ext = ext_by_id.get("sohn_rosen_vtrs") or (est.get("external") or [{}])[0]
+            ret = _external_return_pct(ext) if ext else None
+            if ret is not None:
+                updated["return_pct"] = ret
+        elif pid == "idorsia_catalyst_capped":
+            ext = ext_by_id.get("sohn_rosen_vtrs") or {}
+            if ext.get("return_pct_catalyst_capped") is not None:
+                updated["return_pct"] = _round_pct(float(ext["return_pct_catalyst_capped"]))
+        elif pid.startswith("scenario_"):
+            case = pid.replace("scenario_", "")
+            pct = (legacy.get(case) or {}).get("return_pct")
+            if pct is not None:
+                updated["return_pct"] = _round_pct(float(pct))
+        out.append(updated)
+    return out
+
+
+def resolve_synthesis_paths(data: dict) -> list[dict]:
+    """Choose synthesis paths: preserve human blends, else estimates-driven, else template."""
+    existing = data.get("synthesis") or {}
+    paths = list(existing.get("paths") or [])
+    est = data.get("estimates") or {}
+    has_estimates = bool(est.get("marvin_floor") or est.get("blended_best") or est.get("external"))
+
+    if existing.get("lock_paths") or _has_custom_synthesis_paths(paths):
+        return _sync_path_returns(paths, data) if paths else _paths_from_estimates(data)
+
+    if _should_rebuild_paths_from_estimates(paths, data):
+        return _sync_path_returns(_paths_from_estimates(data), data)
+
+    if not paths:
+        paths = _default_paths(data)
+    elif has_estimates:
+        paths = _sync_path_returns(paths, data)
+    return paths
 
 
 def _load_inventory(ticker: str) -> dict | None:
@@ -166,12 +414,12 @@ def _default_paths(data: dict) -> list[dict]:
     overlay_nav = gate.get("overlay_nav_per_share")
     price = (data.get("inputs") or {}).get("price")
     if overlay_nav and price and overlay_nav > 0:
-        years = 10
+        years = LAWRENCE_HORIZON_YEARS
         nav_irr = ((overlay_nav / price) ** (1 / years) - 1) * 100
         paths.append(
             {
                 "id": "nav_overlay_payoff",
-                "label": "NAV overlay dated payoff (10yr to overlay base)",
+                "label": f"NAV overlay dated payoff ({LAWRENCE_HORIZON_YEARS}yr to overlay base)",
                 "source": f"nav_overlay ~${overlay_nav}/sh vs price ${price}",
                 "return_pct": _round_pct(nav_irr),
                 "weight": 0.10,
@@ -370,13 +618,13 @@ def post_optionality_valuation_pass(data: dict) -> None:
         return
 
     existing = data.get("synthesis") or {}
-    paths = list(existing.get("paths") or _default_paths(data))
+    paths = resolve_synthesis_paths(data)
     gate = data.get("optionality_gate") or {}
     overlay_nav = gate.get("overlay_nav_per_share")
     price = (data.get("inputs") or {}).get("price")
     for i, p in enumerate(paths):
         if p.get("id") == "nav_overlay_payoff" and overlay_nav and price and overlay_nav > 0:
-            years = 10
+            years = LAWRENCE_HORIZON_YEARS
             nav_irr = ((float(overlay_nav) / float(price)) ** (1 / years) - 1) * 100
             paths[i] = {
                 **p,
@@ -402,7 +650,7 @@ def compute_synthesis(data: dict) -> dict:
 
     ticker = data.get("ticker", "")
     existing = data.get("synthesis") or {}
-    raw_paths = existing.get("paths") or _default_paths(data)
+    raw_paths = resolve_synthesis_paths(data)
     paths = _attach_weight_theory(raw_paths)
     if not paths:
         data["synthesis"] = {"status": "incomplete", "reason": "no numeric paths"}
@@ -455,7 +703,7 @@ def compute_synthesis(data: dict) -> dict:
     ir["synthesis_pct"] = total
     if data.get("method") != "yield_curve":
         ir["base_pct"] = total
-        ir["label"] = "10yr IRR (total synthesis)"
+        ir["label"] = SYNTHESIS_LABEL
         ir["display"] = f"{total}% (total synthesis)"
     return synthesis
 
@@ -482,6 +730,97 @@ def website_implied_irr(data: dict) -> dict:
     }
 
 
+def _headline_pct(pct: float | int) -> str:
+    if isinstance(pct, float) and pct == int(pct):
+        return str(int(pct))
+    if isinstance(pct, float):
+        return f"{pct:.2f}".rstrip("0").rstrip(".")
+    return str(pct)
+
+
+def has_blended_estimates(val: dict) -> bool:
+    est = val.get("estimates") or {}
+    return bool(est.get("marvin_floor") or est.get("blended_best") or est.get("external"))
+
+
+def blended_estimate_markdown(val: dict) -> str:
+    """Render ## Blended estimate from valuation.json estimates (repeatable refresh)."""
+    est = val.get("estimates") or {}
+    if not has_blended_estimates(val):
+        return ""
+    syn = val.get("synthesis") or {}
+    headline = syn.get("total_synthesis_pct") or (val.get("implied_return") or {}).get("base_pct")
+    headline_s = _headline_pct(headline) if headline is not None else "n/a"
+    stance = (val.get("stance_proposal") or {}).get("suggested", "watch")
+    price = (val.get("inputs") or {}).get("price", "?")
+
+    lines = [
+        "## Blended estimate (best judgment)",
+        "",
+        "| Lens | Owner cash (or metric) | Return / horizon | Stance hint |",
+        "|------|------------------------|------------------|-------------|",
+    ]
+    mf = est.get("marvin_floor") or {}
+    if mf:
+        ret = mf.get("return_pct")
+        ret_s = f"**{ret}%** / {LAWRENCE_HORIZON_YEARS}yr" if ret is not None else "n/a"
+        ps = mf.get("per_share")
+        cash = f"**${ps}/sh**" if ps is not None else "—"
+        lines.append(f"| Marvin floor | {cash} | {ret_s} | stress |")
+    for ext in est.get("external") or []:
+        ret = _external_return_pct(ext)
+        ret_s = f"**{ret}%** / {LAWRENCE_HORIZON_YEARS}yr" if ret is not None else "context"
+        ps = ext.get("per_share_normalized") or ext.get("per_share")
+        cash = f"**${ps}/sh**" if ps is not None else "—"
+        src = (ext.get("source") or ext.get("source_id") or "External")[:50]
+        lines.append(f"| {src} | {cash} | {ret_s} | external |")
+    bb = est.get("blended_best") or {}
+    if bb:
+        ret = bb.get("return_pct")
+        ret_s = f"**{ret}%** / {LAWRENCE_HORIZON_YEARS}yr operating" if ret is not None else "n/a"
+        ps = bb.get("per_share")
+        cash = f"**${ps}/sh**" if ps is not None else "—"
+        lines.append(f"| Blended operating | {cash} | {ret_s} | — |")
+    lines.append(
+        f"| **Total synthesis (headline)** | blended path | **{headline_s}%** / {LAWRENCE_HORIZON_YEARS}yr | **{stance}** |"
+    )
+    lines.append("")
+    weights = bb.get("weights") or ""
+    syn_paths = syn.get("paths") or []
+    if syn_paths:
+        wparts = [
+            f"**{int((p.get('weight') or 0) * 100)}%** {p.get('label', p.get('id', ''))[:40]}"
+            for p in syn_paths
+            if p.get("return_pct") is not None
+        ]
+        if wparts:
+            lines.append(f"**Weights (synthesis):** " + " · ".join(wparts[:6]) + ".")
+    elif weights:
+        lines.append(f"**Weights:** {weights}")
+    if bb.get("notes"):
+        lines.append("")
+        lines.append(f"**Bridge:** {bb['notes']}")
+    lines += [
+        "",
+        f"**Returns statement (blend):** We expect about **{headline_s}%** per year at **${price}** "
+        f"(total synthesis headline; Marvin floor **{mf.get('return_pct', 'n/a')}%** on "
+        f"**${mf.get('per_share', 'n/a')}/sh** for stress).",
+        "",
+    ]
+    for ext in est.get("external") or []:
+        sid = ext.get("source_id") or "external"
+        lines.append(f"### {ext.get('source', sid)[:60]}")
+        lines.append("")
+        lines.append("| Claim | Marvin use in blend |")
+        lines.append("|-------|---------------------|")
+        notes = (ext.get("notes") or "See cross-check and primary path.")[:200]
+        lines.append(f"| Summary | {notes} |")
+        if ext.get("path"):
+            lines.append(f"| Source | `{ext['path']}` (`{sid}`) |")
+        lines.append("")
+    return "\n".join(lines)
+
+
 def synthesis_markdown(data: dict) -> str:
     syn = data.get("synthesis") or {}
     if syn.get("status") != "complete":
@@ -492,7 +831,7 @@ def synthesis_markdown(data: dict) -> str:
         "Capstone return combining **filings**, **segment/NAV overlays**, **growth theory**, "
         "**third-party cross-checks**, and **qualitative** moat/competition/governance judgments.",
         "",
-        "| # | Source / lens | Type | Return (10yr) | Weight | Role in synthesis |",
+        f"| # | Source / lens | Type | Return ({LAWRENCE_HORIZON_YEARS}yr) | Weight | Role in synthesis |",
         "|---|---------------|------|---------------|--------|-------------------|",
     ]
     for i, p in enumerate(syn.get("paths", []), 1):
@@ -529,7 +868,8 @@ def synthesis_markdown(data: dict) -> str:
         f"2. **Qualitative adjustments:** {' + '.join(_qual_terms(syn.get('qualitative_adjustments', [])))} = **{qpp}** pp",
         f"3. **Total synthesis IRR:** {n}% + {qpp}pp = **{t}%** per year",
         "",
-        f"**Returns statement (synthesis):** At today's price, we expect about **{t}%** per year over ten years "
+        f"**Returns statement (synthesis):** At today's price, we expect about **{t}%** per year over "
+        f"{LAWRENCE_HORIZON_YEARS} years "
         f"after weighting filings, segment build, scenarios, NAV overlay, third-party context, and qualitative moat/governance factors.",
         "",
         f"**[HUMAN REVIEW]:** Synthesis weights and qualitative pp default to auto-build; "

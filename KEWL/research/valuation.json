@@ -1,6 +1,6 @@
 {
   "ticker": "KEWL",
-  "as_of": "2026-06-02",
+  "as_of": "2026-06-03",
   "valuation_mode": "optionality",
   "method": "yield_curve",
   "lawrence_bucket": "other",
@@ -47,12 +47,12 @@
     "shares_outstanding": 1126284,
     "copperwood_royalty_est_usd": 7700000,
     "normalization_note": "SSI mineral-floor + free-option. At $55, ~4.3\u00d7 book \u2014 option yield falls vs $27 entry.",
-    "copper_spot_usd_per_lb": 6.6665,
-    "copper_spot_as_of": "2026-06-02",
+    "copper_spot_usd_per_lb": 6.5423,
+    "copper_spot_as_of": "2026-06-03",
     "copper_spot_source": "https://stooq.com/q/l/?s=hg.f&f=sd2t2ohlcv&h&e=csv",
     "copperwood_royalty_est_usd_ssi_ref": 7700000,
-    "copperwood_royalty_est_usd_at_spot": 12833012.0,
-    "copperwood_royalty_note": "SSI ~$7.7M/yr @ $4.0/lb scaled linearly to spot $6.6665/lb [Assumption]",
+    "copperwood_royalty_est_usd_at_spot": 12593928.0,
+    "copperwood_royalty_note": "SSI ~$7.7M/yr @ $4.0/lb scaled linearly to spot $6.5423/lb [Assumption]",
     "lease_income_annual_usd": 365000.0,
     "lease_income_source": "FY2024 annual; H1 2025 semi-annual trend"
   },
@@ -60,15 +60,15 @@
     "framework": "mineral_floor_option",
     "floor_pass": false,
     "floor_metric": "nav_per_share",
-    "floor_value": 20.93,
+    "floor_value": 20.85,
     "primary_metric": "lawrence_base",
     "primary_label": "annualized return",
     "primary_return_pct": -8.3,
     "incumbent_sleeve": false,
-    "notes": "Economic floor ~$20.93/sh (not GAAP book); spot copper $6.6665/unit; option yield ~20.72%",
-    "overlay_nav_per_share": 22.73,
-    "copperwood_option_yield_pct": 20.72,
-    "overlay_implied_return_pct": -10.69
+    "notes": "Economic floor ~$20.85/sh (not GAAP book); spot copper $6.5423/unit; option yield ~20.33%",
+    "overlay_nav_per_share": 22.65,
+    "copperwood_option_yield_pct": 20.33,
+    "overlay_implied_return_pct": -10.73
   },
   "scenarios": {
     "bear": {
@@ -104,8 +104,8 @@
             "id": "production_partial",
             "label": "Production option (partially in price)",
             "gaap_per_share": 0.0,
-            "uplift_per_share": 3.99,
-            "math": "P=35% x spot royalty $12.8M/yr"
+            "uplift_per_share": 3.91,
+            "math": "P=35% x spot royalty $12.6M/yr"
           },
           {
             "id": "acreage",
@@ -118,7 +118,7 @@
             "id": "residual",
             "label": "Residual to Lawrence base payoff",
             "gaap_per_share": 0.0,
-            "uplift_per_share": 9.07,
+            "uplift_per_share": 9.15,
             "math": "Tie to $30.0 path"
           }
         ],
@@ -132,25 +132,24 @@
       "price": 55.0,
       "payoff": 64.89999999999999,
       "years": 7,
-      "notes": "Production at spot $6.6665"
+      "notes": "Production at spot $6.5423"
     }
   },
   "results": {
     "bear": {
-      "return_pct": -17.8
+      "return_pct": -17.76
     },
     "base": {
-      "return_pct": -8.3
+      "return_pct": -8.29
     },
     "bull": {
-      "return_pct": 2.4
+      "return_pct": 2.39
     }
   },
   "implied_return": {
-    "base_pct": -3.8,
-    "label": "10yr IRR (total synthesis)",
-    "display": "-3.8% (total synthesis)",
-    "synthesis_pct": -3.8
+    "base_pct": -8.29,
+    "label": "annualized return",
+    "display": "-8.29% (base)"
   },
   "stance_proposal": {
     "suggested": "watch",
@@ -228,7 +227,7 @@
   ],
   "nav_overlay": {
     "status": "complete",
-    "as_of": "2026-06-02",
+    "as_of": "2026-06-03",
     "gaap_vs_fair_value": {
       "mineral_rights_balance_sheet_m": 7.98,
       "mineral_rights_source": "H1 2025 semi-annual",
@@ -237,8 +236,8 @@
       "policy": "Minerals at historical cost; Copperwood royalties off balance sheet until production"
     },
     "gaap_book_per_share": 12.7,
-    "economic_floor_per_share": 20.93,
-    "overlay_nav_per_share": 22.73,
+    "economic_floor_per_share": 20.85,
+    "overlay_nav_per_share": 22.65,
     "method": "probability_weighted",
     "lines": [
       {
@@ -256,8 +255,8 @@
       {
         "id": "production_pw",
         "label": "Production royalty P=35% @ spot",
-        "per_share": 3.99,
-        "source": "Scaled to spot $6.6665"
+        "per_share": 3.91,
+        "source": "Scaled to spot $6.5423"
       },
       {
         "id": "acreage",
@@ -266,7 +265,7 @@
         "source": "filing"
       }
     ],
-    "premium_to_economic_floor_pct": 162.8,
+    "premium_to_economic_floor_pct": 163.8,
     "notes": "Do not use GAAP book as dhando floor"
   },
   "catalyst_paths": [
@@ -304,111 +303,21 @@
     }
   ],
   "synthesis": {
-    "status": "complete",
-    "paths": [
-      {
-        "id": "scenario_bear",
-        "label": "Bear scenario (Lawrence)",
-        "source": "scenarios.bear",
-        "return_pct": -17.8,
-        "weight": 0.05,
-        "type": "numeric",
-        "epistemic_tier": "C (scenario envelope)",
-        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
-        "weight_falsifiers": [
-          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
-        ],
-        "hard_to_vary": "yes: asymmetric low weight is structural"
-      },
-      {
-        "id": "scenario_bull",
-        "label": "Bull scenario (Lawrence)",
-        "source": "scenarios.bull",
-        "return_pct": 2.4,
-        "weight": 0.12,
-        "type": "numeric",
-        "epistemic_tier": "C (scenario envelope)",
-        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
-        "weight_falsifiers": [
-          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
-        ],
-        "hard_to_vary": "yes"
-      },
-      {
-        "id": "nav_overlay_payoff",
-        "label": "NAV overlay dated payoff (10yr to overlay base)",
-        "source": "nav_overlay ~$16.12/sh vs price $55.0",
-        "return_pct": -11.55,
-        "weight": 0.1,
-        "type": "numeric",
-        "epistemic_tier": "D (alternate theory: dated asset payoff)",
-        "weight_why": "Answers a different question (NAV convergence) than 10yr cash-flow IRR; capped weight to avoid theory conflation.",
-        "weight_falsifiers": [
-          "NAV overlay base not updated when segment build or filings change >10%",
-          "floor_pass false but weight above 15% without [HUMAN REVIEW]"
-        ],
-        "hard_to_vary": "yes: separate theory type"
-      },
-      {
-        "id": "third_party_context",
-        "label": "Third-party context (HK + Substacks inventory)",
-        "source": "source_inventory (2 sources); cross_check blend",
-        "return_pct": 2.4,
-        "weight": 0.1,
-        "type": "numeric",
-        "notes": "Proxy: upside case when strategic third party has no spot IRR",
-        "epistemic_tier": "D (external triangulation)",
-        "weight_why": "Context-tier HK/Substacks until human promotes in third_party_sources.md; numeric proxy is weak.",
-        "weight_falsifiers": [
-          "Using bull scenario as HK proxy when cross_check synthesis says no IRR upgrade",
-          "Weight above 15% while human_approval pending"
-        ],
-        "hard_to_vary": "no: proxy return is instrumentalist; prefer qualitative pp until approved blend"
-      }
-    ],
-    "qualitative_adjustments": [
-      {
-        "factor": "Partial dhando (HK hard-asset / hidden NAV)",
-        "pp": 0.5,
-        "rationale": "Third-party confirms asset quality not in GAAP book; not full floor at spot price",
-        "sources": "cross_check_HK; hk_scan; HK Q1 2025/2026"
-      },
-      {
-        "factor": "No dated predictive attribute at spot",
-        "pp": -0.2,
-        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
-        "sources": "HK predictive attributes framework"
-      }
-    ],
-    "numeric_weighted_pct": -4.1,
-    "qualitative_pp": 0.3,
-    "total_synthesis_pct": -3.8,
-    "human_approval": "approved",
-    "weight_audit": {
-      "flags": [
-        "Third-party numeric path proxies bull scenario (instrumentalist); HK cross-check says no base IRR upgrade. Prefer qualitative pp only until approved blend.",
-        "NAV overlay is a different theory (asset payoff vs cash-flow IRR); weight capped at 10% to limit theory conflation."
-      ],
-      "deutsch_checks": {
-        "hard_to_vary": false,
-        "falsifiable": true,
-        "not_instrumentalist": false,
-        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
-      }
-    },
-    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+    "status": "n/a",
+    "reason": "Lawrence yield_curve is stance gate; set evidence_refresh.synthesis_in_dive true to enable capstone blend",
+    "human_approval": "n/a"
   },
   "market_inputs": {
     "copper": {
-      "spot": 6.6665,
-      "as_of": "2026-06-02",
+      "spot": 6.5423,
+      "as_of": "2026-06-03",
       "source": "https://stooq.com/q/l/?s=hg.f&f=sd2t2ohlcv&h&e=csv",
-      "fetched_at": "2026-06-02T19:44:54Z",
+      "fetched_at": "2026-06-03T14:34:34Z",
       "stooq_symbol": "hg.f"
     },
     "scenario_grid": {
       "bear": {
-        "copper_usd_per_lb": 4.8,
+        "copper_usd_per_lb": 4.71,
         "label": "trough (~28% below spot)"
       },
       "base": {
@@ -416,16 +325,16 @@
         "label": "spot at compute"
       },
       "bull": {
-        "copper_usd_per_lb": 7.2,
+        "copper_usd_per_lb": 7.07,
         "label": "cycle high (~8% above spot)"
       }
     }
   },
-  "market_inputs_as_of": "2026-06-02",
+  "market_inputs_as_of": "2026-06-03",
   "overlay_options": {
     "lawrence_base": "lease_income_only_zero_production_royalty",
-    "overlay_base_payoff_7yr": 24.93,
-    "overlay_implied_return_pct": -10.69
+    "overlay_base_payoff_7yr": 24.85,
+    "overlay_implied_return_pct": -10.73
   },
   "management_outlook": {
     "cf_positive_from_2026": {

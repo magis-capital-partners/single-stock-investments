@@ -93,7 +93,7 @@ When SOTP references GAAP fair value for a listed stake (MIAX, TPL, etc.):
 | 3 | Growth years 1–5 |
 | 4 | Growth years 6–10 |
 | 5 | Exit multiple year 10 |
-| 6 | Years (10 for full Lawrence) |
+| 6 | Years (7 for full Lawrence default) |
 | 7 | Terminal value check (show one explicit multiplication) |
 
 Run `python _system/scripts/marvin_valuation.py --ticker X --write` and cite outputs.

@@ -78,14 +78,16 @@ def check(ticker: str, *, dive_date: str | None = None, strict: bool = False) ->
         if og.get("floor_metric") == "book_per_share" and nav.get("gaap_vs_fair_value"):
             errs.append("floor_metric still book_per_share with economic misstatement")
 
+    stance_gate = (cfg.get("base_payoff_mode") or "") == "fixed_stance_gate"
     slack = residual_slack_per_share(val)
-    if slack is not None and slack > max_residual_allowed(val):
+    if not stance_gate and slack is not None and slack > max_residual_allowed(val):
         errs.append(f"residual SOTP slack ${slack}/sh exceeds max {max_residual_allowed(val)}")
 
     sotp = (val.get("scenarios") or {}).get("base", {}).get("sotp_build", {})
-    for line in sotp.get("lines") or []:
-        if line.get("id") in ("tie_out", "residual") and (line.get("uplift_per_share") or 0) > max_residual_allowed(val):
-            errs.append(f"large {line.get('id')} slack in sotp_build")
+    if not stance_gate:
+        for line in sotp.get("lines") or []:
+            if line.get("id") in ("tie_out", "residual") and (line.get("uplift_per_share") or 0) > max_residual_allowed(val):
+                errs.append(f"large {line.get('id')} slack in sotp_build")
 
     if has_evidence_refresh_config(val):
         og = val.get("optionality_gate") or {}

@@ -178,18 +178,12 @@ def fill_cross_check(ticker: str, out_date: str) -> str:
 
 def fill_ticker(ticker: str, out_date: str, *, write: bool = False, force: bool = False) -> Path | None:
     ticker = ticker.upper()
-    cc = existing_cross_check(ticker)
-    if cc and cc.exists() and not force:
-        text = cc.read_text(encoding="utf-8", errors="ignore")
-        if not is_stub(text):
-            print(f"SKIP {ticker}: cross-check already filled ({cc.name})")
-            return cc
-
     out_path = ROOT / ticker / "research" / f"cross_check_third_party_{out_date}.md"
-    if not cc:
-        out_path = out_path
-    else:
-        out_path = cc
+    if out_path.exists() and not force:
+        text = out_path.read_text(encoding="utf-8", errors="ignore")
+        if not is_stub(text):
+            print(f"SKIP {ticker}: cross-check already filled ({out_path.name})")
+            return out_path
 
     content = fill_cross_check(ticker, out_date)
     if write:

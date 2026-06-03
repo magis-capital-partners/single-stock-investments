@@ -1,6 +1,6 @@
 # BN — Investment Thesis
 
-**Last updated:** auto-sync
+**Last updated:** 2026-05-21
 
 ## Classification
 
@@ -9,13 +9,11 @@
 | **Archetype** (Stahl) | platform |
 | **Moat** (Munger) | stable |
 | **Dhando** (Pabrai) | partial |
-| **Stance** | watch |
+| **Stance** | hold |
 | **Cycle** | - |
-| **Implied 10yr IRR** (base) | 13.15% (total synthesis) |
-| **IRR method** | full |
-| **Lawrence bucket** | multi_sided |
-| **Payoff lens** | pending |
-| **MOI bucket** | pending |
+| **Implied 7yr IRR** (Lawrence) | pending |
+| **IRR method** | pending |
+| **Lawrence bucket** | — |
 
 ## One-line thesis
 
@@ -43,4 +41,4 @@ Global alternative-asset compounder earning durable fee streams on $614B fee-bea
 - Confirm DE yield vs 5-year range before sizing.
 - Model BN+BNT merger impact.
 
-**Deep dive:** `BN/research/deep_dive_2026-06-01.md` (auto-sync)
+**Deep dive:** `BN/research/deep_dive_2026-06-02.md` (auto-sync)

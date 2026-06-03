@@ -1,6 +1,6 @@
 # BWEL — Investment Thesis
 
-**Last updated:** 2026-06-03
+**Last updated:** 2026-05-21
 
 ## Classification
 
@@ -11,20 +11,16 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | trough |
-| **Implied 10yr IRR** (headline) | 3.77% (total synthesis) |
-| **Lawrence owner cash** | 1.1% |
-| **Economic NAV (overlay)** | ~$1,480/sh |
-| **IRR method** | full |
-| **Lawrence bucket** | low_cost |
-| **Payoff lens** | asset |
-| **MOI bucket** | asset |
+| **Implied 7yr IRR** (Lawrence) | pending |
+| **IRR method** | pending |
+| **Lawrence bucket** | — |
 
 **Deep dive:** `BWEL/research/deep_dive_2026-06-03.md`  
 **Fact-check:** `BWEL/research/fact_check_water_nav_2026-06-02.md`
 
 ## One-line thesis
 
-At ~$549, headline **3.77%** per year blends owner cash, scenarios, and NAV optionality; Lawrence cash alone is **1.1%** while probability-weighted economic NAV is **~$1,480/sh**.
+At ~$549, headline **3.07%** per year (7yr blend) combines owner cash, scenarios, and NAV optionality; Lawrence cash alone is **-1.4%** while probability-weighted economic NAV is **~$1,480/sh**.
 
 ## Key questions
 

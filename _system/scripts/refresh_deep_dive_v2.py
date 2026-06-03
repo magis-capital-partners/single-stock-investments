@@ -174,8 +174,15 @@ def write_pending_md(ticker: str, items: list[dict]) -> None:
     out.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
+from lawrence_horizon import (  # noqa: E402
+    IMPLIED_IRR_LABEL,
+    LAWRENCE_HORIZON_YEARS,
+    RETURN_LABEL,
+    SYNTHESIS_LABEL,
+)
+
 METHOD_LABELS = {
-    "full": "Ten-year cash flow",
+    "full": f"{LAWRENCE_HORIZON_YEARS}-year cash flow",
     "yield_curve": "Dated payoff",
     "scenario": "Scenarios",
     "pending": "Pending",
@@ -247,10 +254,16 @@ def patch_classification_stance(text: str, val: dict) -> str:
             text,
             count=1,
         )
+    text = re.sub(
+        r"\*\*Implied \d+yr IRR\*\*",
+        f"**{IMPLIED_IRR_LABEL}**",
+        text,
+        count=1,
+    )
     display = (val.get("implied_return") or {}).get("display")
     if display:
         text = re.sub(
-            r"(\|\s*\*\*Implied 10yr IRR\*\*[^|]*\|\s*)([^\|]+)(\|)",
+            rf"(\|\s*\*\*{re.escape(IMPLIED_IRR_LABEL)}\*\*[^|]*\|\s*)([^\|]+)(\|)",
             lambda m: f"{m.group(1)}{display}     {m.group(3)}",
             text,
             count=1,
@@ -264,18 +277,18 @@ def patch_exec_summary_irr(body: str, val: dict) -> str:
         return body
     pct = format_headline_pct(base_pct)
     body = re.sub(
-        r"\*\*(?:Lawrence consolidated base|falsifier-adjusted) 10-year annual return is [\d.-]+%\*\*",
-        f"**Base 10-year annual return is {pct}%**",
+        rf"\*\*(?:Lawrence consolidated base|falsifier-adjusted) \d+-year annual return is [\d.-]+%\*\*",
+        f"**Base {LAWRENCE_HORIZON_YEARS}-year annual return is {pct}%**",
         body,
     )
     body = re.sub(
-        r"(?:Lawrence base|Falsifier-adjusted) 10-year annual return is \*\*[\d.-]+%\*\*",
-        f"Base 10-year annual return is **{pct}%**",
+        rf"(?:Lawrence base|Falsifier-adjusted) \d+-year annual return is \*\*[\d.-]+%\*\*",
+        f"Base {LAWRENCE_HORIZON_YEARS}-year annual return is **{pct}%**",
         body,
     )
     body = re.sub(
-        r"Base 10-year annual return is \*\*[\d.-]+%\*\*",
-        f"Base 10-year annual return is **{pct}%**",
+        rf"Base \d+-year annual return is \*\*[\d.-]+%\*\*",
+        f"Base {LAWRENCE_HORIZON_YEARS}-year annual return is **{pct}%**",
         body,
         count=1,
     )
@@ -323,7 +336,33 @@ def patch_exec_summary_irr(body: str, val: dict) -> str:
         body,
         count=1,
     )
+    return patch_horizon_year_prose(body)
+
+
+def patch_horizon_year_prose(body: str) -> str:
+    """Normalize legacy ten-year horizon wording to Lawrence horizon constant."""
+    n = LAWRENCE_HORIZON_YEARS
+    body = re.sub(r"\bover ten years\b", f"over {n} years", body, flags=re.I)
+    body = re.sub(r"\bfor ten years\b", f"for {n} years", body, flags=re.I)
+    body = re.sub(r"\bper year over ten years\b", f"per year over {n} years", body, flags=re.I)
+    body = re.sub(r"\bTen-year owner-cash\b", f"{n}-year owner-cash", body, flags=re.I)
+    body = re.sub(r"\bten-year owner-cash\b", f"{n}-year owner-cash", body, flags=re.I)
     return body
+
+
+def blended_estimate_section(val: dict) -> str | None:
+    """JSON-driven blended estimate; replaces regex patches when estimates exist."""
+    import sys
+
+    scripts = Path(__file__).resolve().parent
+    if str(scripts) not in sys.path:
+        sys.path.insert(0, str(scripts))
+    from valuation_synthesis import blended_estimate_markdown, has_blended_estimates
+
+    if not has_blended_estimates(val):
+        return None
+    body = blended_estimate_markdown(val)
+    return body.strip() if body else None
 
 
 def patch_blended_estimate_irr(body: str, val: dict) -> str:
@@ -533,7 +572,7 @@ def assumption_ledger(val: dict) -> str:
             g2 = base.get("growth_y6_10")
             if g2 is not None:
                 rows.append(
-                    f"| {n} | Growth in years 6 through 10 | **{g2*100:.1f}%** per year | Scenario base |"
+                    f"| {n} | Growth in years 6 through {LAWRENCE_HORIZON_YEARS} | **{g2*100:.1f}%** per year | Scenario base |"
                 )
                 n += 1
         ex = base.get("exit_pfcf_y10") or base.get("exit_multiple")
@@ -542,7 +581,10 @@ def assumption_ledger(val: dict) -> str:
                 f"| {n} | Selling multiple in year 10 | **{ex} times cash flow** | Scenario base |"
             )
             n += 1
-        rows.append(f"| {n} | Time horizon | **10 years** | Ten-year owner-cash model |")
+        rows.append(
+            f"| {n} | Time horizon | **{LAWRENCE_HORIZON_YEARS} years** | "
+            f"{LAWRENCE_HORIZON_YEARS}-year owner-cash model |"
+        )
         n += 1
         ai = val.get("ai_overlay") or {}
         bull = ai.get("ai_inflection_bull") or {}
@@ -597,7 +639,7 @@ def growth_explanation_stress_block(val: dict) -> str:
         "",
         "| Field | Value |",
         "|-------|-------|",
-        f"| Growth assumption under test | Years 1–5: **{g1_pct:.1f}%**; years 6–10: **{g2_pct:.1f}%** (falsifier-adjusted base) |",
+        f"| Growth assumption under test | Years 1–5: **{g1_pct:.1f}%**; years 6–{LAWRENCE_HORIZON_YEARS}: **{g2_pct:.1f}%** (falsifier-adjusted base) |",
         f"| Theory name | {ge.get('theory_label', '')} |",
         f"| Status | **{status}** |",
         "",
@@ -738,7 +780,7 @@ def segment_build_section(val: dict, preserved: str | None) -> str:
 
     footer = f"**Sum PV/sh @ {disc:.0f}%:** **${sum_pv}**" if sum_pv is not None else ""
     if ai_irr is not None:
-        footer += f" · **AI inflection (normalized ${ai.get('fcf_per_share_y0', '?')} FCF₀):** **{ai_irr}%** 10yr IRR"
+        footer += f" · **AI inflection (normalized ${ai.get('fcf_per_share_y0', '?')} FCF₀):** **{ai_irr}%** {RETURN_LABEL}"
     if lawrence is not None:
         footer += f" · **Lawrence base:** **{lawrence}%**"
     lines += ["", footer, ""]
@@ -972,7 +1014,8 @@ def sotp_nav_block(val: dict) -> str:
     lines = [
         "#### Sum-of-parts or NAV",
         "",
-        f"**Base case Year-{base.get('years', sotp.get('years', 5))} economic NAV = ${payoff}/sh** — see Valuation & IRR assumption ledger.",
+        f"**Base case Year-{base.get('years', sotp.get('years', 5))} economic NAV = ${payoff}/sh**. "
+        "See Valuation & IRR assumption ledger.",
         "",
         "| Piece | $/sh (today) | + Incremental uplift | In book? |",
         "|-------|--------------|----------------------|----------|",
@@ -980,7 +1023,7 @@ def sotp_nav_block(val: dict) -> str:
     running = anchor or 0
     for row in lines_data:
         if row.get("id") == "book":
-            lines.append(f"| {row.get('label', 'Anchor')} | **${row.get('gaap_per_share')}** | — | Yes |")
+            lines.append(f"| {row.get('label', 'Anchor')} | **${row.get('gaap_per_share')}** | n/a | Yes |")
             continue
         uplift = row.get("uplift_per_share") or 0
         if uplift:
@@ -1126,7 +1169,7 @@ def yield_curve_sotp_irr(val: dict, ticker: str) -> str:
         f"**Base case** (dated payoff / sum-of-parts; `irr_method`: yield_curve). "
         f"Payoff **${payoff}** and horizon **{years} years** are model assumptions in `valuation.json`.",
         "",
-        "**Step 1 — Price today**",
+        "**Step 1: Price today**",
         f"- **${price}** ({inputs.get('price_source', 'market')})",
         "",
     ]
@@ -1134,19 +1177,19 @@ def yield_curve_sotp_irr(val: dict, ticker: str) -> str:
         if price < book:
             disc = (book - price) / book * 100
             out += [
-                "**Step 2 — Filing anchor (book)**",
+                "**Step 2: Filing anchor (book)**",
                 f"- Book **${book}/sh** · Price **{disc:.0f}%** below book",
                 "",
             ]
         else:
             prem = (price - book) / book * 100 if book else 0
             out += [
-                "**Step 2 — Filing anchor (book)**",
+                "**Step 2: Filing anchor (book)**",
                 f"- Book **${book}/sh** · Price **{prem:.0f}%** above book (option priced in)",
                 "",
             ]
     out += [
-        "**Step 3 — Build payoff by adding incremental lines**",
+        "**Step 3: Build payoff by adding incremental lines**",
         "",
         "```",
         f"  {book or price}  anchor (GAAP book or price)",
@@ -1166,12 +1209,12 @@ def yield_curve_sotp_irr(val: dict, ticker: str) -> str:
         "",
         f"Same build in `{ticker}/research/valuation.json` → `scenarios.base.sotp_build`.",
         "",
-        f"**Step 4 — Horizon: {years} years** (model choice; not company guidance)",
+        f"**Step 4: Horizon: {years} years** (model choice; not company guidance)",
         "",
-        "**Step 5 — Total return**",
+        "**Step 5: Total return**",
         f"- ${payoff} ÷ ${price} − 1 = **{(payoff / price - 1) * 100:.1f}%** total" if price else "",
         "",
-        "**Step 6 — Annualized return**",
+        "**Step 6: Annualized return**",
         f"- (${payoff} ÷ ${price})^(1/{years}) − 1 = **{base_pct}%** per year"
         if price and payoff and base_pct is not None
         else "",
@@ -1213,7 +1256,7 @@ def enrich_business_moat(body: str, val: dict, ticker: str, preserved: str | Non
             "**Bull AI path** in `valuation.json` → `ai_overlay.ai_inflection_bull` is a **placeholder** "
             "($8/sh normalized FCF, higher growth) for sensitivity only — **not computed IRR yet**; "
             "needs a filing-backed bridge from Cloud OI, depreciation on new capex, and TPU revenue if disclosed.",
-            f"**Bull AI path** (`ai_overlay.ai_inflection_bull`): sensitivity **{ai_irr}%** 10yr IRR at normalized "
+            f"**Bull AI path** (`ai_overlay.ai_inflection_bull`): sensitivity **{ai_irr}%** {RETURN_LABEL} at normalized "
             f"${bull.get('fcf_per_share_y0', 8)}/sh FCF₀ — "
             "**not** the stance gate; needs filing-backed bridge from Cloud OI, capex normalization, and TPU revenue if disclosed.",
         )
@@ -1264,28 +1307,28 @@ def irr_arithmetic(val: dict, ticker: str, preserved: str | None) -> str:
         lines += [
             f"**Base case** (`irr_method`: {method}). See assumption ledger and `sotp_build` in valuation.json.",
             "",
-            "**Step 1 — Price today**",
+            "**Step 1: Price today**",
             f"- **${price}** ({inputs.get('price_source', 'market')})",
             "",
         ]
         if book:
             disc = (book - price) / book * 100 if book else 0
             lines += [
-                "**Step 2 — Filing anchor (book)**",
+                "**Step 2: Filing anchor (book)**",
                 f"- Book **${book}/sh** · Price is **{disc:.0f}%** below book" if price < book else f"- Book **${book}/sh**",
                 "",
             ]
         lines += [
-            "**Step 3 — Payoff (sum of parts)**",
+            "**Step 3: Payoff (sum of parts)**",
             f"- Build incremental lines in assumption ledger; payoff **${payoff}** must equal running sum.",
             "",
-            f"**Step 4 — Horizon: {years} years**",
+            f"**Step 4: Horizon: {years} years**",
             "- Model choice in valuation.json; not company guidance.",
             "",
-            "**Step 5 — Total return**",
+            "**Step 5: Total return**",
             f"- ${payoff} ÷ ${price} − 1 = **{(payoff/price - 1)*100:.1f}%** total" if price else "",
             "",
-            "**Step 6 — Annualized IRR**",
+            "**Step 6: Annualized IRR**",
             f"- (${payoff} ÷ ${price})^(1/{years}) − 1 = **{base_pct}%**/yr"
             if price and payoff and base_pct
             else "",
@@ -1302,9 +1345,9 @@ def irr_arithmetic(val: dict, ticker: str, preserved: str | None) -> str:
             f"1. **Price today:** **${price}**",
             f"2. **Starting free cash flow per share:** **${fcf}** "
             f"({inputs.get('per_share_source', inputs.get('fcf_source', ''))})",
-            f"3. **Growth in years 1–5:** **{g1*100:.1f}%** per year · **years 6–10:** **{g2*100:.1f}%** per year",
+            f"3. **Growth in years 1–5:** **{g1*100:.1f}%** per year · **years 6–{LAWRENCE_HORIZON_YEARS}:** **{g2*100:.1f}%** per year",
             f"4. **Selling multiple in year 10:** **{ex} times** year-10 cash flow",
-            f"5. **Annual return at today's price:** **{base_pct}%** per year over ten years "
+            f"5. **Annual return at today's price:** **{base_pct}%** per year over {LAWRENCE_HORIZON_YEARS} years "
             "(`implied_return.base_pct` in `valuation.json`)",
         ]
         return "\n".join(lines)
@@ -1381,19 +1424,15 @@ def build_valuation_section(ticker: str, val: dict, preserved_val: str | None) -
         upside = f"**Upside / downside from price:** Base IRR **{base_pct}%** at **${price}**; see bear/bull in `valuation.json` scenarios."
 
     ret = ""
-    if preserved_val:
-        rm = re.search(r"\*\*Returns statement:\*\*.*", preserved_val)
-        if rm and str(base_pct) in rm.group(0):
-            ret = rm.group(0)
-    if not ret:
-        fcf = inputs.get("fcf_per_share") or inputs.get("per_share")
-        if fcf:
-            ret = (
-                f"**Returns statement:** We expect **{base_pct}%** per year over ten years "
-                f"at **~${price}** on **${fcf}/sh** starting owner cash."
-            )
-        else:
-            ret = f"**Returns statement:** We expect **{base_pct}%** per year at **${price}**."
+    headline = primary_irr_pct(val) or base_pct
+    fcf = inputs.get("fcf_per_share") or inputs.get("per_share")
+    if fcf:
+        ret = (
+            f"**Returns statement:** We expect **{headline}%** per year over {LAWRENCE_HORIZON_YEARS} years "
+            f"at **~${price}** on **${fcf}/sh** starting owner cash."
+        )
+    else:
+        ret = f"**Returns statement:** We expect **{headline}%** per year at **${price}**."
 
     parts = [
         "## Valuation & IRR (assumption ledger)",
@@ -1488,7 +1527,12 @@ def refresh_ticker(ticker: str, out_date: str) -> Path | None:
         if key == "## Executive summary":
             body = patch_exec_summary_irr(body, val)
         if key in ("## Blended estimate (best judgment)", "## Blended estimate"):
-            body = patch_blended_estimate_irr(body, val)
+            rendered = blended_estimate_section(val)
+            if rendered:
+                lines = rendered.splitlines()
+                body = "\n".join(lines[1:]).strip() if lines and lines[0].startswith("## ") else rendered
+            else:
+                body = patch_blended_estimate_irr(body, val)
         if key == "## Primary sources reviewed":
             body = inject_hk_primary_sources(body, ticker)
         if key == "## Payoff & return":
@@ -1527,7 +1571,8 @@ def refresh_ticker(ticker: str, out_date: str) -> Path | None:
     write_pending_md(ticker, pending)
 
     out_path = research / f"deep_dive_{out_date}.md"
-    out_path.write_text("\n".join(out_parts).strip() + "\n", encoding="utf-8")
+    final_text = patch_horizon_year_prose("\n".join(out_parts).strip() + "\n")
+    out_path.write_text(final_text, encoding="utf-8")
     print(f"OK {ticker} -> {out_path.relative_to(ROOT)}")
     return out_path
 

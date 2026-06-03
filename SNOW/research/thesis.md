@@ -1,6 +1,6 @@
 # SNOW — Investment Thesis
 
-**Last updated:** auto-sync
+**Last updated:** 2026-05-21
 
 ## Classification
 
@@ -11,13 +11,11 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | - |
-| **Implied 10yr IRR** (base) | 7.58% (total synthesis) |
-| **IRR method** | full |
-| **Lawrence bucket** | multi_sided |
-| **Payoff lens** | pending |
-| **MOI bucket** | pending |
+| **Implied 7yr IRR** (Lawrence) | pending |
+| **IRR method** | pending |
+| **Lawrence bucket** | — |
 
-**Deep dive:** `SNOW/research/deep_dive_2026-06-01.md` (auto-sync)
+**Deep dive:** `SNOW/research/deep_dive_2026-06-02.md` (auto-sync)
 
 ## One-line thesis
 

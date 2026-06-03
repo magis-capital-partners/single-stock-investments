@@ -166,8 +166,8 @@ def lint_file(path: Path, *, legacy: bool, strict: bool) -> tuple[list[str], lis
         if re.search(pattern, text):
             errors.append(f"{rel}: {msg}")
 
-    if "## Classification" in text and "Implied 10yr IRR" not in text:
-        errors.append(f"{rel}: Classification table missing Implied 10yr IRR (decision stack)")
+    if "## Classification" in text and "Implied 7yr IRR" not in text and "Implied 10yr IRR" not in text:
+        errors.append(f"{rel}: Classification table missing Implied 7yr IRR (decision stack)")
 
     if legacy:
         return errors, warnings

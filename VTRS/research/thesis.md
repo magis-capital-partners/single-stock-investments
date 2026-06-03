@@ -1,6 +1,6 @@
 # VTRS — Investment Thesis
 
-**Last updated:** auto-sync
+**Last updated:** 2026-05-21
 
 ## Classification
 
@@ -11,17 +11,15 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | transition |
-| **Implied 10yr IRR** (base) | 9.7% (blended best; Marvin floor 9.2%) |
+| **Implied 7yr IRR** (Lawrence) | 9.5% (total synthesis) |
 | **IRR method** | full |
 | **Lawrence bucket** | low_cost |
-| **Payoff lens** | event |
-| **MOI bucket** | pending |
 
 **Deep dive:** `VTRS/research/deep_dive_2026-06-02.md` (auto-sync)
 
 ## One-line thesis
 
-Post-EWSR generic pharma; **9.7%** blended IRR ($1.42/sh, 75% Marvin / 25% Rosen approved); Marvin floor **9.2%** on $1.38. Idorsia Phase III catalyst per Rosen. ~$14B net debt; **watch**.
+Post-EWSR generic pharma; **13.61%** synthesis IRR ($1.50/sh 50/50 Marvin/Rosen); floor **9.9%** on $1.45. Rosen Sohn: Idorsia Phase III + cash-yield re-rating (catalyst capped, not 12mo double in base). ~$14B net debt; **watch**.
 
 ## Key questions
 

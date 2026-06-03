@@ -46,4 +46,4 @@
 
 ## Synthesis note (Marvin)
 
-Rosen frames **residual-volatility / deep-value** mispricing plus **Idorsia Phase III optionality** (selatogrel, cenerimod). **Incorporated (2026-06-02):** 75% Marvin floor / 25% Rosen partial normalization in blended owner cash (**$1.42/sh**, **9.7%** 10yr); 12-month double remains catalyst footnote only.
+Rosen frames **residual-volatility / deep-value** mispricing plus **Idorsia Phase III optionality** (selatogrel, cenerimod). **Incorporated (2026-06-02, revised):** 50/50 Marvin floor / Rosen normalization (**$1.50/sh**); synthesis **13.61%** 7yr with Rosen operating path (**14.4%**) + capped Idorsia catalyst; 12-month double remains bull-only.

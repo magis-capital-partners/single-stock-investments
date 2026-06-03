@@ -1,6 +1,6 @@
 # CSGP — Investment Thesis
 
-**Last updated:** auto-sync
+**Last updated:** 2026-05-21
 
 ## Classification
 
@@ -8,16 +8,14 @@
 |-------|-------|
 | **Archetype** (Stahl) | platform |
 | **Moat** (Munger) | stable |
-| **Dhando** (Pabrai) | partial |
+| **Dhando** (Pabrai) | pending |
 | **Stance** | watch |
 | **Cycle** | - |
-| **Implied 10yr IRR** (base) | 10.59% (total synthesis) |
-| **IRR method** | full |
-| **Lawrence bucket** | multi_sided |
-| **Payoff lens** | pending |
-| **MOI bucket** | pending |
+| **Implied 7yr IRR** (Lawrence) | pending |
+| **IRR method** | pending |
+| **Lawrence bucket** | — |
 
-**Deep dive:** `CSGP/research/deep_dive_2026-06-01.md` (auto-sync)
+**Deep dive:** `CSGP/research/deep_dive_2026-06-02.md` (auto-sync)
 
 ## One-line thesis
 

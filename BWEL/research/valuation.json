@@ -178,8 +178,8 @@
     "floor_metric": "price_to_book",
     "floor_value": 783.2,
     "primary_metric": "lawrence_base",
-    "primary_label": "10yr IRR",
-    "primary_return_pct": 1.1,
+    "primary_label": "7yr IRR",
+    "primary_return_pct": -1.4,
     "incumbent_sleeve": false,
     "notes": "Price ~0.70x GAAP book; thin OTC liquidity; family control; mineral rights option not in Lawrence FCF path.",
     "overlay_nav_per_share": 1480.0,
@@ -268,24 +268,24 @@
   },
   "results": {
     "bear": {
-      "return_pct": -2.8
+      "return_pct": -6.3
     },
     "base": {
-      "return_pct": 1.1
+      "return_pct": -1.4
     },
     "bull": {
-      "return_pct": 3.2
+      "return_pct": 1.4
     }
   },
   "implied_return": {
-    "base_pct": 3.77,
-    "label": "10yr IRR (total synthesis)",
-    "display": "3.77% (total synthesis); Lawrence cash 1.1%",
-    "lawrence_owner_cash_pct": 1.1,
-    "falsifier_adjusted_pct": 1.1,
+    "base_pct": 3.07,
+    "label": "7yr IRR (total synthesis)",
+    "display": "3.07% (total synthesis); Lawrence cash -1.4%",
+    "lawrence_owner_cash_pct": -1.4,
+    "falsifier_adjusted_pct": -1.4,
     "nav_overlay_dated_pct": 10.5,
-    "synthesis_pct": 3.77,
-    "headline_note": "Human approved economic NAV assumptions 2026-06-03; NAV path weight 15% in synthesis"
+    "synthesis_pct": 3.07,
+    "headline_note": "Human approved NAV/synthesis weights 2026-06-03; recalc on 7yr Lawrence horizon merge"
   },
   "stance_proposal": {
     "suggested": "watch",
@@ -353,7 +353,7 @@
     "approved": true,
     "approved_date": "2026-06-03",
     "approval_channel": "cursor_chat",
-    "notes": "Economic NAV ~$1,480/sh (probability-weighted water/land) and total synthesis weights approved; headline 3.77%; Lawrence cash 1.1% remains accumulate bar.",
+    "notes": "Economic NAV ~$1,480/sh and synthesis weights approved 2026-06-03; headline 2.91% (7yr blend); Lawrence cash -1.4% is accumulate bar.",
     "economic_nav_water_af": "Approved 2026-06-03; overlay ~$1,480/sh; 400k AF press claim still unverified",
     "synthesis_weights": "approved 2026-06-03; NAV path 15% weight"
   },
@@ -361,13 +361,13 @@
   "moi_bucket": "asset",
   "results_lawrence_legacy": {
     "bear": {
-      "return_pct": -2.8
+      "return_pct": -6.3
     },
     "base": {
-      "return_pct": 1.1
+      "return_pct": -1.4
     },
     "bull": {
-      "return_pct": 3.2
+      "return_pct": 1.4
     }
   },
   "overlay_results": [],
@@ -378,21 +378,22 @@
         "id": "filing_falsifier",
         "label": "Lawrence owner cash (mid-cycle)",
         "source": "scenarios.base; FY2025 annual owner cash",
-        "return_pct": 1.1,
+        "return_pct": -1.4,
         "weight": 0.3,
         "type": "numeric",
         "epistemic_tier": "A (primary falsifiable)",
-        "weight_why": "Filing-based 10yr owner cash; stance gate for 15% accumulate bar.",
+        "weight_why": "Only path tied to 10-K/10-Q owner cash with growth mechanism + falsifier runner; highest refutation reach.",
         "weight_falsifiers": [
-          "FY2025 loss year becomes permanent base case without normalization"
+          "Any triggered growth falsifier forces weight cut or path removal",
+          "Theory-implied diverges from falsifier-adjusted by >2pp without documented mechanism change"
         ],
-        "hard_to_vary": "yes"
+        "hard_to_vary": "yes: weight tracks evidence tier, not target IRR"
       },
       {
         "id": "scenario_bear",
         "label": "Bear scenario (Lawrence)",
         "source": "scenarios.bear",
-        "return_pct": -2.8,
+        "return_pct": -6.3,
         "weight": 0.05,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
@@ -406,7 +407,7 @@
         "id": "scenario_bull",
         "label": "Bull scenario (Lawrence)",
         "source": "scenarios.bull",
-        "return_pct": 3.2,
+        "return_pct": 1.4,
         "weight": 0.12,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
@@ -420,11 +421,11 @@
         "id": "nav_overlay_payoff",
         "label": "NAV overlay dated payoff (10yr to overlay base)",
         "source": "nav_overlay ~$1480.0/sh vs price $548.5",
-        "return_pct": 10.5,
+        "return_pct": 15.23,
         "weight": 0.15,
         "type": "numeric",
         "epistemic_tier": "D (alternate theory: dated asset payoff)",
-        "weight_why": "Economic NAV ~$1,480/sh probability-weighted (human approved 2026-06-03); separate theory from owner cash.",
+        "weight_why": "Answers a different question (NAV convergence) than 7yr cash-flow IRR; capped weight to avoid theory conflation.",
         "weight_falsifiers": [
           "NAV overlay base not updated when segment build or filings change >10%",
           "floor_pass false but weight above 15% without [HUMAN REVIEW]"
@@ -446,15 +447,13 @@
         "sources": "HK predictive attributes framework"
       }
     ],
-    "numeric_weighted_pct": 3.47,
+    "numeric_weighted_pct": 2.77,
     "qualitative_pp": 0.3,
-    "total_synthesis_pct": 3.77,
+    "total_synthesis_pct": 3.07,
     "human_approval": "approved",
-    "human_approval_date": "2026-06-03",
-    "human_approval_note": "Probability-weighted water/land NAV and synthesis weights approved by Bryan Lawrence",
     "weight_audit": {
       "flags": [
-        "NAV overlay is a different theory (asset payoff vs cash-flow IRR); weight 15% after human approval 2026-06-03 (still below primary filing path)."
+        "NAV overlay is a different theory (asset payoff vs cash-flow IRR); weight capped at 10% to limit theory conflation."
       ],
       "deutsch_checks": {
         "hard_to_vary": true,
@@ -464,5 +463,6 @@
       }
     },
     "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
-  }
+  },
+  "lawrence_horizon_years": 7
 }
