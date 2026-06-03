@@ -1,45 +1,49 @@
 # CME — Cross-Check: Third-Party Sources
 
 **Date:** 2026-06-03
-**Agent:** Marvin
+**Agent:** Marvin (automated fill)
 **Marvin dive:** `CME/research/deep_dive_2026-06-03.md`
 **Source inventory:** `CME/third-party-analyses/source_inventory_2026-06-03.md`
 **Framework:** `_system/frameworks/third_party_cross_reference.md`, `external_view_blend.md`
-<!-- THIRD_PARTY_CROSS_CHECK_STUB -->
 
 ## Executive summary
 
-No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (10-K, 10-Q, IR). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+Marvin floor **12.01%** per year (croupier; stance **watch**) from primary filings and `valuation.json`. No third-party sources indexed; filings-only stance. **[HUMAN REVIEW]** for approved-source numeric blend.
 
-**Synthesis:** Marvin floor only; no external blend. Base Lawrence return **11.2%** per year at **$252.65** on FY2025 owner cash **$11.40** per share (`valuation.json`).
+**Synthesis (best estimate):** Marvin **12.01%** base · stance **watch**; external sources adjust conviction on catalyst timing, not primary IRR without human OK.
 
 ## Sources in scope
 
+| Source ID | Title | Path | Status | Cross-check status |
+|-----------|-------|------|--------|-------------------|
 | (none) | Primary filings only | — | — | n/a |
 
 ## Agreements (facts)
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| — | — | — | — |
+| Base return anchor | **12.01%** per year | Qualitative support only | `CME/research/deep_dive_2026-06-03.md` |
+| Archetype / stance | **croupier** · **watch** | See indexed sources | `valuation.json` |
+| Normalization | FY2025 mid-cycle base; Q1 2026 revenue and operating income run above trend and  | Cross-check vs posts | Marvin |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| — | — | — | — |
+| Primary IRR | **12.01%** (Lawrence / scenarios) | No single approved IRR unless promoted | Marvin **70%** numeric; external **30%** catalyst timing |
+| Third party | Filing-first | Context tier only | No numeric upgrade without human OK |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | $11.40/sh owner cash | 11.2% / 7yr | watch |
-| External (combined) | — | — | — |
-| **Blended best estimate** | **$11.40/sh** | **11.2%** | **watch** |
+| Marvin floor | See assumption ledger | **12.01%** | **watch** |
+| External (combined) | Narrative / catalyst | No change to base % | **watch** (conviction) |
+| **Blended best estimate** | **Filing anchor** | **12.01%** | **watch** |
 
-**Weights:** *[Document why]*
+**Weights:** Marvin **70%** on numbers; indexed third party **30%** on catalyst timing and narrative (approved Substacks/HK context only in qualitative layer until human promotes).
 
-**Returns statement (blended):** At **$252.65** per share, we expect about **11.2%** per year over 7 years on filing-based owner cash; no approved third party in the blend.
+**Returns statement (blended):** We expect **12.01%** per year at today's price on the Marvin base case; third-party sources may raise or lower conviction on timing but do not replace filing math without **[HUMAN REVIEW]**.
 
 ## [HUMAN REVIEW]
 
@@ -49,9 +53,10 @@ No third-party sources are indexed for this ticker as of this scan. Marvin stanc
 
 ## [PROPOSED MEMORY]
 
-- [PROPOSED COMPANY] CME: third-party cross-check 2026-06-03
+- [PROPOSED COMPANY] CME: third-party cross-check fill 2026-06-03 — Marvin 12.01% unchanged
 
 ## Primary sources cited
 
 1. `CME/research/deep_dive_2026-06-03.md`
-2. `CME/third-party-analyses/source_inventory_2026-06-03.md`
+2. `CME/research/valuation.json`
+3. `CME/third-party-analyses/source_inventory_2026-06-03.md`
