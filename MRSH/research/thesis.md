@@ -1,6 +1,6 @@
 # MRSH — Investment Thesis
 
-**Last updated:** 2026-06-03
+**Last updated:** auto-sync
 
 ## Classification
 
@@ -11,8 +11,13 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | hold |
 | **Cycle** | mid |
-| **MOI bucket** (legacy) | — |
+| **Implied 7yr IRR** (base) | 17.98% (total synthesis) |
+| **IRR method** | full |
+| **Lawrence bucket** | pricing_power |
 | **Payoff lens** | operating |
+| **MOI bucket** | pending |
+
+**Deep dive:** `MRSH/research/deep_dive_2026-06-03.md` (auto-sync)
 
 ## One-line thesis
 
