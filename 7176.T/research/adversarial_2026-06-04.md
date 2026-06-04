@@ -39,8 +39,7 @@ re_pass: false
 
 | # | Claim in dive | Dive cites | Filing value | Match? | Severity |
 |---|---------------|------------|--------------|--------|----------|
-| — | filing_facts | — | no_full_tier_text_extract | — | inference |
-| — | No filing_facts metrics | — | — | run build_filing_evidence | — |
+| 1 | Latest revenue (filing) | — | **$22512000.00B** vs prior $16254000.00B (+38.5% YoY) | spot-check dive | — |
 
 ---
 
@@ -48,12 +47,9 @@ re_pass: false
 
 | Check | Expected (valuation.json) | Found in dive | OK? |
 |-------|---------------------------|---------------|-----|
-| Returns statement | 10.47% | 10.47% | Yes |
-| Classification IRR | 10.47% | 10.47% | Yes |
-| Valuation bridge base | 10.47% | 10.47% | Yes |
-
-**Lint notes:**
-- 7176.T/research: dive header cites adversarial but file missing
+| Returns statement | 54.74% | 54.74% | Yes |
+| Classification IRR | 54.74% | 54.74% | Yes |
+| Valuation bridge base | 54.74% | 54.74% | Yes |
 
 ---
 
