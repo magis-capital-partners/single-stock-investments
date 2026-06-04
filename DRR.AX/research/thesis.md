@@ -1,21 +1,23 @@
 # DRR.AX — Investment Thesis
 
-**Last updated:** 2026-05-21
+**Last updated:** auto-sync
 
 ## Classification
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Archetype** (Stahl) | optionality |
+| **Moat** (Munger) | stable |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **Implied 7yr IRR** (Lawrence) | pending |
-| **IRR method** | pending |
-| **Lawrence bucket** | — |
+| **Cycle** | mid |
+| **Implied 7yr IRR** (base) | 8.0% (base) |
+| **IRR method** | yield_curve |
+| **Lawrence bucket** | other |
+| **Payoff lens** | asset |
+| **MOI bucket** | pending |
 
-**Deep dive:** `DRR.AX/research/deep_dive_2026-06-02.md` (auto-sync)
+**Deep dive:** `DRR.AX/research/deep_dive_2026-06-04.md` (auto-sync)
 
 ## One-line thesis
 

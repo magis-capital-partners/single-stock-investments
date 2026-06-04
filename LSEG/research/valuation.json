@@ -50,12 +50,12 @@
     }
   },
   "implied_return": {
-    "base_pct": 13.79,
+    "base_pct": 14.65,
     "label": "7yr IRR (total synthesis)",
-    "display": "13.79% (total synthesis)",
+    "display": "14.65% (total synthesis)",
+    "lawrence_stance_gate_pct": 13.5,
     "falsifier_adjusted_pct": 13.5,
-    "synthesis_pct": 13.79,
-    "lawrence_stance_gate_pct": 13.5
+    "synthesis_pct": 14.65
   },
   "stance_proposal": {
     "suggested": "watch",
@@ -94,7 +94,7 @@
         "id": "scenario_bear",
         "label": "Bear scenario (Lawrence)",
         "source": "scenarios.bear",
-        "return_pct": 8.2,
+        "return_pct": 8.0,
         "weight": 0.05,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
@@ -108,7 +108,7 @@
         "id": "scenario_bull",
         "label": "Bull scenario (Lawrence)",
         "source": "scenarios.bull",
-        "return_pct": 15.7,
+        "return_pct": 17.7,
         "weight": 0.12,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
@@ -121,21 +121,19 @@
     ],
     "qualitative_adjustments": [
       {
-        "factor": "Partial dhando (HK hard-asset / hidden NAV)",
-        "pp": 0.5,
-        "rationale": "Third-party confirms asset quality not in GAAP book; not full floor at spot price",
-        "sources": "cross_check_HK; hk_scan; HK Q1 2025/2026"
-      },
-      {
+        "id": "no_predictive_attribute",
         "factor": "No dated predictive attribute at spot",
         "pp": -0.2,
         "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
-        "sources": "HK predictive attributes framework"
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
       }
     ],
-    "numeric_weighted_pct": 13.49,
-    "qualitative_pp": 0.3,
-    "total_synthesis_pct": 13.79,
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 14.85,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 14.65,
     "human_approval": "pending",
     "weight_audit": {
       "flags": [],
@@ -144,6 +142,15 @@
         "falsifiable": true,
         "not_instrumentalist": true,
         "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
       }
     },
     "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"

@@ -1,6 +1,6 @@
 # AMZN — Investment Thesis
 
-**Last updated:** 2026-05-21
+**Last updated:** auto-sync
 
 ## Classification
 
@@ -9,11 +9,13 @@
 | **Archetype** (Stahl) | compounder |
 | **Moat** (Munger) | stable |
 | **Dhando** (Pabrai) | partial |
-| **Stance** | hold |
+| **Stance** | watch |
 | **Cycle** | - |
-| **Implied 7yr IRR** (Lawrence) | pending |
-| **IRR method** | pending |
-| **Lawrence bucket** | — |
+| **Implied 7yr IRR** (base) | 3.2% (total synthesis) |
+| **IRR method** | full |
+| **Lawrence bucket** | pricing_power |
+| **Payoff lens** | pending |
+| **MOI bucket** | pending |
 
 ## One-line thesis
 
@@ -41,4 +43,4 @@ Dominant e-commerce + AWS platform compounding at scale (FY2025 $717B sales, $78
 - Model capex vs. AWS/chips ROI through 2028.
 - Confirm valuation vs 5-year range before sizing.
 
-**Deep dive:** `AMZN/research/deep_dive_2026-06-02.md` (auto-sync)
+**Deep dive:** `AMZN/research/deep_dive_2026-06-04.md` (auto-sync)

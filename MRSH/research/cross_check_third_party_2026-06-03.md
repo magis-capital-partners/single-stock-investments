@@ -8,9 +8,9 @@
 
 ## Executive summary
 
-Marvin floor **17.98%** per year (compounder; stance **hold**) from primary filings and `valuation.json`. No third-party sources indexed; filings-only stance. **[HUMAN REVIEW]** for approved-source numeric blend.
+Marvin total synthesis **17.98%** per year (Lawrence filing base **17.1%**; compounder; stance **hold**) from primary filings and `valuation.json`. No third-party sources indexed; filings-only stance. **[HUMAN REVIEW]** for approved-source numeric blend.
 
-**Synthesis (best estimate):** Marvin **17.98%** base · stance **hold**; external sources adjust conviction on catalyst timing, not primary IRR without human OK.
+**Synthesis (best estimate):** Marvin **17.98%** synthesis · Lawrence gate **17.1%** · stance **hold**; external sources adjust conviction on catalyst timing, not primary IRR without human OK.
 
 ## Sources in scope
 

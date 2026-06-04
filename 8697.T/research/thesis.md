@@ -1,6 +1,6 @@
 # 8697.T — Investment Thesis
 
-**Last updated:** 2026-05-21
+**Last updated:** auto-sync
 
 ## Classification
 
@@ -9,13 +9,15 @@
 | **Archetype** (Stahl) | croupier |
 | **Moat** (Munger) | stable |
 | **Dhando** (Pabrai) | partial |
-| **Stance** | hold |
+| **Stance** | watch |
 | **Cycle** | peak |
-| **Implied 7yr IRR** (Lawrence) | pending |
-| **IRR method** | pending |
-| **Lawrence bucket** | — |
+| **Implied 7yr IRR** (base) | 3.19% (total synthesis) |
+| **IRR method** | full |
+| **Lawrence bucket** | multi_sided |
+| **Payoff lens** | pending |
+| **MOI bucket** | pending |
 
-**Deep dive:** `8697.T/research/deep_dive_2026-06-02.md` (auto-sync)
+**Deep dive:** `8697.T/research/deep_dive_2026-06-04.md` (auto-sync)
 
 ## One-line thesis
 

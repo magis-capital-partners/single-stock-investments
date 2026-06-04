@@ -1,18 +1,21 @@
 # PSK.TO — Investment Thesis
 
-**Last updated:** 2026-06-03
+**Last updated:** auto-sync
 
 ## Classification
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
+| **Archetype** (Stahl) | optionality |
 | **Moat** (Munger) | unproven |
 | **Dhando** (Pabrai) | pending |
 | **Stance** | watch |
 | **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Implied 7yr IRR** (base) | — |
+| **IRR method** | — |
+| **Lawrence bucket** | other |
+| **Payoff lens** | asset |
+| **MOI bucket** | pending |
 
 ## One-line thesis
 

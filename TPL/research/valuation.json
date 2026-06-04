@@ -265,12 +265,12 @@
     }
   },
   "implied_return": {
-    "base_pct": -0.51,
+    "base_pct": -2.85,
     "label": "7yr IRR (total synthesis)",
-    "display": "-0.51% (total synthesis)",
+    "display": "-2.85% (total synthesis)",
+    "lawrence_stance_gate_pct": -4.0,
     "falsifier_adjusted_pct": -4.0,
-    "synthesis_pct": -0.51,
-    "lawrence_stance_gate_pct": -4.0
+    "synthesis_pct": -2.85
   },
   "stance_proposal": {
     "suggested": "watch",
@@ -437,7 +437,7 @@
         "id": "theory_implied",
         "label": "Segment-derived growth (pre-falsifier)",
         "source": "segment_build weighted blend",
-        "return_pct": -1.0,
+        "return_pct": -4.0,
         "weight": 0.08,
         "type": "numeric",
         "epistemic_tier": "B (pre-falsifier derivation)",
@@ -451,7 +451,7 @@
         "id": "scenario_bear",
         "label": "Bear scenario (Lawrence)",
         "source": "scenarios.bear",
-        "return_pct": -5.4,
+        "return_pct": -9.0,
         "weight": 0.05,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
@@ -465,7 +465,7 @@
         "id": "scenario_bull",
         "label": "Bull scenario (Lawrence)",
         "source": "scenarios.bull",
-        "return_pct": 3.4,
+        "return_pct": 1.5,
         "weight": 0.12,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
@@ -492,7 +492,7 @@
       },
       {
         "id": "nav_overlay_payoff",
-        "label": "NAV overlay dated payoff (10yr to overlay base)",
+        "label": "NAV overlay dated payoff (7yr to overlay base)",
         "source": "nav_overlay ~$210.5/sh vs price $393.0",
         "return_pct": -8.53,
         "weight": 0.1,
@@ -507,9 +507,9 @@
       },
       {
         "id": "third_party_context",
-        "label": "Third-party context (HK + Substacks inventory)",
+        "label": "Third-party approved (HK + Substacks + inventory)",
         "source": "source_inventory (8 sources); cross_check blend",
-        "return_pct": 3.4,
+        "return_pct": 1.5,
         "weight": 0.1,
         "type": "numeric",
         "notes": "Proxy: upside case when strategic third party has no spot IRR",
@@ -524,51 +524,47 @@
     ],
     "qualitative_adjustments": [
       {
-        "factor": "Competition / moat (scarce Permian acreage, no scale peer)",
-        "pp": 0.3,
-        "rationale": "Irreplaceable surface + royalty footprint limits competitive entry",
-        "sources": "10-K Item 1; Business & moat"
-      },
-      {
-        "factor": "Partial dhando (HK hard-asset / hidden NAV)",
-        "pp": 0.5,
-        "rationale": "Third-party confirms asset quality not in GAAP book; not full floor at spot price",
-        "sources": "cross_check_HK; hk_scan; HK Q1 2025/2026"
-      },
-      {
+        "id": "governance_transition",
         "factor": "Governance transition (post-Stahl)",
         "pp": -0.4,
         "rationale": "Capital allocation uncertainty until proven",
-        "sources": "https://lemoncakesinvesting.substack.com/p/tpl-texas-pacific-land-co-end-of"
+        "sources": "https://lemoncakesinvesting.substack.com/p/tpl-texas-pacific-land-co-end-of",
+        "falsifier": "Proxy/filings show stable capital allocation for 4+ quarters"
       },
       {
-        "factor": "Water scarcity tailwind (SSI / HK index-weight)",
-        "pp": 0.25,
-        "rationale": "TPWR segment + index cannot replicate subsurface water exposure",
-        "sources": "https://specialsituationinvesting.substack.com/p/portfolio-update-gtx-msb-frmo-tpl"
-      },
-      {
+        "id": "no_predictive_attribute",
         "factor": "No dated predictive attribute at spot",
         "pp": -0.2,
         "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
-        "sources": "HK predictive attributes framework"
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
       }
     ],
-    "numeric_weighted_pct": -0.96,
-    "qualitative_pp": 0.45,
-    "total_synthesis_pct": -0.51,
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": -2.25,
+    "qualitative_pp": -0.6,
+    "total_synthesis_pct": -2.85,
     "human_approval": "approved",
     "weight_audit": {
       "flags": [
         "Third-party numeric path proxies bull scenario (instrumentalist); HK cross-check says no base IRR upgrade. Prefer qualitative pp only until approved blend.",
-        "NAV overlay is a different theory (asset payoff vs cash-flow IRR); weight capped at 10% to limit theory conflation.",
-        "Qualitative \u00b1pp stack may overlap numeric paths (moat/dhando); cap \u00b13pp and require source for each row."
+        "NAV overlay is a different theory (asset payoff vs cash-flow IRR); weight capped at 10% to limit theory conflation."
       ],
       "deutsch_checks": {
         "hard_to_vary": false,
         "falsifiable": true,
         "not_instrumentalist": false,
         "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
       }
     },
     "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
