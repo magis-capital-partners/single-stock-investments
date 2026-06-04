@@ -28,6 +28,14 @@ PY = sys.executable
 SCRIPTS = ROOT / "_system" / "scripts"
 
 
+def dedicated_investor_script(ticker: str) -> Path | None:
+    inv = ROOT / ticker / "investor-documents"
+    if not inv.is_dir():
+        return None
+    scripts = sorted(inv.glob("download_*_investor_docs.py"))
+    return scripts[0] if scripts else None
+
+
 def run(cmd: list[str], label: str) -> None:
     print(f"\n=== {label} ===")
     subprocess.run(cmd, cwd=ROOT, check=False)
@@ -70,7 +78,7 @@ def main() -> None:
                     "# Placeholder: PDFs already mirrored. Rebuild INDEX via build_folder_indexes.py\n",
                     encoding="utf-8",
                 )
-        elif dtype in {"uk_ir", "au_asx"}:
+        elif dtype in {"uk_ir", "au_asx", "in_ir"}:
             script = dedicated_investor_script(ticker)
             if script:
                 run([PY, str(script)], f"{ticker} ({dtype})")

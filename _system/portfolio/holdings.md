@@ -31,6 +31,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-06-04.
 | HE | HE/ | Hawaiian Electric Industries | US | 2026-06-03 | 2026-06-04 | unknown | watch |
 | HKHC | HKHC/ | Horizon Kinetics Holding Corporation | US | 2026-06-03 | 2026-06-03 | unknown | watch |
 | ICE | ICE/ | Intercontinental Exchange | US | 2026-06-02 | 2026-06-04 | croupier | hold |
+| IEX.NS | IEX.NS/ | Indian Energy Exchange Limited | IN | NSE | — | unknown | watch |
 | KEWL | KEWL/ | Keweenaw Land Association | US | 2026-06-02 | 2026-06-03 | optionality | watch |
 | LB | LB/ | LandBridge Company LLC | US | 2026-06-02 | 2026-06-03 | unknown | watch |
 | LSEG | LSEG/ | London Stock Exchange Group | UK | 2026-06-02 | 2026-06-04 | unknown | watch |
@@ -59,4 +60,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-06-04.
 | WBI | WBI/ | WaterBridge Infrastructure | US | 2026-06-02 | 2026-06-04 | infrastructure | watch |
 | WPM | WPM/ | Wheaton Precious Metals Corp. | US | 2026-06-03 | 2026-06-04 | unknown | watch |
 
-**52 holdings total.** Registry: `_system/portfolio/registry.json`
+**53 holdings total.** Registry: `_system/portfolio/registry.json`

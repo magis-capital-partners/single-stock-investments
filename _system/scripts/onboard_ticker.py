@@ -145,9 +145,36 @@ def scaffold_eu(ticker: str, company: str) -> Path:
     return td
 
 
+def scaffold_in(ticker: str, company: str) -> Path:
+    td = ROOT / ticker
+    for sub in (
+        "official-reports/annual-reports",
+        "official-reports/interim-reports",
+        "presentations-and-media",
+        "third-party-analyses",
+        "research",
+    ):
+        (td / sub).mkdir(parents=True, exist_ok=True)
+    (td / "investor-documents" / "ir-iex").mkdir(parents=True, exist_ok=True)
+    idx = td / "document-index.csv"
+    if not idx.exists():
+        idx.write_text("path,title,date,type\n", encoding="utf-8")
+    readme = td / "README.md"
+    if not readme.exists():
+        readme.write_text(
+            f"# {company} ({ticker})\n\n"
+            f"**Ticker:** {ticker} | **Exchange:** NSE (also BSE: 540750) | **Market:** IN\n"
+            f"**IR:** https://www.iexindia.com/investors/financials\n",
+            encoding="utf-8",
+        )
+    return td
+
+
 def scaffold_folder(ticker: str, company: str, market: str) -> Path:
     if market == "JP":
         return scaffold_jp(ticker, company)
+    if market == "IN":
+        return scaffold_in(ticker, company)
     if market in {"SE", "EU"}:
         return scaffold_eu(ticker, company)
     return scaffold_us(ticker, company)
@@ -227,7 +254,7 @@ def run_download(ticker: str, download: dict) -> tuple[bool, str]:
             encoding="utf-8",
         )
         return True, "jp_archive placeholder"
-    if dtype in {"uk_ir", "au_asx"}:
+    if dtype in {"uk_ir", "au_asx", "in_ir"}:
         inv = ROOT / ticker / "investor-documents"
         if inv.is_dir():
             scripts = sorted(inv.glob("download_*_investor_docs.py"))
@@ -396,7 +423,7 @@ def main() -> None:
     parser.add_argument(
         "--market",
         default="US",
-        choices=["US", "JP", "CA", "SE", "EU", "UK", "AU", "OTC"],
+        choices=["US", "JP", "CA", "SE", "EU", "UK", "AU", "IN", "OTC"],
     )
     parser.add_argument("--cik", default=None)
     parser.add_argument("--ir-url", default=None, help="One or more IR root URLs")
