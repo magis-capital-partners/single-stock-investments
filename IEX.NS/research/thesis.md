@@ -1,6 +1,6 @@
 # IEX.NS — Investment Thesis
 
-**Last updated:** 2026-06-04
+**Last updated:** auto-sync
 
 ## Classification
 
@@ -11,12 +11,13 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | mid |
-| **Implied 7yr IRR** (Lawrence) | 9.74% (total synthesis) |
+| **Implied 7yr IRR** (base) | 9.74% (total synthesis) |
 | **IRR method** | full |
 | **Lawrence bucket** | multi_sided |
-| **Valuation overlay** | — |
 | **Payoff lens** | operating |
-| **MOI bucket** (legacy) | — |
+| **MOI bucket** | pending |
+
+**Deep dive:** `IEX.NS/research/deep_dive_2026-06-04.md` (auto-sync)
 
 ## One-line thesis
 
