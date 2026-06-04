@@ -1,0 +1,214 @@
+{
+  "ticker": "SBR",
+  "as_of": "2026-06-03",
+  "valuation_mode": "optionality",
+  "method": "yield_curve",
+  "payoff_lens": "asset",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "n/a",
+    "dhando": "partial",
+    "cycle": "mid",
+    "predictive_attribute": "equity_yield_curve"
+  },
+  "inputs": {
+    "price": 77.23,
+    "price_source": "Stooq SBR.US close 2026-06-03",
+    "units_outstanding": 14579345,
+    "normalized_distribution_per_share": 4.75,
+    "normalization_note": "Trailing twelve monthly distributions summed from 8-K exhibits (~$4.74); FY2025 cash distributions $5.16/unit per monthly 8-K sum. Base case uses ~$4.75/unit mid-cycle.",
+    "copper_spot_usd_per_lb": 6.4837,
+    "copper_spot_as_of": "2026-06-03",
+    "copper_spot_source": "https://stooq.com/q/l/?s=hg.f&f=sd2t2ohlcv&h&e=csv",
+    "copperwood_royalty_est_usd_ssi_ref": 7700000,
+    "copperwood_royalty_est_usd_at_spot": 12481122.0,
+    "copperwood_royalty_note": "SSI ~$7.7M/yr @ $4.0/lb scaled linearly to spot $6.4837/lb [Assumption]"
+  },
+  "optionality_gate": {
+    "framework": "hk_royalty_curve",
+    "floor_pass": true,
+    "floor_metric": "distribution_yield",
+    "floor_value": 6.0,
+    "primary_metric": "lawrence_base",
+    "primary_label": "annualized return",
+    "primary_return_pct": 7.3,
+    "incumbent_sleeve": false,
+    "notes": "Passive royalty trust; monthly distributions pass through oil/gas prices; proved reserves per DeGolyer report in FY2025 10-K.",
+    "copperwood_option_yield_pct": 14.35
+  },
+  "scenarios": {
+    "bear": {
+      "price": 77.23,
+      "payoff": 88.0,
+      "years": 7,
+      "notes": "$3.50/unit/yr avg distributions + terminal ~$63 unit price; commodity softness and depletion"
+    },
+    "base": {
+      "price": 77.23,
+      "payoff": 110.0,
+      "years": 5,
+      "notes": "~$4.75/unit/yr cumulative distributions + terminal unit value ~$86; flat-to-modest reserve engineering uplift",
+      "sotp_build": {
+        "lines": [
+          {
+            "id": "anchor",
+            "label": "Price today anchor",
+            "gaap_per_share": 77.23,
+            "uplift_per_share": 0.0,
+            "math": "Stooq 2026-06-03"
+          },
+          {
+            "id": "dist_cumulative",
+            "label": "Five-year cumulative distributions at ~$4.75/unit per year",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 23.75,
+            "math": "5 x $4.75 [Assumption] from trailing monthly 8-K cadence"
+          },
+          {
+            "id": "terminal",
+            "label": "Terminal unit price after five years",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 9.02,
+            "math": "Terminal ~$86 vs $77.23 today [Assumption]"
+          }
+        ],
+        "year5_economic_nav_per_share": 110.0,
+        "years": 5,
+        "notes": "HK-style equity yield curve on monthly royalty trust"
+      }
+    },
+    "bull": {
+      "price": 77.23,
+      "payoff": 132.0,
+      "years": 5,
+      "notes": "$6.00/unit/yr avg on oil/gas spike + terminal re-rate ~$102"
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 1.9
+    },
+    "base": {
+      "return_pct": 7.3
+    },
+    "bull": {
+      "return_pct": 11.3
+    }
+  },
+  "implied_return": {
+    "base_pct": 7.3,
+    "label": "annualized return",
+    "display": "7.3% (base)"
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "optionality",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true,
+      "floor_pass": true,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": null
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "yield_curve",
+      "evidence": "Trust corpus is depleting royalty; book is not a dhando floor"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / acreage / dormant royalty?",
+      "answer": "Yes",
+      "treatment": "yield_curve",
+      "evidence": "Proved developed and undeveloped reserves in six states; engineering adds reserves over time per 10-K"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "yield_curve",
+      "evidence": "Monthly distributions track production lag; no litigation recovery option like MSB"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option already in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Oil and gas price pass-through is the distribution path; do not double-count"
+    }
+  ],
+  "catalyst_paths": [
+    {
+      "event": "Oil and natural gas price increase",
+      "timing": "ongoing",
+      "impact": "Higher monthly distributions within one to two quarters"
+    },
+    {
+      "event": "Reserve additions from drilling/technology",
+      "timing": "multi-year",
+      "impact": "Extends trust life; HK cites higher proved reserves vs 1999 despite production"
+    },
+    {
+      "event": "Production decline / regulatory cost",
+      "timing": "bear case",
+      "impact": "Lower distributions; terminal unit price compression"
+    }
+  ],
+  "evidence_refresh": {
+    "type": "commodity",
+    "as_of": "2026-06-03"
+  },
+  "synthesis": {
+    "status": "filings_only",
+    "paths": [
+      {
+        "id": "lawrence_base",
+        "weight": 1.0,
+        "return_pct": 7.2,
+        "source": "yield_curve base scenario"
+      }
+    ],
+    "notes": "No approved third party in base IRR; HK Q3-2025 commentary is context tier only"
+  },
+  "market_inputs": {
+    "copper": {
+      "spot": 6.4837,
+      "as_of": "2026-06-03",
+      "source": "https://stooq.com/q/l/?s=hg.f&f=sd2t2ohlcv&h&e=csv",
+      "fetched_at": "2026-06-03T22:01:59Z",
+      "stooq_symbol": "hg.f"
+    },
+    "scenario_grid": {
+      "bear": {
+        "copper_usd_per_lb": 4.67,
+        "label": "trough (~28% below spot)"
+      },
+      "base": {
+        "copper_usd_per_lb": null,
+        "label": "spot at compute"
+      },
+      "bull": {
+        "copper_usd_per_lb": 7.0,
+        "label": "cycle high (~8% above spot)"
+      }
+    }
+  },
+  "market_inputs_as_of": "2026-06-03",
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 1.9
+    },
+    "base": {
+      "return_pct": 7.3
+    },
+    "bull": {
+      "return_pct": 11.3
+    }
+  },
+  "overlay_results": []
+}

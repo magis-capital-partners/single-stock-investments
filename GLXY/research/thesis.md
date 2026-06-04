@@ -6,16 +6,18 @@
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | optionality |
+| **Archetype** (Stahl) | platform |
 | **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **Implied 7yr IRR** (base) | — |
-| **IRR method** | — |
-| **Lawrence bucket** | other |
+| **Cycle** | trough |
+| **Implied 7yr IRR** (base) | 7.65% (total synthesis) |
+| **IRR method** | scenario |
+| **Lawrence bucket** | multi_sided |
 | **Payoff lens** | levered |
 | **MOI bucket** | pending |
+
+**Deep dive:** `GLXY/research/deep_dive_2026-06-03.md` (auto-sync)
 
 ## One-line thesis
 

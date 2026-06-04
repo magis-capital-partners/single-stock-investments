@@ -15,6 +15,7 @@ US_CONFIG_PATH = ROOT / "_system" / "scripts" / "us_ticker_config.json"
 EXCHANGE_META = {
     "8697.T": "TSE",
     "3905.T": "TSE",
+    "7176.T": "TSE",
     "AMZN": "NASDAQ",
     "APLD": "NASDAQ",
     "BN": "NYSE",
@@ -54,6 +55,11 @@ EXCHANGE_META = {
     "BUR": "NYSE",
     "ALS.TO": "TSX",
     "PSK.TO": "TSX",
+    "IEX.NS": "NSE",
+    "DRR.AX": "ASX",
+    "IDA.AX": "ASX",
+    "LSEG": "LSE",
+    "RMV.L": "LSE",
 }
 
 DOWNLOAD_TYPE_OVERRIDES = {
@@ -62,7 +68,29 @@ DOWNLOAD_TYPE_OVERRIDES = {
     "TEQ.ST": "eu_teq",
     "8697.T": "jp_ps1",
     "3905.T": "jp_archive",
+    "7176.T": "jp_archive",
+    "IEX.NS": "in_ir",
+    "DRR.AX": "au_asx",
+    "IDA.AX": "au_asx",
+    "LSEG": "uk_ir",
+    "RMV.L": "uk_ir",
 }
+
+
+def infer_market_from_ticker(ticker: str) -> str | None:
+    """Suffix-based market when onboarding without explicit --market."""
+    if ticker.endswith(".NS"):
+        return "IN"
+    if ticker.endswith(".T"):
+        return "JP"
+    if ticker.endswith(".AX"):
+        return "AU"
+    if ticker.endswith(".L"):
+        return "UK"
+    if ticker == "LSEG":
+        return "UK"
+    return None
+
 
 DEFAULT_CLASSIFICATION = {
     "archetype": "unknown",
@@ -100,6 +128,12 @@ def infer_download_type(ticker: str, market: str, us_config: dict) -> str:
         return "ca_csu"
     if market in {"SE", "EU"}:
         return "eu_teq"
+    if market == "IN":
+        return "in_ir"
+    if market == "UK":
+        return "uk_ir"
+    if market == "AU":
+        return "au_asx"
     if market == "JP":
         return "jp_ps1"
     return "us_shared"

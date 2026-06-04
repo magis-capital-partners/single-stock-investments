@@ -46,10 +46,34 @@ def cashflows_full(
     return stream
 
 
+def _npv_at(rate: float, cfs: list[float]) -> float:
+    return sum(cf / (1 + rate) ** i for i, cf in enumerate(cfs))
+
+
+def _irr_bisect(cfs: list[float], tol: float = 1e-7) -> float | None:
+    """Bracket IRR when Newton diverges (common when price >> cumulative cash flows)."""
+    brackets = [(-0.99, 0.99), (-0.5, 0.5), (-0.25, 0.25)]
+    for lo, hi in brackets:
+        n_lo, n_hi = _npv_at(lo, cfs), _npv_at(hi, cfs)
+        if n_lo * n_hi > 0:
+            continue
+        for _ in range(200):
+            mid = (lo + hi) / 2
+            n_mid = _npv_at(mid, cfs)
+            if abs(n_mid) < tol:
+                return mid
+            if n_lo * n_mid <= 0:
+                hi, n_hi = mid, n_mid
+            else:
+                lo, n_lo = mid, n_mid
+        return (lo + hi) / 2
+    return None
+
+
 def irr(cfs: list[float], guess: float = 0.12, tol: float = 1e-7, max_iter: int = 200) -> float:
     rate = guess
     for _ in range(max_iter):
-        npv = sum(cf / (1 + rate) ** i for i, cf in enumerate(cfs))
+        npv = _npv_at(rate, cfs)
         dnpv = sum(-i * cf / (1 + rate) ** (i + 1) for i, cf in enumerate(cfs))
         if abs(dnpv) < 1e-12:
             break
@@ -57,6 +81,10 @@ def irr(cfs: list[float], guess: float = 0.12, tol: float = 1e-7, max_iter: int 
         rate -= step
         if abs(step) < tol:
             break
+    if abs(rate) > 5 or abs(_npv_at(rate, cfs)) > 1.0:
+        alt = _irr_bisect(cfs, tol=tol)
+        if alt is not None:
+            return alt
     return rate
 
 

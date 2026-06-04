@@ -7,15 +7,17 @@
 | Field | Value |
 |-------|-------|
 | **Archetype** (Stahl) | optionality |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Moat** (Munger) | stable |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **Implied 7yr IRR** (base) | — |
-| **IRR method** | — |
-| **Lawrence bucket** | other |
+| **Cycle** | peak |
+| **Implied 7yr IRR** (base) | 6.12% (total synthesis) |
+| **IRR method** | full |
+| **Lawrence bucket** | pricing_power |
 | **Payoff lens** | asset |
 | **MOI bucket** | pending |
+
+**Deep dive:** `FNV/research/deep_dive_2026-06-03.md` (auto-sync)
 
 ## One-line thesis
 

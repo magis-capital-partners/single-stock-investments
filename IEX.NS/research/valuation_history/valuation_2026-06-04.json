@@ -1,0 +1,212 @@
+{
+  "ticker": "IEX.NS",
+  "as_of": "2026-06-04",
+  "method": "full",
+  "lawrence_bucket": "multi_sided",
+  "payoff_lens": "operating",
+  "classification_inputs": {
+    "archetype": "croupier",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 124.07,
+    "price_source": "Yahoo Finance IEX.NS close 2026-06-04",
+    "fcf_per_share": 3.2,
+    "fcf_source": "FY2024 consolidated PAT ~\u20b9302.5 Cr (~\u20b93.38 EPS) haircut ~5% for reinvestment and one-offs; annual_report_fy_2023_24_bse.pdf",
+    "shares_millions": 89.5,
+    "normalization_note": "FY2024 mid-cycle base; Q4 FY25 investor deck cited for volume trend but not inflated into starting cash flow until FY25 annual is filed"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.04,
+      "growth_y6_10": 0.03,
+      "exit_pfcf_y10": 28,
+      "notes": "Regulatory fee caps, slower market share of short-term power, multiple compression"
+    },
+    "base": {
+      "growth_y1_5": 0.08,
+      "growth_y6_10": 0.06,
+      "exit_pfcf_y10": 35,
+      "notes": "Mid-cycle owner cash; India power-market depth and REC/gas mix; exit near current ~39x cash flow multiple"
+    },
+    "bull": {
+      "growth_y1_5": 0.11,
+      "growth_y6_10": 0.07,
+      "exit_pfcf_y10": 40,
+      "notes": "Sustained traded volume growth, derivatives and gas adoption, limited new-exchange competition"
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 2.1
+    },
+    "base": {
+      "return_pct": 8.8
+    },
+    "bull": {
+      "return_pct": 13.2
+    }
+  },
+  "implied_return": {
+    "base_pct": 9.74,
+    "label": "7yr IRR (total synthesis)",
+    "display": "9.74% (total synthesis)",
+    "lawrence_stance_gate_pct": 8.8,
+    "falsifier_adjusted_pct": 8.8,
+    "synthesis_pct": 9.74
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Asset-light exchange; no land or royalty NAV pattern in FY2024 annual"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Regulated exchange toll on traded volume, not resource royalty"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "FY2024 consolidated PAT ~\u20b9302.5 Cr on revenue \u20b9350.8 Cr (annual report)"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in cash path?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Transaction fees recognized with market activity"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "Immaterial",
+      "treatment": "n/a",
+      "evidence": "Listed exchange operator; no material holdco stakes in filings reviewed"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Regular dividend; no dated legal recovery in base case"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Gas exchange, REC trading, and prospective derivatives embedded in volume growth path (investor presentation Q4 FY25)"
+    },
+    {
+      "q": 0,
+      "question": "Material separate option terminals required?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Lawrence full cash-flow path sufficient after scan"
+    }
+  ],
+  "overlay_results": [],
+  "lawrence_horizon_years": 7,
+  "evidence_refresh": {
+    "synthesis_in_dive": true
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 2.1
+    },
+    "base": {
+      "return_pct": 8.8
+    },
+    "bull": {
+      "return_pct": 13.2
+    }
+  },
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": 2.1,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 13.2,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 9.94,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 9.74,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}

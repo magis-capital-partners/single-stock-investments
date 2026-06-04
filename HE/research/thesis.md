@@ -7,15 +7,17 @@
 | Field | Value |
 |-------|-------|
 | **Archetype** (Stahl) | infrastructure |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Moat** (Munger) | narrow |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **Implied 7yr IRR** (base) | — |
-| **IRR method** | — |
-| **Lawrence bucket** | low_cost |
-| **Payoff lens** | operating |
+| **Cycle** | recovery |
+| **Implied 7yr IRR** (base) | 12.05% (total synthesis) |
+| **IRR method** | full |
+| **Lawrence bucket** | regulated_utility |
+| **Payoff lens** | event |
 | **MOI bucket** | pending |
+
+**Deep dive:** `HE/research/deep_dive_2026-06-03.md` (auto-sync)
 
 ## One-line thesis
 

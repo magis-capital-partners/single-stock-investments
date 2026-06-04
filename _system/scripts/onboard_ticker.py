@@ -21,6 +21,7 @@ from portfolio_registry import (
     ROOT,
     build_download_block,
     infer_download_type,
+    infer_market_from_ticker,
     load_registry,
     save_registry,
 )
@@ -144,10 +145,69 @@ def scaffold_eu(ticker: str, company: str) -> Path:
     return td
 
 
-def scaffold_folder(ticker: str, company: str, market: str) -> Path:
+def scaffold_in(ticker: str, company: str) -> Path:
+    td = ROOT / ticker
+    for sub in (
+        "official-reports/annual-reports",
+        "official-reports/interim-reports",
+        "presentations-and-media",
+        "third-party-analyses",
+        "research",
+    ):
+        (td / sub).mkdir(parents=True, exist_ok=True)
+    (td / "investor-documents" / "ir-iex").mkdir(parents=True, exist_ok=True)
+    idx = td / "document-index.csv"
+    if not idx.exists():
+        idx.write_text("path,title,date,type\n", encoding="utf-8")
+    readme = td / "README.md"
+    if not readme.exists():
+        readme.write_text(
+            f"# {company} ({ticker})\n\n"
+            f"**Ticker:** {ticker} | **Exchange:** NSE (also BSE: 540750) | **Market:** IN\n"
+            f"**IR:** https://www.iexindia.com/investors/financials\n",
+            encoding="utf-8",
+        )
+    return td
+
+
+def scaffold_au(ticker: str, company: str, ir_url: str = "") -> Path:
+    td = ROOT / ticker
+    inv = td / "investor-documents"
+    for sub in ("official-reports", "asx-announcements", "presentations", "research-notes"):
+        (inv / sub).mkdir(parents=True, exist_ok=True)
+    (td / "research").mkdir(parents=True, exist_ok=True)
+    (td / "third-party-analyses").mkdir(parents=True, exist_ok=True)
+    script = inv / f"download_{ticker.lower()}_investor_docs.py"
+    if not script.exists():
+        script.write_text(
+            f'''#!/usr/bin/env python3
+"""Download {ticker} IR PDFs (ASX). Replace stub after onboard."""
+if __name__ == "__main__":
+    raise SystemExit(0)
+''',
+            encoding="utf-8",
+        )
+    readme = td / "README.md"
+    if not readme.exists():
+        ir_line = f"**IR:** {ir_url}\n" if ir_url else ""
+        readme.write_text(
+            f"# {company} ({ticker})\n\n"
+            f"**Ticker:** {ticker} | **Exchange:** ASX | **Market:** AU\n"
+            f"{ir_line}"
+            f"**Last updated:** {datetime.now(timezone.utc).strftime('%Y-%m-%d')}\n",
+            encoding="utf-8",
+        )
+    return td
+
+
+def scaffold_folder(ticker: str, company: str, market: str, ir_url: str = "") -> Path:
     if market == "JP":
         return scaffold_jp(ticker, company)
-    if market in {"SE", "EU"}:
+    if market == "IN":
+        return scaffold_in(ticker, company)
+    if market == "AU":
+        return scaffold_au(ticker, company, ir_url)
+    if market in {"SE", "EU", "UK"}:
         return scaffold_eu(ticker, company)
     return scaffold_us(ticker, company)
 
@@ -226,6 +286,20 @@ def run_download(ticker: str, download: dict) -> tuple[bool, str]:
             encoding="utf-8",
         )
         return True, "jp_archive placeholder"
+    if dtype in {"uk_ir", "au_asx", "in_ir"}:
+        inv = ROOT / ticker / "investor-documents"
+        if inv.is_dir():
+            scripts = sorted(inv.glob("download_*_investor_docs.py"))
+            if scripts:
+                code = run_cmd([PY, str(scripts[0])], f"{ticker} ({dtype})")
+                if code == 0:
+                    return True, f"{dtype} dedicated exit 0"
+                n_pdf = sum(1 for _ in (ROOT / ticker).rglob("*.pdf"))
+                if n_pdf >= 1:
+                    return True, f"{dtype} partial OK ({n_pdf} PDF(s) after exit {code})"
+                return False, f"{dtype} dedicated exit {code}"
+        log(f"{dtype}: no dedicated download script — IR harvest pending")
+        return True, f"{dtype} skipped (no script)"
     return False, f"unknown download type {dtype}"
 
 
@@ -270,6 +344,10 @@ def onboard(args: argparse.Namespace) -> int:
     ticker = args.ticker.strip().upper() if args.market != "JP" else args.ticker.strip()
     company = args.company.strip()
     market = args.market.strip().upper()
+    inferred = infer_market_from_ticker(ticker)
+    if inferred and market == "US" and inferred != "US":
+        log(f"Market inferred from ticker suffix: {inferred} (override --market US to keep US)")
+        market = inferred
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
     reg = load_registry()
@@ -329,7 +407,8 @@ def onboard(args: argparse.Namespace) -> int:
 
     run_cmd([PY, str(SCRIPTS / "sync_portfolio_from_registry.py")], "sync portfolio")
 
-    ticker_dir = scaffold_folder(ticker, company, market)
+    ir_roots = parse_ir_urls(args.ir_url)
+    ticker_dir = scaffold_folder(ticker, company, market, ir_roots[0] if ir_roots else "")
     write_status(ticker_dir, "scaffold")
     write_thesis(ticker, company, classification)
 
@@ -346,11 +425,16 @@ def onboard(args: argparse.Namespace) -> int:
         write_status(ticker_dir, "downloading")
         ok, detail = run_download(ticker, download)
         if not ok:
-            write_status(ticker_dir, "failed", error=detail)
-            write_pending_review(ticker, company, market, False, detail)
-            run_cmd([PY, str(SCRIPTS / "build_folder_indexes.py")], "indexes")
-            run_cmd([PY, str(SCRIPTS / "build_dashboard_data.py")], "dashboard")
-            return 2
+            n_pdf = sum(1 for _ in ticker_dir.rglob("*.pdf"))
+            if n_pdf >= 1:
+                ok = True
+                detail = f"{detail}; partial OK ({n_pdf} PDF(s) on disk)"
+            else:
+                write_status(ticker_dir, "failed", error=detail)
+                write_pending_review(ticker, company, market, False, detail)
+                run_cmd([PY, str(SCRIPTS / "build_folder_indexes.py")], "indexes")
+                run_cmd([PY, str(SCRIPTS / "build_dashboard_data.py")], "dashboard")
+                return 2
     else:
         ok, detail = True, "skipped"
 
@@ -379,7 +463,11 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Onboard a new portfolio ticker")
     parser.add_argument("--ticker", required=True)
     parser.add_argument("--company", required=True)
-    parser.add_argument("--market", default="US", choices=["US", "JP", "CA", "SE", "EU", "OTC"])
+    parser.add_argument(
+        "--market",
+        default="US",
+        choices=["US", "JP", "CA", "SE", "EU", "UK", "AU", "IN", "OTC"],
+    )
     parser.add_argument("--cik", default=None)
     parser.add_argument("--ir-url", default=None, help="One or more IR root URLs")
     parser.add_argument("--notes", default="", help="Watchlist notes")

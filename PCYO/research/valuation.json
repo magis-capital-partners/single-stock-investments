@@ -1,0 +1,310 @@
+{
+  "ticker": "PCYO",
+  "as_of": "2026-06-03",
+  "valuation_mode": "optionality",
+  "method": "full",
+  "lawrence_bucket": "low_cost",
+  "classification_inputs": {
+    "archetype": "infrastructure",
+    "moat": "narrow",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 10.09,
+    "price_source": "Stooq PCYO.US close 2026-06-03",
+    "fcf_per_share": 0.5,
+    "fcf_source": "FY2025 net income $13.1M \u00f7 ~24.1M diluted shares; 27th consecutive profitable quarter; H1 FY2026 EPS $0.23",
+    "shares_outstanding": 24103908,
+    "book_per_share": 6.17,
+    "book_source": "FY2025 shareholders' equity $142.7M \u00f7 shares (10-K); Q2 FY2026 equity $148.7M",
+    "normalization_note": "Lawrence uses filing net income per share, not OCF $13.2M (working-capital and related-party note swings). Sky Ranch lot capex is largely reimbursed via Sky Ranch CAB / Rangeview notes over time."
+  },
+  "nav_overlay": {
+    "as_of": "2026-06-03",
+    "status": "complete",
+    "enabled": true,
+    "method": "nav_floor",
+    "gaap_book_per_share": 6.17,
+    "overlay_nav_per_share": 12.0,
+    "overlay_nav_bull_per_share": 16.0,
+    "overlay_rationale": "Book understates mineral rights (zero carrying); related-party receivables ~$2.3/sh; water+land on BS at depreciated cost. Overlay is conservative SOTP above book, below full AF monetization.",
+    "gaap_vs_fair_value": {
+      "investment_water_wastewater_net_m": 71.298,
+      "related_party_notes_receivable_m": 56.289,
+      "mineral_rights_carrying_m": 0,
+      "policy_source": "10-K FY2025: ~13,900 Arkansas mineral acres impaired to zero in fiscal 2020"
+    },
+    "segments_or_options": [
+      {
+        "id": "mineral_arkansas",
+        "label": "Arkansas River Valley mineral interests (~13,900 acres)",
+        "option_treatment": "nav_floor",
+        "nav_per_share": 0.5,
+        "nav_assumption": "[Assumption] $0.50/sh floor; zero GAAP carrying",
+        "not_in_lawrence_base": true,
+        "evidence": "investor-documents/ir-pcyo/0001104659-25-110312.pdf"
+      },
+      {
+        "id": "sky_ranch_undeveloped",
+        "label": "Sky Ranch undeveloped phases + ECCV 2032 option",
+        "option_treatment": "embedded_in_segment",
+        "nav_per_share": 0,
+        "evidence": "Lot delivery cadence in land development segment growth; not separate terminal",
+        "not_in_lawrence_base": false
+      },
+      {
+        "id": "related_party_receivables",
+        "label": "Sky Ranch CAB / Rangeview reimbursable advances",
+        "option_treatment": "milestone_nav",
+        "nav_per_share": 1.5,
+        "nav_assumption": "Partial mark on $56M receivable; repayment tied to tax bonds/fees [Assumption]",
+        "not_in_lawrence_base": true,
+        "evidence": "10-Q Feb 28, 2026 balance sheet"
+      }
+    ]
+  },
+  "optionality_gate": {
+    "primary_metric": "lawrence_base",
+    "lawrence_pass_threshold_pct": 15,
+    "overlay_pass_threshold_pct": 12,
+    "notes": "Watch on Lawrence IRR; overlay NAV convergence is secondary until human weights synthesis",
+    "primary_label": "7yr IRR",
+    "primary_return_pct": 9.3
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.02,
+      "growth_y6_10": 0.01,
+      "exit_pfcf_y10": 12,
+      "notes": "Housing affordability drag; slower Sky Ranch absorption; O&G water volumes weak"
+    },
+    "base": {
+      "growth_y1_5": 0.07,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 17,
+      "notes": "Steady lot cadence, tap fees, water deliveries; FY2026 Phase 2D/2E milestones"
+    },
+    "bull": {
+      "growth_y1_5": 0.1,
+      "growth_y6_10": 0.06,
+      "exit_pfcf_y10": 20,
+      "notes": "Industrial water demand + faster Sky Ranch; ECCV option value post-2032"
+    }
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true,
+      "floor_pass": false,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": null
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "nav_overlay",
+      "evidence": "Minerals at zero; water systems depreciated; receivables economic"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / acreage?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Sky Ranch phases 2D-2E; 30,602 AF water table 10-K"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "All segments profitable H1 FY2026"
+    },
+    {
+      "q": 4,
+      "question": "Backlog not in FCF path?",
+      "answer": "Yes",
+      "treatment": "milestone_nav",
+      "evidence": "Deferred revenue + CAB repayment timing"
+    },
+    {
+      "q": 5,
+      "question": "Private stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating company"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Water court claims ongoing, not lump-sum recovery"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Lot sales and tap fees in reported revenue"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "Sky Ranch finished-lot deliveries and water/wastewater tap fees drive revenue; mild winter FY2026 accelerated Phase 2D recognition.",
+    "source": "investor-documents/ir-pcyo/2026-04-08_Pure_Cycle_Announces_Financial_Results_For_the_155.pdf",
+    "lawrence_legacy": {
+      "y1_5": 0.07,
+      "y6_10": 0.04,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.07,
+      "y6_10": 0.04,
+      "exit_pfcf_y10": 17.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": null,
+      "as_of_filing_facts": "evidence/_text/0001104659-26-040879.pdf.txt"
+    },
+    "status": "partial"
+  },
+  "estimates": {
+    "external": []
+  },
+  "human_review": {
+    "approved": false,
+    "items": [
+      "nav_overlay marks are draft [Assumption] weights",
+      "Related-party receivable recovery timing",
+      "Water court Box Elder 1,635 AF settlement outcome"
+    ]
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 0.7
+    },
+    "base": {
+      "return_pct": 9.3
+    },
+    "bull": {
+      "return_pct": 14.3
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 0.7
+    },
+    "base": {
+      "return_pct": 9.3
+    },
+    "bull": {
+      "return_pct": 14.3
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": 9.3
+    },
+    "falsifier_adjusted": {
+      "return_pct": 9.3
+    }
+  },
+  "implied_return": {
+    "base_pct": 9.78,
+    "label": "7yr IRR (total synthesis)",
+    "display": "9.78% (total synthesis)",
+    "lawrence_stance_gate_pct": 9.3,
+    "falsifier_adjusted_pct": 9.3,
+    "synthesis_pct": 9.78
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Segment-derived growth (pre-falsifier)",
+        "source": "segment_build weighted blend",
+        "return_pct": 9.3,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": 0.7,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 14.3,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 9.98,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 9.78,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}

@@ -1,0 +1,134 @@
+{
+  "ticker": "RPRX",
+  "as_of": "2026-06-03",
+  "method": "full",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "holding_co",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "asset"
+  },
+  "inputs": {
+    "price": 54.97,
+    "price_source": "Stooq RPRX.US close 2026-06-03",
+    "fcf_per_share": 1.65,
+    "fcf_source": "FY2025 net income $771M \u00f7 ~428M Class A shares (10-K FY2025); normalized owner cash proxy for royalty collections net of operating burden",
+    "shares_millions": 428.4,
+    "normalization_note": "Not using $0.88 dividend alone (reinvestment-heavy). OCF $2.49B includes NCI and new royalty deployment; base uses earnings power per Class A share."
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.0,
+      "growth_y6_10": 0.0,
+      "exit_pfcf_y10": 14,
+      "notes": "Key patent cliffs, leverage overhang, flat royalty collections, multiple compression"
+    },
+    "base": {
+      "growth_y1_5": 0.04,
+      "growth_y6_10": 0.03,
+      "exit_pfcf_y10": 18,
+      "notes": "Portfolio revenue mid-single-digit growth; dividend growth; stable royalty multiple"
+    },
+    "bull": {
+      "growth_y1_5": 0.06,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 22,
+      "notes": "New royalty closes (e.g. Biohaven), pipeline launches, equity marks up, deleveraging"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "nav_floor",
+      "evidence": "Royalty receivables and equity stakes on balance sheet; economic value tied to drug sales, not book alone (10-K FY2025)"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped pipeline / new royalty options?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "Q1 2026 Biohaven transaction; ongoing royalty acquisitions (10-Q Q1 2026, 8-K)"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating income positive $1.56B FY2025"
+    },
+    {
+      "q": 4,
+      "question": "Backlog not in FCF path?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "35+ commercial products; revenue $2.38B FY2025 grows with partner sales"
+    },
+    {
+      "q": 5,
+      "question": "Private stakes below fair value?",
+      "answer": "Yes",
+      "treatment": "milestone_nav",
+      "evidence": "Equity securities FVNI $173M noncurrent (10-Q Q1 2026)"
+    },
+    {
+      "q": 6,
+      "question": "Transitory legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No material one-off recovery in base year"
+    },
+    {
+      "q": 7,
+      "question": "Embedded option in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Top-line-linked royalties on marketed therapies"
+    }
+  ],
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "synthesis": {
+    "status": "incomplete",
+    "reason": "zero weights"
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -7.3
+    },
+    "base": {
+      "return_pct": -0.9
+    },
+    "bull": {
+      "return_pct": 3.2
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -7.3
+    },
+    "base": {
+      "return_pct": -0.9
+    },
+    "bull": {
+      "return_pct": 3.2
+    }
+  },
+  "implied_return": {
+    "base_pct": -0.9,
+    "label": "7yr IRR",
+    "display": "-0.9% (base)"
+  },
+  "overlay_results": []
+}

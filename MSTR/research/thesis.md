@@ -8,14 +8,16 @@
 |-------|-------|
 | **Archetype** (Stahl) | optionality |
 | **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | - |
-| **Implied 7yr IRR** (base) | — |
-| **IRR method** | — |
+| **Implied 7yr IRR** (base) | 4.2% (base) |
+| **IRR method** | yield_curve |
 | **Lawrence bucket** | other |
 | **Payoff lens** | levered |
 | **MOI bucket** | pending |
+
+**Deep dive:** `MSTR/research/deep_dive_2026-06-03.md` (auto-sync)
 
 ## One-line thesis
 

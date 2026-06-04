@@ -7,15 +7,17 @@
 | Field | Value |
 |-------|-------|
 | **Archetype** (Stahl) | holding_co |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Moat** (Munger) | stable |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **Implied 7yr IRR** (base) | — |
-| **IRR method** | — |
-| **Lawrence bucket** | other |
-| **Payoff lens** | asset |
+| **Cycle** | mid |
+| **Implied 7yr IRR** (base) | 6.02% (total synthesis) |
+| **IRR method** | full |
+| **Lawrence bucket** | multi_sided |
+| **Payoff lens** | operating |
 | **MOI bucket** | pending |
+
+**Deep dive:** `BKRB/research/deep_dive_2026-06-03.md` (auto-sync)
 
 ## One-line thesis
 
