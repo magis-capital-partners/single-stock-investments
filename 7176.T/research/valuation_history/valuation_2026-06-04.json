@@ -1,0 +1,214 @@
+{
+  "ticker": "7176.T",
+  "as_of": "2026-06-04",
+  "method": "full",
+  "lawrence_bucket": "multi_sided",
+  "classification_inputs": {
+    "archetype": "croupier",
+    "moat": "unproven",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 464,
+    "price_source": "Stooq 7176.JP close 2026-01-07 (thin tape; confirm live TSE quote)",
+    "fcf_per_share": 23,
+    "fcf_source": "Trailing net income ~\u00a57.1bn divided by ~300M shares [Assumption]; public profile TTM",
+    "shares_millions": 300,
+    "revenue_ttm_jpy_bn": 16.5,
+    "net_income_ttm_jpy_bn": 7.1,
+    "employees": 55,
+    "normalization_note": "Asset-light fee business; starting owner cash = trailing net income per share pending yuho/EDINET cash-flow reconciliation [HUMAN REVIEW]"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 14,
+      "notes": "Japan risk-off; ETF fee compression; AUM outflows"
+    },
+    "base": {
+      "growth_y1_5": 0.06,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 18,
+      "notes": "Mid-cycle owner cash; ETF and fund fee growth with domestic equity activity"
+    },
+    "bull": {
+      "growth_y1_5": 0.08,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 22,
+      "notes": "Sustained thematic/leveraged ETF launches plus institutional inflows"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Asset-light manager; no land/NAV misstatement pattern identified [Assumption]"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Fee-on-AUM and ETF listing model"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Unknown",
+      "treatment": "pending",
+      "evidence": "Segment profitability not verified without securities report [HUMAN REVIEW]"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / RPO not in FCF path?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Recurring management and ETF fees"
+    },
+    {
+      "q": 5,
+      "question": "Private stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No holdco stake pattern in public profile"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating croupier, not yield-curve trust"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Japan-first active/thematic ETF pipeline embedded in ETF segment growth [Assumption]"
+    },
+    {
+      "q": 0,
+      "question": "Material options after scan?",
+      "answer": "No separate overlay",
+      "treatment": "n/a",
+      "evidence": "Lawrence full cash-flow path; product innovation in base growth"
+    }
+  ],
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "lawrence_horizon_years": 7,
+  "evidence_refresh": {
+    "synthesis_in_dive": true
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 3.4
+    },
+    "base": {
+      "return_pct": 9.3
+    },
+    "bull": {
+      "return_pct": 13.7
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 3.4
+    },
+    "base": {
+      "return_pct": 9.3
+    },
+    "bull": {
+      "return_pct": 13.7
+    }
+  },
+  "implied_return": {
+    "base_pct": 10.47,
+    "label": "7yr IRR (total synthesis)",
+    "display": "10.47% (total synthesis)",
+    "lawrence_stance_gate_pct": 9.3,
+    "falsifier_adjusted_pct": 9.3,
+    "synthesis_pct": 10.47
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": 3.4,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 13.7,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 10.67,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 10.47,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}

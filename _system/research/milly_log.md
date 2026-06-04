@@ -67,3 +67,6 @@ One row per adversarial or consistency re-pass. Append via `milly_repass.py` or 
 | 2026-06-04 | RMV.L | standard_batch | OK | marvin_cloud_refresh |
 | 2026-06-04 | RMV.L | standard_batch | OK | marvin_cloud_refresh |
 | 2026-06-04 | RMV.L | standard_batch | OK | marvin_cloud_refresh |
+| 2026-06-04 | IDA.AX | standard_batch | OK | marvin_cloud_refresh |
+| 2026-06-04 | 7176.T | standard_batch | OK | marvin_cloud_refresh |
+| 2026-06-04 | IEX.NS | standard_batch | OK | marvin_cloud_refresh |

@@ -37,4 +37,4 @@ python3 _system/scripts/build_filing_evidence.py IDA.AX
 
 ## Research status
 
-Onboarded 2026-06-04. Deep dive pending.
+Deep dive `research/deep_dive_2026-06-04.md` (base IRR **42.4%**, yield_curve). ASX Weblink harvest pending for cash refresh.

@@ -1,0 +1,302 @@
+{
+  "ticker": "IDA.AX",
+  "as_of": "2026-06-04",
+  "valuation_mode": "optionality",
+  "method": "yield_curve",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "unproven",
+    "dhando": "partial",
+    "cycle": "\u2014",
+    "payoff_lens": "asset",
+    "predictive_attribute": "cash_floor_capital_return_minos_option"
+  },
+  "inputs": {
+    "price": 0.027,
+    "price_source": "Yahoo Finance IDA.AX ~2026-06-04",
+    "shares_outstanding": 642700000,
+    "shares_source": "company_profile_june_2025.pdf (642.7M fully paid ordinary shares)",
+    "cash_m_aud": 71.6,
+    "cash_as_of": "2025-04-11",
+    "cash_source": "company_profile_june_2025.pdf",
+    "cash_per_share": 0.1114,
+    "proposed_capital_return_per_share": 0.05,
+    "proposed_return_source": "company_profile_june_2025.pdf; ASX capital-return proposal (pending full Weblink harvest)",
+    "book_per_share_caveat": "Explorer; no mineral resource; GAAP book not a fair-value floor for Minos/REE/titanium",
+    "normalization_note": "No steady-state owner cash. Base uses dated payoff (capital return + residual cash stub + exploration option), not ten-year free cash flow.",
+    "copper_spot_usd_per_lb": 6.529,
+    "copper_spot_as_of": "2026-06-04",
+    "copper_spot_source": "https://stooq.com/q/l/?s=hg.f&f=sd2t2ohlcv&h&e=csv",
+    "copperwood_royalty_est_usd_ssi_ref": 7700000,
+    "copperwood_royalty_est_usd_at_spot": 12568325.0,
+    "copperwood_royalty_note": "SSI ~$7.7M/yr @ $4.0/lb scaled linearly to spot $6.529/lb [Assumption]"
+  },
+  "optionality_gate": {
+    "framework": "cash_nav_floor",
+    "floor_pass": true,
+    "floor_metric": "cash_per_share",
+    "floor_value": 0.111,
+    "floor_value_note": "A$71.6M cash / 642.7M shares Apr 2025; price A$0.027 implies negative enterprise value at spot",
+    "primary_metric": "lawrence_base",
+    "primary_label": "annualized return",
+    "overlay_nav_per_share": 0.111,
+    "overlay_nav_note": "Cash backing only in overlay base; Minos maiden resource and award top-up in bull sensitivity",
+    "notes": "Stance gate uses Lawrence dated payoff path; cash floor supports partial dhando despite unproven moat.",
+    "primary_return_pct": 42.4,
+    "copperwood_option_yield_pct": 72.43
+  },
+  "nav_overlay": {
+    "as_of": "2026-06-04",
+    "status": "complete",
+    "gaap_vs_fair_value": {
+      "cash_m_aud": 71.6,
+      "cash_per_share": 0.1114,
+      "market_cap_m_aud_at_spot": 17.4,
+      "enterprise_value_m_aud_at_spot": -54.2,
+      "policy_source": "company_profile_june_2025.pdf; spot price from Yahoo ~2026-06-04",
+      "mineral_resources": "none declared (Minos maiden MRE pending)"
+    },
+    "in_model": {
+      "lawrence_irr_on_operating_cash": false,
+      "gaap_book_in_dhando": false,
+      "cash_floor_in_overlay": true,
+      "minos_resource_in_lawrence_base": false
+    },
+    "not_in_model_requires_refresh": [
+      "Updated cash balance from latest ASX quarterly (Weblink harvest pending)",
+      "Tanzania tax-office claim and subsidiary distribution dispute resolution",
+      "Maiden Minos mineral resource estimate and scoping study economics",
+      "REE and titanium project fair value"
+    ],
+    "segments_or_options": [
+      {
+        "id": "cash_treasury",
+        "label": "Cash and settlement proceeds (net of legal reserve)",
+        "option_treatment": "nav_floor",
+        "nav_per_share_full": 0.111,
+        "overlay_value_per_share": 0.111,
+        "evidence": "company_profile_june_2025.pdf: A$71.6M cash 11 Apr 2025",
+        "not_in_lawrence_base": false
+      },
+      {
+        "id": "capital_return",
+        "label": "Proposed capital return up to A$0.05/share",
+        "option_treatment": "yield_curve",
+        "evidence": "company_profile_june_2025.pdf; Dec 2024 special dividend precedent",
+        "not_in_lawrence_base": false
+      },
+      {
+        "id": "minos_gold",
+        "label": "Minos gold project (Lake Labyrinth Shear Zone)",
+        "option_treatment": "probability_weighted",
+        "p_base": 0.12,
+        "nav_per_share_full": 0.06,
+        "overlay_value_per_share": 0.007,
+        "evidence": "company_profile_june_2025.pdf: >14k m RC/diamond + 7.7k m air core; no MRE yet; peer EV/resource comps cited in sponsor deck",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "award_topup",
+        "label": "Additional Tanzania award vs settlement (US$36.9m upside cited Jun 2025 ASX)",
+        "option_treatment": "milestone_nav",
+        "nav_per_share_full": 0.08,
+        "overlay_value_per_share": 0.02,
+        "evidence": "company_profile_june_2025.pdf dispute section; **[HUMAN REVIEW]** pending ASX PDF in folder",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "ree_titanium",
+        "label": "REE metallurgy and titanium permits",
+        "option_treatment": "zero",
+        "base_terminal_rationale": "Not in sponsor Minos focus; no filed resource or NAV mark \u2014 explicit zero in base overlay after scan",
+        "overlay_value_per_share": 0,
+        "evidence": "company_profile_june_2025.pdf: other activities only",
+        "not_in_lawrence_base": true
+      }
+    ]
+  },
+  "scenarios": {
+    "bear": {
+      "price": 0.027,
+      "payoff": 0.038,
+      "years": 5,
+      "notes": "Capital return delayed or reduced; Tanzania tax/subscriber claims absorb cash; exploration burn without resource re-rate"
+    },
+    "base": {
+      "price": 0.027,
+      "payoff": 0.078,
+      "years": 3,
+      "notes": "A$0.05 capital return realized + residual cash stub re-rated toward partial cash backing; Minos option minimal in base",
+      "sotp_build": {
+        "lines": [
+          {
+            "id": "cash_floor",
+            "label": "Cash per share (Apr 2025)",
+            "gaap_per_share": 0.111,
+            "uplift_per_share": 0.0,
+            "math": "A$71.6M / 642.7M shares"
+          },
+          {
+            "id": "capital_return",
+            "label": "Proposed capital return (dated)",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 0.05,
+            "math": "company_profile_june_2025.pdf up to A$0.05/sh"
+          },
+          {
+            "id": "residual_stub",
+            "label": "Residual equity after return + burn (re-rated stub)",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 0.028,
+            "math": "[Assumption] partial recognition of remaining cash and Minos option at price today"
+          }
+        ],
+        "year5_economic_nav_per_share": 0.078,
+        "years": 3,
+        "notes": "Dated payoff path; not full cash NAV at spot"
+      }
+    },
+    "bull": {
+      "price": 0.027,
+      "payoff": 0.13,
+      "years": 4,
+      "notes": "Capital return + partial award top-up + maiden Minos resource re-rate toward peer EV/resource [Assumption]"
+    }
+  },
+  "stance_proposal": {
+    "suggested": "accumulate",
+    "irr_band": ">20%",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": true,
+      "floor_pass": true,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": null
+  },
+  "estimates": {
+    "external": []
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 7.1
+    },
+    "base": {
+      "return_pct": 42.4
+    },
+    "bull": {
+      "return_pct": 48.1
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 7.1
+    },
+    "base": {
+      "return_pct": 42.4
+    },
+    "bull": {
+      "return_pct": 48.1
+    }
+  },
+  "implied_return": {
+    "base_pct": 42.4,
+    "label": "annualized return",
+    "display": "42.4% (base)"
+  },
+  "overlay_results": [],
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Yes",
+      "treatment": "nav_overlay",
+      "evidence": "Economic value is cash + undeveloped ground; no resource on balance sheet"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / acreage?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "Minos drilling; maiden MRE targeted"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Pre-revenue explorer"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No production revenue"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "Partial",
+      "treatment": "milestone_nav",
+      "evidence": "Tanzania settlement / award top-up"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "Yes",
+      "treatment": "yield_curve",
+      "evidence": "Ntaka Hill settlement; proposed A$0.05/sh return"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No operating revenue"
+    }
+  ],
+  "catalyst_paths": [
+    {
+      "event": "Capital return execution",
+      "timing": "base case ~3 years",
+      "impact": "A$0.05/sh dated cash to holders"
+    },
+    {
+      "event": "Maiden Minos mineral resource",
+      "timing": "2025\u20132026 programs per company profile",
+      "impact": "Bull re-rate vs peer EV/resource"
+    },
+    {
+      "event": "Failure mode",
+      "timing": "bear scenario",
+      "impact": "Legal claims on settlement; cash burn without return"
+    }
+  ],
+  "payoff_lens_secondary": "event",
+  "market_inputs": {
+    "copper": {
+      "spot": 6.529,
+      "as_of": "2026-06-04",
+      "source": "https://stooq.com/q/l/?s=hg.f&f=sd2t2ohlcv&h&e=csv",
+      "fetched_at": "2026-06-04T14:06:06Z",
+      "stooq_symbol": "hg.f"
+    },
+    "scenario_grid": {
+      "bear": {
+        "copper_usd_per_lb": 4.7,
+        "label": "trough (~28% below spot)"
+      },
+      "base": {
+        "copper_usd_per_lb": null,
+        "label": "spot at compute"
+      },
+      "bull": {
+        "copper_usd_per_lb": 7.05,
+        "label": "cycle high (~8% above spot)"
+      }
+    }
+  },
+  "market_inputs_as_of": "2026-06-04"
+}

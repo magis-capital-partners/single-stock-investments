@@ -36,4 +36,4 @@ python3 _system/scripts/build_filing_evidence.py 7176.T
 
 ## Research status
 
-Onboarded 2026-06-04. PDF archive pending; deep dive not yet run.
+Onboarded 2026-06-04. Deep dive `research/deep_dive_2026-06-04.md` (public profile only). PDF archive pending; see `research/shopbot/simplex_ir_harvest_brief_2026-06-04.md`.
