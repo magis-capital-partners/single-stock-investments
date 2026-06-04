@@ -7,6 +7,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-06-04.
 | Ticker | Folder | Company | Market | Last download | Last research | Archetype | Stance |
 |--------|--------|---------|--------|---------------|---------------|-----------|--------|
 | 3905.T | 3905.T/ | DataSection Co., Ltd. | JP | 2026-06-02 | 2026-06-03 | compounder | watch |
+| 7176.T | 7176.T/ | Simplex Financial Holdings Co., Ltd. | JP | 2026-06-04 | 2026-06-04 | unknown | watch |
 | 8697.T | 8697.T/ | Japan Exchange Group | JP | 2026-06-02 | 2026-06-03 | croupier | hold |
 | ALS.TO | ALS.TO/ | Altius Minerals Corporation | CA | 2026-06-03 | 2026-06-03 | unknown | watch |
 | AMZN | AMZN/ | Amazon.com | US | 2026-06-02 | 2026-06-04 | compounder | hold |
@@ -31,7 +32,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-06-04.
 | HE | HE/ | Hawaiian Electric Industries | US | 2026-06-03 | 2026-06-04 | unknown | watch |
 | HKHC | HKHC/ | Horizon Kinetics Holding Corporation | US | 2026-06-03 | 2026-06-03 | unknown | watch |
 | ICE | ICE/ | Intercontinental Exchange | US | 2026-06-02 | 2026-06-04 | croupier | hold |
-| IEX.NS | IEX.NS/ | Indian Energy Exchange Limited | IN | NSE | — | unknown | watch |
+| IEX.NS | IEX.NS/ | Indian Energy Exchange Limited | IN | 2026-06-04 | 2026-06-04 | unknown | watch |
 | KEWL | KEWL/ | Keweenaw Land Association | US | 2026-06-02 | 2026-06-03 | optionality | watch |
 | LB | LB/ | LandBridge Company LLC | US | 2026-06-02 | 2026-06-03 | unknown | watch |
 | LSEG | LSEG/ | London Stock Exchange Group | UK | 2026-06-02 | 2026-06-04 | unknown | watch |
@@ -44,10 +45,10 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-06-04.
 | OTCM | OTCM/ | OTC Markets Group | US | 2026-06-02 | 2026-06-03 | croupier | watch |
 | PBT | PBT/ | Permian Basin Royalty Trust | US | 2026-06-03 | 2026-06-04 | unknown | watch |
 | PCYO | PCYO/ | Pure Cycle Corporation | US | 2026-06-03 | 2026-06-03 | unknown | watch |
-| PSK.TO | PSK.TO/ | PrairieSky Royalty Ltd. | CA | 2026-06-03 | 2026-06-03 | optionality | watch |
+| PSK.TO | PSK.TO/ | PrairieSky Royalty Ltd. | CA | 2026-06-03 | 2026-06-04 | optionality | watch |
 | QDEL | QDEL/ | QuidelOrtho | US | 2026-06-02 | 2026-06-03 | turnaround | hold |
 | RGLD | RGLD/ | Royal Gold Inc. | US | 2026-06-03 | 2026-06-03 | unknown | watch |
-| RMV.L | RMV.L/ | Rightmove PLC | UK | LSE | 2026-06-04 | platform | watch |
+| RMV.L | RMV.L/ | Rightmove PLC | UK | 2026-06-04 | 2026-06-04 | platform | watch |
 | RPRX | RPRX/ | Royalty Pharma plc | US | 2026-06-03 | 2026-06-04 | unknown | watch |
 | SBR | SBR/ | Sabine Royalty Trust | US | 2026-06-03 | 2026-06-04 | unknown | watch |
 | SJT | SJT/ | San Juan Basin Royalty Trust | US | 2026-06-02 | 2026-06-04 | optionality | watch |
@@ -60,4 +61,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-06-04.
 | WBI | WBI/ | WaterBridge Infrastructure | US | 2026-06-02 | 2026-06-04 | infrastructure | watch |
 | WPM | WPM/ | Wheaton Precious Metals Corp. | US | 2026-06-03 | 2026-06-04 | unknown | watch |
 
-**53 holdings total.** Registry: `_system/portfolio/registry.json`
+**54 holdings total.** Registry: `_system/portfolio/registry.json`
