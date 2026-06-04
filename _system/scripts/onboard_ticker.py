@@ -170,12 +170,44 @@ def scaffold_in(ticker: str, company: str) -> Path:
     return td
 
 
-def scaffold_folder(ticker: str, company: str, market: str) -> Path:
+def scaffold_au(ticker: str, company: str, ir_url: str = "") -> Path:
+    td = ROOT / ticker
+    inv = td / "investor-documents"
+    for sub in ("official-reports", "asx-announcements", "presentations", "research-notes"):
+        (inv / sub).mkdir(parents=True, exist_ok=True)
+    (td / "research").mkdir(parents=True, exist_ok=True)
+    (td / "third-party-analyses").mkdir(parents=True, exist_ok=True)
+    script = inv / f"download_{ticker.lower()}_investor_docs.py"
+    if not script.exists():
+        script.write_text(
+            f'''#!/usr/bin/env python3
+"""Download {ticker} IR PDFs (ASX). Replace stub after onboard."""
+if __name__ == "__main__":
+    raise SystemExit(0)
+''',
+            encoding="utf-8",
+        )
+    readme = td / "README.md"
+    if not readme.exists():
+        ir_line = f"**IR:** {ir_url}\n" if ir_url else ""
+        readme.write_text(
+            f"# {company} ({ticker})\n\n"
+            f"**Ticker:** {ticker} | **Exchange:** ASX | **Market:** AU\n"
+            f"{ir_line}"
+            f"**Last updated:** {datetime.now(timezone.utc).strftime('%Y-%m-%d')}\n",
+            encoding="utf-8",
+        )
+    return td
+
+
+def scaffold_folder(ticker: str, company: str, market: str, ir_url: str = "") -> Path:
     if market == "JP":
         return scaffold_jp(ticker, company)
     if market == "IN":
         return scaffold_in(ticker, company)
-    if market in {"SE", "EU"}:
+    if market == "AU":
+        return scaffold_au(ticker, company, ir_url)
+    if market in {"SE", "EU", "UK"}:
         return scaffold_eu(ticker, company)
     return scaffold_us(ticker, company)
 
@@ -375,7 +407,8 @@ def onboard(args: argparse.Namespace) -> int:
 
     run_cmd([PY, str(SCRIPTS / "sync_portfolio_from_registry.py")], "sync portfolio")
 
-    ticker_dir = scaffold_folder(ticker, company, market)
+    ir_roots = parse_ir_urls(args.ir_url)
+    ticker_dir = scaffold_folder(ticker, company, market, ir_roots[0] if ir_roots else "")
     write_status(ticker_dir, "scaffold")
     write_thesis(ticker, company, classification)
 

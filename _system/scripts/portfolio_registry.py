@@ -57,6 +57,7 @@ EXCHANGE_META = {
     "PSK.TO": "TSX",
     "IEX.NS": "NSE",
     "DRR.AX": "ASX",
+    "IDA.AX": "ASX",
     "LSEG": "LSE",
     "RMV.L": "LSE",
 }
@@ -70,6 +71,7 @@ DOWNLOAD_TYPE_OVERRIDES = {
     "7176.T": "jp_archive",
     "IEX.NS": "in_ir",
     "DRR.AX": "au_asx",
+    "IDA.AX": "au_asx",
     "LSEG": "uk_ir",
     "RMV.L": "uk_ir",
 }
