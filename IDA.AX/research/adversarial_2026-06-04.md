@@ -39,7 +39,6 @@ re_pass: false
 
 | # | Claim in dive | Dive cites | Filing value | Match? | Severity |
 |---|---------------|------------|--------------|--------|----------|
-| — | filing_facts | — | no_full_tier_text_extract | — | inference |
 | — | No filing_facts metrics | — | — | run build_filing_evidence | — |
 
 ---
@@ -48,13 +47,9 @@ re_pass: false
 
 | Check | Expected (valuation.json) | Found in dive | OK? |
 |-------|---------------------------|---------------|-----|
-| Returns statement | 42.4% | 42.4% | Yes |
-| Classification IRR | 42.4% | 42.4% | Yes |
-| Valuation bridge base | 42.4% | 42.4% | Yes |
-
-**Lint notes:**
-- IDA.AX/research: dive header cites adversarial but file missing
-- IDA.AX/research/deep_dive_2026-06-04.md: executive_summary_first_pct 7.1% vs valuation.json base 42.4% (tol 0.25pp)
+| Returns statement | 23.8% | 23.8% | Yes |
+| Classification IRR | 23.8% | 23.8% | Yes |
+| Valuation bridge base | 23.8% | 23.8% | Yes |
 
 ---
 

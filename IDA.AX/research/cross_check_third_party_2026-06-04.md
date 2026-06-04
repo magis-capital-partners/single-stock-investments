@@ -8,9 +8,9 @@
 
 ## Executive summary
 
-Marvin floor **42.4%** per year (optionality; stance **accumulate**) from primary filings and `valuation.json`. No third-party sources indexed; filings-only stance. **[HUMAN REVIEW]** for approved-source numeric blend.
+Marvin floor **23.8%** per year (optionality; stance **accumulate**) from primary filings and `valuation.json`. No third-party sources indexed; filings-only stance. **[HUMAN REVIEW]** for approved-source numeric blend.
 
-**Synthesis (best estimate):** Marvin **42.4%** base · stance **accumulate**; external sources adjust conviction on catalyst timing, not primary IRR without human OK.
+**Synthesis (best estimate):** Marvin **23.8%** base · stance **accumulate**; external sources adjust conviction on catalyst timing, not primary IRR without human OK.
 
 ## Sources in scope
 
@@ -22,7 +22,7 @@ Marvin floor **42.4%** per year (optionality; stance **accumulate**) from primar
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| Base return anchor | **42.4%** per year | Qualitative support only | `IDA.AX/research/deep_dive_2026-06-04.md` |
+| Base return anchor | **23.8%** per year | Qualitative support only | `IDA.AX/research/deep_dive_2026-06-04.md` |
 | Archetype / stance | **optionality** · **accumulate** | See indexed sources | `valuation.json` |
 | Normalization | No steady-state owner cash. Base uses dated payoff (capital return + residual ca | Cross-check vs posts | Marvin |
 
@@ -30,20 +30,20 @@ Marvin floor **42.4%** per year (optionality; stance **accumulate**) from primar
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| Primary IRR | **42.4%** (Lawrence / scenarios) | No single approved IRR unless promoted | Marvin **70%** numeric; external **30%** catalyst timing |
+| Primary IRR | **23.8%** (Lawrence / scenarios) | No single approved IRR unless promoted | Marvin **70%** numeric; external **30%** catalyst timing |
 | Third party | Filing-first | Context tier only | No numeric upgrade without human OK |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | See assumption ledger | **42.4%** | **accumulate** |
+| Marvin floor | See assumption ledger | **23.8%** | **accumulate** |
 | External (combined) | Narrative / catalyst | No change to base % | **accumulate** (conviction) |
-| **Blended best estimate** | **Filing anchor** | **42.4%** | **accumulate** |
+| **Blended best estimate** | **Filing anchor** | **23.8%** | **accumulate** |
 
 **Weights:** Marvin **70%** on numbers; indexed third party **30%** on catalyst timing and narrative (approved Substacks/HK context only in qualitative layer until human promotes).
 
-**Returns statement (blended):** We expect **42.4%** per year at today's price on the Marvin base case; third-party sources may raise or lower conviction on timing but do not replace filing math without **[HUMAN REVIEW]**.
+**Returns statement (blended):** We expect **23.8%** per year at today's price on the Marvin base case; third-party sources may raise or lower conviction on timing but do not replace filing math without **[HUMAN REVIEW]**.
 
 ## [HUMAN REVIEW]
 
@@ -53,7 +53,7 @@ Marvin floor **42.4%** per year (optionality; stance **accumulate**) from primar
 
 ## [PROPOSED MEMORY]
 
-- [PROPOSED COMPANY] IDA.AX: third-party cross-check fill 2026-06-04 — Marvin 42.4% unchanged
+- [PROPOSED COMPANY] IDA.AX: third-party cross-check fill 2026-06-04 — Marvin 23.8% unchanged
 
 ## Primary sources cited
 

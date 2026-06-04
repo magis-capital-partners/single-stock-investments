@@ -1,7 +1,7 @@
 # Indiana Resources Limited (IDA.AX)
 
 **Ticker:** IDA.AX (ASX: **IDA**) | **Exchange:** ASX | **Market:** AU  
-**Last updated:** 2026-06-04
+**Last updated:** 2026-06-04 (Weblink ASX harvest)
 
 ## Company
 
@@ -37,4 +37,4 @@ python3 _system/scripts/build_filing_evidence.py IDA.AX
 
 ## Research status
 
-Deep dive `research/deep_dive_2026-06-04.md` (base IRR **42.4%**, yield_curve). ASX Weblink harvest pending for cash refresh.
+Deep dive `research/deep_dive_2026-06-04.md` (base IRR **23.8%**, yield_curve). **820** ASX PDFs harvested via Weblink (`download_ida.ax_investor_docs.py`).
