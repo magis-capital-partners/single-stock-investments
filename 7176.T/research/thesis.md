@@ -27,7 +27,8 @@ Japan asset manager and ETF group: FY26 AUM **¥1.34tn** with **success fees +53
 
 - [ ] Confirm live TSE quote and liquidity
 - [ ] Complete full PDF English translation archive (`translate_jp_filings.py`)
-- [ ] Download yuho (EDINET E31267)
+- [x] Annual disclosure (Issuer Information 2025-06-30) — `research/evidence/annual_report_en_FY2025.md`
+- [ ] EDINET API pull if standard yuho filed (set `EDINET_API_KEY`; script `download_edinet_issuer.py`)
 - [ ] Track base-fee vs success-fee mix each quarter
 
 ## Deep dive
