@@ -12,6 +12,8 @@ See [`_system/portfolio/holdings.md`](_system/portfolio/holdings.md).
 
 Static portfolio dashboard (etf-dashboard styling) in [`dashboard/`](dashboard/).
 
+**Equity model viz (prompt):** Per-ticker earnings/fundamental models on the main dashboard — pilot `7176.T`. Spec: [`_system/prompts/dashboard_equity_model_viz.md`](_system/prompts/dashboard_equity_model_viz.md) · registry: [`_system/portfolio/equity_model_registry.json`](_system/portfolio/equity_model_registry.json).
+
 **Darwin IRA:** [Research download plan](_system/frameworks/darwin_ira_research_plan.md) · copy PDF: `_system/scripts/copy_darwin_investor_pdf.ps1`
 
 **Darwin tab (phases 0–4):** [Adaptive portfolio layer](_system/frameworks/darwin_portfolio_tab_proposal.md) · [Source alignment](_system/frameworks/darwin_source_alignment.md) — Holdings | **Darwin** on the dashboard. Rebuild:
