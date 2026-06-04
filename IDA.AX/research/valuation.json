@@ -10,19 +10,22 @@
     "dhando": "partial",
     "cycle": "\u2014",
     "payoff_lens": "asset",
-    "predictive_attribute": "cash_floor_capital_return_minos_option"
+    "predictive_attribute": "cash_floor_post_return_loricatus_minos"
   },
   "inputs": {
     "price": 0.027,
     "price_source": "Yahoo Finance IDA.AX ~2026-06-04",
-    "shares_outstanding": 642700000,
-    "shares_source": "company_profile_june_2025.pdf (642.7M fully paid ordinary shares)",
-    "cash_m_aud": 71.6,
-    "cash_as_of": "2025-04-11",
-    "cash_source": "company_profile_june_2025.pdf",
-    "cash_per_share": 0.1114,
-    "proposed_capital_return_per_share": 0.05,
-    "proposed_return_source": "company_profile_june_2025.pdf; ASX capital-return proposal (pending full Weblink harvest)",
+    "shares_outstanding": 643232458,
+    "shares_source": "2026-03-13_61316298_Half_Yearly_Report_and_Accounts.pdf (ordinary shares fully paid 643,232,458 at 31 Dec 2025)",
+    "cash_m_aud": 31.2,
+    "cash_as_of": "2026-03-31",
+    "cash_source": "2026-04-30_61323330_Quarterly_Activities_Appendix_5B_Cash_Flow_Report.pdf (consolidated closing cash; includes 18% Tanzania proceeds preserved pending Loricatus dispute)",
+    "cash_per_share": 0.0485,
+    "capital_return_completed_per_share": 0.05,
+    "capital_return_completed_date": "2025-08",
+    "capital_return_source": "2026-03-13_61316298_Half_Yearly_Report_and_Accounts.pdf (~A$32.2M paid Aug 2025); Dec 2024 A$0.05 special dividend per FY2025 annual report",
+    "proposed_capital_return_per_share": 0.0,
+    "proposed_return_source": "Prior A$0.05/sh return completed Aug 2025; no further return proposed in Mar-2026 quarterly",
     "book_per_share_caveat": "Explorer; no mineral resource; GAAP book not a fair-value floor for Minos/REE/titanium",
     "normalization_note": "No steady-state owner cash. Base uses dated payoff (capital return + residual cash stub + exploration option), not ten-year free cash flow."
   },
@@ -30,24 +33,24 @@
     "framework": "cash_nav_floor",
     "floor_pass": true,
     "floor_metric": "cash_per_share",
-    "floor_value": 0.111,
-    "floor_value_note": "A$71.6M cash / 642.7M shares Apr 2025; price A$0.027 implies negative enterprise value at spot",
+    "floor_value": 0.0485,
+    "floor_value_note": "A$31.2M cash / 643.2M shares 31 Mar 2026; 18% of Tanzania settlement preserved pending Loricatus; price A$0.027 still below cash",
     "primary_metric": "lawrence_base",
     "primary_label": "annualized return",
-    "overlay_nav_per_share": 0.111,
-    "overlay_nav_note": "Cash backing only in overlay base; Minos maiden resource and award top-up in bull sensitivity",
+    "overlay_nav_per_share": 0.0485,
+    "overlay_nav_note": "Post-Aug-2025 capital return cash backing; Loricatus reserve and exploration burn reduce runway vs Apr-2025 profile",
     "notes": "Stance gate uses Lawrence dated payoff path; cash floor supports partial dhando despite unproven moat.",
-    "primary_return_pct": 42.4
+    "primary_return_pct": 23.8
   },
   "nav_overlay": {
     "as_of": "2026-06-04",
     "status": "complete",
     "gaap_vs_fair_value": {
-      "cash_m_aud": 71.6,
-      "cash_per_share": 0.1114,
+      "cash_m_aud": 31.2,
+      "cash_per_share": 0.0485,
       "market_cap_m_aud_at_spot": 17.4,
-      "enterprise_value_m_aud_at_spot": -54.2,
-      "policy_source": "company_profile_june_2025.pdf; spot price from Yahoo ~2026-06-04",
+      "enterprise_value_m_aud_at_spot": -13.8,
+      "policy_source": "2026-04-30 quarterly Appendix 5B; spot price Yahoo IDA.AX ~2026-06-04",
       "mineral_resources": "none declared (Minos maiden MRE pending)"
     },
     "in_model": {
@@ -57,7 +60,7 @@
       "minos_resource_in_lawrence_base": false
     },
     "not_in_model_requires_refresh": [
-      "Updated cash balance from latest ASX quarterly (Weblink harvest pending)",
+      "Loricatus arbitration outcome and release of 18% preserved Tanzania proceeds",
       "Tanzania tax-office claim and subsidiary distribution dispute resolution",
       "Maiden Minos mineral resource estimate and scoping study economics",
       "REE and titanium project fair value"
@@ -67,17 +70,17 @@
         "id": "cash_treasury",
         "label": "Cash and settlement proceeds (net of legal reserve)",
         "option_treatment": "nav_floor",
-        "nav_per_share_full": 0.111,
-        "overlay_value_per_share": 0.111,
-        "evidence": "company_profile_june_2025.pdf: A$71.6M cash 11 Apr 2025",
+        "nav_per_share_full": 0.0485,
+        "overlay_value_per_share": 0.0485,
+        "evidence": "2026-04-30 quarterly: A$31.2M cash 31 Mar 2026",
         "not_in_lawrence_base": false
       },
       {
         "id": "capital_return",
-        "label": "Proposed capital return up to A$0.05/share",
+        "label": "Completed Aug-2025 capital return A$0.05/share (historical)",
         "option_treatment": "yield_curve",
-        "evidence": "company_profile_june_2025.pdf; Dec 2024 special dividend precedent",
-        "not_in_lawrence_base": false
+        "evidence": "2026-03-13 half-year report; not in forward base payoff",
+        "not_in_lawrence_base": true
       },
       {
         "id": "minos_gold",
@@ -112,49 +115,49 @@
   "scenarios": {
     "bear": {
       "price": 0.027,
-      "payoff": 0.038,
-      "years": 5,
-      "notes": "Capital return delayed or reduced; Tanzania tax/subscriber claims absorb cash; exploration burn without resource re-rate"
+      "payoff": 0.022,
+      "years": 4,
+      "notes": "Loricatus dispute and legal burn (~A$0.9M/qtr) erode cash; no Minos re-rate; 18% reserve at risk"
     },
     "base": {
       "price": 0.027,
-      "payoff": 0.078,
-      "years": 3,
-      "notes": "A$0.05 capital return realized + residual cash stub re-rated toward partial cash backing; Minos option minimal in base",
+      "payoff": 0.046,
+      "years": 2.5,
+      "notes": "Re-rate toward Mar-2026 cash per share (~A$0.0485) after Aug-2025 return already paid; minimal Minos in base",
       "sotp_build": {
         "lines": [
           {
             "id": "cash_floor",
-            "label": "Cash per share (Apr 2025)",
-            "gaap_per_share": 0.111,
+            "label": "Cash per share (31 Mar 2026)",
+            "gaap_per_share": 0.0485,
             "uplift_per_share": 0.0,
-            "math": "A$71.6M / 642.7M shares"
+            "math": "A$31.2M / 643.2M shares per Mar-2026 quarterly"
           },
           {
-            "id": "capital_return",
-            "label": "Proposed capital return (dated)",
+            "id": "loricatus_release",
+            "label": "Partial recognition of preserved 18% settlement slice",
             "gaap_per_share": 0.0,
-            "uplift_per_share": 0.05,
-            "math": "company_profile_june_2025.pdf up to A$0.05/sh"
+            "uplift_per_share": 0.005,
+            "math": "[Assumption] modest uplift if dispute resolves; not full reserve in base"
           },
           {
             "id": "residual_stub",
-            "label": "Residual equity after return + burn (re-rated stub)",
+            "label": "Minos / market re-rate vs cash floor",
             "gaap_per_share": 0.0,
-            "uplift_per_share": 0.028,
-            "math": "[Assumption] partial recognition of remaining cash and Minos option at price today"
+            "uplift_per_share": -0.0075,
+            "math": "[Assumption] price today below cash; base payoff below full cash NAV for timing and burn"
           }
         ],
-        "year5_economic_nav_per_share": 0.078,
-        "years": 3,
-        "notes": "Dated payoff path; not full cash NAV at spot"
+        "year5_economic_nav_per_share": 0.046,
+        "years": 2.5,
+        "notes": "Post-capital-return dated path; Aug-2025 A$0.05/sh already distributed"
       }
     },
     "bull": {
       "price": 0.027,
-      "payoff": 0.13,
-      "years": 4,
-      "notes": "Capital return + partial award top-up + maiden Minos resource re-rate toward peer EV/resource [Assumption]"
+      "payoff": 0.085,
+      "years": 3,
+      "notes": "Loricatus reserve released + maiden Minos resource re-rate; second distribution possible [Assumption]"
     }
   },
   "stance_proposal": {
@@ -173,30 +176,30 @@
   },
   "results_lawrence_legacy": {
     "bear": {
-      "return_pct": 7.1
+      "return_pct": -5.0
     },
     "base": {
-      "return_pct": 42.4
+      "return_pct": 23.8
     },
     "bull": {
-      "return_pct": 48.1
+      "return_pct": 46.6
     }
   },
   "results": {
     "bear": {
-      "return_pct": 7.1
+      "return_pct": -5.0
     },
     "base": {
-      "return_pct": 42.4
+      "return_pct": 23.8
     },
     "bull": {
-      "return_pct": 48.1
+      "return_pct": 46.6
     }
   },
   "implied_return": {
-    "base_pct": 42.4,
+    "base_pct": 23.8,
     "label": "annualized return",
-    "display": "42.4% (base)"
+    "display": "23.8% (base)"
   },
   "overlay_results": [],
   "option_scan": [
@@ -252,9 +255,9 @@
   ],
   "catalyst_paths": [
     {
-      "event": "Capital return execution",
-      "timing": "base case ~3 years",
-      "impact": "A$0.05/sh dated cash to holders"
+      "event": "Cash-floor re-rating",
+      "timing": "base case ~2.5 years",
+      "impact": "Share price moves toward Mar-2026 cash per share (~A$0.0485)"
     },
     {
       "event": "Maiden Minos mineral resource",
