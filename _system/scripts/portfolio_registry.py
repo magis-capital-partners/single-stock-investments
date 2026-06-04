@@ -54,6 +54,7 @@ EXCHANGE_META = {
     "BUR": "NYSE",
     "ALS.TO": "TSX",
     "PSK.TO": "TSX",
+    "IEX.NS": "NSE",
 }
 
 DOWNLOAD_TYPE_OVERRIDES = {
@@ -62,7 +63,21 @@ DOWNLOAD_TYPE_OVERRIDES = {
     "TEQ.ST": "eu_teq",
     "8697.T": "jp_ps1",
     "3905.T": "jp_archive",
+    "IEX.NS": "in_ir",
 }
+
+def infer_market_from_ticker(ticker: str) -> str | None:
+    """Suffix-based market when onboarding without explicit --market."""
+    if ticker.endswith(".NS"):
+        return "IN"
+    if ticker.endswith(".AX"):
+        return "AU"
+    if ticker.endswith(".L"):
+        return "UK"
+    if ticker == "LSEG":
+        return "UK"
+    return None
+
 
 DEFAULT_CLASSIFICATION = {
     "archetype": "unknown",
@@ -100,6 +115,8 @@ def infer_download_type(ticker: str, market: str, us_config: dict) -> str:
         return "ca_csu"
     if market in {"SE", "EU"}:
         return "eu_teq"
+    if market == "IN":
+        return "in_ir"
     if market == "JP":
         return "jp_ps1"
     return "us_shared"

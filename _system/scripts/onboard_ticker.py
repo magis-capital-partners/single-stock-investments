@@ -21,6 +21,7 @@ from portfolio_registry import (
     ROOT,
     build_download_block,
     infer_download_type,
+    infer_market_from_ticker,
     load_registry,
     save_registry,
 )
@@ -144,9 +145,36 @@ def scaffold_eu(ticker: str, company: str) -> Path:
     return td
 
 
+def scaffold_in(ticker: str, company: str) -> Path:
+    td = ROOT / ticker
+    for sub in (
+        "official-reports/annual-reports",
+        "official-reports/interim-reports",
+        "presentations-and-media",
+        "third-party-analyses",
+        "research",
+    ):
+        (td / sub).mkdir(parents=True, exist_ok=True)
+    (td / "investor-documents" / "ir-iex").mkdir(parents=True, exist_ok=True)
+    idx = td / "document-index.csv"
+    if not idx.exists():
+        idx.write_text("path,title,date,type\n", encoding="utf-8")
+    readme = td / "README.md"
+    if not readme.exists():
+        readme.write_text(
+            f"# {company} ({ticker})\n\n"
+            f"**Ticker:** {ticker} | **Exchange:** NSE (also BSE: 540750) | **Market:** IN\n"
+            f"**IR:** https://www.iexindia.com/investors/financials\n",
+            encoding="utf-8",
+        )
+    return td
+
+
 def scaffold_folder(ticker: str, company: str, market: str) -> Path:
     if market == "JP":
         return scaffold_jp(ticker, company)
+    if market == "IN":
+        return scaffold_in(ticker, company)
     if market in {"SE", "EU"}:
         return scaffold_eu(ticker, company)
     return scaffold_us(ticker, company)
@@ -226,6 +254,15 @@ def run_download(ticker: str, download: dict) -> tuple[bool, str]:
             encoding="utf-8",
         )
         return True, "jp_archive placeholder"
+    if dtype == "in_ir":
+        inv = ROOT / ticker / "investor-documents"
+        if inv.is_dir():
+            scripts = sorted(inv.glob("download_*_investor_docs.py"))
+            if scripts:
+                code = run_cmd([PY, str(scripts[0])], f"{ticker} (in_ir)")
+                return code == 0, f"in_ir dedicated exit {code}"
+        log("in_ir: no dedicated download script — IR harvest pending")
+        return True, "in_ir skipped (no script)"
     return False, f"unknown download type {dtype}"
 
 
@@ -270,6 +307,10 @@ def onboard(args: argparse.Namespace) -> int:
     ticker = args.ticker.strip().upper() if args.market != "JP" else args.ticker.strip()
     company = args.company.strip()
     market = args.market.strip().upper()
+    inferred = infer_market_from_ticker(ticker)
+    if inferred and market == "US" and inferred != "US":
+        log(f"Market inferred from ticker suffix: {inferred} (override --market US to keep US)")
+        market = inferred
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
     reg = load_registry()
@@ -379,7 +420,11 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Onboard a new portfolio ticker")
     parser.add_argument("--ticker", required=True)
     parser.add_argument("--company", required=True)
-    parser.add_argument("--market", default="US", choices=["US", "JP", "CA", "SE", "EU", "OTC"])
+    parser.add_argument(
+        "--market",
+        default="US",
+        choices=["US", "JP", "CA", "SE", "EU", "IN", "OTC"],
+    )
     parser.add_argument("--cik", default=None)
     parser.add_argument("--ir-url", default=None, help="One or more IR root URLs")
     parser.add_argument("--notes", default="", help="Watchlist notes")
