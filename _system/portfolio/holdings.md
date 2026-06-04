@@ -7,7 +7,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-06-04.
 | Ticker | Folder | Company | Market | Last download | Last research | Archetype | Stance |
 |--------|--------|---------|--------|---------------|---------------|-----------|--------|
 | 3905.T | 3905.T/ | DataSection Co., Ltd. | JP | 2026-06-02 | 2026-06-03 | compounder | watch |
-| 7176.T | 7176.T/ | Simplex Financial Holdings Co., Ltd. | JP | 2026-06-04 | 2026-06-04 | unknown | watch |
+| 7176.T | 7176.T/ | Simplex Financial Holdings Co., Ltd. | JP | 2026-06-04 | 2026-06-04 | croupier | watch |
 | 8697.T | 8697.T/ | Japan Exchange Group | JP | 2026-06-02 | 2026-06-03 | croupier | hold |
 | ALS.TO | ALS.TO/ | Altius Minerals Corporation | CA | 2026-06-03 | 2026-06-03 | unknown | watch |
 | AMZN | AMZN/ | Amazon.com | US | 2026-06-02 | 2026-06-04 | compounder | hold |
