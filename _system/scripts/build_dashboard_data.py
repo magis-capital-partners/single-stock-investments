@@ -118,6 +118,26 @@ def onboard_status(ticker_dir: Path) -> dict | None:
         return None
 
 
+def reconcile_onboard_status(ticker_dir: Path, pdf_count: int) -> dict | None:
+    """Heal stale failed onboard when primary PDFs exist (e.g. partial BSE after CDN 403)."""
+    status = onboard_status(ticker_dir)
+    if not status or status.get("phase") != "failed" or pdf_count < 1:
+        return status
+    healed = {
+        "phase": "complete",
+        "updated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "error": None,
+        "download_detail": (
+            f"partial IR reconciled ({pdf_count} PDFs on disk); prior: {status.get('error', '')}"
+        ).strip(),
+        "ir_gap": True,
+        "deep_dive_pending": status.get("deep_dive_pending", True),
+    }
+    path = ticker_dir / ".onboard_status.json"
+    path.write_text(json.dumps(healed, indent=2) + "\n", encoding="utf-8")
+    return healed
+
+
 def build_watchlist_rows(watchlist: dict) -> list[dict]:
     rows = []
     for ticker, w in sorted(watchlist.items()):
@@ -558,6 +578,7 @@ def build_ticker_row(ticker: str, holdings: dict[str, dict], portfolio_class: di
     meta = {**TICKER_META.get(ticker, {}), **holdings.get(ticker, {})}
     dl_script, dl_path = has_download_script(ticker_dir)
     classification = classification_for(ticker, ticker_dir, portfolio_class)
+    pdf_count = count_pdfs(ticker_dir)
     row = {
         "ticker": ticker,
         "company": meta.get("company", ticker),
@@ -567,7 +588,7 @@ def build_ticker_row(ticker: str, holdings: dict[str, dict], portfolio_class: di
         "readme": (ticker_dir / "README.md").exists(),
         "download_script": dl_script,
         "download_script_path": dl_path,
-        "pdf_count": count_pdfs(ticker_dir),
+        "pdf_count": pdf_count,
         "sec_filings": count_sec_filings(ticker_dir),
         "research_dir": (ticker_dir / "research").exists(),
         "index_file": has_index(ticker_dir),
@@ -581,7 +602,7 @@ def build_ticker_row(ticker: str, holdings: dict[str, dict], portfolio_class: di
         "human_review": valuation_human_review(ticker_dir),
         "recent_files": recent_files(ticker_dir),
         "developments": recent_developments(ticker_dir, ticker),
-        "onboard": onboard_status(ticker_dir),
+        "onboard": reconcile_onboard_status(ticker_dir, pdf_count),
         "transcripts": transcript_summary(ticker, ticker_dir),
     }
     row["completeness"] = completeness_score(row)

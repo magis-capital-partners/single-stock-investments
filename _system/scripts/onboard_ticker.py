@@ -260,7 +260,12 @@ def run_download(ticker: str, download: dict) -> tuple[bool, str]:
             scripts = sorted(inv.glob("download_*_investor_docs.py"))
             if scripts:
                 code = run_cmd([PY, str(scripts[0])], f"{ticker} ({dtype})")
-                return code == 0, f"{dtype} dedicated exit {code}"
+                if code == 0:
+                    return True, f"{dtype} dedicated exit 0"
+                n_pdf = sum(1 for _ in (ROOT / ticker).rglob("*.pdf"))
+                if n_pdf >= 1:
+                    return True, f"{dtype} partial OK ({n_pdf} PDF(s) after exit {code})"
+                return False, f"{dtype} dedicated exit {code}"
         log(f"{dtype}: no dedicated download script — IR harvest pending")
         return True, f"{dtype} skipped (no script)"
     return False, f"unknown download type {dtype}"
@@ -387,11 +392,16 @@ def onboard(args: argparse.Namespace) -> int:
         write_status(ticker_dir, "downloading")
         ok, detail = run_download(ticker, download)
         if not ok:
-            write_status(ticker_dir, "failed", error=detail)
-            write_pending_review(ticker, company, market, False, detail)
-            run_cmd([PY, str(SCRIPTS / "build_folder_indexes.py")], "indexes")
-            run_cmd([PY, str(SCRIPTS / "build_dashboard_data.py")], "dashboard")
-            return 2
+            n_pdf = sum(1 for _ in ticker_dir.rglob("*.pdf"))
+            if n_pdf >= 1:
+                ok = True
+                detail = f"{detail}; partial OK ({n_pdf} PDF(s) on disk)"
+            else:
+                write_status(ticker_dir, "failed", error=detail)
+                write_pending_review(ticker, company, market, False, detail)
+                run_cmd([PY, str(SCRIPTS / "build_folder_indexes.py")], "indexes")
+                run_cmd([PY, str(SCRIPTS / "build_dashboard_data.py")], "dashboard")
+                return 2
     else:
         ok, detail = True, "skipped"
 
