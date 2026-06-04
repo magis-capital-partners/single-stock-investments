@@ -15,6 +15,7 @@ US_CONFIG_PATH = ROOT / "_system" / "scripts" / "us_ticker_config.json"
 EXCHANGE_META = {
     "8697.T": "TSE",
     "3905.T": "TSE",
+    "7176.T": "TSE",
     "AMZN": "NASDAQ",
     "APLD": "NASDAQ",
     "BN": "NYSE",
@@ -66,6 +67,7 @@ DOWNLOAD_TYPE_OVERRIDES = {
     "TEQ.ST": "eu_teq",
     "8697.T": "jp_ps1",
     "3905.T": "jp_archive",
+    "7176.T": "jp_archive",
     "IEX.NS": "in_ir",
     "DRR.AX": "au_asx",
     "LSEG": "uk_ir",
@@ -77,6 +79,8 @@ def infer_market_from_ticker(ticker: str) -> str | None:
     """Suffix-based market when onboarding without explicit --market."""
     if ticker.endswith(".NS"):
         return "IN"
+    if ticker.endswith(".T"):
+        return "JP"
     if ticker.endswith(".AX"):
         return "AU"
     if ticker.endswith(".L"):
