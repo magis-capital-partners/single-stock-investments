@@ -2,7 +2,8 @@
 
 **Date:** 2026-06-04  
 **Agent:** Marvin (shopbot handoff)  
-**IR root:** https://www.simplex-f-holdings.com/
+**IR root (PDF feeds):** https://www.simplexasset.com/sfh/  
+**Redirect:** https://www.simplex-f-holdings.com/ → frame → `simplexasset.com/sfh/`
 
 ## Objective
 
@@ -26,10 +27,10 @@ Populate `7176.T/_pdf_urls.txt` and run `7176.T/_scripts/download_and_organize.p
 - Normalized owner cash (OCF minus capital spending, or adjusted net income)
 - Related-party and key-person risk
 
-## Blockers
+## Status (2026-06-04)
 
-- `_pdf_urls.txt` is empty; `document_inventory.json` shows **0** local PDFs as of 2026-06-04.
-- Marvin deep dive uses public profile + web only until harvest completes.
+- **Done:** `python3 7176.T/_scripts/download_sfh_ir.py` — **136 PDFs** from three `feed.xml` endpoints.
+- **Pending:** 有価証券報告書 via EDINET **E31267** (API key required on `api.edinet-fsa.go.jp`).
 
 ## Success criteria
 
