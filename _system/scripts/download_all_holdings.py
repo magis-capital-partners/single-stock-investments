@@ -16,6 +16,14 @@ if str(SCRIPTS_DIR) not in sys.path:
 from portfolio_registry import load_registry
 
 ROOT = Path(__file__).resolve().parents[2]
+
+
+def dedicated_investor_script(ticker: str) -> Path | None:
+    inv = ROOT / ticker / "investor-documents"
+    if not inv.is_dir():
+        return None
+    scripts = sorted(inv.glob("download_*_investor_docs.py"))
+    return scripts[0] if scripts else None
 PY = sys.executable
 SCRIPTS = ROOT / "_system" / "scripts"
 
@@ -70,10 +78,10 @@ def main() -> None:
                     "# Placeholder: PDFs already mirrored. Rebuild INDEX via build_folder_indexes.py\n",
                     encoding="utf-8",
                 )
-        elif dtype == "in_ir":
+        elif dtype in {"uk_ir", "au_asx", "in_ir"}:
             script = dedicated_investor_script(ticker)
             if script:
-                run([PY, str(script)], f"{ticker} (in_ir)")
+                run([PY, str(script)], f"{ticker} ({dtype})")
 
     if any((holdings.get(t, {}).get("download") or {}).get("type") == "eu_teq" for t in holdings):
         run([PY, str(SCRIPTS / "download_teq_st.py")], "TEQ.ST")

@@ -254,15 +254,15 @@ def run_download(ticker: str, download: dict) -> tuple[bool, str]:
             encoding="utf-8",
         )
         return True, "jp_archive placeholder"
-    if dtype == "in_ir":
+    if dtype in {"uk_ir", "au_asx", "in_ir"}:
         inv = ROOT / ticker / "investor-documents"
         if inv.is_dir():
             scripts = sorted(inv.glob("download_*_investor_docs.py"))
             if scripts:
-                code = run_cmd([PY, str(scripts[0])], f"{ticker} (in_ir)")
-                return code == 0, f"in_ir dedicated exit {code}"
-        log("in_ir: no dedicated download script — IR harvest pending")
-        return True, "in_ir skipped (no script)"
+                code = run_cmd([PY, str(scripts[0])], f"{ticker} ({dtype})")
+                return code == 0, f"{dtype} dedicated exit {code}"
+        log(f"{dtype}: no dedicated download script — IR harvest pending")
+        return True, f"{dtype} skipped (no script)"
     return False, f"unknown download type {dtype}"
 
 
@@ -423,7 +423,7 @@ def main() -> None:
     parser.add_argument(
         "--market",
         default="US",
-        choices=["US", "JP", "CA", "SE", "EU", "IN", "OTC"],
+        choices=["US", "JP", "CA", "SE", "EU", "UK", "AU", "IN", "OTC"],
     )
     parser.add_argument("--cik", default=None)
     parser.add_argument("--ir-url", default=None, help="One or more IR root URLs")

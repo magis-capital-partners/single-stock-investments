@@ -55,6 +55,9 @@ EXCHANGE_META = {
     "ALS.TO": "TSX",
     "PSK.TO": "TSX",
     "IEX.NS": "NSE",
+    "DRR.AX": "ASX",
+    "LSEG": "LSE",
+    "RMV.L": "LSE",
 }
 
 DOWNLOAD_TYPE_OVERRIDES = {
@@ -64,7 +67,11 @@ DOWNLOAD_TYPE_OVERRIDES = {
     "8697.T": "jp_ps1",
     "3905.T": "jp_archive",
     "IEX.NS": "in_ir",
+    "DRR.AX": "au_asx",
+    "LSEG": "uk_ir",
+    "RMV.L": "uk_ir",
 }
+
 
 def infer_market_from_ticker(ticker: str) -> str | None:
     """Suffix-based market when onboarding without explicit --market."""
@@ -117,6 +124,10 @@ def infer_download_type(ticker: str, market: str, us_config: dict) -> str:
         return "eu_teq"
     if market == "IN":
         return "in_ir"
+    if market == "UK":
+        return "uk_ir"
+    if market == "AU":
+        return "au_asx"
     if market == "JP":
         return "jp_ps1"
     return "us_shared"

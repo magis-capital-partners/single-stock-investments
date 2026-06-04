@@ -23,7 +23,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-06-04.
 | CSU | CSU/ | Constellation Software | CA | 2026-06-02 | 2026-06-03 | compounder | core |
 | DHR | DHR/ | Danaher Corporation | US | 2026-06-02 | 2026-06-04 | compounder | hold |
 | DMLP | DMLP/ | Dorchester Minerals LP | US | 2026-06-03 | 2026-06-04 | unknown | watch |
-| DRR.AX | DRR.AX/ | Deterra Royalties Limited | US | 2026-06-02 | 2026-06-04 | unknown | watch |
+| DRR.AX | DRR.AX/ | Deterra Royalties Limited | AU | 2026-06-02 | 2026-06-04 | unknown | watch |
 | FNV | FNV/ | Franco-Nevada Corporation | US | 2026-06-03 | 2026-06-04 | optionality | watch |
 | FRMO | FRMO/ | FRMO Corporation | US | 2026-06-02 | 2026-06-04 | holding_co | hold |
 | GLXY | GLXY/ | Galaxy Digital Inc. | US | 2026-06-03 | 2026-06-04 | unknown | watch |
@@ -31,10 +31,10 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-06-04.
 | HE | HE/ | Hawaiian Electric Industries | US | 2026-06-03 | 2026-06-04 | unknown | watch |
 | HKHC | HKHC/ | Horizon Kinetics Holding Corporation | US | 2026-06-03 | 2026-06-03 | unknown | watch |
 | ICE | ICE/ | Intercontinental Exchange | US | 2026-06-02 | 2026-06-04 | croupier | hold |
-| IEX.NS | IEX.NS/ | Indian Energy Exchange Limited | IN | — | — | unknown | watch |
+| IEX.NS | IEX.NS/ | Indian Energy Exchange Limited | IN | NSE | — | unknown | watch |
 | KEWL | KEWL/ | Keweenaw Land Association | US | 2026-06-02 | 2026-06-03 | optionality | watch |
 | LB | LB/ | LandBridge Company LLC | US | 2026-06-02 | 2026-06-03 | unknown | watch |
-| LSEG | LSEG/ | London Stock Exchange Group | US | 2026-06-02 | 2026-06-04 | unknown | watch |
+| LSEG | LSEG/ | London Stock Exchange Group | UK | 2026-06-02 | 2026-06-04 | unknown | watch |
 | META | META/ | Meta Platforms Inc | US | 2026-06-02 | 2026-06-04 | unknown | watch |
 | MIAX | MIAX/ | Miami International Holdings | US | 2026-06-03 | 2026-06-04 | unknown | watch |
 | MRSH | MRSH/ | Marsh & McLennan Companies | US | 2026-06-03 | 2026-06-04 | unknown | watch |
@@ -47,7 +47,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-06-04.
 | PSK.TO | PSK.TO/ | PrairieSky Royalty Ltd. | CA | 2026-06-03 | 2026-06-03 | optionality | watch |
 | QDEL | QDEL/ | QuidelOrtho | US | 2026-06-02 | 2026-06-03 | turnaround | hold |
 | RGLD | RGLD/ | Royal Gold Inc. | US | 2026-06-03 | 2026-06-03 | unknown | watch |
-| RMV.L | RMV.L/ | Rightmove PLC | EU | — | 2026-06-04 | unknown | watch |
+| RMV.L | RMV.L/ | Rightmove PLC | UK | LSE | 2026-06-04 | platform | watch |
 | RPRX | RPRX/ | Royalty Pharma plc | US | 2026-06-03 | 2026-06-04 | unknown | watch |
 | SBR | SBR/ | Sabine Royalty Trust | US | 2026-06-03 | 2026-06-04 | unknown | watch |
 | SJT | SJT/ | San Juan Basin Royalty Trust | US | 2026-06-02 | 2026-06-04 | optionality | watch |
