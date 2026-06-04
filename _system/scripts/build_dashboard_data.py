@@ -77,7 +77,11 @@ def parse_holdings() -> dict[str, dict]:
     reg = load_registry()
     meta: dict[str, dict] = {}
     for ticker, h in (reg.get("holdings") or {}).items():
-        meta[ticker] = {"company": h.get("company", ticker), "market": h.get("market", "—")}
+        meta[ticker] = {
+            "company": h.get("company", ticker),
+            "market": h.get("market", "—"),
+            "exchange": h.get("exchange", "—"),
+        }
     if meta:
         return meta
     holdings_path = ROOT / "_system" / "portfolio" / "holdings.md"

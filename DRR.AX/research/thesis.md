@@ -27,7 +27,7 @@ MAC-anchored ASX royalty at ~5% yield with Thacker Pass lithium option; **8.0%**
 
 - [x] Read latest half-year and FY25 results presentations
 - [ ] Harvest FY2025 annual report PDF and March 2026 portfolio update
-- [ ] Confirm ASX market tag in registry (currently US)
+- [x] ASX market tag in registry (AU)
 
 ## [HUMAN REVIEW]
 
