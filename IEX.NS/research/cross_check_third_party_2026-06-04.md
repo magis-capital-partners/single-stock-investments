@@ -9,9 +9,9 @@
 
 ## Executive summary
 
-No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (10-K, 10-Q, IR). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (FY2024 annual, Q4 FY25 presentation). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
 
-**Synthesis:** Marvin floor only; no external blend.
+**Synthesis:** Marvin floor only; no external blend. At **₹124.07**, Marvin expects **9.74%** per year over 7 years on **₹3.2** per share owner cash (FY2024 PAT haircut); stance **watch**.
 
 ## Sources in scope
 
@@ -33,13 +33,13 @@ No third-party sources are indexed for this ticker as of this scan. Marvin stanc
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | — | — | — |
+| Marvin floor | ₹3.2/sh (FY24 PAT haircut) | 9.74% / 7yr synthesis | watch |
 | External (combined) | — | — | — |
-| **Blended best estimate** | **—** | **—** | **—** |
+| **Blended best estimate** | **₹3.2/sh** | **9.74% / 7yr** | **watch** |
 
-**Weights:** *[Document why]*
+**Weights:** 100% Marvin (no approved external sources).
 
-**Returns statement (blended):** *[One sentence; pending sources not in base IRR]*
+**Returns statement (blended):** With no third-party inputs, the blended estimate equals Marvin: about **9.74%** per year over 7 years at **₹124.07** on **₹3.2** per share starting owner cash.
 
 ## [HUMAN REVIEW]
 

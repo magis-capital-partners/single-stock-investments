@@ -6,24 +6,29 @@
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Archetype** (Stahl) | croupier |
+| **Moat** (Munger) | stable |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Cycle** | mid |
+| **Implied 7yr IRR** (Lawrence) | 9.74% (total synthesis) |
+| **IRR method** | full |
+| **Lawrence bucket** | multi_sided |
+| **Valuation overlay** | — |
+| **Payoff lens** | operating |
+| **MOI bucket** (legacy) | — |
 
 ## One-line thesis
 
-Indian Energy Exchange Limited — thesis pending Marvin deep dive.
+India's regulated power-market croupier: high-quality toll on electricity, REC, and gas volume, but at **₹124.07** the 7-year synthesis return (**9.74%**) is below a core-add hurdle; **watch** until price or FY2025 earnings refresh improves the math.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest annual report on disk (FY2024)
+- [ ] Read FY2025 annual when IR harvest completes
+- [x] Lawrence IRR and classification (`deep_dive_2026-06-04.md`)
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-06-04; awaiting deep dive.
+- FY2025 annual on doc.iexindia.com blocked (403); see `research/shopbot/iex_ir_harvest_brief_2026-06-04.md`.
+- Milly adversarial pass pending.
