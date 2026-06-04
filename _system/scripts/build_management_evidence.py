@@ -54,7 +54,27 @@ def find_docs(ticker_dir: Path) -> list[dict]:
     return out
 
 
-def extract_text(path: Path, suffix: str) -> str:
+def text_from_evidence_cache(ticker_dir: Path, pdf_path: Path) -> str:
+    """Prefer English (or Japanese) text extract over raw PDF for Japan IR PDFs."""
+    evidence = ticker_dir / "research" / "evidence"
+    base = pdf_path.name
+    for sub in ("_text_en", "_text"):
+        for name in (f"{base}.en.txt", f"{base}.txt"):
+            cand = evidence / sub / name
+            if cand.is_file():
+                raw = cand.read_text(encoding="utf-8", errors="ignore")
+                if raw.startswith("#"):
+                    raw = re.sub(r"^#.*\n(?:#.*\n)*\n?", "", raw, count=1)
+                if len(raw.strip()) > 200:
+                    return raw
+    return ""
+
+
+def extract_text(path: Path, suffix: str, *, ticker_dir: Path | None = None) -> str:
+    if suffix == ".pdf" and ticker_dir is not None:
+        cached = text_from_evidence_cache(ticker_dir, path)
+        if cached:
+            return cached
     if suffix in (".txt", ".md", ".html"):
         return path.read_text(encoding="utf-8", errors="ignore")
     if suffix == ".pdf":
@@ -110,7 +130,7 @@ def build_ticker(ticker: str) -> int:
     ]
     for doc in docs:
         full = ticker_dir / doc["path"]
-        text = extract_text(full, doc["suffix"]) if full.is_file() else ""
+        text = extract_text(full, doc["suffix"], ticker_dir=ticker_dir) if full.is_file() else ""
         claims = extract_claims(text, doc["path"], doc["file_date"])
         all_claims.extend(claims)
         cache = evidence / "_text" / "mgmt"
