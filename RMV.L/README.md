@@ -1,7 +1,7 @@
 # Rightmove PLC (RMV.L)
 
 **Exchange:** London Stock Exchange (LSE)  
-**Market:** UK / EU template  
+**Market:** UK  
 **Sector:** Online UK residential property portal  
 **IR:** https://plc.rightmove.co.uk/
 
