@@ -31,6 +31,7 @@ Japan-based asset manager serving institutional investors (family offices, pensi
 python3 7176.T/_scripts/download_sfh_ir.py
 python3 _system/scripts/build_folder_indexes.py --ticker 7176.T
 python3 _system/scripts/build_filing_evidence.py 7176.T
+python3 _system/scripts/translate_jp_filings.py 7176.T   # English: research/evidence/_text_en/
 ```
 
 Feeds: `sfh/financial_results/feed.xml`, `sfh/ir_information/feed.xml`, `sfh/shareholders_meeting_notice/feed.xml`.
