@@ -9,7 +9,7 @@
 | **Archetype** (Stahl) | croupier |
 | **Moat** (Munger) | partial |
 | **Dhando** (Pabrai) | partial |
-| **Stance** | watch |
+| **Stance** | watch (non-executable tape; see skeptical equity report) |
 | **Cycle** | mid |
 | **Implied 7yr IRR** (base) | 53.33% (total synthesis) |
 | **IRR method** | full |

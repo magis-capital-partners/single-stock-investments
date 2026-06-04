@@ -1,7 +1,7 @@
 # Simplex Financial Holdings Co., Ltd. (7176.T)
 
-**Exchange:** Tokyo Stock Exchange (TSE Prime)  
-**Market:** Japan  
+**Exchange:** Tokyo Stock Exchange — **TOKYO PRO Market** (code 7176; not TSE Prime)  
+**Market:** Japan (specified / professional investors only for new buys)  
 **Sector:** Investment management, ETF listing and management, open innovation  
 **IR (live PDFs):** https://www.simplexasset.com/sfh/ (frames entry: https://www.simplex-f-holdings.com/)
 
