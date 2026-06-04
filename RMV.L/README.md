@@ -1,3 +1,3 @@
 # Rightmove PLC (RMV.L)
 
-**Market:** EU/SE
+**Ticker:** RMV.L | **Exchange:** LSE | **Market:** UK

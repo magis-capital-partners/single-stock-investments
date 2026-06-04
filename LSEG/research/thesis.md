@@ -33,5 +33,5 @@ Global data/index/clearing croupier with 50%+ margins and strong cash conversion
 
 ## [HUMAN REVIEW]
 
-- Registry lists market as US; LSEG is LSE-listed (LSEG:LON).
+- Registry market: UK (LSE-listed, LSEG:LON).
 - First deep dive 2026-06-01; no approved stance override.

@@ -21,6 +21,7 @@ from portfolio_registry import (
     ROOT,
     build_download_block,
     infer_download_type,
+    infer_market_from_ticker,
     load_registry,
     save_registry,
 )
@@ -226,6 +227,15 @@ def run_download(ticker: str, download: dict) -> tuple[bool, str]:
             encoding="utf-8",
         )
         return True, "jp_archive placeholder"
+    if dtype in {"uk_ir", "au_asx"}:
+        inv = ROOT / ticker / "investor-documents"
+        if inv.is_dir():
+            scripts = sorted(inv.glob("download_*_investor_docs.py"))
+            if scripts:
+                code = run_cmd([PY, str(scripts[0])], f"{ticker} ({dtype})")
+                return code == 0, f"{dtype} dedicated exit {code}"
+        log(f"{dtype}: no dedicated download script — IR harvest pending")
+        return True, f"{dtype} skipped (no script)"
     return False, f"unknown download type {dtype}"
 
 
@@ -270,6 +280,10 @@ def onboard(args: argparse.Namespace) -> int:
     ticker = args.ticker.strip().upper() if args.market != "JP" else args.ticker.strip()
     company = args.company.strip()
     market = args.market.strip().upper()
+    inferred = infer_market_from_ticker(ticker)
+    if inferred and market == "US" and inferred != "US":
+        log(f"Market inferred from ticker suffix: {inferred} (override --market US to keep US)")
+        market = inferred
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
     reg = load_registry()
@@ -379,7 +393,11 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Onboard a new portfolio ticker")
     parser.add_argument("--ticker", required=True)
     parser.add_argument("--company", required=True)
-    parser.add_argument("--market", default="US", choices=["US", "JP", "CA", "SE", "EU", "OTC"])
+    parser.add_argument(
+        "--market",
+        default="US",
+        choices=["US", "JP", "CA", "SE", "EU", "UK", "AU", "OTC"],
+    )
     parser.add_argument("--cik", default=None)
     parser.add_argument("--ir-url", default=None, help="One or more IR root URLs")
     parser.add_argument("--notes", default="", help="Watchlist notes")
