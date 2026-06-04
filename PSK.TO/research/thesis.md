@@ -15,7 +15,7 @@
 | **IRR method** | full |
 | **Lawrence bucket** | pricing_power |
 | **Payoff lens** | operating |
-| **MOI bucket** | pending |
+| **MOI bucket** | operating |
 
 **Deep dive:** `PSK.TO/research/deep_dive_2026-06-03.md` (auto-sync)
 

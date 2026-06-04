@@ -46,7 +46,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-06-04.
 | PSK.TO | PSK.TO/ | PrairieSky Royalty Ltd. | CA | 2026-06-03 | 2026-06-03 | optionality | watch |
 | QDEL | QDEL/ | QuidelOrtho | US | 2026-06-02 | 2026-06-03 | turnaround | hold |
 | RGLD | RGLD/ | Royal Gold Inc. | US | 2026-06-03 | 2026-06-03 | unknown | watch |
-| RMV.L | RMV.L/ | Rightmove PLC | UK | — | 2026-06-04 | unknown | watch |
+| RMV.L | RMV.L/ | Rightmove PLC | UK | LSE | 2026-06-04 | platform | watch |
 | RPRX | RPRX/ | Royalty Pharma plc | US | 2026-06-03 | 2026-06-04 | unknown | watch |
 | SBR | SBR/ | Sabine Royalty Trust | US | 2026-06-03 | 2026-06-04 | unknown | watch |
 | SJT | SJT/ | San Juan Basin Royalty Trust | US | 2026-06-02 | 2026-06-04 | optionality | watch |
