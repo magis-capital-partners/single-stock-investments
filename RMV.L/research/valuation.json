@@ -1,0 +1,169 @@
+{
+  "ticker": "RMV.L",
+  "as_of": "2026-06-04",
+  "method": "full",
+  "lawrence_bucket": "multi_sided",
+  "classification_inputs": {
+    "archetype": "platform",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 4.434,
+    "price_source": "LSE/Stooq RMV.UK close 2026-06-04 (443.4 pence)",
+    "fcf_per_share": 0.3988,
+    "fcf_source": "FY2025 cash generated from operating activities \u00a3308.0m \u00f7 772.38m weighted average shares; capex ~\u00a34m (low capital intensity per AR 2025)",
+    "shares_millions": 772.38,
+    "normalization_note": "FY2025 operating cash as owner-cash proxy; FY2026 guides underlying operating profit +3-5% with heavier innovation spend \u2014 not fully haircut in base FCF\u2080"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 16,
+      "notes": "UK transaction slump, ARPA pressure, margin compression from investment persists"
+    },
+    "base": {
+      "growth_y1_5": 0.07,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 20,
+      "notes": "Revenue +8-10% guide; buybacks shrink share count ~2%/yr; exit ~20\u00d7 vs ~11\u00d7 spot on FY25 cash/share"
+    },
+    "bull": {
+      "growth_y1_5": 0.09,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 24,
+      "notes": "Strategic areas (Commercial, Mortgages, Rentals) sustain 20-30% growth; AI products lift ARPA"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 4,
+      "question": "Backlog / embedded product option in revenue path?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Commercial Property, Mortgages, Rental Services +25% YoY; AI product uptake in FY25 RNS \u2014 growth in core ARPA path, not separate terminal"
+    },
+    {
+      "q": 0,
+      "question": "Material options after scan?",
+      "answer": "No separate NAV/options",
+      "treatment": "n/a",
+      "evidence": "Asset-light portal; no hidden land/NAV; strategic bets modeled via segment revenue growth"
+    }
+  ],
+  "stance_proposal": {
+    "suggested": "accumulate",
+    "irr_band": ">20%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "human_review": {
+    "notes": "First filing-grounded dive; confirm live LSE price and FY26 investment-year FCF normalization with human."
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 16.3
+    },
+    "base": {
+      "return_pct": 23.3
+    },
+    "bull": {
+      "return_pct": 27.9
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 16.3
+    },
+    "base": {
+      "return_pct": 23.3
+    },
+    "bull": {
+      "return_pct": 27.9
+    }
+  },
+  "implied_return": {
+    "base_pct": 24.29,
+    "label": "7yr IRR (total synthesis)",
+    "display": "24.29% (total synthesis)",
+    "lawrence_stance_gate_pct": 23.3,
+    "falsifier_adjusted_pct": 23.3,
+    "synthesis_pct": 24.29
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": 16.3,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 27.9,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 24.49,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 24.29,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}
