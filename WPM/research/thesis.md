@@ -21,15 +21,14 @@
 
 ## One-line thesis
 
-Precious-metals streamer with record FY2025 cash generation; at ~$125 the base return is below our accumulate bar — **watch** until mid-cycle owner cash or price offers ~15% annual return.
+Wheaton Precious Metals Corp. — thesis pending Marvin deep dive.
 
 ## Key questions
 
-- [x] FY2025 results (EX-99.1)
-- [ ] Full AIF / annual report PDF in folder
-- [ ] Antamina ramp and counterparty concentration
+- [ ] Read latest annual report
+- [ ] Read latest quarterly report
+- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
 
 ## [HUMAN REVIEW]
 
-- Confirm normalized owner cash ($3.00 vs $4.197 filing peak).
-- Add annual report PDF for mine-level detail.
+- Onboarded 2026-06-03; awaiting deep dive.

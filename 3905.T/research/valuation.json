@@ -48,12 +48,12 @@
     }
   },
   "implied_return": {
-    "base_pct": 6.46,
+    "base_pct": 4.56,
     "label": "7yr IRR (total synthesis)",
-    "display": "6.46% (total synthesis)",
+    "display": "4.56% (total synthesis)",
+    "lawrence_stance_gate_pct": 3.6,
     "falsifier_adjusted_pct": 3.6,
-    "synthesis_pct": 6.46,
-    "lawrence_stance_gate_pct": 3.6
+    "synthesis_pct": 4.56
   },
   "stance_proposal": {
     "suggested": "watch",
@@ -92,7 +92,7 @@
         "id": "scenario_bear",
         "label": "Bear scenario (Lawrence)",
         "source": "scenarios.bear",
-        "return_pct": -7.1,
+        "return_pct": -12.6,
         "weight": 0.05,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
@@ -106,7 +106,7 @@
         "id": "scenario_bull",
         "label": "Bull scenario (Lawrence)",
         "source": "scenarios.bull",
-        "return_pct": 12.4,
+        "return_pct": 12.0,
         "weight": 0.12,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
@@ -119,15 +119,19 @@
     ],
     "qualitative_adjustments": [
       {
+        "id": "no_predictive_attribute",
         "factor": "No dated predictive attribute at spot",
         "pp": -0.2,
         "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
-        "sources": "HK predictive attributes framework"
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
       }
     ],
-    "numeric_weighted_pct": 6.66,
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 4.76,
     "qualitative_pp": -0.2,
-    "total_synthesis_pct": 6.46,
+    "total_synthesis_pct": 4.56,
     "human_approval": "pending",
     "weight_audit": {
       "flags": [],
@@ -136,6 +140,15 @@
         "falsifiable": true,
         "not_instrumentalist": true,
         "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
       }
     },
     "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"

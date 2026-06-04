@@ -316,12 +316,12 @@
     }
   },
   "implied_return": {
-    "base_pct": 0.61,
+    "base_pct": -0.5,
     "label": "7yr IRR (total synthesis)",
-    "display": "0.61% (total synthesis)",
+    "display": "-0.5% (total synthesis)",
+    "lawrence_stance_gate_pct": -0.9,
     "falsifier_adjusted_pct": -0.9,
-    "synthesis_pct": 0.61,
-    "lawrence_stance_gate_pct": -0.9
+    "synthesis_pct": -0.5
   },
   "overlay_results": [],
   "synthesis": {
@@ -331,7 +331,7 @@
         "id": "theory_implied",
         "label": "Segment-derived growth (pre-falsifier)",
         "source": "segment_build weighted blend",
-        "return_pct": 0.9,
+        "return_pct": -1.8,
         "weight": 0.08,
         "type": "numeric",
         "epistemic_tier": "B (pre-falsifier derivation)",
@@ -371,7 +371,7 @@
       },
       {
         "id": "nav_overlay_payoff",
-        "label": "NAV overlay dated payoff (10yr to overlay base)",
+        "label": "NAV overlay dated payoff (7yr to overlay base)",
         "source": "nav_overlay ~$68.0/sh vs price $73.19",
         "return_pct": -1.05,
         "weight": 0.1,
@@ -385,17 +385,12 @@
         "hard_to_vary": "yes: separate theory type"
       }
     ],
-    "qualitative_adjustments": [
-      {
-        "factor": "Partial dhando (HK hard-asset / hidden NAV)",
-        "pp": 0.5,
-        "rationale": "Third-party confirms asset quality not in GAAP book; not full floor at spot price",
-        "sources": "cross_check_HK; hk_scan; HK Q1 2025/2026"
-      }
-    ],
-    "numeric_weighted_pct": 0.11,
-    "qualitative_pp": 0.5,
-    "total_synthesis_pct": 0.61,
+    "qualitative_adjustments": [],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": -0.5,
+    "qualitative_pp": 0,
+    "total_synthesis_pct": -0.5,
     "human_approval": "pending",
     "weight_audit": {
       "flags": [
@@ -406,6 +401,15 @@
         "falsifiable": true,
         "not_instrumentalist": true,
         "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
       }
     },
     "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"

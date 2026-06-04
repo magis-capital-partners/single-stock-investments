@@ -21,4 +21,14 @@
 
 ## One-line thesis
 
-Cboe Global Markets: Stahl croupier on options/equities/data; **watch** at ~$285 (~13.4% synthesis IRR); entry ~$250–255 for ~15% base.
+Cboe Global Markets — thesis pending Marvin deep dive.
+
+## Key questions
+
+- [ ] Read latest annual report
+- [ ] Read latest quarterly report
+- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+
+## [HUMAN REVIEW]
+
+- Onboarded 2026-06-03; awaiting deep dive.

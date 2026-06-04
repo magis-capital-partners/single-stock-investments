@@ -15,7 +15,7 @@
 | **IRR method** | full |
 | **Lawrence bucket** | multi_sided |
 | **Payoff lens** | operating |
-| **MOI bucket** | pending |
+| **MOI bucket** | operating |
 
 **Deep dive:** `RMV.L/research/deep_dive_2026-06-04.md` (auto-sync)
 

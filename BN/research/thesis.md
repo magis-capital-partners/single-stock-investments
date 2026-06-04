@@ -11,7 +11,7 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | - |
-| **Implied 7yr IRR** (base) | 13.15% (total synthesis) |
+| **Implied 7yr IRR** (base) | 12.71% (total synthesis) |
 | **IRR method** | full |
 | **Lawrence bucket** | multi_sided |
 | **Payoff lens** | pending |
@@ -43,4 +43,4 @@ Global alternative-asset compounder earning durable fee streams on $614B fee-bea
 - Confirm DE yield vs 5-year range before sizing.
 - Model BN+BNT merger impact.
 
-**Deep dive:** `BN/research/deep_dive_2026-06-02.md` (auto-sync)
+**Deep dive:** `BN/research/deep_dive_2026-06-04.md` (auto-sync)

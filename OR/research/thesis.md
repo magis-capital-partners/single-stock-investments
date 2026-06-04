@@ -21,15 +21,14 @@
 
 ## One-line thesis
 
-High-margin precious metals royalty company (OR Royalties) with ~81k GEOs today, filing-guided path to 120–135k GEOs by 2030, ~6% dividend yield, and **watch** stance at **5.98%** synthesis return (~$35.31).
+Osisko Gold Royalties Ltd — thesis pending Marvin deep dive.
 
 ## Key questions
 
-- [x] Read latest annual report (FY2025 40-F exhibits)
-- [ ] Monitor 2026 GEO guidance (80–90k) vs actual deliveries
-- [ ] Track Namdini and Gold Fields portfolio close economics
+- [ ] Read latest annual report
+- [ ] Read latest quarterly report
+- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
 
 ## [HUMAN REVIEW]
 
-- CIK corrected to 1627272 during onboard refresh; download script should auto-fetch 40-F exhibits.
-- 2030 GEO outlook probability weights need human sense-check.
+- Onboarded 2026-06-03; awaiting deep dive.

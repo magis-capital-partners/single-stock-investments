@@ -21,7 +21,7 @@
 
 ## One-line thesis
 
-Diversified pharma royalty aggregator; watch at ~$55 (~-0.9% Lawrence base, 7yr) until price or distributable cash improves.
+Royalty Pharma plc — thesis pending Marvin deep dive.
 
 ## Key questions
 

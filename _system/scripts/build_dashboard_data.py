@@ -13,6 +13,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 from dated_md import dated_md_label, dated_md_sort_key, latest_dated_md  # noqa: E402
+from market_order import sort_market_filters, sort_markets  # noqa: E402
 from valuation_synthesis import website_implied_irr  # noqa: E402
 
 DATA_DIR = ROOT / "dashboard" / "data"
@@ -632,7 +633,8 @@ def build() -> dict:
             "with_readme": with_readme,
             "with_research": with_research,
             "avg_completeness": avg_complete,
-            "markets": sorted({r["market"] for r in rows}),
+            "markets": sort_markets({r["market"] for r in rows}),
+            "market_filters": sort_market_filters({r["market"] for r in rows}),
             "github_repo": GITHUB_REPO,
             "onboard_workflow": ONBOARD_WORKFLOW,
             "onboard_dispatch_event": "onboard-ticker",

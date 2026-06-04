@@ -11,13 +11,13 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | mid |
-| **Implied 7yr IRR** (base) | 9.06% (total synthesis) |
+| **Implied 7yr IRR** (base) | 8.0% (base) |
 | **IRR method** | yield_curve |
 | **Lawrence bucket** | other |
 | **Payoff lens** | asset |
 | **MOI bucket** | pending |
 
-**Deep dive:** `DRR.AX/research/deep_dive_2026-06-02.md` (auto-sync)
+**Deep dive:** `DRR.AX/research/deep_dive_2026-06-04.md` (auto-sync)
 
 ## One-line thesis
 
@@ -27,7 +27,7 @@ MAC-anchored ASX royalty at ~5% yield with Thacker Pass lithium option; **8.0%**
 
 - [x] Read latest half-year and FY25 results presentations
 - [ ] Harvest FY2025 annual report PDF and March 2026 portfolio update
-- [x] ASX market tag in registry (AU)
+- [ ] Confirm ASX market tag in registry (currently US)
 
 ## [HUMAN REVIEW]
 

@@ -24,14 +24,84 @@ DEFAULT_SYMBOLS = {
     "copper": {"stooq": "hg.f", "cents_if_close_gt": 50},
 }
 
+# Explicit registry: only tickers that use copper / Copperwood royalty math.
 TICKER_SYMBOLS: dict[str, list[str]] = {
     "KEWL": ["copper"],
     "MSB": ["copper"],
 }
 
+COPPER_INPUT_KEYS = (
+    "copper_spot_usd_per_lb",
+    "copper_spot_as_of",
+    "copper_spot_source",
+    "copperwood_royalty_est_usd",
+    "copperwood_royalty_est_usd_ssi_ref",
+    "copperwood_royalty_est_usd_at_spot",
+    "copperwood_royalty_note",
+)
+
+
+def commodities_for_ticker(ticker: str, val: dict | None = None) -> list[str]:
+    """Return commodity ids to merge into valuation.json for this ticker."""
+    t = ticker.upper()
+    if t in TICKER_SYMBOLS:
+        return list(TICKER_SYMBOLS[t])
+    if val and ticker_needs_commodity_inputs(val):
+        er = val.get("evidence_refresh") or {}
+        return [str(er.get("commodity") or "copper")]
+    return []
+
+
+def strip_copper_from_valuation(val: dict) -> bool:
+    """Remove erroneous copper / Copperwood fields from a valuation dict. Returns True if changed."""
+    changed = False
+    inputs = val.get("inputs")
+    if isinstance(inputs, dict):
+        for key in list(inputs):
+            if key in COPPER_INPUT_KEYS or "copper" in key.lower():
+                del inputs[key]
+                changed = True
+    mi = val.get("market_inputs")
+    if isinstance(mi, dict) and "copper" in mi:
+        del val["market_inputs"]
+        changed = True
+        val.pop("market_inputs_as_of", None)
+    gate = val.get("optionality_gate")
+    if isinstance(gate, dict) and "copperwood_option_yield_pct" in gate:
+        del gate["copperwood_option_yield_pct"]
+        changed = True
+    return changed
+
+
+COPPER_ONLY_MI_KEYS = frozenset({"copper", "scenario_grid"})
+
+
+def is_copper_only_market_inputs(mi: dict) -> bool:
+    """True when market_inputs block is only copper spot + scenario grid (pipeline leak)."""
+    if not mi:
+        return False
+    keys = set(mi.keys())
+    return keys <= COPPER_ONLY_MI_KEYS and "copper" in keys
+
+
+def strip_copper_market_inputs_file(ticker: str) -> bool:
+    """Delete market_inputs.json when it only held leaked copper data."""
+    path = ROOT / ticker / "research" / "market_inputs.json"
+    if not path.exists():
+        return False
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return False
+    mi = payload.get("market_inputs") or {}
+    if is_copper_only_market_inputs(mi):
+        path.unlink()
+        return True
+    return False
+
 
 def tickers_for_market_merge(explicit: list[str] | None = None) -> list[str]:
-    """Registry tickers that need commodity market_inputs merge."""
+    """Tickers that should receive commodity merge (not every holding with valuation.json)."""
     if explicit:
         return [t.upper() for t in explicit]
     out: set[str] = set(TICKER_SYMBOLS.keys())
@@ -45,11 +115,8 @@ def tickers_for_market_merge(explicit: list[str] | None = None) -> list[str]:
             val = json.loads(vp.read_text(encoding="utf-8"))
         except json.JSONDecodeError:
             continue
-        er = val.get("evidence_refresh") or {}
-        if er.get("type") == "commodity_nav":
+        if commodities_for_ticker(td.name, val):
             out.add(td.name.upper())
-            commodity = er.get("commodity", "copper")
-            TICKER_SYMBOLS.setdefault(td.name.upper(), [commodity])
     return sorted(out)
 
 
@@ -94,60 +161,24 @@ def royalty_at_price(base_usd: float, base_lb: float, spot_lb: float) -> float:
     return round(base_usd * (spot_lb / base_lb), 0)
 
 
-def _load_valuation(ticker: str) -> dict | None:
-    val_path = ROOT / ticker / "research" / "valuation.json"
-    if not val_path.exists():
-        return None
-    return json.loads(val_path.read_text(encoding="utf-8"))
-
-
-def commodity_ids_for_ticker(ticker: str, val: dict | None = None) -> list[str]:
-    """Commodities to merge for this ticker; empty for operating names without overlays."""
-    t = ticker.upper()
-    if t in TICKER_SYMBOLS:
-        return list(TICKER_SYMBOLS[t])
-    val = val if val is not None else _load_valuation(t)
-    if val is None:
-        return []
-    if not ticker_needs_commodity_inputs(val):
-        return []
-    er = val.get("evidence_refresh") or {}
-    return [str(er.get("commodity") or "copper")]
-
-
-COPPER_VALUATION_INPUT_KEYS = (
-    "copper_spot_usd_per_lb",
-    "copper_spot_as_of",
-    "copper_spot_source",
-    "copperwood_royalty_est_usd",
-    "copperwood_royalty_est_usd_ssi_ref",
-    "copperwood_royalty_est_usd_at_spot",
-    "copperwood_royalty_note",
-)
-
-
-def strip_commodity_pollution(val: dict) -> dict:
-    """Remove mistaken copper / copperwood keys from non-commodity valuations."""
-    inputs = val.get("inputs") or {}
-    for key in list(inputs):
-        if "copper" in key.lower():
-            inputs.pop(key, None)
-    for key in COPPER_VALUATION_INPUT_KEYS:
-        inputs.pop(key, None)
-    val["inputs"] = inputs
-    og = val.get("optionality_gate")
-    if isinstance(og, dict):
-        og.pop("copperwood_option_yield_pct", None)
-    val.pop("market_inputs", None)
-    val.pop("market_inputs_as_of", None)
-    return val
-
-
-def merge_ticker(ticker: str, fetched: dict[str, dict], *, val: dict | None = None) -> None:
+def merge_ticker(ticker: str, fetched: dict[str, dict], commodities: list[str]) -> None:
     research = ROOT / ticker / "research"
     research.mkdir(parents=True, exist_ok=True)
+    val_path = research / "valuation.json"
+
+    if not commodities:
+        if val_path.exists():
+            val = json.loads(val_path.read_text(encoding="utf-8"))
+            if strip_copper_from_valuation(val):
+                val_path.write_text(json.dumps(val, indent=2) + "\n", encoding="utf-8")
+                print(f"  stripped leaked copper from {ticker}/research/valuation.json")
+        if strip_copper_market_inputs_file(ticker):
+            print(f"  removed {ticker}/research/market_inputs.json (copper-only leak)")
+        return
+
     mi: dict = {}
-    for cid, row in fetched.items():
+    for cid in commodities:
+        row = fetched.get(cid) or {}
         if row.get("spot") is None:
             continue
         mi[cid] = {
@@ -159,25 +190,11 @@ def merge_ticker(ticker: str, fetched: dict[str, dict], *, val: dict | None = No
         }
         if cid == "copper":
             mi["scenario_grid"] = scenario_grid(row["spot"])
-    if not mi:
-        payload = {
-            "ticker": ticker,
-            "as_of": TODAY,
-            "market_inputs": {},
-            "note": "No commodity overlay for this ticker",
-            "staleness_max_days": 7,
-        }
-    else:
-        payload = {"ticker": ticker, "as_of": TODAY, "market_inputs": mi, "staleness_max_days": 7}
+    payload = {"ticker": ticker, "as_of": TODAY, "market_inputs": mi, "staleness_max_days": 7}
     (research / "market_inputs.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
-    val_path = research / "valuation.json"
     if not val_path.exists():
         return
-    val = val if val is not None else json.loads(val_path.read_text(encoding="utf-8"))
-    if not mi:
-        val = strip_commodity_pollution(val)
-        val_path.write_text(json.dumps(val, indent=2), encoding="utf-8")
-        return
+    val = json.loads(val_path.read_text(encoding="utf-8"))
     val["market_inputs"] = mi
     val["market_inputs_as_of"] = TODAY
     inputs = val.setdefault("inputs", {})
@@ -196,22 +213,103 @@ def merge_ticker(ticker: str, fetched: dict[str, dict], *, val: dict | None = No
                 f"SSI ~${ssi_royalty/1e6:.1f}M/yr @ ${ssi_ref}/lb scaled linearly to spot ${spot}/lb [Assumption]"
             )
             sh = inputs.get("shares_outstanding")
+            if not sh and inputs.get("shares_millions"):
+                sh = float(inputs["shares_millions"]) * 1_000_000
             price = inputs.get("price")
-            if royalty_base is not None and price and sh:
+            if price and sh:
                 mcap = float(price) * float(sh)
                 if mcap > 0:
                     roy_spot = inputs["copperwood_royalty_est_usd_at_spot"]
                     val.setdefault("optionality_gate", {})["copperwood_option_yield_pct"] = round(
                         100.0 * roy_spot / mcap, 2
                     )
-    val_path.write_text(json.dumps(val, indent=2), encoding="utf-8")
+    val_path.write_text(json.dumps(val, indent=2) + "\n", encoding="utf-8")
+
+
+def strip_copper_from_history_snapshot(val: dict) -> bool:
+    """Strip leaked copper fields from a valuation_history snapshot dict."""
+    return strip_copper_from_valuation(val)
+
+
+def strip_all_leaks() -> list[str]:
+    """Scan portfolio files and strip copper where ticker is not commodity-nav eligible."""
+    cleaned: list[str] = []
+
+    def note(ticker: str, suffix: str = "") -> None:
+        label = f"{ticker}{suffix}"
+        if label not in cleaned:
+            cleaned.append(label)
+
+    for vp in sorted(ROOT.glob("*/research/valuation.json")):
+        ticker = vp.parts[-3]
+        try:
+            val = json.loads(vp.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            continue
+        if commodities_for_ticker(ticker, val):
+            continue
+        has_copper = any(k in (val.get("inputs") or {}) for k in COPPER_INPUT_KEYS) or any(
+            "copper" in k.lower() for k in (val.get("inputs") or {})
+        ) or (val.get("market_inputs") or {}).get("copper") or (
+            (val.get("optionality_gate") or {}).get("copperwood_option_yield_pct") is not None
+        )
+        if has_copper and strip_copper_from_valuation(val):
+            vp.write_text(json.dumps(val, indent=2) + "\n", encoding="utf-8")
+            note(ticker)
+        if strip_copper_market_inputs_file(ticker):
+            note(ticker, " (market_inputs.json)")
+
+    for hp in sorted(ROOT.glob("*/research/valuation_history/valuation_*.json")):
+        ticker = hp.parts[-4]
+        try:
+            snap = json.loads(hp.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            continue
+        if commodities_for_ticker(ticker, snap):
+            continue
+        has_copper = any(k in (snap.get("inputs") or {}) for k in COPPER_INPUT_KEYS) or any(
+            "copper" in k.lower() for k in (snap.get("inputs") or {})
+        ) or (snap.get("market_inputs") or {}).get("copper") or (
+            (snap.get("optionality_gate") or {}).get("copperwood_option_yield_pct") is not None
+        )
+        if has_copper and strip_copper_from_history_snapshot(snap):
+            hp.write_text(json.dumps(snap, indent=2) + "\n", encoding="utf-8")
+            note(ticker, f" ({hp.name})")
+
+    for mp in sorted(ROOT.glob("*/research/market_inputs.json")):
+        ticker = mp.parts[-3]
+        val = None
+        vp = ROOT / ticker / "research" / "valuation.json"
+        if vp.exists():
+            try:
+                val = json.loads(vp.read_text(encoding="utf-8"))
+            except json.JSONDecodeError:
+                pass
+        if commodities_for_ticker(ticker, val):
+            continue
+        if strip_copper_market_inputs_file(ticker):
+            note(ticker, " (market_inputs.json)")
+
+    return cleaned
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("tickers", nargs="*", help="Tickers to merge into valuation.json")
     parser.add_argument("--merge", action="store_true")
+    parser.add_argument(
+        "--strip-leaks",
+        action="store_true",
+        help="Remove copper/Copperwood fields from tickers that are not commodity-nav eligible",
+    )
     args = parser.parse_args()
+
+    if args.strip_leaks:
+        cleaned = strip_all_leaks()
+        for t in cleaned:
+            print(f"stripped: {t}")
+        print(f"Done. {len(cleaned)} ticker(s) cleaned.")
+        return 0
 
     COMMODITY_DIR.mkdir(parents=True, exist_ok=True)
     fetched: dict[str, dict] = {}
@@ -245,14 +343,17 @@ def main() -> int:
     else:
         tickers = []
     for t in tickers:
-        val = _load_valuation(t)
-        cids = commodity_ids_for_ticker(t, val)
-        subset = {k: v for k, v in fetched.items() if k in cids}
-        merge_ticker(t, subset, val=val)
-        if subset:
-            print(f"OK merged {t} commodities={list(subset)}")
+        val = None
+        vp = ROOT / t / "research" / "valuation.json"
+        if vp.exists():
+            val = json.loads(vp.read_text(encoding="utf-8"))
+        commodities = commodities_for_ticker(t, val)
+        subset = {k: v for k, v in fetched.items() if k in commodities}
+        merge_ticker(t, subset, commodities)
+        if commodities:
+            print(f"OK merged {t} ({','.join(commodities)})")
         else:
-            print(f"OK cleared commodity inputs for {t} (not applicable)")
+            print(f"OK skipped commodity merge for {t} (not eligible)")
 
     return 0 if ok else 1
 

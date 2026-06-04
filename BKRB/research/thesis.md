@@ -21,14 +21,14 @@
 
 ## One-line thesis
 
-Berkshire Hathaway Class B (BRK.B): fortress float and operating conglomerate at ~0.91x book, but ~6% Lawrence return on FY2025 operating earnings at $475 — **watch** until cheaper or faster capital deployment.
+Berkshire Hathaway Inc. (Class B) — thesis pending Marvin deep dive.
 
 ## Key questions
 
-- [x] Read latest 10-K and earnings release (operating vs GAAP)
-- [ ] Track 2026 buyback pace and cash pile deployment
-- [ ] Revisit if operating earnings per B share re-accelerates above $22
+- [ ] Read latest annual report
+- [ ] Read latest quarterly report
+- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
 
 ## [HUMAN REVIEW]
 
-- Folder symbol **BKRB** vs NYSE **BRK.B** — confirm dashboard price feed mapping.
+- Onboarded 2026-06-03; awaiting deep dive.

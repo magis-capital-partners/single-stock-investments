@@ -21,15 +21,14 @@
 
 ## One-line thesis
 
-Franco-Nevada: zero-debt gold royalty compounder at a quality premium; **4.5%** base owner-cash return at **$229** — watch for better entry or Cobre Panamá / commodity upside in overlay.
+Franco-Nevada Corporation — thesis pending Marvin deep dive.
 
 ## Key questions
 
-- [x] Read FY2025 annual report and Q1 2026 news release
-- [ ] Add SEC EDGAR filings to folder
-- [ ] Human review Cobre Panamá overlay assumptions
+- [ ] Read latest annual report
+- [ ] Read latest quarterly report
+- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
 
 ## [HUMAN REVIEW]
 
-- Deep dive: `FNV/research/deep_dive_2026-06-03.md`
-- Lawrence stance gate **4.5%**; synthesis **6.12%** pending approval
+- Onboarded 2026-06-03; awaiting deep dive.

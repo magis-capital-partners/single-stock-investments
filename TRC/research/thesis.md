@@ -21,16 +21,14 @@
 
 ## One-line thesis
 
-**~270,000** California acres and entitlements (Centennial, Grapevine, TRCC) at **~$18.84** near GAAP book; base **5.8%** per year on 7-year dated NAV payoff — **watch** until IRR or catalyst tightens.
+Tejon Ranch Co. — thesis pending Marvin deep dive.
 
 ## Key questions
 
-- [x] Read latest annual report (10-K FY2025)
-- [x] Read latest quarterly report (10-Q Q1 2026)
-- [ ] Per-acre NAV comps and developable acreage (human)
-- [ ] Centennial / Grapevine litigation and timing
+- [ ] Read latest annual report
+- [ ] Read latest quarterly report
+- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
 
 ## [HUMAN REVIEW]
 
-- Deep dive `TRC/research/deep_dive_2026-06-03.md`
-- CIK fix **96869** applied 2026-06-03 (onboard had **96835**)
+- Onboarded 2026-06-03; awaiting deep dive.

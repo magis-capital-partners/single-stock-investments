@@ -21,7 +21,7 @@
 
 ## One-line thesis
 
-Strategy Inc. (MSTR): levered bitcoin treasury plus ~$463M analytics software; **762k BTC** at Q1 2026; base **4.2%**/yr look-through at ~$390; **watch** (software cash cannot justify price alone).
+MicroStrategy Incorporated — thesis pending Marvin deep dive.
 
 ## Key questions
 

@@ -96,6 +96,7 @@
     font-family: 'JetBrains Mono', monospace; font-size: 13px;
   }
   .search:focus { outline: none; border-color: var(--accent-blue); }
+  .market-filter-group { display: inline-flex; flex-wrap: wrap; gap: 8px; align-items: center; }
   .filter-btn {
     padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600;
     border: 1px solid var(--border); background: var(--bg-card);
@@ -329,10 +330,7 @@
   <div class="holdings-view" id="holdings-view">
   <div class="toolbar">
     <input class="search" id="search" placeholder="Search ticker or company…" />
-    <button class="filter-btn active" data-market="ALL">All</button>
-    <button class="filter-btn" data-market="US">US</button>
-    <button class="filter-btn" data-market="JP">JP</button>
-    <button class="filter-btn" data-market="CA">CA</button>
+    <span id="market-filter-group" class="market-filter-group"></span>
     <button class="filter-btn" data-filter="needs-work">Needs work</button>
   </div>
 
@@ -379,8 +377,9 @@
     <div class="form-row"><label>Company</label><input id="ob-company" placeholder="San Juan Basin Royalty Trust" /></div>
     <div class="form-row"><label>Market</label>
       <select id="ob-market">
+        <option value="SE">SE</option><option value="AU">AU</option><option value="UK">UK</option>
         <option value="US">US</option><option value="JP">JP</option><option value="CA">CA</option>
-        <option value="SE">SE</option><option value="EU">EU</option><option value="OTC">OTC</option>
+        <option value="EU">EU</option><option value="IN">IN</option><option value="OTC">OTC</option>
       </select>
     </div>
     <div class="form-row"><label>CIK (US, optional)</label><input id="ob-cik" placeholder="Auto-lookup if blank" /></div>
@@ -419,7 +418,11 @@
 <script>
 const GH_REPO = 'GoldmanDrew/single-stock-investments';
 const DISPATCH_EVENT = 'onboard-ticker';
-const MARKET_BADGE = { US: 'badge-us', JP: 'badge-jp', SE: 'badge-se', CA: 'badge-jp' };
+const MARKET_BADGE = {
+  SE: 'badge-se', AU: 'badge-se', UK: 'badge-us', US: 'badge-us', JP: 'badge-jp',
+  CA: 'badge-jp', EU: 'badge-purple', IN: 'badge-warn', OTC: 'badge-warn',
+};
+const DEFAULT_MARKET_FILTERS = ['ALL', 'SE', 'AU', 'UK', 'US', 'JP', 'CA', 'EU', 'IN', 'OTC'];
 const ARCHETYPE_BADGE = {
   croupier: 'badge-purple',
   compounder: 'badge-ok',
@@ -534,6 +537,7 @@ async function load() {
   data = await res.json();
   document.getElementById('meta-updated').textContent =
     `Updated ${data.generated_at.replace('T', ' ').replace('Z', ' UTC')} · ${data.summary.ticker_count} tickers`;
+  renderMarketFilters();
   renderSummary();
   renderWatchlist();
   renderTable();
@@ -937,21 +941,34 @@ function selectTicker(ticker) {
     </div>`;
 }
 
+function renderMarketFilters() {
+  const group = document.getElementById('market-filter-group');
+  if (!group || !data) return;
+  const filters = data.summary.market_filters || DEFAULT_MARKET_FILTERS;
+  group.innerHTML = filters.map(m => {
+    const active = marketFilter === m && !needsWork ? ' active' : '';
+    return `<button type="button" class="filter-btn${active}" data-market="${m}">${m === 'ALL' ? 'All' : m}</button>`;
+  }).join('');
+}
+
+function onFilterClick(btn) {
+  document.querySelectorAll('#holdings-view .toolbar .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (btn.dataset.market) {
+    marketFilter = btn.dataset.market;
+    needsWork = false;
+  }
+  if (btn.dataset.filter === 'needs-work') {
+    needsWork = true;
+    marketFilter = 'ALL';
+  }
+  renderTable();
+}
+
 document.getElementById('search').addEventListener('input', renderTable);
-document.querySelectorAll('.filter-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    if (btn.dataset.market) {
-      marketFilter = btn.dataset.market;
-      needsWork = false;
-    }
-    if (btn.dataset.filter === 'needs-work') {
-      needsWork = true;
-      marketFilter = 'ALL';
-    }
-    renderTable();
-  });
+document.querySelector('#holdings-view .toolbar').addEventListener('click', (e) => {
+  const btn = e.target.closest('.filter-btn');
+  if (btn) onFilterClick(btn);
 });
 document.querySelectorAll('thead th').forEach(th => {
   th.addEventListener('click', () => {

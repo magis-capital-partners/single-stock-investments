@@ -21,15 +21,14 @@
 
 ## One-line thesis
 
-Passive Permian royalty trust trading ~2.5× SEC reserve floor; Waddell Ranch in excess cost; base yield-curve path **-15.4%** over seven years — **watch** for cost recovery or conversion catalyst, not a yield buy at **~$29**.
+Permian Basin Royalty Trust — thesis pending Marvin deep dive.
 
 ## Key questions
 
-- [x] Read FY2025 10-K and Q1 2026 trust report
-- [ ] Track Waddell excess-cost recovery vs oil price
-- [ ] Monitor SoftVest indenture-amendment / conversion path
+- [ ] Read latest annual report
+- [ ] Read latest quarterly report
+- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
 
 ## [HUMAN REVIEW]
 
-- Onboard CIK corrected 842518 → 319654 (2026-06-03).
-- Horizon Kinetics ~12.5% holder cited as context only (not approved third party).
+- Onboarded 2026-06-03; awaiting deep dive.

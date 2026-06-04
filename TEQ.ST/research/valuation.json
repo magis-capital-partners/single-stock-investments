@@ -49,12 +49,12 @@
     }
   },
   "implied_return": {
-    "base_pct": 17.03,
+    "base_pct": 18.14,
     "label": "7yr IRR (total synthesis)",
-    "display": "17.03% (total synthesis)",
+    "display": "18.14% (total synthesis)",
+    "lawrence_stance_gate_pct": 14.4,
     "falsifier_adjusted_pct": 14.4,
-    "synthesis_pct": 17.03,
-    "lawrence_stance_gate_pct": 14.4
+    "synthesis_pct": 18.14
   },
   "stance_proposal": {
     "suggested": "hold",
@@ -93,7 +93,7 @@
         "id": "scenario_bear",
         "label": "Bear scenario (Lawrence)",
         "source": "scenarios.bear",
-        "return_pct": 7.2,
+        "return_pct": 6.2,
         "weight": 0.05,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
@@ -107,7 +107,7 @@
         "id": "scenario_bull",
         "label": "Bull scenario (Lawrence)",
         "source": "scenarios.bull",
-        "return_pct": 18.9,
+        "return_pct": 21.1,
         "weight": 0.12,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
@@ -119,9 +119,9 @@
       },
       {
         "id": "third_party_context",
-        "label": "Third-party context (HK + Substacks inventory)",
+        "label": "Third-party approved (HK + Substacks + inventory)",
         "source": "source_inventory (14 sources); cross_check blend",
-        "return_pct": 18.9,
+        "return_pct": 21.1,
         "weight": 0.1,
         "type": "numeric",
         "notes": "Proxy: upside case when strategic third party has no spot IRR",
@@ -136,21 +136,19 @@
     ],
     "qualitative_adjustments": [
       {
-        "factor": "Partial dhando (HK hard-asset / hidden NAV)",
-        "pp": 0.5,
-        "rationale": "Third-party confirms asset quality not in GAAP book; not full floor at spot price",
-        "sources": "cross_check_HK; hk_scan; HK Q1 2025/2026"
-      },
-      {
+        "id": "no_predictive_attribute",
         "factor": "No dated predictive attribute at spot",
         "pp": -0.2,
         "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
-        "sources": "HK predictive attributes framework"
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
       }
     ],
-    "numeric_weighted_pct": 16.73,
-    "qualitative_pp": 0.3,
-    "total_synthesis_pct": 17.03,
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 18.34,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 18.14,
     "human_approval": "approved",
     "weight_audit": {
       "flags": [
@@ -161,6 +159,15 @@
         "falsifiable": true,
         "not_instrumentalist": false,
         "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
       }
     },
     "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"

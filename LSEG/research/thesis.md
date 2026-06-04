@@ -11,13 +11,13 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | mid |
-| **Implied 7yr IRR** (base) | 13.79% (total synthesis) |
+| **Implied 7yr IRR** (base) | 14.65% (total synthesis) |
 | **IRR method** | full |
 | **Lawrence bucket** | multi_sided |
 | **Payoff lens** | pending |
 | **MOI bucket** | pending |
 
-**Deep dive:** `LSEG/research/deep_dive_2026-06-02.md` (auto-sync)
+**Deep dive:** `LSEG/research/deep_dive_2026-06-04.md` (auto-sync)
 
 ## One-line thesis
 
@@ -33,5 +33,5 @@ Global data/index/clearing croupier with 50%+ margins and strong cash conversion
 
 ## [HUMAN REVIEW]
 
-- Registry market: UK (LSE-listed, LSEG:LON).
+- Registry lists market as US; LSEG is LSE-listed (LSEG:LON).
 - First deep dive 2026-06-01; no approved stance override.

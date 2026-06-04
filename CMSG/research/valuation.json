@@ -87,12 +87,12 @@
     }
   },
   "implied_return": {
-    "base_pct": 9.31,
+    "base_pct": 8.81,
     "label": "7yr IRR (total synthesis)",
-    "display": "9.31% (total synthesis)",
+    "display": "8.81% (total synthesis)",
+    "lawrence_stance_gate_pct": 7.5,
     "falsifier_adjusted_pct": 7.5,
-    "synthesis_pct": 9.31,
-    "lawrence_stance_gate_pct": 7.5
+    "synthesis_pct": 8.81
   },
   "stance_proposal": {
     "suggested": "watch",
@@ -206,21 +206,19 @@
     ],
     "qualitative_adjustments": [
       {
-        "factor": "Partial dhando (HK hard-asset / hidden NAV)",
-        "pp": 0.5,
-        "rationale": "Third-party confirms asset quality not in GAAP book; not full floor at spot price",
-        "sources": "cross_check_HK; hk_scan; HK Q1 2025/2026"
-      },
-      {
+        "id": "no_predictive_attribute",
         "factor": "No dated predictive attribute at spot",
         "pp": -0.2,
         "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
-        "sources": "HK predictive attributes framework"
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
       }
     ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
     "numeric_weighted_pct": 9.01,
-    "qualitative_pp": 0.3,
-    "total_synthesis_pct": 9.31,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 8.81,
     "human_approval": "approved",
     "weight_audit": {
       "flags": [],
@@ -229,6 +227,15 @@
         "falsifiable": true,
         "not_instrumentalist": true,
         "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
       }
     },
     "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"

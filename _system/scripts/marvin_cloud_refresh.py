@@ -98,6 +98,11 @@ def main() -> int:
         action="store_true",
         help="Fail on check_evidence_completeness; stricter Milly when evidence_refresh set",
     )
+    parser.add_argument(
+        "--strict-depth",
+        action="store_true",
+        help="Fail when lint_deep_dive_depth.py score < 18/24",
+    )
     args = parser.parse_args()
 
     ticker = args.ticker.upper()
@@ -204,6 +209,14 @@ def main() -> int:
         [PY, str(SCRIPTS / "lint_deep_dive.py"), ticker, "--milly"],
     )
     ok &= lint_ok
+    depth_args = [ticker]
+    if args.strict_depth or strict_evidence:
+        depth_args.append("--strict")
+    ok &= run(
+        "lint deep dive depth",
+        [PY, str(SCRIPTS / "lint_deep_dive_depth.py"), *depth_args],
+        optional=not (args.strict_depth or strict_evidence),
+    )
 
     if not args.skip_milly:
         ok &= run_milly(ticker, args.date, strict_evidence=strict_evidence)

@@ -472,11 +472,16 @@ def _default_paths(data: dict) -> list[dict]:
     gt = data.get("results_growth_theory") or {}
     ti = gt.get("theory_implied", {}).get("return_pct")
     if ti is not None and ti != fa:
+        has_segment = bool((data.get("segment_build") or {}).get("segments"))
         paths.append(
             {
                 "id": "theory_implied",
-                "label": "Segment-derived growth (pre-falsifier)",
-                "source": "segment_build weighted blend",
+                "label": "Segment-derived growth (pre-falsifier)"
+                if has_segment
+                else "Growth theory (pre-falsifier)",
+                "source": "segment_build weighted blend"
+                if has_segment
+                else "growth_explanation + filing revenue YoY",
                 "return_pct": ti,
                 "weight": 0.08,
                 "type": "numeric",
