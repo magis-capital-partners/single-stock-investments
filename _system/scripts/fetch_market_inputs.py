@@ -4,11 +4,17 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 import urllib.request
 from datetime import date, datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+SCRIPTS = Path(__file__).resolve().parent
+if str(SCRIPTS) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS))
+from marvin_pipeline_common import ticker_needs_commodity_inputs  # noqa: E402
+
 COMMODITY_DIR = ROOT / "_system" / "reference" / "market-data" / "commodities"
 UA = "MarvinResearch/1.0 (market-inputs)"
 STOOQ_URL = "https://stooq.com/q/l/?s={symbol}&f=sd2t2ohlcv&h&e=csv"
@@ -21,12 +27,14 @@ DEFAULT_SYMBOLS = {
 # Explicit registry: only tickers that use copper / Copperwood royalty math.
 TICKER_SYMBOLS: dict[str, list[str]] = {
     "KEWL": ["copper"],
+    "MSB": ["copper"],
 }
 
 COPPER_INPUT_KEYS = (
     "copper_spot_usd_per_lb",
     "copper_spot_as_of",
     "copper_spot_source",
+    "copperwood_royalty_est_usd",
     "copperwood_royalty_est_usd_ssi_ref",
     "copperwood_royalty_est_usd_at_spot",
     "copperwood_royalty_note",
@@ -38,13 +46,9 @@ def commodities_for_ticker(ticker: str, val: dict | None = None) -> list[str]:
     t = ticker.upper()
     if t in TICKER_SYMBOLS:
         return list(TICKER_SYMBOLS[t])
-    if val:
+    if val and ticker_needs_commodity_inputs(val):
         er = val.get("evidence_refresh") or {}
-        if er.get("type") == "commodity_nav":
-            return [er.get("commodity") or "copper"]
-        inp = val.get("inputs") or {}
-        if inp.get("copperwood_royalty_est_usd") and er.get("type") == "commodity_nav":
-            return ["copper"]
+        return [str(er.get("commodity") or "copper")]
     return []
 
 
@@ -53,16 +57,15 @@ def strip_copper_from_valuation(val: dict) -> bool:
     changed = False
     inputs = val.get("inputs")
     if isinstance(inputs, dict):
-        for key in COPPER_INPUT_KEYS:
-            if key in inputs:
+        for key in list(inputs):
+            if key in COPPER_INPUT_KEYS or "copper" in key.lower():
                 del inputs[key]
                 changed = True
     mi = val.get("market_inputs")
     if isinstance(mi, dict) and "copper" in mi:
         del val["market_inputs"]
         changed = True
-        if not val.get("market_inputs"):
-            val.pop("market_inputs_as_of", None)
+        val.pop("market_inputs_as_of", None)
     gate = val.get("optionality_gate")
     if isinstance(gate, dict) and "copperwood_option_yield_pct" in gate:
         del gate["copperwood_option_yield_pct"]
@@ -200,23 +203,26 @@ def merge_ticker(ticker: str, fetched: dict[str, dict], commodities: list[str]) 
         inputs["copper_spot_usd_per_lb"] = spot
         inputs["copper_spot_as_of"] = mi["copper"].get("as_of")
         inputs["copper_spot_source"] = mi["copper"].get("source")
-        ssi_ref = 4.0
-        ssi_royalty = inputs.get("copperwood_royalty_est_usd", 7_700_000)
-        inputs["copperwood_royalty_est_usd_ssi_ref"] = ssi_royalty
-        inputs["copperwood_royalty_est_usd_at_spot"] = royalty_at_price(float(ssi_royalty), ssi_ref, spot)
-        inputs["copperwood_royalty_note"] = (
-            f"SSI ~$7.7M/yr @ ${ssi_ref}/lb scaled linearly to spot ${spot}/lb [Assumption]"
-        )
-        sh = inputs.get("shares_outstanding") or inputs.get("shares_millions", 0) * 1_000_000
-        if not sh and inputs.get("shares_millions"):
-            sh = float(inputs["shares_millions"]) * 1_000_000
-        price = inputs.get("price", 55.0)
-        mcap = float(price) * float(sh) if sh else 0
-        roy_spot = inputs["copperwood_royalty_est_usd_at_spot"]
-        if mcap > 0:
-            val.setdefault("optionality_gate", {})["copperwood_option_yield_pct"] = round(
-                100.0 * roy_spot / mcap, 2
+        royalty_base = inputs.get("copperwood_royalty_est_usd")
+        if royalty_base is not None:
+            ssi_ref = 4.0
+            ssi_royalty = float(royalty_base)
+            inputs["copperwood_royalty_est_usd_ssi_ref"] = ssi_royalty
+            inputs["copperwood_royalty_est_usd_at_spot"] = royalty_at_price(ssi_royalty, ssi_ref, spot)
+            inputs["copperwood_royalty_note"] = (
+                f"SSI ~${ssi_royalty/1e6:.1f}M/yr @ ${ssi_ref}/lb scaled linearly to spot ${spot}/lb [Assumption]"
             )
+            sh = inputs.get("shares_outstanding")
+            if not sh and inputs.get("shares_millions"):
+                sh = float(inputs["shares_millions"]) * 1_000_000
+            price = inputs.get("price")
+            if price and sh:
+                mcap = float(price) * float(sh)
+                if mcap > 0:
+                    roy_spot = inputs["copperwood_royalty_est_usd_at_spot"]
+                    val.setdefault("optionality_gate", {})["copperwood_option_yield_pct"] = round(
+                        100.0 * roy_spot / mcap, 2
+                    )
     val_path.write_text(json.dumps(val, indent=2) + "\n", encoding="utf-8")
 
 
@@ -242,9 +248,9 @@ def strip_all_leaks() -> list[str]:
             continue
         if commodities_for_ticker(ticker, val):
             continue
-        has_copper = any(k in (val.get("inputs") or {}) for k in COPPER_INPUT_KEYS) or (
-            val.get("market_inputs") or {}
-        ).get("copper") or (
+        has_copper = any(k in (val.get("inputs") or {}) for k in COPPER_INPUT_KEYS) or any(
+            "copper" in k.lower() for k in (val.get("inputs") or {})
+        ) or (val.get("market_inputs") or {}).get("copper") or (
             (val.get("optionality_gate") or {}).get("copperwood_option_yield_pct") is not None
         )
         if has_copper and strip_copper_from_valuation(val):
@@ -261,16 +267,15 @@ def strip_all_leaks() -> list[str]:
             continue
         if commodities_for_ticker(ticker, snap):
             continue
-        has_copper = any(k in (snap.get("inputs") or {}) for k in COPPER_INPUT_KEYS) or (
-            snap.get("market_inputs") or {}
-        ).get("copper") or (
+        has_copper = any(k in (snap.get("inputs") or {}) for k in COPPER_INPUT_KEYS) or any(
+            "copper" in k.lower() for k in (snap.get("inputs") or {})
+        ) or (snap.get("market_inputs") or {}).get("copper") or (
             (snap.get("optionality_gate") or {}).get("copperwood_option_yield_pct") is not None
         )
         if has_copper and strip_copper_from_history_snapshot(snap):
             hp.write_text(json.dumps(snap, indent=2) + "\n", encoding="utf-8")
             note(ticker, f" ({hp.name})")
 
-    # Orphan market_inputs.json (valuation already clean)
     for mp in sorted(ROOT.glob("*/research/market_inputs.json")):
         ticker = mp.parts[-3]
         val = None

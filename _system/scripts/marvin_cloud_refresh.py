@@ -19,7 +19,11 @@ SCRIPTS = Path(__file__).resolve().parent
 PY = sys.executable
 
 sys.path.insert(0, str(SCRIPTS))
-from marvin_pipeline_common import has_evidence_refresh_config, latest_deep_dive_date  # noqa: E402
+from marvin_pipeline_common import (  # noqa: E402
+    has_evidence_refresh_config,
+    latest_deep_dive_date,
+    ticker_needs_commodity_inputs,
+)
 
 
 def run(label: str, cmd: list[str], *, optional: bool = False) -> bool:
@@ -48,8 +52,7 @@ def needs_evidence_gate(val: dict) -> bool:
         return True
     if val.get("valuation_mode") == "optionality" and val.get("nav_overlay"):
         return True
-    inp = val.get("inputs") or {}
-    return bool(inp.get("copperwood_royalty_est_usd") or inp.get("copper_spot_usd_per_lb"))
+    return ticker_needs_commodity_inputs(val)
 
 
 def run_milly(ticker: str, dive_date: str, *, strict_evidence: bool = False) -> bool:
@@ -158,7 +161,7 @@ def main() -> int:
     ok &= run(
         "market inputs",
         [PY, str(SCRIPTS / "fetch_market_inputs.py"), ticker, "--merge"],
-        optional=not has_evidence_refresh_config(val),
+        optional=not ticker_needs_commodity_inputs(val),
     )
     ok &= run(
         "HK extract refresh",

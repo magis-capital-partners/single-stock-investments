@@ -18,3 +18,15 @@ def latest_deep_dive_date(research_dir: Path) -> str | None:
 def has_evidence_refresh_config(val: dict) -> bool:
     er = val.get("evidence_refresh") or {}
     return bool(er.get("type"))
+
+
+def ticker_needs_commodity_inputs(val: dict) -> bool:
+    """True when valuation should merge commodity spot / royalty overlays (not all tickers)."""
+    inp = val.get("inputs") or {}
+    # Do not key off copper_spot_* alone — fetch_market_inputs may have injected it by mistake.
+    if inp.get("copperwood_royalty_est_usd"):
+        return True
+    er = val.get("evidence_refresh") or {}
+    if er.get("type") == "commodity_nav":
+        return True
+    return False
