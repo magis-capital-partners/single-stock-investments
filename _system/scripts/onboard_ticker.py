@@ -15,6 +15,7 @@ SCRIPTS_DIR = Path(__file__).resolve().parent
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
+from market_order import MARKET_CHOICES
 from portfolio_registry import (
     DEFAULT_CLASSIFICATION,
     EXCHANGE_META,
@@ -466,7 +467,7 @@ def main() -> None:
     parser.add_argument(
         "--market",
         default="US",
-        choices=["US", "JP", "CA", "SE", "EU", "UK", "AU", "IN", "OTC"],
+        choices=list(MARKET_CHOICES),
     )
     parser.add_argument("--cik", default=None)
     parser.add_argument("--ir-url", default=None, help="One or more IR root URLs")

@@ -25,6 +25,8 @@ Follow `_system/frameworks/deep_dive_structure.md` (v2 layout):
 
 Do **not** use the legacy five-section-only template as the final shape — run `refresh_deep_dive_v2.py` after narrative work.
 
+**Refresh-only ≠ deep dive:** Phase 3 (`marvin_cloud_refresh.py`) syncs structure and IRR from `valuation.json`; it does **not** add filing-grounded narrative. Phase 2 must deliver FRMO/TPL-level depth (`_system/frameworks/deep_dive_quality_rubric.md`).
+
 ## Phase 1 — Evidence and sources (agent work)
 
 **Optional index:** `python _system/scripts/build_folder_indexes.py --ticker {{TICKER}}`
@@ -90,7 +92,7 @@ Fix any lint errors before finishing the PR.
 
 ## PR checklist
 
-- [ ] `deep_dive_{{date}}.md` passes `lint_deep_dive.py {{TICKER}}`
+- [ ] `deep_dive_{{date}}.md` passes `lint_deep_dive.py {{TICKER}}` and `lint_deep_dive_depth.py {{TICKER}}` (≥18/24)
 - [ ] `adversarial_{{date}}.md` present; dive header **Adversarial:** pass|blocked
 - [ ] `classification.json` + `thesis.md` synced
 - [ ] No secrets in commits

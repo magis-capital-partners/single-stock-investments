@@ -12,7 +12,7 @@ DATE ?= $(shell date +%Y-%m-%d)
 TICKER ?=
 DATE ?= $(shell date +%Y-%m-%d)
 
-.PHONY: research-check research-check-all evidence milly-repass book-estimate book-estimate-all holdco-uplift short-scan hk-scan hk-cross-check-all hk-extract-refresh third-party-scan-all cross-check-all transcript-sync batch-refresh evidence-check darwin-pit-check darwin-build darwin-pit-audit darwin-sync-external darwin-explore
+.PHONY: research-check research-check-all depth-check depth-audit evidence milly-repass book-estimate book-estimate-all holdco-uplift short-scan hk-scan hk-cross-check-all hk-extract-refresh third-party-scan-all cross-check-all transcript-sync batch-refresh evidence-check darwin-pit-check darwin-build darwin-pit-audit darwin-sync-external darwin-explore
 
 darwin-build:
 	$(PYTHON) $(SCRIPTS)/build_darwin_portfolio.py --fast --account all
@@ -49,6 +49,17 @@ research-check-all:
 	$(PYTHON) $(SCRIPTS)/batch_portfolio_refresh.py --date $(DATE) --strict-evidence
 	$(PYTHON) $(SCRIPTS)/lint_adversarial.py
 	@echo OK: portfolio research-check-all
+
+depth-check:
+ifndef TICKER
+	$(error Set TICKER=)
+endif
+	$(PYTHON) $(SCRIPTS)/lint_deep_dive_depth.py $(TICKER) --strict
+	@echo OK: $(TICKER) depth-check
+
+depth-audit:
+	$(PYTHON) $(SCRIPTS)/audit_deep_dive_depth.py --portfolio --date $(DATE)
+	@echo OK: depth-audit $(DATE)
 
 batch-refresh:
 	$(PYTHON) $(SCRIPTS)/batch_portfolio_refresh.py --date $(DATE) --strict-evidence
