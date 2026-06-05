@@ -1,9 +1,12 @@
 {
-  "built_at": "2026-06-05T15:44:06Z",
+  "built_at": "2026-06-05T15:47:32Z",
   "ticker_count": 1,
   "tickers": {
     "7176.T": {
       "model_ready": true,
+      "diagnostics_ready": true,
+      "production_spec": "v4",
+      "primary_kpi": "perf_fee_h2_positive.out_of_sample.r2",
       "model_type": "earnings_semiannual",
       "as_of": "2026-06-04",
       "company": "7176.T",
@@ -113,6 +116,1163 @@
           "n": 9
         }
       },
+      "oos_metrics_v2": {
+        "model_v2": {
+          "rmse_jpym": 3976.5,
+          "mape_pct": 30.3,
+          "directional_hit": 0.89,
+          "n": 9
+        }
+      },
+      "oos_metrics_v3a": {
+        "model_v3a": {
+          "rmse_jpym": 5407.4,
+          "mape_pct": 42.9,
+          "n": 9
+        }
+      },
+      "diagnostics": {
+        "as_of": "2026-06-05",
+        "production_spec": "v4",
+        "primary_kpi": "perf_fee_h2_positive.out_of_sample.r2",
+        "estimation_window": {
+          "start": "2020-H1",
+          "end": "2026-H2",
+          "n_halfyears": 12,
+          "excluded": "pre-2018 HK legacy"
+        },
+        "targets": {
+          "revenue_total": {
+            "in_sample": {
+              "r2": -0.6945,
+              "adj_r2": -1.3299,
+              "directional_hit": 0.08,
+              "theil_u": 0.972,
+              "n_params": 3,
+              "rmse_jpym": 5317.8,
+              "mae_jpym": 4278.6,
+              "mape_pct": 71.9,
+              "n": 12
+            },
+            "out_of_sample": {
+              "r2": -0.0116,
+              "adj_r2": -0.6186,
+              "directional_hit": 0.56,
+              "theil_u": 0.769,
+              "n_params": 3,
+              "rmse_jpym": 4336.2,
+              "mae_jpym": 2951.2,
+              "mape_pct": 32.6,
+              "n": 9
+            },
+            "overfit_gap": -0.6829,
+            "benchmarks_oos": {
+              "naive_lastyear": {
+                "rmse_jpym": 3230.1,
+                "r2": 0.4386,
+                "beats_model": true
+              },
+              "naive_randomwalk": {
+                "rmse_jpym": 5636.0,
+                "r2": -0.709,
+                "beats_model": false
+              }
+            }
+          },
+          "revenue_h2_only": {
+            "in_sample": {
+              "r2": -1.8766,
+              "adj_r2": -6.1915,
+              "directional_hit": 0.17,
+              "theil_u": 1.544,
+              "n_params": 3,
+              "rmse_jpym": 7008.7,
+              "mae_jpym": 6128.7,
+              "mape_pct": 75.9,
+              "n": 6
+            },
+            "out_of_sample": {
+              "r2": -0.555,
+              "adj_r2": -5.22,
+              "directional_hit": 0.8,
+              "theil_u": 0.85,
+              "n_params": 3,
+              "rmse_jpym": 5630.6,
+              "mae_jpym": 4218.0,
+              "mape_pct": 36.9,
+              "n": 5
+            },
+            "overfit_gap": -1.3216,
+            "benchmarks_oos": {
+              "naive_lastyear": {
+                "rmse_jpym": 4270.3,
+                "r2": 0.1056,
+                "beats_model": true
+              },
+              "naive_randomwalk": {
+                "rmse_jpym": 6627.9,
+                "r2": -1.1546,
+                "beats_model": false
+              }
+            }
+          },
+          "base_fee": {
+            "in_sample": {
+              "r2": 0.4525,
+              "adj_r2": 0.1788,
+              "directional_hit": 0.5,
+              "theil_u": 0.733,
+              "n_params": 1,
+              "rmse_jpym": 247.5,
+              "mae_jpym": 191.6,
+              "mape_pct": 5.2,
+              "n": 4
+            },
+            "out_of_sample": {
+              "r2": -2.143,
+              "adj_r2": null,
+              "directional_hit": 0.5,
+              "theil_u": 1.087,
+              "n_params": 1,
+              "rmse_jpym": 396.2,
+              "mae_jpym": 360.1,
+              "mape_pct": 8.9,
+              "n": 2
+            },
+            "overfit_gap": 2.5955,
+            "benchmarks_oos": {
+              "naive_lastyear": {
+                "rmse_jpym": 588.9,
+                "r2": -5.943,
+                "beats_model": false
+              },
+              "naive_randomwalk": {
+                "rmse_jpym": 364.6,
+                "r2": -1.6611,
+                "beats_model": true
+              }
+            }
+          },
+          "perf_fee": {
+            "in_sample": {
+              "r2": -0.1373,
+              "adj_r2": -0.8955,
+              "directional_hit": 0.17,
+              "theil_u": 0.678,
+              "n_params": 2,
+              "rmse_jpym": 4511.0,
+              "mae_jpym": 3037.8,
+              "mape_pct": 66.7,
+              "n": 6
+            },
+            "out_of_sample": {
+              "r2": -2.6317,
+              "adj_r2": null,
+              "directional_hit": 0.0,
+              "theil_u": 1.099,
+              "n_params": 2,
+              "rmse_jpym": 8473.7,
+              "mae_jpym": 7213.3,
+              "mape_pct": 100.0,
+              "n": 3
+            },
+            "overfit_gap": 2.4944,
+            "benchmarks_oos": {
+              "naive_lastyear": {
+                "rmse_jpym": 3075.3,
+                "r2": 0.5217,
+                "beats_model": true
+              },
+              "naive_randomwalk": {
+                "rmse_jpym": 7712.8,
+                "r2": -2.0088,
+                "beats_model": true
+              }
+            }
+          },
+          "perf_fee_h2_positive": {
+            "in_sample": {
+              "r2": -6.0755,
+              "adj_r2": null,
+              "directional_hit": 0.33,
+              "theil_u": 1.377,
+              "n_params": 2,
+              "rmse_jpym": 6251.4,
+              "mae_jpym": 5099.7,
+              "mape_pct": 66.7,
+              "n": 3
+            },
+            "out_of_sample": {
+              "r2": -14.2489,
+              "adj_r2": null,
+              "directional_hit": 0.0,
+              "theil_u": 1.202,
+              "n_params": 2,
+              "rmse_jpym": 10307.2,
+              "mae_jpym": 9963.5,
+              "mape_pct": 100.0,
+              "n": 2
+            },
+            "overfit_gap": 8.1734,
+            "benchmarks_oos": {
+              "naive_lastyear": {
+                "rmse_jpym": 3761.1,
+                "r2": -1.0304,
+                "beats_model": true
+              },
+              "naive_randomwalk": {
+                "rmse_jpym": 8572.6,
+                "r2": -9.5483,
+                "beats_model": true
+              }
+            }
+          },
+          "ordinary_profit": {
+            "in_sample": {
+              "r2": -0.4623,
+              "adj_r2": -0.7872,
+              "directional_hit": 0.08,
+              "theil_u": 1.115,
+              "n_params": 2,
+              "rmse_jpym": 2951.7,
+              "mae_jpym": 2473.9,
+              "mape_pct": 79.5,
+              "n": 12
+            },
+            "out_of_sample": {
+              "r2": -0.0992,
+              "adj_r2": -0.4656,
+              "directional_hit": 0.56,
+              "theil_u": 1.022,
+              "n_params": 2,
+              "rmse_jpym": 2738.0,
+              "mae_jpym": 2077.2,
+              "mape_pct": 44.6,
+              "n": 9
+            },
+            "overfit_gap": -0.3631,
+            "benchmarks_oos": {
+              "naive_lastyear": {
+                "rmse_jpym": 2400.6,
+                "r2": 0.1549,
+                "beats_model": true
+              },
+              "naive_randomwalk": {
+                "rmse_jpym": 2680.1,
+                "r2": -0.0532,
+                "beats_model": true
+              }
+            }
+          },
+          "net_income": {
+            "in_sample": {
+              "r2": -0.3361,
+              "adj_r2": -0.8372,
+              "directional_hit": 0.08,
+              "theil_u": 1.056,
+              "n_params": 3,
+              "rmse_jpym": 2210.4,
+              "mae_jpym": 1859.1,
+              "mape_pct": 79.9,
+              "n": 12
+            },
+            "out_of_sample": {
+              "r2": -0.0934,
+              "adj_r2": -0.7495,
+              "directional_hit": 0.56,
+              "theil_u": 0.994,
+              "n_params": 3,
+              "rmse_jpym": 2147.7,
+              "mae_jpym": 1590.0,
+              "mape_pct": 44.3,
+              "n": 9
+            },
+            "overfit_gap": -0.2427,
+            "benchmarks_oos": {
+              "naive_lastyear": {
+                "rmse_jpym": 1857.5,
+                "r2": 0.1821,
+                "beats_model": true
+              },
+              "naive_randomwalk": {
+                "rmse_jpym": 2160.8,
+                "r2": -0.1068,
+                "beats_model": false
+              }
+            }
+          }
+        },
+        "coefficients": {
+          "base_rate_ann": {
+            "point": 0.005558,
+            "p05": 0.005266,
+            "p50": 0.005558,
+            "p95": 0.005849,
+            "method": "block_bootstrap_fy",
+            "n_boot": 1000
+          },
+          "k_H1": {
+            "point": 0.00491,
+            "p05": 0.00491,
+            "p50": 0.00491,
+            "p95": 0.00491,
+            "method": "block_bootstrap_fy",
+            "n_boot": 748
+          },
+          "k_H2": {
+            "point": 0.063647,
+            "p05": 0.063647,
+            "p50": 0.063647,
+            "p95": 0.063647,
+            "method": "block_bootstrap_fy",
+            "n_boot": 748
+          },
+          "ord_slope": {
+            "point": 0.516676,
+            "p05": 0.329495,
+            "p50": 0.516676,
+            "p95": 0.530103,
+            "method": "block_bootstrap_fy",
+            "n_boot": 1000
+          },
+          "ord_intercept": {
+            "point": 1018.159188,
+            "p05": 847.215741,
+            "p50": 1018.159188,
+            "p95": 2046.414553,
+            "method": "block_bootstrap_fy",
+            "n_boot": 1000
+          },
+          "tax_rate": {
+            "point": 0.253262,
+            "p05": 0.251382,
+            "p50": 0.253262,
+            "p95": 0.255142,
+            "method": "block_bootstrap_fy",
+            "n_boot": 1000
+          }
+        },
+        "spec_leaderboard": [
+          {
+            "spec": "v1",
+            "revenue_oos_rmse": 4336.2,
+            "revenue_oos_r2": -0.0116,
+            "perf_fee_h2_oos_rmse": 10307.2,
+            "perf_fee_h2_oos_r2": -14.2489,
+            "production_default": false
+          },
+          {
+            "spec": "v2",
+            "revenue_oos_rmse": 3976.5,
+            "revenue_oos_r2": 0.1493,
+            "perf_fee_h2_oos_rmse": 44743.9,
+            "perf_fee_h2_oos_r2": -286.3584,
+            "production_default": false,
+            "note": "v2 worse on revenue OOS RMSE"
+          },
+          {
+            "spec": "v3a",
+            "revenue_oos_rmse": 5407.4,
+            "revenue_oos_r2": -0.5732,
+            "perf_fee_h2_oos_rmse": 11863.0,
+            "perf_fee_h2_oos_r2": -19.1998,
+            "production_default": false,
+            "note": "March Jan-Mar window on H2"
+          },
+          {
+            "spec": "v4",
+            "revenue_oos_rmse": 4832.7,
+            "revenue_oos_r2": -0.2565,
+            "perf_fee_h2_oos_rmse": 8713.5,
+            "perf_fee_h2_oos_r2": -9.8979,
+            "production_default": true,
+            "note": "P4 mandate NAV scrape"
+          }
+        ],
+        "residual_attribution": [
+          {
+            "label": "FY2024H2",
+            "target": "revenue_total",
+            "actual": 11162.3,
+            "fitted": 200.0,
+            "residual": -10962.3,
+            "perf_actual": 7975.0,
+            "perf_fitted": 0.0,
+            "note": "Strong March crystallization"
+          },
+          {
+            "label": "FY2026H2",
+            "target": "revenue_total",
+            "actual": 16934.5,
+            "fitted": 16567.0,
+            "residual": -367.5,
+            "perf_actual": 12603.0,
+            "perf_fitted": 12603.0,
+            "note": "PBR/value rally + perf spike"
+          },
+          {
+            "label": "FY2025H2",
+            "target": "revenue_total",
+            "actual": 10901.5,
+            "fitted": 3738.6,
+            "residual": -7162.9,
+            "perf_actual": 7324.0,
+            "perf_fitted": 0.0,
+            "note": "Model base-floor stuck; weak market"
+          }
+        ],
+        "walk_forward": [
+          {
+            "label": "FY2022H2",
+            "actual": 4302.709,
+            "fitted": 3074.713,
+            "naive_lastyear": 8990.383,
+            "naive_randomwalk": 3526.469,
+            "half": "H2",
+            "period_end": ""
+          },
+          {
+            "label": "FY2023H1",
+            "actual": 3319.298,
+            "fitted": 3074.713,
+            "naive_lastyear": 3526.469,
+            "naive_randomwalk": 4302.709,
+            "half": "H1",
+            "period_end": ""
+          },
+          {
+            "label": "FY2023H2",
+            "actual": 5586.426,
+            "fitted": 4931.224709540503,
+            "naive_lastyear": 4302.709,
+            "naive_randomwalk": 3319.298,
+            "half": "H2",
+            "period_end": ""
+          },
+          {
+            "label": "FY2024H1",
+            "actual": 3804.623,
+            "fitted": 3076.3744351933174,
+            "naive_lastyear": 3319.298,
+            "naive_randomwalk": 5586.426,
+            "half": "H1",
+            "period_end": ""
+          },
+          {
+            "label": "FY2024H2",
+            "actual": 11162.336,
+            "fitted": 9382.223712772497,
+            "naive_lastyear": 5586.426,
+            "naive_randomwalk": 3804.623,
+            "half": "H2",
+            "period_end": ""
+          },
+          {
+            "label": "FY2025H1",
+            "actual": 5353.003,
+            "fitted": 3074.713,
+            "naive_lastyear": 3804.623,
+            "naive_randomwalk": 11162.336,
+            "half": "H1",
+            "period_end": ""
+          },
+          {
+            "label": "FY2025H2",
+            "actual": 10901.498,
+            "fitted": 3074.713,
+            "naive_lastyear": 11162.336,
+            "naive_randomwalk": 5353.003,
+            "half": "H2",
+            "period_end": ""
+          },
+          {
+            "label": "FY2026H1",
+            "actual": 5577.537,
+            "fitted": 3357.9899452809036,
+            "naive_lastyear": 5353.003,
+            "naive_randomwalk": 10901.498,
+            "half": "H1",
+            "period_end": ""
+          },
+          {
+            "label": "FY2026H2",
+            "actual": 16934.463,
+            "fitted": 7334.717900740869,
+            "naive_lastyear": 10901.498,
+            "naive_randomwalk": 5577.537,
+            "half": "H2",
+            "period_end": ""
+          }
+        ],
+        "tornado": [
+          {
+            "driver": "Nikkei H2 return",
+            "low": -0.1,
+            "high": 0.14,
+            "ni_low": 1551,
+            "ni_high": 6623,
+            "ni_delta_pct": 327.0
+          },
+          {
+            "driver": "AUM level",
+            "low": 0.9,
+            "high": 1.1,
+            "ni_low": 1393,
+            "ni_high": 1710,
+            "ni_delta_pct": 20.4
+          },
+          {
+            "driver": "March window return",
+            "low": -0.05,
+            "high": 0.12,
+            "ni_low": 1551,
+            "ni_high": 5899,
+            "ni_delta_pct": 280.2
+          }
+        ],
+        "caveats": [
+          "Primary KPI: perf_fee_h2_positive OOS R\u00b2 (not total-revenue IS R\u00b2).",
+          "perf_fee_h2_positive OOS n is small (fee split disclosed only from FY2024).",
+          "production_spec=v4 per acceptance rule (lowest perf_fee H2 OOS RMSE not worse than v1).",
+          "Naive same-half-last-year beats model on revenue OOS RMSE (\u00a53,230m vs \u00a54,336m).",
+          "n\u224812 half-years; negative OOS R\u00b2 is valid (model worse than mean)."
+        ],
+        "version": "v3_pm_diagnostics"
+      },
+      "spec_comparison": {
+        "as_of": "2026-06-05",
+        "production_spec": "v4",
+        "leaderboard": [
+          {
+            "spec": "v1",
+            "revenue_oos_rmse": 4336.2,
+            "revenue_oos_r2": -0.0116,
+            "perf_fee_h2_oos_rmse": 10307.2,
+            "perf_fee_h2_oos_r2": -14.2489,
+            "production_default": false
+          },
+          {
+            "spec": "v2",
+            "revenue_oos_rmse": 3976.5,
+            "revenue_oos_r2": 0.1493,
+            "perf_fee_h2_oos_rmse": 44743.9,
+            "perf_fee_h2_oos_r2": -286.3584,
+            "production_default": false,
+            "note": "v2 worse on revenue OOS RMSE"
+          },
+          {
+            "spec": "v3a",
+            "revenue_oos_rmse": 5407.4,
+            "revenue_oos_r2": -0.5732,
+            "perf_fee_h2_oos_rmse": 11863.0,
+            "perf_fee_h2_oos_r2": -19.1998,
+            "production_default": false,
+            "note": "March Jan-Mar window on H2"
+          },
+          {
+            "spec": "v4",
+            "revenue_oos_rmse": 4832.7,
+            "revenue_oos_r2": -0.2565,
+            "perf_fee_h2_oos_rmse": 8713.5,
+            "perf_fee_h2_oos_r2": -9.8979,
+            "production_default": true,
+            "note": "P4 mandate NAV scrape"
+          }
+        ],
+        "acceptance_rule": "Reject spec if perf_fee_h2_oos_rmse worsens vs prior"
+      },
+      "coefficient_bootstrap": {
+        "base_rate_ann": {
+          "point": 0.005558,
+          "p05": 0.005266,
+          "p50": 0.005558,
+          "p95": 0.005849,
+          "method": "block_bootstrap_fy",
+          "n_boot": 1000
+        },
+        "k_H1": {
+          "point": 0.00491,
+          "p05": 0.00491,
+          "p50": 0.00491,
+          "p95": 0.00491,
+          "method": "block_bootstrap_fy",
+          "n_boot": 748
+        },
+        "k_H2": {
+          "point": 0.063647,
+          "p05": 0.063647,
+          "p50": 0.063647,
+          "p95": 0.063647,
+          "method": "block_bootstrap_fy",
+          "n_boot": 748
+        },
+        "ord_slope": {
+          "point": 0.516676,
+          "p05": 0.329495,
+          "p50": 0.516676,
+          "p95": 0.530103,
+          "method": "block_bootstrap_fy",
+          "n_boot": 1000
+        },
+        "ord_intercept": {
+          "point": 1018.159188,
+          "p05": 847.215741,
+          "p50": 1018.159188,
+          "p95": 2046.414553,
+          "method": "block_bootstrap_fy",
+          "n_boot": 1000
+        },
+        "tax_rate": {
+          "point": 0.253262,
+          "p05": 0.251382,
+          "p50": 0.253262,
+          "p95": 0.255142,
+          "method": "block_bootstrap_fy",
+          "n_boot": 1000
+        }
+      },
+      "residuals": [
+        {
+          "label": "FY2021H1",
+          "period_end": "2020-09-30",
+          "target": "revenue_total",
+          "actual": 3074.713,
+          "fitted": 200.0,
+          "residual": -2874.713,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2021H1",
+          "period_end": "2020-09-30",
+          "target": "ordinary_profit",
+          "actual": 1653.517,
+          "fitted": -41.428,
+          "residual": -1694.945,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2021H1",
+          "period_end": "2020-09-30",
+          "target": "net_income",
+          "actual": 1178.219,
+          "fitted": -30.48,
+          "residual": -1208.699,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2021H2",
+          "period_end": "2021-03-31",
+          "target": "revenue_total",
+          "actual": 8990.383,
+          "fitted": 200.0,
+          "residual": -8790.383,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2021H2",
+          "period_end": "2021-03-31",
+          "target": "ordinary_profit",
+          "actual": 4729.255,
+          "fitted": -41.428,
+          "residual": -4770.683,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2021H2",
+          "period_end": "2021-03-31",
+          "target": "net_income",
+          "actual": 3452.871,
+          "fitted": -30.48,
+          "residual": -3483.351,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2022H1",
+          "period_end": "2021-09-30",
+          "target": "revenue_total",
+          "actual": 3526.469,
+          "fitted": 200.0,
+          "residual": -3326.469,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2022H1",
+          "period_end": "2021-09-30",
+          "target": "ordinary_profit",
+          "actual": 1958.008,
+          "fitted": -41.428,
+          "residual": -1999.436,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2022H1",
+          "period_end": "2021-09-30",
+          "target": "net_income",
+          "actual": 1423.167,
+          "fitted": -30.48,
+          "residual": -1453.647,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2022H2",
+          "period_end": "2022-03-31",
+          "target": "revenue_total",
+          "actual": 4302.709,
+          "fitted": 200.0,
+          "residual": -4102.709,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2022H2",
+          "period_end": "2022-03-31",
+          "target": "ordinary_profit",
+          "actual": 1187.392,
+          "fitted": -41.428,
+          "residual": -1228.82,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2022H2",
+          "period_end": "2022-03-31",
+          "target": "net_income",
+          "actual": 880.648,
+          "fitted": -30.48,
+          "residual": -911.128,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2023H1",
+          "period_end": "2022-09-30",
+          "target": "revenue_total",
+          "actual": 3319.298,
+          "fitted": 200.0,
+          "residual": -3119.298,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2023H1",
+          "period_end": "2022-09-30",
+          "target": "ordinary_profit",
+          "actual": 1926.574,
+          "fitted": -41.428,
+          "residual": -1968.002,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2023H1",
+          "period_end": "2022-09-30",
+          "target": "net_income",
+          "actual": 1358.671,
+          "fitted": -30.48,
+          "residual": -1389.151,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2023H2",
+          "period_end": "2023-03-31",
+          "target": "revenue_total",
+          "actual": 5586.426,
+          "fitted": 200.0,
+          "residual": -5386.426,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2023H2",
+          "period_end": "2023-03-31",
+          "target": "ordinary_profit",
+          "actual": 2236.419,
+          "fitted": -41.428,
+          "residual": -2277.847,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2023H2",
+          "period_end": "2023-03-31",
+          "target": "net_income",
+          "actual": 1662.698,
+          "fitted": -30.48,
+          "residual": -1693.178,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2024H1",
+          "period_end": "2023-09-30",
+          "target": "revenue_total",
+          "actual": 3804.623,
+          "fitted": 200.0,
+          "residual": -3604.623,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2024H1",
+          "period_end": "2023-09-30",
+          "target": "perf_fee",
+          "actual": 932.0,
+          "fitted": 0.0,
+          "residual": -932.0,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2024H1",
+          "period_end": "2023-09-30",
+          "target": "ordinary_profit",
+          "actual": 2488.758,
+          "fitted": -41.428,
+          "residual": -2530.186,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2024H1",
+          "period_end": "2023-09-30",
+          "target": "net_income",
+          "actual": 1791.219,
+          "fitted": -30.48,
+          "residual": -1821.699,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2024H2",
+          "period_end": "2024-03-31",
+          "target": "revenue_total",
+          "actual": 11162.336,
+          "fitted": 200.0,
+          "residual": -10962.336,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2024H2",
+          "period_end": "2024-03-31",
+          "target": "perf_fee",
+          "actual": 7975.0,
+          "fitted": 0.0,
+          "residual": -7975.0,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2024H2",
+          "period_end": "2024-03-31",
+          "target": "ordinary_profit",
+          "actual": 6321.019,
+          "fitted": -41.428,
+          "residual": -6362.447,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2024H2",
+          "period_end": "2024-03-31",
+          "target": "net_income",
+          "actual": 4817.973,
+          "fitted": -30.48,
+          "residual": -4848.453,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2025H1",
+          "period_end": "2024-09-30",
+          "target": "revenue_total",
+          "actual": 5353.003,
+          "fitted": 3753.454,
+          "residual": -1599.549,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2025H1",
+          "period_end": "2024-09-30",
+          "target": "base_fee",
+          "actual": 3266.0,
+          "fitted": 3553.454,
+          "residual": 287.454,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2025H1",
+          "period_end": "2024-09-30",
+          "target": "perf_fee",
+          "actual": 1996.0,
+          "fitted": 0.0,
+          "residual": -1996.0,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2025H1",
+          "period_end": "2024-09-30",
+          "target": "ordinary_profit",
+          "actual": 3810.2,
+          "fitted": 2016.882,
+          "residual": -1793.318,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2025H1",
+          "period_end": "2024-09-30",
+          "target": "net_income",
+          "actual": 2799.791,
+          "fitted": 1483.88,
+          "residual": -1315.911,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2025H2",
+          "period_end": "2025-03-31",
+          "target": "revenue_total",
+          "actual": 10901.498,
+          "fitted": 3738.587,
+          "residual": -7162.911,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2025H2",
+          "period_end": "2025-03-31",
+          "target": "base_fee",
+          "actual": 3454.0,
+          "fitted": 3538.587,
+          "residual": 84.587,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2025H2",
+          "period_end": "2025-03-31",
+          "target": "perf_fee",
+          "actual": 7324.0,
+          "fitted": 0.0,
+          "residual": -7324.0,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2025H2",
+          "period_end": "2025-03-31",
+          "target": "ordinary_profit",
+          "actual": 5638.399,
+          "fitted": 2008.271,
+          "residual": -3630.128,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2025H2",
+          "period_end": "2025-03-31",
+          "target": "net_income",
+          "actual": 4256.431,
+          "fitted": 1477.544,
+          "residual": -2778.887,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2026H1",
+          "period_end": "2025-09-30",
+          "target": "revenue_total",
+          "actual": 5577.537,
+          "fitted": 5623.598,
+          "residual": 46.061,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2026H1",
+          "period_end": "2025-09-30",
+          "target": "base_fee",
+          "actual": 3711.0,
+          "fitted": 3710.598,
+          "residual": -0.402,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2026H1",
+          "period_end": "2025-09-30",
+          "target": "perf_fee",
+          "actual": 1713.0,
+          "fitted": 1713.0,
+          "residual": 0.0,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2026H1",
+          "period_end": "2025-09-30",
+          "target": "ordinary_profit",
+          "actual": 3974.829,
+          "fitted": 3100.149,
+          "residual": -874.68,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2026H1",
+          "period_end": "2025-09-30",
+          "target": "net_income",
+          "actual": 2861.532,
+          "fitted": 2280.87,
+          "residual": -580.662,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2026H2",
+          "period_end": "2026-03-31",
+          "target": "revenue_total",
+          "actual": 16934.463,
+          "fitted": 16566.952,
+          "residual": -367.511,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2026H2",
+          "period_end": "2026-03-31",
+          "target": "base_fee",
+          "actual": 4158.0,
+          "fitted": 3763.952,
+          "residual": -394.048,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2026H2",
+          "period_end": "2026-03-31",
+          "target": "perf_fee",
+          "actual": 12603.0,
+          "fitted": 12603.0,
+          "residual": -0.0,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2026H2",
+          "period_end": "2026-03-31",
+          "target": "ordinary_profit",
+          "actual": 9995.171,
+          "fitted": 9439.0,
+          "residual": -556.171,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2026H2",
+          "period_end": "2026-03-31",
+          "target": "net_income",
+          "actual": 7769.468,
+          "fitted": 6944.55,
+          "residual": -824.918,
+          "is_oos": 0
+        },
+        {
+          "label": "FY2022H2",
+          "period_end": "",
+          "target": "revenue_total",
+          "actual": 4302.709,
+          "fitted": 3074.713,
+          "residual": -1227.996,
+          "is_oos": 1
+        },
+        {
+          "label": "FY2023H1",
+          "period_end": "",
+          "target": "revenue_total",
+          "actual": 3319.298,
+          "fitted": 3074.713,
+          "residual": -244.585,
+          "is_oos": 1
+        },
+        {
+          "label": "FY2023H2",
+          "period_end": "",
+          "target": "revenue_total",
+          "actual": 5586.426,
+          "fitted": 4931.225,
+          "residual": -655.201,
+          "is_oos": 1
+        },
+        {
+          "label": "FY2024H1",
+          "period_end": "",
+          "target": "revenue_total",
+          "actual": 3804.623,
+          "fitted": 3076.374,
+          "residual": -728.249,
+          "is_oos": 1
+        },
+        {
+          "label": "FY2024H2",
+          "period_end": "",
+          "target": "revenue_total",
+          "actual": 11162.336,
+          "fitted": 9382.224,
+          "residual": -1780.112,
+          "is_oos": 1
+        },
+        {
+          "label": "FY2025H1",
+          "period_end": "",
+          "target": "revenue_total",
+          "actual": 5353.003,
+          "fitted": 3074.713,
+          "residual": -2278.29,
+          "is_oos": 1
+        },
+        {
+          "label": "FY2025H2",
+          "period_end": "",
+          "target": "revenue_total",
+          "actual": 10901.498,
+          "fitted": 3074.713,
+          "residual": -7826.785,
+          "is_oos": 1
+        },
+        {
+          "label": "FY2026H1",
+          "period_end": "",
+          "target": "revenue_total",
+          "actual": 5577.537,
+          "fitted": 3357.99,
+          "residual": -2219.547,
+          "is_oos": 1
+        },
+        {
+          "label": "FY2026H2",
+          "period_end": "",
+          "target": "revenue_total",
+          "actual": 16934.463,
+          "fitted": 7334.718,
+          "residual": -9599.745,
+          "is_oos": 1
+        },
+        {
+          "label": "FY2025H2",
+          "period_end": "2025-03-31",
+          "target": "perf_fee",
+          "actual": 7324.0,
+          "fitted": 0.0,
+          "residual": -7324.0,
+          "is_oos": 1
+        },
+        {
+          "label": "FY2026H1",
+          "period_end": "2025-09-30",
+          "target": "perf_fee",
+          "actual": 1713.0,
+          "fitted": 0.0,
+          "residual": -1713.0,
+          "is_oos": 1
+        },
+        {
+          "label": "FY2026H2",
+          "period_end": "2026-03-31",
+          "target": "perf_fee",
+          "actual": 12603.0,
+          "fitted": 0.0,
+          "residual": -12603.0,
+          "is_oos": 1
+        },
+        {
+          "label": "FY2026H1",
+          "period_end": "2025-09-30",
+          "target": "base_fee",
+          "actual": 3711.0,
+          "fitted": 3516.165,
+          "residual": -194.835,
+          "is_oos": 1
+        },
+        {
+          "label": "FY2026H2",
+          "period_end": "2026-03-31",
+          "target": "base_fee",
+          "actual": 4158.0,
+          "fitted": 3632.602,
+          "residual": -525.398,
+          "is_oos": 1
+        }
+      ],
       "walk_forward": [
         {
           "label": "FY2022H2",
@@ -120,7 +1280,9 @@
           "model": 3074.713,
           "naive_lastyear": 8990.383,
           "naive_randomwalk": 3526.469,
-          "model_v2": 3074.713
+          "model_v3a": 3074.713,
+          "model_v2": 3074.713,
+          "model_v4": 3074.713
         },
         {
           "label": "FY2023H1",
@@ -128,7 +1290,9 @@
           "model": 3074.713,
           "naive_lastyear": 3526.469,
           "naive_randomwalk": 4302.709,
-          "model_v2": 3074.713
+          "model_v3a": 3074.713,
+          "model_v2": 3074.713,
+          "model_v4": 3074.713
         },
         {
           "label": "FY2023H2",
@@ -136,7 +1300,9 @@
           "model": 4931.224709540503,
           "naive_lastyear": 4302.709,
           "naive_randomwalk": 3319.298,
-          "model_v2": 4185.055020974427
+          "model_v3a": 10820.601554867588,
+          "model_v2": 4830.656562502018,
+          "model_v4": 4830.656562502018
         },
         {
           "label": "FY2024H1",
@@ -144,7 +1310,9 @@
           "model": 3076.3744351933174,
           "naive_lastyear": 3319.298,
           "naive_randomwalk": 5586.426,
-          "model_v2": 3075.7401658205995
+          "model_v3a": 3076.163269528032,
+          "model_v2": 3076.163269528032,
+          "model_v4": 3074.713
         },
         {
           "label": "FY2024H2",
@@ -152,7 +1320,9 @@
           "model": 9382.223712772497,
           "naive_lastyear": 5586.426,
           "naive_randomwalk": 3804.623,
-          "model_v2": 7871.338822215634
+          "model_v3a": 12323.507633424557,
+          "model_v2": 10683.903228771325,
+          "model_v4": 3076.01413956657
         },
         {
           "label": "FY2025H1",
@@ -160,7 +1330,9 @@
           "model": 3074.713,
           "naive_lastyear": 3804.623,
           "naive_randomwalk": 11162.336,
-          "model_v2": 3074.713
+          "model_v3a": 3074.713,
+          "model_v2": 3074.713,
+          "model_v4": 3074.837202228321
         },
         {
           "label": "FY2025H2",
@@ -168,7 +1340,9 @@
           "model": 3074.713,
           "naive_lastyear": 11162.336,
           "naive_randomwalk": 5353.003,
-          "model_v2": 3410.5273246226284
+          "model_v3a": 3335.6118371935054,
+          "model_v2": 3559.6210032800977,
+          "model_v4": 9206.798010501061
         },
         {
           "label": "FY2026H1",
@@ -176,7 +1350,9 @@
           "model": 3357.9899452809036,
           "naive_lastyear": 5353.003,
           "naive_randomwalk": 10901.498,
-          "model_v2": 3292.4099527062262
+          "model_v3a": 3412.640798276483,
+          "model_v2": 3412.640798276483,
+          "model_v4": 3079.8559978759713
         },
         {
           "label": "FY2026H2",
@@ -184,7 +1360,9 @@
           "model": 7334.717900740869,
           "naive_lastyear": 10901.498,
           "naive_randomwalk": 5577.537,
-          "model_v2": 6534.422089454042
+          "model_v3a": 4081.557612171715,
+          "model_v2": 8237.720167113557,
+          "model_v4": 5628.247593738179
         }
       ],
       "panel": [
@@ -352,7 +1530,11 @@
           "nikkei_ret": -0.1,
           "revenue_m": 3726.0,
           "net_income_m": 1472.0,
-          "perf_fee_m": 0.0
+          "perf_fee_m": 0.0,
+          "revenue_lo80": -587.0,
+          "revenue_hi80": 8039.0,
+          "net_income_lo80": -1026.0,
+          "net_income_hi80": 3970.0
         },
         {
           "horizon": "next_H1",
@@ -360,7 +1542,11 @@
           "nikkei_ret": 0.03,
           "revenue_m": 4167.0,
           "net_income_m": 1660.0,
-          "perf_fee_m": 200.0
+          "perf_fee_m": 200.0,
+          "revenue_lo80": -146.0,
+          "revenue_hi80": 8480.0,
+          "net_income_lo80": -838.0,
+          "net_income_hi80": 4158.0
         },
         {
           "horizon": "next_H1",
@@ -368,7 +1554,11 @@
           "nikkei_ret": 0.12,
           "revenue_m": 4969.0,
           "net_income_m": 2002.0,
-          "perf_fee_m": 834.0
+          "perf_fee_m": 834.0,
+          "revenue_lo80": 656.0,
+          "revenue_hi80": 9282.0,
+          "net_income_lo80": -496.0,
+          "net_income_hi80": 4500.0
         },
         {
           "horizon": "next_H2",
@@ -376,7 +1566,11 @@
           "nikkei_ret": -0.1,
           "revenue_m": 3726.0,
           "net_income_m": 1472.0,
-          "perf_fee_m": 0.0
+          "perf_fee_m": 0.0,
+          "revenue_lo80": -587.0,
+          "revenue_hi80": 8039.0,
+          "net_income_lo80": -1026.0,
+          "net_income_hi80": 3970.0
         },
         {
           "horizon": "next_H2",
@@ -384,7 +1578,11 @@
           "nikkei_ret": 0.04,
           "revenue_m": 7454.0,
           "net_income_m": 3061.0,
-          "perf_fee_m": 3469.0
+          "perf_fee_m": 3469.0,
+          "revenue_lo80": 3141.0,
+          "revenue_hi80": 11767.0,
+          "net_income_lo80": 563.0,
+          "net_income_hi80": 5559.0
         },
         {
           "horizon": "next_H2",
@@ -392,7 +1590,11 @@
           "nikkei_ret": 0.14,
           "revenue_m": 16907.0,
           "net_income_m": 7089.0,
-          "perf_fee_m": 12735.0
+          "perf_fee_m": 12735.0,
+          "revenue_lo80": 12594.0,
+          "revenue_hi80": 21220.0,
+          "net_income_lo80": 4591.0,
+          "net_income_hi80": 9587.0
         }
       ],
       "shares": {
@@ -456,6 +1658,7 @@
         "data_dictionary": "https://github.com/GoldmanDrew/single-stock-investments/blob/main/7176.T/research/model/data_dictionary.md",
         "forecasts_csv": "https://github.com/GoldmanDrew/single-stock-investments/blob/main/7176.T/research/model/forecasts.csv",
         "model_results": "https://github.com/GoldmanDrew/single-stock-investments/blob/main/7176.T/research/model/model_results.json",
+        "model_diagnostics": "https://github.com/GoldmanDrew/single-stock-investments/blob/main/7176.T/research/model/model_diagnostics.json",
         "skeptical_report": "https://github.com/GoldmanDrew/single-stock-investments/blob/main/7176.T/research/equity_report_skeptical_2026-06-04.md"
       }
     }
@@ -463,10 +1666,13 @@
   "summaries": {
     "7176.T": {
       "ready": true,
+      "diagnostics_ready": true,
+      "production_spec": "v4",
       "as_of": "2026-06-04",
       "headline": "Nowcast H1 revenue \u00a57,173m; OOS RMSE loses to seasonal naive",
       "model_beats_naive": false,
-      "model_type": "earnings_semiannual"
+      "model_type": "earnings_semiannual",
+      "perf_fee_h2_oos_r2": -14.2489
     }
   }
 }

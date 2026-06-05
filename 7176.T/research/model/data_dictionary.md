@@ -84,15 +84,32 @@ Run `python3 acquire_data.py` (or `build_panel.py`, which calls it first). Manif
 | `comp_bridge_halfyear.csv` | [Filing] | Revenue, perf fee, opex, headcount bridge |
 | `capiq_peers.csv` | [Pending] | Template for CapIQ / peer fee ratios |
 
+### P4 — Mandate NAV (scraped + derived)
+
+| File | Tag | Definition |
+|------|-----|------------|
+| `mandate_nav_monthly.csv` | [Filing/Market/Derived] | Monthly NAV/AUM/return per fund from SAM PDFs + yfinance ETFs; `download_mandate_nav.py` |
+| `mandate_nav_detail.csv` | [Filing/Market/Derived] | Per-mandate half-year return, benchmark, excess, AUM weights |
+| `mandate_nav_halfyear.csv` | [Filing/Market/Derived] | AUM-weighted `mandate_weighted_excess`, `mandate_weighted_return`, `mandate_count` |
+| `mandate_scrape_manifest.json` | [Market] | PDF download log + fund IDs |
+| `mandate_reports/` | [Filing] | Saved SAM monthly PDFs |
+
+### P6 — March crystallization window
+
+| File | Tag | Definition |
+|------|-----|------------|
+| `march_window_halfyear.csv` | [Market/Derived] | Jan–Mar return into March FY-end for H2 halves: `march_nikkei_ret`, `march_value_ret`, `march_blended_ret` (0.65×Nikkei + 0.35×value on positive leg). H1 rows fall back to full-half `nikkei_ret`. Feeds **v3a** perf driver in `model.py`. |
+
 ### Panel columns merged from `data/`
 
 `perf_eligible_excess_ret`, `etf_perf_basket_ret`, `value_factor_ret`, `etf_basket_ret`,
 `etf_implied_flow_jpym`, `perf_eligible_aum_jpym`, `nonlisted_share`, `etf_share`,
-`opex_sga_jpy_million`, `incremental_margin`.
+`opex_sga_jpy_million`, `incremental_margin`, `march_nikkei_ret`, `march_value_ret`,
+`march_blended_ret`, `mandate_weighted_excess`, `mandate_count`.
 
 ## Remaining gaps
 
 - **JITA industry flows** — columns present but NaN; needs Vicki scrape or manual export.
-- **Per-fund NAV vs hurdle / high-water mark** — non-listed proxy uses registry [Assumption].
+- **Per-fund NAV vs hurdle / high-water mark** — P4 live for FY2023H1 onward (6 halves); pre-2023 and institutional pool still proxy [Derived]. Vicki: 投信総合検索ライブラリー CSV for Value Up history.
 - **AUM by category pre-2023** and **base/perf split pre-FY2024** — extends component history.
 - **CapIQ** ownership + peer fee/comp ratios — paste into `capiq_export.csv`.

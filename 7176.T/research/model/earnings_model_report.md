@@ -1,7 +1,7 @@
 # 7176.T — Earnings model report
 
 **Simplex Financial Holdings (TOKYO PRO Market)**
-**As of:** 2026-06-04 · **Author:** Marvin (quant pod build)
+**As of:** 2026-06-05 · **Author:** Marvin (quant pod build)
 **Code:** `build_panel.py` → `model.py` → `nowcast.py` · **Data:** `panel_halfyear.csv`, `data_dictionary.md`
 
 > Honest-accuracy build per `../earnings_model_prompt.md`. Asset-manager revenue is
@@ -84,10 +84,11 @@ After wiring `acquire_data.py` (ETF NAV, factor returns, fund proxy), walk-forwa
 | Model | OOS RMSE (¥m) | OOS MAPE | Directional hit |
 |-------|---------------|----------|-----------------|
 | v1 (Nikkei only) | 4,336 | 32.6% | 0.67 |
-| **v2 (blended excess)** | **4,590** | **35.9%** | **0.89** |
+| v2 (blended excess) | 3,977 | 30.3% | 0.89 |
+| v3a (March window on H2) | 5,407 | — | — |
 | Naive (same half last year) | 3,230 | 30.2% | 1.00 |
 
-**Honest read:** v2 **does not improve level accuracy** at this sample size. Directional hit rises (0.67 → 0.89), but RMSE is worse. The registry-weighted fund proxy and filing-anchored ETF AUM (Yahoo does not publish Japan ETF units) are still too coarse to beat a trending naive benchmark. **JITA flows and true per-fund NAV/hurdle remain the binding gap.**
+**Honest read:** v2 improves directional hit (0.67 → 0.89) but **still loses to seasonal naive on RMSE**. v3a (Jan–Mar crystallization window on H2) **worsens** both revenue RMSE and perf-fee H2 RMSE vs v1. **Production spec stays v1** per `spec_comparison.json`. Registry-weighted fund proxy and filing-anchored ETF AUM remain coarse; **JITA flows and true per-fund NAV/hurdle remain the binding gap.**
 
 ---
 
@@ -109,9 +110,22 @@ Decomposed in-sample and out-of-sample R² per target. **Primary KPI:** perf fee
 - Total revenue **OOS R² ≈ 0** (slightly negative): model ties noise; seasonal naive wins on level.
 - Base fee IS R² ~0.45 on n=4 disclosed splits: identity works where data exists.
 - Perf fee OOS R² deeply negative: crystallization miss dominates (FY2024H2, FY2026H2 in `residual_attribution`).
-- **Production spec: v1** (Nikkei). v2 rejected per `spec_comparison.json`.
+- **Production spec: v4** (P4 mandate-weighted excess). Beats v1 on perf-fee H2 OOS RMSE (¥8,714m vs ¥10,307m). v2/v3a rejected.
+
+**Spec leaderboard (OOS):**
+
+| Spec | Rev OOS RMSE | Perf H2 OOS RMSE | Default |
+|------|--------------|------------------|---------|
+| v1 | ¥4,336m | ¥10,307m | no |
+| v2 | ¥3,977m | ¥44,744m | no |
+| v3a | ¥5,407m | ¥11,863m | no |
+| v4 | ¥4,833m | ¥8,714m | **yes** |
 
 Regenerate: `python3 model.py` (runs `model_diagnostics.py` automatically).
+
+### Dashboard PM panel (Phase 2)
+
+Portfolio dashboard **7176.T → Model diagnostics** ingests `model_diagnostics.json`, `spec_comparison.json`, `coefficient_bootstrap.json`, and `residuals_halfyear.csv`. Lead KPI: **perf fee H2+ OOS R²** (not in-sample total revenue). Charts: IS/OOS R² bars, spec leaderboard, actual-vs-fitted scatter, residual bars, H2 NI tornado. Rebuild: `python3 _system/scripts/build_equity_model_dashboard.py`.
 
 ---
 
@@ -128,6 +142,8 @@ Revenue/earnings as a function of the Nikkei return over the half (¥m):
 | Next H2 | base | +4% | 7,454 | 4,161 | 3,061 |
 | Next H2 | bull | +14% | 16,907 | 9,636 | 7,089 |
 
+`forecasts.csv` now includes **80% intervals** (`revenue_lo80`/`hi80`, `net_income_lo80`/`hi80`) from walk-forward OOS residual standard deviation.
+
 **Tornado (EPS sensitivity), largest first:** H2 Nikkei return → performance fee (dominant, convex); AUM level → base fee; value/PBR factor spread (proxy, to add); USD/JPY (HK/overseas); comp ratio. The asymmetry is stark: **a weak-market H2 collapses earnings to roughly the base-fee floor**, while a strong H2 multiplies them.
 
 ---
@@ -143,6 +159,11 @@ Re-runnable monthly. Uses:
 Output: `nowcast_latest.json` (includes `nowcast_jpym` and `nowcast_v2_jpym`).
 
 Caveats: H1 perf-fee nowcast is low-confidence; JITA industry flows still pending; non-listed fund hurdle uses registry [Assumption].
+
+### P4 / P6 data layer (Phase 3)
+
+- **P6 March window:** `march_window_halfyear.csv` — Jan–Mar return into March FY-end for H2 crystallization (`march_nikkei_ret`, `march_value_ret`, `march_blended_ret`). Drives **v3a** spec in `model.py`.
+- **P4 Mandate NAV scaffold:** `mandate_nav_halfyear.csv` — registry-weighted mandate excess vs hurdle [Assumption]. Replace with 受益権報告書 per-fund NAV when scraped (Vicki).
 
 ---
 
@@ -169,10 +190,10 @@ Caveats: H1 perf-fee nowcast is low-confidence; JITA industry flows still pendin
 
 | File | Purpose |
 |------|---------|
-| `acquire_data.py` | P0–P3 data layer → `data/*.csv`, `data_acquisition_manifest.json` |
+| `acquire_data.py` | P0–P6 data layer → `data/*.csv`, `data_acquisition_manifest.json` |
 | `fund_registry.json` | Simplex ETF list, AUM pools, factor proxies, non-listed fund assumptions |
 | `build_panel.py` | Filing panel + market + merge acquired data → `panel_halfyear.csv` |
-| `model.py` | Fit v1/v2 components, walk-forward CV → `model_results.json`, `forecasts.csv` |
+| `model.py` | Fit v1/v2/v3a components, walk-forward CV → `model_results.json`, `forecasts.csv` |
 | `model_diagnostics.py` | IS/OOS R² per target → `model_diagnostics.json`, `spec_comparison.json`, `residuals_halfyear.csv` |
 | `nowcast.py` | Live monthly nowcast (ETF AUM + flows + v2) → `nowcast_latest.json` |
 | `data_dictionary.md` | Every series, unit, source, tag |
