@@ -1,11 +1,11 @@
 {
-  "built_at": "2026-06-05T15:06:50Z",
+  "built_at": "2026-06-05T15:46:01Z",
   "ticker_count": 1,
   "tickers": {
     "7176.T": {
       "model_ready": true,
       "diagnostics_ready": true,
-      "production_spec": "v1",
+      "production_spec": "v4",
       "primary_kpi": "perf_fee_h2_positive.out_of_sample.r2",
       "model_type": "earnings_semiannual",
       "as_of": "2026-06-04",
@@ -133,7 +133,7 @@
       },
       "diagnostics": {
         "as_of": "2026-06-05",
-        "production_spec": "v1",
+        "production_spec": "v4",
         "primary_kpi": "perf_fee_h2_positive.out_of_sample.r2",
         "estimation_window": {
           "start": "2020-H1",
@@ -459,7 +459,7 @@
             "revenue_oos_r2": -0.0116,
             "perf_fee_h2_oos_rmse": 10307.2,
             "perf_fee_h2_oos_r2": -14.2489,
-            "production_default": true
+            "production_default": false
           },
           {
             "spec": "v2",
@@ -477,7 +477,16 @@
             "perf_fee_h2_oos_rmse": 11863.0,
             "perf_fee_h2_oos_r2": -19.1998,
             "production_default": false,
-            "note": "March Jan-Mar window on H2; production stays v1 unless perf_fee H2 RMSE improves"
+            "note": "March Jan-Mar window on H2"
+          },
+          {
+            "spec": "v4",
+            "revenue_oos_rmse": 4832.7,
+            "revenue_oos_r2": -0.2565,
+            "perf_fee_h2_oos_rmse": 8713.5,
+            "perf_fee_h2_oos_r2": -9.8979,
+            "production_default": true,
+            "note": "P4 mandate NAV scrape"
           }
         ],
         "residual_attribution": [
@@ -624,7 +633,7 @@
         "caveats": [
           "Primary KPI: perf_fee_h2_positive OOS R\u00b2 (not total-revenue IS R\u00b2).",
           "perf_fee_h2_positive OOS n is small (fee split disclosed only from FY2024).",
-          "v2 blended excess worsens revenue OOS RMSE; production_spec remains v1.",
+          "production_spec=v4 per acceptance rule (lowest perf_fee H2 OOS RMSE not worse than v1).",
           "Naive same-half-last-year beats model on revenue OOS RMSE (\u00a53,230m vs \u00a54,336m).",
           "n\u224812 half-years; negative OOS R\u00b2 is valid (model worse than mean)."
         ],
@@ -632,7 +641,7 @@
       },
       "spec_comparison": {
         "as_of": "2026-06-05",
-        "production_spec": "v1",
+        "production_spec": "v4",
         "leaderboard": [
           {
             "spec": "v1",
@@ -640,7 +649,7 @@
             "revenue_oos_r2": -0.0116,
             "perf_fee_h2_oos_rmse": 10307.2,
             "perf_fee_h2_oos_r2": -14.2489,
-            "production_default": true
+            "production_default": false
           },
           {
             "spec": "v2",
@@ -658,7 +667,16 @@
             "perf_fee_h2_oos_rmse": 11863.0,
             "perf_fee_h2_oos_r2": -19.1998,
             "production_default": false,
-            "note": "March Jan-Mar window on H2; production stays v1 unless perf_fee H2 RMSE improves"
+            "note": "March Jan-Mar window on H2"
+          },
+          {
+            "spec": "v4",
+            "revenue_oos_rmse": 4832.7,
+            "revenue_oos_r2": -0.2565,
+            "perf_fee_h2_oos_rmse": 8713.5,
+            "perf_fee_h2_oos_r2": -9.8979,
+            "production_default": true,
+            "note": "P4 mandate NAV scrape"
           }
         ],
         "acceptance_rule": "Reject spec if perf_fee_h2_oos_rmse worsens vs prior"
@@ -1263,7 +1281,8 @@
           "naive_lastyear": 8990.383,
           "naive_randomwalk": 3526.469,
           "model_v3a": 3074.713,
-          "model_v2": 3074.713
+          "model_v2": 3074.713,
+          "model_v4": 3074.713
         },
         {
           "label": "FY2023H1",
@@ -1272,7 +1291,8 @@
           "naive_lastyear": 3526.469,
           "naive_randomwalk": 4302.709,
           "model_v3a": 3074.713,
-          "model_v2": 3074.713
+          "model_v2": 3074.713,
+          "model_v4": 3074.713
         },
         {
           "label": "FY2023H2",
@@ -1280,8 +1300,9 @@
           "model": 4931.224709540503,
           "naive_lastyear": 4302.709,
           "naive_randomwalk": 3319.298,
-          "model_v3a": 10820.609151005869,
-          "model_v2": 4830.656562502018
+          "model_v3a": 10820.601554867588,
+          "model_v2": 4830.656562502018,
+          "model_v4": 4830.656562502018
         },
         {
           "label": "FY2024H1",
@@ -1290,7 +1311,8 @@
           "naive_lastyear": 3319.298,
           "naive_randomwalk": 5586.426,
           "model_v3a": 3076.163269528032,
-          "model_v2": 3076.163269528032
+          "model_v2": 3076.163269528032,
+          "model_v4": 3074.713
         },
         {
           "label": "FY2024H2",
@@ -1298,8 +1320,9 @@
           "model": 9382.223712772497,
           "naive_lastyear": 5586.426,
           "naive_randomwalk": 3804.623,
-          "model_v3a": 12323.509289042528,
-          "model_v2": 10683.903131411016
+          "model_v3a": 12323.507633424557,
+          "model_v2": 10683.903228771325,
+          "model_v4": 3076.01413956657
         },
         {
           "label": "FY2025H1",
@@ -1308,7 +1331,8 @@
           "naive_lastyear": 3804.623,
           "naive_randomwalk": 11162.336,
           "model_v3a": 3074.713,
-          "model_v2": 3074.713
+          "model_v2": 3074.713,
+          "model_v4": 3074.837202228321
         },
         {
           "label": "FY2025H2",
@@ -1316,8 +1340,9 @@
           "model": 3074.713,
           "naive_lastyear": 11162.336,
           "naive_randomwalk": 5353.003,
-          "model_v3a": 3335.611821983067,
-          "model_v2": 3559.6210068293326
+          "model_v3a": 3335.6118371935054,
+          "model_v2": 3559.6210032800977,
+          "model_v4": 9206.798010501061
         },
         {
           "label": "FY2026H1",
@@ -1326,7 +1351,8 @@
           "naive_lastyear": 5353.003,
           "naive_randomwalk": 10901.498,
           "model_v3a": 3412.640798276483,
-          "model_v2": 3412.640798276483
+          "model_v2": 3412.640798276483,
+          "model_v4": 3079.8559978759713
         },
         {
           "label": "FY2026H2",
@@ -1334,8 +1360,9 @@
           "model": 7334.717900740869,
           "naive_lastyear": 10901.498,
           "naive_randomwalk": 5577.537,
-          "model_v3a": 4081.557556026479,
-          "model_v2": 8237.72020610449
+          "model_v3a": 4081.557612171715,
+          "model_v2": 8237.720167113557,
+          "model_v4": 5628.247593738179
         }
       ],
       "panel": [
@@ -1640,7 +1667,7 @@
     "7176.T": {
       "ready": true,
       "diagnostics_ready": true,
-      "production_spec": "v1",
+      "production_spec": "v4",
       "as_of": "2026-06-04",
       "headline": "Nowcast H1 revenue \u00a57,173m; OOS RMSE loses to seasonal naive",
       "model_beats_naive": false,

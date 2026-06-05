@@ -1,0 +1,45 @@
+{
+  "as_of": "2026-06-05",
+  "source_root": "https://www.simplexasset.com/sam/japanese_equity_active_management/publicly_offered_funds",
+  "docs_base": "https://www.simplexasset.com/sam/japanese_equity_active_management/publicly_offered_funds/docs",
+  "sam_funds": [
+    {
+      "id": "value_up_fund",
+      "mandate_id": "mandate_value_pbr",
+      "label": "シンプレクス・ジャパン・バリューアップ・ファンド",
+      "page_path": "/value_up_fund/",
+      "docs_prefix": "0001",
+      "archive_suffixes": [],
+      "benchmark": "topix",
+      "perf_rate": 0.20,
+      "hurdle": 0.0,
+      "crystallization": ["H2"],
+      "tag": "[Filing/Market]"
+    },
+    {
+      "id": "orka_fund",
+      "mandate_id": "mandate_other",
+      "label": "シンプレクス謳歌ファンド",
+      "page_path": "/simplex_orka_fund/",
+      "docs_prefix": "0004",
+      "archive_suffixes": ["_02", "_03"],
+      "benchmark": "nikkei",
+      "perf_rate": 0.20,
+      "hurdle": 0.0,
+      "crystallization": ["H2"],
+      "tag": "[Filing/Market]"
+    }
+  ],
+  "perf_etfs": [
+    {"id": "etf_2080", "ticker": "2080.T", "mandate_id": "mandate_value_pbr", "benchmark": "value_pbr", "perf_rate": 0.20, "weight": 0.5},
+    {"id": "etf_2081", "ticker": "2081.T", "mandate_id": "mandate_value_pbr", "benchmark": "value_pbr", "perf_rate": 0.20, "weight": 0.3},
+    {"id": "etf_2082", "ticker": "2082.T", "mandate_id": "mandate_value_pbr", "benchmark": "value_pbr", "perf_rate": 0.20, "weight": 0.2}
+  ],
+  "nonlisted_residual": {
+    "mandate_id": "mandate_japan_equity",
+    "proxy_fund_id": "value_up_fund",
+    "proxy_etf": "2080.T",
+    "note": "Institutional non-listed mandates are not public; residual AUM uses value_up / 2080 return proxy [Derived]",
+    "tag": "[Derived]"
+  }
+}

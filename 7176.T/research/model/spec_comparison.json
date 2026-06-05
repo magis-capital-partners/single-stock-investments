@@ -1,6 +1,6 @@
 {
   "as_of": "2026-06-05",
-  "production_spec": "v1",
+  "production_spec": "v4",
   "leaderboard": [
     {
       "spec": "v1",
@@ -8,7 +8,7 @@
       "revenue_oos_r2": -0.0116,
       "perf_fee_h2_oos_rmse": 10307.2,
       "perf_fee_h2_oos_r2": -14.2489,
-      "production_default": true
+      "production_default": false
     },
     {
       "spec": "v2",
@@ -26,7 +26,16 @@
       "perf_fee_h2_oos_rmse": 11863.0,
       "perf_fee_h2_oos_r2": -19.1998,
       "production_default": false,
-      "note": "March Jan-Mar window on H2; production stays v1 unless perf_fee H2 RMSE improves"
+      "note": "March Jan-Mar window on H2"
+    },
+    {
+      "spec": "v4",
+      "revenue_oos_rmse": 4832.7,
+      "revenue_oos_r2": -0.2565,
+      "perf_fee_h2_oos_rmse": 8713.5,
+      "perf_fee_h2_oos_r2": -9.8979,
+      "production_default": true,
+      "note": "P4 mandate NAV scrape"
     }
   ],
   "acceptance_rule": "Reject spec if perf_fee_h2_oos_rmse worsens vs prior"
