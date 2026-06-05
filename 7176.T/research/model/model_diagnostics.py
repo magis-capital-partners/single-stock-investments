@@ -24,16 +24,19 @@ from model import (  # noqa: E402
     AUM_PROXY_PRE2023,
     _aum_proxy,
     _fit_reduced,
+    driver_return,
     effective_excess_ret,
     enrich,
     fit_base_rate,
     fit_bridge,
     fit_perf,
     fit_perf_v2,
+    fit_perf_v3a,
     predict_base,
     predict_earnings,
     predict_perf,
     predict_perf_v2,
+    predict_perf_v3a,
     walk_forward,
 )
 
@@ -164,8 +167,11 @@ def walk_forward_target(
     return pd.DataFrame(rows)
 
 
-def _predict_perf_oos(train: pd.DataFrame, test: pd.Series, use_v2: bool = False) -> float:
-    if use_v2:
+def _predict_perf_oos(train: pd.DataFrame, test: pd.Series, spec: str = "v1") -> float:
+    if spec == "v3a":
+        params, _ = fit_perf_v3a(train)
+        return float(predict_perf_v3a(test.to_frame().T, params).iloc[0])
+    if spec == "v2":
         params, _ = fit_perf_v2(train)
         return float(predict_perf_v2(test.to_frame().T, params).iloc[0])
     params, _ = fit_perf(train)
@@ -291,10 +297,46 @@ def _target_metrics(
     )
 
 
+def build_tornado(df: pd.DataFrame, bridge: dict, rate: float, perf_params: dict) -> list[dict]:
+    """H2 net income sensitivity from scenario drivers."""
+    latest = df.dropna(subset=["aum_end_jpym"]).iloc[-1]
+    aum0 = float(latest["aum_end_jpym"])
+    base_rev = rate / 2.0 * aum0 + 200.0
+    base_ni = predict_earnings(base_rev, bridge)[1]
+    drivers = [
+        ("Nikkei H2 return", -0.10, 0.14),
+        ("AUM level", 0.90, 1.10),
+        ("March window return", -0.05, 0.12),
+    ]
+    out = []
+    k2 = perf_params.get("H2") or 0.0
+    for name, low_m, high_m in drivers:
+        if name == "Nikkei H2 return":
+            low_rev = rate / 2.0 * aum0 + max(0, k2 * aum0 * low_m) + 200.0
+            high_rev = rate / 2.0 * aum0 + max(0, k2 * aum0 * high_m) + 200.0
+        elif name == "AUM level":
+            low_rev = rate / 2.0 * aum0 * low_m + 200.0
+            high_rev = rate / 2.0 * aum0 * high_m + 200.0
+        else:
+            low_rev = rate / 2.0 * aum0 + max(0, k2 * aum0 * low_m) + 200.0
+            high_rev = rate / 2.0 * aum0 + max(0, k2 * aum0 * high_m) + 200.0
+        low_ni = predict_earnings(low_rev, bridge)[1]
+        high_ni = predict_earnings(high_rev, bridge)[1]
+        out.append(dict(
+            driver=name,
+            low=low_m if isinstance(low_m, float) and abs(low_m) < 2 else low_m,
+            high=high_m if isinstance(high_m, float) and abs(high_m) < 2 else high_m,
+            ni_low=round(low_ni), ni_high=round(high_ni),
+            ni_delta_pct=round((high_ni - low_ni) / base_ni * 100, 1) if base_ni else None,
+        ))
+    return out
+
+
 def spec_leaderboard(df: pd.DataFrame) -> list[dict]:
-    """Compare v1 vs v2 on revenue and perf_fee H2 OOS."""
+    """Compare v1 vs v2 vs v3a on revenue and perf_fee H2 OOS."""
     wf_v1 = walk_forward(df, use_v2=False)
     wf_v2 = walk_forward(df, use_v2=True)
+    wf_v3a = walk_forward(df, use_v3a=True)
 
     def _oos_rmse_r2(wf: pd.DataFrame, filt=None) -> tuple[float, float]:
         if not len(wf):
@@ -312,8 +354,11 @@ def spec_leaderboard(df: pd.DataFrame) -> list[dict]:
     rev_v1_rmse, rev_v1_r2 = _oos_rmse_r2(wf_v1)
     rev_v2_rmse, rev_v2_r2 = _oos_rmse_r2(wf_v2)
 
-    wf_perf_v1 = walk_forward_target(df, "perf_fee_m", lambda tr, te: _predict_perf_oos(tr, te, False))
-    wf_perf_v2 = walk_forward_target(df, "perf_fee_m", lambda tr, te: _predict_perf_oos(tr, te, True))
+    rev_v3a_rmse, rev_v3a_r2 = _oos_rmse_r2(wf_v3a)
+
+    wf_perf_v1 = walk_forward_target(df, "perf_fee_m", lambda tr, te: _predict_perf_oos(tr, te, "v1"))
+    wf_perf_v2 = walk_forward_target(df, "perf_fee_m", lambda tr, te: _predict_perf_oos(tr, te, "v2"))
+    wf_perf_v3a = walk_forward_target(df, "perf_fee_m", lambda tr, te: _predict_perf_oos(tr, te, "v3a"))
 
     def _comp_wf(wf: pd.DataFrame, h2_only: bool) -> tuple[float, float]:
         if not len(wf):
@@ -329,15 +374,23 @@ def spec_leaderboard(df: pd.DataFrame) -> list[dict]:
 
     p1_rmse, p1_r2 = _comp_wf(wf_perf_v1, True)
     p2_rmse, p2_r2 = _comp_wf(wf_perf_v2, True)
+    p3_rmse, p3_r2 = _comp_wf(wf_perf_v3a, True)
 
-    return [
+    entries = [
         dict(spec="v1", revenue_oos_rmse=rev_v1_rmse, revenue_oos_r2=rev_v1_r2,
              perf_fee_h2_oos_rmse=p1_rmse, perf_fee_h2_oos_r2=p1_r2, production_default=True),
         dict(spec="v2", revenue_oos_rmse=rev_v2_rmse, revenue_oos_r2=rev_v2_r2,
-             perf_fee_h2_oos_rmse=p2_rmse, perf_fee_h2_oos_r2=p2_r2,
-             production_default=False,
-             note="v2 worse on revenue OOS RMSE; keep v1 as production default"),
+             perf_fee_h2_oos_rmse=p2_rmse, perf_fee_h2_oos_r2=p2_r2, production_default=False,
+             note="v2 worse on revenue OOS RMSE"),
+        dict(spec="v3a", revenue_oos_rmse=rev_v3a_rmse, revenue_oos_r2=rev_v3a_r2,
+             perf_fee_h2_oos_rmse=p3_rmse, perf_fee_h2_oos_r2=p3_r2, production_default=False,
+             note="March Jan-Mar window on H2; production stays v1 unless perf_fee H2 RMSE improves"),
     ]
+    best_rev = min(entries, key=lambda e: e["revenue_oos_rmse"] if e["revenue_oos_rmse"] == e["revenue_oos_rmse"] else 1e9)
+    for e in entries:
+        e["production_default"] = e["spec"] == best_rev["spec"] and e["spec"] == "v1"
+    entries[0]["production_default"] = True
+    return entries
 
 
 def residual_attribution(df: pd.DataFrame) -> list[dict]:
@@ -463,6 +516,7 @@ def run_diagnostics(df: pd.DataFrame | None = None) -> dict:
     leaderboard = spec_leaderboard(df)
     coeffs = bootstrap_coefficients(df)
     attribution = residual_attribution(df)
+    tornado = build_tornado(df, bridge, rate, perf_params)
 
     diag = dict(
         as_of=str(date.today()),
@@ -474,6 +528,7 @@ def run_diagnostics(df: pd.DataFrame | None = None) -> dict:
         spec_leaderboard=leaderboard,
         residual_attribution=attribution,
         walk_forward=wf_rev.to_dict(orient="records"),
+        tornado=tornado,
         caveats=[
             "Primary KPI: perf_fee_h2_positive OOS R² (not total-revenue IS R²).",
             "perf_fee_h2_positive OOS n is small (fee split disclosed only from FY2024).",

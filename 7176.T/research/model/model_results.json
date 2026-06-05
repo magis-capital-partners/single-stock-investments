@@ -40,6 +40,11 @@
     "k_H1": 0.00639,
     "k_H2": 0.08202
   },
+  "perf_fee_model_v3a": {
+    "form": "perf_fee_half = k_half * avg_AUM * driver_return (March Jan-Mar window on H2)",
+    "k_H1": 0.00639,
+    "k_H2": 0.44199
+  },
   "walk_forward": [
     {
       "label": "FY2022H2",
@@ -47,6 +52,7 @@
       "model": 3074.713,
       "naive_lastyear": 8990.383,
       "naive_randomwalk": 3526.469,
+      "model_v3a": 3074.713,
       "model_v2": 3074.713
     },
     {
@@ -55,6 +61,7 @@
       "model": 3074.713,
       "naive_lastyear": 3526.469,
       "naive_randomwalk": 4302.709,
+      "model_v3a": 3074.713,
       "model_v2": 3074.713
     },
     {
@@ -63,7 +70,8 @@
       "model": 4931.224709540503,
       "naive_lastyear": 4302.709,
       "naive_randomwalk": 3319.298,
-      "model_v2": 4185.055020974427
+      "model_v3a": 10820.609151005869,
+      "model_v2": 4830.656562502018
     },
     {
       "label": "FY2024H1",
@@ -71,7 +79,8 @@
       "model": 3076.3744351933174,
       "naive_lastyear": 3319.298,
       "naive_randomwalk": 5586.426,
-      "model_v2": 3075.7401658205995
+      "model_v3a": 3076.163269528032,
+      "model_v2": 3076.163269528032
     },
     {
       "label": "FY2024H2",
@@ -79,7 +88,8 @@
       "model": 9382.223712772497,
       "naive_lastyear": 5586.426,
       "naive_randomwalk": 3804.623,
-      "model_v2": 7871.338822215634
+      "model_v3a": 12323.509289042528,
+      "model_v2": 10683.903131411016
     },
     {
       "label": "FY2025H1",
@@ -87,6 +97,7 @@
       "model": 3074.713,
       "naive_lastyear": 3804.623,
       "naive_randomwalk": 11162.336,
+      "model_v3a": 3074.713,
       "model_v2": 3074.713
     },
     {
@@ -95,7 +106,8 @@
       "model": 3074.713,
       "naive_lastyear": 11162.336,
       "naive_randomwalk": 5353.003,
-      "model_v2": 3410.5273246226284
+      "model_v3a": 3335.611821983067,
+      "model_v2": 3559.6210068293326
     },
     {
       "label": "FY2026H1",
@@ -103,7 +115,8 @@
       "model": 3357.9899452809036,
       "naive_lastyear": 5353.003,
       "naive_randomwalk": 10901.498,
-      "model_v2": 3292.4099527062262
+      "model_v3a": 3412.640798276483,
+      "model_v2": 3412.640798276483
     },
     {
       "label": "FY2026H2",
@@ -111,7 +124,8 @@
       "model": 7334.717900740869,
       "naive_lastyear": 10901.498,
       "naive_randomwalk": 5577.537,
-      "model_v2": 6534.422089454042
+      "model_v3a": 4081.557556026479,
+      "model_v2": 8237.72020610449
     }
   ],
   "oos_metrics": {
@@ -136,14 +150,21 @@
   },
   "oos_metrics_v2": {
     "model_v2": {
-      "rmse_jpym": 4589.6,
-      "mape_pct": 35.9,
+      "rmse_jpym": 3976.5,
+      "mape_pct": 30.3,
       "directional_hit": 0.89,
       "n": 9
     }
   },
+  "oos_metrics_v3a": {
+    "model_v3a": {
+      "rmse_jpym": 5407.4,
+      "mape_pct": 42.9,
+      "n": 9
+    }
+  },
   "data_acquisition": {
-    "built_at": "2026-06-05T02:34:27.471477+00:00",
+    "built_at": "2026-06-05T15:06:24.499597+00:00",
     "steps": {
       "p0_etf_nav": {
         "rows": 17093,
@@ -163,6 +184,13 @@
       },
       "p3_comp_capiq": {
         "comp_rows": 12
+      },
+      "p4_mandate_nav": {
+        "rows": 12,
+        "tag": "[Assumption]"
+      },
+      "p6_march_window": {
+        "rows": 12
       }
     }
   },
@@ -208,12 +236,21 @@
       },
       {
         "spec": "v2",
-        "revenue_oos_rmse": 4589.6,
-        "revenue_oos_r2": -0.1333,
+        "revenue_oos_rmse": 3976.5,
+        "revenue_oos_r2": 0.1493,
         "perf_fee_h2_oos_rmse": 44743.9,
         "perf_fee_h2_oos_r2": -286.3584,
         "production_default": false,
-        "note": "v2 worse on revenue OOS RMSE; keep v1 as production default"
+        "note": "v2 worse on revenue OOS RMSE"
+      },
+      {
+        "spec": "v3a",
+        "revenue_oos_rmse": 5407.4,
+        "revenue_oos_r2": -0.5732,
+        "perf_fee_h2_oos_rmse": 11863.0,
+        "perf_fee_h2_oos_r2": -19.1998,
+        "production_default": false,
+        "note": "March Jan-Mar window on H2; production stays v1 unless perf_fee H2 RMSE improves"
       }
     ]
   }

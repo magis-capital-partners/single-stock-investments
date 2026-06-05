@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""P0-P3 data acquisition for 7176.T earnings model.
+"""P0-P6 data acquisition for 7176.T earnings model.
 
 Outputs under research/model/data/:
   etf_nav_daily.csv, etf_aum_daily.csv, fund_return_halfyear.csv
@@ -455,6 +455,92 @@ def factor_halfyear(panel: pd.DataFrame, factor_monthly: pd.DataFrame) -> pd.Dat
 
 
 # ---------------------------------------------------------------------------
+# P6 — March crystallization window (Jan–Mar into FY-end)
+# ---------------------------------------------------------------------------
+
+def march_window_halfyear(panel: pd.DataFrame) -> pd.DataFrame:
+    """P6 — Last 3 months return into March year-end (H2 crystallization path)."""
+    daily_path = DATA / "factor_returns_daily.csv"
+    if not daily_path.exists() or panel.empty:
+        return pd.DataFrame()
+    fd = pd.read_csv(daily_path, index_col=0, parse_dates=True)
+    if "nikkei" not in fd.columns:
+        return pd.DataFrame()
+    rows = []
+    for _, r in panel.iterrows():
+        pe = r["period_end"]
+        row = {"period_end": pe.strftime("%Y-%m-%d"), "half": r["half"]}
+        if r["half"] == "H2" and pe.month == 3:
+            jan1 = pd.Timestamp(pe.year, 1, 1)
+            win = fd[(fd.index >= jan1) & (fd.index <= pe)]
+            for col, out in [("nikkei", "march_nikkei_ret"), ("value_pbr", "march_value_ret")]:
+                if col in win.columns:
+                    s = win[col].dropna()
+                    if len(s) >= 2:
+                        row[out] = float(s.iloc[-1] / s.iloc[0] - 1)
+            if "march_nikkei_ret" in row:
+                nik = max(0.0, row.get("march_nikkei_ret", 0))
+                val = row.get("march_value_ret", np.nan)
+                row["march_blended_ret"] = (
+                    0.65 * nik + 0.35 * max(0.0, float(val)) if pd.notna(val) else nik
+                )
+        else:
+            row["march_nikkei_ret"] = r.get("nikkei_ret", np.nan)
+            row["march_blended_ret"] = r.get("nikkei_ret", np.nan)
+        rows.append(row)
+    return pd.DataFrame(rows)
+
+
+# ---------------------------------------------------------------------------
+# P4 — Mandate NAV scaffold (registry-weighted excess)
+# ---------------------------------------------------------------------------
+
+def scaffold_mandate_nav(registry: dict, panel: pd.DataFrame) -> pd.DataFrame:
+    """P4 — Synthetic per-mandate excess from registry; replace with trust reports when available."""
+    if panel.empty:
+        return pd.DataFrame()
+    rows = []
+    pool_nl = registry["aum_pools"][0]["aum_share_fy2025"]
+    for _, r in panel.iterrows():
+        pe = r["period_end"].strftime("%Y-%m-%d")
+        nik = r.get("nikkei_ret", np.nan)
+        val = r.get("value_factor_ret", r.get("value_pbr_ret", np.nan))
+        mandate_rows = []
+        for fund in registry.get("nonlisted_funds", []):
+            bm = fund.get("benchmark", "nikkei")
+            if bm in ("value_pbr", "value"):
+                ret = val if pd.notna(val) else nik
+            else:
+                ret = nik
+            excess = max(0.0, float(ret) - fund.get("hurdle", 0)) if pd.notna(ret) else np.nan
+            mandate_rows.append({
+                "period_end": pe,
+                "mandate_id": fund["id"],
+                "benchmark": bm,
+                "period_return": ret,
+                "excess_vs_hurdle": excess,
+                "aum_share": fund["aum_share_of_nonlisted"] * pool_nl,
+                "perf_rate_assumption": fund.get("perf_rate_assumption"),
+                "tag": fund.get("tag", "[Assumption]"),
+            })
+        rows.extend(mandate_rows)
+    detail = pd.DataFrame(rows)
+    if detail.empty:
+        return detail
+    agg = (
+        detail.groupby("period_end")
+        .apply(lambda g: pd.Series({
+            "mandate_weighted_excess": float((g["excess_vs_hurdle"].fillna(0) * g["aum_share"]).sum() / g["aum_share"].sum()),
+            "mandate_count": len(g),
+        }), include_groups=False)
+        .reset_index()
+    )
+    agg["tag"] = "[Assumption]"
+    agg["note"] = "Replace with 受益権報告書 per-fund NAV when scraped"
+    return agg
+
+
+# ---------------------------------------------------------------------------
 # P3 — Comp bridge + CapIQ
 # ---------------------------------------------------------------------------
 
@@ -569,6 +655,18 @@ def main() -> None:
     capiq = capiq_template()
     capiq.to_csv(DATA / "capiq_peers.csv", index=False)
     manifest["steps"]["p3_comp_capiq"] = {"comp_rows": comp_rows}
+
+    # P4 / P6
+    p4_rows = p6_rows = 0
+    if not panel.empty:
+        mandate = scaffold_mandate_nav(registry, panel)
+        mandate.to_csv(DATA / "mandate_nav_halfyear.csv", index=False)
+        p4_rows = len(mandate)
+        march = march_window_halfyear(panel)
+        march.to_csv(DATA / "march_window_halfyear.csv", index=False)
+        p6_rows = len(march)
+    manifest["steps"]["p4_mandate_nav"] = {"rows": p4_rows, "tag": "[Assumption]"}
+    manifest["steps"]["p6_march_window"] = {"rows": p6_rows}
 
     (DATA / "data_acquisition_manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
     print(json.dumps(manifest, indent=2))
