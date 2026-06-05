@@ -12,7 +12,7 @@ See [`_system/portfolio/holdings.md`](_system/portfolio/holdings.md).
 
 Static portfolio dashboard (etf-dashboard styling) in [`dashboard/`](dashboard/).
 
-**Equity model viz:** Click a ticker with an **M** badge (pilot `7176.T`) to view earnings model charts in the detail panel. Rebuild: `python _system/scripts/build_dashboard_data.py` (includes model ingest). Spec: [`_system/prompts/dashboard_equity_model_viz.md`](_system/prompts/dashboard_equity_model_viz.md).
+**Equity model viz:** Click a ticker with an **M** badge (pilot `7176.T`) to view earnings model charts in the detail panel. Rebuild: `python _system/scripts/build_dashboard_data.py` (includes model ingest). Spec: [`_system/prompts/dashboard_equity_model_viz.md`](_system/prompts/dashboard_equity_model_viz.md). **v2 upgrade (R², PM diagnostics):** [`_system/prompts/equity_model_v2_pm_diagnostics.md`](_system/prompts/equity_model_v2_pm_diagnostics.md).
 
 **Darwin IRA:** [Research download plan](_system/frameworks/darwin_ira_research_plan.md) · copy PDF: `_system/scripts/copy_darwin_investor_pdf.ps1`
 

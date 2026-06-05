@@ -268,12 +268,13 @@ Full-width layout (not 380px sidebar). Structure like Darwin tab:
 
 ## FUTURE PHASES (do not block v1)
 
-| Phase | Feature |
-|-------|---------|
-| 2 | CapIQ ownership panel (user-upload CSV → `research/model/capiq_ownership.csv`) |
-| 3 | Live Nikkei nowcast refresh via scheduled workflow writing `nowcast_latest.json` |
-| 4 | Generic model types: `lawrence_only`, `segment_sotp`, `optionality_nav` |
-| 5 | Embed etf-dashboard VRP macro strip via `_external/etf-dashboard` sync (like Darwin `import_external_data.py`) |
+| Phase | Feature | Spec |
+|-------|---------|------|
+| 2 | **PM diagnostics v2** — R², IS/OOS gap, residuals, tornado, coefficient CIs | `_system/prompts/equity_model_v2_pm_diagnostics.md` |
+| 3 | CapIQ ownership panel (user-upload CSV → `research/model/capiq_export.csv`) |
+| 4 | Live Nikkei nowcast refresh via scheduled workflow writing `nowcast_latest.json` |
+| 5 | Generic model types: `lawrence_only`, `segment_sotp`, `optionality_nav` |
+| 6 | Embed etf-dashboard VRP macro strip via `_external/etf-dashboard` sync (like Darwin `import_external_data.py`) |
 
 ---
 
