@@ -24,6 +24,13 @@
     return `${(Number(v) * 100).toFixed(1)}%`;
   }
 
+  function fmtR2(v) {
+    if (v == null || Number.isNaN(v)) return '—';
+    const n = Number(v);
+    const color = n < 0 ? 'var(--accent-red)' : n < 0.3 ? 'var(--accent-amber)' : 'var(--accent-green)';
+    return `<span style="color:${color}">${n.toFixed(3)}</span>`;
+  }
+
   function chartDefaults() {
     return {
       responsive: true,
@@ -54,6 +61,108 @@
       ${liq.warning ? `<p>${escapeHtml(liq.warning)}</p>` : ''}
       ${lp.date ? `<p class="mono" style="margin-top:6px;font-size:11px">Last print: ¥${lp.price_jpy} × ${lp.volume_shares} sh (${lp.date})</p>` : ''}
     </div>`;
+  }
+
+  function renderPmKpiRow(bundle, escapeHtml) {
+    const diag = bundle.diagnostics || {};
+    const targets = diag.targets || {};
+    const perf = targets.perf_fee_h2_positive || {};
+    const rev = targets.revenue_total || {};
+    const perfOos = perf.out_of_sample || {};
+    const revOos = rev.out_of_sample || {};
+    const gap = rev.overfit_gap;
+    const gapAmber = gap != null && gap > 0.15;
+    const spec = bundle.production_spec || 'v1';
+    const naive = (rev.benchmarks_oos || {}).naive_lastyear || {};
+    return `
+    <div class="model-kpi-row pm-kpi-row">
+      <div class="summary-card"><div class="label">Perf fee H2+ OOS R²</div><div class="value" style="font-size:18px">${fmtR2(perfOos.r2)}</div><div class="sub">primary KPI · n=${perfOos.n ?? '—'}</div></div>
+      <div class="summary-card"><div class="label">Revenue OOS R²</div><div class="value" style="font-size:16px">${fmtR2(revOos.r2)}</div><div class="sub">RMSE ${revOos.rmse_jpym != null ? fmtYenM(revOos.rmse_jpym) : '—'}</div></div>
+      <div class="summary-card"><div class="label">IS vs OOS gap</div><div class="value" style="font-size:16px;color:${gapAmber ? 'var(--accent-amber)' : 'var(--text-primary)'}">${gap != null ? gap.toFixed(3) : '—'}</div><div class="sub">revenue overfit gap</div></div>
+      <div class="summary-card"><div class="label">Production spec</div><div class="value" style="font-size:16px">${escapeHtml(spec)}<span class="spec-badge">active</span></div><div class="sub">${naive.beats_model ? 'naive LY wins level' : 'model wins level'}</div></div>
+    </div>`;
+  }
+
+  function renderDiagnosticsBanner(escapeHtml) {
+    return `<div class="pm-diagnostics-banner">
+      <strong>PM diagnostics</strong> Lead with perf-fee H2 out-of-sample R², not in-sample total revenue.
+      Structural model explains seasonality; level forecast may trail same-half-last-year naive while revenue trends up.
+    </div>`;
+  }
+
+  function renderScorecardTable(diag, escapeHtml) {
+    const targets = diag.targets || {};
+    const order = ['perf_fee_h2_positive', 'revenue_total', 'revenue_h2_only', 'base_fee', 'perf_fee', 'ordinary_profit', 'net_income'];
+    const labels = {
+      perf_fee_h2_positive: 'Perf fee (H2, perf>0)',
+      revenue_total: 'Revenue total',
+      revenue_h2_only: 'Revenue H2 only',
+      base_fee: 'Base fee',
+      perf_fee: 'Perf fee',
+      ordinary_profit: 'Ordinary profit',
+      net_income: 'Net income',
+    };
+    const rows = order.filter((k) => targets[k]).map((k) => {
+      const t = targets[k];
+      const isR = t.in_sample?.r2;
+      const oosR = t.out_of_sample?.r2;
+      const naive = (t.benchmarks_oos || {}).naive_lastyear;
+      return `<tr>
+        <td>${escapeHtml(labels[k] || k)}</td>
+        <td class="mono">${isR != null ? Number(isR).toFixed(3) : '—'}</td>
+        <td class="mono">${oosR != null ? Number(oosR).toFixed(3) : '—'}</td>
+        <td class="mono">${t.out_of_sample?.rmse_jpym != null ? fmtYenM(t.out_of_sample.rmse_jpym) : '—'}</td>
+        <td class="mono">${naive?.beats_model === true ? 'Naive' : naive?.beats_model === false ? 'Model' : '—'}</td>
+      </tr>`;
+    }).join('');
+    if (!rows) return '';
+    return `<table class="darwin-table">
+      <thead><tr><th>Target</th><th>IS R²</th><th>OOS R²</th><th>OOS RMSE</th><th>Level winner</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+  }
+
+  function renderSpecLeaderboard(spec, escapeHtml) {
+    const lb = (spec && spec.leaderboard) || [];
+    if (!lb.length) return '';
+    return `<table class="darwin-table">
+      <thead><tr><th>Spec</th><th>Rev OOS RMSE</th><th>Rev OOS R²</th><th>Perf H2 RMSE</th><th>Default</th></tr></thead>
+      <tbody>${lb.map((r) => `<tr>
+        <td class="mono">${escapeHtml(r.spec)}</td>
+        <td class="mono">${r.revenue_oos_rmse != null ? fmtYenM(r.revenue_oos_rmse) : '—'}</td>
+        <td class="mono">${r.revenue_oos_r2 != null ? Number(r.revenue_oos_r2).toFixed(3) : '—'}</td>
+        <td class="mono">${r.perf_fee_h2_oos_rmse != null ? fmtYenM(r.perf_fee_h2_oos_rmse) : '—'}</td>
+        <td>${r.production_default ? '<span class="badge badge-ok">yes</span>' : '—'}</td>
+      </tr>`).join('')}</tbody>
+    </table>`;
+  }
+
+  function renderAttributionTable(diag, escapeHtml) {
+    const rows = diag.residual_attribution || [];
+    if (!rows.length) return '';
+    return `<table class="darwin-table">
+      <thead><tr><th>Period</th><th>Actual</th><th>Fitted</th><th>Residual</th><th>Note</th></tr></thead>
+      <tbody>${rows.map((r) => `<tr>
+        <td class="mono">${escapeHtml(r.label)}</td>
+        <td class="mono">${fmtYenM(r.actual)}</td>
+        <td class="mono">${fmtYenM(r.fitted)}</td>
+        <td class="mono" style="color:var(--accent-amber)">${fmtYenM(r.residual)}</td>
+        <td style="font-size:11px">${escapeHtml(r.note || '')}</td>
+      </tr>`).join('')}</tbody>
+    </table>`;
+  }
+
+  function renderCoeffTable(coeff, escapeHtml) {
+    if (!coeff || !Object.keys(coeff).length) return '';
+    return `<table class="darwin-table">
+      <thead><tr><th>Coefficient</th><th>Point</th><th>p05</th><th>p95</th></tr></thead>
+      <tbody>${Object.entries(coeff).map(([k, v]) => `<tr>
+        <td class="mono">${escapeHtml(k)}</td>
+        <td class="mono">${v.point ?? '—'}</td>
+        <td class="mono">${v.p05 ?? '—'}</td>
+        <td class="mono">${v.p95 ?? '—'}</td>
+      </tr>`).join('')}</tbody>
+    </table>`;
   }
 
   function renderKpiRow(bundle, escapeHtml) {
@@ -202,6 +311,104 @@
       });
     }
 
+    const diag = bundle.diagnostics || {};
+    const targets = diag.targets || {};
+    const r2Canvas = document.getElementById('model-chart-r2-bars');
+    if (r2Canvas && Object.keys(targets).length) {
+      const order = ['perf_fee_h2_positive', 'revenue_total', 'revenue_h2_only', 'base_fee', 'perf_fee'];
+      const labels = order.filter((k) => targets[k]).map((k) => k.replace(/_/g, ' '));
+      const isData = order.filter((k) => targets[k]).map((k) => targets[k].in_sample?.r2 ?? null);
+      const oosData = order.filter((k) => targets[k]).map((k) => targets[k].out_of_sample?.r2 ?? null);
+      makeChart(r2Canvas, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [
+            { label: 'IS R²', data: isData, backgroundColor: COLORS[5] },
+            { label: 'OOS R²', data: oosData, backgroundColor: COLORS[0] },
+          ],
+        },
+        options: {
+          ...chartDefaults(),
+          plugins: { ...chartDefaults().plugins, title: { display: true, text: 'IS vs OOS R² by target', color: '#8896ae' } },
+        },
+      });
+    }
+
+    const spec = bundle.spec_comparison || {};
+    const specCanvas = document.getElementById('model-chart-spec-leaderboard');
+    if (specCanvas && (spec.leaderboard || []).length) {
+      const lb = spec.leaderboard;
+      makeChart(specCanvas, {
+        type: 'bar',
+        data: {
+          labels: lb.map((r) => r.spec),
+          datasets: [{ label: 'Revenue OOS RMSE (¥m)', data: lb.map((r) => r.revenue_oos_rmse), backgroundColor: COLORS[4] }],
+        },
+        options: {
+          indexAxis: 'y',
+          ...chartDefaults(),
+          plugins: { ...chartDefaults().plugins, title: { display: true, text: 'Spec leaderboard (lower RMSE better)', color: '#8896ae' } },
+        },
+      });
+    }
+
+    const residuals = (bundle.residuals || []).filter((r) => r.target === 'revenue_total' && r.is_oos === 1);
+    const scatterCanvas = document.getElementById('model-chart-actual-fitted');
+    if (scatterCanvas && residuals.length) {
+      makeChart(scatterCanvas, {
+        type: 'scatter',
+        data: {
+          datasets: [{
+            label: 'OOS revenue',
+            data: residuals.map((r) => ({ x: r.actual, y: r.fitted })),
+            backgroundColor: COLORS[0],
+          }],
+        },
+        options: {
+          ...chartDefaults(),
+          plugins: { ...chartDefaults().plugins, title: { display: true, text: 'Actual vs fitted revenue (OOS)', color: '#8896ae' } },
+          scales: {
+            x: { ...chartDefaults().scales.x, title: { display: true, text: 'Actual ¥m', color: '#566580' } },
+            y: { ...chartDefaults().scales.y, title: { display: true, text: 'Fitted ¥m', color: '#566580' } },
+          },
+        },
+      });
+    }
+
+    const resOos = (bundle.residuals || []).filter((r) => r.target === 'revenue_total' && r.is_oos === 1);
+    const resCanvas = document.getElementById('model-chart-residuals');
+    if (resCanvas && resOos.length) {
+      makeChart(resCanvas, {
+        type: 'bar',
+        data: {
+          labels: resOos.map((r) => r.label),
+          datasets: [{ label: 'Residual ¥m', data: resOos.map((r) => r.residual), backgroundColor: COLORS[5] }],
+        },
+        options: {
+          ...chartDefaults(),
+          plugins: { ...chartDefaults().plugins, title: { display: true, text: 'OOS revenue residuals', color: '#8896ae' } },
+        },
+      });
+    }
+
+    const tornado = diag.tornado || [];
+    const torCanvas = document.getElementById('model-chart-tornado');
+    if (torCanvas && tornado.length) {
+      makeChart(torCanvas, {
+        type: 'bar',
+        data: {
+          labels: tornado.map((t) => t.driver),
+          datasets: [{ label: 'NI delta %', data: tornado.map((t) => t.ni_delta_pct), backgroundColor: COLORS[2] }],
+        },
+        options: {
+          indexAxis: 'y',
+          ...chartDefaults(),
+          plugins: { ...chartDefaults().plugins, title: { display: true, text: 'Tornado: H2 net income sensitivity', color: '#8896ae' } },
+        },
+      });
+    }
+
     const shares = (bundle.shares || {}).series || [];
     const shCanvas = document.getElementById('model-chart-shares');
     if (shCanvas && shares.length) {
@@ -243,6 +450,26 @@
         <div class="chart-box split"><canvas id="model-chart-oos"></canvas></div>
         <div class="chart-box split"><canvas id="model-chart-shares"></canvas></div>
       </div>
+      ${bundle.diagnostics_ready ? `
+      <h3 style="margin-top:18px">Model diagnostics <span class="spec-badge">${escapeHtml(bundle.production_spec || 'v1')}</span></h3>
+      ${renderDiagnosticsBanner(escapeHtml)}
+      ${renderPmKpiRow(bundle, escapeHtml)}
+      <div class="model-diagnostics-charts">
+        <div class="chart-box wide"><canvas id="model-chart-r2-bars"></canvas></div>
+        <div class="chart-box"><canvas id="model-chart-spec-leaderboard"></canvas></div>
+        <div class="chart-box"><canvas id="model-chart-actual-fitted"></canvas></div>
+        <div class="chart-box"><canvas id="model-chart-residuals"></canvas></div>
+        <div class="chart-box wide"><canvas id="model-chart-tornado"></canvas></div>
+      </div>
+      <h3 style="margin-top:14px">PM scorecard</h3>
+      ${renderScorecardTable(bundle.diagnostics, escapeHtml)}
+      <h3 style="margin-top:14px">Spec comparison</h3>
+      ${renderSpecLeaderboard(bundle.spec_comparison, escapeHtml)}
+      <h3 style="margin-top:14px">Residual attribution</h3>
+      ${renderAttributionTable(bundle.diagnostics, escapeHtml)}
+      <h3 style="margin-top:14px">Coefficient bootstrap CIs</h3>
+      ${renderCoeffTable(bundle.coefficient_bootstrap, escapeHtml)}
+      ` : ''}
       <h3 style="margin-top:14px">Model specification</h3>
       ${renderSpecTable(bundle, escapeHtml)}
       <h3 style="margin-top:14px">Walk-forward errors</h3>

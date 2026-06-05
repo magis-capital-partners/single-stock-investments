@@ -78,6 +78,24 @@ def parse_panel_csv(path: Path) -> list[dict]:
     return rows[-24:]
 
 
+def parse_residuals_csv(path: Path) -> list[dict]:
+    if not path.exists():
+        return []
+    out: list[dict] = []
+    with path.open(encoding="utf-8", newline="") as f:
+        for row in csv.DictReader(f):
+            out.append({
+                "label": row.get("label"),
+                "period_end": row.get("period_end"),
+                "target": row.get("target"),
+                "actual": round3(row.get("actual")),
+                "fitted": round3(row.get("fitted")),
+                "residual": round3(row.get("residual")),
+                "is_oos": int(row.get("is_oos") or 0),
+            })
+    return out[-80:]
+
+
 def parse_forecasts_csv(path: Path) -> list[dict]:
     if not path.exists():
         return []
@@ -92,6 +110,10 @@ def parse_forecasts_csv(path: Path) -> list[dict]:
                     "revenue_m": round3(row.get("revenue_m")),
                     "net_income_m": round3(row.get("net_income_m")),
                     "perf_fee_m": round3(row.get("perf_fee_m")),
+                    "revenue_lo80": round3(row.get("revenue_lo80")),
+                    "revenue_hi80": round3(row.get("revenue_hi80")),
+                    "net_income_lo80": round3(row.get("net_income_lo80")),
+                    "net_income_hi80": round3(row.get("net_income_hi80")),
                 }
             )
     return out
@@ -135,12 +157,17 @@ def equity_model_summary(bundle: dict) -> dict:
     )
     if not beats and model_rmse is not None:
         headline += "; OOS RMSE loses to seasonal naive"
+    diag = bundle.get("diagnostics") or {}
+    kpi = ((diag.get("targets") or {}).get("perf_fee_h2_positive") or {}).get("out_of_sample") or {}
     return {
         "ready": True,
+        "diagnostics_ready": bundle.get("diagnostics_ready", False),
+        "production_spec": bundle.get("production_spec"),
         "as_of": bundle.get("as_of"),
         "headline": headline,
         "model_beats_naive": beats,
         "model_type": bundle.get("model_type"),
+        "perf_fee_h2_oos_r2": kpi.get("r2"),
     }
 
 
@@ -158,6 +185,9 @@ def build_ticker_bundle(ticker: str) -> dict | None:
         return None
 
     results = load_json(results_path) or {}
+    diagnostics = load_json(model_dir / "model_diagnostics.json") or {}
+    spec_comparison = load_json(model_dir / "spec_comparison.json") or {}
+    coeff_bootstrap = load_json(model_dir / "coefficient_bootstrap.json") or {}
     valuation = load_json(ticker_dir / "research" / "valuation.json") or {}
     nowcast = load_json(model_dir / "nowcast_latest.json") or {}
     shares_raw = load_json(ticker_dir / "research" / "shares_outstanding_split_adjusted.json") or {}
@@ -202,8 +232,12 @@ def build_ticker_bundle(ticker: str) -> dict | None:
     )
 
     rel = ticker
+    diagnostics_ready = bool(diagnostics.get("targets"))
     bundle = {
         "model_ready": True,
+        "diagnostics_ready": diagnostics_ready,
+        "production_spec": diagnostics.get("production_spec") or results.get("production_spec") or "v1",
+        "primary_kpi": diagnostics.get("primary_kpi"),
         "model_type": "earnings_semiannual",
         "as_of": results.get("as_of") or valuation.get("as_of"),
         "company": ticker,
@@ -222,6 +256,12 @@ def build_ticker_bundle(ticker: str) -> dict | None:
             "earnings_bridge": results.get("earnings_bridge"),
         },
         "oos_metrics": results.get("oos_metrics"),
+        "oos_metrics_v2": results.get("oos_metrics_v2"),
+        "oos_metrics_v3a": results.get("oos_metrics_v3a"),
+        "diagnostics": diagnostics if diagnostics_ready else None,
+        "spec_comparison": spec_comparison,
+        "coefficient_bootstrap": coeff_bootstrap,
+        "residuals": parse_residuals_csv(model_dir / "residuals_halfyear.csv"),
         "walk_forward": results.get("walk_forward"),
         "panel": panel,
         "forecasts": parse_forecasts_csv(model_dir / "forecasts.csv"),
@@ -240,6 +280,7 @@ def build_ticker_bundle(ticker: str) -> dict | None:
             "data_dictionary": github_blob(f"{rel}/research/model/data_dictionary.md"),
             "forecasts_csv": github_blob(f"{rel}/research/model/forecasts.csv"),
             "model_results": github_blob(f"{rel}/research/model/model_results.json"),
+            "model_diagnostics": github_blob(f"{rel}/research/model/model_diagnostics.json"),
             "skeptical_report": github_blob(skeptical_rel) if skeptical_rel else None,
         },
     }
