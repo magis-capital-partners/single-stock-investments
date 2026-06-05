@@ -330,12 +330,30 @@
     },
     {
       "spec": "v2",
-      "revenue_oos_rmse": 4589.6,
-      "revenue_oos_r2": -0.1333,
+      "revenue_oos_rmse": 3976.5,
+      "revenue_oos_r2": 0.1493,
       "perf_fee_h2_oos_rmse": 44743.9,
       "perf_fee_h2_oos_r2": -286.3584,
       "production_default": false,
-      "note": "v2 worse on revenue OOS RMSE; keep v1 as production default"
+      "note": "v2 worse on revenue OOS RMSE"
+    },
+    {
+      "spec": "v3a",
+      "revenue_oos_rmse": 5407.4,
+      "revenue_oos_r2": -0.5732,
+      "perf_fee_h2_oos_rmse": 11863.0,
+      "perf_fee_h2_oos_r2": -19.1998,
+      "production_default": false,
+      "note": "March Jan-Mar window on H2"
+    },
+    {
+      "spec": "v4",
+      "revenue_oos_rmse": 5469.7,
+      "revenue_oos_r2": -0.6096,
+      "perf_fee_h2_oos_rmse": 10307.2,
+      "perf_fee_h2_oos_r2": -14.2489,
+      "production_default": false,
+      "note": "P4 mandate NAV scrape"
     }
   ],
   "residual_attribution": [
@@ -453,10 +471,36 @@
       "period_end": ""
     }
   ],
+  "tornado": [
+    {
+      "driver": "Nikkei H2 return",
+      "low": -0.1,
+      "high": 0.14,
+      "ni_low": 1551,
+      "ni_high": 6623,
+      "ni_delta_pct": 327.0
+    },
+    {
+      "driver": "AUM level",
+      "low": 0.9,
+      "high": 1.1,
+      "ni_low": 1393,
+      "ni_high": 1710,
+      "ni_delta_pct": 20.4
+    },
+    {
+      "driver": "March window return",
+      "low": -0.05,
+      "high": 0.12,
+      "ni_low": 1551,
+      "ni_high": 5899,
+      "ni_delta_pct": 280.2
+    }
+  ],
   "caveats": [
     "Primary KPI: perf_fee_h2_positive OOS R\u00b2 (not total-revenue IS R\u00b2).",
     "perf_fee_h2_positive OOS n is small (fee split disclosed only from FY2024).",
-    "v2 blended excess worsens revenue OOS RMSE; production_spec remains v1.",
+    "production_spec=v1 per acceptance rule (lowest perf_fee H2 OOS RMSE not worse than v1).",
     "Naive same-half-last-year beats model on revenue OOS RMSE (\u00a53,230m vs \u00a54,336m).",
     "n\u224812 half-years; negative OOS R\u00b2 is valid (model worse than mean)."
   ],

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""P0-P3 data acquisition for 7176.T earnings model.
+"""P0-P6 data acquisition for 7176.T earnings model.
 
 Outputs under research/model/data/:
   etf_nav_daily.csv, etf_aum_daily.csv, fund_return_halfyear.csv
@@ -219,32 +219,65 @@ def build_fund_nav_proxy(registry: dict, fund_rets: pd.DataFrame, panel: pd.Data
 
 
 # ---------------------------------------------------------------------------
-# P1 — Flows (JITA proxy + ETF implied flows)
+# P1 / P5 — Flows (JITA scrape + ETF implied flows)
 # ---------------------------------------------------------------------------
 
+JITA_SCRIPT = ROOT.parents[1] / "_scripts" / "download_jita_flows.py"
+
+
+def _run_jita_scrape() -> None:
+    import subprocess
+    import sys
+
+    if not JITA_SCRIPT.exists():
+        return
+    subprocess.run([sys.executable, str(JITA_SCRIPT)], check=False, cwd=str(ROOT.parents[1]))
+
+
+def _load_jita_monthly() -> pd.DataFrame:
+    path = DATA / "jita_flows_monthly.csv"
+    if not path.exists():
+        _run_jita_scrape()
+    if not path.exists():
+        return pd.DataFrame()
+    j = pd.read_csv(path, parse_dates=["month"])
+    j["month"] = j["month"].dt.strftime("%Y-%m-%d")
+    return j
+
+
 def fetch_jita_proxy(etf_flows: pd.DataFrame) -> pd.DataFrame:
-    """Monthly flow panel: aggregate ETF implied flows; JITA columns pending scrape."""
+    """Monthly flow panel: Simplex ETF implied flows + JITA industry flows (P5)."""
     months = pd.date_range("2019-09-01", "2026-06-01", freq="MS")
-    if etf_flows.empty:
-        return pd.DataFrame({
-            "month": [m.strftime("%Y-%m-%d") for m in months],
-            "etf_implied_flow_jpym": np.nan,
-            "jita_equity_net_flow_bn_jpy": np.nan,
-            "jita_etf_net_flow_bn_jpy": np.nan,
-            "tag": "[Pending]",
-            "note": "JITA: export from https://www.toushin.or.jp/ or Vicki scrape",
-        })
-    ef = etf_flows.copy()
-    ef["date"] = pd.to_datetime(ef["date"])
-    ef["month"] = ef["date"].dt.to_period("M").dt.to_timestamp()
-    agg = ef.groupby("month")["flow_jpym"].sum().reset_index()
-    agg["month"] = agg["month"].dt.strftime("%Y-%m-%d")
     base = pd.DataFrame({"month": [m.strftime("%Y-%m-%d") for m in months]})
-    out = base.merge(agg.rename(columns={"flow_jpym": "etf_implied_flow_jpym"}), on="month", how="left")
-    out["jita_equity_net_flow_bn_jpy"] = np.nan
-    out["jita_etf_net_flow_bn_jpy"] = np.nan
-    out["tag"] = "[Derived]"
-    out["note"] = "etf_implied_flow from NAV×shares roll-forward; JITA columns pending"
+    base["period"] = pd.to_datetime(base["month"]).dt.to_period("M")
+
+    if etf_flows.empty:
+        out = base.copy()
+        out["etf_implied_flow_jpym"] = np.nan
+    else:
+        ef = etf_flows.copy()
+        ef["date"] = pd.to_datetime(ef["date"])
+        ef["period"] = ef["date"].dt.to_period("M")
+        agg = ef.groupby("period")["flow_jpym"].sum().reset_index()
+        out = base.merge(agg.rename(columns={"flow_jpym": "etf_implied_flow_jpym"}), on="period", how="left")
+
+    jita = _load_jita_monthly()
+    if not jita.empty:
+        jita = jita.copy()
+        jita["period"] = pd.to_datetime(jita["month"]).dt.to_period("M")
+        use = [c for c in ["period", "jita_equity_net_flow_bn_jpy", "jita_etf_net_flow_bn_jpy"] if c in jita.columns]
+        out = out.merge(jita[use], on="period", how="left")
+    else:
+        out["jita_equity_net_flow_bn_jpy"] = np.nan
+        out["jita_etf_net_flow_bn_jpy"] = np.nan
+
+    has_jita = out["jita_equity_net_flow_bn_jpy"].notna().any() if "jita_equity_net_flow_bn_jpy" in out.columns else False
+    out["tag"] = "[Filing/Market]" if has_jita else "[Derived]"
+    out["note"] = (
+        "JITA B-1 株式 + ETF flows (億円); etf_implied_flow from Simplex ETF NAV roll-forward"
+        if has_jita else "etf_implied_flow only; JITA scrape failed"
+    )
+    out.drop(columns=["period"], inplace=True)
     return out
 
 
@@ -281,23 +314,25 @@ def aggregate_flows_halfyear(flows_monthly: pd.DataFrame, panel: pd.DataFrame) -
         return pd.DataFrame()
     fm = flows_monthly.copy()
     fm["month"] = pd.to_datetime(fm["month"])
+    fm["period"] = fm["month"].dt.to_period("M")
     rows = []
     for _, r in panel.iterrows():
         pe = r["period_end"]
         if pe.month == 9:
-            start = pd.Timestamp(pe.year, 4, 1)
+            start_p = pd.Period(f"{pe.year}-04", freq="M")
         else:
-            start = pd.Timestamp(pe.year - 1, 10, 1)
-        win = fm[(fm["month"] >= start) & (fm["month"] <= pe)]
+            start_p = pd.Period(f"{pe.year - 1}-10", freq="M")
+        end_p = pd.Period(f"{pe.year}-{pe.month:02d}", freq="M")
+        win = fm[(fm["period"] >= start_p) & (fm["period"] <= end_p)]
         etf_flow = float(win["etf_implied_flow_jpym"].sum()) if "etf_implied_flow_jpym" in win.columns and len(win) else np.nan
         jita_eq = float(win["jita_equity_net_flow_bn_jpy"].sum()) if "jita_equity_net_flow_bn_jpy" in win.columns and len(win) else np.nan
         jita_etf = float(win["jita_etf_net_flow_bn_jpy"].sum()) if "jita_etf_net_flow_bn_jpy" in win.columns and len(win) else np.nan
         rows.append({
             "period_end": pe.strftime("%Y-%m-%d"),
             "etf_implied_flow_jpym": etf_flow,
-            "jita_equity_flow_bn": jita_eq if pd.notna(jita_eq) and jita_eq != 0 else np.nan,
-            "jita_etf_flow_bn": jita_etf if pd.notna(jita_etf) and jita_etf != 0 else np.nan,
-            "tag": "[Derived]",
+            "jita_equity_flow_bn": jita_eq if pd.notna(jita_eq) else np.nan,
+            "jita_etf_flow_bn": jita_etf if pd.notna(jita_etf) else np.nan,
+            "tag": "[Filing/Market]" if pd.notna(jita_eq) or pd.notna(jita_etf) else "[Derived]",
         })
     return pd.DataFrame(rows)
 
@@ -402,6 +437,22 @@ def fee_history_halfyear(fee_raw: pd.DataFrame) -> pd.DataFrame:
 # P2 — Factor returns
 # ---------------------------------------------------------------------------
 
+def _repair_price_splits(series: pd.Series, jump: float = 0.35) -> pd.Series:
+    """Scale yfinance series after one-day jumps (ETF unit splits / bad ticks)."""
+    s = series.dropna().astype(float).copy()
+    if len(s) < 2:
+        return s
+    ratio = s.pct_change()
+    for i in range(1, len(s)):
+        r = ratio.iloc[i]
+        if pd.isna(r) or abs(r) <= jump:
+            continue
+        scale = s.iloc[i - 1] / s.iloc[i]
+        s.iloc[i:] *= scale
+        ratio = s.pct_change()
+    return s
+
+
 def fetch_factor_returns(registry: dict) -> pd.DataFrame:
     import yfinance as yf
 
@@ -411,7 +462,8 @@ def fetch_factor_returns(registry: dict) -> pd.DataFrame:
         try:
             h = yf.Ticker(tk).history(start="2019-09-01", interval="1d", auto_adjust=True)
             if len(h):
-                frames[name] = h["Close"].rename(name)
+                px = _repair_price_splits(h["Close"])
+                frames[name] = px.rename(name)
         except Exception as exc:
             print(f"[warn] factor {name} ({tk}): {exc}")
     if not frames:
@@ -445,13 +497,216 @@ def factor_halfyear(panel: pd.DataFrame, factor_monthly: pd.DataFrame) -> pd.Dat
         row = {"period_end": pe.strftime("%Y-%m-%d")}
         for col in ["nikkei", "value_pbr", "growth", "reit", "leveraged", "topix"]:
             if col in win.columns:
-                s = win[col].dropna()
-                if len(s) >= 2:
-                    row[f"{col}_ret"] = float(s.iloc[-1] / s.iloc[0] - 1)
+                rets = win[col].dropna()
+                if len(rets) >= 1:
+                    row[f"{col}_ret"] = float((1 + rets).prod() - 1)
         if "value_spread" in win.columns:
             row["value_factor_ret"] = float(win["value_spread"].sum())
         rows.append(row)
     return pd.DataFrame(rows)
+
+
+# ---------------------------------------------------------------------------
+# P6 — March crystallization window (Jan–Mar into FY-end)
+# ---------------------------------------------------------------------------
+
+def march_window_halfyear(panel: pd.DataFrame) -> pd.DataFrame:
+    """P6 — Last 3 months return into March year-end (H2 crystallization path)."""
+    daily_path = DATA / "factor_returns_daily.csv"
+    if not daily_path.exists() or panel.empty:
+        return pd.DataFrame()
+    fd = pd.read_csv(daily_path, index_col=0, parse_dates=True)
+    if "nikkei" not in fd.columns:
+        return pd.DataFrame()
+    rows = []
+    for _, r in panel.iterrows():
+        pe = r["period_end"]
+        row = {"period_end": pe.strftime("%Y-%m-%d"), "half": r["half"]}
+        if r["half"] == "H2" and pe.month == 3:
+            jan1 = pd.Timestamp(pe.year, 1, 1)
+            win = fd[(fd.index >= jan1) & (fd.index <= pe)]
+            for col, out in [("nikkei", "march_nikkei_ret"), ("value_pbr", "march_value_ret")]:
+                if col in win.columns:
+                    s = win[col].dropna()
+                    if len(s) >= 2:
+                        row[out] = float(s.iloc[-1] / s.iloc[0] - 1)
+            if "march_nikkei_ret" in row:
+                nik = max(0.0, row.get("march_nikkei_ret", 0))
+                val = row.get("march_value_ret", np.nan)
+                row["march_blended_ret"] = (
+                    0.65 * nik + 0.35 * max(0.0, float(val)) if pd.notna(val) else nik
+                )
+        else:
+            row["march_nikkei_ret"] = r.get("nikkei_ret", np.nan)
+            row["march_blended_ret"] = r.get("nikkei_ret", np.nan)
+        rows.append(row)
+    return pd.DataFrame(rows)
+
+
+# ---------------------------------------------------------------------------
+# P4 — Mandate NAV from scraped monthly reports + ETF history
+# ---------------------------------------------------------------------------
+
+MANDATE_CATALOG = ROOT / "mandate_funds.json"
+MANDATE_SCRIPT = ROOT.parents[1] / "_scripts" / "download_mandate_nav.py"
+
+
+def _run_mandate_scrape() -> None:
+    """Invoke download_mandate_nav.py (Vicki/Marvin HTTP scrape)."""
+    import subprocess
+    import sys
+
+    if not MANDATE_SCRIPT.exists():
+        return
+    subprocess.run([sys.executable, str(MANDATE_SCRIPT)], check=False, cwd=str(ROOT.parents[1]))
+
+
+def _benchmark_ret(row: pd.Series, bm: str) -> float:
+    """Half-year benchmark return (decimal); drop corrupt |r|>50% half-year moves."""
+    nik = float(row.get("nikkei_ret") or 0)
+
+    def _sanitized(val) -> float | None:
+        if pd.isna(val):
+            return None
+        v = float(val)
+        return v if abs(v) <= 0.5 else None
+
+    if bm in ("value_pbr", "value"):
+        vf = _sanitized(row.get("value_factor_ret"))
+        vp = _sanitized(row.get("value_pbr_ret"))
+        val = vf if vf is not None and abs(vf) > 1e-9 else vp
+        return val if val is not None else nik
+    if bm == "topix":
+        t = _sanitized(row.get("topix_etf_ret")) or _sanitized(row.get("topix_ret"))
+        return t if t is not None else nik
+    return nik
+
+
+def _halfyear_fund_return(monthly: pd.DataFrame, fund_id: str, period_end: pd.Timestamp, half: str) -> float:
+    """Compound monthly returns for fiscal half ending period_end."""
+    sub = monthly[monthly["fund_id"] == fund_id].copy()
+    if sub.empty:
+        return np.nan
+    sub["as_of"] = pd.to_datetime(sub["as_of"])
+    sub = sub.sort_values("as_of")
+    fy = period_end.year if period_end.month == 3 else period_end.year + 1
+    if half == "H1":
+        start, end = pd.Timestamp(fy - 1, 4, 1), pd.Timestamp(fy - 1, 9, 30)
+    else:
+        start, end = pd.Timestamp(fy - 1, 10, 1), pd.Timestamp(fy, 3, 31)
+    win = sub[(sub["as_of"] >= start) & (sub["as_of"] <= end)]
+    if len(win) >= 2 and win["nav_jpy"].notna().sum() >= 2:
+        nav = win["nav_jpy"].dropna()
+        return float(nav.iloc[-1] / nav.iloc[0] - 1.0)
+    if win["month_ret"].notna().any():
+        return float((1 + win["month_ret"].fillna(0)).prod() - 1.0)
+    return np.nan
+
+
+def build_mandate_nav(registry: dict, panel: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """P4 — Pool scraped mandate returns; impute institutional residual from value proxy."""
+    monthly_path = DATA / "mandate_nav_monthly.csv"
+    if not monthly_path.exists():
+        _run_mandate_scrape()
+    if not monthly_path.exists():
+        return pd.DataFrame(), pd.DataFrame()
+
+    catalog = json.loads(MANDATE_CATALOG.read_text(encoding="utf-8")) if MANDATE_CATALOG.exists() else {}
+    monthly = pd.read_csv(monthly_path, parse_dates=["as_of"])
+    detail_rows: list[dict] = []
+    agg_rows: list[dict] = []
+
+    etf_weights = {e["id"]: e["weight"] for e in catalog.get("perf_etfs", [])}
+    latest_public_aum = (
+        monthly.dropna(subset=["aum_jpym"]).groupby("fund_id")["aum_jpym"].last().sum()
+        if "aum_jpym" in monthly.columns else 0.0
+    )
+
+    for _, r in panel.iterrows():
+        pe = pd.Timestamp(r["period_end"])
+        pe_str = pe.strftime("%Y-%m-%d")
+        half = r["half"]
+        mandate_slices: list[dict] = []
+
+        for fund in catalog.get("sam_funds", []):
+            ret = _halfyear_fund_return(monthly, fund["id"], pe, half)
+            if np.isnan(ret):
+                continue
+            bm_ret = _benchmark_ret(r, fund.get("benchmark", "nikkei"))
+            hurdle = fund.get("hurdle", 0.0)
+            excess = max(0.0, ret - bm_ret - hurdle)
+            aum = monthly.loc[monthly["fund_id"] == fund["id"], "aum_jpym"].dropna()
+            aum_jpym = float(aum.iloc[-1]) if len(aum) else np.nan
+            mandate_slices.append({
+                "period_end": pe_str, "half": half, "mandate_id": fund["mandate_id"],
+                "fund_id": fund["id"], "period_return": ret, "benchmark_return": bm_ret,
+                "excess_vs_hurdle": excess, "aum_jpym": aum_jpym,
+                "perf_rate": fund.get("perf_rate"), "tag": fund.get("tag", "[Filing/Market]"),
+                "source": "simplex_monthly_pdf",
+            })
+
+        for etf in catalog.get("perf_etfs", []):
+            ret = _halfyear_fund_return(monthly, etf["id"], pe, half)
+            if np.isnan(ret):
+                continue
+            bm_ret = _benchmark_ret(r, etf.get("benchmark", "value_pbr"))
+            excess = max(0.0, ret - bm_ret)
+            etf_aum = r.get("aum_etf_jpym", np.nan)
+            w = etf_weights.get(etf["id"], 1.0 / max(len(catalog.get("perf_etfs", [])), 1))
+            aum_jpym = float(etf_aum) * w if pd.notna(etf_aum) else np.nan
+            mandate_slices.append({
+                "period_end": pe_str, "half": half, "mandate_id": etf["mandate_id"],
+                "fund_id": etf["id"], "period_return": ret, "benchmark_return": bm_ret,
+                "excess_vs_hurdle": excess, "aum_jpym": aum_jpym,
+                "perf_rate": etf.get("perf_rate"), "tag": "[Market]",
+                "source": "yfinance_etf",
+            })
+
+        # Institutional residual (non-listed minus disclosed public SAM AUM)
+        resid = catalog.get("nonlisted_residual", {})
+        proxy_id = resid.get("proxy_fund_id", "value_up_fund")
+        proxy_ret = _halfyear_fund_return(monthly, proxy_id, pe, half)
+        nonlisted = r.get("aum_nonlisted_jpym", np.nan)
+        if pd.notna(nonlisted) and pd.notna(proxy_ret):
+            residual_aum = max(0.0, float(nonlisted) - float(latest_public_aum or 0))
+            if residual_aum > 0:
+                bm_ret = _benchmark_ret(r, "nikkei")
+                mandate_slices.append({
+                    "period_end": pe_str, "half": half,
+                    "mandate_id": resid.get("mandate_id", "mandate_japan_equity"),
+                    "fund_id": "nonlisted_residual",
+                    "period_return": float(proxy_ret),
+                    "benchmark_return": bm_ret,
+                    "excess_vs_hurdle": max(0.0, float(proxy_ret) - bm_ret),
+                    "aum_jpym": residual_aum,
+                    "perf_rate": 0.15,
+                    "tag": resid.get("tag", "[Derived]"),
+                    "source": f"proxy:{proxy_id}",
+                })
+
+        detail_rows.extend(mandate_slices)
+        if not mandate_slices:
+            continue
+        ddf = pd.DataFrame(mandate_slices)
+        w = ddf["aum_jpym"].fillna(0)
+        wsum = w.sum()
+        if wsum <= 0:
+            w = pd.Series(1.0, index=ddf.index)
+            wsum = len(ddf)
+        agg_rows.append({
+            "period_end": pe_str,
+            "mandate_weighted_excess": float((ddf["excess_vs_hurdle"] * w).sum() / wsum),
+            "mandate_weighted_return": float((ddf["period_return"] * w).sum() / wsum),
+            "mandate_count": len(ddf),
+            "tag": "[Filing/Market/Derived]",
+            "note": "Scraped SAM PDFs + ETF yfinance + nonlisted residual proxy",
+        })
+
+    detail = pd.DataFrame(detail_rows)
+    agg = pd.DataFrame(agg_rows)
+    if not detail.empty:
+        detail.to_csv(DATA / "mandate_nav_detail.csv", index=False)
+    return agg, detail
 
 
 # ---------------------------------------------------------------------------
@@ -547,7 +802,13 @@ def main() -> None:
         flows_h.to_csv(DATA / "flows_halfyear.csv", index=False)
         pools = build_aum_pools_halfyear(registry, panel)
         pools.to_csv(DATA / "aum_pools_halfyear.csv", index=False)
+    jita_rows = int(flows_m["jita_equity_net_flow_bn_jpy"].notna().sum()) if "jita_equity_net_flow_bn_jpy" in flows_m.columns else 0
     manifest["steps"]["p1_flows"] = {"monthly": len(flows_m), "etf_flow_rows": len(etf_flows)}
+    manifest["steps"]["p5_jita_flows"] = {
+        "jita_months": jita_rows,
+        "scrape_script": str(JITA_SCRIPT.relative_to(ROOT.parents[1])),
+        "source": "https://www.toushin.or.jp/tws/toukei_dw/I0112B_pub_m.xlsx",
+    }
 
     # P2 fees (factors already written above)
     fee_raw = extract_fee_history()
@@ -569,6 +830,23 @@ def main() -> None:
     capiq = capiq_template()
     capiq.to_csv(DATA / "capiq_peers.csv", index=False)
     manifest["steps"]["p3_comp_capiq"] = {"comp_rows": comp_rows}
+
+    # P4 / P6
+    p4_rows = p4_detail = p6_rows = 0
+    p4_tag = "[Filing/Market/Derived]"
+    if not panel.empty:
+        mandate, mandate_detail = build_mandate_nav(registry, panel)
+        mandate.to_csv(DATA / "mandate_nav_halfyear.csv", index=False)
+        p4_rows = len(mandate)
+        p4_detail = len(mandate_detail)
+        march = march_window_halfyear(panel)
+        march.to_csv(DATA / "march_window_halfyear.csv", index=False)
+        p6_rows = len(march)
+    manifest["steps"]["p4_mandate_nav"] = {
+        "rows": p4_rows, "detail_rows": p4_detail, "tag": p4_tag,
+        "scrape_script": str(MANDATE_SCRIPT.relative_to(ROOT.parents[1])),
+    }
+    manifest["steps"]["p6_march_window"] = {"rows": p6_rows}
 
     (DATA / "data_acquisition_manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
     print(json.dumps(manifest, indent=2))

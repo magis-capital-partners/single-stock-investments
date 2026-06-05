@@ -117,6 +117,29 @@ def effective_excess_ret(row) -> float:
     return nik
 
 
+def mandate_excess_ret(row) -> float:
+    """P4 scraped mandate pool excess vs benchmark (half-year)."""
+    if pd.notna(row.get("mandate_weighted_excess")):
+        return max(0.0, float(row["mandate_weighted_excess"]))
+    if pd.notna(row.get("mandate_weighted_return")):
+        return max(0.0, float(row["mandate_weighted_return"]))
+    return effective_excess_ret(row)
+
+
+def driver_return(row, spec: str = "v1") -> float:
+    """v1 Nikkei; v2 blended; v3a March window; v4 mandate NAV scrape."""
+    if spec == "v4":
+        return mandate_excess_ret(row)
+    if spec == "v3a" and row.get("half") == "H2":
+        if pd.notna(row.get("march_blended_ret")):
+            return max(0.0, float(row["march_blended_ret"]))
+        if pd.notna(row.get("march_nikkei_ret")):
+            return max(0.0, float(row["march_nikkei_ret"]))
+    if spec in ("v2", "v3a"):
+        return effective_excess_ret(row)
+    return max(0.0, float(row.get("nikkei_ret") or 0))
+
+
 def fit_perf_v2(df: pd.DataFrame):
     sub = df.dropna(subset=["perf_fee_m", "aum_avg_jpym"]).copy()
     sub["excess"] = sub.apply(effective_excess_ret, axis=1)
@@ -134,6 +157,50 @@ def fit_perf_v2(df: pd.DataFrame):
 
 def predict_perf_v2(df: pd.DataFrame, params: dict) -> pd.Series:
     excess = df.apply(effective_excess_ret, axis=1)
+    drive = df["aum_avg_jpym"] * excess
+    k = df["half"].map(params)
+    return (k * drive).fillna(0.0)
+
+
+def fit_perf_v3a(df: pd.DataFrame):
+    sub = df.dropna(subset=["perf_fee_m", "aum_avg_jpym"]).copy()
+    sub["excess"] = sub.apply(lambda r: driver_return(r, "v3a"), axis=1)
+    sub["drive"] = sub["aum_avg_jpym"] * sub["excess"]
+    params = {}
+    for half in ["H1", "H2"]:
+        s = sub[sub["half"] == half]
+        if len(s) >= 1 and s["drive"].sum() > 0:
+            k = float((s["drive"] * s["perf_fee_m"]).sum() / (s["drive"] ** 2).sum())
+        else:
+            k = np.nan
+        params[half] = k
+    return params, sub
+
+
+def predict_perf_v3a(df: pd.DataFrame, params: dict) -> pd.Series:
+    excess = df.apply(lambda r: driver_return(r, "v3a"), axis=1)
+    drive = df["aum_avg_jpym"] * excess
+    k = df["half"].map(params)
+    return (k * drive).fillna(0.0)
+
+
+def fit_perf_v4(df: pd.DataFrame):
+    sub = df.dropna(subset=["perf_fee_m", "aum_avg_jpym"]).copy()
+    sub["excess"] = sub.apply(lambda r: driver_return(r, "v4"), axis=1)
+    sub["drive"] = sub["aum_avg_jpym"] * sub["excess"]
+    params = {}
+    for half in ["H1", "H2"]:
+        s = sub[sub["half"] == half]
+        if len(s) >= 1 and s["drive"].sum() > 0:
+            k = float((s["drive"] * s["perf_fee_m"]).sum() / (s["drive"] ** 2).sum())
+        else:
+            k = np.nan
+        params[half] = k
+    return params, sub
+
+
+def predict_perf_v4(df: pd.DataFrame, params: dict) -> pd.Series:
+    excess = df.apply(lambda r: driver_return(r, "v4"), axis=1)
     drive = df["aum_avg_jpym"] * excess
     k = df["half"].map(params)
     return (k * drive).fillna(0.0)
@@ -184,7 +251,7 @@ def _aum_proxy(row) -> float:
     return float(row["aum_avg_jpym"]) if pd.notna(row["aum_avg_jpym"]) else AUM_PROXY_PRE2023
 
 
-def _fit_reduced(train: pd.DataFrame):
+def _fit_reduced(train: pd.DataFrame, spec: str = "v1"):
     """base_floor from low-perf (H1, weak-market) periods; k_half by no-intercept LS."""
     base_floor = float(train["revenue_m"].min())  # robust floor proxy
     ks = {}
@@ -193,14 +260,14 @@ def _fit_reduced(train: pd.DataFrame):
         if len(s) == 0:
             ks[half] = np.nan
             continue
-        drive = s.apply(lambda r: _aum_proxy(r) * max(0.0, r["nikkei_ret"]), axis=1)
+        drive = s.apply(lambda r: _aum_proxy(r) * driver_return(r, spec), axis=1)
         resid = (s["revenue_m"] - base_floor).clip(lower=0)
         denom = (drive ** 2).sum()
         ks[half] = float((drive * resid).sum() / denom) if denom > 0 else 0.0
     return base_floor, ks
 
 
-def walk_forward(df: pd.DataFrame, use_v2: bool = False):
+def walk_forward(df: pd.DataFrame, use_v2: bool = False, use_v3a: bool = False, use_v4: bool = False):
     d = df.dropna(subset=["revenue_m", "nikkei_ret"]).reset_index(drop=True)
     rows = []
     for i in range(len(d)):
@@ -208,11 +275,12 @@ def walk_forward(df: pd.DataFrame, use_v2: bool = False):
         train = d.iloc[:i]
         if len(train[train["half"] == test["half"]]) < 1 or len(train) < 3:
             continue
-        base_floor, ks = _fit_reduced(train)
+        spec = "v4" if use_v4 else ("v3a" if use_v3a else ("v2" if use_v2 else "v1"))
+        base_floor, ks = _fit_reduced(train, spec=spec)
         k = ks.get(test["half"], np.nan)
         if np.isnan(k):
             continue
-        excess = effective_excess_ret(test) if use_v2 else max(0.0, float(test["nikkei_ret"]))
+        excess = driver_return(test, spec)
         drive = _aum_proxy(test) * excess
         rev_hat = base_floor + k * drive
         ly = train[train["half"] == test["half"]]["revenue_m"]
@@ -252,18 +320,39 @@ def main() -> None:
     rate, base_obs = fit_base_rate(df)
     perf_params, perf_obs = fit_perf(df)
     perf_params_v2, _ = fit_perf_v2(df)
+    perf_params_v3a, _ = fit_perf_v3a(df)
+    perf_params_v4, _ = fit_perf_v4(df)
     bridge = fit_bridge(df)
 
     df["base_hat_m"] = predict_base(df, rate)
     df["perf_hat_m"] = predict_perf(df, perf_params)
     df["perf_hat_v2_m"] = predict_perf_v2(df, perf_params_v2)
+    df["perf_hat_v3a_m"] = predict_perf_v3a(df, perf_params_v3a)
+    df["perf_hat_v4_m"] = predict_perf_v4(df, perf_params_v4)
     df["rev_hat_m"] = df["base_hat_m"].fillna(0) + df["perf_hat_m"].fillna(0) + 200.0
     df["rev_hat_v2_m"] = df["base_hat_m"].fillna(0) + df["perf_hat_v2_m"].fillna(0) + 200.0
+    df["rev_hat_v3a_m"] = df["base_hat_m"].fillna(0) + df["perf_hat_v3a_m"].fillna(0) + 200.0
+    df["rev_hat_v4_m"] = df["base_hat_m"].fillna(0) + df["perf_hat_v4_m"].fillna(0) + 200.0
 
     res = walk_forward(df, use_v2=False)
     res_v2 = walk_forward(df, use_v2=True)
+    res_v3a = walk_forward(df, use_v3a=True)
+    res_v4 = walk_forward(df, use_v4=True)
     mt = metrics(res) if len(res) else {}
     mt_v2 = {}
+    mt_v3a = {}
+    mt_v4 = {}
+    if len(res_v3a):
+        res_v3a = res_v3a.rename(columns={"model": "model_v3a"})
+        res = res.merge(res_v3a[["label", "model_v3a"]], on="label", how="left")
+        err_v3 = res.dropna(subset=["model_v3a"])
+        if len(err_v3):
+            e3 = err_v3["model_v3a"] - err_v3["actual"]
+            mt_v3a = {"model_v3a": dict(
+                rmse_jpym=round(float(np.sqrt((e3 ** 2).mean())), 1),
+                mape_pct=round(float((e3.abs() / err_v3["actual"].abs()).mean() * 100), 1),
+                n=len(err_v3),
+            )}
     if len(res_v2):
         res_v2 = res_v2.rename(columns={"model": "model_v2"})
         res = res.merge(res_v2[["label", "model_v2"]], on="label", how="left")
@@ -281,6 +370,17 @@ def main() -> None:
                     n=len(err_v2),
                 )
             }
+    if len(res_v4):
+        res_v4 = res_v4.rename(columns={"model": "model_v4"})
+        res = res.merge(res_v4[["label", "model_v4"]], on="label", how="left")
+        err_v4 = res.dropna(subset=["model_v4"])
+        if len(err_v4):
+            e4 = err_v4["model_v4"] - err_v4["actual"]
+            mt_v4 = {"model_v4": dict(
+                rmse_jpym=round(float(np.sqrt((e4 ** 2).mean())), 1),
+                mape_pct=round(float((e4.abs() / err_v4["actual"].abs()).mean() * 100), 1),
+                n=len(err_v4),
+            )}
 
     # ----- current/next period nowcast -----
     # Use latest known AUM and a market-return input (set live each month).
@@ -307,9 +407,21 @@ def main() -> None:
             "k_H1": None if np.isnan(perf_params_v2.get("H1", np.nan)) else round(perf_params_v2["H1"], 5),
             "k_H2": None if np.isnan(perf_params_v2.get("H2", np.nan)) else round(perf_params_v2["H2"], 5),
         },
+        "perf_fee_model_v3a": {
+            "form": "perf_fee_half = k_half * avg_AUM * driver_return (March Jan-Mar window on H2)",
+            "k_H1": None if np.isnan(perf_params_v3a.get("H1", np.nan)) else round(perf_params_v3a["H1"], 5),
+            "k_H2": None if np.isnan(perf_params_v3a.get("H2", np.nan)) else round(perf_params_v3a["H2"], 5),
+        },
+        "perf_fee_model_v4": {
+            "form": "perf_fee_half = k_half * avg_AUM * mandate_weighted_excess (P4 scrape)",
+            "k_H1": None if np.isnan(perf_params_v4.get("H1", np.nan)) else round(perf_params_v4["H1"], 5),
+            "k_H2": None if np.isnan(perf_params_v4.get("H2", np.nan)) else round(perf_params_v4["H2"], 5),
+        },
         "walk_forward": res.to_dict(orient="records"),
         "oos_metrics": mt,
         "oos_metrics_v2": mt_v2,
+        "oos_metrics_v3a": mt_v3a,
+        "oos_metrics_v4": mt_v4,
         "data_acquisition": _load_acquisition_manifest(),
         "latest_anchor": {
             "period_end": str(latest["period_end"].date()),
@@ -353,6 +465,12 @@ def main() -> None:
             revenue_m=round(rev_hat), ordinary_m=round(ordn), net_income_m=round(ni),
         ))
     fc = pd.DataFrame(fc_rows)
+    if len(res):
+        oos_std = float((res["model"] - res["actual"]).std())
+        fc["revenue_lo80"] = (fc["revenue_m"] - 1.28 * oos_std).round(0)
+        fc["revenue_hi80"] = (fc["revenue_m"] + 1.28 * oos_std).round(0)
+        fc["net_income_lo80"] = (fc["net_income_m"] - 1.28 * oos_std * bridge["ord_slope"]).round(0)
+        fc["net_income_hi80"] = (fc["net_income_m"] + 1.28 * oos_std * bridge["ord_slope"]).round(0)
     fc.to_csv(OUT / "forecasts.csv", index=False)
 
     print(f"Base rate (ann): {rate*100:.3f}%")
