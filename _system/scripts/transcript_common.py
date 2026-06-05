@@ -307,7 +307,10 @@ def add_manifest_entry(
 ) -> bool:
     entries = manifest.setdefault("entries", [])
     for e in entries:
-        if e.get("id") == file_id or e.get("original_url") == original_url:
+        if e.get("id") == file_id:
+            return False
+        # Legacy rows use original_url=""; only dedupe non-empty URLs.
+        if original_url and e.get("original_url") == original_url:
             return False
         if e.get("canonical_path") == canonical_path:
             return False
