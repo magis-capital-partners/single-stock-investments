@@ -44,10 +44,55 @@ All financials hand-extracted from primary filings (English machine translations
 Daily closes (auto-adjusted) from Yahoo Finance: `^N225`, `1306.T`, `JPY=X`, `1570.T`,
 aggregated to fiscal-half returns and realized volatility in `build_panel.py`.
 
-## Known gaps / to acquire (would materially improve the model)
+## Acquired data layer (`data/`, `acquire_data.py`)
 
-- **Per-ETF NAV × units** (daily, JPX/Simplex) → high-frequency ETF-AUM nowcast.
-- **Per-fund NAV vs hurdle / high-water mark** → performance-fee crystallization timing.
-- **AUM by category pre-2023** and **base/perf split pre-FY2024** → extends component history.
-- **JITA industry flows**, **TSE investor-type flows** → net-flow vs mark-to-market split.
-- **CapIQ** ownership + peer fee/comp ratios → Bayesian priors.
+Run `python3 acquire_data.py` (or `build_panel.py`, which calls it first). Manifest:
+`data/data_acquisition_manifest.json`.
+
+### P0 — ETF NAV × units + fund return proxy
+
+| File | Tag | Definition |
+|------|-----|------------|
+| `etf_nav_daily.csv` | [Market] | Daily NAV per Simplex ETF ticker (Yahoo) |
+| `etf_aum_daily.csv` | [Derived] | NAV × shares outstanding → AUM per ETF |
+| `fund_return_halfyear.csv` | [Derived] | Weighted ETF basket return per fiscal half |
+| `fund_nav_proxy_halfyear.csv` | [Derived/Assumption] | Perf-eligible excess from registry weights + benchmarks |
+
+### P1 — Flows + AUM pools
+
+| File | Tag | Definition |
+|------|-----|------------|
+| `etf_flows_daily.csv` | [Derived] | ΔAUM − return×prior AUM per ETF |
+| `flows_monthly.csv` | [Derived/Pending] | Monthly ETF implied flows; JITA columns NaN pending scrape |
+| `flows_halfyear.csv` | [Derived] | Half-year sum of `etf_implied_flow_jpym` |
+| `aum_pools_halfyear.csv` | [Derived] | Perf-eligible vs base-fee AUM split |
+
+### P2 — Fee history + factor returns
+
+| File | Tag | Definition |
+|------|-----|------------|
+| `fee_history_raw.csv` | [Filing] | Regex extract from evidence `_text/` |
+| `fee_history_halfyear.csv` | [Filing/Derived] | Curated base/perf fee by half |
+| `factor_returns_daily.csv` | [Market] | Nikkei, value, growth, REIT, lev proxies |
+| `factor_returns_monthly.csv` | [Market] | Monthly factor returns |
+| `factor_returns_halfyear.csv` | [Derived] | Half-year factor returns incl. `value_factor_ret` |
+
+### P3 — Comp bridge + CapIQ template
+
+| File | Tag | Definition |
+|------|-----|------------|
+| `comp_bridge_halfyear.csv` | [Filing] | Revenue, perf fee, opex, headcount bridge |
+| `capiq_peers.csv` | [Pending] | Template for CapIQ / peer fee ratios |
+
+### Panel columns merged from `data/`
+
+`perf_eligible_excess_ret`, `etf_perf_basket_ret`, `value_factor_ret`, `etf_basket_ret`,
+`etf_implied_flow_jpym`, `perf_eligible_aum_jpym`, `nonlisted_share`, `etf_share`,
+`opex_sga_jpy_million`, `incremental_margin`.
+
+## Remaining gaps
+
+- **JITA industry flows** — columns present but NaN; needs Vicki scrape or manual export.
+- **Per-fund NAV vs hurdle / high-water mark** — non-listed proxy uses registry [Assumption].
+- **AUM by category pre-2023** and **base/perf split pre-FY2024** — extends component history.
+- **CapIQ** ownership + peer fee/comp ratios — paste into `capiq_export.csv`.

@@ -1,0 +1,93 @@
+{
+  "as_of": "2026-06-04",
+  "source": "Simplex IR + JPX listings + 7176.T filings [Filing/Market]",
+  "aum_pools": [
+    {
+      "id": "nonlisted_trusts",
+      "label": "Non-listed trusts / mandates",
+      "base_fee_eligible": true,
+      "perf_fee_eligible": true,
+      "crystallization": ["H2"],
+      "default_benchmark": "nikkei",
+      "hurdle_return": 0.0,
+      "aum_share_fy2025": 0.81,
+      "note": "From filing split: non-listed ~10,493 oku vs total 12,973 oku Mar-2025"
+    },
+    {
+      "id": "listed_etf",
+      "label": "Listed ETF AUM",
+      "base_fee_eligible": true,
+      "perf_fee_eligible": true,
+      "crystallization": ["H1", "H2"],
+      "default_benchmark": "basket",
+      "hurdle_return": 0.0,
+      "aum_share_fy2025": 0.19,
+      "note": "Listed ETF ~2,479 oku; higher fee velocity; perf on active/thematic"
+    }
+  ],
+  "etf_aum_anchor": {
+    "as_of": "2025-03-31",
+    "total_jpym": 247900,
+    "tag": "[Filing]",
+    "note": "Listed ETF AUM ~2,479 oku from FY2025 filing; split across registry weights"
+  },
+  "etfs": [
+    {"ticker": "1321.T", "name": "Nikkei 225 ETF", "category": "index", "perf_eligible": false, "weight": 0.15, "trust_fee_ann_pct": 0.15},
+    {"ticker": "1356.T", "name": "Nikkei 3x Leveraged", "category": "leveraged", "perf_eligible": false, "weight": 0.08, "trust_fee_ann_pct": 0.89},
+    {"ticker": "1360.T", "name": "Nikkei Inverse", "category": "inverse", "perf_eligible": false, "weight": 0.05, "trust_fee_ann_pct": 0.89},
+    {"ticker": "1570.T", "name": "Nikkei 2x Leveraged (proxy)", "category": "leveraged", "perf_eligible": false, "weight": 0.1, "trust_fee_ann_pct": 0.95, "note": "NEXT FUNDS; used as vol/lev demand proxy"},
+    {"ticker": "1551.T", "name": "TSE Standard Top 20", "category": "thematic", "perf_eligible": false, "weight": 0.05, "trust_fee_ann_pct": 0.5},
+    {"ticker": "1563.T", "name": "TSE Growth Core", "category": "thematic", "perf_eligible": false, "weight": 0.05, "trust_fee_ann_pct": 0.5},
+    {"ticker": "2516.T", "name": "TSE Growth 250", "category": "thematic", "perf_eligible": false, "weight": 0.05, "trust_fee_ann_pct": 0.5},
+    {"ticker": "2080.T", "name": "PBR Improvement ETF", "category": "active", "perf_eligible": true, "weight": 0.12, "trust_fee_ann_pct": 0.55, "benchmark": "value"},
+    {"ticker": "2081.T", "name": "Strategic Shareholding Disposal", "category": "active", "perf_eligible": true, "weight": 0.08, "trust_fee_ann_pct": 0.55, "benchmark": "value"},
+    {"ticker": "2082.T", "name": "Investor-Management Unite", "category": "active", "perf_eligible": true, "weight": 0.08, "trust_fee_ann_pct": 0.55, "benchmark": "value"},
+    {"ticker": "2555.T", "name": "TSE REIT ETF", "category": "reit", "perf_eligible": false, "weight": 0.04, "trust_fee_ann_pct": 0.245},
+    {"ticker": "360A.T", "name": "TSE REIT Core", "category": "reit", "perf_eligible": false, "weight": 0.03, "trust_fee_ann_pct": 0.2},
+    {"ticker": "1671.T", "name": "WTI Crude ETF (legacy)", "category": "commodity", "perf_eligible": false, "weight": 0.02, "trust_fee_ann_pct": 0.5}
+  ],
+  "factor_proxies": {
+    "nikkei": "1321.T",
+    "topix": "1306.T",
+    "value_pbr": "2080.T",
+    "growth": "2516.T",
+    "reit": "2555.T",
+    "leveraged": "1570.T",
+    "usdjpy": "JPY=X"
+  },
+  "nonlisted_funds": [
+    {
+      "id": "mandate_japan_equity",
+      "label": "Japan equity mandates (pooled)",
+      "perf_eligible": true,
+      "benchmark": "nikkei",
+      "hurdle": 0.0,
+      "perf_rate_assumption": 0.15,
+      "crystallization": ["H2"],
+      "aum_share_of_nonlisted": 0.7,
+      "tag": "[Assumption]"
+    },
+    {
+      "id": "mandate_value_pbr",
+      "label": "Value / PBR strategies",
+      "perf_eligible": true,
+      "benchmark": "value_pbr",
+      "hurdle": 0.0,
+      "perf_rate_assumption": 0.2,
+      "crystallization": ["H2"],
+      "aum_share_of_nonlisted": 0.2,
+      "tag": "[Assumption]"
+    },
+    {
+      "id": "mandate_other",
+      "label": "Other / absolute return",
+      "perf_eligible": true,
+      "benchmark": "nikkei",
+      "hurdle": 0.05,
+      "perf_rate_assumption": 0.1,
+      "crystallization": ["H2"],
+      "aum_share_of_nonlisted": 0.1,
+      "tag": "[Assumption]"
+    }
+  ]
+}

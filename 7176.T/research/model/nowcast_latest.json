@@ -1,5 +1,5 @@
 {
-  "asof": "2026-06-04",
+  "asof": "2026-06-05",
   "fiscal_half": "H1",
   "half_window": [
     "2026-04-01",
@@ -7,17 +7,27 @@
   ],
   "aum_anchor_date": "2026-03-31",
   "aum_anchor_jpym": 1335700.0,
-  "nikkei_return_to_date": 0.3395,
+  "aum_nowcast_jpym": 1632091,
+  "aum_source": "etf_nav_x_shares (2026-06-05) + non-ETF MTM; +ETF flow YTD \u00a50m",
+  "nikkei_return_to_date": 0.3042,
+  "effective_excess_ret_v2": 0.2351,
+  "etf_flow_ytd_jpym": 0,
   "nowcast_jpym": {
-    "base_fee": 4342,
-    "perf_fee": 2605,
-    "revenue": 7147,
-    "ordinary_profit": 3983,
-    "net_income": 2930
+    "base_fee": 4536,
+    "perf_fee": 2438,
+    "revenue": 7173,
+    "ordinary_profit": 3998,
+    "net_income": 2941
+  },
+  "nowcast_v2_jpym": {
+    "perf_fee": 2452,
+    "revenue": 7187,
+    "ordinary_profit": 4006,
+    "net_income": 2947
   },
   "caveats": [
     "Perf fee crystallizes near fiscal year-end (Mar); H1 nowcast of perf is low-confidence.",
-    "Assumes flat net flows; replace with per-ETF NAV*units + JITA flows for real edge.",
-    "Single-driver (Nikkei); add value/PBR factor and fund-level NAV for precision."
+    "v2 uses fund-proxy excess when panel has it; live nowcast uses 0.65*Nikkei + 0.35*value.",
+    "JITA industry flows pending; ETF implied flows are [Derived] proxy only."
   ]
 }

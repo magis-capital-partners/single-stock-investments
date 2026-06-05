@@ -188,7 +188,53 @@ def market_features(df: pd.DataFrame, m: pd.DataFrame) -> pd.DataFrame:
     return pd.concat([df, fdf], axis=1)
 
 
+def merge_acquired(fin: pd.DataFrame) -> pd.DataFrame:
+    """Merge P0-P3 outputs from acquire_data.py (if present)."""
+    data_dir = OUT / "data"
+    if not data_dir.exists():
+        return fin
+    fin = fin.copy()
+    fin["period_key"] = fin["period_end"].dt.strftime("%Y-%m-%d")
+
+    merges = [
+        ("fund_nav_proxy_halfyear.csv", ["perf_eligible_excess_ret", "etf_perf_basket_ret", "value_factor_ret"]),
+        ("factor_returns_halfyear.csv", ["value_pbr_ret", "growth_ret", "reit_ret", "leveraged_ret", "topix_ret", "value_factor_ret"]),
+        ("fund_return_halfyear.csv", ["etf_basket_ret", "etf_perf_basket_ret", "etf_basket_vol"]),
+        ("flows_halfyear.csv", ["etf_implied_flow_jpym", "jita_equity_flow_bn", "jita_etf_flow_bn"]),
+        ("aum_pools_halfyear.csv", ["perf_eligible_aum_jpym", "nonlisted_share", "etf_share"]),
+        ("comp_bridge_halfyear.csv", ["opex_sga_jpy_million", "incremental_margin"]),
+    ]
+    for fname, cols in merges:
+        path = data_dir / fname
+        if not path.exists():
+            continue
+        extra = pd.read_csv(path)
+        if "period_end" not in extra.columns:
+            continue
+        extra["period_key"] = pd.to_datetime(extra["period_end"]).dt.strftime("%Y-%m-%d")
+        use_cols = ["period_key"] + [c for c in cols if c in extra.columns]
+        fin = fin.merge(extra[use_cols], on="period_key", how="left", suffixes=("", "_dup"))
+        for c in cols:
+            dup = f"{c}_dup"
+            if dup in fin.columns:
+                fin[c] = fin[c].fillna(fin[dup])
+                fin.drop(columns=[dup], inplace=True)
+    fin.drop(columns=["period_key"], inplace=True, errors="ignore")
+    return fin
+
+
+def run_acquire() -> None:
+    script = OUT / "acquire_data.py"
+    if not script.exists():
+        return
+    import subprocess
+    import sys
+
+    subprocess.run([sys.executable, str(script)], cwd=str(OUT), check=False)
+
+
 def main() -> None:
+    run_acquire()
     fin = build_financials()
     fin = attach_aum(fin)
     try:
@@ -197,6 +243,8 @@ def main() -> None:
         fin = market_features(fin, m)
     except Exception as exc:  # offline fallback
         print(f"[warn] market fetch failed ({exc}); writing financial panel only")
+
+    fin = merge_acquired(fin)
 
     # convenience derived fields
     fin["is_h2"] = (fin["half"] == "H2").astype(int)
@@ -207,6 +255,9 @@ def main() -> None:
         np.nan,
     )
     fin["opmargin"] = np.where(fin["revenue"] > 0, fin["ordinary"] / fin["revenue"], np.nan)
+    if "value_factor_ret" not in fin.columns or fin["value_factor_ret"].isna().all():
+        if "value_pbr_ret" in fin.columns:
+            fin["value_factor_ret"] = fin["value_pbr_ret"]
 
     fin.to_csv(OUT / "panel_halfyear.csv", index=False)
 

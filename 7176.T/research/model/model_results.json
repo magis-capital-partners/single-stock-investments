@@ -34,69 +34,84 @@
     "ord_slope": 0.579242156528464,
     "tax_rate": 0.2642706176532137
   },
+  "perf_fee_model_v2": {
+    "form": "perf_fee_half = k_half * avg_AUM * effective_excess_ret",
+    "effective_excess": "fund_nav_proxy if available else 0.65*Nikkei + 0.35*value_factor",
+    "k_H1": 0.00639,
+    "k_H2": 0.08202
+  },
   "walk_forward": [
     {
       "label": "FY2022H2",
       "actual": 4302.709,
       "model": 3074.713,
       "naive_lastyear": 8990.383,
-      "naive_randomwalk": 3526.469
+      "naive_randomwalk": 3526.469,
+      "model_v2": 3074.713
     },
     {
       "label": "FY2023H1",
       "actual": 3319.298,
       "model": 3074.713,
       "naive_lastyear": 3526.469,
-      "naive_randomwalk": 4302.709
+      "naive_randomwalk": 4302.709,
+      "model_v2": 3074.713
     },
     {
       "label": "FY2023H2",
       "actual": 5586.426,
       "model": 4931.224709540503,
       "naive_lastyear": 4302.709,
-      "naive_randomwalk": 3319.298
+      "naive_randomwalk": 3319.298,
+      "model_v2": 4185.055020974427
     },
     {
       "label": "FY2024H1",
       "actual": 3804.623,
       "model": 3076.3744351933174,
       "naive_lastyear": 3319.298,
-      "naive_randomwalk": 5586.426
+      "naive_randomwalk": 5586.426,
+      "model_v2": 3075.7401658205995
     },
     {
       "label": "FY2024H2",
       "actual": 11162.336,
       "model": 9382.223712772497,
       "naive_lastyear": 5586.426,
-      "naive_randomwalk": 3804.623
+      "naive_randomwalk": 3804.623,
+      "model_v2": 7871.338822215634
     },
     {
       "label": "FY2025H1",
       "actual": 5353.003,
       "model": 3074.713,
       "naive_lastyear": 3804.623,
-      "naive_randomwalk": 11162.336
+      "naive_randomwalk": 11162.336,
+      "model_v2": 3074.713
     },
     {
       "label": "FY2025H2",
       "actual": 10901.498,
       "model": 3074.713,
       "naive_lastyear": 11162.336,
-      "naive_randomwalk": 5353.003
+      "naive_randomwalk": 5353.003,
+      "model_v2": 3410.5273246226284
     },
     {
       "label": "FY2026H1",
       "actual": 5577.537,
       "model": 3357.9899452809036,
       "naive_lastyear": 5353.003,
-      "naive_randomwalk": 10901.498
+      "naive_randomwalk": 10901.498,
+      "model_v2": 3292.4099527062262
     },
     {
       "label": "FY2026H2",
       "actual": 16934.463,
       "model": 7334.717900740869,
       "naive_lastyear": 10901.498,
-      "naive_randomwalk": 5577.537
+      "naive_randomwalk": 5577.537,
+      "model_v2": 6534.422089454042
     }
   ],
   "oos_metrics": {
@@ -117,6 +132,38 @@
       "mape_pct": 58.1,
       "directional_hit": 0.11,
       "n": 9
+    }
+  },
+  "oos_metrics_v2": {
+    "model_v2": {
+      "rmse_jpym": 4589.6,
+      "mape_pct": 35.9,
+      "directional_hit": 0.89,
+      "n": 9
+    }
+  },
+  "data_acquisition": {
+    "built_at": "2026-06-05T02:34:27.471477+00:00",
+    "steps": {
+      "p0_etf_nav": {
+        "rows": 17093,
+        "tickers": 13
+      },
+      "p0_fund_proxy": {
+        "rows": 12
+      },
+      "p1_flows": {
+        "monthly": 82,
+        "etf_flow_rows": 17080
+      },
+      "p2_factors": {
+        "fee_raw": 40,
+        "fee_halfyear": 12,
+        "factor_halfyear": 12
+      },
+      "p3_comp_capiq": {
+        "comp_rows": 12
+      }
     }
   },
   "latest_anchor": {

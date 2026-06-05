@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-05T01:21:37Z",
+  "generated_at": "2026-06-05T02:34:54Z",
   "workspace": "/workspace",
   "summary": {
     "ticker_count": 55,
@@ -164,7 +164,7 @@
       "research_dir": true,
       "index_file": true,
       "last_download": "2026-06-04",
-      "last_research": "2026-06-04",
+      "last_research": "2026-06-05",
       "classification": {
         "archetype": "croupier",
         "moat": "partial",
@@ -208,39 +208,39 @@
       },
       "recent_files": [
         {
-          "path": "7176.T/research/dashboard_model_viz_prompt.md",
-          "name": "dashboard_model_viz_prompt.md",
-          "date": "2026-06-04",
+          "path": "7176.T/research/model/earnings_model_report.md",
+          "name": "earnings_model_report.md",
+          "date": "2026-06-05",
           "type": "md",
-          "github_url": "https://github.com/GoldmanDrew/single-stock-investments/blob/main/7176.T/research/dashboard_model_viz_prompt.md"
+          "github_url": "https://github.com/GoldmanDrew/single-stock-investments/blob/main/7176.T/research/model/earnings_model_report.md"
         },
         {
-          "path": "7176.T/research/model/forecasts.csv",
-          "name": "forecasts.csv",
-          "date": "2026-06-04",
-          "type": "csv",
-          "github_url": "https://github.com/GoldmanDrew/single-stock-investments/blob/main/7176.T/research/model/forecasts.csv"
+          "path": "7176.T/research/model/nowcast.py",
+          "name": "nowcast.py",
+          "date": "2026-06-05",
+          "type": "py",
+          "github_url": "https://github.com/GoldmanDrew/single-stock-investments/blob/main/7176.T/research/model/nowcast.py"
+        },
+        {
+          "path": "7176.T/research/model/nowcast_latest.json",
+          "name": "nowcast_latest.json",
+          "date": "2026-06-05",
+          "type": "json",
+          "github_url": "https://github.com/GoldmanDrew/single-stock-investments/blob/main/7176.T/research/model/nowcast_latest.json"
         },
         {
           "path": "7176.T/research/model/panel_fitted.csv",
           "name": "panel_fitted.csv",
-          "date": "2026-06-04",
+          "date": "2026-06-05",
           "type": "csv",
           "github_url": "https://github.com/GoldmanDrew/single-stock-investments/blob/main/7176.T/research/model/panel_fitted.csv"
         },
         {
-          "path": "7176.T/research/model/model_results.json",
-          "name": "model_results.json",
-          "date": "2026-06-04",
-          "type": "json",
-          "github_url": "https://github.com/GoldmanDrew/single-stock-investments/blob/main/7176.T/research/model/model_results.json"
-        },
-        {
-          "path": "7176.T/research/model/panel_annual.csv",
-          "name": "panel_annual.csv",
-          "date": "2026-06-04",
+          "path": "7176.T/research/model/forecasts.csv",
+          "name": "forecasts.csv",
+          "date": "2026-06-05",
           "type": "csv",
-          "github_url": "https://github.com/GoldmanDrew/single-stock-investments/blob/main/7176.T/research/model/panel_annual.csv"
+          "github_url": "https://github.com/GoldmanDrew/single-stock-investments/blob/main/7176.T/research/model/forecasts.csv"
         }
       ],
       "developments": [
@@ -273,7 +273,7 @@
       "equity_model": {
         "ready": true,
         "as_of": "2026-06-04",
-        "headline": "Nowcast H1 revenue \u00a57,147m; OOS RMSE loses to seasonal naive",
+        "headline": "Nowcast H1 revenue \u00a57,173m; OOS RMSE loses to seasonal naive",
         "model_beats_naive": false,
         "model_type": "earnings_semiannual"
       }
@@ -7178,7 +7178,7 @@
     }
   ],
   "equity_models": {
-    "built_at": "2026-06-05T01:21:36Z",
+    "built_at": "2026-06-05T02:34:53Z",
     "ticker_count": 1,
     "tickers": {
       "7176.T": {
@@ -7204,7 +7204,7 @@
           "price_source": "Stooq/Yahoo 7176.JP last print 2026-01-07 (\u00a5464, 100 shares); not a continuous liquid quote"
         },
         "nowcast": {
-          "asof": "2026-06-04",
+          "asof": "2026-06-05",
           "fiscal_half": "H1",
           "half_window": [
             "2026-04-01",
@@ -7212,18 +7212,28 @@
           ],
           "aum_anchor_date": "2026-03-31",
           "aum_anchor_jpym": 1335700.0,
-          "nikkei_return_to_date": 0.3395,
+          "aum_nowcast_jpym": 1632091,
+          "aum_source": "etf_nav_x_shares (2026-06-05) + non-ETF MTM; +ETF flow YTD \u00a50m",
+          "nikkei_return_to_date": 0.3042,
+          "effective_excess_ret_v2": 0.2351,
+          "etf_flow_ytd_jpym": 0,
           "nowcast_jpym": {
-            "base_fee": 4342,
-            "perf_fee": 2605,
-            "revenue": 7147,
-            "ordinary_profit": 3983,
-            "net_income": 2930
+            "base_fee": 4536,
+            "perf_fee": 2438,
+            "revenue": 7173,
+            "ordinary_profit": 3998,
+            "net_income": 2941
+          },
+          "nowcast_v2_jpym": {
+            "perf_fee": 2452,
+            "revenue": 7187,
+            "ordinary_profit": 4006,
+            "net_income": 2947
           },
           "caveats": [
             "Perf fee crystallizes near fiscal year-end (Mar); H1 nowcast of perf is low-confidence.",
-            "Assumes flat net flows; replace with per-ETF NAV*units + JITA flows for real edge.",
-            "Single-driver (Nikkei); add value/PBR factor and fund-level NAV for precision."
+            "v2 uses fund-proxy excess when panel has it; live nowcast uses 0.65*Nikkei + 0.35*value.",
+            "JITA industry flows pending; ETF implied flows are [Derived] proxy only."
           ]
         },
         "spec": {
@@ -7288,63 +7298,72 @@
             "actual": 4302.709,
             "model": 3074.713,
             "naive_lastyear": 8990.383,
-            "naive_randomwalk": 3526.469
+            "naive_randomwalk": 3526.469,
+            "model_v2": 3074.713
           },
           {
             "label": "FY2023H1",
             "actual": 3319.298,
             "model": 3074.713,
             "naive_lastyear": 3526.469,
-            "naive_randomwalk": 4302.709
+            "naive_randomwalk": 4302.709,
+            "model_v2": 3074.713
           },
           {
             "label": "FY2023H2",
             "actual": 5586.426,
             "model": 4931.224709540503,
             "naive_lastyear": 4302.709,
-            "naive_randomwalk": 3319.298
+            "naive_randomwalk": 3319.298,
+            "model_v2": 4185.055020974427
           },
           {
             "label": "FY2024H1",
             "actual": 3804.623,
             "model": 3076.3744351933174,
             "naive_lastyear": 3319.298,
-            "naive_randomwalk": 5586.426
+            "naive_randomwalk": 5586.426,
+            "model_v2": 3075.7401658205995
           },
           {
             "label": "FY2024H2",
             "actual": 11162.336,
             "model": 9382.223712772497,
             "naive_lastyear": 5586.426,
-            "naive_randomwalk": 3804.623
+            "naive_randomwalk": 3804.623,
+            "model_v2": 7871.338822215634
           },
           {
             "label": "FY2025H1",
             "actual": 5353.003,
             "model": 3074.713,
             "naive_lastyear": 3804.623,
-            "naive_randomwalk": 11162.336
+            "naive_randomwalk": 11162.336,
+            "model_v2": 3074.713
           },
           {
             "label": "FY2025H2",
             "actual": 10901.498,
             "model": 3074.713,
             "naive_lastyear": 11162.336,
-            "naive_randomwalk": 5353.003
+            "naive_randomwalk": 5353.003,
+            "model_v2": 3410.5273246226284
           },
           {
             "label": "FY2026H1",
             "actual": 5577.537,
             "model": 3357.9899452809036,
             "naive_lastyear": 5353.003,
-            "naive_randomwalk": 10901.498
+            "naive_randomwalk": 10901.498,
+            "model_v2": 3292.4099527062262
           },
           {
             "label": "FY2026H2",
             "actual": 16934.463,
             "model": 7334.717900740869,
             "naive_lastyear": 10901.498,
-            "naive_randomwalk": 5577.537
+            "naive_randomwalk": 5577.537,
+            "model_v2": 6534.422089454042
           }
         ],
         "panel": [
@@ -7608,8 +7627,8 @@
         "caveats": [
           "Out-of-sample RMSE is worse than same-half-last-year naive; use model for seasonality and scenarios, not level beats.",
           "Perf fee crystallizes near fiscal year-end (Mar); H1 nowcast of perf is low-confidence.",
-          "Assumes flat net flows; replace with per-ETF NAV*units + JITA flows for real edge.",
-          "Single-driver (Nikkei); add value/PBR factor and fund-level NAV for precision."
+          "v2 uses fund-proxy excess when panel has it; live nowcast uses 0.65*Nikkei + 0.35*value.",
+          "JITA industry flows pending; ETF implied flows are [Derived] proxy only."
         ],
         "links": {
           "model_report": "https://github.com/GoldmanDrew/single-stock-investments/blob/main/7176.T/research/model/earnings_model_report.md",
@@ -7624,7 +7643,7 @@
       "7176.T": {
         "ready": true,
         "as_of": "2026-06-04",
-        "headline": "Nowcast H1 revenue \u00a57,147m; OOS RMSE loses to seasonal naive",
+        "headline": "Nowcast H1 revenue \u00a57,173m; OOS RMSE loses to seasonal naive",
         "model_beats_naive": false,
         "model_type": "earnings_semiannual"
       }
