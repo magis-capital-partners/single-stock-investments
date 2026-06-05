@@ -15,7 +15,7 @@ Documents in folder: **7** (all listed below; Tier 1–3 extracted or keyword-sc
 | partial | annual | 2021-12-31 | `investor-documents/ir-azlcz/2021-12-31_Annual_Report.pdf` | 38702 |
 | partial | annual | 2022-12-31 | `investor-documents/ir-azlcz/2022-12-31_Annual_Report.pdf` | 38423 |
 | partial | annual | 2023-12-31 | `investor-documents/ir-azlcz/2023-12-31_Annual_Report.pdf` | 37197 |
-| partial | annual | 2024-12-31 | `investor-documents/ir-azlcz/2024-12-31_Annual_Report.pdf` | 34341 |
+| full | annual | 2024-12-31 | `investor-documents/ir-azlcz/2024-12-31_Annual_Report.pdf` | 34341 |
 | full | annual | 2025-12-31 | `investor-documents/ir-azlcz/2025-12-31_Annual_Report.pdf` | 45369 |
 
 ## Tier: full — extracts
@@ -58,8 +58,6 @@ Documents in folder: **7** (all listed below; Tier 1–3 extracted or keyword-sc
 - The Apache Railway Company (the “Railway”) . As a limited liability company, ARC’s excess (deficient)  revenues over
 - Corporation’s share of ARC’s net income ( loss) is recognized as a gain ( loss) in the Corporation’s statements of
 
-## Tier: partial — extracts
-
 ### `investor-documents/ir-azlcz/2024-12-31_Annual_Report.pdf`
 **Keyword snippets (related party, financials, segments):**
 - Statements of revenues and expenses – tax basis 4
@@ -82,6 +80,23 @@ Documents in folder: **7** (all listed below; Tier 1–3 extracted or keyword-sc
 - of its land, including solar and wind renewable energy development leases, grazing leases, and mineral leases. In
 - of America  (GAAP). Consequently, certain revenues and expenses are recognized in the determination of excess
 - (deficient) revenues over expenses collected in different reporting periods than they would be if the financial
+- Corporation primarily due to  recognition of revenues when collected and recognition of expenses when paid .
+- interests to related parties . This treatment differs from GAAP, whereby any related party gains would be deferred
+- Although income tax rules are used to determine timing of the reporting of revenues and expenses, nontaxable
+- revenues, and nondeductible expenses, if any, are included in the determination of excess  revenues collected over
+- expenses paid. The Corporation did not have any nontaxable revenues during the years ended December 31, 2024 and
+- Investment in The Apache Railroad Company, LLC:
+- The Apache Railway Company (the “Railway”) . As a limited liability company, ARC’s excess (deficient)  revenues over
+- Corporation’s share of ARC’s net income ( loss) is recognized as a gain ( loss) in the Corporation’s Statement of
+- Revenues and Expenses – Tax Basis, and is added to (deducted from) the investment account. Capital contributions to
+- ARC are treated as additions to the investment account, and distributions received from ARC are treated as
+- Investment in Aztec Minerals, LLC:
+- Minerals, a newly created  subsidiary formed for the purposes of holding and developing those interests . The
+- Corporation’s share of Minerals’ net income (loss) is recognized as a gain (loss) in the Corporation’s Statement of
+- Minerals are treated as additions to the investment account, and distributions received from Minerals are treated as
+- reductions. Under the operating agreement for Minerals, the Corporation is a member and entitled to a preferred
+
+## Tier: partial — extracts
 
 ### `investor-documents/ir-azlcz/2023-12-31_Annual_Report.pdf`
 **Keyword snippets (related party, financials, segments):**

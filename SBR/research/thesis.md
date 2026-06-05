@@ -14,7 +14,7 @@
 | **Implied 7yr IRR** (base) | 7.3% (base) |
 | **IRR method** | yield_curve |
 | **Lawrence bucket** | other |
-| **Payoff lens** | asset |
+| **Payoff lens** | pending |
 | **MOI bucket** | pending |
 
 **Deep dive:** `SBR/research/deep_dive_2026-06-03.md` (auto-sync)

@@ -1,6 +1,6 @@
 # 7176.T — Investment Thesis
 
-**Last updated:** 2026-06-04
+**Last updated:** auto-sync
 
 ## Classification
 
@@ -9,7 +9,7 @@
 | **Archetype** (Stahl) | croupier |
 | **Moat** (Munger) | partial |
 | **Dhando** (Pabrai) | partial |
-| **Stance** | watch (non-executable tape; see skeptical equity report) |
+| **Stance** | accumulate |
 | **Cycle** | mid |
 | **Implied 7yr IRR** (base) | 53.33% (total synthesis) |
 | **IRR method** | full |
@@ -17,7 +17,7 @@
 | **Payoff lens** | operating |
 | **MOI bucket** | pending |
 
-**Deep dive:** `7176.T/research/deep_dive_2026-06-04.md`
+**Deep dive:** `7176.T/research/deep_dive_2026-06-04.md` (auto-sync)
 
 ## One-line thesis
 

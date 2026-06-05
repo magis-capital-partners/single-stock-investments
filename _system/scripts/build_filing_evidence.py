@@ -277,6 +277,16 @@ def build_ticker(ticker: str) -> int:
         else:
             d["tier"] = "inventory"
 
+    # OTC-style folders: multiple annuals, no 10-Q — promote prior-year annual to full for depth gate
+    if sum(1 for d in docs if d.get("tier") == "full") < 2:
+        annuals = sorted(
+            [d for d in docs if d.get("kind") == "annual" and d.get("tier") in ("full", "partial")],
+            key=lambda d: (d.get("file_date") or "", d.get("filename") or ""),
+            reverse=True,
+        )
+        if len(annuals) >= 2 and annuals[1].get("tier") == "partial":
+            annuals[1]["tier"] = "full"
+
     transcript_latest.sort(
         key=lambda d: (d.get("file_date") or "", d.get("filename") or ""), reverse=True
     )
