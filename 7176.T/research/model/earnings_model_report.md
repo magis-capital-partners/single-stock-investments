@@ -110,15 +110,16 @@ Decomposed in-sample and out-of-sample R² per target. **Primary KPI:** perf fee
 - Total revenue **OOS R² ≈ 0** (slightly negative): model ties noise; seasonal naive wins on level.
 - Base fee IS R² ~0.45 on n=4 disclosed splits: identity works where data exists.
 - Perf fee OOS R² deeply negative: crystallization miss dominates (FY2024H2, FY2026H2 in `residual_attribution`).
-- **Production spec: v1** (Nikkei). v2 and v3a rejected per `spec_comparison.json` (acceptance rule: perf-fee H2 OOS RMSE must not worsen).
+- **Production spec: v4** (P4 mandate-weighted excess). Beats v1 on perf-fee H2 OOS RMSE (¥8,714m vs ¥10,307m). v2/v3a rejected.
 
 **Spec leaderboard (OOS):**
 
 | Spec | Rev OOS RMSE | Perf H2 OOS RMSE | Default |
 |------|--------------|------------------|---------|
-| v1 | ¥4,336m | ¥10,307m | yes |
+| v1 | ¥4,336m | ¥10,307m | no |
 | v2 | ¥3,977m | ¥44,744m | no |
 | v3a | ¥5,407m | ¥11,863m | no |
+| v4 | ¥4,833m | ¥8,714m | **yes** |
 
 Regenerate: `python3 model.py` (runs `model_diagnostics.py` automatically).
 

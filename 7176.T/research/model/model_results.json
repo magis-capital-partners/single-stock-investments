@@ -45,6 +45,11 @@
     "k_H1": 0.00639,
     "k_H2": 0.44199
   },
+  "perf_fee_model_v4": {
+    "form": "perf_fee_half = k_half * avg_AUM * mandate_weighted_excess (P4 scrape)",
+    "k_H1": 0.16866,
+    "k_H2": 0.05148
+  },
   "walk_forward": [
     {
       "label": "FY2022H2",
@@ -53,7 +58,8 @@
       "naive_lastyear": 8990.383,
       "naive_randomwalk": 3526.469,
       "model_v3a": 3074.713,
-      "model_v2": 3074.713
+      "model_v2": 3074.713,
+      "model_v4": 3074.713
     },
     {
       "label": "FY2023H1",
@@ -62,7 +68,8 @@
       "naive_lastyear": 3526.469,
       "naive_randomwalk": 4302.709,
       "model_v3a": 3074.713,
-      "model_v2": 3074.713
+      "model_v2": 3074.713,
+      "model_v4": 3074.713
     },
     {
       "label": "FY2023H2",
@@ -70,8 +77,9 @@
       "model": 4931.224709540503,
       "naive_lastyear": 4302.709,
       "naive_randomwalk": 3319.298,
-      "model_v3a": 10820.609151005869,
-      "model_v2": 4830.656562502018
+      "model_v3a": 10820.601554867588,
+      "model_v2": 4830.656562502018,
+      "model_v4": 4830.656562502018
     },
     {
       "label": "FY2024H1",
@@ -80,7 +88,8 @@
       "naive_lastyear": 3319.298,
       "naive_randomwalk": 5586.426,
       "model_v3a": 3076.163269528032,
-      "model_v2": 3076.163269528032
+      "model_v2": 3076.163269528032,
+      "model_v4": 3074.713
     },
     {
       "label": "FY2024H2",
@@ -88,8 +97,9 @@
       "model": 9382.223712772497,
       "naive_lastyear": 5586.426,
       "naive_randomwalk": 3804.623,
-      "model_v3a": 12323.509289042528,
-      "model_v2": 10683.903131411016
+      "model_v3a": 12323.507633424557,
+      "model_v2": 10683.903228771325,
+      "model_v4": 3076.01413956657
     },
     {
       "label": "FY2025H1",
@@ -98,7 +108,8 @@
       "naive_lastyear": 3804.623,
       "naive_randomwalk": 11162.336,
       "model_v3a": 3074.713,
-      "model_v2": 3074.713
+      "model_v2": 3074.713,
+      "model_v4": 3074.837202228321
     },
     {
       "label": "FY2025H2",
@@ -106,8 +117,9 @@
       "model": 3074.713,
       "naive_lastyear": 11162.336,
       "naive_randomwalk": 5353.003,
-      "model_v3a": 3335.611821983067,
-      "model_v2": 3559.6210068293326
+      "model_v3a": 3335.6118371935054,
+      "model_v2": 3559.6210032800977,
+      "model_v4": 9206.798010501061
     },
     {
       "label": "FY2026H1",
@@ -116,7 +128,8 @@
       "naive_lastyear": 5353.003,
       "naive_randomwalk": 10901.498,
       "model_v3a": 3412.640798276483,
-      "model_v2": 3412.640798276483
+      "model_v2": 3412.640798276483,
+      "model_v4": 3079.8559978759713
     },
     {
       "label": "FY2026H2",
@@ -124,8 +137,9 @@
       "model": 7334.717900740869,
       "naive_lastyear": 10901.498,
       "naive_randomwalk": 5577.537,
-      "model_v3a": 4081.557556026479,
-      "model_v2": 8237.72020610449
+      "model_v3a": 4081.557612171715,
+      "model_v2": 8237.720167113557,
+      "model_v4": 5628.247593738179
     }
   ],
   "oos_metrics": {
@@ -163,8 +177,15 @@
       "n": 9
     }
   },
+  "oos_metrics_v4": {
+    "model_v4": {
+      "rmse_jpym": 4832.7,
+      "mape_pct": 34.5,
+      "n": 9
+    }
+  },
   "data_acquisition": {
-    "built_at": "2026-06-05T15:06:24.499597+00:00",
+    "built_at": "2026-06-05T15:44:59.748960+00:00",
     "steps": {
       "p0_etf_nav": {
         "rows": 17093,
@@ -186,8 +207,10 @@
         "comp_rows": 12
       },
       "p4_mandate_nav": {
-        "rows": 12,
-        "tag": "[Assumption]"
+        "rows": 6,
+        "detail_rows": 28,
+        "tag": "[Filing/Market/Derived]",
+        "scrape_script": "_scripts/download_mandate_nav.py"
       },
       "p6_march_window": {
         "rows": 12
@@ -198,7 +221,7 @@
     "period_end": "2026-03-31",
     "aum_end_jpym": 1335700.0
   },
-  "production_spec": "v1",
+  "production_spec": "v4",
   "primary_kpi": "perf_fee_h2_positive.out_of_sample.r2",
   "diagnostics": {
     "version": "v3_pm_diagnostics",
@@ -232,7 +255,7 @@
         "revenue_oos_r2": -0.0116,
         "perf_fee_h2_oos_rmse": 10307.2,
         "perf_fee_h2_oos_r2": -14.2489,
-        "production_default": true
+        "production_default": false
       },
       {
         "spec": "v2",
@@ -250,7 +273,16 @@
         "perf_fee_h2_oos_rmse": 11863.0,
         "perf_fee_h2_oos_r2": -19.1998,
         "production_default": false,
-        "note": "March Jan-Mar window on H2; production stays v1 unless perf_fee H2 RMSE improves"
+        "note": "March Jan-Mar window on H2"
+      },
+      {
+        "spec": "v4",
+        "revenue_oos_rmse": 4832.7,
+        "revenue_oos_r2": -0.2565,
+        "perf_fee_h2_oos_rmse": 8713.5,
+        "perf_fee_h2_oos_r2": -9.8979,
+        "production_default": true,
+        "note": "P4 mandate NAV scrape"
       }
     ]
   }

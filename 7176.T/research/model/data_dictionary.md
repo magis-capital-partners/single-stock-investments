@@ -84,11 +84,15 @@ Run `python3 acquire_data.py` (or `build_panel.py`, which calls it first). Manif
 | `comp_bridge_halfyear.csv` | [Filing] | Revenue, perf fee, opex, headcount bridge |
 | `capiq_peers.csv` | [Pending] | Template for CapIQ / peer fee ratios |
 
-### P4 — Mandate NAV scaffold
+### P4 — Mandate NAV (scraped + derived)
 
 | File | Tag | Definition |
 |------|-----|------------|
-| `mandate_nav_halfyear.csv` | [Assumption] | Registry-weighted mandate excess vs hurdle per half; `mandate_weighted_excess`, `mandate_count`. Replace with trust-report NAV when available. |
+| `mandate_nav_monthly.csv` | [Filing/Market/Derived] | Monthly NAV/AUM/return per fund from SAM PDFs + yfinance ETFs; `download_mandate_nav.py` |
+| `mandate_nav_detail.csv` | [Filing/Market/Derived] | Per-mandate half-year return, benchmark, excess, AUM weights |
+| `mandate_nav_halfyear.csv` | [Filing/Market/Derived] | AUM-weighted `mandate_weighted_excess`, `mandate_weighted_return`, `mandate_count` |
+| `mandate_scrape_manifest.json` | [Market] | PDF download log + fund IDs |
+| `mandate_reports/` | [Filing] | Saved SAM monthly PDFs |
 
 ### P6 — March crystallization window
 
@@ -106,6 +110,6 @@ Run `python3 acquire_data.py` (or `build_panel.py`, which calls it first). Manif
 ## Remaining gaps
 
 - **JITA industry flows** — columns present but NaN; needs Vicki scrape or manual export.
-- **Per-fund NAV vs hurdle / high-water mark** — P4 scaffold uses registry [Assumption]; scrape 受益権報告書 for production mandate NAV.
+- **Per-fund NAV vs hurdle / high-water mark** — P4 live for FY2023H1 onward (6 halves); pre-2023 and institutional pool still proxy [Derived]. Vicki: 投信総合検索ライブラリー CSV for Value Up history.
 - **AUM by category pre-2023** and **base/perf split pre-FY2024** — extends component history.
 - **CapIQ** ownership + peer fee/comp ratios — paste into `capiq_export.csv`.

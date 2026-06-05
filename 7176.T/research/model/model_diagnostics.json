@@ -1,6 +1,6 @@
 {
   "as_of": "2026-06-05",
-  "production_spec": "v1",
+  "production_spec": "v4",
   "primary_kpi": "perf_fee_h2_positive.out_of_sample.r2",
   "estimation_window": {
     "start": "2020-H1",
@@ -326,7 +326,7 @@
       "revenue_oos_r2": -0.0116,
       "perf_fee_h2_oos_rmse": 10307.2,
       "perf_fee_h2_oos_r2": -14.2489,
-      "production_default": true
+      "production_default": false
     },
     {
       "spec": "v2",
@@ -344,7 +344,16 @@
       "perf_fee_h2_oos_rmse": 11863.0,
       "perf_fee_h2_oos_r2": -19.1998,
       "production_default": false,
-      "note": "March Jan-Mar window on H2; production stays v1 unless perf_fee H2 RMSE improves"
+      "note": "March Jan-Mar window on H2"
+    },
+    {
+      "spec": "v4",
+      "revenue_oos_rmse": 4832.7,
+      "revenue_oos_r2": -0.2565,
+      "perf_fee_h2_oos_rmse": 8713.5,
+      "perf_fee_h2_oos_r2": -9.8979,
+      "production_default": true,
+      "note": "P4 mandate NAV scrape"
     }
   ],
   "residual_attribution": [
@@ -491,7 +500,7 @@
   "caveats": [
     "Primary KPI: perf_fee_h2_positive OOS R\u00b2 (not total-revenue IS R\u00b2).",
     "perf_fee_h2_positive OOS n is small (fee split disclosed only from FY2024).",
-    "v2 blended excess worsens revenue OOS RMSE; production_spec remains v1.",
+    "production_spec=v4 per acceptance rule (lowest perf_fee H2 OOS RMSE not worse than v1).",
     "Naive same-half-last-year beats model on revenue OOS RMSE (\u00a53,230m vs \u00a54,336m).",
     "n\u224812 half-years; negative OOS R\u00b2 is valid (model worse than mean)."
   ],

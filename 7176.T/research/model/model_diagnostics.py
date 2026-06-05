@@ -32,11 +32,13 @@ from model import (  # noqa: E402
     fit_perf,
     fit_perf_v2,
     fit_perf_v3a,
+    fit_perf_v4,
     predict_base,
     predict_earnings,
     predict_perf,
     predict_perf_v2,
     predict_perf_v3a,
+    predict_perf_v4,
     walk_forward,
 )
 
@@ -168,6 +170,9 @@ def walk_forward_target(
 
 
 def _predict_perf_oos(train: pd.DataFrame, test: pd.Series, spec: str = "v1") -> float:
+    if spec == "v4":
+        params, _ = fit_perf_v4(train)
+        return float(predict_perf_v4(test.to_frame().T, params).iloc[0])
     if spec == "v3a":
         params, _ = fit_perf_v3a(train)
         return float(predict_perf_v3a(test.to_frame().T, params).iloc[0])
@@ -333,10 +338,11 @@ def build_tornado(df: pd.DataFrame, bridge: dict, rate: float, perf_params: dict
 
 
 def spec_leaderboard(df: pd.DataFrame) -> list[dict]:
-    """Compare v1 vs v2 vs v3a on revenue and perf_fee H2 OOS."""
+    """Compare v1 vs v2 vs v3a vs v4 on revenue and perf_fee H2 OOS."""
     wf_v1 = walk_forward(df, use_v2=False)
     wf_v2 = walk_forward(df, use_v2=True)
     wf_v3a = walk_forward(df, use_v3a=True)
+    wf_v4 = walk_forward(df, use_v4=True)
 
     def _oos_rmse_r2(wf: pd.DataFrame, filt=None) -> tuple[float, float]:
         if not len(wf):
@@ -355,10 +361,12 @@ def spec_leaderboard(df: pd.DataFrame) -> list[dict]:
     rev_v2_rmse, rev_v2_r2 = _oos_rmse_r2(wf_v2)
 
     rev_v3a_rmse, rev_v3a_r2 = _oos_rmse_r2(wf_v3a)
+    rev_v4_rmse, rev_v4_r2 = _oos_rmse_r2(wf_v4)
 
     wf_perf_v1 = walk_forward_target(df, "perf_fee_m", lambda tr, te: _predict_perf_oos(tr, te, "v1"))
     wf_perf_v2 = walk_forward_target(df, "perf_fee_m", lambda tr, te: _predict_perf_oos(tr, te, "v2"))
     wf_perf_v3a = walk_forward_target(df, "perf_fee_m", lambda tr, te: _predict_perf_oos(tr, te, "v3a"))
+    wf_perf_v4 = walk_forward_target(df, "perf_fee_m", lambda tr, te: _predict_perf_oos(tr, te, "v4"))
 
     def _comp_wf(wf: pd.DataFrame, h2_only: bool) -> tuple[float, float]:
         if not len(wf):
@@ -375,21 +383,33 @@ def spec_leaderboard(df: pd.DataFrame) -> list[dict]:
     p1_rmse, p1_r2 = _comp_wf(wf_perf_v1, True)
     p2_rmse, p2_r2 = _comp_wf(wf_perf_v2, True)
     p3_rmse, p3_r2 = _comp_wf(wf_perf_v3a, True)
+    p4_rmse, p4_r2 = _comp_wf(wf_perf_v4, True)
 
     entries = [
         dict(spec="v1", revenue_oos_rmse=rev_v1_rmse, revenue_oos_r2=rev_v1_r2,
-             perf_fee_h2_oos_rmse=p1_rmse, perf_fee_h2_oos_r2=p1_r2, production_default=True),
+             perf_fee_h2_oos_rmse=p1_rmse, perf_fee_h2_oos_r2=p1_r2, production_default=False),
         dict(spec="v2", revenue_oos_rmse=rev_v2_rmse, revenue_oos_r2=rev_v2_r2,
              perf_fee_h2_oos_rmse=p2_rmse, perf_fee_h2_oos_r2=p2_r2, production_default=False,
              note="v2 worse on revenue OOS RMSE"),
         dict(spec="v3a", revenue_oos_rmse=rev_v3a_rmse, revenue_oos_r2=rev_v3a_r2,
              perf_fee_h2_oos_rmse=p3_rmse, perf_fee_h2_oos_r2=p3_r2, production_default=False,
-             note="March Jan-Mar window on H2; production stays v1 unless perf_fee H2 RMSE improves"),
+             note="March Jan-Mar window on H2"),
+        dict(spec="v4", revenue_oos_rmse=rev_v4_rmse, revenue_oos_r2=rev_v4_r2,
+             perf_fee_h2_oos_rmse=p4_rmse, perf_fee_h2_oos_r2=p4_r2, production_default=False,
+             note="P4 mandate NAV scrape"),
     ]
-    best_rev = min(entries, key=lambda e: e["revenue_oos_rmse"] if e["revenue_oos_rmse"] == e["revenue_oos_rmse"] else 1e9)
+    baseline_perf = p1_rmse
+    eligible = [
+        e for e in entries
+        if e["perf_fee_h2_oos_rmse"] == e["perf_fee_h2_oos_rmse"]
+        and e["perf_fee_h2_oos_rmse"] <= baseline_perf
+    ]
+    if eligible:
+        winner = min(eligible, key=lambda e: e["perf_fee_h2_oos_rmse"])
+    else:
+        winner = entries[0]
     for e in entries:
-        e["production_default"] = e["spec"] == best_rev["spec"] and e["spec"] == "v1"
-    entries[0]["production_default"] = True
+        e["production_default"] = e["spec"] == winner["spec"]
     return entries
 
 
@@ -514,13 +534,14 @@ def run_diagnostics(df: pd.DataFrame | None = None) -> dict:
     }
 
     leaderboard = spec_leaderboard(df)
+    production_spec = next((e["spec"] for e in leaderboard if e.get("production_default")), "v1")
     coeffs = bootstrap_coefficients(df)
     attribution = residual_attribution(df)
     tornado = build_tornado(df, bridge, rate, perf_params)
 
     diag = dict(
         as_of=str(date.today()),
-        production_spec="v1",
+        production_spec=production_spec,
         primary_kpi="perf_fee_h2_positive.out_of_sample.r2",
         estimation_window=dict(start="2020-H1", end="2026-H2", n_halfyears=int(len(df)), excluded="pre-2018 HK legacy"),
         targets=targets,
@@ -532,7 +553,7 @@ def run_diagnostics(df: pd.DataFrame | None = None) -> dict:
         caveats=[
             "Primary KPI: perf_fee_h2_positive OOS R² (not total-revenue IS R²).",
             "perf_fee_h2_positive OOS n is small (fee split disclosed only from FY2024).",
-            "v2 blended excess worsens revenue OOS RMSE; production_spec remains v1.",
+            f"production_spec={production_spec} per acceptance rule (lowest perf_fee H2 OOS RMSE not worse than v1).",
             "Naive same-half-last-year beats model on revenue OOS RMSE (¥3,230m vs ¥4,336m).",
             f"n≈{len(df)} half-years; negative OOS R² is valid (model worse than mean).",
         ],
@@ -541,7 +562,7 @@ def run_diagnostics(df: pd.DataFrame | None = None) -> dict:
 
     spec_comp = dict(
         as_of=str(date.today()),
-        production_spec="v1",
+        production_spec=production_spec,
         leaderboard=leaderboard,
         acceptance_rule="Reject spec if perf_fee_h2_oos_rmse worsens vs prior",
     )
