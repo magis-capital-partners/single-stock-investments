@@ -106,6 +106,39 @@ def predict_perf(df: pd.DataFrame, params: dict, hurdle: float = 0.0) -> pd.Seri
     return (k * drive).fillna(0.0)
 
 
+def effective_excess_ret(row) -> float:
+    """P0/P2 blended excess return: fund proxy when available, else Nikkei + value."""
+    if "perf_eligible_excess_ret" in row.index and pd.notna(row.get("perf_eligible_excess_ret")):
+        return float(row["perf_eligible_excess_ret"])
+    nik = max(0.0, float(row.get("nikkei_ret") or 0))
+    val = row.get("value_factor_ret", row.get("value_pbr_ret", np.nan))
+    if pd.notna(val):
+        return 0.65 * nik + 0.35 * max(0.0, float(val))
+    return nik
+
+
+def fit_perf_v2(df: pd.DataFrame):
+    sub = df.dropna(subset=["perf_fee_m", "aum_avg_jpym"]).copy()
+    sub["excess"] = sub.apply(effective_excess_ret, axis=1)
+    sub["drive"] = sub["aum_avg_jpym"] * sub["excess"]
+    params = {}
+    for half in ["H1", "H2"]:
+        s = sub[sub["half"] == half]
+        if len(s) >= 1 and s["drive"].sum() > 0:
+            k = float((s["drive"] * s["perf_fee_m"]).sum() / (s["drive"] ** 2).sum())
+        else:
+            k = np.nan
+        params[half] = k
+    return params, sub
+
+
+def predict_perf_v2(df: pd.DataFrame, params: dict) -> pd.Series:
+    excess = df.apply(effective_excess_ret, axis=1)
+    drive = df["aum_avg_jpym"] * excess
+    k = df["half"].map(params)
+    return (k * drive).fillna(0.0)
+
+
 # ---------------------------------------------------------------------------
 # Component 3 — COSTS / EARNINGS BRIDGE
 #   ordinary margin on revenue; NI = ordinary * (1 - tax). Estimate from history.
@@ -137,6 +170,16 @@ def predict_earnings(rev_m, bridge):
 AUM_PROXY_PRE2023 = 1_250_000.0  # JPY m, ~stable ¥1.25tn [Assumption]
 
 
+def _load_acquisition_manifest() -> dict | None:
+    path = OUT / "data" / "data_acquisition_manifest.json"
+    if not path.exists():
+        return None
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return None
+
+
 def _aum_proxy(row) -> float:
     return float(row["aum_avg_jpym"]) if pd.notna(row["aum_avg_jpym"]) else AUM_PROXY_PRE2023
 
@@ -157,7 +200,7 @@ def _fit_reduced(train: pd.DataFrame):
     return base_floor, ks
 
 
-def walk_forward(df: pd.DataFrame):
+def walk_forward(df: pd.DataFrame, use_v2: bool = False):
     d = df.dropna(subset=["revenue_m", "nikkei_ret"]).reset_index(drop=True)
     rows = []
     for i in range(len(d)):
@@ -169,7 +212,8 @@ def walk_forward(df: pd.DataFrame):
         k = ks.get(test["half"], np.nan)
         if np.isnan(k):
             continue
-        drive = _aum_proxy(test) * max(0.0, test["nikkei_ret"])
+        excess = effective_excess_ret(test) if use_v2 else max(0.0, float(test["nikkei_ret"]))
+        drive = _aum_proxy(test) * excess
         rev_hat = base_floor + k * drive
         ly = train[train["half"] == test["half"]]["revenue_m"]
         rw = train["revenue_m"].iloc[-1]
@@ -207,14 +251,36 @@ def main() -> None:
 
     rate, base_obs = fit_base_rate(df)
     perf_params, perf_obs = fit_perf(df)
+    perf_params_v2, _ = fit_perf_v2(df)
     bridge = fit_bridge(df)
 
     df["base_hat_m"] = predict_base(df, rate)
     df["perf_hat_m"] = predict_perf(df, perf_params)
+    df["perf_hat_v2_m"] = predict_perf_v2(df, perf_params_v2)
     df["rev_hat_m"] = df["base_hat_m"].fillna(0) + df["perf_hat_m"].fillna(0) + 200.0
+    df["rev_hat_v2_m"] = df["base_hat_m"].fillna(0) + df["perf_hat_v2_m"].fillna(0) + 200.0
 
-    res = walk_forward(df)
+    res = walk_forward(df, use_v2=False)
+    res_v2 = walk_forward(df, use_v2=True)
     mt = metrics(res) if len(res) else {}
+    mt_v2 = {}
+    if len(res_v2):
+        res_v2 = res_v2.rename(columns={"model": "model_v2"})
+        res = res.merge(res_v2[["label", "model_v2"]], on="label", how="left")
+        err_v2 = res.dropna(subset=["model_v2"])
+        if len(err_v2):
+            e = err_v2["model_v2"] - err_v2["actual"]
+            hit = float(
+                (np.sign(err_v2["model_v2"].diff().fillna(0)) == np.sign(err_v2["actual"].diff().fillna(0))).mean()
+            ) if len(err_v2) > 1 else float("nan")
+            mt_v2 = {
+                "model_v2": dict(
+                    rmse_jpym=round(float(np.sqrt((e ** 2).mean())), 1),
+                    mape_pct=round(float((e.abs() / err_v2["actual"].abs()).mean() * 100), 1),
+                    directional_hit=round(hit, 2),
+                    n=len(err_v2),
+                )
+            }
 
     # ----- current/next period nowcast -----
     # Use latest known AUM and a market-return input (set live each month).
@@ -235,8 +301,16 @@ def main() -> None:
                     "This seasonality (H2 revenue ~2-3x H1) is the core forecastable structure.",
         },
         "earnings_bridge": bridge,
+        "perf_fee_model_v2": {
+            "form": "perf_fee_half = k_half * avg_AUM * effective_excess_ret",
+            "effective_excess": "fund_nav_proxy if available else 0.65*Nikkei + 0.35*value_factor",
+            "k_H1": None if np.isnan(perf_params_v2.get("H1", np.nan)) else round(perf_params_v2["H1"], 5),
+            "k_H2": None if np.isnan(perf_params_v2.get("H2", np.nan)) else round(perf_params_v2["H2"], 5),
+        },
         "walk_forward": res.to_dict(orient="records"),
         "oos_metrics": mt,
+        "oos_metrics_v2": mt_v2,
+        "data_acquisition": _load_acquisition_manifest(),
         "latest_anchor": {
             "period_end": str(latest["period_end"].date()),
             "aum_end_jpym": float(latest["aum_end_jpym"]),
@@ -270,8 +344,11 @@ def main() -> None:
     print(f"Base rate (ann): {rate*100:.3f}%")
     print(f"Perf k: H1={perf_params.get('H1')}, H2={perf_params.get('H2')}")
     print(f"Bridge: {bridge}")
-    print("\nWalk-forward OOS metrics:")
+    print("\nWalk-forward OOS metrics (v1 Nikkei):")
     print(json.dumps(mt, indent=2))
+    if mt_v2:
+        print("\nWalk-forward OOS metrics (v2 blended excess):")
+        print(json.dumps(mt_v2, indent=2))
     print("\nForecasts:")
     print(fc.to_string(index=False))
 
