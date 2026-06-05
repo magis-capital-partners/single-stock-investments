@@ -1,335 +1,436 @@
-# Prompt — Improve equity earnings models + PM-grade diagnostics (v2)
+# Prompt — Equity model v3: PM diagnostics + perf-crystallization data (7176.T)
 
-**Use this prompt to instruct an analyst/agent to upgrade `{TICKER}/research/model/` and the dashboard model panel with the statistics and charts a multi-manager (Millennium-style) pod PM expects: honest R², out-of-sample discipline, component attribution, uncertainty, and scenario response — without overselling a ~12-point semiannual sample.**
+**Use this prompt to instruct an analyst/agent to upgrade `{TICKER}/research/model/` and the dashboard model panel.** The PM (Citadel / Millennium-style) cares about **decomposed out-of-sample R²**, not a single in-sample headline. The binding problem on 7176.T is **H2 performance-fee crystallization**, not base-fee identity.
 
-Copy everything in the block below into the modeling agent. Read first:
+Copy everything below into the modeling agent. Read first:
 
-- `{TICKER}/research/earnings_model_prompt.md` (v1 build spec)
-- `{TICKER}/research/model/earnings_model_report.md`, `model.py`, `model_results.json`
-- `_system/prompts/dashboard_equity_model_viz.md` (dashboard ingest + UI)
-- `dashboard/equity-model-viz.js`, `_system/scripts/build_equity_model_dashboard.py`
+| File | Why |
+|------|-----|
+| `{TICKER}/research/earnings_model_prompt.md` | v1 revenue identity + sample-size law |
+| `{TICKER}/research/model/earnings_model_report.md` | Honest OOS read |
+| `{TICKER}/research/model/model.py`, `model_results.json` | Current fit + walk-forward |
+| `{TICKER}/research/model/acquire_data.py`, `fund_registry.json`, `data/` | P0–P3 layer (done) |
+| `{TICKER}/research/model/data_dictionary.md` | Series tags |
+| `_system/prompts/dashboard_equity_model_viz.md` | Dashboard ingest |
+| `dashboard/equity-model-viz.js`, `_system/scripts/build_equity_model_dashboard.py` | UI |
 
-**Pilot ticker:** `7176.T` (Simplex Financial Holdings). Design must generalize to future `{TICKER}/research/model/` builds.
+**Pilot ticker:** `7176.T` (Simplex Financial Holdings). Generalize file paths to `{TICKER}/research/model/` for future builds.
 
 ---
 
 ## ROLE
 
-You are a quantitatively rigorous equity analyst on a multi-manager pod. Your PM does not want a single headline R². They want:
+You are a quantitatively rigorous equity analyst on a multi-manager pod. Your PM wants:
 
-1. **Decomposed fit** (base fee identity vs convex performance fee vs earnings bridge).
-2. **In-sample vs out-of-sample** side by side, with the gap visible (overfit alarm).
-3. **Benchmark dominance** stated plainly (we currently lose to seasonal naive on revenue level).
-4. **Uncertainty** on every coefficient and forecast (bootstrap / posterior intervals, not fake precision).
-5. **Actionable charts** on the dashboard when the user clicks the ticker.
+1. **Decomposed fit** — base fee (identity) vs perf fee (convex crystallization) vs earnings bridge.
+2. **Out-of-sample R² first** — in-sample R² paired with overfit gap; never market IS R² alone.
+3. **Benchmark honesty** — seasonal naive likely wins total revenue **level** while revenue trends up; say so.
+4. **Uncertainty** — bootstrap CIs on `k_H1`, `k_H2`, base rate, bridge (n≈12 → wide bands expected).
+5. **Actionable dashboard** — R² scorecard, residuals by leg, tornado, nowcast intervals.
 
-Your job is **model v2 + diagnostics export + dashboard panels**. Not a black-box ML dump.
-
----
-
-## CURRENT STATE (7176.T — do not re-litigate, build on it)
-
-| What works | What is missing |
-|------------|-----------------|
-| Revenue identity decomposition (base + perf) | No R² / adjusted R² exported per component |
-| H1/H2 crystallization seasonality (`k_H2 >> k_H1`) | No residual diagnostics |
-| Walk-forward OOS RMSE/MAPE vs naive | No in-sample vs OOS R² comparison chart |
-| Scenario fan (`forecasts.csv`) | No prediction intervals on nowcast |
-| Dashboard: revenue stack, walk-forward, OOS RMSE bar | No actual-vs-fitted scatter, residual plot, tornado, coefficient stability |
-| Honest report that model loses to naive on level | PM cannot see R² at a glance |
-
-**Binding constraint unchanged:** ~12 semiannual P&L points → **≤3–4 free parameters per sub-equation**, regularization, walk-forward validation.
+**Not in scope:** kitchen-sink ML, 20-factor OLS on 12 points, optimizing in-sample total-revenue R².
 
 ---
 
-## OBJECTIVE (two deliverables)
+## CURRENT STATE (7176.T — build on this, do not restart)
 
-### A. Model v2 (Python)
+### What exists (merged to `main`)
 
-Upgrade `model.py` (or add `model_diagnostics.py` called from `model.py`) to compute and persist a full **diagnostics bundle** while preserving the structural revenue identity.
+| Layer | Status | Files |
+|-------|--------|-------|
+| Revenue identity v1 | Done | `model.py`, `build_panel.py` |
+| P0–P3 data acquisition | Done | `acquire_data.py`, `fund_registry.json`, `data/*` |
+| v2 blended excess driver | Done | `perf_fee_model_v2` in `model_results.json` |
+| Walk-forward OOS RMSE/MAPE | Done | `oos_metrics`, `oos_metrics_v2` |
+| Dashboard model panel | Done | `equity-model-viz.js`, `equity_models.json` |
+| PM diagnostics (R² bundle) | **Not done** | `model_diagnostics.json` missing |
+| Fund-level crystallization | **Not done** | Still `k_H2 × AUM × macro return` |
 
-### B. Dashboard v2 (static JSON + Chart.js)
+### Empirical results (do not ignore)
 
-Extend `build_equity_model_dashboard.py` and `equity-model-viz.js` so clicking a ticker with a model shows **PM-grade panels** including R² (with honest labeling).
+**Walk-forward OOS (9 half-years, total revenue):**
+
+| Spec | RMSE (¥m) | MAPE | Directional hit |
+|------|-----------|------|-----------------|
+| v1 (Nikkei) | 4,336 | 32.6% | 0.67 |
+| v2 (blended excess) | **4,590** | 35.9% | **0.89** |
+| Naive same-half-last-year | **3,230** | 30.2% | 1.00 |
+
+**v2 data layer did not improve level accuracy.** Registry weights and filing-anchored ETF AUM (Yahoo lacks Japan ETF units) are too coarse. Directional hit improved; RMSE worsened.
+
+**Largest residuals (where R² is lost):**
+
+| Half | Actual (¥m) | v1 model | Miss | Driver |
+|------|---------------|----------|------|--------|
+| FY2024H2 | 11,162 | 9,382 | −1,780 | Strong March crystallization |
+| FY2026H2 | 16,934 | 7,335 | **−9,599** | PBR/value rally + perf spike (+53.6% YoY) |
+| FY2025H2 | 10,901 | 3,075 | −7,826 | Weak market; model stuck on base floor |
+
+**Conclusion:** R² uplift requires **fund-level perf crystallization** and **March return path**, not more macro factors blended into one `effective_excess_ret`.
+
+### R² by leg (expected today)
+
+| Target | IS R² (expect) | OOS R² (expect) | Bottleneck |
+|--------|----------------|-----------------|------------|
+| Base fee | High (0.85+) | Moderate | AUM disclosure gaps pre-2023 |
+| **Perf fee (H2)** | Low | **Very low** | No hurdle/HWM/fund NAV |
+| **Perf fee (H2, perf>0)** | Low | **Primary KPI** | Same |
+| Total revenue | Moderate IS | Below naive | Dominated by perf leg |
+| Ordinary / NI | Moderate | Follows revenue | Comp bridge coarse |
+
+**Primary optimization target:** `perf_fee` OOS R² on H2 halves with `perf_fee > 0`, then `revenue_total` H2-only OOS R².
+
+---
+
+## OBJECTIVE (three deliverables)
+
+### A. PM diagnostics bundle (Python)
+
+Add `model_diagnostics.py` (imported from `model.py`) emitting full IS/OOS metrics per target. Preserve v1 `model_results.json` fields for backward compatibility.
+
+### B. Model v3 — perf crystallization spec (Python)
+
+Upgrade perf-fee equation toward the revenue identity in `earnings_model_prompt.md`:
+
+```
+PerfFee_half = Σ_fund ( perf_eligible_AUM_f × max(0, NAV_f/NAV_f_hwm − 1) × perf_rate_f × cryst_flag_f )
+```
+
+Until fund-level data exists, implement **staged fallbacks** (document which stage is active):
+
+| Stage | Driver | Accept only if… |
+|-------|--------|-----------------|
+| v1 | `k_half × AUM × max(0, Nikkei)` | Baseline (current) |
+| v2 | `k_half × AUM × effective_excess_ret` | Beats v1 on **perf_fee OOS RMSE** or H2 revenue OOS RMSE |
+| v3a | v2 + **March 3-month return** into fiscal year-end | Beats v2 on H2 perf OOS |
+| v3b | **Per-fund summed excess** from `mandate_nav_halfyear.csv` | Beats v3a on perf_fee OOS R² |
+| v4 | v3b + **JITA flows** in AUM roll-forward | Beats v3b on nowcast MAE |
+
+**Rejection rule:** Any new spec must log `spec_comparison.json` showing OOS metrics vs prior stage. If worse on perf_fee RMSE, keep prior stage as production default.
+
+### C. Dashboard PM panel (JSON + Chart.js)
+
+Extend ingest + `equity-model-viz.js` per Part 5. **Lead with perf-fee OOS R²**, not total-revenue IS R².
 
 ---
 
 ## PART 1 — METRICS THE PM MUST SEE
 
-Compute for **each target** below. Targets:
+### Targets
 
-| Target | Series | Notes |
-|--------|--------|-------|
-| `revenue_total` | Half revenue (¥m) | Primary stance gate for model quality |
-| `base_fee` | Base fee half (¥m) | Identity fit; expect high in-sample R² where fee split disclosed |
-| `perf_fee` | Performance fee half (¥m) | Convex line; report R² only on periods with `perf_fee > 0` |
-| `ordinary_profit` | Ordinary profit (¥m) | Bridge fit |
-| `net_income` | Parent net income (¥m) | End of bridge |
+| ID | Series | Notes |
+|----|--------|-------|
+| `revenue_total` | Half revenue (¥m) | Full sample |
+| `revenue_h2_only` | H2 revenue only | **Secondary KPI** — crystallization leg |
+| `base_fee` | Base fee half (¥m) | Identity fit |
+| `perf_fee` | Perf fee half (¥m) | Convex leg |
+| `perf_fee_h2_positive` | H2 periods with perf > 0 | **Primary KPI** |
+| `ordinary_profit` | Ordinary (¥m) | Bridge |
+| `net_income` | Parent NI (¥m) | Bridge end |
 
-For **each target**, report **both**:
-
-- **In-sample (IS):** fit on full estimation sample (post-2018, document exclusion rule).
-- **Out-of-sample (OOS):** expanding-window walk-forward (same protocol as v1; do not change definition mid-series without documenting).
+For each target: **in-sample** and **out-of-sample** (expanding-window walk-forward, same protocol as v1).
 
 ### Required statistics (per target × IS/OOS)
 
-| Stat | Definition | PM use |
-|------|------------|--------|
-| `r2` | 1 − SS_res/SS_tot | Explained variance (label clearly IS or OOS) |
-| `adj_r2` | 1 − (1−R²)(n−1)/(n−k−1) | Penalize parameter count; **k** = free params in that sub-equation |
-| `rmse` | Root mean squared error (¥m) | Scale error |
-| `mae` | Mean absolute error (¥m) | Robust error |
-| `mape_pct` | Mean abs % error | Scale-free (flag when actual ≈ 0) |
-| `directional_hit` | Sign(match Δpred, Δactual) | Trading-relevant |
-| `theil_u` | RMSE_model / RMSE_naive_rw | <1 beats random walk |
-| `n` | Observations used | Always show sample size |
-| `n_params` | Free parameters | Pair with adj_r2 |
+| Stat | PM use |
+|------|--------|
+| `r2` | Explained variance — **show OOS larger than IS in UI** |
+| `adj_r2` | Penalize k; always pair with `n` and `n_params` |
+| `rmse`, `mae`, `mape_pct` | Scale errors (¥m) |
+| `directional_hit` | Sign(Δpred) vs sign(Δactual) |
+| `theil_u` | RMSE_model / RMSE_naive_rw |
+| `n`, `n_params` | Sample discipline |
 
-### Required benchmark block (OOS only)
+### Benchmark block (OOS)
 
-For each target, compare structural model against:
+Compare each target against:
 
-1. **Naive same-half-last-year** (current v1 benchmark — likely winner on revenue level).
-2. **Naive random walk** (last period level).
-3. **Structural naive:** `base_rate × AUM` only (no perf fee) — shows value of convex leg.
-4. **Optional:** seasonal dummy + Nikkei return only (2-parameter sanity check).
+1. **Naive same-half-last-year** (likely winner on trending revenue).
+2. **Naive random walk**.
+3. **Structural base-only** (`base_rate × AUM`, no perf).
+4. **Seasonal dummy + Nikkei** (2-parameter sanity check).
 
-Report **loss differential**: `rmse_model − rmse_naive` and whether model wins.
+Report `rmse_model − rmse_naive` and `r2_model − r2_naive`.
 
-### Uncertainty (mandatory for coefficients)
-
-Bootstrap (≥1,000 resamples, block-bootstrap by fiscal year if needed) or Bayesian linear regression with weak priors for:
-
-- `base_rate_ann`
-- `k_H1`, `k_H2`
-- `ord_slope`, `ord_intercept`, `tax_rate`
-
-Export **5th / 50th / 95th percentile** for each. At n≈12, prefer **bootstrap percentile CIs** over OLS t-stats.
-
-### Overfit diagnostic (mandatory headline)
+### Overfit diagnostic (mandatory)
 
 ```
-overfit_gap = r2_in_sample − r2_out_of_sample   (per target)
+overfit_gap = r2_in_sample − r2_out_of_sample
 ```
 
-Display on dashboard. If gap > 0.15 on revenue, amber banner: *"In-sample fit overstates predictive power."*
+Dashboard amber banner if `overfit_gap > 0.15` on `revenue_total` or `perf_fee_h2_positive`.
 
-### Optional (implement if scipy available; else stub with `[HUMAN REVIEW]`)
+### Uncertainty
 
-- **Diebold-Mariano** p-value: model vs naive_lastyear loss differential (revenue).
-- **Ljung-Box** on OOS residuals (autocorrelation = missing dynamics).
+Bootstrap (≥1,000; block-bootstrap by fiscal year) for: `base_rate_ann`, `k_H1`, `k_H2`, `ord_slope`, `ord_intercept`, `tax_rate`. Export p05/p50/p95.
+
+### Optional
+
+- Diebold-Mariano: model vs naive_lastyear (revenue, perf_fee_h2).
+- Ljung-Box on OOS residuals.
 
 ---
 
-## PART 2 — MODEL IMPROVEMENTS (prioritized ROI)
+## PART 2 — DATA ACQUISITION (P4–P7, evidence-ranked)
 
-Implement in order. Each upgrade must re-run walk-forward and **beat or match** prior OOS on at least one dimension (RMSE on perf_fee, directional hit, or scenario response) or be rejected.
+P0–P3 is **done** (`acquire_data.py`). Do not re-scaffold. Extend with:
 
-### Tier 1 — Data (highest ROI; expands effective n)
+### P4 — Perf crystallization microstructure (highest R² ROI)
 
-1. **Per-ETF NAV × units** for every Simplex-listed ETF (daily → aggregate to half-year).
-   - New series: `aum_etf_nowcast`, `etf_flows_half`
-   - Source: JPX ETF pages, Simplex IR, `1306.T` / `1570.T` proxies
-2. **JITA monthly net flows** (equity + ETF category) → `net_flows_half` in panel.
-3. **Value / PBR factor return** (TOPIX value vs growth or custom low-PBR basket) as second driver for perf fee alongside Nikkei.
+| Series | Granularity | Source | Output file |
+|--------|-------------|--------|-------------|
+| Per-mandate / per-fund NAV | Monthly → half | 受益権報告書, trust reports, Simplex IR | `mandate_nav_monthly.csv` |
+| Hurdle, HWM, perf rate | Per fund | Fund terms, offering docs | `mandate_terms.json` |
+| Crystallization calendar | Per fund | H1/H2/March flags | extend `fund_registry.json` |
+| Historical perf fee by bucket | Half-year | Filings pre-FY2024 backfill | `perf_fee_by_bucket_halfyear.csv` |
 
-### Tier 2 — Specification (still ≤4 params per equation)
+**Model use:** Replace `k_H2 × AUM × Nikkei` with summable fund-level excess. This is the only path to explain FY2024H2 / FY2026H2 spikes.
 
-4. **Separate AUM drivers:** `aum_nonlisted` vs `aum_etf` with different base fee rates (2 rates max).
-5. **Perf fee:** `max(0, w1×Nikkei + w2×value_factor − hurdle)` with **one** convexity weight (not 10 factors).
-6. **Cost bridge:** variable comp = `comp_ratio × perf_fee` test; headcount × fixed cost per head for fixed opex.
-7. **H1 perf fee:** explicit low-weight crystallization flag (do not force H1 ≈ 0 in sample).
+### P5 — True AUM path (medium ROI)
 
-### Tier 3 — Nowcast & scenarios
+| Series | Source | Output | Status |
+|--------|--------|--------|--------|
+| JPX ETF units (creation/redemption) | JPX statistics | `etf_units_daily.csv` | Replaces filing-anchored scaling |
+| JITA net flows (equity, ETF) | [toushin.or.jp](https://www.toushin.or.jp/) | `flows_monthly.csv` (fill NaN cols) | Columns exist, values empty |
+| TSE investor-type flows | JPX | `investor_flows_monthly.csv` | New |
 
-8. **Monthly nowcast** with **80% prediction interval** (bootstrap forecast error from walk-forward).
-9. **Tornado chart** inputs: Nikkei H2 return, value factor, AUM level, comp ratio, USD/JPY.
-10. **CapIQ overlay** (user-upload CSV path: `research/model/capiq_export.csv`): ownership %, TPM volume history — qualitative panel, not in regression until verified.
+**Model use:** `AUM_t = AUM_{t-1} × (1+r) + net_flows` — improves base-fee level and perf scaling.
 
-### Tier 4 — Rejected unless OOS improves
+### P6 — Return path (refine v2, conditional ROI)
 
-- Kitchen-sink multivariate OLS on 20 macro variables.
-- LSTM / XGBoost on 12 points without strong regularization and worse OOS than structural form.
-- In-sample R² as the primary marketing number.
+| Series | Source | Output |
+|--------|--------|--------|
+| March 3-month return (into FY-end) | Compute from `^N225`, value ETFs | `march_window_ret_halfyear.csv` |
+| Per-strategy returns (2080/2081/2082, 2516, 1356) | Yahoo daily | extend `factor_returns_*` |
+| Perf-eligible AUM weights (observed, not registry) | Filings + ETF units | `perf_eligible_aum_halfyear.csv` |
+
+**Model use:** Crystallization is path-dependent — Oct dip + Feb–Mar rally ≠ flat half-average return.
+
+### P7 — Bridge and context (lower revenue R² impact)
+
+| Series | Source | Output |
+|--------|--------|--------|
+| Quarterly opex / headcount | Filings, CapIQ paste | `comp_bridge_halfyear.csv` |
+| CapIQ ownership, TPM volume | User CSV | `capiq_peers.csv` |
+| "Other" revenue breakdown | MD&A | `other_revenue_halfyear.csv` |
+
+### Data acceptance gate
+
+After each P-tier, re-run walk-forward and append to `data_acquisition_manifest.json`:
+
+```json
+{
+  "tier": "P4",
+  "oos_delta": {
+    "perf_fee_h2_rmse": -500,
+    "perf_fee_h2_r2": 0.15,
+    "revenue_total_rmse": -200
+  },
+  "accepted": true,
+  "production_spec": "v3b"
+}
+```
+
+**Reject tier** if `perf_fee_h2_rmse` does not improve vs prior tier (unless explicit `[HUMAN REVIEW]` reason documented).
 
 ---
 
-## PART 3 — FILES TO PRODUCE / UPDATE
+## PART 3 — SPECIFICATION UPGRADES (≤4 params per equation)
 
-Under `{TICKER}/research/model/`:
+Implement only after data exists or as explicit fallback:
+
+1. **March window driver:** `perf_drive = AUM × max(0, ret_mar_3m − hurdle)` — 1 extra timing param max.
+2. **Split base rates:** `rate_nonlisted` vs `rate_etf` (2 rates) — only if AUM split reliable.
+3. **Variable comp:** `VariableComp ≈ α × perf_fee` — test if ordinary R² gains.
+4. **H1 perf:** separate low `k_H1` with crystallization flag; do not force zero.
+
+**Rejected unless OOS perf_fee improves:** multivariate OLS on >4 macro factors, LSTM/XGB on 12 points.
+
+---
+
+## PART 4 — FILES TO PRODUCE / UPDATE
 
 | File | Purpose |
 |------|---------|
-| `model.py` | Extend to emit diagnostics (or import `model_diagnostics.py`) |
-| `model_diagnostics.json` | **New** — full PM diagnostics bundle (schema below) |
-| `model_results.json` | Merge summary + pointer to diagnostics (backward compatible) |
-| `residuals_halfyear.csv` | period, target, actual, fitted, residual, is_oos flag |
-| `coefficient_bootstrap.json` | CIs for k_H1, k_H2, base_rate, bridge |
-| `forecasts.csv` | Add columns: `revenue_lo80`, `revenue_hi80`, `net_income_lo80`, `net_income_hi80` |
-| `earnings_model_report.md` | New § **PM diagnostics** with IS/OOS table per target |
-| `figures/` (optional PNG) | `actual_vs_fitted.png`, `residuals.png`, `tornado.png` — or JSON-only for dashboard |
+| `model_diagnostics.py` | IS/OOS R², benchmarks, bootstrap |
+| `model_diagnostics.json` | Full PM bundle (schema below) |
+| `spec_comparison.json` | v1 vs v2 vs v3 OOS leaderboard |
+| `residuals_halfyear.csv` | period, target, actual, fitted, residual, is_oos |
+| `coefficient_bootstrap.json` | CIs |
+| `acquire_data.py` | Add P4–P7 functions (extend, don't replace P0–P3) |
+| `model.py` | Stage selector + diagnostics hook |
+| `earnings_model_report.md` | § PM diagnostics + § Data tier results |
+| `forecasts.csv` | Add `revenue_lo80`, `revenue_hi80` |
 
-Regenerate panel: `python build_panel.py && python model.py`
+Regenerate: `python3 build_panel.py && python3 model.py`
 
 ---
 
-## PART 4 — `model_diagnostics.json` SCHEMA
+## PART 5 — `model_diagnostics.json` SCHEMA
 
 ```json
 {
   "as_of": "YYYY-MM-DD",
-  "estimation_window": { "start": "2018-H1", "end": "2026-H2", "n_halfyears": 12, "excluded": "pre-2018 HK legacy" },
+  "production_spec": "v1|v2|v3a|v3b|v4",
+  "primary_kpi": "perf_fee_h2_positive.out_of_sample.r2",
+  "estimation_window": { "start": "2018-H1", "end": "2026-H2", "n_halfyears": 12 },
   "targets": {
-    "revenue_total": {
-      "in_sample": { "r2": 0.0, "adj_r2": 0.0, "rmse_jpym": 0, "mae_jpym": 0, "mape_pct": 0, "directional_hit": 0, "theil_u": 0, "n": 0, "n_params": 3 },
-      "out_of_sample": { "r2": 0.0, "adj_r2": 0.0, "rmse_jpym": 0, "mae_jpym": 0, "mape_pct": 0, "directional_hit": 0, "theil_u": 0, "n": 0 },
+    "perf_fee_h2_positive": {
+      "in_sample": { "r2": 0.0, "adj_r2": 0.0, "rmse_jpym": 0, "n": 0, "n_params": 2 },
+      "out_of_sample": { "r2": 0.0, "rmse_jpym": 0, "n": 0 },
       "overfit_gap": 0.0,
       "benchmarks_oos": {
-        "naive_lastyear": { "rmse_jpym": 0, "r2": 0.0, "beats_model": true },
-        "naive_randomwalk": { "rmse_jpym": 0, "r2": 0.0 },
-        "structural_base_only": { "rmse_jpym": 0 }
+        "naive_lastyear": { "rmse_jpym": 0, "r2": 0.0, "beats_model": false }
       }
     },
+    "revenue_total": { "...": "same shape" },
+    "revenue_h2_only": { "...": "same shape" },
     "base_fee": { "...": "same shape" },
-    "perf_fee": { "...": "same shape; note zero-inflation in caveats" },
+    "perf_fee": { "...": "same shape" },
     "ordinary_profit": { "...": "same shape" },
     "net_income": { "...": "same shape" }
   },
   "coefficients": {
-    "base_rate_ann": { "point": 0.0056, "p05": 0.0051, "p50": 0.0056, "p95": 0.0061, "method": "bootstrap" },
-    "k_H1": { "point": 0.0049, "p05": 0.0, "p50": 0.0049, "p95": 0.01 },
-    "k_H2": { "point": 0.0636, "p05": 0.04, "p50": 0.0636, "p95": 0.09 },
-    "ord_slope": { "point": 0.579, "p05": 0.45, "p50": 0.579, "p95": 0.68 }
+    "k_H2": { "point": 0.064, "p05": 0.04, "p50": 0.064, "p95": 0.09, "method": "bootstrap" }
   },
-  "walk_forward": [ { "label", "target", "actual", "fitted", "residual", "naive_lastyear" } ],
-  "residual_summary": { "mean_jpym": 0, "std_jpym": 0, "max_abs_jpym": 0 },
-  "tornado": [ { "driver": "Nikkei H2 return", "low": -0.1, "high": 0.14, "eps_delta_pct": 0 } ],
-  "nowcast_interval": { "revenue_p50": 0, "revenue_p05": 0, "revenue_p95": 0 },
-  "caveats": [ "string" ],
-  "version": "v2_pm_diagnostics"
+  "spec_leaderboard": [
+    { "spec": "v1", "perf_fee_h2_oos_rmse": 0, "perf_fee_h2_oos_r2": 0, "revenue_oos_rmse": 4336 },
+    { "spec": "v2", "perf_fee_h2_oos_rmse": 0, "perf_fee_h2_oos_r2": 0, "revenue_oos_rmse": 4590 }
+  ],
+  "residual_attribution": [
+    { "label": "FY2026H2", "target": "perf_fee", "actual": 14316, "fitted": 0, "residual": 0, "note": "March crystallization miss" }
+  ],
+  "walk_forward": [],
+  "tornado": [],
+  "nowcast_interval": {},
+  "caveats": [],
+  "version": "v3_pm_diagnostics"
 }
 ```
 
-**R² rules for JSON and UI:**
+**R² display rules:**
 
-- Always pair `r2` with `n` and `n_params`.
-- Show **OOS R²** larger font than IS R² on dashboard.
-- If OOS R² < 0, display as negative (model worse than mean) — do not floor at zero.
-- Subscript labels in UI: "R² out-of-sample" not "R²" alone.
+- OOS R² **larger font** than IS in dashboard.
+- Negative OOS R² allowed (model worse than mean).
+- Always show `n` and `n_params` beside R².
+- UI label: "R² out-of-sample (perf fee, H2)" not "R²" alone.
 
 ---
 
-## PART 5 — DASHBOARD CHARTS (Millennium PM panel)
+## PART 6 — DASHBOARD CHARTS
 
-Extend `equity-model-viz.js` when user clicks ticker. Add section **Model diagnostics** below existing earnings charts.
+Add section **Model diagnostics** below existing earnings charts.
 
-### KPI strip (add 4 cards)
+### KPI strip (priority order)
 
 | Card | Value |
 |------|-------|
-| OOS R² revenue | `targets.revenue_total.out_of_sample.r2` + n |
-| IS vs OOS gap | `overfit_gap` with amber if >0.15 |
-| OOS RMSE vs naive | delta + winner badge |
-| Perf fee OOS R² | on non-zero perf periods only |
+| **Perf fee H2 OOS R²** | Primary |
+| Revenue OOS R² | Secondary |
+| IS vs OOS overfit gap | Amber if >0.15 |
+| OOS RMSE vs naive | Delta + winner |
+| Production spec | v1 / v2 / v3 badge |
 
-### Charts (Chart.js — new canvas IDs)
+### Charts (minimum 6)
 
-| # | Chart | Type | Data source |
-|---|-------|------|-------------|
-| 1 | **Actual vs fitted** | Scatter + 45° line | `walk_forward` or `residuals_halfyear.csv`; annotate OOS R² |
-| 2 | **IS vs OOS R² by target** | Grouped bar | `targets.*.in_sample.r2` vs `out_of_sample.r2` for 5 targets |
-| 3 | **Residuals over time** | Line + bar | `residuals_halfyear.csv`; color OOS points |
-| 4 | **Residual distribution** | Histogram | OOS residuals only |
-| 5 | **Coefficient stability** | Line with ribbon | Expanding-window `k_H2` + bootstrap p05/p95 |
-| 6 | **Tornado / sensitivity** | Horizontal bar | `tornado[]` — EPS or net income delta |
-| 7 | **Scenario fan** | Line + shaded band | `forecasts.csv` + interval columns |
-| 8 | **Component waterfall** | Stacked bar (one period) | base + perf → revenue → ordinary → net income |
-| 9 | **H2/H1 seasonality** | Grouped bar by FY | revenue H1 vs H2 (already in report table — visualize) |
-| 10 | **Benchmark loss** | Horizontal bar | RMSE: model vs naive_lastyear vs naive_rw vs base_only |
+| # | Chart | Type |
+|---|-------|------|
+| 1 | Actual vs fitted (perf fee H2) | Scatter + 45° line |
+| 2 | IS vs OOS R² by target | Grouped bar (7 targets) |
+| 3 | Residuals over time | Bar; color H2 OOS |
+| 4 | Spec leaderboard | Bar (v1/v2/v3 OOS RMSE) |
+| 5 | Coefficient stability | `k_H2` expanding window + bootstrap band |
+| 6 | Tornado (H2 EPS sensitivity) | Horizontal bar |
+| 7 | Scenario fan + 80% band | Line + shade |
+| 8 | H1 vs H2 revenue by FY | Grouped bar |
+| 9 | Benchmark RMSE comparison | Horizontal bar |
+| 10 | Residual attribution table | FY2024H2, FY2026H2 callouts |
 
-### Tables
+### Honest static copy (7176.T)
 
-- **PM scorecard:** target × IS R² × OOS R² × adj R² × RMSE × beats naive? 
-- **Coefficient CI table:** point, p05, p95
-- **Diebold-Mariano** (if computed): test name, p-value, interpretation one line
-
-### Honest copy (static, 7176.T)
-
-> Structural model explains **seasonality and convexity**; **level forecast** may trail same-half-last-year naive when revenue trends up. Use for pre-report nowcast and scenario response, not as sole EPS estimate.
+> Model explains **seasonality and convexity structure**. **Level forecast** may trail same-half-last-year naive while revenue trends up. **Perf-fee H2 OOS R²** is the quality gate. Use for pre-report nowcast and scenario response, not as sole EPS estimate.
 
 ---
 
-## PART 6 — INGEST PIPELINE UPDATE
+## PART 7 — INGEST PIPELINE
 
-Extend `_system/scripts/build_equity_model_dashboard.py`:
+Extend `build_equity_model_dashboard.py`:
 
-1. Load `model_diagnostics.json` if present; merge into `equity_models.json` tickers[ticker].diagnostics`.
-2. Load `residuals_halfyear.csv` → compact JSON array (round 3 dp).
-3. Load `coefficient_bootstrap.json`.
-4. Add `diagnostics_ready: true` flag on ticker row.
+1. Load `model_diagnostics.json`, `spec_comparison.json`, `residuals_halfyear.csv`.
+2. Merge into `equity_models.json` → `tickers[ticker].diagnostics`.
+3. Set `diagnostics_ready: true`, `production_spec`, `primary_kpi`.
 
-Run: `python _system/scripts/build_dashboard_data.py`
+Run: `python3 _system/scripts/build_dashboard_data.py`
 
 ---
 
-## PART 7 — VALIDATION CHECKLIST
+## PART 8 — VALIDATION CHECKLIST
 
-- [ ] `model_diagnostics.json` exists with all 5 targets × IS/OOS metrics.
-- [ ] OOS R² for revenue is **honest** (likely low or negative vs naive — document, do not hide).
-- [ ] `overfit_gap` computed and visible on dashboard.
-- [ ] Bootstrap CIs on `k_H2` show wide uncertainty (expected at small n).
-- [ ] Dashboard shows **Actual vs fitted** scatter and **IS vs OOS R²** bar chart for 7176.T.
-- [ ] `earnings_model_report.md` updated with PM diagnostics section.
-- [ ] v1 `model_results.json` consumers still work (backward compatible fields preserved).
+- [ ] `model_diagnostics.json` with all targets × IS/OOS (including `perf_fee_h2_positive`, `revenue_h2_only`).
+- [ ] `spec_leaderboard` documents v1 vs v2 (v2 worse on revenue RMSE — honest).
+- [ ] Primary KPI card shows **perf fee H2 OOS R²**, not total revenue IS R².
+- [ ] `overfit_gap` visible; amber when >0.15.
+- [ ] Bootstrap CIs on `k_H2` (wide expected).
+- [ ] Residual attribution flags FY2024H2 / FY2026H2.
+- [ ] P4+ data attempt documented in manifest (even if partial).
+- [ ] v1 `model_results.json` backward compatible.
 - [ ] No em dashes in dashboard UI strings.
 
 ---
 
-## PART 8 — IMPLEMENTATION ORDER (agent workflow)
+## PART 9 — IMPLEMENTATION ORDER
 
-1. Read v1 `model.py` + panel; document estimation sample.
-2. Add `compute_r2`, `compute_adj_r2`, `walk_forward_diagnostics()` — unit-test on synthetic 6-point series.
-3. Implement bootstrap CIs for coefficients.
-4. Write `model_diagnostics.json` + `residuals_halfyear.csv`.
-5. Tier 1 data attempt: at minimum wire **value factor return** column into `build_panel.py` (Yahoo `1306.T` or TOPIX value proxy).
-6. Re-run walk-forward; update `earnings_model_report.md`.
-7. Extend `build_equity_model_dashboard.py` ingest.
-8. Extend `equity-model-viz.js` with charts 1–6 (minimum); 7–10 if time.
-9. `python build_panel.py && python model.py && python _system/scripts/build_dashboard_data.py`
-10. Verify locally: click 7176.T → see OOS R² card + IS/OOS bar chart.
+1. Read `model.py`, `model_results.json`, `acquire_data.py` — document production spec (v1 vs v2).
+2. Implement `model_diagnostics.py`: `compute_r2`, walk-forward per target, benchmarks.
+3. Emit `model_diagnostics.json`, `residuals_halfyear.csv`, `coefficient_bootstrap.json`, `spec_comparison.json`.
+4. **P4 attempt:** scaffold `mandate_nav_monthly.csv` from trust reports or `[Assumption]` proxy; wire v3b if data exists.
+5. **P5 attempt:** JITA scrape or manual CSV → fill `flows_monthly.csv` NaNs; JPX ETF units if scrapeable.
+6. **P6:** add `march_window_ret` to panel; test v3a vs v2 on H2 perf OOS only.
+7. Update `earnings_model_report.md` § PM diagnostics + honest spec comparison.
+8. Dashboard ingest + charts 1–6 minimum.
+9. `python3 build_panel.py && python3 model.py && python3 _system/scripts/build_dashboard_data.py`
+10. Verify: localhost:8765 → 7176.T → perf fee H2 OOS R² card visible.
 
 ---
 
 ## COMMAND BLOCK FOR AGENT (copy below)
 
 ```
-Implement equity model v2 PM diagnostics per _system/prompts/equity_model_v2_pm_diagnostics.md.
+Implement equity model v3 per _system/prompts/equity_model_v2_pm_diagnostics.md.
 
 Ticker: 7176.T.
 
-Deliver: model_diagnostics.json, residuals_halfyear.csv, coefficient_bootstrap.json, updated model.py + earnings_model_report.md, dashboard ingest + equity-model-viz.js charts (actual vs fitted, IS/OOS R² bars, residuals, tornado).
+Phase 1 (required): model_diagnostics.py + model_diagnostics.json + spec_comparison.json
+  — Primary KPI: perf_fee_h2_positive OOS R²
+  — Document v2 regression vs v1 (revenue OOS RMSE 4590 vs 4336)
 
-Honesty: show OOS R² even if negative; show overfit gap; state naive_lastyear beats model on revenue RMSE unless data upgrade changes it.
+Phase 2 (required): dashboard PM panel — perf fee H2 OOS R² card, IS/OOS bar chart,
+  spec leaderboard, residual attribution for FY2024H2/FY2026H2
 
-Verify: build_panel.py → model.py → build_dashboard_data.py → localhost:8765 → click 7176.T.
+Phase 3 (best effort): P4 mandate NAV scaffold + v3a March window driver;
+  reject any spec that worsens perf_fee H2 OOS RMSE
 
-Commit: "7176.T: model v2 PM diagnostics + dashboard R² panels"
+Honesty: negative OOS R² OK; naive_lastyear may beat model on revenue level — state plainly.
+
+Verify: build_panel.py → model.py → build_dashboard_data.py → click 7176.T.
+
+Commit: "7176.T: model v3 PM diagnostics + perf crystallization spec"
 ```
 
 ---
 
-## APPENDIX — Why PMs want these specific views
+## APPENDIX — PM question → metric map
 
-| PM question | Chart / metric |
-|-------------|----------------|
-| "Is this overfit?" | IS vs OOS R² gap |
-| "Does it beat a dumb benchmark?" | RMSE vs naive + Diebold-Mariano |
-| "Where does error live?" | Residual plot by half; perf fee vs base fee R² |
-| "How stable is the convexity?" | Expanding-window k_H2 + bootstrap band |
-| "What moves EPS?" | Tornado |
-| "What do we think next print?" | Nowcast + 80% interval |
-| "Can I trust direction?" | Directional hit + IC |
+| PM question | Answer in model |
+|-------------|-----------------|
+| "Where is R² lost?" | `perf_fee_h2_positive` OOS; residual attribution table |
+| "Did the data upgrade help?" | `spec_leaderboard` + manifest `oos_delta` |
+| "Is this overfit?" | `overfit_gap` per target |
+| "Does it beat a dumb benchmark?" | OOS RMSE vs naive; Diebold-Mariano |
+| "What moves H2 EPS?" | Tornado on March return, AUM, perf rate |
+| "What do we think next print?" | `nowcast_interval` 80% band |
+| "Can I trust direction?" | `directional_hit` (v2 already 0.89) |
 
 ---
 
-*Prompt version: 2026-06-04 · pairs with `earnings_model_prompt.md`, `dashboard_equity_model_viz.md`, `7176.T/research/model/`.*
+*Prompt version: 2026-06-05 · supersedes 2026-06-04 draft · pairs with `earnings_model_prompt.md`, `acquire_data.py` (P0–P3), `dashboard_equity_model_viz.md`.*
