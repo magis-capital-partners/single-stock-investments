@@ -12,7 +12,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-SYMBOLS = ("OTCM", "FRMO", "KEWL", "BWEL")
+SYMBOLS = ("OTCM", "FRMO", "KEWL", "BWEL", "AZLCZ")
 
 
 def log(ticker: Path, msg: str) -> None:

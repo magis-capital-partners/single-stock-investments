@@ -1,0 +1,504 @@
+{
+  "ticker": "AZLCZ",
+  "as_of": "2026-06-05",
+  "valuation_mode": "optionality",
+  "valuation_overlay": "segment_cashflow",
+  "method": "full",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "narrow",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "asset",
+    "moi_bucket": "dormant_asset"
+  },
+  "inputs": {
+    "price": 2287.0,
+    "price_source": "Stooq AZLCZ.US close 2026-06-04",
+    "fcf_per_share": 15.06,
+    "fcf_source": "FY2024 excess revenues over expenses $2,134,121 / 141,666 shares (2025-12-31 annual); excludes FY2025 one-time land sales and Dry Lake cattle charges",
+    "shares_outstanding": 141666,
+    "book_per_share": 54.8,
+    "book_source": "FY2025 stockholders equity $7,763,780 / 141,666 shares (investor-documents/ir-azlcz/2025-12-31_Annual_Report.pdf)",
+    "normalization_note": "Tax-basis cash accounting; FY2025 included $1.92M land-sale gains and $1.98M Dry Lake Farm cattle depreciation. Lawrence uses FY2024 run-rate owner cash."
+  },
+  "nav_overlay": {
+    "as_of": "2026-06-05",
+    "status": "complete",
+    "enabled": true,
+    "method": "probability_weighted",
+    "gaap_book_per_share": 54.8,
+    "land_carrying_thousands": 3027,
+    "land_carrying_per_share": 21.4,
+    "overlay_nav_per_share": 1180.0,
+    "overlay_nav_bull_per_share": 2100.0,
+    "overlay_rationale": "Land at average tax cost (~$13/acre on 239k surface acres); mineral rights assigned zero to Aztec Minerals LLC; renewable lease income is majority of revenue.",
+    "gaap_vs_fair_value": {
+      "land_balance_m": 3.027,
+      "surface_acres_disclosed": 239000,
+      "mineral_acres_disclosed": 318000,
+      "mineral_rights_balance_sheet": 0,
+      "policy_source": "FY2025 annual Note 1: grazing land at average cost; no value assigned to mineral rights transferred to Minerals"
+    },
+    "segments_or_options": [
+      {
+        "id": "renewable_leases",
+        "label": "Solar and wind development and operations leases",
+        "option_treatment": "embedded_in_segment",
+        "nav_per_share_full": 420.0,
+        "overlay_value_per_share": 420.0,
+        "evidence": "FY2025 rentals $3.46M; one solar project entered 30-year operations term",
+        "not_in_lawrence_base": false
+      },
+      {
+        "id": "land_surface",
+        "label": "239k surface acres (incremental to tax cost)",
+        "option_treatment": "nav_floor",
+        "nav_per_share": 380.0,
+        "nav_assumption": "[Assumption] $1,600/acre mark on consolidated AZ acreage net of overlap with lease cash flows",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "water_rights",
+        "label": "South Well Field (13,490 AF entitlement) and North Well Field",
+        "option_treatment": "probability_weighted",
+        "p_base": 0.35,
+        "nav_per_share_full": 220.0,
+        "overlay_value_per_share": 77.0,
+        "evidence": "FY2025 Note 17; Little Colorado adjudication ongoing",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "minerals_helium",
+        "label": "Aztec Minerals LLC oil/gas/helium option",
+        "option_treatment": "probability_weighted",
+        "p_base": 0.15,
+        "nav_per_share_full": 120.0,
+        "overlay_value_per_share": 18.0,
+        "evidence": "Note 10 mineral leases; no production revenue yet",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "apache_railway",
+        "label": "Apache Railroad Company LLC (77.5% economic interest)",
+        "option_treatment": "milestone_nav",
+        "nav_per_share": 26.0,
+        "evidence": "Investment $3.59M; Railway third-party loans repaid 2024",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "related_party_notes",
+        "label": "Notes receivable from related LLCs and Railway",
+        "option_treatment": "milestone_nav",
+        "nav_per_share": 30.0,
+        "evidence": "FY2025 notes receivable $5.02M; illiquid related-party paper",
+        "not_in_lawrence_base": true
+      }
+    ],
+    "in_model": {
+      "lawrence_irr_on_owner_cash": true,
+      "gaap_book_in_dhando": false,
+      "land_nav_in_lawrence_fcf": false
+    },
+    "not_in_model_requires_refresh": [
+      "Per-acre third-party land comps in Navajo County with renewable overlay",
+      "Renewable lease payment schedule by project phase (development vs operations)",
+      "Fair value of stapled Aztec Land Company LLC units",
+      "Water adjudication timeline and enforceable AF entitlement"
+    ]
+  },
+  "segment_build": {
+    "segments": [
+      {
+        "id": "renewable",
+        "label": "Renewable energy leases",
+        "owner_cash_m": 3.46,
+        "growth_y1_5": 0.06,
+        "growth_y6_10": 0.03,
+        "exit_multiple": 16,
+        "notes": "Majority of revenue; one solar ops term commenced 2025"
+      },
+      {
+        "id": "grazing_access",
+        "label": "Grazing and access agreements",
+        "owner_cash_m": 0.35,
+        "growth_y1_5": 0.0,
+        "growth_y6_10": 0.0,
+        "exit_multiple": 12,
+        "notes": "Minimum schedule $379k through 2029 per Note 10"
+      },
+      {
+        "id": "farm_other",
+        "label": "Dry Lake Farm and other revenue",
+        "owner_cash_m": 0.45,
+        "growth_y1_5": 0.0,
+        "growth_y6_10": 0.0,
+        "exit_multiple": 10,
+        "notes": "Volatile; Page Land & Cattle related-party operations"
+      }
+    ],
+    "options": [
+      {
+        "id": "undeveloped_renewable",
+        "label": "Renewable projects still in development/construction terms",
+        "option_treatment": "probability_weighted",
+        "p_base": 0.45,
+        "base_terminal_value_bn": 0.08,
+        "base_terminal_rationale": "Multiple wind/solar leases cancellable in development; partial milestone value from peer AZ renewable ground rents [Assumption]",
+        "overlay_base_terminal_bn": 0.08,
+        "evidence": "FY2025 Note 10",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "minerals",
+        "label": "Helium/oil/gas production royalty",
+        "option_treatment": "probability_weighted",
+        "p_base": 0.15,
+        "base_terminal_value_bn": 0.03,
+        "base_terminal_rationale": "Letter agreement expired; wells under evaluation; no royalty cash yet",
+        "evidence": "FY2025 Note 10",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "land_sales",
+        "label": "Parcel sales and area-plan development",
+        "option_treatment": "probability_weighted",
+        "p_base": 0.25,
+        "base_terminal_value_bn": 0.12,
+        "base_terminal_rationale": "FY2025 recognized $721k land sales plus installment gains; Navajo County Aztec Area Plan",
+        "evidence": "FY2025 statements and Note 16",
+        "not_in_lawrence_base": true
+      }
+    ],
+    "discount_rate": 0.11,
+    "shares": 141666,
+    "horizon_years": 7
+  },
+  "optionality_gate": {
+    "framework": "land_renewable_option",
+    "floor_pass": false,
+    "floor_metric": "overlay_nav_per_share",
+    "floor_value": 1180.0,
+    "primary_metric": "lawrence_base",
+    "primary_label": "7yr IRR",
+    "primary_return_pct": -21.0,
+    "incumbent_sleeve": false,
+    "notes": "Price ~1.9x Marvin overlay NAV ~$1,180/sh; Lawrence owner-cash path deeply negative at $2,287.",
+    "overlay_nav_per_share": 1180.0,
+    "premium_to_overlay_pct": 94
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.0,
+      "growth_y6_10": 0.0,
+      "exit_pfcf_y10": 10,
+      "notes": "Renewable development cancellations; litigation costs rise; related-party concentration"
+    },
+    "base": {
+      "growth_y1_5": 0.05,
+      "growth_y6_10": 0.03,
+      "exit_pfcf_y10": 18,
+      "notes": "Normalized owner cash $15.06/sh; renewable operations term ramp",
+      "sotp_build": {
+        "shares": 141666,
+        "book_per_share": 54.8,
+        "lines": [
+          {
+            "id": "tax_equity_anchor",
+            "label": "Tax-basis equity anchor (not fair value)",
+            "gaap_per_share": 54.8,
+            "uplift_per_share": 0.0,
+            "math": "FY2025 equity / shares"
+          },
+          {
+            "id": "lease_cap",
+            "label": "Renewable and grazing lease run-rate capitalized",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 420.0,
+            "math": "~$3.46M rentals x 16x / shares"
+          },
+          {
+            "id": "land_incremental",
+            "label": "Surface acreage above tax carrying value",
+            "option_treatment": "nav_floor",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 380.0,
+            "math": "239k acres; overlap haircut vs lease line [Assumption]"
+          },
+          {
+            "id": "water_pw",
+            "label": "Little Colorado basin water rights (probability-weighted)",
+            "option_treatment": "probability_weighted",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 77.0,
+            "math": "P=35% x illustrative $220/sh full mark"
+          },
+          {
+            "id": "minerals_pw",
+            "label": "Minerals/helium option",
+            "option_treatment": "probability_weighted",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 18.0,
+            "math": "P=15% x illustrative mark"
+          },
+          {
+            "id": "railway_notes",
+            "label": "Apache Railway stake and related-party notes (haircut)",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 56.0,
+            "math": "ARC investment + notes receivable with illiquidity haircut"
+          },
+          {
+            "id": "undeveloped_renewable",
+            "label": "Projects still in development terms",
+            "option_treatment": "probability_weighted",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 174.0,
+            "math": "P=45% x milestone NAV [Assumption]"
+          }
+        ],
+        "year10_economic_nav_per_share": 1180.0,
+        "sum_check": "54.8 + 420 + 380 + 77 + 18 + 56 + 174 = 1180",
+        "years": 10,
+        "notes": "Economic NAV overlay; Lawrence FCF path separate"
+      }
+    },
+    "bull": {
+      "growth_y1_5": 0.08,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 22,
+      "price": 2287.0,
+      "payoff": 2800.0,
+      "years": 10,
+      "notes": "Multiple renewable projects reach operations; land sales accelerate; water rights clarified"
+    }
+  },
+  "implied_return": {
+    "base_pct": -17.65,
+    "label": "7yr IRR (total synthesis)",
+    "display": "-17.65% (total synthesis)",
+    "lawrence_stance_gate_pct": -21.0,
+    "falsifier_adjusted_pct": -21.0,
+    "synthesis_pct": -17.65
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true,
+      "floor_pass": false,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": null
+  },
+  "growth_explanation": {
+    "mechanism": "Renewable energy leases transitioning from development to 25-35 year operations terms; partial offset from grazing and access income.",
+    "source": "FY2025 Note 10",
+    "stress": "Lessees may cancel during development without refund; concentration in renewable rent.",
+    "lawrence_legacy": {
+      "y1_5": 0.05,
+      "y6_10": 0.03,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.05,
+      "y6_10": 0.03,
+      "exit_pfcf_y10": 18.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": null,
+      "as_of_filing_facts": "evidence/_text/2025-12-31_Annual_Report.pdf.txt"
+    },
+    "status": "partial"
+  },
+  "assumption_ledger": {
+    "base": [
+      {
+        "id": "price",
+        "label": "Price today",
+        "value": 2287.0,
+        "source": "Stooq 2026-06-04"
+      },
+      {
+        "id": "owner_cash",
+        "label": "Starting owner cash per share",
+        "value": 15.06,
+        "source": "FY2024 tax-basis excess revenues over expenses / FY2025 share count"
+      },
+      {
+        "id": "growth_y1_5",
+        "label": "Growth in years 1 through 5",
+        "value": "5% per year",
+        "source": "[Assumption] Renewable operations-term ramp per Note 10"
+      },
+      {
+        "id": "growth_y6_10",
+        "label": "Growth in years 6 through 10",
+        "value": "3% per year",
+        "source": "[Assumption]"
+      },
+      {
+        "id": "exit_multiple",
+        "label": "Selling multiple in year 10",
+        "value": "18 times cash flow",
+        "source": "Base scenario"
+      }
+    ]
+  },
+  "option_scan": [
+    {
+      "q": 3,
+      "question": "In-business option: Renewable projects still in development/construction terms?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "FY2025 Note 10"
+    },
+    {
+      "q": 3,
+      "question": "In-business option: Helium/oil/gas production royalty?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "FY2025 Note 10"
+    },
+    {
+      "q": 3,
+      "question": "In-business option: Parcel sales and area-plan development?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "FY2025 statements and Note 16"
+    }
+  ],
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -29.5
+    },
+    "base": {
+      "return_pct": -21.0
+    },
+    "bull": {
+      "return_pct": -17.1
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -29.5
+    },
+    "base": {
+      "return_pct": -21.0
+    },
+    "bull": {
+      "return_pct": -17.1
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": -21.0
+    },
+    "falsifier_adjusted": {
+      "return_pct": -21.0
+    }
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Segment-derived growth (pre-falsifier)",
+        "source": "segment_build weighted blend",
+        "return_pct": -21.0,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": -29.5,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": -17.1,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      },
+      {
+        "id": "nav_overlay_payoff",
+        "label": "NAV overlay dated payoff (7yr to overlay base)",
+        "source": "nav_overlay ~$1180.0/sh vs price $2287.0",
+        "return_pct": -9.02,
+        "weight": 0.1,
+        "type": "numeric",
+        "epistemic_tier": "D (alternate theory: dated asset payoff)",
+        "weight_why": "Answers a different question (NAV convergence) than 7yr cash-flow IRR; capped weight to avoid theory conflation.",
+        "weight_falsifiers": [
+          "NAV overlay base not updated when segment build or filings change >10%",
+          "floor_pass false but weight above 15% without [HUMAN REVIEW]"
+        ],
+        "hard_to_vary": "yes: separate theory type"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": -17.45,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": -17.65,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [
+        "NAV overlay is a different theory (asset payoff vs cash-flow IRR); weight capped at 10% to limit theory conflation."
+      ],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}

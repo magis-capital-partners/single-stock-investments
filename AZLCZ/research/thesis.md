@@ -1,29 +1,36 @@
 # AZLCZ — Investment Thesis
 
-**Last updated:** 2026-06-05
+**Last updated:** auto-sync
 
 ## Classification
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Archetype** (Stahl) | optionality |
+| **Moat** (Munger) | narrow |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Cycle** | mid |
+| **Implied 7yr IRR** (base) | -17.65% (total synthesis) |
+| **IRR method** | full |
+| **Lawrence bucket** | other |
+| **Payoff lens** | asset |
+| **MOI bucket** | dormant_asset |
+
+**Deep dive:** `AZLCZ/research/deep_dive_2026-06-05.md` (auto-sync)
 
 ## One-line thesis
 
-Aztec Land and Cattle Company — thesis pending Marvin deep dive.
+Arizona land and renewable-ground-rent optionality at a price that already embeds much of the acreage story; watch until owner-cash yield or overlay NAV offers margin of safety.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest annual report (FY2025 OTC)
+- [x] Apply option scan and nav overlay
+- [ ] Stapled Aztec Land Company, LLC look-through
+- [ ] Per-acre and renewable rent comps for overlay refresh
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-06-05; awaiting deep dive.
+- Validate economic NAV marks before accumulate stance.
+- Review related-party transactions for minority holders.

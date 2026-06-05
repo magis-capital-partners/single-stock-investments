@@ -14,7 +14,7 @@
 | **Implied 7yr IRR** (base) | -4.81% (total synthesis) |
 | **IRR method** | full |
 | **Lawrence bucket** | other |
-| **Payoff lens** | asset |
+| **Payoff lens** | pending |
 | **MOI bucket** | pending |
 
 **Deep dive:** `HKHC/research/deep_dive_2026-06-03.md` (auto-sync)
