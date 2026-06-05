@@ -319,6 +319,20 @@ def main() -> None:
     (OUT / "model_results.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
     df.to_csv(OUT / "panel_fitted.csv", index=False)
 
+    from model_diagnostics import run_diagnostics
+
+    diag = run_diagnostics(df)
+    summary["production_spec"] = diag.get("production_spec", "v1")
+    summary["primary_kpi"] = diag.get("primary_kpi")
+    summary["diagnostics"] = {
+        "version": diag.get("version"),
+        "perf_fee_h2_positive_oos": diag["targets"]["perf_fee_h2_positive"]["out_of_sample"],
+        "revenue_total_oos": diag["targets"]["revenue_total"]["out_of_sample"],
+        "overfit_gap_revenue": diag["targets"]["revenue_total"].get("overfit_gap"),
+        "spec_leaderboard": diag.get("spec_leaderboard"),
+    }
+    (OUT / "model_results.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
+
     # ----- forecasts for next interim and full year (scenario on Nikkei return) -----
     fc_rows = []
     aum0 = float(latest["aum_end_jpym"])
@@ -351,6 +365,8 @@ def main() -> None:
         print(json.dumps(mt_v2, indent=2))
     print("\nForecasts:")
     print(fc.to_string(index=False))
+    print("\nPrimary KPI (perf fee H2+, OOS R²):")
+    print(json.dumps(diag["targets"]["perf_fee_h2_positive"]["out_of_sample"], indent=2))
 
 
 if __name__ == "__main__":

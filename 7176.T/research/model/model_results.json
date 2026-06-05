@@ -169,5 +169,52 @@
   "latest_anchor": {
     "period_end": "2026-03-31",
     "aum_end_jpym": 1335700.0
+  },
+  "production_spec": "v1",
+  "primary_kpi": "perf_fee_h2_positive.out_of_sample.r2",
+  "diagnostics": {
+    "version": "v3_pm_diagnostics",
+    "perf_fee_h2_positive_oos": {
+      "r2": -14.2489,
+      "adj_r2": NaN,
+      "directional_hit": 0.0,
+      "theil_u": 1.202,
+      "n_params": 2,
+      "rmse_jpym": 10307.2,
+      "mae_jpym": 9963.5,
+      "mape_pct": 100.0,
+      "n": 2
+    },
+    "revenue_total_oos": {
+      "r2": -0.0116,
+      "adj_r2": -0.6186,
+      "directional_hit": 0.56,
+      "theil_u": 0.769,
+      "n_params": 3,
+      "rmse_jpym": 4336.2,
+      "mae_jpym": 2951.2,
+      "mape_pct": 32.6,
+      "n": 9
+    },
+    "overfit_gap_revenue": -0.6829,
+    "spec_leaderboard": [
+      {
+        "spec": "v1",
+        "revenue_oos_rmse": 4336.2,
+        "revenue_oos_r2": -0.0116,
+        "perf_fee_h2_oos_rmse": 10307.2,
+        "perf_fee_h2_oos_r2": -14.2489,
+        "production_default": true
+      },
+      {
+        "spec": "v2",
+        "revenue_oos_rmse": 4589.6,
+        "revenue_oos_r2": -0.1333,
+        "perf_fee_h2_oos_rmse": 44743.9,
+        "perf_fee_h2_oos_r2": -286.3584,
+        "production_default": false,
+        "note": "v2 worse on revenue OOS RMSE; keep v1 as production default"
+      }
+    ]
   }
 }
