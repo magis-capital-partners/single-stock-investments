@@ -8,7 +8,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from polygon_earnings import normalize_earnings_row, verified_display_events  # noqa: E402
+from download_transcripts import build_sync_summary_payload, merge_sync_summaries  # noqa: E402
 from transcript_common import (  # noqa: E402
+    add_manifest_entry,
     is_transcript_candidate,
     manifest_has_period,
     parse_event_metadata,
@@ -93,6 +95,66 @@ def test_manifest_period_match():
     }
     assert manifest_has_period(manifest, "Q1", 2026, "2026-05-06")
     assert not manifest_has_period(manifest, "Q2", 2026, None)
+
+
+def test_merge_sync_summaries_partial_run():
+    existing = {
+        "tickers": [
+            {"ticker": "ICE", "manifest_entries": 120},
+            {"ticker": "META", "manifest_entries": 70},
+        ]
+    }
+    new_rows = [{"ticker": "CPRT", "manifest_entries": 0, "downloaded": 0}]
+    merged = merge_sync_summaries(existing, new_rows)
+    by = {r["ticker"]: r for r in merged}
+    assert len(merged) == 3
+    assert by["ICE"]["manifest_entries"] == 120
+    assert by["CPRT"]["manifest_entries"] == 0
+
+
+def test_add_manifest_entry_allows_multiple_legacy_rows():
+    manifest = {"entries": []}
+    meta = parse_event_metadata("", "q1-transcript.pdf")
+    ok1 = add_manifest_entry(
+        manifest,
+        canonical_path="investor-documents/ir-a/q1-transcript.pdf",
+        original_url="",
+        original_filename="q1-transcript.pdf",
+        meta=meta,
+        source="legacy_index",
+        bytes_count=1000,
+        file_id="sha256:aaa",
+    )
+    ok2 = add_manifest_entry(
+        manifest,
+        canonical_path="investor-documents/ir-a/q2-transcript.pdf",
+        original_url="",
+        original_filename="q2-transcript.pdf",
+        meta=meta,
+        source="legacy_index",
+        bytes_count=1000,
+        file_id="sha256:bbb",
+    )
+    assert ok1 and ok2
+    assert len(manifest["entries"]) == 2
+
+
+def test_build_sync_summary_payload_totals():
+    payload = build_sync_summary_payload(
+        [
+            {"ticker": "A", "downloaded": 2, "legacy_registered": 5, "manifest_entries": 7, "vicki_brief": True},
+            {"ticker": "B", "downloaded": 0, "legacy_registered": 0, "manifest_entries": 0, "error": "fail"},
+        ],
+        run_mode="partial",
+        tickers_processed=2,
+        polygon_enabled=False,
+    )
+    assert payload["run_mode"] == "partial"
+    assert payload["totals"]["downloaded"] == 2
+    assert payload["totals"]["legacy_registered"] == 5
+    assert payload["totals"]["manifest_entries"] == 7
+    assert payload["totals"]["errors"] == 1
+    assert payload["totals"]["vicki_briefs"] == 1
 
 
 if __name__ == "__main__":

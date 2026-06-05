@@ -1,7 +1,9 @@
 # Transcript pipeline — implementation proposal
 
 **Date:** 2026-06-02  
-**Status:** Implemented (v1)
+**Status:** Implemented (v1.1 — 2026-06-05 sync-summary + legacy dedupe fix)
+
+See `_system/prompts/transcript_pipeline_fix.md` for audit and fix prompt.
 
 ## Scope
 
