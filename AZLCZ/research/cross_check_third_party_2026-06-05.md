@@ -9,9 +9,9 @@
 
 ## Executive summary
 
-No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (10-K, 10-Q, IR). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary OTC annual reports** (2019–2025) and the company website. Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
 
-**Synthesis:** Marvin floor only; no external blend.
+**Synthesis:** Marvin floor only; no external blend. Base stance **watch** at ~-21% Lawrence owner-cash IRR and price ~1.9x Marvin overlay NAV (~$1,180/sh).
 
 ## Sources in scope
 
@@ -33,13 +33,13 @@ No third-party sources are indexed for this ticker as of this scan. Marvin stanc
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | — | — | — |
-| External (combined) | — | — | — |
-| **Blended best estimate** | **—** | **—** | **—** |
+| Marvin floor | ~$15/sh owner cash; overlay NAV ~$1,180/sh | -21% (7yr owner cash) | watch |
+| External (combined) | n/a | n/a | n/a |
+| **Blended best estimate** | **Normalized owner cash** | **-21% per year** | **watch** |
 
-**Weights:** *[Document why]*
+**Weights:** 100% Marvin primary (no approved external sources).
 
-**Returns statement (blended):** *[One sentence; pending sources not in base IRR]*
+**Returns statement (blended):** With no approved third-party input, the blended view equals Marvin's base case: about **-21% per year** on normalized owner cash at $2,287.
 
 ## [HUMAN REVIEW]
 
