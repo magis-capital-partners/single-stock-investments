@@ -1,7 +1,10 @@
 # P5 brief — JITA flows + ETF units (7176.T) — free data plan
 
 **Date:** 2026-06-05  
+**Status:** Done (Marvin HTTP scrape)  
 **Objective:** Fill `jita_equity_flow_bn` / `jita_etf_flow_bn` NaN columns and improve ETF AUM path.
+
+**Result:** 448 monthly rows (1989–2026); all 12 model halves now have JITA equity + ETF net flows (億円).
 
 ## Free sources (no CapIQ)
 

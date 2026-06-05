@@ -47,8 +47,8 @@
   },
   "perf_fee_model_v4": {
     "form": "perf_fee_half = k_half * avg_AUM * mandate_weighted_excess (P4 scrape)",
-    "k_H1": 0.16866,
-    "k_H2": 0.05148
+    "k_H1": 0.03031,
+    "k_H2": 0.04305
   },
   "walk_forward": [
     {
@@ -77,7 +77,7 @@
       "model": 4931.224709540503,
       "naive_lastyear": 4302.709,
       "naive_randomwalk": 3319.298,
-      "model_v3a": 10820.601554867588,
+      "model_v3a": 10820.600374182279,
       "model_v2": 4830.656562502018,
       "model_v4": 4830.656562502018
     },
@@ -97,9 +97,9 @@
       "model": 9382.223712772497,
       "naive_lastyear": 5586.426,
       "naive_randomwalk": 3804.623,
-      "model_v3a": 12323.507633424557,
+      "model_v3a": 12323.51157245296,
       "model_v2": 10683.903228771325,
-      "model_v4": 3076.01413956657
+      "model_v4": 3551.030596288794
     },
     {
       "label": "FY2025H1",
@@ -109,7 +109,7 @@
       "naive_randomwalk": 11162.336,
       "model_v3a": 3074.713,
       "model_v2": 3074.713,
-      "model_v4": 3074.837202228321
+      "model_v4": 3074.7993796734168
     },
     {
       "label": "FY2025H2",
@@ -117,9 +117,9 @@
       "model": 3074.713,
       "naive_lastyear": 11162.336,
       "naive_randomwalk": 5353.003,
-      "model_v3a": 3335.6118371935054,
+      "model_v3a": 3335.6117697509803,
       "model_v2": 3559.6210032800977,
-      "model_v4": 9206.798010501061
+      "model_v4": 8621.885450656542
     },
     {
       "label": "FY2026H1",
@@ -129,7 +129,7 @@
       "naive_randomwalk": 10901.498,
       "model_v3a": 3412.640798276483,
       "model_v2": 3412.640798276483,
-      "model_v4": 3079.8559978759713
+      "model_v4": 3093.2568188751866
     },
     {
       "label": "FY2026H2",
@@ -137,9 +137,9 @@
       "model": 7334.717900740869,
       "naive_lastyear": 10901.498,
       "naive_randomwalk": 5577.537,
-      "model_v3a": 4081.557612171715,
+      "model_v3a": 4081.55734678594,
       "model_v2": 8237.720167113557,
-      "model_v4": 5628.247593738179
+      "model_v4": 3074.713
     }
   ],
   "oos_metrics": {
@@ -179,13 +179,13 @@
   },
   "oos_metrics_v4": {
     "model_v4": {
-      "rmse_jpym": 4832.7,
-      "mape_pct": 34.5,
+      "rmse_jpym": 5469.7,
+      "mape_pct": 36.3,
       "n": 9
     }
   },
   "data_acquisition": {
-    "built_at": "2026-06-05T15:44:59.748960+00:00",
+    "built_at": "2026-06-05T15:48:38.728820+00:00",
     "steps": {
       "p0_etf_nav": {
         "rows": 17093,
@@ -197,6 +197,11 @@
       "p1_flows": {
         "monthly": 82,
         "etf_flow_rows": 17080
+      },
+      "p5_jita_flows": {
+        "jita_months": 80,
+        "scrape_script": "_scripts/download_jita_flows.py",
+        "source": "https://www.toushin.or.jp/tws/toukei_dw/I0112B_pub_m.xlsx"
       },
       "p2_factors": {
         "fee_raw": 40,
@@ -221,7 +226,7 @@
     "period_end": "2026-03-31",
     "aum_end_jpym": 1335700.0
   },
-  "production_spec": "v4",
+  "production_spec": "v1",
   "primary_kpi": "perf_fee_h2_positive.out_of_sample.r2",
   "diagnostics": {
     "version": "v3_pm_diagnostics",
@@ -255,7 +260,7 @@
         "revenue_oos_r2": -0.0116,
         "perf_fee_h2_oos_rmse": 10307.2,
         "perf_fee_h2_oos_r2": -14.2489,
-        "production_default": false
+        "production_default": true
       },
       {
         "spec": "v2",
@@ -277,11 +282,11 @@
       },
       {
         "spec": "v4",
-        "revenue_oos_rmse": 4832.7,
-        "revenue_oos_r2": -0.2565,
-        "perf_fee_h2_oos_rmse": 8713.5,
-        "perf_fee_h2_oos_r2": -9.8979,
-        "production_default": true,
+        "revenue_oos_rmse": 5469.7,
+        "revenue_oos_r2": -0.6096,
+        "perf_fee_h2_oos_rmse": 10307.2,
+        "perf_fee_h2_oos_r2": -14.2489,
+        "production_default": false,
         "note": "P4 mandate NAV scrape"
       }
     ]

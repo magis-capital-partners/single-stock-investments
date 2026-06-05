@@ -63,7 +63,8 @@ Run `python3 acquire_data.py` (or `build_panel.py`, which calls it first). Manif
 | File | Tag | Definition |
 |------|-----|------------|
 | `etf_flows_daily.csv` | [Derived] | ΔAUM − return×prior AUM per ETF |
-| `flows_monthly.csv` | [Derived/Pending] | Monthly ETF implied flows; JITA columns NaN pending scrape |
+| `flows_monthly.csv` | [Filing/Market] | Simplex ETF implied flows + JITA B-1 equity/ETF net flows (億円) |
+| `jita_flows_monthly.csv` | [Market] | JITA B-1 scrape: `jita_equity_net_flow_bn_jpy`, `jita_etf_net_flow_bn_jpy` |
 | `flows_halfyear.csv` | [Derived] | Half-year sum of `etf_implied_flow_jpym` |
 | `aum_pools_halfyear.csv` | [Derived] | Perf-eligible vs base-fee AUM split |
 
@@ -109,7 +110,7 @@ Run `python3 acquire_data.py` (or `build_panel.py`, which calls it first). Manif
 
 ## Remaining gaps
 
-- **JITA industry flows** — columns present but NaN; needs Vicki scrape or manual export.
+- **JITA industry flows** — P5 scrape fills `jita_equity_flow_bn` / `jita_etf_flow_bn` (億円) from B-1 Excel; `download_jita_flows.py`.
 - **Per-fund NAV vs hurdle / high-water mark** — P4 live for FY2023H1 onward (6 halves); pre-2023 and institutional pool still proxy [Derived]. Vicki: 投信総合検索ライブラリー CSV for Value Up history.
 - **AUM by category pre-2023** and **base/perf split pre-FY2024** — extends component history.
 - **CapIQ** ownership + peer fee/comp ratios — paste into `capiq_export.csv`.

@@ -219,32 +219,65 @@ def build_fund_nav_proxy(registry: dict, fund_rets: pd.DataFrame, panel: pd.Data
 
 
 # ---------------------------------------------------------------------------
-# P1 — Flows (JITA proxy + ETF implied flows)
+# P1 / P5 — Flows (JITA scrape + ETF implied flows)
 # ---------------------------------------------------------------------------
 
+JITA_SCRIPT = ROOT.parents[1] / "_scripts" / "download_jita_flows.py"
+
+
+def _run_jita_scrape() -> None:
+    import subprocess
+    import sys
+
+    if not JITA_SCRIPT.exists():
+        return
+    subprocess.run([sys.executable, str(JITA_SCRIPT)], check=False, cwd=str(ROOT.parents[1]))
+
+
+def _load_jita_monthly() -> pd.DataFrame:
+    path = DATA / "jita_flows_monthly.csv"
+    if not path.exists():
+        _run_jita_scrape()
+    if not path.exists():
+        return pd.DataFrame()
+    j = pd.read_csv(path, parse_dates=["month"])
+    j["month"] = j["month"].dt.strftime("%Y-%m-%d")
+    return j
+
+
 def fetch_jita_proxy(etf_flows: pd.DataFrame) -> pd.DataFrame:
-    """Monthly flow panel: aggregate ETF implied flows; JITA columns pending scrape."""
+    """Monthly flow panel: Simplex ETF implied flows + JITA industry flows (P5)."""
     months = pd.date_range("2019-09-01", "2026-06-01", freq="MS")
-    if etf_flows.empty:
-        return pd.DataFrame({
-            "month": [m.strftime("%Y-%m-%d") for m in months],
-            "etf_implied_flow_jpym": np.nan,
-            "jita_equity_net_flow_bn_jpy": np.nan,
-            "jita_etf_net_flow_bn_jpy": np.nan,
-            "tag": "[Pending]",
-            "note": "JITA: export from https://www.toushin.or.jp/ or Vicki scrape",
-        })
-    ef = etf_flows.copy()
-    ef["date"] = pd.to_datetime(ef["date"])
-    ef["month"] = ef["date"].dt.to_period("M").dt.to_timestamp()
-    agg = ef.groupby("month")["flow_jpym"].sum().reset_index()
-    agg["month"] = agg["month"].dt.strftime("%Y-%m-%d")
     base = pd.DataFrame({"month": [m.strftime("%Y-%m-%d") for m in months]})
-    out = base.merge(agg.rename(columns={"flow_jpym": "etf_implied_flow_jpym"}), on="month", how="left")
-    out["jita_equity_net_flow_bn_jpy"] = np.nan
-    out["jita_etf_net_flow_bn_jpy"] = np.nan
-    out["tag"] = "[Derived]"
-    out["note"] = "etf_implied_flow from NAV×shares roll-forward; JITA columns pending"
+    base["period"] = pd.to_datetime(base["month"]).dt.to_period("M")
+
+    if etf_flows.empty:
+        out = base.copy()
+        out["etf_implied_flow_jpym"] = np.nan
+    else:
+        ef = etf_flows.copy()
+        ef["date"] = pd.to_datetime(ef["date"])
+        ef["period"] = ef["date"].dt.to_period("M")
+        agg = ef.groupby("period")["flow_jpym"].sum().reset_index()
+        out = base.merge(agg.rename(columns={"flow_jpym": "etf_implied_flow_jpym"}), on="period", how="left")
+
+    jita = _load_jita_monthly()
+    if not jita.empty:
+        jita = jita.copy()
+        jita["period"] = pd.to_datetime(jita["month"]).dt.to_period("M")
+        use = [c for c in ["period", "jita_equity_net_flow_bn_jpy", "jita_etf_net_flow_bn_jpy"] if c in jita.columns]
+        out = out.merge(jita[use], on="period", how="left")
+    else:
+        out["jita_equity_net_flow_bn_jpy"] = np.nan
+        out["jita_etf_net_flow_bn_jpy"] = np.nan
+
+    has_jita = out["jita_equity_net_flow_bn_jpy"].notna().any() if "jita_equity_net_flow_bn_jpy" in out.columns else False
+    out["tag"] = "[Filing/Market]" if has_jita else "[Derived]"
+    out["note"] = (
+        "JITA B-1 株式 + ETF flows (億円); etf_implied_flow from Simplex ETF NAV roll-forward"
+        if has_jita else "etf_implied_flow only; JITA scrape failed"
+    )
+    out.drop(columns=["period"], inplace=True)
     return out
 
 
@@ -281,23 +314,25 @@ def aggregate_flows_halfyear(flows_monthly: pd.DataFrame, panel: pd.DataFrame) -
         return pd.DataFrame()
     fm = flows_monthly.copy()
     fm["month"] = pd.to_datetime(fm["month"])
+    fm["period"] = fm["month"].dt.to_period("M")
     rows = []
     for _, r in panel.iterrows():
         pe = r["period_end"]
         if pe.month == 9:
-            start = pd.Timestamp(pe.year, 4, 1)
+            start_p = pd.Period(f"{pe.year}-04", freq="M")
         else:
-            start = pd.Timestamp(pe.year - 1, 10, 1)
-        win = fm[(fm["month"] >= start) & (fm["month"] <= pe)]
+            start_p = pd.Period(f"{pe.year - 1}-10", freq="M")
+        end_p = pd.Period(f"{pe.year}-{pe.month:02d}", freq="M")
+        win = fm[(fm["period"] >= start_p) & (fm["period"] <= end_p)]
         etf_flow = float(win["etf_implied_flow_jpym"].sum()) if "etf_implied_flow_jpym" in win.columns and len(win) else np.nan
         jita_eq = float(win["jita_equity_net_flow_bn_jpy"].sum()) if "jita_equity_net_flow_bn_jpy" in win.columns and len(win) else np.nan
         jita_etf = float(win["jita_etf_net_flow_bn_jpy"].sum()) if "jita_etf_net_flow_bn_jpy" in win.columns and len(win) else np.nan
         rows.append({
             "period_end": pe.strftime("%Y-%m-%d"),
             "etf_implied_flow_jpym": etf_flow,
-            "jita_equity_flow_bn": jita_eq if pd.notna(jita_eq) and jita_eq != 0 else np.nan,
-            "jita_etf_flow_bn": jita_etf if pd.notna(jita_etf) and jita_etf != 0 else np.nan,
-            "tag": "[Derived]",
+            "jita_equity_flow_bn": jita_eq if pd.notna(jita_eq) else np.nan,
+            "jita_etf_flow_bn": jita_etf if pd.notna(jita_etf) else np.nan,
+            "tag": "[Filing/Market]" if pd.notna(jita_eq) or pd.notna(jita_etf) else "[Derived]",
         })
     return pd.DataFrame(rows)
 
@@ -767,7 +802,13 @@ def main() -> None:
         flows_h.to_csv(DATA / "flows_halfyear.csv", index=False)
         pools = build_aum_pools_halfyear(registry, panel)
         pools.to_csv(DATA / "aum_pools_halfyear.csv", index=False)
+    jita_rows = int(flows_m["jita_equity_net_flow_bn_jpy"].notna().sum()) if "jita_equity_net_flow_bn_jpy" in flows_m.columns else 0
     manifest["steps"]["p1_flows"] = {"monthly": len(flows_m), "etf_flow_rows": len(etf_flows)}
+    manifest["steps"]["p5_jita_flows"] = {
+        "jita_months": jita_rows,
+        "scrape_script": str(JITA_SCRIPT.relative_to(ROOT.parents[1])),
+        "source": "https://www.toushin.or.jp/tws/toukei_dw/I0112B_pub_m.xlsx",
+    }
 
     # P2 fees (factors already written above)
     fee_raw = extract_fee_history()
