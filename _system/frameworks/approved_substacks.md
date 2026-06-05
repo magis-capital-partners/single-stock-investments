@@ -42,6 +42,7 @@ These are **not** generic Substacks. Marvin may cite and blend only sources list
 | Commodity / TPL structural | **FRMO** | [LCI: Most Important Things Part 1](https://lemoncakesinvesting.substack.com/p/frmo-the-most-important-things-part) |
 | KEWL (mineral floor) | **KEWL** | [SSI: KEWL intro](https://specialsituationinvesting.substack.com/p/keweenaw-land-association-kewl); [SSI: KEWL update](https://specialsituationinvesting.substack.com/p/update-keweenaw-land-association) |
 | Water rights / SGMA / power–water lag | **BWEL**, **LB**, **TPL**, **WBI** (context); **LMNR**, **PCYO** (peers in post) | [Groundbreaker: Water rights — hidden asset](https://groundbreakerre.substack.com/p/water-rights-the-hidden-asset-the) (2026-05-21) |
+| TPL-style land royalty / renewable ramp | **AZLCZ**, **TPL**, **KEWL** | [Groundbreaker: AZLCZ — land compounder](https://groundbreakerre.substack.com/p/aztec-land-and-cattle-azlcz-the-land) (2026-06-04) |
 
 **Note:** Winland trades as **WELX** (not a separate portfolio ticker). Analyze Winland inside **FRMO** look-through and catalyst stack.
 

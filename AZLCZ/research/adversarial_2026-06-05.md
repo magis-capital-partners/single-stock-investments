@@ -47,9 +47,12 @@ re_pass: false
 
 | Check | Expected (valuation.json) | Found in dive | OK? |
 |-------|---------------------------|---------------|-----|
-| Returns statement | -17.65% | -17.65% | Yes |
-| Classification IRR | -17.65% | -17.65% | Yes |
-| Valuation bridge base | -17.65% | -17.65% | Yes |
+| Returns statement | -5.5% | -5.5% | Yes |
+| Classification IRR | -5.5% | -5.5% | Yes |
+| Valuation bridge base | -5.5% | -5.5% | Yes |
+
+**Lint notes:**
+- AZLCZ/research/deep_dive_2026-06-05.md: executive_summary_first_pct -17.65% vs valuation.json base -5.5% (tol 0.25pp)
 
 ---
 
