@@ -79,3 +79,4 @@ One row per adversarial or consistency re-pass. Append via `milly_repass.py` or 
 | 2026-06-05 | AZLCZ | standard_batch | OK | marvin_cloud_refresh |
 | 2026-06-05 | AZLCZ | standard_batch | OK | marvin_cloud_refresh |
 | 2026-06-05 | AZLCZ | standard_batch | OK | marvin_cloud_refresh |
+| 2026-06-05 | AZLCZ | standard_batch | OK | marvin_cloud_refresh |
