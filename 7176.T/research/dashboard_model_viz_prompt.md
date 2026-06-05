@@ -6,7 +6,9 @@ Implementation spec for showing this ticker’s earnings model on the main portf
 
 Pilot ticker: **7176.T**. Model artifacts live in [`research/model/`](model/).
 
-After an agent implements the dashboard UI, rebuild:
+The dashboard UI is implemented: click **7176.T** in Holdings to expand the earnings model panel.
+
+Rebuild data after model changes:
 
 ```bash
 python _system/scripts/build_dashboard_data.py

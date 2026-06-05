@@ -1,0 +1,453 @@
+{
+  "built_at": "2026-06-05T01:21:36Z",
+  "ticker_count": 1,
+  "tickers": {
+    "7176.T": {
+      "model_ready": true,
+      "model_type": "earnings_semiannual",
+      "as_of": "2026-06-04",
+      "company": "7176.T",
+      "liquidity": {
+        "tier": "illiquid_tpm",
+        "exchange": "TOKYO PRO Market",
+        "last_print": {
+          "date": "2026-01-07",
+          "price_jpy": 464,
+          "volume_shares": 100
+        },
+        "warning": "TOKYO PRO Market: extremely thin tape; retail buy restricted. Confirm broker TPM / qualified-investor access before sizing."
+      },
+      "lawrence": {
+        "stance_gate_irr_pct": 53.33,
+        "stance": null,
+        "owner_cash_mid_cycle_jpy": 137.14,
+        "price_today_jpy": 464,
+        "price_source": "Stooq/Yahoo 7176.JP last print 2026-01-07 (\u00a5464, 100 shares); not a continuous liquid quote"
+      },
+      "nowcast": {
+        "asof": "2026-06-04",
+        "fiscal_half": "H1",
+        "half_window": [
+          "2026-04-01",
+          "2026-09-30"
+        ],
+        "aum_anchor_date": "2026-03-31",
+        "aum_anchor_jpym": 1335700.0,
+        "nikkei_return_to_date": 0.3395,
+        "nowcast_jpym": {
+          "base_fee": 4342,
+          "perf_fee": 2605,
+          "revenue": 7147,
+          "ordinary_profit": 3983,
+          "net_income": 2930
+        },
+        "caveats": [
+          "Perf fee crystallizes near fiscal year-end (Mar); H1 nowcast of perf is low-confidence.",
+          "Assumes flat net flows; replace with per-ETF NAV*units + JITA flows for real edge.",
+          "Single-driver (Nikkei); add value/PBR factor and fund-level NAV for precision."
+        ]
+      },
+      "spec": {
+        "base_fee": {
+          "form": "base_fee_half = base_rate/2 * avg_AUM",
+          "base_rate_ann_est_pct": 0.5558,
+          "observations": [
+            {
+              "period": "2024-09-30",
+              "base_rate_ann_pct": 0.5108
+            },
+            {
+              "period": "2025-03-31",
+              "base_rate_ann_pct": 0.5425
+            },
+            {
+              "period": "2025-09-30",
+              "base_rate_ann_pct": 0.5558
+            },
+            {
+              "period": "2026-03-31",
+              "base_rate_ann_pct": 0.614
+            }
+          ],
+          "note": "Effective base rate ~0.5-0.56%/yr, mild upward drift (mix shift to higher-fee active/ETF)."
+        },
+        "perf_fee": {
+          "form": "perf_fee_half = k_half * avg_AUM * max(0, nikkei_ret - hurdle)",
+          "k_H1": 0.00491,
+          "k_H2": 0.06365,
+          "note": "k_H2 >> k_H1: performance fees crystallize at the March fiscal year-end. This seasonality (H2 revenue ~2-3x H1) is the core forecastable structure."
+        },
+        "earnings_bridge": {
+          "ord_intercept": -157.2764331392818,
+          "ord_slope": 0.579242156528464,
+          "tax_rate": 0.2642706176532137
+        }
+      },
+      "oos_metrics": {
+        "model": {
+          "rmse_jpym": 4336.2,
+          "mape_pct": 32.6,
+          "directional_hit": 0.67,
+          "n": 9
+        },
+        "naive_lastyear": {
+          "rmse_jpym": 3230.1,
+          "mape_pct": 30.2,
+          "directional_hit": 1.0,
+          "n": 9
+        },
+        "naive_randomwalk": {
+          "rmse_jpym": 5636.0,
+          "mape_pct": 58.1,
+          "directional_hit": 0.11,
+          "n": 9
+        }
+      },
+      "walk_forward": [
+        {
+          "label": "FY2022H2",
+          "actual": 4302.709,
+          "model": 3074.713,
+          "naive_lastyear": 8990.383,
+          "naive_randomwalk": 3526.469
+        },
+        {
+          "label": "FY2023H1",
+          "actual": 3319.298,
+          "model": 3074.713,
+          "naive_lastyear": 3526.469,
+          "naive_randomwalk": 4302.709
+        },
+        {
+          "label": "FY2023H2",
+          "actual": 5586.426,
+          "model": 4931.224709540503,
+          "naive_lastyear": 4302.709,
+          "naive_randomwalk": 3319.298
+        },
+        {
+          "label": "FY2024H1",
+          "actual": 3804.623,
+          "model": 3076.3744351933174,
+          "naive_lastyear": 3319.298,
+          "naive_randomwalk": 5586.426
+        },
+        {
+          "label": "FY2024H2",
+          "actual": 11162.336,
+          "model": 9382.223712772497,
+          "naive_lastyear": 5586.426,
+          "naive_randomwalk": 3804.623
+        },
+        {
+          "label": "FY2025H1",
+          "actual": 5353.003,
+          "model": 3074.713,
+          "naive_lastyear": 3804.623,
+          "naive_randomwalk": 11162.336
+        },
+        {
+          "label": "FY2025H2",
+          "actual": 10901.498,
+          "model": 3074.713,
+          "naive_lastyear": 11162.336,
+          "naive_randomwalk": 5353.003
+        },
+        {
+          "label": "FY2026H1",
+          "actual": 5577.537,
+          "model": 3357.9899452809036,
+          "naive_lastyear": 5353.003,
+          "naive_randomwalk": 10901.498
+        },
+        {
+          "label": "FY2026H2",
+          "actual": 16934.463,
+          "model": 7334.717900740869,
+          "naive_lastyear": 10901.498,
+          "naive_randomwalk": 5577.537
+        }
+      ],
+      "panel": [
+        {
+          "label": "FY2021H1",
+          "period_end": "2020-09-30",
+          "revenue": 3074713.0,
+          "base_fee": null,
+          "perf_fee": null,
+          "ordinary": 1653517.0,
+          "net_income": 1178219.0,
+          "aum_end_jpym": null,
+          "nikkei_ret": 0.283,
+          "is_h2": 0,
+          "headcount": null
+        },
+        {
+          "label": "FY2021H2",
+          "period_end": "2021-03-31",
+          "revenue": 8990383.0,
+          "base_fee": null,
+          "perf_fee": null,
+          "ordinary": 4729255.0,
+          "net_income": 3452871.0,
+          "aum_end_jpym": null,
+          "nikkei_ret": 0.259,
+          "is_h2": 1,
+          "headcount": null
+        },
+        {
+          "label": "FY2022H1",
+          "period_end": "2021-09-30",
+          "revenue": 3526469.0,
+          "base_fee": null,
+          "perf_fee": null,
+          "ordinary": 1958008.0,
+          "net_income": 1423167.0,
+          "aum_end_jpym": null,
+          "nikkei_ret": 0.002,
+          "is_h2": 0,
+          "headcount": 50.0
+        },
+        {
+          "label": "FY2022H2",
+          "period_end": "2022-03-31",
+          "revenue": 4302709.0,
+          "base_fee": null,
+          "perf_fee": null,
+          "ordinary": 1187392.0,
+          "net_income": 880648.0,
+          "aum_end_jpym": null,
+          "nikkei_ret": -0.033,
+          "is_h2": 1,
+          "headcount": 47.0
+        },
+        {
+          "label": "FY2023H1",
+          "period_end": "2022-09-30",
+          "revenue": 3319298.0,
+          "base_fee": null,
+          "perf_fee": null,
+          "ordinary": 1926574.0,
+          "net_income": 1358671.0,
+          "aum_end_jpym": null,
+          "nikkei_ret": -0.062,
+          "is_h2": 0,
+          "headcount": 49.0
+        },
+        {
+          "label": "FY2023H2",
+          "period_end": "2023-03-31",
+          "revenue": 5586426.0,
+          "base_fee": null,
+          "perf_fee": null,
+          "ordinary": 2236419.0,
+          "net_income": 1662698.0,
+          "aum_end_jpym": 1275900.0,
+          "nikkei_ret": 0.081,
+          "is_h2": 1,
+          "headcount": 49.0
+        },
+        {
+          "label": "FY2024H1",
+          "period_end": "2023-09-30",
+          "revenue": 3804623.0,
+          "base_fee": 2872000.0,
+          "perf_fee": 932000.0,
+          "ordinary": 2488758.0,
+          "net_income": 1791219.0,
+          "aum_end_jpym": null,
+          "nikkei_ret": 0.136,
+          "is_h2": 0,
+          "headcount": 49.0
+        },
+        {
+          "label": "FY2024H2",
+          "period_end": "2024-03-31",
+          "revenue": 11162336.0,
+          "base_fee": null,
+          "perf_fee": null,
+          "ordinary": 6321019.0,
+          "net_income": 4817973.0,
+          "aum_end_jpym": 1308000.0,
+          "nikkei_ret": 0.267,
+          "is_h2": 1,
+          "headcount": 51.0
+        },
+        {
+          "label": "FY2025H1",
+          "period_end": "2024-09-30",
+          "revenue": 5353003.0,
+          "base_fee": 3266000.0,
+          "perf_fee": 1996000.0,
+          "ordinary": 3810200.0,
+          "net_income": 2799791.0,
+          "aum_end_jpym": 1249500.0,
+          "nikkei_ret": -0.047,
+          "is_h2": 0,
+          "headcount": 51.0
+        },
+        {
+          "label": "FY2025H2",
+          "period_end": "2025-03-31",
+          "revenue": 10901498.0,
+          "base_fee": null,
+          "perf_fee": null,
+          "ordinary": 5638399.0,
+          "net_income": 4256431.0,
+          "aum_end_jpym": 1297300.0,
+          "nikkei_ret": -0.079,
+          "is_h2": 1,
+          "headcount": 55.0
+        },
+        {
+          "label": "FY2026H1",
+          "period_end": "2025-09-30",
+          "revenue": 5577537.0,
+          "base_fee": 3711000.0,
+          "perf_fee": 1713000.0,
+          "ordinary": 3974829.0,
+          "net_income": 2861532.0,
+          "aum_end_jpym": 1373300.0,
+          "nikkei_ret": 0.261,
+          "is_h2": 0,
+          "headcount": 58.0
+        },
+        {
+          "label": "FY2026H2",
+          "period_end": "2026-03-31",
+          "revenue": 16934463.0,
+          "base_fee": null,
+          "perf_fee": null,
+          "ordinary": 9995171.0,
+          "net_income": 7769468.0,
+          "aum_end_jpym": 1335700.0,
+          "nikkei_ret": 0.146,
+          "is_h2": 1,
+          "headcount": 55.0
+        }
+      ],
+      "forecasts": [
+        {
+          "horizon": "next_H1",
+          "scenario": "bear",
+          "nikkei_ret": -0.1,
+          "revenue_m": 3726.0,
+          "net_income_m": 1472.0,
+          "perf_fee_m": 0.0
+        },
+        {
+          "horizon": "next_H1",
+          "scenario": "base",
+          "nikkei_ret": 0.03,
+          "revenue_m": 4167.0,
+          "net_income_m": 1660.0,
+          "perf_fee_m": 200.0
+        },
+        {
+          "horizon": "next_H1",
+          "scenario": "bull",
+          "nikkei_ret": 0.12,
+          "revenue_m": 4969.0,
+          "net_income_m": 2002.0,
+          "perf_fee_m": 834.0
+        },
+        {
+          "horizon": "next_H2",
+          "scenario": "bear",
+          "nikkei_ret": -0.1,
+          "revenue_m": 3726.0,
+          "net_income_m": 1472.0,
+          "perf_fee_m": 0.0
+        },
+        {
+          "horizon": "next_H2",
+          "scenario": "base",
+          "nikkei_ret": 0.04,
+          "revenue_m": 7454.0,
+          "net_income_m": 3061.0,
+          "perf_fee_m": 3469.0
+        },
+        {
+          "horizon": "next_H2",
+          "scenario": "bull",
+          "nikkei_ret": 0.14,
+          "revenue_m": 16907.0,
+          "net_income_m": 7089.0,
+          "perf_fee_m": 12735.0
+        }
+      ],
+      "shares": {
+        "cagr_reduction_pct": -34.53,
+        "series": [
+          {
+            "date": "2019-10-01",
+            "split_adjusted_shares": 420000000,
+            "note": "10:1 split effective"
+          },
+          {
+            "date": "2021-08-24",
+            "split_adjusted_shares": 170000000,
+            "note": "Treasury cancellation"
+          },
+          {
+            "date": "2022-08-30",
+            "split_adjusted_shares": 104000000,
+            "note": "Treasury cancellation"
+          },
+          {
+            "date": "2023-04-01",
+            "split_adjusted_shares": 104000000,
+            "note": "10:1 split effective"
+          },
+          {
+            "date": "2023-08-22",
+            "split_adjusted_shares": 62600000,
+            "note": "Treasury cancellation"
+          },
+          {
+            "date": "2024-09-10",
+            "split_adjusted_shares": 43760000,
+            "note": "Treasury cancellation"
+          },
+          {
+            "date": "2025-08-29",
+            "split_adjusted_shares": 27120000,
+            "note": "Treasury cancellation"
+          },
+          {
+            "date": "2025-11-01",
+            "split_adjusted_shares": 27120000,
+            "note": "20:1 split effective"
+          }
+        ]
+      },
+      "triangulation": [
+        "Lawrence IRR uses mid-cycle owner cash (FY2025 \u00a5137/sh), not peak FY2026 success-fee earnings.",
+        "High synthesis return is not executable on the public TPM tape at last thin print.",
+        "Model edge is performance-fee seasonality and pre-report nowcast, not beating seasonal naive on RMSE."
+      ],
+      "caveats": [
+        "Out-of-sample RMSE is worse than same-half-last-year naive; use model for seasonality and scenarios, not level beats.",
+        "Perf fee crystallizes near fiscal year-end (Mar); H1 nowcast of perf is low-confidence.",
+        "Assumes flat net flows; replace with per-ETF NAV*units + JITA flows for real edge.",
+        "Single-driver (Nikkei); add value/PBR factor and fund-level NAV for precision."
+      ],
+      "links": {
+        "model_report": "https://github.com/GoldmanDrew/single-stock-investments/blob/main/7176.T/research/model/earnings_model_report.md",
+        "data_dictionary": "https://github.com/GoldmanDrew/single-stock-investments/blob/main/7176.T/research/model/data_dictionary.md",
+        "forecasts_csv": "https://github.com/GoldmanDrew/single-stock-investments/blob/main/7176.T/research/model/forecasts.csv",
+        "model_results": "https://github.com/GoldmanDrew/single-stock-investments/blob/main/7176.T/research/model/model_results.json",
+        "skeptical_report": "https://github.com/GoldmanDrew/single-stock-investments/blob/main/7176.T/research/equity_report_skeptical_2026-06-04.md"
+      }
+    }
+  },
+  "summaries": {
+    "7176.T": {
+      "ready": true,
+      "as_of": "2026-06-04",
+      "headline": "Nowcast H1 revenue \u00a57,147m; OOS RMSE loses to seasonal naive",
+      "model_beats_naive": false,
+      "model_type": "earnings_semiannual"
+    }
+  }
+}

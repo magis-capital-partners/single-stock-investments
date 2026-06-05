@@ -734,9 +734,43 @@ def build_darwin_if_missing() -> dict | None:
     return load_darwin_bundle()
 
 
+def build_equity_models() -> dict:
+    """Run equity model ingest and return payload for dashboard merge."""
+    script = ROOT / "_system" / "scripts" / "build_equity_model_dashboard.py"
+    if script.exists():
+        import subprocess
+
+        subprocess.run([sys.executable, str(script)], cwd=str(ROOT), check=False)
+    path = DATA_DIR / "equity_models.json"
+    if not path.exists():
+        return {"built_at": None, "ticker_count": 0, "tickers": {}, "summaries": {}}
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return {"built_at": None, "ticker_count": 0, "tickers": {}, "summaries": {}}
+
+
+def merge_equity_model_rows(rows: list[dict], equity_payload: dict) -> None:
+    summaries = equity_payload.get("summaries") or {}
+    tickers = equity_payload.get("tickers") or {}
+    for row in rows:
+        ticker = row["ticker"]
+        if ticker in summaries:
+            row["equity_model"] = summaries[ticker]
+        elif ticker in tickers:
+            row["equity_model"] = {"ready": True, "as_of": tickers[ticker].get("as_of")}
+        else:
+            row["equity_model"] = {"ready": False}
+
+
 def main() -> None:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
+    equity_payload = build_equity_models()
     payload = build()
+    merge_equity_model_rows(payload["tickers"], equity_payload)
+    model_ready = sum(1 for r in payload["tickers"] if (r.get("equity_model") or {}).get("ready"))
+    payload["summary"]["equity_models_ready"] = model_ready
+    payload["equity_models"] = equity_payload
     bundle = load_darwin_bundle() or build_darwin_if_missing() or {}
     serving = bundle.get("serving") or load_darwin_serving()
     if serving:

@@ -268,6 +268,35 @@
 
   .darwin-charts { display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 20px; }
   @media (min-width: 900px) { .darwin-charts.split { grid-template-columns: 1fr 1fr; } }
+
+  .main.model-expanded { grid-template-columns: 1fr !important; }
+  .main.model-expanded .detail {
+    border-left: none; border-top: 1px solid var(--border);
+    max-height: none; padding: 20px 24px 32px;
+  }
+  .liquidity-banner {
+    background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.4);
+    border-radius: 8px; padding: 12px 14px; font-size: 12px; line-height: 1.5;
+    margin-bottom: 12px; color: var(--text-secondary);
+  }
+  .liquidity-banner strong { color: var(--accent-red); }
+  .model-kpi-row {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 8px; margin-bottom: 14px;
+  }
+  .model-charts {
+    display: grid; grid-template-columns: 1fr; gap: 14px; margin: 14px 0;
+  }
+  @media (min-width: 900px) {
+    .model-charts { grid-template-columns: 1fr 1fr; }
+    .model-charts .chart-box:first-child,
+    .model-charts .chart-box:nth-child(2) { grid-column: span 2; }
+  }
+  .chart-box {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px; height: 240px; position: relative;
+  }
+  .model-section .subhead { margin-bottom: 8px; }
   .chart-card {
     background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 14px;
   }
@@ -334,7 +363,7 @@
     <button class="filter-btn" data-filter="needs-work">Needs work</button>
   </div>
 
-  <div class="main">
+  <div class="main" id="main-grid">
     <div class="table-wrap">
       <table>
         <thead>
@@ -414,6 +443,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="darwin-viz.js"></script>
+<script src="equity-model-viz.js"></script>
 <script src="oauth.js"></script>
 <script>
 const GH_REPO = 'GoldmanDrew/single-stock-investments';
@@ -788,13 +818,17 @@ async function submitCloudOnboard() {
 
 function renderSummary() {
   const s = data.summary;
-  document.getElementById('summary').innerHTML = [
+  const cards = [
     { label: 'Holdings', value: s.ticker_count, sub: (s.watchlist_count ? s.watchlist_count + ' watchlist · ' : '') + s.markets.join(' · ') },
     { label: 'Total PDFs', value: s.total_pdfs.toLocaleString(), sub: 'across universe' },
     { label: 'Avg completeness', value: s.avg_completeness + '%', sub: 'infra score' },
     { label: 'With README', value: s.with_readme + '/' + s.ticker_count, sub: 'documented' },
     { label: 'Research dirs', value: s.with_research + '/' + s.ticker_count, sub: 'Marvin output' },
-  ].map(c => `
+  ];
+  if (s.equity_models_ready > 0) {
+    cards.push({ label: 'Equity models', value: s.equity_models_ready, sub: 'click ticker to view' });
+  }
+  document.getElementById('summary').innerHTML = cards.map(c => `
     <div class="summary-card">
       <div class="label">${c.label}</div>
       <div class="value">${c.value}</div>
@@ -837,7 +871,7 @@ function renderTable() {
   document.getElementById('empty').style.display = rows.length ? 'none' : 'block';
   tbody.innerHTML = rows.map(t => `
     <tr class="${selected === t.ticker ? 'selected' : ''}" data-ticker="${t.ticker}">
-      <td class="mono ticker-cell">${t.ticker}${t.onboard?.phase && t.onboard.phase !== 'complete' ? `<span class="onboard-badge">${t.onboard.phase}</span>` : ''}</td>
+      <td class="mono ticker-cell">${t.ticker}${t.equity_model?.ready ? ' <span class="badge badge-ok" title="Earnings model">M</span>' : ''}${t.onboard?.phase && t.onboard.phase !== 'complete' ? `<span class="onboard-badge">${t.onboard.phase}</span>` : ''}</td>
       <td>${t.company}</td>
       <td><span class="badge ${MARKET_BADGE[t.market] || 'badge-us'}">${t.market}</span></td>
       <td class="mono">${t.pdf_count}${t.sec_filings ? ` <span style="color:var(--text-muted);font-size:11px">+${t.sec_filings} SEC</span>` : ''}</td>
@@ -857,11 +891,22 @@ function renderTable() {
   });
 }
 
+function getEquityModelBundle(ticker) {
+  return (data.equity_models && data.equity_models.tickers && data.equity_models.tickers[ticker]) || null;
+}
+
 function selectTicker(ticker) {
   selected = ticker;
+  if (typeof EquityModelViz !== 'undefined') EquityModelViz.destroyCharts();
   renderTable();
   const t = data.tickers.find(x => x.ticker === ticker);
   if (!t) return;
+  const modelBundle = getEquityModelBundle(ticker);
+  const hasModel = modelBundle && modelBundle.model_ready;
+  document.getElementById('main-grid').classList.toggle('model-expanded', !!hasModel);
+  const modelHtml = (typeof EquityModelViz !== 'undefined' && hasModel)
+    ? EquityModelViz.renderSection(modelBundle, { escapeHtml, linkHtml })
+    : '';
   document.getElementById('detail').innerHTML = `
     <h2>${t.ticker}</h2>
     <div class="subhead">${escapeHtml(t.company)} · ${escapeHtml(t.exchange)} · ${linkHtml(t.links?.folder, t.folder)}</div>
@@ -886,6 +931,8 @@ function selectTicker(ticker) {
         ${t.classification?.cycle && t.classification.cycle !== '-' && t.classification.cycle !== '—' ? `<div class="metric"><div class="k">Cycle</div><div class="v">${t.classification.cycle}</div></div>` : ''}
       </div>
     </div>
+
+    ${modelHtml}
 
     <div class="detail-section">
       <h3>Infrastructure</h3>
@@ -939,6 +986,9 @@ function selectTicker(ticker) {
           </li>`).join('')}
       </ul>
     </div>`;
+  if (hasModel && typeof EquityModelViz !== 'undefined') {
+    EquityModelViz.afterRender(modelBundle);
+  }
 }
 
 function renderMarketFilters() {
