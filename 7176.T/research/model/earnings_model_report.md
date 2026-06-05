@@ -91,6 +91,30 @@ After wiring `acquire_data.py` (ETF NAV, factor returns, fund proxy), walk-forwa
 
 ---
 
+## 3b. PM diagnostics (model_diagnostics.json)
+
+Decomposed in-sample and out-of-sample R² per target. **Primary KPI:** perf fee on H2 halves with perf > 0.
+
+| Target | IS R² | OOS R² | OOS RMSE (¥m) | Naive LY beats? |
+|--------|-------|--------|---------------|-----------------|
+| Revenue (total) | −0.69 | −0.01 | 4,336 | Yes (¥3,230) |
+| Revenue (H2 only) | −1.88 | −0.56 | 5,631 | Yes |
+| Base fee | 0.45 | −2.14 | 318 | — |
+| Perf fee | −0.14 | −2.63 | 8,547 | — |
+| **Perf fee (H2, perf>0)** | — | **−14.25** | **10,307** | n=2 only |
+| Ordinary profit | — | — | — | See JSON |
+
+**Honest read:**
+
+- Total revenue **OOS R² ≈ 0** (slightly negative): model ties noise; seasonal naive wins on level.
+- Base fee IS R² ~0.45 on n=4 disclosed splits: identity works where data exists.
+- Perf fee OOS R² deeply negative: crystallization miss dominates (FY2024H2, FY2026H2 in `residual_attribution`).
+- **Production spec: v1** (Nikkei). v2 rejected per `spec_comparison.json`.
+
+Regenerate: `python3 model.py` (runs `model_diagnostics.py` automatically).
+
+---
+
 ## 4. Scenario fan (next interim and next full-year H2)
 
 Revenue/earnings as a function of the Nikkei return over the half (¥m):
@@ -149,5 +173,6 @@ Caveats: H1 perf-fee nowcast is low-confidence; JITA industry flows still pendin
 | `fund_registry.json` | Simplex ETF list, AUM pools, factor proxies, non-listed fund assumptions |
 | `build_panel.py` | Filing panel + market + merge acquired data → `panel_halfyear.csv` |
 | `model.py` | Fit v1/v2 components, walk-forward CV → `model_results.json`, `forecasts.csv` |
+| `model_diagnostics.py` | IS/OOS R² per target → `model_diagnostics.json`, `spec_comparison.json`, `residuals_halfyear.csv` |
 | `nowcast.py` | Live monthly nowcast (ETF AUM + flows + v2) → `nowcast_latest.json` |
 | `data_dictionary.md` | Every series, unit, source, tag |
