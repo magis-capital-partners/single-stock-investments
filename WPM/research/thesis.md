@@ -17,18 +17,18 @@
 | **Payoff lens** | operating |
 | **MOI bucket** | pending |
 
-**Deep dive:** `WPM/research/deep_dive_2026-06-03.md` (auto-sync)
+**Deep dive:** `WPM/research/deep_dive_2026-06-06.md` (auto-sync)
 
 ## One-line thesis
 
-Wheaton Precious Metals Corp. — thesis pending Marvin deep dive.
+Leading precious-metals streamer with filing-backed volume growth (2026 GEO guide 860K to 940K) but **watch** at ~$125: mid-cycle owner cash implies **-2.21% per year** over seven years, below our accumulate bar.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest annual results (EX-99.1 FY2025)
+- [ ] Add AIF PDF for mine-level contract detail
+- [ ] Confirm Antamina accretion and leverage after April 2026 close
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-06-03; awaiting deep dive.
+- Normalized owner cash **$3.00/sh** vs filing **$4.197/sh**; Antamina **$4.3B** deal; CEO Hodaly transition.
