@@ -91,7 +91,7 @@ Run `python3 acquire_data.py` (or `build_panel.py`, which calls it first). Manif
 |------|-----|------------|
 | `mandate_nav_monthly.csv` | [Filing/Market/Derived] | Monthly NAV/AUM/return per fund from SAM PDFs + yfinance ETFs; `download_mandate_nav.py` |
 | `mandate_nav_detail.csv` | [Filing/Market/Derived] | Per-mandate half-year return, benchmark, excess, AUM weights |
-| `mandate_nav_halfyear.csv` | [Filing/Market/Derived] | AUM-weighted `mandate_weighted_excess`, `mandate_weighted_return`, `mandate_count` |
+| `mandate_nav_halfyear.csv` | [Filing/Market/Derived] | `mandate_weighted_excess`, `mandate_crystallization_ret` (H2 HWM path), `mandate_march_ret`, `mandate_weighted_return`, `mandate_count` |
 | `mandate_scrape_manifest.json` | [Market] | PDF download log + fund IDs |
 | `mandate_reports/` | [Filing] | Saved SAM monthly PDFs |
 
@@ -106,7 +106,7 @@ Run `python3 acquire_data.py` (or `build_panel.py`, which calls it first). Manif
 `perf_eligible_excess_ret`, `etf_perf_basket_ret`, `value_factor_ret`, `etf_basket_ret`,
 `etf_implied_flow_jpym`, `perf_eligible_aum_jpym`, `nonlisted_share`, `etf_share`,
 `opex_sga_jpy_million`, `incremental_margin`, `march_nikkei_ret`, `march_value_ret`,
-`march_blended_ret`, `mandate_weighted_excess`, `mandate_count`.
+`march_blended_ret`, `mandate_weighted_excess`, `mandate_crystallization_ret`, `mandate_march_ret`, `mandate_count`.
 
 ## Remaining gaps
 

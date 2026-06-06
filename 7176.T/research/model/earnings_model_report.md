@@ -88,7 +88,7 @@ After wiring `acquire_data.py` (ETF NAV, factor returns, fund proxy), walk-forwa
 | v3a (March window on H2) | 5,407 | — | — |
 | Naive (same half last year) | 3,230 | 30.2% | 1.00 |
 
-**Honest read:** v2 improves directional hit (0.67 → 0.89) but **still loses to seasonal naive on RMSE**. v3a (Jan–Mar crystallization window on H2) **worsens** both revenue RMSE and perf-fee H2 RMSE vs v1. **Production spec stays v1** per `spec_comparison.json`. Registry-weighted fund proxy and filing-anchored ETF AUM remain coarse; **JITA flows and true per-fund NAV/hurdle remain the binding gap.**
+**Honest read:** v2 improves directional hit (0.67 → 0.89) but **still loses to seasonal naive on RMSE**. v3a alone worsens perf-fee H2 RMSE. **Production spec: v4p6** (mandate crystallization + March window + JITA base-fee covariate) per `spec_comparison.json`. Remaining gap: per-mandate hurdle/HWM from 交付運用報告書 and longer mandate NAV history.
 
 ---
 
@@ -102,15 +102,15 @@ Decomposed in-sample and out-of-sample R² per target. **Primary KPI:** perf fee
 | Revenue (H2 only) | −1.88 | −0.56 | 5,631 | Yes |
 | Base fee | 0.45 | −2.14 | 318 | — |
 | Perf fee | −0.14 | −2.63 | 8,547 | — |
-| **Perf fee (H2, perf>0)** | — | **−14.25** | **10,307** | n=2 only |
+| **Perf fee (H2, perf>0)** | — | **−3.05** (v4p6) | **5,310** | n=2 only |
 | Ordinary profit | — | — | — | See JSON |
 
 **Honest read:**
 
 - Total revenue **OOS R² ≈ 0** (slightly negative): model ties noise; seasonal naive wins on level.
 - Base fee IS R² ~0.45 on n=4 disclosed splits: identity works where data exists.
-- Perf fee OOS R² deeply negative: crystallization miss dominates (FY2024H2, FY2026H2 in `residual_attribution`).
-- **Production spec: v4** (P4 mandate-weighted excess). Beats v1 on perf-fee H2 OOS RMSE (¥8,714m vs ¥10,307m). v2/v3a rejected.
+- Perf fee OOS R² still negative on n=2 H2 periods, but **v4p6 halves RMSE** vs v1 (¥5,310m vs ¥10,307m). FY2026H2 in-sample fit now tracks (¥12,091m fitted vs ¥12,603m actual).
+- **Production spec: v4p6** (P4 mandate crystallization + P6 March window + P5 JITA base fee). v1/v2/v3a/v4 rejected.
 
 **Spec leaderboard (OOS):**
 
@@ -119,7 +119,8 @@ Decomposed in-sample and out-of-sample R² per target. **Primary KPI:** perf fee
 | v1 | ¥4,336m | ¥10,307m | no |
 | v2 | ¥3,977m | ¥44,744m | no |
 | v3a | ¥5,407m | ¥11,863m | no |
-| v4 | ¥4,833m | ¥8,714m | **yes** |
+| v4 | ¥5,470m | ¥10,307m | no |
+| **v4p6** | **¥2,004m** | **¥5,310m** | **yes** |
 
 Regenerate: `python3 model.py` (runs `model_diagnostics.py` automatically).
 
@@ -162,8 +163,9 @@ Caveats: H1 perf-fee nowcast is low-confidence; JITA industry flows still pendin
 
 ### P4 / P6 data layer (Phase 3)
 
-- **P6 March window:** `march_window_halfyear.csv` — Jan–Mar return into March FY-end for H2 crystallization (`march_nikkei_ret`, `march_value_ret`, `march_blended_ret`). Drives **v3a** spec in `model.py`.
-- **P4 Mandate NAV scaffold:** `mandate_nav_halfyear.csv` — registry-weighted mandate excess vs hurdle [Assumption]. Replace with 受益権報告書 per-fund NAV when scraped (Vicki).
+- **P6 March window:** `march_window_halfyear.csv` — Jan–Mar return into March FY-end for H2 crystallization (`march_nikkei_ret`, `march_value_ret`, `march_blended_ret`).
+- **P4 Mandate NAV:** `mandate_nav_halfyear.csv` — scraped SAM PDFs + ETF yfinance; `mandate_crystallization_ret` captures H2 HWM/absolute-gain path when benchmark excess is zero. Drives **v4p6** perf spec.
+- **P5 JITA flows:** `jita_equity_flow_bn` / `jita_etf_flow_bn` wired into **v4p6** base-fee path (`base_fee_model_v5` in `model_results.json`).
 
 ---
 

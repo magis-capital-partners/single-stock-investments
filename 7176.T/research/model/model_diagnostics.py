@@ -33,12 +33,14 @@ from model import (  # noqa: E402
     fit_perf_v2,
     fit_perf_v3a,
     fit_perf_v4,
+    fit_perf_v4p6,
     predict_base,
     predict_earnings,
     predict_perf,
     predict_perf_v2,
     predict_perf_v3a,
     predict_perf_v4,
+    predict_perf_v4p6,
     walk_forward,
 )
 
@@ -170,6 +172,9 @@ def walk_forward_target(
 
 
 def _predict_perf_oos(train: pd.DataFrame, test: pd.Series, spec: str = "v1") -> float:
+    if spec == "v4p6":
+        params, _ = fit_perf_v4p6(train)
+        return float(predict_perf_v4p6(test.to_frame().T, params).iloc[0])
     if spec == "v4":
         params, _ = fit_perf_v4(train)
         return float(predict_perf_v4(test.to_frame().T, params).iloc[0])
@@ -338,11 +343,12 @@ def build_tornado(df: pd.DataFrame, bridge: dict, rate: float, perf_params: dict
 
 
 def spec_leaderboard(df: pd.DataFrame) -> list[dict]:
-    """Compare v1 vs v2 vs v3a vs v4 on revenue and perf_fee H2 OOS."""
+    """Compare v1 vs v2 vs v3a vs v4 vs v4p6 on revenue and perf_fee H2 OOS."""
     wf_v1 = walk_forward(df, use_v2=False)
     wf_v2 = walk_forward(df, use_v2=True)
     wf_v3a = walk_forward(df, use_v3a=True)
     wf_v4 = walk_forward(df, use_v4=True)
+    wf_v4p6 = walk_forward(df, use_v4p6=True)
 
     def _oos_rmse_r2(wf: pd.DataFrame, filt=None) -> tuple[float, float]:
         if not len(wf):
@@ -362,11 +368,13 @@ def spec_leaderboard(df: pd.DataFrame) -> list[dict]:
 
     rev_v3a_rmse, rev_v3a_r2 = _oos_rmse_r2(wf_v3a)
     rev_v4_rmse, rev_v4_r2 = _oos_rmse_r2(wf_v4)
+    rev_v4p6_rmse, rev_v4p6_r2 = _oos_rmse_r2(wf_v4p6)
 
     wf_perf_v1 = walk_forward_target(df, "perf_fee_m", lambda tr, te: _predict_perf_oos(tr, te, "v1"))
     wf_perf_v2 = walk_forward_target(df, "perf_fee_m", lambda tr, te: _predict_perf_oos(tr, te, "v2"))
     wf_perf_v3a = walk_forward_target(df, "perf_fee_m", lambda tr, te: _predict_perf_oos(tr, te, "v3a"))
     wf_perf_v4 = walk_forward_target(df, "perf_fee_m", lambda tr, te: _predict_perf_oos(tr, te, "v4"))
+    wf_perf_v4p6 = walk_forward_target(df, "perf_fee_m", lambda tr, te: _predict_perf_oos(tr, te, "v4p6"))
 
     def _comp_wf(wf: pd.DataFrame, h2_only: bool) -> tuple[float, float]:
         if not len(wf):
@@ -384,6 +392,7 @@ def spec_leaderboard(df: pd.DataFrame) -> list[dict]:
     p2_rmse, p2_r2 = _comp_wf(wf_perf_v2, True)
     p3_rmse, p3_r2 = _comp_wf(wf_perf_v3a, True)
     p4_rmse, p4_r2 = _comp_wf(wf_perf_v4, True)
+    p4p6_rmse, p4p6_r2 = _comp_wf(wf_perf_v4p6, True)
 
     entries = [
         dict(spec="v1", revenue_oos_rmse=rev_v1_rmse, revenue_oos_r2=rev_v1_r2,
@@ -397,6 +406,9 @@ def spec_leaderboard(df: pd.DataFrame) -> list[dict]:
         dict(spec="v4", revenue_oos_rmse=rev_v4_rmse, revenue_oos_r2=rev_v4_r2,
              perf_fee_h2_oos_rmse=p4_rmse, perf_fee_h2_oos_r2=p4_r2, production_default=False,
              note="P4 mandate NAV scrape"),
+        dict(spec="v4p6", revenue_oos_rmse=rev_v4p6_rmse, revenue_oos_r2=rev_v4p6_r2,
+             perf_fee_h2_oos_rmse=p4p6_rmse, perf_fee_h2_oos_r2=p4p6_r2, production_default=False,
+             note="P4 mandate crystallization + P6 March window + P5 JITA base fee"),
     ]
     baseline_perf = p1_rmse
     eligible = [

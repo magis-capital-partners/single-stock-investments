@@ -582,18 +582,18 @@ def _benchmark_ret(row: pd.Series, bm: str) -> float:
     return nik
 
 
-def _halfyear_fund_return(monthly: pd.DataFrame, fund_id: str, period_end: pd.Timestamp, half: str) -> float:
-    """Compound monthly returns for fiscal half ending period_end."""
+def _fund_return_window(
+    monthly: pd.DataFrame,
+    fund_id: str,
+    start: pd.Timestamp,
+    end: pd.Timestamp,
+) -> float:
+    """Compound fund return between start and end from monthly NAV table."""
     sub = monthly[monthly["fund_id"] == fund_id].copy()
     if sub.empty:
         return np.nan
     sub["as_of"] = pd.to_datetime(sub["as_of"])
     sub = sub.sort_values("as_of")
-    fy = period_end.year if period_end.month == 3 else period_end.year + 1
-    if half == "H1":
-        start, end = pd.Timestamp(fy - 1, 4, 1), pd.Timestamp(fy - 1, 9, 30)
-    else:
-        start, end = pd.Timestamp(fy - 1, 10, 1), pd.Timestamp(fy, 3, 31)
     win = sub[(sub["as_of"] >= start) & (sub["as_of"] <= end)]
     if len(win) >= 2 and win["nav_jpy"].notna().sum() >= 2:
         nav = win["nav_jpy"].dropna()
@@ -601,6 +601,47 @@ def _halfyear_fund_return(monthly: pd.DataFrame, fund_id: str, period_end: pd.Ti
     if win["month_ret"].notna().any():
         return float((1 + win["month_ret"].fillna(0)).prod() - 1.0)
     return np.nan
+
+
+def _halfyear_fund_return(monthly: pd.DataFrame, fund_id: str, period_end: pd.Timestamp, half: str) -> float:
+    """Compound monthly returns for fiscal half ending period_end."""
+    fy = period_end.year if period_end.month == 3 else period_end.year + 1
+    if half == "H1":
+        start, end = pd.Timestamp(fy - 1, 4, 1), pd.Timestamp(fy - 1, 9, 30)
+    else:
+        start, end = pd.Timestamp(fy - 1, 10, 1), pd.Timestamp(fy, 3, 31)
+    return _fund_return_window(monthly, fund_id, start, end)
+
+
+def _march_fund_return(monthly: pd.DataFrame, fund_id: str, period_end: pd.Timestamp) -> float:
+    """Jan–Mar return into March fiscal year-end (H2 crystallization window)."""
+    if period_end.month != 3:
+        return np.nan
+    return _fund_return_window(
+        monthly,
+        fund_id,
+        pd.Timestamp(period_end.year, 1, 1),
+        period_end,
+    )
+
+
+def _crystallization_excess(
+    period_return: float,
+    benchmark_return: float,
+    hurdle: float,
+    half: str,
+    march_return: float | None = None,
+) -> float:
+    """Perf-fee crystallization driver: benchmark excess plus H2 absolute/HWM path."""
+    bench_excess = max(0.0, period_return - benchmark_return - hurdle)
+    if half != "H2":
+        return bench_excess
+    abs_excess = max(0.0, period_return - hurdle)
+    march_excess = max(0.0, (march_return or np.nan) - hurdle) if pd.notna(march_return) else 0.0
+    # Funds can crystallize on gains above HWM even when trailing the benchmark for the full half.
+    if bench_excess <= 0.0 and abs_excess > 0.0:
+        return max(abs_excess, march_excess)
+    return max(bench_excess, march_excess)
 
 
 def build_mandate_nav(registry: dict, panel: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
@@ -634,13 +675,17 @@ def build_mandate_nav(registry: dict, panel: pd.DataFrame) -> tuple[pd.DataFrame
                 continue
             bm_ret = _benchmark_ret(r, fund.get("benchmark", "nikkei"))
             hurdle = fund.get("hurdle", 0.0)
-            excess = max(0.0, ret - bm_ret - hurdle)
+            march_ret = _march_fund_return(monthly, fund["id"], pe) if half == "H2" else np.nan
+            excess = _crystallization_excess(ret, bm_ret, hurdle, half, march_ret)
+            bench_excess = max(0.0, ret - bm_ret - hurdle)
             aum = monthly.loc[monthly["fund_id"] == fund["id"], "aum_jpym"].dropna()
             aum_jpym = float(aum.iloc[-1]) if len(aum) else np.nan
             mandate_slices.append({
                 "period_end": pe_str, "half": half, "mandate_id": fund["mandate_id"],
                 "fund_id": fund["id"], "period_return": ret, "benchmark_return": bm_ret,
-                "excess_vs_hurdle": excess, "aum_jpym": aum_jpym,
+                "excess_vs_hurdle": bench_excess, "crystallization_ret": excess,
+                "march_return": march_ret if pd.notna(march_ret) else np.nan,
+                "aum_jpym": aum_jpym,
                 "perf_rate": fund.get("perf_rate"), "tag": fund.get("tag", "[Filing/Market]"),
                 "source": "simplex_monthly_pdf",
             })
@@ -650,14 +695,19 @@ def build_mandate_nav(registry: dict, panel: pd.DataFrame) -> tuple[pd.DataFrame
             if np.isnan(ret):
                 continue
             bm_ret = _benchmark_ret(r, etf.get("benchmark", "value_pbr"))
-            excess = max(0.0, ret - bm_ret)
+            hurdle = 0.0
+            march_ret = _march_fund_return(monthly, etf["id"], pe) if half == "H2" else np.nan
+            excess = _crystallization_excess(ret, bm_ret, hurdle, half, march_ret)
+            bench_excess = max(0.0, ret - bm_ret)
             etf_aum = r.get("aum_etf_jpym", np.nan)
             w = etf_weights.get(etf["id"], 1.0 / max(len(catalog.get("perf_etfs", [])), 1))
             aum_jpym = float(etf_aum) * w if pd.notna(etf_aum) else np.nan
             mandate_slices.append({
                 "period_end": pe_str, "half": half, "mandate_id": etf["mandate_id"],
                 "fund_id": etf["id"], "period_return": ret, "benchmark_return": bm_ret,
-                "excess_vs_hurdle": excess, "aum_jpym": aum_jpym,
+                "excess_vs_hurdle": bench_excess, "crystallization_ret": excess,
+                "march_return": march_ret if pd.notna(march_ret) else np.nan,
+                "aum_jpym": aum_jpym,
                 "perf_rate": etf.get("perf_rate"), "tag": "[Market]",
                 "source": "yfinance_etf",
             })
@@ -671,6 +721,8 @@ def build_mandate_nav(registry: dict, panel: pd.DataFrame) -> tuple[pd.DataFrame
             residual_aum = max(0.0, float(nonlisted) - float(latest_public_aum or 0))
             if residual_aum > 0:
                 bm_ret = _benchmark_ret(r, "nikkei")
+                march_ret = _march_fund_return(monthly, proxy_id, pe) if half == "H2" else np.nan
+                crystal = _crystallization_excess(float(proxy_ret), bm_ret, 0.0, half, march_ret)
                 mandate_slices.append({
                     "period_end": pe_str, "half": half,
                     "mandate_id": resid.get("mandate_id", "mandate_japan_equity"),
@@ -678,6 +730,8 @@ def build_mandate_nav(registry: dict, panel: pd.DataFrame) -> tuple[pd.DataFrame
                     "period_return": float(proxy_ret),
                     "benchmark_return": bm_ret,
                     "excess_vs_hurdle": max(0.0, float(proxy_ret) - bm_ret),
+                    "crystallization_ret": crystal,
+                    "march_return": march_ret if pd.notna(march_ret) else np.nan,
                     "aum_jpym": residual_aum,
                     "perf_rate": 0.15,
                     "tag": resid.get("tag", "[Derived]"),
@@ -693,13 +747,18 @@ def build_mandate_nav(registry: dict, panel: pd.DataFrame) -> tuple[pd.DataFrame
         if wsum <= 0:
             w = pd.Series(1.0, index=ddf.index)
             wsum = len(ddf)
+        crystal_col = "crystallization_ret" if "crystallization_ret" in ddf.columns else "excess_vs_hurdle"
+        march_vals = ddf["march_return"].dropna() if "march_return" in ddf.columns else pd.Series(dtype=float)
         agg_rows.append({
             "period_end": pe_str,
+            "half": half,
             "mandate_weighted_excess": float((ddf["excess_vs_hurdle"] * w).sum() / wsum),
+            "mandate_crystallization_ret": float((ddf[crystal_col] * w).sum() / wsum),
+            "mandate_march_ret": float((ddf["march_return"].fillna(0) * w).sum() / wsum) if len(march_vals) else np.nan,
             "mandate_weighted_return": float((ddf["period_return"] * w).sum() / wsum),
             "mandate_count": len(ddf),
             "tag": "[Filing/Market/Derived]",
-            "note": "Scraped SAM PDFs + ETF yfinance + nonlisted residual proxy",
+            "note": "Scraped SAM PDFs + ETF yfinance + nonlisted residual proxy; crystallization_ret includes H2 HWM path",
         })
 
     detail = pd.DataFrame(detail_rows)

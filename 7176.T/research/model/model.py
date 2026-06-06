@@ -77,6 +77,40 @@ def predict_base(df: pd.DataFrame, rate: float) -> pd.Series:
     return rate / 2.0 * df["aum_avg_jpym"]
 
 
+def _jita_flow_m(row) -> float:
+    """Industry equity + ETF net flow over the half (億円 → JPY m). [Assumption] scaling in fit."""
+    eq = float(row.get("jita_equity_flow_bn") or 0)
+    etf = float(row.get("jita_etf_flow_bn") or 0)
+    return (eq + 0.5 * etf) * 100.0
+
+
+def fit_base_rate_v5(df: pd.DataFrame):
+    """Base fee with JITA industry flow covariate (P5)."""
+    sub = df.dropna(subset=["base_fee_m", "aum_avg_jpym"]).copy()
+    if sub.empty:
+        return 0.0, 0.0, sub
+    sub["flow_m"] = sub.apply(_jita_flow_m, axis=1)
+    x_aum = sub["aum_avg_jpym"] / 2.0
+    x_flow = sub["flow_m"] / 2.0
+    y = sub["base_fee_m"]
+    # y ≈ rate * x_aum + gamma * x_flow
+    xa = x_aum.values
+    xf = x_flow.values
+    denom = float((xa ** 2).sum() * (xf ** 2).sum() - (xa * xf).sum() ** 2)
+    if abs(denom) < 1e-9:
+        rate = float((y * xa).sum() / (xa ** 2).sum()) if (xa ** 2).sum() > 0 else 0.0
+        gamma = 0.0
+    else:
+        rate = float(((xf ** 2).sum() * (y * xa).sum() - (xa * xf).sum() * (y * xf).sum()) / denom)
+        gamma = float(((xa ** 2).sum() * (y * xf).sum() - (xa * xf).sum() * (y * xa).sum()) / denom)
+    return rate, gamma, sub
+
+
+def predict_base_v5(df: pd.DataFrame, rate: float, gamma: float) -> pd.Series:
+    flow = df.apply(_jita_flow_m, axis=1)
+    return rate / 2.0 * df["aum_avg_jpym"] + gamma / 2.0 * flow
+
+
 # ---------------------------------------------------------------------------
 # Component 2 — PERFORMANCE FEE  (convex, crystallization-weighted)
 #   perf_m ~ k * perf_base * max(0, eq_ret - hurdle)
@@ -126,8 +160,29 @@ def mandate_excess_ret(row) -> float:
     return effective_excess_ret(row)
 
 
+def mandate_crystallization_ret(row) -> float:
+    """P4 H2 crystallization path: benchmark excess, mandate March window, or absolute gain."""
+    if pd.notna(row.get("mandate_crystallization_ret")):
+        return max(0.0, float(row["mandate_crystallization_ret"]))
+    excess = mandate_excess_ret(row)
+    if row.get("half") == "H2":
+        candidates = [excess]
+        if pd.notna(row.get("mandate_march_ret")):
+            candidates.append(max(0.0, float(row["mandate_march_ret"])))
+        if excess < 0.02 and pd.notna(row.get("march_blended_ret")):
+            candidates.append(max(0.0, float(row["march_blended_ret"])))
+        if excess < 0.01 and pd.notna(row.get("mandate_weighted_return")):
+            candidates.append(max(0.0, float(row["mandate_weighted_return"])))
+        return max(candidates)
+    return excess
+
+
 def driver_return(row, spec: str = "v1") -> float:
-    """v1 Nikkei; v2 blended; v3a March window; v4 mandate NAV scrape."""
+    """v1 Nikkei; v2 blended; v3a March window; v4 mandate NAV; v4p6 mandate + March crystallization."""
+    if spec == "v4p6":
+        if row.get("half") == "H2":
+            return mandate_crystallization_ret(row)
+        return mandate_excess_ret(row)
     if spec == "v4":
         return mandate_excess_ret(row)
     if spec == "v3a" and row.get("half") == "H2":
@@ -206,6 +261,28 @@ def predict_perf_v4(df: pd.DataFrame, params: dict) -> pd.Series:
     return (k * drive).fillna(0.0)
 
 
+def fit_perf_v4p6(df: pd.DataFrame):
+    sub = df.dropna(subset=["perf_fee_m", "aum_avg_jpym"]).copy()
+    sub["excess"] = sub.apply(lambda r: driver_return(r, "v4p6"), axis=1)
+    sub["drive"] = sub["aum_avg_jpym"] * sub["excess"]
+    params = {}
+    for half in ["H1", "H2"]:
+        s = sub[sub["half"] == half]
+        if len(s) >= 1 and s["drive"].sum() > 0:
+            k = float((s["drive"] * s["perf_fee_m"]).sum() / (s["drive"] ** 2).sum())
+        else:
+            k = np.nan
+        params[half] = k
+    return params, sub
+
+
+def predict_perf_v4p6(df: pd.DataFrame, params: dict) -> pd.Series:
+    excess = df.apply(lambda r: driver_return(r, "v4p6"), axis=1)
+    drive = df["aum_avg_jpym"] * excess
+    k = df["half"].map(params)
+    return (k * drive).fillna(0.0)
+
+
 # ---------------------------------------------------------------------------
 # Component 3 — COSTS / EARNINGS BRIDGE
 #   ordinary margin on revenue; NI = ordinary * (1 - tax). Estimate from history.
@@ -267,7 +344,13 @@ def _fit_reduced(train: pd.DataFrame, spec: str = "v1"):
     return base_floor, ks
 
 
-def walk_forward(df: pd.DataFrame, use_v2: bool = False, use_v3a: bool = False, use_v4: bool = False):
+def walk_forward(
+    df: pd.DataFrame,
+    use_v2: bool = False,
+    use_v3a: bool = False,
+    use_v4: bool = False,
+    use_v4p6: bool = False,
+):
     d = df.dropna(subset=["revenue_m", "nikkei_ret"]).reset_index(drop=True)
     rows = []
     for i in range(len(d)):
@@ -275,7 +358,16 @@ def walk_forward(df: pd.DataFrame, use_v2: bool = False, use_v3a: bool = False, 
         train = d.iloc[:i]
         if len(train[train["half"] == test["half"]]) < 1 or len(train) < 3:
             continue
-        spec = "v4" if use_v4 else ("v3a" if use_v3a else ("v2" if use_v2 else "v1"))
+        if use_v4p6:
+            spec = "v4p6"
+        elif use_v4:
+            spec = "v4"
+        elif use_v3a:
+            spec = "v3a"
+        elif use_v2:
+            spec = "v2"
+        else:
+            spec = "v1"
         base_floor, ks = _fit_reduced(train, spec=spec)
         k = ks.get(test["half"], np.nan)
         if np.isnan(k):
@@ -322,26 +414,33 @@ def main() -> None:
     perf_params_v2, _ = fit_perf_v2(df)
     perf_params_v3a, _ = fit_perf_v3a(df)
     perf_params_v4, _ = fit_perf_v4(df)
+    perf_params_v4p6, _ = fit_perf_v4p6(df)
+    rate_v5, gamma_v5, _ = fit_base_rate_v5(df)
     bridge = fit_bridge(df)
 
     df["base_hat_m"] = predict_base(df, rate)
+    df["base_hat_v5_m"] = predict_base_v5(df, rate_v5, gamma_v5)
     df["perf_hat_m"] = predict_perf(df, perf_params)
     df["perf_hat_v2_m"] = predict_perf_v2(df, perf_params_v2)
     df["perf_hat_v3a_m"] = predict_perf_v3a(df, perf_params_v3a)
     df["perf_hat_v4_m"] = predict_perf_v4(df, perf_params_v4)
+    df["perf_hat_v4p6_m"] = predict_perf_v4p6(df, perf_params_v4p6)
     df["rev_hat_m"] = df["base_hat_m"].fillna(0) + df["perf_hat_m"].fillna(0) + 200.0
     df["rev_hat_v2_m"] = df["base_hat_m"].fillna(0) + df["perf_hat_v2_m"].fillna(0) + 200.0
     df["rev_hat_v3a_m"] = df["base_hat_m"].fillna(0) + df["perf_hat_v3a_m"].fillna(0) + 200.0
     df["rev_hat_v4_m"] = df["base_hat_m"].fillna(0) + df["perf_hat_v4_m"].fillna(0) + 200.0
+    df["rev_hat_v4p6_m"] = df["base_hat_v5_m"].fillna(0) + df["perf_hat_v4p6_m"].fillna(0) + 200.0
 
     res = walk_forward(df, use_v2=False)
     res_v2 = walk_forward(df, use_v2=True)
     res_v3a = walk_forward(df, use_v3a=True)
     res_v4 = walk_forward(df, use_v4=True)
+    res_v4p6 = walk_forward(df, use_v4p6=True)
     mt = metrics(res) if len(res) else {}
     mt_v2 = {}
     mt_v3a = {}
     mt_v4 = {}
+    mt_v4p6 = {}
     if len(res_v3a):
         res_v3a = res_v3a.rename(columns={"model": "model_v3a"})
         res = res.merge(res_v3a[["label", "model_v3a"]], on="label", how="left")
@@ -381,6 +480,17 @@ def main() -> None:
                 mape_pct=round(float((e4.abs() / err_v4["actual"].abs()).mean() * 100), 1),
                 n=len(err_v4),
             )}
+    if len(res_v4p6):
+        res_v4p6 = res_v4p6.rename(columns={"model": "model_v4p6"})
+        res = res.merge(res_v4p6[["label", "model_v4p6"]], on="label", how="left")
+        err_p6 = res.dropna(subset=["model_v4p6"])
+        if len(err_p6):
+            e6 = err_p6["model_v4p6"] - err_p6["actual"]
+            mt_v4p6 = {"model_v4p6": dict(
+                rmse_jpym=round(float(np.sqrt((e6 ** 2).mean())), 1),
+                mape_pct=round(float((e6.abs() / err_p6["actual"].abs()).mean() * 100), 1),
+                n=len(err_p6),
+            )}
 
     # ----- current/next period nowcast -----
     # Use latest known AUM and a market-return input (set live each month).
@@ -417,11 +527,22 @@ def main() -> None:
             "k_H1": None if np.isnan(perf_params_v4.get("H1", np.nan)) else round(perf_params_v4["H1"], 5),
             "k_H2": None if np.isnan(perf_params_v4.get("H2", np.nan)) else round(perf_params_v4["H2"], 5),
         },
+        "perf_fee_model_v4p6": {
+            "form": "perf_fee_half = k_half * avg_AUM * crystallization_driver (P4 mandate + P6 March window on H2)",
+            "k_H1": None if np.isnan(perf_params_v4p6.get("H1", np.nan)) else round(perf_params_v4p6["H1"], 5),
+            "k_H2": None if np.isnan(perf_params_v4p6.get("H2", np.nan)) else round(perf_params_v4p6["H2"], 5),
+        },
+        "base_fee_model_v5": {
+            "form": "base_fee_half = rate/2 * avg_AUM + gamma/2 * jita_equity_flow_m (P5)",
+            "base_rate_ann_est_pct": round(rate_v5 * 100, 4),
+            "jita_flow_gamma": round(gamma_v5, 6),
+        },
         "walk_forward": res.to_dict(orient="records"),
         "oos_metrics": mt,
         "oos_metrics_v2": mt_v2,
         "oos_metrics_v3a": mt_v3a,
         "oos_metrics_v4": mt_v4,
+        "oos_metrics_v4p6": mt_v4p6,
         "data_acquisition": _load_acquisition_manifest(),
         "latest_anchor": {
             "period_end": str(latest["period_end"].date()),
