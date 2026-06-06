@@ -116,6 +116,9 @@ def main() -> None:
                 f"{ticker} management evidence",
             )
 
+    run([PY, str(SCRIPTS / "fetch_theme_panel.py")], "Thematic indicator panels")
+    run([PY, str(SCRIPTS / "apply_context_overlay.py")], "Apply thematic context overlay")
+
     run([PY, str(SCRIPTS / "build_folder_indexes.py")], "Build INDEX.csv files")
     run([PY, str(SCRIPTS / "sync_portfolio_from_registry.py")], "Sync portfolio from registry")
     run([PY, str(SCRIPTS / "build_dashboard_data.py")], "Rebuild dashboard JSON")

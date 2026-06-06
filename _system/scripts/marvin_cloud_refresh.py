@@ -47,6 +47,22 @@ def run_script(label: str, script: str, script_args: list[str], *, optional: boo
     return run(label, [PY, str(path), *script_args], optional=optional)
 
 
+def ticker_has_theme_tag(ticker: str) -> bool:
+    """True when ticker is tagged to a thematic indicator panel."""
+    cfg_path = ROOT / "_system" / "portfolio" / "holdings_themes.json"
+    if not cfg_path.exists():
+        return False
+    try:
+        cfg = json.loads(cfg_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return False
+    tk = ticker.upper()
+    for blk in (cfg.get("themes") or {}).values():
+        if tk in {t.upper() for t in (blk.get("tickers") or [])}:
+            return True
+    return False
+
+
 def needs_evidence_gate(val: dict) -> bool:
     if has_evidence_refresh_config(val):
         return True
@@ -183,6 +199,17 @@ def main() -> int:
         "valuation write",
         [PY, str(SCRIPTS / "marvin_valuation.py"), "--ticker", ticker, "--write"],
     )
+    if ticker_has_theme_tag(ticker):
+        run(
+            "thematic indicator panels",
+            [PY, str(SCRIPTS / "fetch_theme_panel.py")],
+            optional=True,
+        )
+        run(
+            "thematic context overlay",
+            [PY, str(SCRIPTS / "apply_context_overlay.py"), ticker],
+            optional=True,
+        )
     if has_evidence_refresh_config(val):
         ok &= run(
             "optionality evidence refresh",
