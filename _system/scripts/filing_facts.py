@@ -109,9 +109,12 @@ def latest_full_text_path(evidence_dir: Path) -> Path | None:
     )
     for pref in prefs:
         for f in files:
-            if pref.lower() in f.name.lower() and "mgmt" not in f.parts:
+            if pref.lower() in f.name.lower() and "mgmt" not in f.parts and f.stat().st_size > 0:
                 return f
-    return files[0] if files else None
+    for f in files:
+        if f.stat().st_size > 0:
+            return f
+    return None
 
 
 def parse_otc_prose_metrics(text: str) -> dict:

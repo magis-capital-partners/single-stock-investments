@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[2]
 SCRIPTS = Path(__file__).resolve().parent
 sys.path.insert(0, str(SCRIPTS))
 
-from marvin_pipeline_common import has_evidence_refresh_config  # noqa: E402
+from marvin_pipeline_common import has_evidence_refresh_config, ticker_needs_commodity_inputs  # noqa: E402
 from optionality_evidence_common import max_residual_allowed, residual_slack_per_share  # noqa: E402
 
 
@@ -61,7 +61,7 @@ def check(ticker: str, *, dive_date: str | None = None, strict: bool = False) ->
 
     mi = research / "market_inputs.json"
     commodity = cfg.get("commodity", "copper")
-    if arch == "optionality" or val.get("inputs", {}).get("copperwood_royalty_est_usd") or cfg.get("commodity"):
+    if ticker_needs_commodity_inputs(val):
         if not mi.exists():
             errs.append("missing market_inputs.json for commodity name")
         else:
