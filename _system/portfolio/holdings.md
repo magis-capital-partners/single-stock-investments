@@ -37,6 +37,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-06-06.
 | IEX.NS | IEX.NS/ | Indian Energy Exchange Limited | IN | 2026-06-06 | 2026-06-06 | unknown | watch |
 | KEWL | KEWL/ | Keweenaw Land Association | US | 2026-06-06 | 2026-06-06 | optionality | watch |
 | LB | LB/ | LandBridge Company LLC | US | 2026-06-06 | 2026-06-06 | unknown | watch |
+| LMNR | LMNR/ | Limoneira Company | US | — | — | unknown | watch |
 | LSEG | LSEG/ | London Stock Exchange Group | UK | 2026-06-06 | 2026-06-06 | unknown | watch |
 | META | META/ | Meta Platforms Inc | US | 2026-06-06 | 2026-06-06 | unknown | watch |
 | MIAX | MIAX/ | Miami International Holdings | US | 2026-06-06 | 2026-06-06 | unknown | watch |
@@ -63,4 +64,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-06-06.
 | WBI | WBI/ | WaterBridge Infrastructure | US | 2026-06-06 | 2026-06-06 | infrastructure | watch |
 | WPM | WPM/ | Wheaton Precious Metals Corp. | US | 2026-06-06 | 2026-06-06 | unknown | watch |
 
-**56 holdings total.** Registry: `_system/portfolio/registry.json`
+**57 holdings total.** Registry: `_system/portfolio/registry.json`
