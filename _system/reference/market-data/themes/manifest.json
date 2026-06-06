@@ -1,0 +1,131 @@
+{
+  "generated_at": "2026-06-06T22:53:31Z",
+  "as_of": "2026-06-06",
+  "staleness_max_days": 10,
+  "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; never auto-inflate Lawrence base IRR (human review promotes to base).",
+  "themes": {
+    "ai_power_land": {
+      "label": "AI compute -> power demand -> grid/water constraint -> scarce Permian surface",
+      "description": "Demand chain behind land/surface/water optionality (TPL water, LB easements, WBI infra, APLD hosting). Hyperscaler capex is the upstream pulse; power and gas prices and Permian activity are the midstream signals.",
+      "series": {
+        "hyperscaler_capex_ttm_usd_bn": {
+          "label": "Hyperscaler capex guide (USD bn, latest)",
+          "latest": 467.3,
+          "as_of": "2026-06-06",
+          "prior_year": null,
+          "yoy_pct": null,
+          "direction": "flat",
+          "good_for": "land_power_demand",
+          "source": "repo:valuation.json/ai_overlay",
+          "optional": false,
+          "stale": false,
+          "error": null,
+          "note": "Derived from ai_overlay in GOOGL/AMZN/META/MSFT valuation.json; filing-cited",
+          "contributors": [
+            "GOOGL:185",
+            "AMZN:147",
+            "META:135"
+          ]
+        },
+        "henry_hub_gas": {
+          "label": "Henry Hub natural gas spot (USD/MMBtu)",
+          "latest": null,
+          "as_of": null,
+          "prior_year": null,
+          "yoy_pct": null,
+          "direction": "flat",
+          "good_for": "power_cost",
+          "source": "fred:DHHNGSP",
+          "optional": false,
+          "stale": true,
+          "error": "network",
+          "note": null
+        },
+        "electricity_price_us": {
+          "label": "US avg electricity price (cents/kWh)",
+          "latest": null,
+          "as_of": null,
+          "prior_year": null,
+          "yoy_pct": null,
+          "direction": "flat",
+          "good_for": "power_cost",
+          "source": "fred:APU000072610",
+          "optional": false,
+          "stale": true,
+          "error": "network",
+          "note": null
+        },
+        "wti_crude": {
+          "label": "WTI crude (USD/bbl)",
+          "latest": null,
+          "as_of": null,
+          "prior_year": null,
+          "yoy_pct": null,
+          "direction": "flat",
+          "good_for": "permian_cashflow",
+          "source": "fred:DCOILWTICO",
+          "optional": false,
+          "stale": true,
+          "error": "network",
+          "note": null
+        },
+        "permian_crude_production_mbbl_d": {
+          "label": "Permian crude production (kbbl/d)",
+          "latest": null,
+          "as_of": null,
+          "prior_year": null,
+          "yoy_pct": null,
+          "direction": "flat",
+          "good_for": "permian_volume",
+          "source": "eia:petroleum/crd/crpdn",
+          "optional": true,
+          "stale": true,
+          "error": "no_eia_key",
+          "note": "Requires EIA_API_KEY; null when absent"
+        },
+        "ust_10y": {
+          "label": "US Treasury 10Y yield (%)",
+          "latest": null,
+          "as_of": null,
+          "prior_year": null,
+          "yoy_pct": null,
+          "direction": "flat",
+          "good_for": "discount_rate",
+          "source": "fred:DGS10",
+          "optional": false,
+          "stale": true,
+          "error": "network",
+          "note": null
+        },
+        "ust_2y": {
+          "label": "US Treasury 2Y yield (%)",
+          "latest": null,
+          "as_of": null,
+          "prior_year": null,
+          "yoy_pct": null,
+          "direction": "flat",
+          "good_for": "discount_rate",
+          "source": "fred:DGS2",
+          "optional": false,
+          "stale": true,
+          "error": "network",
+          "note": null
+        },
+        "hy_oas": {
+          "label": "High-yield OAS credit spread (%)",
+          "latest": null,
+          "as_of": null,
+          "prior_year": null,
+          "yoy_pct": null,
+          "direction": "flat",
+          "good_for": "risk_regime",
+          "source": "fred:BAMLH0A0HYM2",
+          "optional": false,
+          "stale": true,
+          "error": "network",
+          "note": null
+        }
+      }
+    }
+  }
+}

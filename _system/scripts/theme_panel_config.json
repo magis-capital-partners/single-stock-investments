@@ -1,0 +1,25 @@
+{
+  "description": "Thematic macro/industry indicator panels. Broadly ingested context, consumed narrowly by tagged holdings. Tailwinds inform stance and overlay sizing only; they never auto-inflate Lawrence base IRR (human review promotes to base case).",
+  "staleness_max_days": 10,
+  "sources": {
+    "fred": "https://fred.stlouisfed.org/graph/fredgraph.csv?id={id}",
+    "stooq_daily": "https://stooq.com/q/d/l/?s={symbol}&i=d",
+    "eia": "https://api.eia.gov/v2 (requires EIA_API_KEY; degrades gracefully when absent)"
+  },
+  "themes": {
+    "ai_power_land": {
+      "label": "AI compute -> power demand -> grid/water constraint -> scarce Permian surface",
+      "description": "Demand chain behind land/surface/water optionality (TPL water, LB easements, WBI infra, APLD hosting). Hyperscaler capex is the upstream pulse; power and gas prices and Permian activity are the midstream signals.",
+      "series": [
+        {"id": "hyperscaler_capex_ttm_usd_bn", "label": "Hyperscaler capex guide (USD bn, latest)", "source": "repo_valuation", "good_for": "land_power_demand", "note": "Derived from ai_overlay in GOOGL/AMZN/META/MSFT valuation.json; filing-cited"},
+        {"id": "henry_hub_gas", "label": "Henry Hub natural gas spot (USD/MMBtu)", "source": "fred", "fred_id": "DHHNGSP", "good_for": "power_cost"},
+        {"id": "electricity_price_us", "label": "US avg electricity price (cents/kWh)", "source": "fred", "fred_id": "APU000072610", "good_for": "power_cost"},
+        {"id": "wti_crude", "label": "WTI crude (USD/bbl)", "source": "fred", "fred_id": "DCOILWTICO", "good_for": "permian_cashflow"},
+        {"id": "permian_crude_production_mbbl_d", "label": "Permian crude production (kbbl/d)", "source": "eia", "eia_route": "petroleum/crd/crpdn", "eia_facets": {"duoarea": "RTPP", "product": "EPC0", "process": "FPF"}, "good_for": "permian_volume", "optional": true, "note": "Requires EIA_API_KEY; null when absent"},
+        {"id": "ust_10y", "label": "US Treasury 10Y yield (%)", "source": "fred", "fred_id": "DGS10", "good_for": "discount_rate"},
+        {"id": "ust_2y", "label": "US Treasury 2Y yield (%)", "source": "fred", "fred_id": "DGS2", "good_for": "discount_rate"},
+        {"id": "hy_oas", "label": "High-yield OAS credit spread (%)", "source": "fred", "fred_id": "BAMLH0A0HYM2", "good_for": "risk_regime"}
+      ]
+    }
+  }
+}
