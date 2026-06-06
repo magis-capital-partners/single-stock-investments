@@ -1,6 +1,6 @@
 # LMNR — Investment Thesis
 
-**Last updated:** 2026-06-06
+**Last updated:** auto-sync
 
 ## Classification
 
@@ -11,12 +11,17 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | mid |
-| **MOI bucket** (legacy) | land_water_optionality |
+| **Implied 7yr IRR** (base) | 5.3% (base) |
+| **IRR method** | yield_curve |
+| **Lawrence bucket** | other |
 | **Payoff lens** | asset |
+| **MOI bucket** | pending |
+
+**Deep dive:** `LMNR/research/deep_dive_2026-06-06.md` (auto-sync)
 
 ## One-line thesis
 
-California citrus-and-land platform (~10,500 acres, water rights, Harvest JV) priced near GAAP book; dated development cash and ag transformation offer partial dhando — watch until Sunkist margins and distribution cadence prove out (~5.6% base yield-curve at ~$11.83).
+California citrus-and-land platform (~10,500 acres, water rights, Harvest JV) priced near GAAP book; dated development cash and ag transformation offer partial dhando. Watch until Sunkist margins and distribution cadence prove out (~5.3% base yield-curve at ~$11.83).
 
 ## Key questions
 
