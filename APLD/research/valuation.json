@@ -232,5 +232,113 @@
   "lawrence_horizon_years": 7,
   "evidence_refresh": {
     "synthesis_in_dive": true
+  },
+  "context_overlay": {
+    "as_of": "2026-06-06",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "ai_power_land",
+        "label": "AI compute -> power demand -> grid/water constraint -> scarce Permian surface",
+        "indicators": [
+          {
+            "id": "hyperscaler_capex_ttm_usd_bn",
+            "label": "Hyperscaler capex guide (USD bn, latest)",
+            "latest": 467.3,
+            "as_of": "2026-06-06",
+            "yoy_pct": null,
+            "direction": "flat",
+            "good_for": "land_power_demand",
+            "source": "repo:valuation.json/ai_overlay",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "henry_hub_gas",
+            "label": "Henry Hub natural gas spot (USD/MMBtu)",
+            "latest": null,
+            "as_of": null,
+            "yoy_pct": null,
+            "direction": "flat",
+            "good_for": "power_cost",
+            "source": "fred:DHHNGSP",
+            "stale": true,
+            "in_base_irr": false
+          },
+          {
+            "id": "electricity_price_us",
+            "label": "US avg electricity price (cents/kWh)",
+            "latest": null,
+            "as_of": null,
+            "yoy_pct": null,
+            "direction": "flat",
+            "good_for": "power_cost",
+            "source": "fred:APU000072610",
+            "stale": true,
+            "in_base_irr": false
+          },
+          {
+            "id": "wti_crude",
+            "label": "WTI crude (USD/bbl)",
+            "latest": null,
+            "as_of": null,
+            "yoy_pct": null,
+            "direction": "flat",
+            "good_for": "permian_cashflow",
+            "source": "fred:DCOILWTICO",
+            "stale": true,
+            "in_base_irr": false
+          },
+          {
+            "id": "permian_crude_production_mbbl_d",
+            "label": "Permian crude production (kbbl/d)",
+            "latest": null,
+            "as_of": null,
+            "yoy_pct": null,
+            "direction": "flat",
+            "good_for": "permian_volume",
+            "source": "eia:petroleum/crd/crpdn",
+            "stale": true,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": null,
+            "as_of": null,
+            "yoy_pct": null,
+            "direction": "flat",
+            "good_for": "discount_rate",
+            "source": "fred:DGS10",
+            "stale": true,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": null,
+            "as_of": null,
+            "yoy_pct": null,
+            "direction": "flat",
+            "good_for": "discount_rate",
+            "source": "fred:DGS2",
+            "stale": true,
+            "in_base_irr": false
+          },
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": null,
+            "as_of": null,
+            "yoy_pct": null,
+            "direction": "flat",
+            "good_for": "risk_regime",
+            "source": "fred:BAMLH0A0HYM2",
+            "stale": true,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
   }
 }
