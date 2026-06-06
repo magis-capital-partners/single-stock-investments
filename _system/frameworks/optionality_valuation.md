@@ -229,3 +229,16 @@ Reference this file + external sources in `[PROPOSED MEMORY]` when promoting bel
 ### OTC filing facts
 
 When XBRL/IX tags are absent, `filing_facts.py` uses `parse_otc_prose_metrics()` on full-tier `_text/`. Preserves existing metrics if a new parse is empty.
+
+### Thematic context layer (demand tailwinds)
+
+For names whose optionality is driven by an external demand chain (TPL water / LB easements / WBI infra / APLD hosting on the AI compute -> power -> Permian surface chain), maintain a **context layer** that is broadly ingested but consumed narrowly.
+
+- **Config:** `_system/scripts/theme_panel_config.json` declares indicator series (FRED, Stooq, EIA, repo filings). Hyperscaler capex is derived from each ticker's filing-cited `ai_overlay` in `valuation.json` (no fabricated numbers).
+- **Tags:** `_system/portfolio/holdings_themes.json` maps a theme to the holdings it explains.
+- **Refresh:** `fetch_theme_panel.py` writes `_system/reference/market-data/themes/{id}.csv` + `manifest.json` (offline-safe; cached history kept on network failure). `apply_context_overlay.py` injects a `context_overlay` block into each tagged ticker's `valuation.json` and a `research/evidence/thematic_context_{date}.md` snippet.
+- **Hard rule:** `context_overlay` is **context only**. Every indicator carries `in_base_irr: false`. A tailwind may inform **stance** and **overlay sizing**, but it never auto-inflates Lawrence base IRR. Promotion of any indicator to base case requires a human to set `in_base_irr: true` (preserved across refreshes) under **[HUMAN REVIEW]**.
+- **Report use:** cite the snippet in a `#### Thematic context` table inside **Business & moat** (direction vs prior year, in-base-IRR yes/no). Do not move tailwind value into `inputs.fcf_per_share` or `nav_overlay` marks without filing-backed evidence.
+- **Staleness:** indicators older than the per-series gate are flagged `stale` in the manifest and snippet; treat stale tailwinds as narrative only.
+
+Order: runs after `marvin_valuation.py --write` (so the overlay survives recomputation) in both `marvin_cloud_refresh.py` (tagged tickers) and the daily `download_all_holdings.py` tail.

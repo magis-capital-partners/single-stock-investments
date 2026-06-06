@@ -113,3 +113,14 @@ python _system/scripts/lint_adversarial.py {TICKER}
 - Using **bull AI FCF** as Lawrence **FCF₀** without **[Assumption]** and human review  
 - Skipping **capex trough** discussion when guide doubles YoY  
 - Single blended growth rate as “AI is priced in” with no backlog/margin/chip rows  
+
+---
+
+## Downstream demand chain (AI capex -> power -> land)
+
+Hyperscaler capex is also the **upstream demand pulse** for land / surface / water / hosting names (TPL, LB, WBI, APLD, BWEL). That linkage lives in the **thematic context layer**, not in this overlay:
+
+- `theme_panel_config.json` theme `ai_power_land` aggregates the filing-cited capex guides from GOOGL / AMZN / META / MSFT `ai_overlay` into `hyperscaler_capex_ttm_usd_bn`, alongside power, gas, Permian, rate, and credit indicators.
+- `apply_context_overlay.py` surfaces these to tagged holdings as a `context_overlay` block (see `optionality_valuation.md` § **Thematic context layer**).
+- The capex figure is **derived from `valuation.json`**, so this overlay and the downstream context layer never diverge on the number.
+- Same hard rule applies: tailwinds are **context only** until a human promotes them with **[HUMAN REVIEW]**.
