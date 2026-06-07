@@ -47,6 +47,24 @@ def run_script(label: str, script: str, script_args: list[str], *, optional: boo
     return run(label, [PY, str(path), *script_args], optional=optional)
 
 
+def ticker_has_cik(ticker: str) -> bool:
+    """True when ticker has SEC CIK for Form 4 insider fetch."""
+    try:
+        from insider_signal_common import cik_for_ticker  # noqa: WPS433
+
+        return bool(cik_for_ticker(ticker))
+    except Exception:
+        cfg_path = SCRIPTS / "us_ticker_config.json"
+        if not cfg_path.exists():
+            return False
+        try:
+            cfg = json.loads(cfg_path.read_text(encoding="utf-8"))
+            entry = cfg.get(ticker.upper()) or cfg.get(ticker)
+            return bool(isinstance(entry, dict) and entry.get("cik"))
+        except json.JSONDecodeError:
+            return False
+
+
 def ticker_has_theme_tag(ticker: str) -> bool:
     """True when ticker is tagged to a thematic indicator panel."""
     cfg_path = ROOT / "_system" / "portfolio" / "holdings_themes.json"
@@ -227,6 +245,17 @@ def main() -> int:
         run(
             "peer panels",
             [PY, str(SCRIPTS / "fetch_peer_panel.py")],
+            optional=True,
+        )
+    if ticker_has_cik(ticker):
+        run(
+            "insider Form 4 fetch",
+            [PY, str(SCRIPTS / "fetch_insider_transactions.py"), ticker],
+            optional=True,
+        )
+        run(
+            "insider conviction signal",
+            [PY, str(SCRIPTS / "apply_insider_signal.py"), ticker],
             optional=True,
         )
     run(

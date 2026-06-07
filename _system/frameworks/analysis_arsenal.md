@@ -76,6 +76,7 @@ Legacy `moi_bucket` values map 1:1 → `payoff_lens` (see `moi_lens.md`).
 | Segment cash-flow sum | Multi-segment compounder | `segment_cashflow_valuation.md` |
 | Optionality / NAV overlay | `asset` lens | `optionality_valuation.md` |
 | Mechanical overlay refresh | `evidence_refresh.type` in valuation.json | `optionality_valuation.md` § Mechanical refresh; `marvin_cloud_refresh.py` |
+| Insider conviction (Form 4) | US CIK + `insider_signal` in valuation.json | `optionality_valuation.md` § Insider conviction; `apply_insider_signal.py` |
 | Option treatment ladder | Every dive — scan table | `option_treatment.md` |
 | Equity stub scenarios | `levered` lens | `equity_stub_valuation.md` |
 | External view blend | Approved third party cited | `external_view_blend.md` |

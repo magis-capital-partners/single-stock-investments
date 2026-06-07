@@ -20,6 +20,7 @@ PY = sys.executable
 TICKER_RE = re.compile(r"^([^/]+)/research/")
 
 MECHANICAL_EVIDENCE = re.compile(r"^[^/]+/research/evidence/thematic_context_\d{4}-\d{2}-\d{2}\.md$")
+MECHANICAL_INSIDER = re.compile(r"^[^/]+/research/evidence/insider_signal_\d{4}-\d{2}-\d{2}\.md$")
 MECHANICAL_MI = re.compile(r"^[^/]+/research/market_inputs\.json$")
 
 sys.path.insert(0, str(SCRIPTS))
@@ -82,6 +83,28 @@ def valuation_overlay_only_diff(ticker: str, base: str) -> bool:
     return old.get("context_overlay") != new.get("context_overlay")
 
 
+def valuation_insider_only_diff(ticker: str, base: str) -> bool:
+    vp = f"{ticker}/research/valuation.json"
+    r2 = subprocess.run(
+        ["git", "show", f"{base}:{vp}"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+    if r2.returncode != 0:
+        return False
+    try:
+        old = json.loads(r2.stdout)
+        new = json.loads((ROOT / ticker / "research" / "valuation.json").read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return False
+    forbidden = ("inputs", "scenarios", "implied_return", "results", "segment_build", "nav_overlay")
+    for key in forbidden:
+        if old.get(key) != new.get(key):
+            return False
+    return old.get("insider_signal") != new.get("insider_signal")
+
+
 def research_diff_kind(ticker: str, paths: list[str], base: str) -> str:
     """Per ticker: mechanical_only | narrative | mixed."""
     tk_paths = [p for p in paths if p.startswith(f"{ticker}/research/")]
@@ -90,10 +113,10 @@ def research_diff_kind(ticker: str, paths: list[str], base: str) -> str:
     non_mechanical = []
     for p in tk_paths:
         if p.endswith("/research/valuation.json"):
-            if not valuation_overlay_only_diff(ticker, base):
+            if not (valuation_overlay_only_diff(ticker, base) or valuation_insider_only_diff(ticker, base)):
                 non_mechanical.append(p)
             continue
-        if MECHANICAL_EVIDENCE.match(p) or MECHANICAL_MI.match(p):
+        if MECHANICAL_EVIDENCE.match(p) or MECHANICAL_INSIDER.match(p) or MECHANICAL_MI.match(p):
             continue
         if "/research/evidence/filing_facts_" in p and p.endswith(".json"):
             continue
@@ -101,7 +124,7 @@ def research_diff_kind(ticker: str, paths: list[str], base: str) -> str:
     if not non_mechanical:
         return "mechanical_only"
     val_only = all(p.endswith("/research/valuation.json") for p in non_mechanical)
-    if val_only and valuation_overlay_only_diff(ticker, base):
+    if val_only and (valuation_overlay_only_diff(ticker, base) or valuation_insider_only_diff(ticker, base)):
         return "mechanical_only"
     if any(p.endswith(".md") for p in non_mechanical):
         return "mixed" if any(not p.endswith(".md") for p in non_mechanical) else "narrative"
@@ -130,12 +153,27 @@ def main() -> int:
         kind = research_diff_kind(ticker, paths, args.base)
         print(f"\n=== lint {ticker} ({kind}) ===")
         if kind == "mechanical_only":
-            r = subprocess.run(
-                [PY, str(SCRIPTS / "lint_context_overlay.py"), ticker],
-                cwd=ROOT,
-            )
-            if r.returncode != 0:
-                failed += 1
+            val_path = ROOT / ticker / "research" / "valuation.json"
+            val: dict = {}
+            if val_path.exists():
+                try:
+                    val = json.loads(val_path.read_text(encoding="utf-8"))
+                except json.JSONDecodeError:
+                    val = {}
+            if val.get("context_overlay"):
+                r = subprocess.run(
+                    [PY, str(SCRIPTS / "lint_context_overlay.py"), ticker],
+                    cwd=ROOT,
+                )
+                if r.returncode != 0:
+                    failed += 1
+            if val.get("insider_signal"):
+                r = subprocess.run(
+                    [PY, str(SCRIPTS / "lint_insider_signal.py"), ticker],
+                    cwd=ROOT,
+                )
+                if r.returncode != 0:
+                    failed += 1
             continue
         for script, extra in (
             ("lint_deep_dive.py", ["--milly"]),

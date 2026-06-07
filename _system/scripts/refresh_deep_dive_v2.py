@@ -803,6 +803,7 @@ def segment_build_section(val: dict, preserved: str | None) -> str:
 SEGMENT_MAP_HEADING = "#### Segment map (filings)"
 AI_INFRA_HEADING = "#### AI infrastructure — what the valuation captures vs gaps"
 THEMATIC_CONTEXT_HEADING = "#### Thematic context"
+INSIDER_CONVICTION_HEADING = "#### Insider conviction"
 
 
 def extract_thematic_narrative(source: str | None) -> str | None:
@@ -820,6 +821,68 @@ def extract_thematic_narrative(source: str | None) -> str | None:
             return None
         return text
     return None
+
+
+def extract_insider_narrative(source: str | None) -> str | None:
+    """Keep Marvin narrative prose between heading and disclaimer/table on refresh."""
+    if not source:
+        return None
+    pat = re.compile(
+        rf"{re.escape(INSIDER_CONVICTION_HEADING)}\s*\n+(.*?)(?=\n> |\n\| Insider|\n\|[- ]|#### |### |\n## |\Z)",
+        re.DOTALL | re.IGNORECASE,
+    )
+    m = pat.search(source)
+    if m and len(m.group(1).strip()) > 40:
+        text = m.group(1).strip()
+        if text.startswith("> "):
+            return None
+        return text
+    return None
+
+
+def insider_conviction_business_block(val: dict, body: str | None) -> str:
+    """Business-section insider conviction from valuation.json insider_signal."""
+    sig = val.get("insider_signal") or {}
+    if not sig or sig.get("ics") is None:
+        return ""
+    narrative = extract_insider_narrative(body)
+    tilt = (sig.get("scenario_confidence") or {}).get("tilted") or {}
+    priors = (sig.get("scenario_confidence") or {}).get("priors") or {}
+    lines = [INSIDER_CONVICTION_HEADING, ""]
+    if narrative:
+        lines.append(narrative)
+        lines.append("")
+    lines.append(f"> {sig.get('disclaimer', 'Context only. Not in Lawrence base IRR.')}")
+    lines += [
+        "",
+        f"**Insider Conviction Score (ICS):** {sig.get('ics')} ({sig.get('band')}) · "
+        f"**Bull case support:** {sig.get('bull_case_support', 'none')} · "
+        f"**In base IRR:** {'yes [HUMAN REVIEW]' if sig.get('in_base_irr') else 'no (context)'}",
+        "",
+        "| Scenario | Prior weight | Tilted weight |",
+        "|----------|--------------|---------------|",
+    ]
+    for key in ("bear", "base", "bull"):
+        p = priors.get(key)
+        t = tilt.get(key)
+        ps = f"{100 * float(p):.0f}%" if isinstance(p, (int, float)) else "n/a"
+        ts = f"{100 * float(t):.0f}%" if isinstance(t, (int, float)) else "n/a"
+        lines.append(f"| {key.title()} | {ps} | {ts} |")
+    lines += [
+        "",
+        "| Insider | Date | Shares | Price | Value |",
+        "|---------|------|--------|-------|-------|",
+    ]
+    for row in sig.get("top_buys") or []:
+        lines.append(
+            f"| {row.get('insider', '')} | {row.get('date', '')} | "
+            f"{row.get('shares', '')} | ${row.get('price', '')} | ${row.get('value_usd', '')} |"
+        )
+    hooks = sig.get("narrative_hooks") or []
+    if hooks:
+        lines += ["", "**Hooks:** " + "; ".join(hooks)]
+    lines.append("")
+    return "\n".join(lines)
 
 
 def thematic_context_business_block(val: dict, body: str | None) -> str:
@@ -1319,6 +1382,23 @@ def enrich_business_moat(body: str, val: dict, ticker: str, preserved: str | Non
             body = re.sub(
                 r"#### Thematic context.*?(?=\n#### |\n### |\n\*\*Upside / downside|\n## |\Z)",
                 thematic.rstrip() + "\n",
+                body,
+                count=1,
+                flags=re.DOTALL | re.IGNORECASE,
+            )
+    if val.get("insider_signal", {}).get("ics") is not None:
+        insider = insider_conviction_business_block(val, body)
+        if insider and not re.search(r"#### Insider conviction\b", body, re.I):
+            if "#### Thesis pillars" in body:
+                body = inject_before_marker(body, "#### Thesis pillars", insider)
+            elif "**Disruption" in body:
+                body = inject_before_marker(body, "**Disruption", insider)
+            else:
+                body = body.rstrip() + "\n\n" + insider
+        elif insider and re.search(r"#### Insider conviction\b", body, re.I):
+            body = re.sub(
+                r"#### Insider conviction.*?(?=\n#### |\n### |\n\*\*Upside / downside|\n## |\Z)",
+                insider.rstrip() + "\n",
                 body,
                 count=1,
                 flags=re.DOTALL | re.IGNORECASE,

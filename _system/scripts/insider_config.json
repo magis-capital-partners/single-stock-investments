@@ -1,0 +1,49 @@
+{
+  "description": "Insider Conviction Score (ICS) weights. Context only; never auto-inflates Lawrence base IRR.",
+  "window_days": 365,
+  "recency_half_life_days": 120,
+  "recency_floor": 0.45,
+  "sale_negative_cap": 1.0,
+  "cluster_window_days": 14,
+  "cluster_bonus_2_insiders": 0.4,
+  "cluster_bonus_3_events": 0.6,
+  "transaction_weights": {
+    "P": 1.0,
+    "buy_A": 1.0,
+    "S": -0.25,
+    "sell_D": -0.25,
+    "planned_sale": -0.05,
+    "grant": 0.05,
+    "exercise": 0.05,
+    "other": 0.1
+  },
+  "role_weights": {
+    "chair": 1.15,
+    "director": 1.0,
+    "independent_director": 1.1,
+    "officer_buy": 0.9,
+    "officer_sell": 0.3,
+    "ceo": 1.1,
+    "cfo": 0.85,
+    "ten_pct_owner": 1.3,
+    "other": 0.8
+  },
+  "scenario_priors": {
+    "bear": 0.2,
+    "base": 0.55,
+    "bull": 0.25
+  },
+  "scenario_tilt": {
+    "bull_per_ics_point_above_4": 0.025,
+    "bull_cap": 0.15,
+    "bear_per_ics_point_below_4": 0.02,
+    "bear_cap": 0.1
+  },
+  "ics_bands": [
+    {"max": 2, "label": "negligible"},
+    {"max": 4, "label": "weak"},
+    {"max": 6, "label": "moderate"},
+    {"max": 8, "label": "strong"},
+    {"max": 10, "label": "exceptional"}
+  ]
+}

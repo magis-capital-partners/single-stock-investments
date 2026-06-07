@@ -38,6 +38,7 @@ Read `{TICKER}/research/valuation.json` **before** opening optional frameworks. 
 | `book_estimate_config.json` exists | `current_book_estimate.md` | `current_book_estimate.py --write` |
 | HK index ticker (TPL, ICE, MSB, SJT) | `hk_cross_reference.md` | `scan_third_party_sources --with-hk` |
 | Every listed ticker | `third_party_cross_reference.md` | `fill_cross_check` + `check_cross_checks` |
+| `insider_signal` (US CIK ticker) | `optionality_valuation.md` § Insider conviction | `fetch_insider_transactions` + `apply_insider_signal` in cloud refresh |
 
 **Do not** read the full `analysis_arsenal.md` unless onboarding or resolving a missing trigger.
 
