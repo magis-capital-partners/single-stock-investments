@@ -11,13 +11,13 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | mid |
-| **Implied 7yr IRR** (base) | -5.5% (total synthesis) |
+| **Implied 7yr IRR** (base) | -6.28% (total synthesis) |
 | **IRR method** | full |
 | **Lawrence bucket** | other |
 | **Payoff lens** | asset |
 | **MOI bucket** | dormant_asset |
 
-**Deep dive:** `AZLCZ/research/deep_dive_2026-06-05.md` (auto-sync)
+**Deep dive:** `AZLCZ/research/deep_dive_2026-06-07.md` (auto-sync)
 
 ## One-line thesis
 
