@@ -1,6 +1,6 @@
 {
-  "as_of": "2026-06-05",
-  "production_spec": "v1",
+  "as_of": "2026-06-07",
+  "production_spec": "v5",
   "leaderboard": [
     {
       "spec": "v1",
@@ -8,7 +8,8 @@
       "revenue_oos_r2": -0.0116,
       "perf_fee_h2_oos_rmse": 10307.2,
       "perf_fee_h2_oos_r2": -14.2489,
-      "production_default": true
+      "production_default": false,
+      "note": null
     },
     {
       "spec": "v2",
@@ -35,7 +36,25 @@
       "perf_fee_h2_oos_rmse": 10307.2,
       "perf_fee_h2_oos_r2": -14.2489,
       "production_default": false,
-      "note": "P4 mandate NAV scrape"
+      "note": "P4 mandate NAV scrape (macro weighted)"
+    },
+    {
+      "spec": "v3b",
+      "revenue_oos_rmse": 19410.8,
+      "revenue_oos_r2": -19.2712,
+      "perf_fee_h2_oos_rmse": 41025.1,
+      "perf_fee_h2_oos_r2": -240.5777,
+      "production_default": false,
+      "note": "Summable fund-level perf (P4 detail)"
+    },
+    {
+      "spec": "v5",
+      "revenue_oos_rmse": 5626.6,
+      "revenue_oos_r2": -0.7033,
+      "perf_fee_h2_oos_rmse": 10094.3,
+      "perf_fee_h2_oos_r2": -13.6254,
+      "production_default": true,
+      "note": "v3b + march + split base + AUM roll-forward"
     }
   ],
   "acceptance_rule": "Reject spec if perf_fee_h2_oos_rmse worsens vs prior"

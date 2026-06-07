@@ -205,6 +205,9 @@ def merge_acquired(fin: pd.DataFrame) -> pd.DataFrame:
         ("comp_bridge_halfyear.csv", ["opex_sga_jpy_million", "incremental_margin"]),
         ("march_window_halfyear.csv", ["march_nikkei_ret", "march_value_ret", "march_blended_ret"]),
         ("mandate_nav_halfyear.csv", ["mandate_weighted_excess", "mandate_weighted_return", "mandate_count"]),
+        ("aum_rollforward_halfyear.csv", ["aum_end_nowcast_jpym", "aum_avg_nowcast_jpym"]),
+        ("perf_eligible_aum_halfyear.csv", ["perf_eligible_aum_jpym"]),
+        ("other_revenue_halfyear.csv", ["other_revenue_jpym"]),
     ]
     for fname, cols in merges:
         path = data_dir / fname

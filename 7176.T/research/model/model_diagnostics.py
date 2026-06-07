@@ -24,23 +24,28 @@ from model import (  # noqa: E402
     AUM_PROXY_PRE2023,
     _aum_proxy,
     _fit_reduced,
+    _predict_revenue_row,
     driver_return,
     effective_excess_ret,
     enrich,
     fit_base_rate,
+    fit_base_split,
     fit_bridge,
     fit_perf,
     fit_perf_v2,
     fit_perf_v3a,
+    fit_perf_v3b,
     fit_perf_v4,
     predict_base,
     predict_earnings,
     predict_perf,
     predict_perf_v2,
     predict_perf_v3a,
+    predict_perf_v3b_series,
     predict_perf_v4,
     walk_forward,
 )
+from perf_engine import fit_split_base_rates, predict_perf_v3b  # noqa: E402
 
 
 def compute_r2(actual: np.ndarray, fitted: np.ndarray) -> float:
@@ -170,6 +175,12 @@ def walk_forward_target(
 
 
 def _predict_perf_oos(train: pd.DataFrame, test: pd.Series, spec: str = "v1") -> float:
+    if spec == "v3b":
+        params = fit_perf_v3b(train, use_march=False)
+        return float(predict_perf_v3b_series(test.to_frame().T, params).iloc[0])
+    if spec == "v5":
+        params = fit_perf_v3b(train, use_march=True)
+        return float(predict_perf_v3b_series(test.to_frame().T, params).iloc[0])
     if spec == "v4":
         params, _ = fit_perf_v4(train)
         return float(predict_perf_v4(test.to_frame().T, params).iloc[0])
@@ -188,27 +199,26 @@ def _predict_base_oos(train: pd.DataFrame, test: pd.Series) -> float:
     return float(predict_base(test.to_frame().T, rate).iloc[0])
 
 
-def _predict_revenue_oos(train: pd.DataFrame, test: pd.Series, use_v2: bool = False) -> float:
-    base_floor, ks = _fit_reduced(train)
-    k = ks.get(test["half"], np.nan)
-    if np.isnan(k):
-        return float("nan")
-    excess = effective_excess_ret(test) if use_v2 else max(0.0, float(test["nikkei_ret"]))
-    drive = _aum_proxy(test) * excess
-    return float(base_floor + k * drive)
+def _predict_revenue_oos(train: pd.DataFrame, test: pd.Series, spec: str = "v1") -> float:
+    base_floor, params = _fit_reduced(train, spec=spec)
+    rate, _ = fit_base_rate(train) if spec == "v5" else (None, None)
+    split_rates = fit_split_base_rates(train) if spec == "v5" else None
+    return _predict_revenue_row(test, train, spec, base_floor, params, rate, split_rates)
 
 
 def _predict_ordinary_oos(train: pd.DataFrame, test: pd.Series) -> float:
     bridge = fit_bridge(train)
-    rev_hat = _predict_revenue_oos(train, test, use_v2=False)
-    ordn, _ = predict_earnings(rev_hat, bridge)
+    rev_hat = _predict_revenue_oos(train, test, spec="v1")
+    perf_hat = _predict_perf_oos(train, test, "v1")
+    ordn, _ = predict_earnings(rev_hat, bridge, perf_hat)
     return float(ordn)
 
 
 def _predict_ni_oos(train: pd.DataFrame, test: pd.Series) -> float:
     bridge = fit_bridge(train)
-    rev_hat = _predict_revenue_oos(train, test, use_v2=False)
-    _, ni = predict_earnings(rev_hat, bridge)
+    rev_hat = _predict_revenue_oos(train, test, spec="v1")
+    perf_hat = _predict_perf_oos(train, test, "v1")
+    _, ni = predict_earnings(rev_hat, bridge, perf_hat)
     return float(ni)
 
 
@@ -338,11 +348,22 @@ def build_tornado(df: pd.DataFrame, bridge: dict, rate: float, perf_params: dict
 
 
 def spec_leaderboard(df: pd.DataFrame) -> list[dict]:
-    """Compare v1 vs v2 vs v3a vs v4 on revenue and perf_fee H2 OOS."""
-    wf_v1 = walk_forward(df, use_v2=False)
-    wf_v2 = walk_forward(df, use_v2=True)
-    wf_v3a = walk_forward(df, use_v3a=True)
-    wf_v4 = walk_forward(df, use_v4=True)
+    """Compare v1–v5 on revenue and perf_fee H2 OOS."""
+    specs = [
+        ("v1", dict()),
+        ("v2", dict(use_v2=True)),
+        ("v3a", dict(use_v3a=True)),
+        ("v4", dict(use_v4=True)),
+        ("v3b", dict(use_v3b=True)),
+        ("v5", dict(use_v5=True)),
+    ]
+    wf_rev = {name: walk_forward(df, **kw) for name, kw in specs}
+    wf_perf = {
+        name: walk_forward_target(
+            df, "perf_fee_m", (lambda s: (lambda tr, te: _predict_perf_oos(tr, te, s)))(name)
+        )
+        for name, _ in specs
+    }
 
     def _oos_rmse_r2(wf: pd.DataFrame, filt=None) -> tuple[float, float]:
         if not len(wf):
@@ -357,17 +378,6 @@ def spec_leaderboard(df: pd.DataFrame) -> list[dict]:
         r2 = compute_r2(w["actual"].values, w[pred_col].values)
         return round(rmse, 1), round(r2, 4) if np.isfinite(r2) else None
 
-    rev_v1_rmse, rev_v1_r2 = _oos_rmse_r2(wf_v1)
-    rev_v2_rmse, rev_v2_r2 = _oos_rmse_r2(wf_v2)
-
-    rev_v3a_rmse, rev_v3a_r2 = _oos_rmse_r2(wf_v3a)
-    rev_v4_rmse, rev_v4_r2 = _oos_rmse_r2(wf_v4)
-
-    wf_perf_v1 = walk_forward_target(df, "perf_fee_m", lambda tr, te: _predict_perf_oos(tr, te, "v1"))
-    wf_perf_v2 = walk_forward_target(df, "perf_fee_m", lambda tr, te: _predict_perf_oos(tr, te, "v2"))
-    wf_perf_v3a = walk_forward_target(df, "perf_fee_m", lambda tr, te: _predict_perf_oos(tr, te, "v3a"))
-    wf_perf_v4 = walk_forward_target(df, "perf_fee_m", lambda tr, te: _predict_perf_oos(tr, te, "v4"))
-
     def _comp_wf(wf: pd.DataFrame, h2_only: bool) -> tuple[float, float]:
         if not len(wf):
             return float("nan"), float("nan")
@@ -380,34 +390,38 @@ def spec_leaderboard(df: pd.DataFrame) -> list[dict]:
         r2 = compute_r2(w["actual"].values, w["fitted"].values)
         return round(rmse, 1), round(r2, 4) if np.isfinite(r2) else None
 
-    p1_rmse, p1_r2 = _comp_wf(wf_perf_v1, True)
-    p2_rmse, p2_r2 = _comp_wf(wf_perf_v2, True)
-    p3_rmse, p3_r2 = _comp_wf(wf_perf_v3a, True)
-    p4_rmse, p4_r2 = _comp_wf(wf_perf_v4, True)
+    entries = []
+    for name, _ in specs:
+        rev_rmse, rev_r2 = _oos_rmse_r2(wf_rev[name])
+        p_rmse, p_r2 = _comp_wf(wf_perf[name], True)
+        note = None
+        if name == "v2":
+            note = "v2 worse on revenue OOS RMSE"
+        elif name == "v3a":
+            note = "March Jan-Mar window on H2"
+        elif name == "v4":
+            note = "P4 mandate NAV scrape (macro weighted)"
+        elif name == "v3b":
+            note = "Summable fund-level perf (P4 detail)"
+        elif name == "v5":
+            note = "v3b + march + split base + AUM roll-forward"
+        entries.append(dict(
+            spec=name,
+            revenue_oos_rmse=rev_rmse,
+            revenue_oos_r2=rev_r2,
+            perf_fee_h2_oos_rmse=p_rmse,
+            perf_fee_h2_oos_r2=p_r2,
+            production_default=False,
+            note=note,
+        ))
 
-    entries = [
-        dict(spec="v1", revenue_oos_rmse=rev_v1_rmse, revenue_oos_r2=rev_v1_r2,
-             perf_fee_h2_oos_rmse=p1_rmse, perf_fee_h2_oos_r2=p1_r2, production_default=False),
-        dict(spec="v2", revenue_oos_rmse=rev_v2_rmse, revenue_oos_r2=rev_v2_r2,
-             perf_fee_h2_oos_rmse=p2_rmse, perf_fee_h2_oos_r2=p2_r2, production_default=False,
-             note="v2 worse on revenue OOS RMSE"),
-        dict(spec="v3a", revenue_oos_rmse=rev_v3a_rmse, revenue_oos_r2=rev_v3a_r2,
-             perf_fee_h2_oos_rmse=p3_rmse, perf_fee_h2_oos_r2=p3_r2, production_default=False,
-             note="March Jan-Mar window on H2"),
-        dict(spec="v4", revenue_oos_rmse=rev_v4_rmse, revenue_oos_r2=rev_v4_r2,
-             perf_fee_h2_oos_rmse=p4_rmse, perf_fee_h2_oos_r2=p4_r2, production_default=False,
-             note="P4 mandate NAV scrape"),
-    ]
-    baseline_perf = p1_rmse
+    baseline_perf = entries[0]["perf_fee_h2_oos_rmse"]
     eligible = [
         e for e in entries
         if e["perf_fee_h2_oos_rmse"] == e["perf_fee_h2_oos_rmse"]
-        and e["perf_fee_h2_oos_rmse"] <= baseline_perf
+        and (not np.isfinite(baseline_perf) or e["perf_fee_h2_oos_rmse"] <= baseline_perf)
     ]
-    if eligible:
-        winner = min(eligible, key=lambda e: e["perf_fee_h2_oos_rmse"])
-    else:
-        winner = entries[0]
+    winner = min(eligible, key=lambda e: e["perf_fee_h2_oos_rmse"]) if eligible else entries[0]
     for e in entries:
         e["production_default"] = e["spec"] == winner["spec"]
     return entries
@@ -484,11 +498,14 @@ def run_diagnostics(df: pd.DataFrame | None = None) -> dict:
     perf_params_v2, _ = fit_perf_v2(df)
     bridge = fit_bridge(df)
 
+    slope_rev = bridge.get("ord_slope_rev", bridge.get("ord_slope", 0.579))
     df["base_hat_m"] = predict_base(df, rate)
     df["perf_hat_m"] = predict_perf(df, perf_params)
     df["perf_hat_v2_m"] = predict_perf_v2(df, perf_params_v2)
     df["rev_hat_m"] = df["base_hat_m"].fillna(0) + df["perf_hat_m"].fillna(0) + OTHER_REV_M
-    df["ordinary_hat_m"] = bridge["ord_intercept"] + bridge["ord_slope"] * df["rev_hat_m"]
+    df["ordinary_hat_m"] = bridge["ord_intercept"] + slope_rev * df["rev_hat_m"]
+    if bridge.get("bridge_type") == "variable_comp":
+        df["ordinary_hat_m"] += bridge.get("ord_slope_perf", 0) * df["perf_hat_m"].fillna(0)
     df["net_income_hat_m"] = df["ordinary_hat_m"] * (1.0 - bridge["tax_rate"])
 
     # Walk-forward panels

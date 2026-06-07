@@ -35,10 +35,14 @@ def load_params():
     v2 = res.get("perf_fee_model_v2", {})
     kH1_v2 = v2.get("k_H1")
     kH2_v2 = v2.get("k_H2")
+    v5 = res.get("perf_fee_model_v5", {})
+    k_scale_v5 = v5.get("k_scale", 1.0)
+    split_rates = v5.get("split_base_rates", {})
     bridge = res["earnings_bridge"]
+    production_spec = res.get("production_spec", "v1")
     aum0 = res["latest_anchor"]["aum_end_jpym"]
     anchor_date = res["latest_anchor"]["period_end"]
-    return rate, {"H1": kH1, "H2": kH2}, {"H1": kH1_v2, "H2": kH2_v2}, bridge, aum0, anchor_date
+    return rate, {"H1": kH1, "H2": kH2}, {"H1": kH1_v2, "H2": kH2_v2}, bridge, aum0, anchor_date, production_spec, k_scale_v5, split_rates
 
 
 def current_half(today: dt.date):
@@ -118,7 +122,7 @@ def main() -> None:
     if args.half:
         half = args.half
 
-    rate, ks, ks_v2, bridge, aum0, anchor_date = load_params()
+    rate, ks, ks_v2, bridge, aum0, anchor_date, production_spec, k_scale_v5, split_rates = load_params()
     try:
         rets = market_returns(hs, min(today, he))
     except Exception as exc:
@@ -131,12 +135,14 @@ def main() -> None:
     etf_aum, etf_aum_date = etf_aum_now(today)
     flow_ytd = etf_flows_ytd(hs, today)
 
+    panel = pd.read_csv(OUT / "panel_halfyear.csv", parse_dates=["period_end"])
+    latest = panel.dropna(subset=["aum_end_jpym"]).iloc[-1]
+
     # AUM mark: filing anchor + market move + optional flow overlay
     if etf_aum is not None:
         # Scale non-ETF AUM by Nikkei; add live ETF AUM from registry tickers
-        panel = pd.read_csv(OUT / "panel_halfyear.csv", parse_dates=["period_end"])
-        latest = panel.dropna(subset=["aum_end_jpym", "aum_etf_jpym"]).iloc[-1]
-        non_etf = float(latest["aum_end_jpym"] - latest["aum_etf_jpym"])
+        latest_etf = panel.dropna(subset=["aum_end_jpym", "aum_etf_jpym"]).iloc[-1]
+        non_etf = float(latest_etf["aum_end_jpym"] - latest_etf["aum_etf_jpym"])
         avg_aum = non_etf * (1 + nik_ret / 2) + etf_aum
         aum_source = f"etf_nav_filing_anchor ({etf_aum_date}) + non-ETF MTM"
     else:
@@ -148,6 +154,11 @@ def main() -> None:
         aum_source += f"; +ETF flow YTD ¥{flow_ytd:.0f}m"
 
     base_hat = rate / 2.0 * avg_aum
+    if production_spec == "v5" and split_rates:
+        nl = float(latest["aum_nonlisted_jpym"]) if pd.notna(latest.get("aum_nonlisted_jpym")) else avg_aum * 0.81
+        etf = float(latest["aum_etf_jpym"]) if pd.notna(latest.get("aum_etf_jpym")) else avg_aum * 0.19
+        base_hat = split_rates.get("rate_nonlisted_ann", rate) / 2 * nl + split_rates.get("rate_etf_ann", rate) / 2 * etf
+
     k = ks.get(half) or 0.0
     k_v2 = ks_v2.get(half) or k
     perf_hat = k * avg_aum * max(0.0, nik_ret)
@@ -155,9 +166,11 @@ def main() -> None:
     other = 200.0
     rev_hat = base_hat + perf_hat + other
     rev_hat_v2 = base_hat + perf_hat_v2 + other
-    ordinary = bridge["ord_intercept"] + bridge["ord_slope"] * rev_hat
+    slope = bridge.get("ord_slope_rev", bridge.get("ord_slope", 0.579))
+    perf_slope = bridge.get("ord_slope_perf", 0.0)
+    ordinary = bridge["ord_intercept"] + slope * rev_hat + perf_slope * perf_hat
     ni = ordinary * (1 - bridge["tax_rate"])
-    ordinary_v2 = bridge["ord_intercept"] + bridge["ord_slope"] * rev_hat_v2
+    ordinary_v2 = bridge["ord_intercept"] + slope * rev_hat_v2 + perf_slope * perf_hat_v2
     ni_v2 = ordinary_v2 * (1 - bridge["tax_rate"])
 
     out = dict(
@@ -172,9 +185,14 @@ def main() -> None:
             revenue=round(rev_hat), ordinary_profit=round(ordinary),
             net_income=round(ni),
         ),
+        production_spec=production_spec,
         nowcast_v2_jpym=dict(
             perf_fee=round(perf_hat_v2), revenue=round(rev_hat_v2),
             ordinary_profit=round(ordinary_v2), net_income=round(ni_v2),
+        ),
+        nowcast_v5_jpym=dict(
+            k_scale=k_scale_v5,
+            note="Live v5 uses v1 perf proxy until mandate detail refreshed for current half",
         ),
         caveats=[
             "Perf fee crystallizes near fiscal year-end (Mar); H1 nowcast of perf is low-confidence.",
