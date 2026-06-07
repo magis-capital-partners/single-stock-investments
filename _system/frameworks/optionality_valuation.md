@@ -242,3 +242,16 @@ For names whose optionality is driven by an external demand chain (TPL water / L
 - **Staleness:** indicators older than the per-series gate are flagged `stale` in the manifest and snippet; treat stale tailwinds as narrative only.
 
 Order: runs after `marvin_valuation.py --write` (so the overlay survives recomputation) in both `marvin_cloud_refresh.py` (tagged tickers) and the daily `download_all_holdings.py` tail.
+
+### Insider conviction layer (Form 4 cluster)
+
+For US-listed holdings with CIK, maintain an **insider conviction** context block that tilts **scenario confidence** toward the bull case when qualified insiders buy on the open market. This is a qualitative corroboration layer for optionality names (water/land, holdco stakes, dated catalysts), not a second IRR engine.
+
+- **Config:** `_system/scripts/insider_config.json` (ICS weights, scenario priors/tilt caps) + `_system/scripts/insider_domain_map.json` (ticker-specific domain multipliers, e.g. water-law expert on LMNR).
+- **Refresh:** `fetch_insider_transactions.py` writes `_system/reference/market-data/insider/{TICKER}_transactions.csv` + `manifest.json` from SEC Form 4 submissions. `apply_insider_signal.py` injects `insider_signal` into `valuation.json` and `research/evidence/insider_signal_{date}.md`.
+- **Hard rule:** `insider_signal.in_base_irr` stays **false**. ICS and `scenario_confidence.tilted` weights inform **stance discussion** and bull-scenario attention; they never auto-inflate Lawrence base IRR or `scenarios.bull.payoff`. Promotion requires **[HUMAN REVIEW]** (`promote_bull_weight`, optional `synthesis.qualitative_pp`).
+- **Report use:** cite the snippet in **`#### Insider conviction`** inside **Business & moat** (ICS band, tilted scenario weights, top open-market buys). Pair with domain narrative when `bull_case_support` is `strong` or `exceptional`. Do **not** add ICS to the assumption ledger or IRR arithmetic.
+- **Routine sales:** CFO 10b5-1 dribble sales score as low-weight noise, not a bearish thesis driver.
+- **Quantification doc:** `_system/reviews/pending/insider_signal_quantification_2026-06-07.md` (Marvin recommendations).
+
+Order: runs after `marvin_valuation.py --write` for US CIK tickers in `marvin_cloud_refresh.py` and `download_all_holdings.py`.

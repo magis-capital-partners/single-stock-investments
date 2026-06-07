@@ -122,6 +122,8 @@ def main() -> None:
     run([PY, str(SCRIPTS / "apply_context_overlay.py")], "Apply thematic context overlay")
     run([PY, str(SCRIPTS / "fetch_ls_microstructure.py")], "L/S microstructure context")
     run([PY, str(SCRIPTS / "fetch_peer_panel.py")], "Peer comparison panels")
+    run([PY, str(SCRIPTS / "fetch_insider_transactions.py")], "Insider Form 4 transactions")
+    run([PY, str(SCRIPTS / "apply_insider_signal.py")], "Insider conviction overlay")
 
     run([PY, str(SCRIPTS / "build_folder_indexes.py")], "Build INDEX.csv files")
     run([PY, str(SCRIPTS / "sync_portfolio_from_registry.py")], "Sync portfolio from registry")
