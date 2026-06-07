@@ -149,6 +149,13 @@ def fetch_market() -> pd.DataFrame:
         h = yf.Ticker(tk).history(start="2019-09-01", interval="1d", auto_adjust=True)
         if len(h):
             frames[name] = h["Close"].rename(name)
+    if not frames:
+        cache = OUT / "market_monthly.csv"
+        if cache.exists():
+            print("[warn] yfinance empty; reusing market_monthly.csv")
+            m = pd.read_csv(cache, index_col=0, parse_dates=True)
+            return m
+        return pd.DataFrame()
     m = pd.concat(frames.values(), axis=1)
     m.index = pd.to_datetime(m.index).tz_localize(None)
     return m

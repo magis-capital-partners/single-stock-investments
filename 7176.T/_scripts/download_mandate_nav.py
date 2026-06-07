@@ -149,11 +149,24 @@ def scrape_sam_funds(sess: requests.Session, catalog: dict) -> list[dict]:
 def etf_monthly_history(ticker: str, start: str = "2015-01-01") -> pd.DataFrame:
     import yfinance as yf
 
-    hist = yf.Ticker(ticker).history(start=start, interval="1d", auto_adjust=True)
+    hist = pd.DataFrame()
+    try:
+        hist = yf.Ticker(ticker).history(start=start, interval="1d", auto_adjust=True)
+    except Exception as exc:
+        print(f"[warn] {ticker}: {exc}")
+    if hist.empty:
+        nav_path = DATA / "etf_nav_daily.csv"
+        if nav_path.exists():
+            cached = pd.read_csv(nav_path, parse_dates=["date"])
+            sub = cached.loc[cached["ticker"] == ticker, ["date", "nav_jpy"]].copy()
+            if not sub.empty:
+                print(f"[warn] {ticker}: reusing cached etf_nav_daily.csv")
+                hist = sub.set_index("date").rename(columns={"nav_jpy": "Close"})
     if hist.empty:
         return pd.DataFrame()
     hist = hist.reset_index()
-    hist["month"] = hist["Date"].dt.to_period("M")
+    date_col = "Date" if "Date" in hist.columns else "date"
+    hist["month"] = pd.to_datetime(hist[date_col]).dt.to_period("M")
     monthly = hist.groupby("month").agg(
         nav_jpy=("Close", "last"),
         month_start=("Close", "first"),
@@ -238,7 +251,7 @@ def import_touki_nav(catalog: dict) -> list[dict]:
                 "perf_rate": fund.get("perf_rate"),
                 "high_water_mark_jpy": r.get("high_water_mark_jpy"),
                 "source": "touki_library_csv",
-                "source_url": str(path),
+                "source_url": f"touki_nav/{path.name}",
                 "tag": "[Filing/Market]",
             })
     return rows
