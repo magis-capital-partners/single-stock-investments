@@ -699,15 +699,51 @@
             "in_base_irr": false
           },
           {
+            "id": "henry_hub_gas",
+            "label": "Henry Hub natural gas spot (USD/MMBtu)",
+            "latest": null,
+            "as_of": null,
+            "yoy_pct": null,
+            "direction": "flat",
+            "good_for": "power_cost",
+            "source": "fred:DHHNGSP",
+            "stale": true,
+            "in_base_irr": false
+          },
+          {
+            "id": "electricity_price_us",
+            "label": "US avg electricity price (cents/kWh)",
+            "latest": null,
+            "as_of": null,
+            "yoy_pct": null,
+            "direction": "flat",
+            "good_for": "power_cost",
+            "source": "fred:APU000072610",
+            "stale": true,
+            "in_base_irr": false
+          },
+          {
             "id": "wti_crude",
             "label": "WTI crude (USD/bbl)",
-            "latest": 90.54,
+            "latest": 90.54000091552734,
             "as_of": "2026-06-05",
             "yoy_pct": 42.9,
             "direction": "up",
             "good_for": "permian_cashflow",
             "source": "yahoo:CL=F",
             "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "permian_crude_production_mbbl_d",
+            "label": "Permian crude production (kbbl/d)",
+            "latest": null,
+            "as_of": null,
+            "yoy_pct": null,
+            "direction": "flat",
+            "good_for": "permian_volume",
+            "source": "eia:petroleum/crd/crpdn",
+            "stale": true,
             "in_base_irr": false
           },
           {
@@ -721,6 +757,42 @@
             "source": "filing_panel:tpl_operating_panel.csv:water_revenue_m",
             "stale": false,
             "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": null,
+            "as_of": null,
+            "yoy_pct": null,
+            "direction": "flat",
+            "good_for": "discount_rate",
+            "source": "fred:DGS10",
+            "stale": true,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": null,
+            "as_of": null,
+            "yoy_pct": null,
+            "direction": "flat",
+            "good_for": "discount_rate",
+            "source": "fred:DGS2",
+            "stale": true,
+            "in_base_irr": false
+          },
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": null,
+            "as_of": null,
+            "yoy_pct": null,
+            "direction": "flat",
+            "good_for": "risk_regime",
+            "source": "fred:BAMLH0A0HYM2",
+            "stale": true,
+            "in_base_irr": false
           }
         ]
       },
@@ -729,9 +801,57 @@
         "label": "Macro risk regime",
         "indicators": [
           {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": null,
+            "as_of": null,
+            "yoy_pct": null,
+            "direction": "flat",
+            "good_for": "risk_regime",
+            "source": "fred:BAMLH0A0HYM2",
+            "stale": true,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": null,
+            "as_of": null,
+            "yoy_pct": null,
+            "direction": "flat",
+            "good_for": "rates_regime",
+            "source": "fred:DGS10",
+            "stale": true,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": null,
+            "as_of": null,
+            "yoy_pct": null,
+            "direction": "flat",
+            "good_for": "rates_regime",
+            "source": "fred:DGS2",
+            "stale": true,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": null,
+            "as_of": null,
+            "yoy_pct": null,
+            "direction": "flat",
+            "good_for": "dollar_regime",
+            "source": "fred:DTWEXBGS",
+            "stale": true,
+            "in_base_irr": false
+          },
+          {
             "id": "vix_level",
             "label": "VIX index level",
-            "latest": 21.51,
+            "latest": 21.510000228881836,
             "as_of": "2026-06-05",
             "yoy_pct": 16.4,
             "direction": "up",

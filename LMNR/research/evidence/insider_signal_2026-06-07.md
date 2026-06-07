@@ -18,9 +18,9 @@
 
 **Routine / planned sales (context):**
 
+- NOLAN PETER J: 6315 @ $0.0 on 2026-03-25
 - Mora Elizabeth: 6315 @ $0.0 on 2026-03-25
 - Carbone Barbara: 6315 @ $0.0 on 2026-03-25
-- NOLAN PETER J: 6315 @ $0.0 on 2026-03-25
 
 **Narrative hooks:**
 

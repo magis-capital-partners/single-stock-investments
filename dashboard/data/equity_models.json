@@ -1,11 +1,11 @@
 {
-  "built_at": "2026-06-06T23:39:20Z",
+  "built_at": "2026-06-07T14:58:25Z",
   "ticker_count": 1,
   "tickers": {
     "7176.T": {
       "model_ready": true,
       "diagnostics_ready": true,
-      "production_spec": "v1",
+      "production_spec": "v5",
       "primary_kpi": "perf_fee_h2_positive.out_of_sample.r2",
       "model_type": "earnings_semiannual",
       "as_of": "2026-06-04",
@@ -28,7 +28,7 @@
         "price_source": "Stooq/Yahoo 7176.JP last print 2026-01-07 (\u00a5464, 100 shares); not a continuous liquid quote"
       },
       "nowcast": {
-        "asof": "2026-06-05",
+        "asof": "2026-06-07",
         "fiscal_half": "H1",
         "half_window": [
           "2026-04-01",
@@ -36,23 +36,28 @@
         ],
         "aum_anchor_date": "2026-03-31",
         "aum_anchor_jpym": 1335700.0,
-        "aum_nowcast_jpym": 1632091,
-        "aum_source": "etf_nav_x_shares (2026-06-05) + non-ETF MTM; +ETF flow YTD \u00a50m",
-        "nikkei_return_to_date": 0.3042,
-        "effective_excess_ret_v2": 0.2351,
-        "etf_flow_ytd_jpym": 0,
+        "aum_nowcast_jpym": 27877337,
+        "aum_source": "etf_nav_filing_anchor (2026-06-05) + non-ETF MTM; +ETF flow YTD \u00a516244557m",
+        "nikkei_return_to_date": 0.0,
+        "effective_excess_ret_v2": 0.0,
+        "etf_flow_ytd_jpym": 16244557,
         "nowcast_jpym": {
-          "base_fee": 4536,
-          "perf_fee": 2438,
-          "revenue": 7173,
-          "ordinary_profit": 3998,
-          "net_income": 2941
+          "base_fee": 77471,
+          "perf_fee": 0,
+          "revenue": 77671,
+          "ordinary_profit": 35103,
+          "net_income": 25826
         },
+        "production_spec": "v3b",
         "nowcast_v2_jpym": {
-          "perf_fee": 2452,
-          "revenue": 7187,
-          "ordinary_profit": 4006,
-          "net_income": 2947
+          "perf_fee": 0,
+          "revenue": 77671,
+          "ordinary_profit": 35103,
+          "net_income": 25826
+        },
+        "nowcast_v5_jpym": {
+          "k_scale": 6.4282,
+          "note": "Live v5 uses v1 perf proxy until mandate detail refreshed for current half"
         },
         "caveats": [
           "Perf fee crystallizes near fiscal year-end (Mar); H1 nowcast of perf is low-confidence.",
@@ -91,9 +96,11 @@
           "note": "k_H2 >> k_H1: performance fees crystallize at the March fiscal year-end. This seasonality (H2 revenue ~2-3x H1) is the core forecastable structure."
         },
         "earnings_bridge": {
-          "ord_intercept": -157.2764331392818,
-          "ord_slope": 0.579242156528464,
-          "tax_rate": 0.2642706176532137
+          "ord_intercept": 356.8129035390889,
+          "ord_slope_rev": 0.447349872452824,
+          "ord_slope_perf": 0.14492991574656344,
+          "tax_rate": 0.2642706176532137,
+          "bridge_type": "variable_comp"
         }
       },
       "oos_metrics": {
@@ -117,23 +124,20 @@
         }
       },
       "oos_metrics_v2": {
-        "model_v2": {
-          "rmse_jpym": 3976.5,
-          "mape_pct": 30.3,
-          "directional_hit": 0.89,
-          "n": 9
-        }
+        "rmse_jpym": 3976.5,
+        "mape_pct": 30.3,
+        "directional_hit": 0.89,
+        "n": 9
       },
       "oos_metrics_v3a": {
-        "model_v3a": {
-          "rmse_jpym": 5407.4,
-          "mape_pct": 42.9,
-          "n": 9
-        }
+        "rmse_jpym": 5407.4,
+        "mape_pct": 42.9,
+        "directional_hit": 0.78,
+        "n": 9
       },
       "diagnostics": {
-        "as_of": "2026-06-05",
-        "production_spec": "v1",
+        "as_of": "2026-06-07",
+        "production_spec": "v5",
         "primary_kpi": "perf_fee_h2_positive.out_of_sample.r2",
         "estimation_window": {
           "start": "2020-H1",
@@ -329,28 +333,28 @@
           },
           "ordinary_profit": {
             "in_sample": {
-              "r2": -0.4623,
-              "adj_r2": -0.7872,
+              "r2": -0.1717,
+              "adj_r2": -0.4321,
               "directional_hit": 0.08,
-              "theil_u": 1.115,
+              "theil_u": 1.003,
               "n_params": 2,
-              "rmse_jpym": 2951.7,
-              "mae_jpym": 2473.9,
-              "mape_pct": 79.5,
+              "rmse_jpym": 2642.3,
+              "mae_jpym": 2130.7,
+              "mape_pct": 64.3,
               "n": 12
             },
             "out_of_sample": {
-              "r2": -0.0992,
-              "adj_r2": -0.4656,
+              "r2": -0.1639,
+              "adj_r2": -0.5519,
               "directional_hit": 0.56,
-              "theil_u": 1.022,
+              "theil_u": 1.051,
               "n_params": 2,
-              "rmse_jpym": 2738.0,
-              "mae_jpym": 2077.2,
-              "mape_pct": 44.6,
+              "rmse_jpym": 2817.4,
+              "mae_jpym": 2107.1,
+              "mape_pct": 44.8,
               "n": 9
             },
-            "overfit_gap": -0.3631,
+            "overfit_gap": -0.0078,
             "benchmarks_oos": {
               "naive_lastyear": {
                 "rmse_jpym": 2400.6,
@@ -366,28 +370,28 @@
           },
           "net_income": {
             "in_sample": {
-              "r2": -0.3361,
-              "adj_r2": -0.8372,
+              "r2": -0.0775,
+              "adj_r2": -0.4816,
               "directional_hit": 0.08,
-              "theil_u": 1.056,
+              "theil_u": 0.953,
               "n_params": 3,
-              "rmse_jpym": 2210.4,
-              "mae_jpym": 1859.1,
-              "mape_pct": 79.9,
+              "rmse_jpym": 1985.0,
+              "mae_jpym": 1606.7,
+              "mape_pct": 64.5,
               "n": 12
             },
             "out_of_sample": {
-              "r2": -0.0934,
-              "adj_r2": -0.7495,
+              "r2": -0.1559,
+              "adj_r2": -0.8494,
               "directional_hit": 0.56,
-              "theil_u": 0.994,
+              "theil_u": 1.022,
               "n_params": 3,
-              "rmse_jpym": 2147.7,
-              "mae_jpym": 1590.0,
-              "mape_pct": 44.3,
+              "rmse_jpym": 2208.2,
+              "mae_jpym": 1611.9,
+              "mape_pct": 44.4,
               "n": 9
             },
-            "overfit_gap": -0.2427,
+            "overfit_gap": 0.0784,
             "benchmarks_oos": {
               "naive_lastyear": {
                 "rmse_jpym": 1857.5,
@@ -397,7 +401,7 @@
               "naive_randomwalk": {
                 "rmse_jpym": 2160.8,
                 "r2": -0.1068,
-                "beats_model": false
+                "beats_model": true
               }
             }
           }
@@ -426,30 +430,6 @@
             "p95": 0.063647,
             "method": "block_bootstrap_fy",
             "n_boot": 748
-          },
-          "ord_slope": {
-            "point": 0.516676,
-            "p05": 0.329495,
-            "p50": 0.516676,
-            "p95": 0.530103,
-            "method": "block_bootstrap_fy",
-            "n_boot": 1000
-          },
-          "ord_intercept": {
-            "point": 1018.159188,
-            "p05": 847.215741,
-            "p50": 1018.159188,
-            "p95": 2046.414553,
-            "method": "block_bootstrap_fy",
-            "n_boot": 1000
-          },
-          "tax_rate": {
-            "point": 0.253262,
-            "p05": 0.251382,
-            "p50": 0.253262,
-            "p95": 0.255142,
-            "method": "block_bootstrap_fy",
-            "n_boot": 1000
           }
         },
         "spec_leaderboard": [
@@ -459,7 +439,8 @@
             "revenue_oos_r2": -0.0116,
             "perf_fee_h2_oos_rmse": 10307.2,
             "perf_fee_h2_oos_r2": -14.2489,
-            "production_default": true
+            "production_default": false,
+            "note": null
           },
           {
             "spec": "v2",
@@ -481,12 +462,30 @@
           },
           {
             "spec": "v4",
-            "revenue_oos_rmse": 5469.7,
-            "revenue_oos_r2": -0.6096,
+            "revenue_oos_rmse": 7055.9,
+            "revenue_oos_r2": -1.6786,
             "perf_fee_h2_oos_rmse": 10307.2,
             "perf_fee_h2_oos_r2": -14.2489,
             "production_default": false,
-            "note": "P4 mandate NAV scrape"
+            "note": "P4 mandate NAV scrape (macro weighted)"
+          },
+          {
+            "spec": "v3b",
+            "revenue_oos_rmse": 9553.0,
+            "revenue_oos_r2": -3.9099,
+            "perf_fee_h2_oos_rmse": 19744.8,
+            "perf_fee_h2_oos_r2": -54.9578,
+            "production_default": false,
+            "note": "Summable fund-level perf (P4 detail)"
+          },
+          {
+            "spec": "v5",
+            "revenue_oos_rmse": 4778.7,
+            "revenue_oos_r2": -0.2286,
+            "perf_fee_h2_oos_rmse": 10184.1,
+            "perf_fee_h2_oos_r2": -13.887,
+            "production_default": true,
+            "note": "v3b + march + split base + AUM roll-forward"
           }
         ],
         "residual_attribution": [
@@ -609,39 +608,39 @@
             "driver": "Nikkei H2 return",
             "low": -0.1,
             "high": 0.14,
-            "ni_low": 1551,
-            "ni_high": 6623,
-            "ni_delta_pct": 327.0
+            "ni_low": 1550,
+            "ni_high": 5467,
+            "ni_delta_pct": 252.7
           },
           {
             "driver": "AUM level",
             "low": 0.9,
             "high": 1.1,
-            "ni_low": 1393,
-            "ni_high": 1710,
-            "ni_delta_pct": 20.4
+            "ni_low": 1428,
+            "ni_high": 1672,
+            "ni_delta_pct": 15.8
           },
           {
             "driver": "March window return",
             "low": -0.05,
             "high": 0.12,
-            "ni_low": 1551,
-            "ni_high": 5899,
-            "ni_delta_pct": 280.2
+            "ni_low": 1550,
+            "ni_high": 4908,
+            "ni_delta_pct": 216.6
           }
         ],
         "caveats": [
           "Primary KPI: perf_fee_h2_positive OOS R\u00b2 (not total-revenue IS R\u00b2).",
           "perf_fee_h2_positive OOS n is small (fee split disclosed only from FY2024).",
-          "production_spec=v1 per acceptance rule (lowest perf_fee H2 OOS RMSE not worse than v1).",
+          "production_spec=v5 per acceptance rule (lowest perf_fee H2 OOS RMSE not worse than v1).",
           "Naive same-half-last-year beats model on revenue OOS RMSE (\u00a53,230m vs \u00a54,336m).",
           "n\u224812 half-years; negative OOS R\u00b2 is valid (model worse than mean)."
         ],
         "version": "v3_pm_diagnostics"
       },
       "spec_comparison": {
-        "as_of": "2026-06-05",
-        "production_spec": "v1",
+        "as_of": "2026-06-07",
+        "production_spec": "v5",
         "leaderboard": [
           {
             "spec": "v1",
@@ -649,7 +648,8 @@
             "revenue_oos_r2": -0.0116,
             "perf_fee_h2_oos_rmse": 10307.2,
             "perf_fee_h2_oos_r2": -14.2489,
-            "production_default": true
+            "production_default": false,
+            "note": null
           },
           {
             "spec": "v2",
@@ -671,12 +671,30 @@
           },
           {
             "spec": "v4",
-            "revenue_oos_rmse": 5469.7,
-            "revenue_oos_r2": -0.6096,
+            "revenue_oos_rmse": 7055.9,
+            "revenue_oos_r2": -1.6786,
             "perf_fee_h2_oos_rmse": 10307.2,
             "perf_fee_h2_oos_r2": -14.2489,
             "production_default": false,
-            "note": "P4 mandate NAV scrape"
+            "note": "P4 mandate NAV scrape (macro weighted)"
+          },
+          {
+            "spec": "v3b",
+            "revenue_oos_rmse": 9553.0,
+            "revenue_oos_r2": -3.9099,
+            "perf_fee_h2_oos_rmse": 19744.8,
+            "perf_fee_h2_oos_r2": -54.9578,
+            "production_default": false,
+            "note": "Summable fund-level perf (P4 detail)"
+          },
+          {
+            "spec": "v5",
+            "revenue_oos_rmse": 4778.7,
+            "revenue_oos_r2": -0.2286,
+            "perf_fee_h2_oos_rmse": 10184.1,
+            "perf_fee_h2_oos_r2": -13.887,
+            "production_default": true,
+            "note": "v3b + march + split base + AUM roll-forward"
           }
         ],
         "acceptance_rule": "Reject spec if perf_fee_h2_oos_rmse worsens vs prior"
@@ -705,30 +723,6 @@
           "p95": 0.063647,
           "method": "block_bootstrap_fy",
           "n_boot": 748
-        },
-        "ord_slope": {
-          "point": 0.516676,
-          "p05": 0.329495,
-          "p50": 0.516676,
-          "p95": 0.530103,
-          "method": "block_bootstrap_fy",
-          "n_boot": 1000
-        },
-        "ord_intercept": {
-          "point": 1018.159188,
-          "p05": 847.215741,
-          "p50": 1018.159188,
-          "p95": 2046.414553,
-          "method": "block_bootstrap_fy",
-          "n_boot": 1000
-        },
-        "tax_rate": {
-          "point": 0.253262,
-          "p05": 0.251382,
-          "p50": 0.253262,
-          "p95": 0.255142,
-          "method": "block_bootstrap_fy",
-          "n_boot": 1000
         }
       },
       "residuals": [
@@ -746,8 +740,8 @@
           "period_end": "2020-09-30",
           "target": "ordinary_profit",
           "actual": 1653.517,
-          "fitted": -41.428,
-          "residual": -1694.945,
+          "fitted": 446.283,
+          "residual": -1207.234,
           "is_oos": 0
         },
         {
@@ -755,8 +749,8 @@
           "period_end": "2020-09-30",
           "target": "net_income",
           "actual": 1178.219,
-          "fitted": -30.48,
-          "residual": -1208.699,
+          "fitted": 328.343,
+          "residual": -849.876,
           "is_oos": 0
         },
         {
@@ -773,8 +767,8 @@
           "period_end": "2021-03-31",
           "target": "ordinary_profit",
           "actual": 4729.255,
-          "fitted": -41.428,
-          "residual": -4770.683,
+          "fitted": 446.283,
+          "residual": -4282.972,
           "is_oos": 0
         },
         {
@@ -782,8 +776,8 @@
           "period_end": "2021-03-31",
           "target": "net_income",
           "actual": 3452.871,
-          "fitted": -30.48,
-          "residual": -3483.351,
+          "fitted": 328.343,
+          "residual": -3124.528,
           "is_oos": 0
         },
         {
@@ -800,8 +794,8 @@
           "period_end": "2021-09-30",
           "target": "ordinary_profit",
           "actual": 1958.008,
-          "fitted": -41.428,
-          "residual": -1999.436,
+          "fitted": 446.283,
+          "residual": -1511.725,
           "is_oos": 0
         },
         {
@@ -809,8 +803,8 @@
           "period_end": "2021-09-30",
           "target": "net_income",
           "actual": 1423.167,
-          "fitted": -30.48,
-          "residual": -1453.647,
+          "fitted": 328.343,
+          "residual": -1094.824,
           "is_oos": 0
         },
         {
@@ -827,8 +821,8 @@
           "period_end": "2022-03-31",
           "target": "ordinary_profit",
           "actual": 1187.392,
-          "fitted": -41.428,
-          "residual": -1228.82,
+          "fitted": 446.283,
+          "residual": -741.109,
           "is_oos": 0
         },
         {
@@ -836,8 +830,8 @@
           "period_end": "2022-03-31",
           "target": "net_income",
           "actual": 880.648,
-          "fitted": -30.48,
-          "residual": -911.128,
+          "fitted": 328.343,
+          "residual": -552.305,
           "is_oos": 0
         },
         {
@@ -854,8 +848,8 @@
           "period_end": "2022-09-30",
           "target": "ordinary_profit",
           "actual": 1926.574,
-          "fitted": -41.428,
-          "residual": -1968.002,
+          "fitted": 446.283,
+          "residual": -1480.291,
           "is_oos": 0
         },
         {
@@ -863,8 +857,8 @@
           "period_end": "2022-09-30",
           "target": "net_income",
           "actual": 1358.671,
-          "fitted": -30.48,
-          "residual": -1389.151,
+          "fitted": 328.343,
+          "residual": -1030.328,
           "is_oos": 0
         },
         {
@@ -881,8 +875,8 @@
           "period_end": "2023-03-31",
           "target": "ordinary_profit",
           "actual": 2236.419,
-          "fitted": -41.428,
-          "residual": -2277.847,
+          "fitted": 446.283,
+          "residual": -1790.136,
           "is_oos": 0
         },
         {
@@ -890,8 +884,8 @@
           "period_end": "2023-03-31",
           "target": "net_income",
           "actual": 1662.698,
-          "fitted": -30.48,
-          "residual": -1693.178,
+          "fitted": 328.343,
+          "residual": -1334.355,
           "is_oos": 0
         },
         {
@@ -917,8 +911,8 @@
           "period_end": "2023-09-30",
           "target": "ordinary_profit",
           "actual": 2488.758,
-          "fitted": -41.428,
-          "residual": -2530.186,
+          "fitted": 446.283,
+          "residual": -2042.475,
           "is_oos": 0
         },
         {
@@ -926,8 +920,8 @@
           "period_end": "2023-09-30",
           "target": "net_income",
           "actual": 1791.219,
-          "fitted": -30.48,
-          "residual": -1821.699,
+          "fitted": 328.343,
+          "residual": -1462.876,
           "is_oos": 0
         },
         {
@@ -953,8 +947,8 @@
           "period_end": "2024-03-31",
           "target": "ordinary_profit",
           "actual": 6321.019,
-          "fitted": -41.428,
-          "residual": -6362.447,
+          "fitted": 446.283,
+          "residual": -5874.736,
           "is_oos": 0
         },
         {
@@ -962,8 +956,8 @@
           "period_end": "2024-03-31",
           "target": "net_income",
           "actual": 4817.973,
-          "fitted": -30.48,
-          "residual": -4848.453,
+          "fitted": 328.343,
+          "residual": -4489.63,
           "is_oos": 0
         },
         {
@@ -998,8 +992,8 @@
           "period_end": "2024-09-30",
           "target": "ordinary_profit",
           "actual": 3810.2,
-          "fitted": 2016.882,
-          "residual": -1793.318,
+          "fitted": 2035.92,
+          "residual": -1774.28,
           "is_oos": 0
         },
         {
@@ -1007,8 +1001,8 @@
           "period_end": "2024-09-30",
           "target": "net_income",
           "actual": 2799.791,
-          "fitted": 1483.88,
-          "residual": -1315.911,
+          "fitted": 1497.886,
+          "residual": -1301.905,
           "is_oos": 0
         },
         {
@@ -1043,8 +1037,8 @@
           "period_end": "2025-03-31",
           "target": "ordinary_profit",
           "actual": 5638.399,
-          "fitted": 2008.271,
-          "residual": -3630.128,
+          "fitted": 2029.269,
+          "residual": -3609.13,
           "is_oos": 0
         },
         {
@@ -1052,8 +1046,8 @@
           "period_end": "2025-03-31",
           "target": "net_income",
           "actual": 4256.431,
-          "fitted": 1477.544,
-          "residual": -2778.887,
+          "fitted": 1492.993,
+          "residual": -2763.438,
           "is_oos": 0
         },
         {
@@ -1088,8 +1082,8 @@
           "period_end": "2025-09-30",
           "target": "ordinary_profit",
           "actual": 3974.829,
-          "fitted": 3100.149,
-          "residual": -874.68,
+          "fitted": 3120.794,
+          "residual": -854.035,
           "is_oos": 0
         },
         {
@@ -1097,8 +1091,8 @@
           "period_end": "2025-09-30",
           "target": "net_income",
           "actual": 2861.532,
-          "fitted": 2280.87,
-          "residual": -580.662,
+          "fitted": 2296.06,
+          "residual": -565.472,
           "is_oos": 0
         },
         {
@@ -1133,8 +1127,8 @@
           "period_end": "2026-03-31",
           "target": "ordinary_profit",
           "actual": 9995.171,
-          "fitted": 9439.0,
-          "residual": -556.171,
+          "fitted": 9594.588,
+          "residual": -400.583,
           "is_oos": 0
         },
         {
@@ -1142,8 +1136,8 @@
           "period_end": "2026-03-31",
           "target": "net_income",
           "actual": 7769.468,
-          "fitted": 6944.55,
-          "residual": -824.918,
+          "fitted": 7059.021,
+          "residual": -710.447,
           "is_oos": 0
         },
         {
@@ -1282,7 +1276,9 @@
           "naive_randomwalk": 3526.469,
           "model_v3a": 3074.713,
           "model_v2": 3074.713,
-          "model_v4": 3074.713
+          "model_v4": 3074.713,
+          "model_v3b": 3592.0386839422354,
+          "model_v5": 4267.325683942236
         },
         {
           "label": "FY2023H1",
@@ -1292,7 +1288,9 @@
           "naive_randomwalk": 4302.709,
           "model_v3a": 3074.713,
           "model_v2": 3074.713,
-          "model_v4": 3074.713
+          "model_v4": 16569.373509130754,
+          "model_v3b": 3274.713,
+          "model_v5": 3950.0
         },
         {
           "label": "FY2023H2",
@@ -1302,7 +1300,9 @@
           "naive_randomwalk": 3319.298,
           "model_v3a": 10820.600374182279,
           "model_v2": 4830.656562502018,
-          "model_v4": 4830.656562502018
+          "model_v4": 3074.713,
+          "model_v3b": 3274.713,
+          "model_v5": 6109.837330672284
         },
         {
           "label": "FY2024H1",
@@ -1312,7 +1312,9 @@
           "naive_randomwalk": 5586.426,
           "model_v3a": 3076.163269528032,
           "model_v2": 3076.163269528032,
-          "model_v4": 3074.713
+          "model_v4": 3074.713,
+          "model_v3b": 3274.713,
+          "model_v5": 3950.0
         },
         {
           "label": "FY2024H2",
@@ -1320,9 +1322,11 @@
           "model": 9382.223712772497,
           "naive_lastyear": 5586.426,
           "naive_randomwalk": 3804.623,
-          "model_v3a": 12323.51157245296,
-          "model_v2": 10683.903228771325,
-          "model_v4": 3551.030596288794
+          "model_v3a": 12323.512374664602,
+          "model_v2": 10683.903617001455,
+          "model_v4": 3466.293465193704,
+          "model_v3b": 6599.480783121949,
+          "model_v5": 6999.313785263273
         },
         {
           "label": "FY2025H1",
@@ -1332,7 +1336,9 @@
           "naive_randomwalk": 11162.336,
           "model_v3a": 3074.713,
           "model_v2": 3074.713,
-          "model_v4": 3074.7993796734168
+          "model_v4": 3120.1645362893723,
+          "model_v3b": 4183.264466587567,
+          "model_v5": 4735.510724732506
         },
         {
           "label": "FY2025H2",
@@ -1340,9 +1346,11 @@
           "model": 3074.713,
           "naive_lastyear": 11162.336,
           "naive_randomwalk": 5353.003,
-          "model_v3a": 3335.6117697509803,
-          "model_v2": 3559.6210032800977,
-          "model_v4": 8621.885450656542
+          "model_v3a": 3335.611752558147,
+          "model_v2": 3559.6209891273083,
+          "model_v4": 9113.323691916745,
+          "model_v3b": 35516.09530176326,
+          "model_v5": 4244.015393399042
         },
         {
           "label": "FY2026H1",
@@ -1352,7 +1360,9 @@
           "naive_randomwalk": 10901.498,
           "model_v3a": 3412.640798276483,
           "model_v2": 3412.640798276483,
-          "model_v4": 3093.2568188751866
+          "model_v4": 3420.0477118794997,
+          "model_v3b": 4838.503387781151,
+          "model_v5": 10483.83825444653
         },
         {
           "label": "FY2026H2",
@@ -1360,9 +1370,11 @@
           "model": 7334.717900740869,
           "naive_lastyear": 10901.498,
           "naive_randomwalk": 5577.537,
-          "model_v3a": 4081.55734678594,
-          "model_v2": 8237.720167113557,
-          "model_v4": 3074.713
+          "model_v3a": 4081.557279246854,
+          "model_v2": 8237.720011634852,
+          "model_v4": 3074.713,
+          "model_v3b": 3274.713,
+          "model_v5": 6038.483145542987
         }
       ],
       "panel": [
@@ -1529,72 +1541,72 @@
           "scenario": "bear",
           "nikkei_ret": -0.1,
           "revenue_m": 3726.0,
-          "net_income_m": 1472.0,
+          "net_income_m": 1489.0,
           "perf_fee_m": 0.0,
           "revenue_lo80": -587.0,
           "revenue_hi80": 8039.0,
-          "net_income_lo80": -1026.0,
-          "net_income_hi80": 3970.0
+          "net_income_lo80": -441.0,
+          "net_income_hi80": 3419.0
         },
         {
           "horizon": "next_H1",
           "scenario": "base",
           "nikkei_ret": 0.03,
           "revenue_m": 4167.0,
-          "net_income_m": 1660.0,
+          "net_income_m": 1655.0,
           "perf_fee_m": 200.0,
           "revenue_lo80": -146.0,
           "revenue_hi80": 8480.0,
-          "net_income_lo80": -838.0,
-          "net_income_hi80": 4158.0
+          "net_income_lo80": -275.0,
+          "net_income_hi80": 3585.0
         },
         {
           "horizon": "next_H1",
           "scenario": "bull",
           "nikkei_ret": 0.12,
           "revenue_m": 4969.0,
-          "net_income_m": 2002.0,
+          "net_income_m": 1987.0,
           "perf_fee_m": 834.0,
           "revenue_lo80": 656.0,
           "revenue_hi80": 9282.0,
-          "net_income_lo80": -496.0,
-          "net_income_hi80": 4500.0
+          "net_income_lo80": 57.0,
+          "net_income_hi80": 3917.0
         },
         {
           "horizon": "next_H2",
           "scenario": "bear",
           "nikkei_ret": -0.1,
           "revenue_m": 3726.0,
-          "net_income_m": 1472.0,
+          "net_income_m": 1489.0,
           "perf_fee_m": 0.0,
           "revenue_lo80": -587.0,
           "revenue_hi80": 8039.0,
-          "net_income_lo80": -1026.0,
-          "net_income_hi80": 3970.0
+          "net_income_lo80": -441.0,
+          "net_income_hi80": 3419.0
         },
         {
           "horizon": "next_H2",
           "scenario": "base",
           "nikkei_ret": 0.04,
           "revenue_m": 7454.0,
-          "net_income_m": 3061.0,
+          "net_income_m": 3086.0,
           "perf_fee_m": 3469.0,
           "revenue_lo80": 3141.0,
           "revenue_hi80": 11767.0,
-          "net_income_lo80": 563.0,
-          "net_income_hi80": 5559.0
+          "net_income_lo80": 1156.0,
+          "net_income_hi80": 5016.0
         },
         {
           "horizon": "next_H2",
           "scenario": "bull",
           "nikkei_ret": 0.14,
           "revenue_m": 16907.0,
-          "net_income_m": 7089.0,
+          "net_income_m": 7185.0,
           "perf_fee_m": 12735.0,
           "revenue_lo80": 12594.0,
           "revenue_hi80": 21220.0,
-          "net_income_lo80": 4591.0,
-          "net_income_hi80": 9587.0
+          "net_income_lo80": 5255.0,
+          "net_income_hi80": 9115.0
         }
       ],
       "shares": {
@@ -1667,9 +1679,9 @@
     "7176.T": {
       "ready": true,
       "diagnostics_ready": true,
-      "production_spec": "v1",
+      "production_spec": "v5",
       "as_of": "2026-06-04",
-      "headline": "Nowcast H1 revenue \u00a57,173m; OOS RMSE loses to seasonal naive",
+      "headline": "Nowcast H1 revenue \u00a577,671m; OOS RMSE loses to seasonal naive",
       "model_beats_naive": false,
       "model_type": "earnings_semiannual",
       "perf_fee_h2_oos_r2": -14.2489

@@ -234,7 +234,7 @@
     "synthesis_in_dive": true
   },
   "context_overlay": {
-    "as_of": "2026-06-06",
+    "as_of": "2026-06-07",
     "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
     "themes": [
       {
@@ -245,7 +245,7 @@
             "id": "hyperscaler_capex_ttm_usd_bn",
             "label": "Hyperscaler capex guide (USD bn, latest)",
             "latest": 467.3,
-            "as_of": "2026-06-06",
+            "as_of": "2026-06-07",
             "yoy_pct": null,
             "direction": "flat",
             "good_for": "land_power_demand",
@@ -280,13 +280,13 @@
           {
             "id": "wti_crude",
             "label": "WTI crude (USD/bbl)",
-            "latest": null,
-            "as_of": null,
-            "yoy_pct": null,
-            "direction": "flat",
+            "latest": 90.54000091552734,
+            "as_of": "2026-06-05",
+            "yoy_pct": 42.9,
+            "direction": "up",
             "good_for": "permian_cashflow",
-            "source": "fred:DCOILWTICO",
-            "stale": true,
+            "source": "yahoo:CL=F",
+            "stale": false,
             "in_base_irr": false
           },
           {
@@ -299,6 +299,18 @@
             "good_for": "permian_volume",
             "source": "eia:petroleum/crd/crpdn",
             "stale": true,
+            "in_base_irr": false
+          },
+          {
+            "id": "tpl_water_revenue_m",
+            "label": "TPL water segment revenue (USD m, FY)",
+            "latest": 307.5,
+            "as_of": "2026-06-01",
+            "yoy_pct": null,
+            "direction": "flat",
+            "good_for": "water_infra_proof",
+            "source": "filing_panel:tpl_operating_panel.csv:water_revenue_m",
+            "stale": false,
             "in_base_irr": false
           },
           {
@@ -338,7 +350,179 @@
             "in_base_irr": false
           }
         ]
+      },
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": null,
+            "as_of": null,
+            "yoy_pct": null,
+            "direction": "flat",
+            "good_for": "risk_regime",
+            "source": "fred:BAMLH0A0HYM2",
+            "stale": true,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": null,
+            "as_of": null,
+            "yoy_pct": null,
+            "direction": "flat",
+            "good_for": "rates_regime",
+            "source": "fred:DGS10",
+            "stale": true,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": null,
+            "as_of": null,
+            "yoy_pct": null,
+            "direction": "flat",
+            "good_for": "rates_regime",
+            "source": "fred:DGS2",
+            "stale": true,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": null,
+            "as_of": null,
+            "yoy_pct": null,
+            "direction": "flat",
+            "good_for": "dollar_regime",
+            "source": "fred:DTWEXBGS",
+            "stale": true,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 21.510000228881836,
+            "as_of": "2026-06-05",
+            "yoy_pct": 16.4,
+            "direction": "up",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": 0.27,
+            "as_of": "2026-06-05",
+            "yoy_pct": -88.4,
+            "direction": "down",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 12.9,
+            "as_of": "2026-06-05",
+            "yoy_pct": -21.1,
+            "direction": "down",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
       }
     ]
+  },
+  "insider_signal": {
+    "as_of": "2026-06-07",
+    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
+    "in_base_irr": false,
+    "window_days": 365,
+    "ics": 0.0,
+    "band": "negligible",
+    "bull_case_support": "none",
+    "scenario_confidence": {
+      "priors": {
+        "bear": 0.2,
+        "base": 0.55,
+        "bull": 0.25
+      },
+      "tilted": {
+        "bear": 0.28,
+        "base": 0.47,
+        "bull": 0.25
+      },
+      "bull_delta": 0.0,
+      "bear_delta": 0.08,
+      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
+    },
+    "factors": {
+      "buy_score": 0.0,
+      "sell_score": -1.0,
+      "cluster_bonus": 0.0,
+      "net_buy_usd": 0,
+      "net_sell_usd": 46712601.27,
+      "price_today": 46.85
+    },
+    "top_buys": [],
+    "top_sells": [
+      {
+        "insider": "Nottenburg Richard N",
+        "date": "2026-04-30",
+        "shares": 12500,
+        "price": 34.59,
+        "value_usd": 432375.0,
+        "is_10b5_1": false,
+        "contrib": -0.182
+      },
+      {
+        "insider": "Nottenburg Richard N",
+        "date": "2026-04-28",
+        "shares": 12500,
+        "price": 32.0,
+        "value_usd": 400000.0,
+        "is_10b5_1": false,
+        "contrib": -0.179
+      },
+      {
+        "insider": "MILLER DOUGLAS S",
+        "date": "2026-04-27",
+        "shares": 10000,
+        "price": 34.98,
+        "value_usd": 349800.0,
+        "is_10b5_1": false,
+        "contrib": -0.178
+      },
+      {
+        "insider": "Cummins Wes",
+        "date": "2026-04-10",
+        "shares": 39350,
+        "price": 26.26,
+        "value_usd": 1033331.0,
+        "is_10b5_1": false,
+        "contrib": -0.177
+      },
+      {
+        "insider": "Cummins Wes",
+        "date": "2026-04-04",
+        "shares": 34579,
+        "price": 24.56,
+        "value_usd": 849260.24,
+        "is_10b5_1": false,
+        "contrib": -0.169
+      }
+    ],
+    "narrative_hooks": [],
+    "transaction_count": 65
   }
 }

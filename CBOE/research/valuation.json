@@ -212,5 +212,295 @@
     "primary_metric": "lawrence_base",
     "primary_label": "7yr IRR",
     "primary_return_pct": 13.2
+  },
+  "context_overlay": {
+    "as_of": "2026-06-07",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": null,
+            "as_of": null,
+            "yoy_pct": null,
+            "direction": "flat",
+            "good_for": "risk_regime",
+            "source": "fred:BAMLH0A0HYM2",
+            "stale": true,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": null,
+            "as_of": null,
+            "yoy_pct": null,
+            "direction": "flat",
+            "good_for": "rates_regime",
+            "source": "fred:DGS10",
+            "stale": true,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": null,
+            "as_of": null,
+            "yoy_pct": null,
+            "direction": "flat",
+            "good_for": "rates_regime",
+            "source": "fred:DGS2",
+            "stale": true,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": null,
+            "as_of": null,
+            "yoy_pct": null,
+            "direction": "flat",
+            "good_for": "dollar_regime",
+            "source": "fred:DTWEXBGS",
+            "stale": true,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 21.510000228881836,
+            "as_of": "2026-06-05",
+            "yoy_pct": 16.4,
+            "direction": "up",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": 0.27,
+            "as_of": "2026-06-05",
+            "yoy_pct": -88.4,
+            "direction": "down",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 12.9,
+            "as_of": "2026-06-05",
+            "yoy_pct": -21.1,
+            "direction": "down",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      },
+      {
+        "theme_id": "exchange_volatility",
+        "label": "Exchange vol tailwind",
+        "indicators": [
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 21.510000228881836,
+            "as_of": "2026-06-05",
+            "yoy_pct": 16.4,
+            "direction": "up",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 12.9,
+            "as_of": "2026-06-05",
+            "yoy_pct": -21.1,
+            "direction": "down",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vrp_health_score",
+            "label": "VRP health score (etf-dashboard)",
+            "latest": null,
+            "as_of": null,
+            "yoy_pct": null,
+            "direction": "flat",
+            "good_for": "options_market_health",
+            "source": "",
+            "stale": true,
+            "in_base_irr": false
+          },
+          {
+            "id": "vol_term_slope",
+            "label": "Vol term-structure slope (etf-dashboard)",
+            "latest": null,
+            "as_of": null,
+            "yoy_pct": null,
+            "direction": "flat",
+            "good_for": "vol_term_structure",
+            "source": "",
+            "stale": true,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ],
+    "peer_context": {
+      "cluster_id": "exchanges",
+      "path": "_system/reference/market-data/peers/exchanges.csv",
+      "tickers": [
+        "CME",
+        "ICE",
+        "CBOE",
+        "MIAX",
+        "8697.T"
+      ],
+      "note": "Context only; percentile rank not in base IRR."
+    }
+  },
+  "insider_signal": {
+    "as_of": "2026-06-07",
+    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
+    "in_base_irr": false,
+    "window_days": 365,
+    "ics": 10.0,
+    "band": "exceptional",
+    "bull_case_support": "moderate",
+    "scenario_confidence": {
+      "priors": {
+        "bear": 0.2,
+        "base": 0.55,
+        "bull": 0.25
+      },
+      "tilted": {
+        "bear": 0.2,
+        "base": 0.4,
+        "bull": 0.4
+      },
+      "bull_delta": 0.15,
+      "bear_delta": 0.0,
+      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
+    },
+    "factors": {
+      "buy_score": 43.563,
+      "sell_score": -1.0,
+      "cluster_bonus": 0.0,
+      "net_buy_usd": 13831669.38,
+      "net_sell_usd": 14481659.7,
+      "price_today": 285.23
+    },
+    "top_buys": [
+      {
+        "insider": "Tomczyk Fredric J",
+        "date": "2026-02-19",
+        "shares": 10965,
+        "price": 286.17,
+        "value_usd": 3137854.05,
+        "shares_owned_after": 41865,
+        "contrib": 1.828
+      },
+      {
+        "insider": "Griebenow Jill",
+        "date": "2026-02-19",
+        "shares": 1863,
+        "price": 286.17,
+        "value_usd": 533134.71,
+        "shares_owned_after": 17907,
+        "contrib": 1.823
+      },
+      {
+        "insider": "Hocking Robert A",
+        "date": "2026-02-19",
+        "shares": 355,
+        "price": 286.17,
+        "value_usd": 101590.35,
+        "shares_owned_after": 637,
+        "contrib": 1.821
+      },
+      {
+        "insider": "Griebenow Jill",
+        "date": "2026-02-19",
+        "shares": 1652,
+        "price": 286.17,
+        "value_usd": 472752.84,
+        "shares_owned_after": 16776,
+        "contrib": 1.811
+      },
+      {
+        "insider": "Lipscomb Timothy",
+        "date": "2026-02-19",
+        "shares": 796,
+        "price": 286.17,
+        "value_usd": 227791.32,
+        "shares_owned_after": 2689,
+        "contrib": 1.805
+      }
+    ],
+    "top_sells": [
+      {
+        "insider": "DONOHUE CRAIG S",
+        "date": "2026-02-19",
+        "shares": 2079,
+        "price": 286.17,
+        "value_usd": 594947.43,
+        "is_10b5_1": false,
+        "contrib": -0.124
+      },
+      {
+        "insider": "Griebenow Jill",
+        "date": "2026-02-19",
+        "shares": 192,
+        "price": 286.17,
+        "value_usd": 54944.64,
+        "is_10b5_1": false,
+        "contrib": -0.096
+      },
+      {
+        "insider": "Griebenow Jill",
+        "date": "2026-02-19",
+        "shares": 290,
+        "price": 286.17,
+        "value_usd": 82989.3,
+        "is_10b5_1": false,
+        "contrib": -0.096
+      },
+      {
+        "insider": "Griebenow Jill",
+        "date": "2026-02-19",
+        "shares": 732,
+        "price": 286.17,
+        "value_usd": 209476.44,
+        "is_10b5_1": false,
+        "contrib": -0.096
+      },
+      {
+        "insider": "Griebenow Jill",
+        "date": "2026-02-19",
+        "shares": 826,
+        "price": 286.17,
+        "value_usd": 236376.42,
+        "is_10b5_1": false,
+        "contrib": -0.096
+      }
+    ],
+    "narrative_hooks": [],
+    "transaction_count": 118
   }
 }
