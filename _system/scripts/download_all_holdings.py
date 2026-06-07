@@ -36,9 +36,9 @@ def dedicated_investor_script(ticker: str) -> Path | None:
     return scripts[0] if scripts else None
 
 
-def run(cmd: list[str], label: str) -> None:
+def run(cmd: list[str], label: str, *, cwd: Path | None = None) -> None:
     print(f"\n=== {label} ===")
-    subprocess.run(cmd, cwd=ROOT, check=False)
+    subprocess.run(cmd, cwd=cwd or ROOT, check=False)
 
 
 def powershell_script(script: Path) -> list[str]:
@@ -116,8 +116,12 @@ def main() -> None:
                 f"{ticker} management evidence",
             )
 
+    run([PY, "-m", "darwin.import_external_data"], "Sync etf-dashboard external data", cwd=SCRIPTS)
+    run([PY, str(SCRIPTS / "extract_theme_facts.py")], "Extract filing theme panels")
     run([PY, str(SCRIPTS / "fetch_theme_panel.py")], "Thematic indicator panels")
     run([PY, str(SCRIPTS / "apply_context_overlay.py")], "Apply thematic context overlay")
+    run([PY, str(SCRIPTS / "fetch_ls_microstructure.py")], "L/S microstructure context")
+    run([PY, str(SCRIPTS / "fetch_peer_panel.py")], "Peer comparison panels")
 
     run([PY, str(SCRIPTS / "build_folder_indexes.py")], "Build INDEX.csv files")
     run([PY, str(SCRIPTS / "sync_portfolio_from_registry.py")], "Sync portfolio from registry")

@@ -19,11 +19,14 @@ SCRIPTS = Path(__file__).resolve().parent
 PY = sys.executable
 TICKER_RE = re.compile(r"^([^/]+)/research/")
 
+MECHANICAL_EVIDENCE = re.compile(r"^[^/]+/research/evidence/thematic_context_\d{4}-\d{2}-\d{2}\.md$")
+MECHANICAL_MI = re.compile(r"^[^/]+/research/market_inputs\.json$")
+
 sys.path.insert(0, str(SCRIPTS))
 from marvin_pipeline_common import has_evidence_refresh_config  # noqa: E402
 
 
-def tickers_from_diff(base: str) -> list[str]:
+def git_diff_names(base: str) -> list[str]:
     r = subprocess.run(
         ["git", "diff", "--name-only", f"{base}...HEAD"],
         cwd=ROOT,
@@ -37,9 +40,12 @@ def tickers_from_diff(base: str) -> list[str]:
             capture_output=True,
             text=True,
         )
+    return [line.strip().replace("\\", "/") for line in (r.stdout or "").splitlines() if line.strip()]
+
+
+def tickers_from_diff(base: str) -> list[str]:
     tickers: set[str] = set()
-    for line in (r.stdout or "").splitlines():
-        line = line.strip().replace("\\", "/")
+    for line in git_diff_names(base):
         if "/research/" not in line:
             continue
         m = TICKER_RE.match(line)
@@ -48,11 +54,66 @@ def tickers_from_diff(base: str) -> list[str]:
     return sorted(tickers)
 
 
+def valuation_overlay_only_diff(ticker: str, base: str) -> bool:
+    vp = f"{ticker}/research/valuation.json"
+    r = subprocess.run(
+        ["git", "show", f"{base}:{vp}"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+    if r.returncode != 0:
+        return False
+    try:
+        old = json.loads(r.stdout)
+    except json.JSONDecodeError:
+        return False
+    new_path = ROOT / ticker / "research" / "valuation.json"
+    if not new_path.exists():
+        return False
+    try:
+        new = json.loads(new_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return False
+    forbidden = ("inputs", "scenarios", "implied_return", "results", "segment_build", "nav_overlay")
+    for key in forbidden:
+        if old.get(key) != new.get(key):
+            return False
+    return old.get("context_overlay") != new.get("context_overlay")
+
+
+def research_diff_kind(ticker: str, paths: list[str], base: str) -> str:
+    """Per ticker: mechanical_only | narrative | mixed."""
+    tk_paths = [p for p in paths if p.startswith(f"{ticker}/research/")]
+    if not tk_paths:
+        return "narrative"
+    non_mechanical = []
+    for p in tk_paths:
+        if p.endswith("/research/valuation.json"):
+            if not valuation_overlay_only_diff(ticker, base):
+                non_mechanical.append(p)
+            continue
+        if MECHANICAL_EVIDENCE.match(p) or MECHANICAL_MI.match(p):
+            continue
+        if "/research/evidence/filing_facts_" in p and p.endswith(".json"):
+            continue
+        non_mechanical.append(p)
+    if not non_mechanical:
+        return "mechanical_only"
+    val_only = all(p.endswith("/research/valuation.json") for p in non_mechanical)
+    if val_only and valuation_overlay_only_diff(ticker, base):
+        return "mechanical_only"
+    if any(p.endswith(".md") for p in non_mechanical):
+        return "mixed" if any(not p.endswith(".md") for p in non_mechanical) else "narrative"
+    return "mixed"
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--base", default="origin/main", help="Git base ref for diff")
     args = parser.parse_args()
 
+    paths = git_diff_names(args.base)
     tickers = tickers_from_diff(args.base)
     if not tickers:
         print("SKIP: no ticker research paths in diff")
@@ -66,7 +127,16 @@ def main() -> int:
         if not list(dive.glob("deep_dive_*.md")):
             print(f"SKIP {ticker}: no deep dive")
             continue
-        print(f"\n=== lint {ticker} ===")
+        kind = research_diff_kind(ticker, paths, args.base)
+        print(f"\n=== lint {ticker} ({kind}) ===")
+        if kind == "mechanical_only":
+            r = subprocess.run(
+                [PY, str(SCRIPTS / "lint_context_overlay.py"), ticker],
+                cwd=ROOT,
+            )
+            if r.returncode != 0:
+                failed += 1
+            continue
         for script, extra in (
             ("lint_deep_dive.py", ["--milly"]),
             ("lint_adversarial.py", ["--consistency-only"]),

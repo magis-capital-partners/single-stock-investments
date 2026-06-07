@@ -1,6 +1,6 @@
 # TPL — Pending third-party sources
 
-**Updated:** 2026-06-02
+**Updated:** 2026-06-07
 
 Approve in `_system/frameworks/third_party_sources.md` before using in base IRR.
 

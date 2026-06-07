@@ -26,9 +26,9 @@ from marvin_pipeline_common import (  # noqa: E402
 )
 
 
-def run(label: str, cmd: list[str], *, optional: bool = False) -> bool:
+def run(label: str, cmd: list[str], *, optional: bool = False, cwd: Path | None = None) -> bool:
     print(f"  {label}...", flush=True)
-    r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+    r = subprocess.run(cmd, cwd=cwd or ROOT, capture_output=True, text=True)
     out = (r.stdout or "") + (r.stderr or "")
     if out.strip():
         for line in out.strip().splitlines()[-10:]:
@@ -58,7 +58,10 @@ def ticker_has_theme_tag(ticker: str) -> bool:
         return False
     tk = ticker.upper()
     for blk in (cfg.get("themes") or {}).values():
-        if tk in {t.upper() for t in (blk.get("tickers") or [])}:
+        tickers = blk.get("tickers") or []
+        if "*" in tickers:
+            return True
+        if tk in {t.upper() for t in tickers}:
             return True
     return False
 
@@ -201,6 +204,17 @@ def main() -> int:
     )
     if ticker_has_theme_tag(ticker):
         run(
+            "etf-dashboard sync",
+            [PY, "-m", "darwin.import_external_data"],
+            optional=True,
+            cwd=SCRIPTS,
+        )
+        run(
+            "filing theme panels",
+            [PY, str(SCRIPTS / "extract_theme_facts.py"), ticker],
+            optional=True,
+        )
+        run(
             "thematic indicator panels",
             [PY, str(SCRIPTS / "fetch_theme_panel.py")],
             optional=True,
@@ -210,6 +224,16 @@ def main() -> int:
             [PY, str(SCRIPTS / "apply_context_overlay.py"), ticker],
             optional=True,
         )
+        run(
+            "peer panels",
+            [PY, str(SCRIPTS / "fetch_peer_panel.py")],
+            optional=True,
+        )
+    run(
+        "L/S microstructure",
+        [PY, str(SCRIPTS / "fetch_ls_microstructure.py"), ticker],
+        optional=True,
+    )
     if has_evidence_refresh_config(val):
         ok &= run(
             "optionality evidence refresh",

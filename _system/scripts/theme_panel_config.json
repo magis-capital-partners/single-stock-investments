@@ -4,21 +4,57 @@
   "sources": {
     "fred": "https://fred.stlouisfed.org/graph/fredgraph.csv?id={id}",
     "stooq_daily": "https://stooq.com/q/d/l/?s={symbol}&i=d",
-    "eia": "https://api.eia.gov/v2 (requires EIA_API_KEY; degrades gracefully when absent)"
+    "eia": "https://api.eia.gov/v2 (requires EIA_API_KEY; degrades gracefully when absent)",
+    "etf_dashboard": "_external/etf-dashboard/data or _system/reference/market-data/external sync",
+    "yahoo_daily": "query1.finance.yahoo.com daily chart (fallback when FRED/Stooq blocked)",
+    "filing_panel": "_system/reference/market-data/themes/filing_panels/*.csv"
   },
   "themes": {
     "ai_power_land": {
       "label": "AI compute -> power demand -> grid/water constraint -> scarce Permian surface",
-      "description": "Demand chain behind land/surface/water optionality (TPL water, LB easements, WBI infra, APLD hosting). Hyperscaler capex is the upstream pulse; power and gas prices and Permian activity are the midstream signals.",
+      "description": "Demand chain behind land/surface/water optionality (TPL water, LB easements, WBI infra, APLD hosting, AZLCZ Southwest renewable). Hyperscaler capex is the upstream pulse; power and gas prices and Permian activity are the midstream signals.",
       "series": [
         {"id": "hyperscaler_capex_ttm_usd_bn", "label": "Hyperscaler capex guide (USD bn, latest)", "source": "repo_valuation", "good_for": "land_power_demand", "note": "Derived from ai_overlay in GOOGL/AMZN/META/MSFT valuation.json; filing-cited"},
         {"id": "henry_hub_gas", "label": "Henry Hub natural gas spot (USD/MMBtu)", "source": "fred", "fred_id": "DHHNGSP", "good_for": "power_cost"},
         {"id": "electricity_price_us", "label": "US avg electricity price (cents/kWh)", "source": "fred", "fred_id": "APU000072610", "good_for": "power_cost"},
-        {"id": "wti_crude", "label": "WTI crude (USD/bbl)", "source": "fred", "fred_id": "DCOILWTICO", "good_for": "permian_cashflow"},
+        {"id": "wti_crude", "label": "WTI crude (USD/bbl)", "source": "fred", "fred_id": "DCOILWTICO", "good_for": "permian_cashflow", "fallback": {"source": "yahoo_daily", "yahoo_symbol": "CL=F", "note": "WTI front-month futures when FRED unavailable"}},
         {"id": "permian_crude_production_mbbl_d", "label": "Permian crude production (kbbl/d)", "source": "eia", "eia_route": "petroleum/crd/crpdn", "eia_facets": {"duoarea": "RTPP", "product": "EPC0", "process": "FPF"}, "good_for": "permian_volume", "optional": true, "note": "Requires EIA_API_KEY; null when absent"},
+        {"id": "tpl_water_revenue_m", "label": "TPL water segment revenue (USD m, FY)", "source": "filing_panel", "panel": "tpl_operating_panel.csv", "metric": "water_revenue_m", "good_for": "water_infra_proof", "optional": true},
         {"id": "ust_10y", "label": "US Treasury 10Y yield (%)", "source": "fred", "fred_id": "DGS10", "good_for": "discount_rate"},
         {"id": "ust_2y", "label": "US Treasury 2Y yield (%)", "source": "fred", "fred_id": "DGS2", "good_for": "discount_rate"},
         {"id": "hy_oas", "label": "High-yield OAS credit spread (%)", "source": "fred", "fred_id": "BAMLH0A0HYM2", "good_for": "risk_regime"}
+      ]
+    },
+    "macro_regime": {
+      "label": "Macro risk regime",
+      "description": "Portfolio-wide credit, rates, dollar, and vol context for stance sizing.",
+      "series": [
+        {"id": "hy_oas", "label": "High-yield OAS credit spread (%)", "source": "fred", "fred_id": "BAMLH0A0HYM2", "good_for": "risk_regime"},
+        {"id": "ust_10y", "label": "US Treasury 10Y yield (%)", "source": "fred", "fred_id": "DGS10", "good_for": "rates_regime"},
+        {"id": "ust_2y", "label": "US Treasury 2Y yield (%)", "source": "fred", "fred_id": "DGS2", "good_for": "rates_regime"},
+        {"id": "dxy_broad", "label": "Trade-weighted USD index (broad)", "source": "fred", "fred_id": "DTWEXBGS", "good_for": "dollar_regime", "optional": true},
+        {"id": "vix_level", "label": "VIX index level", "source": "fred", "fred_id": "VIXCLS", "good_for": "vol_regime", "fallback": {"source": "yahoo_daily", "yahoo_symbol": "^VIX"}},
+        {"id": "credit_impulse_1m", "label": "HYG vs TLT 1-month return spread (%)", "source": "computed_spread", "leg_a": "HYG", "leg_b": "TLT", "window_days": 21, "good_for": "credit_impulse"},
+        {"id": "spy_20d_realized_vol", "label": "SPY 20-day realized vol (annualized %)", "source": "computed_realized_vol", "ticker": "SPY", "window_days": 20, "good_for": "equity_vol"}
+      ]
+    },
+    "gold_royalties": {
+      "label": "Gold royalty sentiment",
+      "description": "Gold spot and royalty-ETF sentiment for precious-metals royalty compounders.",
+      "series": [
+        {"id": "gold_spot_usd", "label": "Gold spot (USD/oz)", "source": "fred", "fred_id": "GOLDAMGBD228NLBM", "good_for": "gold_price", "fallback": {"source": "yahoo_daily", "yahoo_symbol": "GLD", "scale_note": "GLD price proxy when London fix unavailable"}},
+        {"id": "gdx_etf", "label": "GDX miners ETF (USD)", "source": "yahoo_daily", "yahoo_symbol": "GDX", "good_for": "royalty_sentiment"},
+        {"id": "gdx_gld_ratio", "label": "GDX / GLD ratio (miners vs bullion)", "source": "computed_ratio", "numerator": "GDX", "denominator": "GLD", "good_for": "royalty_multiple_sentiment"}
+      ]
+    },
+    "exchange_volatility": {
+      "label": "Exchange vol tailwind",
+      "description": "Vol level, realized equity vol, and term-structure context for exchange croupiers.",
+      "series": [
+        {"id": "vix_level", "label": "VIX index level", "source": "fred", "fred_id": "VIXCLS", "good_for": "vol_regime", "fallback": {"source": "yahoo_daily", "yahoo_symbol": "^VIX"}},
+        {"id": "spy_20d_realized_vol", "label": "SPY 20-day realized vol (annualized %)", "source": "computed_realized_vol", "ticker": "SPY", "window_days": 20, "good_for": "equity_vol"},
+        {"id": "vrp_health_score", "label": "VRP health score (etf-dashboard)", "source": "etf_dashboard_snapshot", "snapshot_file": "vrp_health.json", "json_path": "health_score", "good_for": "options_market_health", "optional": true},
+        {"id": "vol_term_slope", "label": "Vol term-structure slope (etf-dashboard)", "source": "etf_dashboard_snapshot", "snapshot_file": "vol_shape_history.json", "json_path": "latest.slope", "good_for": "vol_term_structure", "optional": true}
       ]
     }
   }

@@ -1,9 +1,21 @@
 {
-  "description": "Maps thematic indicator panels (theme_panel_config.json) to the holdings whose optionality they help explain. Used by apply_context_overlay.py to inject a context_overlay block into each tagged ticker's valuation.json. Context only: never a base-IRR input.",
+  "description": "Maps thematic indicator panels (theme_panel_config.json) to holdings whose optionality they help explain. Used by apply_context_overlay.py to inject context_overlay into valuation.json. Context only: never a base-IRR input.",
   "themes": {
     "ai_power_land": {
-      "rationale": "AI compute demand -> power/grid/water constraint -> scarce Permian surface and hosting capacity. Explains repricing of land, surface, water, and AI-infra optionality.",
-      "tickers": ["TPL", "LB", "WBI", "APLD", "BWEL"]
+      "rationale": "AI compute demand -> power/grid/water constraint -> scarce Permian surface and Southwest renewable hosting. Hyperscaler capex is the upstream pulse; power and gas prices are midstream signals. AZLCZ Southwest renewable leases share the power-demand tailwind (geography differs from Permian).",
+      "tickers": ["TPL", "LB", "WBI", "APLD", "BWEL", "AZLCZ"]
+    },
+    "macro_regime": {
+      "rationale": "Portfolio-wide risk appetite, rates, dollar, and credit impulse context for stance sizing.",
+      "tickers": ["*"]
+    },
+    "gold_royalties": {
+      "rationale": "Gold spot and royalty-sentiment proxies for precious-metals royalty compounders.",
+      "tickers": ["RGLD", "FNV", "WPM", "OR", "MSB"]
+    },
+    "exchange_volatility": {
+      "rationale": "Vol level and term-structure context for exchange croupiers and vol-sensitive platforms.",
+      "tickers": ["CME", "ICE", "CBOE", "MIAX", "8697.T"]
     }
   }
 }

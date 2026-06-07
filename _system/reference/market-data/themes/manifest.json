@@ -1,17 +1,79 @@
 {
-  "generated_at": "2026-06-06T22:53:31Z",
-  "as_of": "2026-06-06",
+  "generated_at": "2026-06-07T03:35:12Z",
+  "as_of": "2026-06-07",
   "staleness_max_days": 10,
   "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; never auto-inflate Lawrence base IRR (human review promotes to base).",
   "themes": {
+    "exchange_volatility": {
+      "label": "Exchange vol tailwind",
+      "description": "Vol level, realized equity vol, and term-structure context for exchange croupiers.",
+      "series": {
+        "vix_level": {
+          "label": "VIX index level",
+          "latest": 21.510000228881836,
+          "as_of": "2026-06-05",
+          "prior_year": 18.479999542236328,
+          "yoy_pct": 16.4,
+          "direction": "up",
+          "good_for": "vol_regime",
+          "source": "yahoo:^VIX",
+          "optional": false,
+          "stale": false,
+          "error": null,
+          "note": null
+        },
+        "spy_20d_realized_vol": {
+          "label": "SPY 20-day realized vol (annualized %)",
+          "latest": 12.9,
+          "as_of": "2026-06-05",
+          "prior_year": 16.36,
+          "yoy_pct": -21.1,
+          "direction": "down",
+          "good_for": "equity_vol",
+          "source": "realized_vol:SPY:20d",
+          "optional": false,
+          "stale": false,
+          "error": null,
+          "note": null
+        },
+        "vrp_health_score": {
+          "label": "VRP health score (etf-dashboard)",
+          "latest": null,
+          "as_of": null,
+          "prior_year": null,
+          "yoy_pct": null,
+          "direction": "flat",
+          "good_for": "options_market_health",
+          "source": "",
+          "optional": true,
+          "stale": true,
+          "error": "path_missing",
+          "note": null
+        },
+        "vol_term_slope": {
+          "label": "Vol term-structure slope (etf-dashboard)",
+          "latest": null,
+          "as_of": null,
+          "prior_year": null,
+          "yoy_pct": null,
+          "direction": "flat",
+          "good_for": "vol_term_structure",
+          "source": "",
+          "optional": true,
+          "stale": true,
+          "error": "path_missing",
+          "note": null
+        }
+      }
+    },
     "ai_power_land": {
       "label": "AI compute -> power demand -> grid/water constraint -> scarce Permian surface",
-      "description": "Demand chain behind land/surface/water optionality (TPL water, LB easements, WBI infra, APLD hosting). Hyperscaler capex is the upstream pulse; power and gas prices and Permian activity are the midstream signals.",
+      "description": "Demand chain behind land/surface/water optionality (TPL water, LB easements, WBI infra, APLD hosting, AZLCZ Southwest renewable). Hyperscaler capex is the upstream pulse; power and gas prices and Permian activity are the midstream signals.",
       "series": {
         "hyperscaler_capex_ttm_usd_bn": {
           "label": "Hyperscaler capex guide (USD bn, latest)",
           "latest": 467.3,
-          "as_of": "2026-06-06",
+          "as_of": "2026-06-07",
           "prior_year": null,
           "yoy_pct": null,
           "direction": "flat",
@@ -57,16 +119,16 @@
         },
         "wti_crude": {
           "label": "WTI crude (USD/bbl)",
-          "latest": null,
-          "as_of": null,
-          "prior_year": null,
-          "yoy_pct": null,
-          "direction": "flat",
+          "latest": 90.54000091552734,
+          "as_of": "2026-06-05",
+          "prior_year": 63.369998931884766,
+          "yoy_pct": 42.9,
+          "direction": "up",
           "good_for": "permian_cashflow",
-          "source": "fred:DCOILWTICO",
+          "source": "yahoo:CL=F",
           "optional": false,
-          "stale": true,
-          "error": "network",
+          "stale": false,
+          "error": null,
           "note": null
         },
         "permian_crude_production_mbbl_d": {
@@ -82,6 +144,20 @@
           "stale": true,
           "error": "no_eia_key",
           "note": "Requires EIA_API_KEY; null when absent"
+        },
+        "tpl_water_revenue_m": {
+          "label": "TPL water segment revenue (USD m, FY)",
+          "latest": 307.5,
+          "as_of": "2026-06-01",
+          "prior_year": null,
+          "yoy_pct": null,
+          "direction": "flat",
+          "good_for": "water_infra_proof",
+          "source": "filing_panel:tpl_operating_panel.csv:water_revenue_m",
+          "optional": true,
+          "stale": false,
+          "error": null,
+          "note": null
         },
         "ust_10y": {
           "label": "US Treasury 10Y yield (%)",
@@ -123,6 +199,158 @@
           "optional": false,
           "stale": true,
           "error": "network",
+          "note": null
+        }
+      }
+    },
+    "macro_regime": {
+      "label": "Macro risk regime",
+      "description": "Portfolio-wide credit, rates, dollar, and vol context for stance sizing.",
+      "series": {
+        "hy_oas": {
+          "label": "High-yield OAS credit spread (%)",
+          "latest": null,
+          "as_of": null,
+          "prior_year": null,
+          "yoy_pct": null,
+          "direction": "flat",
+          "good_for": "risk_regime",
+          "source": "fred:BAMLH0A0HYM2",
+          "optional": false,
+          "stale": true,
+          "error": "network",
+          "note": null
+        },
+        "ust_10y": {
+          "label": "US Treasury 10Y yield (%)",
+          "latest": null,
+          "as_of": null,
+          "prior_year": null,
+          "yoy_pct": null,
+          "direction": "flat",
+          "good_for": "rates_regime",
+          "source": "fred:DGS10",
+          "optional": false,
+          "stale": true,
+          "error": "network",
+          "note": null
+        },
+        "ust_2y": {
+          "label": "US Treasury 2Y yield (%)",
+          "latest": null,
+          "as_of": null,
+          "prior_year": null,
+          "yoy_pct": null,
+          "direction": "flat",
+          "good_for": "rates_regime",
+          "source": "fred:DGS2",
+          "optional": false,
+          "stale": true,
+          "error": "network",
+          "note": null
+        },
+        "dxy_broad": {
+          "label": "Trade-weighted USD index (broad)",
+          "latest": null,
+          "as_of": null,
+          "prior_year": null,
+          "yoy_pct": null,
+          "direction": "flat",
+          "good_for": "dollar_regime",
+          "source": "fred:DTWEXBGS",
+          "optional": true,
+          "stale": true,
+          "error": "network",
+          "note": null
+        },
+        "vix_level": {
+          "label": "VIX index level",
+          "latest": 21.510000228881836,
+          "as_of": "2026-06-05",
+          "prior_year": 18.479999542236328,
+          "yoy_pct": 16.4,
+          "direction": "up",
+          "good_for": "vol_regime",
+          "source": "yahoo:^VIX",
+          "optional": false,
+          "stale": false,
+          "error": null,
+          "note": null
+        },
+        "credit_impulse_1m": {
+          "label": "HYG vs TLT 1-month return spread (%)",
+          "latest": 0.27,
+          "as_of": "2026-06-05",
+          "prior_year": 2.33,
+          "yoy_pct": -88.4,
+          "direction": "down",
+          "good_for": "credit_impulse",
+          "source": "spread:HYG-TLT:21d",
+          "optional": false,
+          "stale": false,
+          "error": null,
+          "note": null
+        },
+        "spy_20d_realized_vol": {
+          "label": "SPY 20-day realized vol (annualized %)",
+          "latest": 12.9,
+          "as_of": "2026-06-05",
+          "prior_year": 16.36,
+          "yoy_pct": -21.1,
+          "direction": "down",
+          "good_for": "equity_vol",
+          "source": "realized_vol:SPY:20d",
+          "optional": false,
+          "stale": false,
+          "error": null,
+          "note": null
+        }
+      }
+    },
+    "gold_royalties": {
+      "label": "Gold royalty sentiment",
+      "description": "Gold spot and royalty-ETF sentiment for precious-metals royalty compounders.",
+      "series": {
+        "gold_spot_usd": {
+          "label": "Gold spot (USD/oz)",
+          "latest": 396.239990234375,
+          "as_of": "2026-06-05",
+          "prior_year": 309.3299865722656,
+          "yoy_pct": 28.1,
+          "direction": "up",
+          "good_for": "gold_price",
+          "source": "yahoo:GLD (GLD price proxy when London fix unavailable)",
+          "optional": false,
+          "stale": false,
+          "error": null,
+          "note": null
+        },
+        "gdx_etf": {
+          "label": "GDX miners ETF (USD)",
+          "latest": 78.83999633789062,
+          "as_of": "2026-06-05",
+          "prior_year": 53.150001525878906,
+          "yoy_pct": 48.3,
+          "direction": "up",
+          "good_for": "royalty_sentiment",
+          "source": "yahoo:GDX",
+          "optional": false,
+          "stale": false,
+          "error": null,
+          "note": null
+        },
+        "gdx_gld_ratio": {
+          "label": "GDX / GLD ratio (miners vs bullion)",
+          "latest": 0.199,
+          "as_of": "2026-06-05",
+          "prior_year": 0.1718,
+          "yoy_pct": 15.8,
+          "direction": "up",
+          "good_for": "royalty_multiple_sentiment",
+          "source": "ratio:GDX/GLD",
+          "optional": false,
+          "stale": false,
+          "error": null,
           "note": null
         }
       }

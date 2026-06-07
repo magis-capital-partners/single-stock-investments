@@ -49,6 +49,7 @@ MENTAL_MODELS_LEGACY = re.compile(r"### Mental models in plain English", re.IGNO
 RETURN_MATH = re.compile(r"#### Return math in plain English", re.IGNORECASE)
 IRR_ARITHMETIC = re.compile(r"#### IRR arithmetic \(show your work\)", re.IGNORECASE)
 AI_INFRA = re.compile(r"#### AI infrastructure\b", re.I)
+THEMATIC_CONTEXT = re.compile(r"#### Thematic context\b", re.I)
 SYNTHESIS_SECTION = re.compile(r"### Total synthesis IRR \(all sources\)", re.IGNORECASE)
 RETURNS_STATEMENT = re.compile(
     r"\*\*Returns statement:\*\*[^\n]*?\*\*(-?\d+(?:\.\d+)?)\s*%\*\*",
@@ -299,6 +300,11 @@ def lint_file(path: Path, *, legacy: bool, strict: bool) -> tuple[list[str], lis
                 "#### AI infrastructure — model coverage (ai_infrastructure_valuation.md)"
             )
             (errors if strict else warnings).append(msg)
+
+        if val.get("context_overlay", {}).get("themes") and not THEMATIC_CONTEXT.search(text):
+            warnings.append(
+                f"{rel}: context_overlay present — missing #### Thematic context (run refresh_deep_dive_v2.py)"
+            )
 
         sys.path.insert(0, str(Path(__file__).resolve().parent))
         from optionality_evidence_common import has_evidence_refresh_config, synthesis_in_dive

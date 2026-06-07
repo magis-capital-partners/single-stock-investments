@@ -8,29 +8,41 @@ Broadly-ingested macro / industry context that explains *why* holdings' optional
 |------|----------|
 | `manifest.json` | Latest value, YoY, direction, staleness per series, grouped by theme |
 | `{series_id}.csv` | Append-only history (`date,value`) per indicator |
+| `filing_panels/*.csv` | Filing-derived time series (TPL water, AZLCZ leases, hyperscaler capex) |
 
-## Pipeline
+## Pipeline (daily order)
 
 ```bash
-python _system/scripts/fetch_theme_panel.py            # refresh all themes
-python _system/scripts/apply_context_overlay.py        # inject context_overlay into tagged valuation.json
+python -m darwin.import_external_data          # from _system/scripts; sync etf-dashboard
+python _system/scripts/extract_theme_facts.py
+python _system/scripts/fetch_theme_panel.py
+python _system/scripts/apply_context_overlay.py
+python _system/scripts/fetch_ls_microstructure.py
+python _system/scripts/fetch_peer_panel.py
 ```
 
 - **Config:** `_system/scripts/theme_panel_config.json`
-- **Tags:** `_system/portfolio/holdings_themes.json`
-- **Sources:** FRED (rates, credit, gas, electricity, WTI), Stooq (daily closes), EIA (Permian production; needs `EIA_API_KEY`), and repo filings (hyperscaler capex from `ai_overlay` in `valuation.json`).
+- **Tags:** `_system/portfolio/holdings_themes.json` (`"*"` expands to all registry holdings for `macro_regime`)
+- **Sources:** FRED (rates, credit, gas, WTI), Yahoo daily (fallback when FRED/Stooq blocked), etf-dashboard CSV/JSON, EIA (Permian; needs `EIA_API_KEY`), repo `ai_overlay`, filing panels.
+
+## etf-dashboard submodule
+
+Live data: `_external/etf-dashboard` (see `.gitmodules`). Override path with `DARWIN_ETF_DASHBOARD_ROOT`. Synced snapshots also land in `_system/reference/market-data/external/` for offline CI.
 
 ## Rules
 
 - **Context only.** Every indicator carries `in_base_irr: false`. Tailwinds inform stance and overlay sizing; they never auto-inflate Lawrence base IRR.
 - Promotion to base case requires a human to set `in_base_irr: true` (preserved across refreshes) under **[HUMAN REVIEW]**.
-- Offline-safe: on network failure, cached CSV history is kept and the last known value is reused with an error note.
-- No fabricated numbers: the hyperscaler capex series is derived from filing-cited `ai_overlay` blocks in each hyperscaler's `valuation.json`.
+- Offline-safe: on network failure, cached CSV history is kept; Yahoo proxies used for WTI/VIX/GLD when FRED times out.
+- Deep dives: `#### Thematic context` in Business & moat (mechanical table + Marvin narrative preserved on refresh).
 
 ## Themes
 
 | Theme | Chain | Tagged holdings |
 |-------|-------|-----------------|
-| `ai_power_land` | AI compute -> power demand -> grid/water constraint -> scarce Permian surface / hosting | TPL, LB, WBI, APLD, BWEL |
+| `ai_power_land` | AI compute -> power -> grid/water -> land/hosting | TPL, LB, WBI, APLD, BWEL, **AZLCZ** |
+| `macro_regime` | HY OAS, rates, dollar, VIX, credit impulse | All registry holdings (`*`) |
+| `gold_royalties` | Gold spot, GDX, GDX/GLD ratio | RGLD, FNV, WPM, OR, MSB |
+| `exchange_volatility` | VIX, realized vol, VRP health | CME, ICE, CBOE, MIAX, 8697.T |
 
 See `_system/frameworks/optionality_valuation.md` § **Thematic context layer**.

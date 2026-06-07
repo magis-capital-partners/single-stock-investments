@@ -22,8 +22,10 @@ from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+SCRIPTS = Path(__file__).resolve().parent
 THEMES_MANIFEST = ROOT / "_system" / "reference" / "market-data" / "themes" / "manifest.json"
 HOLDINGS_THEMES = ROOT / "_system" / "portfolio" / "holdings_themes.json"
+PEERS_MANIFEST = ROOT / "_system" / "reference" / "market-data" / "peers" / "manifest.json"
 TODAY = date.today().isoformat()
 
 DISCLAIMER = (
@@ -36,14 +38,43 @@ def load_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
 
 
+def registry_tickers() -> list[str]:
+    import sys
+
+    sys.path.insert(0, str(SCRIPTS))
+    from portfolio_registry import load_registry  # noqa: WPS433
+
+    return sorted((load_registry().get("holdings") or {}).keys())
+
+
 def theme_map() -> dict[str, list[str]]:
     """ticker -> [theme_id, ...]"""
     cfg = load_json(HOLDINGS_THEMES).get("themes") or {}
+    all_holdings = registry_tickers()
     out: dict[str, list[str]] = {}
     for theme_id, blk in cfg.items():
-        for tk in blk.get("tickers") or []:
-            out.setdefault(tk.upper(), []).append(theme_id)
+        tickers = blk.get("tickers") or []
+        if "*" in tickers:
+            expanded = all_holdings
+        else:
+            expanded = tickers
+        for tk in expanded:
+            out.setdefault(str(tk).upper(), []).append(theme_id)
     return out
+
+
+def peer_context_for(ticker: str) -> dict | None:
+    manifest = load_json(PEERS_MANIFEST)
+    clusters = manifest.get("clusters") or {}
+    for cluster_id, meta in clusters.items():
+        if ticker in (meta.get("tickers") or []):
+            return {
+                "cluster_id": cluster_id,
+                "path": meta.get("path"),
+                "tickers": meta.get("tickers"),
+                "note": "Context only; percentile rank not in base IRR.",
+            }
+    return None
 
 
 def preserved_base_flags(existing: dict) -> dict[str, bool]:
@@ -81,11 +112,15 @@ def build_overlay(ticker: str, theme_ids: list[str], manifest: dict, existing: d
             themes_out.append({"theme_id": theme_id, "label": tdata.get("label"), "indicators": indicators})
     if not themes_out:
         return None
-    return {
+    out = {
         "as_of": manifest.get("as_of", TODAY),
         "disclaimer": DISCLAIMER,
         "themes": themes_out,
     }
+    peer = peer_context_for(ticker)
+    if peer:
+        out["peer_context"] = peer
+    return out
 
 
 def arrow(direction: str | None) -> str:
