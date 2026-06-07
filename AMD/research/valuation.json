@@ -1,0 +1,535 @@
+{
+  "ticker": "AMD",
+  "as_of": "2026-06-07",
+  "method": "full",
+  "valuation_overlay": "segment_cashflow",
+  "lawrence_bucket": "pricing_power",
+  "payoff_lens": "operating",
+  "classification_inputs": {
+    "archetype": "compounder",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "up"
+  },
+  "inputs": {
+    "price": 120.0,
+    "price_source": "Placeholder ~$120; marvin_cloud_refresh will update live quote",
+    "fcf_per_share": 3.37,
+    "fcf_source": "FY2025 continuing OCF $6.49B \u2212 capex $0.97B \u00f7 1.64B diluted shares (10-K)",
+    "shares_millions": 1636,
+    "normalization_note": "Continuing operations OCF; excludes discontinued ops cash flow"
+  },
+  "ai_overlay": {
+    "as_of": "2026-06-07",
+    "status": "partial \u2014 Data Center MI300/EPYC in segment build; foundry prepayments not in FCF\u2080",
+    "in_model": {
+      "data_center_growth_y1_5": "16% segment_build (MI300 + EPYC AI server CPUs)",
+      "consolidated_growth_base": "10%/7% blended",
+      "fy2025_fcf_sh": "$3.37 filing-based Lawrence FCF\u2080",
+      "client_gaming_cyclical": "6%/5% segment path for PC/console"
+    },
+    "not_in_model_requires_refresh": [
+      "Hyperscaler custom ASIC share shift (GPU/AI accelerator TAM)",
+      "TSMC advanced-node allocation and foundry prepayment timing",
+      "MI350/MI400 roadmap gross-margin bridge vs NVIDIA Blackwell",
+      "China export-control revenue mix",
+      "Xilinx FPGA synergy as separate owner-cash line",
+      "OpenAI / mega-deal volume commitments (press until 8-K)"
+    ],
+    "capex_stress_2026": {
+      "ocf_bn_assumption": 5.5,
+      "ocf_assumption_note": "[Assumption] ~15% below FY2025 continuing OCF if Data Center orders slip",
+      "capex_bn": 1.5,
+      "capex_source": "FY2025 PP&E $0.97B + [Assumption] $0.5B incremental HBM/packaging capacity",
+      "implied_fcf_bn": 4.0,
+      "implied_fcf_per_share": 2.44
+    },
+    "ai_inflection_bull": {
+      "fcf_per_share_y0": 4.8,
+      "fcf_y0_note": "[Assumption] FY2027 normalized if Data Center sustains 35%+ revenue growth and margin expands",
+      "growth_y1_5": 0.18,
+      "growth_y6_10": 0.1,
+      "exit_pfcf_y10": 26,
+      "drivers": "MI300 share gains, EPYC server CPU mix, Client recovery",
+      "computed_return_pct": 21.1
+    }
+  },
+  "segment_build": {
+    "framework": "speedwell_reverse_dcf",
+    "as_of": "2026-06-07",
+    "horizon_years": 7,
+    "discount_rate_explicit": 0.1,
+    "segments": [
+      {
+        "id": "data_center",
+        "label": "Data Center (EPYC CPUs, Instinct GPUs, AI accelerators)",
+        "type": "operating",
+        "revenue_y0_bn": 16.635,
+        "revenue_share_pct": 48.0,
+        "operating_income_y0_bn": 3.603,
+        "owner_cash_y0_bn": 2.65,
+        "owner_cash_y0_per_share": 1.62,
+        "owner_cash_y0_source": "FY2025 FCF allocated 48.0% by segment revenue share (10-K)",
+        "growth_y1_5": 0.16,
+        "growth_y6_10": 0.1,
+        "exit_pfcf_y10": 24,
+        "pv_per_share_at_10pct": 72.5,
+        "notes": "FY2025 rev $16.6B (+32% YoY); OI $3.6B"
+      },
+      {
+        "id": "client_and_gaming",
+        "label": "Client and Gaming (Ryzen, Radeon)",
+        "type": "operating",
+        "revenue_y0_bn": 14.55,
+        "revenue_share_pct": 42.0,
+        "operating_income_y0_bn": 2.855,
+        "owner_cash_y0_bn": 2.32,
+        "owner_cash_y0_per_share": 1.42,
+        "owner_cash_y0_source": "FY2025 FCF allocated 42.0% by segment revenue share",
+        "growth_y1_5": 0.06,
+        "growth_y6_10": 0.05,
+        "exit_pfcf_y10": 16,
+        "pv_per_share_at_10pct": 20.8,
+        "notes": "FY2025 combined segment rev $14.6B; OI $2.9B"
+      },
+      {
+        "id": "embedded",
+        "label": "Embedded (adaptive SoCs, FPGAs from Xilinx)",
+        "type": "operating",
+        "revenue_y0_bn": 3.454,
+        "revenue_share_pct": 10.0,
+        "operating_income_y0_bn": 1.243,
+        "owner_cash_y0_bn": 0.55,
+        "owner_cash_y0_per_share": 0.34,
+        "owner_cash_y0_source": "FY2025 FCF allocated 10.0% by segment revenue share",
+        "growth_y1_5": 0.08,
+        "growth_y6_10": 0.06,
+        "exit_pfcf_y10": 14,
+        "pv_per_share_at_10pct": 3.2,
+        "notes": "FY2025 rev $3.5B; OI $1.2B (highest segment margin)"
+      }
+    ],
+    "options": [
+      {
+        "id": "xilinx_fpga_option",
+        "label": "Xilinx adaptive computing cross-sell",
+        "option_treatment": "embedded_in_segment",
+        "annual_drag_per_share": 0.0,
+        "base_terminal_value_bn": 0,
+        "base_terminal_rationale": "FPGA revenue inside Embedded segment; no separate terminal",
+        "pv_drag_per_share_at_10pct": 0,
+        "notes": "Embedded segment growth embeds Xilinx optionality"
+      }
+    ],
+    "corporate_drag": {
+      "alphabet_level_drag_per_share": 0.0,
+      "pv_drag_per_share_at_10pct": 0,
+      "notes": "Unallocated corp costs net in consolidated OI vs segment sum; no extra drag row"
+    },
+    "reconciliation": {
+      "sum_pv_per_share_at_10pct": 96.5,
+      "implied_business_return_pct": null,
+      "lawrence_base_irr_pct": null,
+      "price_per_share": 120.0,
+      "slack_notes": "Segment sum @10% ~$97 vs $120 placeholder \u2014 price embeds AI share-gain option not fully in segment exits",
+      "sum_pv_per_share_at_explicit_discount": 96.5,
+      "explicit_discount_rate_pct": 10.0
+    }
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.06,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 16,
+      "notes": "Data Center share stalls; PC downturn; custom ASIC pressure"
+    },
+    "base": {
+      "growth_y1_5": 0.1,
+      "growth_y6_10": 0.07,
+      "exit_pfcf_y10": 20,
+      "notes": "MI300 ramp continues; Client stable; margin modest expansion"
+    },
+    "bull": {
+      "growth_y1_5": 0.15,
+      "growth_y6_10": 0.09,
+      "exit_pfcf_y10": 26,
+      "notes": "AI accelerator share gains vs NVIDIA; EPYC share in cloud CPUs"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 4,
+      "question": "Backlog / RPO / AI capex not in FCF path?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Data Center segment growth; RPO $315M (10-K) immaterial vs revenue"
+    },
+    {
+      "q": 3,
+      "question": "In-business option: Xilinx FPGA / adaptive computing?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Embedded segment revenue and margin"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option already in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "MI300 GPU revenue in Data Center segment"
+    }
+  ],
+  "evidence_refresh": {
+    "synthesis_in_dive": false
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -1.7
+    },
+    "base": {
+      "return_pct": 4.5
+    },
+    "bull": {
+      "return_pct": 12.1
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -1.7
+    },
+    "base": {
+      "return_pct": 4.5
+    },
+    "bull": {
+      "return_pct": 12.1
+    }
+  },
+  "implied_return": {
+    "base_pct": 7.84,
+    "label": "7yr IRR (total synthesis)",
+    "display": "7.84% (total synthesis)",
+    "lawrence_stance_gate_pct": 4.5,
+    "falsifier_adjusted_pct": 4.5,
+    "synthesis_pct": 7.84
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "overlay_results": [
+    {
+      "case": "AI inflection",
+      "method": "full (normalized FCF)",
+      "key_inputs": "FCF\u2080=$4.8 g1=18% g2=10% exit=26\u00d7",
+      "return_pct": 21.1,
+      "stance_gate": false,
+      "notes": "[Assumption] FY2027 normalized if Data Center sustains 35%+ revenue growth and margin expands"
+    },
+    {
+      "case": "Capex stress Y0",
+      "method": "illustrative trough",
+      "key_inputs": "OCF 5.5B \u2212 capex 1.5B",
+      "return_pct": null,
+      "display": "FCF ~$2.44/sh (not 7yr IRR)",
+      "stance_gate": false
+    }
+  ],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": -1.7,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 12.1,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 8.04,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 7.84,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  },
+  "context_overlay": {
+    "as_of": "2026-06-07",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": null,
+            "as_of": null,
+            "yoy_pct": null,
+            "direction": "flat",
+            "good_for": "risk_regime",
+            "source": "fred:BAMLH0A0HYM2",
+            "stale": true,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": null,
+            "as_of": null,
+            "yoy_pct": null,
+            "direction": "flat",
+            "good_for": "rates_regime",
+            "source": "fred:DGS10",
+            "stale": true,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": null,
+            "as_of": null,
+            "yoy_pct": null,
+            "direction": "flat",
+            "good_for": "rates_regime",
+            "source": "fred:DGS2",
+            "stale": true,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": null,
+            "as_of": null,
+            "yoy_pct": null,
+            "direction": "flat",
+            "good_for": "dollar_regime",
+            "source": "fred:DTWEXBGS",
+            "stale": true,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 21.510000228881836,
+            "as_of": "2026-06-05",
+            "yoy_pct": 16.4,
+            "direction": "up",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": 0.27,
+            "as_of": "2026-06-05",
+            "yoy_pct": -88.4,
+            "direction": "down",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 12.9,
+            "as_of": "2026-06-05",
+            "yoy_pct": -21.1,
+            "direction": "down",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "insider_signal": {
+    "as_of": "2026-06-07",
+    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
+    "in_base_irr": false,
+    "window_days": 365,
+    "ics": 10.0,
+    "band": "exceptional",
+    "bull_case_support": "moderate",
+    "scenario_confidence": {
+      "priors": {
+        "bear": 0.2,
+        "base": 0.55,
+        "bull": 0.25
+      },
+      "tilted": {
+        "bear": 0.2,
+        "base": 0.4,
+        "bull": 0.4
+      },
+      "bull_delta": 0.15,
+      "bear_delta": 0.0,
+      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
+    },
+    "factors": {
+      "buy_score": 15.373,
+      "sell_score": -1.0,
+      "cluster_bonus": 0.0,
+      "net_buy_usd": 12810423.48,
+      "net_sell_usd": 306531276.0,
+      "price_today": 120.0
+    },
+    "top_buys": [
+      {
+        "insider": "Norrod Forrest Eugene",
+        "date": "2026-05-20",
+        "shares": 8237,
+        "price": 34.19,
+        "value_usd": 281623.03,
+        "shares_owned_after": 344014,
+        "contrib": 1.977
+      },
+      {
+        "insider": "Papermaster Mark D",
+        "date": "2026-05-15",
+        "shares": 6000,
+        "price": 84.85,
+        "value_usd": 509100.0,
+        "shares_owned_after": 1239687,
+        "contrib": 1.688
+      },
+      {
+        "insider": "Su Lisa T",
+        "date": "2025-08-21",
+        "shares": 224727,
+        "price": 34.19,
+        "value_usd": 7683416.13,
+        "shares_owned_after": 3584748,
+        "contrib": 1.489
+      },
+      {
+        "insider": "Papermaster Mark D",
+        "date": "2026-04-15",
+        "shares": 6000,
+        "price": 84.85,
+        "value_usd": 509100.0,
+        "shares_owned_after": 1300466,
+        "contrib": 1.311
+      },
+      {
+        "insider": "Norrod Forrest Eugene",
+        "date": "2026-02-11",
+        "shares": 8200,
+        "price": 34.19,
+        "value_usd": 280358.0,
+        "shares_owned_after": 308548,
+        "contrib": 1.045
+      }
+    ],
+    "top_sells": [
+      {
+        "insider": "Denzel Nora",
+        "date": "2026-06-02",
+        "shares": 8626,
+        "price": 522.0,
+        "value_usd": 4502772.0,
+        "is_10b5_1": false,
+        "contrib": -0.24
+      },
+      {
+        "insider": "Denzel Nora",
+        "date": "2026-05-29",
+        "shares": 1821,
+        "price": 522.0,
+        "value_usd": 950562.0,
+        "is_10b5_1": false,
+        "contrib": -0.232
+      },
+      {
+        "insider": "Su Lisa T",
+        "date": "2025-11-25",
+        "shares": 40000,
+        "price": 0.0,
+        "value_usd": 0.0,
+        "is_10b5_1": false,
+        "contrib": -0.129
+      },
+      {
+        "insider": "Su Lisa T",
+        "date": "2025-08-15",
+        "shares": 49449,
+        "price": 177.51,
+        "value_usd": 8777691.99,
+        "is_10b5_1": false,
+        "contrib": -0.129
+      },
+      {
+        "insider": "Su Lisa T",
+        "date": "2025-08-09",
+        "shares": 6383,
+        "price": 172.76,
+        "value_usd": 1102727.08,
+        "is_10b5_1": false,
+        "contrib": -0.129
+      }
+    ],
+    "narrative_hooks": [],
+    "transaction_count": 217
+  }
+}
