@@ -395,6 +395,8 @@ def implied_etf_flows(aum_df: pd.DataFrame, nav_df: pd.DataFrame) -> pd.DataFram
             continue
         aligned["ret"] = aligned["nav_jpy"].pct_change()
         aligned["flow_jpym"] = aligned["aum_jpym"].diff() - aligned["aum_jpym"].shift(1) * aligned["ret"]
+        cap = aligned["aum_jpym"].shift(1).abs() * 0.05
+        aligned["flow_jpym"] = aligned["flow_jpym"].clip(lower=-cap, upper=cap)
         for dt, row in aligned.iterrows():
             if pd.notna(row.get("flow_jpym")):
                 out.append({
@@ -564,6 +566,19 @@ def fetch_factor_returns(registry: dict) -> pd.DataFrame:
         except Exception as exc:
             print(f"[warn] factor {name} ({tk}): {exc}")
     if not frames:
+        monthly_path = DATA / "factor_returns_monthly.csv"
+        daily_path = DATA / "factor_returns_daily.csv"
+        if monthly_path.exists() and monthly_path.stat().st_size > 20:
+            print("[warn] yfinance empty; reusing cached factor_returns_monthly.csv")
+            return pd.read_csv(monthly_path)
+        if daily_path.exists() and daily_path.stat().st_size > 20:
+            print("[warn] yfinance empty; rebuilding monthly from cached factor_returns_daily.csv")
+            fd = pd.read_csv(daily_path, index_col=0, parse_dates=True)
+            monthly = fd.resample("ME").last().pct_change()
+            monthly.index.name = "month"
+            out = monthly.reset_index()
+            out["month"] = pd.to_datetime(out["month"]).dt.strftime("%Y-%m-%d")
+            return out
         return pd.DataFrame()
     m = pd.concat(frames.values(), axis=1)
     m.index = pd.to_datetime(m.index).tz_localize(None)
@@ -1192,7 +1207,13 @@ def main() -> None:
 
     # P2 factors first (fund proxy needs value_factor_ret on panel)
     factor_m = fetch_factor_returns(registry)
-    factor_m.to_csv(DATA / "factor_returns_monthly.csv", index=False)
+    if not factor_m.empty:
+        factor_m.to_csv(DATA / "factor_returns_monthly.csv", index=False)
+    else:
+        print("[warn] factor fetch empty; keeping existing factor_returns_monthly.csv")
+        factor_path = DATA / "factor_returns_monthly.csv"
+        if factor_path.exists() and factor_path.stat().st_size > 20:
+            factor_m = pd.read_csv(factor_path)
     factor_h = factor_halfyear(panel, factor_m) if not panel.empty else pd.DataFrame()
     if not factor_h.empty:
         factor_h.to_csv(DATA / "factor_returns_halfyear.csv", index=False)
