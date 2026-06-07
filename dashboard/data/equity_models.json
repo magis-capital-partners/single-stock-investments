@@ -1,5 +1,5 @@
 {
-  "built_at": "2026-06-07T15:07:48Z",
+  "built_at": "2026-06-07T21:13:01Z",
   "ticker_count": 1,
   "tickers": {
     "7176.T": {
@@ -36,33 +36,38 @@
         ],
         "aum_anchor_date": "2026-03-31",
         "aum_anchor_jpym": 1335700.0,
-        "aum_nowcast_jpym": 27877337,
-        "aum_source": "etf_nav_filing_anchor (2026-06-05) + non-ETF MTM; +ETF flow YTD \u00a516244557m",
-        "nikkei_return_to_date": 0.0,
-        "effective_excess_ret_v2": 0.0,
-        "etf_flow_ytd_jpym": 16244557,
+        "aum_nonlisted_jpym": 1101200,
+        "aum_etf_sleeve_jpym": 272100,
+        "aum_nowcast_jpym": 1520031,
+        "aum_source": "filing sleeves MTM (non-listed Nikkei + ETF basket); +company ETF flow YTD \u00a5277m",
+        "market_source": "cached_market_nav",
+        "nikkei_return_to_date": 0.2391,
+        "etf_basket_return_to_date": 0.1099,
+        "effective_excess_ret_v2": 0.1915,
+        "etf_flow_ytd_jpym": 277,
         "nowcast_jpym": {
-          "base_fee": 77471,
-          "perf_fee": 0,
-          "revenue": 77671,
-          "ordinary_profit": 35103,
-          "net_income": 25826
+          "base_fee": 4012,
+          "perf_fee": 1784,
+          "revenue": 5997,
+          "ordinary_profit": 3298,
+          "net_income": 2426
         },
-        "production_spec": "v3b",
+        "production_spec": "v5",
         "nowcast_v2_jpym": {
-          "perf_fee": 0,
-          "revenue": 77671,
-          "ordinary_profit": 35103,
-          "net_income": 25826
+          "perf_fee": 1860,
+          "revenue": 6073,
+          "ordinary_profit": 3343,
+          "net_income": 2460
         },
         "nowcast_v5_jpym": {
-          "k_scale": 6.4282,
+          "k_scale": 2.0026,
           "note": "Live v5 uses v1 perf proxy until mandate detail refreshed for current half"
         },
         "caveats": [
           "Perf fee crystallizes near fiscal year-end (Mar); H1 nowcast of perf is low-confidence.",
           "v2 uses fund-proxy excess when panel has it; live nowcast uses 0.65*Nikkei + 0.35*value.",
-          "JITA industry flows pending; ETF implied flows are [Derived] proxy only."
+          "AUM uses filing non-listed + ETF sleeves, not summed product-market AUM.",
+          "Market return from cached_market_nav; verify before trading on nowcast."
         ]
       },
       "spec": {
@@ -1663,7 +1668,8 @@
         "Out-of-sample RMSE is worse than same-half-last-year naive; use model for seasonality and scenarios, not level beats.",
         "Perf fee crystallizes near fiscal year-end (Mar); H1 nowcast of perf is low-confidence.",
         "v2 uses fund-proxy excess when panel has it; live nowcast uses 0.65*Nikkei + 0.35*value.",
-        "JITA industry flows pending; ETF implied flows are [Derived] proxy only."
+        "AUM uses filing non-listed + ETF sleeves, not summed product-market AUM.",
+        "Market return from cached_market_nav; verify before trading on nowcast."
       ],
       "links": {
         "model_report": "https://github.com/GoldmanDrew/single-stock-investments/blob/main/7176.T/research/model/earnings_model_report.md",
@@ -1681,7 +1687,7 @@
       "diagnostics_ready": true,
       "production_spec": "v5",
       "as_of": "2026-06-04",
-      "headline": "Nowcast H1 revenue \u00a577,671m; OOS RMSE loses to seasonal naive",
+      "headline": "Nowcast H1 revenue \u00a55,997m; OOS RMSE loses to seasonal naive",
       "model_beats_naive": false,
       "model_type": "earnings_semiannual",
       "perf_fee_h2_oos_r2": -14.2489
