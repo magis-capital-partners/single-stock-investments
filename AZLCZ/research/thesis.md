@@ -28,9 +28,9 @@ Arizona land and renewable-ground-rent optionality at a price that already embed
 - [x] Read latest annual report (FY2025 OTC)
 - [x] Apply option scan and nav overlay
 - [ ] Stapled Aztec Land Company, LLC look-through
-- [ ] Per-acre and renewable rent comps for overlay refresh
+- [x] Groundbreaker royalty ramp and rent schedules (approved 2026-06-02)
 
 ## [HUMAN REVIEW]
 
-- Validate economic NAV marks before accumulate stance.
 - Review related-party transactions for minority holders.
+- Stapled LLC look-through and water adjudication timeline remain open.

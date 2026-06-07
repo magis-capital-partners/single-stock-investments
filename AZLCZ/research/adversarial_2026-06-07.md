@@ -48,8 +48,8 @@ re_pass: true
 ## Recommended actions
 
 1. None blocking.
-2. **Human:** Verify $1.3M minimum rent in Aztec 11/4/24 investor update PDF.
-3. **Human:** Stapled LLC look-through before accumulate stance.
+2. **Human:** Stapled LLC look-through before accumulate stance.
+3. Groundbreaker royalty ramp and rent floors trusted (approved 2026-06-02).
 
 ---
 
