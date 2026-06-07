@@ -156,6 +156,14 @@ def fetch_etf_nav_daily(registry: dict) -> tuple[pd.DataFrame, pd.DataFrame]:
                 "aum_method": method,
             })
 
+    if not rows_nav:
+        nav_path = DATA / "etf_nav_daily.csv"
+        aum_path = DATA / "etf_aum_daily.csv"
+        if nav_path.exists():
+            print("[warn] yfinance empty; reusing cached etf_nav_daily.csv")
+            nav_df = pd.read_csv(nav_path, parse_dates=["date"])
+            aum_df = pd.read_csv(aum_path, parse_dates=["date"]) if aum_path.exists() else pd.DataFrame()
+            return nav_df, aum_df
     nav_df = pd.DataFrame(rows_nav).sort_values(["ticker", "date"])
     aum_df = pd.DataFrame(rows_aum).sort_values(["ticker", "date"])
     return nav_df, aum_df
