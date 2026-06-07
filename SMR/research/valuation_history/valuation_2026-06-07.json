@@ -1,0 +1,201 @@
+{
+  "ticker": "SMR",
+  "as_of": "2026-06-07",
+  "valuation_mode": "optionality",
+  "method": "yield_curve",
+  "irr_method": "yield_curve",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "unproven",
+    "dhando": "none",
+    "cycle": "-",
+    "payoff_lens": "asset"
+  },
+  "inputs": {
+    "price": 15.0,
+    "price_source": "Placeholder ~June 2026 [HUMAN REVIEW]",
+    "shares_millions": 318.5,
+    "shares_source": "CommonStockSharesOutstanding 318,480,601 at 2025-12-31 (10-K FY2025)",
+    "per_share": -2.15,
+    "fcf_source": "FY2025 operating loss ~$690M on ~164M weighted-average shares \u2248 -$4.20/sh; base burn normalized to -$2.15/sh licensing-stage [Assumption]",
+    "normalization_note": "Positive GAAP net income $356M driven by warrant/derivative gains \u2014 not owner cash. Lawrence uses cash burn from operations."
+  },
+  "optionality_gate": {
+    "framework": "reactor_pipeline",
+    "floor_pass": false,
+    "floor_metric": "cash_per_share",
+    "floor_value": 2.63,
+    "primary_metric": "lawrence_base",
+    "primary_label": "annualized return",
+    "overlay_nav_per_share": 8.0,
+    "notes": "Cash $836M / 318M \u2248 $2.63/sh is liquidity not dhando floor; reactor option sized separately",
+    "primary_return_pct": 2.2
+  },
+  "nav_overlay": {
+    "status": "partial",
+    "as_of": "2026-06-07",
+    "segments_or_options": [
+      {
+        "id": "npm_pipeline",
+        "label": "NuScale Power Module reactor pipeline",
+        "option_treatment": "probability_weighted",
+        "probability_base": 0.18,
+        "milestone_nav_per_share": 48.0,
+        "notes": "ENTRA1 non-binding 72 NPM agreement; Romania Doicesti approval Feb 2026; PMA milestone $260M due 2026"
+      },
+      {
+        "id": "cash_floor",
+        "label": "Cash and near-cash",
+        "option_treatment": "nav_floor",
+        "nav_per_share": 2.63,
+        "notes": "Cash $836M at 12/31/2025 \u2014 not economic moat floor"
+      }
+    ],
+    "not_in_model_requires_refresh": [
+      "CFPP Idaho restart timeline",
+      "ENTRA1 binding contract conversion",
+      "PMA contribution funding vs dilution"
+    ]
+  },
+  "scenarios": {
+    "bear": {
+      "price": 15.0,
+      "payoff": 6.0,
+      "years": 7,
+      "notes": "Pipeline stalls; dilution from $338M 2026 contractual obligations; cash burn"
+    },
+    "base": {
+      "price": 15.0,
+      "payoff": 17.5,
+      "years": 7,
+      "notes": "18% \u00d7 $48 NPM milestone NAV + 82% \u00d7 $10.8 cash/runoff floor [Assumption]",
+      "sotp_build": {
+        "shares": 318480601,
+        "lines": [
+          {
+            "id": "cash",
+            "label": "Cash per share (12/31/2025)",
+            "per_share": 2.63,
+            "source": "$836M \u00f7 318.5M shares (10-K)"
+          },
+          {
+            "id": "pipeline_option",
+            "label": "Probability-weighted NPM deployment (18% \u00d7 $48)",
+            "per_share": 8.64,
+            "source": "ENTRA1 72 NPM non-binding; Romania Doicesti Feb 2026 [Assumption]"
+          },
+          {
+            "id": "licensing_runoff",
+            "label": "Engineering/licensing runoff value",
+            "per_share": 6.23,
+            "source": "Tie-out to $17.50 payoff; Fluor revenue concentration 76% FY2025"
+          }
+        ],
+        "payoff_per_share": 17.5,
+        "years": 7
+      }
+    },
+    "bull": {
+      "price": 15.0,
+      "payoff": 42.0,
+      "years": 7,
+      "notes": "First U.S. SMR deployment; royalty stream on 6+ modules; Fluor exclusivity amended"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Pre-revenue developer; equity $1.17B reflects capital raises not hidden land"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / pipeline?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "NRC-certified SMR design; ENTRA1 72 NPM LOI; Doicesti Romania approval Feb 2026 (10-K subsequent events)"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Yes",
+      "treatment": "zero",
+      "evidence": "Operating loss ~$690M FY2025; R&D $45.5M \u2014 burden in cash burn, no operating profit segment"
+    },
+    {
+      "q": 4,
+      "question": "Backlog not in cash path?",
+      "answer": "Yes",
+      "treatment": "milestone_nav",
+      "evidence": "PMA Milestone Contribution 1 liability $260M triggered by ENTRA1 72 NPM non-binding agreement (10-K)"
+    },
+    {
+      "q": 5,
+      "question": "Private stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Fluor relationship is customer/licensee not unmarked stake"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No litigation recovery or royalty trust"
+    },
+    {
+      "q": 7,
+      "question": "Embedded option in revenue?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "FY2025 revenue $24M is engineering/licensing to Fluor (76%), not reactor electricity sales"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "First NPM deployment converts pipeline to recurring royalties; until then cash burn funded by equity",
+    "base_growth_source": "Yield-curve payoff not growth DCF \u2014 [Assumption] 18% deploy probability",
+    "status": "partial"
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": false,
+      "floor_pass": false,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": null
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -12.3
+    },
+    "base": {
+      "return_pct": 2.2
+    },
+    "bull": {
+      "return_pct": 15.8
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -12.3
+    },
+    "base": {
+      "return_pct": 2.2
+    },
+    "bull": {
+      "return_pct": 15.8
+    }
+  },
+  "implied_return": {
+    "base_pct": 2.2,
+    "label": "annualized return",
+    "display": "2.2% (base)"
+  },
+  "overlay_results": []
+}
