@@ -49,17 +49,17 @@
   },
   "perf_fee_model_v4": {
     "form": "perf_fee_half = k_half * avg_AUM * mandate_weighted_excess (P4 scrape)",
-    "k_H1": 0.03031,
-    "k_H2": 0.04305
+    "k_H1": 0.03304,
+    "k_H2": 0.08319
   },
   "perf_fee_model_v3b": {
     "form": "perf_fee_half = k_scale \u00d7 \u03a3_fund (AUM_f \u00d7 excess_f \u00d7 perf_rate_f \u00d7 cryst_flag)",
-    "k_scale": 0.3166,
+    "k_scale": 0.6582,
     "use_march": false
   },
   "perf_fee_model_v5": {
     "form": "v3b march_excess + split base fee + AUM roll-forward",
-    "k_scale": 2.257,
+    "k_scale": 2.0024,
     "use_march": true,
     "split_base_rates": {
       "rate_nonlisted_ann": 0.00325156219237229,
@@ -97,11 +97,11 @@
       "model": 4931.224709540503,
       "naive_lastyear": 4302.709,
       "naive_randomwalk": 3319.298,
-      "model_v3a": 10820.586832095201,
+      "model_v3a": 10820.600374182279,
       "model_v2": 4830.656562502018,
-      "model_v4": 4830.656562502018,
+      "model_v4": 3074.713,
       "model_v3b": 3274.713,
-      "model_v5": 3810.85
+      "model_v5": 6110.013378408462
     },
     {
       "label": "FY2024H1",
@@ -113,7 +113,7 @@
       "model_v2": 3076.163269528032,
       "model_v4": 3074.713,
       "model_v3b": 3274.713,
-      "model_v5": 4548.608
+      "model_v5": 3950.0
     },
     {
       "label": "FY2024H2",
@@ -121,11 +121,11 @@
       "model": 9382.223712772497,
       "naive_lastyear": 5586.426,
       "naive_randomwalk": 3804.623,
-      "model_v3a": 12323.514594768523,
-      "model_v2": 10683.903131411016,
-      "model_v4": 3551.030596288794,
-      "model_v3b": 6599.479446314549,
-      "model_v5": 5658.3344770073
+      "model_v3a": 12323.512374664602,
+      "model_v2": 10683.903617001455,
+      "model_v4": 3534.9893242384187,
+      "model_v3b": 6599.479446314561,
+      "model_v5": 6999.418970344921
     },
     {
       "label": "FY2025H1",
@@ -135,9 +135,9 @@
       "naive_randomwalk": 11162.336,
       "model_v3a": 3074.713,
       "model_v2": 3074.713,
-      "model_v4": 3074.7993796734168,
-      "model_v3b": 4183.264831893926,
-      "model_v5": 5496.8848973090635
+      "model_v4": 3074.9127855217694,
+      "model_v3b": 4183.264831893923,
+      "model_v5": 4735.477069283818
     },
     {
       "label": "FY2025H2",
@@ -145,11 +145,11 @@
       "model": 3074.713,
       "naive_lastyear": 11162.336,
       "naive_randomwalk": 5353.003,
-      "model_v3a": 3335.6118691096044,
-      "model_v2": 3559.6210068293326,
-      "model_v4": 8621.885450656542,
-      "model_v3b": 67231.63912896726,
-      "model_v5": 4510.527756624443
+      "model_v3a": 3335.611752558147,
+      "model_v2": 3559.6209891273083,
+      "model_v4": 5877.783973181018,
+      "model_v3b": 35969.587225582116,
+      "model_v5": 4243.30275898109
     },
     {
       "label": "FY2026H1",
@@ -159,9 +159,9 @@
       "naive_randomwalk": 10901.498,
       "model_v3a": 3412.640798276483,
       "model_v2": 3412.640798276483,
-      "model_v4": 3093.2568188751866,
-      "model_v3b": 4010.164847657713,
-      "model_v5": 15622.772265302148
+      "model_v4": 3116.331208467572,
+      "model_v3b": 4814.665840854574,
+      "model_v5": 10483.18317003451
     },
     {
       "label": "FY2026H2",
@@ -169,11 +169,11 @@
       "model": 7334.717900740869,
       "naive_lastyear": 10901.498,
       "naive_randomwalk": 5577.537,
-      "model_v3a": 4081.557731775583,
-      "model_v2": 8237.72020610449,
+      "model_v3a": 4081.557279246854,
+      "model_v2": 8237.720011634852,
       "model_v4": 3074.713,
       "model_v3b": 3274.713,
-      "model_v5": 6511.686924207331
+      "model_v5": 6038.483145542987
     }
   ],
   "oos_metrics": {
@@ -209,33 +209,34 @@
     "n": 9
   },
   "oos_metrics_v4": {
-    "rmse_jpym": 5469.7,
-    "mape_pct": 36.3,
-    "directional_hit": 0.78,
+    "rmse_jpym": 5726.8,
+    "mape_pct": 42.6,
+    "directional_hit": 0.56,
     "n": 9
   },
   "oos_metrics_v3b": {
     "model_v3b": {
-      "rmse_jpym": 19410.8,
-      "mape_pct": 85.4,
+      "rmse_jpym": 9686.5,
+      "mape_pct": 52.0,
       "directional_hit": 0.56,
       "n": 9
     }
   },
   "oos_metrics_v5": {
     "model_v5": {
-      "rmse_jpym": 5626.6,
-      "mape_pct": 47.9,
-      "directional_hit": 0.33,
+      "rmse_jpym": 4780.1,
+      "mape_pct": 33.6,
+      "directional_hit": 0.56,
       "n": 9
     }
   },
   "data_acquisition": {
-    "built_at": "2026-06-07T04:20:43.049516+00:00",
+    "built_at": "2026-06-07T04:31:50.430084+00:00",
     "steps": {
       "p0_etf_nav": {
         "rows": 17093,
-        "tickers": 13
+        "tickers": 13,
+        "jpx_units_rows": 312
       },
       "p0_fund_proxy": {
         "rows": 12
@@ -258,7 +259,7 @@
         "comp_rows": 12
       },
       "p4_mandate_terms": {
-        "funds": 6,
+        "funds": 9,
         "path": "mandate_terms.json"
       },
       "p5_aum_rollforward": {
@@ -269,8 +270,8 @@
         "rows": 12
       },
       "p4_mandate_nav": {
-        "rows": 6,
-        "detail_rows": 28,
+        "rows": 7,
+        "detail_rows": 37,
         "tag": "[Filing/Market/Derived]",
         "scrape_script": "_scripts/download_mandate_nav.py",
         "perf_fee_by_bucket": 1
@@ -342,8 +343,8 @@
       },
       {
         "spec": "v4",
-        "revenue_oos_rmse": 5469.7,
-        "revenue_oos_r2": -0.6096,
+        "revenue_oos_rmse": 5726.8,
+        "revenue_oos_r2": -0.7645,
         "perf_fee_h2_oos_rmse": 10307.2,
         "perf_fee_h2_oos_r2": -14.2489,
         "production_default": false,
@@ -351,19 +352,19 @@
       },
       {
         "spec": "v3b",
-        "revenue_oos_rmse": 19410.8,
-        "revenue_oos_r2": -19.2712,
-        "perf_fee_h2_oos_rmse": 41025.1,
-        "perf_fee_h2_oos_r2": -240.5777,
+        "revenue_oos_rmse": 9686.5,
+        "revenue_oos_r2": -4.0481,
+        "perf_fee_h2_oos_rmse": 20031.4,
+        "perf_fee_h2_oos_r2": -56.5945,
         "production_default": false,
         "note": "Summable fund-level perf (P4 detail)"
       },
       {
         "spec": "v5",
-        "revenue_oos_rmse": 5626.6,
-        "revenue_oos_r2": -0.7033,
-        "perf_fee_h2_oos_rmse": 10094.3,
-        "perf_fee_h2_oos_r2": -13.6254,
+        "revenue_oos_rmse": 4780.1,
+        "revenue_oos_r2": -0.2294,
+        "perf_fee_h2_oos_rmse": 10184.4,
+        "perf_fee_h2_oos_r2": -13.8877,
         "production_default": true,
         "note": "v3b + march + split base + AUM roll-forward"
       }

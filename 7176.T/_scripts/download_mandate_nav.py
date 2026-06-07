@@ -146,7 +146,7 @@ def scrape_sam_funds(sess: requests.Session, catalog: dict) -> list[dict]:
     return rows, manifest_pdfs
 
 
-def etf_monthly_history(ticker: str, start: str = "2019-09-01") -> pd.DataFrame:
+def etf_monthly_history(ticker: str, start: str = "2015-01-01") -> pd.DataFrame:
     import yfinance as yf
 
     hist = yf.Ticker(ticker).history(start=start, interval="1d", auto_adjust=True)
@@ -204,6 +204,46 @@ def build_monthly_table(catalog: dict, sam_rows: list[dict]) -> pd.DataFrame:
     return out.sort_values(["fund_id", "as_of"]).drop_duplicates(["fund_id", "as_of"], keep="last")
 
 
+def import_touki_nav(catalog: dict) -> list[dict]:
+    """Import manual 投信総合検索ライブラリー CSV exports (Vicki/browser only).
+
+    Expected path: research/model/data/touki_nav/{fund_id}.csv
+    Columns: as_of (YYYY-MM-DD), nav_jpy, optional aum_jpym, month_ret, high_water_mark_jpy
+    """
+    touki_dir = DATA / "touki_nav"
+    if not touki_dir.exists():
+        return []
+    rows: list[dict] = []
+    fund_map = {f["id"]: f for f in catalog.get("sam_funds", [])}
+    for path in sorted(touki_dir.glob("*.csv")):
+        fund_id = path.stem
+        fund = fund_map.get(fund_id)
+        if not fund:
+            continue
+        df = pd.read_csv(path)
+        if "as_of" not in df.columns:
+            continue
+        for _, r in df.iterrows():
+            as_of = pd.to_datetime(r["as_of"], errors="coerce")
+            if pd.isna(as_of):
+                continue
+            rows.append({
+                "as_of": as_of.strftime("%Y-%m-%d"),
+                "fund_id": fund_id,
+                "mandate_id": fund["mandate_id"],
+                "nav_jpy": r.get("nav_jpy"),
+                "aum_jpym": r.get("aum_jpym"),
+                "month_ret": r.get("month_ret"),
+                "benchmark": fund.get("benchmark"),
+                "perf_rate": fund.get("perf_rate"),
+                "high_water_mark_jpy": r.get("high_water_mark_jpy"),
+                "source": "touki_library_csv",
+                "source_url": str(path),
+                "tag": "[Filing/Market]",
+            })
+    return rows
+
+
 def extend_sam_with_etf_proxy(monthly: pd.DataFrame, catalog: dict) -> pd.DataFrame:
     """Backfill value_up_fund history using 2080.T where SAM PDFs are sparse."""
     proxy = catalog["nonlisted_residual"]["proxy_etf"]
@@ -216,21 +256,31 @@ def extend_sam_with_etf_proxy(monthly: pd.DataFrame, catalog: dict) -> pd.DataFr
     if etf.empty:
         return monthly
 
-    if len(vu) >= 3:
-        return monthly
-
-    # Scale ETF returns to approximate value fund; anchor on latest scraped NAV if present
-    anchor_nav = float(vu["nav_jpy"].iloc[-1]) if len(vu) else np.nan
-    anchor_date = vu["as_of"].iloc[-1] if len(vu) else etf["as_of"].iloc[-1]
     etf = etf.sort_values("as_of")
     etf["cum"] = (1 + etf["month_ret"].fillna(0)).cumprod()
-    if pd.notna(anchor_nav) and len(vu):
-        base_cum = float(etf.loc[etf["as_of"] == anchor_date, "cum"].iloc[-1]) if (etf["as_of"] == anchor_date).any() else float(etf["cum"].iloc[-1])
-        etf["nav_jpy"] = anchor_nav * (etf["cum"] / base_cum)
-    else:
-        etf["nav_jpy"] = 50000 * etf["cum"]
 
-    synth = etf[etf["as_of"] < anchor_date] if len(vu) else etf
+    # Anchor on earliest scraped SAM row, else latest ETF NAV level
+    if len(vu):
+        vu = vu.sort_values("as_of")
+        anchor_nav = float(vu["nav_jpy"].iloc[0])
+        anchor_date = vu["as_of"].iloc[0]
+        first_scraped = anchor_date
+    else:
+        anchor_nav = float(etf["nav_jpy"].iloc[-1]) if etf["nav_jpy"].notna().any() else 50000.0
+        anchor_date = etf["as_of"].iloc[-1]
+        first_scraped = pd.Timestamp.max
+
+    base_cum = float(
+        etf.loc[etf["as_of"] == anchor_date, "cum"].iloc[-1]
+        if (etf["as_of"] == anchor_date).any()
+        else etf["cum"].iloc[-1]
+    )
+    etf["nav_jpy"] = anchor_nav * (etf["cum"] / base_cum)
+
+    synth = etf[etf["as_of"] < first_scraped].copy()
+    if synth.empty:
+        return monthly
+
     synth = synth.assign(
         fund_id="value_up_fund",
         mandate_id="mandate_value_pbr",
@@ -252,7 +302,8 @@ def main() -> None:
     sess = _session()
 
     sam_rows, pdf_manifest = scrape_sam_funds(sess, catalog)
-    monthly = build_monthly_table(catalog, sam_rows)
+    touki_rows = import_touki_nav(catalog)
+    monthly = build_monthly_table(catalog, sam_rows + touki_rows)
     monthly = extend_sam_with_etf_proxy(monthly, catalog)
 
     monthly_out = monthly.copy()
@@ -267,6 +318,7 @@ def main() -> None:
         "sam_pdf_downloads": pdf_manifest,
         "monthly_rows": len(monthly_out),
         "funds": sorted(monthly_out["fund_id"].unique().tolist()),
+        "touki_import_rows": len(touki_rows),
         "note": "Institutional non-listed pool aggregated in acquire_data.build_mandate_nav()",
     }
     (DATA / "mandate_scrape_manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")

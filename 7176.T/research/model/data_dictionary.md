@@ -144,7 +144,8 @@ Run `python3 acquire_data.py` (or `build_panel.py`, which calls it first). Manif
 
 ## Remaining gaps
 
-- **JITA industry flows** — P5 scrape fills `jita_equity_flow_bn` / `jita_etf_flow_bn` (億円) from B-1 Excel; `download_jita_flows.py`.
-- **Per-fund NAV vs hurdle / high-water mark** — P4 live for FY2023H1 onward (6 halves); pre-2023 and institutional pool still proxy [Derived]. Vicki: 投信総合検索ライブラリー CSV for Value Up history.
+- **Per-fund NAV vs hurdle / high-water mark** — P4 live for FY2023H1 onward; pre-2023 via ETF proxy backfill + optional `data/touki_nav/*.csv` (投信総合検索ライブラリー manual export).
+- **JPX listed shares** — `download_jpx_etf_units.py` → `jpx_etf_units_daily.csv` (monthly 受益権口数 forward-filled); creation/redemption units in `jpx_etf_meta.csv`.
+- **JITA in AUM roll-forward** — `_resolve_halfyear_flow()` scales industry 億円 flows by `jita_flow_scale` (default 1.2%); blended pool return for nowcast.
 - **AUM by category pre-2023** and **base/perf split pre-FY2024** — extends component history.
 - **CapIQ** ownership + peer fee/comp ratios — paste into `capiq_export.csv`.
