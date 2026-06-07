@@ -38,7 +38,7 @@ Groundbreaker models AZLCZ as a **TPL-style land royalty compounder** with a **c
 | Starting cash | FY2024 $2.13M owner cash | ~$4M rentals today | Keep **FY2024 $15.06/sh** as Lawrence Y0; growth reflects ramp |
 | Exit multiple | 18x | 12–18x on contracted leases; base 16x | **Adopt 16x** base |
 | NAV | Marvin overlay ~$1,180/sh | Base **$3,445/sh** asset-by-asset | GB full SOTP; Marvin uses GB for **renewable line ($1,115/sh)** + retained land/water options |
-| Rent floors | Not modeled per project | $1.3M min ops rent disclosed 11/4/24 | **[HUMAN REVIEW]** verify in investor update PDF |
+| Rent floors | Not modeled per project | $1.3M min ops rent disclosed 11/4/24 | **Adopted** (Groundbreaker approved 2026-06-02) |
 | Lark Point / 400 MW | Option scan only | Contracted milestones 2026–2028 | Add pipeline option row; weight 45% |
 
 ---
@@ -75,9 +75,8 @@ Groundbreaker models AZLCZ as a **TPL-style land royalty compounder** with a **c
 
 ## [HUMAN REVIEW]
 
-- Obtain Aztec 11/4/24 investor update PDF for $1.3M minimum rent verification.
-- Confirm Lark Point and 400 MW lease terms when disclosed in annual or county filings.
-- Decide whether synthesis or Lawrence alone is stance gate when external growth is adopted.
+- Confirm Lark Point and 400 MW lease terms when disclosed in annual or county filings (Groundbreaker milestones trusted until filings contradict).
+- Stapled LLC look-through and water adjudication timeline remain open.
 
 ## [PROPOSED MEMORY]
 

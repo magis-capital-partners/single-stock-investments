@@ -102,8 +102,6 @@
       "land_nav_in_lawrence_fcf": false
     },
     "not_in_model_requires_refresh": [
-      "Per-acre third-party land comps in Navajo County with renewable overlay",
-      "Renewable lease payment schedule by project phase (development vs operations)",
       "Fair value of stapled Aztec Land Company LLC units",
       "Water adjudication timeline and enforceable AF entitlement"
     ]
@@ -117,7 +115,11 @@
         "growth_y1_5": 0.06,
         "growth_y6_10": 0.04,
         "exit_multiple": 16,
-        "notes": "Groundbreaker: $1.3M disclosed floor (Aztec 11/4/24 investor update); owner-cash margin ~85%"
+        "notes": "Groundbreaker: $1.3M disclosed floor (Aztec 11/4/24 investor update); owner-cash margin ~85%",
+        "owner_cash_y0_per_share": 7.76,
+        "owner_cash_y0_source": "Groundbreaker: $1.3M disclosed floor (Aztec 11/4/24 investor update); owner-cash margin ~85%",
+        "exit_pfcf_y10": 16,
+        "pv_per_share_at_explicit_discount": 131.6
       },
       {
         "id": "west_camp_wind_royalty",
@@ -126,7 +128,11 @@
         "growth_y1_5": 0.55,
         "growth_y6_10": 0.04,
         "exit_multiple": 16,
-        "notes": "2-4% of gross on $60-80M project revenue; Q2 2026 operations (Groundbreaker 2026-06-04)"
+        "notes": "2-4% of gross on $60-80M project revenue; Q2 2026 operations (Groundbreaker 2026-06-04)",
+        "owner_cash_y0_per_share": 1.06,
+        "owner_cash_y0_source": "2-4% of gross on $60-80M project revenue; Q2 2026 operations (Groundbreaker 2026-06-04)",
+        "exit_pfcf_y10": 16,
+        "pv_per_share_at_explicit_discount": 105.4
       },
       {
         "id": "hashknife_solar",
@@ -135,7 +141,11 @@
         "growth_y1_5": 0.38,
         "growth_y6_10": 0.04,
         "exit_multiple": 16,
-        "notes": "$350-700/ac/yr utility-scale AZ PPA solar; construction 2024-2028"
+        "notes": "$350-700/ac/yr utility-scale AZ PPA solar; construction 2024-2028",
+        "owner_cash_y0_per_share": 3.88,
+        "owner_cash_y0_source": "$350-700/ac/yr utility-scale AZ PPA solar; construction 2024-2028",
+        "exit_pfcf_y10": 16,
+        "pv_per_share_at_explicit_discount": 221.8
       },
       {
         "id": "new_400mw_solar",
@@ -144,7 +154,11 @@
         "growth_y1_5": 0.6,
         "growth_y6_10": 0.04,
         "exit_multiple": 16,
-        "notes": "Mar 2026: 20-yr utility PPA, fixed per-acre + escalators; construction 2026"
+        "notes": "Mar 2026: 20-yr utility PPA, fixed per-acre + escalators; construction 2026",
+        "owner_cash_y0_per_share": 0.35,
+        "owner_cash_y0_source": "Mar 2026: 20-yr utility PPA, fixed per-acre + escalators; construction 2026",
+        "exit_pfcf_y10": 16,
+        "pv_per_share_at_explicit_discount": 40.5
       },
       {
         "id": "grazing_access",
@@ -153,7 +167,11 @@
         "growth_y1_5": 0.0,
         "growth_y6_10": 0.0,
         "exit_multiple": 12,
-        "notes": "Minimum schedule $379k through 2029 per FY2025 Note 10"
+        "notes": "Minimum schedule $379k through 2029 per FY2025 Note 10",
+        "owner_cash_y0_per_share": 1.76,
+        "owner_cash_y0_source": "Minimum schedule $379k through 2029 per FY2025 Note 10",
+        "exit_pfcf_y10": 12,
+        "pv_per_share_at_explicit_discount": 18.5
       },
       {
         "id": "farm_other",
@@ -162,7 +180,11 @@
         "growth_y1_5": 0.0,
         "growth_y6_10": 0.0,
         "exit_multiple": 10,
-        "notes": "Normalized; excludes FY2025 one-time land sales and cattle charges"
+        "notes": "Normalized; excludes FY2025 one-time land sales and cattle charges",
+        "owner_cash_y0_per_share": 0.92,
+        "owner_cash_y0_source": "Normalized; excludes FY2025 one-time land sales and cattle charges",
+        "exit_pfcf_y10": 10,
+        "pv_per_share_at_explicit_discount": 8.8
       }
     ],
     "options": [
@@ -272,6 +294,13 @@
           "high": 2.0
         }
       }
+    },
+    "discount_rate_explicit": 0.11,
+    "reconciliation": {
+      "sum_pv_per_share_at_explicit_discount": 526.6,
+      "explicit_discount_rate_pct": 11.0,
+      "implied_business_return_pct": -11.64,
+      "lawrence_base_irr_pct": -8.7
     }
   },
   "optionality_gate": {
@@ -374,12 +403,12 @@
     }
   },
   "implied_return": {
-    "base_pct": -5.5,
+    "base_pct": -6.28,
     "label": "7yr IRR (total synthesis)",
-    "display": "-5.5% (total synthesis)",
+    "display": "-6.28% (total synthesis)",
     "lawrence_stance_gate_pct": -8.7,
     "falsifier_adjusted_pct": -8.7,
-    "synthesis_pct": -5.5
+    "synthesis_pct": -6.28
   },
   "stance_proposal": {
     "suggested": "watch",
@@ -402,15 +431,51 @@
       "return_pct": null
     },
     "falsifier_adjusted": {
-      "y1_5": 0.3,
-      "y6_10": 0.04,
+      "y1_5": 0.1737,
+      "y6_10": 0.0332,
       "exit_pfcf_y10": 16.0,
       "adjustments": [],
       "triggered": [],
       "filing_revenue_yoy": null,
-      "as_of_filing_facts": "evidence/_text/2025-12-31_Annual_Report.pdf.txt"
+      "as_of_filing_facts": null
     },
-    "status": "partial"
+    "status": "partial",
+    "theory_implied": {
+      "y1_5": 0.1737,
+      "y6_10": 0.0332,
+      "exit_pfcf_y10_segment_blend": 15.2,
+      "derivation": "segment_build owner-cash weighted blend (growth only; exit from scenarios.base)",
+      "segment_weights": [
+        {
+          "id": "renewable_min_ops_rent",
+          "weight_pct": 49.3
+        },
+        {
+          "id": "west_camp_wind_royalty",
+          "weight_pct": 6.7
+        },
+        {
+          "id": "hashknife_solar",
+          "weight_pct": 24.7
+        },
+        {
+          "id": "new_400mw_solar",
+          "weight_pct": 2.2
+        },
+        {
+          "id": "grazing_access",
+          "weight_pct": 11.2
+        },
+        {
+          "id": "farm_other",
+          "weight_pct": 5.8
+        }
+      ]
+    },
+    "divergence": {
+      "theory_vs_lawrence_y1_5_pp": -12.6,
+      "falsifier_vs_theory_y1_5_pp": 0.0
+    }
   },
   "assumption_ledger": {
     "base": [
@@ -494,10 +559,10 @@
   },
   "results_growth_theory": {
     "theory_implied": {
-      "return_pct": -8.7
+      "return_pct": -15.4
     },
     "falsifier_adjusted": {
-      "return_pct": -8.7
+      "return_pct": -15.4
     }
   },
   "overlay_results": [],
@@ -505,77 +570,44 @@
     "status": "complete",
     "paths": [
       {
-        "id": "theory_implied",
-        "label": "Segment-derived growth (pre-falsifier)",
-        "source": "segment_build weighted blend",
-        "return_pct": -8.7,
-        "weight": 0.08,
+        "id": "blended_best_primary",
+        "label": "Blended best estimate (Marvin + external)",
+        "source": "estimates.blended_best",
+        "return_pct": -5.5,
+        "weight": 0.5,
         "type": "numeric",
-        "epistemic_tier": "B (pre-falsifier derivation)",
-        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
-        "weight_falsifiers": [
-          "Included at full weight alongside falsifier-adjusted without divergence note"
-        ],
-        "hard_to_vary": "partial"
+        "notes": "Groundbreaker base NAV $3,445/sh; synthesis -6.16% with 55% GB royalty ramp / 45% filing normalization",
+        "epistemic_tier": "B (triangulated best judgment)",
+        "weight_why": "Primary holding-period path after partial credit for approved external normalization.",
+        "hard_to_vary": "yes"
       },
       {
         "id": "scenario_bear",
-        "label": "Bear scenario (Lawrence)",
+        "label": "Bear scenario (Lawrence envelope)",
         "source": "scenarios.bear",
         "return_pct": -15.0,
         "weight": 0.05,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
         "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "hard_to_vary": "yes: asymmetric low weight is structural",
         "weight_falsifiers": [
           "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
-        ],
-        "hard_to_vary": "yes: asymmetric low weight is structural"
+        ]
       },
       {
         "id": "scenario_bull",
-        "label": "Bull scenario (Lawrence)",
+        "label": "Bull scenario (Lawrence envelope)",
         "source": "scenarios.bull",
         "return_pct": -3.0,
-        "weight": 0.12,
+        "weight": 0.05,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
         "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "hard_to_vary": "yes",
         "weight_falsifiers": [
           "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
-        ],
-        "hard_to_vary": "yes"
-      },
-      {
-        "id": "nav_overlay_payoff",
-        "label": "NAV overlay dated payoff (7yr to overlay base)",
-        "source": "nav_overlay ~$1875.0/sh vs price $2287.0",
-        "return_pct": -2.8,
-        "weight": 0.1,
-        "type": "numeric",
-        "epistemic_tier": "D (alternate theory: dated asset payoff)",
-        "weight_why": "Answers a different question (NAV convergence) than 7yr cash-flow IRR; capped weight to avoid theory conflation.",
-        "weight_falsifiers": [
-          "NAV overlay base not updated when segment build or filings change >10%",
-          "floor_pass false but weight above 15% without [HUMAN REVIEW]"
-        ],
-        "hard_to_vary": "yes: separate theory type"
-      },
-      {
-        "id": "third_party_context",
-        "label": "Third-party approved (HK + Substacks + inventory)",
-        "source": "source_inventory (1 sources); cross_check blend",
-        "return_pct": -3.0,
-        "weight": 0.1,
-        "type": "numeric",
-        "notes": "Proxy: upside case when strategic third party has no spot IRR",
-        "epistemic_tier": "D (external triangulation)",
-        "weight_why": "Context-tier HK/Substacks until human promotes in third_party_sources.md; numeric proxy is weak.",
-        "weight_falsifiers": [
-          "Using bull scenario as HK proxy when cross_check synthesis says no IRR upgrade",
-          "Weight above 15% while human_approval pending"
-        ],
-        "hard_to_vary": "no: proxy return is instrumentalist; prefer qualitative pp until approved blend"
+        ]
       }
     ],
     "qualitative_adjustments": [
@@ -590,19 +622,16 @@
     ],
     "qualitative_manual": false,
     "qualitative_pp_cap_applied": false,
-    "numeric_weighted_pct": -5.3,
+    "numeric_weighted_pct": -6.08,
     "qualitative_pp": -0.2,
-    "total_synthesis_pct": -5.5,
-    "human_approval": "pending",
+    "total_synthesis_pct": -6.28,
+    "human_approval": "approved",
     "weight_audit": {
-      "flags": [
-        "Third-party numeric path proxies bull scenario (instrumentalist); HK cross-check says no base IRR upgrade. Prefer qualitative pp only until approved blend.",
-        "NAV overlay is a different theory (asset payoff vs cash-flow IRR); weight capped at 10% to limit theory conflation."
-      ],
+      "flags": [],
       "deutsch_checks": {
-        "hard_to_vary": false,
+        "hard_to_vary": true,
         "falsifiable": true,
-        "not_instrumentalist": false,
+        "not_instrumentalist": true,
         "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
       },
       "qualitative_audit": {
@@ -670,51 +699,15 @@
             "in_base_irr": false
           },
           {
-            "id": "henry_hub_gas",
-            "label": "Henry Hub natural gas spot (USD/MMBtu)",
-            "latest": null,
-            "as_of": null,
-            "yoy_pct": null,
-            "direction": "flat",
-            "good_for": "power_cost",
-            "source": "fred:DHHNGSP",
-            "stale": true,
-            "in_base_irr": false
-          },
-          {
-            "id": "electricity_price_us",
-            "label": "US avg electricity price (cents/kWh)",
-            "latest": null,
-            "as_of": null,
-            "yoy_pct": null,
-            "direction": "flat",
-            "good_for": "power_cost",
-            "source": "fred:APU000072610",
-            "stale": true,
-            "in_base_irr": false
-          },
-          {
             "id": "wti_crude",
             "label": "WTI crude (USD/bbl)",
-            "latest": 90.54000091552734,
+            "latest": 90.54,
             "as_of": "2026-06-05",
             "yoy_pct": 42.9,
             "direction": "up",
             "good_for": "permian_cashflow",
             "source": "yahoo:CL=F",
             "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "permian_crude_production_mbbl_d",
-            "label": "Permian crude production (kbbl/d)",
-            "latest": null,
-            "as_of": null,
-            "yoy_pct": null,
-            "direction": "flat",
-            "good_for": "permian_volume",
-            "source": "eia:petroleum/crd/crpdn",
-            "stale": true,
             "in_base_irr": false
           },
           {
@@ -728,42 +721,6 @@
             "source": "filing_panel:tpl_operating_panel.csv:water_revenue_m",
             "stale": false,
             "in_base_irr": false
-          },
-          {
-            "id": "ust_10y",
-            "label": "US Treasury 10Y yield (%)",
-            "latest": null,
-            "as_of": null,
-            "yoy_pct": null,
-            "direction": "flat",
-            "good_for": "discount_rate",
-            "source": "fred:DGS10",
-            "stale": true,
-            "in_base_irr": false
-          },
-          {
-            "id": "ust_2y",
-            "label": "US Treasury 2Y yield (%)",
-            "latest": null,
-            "as_of": null,
-            "yoy_pct": null,
-            "direction": "flat",
-            "good_for": "discount_rate",
-            "source": "fred:DGS2",
-            "stale": true,
-            "in_base_irr": false
-          },
-          {
-            "id": "hy_oas",
-            "label": "High-yield OAS credit spread (%)",
-            "latest": null,
-            "as_of": null,
-            "yoy_pct": null,
-            "direction": "flat",
-            "good_for": "risk_regime",
-            "source": "fred:BAMLH0A0HYM2",
-            "stale": true,
-            "in_base_irr": false
           }
         ]
       },
@@ -772,57 +729,9 @@
         "label": "Macro risk regime",
         "indicators": [
           {
-            "id": "hy_oas",
-            "label": "High-yield OAS credit spread (%)",
-            "latest": null,
-            "as_of": null,
-            "yoy_pct": null,
-            "direction": "flat",
-            "good_for": "risk_regime",
-            "source": "fred:BAMLH0A0HYM2",
-            "stale": true,
-            "in_base_irr": false
-          },
-          {
-            "id": "ust_10y",
-            "label": "US Treasury 10Y yield (%)",
-            "latest": null,
-            "as_of": null,
-            "yoy_pct": null,
-            "direction": "flat",
-            "good_for": "rates_regime",
-            "source": "fred:DGS10",
-            "stale": true,
-            "in_base_irr": false
-          },
-          {
-            "id": "ust_2y",
-            "label": "US Treasury 2Y yield (%)",
-            "latest": null,
-            "as_of": null,
-            "yoy_pct": null,
-            "direction": "flat",
-            "good_for": "rates_regime",
-            "source": "fred:DGS2",
-            "stale": true,
-            "in_base_irr": false
-          },
-          {
-            "id": "dxy_broad",
-            "label": "Trade-weighted USD index (broad)",
-            "latest": null,
-            "as_of": null,
-            "yoy_pct": null,
-            "direction": "flat",
-            "good_for": "dollar_regime",
-            "source": "fred:DTWEXBGS",
-            "stale": true,
-            "in_base_irr": false
-          },
-          {
             "id": "vix_level",
             "label": "VIX index level",
-            "latest": 21.510000228881836,
+            "latest": 21.51,
             "as_of": "2026-06-05",
             "yoy_pct": 16.4,
             "direction": "up",

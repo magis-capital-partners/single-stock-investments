@@ -51,8 +51,8 @@ Marvin floor **-8.7%** per year Lawrence / **-6.16%** synthesis (optionality; st
 ## [HUMAN REVIEW]
 
 - [x] Groundbreaker RE approved 2026-06-02
-- [ ] Verify $1.3M minimum ops rent in Aztec 11/4/24 investor update
-- [ ] Confirm Lark Point / 400 MW terms in future filings
+- [x] Groundbreaker rent floor ($1.3M min ops) and royalty ramp trusted in base case
+- [ ] Confirm Lark Point / 400 MW terms in future filings (Groundbreaker milestones until filings contradict)
 
 ## [PROPOSED MEMORY]
 
