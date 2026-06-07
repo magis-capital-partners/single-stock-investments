@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Fetch thematic macro / industry indicator panels (context layer).
 
-Broadly ingested context (FRED, Stooq, EIA, repo filings) consumed narrowly by
-tagged holdings via apply_context_overlay.py. Tailwinds inform stance and
-overlay sizing only; they never auto-inflate Lawrence base IRR.
+Broadly ingested context (FRED, Yahoo, etf-dashboard, EIA, repo filings) consumed
+narrowly by tagged holdings via apply_context_overlay.py. Tailwinds inform stance
+and overlay sizing only; they never auto-inflate Lawrence base IRR.
 
   python3 _system/scripts/fetch_theme_panel.py            # fetch all themes
   python3 _system/scripts/fetch_theme_panel.py --theme ai_power_land
@@ -17,21 +17,26 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import math
 import os
 import sys
 import urllib.request
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPTS = Path(__file__).resolve().parent
 CONFIG = SCRIPTS / "theme_panel_config.json"
 THEMES_DIR = ROOT / "_system" / "reference" / "market-data" / "themes"
+FILING_PANELS_DIR = THEMES_DIR / "filing_panels"
+RETURNS_DIR = ROOT / "_system" / "reference" / "market-data" / "returns"
+EXTERNAL_ROOT = ROOT / "_system" / "reference" / "market-data" / "external"
 UA = "MarvinResearch/1.0 (theme-panel)"
 TODAY = date.today().isoformat()
 
 FRED_URL = "https://fred.stlouisfed.org/graph/fredgraph.csv?id={id}"
 STOOQ_DAILY_URL = "https://stooq.com/q/d/l/?s={symbol}&i=d"
+YAHOO_CHART_URL = "https://query1.finance.yahoo.com/v8/finance/chart"
 
 HYPERSCALERS = ("GOOGL", "AMZN", "META", "MSFT")
 
@@ -48,8 +53,57 @@ def _http_get(url: str, timeout: int = 30) -> str | None:
         return None
 
 
-def fetch_fred(fred_id: str) -> tuple[list[tuple[str, float]], str | None]:
-    raw = _http_get(FRED_URL.format(id=fred_id))
+def _sync_external() -> None:
+    """Best-effort etf-dashboard sync before reading local paths."""
+    try:
+        sys.path.insert(0, str(SCRIPTS))
+        from darwin.import_external_data import sync_external_market_data  # noqa: WPS433
+
+        sync_external_market_data()
+    except Exception:
+        pass
+
+
+def _etf_metrics_path() -> Path | None:
+    try:
+        sys.path.insert(0, str(SCRIPTS))
+        from darwin.external_sources import etf_data_path  # noqa: WPS433
+
+        p = etf_data_path("etf_metrics_daily.csv")
+        if p:
+            return p
+    except Exception:
+        pass
+    for candidate in (
+        EXTERNAL_ROOT / "etf_metrics_daily.csv",
+        ROOT / "_external" / "etf-dashboard" / "data" / "etf_metrics_daily.csv",
+    ):
+        if candidate.exists():
+            return candidate
+    return None
+
+
+def _external_json(name: str) -> Path | None:
+    try:
+        sys.path.insert(0, str(SCRIPTS))
+        from darwin.external_sources import etf_data_path  # noqa: WPS433
+
+        p = etf_data_path(name)
+        if p:
+            return p
+    except Exception:
+        pass
+    for candidate in (
+        EXTERNAL_ROOT / name,
+        ROOT / "_external" / "etf-dashboard" / "data" / name,
+    ):
+        if candidate.exists():
+            return candidate
+    return None
+
+
+def fetch_fred(fred_id: str, timeout: int = 8) -> tuple[list[tuple[str, float]], str | None]:
+    raw = _http_get(FRED_URL.format(id=fred_id), timeout=timeout)
     if raw is None:
         return [], "network"
     rows: list[tuple[str, float]] = []
@@ -86,11 +140,43 @@ def fetch_stooq_daily(symbol: str) -> tuple[list[tuple[str, float]], str | None]
     return rows, (None if rows else "empty")
 
 
+def fetch_yahoo_daily(symbol: str, days: int = 400) -> tuple[list[tuple[str, float]], str | None]:
+    end = datetime.now(timezone.utc)
+    start = end - timedelta(days=days)
+    url = (
+        f"{YAHOO_CHART_URL}/{symbol}?period1={int(start.timestamp())}"
+        f"&period2={int(end.timestamp())}&interval=1d"
+    )
+    req = urllib.request.Request(url, headers={"User-Agent": UA})
+    try:
+        payload = json.loads(urllib.request.urlopen(req, timeout=25).read())
+        result = payload["chart"]["result"][0]
+        timestamps = result["timestamp"]
+        closes = result["indicators"]["quote"][0]["close"]
+    except Exception:
+        return [], "network"
+    rows: list[tuple[str, float]] = []
+    for ts, close in zip(timestamps, closes):
+        if close is None:
+            continue
+        d = datetime.fromtimestamp(ts, tz=timezone.utc).strftime("%Y-%m-%d")
+        rows.append((d, float(close)))
+    rows.sort()
+    return rows, (None if rows else "empty")
+
+
 def fetch_eia(route: str, facets: dict | None) -> tuple[list[tuple[str, float]], str | None]:
     key = os.environ.get("EIA_API_KEY")
     if not key:
         return [], "no_eia_key"
-    params = [f"api_key={key}", "frequency=monthly", "data[0]=value", "sort[0][column]=period", "sort[0][direction]=desc", "length=60"]
+    params = [
+        f"api_key={key}",
+        "frequency=monthly",
+        "data[0]=value",
+        "sort[0][column]=period",
+        "sort[0][direction]=desc",
+        "length=60",
+    ]
     for k, v in (facets or {}).items():
         params.append(f"facets[{k}][]={v}")
     url = f"https://api.eia.gov/v2/{route}/data/?" + "&".join(params)
@@ -114,12 +200,157 @@ def fetch_eia(route: str, facets: dict | None) -> tuple[list[tuple[str, float]],
     return rows, (None if rows else "empty")
 
 
-def hyperscaler_capex_guide() -> tuple[list[tuple[str, float]], str | None, list[str]]:
-    """Sum latest disclosed annual capex guide across hyperscalers from ai_overlay.
+def fetch_etf_dashboard_daily(ticker: str, column: str = "underlying_adj_close") -> tuple[list[tuple[str, float]], str | None]:
+    path = _etf_metrics_path()
+    if not path:
+        return [], "no_etf_metrics"
+    rows: list[tuple[str, float]] = []
+    with path.open(encoding="utf-8", errors="ignore") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            if (row.get("ticker") or "").upper() != ticker.upper():
+                continue
+            d = (row.get("date") or "")[:10]
+            try:
+                val = float(row.get(column) or row.get("close_price") or row.get("etf_adj_close") or "")
+            except ValueError:
+                continue
+            if d and val > 0:
+                rows.append((d, val))
+    rows.sort()
+    return rows, (None if rows else "empty")
 
-    Source of truth is each ticker's research/valuation.json (filing-cited), so no
-    external fetch and no fabricated numbers.
-    """
+
+def read_filing_panel(panel: str, metric: str) -> tuple[list[tuple[str, float]], str | None]:
+    path = FILING_PANELS_DIR / panel
+    if not path.exists():
+        return [], "no_panel"
+    rows: list[tuple[str, float]] = []
+    with path.open(encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            d = (row.get("as_of") or row.get("date") or "")[:10]
+            try:
+                val = float(row.get(metric) or "")
+            except ValueError:
+                continue
+            if d:
+                rows.append((d, val))
+    rows.sort()
+    return rows, (None if rows else "empty")
+
+
+def _daily_from_returns_monthly(ticker: str) -> list[tuple[str, float]]:
+    """Approximate daily index from monthly returns vault (month-end levels)."""
+    key = ticker.replace(".", "_")
+    path = RETURNS_DIR / f"{key}.csv"
+    if not path.exists():
+        return []
+    levels: list[tuple[str, float]] = []
+    level = 100.0
+    with path.open(encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            d = (row.get("date") or "")[:10]
+            try:
+                r = float(row.get("monthly_return") or "")
+            except ValueError:
+                continue
+            if d:
+                level *= 1.0 + r
+                levels.append((d, level))
+    return levels
+
+
+def computed_spread(leg_a: str, leg_b: str, window_days: int) -> tuple[list[tuple[str, float]], str | None, str]:
+    rows_a, err_a = fetch_yahoo_daily(leg_a)
+    rows_b, err_b = fetch_yahoo_daily(leg_b)
+    if not rows_a:
+        rows_a = _daily_from_returns_monthly(leg_a)
+    if not rows_b:
+        rows_b = _daily_from_returns_monthly(leg_b)
+    if not rows_a or not rows_b:
+        return [], err_a or err_b or "insufficient_data", ""
+    map_b = {d: v for d, v in rows_b}
+    out: list[tuple[str, float]] = []
+    for i, (d, va) in enumerate(rows_a):
+        if i < window_days:
+            continue
+        d0, v0 = rows_a[i - window_days]
+        vb = map_b.get(d)
+        vb0 = map_b.get(d0)
+        if vb and vb0 and v0 > 0 and vb0 > 0:
+            ret_a = (va / v0 - 1.0) * 100.0
+            ret_b = (vb / vb0 - 1.0) * 100.0
+            out.append((d, round(ret_a - ret_b, 2)))
+    label = f"spread:{leg_a}-{leg_b}:{window_days}d"
+    return out, (None if out else "empty"), label
+
+
+def computed_ratio(numerator: str, denominator: str) -> tuple[list[tuple[str, float]], str | None, str]:
+    rows_n, _ = fetch_yahoo_daily(numerator)
+    rows_d, _ = fetch_yahoo_daily(denominator)
+    if not rows_n or not rows_d:
+        return [], "insufficient_data", ""
+    map_d = {d: v for d, v in rows_d}
+    out: list[tuple[str, float]] = []
+    for d, vn in rows_n:
+        vd = map_d.get(d)
+        if vd and vd > 0:
+            out.append((d, round(vn / vd, 4)))
+    label = f"ratio:{numerator}/{denominator}"
+    return out, (None if out else "empty"), label
+
+
+def computed_realized_vol(ticker: str, window_days: int) -> tuple[list[tuple[str, float]], str | None, str]:
+    rows, err = fetch_yahoo_daily(ticker)
+    if not rows:
+        rows = _daily_from_returns_monthly(ticker)
+    if len(rows) < window_days + 2:
+        return [], err or "insufficient_data", ""
+    out: list[tuple[str, float]] = []
+    for i in range(window_days, len(rows)):
+        window = rows[i - window_days : i + 1]
+        rets = []
+        for j in range(1, len(window)):
+            p0, p1 = window[j - 1][1], window[j][1]
+            if p0 > 0:
+                rets.append(math.log(p1 / p0))
+        if len(rets) >= window_days - 1:
+            var = sum(r * r for r in rets) / len(rets)
+            ann = math.sqrt(var * 252) * 100.0
+            out.append((window[-1][0], round(ann, 2)))
+    label = f"realized_vol:{ticker}:{window_days}d"
+    return out, (None if out else "empty"), label
+
+
+def etf_dashboard_snapshot(snapshot_file: str, json_path: str) -> tuple[list[tuple[str, float]], str | None, str]:
+    path = _external_json(snapshot_file)
+    if not path:
+        return [], "no_snapshot", ""
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return [], "bad_json", ""
+    cur = data
+    for part in json_path.split("."):
+        if isinstance(cur, dict):
+            cur = cur.get(part)
+        else:
+            cur = None
+            break
+    if cur is None:
+        return [], "path_missing", ""
+    as_of = str(data.get("as_of") or data.get("generated_at") or TODAY)[:10]
+    try:
+        val = float(cur)
+    except (TypeError, ValueError):
+        return [], "not_numeric", ""
+    return [(as_of, val)], None, f"etf_dashboard:{snapshot_file}:{json_path}"
+
+
+def hyperscaler_capex_guide() -> tuple[list[tuple[str, float]], str | None, list[str]]:
+    """Sum latest disclosed annual capex guide across hyperscalers from ai_overlay."""
     import re
 
     total = 0.0
@@ -213,6 +444,27 @@ def direction(pct: float | None) -> str:
     return "flat"
 
 
+def _apply_fallback(spec: dict, rows: list[tuple[str, float]], err: str | None) -> tuple[list[tuple[str, float]], str | None, str]:
+    if rows or not spec.get("fallback"):
+        return rows, err, ""
+    fb = spec["fallback"]
+    fb_src = fb.get("source")
+    extra_label = ""
+    if fb_src == "yahoo_daily":
+        sym = fb.get("yahoo_symbol", "")
+        rows, err = fetch_yahoo_daily(sym)
+        extra_label = f"yahoo:{sym}"
+        if fb.get("scale_note"):
+            extra_label += f" ({fb['scale_note']})"
+    elif fb_src == "etf_dashboard":
+        rows, err = fetch_etf_dashboard_daily(
+            fb.get("ticker", ""),
+            fb.get("column", "underlying_adj_close"),
+        )
+        extra_label = f"etf_dashboard:{fb.get('ticker')}"
+    return rows, err, extra_label
+
+
 def process_series(spec: dict, offline: bool) -> dict:
     sid = spec["id"]
     src = spec.get("source")
@@ -221,19 +473,56 @@ def process_series(spec: dict, offline: bool) -> dict:
     rows: list[tuple[str, float]] = []
     err: str | None = None
     extra: dict = {}
+    source_label = str(src)
 
     if offline:
         rows, err = cached, (None if cached else "offline_no_cache")
     elif src == "fred":
         rows, err = fetch_fred(spec["fred_id"])
+        rows, err, fb_label = _apply_fallback(spec, rows, err)
+        if fb_label:
+            source_label = fb_label
     elif src == "stooq_daily":
         rows, err = fetch_stooq_daily(spec["stooq"])
+    elif src == "yahoo_daily":
+        rows, err = fetch_yahoo_daily(spec.get("yahoo_symbol", ""))
+        source_label = f"yahoo:{spec.get('yahoo_symbol')}"
     elif src == "eia":
         rows, err = fetch_eia(spec.get("eia_route", ""), spec.get("eia_facets"))
     elif src == "repo_valuation":
         rows, err, contributors = hyperscaler_capex_guide()
         if contributors:
             extra["contributors"] = contributors
+    elif src == "etf_dashboard":
+        rows, err = fetch_etf_dashboard_daily(
+            spec.get("ticker", ""),
+            spec.get("column", "underlying_adj_close"),
+        )
+        source_label = f"etf_dashboard:{spec.get('ticker')}"
+    elif src == "filing_panel":
+        rows, err = read_filing_panel(spec.get("panel", ""), spec.get("metric", ""))
+        source_label = f"filing_panel:{spec.get('panel')}:{spec.get('metric')}"
+    elif src == "computed_spread":
+        rows, err, source_label = computed_spread(
+            spec.get("leg_a", ""),
+            spec.get("leg_b", ""),
+            int(spec.get("window_days", 21)),
+        )
+    elif src == "computed_ratio":
+        rows, err, source_label = computed_ratio(
+            spec.get("numerator", ""),
+            spec.get("denominator", ""),
+        )
+    elif src == "computed_realized_vol":
+        rows, err, source_label = computed_realized_vol(
+            spec.get("ticker", "SPY"),
+            int(spec.get("window_days", 20)),
+        )
+    elif src == "etf_dashboard_snapshot":
+        rows, err, source_label = etf_dashboard_snapshot(
+            spec.get("snapshot_file", ""),
+            spec.get("json_path", ""),
+        )
     else:
         err = f"unknown_source:{src}"
 
@@ -241,7 +530,6 @@ def process_series(spec: dict, offline: bool) -> dict:
         rows = cached
         err = err or "reused_cache"
     if rows:
-        # Merge new observations into cached history without dropping older points.
         merged = {d: v for d, v in cached}
         merged.update({d: v for d, v in rows})
         rows = sorted(merged.items())
@@ -257,12 +545,14 @@ def process_series(spec: dict, offline: bool) -> dict:
         except ValueError:
             stale = True
 
-    source_label = {
-        "fred": f"fred:{spec.get('fred_id')}",
-        "stooq_daily": f"stooq:{spec.get('stooq')}",
-        "eia": f"eia:{spec.get('eia_route')}",
-        "repo_valuation": "repo:valuation.json/ai_overlay",
-    }.get(src, str(src))
+    if src == "fred" and not spec.get("fallback"):
+        source_label = f"fred:{spec.get('fred_id')}"
+    elif src == "stooq_daily":
+        source_label = f"stooq:{spec.get('stooq')}"
+    elif src == "eia":
+        source_label = f"eia:{spec.get('eia_route')}"
+    elif src == "repo_valuation":
+        source_label = "repo:valuation.json/ai_overlay"
 
     out = {
         "label": spec.get("label", sid),
@@ -283,14 +573,23 @@ def process_series(spec: dict, offline: bool) -> dict:
 
 
 def build(theme_filter: str | None, offline: bool) -> dict:
+    if not offline:
+        _sync_external()
     cfg = load_config()
     THEMES_DIR.mkdir(parents=True, exist_ok=True)
+    manifest_path = THEMES_DIR / "manifest.json"
+    prior: dict = {}
+    if manifest_path.exists():
+        try:
+            prior = json.loads(manifest_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            prior = {}
     manifest: dict = {
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "as_of": TODAY,
         "staleness_max_days": cfg.get("staleness_max_days", 10),
         "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; never auto-inflate Lawrence base IRR (human review promotes to base).",
-        "themes": {},
+        "themes": dict(prior.get("themes") or {}),
     }
     for theme_id, theme in (cfg.get("themes") or {}).items():
         if theme_filter and theme_id != theme_filter:

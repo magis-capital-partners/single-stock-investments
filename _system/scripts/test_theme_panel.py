@@ -91,7 +91,22 @@ def test_overlay_defaults_context_only():
 def test_theme_map_loads():
     tmap = overlay.theme_map()
     assert "TPL" in tmap
+    assert "AZLCZ" in tmap
     assert "ai_power_land" in tmap["TPL"]
+    assert "ai_power_land" in tmap["AZLCZ"]
+    assert "macro_regime" in tmap["TPL"]
+
+
+def test_wti_yahoo_fallback():
+    rows, err = panel.fetch_yahoo_daily("CL=F", days=30)
+    assert rows or err
+    if rows:
+        assert rows[-1][1] > 0
+
+
+def test_theme_map_wildcard_macro():
+    tmap = overlay.theme_map()
+    assert "macro_regime" in tmap.get("CME", [])
 
 
 if __name__ == "__main__":

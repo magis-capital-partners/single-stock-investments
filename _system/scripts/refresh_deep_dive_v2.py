@@ -802,6 +802,63 @@ def segment_build_section(val: dict, preserved: str | None) -> str:
 
 SEGMENT_MAP_HEADING = "#### Segment map (filings)"
 AI_INFRA_HEADING = "#### AI infrastructure — what the valuation captures vs gaps"
+THEMATIC_CONTEXT_HEADING = "#### Thematic context"
+
+
+def extract_thematic_narrative(source: str | None) -> str | None:
+    """Keep Marvin narrative prose between heading and table/disclaimer on refresh."""
+    if not source:
+        return None
+    pat = re.compile(
+        rf"{re.escape(THEMATIC_CONTEXT_HEADING)}\s*\n+(.*?)(?=\n> |\n\| Indicator|\n\|[- ]|#### |### |\n## |\Z)",
+        re.DOTALL | re.IGNORECASE,
+    )
+    m = pat.search(source)
+    if m and len(m.group(1).strip()) > 40:
+        text = m.group(1).strip()
+        if text.startswith("> "):
+            return None
+        return text
+    return None
+
+
+def thematic_context_business_block(val: dict, body: str | None) -> str:
+    """Business-section thematic context table from valuation.json context_overlay."""
+    overlay = val.get("context_overlay") or {}
+    themes = overlay.get("themes") or []
+    if not themes:
+        return ""
+    narrative = extract_thematic_narrative(body)
+    lines = [THEMATIC_CONTEXT_HEADING, ""]
+    if narrative:
+        lines.append(narrative)
+        lines.append("")
+    lines.append(f"> {overlay.get('disclaimer', 'Context only. Not in Lawrence base IRR.')}")
+    lines += [
+        "",
+        "| Indicator | Latest | As of | YoY | Direction | In base IRR? |",
+        "|-----------|--------|-------|-----|-----------|--------------|",
+    ]
+    for theme in themes:
+        for ind in theme.get("indicators") or []:
+            yoy = f"{ind['yoy_pct']:+.1f}%" if isinstance(ind.get("yoy_pct"), (int, float)) else "n/a"
+            latest = ind.get("latest")
+            latest_s = f"{latest}" if latest is not None else "n/a"
+            if ind.get("stale"):
+                latest_s += " (stale)"
+            base = "yes [HUMAN REVIEW]" if ind.get("in_base_irr") else "no (context)"
+            lines.append(
+                f"| {ind.get('label', ind.get('id', ''))} | {latest_s} | "
+                f"{ind.get('as_of') or 'n/a'} | {yoy} | {ind.get('direction', 'flat')} | {base} |"
+            )
+    peer = overlay.get("peer_context")
+    if peer:
+        lines += [
+            "",
+            f"**Peer cluster:** `{peer.get('cluster_id')}` ({', '.join(peer.get('tickers') or [])}) — context only.",
+        ]
+    lines.append("")
+    return "\n".join(lines)
 
 
 def segment_map_business_block(val: dict, preserved: str | None) -> str:
@@ -1249,6 +1306,23 @@ def enrich_business_moat(body: str, val: dict, ticker: str, preserved: str | Non
             body = inject_before_marker(body, "**Disruption", ai)
         else:
             body = body.rstrip() + "\n\n" + ai
+    if val.get("context_overlay", {}).get("themes"):
+        thematic = thematic_context_business_block(val, body)
+        if thematic and not re.search(r"#### Thematic context\b", body, re.I):
+            if "#### Thesis pillars" in body:
+                body = inject_before_marker(body, "#### Thesis pillars", thematic)
+            elif "**Disruption" in body:
+                body = inject_before_marker(body, "**Disruption", thematic)
+            else:
+                body = body.rstrip() + "\n\n" + thematic
+        elif thematic and re.search(r"#### Thematic context\b", body, re.I):
+            body = re.sub(
+                r"#### Thematic context.*?(?=\n#### |\n### |\n\*\*Upside / downside|\n## |\Z)",
+                thematic.rstrip() + "\n",
+                body,
+                count=1,
+                flags=re.DOTALL | re.IGNORECASE,
+            )
     bull = (val.get("ai_overlay") or {}).get("ai_inflection_bull") or {}
     ai_irr = bull.get("computed_return_pct")
     if ai_irr is not None:
