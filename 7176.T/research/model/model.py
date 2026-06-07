@@ -19,8 +19,21 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from perf_engine import (
+    OTHER_REV_M,
+    aum_nowcast_avg,
+    fit_bridge_v2,
+    fit_k_scale,
+    fit_split_base_rates,
+    predict_base_split,
+    predict_earnings_v2,
+    predict_perf_v3b,
+    revenue_from_components,
+)
+
 OUT = Path(__file__).resolve().parent
 PANEL = OUT / "panel_halfyear.csv"
+OTHER_REV = OTHER_REV_M
 
 # ---------------------------------------------------------------------------
 # Derived fee splits [Derived from filings — provenance in data_dictionary.md]
@@ -207,20 +220,45 @@ def predict_perf_v4(df: pd.DataFrame, params: dict) -> pd.Series:
 
 
 # ---------------------------------------------------------------------------
+# Component 2b — v3b summable fund-level perf (P4 mandate detail)
+# ---------------------------------------------------------------------------
+def fit_perf_v3b(df: pd.DataFrame, use_march: bool = False) -> dict:
+    k = fit_k_scale(df, use_march=use_march)
+    return {"k_scale": k, "use_march": use_march}
+
+
+def predict_perf_v3b_series(df: pd.DataFrame, params: dict) -> pd.Series:
+    return predict_perf_v3b(df, params["k_scale"], params.get("use_march", False))
+
+
+def fit_base_split(df: pd.DataFrame) -> dict:
+    return fit_split_base_rates(df)
+
+
+def predict_base_v5(df: pd.DataFrame, rates: dict) -> pd.Series:
+    return df.apply(lambda r: predict_base_split(r, rates), axis=1)
+
+
+# ---------------------------------------------------------------------------
 # Component 3 — COSTS / EARNINGS BRIDGE
 #   ordinary margin on revenue; NI = ordinary * (1 - tax). Estimate from history.
 # ---------------------------------------------------------------------------
 def fit_bridge(df: pd.DataFrame):
     sub = df.dropna(subset=["ordinary_m", "revenue_m", "net_income_m"])
+    if len(sub) >= 4 and sub["perf_fee_m"].notna().sum() >= 3:
+        return fit_bridge_v2(sub)
     # variable-cost model: ordinary = a + b*revenue (operating leverage)
     X = sub["revenue_m"].values
     y = sub["ordinary_m"].values
     b, a = np.polyfit(X, y, 1)
     tax = 1.0 - float((sub["net_income_m"] / sub["ordinary_m"]).mean())
-    return dict(ord_intercept=float(a), ord_slope=float(b), tax_rate=tax)
+    return dict(ord_intercept=float(a), ord_slope=float(b), ord_slope_rev=float(b),
+                ord_slope_perf=0.0, tax_rate=tax, bridge_type="linear")
 
 
-def predict_earnings(rev_m, bridge):
+def predict_earnings(rev_m, bridge, perf_m=0.0):
+    if bridge.get("bridge_type") == "variable_comp":
+        return predict_earnings_v2(rev_m, perf_m, bridge)
     ordinary = bridge["ord_intercept"] + bridge["ord_slope"] * rev_m
     ni = ordinary * (1.0 - bridge["tax_rate"])
     return ordinary, ni
@@ -252,8 +290,12 @@ def _aum_proxy(row) -> float:
 
 
 def _fit_reduced(train: pd.DataFrame, spec: str = "v1"):
-    """base_floor from low-perf (H1, weak-market) periods; k_half by no-intercept LS."""
-    base_floor = float(train["revenue_m"].min())  # robust floor proxy
+    """base_floor from low-perf periods; k_half or v3b k_scale by spec."""
+    base_floor = float(train["revenue_m"].min())
+    if spec in ("v3b", "v5"):
+        use_march = spec == "v5"
+        k_scale = fit_k_scale(train, use_march=use_march)
+        return base_floor, {"k_scale": k_scale, "use_march": use_march}
     ks = {}
     for half in ["H1", "H2"]:
         s = train[train["half"] == half].copy()
@@ -267,7 +309,31 @@ def _fit_reduced(train: pd.DataFrame, spec: str = "v1"):
     return base_floor, ks
 
 
-def walk_forward(df: pd.DataFrame, use_v2: bool = False, use_v3a: bool = False, use_v4: bool = False):
+def _predict_revenue_row(test, train, spec: str, base_floor, params, rate=None, split_rates=None):
+    if spec in ("v3b", "v5"):
+        k = params.get("k_scale", 1.0)
+        use_march = params.get("use_march", spec == "v5")
+        perf = float(predict_perf_v3b(test.to_frame().T, k, use_march).iloc[0])
+        if spec == "v5" and split_rates:
+            row = test.copy()
+            if pd.notna(row.get("aum_avg_nowcast_jpym")):
+                row["aum_avg_jpym"] = row["aum_avg_nowcast_jpym"]
+            base = float(predict_base_split(row, split_rates))
+        elif rate is not None:
+            base = float(predict_base(test.to_frame().T, rate).iloc[0])
+        else:
+            base = base_floor
+        return revenue_from_components(base, perf, OTHER_REV)
+    k = params.get(test["half"], np.nan)
+    if np.isnan(k):
+        return float("nan")
+    excess = driver_return(test, spec)
+    drive = _aum_proxy(test) * excess
+    return float(base_floor + k * drive)
+
+
+def walk_forward(df: pd.DataFrame, use_v2: bool = False, use_v3a: bool = False, use_v4: bool = False,
+                 use_v3b: bool = False, use_v5: bool = False):
     d = df.dropna(subset=["revenue_m", "nikkei_ret"]).reset_index(drop=True)
     rows = []
     for i in range(len(d)):
@@ -275,14 +341,24 @@ def walk_forward(df: pd.DataFrame, use_v2: bool = False, use_v3a: bool = False, 
         train = d.iloc[:i]
         if len(train[train["half"] == test["half"]]) < 1 or len(train) < 3:
             continue
-        spec = "v4" if use_v4 else ("v3a" if use_v3a else ("v2" if use_v2 else "v1"))
-        base_floor, ks = _fit_reduced(train, spec=spec)
-        k = ks.get(test["half"], np.nan)
-        if np.isnan(k):
+        if use_v5:
+            spec = "v5"
+        elif use_v3b:
+            spec = "v3b"
+        elif use_v4:
+            spec = "v4"
+        elif use_v3a:
+            spec = "v3a"
+        elif use_v2:
+            spec = "v2"
+        else:
+            spec = "v1"
+        base_floor, params = _fit_reduced(train, spec=spec)
+        rate, _ = fit_base_rate(train) if spec == "v5" else (None, None)
+        split_rates = fit_split_base_rates(train) if spec == "v5" else None
+        rev_hat = _predict_revenue_row(test, train, spec, base_floor, params, rate, split_rates)
+        if not np.isfinite(rev_hat):
             continue
-        excess = driver_return(test, spec)
-        drive = _aum_proxy(test) * excess
-        rev_hat = base_floor + k * drive
         ly = train[train["half"] == test["half"]]["revenue_m"]
         rw = train["revenue_m"].iloc[-1]
         rows.append(dict(
@@ -322,65 +398,104 @@ def main() -> None:
     perf_params_v2, _ = fit_perf_v2(df)
     perf_params_v3a, _ = fit_perf_v3a(df)
     perf_params_v4, _ = fit_perf_v4(df)
+    perf_params_v3b = fit_perf_v3b(df, use_march=False)
+    perf_params_v5 = fit_perf_v3b(df, use_march=True)
+    split_rates = fit_base_split(df)
     bridge = fit_bridge(df)
 
     df["base_hat_m"] = predict_base(df, rate)
+    df["base_hat_v5_m"] = predict_base_v5(df, split_rates)
     df["perf_hat_m"] = predict_perf(df, perf_params)
     df["perf_hat_v2_m"] = predict_perf_v2(df, perf_params_v2)
     df["perf_hat_v3a_m"] = predict_perf_v3a(df, perf_params_v3a)
     df["perf_hat_v4_m"] = predict_perf_v4(df, perf_params_v4)
-    df["rev_hat_m"] = df["base_hat_m"].fillna(0) + df["perf_hat_m"].fillna(0) + 200.0
-    df["rev_hat_v2_m"] = df["base_hat_m"].fillna(0) + df["perf_hat_v2_m"].fillna(0) + 200.0
-    df["rev_hat_v3a_m"] = df["base_hat_m"].fillna(0) + df["perf_hat_v3a_m"].fillna(0) + 200.0
-    df["rev_hat_v4_m"] = df["base_hat_m"].fillna(0) + df["perf_hat_v4_m"].fillna(0) + 200.0
+    df["perf_hat_v3b_m"] = predict_perf_v3b_series(df, perf_params_v3b)
+    df["perf_hat_v5_m"] = predict_perf_v3b_series(df, perf_params_v5)
+    df["rev_hat_m"] = df["base_hat_m"].fillna(0) + df["perf_hat_m"].fillna(0) + OTHER_REV
+    df["rev_hat_v2_m"] = df["base_hat_m"].fillna(0) + df["perf_hat_v2_m"].fillna(0) + OTHER_REV
+    df["rev_hat_v3a_m"] = df["base_hat_m"].fillna(0) + df["perf_hat_v3a_m"].fillna(0) + OTHER_REV
+    df["rev_hat_v4_m"] = df["base_hat_m"].fillna(0) + df["perf_hat_v4_m"].fillna(0) + OTHER_REV
+    df["rev_hat_v3b_m"] = df["base_hat_m"].fillna(0) + df["perf_hat_v3b_m"].fillna(0) + OTHER_REV
+    df["rev_hat_v5_m"] = df["base_hat_v5_m"].fillna(0) + df["perf_hat_v5_m"].fillna(0) + OTHER_REV
 
     res = walk_forward(df, use_v2=False)
     res_v2 = walk_forward(df, use_v2=True)
     res_v3a = walk_forward(df, use_v3a=True)
     res_v4 = walk_forward(df, use_v4=True)
+    res_v3b = walk_forward(df, use_v3b=True)
+    res_v5 = walk_forward(df, use_v5=True)
     mt = metrics(res) if len(res) else {}
     mt_v2 = {}
     mt_v3a = {}
     mt_v4 = {}
+    mt_v3b = {}
+    mt_v5 = {}
+
+    def _merge_wf_spec(res_spec, col_name, bucket):
+        nonlocal res
+        if not len(res_spec):
+            return {}
+        merged = res_spec.rename(columns={"model": col_name})
+        res = res.merge(merged[["label", col_name]], on="label", how="left")
+        err = res.dropna(subset=[col_name])
+        if not len(err):
+            return {}
+        e = err[col_name] - err["actual"]
+        hit = float(
+            (np.sign(err[col_name].diff().fillna(0)) == np.sign(err["actual"].diff().fillna(0))).mean()
+        ) if len(err) > 1 else float("nan")
+        return {
+            col_name: dict(
+                rmse_jpym=round(float(np.sqrt((e ** 2).mean())), 1),
+                mape_pct=round(float((e.abs() / err["actual"].abs()).mean() * 100), 1),
+                directional_hit=round(hit, 2) if np.isfinite(hit) else None,
+                n=len(err),
+            )
+        }
+
     if len(res_v3a):
-        res_v3a = res_v3a.rename(columns={"model": "model_v3a"})
-        res = res.merge(res_v3a[["label", "model_v3a"]], on="label", how="left")
-        err_v3 = res.dropna(subset=["model_v3a"])
-        if len(err_v3):
-            e3 = err_v3["model_v3a"] - err_v3["actual"]
-            mt_v3a = {"model_v3a": dict(
-                rmse_jpym=round(float(np.sqrt((e3 ** 2).mean())), 1),
-                mape_pct=round(float((e3.abs() / err_v3["actual"].abs()).mean() * 100), 1),
-                n=len(err_v3),
-            )}
+        mt_v3a = _merge_wf_spec(res_v3a, "model_v3a", "v3a").get("model_v3a", {})
+        if isinstance(mt_v3a, dict) and "rmse_jpym" not in mt_v3a:
+            err_v3 = res.dropna(subset=["model_v3a"])
+            if len(err_v3):
+                e3 = err_v3["model_v3a"] - err_v3["actual"]
+                mt_v3a = {"model_v3a": dict(
+                    rmse_jpym=round(float(np.sqrt((e3 ** 2).mean())), 1),
+                    mape_pct=round(float((e3.abs() / err_v3["actual"].abs()).mean() * 100), 1),
+                    n=len(err_v3),
+                )}
     if len(res_v2):
-        res_v2 = res_v2.rename(columns={"model": "model_v2"})
-        res = res.merge(res_v2[["label", "model_v2"]], on="label", how="left")
-        err_v2 = res.dropna(subset=["model_v2"])
-        if len(err_v2):
-            e = err_v2["model_v2"] - err_v2["actual"]
-            hit = float(
-                (np.sign(err_v2["model_v2"].diff().fillna(0)) == np.sign(err_v2["actual"].diff().fillna(0))).mean()
-            ) if len(err_v2) > 1 else float("nan")
-            mt_v2 = {
-                "model_v2": dict(
-                    rmse_jpym=round(float(np.sqrt((e ** 2).mean())), 1),
-                    mape_pct=round(float((e.abs() / err_v2["actual"].abs()).mean() * 100), 1),
-                    directional_hit=round(hit, 2),
-                    n=len(err_v2),
-                )
-            }
+        mt_v2 = _merge_wf_spec(res_v2, "model_v2", "v2").get("model_v2", {})
+        if not mt_v2:
+            err_v2 = res.dropna(subset=["model_v2"])
+            if len(err_v2):
+                e = err_v2["model_v2"] - err_v2["actual"]
+                hit = float(
+                    (np.sign(err_v2["model_v2"].diff().fillna(0)) == np.sign(err_v2["actual"].diff().fillna(0))).mean()
+                ) if len(err_v2) > 1 else float("nan")
+                mt_v2 = {
+                    "model_v2": dict(
+                        rmse_jpym=round(float(np.sqrt((e ** 2).mean())), 1),
+                        mape_pct=round(float((e.abs() / err_v2["actual"].abs()).mean() * 100), 1),
+                        directional_hit=round(hit, 2),
+                        n=len(err_v2),
+                    )
+                }
     if len(res_v4):
-        res_v4 = res_v4.rename(columns={"model": "model_v4"})
-        res = res.merge(res_v4[["label", "model_v4"]], on="label", how="left")
-        err_v4 = res.dropna(subset=["model_v4"])
-        if len(err_v4):
-            e4 = err_v4["model_v4"] - err_v4["actual"]
-            mt_v4 = {"model_v4": dict(
-                rmse_jpym=round(float(np.sqrt((e4 ** 2).mean())), 1),
-                mape_pct=round(float((e4.abs() / err_v4["actual"].abs()).mean() * 100), 1),
-                n=len(err_v4),
-            )}
+        mt_v4 = _merge_wf_spec(res_v4, "model_v4", "v4").get("model_v4", {})
+        if not mt_v4:
+            err_v4 = res.dropna(subset=["model_v4"])
+            if len(err_v4):
+                e4 = err_v4["model_v4"] - err_v4["actual"]
+                mt_v4 = {"model_v4": dict(
+                    rmse_jpym=round(float(np.sqrt((e4 ** 2).mean())), 1),
+                    mape_pct=round(float((e4.abs() / err_v4["actual"].abs()).mean() * 100), 1),
+                    n=len(err_v4),
+                )}
+    if len(res_v3b):
+        mt_v3b = _merge_wf_spec(res_v3b, "model_v3b", "v3b")
+    if len(res_v5):
+        mt_v5 = _merge_wf_spec(res_v5, "model_v5", "v5")
 
     # ----- current/next period nowcast -----
     # Use latest known AUM and a market-return input (set live each month).
@@ -417,11 +532,24 @@ def main() -> None:
             "k_H1": None if np.isnan(perf_params_v4.get("H1", np.nan)) else round(perf_params_v4["H1"], 5),
             "k_H2": None if np.isnan(perf_params_v4.get("H2", np.nan)) else round(perf_params_v4["H2"], 5),
         },
+        "perf_fee_model_v3b": {
+            "form": "perf_fee_half = k_scale × Σ_fund (AUM_f × excess_f × perf_rate_f × cryst_flag)",
+            "k_scale": round(perf_params_v3b["k_scale"], 4),
+            "use_march": False,
+        },
+        "perf_fee_model_v5": {
+            "form": "v3b march_excess + split base fee + AUM roll-forward",
+            "k_scale": round(perf_params_v5["k_scale"], 4),
+            "use_march": True,
+            "split_base_rates": split_rates,
+        },
         "walk_forward": res.to_dict(orient="records"),
         "oos_metrics": mt,
-        "oos_metrics_v2": mt_v2,
-        "oos_metrics_v3a": mt_v3a,
-        "oos_metrics_v4": mt_v4,
+        "oos_metrics_v2": mt_v2 if isinstance(mt_v2, dict) else {},
+        "oos_metrics_v3a": mt_v3a if isinstance(mt_v3a, dict) else {},
+        "oos_metrics_v4": mt_v4 if isinstance(mt_v4, dict) else {},
+        "oos_metrics_v3b": mt_v3b if isinstance(mt_v3b, dict) else {},
+        "oos_metrics_v5": mt_v5 if isinstance(mt_v5, dict) else {},
         "data_acquisition": _load_acquisition_manifest(),
         "latest_anchor": {
             "period_end": str(latest["period_end"].date()),
@@ -456,8 +584,8 @@ def main() -> None:
         base_hat = rate / 2.0 * avg_aum
         k = perf_params.get(half, np.nan)
         perf_hat = (k * avg_aum * max(0.0, ret)) if not np.isnan(k) else np.nan
-        rev_hat = base_hat + (perf_hat if not np.isnan(perf_hat) else 0) + 200.0
-        ordn, ni = predict_earnings(rev_hat, bridge)
+        rev_hat = base_hat + (perf_hat if not np.isnan(perf_hat) else 0) + OTHER_REV
+        ordn, ni = predict_earnings(rev_hat, bridge, perf_hat if not np.isnan(perf_hat) else 0)
         fc_rows.append(dict(
             horizon=f"next_{half}", scenario=scen, nikkei_ret=ret,
             avg_aum_jpym=round(avg_aum), base_fee_m=round(base_hat),
@@ -467,10 +595,11 @@ def main() -> None:
     fc = pd.DataFrame(fc_rows)
     if len(res):
         oos_std = float((res["model"] - res["actual"]).std())
+        slope = bridge.get("ord_slope_rev", bridge.get("ord_slope", 0.579))
         fc["revenue_lo80"] = (fc["revenue_m"] - 1.28 * oos_std).round(0)
         fc["revenue_hi80"] = (fc["revenue_m"] + 1.28 * oos_std).round(0)
-        fc["net_income_lo80"] = (fc["net_income_m"] - 1.28 * oos_std * bridge["ord_slope"]).round(0)
-        fc["net_income_hi80"] = (fc["net_income_m"] + 1.28 * oos_std * bridge["ord_slope"]).round(0)
+        fc["net_income_lo80"] = (fc["net_income_m"] - 1.28 * oos_std * slope).round(0)
+        fc["net_income_hi80"] = (fc["net_income_m"] + 1.28 * oos_std * slope).round(0)
     fc.to_csv(OUT / "forecasts.csv", index=False)
 
     print(f"Base rate (ann): {rate*100:.3f}%")

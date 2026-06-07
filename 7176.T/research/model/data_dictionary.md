@@ -108,9 +108,44 @@ Run `python3 acquire_data.py` (or `build_panel.py`, which calls it first). Manif
 `opex_sga_jpy_million`, `incremental_margin`, `march_nikkei_ret`, `march_value_ret`,
 `march_blended_ret`, `mandate_weighted_excess`, `mandate_count`.
 
+### P4 — Mandate terms + perf by bucket
+
+| File | Tag | Definition |
+|------|-----|------------|
+| `../mandate_terms.json` | [Filing/Assumption] | Per-fund hurdle, perf_rate, crystallization calendar |
+| `mandate_nav_detail.csv` | [Filing/Market/Derived] | Per-fund half-year return, excess, AUM; includes `march_excess` |
+| `perf_fee_by_bucket_halfyear.csv` | [Derived] | Structural perf driver by mandate bucket vs actual |
+
+### P5 — AUM roll-forward + ETF units
+
+| File | Tag | Definition |
+|------|-----|------------|
+| `etf_units_daily.csv` | [Market/Derived] | Daily shares + NAV per ETF |
+| `aum_rollforward_halfyear.csv` | [Derived] | `AUM_end = AUM_prior × (1+r) + flows`; nowcast avg AUM |
+| `perf_eligible_aum_halfyear.csv` | [Derived] | Observed perf-eligible AUM split |
+
+### P7 — Other revenue bridge
+
+| File | Tag | Definition |
+|------|-----|------------|
+| `other_revenue_halfyear.csv` | [Derived] | Revenue minus disclosed base/perf fees |
+
+### Panel columns merged from `data/` (additions)
+
+`aum_end_nowcast_jpym`, `aum_avg_nowcast_jpym`, `other_revenue_jpym`.
+
+### Model specs (see `spec_comparison.json`)
+
+| Spec | Driver |
+|------|--------|
+| v1 | Nikkei × AUM crystallization |
+| v3b | Σ fund (AUM × excess × perf_rate × cryst) + k_scale |
+| **v5 (production)** | v3b + march_excess + split base fee + AUM roll-forward |
+
 ## Remaining gaps
 
-- **JITA industry flows** — P5 scrape fills `jita_equity_flow_bn` / `jita_etf_flow_bn` (億円) from B-1 Excel; `download_jita_flows.py`.
-- **Per-fund NAV vs hurdle / high-water mark** — P4 live for FY2023H1 onward (6 halves); pre-2023 and institutional pool still proxy [Derived]. Vicki: 投信総合検索ライブラリー CSV for Value Up history.
+- **Per-fund NAV vs hurdle / high-water mark** — P4 live for FY2023H1 onward; pre-2023 via ETF proxy backfill + optional `data/touki_nav/*.csv` (投信総合検索ライブラリー manual export).
+- **JPX listed shares** — `download_jpx_etf_units.py` → `jpx_etf_units_daily.csv` (monthly 受益権口数 forward-filled); creation/redemption units in `jpx_etf_meta.csv`.
+- **JITA in AUM roll-forward** — `_resolve_halfyear_flow()` scales industry 億円 flows by `jita_flow_scale` (default 1.2%); blended pool return for nowcast.
 - **AUM by category pre-2023** and **base/perf split pre-FY2024** — extends component history.
 - **CapIQ** ownership + peer fee/comp ratios — paste into `capiq_export.csv`.

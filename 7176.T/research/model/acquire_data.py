@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
-"""P0-P6 data acquisition for 7176.T earnings model.
+"""P0-P7 data acquisition for 7176.T earnings model.
 
 Outputs under research/model/data/:
   etf_nav_daily.csv, etf_aum_daily.csv, fund_return_halfyear.csv
   flows_monthly.csv, fee_history.csv, factor_returns_monthly.csv
   comp_bridge_halfyear.csv, aum_pools_halfyear.csv
+  mandate_nav_*.csv, perf_fee_by_bucket_halfyear.csv, aum_rollforward_halfyear.csv
+  etf_units_daily.csv, perf_eligible_aum_halfyear.csv, other_revenue_halfyear.csv
   capiq_peers.csv (template or import), data_acquisition_manifest.json
 
 Run: python3 acquire_data.py
@@ -25,6 +27,7 @@ DATA = ROOT / "data"
 EVIDENCE = ROOT.parent / "evidence"
 EVIDENCE_TEXT = EVIDENCE / "_text"
 REGISTRY = ROOT / "fund_registry.json"
+JPX_SCRIPT = ROOT.parents[1] / "_scripts" / "download_jpx_etf_units.py"
 
 
 def load_registry() -> dict:
@@ -58,6 +61,24 @@ def _etf_aum_from_anchor(registry: dict, nav_by_ticker: dict[str, pd.Series]) ->
     return out
 
 
+def _run_jpx_units_scrape() -> None:
+    import subprocess
+    import sys
+
+    if not JPX_SCRIPT.exists():
+        return
+    subprocess.run([sys.executable, str(JPX_SCRIPT)], check=False, cwd=str(ROOT.parents[1]))
+
+
+def _load_jpx_units_daily() -> pd.DataFrame:
+    path = DATA / "jpx_etf_units_daily.csv"
+    if not path.exists():
+        _run_jpx_units_scrape()
+    if not path.exists():
+        return pd.DataFrame()
+    return pd.read_csv(path, parse_dates=["date"])
+
+
 def fetch_etf_nav_daily(registry: dict) -> tuple[pd.DataFrame, pd.DataFrame]:
     import yfinance as yf
 
@@ -85,26 +106,43 @@ def fetch_etf_nav_daily(registry: dict) -> tuple[pd.DataFrame, pd.DataFrame]:
 
     anchor_aum = _etf_aum_from_anchor(registry, nav_by_ticker)
     anchor_date = pd.Timestamp(registry.get("etf_aum_anchor", {}).get("as_of", "2025-03-31"))
+    jpx_units = _load_jpx_units_daily()
+    jpx_by_ticker: dict[str, pd.Series] = {}
+    if not jpx_units.empty:
+        for tk, g in jpx_units.groupby("ticker"):
+            s = g.set_index("date")["listed_shares"].sort_index()
+            jpx_by_ticker[tk] = s
 
     for tk in tickers:
         if tk not in nav_by_ticker:
             continue
         unit = nav_by_ticker[tk]
+        jpx_shares = jpx_by_ticker.get(tk)
         try:
             info = yf.Ticker(tk).info or {}
         except Exception:
             info = {}
-        shares = info.get("sharesOutstanding") or info.get("fundSharesOutstanding") or np.nan
+        yahoo_shares = info.get("sharesOutstanding") or info.get("fundSharesOutstanding") or np.nan
         prior = unit[unit.index <= anchor_date]
         nav_anchor = float(prior.iloc[-1]) if len(prior) else float(unit.iloc[0])
         filing_aum_m = anchor_aum.get(tk)
         for dt_idx, nav in unit.items():
+            shares = np.nan
+            method = "[Pending]"
+            if jpx_shares is not None:
+                prior_jpx = jpx_shares[jpx_shares.index <= dt_idx]
+                if len(prior_jpx) and pd.notna(prior_jpx.iloc[-1]):
+                    shares = float(prior_jpx.iloc[-1])
+                    method = "[Market/JPX]"
+            elif pd.notna(yahoo_shares) and yahoo_shares:
+                shares = float(yahoo_shares)
+                method = "[Market/Yahoo]"
             if pd.notna(shares) and shares:
                 aum_jpy = nav * shares
-                method = "[Market]"
             elif filing_aum_m and nav_anchor:
                 aum_jpy = filing_aum_m * 1e6 * (float(nav) / nav_anchor)
                 method = "[Filing/Derived]"
+                shares = np.nan
             else:
                 aum_jpy = np.nan
                 method = "[Pending]"
@@ -121,6 +159,57 @@ def fetch_etf_nav_daily(registry: dict) -> tuple[pd.DataFrame, pd.DataFrame]:
     nav_df = pd.DataFrame(rows_nav).sort_values(["ticker", "date"])
     aum_df = pd.DataFrame(rows_aum).sort_values(["ticker", "date"])
     return nav_df, aum_df
+
+
+def refresh_aum_with_jpx(nav_df: pd.DataFrame, registry: dict) -> pd.DataFrame:
+    """Recompute AUM rows after jpx_etf_units_daily.csv is built."""
+    if nav_df.empty:
+        return pd.DataFrame()
+    jpx_units = _load_jpx_units_daily()
+    if jpx_units.empty:
+        return pd.DataFrame()
+    anchor_aum = _etf_aum_from_anchor(registry, {
+        tk: nav_df[nav_df["ticker"] == tk].set_index("date")["nav_jpy"].sort_index()
+        for tk in nav_df["ticker"].unique()
+    })
+    anchor_date = pd.Timestamp(registry.get("etf_aum_anchor", {}).get("as_of", "2025-03-31"))
+    jpx_by_ticker: dict[str, pd.Series] = {}
+    for tk, g in jpx_units.groupby("ticker"):
+        jpx_by_ticker[tk] = g.set_index("date")["listed_shares"].sort_index()
+
+    rows_aum = []
+    for tk in nav_df["ticker"].unique():
+        unit = nav_df[nav_df["ticker"] == tk].set_index("date")["nav_jpy"].sort_index()
+        jpx_shares = jpx_by_ticker.get(tk)
+        prior = unit[unit.index <= anchor_date]
+        nav_anchor = float(prior.iloc[-1]) if len(prior) else float(unit.iloc[0])
+        filing_aum_m = anchor_aum.get(tk)
+        for dt_idx, nav in unit.items():
+            shares = np.nan
+            method = "[Pending]"
+            if jpx_shares is not None:
+                prior_jpx = jpx_shares[jpx_shares.index <= dt_idx]
+                if len(prior_jpx) and pd.notna(prior_jpx.iloc[-1]):
+                    shares = float(prior_jpx.iloc[-1])
+                    method = "[Market/JPX]"
+            if pd.notna(shares) and shares:
+                aum_jpy = nav * shares
+            elif filing_aum_m and nav_anchor:
+                aum_jpy = filing_aum_m * 1e6 * (float(nav) / nav_anchor)
+                method = "[Filing/Derived]"
+            else:
+                aum_jpy = np.nan
+                method = "[Pending]"
+            rows_aum.append({
+                "date": dt_idx,
+                "ticker": tk,
+                "nav_jpy": float(nav),
+                "shares": float(shares) if pd.notna(shares) else np.nan,
+                "aum_jpy": float(aum_jpy) if pd.notna(aum_jpy) else np.nan,
+                "aum_jpym": float(aum_jpy) / 1e6 if pd.notna(aum_jpy) else np.nan,
+                "aum_method": method,
+            })
+    return pd.DataFrame(rows_aum).sort_values(["ticker", "date"])
 
 
 def fund_return_halfyear(registry: dict, nav_df: pd.DataFrame) -> pd.DataFrame:
@@ -603,6 +692,69 @@ def _halfyear_fund_return(monthly: pd.DataFrame, fund_id: str, period_end: pd.Ti
     return np.nan
 
 
+def _implied_nonlisted_return(panel_sorted: pd.DataFrame, idx: int, row: pd.Series) -> float:
+    """Filing-anchored half-year return on non-listed AUM pool (decimal)."""
+    if idx <= 0:
+        return np.nan
+    prior = panel_sorted.iloc[idx - 1]
+    cur = row.get("aum_nonlisted_jpym")
+    prev = prior.get("aum_nonlisted_jpym")
+    if pd.isna(cur) or pd.isna(prev) or float(prev) <= 0:
+        return np.nan
+    return float(cur) / float(prev) - 1.0
+
+
+def _build_nonlisted_mandate_slices(
+    row: pd.Series,
+    panel_sorted: pd.DataFrame,
+    idx: int,
+    registry: dict,
+    resid_cfg: dict,
+    latest_public_aum: float,
+    pe_str: str,
+    half: str,
+) -> list[dict]:
+    """Split institutional residual into registry buckets with filing-implied or benchmark returns."""
+    nonlisted = row.get("aum_nonlisted_jpym")
+    if pd.isna(nonlisted):
+        return []
+    residual_aum = max(0.0, float(nonlisted) - float(latest_public_aum or 0))
+    if residual_aum <= 0:
+        return []
+
+    implied_ret = _implied_nonlisted_return(panel_sorted, idx, row)
+    slices: list[dict] = []
+    for fund in registry.get("nonlisted_funds", []):
+        share = float(fund.get("aum_share_of_nonlisted") or 0)
+        if share <= 0:
+            continue
+        bucket_aum = residual_aum * share
+        bm = fund.get("benchmark", "nikkei")
+        bm_ret = _benchmark_ret(row, bm)
+        hurdle = float(fund.get("hurdle") or 0.0)
+        if pd.notna(implied_ret):
+            period_ret = float(implied_ret)
+            source = "filing_aum_implied"
+        else:
+            period_ret = bm_ret
+            source = "benchmark_proxy"
+        excess = max(0.0, period_ret - bm_ret - hurdle)
+        slices.append({
+            "period_end": pe_str,
+            "half": half,
+            "mandate_id": fund.get("id", resid_cfg.get("mandate_id", "mandate_japan_equity")),
+            "fund_id": f"nonlisted_{fund['id']}",
+            "period_return": period_ret,
+            "benchmark_return": bm_ret,
+            "excess_vs_hurdle": excess,
+            "aum_jpym": bucket_aum,
+            "perf_rate": fund.get("perf_rate_assumption", 0.15),
+            "tag": resid_cfg.get("tag", "[Derived]"),
+            "source": source,
+        })
+    return slices
+
+
 def build_mandate_nav(registry: dict, panel: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     """P4 — Pool scraped mandate returns; impute institutional residual from value proxy."""
     monthly_path = DATA / "mandate_nav_monthly.csv"
@@ -615,6 +767,7 @@ def build_mandate_nav(registry: dict, panel: pd.DataFrame) -> tuple[pd.DataFrame
     monthly = pd.read_csv(monthly_path, parse_dates=["as_of"])
     detail_rows: list[dict] = []
     agg_rows: list[dict] = []
+    panel_sorted = panel.sort_values("period_end").reset_index(drop=True)
 
     etf_weights = {e["id"]: e["weight"] for e in catalog.get("perf_etfs", [])}
     latest_public_aum = (
@@ -622,7 +775,7 @@ def build_mandate_nav(registry: dict, panel: pd.DataFrame) -> tuple[pd.DataFrame
         if "aum_jpym" in monthly.columns else 0.0
     )
 
-    for _, r in panel.iterrows():
+    for idx, r in panel_sorted.iterrows():
         pe = pd.Timestamp(r["period_end"])
         pe_str = pe.strftime("%Y-%m-%d")
         half = r["half"]
@@ -662,27 +815,13 @@ def build_mandate_nav(registry: dict, panel: pd.DataFrame) -> tuple[pd.DataFrame
                 "source": "yfinance_etf",
             })
 
-        # Institutional residual (non-listed minus disclosed public SAM AUM)
+        # Institutional residual: filing-implied return split across registry buckets
         resid = catalog.get("nonlisted_residual", {})
-        proxy_id = resid.get("proxy_fund_id", "value_up_fund")
-        proxy_ret = _halfyear_fund_return(monthly, proxy_id, pe, half)
-        nonlisted = r.get("aum_nonlisted_jpym", np.nan)
-        if pd.notna(nonlisted) and pd.notna(proxy_ret):
-            residual_aum = max(0.0, float(nonlisted) - float(latest_public_aum or 0))
-            if residual_aum > 0:
-                bm_ret = _benchmark_ret(r, "nikkei")
-                mandate_slices.append({
-                    "period_end": pe_str, "half": half,
-                    "mandate_id": resid.get("mandate_id", "mandate_japan_equity"),
-                    "fund_id": "nonlisted_residual",
-                    "period_return": float(proxy_ret),
-                    "benchmark_return": bm_ret,
-                    "excess_vs_hurdle": max(0.0, float(proxy_ret) - bm_ret),
-                    "aum_jpym": residual_aum,
-                    "perf_rate": 0.15,
-                    "tag": resid.get("tag", "[Derived]"),
-                    "source": f"proxy:{proxy_id}",
-                })
+        mandate_slices.extend(
+            _build_nonlisted_mandate_slices(
+                r, panel_sorted, int(idx), registry, resid, latest_public_aum, pe_str, half
+            )
+        )
 
         detail_rows.extend(mandate_slices)
         if not mandate_slices:
@@ -699,7 +838,7 @@ def build_mandate_nav(registry: dict, panel: pd.DataFrame) -> tuple[pd.DataFrame
             "mandate_weighted_return": float((ddf["period_return"] * w).sum() / wsum),
             "mandate_count": len(ddf),
             "tag": "[Filing/Market/Derived]",
-            "note": "Scraped SAM PDFs + ETF yfinance + nonlisted residual proxy",
+            "note": "Scraped SAM + ETF history + filing-implied nonlisted buckets",
         })
 
     detail = pd.DataFrame(detail_rows)
@@ -744,6 +883,263 @@ def build_comp_bridge(panel: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+# ---------------------------------------------------------------------------
+# P4 — mandate terms + perf fee by bucket + march excess on detail
+# ---------------------------------------------------------------------------
+
+def build_mandate_terms_export() -> dict:
+    """Copy mandate_terms.json metadata into manifest (file lives in model/)."""
+    terms_path = ROOT / "mandate_terms.json"
+    if not terms_path.exists():
+        return {}
+    return json.loads(terms_path.read_text(encoding="utf-8"))
+
+
+def enrich_mandate_detail_march(
+    detail: pd.DataFrame,
+    march: pd.DataFrame,
+    factor_h: pd.DataFrame,
+) -> pd.DataFrame:
+    """Add march_excess per fund row for H2 crystallization (P6)."""
+    if detail.empty:
+        return detail
+    d = detail.copy()
+    d["march_excess"] = np.nan
+    if march.empty:
+        return d
+    march_map = march.set_index("period_end") if "period_end" in march.columns else pd.DataFrame()
+    strat_map = {
+        "value_up_fund": "march_value_ret",
+        "etf_2080": "march_value_ret",
+        "etf_2081": "march_value_ret",
+        "etf_2082": "march_value_ret",
+        "orka_fund": "march_nikkei_ret",
+        "nonlisted_residual": "march_nikkei_ret",
+        "nonlisted_mandate_japan_equity": "march_nikkei_ret",
+        "nonlisted_mandate_value_pbr": "march_value_ret",
+        "nonlisted_mandate_other": "march_nikkei_ret",
+    }
+    for i, row in d.iterrows():
+        if row["half"] != "H2":
+            continue
+        pe = row["period_end"]
+        mrow = march_map.loc[pe] if pe in march_map.index else None
+        if mrow is None:
+            continue
+        fid = str(row.get("fund_id", ""))
+        col = strat_map.get(fid)
+        if col is None and fid.startswith("nonlisted_mandate_value"):
+            col = "march_value_ret"
+        elif col is None and fid.startswith("nonlisted_"):
+            col = "march_nikkei_ret"
+        elif col is None:
+            col = "march_nikkei_ret"
+        march_ret = mrow.get(col, mrow.get("march_nikkei_ret", np.nan))
+        if pd.isna(march_ret):
+            continue
+        bm = float(row.get("benchmark_return") or 0)
+        d.at[i, "march_excess"] = max(0.0, float(march_ret) - bm)
+    return d
+
+
+def build_perf_fee_by_bucket(detail: pd.DataFrame, panel: pd.DataFrame) -> pd.DataFrame:
+    """Aggregate structural perf driver by mandate bucket (¥m)."""
+    if detail.empty or panel.empty:
+        return pd.DataFrame()
+    rows = []
+    for _, r in panel.iterrows():
+        pe = r["period_end"].strftime("%Y-%m-%d")
+        half = r["half"]
+        sub = detail[(detail["period_end"] == pe) & (detail["half"] == half)]
+        if sub.empty:
+            continue
+        for mid, g in sub.groupby("mandate_id"):
+            drive = 0.0
+            for _, s in g.iterrows():
+                aum = s.get("aum_jpym")
+                if pd.isna(aum) or float(aum) <= 0:
+                    continue
+                exc = max(0.0, float(s.get("excess_vs_hurdle") or 0))
+                rate = float(s.get("perf_rate") or 0.15)
+                drive += float(aum) * exc * rate
+            rows.append({
+                "period_end": pe,
+                "half": half,
+                "mandate_id": mid,
+                "structural_perf_drive_jpym": round(drive, 2),
+                "fund_count": len(g),
+                "tag": "[Derived]",
+            })
+        actual = r.get("perf_fee")
+        if pd.notna(actual):
+            rows.append({
+                "period_end": pe,
+                "half": half,
+                "mandate_id": "_actual_total",
+                "structural_perf_drive_jpym": float(actual) / 1000.0,
+                "fund_count": np.nan,
+                "tag": "[Filing]",
+            })
+    return pd.DataFrame(rows)
+
+
+# ---------------------------------------------------------------------------
+# P5 — ETF units + AUM roll-forward
+# ---------------------------------------------------------------------------
+
+def build_etf_units_daily(aum_df: pd.DataFrame) -> pd.DataFrame:
+    if aum_df.empty:
+        return pd.DataFrame()
+    cols = ["date", "ticker", "shares", "nav_jpy", "aum_jpym", "aum_method"]
+    out = aum_df[[c for c in cols if c in aum_df.columns]].copy()
+    out["tag"] = out["aum_method"] if "aum_method" in out.columns else "[Derived]"
+    jpx_meta = DATA / "jpx_etf_meta.csv"
+    if jpx_meta.exists():
+        meta = pd.read_csv(jpx_meta)
+        meta["ticker"] = meta["ticker"].astype(str)
+        out = out.merge(
+            meta[["ticker", "creation_unit_shares", "redemption_unit_shares"]],
+            on="ticker",
+            how="left",
+        )
+    return out.sort_values(["ticker", "date"])
+
+
+def _resolve_halfyear_flow(
+    pe: str,
+    fh: pd.DataFrame,
+    registry: dict,
+    row: pd.Series,
+) -> tuple[float, str, dict]:
+    """Pick net flow (¥m) for AUM roll-forward: ETF-implied, else JITA-scaled industry flows."""
+    meta = {"etf_implied_flow_jpym": np.nan, "jita_equity_flow_bn": np.nan, "jita_etf_flow_bn": np.nan}
+    if fh.empty or pe not in fh.index:
+        return np.nan, "[Derived]", meta
+    fr = fh.loc[pe]
+    meta["etf_implied_flow_jpym"] = fr.get("etf_implied_flow_jpym", np.nan)
+    meta["jita_equity_flow_bn"] = fr.get("jita_equity_flow_bn", np.nan)
+    meta["jita_etf_flow_bn"] = fr.get("jita_etf_flow_bn", np.nan)
+
+    scale = float(registry.get("jita_flow_scale", 0.012))
+    etf_share = float(row.get("etf_share") or registry["aum_pools"][1].get("aum_share_fy2025", 0.19))
+    nl_share = 1.0 - etf_share
+
+    ef = meta["etf_implied_flow_jpym"]
+    jita_etf = meta["jita_etf_flow_bn"]
+    jita_eq = meta["jita_equity_flow_bn"]
+
+    etf_flow = np.nan
+    if pd.notna(ef) and abs(float(ef)) > 1e-3:
+        etf_flow = float(ef)
+    elif pd.notna(jita_etf):
+        etf_flow = float(jita_etf) * 100.0 * scale  # 億円 → ¥m, industry → Simplex
+
+    nl_flow = float(jita_eq) * 100.0 * scale if pd.notna(jita_eq) else 0.0
+    etf_part = float(etf_flow) if pd.notna(etf_flow) else 0.0
+    total = etf_part * etf_share + nl_flow * nl_share
+
+    tag = "[Filing/Market]" if pd.notna(jita_etf) or pd.notna(jita_eq) else "[Derived]"
+    if pd.notna(etf_flow) and abs(float(ef or 0)) > 1e-3:
+        tag = "[Derived]"
+    return total, tag, meta
+
+
+def build_aum_rollforward(
+    panel: pd.DataFrame,
+    flows_h: pd.DataFrame,
+    registry: dict,
+) -> pd.DataFrame:
+    """AUM_t = AUM_{t-1} × (1 + ret) + net_flows; compare to filing anchor."""
+    if panel.empty:
+        return pd.DataFrame()
+    fh = flows_h.set_index("period_end") if not flows_h.empty and "period_end" in flows_h.columns else pd.DataFrame()
+    rows = []
+    prior_end = np.nan
+    for _, r in panel.sort_values("period_end").iterrows():
+        pe = r["period_end"].strftime("%Y-%m-%d")
+        filing_end = r.get("aum_end_jpym")
+        filing_avg = r.get("aum_avg_jpym")
+        nik_ret = float(r.get("nikkei_ret") or 0)
+        etf_ret = float(r.get("etf_basket_ret") or nik_ret)
+        etf_share = float(r.get("etf_share") or registry["aum_pools"][1].get("aum_share_fy2025", 0.19))
+        nl_share = 1.0 - etf_share
+        blended_ret = nik_ret * nl_share + etf_ret * etf_share
+
+        flow, flow_tag, flow_meta = _resolve_halfyear_flow(pe, fh, registry, r)
+        nowcast_end = np.nan
+        if pd.notna(prior_end):
+            nowcast_end = float(prior_end) * (1.0 + blended_ret) + (float(flow) if pd.notna(flow) else 0.0)
+        if pd.notna(filing_end):
+            prior_end = float(filing_end)
+        elif pd.notna(nowcast_end):
+            prior_end = float(nowcast_end)
+        avg_nowcast = np.nan
+        if pd.notna(nowcast_end) and pd.notna(filing_avg):
+            avg_nowcast = (float(nowcast_end) + float(filing_avg)) / 2.0
+        elif pd.notna(nowcast_end):
+            avg_nowcast = float(nowcast_end)
+        rows.append({
+            "period_end": pe,
+            "half": r["half"],
+            "aum_end_filing_jpym": filing_end,
+            "aum_end_nowcast_jpym": round(nowcast_end, 1) if pd.notna(nowcast_end) else np.nan,
+            "aum_avg_filing_jpym": filing_avg,
+            "aum_avg_nowcast_jpym": round(avg_nowcast, 1) if pd.notna(avg_nowcast) else np.nan,
+            "net_flow_jpym": round(flow, 1) if pd.notna(flow) else np.nan,
+            "etf_implied_flow_jpym": flow_meta.get("etf_implied_flow_jpym"),
+            "jita_equity_flow_bn": flow_meta.get("jita_equity_flow_bn"),
+            "jita_etf_flow_bn": flow_meta.get("jita_etf_flow_bn"),
+            "blended_return": blended_ret,
+            "nikkei_ret": nik_ret,
+            "tag": flow_tag,
+        })
+    return pd.DataFrame(rows)
+
+
+def build_perf_eligible_aum(panel: pd.DataFrame, pools: pd.DataFrame) -> pd.DataFrame:
+    if panel.empty:
+        return pd.DataFrame()
+    pool = pools.set_index("period_end") if not pools.empty else pd.DataFrame()
+    rows = []
+    for _, r in panel.iterrows():
+        pe = r["period_end"].strftime("%Y-%m-%d")
+        row = {"period_end": pe, "half": r["half"]}
+        if not pool.empty and pe in pool.index:
+            pr = pool.loc[pe]
+            row["perf_eligible_aum_jpym"] = pr.get("perf_eligible_aum_jpym")
+            row["nonlisted_share"] = pr.get("nonlisted_share")
+            row["etf_share"] = pr.get("etf_share")
+        else:
+            aum = r.get("aum_end_jpym")
+            row["perf_eligible_aum_jpym"] = aum
+            row["nonlisted_share"] = np.nan
+            row["etf_share"] = np.nan
+        rows.append(row)
+    return pd.DataFrame(rows)
+
+
+def build_other_revenue(panel: pd.DataFrame) -> pd.DataFrame:
+    rows = []
+    for _, r in panel.iterrows():
+        rev = r.get("revenue")
+        base = r.get("base_fee")
+        perf = r.get("perf_fee")
+        other = np.nan
+        if pd.notna(rev):
+            other = float(rev) / 1000.0
+            if pd.notna(base):
+                other -= float(base) / 1000.0
+            if pd.notna(perf):
+                other -= float(perf) / 1000.0
+        rows.append({
+            "period_end": r["period_end"].strftime("%Y-%m-%d"),
+            "half": r["half"],
+            "other_revenue_jpym": other,
+            "tag": "[Derived]" if pd.notna(other) else "[Pending]",
+        })
+    return pd.DataFrame(rows)
+
+
 def capiq_template() -> pd.DataFrame:
     template = DATA / "capiq_export.csv"
     if template.exists():
@@ -772,7 +1168,17 @@ def main() -> None:
     nav_df, aum_df = fetch_etf_nav_daily(registry)
     nav_df.to_csv(DATA / "etf_nav_daily.csv", index=False)
     aum_df.to_csv(DATA / "etf_aum_daily.csv", index=False)
-    manifest["steps"]["p0_etf_nav"] = {"rows": len(nav_df), "tickers": nav_df["ticker"].nunique() if len(nav_df) else 0}
+    _run_jpx_units_scrape()
+    aum_jpx = refresh_aum_with_jpx(nav_df, registry)
+    if not aum_jpx.empty:
+        aum_df = aum_jpx
+        aum_df.to_csv(DATA / "etf_aum_daily.csv", index=False)
+    jpx_rows = len(pd.read_csv(DATA / "jpx_etf_units_daily.csv")) if (DATA / "jpx_etf_units_daily.csv").exists() else 0
+    manifest["steps"]["p0_etf_nav"] = {
+        "rows": len(nav_df),
+        "tickers": nav_df["ticker"].nunique() if len(nav_df) else 0,
+        "jpx_units_rows": jpx_rows,
+    }
 
     panel = pd.read_csv(ROOT / "panel_halfyear.csv", parse_dates=["period_end"]) if (ROOT / "panel_halfyear.csv").exists() else pd.DataFrame()
 
@@ -832,8 +1238,9 @@ def main() -> None:
     manifest["steps"]["p3_comp_capiq"] = {"comp_rows": comp_rows}
 
     # P4 / P6
-    p4_rows = p4_detail = p6_rows = 0
+    p4_rows = p4_detail = p6_rows = p5_roll = p7_other = 0
     p4_tag = "[Filing/Market/Derived]"
+    oos_acceptance: list[dict] = []
     if not panel.empty:
         mandate, mandate_detail = build_mandate_nav(registry, panel)
         mandate.to_csv(DATA / "mandate_nav_halfyear.csv", index=False)
@@ -842,11 +1249,44 @@ def main() -> None:
         march = march_window_halfyear(panel)
         march.to_csv(DATA / "march_window_halfyear.csv", index=False)
         p6_rows = len(march)
+        mandate_detail = enrich_mandate_detail_march(mandate_detail, march, factor_h)
+        if not mandate_detail.empty:
+            mandate_detail.to_csv(DATA / "mandate_nav_detail.csv", index=False)
+        perf_bucket = build_perf_fee_by_bucket(mandate_detail, panel)
+        perf_bucket.to_csv(DATA / "perf_fee_by_bucket_halfyear.csv", index=False)
+        terms = build_mandate_terms_export()
+        manifest["steps"]["p4_mandate_terms"] = {
+            "funds": len(terms.get("funds", {})),
+            "path": "mandate_terms.json",
+        }
+
+        units = build_etf_units_daily(aum_df)
+        units.to_csv(DATA / "etf_units_daily.csv", index=False)
+        flows_h_path = DATA / "flows_halfyear.csv"
+        flows_h_df = pd.read_csv(flows_h_path) if flows_h_path.exists() else pd.DataFrame()
+        pools_path = DATA / "aum_pools_halfyear.csv"
+        pools_df = pd.read_csv(pools_path) if pools_path.exists() else pd.DataFrame()
+        roll = build_aum_rollforward(panel, flows_h_df, registry)
+        roll.to_csv(DATA / "aum_rollforward_halfyear.csv", index=False)
+        p5_roll = len(roll)
+        perf_elig = build_perf_eligible_aum(panel, pools_df)
+        perf_elig.to_csv(DATA / "perf_eligible_aum_halfyear.csv", index=False)
+        other_rev = build_other_revenue(panel)
+        other_rev.to_csv(DATA / "other_revenue_halfyear.csv", index=False)
+        p7_other = len(other_rev)
+        manifest["steps"]["p5_aum_rollforward"] = {
+            "rows": p5_roll,
+            "etf_units_rows": len(units),
+        }
+        manifest["steps"]["p7_other_revenue"] = {"rows": p7_other}
+
     manifest["steps"]["p4_mandate_nav"] = {
         "rows": p4_rows, "detail_rows": p4_detail, "tag": p4_tag,
         "scrape_script": str(MANDATE_SCRIPT.relative_to(ROOT.parents[1])),
+        "perf_fee_by_bucket": int((DATA / "perf_fee_by_bucket_halfyear.csv").exists()),
     }
     manifest["steps"]["p6_march_window"] = {"rows": p6_rows}
+    manifest["oos_acceptance"] = oos_acceptance
 
     (DATA / "data_acquisition_manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
     print(json.dumps(manifest, indent=2))

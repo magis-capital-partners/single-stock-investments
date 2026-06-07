@@ -1,6 +1,6 @@
 {
-  "as_of": "2026-06-05",
-  "production_spec": "v1",
+  "as_of": "2026-06-07",
+  "production_spec": "v5",
   "primary_kpi": "perf_fee_h2_positive.out_of_sample.r2",
   "estimation_window": {
     "start": "2020-H1",
@@ -196,28 +196,28 @@
     },
     "ordinary_profit": {
       "in_sample": {
-        "r2": -0.4623,
-        "adj_r2": -0.7872,
+        "r2": -0.1717,
+        "adj_r2": -0.4321,
         "directional_hit": 0.08,
-        "theil_u": 1.115,
+        "theil_u": 1.003,
         "n_params": 2,
-        "rmse_jpym": 2951.7,
-        "mae_jpym": 2473.9,
-        "mape_pct": 79.5,
+        "rmse_jpym": 2642.3,
+        "mae_jpym": 2130.7,
+        "mape_pct": 64.3,
         "n": 12
       },
       "out_of_sample": {
-        "r2": -0.0992,
-        "adj_r2": -0.4656,
+        "r2": -0.1639,
+        "adj_r2": -0.5519,
         "directional_hit": 0.56,
-        "theil_u": 1.022,
+        "theil_u": 1.051,
         "n_params": 2,
-        "rmse_jpym": 2738.0,
-        "mae_jpym": 2077.2,
-        "mape_pct": 44.6,
+        "rmse_jpym": 2817.4,
+        "mae_jpym": 2107.1,
+        "mape_pct": 44.8,
         "n": 9
       },
-      "overfit_gap": -0.3631,
+      "overfit_gap": -0.0078,
       "benchmarks_oos": {
         "naive_lastyear": {
           "rmse_jpym": 2400.6,
@@ -233,28 +233,28 @@
     },
     "net_income": {
       "in_sample": {
-        "r2": -0.3361,
-        "adj_r2": -0.8372,
+        "r2": -0.0775,
+        "adj_r2": -0.4816,
         "directional_hit": 0.08,
-        "theil_u": 1.056,
+        "theil_u": 0.953,
         "n_params": 3,
-        "rmse_jpym": 2210.4,
-        "mae_jpym": 1859.1,
-        "mape_pct": 79.9,
+        "rmse_jpym": 1985.0,
+        "mae_jpym": 1606.7,
+        "mape_pct": 64.5,
         "n": 12
       },
       "out_of_sample": {
-        "r2": -0.0934,
-        "adj_r2": -0.7495,
+        "r2": -0.1559,
+        "adj_r2": -0.8494,
         "directional_hit": 0.56,
-        "theil_u": 0.994,
+        "theil_u": 1.022,
         "n_params": 3,
-        "rmse_jpym": 2147.7,
-        "mae_jpym": 1590.0,
-        "mape_pct": 44.3,
+        "rmse_jpym": 2208.2,
+        "mae_jpym": 1611.9,
+        "mape_pct": 44.4,
         "n": 9
       },
-      "overfit_gap": -0.2427,
+      "overfit_gap": 0.0784,
       "benchmarks_oos": {
         "naive_lastyear": {
           "rmse_jpym": 1857.5,
@@ -264,7 +264,7 @@
         "naive_randomwalk": {
           "rmse_jpym": 2160.8,
           "r2": -0.1068,
-          "beats_model": false
+          "beats_model": true
         }
       }
     }
@@ -293,30 +293,6 @@
       "p95": 0.063647,
       "method": "block_bootstrap_fy",
       "n_boot": 748
-    },
-    "ord_slope": {
-      "point": 0.516676,
-      "p05": 0.329495,
-      "p50": 0.516676,
-      "p95": 0.530103,
-      "method": "block_bootstrap_fy",
-      "n_boot": 1000
-    },
-    "ord_intercept": {
-      "point": 1018.159188,
-      "p05": 847.215741,
-      "p50": 1018.159188,
-      "p95": 2046.414553,
-      "method": "block_bootstrap_fy",
-      "n_boot": 1000
-    },
-    "tax_rate": {
-      "point": 0.253262,
-      "p05": 0.251382,
-      "p50": 0.253262,
-      "p95": 0.255142,
-      "method": "block_bootstrap_fy",
-      "n_boot": 1000
     }
   },
   "spec_leaderboard": [
@@ -326,7 +302,8 @@
       "revenue_oos_r2": -0.0116,
       "perf_fee_h2_oos_rmse": 10307.2,
       "perf_fee_h2_oos_r2": -14.2489,
-      "production_default": true
+      "production_default": false,
+      "note": null
     },
     {
       "spec": "v2",
@@ -348,12 +325,30 @@
     },
     {
       "spec": "v4",
-      "revenue_oos_rmse": 5469.7,
-      "revenue_oos_r2": -0.6096,
+      "revenue_oos_rmse": 5726.8,
+      "revenue_oos_r2": -0.7645,
       "perf_fee_h2_oos_rmse": 10307.2,
       "perf_fee_h2_oos_r2": -14.2489,
       "production_default": false,
-      "note": "P4 mandate NAV scrape"
+      "note": "P4 mandate NAV scrape (macro weighted)"
+    },
+    {
+      "spec": "v3b",
+      "revenue_oos_rmse": 9686.5,
+      "revenue_oos_r2": -4.0481,
+      "perf_fee_h2_oos_rmse": 20031.4,
+      "perf_fee_h2_oos_r2": -56.5945,
+      "production_default": false,
+      "note": "Summable fund-level perf (P4 detail)"
+    },
+    {
+      "spec": "v5",
+      "revenue_oos_rmse": 4780.1,
+      "revenue_oos_r2": -0.2294,
+      "perf_fee_h2_oos_rmse": 10184.4,
+      "perf_fee_h2_oos_r2": -13.8877,
+      "production_default": true,
+      "note": "v3b + march + split base + AUM roll-forward"
     }
   ],
   "residual_attribution": [
@@ -476,31 +471,31 @@
       "driver": "Nikkei H2 return",
       "low": -0.1,
       "high": 0.14,
-      "ni_low": 1551,
-      "ni_high": 6623,
-      "ni_delta_pct": 327.0
+      "ni_low": 1550,
+      "ni_high": 5467,
+      "ni_delta_pct": 252.7
     },
     {
       "driver": "AUM level",
       "low": 0.9,
       "high": 1.1,
-      "ni_low": 1393,
-      "ni_high": 1710,
-      "ni_delta_pct": 20.4
+      "ni_low": 1428,
+      "ni_high": 1672,
+      "ni_delta_pct": 15.8
     },
     {
       "driver": "March window return",
       "low": -0.05,
       "high": 0.12,
-      "ni_low": 1551,
-      "ni_high": 5899,
-      "ni_delta_pct": 280.2
+      "ni_low": 1550,
+      "ni_high": 4908,
+      "ni_delta_pct": 216.6
     }
   ],
   "caveats": [
     "Primary KPI: perf_fee_h2_positive OOS R\u00b2 (not total-revenue IS R\u00b2).",
     "perf_fee_h2_positive OOS n is small (fee split disclosed only from FY2024).",
-    "production_spec=v1 per acceptance rule (lowest perf_fee H2 OOS RMSE not worse than v1).",
+    "production_spec=v5 per acceptance rule (lowest perf_fee H2 OOS RMSE not worse than v1).",
     "Naive same-half-last-year beats model on revenue OOS RMSE (\u00a53,230m vs \u00a54,336m).",
     "n\u224812 half-years; negative OOS R\u00b2 is valid (model worse than mean)."
   ],
