@@ -1,0 +1,396 @@
+{
+  "ticker": "WPM",
+  "as_of": "2026-06-07",
+  "method": "full",
+  "lawrence_bucket": "pricing_power",
+  "classification_inputs": {
+    "archetype": "compounder",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "peak",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 124.99,
+    "price_source": "NYSE via Stooq 2026-06-03",
+    "fcf_per_share": 3.0,
+    "fcf_source": "Mid-cycle owner cash: between FY2024 ops CF/sh $2.266 and FY2025 $4.197 (EX-99.1); haircut from peak gold/silver prices; 2026 GEO guidance 860 to 940K supports volume ramp but not in starting cash flow",
+    "shares_millions": 454.0,
+    "normalization_note": "FY2025 record $4.197/sh operating cash flow reflects cycle-high metal prices; base uses ~$3.00/sh sustainable owner cash"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.02,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 14,
+      "notes": "Metal prices mean-revert; Antamina integration slower"
+    },
+    "base": {
+      "growth_y1_5": 0.06,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 18,
+      "notes": "2026 GEO guidance 860\u2013940K (EX-99.1); Antamina +70K GEOs from Apr 2026; mid-cycle metal prices"
+    },
+    "bull": {
+      "growth_y1_5": 0.08,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 22,
+      "notes": "Sustained precious-metal strength + new stream deliveries"
+    }
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Streaming contracts and investments carried per IFRS; not land-at-cost pattern"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / pipeline streams?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "EX-99.1: 23 operating mines, 25 development projects; 2030 outlook 1.2M GEOs; growth in Lawrence base cites pipeline"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Asset-light model; no material loss drag segment in FY2025 EX-99.1"
+    },
+    {
+      "q": 4,
+      "question": "Backlog not in cash path?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "EX-99.1: BHP Antamina PMPA $4.3B upfront (Apr 2026 close); 67.5% silver stream; +70K GEOs in 2026; embedded in growth"
+    },
+    {
+      "q": 5,
+      "question": "Private stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Public streaming company; no holdco-style opaque sleeves"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Regular dividend $0.66/sh FY2025; not yield-curve setup"
+    },
+    {
+      "q": 7,
+      "question": "Embedded option in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "FY2025 revenue $2.3B driven by higher gold/silver prices (EX-99.1); commodity lever already in owner-cash normalization"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "2026 GEO guidance 860\u2013940K (+Antamina stream Apr 2026); Spring Valley/Hemlo PMPAs; 2030 outlook 1.2M GEOs; offset if metal prices revert",
+    "base_growth_source": "EX-99.1 2026 production outlook; [Assumption] 6% years 1-5 mid-cycle, not peak $4.197/sh cash flow",
+    "lawrence_legacy": {
+      "y1_5": 0.06,
+      "y6_10": 0.04,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.06,
+      "y6_10": 0.04,
+      "exit_pfcf_y10": 18.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": null,
+      "as_of_filing_facts": null
+    },
+    "status": "partial"
+  },
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Growth theory (pre-falsifier)",
+        "source": "growth_explanation + filing revenue YoY",
+        "return_pct": -2.8,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": -8.7,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 1.3,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": -2.01,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": -2.21,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  },
+  "optionality_gate": {
+    "primary_metric": "lawrence_base",
+    "primary_label": "7yr IRR",
+    "primary_return_pct": -2.8
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -8.7
+    },
+    "base": {
+      "return_pct": -2.8
+    },
+    "bull": {
+      "return_pct": 1.3
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -8.7
+    },
+    "base": {
+      "return_pct": -2.8
+    },
+    "bull": {
+      "return_pct": 1.3
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": -2.8
+    },
+    "falsifier_adjusted": {
+      "return_pct": -2.8
+    }
+  },
+  "implied_return": {
+    "base_pct": -2.21,
+    "label": "7yr IRR (total synthesis)",
+    "display": "-2.21% (total synthesis)",
+    "lawrence_stance_gate_pct": -2.8,
+    "falsifier_adjusted_pct": -2.8,
+    "synthesis_pct": -2.21
+  },
+  "overlay_results": [],
+  "context_overlay": {
+    "as_of": "2026-06-07",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": null,
+            "as_of": null,
+            "yoy_pct": null,
+            "direction": "flat",
+            "good_for": "risk_regime",
+            "source": "fred:BAMLH0A0HYM2",
+            "stale": true,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": null,
+            "as_of": null,
+            "yoy_pct": null,
+            "direction": "flat",
+            "good_for": "rates_regime",
+            "source": "fred:DGS10",
+            "stale": true,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": null,
+            "as_of": null,
+            "yoy_pct": null,
+            "direction": "flat",
+            "good_for": "rates_regime",
+            "source": "fred:DGS2",
+            "stale": true,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": null,
+            "as_of": null,
+            "yoy_pct": null,
+            "direction": "flat",
+            "good_for": "dollar_regime",
+            "source": "fred:DTWEXBGS",
+            "stale": true,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 21.510000228881836,
+            "as_of": "2026-06-05",
+            "yoy_pct": 16.4,
+            "direction": "up",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": 0.27,
+            "as_of": "2026-06-05",
+            "yoy_pct": -88.4,
+            "direction": "down",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 12.9,
+            "as_of": "2026-06-05",
+            "yoy_pct": -21.1,
+            "direction": "down",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      },
+      {
+        "theme_id": "gold_royalties",
+        "label": "Gold royalty sentiment",
+        "indicators": [
+          {
+            "id": "gold_spot_usd",
+            "label": "Gold spot (USD/oz)",
+            "latest": 396.239990234375,
+            "as_of": "2026-06-05",
+            "yoy_pct": 28.1,
+            "direction": "up",
+            "good_for": "gold_price",
+            "source": "yahoo:GLD (GLD price proxy when London fix unavailable)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "gdx_etf",
+            "label": "GDX miners ETF (USD)",
+            "latest": 78.83999633789062,
+            "as_of": "2026-06-05",
+            "yoy_pct": 48.3,
+            "direction": "up",
+            "good_for": "royalty_sentiment",
+            "source": "yahoo:GDX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "gdx_gld_ratio",
+            "label": "GDX / GLD ratio (miners vs bullion)",
+            "latest": 0.199,
+            "as_of": "2026-06-05",
+            "yoy_pct": 15.8,
+            "direction": "up",
+            "good_for": "royalty_multiple_sentiment",
+            "source": "ratio:GDX/GLD",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ],
+    "peer_context": {
+      "cluster_id": "royalties",
+      "path": "_system/reference/market-data/peers/royalties.csv",
+      "tickers": [
+        "RGLD",
+        "FNV",
+        "WPM",
+        "OR"
+      ],
+      "note": "Context only; percentile rank not in base IRR."
+    }
+  }
+}
