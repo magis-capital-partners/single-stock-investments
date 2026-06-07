@@ -1,0 +1,262 @@
+{
+  "ticker": "LMNR",
+  "as_of": "2026-06-06",
+  "valuation_mode": "optionality",
+  "method": "yield_curve",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "asset",
+    "predictive_attribute": "land_water_development_yield_curve"
+  },
+  "inputs": {
+    "price": 11.83,
+    "price_source": "Yahoo Finance LMNR regular market 2026-06-06",
+    "fcf_per_share": 0.34,
+    "fcf_source": "FY2025 cash from operations $6.0M minus illustrative maintenance capital spending $0.0M (trough year), divided by 17.834M diluted shares; 3-year average OCF $13.3M implies ~$0.75/sh before capex",
+    "shares_outstanding": 17834891,
+    "shares_source": "10-K FY2025 weighted average diluted shares (SEC XBRL); 18.036M common shares outstanding Oct 31 2025",
+    "book_per_share": 10.7,
+    "book_per_share_caveat": "GAAP stockholders equity ~$190.8M (assets $311.1M less liabilities $120.3M) / shares; land and water at historical cost, not fair-value dhando floor",
+    "dividend_per_share_annual": 0.0,
+    "normalization_note": "FY2025 OCF troughed at $6.0M after land/water sales timing and Sunkist transition; yield-curve base uses dated development distributions plus run-rate ag cash, not trough OCF alone."
+  },
+  "optionality_gate": {
+    "framework": "land_water_development_floor",
+    "floor_pass": true,
+    "floor_metric": "book_plus_dated_cash",
+    "floor_value": 10.7,
+    "floor_value_note": "GAAP book ~$10.70/sh; long-term debt $72.5M FY2025 ($89.9M Q1 FY2026) limits pure asset floor",
+    "primary_metric": "lawrence_base",
+    "primary_label": "annualized return",
+    "overlay_nav_per_share": 16.5,
+    "overlay_nav_note": "Illustrative: haircut management $180M development guide to $120M over 7y (~$6.7/sh PV) plus water/land marks [Assumption]",
+    "notes": "Stance gate uses 7-year dated payoff; ag turnaround and Sunkist cadence not in Lawrence FCF\u2080.",
+    "primary_return_pct": 5.3
+  },
+  "nav_overlay": {
+    "as_of": "2026-06-06",
+    "status": "complete",
+    "gaap_vs_fair_value": {
+      "total_assets_m": 311.137,
+      "stockholders_equity_m": 190.837,
+      "acres_disclosed": 10500,
+      "policy_source": "10-K FY2025: approximately 10,500 acres of land, water resources and other assets in California; international farming ~5,100 acres",
+      "land_line_item": "Land, buildings and improvements at cost",
+      "source": "investor-documents/sec-edgar/10-K_20251223_rpt20251031_acc0001342423_25_000039.htm"
+    },
+    "in_model": {
+      "lawrence_irr_on_operating_cash": false,
+      "gaap_book_in_dhando": false,
+      "segment_operating_pv": false,
+      "undeveloped_acreage_in_lawrence_growth": false
+    },
+    "not_in_model_requires_refresh": [
+      "Per-acre marks on remaining non-strategic land pipeline",
+      "SGMA / basin-specific water transaction comps",
+      "Harvest at Limoneira Phase 2 absorption vs management cash-flow table",
+      "Sunkist partnership margin impact on normalized lemon economics"
+    ],
+    "segments_or_options": [
+      {
+        "id": "harvest_east_area",
+        "label": "Harvest at Limoneira + East Area II development distributions",
+        "option_treatment": "probability_weighted",
+        "p_base": 0.65,
+        "nav_per_share_full": 10.1,
+        "overlay_value_per_share": 6.6,
+        "evidence": "8-K 2026-03-12: company expects ~$180M total proceeds over seven fiscal years; $10M received FY2025, $15M FY2024",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "water_rights",
+        "label": "Santa Paula basin water rights monetization",
+        "option_treatment": "milestone_nav",
+        "nav_per_share": 1.0,
+        "nav_assumption": "[Assumption] partial mark; FY2025 $1.5M gain on water sale at ~$30K/acre-foot",
+        "evidence": "10-K FY2025; 8-K 2026-03-23 near-term monetization guidance",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "avocado_bearing_ramp",
+        "label": "800 acres non-bearing avocados \u2192 full bearing",
+        "option_treatment": "embedded_in_segment",
+        "evidence": "8-K 2026-03-23: 800 acres estimated full bearing in 2\u20134 years; FY2026 guide 5.0\u20136.0M lbs",
+        "not_in_lawrence_base": false
+      },
+      {
+        "id": "agribusiness_run_rate",
+        "label": "Lemons, packing, rentals (operating)",
+        "option_treatment": "embedded_in_segment",
+        "evidence": "10-K FY2025 agribusiness + rental operations; Sunkist partnership from FY2026",
+        "not_in_lawrence_base": false
+      }
+    ]
+  },
+  "scenarios": {
+    "bear": {
+      "price": 11.83,
+      "payoff": 12.5,
+      "years": 7,
+      "notes": "Development delays; ag margin pressure; reversion toward book"
+    },
+    "base": {
+      "price": 11.83,
+      "payoff": 17.0,
+      "years": 7,
+      "notes": "Haircut development guide + normalized ag cash + modest land/water sales",
+      "sotp_build": {
+        "lines": [
+          {
+            "id": "book",
+            "label": "GAAP book anchor",
+            "gaap_per_share": 10.7,
+            "uplift_per_share": 0.0,
+            "math": "Assets minus liabilities per 10-K FY2025"
+          },
+          {
+            "id": "development_path",
+            "label": "Dated development distributions (haircut)",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 4.0,
+            "math": "[Assumption] 65% of $180M guide over 7y, PV at simple 8%"
+          },
+          {
+            "id": "ag_water",
+            "label": "Ag normalization + water/land sales",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 2.3,
+            "math": "[Assumption] SG&A savings, avocado ramp, episodic water sales"
+          }
+        ],
+        "year5_economic_nav_per_share": 17.0,
+        "years": 7,
+        "notes": "Conservative vs management $180M table; see nav_overlay"
+      }
+    },
+    "bull": {
+      "price": 11.83,
+      "payoff": 22.0,
+      "years": 7,
+      "notes": "Full development table + avocado doubling + water re-rate [Assumption]"
+    }
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true,
+      "floor_pass": true,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": null
+  },
+  "estimates": {
+    "external": []
+  },
+  "growth_explanation": {
+    "base_mechanism": "800-acre avocado bearing ramp, $10M SG&A savings target, Sunkist lemon optimization, episodic land/water monetization",
+    "bear_risk": "Q1 FY2026 revenue cadence shift under Sunkist; long-term debt rose to $89.9M",
+    "source": "8-K 2026-03-12; 10-K FY2025"
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Yes",
+      "treatment": "nav_overlay",
+      "evidence": "~10,500 CA acres + water at cost; economic land/water above book"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / acreage?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "Harvest at Limoneira + East Area II; non-strategic land pipeline"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Q1 FY2026 adjusted EBITDA loss $7.7M during transition; not zeroed"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF?",
+      "answer": "Yes",
+      "treatment": "milestone_nav",
+      "evidence": "Management development cash-flow projections in 8-K exhibits"
+    },
+    {
+      "q": 5,
+      "question": "Private stakes below fair value?",
+      "answer": "No material",
+      "treatment": "n/a",
+      "evidence": "50% Harvest JV equity method; distributions in cash flow"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution?",
+      "answer": "Yes",
+      "treatment": "yield_curve",
+      "evidence": "Lumpy Harvest distributions ($10M FY2025 share of $20M JV distribution)"
+    },
+    {
+      "q": 7,
+      "question": "Embedded in revenue?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Rental operations and packing revenue in agribusiness segments"
+    }
+  ],
+  "catalyst_paths": [
+    {
+      "event": "Harvest / East Area II distributions",
+      "timing": "FY2026\u2013FY2032 per management table",
+      "impact": "Primary dated cash driver in base payoff"
+    },
+    {
+      "event": "Water rights sale",
+      "timing": "FY2026 near-term per 8-K 2026-03-23",
+      "impact": "Episodic NAV uplift; $1.5M gain precedent FY2025"
+    },
+    {
+      "event": "Avocado bearing acres online",
+      "timing": "2\u20134 years on 800 non-bearing acres",
+      "impact": "Volume guide 5.0\u20136.0M lbs FY2026 scaling up"
+    }
+  ],
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 0.8
+    },
+    "base": {
+      "return_pct": 5.3
+    },
+    "bull": {
+      "return_pct": 9.3
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 0.8
+    },
+    "base": {
+      "return_pct": 5.3
+    },
+    "bull": {
+      "return_pct": 9.3
+    }
+  },
+  "implied_return": {
+    "base_pct": 5.3,
+    "label": "annualized return",
+    "display": "5.3% (base)"
+  },
+  "overlay_results": []
+}
