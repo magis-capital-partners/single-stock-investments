@@ -68,6 +68,6 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-06-08.
 | TSLA | TSLA/ | Tesla, Inc. | US | 2026-06-08 | 2026-06-08 | unknown | watch |
 | VTRS | VTRS/ | Viatris Inc | US | 2026-06-08 | 2026-06-08 | turnaround | watch |
 | WBI | WBI/ | WaterBridge Infrastructure | US | 2026-06-08 | 2026-06-08 | infrastructure | watch |
-| WPM | WPM/ | Wheaton Precious Metals Corp. | US | 2026-06-08 | 2026-06-08 | unknown | watch |
+| WPM | WPM/ | Wheaton Precious Metals Corp. | US | 2026-06-08 | 2026-06-08 | compounder | watch |
 
 **63 holdings total.** Registry: `_system/portfolio/registry.json`

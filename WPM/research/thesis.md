@@ -11,17 +11,17 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | peak |
-| **Implied 7yr IRR** (base) | -2.21% (total synthesis) |
+| **Implied 7yr IRR** (base) | -1.03% (total synthesis) |
 | **IRR method** | full |
 | **Lawrence bucket** | pricing_power |
 | **Payoff lens** | operating |
 | **MOI bucket** | pending |
 
-**Deep dive:** `WPM/research/deep_dive_2026-06-07.md` (auto-sync)
+**Deep dive:** `WPM/research/deep_dive_2026-06-08.md` (auto-sync)
 
 ## One-line thesis
 
-Leading precious-metals streamer with filing-backed volume growth (2026 GEO guide 860K to 940K) but **watch** at ~$125: mid-cycle owner cash implies **-2.21% per year** over seven years, below our accumulate bar.
+Leading precious-metals streamer with filing-backed volume growth (2026 GEO guide 860K to 940K) but **watch** at ~$116: mid-cycle owner cash implies **-1.03% per year** over seven years, below our accumulate bar.
 
 ## Key questions
 
