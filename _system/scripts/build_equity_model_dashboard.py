@@ -139,35 +139,97 @@ def liquidity_from_valuation(valuation: dict | None, ticker: str) -> dict:
     return {"tier": "standard", "exchange": None, "last_print": None, "warning": None}
 
 
+def build_production_block(
+    results: dict,
+    spec_comparison: dict,
+    diagnostics: dict,
+) -> dict:
+    spec = (
+        diagnostics.get("production_spec")
+        or results.get("production_spec")
+        or (spec_comparison or {}).get("production_spec")
+        or "v1"
+    )
+    leaderboard = (spec_comparison or {}).get("leaderboard") or []
+    prod_row = next(
+        (r for r in leaderboard if r.get("production_default")),
+        next((r for r in leaderboard if r.get("spec") == spec), None),
+    )
+    v1_row = next((r for r in leaderboard if r.get("spec") == "v1"), None)
+    v2_row = next((r for r in leaderboard if r.get("spec") == "v2"), None)
+
+    oos_v5 = (results.get("oos_metrics_v5") or {}).get("model_v5") or {}
+    if not oos_v5.get("rmse_jpym") and prod_row:
+        oos_v5 = {
+            "rmse_jpym": prod_row.get("revenue_oos_rmse"),
+            "mape_pct": None,
+            "n": 9,
+        }
+
+    perf_key = f"perf_fee_model_{spec}" if spec != "v1" else "perf_fee_model"
+    perf_model = results.get(perf_key) or results.get("perf_fee_model") or {}
+    split = perf_model.get("split_base_rates") or {}
+
+    return {
+        "spec": spec,
+        "walk_forward_key": "model_v5" if spec == "v5" else "model",
+        "acceptance_rule": (spec_comparison or {}).get(
+            "acceptance_rule",
+            "Reject spec if perf_fee_h2_oos_rmse worsens vs prior",
+        ),
+        "revenue_oos_rmse": prod_row.get("revenue_oos_rmse") if prod_row else oos_v5.get("rmse_jpym"),
+        "revenue_oos_r2": prod_row.get("revenue_oos_r2") if prod_row else None,
+        "perf_fee_h2_oos_rmse": prod_row.get("perf_fee_h2_oos_rmse") if prod_row else None,
+        "perf_fee_h2_oos_r2": prod_row.get("perf_fee_h2_oos_r2") if prod_row else None,
+        "v1_perf_fee_h2_oos_rmse": v1_row.get("perf_fee_h2_oos_rmse") if v1_row else None,
+        "v2_revenue_oos_rmse": v2_row.get("revenue_oos_rmse") if v2_row else None,
+        "v2_perf_fee_h2_oos_rmse": v2_row.get("perf_fee_h2_oos_rmse") if v2_row else None,
+        "oos_revenue": oos_v5,
+        "forms": {
+            "base_fee": results.get("base_fee_model"),
+            "perf_fee": perf_model,
+            "split_base_rates": split,
+            "earnings_bridge": results.get("earnings_bridge"),
+        },
+    }
+
+
 def equity_model_summary(bundle: dict) -> dict:
-    oos = bundle.get("oos_metrics") or {}
-    model_rmse = (oos.get("model") or {}).get("rmse_jpym")
-    naive_rmse = (oos.get("naive_lastyear") or {}).get("rmse_jpym")
-    beats = (
-        model_rmse is not None
+    prod = bundle.get("production") or {}
+    oos = prod.get("oos_revenue") or {}
+    rev_rmse = oos.get("rmse_jpym")
+    naive_rmse = ((bundle.get("oos_metrics") or {}).get("naive_lastyear") or {}).get("rmse_jpym")
+    beats_revenue = (
+        rev_rmse is not None
         and naive_rmse is not None
-        and float(model_rmse) < float(naive_rmse)
+        and float(rev_rmse) < float(naive_rmse)
     )
     nowcast = bundle.get("nowcast") or {}
     nc = nowcast.get("nowcast_jpym") or {}
+    spec = prod.get("spec") or bundle.get("production_spec") or "v1"
+    perf_h2 = prod.get("perf_fee_h2_oos_rmse")
     headline = (
-        f"Nowcast {nowcast.get('fiscal_half', '')} revenue ¥{nc.get('revenue', 0):,}m"
+        f"{spec} · Nowcast {nowcast.get('fiscal_half', '')} revenue ¥{nc.get('revenue', 0):,}m"
         if nc.get("revenue")
-        else "Earnings model ready"
+        else f"{spec} · Earnings model ready"
     )
-    if not beats and model_rmse is not None:
-        headline += "; OOS RMSE loses to seasonal naive"
+    if perf_h2 is not None:
+        headline += f" · perf H2 OOS ¥{perf_h2:,.0f}m"
+    if not beats_revenue and rev_rmse is not None:
+        headline += " · revenue level trails seasonal naive"
     diag = bundle.get("diagnostics") or {}
     kpi = ((diag.get("targets") or {}).get("perf_fee_h2_positive") or {}).get("out_of_sample") or {}
     return {
         "ready": True,
         "diagnostics_ready": bundle.get("diagnostics_ready", False),
-        "production_spec": bundle.get("production_spec"),
+        "production_spec": spec,
         "as_of": bundle.get("as_of"),
         "headline": headline,
-        "model_beats_naive": beats,
+        "model_beats_naive": beats_revenue,
         "model_type": bundle.get("model_type"),
         "perf_fee_h2_oos_r2": kpi.get("r2"),
+        "perf_fee_h2_oos_rmse": perf_h2,
+        "revenue_oos_rmse": rev_rmse,
     }
 
 
@@ -215,15 +277,21 @@ def build_ticker_bundle(ticker: str) -> dict | None:
     implied = valuation.get("implied_return") or {}
     class_in = valuation.get("classification_inputs") or {}
 
-    model_rmse = (results.get("oos_metrics") or {}).get("model", {}).get("rmse_jpym")
+    production = build_production_block(results, spec_comparison, diagnostics)
+    prod_rev_rmse = (production.get("oos_revenue") or {}).get("rmse_jpym")
     naive_rmse = (results.get("oos_metrics") or {}).get("naive_lastyear", {}).get("rmse_jpym")
-    beats_naive = model_rmse is not None and naive_rmse is not None and model_rmse > naive_rmse
+    loses_to_naive = (
+        prod_rev_rmse is not None
+        and naive_rmse is not None
+        and float(prod_rev_rmse) > float(naive_rmse)
+    )
 
     caveats = list(nowcast.get("caveats") or [])
-    if beats_naive:
+    if loses_to_naive:
         caveats.insert(
             0,
-            "Out-of-sample RMSE is worse than same-half-last-year naive; use model for seasonality and scenarios, not level beats.",
+            f"{production.get('spec', 'v5')} revenue OOS RMSE is worse than same-half-last-year naive; "
+            "use model for perf-fee seasonality and pre-report nowcast, not level beats.",
         )
 
     skeptical = sorted(ticker_dir.glob("research/equity_report_skeptical_*.md"))
@@ -233,13 +301,26 @@ def build_ticker_bundle(ticker: str) -> dict | None:
 
     rel = ticker
     diagnostics_ready = bool(diagnostics.get("targets"))
+    nc = nowcast.get("nowcast_jpym") or {}
+    headline = (
+        f"{production['spec']} · Nowcast {nowcast.get('fiscal_half', '')} revenue ¥{nc.get('revenue', 0):,}m"
+        if nc.get("revenue")
+        else f"{production['spec']} · Earnings model ready"
+    )
+    if production.get("perf_fee_h2_oos_rmse") is not None:
+        headline += f" · perf H2 OOS ¥{production['perf_fee_h2_oos_rmse']:,.0f}m"
+    if loses_to_naive:
+        headline += " · revenue level trails seasonal naive"
+
     bundle = {
         "model_ready": True,
         "diagnostics_ready": diagnostics_ready,
-        "production_spec": diagnostics.get("production_spec") or results.get("production_spec") or "v1",
+        "production_spec": production["spec"],
+        "production": production,
         "primary_kpi": diagnostics.get("primary_kpi"),
         "model_type": "earnings_semiannual",
         "as_of": results.get("as_of") or valuation.get("as_of"),
+        "headline": headline,
         "company": ticker,
         "liquidity": liquidity_from_valuation(valuation, ticker),
         "lawrence": {
@@ -250,7 +331,12 @@ def build_ticker_bundle(ticker: str) -> dict | None:
             "price_source": inputs.get("price_source"),
         },
         "nowcast": nowcast,
-        "spec": {
+        "spec": production.get("forms") or {
+            "base_fee": results.get("base_fee_model"),
+            "perf_fee": results.get("perf_fee_model"),
+            "earnings_bridge": results.get("earnings_bridge"),
+        },
+        "spec_v1": {
             "base_fee": results.get("base_fee_model"),
             "perf_fee": results.get("perf_fee_model"),
             "earnings_bridge": results.get("earnings_bridge"),
@@ -258,6 +344,7 @@ def build_ticker_bundle(ticker: str) -> dict | None:
         "oos_metrics": results.get("oos_metrics"),
         "oos_metrics_v2": results.get("oos_metrics_v2"),
         "oos_metrics_v3a": results.get("oos_metrics_v3a"),
+        "oos_metrics_v5": results.get("oos_metrics_v5"),
         "diagnostics": diagnostics if diagnostics_ready else None,
         "spec_comparison": spec_comparison,
         "coefficient_bootstrap": coeff_bootstrap,

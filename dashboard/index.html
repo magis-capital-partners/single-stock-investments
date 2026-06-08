@@ -317,6 +317,25 @@
     text-transform: uppercase; padding: 2px 8px; border-radius: 4px;
     background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); margin-left: 6px;
   }
+  .model-explainer {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+    margin-bottom: 14px; overflow: hidden;
+  }
+  .model-explainer summary {
+    cursor: pointer; padding: 12px 14px; font-weight: 600; font-size: 13px;
+    list-style: none; display: flex; align-items: center; gap: 8px;
+  }
+  .model-explainer summary::-webkit-details-marker { display: none; }
+  .model-explainer-body {
+    padding: 0 14px 14px; font-size: 12px; line-height: 1.6; color: var(--text-secondary);
+  }
+  .model-explainer-body p { margin-bottom: 10px; }
+  .model-explainer-steps { margin: 8px 0 10px 18px; }
+  .model-explainer-steps li { margin-bottom: 6px; }
+  .model-explainer-gate { color: var(--text-primary); }
+  .model-explainer-note { font-size: 11px; color: var(--text-muted); }
+  .summary-card.metric-gate { border-color: rgba(16, 185, 129, 0.35); }
+  .darwin-table tr.spec-row-active td { background: rgba(59, 130, 246, 0.06); }
   .chart-card {
     background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 14px;
   }
@@ -909,7 +928,7 @@ function renderTable() {
   document.getElementById('empty').style.display = rows.length ? 'none' : 'block';
   tbody.innerHTML = rows.map(t => `
     <tr class="${selected === t.ticker ? 'selected' : ''}" data-ticker="${t.ticker}">
-      <td class="mono ticker-cell">${t.ticker}${t.equity_model?.ready ? ' <span class="badge badge-ok" title="Earnings model">M</span>' : ''}${t.onboard?.phase && t.onboard.phase !== 'complete' ? `<span class="onboard-badge">${t.onboard.phase}</span>` : ''}</td>
+      <td class="mono ticker-cell">${t.ticker}${t.equity_model?.ready ? ` <span class="badge badge-ok" title="Earnings model ${t.equity_model.production_spec || 'v5'} ready">M</span>` : ''}${t.onboard?.phase && t.onboard.phase !== 'complete' ? `<span class="onboard-badge">${t.onboard.phase}</span>` : ''}</td>
       <td>${t.company}</td>
       <td><span class="badge ${MARKET_BADGE[t.market] || 'badge-us'}">${t.market}</span></td>
       <td class="mono">${t.pdf_count}${t.sec_filings ? ` <span style="color:var(--text-muted);font-size:11px">+${t.sec_filings} SEC</span>` : ''}</td>
