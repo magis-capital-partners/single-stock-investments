@@ -306,6 +306,17 @@ def lint_file(path: Path, *, legacy: bool, strict: bool) -> tuple[list[str], lis
                 f"{rel}: context_overlay present — missing #### Thematic context (run refresh_deep_dive_v2.py)"
             )
 
+        ps = str((val.get("inputs") or {}).get("price_source") or "")
+        if re.search(r"placeholder|confirm via fetch_market", ps, re.I):
+            errors.append(f"{rel}: placeholder equity price in valuation.json — run fetch_equity_prices.py")
+
+        if val.get("btc_overlay", {}).get("themes") and not re.search(
+            r"#### (?:Bitcoin|Stablecoin) economics — model coverage", text, re.I
+        ):
+            warnings.append(
+                f"{rel}: btc_overlay present — missing crypto economics section (run refresh_deep_dive_v2.py)"
+            )
+
         sys.path.insert(0, str(Path(__file__).resolve().parent))
         from optionality_evidence_common import has_evidence_refresh_config, synthesis_in_dive
 

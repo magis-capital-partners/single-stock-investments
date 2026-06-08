@@ -45,12 +45,20 @@ def load_config() -> dict:
     return json.loads(CONFIG.read_text(encoding="utf-8"))
 
 
-def _http_get(url: str, timeout: int = 30) -> str | None:
+def _http_get(url: str, timeout: int = 30, retries: int = 3) -> str | None:
+    import time
+
     req = urllib.request.Request(url, headers={"User-Agent": UA})
-    try:
-        return urllib.request.urlopen(req, timeout=timeout).read().decode("utf-8", errors="ignore")
-    except Exception:
-        return None
+    delay = 1.0
+    for attempt in range(retries):
+        try:
+            return urllib.request.urlopen(req, timeout=timeout).read().decode("utf-8", errors="ignore")
+        except Exception:
+            if attempt + 1 >= retries:
+                return None
+            time.sleep(delay)
+            delay = min(delay * 2, 8.0)
+    return None
 
 
 def _sync_external() -> None:
@@ -102,8 +110,8 @@ def _external_json(name: str) -> Path | None:
     return None
 
 
-def fetch_fred(fred_id: str, timeout: int = 8) -> tuple[list[tuple[str, float]], str | None]:
-    raw = _http_get(FRED_URL.format(id=fred_id), timeout=timeout)
+def fetch_fred(fred_id: str, timeout: int = 12) -> tuple[list[tuple[str, float]], str | None]:
+    raw = _http_get(FRED_URL.format(id=fred_id), timeout=timeout, retries=2)
     if raw is None:
         return [], "network"
     rows: list[tuple[str, float]] = []
@@ -462,6 +470,14 @@ def _apply_fallback(spec: dict, rows: list[tuple[str, float]], err: str | None) 
             fb.get("column", "underlying_adj_close"),
         )
         extra_label = f"etf_dashboard:{fb.get('ticker')}"
+    elif fb_src == "computed_spread":
+        rows, err, extra_label = computed_spread(
+            fb.get("leg_a", ""),
+            fb.get("leg_b", ""),
+            int(fb.get("window_days", 21)),
+        )
+        if fb.get("note"):
+            extra_label = f"{extra_label} ({fb['note']})"
     return rows, err, extra_label
 
 
@@ -478,10 +494,21 @@ def process_series(spec: dict, offline: bool) -> dict:
     if offline:
         rows, err = cached, (None if cached else "offline_no_cache")
     elif src == "fred":
-        rows, err = fetch_fred(spec["fred_id"])
-        rows, err, fb_label = _apply_fallback(spec, rows, err)
-        if fb_label:
-            source_label = fb_label
+        # Prefer configured fallback (Yahoo/ETF) when present — FRED often blocked in CI/cloud.
+        if spec.get("fallback"):
+            rows, err, fb_label = _apply_fallback(spec, [], "fred_deferred")
+            if rows:
+                source_label = fb_label
+            else:
+                rows, err = fetch_fred(spec["fred_id"])
+                rows, err, fb_label = _apply_fallback(spec, rows, err)
+                if fb_label:
+                    source_label = fb_label
+        else:
+            rows, err = fetch_fred(spec["fred_id"])
+            rows, err, fb_label = _apply_fallback(spec, rows, err)
+            if fb_label:
+                source_label = fb_label
     elif src == "stooq_daily":
         rows, err = fetch_stooq_daily(spec["stooq"])
     elif src == "yahoo_daily":

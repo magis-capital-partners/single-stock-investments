@@ -924,6 +924,43 @@ def thematic_context_business_block(val: dict, body: str | None) -> str:
     return "\n".join(lines)
 
 
+CRYPTO_CONTEXT_HEADING = "#### Bitcoin economics — model coverage"
+STABLECOIN_CONTEXT_HEADING = "#### Stablecoin economics — model coverage"
+
+
+def crypto_context_business_block(val: dict) -> str:
+    overlay = val.get("btc_overlay") or {}
+    themes = overlay.get("themes") or []
+    if not themes:
+        return ""
+    exposure = overlay.get("crypto_exposure", "treasury")
+    heading = (
+        STABLECOIN_CONTEXT_HEADING if exposure == "stablecoin" else CRYPTO_CONTEXT_HEADING
+    )
+    lines = [heading, ""]
+    lines.append(f"> {overlay.get('disclaimer', 'Context only. Not in Lawrence base IRR.')}")
+    lines += [
+        "",
+        f"**Exposure type:** {exposure}",
+        "",
+        "| Indicator | Latest | As of | YoY | Direction | In base IRR? |",
+        "|-----------|--------|-------|-----|-----------|--------------|",
+    ]
+    for theme in themes:
+        for ind in theme.get("indicators") or []:
+            yoy = f"{ind['yoy_pct']:+.1f}%" if isinstance(ind.get("yoy_pct"), (int, float)) else "n/a"
+            latest = ind.get("latest")
+            latest_s = f"{latest}" if latest is not None else "fetch failed"
+            if ind.get("stale") and latest is None:
+                latest_s = "fetch failed (stale)"
+            lines.append(
+                f"| {ind.get('label', ind.get('id', ''))} | {latest_s} | "
+                f"{ind.get('as_of') or 'n/a'} | {yoy} | {ind.get('direction', 'flat')} | no (context) |"
+            )
+    lines.append("")
+    return "\n".join(lines)
+
+
 def segment_map_business_block(val: dict, preserved: str | None) -> str:
     """Business-section segment table from valuation.json (hyperscalers)."""
     kept = extract_preserved_block(preserved, SEGMENT_MAP_HEADING)
@@ -1382,6 +1419,24 @@ def enrich_business_moat(body: str, val: dict, ticker: str, preserved: str | Non
             body = re.sub(
                 r"#### Thematic context.*?(?=\n#### |\n### |\n\*\*Upside / downside|\n## |\Z)",
                 thematic.rstrip() + "\n",
+                body,
+                count=1,
+                flags=re.DOTALL | re.IGNORECASE,
+            )
+    if val.get("btc_overlay", {}).get("themes"):
+        crypto = crypto_context_business_block(val)
+        crypto_pat = r"#### (?:Bitcoin|Stablecoin) economics — model coverage"
+        if crypto and not re.search(crypto_pat, body, re.I):
+            if "#### Thesis pillars" in body:
+                body = inject_before_marker(body, "#### Thesis pillars", crypto)
+            elif "**Disruption" in body:
+                body = inject_before_marker(body, "**Disruption", crypto)
+            else:
+                body = body.rstrip() + "\n\n" + crypto
+        elif crypto and re.search(crypto_pat, body, re.I):
+            body = re.sub(
+                crypto_pat + r".*?(?=\n#### |\n### |\n\*\*Upside / downside|\n## |\Z)",
+                crypto.rstrip() + "\n",
                 body,
                 count=1,
                 flags=re.DOTALL | re.IGNORECASE,
