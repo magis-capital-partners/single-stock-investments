@@ -68,16 +68,23 @@ def main() -> None:
             if script.exists() and script.stat().st_size > 80:
                 run(powershell_script(script), ticker)
         elif dtype == "jp_archive":
-            log = ROOT / ticker / "_download_log.txt"
-            log.write_text(f"{datetime.now().isoformat()} Archive present; INDEX rebuilt by Marvin\n", encoding="utf-8")
-            script_dir = ROOT / ticker / "_scripts"
-            script_dir.mkdir(parents=True, exist_ok=True)
-            dl_script = script_dir / "download_and_organize.ps1"
-            if not dl_script.exists():
-                dl_script.write_text(
-                    "# Placeholder: PDFs already mirrored. Rebuild INDEX via build_folder_indexes.py\n",
+            ir_script = ROOT / ticker / "_scripts" / "download_sfh_ir.py"
+            if ir_script.exists():
+                run([PY, str(ir_script)], f"{ticker} IR harvest")
+            else:
+                log = ROOT / ticker / "_download_log.txt"
+                log.write_text(
+                    f"{datetime.now().isoformat()} Archive present; INDEX rebuilt by Marvin\n",
                     encoding="utf-8",
                 )
+                script_dir = ROOT / ticker / "_scripts"
+                script_dir.mkdir(parents=True, exist_ok=True)
+                dl_script = script_dir / "download_and_organize.ps1"
+                if not dl_script.exists():
+                    dl_script.write_text(
+                        "# Placeholder: PDFs already mirrored. Rebuild INDEX via build_folder_indexes.py\n",
+                        encoding="utf-8",
+                    )
         elif dtype in {"uk_ir", "au_asx", "in_ir"}:
             script = dedicated_investor_script(ticker)
             if script:
@@ -127,6 +134,7 @@ def main() -> None:
 
     run([PY, str(SCRIPTS / "build_folder_indexes.py")], "Build INDEX.csv files")
     run([PY, str(SCRIPTS / "sync_portfolio_from_registry.py")], "Sync portfolio from registry")
+    run([PY, str(SCRIPTS / "refresh_equity_model.py")], "Equity model refresh (IR + pipeline)")
     run([PY, str(SCRIPTS / "build_dashboard_data.py")], "Rebuild dashboard JSON")
     print("\nAll download jobs finished.")
 
