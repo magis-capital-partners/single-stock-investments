@@ -1,0 +1,541 @@
+{
+  "ticker": "TSLA",
+  "as_of": "2026-06-07",
+  "method": "scenario",
+  "irr_method": "scenario",
+  "valuation_overlay": "segment_cashflow",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "platform",
+    "moat": "eroding",
+    "dhando": "none",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 350.0,
+    "price_source": "Placeholder ~June 2026 [HUMAN REVIEW]",
+    "per_share": 1.75,
+    "fcf_source": "FY2025 operating cash flow $14.747B minus capital spending $8.527B, divided by 3.528B weighted-average diluted shares (10-K FY2025)",
+    "shares_millions": 3528,
+    "normalization_note": "Filed free cash flow ~$1.76/sh; base uses $1.75/sh before heavy 2026 capex trough. Capex stress path ~$0.50/sh not in Lawrence base."
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.02,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 12,
+      "notes": "Auto price war, FSD option fails, capex with no payoff"
+    },
+    "base": {
+      "growth_y1_5": 0.06,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 18,
+      "notes": "Energy storage ramp, auto volume stable, no robotaxi in base cash flow"
+    },
+    "bull": {
+      "growth_y1_5": 0.12,
+      "growth_y6_10": 0.08,
+      "exit_pfcf_y10": 25,
+      "notes": "Robotaxi or FSD subscription scale; energy margin expansion"
+    }
+  },
+  "segment_build": {
+    "horizon_years": 7,
+    "segments": [
+      {
+        "id": "automotive",
+        "label": "Automotive (sales, leasing, credits)",
+        "type": "operating",
+        "owner_cash_y0_per_share": 1.35,
+        "growth_y1_5": 0.04,
+        "growth_y6_10": 0.03,
+        "exit_pfcf_y10": 16,
+        "evidence": "FY2025 automotive revenue ~$78.5B; Q1 2026 automotive revenue $17.7B (10-Q); margin pressure vs 2022 peak"
+      },
+      {
+        "id": "energy",
+        "label": "Energy generation and storage",
+        "type": "operating",
+        "owner_cash_y0_per_share": 0.4,
+        "growth_y1_5": 0.15,
+        "growth_y6_10": 0.1,
+        "exit_pfcf_y10": 20,
+        "evidence": "FY2025 energy revenue ~$2.8B; segment growing faster than auto (10-K segment note)"
+      }
+    ],
+    "options": [
+      {
+        "id": "fsd_robotaxi",
+        "label": "Full Self-Driving / robotaxi software option",
+        "option_treatment": "probability_weighted",
+        "annual_drag_per_share": 0.15,
+        "base_terminal_value_bn": 0,
+        "overlay_base_terminal_bn": 45,
+        "probability_base": 0.12,
+        "base_terminal_rationale": "No SEC fair-value mark; pre-scale autonomy \u2014 explicit zero in Lawrence consolidated; overlay uses 12% base probability [Assumption]",
+        "evidence": "10-Q Q1 2026 FSD subscription revenue embedded in automotive; no robotaxi profit disclosure",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "optimus",
+        "label": "Optimus humanoid robot",
+        "option_treatment": "zero",
+        "annual_drag_per_share": 0.05,
+        "base_terminal_value_bn": 0,
+        "base_terminal_rationale": "Pre-revenue R&D; no filing mark \u2014 explicit zero after option scan",
+        "evidence": "R&D expense $6.4B FY2025 (10-K); Optimus not separately reported",
+        "not_in_lawrence_base": true
+      }
+    ],
+    "corporate_drag": {
+      "alphabet_level_drag_per_share": 0.1,
+      "notes": "Heavy capex above segment depreciation; AI training spend not fully in segment owner cash"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Manufacturing PP&E and leases on balance sheet; no land-at-zero pattern"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant asset?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating auto and energy factories; not royalty trust"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "R&D $6.4B FY2025 burdened in consolidated path; no separate loss segment in 10-K"
+    },
+    {
+      "q": 4,
+      "question": "Backlog not in cash path?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "FSD deferred revenue and robotaxi narrative not in Lawrence FCF0"
+    },
+    {
+      "q": 5,
+      "question": "Private stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No material holdco-style opaque sleeves in FY2025 10-K"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No dated legal recovery or royalty trust structure"
+    },
+    {
+      "q": 7,
+      "question": "Embedded option in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Regulatory credits and FSD subscription in automotive revenue (10-K)"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "Energy storage mix shift and cost curve; auto volume recovery; FSD/robotaxi excluded from Lawrence base growth",
+    "base_growth_source": "[Assumption] 6% years 1-5 on normalized $1.75/sh owner cash; energy segment faster in overlay",
+    "status": "partial",
+    "theory_implied": {
+      "y1_5": 0.0651,
+      "y6_10": 0.046,
+      "exit_pfcf_y10_segment_blend": 16.9,
+      "derivation": "segment_build owner-cash weighted blend (growth only; exit from scenarios.base)",
+      "segment_weights": [
+        {
+          "id": "automotive",
+          "weight_pct": 77.1
+        },
+        {
+          "id": "energy",
+          "weight_pct": 22.9
+        }
+      ]
+    },
+    "lawrence_legacy": {
+      "y1_5": 0.06,
+      "y6_10": 0.04,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.0651,
+      "y6_10": 0.046,
+      "exit_pfcf_y10": 18.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": null,
+      "as_of_filing_facts": "evidence/_text/10-K-A_20260430_rpt20251231_acc0001104659_26_053166.htm.txt"
+    },
+    "divergence": {
+      "theory_vs_lawrence_y1_5_pp": 0.5,
+      "falsifier_vs_theory_y1_5_pp": 0.0
+    }
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": false
+    },
+    "override_reason": null
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -29.6
+    },
+    "base": {
+      "return_pct": -23.4
+    },
+    "bull": {
+      "return_pct": -16.0
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -29.6
+    },
+    "base": {
+      "return_pct": -23.4
+    },
+    "bull": {
+      "return_pct": -16.0
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": -23.1
+    },
+    "falsifier_adjusted": {
+      "return_pct": -23.1
+    }
+  },
+  "implied_return": {
+    "base_pct": -21.19,
+    "label": "7yr IRR (total synthesis)",
+    "display": "-21.19% (total synthesis)",
+    "lawrence_stance_gate_pct": -23.4,
+    "falsifier_adjusted_pct": -23.4,
+    "synthesis_pct": -21.19
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Segment-derived growth (pre-falsifier)",
+        "source": "segment_build weighted blend",
+        "return_pct": -23.1,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": -29.6,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": -16.0,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": -20.99,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": -21.19,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  },
+  "context_overlay": {
+    "as_of": "2026-06-07",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": null,
+            "as_of": null,
+            "yoy_pct": null,
+            "direction": "flat",
+            "good_for": "risk_regime",
+            "source": "fred:BAMLH0A0HYM2",
+            "stale": true,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": null,
+            "as_of": null,
+            "yoy_pct": null,
+            "direction": "flat",
+            "good_for": "rates_regime",
+            "source": "fred:DGS10",
+            "stale": true,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": null,
+            "as_of": null,
+            "yoy_pct": null,
+            "direction": "flat",
+            "good_for": "rates_regime",
+            "source": "fred:DGS2",
+            "stale": true,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": null,
+            "as_of": null,
+            "yoy_pct": null,
+            "direction": "flat",
+            "good_for": "dollar_regime",
+            "source": "fred:DTWEXBGS",
+            "stale": true,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 21.510000228881836,
+            "as_of": "2026-06-05",
+            "yoy_pct": 16.4,
+            "direction": "up",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": 0.27,
+            "as_of": "2026-06-05",
+            "yoy_pct": -88.4,
+            "direction": "down",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 12.9,
+            "as_of": "2026-06-05",
+            "yoy_pct": -21.1,
+            "direction": "down",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "insider_signal": {
+    "as_of": "2026-06-07",
+    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
+    "in_base_irr": false,
+    "window_days": 365,
+    "ics": 10.0,
+    "band": "exceptional",
+    "bull_case_support": "moderate",
+    "scenario_confidence": {
+      "priors": {
+        "bear": 0.2,
+        "base": 0.55,
+        "bull": 0.25
+      },
+      "tilted": {
+        "bear": 0.2,
+        "base": 0.4,
+        "bull": 0.4
+      },
+      "bull_delta": 0.15,
+      "bear_delta": 0.0,
+      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
+    },
+    "factors": {
+      "buy_score": 58.018,
+      "sell_score": -1.0,
+      "cluster_bonus": 0.0,
+      "net_buy_usd": 144813469390.24,
+      "net_sell_usd": 168651291.42,
+      "price_today": 350.0
+    },
+    "top_buys": [
+      {
+        "insider": "Wilson-Thompson Kathleen",
+        "date": "2026-04-30",
+        "shares": 40948,
+        "price": 14.99,
+        "value_usd": 613810.52,
+        "shares_owned_after": 74808,
+        "contrib": 2.787
+      },
+      {
+        "insider": "Musk Elon",
+        "date": "2025-11-06",
+        "shares": 423743904,
+        "price": 334.09,
+        "value_usd": 141568600887.36,
+        "shares_owned_after": 519743904,
+        "contrib": 2.228
+      },
+      {
+        "insider": "Wilson-Thompson Kathleen",
+        "date": "2026-03-30",
+        "shares": 40000,
+        "price": 14.99,
+        "value_usd": 599600.0,
+        "shares_owned_after": 59669,
+        "contrib": 2.152
+      },
+      {
+        "insider": "Wilson-Thompson Kathleen",
+        "date": "2026-02-25",
+        "shares": 40000,
+        "price": 14.99,
+        "value_usd": 599600.0,
+        "shares_owned_after": 45400,
+        "contrib": 1.721
+      },
+      {
+        "insider": "Taneja Vaibhav",
+        "date": "2026-05-13",
+        "shares": 2000,
+        "price": 18.22,
+        "value_usd": 36440.0,
+        "shares_owned_after": 21106,
+        "contrib": 1.693
+      }
+    ],
+    "top_sells": [
+      {
+        "insider": "Musk Elon",
+        "date": "2026-04-21",
+        "shares": 96000000,
+        "price": 0.0,
+        "value_usd": 0.0,
+        "is_10b5_1": false,
+        "contrib": -0.186
+      },
+      {
+        "insider": "Taneja Vaibhav",
+        "date": "2026-05-13",
+        "shares": 3000,
+        "price": 450.0,
+        "value_usd": 1350000.0,
+        "is_10b5_1": false,
+        "contrib": -0.173
+      },
+      {
+        "insider": "Musk Elon",
+        "date": "2025-12-30",
+        "shares": 210699,
+        "price": 0.0,
+        "value_usd": 0.0,
+        "is_10b5_1": false,
+        "contrib": -0.124
+      },
+      {
+        "insider": "Musk Kimbal",
+        "date": "2025-12-09",
+        "shares": 56820,
+        "price": 450.66,
+        "value_usd": 25606501.2,
+        "is_10b5_1": false,
+        "contrib": -0.113
+      },
+      {
+        "insider": "Musk Kimbal",
+        "date": "2025-12-09",
+        "shares": 15242,
+        "price": 0.0,
+        "value_usd": 0.0,
+        "is_10b5_1": false,
+        "contrib": -0.113
+      }
+    ],
+    "narrative_hooks": [],
+    "transaction_count": 121
+  }
+}
