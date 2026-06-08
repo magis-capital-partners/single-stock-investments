@@ -22,6 +22,7 @@ sys.path.insert(0, str(SCRIPTS))
 from marvin_pipeline_common import (  # noqa: E402
     has_evidence_refresh_config,
     latest_deep_dive_date,
+    ticker_has_crypto_tag,
     ticker_needs_commodity_inputs,
 )
 
@@ -216,6 +217,22 @@ def main() -> int:
             "--with-hk",
         ],
     )
+    ok &= run(
+        "equity price",
+        [PY, str(SCRIPTS / "fetch_equity_prices.py"), ticker, "--merge"],
+        optional=True,
+    )
+    if ticker_has_crypto_tag(ticker):
+        run(
+            "crypto indicator panels",
+            [PY, str(SCRIPTS / "fetch_crypto_panel.py")],
+            optional=True,
+        )
+        run(
+            "crypto context overlay",
+            [PY, str(SCRIPTS / "apply_btc_context_overlay.py"), ticker],
+            optional=True,
+        )
     ok &= run(
         "valuation write",
         [PY, str(SCRIPTS / "marvin_valuation.py"), "--ticker", ticker, "--write"],

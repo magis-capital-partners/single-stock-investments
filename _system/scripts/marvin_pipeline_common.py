@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import re
+import json
 from pathlib import Path
 
 
@@ -18,6 +19,17 @@ def latest_deep_dive_date(research_dir: Path) -> str | None:
 def has_evidence_refresh_config(val: dict) -> bool:
     er = val.get("evidence_refresh") or {}
     return bool(er.get("type"))
+
+
+def ticker_has_crypto_tag(ticker: str) -> bool:
+    path = Path(__file__).resolve().parents[2] / "_system" / "portfolio" / "holdings_crypto.json"
+    if not path.exists():
+        return False
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return False
+    return ticker.upper() in (data.get("holdings") or {})
 
 
 def ticker_needs_commodity_inputs(val: dict) -> bool:

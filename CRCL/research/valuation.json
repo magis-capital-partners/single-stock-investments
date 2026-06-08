@@ -1,0 +1,464 @@
+{
+  "ticker": "CRCL",
+  "as_of": "2026-06-08",
+  "method": "full",
+  "irr_method": "full",
+  "lawrence_bucket": "multi_sided",
+  "valuation_mode": "operating",
+  "classification_inputs": {
+    "archetype": "platform",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 80.28,
+    "price_source": "Yahoo CRCL close 2026-06-05",
+    "shares_millions": 158.0,
+    "shares_source": "FY2025 NetIncomeLoss $69.5M / EPS $0.44 basic (10-K); post-IPO share count [Approximation]",
+    "per_share": 0.55,
+    "fcf_per_share": 0.55,
+    "fcf_source": "Normalized owner cash: FY2025 operating income $96.4M on ~158M shares; reserve-interest revenue less distribution costs",
+    "normalization_note": "FY2025 revenue $2.75B (+64% YoY) driven by USDC in circulation and reserve yields; net income $69.5M reflects IPO/stock-comp and rate normalization vs 2024.",
+    "price_as_of": "2026-06-05"
+  },
+  "estimates": {
+    "marvin_floor": {
+      "per_share": 0.44,
+      "return_pct": null,
+      "notes": "FY2025 GAAP net income $69.5M / ~158M shares"
+    },
+    "blended_best": {
+      "per_share": 0.55,
+      "return_pct": null,
+      "notes": "Operating income normalized owner cash; filings only"
+    }
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.02,
+      "growth_y6_10": 0.01,
+      "exit_pfcf_y10": 12,
+      "notes": "Fed cuts compress reserve yield; USDC share loss to competitors"
+    },
+    "base": {
+      "growth_y1_5": 0.08,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 18,
+      "notes": "USDC supply grows with on-chain + TradFi adoption; reserve yield mid-cycle"
+    },
+    "bull": {
+      "growth_y1_5": 0.14,
+      "growth_y6_10": 0.07,
+      "exit_pfcf_y10": 22,
+      "notes": "GENIUS Act clarity + EURC/CCTP scale; higher average balances"
+    }
+  },
+  "btc_overlay": {
+    "as_of": "2026-06-08",
+    "crypto_exposure": "stablecoin",
+    "status": "partial",
+    "disclaimer": "Context only. Crypto and mining metrics inform stance and overlays; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "in_base_irr": false,
+    "themes": [
+      {
+        "theme_id": "stablecoin_economics",
+        "label": "Stablecoin supply and reserve economics",
+        "indicators": [
+          {
+            "id": "usdc_market_cap_bn",
+            "label": "USDC market cap (USD bn)",
+            "latest": 75.64,
+            "as_of": "2026-06-08",
+            "yoy_pct": null,
+            "direction": "flat",
+            "source": "coingecko:usd-coin:market_cap",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "usdc_circulating_bn",
+            "label": "USDC circulating supply (USD bn)",
+            "latest": 75.647,
+            "as_of": "2026-06-08",
+            "yoy_pct": null,
+            "direction": "flat",
+            "source": "coingecko:usd-coin:circulating_supply",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "btc_spot_usd",
+            "label": "Bitcoin spot (USD, cross-asset context)",
+            "latest": 62745.83984375,
+            "as_of": "2026-06-08",
+            "yoy_pct": -40.7,
+            "direction": "down",
+            "source": "yahoo:BTC-USD",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ],
+    "mining_economics_context": {
+      "source": "mempool.space + computed"
+    },
+    "in_model": {},
+    "not_in_model_requires_refresh": [
+      "live_btc_spot_in_price_input",
+      "hashprice_vs_fleet_breakeven",
+      "post_halving_subsidy_schedule"
+    ]
+  },
+  "implied_return": {
+    "base_pct": -16.76,
+    "label": "7yr IRR (total synthesis)",
+    "display": "-16.76% (total synthesis)",
+    "lawrence_stance_gate_pct": -18.4,
+    "falsifier_adjusted_pct": -18.4,
+    "synthesis_pct": -16.76
+  },
+  "stance": {
+    "proposal": "watch",
+    "rationale": "Pending mechanical IRR at live price"
+  },
+  "human_review": {
+    "live_price_confirmed": false
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -26.3
+    },
+    "base": {
+      "return_pct": -18.4
+    },
+    "bull": {
+      "return_pct": -12.5
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -26.3
+    },
+    "base": {
+      "return_pct": -18.4
+    },
+    "bull": {
+      "return_pct": -12.5
+    }
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": -26.3,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": -12.5,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": -16.56,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": -16.76,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  },
+  "option_scan": [
+    {
+      "q": 0,
+      "question": "Material options after scan?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating compounder / croupier \u2014 Lawrence full cash-flow path sufficient"
+    }
+  ],
+  "context_overlay": {
+    "as_of": "2026-06-08",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": 0.02,
+            "as_of": "2026-06-05",
+            "yoy_pct": -96.3,
+            "direction": "down",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.535999774932861,
+            "as_of": "2026-06-05",
+            "yoy_pct": 3.2,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.28000020980835,
+            "as_of": "2026-06-05",
+            "yoy_pct": 7.3,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 100.03199768066406,
+            "as_of": "2026-06-08",
+            "yoy_pct": 1.1,
+            "direction": "up",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 21.510000228881836,
+            "as_of": "2026-06-05",
+            "yoy_pct": 16.4,
+            "direction": "up",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": 0.27,
+            "as_of": "2026-06-05",
+            "yoy_pct": -88.4,
+            "direction": "down",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 12.9,
+            "as_of": "2026-06-05",
+            "yoy_pct": -21.1,
+            "direction": "down",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "insider_signal": {
+    "as_of": "2026-06-08",
+    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
+    "in_base_irr": false,
+    "window_days": 365,
+    "ics": 10.0,
+    "band": "exceptional",
+    "bull_case_support": "moderate",
+    "scenario_confidence": {
+      "priors": {
+        "bear": 0.2,
+        "base": 0.55,
+        "bull": 0.25
+      },
+      "tilted": {
+        "bear": 0.2,
+        "base": 0.4,
+        "bull": 0.4
+      },
+      "bull_delta": 0.15,
+      "bear_delta": 0.0,
+      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
+    },
+    "factors": {
+      "buy_score": 24.53,
+      "sell_score": -1.0,
+      "cluster_bonus": 0.0,
+      "net_buy_usd": 5864058.43,
+      "net_sell_usd": 110812497.99,
+      "price_today": 80.28
+    },
+    "top_buys": [
+      {
+        "insider": "Chandhok Nikhil",
+        "date": "2026-05-21",
+        "shares": 10000,
+        "price": 25.81,
+        "value_usd": 258100.0,
+        "shares_owned_after": 542745,
+        "contrib": 1.901
+      },
+      {
+        "insider": "Chandhok Nikhil",
+        "date": "2026-04-21",
+        "shares": 10000,
+        "price": 25.81,
+        "value_usd": 258100.0,
+        "shares_owned_after": 546561,
+        "contrib": 1.48
+      },
+      {
+        "insider": "Fox-Geen Jeremy",
+        "date": "2026-05-01",
+        "shares": 7200,
+        "price": 10.11,
+        "value_usd": 72792.0,
+        "shares_owned_after": 370926,
+        "contrib": 1.333
+      },
+      {
+        "insider": "Fox-Geen Jeremy",
+        "date": "2025-12-18",
+        "shares": 39564,
+        "price": 10.11,
+        "value_usd": 399992.04,
+        "shares_owned_after": 321737,
+        "contrib": 1.266
+      },
+      {
+        "insider": "Tarbert Heath",
+        "date": "2026-03-02",
+        "shares": 75108,
+        "price": 25.09,
+        "value_usd": 1884459.72,
+        "shares_owned_after": 721163,
+        "contrib": 1.24
+      }
+    ],
+    "top_sells": [
+      {
+        "insider": "Fox-Geen Jeremy",
+        "date": "2026-06-01",
+        "shares": 7425,
+        "price": 113.0,
+        "value_usd": 839025.0,
+        "is_10b5_1": false,
+        "contrib": -0.2
+      },
+      {
+        "insider": "Ostling Danita K",
+        "date": "2026-05-12",
+        "shares": 1200,
+        "price": 132.06,
+        "value_usd": 158472.0,
+        "is_10b5_1": false,
+        "contrib": -0.2
+      },
+      {
+        "insider": "Allaire Jeremy",
+        "date": "2025-12-09",
+        "shares": 3500,
+        "price": 0.0,
+        "value_usd": 0.0,
+        "is_10b5_1": false,
+        "contrib": -0.129
+      },
+      {
+        "insider": "Allaire Jeremy",
+        "date": "2025-12-09",
+        "shares": 235000,
+        "price": 0.0,
+        "value_usd": 0.0,
+        "is_10b5_1": false,
+        "contrib": -0.129
+      },
+      {
+        "insider": "BURNS M MICHELE",
+        "date": "2026-03-09",
+        "shares": 22,
+        "price": 0.0,
+        "value_usd": 0.0,
+        "is_10b5_1": false,
+        "contrib": -0.117
+      }
+    ],
+    "narrative_hooks": [],
+    "transaction_count": 204
+  }
+}

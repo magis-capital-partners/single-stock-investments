@@ -1,0 +1,179 @@
+{
+  "ticker": "CRCL",
+  "as_of": "2026-06-08",
+  "method": "full",
+  "irr_method": "full",
+  "lawrence_bucket": "multi_sided",
+  "valuation_mode": "operating",
+  "classification_inputs": {
+    "archetype": "platform",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 80.28,
+    "price_source": "Yahoo CRCL close 2026-06-05",
+    "shares_millions": 158.0,
+    "shares_source": "FY2025 NetIncomeLoss $69.5M / EPS $0.44 basic (10-K); post-IPO share count [Approximation]",
+    "per_share": 0.55,
+    "fcf_per_share": 0.55,
+    "fcf_source": "Normalized owner cash: FY2025 operating income $96.4M on ~158M shares; reserve-interest revenue less distribution costs",
+    "normalization_note": "FY2025 revenue $2.75B (+64% YoY) driven by USDC in circulation and reserve yields; net income $69.5M reflects IPO/stock-comp and rate normalization vs 2024.",
+    "price_as_of": "2026-06-05"
+  },
+  "estimates": {
+    "marvin_floor": {
+      "per_share": 0.44,
+      "return_pct": null,
+      "notes": "FY2025 GAAP net income $69.5M / ~158M shares"
+    },
+    "blended_best": {
+      "per_share": 0.55,
+      "return_pct": null,
+      "notes": "Operating income normalized owner cash; filings only"
+    }
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.02,
+      "growth_y6_10": 0.01,
+      "exit_pfcf_y10": 12,
+      "notes": "Fed cuts compress reserve yield; USDC share loss to competitors"
+    },
+    "base": {
+      "growth_y1_5": 0.08,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 18,
+      "notes": "USDC supply grows with on-chain + TradFi adoption; reserve yield mid-cycle"
+    },
+    "bull": {
+      "growth_y1_5": 0.14,
+      "growth_y6_10": 0.07,
+      "exit_pfcf_y10": 22,
+      "notes": "GENIUS Act clarity + EURC/CCTP scale; higher average balances"
+    }
+  },
+  "btc_overlay": {
+    "crypto_exposure": "stablecoin",
+    "status": "pending",
+    "in_base_irr": false
+  },
+  "implied_return": {
+    "base_pct": -19.6,
+    "label": "7yr IRR (total synthesis)",
+    "display": "-19.6% (total synthesis)",
+    "lawrence_stance_gate_pct": -18.4,
+    "falsifier_adjusted_pct": -18.4,
+    "synthesis_pct": -19.6
+  },
+  "stance": {
+    "proposal": "watch",
+    "rationale": "Pending mechanical IRR at live price"
+  },
+  "human_review": {
+    "live_price_confirmed": false
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -26.3
+    },
+    "base": {
+      "return_pct": -18.4
+    },
+    "bull": {
+      "return_pct": -12.5
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -26.3
+    },
+    "base": {
+      "return_pct": -18.4
+    },
+    "bull": {
+      "return_pct": -12.5
+    }
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence envelope)",
+        "source": "scenarios.bear",
+        "return_pct": -26.3,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "hard_to_vary": "yes: asymmetric low weight is structural",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ]
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence envelope)",
+        "source": "scenarios.bull",
+        "return_pct": -12.5,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "hard_to_vary": "yes",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ]
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": -19.4,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": -19.6,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}

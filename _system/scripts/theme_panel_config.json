@@ -20,19 +20,19 @@
         {"id": "wti_crude", "label": "WTI crude (USD/bbl)", "source": "fred", "fred_id": "DCOILWTICO", "good_for": "permian_cashflow", "fallback": {"source": "yahoo_daily", "yahoo_symbol": "CL=F", "note": "WTI front-month futures when FRED unavailable"}},
         {"id": "permian_crude_production_mbbl_d", "label": "Permian crude production (kbbl/d)", "source": "eia", "eia_route": "petroleum/crd/crpdn", "eia_facets": {"duoarea": "RTPP", "product": "EPC0", "process": "FPF"}, "good_for": "permian_volume", "optional": true, "note": "Requires EIA_API_KEY; null when absent"},
         {"id": "tpl_water_revenue_m", "label": "TPL water segment revenue (USD m, FY)", "source": "filing_panel", "panel": "tpl_operating_panel.csv", "metric": "water_revenue_m", "good_for": "water_infra_proof", "optional": true},
-        {"id": "ust_10y", "label": "US Treasury 10Y yield (%)", "source": "fred", "fred_id": "DGS10", "good_for": "discount_rate"},
-        {"id": "ust_2y", "label": "US Treasury 2Y yield (%)", "source": "fred", "fred_id": "DGS2", "good_for": "discount_rate"},
-        {"id": "hy_oas", "label": "High-yield OAS credit spread (%)", "source": "fred", "fred_id": "BAMLH0A0HYM2", "good_for": "risk_regime"}
+        {"id": "ust_10y", "label": "US Treasury 10Y yield (%)", "source": "fred", "fred_id": "DGS10", "good_for": "discount_rate", "fallback": {"source": "yahoo_daily", "yahoo_symbol": "^TNX", "note": "CBOE 10Y index proxy when FRED unavailable"}},
+        {"id": "ust_2y", "label": "US Treasury 2Y yield (%)", "source": "fred", "fred_id": "DGS2", "good_for": "discount_rate", "fallback": {"source": "yahoo_daily", "yahoo_symbol": "^FVX", "note": "5Y yield proxy when 2Y FRED unavailable"}},
+        {"id": "hy_oas", "label": "High-yield OAS credit spread (%)", "source": "fred", "fred_id": "BAMLH0A0HYM2", "good_for": "risk_regime", "fallback": {"source": "computed_spread", "leg_a": "HYG", "leg_b": "LQD", "window_days": 21, "note": "HYG-LQD 1m spread proxy, not OAS"}}
       ]
     },
     "macro_regime": {
       "label": "Macro risk regime",
       "description": "Portfolio-wide credit, rates, dollar, and vol context for stance sizing.",
       "series": [
-        {"id": "hy_oas", "label": "High-yield OAS credit spread (%)", "source": "fred", "fred_id": "BAMLH0A0HYM2", "good_for": "risk_regime"},
-        {"id": "ust_10y", "label": "US Treasury 10Y yield (%)", "source": "fred", "fred_id": "DGS10", "good_for": "rates_regime"},
-        {"id": "ust_2y", "label": "US Treasury 2Y yield (%)", "source": "fred", "fred_id": "DGS2", "good_for": "rates_regime"},
-        {"id": "dxy_broad", "label": "Trade-weighted USD index (broad)", "source": "fred", "fred_id": "DTWEXBGS", "good_for": "dollar_regime", "optional": true},
+        {"id": "hy_oas", "label": "High-yield OAS credit spread (%)", "source": "fred", "fred_id": "BAMLH0A0HYM2", "good_for": "risk_regime", "fallback": {"source": "computed_spread", "leg_a": "HYG", "leg_b": "LQD", "window_days": 21, "note": "HYG-LQD 1m spread proxy, not OAS"}},
+        {"id": "ust_10y", "label": "US Treasury 10Y yield (%)", "source": "fred", "fred_id": "DGS10", "good_for": "rates_regime", "fallback": {"source": "yahoo_daily", "yahoo_symbol": "^TNX", "note": "CBOE 10Y index proxy when FRED unavailable"}},
+        {"id": "ust_2y", "label": "US Treasury 2Y yield (%)", "source": "fred", "fred_id": "DGS2", "good_for": "rates_regime", "fallback": {"source": "yahoo_daily", "yahoo_symbol": "^FVX", "note": "5Y yield proxy when 2Y FRED unavailable"}},
+        {"id": "dxy_broad", "label": "Trade-weighted USD index (broad)", "source": "fred", "fred_id": "DTWEXBGS", "good_for": "dollar_regime", "optional": true, "fallback": {"source": "yahoo_daily", "yahoo_symbol": "DX-Y.NYB", "note": "DXY futures proxy when FRED unavailable"}},
         {"id": "vix_level", "label": "VIX index level", "source": "fred", "fred_id": "VIXCLS", "good_for": "vol_regime", "fallback": {"source": "yahoo_daily", "yahoo_symbol": "^VIX"}},
         {"id": "credit_impulse_1m", "label": "HYG vs TLT 1-month return spread (%)", "source": "computed_spread", "leg_a": "HYG", "leg_b": "TLT", "window_days": 21, "good_for": "credit_impulse"},
         {"id": "spy_20d_realized_vol", "label": "SPY 20-day realized vol (annualized %)", "source": "computed_realized_vol", "ticker": "SPY", "window_days": 20, "good_for": "equity_vol"}

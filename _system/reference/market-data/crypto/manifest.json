@@ -1,0 +1,146 @@
+{
+  "generated_at": "2026-06-08T04:58:00Z",
+  "as_of": "2026-06-08",
+  "staleness_max_days": 7,
+  "disclaimer": "Context only. Crypto metrics inform stance and overlays; never auto-inflate Lawrence base IRR.",
+  "themes": {
+    "btc_network_economics": {
+      "label": "Bitcoin network and mining economics",
+      "description": "Spot, hash rate, difficulty, fees, hashprice, and breakeven power context for BTC-exposed holdings.",
+      "series": {
+        "btc_spot_usd": {
+          "label": "Bitcoin spot (USD)",
+          "latest": 62745.83984375,
+          "as_of": "2026-06-08",
+          "prior_year": 105793.6484375,
+          "yoy_pct": -40.7,
+          "direction": "down",
+          "good_for": "btc_price",
+          "source": "yahoo:BTC-USD",
+          "optional": false,
+          "stale": false,
+          "error": null,
+          "note": null
+        },
+        "btc_hash_rate_eh": {
+          "label": "Network hash rate (EH/s, 7d avg)",
+          "latest": 806.9019970486307,
+          "as_of": "2026-06-08",
+          "prior_year": null,
+          "yoy_pct": null,
+          "direction": "flat",
+          "good_for": "mining_supply",
+          "source": "mempool.space:hashrate",
+          "optional": false,
+          "stale": false,
+          "error": null,
+          "note": null
+        },
+        "btc_difficulty": {
+          "label": "Mining difficulty (index)",
+          "latest": 138955357012247.3,
+          "as_of": "2026-06-08",
+          "prior_year": null,
+          "yoy_pct": null,
+          "direction": "flat",
+          "good_for": "mining_cost",
+          "source": "mempool.space:difficulty",
+          "optional": false,
+          "stale": false,
+          "error": null,
+          "note": null
+        },
+        "btc_avg_fee_per_block_usd": {
+          "label": "Avg transaction fees per block (USD)",
+          "latest": 458.6148,
+          "as_of": "2026-06-08",
+          "prior_year": null,
+          "yoy_pct": null,
+          "direction": "flat",
+          "good_for": "miner_revenue",
+          "source": "mempool.space:fees",
+          "optional": false,
+          "stale": false,
+          "error": null,
+          "note": null
+        },
+        "btc_hashprice_usd_ph_day": {
+          "label": "Hashprice (USD/PH/day)",
+          "latest": 0.035074,
+          "as_of": "2026-06-08",
+          "prior_year": null,
+          "yoy_pct": null,
+          "direction": "flat",
+          "good_for": "miner_breakeven",
+          "source": "computed:hashprice",
+          "optional": false,
+          "stale": false,
+          "error": null,
+          "note": null
+        },
+        "btc_breakeven_power_30jth": {
+          "label": "Breakeven power cost at 30 J/TH ($/kWh)",
+          "latest": 0.0487,
+          "as_of": "2026-06-08",
+          "prior_year": null,
+          "yoy_pct": null,
+          "direction": "flat",
+          "good_for": "miner_breakeven",
+          "source": "computed:breakeven_30.0jth",
+          "optional": false,
+          "stale": false,
+          "error": null,
+          "note": null
+        }
+      }
+    },
+    "stablecoin_economics": {
+      "label": "Stablecoin supply and reserve economics",
+      "description": "USDC market cap and supply context for stablecoin issuers (Circle/CRCL).",
+      "series": {
+        "usdc_market_cap_bn": {
+          "label": "USDC market cap (USD bn)",
+          "latest": 75.64,
+          "as_of": "2026-06-08",
+          "prior_year": null,
+          "yoy_pct": null,
+          "direction": "flat",
+          "good_for": "stablecoin_supply",
+          "source": "coingecko:usd-coin:market_cap",
+          "optional": false,
+          "stale": false,
+          "error": null,
+          "note": null
+        },
+        "usdc_circulating_bn": {
+          "label": "USDC circulating supply (USD bn)",
+          "latest": 75.647,
+          "as_of": "2026-06-08",
+          "prior_year": null,
+          "yoy_pct": null,
+          "direction": "flat",
+          "good_for": "stablecoin_supply",
+          "source": "coingecko:usd-coin:circulating_supply",
+          "optional": false,
+          "stale": false,
+          "error": null,
+          "note": null
+        },
+        "btc_spot_usd": {
+          "label": "Bitcoin spot (USD, cross-asset context)",
+          "latest": 62745.83984375,
+          "as_of": "2026-06-08",
+          "prior_year": 105793.6484375,
+          "yoy_pct": -40.7,
+          "direction": "down",
+          "good_for": "crypto_regime",
+          "source": "yahoo:BTC-USD",
+          "optional": true,
+          "stale": false,
+          "error": null,
+          "note": null
+        }
+      }
+    }
+  }
+}
