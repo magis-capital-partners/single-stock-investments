@@ -1,8 +1,8 @@
 # Market data workflow fix — macro `n/a` + stale equity prices
 
-**Date:** 2026-06-07  
+**Date:** 2026-06-07 (updated)  
 **Status:** Plan (pending human review)  
-**Trigger:** MSTR deep dive shows `n/a (stale)` for HY OAS, Treasury yields, and DXY; MSTR `inputs.price` is a placeholder ($390) after `marvin_cloud_refresh.py`.  
+**Trigger:** MSTR deep dive shows `n/a (stale)` for HY OAS, Treasury yields, and DXY; MSTR `inputs.price` is a placeholder ($390) after `marvin_cloud_refresh.py`. User request: add **crypto economics framework** for BTC-exposed tickers, grounded in HK Cryptocurrency Compendium, with live mining-economics metrics.  
 **Related:** `_system/reviews/pending/thematic_ingestion_roadmap_2026-06-07.md` (broader theme expansion)
 
 ---
@@ -13,6 +13,7 @@ Neither issue is MSTR-specific.
 
 1. **Thematic `n/a` rows** — All holdings tagged `macro_regime` (effectively `*`) inherit the same four null FRED series from `themes/manifest.json`. VIX, credit impulse, and SPY realized vol populate because they use Yahoo or local `returns/` CSVs.
 2. **Stale equity price** — `marvin_cloud_refresh.py` never fetches live stock quotes. `fetch_market_inputs.py` is commodity-only (copper for KEWL/MSB). Placeholder prices survive refresh and flow into Lawrence IRR.
+3. **No crypto economics layer** — MSTR, GLXY, and CMSG model BTC exposure from filings and placeholders, but there is no live network/mining panel, no `btc_overlay` framework, and no HK Compendium extract in-repo yet.
 
 ---
 
@@ -187,6 +188,176 @@ python3 _system/scripts/batch_portfolio_refresh.py --date 2026-06-07
 
 ---
 
+## Phase 5 — Crypto economics framework + BTC mining metrics
+
+**Goal:** For tickers whose economics or price depend materially on bitcoin, ingest live network and mining-economics data, ground analysis in Horizon Kinetics' Cryptocurrency Compendium, and expose a **context overlay** (never auto-inflate Lawrence base IRR).
+
+**North star (HK / Stahl):** Bitcoin has a **self-equilibrating production cost** — spot price over time reflects mining cost plus incentive margin; difficulty adjustment raises marginal cost of production. Mining economics are the protocol floor context for treasury holders (MSTR) and direct operators (CMSG). See `Stahl-Worth-The-Time-Predictive-Attributes-extract.txt` (mining cost + margin); full treatment in HK Compendium.
+
+### 5A. Wisdom source — HK Cryptocurrency Compendium
+
+| Task | Detail |
+|------|--------|
+| Vault path | Windows: `C:\Users\werdn\Documents\Investing\Horizon Kinetics\hk_pdfs\Horizon_Kinetics_Cryptocurrency_Compendium.pdf`; cloud: `$HK_PDFS_ROOT` per `hk_paths.json` |
+| Extract | Add entry to `hk_extract_manifest.json`; run `refresh_hk_extracts.py` → `_system/reference/investment-wisdom/horizon-kinetics/HK-Cryptocurrency-Compendium-extract.txt` |
+| Framework proposal | New triggered doc `_system/frameworks/crypto_economics_valuation.md` (proposal via `architecture_review_template.md` — passes governance: answers decision-stack Q1/Q5, new `btc_overlay` JSON key, lint hook) |
+| Agent trigger | Add row to `classification.md` trigger map: `btc_overlay` or `crypto_exposure: treasury | miner | platform` → open `crypto_economics_valuation.md` |
+
+**Compendium sections to index (agent checklist):**
+
+1. Supply protocol (21M cap, halving schedule, difficulty adjustment)
+2. Mining as marginal producer (hash rate, electricity, ASIC efficiency)
+3. Store-of-value vs speculative demand (ETF flows, exchange volume)
+4. Treasury / wrapper equities (mNAV, dilution flywheel — MSTR pattern)
+5. Miner operator economics (hashprice, fleet efficiency, power contracts — CMSG pattern)
+6. Platform / market-maker cycle (fees, staking, vol marks — GLXY pattern)
+
+### 5B. Affected tickers (initial tag set)
+
+| Ticker | Exposure type | Mining panel use | Lawrence path today |
+|--------|---------------|------------------|---------------------|
+| **MSTR** | BTC treasury + levered wrapper | Protocol floor context; spot vs look-through NAV; **not** miner breakeven in base IRR | `yield_curve` + `nav_overlay` |
+| **GLXY** | Digital-asset platform + treasury marks | Network activity, fee revenue, vol regime | `scenario` + segment build |
+| **CMSG** | Miner + treasury (Horizon-affiliated) | **Direct** hashprice vs fleet; network share; power breakeven | `scenario` + approved Substacks |
+| **FRMO / HKHC** | Holdco crypto sleeves (optional v2) | Context only; cite FRMO letter extracts | holding_co |
+
+Tag in new `holdings_themes.json` theme `btc_network_economics` and/or per-ticker `crypto_exposure` in `valuation.json`.
+
+**Out of scope v1:** Alt-coins, ETH staking economics, DeFi yields. BTC-only.
+
+### 5C. Data vendor strategy (reputable + Marvin-friendly)
+
+**Recommended stack (tiered):**
+
+| Tier | Source | Metrics | Auth | Rationale |
+|------|--------|---------|------|-----------|
+| **Primary (mining)** | [mempool.space API](https://mempool.space/docs/api) | Hash rate, difficulty, block reward, avg fees/block, mempool congestion, recommended fees | Free, no key; widely cited | Best open-source mining/network panel; aligns with HK marginal-cost framing |
+| **Primary (spot)** | Yahoo `BTC-USD` or CoinGecko free API | BTC USD spot, 24h vol, market cap | Free | Already used in theme panel patterns |
+| **Secondary (on-chain)** | Coin Metrics Community API | Active addresses, transfer volume, realized cap | Free tier + API key | Institutional-grade; backup when mempool gaps |
+| **Optional (premium)** | Glassnode | Hash ribbons, miner revenue, Puell multiple | Paid `GLASSNODE_API_KEY` | Upgrade path if human approves subscription |
+| **Computed** | Marvin scripts | **Hashprice** ($/PH/day), **breakeven power** ($/kWh at assumed J/TH), **subsidy+fee revenue** per EH | Derived from above | Standard miner economics (Braiins / Hashrate Index methodology) |
+
+**Do not use** scraped exchange order books or unaudited social sentiment as base inputs.
+
+**Vault layout:**
+
+```
+_system/reference/market-data/crypto/
+  manifest.json              # latest values + staleness (mirror themes/)
+  btc_spot_usd.csv
+  btc_hash_rate_eh.csv
+  btc_difficulty.csv
+  btc_block_fees_usd.csv
+  btc_hashprice_usd_ph_day.csv   # computed
+  btc_mining_breakeven_power.csv # computed at reference efficiency tiers
+  README.md                  # API keys, rate limits, methodology
+```
+
+### 5D. New scripts and config
+
+| Artifact | Purpose |
+|----------|---------|
+| `crypto_panel_config.json` | Series definitions (id, label, source, optional, fallback, good_for) |
+| `fetch_crypto_panel.py` | Fetch BTC network + mining series → CSV cache + `crypto/manifest.json`; `--offline` recompute from cache |
+| `compute_mining_economics.py` | Derive hashprice, breakeven $/kWh at 25/30/35 J/TH reference efficiencies; subsidy+fee USD/EH/day |
+| `apply_btc_context_overlay.py` | Merge `btc_network_economics` theme into `valuation.json` `btc_overlay` + `evidence/crypto_context_{date}.md` for tagged tickers |
+| Wire `marvin_cloud_refresh.py` | After `fetch_equity_prices` (Phase 2), before valuation write: `fetch_crypto_panel.py` then `apply_btc_context_overlay.py` when `crypto_exposure` set |
+
+**`btc_overlay` JSON shape** (mirror `ai_overlay`):
+
+```json
+"btc_overlay": {
+  "as_of": "YYYY-MM-DD",
+  "crypto_exposure": "treasury | miner | platform",
+  "status": "partial | complete",
+  "in_model": {
+    "btc_spot_usd": null,
+    "filing_btc_holdings": null,
+    "look_through_nav_per_share": null
+  },
+  "not_in_model_requires_refresh": [
+    "live_btc_spot_in_price_input",
+    "hashprice_vs_fleet_breakeven",
+    "post_halving_subsidy_schedule"
+  ],
+  "mining_economics_context": {
+    "hash_rate_eh": null,
+    "difficulty": null,
+    "hashprice_usd_ph_day": null,
+    "breakeven_power_usd_kwh_30jth": null,
+    "fee_share_of_miner_revenue_pct": null,
+    "source": "mempool.space + computed"
+  },
+  "network_regime": "accumulation | distribution | stress",
+  "in_base_irr": false
+}
+```
+
+**Hard rule:** `mining_economics_context` and thematic rows are **context only** (`in_base_irr: false`). Lawrence base stays filing-based owner cash / yield-curve / scenario paths. Human promotes mining-floor or spot-path into base under **[HUMAN REVIEW]**.
+
+### 5E. Framework doc — `crypto_economics_valuation.md` (proposal)
+
+**Decision-stack mapping:**
+
+| Question | Crypto economics answers |
+|----------|-------------------------|
+| Q1 What is it? | Treasury wrapper vs miner vs platform; BTC as produced commodity with protocol rules |
+| Q2 Will it last? | Halving + difficulty path; fleet obsolescence (miners); capital-structure flywheel (MSTR) |
+| Q5 Why mispriced? | mNAV premium, hashprice vs power contract, fee-regime shifts, ETF arb |
+
+**Marvin report requirements** (when `btc_overlay` present):
+
+In **Business & moat**, after option scan:
+
+#### `#### Bitcoin economics — model coverage`
+
+| Theme | Latest metric | Filing fact | In base IRR? |
+|-------|---------------|-------------|--------------|
+| BTC spot vs filing mark | $X (date) | Q1 fair value $64B | no (context) unless price input refreshed |
+| Network hash rate / difficulty | EH/s; diff | — | no (context) |
+| Hashprice / breakeven power | $/PH/day; $/kWh | CMSG fleet efficiency if disclosed | no (context) |
+| Subsidy + fees per EH | USD/day | Post-2024 halving 3.125 BTC/block | no (context) |
+| mNAV / wrapper premium (MSTR) | premium % | Look-through ~$150/sh vs price | overlay only |
+
+2–3 sentences linking HK Compendium concept (marginal cost of production, self-equilibrating supply) to the specific ticker.
+
+In **Payoff & return:** one sentence on what changes in bear (hashprice collapse / BTC −40%) vs bull (spot re-rate + sustained fees).
+
+**Milly checks:** `btc_coverage: incomplete` if overlay missing on tagged ticker; flag if `inputs.price` placeholder while `btc_overlay` cites spot; flag if miner ticker lacks hashprice row.
+
+### 5F. Theme panel — `btc_network_economics`
+
+Add to `theme_panel_config.json` + `holdings_themes.json`:
+
+| Series | Source | good_for |
+|--------|--------|----------|
+| `btc_spot_usd` | Yahoo `BTC-USD` / CoinGecko | all BTC tickers |
+| `btc_hash_rate_eh` | mempool.space | miner + treasury context |
+| `btc_difficulty` | mempool.space | protocol cost path |
+| `btc_avg_fee_per_block_usd` | mempool.space (fees × spot) | miner revenue mix |
+| `btc_hashprice_usd_ph_day` | computed | miner breakeven |
+| `btc_breakeven_power_30jth` | computed | stress test |
+| `btc_subsidy_per_block_btc` | constant 3.125 post-Apr-2024 | halving awareness |
+| `btc_etf_netflow_7d_usd` | optional (CoinGlass / Farside — v2) | demand context |
+
+**Consumption:** `apply_btc_context_overlay.py` writes table to `evidence/crypto_context_{date}.md`; `refresh_deep_dive_v2.py` renders `#### Bitcoin economics — model coverage` when `btc_overlay` present (same pattern as thematic context block in thematic roadmap Phase 1C).
+
+### 5G. Deliverables and acceptance
+
+| Deliverable | Acceptance |
+|-------------|------------|
+| HK Compendium extract in-repo | `HK-Cryptocurrency-Compendium-extract.txt` exists; cited in MSTR dive |
+| `crypto/manifest.json` live | `btc_spot_usd`, `btc_hash_rate_eh`, `btc_hashprice_usd_ph_day` non-null, `as_of` ≤7 days |
+| MSTR `btc_overlay` seeded | `valuation.json` has overlay; `crypto_context_*.md` populated |
+| CMSG mining row | Hashprice + breakeven power in context table; narrative ties to fleet |
+| GLXY overlay | Platform framing (fees/vol); mining rows context-only |
+| Framework + trigger map | `crypto_economics_valuation.md` + `classification.md` row + optional `.mdc` rule |
+| Lint | No `btc_overlay` with `in_base_irr: true` without human edit |
+
+**PR:** `cursor/crypto-economics-framework-94a1` (depends on Phase 2 equity price for MSTR spot tie-out; can parallel Phase 1).
+
+---
+
 ## PR sequencing
 
 | Order | Branch | Scope |
@@ -195,8 +366,9 @@ python3 _system/scripts/batch_portfolio_refresh.py --date 2026-06-07
 | **2** | `cursor/equity-price-refresh-94a1` | Phase 2: `fetch_equity_prices.py` + refresh wire |
 | **3** | `cursor/market-freshness-lint-94a1` | Phase 3: lint + required theme fetch |
 | **4** | `cursor/portfolio-market-repair-94a1` | Phase 4: batch repair + MSTR/NVDA/etc IRR updates |
+| **5** | `cursor/crypto-economics-framework-94a1` | Phase 5: HK Compendium extract, `fetch_crypto_panel.py`, `btc_overlay`, mining economics |
 
-Phase 1 and 2 can ship in parallel; Phase 4 depends on both.
+Phase 1, 2, and 5 can start in parallel; Phase 4 depends on 1–2; Phase 5 proof dives (MSTR, CMSG) depend on 2 for live equity+BTC spot alignment.
 
 ---
 
@@ -211,6 +383,9 @@ Phase 1 and 2 can ship in parallel; Phase 4 depends on both.
 | IRR moved | MSTR `implied_return.base_pct` updated vs $390 placeholder |
 | Lint | `make research-check TICKER=MSTR` passes |
 | Guardrail | `context_overlay` rows remain `in_base_irr: false` |
+| BTC mining panel | `crypto/manifest.json` → hashprice + hash rate populated |
+| MSTR crypto section | `#### Bitcoin economics — model coverage` in deep dive |
+| HK Compendium | Extract on file; cited in crypto framework proposal |
 
 ---
 
@@ -223,6 +398,9 @@ Phase 1 and 2 can ship in parallel; Phase 4 depends on both.
 | OTC / thin names (AZLCZ, BWEL) | Stooq miss → keep last price + `[HUMAN REVIEW]`; do not overwrite with null |
 | IRR churn on price repair | Expected; document in PR; human confirms `live_price_confirmed` |
 | Duplicate work with thematic roadmap | This plan is the **incident fix**; roadmap Phase 2 macro_regime is the long-term superset |
+| Crypto API rate limits | Cache CSVs daily; `--offline` mode; single fetch per refresh batch |
+| Hashprice assumptions | Publish reference J/TH tiers; label `[Assumption]` when fleet efficiency unknown |
+| Mining metrics in base IRR | Forbidden without human promotion; Milly flags silent merge |
 
 ---
 
@@ -232,6 +410,9 @@ Phase 1 and 2 can ship in parallel; Phase 4 depends on both.
 2. **Price auto-overwrite:** Always refresh price on every `marvin_cloud_refresh`, or only when stale >7 days?
 3. **CI network:** Allow outbound FRED/Yahoo in `daily-sync.yml`, or snapshot-only policy?
 4. **Placeholder IRR:** Re-run full batch refresh immediately after Phase 2, or ticker-by-ticker human review?
+5. **Crypto data vendor:** mempool.space + CoinGecko free tier (recommended) vs Glassnode paid subscription?
+6. **HK Compendium:** Human to place PDF in `hk_pdfs` vault for `refresh_hk_extracts.py`, or manual extract upload?
+7. **Miner breakeven in overlay:** Show computed industry breakeven only, or require CMSG fleet kWh/TH from filings v2?
 
 ---
 
@@ -242,3 +423,6 @@ Phase 1 and 2 can ship in parallel; Phase 4 depends on both.
 - [ ] `marvin_cloud_refresh.py` documents and executes equity price fetch before valuation write
 - [ ] Lint fails on new placeholder prices; warns on >7-day price staleness
 - [ ] Misleading `fetch_market_inputs` copy removed from equity `price_source` fields
+- [ ] HK Cryptocurrency Compendium extracted and `crypto_economics_valuation.md` proposed
+- [ ] `fetch_crypto_panel.py` populates mining economics (hash rate, hashprice, breakeven power)
+- [ ] MSTR, GLXY, CMSG have `btc_overlay` + `crypto_context_*.md` with `in_base_irr: false`
