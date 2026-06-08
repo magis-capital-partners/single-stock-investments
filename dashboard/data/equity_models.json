@@ -1,14 +1,78 @@
 {
-  "built_at": "2026-06-08T02:47:48Z",
+  "built_at": "2026-06-08T04:48:57Z",
   "ticker_count": 1,
   "tickers": {
     "7176.T": {
       "model_ready": true,
       "diagnostics_ready": true,
       "production_spec": "v5",
+      "production": {
+        "spec": "v5",
+        "walk_forward_key": "model_v5",
+        "acceptance_rule": "Reject spec if perf_fee_h2_oos_rmse worsens vs prior",
+        "revenue_oos_rmse": 4778.7,
+        "revenue_oos_r2": -0.2286,
+        "perf_fee_h2_oos_rmse": 10184.1,
+        "perf_fee_h2_oos_r2": -13.887,
+        "v1_perf_fee_h2_oos_rmse": 10307.2,
+        "v2_revenue_oos_rmse": 3976.5,
+        "v2_perf_fee_h2_oos_rmse": 44743.9,
+        "oos_revenue": {
+          "rmse_jpym": 4778.7,
+          "mape_pct": 32.8,
+          "directional_hit": 0.67,
+          "n": 9
+        },
+        "forms": {
+          "base_fee": {
+            "form": "base_fee_half = base_rate/2 * avg_AUM",
+            "base_rate_ann_est_pct": 0.5558,
+            "observations": [
+              {
+                "period": "2024-09-30",
+                "base_rate_ann_pct": 0.5108
+              },
+              {
+                "period": "2025-03-31",
+                "base_rate_ann_pct": 0.5425
+              },
+              {
+                "period": "2025-09-30",
+                "base_rate_ann_pct": 0.5558
+              },
+              {
+                "period": "2026-03-31",
+                "base_rate_ann_pct": 0.614
+              }
+            ],
+            "note": "Effective base rate ~0.5-0.56%/yr, mild upward drift (mix shift to higher-fee active/ETF)."
+          },
+          "perf_fee": {
+            "form": "v3b march_excess + split base fee + AUM roll-forward",
+            "k_scale": 2.0026,
+            "use_march": true,
+            "split_base_rates": {
+              "rate_nonlisted_ann": 0.00325156219237229,
+              "rate_etf_ann": 0.013990174671542028
+            }
+          },
+          "split_base_rates": {
+            "rate_nonlisted_ann": 0.00325156219237229,
+            "rate_etf_ann": 0.013990174671542028
+          },
+          "earnings_bridge": {
+            "ord_intercept": 356.8129035390889,
+            "ord_slope_rev": 0.447349872452824,
+            "ord_slope_perf": 0.14492991574656344,
+            "tax_rate": 0.2642706176532137,
+            "bridge_type": "variable_comp"
+          }
+        }
+      },
       "primary_kpi": "perf_fee_h2_positive.out_of_sample.r2",
       "model_type": "earnings_semiannual",
       "as_of": "2026-06-04",
+      "headline": "v5 \u00b7 Nowcast H1 revenue \u00a55,997m \u00b7 perf H2 OOS \u00a510,184m \u00b7 revenue level trails seasonal naive",
       "company": "7176.T",
       "liquidity": {
         "tier": "illiquid_tpm",
@@ -95,6 +159,51 @@
           "note": "Effective base rate ~0.5-0.56%/yr, mild upward drift (mix shift to higher-fee active/ETF)."
         },
         "perf_fee": {
+          "form": "v3b march_excess + split base fee + AUM roll-forward",
+          "k_scale": 2.0026,
+          "use_march": true,
+          "split_base_rates": {
+            "rate_nonlisted_ann": 0.00325156219237229,
+            "rate_etf_ann": 0.013990174671542028
+          }
+        },
+        "split_base_rates": {
+          "rate_nonlisted_ann": 0.00325156219237229,
+          "rate_etf_ann": 0.013990174671542028
+        },
+        "earnings_bridge": {
+          "ord_intercept": 356.8129035390889,
+          "ord_slope_rev": 0.447349872452824,
+          "ord_slope_perf": 0.14492991574656344,
+          "tax_rate": 0.2642706176532137,
+          "bridge_type": "variable_comp"
+        }
+      },
+      "spec_v1": {
+        "base_fee": {
+          "form": "base_fee_half = base_rate/2 * avg_AUM",
+          "base_rate_ann_est_pct": 0.5558,
+          "observations": [
+            {
+              "period": "2024-09-30",
+              "base_rate_ann_pct": 0.5108
+            },
+            {
+              "period": "2025-03-31",
+              "base_rate_ann_pct": 0.5425
+            },
+            {
+              "period": "2025-09-30",
+              "base_rate_ann_pct": 0.5558
+            },
+            {
+              "period": "2026-03-31",
+              "base_rate_ann_pct": 0.614
+            }
+          ],
+          "note": "Effective base rate ~0.5-0.56%/yr, mild upward drift (mix shift to higher-fee active/ETF)."
+        },
+        "perf_fee": {
           "form": "perf_fee_half = k_half * avg_AUM * max(0, nikkei_ret - hurdle)",
           "k_H1": 0.00491,
           "k_H2": 0.06365,
@@ -139,6 +248,14 @@
         "mape_pct": 42.9,
         "directional_hit": 0.78,
         "n": 9
+      },
+      "oos_metrics_v5": {
+        "model_v5": {
+          "rmse_jpym": 4778.7,
+          "mape_pct": 32.8,
+          "directional_hit": 0.67,
+          "n": 9
+        }
       },
       "diagnostics": {
         "as_of": "2026-06-07",
@@ -1665,7 +1782,7 @@
         "Model edge is performance-fee seasonality and pre-report nowcast, not beating seasonal naive on RMSE."
       ],
       "caveats": [
-        "Out-of-sample RMSE is worse than same-half-last-year naive; use model for seasonality and scenarios, not level beats.",
+        "v5 revenue OOS RMSE is worse than same-half-last-year naive; use model for perf-fee seasonality and pre-report nowcast, not level beats.",
         "Perf fee crystallizes near fiscal year-end (Mar); H1 nowcast of perf is low-confidence.",
         "v2 uses fund-proxy excess when panel has it; live nowcast uses 0.65*Nikkei + 0.35*value.",
         "AUM uses filing non-listed + ETF sleeves, not summed product-market AUM.",
@@ -1687,10 +1804,12 @@
       "diagnostics_ready": true,
       "production_spec": "v5",
       "as_of": "2026-06-04",
-      "headline": "Nowcast H1 revenue \u00a55,997m; OOS RMSE loses to seasonal naive",
+      "headline": "v5 \u00b7 Nowcast H1 revenue \u00a55,997m \u00b7 perf H2 OOS \u00a510,184m \u00b7 revenue level trails seasonal naive",
       "model_beats_naive": false,
       "model_type": "earnings_semiannual",
-      "perf_fee_h2_oos_r2": -14.2489
+      "perf_fee_h2_oos_r2": -14.2489,
+      "perf_fee_h2_oos_rmse": 10184.1,
+      "revenue_oos_rmse": 4778.7
     }
   }
 }

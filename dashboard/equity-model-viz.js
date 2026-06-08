@@ -52,6 +52,55 @@
     return ch;
   }
 
+  function prod(bundle) {
+    return bundle.production || {};
+  }
+
+  function productionSpec(bundle) {
+    return prod(bundle).spec || bundle.production_spec || 'v1';
+  }
+
+  function walkForwardKey(bundle) {
+    return prod(bundle).walk_forward_key || 'model_v5';
+  }
+
+  function walkForwardPred(row, key) {
+    if (row[key] != null && !Number.isNaN(Number(row[key]))) return row[key];
+    return row.model;
+  }
+
+  function renderHowItWorks(bundle, escapeHtml) {
+    const p = prod(bundle);
+    const spec = productionSpec(bundle);
+    const revRmse = p.revenue_oos_rmse;
+    const perfRmse = p.perf_fee_h2_oos_rmse;
+    const v1Perf = p.v1_perf_fee_h2_oos_rmse;
+    const v2Rev = p.v2_revenue_oos_rmse;
+    const v2Perf = p.v2_perf_fee_h2_oos_rmse;
+    const nc = (bundle.nowcast || {}).nowcast_jpym || {};
+    return `
+    <details class="model-explainer" open>
+      <summary>How this model works <span class="spec-badge">${escapeHtml(spec)} production</span></summary>
+      <div class="model-explainer-body">
+        <p><strong>What we forecast.</strong> Semiannual revenue ≈ base fee + performance fee + ~¥200m other.
+        Japanese FY ends March; <strong>H2 revenue is often 2–3× H1</strong> when perf fees crystallize.</p>
+        <p><strong>How ${escapeHtml(spec)} works.</strong></p>
+        <ol class="model-explainer-steps">
+          <li><strong>Base fees</strong> — split effective rate on non-listed sleeve (~81%) vs listed ETF sleeve (~19%) from filings.</li>
+          <li><strong>Perf fees</strong> — sum fund-level crystallization (Value Up, Orka, PBR ETFs) from mandate NAV scrape; Jan–Mar window on H2.</li>
+          <li><strong>AUM path</strong> — roll forward with JITA-scaled industry flows and JPX ETF creation/redemption units.</li>
+          <li><strong>Live nowcast</strong> — mark filing AUM sleeves to Nikkei + ETF basket; apply fitted coefficients${nc.revenue ? ` (current H1 ≈ ${fmtYenM(nc.revenue)})` : ''}.</li>
+        </ol>
+        <p class="model-explainer-gate"><strong>Why ${escapeHtml(spec)} is production.</strong>
+          Gate = lowest <em>perf-fee H2</em> walk-forward RMSE that does not worsen vs v1.
+          ${perfRmse != null && v1Perf != null ? `${escapeHtml(spec)} perf H2 OOS ${fmtYenM(perfRmse)} vs v1 ${fmtYenM(v1Perf)}.` : ''}
+          ${v2Rev != null && revRmse != null ? ` v2 wins <em>revenue level</em> (${fmtYenM(v2Rev)} vs ${fmtYenM(revRmse)}) but fails perf gate${v2Perf != null ? ` (${fmtYenM(v2Perf)})` : ''}.` : ''}
+        </p>
+        <p class="model-explainer-note">Negative revenue R² is normal here — the edge is seasonal perf crystallization and pre-report nowcast, not beating same-half-last-year on total revenue every half.</p>
+      </div>
+    </details>`;
+  }
+
   function renderLiquidityBanner(liq, escapeHtml) {
     if (!liq || liq.tier === 'standard') return '';
     const lp = liq.last_print || {};
@@ -72,7 +121,7 @@
     const revOos = rev.out_of_sample || {};
     const gap = rev.overfit_gap;
     const gapAmber = gap != null && gap > 0.15;
-    const spec = bundle.production_spec || 'v1';
+    const spec = productionSpec(bundle);
     const naive = (rev.benchmarks_oos || {}).naive_lastyear || {};
     return `
     <div class="model-kpi-row pm-kpi-row">
@@ -83,10 +132,14 @@
     </div>`;
   }
 
-  function renderDiagnosticsBanner(escapeHtml) {
+  function renderDiagnosticsBanner(bundle, escapeHtml) {
+    const spec = productionSpec(bundle);
+    const p = prod(bundle);
     return `<div class="pm-diagnostics-banner">
-      <strong>PM diagnostics</strong> Lead with perf-fee H2 out-of-sample R², not in-sample total revenue.
-      Structural model explains seasonality; level forecast may trail same-half-last-year naive while revenue trends up.
+      <strong>${escapeHtml(spec)} is production</strong> — selected on perf-fee H2 OOS RMSE
+      ${p.perf_fee_h2_oos_rmse != null ? `(${fmtYenM(p.perf_fee_h2_oos_rmse)}` : ''}
+      ${p.v1_perf_fee_h2_oos_rmse != null ? ` vs v1 ${fmtYenM(p.v1_perf_fee_h2_oos_rmse)})` : p.perf_fee_h2_oos_rmse != null ? ')' : '.'}
+      Revenue level may still trail seasonal naive; PM scorecard uses structural v1 fit metrics for comparison.
     </div>`;
   }
 
@@ -126,13 +179,14 @@
     const lb = (spec && spec.leaderboard) || [];
     if (!lb.length) return '';
     return `<table class="darwin-table">
-      <thead><tr><th>Spec</th><th>Rev OOS RMSE</th><th>Rev OOS R²</th><th>Perf H2 RMSE</th><th>Default</th></tr></thead>
-      <tbody>${lb.map((r) => `<tr>
-        <td class="mono">${escapeHtml(r.spec)}</td>
+      <thead><tr><th>Spec</th><th>Rev OOS RMSE</th><th>Rev OOS R²</th><th>Perf H2 RMSE</th><th>Default</th><th>Note</th></tr></thead>
+      <tbody>${lb.map((r) => `<tr class="${r.production_default ? 'spec-row-active' : ''}">
+        <td class="mono">${escapeHtml(r.spec)}${r.production_default ? ' <span class="spec-badge">active</span>' : ''}</td>
         <td class="mono">${r.revenue_oos_rmse != null ? fmtYenM(r.revenue_oos_rmse) : '—'}</td>
         <td class="mono">${r.revenue_oos_r2 != null ? Number(r.revenue_oos_r2).toFixed(3) : '—'}</td>
         <td class="mono">${r.perf_fee_h2_oos_rmse != null ? fmtYenM(r.perf_fee_h2_oos_rmse) : '—'}</td>
         <td>${r.production_default ? '<span class="badge badge-ok">yes</span>' : '—'}</td>
+        <td style="font-size:11px;color:var(--text-secondary)">${escapeHtml(r.note || '')}</td>
       </tr>`).join('')}</tbody>
     </table>`;
   }
@@ -167,53 +221,74 @@
 
   function renderKpiRow(bundle, escapeHtml) {
     const nc = (bundle.nowcast || {}).nowcast_jpym || {};
-    const spec = bundle.spec || {};
-    const bf = spec.base_fee || {};
-    const pf = spec.perf_fee || {};
+    const specForms = bundle.spec || {};
+    const bf = specForms.base_fee || {};
+    const pf = specForms.perf_fee || {};
+    const split = pf.split_base_rates || {};
     const law = bundle.lawrence || {};
-    const oos = (bundle.oos_metrics || {}).model || {};
+    const p = prod(bundle);
+    const prodOos = p.oos_revenue || (bundle.oos_metrics_v5 || {}).model_v5 || {};
     const naive = (bundle.oos_metrics || {}).naive_lastyear || {};
-    const beats = naive.rmse_jpym != null && oos.rmse_jpym != null && oos.rmse_jpym < naive.rmse_jpym;
+    const revRmse = prodOos.rmse_jpym != null ? prodOos.rmse_jpym : p.revenue_oos_rmse;
+    const beatsRev = naive.rmse_jpym != null && revRmse != null && revRmse < naive.rmse_jpym;
+    const spec = productionSpec(bundle);
+    const baseRateLabel = split.rate_nonlisted_ann != null
+      ? `NL ${(split.rate_nonlisted_ann * 100).toFixed(2)}% · ETF ${(split.rate_etf_ann * 100).toFixed(2)}%`
+      : (bf.base_rate_ann_est_pct != null ? (bf.base_rate_ann_est_pct * 100).toFixed(2) + '%/yr' : '—');
 
     return `
     <div class="model-kpi-row">
-      <div class="summary-card"><div class="label">Nowcast revenue</div><div class="value" style="font-size:16px">${fmtYenM(nc.revenue)}</div><div class="sub">as of ${escapeHtml(bundle.as_of || '')}</div></div>
-      <div class="summary-card"><div class="label">Nowcast net income</div><div class="value" style="font-size:16px">${fmtYenM(nc.net_income)}</div><div class="sub">${escapeHtml((bundle.nowcast || {}).fiscal_half || '')} window</div></div>
-      <div class="summary-card"><div class="label">Base fee rate</div><div class="value" style="font-size:16px">${bf.base_rate_ann_est_pct != null ? (bf.base_rate_ann_est_pct * 100).toFixed(2) + '%/yr' : '—'}</div><div class="sub">effective on AUM</div></div>
+      <div class="summary-card"><div class="label">Nowcast revenue</div><div class="value" style="font-size:16px">${fmtYenM(nc.revenue)}</div><div class="sub">${escapeHtml(spec)} · ${escapeHtml((bundle.nowcast || {}).fiscal_half || '')}</div></div>
+      <div class="summary-card"><div class="label">Nowcast net income</div><div class="value" style="font-size:16px">${fmtYenM(nc.net_income)}</div><div class="sub">as of ${escapeHtml(bundle.as_of || bundle.nowcast?.asof || '')}</div></div>
+      <div class="summary-card"><div class="label">Base fee rate</div><div class="value" style="font-size:14px">${baseRateLabel}</div><div class="sub">${split.rate_nonlisted_ann != null ? 'split base (v5)' : 'effective on AUM'}</div></div>
       <div class="summary-card"><div class="label">Lawrence IRR</div><div class="value" style="font-size:16px;color:var(--accent-green)">${law.stance_gate_irr_pct != null ? law.stance_gate_irr_pct + '%/yr' : '—'}</div><div class="sub">stance gate · ${escapeHtml(law.stance || '')}</div></div>
-      <div class="summary-card"><div class="label">OOS RMSE</div><div class="value" style="font-size:16px;color:${beats ? 'var(--accent-green)' : 'var(--accent-amber)'}">${oos.rmse_jpym != null ? fmtYenM(oos.rmse_jpym) : '—'}</div><div class="sub">${beats ? 'beats naive' : 'loses to naive ' + (naive.rmse_jpym != null ? fmtYenM(naive.rmse_jpym) : '')}</div></div>
+      <div class="summary-card metric-gate"><div class="label">Perf H2 OOS RMSE</div><div class="value" style="font-size:16px;color:var(--accent-green)">${p.perf_fee_h2_oos_rmse != null ? fmtYenM(p.perf_fee_h2_oos_rmse) : '—'}</div><div class="sub">production gate · ${escapeHtml(spec)}${p.v1_perf_fee_h2_oos_rmse != null ? ' · v1 ' + fmtYenM(p.v1_perf_fee_h2_oos_rmse) : ''}</div></div>
+      <div class="summary-card"><div class="label">Revenue OOS RMSE</div><div class="value" style="font-size:16px;color:${beatsRev ? 'var(--accent-green)' : 'var(--accent-amber)'}">${revRmse != null ? fmtYenM(revRmse) : '—'}</div><div class="sub">${beatsRev ? 'beats naive' : 'loses to naive ' + (naive.rmse_jpym != null ? fmtYenM(naive.rmse_jpym) : '')} · ${escapeHtml(spec)}</div></div>
     </div>`;
   }
 
   function renderSpecTable(bundle, escapeHtml) {
-    const spec = bundle.spec || {};
-    const bf = spec.base_fee || {};
-    const pf = spec.perf_fee || {};
+    const specForms = bundle.spec || {};
+    const bf = specForms.base_fee || {};
+    const pf = specForms.perf_fee || {};
+    const split = pf.split_base_rates || {};
+    const spec = productionSpec(bundle);
+    const v1 = bundle.spec_v1 || {};
+    const v1pf = v1.perf_fee || {};
+    const splitRow = split.rate_nonlisted_ann != null ? `
+        <tr><td>Split base (v5)</td><td class="mono" style="font-size:11px">non-listed ${(split.rate_nonlisted_ann * 100).toFixed(3)}%/yr · ETF ${(split.rate_etf_ann * 100).toFixed(3)}%/yr</td></tr>` : '';
     return `
     <table class="darwin-table">
-      <thead><tr><th>Block</th><th>Form</th></tr></thead>
+      <thead><tr><th>Block</th><th>Form (${escapeHtml(spec)} production)</th></tr></thead>
       <tbody>
         <tr><td>Base fees</td><td class="mono" style="font-size:11px">${escapeHtml(bf.form || '')}</td></tr>
+        ${splitRow}
         <tr><td>Performance fees</td><td class="mono" style="font-size:11px">${escapeHtml(pf.form || '')}</td></tr>
-        <tr><td>k H1 / H2</td><td class="mono">${pf.k_H1 ?? '—'} / ${pf.k_H2 ?? '—'}</td></tr>
+        <tr><td>k scale / H1·H2</td><td class="mono">${pf.k_scale != null ? 'k_scale ' + pf.k_scale : (v1pf.k_H1 ?? '—') + ' / ' + (v1pf.k_H2 ?? '—')}</td></tr>
+        <tr><td>March window</td><td class="mono">${pf.use_march === true ? 'yes (H2 crystallization)' : pf.use_march === false ? 'no' : '—'}</td></tr>
       </tbody>
     </table>`;
   }
 
-  function renderWalkForwardTable(wf, escapeHtml) {
+  function renderWalkForwardTable(wf, bundle, escapeHtml) {
     if (!wf || !wf.length) return '';
+    const key = walkForwardKey(bundle);
+    const spec = productionSpec(bundle);
+    const label = spec.toUpperCase();
     return `
     <table class="darwin-table">
-      <thead><tr><th>Period</th><th>Actual</th><th>Model</th><th>Naive YoY</th><th>Model err</th></tr></thead>
+      <thead><tr><th>Period</th><th>Actual</th><th>${label}</th><th>Naive YoY</th><th>${label} err</th><th>v1 (legacy)</th></tr></thead>
       <tbody>
         ${wf.map((r) => {
-          const err = r.actual != null && r.model != null ? r.actual - r.model : null;
+          const pred = walkForwardPred(r, key);
+          const err = r.actual != null && pred != null ? r.actual - pred : null;
           return `<tr>
             <td class="mono">${escapeHtml(r.label)}</td>
             <td class="mono">${fmtYenM(r.actual)}</td>
-            <td class="mono">${fmtYenM(r.model)}</td>
+            <td class="mono">${fmtYenM(pred)}</td>
             <td class="mono">${fmtYenM(r.naive_lastyear)}</td>
             <td class="mono" style="color:${err > 0 ? 'var(--accent-amber)' : 'var(--text-secondary)'}">${err != null ? fmtYenM(err) : '—'}</td>
+            <td class="mono" style="color:var(--text-muted)">${fmtYenM(r.model)}</td>
           </tr>`;
         }).join('')}
       </tbody>
@@ -273,6 +348,8 @@
     }
 
     const wf = bundle.walk_forward || [];
+    const wfKey = walkForwardKey(bundle);
+    const wfSpec = productionSpec(bundle).toUpperCase();
     const wfCanvas = document.getElementById('model-chart-walkforward');
     if (wfCanvas && wf.length) {
       makeChart(wfCanvas, {
@@ -281,32 +358,35 @@
           labels: wf.map((w) => w.label),
           datasets: [
             { label: 'Actual', data: wf.map((w) => w.actual), borderColor: COLORS[2], tension: 0.2 },
-            { label: 'Model', data: wf.map((w) => w.model), borderColor: COLORS[0], tension: 0.2 },
+            { label: wfSpec, data: wf.map((w) => walkForwardPred(w, wfKey)), borderColor: COLORS[0], borderWidth: 2, tension: 0.2 },
             { label: 'Naive same-half YoY', data: wf.map((w) => w.naive_lastyear), borderColor: COLORS[4], borderDash: [4, 4], tension: 0.2 },
+            { label: 'v1 (legacy)', data: wf.map((w) => w.model), borderColor: COLORS[5], borderDash: [2, 2], tension: 0.2, hidden: true },
           ],
         },
-        options: { ...chartDefaults(), plugins: { ...chartDefaults().plugins, title: { display: true, text: 'Walk-forward revenue (¥m)', color: '#8896ae' } } },
+        options: { ...chartDefaults(), plugins: { ...chartDefaults().plugins, title: { display: true, text: `Walk-forward revenue · ${wfSpec} (¥m)`, color: '#8896ae' } } },
       });
     }
 
     const oos = bundle.oos_metrics || {};
+    const prodOos = prod(bundle).oos_revenue || (bundle.oos_metrics_v5 || {}).model_v5 || {};
     const oosCanvas = document.getElementById('model-chart-oos');
     if (oosCanvas) {
+      const specLabel = productionSpec(bundle).toUpperCase();
       const methods = [
-        { k: 'model', label: 'Structural model', color: COLORS[0] },
-        { k: 'naive_lastyear', label: 'Naive YoY', color: COLORS[4] },
-        { k: 'naive_randomwalk', label: 'Random walk', color: COLORS[5] },
-      ].filter((m) => oos[m.k]);
+        { rmse: prodOos.rmse_jpym, label: `${specLabel} revenue`, color: COLORS[0] },
+        { rmse: (oos.naive_lastyear || {}).rmse_jpym, label: 'Naive YoY', color: COLORS[4] },
+        { rmse: (oos.model || {}).rmse_jpym, label: 'v1 revenue', color: COLORS[5] },
+      ].filter((m) => m.rmse != null);
       makeChart(oosCanvas, {
         type: 'bar',
         data: {
           labels: methods.map((m) => m.label),
-          datasets: [{ label: 'RMSE (¥m)', data: methods.map((m) => oos[m.k].rmse_jpym), backgroundColor: methods.map((m) => m.color) }],
+          datasets: [{ label: 'Revenue OOS RMSE (¥m)', data: methods.map((m) => m.rmse), backgroundColor: methods.map((m) => m.color) }],
         },
         options: {
           indexAxis: 'y',
           ...chartDefaults(),
-          plugins: { ...chartDefaults().plugins, title: { display: true, text: 'Out-of-sample RMSE (lower is better)', color: '#8896ae' } },
+          plugins: { ...chartDefaults().plugins, title: { display: true, text: 'Revenue OOS RMSE · perf H2 gate in spec chart', color: '#8896ae' } },
         },
       });
     }
@@ -339,16 +419,20 @@
     const specCanvas = document.getElementById('model-chart-spec-leaderboard');
     if (specCanvas && (spec.leaderboard || []).length) {
       const lb = spec.leaderboard;
+      const prodColors = lb.map((r) => (r.production_default ? COLORS[0] : COLORS[4]));
       makeChart(specCanvas, {
         type: 'bar',
         data: {
           labels: lb.map((r) => r.spec),
-          datasets: [{ label: 'Revenue OOS RMSE (¥m)', data: lb.map((r) => r.revenue_oos_rmse), backgroundColor: COLORS[4] }],
+          datasets: [
+            { label: 'Revenue OOS RMSE (¥m)', data: lb.map((r) => r.revenue_oos_rmse), backgroundColor: prodColors },
+            { label: 'Perf H2 OOS RMSE (¥m)', data: lb.map((r) => r.perf_fee_h2_oos_rmse), backgroundColor: COLORS[2] },
+          ],
         },
         options: {
           indexAxis: 'y',
           ...chartDefaults(),
-          plugins: { ...chartDefaults().plugins, title: { display: true, text: 'Spec leaderboard (lower RMSE better)', color: '#8896ae' } },
+          plugins: { ...chartDefaults().plugins, title: { display: true, text: 'Spec leaderboard · production = min perf H2 RMSE ≤ v1', color: '#8896ae' } },
         },
       });
     }
@@ -367,7 +451,7 @@
         },
         options: {
           ...chartDefaults(),
-          plugins: { ...chartDefaults().plugins, title: { display: true, text: 'Actual vs fitted revenue (OOS)', color: '#8896ae' } },
+          plugins: { ...chartDefaults().plugins, title: { display: true, text: 'Actual vs fitted revenue (OOS · v1 structural)', color: '#8896ae' } },
           scales: {
             x: { ...chartDefaults().scales.x, title: { display: true, text: 'Actual ¥m', color: '#566580' } },
             y: { ...chartDefaults().scales.y, title: { display: true, text: 'Fitted ¥m', color: '#566580' } },
@@ -438,11 +522,13 @@
       ['Skeptical report', links.skeptical_report],
     ].filter(([, u]) => u);
 
+    const specLabel = productionSpec(bundle);
     return `
     <div class="detail-section model-section">
-      <h3>Earnings model <span class="badge badge-ok" style="margin-left:6px">live</span></h3>
+      <h3>Earnings model <span class="spec-badge">${escapeHtml(specLabel)}</span> <span class="badge badge-ok" style="margin-left:6px">live</span></h3>
       ${renderLiquidityBanner(bundle.liquidity, escapeHtml)}
-      <p class="subhead" style="margin-bottom:12px">Structural semiannual model · ${escapeHtml(bundle.as_of || '')}</p>
+      <p class="subhead" style="margin-bottom:8px">${escapeHtml(bundle.headline || `Structural semiannual model · ${bundle.as_of || ''}`)}</p>
+      ${renderHowItWorks(bundle, escapeHtml)}
       ${renderKpiRow(bundle, escapeHtml)}
       <div class="model-charts">
         <div class="chart-box"><canvas id="model-chart-revenue"></canvas></div>
@@ -451,8 +537,8 @@
         <div class="chart-box split"><canvas id="model-chart-shares"></canvas></div>
       </div>
       ${bundle.diagnostics_ready ? `
-      <h3 style="margin-top:18px">Model diagnostics <span class="spec-badge">${escapeHtml(bundle.production_spec || 'v1')}</span></h3>
-      ${renderDiagnosticsBanner(escapeHtml)}
+      <h3 style="margin-top:18px">Model diagnostics <span class="spec-badge">${escapeHtml(specLabel)}</span></h3>
+      ${renderDiagnosticsBanner(bundle, escapeHtml)}
       ${renderPmKpiRow(bundle, escapeHtml)}
       <div class="model-diagnostics-charts">
         <div class="chart-box wide"><canvas id="model-chart-r2-bars"></canvas></div>
@@ -473,7 +559,7 @@
       <h3 style="margin-top:14px">Model specification</h3>
       ${renderSpecTable(bundle, escapeHtml)}
       <h3 style="margin-top:14px">Walk-forward errors</h3>
-      ${renderWalkForwardTable(bundle.walk_forward, escapeHtml)}
+      ${renderWalkForwardTable(bundle.walk_forward, bundle, escapeHtml)}
       ${bundle.forecasts && bundle.forecasts.length ? `<h3 style="margin-top:14px">Scenarios</h3>${renderForecastsTable(bundle.forecasts, escapeHtml)}` : ''}
       ${(bundle.triangulation || []).length ? `
       <h3 style="margin-top:14px">Triangulation</h3>
