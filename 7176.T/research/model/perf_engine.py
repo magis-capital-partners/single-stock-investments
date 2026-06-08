@@ -42,10 +42,17 @@ def crystallization_applies(fund_id: str, half: str, terms: dict | None = None) 
 
 
 def _drive_excess(row: pd.Series, use_march: bool = False) -> float:
+    hwm_exc = row.get("hwm_excess")
+    if pd.notna(hwm_exc) and float(hwm_exc) > 0:
+        return float(hwm_exc)
     if use_march and pd.notna(row.get("march_excess")):
-        return max(0.0, float(row["march_excess"]))
+        me = float(row["march_excess"])
+        if me > 0:
+            return me
     if pd.notna(row.get("excess_vs_hurdle")):
-        return max(0.0, float(row["excess_vs_hurdle"]))
+        eh = max(0.0, float(row["excess_vs_hurdle"]))
+        if eh > 0:
+            return eh
     ret = float(row.get("period_return") or 0)
     bm = float(row.get("benchmark_return") or 0)
     return max(0.0, ret - bm)

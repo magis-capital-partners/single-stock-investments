@@ -107,23 +107,62 @@ def download_pdf(sess: requests.Session, url: str, dest: Path) -> bool:
         return False
 
 
+def pdf_exists(sess: requests.Session, url: str) -> bool:
+    try:
+        r = sess.head(url, timeout=20, allow_redirects=True)
+        if r.status_code != 200:
+            return False
+        ctype = (r.headers.get("content-type") or "").lower()
+        return "pdf" in ctype or url.lower().endswith(".pdf")
+    except requests.RequestException:
+        return False
+
+
+def archive_pdf_filenames(prefix: str, archive_suffixes: list[str]) -> list[str]:
+    """Candidate SAM monthly report filenames (newest periods first)."""
+    names: list[str] = []
+    for y in range(2026, 2022, -1):
+        for m in range(12, 0, -1):
+            if y == 2026 and m > 3:
+                continue
+            if y == 2023 and m < 4:
+                continue
+            ym = f"{y}{m:02d}"
+            names.extend([
+                f"{prefix}_{ym}Monthlyrpt.pdf",
+                f"{prefix}{ym}Monthlyrpt.pdf",
+                f"{prefix}_{y % 100:02d}{m:02d}Monthlyrpt.pdf",
+            ])
+    for suf in [""] + list(archive_suffixes):
+        names.append(f"{prefix}{suf}Monthlyrpt.pdf")
+    seen: set[str] = set()
+    out: list[str] = []
+    for n in names:
+        if n not in seen:
+            seen.add(n)
+            out.append(n)
+    return out
+
+
 def extract_pdf_text(path: Path) -> str:
     import pypdf
 
     return "\n".join(p.extract_text() or "" for p in pypdf.PdfReader(str(path)).pages)
 
 
-def scrape_sam_funds(sess: requests.Session, catalog: dict) -> list[dict]:
+def scrape_sam_funds(sess: requests.Session, catalog: dict) -> tuple[list[dict], list[dict]]:
     rows: list[dict] = []
     base = catalog["docs_base"]
     manifest_pdfs: list[dict] = []
 
     for fund in catalog["sam_funds"]:
         prefix = fund["docs_prefix"]
-        suffixes = [""] + fund.get("archive_suffixes", [])
-        for suf in suffixes:
-            fname = f"{prefix}{suf}Monthlyrpt.pdf"
+        fnames = archive_pdf_filenames(prefix, fund.get("archive_suffixes", []))
+        for fname in fnames:
             url = f"{base}/{fname}"
+            if not pdf_exists(sess, url):
+                manifest_pdfs.append({"fund_id": fund["id"], "url": url, "saved": False, "probed": True})
+                continue
             dest = PDF_DIR / fund["id"] / fname
             ok = download_pdf(sess, url, dest)
             manifest_pdfs.append({"fund_id": fund["id"], "url": url, "saved": ok, "path": str(dest)})
@@ -141,9 +180,19 @@ def scrape_sam_funds(sess: requests.Session, catalog: dict) -> list[dict]:
                 "tag": fund.get("tag", "[Filing/Market]"),
             })
             rows.append(parsed)
-            time.sleep(0.3)
+            time.sleep(0.15)
 
-    return rows, manifest_pdfs
+    # Dedupe: prefer rows with HWM, then latest as_of per fund
+    deduped: dict[tuple[str, str], dict] = {}
+    for row in rows:
+        key = (row["fund_id"], row["as_of"])
+        prev = deduped.get(key)
+        if prev is None:
+            deduped[key] = row
+            continue
+        if row.get("high_water_mark_jpy") and not prev.get("high_water_mark_jpy"):
+            deduped[key] = row
+    return list(deduped.values()), manifest_pdfs
 
 
 def etf_monthly_history(ticker: str, start: str = "2015-01-01") -> pd.DataFrame:
@@ -310,6 +359,11 @@ def extend_sam_with_etf_proxy(monthly: pd.DataFrame, catalog: dict) -> pd.DataFr
 
 
 def main() -> None:
+    import sys
+
+    sys.path.insert(0, str(MODEL))
+    from hwm_engine import enrich_etf_monthly_hwm
+
     DATA.mkdir(parents=True, exist_ok=True)
     catalog = json.loads(CATALOG.read_text(encoding="utf-8"))
     sess = _session()
@@ -317,6 +371,7 @@ def main() -> None:
     sam_rows, pdf_manifest = scrape_sam_funds(sess, catalog)
     touki_rows = import_touki_nav(catalog)
     monthly = build_monthly_table(catalog, sam_rows + touki_rows)
+    monthly = enrich_etf_monthly_hwm(monthly)
     monthly = extend_sam_with_etf_proxy(monthly, catalog)
 
     monthly_out = monthly.copy()

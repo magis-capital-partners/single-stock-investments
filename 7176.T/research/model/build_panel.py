@@ -53,17 +53,8 @@ H1 = [
     (2026, 5_577_537, 3_974_829, 2_861_532, 3_711_000, 1_713_000, 58),
 ]
 
-# AUM by period end (JPY 100m units, 億円) [Filing]
-# total, of which non-listed funds, listed ETF (where disclosed)
-AUM = {
-    # period_end_date : (total_oku, nonlisted_oku, etf_oku)
-    "2023-03-31": (12_759, 10_723, 2_037),
-    "2024-03-31": (13_080, 10_478, 2_601),
-    "2024-09-30": (12_495, 10_170, 2_325),
-    "2025-03-31": (12_973, 10_493, 2_479),
-    "2025-09-30": (13_733, None, 2_721),
-    "2026-03-31": (13_357, None, None),
-}
+# AUM by period end — canonical dict lives in aum_sleeves.py (shared with acquire_data)
+from aum_sleeves import AUM_BY_PERIOD as AUM  # noqa: E402
 
 # Share count (issued, as filed) and split-adjusted to Nov-2025 units [Filing/Derived]
 # Used for EPS; split-adjusted series lives in research/shares_outstanding_split_adjusted.json
@@ -112,19 +103,27 @@ def build_financials() -> pd.DataFrame:
 
 
 def attach_aum(df: pd.DataFrame) -> pd.DataFrame:
-    aum_tot, aum_nl, aum_etf = [], [], []
+    from aum_sleeves import resolve_aum_jpym
+
+    aum_tot, aum_nl, aum_etf, aum_tags = [], [], [], []
     for pe in df["period_end"]:
         key = pe.strftime("%Y-%m-%d")
         t = AUM.get(key)
         if t:
-            aum_tot.append(t[0] * 100.0)  # 億円 -> 百万円 (×100 = million yen)
-            aum_nl.append(t[1] * 100.0 if t[1] is not None else np.nan)
-            aum_etf.append(t[2] * 100.0 if t[2] is not None else np.nan)
+            tot, nl, etf, tag = resolve_aum_jpym(key, t[0], t[1], t[2])
+            aum_tot.append(tot)
+            aum_nl.append(nl)
+            aum_etf.append(etf)
+            aum_tags.append(tag)
         else:
-            aum_tot.append(np.nan); aum_nl.append(np.nan); aum_etf.append(np.nan)
+            aum_tot.append(np.nan)
+            aum_nl.append(np.nan)
+            aum_etf.append(np.nan)
+            aum_tags.append("")
     df["aum_end_jpym"] = aum_tot
     df["aum_nonlisted_jpym"] = aum_nl
     df["aum_etf_jpym"] = aum_etf
+    df["aum_sleeve_tag"] = aum_tags
     # average AUM over the half = mean(prior end, this end)
     df = df.sort_values("period_end").reset_index(drop=True)
     df["aum_avg_jpym"] = (df["aum_end_jpym"] + df["aum_end_jpym"].shift(1)) / 2.0
@@ -246,6 +245,18 @@ def run_acquire() -> None:
 
 
 def main() -> None:
+    from parse_aum_filings import apply_to_aum_sleeves, scan_evidence
+
+    try:
+        filing_df = scan_evidence()
+        if not filing_df.empty:
+            OUT = Path(__file__).resolve().parent / "data" / "aum_filings_parsed.csv"
+            OUT.parent.mkdir(parents=True, exist_ok=True)
+            filing_df.to_csv(OUT, index=False)
+            apply_to_aum_sleeves(filing_df)
+    except Exception as exc:
+        print(f"[warn] AUM filing parse skipped: {exc}")
+
     run_acquire()
     fin = build_financials()
     fin = attach_aum(fin)

@@ -441,8 +441,11 @@ def aggregate_flows_halfyear(flows_monthly: pd.DataFrame, panel: pd.DataFrame) -
 # ---------------------------------------------------------------------------
 
 def build_aum_pools_halfyear(registry: dict, panel: pd.DataFrame) -> pd.DataFrame:
+    from aum_sleeves import fill_panel_aum_row
+
     rows = []
     for _, r in panel.iterrows():
+        r = fill_panel_aum_row(r)
         aum = r.get("aum_end_jpym", np.nan)
         aum_nl = r.get("aum_nonlisted_jpym", np.nan)
         aum_etf = r.get("aum_etf_jpym", np.nan)
@@ -762,6 +765,22 @@ def _build_nonlisted_mandate_slices(
             period_ret = bm_ret
             source = "benchmark_proxy"
         excess = max(0.0, period_ret - bm_ret - hurdle)
+        if half == "H2" and excess <= 0:
+            if bm in ("value_pbr", "value"):
+                mb = row.get("march_value_ret")
+            elif fund.get("id") == "mandate_japan_equity":
+                mb = (
+                    row.get("march_value_ret")
+                    or row.get("march_blended_ret")
+                    or row.get("march_nikkei_ret")
+                )
+            else:
+                mb = row.get("march_nikkei_ret") or row.get("march_blended_ret")
+            if pd.isna(mb):
+                mb = row.get("march_blended_ret")
+            if pd.notna(mb):
+                excess = max(0.0, float(mb) - hurdle)
+                source = "march_window_proxy"
         slices.append({
             "period_end": pe_str,
             "half": half,
@@ -778,6 +797,25 @@ def _build_nonlisted_mandate_slices(
     return slices
 
 
+def _load_etf_aum_daily() -> pd.DataFrame:
+    path = DATA / "etf_aum_daily.csv"
+    if not path.exists():
+        return pd.DataFrame()
+    df = pd.read_csv(path, parse_dates=["date"])
+    return df
+
+
+def _perf_etf_aum_at(period_end: pd.Timestamp, ticker: str, aum_daily: pd.DataFrame) -> float:
+    """Listed ETF AUM (¥m) at or before period_end from P5 daily series."""
+    if aum_daily.empty or "ticker" not in aum_daily.columns:
+        return np.nan
+    sub = aum_daily[(aum_daily["ticker"] == ticker) & (aum_daily["date"] <= period_end)]
+    if sub.empty:
+        return np.nan
+    val = sub.sort_values("date").iloc[-1].get("aum_jpym")
+    return float(val) if pd.notna(val) else np.nan
+
+
 def build_mandate_nav(registry: dict, panel: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     """P4 — Pool scraped mandate returns; impute institutional residual from value proxy."""
     monthly_path = DATA / "mandate_nav_monthly.csv"
@@ -788,9 +826,13 @@ def build_mandate_nav(registry: dict, panel: pd.DataFrame) -> tuple[pd.DataFrame
 
     catalog = json.loads(MANDATE_CATALOG.read_text(encoding="utf-8")) if MANDATE_CATALOG.exists() else {}
     monthly = pd.read_csv(monthly_path, parse_dates=["as_of"])
+    etf_aum_daily = _load_etf_aum_daily()
     detail_rows: list[dict] = []
     agg_rows: list[dict] = []
+    from aum_sleeves import fill_panel_aum_row
+
     panel_sorted = panel.sort_values("period_end").reset_index(drop=True)
+    panel_sorted = pd.DataFrame([fill_panel_aum_row(r) for _, r in panel_sorted.iterrows()])
 
     etf_weights = {e["id"]: e["weight"] for e in catalog.get("perf_etfs", [])}
     latest_public_aum = (
@@ -813,10 +855,17 @@ def build_mandate_nav(registry: dict, panel: pd.DataFrame) -> tuple[pd.DataFrame
             excess = max(0.0, ret - bm_ret - hurdle)
             aum = monthly.loc[monthly["fund_id"] == fund["id"], "aum_jpym"].dropna()
             aum_jpym = float(aum.iloc[-1]) if len(aum) else np.nan
+            from hwm_engine import hwm_excess_return, nav_hwm_at
+
+            nav_end, hwm_end = nav_hwm_at(fund["id"], pe, monthly)
+            hwm_exc = hwm_excess_return(nav_end, hwm_end, hurdle) if half == "H2" else 0.0
+            if hwm_exc > excess:
+                excess = hwm_exc
             mandate_slices.append({
                 "period_end": pe_str, "half": half, "mandate_id": fund["mandate_id"],
                 "fund_id": fund["id"], "period_return": ret, "benchmark_return": bm_ret,
                 "excess_vs_hurdle": excess, "aum_jpym": aum_jpym,
+                "nav_jpy_end": nav_end, "high_water_mark_jpy": hwm_end, "hwm_excess": hwm_exc,
                 "perf_rate": fund.get("perf_rate"), "tag": fund.get("tag", "[Filing/Market]"),
                 "source": "simplex_monthly_pdf",
             })
@@ -827,13 +876,23 @@ def build_mandate_nav(registry: dict, panel: pd.DataFrame) -> tuple[pd.DataFrame
                 continue
             bm_ret = _benchmark_ret(r, etf.get("benchmark", "value_pbr"))
             excess = max(0.0, ret - bm_ret)
-            etf_aum = r.get("aum_etf_jpym", np.nan)
-            w = etf_weights.get(etf["id"], 1.0 / max(len(catalog.get("perf_etfs", [])), 1))
-            aum_jpym = float(etf_aum) * w if pd.notna(etf_aum) else np.nan
+            ticker = etf.get("ticker", "")
+            aum_jpym = _perf_etf_aum_at(pe, ticker, etf_aum_daily)
+            if pd.isna(aum_jpym):
+                etf_aum = r.get("aum_etf_jpym", np.nan)
+                w = etf_weights.get(etf["id"], 1.0 / max(len(catalog.get("perf_etfs", [])), 1))
+                aum_jpym = float(etf_aum) * w if pd.notna(etf_aum) else np.nan
+            from hwm_engine import hwm_excess_return, nav_hwm_at
+
+            nav_end, hwm_end = nav_hwm_at(etf["id"], pe, monthly)
+            hwm_exc = hwm_excess_return(nav_end, hwm_end, 0.0) if half == "H2" else 0.0
+            if hwm_exc > excess:
+                excess = hwm_exc
             mandate_slices.append({
                 "period_end": pe_str, "half": half, "mandate_id": etf["mandate_id"],
                 "fund_id": etf["id"], "period_return": ret, "benchmark_return": bm_ret,
                 "excess_vs_hurdle": excess, "aum_jpym": aum_jpym,
+                "nav_jpy_end": nav_end, "high_water_mark_jpy": hwm_end, "hwm_excess": hwm_exc,
                 "perf_rate": etf.get("perf_rate"), "tag": "[Market]",
                 "source": "yfinance_etf",
             })
@@ -960,8 +1019,8 @@ def enrich_mandate_detail_march(
         march_ret = mrow.get(col, mrow.get("march_nikkei_ret", np.nan))
         if pd.isna(march_ret):
             continue
-        bm = float(row.get("benchmark_return") or 0)
-        d.at[i, "march_excess"] = max(0.0, float(march_ret) - bm)
+        hurdle = 0.0
+        d.at[i, "march_excess"] = max(0.0, float(march_ret) - hurdle)
     return d
 
 
@@ -1184,6 +1243,16 @@ def capiq_template() -> pd.DataFrame:
 
 def main() -> None:
     DATA.mkdir(parents=True, exist_ok=True)
+    try:
+        from parse_aum_filings import apply_to_aum_sleeves, scan_evidence
+
+        filing_df = scan_evidence()
+        if not filing_df.empty:
+            filing_df.to_csv(DATA / "aum_filings_parsed.csv", index=False)
+            apply_to_aum_sleeves(filing_df)
+    except Exception as exc:
+        print(f"[warn] parse_aum_filings: {exc}")
+
     registry = load_registry()
     manifest = {"built_at": datetime.now(timezone.utc).isoformat(), "steps": {}}
 
