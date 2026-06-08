@@ -59,12 +59,22 @@ TICKER_META = {
 }
 
 
+SKIP_TICKER_DIRS = {"_system", "dashboard", ".git", ".github", ".cursor", "_external"}
+
+
 def list_tickers() -> list[str]:
-    skip = {"_system", "dashboard", ".git", ".github", ".cursor"}
+    """Registry holdings are source of truth; folder scan is fallback only."""
+    reg = load_registry()
+    holdings = reg.get("holdings") or {}
+    if holdings:
+        return sorted(holdings.keys())
     tickers = []
     for p in ROOT.iterdir():
-        if p.is_dir() and p.name not in skip and not p.name.startswith("."):
-            tickers.append(p.name)
+        if not p.is_dir():
+            continue
+        if p.name in SKIP_TICKER_DIRS or p.name.startswith(("_", ".")):
+            continue
+        tickers.append(p.name)
     return sorted(tickers)
 
 
@@ -361,6 +371,24 @@ def one_line_thesis(ticker_dir: Path) -> str | None:
     return re.sub(r"\*\*", "", m.group(1).strip())
 
 
+STALE_THESIS_PHRASE = "pending marvin deep dive"
+EXEC_SUMMARY_RE = re.compile(
+    r"## Executive summary\s*\n+(?!\s*##)(.+?)(?:\n\n---|\n\n## )",
+    re.DOTALL | re.IGNORECASE,
+)
+
+
+def display_one_line_thesis(ticker_dir: Path, deep_dive: dict | None) -> str | None:
+    thesis = one_line_thesis(ticker_dir)
+    if thesis and STALE_THESIS_PHRASE not in thesis.lower():
+        return thesis
+    summary = (deep_dive or {}).get("executive_summary")
+    if summary:
+        first = re.match(r"([^.!?]+[.!?])", summary.strip())
+        return first.group(1).strip() if first else summary[:200]
+    return thesis
+
+
 def _research_links(ticker: str, ticker_dir: Path) -> dict:
     research = ticker_dir / "research"
     links = {
@@ -395,10 +423,9 @@ def latest_deep_dive(ticker_dir: Path, classification: dict) -> dict | None:
     dive_date = date_m.group(1) if date_m else None
 
     summary = None
-    sm = re.search(r"## Executive summary\s*\n\s*\n(.+?)(?:\n\n---|\n\n## )", text, re.DOTALL)
+    sm = EXEC_SUMMARY_RE.search(text)
     if sm:
-        summary = sm.group(1).strip()
-        summary = re.sub(r"\*\*", "", summary)
+        summary = re.sub(r"\*\*", "", sm.group(1).strip())
         if len(summary) > 600:
             summary = summary[:597] + "..."
 
@@ -580,6 +607,7 @@ def build_ticker_row(ticker: str, holdings: dict[str, dict], portfolio_class: di
     dl_script, dl_path = has_download_script(ticker_dir)
     classification = classification_for(ticker, ticker_dir, portfolio_class)
     pdf_count = count_pdfs(ticker_dir)
+    deep_dive = latest_deep_dive(ticker_dir, classification)
     row = {
         "ticker": ticker,
         "company": meta.get("company", ticker),
@@ -597,9 +625,9 @@ def build_ticker_row(ticker: str, holdings: dict[str, dict], portfolio_class: di
         "last_research": last_research(ticker_dir),
         "classification": classification,
         "thesis_status": classification["archetype"],
-        "one_line_thesis": one_line_thesis(ticker_dir),
+        "one_line_thesis": display_one_line_thesis(ticker_dir, deep_dive),
         "links": _research_links(ticker, ticker_dir),
-        "deep_dive": latest_deep_dive(ticker_dir, classification),
+        "deep_dive": deep_dive,
         "human_review": valuation_human_review(ticker_dir),
         "recent_files": recent_files(ticker_dir),
         "developments": recent_developments(ticker_dir, ticker),

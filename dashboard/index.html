@@ -197,6 +197,8 @@
     text-decoration: none; font-family: 'JetBrains Mono', monospace;
   }
   .research-link:hover { text-decoration: underline; }
+  .deep-dive-cell { font-size: 11px; white-space: nowrap; }
+  .deep-dive-cell a { font-family: 'JetBrains Mono', monospace; }
 
   .human-review-banner {
     background: rgba(234, 179, 8, 0.12); border: 1px solid rgba(234, 179, 8, 0.45);
@@ -395,6 +397,7 @@
             <th data-sort="classification.archetype">Archetype</th>
             <th data-sort="classification.analysis_irr_pct">Blended IRR</th>
             <th data-sort="classification.stance">Stance</th>
+            <th data-sort="deep_dive.date">Deep dive</th>
           </tr>
         </thead>
         <tbody id="tbody"></tbody>
@@ -539,6 +542,20 @@ function linkHtml(url, label, className = '') {
 
 function escapeHtml(s) {
   return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+}
+
+function renderDeepDiveCell(t) {
+  if (!t.deep_dive?.github_url) {
+    return '<span class="mono deep-dive-cell" style="color:var(--text-muted)">—</span>';
+  }
+  const label = t.deep_dive.date || 'View';
+  return `<a class="research-link deep-dive-cell" href="${t.deep_dive.github_url}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${label} →</a>`;
+}
+
+function detailDevelopments(t) {
+  const devs = t.developments || [];
+  if (!t.deep_dive) return devs;
+  return devs.filter(d => d.type !== 'deep_dive');
 }
 
 function parseIrrPct(implied) {
@@ -873,6 +890,9 @@ function filtered() {
       bv = b.classification?.analysis_irr_pct ?? parseIrrPct(b.classification?.implied_irr);
       av = av == null ? -Infinity : av;
       bv = bv == null ? -Infinity : bv;
+    } else if (sortKey === 'deep_dive.date') {
+      av = a.deep_dive?.date || '';
+      bv = b.deep_dive?.date || '';
     } else {
       if (typeof av === 'string') av = av.toLowerCase();
       if (typeof bv === 'string') bv = bv.toLowerCase();
@@ -903,6 +923,7 @@ function renderTable() {
       <td><span class="badge ${ARCHETYPE_BADGE[t.classification?.archetype] || 'badge-warn'}">${t.classification?.archetype || '—'}</span></td>
       <td>${renderIrrCell(t)}</td>
       <td><span class="badge ${STANCE_BADGE[t.classification?.stance] || 'badge-warn'}">${t.classification?.stance || '—'}</span></td>
+      <td>${renderDeepDiveCell(t)}</td>
     </tr>`).join('');
   tbody.querySelectorAll('tr').forEach(tr => {
     tr.addEventListener('click', () => selectTicker(tr.dataset.ticker));
@@ -925,6 +946,7 @@ function selectTicker(ticker) {
   const modelHtml = (typeof EquityModelViz !== 'undefined' && hasModel)
     ? EquityModelViz.renderSection(modelBundle, { escapeHtml, linkHtml })
     : '';
+  const developments = detailDevelopments(t);
   document.getElementById('detail').innerHTML = `
     <h2>${t.ticker}</h2>
     <div class="subhead">${escapeHtml(t.company)} · ${escapeHtml(t.exchange)} · ${linkHtml(t.links?.folder, t.folder)}</div>
@@ -968,15 +990,16 @@ function selectTicker(ticker) {
     <div class="detail-section">
       <h3>Marvin deep dive · ${t.deep_dive.date || ''}</h3>
       <div class="research-box">
-        ${t.one_line_thesis ? `<div class="thesis-line">${t.one_line_thesis}</div>` : ''}
-        ${t.deep_dive.executive_summary ? `<div class="summary">${t.deep_dive.executive_summary}</div>` : ''}
+        ${t.one_line_thesis ? `<div class="thesis-line">${escapeHtml(stripMd(t.one_line_thesis))}</div>` : ''}
+        ${t.deep_dive.executive_summary
+          ? `<div class="summary">${escapeHtml(stripMd(t.deep_dive.executive_summary))}</div>`
+          : `<div class="summary" style="color:var(--text-muted)">Open the full report for the executive summary.</div>`}
         <span class="badge ${STANCE_BADGE[t.deep_dive.stance] || 'badge-warn'}">${t.deep_dive.stance || t.classification?.stance || '—'}</span>
         <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:12px">
           <a class="research-link" href="${t.deep_dive.github_url}" target="_blank" rel="noopener">Latest deep dive →</a>
           ${t.links?.adversarial ? `<a class="research-link" href="${t.links.adversarial}" target="_blank" rel="noopener">Milly adversarial →</a>` : ''}
           ${t.links?.valuation ? `<a class="research-link" href="${t.links.valuation}" target="_blank" rel="noopener">valuation.json →</a>` : ''}
           ${t.links?.thesis ? `<a class="research-link" href="${t.links.thesis}" target="_blank" rel="noopener">Thesis →</a>` : ''}
-          ${t.links?.readme ? `<a class="research-link" href="${t.links.readme}" target="_blank" rel="noopener">README →</a>` : ''}
         </div>
       </div>
     </div>` : ''}
@@ -984,7 +1007,7 @@ function selectTicker(ticker) {
     <div class="detail-section">
       <h3>Recent developments</h3>
       <ul class="dev-list">
-        ${(t.developments.length ? t.developments : [{ date: '—', label: 'No developments tracked yet', source: '' }]).map(d => `
+        ${(developments.length ? developments : [{ date: '—', label: 'No developments tracked yet', source: '' }]).map(d => `
           <li>
             <div class="dev-date">${d.date || ''} · ${d.type || ''}</div>
             <div class="dev-label">${d.url ? linkHtml(d.url, d.label) : escapeHtml(d.label)}</div>
@@ -993,17 +1016,17 @@ function selectTicker(ticker) {
       </ul>
     </div>
 
-    <div class="detail-section">
-      <h3>Recent files</h3>
+    ${t.recent_files.length ? `
+    <details class="detail-section">
+      <summary style="cursor:pointer;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);margin-bottom:8px">Recent files (${t.recent_files.length})</summary>
       <ul class="dev-list">
-        ${(t.recent_files.length ? t.recent_files : [{ date: '—', name: 'No files indexed', path: '' }]).map(f => `
+        ${t.recent_files.map(f => `
           <li>
             <div class="dev-date">${f.date}</div>
             <div class="dev-label">${f.github_url ? linkHtml(f.github_url, f.name, 'mono') : `<span class="mono">${escapeHtml(f.name)}</span>`}</div>
-            <div class="dev-date file-link">${f.github_url ? linkHtml(f.github_url, f.path || '') : escapeHtml(f.path || '')}</div>
           </li>`).join('')}
       </ul>
-    </div>`;
+    </details>` : ''}`;
   if (hasModel && typeof EquityModelViz !== 'undefined') {
     EquityModelViz.afterRender(modelBundle);
   }
