@@ -1,6 +1,6 @@
 # WPM — Pending third-party sources
 
-**Updated:** 2026-06-07
+**Updated:** 2026-06-08
 
 Approve in `_system/frameworks/third_party_sources.md` before using in base IRR.
 

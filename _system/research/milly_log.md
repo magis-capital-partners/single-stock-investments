@@ -105,3 +105,4 @@ One row per adversarial or consistency re-pass. Append via `milly_repass.py` or 
 | 2026-06-07 | AMD | standard_batch | OK | manual |
 | 2026-06-07 | SMR | standard_batch | OK | marvin_cloud_refresh |
 | 2026-06-07 | SMR | standard_batch | OK | marvin_cloud_refresh |
+| 2026-06-08 | WPM | standard_batch | OK | marvin_cloud_refresh |
