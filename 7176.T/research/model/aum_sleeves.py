@@ -18,26 +18,28 @@ AUM_BY_PERIOD: dict[str, tuple[float, float | None, float | None]] = {
     # Provisional until FY2026 有報: scale Sep-2025 ETF share to Mar-2026 total
     "2026-03-31": (13_357, 10_711, 2_646),
 }
-AUM_PROVISIONAL_PERIODS = frozenset({"2026-03-31"})
+AUM_PROVISIONAL_PERIODS: set[str] = {"2026-03-31"}
 
 # Business-line AUM (億円) from filings — populated by parse_aum_filings.py
 AUM_BUSINESS_LINES: dict[str, dict[str, float]] = {}
 
 
 def refresh_from_dataframe(df: pd.DataFrame) -> dict:
-    """Merge filing-parsed sleeves into AUM_BY_PERIOD; skip provisional periods."""
-    global AUM_BUSINESS_LINES
+    """Merge filing-parsed sleeves into AUM_BY_PERIOD; filings override provisional."""
+    global AUM_BUSINESS_LINES, AUM_PROVISIONAL_PERIODS
     updated = []
+    cleared_provisional: list[str] = []
     for _, r in df.iterrows():
         pe = str(r["period_end"])[:10]
-        if pe in AUM_PROVISIONAL_PERIODS:
-            continue
         total = float(r["aum_total_oku"])
         nl = r.get("aum_nonlisted_oku")
         etf = r.get("aum_etf_oku")
         nl_f = float(nl) if pd.notna(nl) else None
         etf_f = float(etf) if pd.notna(etf) else None
         AUM_BY_PERIOD[pe] = (total, nl_f, etf_f)
+        if pe in AUM_PROVISIONAL_PERIODS:
+            AUM_PROVISIONAL_PERIODS.discard(pe)
+            cleared_provisional.append(pe)
         bl = {}
         for col, key in [
             ("aum_equity_oku", "equity"),
@@ -50,7 +52,11 @@ def refresh_from_dataframe(df: pd.DataFrame) -> dict:
         if bl:
             AUM_BUSINESS_LINES[pe] = bl
         updated.append(pe)
-    return {"updated_periods": updated, "n": len(updated)}
+    return {
+        "updated_periods": updated,
+        "n": len(updated),
+        "cleared_provisional": cleared_provisional,
+    }
 
 
 def resolve_aum_oku(

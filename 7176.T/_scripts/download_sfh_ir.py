@@ -29,7 +29,10 @@ def log(msg: str) -> None:
     line = f"{ts} {msg}\n"
     with LOG.open("a", encoding="utf-8") as f:
         f.write(line)
-    print(line.rstrip())
+    try:
+        print(line.rstrip())
+    except UnicodeEncodeError:
+        print(line.rstrip().encode("ascii", "replace").decode("ascii"))
 
 
 def dest_folder(section: str, title: str, filename: str) -> Path:
