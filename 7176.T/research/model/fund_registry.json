@@ -50,13 +50,67 @@
   ],
   "factor_proxies": {
     "nikkei": "1321.T",
-    "topix": "1321.T",
+    "topix": "1306.T",
     "value_pbr": "2080.T",
     "growth": "2516.T",
     "reit": "2555.T",
     "leveraged": "1570.T",
     "usdjpy": "JPY=X"
   },
+  "business_line_buckets": [
+    {
+      "id": "equity",
+      "fund_id": "nonlisted_mandate_japan_equity",
+      "mandate_id": "mandate_japan_equity",
+      "benchmark": "nikkei",
+      "return_col": "nikkei_ret",
+      "march_col": "march_nikkei_ret",
+      "perf_rate": 0.15,
+      "hurdle": 0.0,
+      "share_sep2025": 0.3879,
+      "tag": "[Proxy/Filing]",
+      "note": "Sep-2025 株式 5,329億 / total 13,733"
+    },
+    {
+      "id": "etf",
+      "fund_id": "listed_etf_pool",
+      "mandate_id": "mandate_value_pbr",
+      "benchmark": "etf_basket",
+      "return_col": "etf_perf_basket_ret",
+      "march_col": "march_value_ret",
+      "perf_rate": 0.20,
+      "hurdle": 0.0,
+      "share_sep2025": 0.1981,
+      "tag": "[Proxy/Filing]",
+      "note": "Sep-2025 ETF 2,721億; detail from perf_etfs scrape"
+    },
+    {
+      "id": "qis",
+      "fund_id": "nonlisted_mandate_other",
+      "mandate_id": "mandate_other",
+      "benchmark": "topix",
+      "return_col": "topix_ret",
+      "march_col": "march_nikkei_ret",
+      "perf_rate": 0.10,
+      "hurdle": 0.05,
+      "share_sep2025": 0.3947,
+      "tag": "[Proxy/Filing]",
+      "note": "Sep-2025 QIS 5,421億"
+    },
+    {
+      "id": "other",
+      "fund_id": "nonlisted_mandate_value_pbr",
+      "mandate_id": "mandate_value_pbr",
+      "benchmark": "value_pbr",
+      "return_col": "value_factor_ret",
+      "march_col": "march_value_ret",
+      "perf_rate": 0.20,
+      "hurdle": 0.0,
+      "share_sep2025": 0.0190,
+      "tag": "[Proxy/Filing]",
+      "note": "Sep-2025 その他 261億"
+    }
+  ],
   "nonlisted_funds": [
     {
       "id": "mandate_japan_equity",

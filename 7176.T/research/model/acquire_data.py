@@ -274,44 +274,31 @@ def fund_return_halfyear(registry: dict, nav_df: pd.DataFrame) -> pd.DataFrame:
 # ---------------------------------------------------------------------------
 
 def build_fund_nav_proxy(registry: dict, fund_rets: pd.DataFrame, panel: pd.DataFrame) -> pd.DataFrame:
-    """Synthetic perf-eligible return from registry benchmarks × factor returns."""
-    if fund_rets.empty or panel.empty:
+    """Business-line weighted perf-eligible excess (bucket proxy layer)."""
+    from bucket_proxy import build_bucket_weighted_proxy
+
+    bw = build_bucket_weighted_proxy(panel, registry)
+    if bw.empty:
         return pd.DataFrame()
-    fr = fund_rets.set_index("period_end")
+    fr = fund_rets.set_index("period_end") if not fund_rets.empty else pd.DataFrame()
     rows = []
-    for _, r in panel.iterrows():
-        pe = r["period_end"].strftime("%Y-%m-%d")
-        if pe not in fr.index:
-            continue
-        nik = r.get("nikkei_ret", np.nan)
-        val = r.get("value_factor_ret", np.nan)
-        etf_perf = fr.loc[pe, "etf_perf_basket_ret"] if "etf_perf_basket_ret" in fr.columns else np.nan
-        pool_nl = registry["aum_pools"][0]
-        pool_etf = registry["aum_pools"][1]
-        perf_drive = 0.0
-        wt = 0.0
-        for fund in registry.get("nonlisted_funds", []):
-            bm = fund.get("benchmark", "nikkei")
-            if bm in ("nikkei",):
-                ret = nik
-            elif bm in ("value_pbr", "value"):
-                ret = val if pd.notna(val) else nik
-            else:
-                ret = nik
-            excess = max(0.0, float(ret) - fund.get("hurdle", 0))
-            w = fund["aum_share_of_nonlisted"] * pool_nl["aum_share_fy2025"]
-            perf_drive += w * excess
-            wt += w
-        if pd.notna(etf_perf):
-            perf_drive += pool_etf["aum_share_fy2025"] * max(0.0, float(etf_perf))
-            wt += pool_etf["aum_share_fy2025"]
-        rows.append({
+    for _, r in bw.iterrows():
+        pe = r["period_end"]
+        row = {
             "period_end": pe,
-            "perf_eligible_excess_ret": perf_drive / wt if wt else np.nan,
-            "etf_perf_basket_ret": etf_perf,
-            "nikkei_ret": nik,
-            "value_factor_ret": val,
-        })
+            "perf_eligible_excess_ret": r.get("bucket_weighted_excess"),
+            "bucket_weighted_ret": r.get("bucket_weighted_ret"),
+            "bucket_weighted_march_ret": r.get("bucket_weighted_march_ret"),
+            "tag": r.get("tag", "[Proxy/Derived]"),
+        }
+        if not fr.empty and pe in fr.index:
+            row["etf_perf_basket_ret"] = fr.loc[pe, "etf_perf_basket_ret"] if "etf_perf_basket_ret" in fr.columns else np.nan
+        p = panel[panel["period_end"].dt.strftime("%Y-%m-%d") == pe]
+        if not p.empty:
+            pr = p.iloc[0]
+            row["nikkei_ret"] = pr.get("nikkei_ret")
+            row["value_factor_ret"] = pr.get("value_factor_ret")
+        rows.append(row)
     return pd.DataFrame(rows)
 
 
@@ -694,6 +681,9 @@ def _benchmark_ret(row: pd.Series, bm: str) -> float:
     if bm == "topix":
         t = _sanitized(row.get("topix_etf_ret")) or _sanitized(row.get("topix_ret"))
         return t if t is not None else nik
+    if bm == "growth":
+        g = _sanitized(row.get("growth_ret"))
+        return g if g is not None else nik
     return nik
 
 
@@ -740,58 +730,43 @@ def _build_nonlisted_mandate_slices(
     pe_str: str,
     half: str,
 ) -> list[dict]:
-    """Split institutional residual into registry buckets with filing-implied or benchmark returns."""
-    nonlisted = row.get("aum_nonlisted_jpym")
-    if pd.isna(nonlisted):
-        return []
-    residual_aum = max(0.0, float(nonlisted) - float(latest_public_aum or 0))
-    if residual_aum <= 0:
+    """Business-line institutional buckets with factor + march proxies."""
+    from aum_sleeves import business_line_aum_jpym
+    from bucket_proxy import bucket_excess
+
+    bl_aum = business_line_aum_jpym(pe_str, row.get("aum_end_jpym"))
+    if not bl_aum:
         return []
 
-    implied_ret = _implied_nonlisted_return(panel_sorted, idx, row)
     slices: list[dict] = []
-    for fund in registry.get("nonlisted_funds", []):
-        share = float(fund.get("aum_share_of_nonlisted") or 0)
-        if share <= 0:
+    buckets = registry.get("business_line_buckets") or []
+    if not buckets:
+        buckets = [
+            {**f, "id": f.get("id"), "fund_id": f"nonlisted_{f['id']}"}
+            for f in registry.get("nonlisted_funds", [])
+        ]
+    for bucket in buckets:
+        bid = bucket.get("id")
+        if bid == "etf":
             continue
-        bucket_aum = residual_aum * share
-        bm = fund.get("benchmark", "nikkei")
+        fund_id = bucket.get("fund_id") or f"nonlisted_{bucket.get('id', 'mandate')}"
+        aum_jpym = bl_aum.get(bid or "", np.nan)
+        if pd.isna(aum_jpym) or float(aum_jpym) <= 0:
+            continue
+        bm = bucket.get("benchmark", "nikkei")
         bm_ret = _benchmark_ret(row, bm)
-        hurdle = float(fund.get("hurdle") or 0.0)
-        if pd.notna(implied_ret):
-            period_ret = float(implied_ret)
-            source = "filing_aum_implied"
-        else:
-            period_ret = bm_ret
-            source = "benchmark_proxy"
-        excess = max(0.0, period_ret - bm_ret - hurdle)
-        if half == "H2" and excess <= 0:
-            if bm in ("value_pbr", "value"):
-                mb = row.get("march_value_ret")
-            elif fund.get("id") == "mandate_japan_equity":
-                mb = (
-                    row.get("march_value_ret")
-                    or row.get("march_blended_ret")
-                    or row.get("march_nikkei_ret")
-                )
-            else:
-                mb = row.get("march_nikkei_ret") or row.get("march_blended_ret")
-            if pd.isna(mb):
-                mb = row.get("march_blended_ret")
-            if pd.notna(mb):
-                excess = max(0.0, float(mb) - hurdle)
-                source = "march_window_proxy"
+        period_ret, excess, source = bucket_excess(row, bucket, half=half)
         slices.append({
             "period_end": pe_str,
             "half": half,
-            "mandate_id": fund.get("id", resid_cfg.get("mandate_id", "mandate_japan_equity")),
-            "fund_id": f"nonlisted_{fund['id']}",
+            "mandate_id": bucket.get("mandate_id", resid_cfg.get("mandate_id")),
+            "fund_id": fund_id,
             "period_return": period_ret,
             "benchmark_return": bm_ret,
             "excess_vs_hurdle": excess,
-            "aum_jpym": bucket_aum,
-            "perf_rate": fund.get("perf_rate_assumption", 0.15),
-            "tag": resid_cfg.get("tag", "[Derived]"),
+            "aum_jpym": float(aum_jpym),
+            "perf_rate": bucket.get("perf_rate", bucket.get("perf_rate_assumption", 0.15)),
+            "tag": bucket.get("tag", resid_cfg.get("tag", "[Proxy/Derived]")),
             "source": source,
         })
     return slices
@@ -897,6 +872,21 @@ def build_mandate_nav(registry: dict, panel: pd.DataFrame) -> tuple[pd.DataFrame
                 "source": "yfinance_etf",
             })
 
+        for proxy in catalog.get("etf_style_proxies", []):
+            ret = _halfyear_fund_return(monthly, proxy["id"], pe, half)
+            if np.isnan(ret):
+                continue
+            bm_ret = _benchmark_ret(r, proxy.get("benchmark", "nikkei"))
+            hurdle = float(proxy.get("hurdle") or 0.0)
+            excess = max(0.0, ret - bm_ret - hurdle)
+            mandate_slices.append({
+                "period_end": pe_str, "half": half, "mandate_id": proxy["mandate_id"],
+                "fund_id": proxy["id"], "period_return": ret, "benchmark_return": bm_ret,
+                "excess_vs_hurdle": excess, "aum_jpym": np.nan,
+                "perf_rate": proxy.get("perf_rate"), "tag": "[Proxy/Market]",
+                "source": "etf_style_proxy",
+            })
+
         # Institutional residual: filing-implied return split across registry buckets
         resid = catalog.get("nonlisted_residual", {})
         mandate_slices.extend(
@@ -997,7 +987,9 @@ def enrich_mandate_detail_march(
         "etf_2082": "march_value_ret",
         "orka_fund": "march_nikkei_ret",
         "nonlisted_residual": "march_nikkei_ret",
-        "nonlisted_mandate_japan_equity": "march_nikkei_ret",
+        "proxy_nikkei_equity": "march_nikkei_ret",
+        "proxy_growth_equity": "march_nikkei_ret",
+        "proxy_topix_qis": "march_nikkei_ret",
         "nonlisted_mandate_value_pbr": "march_value_ret",
         "nonlisted_mandate_other": "march_nikkei_ret",
     }
@@ -1294,7 +1286,15 @@ def main() -> None:
     fund_rets.to_csv(DATA / "fund_return_halfyear.csv", index=False)
     fund_proxy = build_fund_nav_proxy(registry, fund_rets, panel)
     fund_proxy.to_csv(DATA / "fund_nav_proxy_halfyear.csv", index=False)
-    manifest["steps"]["p0_fund_proxy"] = {"rows": len(fund_proxy)}
+    from bucket_proxy import build_bucket_weighted_proxy
+
+    bucket_proxy_df = build_bucket_weighted_proxy(panel, registry)
+    if not bucket_proxy_df.empty:
+        bucket_proxy_df.to_csv(DATA / "bucket_weighted_proxy_halfyear.csv", index=False)
+    manifest["steps"]["p0_fund_proxy"] = {
+        "rows": len(fund_proxy),
+        "bucket_proxy_rows": len(bucket_proxy_df),
+    }
 
     # P1
     etf_flows = implied_etf_flows(aum_df, nav_df)
@@ -1348,6 +1348,13 @@ def main() -> None:
         march.to_csv(DATA / "march_window_halfyear.csv", index=False)
         p6_rows = len(march)
         mandate_detail = enrich_mandate_detail_march(mandate_detail, march, factor_h)
+        from hwm_engine import apply_synthetic_hwm_to_nonlisted
+
+        mandate_detail = apply_synthetic_hwm_to_nonlisted(mandate_detail, registry)
+        from perf_calibration import run_perf_calibration
+
+        _, cal_manifest, mandate_detail = run_perf_calibration(panel, mandate_detail, registry)
+        manifest["steps"]["p8_perf_calibration"] = cal_manifest
         if not mandate_detail.empty:
             mandate_detail.to_csv(DATA / "mandate_nav_detail.csv", index=False)
         perf_bucket = build_perf_fee_by_bucket(mandate_detail, panel)

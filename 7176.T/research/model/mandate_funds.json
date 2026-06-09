@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-06-05",
+  "as_of": "2026-06-08",
   "source_root": "https://www.simplexasset.com/sam/japanese_equity_active_management/publicly_offered_funds",
   "docs_base": "https://www.simplexasset.com/sam/japanese_equity_active_management/publicly_offered_funds/docs",
   "sam_funds": [
@@ -30,6 +30,32 @@
       "tag": "[Filing/Market]"
     }
   ],
+  "etf_style_proxies": [
+    {
+      "id": "proxy_nikkei_equity",
+      "ticker": "1321.T",
+      "mandate_id": "mandate_japan_equity",
+      "benchmark": "nikkei",
+      "perf_rate": 0.15,
+      "label": "Nikkei 225 ETF style anchor [Proxy]"
+    },
+    {
+      "id": "proxy_growth_equity",
+      "ticker": "2516.T",
+      "mandate_id": "mandate_japan_equity",
+      "benchmark": "growth",
+      "perf_rate": 0.15,
+      "label": "TSE Growth 250 style anchor [Proxy]"
+    },
+    {
+      "id": "proxy_topix_qis",
+      "ticker": "1306.T",
+      "mandate_id": "mandate_other",
+      "benchmark": "topix",
+      "perf_rate": 0.10,
+      "label": "TOPIX ETF QIS/low-beta anchor [Proxy]"
+    }
+  ],
   "perf_etfs": [
     {"id": "etf_2080", "ticker": "2080.T", "mandate_id": "mandate_value_pbr", "benchmark": "value_pbr", "perf_rate": 0.20, "weight": 0.5},
     {"id": "etf_2081", "ticker": "2081.T", "mandate_id": "mandate_value_pbr", "benchmark": "value_pbr", "perf_rate": 0.20, "weight": 0.3},
@@ -39,13 +65,28 @@
     "mandate_id": "mandate_japan_equity",
     "proxy_fund_id": "value_up_fund",
     "proxy_etf": "2080.T",
-    "method": "filing_implied_buckets",
-    "note": "Institutional non-listed split across fund_registry.nonlisted_funds; return from filing AUM delta or benchmark [Derived]",
+    "method": "business_line_bucket_proxy",
+    "note": "Institutional sleeves from fund_registry.business_line_buckets + synthetic HWM [Proxy]",
     "tag": "[Derived]"
   },
   "touki_import": {
-    "fund_code_value_up": "9D311082",
     "import_dir": "research/model/data/touki_nav",
-    "note": "Manual CSV from 投信総合検索ライブラリー; filename value_up_fund.csv"
+    "funds": {
+      "value_up_fund": {
+        "code": "9D311082",
+        "label": "シンプレクス・ジャパン・バリューアップ・ファンド"
+      },
+      "orka_fund": {
+        "code": "9D326847",
+        "label": "シンプレクス謳歌ファンド",
+        "note": "Verify in 投信総合検索ライブラリー before pasting CSV [Assumption]"
+      },
+      "proxy_growth_equity": {
+        "code": "9D311082",
+        "label": "Reuse Value-Up touki path until dedicated growth fund CSV added",
+        "optional": true
+      }
+    },
+    "note": "Drop browser-exported CSV as {fund_id}.csv; Marvin merges in download_mandate_nav.py"
   }
 }

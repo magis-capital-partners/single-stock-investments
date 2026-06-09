@@ -23,6 +23,25 @@ AUM_PROVISIONAL_PERIODS: set[str] = {"2026-03-31"}
 # Business-line AUM (億円) from filings — populated by parse_aum_filings.py
 AUM_BUSINESS_LINES: dict[str, dict[str, float]] = {}
 
+# Sep-2025 interim mix (億円 5,329 / 2,721 / 5,421 / 261 of 13,733 total)
+DEFAULT_BUSINESS_LINE_SHARE: dict[str, float] = {
+    "equity": 5_329 / 13_733,
+    "etf": 2_721 / 13_733,
+    "qis": 5_421 / 13_733,
+    "other": 261 / 13_733,
+}
+
+
+def business_line_aum_jpym(period_key: str, total_jpym: float | None) -> dict[str, float]:
+    """Business-line AUM in ¥m from filing buckets or scaled total."""
+    bl = AUM_BUSINESS_LINES.get(period_key[:10])
+    if bl:
+        return {k: float(v) * 100.0 for k, v in bl.items()}
+    if total_jpym is None or not np.isfinite(total_jpym):
+        return {}
+    t_oku = float(total_jpym) / 100.0
+    return {k: t_oku * share * 100.0 for k, share in DEFAULT_BUSINESS_LINE_SHARE.items()}
+
 
 def refresh_from_dataframe(df: pd.DataFrame) -> dict:
     """Merge filing-parsed sleeves into AUM_BY_PERIOD; filings override provisional."""

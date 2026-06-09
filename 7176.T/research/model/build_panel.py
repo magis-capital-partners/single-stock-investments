@@ -203,7 +203,8 @@ def merge_acquired(fin: pd.DataFrame) -> pd.DataFrame:
     fin["period_key"] = fin["period_end"].dt.strftime("%Y-%m-%d")
 
     merges = [
-        ("fund_nav_proxy_halfyear.csv", ["perf_eligible_excess_ret", "etf_perf_basket_ret", "value_factor_ret"]),
+        ("fund_nav_proxy_halfyear.csv", ["perf_eligible_excess_ret", "etf_perf_basket_ret", "value_factor_ret", "bucket_weighted_ret", "bucket_weighted_excess"]),
+        ("bucket_weighted_proxy_halfyear.csv", ["bucket_weighted_ret", "bucket_weighted_excess", "bucket_weighted_march_ret"]),
         ("factor_returns_halfyear.csv", ["value_pbr_ret", "growth_ret", "reit_ret", "leveraged_ret", "topix_ret", "value_factor_ret"]),
         ("fund_return_halfyear.csv", ["etf_basket_ret", "etf_perf_basket_ret", "etf_basket_vol"]),
         ("flows_halfyear.csv", ["etf_implied_flow_jpym", "jita_equity_flow_bn", "jita_etf_flow_bn"]),
@@ -250,9 +251,9 @@ def main() -> None:
     try:
         filing_df = scan_evidence()
         if not filing_df.empty:
-            OUT = Path(__file__).resolve().parent / "data" / "aum_filings_parsed.csv"
-            OUT.parent.mkdir(parents=True, exist_ok=True)
-            filing_df.to_csv(OUT, index=False)
+            filing_out = Path(__file__).resolve().parent / "data" / "aum_filings_parsed.csv"
+            filing_out.parent.mkdir(parents=True, exist_ok=True)
+            filing_df.to_csv(filing_out, index=False)
             apply_to_aum_sleeves(filing_df)
     except Exception as exc:
         print(f"[warn] AUM filing parse skipped: {exc}")

@@ -259,6 +259,21 @@ def build_monthly_table(catalog: dict, sam_rows: list[dict]) -> pd.DataFrame:
         hist["tag"] = "[Market]"
         frames.append(hist)
 
+    for proxy in catalog.get("etf_style_proxies", []):
+        hist = etf_monthly_history(proxy["ticker"])
+        if hist.empty:
+            continue
+        hist["mandate_id"] = proxy["mandate_id"]
+        hist["benchmark"] = proxy.get("benchmark", "nikkei")
+        hist["perf_rate"] = proxy.get("perf_rate")
+        hist["fund_id"] = proxy["id"]
+        hist["aum_jpym"] = np.nan
+        hist["high_water_mark_jpy"] = np.nan
+        hist["source"] = "etf_style_proxy"
+        hist["source_url"] = f"https://finance.yahoo.com/quote/{proxy['ticker']}"
+        hist["tag"] = "[Proxy/Market]"
+        frames.append(hist)
+
     if not frames:
         return pd.DataFrame()
     out = pd.concat(frames, ignore_index=True)
@@ -277,14 +292,24 @@ def import_touki_nav(catalog: dict) -> list[dict]:
         return []
     rows: list[dict] = []
     fund_map = {f["id"]: f for f in catalog.get("sam_funds", [])}
+    for proxy in catalog.get("etf_style_proxies", []):
+        fund_map[proxy["id"]] = proxy
+    touki_meta = (catalog.get("touki_import") or {}).get("funds") or {}
+
     for path in sorted(touki_dir.glob("*.csv")):
+        if path.name.lower() == "readme.md":
+            continue
         fund_id = path.stem
         fund = fund_map.get(fund_id)
-        if not fund:
+        meta = touki_meta.get(fund_id, {})
+        if not fund and not meta:
             continue
         df = pd.read_csv(path)
         if "as_of" not in df.columns:
             continue
+        mandate_id = (fund or {}).get("mandate_id", "mandate_value_pbr")
+        benchmark = (fund or {}).get("benchmark", "nikkei")
+        perf_rate = (fund or {}).get("perf_rate", 0.15)
         for _, r in df.iterrows():
             as_of = pd.to_datetime(r["as_of"], errors="coerce")
             if pd.isna(as_of):
@@ -292,16 +317,17 @@ def import_touki_nav(catalog: dict) -> list[dict]:
             rows.append({
                 "as_of": as_of.strftime("%Y-%m-%d"),
                 "fund_id": fund_id,
-                "mandate_id": fund["mandate_id"],
+                "mandate_id": mandate_id,
                 "nav_jpy": r.get("nav_jpy"),
                 "aum_jpym": r.get("aum_jpym"),
                 "month_ret": r.get("month_ret"),
-                "benchmark": fund.get("benchmark"),
-                "perf_rate": fund.get("perf_rate"),
+                "benchmark": benchmark,
+                "perf_rate": perf_rate,
                 "high_water_mark_jpy": r.get("high_water_mark_jpy"),
                 "source": "touki_library_csv",
                 "source_url": f"touki_nav/{path.name}",
                 "tag": "[Filing/Market]",
+                "touki_code": meta.get("code"),
             })
     return rows
 
