@@ -72,7 +72,7 @@ If **new_documents** or **new_valuation_news**: focus on what changed for owner 
 python _system/scripts/marvin_cloud_refresh.py {{TICKER}} --date {{date}}
 ```
 
-Includes: transcripts, filing + management evidence, market inputs, third-party scan, valuation write, `refresh_optionality_valuation` when `evidence_refresh.type` is set, deep dive v2 sync, lint, Milly, evidence completeness (strict when triggers apply), classification sync, dashboard, cross-check fill/verify.
+Includes: transcripts, filing + management evidence, market inputs, third-party scan, valuation write, `refresh_optionality_valuation` when `evidence_refresh.type` is set, deep dive v2 sync, lint, Milly, evidence completeness (strict when triggers apply), classification sync, **persona lenses** (`persona_lens.py`), insights merge, dashboard, cross-check fill/verify.
 
 | Also | Command |
 |------|---------|
