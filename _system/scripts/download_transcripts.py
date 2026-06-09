@@ -34,9 +34,11 @@ if str(SCRIPTS_DIR) not in sys.path:
 
 from portfolio_registry import load_registry, US_CONFIG_PATH  # noqa: E402
 from polygon_earnings import (  # noqa: E402
+    cache_is_fresh,
     earnings_needing_transcript,
     fetch_portfolio_earnings,
     load_earnings_cache,
+    resolve_earnings_events,
     save_earnings_cache,
     verified_display_events,
 )
@@ -358,16 +360,31 @@ def main() -> None:
     partial_run = bool(args.tickers)
     run_mode = "partial" if partial_run else "full"
 
+    cache = load_earnings_cache()
     if args.skip_earnings_fetch or args.legacy_only:
-        cache = load_earnings_cache()
         portfolio_events = cache.get("events") or []
         polygon_enabled = bool(cache.get("polygon_enabled"))
+    elif cache_is_fresh(cache) and cache.get("events"):
+        portfolio_events = cache.get("events") or []
+        polygon_enabled = bool(cache.get("polygon_enabled"))
+        print(
+            f"Using fresh earnings cache ({len(portfolio_events)} events, as_of={cache.get('as_of')})"
+        )
     else:
         payload = fetch_portfolio_earnings(tickers=tickers if partial_run else None)
-        portfolio_events = payload.get("events") or []
+        access_status = payload.get("access_status")
+        if access_status == "forbidden":
+            print(
+                "::warning::Polygon Benzinga earnings API returned 403; using cached calendar"
+            )
+        elif access_status == "transient":
+            print(
+                "::warning::Polygon Benzinga earnings API probe failed transiently; using cached calendar if available"
+            )
+        portfolio_events = resolve_earnings_events(payload, cache)
         polygon_enabled = bool(payload.get("polygon_enabled"))
         if not args.dry_run:
-            save_earnings_cache(payload)
+            save_earnings_cache(payload, existing=cache)
 
     summaries = []
     for ticker in tickers:

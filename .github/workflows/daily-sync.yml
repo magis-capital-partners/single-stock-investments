@@ -37,6 +37,7 @@ jobs:
       - name: Run portfolio downloads
         env:
           POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY || secrets.POLYGON_IO_API_KEY }}
+          POLYGON_EARNINGS_CACHE_MAX_AGE_HOURS: "36"
         run: python _system/scripts/download_all_holdings.py
 
       - name: Commit and push workspace
