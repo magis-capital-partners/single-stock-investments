@@ -921,26 +921,31 @@ function renderWatchlistTab() {
       </tbody>
     </table>` : '<p class="form-hint">No registry watchlist entries. Add via onboard modal (watchlist only) or NOL screener below.</p>';
 
-  const nolTable = nolRows.length ? `
-    <table class="darwin-table">
-      <thead><tr>
-        <th>Ticker</th><th>Company</th><th>Mkt</th><th>DTA (gross)</th><th>Realizable DTA</th><th>Filing</th><th>Status</th><th></th>
-      </tr></thead>
-      <tbody>
-        ${nolRows.map(r => `
+  const nolRowHtml = (r) => `
           <tr>
             <td class="mono">${escapeHtml(r.ticker)}${r.in_holdings ? ' <span class="badge badge-ok" title="Already a holding">H</span>' : ''}${r.in_watchlist ? ' <span class="badge badge-warn" title="On watchlist">W</span>' : ''}</td>
             <td>${escapeHtml(r.company)}</td>
-            <td><span class="badge ${MARKET_BADGE[r.market] || 'badge-warn'}">${escapeHtml(r.market)}</span></td>
+            <td><span class="badge ${r.is_small_cap ? 'badge-sleeve' : 'badge-warn'}">${escapeHtml(r.cap_bucket || '—')}</span></td>
+            <td class="mono">${escapeHtml(r.market_cap_display || '—')}</td>
             <td class="mono">${escapeHtml(r.dta_gross_display || '—')}</td>
             <td class="mono">${escapeHtml(r.dta_realizable_display || '—')}</td>
             <td class="mono" style="font-size:11px">${escapeHtml(r.filing_as_of || '—')}</td>
             <td style="font-size:11px">${escapeHtml(r.screen_status || '—')}</td>
             <td>${r.in_holdings ? '<span class="form-hint">holding</span>' : `<button type="button" class="btn-secondary btn-sm" data-nol-watch="${escapeHtml(r.ticker)}"
               data-company="${escapeHtml(r.company)}" data-market="${escapeHtml(r.market)}">+ Watchlist</button>`}</td>
-          </tr>`).join('')}
-      </tbody>
-    </table>` : '<p class="form-hint">NOL screener not built. Run: python _system/scripts/build_nol_screener.py --write</p>';
+          </tr>`;
+
+  const nolHead = `<thead><tr>
+        <th>Ticker</th><th>Company</th><th>Cap</th><th>Mkt cap</th><th>DTA (gross)</th><th>Realizable DTA</th><th>Filing</th><th>Status</th><th></th>
+      </tr></thead>`;
+
+  const smallRows = nolRows.filter(r => r.is_small_cap);
+  const largeRows = nolRows.filter(r => !r.is_small_cap);
+  const nolTable = nolRows.length ? `
+    ${smallRows.length ? `<h4 style="font-size:12px;color:var(--text-muted);margin:12px 0 8px">Small / micro cap (${smallRows.length}) — takeover tax-attribute sleeve</h4>
+    <table class="darwin-table">${nolHead}<tbody>${smallRows.map(nolRowHtml).join('')}</tbody></table>` : ''}
+    ${largeRows.length ? `<h4 style="font-size:12px;color:var(--text-muted);margin:16px 0 8px">Mid / large cap (${largeRows.length})</h4>
+    <table class="darwin-table">${nolHead}<tbody>${largeRows.map(nolRowHtml).join('')}</tbody></table>` : ''}` : '<p class="form-hint">NOL screener not built. Run: python _system/scripts/build_nol_screener.py --write</p>';
 
   content.innerHTML = `
     <div class="watchlist-section">
@@ -949,7 +954,7 @@ function renderWatchlistTab() {
       ${registryTable}
     </div>
     <div class="watchlist-section">
-      <h3>NOL carryforward screener (${nolRows.length})</h3>
+      <h3>NOL carryforward screener (${nolRows.length}${nol.small_cap_count != null ? ` · ${nol.small_cap_count} small/micro` : ''})</h3>
       <p class="form-hint" style="margin-bottom:10px">${escapeHtml(nol.criteria || 'Deferred tax asset screen from SEC companyfacts + seed list.')}</p>
       ${nolTable}
       <p class="form-hint" style="margin-top:10px">Seed: <code>${escapeHtml(nol.seed_path || '_system/reference/market-data/screens/nol_seed.csv')}</code> · Rebuild: <code>python _system/scripts/build_nol_screener.py --write</code></p>
@@ -1097,7 +1102,11 @@ function filtered() {
     if (marketFilter !== 'ALL' && t.market !== marketFilter) return false;
     if (sleeveFilter !== 'ALL') {
       const sid = t.classification?.investment_sleeve;
-      if (sid !== sleeveFilter) return false;
+      if (sleeveFilter === 'real_assets_all') {
+        if (!sid || !String(sid).startsWith('real_assets')) return false;
+      } else if (sid !== sleeveFilter) {
+        return false;
+      }
     }
     if (needsWork && t.completeness >= 80) return false;
     if (q && !(`${t.ticker} ${t.company}`.toLowerCase().includes(q))) return false;

@@ -2,6 +2,7 @@
 """Build NOL carryforward screener JSON for dashboard Watchlist tab.
 
 Reads seed candidates + SEC XBRL company facts (deferred tax assets / valuation allowance).
+Fetches market cap from Yahoo for cap-bucket tagging (micro/small/mid/large).
 Marks rows already in registry holdings or watchlist.
 
 Usage:
@@ -13,8 +14,8 @@ from __future__ import annotations
 import argparse
 import csv
 import json
-import re
 import sys
+import time
 import urllib.error
 import urllib.request
 from datetime import datetime, timezone
@@ -26,7 +27,9 @@ REGISTRY_PATH = ROOT / "_system" / "portfolio" / "registry.json"
 OUTPUT = ROOT / "dashboard" / "data" / "nol_screener.json"
 
 SEC_UA = "Marvin Research marvin@single-stock-investments.local"
+YAHOO_UA = "MarvinResearch/1.0"
 SEC_TICKERS_URL = "https://www.sec.gov/files/company_tickers.json"
+YAHOO_QUOTE_URL = "https://query1.finance.yahoo.com/v7/finance/quote"
 
 # XBRL tags seen on 10-K balance sheets / tax footnotes
 DTA_TAGS = (
@@ -38,6 +41,13 @@ DTA_TAGS = (
 ALLOWANCE_TAGS = (
     "ValuationAllowanceDeferredTaxAssets",
     "DeferredTaxAssetsValuationAllowance",
+)
+
+CAP_BUCKETS = (
+    ("micro", 300_000_000),
+    ("small", 2_000_000_000),
+    ("mid", 10_000_000_000),
+    ("large", None),
 )
 
 
@@ -64,6 +74,7 @@ def load_seed_rows() -> list[dict]:
                     "ticker": ticker,
                     "company": (row.get("company") or ticker).strip(),
                     "market": (row.get("market") or "US").strip().upper(),
+                    "cap_tier_seed": (row.get("cap_tier") or "").strip().lower(),
                     "notes": (row.get("notes") or "").strip(),
                     "source": "seed",
                 }
@@ -71,8 +82,8 @@ def load_seed_rows() -> list[dict]:
     return rows
 
 
-def fetch_sec_json(url: str) -> dict | None:
-    req = urllib.request.Request(url, headers={"User-Agent": SEC_UA})
+def fetch_json(url: str, ua: str = SEC_UA) -> dict | None:
+    req = urllib.request.Request(url, headers={"User-Agent": ua})
     try:
         with urllib.request.urlopen(req, timeout=30) as resp:
             return json.loads(resp.read().decode())
@@ -81,7 +92,7 @@ def fetch_sec_json(url: str) -> dict | None:
 
 
 def load_cik_map() -> dict[str, str]:
-    data = fetch_sec_json(SEC_TICKERS_URL)
+    data = fetch_json(SEC_TICKERS_URL)
     if not data:
         return {}
     out: dict[str, str] = {}
@@ -122,7 +133,7 @@ def latest_usd_fact(facts: dict, tags: tuple[str, ...]) -> tuple[float | None, s
 
 def screen_ticker(ticker: str, cik: str) -> dict:
     url = f"https://data.sec.gov/api/xbrl/companyfacts/CIK{cik}.json"
-    data = fetch_sec_json(url)
+    data = fetch_json(url)
     if not data:
         return {"sec_error": "companyfacts unavailable"}
     dta, dta_date = latest_usd_fact(data, DTA_TAGS)
@@ -142,26 +153,66 @@ def screen_ticker(ticker: str, cik: str) -> dict:
     }
 
 
+def cap_bucket_from_mcap(mcap: float | None) -> str | None:
+    if mcap is None or mcap <= 0:
+        return None
+    for name, ceiling in CAP_BUCKETS:
+        if ceiling is None or mcap < ceiling:
+            return name
+    return "large"
+
+
+def fetch_market_caps(tickers: list[str]) -> dict[str, float | None]:
+    """Batch Yahoo quote for marketCap (US tickers only)."""
+    out: dict[str, float | None] = {t: None for t in tickers}
+    batch_size = 20
+    for i in range(0, len(tickers), batch_size):
+        chunk = tickers[i : i + batch_size]
+        symbols = ",".join(chunk)
+        url = f"{YAHOO_QUOTE_URL}?symbols={symbols}"
+        data = fetch_json(url, ua=YAHOO_UA)
+        if not data:
+            continue
+        for row in data.get("quoteResponse", {}).get("result") or []:
+            sym = str(row.get("symbol") or "").upper()
+            mcap = row.get("marketCap")
+            if sym and mcap is not None:
+                out[sym] = float(mcap)
+        time.sleep(0.15)
+    return out
+
+
 def fmt_usd_mm(val: float | None) -> str | None:
     if val is None:
         return None
     return f"${val / 1_000_000:.1f}M"
 
 
+def fmt_mcap(val: float | None) -> str | None:
+    if val is None:
+        return None
+    if val >= 1_000_000_000:
+        return f"${val / 1_000_000_000:.2f}B"
+    return f"${val / 1_000_000:.0f}M"
+
+
 def build_rows() -> list[dict]:
     holdings, watchlist = load_registry_sets()
+    seeds = load_seed_rows()
     cik_map = load_cik_map()
+    mcap_map = fetch_market_caps([s["ticker"] for s in seeds if s["market"] == "US"])
+
     seen: set[str] = set()
     out: list[dict] = []
 
-    for seed in load_seed_rows():
+    for seed in seeds:
         ticker = seed["ticker"]
         if ticker in seen:
             continue
         seen.add(ticker)
 
         row = {**seed}
-        cik = cik_map.get(ticker.split(".")[0])  # ALS.TO → try ALS
+        cik = cik_map.get(ticker.split(".")[0])
         if not cik:
             cik = cik_map.get(ticker)
 
@@ -170,6 +221,10 @@ def build_rows() -> list[dict]:
             sec = screen_ticker(ticker, cik)
             if sec.get("sec_entity") and not row.get("company"):
                 row["company"] = sec["sec_entity"]
+            time.sleep(0.12)
+
+        mcap = mcap_map.get(ticker)
+        cap_bucket = cap_bucket_from_mcap(mcap) or seed.get("cap_tier_seed") or None
 
         row.update(
             {
@@ -184,13 +239,20 @@ def build_rows() -> list[dict]:
                 "cik": sec.get("cik"),
                 "sec_error": sec.get("sec_error"),
                 "screen_status": "ok" if sec.get("dta_gross_usd") is not None else "pending_sec",
+                "market_cap_usd": mcap,
+                "market_cap_display": fmt_mcap(mcap),
+                "cap_bucket": cap_bucket,
+                "is_small_cap": cap_bucket in ("micro", "small"),
             }
         )
+        row.pop("cap_tier_seed", None)
         out.append(row)
 
-    # Sort: realizable DTA desc, then ticker
+    # Small caps first (actionable takeover sleeve), then by realizable DTA
+    bucket_rank = {"micro": 0, "small": 1, "mid": 2, "large": 3}
     out.sort(
         key=lambda r: (
+            bucket_rank.get(r.get("cap_bucket") or "", 9),
             -(r.get("dta_realizable_usd") or r.get("dta_gross_usd") or 0),
             r["ticker"],
         ),
@@ -204,22 +266,25 @@ def main() -> int:
     args = parser.parse_args()
 
     rows = build_rows()
+    small_count = sum(1 for r in rows if r.get("is_small_cap"))
     payload = {
         "built_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "criteria": (
-            "Deferred tax assets (us-gaap) from SEC companyfacts; "
-            "realizable ≈ gross DTA − valuation allowance. "
-            "Seed list in _system/reference/market-data/screens/nol_seed.csv."
+            "US deferred tax assets (SEC companyfacts) + market-cap bucket (Yahoo). "
+            "Realizable DTA ≈ gross − valuation allowance. "
+            "Small/micro caps prioritized for takeover tax-attribute optionality. "
+            "Seed: _system/reference/market-data/screens/nol_seed.csv."
         ),
         "seed_path": str(SEED_PATH.relative_to(ROOT)).replace("\\", "/"),
         "row_count": len(rows),
+        "small_cap_count": small_count,
         "rows": rows,
     }
 
     if args.write:
         OUTPUT.parent.mkdir(parents=True, exist_ok=True)
         OUTPUT.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
-        print(f"Wrote {OUTPUT} ({len(rows)} rows)")
+        print(f"Wrote {OUTPUT} ({len(rows)} rows, {small_count} small/micro)")
     else:
         print(json.dumps(payload, indent=2))
 

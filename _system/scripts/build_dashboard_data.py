@@ -833,6 +833,26 @@ def build() -> dict:
     avg_complete = round(sum(r["completeness"] for r in rows) / len(rows)) if rows else 0
 
     sleeve_filters = [{"id": "ALL", "label": "All sleeves"}]
+    real_assets_union: set[str] = set()
+    for sleeve_id in _INVESTMENT_SLEEVE_LABELS:
+        if sleeve_id.startswith("real_assets"):
+            real_assets_union.update(
+                t
+                for t, sid in _INVESTMENT_SLEEVE_INDEX.items()
+                if sid == sleeve_id
+            )
+    if real_assets_union:
+        sleeve_filters.append(
+            {
+                "id": "real_assets_all",
+                "label": "All hard assets",
+                "count": sum(
+                    1
+                    for r in rows
+                    if r["ticker"] in real_assets_union
+                ),
+            }
+        )
     for sleeve_id, label in sorted(_INVESTMENT_SLEEVE_LABELS.items(), key=lambda x: x[1]):
         count = sum(
             1
