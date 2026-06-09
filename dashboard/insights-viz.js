@@ -74,6 +74,9 @@
       classification.cycle && classification.cycle !== '-' && classification.cycle !== '—'
         ? `cycle ${classification.cycle}`
         : null,
+      classification.investment_sleeve_label && classification.investment_sleeve_label !== '—'
+        ? classification.investment_sleeve_label
+        : null,
     ].filter(Boolean);
     if (!parts.length) return '';
     return `

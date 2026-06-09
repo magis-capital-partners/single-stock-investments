@@ -19,6 +19,7 @@ Replace the old single **thesis status** (intact / weakening / strengthening / u
 | **Valuation overlay** | Speedwell / Hohn | `—`, `segment_cashflow` | Per-segment cash-flow sum + reverse DCF cross-check (`segment_cashflow_valuation.md`) |
 | **Payoff lens** | Decision stack Q5 | `operating`, `asset`, `event`, `levered`, `pending` | Which toolkit applies (`analysis_arsenal.md`) |
 | **MOI bucket** | Mihaljevic | optional legacy audit tag | Deprecated — map to `payoff_lens`; see `moi_lens.md` |
+| **Investment sleeve** | Portfolio | `—`, `real_assets_lt`, … | Orthogonal sort/filter sleeve; membership map in `_system/portfolio/investment_sleeves.json` |
 
 ## valuation.json trigger map (machine + agent)
 
@@ -75,6 +76,7 @@ Every deep dive and thesis update ends with:
 | **Valuation overlay** | … |
 | **Payoff lens** | … |
 | **MOI bucket** | … (optional legacy) |
+| **Investment sleeve** | … |
 
 ## [HUMAN REVIEW]
 …

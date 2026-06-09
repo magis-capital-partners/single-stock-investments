@@ -20,6 +20,7 @@ DATA_DIR = ROOT / "dashboard" / "data"
 OUTPUT = DATA_DIR / "dashboard_data.json"
 CLASS_PATH = ROOT / "_system" / "portfolio" / "classification.json"
 REGISTRY_PATH = ROOT / "_system" / "portfolio" / "registry.json"
+SLEEVES_PATH = ROOT / "_system" / "portfolio" / "investment_sleeves.json"
 GITHUB_REPO = "GoldmanDrew/single-stock-investments"
 ONBOARD_WORKFLOW = "marvin-onboard.yml"
 
@@ -228,6 +229,26 @@ def load_classification() -> dict[str, dict]:
     return json.loads(CLASS_PATH.read_text(encoding="utf-8"))
 
 
+def load_investment_sleeve_index() -> tuple[dict[str, str], dict[str, str]]:
+    """Map ticker -> sleeve id and sleeve id -> display label."""
+    if not SLEEVES_PATH.exists():
+        return {}, {}
+    try:
+        doc = json.loads(SLEEVES_PATH.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return {}, {}
+    ticker_to_sleeve: dict[str, str] = {}
+    labels: dict[str, str] = {}
+    for sleeve_id, meta in (doc.get("sleeves") or {}).items():
+        labels[sleeve_id] = meta.get("label") or sleeve_id
+        for ticker in meta.get("tickers") or []:
+            ticker_to_sleeve[str(ticker).upper()] = sleeve_id
+    return ticker_to_sleeve, labels
+
+
+_INVESTMENT_SLEEVE_INDEX, _INVESTMENT_SLEEVE_LABELS = load_investment_sleeve_index()
+
+
 def parse_classification_from_thesis(ticker_dir: Path) -> dict | None:
     thesis = ticker_dir / "research" / "thesis.md"
     if not thesis.exists():
@@ -281,6 +302,8 @@ def classification_for(ticker: str, ticker_dir: Path, portfolio: dict[str, dict]
         "implied_irr": "pending",
         "irr_method": "pending",
         "lawrence_bucket": "—",
+        "investment_sleeve": "—",
+        "investment_sleeve_label": "—",
     }
     out = {k: merged.get(k, defaults[k]) for k in defaults}
     val = load_valuation(ticker_dir)
@@ -289,7 +312,7 @@ def classification_for(ticker: str, ticker_dir: Path, portfolio: dict[str, dict]
             val["ticker"] = ticker_dir.name
         irr_web = website_implied_irr(val)
         inputs = val.get("classification_inputs") or {}
-        for key in ("archetype", "moat", "dhando", "cycle"):
+        for key in ("archetype", "moat", "dhando", "cycle", "investment_sleeve"):
             if inputs.get(key) and inputs[key] not in ("-", "—", "pending"):
                 out[key] = inputs[key]
         if irr_web.get("display"):
@@ -323,6 +346,13 @@ def classification_for(ticker: str, ticker_dir: Path, portfolio: dict[str, dict]
             out["filing_irr_ref"] = f"{irr_web['falsifier_adjusted_pct']}% (falsifier-adjusted)"
         if irr_web.get("synthesis_status") == "complete":
             out["irr_source"] = "total_synthesis"
+    sleeve_id = _INVESTMENT_SLEEVE_INDEX.get(ticker.upper())
+    if sleeve_id and out.get("investment_sleeve") in ("—", "-", "pending", None, ""):
+        out["investment_sleeve"] = sleeve_id
+    if out.get("investment_sleeve") and out["investment_sleeve"] not in ("—", "-", "pending"):
+        out["investment_sleeve_label"] = _INVESTMENT_SLEEVE_LABELS.get(
+            out["investment_sleeve"], out["investment_sleeve"]
+        )
     return out
 
 
@@ -802,6 +832,15 @@ def build() -> dict:
     with_readme = sum(1 for r in rows if r["readme"])
     avg_complete = round(sum(r["completeness"] for r in rows) / len(rows)) if rows else 0
 
+    sleeve_filters = [{"id": "ALL", "label": "All sleeves"}]
+    for sleeve_id, label in sorted(_INVESTMENT_SLEEVE_LABELS.items(), key=lambda x: x[1]):
+        count = sum(
+            1
+            for r in rows
+            if (r.get("classification") or {}).get("investment_sleeve") == sleeve_id
+        )
+        sleeve_filters.append({"id": sleeve_id, "label": label, "count": count})
+
     return {
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "workspace": str(ROOT),
@@ -814,6 +853,7 @@ def build() -> dict:
             "avg_completeness": avg_complete,
             "markets": sort_markets({r["market"] for r in rows}),
             "market_filters": sort_market_filters({r["market"] for r in rows}),
+            "sleeve_filters": sleeve_filters,
             "github_repo": GITHUB_REPO,
             "onboard_workflow": ONBOARD_WORKFLOW,
             "onboard_dispatch_event": "onboard-ticker",
@@ -913,6 +953,24 @@ def build_darwin_if_missing() -> dict | None:
     return load_darwin_bundle()
 
 
+def build_nol_screener_if_missing() -> dict | None:
+    path = DATA_DIR / "nol_screener.json"
+    if path.exists():
+        return _load_json(path)
+    script = ROOT / "_system" / "scripts" / "build_nol_screener.py"
+    if not script.exists():
+        return None
+    import subprocess
+
+    subprocess.run(
+        [sys.executable, str(script), "--write"],
+        cwd=str(ROOT),
+        check=False,
+        timeout=300,
+    )
+    return _load_json(path)
+
+
 def build_equity_models() -> dict:
     """Run equity model ingest and return payload for dashboard merge."""
     script = ROOT / "_system" / "scripts" / "build_equity_model_dashboard.py"
@@ -971,6 +1029,12 @@ def main() -> None:
         payload["darwin"] = bundle["roth"]
     if bundle:
         payload["darwin_accounts"] = bundle
+    nol = build_nol_screener_if_missing()
+    if nol:
+        payload["nol_screener"] = nol
+        payload["summary"]["nol_screener_count"] = nol.get("row_count") or len(
+            nol.get("rows") or []
+        )
     OUTPUT.write_text(json.dumps(payload, indent=2), encoding="utf-8")
     write_oauth_config()
     print(f"Wrote {OUTPUT} ({payload['summary']['ticker_count']} tickers)")

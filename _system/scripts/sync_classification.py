@@ -31,6 +31,7 @@ CLASS_FIELDS = [
     "lawrence_bucket",
     "payoff_lens",
     "moi_bucket",
+    "investment_sleeve",
 ]
 
 LABEL_MAP = {
@@ -44,6 +45,7 @@ LABEL_MAP = {
     "lawrence_bucket": "Lawrence bucket",
     "payoff_lens": "Payoff lens",
     "moi_bucket": "MOI bucket",
+    "investment_sleeve": "Investment sleeve",
 }
 
 
@@ -72,7 +74,7 @@ def load_valuation(ticker: str) -> dict | None:
 def valuation_classification(val: dict) -> dict:
     out = {}
     inputs = val.get("classification_inputs") or {}
-    for key in ("archetype", "moat", "dhando", "cycle", "payoff_lens", "moi_bucket"):
+    for key in ("archetype", "moat", "dhando", "cycle", "payoff_lens", "moi_bucket", "investment_sleeve"):
         if inputs.get(key) and inputs[key] not in ("-", "—", "pending", "unknown"):
             out[key] = inputs[key]
     if val.get("lawrence_bucket"):

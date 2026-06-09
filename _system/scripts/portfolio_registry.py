@@ -100,6 +100,7 @@ DEFAULT_CLASSIFICATION = {
     "cycle": "-",
     "moi_bucket": "pending",
     "payoff_lens": "pending",
+    "investment_sleeve": "-",
 }
 
 
