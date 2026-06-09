@@ -155,6 +155,31 @@
     letter-spacing: 0.6px; color: var(--text-muted); margin-bottom: 8px;
   }
   .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .metric-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+  @media (max-width: 520px) { .metric-grid-3 { grid-template-columns: 1fr 1fr; } }
+  .tier-sub { font-size: 10px; color: var(--text-muted); margin-top: 3px; font-weight: 500; }
+  .tier-0 { margin-bottom: 12px; }
+  .tier-1 { margin-bottom: 10px; }
+  .identity-line { font-size: 12px; color: var(--text-secondary); font-family: 'JetBrains Mono', monospace; }
+  .lens-chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .lens-chip {
+    padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 600;
+    border: 1px solid var(--border); background: var(--bg-card); color: var(--text-secondary);
+    cursor: pointer; font-family: 'JetBrains Mono', monospace;
+  }
+  .lens-chip:hover, .lens-chip-active { border-color: var(--accent-blue); color: var(--accent-cyan); }
+  .lens-chip-silent { font-size: 10px; color: var(--text-muted); padding: 4px 8px; }
+  .source-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .source-pill { padding: 4px 10px; font-size: 11px; }
+  .context-list { list-style: none; }
+  .context-list li {
+    padding: 8px 10px; background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 6px; margin-bottom: 6px; font-size: 12px; line-height: 1.45;
+  }
+  .context-src { margin-right: 6px; vertical-align: middle; }
+  .divergence-flag { color: var(--accent-amber); margin-left: 4px; }
+  .lens-delta-warn { color: var(--accent-amber); font-weight: 700; }
+  details.detail-section summary { cursor: pointer; color: var(--text-muted); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; }
   .metric {
     background: var(--bg-card); border: 1px solid var(--border);
     border-radius: 6px; padding: 10px 12px;
@@ -263,6 +288,9 @@
   }
   .darwin-panel { padding: 16px 24px 32px; display: none; flex: 1; overflow: auto; }
   .darwin-panel.active { display: block; }
+  .insights-panel { padding: 16px 24px 32px; display: none; flex: 1; overflow: auto; }
+  .insights-panel.active { display: block; }
+  .persona-tabs .view-tab { font-size: 11px; padding: 4px 8px; }
   .darwin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 18px; }
   .darwin-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 8px; }
   .darwin-table th, .darwin-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: left; }
@@ -390,6 +418,7 @@
 
   <nav class="view-tabs" id="view-tabs">
     <button type="button" class="view-tab active" data-view="holdings">Holdings</button>
+    <button type="button" class="view-tab" data-view="insights">Insights</button>
     <button type="button" class="view-tab" data-view="darwin">Darwin</button>
   </nav>
 
@@ -414,7 +443,9 @@
             <th data-sort="completeness">Complete</th>
             <th data-sort="last_download">Download</th>
             <th data-sort="classification.archetype">Archetype</th>
-            <th data-sort="classification.analysis_irr_pct">Blended IRR</th>
+            <th data-sort="classification.analysis_irr_pct">House IRR</th>
+            <th data-sort="decision_summary.lens_blend_pct">Lens blend</th>
+            <th data-sort="decision_summary.lens_delta">Lens Δ</th>
             <th data-sort="classification.stance">Stance</th>
             <th data-sort="deep_dive.date">Deep dive</th>
           </tr>
@@ -436,6 +467,11 @@
     </nav>
     <div class="loading" id="darwin-loading">Loading Darwin portfolio…</div>
     <div id="darwin-content" style="display:none"></div>
+  </section>
+
+  <section class="insights-panel" id="insights-panel">
+    <div class="loading" id="insights-loading">Loading insights…</div>
+    <div id="insights-content" style="display:none"></div>
   </section>
 </div>
 
@@ -484,6 +520,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="darwin-viz.js"></script>
 <script src="equity-model-viz.js"></script>
+<script src="insights-viz.js"></script>
 <script src="oauth.js"></script>
 <script>
 const GH_REPO = 'GoldmanDrew/single-stock-investments';
@@ -530,6 +567,10 @@ let marketFilter = 'ALL';
 let needsWork = false;
 let activeView = 'holdings';
 let activeDarwinAccount = 'roth';
+let expandedPersona = null;
+let activeInsightFilter = 'letters';
+let insightsQuarter = 'all';
+let fundRegistrySearch = '';
 let darwinEquityChart = null;
 let darwinHoldingsChart = null;
 
@@ -610,6 +651,28 @@ function renderIrrCell(t) {
   return `<span class="irr-cell ${irrClass(pct)}" title="${escapeHtml(title)}">${head}${label ? `<span class="irr-sub">${escapeHtml(label)}</span>` : ''}</span>`;
 }
 
+function lensDelta(t) {
+  const ds = t.decision_summary;
+  if (!ds || ds.house_irr_pct == null || ds.lens_blend_pct == null) return null;
+  return Number(ds.house_irr_pct) - Number(ds.lens_blend_pct);
+}
+
+function renderLensBlendCell(t) {
+  const ds = t.decision_summary;
+  if (!ds || ds.lens_blend_pct == null) return '<span class="mono" style="color:var(--text-muted)">—</span>';
+  const band = ds.lens_band_pct;
+  const bandStr = band ? ` [${band[0].toFixed(0)}–${band[1].toFixed(0)}]` : '';
+  return `<span class="mono irr-cell">${ds.lens_blend_pct.toFixed(1)}%${bandStr}</span>`;
+}
+
+function renderLensDeltaCell(t) {
+  const d = lensDelta(t);
+  if (d == null) return '<span class="mono" style="color:var(--text-muted)">—</span>';
+  const warn = Math.abs(d) > 2 ? ' lens-delta-warn' : '';
+  const sign = d > 0 ? '+' : '';
+  return `<span class="mono${warn}">${sign}${d.toFixed(1)}pp</span>`;
+}
+
 async function load() {
   try {
     oauthConfig = await MarvinOAuth.loadConfig();
@@ -626,6 +689,7 @@ async function load() {
   renderWatchlist();
   renderTable();
   renderDarwin();
+  renderInsights();
   if (data.tickers.length) selectTicker(data.tickers[0].ticker);
 }
 
@@ -644,9 +708,43 @@ function setView(view) {
   });
   document.getElementById('holdings-view').classList.toggle('hidden', view !== 'holdings');
   document.getElementById('darwin-panel').classList.toggle('active', view === 'darwin');
+  document.getElementById('insights-panel').classList.toggle('active', view === 'insights');
   document.getElementById('summary').style.display = view === 'holdings' ? '' : 'none';
   document.getElementById('watchlist-wrap').style.display =
     view === 'holdings' && (data.watchlist || []).length ? 'block' : 'none';
+}
+
+function renderInsights() {
+  const loading = document.getElementById('insights-loading');
+  const content = document.getElementById('insights-content');
+  const insights = data.insights;
+  if (!insights || !window.InsightsViz) {
+    loading.textContent = 'Insights not built. Run: python _system/scripts/build_insights.py';
+    content.style.display = 'none';
+    return;
+  }
+  loading.style.display = 'none';
+  content.style.display = 'block';
+  content.innerHTML = InsightsViz.renderInsightsPanel(insights, {
+    escapeHtml,
+    linkHtml,
+    ghRepo: GH_REPO,
+    quarter: insightsQuarter,
+    fundSearch: fundRegistrySearch,
+  });
+  content.querySelectorAll('[data-insights-quarter]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      insightsQuarter = btn.dataset.insightsQuarter;
+      renderInsights();
+    });
+  });
+  const search = content.querySelector('#fund-registry-search');
+  if (search) {
+    search.addEventListener('input', () => {
+      fundRegistrySearch = search.value;
+      renderInsights();
+    });
+  }
 }
 
 function renderDarwin() {
@@ -909,6 +1007,16 @@ function filtered() {
       bv = b.classification?.analysis_irr_pct ?? parseIrrPct(b.classification?.implied_irr);
       av = av == null ? -Infinity : av;
       bv = bv == null ? -Infinity : bv;
+    } else if (sortKey === 'decision_summary.lens_blend_pct') {
+      av = a.decision_summary?.lens_blend_pct;
+      bv = b.decision_summary?.lens_blend_pct;
+      av = av == null ? -Infinity : av;
+      bv = bv == null ? -Infinity : bv;
+    } else if (sortKey === 'decision_summary.lens_delta') {
+      av = lensDelta(a);
+      bv = lensDelta(b);
+      av = av == null ? -Infinity : av;
+      bv = bv == null ? -Infinity : bv;
     } else if (sortKey === 'deep_dive.date') {
       av = a.deep_dive?.date || '';
       bv = b.deep_dive?.date || '';
@@ -941,6 +1049,8 @@ function renderTable() {
       <td class="mono" style="font-size:11px;color:var(--text-secondary)">${t.last_download || '—'}</td>
       <td><span class="badge ${ARCHETYPE_BADGE[t.classification?.archetype] || 'badge-warn'}">${t.classification?.archetype || '—'}</span></td>
       <td>${renderIrrCell(t)}</td>
+      <td>${renderLensBlendCell(t)}</td>
+      <td>${renderLensDeltaCell(t)}</td>
       <td><span class="badge ${STANCE_BADGE[t.classification?.stance] || 'badge-warn'}">${t.classification?.stance || '—'}</span></td>
       <td>${renderDeepDiveCell(t)}</td>
     </tr>`).join('');
@@ -951,6 +1061,25 @@ function renderTable() {
 
 function getEquityModelBundle(ticker) {
   return (data.equity_models && data.equity_models.tickers && data.equity_models.tickers[ticker]) || null;
+}
+
+function wireDetailEvents(ticker) {
+  const detail = document.getElementById('detail');
+  detail.querySelectorAll('[data-lens-persona]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const p = btn.dataset.lensPersona;
+      expandedPersona = expandedPersona === p ? null : p;
+      selectTicker(ticker);
+    });
+  });
+  detail.querySelectorAll('[data-insight-filter]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      activeInsightFilter = btn.dataset.insightFilter;
+      selectTicker(ticker);
+    });
+  });
 }
 
 function selectTicker(ticker) {
@@ -966,6 +1095,25 @@ function selectTicker(ticker) {
     ? EquityModelViz.renderSection(modelBundle, { escapeHtml, linkHtml })
     : '';
   const developments = detailDevelopments(t);
+  const iv = window.InsightsViz;
+  const tier0 = iv && t.decision_summary
+    ? iv.renderDecisionSummary(t.decision_summary, t.human_review, {
+        escapeHtml,
+        renderIrrCell,
+        classification: t.classification,
+      })
+    : '';
+  const tier1 = iv ? iv.renderIdentityLine(t.classification, escapeHtml) : '';
+  const tier2 = iv && t.lenses
+    ? iv.renderActiveLensChips(t.active_lenses, t.silent_lens_count, expandedPersona, t.lenses, escapeHtml)
+    : '';
+  const tier3 = iv && t.insights?.length
+    ? iv.renderExternalContext(t.insights, activeInsightFilter, escapeHtml, linkHtml)
+    : '';
+  const consensusDetail = iv && t.lenses ? iv.renderConsensusDetail(t.lenses, escapeHtml) : '';
+  const filingRef = t.classification?.filing_irr_ref && t.classification?.irr_source === 'total_synthesis'
+    ? `<div class="tier-sub" style="margin-top:6px">Filing ref: ${escapeHtml(t.classification.filing_irr_ref)}</div>`
+    : '';
   document.getElementById('detail').innerHTML = `
     <h2>${t.ticker}</h2>
     <div class="subhead">${escapeHtml(t.company)} · ${escapeHtml(t.exchange)} · ${linkHtml(t.links?.folder, t.folder)}</div>
@@ -979,31 +1127,20 @@ function selectTicker(ticker) {
       ${t.human_review.live_price_confirmed ? `<div class="hr-line">Price confirmed: ${escapeHtml(t.human_review.live_price_confirmed)}</div>` : ''}
     </div>` : ''}
 
-    <div class="detail-section">
-      <h3>Classification</h3>
-      <div class="metric-grid">
-        <div class="metric"><div class="k">Archetype</div><div class="v"><span class="badge ${ARCHETYPE_BADGE[t.classification?.archetype] || 'badge-warn'}">${t.classification?.archetype || '—'}</span></div></div>
+    ${tier0 || `
+    <div class="detail-section tier-0">
+      <div class="metric-grid metric-grid-3">
         <div class="metric"><div class="k">Stance</div><div class="v"><span class="badge ${STANCE_BADGE[t.classification?.stance] || 'badge-warn'}">${t.classification?.stance || '—'}</span></div></div>
-        <div class="metric"><div class="k">Moat</div><div class="v"><span class="badge ${MOAT_BADGE[t.classification?.moat] || 'badge-warn'}">${t.classification?.moat || '—'}</span></div></div>
-        <div class="metric"><div class="k">Dhando</div><div class="v">${t.classification?.dhando || '—'}</div></div>
-        <div class="metric"><div class="k">Blended IRR</div><div class="v">${renderIrrCell(t)}${t.classification?.filing_irr_ref && t.classification?.irr_source === 'total_synthesis' ? `<div style="font-size:10px;color:var(--text-muted);margin-top:4px">Filing ref: ${escapeHtml(t.classification.filing_irr_ref)}</div>` : ''}${t.classification?.analysis_as_of ? `<div style="font-size:10px;color:var(--text-muted);margin-top:4px">as of ${escapeHtml(t.classification.analysis_as_of)}</div>` : ''}</div></div>
-        ${t.classification?.cycle && t.classification.cycle !== '-' && t.classification.cycle !== '—' ? `<div class="metric"><div class="k">Cycle</div><div class="v">${t.classification.cycle}</div></div>` : ''}
+        <div class="metric"><div class="k">House IRR</div><div class="v">${renderIrrCell(t)}${filingRef}</div></div>
+        <div class="metric"><div class="k">As of</div><div class="v mono">${escapeHtml(t.classification?.analysis_as_of || '—')}</div></div>
       </div>
-    </div>
+    </div>`}
 
-    ${modelHtml}
+    ${tier1}
 
-    <div class="detail-section">
-      <h3>Infrastructure</h3>
-      <div class="metric-grid">
-        <div class="metric"><div class="k">README</div><div class="v">${t.readme ? '✓' : '✗'}</div></div>
-        <div class="metric"><div class="k">Download script</div><div class="v">${t.download_script ? '✓' : '✗'}</div></div>
-        <div class="metric"><div class="k">Index file</div><div class="v">${t.index_file ? '✓' : '✗'}</div></div>
-        <div class="metric"><div class="k">Research dir</div><div class="v">${t.research_dir ? '✓' : '✗'}</div></div>
-        <div class="metric"><div class="k">Last download</div><div class="v">${t.last_download || '—'}</div></div>
-        <div class="metric"><div class="k">Last research</div><div class="v">${t.last_research || '—'}</div></div>
-      </div>
-    </div>
+    ${tier2}
+
+    ${tier3}
 
     ${t.deep_dive ? `
     <div class="detail-section">
@@ -1023,6 +1160,23 @@ function selectTicker(ticker) {
       </div>
     </div>` : ''}
 
+    ${consensusDetail}
+
+    ${modelHtml}
+
+    <details class="detail-section tier-4">
+      <summary>Infrastructure</summary>
+      <div class="metric-grid" style="margin-top:10px">
+        <div class="metric"><div class="k">README</div><div class="v">${t.readme ? '✓' : '✗'}</div></div>
+        <div class="metric"><div class="k">Download script</div><div class="v">${t.download_script ? '✓' : '✗'}</div></div>
+        <div class="metric"><div class="k">Index file</div><div class="v">${t.index_file ? '✓' : '✗'}</div></div>
+        <div class="metric"><div class="k">Research dir</div><div class="v">${t.research_dir ? '✓' : '✗'}</div></div>
+        <div class="metric"><div class="k">Completeness</div><div class="v">${t.completeness}%</div></div>
+        <div class="metric"><div class="k">Last download</div><div class="v">${t.last_download || '—'}</div></div>
+        <div class="metric"><div class="k">Last research</div><div class="v">${t.last_research || '—'}</div></div>
+      </div>
+    </details>
+
     <div class="detail-section">
       <h3>Recent developments</h3>
       <ul class="dev-list">
@@ -1037,8 +1191,8 @@ function selectTicker(ticker) {
 
     ${t.recent_files.length ? `
     <details class="detail-section">
-      <summary style="cursor:pointer;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);margin-bottom:8px">Recent files (${t.recent_files.length})</summary>
-      <ul class="dev-list">
+      <summary>Recent files (${t.recent_files.length})</summary>
+      <ul class="dev-list" style="margin-top:8px">
         ${t.recent_files.map(f => `
           <li>
             <div class="dev-date">${f.date}</div>
@@ -1049,6 +1203,7 @@ function selectTicker(ticker) {
   if (hasModel && typeof EquityModelViz !== 'undefined') {
     EquityModelViz.afterRender(modelBundle);
   }
+  wireDetailEvents(ticker);
 }
 
 function renderMarketFilters() {

@@ -55,6 +55,26 @@ def main() -> int:
             if not dd.get("executive_summary"):
                 warnings.append(f"{ticker}: deep_dive has no executive_summary")
 
+        lenses = row.get("lenses")
+        ds = row.get("decision_summary")
+        if lenses and not ds:
+            errors.append(f"{ticker}: lenses present but decision_summary missing")
+        elif ds:
+            for key in (
+                "stance",
+                "stance_source",
+                "house_irr_pct",
+                "lens_blend_pct",
+                "agreement_pct",
+                "as_of",
+            ):
+                if key not in ds:
+                    errors.append(f"{ticker}: decision_summary missing key {key}")
+        if lenses is not None and "active_lenses" not in row:
+            errors.append(f"{ticker}: lenses present but active_lenses missing")
+        if lenses is not None and "silent_lens_count" not in row:
+            errors.append(f"{ticker}: lenses present but silent_lens_count missing")
+
         onboard = row.get("onboard") or {}
         if onboard.get("deep_dive_pending") is False and dive_files and not dd:
             errors.append(f"{ticker}: onboard marks deep dive complete but JSON has no deep_dive")

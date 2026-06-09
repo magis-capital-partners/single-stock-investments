@@ -40,6 +40,8 @@ Read `{TICKER}/research/valuation.json` **before** opening optional frameworks. 
 | HK index ticker (TPL, ICE, MSB, SJT) | `hk_cross_reference.md` | `scan_third_party_sources --with-hk` |
 | Every listed ticker | `third_party_cross_reference.md` | `fill_cross_check` + `check_cross_checks` |
 | `insider_signal` (US CIK ticker) | `optionality_valuation.md` § Insider conviction | `fetch_insider_transactions` + `apply_insider_signal` in cloud refresh |
+| Every ticker with `valuation.json` | `persona_lens_consensus.md` | `persona_lens.py` → `{TICKER}/research/lenses.json` + `lens_consensus` block |
+| `lens_consensus.lawrence_divergence` | Milly + `[HUMAN REVIEW]` | compare consensus stance vs Lawrence gate |
 
 **Do not** read the full `analysis_arsenal.md` unless onboarding or resolving a missing trigger.
 

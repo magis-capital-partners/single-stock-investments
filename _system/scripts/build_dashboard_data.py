@@ -601,7 +601,141 @@ def transcript_summary(ticker: str, ticker_dir: Path) -> dict:
     }
 
 
-def build_ticker_row(ticker: str, holdings: dict[str, dict], portfolio_class: dict[str, dict]) -> dict:
+def load_lenses(ticker_dir: Path) -> dict | None:
+    path = ticker_dir / "research" / "lenses.json"
+    return _load_json(path)
+
+
+def load_insights_for_ticker(ticker: str, insights_doc: dict | None) -> list[dict]:
+    if not insights_doc:
+        return []
+    by_ticker = insights_doc.get("by_ticker") or {}
+    return by_ticker.get(ticker.upper()) or by_ticker.get(ticker) or []
+
+
+SOURCE_PRIORITY = {
+    "superinvestor_letter": 0,
+    "insider": 1,
+    "third_party": 2,
+    "macro": 3,
+    "theme": 4,
+    "news": 5,
+}
+
+
+def insight_evidence_url(evidence_ref: str | None) -> str | None:
+    if not evidence_ref:
+        return None
+    ref = evidence_ref.strip()
+    if ref.startswith("http://") or ref.startswith("https://"):
+        return ref
+    base = ref.split("#", 1)[0]
+    return github_blob_url(base)
+
+
+def enrich_ticker_insights(raw: list[dict], limit: int = 10) -> list[dict]:
+    out: list[dict] = []
+    for r in raw:
+        row = dict(r)
+        row["evidence_url"] = insight_evidence_url(row.get("evidence_ref"))
+        out.append(row)
+    out.sort(
+        key=lambda x: (
+            SOURCE_PRIORITY.get(x.get("source", ""), 9),
+            x.get("as_of") or "",
+        )
+    )
+    return out[:limit]
+
+
+def build_active_lenses(lenses_doc: dict | None) -> tuple[list[dict], int]:
+    if not lenses_doc:
+        return [], 0
+    personas = lenses_doc.get("lenses") or []
+    active: list[dict] = []
+    silent = 0
+    for p in personas:
+        rel = float(p.get("relevance") or 0)
+        verdict = p.get("verdict") or "silent"
+        if rel <= 0 or verdict == "silent":
+            silent += 1
+            continue
+        label = (p.get("label") or p.get("persona") or "").split("/")[0].strip()
+        active.append(
+            {
+                "persona": p.get("persona"),
+                "label": label or p.get("persona"),
+                "verdict": verdict,
+                "return_pct": p.get("return_pct"),
+                "relevance": rel,
+                "horizon_yrs": p.get("horizon_yrs"),
+                "key_metrics": p.get("key_metrics") or [],
+                "falsifier": p.get("falsifier"),
+            }
+        )
+    active.sort(key=lambda x: (-x["relevance"], -(x.get("return_pct") or -999)))
+    return active[:3], silent
+
+
+def build_decision_summary(
+    classification: dict,
+    lenses_doc: dict | None,
+    human_review: dict | None,
+    valuation: dict | None,
+) -> dict | None:
+    if not lenses_doc:
+        return None
+    blend = lenses_doc.get("valuation_blend") or {}
+    consensus = lenses_doc.get("consensus") or {}
+    lens_block = (valuation or {}).get("lens_consensus") or {}
+
+    approved = (human_review or {}).get("approved_stance")
+    if approved:
+        stance = approved
+        stance_source = "approved"
+    elif consensus.get("stance"):
+        stance = consensus["stance"]
+        stance_source = "lens_consensus"
+    else:
+        stance = classification.get("stance", "watch")
+        stance_source = "classification"
+
+    dissents = consensus.get("dissents") or []
+    top_dissent = None
+    if dissents:
+        d0 = dissents[0]
+        top_dissent = {
+            "persona": d0.get("persona"),
+            "label": (d0.get("label") or d0.get("persona") or "").split("/")[0],
+            "verdict": d0.get("verdict"),
+        }
+
+    house = classification.get("analysis_irr_pct")
+    blend_pct = blend.get("blended_return_pct")
+    divergence = bool(
+        lens_block.get("lawrence_divergence")
+        or consensus.get("lawrence_divergence")
+    )
+    if house is not None and blend_pct is not None and not divergence:
+        divergence = abs(float(house) - float(blend_pct)) > 2.0
+
+    lens_stance = consensus.get("stance")
+
+    return {
+        "stance": stance,
+        "stance_source": stance_source,
+        "lens_stance": lens_stance,
+        "house_irr_pct": house,
+        "lens_blend_pct": blend_pct,
+        "lens_band_pct": blend.get("band_pct"),
+        "agreement_pct": consensus.get("agreement_pct"),
+        "top_dissent": top_dissent,
+        "divergence": divergence,
+        "as_of": lenses_doc.get("as_of") or classification.get("analysis_as_of"),
+    }
+
+
+def build_ticker_row(ticker: str, holdings: dict[str, dict], portfolio_class: dict[str, dict], insights_doc: dict | None = None) -> dict:
     ticker_dir = ROOT / ticker
     meta = {**TICKER_META.get(ticker, {}), **holdings.get(ticker, {})}
     dl_script, dl_path = has_download_script(ticker_dir)
@@ -635,6 +769,22 @@ def build_ticker_row(ticker: str, holdings: dict[str, dict], portfolio_class: di
         "transcripts": transcript_summary(ticker, ticker_dir),
     }
     row["completeness"] = completeness_score(row)
+    lenses = load_lenses(ticker_dir)
+    val = load_valuation(ticker_dir)
+    if lenses:
+        row["lenses"] = {
+            "as_of": lenses.get("as_of"),
+            "valuation_blend": lenses.get("valuation_blend"),
+            "consensus": lenses.get("consensus"),
+            "personas": lenses.get("lenses"),
+        }
+        active, silent_count = build_active_lenses(lenses)
+        row["active_lenses"] = active
+        row["silent_lens_count"] = silent_count
+        row["decision_summary"] = build_decision_summary(
+            classification, lenses, row.get("human_review"), val
+        )
+    row["insights"] = enrich_ticker_insights(load_insights_for_ticker(ticker, insights_doc))
     return row
 
 
@@ -643,7 +793,8 @@ def build() -> dict:
     holdings = parse_holdings()
     portfolio_class = load_classification()
     tickers = list_tickers()
-    rows = [build_ticker_row(t, holdings, portfolio_class) for t in tickers]
+    insights_doc = _load_json(DATA_DIR / "insights.json")
+    rows = [build_ticker_row(t, holdings, portfolio_class, insights_doc) for t in tickers]
     watchlist = build_watchlist_rows(reg.get("watchlist") or {})
 
     total_pdfs = sum(r["pdf_count"] for r in rows)
@@ -799,6 +950,19 @@ def main() -> None:
     model_ready = sum(1 for r in payload["tickers"] if (r.get("equity_model") or {}).get("ready"))
     payload["summary"]["equity_models_ready"] = model_ready
     payload["equity_models"] = equity_payload
+    insights_doc = _load_json(DATA_DIR / "insights.json")
+    if not insights_doc:
+        import subprocess
+
+        ins_script = ROOT / "_system" / "scripts" / "build_insights.py"
+        if ins_script.exists():
+            subprocess.run([sys.executable, str(ins_script)], cwd=str(ROOT), check=False)
+            insights_doc = _load_json(DATA_DIR / "insights.json")
+    if insights_doc:
+        payload["insights"] = insights_doc
+    persona_cal = _load_json(DATA_DIR / "persona_calibration.json")
+    if persona_cal:
+        payload["persona_calibration"] = persona_cal
     bundle = load_darwin_bundle() or build_darwin_if_missing() or {}
     serving = bundle.get("serving") or load_darwin_serving()
     if serving:

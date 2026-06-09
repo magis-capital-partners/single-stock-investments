@@ -87,7 +87,7 @@ Legacy `moi_bucket` values map 1:1 → `payoff_lens` (see `moi_lens.md`).
 |------|---------|-----|
 | Special situation inefficiency list | `event` lens | `special_situation_lens.md` |
 | Spinoff / simplification | Conglomerate, BN, SPGI | Stahl spinoffs PDF |
-| Milly adversarial pass | After every deep dive | `MILLY.md` |
+| Persona-lens consensus | every ticker with `valuation.json` | `persona_lens_consensus.md`; `persona_lens.py` + `build_insights.py` |
 
 ---
 

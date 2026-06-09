@@ -245,6 +245,19 @@ def feature_row(
 
     narr = narrative_features_for_row(ticker, one_line_thesis(ticker_dir), as_of=as_of)
 
+    persona_agreement_pct = None
+    superinvestor_overlap = 0
+    lenses_path = ticker_dir / "research" / "lenses.json"
+    if lenses_path.exists():
+        try:
+            lenses_doc = json.loads(lenses_path.read_text(encoding="utf-8"))
+            persona_agreement_pct = (lenses_doc.get("consensus") or {}).get("agreement_pct")
+            for lens in lenses_doc.get("lenses") or []:
+                if lens.get("relevance", 0) >= 1.0:
+                    superinvestor_overlap += 1
+        except json.JSONDecodeError:
+            pass
+
     vector = (
         [irr_base or 0.0, irr_bear or irr_base or 0.0, irr_bull or irr_base or 0.0, irr_fals or irr_base or 0.0]
         + narr["narrative_embedding"]
@@ -258,6 +271,8 @@ def feature_row(
             min((falsifier_count or 0) / 5.0, 1.0),
             1.0 if human_pending else 0.0,
             min((_days_since(dive_date) or 365) / 365.0, 2.0),
+            (persona_agreement_pct or 0.0) / 100.0,
+            min(superinvestor_overlap / 3.0, 1.0),
         ]
     )
 
@@ -269,7 +284,7 @@ def feature_row(
         + [f"dhando_{d}" for d in DHANDO]
         + [f"stance_{s}" for s in STANCES]
         + [f"bucket_{b}" for b in BUCKETS]
-        + ["completeness", "falsifier_norm", "human_review_pending", "staleness_years"]
+        + ["completeness", "falsifier_norm", "human_review_pending", "staleness_years", "persona_agreement_norm", "persona_high_relevance_norm"]
     )
 
     return {
@@ -288,6 +303,8 @@ def feature_row(
         "feature_as_of": as_of,
         "one_line_thesis": one_line_thesis(ticker_dir),
         "human_review_pending": human_pending,
+        "persona_agreement_pct": persona_agreement_pct,
+        "persona_high_relevance_count": superinvestor_overlap,
         "narrative_embedding": narr["narrative_embedding"],
         "narrative_snippet_len": narr["narrative_snippet_len"],
         "feature_names": names,

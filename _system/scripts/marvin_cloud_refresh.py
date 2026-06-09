@@ -329,12 +329,25 @@ def main() -> int:
         [PY, str(SCRIPTS / "sync_classification.py"), "--fix", "--ticker", ticker],
         optional=True,
     )
+    ok &= run_script(
+        "persona lenses",
+        "persona_lens.py",
+        [ticker],
+        optional=True,
+    )
     if not args.skip_dashboard:
         ok &= run(
             "dashboard JSON",
             [PY, str(SCRIPTS / "build_dashboard_data.py")],
             optional=True,
         )
+    ok &= run_script("insights merge", "build_insights.py", [], optional=True)
+    ok &= run_script(
+        "persona calibration",
+        "relevance_calibration_check.py",
+        [],
+        optional=True,
+    )
     ok &= run(
         "cross-check verify",
         [PY, str(SCRIPTS / "check_cross_checks.py"), ticker],

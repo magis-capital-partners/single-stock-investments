@@ -12,7 +12,22 @@ DATE ?= $(shell date +%Y-%m-%d)
 TICKER ?=
 DATE ?= $(shell date +%Y-%m-%d)
 
-.PHONY: research-check research-check-all depth-check depth-audit evidence milly-repass book-estimate book-estimate-all holdco-uplift short-scan hk-scan hk-cross-check-all hk-extract-refresh third-party-scan-all cross-check-all transcript-sync batch-refresh evidence-check darwin-pit-check darwin-build darwin-pit-audit darwin-sync-external darwin-explore
+.PHONY: research-check research-check-all depth-check depth-audit evidence milly-repass book-estimate book-estimate-all holdco-uplift short-scan hk-scan hk-cross-check-all hk-extract-refresh third-party-scan-all cross-check-all transcript-sync batch-refresh evidence-check darwin-pit-check darwin-build darwin-pit-audit darwin-sync-external darwin-explore persona-lens persona-insights persona-check
+
+persona-lens:
+	$(PYTHON) $(SCRIPTS)/fetch_superinvestor_letters.py --all --build
+	$(PYTHON) $(SCRIPTS)/persona_lens.py --all
+	$(PYTHON) $(SCRIPTS)/append_persona_memory.py --date $(DATE)
+	$(PYTHON) $(SCRIPTS)/build_dashboard_data.py
+	@echo OK: persona-lens pipeline
+
+persona-fetch-letters:
+	$(PYTHON) $(SCRIPTS)/fetch_superinvestor_letters.py --all --build
+	@echo OK: persona-fetch-letters
+
+persona-check:
+	$(PYTHON) $(SCRIPTS)/lint_persona_lens.py --portfolio
+	@echo OK: persona-check
 
 darwin-build:
 	$(PYTHON) $(SCRIPTS)/build_darwin_portfolio.py --fast --account all

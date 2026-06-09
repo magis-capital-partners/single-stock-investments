@@ -1,0 +1,138 @@
+{
+  "version": "1.0",
+  "portfolio_bar_pct": 15,
+  "max_high_relevance": 3,
+  "personas": {
+    "hohn": {
+      "label": "Chris Hohn / TCI",
+      "source": "_system/reference/investment-wisdom/tci/",
+      "horizon_base_yrs": 4,
+      "bar_min_return_pct": 15,
+      "return_fn": "lawrence_base",
+      "criteria": [
+        {"id": "barrier_archetype", "check": "archetype_any", "values": ["croupier", "compounder", "platform", "infrastructure", "serial_acquirer"]},
+        {"id": "positive_fcf", "check": "fcf_yield_gte", "threshold": 0.5},
+        {"id": "modelable", "check": "base_irr_present"}
+      ],
+      "falsifier": "FCF yield < 0.5% or commoditized archetype (turnaround/optionality only)",
+      "key_metrics": ["fcf_yield", "base_return_pct", "growth_y1_5"]
+    },
+    "pabrai": {
+      "label": "Mohnish Pabrai",
+      "source": "_system/reference/investment-wisdom/pabrai/",
+      "horizon_base_yrs": 3,
+      "bar_min_return_pct": 15,
+      "return_fn": "pabrai_bear_bounded",
+      "criteria": [
+        {"id": "dhando_ok", "check": "dhando_any", "values": ["full", "partial"]},
+        {"id": "leverage_ok", "check": "leverage_lte", "threshold": 3.0},
+        {"id": "bounded_downside", "check": "bear_return_gte", "threshold": -15}
+      ],
+      "falsifier": "dhando -> none OR net-debt/EBITDA > 3 OR bear return < -15%",
+      "key_metrics": ["downside_upside_ratio", "net_debt_ebitda", "dhando"]
+    },
+    "stahl": {
+      "label": "Murray Stahl",
+      "source": "_system/reference/investment-wisdom/stahl/",
+      "horizon_base_yrs": 10,
+      "bar_min_return_pct": 10,
+      "return_fn": "stahl_long_horizon",
+      "criteria": [
+        {"id": "hard_asset_archetype", "check": "archetype_any", "values": ["croupier", "infrastructure", "holding_co", "platform"]},
+        {"id": "moat_durable", "check": "moat_any", "values": ["widening", "stable"]}
+      ],
+      "falsifier": "No asset intensity / pricing power (moat eroding + non-croupier)",
+      "key_metrics": ["archetype", "moat", "bull_return_pct"]
+    },
+    "munger": {
+      "label": "Charlie Munger",
+      "source": "_system/reference/investment-wisdom/munger/",
+      "horizon_base_yrs": 10,
+      "bar_min_return_pct": 12,
+      "return_fn": "munger_quality",
+      "criteria": [
+        {"id": "moat_ok", "check": "moat_any", "values": ["widening", "stable"]},
+        {"id": "comprehensible", "check": "irr_method_not", "values": ["pending"]}
+      ],
+      "falsifier": "Moat eroding/unproven or irr_method pending",
+      "key_metrics": ["moat", "base_return_pct", "roic_proxy"]
+    },
+    "greenblatt": {
+      "label": "Joel Greenblatt",
+      "source": "_system/reference/investment-wisdom/greenblatt/",
+      "horizon_base_yrs": 3,
+      "bar_min_return_pct": 15,
+      "return_fn": "greenblatt_magic",
+      "criteria": [
+        {"id": "earnings_yield_high", "check": "fcf_yield_percentile_gte", "threshold": 0.66},
+        {"id": "quality_proxy", "check": "base_irr_percentile_gte", "threshold": 0.5}
+      ],
+      "falsifier": "FCF yield below universe median OR base IRR below median",
+      "key_metrics": ["earnings_yield", "roic_proxy", "base_return_pct"]
+    },
+    "buffett_weschler": {
+      "label": "Buffett / Weschler",
+      "source": "_system/reference/investment-wisdom/buffett/",
+      "horizon_base_yrs": 10,
+      "bar_min_return_pct": 12,
+      "return_fn": "buffett_owner_earnings",
+      "criteria": [
+        {"id": "durable_moat", "check": "moat_any", "values": ["widening", "stable"]},
+        {"id": "compounder_archetype", "check": "archetype_any", "values": ["compounder", "platform", "serial_acquirer"]},
+        {"id": "dhando_not_none", "check": "dhando_not", "values": ["none"]}
+      ],
+      "falsifier": "Eroding moat or dhando none",
+      "key_metrics": ["owner_earnings_yield", "moat", "base_return_pct"]
+    },
+    "moi": {
+      "label": "John Mihaljevic / MOI",
+      "source": "_system/reference/investment-wisdom/mihaljevic/",
+      "horizon_base_yrs": 3,
+      "bar_min_return_pct": 15,
+      "return_fn": "lawrence_base",
+      "criteria": [
+        {"id": "special_situation", "check": "payoff_lens_any", "values": ["asset", "event", "levered"]}
+      ],
+      "falsifier": "Operating lens only — no dated inefficiency / catalyst",
+      "key_metrics": ["payoff_lens", "base_return_pct", "catalyst_present"]
+    },
+    "hk": {
+      "label": "Horizon Kinetics",
+      "source": "_system/reference/investment-wisdom/horizon-kinetics/",
+      "horizon_base_yrs": 5,
+      "bar_min_return_pct": 12,
+      "return_fn": "hk_dated_payoff",
+      "criteria": [
+        {"id": "asset_or_event", "check": "payoff_lens_any", "values": ["asset", "event"]},
+        {"id": "dated_payoff", "check": "predictive_attribute_or_asset"}
+      ],
+      "falsifier": "No dated contractual payoff or royalty/trust structure",
+      "key_metrics": ["payoff_lens", "base_return_pct", "predictive_attribute"]
+    },
+    "lawrence": {
+      "label": "Lawrence (house IRR)",
+      "source": "_system/frameworks/lawrence_irr.md",
+      "horizon_base_yrs": 7,
+      "bar_min_return_pct": 15,
+      "return_fn": "lawrence_synthesis",
+      "criteria": [
+        {"id": "always", "check": "always"}
+      ],
+      "falsifier": "Synthesis incomplete or irr_method pending",
+      "key_metrics": ["synthesis_pct", "base_return_pct", "filing_gate_pct"]
+    }
+  },
+  "fund_persona_map": {
+    "pershing square": ["buffett_weschler", "hohn"],
+    "ackman": ["buffett_weschler", "hohn"],
+    "baupost": ["pabrai", "moi"],
+    "klarman": ["pabrai", "moi"],
+    "third point": ["hohn", "moi"],
+    "lone pine": ["buffett_weschler", "hohn"],
+    "tiger global": ["hohn", "buffett_weschler"],
+    "coatue": ["hohn"],
+    "valueact": ["hohn", "buffett_weschler"],
+    "horizon kinetics": ["hk", "stahl"],
+    "horizon": ["hk", "stahl"]
+  }
+}
