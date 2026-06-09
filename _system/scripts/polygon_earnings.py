@@ -13,7 +13,7 @@ import time
 from collections import deque
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 import requests
 
@@ -30,13 +30,17 @@ POLYGON_BASES = (
     "https://api.massive.com",
 )
 EARNINGS_PATH = "/benzinga/v1/earnings"
+PROBE_TICKER = os.getenv("POLYGON_EARNINGS_PROBE_TICKER", "AAPL")
 
-POLICY_VERSION = 1
+AccessStatus = Literal["ok", "forbidden", "no_key", "transient", "unknown"]
+
+POLICY_VERSION = 2
 HTTP_TIMEOUT_SEC = int(os.getenv("POLYGON_EARNINGS_HTTP_TIMEOUT_SEC", "30"))
 HTTP_RETRY_TOTAL = int(os.getenv("POLYGON_EARNINGS_HTTP_RETRY_TOTAL", "3"))
 POLYGON_REQS_PER_MIN = int(os.getenv("POLYGON_EARNINGS_REQS_PER_MIN", "5"))
 DEFAULT_LOOKBACK_DAYS = int(os.getenv("POLYGON_EARNINGS_LOOKBACK_DAYS", "120"))
 DEFAULT_LOOKAHEAD_DAYS = int(os.getenv("POLYGON_EARNINGS_LOOKAHEAD_DAYS", "45"))
+CACHE_MAX_AGE_HOURS = int(os.getenv("POLYGON_EARNINGS_CACHE_MAX_AGE_HOURS", "36"))
 
 _REQUEST_TIMESTAMPS: deque[float] = deque()
 
@@ -62,9 +66,15 @@ def _session() -> requests.Session:
     return s
 
 
-def _polygon_get(session: requests.Session, url: str, params: dict | None = None) -> dict | None:
+def _polygon_request(
+    session: requests.Session,
+    url: str,
+    params: dict | None = None,
+    *,
+    log_errors: bool = True,
+) -> tuple[dict | None, int | None]:
     if not POLYGON_API_KEY:
-        return None
+        return None, None
     p = dict(params or {})
     p.setdefault("apiKey", POLYGON_API_KEY)
     for attempt in range(max(1, HTTP_RETRY_TOTAL + 1)):
@@ -72,7 +82,8 @@ def _polygon_get(session: requests.Session, url: str, params: dict | None = None
         try:
             resp = session.get(url, params=p, timeout=HTTP_TIMEOUT_SEC)
         except Exception as exc:  # noqa: BLE001
-            LOGGER.warning("polygon earnings request failed: %s", exc)
+            if log_errors:
+                LOGGER.warning("polygon earnings request failed: %s", exc)
             time.sleep(0.4 * (attempt + 1))
             continue
         _REQUEST_TIMESTAMPS.append(time.monotonic())
@@ -80,13 +91,166 @@ def _polygon_get(session: requests.Session, url: str, params: dict | None = None
             time.sleep(min(20.0, 2.0 * (attempt + 1)))
             continue
         if resp.status_code >= 400:
-            LOGGER.warning("polygon earnings GET %s -> %s", url, resp.status_code)
-            return None
+            if log_errors:
+                LOGGER.warning("polygon earnings GET %s -> %s", url, resp.status_code)
+            return None, resp.status_code
         try:
-            return resp.json()
+            return resp.json(), resp.status_code
         except Exception:  # noqa: BLE001
-            return None
+            return None, resp.status_code
+    return None, None
+
+
+def _polygon_get(
+    session: requests.Session,
+    url: str,
+    params: dict | None = None,
+    *,
+    log_errors: bool = True,
+) -> dict | None:
+    payload, status_code = _polygon_request(session, url, params, log_errors=log_errors)
+    if status_code == 200 and payload is not None:
+        return payload
     return None
+
+
+def probe_earnings_access(
+    session: requests.Session | None = None,
+    *,
+    probe_ticker: str = PROBE_TICKER,
+) -> AccessStatus:
+    """Single probe before portfolio-wide fetch. Returns access status without per-ticker spam."""
+    if not POLYGON_API_KEY:
+        return "no_key"
+
+    session = session or _session()
+    today = date.today()
+    params = {
+        "ticker": probe_ticker,
+        "date.gte": (today - timedelta(days=7)).isoformat(),
+        "date.lte": (today + timedelta(days=7)).isoformat(),
+        "limit": 1,
+    }
+
+    status_codes: list[int] = []
+
+    def _probe_once() -> AccessStatus:
+        status_codes.clear()
+        for base in POLYGON_BASES:
+            url = f"{base}{EARNINGS_PATH}"
+            _payload, code = _polygon_request(session, url, params, log_errors=False)
+            if code == 200:
+                return "ok"
+            if code is not None:
+                status_codes.append(code)
+        if status_codes and all(code == 403 for code in status_codes):
+            return "forbidden"
+        if any(code == 429 for code in status_codes):
+            return "transient"
+        if status_codes:
+            return "unknown"
+        return "transient"
+
+    first = _probe_once()
+    if first == "transient":
+        time.sleep(1.0)
+        second = _probe_once()
+        return second if second != "transient" else "transient"
+    return first
+
+
+def _event_counts(events: list[dict]) -> dict[str, int]:
+    return {
+        "event_count": len(events),
+        "verified_count": sum(1 for e in events if e.get("verified")),
+        "reported_count": sum(1 for e in events if e.get("reported")),
+    }
+
+
+def _build_payload(
+    events: list[dict],
+    errors: list[dict],
+    *,
+    date_from: date,
+    date_to: date,
+    access_status: AccessStatus,
+    fetch_skipped: bool = False,
+) -> dict[str, Any]:
+    now = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
+    payload = {
+        "as_of": now,
+        "policy_version": POLICY_VERSION,
+        "date_from": date_from.isoformat(),
+        "date_to": date_to.isoformat(),
+        "polygon_enabled": bool(POLYGON_API_KEY),
+        "access_status": access_status,
+        "access_checked_at": now,
+        "fetch_skipped": fetch_skipped,
+        "events": events,
+        "errors": errors,
+    }
+    payload.update(_event_counts(events))
+    return payload
+
+
+def merge_earnings_cache_payload(existing: dict, incoming: dict) -> dict:
+    """Merge fetch result with existing cache; never wipe events on access denial."""
+    existing = existing or {}
+    access = incoming.get("access_status", "unknown")
+    fetch_skipped = bool(incoming.get("fetch_skipped"))
+    existing_events = existing.get("events") or []
+    incoming_events = incoming.get("events") or []
+
+    if access == "ok" and incoming_events:
+        return incoming
+
+    if access == "ok" and not fetch_skipped:
+        return incoming
+
+    if fetch_skipped or access in ("forbidden", "no_key", "transient"):
+        out = dict(incoming)
+        if existing_events:
+            out["events"] = existing_events
+            out.update(_event_counts(existing_events))
+            out["events_source"] = "cache_preserved"
+            out["cache_preserved"] = True
+        return out
+
+    if not incoming_events and existing_events:
+        out = dict(incoming)
+        out["events"] = existing_events
+        out.update(_event_counts(existing_events))
+        out["events_source"] = "cache_preserved"
+        out["cache_preserved"] = True
+        return out
+
+    return incoming
+
+
+def resolve_earnings_events(fetch_payload: dict, cache: dict | None = None) -> list[dict]:
+    """Return events for downstream use, preserving cache when fetch was skipped or denied."""
+    cache = cache or {}
+    merged = merge_earnings_cache_payload(cache, fetch_payload)
+    events = merged.get("events") or []
+    if merged.get("cache_preserved"):
+        LOGGER.info(
+            "Using cached earnings calendar (%d events, as_of=%s)",
+            len(events),
+            cache.get("as_of") or "unknown",
+        )
+    return events
+
+
+def cache_is_fresh(cache: dict, *, max_age_hours: int = CACHE_MAX_AGE_HOURS) -> bool:
+    as_of = cache.get("as_of")
+    if not as_of:
+        return False
+    try:
+        ts = datetime.fromisoformat(str(as_of).replace("Z", "+00:00"))
+    except ValueError:
+        return False
+    age = datetime.now(UTC) - ts
+    return age <= timedelta(hours=max_age_hours)
 
 
 def _paginate(
@@ -219,7 +383,52 @@ def fetch_portfolio_earnings(
     if tickers:
         configs = {t: configs[t] for t in tickers if t in configs}
 
+    if not POLYGON_API_KEY:
+        return _build_payload(
+            [],
+            [],
+            date_from=date_from,
+            date_to=date_to,
+            access_status="no_key",
+            fetch_skipped=True,
+        )
+
     session = _session()
+    access = probe_earnings_access(session)
+
+    if access == "forbidden":
+        LOGGER.warning("polygon earnings access denied (403); skipping portfolio fetch")
+        return _build_payload(
+            [],
+            [],
+            date_from=date_from,
+            date_to=date_to,
+            access_status="forbidden",
+            fetch_skipped=True,
+        )
+
+    if access == "transient":
+        LOGGER.warning("polygon earnings probe transient failure; skipping portfolio fetch")
+        return _build_payload(
+            [],
+            [],
+            date_from=date_from,
+            date_to=date_to,
+            access_status="transient",
+            fetch_skipped=True,
+        )
+
+    if access != "ok":
+        LOGGER.warning("polygon earnings probe returned %s; skipping portfolio fetch", access)
+        return _build_payload(
+            [],
+            [],
+            date_from=date_from,
+            date_to=date_to,
+            access_status=access,
+            fetch_skipped=True,
+        )
+
     events: list[dict] = []
     errors: list[dict] = []
 
@@ -242,24 +451,21 @@ def fetch_portfolio_earnings(
 
     events.sort(key=lambda e: (e.get("date") or "", e.get("portfolio_ticker") or ""), reverse=True)
 
-    payload = {
-        "as_of": datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "policy_version": POLICY_VERSION,
-        "date_from": date_from.isoformat(),
-        "date_to": date_to.isoformat(),
-        "polygon_enabled": bool(POLYGON_API_KEY),
-        "event_count": len(events),
-        "verified_count": sum(1 for e in events if e.get("verified")),
-        "reported_count": sum(1 for e in events if e.get("reported")),
-        "events": events,
-        "errors": errors,
-    }
-    return payload
+    return _build_payload(
+        events,
+        errors,
+        date_from=date_from,
+        date_to=date_to,
+        access_status="ok",
+        fetch_skipped=False,
+    )
 
 
-def save_earnings_cache(payload: dict) -> Path:
+def save_earnings_cache(payload: dict, *, existing: dict | None = None) -> Path:
+    existing = load_earnings_cache() if existing is None else existing
+    merged = merge_earnings_cache_payload(existing, payload)
     EARNINGS_CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
-    EARNINGS_CACHE_PATH.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    EARNINGS_CACHE_PATH.write_text(json.dumps(merged, indent=2) + "\n", encoding="utf-8")
     return EARNINGS_CACHE_PATH
 
 
