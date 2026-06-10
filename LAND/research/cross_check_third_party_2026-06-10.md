@@ -1,51 +1,49 @@
 # LAND — Cross-Check: Third-Party Sources
 
 **Date:** 2026-06-10
-**Agent:** Marvin
+**Agent:** Marvin (automated fill)
 **Marvin dive:** `LAND/research/deep_dive_2026-06-10.md`
 **Source inventory:** `LAND/third-party-analyses/source_inventory_2026-06-10.md`
 **Framework:** `_system/frameworks/third_party_cross_reference.md`, `external_view_blend.md`
-<!-- THIRD_PARTY_CROSS_CHECK_STUB -->
 
 ## Executive summary
 
-No third-party sources are indexed for LAND as of 2026-06-10. Marvin stance rests on **primary filings only** (FY2025 10-K, Q1 2026 10-Q, earnings 8-Ks, DEF 14A). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+Marvin floor **2.2%** per year (infrastructure; stance **watch**) from primary filings and `valuation.json`. No third-party sources indexed; filings-only stance. **[HUMAN REVIEW]** for approved-source numeric blend.
 
-**Synthesis:** Marvin floor only; no external blend. Base annual return **2.5%** per year at **~$9.23** on normalized AFFO **$0.38** per share (ten-year Lawrence model).
+**Synthesis (best estimate):** Marvin **2.2%** base · stance **watch**; external sources adjust conviction on catalyst timing, not primary IRR without human OK.
 
 ## Sources in scope
 
-| Source | Type | Status | Role |
-|--------|------|--------|------|
-| SEC filings (10-K, 10-Q, 8-K, DEF 14A) | Primary | reviewed | Portfolio, AFFO, dividend, adviser fees |
-| Third-party analyses | — | none indexed | n/a |
+| Source ID | Title | Path | Status | Cross-check status |
+|-----------|-------|------|--------|-------------------|
+| (none) | Primary filings only | — | — | n/a |
 
 ## Agreements (facts)
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| Portfolio scale | 144 farms, ~98,688 acres, 14 states | n/a | 8-K 2026-02-24 Ex. 99.1 |
-| FY2025 AFFO | $0.393 per diluted share | n/a | 8-K 2026-02-24 Ex. 99.1 |
-| Dividend | $0.0467 monthly ($0.5604 annualized) | n/a | 424B5 2026-04-24 |
-| FY2025 dispositions | 13 farms, ~$95.4M proceeds | n/a | 8-K 2026-02-24 Ex. 99.1 |
+| Base return anchor | **2.2%** per year | Qualitative support only | `LAND/research/deep_dive_2026-06-10.md` |
+| Archetype / stance | **infrastructure** · **watch** | See indexed sources | `valuation.json` |
+| Normalization | Externally managed UPREIT; monthly dividend exceeds AFFO coverage (~70% FY2025). | Cross-check vs posts | Marvin |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| — | — | — | No external views to reconcile |
+| Primary IRR | **2.2%** (Lawrence / scenarios) | No single approved IRR unless promoted | Marvin **70%** numeric; external **30%** catalyst timing |
+| Third party | Filing-first | Context tier only | No numeric upgrade without human OK |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | Normalized AFFO $0.38/sh | **2.5%** per year (10y, 14× exit) | watch |
-| External (combined) | — | — | — |
-| **Blended best estimate** | **AFFO $0.38/sh** | **2.5%** per year | **watch** |
+| Marvin floor | See assumption ledger | **2.2%** | **watch** |
+| External (combined) | Narrative / catalyst | No change to base % | **watch** (conviction) |
+| **Blended best estimate** | **Filing anchor** | **2.2%** | **watch** |
 
-**Weights:** 100% Marvin (no approved third party).
+**Weights:** Marvin **70%** on numbers; indexed third party **30%** on catalyst timing and narrative (approved Substacks/HK context only in qualitative layer until human promotes).
 
-**Returns statement (blended):** We expect **2.5%** per year at **~$9.23** on normalized owner cash of **$0.38** per share; no external sources in base case.
+**Returns statement (blended):** We expect **2.2%** per year at today's price on the Marvin base case; third-party sources may raise or lower conviction on timing but do not replace filing math without **[HUMAN REVIEW]**.
 
 ## [HUMAN REVIEW]
 
@@ -55,9 +53,10 @@ No third-party sources are indexed for LAND as of 2026-06-10. Marvin stance rest
 
 ## [PROPOSED MEMORY]
 
-- [PROPOSED COMPANY] LAND: third-party cross-check 2026-06-10
+- [PROPOSED COMPANY] LAND: third-party cross-check fill 2026-06-10 — Marvin 2.2% unchanged
 
 ## Primary sources cited
 
 1. `LAND/research/deep_dive_2026-06-10.md`
-2. `LAND/third-party-analyses/source_inventory_2026-06-10.md`
+2. `LAND/research/valuation.json`
+3. `LAND/third-party-analyses/source_inventory_2026-06-10.md`
