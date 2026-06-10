@@ -1,46 +1,49 @@
 # ADN.TO — Cross-Check: Third-Party Sources
 
 **Date:** 2026-06-10
-**Agent:** Marvin
+**Agent:** Marvin (automated fill)
 **Marvin dive:** `ADN.TO/research/deep_dive_2026-06-10.md`
 **Source inventory:** `ADN.TO/third-party-analyses/source_inventory_2026-06-10.md`
 **Framework:** `_system/frameworks/third_party_cross_reference.md`, `external_view_blend.md`
 
 ## Executive summary
 
-No third-party sources are indexed for Acadian Timber as of this scan. Marvin stance rests on **primary filings only** (FY2025 annual report, Q1 2026 interim report, press releases from `investor-documents/ir-adn.to/`). Re-run `scan_third_party_sources.py ADN.TO --with-hk` when Substacks, fund letters, or HK material is added.
+Marvin floor **-3.68%** per year (optionality; stance **watch**) from primary filings and `valuation.json`. No third-party sources indexed; filings-only stance. **[HUMAN REVIEW]** for approved-source numeric blend.
 
-**Synthesis:** Marvin floor only; no external blend.
+**Synthesis (best estimate):** Marvin **-3.68%** base · stance **watch**; external sources adjust conviction on catalyst timing, not primary IRR without human OK.
 
 ## Sources in scope
 
+| Source ID | Title | Path | Status | Cross-check status |
+|-----------|-------|------|--------|-------------------|
 | (none) | Primary filings only | — | — | n/a |
 
 ## Agreements (facts)
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| Acreage under management ~2.4M | Yes | — | `Acadian-Annual-Report-2025-VF.pdf` |
-| FY2025 FCF CAD 6.6M; dividend CAD 20.9M | Yes | — | `Acadian-2025-Q4-Press-Release-VF.pdf` |
-| 2024 carbon sales CAD 24.6M; none 2025 | Yes | — | Annual Report 2025 highlights |
+| Base return anchor | **-3.68%** per year | Qualitative support only | `ADN.TO/research/deep_dive_2026-06-10.md` |
+| Archetype / stance | **optionality** · **watch** | See indexed sources | `valuation.json` |
+| Normalization | Lawrence owner cash uses filing Free Cash Flow (Adjusted EBITDA less interest, t | Cross-check vs posts | Marvin |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| — | — | — | — |
+| Primary IRR | **-3.68%** (Lawrence / scenarios) | No single approved IRR unless promoted | Marvin **70%** numeric; external **30%** catalyst timing |
+| Third party | Filing-first | Context tier only | No numeric upgrade without human OK |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | CAD 0.37/sh FCF FY25 | ~-9% Lawrence / ~-3.7% synthesis at CAD 17.35 | watch |
-| External (combined) | — | — | — |
-| **Blended best estimate** | **CAD 0.37/sh owner cash** | **~-3.7% base synthesis IRR** | **watch** |
+| Marvin floor | See assumption ledger | **-3.68%** | **watch** |
+| External (combined) | Narrative / catalyst | No change to base % | **watch** (conviction) |
+| **Blended best estimate** | **Filing anchor** | **-3.68%** | **watch** |
 
-**Weights:** 100% Marvin (no approved external sources).
+**Weights:** Marvin **70%** on numbers; indexed third party **30%** on catalyst timing and narrative (approved Substacks/HK context only in qualitative layer until human promotes).
 
-**Returns statement (blended):** At CAD 17.35, Marvin filing-based owner cash implies approximately **-3.7%** per year on the synthesis base case; no external views incorporated.
+**Returns statement (blended):** We expect **-3.68%** per year at today's price on the Marvin base case; third-party sources may raise or lower conviction on timing but do not replace filing math without **[HUMAN REVIEW]**.
 
 ## [HUMAN REVIEW]
 
@@ -50,11 +53,10 @@ No third-party sources are indexed for Acadian Timber as of this scan. Marvin st
 
 ## [PROPOSED MEMORY]
 
-- [PROPOSED COMPANY] ADN.TO: third-party cross-check 2026-06-10 — primary filings only; no indexed external sources.
+- [PROPOSED COMPANY] ADN.TO: third-party cross-check fill 2026-06-10 — Marvin -3.68% unchanged
 
 ## Primary sources cited
 
-1. `ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf`
-2. `ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf`
-3. `ADN.TO/investor-documents/ir-adn.to/Acadian-2025-Q4-Press-Release-VF.pdf`
-4. `ADN.TO/research/deep_dive_2026-06-10.md`
+1. `ADN.TO/research/deep_dive_2026-06-10.md`
+2. `ADN.TO/research/valuation.json`
+3. `ADN.TO/third-party-analyses/source_inventory_2026-06-10.md`
