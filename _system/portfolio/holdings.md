@@ -9,7 +9,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-06-10.
 | 3905.T | 3905.T/ | DataSection Co., Ltd. | JP | 2026-06-10 | 2026-06-10 | compounder | watch |
 | 7176.T | 7176.T/ | Simplex Financial Holdings Co., Ltd. | JP | 2026-06-10 | 2026-06-10 | unknown | watch |
 | 8697.T | 8697.T/ | Japan Exchange Group | JP | 2026-06-10 | 2026-06-10 | croupier | hold |
-| ADN.TO | ADN.TO/ | Acadian Timber Corp. | CA | — | 2026-06-10 | optionality | watch |
+| ADN.TO | ADN.TO/ | Acadian Timber Corp. | CA | 2026-06-10 | 2026-06-10 | optionality | watch |
 | ALS.TO | ALS.TO/ | Altius Minerals Corporation | CA | 2026-06-03 | 2026-06-10 | unknown | watch |
 | AMD | AMD/ | Advanced Micro Devices, Inc. | US | 2026-06-10 | 2026-06-10 | unknown | watch |
 | AMZN | AMZN/ | Amazon.com | US | 2026-06-10 | 2026-06-10 | compounder | hold |
@@ -18,6 +18,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-06-10.
 | BKRB | BKRB/ | Berkshire Hathaway Inc. (Class B) | US | 2026-06-10 | 2026-06-10 | unknown | watch |
 | BN | BN/ | Brookfield Corporation | US | 2026-06-10 | 2026-06-10 | platform | hold |
 | BUR | BUR/ | Burford Capital Limited | US | 2026-06-10 | 2026-06-10 | unknown | watch |
+| BVERS | BVERS/ | Beaver Coal Company, Limited | OTC | — | 2026-06-10 | optionality | watch |
 | BWEL | BWEL/ | J.G. Boswell Company | US | 2026-06-10 | 2026-06-10 | optionality | watch |
 | CBOE | CBOE/ | Cboe Global Markets | US | 2026-06-10 | 2026-06-10 | unknown | watch |
 | CME | CME/ | CME Group Inc. | US | 2026-06-10 | 2026-06-10 | unknown | watch |
@@ -31,6 +32,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-06-10.
 | DRR.AX | DRR.AX/ | Deterra Royalties Limited | AU | 2026-06-02 | 2026-06-10 | unknown | watch |
 | FNV | FNV/ | Franco-Nevada Corporation | US | 2026-06-10 | 2026-06-10 | optionality | watch |
 | FRMO | FRMO/ | FRMO Corporation | US | 2026-06-10 | 2026-06-10 | holding_co | hold |
+| GCCO | GCCO/ | Garden City Co. | OTC | — | 2026-06-10 | optionality | watch |
 | GLXY | GLXY/ | Galaxy Digital Inc. | US | 2026-06-10 | 2026-06-10 | unknown | watch |
 | GOOGL | GOOGL/ | Alphabet Inc. | US | 2026-06-10 | 2026-06-10 | compounder | hold |
 | HE | HE/ | Hawaiian Electric Industries | US | 2026-06-10 | 2026-06-10 | unknown | watch |
@@ -56,6 +58,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-06-10.
 | PBT | PBT/ | Permian Basin Royalty Trust | US | 2026-06-10 | 2026-06-10 | unknown | watch |
 | PCH | PCH/ | PotlatchDeltic Corporation | US | 2026-06-10 | 2026-06-10 | optionality | watch |
 | PCYO | PCYO/ | Pure Cycle Corporation | US | 2026-06-10 | 2026-06-10 | unknown | watch |
+| PDER | PDER/ | Pardee Resources Company | OTC | — | 2026-06-10 | optionality | watch |
 | PSK.TO | PSK.TO/ | PrairieSky Royalty Ltd. | CA | 2026-06-03 | 2026-06-10 | optionality | watch |
 | QDEL | QDEL/ | QuidelOrtho | US | 2026-06-10 | 2026-06-10 | turnaround | hold |
 | RGLD | RGLD/ | Royal Gold Inc. | US | 2026-06-10 | 2026-06-10 | unknown | watch |
@@ -74,5 +77,6 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-06-10.
 | VTRS | VTRS/ | Viatris Inc | US | 2026-06-10 | 2026-06-10 | turnaround | watch |
 | WBI | WBI/ | WaterBridge Infrastructure | US | 2026-06-10 | 2026-06-10 | infrastructure | watch |
 | WPM | WPM/ | Wheaton Precious Metals Corp. | US | 2026-06-10 | 2026-06-10 | compounder | watch |
+| WRLC | WRLC/ | Windrock Land Company | OTC | — | 2026-06-10 | optionality | watch |
 
-**68 holdings total.** Registry: `_system/portfolio/registry.json`
+**72 holdings total.** Registry: `_system/portfolio/registry.json`
