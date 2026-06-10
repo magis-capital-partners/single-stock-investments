@@ -1,0 +1,375 @@
+{
+  "ticker": "GCCO",
+  "as_of": "2026-06-10",
+  "valuation_mode": "optionality",
+  "method": "full",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "unproven",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "asset",
+    "investment_sleeve": "real_assets_land",
+    "predictive_attribute": "family_controlled_farmland_otc"
+  },
+  "inputs": {
+    "price": 1284.0,
+    "price_source": "[Assumption] Dec 2024 stock option exercise price $1,284/sh (2024-12-31_Annual_Report.pdf Note 10); refresh live OTC quote before accumulate",
+    "price_as_of": "2026-06-10",
+    "shares_outstanding": 34865,
+    "shares_source": "FY2024 annual report: 34,865 shares issued and outstanding",
+    "book_per_share": 406.77,
+    "book_per_share_source": "FY2024 stockholders equity $14,191,824 / 34,865 shares",
+    "equity_market_cap_m": 44.77,
+    "book_equity_m": 14.19,
+    "total_debt_m": 0.0,
+    "dividend_per_share_annual": 40.0,
+    "dividend_source": "FY2024 dividends $40/sh ($1,394,600 total); FY2023 $45/sh",
+    "fcf_per_share": 52.88,
+    "fcf_source": "FY2024: net cash from operations $2,196,071 minus property purchases $352,259 = $1,843,812 / 34,865 shares",
+    "net_income_m": 1.95,
+    "revenue_m": 6.41,
+    "farm_rental_income_m": 4.28,
+    "oil_gas_royalties_m": 1.44,
+    "investment_portfolio_income_m": 0.68,
+    "marketable_securities_m": 8.12,
+    "grain_inventory_m": 2.59,
+    "land_water_rights_cost_m": 2.93,
+    "pp_e_net_m": 5.19,
+    "liquid_assets_per_share": 317.0,
+    "liquid_assets_note": "Cash $0.49M + marketable securities $8.12M + grain inventory $2.59M at Dec 2024 marks",
+    "normalization_note": "Lawrence base uses operating cash less capital spending, not net income (includes $364K unrealized securities gains in FY2024). Farm rental and oil/gas royalties declined YoY on crop/oil prices.",
+    "financials_source": "investor-documents/ir-gcco/2024-12-31_Annual_Report.pdf"
+  },
+  "optionality_gate": {
+    "framework": "farmland_royalty_floor",
+    "framework_label": "liquid_assets_plus_book_floor",
+    "floor_pass": false,
+    "floor_metric": "liquid_assets_per_share",
+    "floor_value": 317.0,
+    "floor_value_note": "Mark-to-market liquid assets Dec 2024; land carried at historical cost ($2.93M) not fair-value NAV",
+    "primary_metric": "lawrence_base",
+    "primary_label": "7yr IRR",
+    "primary_return_pct": -1.4,
+    "book_premium_pct": 215.7,
+    "premium_to_liquid_floor_pct": 304.7,
+    "incumbent_sleeve": true,
+    "notes": "Price ~3.2\u00d7 GAAP book and ~4\u00d7 liquid-asset floor; no debt; dividend $40/sh below normalized owner cash ~$53/sh but above trough farm/oil cycle earnings power"
+  },
+  "nav_overlay": {
+    "as_of": "2026-06-10",
+    "status": "partial",
+    "gaap_vs_fair_value": {
+      "land_water_rights_balance_sheet_m": 2.93,
+      "irrigation_systems_cost_m": 9.88,
+      "policy": "Property and equipment at historical cost; land and water rights $2,929,945 on Dec 2024 balance sheet",
+      "source": "2024-12-31_Annual_Report.pdf Note (4)",
+      "acres_disclosed": null
+    },
+    "gaap_book_per_share": 406.77,
+    "liquid_assets_per_share": 317.0,
+    "overlay_nav_per_share": 520.0,
+    "overlay_nav_note": "[Assumption] GAAP book + partial land remark pending acreage from supplemental PDFs (image-only in workspace)",
+    "in_model": {
+      "lawrence_irr_on_operating_cash": true,
+      "gaap_book_in_dhando": false,
+      "investment_gains_in_fcf0": false,
+      "undeveloped_acreage_in_lawrence_growth": false
+    },
+    "not_in_model_requires_refresh": [
+      "Acreage and per-acre fair marks from supplemental information PDFs (not text-extracted)",
+      "FY2025 annual report (image PDF; OCR pending)",
+      "Live OTC Pink quote and daily volume",
+      "Oil/gas royalty decline rate by well count"
+    ],
+    "segments_or_options": [
+      {
+        "id": "crop_share_farm_rental",
+        "label": "Southwest Kansas crop-share farm rental",
+        "option_treatment": "embedded_in_segment",
+        "evidence": "Note (1): owns farmland rented on crop share basis; FY2024 farm rental income $4.28M",
+        "not_in_lawrence_base": false
+      },
+      {
+        "id": "oil_gas_royalties",
+        "label": "Third-party oil and gas royalties on company land",
+        "option_treatment": "embedded_in_segment",
+        "evidence": "Note (1): royalties from wells on property; FY2024 $1.44M",
+        "not_in_lawrence_base": false
+      },
+      {
+        "id": "investment_portfolio",
+        "label": "Treasury and equity portfolio ($8.1M fair value)",
+        "option_treatment": "nav_floor",
+        "nav_per_share": 233.0,
+        "nav_assumption": "Mark-to-market securities per Note (2); not in Lawrence FCF growth path",
+        "evidence": "2024-12-31_Annual_Report.pdf balance sheet",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "farmland_fair_value",
+        "label": "Farmland + irrigation at fair value vs historical cost",
+        "option_treatment": "nav_floor",
+        "nav_per_share": 103.0,
+        "nav_assumption": "[Assumption] Partial uplift above $2.93M land line; acreage not in extracted text",
+        "evidence": "PP&E Note (4); supplemental PDFs pending Vicki/OCR",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "water_rights_litigation",
+        "label": "Water issues / Ogallala aquifer management",
+        "option_treatment": "probability_weighted",
+        "p_base": 0.25,
+        "nav_per_share_full": 40.0,
+        "overlay_value_per_share": 10.0,
+        "evidence": "G&A includes 'water issues expenses' $1.1M FY2024; no quantified recovery in filing",
+        "not_in_lawrence_base": true
+      }
+    ]
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Yes (likely)",
+      "treatment": "nav_overlay",
+      "evidence": "Land and water rights at $2.93M cost; irrigation $9.88M cost; fair farmland value likely higher [Assumption]"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / acreage / dormant royalty?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Producing oil/gas royalties; crop-share acres not quantified in extracted annual text"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Profitable operating company FY2024 net income $1.95M"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF path?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Crop share recognized at harvest; royalties monthly"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Co-op stock $169K immaterial"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "Partial",
+      "treatment": "probability_weighted",
+      "evidence": "Water issues expense line; no dated recovery in filing"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Farm rental and royalties are core revenue streams"
+    }
+  ],
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": -0.02,
+      "growth_y6_10": -0.01,
+      "exit_pfcf_y10": 11,
+      "notes": "Farm rental and oil/gas stay soft; dividend cut toward $30/sh; securities gains fade"
+    },
+    "base": {
+      "growth_y1_5": 0.01,
+      "growth_y6_10": 0.01,
+      "exit_pfcf_y10": 14,
+      "notes": "Normalized owner cash $52.88/sh; modest crop-cycle recovery; family dividend policy continues"
+    },
+    "bull": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 16,
+      "notes": "Farm/oil rebound toward 2022 revenue levels; portfolio gains; acreage mark crystallized"
+    }
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": true,
+      "floor_pass": false,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": null
+  },
+  "growth_explanation": {
+    "base_mechanism": "Crop-share farm income tied to southwest Kansas harvests and commodity prices; oil/gas royalties from third-party wells on owned land; investment portfolio marks add volatility but are excluded from Lawrence owner-cash starting point",
+    "bear_risk": "FY2024 farm rental down 7% and oil/gas royalties down 17% vs 2023; postretirement health obligation $1.28M grows with actuarial losses",
+    "source": "2024-12-31_Annual_Report.pdf statements of income and Note (7)",
+    "lawrence_legacy": {
+      "y1_5": 0.01,
+      "y6_10": 0.01,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.01,
+      "y6_10": 0.01,
+      "exit_pfcf_y10": 14.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": null,
+      "as_of_filing_facts": null
+    },
+    "status": "partial"
+  },
+  "human_review": {
+    "notes": "Price anchored to Dec 2024 option strike; supplemental acreage PDFs and FY2025 annual need OCR/Vicki. Tutt/Hybl family board control.",
+    "live_price_confirmed": false
+  },
+  "catalyst_paths": [
+    {
+      "event": "Crop price / harvest recovery",
+      "timing": "1-3 years",
+      "impact": "Farm rental income rebound from FY2024 $4.28M toward FY2022 $6.58M",
+      "source": "2023 vs 2024 statements of income"
+    },
+    {
+      "event": "Oil/gas royalty stabilization",
+      "timing": "commodity cycle",
+      "impact": "Royalties were $2.42M FY2022 vs $1.44M FY2024",
+      "source": "filing"
+    },
+    {
+      "event": "Supplemental acreage disclosure / fair-value mark",
+      "timing": "uncertain",
+      "impact": "Upgrade nav_overlay above GAAP book",
+      "source": "supplemental PDFs in INDEX.csv"
+    },
+    {
+      "event": "Failure mode",
+      "timing": "-",
+      "impact": "Price reverts toward liquid-asset floor ~$317/sh if dividends cut and farm/oil stay weak"
+    }
+  ],
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -6.6
+    },
+    "base": {
+      "return_pct": -1.4
+    },
+    "bull": {
+      "return_pct": 1.8
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -6.6
+    },
+    "base": {
+      "return_pct": -1.4
+    },
+    "bull": {
+      "return_pct": 1.8
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": -1.4
+    },
+    "falsifier_adjusted": {
+      "return_pct": -1.4
+    }
+  },
+  "implied_return": {
+    "base_pct": -0.9,
+    "label": "7yr IRR (total synthesis)",
+    "display": "-0.9% (total synthesis)",
+    "lawrence_stance_gate_pct": -1.4,
+    "falsifier_adjusted_pct": -1.4,
+    "synthesis_pct": -0.9
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Growth theory (pre-falsifier)",
+        "source": "growth_explanation + filing revenue YoY",
+        "return_pct": -1.4,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": -6.6,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 1.8,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": -0.9,
+    "qualitative_pp": 0,
+    "total_synthesis_pct": -0.9,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}

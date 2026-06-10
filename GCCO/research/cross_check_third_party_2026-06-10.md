@@ -38,13 +38,13 @@ No third-party sources are indexed for Garden City Co. as of this scan. Marvin s
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | ~$53/sh owner cash; ~$407/sh book | **-1.4%** per year base (7yr) | watch |
-| External (combined) | — | — | — |
-| **Blended best estimate** | **Marvin only** | **-1.4%** per year | **watch** |
+| Marvin floor | ~$53/sh owner cash; ~$407/sh book | **-0.9%** per year base (7yr synthesis) | watch |
+| External (combined) | n/a | n/a | n/a |
+| **Blended best estimate** | **Marvin only** | **-0.9%** per year | **watch** |
 
 **Weights:** 100% Marvin primary filings; no approved third party.
 
-**Returns statement (blended):** At an indicative **~$1,284** per share, we expect about **-1.4%** per year on the base case using FY2024 normalized owner cash (no external adjustment).
+**Returns statement (blended):** At an indicative **~$1,284** per share, we expect about **-0.9%** per year on the base case using FY2024 normalized owner cash (no external adjustment).
 
 ## [HUMAN REVIEW]
 
