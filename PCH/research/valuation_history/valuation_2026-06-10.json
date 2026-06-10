@@ -1,0 +1,579 @@
+{
+  "ticker": "PCH",
+  "as_of": "2026-06-10",
+  "valuation_mode": "optionality",
+  "method": "full",
+  "lawrence_horizon_years": 7,
+  "lawrence_bucket": "other",
+  "valuation_overlay": "segment_cashflow",
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "unproven",
+    "dhando": "partial",
+    "cycle": "trough",
+    "payoff_lens": "event",
+    "investment_sleeve": "real_assets_land",
+    "predictive_attribute": "timberland_acreage_reit_merger_archive"
+  },
+  "inputs": {
+    "price": 39.25,
+    "price_source": "FY2024 10-K: closing share price December 31, 2024 (PCH delisted January 30, 2026)",
+    "price_as_of": "2024-12-31",
+    "fcf_per_share": 0.85,
+    "fcf_source": "FY2024 Cash Available for Distribution $67.474M / 79.339M weighted-average diluted shares (10-K 2025-02-13)",
+    "shares_outstanding": 78700000,
+    "shares_source": "10-K: 78.7M shares outstanding at December 31, 2024",
+    "shares_diluted": 79339000,
+    "book_per_share": 25.9,
+    "book_per_share_caveat": "Stockholders equity $2,037.7M / 78.7M shares; timber at depletion basis not fair-value NAV",
+    "dividend_per_share_annual": 1.8,
+    "acres_owned": 2100000,
+    "acres_source": "10-K Item 1: 2.1 million acres of timberland in seven states",
+    "timber_timberlands_net_m": 2357.2,
+    "long_term_debt_m": 1034.7,
+    "net_debt_m": 883.1,
+    "total_adjusted_ebitdda_m": 232.1,
+    "cad_m": 67.5,
+    "merger_status": "closed",
+    "merger_consideration": "1.8185 Rayonier shares + $0.61 cash per PCH share (8-K 2026-01-30)",
+    "successor_ticker": "RYN",
+    "normalization_note": "Lawrence base uses filing CAD, not dividend ($1.80/sh exceeded CAD in FY2024). Standalone archive at last trade price; ongoing exposure is RYN."
+  },
+  "optionality_gate": {
+    "framework": "timber_reit_floor_merger_event",
+    "floor_pass": true,
+    "floor_metric": "timber_book_less_net_debt_per_share",
+    "floor_value": 18.5,
+    "floor_value_note": "[Assumption] timber and timberlands at GAAP depletion basis ~$30/sh gross less ~$11/sh net debt; not fair-value acreage marks",
+    "primary_metric": "lawrence_base",
+    "primary_label": "7yr IRR",
+    "overlay_nav_per_share": 22.0,
+    "overlay_nav_note": "[Assumption] rural land sale comps ~$2,302/acre FY2024 vs cost-basis timber book; undeveloped HBU acreage not fully marked",
+    "notes": "Merger closed 2026-01-30; stance gate uses pre-merger standalone economics for archive. Floor does not override sub-15% Lawrence IRR.",
+    "primary_return_pct": -11.9
+  },
+  "nav_overlay": {
+    "as_of": "2026-06-10",
+    "status": "complete",
+    "gaap_vs_fair_value": {
+      "timber_timberlands_net_m": 2357.2,
+      "acres_disclosed": 2100000,
+      "policy_source": "10-K: timber and timberlands carried at cost less depletion; no fair-value NAV disclosed",
+      "source": "investor-documents/sec-edgar/10-K_20250213_rpt20241231_acc0000950170_25_019711.htm"
+    },
+    "in_model": {
+      "lawrence_irr_on_operating_cash": true,
+      "gaap_book_in_dhando": false,
+      "segment_operating_pv": false,
+      "undeveloped_acreage_in_lawrence_growth": false
+    },
+    "not_in_model_requires_refresh": [
+      "Per-acre fair marks on 2.1M-acre portfolio vs FY2024 rural sales (~$2,302/acre average)",
+      "Rayonier merger synergy realization on combined ~4M acres",
+      "Mid-cycle normalized lumber and sawlog pricing for Wood Products segment",
+      "Carbon sequestration and non-timber royalty monetization beyond disclosed leases"
+    ],
+    "segments_or_options": [
+      {
+        "id": "timberland_core",
+        "label": "2.1M-acre core timberland (Northern + Southern regions)",
+        "option_treatment": "nav_floor",
+        "nav_per_share": 18.0,
+        "nav_assumption": "GAAP timber book ~$30/sh gross; depletion basis understates mature Southern timber",
+        "evidence": "10-K Item 1; segment Timberlands Adjusted EBITDDA $151.3M FY2024",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "rural_hbu_sales",
+        "label": "Rural real estate / higher-and-better-use dispositions",
+        "option_treatment": "probability_weighted",
+        "p_base": 0.5,
+        "nav_per_share_full": 4.0,
+        "overlay_value_per_share": 2.0,
+        "evidence": "FY2024 sold 57,389 acres rural at ~$2,302/acre; lumpy Real Estate EBITDDA",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "wood_products_mills",
+        "label": "Seven sawmills + plywood (Wood Products segment)",
+        "option_treatment": "burden_in_cf",
+        "evidence": "FY2024 segment operating loss $(23.6)M; Adjusted EBITDDA $20.5M at lumber trough",
+        "not_in_lawrence_base": false
+      },
+      {
+        "id": "rayonier_merger",
+        "label": "Rayonier all-stock merger (closed 2026-01-30)",
+        "option_treatment": "milestone_nav",
+        "nav_per_share": 0.0,
+        "nav_assumption": "Realized consideration 1.8185 RYN + $0.61 cash; value follows RYN from close",
+        "evidence": "8-K 20260202_rpt20260130",
+        "not_in_lawrence_base": true
+      }
+    ]
+  },
+  "segment_build": {
+    "as_of": "2026-06-10",
+    "segments": [
+      {
+        "id": "timberlands",
+        "label": "Timberlands",
+        "adjusted_ebitdda_m_fy2024": 151.3,
+        "operating_income_m_fy2024": 76.3,
+        "option_treatment": "embedded_in_segment",
+        "owner_cash_note": "Harvest cash flow; ~7.4M ton 2025 guide; 35-49% of Wood Products fiber internal",
+        "source": "10-K Note 2 segment table FY2024"
+      },
+      {
+        "id": "wood_products",
+        "label": "Wood Products",
+        "adjusted_ebitdda_m_fy2024": 20.5,
+        "operating_income_m_fy2024": -23.6,
+        "option_treatment": "burden_in_cf",
+        "base_terminal_rationale": "Cyclical mill segment at lumber trough; positive EBITDDA but GAAP operating loss; burden in consolidated CAD path, not zeroed",
+        "source": "10-K Note 2; Wood Products segment statistics FY2024"
+      },
+      {
+        "id": "real_estate",
+        "label": "Real Estate",
+        "adjusted_ebitdda_m_fy2024": 147.0,
+        "operating_income_m_fy2024": 35.8,
+        "option_treatment": "probability_weighted",
+        "owner_cash_note": "Rural land sales + development lots; Real Estate Adjusted EBITDDA $147.0M FY2024 incl. large Southern timberland parcel sale",
+        "source": "10-K MD&A Real Estate Adjusted EBITDDA table FY2024"
+      }
+    ],
+    "consolidated_adjusted_ebitdda_m": 232.1,
+    "consolidated_cad_m": 67.5,
+    "tie_out_note": "Lawrence FCF path uses consolidated CAD per share, not segment EBITDDA sum",
+    "horizon_years": 7
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.0,
+      "growth_y6_10": -0.01,
+      "exit_pfcf_y10": 10,
+      "notes": "Prolonged lumber trough; Wood Products losses persist; dividend cut; CAD flat"
+    },
+    "base": {
+      "growth_y1_5": 0.02,
+      "growth_y6_10": 0.015,
+      "exit_pfcf_y10": 12,
+      "notes": "Normalized CAD $0.85/sh; modest harvest growth; lumber cycle normalizes from FY2024 trough"
+    },
+    "bull": {
+      "growth_y1_5": 0.05,
+      "growth_y6_10": 0.03,
+      "exit_pfcf_y10": 14,
+      "notes": "Lumber rebound + rural HBU sales; CAD $1.00+ mid-cycle; multiple re-rate"
+    }
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": true,
+      "floor_pass": true,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": null
+  },
+  "human_review": {
+    "notes": "PCH delisted post-merger; last standalone price $39.25 (12/31/2024). Merger proxy Morgan Stanley DCF ranges cited as [PENDING APPROVAL] context only.",
+    "merger_closed_date": "2026-01-30",
+    "merger_exchange_ratio": 1.8185,
+    "merger_cash_per_share": 0.61,
+    "successor_ticker": "RYN",
+    "live_price_confirmed": false
+  },
+  "growth_explanation": {
+    "base_mechanism": "Sustainable harvest on 2.1M acres, internal fiber to mills, periodic rural/HBU land sales, lumber cycle normalization from 2024 trough",
+    "bear_risk": "Wood Products operating losses; dividend exceeded CAD; ~$1.0B long-term debt; Q3 2025 YTD net income only ~$3.3M",
+    "source": "10-K FY2024; 10-Q Q3 2025",
+    "status": "partial",
+    "lawrence_legacy": {
+      "y1_5": 0.02,
+      "y6_10": 0.015,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.02,
+      "y6_10": 0.015,
+      "exit_pfcf_y10": 12.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": 0.0371,
+      "as_of_filing_facts": "evidence/_text/10-K_20250213_rpt20241231_acc0000950170_25_019711.htm.txt"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Yes",
+      "treatment": "nav_overlay",
+      "evidence": "Timber at depletion cost; FY2024 rural sales ~$2,302/acre vs implied book ~$1,100/acre"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / acreage?",
+      "answer": "Yes",
+      "treatment": "nav_floor",
+      "evidence": "2.1M acres; rural real estate program; master-planned development and country club"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Yes",
+      "treatment": "burden_in_cf",
+      "evidence": "Wood Products operating loss $(23.6)M FY2024 at lumber trough"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF?",
+      "answer": "Partial",
+      "treatment": "probability_weighted",
+      "evidence": "Real estate development pipeline; lumpy rural parcel timing"
+    },
+    {
+      "q": 5,
+      "question": "Private stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No material private equity stakes"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution?",
+      "answer": "Yes",
+      "treatment": "yield_curve",
+      "evidence": "Dividend $1.80/sh vs CAD ~$0.85/sh FY2024"
+    },
+    {
+      "q": 7,
+      "question": "Embedded in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Timber harvest and mill sales in operating revenue"
+    }
+  ],
+  "merger_event": {
+    "announced": "2025-10-13",
+    "closed": "2026-01-30",
+    "counterparty": "RYN",
+    "consideration": "1.8185 RYN shares + $0.61 cash per PCH share",
+    "source": "8-K_20260202_rpt20260130_acc0001193125_26_032108.htm",
+    "in_base_irr": false,
+    "stance": "archive_merged_track_RYN"
+  },
+  "estimates": {
+    "external": []
+  },
+  "context_overlay": {
+    "as_of": "2026-06-10",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": -0.03,
+            "as_of": "2026-06-10",
+            "yoy_pct": -107.3,
+            "direction": "down",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.5320000648498535,
+            "as_of": "2026-06-10",
+            "yoy_pct": 1.3,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.255000114440918,
+            "as_of": "2026-06-10",
+            "yoy_pct": 4.2,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 99.91100311279297,
+            "as_of": "2026-06-10",
+            "yoy_pct": 0.9,
+            "direction": "flat",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 22.280000686645508,
+            "as_of": "2026-06-10",
+            "yoy_pct": 31.4,
+            "direction": "up",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": -0.09,
+            "as_of": "2026-06-10",
+            "yoy_pct": -103.5,
+            "direction": "down",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 13.03,
+            "as_of": "2026-06-10",
+            "yoy_pct": 8.0,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "insider_signal": {
+    "as_of": "2026-06-10",
+    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
+    "in_base_irr": false,
+    "window_days": 365,
+    "ics": 0.0,
+    "band": "negligible",
+    "bull_case_support": "none",
+    "scenario_confidence": {
+      "priors": {
+        "bear": 0.2,
+        "base": 0.55,
+        "bull": 0.25
+      },
+      "tilted": {
+        "bear": 0.28,
+        "base": 0.47,
+        "bull": 0.25
+      },
+      "bull_delta": 0.0,
+      "bear_delta": 0.08,
+      "note": "Merger-close related Form 4 filings; not incremental bullish signal for standalone PCH"
+    },
+    "factors": {
+      "buy_score": 0.0,
+      "sell_score": -1.0,
+      "cluster_bonus": 0.0,
+      "net_buy_usd": 0,
+      "net_sell_usd": 1988912.25,
+      "price_today": 39.25
+    },
+    "top_buys": [],
+    "top_sells": [
+      {
+        "insider": "WASECHEK WAYNE",
+        "date": "2026-01-30",
+        "shares": 34621,
+        "price": 0.0,
+        "value_usd": 0.0,
+        "is_10b5_1": false,
+        "contrib": -0.096
+      },
+      {
+        "insider": "WASECHEK WAYNE",
+        "date": "2026-01-05",
+        "shares": 22,
+        "price": 39.59,
+        "value_usd": 870.98,
+        "is_10b5_1": false,
+        "contrib": -0.096
+      },
+      {
+        "insider": "WASECHEK WAYNE",
+        "date": "2025-12-22",
+        "shares": 1651,
+        "price": 39.48,
+        "value_usd": 65181.48,
+        "is_10b5_1": false,
+        "contrib": -0.096
+      },
+      {
+        "insider": "Tyler Michele",
+        "date": "2026-01-30",
+        "shares": 47243,
+        "price": 0.0,
+        "value_usd": 0.0,
+        "is_10b5_1": false,
+        "contrib": -0.09
+      },
+      {
+        "insider": "Torma Anna E.",
+        "date": "2026-01-30",
+        "shares": 31014,
+        "price": 0.0,
+        "value_usd": 0.0,
+        "is_10b5_1": false,
+        "contrib": -0.09
+      }
+    ],
+    "narrative_hooks": [],
+    "transaction_count": 59
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -15.5
+    },
+    "base": {
+      "return_pct": -11.9
+    },
+    "bull": {
+      "return_pct": -8.0
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -15.5
+    },
+    "base": {
+      "return_pct": -11.9
+    },
+    "bull": {
+      "return_pct": -8.0
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": -11.9
+    },
+    "falsifier_adjusted": {
+      "return_pct": -11.9
+    }
+  },
+  "implied_return": {
+    "base_pct": -9.95,
+    "label": "7yr IRR (total synthesis)",
+    "display": "-9.95% (total synthesis)",
+    "lawrence_stance_gate_pct": -11.9,
+    "falsifier_adjusted_pct": -11.9,
+    "synthesis_pct": -9.95
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Segment-derived growth (pre-falsifier)",
+        "source": "segment_build weighted blend",
+        "return_pct": -11.9,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": -15.5,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": -8.0,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      },
+      {
+        "id": "nav_overlay_payoff",
+        "label": "NAV overlay dated payoff (7yr to overlay base)",
+        "source": "nav_overlay ~$22.0/sh vs price $39.25",
+        "return_pct": -7.94,
+        "weight": 0.1,
+        "type": "numeric",
+        "epistemic_tier": "D (alternate theory: dated asset payoff)",
+        "weight_why": "Answers a different question (NAV convergence) than 7yr cash-flow IRR; capped weight to avoid theory conflation.",
+        "weight_falsifiers": [
+          "NAV overlay base not updated when segment build or filings change >10%",
+          "floor_pass false but weight above 15% without [HUMAN REVIEW]"
+        ],
+        "hard_to_vary": "yes: separate theory type"
+      }
+    ],
+    "qualitative_adjustments": [],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": -9.95,
+    "qualitative_pp": 0,
+    "total_synthesis_pct": -9.95,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [
+        "NAV overlay is a different theory (asset payoff vs cash-flow IRR); weight capped at 10% to limit theory conflation."
+      ],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}
