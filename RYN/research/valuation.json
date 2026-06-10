@@ -2,7 +2,8 @@
   "ticker": "RYN",
   "as_of": "2026-06-10",
   "valuation_mode": "optionality",
-  "method": "pending",
+  "valuation_overlay": "segment_cashflow",
+  "method": "full",
   "lawrence_bucket": "other",
   "classification_inputs": {
     "archetype": "optionality",
@@ -14,19 +15,285 @@
     "predictive_attribute": "timberland_acreage_reit"
   },
   "inputs": {
-    "acres_owned": 2800000,
-    "acres_source": "User context / company disclosure: ~2.8M acres across 11 US states and New Zealand",
-    "revenue_model_note": "Timberland REIT: earns fees from operators who conduct logging on owned acreage",
-    "price": null,
-    "price_source": "Pending Marvin refresh after SEC download"
+    "price": 19.82,
+    "price_source": "Insider Form 4 cluster purchases 2026-05-15 at $19.82; mechanical refresh will sync Yahoo RYN close 2026-06-10",
+    "price_as_of": "2026-06-10",
+    "fcf_per_share": 0.58,
+    "fcf_source": "Normalized Cash Available for Distribution (CAD): Q1 2026 Adjusted CAD $62.7M on ~256M diluted shares = $0.245/quarter; haircut ~40% for lumpy real estate rural/solar acreage sales; annualized ~$0.58/sh (10-Q 2026-05-08 Performance and Liquidity Indicators)",
+    "shares_outstanding": 301675323,
+    "shares_source": "10-Q 2026-05-08: common shares outstanding 301,675,323 at 2026-03-31",
+    "book_per_share": 17.66,
+    "book_per_share_caveat": "Stockholders equity $5,329M / 301.7M shares post-merger; timberlands carried at depletion basis not fair-value NAV",
+    "dividend_per_share_annual": 1.04,
+    "acres_owned": 4010000,
+    "acres_leased": 81000,
+    "acres_source": "10-Q 2026-05-08: ~4.01M owned+leased acres (3.2M U.S. South, 930K U.S. Northwest) after PotlatchDeltic merger closed 2026-01-30",
+    "timberlands_net_m": 5867.7,
+    "total_debt_noncurrent_m": 1855.1,
+    "cash_m": 681.7,
+    "merger_note": "Rayonier merged with PotlatchDeltic Corporation effective 2026-01-30; combined entity adds ~2.1M acres, six sawmills (Wood Products), and expanded Real Estate segment",
+    "large_disposition_fy2025_note": "Standalone FY2025 included 55,000-acre large disposition ($291M operating income from large dispositions per 10-K FY2025); excluded from normalized CAD",
+    "normalization_note": "Lawrence base uses normalized CAD, not GAAP net income (Q1 2026 net loss $12.4M includes merger costs and tax items) or lumpy Real Estate segment EBITDA"
+  },
+  "optionality_gate": {
+    "framework": "timber_reit_nav_floor_option",
+    "floor_pass": true,
+    "floor_metric": "book_equity_per_share",
+    "floor_value": 17.66,
+    "floor_value_note": "GAAP equity ~$17.66/sh at 2026-03-31; timberlands at depletion basis ~$1,463/acre on books vs transaction comps often higher",
+    "primary_metric": "lawrence_base",
+    "primary_label": "7yr IRR",
+    "overlay_nav_per_share": 22.0,
+    "overlay_nav_note": "[Assumption] timberland fair value ~$1,800/acre on 4.0M acres less ~$6.2/sh net debt; not GAAP book",
+    "notes": "Price ~12% above GAAP book post-merger; stance gate uses normalized CAD ten-year path, not book floor alone",
+    "primary_return_pct": null
+  },
+  "nav_overlay": {
+    "as_of": "2026-06-10",
+    "status": "complete",
+    "gaap_vs_fair_value": {
+      "timberlands_net_m": 5867.7,
+      "acres_disclosed": 4010000,
+      "gaap_per_acre": 1463,
+      "policy_source": "10-Q 2026-05-08: timber and timberlands at depletion basis; merger added PotlatchDeltic book values",
+      "source": "investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0000052827_26_000078.htm"
+    },
+    "in_model": {
+      "lawrence_irr_on_operating_cash": true,
+      "gaap_book_in_dhando": false,
+      "segment_operating_pv": false,
+      "undeveloped_acreage_in_lawrence_growth": false
+    },
+    "not_in_model_requires_refresh": [
+      "Per-acre fair marks on 4.1M acres vs Q1 2026 rural sale comps ($6,457/acre weighted; solar parcel $10,100/acre)",
+      "Merger synergy realization on Wood Products and overhead",
+      "Carbon capture and storage / solar lease option value on Southern acreage",
+      "Post-merger leverage path ($1.86B long-term debt; Q1 mandatory repayments $27.5M)"
+    ],
+    "segments_or_options": [
+      {
+        "id": "southern_timber",
+        "label": "Southern Timber (~3.16M acres)",
+        "option_treatment": "embedded_in_segment",
+        "evidence": "Q1 2026 Adjusted EBITDA $45.5M; carbon capture and solar contract revenue embedded",
+        "not_in_lawrence_base": false
+      },
+      {
+        "id": "northwest_timber",
+        "label": "Pacific Northwest Timber (~930K acres)",
+        "option_treatment": "embedded_in_segment",
+        "evidence": "Q1 2026 Adjusted EBITDA $8.6M; export log markets CFR basis",
+        "not_in_lawrence_base": false
+      },
+      {
+        "id": "wood_products",
+        "label": "Wood Products (six sawmills from PotlatchDeltic)",
+        "option_treatment": "embedded_in_segment",
+        "evidence": "Q1 2026 Adjusted EBITDA $6.8M; 288M board feet lumber shipments full quarter inclusive pre-merger",
+        "not_in_lawrence_base": false
+      },
+      {
+        "id": "real_estate_hbu",
+        "label": "Real Estate (HBU land sales, Chenal Valley)",
+        "option_treatment": "probability_weighted",
+        "p_base": 0.4,
+        "nav_per_share_full": 3.5,
+        "overlay_value_per_share": 1.4,
+        "evidence": "Q1 2026 7,695 acres sold ($59.8M); lumpy vs prior Q1 1,031 acres ($10.2M); improved development and rural solar options",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "ccs_solar_options",
+        "label": "Carbon capture / solar lease optionality on Southern acreage",
+        "option_treatment": "probability_weighted",
+        "p_base": 0.3,
+        "nav_per_share_full": 2.0,
+        "overlay_value_per_share": 0.6,
+        "evidence": "10-Q segment discussion: CCS and solar energy contract revenue in Southern Timber; Q1 rural solar sale $10,100/acre",
+        "not_in_lawrence_base": true
+      }
+    ]
+  },
+  "segment_build": {
+    "as_of": "2026-06-10",
+    "segments": [
+      {
+        "id": "southern_timber",
+        "label": "Southern Timber",
+        "acres_end_q1_k": 3161,
+        "q1_adj_ebitda_m": 45.5,
+        "owner_cash_per_share_annual": 0.28,
+        "growth_y1_5": 0.025,
+        "growth_y6_10": 0.015,
+        "exit_multiple": 12,
+        "option_treatment": "embedded_in_segment",
+        "evidence": "10-Q 2026-05-08 segment table; 3,161K period-end acres"
+      },
+      {
+        "id": "northwest_timber",
+        "label": "Pacific Northwest Timber",
+        "acres_end_q1_k": 930,
+        "q1_adj_ebitda_m": 8.6,
+        "owner_cash_per_share_annual": 0.05,
+        "growth_y1_5": 0.02,
+        "growth_y6_10": 0.01,
+        "exit_multiple": 11,
+        "option_treatment": "embedded_in_segment",
+        "evidence": "10-Q 2026-05-08 segment table; 930K period-end acres"
+      },
+      {
+        "id": "wood_products",
+        "label": "Wood Products",
+        "q1_adj_ebitda_m": 6.8,
+        "owner_cash_per_share_annual": 0.04,
+        "growth_y1_5": 0.0,
+        "growth_y6_10": 0.0,
+        "exit_multiple": 8,
+        "option_treatment": "embedded_in_segment",
+        "evidence": "Merger-added sawmill segment; cyclical lumber exposure"
+      },
+      {
+        "id": "real_estate",
+        "label": "Real Estate",
+        "q1_adj_ebitda_m": 46.2,
+        "owner_cash_per_share_annual": 0.08,
+        "growth_y1_5": 0.0,
+        "growth_y6_10": -0.02,
+        "exit_multiple": 10,
+        "option_treatment": "probability_weighted",
+        "p_base": 0.35,
+        "evidence": "Q1 lumpy HBU sales; normalized run-rate well below Q1 $46.2M Adjusted EBITDA"
+      }
+    ],
+    "options": [
+      {
+        "id": "real_estate_hbu",
+        "label": "Higher-and-better-use land bank",
+        "option_treatment": "probability_weighted",
+        "annual_drag_per_share": 0.0,
+        "base_terminal_value_bn": 0.42,
+        "base_terminal_rationale": "P_base 0.4 × ~$1.05B incremental HBU value above normalized timber run-rate",
+        "overlay_base_terminal_bn": 0.42,
+        "bull_terminal_value_bn": 1.05,
+        "evidence": "Q1 2026 rural/improved development sales; Chenal Valley residential lots",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "ccs_solar",
+        "label": "CCS / solar lease contracts",
+        "option_treatment": "probability_weighted",
+        "annual_drag_per_share": 0.0,
+        "base_terminal_value_bn": 0.18,
+        "base_terminal_rationale": "P_base 0.3 × contracted option value on Southern acreage",
+        "overlay_base_terminal_bn": 0.18,
+        "bull_terminal_value_bn": 0.6,
+        "evidence": "10-Q Southern Timber CCS and solar revenue discussion",
+        "not_in_lawrence_base": true
+      }
+    ],
+    "corporate_drag_per_share": 0.12,
+    "corporate_drag_note": "Interest on $1.86B debt, merger integration, corporate G&A not in segment EBITDA"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": -0.01,
+      "growth_y6_10": -0.02,
+      "exit_pfcf_y10": 10,
+      "notes": "Lumber downturn compresses Wood Products; Real Estate sales stall; leverage limits buybacks"
+    },
+    "base": {
+      "growth_y1_5": 0.02,
+      "growth_y6_10": 0.015,
+      "exit_pfcf_y10": 13,
+      "notes": "Normalized CAD $0.58/sh; merger scale benefits; modest HBU contribution"
+    },
+    "bull": {
+      "growth_y1_5": 0.04,
+      "growth_y6_10": 0.025,
+      "exit_pfcf_y10": 15,
+      "notes": "Synergy capture; CCS/solar contracts scale; lumber cycle recovery; multiple re-rate"
+    }
   },
   "stance_proposal": {
     "suggested": "watch",
-    "irr_band": "pending",
-    "rationale": "Onboarded land-sleeve timber REIT; NAV overlay on acreage marks and harvest fee economics pending deep dive."
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": true,
+      "floor_pass": true,
+      "valuation_mode": "optionality"
+    },
+    "rationale": "Post-merger integrated timber REIT at ~$19.82 with partial book floor; normalized CAD yield attractive but Lawrence base IRR below accumulate threshold pending synergy proof.",
+    "override_reason": null
   },
   "human_review": {
-    "notes": "Provisional onboard; refresh price, shares, and timber NAV from latest 10-K."
+    "notes": "Merger closed 2026-01-30; first combined 10-Q is Q1 2026. Provisional normalized CAD excludes Q1 lumpy Real Estate. UPREIT structure (Rayonier, L.P.) with operating partnership units.",
+    "live_price_confirmed": false
+  },
+  "growth_explanation": {
+    "base_mechanism": "Merger scale on 4.1M acres; Southern timber harvest growth; Northwest export log premiums; selective HBU real estate crystallization",
+    "bear_risk": "Wood Products cyclicality; $1.86B debt stack; integration execution; lumber price downturn",
+    "source": "10-Q 2026-05-08 segment discussion and merger 8-K 2026-02-02",
+    "lawrence_legacy": {
+      "y1_5": 0.02,
+      "y6_10": 0.015,
+      "return_pct": null
+    },
+    "status": "partial"
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "nav_overlay",
+      "evidence": "Timberlands at depletion basis $5.87B (~$1,463/acre); transaction comps often higher (Q1 rural $6,457/acre weighted)"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / acreage?",
+      "answer": "Yes",
+      "treatment": "nav_floor",
+      "evidence": "4.1M acres with HBU real estate and CCS/solar optionality not fully in run-rate CAD"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "All four reportable segments generated positive Q1 Adjusted EBITDA"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF path?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "CCS and solar energy contracts in Southern Timber; Real Estate development pipeline"
+    },
+    {
+      "q": 5,
+      "question": "Private stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No material private equity stakes post-merger"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Quarterly dividend $0.26/sh ($1.04 annual) covered by normalized CAD ~$0.58/sh"
+    },
+    {
+      "q": 7,
+      "question": "Embedded in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Timber harvest and Wood Products revenue in operating segments"
+    }
+  ],
+  "estimates": {
+    "external": []
   },
   "context_overlay": {
     "as_of": "2026-06-10",
@@ -153,7 +420,7 @@
       "cluster_bonus": 0.0,
       "net_buy_usd": 1457400.08,
       "net_sell_usd": 4897525.3,
-      "price_today": null
+      "price_today": 19.82
     },
     "top_buys": [
       {
