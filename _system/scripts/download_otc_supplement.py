@@ -82,6 +82,13 @@ def run() -> None:
                 "https://www.keweenawland.com/annual-reports/",
             ],
         },
+        "HNFSA": {
+            "dir": "investor-documents/ir-hnfsa",
+            "pages": [
+                "https://www.hanoverfoods.com/",
+                "https://www.otcmarkets.com/stock/HNFSA/financials",
+            ],
+        },
         "CSU": {
             "dir": "official-reports",
             "pages": [
