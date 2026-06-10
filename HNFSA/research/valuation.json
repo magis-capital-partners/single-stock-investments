@@ -2,7 +2,7 @@
   "ticker": "HNFSA",
   "as_of": "2026-06-10",
   "valuation_mode": "optionality",
-  "method": "pending",
+  "method": "yield_curve",
   "lawrence_bucket": "other",
   "classification_inputs": {
     "archetype": "optionality",
@@ -15,20 +15,171 @@
   },
   "inputs": {
     "price": 55.0,
-    "price_source": "[Assumption] OTC Pink Class A indicative ~$50-60 (user/HK context 2026-06-10); refresh before stance",
+    "price_source": "[Assumption] OTC Pink Class A indicative ~$50-60 (onboard 2026-06-10); refresh before accumulate",
+    "price_as_of": "2026-06-10",
     "shares_outstanding": 1210000,
-    "shares_source": "[Assumption] ~1.21M diluted from historical 10-K share classes; verify latest OTC disclosure",
+    "shares_source": "[Assumption] ~$106M equity / $87.62 book per share (aggregator); Class A-only float may be lower \u2014 verify",
     "book_per_share": 87.62,
-    "book_per_share_caveat": "GAAP equity ~$106M / shares (Stockanalysis OTC stats 2026-06); trades ~0.5x book \u2014 not $325 appraisal-style tangible book",
-    "land_ppe_note": "Land+buildings at historical cost ~$54M bundled in PP&E; thesis requires facility/acreage re-mark not GAAP line item"
+    "book_per_share_source": "[Assumption] OTC aggregator book value; last filed GAAP equity is FY2004 10-K Exhibit 13 \u2014 stale",
+    "equity_market_cap_m": 66.55,
+    "book_equity_m": 105.99,
+    "total_debt_m": 62.13,
+    "debt_source": "[Assumption] Aggregator balance sheet; not verified against filed statements",
+    "dividend_per_share_annual": 1.1,
+    "dividend_source": "[Assumption] Aggregator forward dividend ~$1.10; last SEC dividend disclosure FY2004 era",
+    "revenue_m": 330.81,
+    "net_income_m": 11.57,
+    "operating_income_m": 19.25,
+    "financials_source": "[Assumption] Aggregator trailing metrics; fiscal period not disclosed on OTC Pink \u2014 treat as illustrative only",
+    "plants_count": 15,
+    "plants_source": "10-K FY2004 Item 1: 11 PA, 1 MD, 1 DE, 1 NJ, 2 Guatemala",
+    "employees": 2205,
+    "employees_source": "10-K FY2004 Item 1 (August 1, 2004)",
+    "land_ppe_note": "Land and buildings carried at historical cost in PP&E; FY2004 filing cites owned multi-state plant network \u2014 fair-value remark not in Lawrence base",
+    "normalization_note": "No SEC or OTC Markets financial PDFs indexed as of 2026-06-10. Lawrence base uses book-discount re-rate path, not heroic operating growth.",
+    "last_sec_filing": "10-K FY2004 (period ended 2004-05-30); SC 13E3 odd-lot tender December 2004; no EDGAR filings after 2005-01-14"
   },
+  "optionality_gate": {
+    "framework": "mineral_floor_option",
+    "framework_label": "land_backed_processor_floor",
+    "floor_pass": true,
+    "floor_metric": "book_equity_per_share",
+    "floor_value": 87.62,
+    "floor_value_note": "GAAP book per aggregator; PP&E at historical cost \u2014 economic floor requires plant/acreage remark [Assumption]",
+    "primary_metric": "lawrence_base",
+    "primary_label": "annualized return",
+    "primary_return_pct": 3.9,
+    "book_discount_pct": 37.2,
+    "incumbent_sleeve": true,
+    "notes": "Price ~63% of GAAP book; partial dhando only until fresh filings or facility marks. Primary gate uses partial book re-rate, not operating compounder math."
+  },
+  "nav_overlay": {
+    "as_of": "2026-06-10",
+    "status": "complete",
+    "gaap_vs_fair_value": {
+      "policy": "Plants and land at historical cost; no fair-value NAV in last SEC filing (FY2004)",
+      "source": "investor-documents/sec-edgar/10-K_20040830_rpt20040531_acc000095011604002631.htm Item 1",
+      "plants_disclosed": "15 processing plants (PA, MD, DE, NJ, Guatemala)"
+    },
+    "in_model": {
+      "lawrence_irr_on_operating_cash": false,
+      "gaap_book_in_dhando": false,
+      "segment_operating_pv": false,
+      "undeveloped_acreage_in_lawrence_growth": false
+    },
+    "not_in_model_requires_refresh": [
+      "Current PP&E and land breakout from management or OTC disclosure",
+      "Per-plant fair value or excess-acreage sale marks",
+      "Verified share count (Class A float vs treasury / ESOP)",
+      "Refreshed debt maturity schedule and covenant headroom"
+    ],
+    "segments_or_options": [
+      {
+        "id": "pa_plant_network",
+        "label": "Pennsylvania-centered processing plants and owned real estate",
+        "option_treatment": "nav_floor",
+        "nav_per_share": 12.0,
+        "nav_assumption": "[Assumption] Partial uplift above GAAP cost for Hanover/Centre Hall footprint; no filed appraisal",
+        "evidence": "10-K FY2004 Item 1 plant list; valuation.json land_ppe_note",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "operating_processor",
+        "label": "Canned/frozen vegetable and private-label processor",
+        "option_treatment": "embedded_in_segment",
+        "evidence": "10-K FY2004 business description; aggregator revenue ~$331M [Assumption]",
+        "not_in_lawrence_base": false
+      },
+      {
+        "id": "family_control_catalyst",
+        "label": "Warehime family control / odd-lot tender history",
+        "option_treatment": "probability_weighted",
+        "p_base": 0.15,
+        "nav_per_share_full": 25.0,
+        "overlay_value_per_share": 3.75,
+        "evidence": "SC 13E3 December 2004 odd-lot tender; Class B control structure in 10-K",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "guatemala_ops",
+        "label": "Guatemala frozen operations (~583 employees FY2004)",
+        "option_treatment": "embedded_in_segment",
+        "evidence": "10-K FY2004 Item 1 employees; foreign assets ~$12.5M",
+        "not_in_lawrence_base": false
+      }
+    ]
+  },
+  "scenarios": {
+    "bear": {
+      "price": 55.0,
+      "payoff": 48.0,
+      "years": 7,
+      "notes": "Book erosion from commodity margin squeeze, debt refinanced at higher rates, no facility monetization"
+    },
+    "base": {
+      "price": 55.0,
+      "payoff": 72.0,
+      "years": 7,
+      "sotp_build": {
+        "lines": [
+          {
+            "id": "book",
+            "label": "GAAP book anchor",
+            "value_per_share": 87.62
+          },
+          {
+            "id": "debt_haircut",
+            "label": "Leverage and staleness haircut",
+            "uplift_per_share": 15.62,
+            "math": "Debt ~$62M [Assumption]; embedded in $72 payoff not separate floor"
+          },
+          {
+            "id": "plant_remark",
+            "label": "Plant / land remark (overlay only)",
+            "uplift_per_share": 12.0,
+            "math": "[Assumption] nav_floor; not in Lawrence base payoff"
+          },
+          {
+            "id": "family_catalyst",
+            "label": "Family liquidity catalyst (overlay only)",
+            "uplift_per_share": 3.75,
+            "math": "P=15% per SC 13E3 precedent"
+          }
+        ],
+        "payoff_per_share": 72.0,
+        "notes": "Base assumes price moves toward ~82% of stated book over seven years, not full fair-value mark"
+      },
+      "notes": "Partial book catch-up + retained earnings; no facility sale in base"
+    },
+    "bull": {
+      "price": 55.0,
+      "payoff": 88.0,
+      "years": 7,
+      "notes": "Strategic sale / re-mark of owned plants or family liquidity event re-rates equity near GAAP book"
+    }
+  },
+  "implied_return": {
+    "base_pct": 3.9,
+    "label": "annualized return",
+    "display": "3.9% (base)"
+  },
+  "approved_stance": "watch",
   "stance_proposal": {
-    "suggested": "watch",
-    "irr_band": "pending",
-    "rationale": "Onboarded land-sleeve candidate: below GAAP book processor with owned PA real estate; deep dive required for NAV overlay and Lawrence path."
+    "suggested": "hold",
+    "irr_band": "optionality",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": true,
+      "floor_pass": true,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": "Mechanical hold on floor_pass and partial dhando; overridden to watch: last SEC filing FY2004, no indexed OTC financial PDFs, book/debt/price are aggregator [Assumption], family control limits catalyst visibility.",
+    "approved_stance": "watch"
   },
   "human_review": {
-    "notes": "Price and share count are provisional until SEC/OTC refresh. Appraisal-style $300+ BVPS claims are [Assumption] upper bound only."
+    "approved_stance": "watch",
+    "approved_date": "2026-06-10",
+    "notes": "Price, share count, book, debt, and operating metrics are aggregator-derived [Assumption] until verified. Appraisal-style $300+ BVPS claims are falsifier ceiling only. Flag for Vicki / human to obtain current shareholder report."
   },
   "context_overlay": {
     "as_of": "2026-06-10",
@@ -41,9 +192,9 @@
           {
             "id": "hy_oas",
             "label": "High-yield OAS credit spread (%)",
-            "latest": -0.03,
+            "latest": 0.05,
             "as_of": "2026-06-10",
-            "yoy_pct": -107.3,
+            "yoy_pct": -87.8,
             "direction": "down",
             "good_for": "risk_regime",
             "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
@@ -53,9 +204,9 @@
           {
             "id": "ust_10y",
             "label": "US Treasury 10Y yield (%)",
-            "latest": 4.5320000648498535,
+            "latest": 4.5360002517700195,
             "as_of": "2026-06-10",
-            "yoy_pct": 1.3,
+            "yoy_pct": 1.4,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^TNX",
@@ -65,9 +216,9 @@
           {
             "id": "ust_2y",
             "label": "US Treasury 2Y yield (%)",
-            "latest": 4.255000114440918,
+            "latest": 4.259999752044678,
             "as_of": "2026-06-10",
-            "yoy_pct": 4.2,
+            "yoy_pct": 4.3,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^FVX",
@@ -77,7 +228,7 @@
           {
             "id": "dxy_broad",
             "label": "Trade-weighted USD index (broad)",
-            "latest": 99.91100311279297,
+            "latest": 99.92500305175781,
             "as_of": "2026-06-10",
             "yoy_pct": 0.9,
             "direction": "flat",
@@ -89,9 +240,9 @@
           {
             "id": "vix_level",
             "label": "VIX index level",
-            "latest": 22.280000686645508,
+            "latest": 21.690000534057617,
             "as_of": "2026-06-10",
-            "yoy_pct": 31.4,
+            "yoy_pct": 28.0,
             "direction": "up",
             "good_for": "vol_regime",
             "source": "yahoo:^VIX",
@@ -101,9 +252,9 @@
           {
             "id": "credit_impulse_1m",
             "label": "HYG vs TLT 1-month return spread (%)",
-            "latest": -0.09,
+            "latest": 0.2,
             "as_of": "2026-06-10",
-            "yoy_pct": -103.5,
+            "yoy_pct": -92.3,
             "direction": "down",
             "good_for": "credit_impulse",
             "source": "spread:HYG-TLT:21d",
@@ -113,9 +264,9 @@
           {
             "id": "spy_20d_realized_vol",
             "label": "SPY 20-day realized vol (annualized %)",
-            "latest": 13.03,
+            "latest": 13.17,
             "as_of": "2026-06-10",
-            "yoy_pct": 8.0,
+            "yoy_pct": 9.1,
             "direction": "up",
             "good_for": "equity_vol",
             "source": "realized_vol:SPY:20d",
@@ -125,5 +276,76 @@
         ]
       }
     ]
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Yes",
+      "treatment": "nav_overlay",
+      "evidence": "nav_overlay in valuation.json"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / acreage?",
+      "answer": "Yes",
+      "treatment": "nav_floor",
+      "evidence": "Segment build / undeveloped row"
+    }
+  ],
+  "catalyst_paths": [
+    {
+      "event": "Base catalyst path",
+      "timing": "7 years",
+      "impact": "Partial book catch-up + retained earnings; no facility sale in base"
+    },
+    {
+      "event": "Failure mode",
+      "timing": "bear scenario",
+      "impact": "Book erosion from commodity margin squeeze, debt refinanced at higher rates, no facility monetization"
+    }
+  ],
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -1.9
+    },
+    "base": {
+      "return_pct": 3.9
+    },
+    "bull": {
+      "return_pct": 6.9
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -1.9
+    },
+    "base": {
+      "return_pct": 3.9
+    },
+    "bull": {
+      "return_pct": 6.9
+    }
+  },
+  "overlay_results": [],
+  "lens_consensus": {
+    "as_of": "2026-06-10",
+    "shared_inputs_ref": "valuation.json@2026-06-10",
+    "valuation_richness": 0.74,
+    "blended_return_pct": 1.33,
+    "band_pct": [
+      -1.9,
+      3.9
+    ],
+    "weighted_median_pct": 3.31,
+    "median_mean_flag": false,
+    "stance": "pass",
+    "agreement_pct": 100,
+    "dissent_count": 0,
+    "lawrence_divergence": false,
+    "top_dissents": [],
+    "contributor_count": 5,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
   }
 }
