@@ -36,6 +36,7 @@ def from_superinvestor_letters(doc: dict) -> list[dict]:
     out: list[dict] = []
     for letter in doc.get("letters") or []:
         fund = letter.get("fund", "Unknown")
+        fund_id = letter.get("fund_id") or fund
         as_of = letter.get("letter_date")
         for th in letter.get("themes") or []:
             out.append(
@@ -48,6 +49,7 @@ def from_superinvestor_letters(doc: dict) -> list[dict]:
                     direction={"constructive": "bullish", "cautious": "bearish"}.get(th.get("stance"), "neutral"),
                     evidence_ref=letter.get("source_file"),
                     fund=fund,
+                    fund_id=fund_id,
                     quarter=letter.get("quarter"),
                     tickers=th.get("tickers") or [],
                 )
@@ -56,17 +58,23 @@ def from_superinvestor_letters(doc: dict) -> list[dict]:
             tk = pos.get("ticker")
             if not tk:
                 continue
+            action = pos.get("action", "discussed")
+            commentary = pos.get("commentary") or pos.get("thesis") or ""
+            claim = commentary if commentary else f"{fund} {action} {tk}"
             out.append(
                 insight_record(
                     source="superinvestor_letter",
                     as_of=as_of,
                     scope="ticker",
                     ref=tk,
-                    claim=f"{fund} {pos.get('action', 'discussed')} {tk}",
-                    direction={"add": "bullish", "trim": "bearish"}.get(pos.get("action"), "neutral"),
+                    claim=claim,
+                    direction={"add": "bullish", "trim": "bearish"}.get(action, "neutral"),
                     evidence_ref=letter.get("source_file"),
                     fund=fund,
+                    fund_id=fund_id,
                     quarter=letter.get("quarter"),
+                    action=action,
+                    commentary=commentary,
                 )
             )
     return out
@@ -186,7 +194,7 @@ def from_news(doc: dict) -> list[dict]:
     return out[:30]
 
 
-def theme_rankings(records: list[dict], quarter: str | None = None) -> list[dict]:
+def theme_rankings(records: list[dict], quarter: str | None = None, our_tickers: set[str] | None = None) -> list[dict]:
     """Count distinct letters per theme (not raw paragraph hits)."""
     by_theme: dict[str, dict] = {}
     for r in records:
@@ -216,11 +224,15 @@ def theme_rankings(records: list[dict], quarter: str | None = None) -> list[dict
             direction = r.get("direction", "neutral")
             bucket[direction] = bucket.get(direction, 0) + 1
         for tk in r.get("tickers") or []:
-            if tk:
+            if tk and re.match(r"^[A-Z0-9][A-Z0-9.\-]{0,11}$", str(tk).upper()):
                 bucket["top_tickers"].add(str(tk).upper())
     out: list[dict] = []
+    holdings = our_tickers or set()
     for bucket in by_theme.values():
-        top = sorted(bucket["top_tickers"])[:8]
+        all_tickers = sorted(bucket["top_tickers"])
+        ours = [t for t in all_tickers if t in holdings]
+        rest = [t for t in all_tickers if t not in holdings]
+        top = (ours + rest)[:8]
         out.append(
             {
                 "theme": bucket["theme"],
@@ -235,54 +247,145 @@ def theme_rankings(records: list[dict], quarter: str | None = None) -> list[dict
     return sorted(out, key=lambda x: (-x["letter_count"], x["theme"]))
 
 
-def theme_rankings_by_quarter(records: list[dict]) -> dict[str, list[dict]]:
+def theme_rankings_by_quarter(records: list[dict], our_tickers: set[str] | None = None) -> dict[str, list[dict]]:
     quarters = sorted({r.get("quarter") for r in records if r.get("quarter")})
-    out = {"all": theme_rankings(records)}
+    out = {"all": theme_rankings(records, our_tickers=our_tickers)}
     for q in quarters:
-        out[q] = theme_rankings(records, quarter=q)
+        out[q] = theme_rankings(records, quarter=q, our_tickers=our_tickers)
     return out
 
 
-def fund_registry(records: list[dict], our_tickers: set[str]) -> list[dict]:
+def fund_registry(letters: list[dict], our_tickers: set[str]) -> list[dict]:
     """One row per fund+quarter with overlap against our book."""
     by_key: dict[str, dict] = {}
-    for r in records:
-        if r.get("source") != "superinvestor_letter":
-            continue
-        fund = r.get("fund") or "Unknown"
-        quarter = r.get("quarter") or "—"
-        key = f"{fund}|{quarter}"
+    for letter in letters:
+        fund = letter.get("fund") or "Unknown"
+        fund_id = letter.get("fund_id") or fund
+        quarter = letter.get("quarter") or "—"
+        key = f"{fund_id}|{quarter}"
+        letter_tickers = {str(t).upper() for t in (letter.get("tickers") or [])}
+        overlap = sorted(letter_tickers & our_tickers)
         row = by_key.setdefault(
             key,
             {
+                "fund_id": fund_id,
                 "fund": fund,
+                "manager": letter.get("manager") or "",
                 "quarter": quarter,
-                "our_tickers": set(),
-                "sample_claim": None,
-                "evidence_ref": r.get("evidence_ref"),
+                "our_tickers": set(overlap),
+                "tickers": set(letter_tickers),
+                "themes": set(),
+                "maps_to_persona": letter.get("maps_to_persona") or [],
+                "lead_summary": letter.get("lead_summary") or "",
+                "evidence_ref": letter.get("source_file"),
+                "letter_date": letter.get("letter_date"),
             },
         )
-        if r.get("scope") == "ticker" and r.get("ref"):
-            tk = str(r["ref"]).upper()
-            if tk in our_tickers:
-                row["our_tickers"].add(tk)
-            if not row["sample_claim"]:
-                row["sample_claim"] = r.get("claim")
-        elif r.get("scope") == "theme" and not row["sample_claim"]:
-            row["sample_claim"] = r.get("claim")
+        row["our_tickers"].update(overlap)
+        row["tickers"].update(letter_tickers)
+        for th in letter.get("themes") or []:
+            if th.get("theme"):
+                row["themes"].add(th["theme"])
+        if not row["lead_summary"] and letter.get("lead_summary"):
+            row["lead_summary"] = letter["lead_summary"]
     out = []
     for row in by_key.values():
         out.append(
             {
+                "fund_id": row["fund_id"],
                 "fund": row["fund"],
+                "manager": row["manager"],
                 "quarter": row["quarter"],
+                "letter_date": row["letter_date"],
                 "our_tickers": sorted(row["our_tickers"]),
                 "our_ticker_count": len(row["our_tickers"]),
-                "sample_claim": row["sample_claim"],
+                "tickers": sorted(row["tickers"])[:20],
+                "themes": sorted(row["themes"]),
+                "maps_to_persona": row["maps_to_persona"],
+                "lead_summary": (row["lead_summary"] or "")[:280],
                 "evidence_ref": row["evidence_ref"],
             }
         )
     return sorted(out, key=lambda x: (-x["our_ticker_count"], x["fund"]))
+
+
+def letter_index(letters: list[dict], our_tickers: set[str]) -> list[dict]:
+    rows: list[dict] = []
+    for letter in letters:
+        tickers = [str(t).upper() for t in (letter.get("tickers") or [])]
+        overlap = sorted(set(tickers) & our_tickers)
+        positions = letter.get("positions") or []
+        adds = [p["ticker"] for p in positions if p.get("action") == "add" and p.get("ticker")]
+        trims = [p["ticker"] for p in positions if p.get("action") == "trim" and p.get("ticker")]
+        rows.append(
+            {
+                "fund_id": letter.get("fund_id"),
+                "fund": letter.get("fund"),
+                "manager": letter.get("manager") or "",
+                "quarter": letter.get("quarter"),
+                "letter_date": letter.get("letter_date"),
+                "themes": [t.get("theme") for t in (letter.get("themes") or []) if t.get("theme")],
+                "tickers": tickers[:20],
+                "our_overlap": overlap,
+                "adds": adds[:8],
+                "trims": trims[:8],
+                "lead_summary": (letter.get("lead_summary") or "")[:320],
+                "maps_to_persona": letter.get("maps_to_persona") or [],
+                "source_file": letter.get("source_file"),
+            }
+        )
+    return sorted(rows, key=lambda x: (x.get("letter_date") or "", x.get("fund") or ""), reverse=True)
+
+
+def fund_profiles(letters: list[dict], our_tickers: set[str]) -> dict[str, dict]:
+    by_fund: dict[str, dict] = {}
+    for letter in letters:
+        fund_id = letter.get("fund_id") or slugify(letter.get("fund", "unknown"))
+        profile = by_fund.setdefault(
+            fund_id,
+            {
+                "fund_id": fund_id,
+                "fund": letter.get("fund"),
+                "manager": letter.get("manager") or "",
+                "maps_to_persona": letter.get("maps_to_persona") or [],
+                "our_tickers": set(),
+                "letters": [],
+            },
+        )
+        if letter.get("manager") and not profile["manager"]:
+            profile["manager"] = letter["manager"]
+        if letter.get("maps_to_persona"):
+            profile["maps_to_persona"] = letter["maps_to_persona"]
+        tickers = {str(t).upper() for t in (letter.get("tickers") or [])}
+        profile["our_tickers"].update(tickers & our_tickers)
+        profile["letters"].append(
+            {
+                "quarter": letter.get("quarter"),
+                "letter_date": letter.get("letter_date"),
+                "lead_summary": letter.get("lead_summary") or "",
+                "themes": letter.get("themes") or [],
+                "positions": letter.get("positions") or [],
+                "tickers": letter.get("tickers") or [],
+                "risks": letter.get("risks") or [],
+                "catalysts": letter.get("catalysts") or [],
+                "macro_views": letter.get("macro_views") or [],
+                "source_file": letter.get("source_file"),
+            }
+        )
+    for profile in by_fund.values():
+        profile["our_tickers"] = sorted(profile["our_tickers"])
+        profile["letters"] = sorted(
+            profile["letters"],
+            key=lambda x: (x.get("letter_date") or "", x.get("quarter") or ""),
+            reverse=True,
+        )
+        profile["latest_quarter"] = profile["letters"][0].get("quarter") if profile["letters"] else None
+    return by_fund
+
+
+def slugify(name: str) -> str:
+    s = re.sub(r"[^a-zA-Z0-9]+", "-", name.strip().lower()).strip("-")
+    return s or "unknown-fund"
 
 
 def our_holdings_tickers() -> set[str]:
@@ -301,16 +404,51 @@ def ticker_insights(records: list[dict]) -> dict[str, list[dict]]:
         if r.get("scope") != "ticker":
             continue
         tk = str(r.get("ref", "")).upper()
-        if not tk or not re.match(r"^[A-Z0-9.\-]+$", tk):
+        if not tk or not re.match(r"^[A-Z0-9][A-Z0-9.\-]{0,11}$", tk):
             continue
         by_ticker.setdefault(tk, []).append(r)
     return by_ticker
+
+
+def ticker_discussants(letters: list[dict], our_tickers: set[str]) -> dict[str, list[dict]]:
+    """Per-ticker summary of which funds discuss it (letters only)."""
+    by_ticker: dict[str, dict[str, dict]] = {}
+    for letter in letters:
+        fund = letter.get("fund") or "Unknown"
+        fund_id = letter.get("fund_id") or fund
+        for pos in letter.get("positions") or []:
+            tk = str(pos.get("ticker", "")).upper()
+            if not tk:
+                continue
+            bucket = by_ticker.setdefault(tk, {})
+            entry = bucket.setdefault(
+                fund_id,
+                {
+                    "fund": fund,
+                    "fund_id": fund_id,
+                    "quarter": letter.get("quarter"),
+                    "letter_date": letter.get("letter_date"),
+                    "action": pos.get("action", "discussed"),
+                    "commentary": pos.get("commentary") or pos.get("thesis") or "",
+                    "source_file": letter.get("source_file"),
+                    "in_our_book": tk in our_tickers,
+                },
+            )
+            if pos.get("commentary") and len(pos["commentary"]) > len(entry.get("commentary") or ""):
+                entry["commentary"] = pos["commentary"]
+                entry["action"] = pos.get("action", entry["action"])
+    out: dict[str, list[dict]] = {}
+    for tk, funds in by_ticker.items():
+        rows = sorted(funds.values(), key=lambda x: (x.get("letter_date") or ""), reverse=True)
+        out[tk] = rows[:12]
+    return out
 
 
 def main() -> int:
     records: list[dict] = []
 
     letters_doc = load_json(LETTERS_INSIGHTS) or {"letters": []}
+    letters = letters_doc.get("letters") or []
     records.extend(from_superinvestor_letters(letters_doc))
 
     for p in ROOT.iterdir():
@@ -333,15 +471,19 @@ def main() -> int:
     payload = {
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "record_count": len(records),
-        "theme_rankings": theme_rankings(records),
-        "theme_rankings_by_quarter": theme_rankings_by_quarter(records),
-        "fund_registry": fund_registry(records, our_tickers),
+        "letter_count": len(letters),
+        "theme_rankings": theme_rankings(records, our_tickers=our_tickers),
+        "theme_rankings_by_quarter": theme_rankings_by_quarter(records, our_tickers),
+        "letter_index": letter_index(letters, our_tickers),
+        "fund_registry": fund_registry(letters, our_tickers),
+        "fund_profiles": fund_profiles(letters, our_tickers),
+        "ticker_discussants": ticker_discussants(letters, our_tickers),
         "by_ticker": ticker_insights(records),
         "records": records,
     }
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
-    print(f"Wrote {OUTPUT} ({len(records)} insight records)")
+    print(f"Wrote {OUTPUT} ({len(records)} insight records, {len(letters)} letters)")
     return 0
 
 

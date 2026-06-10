@@ -663,7 +663,14 @@ def insight_evidence_url(evidence_ref: str | None) -> str | None:
     return github_blob_url(base)
 
 
-def enrich_ticker_insights(raw: list[dict], limit: int = 10) -> list[dict]:
+def load_letter_discussants(ticker: str, insights_doc: dict | None) -> list[dict]:
+    if not insights_doc:
+        return []
+    by_ticker = insights_doc.get("ticker_discussants") or {}
+    return by_ticker.get(ticker.upper()) or by_ticker.get(ticker) or []
+
+
+def enrich_ticker_insights(raw: list[dict], limit: int = 12) -> list[dict]:
     out: list[dict] = []
     for r in raw:
         row = dict(r)
@@ -815,6 +822,7 @@ def build_ticker_row(ticker: str, holdings: dict[str, dict], portfolio_class: di
             classification, lenses, row.get("human_review"), val
         )
     row["insights"] = enrich_ticker_insights(load_insights_for_ticker(ticker, insights_doc))
+    row["letter_discussants"] = load_letter_discussants(ticker, insights_doc)
     return row
 
 

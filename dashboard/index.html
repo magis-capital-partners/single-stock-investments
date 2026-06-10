@@ -291,6 +291,14 @@
   .darwin-panel.active { display: block; }
   .insights-panel { padding: 16px 24px 32px; display: none; flex: 1; overflow: auto; }
   .insights-panel.active { display: block; }
+  .clickable-row { cursor: pointer; }
+  .clickable-row:hover td { background: rgba(59, 130, 246, 0.06); }
+  button.linkish {
+    background: none; border: none; padding: 0; color: var(--accent-cyan);
+    cursor: pointer; font: inherit; text-align: left;
+  }
+  button.linkish:hover { text-decoration: underline; }
+  .fund-detail h4 { text-transform: uppercase; letter-spacing: .5px; }
   .watchlist-panel { padding: 16px 24px 32px; display: none; flex: 1; overflow: auto; }
   .watchlist-panel.active { display: block; }
   .watchlist-section { margin-bottom: 28px; }
@@ -590,6 +598,9 @@ let expandedPersona = null;
 let activeInsightFilter = 'letters';
 let insightsQuarter = 'all';
 let fundRegistrySearch = '';
+let insightsBookOnly = false;
+let insightsSection = 'themes';
+let selectedFundId = null;
 let darwinEquityChart = null;
 let darwinHoldingsChart = null;
 
@@ -753,6 +764,9 @@ function renderInsights() {
     ghRepo: GH_REPO,
     quarter: insightsQuarter,
     fundSearch: fundRegistrySearch,
+    bookOnly: insightsBookOnly,
+    selectedFundId,
+    activeSection: insightsSection,
   });
   content.querySelectorAll('[data-insights-quarter]').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -760,10 +774,42 @@ function renderInsights() {
       renderInsights();
     });
   });
+  content.querySelectorAll('[data-insights-section]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      insightsSection = btn.dataset.insightsSection;
+      selectedFundId = null;
+      renderInsights();
+    });
+  });
   const search = content.querySelector('#fund-registry-search');
   if (search) {
     search.addEventListener('input', () => {
       fundRegistrySearch = search.value;
+      renderInsights();
+    });
+  }
+  const bookOnly = content.querySelector('#insights-book-only');
+  if (bookOnly) {
+    bookOnly.addEventListener('change', () => {
+      insightsBookOnly = bookOnly.checked;
+      renderInsights();
+    });
+  }
+  content.querySelectorAll('[data-fund-id]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = el.dataset.fundId;
+      if (id) {
+        selectedFundId = id;
+        renderInsights();
+      }
+    });
+  });
+  const backBtn = content.querySelector('[data-insights-back]');
+  if (backBtn) {
+    backBtn.addEventListener('click', () => {
+      selectedFundId = null;
+      insightsSection = 'funds';
       renderInsights();
     });
   }
@@ -1226,8 +1272,11 @@ function selectTicker(ticker) {
   const tier2 = iv && t.lenses
     ? iv.renderActiveLensChips(t.active_lenses, t.silent_lens_count, expandedPersona, t.lenses, escapeHtml)
     : '';
-  const tier3 = iv && t.insights?.length
-    ? iv.renderExternalContext(t.insights, activeInsightFilter, escapeHtml, linkHtml)
+  const discussants = (data.insights?.ticker_discussants || {})[t.ticker]
+    || (data.insights?.ticker_discussants || {})[t.ticker.toUpperCase()]
+    || [];
+  const tier3 = iv && (t.insights?.length || discussants.length)
+    ? iv.renderExternalContext(t.insights, activeInsightFilter, escapeHtml, linkHtml, discussants, GH_REPO)
     : '';
   const consensusDetail = iv && t.lenses ? iv.renderConsensusDetail(t.lenses, escapeHtml) : '';
   const filingRef = t.classification?.filing_irr_ref && t.classification?.irr_source === 'total_synthesis'
