@@ -10,12 +10,14 @@
 | **Moat** (Munger) | unproven |
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | mid |
-| **Implied 7yr IRR** (base) | — |
-| **IRR method** | pending |
+| **Cycle** | trough |
+| **Implied 7yr IRR** (base) | -9.95% (total synthesis) |
+| **IRR method** | full |
 | **Lawrence bucket** | other |
-| **Payoff lens** | asset |
+| **Payoff lens** | event |
 | **MOI bucket** | pending |
+
+**Deep dive:** `PCH/research/deep_dive_2026-06-10.md` (auto-sync)
 
 ## One-line thesis
 
