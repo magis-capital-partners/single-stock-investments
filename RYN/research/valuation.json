@@ -46,7 +46,7 @@
     "overlay_nav_per_share": 22.0,
     "overlay_nav_note": "[Assumption] timberland fair value ~$1,800/acre on 4.0M acres less ~$6.2/sh net debt; not GAAP book",
     "notes": "Price ~12% above GAAP book post-merger; stance gate uses normalized CAD ten-year path, not book floor alone",
-    "primary_return_pct": null
+    "primary_return_pct": -6.7
   },
   "nav_overlay": {
     "as_of": "2026-06-10",
@@ -172,7 +172,7 @@
         "option_treatment": "probability_weighted",
         "annual_drag_per_share": 0.0,
         "base_terminal_value_bn": 0.42,
-        "base_terminal_rationale": "P_base 0.4 × ~$1.05B incremental HBU value above normalized timber run-rate",
+        "base_terminal_rationale": "P_base 0.4 \u00d7 ~$1.05B incremental HBU value above normalized timber run-rate",
         "overlay_base_terminal_bn": 0.42,
         "bull_terminal_value_bn": 1.05,
         "evidence": "Q1 2026 rural/improved development sales; Chenal Valley residential lots",
@@ -184,7 +184,7 @@
         "option_treatment": "probability_weighted",
         "annual_drag_per_share": 0.0,
         "base_terminal_value_bn": 0.18,
-        "base_terminal_rationale": "P_base 0.3 × contracted option value on Southern acreage",
+        "base_terminal_rationale": "P_base 0.3 \u00d7 contracted option value on Southern acreage",
         "overlay_base_terminal_bn": 0.18,
         "bull_terminal_value_bn": 0.6,
         "evidence": "10-Q Southern Timber CCS and solar revenue discussion",
@@ -192,7 +192,8 @@
       }
     ],
     "corporate_drag_per_share": 0.12,
-    "corporate_drag_note": "Interest on $1.86B debt, merger integration, corporate G&A not in segment EBITDA"
+    "corporate_drag_note": "Interest on $1.86B debt, merger integration, corporate G&A not in segment EBITDA",
+    "horizon_years": 7
   },
   "scenarios": {
     "bear": {
@@ -223,7 +224,6 @@
       "floor_pass": true,
       "valuation_mode": "optionality"
     },
-    "rationale": "Post-merger integrated timber REIT at ~$19.82 with partial book floor; normalized CAD yield attractive but Lawrence base IRR below accumulate threshold pending synergy proof.",
     "override_reason": null
   },
   "human_review": {
@@ -239,7 +239,16 @@
       "y6_10": 0.015,
       "return_pct": null
     },
-    "status": "partial"
+    "status": "partial",
+    "falsifier_adjusted": {
+      "y1_5": 0.02,
+      "y6_10": 0.015,
+      "exit_pfcf_y10": 13.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": -0.5096,
+      "as_of_filing_facts": "evidence/_text/10-K_20260223_rpt20251231_acc0000052827_26_000036.htm.txt"
+    }
   },
   "option_scan": [
     {
@@ -306,9 +315,9 @@
           {
             "id": "hy_oas",
             "label": "High-yield OAS credit spread (%)",
-            "latest": -0.03,
+            "latest": 0.04,
             "as_of": "2026-06-10",
-            "yoy_pct": -107.3,
+            "yoy_pct": -90.2,
             "direction": "down",
             "good_for": "risk_regime",
             "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
@@ -318,9 +327,9 @@
           {
             "id": "ust_10y",
             "label": "US Treasury 10Y yield (%)",
-            "latest": 4.5320000648498535,
+            "latest": 4.538000106811523,
             "as_of": "2026-06-10",
-            "yoy_pct": 1.3,
+            "yoy_pct": 1.4,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^TNX",
@@ -330,9 +339,9 @@
           {
             "id": "ust_2y",
             "label": "US Treasury 2Y yield (%)",
-            "latest": 4.255000114440918,
+            "latest": 4.263999938964844,
             "as_of": "2026-06-10",
-            "yoy_pct": 4.2,
+            "yoy_pct": 4.4,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^FVX",
@@ -342,7 +351,7 @@
           {
             "id": "dxy_broad",
             "label": "Trade-weighted USD index (broad)",
-            "latest": 99.91100311279297,
+            "latest": 99.92400360107422,
             "as_of": "2026-06-10",
             "yoy_pct": 0.9,
             "direction": "flat",
@@ -354,9 +363,9 @@
           {
             "id": "vix_level",
             "label": "VIX index level",
-            "latest": 22.280000686645508,
+            "latest": 21.760000228881836,
             "as_of": "2026-06-10",
-            "yoy_pct": 31.4,
+            "yoy_pct": 28.4,
             "direction": "up",
             "good_for": "vol_regime",
             "source": "yahoo:^VIX",
@@ -366,9 +375,9 @@
           {
             "id": "credit_impulse_1m",
             "label": "HYG vs TLT 1-month return spread (%)",
-            "latest": -0.09,
+            "latest": 0.19,
             "as_of": "2026-06-10",
-            "yoy_pct": -103.5,
+            "yoy_pct": -92.7,
             "direction": "down",
             "good_for": "credit_impulse",
             "source": "spread:HYG-TLT:21d",
@@ -378,9 +387,9 @@
           {
             "id": "spy_20d_realized_vol",
             "label": "SPY 20-day realized vol (annualized %)",
-            "latest": 13.03,
+            "latest": 13.12,
             "as_of": "2026-06-10",
-            "yoy_pct": 8.0,
+            "yoy_pct": 8.7,
             "direction": "up",
             "good_for": "equity_vol",
             "source": "realized_vol:SPY:20d",
@@ -415,7 +424,7 @@
       "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
     },
     "factors": {
-      "buy_score": 29.274,
+      "buy_score": 36.172,
       "sell_score": -1.0,
       "cluster_bonus": 0.0,
       "net_buy_usd": 1457400.08,
@@ -430,7 +439,7 @@
         "price": 19.82,
         "value_usd": 134994.02,
         "shares_owned_after": 22680,
-        "contrib": 3.063
+        "contrib": 3.829
       },
       {
         "insider": "BASS KEITH E",
@@ -439,7 +448,7 @@
         "price": 19.82,
         "value_usd": 134994.02,
         "shares_owned_after": 44131,
-        "contrib": 2.775
+        "contrib": 3.468
       },
       {
         "insider": "Nelson Ann C",
@@ -448,7 +457,7 @@
         "price": 19.82,
         "value_usd": 134994.02,
         "shares_owned_after": 44613,
-        "contrib": 2.77
+        "contrib": 3.463
       },
       {
         "insider": "Jones Scott R.",
@@ -457,7 +466,7 @@
         "price": 19.82,
         "value_usd": 134994.02,
         "shares_owned_after": 50439,
-        "contrib": 2.723
+        "contrib": 3.404
       },
       {
         "insider": "LELAND D MARK",
@@ -466,7 +475,7 @@
         "price": 19.82,
         "value_usd": 134994.02,
         "shares_owned_after": 64006,
-        "contrib": 2.635
+        "contrib": 3.293
       }
     ],
     "top_sells": [
@@ -518,5 +527,155 @@
     ],
     "narrative_hooks": [],
     "transaction_count": 57
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -12.2
+    },
+    "base": {
+      "return_pct": -6.7
+    },
+    "bull": {
+      "return_pct": -3.5
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -12.2
+    },
+    "base": {
+      "return_pct": -6.7
+    },
+    "bull": {
+      "return_pct": -3.5
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": -6.7
+    },
+    "falsifier_adjusted": {
+      "return_pct": -6.7
+    }
+  },
+  "implied_return": {
+    "base_pct": -4.05,
+    "label": "7yr IRR (total synthesis)",
+    "display": "-4.05% (total synthesis)",
+    "lawrence_stance_gate_pct": -6.7,
+    "falsifier_adjusted_pct": -6.7,
+    "synthesis_pct": -4.05
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Segment-derived growth (pre-falsifier)",
+        "source": "segment_build weighted blend",
+        "return_pct": -6.7,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": -12.2,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": -3.5,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      },
+      {
+        "id": "nav_overlay_payoff",
+        "label": "NAV overlay dated payoff (7yr to overlay base)",
+        "source": "nav_overlay ~$22.0/sh vs price $19.82",
+        "return_pct": 1.5,
+        "weight": 0.1,
+        "type": "numeric",
+        "epistemic_tier": "D (alternate theory: dated asset payoff)",
+        "weight_why": "Answers a different question (NAV convergence) than 7yr cash-flow IRR; capped weight to avoid theory conflation.",
+        "weight_falsifiers": [
+          "NAV overlay base not updated when segment build or filings change >10%",
+          "floor_pass false but weight above 15% without [HUMAN REVIEW]"
+        ],
+        "hard_to_vary": "yes: separate theory type"
+      }
+    ],
+    "qualitative_adjustments": [],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": -4.05,
+    "qualitative_pp": 0,
+    "total_synthesis_pct": -4.05,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [
+        "NAV overlay is a different theory (asset payoff vs cash-flow IRR); weight capped at 10% to limit theory conflation."
+      ],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  },
+  "lens_consensus": {
+    "as_of": "2026-06-10",
+    "shared_inputs_ref": "valuation.json@2026-06-10",
+    "valuation_richness": 0.634,
+    "blended_return_pct": -8.16,
+    "band_pct": [
+      -12.2,
+      -4.05
+    ],
+    "weighted_median_pct": -6.7,
+    "median_mean_flag": false,
+    "stance": "pass",
+    "agreement_pct": 100,
+    "dissent_count": 0,
+    "lawrence_divergence": false,
+    "top_dissents": [],
+    "contributor_count": 5,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
   }
 }
