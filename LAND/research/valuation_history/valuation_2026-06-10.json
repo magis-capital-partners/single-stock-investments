@@ -1,0 +1,443 @@
+{
+  "ticker": "LAND",
+  "as_of": "2026-06-10",
+  "valuation_mode": "optionality",
+  "method": "full",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "infrastructure",
+    "moat": "unproven",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "asset",
+    "investment_sleeve": "real_assets_land",
+    "predictive_attribute": "farmland_lease_reit"
+  },
+  "inputs": {
+    "price": 9.225,
+    "price_source": "Yahoo LAND close 2026-06-10",
+    "fcf_per_share": 0.38,
+    "fcf_source": "FY2025 adjusted funds from operations $0.393 per diluted share (8-K 2026-02-24 Ex. 99.1); normalized to $0.38 for lower base rent after 13-farm disposition program",
+    "shares_outstanding": 41759181,
+    "shares_source": "Q1 2026 8-K Ex. 99.1 fully diluted common 41,759,181 at 2026-03-31",
+    "book_per_share": 16.5,
+    "book_per_share_caveat": "Stockholders equity $688.3M / diluted shares at 2026-03-31; farmland at historical cost less depreciation, not fair-value NAV",
+    "dividend_per_share_annual": 0.5604,
+    "farms_owned": 144,
+    "acres_owned": 98688,
+    "water_acre_feet_ca": 55649,
+    "real_estate_net_m": 1087.7,
+    "real_estate_cost_m": 1143.8,
+    "total_indebtedness_m": 486.0,
+    "dispositions_2025_note": "Sold 13 farms (~12,502 gross acres) for ~$95.4M proceeds; ~$21.3M aggregate net gain on sale",
+    "normalization_note": "Externally managed UPREIT; monthly dividend exceeds AFFO coverage (~70% FY2025). Lawrence base uses filing AFFO, not GAAP net income (preferred dividends) or disposition gains.",
+    "price_as_of": "2026-06-10"
+  },
+  "optionality_gate": {
+    "framework": "farmland_reit_floor_option",
+    "floor_pass": true,
+    "floor_metric": "book_equity_per_share",
+    "floor_value": 16.5,
+    "floor_value_note": "GAAP equity ~$16.5/sh at 2026-03-31; real estate at cost ~$27/sh gross before ~$11.6/sh leverage; not fair-value NAV",
+    "primary_metric": "lawrence_base",
+    "primary_label": "7yr IRR",
+    "overlay_nav_per_share": 14.0,
+    "overlay_nav_note": "[Assumption] cost-basis real estate less debt haircuts; disposition comps ~$7,630/acre on sold farms vs ~$11,700/acre portfolio cost",
+    "notes": "Price ~44% below GAAP book; stance gate uses normalized AFFO ten-year path, not book floor alone",
+    "primary_return_pct": -0.2
+  },
+  "nav_overlay": {
+    "as_of": "2026-06-10",
+    "status": "complete",
+    "gaap_vs_fair_value": {
+      "real_estate_investment_net_m": 1087.7,
+      "real_estate_at_cost_m": 1143.8,
+      "acres_disclosed": 98688,
+      "water_acre_feet_ca": 55649,
+      "policy_source": "10-K FY2025: farmland carried at cost less accumulated depreciation; no fair-value NAV disclosed",
+      "source": "investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001495240_26_000007.htm"
+    },
+    "in_model": {
+      "lawrence_irr_on_operating_cash": true,
+      "gaap_book_in_dhando": false,
+      "segment_operating_pv": false,
+      "undeveloped_acreage_in_lawrence_growth": false
+    },
+    "not_in_model_requires_refresh": [
+      "Per-acre fair marks on remaining 144-farm portfolio vs 2025 disposition comps",
+      "California water rights monetization value beyond lease revenue",
+      "Normalized participation rent on Repositioned Farms after pistachio bonus cycle",
+      "External adviser fee drag vs self-managed farmland REIT peers"
+    ],
+    "segments_or_options": [
+      {
+        "id": "ca_water_rights",
+        "label": "California water portfolio (~55,649 acre-feet)",
+        "option_treatment": "nav_floor",
+        "nav_per_share": 1.5,
+        "nav_assumption": "[Assumption] partial mark above cost; FY2025 purchased 1,530 acre-feet at ~$381/acre-foot",
+        "evidence": "8-K 2026-02-24 Ex. 99.1; 424B5 2026-04-24 prospectus supplement",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "participation_rent",
+        "label": "Repositioned Farms participation rent (pistachios, tree crops)",
+        "option_treatment": "embedded_in_segment",
+        "evidence": "FY2025 participation rents ~$20M; Q1 2026 pistachio bonus ~$4.9M",
+        "not_in_lawrence_base": false
+      },
+      {
+        "id": "portfolio_rotation",
+        "label": "Farm sale / reinvest rotation gains",
+        "option_treatment": "probability_weighted",
+        "p_base": 0.5,
+        "nav_per_share_full": 2.0,
+        "overlay_value_per_share": 1.0,
+        "evidence": "FY2025 sold 13 farms for ~$95.4M with ~$21.3M net gain; management rotation strategy",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "triple_net_lease_income",
+        "label": "Triple-net base rent on 144 farms",
+        "option_treatment": "embedded_in_segment",
+        "evidence": "424B5 2026-04-24: primarily triple-net leases, 3-15 year terms",
+        "not_in_lawrence_base": false
+      }
+    ]
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.0,
+      "growth_y6_10": -0.01,
+      "exit_pfcf_y10": 11,
+      "notes": "Base rent decline persists; dividend cut; participation rent weak; leverage limits acquisitions"
+    },
+    "base": {
+      "growth_y1_5": 0.025,
+      "growth_y6_10": 0.015,
+      "exit_pfcf_y10": 14,
+      "notes": "Normalized AFFO $0.38/sh; lease escalators + modest participation; portfolio rotation at cost"
+    },
+    "bull": {
+      "growth_y1_5": 0.05,
+      "growth_y6_10": 0.03,
+      "exit_pfcf_y10": 16,
+      "notes": "Participation rent scales; water lease revenue; self-funding after ATM pause; multiple re-rate"
+    }
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": true,
+      "floor_pass": true,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": null
+  },
+  "human_review": {
+    "notes": "Externally managed (Gladstone Management); UPREIT with Series B/C preferred; provisional acreage from FY2025/Q1 2026 disclosures.",
+    "live_price_confirmed": false
+  },
+  "growth_explanation": {
+    "base_mechanism": "Triple-net lease escalators, Repositioned Farms participation rent on permanent crops, selective farm acquisitions funded by 2025 dispositions",
+    "bear_risk": "Fixed base rent fell after 13-farm sales; Q1 2026 AFFO covered only ~54% of quarterly dividend; ATM dilution 3.7M shares in Q1",
+    "source": "8-K 2026-02-24 and 8-K 2026-05-11 Ex. 99.1",
+    "lawrence_legacy": {
+      "y1_5": 0.025,
+      "y6_10": 0.015,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.025,
+      "y6_10": 0.015,
+      "exit_pfcf_y10": 14.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": 0.0366,
+      "as_of_filing_facts": "evidence/_text/10-K-A_20260407_rpt20251231_acc0001495240_26_000011.htm.txt"
+    },
+    "status": "partial"
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "nav_overlay",
+      "evidence": "Farmland at cost less depreciation; 2025 dispositions produced ~$21.3M net gains vs carrying values"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / acreage?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating leased farmland portfolio; 94.9% occupancy at 2026-03-31"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Partial",
+      "treatment": "burden_in_cf",
+      "evidence": "Q1 2026 net loss to common ($10.0M) driven by preferred dividends/charges, not operating farm losses"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF path?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Participation rent on Repositioned Farms; lumpy crop-year timing"
+    },
+    {
+      "q": 5,
+      "question": "Private stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No material private equity stakes"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution?",
+      "answer": "Yes",
+      "treatment": "yield_curve",
+      "evidence": "Monthly dividend $0.0467 exceeds normalized AFFO; 159 consecutive monthly payments as of Q1 2026"
+    },
+    {
+      "q": 7,
+      "question": "Embedded in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Base rent and crop sales in operating revenue; direct-operated farms (~4 farms)"
+    }
+  ],
+  "estimates": {
+    "external": []
+  },
+  "context_overlay": {
+    "as_of": "2026-06-10",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": -0.03,
+            "as_of": "2026-06-10",
+            "yoy_pct": -107.3,
+            "direction": "down",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.5320000648498535,
+            "as_of": "2026-06-10",
+            "yoy_pct": 1.3,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.255000114440918,
+            "as_of": "2026-06-10",
+            "yoy_pct": 4.2,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 99.91100311279297,
+            "as_of": "2026-06-10",
+            "yoy_pct": 0.9,
+            "direction": "flat",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 22.280000686645508,
+            "as_of": "2026-06-10",
+            "yoy_pct": 31.4,
+            "direction": "up",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": -0.09,
+            "as_of": "2026-06-10",
+            "yoy_pct": -103.5,
+            "direction": "down",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 13.03,
+            "as_of": "2026-06-10",
+            "yoy_pct": 8.0,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -5.2
+    },
+    "base": {
+      "return_pct": -0.2
+    },
+    "bull": {
+      "return_pct": 3.6
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -5.2
+    },
+    "base": {
+      "return_pct": -0.2
+    },
+    "bull": {
+      "return_pct": 3.6
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": -0.2
+    },
+    "falsifier_adjusted": {
+      "return_pct": -0.2
+    }
+  },
+  "implied_return": {
+    "base_pct": 2.2,
+    "label": "7yr IRR (total synthesis)",
+    "display": "2.2% (total synthesis)",
+    "lawrence_stance_gate_pct": -0.2,
+    "falsifier_adjusted_pct": -0.2,
+    "synthesis_pct": 2.2
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Growth theory (pre-falsifier)",
+        "source": "growth_explanation + filing revenue YoY",
+        "return_pct": -0.2,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": -5.2,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 3.6,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      },
+      {
+        "id": "nav_overlay_payoff",
+        "label": "NAV overlay dated payoff (7yr to overlay base)",
+        "source": "nav_overlay ~$14.0/sh vs price $9.225",
+        "return_pct": 6.14,
+        "weight": 0.1,
+        "type": "numeric",
+        "epistemic_tier": "D (alternate theory: dated asset payoff)",
+        "weight_why": "Answers a different question (NAV convergence) than 7yr cash-flow IRR; capped weight to avoid theory conflation.",
+        "weight_falsifiers": [
+          "NAV overlay base not updated when segment build or filings change >10%",
+          "floor_pass false but weight above 15% without [HUMAN REVIEW]"
+        ],
+        "hard_to_vary": "yes: separate theory type"
+      }
+    ],
+    "qualitative_adjustments": [],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 2.2,
+    "qualitative_pp": 0,
+    "total_synthesis_pct": 2.2,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [
+        "NAV overlay is a different theory (asset payoff vs cash-flow IRR); weight capped at 10% to limit theory conflation."
+      ],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}
