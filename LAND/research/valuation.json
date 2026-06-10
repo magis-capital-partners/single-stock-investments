@@ -2,7 +2,7 @@
   "ticker": "LAND",
   "as_of": "2026-06-10",
   "valuation_mode": "optionality",
-  "method": "pending",
+  "method": "full",
   "lawrence_bucket": "other",
   "classification_inputs": {
     "archetype": "infrastructure",
@@ -14,23 +14,189 @@
     "predictive_attribute": "farmland_lease_reit"
   },
   "inputs": {
+    "price": 9.23,
+    "price_source": "Yahoo Finance LAND regular market 2026-06-10",
+    "fcf_per_share": 0.38,
+    "fcf_source": "FY2025 adjusted funds from operations $0.393 per diluted share (8-K 2026-02-24 Ex. 99.1); normalized to $0.38 for lower base rent after 13-farm disposition program",
+    "shares_outstanding": 41759181,
+    "shares_source": "Q1 2026 8-K Ex. 99.1 fully diluted common 41,759,181 at 2026-03-31",
+    "book_per_share": 16.5,
+    "book_per_share_caveat": "Stockholders equity $688.3M / diluted shares at 2026-03-31; farmland at historical cost less depreciation, not fair-value NAV",
+    "dividend_per_share_annual": 0.5604,
     "farms_owned": 144,
     "acres_owned": 98688,
-    "water_acre_feet_ca": 55532,
-    "states": 14,
-    "acres_source": "FY2025 10-K / company IR: ~98,688 acres, 144 farms, 55,532 acre-feet CA water (Dec 31, 2025)",
-    "real_estate_net_m": 1100,
-    "dispositions_2025_note": "Sold 13 farms (~12,502 gross acres) for ~$95.4M; portfolio rotation strategy",
-    "price": null,
-    "price_source": "Pending Marvin refresh after SEC download"
+    "water_acre_feet_ca": 55649,
+    "real_estate_net_m": 1087.7,
+    "real_estate_cost_m": 1143.8,
+    "total_indebtedness_m": 486.0,
+    "dispositions_2025_note": "Sold 13 farms (~12,502 gross acres) for ~$95.4M proceeds; ~$21.3M aggregate net gain on sale",
+    "normalization_note": "Externally managed UPREIT; monthly dividend exceeds AFFO coverage (~70% FY2025). Lawrence base uses filing AFFO, not GAAP net income (preferred dividends) or disposition gains."
+  },
+  "optionality_gate": {
+    "framework": "farmland_reit_floor_option",
+    "floor_pass": true,
+    "floor_metric": "book_equity_per_share",
+    "floor_value": 16.5,
+    "floor_value_note": "GAAP equity ~$16.5/sh at 2026-03-31; real estate at cost ~$27/sh gross before ~$11.6/sh leverage; not fair-value NAV",
+    "primary_metric": "lawrence_base",
+    "primary_label": "annualized return",
+    "overlay_nav_per_share": 14.0,
+    "overlay_nav_note": "[Assumption] cost-basis real estate less debt haircuts; disposition comps ~$7,630/acre on sold farms vs ~$11,700/acre portfolio cost",
+    "notes": "Price ~44% below GAAP book; stance gate uses normalized AFFO ten-year path, not book floor alone",
+    "primary_return_pct": 2.5
+  },
+  "nav_overlay": {
+    "as_of": "2026-06-10",
+    "status": "complete",
+    "gaap_vs_fair_value": {
+      "real_estate_investment_net_m": 1087.7,
+      "real_estate_at_cost_m": 1143.8,
+      "acres_disclosed": 98688,
+      "water_acre_feet_ca": 55649,
+      "policy_source": "10-K FY2025: farmland carried at cost less accumulated depreciation; no fair-value NAV disclosed",
+      "source": "investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001495240_26_000007.htm"
+    },
+    "in_model": {
+      "lawrence_irr_on_operating_cash": true,
+      "gaap_book_in_dhando": false,
+      "segment_operating_pv": false,
+      "undeveloped_acreage_in_lawrence_growth": false
+    },
+    "not_in_model_requires_refresh": [
+      "Per-acre fair marks on remaining 144-farm portfolio vs 2025 disposition comps",
+      "California water rights monetization value beyond lease revenue",
+      "Normalized participation rent on Repositioned Farms after pistachio bonus cycle",
+      "External adviser fee drag vs self-managed farmland REIT peers"
+    ],
+    "segments_or_options": [
+      {
+        "id": "ca_water_rights",
+        "label": "California water portfolio (~55,649 acre-feet)",
+        "option_treatment": "nav_floor",
+        "nav_per_share": 1.5,
+        "nav_assumption": "[Assumption] partial mark above cost; FY2025 purchased 1,530 acre-feet at ~$381/acre-foot",
+        "evidence": "8-K 2026-02-24 Ex. 99.1; 424B5 2026-04-24 prospectus supplement",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "participation_rent",
+        "label": "Repositioned Farms participation rent (pistachios, tree crops)",
+        "option_treatment": "embedded_in_segment",
+        "evidence": "FY2025 participation rents ~$20M; Q1 2026 pistachio bonus ~$4.9M",
+        "not_in_lawrence_base": false
+      },
+      {
+        "id": "portfolio_rotation",
+        "label": "Farm sale / reinvest rotation gains",
+        "option_treatment": "probability_weighted",
+        "p_base": 0.5,
+        "nav_per_share_full": 2.0,
+        "overlay_value_per_share": 1.0,
+        "evidence": "FY2025 sold 13 farms for ~$95.4M with ~$21.3M net gain; management rotation strategy",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "triple_net_lease_income",
+        "label": "Triple-net base rent on 144 farms",
+        "option_treatment": "embedded_in_segment",
+        "evidence": "424B5 2026-04-24: primarily triple-net leases, 3-15 year terms",
+        "not_in_lawrence_base": false
+      }
+    ]
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.0,
+      "growth_y6_10": -0.01,
+      "exit_pfcf_y10": 11,
+      "notes": "Base rent decline persists; dividend cut; participation rent weak; leverage limits acquisitions"
+    },
+    "base": {
+      "growth_y1_5": 0.025,
+      "growth_y6_10": 0.015,
+      "exit_pfcf_y10": 14,
+      "notes": "Normalized AFFO $0.38/sh; lease escalators + modest participation; portfolio rotation at cost"
+    },
+    "bull": {
+      "growth_y1_5": 0.05,
+      "growth_y6_10": 0.03,
+      "exit_pfcf_y10": 16,
+      "notes": "Participation rent scales; water lease revenue; self-funding after ATM pause; multiple re-rate"
+    }
   },
   "stance_proposal": {
     "suggested": "watch",
-    "irr_band": "pending",
-    "rationale": "Onboarded land-sleeve farmland REIT; lease-income + water optionality; assess NAV overlay vs monthly dividend REIT model."
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": true,
+      "floor_pass": true,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": null,
+    "rationale": "Farmland lease infrastructure at ~$9.23 with book discount but sub-15% AFFO IRR; dividend coverage gap and external adviser structure cap stance."
   },
   "human_review": {
-    "notes": "Externally managed (Gladstone Management); UPREIT structure. Provisional acreage from FY2025 disclosures."
+    "notes": "Externally managed (Gladstone Management); UPREIT with Series B/C preferred; provisional acreage from FY2025/Q1 2026 disclosures."
+  },
+  "growth_explanation": {
+    "base_mechanism": "Triple-net lease escalators, Repositioned Farms participation rent on permanent crops, selective farm acquisitions funded by 2025 dispositions",
+    "bear_risk": "Fixed base rent fell after 13-farm sales; Q1 2026 AFFO covered only ~54% of quarterly dividend; ATM dilution 3.7M shares in Q1",
+    "source": "8-K 2026-02-24 and 8-K 2026-05-11 Ex. 99.1"
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "nav_overlay",
+      "evidence": "Farmland at cost less depreciation; 2025 dispositions produced ~$21.3M net gains vs carrying values"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / acreage?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating leased farmland portfolio; 94.9% occupancy at 2026-03-31"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Partial",
+      "treatment": "burden_in_cf",
+      "evidence": "Q1 2026 net loss to common ($10.0M) driven by preferred dividends/charges, not operating farm losses"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF path?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Participation rent on Repositioned Farms; lumpy crop-year timing"
+    },
+    {
+      "q": 5,
+      "question": "Private stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No material private equity stakes"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution?",
+      "answer": "Yes",
+      "treatment": "yield_curve",
+      "evidence": "Monthly dividend $0.0467 exceeds normalized AFFO; 159 consecutive monthly payments as of Q1 2026"
+    },
+    {
+      "q": 7,
+      "question": "Embedded in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Base rent and crop sales in operating revenue; direct-operated farms (~4 farms)"
+    }
+  ],
+  "estimates": {
+    "external": []
   },
   "context_overlay": {
     "as_of": "2026-06-10",
