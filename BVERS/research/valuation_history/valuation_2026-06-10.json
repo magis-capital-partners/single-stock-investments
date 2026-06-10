@@ -1,0 +1,326 @@
+{
+  "ticker": "BVERS",
+  "as_of": "2026-06-10",
+  "valuation_mode": "optionality",
+  "method": "full",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "narrow",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "asset",
+    "investment_sleeve": "real_assets_land",
+    "predictive_attribute": "market_structure_discount"
+  },
+  "inputs": {
+    "price": 2400.0,
+    "price_source": "[Assumption] Yahoo Finance BVERS last sale ~$2,300 (2026-04-10); bid/ask ~$2,375\u2013$2,650; thin OTC Pink volume",
+    "price_as_of": "2026-06-10",
+    "fcf_per_share": 206.17,
+    "fcf_source": "FY2025 distribution $206.17 per unit (2025-12-31 Annual Report letter; 103.8% of net income)",
+    "shares_outstanding": 24878,
+    "shares_source": "2024 balance sheet: Limited partners 24,878 shares of interest; confirmed by net income / income per unit 2025 ($4,942,513 / $198.67)",
+    "book_per_share": 594.82,
+    "book_source": "FY2025 total partnership capital $14,797,930 / 24,878 units",
+    "book_per_share_caveat": "Land carried at $3,511,890 historical cost (~$69/acre on ~50,622 timber acres); not fair-value NAV",
+    "dividend_per_share_annual": 206.17,
+    "dividend_source": "FY2025 distribution per unit (annual report letter)",
+    "net_income_per_unit_2025": 198.67,
+    "total_assets_m": 15.848,
+    "notes_payable_m": 0.289,
+    "cash_m": 4.159,
+    "coal_royalties_2025_m": 4.373,
+    "surface_rentals_2025_m": 2.852,
+    "coal_reserve_tons_2025": 22109,
+    "timber_acres_2025": 50552,
+    "contracted_minimum_rentals_5yr_m": 13.061,
+    "partnership_term_end": "2030-10-31",
+    "normalization_note": "Lawrence uses FY2025 cash distribution as owner cash (not 2024's $305/unit payout funded by excess liquidity). Coal royalties cyclical; surface leasing share rising to 36.5% of revenue.",
+    "last_filing": "FY2025 annual report via OTC Disclosure (amended 2026-04-28)"
+  },
+  "optionality_gate": {
+    "framework": "mineral_floor_option",
+    "framework_label": "royalty_lp_land_surface",
+    "floor_pass": true,
+    "floor_metric": "cash_plus_contracted_rentals",
+    "floor_value": 594.82,
+    "floor_value_note": "GAAP book ~$595/unit is accounting floor only; economic value is royalty stream + surface option. Cash $4.16M and $13.06M contracted minimum rentals (Note 6) bound liquidity risk.",
+    "primary_metric": "lawrence_base",
+    "primary_label": "7yr IRR",
+    "distribution_yield_pct": 8.59,
+    "premium_to_gaap_book_pct": 303.5,
+    "incumbent_sleeve": false,
+    "notes": "Price ~4.0\u00d7 GAAP book because land/coal reserves carried at historical cost; stance gate uses Lawrence distribution path, not book discount.",
+    "primary_return_pct": 10.9
+  },
+  "nav_overlay": {
+    "as_of": "2026-06-10",
+    "status": "complete",
+    "gaap_vs_fair_value": {
+      "land_carrying_m": 3.512,
+      "land_carrying_per_acre": 69.4,
+      "timber_acres": 50552,
+      "metallurgical_coal_reserve_tons": 22109,
+      "policy_source": "Note 4: Land $3,511,890 at historical cost; Reserve Grid based on independent appraisals (not fully marked on balance sheet)",
+      "source": "investor-documents/ir-bvers/2025-12-31_Annual_Report.pdf Notes 4, 6; BCC Reserve Grid 2025"
+    },
+    "in_model": {
+      "lawrence_irr_on_owner_cash": true,
+      "gaap_book_in_dhando": false,
+      "undeveloped_reserves_in_lawrence_growth": false
+    },
+    "not_in_model_requires_refresh": [
+      "Independent appraisal dollar values for coal/timber reserves (grid shows volumes only)",
+      "Per-acre fair marks on ~40,000 coal-bearing acres and ~9,600 non-coal acres",
+      "Post-2030 partnership renewal terms",
+      "Private-market unit transaction comps beyond thin OTC prints"
+    ],
+    "segments_or_options": [
+      {
+        "id": "met_coal_reserves",
+        "label": "Metallurgical coal reserves (~22.1M tons YE 2025)",
+        "option_treatment": "nav_floor",
+        "nav_per_share": 400.0,
+        "nav_assumption": "[Assumption] Partial mark above GAAP land line; reserve grid tons only, no filing dollar NAV",
+        "evidence": "BCC Reserve Grid 2025; coal royalties $4.37M FY2025",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "surface_leasing_ramp",
+        "label": "Surface leasing, hospitality, commercial ground leases",
+        "option_treatment": "embedded_in_segment",
+        "evidence": "Rentals and other revenue $2.85M (+7.5% YoY); 36.5% of total revenue FY2025",
+        "not_in_lawrence_base": false
+      },
+      {
+        "id": "undeveloped_acreage",
+        "label": "Undeveloped / non-producing coal acreage and timber growth",
+        "option_treatment": "probability_weighted",
+        "p_base": 0.35,
+        "nav_per_share_full": 250.0,
+        "overlay_value_per_share": 87.5,
+        "evidence": "~40,000 coal-bearing acres + timber growth 4,255 MBF in 2025; management surface land-lessor plan",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "partnership_liquidity",
+        "label": "GP consent / non-reporting LP transfer restriction",
+        "option_treatment": "zero",
+        "base_terminal_rationale": "Market structure discount is ongoing, not a separate terminal option; captured in yield lens",
+        "evidence": "2022-10-28 Supplemental Information; unit transfer requires GP consent",
+        "not_in_lawrence_base": true
+      }
+    ]
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": -0.02,
+      "growth_y6_10": -0.01,
+      "exit_pfcf_y10": 10,
+      "notes": "Sustained met coal price weakness; distributions cut toward net income; two-customer concentration"
+    },
+    "base": {
+      "growth_y1_5": 0.02,
+      "growth_y6_10": 0.01,
+      "exit_pfcf_y10": 12,
+      "notes": "FY2025 distribution $206/unit; surface leasing mix rises; coal royalties mid-cycle",
+      "sotp_build": {
+        "shares": 24878,
+        "book_per_share": 594.82,
+        "lines": [
+          {
+            "id": "book",
+            "label": "GAAP partnership capital anchor",
+            "gaap_per_share": 594.82,
+            "uplift_per_share": 0.0,
+            "math": "FY2025 partnership capital / 24,878 units"
+          },
+          {
+            "id": "coal_reserves_nav",
+            "label": "Met coal reserves (overlay only)",
+            "option_treatment": "nav_floor",
+            "uplift_per_share": 400.0,
+            "math": "[Assumption] 22.1M tons metallurgical reserves; not on balance sheet at fair value"
+          },
+          {
+            "id": "undeveloped_pw",
+            "label": "Undeveloped acreage / timber option",
+            "option_treatment": "probability_weighted",
+            "uplift_per_share": 87.5,
+            "math": "P=35% \u00d7 $250 full mark"
+          },
+          {
+            "id": "operating_franchise",
+            "label": "Royalty + surface cash-flow franchise",
+            "option_treatment": "embedded_in_segment",
+            "uplift_per_share": 1317.68,
+            "math": "Implied by market price $2,400 vs GAAP $595 + overlays; not additive to Lawrence cash path"
+          }
+        ],
+        "notes": "Market price embeds royalty franchise; overlay lines illustrate GAAP vs economic gap only"
+      }
+    },
+    "bull": {
+      "growth_y1_5": 0.04,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 14,
+      "notes": "Met coal up-cycle + surface development (Dayton St., Cabins at Pine Haven) accelerates rentals"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Yes",
+      "treatment": "nav_overlay",
+      "evidence": "Land $3.5M at historical cost on ~50,552 acres; coal/timber reserves appraised in grid but not fair-valued on BS (Note 4)"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / acreage / dormant royalty?",
+      "answer": "Yes",
+      "treatment": "nav_floor",
+      "evidence": "22.1M tons met coal reserves; ~40,000 coal-bearing acres; minimum rental credit $937,930 (Note 6)"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating income $4.89M FY2025; fixed-cost royalty model"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Contracted minimum rentals $13.06M over 2026\u20132030 (Note 6)"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Wholly owned mini-storage (91%) and Woodlands Amenities subsidiaries consolidated"
+    },
+    {
+      "q": 6,
+      "question": "Transitory legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No material litigation disclosed (Note 8)"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option already in revenue?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Surface leasing growth already in rentals line; coal royalties remain commodity-linked"
+    }
+  ],
+  "payoff_lens": "asset",
+  "moi_bucket": "asset",
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 5.1
+    },
+    "base": {
+      "return_pct": 10.9
+    },
+    "bull": {
+      "return_pct": 14.6
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 5.1
+    },
+    "base": {
+      "return_pct": 10.9
+    },
+    "bull": {
+      "return_pct": 14.6
+    }
+  },
+  "implied_return": {
+    "base_pct": 11.81,
+    "label": "7yr IRR (total synthesis)",
+    "display": "11.81% (total synthesis)",
+    "lawrence_stance_gate_pct": 10.9,
+    "falsifier_adjusted_pct": 10.9,
+    "synthesis_pct": 11.81
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "optionality",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true,
+      "floor_pass": true,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": null
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": 5.1,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 14.6,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 11.81,
+    "qualitative_pp": 0,
+    "total_synthesis_pct": 11.81,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}

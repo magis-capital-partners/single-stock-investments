@@ -1,0 +1,598 @@
+{
+  "ticker": "PDER",
+  "as_of": "2026-06-10",
+  "valuation_mode": "optionality",
+  "method": "full",
+  "lawrence_bucket": "other",
+  "valuation_overlay": "segment_cashflow",
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "narrow",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "asset",
+    "investment_sleeve": "real_assets_land",
+    "predictive_attribute": "dormant_asset"
+  },
+  "inputs": {
+    "price": 273.99,
+    "price_source": "Yahoo Finance PDER close 2026-06-10",
+    "price_as_of": "2026-06-10",
+    "fcf_per_share": 16.0,
+    "fcf_source": "Normalized owner cash ~$10.5M: between FY2025 operating cash $9.19M ($14.1/sh) and FY2024 $16.35M ($25.2/sh); excludes 2025 $8.9M oil/gas sale gain; Q1 2026 coal idling headwind",
+    "shares_outstanding": 651498,
+    "shares_source": "2025-12-31 Annual Report: 651,498 common shares outstanding at December 31, 2025",
+    "book_per_share": 205.44,
+    "book_per_share_caveat": "Pardee shareholders equity $134.2M / shares; minerals and timber carried at depletion/historical cost; independent reserve appraisals cited but not fully marked to fair value on balance sheet",
+    "dividend_per_share_annual": 7.2,
+    "special_dividend_2025": 15.0,
+    "cash_m": 27.85,
+    "total_assets_m": 171.24,
+    "shareholders_equity_m": 134.18,
+    "operating_cash_2025_m": 9.19,
+    "operating_cash_2024_m": 16.35,
+    "normalization_note": "Family-controlled OTC natural-resource holdco; Lawrence base uses normalized distributable cash, not 2025 EPS $25.09 inflated by one-time property sale.",
+    "year_end_price_2025": 298.99
+  },
+  "optionality_gate": {
+    "framework": "mineral_floor_option",
+    "floor_pass": false,
+    "floor_metric": "nav_per_share",
+    "floor_value": 240.0,
+    "floor_value_note": "Illustrative fair NAV ~$240/sh [Assumption]; GAAP book ~$205/sh understates reserves; price ~$274 still above overlay NAV",
+    "primary_metric": "lawrence_base",
+    "primary_label": "7yr IRR",
+    "overlay_nav_per_share": 240.0,
+    "overlay_nav_note": "[Assumption] reserve appraisals + rural real estate marks above GAAP book; still below OTC market price",
+    "notes": "Price premium to book limits dhando; stance gate uses normalized owner-cash ten-year path, not book floor alone",
+    "primary_return_pct": 3.6
+  },
+  "nav_overlay": {
+    "as_of": "2026-06-10",
+    "status": "complete",
+    "gaap_vs_fair_value": {
+      "stockholders_equity_m": 134.18,
+      "total_assets_m": 171.24,
+      "oil_gas_investments_net_m": 40.07,
+      "property_equipment_net_m": 99.16,
+      "policy_source": "2025 Annual Report: coal/oil/gas at depletion; timber at cost; reserve tables based on independent consulting appraisals",
+      "source": "investor-documents/ir-pder/2025-12-31_Annual_Report.pdf"
+    },
+    "in_model": {
+      "lawrence_irr_on_operating_cash": true,
+      "gaap_book_in_dhando": false,
+      "segment_operating_pv": false,
+      "undeveloped_acreage_in_lawrence_growth": false
+    },
+    "not_in_model_requires_refresh": [
+      "Per-ton fair value of 128.1 mm tons metallurgical and 206.2 mm tons thermal coal reserves vs carrying values",
+      "47,000-acre hardwood timber sale process (no-sale April 2025) and carbon-market bid economics",
+      "Roanoke Virginia school solar $14.4M partnership run-rate after 2025 close",
+      "Portugal almond farm recovery after 2025 rainfall losses"
+    ],
+    "segments_or_options": [
+      {
+        "id": "undeveloped_coal",
+        "label": "New metallurgical coal mine development (surface + underground)",
+        "option_treatment": "probability_weighted",
+        "p_base": 0.4,
+        "nav_per_share_full": 35.0,
+        "overlay_value_per_share": 14.0,
+        "evidence": "2025 Annual Report: two new met coal mines expected to benefit 2026+; Q1 2026 major mine idling offsets near-term",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "hardwood_timber_block",
+        "label": "47,000-acre WV hardwood timber block (retained mineral rights)",
+        "option_treatment": "nav_floor",
+        "nav_per_share": 20.0,
+        "nav_assumption": "[Assumption] carbon/natural-capital bid failed; retained coal/O&G rights deter buyers; per-acre mark below 2025 rural land sale comps",
+        "evidence": "2025 Annual Report: 47k-acre sale initiative ended no-sale April 2025",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "roanoke_solar",
+        "label": "Roanoke VA school rooftop solar partnerships (9 installations)",
+        "option_treatment": "embedded_in_segment",
+        "evidence": "July 2025 $14.4M commitment for 90% equity in four partnerships; 25-year income stream",
+        "not_in_lawrence_base": false
+      },
+      {
+        "id": "pa_og_dormant",
+        "label": "Western PA 8,800-acre mineral sale (completed)",
+        "option_treatment": "milestone_nav",
+        "evidence": "April 2025 $8.9M sale of dormant minerals; ~$10.86/sh one-time EPS contribution in 2025",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "marcellus_acquisitions",
+        "label": "2025 Marcellus mineral acreage acquisitions",
+        "option_treatment": "embedded_in_segment",
+        "evidence": "$600k WV/PA mineral acreage with 50-year productive life from Marcellus wells",
+        "not_in_lawrence_base": false
+      }
+    ]
+  },
+  "segment_build": {
+    "as_of": "2026-06-10",
+    "shares": 651498,
+    "discount_rate": 0.1,
+    "segments": [
+      {
+        "id": "met_coal",
+        "label": "Metallurgical coal royalties",
+        "owner_cash_y0_per_share": 4.3,
+        "growth_y1_5": 0.0,
+        "growth_y6_10": -0.02,
+        "exit_multiple": 10,
+        "source": "FY2025 revenue $16.8M; Q1 2026 down 25% YoY; mine idling Feb 2026"
+      },
+      {
+        "id": "oil_gas",
+        "label": "Oil & gas royalties",
+        "owner_cash_y0_per_share": 3.2,
+        "growth_y1_5": 0.03,
+        "growth_y6_10": 0.01,
+        "exit_multiple": 12,
+        "source": "FY2025 revenue $8.4M; Appalachian gas price recovery; excludes 2025 one-time sale"
+      },
+      {
+        "id": "timber_surface",
+        "label": "Timber & surface",
+        "owner_cash_y0_per_share": 2.5,
+        "growth_y1_5": 0.02,
+        "growth_y6_10": 0.01,
+        "exit_multiple": 11,
+        "source": "FY2025 revenue $6.7M; record rural real estate sales partially offset timber weakness"
+      },
+      {
+        "id": "alt_energy",
+        "label": "Alternative energy (solar)",
+        "owner_cash_y0_per_share": 0.8,
+        "growth_y1_5": 0.08,
+        "growth_y6_10": 0.03,
+        "exit_multiple": 14,
+        "source": "FY2025 revenue $2.1M; 13.0 MW capacity after Roanoke additions"
+      },
+      {
+        "id": "agriculture",
+        "label": "Agriculture (table grapes, almonds)",
+        "owner_cash_y0_per_share": 3.5,
+        "growth_y1_5": 0.01,
+        "growth_y6_10": 0.0,
+        "exit_multiple": 12,
+        "source": "FY2025 revenue $12.9M; CA grapes strong; Portugal almond losses"
+      }
+    ],
+    "options": [
+      {
+        "id": "new_met_mines",
+        "label": "New met coal mine development",
+        "option_treatment": "probability_weighted",
+        "annual_drag_per_share": 0.0,
+        "base_terminal_value_per_share": 14.0,
+        "base_terminal_rationale": "P=40% x $35/sh full reserve development value [Assumption]",
+        "evidence": "2025 Annual Report strategic focus; offset by Q1 2026 idling",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "hardwood_option",
+        "label": "Hardwood timber block option",
+        "option_treatment": "nav_floor",
+        "base_terminal_value_per_share": 8.0,
+        "base_terminal_rationale": "Partial mark on 47k acres retained; carbon sale failed",
+        "evidence": "2025 Annual Report no-sale on 47k-acre initiative",
+        "not_in_lawrence_base": true
+      }
+    ],
+    "corporate_drag_per_share": 1.5,
+    "corporate_drag_note": "General & administrative ~$3.7M FY2025; allocated per share",
+    "horizon_years": 7
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": -0.02,
+      "growth_y6_10": -0.01,
+      "exit_pfcf_y10": 10,
+      "notes": "Coal idling persists; met coal pricing weak; specials not repeated; owner cash $12/sh trough"
+    },
+    "base": {
+      "growth_y1_5": 0.02,
+      "growth_y6_10": 0.01,
+      "exit_pfcf_y10": 12,
+      "notes": "Normalized owner cash $16/sh; regular dividend $7.20 maintained; no large asset sales in base"
+    },
+    "bull": {
+      "growth_y1_5": 0.04,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 14,
+      "notes": "New mines online; gas prices firm; Roanoke solar ramps; occasional special dividends"
+    }
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true,
+      "floor_pass": false,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": null
+  },
+  "human_review": {
+    "notes": "OTC Pink thin market (~7% turnover in 2025); family-controlled; no SEC 10-K; price and book from 2025 Annual Report and Yahoo 2026-06-10.",
+    "live_price_confirmed": true
+  },
+  "growth_explanation": {
+    "base_mechanism": "Diversified royalty streams: Appalachian met coal and gas, timber/surface leases, California table grapes, and expanding solar portfolio (Roanoke VA schools)",
+    "bear_risk": "Q1 2026 coal mine idling and China met-coal export pressure; premium OTC price vs book limits margin of safety",
+    "source": "investor-documents/ir-pder/2025-12-31_Annual_Report.pdf; 2026-03-31 Quarterly Report",
+    "status": "partial",
+    "theory_implied": {
+      "y1_5": 0.0171,
+      "y6_10": -0.0003,
+      "exit_pfcf_y10_segment_blend": 22.0,
+      "derivation": "segment_build owner-cash weighted blend (growth only; exit from scenarios.base)",
+      "segment_weights": [
+        {
+          "id": "met_coal",
+          "weight_pct": 30.1
+        },
+        {
+          "id": "oil_gas",
+          "weight_pct": 22.4
+        },
+        {
+          "id": "timber_surface",
+          "weight_pct": 17.5
+        },
+        {
+          "id": "alt_energy",
+          "weight_pct": 5.6
+        },
+        {
+          "id": "agriculture",
+          "weight_pct": 24.5
+        }
+      ]
+    },
+    "lawrence_legacy": {
+      "y1_5": 0.02,
+      "y6_10": 0.01,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.0171,
+      "y6_10": -0.0003,
+      "exit_pfcf_y10": 12.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": null,
+      "as_of_filing_facts": "evidence/_text/2025-12-31_Annual_Report.pdf.txt"
+    },
+    "divergence": {
+      "theory_vs_lawrence_y1_5_pp": -0.3,
+      "falsifier_vs_theory_y1_5_pp": 0.0
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "nav_overlay",
+      "evidence": "Minerals/timber at depletion/historical cost; independent reserve appraisals in annual report"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / acreage?",
+      "answer": "Yes",
+      "treatment": "nav_floor",
+      "evidence": "128.1 mm tons met coal, 206.2 mm tons thermal, 644 mmbf hardwood, 21.3 bcfe gas reserves"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Yes",
+      "treatment": "burden_in_cf",
+      "evidence": "Portugal almond farm operating losses in 2025; burden in agriculture segment"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF path?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Roanoke 25-year solar contracts; new met coal mine development timeline"
+    },
+    {
+      "q": 5,
+      "question": "Private stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Equity method investments modest; no holdco-style private marks"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution?",
+      "answer": "Yes",
+      "treatment": "yield_curve",
+      "evidence": "Regular $7.20/sh plus lumpy specials ($15 in 2025, $25 in 2024)"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Rural real estate sales and gas price recovery already in 2025 revenue mix"
+    }
+  ],
+  "estimates": {
+    "external": []
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -1.9
+    },
+    "base": {
+      "return_pct": 3.6
+    },
+    "bull": {
+      "return_pct": 7.1
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -1.9
+    },
+    "base": {
+      "return_pct": 3.6
+    },
+    "bull": {
+      "return_pct": 7.1
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": 3.1
+    },
+    "falsifier_adjusted": {
+      "return_pct": 3.1
+    }
+  },
+  "implied_return": {
+    "base_pct": 2.34,
+    "label": "7yr IRR (total synthesis)",
+    "display": "2.34% (total synthesis)",
+    "lawrence_stance_gate_pct": 3.6,
+    "falsifier_adjusted_pct": 3.6,
+    "synthesis_pct": 2.34
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Segment-derived growth (pre-falsifier)",
+        "source": "segment_build weighted blend",
+        "return_pct": 3.1,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": -1.9,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 7.1,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      },
+      {
+        "id": "nav_overlay_payoff",
+        "label": "NAV overlay dated payoff (7yr to overlay base)",
+        "source": "nav_overlay ~$240.0/sh vs price $273.99",
+        "return_pct": -1.87,
+        "weight": 0.1,
+        "type": "numeric",
+        "epistemic_tier": "D (alternate theory: dated asset payoff)",
+        "weight_why": "Answers a different question (NAV convergence) than 7yr cash-flow IRR; capped weight to avoid theory conflation.",
+        "weight_falsifiers": [
+          "NAV overlay base not updated when segment build or filings change >10%",
+          "floor_pass false but weight above 15% without [HUMAN REVIEW]"
+        ],
+        "hard_to_vary": "yes: separate theory type"
+      }
+    ],
+    "qualitative_adjustments": [],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 2.34,
+    "qualitative_pp": 0,
+    "total_synthesis_pct": 2.34,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [
+        "NAV overlay is a different theory (asset payoff vs cash-flow IRR); weight capped at 10% to limit theory conflation."
+      ],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  },
+  "context_overlay": {
+    "as_of": "2026-06-10",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": 0.07,
+            "as_of": "2026-06-10",
+            "yoy_pct": -82.9,
+            "direction": "down",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.541999816894531,
+            "as_of": "2026-06-10",
+            "yoy_pct": 1.5,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.263999938964844,
+            "as_of": "2026-06-10",
+            "yoy_pct": 4.4,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 100.02999877929688,
+            "as_of": "2026-06-10",
+            "yoy_pct": 1.0,
+            "direction": "flat",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 22.219999313354492,
+            "as_of": "2026-06-10",
+            "yoy_pct": 31.1,
+            "direction": "up",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": 0.16,
+            "as_of": "2026-06-10",
+            "yoy_pct": -93.8,
+            "direction": "down",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 13.8,
+            "as_of": "2026-06-10",
+            "yoy_pct": 14.3,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "lens_consensus": {
+    "as_of": "2026-06-10",
+    "shared_inputs_ref": "valuation.json@2026-06-10",
+    "valuation_richness": 0.76,
+    "blended_return_pct": 1.69,
+    "band_pct": [
+      -1.9,
+      7.84
+    ],
+    "weighted_median_pct": 2.34,
+    "median_mean_flag": false,
+    "stance": "watch",
+    "agreement_pct": 62,
+    "dissent_count": 2,
+    "lawrence_divergence": false,
+    "top_dissents": [
+      {
+        "persona": "pabrai",
+        "label": "Mohnish Pabrai",
+        "verdict": "pass",
+        "return_pct": -1.9,
+        "key_metric": "downside_upside_ratio=0.268",
+        "conviction": 0.845,
+        "falsifier": "dhando -> none OR net-debt/EBITDA > 3 OR bear return < -15%"
+      },
+      {
+        "persona": "munger",
+        "label": "Charlie Munger",
+        "verdict": "pass",
+        "return_pct": -1.9,
+        "key_metric": "moat=narrow",
+        "conviction": 0.695,
+        "falsifier": "Moat eroding/unproven or irr_method pending"
+      }
+    ],
+    "contributor_count": 6,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
+  }
+}

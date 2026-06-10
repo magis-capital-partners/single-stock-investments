@@ -1,0 +1,409 @@
+{
+  "ticker": "CKX",
+  "as_of": "2026-06-10",
+  "valuation_mode": "optionality",
+  "method": "yield_curve",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "unproven",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "asset",
+    "investment_sleeve": "real_assets_land",
+    "predictive_attribute": "dormant_asset"
+  },
+  "inputs": {
+    "price": 10.59,
+    "price_source": "Yahoo CKX close 2026-06-10",
+    "price_as_of": "2026-06-10",
+    "fcf_per_share": 0.22,
+    "fcf_source": "FY2025 cash from operations $459,630 divided by 2,045,622 weighted-average diluted shares; excludes $3.56M land-sale gain and investing proceeds",
+    "shares_outstanding": 2053129,
+    "shares_source": "10-K FY2025 cover: 2,053,129 shares outstanding at 2026-03-30",
+    "book_per_share": 10.47,
+    "book_per_share_caveat": "Stockholders equity $21.50M at 2026-03-31 / shares; land and mineral interests at historical cost, not fair-value NAV",
+    "cash_per_share": 8.78,
+    "cash_source": "Cash and equivalents $18.01M at 2025-12-31 / 2,053,129 shares",
+    "dividend_per_share_annual": 0.0,
+    "net_acres": 7023,
+    "wholly_owned_acres": 715,
+    "co_owned_net_acres_pct": 90,
+    "land_sale_2025_note": "Sold 6,548 wholly-owned acres for $8,618,022 cash (~$1,316/acre); gain $3,557,868",
+    "normalization_note": "Run-rate owner cash uses operating cash flow, not FY2025 EPS $1.47 inflated by land sale. Strategic-alternatives process is primary dated catalyst; Lawrence full path is secondary stance gate."
+  },
+  "optionality_gate": {
+    "framework": "mineral_floor_option",
+    "floor_pass": true,
+    "floor_metric": "cash_per_share",
+    "floor_value": 8.78,
+    "floor_value_note": "Cash $18.0M at 12/31/2025; no debt; land at cost on balance sheet understates co-owned acreage",
+    "primary_metric": "lawrence_base",
+    "primary_label": "annualized return",
+    "overlay_nav_per_share": 14.5,
+    "overlay_nav_note": "[Assumption] 7,023 net acres at Nov-2025 sale comp $1,316/acre on 40% of acres + cash + royalty run-rate capitalized",
+    "notes": "Cash floor ~73% of illustrative $12 price; stance gate uses yield-curve base payoff, not ten-year cash flow on $0.22/sh alone",
+    "primary_return_pct": 3.7
+  },
+  "nav_overlay": {
+    "as_of": "2026-06-10",
+    "status": "complete",
+    "gaap_vs_fair_value": {
+      "land_gross_m": 3.69,
+      "timber_properties_m": 0.53,
+      "cash_m": 18.01,
+      "stockholders_equity_m": 21.45,
+      "net_acres_disclosed": 7023,
+      "wholly_owned_acres": 715,
+      "co_owned_structure": "1/6 undivided interest in ~33,200 acres (5,533 net acres) plus other co-owned interests; ~90% of net acres co-owned post Nov-2025 sale",
+      "policy_source": "10-K FY2025 Item 2: land carried at cost; mineral royalties passive; no reserve disclosure",
+      "source": "investor-documents/sec-edgar/10-K_20260331_rpt20251231_acc0001437749_26_010434.htm"
+    },
+    "in_model": {
+      "lawrence_irr_on_operating_cash": true,
+      "gaap_book_in_dhando": false,
+      "segment_operating_pv": false,
+      "undeveloped_acreage_in_lawrence_growth": false
+    },
+    "not_in_model_requires_refresh": [
+      "Fair per-acre marks on 5,533 net co-owned undeveloped acres beyond Nov-2025 $1,316/acre timber comp",
+      "Partition or sale of undivided co-owned interests (unanimous co-owner consent required)",
+      "Outcome and timing of strategic-alternatives process initiated Aug-2023",
+      "Oil and gas royalty decline curve across 20 producing fields (0.0045% to 7.62% interests)"
+    ],
+    "segments_or_options": [
+      {
+        "id": "cash_treasury",
+        "label": "Cash and certificates of deposit (no debt)",
+        "option_treatment": "nav_floor",
+        "nav_per_share": 8.78,
+        "evidence": "10-K FY2025 balance sheet: $18.01M cash at 12/31/2025; Q1 2026 $12.7M cash + $2.2M CDs",
+        "not_in_lawrence_base": false
+      },
+      {
+        "id": "co_owned_acreage",
+        "label": "Co-owned Louisiana acreage (~90% of 7,023 net acres)",
+        "option_treatment": "probability_weighted",
+        "p_base": 0.35,
+        "nav_per_share_full": 6.0,
+        "overlay_value_per_share": 2.1,
+        "evidence": "10-K Item 1A: 1/6 of ~33,200 acres (5,533 net); partition/sale requires unanimous co-owner consent",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "oil_gas_royalties",
+        "label": "Passive royalty interests (20 fields)",
+        "option_treatment": "embedded_in_segment",
+        "evidence": "FY2025 oil and gas segment revenue $415,469; depleting third-party operated wells",
+        "not_in_lawrence_base": false
+      },
+      {
+        "id": "strategic_alternatives",
+        "label": "Strategic alternatives / company or asset sale",
+        "option_treatment": "milestone_nav",
+        "nav_per_share_full": 18.0,
+        "overlay_value_per_share": 4.0,
+        "evidence": "Board process since Aug-2023; Nov-2025 6,548-acre sale $8.6M; financial advisor engaged",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "surface_pipeline",
+        "label": "Surface easements and pipeline rents (lumpy)",
+        "option_treatment": "embedded_in_segment",
+        "evidence": "FY2025 surface segment revenue $328,249 vs $1,081,053 in FY2024; pipeline ROW non-recurring",
+        "not_in_lawrence_base": false
+      }
+    ]
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Yes",
+      "treatment": "nav_overlay",
+      "evidence": "Land $3.69M on BS vs 7,023 net acres; co-owned undivided interests not marked to Nov-2025 sale comp"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / acreage?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "5,533 net co-owned acres predominantly undeveloped; partition option per 10-K Item 1"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "All three segments profitable at gross level FY2025"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Surface pipeline ROW lumpy; not contracted backlog"
+    },
+    {
+      "q": 5,
+      "question": "Private stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No private equity stakes; only land/mineral/timber"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No dividend; no litigation recovery timeline"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Oil/gas and timber cash already in segment revenue paths"
+    }
+  ],
+  "scenarios": {
+    "bear": {
+      "price": 12.0,
+      "payoff": 10.0,
+      "years": 7,
+      "notes": "Reversion toward cash floor; strategic process stalls; royalty decline"
+    },
+    "base": {
+      "price": 12.0,
+      "payoff": 15.5,
+      "years": 7,
+      "notes": "Cash floor + partial acreage monetization at Nov-2025 comp; see nav_overlay",
+      "sotp_build": {
+        "shares": 2053129,
+        "book_per_share": 10.47,
+        "lines": [
+          {
+            "id": "book",
+            "label": "GAAP book / price anchor",
+            "gaap_per_share": 10.47,
+            "uplift_per_share": 0.0,
+            "math": "Anchor $10.47/sh equity at 2026-03-31"
+          },
+          {
+            "id": "cash_floor",
+            "label": "Cash treasury (already in equity)",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 0.0,
+            "math": "Cash $8.78/sh \u2014 overlap with book; not double-counted"
+          },
+          {
+            "id": "acreage_partial",
+            "label": "Co-owned acreage partial monetization",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 2.5,
+            "math": "P=35% x illustrative $6/sh full acreage mark [Assumption]"
+          },
+          {
+            "id": "strategic_catalyst",
+            "label": "Strategic transaction premium",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 2.53,
+            "math": "Milestone NAV on process since Aug-2023 [Assumption]"
+          }
+        ],
+        "year5_economic_nav_per_share": 15.5,
+        "years": 7,
+        "notes": "Cash floor + partial acreage monetization at Nov-2025 comp; see nav_overlay"
+      }
+    },
+    "bull": {
+      "price": 12.0,
+      "payoff": 22.0,
+      "years": 5,
+      "notes": "Full company or bulk-asset sale at premium to book; partition of co-owned acreage [Assumption]"
+    }
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": true,
+      "floor_pass": true,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": null
+  },
+  "estimates": {
+    "marvin_floor": {
+      "owner_cash_per_share": 0.22,
+      "return_pct": 3.5,
+      "stance": "watch"
+    },
+    "external": []
+  },
+  "growth_explanation": {
+    "base_growth_mechanism": "Normalized run-rate owner cash flat to low-single-digit; oil/gas royalties deplete; timber harvest cyclical; surface income lumpy",
+    "bear_change": "Strategic process fails; royalties decline faster than base",
+    "bull_change": "Bulk land sale or company transaction crystallizes co-owned acreage above book"
+  },
+  "catalyst_paths": [
+    {
+      "event": "Base catalyst path",
+      "timing": "7 years",
+      "impact": "Cash floor + partial acreage monetization at Nov-2025 comp; see nav_overlay"
+    },
+    {
+      "event": "Failure mode",
+      "timing": "bear scenario",
+      "impact": "Reversion toward cash floor; strategic process stalls; royalty decline"
+    }
+  ],
+  "human_review": {
+    "live_price_confirmed": false
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -2.6
+    },
+    "base": {
+      "return_pct": 3.7
+    },
+    "bull": {
+      "return_pct": 12.9
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -2.6
+    },
+    "base": {
+      "return_pct": 3.7
+    },
+    "bull": {
+      "return_pct": 12.9
+    }
+  },
+  "implied_return": {
+    "base_pct": 3.7,
+    "label": "annualized return",
+    "display": "3.7% (base)"
+  },
+  "overlay_results": [],
+  "context_overlay": {
+    "as_of": "2026-06-10",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": 0.07,
+            "as_of": "2026-06-10",
+            "yoy_pct": -82.9,
+            "direction": "down",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.541999816894531,
+            "as_of": "2026-06-10",
+            "yoy_pct": 1.5,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.263999938964844,
+            "as_of": "2026-06-10",
+            "yoy_pct": 4.4,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 100.0250015258789,
+            "as_of": "2026-06-10",
+            "yoy_pct": 1.0,
+            "direction": "flat",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 22.219999313354492,
+            "as_of": "2026-06-10",
+            "yoy_pct": 31.1,
+            "direction": "up",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": 0.16,
+            "as_of": "2026-06-10",
+            "yoy_pct": -93.8,
+            "direction": "down",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 13.8,
+            "as_of": "2026-06-10",
+            "yoy_pct": 14.3,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "lens_consensus": {
+    "as_of": "2026-06-10",
+    "shared_inputs_ref": "valuation.json@2026-06-10",
+    "valuation_richness": 0.617,
+    "blended_return_pct": 0.92,
+    "band_pct": [
+      -2.6,
+      3.7
+    ],
+    "weighted_median_pct": 3.15,
+    "median_mean_flag": false,
+    "stance": "pass",
+    "agreement_pct": 100,
+    "dissent_count": 0,
+    "lawrence_divergence": false,
+    "top_dissents": [],
+    "contributor_count": 5,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
+  }
+}

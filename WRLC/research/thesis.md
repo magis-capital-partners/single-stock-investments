@@ -7,26 +7,28 @@
 | Field | Value |
 |-------|-------|
 | **Archetype** (Stahl) | optionality |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Moat** (Munger) | narrow |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **Implied 7yr IRR** (base) | — |
-| **IRR method** | — |
+| **Cycle** | mid |
+| **Implied 7yr IRR** (base) | 5.91% (total synthesis) |
+| **IRR method** | full |
 | **Lawrence bucket** | other |
 | **Payoff lens** | asset |
 | **MOI bucket** | pending |
 
+**Deep dive:** `WRLC/research/deep_dive_2026-06-10.md` (auto-sync)
+
 ## One-line thesis
 
-Windrock Land Company — thesis pending Marvin deep dive.
+Debt-free East Tennessee land company (**73,000+ acres**) operating Windrock Park OHV recreation plus timber/royalty income; **watch** at **~$520** with **5.91%** base annual return on **~$38/sh** normalized owner cash.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest annual report (FY2025 audited)
+- [ ] Read latest quarterly report (none indexed)
+- [x] Apply mental models and option scan
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-06-10; awaiting deep dive.
+- Onboarded 2026-06-10; deep dive complete 2026-06-10. Verify live OTC quote before accumulate.

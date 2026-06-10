@@ -1,0 +1,376 @@
+{
+  "ticker": "WRLC",
+  "as_of": "2026-06-10",
+  "valuation_mode": "optionality",
+  "method": "full",
+  "valuation_overlay": "segment_cashflow",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "narrow",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "asset",
+    "investment_sleeve": "real_assets_land",
+    "predictive_attribute": "market_structure_discount"
+  },
+  "inputs": {
+    "price": 520.0,
+    "price_source": "[Assumption] OTC Pink indicative ~$520 bid / ~$540 ask (Yahoo Finance snapshot 2026-06-10); Stooq has no WRLC.US quote",
+    "price_as_of": "2026-06-10",
+    "fcf_per_share": 38.0,
+    "fcf_source": "FY2025 cash from operations $4.76M minus maintenance capital spending ~$0.63M, divided by 93,298 shares; excludes net realized/unrealized marketable securities gains (~$0.54M net in other income)",
+    "shares_outstanding": 93298,
+    "shares_source": "FY2025 annual report Note 1: 93,298 shares issued and outstanding at December 31, 2025 and 2024",
+    "book_per_share": 259.83,
+    "book_per_share_source": "FY2025 stockholders equity $24,241,897 / 93,298 shares",
+    "dividend_per_share_annual": 22.0,
+    "dividend_source": "FY2025 dividends paid $2,052,556 / 93,298 shares",
+    "acres_disclosed": 73000,
+    "acres_source": "FY2025 annual report Note 1: owns over 73,000 acres in East Tennessee",
+    "land_carrying_m": 10.643,
+    "land_carrying_source": "FY2025 balance sheet: Land and Land Improvements $10,643,053",
+    "marketable_securities_m": 6.035,
+    "cash_m": 2.443,
+    "total_debt_m": 0.0,
+    "debt_note": "Lines of credit and long-term debt paid to zero at December 31, 2025",
+    "revenue_m": 12.856,
+    "operating_income_m": 4.014,
+    "net_income_m": 3.4,
+    "financials_source": "FY2025 consolidated statements of income; investor-documents/ir-wrlc/2025-12-31_Annual_Report.pdf",
+    "normalization_note": "2024 included heavy recreation capex ($3.6M) and elevated carbon credits ($0.91M vs $0.17M in 2025). Lawrence base uses normalized owner cash after maintenance capex, not peak carbon or securities trading gains."
+  },
+  "optionality_gate": {
+    "framework": "land_recreation_floor_option",
+    "floor_pass": true,
+    "floor_metric": "tangible_book_plus_liquid_assets",
+    "floor_value": 350.0,
+    "floor_value_note": "GAAP equity $259.83/sh plus liquid assets (cash + marketable securities ~$90/sh) less overlap; land at historical cost \u2014 not fair-value NAV",
+    "primary_metric": "lawrence_base",
+    "primary_label": "7yr IRR",
+    "overlay_nav_per_share": 480.0,
+    "overlay_nav_note": "[Assumption] Segment operating sum-of-parts ~$480/sh before undeveloped land mark; see segment_build",
+    "premium_to_overlay_pct": 8.3,
+    "notes": "Price ~2.0\u00d7 GAAP book but book land ~$146/acre on 73k acres; recreation segment monetizes much of acreage. Floor pass on debt-free balance sheet and distributable cash; not a deep GAAP book discount.",
+    "primary_return_pct": 7.8
+  },
+  "nav_overlay": {
+    "as_of": "2026-06-10",
+    "status": "complete",
+    "gaap_vs_fair_value": {
+      "land_and_improvements_m": 10.643,
+      "acres_disclosed": ">73,000",
+      "land_per_acre_carrying": 146,
+      "policy": "Land and improvements at historical cost; operating recreation infrastructure capitalized in PP&E",
+      "source": "investor-documents/ir-wrlc/2025-12-31_Annual_Report.pdf Note 1 and balance sheet"
+    },
+    "in_model": {
+      "lawrence_irr_on_operating_cash": true,
+      "gaap_book_in_dhando": false,
+      "segment_operating_pv": true,
+      "undeveloped_acreage_in_lawrence_growth": false
+    },
+    "not_in_model_requires_refresh": [
+      "Per-acre fair-value appraisal on 73,000-acre East Tennessee block",
+      "Carbon offset contract volume and price beyond 2025 trough",
+      "Oil and gas royalty upside if Appalachian drilling accelerates",
+      "Windrock Park attendance and permit growth post-2024 capex cycle"
+    ],
+    "segments_or_options": [
+      {
+        "id": "undeveloped_timber_acreage",
+        "label": "Timber / mineral acreage not fully in run-rate cash",
+        "option_treatment": "nav_floor",
+        "nav_per_share": 40.0,
+        "nav_assumption": "[Assumption] Incremental value above PP&E cost for non-recreation timber block; partial overlap with segment cash flows",
+        "evidence": "Note 1: timber harvesting agreements; land at $10.6M cost on 73k acres",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "carbon_offset_recovery",
+        "label": "American Carbon Registry offset sales (contract trough 2025)",
+        "option_treatment": "probability_weighted",
+        "p_base": 0.4,
+        "nav_per_share_full": 8.0,
+        "overlay_value_per_share": 3.2,
+        "evidence": "Note 5: carbon revenue $172.5K in 2025 vs $912.5K in 2024 under Carbon Agreement",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "oil_gas_royalty_option",
+        "label": "Gas and oil royalty expansion on company acreage",
+        "option_treatment": "probability_weighted",
+        "p_base": 0.25,
+        "nav_per_share_full": 12.0,
+        "overlay_value_per_share": 3.0,
+        "evidence": "Note 1: royalty agreements; FY2025 gas/oil royalties $475.5K",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "marketable_securities",
+        "label": "Level 1 marketable equity portfolio",
+        "option_treatment": "milestone_nav",
+        "nav_per_share": 64.7,
+        "nav_assumption": "Mark-to-market $6.03M at 12/31/2025; volatile \u2014 not in Lawrence FCF\u2080",
+        "evidence": "Note 3: marketable securities fair value $6,034,542",
+        "not_in_lawrence_base": true
+      }
+    ]
+  },
+  "segment_build": {
+    "as_of": "2026-06-10",
+    "segments": [
+      {
+        "id": "natural_resources",
+        "label": "Natural Resources",
+        "revenue_m": 3.207,
+        "segment_net_income_m": 1.031,
+        "owner_cash_per_share_annual": 11.0,
+        "growth_y1_5": 0.02,
+        "growth_y6_10": 0.015,
+        "exit_multiple": 10,
+        "option_treatment": "embedded_in_segment",
+        "evidence": "Note 9 FY2025: timber, oil/gas royalties, carbon, tower/wind leases; segment net income $1,030,777"
+      },
+      {
+        "id": "recreation",
+        "label": "Recreation (Windrock Park)",
+        "revenue_m": 9.649,
+        "segment_net_income_m": 2.983,
+        "owner_cash_per_share_annual": 32.0,
+        "growth_y1_5": 0.03,
+        "growth_y6_10": 0.02,
+        "exit_multiple": 12,
+        "option_treatment": "embedded_in_segment",
+        "evidence": "Note 9 FY2025: land use permits $3.42M, rental $3.79M, merchandise $2.27M; segment net income $2,982,767"
+      }
+    ],
+    "options": [
+      {
+        "id": "carbon_offset_recovery",
+        "label": "Carbon offset contract recovery",
+        "option_treatment": "probability_weighted",
+        "annual_drag_per_share": 0.0,
+        "base_terminal_value_bn": 0.025,
+        "base_terminal_rationale": "P_base 0.4 \u00d7 normalized $0.6M/yr carbon revenue capitalized at 10\u00d7",
+        "overlay_base_terminal_bn": 0.025,
+        "bull_terminal_value_bn": 0.09,
+        "evidence": "Note 5 Carbon Agreement; 2024 revenue $912.5K vs 2025 $172.5K",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "undeveloped_acreage",
+        "label": "Undeveloped timber / mineral acreage",
+        "option_treatment": "nav_floor",
+        "annual_drag_per_share": 0.0,
+        "base_terminal_value_bn": 0.12,
+        "base_terminal_rationale": "Partial fair-value uplift above $10.6M land carrying; overlap haircut vs recreation cash flows",
+        "overlay_base_terminal_bn": 0.12,
+        "bull_terminal_value_bn": 0.35,
+        "evidence": "73,000 acres at ~$146/acre GAAP vs recreation monetization",
+        "not_in_lawrence_base": true
+      }
+    ],
+    "corporate_drag_per_share": 5.0,
+    "corporate_drag_note": "Consolidated taxes, interest, and marketable securities volatility not allocated to segments; FY2025 other income net $0.77M",
+    "horizon_years": 7
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.0,
+      "growth_y6_10": -0.01,
+      "exit_pfcf_y10": 10,
+      "notes": "Carbon stays depressed; recreation permit growth stalls; securities portfolio marks down"
+    },
+    "base": {
+      "growth_y1_5": 0.02,
+      "growth_y6_10": 0.015,
+      "exit_pfcf_y10": 12,
+      "notes": "Normalized owner cash $38/sh; debt-free; dividend ~$22/sh"
+    },
+    "bull": {
+      "growth_y1_5": 0.04,
+      "growth_y6_10": 0.025,
+      "exit_pfcf_y10": 14,
+      "notes": "Windrock Park attendance re-accelerates post-capex; carbon and royalty recovery; multiple re-rate"
+    }
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "optionality",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true,
+      "floor_pass": true,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": "Debt-free land company with real recreation cash flows, but price ~2\u00d7 GAAP book and ~8% premium to segment overlay; OTC illiquidity (~25 shares/day) and carbon trough cap accumulate stance."
+  },
+  "growth_explanation": {
+    "mechanism": "Recreation growth from Windrock Park land-use permits and rentals after 2024 facility capex; natural resources tied to timber harvest cycles and royalty volumes.",
+    "base_assumption_source": "FY2025 segment reporting; 2024 heavy capex year normalized down",
+    "bear_change": "Carbon credits remain at 2025 trough; no permit price increases",
+    "bull_change": "Carbon Agreement optional cycles resume; oil/gas royalty volumes expand on Appalachian activity",
+    "lawrence_legacy": {
+      "y1_5": 0.02,
+      "y6_10": 0.015,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.02,
+      "y6_10": 0.015,
+      "exit_pfcf_y10": 12.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": null,
+      "as_of_filing_facts": "evidence/_text/2025-12-31_Annual_Report.pdf.txt"
+    },
+    "status": "partial"
+  },
+  "option_scan": [
+    {
+      "q": 3,
+      "question": "In-business option: Carbon offset contract recovery?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "Note 5 Carbon Agreement; 2024 revenue $912.5K vs 2025 $172.5K"
+    },
+    {
+      "q": 3,
+      "question": "In-business option: Undeveloped timber / mineral acreage?",
+      "answer": "Yes",
+      "treatment": "nav_floor",
+      "evidence": "73,000 acres at ~$146/acre GAAP vs recreation monetization"
+    }
+  ],
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 3.6
+    },
+    "base": {
+      "return_pct": 7.8
+    },
+    "bull": {
+      "return_pct": 11.5
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 3.6
+    },
+    "base": {
+      "return_pct": 7.8
+    },
+    "bull": {
+      "return_pct": 11.5
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": 7.8
+    },
+    "falsifier_adjusted": {
+      "return_pct": 7.8
+    }
+  },
+  "implied_return": {
+    "base_pct": 5.91,
+    "label": "7yr IRR (total synthesis)",
+    "display": "5.91% (total synthesis)",
+    "lawrence_stance_gate_pct": 7.8,
+    "falsifier_adjusted_pct": 7.8,
+    "synthesis_pct": 5.91
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Segment-derived growth (pre-falsifier)",
+        "source": "segment_build weighted blend",
+        "return_pct": 7.8,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": 3.6,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 11.5,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      },
+      {
+        "id": "nav_overlay_payoff",
+        "label": "NAV overlay dated payoff (7yr to overlay base)",
+        "source": "nav_overlay ~$480.0/sh vs price $520.0",
+        "return_pct": -1.14,
+        "weight": 0.1,
+        "type": "numeric",
+        "epistemic_tier": "D (alternate theory: dated asset payoff)",
+        "weight_why": "Answers a different question (NAV convergence) than 7yr cash-flow IRR; capped weight to avoid theory conflation.",
+        "weight_falsifiers": [
+          "NAV overlay base not updated when segment build or filings change >10%",
+          "floor_pass false but weight above 15% without [HUMAN REVIEW]"
+        ],
+        "hard_to_vary": "yes: separate theory type"
+      }
+    ],
+    "qualitative_adjustments": [],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 5.91,
+    "qualitative_pp": 0,
+    "total_synthesis_pct": 5.91,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [
+        "NAV overlay is a different theory (asset payoff vs cash-flow IRR); weight capped at 10% to limit theory conflation."
+      ],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}
