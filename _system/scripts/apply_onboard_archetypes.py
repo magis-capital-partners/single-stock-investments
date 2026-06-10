@@ -38,6 +38,7 @@ ONBOARD_ARCHETYPE: dict[str, dict] = {
     "PDER": {"archetype": "optionality", "payoff_lens": "asset", "lawrence_bucket": "other"},
     "BVERS": {"archetype": "optionality", "payoff_lens": "asset", "lawrence_bucket": "other"},
     "GCCO": {"archetype": "optionality", "payoff_lens": "asset", "lawrence_bucket": "other"},
+    "CKX": {"archetype": "optionality", "payoff_lens": "asset", "lawrence_bucket": "other"},
     "BUR": {"archetype": "croupier", "payoff_lens": "event", "lawrence_bucket": "other"},
     "ALS.TO": {"archetype": "optionality", "payoff_lens": "asset", "lawrence_bucket": "other"},
     "PSK.TO": {"archetype": "optionality", "payoff_lens": "asset", "lawrence_bucket": "other"},

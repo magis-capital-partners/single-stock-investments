@@ -29,6 +29,7 @@ EXCHANGE_META = {
     "PDER": "OTC Pink",
     "BVERS": "OTC Pink",
     "GCCO": "OTC Pink",
+    "CKX": "NYSE American",
     "GOOGL": "NASDAQ",
     "ICE": "NYSE",
     "KEWL": "OTC Pink",
