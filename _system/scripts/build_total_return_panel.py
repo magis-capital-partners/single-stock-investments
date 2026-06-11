@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build total-return panel: dividend sum, price vs total-return index, market cap.
 
-Reads distribution history from valuation.json, fetches Yahoo monthly prices,
+Reads distribution history from valuation.json, fetches Yahoo full-history daily prices,
 writes {TICKER}/research/total_return_panel.json, charts/total_return_{date}.svg,
 and merges summary into valuation.json -> total_return_panel.
 """
@@ -35,12 +35,11 @@ def tickers_from_registry() -> list[str]:
     return sorted(holdings.keys())
 
 
-def fetch_yahoo_monthly_closes(symbol: str, years: int = 20) -> tuple[list[str], list[float], str]:
+def fetch_yahoo_daily_closes(symbol: str) -> tuple[list[str], list[float], str]:
     end = datetime.now(timezone.utc)
-    start = end.replace(year=max(1970, end.year - years))
     url = (
-        f"{YAHOO_CHART}/{symbol}?period1={int(start.timestamp())}"
-        f"&period2={int(end.timestamp())}&interval=1mo"
+        f"{YAHOO_CHART}/{symbol}?period1=0"
+        f"&period2={int(end.timestamp())}&interval=1d"
     )
     req = urllib.request.Request(url, headers={"User-Agent": UA})
     try:
@@ -51,18 +50,18 @@ def fetch_yahoo_monthly_closes(symbol: str, years: int = 20) -> tuple[list[str],
     except Exception as exc:
         return [], [], f"yahoo_error:{exc}"
 
-    by_month: dict[str, float] = {}
+    by_day: dict[str, float] = {}
     for ts, close in zip(timestamps, closes):
         if close is None:
             continue
-        d = datetime.fromtimestamp(ts, tz=timezone.utc).strftime("%Y-%m")
-        by_month[d] = float(close)
+        d = datetime.fromtimestamp(ts, tz=timezone.utc).strftime("%Y-%m-%d")
+        by_day[d] = float(close)
 
-    months = sorted(by_month.keys())
-    if len(months) < 2:
+    days = sorted(by_day.keys())
+    if len(days) < 2:
         return [], [], "yahoo_insufficient"
-    dates = [f"{m}-01" for m in months]
-    prices = [by_month[m] for m in months]
+    dates = days
+    prices = [by_day[d] for d in days]
     return dates, prices, f"yahoo:{symbol}"
 
 
@@ -99,15 +98,15 @@ def build_series(
     price_idx = [100.0 * p / base for p in prices]
     tr_idx: list[float] = []
     tr_level = 100.0
-    applied_years: set[int] = set()
+    year_last_idx: dict[int, int] = {}
+    for i, d in enumerate(dates):
+        year_last_idx[int(d[:4])] = i
     for i, (d, p) in enumerate(zip(dates, prices)):
         if i > 0 and prices[i - 1] > 0:
             tr_level *= p / prices[i - 1]
         yr = int(d[:4])
-        mo = int(d[5:7])
-        if mo == 12 and yr in dist_by_year and yr not in applied_years and p > 0:
+        if year_last_idx.get(yr) == i and yr in dist_by_year and p > 0:
             tr_level *= 1.0 + dist_by_year[yr] / p
-            applied_years.add(yr)
         tr_idx.append(tr_level)
     cum_div = sum(dist_by_year.values())
     return price_idx, tr_idx, cum_div
@@ -201,7 +200,7 @@ def build_panel(ticker: str, as_of: str | None = None, *, merge: bool = True) ->
     exchange = row.get("exchange", "")
     ysym = yahoo_symbol_for(t, market, exchange)
 
-    dates, prices, src = fetch_yahoo_monthly_closes(ysym)
+    dates, prices, src = fetch_yahoo_daily_closes(ysym)
     dist = distribution_map(val)
     panel_status = "complete"
     panel_error = None
@@ -225,7 +224,11 @@ def build_panel(ticker: str, as_of: str | None = None, *, merge: bool = True) ->
 
     start_price = prices[0] if prices else None
     end_price = prices[-1] if prices else None
-    span_years = max(0.5, (len(prices) - 1) / 12.0) if len(prices) >= 2 else None
+    if len(dates) >= 2:
+        span_days = max(1, (date.fromisoformat(dates[-1]) - date.fromisoformat(dates[0])).days)
+        span_years = max(0.5, span_days / 365.25)
+    else:
+        span_years = None
     price_ann = (
         annualized_return(start_price, end_price, span_years, 0.0)
         if start_price is not None and end_price is not None and span_years is not None
@@ -260,6 +263,8 @@ def build_panel(ticker: str, as_of: str | None = None, *, merge: bool = True) ->
         "error": panel_error,
         "history_start": dates[0] if dates else None,
         "history_end": dates[-1] if dates else None,
+        "price_points": len(prices),
+        "price_interval": "1d",
         "start_price": round(start_price, 4) if start_price is not None else None,
         "end_price": round(end_price, 4) if end_price is not None else None,
         "cumulative_distributions_per_share": round(cum_div, 4),
