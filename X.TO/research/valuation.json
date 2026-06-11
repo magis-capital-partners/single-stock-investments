@@ -1,0 +1,117 @@
+{
+  "ticker": "X.TO",
+  "as_of": "2026-06-11",
+  "method": "full",
+  "lawrence_bucket": "multi_sided",
+  "classification_inputs": {
+    "archetype": "croupier",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 50.29,
+    "price_source": "Yahoo Finance X.TO close 2026-06-11 (CAD)",
+    "fcf_per_share": 2.32,
+    "fcf_source": "FY2025 cash from operations $764.8M minus capital spending $121.2M divided by ~278M diluted shares",
+    "shares_millions": 278.1,
+    "normalization_note": "FY2025 mid-cycle owner cash; GAAP net income $415.7M depressed by amortization and one-time items vs adjusted net income $595.8M (adjusted diluted EPS $2.13)"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 16,
+      "notes": "Volume mean-reversion; listing fee pressure; slower Trayport/VettaFi growth"
+    },
+    "base": {
+      "growth_y1_5": 0.06,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 20,
+      "notes": "Mid-cycle FCF growth on recurring GSIA and derivatives mix; exit ~20x cash flow"
+    },
+    "bull": {
+      "growth_y1_5": 0.08,
+      "growth_y6_10": 0.06,
+      "exit_pfcf_y10": 22,
+      "notes": "Sustained global energy/data growth plus Canadian equity activity; Cboe Australia integration"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Exchange intangible assets on balance sheet; no land/NAV misstatement pattern"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Asset-light croupier model"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "AlphaX US ATS launch Jan 2025; ~$8M op ex + $11.5M capex in 2024 per 2024 annual MD&A; early-stage drag embedded in growth segments"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / RPO not in FCF path?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Deferred listing fees and GSIA recurring revenue (~$290M ARR trayport/VettaFi per Q1/26 MD&A); recognized over time in segment revenue"
+    },
+    {
+      "q": 5,
+      "question": "Private stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "BOX stake consolidated; no holdco NAV discount pattern"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating croupier, not yield-curve royalty trust"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Trayport energy connectivity, VettaFi ETF indexing, private-markets expansion in TM2X strategy embedded in GSIA growth path"
+    },
+    {
+      "q": 0,
+      "question": "Material options after scan?",
+      "answer": "No separate overlay",
+      "treatment": "n/a",
+      "evidence": "Lawrence full cash-flow path sufficient; growth initiatives in segment revenue, not separate NAV overlay"
+    }
+  ],
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "lawrence_horizon_years": 7,
+  "evidence_refresh": {
+    "synthesis_in_dive": true
+  },
+  "growth_explanation": {
+    "mechanism": "Recurring GSIA (Trayport, VettaFi, Datalinx) plus derivatives volumes and listing fee escalators on TSX/TSXV market cap",
+    "source": "FY2025 annual MD&A; Q1/26 MD&A segment revenue tables",
+    "filing_cite": "X.TO/investor-documents/ir-tmx/annual_report_2025.pdf"
+  }
+}
