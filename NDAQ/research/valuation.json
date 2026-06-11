@@ -1,0 +1,471 @@
+{
+  "ticker": "NDAQ",
+  "as_of": "2026-06-11",
+  "method": "full",
+  "lawrence_bucket": "multi_sided",
+  "payoff_lens": "operating",
+  "classification_inputs": {
+    "archetype": "croupier",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 87.06,
+    "price_source": "Yahoo NDAQ close 2026-06-11",
+    "fcf_per_share": 3.44,
+    "fcf_source": "FY2025 cash from operations $2,255M minus $266M capital spending, divided by ~579M diluted shares (10-K FY2025)",
+    "shares_millions": 578.6,
+    "normalization_note": "FY2025 mid-cycle base; Q1 2026 operating income and net income run above trend and are not inflated into starting cash flow",
+    "price_as_of": "2026-06-11"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 16,
+      "notes": "Volume mean-reversion, FinTech growth slows, multiple compresses"
+    },
+    "base": {
+      "growth_y1_5": 0.07,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 22,
+      "notes": "Mid-cycle owner cash; Capital Access + FinTech mix; exit near current ~25x cash flow multiple"
+    },
+    "bull": {
+      "growth_y1_5": 0.09,
+      "growth_y6_10": 0.06,
+      "exit_pfcf_y10": 26,
+      "notes": "Sustained trading volumes, Verafin/AxiomSL ARR acceleration, index licensing tailwind"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Exchange franchise on balance sheet; equity $12.2B FY2025 10-K; no land-at-cost pattern"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Technology and exchange franchise, not resource royalty"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "FY2025 operating income $2,331M on $5,249M net revenues less transaction expenses"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in cash path?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Capital Access Platforms ARR $1,340M and FinTech ARR embedded in segment growth (10-K FY2025)"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "Immaterial",
+      "treatment": "n/a",
+      "evidence": "Strategic investments valued at $257M FY2025; not thesis driver"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Regular dividend; no dated legal recovery"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Anti-financial crime (Verafin), index licensing, and marketplace expansion in FinTech and Capital Access segments (10-K MD&A)"
+    },
+    {
+      "q": 0,
+      "question": "Material separate option terminals required?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Lawrence full cash-flow path sufficient after scan"
+    }
+  ],
+  "evidence_refresh": {
+    "synthesis_in_dive": true
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 1.2
+    },
+    "base": {
+      "return_pct": 8.8
+    },
+    "bull": {
+      "return_pct": 12.9
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 1.2
+    },
+    "base": {
+      "return_pct": 8.8
+    },
+    "bull": {
+      "return_pct": 12.9
+    }
+  },
+  "implied_return": {
+    "base_pct": 9.26,
+    "label": "7yr IRR (total synthesis)",
+    "display": "9.26% (total synthesis)",
+    "lawrence_stance_gate_pct": 8.8,
+    "falsifier_adjusted_pct": 8.8,
+    "synthesis_pct": 9.26
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": 1.2,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 12.9,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 9.46,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 9.26,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  },
+  "human_review": {
+    "live_price_confirmed": false
+  },
+  "total_return_panel": {
+    "as_of": "2026-06-11",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 0,
+    "distribution_history_sum": 0,
+    "market_cap_m": null,
+    "total_return_annualized_pct": 12.68,
+    "chart": "NDAQ/research/charts/total_return_2026-06-11.svg",
+    "panel_json": "NDAQ/research/total_return_panel.json"
+  },
+  "context_overlay": {
+    "as_of": "2026-06-11",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": -0.32,
+            "as_of": "2026-06-11",
+            "yoy_pct": 66.3,
+            "direction": "up",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.493000030517578,
+            "as_of": "2026-06-11",
+            "yoy_pct": 1.8,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.220000267028809,
+            "as_of": "2026-06-11",
+            "yoy_pct": 5.3,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 99.85399627685547,
+            "as_of": "2026-06-11",
+            "yoy_pct": 1.2,
+            "direction": "up",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 20.040000915527344,
+            "as_of": "2026-06-11",
+            "yoy_pct": 16.1,
+            "direction": "up",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": -1.0,
+            "as_of": "2026-06-11",
+            "yoy_pct": -394.1,
+            "direction": "down",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 14.23,
+            "as_of": "2026-06-11",
+            "yoy_pct": 19.8,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "insider_signal": {
+    "as_of": "2026-06-11",
+    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
+    "in_base_irr": false,
+    "window_days": 365,
+    "ics": 9.12,
+    "band": "exceptional",
+    "bull_case_support": "moderate",
+    "scenario_confidence": {
+      "priors": {
+        "bear": 0.2,
+        "base": 0.55,
+        "bull": 0.25
+      },
+      "tilted": {
+        "bear": 0.2,
+        "base": 0.422,
+        "bull": 0.378
+      },
+      "bull_delta": 0.128,
+      "bear_delta": 0.0,
+      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
+    },
+    "factors": {
+      "buy_score": 8.932,
+      "sell_score": -1.0,
+      "cluster_bonus": 0.0,
+      "net_buy_usd": 34712701.22,
+      "net_sell_usd": 109697557.29,
+      "price_today": 87.06
+    },
+    "top_buys": [
+      {
+        "insider": "FRIEDMAN ADENA T",
+        "date": "2026-04-01",
+        "shares": 113611,
+        "price": 22.22,
+        "value_usd": 2524436.42,
+        "shares_owned_after": 2079362,
+        "contrib": 1.802
+      },
+      {
+        "insider": "FRIEDMAN ADENA T",
+        "date": "2026-02-02",
+        "shares": 300000,
+        "price": 22.22,
+        "value_usd": 6666000.0,
+        "shares_owned_after": 2224903,
+        "contrib": 1.636
+      },
+      {
+        "insider": "FRIEDMAN ADENA T",
+        "date": "2026-01-02",
+        "shares": 300000,
+        "price": 22.22,
+        "value_usd": 6666000.0,
+        "shares_owned_after": 2224903,
+        "contrib": 1.636
+      },
+      {
+        "insider": "Torgeby Johan",
+        "date": "2026-02-17",
+        "shares": 12000,
+        "price": 79.86,
+        "value_usd": 958320.0,
+        "shares_owned_after": 40797,
+        "contrib": 1.487
+      },
+      {
+        "insider": "FRIEDMAN ADENA T",
+        "date": "2026-03-06",
+        "shares": 92840,
+        "price": 22.22,
+        "value_usd": 2062904.8,
+        "shares_owned_after": 2172163,
+        "contrib": 1.424
+      }
+    ],
+    "top_sells": [
+      {
+        "insider": "Griggs PC Nelson",
+        "date": "2026-05-18",
+        "shares": 5093,
+        "price": 92.62,
+        "value_usd": 471713.66,
+        "is_10b5_1": false,
+        "contrib": -0.164
+      },
+      {
+        "insider": "FRIEDMAN ADENA T",
+        "date": "2026-04-03",
+        "shares": 8075,
+        "price": 86.65,
+        "value_usd": 699698.75,
+        "is_10b5_1": false,
+        "contrib": -0.162
+      },
+      {
+        "insider": "FRIEDMAN ADENA T",
+        "date": "2026-04-01",
+        "shares": 113611,
+        "price": 85.44,
+        "value_usd": 9706923.84,
+        "is_10b5_1": false,
+        "contrib": -0.159
+      },
+      {
+        "insider": "FRIEDMAN ADENA T",
+        "date": "2026-04-01",
+        "shares": 13739,
+        "price": 84.89,
+        "value_usd": 1166303.71,
+        "is_10b5_1": false,
+        "contrib": -0.159
+      },
+      {
+        "insider": "Peterson Bradley J",
+        "date": "2026-04-28",
+        "shares": 7710,
+        "price": 90.82,
+        "value_usd": 700222.2,
+        "is_10b5_1": false,
+        "contrib": -0.139
+      }
+    ],
+    "narrative_hooks": [],
+    "transaction_count": 99
+  },
+  "lens_consensus": {
+    "as_of": "2026-06-11",
+    "shared_inputs_ref": "valuation.json@2026-06-11",
+    "valuation_richness": 0.213,
+    "blended_return_pct": 7.84,
+    "band_pct": [
+      1.2,
+      10.95
+    ],
+    "weighted_median_pct": 8.8,
+    "median_mean_flag": false,
+    "stance": "watch",
+    "agreement_pct": 100,
+    "dissent_count": 0,
+    "lawrence_divergence": false,
+    "top_dissents": [],
+    "contributor_count": 8,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
+  }
+}
