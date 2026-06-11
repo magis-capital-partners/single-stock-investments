@@ -217,5 +217,151 @@
       }
     },
     "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  },
+  "total_return_panel": {
+    "as_of": "2026-06-11",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 0,
+    "distribution_history_sum": 0,
+    "market_cap_m": null,
+    "total_return_annualized_pct": -16.17,
+    "chart": "NZX.NZ/research/charts/total_return_2026-06-11.svg",
+    "panel_json": "NZX.NZ/research/total_return_panel.json"
+  },
+  "context_overlay": {
+    "as_of": "2026-06-11",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": -0.3,
+            "as_of": "2026-06-11",
+            "yoy_pct": 68.4,
+            "direction": "up",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.5279998779296875,
+            "as_of": "2026-06-11",
+            "yoy_pct": 2.6,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.259999752044678,
+            "as_of": "2026-06-11",
+            "yoy_pct": 6.3,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 100.16699981689453,
+            "as_of": "2026-06-11",
+            "yoy_pct": 1.6,
+            "direction": "up",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 21.6200008392334,
+            "as_of": "2026-06-11",
+            "yoy_pct": 25.3,
+            "direction": "up",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": -0.93,
+            "as_of": "2026-06-11",
+            "yoy_pct": -373.5,
+            "direction": "down",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 14.33,
+            "as_of": "2026-06-11",
+            "yoy_pct": 20.6,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "lens_consensus": {
+    "as_of": "2026-06-11",
+    "shared_inputs_ref": "valuation.json@2026-06-11",
+    "valuation_richness": 0.247,
+    "blended_return_pct": 10.65,
+    "band_pct": [
+      7.0,
+      13.3
+    ],
+    "weighted_median_pct": 11.3,
+    "median_mean_flag": false,
+    "stance": "watch",
+    "agreement_pct": 82,
+    "dissent_count": 2,
+    "lawrence_divergence": false,
+    "top_dissents": [
+      {
+        "persona": "stahl",
+        "label": "Murray Stahl",
+        "verdict": "hold",
+        "return_pct": 11.3,
+        "key_metric": "archetype=croupier",
+        "conviction": 0.065,
+        "falsifier": "No asset intensity / pricing power (moat eroding + non-croupier)"
+      },
+      {
+        "persona": "hk",
+        "label": "Horizon Kinetics",
+        "verdict": "hold",
+        "return_pct": 13.3,
+        "key_metric": "payoff_lens=pending",
+        "conviction": 0.065,
+        "falsifier": "No dated contractual payoff or royalty/trust structure"
+      }
+    ],
+    "contributor_count": 8,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
   }
 }

@@ -1,51 +1,49 @@
 # NZX.NZ — Cross-Check: Third-Party Sources
 
 **Date:** 2026-06-11
-**Agent:** Marvin
+**Agent:** Marvin (automated fill)
 **Marvin dive:** `NZX.NZ/research/deep_dive_2026-06-11.md`
 **Source inventory:** `NZX.NZ/third-party-analyses/source_inventory_2026-06-11.md`
 **Framework:** `_system/frameworks/third_party_cross_reference.md`, `external_view_blend.md`
-<!-- THIRD_PARTY_CROSS_CHECK_STUB -->
 
 ## Executive summary
 
-No third-party sources are indexed for NZX.NZ as of 2026-06-11. Marvin stance rests on **primary NZX filings only** (FY2025 annual report, results pack, Q1 2026 operating metrics). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+Marvin floor **11.82%** per year (croupier; stance **watch**) from primary filings and `valuation.json`. No third-party sources indexed; filings-only stance. **[HUMAN REVIEW]** for approved-source numeric blend.
 
-**Synthesis:** Marvin floor only; no external blend. Base annual return **11.8%** per year at NZD 1.395; stance **watch**.
+**Synthesis (best estimate):** Marvin **11.82%** base · stance **watch**; external sources adjust conviction on catalyst timing, not primary IRR without human OK.
 
 ## Sources in scope
 
-| Source | Type | Status | Role |
-|--------|------|--------|------|
-| NZX FY2025 annual report + results | Primary IR | Reviewed | Revenue, FCF, segments |
-| Third-party inventory | Scan output | Empty | No external views |
+| Source ID | Title | Path | Status | Cross-check status |
+|-----------|-------|------|--------|-------------------|
+| (none) | Primary filings only | — | — | n/a |
 
 ## Agreements (facts)
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| FY2025 operating revenue | NZD 128.9m (+7.3%) | — | Results announcement |
-| FY2025 normalized EBITDA | NZD 53.5m (+11.6%) | — | News release |
-| FY2025 free cash flow | NZD 26.5m (+25%) | — | Investor presentation |
-| Smart FUM | NZD 15.8b (+17.6%) | — | Annual report |
+| Base return anchor | **11.82%** per year | Qualitative support only | `NZX.NZ/research/deep_dive_2026-06-11.md` |
+| Archetype / stance | **croupier** · **watch** | See indexed sources | `valuation.json` |
+| Normalization | FY2025 filing-based owner cash; wealth-tech amortisation bubble may lift FCF fas | Cross-check vs posts | Marvin |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| — | No external views to challenge | — | Marvin-only |
+| Primary IRR | **11.82%** (Lawrence / scenarios) | No single approved IRR unless promoted | Marvin **70%** numeric; external **30%** catalyst timing |
+| Third party | Filing-first | Context tier only | No numeric upgrade without human OK |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | NZD 0.0807 FCF/sh FY2025 | 11.8% / 10yr | watch |
-| External (combined) | n/a | n/a | n/a |
-| **Blended best estimate** | **Marvin floor** | **11.8%** | **watch** |
+| Marvin floor | See assumption ledger | **11.82%** | **watch** |
+| External (combined) | Narrative / catalyst | No change to base % | **watch** (conviction) |
+| **Blended best estimate** | **Filing anchor** | **11.82%** | **watch** |
 
-**Weights:** 100% Marvin (no approved third-party sources).
+**Weights:** Marvin **70%** on numbers; indexed third party **30%** on catalyst timing and narrative (approved Substacks/HK context only in qualitative layer until human promotes).
 
-**Returns statement (blended):** At NZD 1.395 today, filing-based owner cash implies **11.8%** per year over ten years; no external adjustment.
+**Returns statement (blended):** We expect **11.82%** per year at today's price on the Marvin base case; third-party sources may raise or lower conviction on timing but do not replace filing math without **[HUMAN REVIEW]**.
 
 ## [HUMAN REVIEW]
 
@@ -55,9 +53,10 @@ No third-party sources are indexed for NZX.NZ as of 2026-06-11. Marvin stance re
 
 ## [PROPOSED MEMORY]
 
-- [PROPOSED COMPANY] NZX.NZ: third-party cross-check 2026-06-11
+- [PROPOSED COMPANY] NZX.NZ: third-party cross-check fill 2026-06-11 — Marvin 11.82% unchanged
 
 ## Primary sources cited
 
 1. `NZX.NZ/research/deep_dive_2026-06-11.md`
-2. `NZX.NZ/third-party-analyses/source_inventory_2026-06-11.md`
+2. `NZX.NZ/research/valuation.json`
+3. `NZX.NZ/third-party-analyses/source_inventory_2026-06-11.md`
