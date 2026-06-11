@@ -9,9 +9,9 @@
 
 ## Executive summary
 
-No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (10-K, 10-Q, IR). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+No approved third-party sources are indexed for BYMA as of 2026-06-11. Marvin stance rests on **primary IR filings** (FY2025 financial statements, Q1 2026 interim statements, 4Q25 and 1Q26 press releases). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
 
-**Synthesis:** Marvin floor only; no external blend.
+**Synthesis:** Marvin floor only; no external blend. Base annual return **25.2%** (7-year synthesis) from `BYMA/research/valuation.json`; proposed stance **watch** pending Argentina sizing review.
 
 ## Sources in scope
 
