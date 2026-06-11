@@ -1,0 +1,254 @@
+{
+  "ticker": "GPW.WA",
+  "as_of": "2026-06-11",
+  "method": "full",
+  "lawrence_bucket": "multi_sided",
+  "payoff_lens": "operating",
+  "classification_inputs": {
+    "archetype": "croupier",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid"
+  },
+  "inputs": {
+    "price": 83.6,
+    "price_source": "Yahoo Finance GPW.WA 2026-06-11",
+    "fcf_per_share": 3.35,
+    "fcf_source": "FY2024 diluted EPS PLN 3.54; mid-cycle owner cash normalized vs Q1 2025 run-rate",
+    "shares_millions": 41.972,
+    "normalization_note": "FY2024 consolidated base; Q1 2025 EPS PLN 1.20/quarter not fully in starting cash; intangible IT capex PLN 44.9M depresses cash conversion vs earnings"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.02,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 14,
+      "notes": "Polish equity turnover stall; commodity fee pressure"
+    },
+    "base": {
+      "growth_y1_5": 0.06,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 18,
+      "notes": "Mid-cycle volume + information services; exit ~18x vs ~25x spot earnings"
+    },
+    "bull": {
+      "growth_y1_5": 0.09,
+      "growth_y6_10": 0.06,
+      "exit_pfcf_y10": 22,
+      "notes": "Sustained Main Market turnover + commodity gas spot growth"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Equity-method stakes carried at equity; no land/NAV misstatement pattern"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating exchange infrastructure; no resource option"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "All reported segments profitable in Q1 2025"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF path?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Exchange fees recognized with activity; no material deferred backlog"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Armenia exchange/depository revenue PLN 5.6M Q1; equity-method income PLN 10.3M Q1 \u2014 embedded in consolidated earnings, no separate terminal"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Regular dividend policy; no dated legal recovery"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "Partial",
+      "treatment": "zero",
+      "evidence": "Tokenization / DAI auction platform early-stage; not in Lawrence base FCF",
+      "base_terminal_rationale": "Pre-revenue product option; no filing mark \u2014 explicit zero terminal after scan"
+    },
+    {
+      "q": 0,
+      "question": "Material options after scan?",
+      "answer": "No separate overlay",
+      "treatment": "n/a",
+      "evidence": "Armenia and associates flow through equity income; tokenization zero terminal; Lawrence full path sufficient"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "Main Market equity turnover and information-services fees; commodity TGE gas spot and clearing",
+    "source": "Q1 2025 management report segment tables",
+    "base_growth_citation": "investor-documents/ir-gpw/2025-03-31_Q1_Management_Report_EN.pdf",
+    "lawrence_legacy": {
+      "y1_5": 0.06,
+      "y6_10": 0.04,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.06,
+      "y6_10": 0.04,
+      "exit_pfcf_y10": 18.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": null,
+      "as_of_filing_facts": null
+    },
+    "status": "partial"
+  },
+  "evidence_refresh": {
+    "synthesis_in_dive": true
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -0.9
+    },
+    "base": {
+      "return_pct": 5.5
+    },
+    "bull": {
+      "return_pct": 10.9
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -0.9
+    },
+    "base": {
+      "return_pct": 5.5
+    },
+    "bull": {
+      "return_pct": 10.9
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": 5.5
+    },
+    "falsifier_adjusted": {
+      "return_pct": 5.5
+    }
+  },
+  "implied_return": {
+    "base_pct": 6.61,
+    "label": "7yr IRR (total synthesis)",
+    "display": "6.61% (total synthesis)",
+    "lawrence_stance_gate_pct": 5.5,
+    "falsifier_adjusted_pct": 5.5,
+    "synthesis_pct": 6.61
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Growth theory (pre-falsifier)",
+        "source": "growth_explanation + filing revenue YoY",
+        "return_pct": 5.5,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": -0.9,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 10.9,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 6.81,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 6.61,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}

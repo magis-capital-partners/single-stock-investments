@@ -6,27 +6,30 @@
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | croupier |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
-| **Stance** | watch |
-| **Cycle** | - |
-| **Implied 7yr IRR** (base) | — |
-| **IRR method** | — |
+| **Archetype** (Stahl) | platform |
+| **Moat** (Munger) | stable |
+| **Dhando** (Pabrai) | partial |
+| **Stance** | accumulate |
+| **Cycle** | mid |
+| **Implied 7yr IRR** (base) | 25.91% (total synthesis) |
+| **IRR method** | full |
 | **Lawrence bucket** | multi_sided |
 | **Payoff lens** | operating |
 | **MOI bucket** | pending |
 
+**Deep dive:** `XP/research/deep_dive_2026-06-11.md` (auto-sync)
+
 ## One-line thesis
 
-XP Inc. — thesis pending Marvin deep dive.
+Brazil's #1 independent investment platform: **R$1.49T** client assets, fee toll on AuC and cross-sell; **accumulate** at ~**25.91%** base IRR (~$15.26 ADR) pending governance review.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest annual report (FY2025 20-F)
+- [ ] Read latest quarterly report (no 6-K in folder yet)
+- [x] Apply platform / multi-sided lenses
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-06-11; awaiting deep dive.
+- Governance and management alignment before sizing accumulate.
+- Confirm BRL/USD and Other-segment loss haircut on owner cash.

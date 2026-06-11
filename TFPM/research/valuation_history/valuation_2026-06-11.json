@@ -1,0 +1,346 @@
+{
+  "ticker": "TFPM",
+  "as_of": "2026-06-11",
+  "valuation_mode": "optionality",
+  "method": "full",
+  "lawrence_bucket": "pricing_power",
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "peak",
+    "payoff_lens": "asset",
+    "predictive_attribute": "commodity_optionality_compression"
+  },
+  "inputs": {
+    "price": 27.8,
+    "price_source": "Yahoo TFPM close 2026-06-11",
+    "fcf_per_share": 1.54,
+    "fcf_source": "FY2025 operating cash flow $312,832k / 203,618,559 weighted average shares (2025 Annual Report MD&A)",
+    "shares_millions": 203.6,
+    "normalization_note": "Royalty/stream model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 OCF equals free cash flow per company non-IFRS table. 2026 GEO guidance 95k-105k is below FY2025 actual 113,237 GEOs; base growth assumes commodity price normalization offset by portfolio additions (Orogen).",
+    "price_as_of": "2026-06-11"
+  },
+  "optionality_gate": {
+    "framework": "royalty_floor_no_debt",
+    "floor_pass": true,
+    "floor_metric": "balance_sheet",
+    "floor_value": "undrawn_700m_credit_facility_no_term_debt",
+    "primary_metric": "lawrence_base",
+    "primary_label": "7yr IRR",
+    "primary_return_pct": 9.7,
+    "incumbent_sleeve": false,
+    "notes": "Credit Facility $700M undrawn at Dec 31, 2025; accordion to $1B. No term debt. Dividend $0.23/sh (~0.7% yield) is not a dhando floor; partial dhando from non-recourse royalty structure and acquisition optionality."
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": -0.02,
+      "growth_y6_10": 0.0,
+      "exit_pfcf_y10": 16,
+      "notes": "Gold/silver mean-revert; 2026 GEO guidance 95-105k below FY2025 113k; Northparkes step-down risk; multiple compresses"
+    },
+    "base": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 20,
+      "notes": "Mid-single-digit cash flow growth [Assumption] off FY2025 record; 2030 management outlook 140-150k GEOs not in base Lawrence path"
+    },
+    "bull": {
+      "growth_y1_5": 0.06,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 24,
+      "notes": "Commodity prices hold; Orogen assets ramp; Evolution Northparkes expansion; development book converts"
+    }
+  },
+  "valuation_overlay": "segment_cashflow",
+  "segment_build": {
+    "segments": [
+      {
+        "id": "precious_streams_royalties",
+        "label": "Producing precious metal streams & royalties",
+        "fcf_per_share_y0": 1.35,
+        "growth_y1_5": 0.03,
+        "growth_y6_10": 0.02,
+        "exit_pfcf_y10": 22,
+        "evidence": "34 producing assets; FY2025 113,237 GEOs; Northparkes, Cerro Lindo, Buritica top revenue contributors per AIF"
+      },
+      {
+        "id": "diversified_royalties",
+        "label": "Other metals & diversified royalties",
+        "fcf_per_share_y0": 0.19,
+        "growth_y1_5": 0.02,
+        "growth_y6_10": 0.015,
+        "exit_pfcf_y10": 16,
+        "evidence": "Silver and base-metal royalties; 24% FY2025 revenue from silver per annual report commentary"
+      }
+    ],
+    "options": [
+      {
+        "id": "development_exploration_book",
+        "label": "Development & exploration royalty book (205 assets)",
+        "option_treatment": "zero",
+        "annual_drag_per_share": 0.0,
+        "base_terminal_value_bn": 0.0,
+        "base_terminal_rationale": "No audited fair values for pre-production portfolio; 205 development/exploration assets not in FY2026 GEO guidance",
+        "evidence": "2025 Annual Report: 205 development & exploration assets vs 34 producing; 2030 GEO outlook 140-150k is management aspiration only",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "northparkes_expansion",
+        "label": "Northparkes expansion / Evolution funding option",
+        "option_treatment": "probability_weighted",
+        "annual_drag_per_share": 0.0,
+        "base_terminal_value_bn": 0.15,
+        "base_terminal_rationale": "TF International agreed to fund $84.3M in Q4 2026 for Northparkes development; incremental GEOs above 2026 guidance band \u2014 P-weighted overlay only",
+        "overlay_base_terminal_bn": 0.15,
+        "bull_terminal_value_bn": 0.4,
+        "evidence": "investor-documents/sec-edgar/2025-Form-40-F.pdf AIF \u2014 Evolution / TF International funding announcement Feb 2026",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "orogen_acquired_assets",
+        "label": "Orogen transaction assets (closed July 2025)",
+        "option_treatment": "embedded_in_segment",
+        "annual_drag_per_share": 0.0,
+        "base_terminal_value_bn": 0.0,
+        "base_terminal_rationale": "C$171.5M cash + 5.6M shares issued; cash flows embedded in producing segment growth [Assumption]",
+        "evidence": "2025 Form 40-F AIF Orogen Transaction July 9, 2025",
+        "not_in_lawrence_base": true
+      }
+    ],
+    "corporate_drag_per_share": 0.0,
+    "horizon_years": 7
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "nav_overlay",
+      "evidence": "Shareholders equity $2.05B vs economic royalty/stream portfolio; intangibles carry contractual cash flows not fully marked to spot commodity prices"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "205 development/exploration assets; management 2030 outlook 140-150k GEOs vs 113k FY2025"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No operating mines; corporate G&A modest vs revenue"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF path?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Streams and royalties recognized as operators produce"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "11% Orogen Spinco stake; prepaid gold interests per balance sheet"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Regular quarterly dividend program since 2021; no litigation recovery in base year"
+    },
+    {
+      "q": 7,
+      "question": "Embedded option already in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Record precious metal prices in FY2025 revenue $389M (+44% YoY); commodity beta in producing segment"
+    }
+  ],
+  "evidence_refresh": {
+    "type": "commodity_nav",
+    "synthesis_in_dive": true,
+    "base_payoff_mode": "fixed_stance_gate"
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "optionality",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true,
+      "floor_pass": true,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": null
+  },
+  "human_review": {
+    "live_price_confirmed": false
+  },
+  "catalyst_paths": [
+    {
+      "event": "Northparkes expansion funding and incremental GEOs",
+      "timing": "2026-2027",
+      "impact": "GEO growth above 2026 guidance band of 95-105k"
+    },
+    {
+      "event": "Commodity price normalization",
+      "timing": "bear scenario",
+      "impact": "Flat to declining cash flow; multiple compression"
+    },
+    {
+      "event": "Accretive stream acquisitions",
+      "timing": "ongoing",
+      "impact": "Portfolio growth via $700M undrawn credit facility"
+    }
+  ],
+  "lawrence_horizon_years": 7,
+  "growth_explanation": {
+    "mechanism": "GEO volume from 34 producing assets times precious metal prices, plus new stream investments (Orogen, Sierra Sun, Allied streams). 2026 guidance 95-105k GEOs below FY2025 113k actual.",
+    "source": "2025 Annual Report MD&A and 2026 guidance table",
+    "lawrence_legacy": {
+      "y1_5": 0.03,
+      "y6_10": 0.02,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.03,
+      "y6_10": 0.02,
+      "exit_pfcf_y10": 20.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": null,
+      "as_of_filing_facts": "evidence/_text/2025-Annual-Report.pdf.txt"
+    },
+    "status": "partial"
+  },
+  "market_inputs": {},
+  "market_inputs_as_of": "2026-06-11",
+  "total_return_panel": {
+    "as_of": "2026-06-11",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 0,
+    "distribution_history_sum": 0,
+    "market_cap_m": null,
+    "total_return_annualized_pct": 26.59,
+    "chart": "TFPM/research/charts/total_return_2026-06-11.svg",
+    "panel_json": "TFPM/research/total_return_panel.json"
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 2.5
+    },
+    "base": {
+      "return_pct": 9.7
+    },
+    "bull": {
+      "return_pct": 15.1
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 2.5
+    },
+    "base": {
+      "return_pct": 9.7
+    },
+    "bull": {
+      "return_pct": 15.1
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": 9.7
+    },
+    "falsifier_adjusted": {
+      "return_pct": 9.7
+    }
+  },
+  "implied_return": {
+    "base_pct": 10.85,
+    "label": "7yr IRR (total synthesis)",
+    "display": "10.85% (total synthesis)",
+    "lawrence_stance_gate_pct": 9.7,
+    "falsifier_adjusted_pct": 9.7,
+    "synthesis_pct": 10.85
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Segment-derived growth (pre-falsifier)",
+        "source": "segment_build weighted blend",
+        "return_pct": 9.7,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": 2.5,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 15.1,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 10.85,
+    "qualitative_pp": 0,
+    "total_synthesis_pct": 10.85,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}

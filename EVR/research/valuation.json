@@ -1,0 +1,324 @@
+{
+  "ticker": "EVR",
+  "as_of": "2026-06-11",
+  "method": "full",
+  "valuation_mode": "optionality",
+  "lawrence_bucket": "pricing_power",
+  "lawrence_horizon_years": 7,
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "unproven",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "asset"
+  },
+  "inputs": {
+    "price": 2.8,
+    "price_source": "Yahoo Finance EVR.CN close 2026-06-11",
+    "price_as_of": "2026-06-11",
+    "fcf_per_share": 0.16,
+    "fcf_source": "Normalized 2026 owner cash: YTD royalty payments C$2.70M (Jan 1-Jun 1 NR) plus Uis run-rate US$4-4.5M/year (corporate presentation Feb 2026) and HVC YTD C$1.19M; divided by ~55.1M pro-forma shares post-Uis issuance",
+    "shares_millions": 55.1,
+    "normalization_note": "Royalty holding company; owner cash = cash royalty receipts net of minimal G&A. FY2025 MD&A on SEDAR+ not yet harvested; base uses H1 2026 disclosed payments and operator-guided ramp, not GAAP net income."
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 12,
+      "notes": "Copper/tin prices weaken; HVC mine life uncertainty; Copper Mountain carveout delays; junior multiple compression"
+    },
+    "base": {
+      "growth_y1_5": 0.1,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 16,
+      "notes": "McIlvenna Bay Q3 2026 start; Uis steady state; Copper Mountain payments after US$10M carveout; HVC MLE to 2046"
+    },
+    "bull": {
+      "growth_y1_5": 0.14,
+      "growth_y6_10": 0.07,
+      "exit_pfcf_y10": 20,
+      "notes": "Four cash-flowing royalties by 2027; Sal de Los Angeles construction; Sunnyside close; copper/tin tailwinds; re-rate toward 1.0x NAV peer multiple"
+    }
+  },
+  "optionality_gate": {
+    "framework": "royalty_nav_discount",
+    "floor_pass": true,
+    "floor_metric": "nav_discount",
+    "floor_value": 25,
+    "primary_metric": "lawrence_base",
+    "primary_label": "7yr IRR",
+    "primary_return_pct": 13.8,
+    "incumbent_sleeve": false,
+    "notes": "Corporate presentation Feb 2026 shows EVR at ~0.75x P/NAV vs junior royalty peers at 1.0-1.7x; at C$2.80 vs ~C$4.26 implied NAV (~34% discount). Lawrence owner-cash path is stance gate; development royalties sized in overlay only."
+  },
+  "nav_overlay": {
+    "nav_per_share_cad": 4.26,
+    "nav_source": "EVR/presentations-and-media/corporate-presentation-2026-02.pdf \u2014 peer P/NAV table (~0.75x at C$3.21; C$163M market cap / 50.9M shares)",
+    "discount_to_nav_pct": 34,
+    "measurement_date": "2026-02-20"
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "nav_overlay",
+      "evidence": "Royalty interests carried at cost; economic value tied to commodity prices and reserve growth, not marked to market (CSE listing statement / FY2025 FS per SEDAR+ reference in June 1 NR)"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "14-asset portfolio: 7 exploration royalties (Hanson Lake, Bigstone, Pine Bay, etc.); Sal de Los Angeles lithium permitted but pre-production; Copper Mountain US$3.3M carveout remaining"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Royalty-only model; no operating loss segments"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF path?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "McIlvenna Bay C$0.75/t royalty expected Q3 2026; Copper Mountain 5% NSR after US$10M pre-tax exclusion (US$6.7M paid to date per June 1 NR)"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "Partial",
+      "treatment": "milestone_nav",
+      "evidence": "Cash and publicly tradeable securities plus convertible debenture in private entity (~C$9M per presentation pro-forma cap table)"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No dividend program yet; reinvestment/acquisition phase"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option already in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "HVC 0.51% NPI and Uis tin GRR already in YTD C$2.70M payments"
+    }
+  ],
+  "nav_overlay_options": [
+    {
+      "id": "copper_mountain_carveout",
+      "label": "Copper Mountain 5% NSR (post US$10M exclusion)",
+      "option_treatment": "probability_weighted",
+      "base_terminal_value_cad_per_share": 0.45,
+      "base_terminal_rationale": "US$3.3M carveout remaining; Hudbay 2027-2028 copper guidance +92% vs 2026; not in Lawrence FCF base until payments commence",
+      "evidence": "EVR/official-reports/news-release-2026-06-01-ytd-royalty-payments.txt"
+    },
+    {
+      "id": "mcilvenna_bay_ramp",
+      "label": "McIlvenna Bay C$0.75/t net tonnage royalty",
+      "option_treatment": "embedded_in_segment",
+      "base_terminal_value_cad_per_share": 0.35,
+      "base_terminal_rationale": "Eldorado commercial production expected Q3 2026; partial 2026 contribution in base growth, full ramp in overlay",
+      "evidence": "EVR/official-reports/news-release-2026-06-01-ytd-royalty-payments.txt"
+    },
+    {
+      "id": "sal_de_los_angeles_lithium",
+      "label": "Litio Angeles Argentina 2% NSR lithium",
+      "option_treatment": "probability_weighted",
+      "base_terminal_value_cad_per_share": 0.25,
+      "base_terminal_rationale": "Permitted 10 ktpa LCE Phase 1; construction timing tied to lithium market and RIGI application; zero in Lawrence base",
+      "evidence": "EVR/presentations-and-media/corporate-presentation-2026-02.pdf"
+    },
+    {
+      "id": "exploration_royalty_book",
+      "label": "Exploration-stage royalties (7 assets)",
+      "option_treatment": "zero",
+      "base_terminal_value_cad_per_share": 0.0,
+      "base_terminal_rationale": "Pre-resource or early-stage; no disclosed cash flows; explicit zero after option scan",
+      "evidence": "EVR/presentations-and-media/corporate-presentation-2026-02.pdf \u2014 portfolio overview"
+    }
+  ],
+  "growth_explanation": {
+    "base_mechanism": "Ramp from one to four cash-flowing royalties in 2026 (HVC, Uis, McIlvenna Bay, Copper Mountain) per June 1 operator updates",
+    "bear_falsifier": "Sustained copper/tin price decline or Teck HVC mine-life extension delay",
+    "bull_falsifier": "Faster Copper Mountain carveout clearance plus Sal de Los Angeles construction start with peer multiple re-rate above 1.0x NAV",
+    "lawrence_legacy": {
+      "y1_5": 0.1,
+      "y6_10": 0.05,
+      "return_pct": null
+    },
+    "status": "partial",
+    "falsifier_adjusted": {
+      "y1_5": 0.1,
+      "y6_10": 0.05,
+      "exit_pfcf_y10": 16.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": null,
+      "as_of_filing_facts": null
+    }
+  },
+  "catalyst_paths": [
+    {
+      "event": "McIlvenna Bay commercial production",
+      "timing": "Q3 2026",
+      "impact": "C$0.75/t royalty on Eldorado copper-zinc output"
+    },
+    {
+      "event": "Copper Mountain carveout cleared",
+      "timing": "2026-2027",
+      "impact": "5% NSR on ~48k tpa copper guidance 2027-2028"
+    },
+    {
+      "event": "HVC Mine Life Extension",
+      "timing": "to 2046",
+      "impact": "Extends 0.51% NPI on Canada's largest copper mine"
+    },
+    {
+      "event": "Failure mode",
+      "timing": "bear scenario",
+      "impact": "Commodity downturn; junior royalty multiple compression; acquisition overpay"
+    }
+  ],
+  "human_review": [],
+  "estimates": {
+    "external": []
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 4.2
+    },
+    "base": {
+      "return_pct": 13.8
+    },
+    "bull": {
+      "return_pct": 20.5
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 4.2
+    },
+    "base": {
+      "return_pct": 13.8
+    },
+    "bull": {
+      "return_pct": 20.5
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": 13.8
+    },
+    "falsifier_adjusted": {
+      "return_pct": 13.8
+    }
+  },
+  "implied_return": {
+    "base_pct": 14.9,
+    "label": "7yr IRR (total synthesis)",
+    "display": "14.9% (total synthesis)",
+    "lawrence_stance_gate_pct": 13.8,
+    "falsifier_adjusted_pct": 13.8,
+    "synthesis_pct": 14.9
+  },
+  "stance_proposal": {
+    "suggested": "hold",
+    "irr_band": "optionality",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": true,
+      "floor_pass": true,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": null
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Growth theory (pre-falsifier)",
+        "source": "growth_explanation + filing revenue YoY",
+        "return_pct": 13.8,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": 4.2,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 20.5,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 15.1,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 14.9,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}
