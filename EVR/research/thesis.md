@@ -8,18 +8,20 @@
 |-------|-------|
 | **Archetype** (Stahl) | optionality |
 | **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
-| **Stance** | watch |
-| **Cycle** | - |
-| **Implied 7yr IRR** (base) | — |
-| **IRR method** | — |
-| **Lawrence bucket** | other |
+| **Dhando** (Pabrai) | partial |
+| **Stance** | hold |
+| **Cycle** | mid |
+| **Implied 7yr IRR** (base) | 14.9% (total synthesis) |
+| **IRR method** | full |
+| **Lawrence bucket** | pricing_power |
 | **Payoff lens** | asset |
 | **MOI bucket** | pending |
 
+**Deep dive:** `EVR/research/deep_dive_2026-06-11.md` (auto-sync)
+
 ## One-line thesis
 
-Evolve Royalties Ltd — thesis pending Marvin deep dive.
+CSE copper/tin junior royalty (Nomad team) ramping to four cash-flowing assets in 2026; **hold** at ~34% NAV discount with **14.9%** synthesis return.
 
 ## Key questions
 
