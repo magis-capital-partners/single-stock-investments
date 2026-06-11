@@ -1,0 +1,147 @@
+{
+  "ticker": "KRP",
+  "as_of": "2026-06-11",
+  "method": "full",
+  "valuation_mode": "optionality",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "narrow",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "asset",
+    "predictive_attribute": "market_structure_discount"
+  },
+  "inputs": {
+    "price": 13.5,
+    "price_source": "Placeholder pre-fetch; marvin_cloud_refresh updates Stooq",
+    "fcf_per_share": 1.6,
+    "fcf_source": "FY2025 common-unit cash distributions paid $149.435M / ~93.396M units ≈ $1.60/unit (10-K_20260226)",
+    "units_outstanding_m": 93.396,
+    "units_source": "10-K cover: 93,396,488 common units outstanding Feb 20, 2026",
+    "book_per_share": 8.5,
+    "book_source": "FY2025 partners' capital ~$1.01B / 93.4M units [approx.; GAAP not fair-value floor]",
+    "normalization_note": "Lawrence uses declared cash distributions to common unitholders, not GAAP net income ($0.62/unit FY2025). Q1 2026 revenue and net income per unit fell year over year; base uses trailing FY2025 distribution run-rate.",
+    "price_as_of": "2026-06-11"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": -0.02,
+      "growth_y6_10": -0.03,
+      "exit_pfcf_y10": 8,
+      "notes": "Commodity trough; credit facility amortization absorbs cash; distribution cuts"
+    },
+    "base": {
+      "growth_y1_5": 0.02,
+      "growth_y6_10": 0.01,
+      "exit_pfcf_y10": 10,
+      "notes": "Mid-cycle distributions; bolt-on mineral/ORRI acquisitions offset base decline"
+    },
+    "bull": {
+      "growth_y1_5": 0.05,
+      "growth_y6_10": 0.03,
+      "exit_pfcf_y10": 12,
+      "notes": "Permian activity + accretive deals; undeveloped acreage conversion"
+    }
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Mineral/ORRI interests on balance sheet at cost; reserve PV in Ryder Scott report exceeds carrying value in downturns [Assumption]"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / acreage / dormant royalty?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "~127,832 gross (9,760 net) undeveloped mineral acres + ~18,554 gross (92 net) undeveloped ORRI acres (10-K_20260226 asset tables)"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No litigation recovery curve; Q1 2026 weakness is commodity/activity, not contractual suspension"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option already in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Producing royalty cash in revenues; growth via acquisitions in MD&A"
+    }
+  ],
+  "nav_overlay": {
+    "gaap_vs_fair_value": {
+      "note": "Royalties carried on balance sheet; fair value tied to commodity cash flows and reserve report, not separate NAV mark each quarter"
+    },
+    "asset_inventory_filing": {
+      "mineral_gross_acres": 12300000,
+      "orri_gross_acres": 4700000,
+      "undeveloped_mineral_gross_net": "127,832 gross / 9,760 net",
+      "undeveloped_orri_gross_net": "18,554 gross / 92 net",
+      "proved_reserves_mboe": 72944,
+      "source": "10-K_20260226"
+    },
+    "segments_or_options": [
+      {
+        "id": "undeveloped_mineral_acres",
+        "label": "Undeveloped mineral acreage",
+        "option_treatment": "probability_weighted",
+        "notes": "Zero in Lawrence base; partial PV in overlay sensitivity only"
+      }
+    ],
+    "not_in_model_requires_refresh": [
+      "Per-acre fair value comps for undeveloped net acres not in Lawrence FCF path"
+    ]
+  },
+  "optionality_gate": {
+    "framework": "mineral_floor_option",
+    "floor_pass": true,
+    "floor_metric": "distribution_yield",
+    "floor_value": 1.6,
+    "primary_metric": "lawrence_base",
+    "primary_label": "7yr IRR",
+    "primary_return_pct": null,
+    "normalized_yield_pct": 11.9,
+    "notes": "FY2025 distribution yield ~11.9% at placeholder price; Lawrence IRR is stance gate unless human overrides"
+  },
+  "growth_explanation": {
+    "mechanism": "Base growth assumes modest distribution increases from bolt-on mineral and ORRI acquisitions (2024-2025 8-K deal flow) offsetting natural decline on legacy properties.",
+    "bear_trigger": "WTI/Henry Hub sustained down-cycle cuts distributions below $1.30/unit for four quarters while revolver balance stays above $400M.",
+    "bull_trigger": "Distribution run-rate above $1.90/unit sustained with accretive unit/equity-funded acquisitions and Permian rig count recovery.",
+    "status": "partial"
+  },
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "lawrence_base",
+        "label": "Lawrence base (distributions)",
+        "source": "scenarios.base",
+        "return_pct": null,
+        "weight": 1.0,
+        "type": "numeric",
+        "epistemic_tier": "A (filings)",
+        "weight_why": "No approved third-party sources; primary filing path only."
+      }
+    ],
+    "human_approval": "pending"
+  },
+  "lawrence_horizon_years": 7,
+  "human_review": {
+    "live_price_confirmed": false
+  }
+}
