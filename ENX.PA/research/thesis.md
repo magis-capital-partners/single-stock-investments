@@ -7,26 +7,28 @@
 | Field | Value |
 |-------|-------|
 | **Archetype** (Stahl) | croupier |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Moat** (Munger) | stable |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **Implied 7yr IRR** (base) | — |
-| **IRR method** | — |
+| **Cycle** | mid |
+| **Implied 7yr IRR** (base) | 10.29% (total synthesis) |
+| **IRR method** | full |
 | **Lawrence bucket** | multi_sided |
 | **Payoff lens** | operating |
 | **MOI bucket** | pending |
 
+**Deep dive:** `ENX.PA/research/deep_dive_2026-06-11.md` (auto-sync)
+
 ## One-line thesis
 
-Euronext N.V. — thesis pending Marvin deep dive.
+Pan-European exchange croupier: FY2025 FCF €682M on €1.8B revenue; **watch** at ~10.3% synthesis IRR (quality franchise, price full).
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest annual report (URD 2025)
+- [x] Read latest quarterly report (Q1 2026 press release)
+- [x] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-06-11; awaiting deep dive.
+- Synthesis weights pending human approval (2026-06-11).
