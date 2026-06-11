@@ -6,7 +6,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-06-11.
 
 | Ticker | Folder | Company | Market | Last download | Last research | Archetype | Stance |
 |--------|--------|---------|--------|---------------|---------------|-----------|--------|
-| 0388.HK | 0388.HK/ | Hong Kong Exchanges and Clearing Ltd | EU | — | 2026-06-11 | unknown | watch |
+| 0388.HK | 0388.HK/ | Hong Kong Exchanges and Clearing Ltd | EU | — | 2026-06-11 | croupier | watch |
 | 3905.T | 3905.T/ | DataSection Co., Ltd. | JP | 2026-06-10 | 2026-06-11 | compounder | watch |
 | 7176.T | 7176.T/ | Simplex Financial Holdings Co., Ltd. | JP | 2026-06-10 | 2026-06-11 | unknown | watch |
 | 8697.T | 8697.T/ | Japan Exchange Group | JP | 2026-06-10 | 2026-06-11 | croupier | hold |

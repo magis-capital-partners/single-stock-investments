@@ -7,19 +7,21 @@
 | Field | Value |
 |-------|-------|
 | **Archetype** (Stahl) | croupier |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Moat** (Munger) | stable |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **Implied 7yr IRR** (base) | — |
-| **IRR method** | — |
+| **Cycle** | peak |
+| **Implied 7yr IRR** (base) | -0.15% (total synthesis) |
+| **IRR method** | full |
 | **Lawrence bucket** | multi_sided |
 | **Payoff lens** | operating |
 | **MOI bucket** | pending |
 
+**Deep dive:** `0388.HK/research/deep_dive_2026-06-11.md` (auto-sync)
+
 ## One-line thesis
 
-Hong Kong Exchanges and Clearing Ltd — thesis pending Marvin deep dive.
+Asia flagship exchange croupier at cycle-peak earnings; ~-0.15% base annual return at HK$383 implies watch until turnover normalizes or price resets.
 
 ## Key questions
 
@@ -29,4 +31,4 @@ Hong Kong Exchanges and Clearing Ltd — thesis pending Marvin deep dive.
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-06-11; awaiting deep dive.
+- First deep dive 2026-06-11; IR PDF harvest pending (Vicki brief).
