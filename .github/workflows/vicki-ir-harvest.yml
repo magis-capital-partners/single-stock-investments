@@ -1,0 +1,107 @@
+name: Vicki IR Harvest
+
+# Browser IR harvest for tickers where Marvin curl/urllib failed (ir_gap).
+# Trigger: push updated queue to main, or manual workflow_dispatch.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tickers:
+        description: "Optional comma-separated tickers (empty = queue file)"
+        required: false
+        type: string
+      max_parallel:
+        description: "Max concurrent Vicki jobs"
+        required: false
+        default: "2"
+        type: string
+  push:
+    branches: [main]
+    paths:
+      - _system/data/vicki_dispatch_queue.json
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vicki-ir-harvest
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      tickers: ${{ steps.matrix.outputs.tickers }}
+      max_parallel: ${{ steps.matrix.outputs.max_parallel }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build matrix
+        id: matrix
+        env:
+          TICKERS_INPUT: ${{ github.event.inputs.tickers }}
+        run: |
+          if [ -n "$TICKERS_INPUT" ]; then
+            TICKERS_JSON=$(python _system/scripts/build_vicki_dispatch_matrix.py --tickers "$TICKERS_INPUT")
+          else
+            TICKERS_JSON=$(python _system/scripts/build_vicki_dispatch_matrix.py --use-queue)
+          fi
+          echo "tickers=$TICKERS_JSON" >> "$GITHUB_OUTPUT"
+          MAXP="${{ github.event.inputs.max_parallel }}"
+          if [ -z "$MAXP" ] && [ -f _system/data/vicki_dispatch_queue.json ]; then
+            MAXP=$(python -c "import json; print(json.load(open('_system/data/vicki_dispatch_queue.json')).get('max_parallel') or 2)")
+          fi
+          MAXP="${MAXP:-2}"
+          echo "max_parallel=$MAXP" >> "$GITHUB_OUTPUT"
+          echo "Vicki tickers: $TICKERS_JSON (max_parallel=$MAXP)"
+
+  harvest:
+    needs: prepare
+    if: needs.prepare.outputs.tickers != '[]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      max_parallel: ${{ fromJson(needs.prepare.outputs.max_parallel) }}
+      matrix:
+        ticker: ${{ fromJson(needs.prepare.outputs.tickers) }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check Cursor API key
+        env:
+          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
+        run: |
+          if [ -z "$CURSOR_API_KEY" ]; then
+            echo "::error::CURSOR_API_KEY secret is not set."
+            exit 1
+          fi
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Cursor SDK
+        working-directory: _system/scripts
+        run: npm install --no-save @cursor/sdk
+
+      - name: Run Vicki IR harvest (${{ matrix.ticker }})
+        env:
+          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
+          TICKER: ${{ matrix.ticker }}
+          PICK_REASON: ir_gap
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: node _system/scripts/vicki_ir_harvest.mjs
+
+      - name: Summary
+        if: success()
+        run: echo "Vicki IR harvest PR started for ${{ matrix.ticker }}."
