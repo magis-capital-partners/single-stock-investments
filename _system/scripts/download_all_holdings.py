@@ -41,11 +41,11 @@ def run(cmd: list[str], label: str, *, cwd: Path | None = None) -> None:
     subprocess.run(cmd, cwd=cwd or ROOT, check=False)
 
 
-def powershell_script(script: Path) -> list[str]:
+def powershell_script(script: Path) -> list[str] | None:
     for exe in ("pwsh", "powershell"):
         if shutil.which(exe):
             return [exe, "-ExecutionPolicy", "Bypass", "-File", str(script)]
-    raise RuntimeError(f"PowerShell not found; cannot run {script}")
+    return None
 
 
 def main() -> None:
@@ -66,7 +66,11 @@ def main() -> None:
         elif dtype == "jp_ps1":
             script = ROOT / ticker / "_scripts" / "download_and_organize.ps1"
             if script.exists() and script.stat().st_size > 80:
-                run(powershell_script(script), ticker)
+                ps_cmd = powershell_script(script)
+                if ps_cmd:
+                    run(ps_cmd, ticker)
+                else:
+                    print(f"\n=== {ticker} (jp_ps1 skipped — no PowerShell) ===")
         elif dtype == "jp_archive":
             ir_script = ROOT / ticker / "_scripts" / "download_sfh_ir.py"
             if ir_script.exists():
@@ -89,6 +93,8 @@ def main() -> None:
             script = dedicated_investor_script(ticker)
             if script:
                 run([PY, str(script)], f"{ticker} ({dtype})")
+            else:
+                run([PY, str(SCRIPTS / "download_ir_harvest.py"), "--ticker", ticker], f"{ticker} ({dtype} harvest)")
 
     if any((holdings.get(t, {}).get("download") or {}).get("type") == "eu_teq" for t in holdings):
         run([PY, str(SCRIPTS / "download_teq_st.py")], "TEQ.ST")

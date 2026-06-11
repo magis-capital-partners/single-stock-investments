@@ -558,7 +558,11 @@ def recent_developments(ticker_dir: Path, ticker: str) -> list[dict]:
     manifest_rows: list[dict] = []
     if manifest.exists():
         try:
-            manifest_rows = json.loads(manifest.read_text(encoding="utf-8"))
+            raw_manifest = json.loads(manifest.read_text(encoding="utf-8"))
+            if isinstance(raw_manifest, list):
+                manifest_rows = [r for r in raw_manifest if isinstance(r, dict)]
+            else:
+                manifest_rows = []
             rows = sorted(manifest_rows, key=lambda r: r.get("filingDate", ""), reverse=True)
             for row in rows[:5]:
                 if row.get("form", "").startswith("8-K") and not row.get("exhibit"):
