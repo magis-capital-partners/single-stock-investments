@@ -42,13 +42,13 @@ No approved third-party sources are indexed for MTA. Marvin stance rests on **pr
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | **$0.048**/sh FY2025 operating cash | **-16.3%** Lawrence base / **-14.0%** synthesis | watch |
+| Marvin floor | **$0.048**/sh FY2025 operating cash | **-16.9%** Lawrence base / **-14.56%** synthesis | watch |
 | External (combined) | Consensus NAV **$7.75** | Not in base IRR | context only |
-| **Blended best estimate** | **Filing cash + unapproved NAV overlay** | **-14.0%** synthesis (Marvin-only base) | **watch** |
+| **Blended best estimate** | **Filing cash + unapproved NAV overlay** | **-14.56%** synthesis (Marvin-only base) | **watch** |
 
 **Weights:** Marvin filing path **100%** for base IRR; consensus NAV **0%** until promoted in `third_party_sources.md`.
 
-**Returns statement (blended):** At approximately **$6.50** per share, Marvin expects about **-14.0%** per year on the total-synthesis base case using FY2025 operating cash per share; consensus NAV is cited for context only.
+**Returns statement (blended):** At **$6.82** per share, Marvin expects about **-14.56%** per year on the total-synthesis base case using FY2025 operating cash per share; consensus NAV is cited for context only.
 
 ## [HUMAN REVIEW]
 
