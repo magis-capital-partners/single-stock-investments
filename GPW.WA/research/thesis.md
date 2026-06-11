@@ -7,15 +7,17 @@
 | Field | Value |
 |-------|-------|
 | **Archetype** (Stahl) | croupier |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Moat** (Munger) | stable |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **Implied 7yr IRR** (base) | — |
-| **IRR method** | — |
+| **Cycle** | mid |
+| **Implied 7yr IRR** (base) | 6.61% (total synthesis) |
+| **IRR method** | full |
 | **Lawrence bucket** | multi_sided |
 | **Payoff lens** | operating |
 | **MOI bucket** | pending |
+
+**Deep dive:** `GPW.WA/research/deep_dive_2026-06-11.md` (auto-sync)
 
 ## One-line thesis
 
