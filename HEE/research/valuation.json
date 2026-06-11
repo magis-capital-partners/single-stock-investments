@@ -1,0 +1,122 @@
+{
+  "ticker": "HEE",
+  "listing_symbol": "EXAE.AT",
+  "as_of": "2026-06-11",
+  "method": "full",
+  "currency": "EUR",
+  "lawrence_bucket": "multi_sided",
+  "classification_inputs": {
+    "archetype": "croupier",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "peak",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 7.49,
+    "price_source": "Yahoo EXAE.AT close 2026-06-11 (confirm live)",
+    "price_as_of": "2026-06-11",
+    "fcf_per_share": 0.42,
+    "fcf_source": "Mid-cycle owner cash: FY2024 OCF \u20ac21.1M minus capex \u20ac5.8M = \u20ac0.26/sh, adjusted upward for structural reforms but below FY2025 spike OCF \u20ac53.6M (\u20ac0.87/sh)",
+    "shares_millions": 57.85,
+    "normalization_note": "FY2025 peak activity (+58.9% turnover); base owner cash below spot FY2025 cash from operations minus capital spending"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.0,
+      "growth_y6_10": 0.0,
+      "exit_pfcf_y10": 14,
+      "notes": "Greek volume mean-reversion; Euronext integration costs linger"
+    },
+    "base": {
+      "growth_y1_5": 0.05,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 17,
+      "notes": "Mid-cycle owner cash; FTSE developed-market upgrade Sept 2026 embedded in growth [Assumption]"
+    },
+    "bull": {
+      "growth_y1_5": 0.07,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 22,
+      "notes": "Sustained volume + Euronext liquidity synergy"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "nav_floor",
+      "evidence": "Real estate investments revalued at fair value; Acharnon property income approach in annual report note 5.24"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Exchange franchise; Thessaloniki property sold Nov 2025"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Group EBIT \u20ac37.7M FY2025; all operating segments profitable"
+    },
+    {
+      "q": 4,
+      "question": "Backlog not in cash path?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Fees follow trading and listing activity"
+    },
+    {
+      "q": 5,
+      "question": "Private stakes below fair value?",
+      "answer": "Immaterial",
+      "treatment": "n/a",
+      "evidence": "Hellenic Energy Exchange dividend \u20ac368k FY2025"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Regular dividend policy; \u20ac0.29/sh paid June 2025"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "IT/digital and data services in turnover mix; Euronext integration synergy"
+    },
+    {
+      "q": 0,
+      "question": "Material separate option terminals?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Lawrence full cash-flow path sufficient; real estate marks in comprehensive income not separate terminal"
+    }
+  ],
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "evidence_refresh": {
+    "synthesis_in_dive": true
+  },
+  "growth_explanation": {
+    "mechanism": "Greek capital market reforms, FTSE Russell developed-market reclassification effective Sept 2026, and Euronext integration expand handled volume and listing fees; base growth assumes partial normalization from FY2025 peak.",
+    "falsifiers": [
+      "Consolidated turnover falls below \u20ac60M for two consecutive years",
+      "Post-trading segment EBIT margin compresses below 40%"
+    ]
+  },
+  "lawrence_horizon_years": 7
+}

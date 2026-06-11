@@ -7,6 +7,7 @@ YAHOO_SYMBOL: dict[str, str] = {
     "8697.T": "8697.T",
     "3905.T": "3905.T",
     "LSEG": "LSEG.L",
+    "HEE": "EXAE.AT",
     "CMSG": "CMSG",
     "KEWL": "KEWL",
     "FRMO": "FRMO",
