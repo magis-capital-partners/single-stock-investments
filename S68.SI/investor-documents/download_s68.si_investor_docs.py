@@ -23,13 +23,13 @@ IR_REFERER = "https://investorrelations.sgx.com/"
 
 PDF_SOURCES: list[tuple[str, str, Path]] = [
     (
-        "annual_report_fy2024",
-        "https://links.sgx.com/1.0.0/corporate-announcements/0T72IU8JVA9YD3JA/839170_Annual%20Report%20FY2024.pdf",
+        "annual_report_fy2025",
+        "https://investorrelations.sgx.com/static-files/5d920b13-c5bb-4280-9b84-74025f006fc5",
         ANNUAL_DIR,
     ),
     (
-        "annual_report_fy2025",
-        "https://investorrelations.sgx.com/static-files/5d920b13-c5bb-4280-9b84-74025f006fc5",
+        "financial_statements_fy2025",
+        "https://investorrelations.sgx.com/static-files/634d5dd6-260a-4d66-ba38-3502fbe92587",
         ANNUAL_DIR,
     ),
     (
