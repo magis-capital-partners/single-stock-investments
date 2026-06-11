@@ -7,26 +7,29 @@
 | Field | Value |
 |-------|-------|
 | **Archetype** (Stahl) | croupier |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Moat** (Munger) | stable |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **Implied 7yr IRR** (base) | — |
-| **IRR method** | — |
+| **Cycle** | mid |
+| **Implied 7yr IRR** (base) | 14.09% (total synthesis) |
+| **IRR method** | full |
 | **Lawrence bucket** | multi_sided |
 | **Payoff lens** | operating |
 | **MOI bucket** | pending |
 
+**Deep dive:** `PSE/research/deep_dive_2026-06-11.md` (auto-sync)
+
 ## One-line thesis
 
-Philippine Stock Exchange Inc. — thesis pending Marvin deep dive.
+Philippines exchange croupier with integrated post-trade stack (PDSHC); watch at PHP 211 (~14% synthesis IRR on normalized owner cash).
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest annual report (FY2025 on disk)
+- [x] Read latest quarterly report (Q3 2025 on disk)
+- [ ] Confirm live PHP price via PSE edge or local broker
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-06-11; awaiting deep dive.
+- Confirm PHP spot price; Stooq/Yahoo do not cover PSE listing.
+- PDSHC consolidation: verify synergy targets with management.
