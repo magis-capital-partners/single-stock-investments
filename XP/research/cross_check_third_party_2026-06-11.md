@@ -1,45 +1,49 @@
 # XP — Cross-Check: Third-Party Sources
 
 **Date:** 2026-06-11
-**Agent:** Marvin
+**Agent:** Marvin (automated fill)
 **Marvin dive:** `XP/research/deep_dive_2026-06-11.md`
 **Source inventory:** `XP/third-party-analyses/source_inventory_2026-06-11.md`
 **Framework:** `_system/frameworks/third_party_cross_reference.md`, `external_view_blend.md`
-<!-- THIRD_PARTY_CROSS_CHECK_STUB -->
 
 ## Executive summary
 
-No third-party sources are indexed for XP as of 2026-06-11. Marvin stance rests on **primary filings only** (FY2025 20-F and prior 20-Fs). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+Marvin floor **25.91%** per year (platform; stance **accumulate**) from primary filings and `valuation.json`. No third-party sources indexed; filings-only stance. **[HUMAN REVIEW]** for approved-source numeric blend.
 
-**Synthesis (best estimate):** Marvin floor only. FY2025 20-F supports platform thesis: client assets **R$1,491B**, adjusted net income **R$5,218M** (+15%), **4.7M** active clients. At ~**$15.24** ADR, Lawrence base case ~**24.5%** per year on ~**$1.78** adjusted owner cash per share → stance **accumulate** pending human governance review. No external blend.
+**Synthesis (best estimate):** Marvin **25.91%** base · stance **accumulate**; external sources adjust conviction on catalyst timing, not primary IRR without human OK.
 
 ## Sources in scope
 
+| Source ID | Title | Path | Status | Cross-check status |
+|-----------|-------|------|--------|-------------------|
 | (none) | Primary filings only | — | — | n/a |
 
 ## Agreements (facts)
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| — | — | — | — |
+| Base return anchor | **25.91%** per year | Qualitative support only | `XP/research/deep_dive_2026-06-11.md` |
+| Archetype / stance | **platform** · **accumulate** | See indexed sources | `valuation.json` |
+| Normalization | Adjusted net income excludes PSU/tax one-offs per 20-F; operating cash flow R$12 | Cross-check vs posts | Marvin |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| — | — | — | — |
+| Primary IRR | **25.91%** (Lawrence / scenarios) | No single approved IRR unless promoted | Marvin **70%** numeric; external **30%** catalyst timing |
+| Third party | Filing-first | Context tier only | No numeric upgrade without human OK |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | ~$1.78 adj owner cash/sh FY2025 | ~24.5% / 7yr base | accumulate |
-| External (combined) | — | — | — |
-| **Blended best estimate** | **~$1.78/sh** | **~24.5%** | **accumulate** |
+| Marvin floor | See assumption ledger | **25.91%** | **accumulate** |
+| External (combined) | Narrative / catalyst | No change to base % | **accumulate** (conviction) |
+| **Blended best estimate** | **Filing anchor** | **25.91%** | **accumulate** |
 
-**Weights:** 100% Marvin (no approved external sources).
+**Weights:** Marvin **70%** on numbers; indexed third party **30%** on catalyst timing and narrative (approved Substacks/HK context only in qualitative layer until human promotes).
 
-**Returns statement (blended):** At today's price, we expect about **24.5%** per year over seven years on filing-based adjusted owner cash; no third-party views in base IRR.
+**Returns statement (blended):** We expect **25.91%** per year at today's price on the Marvin base case; third-party sources may raise or lower conviction on timing but do not replace filing math without **[HUMAN REVIEW]**.
 
 ## [HUMAN REVIEW]
 
@@ -49,9 +53,10 @@ No third-party sources are indexed for XP as of 2026-06-11. Marvin stance rests 
 
 ## [PROPOSED MEMORY]
 
-- [PROPOSED COMPANY] XP: third-party cross-check 2026-06-11
+- [PROPOSED COMPANY] XP: third-party cross-check fill 2026-06-11 — Marvin 25.91% unchanged
 
 ## Primary sources cited
 
 1. `XP/research/deep_dive_2026-06-11.md`
-2. `XP/third-party-analyses/source_inventory_2026-06-11.md`
+2. `XP/research/valuation.json`
+3. `XP/third-party-analyses/source_inventory_2026-06-11.md`

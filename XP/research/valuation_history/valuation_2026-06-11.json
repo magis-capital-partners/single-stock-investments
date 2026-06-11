@@ -1,0 +1,189 @@
+{
+  "ticker": "XP",
+  "as_of": "2026-06-11",
+  "method": "full",
+  "lawrence_bucket": "multi_sided",
+  "classification_inputs": {
+    "archetype": "platform",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 15.26,
+    "price_source": "Yahoo XP close 2026-06-11",
+    "fcf_per_share": 1.78,
+    "fcf_source": "FY2025 adjusted net income ~$949M \u00f7 ~533M diluted shares (20-F adjusted NI reconciliation); owner-cash proxy for capital-light platform",
+    "shares_millions": 533,
+    "normalization_note": "Adjusted net income excludes PSU/tax one-offs per 20-F; operating cash flow R$12.0B not used as FCF\u2080 because client-money flows dominate broker balance sheet",
+    "price_as_of": "2026-06-11"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.02,
+      "growth_y6_10": 0.01,
+      "exit_pfcf_y10": 11,
+      "notes": "Brazil rate shock, client-asset outflows, IFA competition compress take rate"
+    },
+    "base": {
+      "growth_y1_5": 0.07,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 14,
+      "notes": "Client assets +8% FY25; adj NI +15% normalized to 7% owner-cash growth; exit 14\u00d7 vs ~8.5\u00d7 spot on adj EPS"
+    },
+    "bull": {
+      "growth_y1_5": 0.1,
+      "growth_y6_10": 0.06,
+      "exit_pfcf_y10": 17,
+      "notes": "Cards/loan cross-sell + institutional share gains; multiple re-rates toward LatAm wealth peers"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Other gross revenues loss R$2,458M FY2025 (13% of total revenue); burden in consolidated P&L, not separate terminal \u2014 20-F segment table"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue path?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Cards TPV R$53B, loan portfolio R$35B, insurance cross-sell \u2014 growth in retail revenue path per 20-F KPI table"
+    },
+    {
+      "q": 0,
+      "question": "Material options after scan?",
+      "answer": "No separate NAV/options",
+      "treatment": "n/a",
+      "evidence": "Client assets are off-balance-sheet servicing; Lawrence full cash-flow on adjusted earnings sufficient"
+    }
+  ],
+  "stance_proposal": {
+    "suggested": "accumulate",
+    "irr_band": ">20%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "human_review": {
+    "notes": "First filing-grounded dive; confirm live price, BRL/USD, and whether to haircut FCF\u2080 for Other-segment drag with human.",
+    "live_price_confirmed": false
+  },
+  "lawrence_horizon_years": 7,
+  "total_return_panel": {
+    "as_of": "2026-06-11",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 0,
+    "distribution_history_sum": 0,
+    "market_cap_m": null,
+    "total_return_annualized_pct": -11.78,
+    "chart": "XP/research/charts/total_return_2026-06-11.svg",
+    "panel_json": "XP/research/total_return_panel.json"
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 16.3
+    },
+    "base": {
+      "return_pct": 24.4
+    },
+    "bull": {
+      "return_pct": 30.2
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 16.3
+    },
+    "base": {
+      "return_pct": 24.4
+    },
+    "bull": {
+      "return_pct": 30.2
+    }
+  },
+  "implied_return": {
+    "base_pct": 25.91,
+    "label": "7yr IRR (total synthesis)",
+    "display": "25.91% (total synthesis)",
+    "lawrence_stance_gate_pct": 24.4,
+    "falsifier_adjusted_pct": 24.4,
+    "synthesis_pct": 25.91
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": 16.3,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 30.2,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 26.11,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 25.91,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}

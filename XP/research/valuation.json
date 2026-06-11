@@ -11,12 +11,13 @@
     "payoff_lens": "operating"
   },
   "inputs": {
-    "price": 15.24,
-    "price_source": "Yahoo Finance ~2026-06-11",
+    "price": 15.26,
+    "price_source": "Yahoo XP close 2026-06-11",
     "fcf_per_share": 1.78,
-    "fcf_source": "FY2025 adjusted net income ~$949M ÷ ~533M diluted shares (20-F adjusted NI reconciliation); owner-cash proxy for capital-light platform",
+    "fcf_source": "FY2025 adjusted net income ~$949M \u00f7 ~533M diluted shares (20-F adjusted NI reconciliation); owner-cash proxy for capital-light platform",
     "shares_millions": 533,
-    "normalization_note": "Adjusted net income excludes PSU/tax one-offs per 20-F; operating cash flow R$12.0B not used as FCF₀ because client-money flows dominate broker balance sheet"
+    "normalization_note": "Adjusted net income excludes PSU/tax one-offs per 20-F; operating cash flow R$12.0B not used as FCF\u2080 because client-money flows dominate broker balance sheet",
+    "price_as_of": "2026-06-11"
   },
   "scenarios": {
     "bear": {
@@ -29,10 +30,10 @@
       "growth_y1_5": 0.07,
       "growth_y6_10": 0.04,
       "exit_pfcf_y10": 14,
-      "notes": "Client assets +8% FY25; adj NI +15% normalized to 7% owner-cash growth; exit 14× vs ~8.5× spot on adj EPS"
+      "notes": "Client assets +8% FY25; adj NI +15% normalized to 7% owner-cash growth; exit 14\u00d7 vs ~8.5\u00d7 spot on adj EPS"
     },
     "bull": {
-      "growth_y1_5": 0.10,
+      "growth_y1_5": 0.1,
       "growth_y6_10": 0.06,
       "exit_pfcf_y10": 17,
       "notes": "Cards/loan cross-sell + institutional share gains; multiple re-rates toward LatAm wealth peers"
@@ -40,30 +41,58 @@
   },
   "option_scan": [
     {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Broker platform; client assets serviced off balance sheet per 20-F"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating platform, not resource NAV"
+    },
+    {
       "q": 3,
       "question": "In-business loss segment?",
       "answer": "Yes",
       "treatment": "embedded_in_segment",
-      "evidence": "Other gross revenues loss R$2,458M FY2025 (13% of total revenue); burden in consolidated P&L, not separate terminal — 20-F segment table"
+      "evidence": "Other gross revenues loss R$2,458M FY2025 (13% of total revenue); 20-F segment table"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / RPO not in FCF path?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "AuC-driven fees, not contracted backlog"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Equity-method income R$116M FY2025; immaterial vs consolidated earnings"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No dated legal or trust recovery"
     },
     {
       "q": 7,
       "question": "Embedded product option in revenue path?",
       "answer": "Yes",
       "treatment": "embedded_in_segment",
-      "evidence": "Cards TPV R$53B, loan portfolio R$35B, insurance cross-sell — growth in retail revenue path per 20-F KPI table"
-    },
-    {
-      "q": 0,
-      "question": "Material options after scan?",
-      "answer": "No separate NAV/options",
-      "treatment": "n/a",
-      "evidence": "Client assets are off-balance-sheet servicing; Lawrence full cash-flow on adjusted earnings sufficient"
+      "evidence": "Cards TPV R$53B, loan portfolio R$35B; growth in retail revenue path per 20-F KPI table"
     }
   ],
   "stance_proposal": {
     "suggested": "accumulate",
-    "irr_band": ">15%",
+    "irr_band": ">20%",
     "gates": {
       "moat_ok": true,
       "dhando_ok": true
@@ -71,7 +100,253 @@
     "override_reason": null
   },
   "human_review": {
-    "notes": "First filing-grounded dive; confirm live price, BRL/USD, and whether to haircut FCF₀ for Other-segment drag with human."
+    "notes": "First filing-grounded dive; confirm live price, BRL/USD, and whether to haircut FCF\u2080 for Other-segment drag with human.",
+    "live_price_confirmed": false
   },
-  "lawrence_horizon_years": 7
+  "lawrence_horizon_years": 7,
+  "total_return_panel": {
+    "as_of": "2026-06-11",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 0,
+    "distribution_history_sum": 0,
+    "market_cap_m": null,
+    "total_return_annualized_pct": -11.78,
+    "chart": "XP/research/charts/total_return_2026-06-11.svg",
+    "panel_json": "XP/research/total_return_panel.json"
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 16.3
+    },
+    "base": {
+      "return_pct": 24.4
+    },
+    "bull": {
+      "return_pct": 30.2
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 16.3
+    },
+    "base": {
+      "return_pct": 24.4
+    },
+    "bull": {
+      "return_pct": 30.2
+    }
+  },
+  "implied_return": {
+    "base_pct": 25.91,
+    "label": "7yr IRR (total synthesis)",
+    "display": "25.91% (total synthesis)",
+    "lawrence_stance_gate_pct": 24.4,
+    "falsifier_adjusted_pct": 24.4,
+    "synthesis_pct": 25.91
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": 16.3,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 30.2,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 26.11,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 25.91,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  },
+  "context_overlay": {
+    "as_of": "2026-06-11",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": -0.31,
+            "as_of": "2026-06-11",
+            "yoy_pct": 67.4,
+            "direction": "up",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.474999904632568,
+            "as_of": "2026-06-11",
+            "yoy_pct": 1.4,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.199999809265137,
+            "as_of": "2026-06-11",
+            "yoy_pct": 4.8,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 99.90799713134766,
+            "as_of": "2026-06-11",
+            "yoy_pct": 1.3,
+            "direction": "up",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 19.940000534057617,
+            "as_of": "2026-06-11",
+            "yoy_pct": 15.5,
+            "direction": "up",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": -0.97,
+            "as_of": "2026-06-11",
+            "yoy_pct": -385.3,
+            "direction": "down",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 14.2,
+            "as_of": "2026-06-11",
+            "yoy_pct": 19.5,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "lens_consensus": {
+    "as_of": "2026-06-11",
+    "shared_inputs_ref": "valuation.json@2026-06-11",
+    "valuation_richness": 0.0,
+    "blended_return_pct": 22.72,
+    "band_pct": [
+      16.3,
+      26.4
+    ],
+    "weighted_median_pct": 24.4,
+    "median_mean_flag": false,
+    "stance": "accumulate",
+    "agreement_pct": 73,
+    "dissent_count": 2,
+    "lawrence_divergence": false,
+    "top_dissents": [
+      {
+        "persona": "greenblatt",
+        "label": "Joel Greenblatt",
+        "verdict": "hold",
+        "return_pct": 18.66,
+        "key_metric": "earnings_yield=11.66",
+        "conviction": 0.183,
+        "falsifier": "FCF yield below universe median OR base IRR below median"
+      },
+      {
+        "persona": "pabrai",
+        "label": "Mohnish Pabrai",
+        "verdict": "hold",
+        "return_pct": 16.3,
+        "key_metric": "downside_upside_ratio=0.54",
+        "conviction": 0.065,
+        "falsifier": "dhando -> none OR net-debt/EBITDA > 3 OR bear return < -15%"
+      }
+    ],
+    "contributor_count": 8,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
+  }
 }
