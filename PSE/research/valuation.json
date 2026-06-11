@@ -1,0 +1,217 @@
+{
+  "ticker": "PSE",
+  "as_of": "2026-06-11",
+  "method": "full",
+  "lawrence_bucket": "multi_sided",
+  "payoff_lens": "operating",
+  "classification_inputs": {
+    "archetype": "croupier",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 211.0,
+    "price_as_of": "2026-06-09",
+    "price_source": "PSE edge stock data (cmpy_id=478) last traded PHP 211.00; Stooq/Yahoo unavailable for PH listing",
+    "fcf_per_share": 14.0,
+    "fcf_source": "FY2025 consolidated OCF PHP 1,429.6M minus capital spending PHP 204.2M, divided by 82.27M outstanding shares; ~6% haircut for PDSHC integration and FVTPL volatility (audited_financials_dec_2025.pdf, annual_report_2025.pdf)",
+    "shares_millions": 82.27,
+    "normalization_note": "FY2025 post-PDSHC consolidation treated as mid-cycle run rate; not peak 2024 pre-consolidation revenue"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.02,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 12,
+      "notes": "Philippine equity turnover slump, lower transaction fees, mark-to-market losses on treasury investments, multiple compression"
+    },
+    "base": {
+      "growth_y1_5": 0.06,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 15,
+      "notes": "Mid-cycle owner cash after PDSHC stack; listing fee amortization, PDTC/PDEx trading toll, regular PHP 10 dividend"
+    },
+    "bull": {
+      "growth_y1_5": 0.09,
+      "growth_y6_10": 0.06,
+      "exit_pfcf_y10": 18,
+      "notes": "Sustained market activity, ASEAN sustainability/data products, limited fee regulation"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Book value per share PHP 67.35 FY2025; investment property and FVTPL marked; no land-at-cost pattern"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Exchange and market infrastructure toll; not resource royalty"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "FY2025 consolidated net income PHP 1.224B on gross revenue PHP 2.843B"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in cash path?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Listing fees deferred over 15-year listed life per PFRS 15; PHP 147.6M received vs PHP 91.7M recognized in 9M2025 (quarterly_report_3q_2025.pdf)"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "Immaterial",
+      "treatment": "n/a",
+      "evidence": "PDSHC now consolidated; remaining 7.94% non-controlling interest immaterial to thesis"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Regular cash dividend PHP 10 per share FY2025; not a dated recovery"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "PDSHC/PDTC/PDEx depository and trading stack embedded in post-2025 revenue base; ASEAN ESG data marketplace in development"
+    },
+    {
+      "q": 0,
+      "question": "Material separate option terminals required?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Lawrence full cash-flow path sufficient after scan"
+    }
+  ],
+  "lawrence_horizon_years": 7,
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "human_review": {
+    "live_price_confirmed": false,
+    "items": [
+      "Confirm PHP spot price via PSE edge or local broker; Stooq/Yahoo do not cover PSE.PH",
+      "Review FY2025 annual report narrative sections when full 77-page extract is tier-upgraded"
+    ]
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 6.1
+    },
+    "base": {
+      "return_pct": 12.7
+    },
+    "bull": {
+      "return_pct": 17.7
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 6.1
+    },
+    "base": {
+      "return_pct": 12.7
+    },
+    "bull": {
+      "return_pct": 17.7
+    }
+  },
+  "implied_return": {
+    "base_pct": 14.09,
+    "label": "7yr IRR (total synthesis)",
+    "display": "14.09% (total synthesis)",
+    "lawrence_stance_gate_pct": 12.7,
+    "falsifier_adjusted_pct": 12.7,
+    "synthesis_pct": 14.09
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": 6.1,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 17.7,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 14.29,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 14.09,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}
