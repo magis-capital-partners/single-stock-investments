@@ -1,0 +1,181 @@
+{
+  "ticker": "ABX",
+  "as_of": "2026-06-11",
+  "method": "full",
+  "valuation_mode": "operating",
+  "valuation_overlay": "segment_cashflow",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "platform",
+    "moat": "unproven",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating",
+    "predictive_attribute": "complexity_discount"
+  },
+  "inputs": {
+    "price": 9.25,
+    "price_source": "Yahoo Finance ABX regular market price 2026-06-11",
+    "price_as_of": "2026-06-11",
+    "fcf_per_share": 0.25,
+    "fcf_source": "FY2025 cash from operations $25.68M minus capital spending $0.93M, divided by 99.23M diluted weighted-average shares (10-K filed 2026-03-13)",
+    "shares_millions": 99.2,
+    "shares_source": "FY2025 diluted weighted-average shares 99,230,950 (10-K)",
+    "book_per_share": 4.22,
+    "book_source": "Stockholders equity $418.54M / 99.23M diluted shares (10-K 2025-12-31)",
+    "dividend_per_share_annual": 0.2,
+    "dividend_source": "Cash dividend declared $0.20 per share November 2025 (S-3 filing 2025-11-25)",
+    "long_term_debt_m": 405.8,
+    "total_assets_m": 902.2,
+    "adjusted_ebitda_m": 132.6,
+    "adjusted_ebitda_source": "FY2025 Adjusted EBITDA $132,553,833 (10-K non-GAAP reconciliation)",
+    "revenue_fy2025_m": 235.2,
+    "revenue_growth_yoy_pct": 110,
+    "normalization_note": "Lawrence base uses GAAP owner cash; life-settlement policy maturities make operating cash lumpy (Q1 2026 OCF $91.7M vs FY2025 $25.7M). Adjusted EBITDA cited in narrative only, not in FCF0."
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 9,
+      "notes": "Mortality assumption miss; funding cost spike; integration drag from Carlisle/FCF deals"
+    },
+    "base": {
+      "growth_y1_5": 0.12,
+      "growth_y6_10": 0.07,
+      "exit_pfcf_y10": 12,
+      "notes": "Life Solutions origination scale + asset-management fee growth; securitization lowers funding cost"
+    },
+    "bull": {
+      "growth_y1_5": 0.18,
+      "growth_y6_10": 0.1,
+      "exit_pfcf_y10": 14,
+      "notes": "Repeatable $50M+ securitizations; Abacus Intel tech fees ramp; dividend maintained"
+    }
+  },
+  "segment_build": {
+    "horizon_years": 7,
+    "segments": [
+      {
+        "id": "life_solutions",
+        "label": "Life Solutions (policy origination and servicing)",
+        "owner_cash_start_m": 21.0,
+        "growth_y1_5": 0.14,
+        "growth_y6_10": 0.08,
+        "exit_multiple": 12,
+        "evidence": "FY2025 segment revenue $200.7M of $235.2M total; operating income consolidated $88.8M (10-K segment note)"
+      },
+      {
+        "id": "asset_management",
+        "label": "Asset Management (FCF Advisors and managed accounts)",
+        "owner_cash_start_m": 3.5,
+        "growth_y1_5": 0.1,
+        "growth_y6_10": 0.06,
+        "exit_multiple": 11,
+        "evidence": "FY2025 segment revenue $33.8M; FCF Advisors acquired Dec 2024 (10-K Business section)"
+      },
+      {
+        "id": "technology_services",
+        "label": "Technology Services (Abacus Intel / mortality verification)",
+        "owner_cash_start_m": 0.2,
+        "growth_y1_5": 0.25,
+        "growth_y6_10": 0.12,
+        "exit_multiple": 10,
+        "evidence": "FY2025 segment revenue $0.7M; launched Q4 2024 (10-K)"
+      }
+    ],
+    "options": [
+      {
+        "id": "policy_portfolio_nav",
+        "label": "Life insurance policy portfolio (balance-sheet investments)",
+        "option_treatment": "nav_floor",
+        "annual_drag_per_share": 0.0,
+        "base_terminal_value_bn": 0,
+        "base_terminal_rationale": "Policy investments carried at fair value on balance sheet; not modeled as separate terminal — embedded in Life Solutions cash path",
+        "evidence": "Available-for-sale life settlement investments ~$500M+ on balance sheet (10-K Note 4); fair-value marks flow through earnings",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "securitization_platform",
+        "label": "Repeatable securitized funding (Oct 2025 $50M note)",
+        "option_treatment": "embedded_in_segment",
+        "evidence": "10-K: October 2025 $50M investment-grade securitized note; lowers cost of capital for Life Solutions growth",
+        "not_in_lawrence_base": false
+      }
+    ]
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "nav_floor",
+      "evidence": "Policy portfolio marked to fair value; equity $418M vs EV ~$1.3B at price (10-K balance sheet)"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Financial assets, not land/minerals"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "All three reportable segments profitable at gross profit level FY2025"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / RPO not in FCF path?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Policy servicing fees and future mortality gains on owned policies not in GAAP OCF starting point"
+    },
+    {
+      "q": 5,
+      "question": "Private stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No material private equity stakes disclosed"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating platform; $0.20 dividend is ongoing policy not recovery trade"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Securitization and tech verification embedded in Life Solutions growth assumption"
+    }
+  ],
+  "growth_explanation": {
+    "base_growth_mechanism": "Roll-up of life-settlement originators (Carlisle 2024, FCF Advisors 2024) plus repeatable securitized funding should lift owner cash faster than FY2025 GAAP OCF implies.",
+    "falsifiers": [
+      "Longevity improvements extend policy lives and compress returns",
+      "Credit spreads widen on ABXL notes or warehouse lines",
+      "Integration costs from acquisitions exceed disclosed $11.8M FY2025 add-backs"
+    ]
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "rationale": "Lawrence GAAP owner-cash IRR below 15% accumulate bar; leverage and mortality risk cap dhando despite revenue momentum"
+  },
+  "estimates": {
+    "marvin_floor": {
+      "per_share": 0.25,
+      "notes": "FY2025 GAAP free cash flow per share only"
+    },
+    "blended_best": {
+      "per_share": 0.25,
+      "weights": "100% Marvin GAAP floor (no approved third party)",
+      "notes": "Filings-only; adjusted EBITDA $1.34/sh not in Lawrence base"
+    }
+  }
+}

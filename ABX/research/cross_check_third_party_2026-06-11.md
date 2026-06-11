@@ -9,9 +9,9 @@
 
 ## Executive summary
 
-No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (10-K, 10-Q, IR). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+No third-party sources are indexed for this ticker as of 2026-06-11. Marvin stance rests on **primary SEC filings** (FY2025 10-K filed 2026-03-13, Q1 2026 10-Q filed 2026-05-11). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
 
-**Synthesis:** Marvin floor only; no external blend.
+**Synthesis:** Marvin floor only; no external blend. Base IRR uses FY2025 GAAP owner cash ($0.25 per share); adjusted EBITDA $132.6M cited as context, not in Lawrence gate.
 
 ## Sources in scope
 
@@ -33,13 +33,13 @@ No third-party sources are indexed for this ticker as of this scan. Marvin stanc
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | — | — | — |
+| Marvin floor | $0.25/sh GAAP FCF start | Low-teens IRR at $9.25 [pending mechanical] | watch |
 | External (combined) | — | — | — |
-| **Blended best estimate** | **—** | **—** | **—** |
+| **Blended best estimate** | **$0.25/sh** | **Same as Marvin** | **watch** |
 
-**Weights:** *[Document why]*
+**Weights:** 100% Marvin filings floor (no approved third party).
 
-**Returns statement (blended):** *[One sentence; pending sources not in base IRR]*
+**Returns statement (blended):** At today's price near $9.25, the filing-based owner-cash path does not clear our 15% accumulate bar; stance **watch** until normalized cash conversion improves or price resets.
 
 ## [HUMAN REVIEW]
 
