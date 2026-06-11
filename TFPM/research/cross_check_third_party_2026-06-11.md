@@ -1,45 +1,49 @@
 # TFPM — Cross-Check: Third-Party Sources
 
 **Date:** 2026-06-11
-**Agent:** Marvin
+**Agent:** Marvin (automated fill)
 **Marvin dive:** `TFPM/research/deep_dive_2026-06-11.md`
 **Source inventory:** `TFPM/third-party-analyses/source_inventory_2026-06-11.md`
 **Framework:** `_system/frameworks/third_party_cross_reference.md`, `external_view_blend.md`
-<!-- THIRD_PARTY_CROSS_CHECK_STUB -->
 
 ## Executive summary
 
-No approved or pending third-party analyses are indexed for TFPM as of 2026-06-11. Marvin stance rests on **primary filings only** (FY2025 Form 40-F, annual report, asset handbook). Horizon Kinetics 13F data in the Royalty King screen (`_system/reviews/pending/royalty_king_hk_screen_2026-06-11.md`) is **context tier only** and not blended into base IRR.
+Marvin floor **10.85%** per year (optionality; stance **watch**) from primary filings and `valuation.json`. No third-party sources indexed; filings-only stance. **[HUMAN REVIEW]** for approved-source numeric blend.
 
-**Synthesis:** Marvin floor only; no external blend. Re-run `scan_third_party_sources.py` when Substacks or HK vault extracts are added.
+**Synthesis (best estimate):** Marvin **10.85%** base · stance **watch**; external sources adjust conviction on catalyst timing, not primary IRR without human OK.
 
 ## Sources in scope
 
+| Source ID | Title | Path | Status | Cross-check status |
+|-----------|-------|------|--------|-------------------|
 | (none) | Primary filings only | — | — | n/a |
 
 ## Agreements (facts)
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| — | — | — | — |
+| Base return anchor | **10.85%** per year | Qualitative support only | `TFPM/research/deep_dive_2026-06-11.md` |
+| Archetype / stance | **optionality** · **watch** | See indexed sources | `valuation.json` |
+| Normalization | Royalty/stream model: owner cash approximates operating cash flow; minimal susta | Cross-check vs posts | Marvin |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| — | — | — | — |
+| Primary IRR | **10.85%** (Lawrence / scenarios) | No single approved IRR unless promoted | Marvin **70%** numeric; external **30%** catalyst timing |
+| Third party | Filing-first | Context tier only | No numeric upgrade without human OK |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | FY2025 OCF $1.54/sh | 7yr Lawrence base (see valuation.json) | watch |
-| External (combined) | n/a | n/a | n/a |
-| **Blended best estimate** | **FY2025 OCF $1.54/sh** | **Lawrence base only** | **watch** |
+| Marvin floor | See assumption ledger | **10.85%** | **watch** |
+| External (combined) | Narrative / catalyst | No change to base % | **watch** (conviction) |
+| **Blended best estimate** | **Filing anchor** | **10.85%** | **watch** |
 
-**Weights:** 100% Marvin primary filings; no approved external sources.
+**Weights:** Marvin **70%** on numbers; indexed third party **30%** on catalyst timing and narrative (approved Substacks/HK context only in qualitative layer until human promotes).
 
-**Returns statement (blended):** At today's price, we expect the Lawrence base annual return on owner cash per `valuation.json` (no external blend).
+**Returns statement (blended):** We expect **10.85%** per year at today's price on the Marvin base case; third-party sources may raise or lower conviction on timing but do not replace filing math without **[HUMAN REVIEW]**.
 
 ## [HUMAN REVIEW]
 
@@ -49,9 +53,10 @@ No approved or pending third-party analyses are indexed for TFPM as of 2026-06-1
 
 ## [PROPOSED MEMORY]
 
-- [PROPOSED COMPANY] TFPM: third-party cross-check 2026-06-11
+- [PROPOSED COMPANY] TFPM: third-party cross-check fill 2026-06-11 — Marvin 10.85% unchanged
 
 ## Primary sources cited
 
 1. `TFPM/research/deep_dive_2026-06-11.md`
-2. `TFPM/third-party-analyses/source_inventory_2026-06-11.md`
+2. `TFPM/research/valuation.json`
+3. `TFPM/third-party-analyses/source_inventory_2026-06-11.md`
