@@ -44,7 +44,7 @@ ONBOARD_ARCHETYPE: dict[str, dict] = {
     "PSK.TO": {"archetype": "optionality", "payoff_lens": "asset", "lawrence_bucket": "other"},
     # Royalty King + HK screen batch 2026-06-11
     "0388.HK": {"archetype": "croupier", "payoff_lens": "operating", "lawrence_bucket": "multi_sided"},
-    "ABX": {"archetype": "croupier", "payoff_lens": "operating", "lawrence_bucket": "multi_sided"},
+    "ABX": {"archetype": "platform", "payoff_lens": "operating", "lawrence_bucket": "other"},
     "ASX.AX": {"archetype": "croupier", "payoff_lens": "operating", "lawrence_bucket": "multi_sided"},
     "B3SA3.SA": {"archetype": "croupier", "payoff_lens": "operating", "lawrence_bucket": "multi_sided"},
     "BMYS.KL": {"archetype": "croupier", "payoff_lens": "operating", "lawrence_bucket": "multi_sided"},
