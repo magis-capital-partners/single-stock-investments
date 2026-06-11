@@ -1,0 +1,60 @@
+{
+  "ticker": "DB1.DE",
+  "as_of": "2026-06-11",
+  "method": "full",
+  "lawrence_bucket": "multi_sided",
+  "currency": "EUR",
+  "classification_inputs": {
+    "archetype": "croupier",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 246.4,
+    "price_source": "Yahoo Finance DB1.DE ~€246.40 (2026-06-11)",
+    "fcf_per_share": 12.52,
+    "fcf_source": "FY2025 cash from operations ex CCP €2,672M minus capex (intangibles €325M + PP&E €55M) ÷ 183.1M shares",
+    "shares_millions": 183.1,
+    "normalization_note": "FY2025 mid-cycle base; Q1 2026 net revenue ex treasury +12% run-rate above trend (not inflated into starting cash flow); treasury result declining with rates"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.04,
+      "growth_y6_10": 0.03,
+      "exit_pfcf_y10": 18,
+      "notes": "Trading volume mean-reversion, treasury headwind, Allfunds integration delay"
+    },
+    "base": {
+      "growth_y1_5": 0.07,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 22,
+      "notes": "8% organic revenue CAGR guide to 2028; ~20× spot P/FCF → 22× exit"
+    },
+    "bull": {
+      "growth_y1_5": 0.09,
+      "growth_y6_10": 0.06,
+      "exit_pfcf_y10": 26,
+      "notes": "Sustained volatility + digital assets + Allfunds synergy"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 0,
+      "question": "Material options after scan?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Allfunds acquisition and digital-asset rails are strategic but not separately sized in Lawrence base; FY2025 owner cash path sufficient for stance gate"
+    }
+  ],
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  }
+}
