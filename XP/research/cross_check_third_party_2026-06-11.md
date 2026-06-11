@@ -9,9 +9,9 @@
 
 ## Executive summary
 
-No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (10-K, 10-Q, IR). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+No third-party sources are indexed for XP as of 2026-06-11. Marvin stance rests on **primary filings only** (FY2025 20-F and prior 20-Fs). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
 
-**Synthesis:** Marvin floor only; no external blend.
+**Synthesis (best estimate):** Marvin floor only. FY2025 20-F supports platform thesis: client assets **R$1,491B**, adjusted net income **R$5,218M** (+15%), **4.7M** active clients. At ~**$15.24** ADR, Lawrence base case ~**24.5%** per year on ~**$1.78** adjusted owner cash per share → stance **accumulate** pending human governance review. No external blend.
 
 ## Sources in scope
 
@@ -33,13 +33,13 @@ No third-party sources are indexed for this ticker as of this scan. Marvin stanc
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | — | — | — |
+| Marvin floor | ~$1.78 adj owner cash/sh FY2025 | ~24.5% / 7yr base | accumulate |
 | External (combined) | — | — | — |
-| **Blended best estimate** | **—** | **—** | **—** |
+| **Blended best estimate** | **~$1.78/sh** | **~24.5%** | **accumulate** |
 
-**Weights:** *[Document why]*
+**Weights:** 100% Marvin (no approved external sources).
 
-**Returns statement (blended):** *[One sentence; pending sources not in base IRR]*
+**Returns statement (blended):** At today's price, we expect about **24.5%** per year over seven years on filing-based adjusted owner cash; no third-party views in base IRR.
 
 ## [HUMAN REVIEW]
 
