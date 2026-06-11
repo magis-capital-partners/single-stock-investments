@@ -7,26 +7,29 @@
 | Field | Value |
 |-------|-------|
 | **Archetype** (Stahl) | croupier |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Moat** (Munger) | stable |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **Implied 7yr IRR** (base) | — |
-| **IRR method** | — |
+| **Cycle** | mid |
+| **Implied 7yr IRR** (base) | -2.39% (total synthesis) |
+| **IRR method** | full |
 | **Lawrence bucket** | multi_sided |
 | **Payoff lens** | operating |
 | **MOI bucket** | pending |
 
+**Deep dive:** `S68.SI/research/deep_dive_2026-06-11.md` (auto-sync)
+
 ## One-line thesis
 
-Singapore Exchange Limited — thesis pending Marvin deep dive.
+Asia multi-asset exchange croupier with stable moat; **watch** at **S$22.25** — synthesis **-2.39%** per year vs normalized owner cash **S$0.52**.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest annual report (IR extract on disk; PDF pending Vicki)
+- [ ] Read H1 FY2026 interim when available
+- [x] Apply Stahl croupier + Lawrence multi-sided lenses
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-06-11; awaiting deep dive.
+- FY2025 annual PDF and investor deck blocked from cloud; Vicki harvest per `research/shopbot/sgx_ir_harvest_brief_2026-06-11.md`.
+- Entry band **S$14–15** for low-teens return is illustrative pending human confirmation.
