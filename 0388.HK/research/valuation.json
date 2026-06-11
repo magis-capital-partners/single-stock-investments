@@ -1,0 +1,64 @@
+{
+  "ticker": "0388.HK",
+  "as_of": "2026-06-11",
+  "method": "full",
+  "lawrence_bucket": "multi_sided",
+  "classification_inputs": {
+    "archetype": "croupier",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "peak",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 383.0,
+    "price_source": "Yahoo Finance close 2026-06-10 HKD (confirm live)",
+    "fcf_per_share": 11.0,
+    "fcf_source": "FY2025 basic EPS HK$14.05 normalized down for peak turnover / margin-fund pass-through (below spot EPS)",
+    "shares_millions": 1264,
+    "normalization_note": "Peak activity FY2024–FY2025; base owner cash below reported EPS HK$14.05"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.0,
+      "growth_y6_10": 0.0,
+      "exit_pfcf_y10": 14,
+      "notes": "Volume mean-reversion; margin-fund income normalizes"
+    },
+    "base": {
+      "growth_y1_5": 0.05,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 19,
+      "notes": "Mid-cycle volume + Connect / data monetization"
+    },
+    "bull": {
+      "growth_y1_5": 0.07,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 22,
+      "notes": "Sustained China / derivatives activity + LME fee stack"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 0,
+      "question": "Material options after scan?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Connect schemes, LME, and unlisted stakes are embedded in consolidated croupier cash flows; no separate terminal option row"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "Trading and clearing fees scale with cash-equity average daily turnover and derivatives activity; Connect programs add structural volume; margin-fund investment income is partly rate-sensitive.",
+    "base_growth_source": "HKEX FY2024 annual report and Q1 2026 results (IR); normalized below peak EPS",
+    "falsifiers": [
+      "Sustained collapse in headline ADT below HK$100B for four quarters",
+      "Regulatory fee caps on core trading or clearing tariffs"
+    ]
+  },
+  "evidence_refresh": {
+    "synthesis_in_dive": true
+  },
+  "estimates": {
+    "external": []
+  }
+}
