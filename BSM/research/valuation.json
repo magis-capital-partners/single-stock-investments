@@ -1,0 +1,199 @@
+{
+  "ticker": "BSM",
+  "as_of": "2026-06-11",
+  "method": "full",
+  "lawrence_bucket": "other",
+  "valuation_mode": "optionality",
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "narrow",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "asset",
+    "predictive_attribute": "market_structure_discount_k1_mlp"
+  },
+  "inputs": {
+    "price": 13.88,
+    "price_source": "Yahoo BSM close 2026-06-11",
+    "fcf_per_share": 1.35,
+    "fcf_source": "FY2025 common distributions $285.654M / 211.667M weighted avg units (10-K cash flow stmt)",
+    "units_outstanding_m": 212.334,
+    "book_per_share": 6.29,
+    "book_source": "FY2025 total assets $1,335.554M / 212.334M units (GAAP; minerals at depletion cost, not fair-value floor)",
+    "normalization_note": "Lawrence uses cash distributions to common unitholders, not GAAP net income ($1.28/unit FY2025).",
+    "price_as_of": "2026-06-11"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": -0.02,
+      "growth_y6_10": -0.03,
+      "exit_pfcf_y10": 8,
+      "notes": "Oil/gas price trough; distributions fall; working-interest capex drains cash"
+    },
+    "base": {
+      "growth_y1_5": 0.0,
+      "growth_y6_10": 0.0,
+      "exit_pfcf_y10": 10,
+      "notes": "Flat distributions near FY2025 run-rate; lease bonus variable"
+    },
+    "bull": {
+      "growth_y1_5": 0.02,
+      "growth_y6_10": 0.01,
+      "exit_pfcf_y10": 12,
+      "notes": "Gas-heavy revenue mix holds; lease bonus and working-interest participation add growth"
+    }
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true,
+      "floor_pass": false,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": null
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Yes",
+      "treatment": "nav_floor",
+      "evidence": "Minerals at depletion cost; $6.29/unit GAAP assets vs ~$13.88 price (10-K FY2025)"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / acreage / dormant royalty?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "17,691,566 net undeveloped mineral/royalty acres (10-K Acreage table)"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Working-interest LOE and $18.6M FY2025 exploration expense (10-K)"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option already in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Producing royalty cash in run-rate; undeveloped acres excluded from Lawrence base"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "Base case assumes flat distributions near FY2025 $1.35/unit; gas revenue offset partially stabilizes cash versus oil volume decline.",
+    "bear_trigger": "Q1 2026 run-rate ($0.30/quarter) persists four quarters with no lease bonus recovery.",
+    "bull_trigger": "Lease bonus above $25M/year plus gas realizations hold above $3.25/Mcf with flat unit count.",
+    "status": "partial"
+  },
+  "nav_overlay": {
+    "status": "context",
+    "undeveloped_mineral_acres": 17691566,
+    "developed_mineral_acres": 2635046,
+    "note": "17.7M net undeveloped mineral/royalty acres not separately fair-valued on GAAP balance sheet; overlay context only in base Lawrence path",
+    "option_treatment": "probability_weighted",
+    "base_terminal_rationale": "Undeveloped acreage conversion uncertain; Lawrence base uses distributions only"
+  },
+  "optionality_gate": {
+    "primary_metric": "lawrence_base",
+    "primary_label": "7yr IRR",
+    "secondary_metric": "distribution_yield",
+    "secondary_label": "Distribution yield vs undeveloped acreage option",
+    "primary_return_pct": 9.4
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 4.8
+    },
+    "base": {
+      "return_pct": 9.4
+    },
+    "bull": {
+      "return_pct": 13.4
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 4.8
+    },
+    "base": {
+      "return_pct": 9.4
+    },
+    "bull": {
+      "return_pct": 13.4
+    }
+  },
+  "implied_return": {
+    "base_pct": 10.87,
+    "label": "7yr IRR (total synthesis)",
+    "display": "10.87% (total synthesis)",
+    "lawrence_stance_gate_pct": 9.4,
+    "falsifier_adjusted_pct": 9.4,
+    "synthesis_pct": 10.87
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": 4.8,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 13.4,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 10.87,
+    "qualitative_pp": 0,
+    "total_synthesis_pct": 10.87,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}
