@@ -7,19 +7,21 @@
 | Field | Value |
 |-------|-------|
 | **Archetype** (Stahl) | optionality |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Moat** (Munger) | narrow |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **Implied 7yr IRR** (base) | — |
-| **IRR method** | — |
+| **Cycle** | trough |
+| **Implied 7yr IRR** (base) | -9.91% (total synthesis) |
+| **IRR method** | full |
 | **Lawrence bucket** | other |
 | **Payoff lens** | asset |
 | **MOI bucket** | pending |
 
+**Deep dive:** `NRP/research/deep_dive_2026-06-11.md` (auto-sync)
+
 ## One-line thesis
 
-Natural Resource Partners LP — thesis pending Marvin deep dive.
+Passive U.S. mineral royalty MLP at **~$107**/unit: **$3.00**/yr recurring distributions on a **~13M-acre** footprint plus a Sisecam soda ash option; Lawrence base **-9.9%**/yr → **watch** until yield or cycle improves.
 
 ## Key questions
 
@@ -29,4 +31,5 @@ Natural Resource Partners LP — thesis pending Marvin deep dive.
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-06-11; awaiting deep dive.
+- Confirm recurring vs special distribution in base case
+- GP alignment and Sisecam recovery timeline

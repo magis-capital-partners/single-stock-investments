@@ -14,15 +14,18 @@
     "predictive_attribute": "market_structure_discount"
   },
   "inputs": {
-    "price": 95.0,
-    "price_source": "Placeholder pre-fetch; marvin_cloud_refresh updates Stooq",
+    "price": 106.995,
+    "price_source": "Yahoo NRP close 2026-06-11",
     "fcf_per_share": 3.0,
-    "fcf_source": "Recurring quarterly distribution $0.75/unit × 4 (FY2025 run rate; excludes March 2025 $1.21 special tax distribution) — 10-K_20260227",
+    "fcf_source": "Recurring quarterly distribution $0.75/unit \u00d7 4 (FY2025 run rate; excludes March 2025 $1.21 special tax distribution) \u2014 10-K_20260227",
     "units_outstanding_m": 13.25,
     "book_per_share": 47.7,
     "book_source": "Partners capital $632.5M / 13.25M units at 3/31/2026 (approx.; not fair-value floor)",
-    "normalization_note": "Lawrence uses declared common-unit distributions, not GAAP net income. Soda Ash equity distributions collapsed in 2025–Q1 2026; base uses recurring $0.75/qtr only.",
-    "price_as_of": "2026-06-11"
+    "normalization_note": "Lawrence uses declared common-unit distributions, not GAAP net income. Soda Ash equity distributions collapsed in 2025\u2013Q1 2026; base uses recurring $0.75/qtr only.",
+    "price_as_of": "2026-06-11",
+    "copper_spot_usd_per_lb": 4.0,
+    "lease_income_annual_usd": 0.0,
+    "copperwood_royalty_est_usd_at_spot": 0.0
   },
   "scenarios": {
     "bear": {
@@ -35,13 +38,61 @@
       "growth_y1_5": 0.0,
       "growth_y6_10": 0.0,
       "exit_pfcf_y10": 11,
-      "notes": "Flat $3.00/unit recurring distributions; debt service on ~$60M revolver; soda ash option not in base cash"
+      "notes": "Flat $3.00/unit recurring distributions; debt service on ~$60M revolver; soda ash option not in base cash",
+      "payoff": 30.0,
+      "years": 7,
+      "sotp_build": {
+        "shares": 1,
+        "book_per_share": 47.7,
+        "lines": [
+          {
+            "id": "book",
+            "label": "GAAP book / price anchor",
+            "gaap_per_share": 47.7,
+            "uplift_per_share": 0.0,
+            "math": "Anchor $47.7/sh"
+          },
+          {
+            "id": "lease_cap",
+            "label": "Mineral lease run-rate capitalized",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 0.0,
+            "math": "~$0K/yr x 10.0x / shares"
+          },
+          {
+            "id": "production_partial",
+            "label": "Production option (partially in price)",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 0.0,
+            "math": "P=35% x spot royalty $0.0M/yr"
+          },
+          {
+            "id": "acreage",
+            "label": "Acreage + secondary lessee",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 0.0,
+            "math": "Filing + option [Assumption]"
+          },
+          {
+            "id": "residual",
+            "label": "Residual to Lawrence base payoff",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": -17.7,
+            "math": "Tie to $30.0 path"
+          }
+        ],
+        "year5_economic_nav_per_share": 30.0,
+        "sum_check": "lines sum to 30.0",
+        "years": 7,
+        "notes": "Lawrence base with partial production option"
+      }
     },
     "bull": {
       "growth_y1_5": 0.03,
       "growth_y6_10": 0.02,
       "exit_pfcf_y10": 13,
-      "notes": "Met coal stabilizes; Sisecam distributions resume; carbon/renewable lease option adds incremental royalty"
+      "notes": "Production at spot $4.0",
+      "payoff": 126.2541
     }
   },
   "stance_proposal": {
@@ -94,36 +145,53 @@
   ],
   "optionality_gate": {
     "framework": "mineral_floor_option",
-    "floor_pass": true,
-    "floor_metric": "distribution_yield",
-    "floor_value": 3.2,
+    "floor_pass": false,
+    "floor_metric": "nav_per_share",
+    "floor_value": 47.7,
     "primary_metric": "lawrence_base",
     "primary_label": "7yr IRR",
-    "primary_return_pct": null,
-    "notes": "Recurring yield ~3% at ~$95; asset floor from mineral book + Sisecam stake; Lawrence base below 15% bar — size for optionality not core"
+    "primary_return_pct": -10.7,
+    "notes": "Economic floor ~$47.7/sh (not GAAP book); spot copper $4.0/unit; option yield ~0.0%",
+    "overlay_nav_per_share": 47.7,
+    "copperwood_option_yield_pct": 0.0,
+    "overlay_implied_return_pct": -9.87
   },
   "nav_overlay": {
-    "framework": "mineral_floor_option",
+    "status": "complete",
+    "as_of": "2026-06-11",
+    "gaap_vs_fair_value": {},
     "gaap_book_per_share": 47.7,
-    "fair_nav_note": "Mineral rights carried at cost/depletion; 13M-acre portfolio not fully marked. Do not use GAAP book alone as dhando floor.",
-    "options": [
+    "economic_floor_per_share": 47.7,
+    "overlay_nav_per_share": 47.7,
+    "method": "probability_weighted",
+    "lines": [
       {
-        "id": "undeveloped_mineral_acreage",
-        "label": "Undeveloped / carbon / renewable mineral leases",
-        "option_treatment": "zero",
-        "base_terminal_value_per_share": 0,
-        "base_terminal_rationale": "No filing fair-value mark for undeveloped 13M-acre option; explicit zero in Lawrence base after scan",
-        "evidence": "10-K_20260227 Business — carbon sequestration and renewable energy lease option cited; not in run-rate distributions"
+        "id": "gaap_book",
+        "label": "GAAP equity per share",
+        "per_share": 47.7,
+        "source": "filing"
       },
       {
-        "id": "sisecam_wyoming_recovery",
-        "label": "Sisecam Wyoming distribution recovery",
-        "option_treatment": "probability_weighted",
-        "base_terminal_value_per_share": 0,
-        "base_terminal_rationale": "Q1 2026 zero distribution; $39.2M contribution — recovery timing uncertain; zero in base Lawrence FCF",
-        "evidence": "10-Q_20260506 MD&A Soda Ash segment"
+        "id": "lease_cap",
+        "label": "Lease run-rate capitalized",
+        "per_share": 0.0,
+        "source": "[Assumption] 10.0x on ~$0K/yr"
+      },
+      {
+        "id": "production_pw",
+        "label": "Production royalty P=35% @ spot",
+        "per_share": 0.0,
+        "source": "Scaled to spot $4.0"
+      },
+      {
+        "id": "acreage",
+        "label": "Acreage / secondary option",
+        "per_share": 0.0,
+        "source": "filing"
       }
-    ]
+    ],
+    "premium_to_economic_floor_pct": 124.3,
+    "notes": "Do not use GAAP book as dhando floor"
   },
   "segment_build": {
     "segments": [
@@ -154,15 +222,30 @@
         "annual_drag_per_share": 0.0,
         "base_terminal_value_per_share": 0,
         "base_terminal_rationale": "Not in Lawrence base until distributions resume in filings",
-        "evidence": "10-Q_20260506 — no Q1 2026 distribution from Sisecam"
+        "evidence": "10-Q_20260506 \u2014 no Q1 2026 distribution from Sisecam"
       }
-    ]
+    ],
+    "horizon_years": 7
   },
   "growth_explanation": {
     "mechanism": "Base assumes flat $0.75 quarterly distribution. Upside requires met coal price/volume stabilization on Appalachian/Illinois/Powder River leases or resumed Sisecam Wyoming distributions.",
     "bear_trigger": "Quarterly distribution cut below $0.60/unit for two consecutive quarters while coal revenues decline further.",
     "bull_trigger": "Sisecam distributions resume above $15M annual run-rate to NRP plus stable $0.75/qtr on coal royalties.",
-    "status": "partial"
+    "status": "partial",
+    "lawrence_legacy": {
+      "y1_5": 0.0,
+      "y6_10": 0.0,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.0,
+      "y6_10": 0.0,
+      "exit_pfcf_y10": 11.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": -0.1841,
+      "as_of_filing_facts": "evidence/_text/10-K_20260227_rpt20251231_acc0001437749_26_006147.htm.txt"
+    }
   },
   "evidence_refresh": {
     "type": "commodity_nav",
@@ -172,19 +255,359 @@
     "status": "complete",
     "paths": [
       {
-        "id": "lawrence_base",
-        "label": "Lawrence base (recurring distributions)",
-        "source": "scenarios.base",
-        "return_pct": null,
-        "weight": 1.0,
+        "id": "theory_implied",
+        "label": "Segment-derived growth (pre-falsifier)",
+        "source": "segment_build weighted blend",
+        "return_pct": -10.7,
+        "weight": 0.08,
         "type": "numeric",
-        "epistemic_tier": "A (filings)",
-        "weight_why": "No approved third-party sources; recurring distribution path only."
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": -14.6,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": -6.6,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      },
+      {
+        "id": "nav_overlay_payoff",
+        "label": "NAV overlay dated payoff (7yr to overlay base)",
+        "source": "nav_overlay ~$47.7/sh vs price $106.995",
+        "return_pct": -10.9,
+        "weight": 0.1,
+        "type": "numeric",
+        "epistemic_tier": "D (alternate theory: dated asset payoff)",
+        "weight_why": "Answers a different question (NAV convergence) than 7yr cash-flow IRR; capped weight to avoid theory conflation.",
+        "weight_falsifiers": [
+          "NAV overlay base not updated when segment build or filings change >10%",
+          "floor_pass false but weight above 15% without [HUMAN REVIEW]"
+        ],
+        "hard_to_vary": "yes: separate theory type"
       }
     ],
-    "numeric_weighted_pct": null,
-    "total_synthesis_pct": null,
-    "human_approval": "pending"
+    "qualitative_adjustments": [],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": -9.91,
+    "qualitative_pp": 0,
+    "total_synthesis_pct": -9.91,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [
+        "NAV overlay is a different theory (asset payoff vs cash-flow IRR); weight capped at 10% to limit theory conflation."
+      ],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
   },
-  "lawrence_horizon_years": 7
+  "lawrence_horizon_years": 7,
+  "market_inputs": {},
+  "market_inputs_as_of": "2026-06-11",
+  "human_review": {
+    "live_price_confirmed": false
+  },
+  "total_return_panel": {
+    "as_of": "2026-06-11",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 0,
+    "distribution_history_sum": 0,
+    "market_cap_m": null,
+    "total_return_annualized_pct": 0.42,
+    "chart": "NRP/research/charts/total_return_2026-06-11.svg",
+    "panel_json": "NRP/research/total_return_panel.json"
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -14.6
+    },
+    "base": {
+      "return_pct": -10.7
+    },
+    "bull": {
+      "return_pct": -6.6
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -25.21
+    },
+    "base": {
+      "return_pct": -16.61
+    },
+    "bull": {
+      "return_pct": 2.39
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": -10.7
+    },
+    "falsifier_adjusted": {
+      "return_pct": -10.7
+    }
+  },
+  "implied_return": {
+    "base_pct": -9.91,
+    "label": "7yr IRR (total synthesis)",
+    "display": "-9.91% (total synthesis)",
+    "lawrence_stance_gate_pct": -16.61,
+    "falsifier_adjusted_pct": -16.61,
+    "synthesis_pct": -9.91
+  },
+  "overlay_results": [],
+  "context_overlay": {
+    "as_of": "2026-06-11",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": -0.18,
+            "as_of": "2026-06-11",
+            "yoy_pct": 81.1,
+            "direction": "up",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.529999732971191,
+            "as_of": "2026-06-11",
+            "yoy_pct": 2.7,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.26200008392334,
+            "as_of": "2026-06-11",
+            "yoy_pct": 6.3,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 100.30500030517578,
+            "as_of": "2026-06-11",
+            "yoy_pct": 1.7,
+            "direction": "up",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 21.510000228881836,
+            "as_of": "2026-06-11",
+            "yoy_pct": 24.6,
+            "direction": "up",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": -0.73,
+            "as_of": "2026-06-11",
+            "yoy_pct": -314.7,
+            "direction": "down",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 13.81,
+            "as_of": "2026-06-11",
+            "yoy_pct": 16.2,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "insider_signal": {
+    "as_of": "2026-06-11",
+    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
+    "in_base_irr": false,
+    "window_days": 365,
+    "ics": 1.1,
+    "band": "negligible",
+    "bull_case_support": "none",
+    "scenario_confidence": {
+      "priors": {
+        "bear": 0.2,
+        "base": 0.55,
+        "bull": 0.25
+      },
+      "tilted": {
+        "bear": 0.258,
+        "base": 0.492,
+        "bull": 0.25
+      },
+      "bull_delta": 0.0,
+      "bear_delta": 0.058,
+      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
+    },
+    "factors": {
+      "buy_score": 1.483,
+      "sell_score": -0.523,
+      "cluster_bonus": 0.0,
+      "net_buy_usd": 34332.48,
+      "net_sell_usd": 8887289.06,
+      "price_today": 106.995
+    },
+    "top_buys": [
+      {
+        "insider": "Craig Kevin J",
+        "date": "2026-05-26",
+        "shares": 336,
+        "price": 102.18,
+        "value_usd": 34332.48,
+        "shares_owned_after": 47019,
+        "contrib": 1.483
+      }
+    ],
+    "top_sells": [
+      {
+        "insider": "ROBERTSON CORBIN J JR",
+        "date": "2026-02-10",
+        "shares": 28666,
+        "price": 123.04,
+        "value_usd": 3527064.64,
+        "is_10b5_1": false,
+        "contrib": -0.129
+      },
+      {
+        "insider": "ROBERTSON CORBIN J JR",
+        "date": "2025-12-31",
+        "shares": 794,
+        "price": 0.0,
+        "value_usd": 0.0,
+        "is_10b5_1": false,
+        "contrib": -0.129
+      },
+      {
+        "insider": "Zolas Christopher",
+        "date": "2026-02-10",
+        "shares": 6879,
+        "price": 123.04,
+        "value_usd": 846392.16,
+        "is_10b5_1": false,
+        "contrib": -0.096
+      },
+      {
+        "insider": "WOOTEN GREGORY F",
+        "date": "2026-02-10",
+        "shares": 4923,
+        "price": 123.04,
+        "value_usd": 605725.92,
+        "is_10b5_1": false,
+        "contrib": -0.034
+      },
+      {
+        "insider": "WARMAN PHILIP T",
+        "date": "2026-02-10",
+        "shares": 4249,
+        "price": 123.04,
+        "value_usd": 522796.96,
+        "is_10b5_1": false,
+        "contrib": -0.034
+      }
+    ],
+    "narrative_hooks": [],
+    "transaction_count": 21
+  },
+  "overlay_options": {
+    "lawrence_base": "lease_income_only_zero_production_royalty",
+    "overlay_base_payoff_7yr": 51.7,
+    "overlay_implied_return_pct": -9.87
+  },
+  "lens_consensus": {
+    "as_of": "2026-06-11",
+    "shared_inputs_ref": "valuation.json@2026-06-11",
+    "valuation_richness": 0.65,
+    "blended_return_pct": -16.83,
+    "band_pct": [
+      -25.21,
+      -9.91
+    ],
+    "weighted_median_pct": -16.61,
+    "median_mean_flag": false,
+    "stance": "pass",
+    "agreement_pct": 100,
+    "dissent_count": 0,
+    "lawrence_divergence": false,
+    "top_dissents": [],
+    "contributor_count": 5,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
+  }
 }
