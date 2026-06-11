@@ -1,0 +1,171 @@
+{
+  "ticker": "DB1.DE",
+  "as_of": "2026-06-11",
+  "method": "full",
+  "lawrence_bucket": "multi_sided",
+  "currency": "EUR",
+  "classification_inputs": {
+    "archetype": "croupier",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 246.4,
+    "price_source": "Yahoo Finance DB1.DE ~\u20ac246.40 (2026-06-11)",
+    "fcf_per_share": 12.52,
+    "fcf_source": "FY2025 cash from operations ex CCP \u20ac2,672M minus capex (intangibles \u20ac325M + PP&E \u20ac55M) \u00f7 183.1M shares",
+    "shares_millions": 183.1,
+    "normalization_note": "FY2025 mid-cycle base; Q1 2026 net revenue ex treasury +12% run-rate above trend (not inflated into starting cash flow); treasury result declining with rates"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.04,
+      "growth_y6_10": 0.03,
+      "exit_pfcf_y10": 18,
+      "notes": "Trading volume mean-reversion, treasury headwind, Allfunds integration delay"
+    },
+    "base": {
+      "growth_y1_5": 0.07,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 22,
+      "notes": "8% organic revenue CAGR guide to 2028; ~20\u00d7 spot P/FCF \u2192 22\u00d7 exit"
+    },
+    "bull": {
+      "growth_y1_5": 0.09,
+      "growth_y6_10": 0.06,
+      "exit_pfcf_y10": 26,
+      "notes": "Sustained volatility + digital assets + Allfunds synergy"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 0,
+      "question": "Material options after scan?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Allfunds acquisition and digital-asset rails are strategic but not separately sized in Lawrence base; FY2025 owner cash path sufficient for stance gate"
+    }
+  ],
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "total_return_panel": {
+    "as_of": "2026-06-11",
+    "status": "insufficient_price_history",
+    "error": "yahoo_error:HTTP Error 404: Not Found",
+    "cumulative_distributions_per_share": 0,
+    "distribution_history_sum": 0,
+    "market_cap_m": null,
+    "total_return_annualized_pct": null,
+    "chart": "DB1.DE/research/charts/total_return_2026-06-11.svg",
+    "panel_json": "DB1.DE/research/total_return_panel.json"
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 7.9
+    },
+    "base": {
+      "return_pct": 13.4
+    },
+    "bull": {
+      "return_pct": 17.5
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 7.9
+    },
+    "base": {
+      "return_pct": 13.4
+    },
+    "bull": {
+      "return_pct": 17.5
+    }
+  },
+  "implied_return": {
+    "base_pct": 14.48,
+    "label": "7yr IRR (total synthesis)",
+    "display": "14.48% (total synthesis)",
+    "lawrence_stance_gate_pct": 13.4,
+    "falsifier_adjusted_pct": 13.4,
+    "synthesis_pct": 14.48
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": 7.9,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 17.5,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 14.68,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 14.48,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}
