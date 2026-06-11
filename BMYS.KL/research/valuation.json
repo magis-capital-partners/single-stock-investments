@@ -1,0 +1,111 @@
+{
+  "ticker": "BMYS.KL",
+  "as_of": "2026-06-11",
+  "method": "full",
+  "lawrence_bucket": "multi_sided",
+  "classification_inputs": {
+    "archetype": "croupier",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "peak",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 8.55,
+    "price_source": "KLSE screener indicative 2026-06-11; confirm via fetch_equity_prices.py",
+    "currency": "MYR",
+    "fcf_per_share": 0.40,
+    "fcf_source": "FY2024 cash from operations RM436.6m minus capital spending RM36.3m, divided by 809.3m shares; haircut from peak activity",
+    "shares_millions": 809.299,
+    "normalization_note": "FY2024 operating revenue +27.8% YoY and Q1 2025 profit -8.8% YoY; base owner cash below spot EPS 38.3 sen"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.0,
+      "growth_y6_10": 0.0,
+      "exit_pfcf_y10": 14,
+      "notes": "Malaysia ADV mean-reversion; securities trading revenue -12% in Q1 2025"
+    },
+    "base": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.025,
+      "exit_pfcf_y10": 18,
+      "notes": "Data and derivatives mix offset cyclical cash equities; mid-cycle normalization"
+    },
+    "bull": {
+      "growth_y1_5": 0.05,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 22,
+      "notes": "Sustained IPO pipeline and BCX carbon credits scale"
+    }
+  },
+  "distributions": {
+    "fy2024_dps_sen": 40,
+    "fy2024_dps_note": "Interim 14 sen + final 18 sen + special 8 sen per FY2024 condensed report",
+    "currency": "MYR"
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Exchange operator; no land/NAV misstatement pattern"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating croupier"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "All segments profitable in FY2024"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / RPO not in FCF path?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Trading fees recognized with activity"
+    },
+    {
+      "q": 5,
+      "question": "Private stakes below fair value?",
+      "answer": "Minor",
+      "treatment": "embedded_in_segment",
+      "evidence": "Investment securities RM70.7m at 31 Mar 2025; immaterial vs market cap"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Regular dividend payer"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "BCX carbon credits and MyBURSA digital platform in Securities/Data growth [Assumption]"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "Derivatives and data revenue grow with product diversification; securities fees revert toward mid-cycle ADV",
+    "source": "FY2024 segment commentary; Q1 2025 operating revenue -1.7% YoY"
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  }
+}
