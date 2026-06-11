@@ -13,10 +13,10 @@
     "predictive_attribute": "market_structure_discount"
   },
   "inputs": {
-    "price": 13.5,
-    "price_source": "Placeholder pre-fetch; marvin_cloud_refresh updates Stooq",
+    "price": 15.52,
+    "price_source": "Yahoo KRP close 2026-06-11",
     "fcf_per_share": 1.6,
-    "fcf_source": "FY2025 common-unit cash distributions paid $149.435M / ~93.396M units ≈ $1.60/unit (10-K_20260226)",
+    "fcf_source": "FY2025 common-unit cash distributions paid $149.435M / ~93.396M units \u2248 $1.60/unit (10-K_20260226)",
     "units_outstanding_m": 93.396,
     "units_source": "10-K cover: 93,396,488 common units outstanding Feb 20, 2026",
     "book_per_share": 8.5,
@@ -46,10 +46,12 @@
   },
   "stance_proposal": {
     "suggested": "watch",
-    "irr_band": "<15%",
+    "irr_band": "optionality",
     "gates": {
       "moat_ok": true,
-      "dhando_ok": true
+      "dhando_ok": true,
+      "floor_pass": true,
+      "valuation_mode": "optionality"
     },
     "override_reason": null
   },
@@ -69,6 +71,27 @@
       "evidence": "~127,832 gross (9,760 net) undeveloped mineral acres + ~18,554 gross (92 net) undeveloped ORRI acres (10-K_20260226 asset tables)"
     },
     {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Single profitable royalty segment; no Other Bets-style loss drag (10-K)"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / RPO not in FCF path?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Royalty revenue is production-linked, not contracted backlog (10-K)"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Public partnership; Apollo preferred disclosed on balance sheet"
+    },
+    {
       "q": 6,
       "question": "Transitory distribution / legal recovery?",
       "answer": "No",
@@ -84,6 +107,7 @@
     }
   ],
   "nav_overlay": {
+    "status": "complete",
     "gaap_vs_fair_value": {
       "note": "Royalties carried on balance sheet; fair value tied to commodity cash flows and reserve report, not separate NAV mark each quarter"
     },
@@ -114,7 +138,7 @@
     "floor_value": 1.6,
     "primary_metric": "lawrence_base",
     "primary_label": "7yr IRR",
-    "primary_return_pct": null,
+    "primary_return_pct": 12.6,
     "normalized_yield_pct": 11.9,
     "notes": "FY2025 distribution yield ~11.9% at placeholder price; Lawrence IRR is stance gate unless human overrides"
   },
@@ -122,26 +146,275 @@
     "mechanism": "Base growth assumes modest distribution increases from bolt-on mineral and ORRI acquisitions (2024-2025 8-K deal flow) offsetting natural decline on legacy properties.",
     "bear_trigger": "WTI/Henry Hub sustained down-cycle cuts distributions below $1.30/unit for four quarters while revolver balance stays above $400M.",
     "bull_trigger": "Distribution run-rate above $1.90/unit sustained with accretive unit/equity-funded acquisitions and Permian rig count recovery.",
-    "status": "partial"
+    "status": "partial",
+    "lawrence_legacy": {
+      "y1_5": 0.02,
+      "y6_10": 0.01,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.02,
+      "y6_10": 0.01,
+      "exit_pfcf_y10": 10.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": 0.0793,
+      "as_of_filing_facts": "evidence/_text/10-K_20260226_rpt20251231_acc0001104659_26_020477.htm.txt"
+    }
   },
   "synthesis": {
-    "status": "complete",
-    "paths": [
-      {
-        "id": "lawrence_base",
-        "label": "Lawrence base (distributions)",
-        "source": "scenarios.base",
-        "return_pct": null,
-        "weight": 1.0,
-        "type": "numeric",
-        "epistemic_tier": "A (filings)",
-        "weight_why": "No approved third-party sources; primary filing path only."
-      }
-    ],
-    "human_approval": "pending"
+    "status": "incomplete",
+    "reason": "zero weights"
   },
   "lawrence_horizon_years": 7,
   "human_review": {
     "live_price_confirmed": false
+  },
+  "total_return_panel": {
+    "as_of": "2026-06-11",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 0,
+    "distribution_history_sum": 0,
+    "market_cap_m": null,
+    "total_return_annualized_pct": -3.0,
+    "chart": "KRP/research/charts/total_return_2026-06-11.svg",
+    "panel_json": "KRP/research/total_return_panel.json"
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 6.0
+    },
+    "base": {
+      "return_pct": 12.6
+    },
+    "bull": {
+      "return_pct": 17.7
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 6.0
+    },
+    "base": {
+      "return_pct": 12.6
+    },
+    "bull": {
+      "return_pct": 17.7
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": 12.6
+    },
+    "falsifier_adjusted": {
+      "return_pct": 12.6
+    }
+  },
+  "implied_return": {
+    "base_pct": 12.6,
+    "label": "7yr IRR",
+    "display": "12.6% (base)"
+  },
+  "overlay_results": [],
+  "context_overlay": {
+    "as_of": "2026-06-11",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": -0.1,
+            "as_of": "2026-06-11",
+            "yoy_pct": 89.5,
+            "direction": "up",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.529999732971191,
+            "as_of": "2026-06-11",
+            "yoy_pct": 2.7,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.263999938964844,
+            "as_of": "2026-06-11",
+            "yoy_pct": 6.4,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 100.29000091552734,
+            "as_of": "2026-06-11",
+            "yoy_pct": 1.7,
+            "direction": "up",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 21.450000762939453,
+            "as_of": "2026-06-11",
+            "yoy_pct": 24.3,
+            "direction": "up",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": -0.5,
+            "as_of": "2026-06-11",
+            "yoy_pct": -247.1,
+            "direction": "down",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 13.67,
+            "as_of": "2026-06-11",
+            "yoy_pct": 15.1,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "insider_signal": {
+    "as_of": "2026-06-11",
+    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
+    "in_base_irr": false,
+    "window_days": 365,
+    "ics": 0.0,
+    "band": "negligible",
+    "bull_case_support": "none",
+    "scenario_confidence": {
+      "priors": {
+        "bear": 0.2,
+        "base": 0.55,
+        "bull": 0.25
+      },
+      "tilted": {
+        "bear": 0.28,
+        "base": 0.47,
+        "bull": 0.25
+      },
+      "bull_delta": 0.0,
+      "bear_delta": 0.08,
+      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
+    },
+    "factors": {
+      "buy_score": 0.0,
+      "sell_score": -1.0,
+      "cluster_bonus": 0.4,
+      "net_buy_usd": 0,
+      "net_sell_usd": 4631332.6,
+      "price_today": 15.52
+    },
+    "top_buys": [],
+    "top_sells": [
+      {
+        "insider": "Ravnaas Robert D.",
+        "date": "2026-03-04",
+        "shares": 30496,
+        "price": 14.54,
+        "value_usd": 443411.84,
+        "is_10b5_1": false,
+        "contrib": -0.124
+      },
+      {
+        "insider": "Ravnaas Robert D.",
+        "date": "2026-03-04",
+        "shares": 36597,
+        "price": 14.54,
+        "value_usd": 532120.38,
+        "is_10b5_1": false,
+        "contrib": -0.124
+      },
+      {
+        "insider": "Ravnaas Robert D.",
+        "date": "2026-03-03",
+        "shares": 24209,
+        "price": 14.57,
+        "value_usd": 352725.13,
+        "is_10b5_1": false,
+        "contrib": -0.124
+      },
+      {
+        "insider": "Taylor Brett G.",
+        "date": "2026-03-04",
+        "shares": 21195,
+        "price": 14.54,
+        "value_usd": 308175.3,
+        "is_10b5_1": false,
+        "contrib": -0.113
+      },
+      {
+        "insider": "Taylor Brett G.",
+        "date": "2026-03-04",
+        "shares": 25435,
+        "price": 14.54,
+        "value_usd": 369824.9,
+        "is_10b5_1": false,
+        "contrib": -0.113
+      }
+    ],
+    "narrative_hooks": [
+      "Multiple insiders bought within cluster window"
+    ],
+    "transaction_count": 31
+  },
+  "lens_consensus": {
+    "as_of": "2026-06-11",
+    "shared_inputs_ref": "valuation.json@2026-06-11",
+    "valuation_richness": 0.16,
+    "blended_return_pct": 10.13,
+    "band_pct": [
+      6.0,
+      12.6
+    ],
+    "weighted_median_pct": 12.31,
+    "median_mean_flag": false,
+    "stance": "watch",
+    "agreement_pct": 100,
+    "dissent_count": 0,
+    "lawrence_divergence": false,
+    "top_dissents": [],
+    "contributor_count": 6,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
   }
 }

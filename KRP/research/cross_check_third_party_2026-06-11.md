@@ -36,9 +36,9 @@ No third-party sources are indexed for KRP as of this scan. Marvin stance rests 
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | ~$1.60/unit FY2025 distributions | 7yr Lawrence (pending refresh) | watch |
+| Marvin floor | ~$1.60/unit FY2025 distributions | **12.6%** per year (7yr Lawrence base) | watch |
 | External (combined) | — | — | — |
-| **Blended best estimate** | **~$1.60/unit distributions** | **Lawrence base only** | **watch** |
+| **Blended best estimate** | **~$1.60/unit distributions** | **12.6% per year (Lawrence base)** | **watch** |
 
 **Weights:** 100% Marvin filing path; no approved third-party numeric paths.
 

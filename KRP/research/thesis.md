@@ -7,26 +7,25 @@
 | Field | Value |
 |-------|-------|
 | **Archetype** (Stahl) | optionality |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Moat** (Munger) | narrow |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **Implied 7yr IRR** (base) | — |
-| **IRR method** | — |
+| **Cycle** | mid |
+| **Implied 7yr IRR** (base) | 12.6% (base) |
+| **IRR method** | full |
 | **Lawrence bucket** | other |
 | **Payoff lens** | asset |
 | **MOI bucket** | pending |
 
+**Deep dive:** `KRP/research/deep_dive_2026-06-11.md` (auto-sync)
+
 ## One-line thesis
 
-Kimbell Royalty Partners LP — thesis pending Marvin deep dive.
+Passive U.S. mineral/ORRI owner paying ~$1.60/unit FY2025 distributions; **12.6%** base IRR at **$15.52** is below bar — **watch** until leverage normalizes or price improves.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
-
-## [HUMAN REVIEW]
-
-- Onboarded 2026-06-11; awaiting deep dive.
+- [x] Read latest annual report (10-K FY2025)
+- [x] Read latest quarterly report (10-Q Q1 2026)
+- [x] Apply Tier 1 lenses (Stahl, Munger, Pabrai, HK market structure)
+- [ ] Human review: Apollo preferred terms and revolver amortization vs distribution policy
