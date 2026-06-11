@@ -1,0 +1,46 @@
+# Total return panel (dividends + chart + market cap)
+
+On every Marvin refresh, build the **total return panel** after equity price fetch.
+
+## Mechanical step
+
+```bash
+python _system/scripts/build_total_return_panel.py {TICKER} --date YYYY-MM-DD
+```
+
+Wired in `marvin_cloud_refresh.py` after `fetch_equity_prices.py` (optional step; warn-only on thin OTC history).
+
+## Inputs (`valuation.json`)
+
+| Key | Required | Notes |
+|-----|----------|-------|
+| `inputs.shares_outstanding` | yes for market cap | Filing unit/share count |
+| `inputs.price` | yes | Live or assumption price |
+| `inputs.distribution_history` | preferred | `[{year, amount_per_share, source}]` annual distributions/dividends |
+| `inputs.dividend_per_share_annual` | fallback | Latest year only |
+
+## Outputs
+
+| File | Content |
+|------|---------|
+| `{TICKER}/research/total_return_panel.json` | Metrics: cumulative distributions, annualized price vs total return, market cap |
+| `{TICKER}/research/charts/total_return_{date}.svg` | Price index vs total-return index (rebased 100) |
+| `valuation.json` → `total_return_panel` | Summary pointer for scripts and deep dive inject |
+
+## Deep dive placement
+
+In **Primary sources reviewed**, add `#### Total return and market cap` when panel exists:
+
+- Cumulative distributions per share (sum of `distribution_history`)
+- Estimated market cap (price × shares)
+- Embed chart: `![Total return]({TICKER}/research/charts/total_return_{date}.svg)`
+- Note price source and thin-liquidity caveat for OTC names
+
+## Universe rollout
+
+See `_system/prompts/total_return_panel_rollout.md`. Batch via `batch_portfolio_refresh.py` on next portfolio run.
+
+## Do not
+
+- Put total-return math in Lawrence IRR or synthesis weights (context panel only).
+- Auto-fill `distribution_history` without filing citation; use **[Assumption]** only when filings missing.

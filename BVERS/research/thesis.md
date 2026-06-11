@@ -26,10 +26,10 @@ At ~$2,400/unit, BVERS offers ~11.81% synthesis IRR on FY2025 distributions ($20
 ## Key questions
 
 - [x] Read latest annual report (FY2025 OTC annual)
-- [ ] Refresh OTC unit price before accumulate sizing
-- [ ] Clarify post-2030 partnership renewal terms
+- [x] Human review approved (2026-06-11); stance **watch**
+- [ ] Refresh OTC unit price before accumulate sizing (monitor)
+- [ ] Clarify post-2030 partnership renewal terms (monitor)
 
 ## [HUMAN REVIEW]
 
-- Unit price ~$2,400 is [Assumption] from thin OTC quotes; confirm before sizing.
-- Two customers = 55% of revenue; related-party fees disclosed in Note 9.
+**Approved 2026-06-11.** Stance **watch**; synthesis weights and governance gate accepted. Monitors: OTC price refresh before accumulate; post-2030 renewal; customer concentration.
