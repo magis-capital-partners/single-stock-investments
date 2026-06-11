@@ -10,13 +10,13 @@
 
 No third-party sources are indexed for HEE as of this scan. Marvin stance rests on **primary filings only** (FY2025 and FY2024 annual reports). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
 
-**Synthesis:** Marvin floor only; no external blend. Base case **~10%** per year at **€7.49** on mid-cycle owner cash **€0.42** per share (`HEE/research/valuation.json`).
+**Synthesis:** Marvin floor only; no external blend. Base case **10.86%** per year at **€7.49** on mid-cycle owner cash **€0.42** per share (`HEE/research/valuation.json`).
 
 ## Sources in scope
 
-| Source | Type | Status | Used in base IRR? |
-|--------|------|--------|-------------------|
-| (none) | Primary filings only | n/a | n/a |
+| Source ID | Title | Path | Status | Cross-check status |
+|-----------|-------|------|--------|-------------------|
+| (none) | Primary filings only | — | — | n/a |
 
 ## Agreements (facts)
 
@@ -34,13 +34,13 @@ No third-party sources are indexed for HEE as of this scan. Marvin stance rests 
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | €0.42/sh mid-cycle owner cash | ~10% / 7yr | watch |
+| Marvin floor | €0.42/sh mid-cycle owner cash | 10.86% / 7yr | watch |
 | External (combined) | — | — | — |
-| **Blended best estimate** | **€0.42/sh** | **~10% / 7yr** | **watch** |
+| **Blended best estimate** | **€0.42/sh** | **10.86% / 7yr** | **watch** |
 
 **Weights:** 100% Marvin filings (no approved third party).
 
-**Returns statement (blended):** At **€7.49** per share, Marvin filing-based base case implies about **10% per year** over 7 years; no external views blended.
+**Returns statement (blended):** At **€7.49** per share, Marvin filing-based base case implies **10.86% per year** over 7 years; no external views blended.
 
 ## [HUMAN REVIEW]
 
@@ -50,11 +50,12 @@ No third-party sources are indexed for HEE as of this scan. Marvin stance rests 
 
 ## [PROPOSED MEMORY]
 
-- [PROPOSED COMPANY] HEE: third-party cross-check 2026-06-11 — Marvin floor only; watch ~10% base IRR.
+- [PROPOSED COMPANY] HEE: third-party cross-check 2026-06-11 — Marvin floor only; watch 10.86% base IRR.
 
 ## Primary sources cited
 
 1. `HEE/investor-documents/ir-athex/annual_report_2025.pdf`
 2. `HEE/investor-documents/ir-athex/annual_report_2024.pdf`
 3. `HEE/research/deep_dive_2026-06-11.md`
-4. `HEE/third-party-analyses/source_inventory_2026-06-11.md`
+4. `HEE/research/valuation.json`
+5. `HEE/third-party-analyses/source_inventory_2026-06-11.md`
