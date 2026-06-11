@@ -70,6 +70,32 @@ EXCHANGE_META = {
     "IDA.AX": "ASX",
     "LSEG": "LSE",
     "RMV.L": "LSE",
+    "0388.HK": "HKEX",
+    "ABX": "NASDAQ",
+    "ASX.AX": "ASX",
+    "B3SA3.SA": "B3",
+    "BMYS.KL": "KLSE",
+    "BOLSAA.MX": "BMV",
+    "BSM": "NYSE",
+    "BYMA": "BYMA",
+    "CDZI": "NASDAQ",
+    "DB1.DE": "XETRA",
+    "ENX.PA": "Euronext Paris",
+    "EVR": "CSE",
+    "GPW.WA": "WSE",
+    "GROY": "NYSE American",
+    "HEE": "ATHEX",
+    "KRP": "NYSE",
+    "MTA": "NYSE American",
+    "NDAQ": "NASDAQ",
+    "NRP": "NYSE",
+    "NZX.NZ": "NZX",
+    "PSE": "PSE",
+    "S68.SI": "SGX",
+    "TASE": "TASE",
+    "TFPM": "NYSE",
+    "X.TO": "TSX",
+    "XP": "NASDAQ",
 }
 
 DOWNLOAD_TYPE_OVERRIDES = {
@@ -84,6 +110,22 @@ DOWNLOAD_TYPE_OVERRIDES = {
     "IDA.AX": "au_asx",
     "LSEG": "uk_ir",
     "RMV.L": "uk_ir",
+    "0388.HK": "uk_ir",
+    "B3SA3.SA": "uk_ir",
+    "BMYS.KL": "uk_ir",
+    "BOLSAA.MX": "uk_ir",
+    "BYMA": "uk_ir",
+    "DB1.DE": "uk_ir",
+    "ENX.PA": "uk_ir",
+    "EVR": "uk_ir",
+    "GPW.WA": "uk_ir",
+    "HEE": "uk_ir",
+    "NZX.NZ": "au_asx",
+    "PSE": "uk_ir",
+    "S68.SI": "uk_ir",
+    "TASE": "uk_ir",
+    "X.TO": "uk_ir",
+    "ASX.AX": "au_asx",
 }
 
 
@@ -95,6 +137,14 @@ def infer_market_from_ticker(ticker: str) -> str | None:
         return "JP"
     if ticker.endswith(".AX"):
         return "AU"
+    if ticker.endswith(".NZ"):
+        return "AU"
+    if ticker.endswith(".TO"):
+        return "CA"
+    if ticker.endswith(".HK"):
+        return "EU"
+    if ticker.endswith((".DE", ".PA", ".WA", ".SA", ".MX", ".KL", ".SI")):
+        return "EU"
     if ticker.endswith(".L"):
         return "UK"
     if ticker == "LSEG":
