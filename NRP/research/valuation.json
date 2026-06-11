@@ -1,0 +1,190 @@
+{
+  "ticker": "NRP",
+  "as_of": "2026-06-11",
+  "valuation_mode": "optionality",
+  "valuation_overlay": "segment_cashflow",
+  "method": "full",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "narrow",
+    "dhando": "partial",
+    "cycle": "trough",
+    "payoff_lens": "asset",
+    "predictive_attribute": "market_structure_discount"
+  },
+  "inputs": {
+    "price": 95.0,
+    "price_source": "Placeholder pre-fetch; marvin_cloud_refresh updates Stooq",
+    "fcf_per_share": 3.0,
+    "fcf_source": "Recurring quarterly distribution $0.75/unit × 4 (FY2025 run rate; excludes March 2025 $1.21 special tax distribution) — 10-K_20260227",
+    "units_outstanding_m": 13.25,
+    "book_per_share": 47.7,
+    "book_source": "Partners capital $632.5M / 13.25M units at 3/31/2026 (approx.; not fair-value floor)",
+    "normalization_note": "Lawrence uses declared common-unit distributions, not GAAP net income. Soda Ash equity distributions collapsed in 2025–Q1 2026; base uses recurring $0.75/qtr only.",
+    "price_as_of": "2026-06-11"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": -0.02,
+      "growth_y6_10": -0.03,
+      "exit_pfcf_y10": 9,
+      "notes": "Coal royalty volumes/prices stay weak; $0.75/qtr cut; Sisecam Wyoming distributions minimal"
+    },
+    "base": {
+      "growth_y1_5": 0.0,
+      "growth_y6_10": 0.0,
+      "exit_pfcf_y10": 11,
+      "notes": "Flat $3.00/unit recurring distributions; debt service on ~$60M revolver; soda ash option not in base cash"
+    },
+    "bull": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 13,
+      "notes": "Met coal stabilizes; Sisecam distributions resume; carbon/renewable lease option adds incremental royalty"
+    }
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true,
+      "floor_pass": true,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": null
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "nav_overlay",
+      "evidence": "Mineral rights net $380M + equity method Sisecam $276M on balance sheet; ~13M acre footprint not marked to fair NAV (10-K_20260227)"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / acreage / dormant royalty?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "13M acres mineral interests; coal/oil/gas/carbon sequestration leases largely undeveloped vs current run-rate (10-K Business)"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "49% non-controlling interest in Sisecam Wyoming; Q1 2026 $39.2M capital contribution; distributions paused (10-Q_20260506)"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "Partial",
+      "treatment": "yield_curve",
+      "evidence": "Revenues down from $370M (2023) to $207M (2025); distributions cut to $0.75/qtr from higher 2023 levels; debt refinanced"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option already in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Producing coal royalties ~99% of segment revenue; soda ash equity cash in segment when paid"
+    }
+  ],
+  "optionality_gate": {
+    "framework": "mineral_floor_option",
+    "floor_pass": true,
+    "floor_metric": "distribution_yield",
+    "floor_value": 3.2,
+    "primary_metric": "lawrence_base",
+    "primary_label": "7yr IRR",
+    "primary_return_pct": null,
+    "notes": "Recurring yield ~3% at ~$95; asset floor from mineral book + Sisecam stake; Lawrence base below 15% bar — size for optionality not core"
+  },
+  "nav_overlay": {
+    "framework": "mineral_floor_option",
+    "gaap_book_per_share": 47.7,
+    "fair_nav_note": "Mineral rights carried at cost/depletion; 13M-acre portfolio not fully marked. Do not use GAAP book alone as dhando floor.",
+    "options": [
+      {
+        "id": "undeveloped_mineral_acreage",
+        "label": "Undeveloped / carbon / renewable mineral leases",
+        "option_treatment": "zero",
+        "base_terminal_value_per_share": 0,
+        "base_terminal_rationale": "No filing fair-value mark for undeveloped 13M-acre option; explicit zero in Lawrence base after scan",
+        "evidence": "10-K_20260227 Business — carbon sequestration and renewable energy lease option cited; not in run-rate distributions"
+      },
+      {
+        "id": "sisecam_wyoming_recovery",
+        "label": "Sisecam Wyoming distribution recovery",
+        "option_treatment": "probability_weighted",
+        "base_terminal_value_per_share": 0,
+        "base_terminal_rationale": "Q1 2026 zero distribution; $39.2M contribution — recovery timing uncertain; zero in base Lawrence FCF",
+        "evidence": "10-Q_20260506 MD&A Soda Ash segment"
+      }
+    ]
+  },
+  "segment_build": {
+    "segments": [
+      {
+        "id": "mineral_rights",
+        "label": "Mineral Rights (coal, oil/gas, aggregates)",
+        "revenue_share_pct": 99,
+        "owner_cash_per_share": 2.95,
+        "growth_y1_5": 0.0,
+        "exit_multiple": 11,
+        "evidence": "FY2025 segment revenue $204.2M; distributions primarily from coal royalties (10-K_20260227)"
+      },
+      {
+        "id": "soda_ash",
+        "label": "Soda Ash (49% Sisecam Wyoming)",
+        "revenue_share_pct": 1,
+        "owner_cash_per_share": 0.05,
+        "growth_y1_5": 0.0,
+        "exit_multiple": 8,
+        "evidence": "FY2025 segment revenue $3.1M; equity distributions collapsed vs prior years (10-K_20260227)"
+      }
+    ],
+    "options": [
+      {
+        "id": "sisecam_distribution_recovery",
+        "label": "Sisecam Wyoming cash distribution recovery",
+        "option_treatment": "probability_weighted",
+        "annual_drag_per_share": 0.0,
+        "base_terminal_value_per_share": 0,
+        "base_terminal_rationale": "Not in Lawrence base until distributions resume in filings",
+        "evidence": "10-Q_20260506 — no Q1 2026 distribution from Sisecam"
+      }
+    ]
+  },
+  "growth_explanation": {
+    "mechanism": "Base assumes flat $0.75 quarterly distribution. Upside requires met coal price/volume stabilization on Appalachian/Illinois/Powder River leases or resumed Sisecam Wyoming distributions.",
+    "bear_trigger": "Quarterly distribution cut below $0.60/unit for two consecutive quarters while coal revenues decline further.",
+    "bull_trigger": "Sisecam distributions resume above $15M annual run-rate to NRP plus stable $0.75/qtr on coal royalties.",
+    "status": "partial"
+  },
+  "evidence_refresh": {
+    "type": "commodity_nav",
+    "as_of": "2026-06-11"
+  },
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "lawrence_base",
+        "label": "Lawrence base (recurring distributions)",
+        "source": "scenarios.base",
+        "return_pct": null,
+        "weight": 1.0,
+        "type": "numeric",
+        "epistemic_tier": "A (filings)",
+        "weight_why": "No approved third-party sources; recurring distribution path only."
+      }
+    ],
+    "numeric_weighted_pct": null,
+    "total_synthesis_pct": null,
+    "human_approval": "pending"
+  },
+  "lawrence_horizon_years": 7
+}
