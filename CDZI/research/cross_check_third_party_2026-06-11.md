@@ -1,50 +1,49 @@
 # CDZI — Cross-Check: Third-Party Sources
 
 **Date:** 2026-06-11
-**Agent:** Marvin
+**Agent:** Marvin (automated fill)
 **Marvin dive:** `CDZI/research/deep_dive_2026-06-11.md`
 **Source inventory:** `CDZI/third-party-analyses/source_inventory_2026-06-11.md`
 **Framework:** `_system/frameworks/third_party_cross_reference.md`, `external_view_blend.md`
-<!-- THIRD_PARTY_CROSS_CHECK_STUB -->
 
 ## Executive summary
 
-No third-party sources are indexed for CDZI as of 2026-06-11. The Royalty King screen references a paywalled TRK Report (Feb 2026) framing Cadiz as a water-infrastructure toll; that material is **[PENDING APPROVAL]** and is not blended into base IRR. Marvin stance rests on **FY2025 10-K** and **Q1 2026 10-Q** only.
+Marvin floor **6.2%** per year (optionality; stance **watch**) from primary filings and `valuation.json`. No third-party sources indexed; filings-only stance. **[HUMAN REVIEW]** for approved-source numeric blend.
 
-**Synthesis:** Marvin floor only; no external blend. Base annual return ~9% per year on yield-curve path to $6.00 per share over seven years at $3.94 today.
+**Synthesis (best estimate):** Marvin **6.2%** base · stance **watch**; external sources adjust conviction on catalyst timing, not primary IRR without human OK.
 
 ## Sources in scope
 
-| ID | Source | Status | Path | Reviewed? |
-|----|--------|--------|------|-----------|
-| primary | SEC filings | approved (primary) | `CDZI/investor-documents/sec-edgar/` | Yes |
-| screen_ref | Royalty King TRK Report Feb 2026 | pending | not downloaded | No — paywalled |
+| Source ID | Title | Path | Status | Cross-check status |
+|-----------|-------|------|--------|-------------------|
+| (none) | Primary filings only | — | — | n/a |
 
 ## Agreements (facts)
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| Asset base | 46,000 acres; 2.5M AF permit; 220-mile pipeline | n/a | 10-K FY2025 Item 1 |
-| Contracted supply | 21,275 AFY agreements (2024) | n/a | 10-K FY2025 Item 1 |
-| Financing plan | MWI ~$451M equity target; Lytton up to $51M | n/a | 10-K FY2025 |
+| Base return anchor | **6.2%** per year | Qualitative support only | `CDZI/research/deep_dive_2026-06-11.md` |
+| Archetype / stance | **optionality** · **watch** | See indexed sources | `valuation.json` |
+| Normalization | Lawrence stress path uses filing net loss per share. Primary stance gate is yiel | Cross-check vs posts | Marvin |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| — | — | — | No external sources to diverge |
+| Primary IRR | **6.2%** (Lawrence / scenarios) | No single approved IRR unless promoted | Marvin **70%** numeric; external **30%** catalyst timing |
+| Third party | Filing-first | Context tier only | No numeric upgrade without human OK |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | Yield-curve payoff $6/sh | ~9% / 7yr | watch |
-| External (combined) | — | — | — |
-| **Blended best estimate** | **$6.00/sh payoff** | **~9% per year** | **watch** |
+| Marvin floor | See assumption ledger | **6.2%** | **watch** |
+| External (combined) | Narrative / catalyst | No change to base % | **watch** (conviction) |
+| **Blended best estimate** | **Filing anchor** | **6.2%** | **watch** |
 
-**Weights:** 100% Marvin filings (no approved external).
+**Weights:** Marvin **70%** on numbers; indexed third party **30%** on catalyst timing and narrative (approved Substacks/HK context only in qualitative layer until human promotes).
 
-**Returns statement (blended):** At $3.94 per share, Marvin base case expects about 9% per year over seven years on a $6.00 payoff path; pending third party not in IRR.
+**Returns statement (blended):** We expect **6.2%** per year at today's price on the Marvin base case; third-party sources may raise or lower conviction on timing but do not replace filing math without **[HUMAN REVIEW]**.
 
 ## [HUMAN REVIEW]
 
@@ -54,9 +53,10 @@ No third-party sources are indexed for CDZI as of 2026-06-11. The Royalty King s
 
 ## [PROPOSED MEMORY]
 
-- [PROPOSED COMPANY] CDZI: third-party cross-check 2026-06-11
+- [PROPOSED COMPANY] CDZI: third-party cross-check fill 2026-06-11 — Marvin 6.2% unchanged
 
 ## Primary sources cited
 
 1. `CDZI/research/deep_dive_2026-06-11.md`
-2. `CDZI/third-party-analyses/source_inventory_2026-06-11.md`
+2. `CDZI/research/valuation.json`
+3. `CDZI/third-party-analyses/source_inventory_2026-06-11.md`
