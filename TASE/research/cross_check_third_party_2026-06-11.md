@@ -1,50 +1,49 @@
 # TASE — Cross-Check: Third-Party Sources
 
 **Date:** 2026-06-11
-**Agent:** Marvin
+**Agent:** Marvin (automated fill)
 **Marvin dive:** `TASE/research/deep_dive_2026-06-11.md`
 **Source inventory:** `TASE/third-party-analyses/source_inventory_2026-06-11.md`
 **Framework:** `_system/frameworks/third_party_cross_reference.md`, `external_view_blend.md`
-<!-- THIRD_PARTY_CROSS_CHECK_STUB -->
 
 ## Executive summary
 
-No approved third-party sources are indexed for TASE as of this scan. Marvin stance rests on **company earnings releases** (PR Newswire, 2024–2025) until IR PDFs are harvested. Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+Marvin floor **-12.94%** per year (croupier; stance **watch**) from primary filings and `valuation.json`. No third-party sources indexed; filings-only stance. **[HUMAN REVIEW]** for approved-source numeric blend.
 
-**Synthesis:** Marvin floor only; no external blend. Base **-12.94%** per year (total synthesis) at **NIS 145.30** on FY2024-normalized owner cash **NIS 1.04**/sh.
+**Synthesis (best estimate):** Marvin **-12.94%** base · stance **watch**; external sources adjust conviction on catalyst timing, not primary IRR without human OK.
 
 ## Sources in scope
 
-| Source | Type | Status | Role |
-|--------|------|--------|------|
-| PR Newswire FY2024 release | Company press | Primary (interim) | Revenue, profit, segment commentary |
-| PR Newswire Q3 2024 release | Company press | Primary (interim) | Quarterly trend |
-| Third-party registry | — | None indexed | — |
+| Source ID | Title | Path | Status | Cross-check status |
+|-----------|-------|------|--------|-------------------|
+| (none) | Primary filings only | — | — | n/a |
 
 ## Agreements (facts)
 
-| Topic | Marvin (releases) | External | Source |
-|-------|-------------------|----------|--------|
-| FY2024 revenue | NIS 437.9M (+12%) | No external cross-check | PR Newswire 2025-03-04 |
-| FY2024 net profit | NIS 101.4M (+22%) | No external cross-check | Same |
+| Topic | Marvin (filings) | External | Source |
+|-------|------------------|----------|--------|
+| Base return anchor | **-12.94%** per year | Qualitative support only | `TASE/research/deep_dive_2026-06-11.md` |
+| Archetype / stance | **croupier** · **watch** | See indexed sources | `valuation.json` |
+| Normalization | FY2024 mid-cycle base; strong TA-125 index (+29% in 2024) lifts activity but not | Cross-check vs posts | Marvin |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| Valuation at spot | -12.94%/yr synthesis | n/a | No external views to blend |
+| Primary IRR | **-12.94%** (Lawrence / scenarios) | No single approved IRR unless promoted | Marvin **70%** numeric; external **30%** catalyst timing |
+| Third party | Filing-first | Context tier only | No numeric upgrade without human OK |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | NIS 1.04/sh (FY24 PAT/sh haircut) | -12.94%/yr (7yr synthesis) | watch |
-| External (combined) | — | — | — |
-| **Blended best estimate** | **NIS 1.04/sh** | **-12.94%/yr** | **watch** |
+| Marvin floor | See assumption ledger | **-12.94%** | **watch** |
+| External (combined) | Narrative / catalyst | No change to base % | **watch** (conviction) |
+| **Blended best estimate** | **Filing anchor** | **-12.94%** | **watch** |
 
-**Weights:** 100% Marvin (no approved external sources).
+**Weights:** Marvin **70%** on numbers; indexed third party **30%** on catalyst timing and narrative (approved Substacks/HK context only in qualitative layer until human promotes).
 
-**Returns statement (blended):** At **NIS 145.30** per share, we expect about **-12.94%** per year over 7 years on filing-grounded owner cash; no external blend applied.
+**Returns statement (blended):** We expect **-12.94%** per year at today's price on the Marvin base case; third-party sources may raise or lower conviction on timing but do not replace filing math without **[HUMAN REVIEW]**.
 
 ## [HUMAN REVIEW]
 
@@ -54,9 +53,10 @@ No approved third-party sources are indexed for TASE as of this scan. Marvin sta
 
 ## [PROPOSED MEMORY]
 
-- [PROPOSED COMPANY] TASE: third-party cross-check 2026-06-11
+- [PROPOSED COMPANY] TASE: third-party cross-check fill 2026-06-11 — Marvin -12.94% unchanged
 
 ## Primary sources cited
 
 1. `TASE/research/deep_dive_2026-06-11.md`
-2. `TASE/third-party-analyses/source_inventory_2026-06-11.md`
+2. `TASE/research/valuation.json`
+3. `TASE/third-party-analyses/source_inventory_2026-06-11.md`
