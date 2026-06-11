@@ -1,0 +1,223 @@
+{
+  "ticker": "ASX.AX",
+  "as_of": "2026-06-11",
+  "method": "full",
+  "lawrence_bucket": "multi_sided",
+  "classification_inputs": {
+    "archetype": "croupier",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 48.82,
+    "price_source": "Yahoo ASX.AX close 2026-06-11",
+    "fcf_per_share": 2.05,
+    "fcf_source": "FY2025 underlying NPAT $510.0M + D&A $48.4M minus normalized capital spending $98M (total capex $176M less $77.7M CHESS replacement), divided by ~194.0M weighted average shares",
+    "shares_millions": 194.0,
+    "normalization_note": "FY2025 mid-cycle base; underlying EPS 262.9c not used as starting cash because CHESS modernisation elevates capex and net interest income on participant balances is partly rate-sensitive",
+    "price_as_of": "2026-06-11"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 16,
+      "notes": "Activity mean-reversion; CHESS delays; Sympli losses persist; fee pressure"
+    },
+    "base": {
+      "growth_y1_5": 0.05,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 19,
+      "notes": "Mid-cycle owner cash; Markets and Technology & Data growth; exit ~19x year-7 cash flow"
+    },
+    "bull": {
+      "growth_y1_5": 0.06,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 22,
+      "notes": "Sustained volumes; CHESS go-live; Sympli break-even; margin expansion on tech spend"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Exchange intangibles and software on balance sheet at cost; no land/NAV misstatement pattern"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Asset-light croupier; no dormant royalty acreage"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Partial",
+      "treatment": "zero",
+      "evidence": "49.4% Sympli stake; ASX share of Sympli net loss $11.0M FY25 (annual report p.98); no separate terminal in Lawrence base"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / RPO not in FCF path?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "CHESS replacement ($77.7M capex FY25) embedded in Technology & Data capex path, not separate option row"
+    },
+    {
+      "q": 5,
+      "question": "Private stakes below fair value?",
+      "answer": "No material",
+      "treatment": "n/a",
+      "evidence": "Sympli equity-accounted; carrying value reflects losses; immaterial to consolidated owner cash"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating croupier, not yield-curve trust"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Net interest income $86.8M on participant margin balances partly rate/volume cyclical; normalized in starting owner cash haircut"
+    },
+    {
+      "q": 0,
+      "question": "Material options after scan?",
+      "answer": "No separate overlay",
+      "treatment": "n/a",
+      "evidence": "Lawrence full cash-flow path sufficient; Sympli drag immaterial; CHESS in capex normalization"
+    }
+  ],
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "human_review": {
+    "live_price_confirmed": false
+  },
+  "total_return_panel": {
+    "as_of": "2026-06-11",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 0,
+    "distribution_history_sum": 0,
+    "market_cap_m": null,
+    "total_return_annualized_pct": 8.87,
+    "chart": "ASX.AX/research/charts/total_return_2026-06-11.svg",
+    "panel_json": "ASX.AX/research/total_return_panel.json"
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 2.2
+    },
+    "base": {
+      "return_pct": 6.2
+    },
+    "bull": {
+      "return_pct": 9.1
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 2.2
+    },
+    "base": {
+      "return_pct": 6.2
+    },
+    "bull": {
+      "return_pct": 9.1
+    }
+  },
+  "implied_return": {
+    "base_pct": 6.87,
+    "label": "7yr IRR (total synthesis)",
+    "display": "6.87% (total synthesis)",
+    "lawrence_stance_gate_pct": 6.2,
+    "falsifier_adjusted_pct": 6.2,
+    "synthesis_pct": 6.87
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": 2.2,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 9.1,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 7.07,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 6.87,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}
