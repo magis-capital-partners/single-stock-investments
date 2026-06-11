@@ -1,0 +1,339 @@
+{
+  "ticker": "ENX.PA",
+  "as_of": "2026-06-11",
+  "method": "full",
+  "currency": "EUR",
+  "lawrence_bucket": "multi_sided",
+  "classification_inputs": {
+    "archetype": "croupier",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 145.7,
+    "price_source": "Yahoo Finance ENX.PA close 2026-06-11",
+    "fcf_per_share": 6.73,
+    "fcf_source": "FY2025 free cash flow \u20ac682.3M (OCF \u20ac812.1M minus capital spending \u20ac129.8M) divided by ~101.4M shares (urd_2025.pdf \u00a75.2.4\u20135.2.5)",
+    "shares_millions": 101.4,
+    "normalization_note": "FY2025 mid-cycle base; Q1 2026 underlying revenue +15.3% YoY on elevated volatility (not inflated into starting cash flow)"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 18,
+      "notes": "Volume mean-reversion; fee pressure; slower Innovate for Growth 2027 delivery"
+    },
+    "base": {
+      "growth_y1_5": 0.06,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 20,
+      "notes": "Mid-cycle FY2025 FCF; non-volume mix ~56%; exit ~20\u00d7 cash flow"
+    },
+    "bull": {
+      "growth_y1_5": 0.08,
+      "growth_y6_10": 0.06,
+      "exit_pfcf_y10": 22,
+      "notes": "Sustained double-digit revenue growth; clearing expansion; Athens and data upsell"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Exchange intangible assets on balance sheet; no land/NAV misstatement pattern (urd_2025.pdf)"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Asset-light croupier model"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "All reporting segments profitable FY2025 and Q1 2026 (q1_2026_press_release.pdf)"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / RPO not in FCF path?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Transaction and subscription revenue recognized with activity"
+    },
+    {
+      "q": 5,
+      "question": "Private stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No material holdco stakes; reference shareholders are strategic investors not hidden NAV"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating croupier, not yield-curve royalty trust"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Clearing migration and data/Athens expansion embedded in Capital Markets and Data Solutions growth path"
+    },
+    {
+      "q": 0,
+      "question": "Material options after scan?",
+      "answer": "No separate overlay",
+      "treatment": "n/a",
+      "evidence": "Lawrence full cash-flow path sufficient; strategic plan upside in bull scenario only"
+    }
+  ],
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "lawrence_horizon_years": 7,
+  "evidence_refresh": {
+    "synthesis_in_dive": true
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 5.2
+    },
+    "base": {
+      "return_pct": 9.6
+    },
+    "bull": {
+      "return_pct": 12.7
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 5.2
+    },
+    "base": {
+      "return_pct": 9.6
+    },
+    "bull": {
+      "return_pct": 12.7
+    }
+  },
+  "implied_return": {
+    "base_pct": 10.29,
+    "label": "7yr IRR (total synthesis)",
+    "display": "10.29% (total synthesis)",
+    "lawrence_stance_gate_pct": 9.6,
+    "falsifier_adjusted_pct": 9.6,
+    "synthesis_pct": 10.29
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": 5.2,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 12.7,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 10.49,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 10.29,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  },
+  "total_return_panel": {
+    "as_of": "2026-06-11",
+    "status": "insufficient_price_history",
+    "error": "yahoo_error:HTTP Error 404: Not Found",
+    "cumulative_distributions_per_share": 0,
+    "distribution_history_sum": 0,
+    "market_cap_m": null,
+    "total_return_annualized_pct": null,
+    "chart": "ENX.PA/research/charts/total_return_2026-06-11.svg",
+    "panel_json": "ENX.PA/research/total_return_panel.json"
+  },
+  "context_overlay": {
+    "as_of": "2026-06-11",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": -0.1,
+            "as_of": "2026-06-11",
+            "yoy_pct": 89.5,
+            "direction": "up",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.5320000648498535,
+            "as_of": "2026-06-11",
+            "yoy_pct": 2.7,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.265999794006348,
+            "as_of": "2026-06-11",
+            "yoy_pct": 6.4,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 100.26300048828125,
+            "as_of": "2026-06-11",
+            "yoy_pct": 1.7,
+            "direction": "up",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 21.350000381469727,
+            "as_of": "2026-06-11",
+            "yoy_pct": 23.7,
+            "direction": "up",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": -0.45,
+            "as_of": "2026-06-11",
+            "yoy_pct": -232.4,
+            "direction": "down",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 13.67,
+            "as_of": "2026-06-11",
+            "yoy_pct": 15.1,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "lens_consensus": {
+    "as_of": "2026-06-11",
+    "shared_inputs_ref": "valuation.json@2026-06-11",
+    "valuation_richness": 0.36,
+    "blended_return_pct": 9.23,
+    "band_pct": [
+      5.2,
+      11.6
+    ],
+    "weighted_median_pct": 9.6,
+    "median_mean_flag": false,
+    "stance": "watch",
+    "agreement_pct": 100,
+    "dissent_count": 0,
+    "lawrence_divergence": false,
+    "top_dissents": [],
+    "contributor_count": 8,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
+  }
+}
