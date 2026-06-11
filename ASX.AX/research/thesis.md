@@ -7,26 +7,28 @@
 | Field | Value |
 |-------|-------|
 | **Archetype** (Stahl) | croupier |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Moat** (Munger) | stable |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **Implied 7yr IRR** (base) | — |
-| **IRR method** | — |
+| **Cycle** | mid |
+| **Implied 7yr IRR** (base) | 6.87% (total synthesis) |
+| **IRR method** | full |
 | **Lawrence bucket** | multi_sided |
 | **Payoff lens** | operating |
 | **MOI bucket** | pending |
 
+**Deep dive:** `ASX.AX/research/deep_dive_2026-06-11.md` (auto-sync)
+
 ## One-line thesis
 
-ASX Limited — thesis pending Marvin deep dive.
+Australia's licensed exchange and clearing monopoly: FY2025 revenue $1.11B (+7%), 62.8% EBITDA margin, but ~6.9% base annual return at AUD 48.82 after CHESS capex drag → **watch**.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest annual report (FY2025)
+- [ ] Read latest half-year report when published
+- [ ] CHESS replacement go-live timeline and regulatory posture post-Oct 2024 incident
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-06-11; awaiting deep dive.
+- First deep dive 2026-06-11; confirm live price and moat after CHESS incident.
