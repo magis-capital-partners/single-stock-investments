@@ -7,19 +7,21 @@
 | Field | Value |
 |-------|-------|
 | **Archetype** (Stahl) | croupier |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Moat** (Munger) | stable |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **Implied 7yr IRR** (base) | — |
-| **IRR method** | — |
+| **Cycle** | mid |
+| **Implied 7yr IRR** (base) | 25.2% (total synthesis) |
+| **IRR method** | full |
 | **Lawrence bucket** | multi_sided |
 | **Payoff lens** | operating |
 | **MOI bucket** | pending |
 
+**Deep dive:** `BYMA/research/deep_dive_2026-06-11.md` (auto-sync)
+
 ## One-line thesis
 
-Bolsas y Mercados Argentinos S.A. — thesis pending Marvin deep dive.
+Argentina exchange and CSD croupier with ~76% EBITDA margin; base IRR ~25% at ARS 296 but watch pending human Argentina sizing (dhando partial).
 
 ## Key questions
 
@@ -29,4 +31,4 @@ Bolsas y Mercados Argentinos S.A. — thesis pending Marvin deep dive.
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-06-11; awaiting deep dive.
+- Confirm watch vs mechanical accumulate for Argentina exposure sizing.
