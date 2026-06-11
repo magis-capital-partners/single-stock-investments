@@ -1,0 +1,221 @@
+{
+  "ticker": "NZX.NZ",
+  "as_of": "2026-06-11",
+  "method": "full",
+  "lawrence_bucket": "multi_sided",
+  "classification_inputs": {
+    "archetype": "croupier",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 1.395,
+    "price_source": "Yahoo Finance NZX.NZ 2026-06-11",
+    "fcf_per_share": 0.0807,
+    "fcf_source": "FY2025 free cash flow NZD 26.5m / 328.216m weighted average shares (Annual Report Note 14, investor presentation)",
+    "shares_millions": 328.5,
+    "normalization_note": "FY2025 filing-based owner cash; wealth-tech amortisation bubble may lift FCF faster than net profit per management commentary"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.02,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 16,
+      "notes": "Capital-raising drought; derivatives ramp delayed; multiple compression"
+    },
+    "base": {
+      "growth_y1_5": 0.05,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 18,
+      "notes": "Funds + wealth-tech growth offsets flat exchange tolls; FY2026 EBITDA guidance NZD 53-58.5m"
+    },
+    "bull": {
+      "growth_y1_5": 0.07,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 20,
+      "notes": "Listing recovery + equity derivatives + KiwiSaver structural tailwind"
+    }
+  },
+  "option_scan": [
+    {
+      "id": "gaap_book",
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Goodwill and software intangibles on balance sheet; negative net tangible assets is accounting classification not hidden land"
+    },
+    {
+      "id": "derivatives_launch",
+      "question": "In-business option not in FCF path?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Equity derivatives launched April 2026; revenue in Secondary Markets segment growth assumption"
+    },
+    {
+      "id": "quaystreet_externalisation",
+      "question": "Corporate action affecting run-rate?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "QuayStreet investment management externalised Feb 2026; FUM fees net of fund costs per Q1 2026 metrics"
+    },
+    {
+      "id": "material_options",
+      "question": "Material standalone options after scan?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Derivatives and platform migrations embedded in operating segments; no separate NAV overlay"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "Structural KiwiSaver and wealth-platform FUM growth plus new equity derivatives; partially offset by cyclical NZ capital-markets issuance and trading volumes.",
+    "source": "FY2025 annual report; Q1 2026 operating revenue release",
+    "lawrence_legacy": {
+      "y1_5": 0.05,
+      "y6_10": 0.04,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.05,
+      "y6_10": 0.04,
+      "exit_pfcf_y10": 18.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": null,
+      "as_of_filing_facts": null
+    },
+    "status": "partial"
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 7.0
+    },
+    "base": {
+      "return_pct": 11.3
+    },
+    "bull": {
+      "return_pct": 14.6
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 7.0
+    },
+    "base": {
+      "return_pct": 11.3
+    },
+    "bull": {
+      "return_pct": 14.6
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": 11.3
+    },
+    "falsifier_adjusted": {
+      "return_pct": 11.3
+    }
+  },
+  "implied_return": {
+    "base_pct": 11.82,
+    "label": "7yr IRR (total synthesis)",
+    "display": "11.82% (total synthesis)",
+    "lawrence_stance_gate_pct": 11.3,
+    "falsifier_adjusted_pct": 11.3,
+    "synthesis_pct": 11.82
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Growth theory (pre-falsifier)",
+        "source": "growth_explanation + filing revenue YoY",
+        "return_pct": 11.3,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": 7.0,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 14.6,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 12.02,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 11.82,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}
