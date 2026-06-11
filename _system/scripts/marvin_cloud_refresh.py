@@ -222,6 +222,11 @@ def main() -> int:
         [PY, str(SCRIPTS / "fetch_equity_prices.py"), ticker, "--merge"],
         optional=True,
     )
+    run(
+        "total return panel",
+        [PY, str(SCRIPTS / "build_total_return_panel.py"), ticker, "--date", args.date],
+        optional=True,
+    )
     if ticker_has_crypto_tag(ticker):
         run(
             "crypto indicator panels",

@@ -8,7 +8,7 @@
 
 ## Executive summary
 
-Marvin floor **11.81%** per year (optionality; stance **watch**) from primary filings and `valuation.json`. No third-party sources indexed; filings-only stance. **[HUMAN REVIEW]** for approved-source numeric blend.
+Marvin floor **11.81%** per year (optionality; stance **watch**) from primary filings and `valuation.json`. No third-party sources indexed; filings-only stance. Human approved 2026-06-11 (no third-party numeric blend).
 
 **Synthesis (best estimate):** Marvin **11.81%** base · stance **watch**; external sources adjust conviction on catalyst timing, not primary IRR without human OK.
 
@@ -47,9 +47,7 @@ Marvin floor **11.81%** per year (optionality; stance **watch**) from primary fi
 
 ## [HUMAN REVIEW]
 
-- [ ] Every **approved** source reviewed against filings
-- [ ] Every **pending** source cited with **[PENDING APPROVAL]** only
-- [ ] Blended estimate in `valuation.json` → `estimates.external[]` if material
+**Approved 2026-06-11.** No indexed third-party sources; Marvin filing floor stands. Checklist N/A until sources indexed.
 
 ## [PROPOSED MEMORY]
 
