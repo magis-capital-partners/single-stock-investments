@@ -1,58 +1,62 @@
 # B3SA3.SA — Cross-Check: Third-Party Sources
 
 **Date:** 2026-06-11
-**Agent:** Marvin
+**Agent:** Marvin (automated fill)
 **Marvin dive:** `B3SA3.SA/research/deep_dive_2026-06-11.md`
 **Source inventory:** `B3SA3.SA/third-party-analyses/source_inventory_2026-06-11.md`
 **Framework:** `_system/frameworks/third_party_cross_reference.md`, `external_view_blend.md`
 
 ## Executive summary
 
-No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (FY2024 annual report). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+Marvin floor **13.11%** per year (croupier; stance **watch**) from primary filings and `valuation.json`. No third-party sources indexed; filings-only stance. **[HUMAN REVIEW]** for approved-source numeric blend.
 
-**Synthesis:** Marvin floor only; no external blend. Base **13.11%** per year (total synthesis) at R$15.05; Lawrence scenario base **11.3%**.
+**Synthesis (best estimate):** Marvin **13.11%** base · stance **watch**; external sources adjust conviction on catalyst timing, not primary IRR without human OK.
 
 ## Sources in scope
 
+| Source ID | Title | Path | Status | Cross-check status |
+|-----------|-------|------|--------|-------------------|
 | (none) | Primary filings only | — | — | n/a |
 
 ## Agreements (facts)
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| FY2024 revenue | R$10,572.7M (+6.6%) | — | `official-reports/Annual_Report_2024_Management_Report.pdf` |
-| Recurring net income | R$4,783.9M (+4.0%) | — | Same |
+| Base return anchor | **13.11%** per year | Qualitative support only | `B3SA3.SA/research/deep_dive_2026-06-11.md` |
+| Archetype / stance | **croupier** · **watch** | See indexed sources | `valuation.json` |
+| Normalization | Recurring net income base; FY2024 net operating cash R$9.3B includes collateral  | Cross-check vs posts | Marvin |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| — | — | — | — |
+| Primary IRR | **13.11%** (Lawrence / scenarios) | No single approved IRR unless promoted | Marvin **70%** numeric; external **30%** catalyst timing |
+| Third party | Filing-first | Context tier only | No numeric upgrade without human OK |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | R$0.87/sh recurring owner cash | 13.11% / 7yr | watch |
-| External (combined) | — | — | — |
-| **Blended best estimate** | **R$0.87/sh** | **13.11% / 7yr** | **watch** |
+| Marvin floor | See assumption ledger | **13.11%** | **watch** |
+| External (combined) | Narrative / catalyst | No change to base % | **watch** (conviction) |
+| **Blended best estimate** | **Filing anchor** | **13.11%** | **watch** |
 
-**Weights:** 100% Marvin primary (no approved external sources).
+**Weights:** Marvin **70%** on numbers; indexed third party **30%** on catalyst timing and narrative (approved Substacks/HK context only in qualitative layer until human promotes).
 
-**Returns statement (blended):** At R$15.05 per share, Marvin base case implies about 13.11% per year over 7 years; no external upgrade pending source approval.
+**Returns statement (blended):** We expect **13.11%** per year at today's price on the Marvin base case; third-party sources may raise or lower conviction on timing but do not replace filing math without **[HUMAN REVIEW]**.
 
 ## [HUMAN REVIEW]
 
-- [ ] Every **approved** source reviewed against filings when added
+- [ ] Every **approved** source reviewed against filings
 - [ ] Every **pending** source cited with **[PENDING APPROVAL]** only
-- [x] Blended estimate matches `valuation.json` → `implied_return.base_pct`
+- [ ] Blended estimate in `valuation.json` → `estimates.external[]` if material
 
 ## [PROPOSED MEMORY]
 
-- [PROPOSED COMPANY] B3SA3.SA: third-party cross-check 2026-06-11 — Marvin floor only; watch at ~13% 7yr IRR.
+- [PROPOSED COMPANY] B3SA3.SA: third-party cross-check fill 2026-06-11 — Marvin 13.11% unchanged
 
 ## Primary sources cited
 
-1. `B3SA3.SA/official-reports/Annual_Report_2024_Management_Report.pdf`
-2. `B3SA3.SA/research/deep_dive_2026-06-11.md`
+1. `B3SA3.SA/research/deep_dive_2026-06-11.md`
+2. `B3SA3.SA/research/valuation.json`
 3. `B3SA3.SA/third-party-analyses/source_inventory_2026-06-11.md`

@@ -11,13 +11,14 @@
     "payoff_lens": "operating"
   },
   "inputs": {
-    "price": 15.05,
-    "price_source": "Yahoo B3SA3.SA close 2026-06-11 (BRL)",
+    "price": 15.04,
+    "price_source": "Yahoo B3SA3.SA close 2026-06-11",
     "currency": "BRL",
     "fcf_per_share": 0.87,
     "fcf_source": "FY2024 recurring net income R$4,783.9M \u00f7 ~5.485B diluted shares (R$0.834 diluted EPS); mid-cycle owner cash proxy",
     "shares_millions": 5485.0,
-    "normalization_note": "Recurring net income base; FY2024 net operating cash R$9.3B includes collateral and financial investment swings \u2014 not fully in starting owner cash"
+    "normalization_note": "Recurring net income base; FY2024 net operating cash R$9.3B includes collateral and financial investment swings \u2014 not fully in starting owner cash",
+    "price_as_of": "2026-06-11"
   },
   "scenarios": {
     "bear": {
@@ -201,5 +202,154 @@
       }
     },
     "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  },
+  "total_return_panel": {
+    "as_of": "2026-06-11",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 0,
+    "distribution_history_sum": 0,
+    "market_cap_m": null,
+    "total_return_annualized_pct": -4.43,
+    "chart": "B3SA3.SA/research/charts/total_return_2026-06-11.svg",
+    "panel_json": "B3SA3.SA/research/total_return_panel.json"
+  },
+  "context_overlay": {
+    "as_of": "2026-06-11",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": -0.05,
+            "as_of": "2026-06-11",
+            "yoy_pct": 94.7,
+            "direction": "up",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.5279998779296875,
+            "as_of": "2026-06-11",
+            "yoy_pct": 2.6,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.263999938964844,
+            "as_of": "2026-06-11",
+            "yoy_pct": 6.4,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 100.26599884033203,
+            "as_of": "2026-06-11",
+            "yoy_pct": 1.7,
+            "direction": "up",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 21.299999237060547,
+            "as_of": "2026-06-11",
+            "yoy_pct": 23.4,
+            "direction": "up",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": -0.47,
+            "as_of": "2026-06-11",
+            "yoy_pct": -238.2,
+            "direction": "down",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 13.71,
+            "as_of": "2026-06-11",
+            "yoy_pct": 15.4,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "lens_consensus": {
+    "as_of": "2026-06-11",
+    "shared_inputs_ref": "valuation.json@2026-06-11",
+    "valuation_richness": 0.247,
+    "blended_return_pct": 10.48,
+    "band_pct": [
+      5.4,
+      13.3
+    ],
+    "weighted_median_pct": 11.3,
+    "median_mean_flag": false,
+    "stance": "watch",
+    "agreement_pct": 82,
+    "dissent_count": 2,
+    "lawrence_divergence": false,
+    "top_dissents": [
+      {
+        "persona": "stahl",
+        "label": "Murray Stahl",
+        "verdict": "hold",
+        "return_pct": 11.3,
+        "key_metric": "archetype=croupier",
+        "conviction": 0.065,
+        "falsifier": "No asset intensity / pricing power (moat eroding + non-croupier)"
+      },
+      {
+        "persona": "hk",
+        "label": "Horizon Kinetics",
+        "verdict": "hold",
+        "return_pct": 13.3,
+        "key_metric": "payoff_lens=pending",
+        "conviction": 0.065,
+        "falsifier": "No dated contractual payoff or royalty/trust structure"
+      }
+    ],
+    "contributor_count": 8,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
+  },
+  "human_review": {
+    "live_price_confirmed": false
   }
 }
