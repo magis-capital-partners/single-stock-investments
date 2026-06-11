@@ -9,9 +9,9 @@
 
 ## Executive summary
 
-No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (10-K, 10-Q, IR). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (BMV annual and quarterly reports). TRK Report Jan 2026 flagged BOLSAA.MX in the Royalty King exchange screen but is **[PENDING APPROVAL]** and not in base IRR.
 
-**Synthesis:** Marvin floor only; no external blend.
+**Synthesis:** Marvin floor only; no external blend. Lawrence base **17.2%** at MXN 36.36 on FY2025 owner cash (see `valuation.json`).
 
 ## Sources in scope
 
@@ -33,13 +33,13 @@ No third-party sources are indexed for this ticker as of this scan. Marvin stanc
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | — | — | — |
-| External (combined) | — | — | — |
-| **Blended best estimate** | **—** | **—** | **—** |
+| Marvin floor | MXN 2.85/sh owner cash; 5%/4% growth | **17.2%** / 7yr | hold (proposed) |
+| External (combined) | n/a | n/a | n/a |
+| **Blended best estimate** | **Same as Marvin floor** | **17.2%** | **hold (proposed)** |
 
-**Weights:** *[Document why]*
+**Weights:** 100% Marvin (no approved external sources).
 
-**Returns statement (blended):** *[One sentence; pending sources not in base IRR]*
+**Returns statement (blended):** With no approved third-party inputs, blended return equals Marvin base **17.2%** per year at MXN 36.36.
 
 ## [HUMAN REVIEW]
 

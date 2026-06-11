@@ -1,0 +1,162 @@
+{
+  "ticker": "BOLSAA.MX",
+  "as_of": "2026-06-11",
+  "method": "full",
+  "lawrence_bucket": "multi_sided",
+  "currency": "MXN",
+  "classification_inputs": {
+    "archetype": "croupier",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid"
+  },
+  "inputs": {
+    "price": 36.36,
+    "price_source": "Yahoo Finance BOLSAA.MX close 2026-06-11",
+    "fcf_per_share": 2.85,
+    "fcf_source": "FY2025 net cash from operating activities MXN 1,884.6M minus capital spending MXN 259M, divided by 556M shares in circulation",
+    "shares_millions": 556.0,
+    "normalization_note": "Mid-cycle owner cash; Asigna margin-deposit revenue cyclical and Q4 2025 expense step-up from Digital Evolution not inflated into base"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.02,
+      "growth_y6_10": 0.01,
+      "exit_pfcf_y10": 14,
+      "notes": "Volume mean-reversion; margin deposit decline; expense inflation persists"
+    },
+    "base": {
+      "growth_y1_5": 0.05,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 18,
+      "notes": "Mid-single revenue growth; Indeval and data mix; ~12x spot P/FCF to 18x exit"
+    },
+    "bull": {
+      "growth_y1_5": 0.07,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 22,
+      "notes": "Nearshoring listings + sustained derivatives/SIC volume; margin stabilization post tech spend"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 0,
+      "question": "Material options after scan?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating croupier; Lawrence full cash-flow path sufficient. Digital Evolution and custody scale embedded in segment revenue, not separate NAV."
+    }
+  ],
+  "stance_proposal": {
+    "suggested": "hold",
+    "irr_band": "15\u201320%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "evidence_refresh": {
+    "synthesis_in_dive": true
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 10.8
+    },
+    "base": {
+      "return_pct": 17.2
+    },
+    "bull": {
+      "return_pct": 21.9
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 10.8
+    },
+    "base": {
+      "return_pct": 17.2
+    },
+    "bull": {
+      "return_pct": 21.9
+    }
+  },
+  "implied_return": {
+    "base_pct": 18.44,
+    "label": "7yr IRR (total synthesis)",
+    "display": "18.44% (total synthesis)",
+    "lawrence_stance_gate_pct": 17.2,
+    "falsifier_adjusted_pct": 17.2,
+    "synthesis_pct": 18.44
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": 10.8,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 21.9,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 18.64,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 18.44,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}
