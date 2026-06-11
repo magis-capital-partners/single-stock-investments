@@ -112,4 +112,5 @@ One row per adversarial or consistency re-pass. Append via `milly_repass.py` or 
 | 2026-06-10 | HNFSA | standard_batch | OK | marvin_cloud_refresh |
 | 2026-06-10 | RYN | standard_batch | OK | marvin_cloud_refresh |
 | 2026-06-10 | GCCO | standard_batch | OK | marvin_cloud_refresh |
-| 2026-06-11 | 0388.HK | standard_batch | OK | marvin_cloud_refresh |
+| 2026-06-11 | B3SA3.SA | standard_batch | OK | marvin_cloud_refresh |
+| 2026-06-11 | B3SA3.SA | standard_batch | OK | marvin_cloud_refresh |
