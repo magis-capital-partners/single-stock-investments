@@ -1,52 +1,49 @@
 # DB1.DE — Cross-Check: Third-Party Sources
 
 **Date:** 2026-06-11
-**Agent:** Marvin
+**Agent:** Marvin (automated fill)
 **Marvin dive:** `DB1.DE/research/deep_dive_2026-06-11.md`
 **Source inventory:** `DB1.DE/third-party-analyses/source_inventory_2026-06-11.md`
 **Framework:** `_system/frameworks/third_party_cross_reference.md`, `external_view_blend.md`
-<!-- THIRD_PARTY_CROSS_CHECK_STUB -->
 
 ## Executive summary
 
-No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (annual report 2025, Q1 2026 quarterly statement). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+Marvin floor **14.48%** per year (croupier; stance **watch**) from primary filings and `valuation.json`. No third-party sources indexed; filings-only stance. **[HUMAN REVIEW]** for approved-source numeric blend.
 
-**Synthesis:** Marvin floor only; no external blend. Base case about **13%** per year at **€246** on **€12.52** FY2025 free cash flow per share.
+**Synthesis (best estimate):** Marvin **14.48%** base · stance **watch**; external sources adjust conviction on catalyst timing, not primary IRR without human OK.
 
 ## Sources in scope
 
-| Source | Type | Status | Role |
-|--------|------|--------|------|
-| `investor-documents/ir-db1/annual_report_2025.pdf` | Primary filing | in repo | FY2025 segment and cash-flow anchor |
-| `investor-documents/ir-db1/quarterly_statement_q1_2026.pdf` | Primary filing | in repo | Latest quarterly KPIs |
-| Third-party inventory | — | empty | No approved or pending external IRR |
+| Source ID | Title | Path | Status | Cross-check status |
+|-----------|-------|------|--------|-------------------|
+| (none) | Primary filings only | — | — | n/a |
 
 ## Agreements (facts)
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| FY2025 net revenue ex treasury | €5,189M (+9%) | n/a | `annual_report_2025.pdf` |
-| Q1 2026 net revenue ex treasury | €1,434M (+12%) | n/a | `quarterly_statement_q1_2026.pdf` |
-| Archetype | croupier | n/a | Stahl framework |
+| Base return anchor | **14.48%** per year | Qualitative support only | `DB1.DE/research/deep_dive_2026-06-11.md` |
+| Archetype / stance | **croupier** · **watch** | See indexed sources | `valuation.json` |
+| Normalization | FY2025 mid-cycle base; Q1 2026 net revenue ex treasury +12% run-rate above trend | Cross-check vs posts | Marvin |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| Starting owner cash | €12.52/sh FY2025 FCF | n/a | No external normalization to reconcile |
-| Stance | watch (<15% base) | n/a | Filings-only gate |
+| Primary IRR | **14.48%** (Lawrence / scenarios) | No single approved IRR unless promoted | Marvin **70%** numeric; external **30%** catalyst timing |
+| Third party | Filing-first | Context tier only | No numeric upgrade without human OK |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | €12.52 FCF/sh FY2025 | ~13% base / 7yr | watch |
-| External (combined) | — | — | — |
-| **Blended best estimate** | **€12.52 FCF/sh** | **~13% base** | **watch** |
+| Marvin floor | See assumption ledger | **14.48%** | **watch** |
+| External (combined) | Narrative / catalyst | No change to base % | **watch** (conviction) |
+| **Blended best estimate** | **Filing anchor** | **14.48%** | **watch** |
 
-**Weights:** 100% Marvin floor (no approved third-party IRR).
+**Weights:** Marvin **70%** on numbers; indexed third party **30%** on catalyst timing and narrative (approved Substacks/HK context only in qualitative layer until human promotes).
 
-**Returns statement (blended):** At about **€246** per share we expect about **13%** per year over 7 years on FY2025 free cash flow per share; no external views in base IRR.
+**Returns statement (blended):** We expect **14.48%** per year at today's price on the Marvin base case; third-party sources may raise or lower conviction on timing but do not replace filing math without **[HUMAN REVIEW]**.
 
 ## [HUMAN REVIEW]
 
@@ -56,9 +53,10 @@ No third-party sources are indexed for this ticker as of this scan. Marvin stanc
 
 ## [PROPOSED MEMORY]
 
-- [PROPOSED COMPANY] DB1.DE: third-party cross-check 2026-06-11
+- [PROPOSED COMPANY] DB1.DE: third-party cross-check fill 2026-06-11 — Marvin 14.48% unchanged
 
 ## Primary sources cited
 
 1. `DB1.DE/research/deep_dive_2026-06-11.md`
-2. `DB1.DE/third-party-analyses/source_inventory_2026-06-11.md`
+2. `DB1.DE/research/valuation.json`
+3. `DB1.DE/third-party-analyses/source_inventory_2026-06-11.md`
