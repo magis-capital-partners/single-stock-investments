@@ -33,6 +33,10 @@ def github_tree_url(rel_path: str) -> str:
     return f"https://github.com/{GITHUB_REPO}/tree/main/{rel_path.replace(chr(92), '/').rstrip('/')}"
 
 
+def github_raw_url(rel_path: str) -> str:
+    return f"https://raw.githubusercontent.com/{GITHUB_REPO}/main/{rel_path.replace(chr(92), '/')}"
+
+
 DATED_MD_RE = re.compile(r"_(\d{4}-\d{2}-\d{2})\.md$")
 
 
@@ -375,6 +379,54 @@ def valuation_human_review(ticker_dir: Path) -> dict | None:
         "approved_date": hr.get("approved_date"),
         "notes": hr.get("notes"),
     }
+
+
+def valuation_total_return_panel(ticker: str, ticker_dir: Path) -> dict | None:
+    val = load_valuation(ticker_dir)
+    if not val:
+        return {
+            "ticker": ticker,
+            "status": "missing",
+            "error": "no_valuation_json",
+            "chart_github_url": None,
+            "chart_raw_url": None,
+            "panel_github_url": None,
+        }
+    panel = val.get("total_return_panel") or {}
+    panel_path = ticker_dir / "research" / "total_return_panel.json"
+    panel_file = None
+    if panel_path.exists():
+        try:
+            panel_file = json.loads(panel_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            panel_file = None
+    merged = {}
+    if isinstance(panel_file, dict):
+        merged.update(panel_file)
+    if isinstance(panel, dict):
+        merged.update(panel)
+    if not merged:
+        return {
+            "ticker": ticker,
+            "status": "missing",
+            "error": "panel_not_built",
+            "chart_github_url": None,
+            "chart_raw_url": None,
+            "panel_github_url": None,
+        }
+    chart_rel = merged.get("chart")
+    panel_rel = merged.get("panel_json")
+    merged["chart_github_url"] = (
+        github_blob_url(chart_rel) if chart_rel else None
+    )
+    merged["chart_raw_url"] = (
+        github_raw_url(chart_rel) if chart_rel else None
+    )
+    merged["panel_github_url"] = (
+        github_blob_url(panel_rel) if panel_rel else None
+    )
+    merged["ticker"] = ticker
+    return merged
 
 
 def thesis_status(ticker_dir: Path) -> str:
@@ -800,6 +852,7 @@ def build_ticker_row(ticker: str, holdings: dict[str, dict], portfolio_class: di
         "links": _research_links(ticker, ticker_dir),
         "deep_dive": deep_dive,
         "human_review": valuation_human_review(ticker_dir),
+        "total_return_panel": valuation_total_return_panel(ticker, ticker_dir),
         "recent_files": recent_files(ticker_dir),
         "developments": recent_developments(ticker_dir, ticker),
         "onboard": reconcile_onboard_status(ticker_dir, pdf_count),

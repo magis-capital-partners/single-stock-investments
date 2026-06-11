@@ -408,6 +408,35 @@
   .holdings-view { display: flex; flex-direction: column; flex: 1; min-height: 0; }
   .holdings-view.hidden { display: none; }
   .onboard-badge { font-size: 10px; margin-left: 6px; color: var(--accent-amber); }
+  .total-return-panel .tr-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .total-return-panel .tr-note {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 8px;
+  }
+  .total-return-panel .tr-chart {
+    margin-top: 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #fff;
+    overflow: hidden;
+  }
+  .total-return-panel .tr-chart img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .total-return-panel .tr-links {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
   .device-code-box { margin: 16px 0; line-height: 1.6; }
   .device-code {
     font-size: 28px; letter-spacing: 4px; font-weight: 700;
@@ -701,6 +730,53 @@ function renderLensDeltaCell(t) {
   const warn = Math.abs(d) > 2 ? ' lens-delta-warn' : '';
   const sign = d > 0 ? '+' : '';
   return `<span class="mono${warn}">${sign}${d.toFixed(1)}pp</span>`;
+}
+
+function fmtNum(v, digits = 2) {
+  if (v == null || Number.isNaN(Number(v))) return '—';
+  return Number(v).toFixed(digits);
+}
+
+function fmtPct(v) {
+  if (v == null || Number.isNaN(Number(v))) return '—';
+  return `${Number(v).toFixed(1)}%`;
+}
+
+function renderTotalReturnSection(t) {
+  const tr = t.total_return_panel;
+  if (!tr) {
+    return `
+    <div class="detail-section total-return-panel">
+      <h3>Total return panel</h3>
+      <div class="summary" style="color:var(--text-muted)">Not built yet for this ticker.</div>
+    </div>`;
+  }
+  const status = tr.status || 'pending';
+  const statusBadge = status === 'complete'
+    ? '<span class="badge badge-ok">complete</span>'
+    : '<span class="badge badge-warn">partial</span>';
+  const chartImg = tr.chart_raw_url && status === 'complete'
+    ? `<div class="tr-chart"><img loading="lazy" src="${tr.chart_raw_url}" alt="${t.ticker} total return chart" /></div>`
+    : '';
+  const note = status !== 'complete'
+    ? `Price history incomplete (${escapeHtml(tr.error || 'unknown')}). Panel still includes distributions and market-cap estimate when available.`
+    : `History ${escapeHtml(tr.history_start || '—')} to ${escapeHtml(tr.history_end || '—')}.`;
+  return `
+    <div class="detail-section total-return-panel">
+      <h3>Total return panel ${statusBadge}</h3>
+      <div class="tr-grid">
+        <div class="metric"><div class="k">Cumulative distributions/share</div><div class="v mono">${fmtNum(tr.cumulative_distributions_per_share)}</div></div>
+        <div class="metric"><div class="k">Total return annualized</div><div class="v mono">${fmtPct(tr.total_return_annualized_pct)}</div></div>
+        <div class="metric"><div class="k">Price-only annualized</div><div class="v mono">${fmtPct(tr.price_only_annualized_pct)}</div></div>
+        <div class="metric"><div class="k">Market cap estimate</div><div class="v mono">${tr.market_cap_m != null ? `$${fmtNum(tr.market_cap_m)}M` : '—'}</div></div>
+      </div>
+      ${chartImg}
+      <div class="tr-links">
+        ${tr.panel_github_url ? `<a class="research-link" href="${tr.panel_github_url}" target="_blank" rel="noopener">Panel JSON →</a>` : ''}
+        ${tr.chart_github_url ? `<a class="research-link" href="${tr.chart_github_url}" target="_blank" rel="noopener">Chart file →</a>` : ''}
+      </div>
+      <div class="tr-note">${escapeHtml(note)}</div>
+    </div>`;
 }
 
 async function load() {
@@ -1309,6 +1385,8 @@ function selectTicker(ticker) {
     ${tier2}
 
     ${tier3}
+
+    ${renderTotalReturnSection(t)}
 
     ${t.deep_dive ? `
     <div class="detail-section">
