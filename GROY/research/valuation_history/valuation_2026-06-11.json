@@ -1,0 +1,363 @@
+{
+  "ticker": "GROY",
+  "as_of": "2026-06-11",
+  "valuation_mode": "optionality",
+  "method": "full",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "unproven",
+    "dhando": "partial",
+    "cycle": "peak",
+    "payoff_lens": "asset",
+    "predictive_attribute": "dormant_asset",
+    "moi_bucket": "royalty_aggregator"
+  },
+  "inputs": {
+    "price": 2.77,
+    "price_source": "Yahoo GROY close 2026-06-11",
+    "fcf_per_share": 0.033,
+    "fcf_source": "FY2025 operating cash flow $6.17M \u00f7 188.006M weighted average shares (20-F Item 5 MD&A)",
+    "shares_millions": 188.0,
+    "normalization_note": "Owner cash uses operating cash flow ($6.17M FY2025), not reported net loss ($4.1M) which includes fair-value gains on gold-linked loan, short-term investments, and other non-cash items per MD&A. Adjusted net loss $1.7M shown as cross-check. Minimal sustaining capex at royalty holding company; royalty generator land proceeds credited against mineral interests excluded from Lawrence FCF\u2080.",
+    "price_as_of": "2026-06-11"
+  },
+  "optionality_gate": {
+    "framework": "royalty_development_option",
+    "floor_pass": true,
+    "floor_metric": "balance_sheet",
+    "floor_value": "no_debt_12.4m_cash_75m_undrawn_credit",
+    "primary_metric": "lawrence_base",
+    "primary_label": "7yr IRR",
+    "primary_return_pct": -8.7,
+    "incumbent_sleeve": false,
+    "notes": "No outstanding debt at 12/31/2025 after credit facility and debenture repayment; $75M revolver available. Lawrence owner-cash gate is low because producing cash is early-stage (~$0.033/sh OCF). Do not use GAAP book (~$3.11/sh equity) as dhando floor: royalty interests carried at cost/amortized cost, not fair value (20-F accounting policies)."
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 14,
+      "notes": "Gold price mean-reverts from record 2025 levels; revenue concentration in four mines hurts if one operator stalls; share count dilution from royalty generator model continues"
+    },
+    "base": {
+      "growth_y1_5": 0.12,
+      "growth_y6_10": 0.06,
+      "exit_pfcf_y10": 18,
+      "notes": "FY2025 revenue +55% YoY; producing ramps at Borborema, C\u00f4t\u00e9, Vares, Cozamin continue; land-agreement proceeds add to total cash but excluded from Lawrence FCF\u2080 [Assumption]"
+    },
+    "bull": {
+      "growth_y1_5": 0.18,
+      "growth_y6_10": 0.08,
+      "exit_pfcf_y10": 22,
+      "notes": "Development royalties (Canadian Malartic Odyssey, Pedra Branca Jan 2026) plus accretive M&A; gold price stays elevated; OCF scales toward adjusted EBITDA $9.8M run-rate"
+    }
+  },
+  "valuation_overlay": "segment_cashflow",
+  "segment_build": {
+    "segments": [
+      {
+        "id": "producing_royalties",
+        "label": "Producing royalties & streams (Borborema, C\u00f4t\u00e9, Vares, Cozamin, others)",
+        "fcf_per_share_y0": 0.028,
+        "growth_y1_5": 0.12,
+        "growth_y6_10": 0.05,
+        "exit_pfcf_y10": 18,
+        "evidence": "79.7% FY2025 revenue from four properties; OCF $6.17M on 188M WA shares"
+      },
+      {
+        "id": "land_agreements",
+        "label": "Royalty generator land agreements (38 properties)",
+        "fcf_per_share_y0": 0.005,
+        "growth_y1_5": 0.08,
+        "growth_y6_10": 0.04,
+        "exit_pfcf_y10": 15,
+        "evidence": "Total revenue incl. land proceeds $17.8M vs royalty revenue $15.6M FY2025; 9 new royalties added in 2025"
+      }
+    ],
+    "options": [
+      {
+        "id": "development_royalty_book",
+        "label": "Development-stage royalty book (Canadian Malartic Odyssey, Pedra Branca, non-producing portfolio majority)",
+        "option_treatment": "probability_weighted",
+        "annual_drag_per_share": 0.0,
+        "base_terminal_value_bn": 0.15,
+        "base_terminal_rationale": "Substantial majority of interests on non-producing properties per 20-F risk factors; Canadian Malartic 38.6% of assets; partial P-weighted overlay only",
+        "overlay_base_terminal_bn": 0.15,
+        "bull_terminal_value_bn": 0.45,
+        "evidence": "20-F Item 4: Canadian Malartic only material SK1300 property; Odyssey ramp on schedule; Pedra Branca royalty acquired Jan 2026",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "gold_linked_loan_fvtpl",
+        "label": "Gold-linked loan & fair-value financial assets",
+        "option_treatment": "zero",
+        "base_terminal_value_bn": 0.0,
+        "base_terminal_rationale": "Mark-to-market items drove FY2025 net loss volatility; loan principal repaid 2025; not recurring owner cash",
+        "evidence": "20-F MD&A: fair value gain on gold-linked loan; outstanding principal fully repaid during 2025",
+        "not_in_lawrence_base": true
+      }
+    ],
+    "corporate_drag_per_share": 0.002,
+    "horizon_years": 7
+  },
+  "nav_overlay": {
+    "gaap_vs_fair_value": {
+      "note": "Royalty and streaming interests at cost/amortized cost; deferred tax liabilities on mineral interests $134M vs revenue $15.6M shows economic value not fully marked"
+    },
+    "asset_inventory_filing": {
+      "canadian_malartic_pct_assets": 38.6,
+      "producing_revenue_concentration_pct": 79.7,
+      "non_producing_majority": true
+    },
+    "segments_or_options": [
+      {
+        "id": "development_royalty_book",
+        "option_treatment": "probability_weighted",
+        "notes": "Non-producing majority; Odyssey and Pedra Branca catalysts"
+      }
+    ],
+    "not_in_model_requires_refresh": [
+      "Pedra Branca 1.5% NSR acquired January 2026 (post-20-F)",
+      "Full portfolio fair-value SOTP vs carrying value"
+    ]
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Yes",
+      "treatment": "nav_overlay",
+      "evidence": "Royalty interests at cost/amortized cost; deferred tax on mineral interests $134M; equity $699M vs producing cash ~$6M OCF (20-F consolidated statements)"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "20-F: substantial majority of interests on non-producing properties; Canadian Malartic Odyssey ramp; 56 royalties since Ely Gold deal, many pre-production"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Single royalty holding company; adjusted EBITDA positive $9.8M FY2025"
+    },
+    {
+      "q": 4,
+      "question": "Backlog not in FCF path?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Land agreement proceeds in total revenue $17.8M but partially credited against mineral interests; royalty generator model separate from producing OCF"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "Partial",
+      "treatment": "milestone_nav",
+      "evidence": "Equity stakes in Apex Silver and other operators from royalty-for-equity deals; fair value through P&L"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Dividend $0.01/sh; no HK-style distribution recovery"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option already in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Borborema commercial production 2025, C\u00f4t\u00e9 and Vares ramps already in FY2025 revenue mix"
+    }
+  ],
+  "growth_explanation": {
+    "base_mechanism": "Producing mine ramps (Borborema start, C\u00f4t\u00e9/Vares/Cozamin volume) plus royalty-generator land model adding pre-production assets",
+    "bear_falsifier": "Gold price decline from 2025 records or operator delay at concentrated top-four mines",
+    "bull_falsifier": "Canadian Malartic Odyssey and Pedra Branca royalties scale faster than base producing path",
+    "lawrence_legacy": {
+      "y1_5": 0.12,
+      "y6_10": 0.06,
+      "return_pct": null
+    },
+    "status": "partial",
+    "falsifier_adjusted": {
+      "y1_5": 0.12,
+      "y6_10": 0.06,
+      "exit_pfcf_y10": 18.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": 0.5451,
+      "as_of_filing_facts": "evidence/_text/20-F_20260319_rpt20251231_acc0001193125_26_114767.htm.txt"
+    }
+  },
+  "evidence_refresh": {
+    "type": "commodity",
+    "commodities": [
+      "gold",
+      "copper"
+    ],
+    "as_of": "2026-06-11"
+  },
+  "human_review": {
+    "live_price_confirmed": false
+  },
+  "catalyst_paths": [
+    {
+      "event": "Canadian Malartic Odyssey underground ramp",
+      "timing": "2026-2028",
+      "impact": "Material asset (38.6% of balance sheet); operator Agnico Eagle advancing ahead of schedule per Feb 2026 release"
+    },
+    {
+      "event": "Pedra Branca royalty (1.5% NSR)",
+      "timing": "January 2026 acquisition",
+      "impact": "New development asset; not in FY2025 OCF base"
+    },
+    {
+      "event": "Failure mode",
+      "timing": "bear scenario",
+      "impact": "Commodity downturn plus dilution from equity-funded royalty generator; OCF stagnates near $0.03/sh"
+    }
+  ],
+  "lawrence_horizon_years": 7,
+  "human_review_items": [
+    "CIK 1834026 added to us_ticker_config.json during this refresh (was null at onboard)",
+    "Use development-option overlay vs GAAP book for sizing; book is not dhando floor"
+  ],
+  "total_return_panel": {
+    "as_of": "2026-06-11",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 0,
+    "distribution_history_sum": 0,
+    "market_cap_m": null,
+    "total_return_annualized_pct": -4.76,
+    "chart": "GROY/research/charts/total_return_2026-06-11.svg",
+    "panel_json": "GROY/research/total_return_panel.json"
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -17.6
+    },
+    "base": {
+      "return_pct": -8.7
+    },
+    "bull": {
+      "return_pct": -2.3
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -17.6
+    },
+    "base": {
+      "return_pct": -8.7
+    },
+    "bull": {
+      "return_pct": -2.3
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": -8.7
+    },
+    "falsifier_adjusted": {
+      "return_pct": -8.7
+    }
+  },
+  "implied_return": {
+    "base_pct": -7.41,
+    "label": "7yr IRR (total synthesis)",
+    "display": "-7.41% (total synthesis)",
+    "lawrence_stance_gate_pct": -8.7,
+    "falsifier_adjusted_pct": -8.7,
+    "synthesis_pct": -7.41
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": true,
+      "floor_pass": true,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": null
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Segment-derived growth (pre-falsifier)",
+        "source": "segment_build weighted blend",
+        "return_pct": -8.7,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": -17.6,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": -2.3,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": -7.41,
+    "qualitative_pp": 0,
+    "total_synthesis_pct": -7.41,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}

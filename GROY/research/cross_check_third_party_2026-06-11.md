@@ -36,7 +36,7 @@ No third-party sources are indexed for Gold Royalty Corp. as of this scan. Marvi
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | FY2025 OCF ~$0.033/sh | 7yr Lawrence model | watch |
+| Marvin floor | FY2025 OCF ~$0.033/sh | **-7.41%** / 7yr | watch |
 | External (combined) | — | — | — |
 | **Blended best estimate** | **Marvin floor only** | **Lawrence gate** | **watch** |
 
