@@ -8,14 +8,16 @@
 |-------|-------|
 | **Archetype** (Stahl) | optionality |
 | **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **Implied 7yr IRR** (base) | — |
-| **IRR method** | — |
+| **Cycle** | peak |
+| **Implied 7yr IRR** (base) | -7.41% (total synthesis) |
+| **IRR method** | full |
 | **Lawrence bucket** | other |
 | **Payoff lens** | asset |
-| **MOI bucket** | pending |
+| **MOI bucket** | royalty_aggregator |
+
+**Deep dive:** `GROY/research/deep_dive_2026-06-11.md` (auto-sync)
 
 ## One-line thesis
 
