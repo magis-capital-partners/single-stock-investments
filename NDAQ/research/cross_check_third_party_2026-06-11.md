@@ -9,9 +9,9 @@
 
 ## Executive summary
 
-No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (10-K, 10-Q, IR). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (FY2025 10-K, Q1 2026 10-Q). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
 
-**Synthesis:** Marvin floor only; no external blend.
+**Synthesis:** Marvin floor only; no external blend. Base case **9.26%** per year total synthesis at **$86.66** on FY2025 owner cash **$3.44**/share; stance **watch**.
 
 ## Sources in scope
 
@@ -33,13 +33,13 @@ No third-party sources are indexed for this ticker as of this scan. Marvin stanc
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | — | — | — |
+| Marvin floor | $3.44/sh FY2025 owner cash | 9.26% / 7yr | watch |
 | External (combined) | — | — | — |
-| **Blended best estimate** | **—** | **—** | **—** |
+| **Blended best estimate** | **$3.44/sh owner cash** | **9.26% / 7yr** | **watch** |
 
-**Weights:** *[Document why]*
+**Weights:** 100% Marvin floor (no approved external sources).
 
-**Returns statement (blended):** *[One sentence; pending sources not in base IRR]*
+**Returns statement (blended):** At today's price, Marvin filings-only base case implies about **9.26%** per year over 7 years; no external blend applied.
 
 ## [HUMAN REVIEW]
 
