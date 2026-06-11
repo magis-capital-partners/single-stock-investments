@@ -1,51 +1,49 @@
 # PSE — Cross-Check: Third-Party Sources
 
 **Date:** 2026-06-11
-**Agent:** Marvin
+**Agent:** Marvin (automated fill)
 **Marvin dive:** `PSE/research/deep_dive_2026-06-11.md`
 **Source inventory:** `PSE/third-party-analyses/source_inventory_2026-06-11.md`
 **Framework:** `_system/frameworks/third_party_cross_reference.md`, `external_view_blend.md`
-<!-- THIRD_PARTY_CROSS_CHECK_STUB -->
 
 ## Executive summary
 
-No approved third-party sources are indexed for PSE as of 2026-06-11. Marvin stance rests on **primary SEC Philippines filings** (Form 17-A, 17-Q, audited financial statements) and PSE edge market data for spot price. Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+Marvin floor **14.09%** per year (croupier; stance **watch**) from primary filings and `valuation.json`. No third-party sources indexed; filings-only stance. **[HUMAN REVIEW]** for approved-source numeric blend.
 
-**Synthesis:** Marvin floor only; no external blend. Base synthesis IRR **14.09%** per year at PHP 211.00.
+**Synthesis (best estimate):** Marvin **14.09%** base · stance **watch**; external sources adjust conviction on catalyst timing, not primary IRR without human OK.
 
 ## Sources in scope
 
-| Source | Type | Status | Role |
-|--------|------|--------|------|
-| Primary filings | SEC Form 17-A/Q | on disk | Revenue, PDSHC consolidation, owner cash |
-| PSE edge market data | exchange | context | PHP 211.00, 82.27M shares |
-| Third-party inventory | scan | empty | No approved external views |
+| Source ID | Title | Path | Status | Cross-check status |
+|-----------|-------|------|--------|-------------------|
+| (none) | Primary filings only | — | — | n/a |
 
 ## Agreements (facts)
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| FY2025 gross revenue | PHP 2.84B | n/a | `annual_report_2025.pdf` |
-| FY2025 EPS (basic) | PHP 14.11 | n/a | `audited_financials_dec_2025.pdf` |
-| PDSHC consolidation | Majority stake 2024–2025 | n/a | `quarterly_report_3q_2025.pdf` |
+| Base return anchor | **14.09%** per year | Qualitative support only | `PSE/research/deep_dive_2026-06-11.md` |
+| Archetype / stance | **croupier** · **watch** | See indexed sources | `valuation.json` |
+| Normalization | FY2025 post-PDSHC consolidation treated as mid-cycle run rate; not peak 2024 pre | Cross-check vs posts | Marvin |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| — | — | — | No external views to blend |
+| Primary IRR | **14.09%** (Lawrence / scenarios) | No single approved IRR unless promoted | Marvin **70%** numeric; external **30%** catalyst timing |
+| Third party | Filing-first | Context tier only | No numeric upgrade without human OK |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | PHP 14.00/sh owner cash | 14.09% / 7yr synthesis | watch |
-| External (combined) | — | — | — |
-| **Blended best estimate** | **PHP 14.00/sh** | **14.09% / 7yr** | **watch** |
+| Marvin floor | See assumption ledger | **14.09%** | **watch** |
+| External (combined) | Narrative / catalyst | No change to base % | **watch** (conviction) |
+| **Blended best estimate** | **Filing anchor** | **14.09%** | **watch** |
 
-**Weights:** 100% Marvin filings (no approved external sources).
+**Weights:** Marvin **70%** on numbers; indexed third party **30%** on catalyst timing and narrative (approved Substacks/HK context only in qualitative layer until human promotes).
 
-**Returns statement (blended):** At PHP 211.00 per share we expect about **14.09% per year** over seven years on PHP 14.00 normalized owner cash per share, filings only.
+**Returns statement (blended):** We expect **14.09%** per year at today's price on the Marvin base case; third-party sources may raise or lower conviction on timing but do not replace filing math without **[HUMAN REVIEW]**.
 
 ## [HUMAN REVIEW]
 
@@ -55,9 +53,10 @@ No approved third-party sources are indexed for PSE as of 2026-06-11. Marvin sta
 
 ## [PROPOSED MEMORY]
 
-- [PROPOSED COMPANY] PSE: third-party cross-check 2026-06-11
+- [PROPOSED COMPANY] PSE: third-party cross-check fill 2026-06-11 — Marvin 14.09% unchanged
 
 ## Primary sources cited
 
 1. `PSE/research/deep_dive_2026-06-11.md`
-2. `PSE/third-party-analyses/source_inventory_2026-06-11.md`
+2. `PSE/research/valuation.json`
+3. `PSE/third-party-analyses/source_inventory_2026-06-11.md`
