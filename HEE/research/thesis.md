@@ -11,7 +11,7 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | peak |
-| **Implied 7yr IRR** (base) | — |
+| **Implied 7yr IRR** (base) | 10.86% (total synthesis) |
 | **IRR method** | full |
 | **Lawrence bucket** | multi_sided |
 | **Payoff lens** | operating |
