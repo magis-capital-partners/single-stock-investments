@@ -30,6 +30,11 @@ def registry_row(ticker: str) -> dict | None:
     return (load_registry().get("holdings") or {}).get(ticker.upper())
 
 
+def tickers_from_registry() -> list[str]:
+    holdings = (load_registry().get("holdings") or {})
+    return sorted(holdings.keys())
+
+
 def fetch_yahoo_monthly_closes(symbol: str, years: int = 20) -> tuple[list[str], list[float], str]:
     end = datetime.now(timezone.utc)
     start = end.replace(year=max(1970, end.year - years))
@@ -197,12 +202,17 @@ def build_panel(ticker: str, as_of: str | None = None, *, merge: bool = True) ->
     ysym = yahoo_symbol_for(t, market, exchange)
 
     dates, prices, src = fetch_yahoo_monthly_closes(ysym)
-    if len(prices) < 2:
-        print(f"WARN {t}: insufficient Yahoo history ({src})")
-        return False
-
     dist = distribution_map(val)
-    price_idx, tr_idx, cum_div = build_series(dates, prices, dist)
+    panel_status = "complete"
+    panel_error = None
+    price_idx: list[float] = []
+    tr_idx: list[float] = []
+    cum_div = sum(dist.values())
+    if len(prices) >= 2:
+        price_idx, tr_idx, cum_div = build_series(dates, prices, dist)
+    else:
+        panel_status = "insufficient_price_history"
+        panel_error = src
 
     price = inputs.get("price")
     if price is None:
@@ -213,11 +223,19 @@ def build_panel(ticker: str, as_of: str | None = None, *, merge: bool = True) ->
     if price and shares:
         market_cap_m = round(float(price) * float(shares) / 1_000_000, 2)
 
-    start_price = prices[0]
-    end_price = prices[-1]
-    span_years = max(0.5, (len(prices) - 1) / 12.0)
-    price_ann = annualized_return(start_price, end_price, span_years, 0.0)
-    tr_ann = annualized_return(start_price, end_price, span_years, cum_div)
+    start_price = prices[0] if prices else None
+    end_price = prices[-1] if prices else None
+    span_years = max(0.5, (len(prices) - 1) / 12.0) if len(prices) >= 2 else None
+    price_ann = (
+        annualized_return(start_price, end_price, span_years, 0.0)
+        if start_price is not None and end_price is not None and span_years is not None
+        else None
+    )
+    tr_ann = (
+        annualized_return(start_price, end_price, span_years, cum_div)
+        if start_price is not None and end_price is not None and span_years is not None
+        else None
+    )
 
     as_of = as_of or date.today().isoformat()
     charts_dir = research / "charts"
@@ -238,15 +256,17 @@ def build_panel(ticker: str, as_of: str | None = None, *, merge: bool = True) ->
         "ticker": t,
         "as_of": as_of,
         "price_source": src,
-        "history_start": dates[0],
-        "history_end": dates[-1],
-        "start_price": round(start_price, 4),
-        "end_price": round(end_price, 4),
+        "status": panel_status,
+        "error": panel_error,
+        "history_start": dates[0] if dates else None,
+        "history_end": dates[-1] if dates else None,
+        "start_price": round(start_price, 4) if start_price is not None else None,
+        "end_price": round(end_price, 4) if end_price is not None else None,
         "cumulative_distributions_per_share": round(cum_div, 4),
         "distribution_years": len(dist),
         "distribution_history_sum": round(sum(dist.values()), 4),
-        "price_index_end": round(price_idx[-1], 2),
-        "total_return_index_end": round(tr_idx[-1], 2),
+        "price_index_end": round(price_idx[-1], 2) if price_idx else None,
+        "total_return_index_end": round(tr_idx[-1], 2) if tr_idx else None,
         "price_only_annualized_pct": round(price_ann, 2) if price_ann is not None else None,
         "total_return_annualized_pct": round(tr_ann, 2) if tr_ann is not None else None,
         "market_cap_m": market_cap_m,
@@ -261,7 +281,8 @@ def build_panel(ticker: str, as_of: str | None = None, *, merge: bool = True) ->
     if merge:
         val["total_return_panel"] = {
             "as_of": as_of,
-            "status": "complete",
+            "status": panel_status,
+            "error": panel_error,
             "cumulative_distributions_per_share": panel["cumulative_distributions_per_share"],
             "distribution_history_sum": panel["distribution_history_sum"],
             "market_cap_m": market_cap_m,
@@ -271,21 +292,38 @@ def build_panel(ticker: str, as_of: str | None = None, *, merge: bool = True) ->
         }
         vpath.write_text(json.dumps(val, indent=2) + "\n", encoding="utf-8")
 
-    print(
-        f"OK {t}: cum_div=${cum_div:.2f}/sh market_cap={market_cap_m}M "
-        f"chart={chart_path.relative_to(ROOT)}"
-    )
-    return True
+    if panel_status == "complete":
+        print(
+            f"OK {t}: cum_div=${cum_div:.2f}/sh market_cap={market_cap_m}M "
+            f"chart={chart_path.relative_to(ROOT)}"
+        )
+        return True
+    print(f"WARN {t}: {panel_status} ({panel_error})")
+    return False
 
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("tickers", nargs="+")
+    ap.add_argument("tickers", nargs="*")
+    ap.add_argument("--all", action="store_true", help="Build panels for all registry holdings")
     ap.add_argument("--date", default=date.today().isoformat())
     ap.add_argument("--no-merge", action="store_true")
     args = ap.parse_args()
-    ok = all(build_panel(t, args.date, merge=not args.no_merge) for t in args.tickers)
-    return 0 if ok else 1
+    tickers = [t.upper() for t in args.tickers]
+    if args.all:
+        tickers = tickers_from_registry()
+    if not tickers:
+        ap.error("provide tickers or use --all")
+
+    ok = 0
+    warn = 0
+    for t in tickers:
+        if build_panel(t, args.date, merge=not args.no_merge):
+            ok += 1
+        else:
+            warn += 1
+    print(f"SUMMARY: ok={ok} warn={warn} total={len(tickers)}")
+    return 0 if ok > 0 else 1
 
 
 if __name__ == "__main__":
