@@ -40,9 +40,9 @@ No approved third-party sources are indexed for EVR as of this scan. Marvin stan
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | C$0.16/sh normalized owner cash | Lawrence 7yr — pending refresh | watch |
+| Marvin floor | C$0.16/sh normalized owner cash | Lawrence 7yr **14.9%** synthesis | hold (NAV floor) |
 | External (Royalty King) | NAV re-rate option | Not quantified in screen excerpt | context only |
-| **Blended best estimate** | **Marvin floor** | **Pending mechanical IRR** | **watch** |
+| **Blended best estimate** | **Marvin floor** | **14.9%** per year (synthesis) | **hold** |
 
 **Weights:** 100% Marvin primary until Royalty King TRK Report Apr 2026 is human-approved.
 

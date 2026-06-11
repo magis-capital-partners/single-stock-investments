@@ -93,6 +93,8 @@ def yahoo_symbol_for(ticker: str, market: str, exchange: str) -> str:
         return f"{base}.L"
     if exchange and "TSX" in exchange.upper() and ".TO" not in t:
         return f"{t}.TO"
+    if exchange and exchange.upper() == "CSE" and ".CN" not in t:
+        return f"{t.split('.')[0]}.CN"
     return t.split(".")[0]
 
 

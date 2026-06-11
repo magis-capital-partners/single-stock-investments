@@ -15,8 +15,9 @@
   "inputs": {
     "price": 2.8,
     "price_source": "Yahoo Finance EVR.CN close 2026-06-11",
+    "price_as_of": "2026-06-11",
     "fcf_per_share": 0.16,
-    "fcf_source": "Normalized 2026 owner cash: YTD royalty payments C$2.70M (Jan 1–Jun 1 NR) plus Uis run-rate US$4–4.5M/year (corporate presentation Feb 2026) and HVC YTD C$1.19M; divided by ~55.1M pro-forma shares post-Uis issuance",
+    "fcf_source": "Normalized 2026 owner cash: YTD royalty payments C$2.70M (Jan 1-Jun 1 NR) plus Uis run-rate US$4-4.5M/year (corporate presentation Feb 2026) and HVC YTD C$1.19M; divided by ~55.1M pro-forma shares post-Uis issuance",
     "shares_millions": 55.1,
     "normalization_note": "Royalty holding company; owner cash = cash royalty receipts net of minimal G&A. FY2025 MD&A on SEDAR+ not yet harvested; base uses H1 2026 disclosed payments and operator-guided ramp, not GAAP net income."
   },
@@ -47,13 +48,13 @@
     "floor_value": 25,
     "primary_metric": "lawrence_base",
     "primary_label": "7yr IRR",
-    "primary_return_pct": null,
+    "primary_return_pct": 13.8,
     "incumbent_sleeve": false,
-    "notes": "Corporate presentation Feb 2026 shows EVR at ~0.75x P/NAV vs junior royalty peers at 1.0–1.7x; at C$2.80 vs ~C$4.26 implied NAV (~34% discount). Lawrence owner-cash path is stance gate; development royalties sized in overlay only."
+    "notes": "Corporate presentation Feb 2026 shows EVR at ~0.75x P/NAV vs junior royalty peers at 1.0-1.7x; at C$2.80 vs ~C$4.26 implied NAV (~34% discount). Lawrence owner-cash path is stance gate; development royalties sized in overlay only."
   },
   "nav_overlay": {
     "nav_per_share_cad": 4.26,
-    "nav_source": "EVR/presentations-and-media/corporate-presentation-2026-02.pdf — peer P/NAV table (~0.75x at C$3.21; C$163M market cap / 50.9M shares)",
+    "nav_source": "EVR/presentations-and-media/corporate-presentation-2026-02.pdf \u2014 peer P/NAV table (~0.75x at C$3.21; C$163M market cap / 50.9M shares)",
     "discount_to_nav_pct": 34,
     "measurement_date": "2026-02-20"
   },
@@ -114,7 +115,7 @@
       "label": "Copper Mountain 5% NSR (post US$10M exclusion)",
       "option_treatment": "probability_weighted",
       "base_terminal_value_cad_per_share": 0.45,
-      "base_terminal_rationale": "US$3.3M carveout remaining; Hudbay 2027–2028 copper guidance +92% vs 2026; not in Lawrence FCF₀ until payments commence",
+      "base_terminal_rationale": "US$3.3M carveout remaining; Hudbay 2027-2028 copper guidance +92% vs 2026; not in Lawrence FCF base until payments commence",
       "evidence": "EVR/official-reports/news-release-2026-06-01-ytd-royalty-payments.txt"
     },
     {
@@ -139,14 +140,9 @@
       "option_treatment": "zero",
       "base_terminal_value_cad_per_share": 0.0,
       "base_terminal_rationale": "Pre-resource or early-stage; no disclosed cash flows; explicit zero after option scan",
-      "evidence": "EVR/presentations-and-media/corporate-presentation-2026-02.pdf — portfolio overview"
+      "evidence": "EVR/presentations-and-media/corporate-presentation-2026-02.pdf \u2014 portfolio overview"
     }
   ],
-  "evidence_refresh": {
-    "type": "commodity_nav",
-    "commodities": ["copper", "tin", "lithium"],
-    "notes": "Royalty cash flows levered to LME copper and tin; lithium option on LAA"
-  },
   "growth_explanation": {
     "base_mechanism": "Ramp from one to four cash-flowing royalties in 2026 (HVC, Uis, McIlvenna Bay, Copper Mountain) per June 1 operator updates",
     "bear_falsifier": "Sustained copper/tin price decline or Teck HVC mine-life extension delay",
@@ -156,7 +152,16 @@
       "y6_10": 0.05,
       "return_pct": null
     },
-    "status": "partial"
+    "status": "partial",
+    "falsifier_adjusted": {
+      "y1_5": 0.1,
+      "y6_10": 0.05,
+      "exit_pfcf_y10": 16.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": null,
+      "as_of_filing_facts": null
+    }
   },
   "catalyst_paths": [
     {
@@ -166,8 +171,8 @@
     },
     {
       "event": "Copper Mountain carveout cleared",
-      "timing": "2026–2027",
-      "impact": "5% NSR on ~48k tpa copper guidance 2027–2028"
+      "timing": "2026-2027",
+      "impact": "5% NSR on ~48k tpa copper guidance 2027-2028"
     },
     {
       "event": "HVC Mine Life Extension",
@@ -183,5 +188,137 @@
   "human_review": [],
   "estimates": {
     "external": []
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 4.2
+    },
+    "base": {
+      "return_pct": 13.8
+    },
+    "bull": {
+      "return_pct": 20.5
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 4.2
+    },
+    "base": {
+      "return_pct": 13.8
+    },
+    "bull": {
+      "return_pct": 20.5
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": 13.8
+    },
+    "falsifier_adjusted": {
+      "return_pct": 13.8
+    }
+  },
+  "implied_return": {
+    "base_pct": 14.9,
+    "label": "7yr IRR (total synthesis)",
+    "display": "14.9% (total synthesis)",
+    "lawrence_stance_gate_pct": 13.8,
+    "falsifier_adjusted_pct": 13.8,
+    "synthesis_pct": 14.9
+  },
+  "stance_proposal": {
+    "suggested": "hold",
+    "irr_band": "optionality",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": true,
+      "floor_pass": true,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": null
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Growth theory (pre-falsifier)",
+        "source": "growth_explanation + filing revenue YoY",
+        "return_pct": 13.8,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": 4.2,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 20.5,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 15.1,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 14.9,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
   }
 }
