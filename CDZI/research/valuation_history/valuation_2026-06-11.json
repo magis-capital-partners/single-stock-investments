@@ -1,0 +1,321 @@
+{
+  "ticker": "CDZI",
+  "as_of": "2026-06-11",
+  "valuation_mode": "optionality",
+  "method": "yield_curve",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "unproven",
+    "dhando": "partial",
+    "cycle": "trough",
+    "payoff_lens": "asset",
+    "investment_sleeve": "real_assets_land",
+    "predictive_attribute": "dormant_asset"
+  },
+  "inputs": {
+    "price": 3.94,
+    "price_source": "Yahoo CDZI close 2026-06-11",
+    "price_as_of": "2026-06-11",
+    "fcf_per_share": -0.37,
+    "fcf_source": "FY2025 net loss $31.1M divided by 83.2M weighted-average diluted shares; operating cash flow used $18.9M",
+    "shares_outstanding": 84086286,
+    "shares_source": "10-Q cover: 84,086,286 common shares outstanding at 2026-05-11",
+    "book_per_share": 0.28,
+    "book_per_share_caveat": "Stockholders equity $23.3M at 2025-12-31 / shares; 46,000-acre land and 220-mile pipeline carried at historical cost \u2014 not fair-value NAV",
+    "cash_per_share": 0.2,
+    "cash_source": "Cash $8.6M at 2025-12-31 / 83.2M shares; Q1 2026 $16.5M after equity raises",
+    "debt_total_m": 78.3,
+    "debt_source": "10-K FY2025: $78.3M total indebtedness, $63.3M secured",
+    "normalization_note": "Lawrence stress path uses filing net loss per share. Primary stance gate is yield-curve payoff on Mojave Groundwater Bank catalyst, not ten-year cash flow on negative owner cash."
+  },
+  "optionality_gate": {
+    "framework": "water_infrastructure_toll",
+    "floor_pass": false,
+    "floor_metric": "cash_per_share",
+    "floor_value": 0.2,
+    "floor_value_note": "Cash ~$0.20/sh at FY2025 year-end vs ~$86M debt; GAAP book not a dhando floor",
+    "primary_metric": "lawrence_base",
+    "primary_label": "annualized return",
+    "overlay_nav_per_share": 5.5,
+    "overlay_nav_note": "[Assumption] Probability-weighted Mojave Bank contracted supply (21,275 AFY) + pipeline/land floor; see nav_overlay",
+    "notes": "Pre-revenue on core water bank; ATEC filter sales are operating but do not fund $1.25-1.5B buildout alone",
+    "primary_return_pct": 6.2
+  },
+  "nav_overlay": {
+    "as_of": "2026-06-11",
+    "status": "complete",
+    "enabled": true,
+    "method": "probability_weighted",
+    "gaap_book_per_share": 0.28,
+    "overlay_nav_per_share": 5.5,
+    "overlay_nav_bull_per_share": 9.0,
+    "overlay_rationale": "Book understates permitted water supply (2.5M AF), 46,000 acres, and Northern Pipeline; overlay sizes contracted 21,275 AFY supply path and MWI equity option \u2014 not full 50,000 AFY ramp.",
+    "gaap_vs_fair_value": {
+      "water_land_segment_assets_m": 130.9,
+      "water_treatment_segment_assets_m": 10.0,
+      "permitted_supply_af": 2500000,
+      "storage_capacity_af": 1000000,
+      "contracted_afy": 21275,
+      "pricing_net_per_afy_2024": 850,
+      "northern_pipeline_miles": 220,
+      "cadiz_ranch_acres": 46000,
+      "policy_source": "10-K FY2025 Item 1: land and pipelines at cost; Mojave Groundwater Bank permits sustained 2014/2016"
+    },
+    "in_model": {
+      "lawrence_irr_on_operating_cash": false,
+      "gaap_book_in_dhando": false,
+      "mojave_water_in_lawrence_growth": false
+    },
+    "not_in_model_requires_refresh": [
+      "Binding $400M private-equity commitment to MWI (currently due diligence only)",
+      "Northern Pipeline conversion in-service date and throughput above 20,000-23,000 AFY",
+      "Lytton Credit Agreement draw timing and Storage Cash Flows Right conversion",
+      "Southern Pipeline Arizona routing and EPCOR marketing termination impact",
+      "RIC hydrogen lease escalation beyond $35,000/year development phase"
+    ],
+    "segments_or_options": [
+      {
+        "id": "mojave_contracted_supply",
+        "label": "Mojave Groundwater Bank \u2014 21,275 AFY contracted supply",
+        "option_treatment": "probability_weighted",
+        "p_base": 0.45,
+        "nav_per_share_full": 4.0,
+        "overlay_value_per_share": 1.8,
+        "nav_assumption": "21,275 AFY \u00d7 $850/AF net \u2248 $18M/year gross at wellhead; 45% probability of partial ramp by year 7 [Assumption]",
+        "not_in_lawrence_base": true,
+        "evidence": "10-K FY2025 Item 1: 2024 supply agreements; FEIR permits 50,000 AFY"
+      },
+      {
+        "id": "mwi_equity_stake",
+        "label": "MWI equity + pipeline reimbursement at financing close",
+        "option_treatment": "milestone_nav",
+        "nav_per_share_full": 3.0,
+        "overlay_value_per_share": 1.2,
+        "nav_assumption": "Upfront reimbursement + minority MWI equity on $451M target equity plan [Assumption]",
+        "not_in_lawrence_base": true,
+        "evidence": "10-K FY2025: MWI formed Dec 2024; Lytton Credit Agreement Oct 2025 up to $51M"
+      },
+      {
+        "id": "northern_pipeline",
+        "label": "220-mile Northern Pipeline (idle, conversion permitted)",
+        "option_treatment": "nav_floor",
+        "nav_per_share": 0.8,
+        "evidence": "10-K FY2025: acquired 2021; FVWA 2nd Addendum Sep 2025 for water conversion",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "atec_filters",
+        "label": "ATEC water treatment filter sales",
+        "option_treatment": "embedded_in_segment",
+        "nav_per_share": 0,
+        "evidence": "FY2025 Water Treatment segment revenue $14.5M; 441 filters shipped",
+        "not_in_lawrence_base": false
+      },
+      {
+        "id": "storage_banking",
+        "label": "Up to 1M AF groundwater storage / banking fees",
+        "option_treatment": "zero",
+        "base_terminal_rationale": "No storage contracts signed; discussions only \u2014 explicit zero in overlay base after scan",
+        "nav_per_share": 0,
+        "not_in_lawrence_base": true,
+        "evidence": "10-K FY2025: banking capacity permitted; no executed storage agreements"
+      },
+      {
+        "id": "ric_hydrogen_lease",
+        "label": "RIC Energy hydrogen lease (3,000 acres Cadiz Ranch)",
+        "option_treatment": "milestone_nav",
+        "nav_per_share_full": 0.5,
+        "overlay_value_per_share": 0.1,
+        "evidence": "10-K FY2025: $35k/year development lease; $1,000/acre if construction approved",
+        "not_in_lawrence_base": true
+      }
+    ]
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Yes",
+      "treatment": "nav_overlay",
+      "evidence": "Water and Land Resources segment assets $130.9M at cost vs permitted 2.5M AF supply and 46,000 acres"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / acreage?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "Mojave aquifer; 21,275 AFY contracted of 50,000 AFY permit; Northern/Southern pipeline routes"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Corporate G&A and development spend burden consolidated path; Water Treatment profitable at revenue level"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "21,275 AFY supply agreements subject to financial/regulatory conditions precedent"
+    },
+    {
+      "q": 5,
+      "question": "Private stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "MWI not yet capitalized; no mark on unconsolidated stake"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No dividend; prior litigation on permits resolved 2014/2016"
+    },
+    {
+      "q": 7,
+      "question": "Embedded option in revenue?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "ATEC filter growth in segment revenue; Mojave water not yet in run-rate"
+    }
+  ],
+  "scenarios": {
+    "bear": {
+      "price": 3.94,
+      "payoff": 2.0,
+      "years": 7,
+      "notes": "MWI financing fails; continued dilution and debt service; ATEC-only stub"
+    },
+    "base": {
+      "price": 3.94,
+      "payoff": 6.0,
+      "years": 7,
+      "notes": "Partial Northern Pipeline conversion; MWI first-close with Lytton + partial PE; ~20k AFY initial deliveries",
+      "sotp_build": {
+        "shares": 84086286,
+        "book_per_share": 0.28,
+        "lines": [
+          {
+            "id": "book",
+            "label": "GAAP book anchor (not floor)",
+            "gaap_per_share": 0.28,
+            "uplift_per_share": 0.0,
+            "math": "Equity $23.3M / 83.2M shares at 2025-12-31"
+          },
+          {
+            "id": "atec_run_rate",
+            "label": "ATEC operating value (embedded)",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 0.5,
+            "math": "[Assumption] ~$14.5M revenue at modest multiple / shares"
+          },
+          {
+            "id": "mojave_partial",
+            "label": "Contracted water toll (probability-weighted)",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 1.8,
+            "math": "45% \u00d7 $4.0/sh full value on 21,275 AFY path"
+          },
+          {
+            "id": "mwi_close",
+            "label": "MWI reimbursement + equity",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 1.2,
+            "math": "Milestone on $451M equity plan first close [Assumption]"
+          },
+          {
+            "id": "pipeline_land",
+            "label": "Pipeline and land floor",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 0.8,
+            "math": "Northern Pipeline conversion permitted; land at cost on BS"
+          },
+          {
+            "id": "debt_overhang",
+            "label": "Debt and dilution drag",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": -0.5,
+            "math": "Net $78M debt and ongoing equity issuance reduce per-share payoff"
+          }
+        ]
+      }
+    },
+    "bull": {
+      "price": 3.94,
+      "payoff": 11.0,
+      "years": 7,
+      "notes": "Full MWI capitalization; 25k+ AFY throughput; storage contracts; RIC hydrogen ramp"
+    }
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": true,
+      "floor_pass": false,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": null
+  },
+  "growth_explanation": {
+    "base_mechanism": "Mojave Groundwater Bank initial deliveries via converted Northern Pipeline after MWI equity close; ATEC filter volume as secondary operating ramp",
+    "bear_change": "Financing and regulatory conditions precedent not satisfied; losses persist",
+    "bull_change": "Full 50,000 AFY permit utilization plus storage banking fees"
+  },
+  "catalyst_paths": [
+    {
+      "event": "Base catalyst path",
+      "timing": "7 years",
+      "impact": "Partial Northern Pipeline conversion; MWI first-close with Lytton + partial PE; ~20k AFY initial deliveries"
+    },
+    {
+      "event": "Failure mode",
+      "timing": "bear scenario",
+      "impact": "MWI financing fails; continued dilution and debt service; ATEC-only stub"
+    }
+  ],
+  "total_return_panel": {
+    "as_of": "2026-06-11",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 0,
+    "distribution_history_sum": 0,
+    "market_cap_m": 331.3,
+    "total_return_annualized_pct": -12.21,
+    "chart": "CDZI/research/charts/total_return_2026-06-11.svg",
+    "panel_json": "CDZI/research/total_return_panel.json"
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -9.2
+    },
+    "base": {
+      "return_pct": 6.2
+    },
+    "bull": {
+      "return_pct": 15.8
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -9.2
+    },
+    "base": {
+      "return_pct": 6.2
+    },
+    "bull": {
+      "return_pct": 15.8
+    }
+  },
+  "implied_return": {
+    "base_pct": 6.2,
+    "label": "annualized return",
+    "display": "6.2% (base)"
+  },
+  "overlay_results": []
+}
