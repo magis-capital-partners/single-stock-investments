@@ -9,9 +9,9 @@
 
 ## Executive summary
 
-No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (10-K, 10-Q, IR). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+No approved or pending third-party analyses are indexed for TFPM as of 2026-06-11. Marvin stance rests on **primary filings only** (FY2025 Form 40-F, annual report, asset handbook). Horizon Kinetics 13F data in the Royalty King screen (`_system/reviews/pending/royalty_king_hk_screen_2026-06-11.md`) is **context tier only** and not blended into base IRR.
 
-**Synthesis:** Marvin floor only; no external blend.
+**Synthesis:** Marvin floor only; no external blend. Re-run `scan_third_party_sources.py` when Substacks or HK vault extracts are added.
 
 ## Sources in scope
 
@@ -33,13 +33,13 @@ No third-party sources are indexed for this ticker as of this scan. Marvin stanc
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | — | — | — |
-| External (combined) | — | — | — |
-| **Blended best estimate** | **—** | **—** | **—** |
+| Marvin floor | FY2025 OCF $1.54/sh | 7yr Lawrence base (see valuation.json) | watch |
+| External (combined) | n/a | n/a | n/a |
+| **Blended best estimate** | **FY2025 OCF $1.54/sh** | **Lawrence base only** | **watch** |
 
-**Weights:** *[Document why]*
+**Weights:** 100% Marvin primary filings; no approved external sources.
 
-**Returns statement (blended):** *[One sentence; pending sources not in base IRR]*
+**Returns statement (blended):** At today's price, we expect the Lawrence base annual return on owner cash per `valuation.json` (no external blend).
 
 ## [HUMAN REVIEW]
 
