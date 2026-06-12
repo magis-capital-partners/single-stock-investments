@@ -38,13 +38,13 @@ No sources are in the approved registry for STHO. One **context-tier** reference
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | Q1 book $19.88/sh; base $15/sh in 5yr | **11.8%** per year (base) | watch |
+| Marvin floor | Q1 book $19.88/sh; base $15/sh in 5yr | **10.4%** per year (base) | watch |
 | External (McIntyre) | Accelerated repurchases | Not quantified | accumulate (external only) |
-| **Blended best estimate** | **$15/sh base payoff** | **11.8%** per year | **watch** (Marvin gate) |
+| **Blended best estimate** | **$15/sh base payoff** | **10.4%** per year | **watch** (Marvin gate) |
 
 **Weights:** 100% Marvin floor for base IRR until McIntyre is promoted in `third_party_sources.md`.
 
-**Returns statement (blended):** Base IRR remains **11.8%** per year on Marvin assumptions; McIntyre optimism is context only.
+**Returns statement (blended):** Base IRR remains **10.4%** per year on Marvin assumptions; McIntyre optimism is context only.
 
 ## [HUMAN REVIEW]
 
@@ -54,7 +54,7 @@ No sources are in the approved registry for STHO. One **context-tier** reference
 
 ## [PROPOSED MEMORY]
 
-- [PROPOSED COMPANY] STHO cross-check 2026-06-12: McIntyre context only; Marvin base 11.8% yield-curve.
+- [PROPOSED COMPANY] STHO cross-check 2026-06-12: McIntyre context only; Marvin base 10.4% yield-curve.
 
 ## Primary sources cited
 

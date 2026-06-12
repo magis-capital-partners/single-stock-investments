@@ -14,7 +14,7 @@
 | **Implied 7yr IRR** (base) | 18.44% (total synthesis) |
 | **IRR method** | full |
 | **Lawrence bucket** | multi_sided |
-| **Payoff lens** | operating |
+| **Payoff lens** | pending |
 | **MOI bucket** | pending |
 
 **Deep dive:** `BOLSAA.MX/research/deep_dive_2026-06-11.md` (auto-sync)
