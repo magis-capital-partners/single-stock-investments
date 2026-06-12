@@ -1,0 +1,383 @@
+{
+  "ticker": "STHO",
+  "as_of": "2026-06-12",
+  "valuation_mode": "optionality",
+  "method": "yield_curve",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "holding_co",
+    "moat": "n/a",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "event"
+  },
+  "inputs": {
+    "price": 9.15,
+    "price_source": "Yahoo STHO close 2026-06-12",
+    "book_per_share": 19.88,
+    "book_per_share_filed": 19.88,
+    "shares_outstanding": 12081333,
+    "shares_source": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm (May 6, 2026)",
+    "equity_m": 240.153,
+    "normalization_note": "Q1 2026 stockholders' equity $240.2M; wind-down legacy iStar assets + ~13.5M Safehold shares; not normalized operating FCF.",
+    "price_as_of": "2026-06-12"
+  },
+  "optionality_gate": {
+    "framework": "holdco_sotp",
+    "floor_pass": true,
+    "floor_metric": "book_per_share",
+    "floor_value": 19.88,
+    "primary_metric": "lawrence_base",
+    "primary_label": "annualized return",
+    "primary_return_pct": 10.4,
+    "incumbent_sleeve": false,
+    "notes": "Price ~57% below Q1 2026 book; asset-sale and repurchase path; margin loan on SAFE stake caps downside vs zero but adds complexity.",
+    "discount_to_book_pct": 57.0
+  },
+  "approved_stance": "watch",
+  "nav_overlay": {
+    "status": "complete",
+    "as_of": "2026-03-31",
+    "source": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+    "lines": [
+      {
+        "id": "safe_stake",
+        "label": "Safehold Inc. stake (~13.5M shares)",
+        "fair_value_m": 183.0,
+        "per_share": 15.15,
+        "option_treatment": "milestone_nav",
+        "evidence": "Fair value $183.0M at SAFE $13.53 (3/31/2026); collateral for margin loan"
+      },
+      {
+        "id": "legacy_portfolio",
+        "label": "Monetizing legacy loans, properties, land",
+        "carrying_value_m": 71.5,
+        "per_share": 5.92,
+        "option_treatment": "probability_weighted",
+        "evidence": "Aggregate carrying value ~$71.5M; includes zero-carry assets per 10-Q"
+      },
+      {
+        "id": "cash_net_debt",
+        "label": "Cash and restricted cash less long-term debt",
+        "net_m": -139.8,
+        "per_share": -1.19,
+        "option_treatment": "nav_floor",
+        "evidence": "Cash+restricted $67.2M less margin/Safe credit debt $207.0M (Q1 2026)"
+      }
+    ],
+    "sum_per_share": 19.88,
+    "price_discount_pct": 57.0
+  },
+  "scenarios": {
+    "bear": {
+      "price": 9.15,
+      "payoff": 10.0,
+      "years": 5,
+      "notes": "Slow legacy sales; SAFE mark compression; buybacks stall"
+    },
+    "base": {
+      "price": 9.15,
+      "payoff": 15.0,
+      "years": 5,
+      "notes": "~75% of Q1 book realized via asset sales, SAFE dividends, and repurchases",
+      "sotp_build": {
+        "shares": 12081333,
+        "shares_source": "10-Q 2026-05-08",
+        "book_equity_m": 240.153,
+        "book_per_share": 19.88,
+        "lines": [
+          {
+            "id": "book",
+            "label": "Q1 2026 GAAP equity (anchor)",
+            "gaap_per_share": 19.88,
+            "uplift_per_share": 0.0,
+            "math": "$240.153M / 12.081M shares"
+          },
+          {
+            "id": "safe_stake",
+            "label": "Safehold stake mark",
+            "gaap_per_share": 15.15,
+            "uplift_per_share": 0.0,
+            "math": "Fair value $183M in nav_overlay"
+          },
+          {
+            "id": "legacy_portfolio",
+            "label": "Legacy monetizing portfolio",
+            "gaap_per_share": 5.92,
+            "uplift_per_share": 0.0,
+            "math": "Carrying value $71.5M per 10-Q"
+          },
+          {
+            "id": "cash_net_debt",
+            "label": "Cash less long-term debt",
+            "gaap_per_share": -1.19,
+            "uplift_per_share": 0.0,
+            "math": "Net $67.2M cash vs $207M debt"
+          },
+          {
+            "id": "realization_haircut",
+            "label": "Wind-down realization haircut",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": -4.88,
+            "math": "Base assumes 75% of book ($15/sh) not full $19.88"
+          }
+        ],
+        "year5_economic_nav_per_share": 15.0,
+        "years": 5,
+        "notes": "Yield-curve base; not Lawrence 10yr FCF"
+      }
+    },
+    "bull": {
+      "price": 9.15,
+      "payoff": 20.0,
+      "years": 4,
+      "notes": "Near-full NAV monetization; accelerated repurchases post-Asbury deconsolidation (McIntyre context)"
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 1.8
+    },
+    "base": {
+      "return_pct": 10.4
+    },
+    "bull": {
+      "return_pct": 21.6
+    }
+  },
+  "implied_return": {
+    "base_pct": 10.4,
+    "label": "annualized return",
+    "display": "10.4% (base)"
+  },
+  "stance_proposal": {
+    "suggested": "hold",
+    "irr_band": "optionality",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true,
+      "floor_pass": true,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": "Externally managed by Safehold affiliate; wind-down timing uncertain despite book discount",
+    "approved_stance": "watch"
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "partial",
+      "treatment": "nav_floor",
+      "evidence": "Some legacy assets at zero carrying value; SAFE marked to market"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / acreage / dormant royalty?",
+      "answer": "yes",
+      "treatment": "probability_weighted",
+      "evidence": "Magnolia Green ~1,900 acres entitled; Asbury Park waterfront venture deconsolidated 3/27/2026"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "no",
+      "treatment": "zero",
+      "evidence": "Single wind-down segment; Q1 net loss driven by SAFE mark and operating costs"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / RPO not in FCF path?",
+      "answer": "no",
+      "treatment": "embedded_in_segment",
+      "evidence": "n/a \u2014 asset monetization vehicle"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "yes",
+      "treatment": "milestone_nav",
+      "evidence": "13.5M SAFE shares $183M fair value; margin loan limits sale timing"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "no",
+      "treatment": "yield_curve",
+      "evidence": "Capital return via repurchases, not recurring distributions"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "no",
+      "treatment": "zero",
+      "evidence": "Revenue from leases, loan interest, SAFE dividends"
+    }
+  ],
+  "estimates": {
+    "external": []
+  },
+  "human_review": {
+    "live_price_confirmed": false
+  },
+  "catalyst_paths": [
+    {
+      "event": "Base catalyst path",
+      "timing": "5 years",
+      "impact": "~75% of Q1 book realized via asset sales, SAFE dividends, and repurchases"
+    },
+    {
+      "event": "Failure mode",
+      "timing": "bear scenario",
+      "impact": "Slow legacy sales; SAFE mark compression; buybacks stall"
+    }
+  ],
+  "total_return_panel": {
+    "as_of": "2026-06-12",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 0,
+    "distribution_history_sum": 0,
+    "market_cap_m": 110.54,
+    "total_return_annualized_pct": -21.63,
+    "chart": "STHO/research/charts/total_return_2026-06-12.svg",
+    "panel_json": "STHO/research/total_return_panel.json"
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 1.8
+    },
+    "base": {
+      "return_pct": 10.4
+    },
+    "bull": {
+      "return_pct": 21.6
+    }
+  },
+  "overlay_results": [],
+  "context_overlay": {
+    "as_of": "2026-06-12",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": -0.23,
+            "as_of": "2026-06-12",
+            "yoy_pct": 84.6,
+            "direction": "up",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.4830002784729,
+            "as_of": "2026-06-12",
+            "yoy_pct": 2.9,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.209000110626221,
+            "as_of": "2026-06-12",
+            "yoy_pct": 6.3,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 99.74600219726562,
+            "as_of": "2026-06-12",
+            "yoy_pct": 1.9,
+            "direction": "up",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 18.81999969482422,
+            "as_of": "2026-06-12",
+            "yoy_pct": 4.4,
+            "direction": "up",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": -0.97,
+            "as_of": "2026-06-12",
+            "yoy_pct": 27.1,
+            "direction": "up",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 14.77,
+            "as_of": "2026-06-12",
+            "yoy_pct": 23.5,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "lens_consensus": {
+    "as_of": "2026-06-12",
+    "shared_inputs_ref": "valuation.json@2026-06-12",
+    "valuation_richness": 0.207,
+    "blended_return_pct": 8.8,
+    "band_pct": [
+      3.2,
+      11.9
+    ],
+    "weighted_median_pct": 11.9,
+    "median_mean_flag": true,
+    "stance": "watch",
+    "agreement_pct": 89,
+    "dissent_count": 1,
+    "lawrence_divergence": false,
+    "top_dissents": [
+      {
+        "persona": "stahl",
+        "label": "Murray Stahl",
+        "verdict": "hold",
+        "return_pct": 11.9,
+        "key_metric": "archetype=holding_co",
+        "conviction": 0.095,
+        "falsifier": "No asset intensity / pricing power (moat eroding + non-croupier)"
+      }
+    ],
+    "contributor_count": 7,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
+  }
+}

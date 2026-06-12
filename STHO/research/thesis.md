@@ -1,29 +1,35 @@
 # STHO — Investment Thesis
 
-**Last updated:** 2026-06-12
+**Last updated:** auto-sync
 
 ## Classification
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Archetype** (Stahl) | holding_co |
+| **Moat** (Munger) | n/a |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Cycle** | mid |
+| **Implied 7yr IRR** (base) | 10.4% (base) |
+| **IRR method** | yield_curve |
+| **Lawrence bucket** | other |
+| **Payoff lens** | event |
+| **MOI bucket** | pending |
+
+**Deep dive:** `STHO/research/deep_dive_2026-06-12.md` (auto-sync)
 
 ## One-line thesis
 
-Star Holdings — thesis pending Marvin deep dive.
+Star Holdings trades ~54% below Q1 2026 book (~$19.88/sh) as a legacy iStar wind-down with a large Safehold stake; base case **10.4%** per year if ~75% of book is returned over five years — **watch** pending related-party review.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest annual report (FY2025 10-K)
+- [x] Read latest quarterly report (Q1 2026 10-Q)
+- [ ] Human review: Safehold manager alignment and Magnolia Green timeline
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-06-12; awaiting deep dive.
+- Externally managed by Safehold subsidiary; fee escalation in year four.
+- McIntyre letter context only — not in approved third-party registry.
