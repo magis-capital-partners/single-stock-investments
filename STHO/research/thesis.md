@@ -1,6 +1,6 @@
 # STHO — Investment Thesis
 
-**Last updated:** 2026-06-12
+**Last updated:** auto-sync
 
 ## Classification
 
@@ -11,11 +11,13 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | accumulate |
 | **Cycle** | mid |
-| **Implied 7yr IRR** (Lawrence) | 20.5% (yield curve base) |
+| **Implied 7yr IRR** (base) | 20.6% (base) |
 | **IRR method** | yield_curve |
 | **Lawrence bucket** | other |
 | **Payoff lens** | event |
-| **MOI bucket** | spinoff |
+| **MOI bucket** | pending |
+
+**Deep dive:** `STHO/research/deep_dive_2026-06-12.md` (auto-sync)
 
 ## One-line thesis
 

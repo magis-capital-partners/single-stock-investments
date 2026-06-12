@@ -93,7 +93,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-06-12.
 | SMR | SMR/ | NuScale Power Corporation | US | 2026-06-11 | 2026-06-12 | unknown | watch |
 | SNOW | SNOW/ | Snowflake Inc | US | 2026-06-11 | 2026-06-12 | platform | watch |
 | SPGI | SPGI/ | S&P Global | US | 2026-06-11 | 2026-06-12 | croupier | hold |
-| STHO | STHO/ | Star Holdings | US | — | — | unknown | watch |
+| STHO | STHO/ | Star Holdings | US | 2026-06-12 | 2026-06-12 | unknown | watch |
 | TASE | TASE/ | Tel Aviv Stock Exchange Ltd. | EU | 2026-06-11 | 2026-06-12 | unknown | watch |
 | TEQ.ST | TEQ.ST/ | Teqnion AB | SE | 2026-06-11 | 2026-06-12 | serial_acquirer | hold |
 | TFPM | TFPM/ | Triple Flag Precious Metals Corp. | US | 2026-06-11 | 2026-06-12 | unknown | watch |

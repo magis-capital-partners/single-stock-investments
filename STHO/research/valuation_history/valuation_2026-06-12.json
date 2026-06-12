@@ -1,0 +1,274 @@
+{
+  "ticker": "STHO",
+  "as_of": "2026-06-12",
+  "valuation_mode": "optionality",
+  "method": "yield_curve",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "n/a",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "event",
+    "predictive_attribute": "spinoff_discount"
+  },
+  "inputs": {
+    "price": 9.22,
+    "price_source": "Yahoo Finance STHO regular market 2026-06-12",
+    "price_as_of": "2026-06-12",
+    "shares_outstanding": 12081333,
+    "shares_source": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm CommonStockSharesOutstanding 2026-03-31",
+    "book_per_share": 19.77,
+    "book_source": "StockholdersEquity $238,889K / 12,081,333 shares at 2026-03-31",
+    "book_per_share_filed": 20.43,
+    "book_per_share_filed_source": "StockholdersEquity $251,766K / 12,317,759 shares at 2025-12-31",
+    "fcf_per_share": 0.95,
+    "fcf_source": "FY2025 NetCashProvidedByUsedInOperatingActivities $11,658K / ~12.3M shares \u2014 lumpy; asset-sale dependent [Assumption for Lawrence gate only]",
+    "normalization_note": "Wind-down vehicle: Lawrence full IRR on operating cash is not the primary metric. Yield curve on book liquidation + SAFE floor."
+  },
+  "optionality_gate": {
+    "framework": "wind_down_sotp",
+    "floor_pass": true,
+    "floor_metric": "safe_stake_mark",
+    "floor_value": 18.13,
+    "floor_value_source": "13,522,651 SAFE shares x $16.205 / 12,081,333 STHO shares (Yahoo SAFE 2026-06-12)",
+    "primary_metric": "lawrence_base",
+    "primary_label": "annualized return",
+    "discount_to_book_pct": 53.4,
+    "notes": "Price ~$9.22 vs Q1 book ~$19.77/sh; SAFE stake alone ~$18.13/sh at current SAFE quote.",
+    "primary_return_pct": 20.6
+  },
+  "nav_overlay": {
+    "measurement_date": "2026-03-31",
+    "safe_shares": 13522651,
+    "safe_price": 16.205,
+    "safe_value_m": 219.1,
+    "lines": [
+      {
+        "id": "safe_stake",
+        "label": "Safehold common stock (13,522,651 shares)",
+        "option_treatment": "nav_floor",
+        "per_share": 18.13,
+        "evidence": "10-K FY2025 fair value $185.1M at $13.69; remarked at Yahoo SAFE $16.205 on 2026-06-12"
+      },
+      {
+        "id": "asbury",
+        "label": "Asbury Park Waterfront (carrying value)",
+        "option_treatment": "milestone_nav",
+        "per_share": 5.25,
+        "evidence": "10-K FY2025 aggregate carrying value ~$127.6M / shares"
+      },
+      {
+        "id": "magnolia_other",
+        "label": "Magnolia Green + legacy loans/land (net)",
+        "option_treatment": "probability_weighted",
+        "per_share": 2.5,
+        "evidence": "10-K legacy assets ~$149.8M gross book less debt allocation [Assumption]"
+      },
+      {
+        "id": "debt_drag",
+        "label": "Secured debt and fees (net liability)",
+        "option_treatment": "zero",
+        "per_share": -6.11,
+        "evidence": "Long-term debt $207.0M at 2026-03-31; margin loan on SAFE; management fee 1.5-2.0%"
+      }
+    ],
+    "economic_nav_per_share": 19.77,
+    "premium_discount_to_price_pct": -53.4
+  },
+  "scenarios": {
+    "bear": {
+      "price": 9.22,
+      "payoff": 14.0,
+      "years": 6,
+      "notes": "Slow asset sales; SAFE weak; development overruns on Magnolia; limited buybacks",
+      "sotp_build": {
+        "shares": 12081333,
+        "book_per_share": 19.77,
+        "lines": [
+          {
+            "id": "book",
+            "label": "Q1 2026 book anchor",
+            "gaap_per_share": 19.77,
+            "uplift_per_share": 0.0,
+            "math": "$238,889K equity / 12,081,333 shares"
+          },
+          {
+            "id": "haircut",
+            "label": "Liquidation haircut (timing, fees, SAFE decline)",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": -5.77,
+            "math": "Bear payoff $14.0 vs book"
+          }
+        ],
+        "year5_economic_nav_per_share": 14.0,
+        "years": 6,
+        "notes": "6-year slow wind-down"
+      }
+    },
+    "base": {
+      "price": 9.22,
+      "payoff": 19.5,
+      "years": 4,
+      "payoff_logic": "Near-book liquidation via asset sales, loan repayments, SAFE dividends/exit, and continued repurchases",
+      "years_logic": "Management targets monetization; ~10% shares repurchased in 12 months per context letters; 4-year base path [Assumption]",
+      "notes": "Repurchases at $8.45 avg Q1 2026; assets fell $90M Q1 as sales progress",
+      "sotp_build": {
+        "shares": 12081333,
+        "book_per_share": 19.77,
+        "lines": [
+          {
+            "id": "book",
+            "label": "Q1 2026 GAAP equity per share",
+            "gaap_per_share": 19.77,
+            "uplift_per_share": 0.0,
+            "math": "$238,889K / 12,081,333"
+          },
+          {
+            "id": "safe_mark",
+            "label": "SAFE stake at market (floor check)",
+            "gaap_per_share": 18.13,
+            "uplift_per_share": 0.0,
+            "math": "13,522,651 x $16.205 / shares \u2014 exceeds price today alone"
+          },
+          {
+            "id": "real_estate",
+            "label": "Legacy real estate + loans monetization",
+            "gaap_per_share": 7.65,
+            "uplift_per_share": 0.0,
+            "math": "Asbury $127.6M + other legacy $149.8M gross; net of debt in book"
+          },
+          {
+            "id": "tie_out",
+            "label": "Tie-out to base payoff (fees, timing slack)",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": -0.27,
+            "math": "Book path $19.77 \u2192 payoff $19.50 over 4 years"
+          }
+        ],
+        "incremental_uplifts_sum": -0.27,
+        "year5_economic_nav_per_share": 19.5,
+        "years": 4,
+        "notes": "Liquidation yield curve; not 10-year Lawrence FCF"
+      }
+    },
+    "bull": {
+      "price": 9.22,
+      "payoff": 22.0,
+      "years": 3,
+      "notes": "Accelerated sales post-JV exit; aggressive buybacks; SAFE re-rates"
+    }
+  },
+  "stance_proposal": {
+    "suggested": "accumulate",
+    "irr_band": ">20%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true,
+      "floor_pass": true,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": null
+  },
+  "option_treatment": {
+    "scan_completed": true,
+    "options": [
+      {
+        "id": "safe_stake",
+        "label": "Safehold Inc. common stock",
+        "option_treatment": "nav_floor",
+        "base_terminal_value_bn": 0.219,
+        "evidence": "10-K FY2025; margin loan collateral; 13,522,651 shares"
+      },
+      {
+        "id": "asbury_development",
+        "label": "Asbury Park undeveloped sites + hotels",
+        "option_treatment": "milestone_nav",
+        "base_terminal_value_bn": 0.128,
+        "evidence": "10-K FY2025 carrying value $127.6M"
+      },
+      {
+        "id": "magnolia_green",
+        "label": "Magnolia Green residential development",
+        "option_treatment": "probability_weighted",
+        "base_terminal_value_bn": 0.05,
+        "evidence": "10-K development portfolio; completion capex required"
+      }
+    ]
+  },
+  "estimates": {
+    "marvin": {
+      "payoff": 19.5,
+      "years": 4,
+      "return_pct": 20.5
+    },
+    "external": []
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Yes",
+      "treatment": "nav_overlay",
+      "evidence": "nav_overlay in valuation.json"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / acreage?",
+      "answer": "Yes",
+      "treatment": "nav_floor",
+      "evidence": "Segment build / undeveloped row"
+    }
+  ],
+  "catalyst_paths": [
+    {
+      "event": "Base catalyst path",
+      "timing": "4 years",
+      "impact": "Repurchases at $8.45 avg Q1 2026; assets fell $90M Q1 as sales progress"
+    },
+    {
+      "event": "Failure mode",
+      "timing": "bear scenario",
+      "impact": "Slow asset sales; SAFE weak; development overruns on Magnolia; limited buybacks"
+    }
+  ],
+  "total_return_panel": {
+    "as_of": "2026-06-12",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 0,
+    "distribution_history_sum": 0,
+    "market_cap_m": 111.39,
+    "total_return_annualized_pct": -21.7,
+    "chart": "STHO/research/charts/total_return_2026-06-12.svg",
+    "panel_json": "STHO/research/total_return_panel.json"
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 7.2
+    },
+    "base": {
+      "return_pct": 20.6
+    },
+    "bull": {
+      "return_pct": 33.6
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 7.2
+    },
+    "base": {
+      "return_pct": 20.6
+    },
+    "bull": {
+      "return_pct": 33.6
+    }
+  },
+  "implied_return": {
+    "base_pct": 20.6,
+    "label": "annualized return",
+    "display": "20.6% (base)"
+  },
+  "overlay_results": []
+}

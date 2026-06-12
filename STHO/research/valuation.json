@@ -23,7 +23,7 @@
     "book_per_share_filed": 20.43,
     "book_per_share_filed_source": "StockholdersEquity $251,766K / 12,317,759 shares at 2025-12-31",
     "fcf_per_share": 0.95,
-    "fcf_source": "FY2025 NetCashProvidedByUsedInOperatingActivities $11,658K / ~12.3M shares — lumpy; asset-sale dependent [Assumption for Lawrence gate only]",
+    "fcf_source": "FY2025 NetCashProvidedByUsedInOperatingActivities $11,658K / ~12.3M shares \u2014 lumpy; asset-sale dependent [Assumption for Lawrence gate only]",
     "normalization_note": "Wind-down vehicle: Lawrence full IRR on operating cash is not the primary metric. Yield curve on book liquidation + SAFE floor."
   },
   "optionality_gate": {
@@ -32,12 +32,14 @@
     "floor_metric": "safe_stake_mark",
     "floor_value": 18.13,
     "floor_value_source": "13,522,651 SAFE shares x $16.205 / 12,081,333 STHO shares (Yahoo SAFE 2026-06-12)",
-    "primary_metric": "base",
-    "primary_label": "annualized return (liquidation yield curve)",
+    "primary_metric": "lawrence_base",
+    "primary_label": "annualized return",
     "discount_to_book_pct": 53.4,
-    "notes": "Price ~$9.22 vs Q1 book ~$19.77/sh; SAFE stake alone ~$18.13/sh at current SAFE quote."
+    "notes": "Price ~$9.22 vs Q1 book ~$19.77/sh; SAFE stake alone ~$18.13/sh at current SAFE quote.",
+    "primary_return_pct": 20.6
   },
   "nav_overlay": {
+    "status": "complete",
     "measurement_date": "2026-03-31",
     "safe_shares": 13522651,
     "safe_price": 16.205,
@@ -128,7 +130,7 @@
             "label": "SAFE stake at market (floor check)",
             "gaap_per_share": 18.13,
             "uplift_per_share": 0.0,
-            "math": "13,522,651 x $16.205 / shares — exceeds price today alone"
+            "math": "13,522,651 x $16.205 / shares \u2014 exceeds price today alone"
           },
           {
             "id": "real_estate",
@@ -142,7 +144,7 @@
             "label": "Tie-out to base payoff (fees, timing slack)",
             "gaap_per_share": 0.0,
             "uplift_per_share": -0.27,
-            "math": "Book path $19.77 → payoff $19.50 over 4 years"
+            "math": "Book path $19.77 \u2192 payoff $19.50 over 4 years"
           }
         ],
         "incremental_uplifts_sum": -0.27,
@@ -160,8 +162,14 @@
   },
   "stance_proposal": {
     "suggested": "accumulate",
-    "irr_band": "15–20%",
-    "rationale": "Optionality floor: SAFE stake mark exceeds price; base liquidation yield curve ~20% with partial dhando"
+    "irr_band": ">20%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true,
+      "floor_pass": true,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": null
   },
   "option_treatment": {
     "scan_completed": true,
@@ -196,5 +204,216 @@
       "return_pct": 20.5
     },
     "external": []
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Yes",
+      "treatment": "nav_overlay",
+      "evidence": "nav_overlay in valuation.json"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / acreage?",
+      "answer": "Yes",
+      "treatment": "nav_floor",
+      "evidence": "Segment build / undeveloped row"
+    }
+  ],
+  "catalyst_paths": [
+    {
+      "event": "Base catalyst path",
+      "timing": "4 years",
+      "impact": "Repurchases at $8.45 avg Q1 2026; assets fell $90M Q1 as sales progress"
+    },
+    {
+      "event": "Failure mode",
+      "timing": "bear scenario",
+      "impact": "Slow asset sales; SAFE weak; development overruns on Magnolia; limited buybacks"
+    }
+  ],
+  "total_return_panel": {
+    "as_of": "2026-06-12",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 0,
+    "distribution_history_sum": 0,
+    "market_cap_m": 111.39,
+    "total_return_annualized_pct": -21.7,
+    "chart": "STHO/research/charts/total_return_2026-06-12.svg",
+    "panel_json": "STHO/research/total_return_panel.json"
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 7.2
+    },
+    "base": {
+      "return_pct": 20.6
+    },
+    "bull": {
+      "return_pct": 33.6
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 7.2
+    },
+    "base": {
+      "return_pct": 20.6
+    },
+    "bull": {
+      "return_pct": 33.6
+    }
+  },
+  "implied_return": {
+    "base_pct": 20.6,
+    "label": "annualized return",
+    "display": "20.6% (base)"
+  },
+  "overlay_results": [],
+  "context_overlay": {
+    "as_of": "2026-06-12",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": -0.19,
+            "as_of": "2026-06-12",
+            "yoy_pct": 87.2,
+            "direction": "up",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.484999656677246,
+            "as_of": "2026-06-12",
+            "yoy_pct": 2.9,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.206999778747559,
+            "as_of": "2026-06-12",
+            "yoy_pct": 6.2,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 99.74600219726562,
+            "as_of": "2026-06-12",
+            "yoy_pct": 1.9,
+            "direction": "up",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 19.260000228881836,
+            "as_of": "2026-06-12",
+            "yoy_pct": 6.9,
+            "direction": "up",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": -0.95,
+            "as_of": "2026-06-12",
+            "yoy_pct": 28.6,
+            "direction": "up",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 14.66,
+            "as_of": "2026-06-12",
+            "yoy_pct": 22.6,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "lens_consensus": {
+    "as_of": "2026-06-12",
+    "shared_inputs_ref": "valuation.json@2026-06-12",
+    "valuation_richness": 0.0,
+    "blended_return_pct": 14.61,
+    "band_pct": [
+      7.2,
+      20.6
+    ],
+    "weighted_median_pct": 15.3,
+    "median_mean_flag": false,
+    "stance": "watch",
+    "agreement_pct": 33,
+    "dissent_count": 4,
+    "lawrence_divergence": true,
+    "top_dissents": [
+      {
+        "persona": "hohn",
+        "label": "Chris Hohn / TCI",
+        "verdict": "accumulate",
+        "return_pct": 20.6,
+        "key_metric": "fcf_yield=10.3",
+        "conviction": 0.28,
+        "falsifier": "FCF yield < 0.5% or commoditized archetype (turnaround/optionality only)"
+      },
+      {
+        "persona": "lawrence",
+        "label": "Lawrence (house IRR)",
+        "verdict": "accumulate",
+        "return_pct": 20.6,
+        "key_metric": "synthesis_pct=None",
+        "conviction": 0.28,
+        "falsifier": "Synthesis incomplete or irr_method pending"
+      },
+      {
+        "persona": "buffett_weschler",
+        "label": "Buffett / Weschler",
+        "verdict": "hold",
+        "return_pct": 17.51,
+        "key_metric": "owner_earnings_yield=10.3",
+        "conviction": 0.276,
+        "falsifier": "Eroding moat or dhando none"
+      }
+    ],
+    "contributor_count": 6,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
   }
 }
