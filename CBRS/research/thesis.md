@@ -1,6 +1,6 @@
 # CBRS — Investment Thesis
 
-**Last updated:** 2026-06-15
+**Last updated:** auto-sync
 
 ## Classification
 
@@ -11,8 +11,13 @@
 | **Dhando** (Pabrai) | none |
 | **Stance** | watch |
 | **Cycle** | up |
-| **MOI bucket** (legacy) | pending |
+| **Implied 7yr IRR** (base) | -2.4% (base) |
+| **IRR method** | yield_curve |
+| **Lawrence bucket** | pricing_power |
 | **Payoff lens** | operating |
+| **MOI bucket** | pending |
+
+**Deep dive:** `CBRS/research/deep_dive_2026-06-15.md` (auto-sync)
 
 ## One-line thesis
 

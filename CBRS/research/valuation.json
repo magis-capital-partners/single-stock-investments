@@ -285,58 +285,7 @@
       "notes": "No approved third-party blend; Marvin floor only"
     }
   },
-  "growth_explanation": {
-    "mechanism": "Inference workload mix shift from training to low-latency serving; OpenAI and AWS partnerships diversify beyond UAE strategic partners",
-    "source": "S-1/A business section and MD&A",
-    "falsifiers": [
-      {
-        "id": "customer_concentration",
-        "observation": "MBZUAI share stays above 50% of revenue",
-        "weight": 0.15
-      },
-      {
-        "id": "openai_mra_clawback",
-        "observation": "OpenAI MRA termination triggers $1.0B loan clawback",
-        "weight": 0.2
-      },
-      {
-        "id": "cloud_margin",
-        "observation": "Cloud gross margin stays below 30% after capex cycle",
-        "weight": 0.1
-      }
-    ],
-    "theory_implied": {
-      "y1_5": 0.18,
-      "y6_10": 0.1,
-      "exit_pfcf_y10_segment_blend": 22.0,
-      "derivation": "segment_build owner-cash weighted blend (growth only; exit from scenarios.base)",
-      "segment_weights": [
-        {
-          "id": "hardware",
-          "weight_pct": 100.0
-        }
-      ]
-    },
-    "lawrence_legacy": {
-      "y1_5": null,
-      "y6_10": null,
-      "return_pct": null
-    },
-    "falsifier_adjusted": {
-      "y1_5": 0.18,
-      "y6_10": 0.1,
-      "exit_pfcf_y10": 22.0,
-      "adjustments": [],
-      "triggered": [],
-      "filing_revenue_yoy": null,
-      "as_of_filing_facts": null
-    },
-    "status": "partial",
-    "divergence": {
-      "theory_vs_lawrence_y1_5_pp": 18.0,
-      "falsifier_vs_theory_y1_5_pp": 0.0
-    }
-  },
+  "growth_explanation": null,
   "lawrence_horizon_years": 7,
   "results_lawrence_legacy": {
     "bear": {
@@ -360,14 +309,7 @@
       "return_pct": 8.2
     }
   },
-  "results_growth_theory": {
-    "theory_implied": {
-      "return_pct": 15118636258.1
-    },
-    "falsifier_adjusted": {
-      "return_pct": 15118636258.1
-    }
-  },
+  "results_growth_theory": null,
   "implied_return": {
     "base_pct": -2.4,
     "label": "annualized return",
@@ -395,45 +337,36 @@
     "status": "complete",
     "paths": [
       {
-        "id": "theory_implied",
-        "label": "Segment-derived growth (pre-falsifier)",
-        "source": "segment_build weighted blend",
-        "return_pct": 15118636258.1,
-        "weight": 0.08,
+        "id": "lawrence_base",
+        "label": "Lawrence base (yield curve)",
+        "source": "scenarios.base",
+        "return_pct": -2.4,
+        "weight": 0.85,
         "type": "numeric",
-        "epistemic_tier": "B (pre-falsifier derivation)",
-        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
-        "weight_falsifiers": [
-          "Included at full weight alongside falsifier-adjusted without divergence note"
-        ],
-        "hard_to_vary": "partial"
+        "epistemic_tier": "A (primary filings)",
+        "weight_why": "Stance gate from filing-based payoff path at spot price",
+        "hard_to_vary": "yes"
       },
       {
         "id": "scenario_bear",
         "label": "Bear scenario (Lawrence)",
         "source": "scenarios.bear",
-        "return_pct": 3027457882256.9,
-        "weight": 0.05,
+        "return_pct": -11.3,
+        "weight": 0.075,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
-        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
-        "weight_falsifiers": [
-          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
-        ],
-        "hard_to_vary": "yes: asymmetric low weight is structural"
+        "weight_why": "Downside stress if customer concentration persists",
+        "hard_to_vary": "yes"
       },
       {
         "id": "scenario_bull",
         "label": "Bull scenario (Lawrence)",
         "source": "scenarios.bull",
-        "return_pct": 1579723373119174.5,
-        "weight": 0.12,
+        "return_pct": 8.2,
+        "weight": 0.075,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
-        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
-        "weight_falsifiers": [
-          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
-        ],
+        "weight_why": "Upside if OpenAI/AWS partnerships convert",
         "hard_to_vary": "yes"
       }
     ],
@@ -449,28 +382,247 @@
     ],
     "qualitative_manual": false,
     "qualitative_pp_cap_applied": false,
-    "numeric_weighted_pct": 758877548637257.8,
+    "numeric_weighted_pct": -2.4,
     "qualitative_pp": -0.2,
-    "total_synthesis_pct": 758877548637257.5,
+    "total_synthesis_pct": -2.4,
     "human_approval": "pending",
-    "weight_audit": {
-      "flags": [],
-      "deutsch_checks": {
-        "hard_to_vary": true,
-        "falsifiable": true,
-        "not_instrumentalist": true,
-        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
-      },
-      "qualitative_audit": {
-        "flags": [],
-        "deutsch_checks": {
-          "hard_to_vary": true,
-          "falsifiable": true,
-          "not_double_count": true,
-          "small_band": true
-        }
+    "notes": "Capstone IRR; yield_curve base gate"
+  },
+  "total_return_panel": {
+    "as_of": "2026-06-15",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 0,
+    "distribution_history_sum": 0,
+    "market_cap_m": null,
+    "total_return_annualized_pct": -49.64,
+    "chart": "CBRS/research/charts/total_return_2026-06-15.svg",
+    "panel_json": "CBRS/research/total_return_panel.json"
+  },
+  "context_overlay": {
+    "as_of": "2026-06-15",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": -0.19,
+            "as_of": "2026-06-15",
+            "yoy_pct": 54.8,
+            "direction": "up",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.468999862670898,
+            "as_of": "2026-06-15",
+            "yoy_pct": 0.4,
+            "direction": "flat",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.188000202178955,
+            "as_of": "2026-06-15",
+            "yoy_pct": 3.8,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 99.64399719238281,
+            "as_of": "2026-06-15",
+            "yoy_pct": 1.7,
+            "direction": "up",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 16.1200008392334,
+            "as_of": "2026-06-15",
+            "yoy_pct": -15.6,
+            "direction": "down",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": -0.7,
+            "as_of": "2026-06-15",
+            "yoy_pct": -173.7,
+            "direction": "down",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 15.38,
+            "as_of": "2026-06-15",
+            "yoy_pct": 20.8,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
       }
+    ]
+  },
+  "insider_signal": {
+    "as_of": "2026-06-15",
+    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
+    "in_base_irr": false,
+    "window_days": 365,
+    "ics": 0.0,
+    "band": "negligible",
+    "bull_case_support": "none",
+    "scenario_confidence": {
+      "priors": {
+        "bear": 0.2,
+        "base": 0.55,
+        "bull": 0.25
+      },
+      "tilted": {
+        "bear": 0.28,
+        "base": 0.47,
+        "bull": 0.25
+      },
+      "bull_delta": 0.0,
+      "bear_delta": 0.08,
+      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
     },
-    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+    "factors": {
+      "buy_score": 0.0,
+      "sell_score": -1.0,
+      "cluster_bonus": 0.0,
+      "net_buy_usd": 0,
+      "net_sell_usd": 131974745.0,
+      "price_today": 219.52
+    },
+    "top_buys": [],
+    "top_sells": [
+      {
+        "insider": "Susan Lior",
+        "date": "2026-05-15",
+        "shares": 1093998,
+        "price": 0.0,
+        "value_usd": 0.0,
+        "is_10b5_1": false,
+        "contrib": -0.193
+      },
+      {
+        "insider": "DONIO ELENA A.",
+        "date": "2026-05-15",
+        "shares": 33701,
+        "price": 0.0,
+        "value_usd": 0.0,
+        "is_10b5_1": false,
+        "contrib": -0.193
+      },
+      {
+        "insider": "Auvil Paul R. III",
+        "date": "2026-05-15",
+        "shares": 203750,
+        "price": 0.0,
+        "value_usd": 0.0,
+        "is_10b5_1": false,
+        "contrib": -0.193
+      },
+      {
+        "insider": "Komin Robert Patrick Jr.",
+        "date": "2026-05-15",
+        "shares": 854153,
+        "price": 0.0,
+        "value_usd": 0.0,
+        "is_10b5_1": false,
+        "contrib": -0.164
+      },
+      {
+        "insider": "Komin Robert Patrick Jr.",
+        "date": "2026-05-15",
+        "shares": 175000,
+        "price": 0.0,
+        "value_usd": 0.0,
+        "is_10b5_1": false,
+        "contrib": -0.164
+      }
+    ],
+    "narrative_hooks": [],
+    "transaction_count": 17
+  },
+  "lens_consensus": {
+    "as_of": "2026-06-15",
+    "shared_inputs_ref": "valuation.json@2026-06-15",
+    "valuation_richness": 1.0,
+    "blended_return_pct": -2.4,
+    "band_pct": [
+      -11.3,
+      8.2
+    ],
+    "weighted_median_pct": -2.4,
+    "median_mean_flag": true,
+    "stance": "watch",
+    "agreement_pct": 25,
+    "dissent_count": 6,
+    "lawrence_divergence": false,
+    "top_dissents": [
+      {
+        "persona": "munger",
+        "label": "Charlie Munger",
+        "verdict": "pass",
+        "return_pct": -11.3,
+        "key_metric": "moat=unproven",
+        "conviction": 1.0,
+        "falsifier": "Moat eroding/unproven or irr_method pending"
+      },
+      {
+        "persona": "hohn",
+        "label": "Chris Hohn / TCI",
+        "verdict": "pass",
+        "return_pct": -2.4,
+        "key_metric": "fcf_yield=-0.3",
+        "conviction": 0.87,
+        "falsifier": "FCF yield < 0.5% or commoditized archetype (turnaround/optionality only)"
+      },
+      {
+        "persona": "pabrai",
+        "label": "Mohnish Pabrai",
+        "verdict": "pass",
+        "return_pct": -2.4,
+        "key_metric": "downside_upside_ratio=1.378",
+        "conviction": 0.87,
+        "falsifier": "dhando -> none OR net-debt/EBITDA > 3 OR bear return < -15%"
+      }
+    ],
+    "contributor_count": 7,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
   }
 }
