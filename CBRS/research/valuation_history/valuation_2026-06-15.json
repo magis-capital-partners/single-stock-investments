@@ -1,0 +1,422 @@
+{
+  "ticker": "CBRS",
+  "as_of": "2026-06-15",
+  "method": "full",
+  "irr_method": "full",
+  "valuation_overlay": "segment_cashflow",
+  "valuation_mode": "operating",
+  "lawrence_bucket": "pricing_power",
+  "classification_inputs": {
+    "archetype": "platform",
+    "moat": "unproven",
+    "dhando": "none",
+    "cycle": "up",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 219.52,
+    "price_source": "Yahoo CBRS close 2026-06-15",
+    "price_as_of": "2026-06-15",
+    "shares_millions": 219.7,
+    "shares_source": "215,228,541 + 4.5M over-allotment = 219,728,541 Class A+B post-IPO (S-1/A May 11, 2026)",
+    "per_share": -0.66,
+    "fcf_per_share": -0.66,
+    "fcf_source": "FY2025 loss from operations $145.9M / 219.7M shares; excludes $390.7M other income from warrant/forward-contract marks (S-1/A)",
+    "normalization_note": "GAAP net income $237.8M and positive operating cash flow in 2024 were driven by customer deposits and fair-value gains, not normalized owner cash. FY2025 operating cash flow was -$10.1M and investing cash outflow was -$667.6M for cloud inference buildout."
+  },
+  "ai_overlay": {
+    "as_of": "2026-06-15",
+    "status": "partial \u2014 OpenAI MRA and AWS term sheet in option scan; not in Lawrence FCF\u2080",
+    "in_model": {
+      "hardware_revenue_y0_bn": 0.358,
+      "cloud_revenue_y0_bn": 0.152,
+      "consolidated_growth_base": "22%/12% blended segment path",
+      "fy2025_owner_cash_sh": "-$0.66 operating-loss normalized"
+    },
+    "not_in_model_requires_refresh": [
+      "OpenAI 750MW deployment schedule and MRA termination clawback",
+      "AWS binding term sheet conversion to recognized cloud revenue",
+      "WSE-4 tape-out timing and gross-margin bridge vs NVIDIA Blackwell",
+      "Customer concentration below 40% single-name threshold",
+      "Q1 2026 earnings (scheduled June 23, 2026)"
+    ],
+    "capex_stress_2026": {
+      "ocf_m_assumption": -50,
+      "ocf_assumption_note": "[Assumption] FY2026 cloud buildout keeps operating cash flow near breakeven while investing outflows remain elevated",
+      "capex_m": 500,
+      "capex_source": "FY2025 investing cash outflow $667.6M; partial repeat for inference capacity [Assumption]",
+      "implied_fcf_m": -550,
+      "implied_fcf_per_share": -2.5
+    },
+    "ai_inflection_bull": {
+      "fcf_per_share_y0": 2.5,
+      "fcf_y0_note": "[Assumption] FY2028 normalized if OpenAI/AWS revenue converts and cloud gross margin expands above 45%",
+      "growth_y1_5": 0.35,
+      "growth_y6_10": 0.15,
+      "exit_pfcf_y10": 28,
+      "drivers": "OpenAI MRA conversion, AWS hyperscaler ramp, inference TAM share",
+      "computed_return_pct": 12.3
+    }
+  },
+  "segment_build": {
+    "framework": "speedwell_reverse_dcf",
+    "as_of": "2026-06-15",
+    "horizon_years": 7,
+    "discount_rate_explicit": 0.1,
+    "segments": [
+      {
+        "id": "hardware",
+        "label": "Hardware (on-prem wafer-scale systems)",
+        "type": "operating",
+        "revenue_y0_bn": 0.358,
+        "revenue_share_pct": 70.3,
+        "operating_income_y0_bn": 0.154,
+        "owner_cash_y0_bn": 0.08,
+        "owner_cash_y0_per_share": 0.36,
+        "owner_cash_y0_source": "Hardware gross profit $153.7M less allocated R&D/S&M [Assumption]; S-1/A FY2025",
+        "growth_y1_5": 0.18,
+        "growth_y6_10": 0.1,
+        "exit_pfcf_y10": 22,
+        "pv_per_share_at_10pct": 18.5,
+        "notes": "FY2025 hardware revenue $358.4M (+69% YoY); MBZUAI concentration"
+      },
+      {
+        "id": "cloud_inference",
+        "label": "Cloud and other services (inference capacity)",
+        "type": "operating",
+        "revenue_y0_bn": 0.152,
+        "revenue_share_pct": 29.7,
+        "operating_income_y0_bn": 0.045,
+        "owner_cash_y0_bn": -0.22,
+        "owner_cash_y0_per_share": -1.0,
+        "owner_cash_y0_source": "Cloud gross profit $45.4M less data-center capex drag $667M allocated [Assumption]",
+        "growth_y1_5": 0.45,
+        "growth_y6_10": 0.2,
+        "exit_pfcf_y10": 25,
+        "pv_per_share_at_10pct": 12.0,
+        "notes": "FY2025 cloud revenue $151.6M (+94% YoY); AWS/OpenAI optionality"
+      },
+      {
+        "id": "corporate_rd",
+        "label": "Corporate R&D and public-company overhead",
+        "type": "drag",
+        "revenue_y0_bn": 0.0,
+        "owner_cash_y0_bn": -0.146,
+        "owner_cash_y0_per_share": -0.66,
+        "owner_cash_y0_source": "FY2025 loss from operations -$145.9M (S-1/A)",
+        "growth_y1_5": 0.05,
+        "growth_y6_10": 0.03,
+        "exit_pfcf_y10": 0,
+        "pv_per_share_at_10pct": -4.5,
+        "notes": "R&D $243.3M + S&M $70.6M + G&A $31.0M burden"
+      }
+    ],
+    "options": [
+      {
+        "id": "openai_mra",
+        "label": "OpenAI master revenue agreement and warrant",
+        "option_treatment": "probability_weighted",
+        "annual_drag_per_share": 0.0,
+        "base_terminal_value_bn": 8.0,
+        "base_terminal_rationale": "MRA valued at >$20B press; 40% probability of $8B NPV equivalent in overlay base [Assumption]",
+        "overlay_base_terminal_bn": 8.0,
+        "bull_terminal_value_bn": 20.0,
+        "probability_base": 0.4,
+        "evidence": "S-1/A: OpenAI 750MW deployment; $1.0B working-capital loan; 33.4M Class N warrant shares",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "aws_term_sheet",
+        "label": "AWS hyperscaler inference partnership",
+        "option_treatment": "embedded_in_segment",
+        "annual_drag_per_share": 0.0,
+        "base_terminal_value_bn": 0,
+        "base_terminal_rationale": "Binding term sheet March 2026; revenue path embedded in cloud segment growth, not separate terminal",
+        "evidence": "S-1/A business section: AWS first hyperscaler to deploy Cerebras in data centers",
+        "not_in_lawrence_base": false
+      },
+      {
+        "id": "warrant_mtm",
+        "label": "Warrant and forward-contract mark-to-market",
+        "option_treatment": "zero",
+        "annual_drag_per_share": 0.0,
+        "base_terminal_value_bn": 0,
+        "base_terminal_rationale": "Explicit zero \u2014 $390.7M other income in FY2025 is non-recurring fair-value accounting, not owner cash",
+        "evidence": "S-1/A: other income (expense) net $390.7M drove GAAP net income $237.8M",
+        "not_in_lawrence_base": true
+      }
+    ],
+    "segment_sum_pv_per_share": 26.0,
+    "implied_return_at_price_pct": null,
+    "notes": "Segment sum illustrative; Lawrence consolidated gate uses normalized -$0.66/sh owner cash"
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Semiconductor developer; assets reflect cash, inventory, and PP&E at cost"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / backlog?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "OpenAI MRA >$20B; 750MW deployment commitment (S-1/A)"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Yes",
+      "treatment": "zero terminal",
+      "evidence": "Cloud buildout and R&D drag; FY2025 loss from operations $145.9M"
+    },
+    {
+      "q": 4,
+      "question": "Backlog not in cash path?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "AWS term sheet and OpenAI capacity not fully in FY2025 revenue"
+    },
+    {
+      "q": 5,
+      "question": "Private stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No holdco stakes; warrants are liabilities not hidden assets"
+    },
+    {
+      "q": 6,
+      "question": "Transitory recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Growth story is structural inference demand, not one-time catch-up"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Cloud inference already in revenue $151.6M; AWS/OpenAI upside in growth path"
+    }
+  ],
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.05,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 12,
+      "notes": "MBZUAI/G42 concentration persists; OpenAI MRA delayed; cloud capex with no margin recovery"
+    },
+    "base": {
+      "growth_y1_5": 0.22,
+      "growth_y6_10": 0.12,
+      "exit_pfcf_y10": 20,
+      "notes": "Diversification via AWS/OpenAI; operating loss narrows to positive owner cash by year 5 [Assumption]"
+    },
+    "bull": {
+      "growth_y1_5": 0.35,
+      "growth_y6_10": 0.18,
+      "exit_pfcf_y10": 28,
+      "notes": "OpenAI MRA fully converts; AWS becomes top-3 customer; inference share gains vs GPU"
+    }
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": ">20%",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": false
+    },
+    "override_reason": null
+  },
+  "estimates": {
+    "marvin_floor": {
+      "per_share": -0.66,
+      "return_pct": null,
+      "notes": "FY2025 operating loss per share; filings only"
+    },
+    "blended_best": {
+      "per_share": -0.66,
+      "return_pct": null,
+      "notes": "No approved third-party blend; Marvin floor only"
+    }
+  },
+  "growth_explanation": {
+    "mechanism": "Inference workload mix shift from training to low-latency serving; OpenAI and AWS partnerships diversify beyond UAE strategic partners",
+    "source": "S-1/A business section and MD&A",
+    "falsifiers": [
+      {
+        "id": "customer_concentration",
+        "observation": "MBZUAI share stays above 50% of revenue",
+        "weight": 0.15
+      },
+      {
+        "id": "openai_mra_clawback",
+        "observation": "OpenAI MRA termination triggers $1.0B loan clawback",
+        "weight": 0.2
+      },
+      {
+        "id": "cloud_margin",
+        "observation": "Cloud gross margin stays below 30% after capex cycle",
+        "weight": 0.1
+      }
+    ],
+    "theory_implied": {
+      "y1_5": 0.18,
+      "y6_10": 0.1,
+      "exit_pfcf_y10_segment_blend": 22.0,
+      "derivation": "segment_build owner-cash weighted blend (growth only; exit from scenarios.base)",
+      "segment_weights": [
+        {
+          "id": "hardware",
+          "weight_pct": 100.0
+        }
+      ]
+    },
+    "lawrence_legacy": {
+      "y1_5": 0.22,
+      "y6_10": 0.12,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.18,
+      "y6_10": 0.1,
+      "exit_pfcf_y10": 20.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": null,
+      "as_of_filing_facts": null
+    },
+    "status": "partial",
+    "divergence": {
+      "theory_vs_lawrence_y1_5_pp": -4.0,
+      "falsifier_vs_theory_y1_5_pp": 0.0
+    }
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 3027457882256.9
+    },
+    "base": {
+      "return_pct": 7245757728.8
+    },
+    "bull": {
+      "return_pct": 1579723373119174.5
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 3027457882256.9
+    },
+    "base": {
+      "return_pct": 7245757728.8
+    },
+    "bull": {
+      "return_pct": 1579723373119174.5
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": 22342059657.9
+    },
+    "falsifier_adjusted": {
+      "return_pct": 22342059657.9
+    }
+  },
+  "implied_return": {
+    "base_pct": 791375415500715.5,
+    "label": "7yr IRR (total synthesis)",
+    "display": "791375415500715.5% (total synthesis)",
+    "lawrence_stance_gate_pct": 7245757728.8,
+    "falsifier_adjusted_pct": 7245757728.8,
+    "synthesis_pct": 791375415500715.5
+  },
+  "overlay_results": [
+    {
+      "case": "AI inflection",
+      "method": "full (normalized FCF)",
+      "key_inputs": "FCF\u2080=$2.5 g1=35% g2=15% exit=28\u00d7",
+      "return_pct": 12.3,
+      "stance_gate": false,
+      "notes": "[Assumption] FY2028 normalized if OpenAI/AWS revenue converts and cloud gross margin expands above 45%"
+    },
+    {
+      "case": "Capex stress Y0",
+      "method": "illustrative trough",
+      "key_inputs": "OCF NoneB \u2212 capex NoneB",
+      "return_pct": null,
+      "display": "FCF ~$-2.5/sh (not 7yr IRR)",
+      "stance_gate": false
+    }
+  ],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence envelope)",
+        "source": "scenarios.bear",
+        "return_pct": 3027457882256.9,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "hard_to_vary": "yes: asymmetric low weight is structural",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ]
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence envelope)",
+        "source": "scenarios.bull",
+        "return_pct": 1579723373119174.5,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "hard_to_vary": "yes",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ]
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 791375415500715.8,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 791375415500715.5,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}

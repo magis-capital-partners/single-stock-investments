@@ -6,24 +6,27 @@
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
+| **Archetype** (Stahl) | platform |
 | **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Dhando** (Pabrai) | none |
 | **Stance** | watch |
-| **Cycle** | - |
+| **Cycle** | up |
 | **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Payoff lens** | operating |
 
 ## One-line thesis
 
-Cerebras Systems — thesis pending Marvin deep dive.
+Cerebras is a fast-growing wafer-scale AI inference platform with $510M FY2025 revenue, but customer concentration and partnership-dependent growth leave normalized owner cash negative at ~$220; watch until OpenAI/AWS convert and Q1 2026 filings confirm run-rate.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read S-1/A registration statement (May 11, 2026)
+- [x] Read IPO closing 8-K (May 15, 2026)
+- [ ] Read first 10-Q (expected post June 23, 2026 earnings)
+- [ ] Track MBZUAI/G42 concentration below 40%
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-06-15; awaiting deep dive.
+- Q1 2026 earnings June 23, 2026
+- OpenAI MRA binding conversion
+- AWS revenue recognition in filings
