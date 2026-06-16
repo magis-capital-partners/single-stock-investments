@@ -1,0 +1,585 @@
+{
+  "ticker": "CBRS",
+  "as_of": "2026-06-16",
+  "method": "scenario",
+  "irr_method": "scenario",
+  "valuation_overlay": "segment_cashflow",
+  "lawrence_bucket": "pricing_power",
+  "payoff_lens": "operating",
+  "classification_inputs": {
+    "archetype": "compounder",
+    "moat": "unproven",
+    "dhando": "none",
+    "cycle": "up",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 213.58,
+    "price_source": "Yahoo CBRS close 2026-06-16",
+    "per_share": 0.18,
+    "fcf_source": "FY2025 net cash used in operating activities $10.0M negative on ~206M post-IPO shares = -$0.05/sh filing path; Lawrence base uses $0.18/sh normalized owner cash after stripping $363.3M forward-contract gain and growth cloud capex [Assumption]",
+    "shares_millions": 206.0,
+    "shares_source": "S-1 diluted weighted-average 171.821M (as-if converted) plus 34.5M IPO primary shares (8-K May 15 2026)",
+    "normalization_note": "GAAP net income $237.8M includes one-time $363.3M forward contract extinguishment gain; operating loss $145.9M; PP&E purchases $382.7M for Cerebras Cloud build-out",
+    "price_as_of": "2026-06-16"
+  },
+  "ai_overlay": {
+    "as_of": "2026-06-16",
+    "status": "partial",
+    "in_model": {
+      "hardware_revenue_m": 358.4,
+      "cloud_revenue_m": 151.6,
+      "openai_mra_value_bn": 20,
+      "openai_capacity_mw": 750,
+      "lawrence_starting_owner_cash_per_share": 0.18,
+      "gross_margin_pct_2025": 39
+    },
+    "not_in_model_requires_refresh": [
+      "OpenAI MRA revenue recognition schedule and capacity tranche timing",
+      "Post-IPO share count and dual-class voting dilution path",
+      "Wafer-scale Engine 4 product cycle gross margin bridge",
+      "Custom ASIC competition from NVIDIA Blackwell/Rubin and hyperscaler silicon",
+      "Working Capital Loan $1.0B repayment terms tied to OpenAI delivery milestones"
+    ],
+    "capex_stress_2026": {
+      "ocf_m_assumption": -50,
+      "capex_m": 450,
+      "capex_source": "FY2025 PP&E $382.7M plus [Assumption] incremental cloud build for OpenAI tranches",
+      "implied_fcf_per_share": -2.43,
+      "notes": "Illustrative trough if cloud capex accelerates before OpenAI revenue converts; not Lawrence FCF0"
+    },
+    "ai_inflection_bull": {
+      "fcf_per_share_y0": 1.85,
+      "growth_y1_5": 0.35,
+      "growth_y6_10": 0.18,
+      "exit_pfcf_y10": 30,
+      "fcf_y0_note": "[Assumption] FY2028 normalized if OpenAI MRA converts and cloud mix exceeds 50% of revenue at 45%+ gross margin",
+      "computed_return_pct": 9.5
+    }
+  },
+  "segment_build": {
+    "framework": "speedwell_reverse_dcf",
+    "as_of": "2026-06-16",
+    "horizon_years": 7,
+    "discount_rate_explicit": 0.1,
+    "segments": [
+      {
+        "id": "hardware",
+        "label": "Wafer-scale hardware systems (CS-3 / WSE-3)",
+        "type": "operating",
+        "revenue_y0_m": 358.4,
+        "revenue_share_pct": 70.3,
+        "owner_cash_y0_per_share": 0.13,
+        "owner_cash_y0_source": "Normalized owner cash allocated 70% by FY2025 hardware revenue share (S-1)",
+        "growth_y1_5": 0.22,
+        "growth_y6_10": 0.12,
+        "exit_pfcf_y10": 22,
+        "notes": "FY2025 hardware revenue $358.4M; customer concentration G42/MBZUAI/OpenAI"
+      },
+      {
+        "id": "cloud",
+        "label": "Cerebras Cloud and inference services",
+        "type": "operating",
+        "revenue_y0_m": 151.6,
+        "revenue_share_pct": 29.7,
+        "owner_cash_y0_per_share": 0.05,
+        "owner_cash_y0_source": "Normalized owner cash allocated 30% by FY2025 cloud revenue share (S-1)",
+        "growth_y1_5": 0.45,
+        "growth_y6_10": 0.2,
+        "exit_pfcf_y10": 28,
+        "notes": "Cloud revenue $151.6M (+94% YoY); OpenAI Codex-Spark inference; capex-heavy ramp"
+      }
+    ],
+    "options": [
+      {
+        "id": "openai_mra_backlog",
+        "label": "OpenAI multi-year MRA ($20B+ disclosed value, 750 MW)",
+        "option_treatment": "embedded_in_segment",
+        "annual_drag_per_share": 0,
+        "base_terminal_value_bn": 0,
+        "base_terminal_rationale": "Contracted capacity conversion modeled in cloud segment growth years 1-5, not separate terminal row",
+        "evidence": "S-1 risk factors: MRA represents substantial portion of projected revenues; January 2026 announcement",
+        "not_in_lawrence_base": false
+      },
+      {
+        "id": "openai_warrant",
+        "label": "OpenAI warrant (Series F-1 preferred linkage)",
+        "option_treatment": "milestone_nav",
+        "annual_drag_per_share": 0,
+        "base_terminal_value_bn": 0,
+        "base_terminal_rationale": "Warrant economics tied to OpenAI relationship; no SEC fair-value mark in base overlay until exercised or marked",
+        "evidence": "S-1 Note 12 OpenAI Warrant; pre-IPO capital structure",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "wse4_product_cycle",
+        "label": "Wafer-scale Engine 4 next-gen silicon",
+        "option_treatment": "zero",
+        "annual_drag_per_share": 0.12,
+        "base_terminal_rationale": "Pre-revenue at scale in overlay base; R&D burden in corporate drag until filing discloses revenue",
+        "evidence": "S-1 R&D expense $243.3M FY2025; product roadmap risk factors",
+        "not_in_lawrence_base": true
+      }
+    ],
+    "corporate_drag_per_share": 0.15,
+    "corporate_drag_note": "R&D and G&A in excess of segment allocation; stock-based compensation normalized"
+  },
+  "option_scan": [
+    {
+      "id": "openai_mra",
+      "question": "Backlog / contracted revenue not in FCF path?",
+      "answer": "yes",
+      "treatment": "embedded_in_segment",
+      "in_lawrence_base": false,
+      "evidence": "OpenAI MRA $20B+; 750 MW deployment commitment (S-1)"
+    },
+    {
+      "id": "gaap_misstatement",
+      "question": "GAAP book misstates core assets?",
+      "answer": "no",
+      "treatment": "n/a",
+      "evidence": "Datacenter PP&E on balance sheet; cloud build capitalized"
+    },
+    {
+      "id": "customer_concentration",
+      "question": "Transitory or structural concentration?",
+      "answer": "yes",
+      "treatment": "probability_weighted",
+      "in_lawrence_base": true,
+      "evidence": "MBZUAI 62% and G42 24% of FY2025 revenue; OpenAI MRA forward-weighted (S-1)"
+    }
+  ],
+  "optionality_gate": {
+    "framework": "ai_cloud_backlog",
+    "floor_pass": false,
+    "floor_metric": "normalized_owner_cash_yield",
+    "floor_value": 0.06,
+    "primary_metric": "lawrence_base",
+    "primary_label": "7yr IRR",
+    "notes": "IPO premium embeds OpenAI MRA; Lawrence base uses normalized $0.18/sh not GAAP net income",
+    "primary_return_pct": -28.9
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.08,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 12,
+      "notes": "OpenAI delivery slip; customer concentration loss; margin compression vs NVIDIA"
+    },
+    "base": {
+      "growth_y1_5": 0.28,
+      "growth_y6_10": 0.14,
+      "exit_pfcf_y10": 22,
+      "notes": "OpenAI tranches ramp; cloud mix rises; hardware grows with sovereign AI demand"
+    },
+    "bull": {
+      "growth_y1_5": 0.4,
+      "growth_y6_10": 0.2,
+      "exit_pfcf_y10": 32,
+      "notes": "Full OpenAI MRA conversion; inference share gains; WSE-4 cycle on time"
+    }
+  },
+  "bear_case": {
+    "notes": "Primary risk: OpenAI MRA termination or delivery failure triggers Working Capital Loan repayment and revenue cliff"
+  },
+  "growth_explanation": {
+    "mechanism": "OpenAI 750 MW deployment and sovereign AI hardware orders drive revenue; cloud inference scales with installed base",
+    "source": "S-1 business description and risk factors",
+    "stress": "Customer concentration and capex ahead of cash conversion compress near-term owner cash",
+    "theory_implied": {
+      "y1_5": 0.2839,
+      "y6_10": 0.1422,
+      "exit_pfcf_y10_segment_blend": 23.7,
+      "derivation": "segment_build owner-cash weighted blend (growth only; exit from scenarios.base)",
+      "segment_weights": [
+        {
+          "id": "hardware",
+          "weight_pct": 72.2
+        },
+        {
+          "id": "cloud",
+          "weight_pct": 27.8
+        }
+      ]
+    },
+    "lawrence_legacy": {
+      "y1_5": 0.28,
+      "y6_10": 0.14,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.2839,
+      "y6_10": 0.1422,
+      "exit_pfcf_y10": 22.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": null,
+      "as_of_filing_facts": "evidence/_text/S-1_20260417_rpt20260417_acc0001628280_26_025762.htm.txt"
+    },
+    "status": "partial",
+    "divergence": {
+      "theory_vs_lawrence_y1_5_pp": 0.4,
+      "falsifier_vs_theory_y1_5_pp": 0.0
+    }
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": false
+    },
+    "override_reason": null
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -43.1
+    },
+    "base": {
+      "return_pct": -28.9
+    },
+    "bull": {
+      "return_pct": -19.1
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -43.1
+    },
+    "base": {
+      "return_pct": -28.9
+    },
+    "bull": {
+      "return_pct": -19.1
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": -28.7
+    },
+    "falsifier_adjusted": {
+      "return_pct": -28.7
+    }
+  },
+  "implied_return": {
+    "base_pct": -27.17,
+    "label": "7yr IRR (total synthesis)",
+    "display": "-27.17% (total synthesis)",
+    "lawrence_stance_gate_pct": -28.9,
+    "falsifier_adjusted_pct": -28.9,
+    "synthesis_pct": -27.17
+  },
+  "overlay_results": [
+    {
+      "case": "AI inflection",
+      "method": "scenario (normalized FCF)",
+      "key_inputs": "FCF\u2080=$1.85 g1=35% g2=18% exit=30\u00d7",
+      "return_pct": 9.5,
+      "stance_gate": false,
+      "notes": "[Assumption] FY2028 normalized if OpenAI MRA converts and cloud mix exceeds 50% of revenue at 45%+ gross margin"
+    },
+    {
+      "case": "Capex stress Y0",
+      "method": "illustrative trough",
+      "key_inputs": "OCF NoneB \u2212 capex NoneB",
+      "return_pct": null,
+      "display": "FCF ~$-2.43/sh (not 7yr IRR)",
+      "stance_gate": false
+    }
+  ],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Segment-derived growth (pre-falsifier)",
+        "source": "segment_build weighted blend",
+        "return_pct": -28.7,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": -43.1,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": -19.1,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": -26.97,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": -27.17,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  },
+  "human_review": {
+    "live_price_confirmed": false
+  },
+  "total_return_panel": {
+    "as_of": "2026-06-16",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 0,
+    "distribution_history_sum": 0,
+    "market_cap_m": null,
+    "total_return_annualized_pct": -52.9,
+    "chart": "CBRS/research/charts/total_return_2026-06-16.svg",
+    "panel_json": "CBRS/research/total_return_panel.json"
+  },
+  "context_overlay": {
+    "as_of": "2026-06-16",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": -0.54,
+            "as_of": "2026-06-16",
+            "yoy_pct": -28.6,
+            "direction": "down",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.425999641418457,
+            "as_of": "2026-06-16",
+            "yoy_pct": -0.6,
+            "direction": "flat",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.151000022888184,
+            "as_of": "2026-06-16",
+            "yoy_pct": 2.9,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 99.5459976196289,
+            "as_of": "2026-06-16",
+            "yoy_pct": 1.6,
+            "direction": "up",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 15.90999984741211,
+            "as_of": "2026-06-16",
+            "yoy_pct": -16.7,
+            "direction": "down",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": -2.48,
+            "as_of": "2026-06-16",
+            "yoy_pct": -361.1,
+            "direction": "down",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 15.51,
+            "as_of": "2026-06-16",
+            "yoy_pct": 21.8,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "insider_signal": {
+    "as_of": "2026-06-16",
+    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
+    "in_base_irr": false,
+    "window_days": 365,
+    "ics": 0.0,
+    "band": "negligible",
+    "bull_case_support": "none",
+    "scenario_confidence": {
+      "priors": {
+        "bear": 0.2,
+        "base": 0.55,
+        "bull": 0.25
+      },
+      "tilted": {
+        "bear": 0.28,
+        "base": 0.47,
+        "bull": 0.25
+      },
+      "bull_delta": 0.0,
+      "bear_delta": 0.08,
+      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
+    },
+    "factors": {
+      "buy_score": 0.0,
+      "sell_score": -1.0,
+      "cluster_bonus": 0.0,
+      "net_buy_usd": 0,
+      "net_sell_usd": 131974745.0,
+      "price_today": 213.58
+    },
+    "top_buys": [],
+    "top_sells": [
+      {
+        "insider": "Susan Lior",
+        "date": "2026-05-15",
+        "shares": 1093998,
+        "price": 0.0,
+        "value_usd": 0.0,
+        "is_10b5_1": false,
+        "contrib": -0.191
+      },
+      {
+        "insider": "DONIO ELENA A.",
+        "date": "2026-05-15",
+        "shares": 33701,
+        "price": 0.0,
+        "value_usd": 0.0,
+        "is_10b5_1": false,
+        "contrib": -0.191
+      },
+      {
+        "insider": "Auvil Paul R. III",
+        "date": "2026-05-15",
+        "shares": 203750,
+        "price": 0.0,
+        "value_usd": 0.0,
+        "is_10b5_1": false,
+        "contrib": -0.191
+      },
+      {
+        "insider": "Komin Robert Patrick Jr.",
+        "date": "2026-05-15",
+        "shares": 854153,
+        "price": 0.0,
+        "value_usd": 0.0,
+        "is_10b5_1": false,
+        "contrib": -0.163
+      },
+      {
+        "insider": "Komin Robert Patrick Jr.",
+        "date": "2026-05-15",
+        "shares": 175000,
+        "price": 0.0,
+        "value_usd": 0.0,
+        "is_10b5_1": false,
+        "contrib": -0.163
+      }
+    ],
+    "narrative_hooks": [],
+    "transaction_count": 17
+  },
+  "lens_consensus": {
+    "as_of": "2026-06-16",
+    "shared_inputs_ref": "valuation.json@2026-06-16",
+    "valuation_richness": 1.0,
+    "blended_return_pct": -29.53,
+    "band_pct": [
+      -43.1,
+      -24.56
+    ],
+    "weighted_median_pct": -27.17,
+    "median_mean_flag": false,
+    "stance": "pass",
+    "agreement_pct": 100,
+    "dissent_count": 0,
+    "lawrence_divergence": false,
+    "top_dissents": [],
+    "contributor_count": 6,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
+  }
+}
