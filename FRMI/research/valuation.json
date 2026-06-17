@@ -13,13 +13,13 @@
     "payoff_lens": "asset"
   },
   "inputs": {
-    "price": 5.0,
-    "price_source": "Placeholder pre-refresh; marvin_cloud_refresh fetches live quote",
-    "price_as_of": "2026-06-17",
+    "price": 7.88,
+    "price_source": "Yahoo FRMI close 2026-06-16",
+    "price_as_of": "2026-06-16",
     "shares_millions": 637.6,
     "shares_source": "637,574,239 shares outstanding May 11, 2026 (10-Q cover page)",
-    "per_share": -0.30,
-    "fcf_source": "Pre-revenue; Q1 2026 net loss $188.7M on 629.8M shares ≈ -$0.30/sh; normalized burn excludes one-time debt extinguishment [Assumption]",
+    "per_share": -0.3,
+    "fcf_source": "Pre-revenue; Q1 2026 net loss $188.7M on 629.8M shares \u2248 -$0.30/sh; normalized burn excludes one-time debt extinguishment [Assumption]",
     "normalization_note": "No operating revenue. Lawrence consolidated uses cash burn from operations ($7.3M Q1) plus capitalized G&A; not REIT rental path until powered shell delivery."
   },
   "optionality_gate": {
@@ -29,9 +29,9 @@
     "floor_value": 0.38,
     "primary_metric": "lawrence_base",
     "primary_label": "annualized return",
-    "overlay_nav_per_share": 1.70,
-    "notes": "Cash + restricted $243M / 637M ≈ $0.38/sh is liquidity not dhando floor; GAAP equity $1.07B ≈ $1.70/sh; PP&E $1.43B is development asset not cash",
-    "primary_return_pct": null
+    "overlay_nav_per_share": 1.7,
+    "notes": "Cash + restricted $243M / 637M \u2248 $0.38/sh is liquidity not dhando floor; GAAP equity $1.07B \u2248 $1.70/sh; PP&E $1.43B is development asset not cash",
+    "primary_return_pct": 8.8
   },
   "nav_overlay": {
     "status": "complete",
@@ -42,7 +42,7 @@
         "label": "Project Matador property, plant and equipment (net)",
         "option_treatment": "nav_floor",
         "nav_per_share": 2.24,
-        "notes": "$1,430.9M PP&E net at 3/31/2026 ÷ 637.6M shares; monetization or tenant-backed financing required to realize"
+        "notes": "$1,430.9M PP&E net at 3/31/2026 \u00f7 637.6M shares; monetization or tenant-backed financing required to realize"
       },
       {
         "id": "tenant_catalyst",
@@ -86,7 +86,7 @@
       "price": 5.0,
       "payoff": 9.0,
       "years": 7,
-      "notes": "35% × $18 tenant re-rate + 65% × $2.24 PP&E floor + cash [Assumption]; first powered shell ops targeted 2027",
+      "notes": "35% \u00d7 $18 tenant re-rate + 65% \u00d7 $2.24 PP&E floor + cash [Assumption]; first powered shell ops targeted 2027",
       "sotp_build": {
         "shares": 637574239,
         "lines": [
@@ -104,8 +104,8 @@
           },
           {
             "id": "tenant_option",
-            "label": "Probability-weighted tenant catalyst (35% × $18)",
-            "per_share": 6.30,
+            "label": "Probability-weighted tenant catalyst (35% \u00d7 $18)",
+            "per_share": 6.3,
             "source": "Management commercial urgency; no signed lease as of 3/31/2026 [Assumption]"
           },
           {
@@ -179,7 +179,7 @@
   ],
   "estimates": {
     "marvin_floor": {
-      "per_share": -0.30,
+      "per_share": -0.3,
       "return_pct": null,
       "payoff_per_share": 2.5,
       "years": 5,
@@ -195,7 +195,7 @@
         "return_pct_approx": null,
         "payoff_per_share_approx": 30.0,
         "horizon_years": 2,
-        "notes": "Context only: ~2× book at <$6; $30+ on tenant catalyst; long-term $150 on 6 GW REIT math — not in base IRR"
+        "notes": "Context only: ~2\u00d7 book at <$6; $30+ on tenant catalyst; long-term $150 on 6 GW REIT math \u2014 not in base IRR"
       }
     ],
     "blended_best": {
@@ -211,7 +211,9 @@
     "irr_band": "<15%",
     "gates": {
       "moat_ok": false,
-      "dhando_ok": false
+      "dhando_ok": true,
+      "floor_pass": false,
+      "valuation_mode": "optionality"
     },
     "override_reason": null
   },
@@ -219,5 +221,259 @@
     "mechanism": "Pre-revenue until definitive hyperscaler lease and powered shell delivery; rental growth tied to MW leased and escalators in ground leases (TTU 3% annual)",
     "source": "10-Q Note 6 leases; MD&A revenue model",
     "stress": "AI demand efficiency risk; no tenant signed at 3/31/2026"
+  },
+  "catalyst_paths": [
+    {
+      "event": "Base catalyst path",
+      "timing": "7 years",
+      "impact": "35% \u00d7 $18 tenant re-rate + 65% \u00d7 $2.24 PP&E floor + cash [Assumption]; first powered shell ops targeted 2027"
+    },
+    {
+      "event": "Failure mode",
+      "timing": "bear scenario",
+      "impact": "Governance overhang, dilution, no tenant; asset write-down or distressed monetization of equipment"
+    }
+  ],
+  "human_review": {
+    "live_price_confirmed": false
+  },
+  "total_return_panel": {
+    "as_of": "2026-06-17",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 0,
+    "distribution_history_sum": 0,
+    "market_cap_m": null,
+    "total_return_annualized_pct": -86.56,
+    "chart": "FRMI/research/charts/total_return_2026-06-17.svg",
+    "panel_json": "FRMI/research/total_return_panel.json"
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -12.9
+    },
+    "base": {
+      "return_pct": 8.8
+    },
+    "bull": {
+      "return_pct": 27.9
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -12.9
+    },
+    "base": {
+      "return_pct": 8.8
+    },
+    "bull": {
+      "return_pct": 27.9
+    }
+  },
+  "implied_return": {
+    "base_pct": 8.8,
+    "label": "annualized return",
+    "display": "8.8% (base)"
+  },
+  "overlay_results": [],
+  "context_overlay": {
+    "as_of": "2026-06-17",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": -0.45,
+            "as_of": "2026-06-16",
+            "yoy_pct": -7.1,
+            "direction": "down",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.427999973297119,
+            "as_of": "2026-06-16",
+            "yoy_pct": -0.5,
+            "direction": "flat",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.151000022888184,
+            "as_of": "2026-06-16",
+            "yoy_pct": 2.9,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 99.52200317382812,
+            "as_of": "2026-06-17",
+            "yoy_pct": 0.7,
+            "direction": "flat",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 16.40999984741211,
+            "as_of": "2026-06-16",
+            "yoy_pct": -14.1,
+            "direction": "down",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": -2.31,
+            "as_of": "2026-06-16",
+            "yoy_pct": -343.2,
+            "direction": "down",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 15.58,
+            "as_of": "2026-06-16",
+            "yoy_pct": 22.4,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "insider_signal": {
+    "as_of": "2026-06-17",
+    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
+    "in_base_irr": false,
+    "window_days": 365,
+    "ics": 0.0,
+    "band": "negligible",
+    "bull_case_support": "none",
+    "scenario_confidence": {
+      "priors": {
+        "bear": 0.2,
+        "base": 0.55,
+        "bull": 0.25
+      },
+      "tilted": {
+        "bear": 0.28,
+        "base": 0.47,
+        "bull": 0.25
+      },
+      "bull_delta": 0.0,
+      "bear_delta": 0.08,
+      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
+    },
+    "factors": {
+      "buy_score": 0.0,
+      "sell_score": -0.748,
+      "cluster_bonus": 0.4,
+      "net_buy_usd": 0,
+      "net_sell_usd": 68812432.77,
+      "price_today": 7.88
+    },
+    "top_buys": [],
+    "top_sells": [
+      {
+        "insider": "Everson Miles E.",
+        "date": "2026-04-09",
+        "shares": 427004,
+        "price": 4.58,
+        "value_usd": 1955678.32,
+        "is_10b5_1": false,
+        "contrib": -0.12
+      },
+      {
+        "insider": "Everson Miles E.",
+        "date": "2026-04-08",
+        "shares": 403205,
+        "price": 4.91,
+        "value_usd": 1979736.55,
+        "is_10b5_1": false,
+        "contrib": -0.119
+      },
+      {
+        "insider": "Perry Griffin",
+        "date": "2026-03-31",
+        "shares": 2000000,
+        "price": 5.5384,
+        "value_usd": 11076800.0,
+        "is_10b5_1": false,
+        "contrib": -0.104
+      },
+      {
+        "insider": "Perry Griffin",
+        "date": "2026-03-30",
+        "shares": 9000000,
+        "price": 5.0213,
+        "value_usd": 45191700.0,
+        "is_10b5_1": false,
+        "contrib": -0.104
+      },
+      {
+        "insider": "Uzman Mesut",
+        "date": "2026-06-03",
+        "shares": 79032,
+        "price": 6.31,
+        "value_usd": 498691.92,
+        "is_10b5_1": false,
+        "contrib": -0.067
+      }
+    ],
+    "narrative_hooks": [
+      "Multiple insiders bought within cluster window"
+    ],
+    "transaction_count": 17
+  },
+  "lens_consensus": {
+    "as_of": "2026-06-17",
+    "shared_inputs_ref": "valuation.json@2026-06-17",
+    "valuation_richness": 0.413,
+    "blended_return_pct": 0.5,
+    "band_pct": [
+      -12.9,
+      8.8
+    ],
+    "weighted_median_pct": 7.48,
+    "median_mean_flag": true,
+    "stance": "pass",
+    "agreement_pct": 100,
+    "dissent_count": 0,
+    "lawrence_divergence": false,
+    "top_dissents": [],
+    "contributor_count": 6,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
   }
 }
