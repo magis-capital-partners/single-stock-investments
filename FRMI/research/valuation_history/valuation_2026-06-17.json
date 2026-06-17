@@ -1,0 +1,279 @@
+{
+  "ticker": "FRMI",
+  "as_of": "2026-06-17",
+  "valuation_mode": "optionality",
+  "method": "yield_curve",
+  "irr_method": "yield_curve",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "unproven",
+    "dhando": "partial",
+    "cycle": "-",
+    "payoff_lens": "asset"
+  },
+  "inputs": {
+    "price": 7.88,
+    "price_source": "Yahoo FRMI close 2026-06-16",
+    "price_as_of": "2026-06-16",
+    "shares_millions": 637.6,
+    "shares_source": "637,574,239 shares outstanding May 11, 2026 (10-Q cover page)",
+    "per_share": -0.3,
+    "fcf_source": "Pre-revenue; Q1 2026 net loss $188.7M on 629.8M shares \u2248 -$0.30/sh; normalized burn excludes one-time debt extinguishment [Assumption]",
+    "normalization_note": "No operating revenue. Lawrence consolidated uses cash burn from operations ($7.3M Q1) plus capitalized G&A; not REIT rental path until powered shell delivery."
+  },
+  "optionality_gate": {
+    "framework": "powered_shell_reit",
+    "floor_pass": false,
+    "floor_metric": "cash_per_share",
+    "floor_value": 0.38,
+    "primary_metric": "lawrence_base",
+    "primary_label": "annualized return",
+    "overlay_nav_per_share": 1.7,
+    "notes": "Cash + restricted $243M / 637M \u2248 $0.38/sh is liquidity not dhando floor; GAAP equity $1.07B \u2248 $1.70/sh; PP&E $1.43B is development asset not cash",
+    "primary_return_pct": 8.8
+  },
+  "nav_overlay": {
+    "status": "complete",
+    "as_of": "2026-06-17",
+    "segments_or_options": [
+      {
+        "id": "project_matador_ppe",
+        "label": "Project Matador property, plant and equipment (net)",
+        "option_treatment": "nav_floor",
+        "nav_per_share": 2.24,
+        "notes": "$1,430.9M PP&E net at 3/31/2026 \u00f7 637.6M shares; monetization or tenant-backed financing required to realize"
+      },
+      {
+        "id": "tenant_catalyst",
+        "label": "Definitive hyperscaler lease (400+ MW Phase 1)",
+        "option_treatment": "probability_weighted",
+        "probability_base": 0.35,
+        "milestone_nav_per_share": 18.0,
+        "notes": "Management targets binding tenant within 90 days of May 14 earnings; Beal covenant requires 400 MW lease by anniversary [Assumption on timing]"
+      },
+      {
+        "id": "nuclear_option",
+        "label": "NRC COL application (4.4 GW nuclear baseload)",
+        "option_treatment": "zero",
+        "base_terminal_value_bn": 0,
+        "base_terminal_rationale": "First new-build COL accepted in 15 years per MD&A; no revenue or fair-value mark; explicit zero in Lawrence base",
+        "notes": "2030s timeline; not consuming capital in base path per 10-Q risk factors"
+      },
+      {
+        "id": "cash_floor",
+        "label": "Cash and restricted cash",
+        "option_treatment": "nav_floor",
+        "nav_per_share": 0.38,
+        "notes": "$207.5M cash + $35.8M restricted at 3/31/2026"
+      }
+    ],
+    "not_in_model_requires_refresh": [
+      "Binding tenant lease economics (rent per kW, term, capex share)",
+      "Yorkville Note draw schedule and dilution",
+      "Proxy contest resolution and permanent CEO hire",
+      "MPS mobile gen lease commencement July 2027 pick-up dates"
+    ]
+  },
+  "scenarios": {
+    "bear": {
+      "price": 5.0,
+      "payoff": 2.5,
+      "years": 5,
+      "notes": "Governance overhang, dilution, no tenant; asset write-down or distressed monetization of equipment"
+    },
+    "base": {
+      "price": 5.0,
+      "payoff": 9.0,
+      "years": 7,
+      "notes": "35% \u00d7 $18 tenant re-rate + 65% \u00d7 $2.24 PP&E floor + cash [Assumption]; first powered shell ops targeted 2027",
+      "sotp_build": {
+        "shares": 637574239,
+        "lines": [
+          {
+            "id": "cash",
+            "label": "Cash and restricted per share",
+            "per_share": 0.38,
+            "source": "10-Q balance sheet 3/31/2026"
+          },
+          {
+            "id": "ppe_floor",
+            "label": "PP&E net per share (cost basis)",
+            "per_share": 2.24,
+            "source": "10-Q Note 4; not fair-value marked"
+          },
+          {
+            "id": "tenant_option",
+            "label": "Probability-weighted tenant catalyst (35% \u00d7 $18)",
+            "per_share": 6.3,
+            "source": "Management commercial urgency; no signed lease as of 3/31/2026 [Assumption]"
+          },
+          {
+            "id": "governance_haircut",
+            "label": "Governance and dilution haircut",
+            "per_share": 0.08,
+            "source": "Tie-out adjustment; proxy contest and going-concern language"
+          }
+        ],
+        "payoff_per_share": 9.0,
+        "years": 7
+      }
+    },
+    "bull": {
+      "price": 5.0,
+      "payoff": 28.0,
+      "years": 7,
+      "notes": "Binding tenant + multi-GW gas path; external research note $30+ re-rate on LOI analog [PENDING APPROVAL]"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "nav_floor",
+      "evidence": "PP&E $1.43B reflects procured turbines, substations, site work at cost; no fair-value uplift for permits or tenant option"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / pipeline?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "11 GW permitted campus expandable to 17 GW; TCEQ air permits; no revenue until powered shell delivery (10-Q Note 1)"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Yes",
+      "treatment": "zero terminal",
+      "evidence": "Q1 G&A $166M incl $134M share-based comp; pre-revenue development company"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF path?",
+      "answer": "No signed lease",
+      "treatment": "milestone_nav",
+      "evidence": "No definitive tenant lease at 3/31/2026; vertical construction awaits lease (10-Q)"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Single-segment REIT developer; no look-through stakes"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No distributions; securities class action and Firebird litigation pending"
+    },
+    {
+      "q": 7,
+      "question": "Embedded option already in revenue?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Zero revenue; interest income only"
+    }
+  ],
+  "estimates": {
+    "marvin_floor": {
+      "per_share": -0.3,
+      "return_pct": null,
+      "payoff_per_share": 2.5,
+      "years": 5,
+      "notes": "Pre-revenue burn + bear payoff path; governance and dilution dominate"
+    },
+    "external": [
+      {
+        "source_id": "research_note_frmi",
+        "source": "FRMI.pdf investor research note",
+        "path": "FRMI/investor-documents/research-notes/FRMI.pdf",
+        "approved": false,
+        "status": "PENDING APPROVAL",
+        "return_pct_approx": null,
+        "payoff_per_share_approx": 30.0,
+        "horizon_years": 2,
+        "notes": "Context only: ~2\u00d7 book at <$6; $30+ on tenant catalyst; long-term $150 on 6 GW REIT math \u2014 not in base IRR"
+      }
+    ],
+    "blended_best": {
+      "payoff_per_share": 9.0,
+      "years": 7,
+      "return_pct": null,
+      "weights": "85% Marvin filing floor / 15% external tenant re-rate context (pending approval)",
+      "notes": "External view treated as bull sensitivity only until human promotes source"
+    }
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": true,
+      "floor_pass": false,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": null
+  },
+  "growth_explanation": {
+    "mechanism": "Pre-revenue until definitive hyperscaler lease and powered shell delivery; rental growth tied to MW leased and escalators in ground leases (TTU 3% annual)",
+    "source": "10-Q Note 6 leases; MD&A revenue model",
+    "stress": "AI demand efficiency risk; no tenant signed at 3/31/2026"
+  },
+  "catalyst_paths": [
+    {
+      "event": "Base catalyst path",
+      "timing": "7 years",
+      "impact": "35% \u00d7 $18 tenant re-rate + 65% \u00d7 $2.24 PP&E floor + cash [Assumption]; first powered shell ops targeted 2027"
+    },
+    {
+      "event": "Failure mode",
+      "timing": "bear scenario",
+      "impact": "Governance overhang, dilution, no tenant; asset write-down or distressed monetization of equipment"
+    }
+  ],
+  "human_review": {
+    "live_price_confirmed": false
+  },
+  "total_return_panel": {
+    "as_of": "2026-06-17",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 0,
+    "distribution_history_sum": 0,
+    "market_cap_m": null,
+    "total_return_annualized_pct": -86.56,
+    "chart": "FRMI/research/charts/total_return_2026-06-17.svg",
+    "panel_json": "FRMI/research/total_return_panel.json"
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -12.9
+    },
+    "base": {
+      "return_pct": 8.8
+    },
+    "bull": {
+      "return_pct": 27.9
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -12.9
+    },
+    "base": {
+      "return_pct": 8.8
+    },
+    "bull": {
+      "return_pct": 27.9
+    }
+  },
+  "implied_return": {
+    "base_pct": 8.8,
+    "label": "annualized return",
+    "display": "8.8% (base)"
+  },
+  "overlay_results": []
+}

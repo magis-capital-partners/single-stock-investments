@@ -1,29 +1,36 @@
 # FRMI — Investment Thesis
 
-**Last updated:** 2026-06-16
+**Last updated:** auto-sync
 
 ## Classification
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
+| **Archetype** (Stahl) | optionality |
 | **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Implied 7yr IRR** (base) | 8.8% (base) |
+| **IRR method** | yield_curve |
+| **Lawrence bucket** | other |
+| **Payoff lens** | asset |
+| **MOI bucket** | pending |
+
+**Deep dive:** `FRMI/research/deep_dive_2026-06-17.md` (auto-sync)
 
 ## One-line thesis
 
-Fermi Inc. — thesis pending Marvin deep dive.
+Pre-revenue powered-shell REIT developing Project Matador (~11 GW private power campus); asset-rich, tenant-gated, **watch** at **8.8%** base return.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest quarterly report (Q1 2026 10-Q)
+- [ ] Read first annual report (10-K when filed)
+- [ ] Binding hyperscaler lease economics in SEC filings
+- [ ] Proxy contest and permanent CEO resolution
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-06-16; awaiting deep dive.
+- Deep dive 2026-06-17; external research note pending approval
+- Proxy contest, permanent CEO, and tenant lease timing unresolved
