@@ -95,6 +95,8 @@ def classify_path(rel: str) -> tuple[int, str]:
         return 92, "quarterly"
     if "def_14a" in low or "def 14a" in low or "proxy" in low:
         return 88, "proxy"
+    if "s-1" in low or "s_1" in low or "f-1" in low or "f_1" in low:
+        return 100, "S-1"
     if "8-k" in low or "8_k" in low:
         return 75, "8-K"
     if "corrected-transcript" in low or "corrected_transcript" in low:
@@ -256,7 +258,7 @@ def build_ticker(ticker: str) -> int:
         ):
             kind_latest[k] = d
 
-    full_kinds = {"10-K", "10-Q", "20-F", "40-F", "annual", "quarterly", "proxy", "otcqx", "10-k", "10-q", "20-f", "40-f", "md&a"}
+    full_kinds = {"10-K", "10-Q", "20-F", "40-F", "annual", "quarterly", "proxy", "otcqx", "10-k", "10-q", "20-f", "40-f", "md&a", "S-1"}
     transcript_kinds = {"transcript", "earnings_transcript"}
     transcript_latest: list[dict] = []
     full_count = 0

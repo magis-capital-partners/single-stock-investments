@@ -1,29 +1,36 @@
 # CBRS — Investment Thesis
 
-**Last updated:** 2026-06-15
+**Last updated:** auto-sync
 
 ## Classification
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
+| **Archetype** (Stahl) | compounder |
 | **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Dhando** (Pabrai) | none |
 | **Stance** | watch |
-| **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Cycle** | up |
+| **Implied 7yr IRR** (base) | -27.17% (total synthesis) |
+| **IRR method** | scenario |
+| **Lawrence bucket** | pricing_power |
+| **Payoff lens** | operating |
+| **MOI bucket** | pending |
+
+**Deep dive:** `CBRS/research/deep_dive_2026-06-16.md` (auto-sync)
 
 ## One-line thesis
 
-Cerebras Systems — thesis pending Marvin deep dive.
+Cerebras is a high-growth wafer-scale AI chip and cloud vendor with a disclosed OpenAI mega-contract, but normalized owner cash, customer concentration, and IPO premium produce a negative base return at today's price; **watch** until post-IPO filings prove cash conversion.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read S-1 and IPO 8-K
+- [ ] First post-IPO 10-Q and earnings call
+- [ ] OpenAI MRA revenue recognition schedule
+- [ ] Live price vs placeholder in valuation.json
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-06-15; awaiting deep dive.
+- Deep dive 2026-06-16 complete; price placeholder pending refresh
+- See `CBRS/research/deep_dive_2026-06-16.md`
