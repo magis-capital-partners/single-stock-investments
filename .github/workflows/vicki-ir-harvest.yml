@@ -68,7 +68,7 @@ jobs:
     timeout-minutes: 90
     strategy:
       fail-fast: false
-      max_parallel: ${{ fromJson(needs.prepare.outputs.max_parallel) }}
+      max-parallel: ${{ fromJson(needs.prepare.outputs.max_parallel) }}
       matrix:
         ticker: ${{ fromJson(needs.prepare.outputs.tickers) }}
 
