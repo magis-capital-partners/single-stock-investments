@@ -118,3 +118,4 @@ One row per adversarial or consistency re-pass. Append via `milly_repass.py` or 
 | 2026-06-16 | CBRS | standard_batch | OK | marvin_cloud_refresh |
 | 2026-06-14 | XP | standard_batch | OK | marvin_cloud_refresh |
 | 2026-06-17 | XP | standard_batch | OK | marvin_cloud_refresh |
+| 2026-06-18 | VOXR | standard_batch | BLOCKED | marvin_cloud_refresh |
