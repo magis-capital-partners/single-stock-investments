@@ -6,24 +6,30 @@
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
+| **Archetype** (Stahl) | optionality |
 | **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Cycle** | peak |
+| **Implied 7yr IRR** (Lawrence) | 5.4% (total synthesis) |
+| **IRR method** | full |
+| **Lawrence bucket** | pricing_power |
+| **Valuation overlay** | — |
+| **Payoff lens** | asset |
+| **MOI bucket** (legacy) | commodity_optionality |
 
 ## One-line thesis
 
-Vox Royalty Corp — thesis pending Marvin deep dive.
+Vox Royalty is a gold-weighted micro-cap royalty/streamer with **70+** assets and record FY2025 cash flow; at **$5.20** the seven-year return is **5.4%** per year (synthesis) — **watch** until 2026 receipt guidance converts to durable per-share owner cash.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest annual report (FY2025 40-F ex 99.2)
+- [ ] Read latest quarterly report (add Q1 2026 6-K when filed)
+- [x] Apply option scan and optionality overlay
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-06-18; awaiting deep dive.
+- 2026 receipt guide **$28–32M** is management forward-looking; not in Lawrence base
+- Credit facility: **$6.7M** drawn at Dec 31, 2025 vs press citing full repayment early 2026
+- No approved third-party sources
