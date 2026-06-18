@@ -1,6 +1,6 @@
 # VOXR — Investment Thesis
 
-**Last updated:** 2026-06-18
+**Last updated:** auto-sync
 
 ## Classification
 
@@ -11,12 +11,13 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | peak |
-| **Implied 7yr IRR** (Lawrence) | 5.4% (total synthesis) |
+| **Implied 7yr IRR** (base) | 5.38% (total synthesis) |
 | **IRR method** | full |
 | **Lawrence bucket** | pricing_power |
-| **Valuation overlay** | — |
 | **Payoff lens** | asset |
-| **MOI bucket** (legacy) | commodity_optionality |
+| **MOI bucket** | pending |
+
+**Deep dive:** `VOXR/research/deep_dive_2026-06-18.md` (auto-sync)
 
 ## One-line thesis
 

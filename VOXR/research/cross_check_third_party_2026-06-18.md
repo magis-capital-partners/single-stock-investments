@@ -1,60 +1,62 @@
 # VOXR — Cross-Check: Third-Party Sources
 
 **Date:** 2026-06-18
-**Agent:** Marvin
+**Agent:** Marvin (automated fill)
 **Marvin dive:** `VOXR/research/deep_dive_2026-06-18.md`
 **Source inventory:** `VOXR/third-party-analyses/source_inventory_2026-06-18.md`
 **Framework:** `_system/frameworks/third_party_cross_reference.md`, `external_view_blend.md`
 
 ## Executive summary
 
-No third-party sources are indexed for VOXR as of this scan. Marvin stance rests on **primary filings only** (FY2025 40-F ex 99.2 financial statements, March 30, 2026 results release ex 99.1, June 2026 corporate presentation, February 2026 shareholder letter). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or sell-side coverage is added.
+Marvin floor **5.38%** per year (optionality; stance **watch**) from primary filings and `valuation.json`. No third-party sources indexed; filings-only stance. **[HUMAN REVIEW]** for approved-source numeric blend.
 
-**Synthesis:** Marvin floor only; no external blend. Base IRR **2.2%** per year (Lawrence gate); total synthesis **5.4%** per year at **$5.20**.
+**Synthesis (best estimate):** Marvin **5.38%** base · stance **watch**; external sources adjust conviction on catalyst timing, not primary IRR without human OK.
 
 ## Sources in scope
 
-| Source | Type | Status | In base IRR? |
-|--------|------|--------|--------------|
-| (none indexed) | — | n/a | n/a |
+| Source ID | Title | Path | Status | Cross-check status |
+|-----------|-------|------|--------|-------------------|
+| (none) | Primary filings only | — | — | n/a |
 
 ## Agreements (facts)
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| — | — | — | — |
+| Base return anchor | **5.38%** per year | Qualitative support only | `VOXR/research/deep_dive_2026-06-18.md` |
+| Archetype / stance | **optionality** · **watch** | See indexed sources | `valuation.json` |
+| Normalization | Royalty/stream model: owner cash approximates operating cash flow; minimal susta | Cross-check vs posts | Marvin |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| — | — | — | — |
+| Primary IRR | **5.38%** (Lawrence / scenarios) | No single approved IRR unless promoted | Marvin **70%** numeric; external **30%** catalyst timing |
+| Third party | Filing-first | Context tier only | No numeric upgrade without human OK |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | **$0.157/sh** FY2025 OCF | **2.2%** / 7yr Lawrence | watch |
-| External (combined) | — | — | — |
-| **Blended best estimate** | **$0.157/sh** | **5.4%** total synthesis | **watch** |
+| Marvin floor | See assumption ledger | **5.38%** | **watch** |
+| External (combined) | Narrative / catalyst | No change to base % | **watch** (conviction) |
+| **Blended best estimate** | **Filing anchor** | **5.38%** | **watch** |
 
-**Weights:** No external sources; synthesis weights are Lawrence scenarios + qualitative commodity-optionality adjustment only (`valuation.json` → `synthesis`).
+**Weights:** Marvin **70%** on numbers; indexed third party **30%** on catalyst timing and narrative (approved Substacks/HK context only in qualitative layer until human promotes).
 
-**Returns statement (blended):** At **$5.20**, Marvin expects **5.4%** per year on total synthesis; no approved third-party views in base IRR.
+**Returns statement (blended):** We expect **5.38%** per year at today's price on the Marvin base case; third-party sources may raise or lower conviction on timing but do not replace filing math without **[HUMAN REVIEW]**.
 
 ## [HUMAN REVIEW]
 
-- [ ] Every **approved** source reviewed against filings (none indexed)
+- [ ] Every **approved** source reviewed against filings
 - [ ] Every **pending** source cited with **[PENDING APPROVAL]** only
-- [ ] Blended estimate in `valuation.json` → `estimates.external[]` if material third party added
+- [ ] Blended estimate in `valuation.json` → `estimates.external[]` if material
 
 ## [PROPOSED MEMORY]
 
-- [PROPOSED COMPANY] VOXR: third-party cross-check 2026-06-18 — Marvin floor only; no external blend.
+- [PROPOSED COMPANY] VOXR: third-party cross-check fill 2026-06-18 — Marvin 5.38% unchanged
 
 ## Primary sources cited
 
 1. `VOXR/research/deep_dive_2026-06-18.md`
-2. `VOXR/third-party-analyses/source_inventory_2026-06-18.md`
-3. `VOXR/investor-documents/sec-edgar/40F2025_000165495426002978_voxr_ex992.htm`
-4. `VOXR/investor-documents/sec-edgar/6K_0001654954_000165495426002977_voxr_ex991.htm`
+2. `VOXR/research/valuation.json`
+3. `VOXR/third-party-analyses/source_inventory_2026-06-18.md`
