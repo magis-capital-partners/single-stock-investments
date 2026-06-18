@@ -9,6 +9,7 @@
 |----|-------|------|----------------|
 | `apld_pf3_summary` | Polaris Forge 3 lease (May 20, 2026 PR summary) | `investor-documents/research-notes/2026-05-20_Polaris_Forge_3_lease_summary.md` | Catalyst / 25% blend weight on ramp timing (`valuation.json` external) |
 | `apld_reiterate_buy` | What Would A Run The Table Scenario Look Like — Reiterate BUY | `investor-documents/research-notes/What Would A Run The Table Scenario Look Like_ Reiterate BUY.pdf` | Bull-case framing; cross-check vs filings; **not** sole owner-cash anchor |
+| VIC: APLD VIC PDF | 2026-06-18 | APLD/third-party-analyses/vic/vic_pdf_2026-06-18_apld-vic-pdf_51e04aef1b.pdf | **Pending** - local single-page intake `APLD/third-party-analyses/vic/vic_pdf_2026-06-18_apld-vic-pdf_51e04aef1b.pdf`; not in base IRR |
 
 ## Cross-check
 

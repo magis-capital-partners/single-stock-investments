@@ -135,6 +135,32 @@ def _short_reports(ticker: str) -> list[dict]:
     ]
 
 
+def _vic_sources(ticker: str) -> list[dict]:
+    vic_dir = ROOT / ticker / "third-party-analyses" / "vic"
+    if not vic_dir.is_dir():
+        return []
+    out: list[dict] = []
+    files = sorted([*vic_dir.glob("*.md"), *vic_dir.glob("*.pdf")])
+    for f in files:
+        title = f.stem
+        if f.suffix.lower() == ".md":
+            text = f.read_text(encoding="utf-8", errors="ignore")
+            for line in text.splitlines():
+                if line.startswith("# "):
+                    title = line[2:].strip()
+                    break
+        out.append(
+            {
+                "source_id": "vic",
+                "title": title[:120],
+                "path": _rel(f),
+                "status": "pending",
+                "use": "VIC local single-page intake; human approval required",
+            }
+        )
+    return out
+
+
 def _hk_sources(ticker: str) -> list[dict]:
     tp = ROOT / ticker / "third-party-analyses"
     scans = sorted(tp.glob("hk_scan_*.json")) if tp.is_dir() else []
@@ -185,6 +211,7 @@ def collect_third_party_sources(ticker: str) -> dict:
     ticker = ticker.upper()
     sources: list[dict] = []
     sources.extend(_approved_registry(ticker))
+    sources.extend(_vic_sources(ticker))
     ref = ROOT / ticker / "third-party-analyses" / "references.md"
     if ref.exists():
         sources.extend(_parse_md_table_paths(ref.read_text(encoding="utf-8", errors="ignore")))

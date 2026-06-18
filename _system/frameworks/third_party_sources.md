@@ -18,6 +18,8 @@
 
 **Horizon Kinetics** quarterly commentaries and Stahl shelf essays default to **context** until human adds an approved row. Workflow: `hk_cross_reference.md`.
 
+**Value Investors Club** local intakes default to **pending**. Use `_system/scripts/vic_local_intake.py` and `_system/frameworks/vic_local_intake.md`; do not automate VIC login, scheduled crawls, or bulk retrieval.
+
 ---
 
 ## Approved registry
@@ -39,6 +41,17 @@
 | `hk_context_ice` | HK context (ICE) | ICE | `ICE/third-party-analyses/references.md` | **2026-06-02** (human: all context sources approved) |
 | `hk_context_sjt` | HK context (SJT) | SJT | `SJT/third-party-analyses/references.md` | **2026-06-02** (human: all context sources approved) |
 | `hk_context_kewl` | HK + SSI context (KEWL) | KEWL | `KEWL/third-party-analyses/references.md` | **2026-06-02** (human: all context sources approved) |
+| `semper_bkrb_2025` | Semper Augustus Investments Group | BKRB | `BKRB/investor-documents/research-notes/Semper_Augustus_2025_both-sides-now-berkshire-going-out-on-top.pdf` | **2026-06-18** (human: yes - Berkshire deep-dive / owner-earnings context) |
+| `semper_bkrb_2024` | Semper Augustus Investments Group | BKRB | `BKRB/investor-documents/research-notes/Semper_Augustus_2024_wont-get-fooled-again-berkshire-getting-in-tune.pdf` | **2026-06-18** (human: yes - Berkshire deep-dive / insurance and capital allocation context) |
+| `semper_bkrb_2023` | Semper Augustus Investments Group | BKRB | `BKRB/investor-documents/research-notes/Semper_Augustus_2023_dirty-deeds-done-dirt-cheap-berkshire-flag-half-staff.pdf` | **2026-06-18** (human: yes - Berkshire deep-dive / valuation context) |
+| `semper_bkrb_2022` | Semper Augustus Investments Group | BKRB | `BKRB/investor-documents/research-notes/Semper_Augustus_2022_crazy-train-berkshire-getting-better-all-the-time.pdf` | **2026-06-18** (human: yes - Berkshire deep-dive / business quality context) |
+| `semper_bkrb_2021` | Semper Augustus Investments Group | BKRB | `BKRB/investor-documents/research-notes/Semper_Augustus_2021_brown-sugar-berkshire-charlie-is-my-darling.pdf` | **2026-06-18** (human: yes - Berkshire deep-dive / long-horizon context) |
+| `semper_bkrb_2020` | Semper Augustus Investments Group | BKRB | `BKRB/investor-documents/research-notes/Semper_Augustus_2020_point-of-no-return-berkshire-goat-goes-full-repo.pdf` | **2026-06-18** (human: yes - Berkshire deep-dive / repurchase context) |
+| `semper_bkrb_2019` | Semper Augustus Investments Group | BKRB | `BKRB/investor-documents/research-notes/Semper_Augustus_2019_money-for-nothing-berkshire-fumblerooskie.pdf` | **2026-06-18** (human: yes - Berkshire deep-dive / capital allocation context) |
+| `semper_bkrb_2018` | Semper Augustus Investments Group | BKRB | `BKRB/investor-documents/research-notes/Semper_Augustus_2018_addicted-to-loans-second-great-pivot-at-berkshire.pdf` | **2026-06-18** (human: yes - Berkshire deep-dive / operating and investment mix context) |
+| `semper_bkrb_2017` | Semper Augustus Investments Group | BKRB | `BKRB/investor-documents/research-notes/Semper_Augustus_2017_double-double-berkshire-charmed-by-tax-deed.pdf` | **2026-06-18** (human: yes - Berkshire deep-dive / tax and valuation context) |
+| `semper_bkrb_2016` | Semper Augustus Investments Group | BKRB | `BKRB/investor-documents/research-notes/Semper_Augustus_2016_sympathy-for-the-dog-brief-berkshire-redux.pdf` | **2026-06-18** (human: yes - Berkshire deep-dive / investment case context) |
+| `semper_bkrb_2015` | Semper Augustus Investments Group | BKRB | `BKRB/investor-documents/research-notes/Semper_Augustus_2015_party-like-1999-deep-dive-into-berkshire-hathaway.pdf` | **2026-06-18** (human: yes - foundational Berkshire deep dive) |
 
 ---
 
@@ -59,6 +72,7 @@ Marvin scans `{TICKER}/investor-documents/research-notes/` and flags new files h
 | File | Purpose |
 |------|---------|
 | `{TICKER}/third-party-analyses/references.md` | Index of approved + pending URLs/PDFs + HK scan |
+| `{TICKER}/third-party-analyses/vic/*.md` | Local single-page VIC intakes; pending until human approval |
 | `{TICKER}/third-party-analyses/hk_scan_{date}.md` | Auto HK / Stahl source map (`scan_hk_sources.py`) |
 | `{TICKER}/third-party-analyses/pending.md` | Queue for human approval |
 | `{TICKER}/research/cross_check_*` | Agreements / divergences / synthesis |
