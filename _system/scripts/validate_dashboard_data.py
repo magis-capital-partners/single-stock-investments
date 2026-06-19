@@ -9,6 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 DATA_PATH = ROOT / "dashboard" / "data" / "dashboard_data.json"
 REGISTRY_PATH = ROOT / "_system" / "portfolio" / "registry.json"
+INSIGHTS_PATH = ROOT / "dashboard" / "data" / "insights.json"
 
 
 def main() -> int:
@@ -21,6 +22,13 @@ def main() -> int:
 
     payload = json.loads(DATA_PATH.read_text(encoding="utf-8"))
     registry = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
+    insights = {}
+    if INSIGHTS_PATH.exists():
+        insights = json.loads(INSIGHTS_PATH.read_text(encoding="utf-8"))
+    elif payload.get("insights"):
+        insights = payload["insights"]
+    else:
+        errors.append("missing dashboard insights payload")
     holdings = sorted((registry.get("holdings") or {}).keys())
     rows = payload.get("tickers") or []
     dash_tickers = [r.get("ticker") for r in rows]
@@ -78,6 +86,32 @@ def main() -> int:
         onboard = row.get("onboard") or {}
         if onboard.get("deep_dive_pending") is False and dive_files and not dd:
             errors.append(f"{ticker}: onboard marks deep dive complete but JSON has no deep_dive")
+
+    if insights:
+        for key in ("events", "events_by_ticker", "source_health", "provenance"):
+            if key not in insights:
+                errors.append(f"insights missing key {key}")
+        events = insights.get("events") or []
+        if not isinstance(events, list):
+            errors.append("insights.events must be a list")
+        elif not events:
+            warnings.append("insights.events is empty")
+        else:
+            required = ("id", "source", "event_type", "impact_axis", "title", "summary", "score")
+            for idx, event in enumerate(events[:50]):
+                for key in required:
+                    if key not in event:
+                        errors.append(f"insights.events[{idx}] missing key {key}")
+                if event.get("ticker") and event["ticker"] not in holdings:
+                    warnings.append(f"insights event references non-holding ticker {event['ticker']}")
+        source_health = insights.get("source_health") or {}
+        if not isinstance(source_health, dict):
+            errors.append("insights.source_health must be an object")
+        elif "filing_facts" not in source_health or "portfolio_news" not in source_health:
+            errors.append("insights.source_health missing expected local sources")
+        provenance = insights.get("provenance") or {}
+        if provenance.get("schema_version") != 2:
+            errors.append("insights provenance schema_version must be 2")
 
     for msg in warnings:
         print(f"WARN: {msg}")
