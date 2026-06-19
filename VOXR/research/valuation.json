@@ -1,0 +1,435 @@
+{
+  "ticker": "VOXR",
+  "as_of": "2026-06-18",
+  "method": "full",
+  "valuation_mode": "optionality",
+  "lawrence_bucket": "pricing_power",
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "unproven",
+    "dhando": "partial",
+    "cycle": "peak",
+    "payoff_lens": "asset",
+    "predictive_attribute": "commodity_optionality_compression"
+  },
+  "inputs": {
+    "price": 5.195,
+    "price_source": "Yahoo VOXR close 2026-06-18",
+    "fcf_per_share": 0.157,
+    "fcf_source": "FY2025 net cash from operating activities $10,737k / 68,364,945 shares outstanding Dec 31, 2025 (40-F ex99.2 consolidated statements of cash flows)",
+    "shares_millions": 68.4,
+    "normalization_note": "Royalty/stream model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes new net precious metal streaming income ($4.6M) and elevated gold prices. Management guides $28-32M receipts for 2026F (corporate presentation) \u2014 not in Lawrence FCF starting point.",
+    "price_as_of": "2026-06-18",
+    "book_per_share": 1.57,
+    "shares_outstanding": 68364945
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.0,
+      "growth_y6_10": -0.02,
+      "exit_pfcf_y10": 14,
+      "notes": "Gold/metal prices mean-revert; receipts flat; G&A ~$4.9M persists vs ~$10M gross profit; credit facility $6.7M year-end; multiple compresses"
+    },
+    "base": {
+      "growth_y1_5": 0.08,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 18,
+      "notes": "Portfolio ramps from 12 producing assets and Sept 2025 Global Gold Portfolio; conservative vs management 2026F $28-32M receipt guide [Assumption]"
+    },
+    "bull": {
+      "growth_y1_5": 0.18,
+      "growth_y6_10": 0.08,
+      "exit_pfcf_y10": 22,
+      "notes": "Management 2026F receipt guide achieved; development book converts; GDXJ inclusion improves liquidity; commodity prices hold"
+    }
+  },
+  "optionality_gate": {
+    "framework": "royalty_development_book",
+    "floor_pass": true,
+    "floor_metric": "book_per_share",
+    "floor_value": 1.57,
+    "primary_metric": "lawrence_base",
+    "primary_label": "7yr IRR",
+    "primary_return_pct": 2.2,
+    "incumbent_sleeve": false,
+    "notes": "Shareholders equity $107.0M / 68.4M shares = ~$1.57/sh at Dec 31, 2025; 67 development/exploration assets not in Lawrence FCF0. Credit facility $6.7M drawn at year-end per filing; press cites full repayment early 2026 [HUMAN REVIEW]."
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "nav_overlay",
+      "evidence": "Royalty interests carried at cost less depletion; economic value tied to metal prices and operator reserves (40-F ex99.2 Note 2(e))"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "Corporate presentation June 2026: 67 development & exploration assets vs 12 producing; Global Gold Portfolio acquired Sept 2025 for $60M"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Single royalty/stream operating model; FY2025 gross profit $10.1M before G&A (40-F ex99.2)"
+    },
+    {
+      "q": 4,
+      "question": "Backlog not in cash path?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "Management 2026F receipt guide $28-32M vs FY2025 $16.6M receipts (corporate presentation; shareholder letter)"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No material private equity stakes disclosed in FY2025 financial statements"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No regular dividend; special distributions not in base year"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option already in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "FY2025 record metal prices and new streaming income embedded in royalty receipts $16.6M (6-K ex99.1 Mar 30, 2026)"
+    }
+  ],
+  "nav_overlay_options": [
+    {
+      "id": "development_exploration_book",
+      "label": "Development & exploration royalty book (67 assets)",
+      "option_treatment": "probability_weighted",
+      "base_terminal_value_usd_per_share": 1.25,
+      "base_terminal_rationale": "67 non-producing assets; Sept 2025 $60M Global Gold Portfolio not fully in FY2025 cash flow \u2014 P-weighted overlay only",
+      "evidence": "investor-documents/ir-voxr/VOXR_-_Corporate_Presentation_-_June_Final.pdf"
+    },
+    {
+      "id": "receipt_guidance_2026",
+      "label": "2026 receipt guidance ($28-32M) vs FY2025 actual",
+      "option_treatment": "milestone_nav",
+      "base_terminal_value_usd_per_share": 0.75,
+      "base_terminal_rationale": "Partial credit for volume ramp from acquired streams; not in Lawrence FCF0 starting point",
+      "evidence": "investor-documents/ir-voxr/VOXR_-_Corporate_Presentation_-_June_Final.pdf; shareholder letter Feb 2026"
+    }
+  ],
+  "growth_explanation": {
+    "base_mechanism": "12 producing assets plus Sept 2025 Global Gold Portfolio and Australian stream ramps (Plutonic East, Boundary) drive receipt growth; G&A leverage if receipts scale toward 2026F guide",
+    "bear_falsifier": "Sustained metal price decline or operator delays on top development assets (Greenstone, Bowdens, South Railroad per presentation)",
+    "bull_falsifier": "2026F $28-32M receipt guide achieved with accretive M&A below hurdle",
+    "status": "partial",
+    "lawrence_legacy": {
+      "y1_5": 0.08,
+      "y6_10": 0.04,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.08,
+      "y6_10": 0.04,
+      "exit_pfcf_y10": 18.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": null,
+      "as_of_filing_facts": "evidence/_text/40F2025_000165495426002978_voxr_ex992.htm.txt"
+    }
+  },
+  "catalyst_paths": [
+    {
+      "event": "2026 receipt guidance ($28-32M)",
+      "timing": "2026",
+      "impact": "Volume growth from acquired streams and producing Aussie gold assets"
+    },
+    {
+      "event": "GDXJ index inclusion",
+      "timing": "Q1 2026",
+      "impact": "Liquidity and passive fund demand (shareholder letter Feb 2026)"
+    },
+    {
+      "event": "Failure mode",
+      "timing": "bear scenario",
+      "impact": "Receipts flat; G&A burden persists; development book delays"
+    }
+  ],
+  "lawrence_horizon_years": 7,
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": true,
+      "floor_pass": true,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": null
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -7.6
+    },
+    "base": {
+      "return_pct": 2.2
+    },
+    "bull": {
+      "return_pct": 12.9
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -7.6
+    },
+    "base": {
+      "return_pct": 2.2
+    },
+    "bull": {
+      "return_pct": 12.9
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": 2.2
+    },
+    "falsifier_adjusted": {
+      "return_pct": 2.2
+    }
+  },
+  "implied_return": {
+    "base_pct": 5.38,
+    "label": "7yr IRR (total synthesis)",
+    "display": "5.38% (total synthesis)",
+    "lawrence_stance_gate_pct": 2.2,
+    "falsifier_adjusted_pct": 2.2,
+    "synthesis_pct": 5.38
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Growth theory (pre-falsifier)",
+        "source": "growth_explanation + filing revenue YoY",
+        "return_pct": 2.2,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": -7.6,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 12.9,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 5.38,
+    "qualitative_pp": 0,
+    "total_synthesis_pct": 5.38,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  },
+  "market_inputs": {},
+  "market_inputs_as_of": "2026-06-18",
+  "total_return_panel": {
+    "as_of": "2026-06-18",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 0,
+    "distribution_history_sum": 0,
+    "market_cap_m": null,
+    "total_return_annualized_pct": 15.76,
+    "chart": "VOXR/research/charts/total_return_2026-06-18.svg",
+    "panel_json": "VOXR/research/total_return_panel.json"
+  },
+  "context_overlay": {
+    "as_of": "2026-06-19",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": -0.99,
+            "as_of": "2026-06-18",
+            "yoy_pct": -50.0,
+            "direction": "down",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.442999839782715,
+            "as_of": "2026-06-18",
+            "yoy_pct": 1.0,
+            "direction": "flat",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.213000297546387,
+            "as_of": "2026-06-18",
+            "yoy_pct": 5.5,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 100.8010025024414,
+            "as_of": "2026-06-19",
+            "yoy_pct": 1.9,
+            "direction": "up",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 16.780000686645508,
+            "as_of": "2026-06-19",
+            "yoy_pct": -16.7,
+            "direction": "down",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": -3.66,
+            "as_of": "2026-06-18",
+            "yoy_pct": -662.5,
+            "direction": "down",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 15.86,
+            "as_of": "2026-06-18",
+            "yoy_pct": 21.7,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "lens_consensus": {
+    "as_of": "2026-06-18",
+    "shared_inputs_ref": "valuation.json@2026-06-18",
+    "valuation_richness": 0.245,
+    "blended_return_pct": 15.01,
+    "band_pct": [
+      5.38,
+      28.47
+    ],
+    "weighted_median_pct": 15.21,
+    "median_mean_flag": false,
+    "stance": "watch",
+    "agreement_pct": 62,
+    "dissent_count": 2,
+    "lawrence_divergence": true,
+    "top_dissents": [
+      {
+        "persona": "lawrence",
+        "label": "Lawrence (house IRR)",
+        "verdict": "pass",
+        "return_pct": 5.38,
+        "key_metric": "synthesis_pct=5.38",
+        "conviction": 0.481,
+        "falsifier": "Synthesis incomplete or irr_method pending"
+      },
+      {
+        "persona": "greenblatt",
+        "label": "Joel Greenblatt",
+        "verdict": "pass",
+        "return_pct": 11.02,
+        "key_metric": "earnings_yield=3.02",
+        "conviction": 0.199,
+        "falsifier": "FCF yield below universe median OR base IRR below median"
+      }
+    ],
+    "contributor_count": 6,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
+  }
+}
