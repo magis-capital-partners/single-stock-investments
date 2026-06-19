@@ -38,7 +38,7 @@ Open http://localhost:8765/
 
 **Live site (GitHub Pages, same repo):**
 
-https://goldmandrew.github.io/single-stock-investments/
+https://magis-capital-partners.github.io/single-stock-investments/
 
 ## Agents
 
@@ -49,8 +49,8 @@ https://goldmandrew.github.io/single-stock-investments/
 
 | Item | URL |
 |------|-----|
-| **Repository** | [github.com/GoldmanDrew/single-stock-investments](https://github.com/GoldmanDrew/single-stock-investments) (public) |
-| **Dashboard (Pages)** | [goldmandrew.github.io/single-stock-investments](https://goldmandrew.github.io/single-stock-investments/) |
+| **Repository** | [github.com/magis-capital-partners/single-stock-investments](https://github.com/magis-capital-partners/single-stock-investments) (private) |
+| **Dashboard (Pages)** | [magis-capital-partners.github.io/single-stock-investments](https://magis-capital-partners.github.io/single-stock-investments/) |
 
 Everything lives in one repo: Marvin workspace + `dashboard/` for Pages. **No PAT required** for dashboard sync.
 
@@ -133,7 +133,7 @@ Dashboard links use **filename date** (not mtime) for latest `deep_dive_*.md` / 
 
 ### Public repo note
 
-Making this repo public exposes ticker PDFs, research notes, and `_system/memory/MEMORY.md`. Review contents before switching visibility.
+This repo is private because it contains ticker PDFs, research notes, and `_system/memory/MEMORY.md`. Review GitHub Pages access separately before assuming dashboard data is private.
 
 ## Structure
 
