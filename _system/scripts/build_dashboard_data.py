@@ -701,11 +701,13 @@ def load_insights_for_ticker(ticker: str, insights_doc: dict | None) -> list[dic
 
 SOURCE_PRIORITY = {
     "superinvestor_letter": 0,
-    "insider": 1,
-    "third_party": 2,
-    "macro": 3,
-    "theme": 4,
-    "news": 5,
+    "filing": 1,
+    "earnings": 2,
+    "insider": 3,
+    "news": 4,
+    "third_party": 5,
+    "macro": 6,
+    "theme": 7,
 }
 
 
@@ -732,12 +734,9 @@ def enrich_ticker_insights(raw: list[dict], limit: int = 12) -> list[dict]:
         row = dict(r)
         row["evidence_url"] = insight_evidence_url(row.get("evidence_ref"))
         out.append(row)
-    out.sort(
-        key=lambda x: (
-            SOURCE_PRIORITY.get(x.get("source", ""), 9),
-            x.get("as_of") or "",
-        )
-    )
+    out.sort(key=lambda x: x.get("as_of") or "", reverse=True)
+    out.sort(key=lambda x: SOURCE_PRIORITY.get(x.get("source", ""), 9))
+    out.sort(key=lambda x: int(x.get("score") or 0), reverse=True)
     return out[:limit]
 
 

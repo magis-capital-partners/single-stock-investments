@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import csv
+import hashlib
 import re
 from datetime import datetime, timezone
 from pathlib import Path
@@ -12,6 +14,97 @@ OUTPUT = ROOT / "dashboard" / "data" / "insights.json"
 LETTERS_INSIGHTS = ROOT / "_system" / "reference" / "superinvestor-letters" / "insights.json"
 NEWS_PATH = ROOT / "dashboard" / "data" / "portfolio_news.json"
 THEMES_DIR = ROOT / "_system" / "reference" / "market-data" / "themes"
+INSIDER_DIR = ROOT / "_system" / "reference" / "market-data" / "insider"
+INSIDER_MANIFEST = INSIDER_DIR / "manifest.json"
+EARNINGS_CACHE = ROOT / "_system" / "data" / "earnings_calendar.json"
+
+VALID_TICKER_RE = re.compile(r"^[A-Z0-9][A-Z0-9.\-]{0,11}$")
+
+SOURCE_META = {
+    "superinvestor_letter": {"label": "Letter", "materiality": 0.72, "axis": "ownership"},
+    "filing": {"label": "Filing", "materiality": 0.92, "axis": "fundamentals"},
+    "earnings": {"label": "Earnings", "materiality": 0.9, "axis": "fundamentals"},
+    "insider": {"label": "Insider", "materiality": 0.84, "axis": "ownership"},
+    "news": {"label": "News", "materiality": 0.72, "axis": "catalyst"},
+    "macro": {"label": "Macro", "materiality": 0.62, "axis": "macro"},
+    "theme": {"label": "Theme", "materiality": 0.58, "axis": "macro"},
+    "third_party": {"label": "Research", "materiality": 0.55, "axis": "variant_view"},
+}
+
+NEWS_AXIS = {
+    "earnings_material": "fundamentals",
+    "regulatory": "risk",
+    "ai_material": "catalyst",
+    "capital_allocation": "capital_allocation",
+    "insider_block": "ownership",
+    "mna": "catalyst",
+    "legal": "risk",
+}
+
+METRIC_LABELS = {
+    "revenues": "Revenue",
+    "revenue": "Revenue",
+    "operating_income": "Operating income",
+    "net_income": "Net income",
+    "eps_basic": "Basic EPS",
+    "eps_diluted": "Diluted EPS",
+    "cash": "Cash",
+    "stockholders_equity": "Equity",
+    "long_term_debt": "Long-term debt",
+}
+
+
+def normalize_date(value) -> str | None:
+    if value is None:
+        return None
+    s = str(value).strip()
+    if not s:
+        return None
+    m = re.match(r"^(\d{4}-\d{2}-\d{2})", s)
+    if m:
+        return m.group(1)
+    try:
+        return datetime.fromisoformat(s.replace("Z", "+00:00")).date().isoformat()
+    except ValueError:
+        return None
+
+
+def parse_date(value):
+    normalized = normalize_date(value)
+    if not normalized:
+        return None
+    try:
+        return datetime.strptime(normalized, "%Y-%m-%d").date()
+    except ValueError:
+        return None
+
+
+def today_utc():
+    return datetime.now(timezone.utc).date()
+
+
+def to_float(value) -> float | None:
+    if value in (None, ""):
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def relative_path(path: Path) -> str:
+    return str(path.relative_to(ROOT)).replace("\\", "/")
+
+
+def short_text(value: str | None, limit: int = 260) -> str:
+    text = re.sub(r"\s+", " ", value or "").strip()
+    if len(text) <= limit:
+        return text
+    return text[: limit - 1].rstrip() + "..."
+
+
+def valid_ticker(value: str | None) -> bool:
+    return bool(value and VALID_TICKER_RE.match(str(value).upper()))
 
 
 def load_json(path: Path) -> dict | list | None:
@@ -27,8 +120,12 @@ def insight_record(**kwargs) -> dict:
     base = {
         "in_base_irr": False,
         "confidence": "med",
+        "event_type": None,
+        "impact_axis": None,
     }
     base.update(kwargs)
+    if base.get("as_of"):
+        base["as_of"] = normalize_date(base.get("as_of")) or base.get("as_of")
     return base
 
 
@@ -48,6 +145,8 @@ def from_superinvestor_letters(doc: dict) -> list[dict]:
                     claim=f"{fund}: {th.get('theme')} — {th.get('stance', 'neutral')}",
                     direction={"constructive": "bullish", "cautious": "bearish"}.get(th.get("stance"), "neutral"),
                     evidence_ref=letter.get("source_file"),
+                    event_type="letter_theme",
+                    impact_axis="macro",
                     fund=fund,
                     fund_id=fund_id,
                     quarter=letter.get("quarter"),
@@ -70,6 +169,8 @@ def from_superinvestor_letters(doc: dict) -> list[dict]:
                     claim=claim,
                     direction={"add": "bullish", "trim": "bearish"}.get(action, "neutral"),
                     evidence_ref=letter.get("source_file"),
+                    event_type="letter_position",
+                    impact_axis="ownership",
                     fund=fund,
                     fund_id=fund_id,
                     quarter=letter.get("quarter"),
@@ -97,6 +198,8 @@ def from_valuation_context(ticker: str, val: dict) -> list[dict]:
                     claim=f"{ind.get('label')}: {ind.get('latest')} ({ind.get('direction', 'flat')})",
                     direction={"up": "bullish", "down": "bearish"}.get(ind.get("direction"), "neutral"),
                     evidence_ref=f"{ticker}/research/valuation.json#context_overlay",
+                    event_type="macro_signal",
+                    impact_axis="macro",
                     theme_id=theme.get("theme_id"),
                 )
             )
@@ -112,6 +215,8 @@ def from_valuation_context(ticker: str, val: dict) -> list[dict]:
                 claim=f"Insider conviction band: {insider.get('band')} (ICS {insider.get('ics')})",
                 direction="bearish" if insider.get("ics", 0) < 0 else "bullish",
                 evidence_ref=f"{ticker}/research/valuation.json#insider_signal",
+                event_type="insider_signal",
+                impact_axis="ownership",
                 confidence="low",
             )
         )
@@ -140,6 +245,8 @@ def from_third_party(ticker_dir: Path, ticker: str) -> list[dict]:
                 claim=f"Third-party source indexed: {title}",
                 direction="neutral",
                 evidence_ref=str(inv_path.relative_to(ROOT)).replace("\\", "/"),
+                event_type="research_source",
+                impact_axis="variant_view",
                 confidence="low",
             )
         )
@@ -168,6 +275,8 @@ def from_theme_panel() -> list[dict]:
                     claim=f"Theme panel {csv_path.stem}: latest {last[val_idx].strip()}",
                     direction="neutral",
                     evidence_ref=str(csv_path.relative_to(ROOT)).replace("\\", "/"),
+                    event_type="macro_theme",
+                    impact_axis="macro",
                     confidence="low",
                 )
             )
@@ -179,19 +288,231 @@ def from_theme_panel() -> list[dict]:
 def from_news(doc: dict) -> list[dict]:
     out: list[dict] = []
     for item in doc.get("items") or doc.get("news") or []:
+        tickers = item.get("tickers") or ([item.get("ticker")] if item.get("ticker") else [])
+        if not tickers:
+            tickers = [None]
+        for ticker in tickers:
+            out.append(
+                insight_record(
+                    source="news",
+                    as_of=item.get("published_utc") or item.get("date"),
+                    scope="ticker" if ticker else item.get("scope", "portfolio"),
+                    ref=str(ticker).upper() if ticker else item.get("title"),
+                    title=item.get("title") or "News item",
+                    claim=item.get("summary") or item.get("title") or "News item",
+                    direction="neutral",
+                    evidence_ref=item.get("url"),
+                    event_type=item.get("category") or "news",
+                    impact_axis=NEWS_AXIS.get(item.get("category"), "catalyst"),
+                    publisher=item.get("publisher") or item.get("source"),
+                    confidence="med" if float(item.get("confidence") or 0) >= 0.8 else "low",
+                )
+            )
+    return out[:120]
+
+
+def pct_change(current: float | None, prior: float | None) -> float | None:
+    if current is None or prior in (None, 0):
+        return None
+    return (current - prior) / abs(prior) * 100.0
+
+
+def metric_direction(metric: str, change: float) -> str:
+    if metric == "long_term_debt":
+        return "bearish" if change > 0 else "bullish"
+    if metric in {"cash", "stockholders_equity"}:
+        return "bullish" if change > 0 else "bearish"
+    return "bullish" if change > 0 else "bearish"
+
+
+def from_filing_facts(ticker_dir: Path, ticker: str) -> list[dict]:
+    evidence_dir = ticker_dir / "research" / "evidence"
+    if not evidence_dir.exists():
+        return []
+    files = sorted(evidence_dir.glob("filing_facts_*.json"), reverse=True)
+    if not files:
+        return []
+    latest = files[0]
+    doc = load_json(latest)
+    if not isinstance(doc, dict):
+        return []
+
+    metrics = doc.get("metrics") or {}
+    candidates: list[dict] = []
+    for name, metric in metrics.items():
+        if not isinstance(metric, dict):
+            continue
+        current = to_float(metric.get("current"))
+        prior = to_float(metric.get("prior"))
+        change = pct_change(current, prior)
+        if change is None:
+            continue
+        threshold = 10 if name in {"revenues", "revenue", "operating_income", "net_income", "eps_basic", "eps_diluted"} else 20
+        if abs(change) < threshold:
+            continue
+        label = METRIC_LABELS.get(name, name.replace("_", " ").title())
+        candidates.append(
+            {
+                "name": name,
+                "label": label,
+                "current": current,
+                "prior": prior,
+                "change": change,
+                "abs_change": abs(change),
+            }
+        )
+
+    out: list[dict] = []
+    for item in sorted(candidates, key=lambda x: x["abs_change"], reverse=True)[:2]:
+        change = item["change"]
         out.append(
             insight_record(
-                source="news",
-                as_of=item.get("date"),
-                scope=item.get("scope", "portfolio"),
-                ref=item.get("ticker") or item.get("title"),
-                claim=item.get("title") or item.get("summary") or "News item",
+                source="filing",
+                as_of=doc.get("as_of"),
+                scope="ticker",
+                ref=ticker,
+                title=f"{item['label']} {'up' if change > 0 else 'down'} {abs(change):.0f}%",
+                claim=(
+                    f"{item['label']} moved {change:+.1f}% versus the prior period "
+                    f"({item['prior']:,.1f} to {item['current']:,.1f})."
+                ),
+                direction=metric_direction(item["name"], change),
+                evidence_ref=relative_path(latest),
+                event_type="filing_metric",
+                impact_axis="fundamentals",
+                confidence="med",
+            )
+        )
+
+    if not out and metrics:
+        out.append(
+            insight_record(
+                source="filing",
+                as_of=doc.get("as_of"),
+                scope="ticker",
+                ref=ticker,
+                title="Filing facts refreshed",
+                claim=f"Filing parser captured {len(metrics)} metrics from the latest local evidence file.",
                 direction="neutral",
-                evidence_ref=item.get("url"),
+                evidence_ref=relative_path(latest),
+                event_type="filing_refresh",
+                impact_axis="fundamentals",
                 confidence="low",
             )
         )
-    return out[:30]
+    return out
+
+
+def insider_csv_path(csv_ref: str | None) -> Path | None:
+    if not csv_ref:
+        return None
+    ref = Path(str(csv_ref).replace("\\", "/"))
+    if ref.parts and ref.parts[0] == "insider":
+        return INSIDER_DIR.parent / ref
+    return INSIDER_DIR / ref
+
+
+def from_insider_transactions(our_tickers: set[str]) -> list[dict]:
+    manifest = load_json(INSIDER_MANIFEST)
+    if not isinstance(manifest, dict):
+        return []
+    out: list[dict] = []
+    for ticker, meta in (manifest.get("tickers") or {}).items():
+        ticker = str(ticker).upper()
+        if our_tickers and ticker not in our_tickers:
+            continue
+        csv_path = insider_csv_path((meta or {}).get("csv"))
+        if not csv_path or not csv_path.exists():
+            continue
+        rows: list[dict] = []
+        try:
+            with csv_path.open(newline="", encoding="utf-8") as f:
+                for row in csv.DictReader(f):
+                    code = (row.get("transaction_code") or "").upper()
+                    acquired = (row.get("acquired_disposed") or "").upper()
+                    value = abs(to_float(row.get("value_usd")) or 0.0)
+                    if code not in {"P", "S"} and acquired not in {"A", "D"}:
+                        continue
+                    if value < 25000 and code != "P":
+                        continue
+                    rows.append(row)
+        except OSError:
+            continue
+        rows.sort(
+            key=lambda r: (
+                normalize_date(r.get("filing_date") or r.get("transaction_date")) or "",
+                abs(to_float(r.get("value_usd")) or 0.0),
+            ),
+            reverse=True,
+        )
+        for row in rows[:2]:
+            code = (row.get("transaction_code") or "").upper()
+            acquired = (row.get("acquired_disposed") or "").upper()
+            is_buy = code == "P" or acquired == "A"
+            value = abs(to_float(row.get("value_usd")) or 0.0)
+            shares = to_float(row.get("shares"))
+            actor = short_text(row.get("insider") or "Insider", 80)
+            action = "purchase" if is_buy else "sale"
+            value_text = f"${value:,.0f}" if value else "undisclosed value"
+            share_text = f"{shares:,.0f} shares" if shares else "shares"
+            out.append(
+                insight_record(
+                    source="insider",
+                    as_of=row.get("filing_date") or row.get("transaction_date") or meta.get("as_of"),
+                    scope="ticker",
+                    ref=ticker,
+                    title=f"Insider {action}: {actor}",
+                    claim=f"{actor} reported an insider {action} of {share_text} ({value_text}).",
+                    direction="bullish" if is_buy else "bearish",
+                    evidence_ref=row.get("source_path") or relative_path(csv_path),
+                    event_type="form4_transaction",
+                    impact_axis="ownership",
+                    confidence="med" if value >= 100000 else "low",
+                )
+            )
+    return out
+
+
+def from_earnings_calendar() -> list[dict]:
+    docs: list[tuple[Path, dict]] = []
+    global_doc = load_json(EARNINGS_CACHE)
+    if isinstance(global_doc, dict):
+        docs.append((EARNINGS_CACHE, global_doc))
+    for path in ROOT.glob("*/research/evidence/earnings_calendar.json"):
+        doc = load_json(path)
+        if isinstance(doc, dict):
+            docs.append((path, doc))
+
+    out: list[dict] = []
+    seen: set[str] = set()
+    for path, doc in docs:
+        for event in doc.get("events") or []:
+            ticker = str(event.get("ticker") or event.get("portfolio_ticker") or doc.get("ticker") or "").upper()
+            if not valid_ticker(ticker):
+                continue
+            event_date = event.get("date") or event.get("earnings_date") or event.get("report_date")
+            key = f"{ticker}|{event_date}|{path}"
+            if key in seen:
+                continue
+            seen.add(key)
+            reported = bool(event.get("reported") or event.get("actual_eps") is not None)
+            verified = bool(event.get("verified") or doc.get("verified_only"))
+            out.append(
+                insight_record(
+                    source="earnings",
+                    as_of=event_date or doc.get("as_of"),
+                    scope="ticker",
+                    ref=ticker,
+                    title=("Reported earnings" if reported else "Upcoming earnings"),
+                    claim=short_text(event.get("summary") or event.get("title") or f"{ticker} earnings event tracked."),
+                    direction="neutral",
+                    evidence_ref=relative_path(path),
+                    event_type="reported_earnings" if reported else "earnings_calendar",
+                    impact_axis="fundamentals",
+                    confidence="med" if verified else "low",
+                )
+            )
+    return out
 
 
 def theme_rankings(records: list[dict], quarter: str | None = None, our_tickers: set[str] | None = None) -> list[dict]:
@@ -444,22 +765,276 @@ def ticker_discussants(letters: list[dict], our_tickers: set[str]) -> dict[str, 
     return out
 
 
+def confidence_weight(confidence: str | None) -> float:
+    return {"high": 1.0, "med": 0.75, "medium": 0.75, "low": 0.45}.get(str(confidence or "").lower(), 0.6)
+
+
+def freshness_days(as_of: str | None) -> int | None:
+    d = parse_date(as_of)
+    if not d:
+        return None
+    return (today_utc() - d).days
+
+
+def freshness_weight(days: int | None) -> float:
+    if days is None:
+        return 0.5
+    if days < 0:
+        return 0.85
+    if days <= 7:
+        return 1.0
+    if days <= 30:
+        return 0.84
+    if days <= 90:
+        return 0.62
+    if days <= 365:
+        return 0.38
+    return 0.2
+
+
+def event_relevance(ticker: str | None, scope: str | None, our_tickers: set[str]) -> float:
+    if ticker and ticker in our_tickers:
+        return 1.0
+    if scope == "portfolio":
+        return 0.72
+    return 0.45
+
+
+def event_materiality(record: dict) -> float:
+    source = record.get("source")
+    base = SOURCE_META.get(source, {}).get("materiality", 0.55)
+    event_type = record.get("event_type") or ""
+    if event_type in {"filing_metric", "reported_earnings"}:
+        base += 0.08
+    if event_type == "form4_transaction" and record.get("direction") == "bullish":
+        base += 0.06
+    if source == "news" and record.get("impact_axis") in {"risk", "fundamentals"}:
+        base += 0.06
+    return min(base, 1.0)
+
+
+def event_score(record: dict, ticker: str | None, our_tickers: set[str]) -> int:
+    days = freshness_days(record.get("as_of"))
+    score = (
+        100
+        * event_materiality(record)
+        * confidence_weight(record.get("confidence"))
+        * freshness_weight(days)
+        * event_relevance(ticker, record.get("scope"), our_tickers)
+    )
+    return max(1, round(score))
+
+
+def event_title(record: dict) -> str:
+    if record.get("title"):
+        return short_text(record.get("title"), 120)
+    source_label = SOURCE_META.get(record.get("source"), {}).get("label", record.get("source") or "Insight")
+    ref = record.get("ref")
+    if ref:
+        return short_text(f"{source_label}: {ref}", 120)
+    return short_text(source_label, 120)
+
+
+def event_id(record: dict, ticker: str | None) -> str:
+    raw = "|".join(
+        [
+            str(record.get("source") or ""),
+            str(record.get("event_type") or ""),
+            str(ticker or record.get("ref") or ""),
+            str(record.get("as_of") or ""),
+            str(record.get("claim") or ""),
+            str(record.get("evidence_ref") or ""),
+        ]
+    )
+    return hashlib.sha1(raw.encode("utf-8")).hexdigest()[:16]
+
+
+def events_from_records(records: list[dict], our_tickers: set[str]) -> list[dict]:
+    events: list[dict] = []
+    for record in records:
+        source = record.get("source")
+        scope = record.get("scope")
+        if source == "superinvestor_letter" and scope == "theme":
+            continue
+        ticker = str(record.get("ref") or "").upper() if scope == "ticker" else None
+        if ticker and not valid_ticker(ticker):
+            ticker = None
+        if not ticker and scope != "portfolio":
+            continue
+        days = freshness_days(record.get("as_of"))
+        axis = record.get("impact_axis") or SOURCE_META.get(source, {}).get("axis") or "context"
+        event = {
+            "id": event_id(record, ticker),
+            "ticker": ticker,
+            "in_our_book": bool(ticker and ticker in our_tickers),
+            "source": source,
+            "source_label": SOURCE_META.get(source, {}).get("label", source or "Insight"),
+            "source_name": record.get("publisher") or record.get("fund") or SOURCE_META.get(source, {}).get("label"),
+            "event_type": record.get("event_type") or source or "insight",
+            "impact_axis": axis,
+            "observed_at": normalize_date(record.get("as_of")),
+            "freshness_days": days,
+            "title": event_title(record),
+            "summary": short_text(record.get("claim"), 320),
+            "direction": record.get("direction") or "neutral",
+            "confidence": record.get("confidence") or "med",
+            "portfolio_relevance": event_relevance(ticker, scope, our_tickers),
+            "score": event_score(record, ticker, our_tickers),
+            "evidence_ref": record.get("evidence_ref"),
+        }
+        events.append(event)
+    events.sort(key=lambda e: (e["score"], e.get("observed_at") or ""), reverse=True)
+    return events[:400]
+
+
+def events_by_ticker(events: list[dict]) -> dict[str, list[dict]]:
+    out: dict[str, list[dict]] = {}
+    for event in events:
+        ticker = event.get("ticker")
+        if not ticker:
+            continue
+        out.setdefault(ticker, []).append(event)
+    for ticker, rows in out.items():
+        rows.sort(key=lambda e: (e.get("score") or 0, e.get("observed_at") or ""), reverse=True)
+        out[ticker] = rows[:25]
+    return out
+
+
+def source_counts(records: list[dict]) -> dict[str, int]:
+    counts: dict[str, int] = {}
+    for record in records:
+        source = record.get("source") or "unknown"
+        counts[source] = counts.get(source, 0) + 1
+    return counts
+
+
+def newest_as_of(values) -> str | None:
+    dates = [normalize_date(v) for v in values if normalize_date(v)]
+    return max(dates) if dates else None
+
+
+def latest_filing_fact_files() -> list[Path]:
+    latest: list[Path] = []
+    for ticker_dir in ROOT.iterdir():
+        if not ticker_dir.is_dir() or ticker_dir.name.startswith((".", "_")):
+            continue
+        files = sorted((ticker_dir / "research" / "evidence").glob("filing_facts_*.json"), reverse=True)
+        if files:
+            latest.append(files[0])
+    return latest
+
+
+def third_party_inventory_count() -> int:
+    count = 0
+    for ticker_dir in ROOT.iterdir():
+        if ticker_dir.is_dir() and not ticker_dir.name.startswith((".", "_")):
+            if list(ticker_dir.glob("third-party-analyses/source_inventory_*.json")):
+                count += 1
+    return count
+
+
+def build_source_health(records: list[dict], letters: list[dict], news_doc: dict | None) -> dict:
+    counts = source_counts(records)
+    insider_manifest = load_json(INSIDER_MANIFEST)
+    earnings_doc = load_json(EARNINGS_CACHE)
+    filing_files = latest_filing_fact_files()
+    insider_tickers = (insider_manifest or {}).get("tickers") if isinstance(insider_manifest, dict) else {}
+    insider_errors = [
+        meta.get("error")
+        for meta in (insider_tickers or {}).values()
+        if isinstance(meta, dict) and meta.get("error")
+    ]
+    return {
+        "superinvestor_letters": {
+            "status": "ok" if letters else "empty",
+            "records": counts.get("superinvestor_letter", 0),
+            "items": len(letters),
+            "as_of": newest_as_of([l.get("letter_date") for l in letters]),
+            "path": relative_path(LETTERS_INSIGHTS),
+        },
+        "portfolio_news": {
+            "status": "ok" if news_doc else "missing",
+            "records": counts.get("news", 0),
+            "items": len((news_doc or {}).get("items") or (news_doc or {}).get("news") or []),
+            "as_of": normalize_date((news_doc or {}).get("build_time") or (news_doc or {}).get("generated_at")),
+            "path": relative_path(NEWS_PATH),
+        },
+        "insider_transactions": {
+            "status": "degraded" if insider_errors else ("ok" if insider_tickers else "missing"),
+            "records": counts.get("insider", 0),
+            "items": len(insider_tickers or {}),
+            "as_of": newest_as_of([(m or {}).get("as_of") for m in (insider_tickers or {}).values() if isinstance(m, dict)]),
+            "warnings": len(insider_errors),
+            "path": relative_path(INSIDER_MANIFEST),
+        },
+        "filing_facts": {
+            "status": "ok" if filing_files else "missing",
+            "records": counts.get("filing", 0),
+            "items": len(filing_files),
+            "as_of": newest_as_of([p.stem.replace("filing_facts_", "") for p in filing_files]),
+            "path": "*/research/evidence/filing_facts_*.json",
+        },
+        "earnings_calendar": {
+            "status": (earnings_doc or {}).get("access_status") or ("ok" if earnings_doc else "missing"),
+            "records": counts.get("earnings", 0),
+            "items": len((earnings_doc or {}).get("events") or []),
+            "as_of": normalize_date((earnings_doc or {}).get("as_of")),
+            "path": relative_path(EARNINGS_CACHE),
+        },
+        "theme_panels": {
+            "status": "ok" if THEMES_DIR.exists() else "missing",
+            "records": counts.get("theme", 0),
+            "items": len(list(THEMES_DIR.glob("*.csv"))) if THEMES_DIR.exists() else 0,
+            "path": relative_path(THEMES_DIR),
+        },
+        "third_party_inventories": {
+            "status": "ok" if third_party_inventory_count() else "missing",
+            "records": counts.get("third_party", 0),
+            "items": third_party_inventory_count(),
+            "path": "*/third-party-analyses/source_inventory_*.json",
+        },
+    }
+
+
+def build_provenance(records: list[dict], events: list[dict]) -> dict:
+    return {
+        "schema_version": 2,
+        "pipeline": relative_path(Path(__file__).resolve()),
+        "generated_by": "build_insights.py",
+        "record_count": len(records),
+        "event_count": len(events),
+        "event_score": "materiality * confidence * freshness * portfolio_relevance",
+        "inputs": [
+            relative_path(LETTERS_INSIGHTS),
+            relative_path(NEWS_PATH),
+            relative_path(INSIDER_MANIFEST),
+            relative_path(EARNINGS_CACHE),
+            "*/research/evidence/filing_facts_*.json",
+            "*/third-party-analyses/source_inventory_*.json",
+            relative_path(THEMES_DIR),
+        ],
+    }
+
+
 def main() -> int:
     records: list[dict] = []
 
     letters_doc = load_json(LETTERS_INSIGHTS) or {"letters": []}
     letters = letters_doc.get("letters") or []
     records.extend(from_superinvestor_letters(letters_doc))
+    our_tickers = our_holdings_tickers()
+    records.extend(from_insider_transactions(our_tickers))
+    records.extend(from_earnings_calendar())
 
     for p in ROOT.iterdir():
         if not p.is_dir() or p.name.startswith((".", "_")):
             continue
         val_path = p / "research" / "valuation.json"
-        if not val_path.exists():
-            continue
-        val = load_json(val_path)
-        if isinstance(val, dict):
-            records.extend(from_valuation_context(p.name, val))
+        if val_path.exists():
+            val = load_json(val_path)
+            if isinstance(val, dict):
+                records.extend(from_valuation_context(p.name, val))
+        records.extend(from_filing_facts(p, p.name))
         records.extend(from_third_party(p, p.name))
 
     records.extend(from_theme_panel())
@@ -467,11 +1042,16 @@ def main() -> int:
     if isinstance(news_doc, dict):
         records.extend(from_news(news_doc))
 
-    our_tickers = our_holdings_tickers()
+    events = events_from_records(records, our_tickers)
     payload = {
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "record_count": len(records),
+        "event_count": len(events),
         "letter_count": len(letters),
+        "source_health": build_source_health(records, letters, news_doc if isinstance(news_doc, dict) else None),
+        "provenance": build_provenance(records, events),
+        "events": events,
+        "events_by_ticker": events_by_ticker(events),
         "theme_rankings": theme_rankings(records, our_tickers=our_tickers),
         "theme_rankings_by_quarter": theme_rankings_by_quarter(records, our_tickers),
         "letter_index": letter_index(letters, our_tickers),
@@ -483,7 +1063,7 @@ def main() -> int:
     }
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
-    print(f"Wrote {OUTPUT} ({len(records)} insight records, {len(letters)} letters)")
+    print(f"Wrote {OUTPUT} ({len(records)} insight records, {len(events)} events, {len(letters)} letters)")
     return 0
 
 

@@ -16,11 +16,24 @@
 
   const SOURCE_LABEL = {
     superinvestor_letter: 'letter',
+    filing: 'filing',
+    earnings: 'earnings',
     macro: 'macro',
     insider: 'insider',
     third_party: 'third_party',
     theme: 'theme',
     news: 'news',
+  };
+
+  const AXIS_LABEL = {
+    fundamentals: 'fundamentals',
+    ownership: 'ownership',
+    catalyst: 'catalyst',
+    risk: 'risk',
+    macro: 'macro',
+    capital_allocation: 'capital allocation',
+    variant_view: 'variant view',
+    context: 'context',
   };
 
   function fmtPct(v, digits) {
@@ -134,8 +147,13 @@
     if (!filter || filter === 'all') return insights;
     const map = {
       letters: 'superinvestor_letter',
+      filings: 'filing',
+      earnings: 'earnings',
       macro: 'macro',
       insider: 'insider',
+      ownership: 'insider',
+      news: 'news',
+      research: 'third_party',
       third_party: 'third_party',
     };
     const src = map[filter] || filter;
@@ -174,8 +192,12 @@
     const rows = filterInsights(insights, filter).slice(0, 6);
     const pills = [
       { id: 'letters', label: 'Letters' },
-      { id: 'macro', label: 'Macro' },
+      { id: 'filings', label: 'Filings' },
+      { id: 'earnings', label: 'Earnings' },
       { id: 'insider', label: 'Insider' },
+      { id: 'news', label: 'News' },
+      { id: 'macro', label: 'Macro' },
+      { id: 'research', label: 'Research' },
       { id: 'all', label: 'All' },
     ];
     const otherBlock = `
@@ -346,6 +368,83 @@
       </div>`;
   }
 
+  function filterEvents(events, opts) {
+    const { search, bookOnly } = opts || {};
+    let list = events || [];
+    if (bookOnly) {
+      list = list.filter(e => e.in_our_book || e.portfolio_relevance >= 1);
+    }
+    if (search) {
+      const q = search.toLowerCase();
+      list = list.filter(e =>
+        (e.ticker || '').toLowerCase().includes(q)
+        || (e.title || '').toLowerCase().includes(q)
+        || (e.summary || '').toLowerCase().includes(q)
+        || (e.source_label || e.source || '').toLowerCase().includes(q)
+        || (e.impact_axis || '').toLowerCase().includes(q)
+      );
+    }
+    return list;
+  }
+
+  function renderEventQueue(events, escapeHtml, linkHtml, ghRepo, opts) {
+    const rows = filterEvents(events, opts).slice(0, 120);
+    if (!rows.length) {
+      return '<p class="subhead">No ranked events match this view.</p>';
+    }
+    return `
+      <table class="darwin-table" id="insights-event-table">
+        <thead><tr><th>Score</th><th>Date</th><th>Ticker</th><th>Source</th><th>Axis</th><th>Event</th><th></th></tr></thead>
+        <tbody>
+          ${rows.map(e => {
+            const directionClass = e.direction === 'bullish' ? 'badge-ok' : (e.direction === 'bearish' ? 'badge-bad' : 'badge-us');
+            const ticker = e.ticker ? `<span class="mono">${escapeHtml(e.ticker)}</span>` : '<span class="tier-sub">portfolio</span>';
+            return `
+              <tr>
+                <td class="mono">${Number(e.score || 0)}</td>
+                <td class="mono">${escapeHtml(e.observed_at || 'n/a')}</td>
+                <td>${ticker}</td>
+                <td><span class="badge badge-us">${escapeHtml(e.source_label || SOURCE_LABEL[e.source] || e.source || 'source')}</span></td>
+                <td>${escapeHtml(AXIS_LABEL[e.impact_axis] || e.impact_axis || 'context')}</td>
+                <td style="min-width:280px">
+                  <div><span class="badge ${directionClass}">${escapeHtml(e.direction || 'neutral')}</span> <strong>${escapeHtml(e.title || 'Insight')}</strong></div>
+                  <div class="tier-sub" style="margin-top:4px">${escapeHtml((e.summary || '').slice(0, 220))}</div>
+                </td>
+                <td>${evidenceLink(e.evidence_ref, linkHtml, ghRepo)}</td>
+              </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+      ${(events || []).length > rows.length ? `<p class="tier-sub">${(events || []).length - rows.length} more events outside the current table window.</p>` : ''}`;
+  }
+
+  function renderSourceHealth(health, escapeHtml) {
+    const rows = Object.entries(health || {});
+    if (!rows.length) {
+      return '<p class="subhead">No source health data yet.</p>';
+    }
+    return `
+      <table class="darwin-table" id="insights-source-table">
+        <thead><tr><th>Source</th><th>Status</th><th>Records</th><th>Items</th><th>As of</th><th>Notes</th></tr></thead>
+        <tbody>
+          ${rows.map(([key, h]) => {
+            const status = h.status || 'unknown';
+            const cls = status === 'ok' ? 'badge-ok' : (status === 'missing' || status === 'forbidden' ? 'badge-warn' : 'badge-us');
+            const notes = h.warnings ? `${h.warnings} warning(s)` : (h.path || '');
+            return `
+              <tr>
+                <td>${escapeHtml(key.replace(/_/g, ' '))}</td>
+                <td><span class="badge ${cls}">${escapeHtml(status)}</span></td>
+                <td class="mono">${h.records ?? 'n/a'}</td>
+                <td class="mono">${h.items ?? 'n/a'}</td>
+                <td class="mono">${escapeHtml(h.as_of || 'n/a')}</td>
+                <td class="tier-sub">${escapeHtml(notes)}</td>
+              </tr>`;
+          }).join('')}
+        </tbody>
+      </table>`;
+  }
+
   function filterLetterIndex(rows, opts) {
     const { quarter, search, bookOnly } = opts || {};
     let list = rows || [];
@@ -376,7 +475,7 @@
       fundSearch = '',
       bookOnly = false,
       selectedFundId = null,
-      activeSection = 'themes',
+      activeSection = 'events',
     } = options || {};
 
     const profiles = insights?.fund_profiles || {};
@@ -407,24 +506,30 @@
 
     const qTabs = [{ id: 'all', label: 'All' }, ...quarters.map(q => ({ id: q, label: q }))];
     const sections = [
+      { id: 'events', label: 'Events' },
       { id: 'themes', label: 'Themes' },
       { id: 'letters', label: 'Letter index' },
       { id: 'funds', label: 'Funds' },
+      { id: 'sources', label: 'Sources' },
     ];
 
     let body = '';
-    if (activeSection === 'themes') {
+    if (activeSection === 'events') {
+      body = renderEventQueue(insights?.events || [], escapeHtml, linkHtml, ghRepo, { search: fundSearch, bookOnly });
+    } else if (activeSection === 'themes') {
       body = renderThemeRankings(themes, escapeHtml);
     } else if (activeSection === 'letters') {
       body = renderLetterIndex(letters, escapeHtml, linkHtml, ghRepo, true);
-    } else {
+    } else if (activeSection === 'funds') {
       body = renderFundRegistry(funds, escapeHtml, linkHtml, ghRepo, false);
+    } else {
+      body = renderSourceHealth(insights?.source_health || {}, escapeHtml);
     }
 
     return `
       <h2 style="font-size:18px;margin-bottom:6px">Insights</h2>
       <p class="subhead" style="margin-bottom:14px">
-        Portfolio context only · ${insights?.letter_count || 0} letters · ${insights?.record_count || 0} records · never in house IRR
+        Portfolio context only · ${insights?.event_count || 0} events · ${insights?.letter_count || 0} letters · ${insights?.record_count || 0} records
       </p>
       <nav class="view-tabs" id="insights-section-tabs" style="margin-bottom:10px">
         ${sections.map(s => `<button type="button" class="view-tab${activeSection === s.id ? ' active' : ''}" data-insights-section="${s.id}">${s.label}</button>`).join('')}
@@ -437,7 +542,7 @@
           <input type="checkbox" id="insights-book-only" ${bookOnly ? 'checked' : ''} />
           In our book only
         </label>
-        <input class="search" id="fund-registry-search" placeholder="Search fund, ticker, theme…" value="${escapeHtml(fundSearch)}" style="max-width:280px" />
+        <input class="search" id="fund-registry-search" placeholder="Search ticker, event, fund, theme..." value="${escapeHtml(fundSearch)}" style="max-width:280px" />
       </div>
       ${body}`;
   }
