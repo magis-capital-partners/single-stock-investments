@@ -216,6 +216,18 @@
     color: var(--accent-cyan); font-weight: 600; margin-bottom: 10px;
   }
   .research-box .summary { color: var(--text-secondary); margin-bottom: 12px; }
+  .essential-box { display: grid; gap: 10px; }
+  .essential-item {
+    padding: 9px 10px; border: 1px solid var(--border); border-radius: 6px;
+    background: rgba(13, 20, 36, 0.55);
+  }
+  .essential-title { margin-top: 5px; font-size: 12px; font-weight: 700; color: var(--text-primary); }
+  .insight-cell { min-width: 128px; }
+  .insight-cell .badge { margin-bottom: 3px; }
+  .insight-cell .sub { display: block; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .insight-source-list { display: flex; flex-wrap: wrap; gap: 4px; max-width: 160px; }
+  .needs-list { display: flex; flex-wrap: wrap; gap: 4px; max-width: 180px; }
+  .needs-list .badge { margin-bottom: 2px; }
   .research-link {
     display: inline-flex; align-items: center; gap: 6px;
     font-size: 12px; font-weight: 600; color: var(--accent-blue);
@@ -497,6 +509,10 @@
             <th data-sort="decision_summary.lens_blend_pct">Lens blend</th>
             <th data-sort="decision_summary.lens_delta">Lens Δ</th>
             <th data-sort="classification.stance">Stance</th>
+            <th data-sort="essential_insights.status.label">Insight</th>
+            <th data-sort="essential_insights.freshness_days">Fresh</th>
+            <th data-sort="essential_insights.source_mix">Source</th>
+            <th data-sort="essential_insights.needs_work">Needs</th>
             <th data-sort="deep_dive.date">Deep dive</th>
           </tr>
         </thead>
@@ -610,6 +626,16 @@ const MOAT_BADGE = {
   eroding: 'badge-bad',
   unproven: 'badge-warn',
   'n/a': 'badge-warn',
+};
+const INSIGHT_SOURCE_LABEL = {
+  filing: 'filing',
+  earnings: 'earnings',
+  insider: 'insider',
+  superinvestor_letter: 'letter',
+  news: 'news',
+  third_party: 'research',
+  macro: 'macro',
+  theme: 'theme',
 };
 
 let data = null;
@@ -732,6 +758,48 @@ function renderLensDeltaCell(t) {
   return `<span class="mono${warn}">${sign}${d.toFixed(1)}pp</span>`;
 }
 
+function insightToneClass(tone) {
+  if (tone === 'bullish') return 'badge-ok';
+  if (tone === 'risk') return 'badge-bad';
+  if (tone === 'ownership') return 'badge-purple';
+  if (tone === 'stale') return 'badge-warn';
+  return 'badge-us';
+}
+
+function renderInsightCell(t) {
+  const e = t.essential_insights || {};
+  const status = e.status || { label: 'No insight', tone: 'stale' };
+  const latest = e.latest || (e.bullets || [])[0];
+  return `
+    <div class="insight-cell">
+      <span class="badge ${insightToneClass(status.tone)}">${escapeHtml(status.label || 'Covered')}</span>
+      <span class="sub tier-sub">${escapeHtml(latest?.title || latest?.summary || 'No ranked item')}</span>
+    </div>`;
+}
+
+function renderInsightFreshCell(t) {
+  const days = t.essential_insights?.freshness_days;
+  if (days == null) return '<span class="mono tier-sub">n/a</span>';
+  const cls = days <= 30 ? 'badge-ok' : (days <= 90 ? 'badge-us' : 'badge-warn');
+  return `<span class="badge ${cls}">${days}d</span>`;
+}
+
+function renderInsightSourceCell(t) {
+  const mix = t.essential_insights?.source_mix || [];
+  if (!mix.length) return '<span class="tier-sub">none</span>';
+  return `<div class="insight-source-list">${mix.slice(0, 3).map(src =>
+    `<span class="badge badge-us">${escapeHtml(INSIGHT_SOURCE_LABEL[src] || src)}</span>`
+  ).join('')}${mix.length > 3 ? `<span class="tier-sub">+${mix.length - 3}</span>` : ''}</div>`;
+}
+
+function renderInsightNeedsCell(t) {
+  const reasons = t.essential_insights?.needs_work_reasons || [];
+  if (!reasons.length) return '<span class="badge badge-ok">clear</span>';
+  return `<div class="needs-list">${reasons.slice(0, 2).map(reason =>
+    `<span class="badge badge-warn">${escapeHtml(reason)}</span>`
+  ).join('')}${reasons.length > 2 ? `<span class="tier-sub">+${reasons.length - 2}</span>` : ''}</div>`;
+}
+
 function fmtNum(v, digits = 2) {
   if (v == null || Number.isNaN(Number(v))) return '—';
   return Number(v).toFixed(digits);
@@ -843,6 +911,7 @@ function renderInsights() {
     bookOnly: insightsBookOnly,
     selectedFundId,
     activeSection: insightsSection,
+    tickers: data.tickers || [],
   });
   content.querySelectorAll('[data-insights-quarter]').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -881,11 +950,19 @@ function renderInsights() {
       }
     });
   });
+  content.querySelectorAll('[data-select-ticker]').forEach(el => {
+    el.addEventListener('click', () => {
+      const ticker = el.dataset.selectTicker;
+      if (!ticker) return;
+      setView('holdings');
+      selectTicker(ticker);
+    });
+  });
   const backBtn = content.querySelector('[data-insights-back]');
   if (backBtn) {
     backBtn.addEventListener('click', () => {
       selectedFundId = null;
-      insightsSection = 'funds';
+      insightsSection = 'tickers';
       renderInsights();
     });
   }
@@ -1230,8 +1307,19 @@ function filtered() {
         return false;
       }
     }
-    if (needsWork && t.completeness >= 80) return false;
-    if (q && !(`${t.ticker} ${t.company}`.toLowerCase().includes(q))) return false;
+    if (needsWork && t.completeness >= 80 && !t.essential_insights?.needs_work) return false;
+    if (q) {
+      const e = t.essential_insights || {};
+      const haystack = [
+        t.ticker,
+        t.company,
+        e.status?.label,
+        ...(e.source_mix || []),
+        ...(e.needs_work_reasons || []),
+        ...((e.bullets || []).map(b => `${b.title || ''} ${b.summary || ''}`)),
+      ].join(' ').toLowerCase();
+      if (!haystack.includes(q)) return false;
+    }
     return true;
   }).sort((a, b) => {
     let av = a[sortKey], bv = b[sortKey];
@@ -1258,6 +1346,20 @@ function filtered() {
     } else if (sortKey === 'deep_dive.date') {
       av = a.deep_dive?.date || '';
       bv = b.deep_dive?.date || '';
+    } else if (sortKey === 'essential_insights.status.label') {
+      av = a.essential_insights?.status?.label || '';
+      bv = b.essential_insights?.status?.label || '';
+    } else if (sortKey === 'essential_insights.freshness_days') {
+      av = a.essential_insights?.freshness_days;
+      bv = b.essential_insights?.freshness_days;
+      av = av == null ? Infinity : av;
+      bv = bv == null ? Infinity : bv;
+    } else if (sortKey === 'essential_insights.source_mix') {
+      av = (a.essential_insights?.source_mix || []).join(',');
+      bv = (b.essential_insights?.source_mix || []).join(',');
+    } else if (sortKey === 'essential_insights.needs_work') {
+      av = a.essential_insights?.needs_work ? 1 : 0;
+      bv = b.essential_insights?.needs_work ? 1 : 0;
     } else {
       if (typeof av === 'string') av = av.toLowerCase();
       if (typeof bv === 'string') bv = bv.toLowerCase();
@@ -1293,6 +1395,10 @@ function renderTable() {
       <td>${renderLensBlendCell(t)}</td>
       <td>${renderLensDeltaCell(t)}</td>
       <td><span class="badge ${STANCE_BADGE[t.classification?.stance] || 'badge-warn'}">${t.classification?.stance || '—'}</span></td>
+      <td>${renderInsightCell(t)}</td>
+      <td>${renderInsightFreshCell(t)}</td>
+      <td>${renderInsightSourceCell(t)}</td>
+      <td>${renderInsightNeedsCell(t)}</td>
       <td>${renderDeepDiveCell(t)}</td>
     </tr>`).join('');
   tbody.querySelectorAll('tr').forEach(tr => {
@@ -1348,6 +1454,9 @@ function selectTicker(ticker) {
   const tier2 = iv && t.lenses
     ? iv.renderActiveLensChips(t.active_lenses, t.silent_lens_count, expandedPersona, t.lenses, escapeHtml)
     : '';
+  const essentialInsights = iv
+    ? iv.renderEssentialInsights(t.essential_insights, escapeHtml, linkHtml)
+    : '';
   const discussants = (data.insights?.ticker_discussants || {})[t.ticker]
     || (data.insights?.ticker_discussants || {})[t.ticker.toUpperCase()]
     || [];
@@ -1383,6 +1492,8 @@ function selectTicker(ticker) {
     ${tier1}
 
     ${tier2}
+
+    ${essentialInsights}
 
     ${tier3}
 

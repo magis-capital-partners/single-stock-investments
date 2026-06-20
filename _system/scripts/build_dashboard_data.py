@@ -700,10 +700,10 @@ def load_insights_for_ticker(ticker: str, insights_doc: dict | None) -> list[dic
 
 
 SOURCE_PRIORITY = {
-    "superinvestor_letter": 0,
-    "filing": 1,
-    "earnings": 2,
-    "insider": 3,
+    "filing": 0,
+    "earnings": 1,
+    "insider": 2,
+    "superinvestor_letter": 3,
     "news": 4,
     "third_party": 5,
     "macro": 6,
@@ -738,6 +738,192 @@ def enrich_ticker_insights(raw: list[dict], limit: int = 12) -> list[dict]:
     out.sort(key=lambda x: SOURCE_PRIORITY.get(x.get("source", ""), 9))
     out.sort(key=lambda x: int(x.get("score") or 0), reverse=True)
     return out[:limit]
+
+
+def load_events_for_ticker(ticker: str, insights_doc: dict | None) -> list[dict]:
+    if not insights_doc:
+        return []
+    by_ticker = insights_doc.get("events_by_ticker") or {}
+    rows = by_ticker.get(ticker.upper()) or by_ticker.get(ticker) or []
+    out: list[dict] = []
+    for r in rows:
+        row = dict(r)
+        row["evidence_url"] = insight_evidence_url(row.get("evidence_ref"))
+        out.append(row)
+    return out
+
+
+def insight_date(row: dict) -> str:
+    return str(row.get("observed_at") or row.get("as_of") or "")
+
+
+def insight_score(row: dict) -> int:
+    try:
+        return int(row.get("score") or 0)
+    except (TypeError, ValueError):
+        return 0
+
+
+def insight_claim(row: dict) -> str:
+    return str(row.get("summary") or row.get("claim") or row.get("title") or "").strip()
+
+
+def days_since_iso(value: str | None) -> int | None:
+    if not value:
+        return None
+    try:
+        d = datetime.strptime(str(value)[:10], "%Y-%m-%d").date()
+    except ValueError:
+        return None
+    return (datetime.now(timezone.utc).date() - d).days
+
+
+def best_insight(rows: list[dict], predicate) -> dict | None:
+    matches = [r for r in rows if predicate(r)]
+    if not matches:
+        return None
+    matches.sort(key=lambda r: (insight_score(r), insight_date(r)), reverse=True)
+    return matches[0]
+
+
+def latest_insight(rows: list[dict]) -> dict | None:
+    dated = [r for r in rows if insight_date(r)]
+    if not dated:
+        return best_insight(rows, lambda _r: True)
+    dated.sort(key=lambda r: (insight_date(r), insight_score(r)), reverse=True)
+    return dated[0]
+
+
+def compact_insight(row: dict | None) -> dict | None:
+    if not row:
+        return None
+    source = row.get("source")
+    label = row.get("source_label") or source or "Insight"
+    return {
+        "id": row.get("id") or f"{source}:{row.get('event_type') or row.get('ref') or insight_date(row)}",
+        "source": source,
+        "source_label": row.get("source_label") or source or "Insight",
+        "source_name": row.get("source_name") or row.get("fund") or row.get("publisher"),
+        "event_type": row.get("event_type"),
+        "impact_axis": row.get("impact_axis"),
+        "date": insight_date(row) or None,
+        "direction": row.get("direction") or "neutral",
+        "confidence": row.get("confidence") or "med",
+        "score": insight_score(row),
+        "title": row.get("title") or str(label),
+        "summary": insight_claim(row)[:320],
+        "evidence_url": row.get("evidence_url") or insight_evidence_url(row.get("evidence_ref")),
+    }
+
+
+def build_essential_insights(
+    ticker: str,
+    events: list[dict],
+    raw_insights: list[dict],
+    discussants: list[dict],
+) -> dict:
+    rows = events if events else raw_insights
+    latest = compact_insight(latest_insight(rows))
+    bull = compact_insight(best_insight(rows, lambda r: r.get("direction") == "bullish"))
+    bear = compact_insight(
+        best_insight(
+            rows,
+            lambda r: r.get("direction") == "bearish" or r.get("impact_axis") == "risk",
+        )
+    )
+    owner = compact_insight(
+        best_insight(rows, lambda r: r.get("source") in {"superinvestor_letter", "insider"})
+    )
+    if not owner and discussants:
+        d0 = discussants[0]
+        owner = {
+            "id": f"letter:{ticker}:{d0.get('fund')}",
+            "source": "superinvestor_letter",
+            "source_label": "Letter",
+            "source_name": d0.get("fund"),
+            "event_type": "letter_position",
+            "impact_axis": "ownership",
+            "date": d0.get("letter_date"),
+            "direction": {"add": "bullish", "trim": "bearish"}.get(d0.get("action"), "neutral"),
+            "confidence": "med",
+            "score": 0,
+            "title": f"{d0.get('fund', 'Investor')} {d0.get('action', 'discussed')}",
+            "summary": (d0.get("commentary") or "")[:320],
+            "evidence_url": insight_evidence_url(d0.get("source_file")),
+        }
+
+    bullets: list[dict] = []
+    seen: set[str] = set()
+    for item in (latest, bear, bull, owner):
+        if not item or item["id"] in seen:
+            continue
+        seen.add(item["id"])
+        bullets.append(item)
+        if len(bullets) >= 3:
+            break
+
+    source_mix = sorted({r.get("source") for r in rows if r.get("source")})
+    freshness_days = None
+    for r in rows:
+        value = r.get("freshness_days")
+        if isinstance(value, (int, float)) and (freshness_days is None or value < freshness_days):
+            freshness_days = int(value)
+
+    fresh = freshness_days is not None and freshness_days <= 30
+    bear_specific = bool(
+        bear
+        and bear.get("source") not in {"macro", "theme"}
+        and bear.get("impact_axis") in {"risk", "fundamentals", "ownership", "variant_view", None}
+    )
+    bull_specific = bool(
+        bull
+        and bull.get("source") not in {"macro", "theme"}
+        and bull.get("impact_axis") in {"catalyst", "fundamentals", "ownership", "capital_allocation", "variant_view", None}
+    )
+
+    if not rows and not discussants:
+        status = {"label": "No insight", "tone": "stale"}
+    elif bear_specific and fresh:
+        status = {"label": "Fresh risk", "tone": "risk"}
+    elif bull_specific and fresh:
+        status = {"label": "Fresh catalyst", "tone": "bullish"}
+    elif owner:
+        status = {"label": "Owner signal", "tone": "ownership"}
+    elif freshness_days is not None and freshness_days > 120:
+        status = {"label": "Stale", "tone": "stale"}
+    else:
+        status = {"label": "Covered", "tone": "neutral"}
+
+    return {
+        "status": status,
+        "latest": latest,
+        "bull": bull,
+        "bear": bear,
+        "owner": owner,
+        "bullets": bullets,
+        "source_mix": source_mix,
+        "freshness_days": freshness_days,
+        "event_count": len(events),
+        "record_count": len(raw_insights),
+        "needs_work": not rows or (freshness_days is not None and freshness_days > 90) or len(source_mix) < 2,
+    }
+
+
+def essential_needs_work_reasons(row: dict) -> list[str]:
+    essential = row.get("essential_insights") or {}
+    reasons: list[str] = []
+    bullets = essential.get("bullets") or []
+    if not bullets or any(not b.get("evidence_url") for b in bullets):
+        reasons.append("missing evidence")
+    freshness = essential.get("freshness_days")
+    if isinstance(freshness, int) and freshness > 90:
+        reasons.append("stale source")
+    valuation_days = days_since_iso((row.get("classification") or {}).get("analysis_as_of"))
+    if valuation_days is None or valuation_days > 90:
+        reasons.append("stale valuation")
+    if "third_party" not in set(essential.get("source_mix") or []):
+        reasons.append("no third-party check")
+    return reasons[:4]
 
 
 def build_active_lenses(lenses_doc: dict | None) -> tuple[list[dict], int]:
@@ -878,7 +1064,17 @@ def build_ticker_row(ticker: str, holdings: dict[str, dict], portfolio_class: di
             classification, lenses, row.get("human_review"), val
         )
     row["insights"] = enrich_ticker_insights(load_insights_for_ticker(ticker, insights_doc))
+    row["insight_events"] = load_events_for_ticker(ticker, insights_doc)
     row["letter_discussants"] = load_letter_discussants(ticker, insights_doc)
+    row["essential_insights"] = build_essential_insights(
+        ticker,
+        row["insight_events"],
+        row["insights"],
+        row["letter_discussants"],
+    )
+    reasons = essential_needs_work_reasons(row)
+    row["essential_insights"]["needs_work_reasons"] = reasons
+    row["essential_insights"]["needs_work"] = bool(reasons)
     return row
 
 

@@ -13,3 +13,4 @@ Auto-scan `SJT/third-party-analyses/hk_scan_2026-06-02.md`. Mental models: equit
 | `_system/reference/investment-wisdom/horizon-kinetics/HK-Q1-2025-Commentary-extract.txt` | NPI deficit; May/June 2025 dividend reinstatement thesis; Mesabi precedent | Context (not in base IRR) |
 | `_system/reference/investment-wisdom/horizon-kinetics/HK-Q3-2025-Commentary-extract.txt` | Gas royalty NPI mechanics; deficit as interest-free capital | Context (not in base IRR) |
 | `_system/reference/investment-wisdom/horizon-kinetics/HK-Q1-2026-Commentary-extract.txt` | Royalty trust market-structure discounts; yield-screen exclusion | Context (not in base IRR) |
+| VIC: SJT VIC PDF | 2026-06-20 | SJT/third-party-analyses/vic/vic_pdf_2026-06-20_sjt-vic-pdf_50747d33bc.pdf | **Pending** - local single-page intake `SJT/third-party-analyses/vic/vic_pdf_2026-06-20_sjt-vic-pdf_50747d33bc.pdf`; not in base IRR |

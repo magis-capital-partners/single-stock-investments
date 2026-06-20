@@ -25,6 +25,13 @@ persona-fetch-letters:
 	$(PYTHON) $(SCRIPTS)/fetch_superinvestor_letters.py --all --build
 	@echo OK: persona-fetch-letters
 
+persona-insights:
+	$(PYTHON) $(SCRIPTS)/fetch_terminalvalue_sources.py
+	$(PYTHON) $(SCRIPTS)/build_insights.py
+	$(PYTHON) $(SCRIPTS)/build_dashboard_data.py
+	$(PYTHON) $(SCRIPTS)/validate_dashboard_data.py
+	@echo OK: persona-insights
+
 persona-check:
 	$(PYTHON) $(SCRIPTS)/lint_persona_lens.py --portfolio
 	@echo OK: persona-check

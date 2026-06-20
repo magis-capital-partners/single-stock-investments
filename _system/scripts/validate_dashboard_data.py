@@ -30,6 +30,7 @@ def main() -> int:
     else:
         errors.append("missing dashboard insights payload")
     holdings = sorted((registry.get("holdings") or {}).keys())
+    front_tickers = set(holdings) | set((registry.get("watchlist") or {}).keys())
     rows = payload.get("tickers") or []
     dash_tickers = [r.get("ticker") for r in rows]
 
@@ -102,8 +103,13 @@ def main() -> int:
                 for key in required:
                     if key not in event:
                         errors.append(f"insights.events[{idx}] missing key {key}")
-                if event.get("ticker") and event["ticker"] not in holdings:
-                    warnings.append(f"insights event references non-holding ticker {event['ticker']}")
+                if event.get("ticker") and event["ticker"] not in front_tickers:
+                    warnings.append(f"insights event references non-portfolio ticker {event['ticker']}")
+        if "records" in insights:
+            errors.append("insights payload should not include raw records; use record_archive.path")
+        archive = insights.get("record_archive") or {}
+        if not archive.get("path"):
+            errors.append("insights missing record_archive.path")
         source_health = insights.get("source_health") or {}
         if not isinstance(source_health, dict):
             errors.append("insights.source_health must be an object")

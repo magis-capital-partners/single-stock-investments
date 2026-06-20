@@ -223,6 +223,58 @@
     return letterBlock + (filter === 'letters' && letterBlock ? '' : otherBlock);
   }
 
+  function insightToneClass(tone) {
+    if (tone === 'bullish') return 'badge-ok';
+    if (tone === 'risk') return 'badge-bad';
+    if (tone === 'ownership') return 'badge-purple';
+    if (tone === 'stale') return 'badge-warn';
+    return 'badge-us';
+  }
+
+  function renderInsightItem(item, escapeHtml, linkHtml) {
+    if (!item) return '<span class="tier-sub">No signal</span>';
+    const directionClass = item.direction === 'bullish'
+      ? 'badge-ok'
+      : (item.direction === 'bearish' ? 'badge-bad' : 'badge-us');
+    const link = item.evidence_url ? ` ${linkHtml(item.evidence_url, 'evidence')}` : '';
+    return `
+      <div class="essential-item">
+        <div>
+          <span class="badge ${directionClass}">${escapeHtml(item.direction || 'neutral')}</span>
+          <span class="badge badge-us">${escapeHtml(item.source_label || item.source || 'source')}</span>
+          <span class="badge badge-us">${escapeHtml(item.confidence || 'med')}</span>
+          ${item.date ? `<span class="mono tier-sub">${escapeHtml(item.date)}</span>` : ''}
+        </div>
+        <div class="essential-title">${escapeHtml(item.title || 'Insight')}${link}</div>
+        ${item.summary ? `<div class="tier-sub">${escapeHtml(item.summary)}</div>` : ''}
+      </div>`;
+  }
+
+  function renderEssentialInsights(essential, escapeHtml, linkHtml) {
+    if (!essential || !(essential.bullets || []).length) {
+      return `
+        <div class="detail-section tier-2">
+          <h3>Essential insights</h3>
+          <div class="research-box">
+            <div class="tier-sub">No ranked insight is attached to this ticker yet.</div>
+          </div>
+        </div>`;
+    }
+    const status = essential.status || {};
+    const sourceMix = (essential.source_mix || []).map(s => SOURCE_LABEL[s] || s).join(', ') || 'none';
+    return `
+      <div class="detail-section tier-2">
+        <h3>Essential insights</h3>
+        <div class="research-box essential-box">
+          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:10px">
+            <span class="badge ${insightToneClass(status.tone)}">${escapeHtml(status.label || 'Covered')}</span>
+            <span class="tier-sub">${essential.freshness_days != null ? `${essential.freshness_days}d old` : 'undated'} · ${escapeHtml(sourceMix)}</span>
+          </div>
+          ${(essential.bullets || []).slice(0, 3).map(item => renderInsightItem(item, escapeHtml, linkHtml)).join('')}
+        </div>
+      </div>`;
+  }
+
   function renderConsensusDetail(lenses, escapeHtml) {
     if (!lenses?.valuation_blend) return '';
     const blend = lenses.valuation_blend;
@@ -418,6 +470,54 @@
       ${(events || []).length > rows.length ? `<p class="tier-sub">${(events || []).length - rows.length} more events outside the current table window.</p>` : ''}`;
   }
 
+  function filterTickerEssentials(tickers, opts) {
+    const { search, bookOnly } = opts || {};
+    let rows = tickers || [];
+    if (bookOnly) {
+      rows = rows.filter(t => t.essential_insights && !t.essential_insights.needs_work);
+    }
+    if (search) {
+      const q = search.toLowerCase();
+      rows = rows.filter(t => {
+        const e = t.essential_insights || {};
+        const text = [
+          t.ticker,
+          t.company,
+          e.status?.label,
+          ...(e.source_mix || []),
+          ...((e.bullets || []).map(b => `${b.title || ''} ${b.summary || ''}`)),
+        ].join(' ').toLowerCase();
+        return text.includes(q);
+      });
+    }
+    return rows;
+  }
+
+  function renderTickerEssentials(tickers, escapeHtml, linkHtml, opts) {
+    const rows = filterTickerEssentials(tickers, opts).slice(0, 160);
+    if (!rows.length) return '<p class="subhead">No ticker essentials match this view.</p>';
+    return `
+      <table class="darwin-table" id="insights-ticker-table">
+        <thead><tr><th>Ticker</th><th>Status</th><th>Fresh</th><th>Latest</th><th>Bull</th><th>Bear/Risk</th><th>Owner</th></tr></thead>
+        <tbody>
+          ${rows.map(t => {
+            const e = t.essential_insights || {};
+            const status = e.status || {};
+            return `
+              <tr>
+                <td><button type="button" class="linkish mono" data-select-ticker="${escapeHtml(t.ticker)}">${escapeHtml(t.ticker)}</button><div class="tier-sub">${escapeHtml(t.company || '')}</div></td>
+                <td><span class="badge ${insightToneClass(status.tone)}">${escapeHtml(status.label || 'No insight')}</span></td>
+                <td class="mono">${e.freshness_days != null ? `${e.freshness_days}d` : 'n/a'}</td>
+                <td>${renderInsightItem(e.latest, escapeHtml, linkHtml)}</td>
+                <td>${renderInsightItem(e.bull, escapeHtml, linkHtml)}</td>
+                <td>${renderInsightItem(e.bear, escapeHtml, linkHtml)}</td>
+                <td>${renderInsightItem(e.owner, escapeHtml, linkHtml)}</td>
+              </tr>`;
+          }).join('')}
+        </tbody>
+      </table>`;
+  }
+
   function renderSourceHealth(health, escapeHtml) {
     const rows = Object.entries(health || {});
     if (!rows.length) {
@@ -430,7 +530,7 @@
           ${rows.map(([key, h]) => {
             const status = h.status || 'unknown';
             const cls = status === 'ok' ? 'badge-ok' : (status === 'missing' || status === 'forbidden' ? 'badge-warn' : 'badge-us');
-            const notes = h.warnings ? `${h.warnings} warning(s)` : (h.path || '');
+            const notes = h.notes || (h.warnings ? `${h.warnings} warning(s)` : (h.path || ''));
             return `
               <tr>
                 <td>${escapeHtml(key.replace(/_/g, ' '))}</td>
@@ -443,6 +543,32 @@
           }).join('')}
         </tbody>
       </table>`;
+  }
+
+  function renderDataSourceCandidates(candidates, escapeHtml) {
+    const tools = candidates?.selected_tools || [];
+    if (!tools.length) return '<p class="subhead">No TerminalValue candidate source registry yet.</p>';
+    return `
+      <div class="detail-section">
+        <h3>TerminalValue candidate feeds</h3>
+        <p class="tier-sub" style="margin-bottom:8px">
+          ${escapeHtml(candidates.source_label || 'TerminalValue.io')} · reviewed ${escapeHtml(candidates.reviewed_at || 'n/a')} · ${tools.length} selected feeds
+        </p>
+        <table class="darwin-table">
+          <thead><tr><th>Provider</th><th>Role</th><th>Status</th><th>Priority</th><th>Credential</th><th>Target</th></tr></thead>
+          <tbody>
+            ${tools.map(t => `
+              <tr>
+                <td>${escapeHtml(t.name || 'Provider')}</td>
+                <td>${escapeHtml(t.dashboard_role || '')}</td>
+                <td><span class="badge ${t.integration_status === 'live' ? 'badge-ok' : 'badge-warn'}">${escapeHtml(t.integration_status || 'candidate')}</span></td>
+                <td>${escapeHtml(t.priority || 'medium')}</td>
+                <td>${t.credential_required ? 'required' : 'not required'}</td>
+                <td class="mono" style="font-size:11px">${escapeHtml(t.target_pipeline || '')}</td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`;
   }
 
   function filterLetterIndex(rows, opts) {
@@ -476,6 +602,7 @@
       bookOnly = false,
       selectedFundId = null,
       activeSection = 'events',
+      tickers = [],
     } = options || {};
 
     const profiles = insights?.fund_profiles || {};
@@ -506,30 +633,28 @@
 
     const qTabs = [{ id: 'all', label: 'All' }, ...quarters.map(q => ({ id: q, label: q }))];
     const sections = [
-      { id: 'events', label: 'Events' },
+      { id: 'events', label: 'What changed' },
+      { id: 'tickers', label: 'Ticker insights' },
       { id: 'themes', label: 'Themes' },
-      { id: 'letters', label: 'Letter index' },
-      { id: 'funds', label: 'Funds' },
-      { id: 'sources', label: 'Sources' },
+      { id: 'sources', label: 'Source health' },
     ];
 
     let body = '';
     if (activeSection === 'events') {
       body = renderEventQueue(insights?.events || [], escapeHtml, linkHtml, ghRepo, { search: fundSearch, bookOnly });
+    } else if (activeSection === 'tickers') {
+      body = renderTickerEssentials(tickers, escapeHtml, linkHtml, { search: fundSearch, bookOnly });
     } else if (activeSection === 'themes') {
       body = renderThemeRankings(themes, escapeHtml);
-    } else if (activeSection === 'letters') {
-      body = renderLetterIndex(letters, escapeHtml, linkHtml, ghRepo, true);
-    } else if (activeSection === 'funds') {
-      body = renderFundRegistry(funds, escapeHtml, linkHtml, ghRepo, false);
     } else {
-      body = renderSourceHealth(insights?.source_health || {}, escapeHtml);
+      body = renderSourceHealth(insights?.source_health || {}, escapeHtml)
+        + renderDataSourceCandidates(insights?.data_source_candidates || {}, escapeHtml);
     }
 
     return `
       <h2 style="font-size:18px;margin-bottom:6px">Insights</h2>
       <p class="subhead" style="margin-bottom:14px">
-        Portfolio context only · ${insights?.event_count || 0} events · ${insights?.letter_count || 0} letters · ${insights?.record_count || 0} records
+        Portfolio context only · ${insights?.event_count || 0} events · ${insights?.letter_count || 0} letters · ${insights?.front_record_count || 0} front records · ${insights?.archived_record_count || 0} archived
       </p>
       <nav class="view-tabs" id="insights-section-tabs" style="margin-bottom:10px">
         ${sections.map(s => `<button type="button" class="view-tab${activeSection === s.id ? ' active' : ''}" data-insights-section="${s.id}">${s.label}</button>`).join('')}
@@ -540,7 +665,7 @@
         </nav>
         <label class="tier-sub" style="display:flex;align-items:center;gap:6px">
           <input type="checkbox" id="insights-book-only" ${bookOnly ? 'checked' : ''} />
-          In our book only
+          High-signal only
         </label>
         <input class="search" id="fund-registry-search" placeholder="Search ticker, event, fund, theme..." value="${escapeHtml(fundSearch)}" style="max-width:280px" />
       </div>
@@ -553,6 +678,7 @@
     renderActiveLensChips,
     renderExternalContext,
     renderConsensusDetail,
+    renderEssentialInsights,
     renderInsightsPanel,
     renderLetterDiscussants,
     filterInsights,

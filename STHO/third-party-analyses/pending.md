@@ -1,9 +1,9 @@
 # STHO — Pending third-party sources
 
-**Updated:** 2026-06-12
+**Updated:** 2026-06-20
 
 Approve in `_system/frameworks/third_party_sources.md` before using in base IRR.
 
 | File | Status |
 |------|--------|
-| (none) | — |
+| `STHO/third-party-analyses/vic/vic_pdf_2026-06-20_stho-vic-pdf_509af8f0dd.pdf` | Pending VIC intake captured 2026-06-20; human approval required before IRR/stance use |

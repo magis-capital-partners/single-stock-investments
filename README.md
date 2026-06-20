@@ -85,6 +85,8 @@ python _system/scripts/marvin_cloud_refresh.py TICKER --date 2026-05-29
 
 **INDEX.csv:** prefer per-ticker regen: `python _system/scripts/build_folder_indexes.py --ticker SNOW` (avoid full-portfolio regen unless intentional).
 
+**Dropbox research ingestion:** source-preserving bulk intake for the Stahl/Horizon Kinetics and SumZero Dropbox folders lives in [`_system/frameworks/dropbox_ingestion.md`](_system/frameworks/dropbox_ingestion.md). Run `python _system/scripts/dropbox_ingest.py --stahl-password stahl`; raw archives stay local while manifests, indexes, extracted text, and summaries are written under `_system/dropbox_ingestion/`.
+
 ### Cursor models and billing
 
 | Context | Model | Notes |

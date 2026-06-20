@@ -11,24 +11,87 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 OUTPUT = ROOT / "dashboard" / "data" / "insights.json"
+ARCHIVE_OUTPUT = ROOT / "_system" / "reference" / "data-sources" / "insights_record_archive.json"
 LETTERS_INSIGHTS = ROOT / "_system" / "reference" / "superinvestor-letters" / "insights.json"
 NEWS_PATH = ROOT / "dashboard" / "data" / "portfolio_news.json"
 THEMES_DIR = ROOT / "_system" / "reference" / "market-data" / "themes"
 INSIDER_DIR = ROOT / "_system" / "reference" / "market-data" / "insider"
 INSIDER_MANIFEST = INSIDER_DIR / "manifest.json"
 EARNINGS_CACHE = ROOT / "_system" / "data" / "earnings_calendar.json"
+TERMINALVALUE_SOURCES = ROOT / "_system" / "reference" / "data-sources" / "terminalvalue_candidates.json"
 
 VALID_TICKER_RE = re.compile(r"^[A-Z0-9][A-Z0-9.\-]{0,11}$")
 
 SOURCE_META = {
-    "superinvestor_letter": {"label": "Letter", "materiality": 0.72, "axis": "ownership"},
-    "filing": {"label": "Filing", "materiality": 0.92, "axis": "fundamentals"},
-    "earnings": {"label": "Earnings", "materiality": 0.9, "axis": "fundamentals"},
-    "insider": {"label": "Insider", "materiality": 0.84, "axis": "ownership"},
-    "news": {"label": "News", "materiality": 0.72, "axis": "catalyst"},
-    "macro": {"label": "Macro", "materiality": 0.62, "axis": "macro"},
-    "theme": {"label": "Theme", "materiality": 0.58, "axis": "macro"},
-    "third_party": {"label": "Research", "materiality": 0.55, "axis": "variant_view"},
+    "filing": {"label": "Filing", "materiality": 0.96, "quality": 1.0, "axis": "fundamentals"},
+    "earnings": {"label": "Earnings", "materiality": 0.94, "quality": 0.96, "axis": "fundamentals"},
+    "insider": {"label": "Insider", "materiality": 0.86, "quality": 0.9, "axis": "ownership"},
+    "superinvestor_letter": {"label": "Letter", "materiality": 0.8, "quality": 0.82, "axis": "ownership"},
+    "news": {"label": "News", "materiality": 0.72, "quality": 0.7, "axis": "catalyst"},
+    "third_party": {"label": "Research", "materiality": 0.58, "quality": 0.58, "axis": "variant_view"},
+    "macro": {"label": "Macro", "materiality": 0.62, "quality": 0.54, "axis": "macro"},
+    "theme": {"label": "Theme", "materiality": 0.58, "quality": 0.5, "axis": "macro"},
+}
+
+MODEL_IMPACT_TERMS = (
+    "irr",
+    "valuation",
+    "guidance",
+    "falsifier",
+    "margin",
+    "revenue",
+    "earnings",
+    "capex",
+    "capital allocation",
+    "buyback",
+    "dividend",
+    "regulatory",
+    "lawsuit",
+    "approval",
+    "acquisition",
+    "contract",
+    "insider purchase",
+    "risk",
+    "catalyst",
+)
+
+LETTER_BOILERPLATE_PHRASES = (
+    "no offer to purchase",
+    "no offer to sell",
+    "could lose all or a substantial",
+    "past performance",
+    "not investment advice",
+    "forward-looking",
+    "confidential",
+    "subscribe",
+    "being able to jog",
+)
+
+COMPANY_STOPWORDS = {
+    "inc",
+    "corp",
+    "corporation",
+    "company",
+    "co",
+    "limited",
+    "ltd",
+    "plc",
+    "group",
+    "holdings",
+    "holding",
+    "class",
+    "ordinary",
+    "common",
+    "shares",
+    "trust",
+    "partners",
+    "limited",
+    "sa",
+    "nv",
+    "ag",
+    "the",
+    "and",
+    "of",
 }
 
 NEWS_AXIS = {
@@ -552,8 +615,9 @@ def theme_rankings(records: list[dict], quarter: str | None = None, our_tickers:
     for bucket in by_theme.values():
         all_tickers = sorted(bucket["top_tickers"])
         ours = [t for t in all_tickers if t in holdings]
-        rest = [t for t in all_tickers if t not in holdings]
-        top = (ours + rest)[:8]
+        if holdings and not ours:
+            continue
+        top = (ours if holdings else all_tickers)[:8]
         out.append(
             {
                 "theme": bucket["theme"],
@@ -709,20 +773,101 @@ def slugify(name: str) -> str:
     return s or "unknown-fund"
 
 
-def our_holdings_tickers() -> set[str]:
+def load_registry() -> dict:
     reg_path = ROOT / "_system" / "portfolio" / "registry.json"
     if not reg_path.exists():
-        return set()
+        return {"holdings": {}, "watchlist": {}}
     reg = load_json(reg_path)
     if not isinstance(reg, dict):
-        return set()
-    return {str(k).upper() for k in (reg.get("holdings") or {})}
+        return {"holdings": {}, "watchlist": {}}
+    return reg
 
 
-def ticker_insights(records: list[dict]) -> dict[str, list[dict]]:
+def portfolio_tickers(include_watchlist: bool = True) -> set[str]:
+    reg = load_registry()
+    tickers = {str(k).upper() for k in (reg.get("holdings") or {})}
+    if include_watchlist:
+        tickers.update(str(k).upper() for k in (reg.get("watchlist") or {}))
+    return tickers
+
+
+def portfolio_company_hints(include_watchlist: bool = True) -> dict[str, set[str]]:
+    reg = load_registry()
+    rows = dict(reg.get("holdings") or {})
+    if include_watchlist:
+        rows.update(reg.get("watchlist") or {})
+    hints: dict[str, set[str]] = {}
+    for ticker, meta in rows.items():
+        company = str((meta or {}).get("company") or ticker)
+        tokens = {
+            token.lower()
+            for token in re.findall(r"[A-Za-z][A-Za-z0-9&]{2,}", company)
+            if token.lower() not in COMPANY_STOPWORDS and len(token) >= 4
+        }
+        hints[str(ticker).upper()] = tokens
+    return hints
+
+
+def our_holdings_tickers() -> set[str]:
+    return portfolio_tickers(include_watchlist=False)
+
+
+def is_letter_boilerplate(text: str) -> bool:
+    lower = text.lower()
+    return any(phrase in lower for phrase in LETTER_BOILERPLATE_PHRASES)
+
+
+def contains_ticker_token(text: str, ticker: str) -> bool:
+    if not text or not ticker:
+        return False
+    tk = str(ticker).upper()
+    pattern = rf"(?<![A-Z0-9.\-]){re.escape(tk)}(?![A-Z0-9.\-])"
+    flags = 0 if len(tk.replace(".", "").replace("-", "")) <= 2 else re.IGNORECASE
+    return bool(re.search(pattern, text, flags))
+
+
+def has_company_hint(text: str, ticker: str, company_hints: dict[str, set[str]]) -> bool:
+    lower = text.lower()
+    return any(hint in lower for hint in company_hints.get(str(ticker).upper(), set()))
+
+
+def strong_letter_ticker_evidence(record: dict, company_hints: dict[str, set[str]]) -> bool:
+    ticker = str(record.get("ref") or "").upper()
+    text = " ".join(
+        str(record.get(key) or "")
+        for key in ("title", "claim", "commentary", "thesis")
+    ).strip()
+    if not text:
+        return record.get("action") in {"add", "trim"}
+    if is_letter_boilerplate(text):
+        return False
+    if record.get("action") in {"add", "trim"}:
+        return True
+    return contains_ticker_token(text, ticker) or has_company_hint(text, ticker, company_hints)
+
+
+def front_record_allowed(record: dict, front_tickers: set[str], company_hints: dict[str, set[str]]) -> bool:
+    scope = record.get("scope")
+    if scope == "portfolio":
+        return True
+    if scope != "ticker":
+        return False
+    ticker = str(record.get("ref") or "").upper()
+    if ticker not in front_tickers:
+        return False
+    if record.get("source") == "superinvestor_letter":
+        return strong_letter_ticker_evidence(record, company_hints)
+    return True
+
+
+def ticker_insights(
+    records: list[dict],
+    front_tickers: set[str],
+    company_hints: dict[str, set[str]],
+) -> dict[str, list[dict]]:
     by_ticker: dict[str, list[dict]] = {}
     for r in records:
-        if r.get("scope") != "ticker":
+        if not front_record_allowed(r, front_tickers, company_hints):
             continue
         tk = str(r.get("ref", "")).upper()
         if not tk or not re.match(r"^[A-Z0-9][A-Z0-9.\-]{0,11}$", tk):
@@ -731,7 +876,11 @@ def ticker_insights(records: list[dict]) -> dict[str, list[dict]]:
     return by_ticker
 
 
-def ticker_discussants(letters: list[dict], our_tickers: set[str]) -> dict[str, list[dict]]:
+def ticker_discussants(
+    letters: list[dict],
+    our_tickers: set[str],
+    company_hints: dict[str, set[str]],
+) -> dict[str, list[dict]]:
     """Per-ticker summary of which funds discuss it (letters only)."""
     by_ticker: dict[str, dict[str, dict]] = {}
     for letter in letters:
@@ -739,7 +888,18 @@ def ticker_discussants(letters: list[dict], our_tickers: set[str]) -> dict[str, 
         fund_id = letter.get("fund_id") or fund
         for pos in letter.get("positions") or []:
             tk = str(pos.get("ticker", "")).upper()
-            if not tk:
+            if not tk or tk not in our_tickers or not valid_ticker(tk):
+                continue
+            position_record = {
+                "source": "superinvestor_letter",
+                "scope": "ticker",
+                "ref": tk,
+                "action": pos.get("action", "discussed"),
+                "claim": pos.get("commentary") or pos.get("thesis") or "",
+                "commentary": pos.get("commentary") or "",
+                "thesis": pos.get("thesis") or "",
+            }
+            if not strong_letter_ticker_evidence(position_record, company_hints):
                 continue
             bucket = by_ticker.setdefault(tk, {})
             entry = bucket.setdefault(
@@ -813,14 +973,35 @@ def event_materiality(record: dict) -> float:
     return min(base, 1.0)
 
 
+def source_quality(record: dict) -> float:
+    return SOURCE_META.get(record.get("source"), {}).get("quality", 0.55)
+
+
+def model_impact_weight(record: dict) -> float:
+    text = " ".join(
+        str(record.get(key) or "")
+        for key in ("title", "claim", "summary", "event_type", "impact_axis")
+    ).lower()
+    weight = 1.0
+    if any(term in text for term in MODEL_IMPACT_TERMS):
+        weight += 0.12
+    if record.get("impact_axis") in {"fundamentals", "risk", "catalyst", "capital_allocation"}:
+        weight += 0.08
+    if record.get("in_base_irr"):
+        weight -= 0.18
+    return max(0.65, min(weight, 1.25))
+
+
 def event_score(record: dict, ticker: str | None, our_tickers: set[str]) -> int:
     days = freshness_days(record.get("as_of"))
     score = (
         100
+        * source_quality(record)
         * event_materiality(record)
         * confidence_weight(record.get("confidence"))
         * freshness_weight(days)
         * event_relevance(ticker, record.get("scope"), our_tickers)
+        * model_impact_weight(record)
     )
     return max(1, round(score))
 
@@ -849,9 +1030,15 @@ def event_id(record: dict, ticker: str | None) -> str:
     return hashlib.sha1(raw.encode("utf-8")).hexdigest()[:16]
 
 
-def events_from_records(records: list[dict], our_tickers: set[str]) -> list[dict]:
+def events_from_records(
+    records: list[dict],
+    front_tickers: set[str],
+    company_hints: dict[str, set[str]],
+) -> list[dict]:
     events: list[dict] = []
     for record in records:
+        if not front_record_allowed(record, front_tickers, company_hints):
+            continue
         source = record.get("source")
         scope = record.get("scope")
         if source == "superinvestor_letter" and scope == "theme":
@@ -866,7 +1053,7 @@ def events_from_records(records: list[dict], our_tickers: set[str]) -> list[dict
         event = {
             "id": event_id(record, ticker),
             "ticker": ticker,
-            "in_our_book": bool(ticker and ticker in our_tickers),
+            "in_our_book": bool(ticker and ticker in front_tickers),
             "source": source,
             "source_label": SOURCE_META.get(source, {}).get("label", source or "Insight"),
             "source_name": record.get("publisher") or record.get("fund") or SOURCE_META.get(source, {}).get("label"),
@@ -878,8 +1065,8 @@ def events_from_records(records: list[dict], our_tickers: set[str]) -> list[dict
             "summary": short_text(record.get("claim"), 320),
             "direction": record.get("direction") or "neutral",
             "confidence": record.get("confidence") or "med",
-            "portfolio_relevance": event_relevance(ticker, scope, our_tickers),
-            "score": event_score(record, ticker, our_tickers),
+            "portfolio_relevance": event_relevance(ticker, scope, front_tickers),
+            "score": event_score(record, ticker, front_tickers),
             "evidence_ref": record.get("evidence_ref"),
         }
         events.append(event)
@@ -933,10 +1120,16 @@ def third_party_inventory_count() -> int:
     return count
 
 
-def build_source_health(records: list[dict], letters: list[dict], news_doc: dict | None) -> dict:
+def build_source_health(
+    records: list[dict],
+    letters: list[dict],
+    news_doc: dict | None,
+    archive_meta: dict | None = None,
+) -> dict:
     counts = source_counts(records)
     insider_manifest = load_json(INSIDER_MANIFEST)
     earnings_doc = load_json(EARNINGS_CACHE)
+    terminalvalue_doc = load_json(TERMINALVALUE_SOURCES)
     filing_files = latest_filing_fact_files()
     insider_tickers = (insider_manifest or {}).get("tickers") if isinstance(insider_manifest, dict) else {}
     insider_errors = [
@@ -993,6 +1186,62 @@ def build_source_health(records: list[dict], letters: list[dict], news_doc: dict
             "items": third_party_inventory_count(),
             "path": "*/third-party-analyses/source_inventory_*.json",
         },
+        "terminalvalue_candidates": {
+            "status": "ok" if terminalvalue_doc else "missing",
+            "records": 0,
+            "items": len((terminalvalue_doc or {}).get("selected_tools") or []),
+            "as_of": (terminalvalue_doc or {}).get("reviewed_at"),
+            "path": relative_path(TERMINALVALUE_SOURCES),
+            "notes": "Provider candidates for fundamentals, filings, transcripts, ownership, news, macro and valuation feeds.",
+        },
+        "research_archive": {
+            "status": "ok" if archive_meta else "missing",
+            "records": (archive_meta or {}).get("record_count", 0),
+            "items": (archive_meta or {}).get("archived_ticker_count", 0),
+            "as_of": (archive_meta or {}).get("generated_at"),
+            "path": relative_path(ARCHIVE_OUTPUT),
+            "notes": "Full raw insight records are kept out of the front dashboard payload.",
+        },
+    }
+
+
+def build_record_archive(
+    records: list[dict],
+    front_tickers: set[str],
+    company_hints: dict[str, set[str]],
+) -> dict:
+    archived_tickers = {
+        str(r.get("ref") or "").upper()
+        for r in records
+        if r.get("scope") == "ticker"
+        and valid_ticker(str(r.get("ref") or "").upper())
+        and not front_record_allowed(r, front_tickers, company_hints)
+    }
+    front_records = [r for r in records if front_record_allowed(r, front_tickers, company_hints)]
+    return {
+        "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "record_count": len(records),
+        "front_record_count": len(front_records),
+        "archived_record_count": len(records) - len(front_records),
+        "front_ticker_count": len(front_tickers),
+        "archived_ticker_count": len(archived_tickers),
+        "by_source": source_counts(records),
+        "archived_tickers": sorted(archived_tickers),
+        "records": records,
+    }
+
+
+def write_record_archive(archive_doc: dict) -> dict:
+    ARCHIVE_OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+    ARCHIVE_OUTPUT.write_text(json.dumps(archive_doc, indent=2) + "\n", encoding="utf-8")
+    return {
+        "generated_at": archive_doc.get("generated_at"),
+        "record_count": archive_doc.get("record_count"),
+        "front_record_count": archive_doc.get("front_record_count"),
+        "archived_record_count": archive_doc.get("archived_record_count"),
+        "front_ticker_count": archive_doc.get("front_ticker_count"),
+        "archived_ticker_count": archive_doc.get("archived_ticker_count"),
+        "path": relative_path(ARCHIVE_OUTPUT),
     }
 
 
@@ -1009,6 +1258,8 @@ def build_provenance(records: list[dict], events: list[dict]) -> dict:
             relative_path(NEWS_PATH),
             relative_path(INSIDER_MANIFEST),
             relative_path(EARNINGS_CACHE),
+            relative_path(TERMINALVALUE_SOURCES),
+            relative_path(ARCHIVE_OUTPUT),
             "*/research/evidence/filing_facts_*.json",
             "*/third-party-analyses/source_inventory_*.json",
             relative_path(THEMES_DIR),
@@ -1022,8 +1273,9 @@ def main() -> int:
     letters_doc = load_json(LETTERS_INSIGHTS) or {"letters": []}
     letters = letters_doc.get("letters") or []
     records.extend(from_superinvestor_letters(letters_doc))
-    our_tickers = our_holdings_tickers()
-    records.extend(from_insider_transactions(our_tickers))
+    front_tickers = portfolio_tickers(include_watchlist=True)
+    company_hints = portfolio_company_hints(include_watchlist=True)
+    records.extend(from_insider_transactions(front_tickers))
     records.extend(from_earnings_calendar())
 
     for p in ROOT.iterdir():
@@ -1041,25 +1293,35 @@ def main() -> int:
     news_doc = load_json(NEWS_PATH)
     if isinstance(news_doc, dict):
         records.extend(from_news(news_doc))
+    terminalvalue_doc = load_json(TERMINALVALUE_SOURCES)
 
-    events = events_from_records(records, our_tickers)
+    events = events_from_records(records, front_tickers, company_hints)
+    archive_meta = write_record_archive(build_record_archive(records, front_tickers, company_hints))
     payload = {
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "record_count": len(records),
+        "front_record_count": archive_meta.get("front_record_count"),
+        "archived_record_count": archive_meta.get("archived_record_count"),
         "event_count": len(events),
         "letter_count": len(letters),
-        "source_health": build_source_health(records, letters, news_doc if isinstance(news_doc, dict) else None),
+        "source_health": build_source_health(
+            records,
+            letters,
+            news_doc if isinstance(news_doc, dict) else None,
+            archive_meta,
+        ),
+        "data_source_candidates": terminalvalue_doc or {},
         "provenance": build_provenance(records, events),
+        "record_archive": archive_meta,
         "events": events,
         "events_by_ticker": events_by_ticker(events),
-        "theme_rankings": theme_rankings(records, our_tickers=our_tickers),
-        "theme_rankings_by_quarter": theme_rankings_by_quarter(records, our_tickers),
-        "letter_index": letter_index(letters, our_tickers),
-        "fund_registry": fund_registry(letters, our_tickers),
-        "fund_profiles": fund_profiles(letters, our_tickers),
-        "ticker_discussants": ticker_discussants(letters, our_tickers),
-        "by_ticker": ticker_insights(records),
-        "records": records,
+        "theme_rankings": theme_rankings(records, our_tickers=front_tickers),
+        "theme_rankings_by_quarter": theme_rankings_by_quarter(records, front_tickers),
+        "letter_index": letter_index(letters, front_tickers),
+        "fund_registry": fund_registry(letters, front_tickers),
+        "fund_profiles": fund_profiles(letters, front_tickers),
+        "ticker_discussants": ticker_discussants(letters, front_tickers, company_hints),
+        "by_ticker": ticker_insights(records, front_tickers, company_hints),
     }
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
