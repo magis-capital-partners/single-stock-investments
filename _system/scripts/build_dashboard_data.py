@@ -705,9 +705,10 @@ SOURCE_PRIORITY = {
     "insider": 2,
     "superinvestor_letter": 3,
     "news": 4,
-    "third_party": 5,
-    "macro": 6,
-    "theme": 7,
+    "sumzero_research": 5,
+    "third_party": 6,
+    "macro": 7,
+    "theme": 8,
 }
 
 
@@ -823,6 +824,7 @@ def build_essential_insights(
     discussants: list[dict],
 ) -> dict:
     rows = events if events else raw_insights
+    source_rows = [*events, *raw_insights]
     latest = compact_insight(latest_insight(rows))
     bull = compact_insight(best_insight(rows, lambda r: r.get("direction") == "bullish"))
     bear = compact_insight(
@@ -862,7 +864,7 @@ def build_essential_insights(
         if len(bullets) >= 3:
             break
 
-    source_mix = sorted({r.get("source") for r in rows if r.get("source")})
+    source_mix = sorted({r.get("source") for r in source_rows if r.get("source")})
     freshness_days = None
     for r in rows:
         value = r.get("freshness_days")
@@ -905,7 +907,7 @@ def build_essential_insights(
         "freshness_days": freshness_days,
         "event_count": len(events),
         "record_count": len(raw_insights),
-        "needs_work": not rows or (freshness_days is not None and freshness_days > 90) or len(source_mix) < 2,
+        "needs_work": not source_rows or (freshness_days is not None and freshness_days > 90) or len(source_mix) < 2,
     }
 
 
@@ -921,7 +923,8 @@ def essential_needs_work_reasons(row: dict) -> list[str]:
     valuation_days = days_since_iso((row.get("classification") or {}).get("analysis_as_of"))
     if valuation_days is None or valuation_days > 90:
         reasons.append("stale valuation")
-    if "third_party" not in set(essential.get("source_mix") or []):
+    outside_research_sources = {"third_party", "sumzero_research"}
+    if not (outside_research_sources & set(essential.get("source_mix") or [])):
         reasons.append("no third-party check")
     return reasons[:4]
 
@@ -1063,13 +1066,19 @@ def build_ticker_row(ticker: str, holdings: dict[str, dict], portfolio_class: di
         row["decision_summary"] = build_decision_summary(
             classification, lenses, row.get("human_review"), val
         )
-    row["insights"] = enrich_ticker_insights(load_insights_for_ticker(ticker, insights_doc))
+    full_insights = enrich_ticker_insights(load_insights_for_ticker(ticker, insights_doc), limit=200)
+    display_insights = full_insights[:12]
+    if not any(r.get("source") == "sumzero_research" for r in display_insights):
+        sumzero_row = next((r for r in full_insights if r.get("source") == "sumzero_research"), None)
+        if sumzero_row:
+            display_insights = [*display_insights[:11], sumzero_row]
+    row["insights"] = display_insights
     row["insight_events"] = load_events_for_ticker(ticker, insights_doc)
     row["letter_discussants"] = load_letter_discussants(ticker, insights_doc)
     row["essential_insights"] = build_essential_insights(
         ticker,
         row["insight_events"],
-        row["insights"],
+        full_insights,
         row["letter_discussants"],
     )
     reasons = essential_needs_work_reasons(row)

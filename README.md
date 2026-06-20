@@ -87,6 +87,8 @@ python _system/scripts/marvin_cloud_refresh.py TICKER --date 2026-05-29
 
 **Dropbox research ingestion:** source-preserving bulk intake for the Stahl/Horizon Kinetics and SumZero Dropbox folders lives in [`_system/frameworks/dropbox_ingestion.md`](_system/frameworks/dropbox_ingestion.md). Run `python _system/scripts/dropbox_ingest.py --stahl-password stahl`; raw archives stay local while manifests, indexes, extracted text, and summaries are written under `_system/dropbox_ingestion/`.
 
+**SumZero Insights bridge:** `python _system/scripts/build_sumzero_index.py` scans the local `~/Downloads/SumZero Ideas.zip` archive, writes a compact committed index at `_system/reference/data-sources/sumzero_ideas_index.json`, and feeds matched holdings/watchlist ideas into the dashboard Insights tab. Raw SumZero documents stay local/ignored; `make persona-insights` refreshes the index before rebuilding dashboard data.
+
 ### Cursor models and billing
 
 | Context | Model | Notes |

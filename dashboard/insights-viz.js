@@ -20,6 +20,7 @@
     earnings: 'earnings',
     macro: 'macro',
     insider: 'insider',
+    sumzero_research: 'sumzero',
     third_party: 'third_party',
     theme: 'theme',
     news: 'news',
@@ -153,10 +154,12 @@
       insider: 'insider',
       ownership: 'insider',
       news: 'news',
-      research: 'third_party',
+      sumzero: 'sumzero_research',
+      research: ['third_party', 'sumzero_research'],
       third_party: 'third_party',
     };
     const src = map[filter] || filter;
+    if (Array.isArray(src)) return insights.filter(r => src.includes(r.source));
     return insights.filter(r => r.source === src);
   }
 
@@ -195,6 +198,7 @@
       { id: 'filings', label: 'Filings' },
       { id: 'earnings', label: 'Earnings' },
       { id: 'insider', label: 'Insider' },
+      { id: 'sumzero', label: 'SumZero' },
       { id: 'news', label: 'News' },
       { id: 'macro', label: 'Macro' },
       { id: 'research', label: 'Research' },

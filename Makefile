@@ -12,7 +12,7 @@ DATE ?= $(shell date +%Y-%m-%d)
 TICKER ?=
 DATE ?= $(shell date +%Y-%m-%d)
 
-.PHONY: research-check research-check-all depth-check depth-audit evidence milly-repass book-estimate book-estimate-all holdco-uplift short-scan hk-scan hk-cross-check-all hk-extract-refresh third-party-scan-all cross-check-all transcript-sync batch-refresh evidence-check darwin-pit-check darwin-build darwin-pit-audit darwin-sync-external darwin-explore persona-lens persona-insights persona-check
+.PHONY: research-check research-check-all depth-check depth-audit evidence milly-repass book-estimate book-estimate-all holdco-uplift short-scan hk-scan hk-cross-check-all hk-extract-refresh third-party-scan-all cross-check-all transcript-sync batch-refresh evidence-check darwin-pit-check darwin-build darwin-pit-audit darwin-sync-external darwin-explore persona-lens persona-insights persona-check sumzero-index
 
 persona-lens:
 	$(PYTHON) $(SCRIPTS)/fetch_superinvestor_letters.py --all --build
@@ -27,10 +27,15 @@ persona-fetch-letters:
 
 persona-insights:
 	$(PYTHON) $(SCRIPTS)/fetch_terminalvalue_sources.py
+	$(PYTHON) $(SCRIPTS)/build_sumzero_index.py
 	$(PYTHON) $(SCRIPTS)/build_insights.py
 	$(PYTHON) $(SCRIPTS)/build_dashboard_data.py
 	$(PYTHON) $(SCRIPTS)/validate_dashboard_data.py
 	@echo OK: persona-insights
+
+sumzero-index:
+	$(PYTHON) $(SCRIPTS)/build_sumzero_index.py
+	@echo OK: sumzero-index
 
 persona-check:
 	$(PYTHON) $(SCRIPTS)/lint_persona_lens.py --portfolio

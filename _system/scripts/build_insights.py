@@ -19,6 +19,7 @@ INSIDER_DIR = ROOT / "_system" / "reference" / "market-data" / "insider"
 INSIDER_MANIFEST = INSIDER_DIR / "manifest.json"
 EARNINGS_CACHE = ROOT / "_system" / "data" / "earnings_calendar.json"
 TERMINALVALUE_SOURCES = ROOT / "_system" / "reference" / "data-sources" / "terminalvalue_candidates.json"
+SUMZERO_INDEX = ROOT / "_system" / "reference" / "data-sources" / "sumzero_ideas_index.json"
 
 VALID_TICKER_RE = re.compile(r"^[A-Z0-9][A-Z0-9.\-]{0,11}$")
 
@@ -27,6 +28,7 @@ SOURCE_META = {
     "earnings": {"label": "Earnings", "materiality": 0.94, "quality": 0.96, "axis": "fundamentals"},
     "insider": {"label": "Insider", "materiality": 0.86, "quality": 0.9, "axis": "ownership"},
     "superinvestor_letter": {"label": "Letter", "materiality": 0.8, "quality": 0.82, "axis": "ownership"},
+    "sumzero_research": {"label": "SumZero", "materiality": 0.64, "quality": 0.68, "axis": "variant_view"},
     "news": {"label": "News", "materiality": 0.72, "quality": 0.7, "axis": "catalyst"},
     "third_party": {"label": "Research", "materiality": 0.58, "quality": 0.58, "axis": "variant_view"},
     "macro": {"label": "Macro", "materiality": 0.62, "quality": 0.54, "axis": "macro"},
@@ -314,6 +316,59 @@ def from_third_party(ticker_dir: Path, ticker: str) -> list[dict]:
             )
         )
     return out[:5]
+
+
+def from_sumzero_ideas(doc: dict | None, front_tickers: set[str]) -> list[dict]:
+    if not isinstance(doc, dict):
+        return []
+    out: list[dict] = []
+    for item in doc.get("matched_documents") or []:
+        match = item.get("match") or {}
+        ticker = str(match.get("ticker") or "").upper()
+        if ticker not in front_tickers or not valid_ticker(ticker):
+            continue
+        title = item.get("title") or item.get("filename") or "SumZero idea"
+        direction = item.get("direction") or "neutral"
+        match_type = match.get("match_type") or "archive_match"
+        evidence = f"{relative_path(SUMZERO_INDEX)}#document-{item.get('id')}"
+        if direction == "bearish":
+            event_type = "sumzero_short"
+            axis = "risk"
+            claim = f"SumZero short/risk idea indexed: {title}."
+        elif direction == "bullish":
+            event_type = "sumzero_long"
+            axis = "variant_view"
+            claim = f"SumZero long/variant idea indexed: {title}."
+        else:
+            event_type = "sumzero_idea"
+            axis = "variant_view"
+            claim = f"SumZero outside research idea indexed: {title}."
+        out.append(
+            insight_record(
+                source="sumzero_research",
+                as_of=item.get("document_date") or item.get("last_modified"),
+                scope="ticker",
+                ref=ticker,
+                title=f"SumZero: {title}",
+                claim=(
+                    f"{claim} Match: {match_type.replace('_', ' ')}"
+                    f"{' via ' + match.get('matched_alias') if match.get('matched_alias') else ''}; "
+                    f"archive member `{item.get('archive_member')}`."
+                ),
+                direction=direction,
+                evidence_ref=evidence,
+                event_type=event_type,
+                impact_axis=axis,
+                confidence=match.get("confidence") or "med",
+                publisher="SumZero Ideas",
+                document_type=item.get("document_type"),
+                archive_member=item.get("archive_member"),
+                theme_tags=item.get("theme_tags") or [],
+                match_type=match_type,
+            )
+        )
+    out.sort(key=lambda r: (r.get("as_of") or "", confidence_weight(r.get("confidence"))), reverse=True)
+    return out[:250]
 
 
 def from_theme_panel() -> list[dict]:
@@ -1130,6 +1185,9 @@ def build_source_health(
     insider_manifest = load_json(INSIDER_MANIFEST)
     earnings_doc = load_json(EARNINGS_CACHE)
     terminalvalue_doc = load_json(TERMINALVALUE_SOURCES)
+    sumzero_doc = load_json(SUMZERO_INDEX)
+    sumzero_summary = (sumzero_doc or {}).get("summary") if isinstance(sumzero_doc, dict) else {}
+    sumzero_archive = (sumzero_doc or {}).get("archive") if isinstance(sumzero_doc, dict) else {}
     filing_files = latest_filing_fact_files()
     insider_tickers = (insider_manifest or {}).get("tickers") if isinstance(insider_manifest, dict) else {}
     insider_errors = [
@@ -1185,6 +1243,21 @@ def build_source_health(
             "records": counts.get("third_party", 0),
             "items": third_party_inventory_count(),
             "path": "*/third-party-analyses/source_inventory_*.json",
+        },
+        "sumzero_ideas": {
+            "status": (
+                "missing"
+                if not sumzero_doc or (isinstance(sumzero_doc, dict) and sumzero_doc.get("status") == "missing")
+                else ("empty" if not (sumzero_summary or {}).get("matched_documents") else "ok")
+            ),
+            "records": counts.get("sumzero_research", 0),
+            "items": (sumzero_summary or {}).get("documents", 0),
+            "matches": (sumzero_summary or {}).get("matched_documents", 0),
+            "matched_tickers": (sumzero_summary or {}).get("matched_ticker_count", 0),
+            "as_of": normalize_date((sumzero_doc or {}).get("generated_at")) if isinstance(sumzero_doc, dict) else None,
+            "archive_latest_modified": (sumzero_archive or {}).get("latest_modified"),
+            "path": relative_path(SUMZERO_INDEX),
+            "notes": "Local SumZero Ideas archive index; raw documents stay out of git.",
         },
         "terminalvalue_candidates": {
             "status": "ok" if terminalvalue_doc else "missing",
@@ -1259,6 +1332,7 @@ def build_provenance(records: list[dict], events: list[dict]) -> dict:
             relative_path(INSIDER_MANIFEST),
             relative_path(EARNINGS_CACHE),
             relative_path(TERMINALVALUE_SOURCES),
+            relative_path(SUMZERO_INDEX),
             relative_path(ARCHIVE_OUTPUT),
             "*/research/evidence/filing_facts_*.json",
             "*/third-party-analyses/source_inventory_*.json",
@@ -1275,6 +1349,8 @@ def main() -> int:
     records.extend(from_superinvestor_letters(letters_doc))
     front_tickers = portfolio_tickers(include_watchlist=True)
     company_hints = portfolio_company_hints(include_watchlist=True)
+    sumzero_doc = load_json(SUMZERO_INDEX)
+    records.extend(from_sumzero_ideas(sumzero_doc if isinstance(sumzero_doc, dict) else None, front_tickers))
     records.extend(from_insider_transactions(front_tickers))
     records.extend(from_earnings_calendar())
 
