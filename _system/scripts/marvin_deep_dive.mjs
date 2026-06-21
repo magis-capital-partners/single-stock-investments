@@ -10,6 +10,7 @@
  *   CURSOR_API_KEY  — required (repo secret)
  *   TICKER          — required (e.g. 8697.T)
  *   GITHUB_REPOSITORY — owner/repo (set automatically in Actions)
+ *   GITHUB_DEFAULT_BRANCH / GITHUB_REF_NAME — optional branch hint (default main)
  *   PICK_REASON     — optional (new_documents, new_valuation_news, manual, …)
  *   HK_PDFS_ROOT    — optional; forwarded to cloud agent (default /opt/cursor/hk_pdfs)
  */
@@ -19,6 +20,10 @@ import { Agent, CursorAgentError } from "@cursor/sdk";
 const ticker = process.env.TICKER?.trim();
 const apiKey = process.env.CURSOR_API_KEY?.trim();
 const repo = process.env.GITHUB_REPOSITORY?.trim();
+const startingRef =
+  process.env.GITHUB_REF_NAME?.trim()
+  || process.env.GITHUB_DEFAULT_BRANCH?.trim()
+  || "main";
 const pickReason = process.env.PICK_REASON?.trim() || "scheduled";
 const hkPdfsRoot = process.env.HK_PDFS_ROOT?.trim() || "/opt/cursor/hk_pdfs";
 const date = new Date().toISOString().slice(0, 10);
@@ -58,12 +63,13 @@ const repoUrl = `https://github.com/${repo}`;
 
 try {
   console.log(`Starting Marvin deep dive for ${ticker} on ${repoUrl}...`);
+  console.log(`Starting ref: ${startingRef}`);
   console.log(`HK_PDFS_ROOT (cloud): ${hkPdfsRoot}`);
   const result = await Agent.prompt(prompt, {
     apiKey,
     model: { id: "composer-2.5" },
     cloud: {
-      repos: [{ url: repoUrl }],
+      repos: [{ url: repoUrl, startingRef }],
       autoCreatePR: true,
       skipReviewerRequest: true,
       envVars: { HK_PDFS_ROOT: hkPdfsRoot },
