@@ -207,6 +207,9 @@
     font-size: 11px; font-weight: 700; text-decoration: none; white-space: nowrap;
   }
   .source-open-link:hover { text-decoration: underline; }
+  .memory-score-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .memory-biotech { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 8px 0; }
+  @media (max-width: 520px) { .memory-score-row { grid-template-columns: 1fr; } }
   .divergence-flag { color: var(--accent-amber); margin-left: 4px; }
   .lens-delta-warn { color: var(--accent-amber); font-weight: 700; }
   details.detail-section summary { cursor: pointer; color: var(--text-muted); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; }
@@ -942,6 +945,7 @@ function renderInsights() {
     selectedFundId,
     activeSection: insightsSection,
     tickers: data.tickers || [],
+    memory: data.research_memory || null,
   });
   content.querySelectorAll('[data-insights-quarter]').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -1487,6 +1491,9 @@ function selectTicker(ticker) {
   const essentialInsights = iv
     ? iv.renderEssentialInsights(t.essential_insights, escapeHtml, linkHtml)
     : '';
+  const researchMemory = iv
+    ? iv.renderResearchMemory(t.research_memory, escapeHtml, linkHtml)
+    : '';
   const discussants = (data.insights?.ticker_discussants || {})[t.ticker]
     || (data.insights?.ticker_discussants || {})[t.ticker.toUpperCase()]
     || [];
@@ -1524,6 +1531,8 @@ function selectTicker(ticker) {
     ${tier2}
 
     ${essentialInsights}
+
+    ${researchMemory}
 
     ${tier3}
 

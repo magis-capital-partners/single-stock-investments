@@ -18,6 +18,7 @@ from valuation_synthesis import website_implied_irr  # noqa: E402
 
 DATA_DIR = ROOT / "dashboard" / "data"
 OUTPUT = DATA_DIR / "dashboard_data.json"
+RESEARCH_MEMORY_PATH = DATA_DIR / "research_memory.json"
 CLASS_PATH = ROOT / "_system" / "portfolio" / "classification.json"
 REGISTRY_PATH = ROOT / "_system" / "portfolio" / "registry.json"
 SLEEVES_PATH = ROOT / "_system" / "portfolio" / "investment_sleeves.json"
@@ -1061,7 +1062,37 @@ def build_decision_summary(
     }
 
 
-def build_ticker_row(ticker: str, holdings: dict[str, dict], portfolio_class: dict[str, dict], insights_doc: dict | None = None) -> dict:
+def compact_research_memory(ticker: str, memory_doc: dict | None) -> dict | None:
+    if not memory_doc:
+        return None
+    by_ticker = memory_doc.get("by_ticker") or {}
+    mem = by_ticker.get(ticker.upper()) or by_ticker.get(ticker)
+    if not mem:
+        return None
+    return {
+        "claim_count": mem.get("claim_count", 0),
+        "evidence_count": mem.get("evidence_count", 0),
+        "source_count": mem.get("source_count", 0),
+        "source_mix": mem.get("source_mix") or [],
+        "confirming_count": mem.get("confirming_count", 0),
+        "disconfirming_count": mem.get("disconfirming_count", 0),
+        "mixed_count": mem.get("mixed_count", 0),
+        "neutral_count": mem.get("neutral_count", 0),
+        "top_claims": (mem.get("top_claims") or [])[:4],
+        "inflection_claims": (mem.get("inflection_claims") or [])[:3],
+        "risk_claims": (mem.get("risk_claims") or [])[:3],
+        "ownership_claims": (mem.get("ownership_claims") or [])[:3],
+        "biotech": mem.get("biotech") or {},
+    }
+
+
+def build_ticker_row(
+    ticker: str,
+    holdings: dict[str, dict],
+    portfolio_class: dict[str, dict],
+    insights_doc: dict | None = None,
+    memory_doc: dict | None = None,
+) -> dict:
     ticker_dir = ROOT / ticker
     meta = {**TICKER_META.get(ticker, {}), **holdings.get(ticker, {})}
     dl_script, dl_path = has_download_script(ticker_dir)
@@ -1129,6 +1160,7 @@ def build_ticker_row(ticker: str, holdings: dict[str, dict], portfolio_class: di
     reasons = essential_needs_work_reasons(row)
     row["essential_insights"]["needs_work_reasons"] = reasons
     row["essential_insights"]["needs_work"] = bool(reasons)
+    row["research_memory"] = compact_research_memory(ticker, memory_doc)
     return row
 
 
@@ -1138,7 +1170,8 @@ def build() -> dict:
     portfolio_class = load_classification()
     tickers = list_tickers()
     insights_doc = _load_json(DATA_DIR / "insights.json")
-    rows = [build_ticker_row(t, holdings, portfolio_class, insights_doc) for t in tickers]
+    memory_doc = _load_json(RESEARCH_MEMORY_PATH)
+    rows = [build_ticker_row(t, holdings, portfolio_class, insights_doc, memory_doc) for t in tickers]
     watchlist = build_watchlist_rows(reg.get("watchlist") or {})
 
     total_pdfs = sum(r["pdf_count"] for r in rows)
@@ -1194,6 +1227,7 @@ def build() -> dict:
         },
         "watchlist": watchlist,
         "tickers": rows,
+        "research_memory": memory_doc,
     }
 
 
@@ -1334,24 +1368,41 @@ def merge_equity_model_rows(rows: list[dict], equity_payload: dict) -> None:
             row["equity_model"] = {"ready": False}
 
 
+def build_insights_if_missing() -> dict | None:
+    insights_doc = _load_json(DATA_DIR / "insights.json")
+    if insights_doc:
+        return insights_doc
+    import subprocess
+
+    ins_script = ROOT / "_system" / "scripts" / "build_insights.py"
+    if ins_script.exists():
+        subprocess.run([sys.executable, str(ins_script)], cwd=str(ROOT), check=False)
+    return _load_json(DATA_DIR / "insights.json")
+
+
+def build_research_memory() -> dict | None:
+    import subprocess
+
+    script = ROOT / "_system" / "scripts" / "build_research_memory.py"
+    if script.exists():
+        subprocess.run([sys.executable, str(script)], cwd=str(ROOT), check=False)
+    return _load_json(RESEARCH_MEMORY_PATH)
+
+
 def main() -> None:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     equity_payload = build_equity_models()
+    insights_doc = build_insights_if_missing()
+    memory_doc = build_research_memory()
     payload = build()
     merge_equity_model_rows(payload["tickers"], equity_payload)
     model_ready = sum(1 for r in payload["tickers"] if (r.get("equity_model") or {}).get("ready"))
     payload["summary"]["equity_models_ready"] = model_ready
     payload["equity_models"] = equity_payload
-    insights_doc = _load_json(DATA_DIR / "insights.json")
-    if not insights_doc:
-        import subprocess
-
-        ins_script = ROOT / "_system" / "scripts" / "build_insights.py"
-        if ins_script.exists():
-            subprocess.run([sys.executable, str(ins_script)], cwd=str(ROOT), check=False)
-            insights_doc = _load_json(DATA_DIR / "insights.json")
     if insights_doc:
         payload["insights"] = insights_doc
+    if memory_doc:
+        payload["research_memory"] = memory_doc
     persona_cal = _load_json(DATA_DIR / "persona_calibration.json")
     if persona_cal:
         payload["persona_calibration"] = persona_cal

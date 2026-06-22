@@ -12,7 +12,7 @@ DATE ?= $(shell date +%Y-%m-%d)
 TICKER ?=
 DATE ?= $(shell date +%Y-%m-%d)
 
-.PHONY: research-check research-check-all depth-check depth-audit evidence milly-repass book-estimate book-estimate-all holdco-uplift short-scan hk-scan hk-cross-check-all hk-extract-refresh third-party-scan-all cross-check-all transcript-sync batch-refresh evidence-check darwin-pit-check darwin-build darwin-pit-audit darwin-sync-external darwin-explore persona-lens persona-insights persona-check sumzero-index
+.PHONY: research-check research-check-all depth-check depth-audit evidence milly-repass book-estimate book-estimate-all holdco-uplift short-scan hk-scan hk-cross-check-all hk-extract-refresh third-party-scan-all cross-check-all transcript-sync batch-refresh evidence-check darwin-pit-check darwin-build darwin-pit-audit darwin-sync-external darwin-explore persona-lens persona-insights persona-check research-memory sumzero-index
 
 persona-lens:
 	$(PYTHON) $(SCRIPTS)/fetch_superinvestor_letters.py --all --build
@@ -29,9 +29,15 @@ persona-insights:
 	$(PYTHON) $(SCRIPTS)/fetch_terminalvalue_sources.py
 	$(PYTHON) $(SCRIPTS)/build_sumzero_index.py
 	$(PYTHON) $(SCRIPTS)/build_insights.py
+	$(PYTHON) $(SCRIPTS)/build_research_memory.py
 	$(PYTHON) $(SCRIPTS)/build_dashboard_data.py
 	$(PYTHON) $(SCRIPTS)/validate_dashboard_data.py
 	@echo OK: persona-insights
+
+research-memory:
+	$(PYTHON) $(SCRIPTS)/build_research_memory.py
+	$(PYTHON) $(SCRIPTS)/build_dashboard_data.py
+	@echo OK: research-memory
 
 sumzero-index:
 	$(PYTHON) $(SCRIPTS)/build_sumzero_index.py

@@ -331,6 +331,66 @@
       </div>`;
   }
 
+  function renderMemoryClaim(claim, escapeHtml, linkHtml) {
+    if (!claim) return '';
+    const directionClass = claim.direction === 'bullish'
+      ? 'badge-ok'
+      : (claim.direction === 'bearish' ? 'badge-bad' : 'badge-us');
+    const link = claim.evidence_url
+      ? ` ${linkHtml(claim.evidence_url, evidenceLabel(claim.evidence_url, claim.evidence_label), 'source-open-link')}`
+      : '';
+    return `<li class="source-card">
+      <div class="source-card-head">
+        <div class="source-card-badges">
+          <span class="badge ${directionClass}">${escapeHtml(claim.direction || 'neutral')}</span>
+          <span class="badge badge-us">${escapeHtml(claim.claim_type || 'claim')}</span>
+        </div>
+        <span class="source-date mono">${escapeHtml(claim.date || '')}</span>
+      </div>
+      <div class="source-card-title">${escapeHtml(claim.claim || 'Research claim')}${link}</div>
+      <div class="source-card-footer">
+        <span>${escapeHtml(claim.source_title || claim.source_type || 'source')}</span>
+        <span class="mono">${Number(claim.confidence_score || 0)}</span>
+      </div>
+    </li>`;
+  }
+
+  function renderResearchMemory(memory, escapeHtml, linkHtml) {
+    if (!memory || !memory.claim_count) {
+      return `
+        <div class="detail-section tier-2">
+          <h3>Research memory</h3>
+          <div class="research-box"><div class="tier-sub">No cross-referenced claims attached yet.</div></div>
+        </div>`;
+    }
+    const biotech = memory.biotech || {};
+    const sourceMix = (memory.source_mix || []).map(s => SOURCE_LABEL[s] || String(s).replace(/_/g, ' ')).join(', ') || 'none';
+    const inflectionClaims = memory.inflection_claims || [];
+    const riskClaims = memory.risk_claims || [];
+    const topClaims = memory.top_claims || [];
+    const biotechHtml = biotech.is_biotech_related ? `
+      <div class="memory-biotech">
+        <span class="badge badge-purple">Biotech</span>
+        <span class="tier-sub">${biotech.tracked_specialist_fund_count || 0} specialist funds tracked · ${biotech.ownership_records?.length || 0} 13F records loaded</span>
+      </div>` : '';
+    return `
+      <div class="detail-section tier-2">
+        <h3>Research memory</h3>
+        <div class="research-box essential-box">
+          <div class="memory-score-row">
+            <div class="metric"><div class="k">Claims</div><div class="v mono">${memory.claim_count}</div></div>
+            <div class="metric"><div class="k">Sources</div><div class="v mono">${memory.source_count}</div></div>
+            <div class="metric"><div class="k">Evidence</div><div class="v mono">+${memory.confirming_count || 0} / -${memory.disconfirming_count || 0}</div></div>
+          </div>
+          <div class="tier-sub" style="margin:8px 0">${escapeHtml(sourceMix)}</div>
+          ${biotechHtml}
+          ${inflectionClaims.length ? `<h3 style="margin-top:12px">Inflection claims</h3><ul class="source-stack">${inflectionClaims.map(c => renderMemoryClaim(c, escapeHtml, linkHtml)).join('')}</ul>` : ''}
+          ${riskClaims.length ? `<h3 style="margin-top:12px">Risks / disconfirming</h3><ul class="source-stack">${riskClaims.map(c => renderMemoryClaim(c, escapeHtml, linkHtml)).join('')}</ul>` : ''}
+          ${!inflectionClaims.length && !riskClaims.length ? `<ul class="source-stack">${topClaims.slice(0, 3).map(c => renderMemoryClaim(c, escapeHtml, linkHtml)).join('')}</ul>` : ''}
+        </div>
+      </div>`;
+  }
+
   function renderConsensusDetail(lenses, escapeHtml) {
     if (!lenses?.valuation_blend) return '';
     const blend = lenses.valuation_blend;
@@ -628,6 +688,87 @@
       </div>`;
   }
 
+  function renderMemoryLedger(memory, escapeHtml, linkHtml, opts) {
+    const { search = '', bookOnly = false } = opts || {};
+    const q = search.toLowerCase();
+    let rows = memory?.claim_ledger || [];
+    if (bookOnly) {
+      rows = rows.filter(r => r.claim_type === 'inflection' || r.claim_type === 'risk' || r.claim_type === 'ownership' || r.direction === 'bearish');
+    }
+    if (q) {
+      rows = rows.filter(r => [r.ticker, r.claim, r.claim_type, r.source_title, r.source_type].join(' ').toLowerCase().includes(q));
+    }
+    rows = rows.slice(0, 160);
+    if (!rows.length) return '<p class="subhead">No research-memory claims match this view.</p>';
+    return `
+      <table class="darwin-table">
+        <thead><tr><th>Ticker</th><th>Type</th><th>Direction</th><th>Claim</th><th>Source</th><th></th></tr></thead>
+        <tbody>${rows.map(r => {
+          const cls = r.direction === 'bullish' ? 'badge-ok' : (r.direction === 'bearish' ? 'badge-bad' : 'badge-us');
+          return `<tr>
+            <td><button type="button" class="linkish mono" data-select-ticker="${escapeHtml(r.ticker)}">${escapeHtml(r.ticker)}</button></td>
+            <td><span class="badge badge-us">${escapeHtml(r.claim_type || 'claim')}</span></td>
+            <td><span class="badge ${cls}">${escapeHtml(r.direction || 'neutral')}</span></td>
+            <td style="min-width:320px">${escapeHtml(r.claim || '')}</td>
+            <td>${escapeHtml(r.source_title || r.source_type || 'source')}</td>
+            <td>${r.evidence_url ? linkHtml(r.evidence_url, evidenceLabel(r.evidence_url, r.evidence_label), 'source-open-link') : '—'}</td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table>`;
+  }
+
+  function renderMemoryReviewQueue(memory, escapeHtml) {
+    const rows = (memory?.review_queue || []).slice(0, 160);
+    if (!rows.length) return '<p class="subhead">No memory review items.</p>';
+    return `
+      <div class="detail-section">
+        <h3>Review queue</h3>
+        <table class="darwin-table">
+          <thead><tr><th>Priority</th><th>Ticker</th><th>Reason</th></tr></thead>
+          <tbody>${rows.map(r => `<tr>
+            <td><span class="badge ${r.priority === 'high' ? 'badge-bad' : 'badge-warn'}">${escapeHtml(r.priority || 'medium')}</span></td>
+            <td><button type="button" class="linkish mono" data-select-ticker="${escapeHtml(r.ticker)}">${escapeHtml(r.ticker)}</button></td>
+            <td>${escapeHtml(r.reason || '')}</td>
+          </tr>`).join('')}</tbody>
+        </table>
+      </div>`;
+  }
+
+  function renderBiotechMemory(memory, escapeHtml, linkHtml) {
+    const funds = memory?.biotech?.specialist_funds || [];
+    const tickers = Object.values(memory?.by_ticker || {}).filter(t => t.biotech?.is_biotech_related);
+    return `
+      <div class="detail-section">
+        <h3>Biotech specialist registry</h3>
+        <p class="tier-sub" style="margin-bottom:8px">${funds.length} specialist funds tracked for 13F ingestion · ${tickers.length} biotech-related tickers detected in current book/watchlist.</p>
+        <table class="darwin-table">
+          <thead><tr><th>Fund</th><th>Specialty</th><th>Role</th><th>Notes</th></tr></thead>
+          <tbody>${funds.map(f => `<tr>
+            <td>${escapeHtml(f.fund || '')}</td>
+            <td><span class="badge badge-purple">${escapeHtml(f.specialty || 'biotech')}</span></td>
+            <td>${escapeHtml(f.signal_role || 'specialist_13f')}</td>
+            <td class="tier-sub">${escapeHtml(f.notes || '')}</td>
+          </tr>`).join('')}</tbody>
+        </table>
+      </div>
+      <div class="detail-section">
+        <h3>Biotech-related ticker queue</h3>
+        <table class="darwin-table">
+          <thead><tr><th>Ticker</th><th>Claims</th><th>Evidence</th><th>13F status</th><th>Top claim</th></tr></thead>
+          <tbody>${tickers.map(t => {
+            const top = (t.top_claims || [])[0] || {};
+            return `<tr>
+              <td><button type="button" class="linkish mono" data-select-ticker="${escapeHtml(t.ticker)}">${escapeHtml(t.ticker)}</button><div class="tier-sub">${escapeHtml(t.company || '')}</div></td>
+              <td class="mono">${t.claim_count || 0}</td>
+              <td class="mono">+${t.confirming_count || 0} / -${t.disconfirming_count || 0}</td>
+              <td><span class="badge ${(t.biotech?.ownership_records || []).length ? 'badge-ok' : 'badge-warn'}">${(t.biotech?.ownership_records || []).length ? 'loaded' : 'ready'}</span></td>
+              <td>${escapeHtml((top.claim || '').slice(0, 180))} ${top.evidence_url ? linkHtml(top.evidence_url, evidenceLabel(top.evidence_url, top.evidence_label), 'source-open-link') : ''}</td>
+            </tr>`;
+          }).join('')}</tbody>
+        </table>
+      </div>`;
+  }
+
   function filterLetterIndex(rows, opts) {
     const { quarter, search, bookOnly } = opts || {};
     let list = rows || [];
@@ -660,6 +801,7 @@
       selectedFundId = null,
       activeSection = 'events',
       tickers = [],
+      memory = null,
     } = options || {};
 
     const profiles = insights?.fund_profiles || {};
@@ -692,6 +834,8 @@
     const sections = [
       { id: 'events', label: 'What changed' },
       { id: 'tickers', label: 'Ticker insights' },
+      { id: 'memory', label: 'Research memory' },
+      { id: 'biotech', label: 'Biotech' },
       { id: 'themes', label: 'Themes' },
       { id: 'sources', label: 'Source health' },
     ];
@@ -701,6 +845,12 @@
       body = renderEventQueue(insights?.events || [], escapeHtml, linkHtml, ghRepo, { search: fundSearch, bookOnly });
     } else if (activeSection === 'tickers') {
       body = renderTickerEssentials(tickers, escapeHtml, linkHtml, { search: fundSearch, bookOnly });
+    } else if (activeSection === 'memory') {
+      body = renderMemoryLedger(memory, escapeHtml, linkHtml, { search: fundSearch, bookOnly })
+        + '<div style="height:14px"></div>'
+        + renderMemoryReviewQueue(memory, escapeHtml);
+    } else if (activeSection === 'biotech') {
+      body = renderBiotechMemory(memory, escapeHtml, linkHtml);
     } else if (activeSection === 'themes') {
       body = renderThemeRankings(themes, escapeHtml);
     } else {
@@ -736,6 +886,7 @@
     renderExternalContext,
     renderConsensusDetail,
     renderEssentialInsights,
+    renderResearchMemory,
     renderInsightsPanel,
     renderLetterDiscussants,
     filterInsights,
