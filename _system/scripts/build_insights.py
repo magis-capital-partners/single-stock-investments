@@ -22,6 +22,7 @@ TERMINALVALUE_SOURCES = ROOT / "_system" / "reference" / "data-sources" / "termi
 SUMZERO_INDEX = ROOT / "_system" / "reference" / "data-sources" / "sumzero_ideas_index.json"
 
 VALID_TICKER_RE = re.compile(r"^[A-Z0-9][A-Z0-9.\-]{0,11}$")
+DOCUMENT_SUFFIXES = {".pdf", ".htm", ".html", ".md", ".txt", ".json"}
 
 SOURCE_META = {
     "filing": {"label": "Filing", "materiality": 0.96, "quality": 1.0, "axis": "fundamentals"},
@@ -161,6 +162,56 @@ def relative_path(path: Path) -> str:
     return str(path.relative_to(ROOT)).replace("\\", "/")
 
 
+def source_document_ref(ref: str | None) -> str | None:
+    """Prefer the human-readable source document over extracted text/inventory files."""
+    if not ref:
+        return None
+    clean = str(ref).strip()
+    if not clean:
+        return None
+    if clean.startswith(("http://", "https://")):
+        return clean
+    base = clean.split("#", 1)[0].replace("\\", "/")
+    suffix = f"#{clean.split('#', 1)[1]}" if "#" in clean else ""
+    path = ROOT / base
+    candidates: list[Path] = []
+    if base.endswith(".pdf.txt"):
+        candidates.append(ROOT / base[: -len(".txt")])
+    if path.suffix.lower() in {".txt", ".md"}:
+        candidates.append(path.with_suffix(".pdf"))
+    if path.suffix.lower() not in {".json"}:
+        candidates.append(path)
+    for candidate in candidates:
+        if candidate.exists():
+            return relative_path(candidate) + suffix
+    return clean
+
+
+def evidence_url(ref: str | None) -> str | None:
+    doc_ref = source_document_ref(ref)
+    if not doc_ref:
+        return None
+    if doc_ref.startswith(("http://", "https://")):
+        return doc_ref
+    return f"https://github.com/GoldmanDrew/single-stock-investments/blob/main/{doc_ref}"
+
+
+def evidence_label(ref: str | None) -> str:
+    doc_ref = source_document_ref(ref)
+    if not doc_ref:
+        return "source"
+    if doc_ref.startswith(("http://", "https://")):
+        return "article"
+    suffix = Path(doc_ref.split("#", 1)[0]).suffix.lower()
+    if suffix == ".pdf":
+        return "PDF"
+    if suffix in {".htm", ".html"}:
+        return "HTML"
+    if suffix == ".json":
+        return "index"
+    return "source"
+
+
 def short_text(value: str | None, limit: int = 260) -> str:
     text = re.sub(r"\s+", " ", value or "").strip()
     if len(text) <= limit:
@@ -200,6 +251,7 @@ def from_superinvestor_letters(doc: dict) -> list[dict]:
         fund = letter.get("fund", "Unknown")
         fund_id = letter.get("fund_id") or fund
         as_of = letter.get("letter_date")
+        source_ref = source_document_ref(letter.get("source_document") or letter.get("source_file"))
         for th in letter.get("themes") or []:
             out.append(
                 insight_record(
@@ -209,7 +261,9 @@ def from_superinvestor_letters(doc: dict) -> list[dict]:
                     ref=th.get("theme"),
                     claim=f"{fund}: {th.get('theme')} — {th.get('stance', 'neutral')}",
                     direction={"constructive": "bullish", "cautious": "bearish"}.get(th.get("stance"), "neutral"),
-                    evidence_ref=letter.get("source_file"),
+                    evidence_ref=source_ref,
+                    evidence_url=evidence_url(source_ref),
+                    evidence_label=evidence_label(source_ref),
                     event_type="letter_theme",
                     impact_axis="macro",
                     fund=fund,
@@ -233,7 +287,9 @@ def from_superinvestor_letters(doc: dict) -> list[dict]:
                     ref=tk,
                     claim=claim,
                     direction={"add": "bullish", "trim": "bearish"}.get(action, "neutral"),
-                    evidence_ref=letter.get("source_file"),
+                    evidence_ref=source_ref,
+                    evidence_url=evidence_url(source_ref),
+                    evidence_label=evidence_label(source_ref),
                     event_type="letter_position",
                     impact_axis="ownership",
                     fund=fund,
@@ -299,20 +355,36 @@ def from_third_party(ticker_dir: Path, ticker: str) -> list[dict]:
     doc = load_json(inv_path)
     if not isinstance(doc, dict):
         return out
+    seen_refs: set[str] = set()
     for src in doc.get("sources") or []:
         title = src.get("title") or src.get("source") or "Third party"
+        raw_ref = src.get("url") or src.get("source_url") or src.get("path")
+        source_ref = source_document_ref(raw_ref) or relative_path(inv_path)
+        if source_ref in seen_refs:
+            continue
+        seen_refs.add(source_ref)
+        status = src.get("status") or "context"
+        confidence = "med" if status in {"approved", "context"} else "low"
+        use = src.get("use") or status
         out.append(
             insight_record(
                 source="third_party",
-                as_of=src.get("date") or doc.get("as_of"),
+                as_of=src.get("date") or doc.get("as_of") or doc.get("scan_date"),
                 scope="ticker",
                 ref=ticker,
-                claim=f"Third-party source indexed: {title}",
+                title=title,
+                claim=f"{title} ({status}; {use})",
                 direction="neutral",
-                evidence_ref=str(inv_path.relative_to(ROOT)).replace("\\", "/"),
+                evidence_ref=source_ref,
+                evidence_url=evidence_url(source_ref),
+                evidence_label=evidence_label(source_ref),
+                inventory_ref=relative_path(inv_path),
                 event_type="research_source",
                 impact_axis="variant_view",
-                confidence="low",
+                confidence=confidence,
+                publisher=src.get("source_id") or src.get("publisher") or "Third-party research",
+                source_path=raw_ref,
+                document_type=Path(str(source_ref).split("#", 1)[0]).suffix.lower().lstrip("."),
             )
         )
     return out[:5]
@@ -420,10 +492,13 @@ def from_news(doc: dict) -> list[dict]:
                     claim=item.get("summary") or item.get("title") or "News item",
                     direction="neutral",
                     evidence_ref=item.get("url"),
+                    evidence_url=item.get("url"),
+                    evidence_label="article",
                     event_type=item.get("category") or "news",
                     impact_axis=NEWS_AXIS.get(item.get("category"), "catalyst"),
                     publisher=item.get("publisher") or item.get("source"),
                     confidence="med" if float(item.get("confidence") or 0) >= 0.8 else "low",
+                    match_tier=item.get("match_tier"),
                 )
             )
     return out[:120]
@@ -705,6 +780,7 @@ def fund_registry(letters: list[dict], our_tickers: set[str]) -> list[dict]:
         key = f"{fund_id}|{quarter}"
         letter_tickers = {str(t).upper() for t in (letter.get("tickers") or [])}
         overlap = sorted(letter_tickers & our_tickers)
+        source_ref = source_document_ref(letter.get("source_document") or letter.get("source_file"))
         row = by_key.setdefault(
             key,
             {
@@ -717,7 +793,9 @@ def fund_registry(letters: list[dict], our_tickers: set[str]) -> list[dict]:
                 "themes": set(),
                 "maps_to_persona": letter.get("maps_to_persona") or [],
                 "lead_summary": letter.get("lead_summary") or "",
-                "evidence_ref": letter.get("source_file"),
+                "evidence_ref": source_ref,
+                "evidence_url": evidence_url(source_ref),
+                "evidence_label": evidence_label(source_ref),
                 "letter_date": letter.get("letter_date"),
             },
         )
@@ -744,6 +822,8 @@ def fund_registry(letters: list[dict], our_tickers: set[str]) -> list[dict]:
                 "maps_to_persona": row["maps_to_persona"],
                 "lead_summary": (row["lead_summary"] or "")[:280],
                 "evidence_ref": row["evidence_ref"],
+                "evidence_url": row["evidence_url"],
+                "evidence_label": row["evidence_label"],
             }
         )
     return sorted(out, key=lambda x: (-x["our_ticker_count"], x["fund"]))
@@ -757,6 +837,7 @@ def letter_index(letters: list[dict], our_tickers: set[str]) -> list[dict]:
         positions = letter.get("positions") or []
         adds = [p["ticker"] for p in positions if p.get("action") == "add" and p.get("ticker")]
         trims = [p["ticker"] for p in positions if p.get("action") == "trim" and p.get("ticker")]
+        source_ref = source_document_ref(letter.get("source_document") or letter.get("source_file"))
         rows.append(
             {
                 "fund_id": letter.get("fund_id"),
@@ -772,6 +853,9 @@ def letter_index(letters: list[dict], our_tickers: set[str]) -> list[dict]:
                 "lead_summary": (letter.get("lead_summary") or "")[:320],
                 "maps_to_persona": letter.get("maps_to_persona") or [],
                 "source_file": letter.get("source_file"),
+                "source_document": source_ref,
+                "evidence_url": evidence_url(source_ref),
+                "evidence_label": evidence_label(source_ref),
             }
         )
     return sorted(rows, key=lambda x: (x.get("letter_date") or "", x.get("fund") or ""), reverse=True)
@@ -797,6 +881,7 @@ def fund_profiles(letters: list[dict], our_tickers: set[str]) -> dict[str, dict]
         if letter.get("maps_to_persona"):
             profile["maps_to_persona"] = letter["maps_to_persona"]
         tickers = {str(t).upper() for t in (letter.get("tickers") or [])}
+        source_ref = source_document_ref(letter.get("source_document") or letter.get("source_file"))
         profile["our_tickers"].update(tickers & our_tickers)
         profile["letters"].append(
             {
@@ -810,6 +895,9 @@ def fund_profiles(letters: list[dict], our_tickers: set[str]) -> dict[str, dict]
                 "catalysts": letter.get("catalysts") or [],
                 "macro_views": letter.get("macro_views") or [],
                 "source_file": letter.get("source_file"),
+                "source_document": source_ref,
+                "evidence_url": evidence_url(source_ref),
+                "evidence_label": evidence_label(source_ref),
             }
         )
     for profile in by_fund.values():
@@ -941,6 +1029,7 @@ def ticker_discussants(
     for letter in letters:
         fund = letter.get("fund") or "Unknown"
         fund_id = letter.get("fund_id") or fund
+        source_ref = source_document_ref(letter.get("source_document") or letter.get("source_file"))
         for pos in letter.get("positions") or []:
             tk = str(pos.get("ticker", "")).upper()
             if not tk or tk not in our_tickers or not valid_ticker(tk):
@@ -967,6 +1056,9 @@ def ticker_discussants(
                     "action": pos.get("action", "discussed"),
                     "commentary": pos.get("commentary") or pos.get("thesis") or "",
                     "source_file": letter.get("source_file"),
+                    "source_document": source_ref,
+                    "evidence_url": evidence_url(source_ref),
+                    "evidence_label": evidence_label(source_ref),
                     "in_our_book": tk in our_tickers,
                 },
             )
@@ -1123,6 +1215,11 @@ def events_from_records(
             "portfolio_relevance": event_relevance(ticker, scope, front_tickers),
             "score": event_score(record, ticker, front_tickers),
             "evidence_ref": record.get("evidence_ref"),
+            "evidence_url": record.get("evidence_url") or evidence_url(record.get("evidence_ref")),
+            "evidence_label": record.get("evidence_label") or evidence_label(record.get("evidence_ref")),
+            "inventory_ref": record.get("inventory_ref"),
+            "source_path": record.get("source_path"),
+            "match_tier": record.get("match_tier"),
         }
         events.append(event)
     events.sort(key=lambda e: (e["score"], e.get("observed_at") or ""), reverse=True)

@@ -15,15 +15,15 @@
   };
 
   const SOURCE_LABEL = {
-    superinvestor_letter: 'letter',
-    filing: 'filing',
-    earnings: 'earnings',
-    macro: 'macro',
-    insider: 'insider',
-    sumzero_research: 'sumzero',
-    third_party: 'third_party',
-    theme: 'theme',
-    news: 'news',
+    superinvestor_letter: 'Letter',
+    filing: 'Filing',
+    earnings: 'Earnings',
+    macro: 'Macro',
+    insider: 'Insider',
+    sumzero_research: 'SumZero',
+    third_party: 'Research',
+    theme: 'Theme',
+    news: 'News',
   };
 
   const AXIS_LABEL = {
@@ -43,10 +43,40 @@
     return `${Number(v).toFixed(d)}%`;
   }
 
-  function evidenceLink(ref, linkHtml, ghRepo) {
+  function evidenceLabel(ref, fallback) {
+    if (fallback) return fallback;
+    const clean = (ref || '').split('#')[0].toLowerCase();
+    if (clean.endsWith('.pdf')) return 'PDF';
+    if (clean.endsWith('.htm') || clean.endsWith('.html')) return 'HTML';
+    if (clean.startsWith('http')) return 'Open';
+    if (clean.endsWith('.json')) return 'Index';
+    return 'Open';
+  }
+
+  function evidenceLink(ref, linkHtml, ghRepo, label) {
     if (!ref) return '—';
-    if (ref.startsWith('http')) return linkHtml(ref, 'Open');
-    return linkHtml(`https://github.com/${ghRepo}/blob/main/${ref}`, 'Extract');
+    const text = evidenceLabel(ref, label);
+    if (ref.startsWith('http')) return linkHtml(ref, text, 'source-open-link');
+    return linkHtml(`https://github.com/${ghRepo}/blob/main/${ref}`, text, 'source-open-link');
+  }
+
+  function recordEvidenceLink(row, linkHtml, ghRepo) {
+    const ref = row?.evidence_url || row?.source_document || row?.evidence_ref || row?.source_file;
+    if (!ref) return '';
+    return evidenceLink(ref, linkHtml, ghRepo, row.evidence_label);
+  }
+
+  function sourceBadgeClass(source) {
+    if (source === 'news') return 'badge-ok';
+    if (source === 'superinvestor_letter') return 'badge-purple';
+    if (source === 'third_party' || source === 'sumzero_research') return 'badge-us';
+    if (source === 'insider') return 'badge-warn';
+    return 'badge-us';
+  }
+
+  function cleanText(value, limit = 220) {
+    const text = String(value || '').replace(/\s+/g, ' ').trim();
+    return text.length > limit ? text.slice(0, limit - 1).trim() + '...' : text;
   }
 
   function renderDecisionSummary(ds, humanReview, helpers) {
@@ -168,20 +198,26 @@
     return `
       <div class="detail-section tier-3">
         <h3>Who discusses this</h3>
-        <ul class="context-list">
+        <ul class="source-stack">
           ${discussants.slice(0, 8).map(d => {
             const action = d.action || 'discussed';
             const badge = STANCE_BADGE[action] || 'badge-us';
-            const snippet = escapeHtml((d.commentary || '').slice(0, 200));
-            const link = d.source_file
-              ? ` · ${linkHtml(`https://github.com/${ghRepo}/blob/main/${d.source_file}`, 'letter')}`
-              : '';
-            return `<li>
-              <span class="badge ${badge}">${escapeHtml(action)}</span>
-              <strong>${escapeHtml(d.fund)}</strong>
-              <span class="tier-sub">${escapeHtml(d.quarter || '')} · ${escapeHtml(d.letter_date || '')}</span>
-              ${snippet ? `<div style="font-size:12px;margin-top:4px;color:var(--text-secondary)">"${snippet}"</div>` : ''}
-              ${link}
+            const snippet = escapeHtml(cleanText(d.commentary, 220));
+            const link = recordEvidenceLink(d, linkHtml, ghRepo);
+            return `<li class="source-card">
+              <div class="source-card-head">
+                <div class="source-card-badges">
+                  <span class="badge ${sourceBadgeClass('superinvestor_letter')}">Letter</span>
+                  <span class="badge ${badge}">${escapeHtml(action)}</span>
+                </div>
+                <span class="source-date mono">${escapeHtml(d.letter_date || '')}</span>
+              </div>
+              <div class="source-card-title">${escapeHtml(d.fund || 'Investor letter')}</div>
+              ${snippet ? `<div class="source-card-body">${snippet}</div>` : ''}
+              <div class="source-card-footer">
+                <span>${escapeHtml(d.quarter || '—')}</span>
+                ${link}
+              </div>
             </li>`;
           }).join('')}
         </ul>
@@ -210,17 +246,33 @@
         <nav class="source-pills">
           ${pills.map(p => `<button type="button" class="filter-btn source-pill${filter === p.id ? ' active' : ''}" data-insight-filter="${p.id}">${p.label}</button>`).join('')}
         </nav>
-        ${rows.length ? `<ul class="context-list">
+        ${rows.length ? `<ul class="source-stack">
           ${rows.map(r => {
             const src = SOURCE_LABEL[r.source] || r.source;
-            const fund = r.fund ? `${escapeHtml(r.fund)} · ` : '';
-            const ref = r.ref ? `${escapeHtml(r.ref)} · ` : '';
-            const claim = escapeHtml((r.claim || '').slice(0, 160));
-            const link = r.evidence_url
-              ? ` · ${linkHtml(r.evidence_url, '↗ extract')}`
-              : '';
+            const sourceName = r.source_name || r.fund || r.publisher || '';
+            const date = r.date || r.as_of || r.observed_at || '';
+            const title = cleanText(r.title || sourceName || src, 110);
+            const claim = escapeHtml(cleanText(r.summary || r.claim, 220));
+            const link = recordEvidenceLink(r, linkHtml, ghRepo);
             const action = r.action ? `<span class="badge ${STANCE_BADGE[r.action] || 'badge-us'}">${escapeHtml(r.action)}</span> ` : '';
-            return `<li><span class="badge badge-us context-src">${escapeHtml(src)}</span> ${action}${fund}${ref}"${claim}"${link}</li>`;
+            const directionClass = r.direction === 'bullish' ? 'badge-ok' : (r.direction === 'bearish' ? 'badge-bad' : 'badge-us');
+            return `<li class="source-card">
+              <div class="source-card-head">
+                <div class="source-card-badges">
+                  <span class="badge ${sourceBadgeClass(r.source)}">${escapeHtml(src)}</span>
+                  ${action || `<span class="badge ${directionClass}">${escapeHtml(r.direction || 'neutral')}</span>`}
+                  ${r.confidence ? `<span class="badge badge-us">${escapeHtml(r.confidence)}</span>` : ''}
+                </div>
+                <span class="source-date mono">${escapeHtml(date || '')}</span>
+              </div>
+              <div class="source-card-title">${escapeHtml(title)}</div>
+              ${sourceName ? `<div class="source-card-meta">${escapeHtml(sourceName)}</div>` : ''}
+              ${claim ? `<div class="source-card-body">${claim}</div>` : ''}
+              <div class="source-card-footer">
+                <span>${escapeHtml(AXIS_LABEL[r.impact_axis] || r.event_type || r.ref || 'context')}</span>
+                ${link}
+              </div>
+            </li>`;
           }).join('')}
         </ul>` : '<p class="tier-sub">No matching context for this filter.</p>'}
       </div>`;
@@ -240,7 +292,7 @@
     const directionClass = item.direction === 'bullish'
       ? 'badge-ok'
       : (item.direction === 'bearish' ? 'badge-bad' : 'badge-us');
-    const link = item.evidence_url ? ` ${linkHtml(item.evidence_url, 'evidence')}` : '';
+    const link = item.evidence_url ? ` ${linkHtml(item.evidence_url, evidenceLabel(item.evidence_url, item.evidence_label), 'source-open-link')}` : '';
     return `
       <div class="essential-item">
         <div>
@@ -336,7 +388,7 @@
     }
     return `
       <table class="darwin-table" id="insights-letter-table">
-        <thead><tr><th>Date</th><th>Fund</th><th>Quarter</th><th>Themes</th><th>Tickers</th><th>Our overlap</th><th>Summary</th></tr></thead>
+        <thead><tr><th>Date</th><th>Fund</th><th>Quarter</th><th>Themes</th><th>Tickers</th><th>Our overlap</th><th>Summary</th><th>Source</th></tr></thead>
         <tbody>
           ${rows.slice(0, 80).map(r => `
             <tr class="clickable-row" data-fund-id="${escapeHtml(r.fund_id || '')}">
@@ -347,6 +399,7 @@
               <td class="mono" style="font-size:11px">${(r.tickers || []).slice(0, 5).join(', ') || '—'}</td>
               <td class="mono" style="font-size:11px;color:var(--accent-cyan)">${(r.our_overlap || []).join(', ') || '—'}</td>
               <td style="font-size:11px;max-width:240px">${escapeHtml((r.lead_summary || '').slice(0, 120))}</td>
+              <td>${recordEvidenceLink(r, linkHtml, ghRepo)}</td>
             </tr>`).join('')}
         </tbody>
       </table>
@@ -375,7 +428,7 @@
               <td class="mono">${(f.our_tickers || []).join(', ') || '—'}</td>
               <td style="font-size:11px">${(f.themes || []).slice(0, 4).join(', ') || '—'}</td>
               <td style="font-size:11px">${(f.maps_to_persona || []).join(', ') || '—'}</td>
-              <td>${evidenceLink(f.evidence_ref, linkHtml, ghRepo)}</td>
+              <td>${evidenceLink(f.evidence_url || f.evidence_ref, linkHtml, ghRepo, f.evidence_label)}</td>
             </tr>`).join('')}
         </tbody>
       </table>
@@ -419,7 +472,7 @@
           </tbody>
         </table>` : ''}
         <p class="tier-sub" style="margin-top:10px">
-          ${(profile.letters || []).length} letter(s) · latest ${escapeHtml(latest.quarter || '—')} · ${evidenceLink(latest.source_file, linkHtml, ghRepo)}
+          ${(profile.letters || []).length} letter(s) · latest ${escapeHtml(latest.quarter || '—')} · ${evidenceLink(latest.evidence_url || latest.source_document || latest.source_file, linkHtml, ghRepo, latest.evidence_label)}
         </p>
       </div>`;
   }
@@ -466,7 +519,7 @@
                   <div><span class="badge ${directionClass}">${escapeHtml(e.direction || 'neutral')}</span> <strong>${escapeHtml(e.title || 'Insight')}</strong></div>
                   <div class="tier-sub" style="margin-top:4px">${escapeHtml((e.summary || '').slice(0, 220))}</div>
                 </td>
-                <td>${evidenceLink(e.evidence_ref, linkHtml, ghRepo)}</td>
+                <td>${evidenceLink(e.evidence_url || e.evidence_ref, linkHtml, ghRepo, e.evidence_label)}</td>
               </tr>`;
           }).join('')}
         </tbody>

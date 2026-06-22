@@ -14,7 +14,7 @@ REGISTRY_PATH = ROOT / "_system" / "portfolio" / "registry.json"
 PORTFOLIO_NEWS_PATH = ROOT / "dashboard" / "data" / "portfolio_news.json"
 NEWS_SEEN_PATH = ROOT / "_system" / "data" / "news_seen.json"
 
-POLICY_VERSION = 2
+POLICY_VERSION = 3
 FEED_MIN_CONFIDENCE = 0.80
 REFRESH_MIN_CONFIDENCE = 0.85
 OTC_EXPLICIT_ONLY = frozenset({"FRMO", "KEWL", "OTCM"})
@@ -295,21 +295,44 @@ HOLDING_OVERRIDES: dict[str, dict] = {
     "OTCM": {"search_names": ["OTC Markets Group", "OTC Markets"]},
 }
 
+COMPANY_SUFFIX_RE = re.compile(
+    r"\b(?:incorporated|inc|corporation|corp|company|co|limited|ltd|plc|lp|llc|"
+    r"holdings?|group|trust|class|ordinary|common|shares|sa|nv|ag|ab|berhad)\b\.?",
+    re.I,
+)
+COMPANY_ALIAS_STOPWORDS = frozenset({
+    "and", "the", "company", "group", "holdings", "holding", "limited", "corporation",
+    "corp", "inc", "ltd", "plc", "trust", "class", "common", "ordinary", "shares",
+})
+MANUAL_SEARCH_ALIASES: dict[str, list[str]] = {
+    "GOOGL": ["Google"],
+    "BKRB": ["Berkshire", "Berkshire Hathaway"],
+    "0388.HK": ["HKEX", "Hong Kong Exchanges"],
+    "8697.T": ["JPX"],
+    "LSEG": ["London Stock Exchange"],
+    "HKHC": ["Horizon Kinetics"],
+}
+
 _TICKER_STOPWORDS = frozenset({
     "ETF", "ETFS", "NAV", "AUM", "USD", "USA", "CEO", "CFO", "SEC", "IRS",
     "API", "PDF", "NYSE", "NASDAQ", "AMEX", "IPO", "OTC", "AI", "IT", "US",
     "THE", "AND", "FOR", "NEW", "INC", "LTD", "CORP", "LLC",
 })
 
+_EXCHANGE_NAMES = (
+    r"NASDAQ|NYSE|NYSE\s*ARCA|ARCA|AMEX|TSX|TSXV|CSE|OTCQX|OTCQB|OTC|CBOE|LSE|"
+    r"AIM|ASX|HKEX|SEHK|TSE|JPX|SGX|B3|BMV|GPW|FWB|XETRA|EURONEXT|EPA|BIT|MIL|STO|OMX"
+)
 _PAREN_TICKER_RE = re.compile(
-    r"\(\s*(?:(?:NASDAQ|NYSE|NYSE\s*ARCA|ARCA|TSX|CBOE|OTC)"
-    r"(?:\s*Exchange)?(?:,\s*Inc\.?)?\s*:\s*)?([A-Z0-9.\-]{1,10})\s*\)"
+    rf"\(\s*(?:(?:{_EXCHANGE_NAMES})(?:\s*Exchange)?(?:,\s*Inc\.?)?\s*:\s*)?"
+    r"([A-Z0-9.\-]{1,12})\s*\)",
+    re.I,
 )
 _EXCHANGE_TICKER_RE = re.compile(
-    r"\b(?:NASDAQ|NYSE|NYSE\s*ARCA|ARCA|TSX|CBOE|OTC)"
-    r"(?:\s*Exchange)?(?:,\s*Inc\.?)?\s*:\s*([A-Z0-9.\-]{1,10})\b"
+    rf"\b(?:{_EXCHANGE_NAMES})(?:\s*Exchange)?(?:,\s*Inc\.?)?\s*:\s*([A-Z0-9.\-]{{1,12}})\b",
+    re.I,
 )
-_DOLLAR_TICKER_RE = re.compile(r"\$([A-Z0-9.\-]{1,10})\b")
+_DOLLAR_TICKER_RE = re.compile(r"\$([A-Z0-9.\-]{1,12})\b")
 _MANAGEMENT_REFRESH_RE = re.compile(
     r"\b(CEO|CFO|chief executive|chief financial|board chair)\b", re.I
 )
@@ -394,14 +417,51 @@ def load_registry() -> dict:
     return json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
 
 
+def company_aliases(company: str) -> list[str]:
+    clean = re.sub(r"\([^)]*\)", " ", company or "")
+    clean = clean.replace("&", " and ")
+    clean = re.sub(r"[^A-Za-z0-9]+", " ", clean)
+    clean = re.sub(r"\s+", " ", clean).strip()
+    without_suffix = re.sub(COMPANY_SUFFIX_RE, " ", clean)
+    without_suffix = re.sub(r"\s+", " ", without_suffix).strip()
+    words = [
+        w
+        for w in without_suffix.split()
+        if w.lower() not in COMPANY_ALIAS_STOPWORDS and len(w) >= 4
+    ]
+    aliases = [company]
+    if len(words) >= 2:
+        aliases.extend([clean, without_suffix])
+        aliases.append(" ".join(words[:2]))
+    return [a for a in dict.fromkeys(a.strip() for a in aliases) if len(a) >= 4]
+
+
+def ticker_token_aliases(ticker: str) -> list[str]:
+    tokens = [ticker]
+    if "." in ticker:
+        base = ticker.split(".", 1)[0]
+        if len(base) >= 2 and base.upper() not in _TICKER_STOPWORDS:
+            tokens.append(base)
+            if base.isdigit():
+                stripped = base.lstrip("0")
+                if stripped and stripped != base:
+                    tokens.append(stripped)
+    return list(dict.fromkeys(tokens))
+
+
 def build_holding_config(ticker: str, holding: dict) -> HoldingNewsConfig:
     override = HOLDING_OVERRIDES.get(ticker, {})
     company = holding.get("company") or ticker
-    search_names = list(override.get("search_names") or [company])
+    search_names = [
+        *company_aliases(company),
+        *(MANUAL_SEARCH_ALIASES.get(ticker) or []),
+        *(override.get("search_names") or []),
+    ]
     if company not in search_names:
         search_names.insert(0, company)
+    search_names = list(dict.fromkeys(n for n in search_names if n))
 
-    tokens = override.get("ticker_tokens") or [ticker]
+    tokens = [*ticker_token_aliases(ticker), *(override.get("ticker_tokens") or [])]
     if ticker not in tokens:
         tokens = [ticker, *tokens]
 

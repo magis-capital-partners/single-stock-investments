@@ -140,11 +140,14 @@ def _vic_sources(ticker: str) -> list[dict]:
     if not vic_dir.is_dir():
         return []
     out: list[dict] = []
-    files = sorted([*vic_dir.glob("*.md"), *vic_dir.glob("*.pdf")])
-    for f in files:
+    stems = sorted({f.stem for f in [*vic_dir.glob("*.md"), *vic_dir.glob("*.pdf")]})
+    for stem in stems:
+        md = vic_dir / f"{stem}.md"
+        pdf = vic_dir / f"{stem}.pdf"
+        f = pdf if pdf.exists() else md
         title = f.stem
-        if f.suffix.lower() == ".md":
-            text = f.read_text(encoding="utf-8", errors="ignore")
+        if md.exists():
+            text = md.read_text(encoding="utf-8", errors="ignore")
             for line in text.splitlines():
                 if line.startswith("# "):
                     title = line[2:].strip()

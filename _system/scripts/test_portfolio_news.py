@@ -40,6 +40,39 @@ def test_match_amzn_explicit():
     assert tier == "explicit"
 
 
+def test_match_brand_alias():
+    configs = load_holding_configs()
+    ticker, tier = match_holding(
+        "Google parent announces new $70B buyback authorization",
+        "https://abc.xyz/investor/news",
+        configs,
+    )
+    assert ticker == "GOOGL"
+    assert tier == "high"
+
+
+def test_match_local_market_base_ticker():
+    configs = load_holding_configs()
+    ticker, tier = match_holding(
+        "Rightmove plc (LSE: RMV) raises full-year outlook",
+        "https://www.rightmove.co.uk/news",
+        configs,
+    )
+    assert ticker == "RMV.L"
+    assert tier == "explicit"
+
+
+def test_match_manual_exchange_alias():
+    configs = load_holding_configs()
+    ticker, tier = match_holding(
+        "HKEX announces a new market-structure consultation",
+        "https://www.hkexgroup.com/media-centre",
+        configs,
+    )
+    assert ticker == "0388.HK"
+    assert tier == "high"
+
+
 def test_refresh_eligible_buyback():
     item = NewsItem(
         id="test:1",
@@ -95,6 +128,9 @@ if __name__ == "__main__":
     test_classify_guidance()
     test_rejects_analyst_noise()
     test_match_amzn_explicit()
+    test_match_brand_alias()
+    test_match_local_market_base_ticker()
+    test_match_manual_exchange_alias()
     test_refresh_eligible_buyback()
     test_otc_requires_explicit()
     test_rejects_fund_flow_m_and_a()

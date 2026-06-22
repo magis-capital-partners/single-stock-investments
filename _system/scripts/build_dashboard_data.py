@@ -37,6 +37,30 @@ def github_raw_url(rel_path: str) -> str:
     return f"https://raw.githubusercontent.com/{GITHUB_REPO}/main/{rel_path.replace(chr(92), '/')}"
 
 
+def source_document_ref(ref: str | None) -> str | None:
+    if not ref:
+        return None
+    clean = str(ref).strip()
+    if not clean:
+        return None
+    if clean.startswith(("http://", "https://")):
+        return clean
+    base = clean.split("#", 1)[0].replace("\\", "/")
+    suffix = f"#{clean.split('#', 1)[1]}" if "#" in clean else ""
+    path = ROOT / base
+    candidates: list[Path] = []
+    if base.endswith(".pdf.txt"):
+        candidates.append(ROOT / base[: -len(".txt")])
+    if path.suffix.lower() in {".txt", ".md"}:
+        candidates.append(path.with_suffix(".pdf"))
+    if path.suffix.lower() != ".json":
+        candidates.append(path)
+    for candidate in candidates:
+        if candidate.exists():
+            return str(candidate.relative_to(ROOT)).replace("\\", "/") + suffix
+    return clean
+
+
 DATED_MD_RE = re.compile(r"_(\d{4}-\d{2}-\d{2})\.md$")
 
 
@@ -715,7 +739,9 @@ SOURCE_PRIORITY = {
 def insight_evidence_url(evidence_ref: str | None) -> str | None:
     if not evidence_ref:
         return None
-    ref = evidence_ref.strip()
+    ref = source_document_ref(evidence_ref)
+    if not ref:
+        return None
     if ref.startswith("http://") or ref.startswith("https://"):
         return ref
     base = ref.split("#", 1)[0]
@@ -726,14 +752,26 @@ def load_letter_discussants(ticker: str, insights_doc: dict | None) -> list[dict
     if not insights_doc:
         return []
     by_ticker = insights_doc.get("ticker_discussants") or {}
-    return by_ticker.get(ticker.upper()) or by_ticker.get(ticker) or []
+    rows = by_ticker.get(ticker.upper()) or by_ticker.get(ticker) or []
+    out: list[dict] = []
+    for r in rows:
+        row = dict(r)
+        source_ref = row.get("source_document") or source_document_ref(row.get("source_file"))
+        row["source_document"] = source_ref
+        row["evidence_url"] = row.get("evidence_url") or insight_evidence_url(source_ref)
+        row["evidence_label"] = row.get("evidence_label") or ("PDF" if str(source_ref or "").lower().endswith(".pdf") else "source")
+        out.append(row)
+    return out
 
 
 def enrich_ticker_insights(raw: list[dict], limit: int = 12) -> list[dict]:
     out: list[dict] = []
     for r in raw:
         row = dict(r)
-        row["evidence_url"] = insight_evidence_url(row.get("evidence_ref"))
+        row["evidence_url"] = row.get("evidence_url") or insight_evidence_url(row.get("evidence_ref"))
+        if not row.get("evidence_label"):
+            ref = source_document_ref(row.get("evidence_ref"))
+            row["evidence_label"] = "PDF" if str(ref or "").lower().endswith(".pdf") else ("article" if str(ref or "").startswith("http") else "source")
         out.append(row)
     out.sort(key=lambda x: x.get("as_of") or "", reverse=True)
     out.sort(key=lambda x: SOURCE_PRIORITY.get(x.get("source", ""), 9))
@@ -749,7 +787,10 @@ def load_events_for_ticker(ticker: str, insights_doc: dict | None) -> list[dict]
     out: list[dict] = []
     for r in rows:
         row = dict(r)
-        row["evidence_url"] = insight_evidence_url(row.get("evidence_ref"))
+        row["evidence_url"] = row.get("evidence_url") or insight_evidence_url(row.get("evidence_ref"))
+        if not row.get("evidence_label"):
+            ref = source_document_ref(row.get("evidence_ref"))
+            row["evidence_label"] = "PDF" if str(ref or "").lower().endswith(".pdf") else ("article" if str(ref or "").startswith("http") else "source")
         out.append(row)
     return out
 
@@ -814,6 +855,9 @@ def compact_insight(row: dict | None) -> dict | None:
         "title": row.get("title") or str(label),
         "summary": insight_claim(row)[:320],
         "evidence_url": row.get("evidence_url") or insight_evidence_url(row.get("evidence_ref")),
+        "evidence_label": row.get("evidence_label"),
+        "match_tier": row.get("match_tier"),
+        "inventory_ref": row.get("inventory_ref"),
     }
 
 
@@ -851,7 +895,8 @@ def build_essential_insights(
             "score": 0,
             "title": f"{d0.get('fund', 'Investor')} {d0.get('action', 'discussed')}",
             "summary": (d0.get("commentary") or "")[:320],
-            "evidence_url": insight_evidence_url(d0.get("source_file")),
+            "evidence_url": d0.get("evidence_url") or insight_evidence_url(d0.get("source_document") or d0.get("source_file")),
+            "evidence_label": d0.get("evidence_label"),
         }
 
     bullets: list[dict] = []
