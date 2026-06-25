@@ -8,8 +8,12 @@ import re
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
+import sys
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "_system" / "scripts"))
+from document_store import document_id_for_ref  # noqa: E402
+
 DATA_DIR = ROOT / "dashboard" / "data"
 OUTPUT = DATA_DIR / "research_memory.json"
 INSIGHTS_PATH = DATA_DIR / "insights.json"
@@ -96,11 +100,11 @@ def source_type(row: dict) -> str:
 
 def source_key(row: dict) -> str:
     return (
-        row.get("evidence_url")
-        or row.get("evidence_ref")
+        row.get("evidence_ref")
         or row.get("source_document")
         or row.get("source_file")
         or row.get("inventory_ref")
+        or row.get("evidence_url")
         or row.get("id")
         or "unknown"
     )
@@ -117,6 +121,7 @@ def source_record(row: dict) -> dict:
         "author": row.get("fund") or row.get("source_name") or row.get("publisher"),
         "url": row.get("evidence_url") or row.get("evidence_ref"),
         "label": row.get("evidence_label") or "source",
+        "document_id": row.get("evidence_document_id") or document_id_for_ref(key),
     }
 
 
@@ -293,6 +298,7 @@ def build() -> dict:
             "source_title": src["title"],
             "evidence_url": src["url"],
             "evidence_label": src["label"],
+            "evidence_document_id": src.get("document_id"),
         }
         claim_ledger.append(claim)
         evidence_ledger.append(
@@ -307,6 +313,7 @@ def build() -> dict:
                 "summary": text,
                 "url": src["url"],
                 "label": src["label"],
+                "document_id": src.get("document_id"),
             }
         )
 

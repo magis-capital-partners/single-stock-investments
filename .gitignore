@@ -13,6 +13,12 @@ _system/logs/
 _system/data/vic_active_ticker.json
 dashboard/oauth-proxy/.wrangler/
 
+# Local credentials - never commit service-account keys or OAuth tokens.
+_secrets/
+*.credentials.json
+*service-account*.json
+*google*key*.json
+
 # Cloned sibling repos for Darwin external sync (optional local paths)
 _external/
 
@@ -25,6 +31,9 @@ _system/reference/investment-wisdom/mihaljevic/Manual-of-Ideas-1st-Edition-2013.
 _system/reference/superinvestor-letters/INCOMING/**
 _system/reference/superinvestor-letters/**/*.pdf
 !_system/reference/superinvestor-letters/INCOMING/.gitkeep
+
+# SumZero archive extracts — raw PDFs local only; commit the compact index.
+_system/reference/sumzero-research/**/*.pdf
 NVDA/investor-documents/ir-nvda/JHH-Computex-2026-Keynote.pdf
 NVDA/investor-documents/ir-nvda/2013-annual-report-insert-web-ir-update.pdf
 

@@ -8,8 +8,12 @@ import hashlib
 import re
 from datetime import datetime, timezone
 from pathlib import Path
+import sys
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "_system" / "scripts"))
+from document_store import best_document_label, best_document_url, document_id_for_ref  # noqa: E402
+
 OUTPUT = ROOT / "dashboard" / "data" / "insights.json"
 ARCHIVE_OUTPUT = ROOT / "_system" / "reference" / "data-sources" / "insights_record_archive.json"
 LETTERS_INSIGHTS = ROOT / "_system" / "reference" / "superinvestor-letters" / "insights.json"
@@ -191,25 +195,21 @@ def evidence_url(ref: str | None) -> str | None:
     doc_ref = source_document_ref(ref)
     if not doc_ref:
         return None
-    if doc_ref.startswith(("http://", "https://")):
-        return doc_ref
-    return f"https://github.com/GoldmanDrew/single-stock-investments/blob/main/{doc_ref}"
+    return best_document_url(doc_ref, "GoldmanDrew/single-stock-investments")
 
 
 def evidence_label(ref: str | None) -> str:
     doc_ref = source_document_ref(ref)
     if not doc_ref:
         return "source"
-    if doc_ref.startswith(("http://", "https://")):
-        return "article"
-    suffix = Path(doc_ref.split("#", 1)[0]).suffix.lower()
-    if suffix == ".pdf":
-        return "PDF"
-    if suffix in {".htm", ".html"}:
-        return "HTML"
-    if suffix == ".json":
-        return "index"
-    return "source"
+    return best_document_label(doc_ref)
+
+
+def evidence_document_id(ref: str | None) -> str | None:
+    doc_ref = source_document_ref(ref)
+    if not doc_ref:
+        return None
+    return document_id_for_ref(doc_ref)
 
 
 def short_text(value: str | None, limit: int = 260) -> str:
@@ -402,7 +402,7 @@ def from_sumzero_ideas(doc: dict | None, front_tickers: set[str]) -> list[dict]:
         title = item.get("title") or item.get("filename") or "SumZero idea"
         direction = item.get("direction") or "neutral"
         match_type = match.get("match_type") or "archive_match"
-        evidence = f"{relative_path(SUMZERO_INDEX)}#document-{item.get('id')}"
+        evidence = item.get("local_pdf_path") or f"{relative_path(SUMZERO_INDEX)}#document-{item.get('id')}"
         if direction == "bearish":
             event_type = "sumzero_short"
             axis = "risk"
@@ -429,6 +429,9 @@ def from_sumzero_ideas(doc: dict | None, front_tickers: set[str]) -> list[dict]:
                 ),
                 direction=direction,
                 evidence_ref=evidence,
+                evidence_url=evidence_url(evidence),
+                evidence_label=evidence_label(evidence),
+                evidence_document_id=evidence_document_id(evidence),
                 event_type=event_type,
                 impact_axis=axis,
                 confidence=match.get("confidence") or "med",
@@ -1217,6 +1220,7 @@ def events_from_records(
             "evidence_ref": record.get("evidence_ref"),
             "evidence_url": record.get("evidence_url") or evidence_url(record.get("evidence_ref")),
             "evidence_label": record.get("evidence_label") or evidence_label(record.get("evidence_ref")),
+            "evidence_document_id": record.get("evidence_document_id") or evidence_document_id(record.get("evidence_ref")),
             "inventory_ref": record.get("inventory_ref"),
             "source_path": record.get("source_path"),
             "match_tier": record.get("match_tier"),

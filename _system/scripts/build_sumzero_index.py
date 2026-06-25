@@ -15,6 +15,7 @@ ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_ARCHIVE = Path.home() / "Downloads" / "SumZero Ideas.zip"
 OUTPUT = ROOT / "_system" / "reference" / "data-sources" / "sumzero_ideas_index.json"
 REGISTRY_PATH = ROOT / "_system" / "portfolio" / "registry.json"
+STAGING_DIR = ROOT / "_system" / "reference" / "sumzero-research"
 
 LEGAL_SUFFIXES = {
     "inc",
@@ -112,6 +113,34 @@ def rel_or_hint(path: Path) -> str:
             return "~/" + str(path.relative_to(home)).replace("\\", "/")
         except ValueError:
             return str(path).replace("\\", "/")
+
+
+def safe_filename(value: str) -> str:
+    name = Path(value).name.strip() or "sumzero-document.pdf"
+    name = re.sub(r'[<>:"/\\|?*\x00-\x1f]+', "_", name)
+    name = re.sub(r"\s+", " ", name).strip(" .")
+    if not name:
+        return "sumzero-document.pdf"
+    suffix = Path(name).suffix
+    stem = Path(name).stem
+    max_len = 120
+    if len(name) > max_len:
+        room = max_len - len(suffix)
+        name = f"{stem[:room].rstrip(' .')}{suffix}"
+    return name
+
+
+def staged_pdf_path(doc_id: str, filename: str, staging_dir: Path = STAGING_DIR) -> Path:
+    return staging_dir / doc_id / safe_filename(filename)
+
+
+def extract_pdf_member(zf: zipfile.ZipFile, info: zipfile.ZipInfo, target: Path) -> None:
+    if target.exists() and target.stat().st_size == info.file_size:
+        return
+    target.parent.mkdir(parents=True, exist_ok=True)
+    with zf.open(info) as src, target.open("wb") as dst:
+        for chunk in iter(lambda: src.read(1024 * 1024), b""):
+            dst.write(chunk)
 
 
 def load_registry_rows() -> list[dict]:
@@ -239,7 +268,7 @@ def match_entry(title: str, aliases: list[dict]) -> dict | None:
     }
 
 
-def build_index(archive: Path) -> dict:
+def build_index(archive: Path, extract_pdfs: bool = True, staging_dir: Path = STAGING_DIR) -> dict:
     generated_at = now_utc()
     registry_rows = load_registry_rows()
     aliases = build_alias_rows(registry_rows)
@@ -266,19 +295,30 @@ def build_index(archive: Path) -> dict:
     latest_modified = ""
     total_bytes = 0
 
+    extracted_pdf_count = 0
+
     with zipfile.ZipFile(archive) as zf:
         entries = [info for info in zf.infolist() if not info.is_dir() and info.file_size > 0]
         for info in entries:
             full_name = info.filename
             filename = Path(full_name).name
+            doc_id = document_id(info)
             title = Path(filename).stem.strip() or filename
             modified = entry_date(info)
             latest_modified = max(latest_modified, modified)
             total_bytes += info.file_size
             doc_date = guess_document_date(title, modified)
             direction, tags = direction_and_tags(title)
+            local_pdf_path = None
+            if document_type(filename) == "pdf":
+                target = staged_pdf_path(doc_id, filename, staging_dir)
+                if extract_pdfs:
+                    extract_pdf_member(zf, info, target)
+                    extracted_pdf_count += 1
+                if target.exists():
+                    local_pdf_path = rel_or_hint(target)
             doc = {
-                "id": document_id(info),
+                "id": doc_id,
                 "archive_member": full_name,
                 "filename": filename,
                 "title": title,
@@ -289,6 +329,8 @@ def build_index(archive: Path) -> dict:
                 "direction": direction,
                 "theme_tags": tags,
             }
+            if local_pdf_path:
+                doc["local_pdf_path"] = local_pdf_path
             match = match_entry(title, aliases)
             if match:
                 doc["match"] = match
@@ -322,6 +364,7 @@ def build_index(archive: Path) -> dict:
             "documents": len(documents),
             "matched_documents": len(matched),
             "matched_ticker_count": len(by_ticker),
+            "extracted_pdfs": extracted_pdf_count,
             "by_ticker": dict(sorted(by_ticker.items())),
             "by_match_type": dict(sorted(by_match_type.items())),
             "by_direction": dict(sorted(by_direction.items())),
@@ -335,9 +378,11 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Index local SumZero Ideas archive for dashboard insights.")
     parser.add_argument("--archive", type=Path, default=DEFAULT_ARCHIVE, help="Path to SumZero Ideas.zip")
     parser.add_argument("--output", type=Path, default=OUTPUT, help="Output JSON path")
+    parser.add_argument("--staging-dir", type=Path, default=STAGING_DIR, help="Gitignored folder for extracted SumZero PDFs")
+    parser.add_argument("--no-extract-pdfs", action="store_true", help="Only index the archive; do not refresh staged PDFs")
     args = parser.parse_args()
 
-    doc = build_index(args.archive.expanduser())
+    doc = build_index(args.archive.expanduser(), extract_pdfs=not args.no_extract_pdfs, staging_dir=args.staging_dir)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(doc, indent=2) + "\n", encoding="utf-8")
     summary = doc.get("summary") or {}

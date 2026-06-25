@@ -13,12 +13,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 from dated_md import dated_md_label, dated_md_sort_key, latest_dated_md  # noqa: E402
+from document_store import best_document_label, best_document_url, document_id_for_ref  # noqa: E402
 from market_order import sort_market_filters, sort_markets  # noqa: E402
 from valuation_synthesis import website_implied_irr  # noqa: E402
 
 DATA_DIR = ROOT / "dashboard" / "data"
 OUTPUT = DATA_DIR / "dashboard_data.json"
 RESEARCH_MEMORY_PATH = DATA_DIR / "research_memory.json"
+DOCUMENT_REGISTRY_PATH = DATA_DIR / "document_registry.json"
 CLASS_PATH = ROOT / "_system" / "portfolio" / "classification.json"
 REGISTRY_PATH = ROOT / "_system" / "portfolio" / "registry.json"
 SLEEVES_PATH = ROOT / "_system" / "portfolio" / "investment_sleeves.json"
@@ -743,10 +745,7 @@ def insight_evidence_url(evidence_ref: str | None) -> str | None:
     ref = source_document_ref(evidence_ref)
     if not ref:
         return None
-    if ref.startswith("http://") or ref.startswith("https://"):
-        return ref
-    base = ref.split("#", 1)[0]
-    return github_blob_url(base)
+    return best_document_url(ref, GITHUB_REPO)
 
 
 def load_letter_discussants(ticker: str, insights_doc: dict | None) -> list[dict]:
@@ -759,8 +758,9 @@ def load_letter_discussants(ticker: str, insights_doc: dict | None) -> list[dict
         row = dict(r)
         source_ref = row.get("source_document") or source_document_ref(row.get("source_file"))
         row["source_document"] = source_ref
-        row["evidence_url"] = row.get("evidence_url") or insight_evidence_url(source_ref)
-        row["evidence_label"] = row.get("evidence_label") or ("PDF" if str(source_ref or "").lower().endswith(".pdf") else "source")
+        row["evidence_url"] = insight_evidence_url(source_ref) or row.get("evidence_url")
+        row["evidence_label"] = row.get("evidence_label") or best_document_label(source_ref)
+        row["evidence_document_id"] = row.get("evidence_document_id") or document_id_for_ref(source_ref)
         out.append(row)
     return out
 
@@ -769,10 +769,11 @@ def enrich_ticker_insights(raw: list[dict], limit: int = 12) -> list[dict]:
     out: list[dict] = []
     for r in raw:
         row = dict(r)
-        row["evidence_url"] = row.get("evidence_url") or insight_evidence_url(row.get("evidence_ref"))
+        row["evidence_url"] = insight_evidence_url(row.get("evidence_ref")) or row.get("evidence_url")
         if not row.get("evidence_label"):
             ref = source_document_ref(row.get("evidence_ref"))
-            row["evidence_label"] = "PDF" if str(ref or "").lower().endswith(".pdf") else ("article" if str(ref or "").startswith("http") else "source")
+            row["evidence_label"] = best_document_label(ref)
+        row["evidence_document_id"] = row.get("evidence_document_id") or document_id_for_ref(row.get("evidence_ref"))
         out.append(row)
     out.sort(key=lambda x: x.get("as_of") or "", reverse=True)
     out.sort(key=lambda x: SOURCE_PRIORITY.get(x.get("source", ""), 9))
@@ -788,10 +789,11 @@ def load_events_for_ticker(ticker: str, insights_doc: dict | None) -> list[dict]
     out: list[dict] = []
     for r in rows:
         row = dict(r)
-        row["evidence_url"] = row.get("evidence_url") or insight_evidence_url(row.get("evidence_ref"))
+        row["evidence_url"] = insight_evidence_url(row.get("evidence_ref")) or row.get("evidence_url")
         if not row.get("evidence_label"):
             ref = source_document_ref(row.get("evidence_ref"))
-            row["evidence_label"] = "PDF" if str(ref or "").lower().endswith(".pdf") else ("article" if str(ref or "").startswith("http") else "source")
+            row["evidence_label"] = best_document_label(ref)
+        row["evidence_document_id"] = row.get("evidence_document_id") or document_id_for_ref(row.get("evidence_ref"))
         out.append(row)
     return out
 
@@ -855,8 +857,9 @@ def compact_insight(row: dict | None) -> dict | None:
         "score": insight_score(row),
         "title": row.get("title") or str(label),
         "summary": insight_claim(row)[:320],
-        "evidence_url": row.get("evidence_url") or insight_evidence_url(row.get("evidence_ref")),
-        "evidence_label": row.get("evidence_label"),
+        "evidence_url": insight_evidence_url(row.get("evidence_ref")) or row.get("evidence_url"),
+        "evidence_label": row.get("evidence_label") or best_document_label(row.get("evidence_ref")),
+        "evidence_document_id": row.get("evidence_document_id") or document_id_for_ref(row.get("evidence_ref")),
         "match_tier": row.get("match_tier"),
         "inventory_ref": row.get("inventory_ref"),
     }
@@ -896,8 +899,9 @@ def build_essential_insights(
             "score": 0,
             "title": f"{d0.get('fund', 'Investor')} {d0.get('action', 'discussed')}",
             "summary": (d0.get("commentary") or "")[:320],
-            "evidence_url": d0.get("evidence_url") or insight_evidence_url(d0.get("source_document") or d0.get("source_file")),
-            "evidence_label": d0.get("evidence_label"),
+            "evidence_url": insight_evidence_url(d0.get("source_document") or d0.get("source_file")) or d0.get("evidence_url"),
+            "evidence_label": d0.get("evidence_label") or best_document_label(d0.get("source_document") or d0.get("source_file")),
+            "evidence_document_id": d0.get("evidence_document_id") or document_id_for_ref(d0.get("source_document") or d0.get("source_file")),
         }
 
     bullets: list[dict] = []
@@ -1368,31 +1372,24 @@ def merge_equity_model_rows(rows: list[dict], equity_payload: dict) -> None:
             row["equity_model"] = {"ready": False}
 
 
-def build_insights_if_missing() -> dict | None:
-    insights_doc = _load_json(DATA_DIR / "insights.json")
-    if insights_doc:
-        return insights_doc
+def build_document_registry() -> dict | None:
     import subprocess
 
-    ins_script = ROOT / "_system" / "scripts" / "build_insights.py"
-    if ins_script.exists():
-        subprocess.run([sys.executable, str(ins_script)], cwd=str(ROOT), check=False)
-    return _load_json(DATA_DIR / "insights.json")
+    script = ROOT / "_system" / "scripts" / "build_document_registry.py"
+    if script.exists():
+        subprocess.run([sys.executable, str(script)], cwd=str(ROOT), check=False)
+    return _load_json(DOCUMENT_REGISTRY_PATH)
 
 
 def build_research_memory() -> dict | None:
-    import subprocess
-
-    script = ROOT / "_system" / "scripts" / "build_research_memory.py"
-    if script.exists():
-        subprocess.run([sys.executable, str(script)], cwd=str(ROOT), check=False)
     return _load_json(RESEARCH_MEMORY_PATH)
 
 
 def main() -> None:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     equity_payload = build_equity_models()
-    insights_doc = build_insights_if_missing()
+    document_registry = build_document_registry()
+    insights_doc = _load_json(DATA_DIR / "insights.json")
     memory_doc = build_research_memory()
     payload = build()
     merge_equity_model_rows(payload["tickers"], equity_payload)
@@ -1403,6 +1400,8 @@ def main() -> None:
         payload["insights"] = insights_doc
     if memory_doc:
         payload["research_memory"] = memory_doc
+    if document_registry:
+        payload["document_registry"] = document_registry
     persona_cal = _load_json(DATA_DIR / "persona_calibration.json")
     if persona_cal:
         payload["persona_calibration"] = persona_cal
