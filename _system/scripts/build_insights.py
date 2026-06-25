@@ -24,6 +24,8 @@ INSIDER_MANIFEST = INSIDER_DIR / "manifest.json"
 EARNINGS_CACHE = ROOT / "_system" / "data" / "earnings_calendar.json"
 TERMINALVALUE_SOURCES = ROOT / "_system" / "reference" / "data-sources" / "terminalvalue_candidates.json"
 SUMZERO_INDEX = ROOT / "_system" / "reference" / "data-sources" / "sumzero_ideas_index.json"
+DOCUMENT_REGISTRY_PATH = ROOT / "dashboard" / "data" / "document_registry.json"
+DRIVE_AUDIT_PATH = ROOT / "_system" / "reference" / "document-store" / "drive_audit_latest.json"
 
 VALID_TICKER_RE = re.compile(r"^[A-Z0-9][A-Z0-9.\-]{0,11}$")
 DOCUMENT_SUFFIXES = {".pdf", ".htm", ".html", ".md", ".txt", ".json"}
@@ -1287,8 +1289,12 @@ def build_source_health(
     earnings_doc = load_json(EARNINGS_CACHE)
     terminalvalue_doc = load_json(TERMINALVALUE_SOURCES)
     sumzero_doc = load_json(SUMZERO_INDEX)
+    registry_doc = load_json(DOCUMENT_REGISTRY_PATH)
+    drive_audit_doc = load_json(DRIVE_AUDIT_PATH)
     sumzero_summary = (sumzero_doc or {}).get("summary") if isinstance(sumzero_doc, dict) else {}
     sumzero_archive = (sumzero_doc or {}).get("archive") if isinstance(sumzero_doc, dict) else {}
+    registry_summary = (registry_doc or {}).get("summary") if isinstance(registry_doc, dict) else {}
+    drive_audit_summary = (drive_audit_doc or {}).get("summary") if isinstance(drive_audit_doc, dict) else {}
     filing_files = latest_filing_fact_files()
     insider_tickers = (insider_manifest or {}).get("tickers") if isinstance(insider_manifest, dict) else {}
     insider_errors = [
@@ -1359,6 +1365,27 @@ def build_source_health(
             "archive_latest_modified": (sumzero_archive or {}).get("latest_modified"),
             "path": relative_path(SUMZERO_INDEX),
             "notes": "Local SumZero Ideas archive index; raw documents stay out of git.",
+        },
+        "pdf_store": {
+            "status": (
+                "missing"
+                if not registry_summary
+                else (
+                    "degraded"
+                    if (registry_summary.get("pending_upload_count") or 0)
+                    or (drive_audit_summary.get("duplicate_sha_count") or 0)
+                    else "ok"
+                )
+            ),
+            "records": registry_summary.get("document_count", 0),
+            "items": registry_summary.get("uploaded_count", 0),
+            "pending_uploads": registry_summary.get("pending_upload_count", 0),
+            "drive_pdfs": drive_audit_summary.get("drive_pdf_count"),
+            "orphans": drive_audit_summary.get("orphan_drive_pdf_count"),
+            "duplicate_sha_groups": drive_audit_summary.get("duplicate_sha_count"),
+            "as_of": normalize_date((registry_doc or {}).get("generated_at")) if isinstance(registry_doc, dict) else None,
+            "path": relative_path(DOCUMENT_REGISTRY_PATH),
+            "notes": "Google Drive canonical PDF store; orphan count is unmanaged legacy PDFs retained under canonical folders.",
         },
         "terminalvalue_candidates": {
             "status": "ok" if terminalvalue_doc else "missing",
