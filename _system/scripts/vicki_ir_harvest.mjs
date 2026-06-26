@@ -16,6 +16,7 @@ import { Agent, CursorAgentError } from "@cursor/sdk";
 const ticker = process.env.TICKER?.trim();
 const apiKey = process.env.CURSOR_API_KEY?.trim();
 const repo = process.env.GITHUB_REPOSITORY?.trim();
+const startingRef = process.env.CURSOR_STARTING_REF?.trim();
 const pickReason = process.env.PICK_REASON?.trim() || "ir_gap";
 const date = new Date().toISOString().slice(0, 10);
 
@@ -54,11 +55,13 @@ const repoUrl = `https://github.com/${repo}`;
 
 try {
   console.log(`Starting Vicki IR harvest for ${ticker} on ${repoUrl}...`);
+  console.log(`Starting ref: ${startingRef || "(Cursor default branch)"}`);
+  const repoSpec = startingRef ? { url: repoUrl, startingRef } : { url: repoUrl };
   const result = await Agent.prompt(prompt, {
     apiKey,
     model: { id: "composer-2.5" },
     cloud: {
-      repos: [{ url: repoUrl }],
+      repos: [repoSpec],
       autoCreatePR: true,
       skipReviewerRequest: true,
     },

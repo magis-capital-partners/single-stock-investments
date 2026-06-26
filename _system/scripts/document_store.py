@@ -18,17 +18,31 @@ def _clean_ref(ref: str | None) -> tuple[str | None, str]:
     return base.replace("\\", "/"), f"#{anchor}" if sep else ""
 
 
+_REGISTRY_CACHE: dict | None = None
+_INDEX_CACHE: dict[int, dict[str, dict[str, dict]]] = {}
+
+
 def load_document_registry() -> dict:
+    global _REGISTRY_CACHE
+    if _REGISTRY_CACHE is not None:
+        return _REGISTRY_CACHE
     if not REGISTRY_PATH.exists():
-        return {}
+        _REGISTRY_CACHE = {}
+        return _REGISTRY_CACHE
     try:
-        return json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
+        _REGISTRY_CACHE = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
     except json.JSONDecodeError:
-        return {}
+        _REGISTRY_CACHE = {}
+    return _REGISTRY_CACHE
 
 
 def registry_indexes(registry: dict | None = None) -> dict[str, dict[str, dict]]:
     registry = registry or load_document_registry()
+    # cache the (expensive) index build per registry object identity
+    key = id(registry)
+    cached = _INDEX_CACHE.get(key)
+    if cached is not None:
+        return cached
     docs = registry.get("documents") or []
     by_pdf: dict[str, dict] = {}
     by_text: dict[str, dict] = {}
@@ -44,7 +58,9 @@ def registry_indexes(registry: dict | None = None) -> dict[str, dict[str, dict]]
             by_text[str(doc["text_extract_path"]).replace("\\", "/")] = doc
         for text_path in doc.get("alternate_text_extract_paths") or []:
             by_text[str(text_path).replace("\\", "/")] = doc
-    return {"by_pdf": by_pdf, "by_text": by_text, "by_id": by_id}
+    result = {"by_pdf": by_pdf, "by_text": by_text, "by_id": by_id}
+    _INDEX_CACHE[key] = result
+    return result
 
 
 def document_for_ref(ref: str | None, registry: dict | None = None) -> dict | None:
