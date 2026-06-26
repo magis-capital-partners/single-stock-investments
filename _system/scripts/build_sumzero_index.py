@@ -6,6 +6,7 @@ import argparse
 import hashlib
 import json
 import re
+import shutil
 import zipfile
 from collections import Counter
 from datetime import datetime, timezone
@@ -123,7 +124,7 @@ def safe_filename(value: str) -> str:
         return "sumzero-document.pdf"
     suffix = Path(name).suffix
     stem = Path(name).stem
-    max_len = 120
+    max_len = 80
     if len(name) > max_len:
         room = max_len - len(suffix)
         name = f"{stem[:room].rstrip(' .')}{suffix}"
@@ -132,6 +133,56 @@ def safe_filename(value: str) -> str:
 
 def staged_pdf_path(doc_id: str, filename: str, staging_dir: Path = STAGING_DIR) -> Path:
     return staging_dir / doc_id / safe_filename(filename)
+
+
+def slugify_title(value: str) -> str:
+    """Build a short, human-readable folder slug from an idea title."""
+    slug = re.sub(r"\s+", "-", normalize(value)).strip("-")
+    if len(slug) > 44:
+        slug = slug[:44].rsplit("-", 1)[0] or slug[:44]
+    return slug
+
+
+def descriptive_sumzero_dir(
+    used: dict[str, set[str]],
+    match: dict | None,
+    title: str,
+    doc_date: str,
+    doc_id: str,
+    staging_dir: Path = STAGING_DIR,
+) -> Path:
+    """Resolve a descriptive staging folder: {TICKER|_unmatched}/{date-title-slug}.
+
+    Ticker-matched ideas land under their ticker so build_document_registry maps
+    them to single-stocks/{TICKER}/sumzero/...; unmatched ideas go to _unmatched/.
+    A short doc_id suffix is appended only when two ideas collide on the same slug.
+    """
+    scope = str(match.get("ticker")).upper() if match and match.get("ticker") else "_unmatched"
+    date_prefix = doc_date if re.match(r"^\d{4}-\d{2}-\d{2}$", doc_date or "") else "undated"
+    title_slug = slugify_title(title) or "sumzero-idea"
+    name = f"{date_prefix}-{title_slug}"
+    seen = used.setdefault(scope, set())
+    if name in seen:
+        name = f"{name}-{doc_id[:6]}"
+    seen.add(name)
+    return staging_dir / scope / name
+
+
+def clean_staging_dir(staging_dir: Path) -> None:
+    """Remove derived staged SumZero PDFs before extracting the canonical layout."""
+    resolved = staging_dir.resolve()
+    expected = STAGING_DIR.resolve()
+    if resolved != expected and expected not in resolved.parents:
+        raise SystemExit(f"Refusing to clean unexpected staging path: {staging_dir}")
+    if not staging_dir.exists():
+        return
+    for child in staging_dir.iterdir():
+        if child.name == ".gitkeep":
+            continue
+        if child.is_dir():
+            shutil.rmtree(child)
+        elif child.suffix.lower() == ".pdf":
+            child.unlink()
 
 
 def extract_pdf_member(zf: zipfile.ZipFile, info: zipfile.ZipInfo, target: Path) -> None:
@@ -268,7 +319,12 @@ def match_entry(title: str, aliases: list[dict]) -> dict | None:
     }
 
 
-def build_index(archive: Path, extract_pdfs: bool = True, staging_dir: Path = STAGING_DIR) -> dict:
+def build_index(
+    archive: Path,
+    extract_pdfs: bool = True,
+    staging_dir: Path = STAGING_DIR,
+    clean_staging: bool = True,
+) -> dict:
     generated_at = now_utc()
     registry_rows = load_registry_rows()
     aliases = build_alias_rows(registry_rows)
@@ -296,6 +352,10 @@ def build_index(archive: Path, extract_pdfs: bool = True, staging_dir: Path = ST
     total_bytes = 0
 
     extracted_pdf_count = 0
+    used_slugs: dict[str, set[str]] = {}
+
+    if extract_pdfs and clean_staging:
+        clean_staging_dir(staging_dir)
 
     with zipfile.ZipFile(archive) as zf:
         entries = [info for info in zf.infolist() if not info.is_dir() and info.file_size > 0]
@@ -309,9 +369,11 @@ def build_index(archive: Path, extract_pdfs: bool = True, staging_dir: Path = ST
             total_bytes += info.file_size
             doc_date = guess_document_date(title, modified)
             direction, tags = direction_and_tags(title)
+            match = match_entry(title, aliases)
             local_pdf_path = None
             if document_type(filename) == "pdf":
-                target = staged_pdf_path(doc_id, filename, staging_dir)
+                folder = descriptive_sumzero_dir(used_slugs, match, title, doc_date, doc_id, staging_dir)
+                target = folder / safe_filename(filename)
                 if extract_pdfs:
                     extract_pdf_member(zf, info, target)
                     extracted_pdf_count += 1
@@ -331,7 +393,6 @@ def build_index(archive: Path, extract_pdfs: bool = True, staging_dir: Path = ST
             }
             if local_pdf_path:
                 doc["local_pdf_path"] = local_pdf_path
-            match = match_entry(title, aliases)
             if match:
                 doc["match"] = match
                 matched.append(doc)
@@ -380,9 +441,15 @@ def main() -> int:
     parser.add_argument("--output", type=Path, default=OUTPUT, help="Output JSON path")
     parser.add_argument("--staging-dir", type=Path, default=STAGING_DIR, help="Gitignored folder for extracted SumZero PDFs")
     parser.add_argument("--no-extract-pdfs", action="store_true", help="Only index the archive; do not refresh staged PDFs")
+    parser.add_argument("--no-clean-staging", action="store_true", help="Keep existing staged SumZero PDFs instead of replacing them")
     args = parser.parse_args()
 
-    doc = build_index(args.archive.expanduser(), extract_pdfs=not args.no_extract_pdfs, staging_dir=args.staging_dir)
+    doc = build_index(
+        args.archive.expanduser(),
+        extract_pdfs=not args.no_extract_pdfs,
+        staging_dir=args.staging_dir,
+        clean_staging=not args.no_clean_staging,
+    )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(doc, indent=2) + "\n", encoding="utf-8")
     summary = doc.get("summary") or {}

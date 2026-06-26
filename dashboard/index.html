@@ -665,10 +665,13 @@ const INSIGHT_SOURCE_LABEL = {
   earnings: 'earnings',
   insider: 'insider',
   superinvestor_letter: 'letter',
+  sumzero_research: 'SumZero',
+  company_document: 'company',
   news: 'news',
   third_party: 'research',
   macro: 'macro',
   theme: 'theme',
+  pdf: 'PDF',
 };
 
 let data = null;
@@ -684,10 +687,10 @@ let activeView = 'holdings';
 let activeDarwinAccount = 'roth';
 let expandedPersona = null;
 let activeInsightFilter = 'letters';
-let insightsQuarter = 'all';
+let insightsQuarter = 'latest';
 let fundRegistrySearch = '';
-let insightsBookOnly = false;
-let insightsSection = 'events';
+let insightsBookOnly = true;
+let insightsSection = 'overview';
 let selectedFundId = null;
 let darwinEquityChart = null;
 let darwinHoldingsChart = null;
@@ -946,6 +949,7 @@ function renderInsights() {
     activeSection: insightsSection,
     tickers: data.tickers || [],
     memory: data.research_memory || null,
+    documentCatalog: data.document_catalog || null,
   });
   content.querySelectorAll('[data-insights-quarter]').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -1321,6 +1325,14 @@ function renderSummary() {
   if (s.equity_models_ready > 0) {
     cards.push({ label: 'Equity models', value: s.equity_models_ready, sub: 'click ticker to view' });
   }
+  const catalog = data.document_catalog?.summary;
+  if (catalog) {
+    cards.push({
+      label: 'PDF store',
+      value: Number(catalog.uploaded_count || 0).toLocaleString(),
+      sub: `${Number(catalog.pending_upload_count || 0).toLocaleString()} pending`,
+    });
+  }
   document.getElementById('summary').innerHTML = cards.map(c => `
     <div class="summary-card">
       <div class="label">${c.label}</div>
@@ -1413,7 +1425,9 @@ function renderTable() {
       <td class="mono ticker-cell">${t.ticker}${t.equity_model?.ready ? ` <span class="badge badge-ok" title="Earnings model ${t.equity_model.production_spec || 'v5'} ready">M</span>` : ''}${t.onboard?.phase && t.onboard.phase !== 'complete' ? `<span class="onboard-badge">${t.onboard.phase}</span>` : ''}</td>
       <td>${t.company}</td>
       <td><span class="badge ${MARKET_BADGE[t.market] || 'badge-us'}">${t.market}</span></td>
-      <td class="mono">${t.pdf_count}${t.sec_filings ? ` <span style="color:var(--text-muted);font-size:11px">+${t.sec_filings} SEC</span>` : ''}</td>
+      <td class="mono">${t.pdf_store?.drive_folder_url
+        ? `<a class="source-open-link" href="${t.pdf_store.drive_folder_url}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${t.pdf_count}</a>`
+        : t.pdf_count}${t.sec_filings ? ` <span style="color:var(--text-muted);font-size:11px">+${t.sec_filings} SEC</span>` : ''}</td>
       <td>
         <div style="display:flex;align-items:center;gap:8px">
           <div class="bar-wrap"><div class="bar-fill" style="width:${t.completeness}%"></div></div>

@@ -22,6 +22,8 @@
     insider: 'Insider',
     sumzero_research: 'SumZero',
     third_party: 'Research',
+    company_document: 'Company',
+    pdf: 'PDF',
     theme: 'Theme',
     news: 'News',
   };
@@ -185,10 +187,20 @@
       ownership: 'insider',
       news: 'news',
       sumzero: 'sumzero_research',
-      research: ['third_party', 'sumzero_research'],
+      company: 'company_document',
+      research: ['third_party', 'sumzero_research', 'research'],
       third_party: 'third_party',
     };
     const src = map[filter] || filter;
+    if (filter === 'vic') {
+      return insights.filter(r =>
+        r.source === 'third_party'
+        && [r.publisher, r.source_name, r.source_path, r.evidence_ref, r.evidence_url]
+          .join(' ')
+          .toLowerCase()
+          .includes('vic')
+      );
+    }
     if (Array.isArray(src)) return insights.filter(r => src.includes(r.source));
     return insights.filter(r => r.source === src);
   }
@@ -232,12 +244,11 @@
     const pills = [
       { id: 'letters', label: 'Letters' },
       { id: 'filings', label: 'Filings' },
-      { id: 'earnings', label: 'Earnings' },
-      { id: 'insider', label: 'Insider' },
+      { id: 'company', label: 'Company' },
+      { id: 'vic', label: 'VIC' },
       { id: 'sumzero', label: 'SumZero' },
-      { id: 'news', label: 'News' },
-      { id: 'macro', label: 'Macro' },
       { id: 'research', label: 'Research' },
+      { id: 'news', label: 'News' },
       { id: 'all', label: 'All' },
     ];
     const otherBlock = `
@@ -688,6 +699,66 @@
       </div>`;
   }
 
+  function filterDocumentCatalog(catalog, opts) {
+    const { search = '', quarter = 'all', bookOnly = false } = opts || {};
+    const q = search.toLowerCase();
+    let rows = catalog?.documents || [];
+    if (quarter && quarter !== 'all') {
+      const label = quarter.replace(/^(\d{4})Q([1-4])$/, '$1 Q$2');
+      rows = rows.filter(r => !r.quarter || r.quarter === label || r.quarter === quarter);
+    }
+    if (bookOnly) {
+      rows = rows.filter(r => r.ticker);
+    }
+    if (q) {
+      rows = rows.filter(r => [
+        r.ticker,
+        r.title,
+        r.source_label,
+        r.source_type,
+        r.quarter,
+        r.drive_folder_path,
+      ].join(' ').toLowerCase().includes(q));
+    }
+    return rows;
+  }
+
+  function renderDocumentCatalog(catalog, escapeHtml, linkHtml, opts) {
+    const rows = filterDocumentCatalog(catalog, opts).slice(0, 300);
+    const summary = catalog?.summary || {};
+    const bySource = summary.by_source_type || {};
+    const cards = Object.entries(bySource)
+      .sort((a, b) => b[1] - a[1])
+      .map(([source, count]) => `<span class="badge badge-us">${escapeHtml(SOURCE_LABEL[source] || source.replace(/_/g, ' '))}: ${count}</span>`)
+      .join('');
+    if (!catalog) {
+      return '<p class="subhead">PDF catalog not built. Run: python _system/scripts/build_dashboard_data.py</p>';
+    }
+    return `
+      <div class="detail-section">
+        <h3>PDF library</h3>
+        <p class="tier-sub" style="margin-bottom:8px">
+          ${summary.document_count || 0} documents · ${summary.uploaded_count || 0} uploaded · ${summary.pending_upload_count || 0} pending
+        </p>
+        <div class="source-card-badges" style="margin-bottom:10px">${cards}</div>
+        <table class="darwin-table" id="insights-document-catalog">
+          <thead><tr><th>Source</th><th>Ticker</th><th>Quarter</th><th>Title</th><th>Folder</th><th></th></tr></thead>
+          <tbody>
+            ${rows.map(r => `
+              <tr>
+                <td><span class="badge badge-us">${escapeHtml(r.source_label || r.source_type || 'PDF')}</span></td>
+                <td class="mono">${escapeHtml(r.ticker || '—')}</td>
+                <td class="mono">${escapeHtml(r.quarter || '—')}</td>
+                <td style="min-width:280px">${escapeHtml(r.title || 'Untitled')}</td>
+                <td class="tier-sub">${escapeHtml(r.drive_folder_path || '')}</td>
+                <td>${r.drive_web_view_link ? linkHtml(r.drive_web_view_link, 'PDF', 'source-open-link') : '—'}</td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+        ${(catalog.documents || []).length > rows.length ? `<p class="tier-sub">${(catalog.documents || []).length - rows.length} more documents outside the current table window.</p>` : ''}
+      </div>`;
+  }
+
   function renderMemoryLedger(memory, escapeHtml, linkHtml, opts) {
     const { search = '', bookOnly = false } = opts || {};
     const q = search.toLowerCase();
@@ -802,6 +873,7 @@
       activeSection = 'events',
       tickers = [],
       memory = null,
+      documentCatalog = null,
     } = options || {};
 
     const profiles = insights?.fund_profiles || {};
@@ -810,10 +882,16 @@
     }
 
     const byQ = insights?.theme_rankings_by_quarter || {};
-    const quarters = Object.keys(byQ).filter(q => q !== 'all').sort().reverse();
-    const themes = byQ[quarter] || insights?.theme_rankings || [];
+    const letterIndex = insights?.letter_index || [];
+    const quarterSet = new Set([
+      ...Object.keys(byQ).filter(q => q && q !== 'all'),
+      ...letterIndex.map(r => r.quarter).filter(Boolean),
+    ]);
+    const quarters = Array.from(quarterSet).sort().reverse();
+    const effectiveQuarter = quarter === 'latest' ? (quarters[0] || 'all') : quarter;
+    const themes = byQ[effectiveQuarter] || insights?.theme_rankings || [];
     let funds = insights?.fund_registry || [];
-    let letters = filterLetterIndex(insights?.letter_index || [], { quarter, search: fundSearch, bookOnly });
+    let letters = filterLetterIndex(letterIndex, { quarter: effectiveQuarter, search: fundSearch, bookOnly });
 
     if (fundSearch) {
       const q = fundSearch.toLowerCase();
@@ -826,31 +904,42 @@
     if (bookOnly) {
       funds = funds.filter(f => (f.our_ticker_count || 0) > 0);
     }
-    if (quarter && quarter !== 'all') {
-      funds = funds.filter(f => f.quarter === quarter);
+    if (effectiveQuarter && effectiveQuarter !== 'all') {
+      funds = funds.filter(f => f.quarter === effectiveQuarter);
     }
 
     const qTabs = [{ id: 'all', label: 'All' }, ...quarters.map(q => ({ id: q, label: q }))];
     const sections = [
+      { id: 'overview', label: 'Overview' },
       { id: 'events', label: 'What changed' },
+      { id: 'letters', label: 'Letters' },
+      { id: 'funds', label: 'Funds' },
+      { id: 'documents', label: 'PDF library' },
       { id: 'tickers', label: 'Ticker insights' },
       { id: 'memory', label: 'Research memory' },
-      { id: 'biotech', label: 'Biotech' },
       { id: 'themes', label: 'Themes' },
-      { id: 'sources', label: 'Source health' },
+      { id: 'sources', label: 'Pipeline status' },
     ];
 
     let body = '';
-    if (activeSection === 'events') {
+    if (activeSection === 'overview') {
+      body = renderSourceHealth(insights?.source_health || {}, escapeHtml);
+    } else if (activeSection === 'events') {
       body = renderEventQueue(insights?.events || [], escapeHtml, linkHtml, ghRepo, { search: fundSearch, bookOnly });
+    } else if (activeSection === 'letters') {
+      const scope = effectiveQuarter && effectiveQuarter !== 'all' ? effectiveQuarter : 'all quarters';
+      body = `<p class="tier-sub" style="margin-bottom:8px">${letters.length} letter(s) · ${escapeHtml(scope)}${bookOnly ? ' · overlap with our book only' : ''}</p>`
+        + renderLetterIndex(letters, escapeHtml, linkHtml, ghRepo, true);
+    } else if (activeSection === 'funds') {
+      body = renderFundRegistry(funds, escapeHtml, linkHtml, ghRepo, bookOnly);
+    } else if (activeSection === 'documents') {
+      body = renderDocumentCatalog(documentCatalog, escapeHtml, linkHtml, { search: fundSearch, quarter: effectiveQuarter, bookOnly });
     } else if (activeSection === 'tickers') {
       body = renderTickerEssentials(tickers, escapeHtml, linkHtml, { search: fundSearch, bookOnly });
     } else if (activeSection === 'memory') {
       body = renderMemoryLedger(memory, escapeHtml, linkHtml, { search: fundSearch, bookOnly })
         + '<div style="height:14px"></div>'
         + renderMemoryReviewQueue(memory, escapeHtml);
-    } else if (activeSection === 'biotech') {
-      body = renderBiotechMemory(memory, escapeHtml, linkHtml);
     } else if (activeSection === 'themes') {
       body = renderThemeRankings(themes, escapeHtml);
     } else {
@@ -868,7 +957,7 @@
       </nav>
       <div class="detail-section" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:10px">
         <nav class="view-tabs" id="insights-quarter-tabs">
-          ${qTabs.map(t => `<button type="button" class="view-tab${quarter === t.id ? ' active' : ''}" data-insights-quarter="${escapeHtml(t.id)}">${escapeHtml(t.label)}</button>`).join('')}
+          ${qTabs.map(t => `<button type="button" class="view-tab${effectiveQuarter === t.id ? ' active' : ''}" data-insights-quarter="${escapeHtml(t.id)}">${escapeHtml(t.label)}</button>`).join('')}
         </nav>
         <label class="tier-sub" style="display:flex;align-items:center;gap:6px">
           <input type="checkbox" id="insights-book-only" ${bookOnly ? 'checked' : ''} />

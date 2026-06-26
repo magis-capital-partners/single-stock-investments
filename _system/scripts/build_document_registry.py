@@ -6,6 +6,7 @@ import hashlib
 import json
 import mimetypes
 import os
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -15,6 +16,7 @@ CONFIG_PATH = ROOT / "_system" / "reference" / "document-store" / "google_drive_
 DEFAULT_LETTERS_DRIVE_FOLDER_ID = "0AFpaOm4iTLqjUk9PVA"
 DEFAULT_GENERAL_DRIVE_FOLDER_ID = "0AFpaOm4iTLqjUk9PVA"
 SKIP_PARTS = {".git", ".cursor", "_external", "__pycache__", "node_modules"}
+SKIP_TICKER_DIRS = {"_system", "dashboard", ".git", ".github", ".cursor", "_external"}
 
 
 def load_json(path: Path, default):
@@ -88,19 +90,53 @@ def drive_root_for_source(source_type: str, config: dict) -> tuple[str, dict]:
     return default_key, roots.get(default_key) or next(iter(roots.items()))[1]
 
 
+QUARTER_RE = re.compile(r"^(\d{4})Q([1-4])$", re.IGNORECASE)
+
+
+def format_quarter(value: str) -> str:
+    """Render a quarter folder name as a human label, e.g. 2026Q1 -> '2026 Q1'."""
+    m = QUARTER_RE.match(value or "")
+    return f"{m.group(1)} Q{m.group(2)}" if m else value
+
+
 def drive_folder_path_for(path: Path) -> str:
+    """Map a local PDF path to its canonical Drive folder path.
+
+    Layout (post-reorg):
+      Letters/{YYYY Qn}/...                 hedge fund / superinvestor letters
+      Single Stocks/{TICKER}/Company/...    company & IR documents
+      Single Stocks/{TICKER}/VIC/...        Value Investors Club write-ups
+      Single Stocks/{TICKER}/Research/...   other per-ticker third-party research
+      Single Stocks/{TICKER}/SumZero/...    ticker-matched SumZero ideas
+      Research Sources/SumZero Unmatched/... SumZero ideas with no ticker match
+    """
     parts = list(path.relative_to(ROOT).parts[:-1])
     if parts[:3] == ["_system", "reference", "superinvestor-letters"]:
-        return "/".join(["superinvestor-letters", *parts[3:]])
+        rest = parts[3:]
+        if rest:
+            return "/".join(["Letters", format_quarter(rest[0]), *rest[1:]])
+        return "Letters"
     if parts[:3] == ["_system", "reference", "sumzero-research"]:
-        return "/".join(["sumzero-research", *parts[3:]])
+        rest = parts[3:]
+        if not rest:
+            return "Research Sources/SumZero Unmatched"
+        if rest[0] == "_unmatched":
+            return "/".join(["Research Sources", "SumZero Unmatched", *rest[1:]])
+        return "/".join(["Single Stocks", rest[0], "SumZero", *rest[1:]])
     if len(parts) >= 2 and parts[1] == "third-party-analyses":
-        return "/".join(["third-party-research", parts[0], *parts[2:]])
+        ticker, rest = parts[0], parts[2:]
+        if rest and rest[0].lower() == "vic":
+            return "/".join(["Single Stocks", ticker, "VIC", *rest[1:]])
+        return "/".join(["Single Stocks", ticker, "Research", *rest])
     if len(parts) >= 2 and parts[1] == "investor-documents":
-        return "/".join(["company-documents", parts[0], *parts[2:]])
+        return "/".join(["Single Stocks", parts[0], "Company", *parts[2:]])
+    if parts and (ROOT / parts[0]).is_dir() and parts[0] not in SKIP_TICKER_DIRS and not parts[0].startswith((".", "_")):
+        return "/".join(["Single Stocks", parts[0], "Files", *parts[1:]])
     if parts[:3] == ["_system", "dropbox_ingestion", "00_sources"]:
-        return "/".join(["dropbox-ingestion", *parts[3:]])
-    return "/".join(parts) or "uncategorized"
+        return "/".join(["Research Sources", "Dropbox Ingestion", *parts[3:]])
+    if parts[:3] == ["_system", "reference", "investment-wisdom"]:
+        return "/".join(["Research Sources", "Investment Wisdom", *parts[3:]])
+    return "/".join(["Research Sources", "Uncategorized", *parts]) if parts else "Research Sources/Uncategorized"
 
 
 def text_extract_for(pdf: Path) -> str | None:
@@ -203,7 +239,7 @@ def build() -> dict:
             "drive_root_key": drive_root_key,
             "drive_root_label": drive_root.get("label"),
             "drive_root_folder_id": drive_root.get("folder_id"),
-            "drive_folder_path": prior.get("drive_folder_path") or drive_folder_path,
+            "drive_folder_path": drive_folder_path,
             "drive_folder_id": prior_drive_folder_id(prior),
             "drive_file_id": prior.get("drive_file_id"),
             "drive_web_view_link": prior.get("drive_web_view_link"),

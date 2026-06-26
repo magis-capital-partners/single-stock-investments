@@ -7,6 +7,7 @@ import json
 import os
 import re
 import sys
+from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -21,6 +22,8 @@ DATA_DIR = ROOT / "dashboard" / "data"
 OUTPUT = DATA_DIR / "dashboard_data.json"
 RESEARCH_MEMORY_PATH = DATA_DIR / "research_memory.json"
 DOCUMENT_REGISTRY_PATH = DATA_DIR / "document_registry.json"
+DOCUMENT_CATALOG_PATH = DATA_DIR / "document_catalog.json"
+DRIVE_FOLDER_INDEX_PATH = ROOT / "_system" / "reference" / "document-store" / "drive_folder_index.json"
 CLASS_PATH = ROOT / "_system" / "portfolio" / "classification.json"
 REGISTRY_PATH = ROOT / "_system" / "portfolio" / "registry.json"
 SLEEVES_PATH = ROOT / "_system" / "portfolio" / "investment_sleeves.json"
@@ -220,6 +223,129 @@ def has_download_script(ticker_dir: Path) -> tuple[bool, str | None]:
 
 def count_pdfs(ticker_dir: Path) -> int:
     return sum(1 for _ in ticker_dir.rglob("*.pdf"))
+
+
+def source_type_label(source_type: str | None) -> str:
+    labels = {
+        "superinvestor_letter": "Letters",
+        "company_document": "Company",
+        "third_party": "VIC / third party",
+        "sumzero_research": "SumZero",
+        "research": "Research",
+        "dropbox_ingestion": "Dropbox ingestion",
+        "pdf": "Other PDFs",
+    }
+    return labels.get(source_type or "", str(source_type or "Other").replace("_", " ").title())
+
+
+def catalog_ticker(doc: dict) -> str | None:
+    folder = str(doc.get("drive_folder_path") or "")
+    parts = [p for p in folder.split("/") if p]
+    if len(parts) >= 2 and parts[0] == "Single Stocks":
+        return parts[1]
+    local = str(doc.get("local_pdf_path") or "")
+    first = local.split("/", 1)[0]
+    if first and (ROOT / first).is_dir() and first not in SKIP_TICKER_DIRS and not first.startswith((".", "_")):
+        return first
+    return None
+
+
+def catalog_quarter(doc: dict) -> str | None:
+    folder = str(doc.get("drive_folder_path") or "")
+    parts = [p for p in folder.split("/") if p]
+    if len(parts) >= 2 and parts[0] == "Letters":
+        return parts[1]
+    local = str(doc.get("local_pdf_path") or "")
+    m = re.search(r"superinvestor-letters/(\d{4})Q([1-4])/", local)
+    if m:
+        return f"{m.group(1)} Q{m.group(2)}"
+    return None
+
+
+def load_drive_folder_index() -> dict:
+    if not DRIVE_FOLDER_INDEX_PATH.exists():
+        return {"folders": {}, "generated_at": None}
+    try:
+        return json.loads(DRIVE_FOLDER_INDEX_PATH.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return {"folders": {}, "generated_at": None}
+
+
+def folder_url(folder_id: str | None) -> str | None:
+    return f"https://drive.google.com/drive/folders/{folder_id}" if folder_id else None
+
+
+def build_document_catalog(document_registry: dict | None) -> dict | None:
+    if not isinstance(document_registry, dict):
+        return None
+    docs = document_registry.get("documents") or []
+    folder_index = load_drive_folder_index()
+    folders = folder_index.get("folders") or {}
+    rows: list[dict] = []
+    by_source: Counter[str] = Counter()
+    by_ticker: Counter[str] = Counter()
+    by_quarter: Counter[str] = Counter()
+    for doc in docs:
+        source_type = doc.get("source_type") or "pdf"
+        ticker = catalog_ticker(doc)
+        quarter = catalog_quarter(doc)
+        folder_path = doc.get("drive_folder_path")
+        row = {
+            "document_id": doc.get("document_id"),
+            "title": doc.get("title"),
+            "ticker": ticker,
+            "quarter": quarter,
+            "source_type": source_type,
+            "source_label": source_type_label(source_type),
+            "drive_folder_path": folder_path,
+            "drive_folder_id": doc.get("drive_folder_id"),
+            "drive_folder_url": folder_url(doc.get("drive_folder_id")),
+            "drive_web_view_link": doc.get("drive_web_view_link"),
+            "modified_at": doc.get("modified_at"),
+            "size_bytes": doc.get("size_bytes"),
+        }
+        if folder_path and folder_path in folders:
+            row["drive_folder_id"] = folders[folder_path].get("id") or row.get("drive_folder_id")
+            row["drive_folder_url"] = folders[folder_path].get("webViewLink") or folder_url(row.get("drive_folder_id"))
+        rows.append(row)
+        by_source[source_type] += 1
+        if ticker:
+            by_ticker[ticker] += 1
+        if quarter:
+            by_quarter[quarter] += 1
+    rows.sort(key=lambda r: ((r.get("source_label") or ""), (r.get("ticker") or ""), (r.get("title") or "")))
+    catalog = {
+        "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "registry_generated_at": document_registry.get("generated_at"),
+        "folder_index_generated_at": folder_index.get("generated_at"),
+        "summary": {
+            "document_count": len(rows),
+            "uploaded_count": (document_registry.get("summary") or {}).get("uploaded_count", 0),
+            "pending_upload_count": (document_registry.get("summary") or {}).get("pending_upload_count", 0),
+            "by_source_type": dict(sorted(by_source.items())),
+            "by_ticker": dict(sorted(by_ticker.items())),
+            "by_quarter": dict(sorted(by_quarter.items(), reverse=True)),
+        },
+        "documents": rows,
+    }
+    DOCUMENT_CATALOG_PATH.write_text(json.dumps(catalog, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return catalog
+
+
+def attach_pdf_store_rows(rows: list[dict], catalog: dict | None) -> None:
+    if not isinstance(catalog, dict):
+        return
+    folders = (load_drive_folder_index().get("folders") or {})
+    by_ticker = ((catalog.get("summary") or {}).get("by_ticker") or {})
+    for row in rows:
+        ticker = row.get("ticker")
+        ticker_folder = folders.get(f"Single Stocks/{ticker}") or {}
+        row["pdf_store"] = {
+            "count": int(by_ticker.get(ticker, 0) or 0),
+            "drive_folder_path": f"Single Stocks/{ticker}",
+            "drive_folder_id": ticker_folder.get("id"),
+            "drive_folder_url": ticker_folder.get("webViewLink") or folder_url(ticker_folder.get("id")),
+        }
 
 
 def count_sec_filings(ticker_dir: Path) -> int:
@@ -1389,9 +1515,11 @@ def main() -> None:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     equity_payload = build_equity_models()
     document_registry = build_document_registry()
+    document_catalog = build_document_catalog(document_registry)
     insights_doc = _load_json(DATA_DIR / "insights.json")
     memory_doc = build_research_memory()
     payload = build()
+    attach_pdf_store_rows(payload["tickers"], document_catalog)
     merge_equity_model_rows(payload["tickers"], equity_payload)
     model_ready = sum(1 for r in payload["tickers"] if (r.get("equity_model") or {}).get("ready"))
     payload["summary"]["equity_models_ready"] = model_ready
@@ -1400,8 +1528,14 @@ def main() -> None:
         payload["insights"] = insights_doc
     if memory_doc:
         payload["research_memory"] = memory_doc
-    if document_registry:
-        payload["document_registry"] = document_registry
+    if document_catalog:
+        payload["document_catalog"] = {
+            "generated_at": document_catalog.get("generated_at"),
+            "registry_generated_at": document_catalog.get("registry_generated_at"),
+            "folder_index_generated_at": document_catalog.get("folder_index_generated_at"),
+            "summary": document_catalog.get("summary"),
+            "documents": document_catalog.get("documents"),
+        }
     persona_cal = _load_json(DATA_DIR / "persona_calibration.json")
     if persona_cal:
         payload["persona_calibration"] = persona_cal

@@ -14,6 +14,7 @@ from googleapiclient.discovery import build
 ROOT = Path(__file__).resolve().parents[2]
 REGISTRY_PATH = ROOT / "dashboard" / "data" / "document_registry.json"
 CONFIG_PATH = ROOT / "_system" / "reference" / "document-store" / "google_drive_config.json"
+AUDIT_OUTPUT = ROOT / "_system" / "reference" / "document-store" / "drive_audit_latest.json"
 SCOPES = ["https://www.googleapis.com/auth/drive.readonly"]
 
 
@@ -121,6 +122,8 @@ def main() -> int:
     args = parser.parse_args()
 
     audit = build_audit(args.root_id)
+    AUDIT_OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+    AUDIT_OUTPUT.write_text(json.dumps(audit, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     if args.json:
         print(json.dumps(audit, indent=2, sort_keys=True))
     else:

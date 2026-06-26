@@ -12,7 +12,7 @@ DATE ?= $(shell date +%Y-%m-%d)
 TICKER ?=
 DATE ?= $(shell date +%Y-%m-%d)
 
-.PHONY: research-check research-check-all depth-check depth-audit evidence milly-repass book-estimate book-estimate-all holdco-uplift short-scan hk-scan hk-cross-check-all hk-extract-refresh third-party-scan-all cross-check-all transcript-sync batch-refresh evidence-check darwin-pit-check darwin-build darwin-pit-audit darwin-sync-external darwin-explore persona-lens persona-insights persona-check document-registry document-sync-drive document-sync-drive-letters document-sync-drive-general research-memory sumzero-index
+.PHONY: research-check research-check-all depth-check depth-audit evidence milly-repass book-estimate book-estimate-all holdco-uplift short-scan hk-scan hk-cross-check-all hk-extract-refresh third-party-scan-all cross-check-all transcript-sync batch-refresh evidence-check darwin-pit-check darwin-build darwin-pit-audit darwin-sync-external darwin-explore persona-lens persona-insights persona-check document-registry document-sync-drive document-sync-drive-letters document-sync-drive-general document-drive-plan document-drive-migrate document-drive-cleanup document-drive-audit research-memory sumzero-index
 
 persona-lens:
 	$(PYTHON) $(SCRIPTS)/fetch_superinvestor_letters.py --all --build
@@ -37,7 +37,30 @@ persona-insights:
 
 document-registry:
 	$(PYTHON) $(SCRIPTS)/build_document_registry.py
+	$(PYTHON) $(SCRIPTS)/build_dashboard_data.py
 	@echo OK: document-registry
+
+document-drive-plan:
+	$(PYTHON) $(SCRIPTS)/plan_drive_reorg.py
+	$(PYTHON) $(SCRIPTS)/migrate_drive_pdf_store_layout.py --dry-run
+	$(PYTHON) $(SCRIPTS)/cleanup_drive_pdf_store.py --dry-run --trash-legacy-folders --trash-empty-duplicates
+	@echo OK: document-drive-plan
+
+document-drive-migrate:
+	$(PYTHON) $(SCRIPTS)/migrate_drive_pdf_store_layout.py --apply
+	$(PYTHON) $(SCRIPTS)/audit_drive_pdf_store.py
+	@echo OK: document-drive-migrate
+
+document-drive-cleanup:
+	$(PYTHON) $(SCRIPTS)/cleanup_drive_pdf_store.py --apply --trash-legacy-folders --trash-empty-duplicates
+	$(PYTHON) $(SCRIPTS)/dedupe_drive_pdf_store.py --dry-run
+	$(PYTHON) $(SCRIPTS)/audit_drive_pdf_store.py
+	@echo OK: document-drive-cleanup
+
+document-drive-audit:
+	$(PYTHON) $(SCRIPTS)/audit_drive_pdf_store.py
+	$(PYTHON) $(SCRIPTS)/plan_drive_reorg.py
+	@echo OK: document-drive-audit
 
 document-sync-drive:
 	$(PYTHON) $(SCRIPTS)/build_document_registry.py
