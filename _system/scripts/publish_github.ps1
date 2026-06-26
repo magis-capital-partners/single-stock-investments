@@ -1,5 +1,6 @@
 # Publish workspace to GitHub and refresh dashboard data.
-# Dashboard is served via GitHub Pages from /dashboard (see .github/workflows/dashboard-pages.yml).
+# GitHub Pages currently serves the legacy /docs folder on main (not dashboard/ directly).
+# Keep dashboard/ as the working tree, then mirror it into docs/ before push.
 $ErrorActionPreference = "Stop"
 $Root = "C:\Users\werdn\Documents\Investing\Single Stock Investments"
 Set-Location $Root
@@ -19,7 +20,9 @@ if (Get-Command gh -ErrorAction SilentlyContinue) {
 $RepoName = "single-stock-investments"
 
 python _system/scripts/build_dashboard_data.py
-git add -A
+robocopy dashboard docs /MIR /XD .git .wrangler /NFL /NDL /NJH /NJS /nc /ns /np | Out-Null
+if ($LASTEXITCODE -gt 7) { throw "robocopy dashboard -> docs failed with exit code $LASTEXITCODE" }
+git add dashboard docs
 if (-not (git diff --staged --quiet)) {
     git commit -m "chore: refresh dashboard data"
 }

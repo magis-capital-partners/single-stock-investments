@@ -731,6 +731,11 @@
       .sort((a, b) => b[1] - a[1])
       .map(([source, count]) => `<span class="badge badge-us">${escapeHtml(SOURCE_LABEL[source] || source.replace(/_/g, ' '))}: ${count}</span>`)
       .join('');
+    const byQuarter = summary.by_quarter || {};
+    const quarterCards = Object.entries(byQuarter)
+      .sort((a, b) => String(b[0]).localeCompare(String(a[0])))
+      .map(([quarter, count]) => `<span class="badge badge-purple">${escapeHtml(quarter)}: ${count}</span>`)
+      .join('');
     if (!catalog) {
       return '<p class="subhead">PDF catalog not built. Run: python _system/scripts/build_dashboard_data.py</p>';
     }
@@ -740,7 +745,8 @@
         <p class="tier-sub" style="margin-bottom:8px">
           ${summary.document_count || 0} documents · ${summary.uploaded_count || 0} uploaded · ${summary.pending_upload_count || 0} pending
         </p>
-        <div class="source-card-badges" style="margin-bottom:10px">${cards}</div>
+        <div class="source-card-badges" style="margin-bottom:6px">${cards}</div>
+        ${quarterCards ? `<div class="source-card-badges" style="margin-bottom:10px">${quarterCards}</div>` : ''}
         <table class="darwin-table" id="insights-document-catalog">
           <thead><tr><th>Source</th><th>Ticker</th><th>Quarter</th><th>Title</th><th>Folder</th><th></th></tr></thead>
           <tbody>
@@ -861,6 +867,93 @@
     return list;
   }
 
+  function consensusSentimentChip(sentiment, escapeHtml) {
+    const map = { accumulating: 'badge-ok', reducing: 'badge-bad', mixed: 'badge-warn', discussed: 'badge-us' };
+    return `<span class="badge ${map[sentiment] || 'badge-us'}">${escapeHtml(sentiment || 'discussed')}</span>`;
+  }
+
+  function consensusTickerCell(row, escapeHtml) {
+    const book = row.in_book ? '<span class="badge badge-ok" title="In our book" style="margin-left:4px">book</span>' : '';
+    return `<button type="button" class="linkish mono" data-select-ticker="${escapeHtml(row.ticker)}">${escapeHtml(row.ticker)}</button>${book}`;
+  }
+
+  function renderConsensus(consensus, escapeHtml, linkHtml, ghRepo, opts) {
+    const { quarter = 'all', bookOnly = false, search = '' } = opts || {};
+    if (!consensus || !consensus.by_quarter) {
+      return '<p class="subhead">No consensus built yet. Run <span class="mono">python _system/scripts/build_insights.py</span>.</p>';
+    }
+    const key = consensus.by_quarter[quarter] ? quarter : 'all';
+    const block = consensus.by_quarter[key] || {};
+    const q = (search || '').toLowerCase();
+    const matchRow = r => !q
+      || (r.ticker || '').toLowerCase().includes(q)
+      || (r.name || '').toLowerCase().includes(q)
+      || (r.fund || '').toLowerCase().includes(q);
+    const bookRow = r => !bookOnly || r.in_book;
+    const most = (block.most_discussed || []).filter(r => bookRow(r) && matchRow(r));
+    const changes = (block.biggest_changes || []).filter(r => bookRow(r) && matchRow(r));
+    const activity = (block.activity || []).filter(r => bookRow(r) && matchRow(r));
+    const summary = consensus.summary || {};
+    const scope = key === 'all' ? 'all quarters' : key;
+
+    const mostRows = most.slice(0, 60).map((r, i) => `
+      <tr>
+        <td class="mono" style="color:var(--text-muted)">${i + 1}</td>
+        <td>${consensusTickerCell(r, escapeHtml)}</td>
+        <td style="font-size:11px;max-width:200px">${escapeHtml((r.name || '').slice(0, 40))}</td>
+        <td class="mono" style="text-align:center">${r.fund_count}</td>
+        <td class="mono" style="text-align:center;color:var(--accent-green,#4ade80)">${r.buy_funds || 0}</td>
+        <td class="mono" style="text-align:center;color:var(--accent-red,#f87171)">${(r.sell_funds || 0) + (r.short_funds || 0)}</td>
+        <td class="mono" style="text-align:center">${r.net > 0 ? '+' : ''}${r.net}</td>
+        <td>${consensusSentimentChip(r.sentiment, escapeHtml)}</td>
+        <td style="font-size:10px;color:var(--text-muted);max-width:220px">${(r.funds || []).slice(0, 6).map(f => escapeHtml(f)).join(', ')}</td>
+      </tr>`).join('');
+
+    const activityRows = activity.slice(0, 120).map(r => `
+      <tr>
+        <td class="mono" style="font-size:11px">${escapeHtml(r.letter_date || '—')}</td>
+        <td>${r.fund_id ? `<button type="button" class="linkish" data-fund-id="${escapeHtml(r.fund_id)}">${escapeHtml(r.fund)}</button>` : escapeHtml(r.fund)}</td>
+        <td><span class="badge ${STANCE_BADGE[r.action] || 'badge-us'}">${escapeHtml(r.action)}</span></td>
+        <td>${consensusTickerCell(r, escapeHtml)}</td>
+        <td style="font-size:11px;max-width:340px">${escapeHtml((r.commentary || '').slice(0, 180))}</td>
+        <td>${evidenceLink(r.evidence_url, linkHtml, ghRepo, r.evidence_label)}</td>
+      </tr>`).join('');
+
+    const changesRows = changes.slice(0, 24).map(r => `
+      <tr>
+        <td>${consensusTickerCell(r, escapeHtml)}</td>
+        <td style="font-size:11px">${escapeHtml((r.name || '').slice(0, 32))}</td>
+        <td class="mono" style="text-align:center;color:${r.net >= 0 ? 'var(--accent-green,#4ade80)' : 'var(--accent-red,#f87171)'}">${r.net > 0 ? '+' : ''}${r.net}</td>
+        <td>${consensusSentimentChip(r.sentiment, escapeHtml)}</td>
+      </tr>`).join('');
+
+    return `
+      <p class="tier-sub" style="margin-bottom:6px">
+        Dataroma-style cross-fund consensus from superinvestor letters · ${summary.fund_count || 0} funds · ${summary.tickers_covered || 0} securities · scope <strong>${escapeHtml(scope)}</strong>${bookOnly ? ' · our book only' : ''}
+      </p>
+      <p class="tier-sub" style="margin-bottom:12px;color:var(--text-muted)">
+        Only high-confidence mentions (explicit ticker syntax or verified company name) are counted. Buy = new/added; sell = trimmed/exited/short.
+      </p>
+      <h4 style="font-size:12px;color:var(--text-muted);margin:6px 0">MOST DISCUSSED</h4>
+      ${most.length ? `<table class="darwin-table">
+        <thead><tr><th>#</th><th>Ticker</th><th>Name</th><th title="Distinct funds">Funds</th><th title="Funds buying">Buy</th><th title="Funds selling/short">Sell</th><th title="Buy minus sell funds">Net</th><th>Lean</th><th>Who</th></tr></thead>
+        <tbody>${mostRows}</tbody>
+      </table>` : '<p class="subhead">No securities match this filter.</p>'}
+      ${changes.length ? `
+      <h4 style="font-size:12px;color:var(--text-muted);margin:18px 0 6px">BIGGEST NET MOVES</h4>
+      <table class="darwin-table">
+        <thead><tr><th>Ticker</th><th>Name</th><th title="Net buying funds minus selling funds">Net funds</th><th>Lean</th></tr></thead>
+        <tbody>${changesRows}</tbody>
+      </table>` : ''}
+      ${activity.length ? `
+      <h4 style="font-size:12px;color:var(--text-muted);margin:18px 0 6px">POSITION ACTIVITY (NEW · ADD · TRIM · EXIT · SHORT)</h4>
+      <table class="darwin-table">
+        <thead><tr><th>Date</th><th>Fund</th><th>Action</th><th>Ticker</th><th>Commentary</th><th>Source</th></tr></thead>
+        <tbody>${activityRows}</tbody>
+      </table>
+      ${activity.length > 120 ? `<p class="tier-sub">${activity.length - 120} more — refine with search or quarter</p>` : ''}` : ''}`;
+  }
+
   function renderInsightsPanel(insights, options) {
     const {
       escapeHtml,
@@ -883,9 +976,13 @@
 
     const byQ = insights?.theme_rankings_by_quarter || {};
     const letterIndex = insights?.letter_index || [];
+    const catalogQuarters = Object.keys((documentCatalog?.summary?.by_quarter) || {});
+    const consensusQuarters = (insights?.consensus?.quarters) || [];
     const quarterSet = new Set([
       ...Object.keys(byQ).filter(q => q && q !== 'all'),
       ...letterIndex.map(r => r.quarter).filter(Boolean),
+      ...consensusQuarters.filter(Boolean),
+      ...catalogQuarters.filter(q => q && q !== 'all'),
     ]);
     const quarters = Array.from(quarterSet).sort().reverse();
     const effectiveQuarter = quarter === 'latest' ? (quarters[0] || 'all') : quarter;
@@ -912,6 +1009,7 @@
     const sections = [
       { id: 'overview', label: 'Overview' },
       { id: 'events', label: 'What changed' },
+      { id: 'consensus', label: 'Consensus' },
       { id: 'letters', label: 'Letters' },
       { id: 'funds', label: 'Funds' },
       { id: 'documents', label: 'PDF library' },
@@ -926,6 +1024,8 @@
       body = renderSourceHealth(insights?.source_health || {}, escapeHtml);
     } else if (activeSection === 'events') {
       body = renderEventQueue(insights?.events || [], escapeHtml, linkHtml, ghRepo, { search: fundSearch, bookOnly });
+    } else if (activeSection === 'consensus') {
+      body = renderConsensus(insights?.consensus, escapeHtml, linkHtml, ghRepo, { quarter: effectiveQuarter, bookOnly, search: fundSearch });
     } else if (activeSection === 'letters') {
       const scope = effectiveQuarter && effectiveQuarter !== 'all' ? effectiveQuarter : 'all quarters';
       body = `<p class="tier-sub" style="margin-bottom:8px">${letters.length} letter(s) · ${escapeHtml(scope)}${bookOnly ? ' · overlap with our book only' : ''}</p>`
