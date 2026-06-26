@@ -219,3 +219,7 @@ transcript-sync:
 	$(PYTHON) $(SCRIPTS)/download_transcripts.py --register-legacy $(if $(TICKER),$(TICKER),)
 	$(PYTHON) $(SCRIPTS)/transcript_gap_report.py
 	@echo OK: transcript-sync
+
+pages-sync:
+	$(PYTHON) $(SCRIPTS)/sync_pages_docs.py
+	@echo OK: pages-sync (dashboard/ copied to docs/ for GitHub Pages)
