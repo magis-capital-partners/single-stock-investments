@@ -1,19 +1,9 @@
 name: Daily Download & Dashboard Sync
 
-# Runs daily. The full document/transcript harvest (network + OCR heavy) only
-# runs on Mon/Thu; every other day does a light market/thematic/dashboard
-# refresh. Use the `force_full_harvest` dispatch input to force a full run.
-
 on:
   schedule:
     - cron: "0 12 * * *"  # Daily 12:00 UTC
   workflow_dispatch:
-    inputs:
-      force_full_harvest:
-        description: "Run the full document/transcript harvest regardless of weekday"
-        required: false
-        type: boolean
-        default: false
 
 permissions:
   contents: write
@@ -25,68 +15,81 @@ concurrency:
 jobs:
   download-and-sync:
     runs-on: ubuntu-latest
-    timeout-minutes: 240
-    outputs:
-      heavy: ${{ steps.mode.outputs.heavy }}
+    timeout-minutes: 360
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Decide harvest mode
-        id: mode
-        run: |
-          DOW=$(date -u +%u)  # 1=Mon .. 7=Sun
-          HEAVY=false
-          # Full harvest on Monday (1) and Thursday (4).
-          if [ "$DOW" = "1" ] || [ "$DOW" = "4" ]; then HEAVY=true; fi
-          if [ "${{ github.event.inputs.force_full_harvest }}" = "true" ]; then HEAVY=true; fi
-          echo "heavy=$HEAVY" >> "$GITHUB_OUTPUT"
-          echo "Day-of-week=$DOW heavy=$HEAVY"
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-          cache: pip
-          cache-dependency-path: |
-            _system/scripts/requirements.txt
-            _system/scripts/requirements-transcripts.txt
 
-      - name: Install base dependencies
-        run: pip install -r _system/scripts/requirements.txt
-
-      - name: Install transcript pipeline dependencies (full harvest only)
-        if: steps.mode.outputs.heavy == 'true'
+      - name: Install transcript pipeline dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y tesseract-ocr poppler-utils
-          pip install -r _system/scripts/requirements-transcripts.txt
+          pip install -r _system/scripts/requirements.txt -r _system/scripts/requirements-transcripts.txt
 
-      - name: Run full portfolio harvest
-        if: steps.mode.outputs.heavy == 'true'
+      - name: Run portfolio downloads
         env:
           POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY || secrets.POLYGON_IO_API_KEY }}
           POLYGON_EARNINGS_CACHE_MAX_AGE_HOURS: "36"
         run: python _system/scripts/download_all_holdings.py
 
-      - name: Run light daily refresh
-        if: steps.mode.outputs.heavy != 'true'
-        env:
-          POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY || secrets.POLYGON_IO_API_KEY }}
-          POLYGON_EARNINGS_CACHE_MAX_AGE_HOURS: "36"
-        run: python _system/scripts/download_all_holdings.py --light
-
       - name: Commit and push workspace
         run: |
           git add -A
-          bash _system/scripts/ci_push_main.sh "chore: daily sync $(date -u +%Y-%m-%d)"
+          bash _system/scripts/ci_push_main.sh "chore: daily download sync $(date -u +%Y-%m-%d)"
 
-  marvin-refresh:
+  portfolio-news:
     needs: download-and-sync
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 45
+    env:
+      POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY || secrets.POLYGON_IO_API_KEY }}
+      PORTFOLIO_NEWS_WINDOW_DAYS: "30"
+      PORTFOLIO_NEWS_POLYGON_REQS_PER_MIN: "5"
+      PORTFOLIO_NEWS_MAX_PAGES: "15"
+    steps:
+      - name: Checkout latest main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r _system/scripts/requirements-news.txt
+
+      - name: Ingest portfolio news
+        working-directory: _system/scripts
+        run: python ingest_portfolio_news.py
+
+      - name: Commit news artifacts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add dashboard/data/portfolio_news.json _system/data/news_seen.json _system/reviews/pending/news_*.md
+          git add '*/research/news/news_index.json' 2>/dev/null || true
+          if git diff --staged --quiet; then
+            echo "No news changes to commit."
+          else
+            git commit -m "chore: daily portfolio news $(date -u +%Y-%m-%d)"
+            git push
+          fi
+
+  marvin-refresh:
+    needs: portfolio-news
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
     permissions:
       contents: read
 
@@ -138,7 +141,6 @@ jobs:
         if: steps.pick.outputs.skip != 'true' && steps.pick.outputs.ticker != ''
         env:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
-          CURSOR_STARTING_REF: main
           HK_PDFS_ROOT: ${{ secrets.HK_PDFS_ROOT || '/opt/cursor/hk_pdfs' }}
           TICKER: ${{ steps.pick.outputs.ticker }}
           PICK_REASON: ${{ steps.pick.outputs.reason }}

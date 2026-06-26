@@ -103,7 +103,6 @@ jobs:
       - name: Run Marvin deep dive (${{ matrix.ticker }})
         env:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
-          CURSOR_STARTING_REF: main
           HK_PDFS_ROOT: ${{ secrets.HK_PDFS_ROOT || '/opt/cursor/hk_pdfs' }}
           TICKER: ${{ matrix.ticker }}
           PICK_REASON: batch_onboard_pending

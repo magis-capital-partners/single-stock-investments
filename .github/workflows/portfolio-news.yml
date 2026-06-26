@@ -2,8 +2,8 @@ name: Portfolio News Ingest
 
 on:
   schedule:
-    # Once per day at 11:30 UTC, ahead of the 12:00 daily sync.
-    - cron: "30 11 * * *"
+    # Every 6 hours, offset 30 min after the hour (after daily sync at :00).
+    - cron: "30 */6 * * *"
   workflow_dispatch:
     inputs:
       tickers:
