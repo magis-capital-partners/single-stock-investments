@@ -59,7 +59,7 @@ concurrency:
 jobs:
   onboard:
     runs-on: ubuntu-latest
-    timeout-minutes: 360
+    timeout-minutes: 120
 
     steps:
       - name: Checkout
@@ -157,6 +157,7 @@ jobs:
         if: steps.vars.outputs.watchlist_only != 'true' && steps.cursor.outputs.ready == 'true'
         env:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
+          CURSOR_STARTING_REF: main
           HK_PDFS_ROOT: ${{ secrets.HK_PDFS_ROOT || '/opt/cursor/hk_pdfs' }}
           TICKER: ${{ steps.vars.outputs.ticker }}
           PICK_REASON: onboard

@@ -26,6 +26,7 @@ TERMINALVALUE_SOURCES = ROOT / "_system" / "reference" / "data-sources" / "termi
 SUMZERO_INDEX = ROOT / "_system" / "reference" / "data-sources" / "sumzero_ideas_index.json"
 DOCUMENT_REGISTRY_PATH = ROOT / "dashboard" / "data" / "document_registry.json"
 DRIVE_AUDIT_PATH = ROOT / "_system" / "reference" / "document-store" / "drive_audit_latest.json"
+SECURITY_MASTER_PATH = ROOT / "_system" / "reference" / "securities" / "security_master.json"
 
 VALID_TICKER_RE = re.compile(r"^[A-Z0-9][A-Z0-9.\-]{0,11}$")
 DOCUMENT_SUFFIXES = {".pdf", ".htm", ".html", ".md", ".txt", ".json"}
@@ -866,6 +867,146 @@ def letter_index(letters: list[dict], our_tickers: set[str]) -> list[dict]:
     return sorted(rows, key=lambda x: (x.get("letter_date") or "", x.get("fund") or ""), reverse=True)
 
 
+def security_names() -> dict[str, str]:
+    data = load_json(SECURITY_MASTER_PATH)
+    if not isinstance(data, dict):
+        return {}
+    return {str(k).upper(): str((v or {}).get("name") or k) for k, v in data.items()}
+
+
+BUY_ACTIONS = {"new", "add", "buy"}
+SELL_ACTIONS = {"trim", "exit"}
+SHORT_ACTIONS = {"short"}
+ACTIONABLE = BUY_ACTIONS | SELL_ACTIONS | SHORT_ACTIONS
+
+
+def _consensus_bucket(ticker: str, names: dict[str, str], our_tickers: set[str]) -> dict:
+    return {
+        "ticker": ticker,
+        "name": names.get(ticker, ticker),
+        "in_book": ticker in our_tickers,
+        "buy_funds": set(),
+        "sell_funds": set(),
+        "short_funds": set(),
+        "neutral_funds": set(),
+        "all_funds": set(),
+    }
+
+
+def _finalize_consensus_row(b: dict) -> dict:
+    buys, sells, shorts = len(b["buy_funds"]), len(b["sell_funds"]), len(b["short_funds"])
+    fund_count = len(b["all_funds"])
+    if buys > sells + shorts:
+        sentiment = "accumulating"
+    elif sells + shorts > buys:
+        sentiment = "reducing"
+    else:
+        sentiment = "mixed" if (buys or sells or shorts) else "discussed"
+    return {
+        "ticker": b["ticker"],
+        "name": b["name"],
+        "in_book": b["in_book"],
+        "fund_count": fund_count,
+        "buy_funds": buys,
+        "sell_funds": sells,
+        "short_funds": shorts,
+        "net": buys - sells - shorts,
+        "sentiment": sentiment,
+        "funds": sorted(b["all_funds"])[:10],
+    }
+
+
+def build_consensus(letters: list[dict], our_tickers: set[str], names: dict[str, str]) -> dict:
+    """Dataroma-style cross-fund aggregation over Tier A/B letter positions."""
+    quarters: set[str] = set()
+    by_q: dict[str, dict[str, dict]] = {}
+    all_q: dict[str, dict] = {}
+    activity_by_q: dict[str, list[dict]] = {}
+    by_ticker: dict[str, list[dict]] = {}
+    all_funds: set[str] = set()
+
+    for letter in letters:
+        q = letter.get("quarter") or "unknown"
+        quarters.add(q)
+        fund = letter.get("fund") or "Unknown"
+        fund_id = letter.get("fund_id") or fund
+        all_funds.add(fund_id)
+        letter_date = letter.get("letter_date")
+        source_ref = source_document_ref(letter.get("source_document") or letter.get("source_file"))
+        ev_url = evidence_url(source_ref)
+        ev_label = evidence_label(source_ref)
+        for pos in letter.get("positions") or []:
+            tk = str(pos.get("ticker") or "").upper()
+            if not tk or not valid_ticker(tk):
+                continue
+            action = pos.get("action") or "discussed"
+            for store in (by_q.setdefault(q, {}), all_q):
+                b = store.get(tk) or _consensus_bucket(tk, names, our_tickers)
+                store[tk] = b
+                b["all_funds"].add(fund)
+                if action in BUY_ACTIONS:
+                    b["buy_funds"].add(fund)
+                elif action in SELL_ACTIONS:
+                    b["sell_funds"].add(fund)
+                elif action in SHORT_ACTIONS:
+                    b["short_funds"].add(fund)
+                else:
+                    b["neutral_funds"].add(fund)
+            row = {
+                "ticker": tk,
+                "name": names.get(tk, tk),
+                "fund": fund,
+                "fund_id": fund_id,
+                "quarter": q,
+                "letter_date": letter_date,
+                "action": action,
+                "direction": pos.get("direction") or "neutral",
+                "conviction": pos.get("conviction") or "low",
+                "tier": pos.get("tier"),
+                "in_book": tk in our_tickers,
+                "commentary": short_text(pos.get("commentary") or pos.get("thesis"), 280),
+                "evidence_url": ev_url,
+                "evidence_label": ev_label,
+            }
+            by_ticker.setdefault(tk, []).append(row)
+            if action in ACTIONABLE:
+                activity_by_q.setdefault(q, []).append(row)
+
+    def section(store: dict[str, dict], q: str) -> dict:
+        rows = [_finalize_consensus_row(b) for b in store.values()]
+        most = sorted(rows, key=lambda r: (-r["fund_count"], -abs(r["net"]), r["ticker"]))
+        changes = sorted([r for r in rows if r["net"] != 0], key=lambda r: (-abs(r["net"]), -r["fund_count"]))
+        activity = sorted(
+            activity_by_q.get(q, []) if q != "all" else [r for rs in activity_by_q.values() for r in rs],
+            key=lambda r: (r.get("letter_date") or "", r.get("conviction") or ""),
+            reverse=True,
+        )
+        return {
+            "letter_count": sum(1 for letter in letters if (q == "all" or letter.get("quarter") == q)),
+            "most_discussed": most[:80],
+            "biggest_changes": changes[:40],
+            "activity": activity[:250],
+        }
+
+    out_by_q = {q: section(store, q) for q, store in by_q.items()}
+    out_by_q["all"] = section(all_q, "all")
+    for tk, rows in by_ticker.items():
+        rows.sort(key=lambda r: (r.get("letter_date") or ""), reverse=True)
+        by_ticker[tk] = rows[:20]
+
+    return {
+        "as_of": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "quarters": sorted(quarters),
+        "summary": {
+            "tickers_covered": len(all_q),
+            "fund_count": len(all_funds),
+            "book_tickers_discussed": sorted(t for t in all_q if t in our_tickers),
+        },
+        "by_quarter": out_by_q,
+        "by_ticker": by_ticker,
+    }
+
+
 def fund_profiles(letters: list[dict], our_tickers: set[str]) -> dict[str, dict]:
     by_fund: dict[str, dict] = {}
     for letter in letters:
@@ -1522,15 +1663,35 @@ def main() -> int:
         "theme_rankings": theme_rankings(records, our_tickers=front_tickers),
         "theme_rankings_by_quarter": theme_rankings_by_quarter(records, front_tickers),
         "letter_index": letter_index(letters, front_tickers),
+        "consensus": build_consensus(letters, front_tickers, security_names()),
         "fund_registry": fund_registry(letters, front_tickers),
         "fund_profiles": fund_profiles(letters, front_tickers),
         "ticker_discussants": ticker_discussants(letters, front_tickers, company_hints),
         "by_ticker": ticker_insights(records, front_tickers, company_hints),
     }
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-    OUTPUT.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    _atomic_write(OUTPUT, json.dumps(payload, indent=2) + "\n")
     print(f"Wrote {OUTPUT} ({len(records)} insight records, {len(events)} events, {len(letters)} letters)")
     return 0
+
+
+def _atomic_write(path: Path, text: str, retries: int = 6) -> None:
+    """Write via a temp file + os.replace, retrying transient Windows/OneDrive
+    file locks (Errno 13/22) that intermittently hold synced files."""
+    import os
+    import time
+
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    last_err: Exception | None = None
+    for attempt in range(retries):
+        try:
+            tmp.write_text(text, encoding="utf-8")
+            os.replace(tmp, path)
+            return
+        except OSError as err:
+            last_err = err
+            time.sleep(1.0 + attempt)
+    raise OSError(f"Could not write {path} after {retries} attempts: {last_err}")
 
 
 if __name__ == "__main__":

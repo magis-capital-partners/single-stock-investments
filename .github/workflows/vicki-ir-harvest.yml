@@ -97,6 +97,7 @@ jobs:
       - name: Run Vicki IR harvest (${{ matrix.ticker }})
         env:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
+          CURSOR_STARTING_REF: main
           TICKER: ${{ matrix.ticker }}
           PICK_REASON: ir_gap
           GITHUB_REPOSITORY: ${{ github.repository }}

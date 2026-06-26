@@ -89,6 +89,18 @@ python _system/scripts/marvin_cloud_refresh.py TICKER --date 2026-05-29
 
 **SumZero Insights bridge:** `python _system/scripts/build_sumzero_index.py` scans the local `~/Downloads/SumZero Ideas.zip` archive, writes a compact committed index at `_system/reference/data-sources/sumzero_ideas_index.json`, and feeds matched holdings/watchlist ideas into the dashboard Insights tab. Raw SumZero documents stay local/ignored; `make persona-insights` refreshes the index before rebuilding dashboard data.
 
+**Letter → ticker consensus pipeline (dataroma-style):** evidence-tiered matching that resolves superinvestor-letter mentions to a canonical security universe and aggregates a cross-fund consensus. Run in order:
+
+```powershell
+python _system/scripts/build_security_master.py        # canonical universe: book + Tier-A symbols harvested from letters
+python _system/scripts/build_superinvestor_insights.py # tiered per-letter mentions, fund_id + real letter dates
+python _system/scripts/calibrate_letter_matching.py --gold  # precision/recall gate vs _eval/gold.jsonl (must PASS)
+python _system/scripts/build_insights.py               # adds the consensus block (most-discussed / activity / by-ticker)
+python _system/scripts/build_dashboard_data.py          # embeds insights into the dashboard payload
+```
+
+Matching logic lives in [`letter_matching.py`](_system/scripts/letter_matching.py) (Tier A = explicit ticker syntax, Tier B = verified company name; word/benchmark/credential collisions are gated out). Curate funds in [`_system/reference/superinvestor-letters/funds.json`](_system/reference/superinvestor-letters/funds.json) (uncurated letters are grouped deterministically and listed in `funds_unresolved.json`). The dashboard **Insights → Consensus** tab renders the result with quarter/book/search facets. Current calibration: precision 0.97 / recall 0.94.
+
 ### Cursor models and billing
 
 | Context | Model | Notes |

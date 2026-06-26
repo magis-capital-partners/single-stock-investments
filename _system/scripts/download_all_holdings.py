@@ -1,7 +1,17 @@
 #!/usr/bin/env python3
-"""Orchestrate downloads for all portfolio holdings (registry-driven)."""
+"""Orchestrate downloads for all portfolio holdings (registry-driven).
+
+Modes:
+  (default)  Full harvest — per-ticker document/transcript downloads (network +
+             OCR heavy) followed by the daily market/thematic/dashboard refresh.
+  --light    Daily refresh only — skip the heavy per-ticker document harvest and
+             only refresh the fast, daily-changing market/thematic data plus the
+             dashboard. Intended for the daily schedule; the full harvest runs a
+             couple of times per week.
+"""
 from __future__ import annotations
 
+import argparse
 import json
 import shutil
 import subprocess
@@ -16,14 +26,6 @@ if str(SCRIPTS_DIR) not in sys.path:
 from portfolio_registry import load_registry
 
 ROOT = Path(__file__).resolve().parents[2]
-
-
-def dedicated_investor_script(ticker: str) -> Path | None:
-    inv = ROOT / ticker / "investor-documents"
-    if not inv.is_dir():
-        return None
-    scripts = sorted(inv.glob("download_*_investor_docs.py"))
-    return scripts[0] if scripts else None
 PY = sys.executable
 SCRIPTS = ROOT / "_system" / "scripts"
 
@@ -48,10 +50,8 @@ def powershell_script(script: Path) -> list[str] | None:
     return None
 
 
-def main() -> None:
-    reg = load_registry()
-    holdings = reg.get("holdings") or {}
-
+def harvest_documents(holdings: dict) -> None:
+    """Heavy, network- and OCR-intensive per-ticker document/transcript harvest."""
     for ticker in sorted(holdings.keys()):
         dl = (holdings[ticker].get("download") or {})
         dtype = dl.get("type", "us_shared")
@@ -109,6 +109,19 @@ def main() -> None:
     run([PY, str(SCRIPTS / "transcript_gap_report.py")], "Transcript coverage report")
 
     for ticker in sorted(holdings.keys()):
+        tx_dir = ROOT / ticker / "investor-documents" / "transcripts"
+        if tx_dir.is_dir() and any(tx_dir.iterdir()):
+            run(
+                [PY, str(SCRIPTS / "build_management_evidence.py"), ticker],
+                f"{ticker} management evidence",
+            )
+
+    run([PY, str(SCRIPTS / "refresh_equity_model.py")], "Equity model refresh (IR + pipeline)")
+
+
+def daily_refresh(holdings: dict) -> None:
+    """Fast, daily-changing market/thematic refresh plus dashboard rebuild."""
+    for ticker in sorted(holdings.keys()):
         val_path = ROOT / ticker / "research" / "valuation.json"
         if not val_path.exists():
             continue
@@ -122,12 +135,6 @@ def main() -> None:
                 [PY, str(SCRIPTS / "fetch_market_inputs.py"), ticker, "--merge"],
                 f"{ticker} market inputs",
             )
-        tx_dir = ROOT / ticker / "investor-documents" / "transcripts"
-        if tx_dir.is_dir() and any(tx_dir.iterdir()):
-            run(
-                [PY, str(SCRIPTS / "build_management_evidence.py"), ticker],
-                f"{ticker} management evidence",
-            )
 
     run([PY, "-m", "darwin.import_external_data"], "Sync etf-dashboard external data", cwd=SCRIPTS)
     run([PY, str(SCRIPTS / "extract_theme_facts.py")], "Extract filing theme panels")
@@ -140,9 +147,29 @@ def main() -> None:
 
     run([PY, str(SCRIPTS / "build_folder_indexes.py")], "Build INDEX.csv files")
     run([PY, str(SCRIPTS / "sync_portfolio_from_registry.py")], "Sync portfolio from registry")
-    run([PY, str(SCRIPTS / "refresh_equity_model.py")], "Equity model refresh (IR + pipeline)")
     run([PY, str(SCRIPTS / "build_dashboard_data.py")], "Rebuild dashboard JSON")
-    print("\nAll download jobs finished.")
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--light",
+        action="store_true",
+        help="Skip the heavy per-ticker document/transcript harvest; only refresh "
+        "daily market/thematic data and rebuild the dashboard.",
+    )
+    args = parser.parse_args()
+
+    reg = load_registry()
+    holdings = reg.get("holdings") or {}
+
+    if args.light:
+        print("=== Light daily refresh (document harvest skipped) ===")
+    else:
+        harvest_documents(holdings)
+
+    daily_refresh(holdings)
+    print("\nLight daily refresh finished." if args.light else "\nAll download jobs finished.")
 
 
 if __name__ == "__main__":
