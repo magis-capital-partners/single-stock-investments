@@ -29,6 +29,7 @@ from pathlib import Path
 import requests
 
 from portfolio_news_common import (
+    DOCS_PORTFOLIO_NEWS_PATH,
     FEED_MIN_CONFIDENCE,
     NEGATIVE_PATTERNS,
     POLICY_VERSION,
@@ -475,7 +476,10 @@ def persist(items: list[NewsItem], configs: dict[str, HoldingNewsConfig]) -> Non
         "feed_min_confidence": FEED_MIN_CONFIDENCE,
         "items": [it.to_dict() for it in items],
     }
-    PORTFOLIO_NEWS_PATH.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    news_json = json.dumps(payload, indent=2) + "\n"
+    PORTFOLIO_NEWS_PATH.write_text(news_json, encoding="utf-8")
+    if DOCS_PORTFOLIO_NEWS_PATH.parent.exists():
+        DOCS_PORTFOLIO_NEWS_PATH.write_text(news_json, encoding="utf-8")
 
     seen = _load_seen()
     seen_ids = set(seen.get("ids") or [])

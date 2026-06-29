@@ -124,6 +124,20 @@ def test_rejects_opinion_spinoff_headline():
     assert cat is None
 
 
+def test_persist_mirrors_docs_portfolio_news():
+    from ingest_portfolio_news import persist  # noqa: WPS433
+
+    from portfolio_news_common import DOCS_PORTFOLIO_NEWS_PATH, PORTFOLIO_NEWS_PATH
+
+    configs = load_holding_configs()
+    persist([], configs)
+    assert PORTFOLIO_NEWS_PATH.exists()
+    assert DOCS_PORTFOLIO_NEWS_PATH.exists()
+    assert PORTFOLIO_NEWS_PATH.read_text(encoding="utf-8") == DOCS_PORTFOLIO_NEWS_PATH.read_text(
+        encoding="utf-8"
+    )
+
+
 if __name__ == "__main__":
     test_classify_guidance()
     test_rejects_analyst_noise()
@@ -137,4 +151,5 @@ if __name__ == "__main__":
     test_rejects_routine_dividend()
     test_rejects_sec_filing_roundup()
     test_rejects_opinion_spinoff_headline()
+    test_persist_mirrors_docs_portfolio_news()
     print("ok")
