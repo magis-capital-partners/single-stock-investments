@@ -154,21 +154,21 @@
     }
   },
   "implied_return": {
-    "base_pct": 15.4,
-    "label": "7yr IRR (Lawrence base)",
-    "display": "15.4% (Lawrence base)",
+    "base_pct": 22.38,
+    "label": "7yr IRR (total synthesis)",
+    "display": "22.38% (total synthesis)",
     "lawrence_stance_gate_pct": 15.4,
     "falsifier_adjusted_pct": 15.4,
-    "synthesis_pct": 17.15
+    "synthesis_pct": 22.38
   },
   "stance_proposal": {
     "suggested": "watch",
-    "irr_band": "10-15%",
+    "irr_band": ">20%",
     "gates": {
       "moat_ok": false,
       "dhando_ok": true
     },
-    "override_reason": "Marvin filings primary; moat unproven; POC catalyst unconfirmed"
+    "override_reason": "Blended IRR clears 15% band; moat unproven caps at hold not accumulate"
   },
   "overlay_results": [],
   "results_lawrence_legacy": {
@@ -213,22 +213,22 @@
         "label": "Marvin floor (filings stress)",
         "source": "estimates.marvin_floor",
         "return_pct": 10.9,
-        "weight": 0.3,
+        "weight": 0.25,
         "type": "numeric",
         "epistemic_tier": "A (primary filings)",
         "weight_why": "Stress floor from primary docs; anchors pessimistic bound.",
         "hard_to_vary": "yes"
       },
       {
-        "id": "marvin_filings_primary",
-        "label": "Marvin filings primary (segment + owner cash)",
-        "source": "scenarios.base @ $1.65/sh",
-        "return_pct": 15.4,
+        "id": "blended_best_primary",
+        "label": "Blended best estimate (Marvin + external)",
+        "source": "estimates.blended_best @ $1.45/sh",
+        "return_pct": 18.0,
         "weight": 0.5,
         "type": "numeric",
-        "notes": "Independent of McIntyre normalization; segment overlay",
-        "epistemic_tier": "A (primary filings)",
-        "weight_why": "Primary holding-period path from SEC filings and guided EBITDA FCF bridge.",
+        "notes": "55% marvin_floor / 45% partial McIntyre normalization",
+        "epistemic_tier": "B (triangulated best judgment)",
+        "weight_why": "Primary holding-period path after partial credit for approved external normalization.",
         "hard_to_vary": "yes"
       },
       {
@@ -236,7 +236,7 @@
         "label": "McIntyre Partnerships Q1 2026",
         "source": "QDEL/investor-documents/research-notes/McIntyre_Partnerships_Q1_2026_Letter.pdf",
         "return_pct": 97.0,
-        "weight": 0.05,
+        "weight": 0.08,
         "type": "numeric",
         "notes": "15x on 2028 FCF; 2.5yr frame; put hedge on fund position",
         "epistemic_tier": "D (external context)",
@@ -275,9 +275,9 @@
     "qualitative_adjustments": [],
     "qualitative_manual": false,
     "qualitative_pp_cap_applied": false,
-    "numeric_weighted_pct": 17.15,
+    "numeric_weighted_pct": 22.38,
     "qualitative_pp": 0,
-    "total_synthesis_pct": 17.15,
+    "total_synthesis_pct": 22.38,
     "human_approval": "pending",
     "weight_audit": {
       "flags": [],

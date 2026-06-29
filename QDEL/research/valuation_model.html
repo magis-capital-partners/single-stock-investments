@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QDEL — Marvin Segment Valuation Model</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --card: #1a2332;
+      --border: #2d3a4f;
+      --text: #e8edf4;
+      --muted: #8b9cb3;
+      --accent: #3b82f6;
+      --green: #22c55e;
+      --amber: #f59e0b;
+      --red: #ef4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 1.5rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    h1 { font-size: 1.5rem; margin-bottom: 0.25rem; }
+    .subtitle { color: var(--muted); font-size: 0.9rem; margin-bottom: 1.5rem; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .card h2 { font-size: 1rem; margin-bottom: 1rem; color: var(--accent); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th, td { padding: 0.5rem 0.4rem; text-align: right; border-bottom: 1px solid var(--border); }
+    th:first-child, td:first-child { text-align: left; }
+    th { color: var(--muted); font-weight: 500; }
+    .tier-recurring { color: var(--green); }
+    .tier-volatile { color: var(--amber); }
+    .tier-option { color: #a78bfa; }
+    .tier-wind { color: var(--muted); }
+    .slider-row { margin-bottom: 0.9rem; }
+    .slider-row label { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.3rem; }
+    .slider-row input[type=range] { width: 100%; accent-color: var(--accent); }
+    .big-number { font-size: 2rem; font-weight: 700; }
+    .big-number.positive { color: var(--green); }
+    .scenario-tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+    .scenario-tabs button {
+      flex: 1; padding: 0.6rem; border: 1px solid var(--border);
+      background: transparent; color: var(--text); border-radius: 6px; cursor: pointer;
+    }
+    .scenario-tabs button.active { background: var(--accent); border-color: var(--accent); }
+    .results-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+    .result-box {
+      background: #121a26; border-radius: 6px; padding: 0.75rem; text-align: center;
+    }
+    .result-box .label { font-size: 0.75rem; color: var(--muted); }
+    .result-box .value { font-size: 1.25rem; font-weight: 600; }
+    .disclaimer { font-size: 0.75rem; color: var(--muted); margin-top: 1rem; }
+    .badge { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.7rem; background: #2d3a4f; }
+    .badge.new { background: #1e3a5f; color: #60a5fa; }
+    a { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <h1>QuidelOrtho (QDEL) — Segment Valuation</h1>
+  <p class="subtitle">
+    Marvin independent model · Data: <code>qdel_data.json</code> · FY2025 10-K segments ·
+    <span class="badge new">NEW Jun 27, 2026</span> POC divestiture scenario
+  </p>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Segment map (FY2025 revenue)</h2>
+      <table id="segmentTable">
+        <thead>
+          <tr><th>Segment</th><th>Revenue</th><th>%</th><th>EBITDA</th><th>Tier</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <p class="disclaimer">EBITDA allocation: Marvin assumption from consolidated $597M adj. EBITDA — not sell-side or fund letter inputs.</p>
+    </div>
+
+    <div class="card">
+      <h2>Market snapshot</h2>
+      <div class="results-grid" style="margin-bottom:1rem">
+        <div class="result-box"><div class="label">Price today</div><div class="value" id="spotPrice">$13.79</div></div>
+        <div class="result-box"><div class="label">Market cap</div><div class="value" id="mktCap">$935M</div></div>
+        <div class="result-box"><div class="label">Implied EV/EBITDA</div><div class="value" id="impliedMult">5.4×</div></div>
+      </div>
+      <table>
+        <tr><td>Net debt</td><td id="netDebt">$2,380M</td></tr>
+        <tr><td>FY25 adj. EBITDA</td><td>$597M</td></tr>
+        <tr><td>FY26 EBITDA guide</td><td>$615–630M</td></tr>
+        <tr><td>Core revenue (Labs + IH)</td><td>$2,050M (75%)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Assumptions (adjust sliders)</h2>
+    <div class="grid">
+      <div>
+        <div class="slider-row">
+          <label><span>Labs EBITDA multiple</span><span id="labsMultVal">10.0×</span></label>
+          <input type="range" id="labsMult" min="6" max="14" step="0.5" value="10">
+        </div>
+        <div class="slider-row">
+          <label><span>Immunohematology EBITDA multiple</span><span id="ihMultVal">11.0×</span></label>
+          <input type="range" id="ihMult" min="6" max="14" step="0.5" value="11">
+        </div>
+        <div class="slider-row">
+          <label><span>POC treatment</span><span id="pocModeVal">Divestiture $1.5B</span></label>
+          <input type="range" id="pocMode" min="0" max="2" step="1" value="1">
+        </div>
+        <div class="slider-row">
+          <label><span>POC sale price ($M)</span><span id="pocSaleVal">$1,500M</span></label>
+          <input type="range" id="pocSale" min="800" max="2000" step="50" value="1500">
+        </div>
+      </div>
+      <div>
+        <div class="slider-row">
+          <label><span>POC operating multiple (if held)</span><span id="pocMultVal">8.0×</span></label>
+          <input type="range" id="pocMult" min="4" max="12" step="0.5" value="8">
+        </div>
+        <div class="slider-row">
+          <label><span>Molecular option value ($M)</span><span id="molVal">$50M</span></label>
+          <input type="range" id="molOpt" min="0" max="300" step="10" value="50">
+        </div>
+        <div class="slider-row">
+          <label><span>Owner cash / share (Lawrence base)</span><span id="ocfVal">$1.65</span></label>
+          <input type="range" id="ownerCash" min="0.80" max="2.50" step="0.05" value="1.65">
+        </div>
+        <div class="slider-row">
+          <label><span>Exit multiple (10yr IRR)</span><span id="exitVal">9.0×</span></label>
+          <input type="range" id="exitMult" min="6" max="14" step="0.5" value="9">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Scenario: POC divestiture</h2>
+    <div class="scenario-tabs">
+      <button class="active" data-scenario="status">Status quo (hold POC)</button>
+      <button data-scenario="divest">Post POC sale</button>
+      <button data-scenario="both">Compare both</button>
+    </div>
+    <div class="results-grid">
+      <div class="result-box">
+        <div class="label">SOTP equity value / share</div>
+        <div class="value positive" id="sotpPrice">—</div>
+      </div>
+      <div class="result-box">
+        <div class="label">Upside vs spot</div>
+        <div class="value" id="sotpUpside">—</div>
+      </div>
+      <div class="result-box">
+        <div class="label">7yr Lawrence IRR</div>
+        <div class="value" id="lawrenceIrr">—</div>
+      </div>
+    </div>
+    <table style="margin-top:1rem" id="sotpBridge">
+      <thead><tr><th>Line</th><th>Enterprise value</th><th>Per share</th></tr></thead>
+      <tbody></tbody>
+      <tfoot><tr><th>Equity value</th><th id="totalEv">—</th><th id="totalPs">—</th></tr></tfoot>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Investor lens (Marvin — independent of fund letters)</h2>
+    <table>
+      <tr><td><strong>Tier 1 — Recurring core</strong> (Labs + IH)</td><td>75% of revenue; contract consumables; value on normalized EBITDA, not flu/COVID</td></tr>
+      <tr><td><strong>Tier 2 — Volatile</strong> (POC)</td><td>22% of revenue; flu seasonality; Jun 27 FT report: ~$1.5B sale process → deleveraging catalyst</td></tr>
+      <tr><td><strong>Tier 3 — Option</strong> (Molecular / LEX)</td><td>Launch drag ~$50M in 2026 per company; probability-weighted, not in base IRR</td></tr>
+      <tr><td><strong>Tier 4 — Wind-down</strong> (Donor)</td><td>U.S. exit; $0 terminal</td></tr>
+      <tr><td><strong>Primary return path</strong></td><td>Filings-based owner cash → 7yr Lawrence IRR (not McIntyre $4/sh 2028 path)</td></tr>
+      <tr><td><strong>McIntyre letter</strong></td><td>Context tier only — see <code>cross_check_McIntyre_2026-05-26.md</code></td></tr>
+    </table>
+  </div>
+
+  <p class="disclaimer">
+    Sources: QDEL FY2025 10-K (<code>10-K_20260219...</code>), Q1 FY2026 10-Q, company earnings materials.
+    POC divestiture: Financial Times report Jun 27, 2026 via Seeking Alpha — unconfirmed by company.
+    Not investment advice. Marvin / single-stock-investments repo.
+  </p>
+
+  <script>
+    const DATA = {
+      shares: 67.8,
+      price: 13.79,
+      netDebt: 2380,
+      segments: [
+        { id: 'labs', label: 'Labs', rev: 1505.7, pct: 55.1, ebitda: 346, tier: 'recurring', tierClass: 'tier-recurring' },
+        { id: 'ih', label: 'Immunohematology', rev: 543.8, pct: 19.9, ebitda: 136, tier: 'recurring', tierClass: 'tier-recurring' },
+        { id: 'poc', label: 'Point of Care', rev: 601.6, pct: 22.0, ebitda: 84, tier: 'volatile', tierClass: 'tier-volatile' },
+        { id: 'mol', label: 'Molecular', rev: 26.5, pct: 1.0, ebitda: -40, tier: 'option', tierClass: 'tier-option' },
+        { id: 'donor', label: 'Donor Screening', rev: 52.6, pct: 1.9, ebitda: 0, tier: 'wind-down', tierClass: 'tier-wind' }
+      ]
+    };
+
+    let activeScenario = 'status';
+
+    function fmtM(n) { return '$' + Math.round(n).toLocaleString() + 'M'; }
+    function fmtPs(n) { return '$' + n.toFixed(2); }
+    function fmtPct(n) { return (n >= 0 ? '+' : '') + n.toFixed(0) + '%'; }
+
+    function irr7yr(price, fcf0, g1, g2, exitMult, years = 7) {
+      let fcf = fcf0;
+      for (let y = 1; y <= 5; y++) fcf *= (1 + g1);
+      for (let y = 6; y <= years; y++) fcf *= (1 + g2);
+      const terminal = fcf * exitMult;
+      let pv = 0;
+      fcf = fcf0;
+      for (let y = 1; y <= years; y++) {
+        fcf *= (y <= 5 ? (1 + g1) : (1 + g2));
+        pv += fcf / Math.pow(1 + 0.10, y);
+      }
+      pv += terminal / Math.pow(1 + 0.10, years);
+      if (pv <= 0 || price <= 0) return 0;
+      return (Math.pow(pv / price, 1 / years) - 1) * 100;
+    }
+
+    function getInputs() {
+      const pocModes = ['Operating', 'Divestiture', 'Zero'];
+      const pocModeIdx = +document.getElementById('pocMode').value;
+      return {
+        labsMult: +document.getElementById('labsMult').value,
+        ihMult: +document.getElementById('ihMult').value,
+        pocMode: pocModes[pocModeIdx],
+        pocModeIdx,
+        pocSale: +document.getElementById('pocSale').value,
+        pocMult: +document.getElementById('pocMult').value,
+        molOpt: +document.getElementById('molOpt').value,
+        ownerCash: +document.getElementById('ownerCash').value,
+        exitMult: +document.getElementById('exitMult').value
+      };
+    }
+
+    function calcSOTP(inp, divest) {
+      const lines = [];
+      let ev = 0;
+      const labsEv = DATA.segments[0].ebitda * inp.labsMult;
+      const ihEv = DATA.segments[1].ebitda * inp.ihMult;
+      lines.push({ label: 'Labs', ev: labsEv });
+      lines.push({ label: 'Immunohematology', ev: ihEv });
+      ev += labsEv + ihEv;
+
+      let pocEv = 0;
+      let debtReduction = 0;
+      if (divest || inp.pocModeIdx === 1) {
+        pocEv = inp.pocSale;
+        debtReduction = inp.pocSale;
+        lines.push({ label: 'POC divestiture (cash)', ev: pocEv });
+      } else if (inp.pocModeIdx === 0) {
+        pocEv = DATA.segments[2].ebitda * inp.pocMult;
+        lines.push({ label: 'Point of Care (operating)', ev: pocEv });
+      } else {
+        lines.push({ label: 'Point of Care (written off)', ev: 0 });
+      }
+      ev += pocEv;
+
+      if (inp.molOpt > 0) {
+        lines.push({ label: 'Molecular option (LEX)', ev: inp.molOpt });
+        ev += inp.molOpt;
+      }
+
+      const netDebt = DATA.netDebt - debtReduction;
+      const equity = ev - netDebt;
+      const perShare = equity / DATA.shares;
+      return { lines, ev, equity, perShare, netDebt, debtReduction };
+    }
+
+    function render() {
+      const inp = getInputs();
+      document.getElementById('labsMultVal').textContent = inp.labsMult.toFixed(1) + '×';
+      document.getElementById('ihMultVal').textContent = inp.ihMult.toFixed(1) + '×';
+      document.getElementById('pocModeVal').textContent = inp.pocMode + (inp.pocModeIdx === 1 ? ' $' + inp.pocSale + 'M' : '');
+      document.getElementById('pocSaleVal').textContent = fmtM(inp.pocSale);
+      document.getElementById('pocMultVal').textContent = inp.pocMult.toFixed(1) + '×';
+      document.getElementById('molVal').textContent = fmtM(inp.molOpt);
+      document.getElementById('ocfVal').textContent = fmtPs(inp.ownerCash);
+      document.getElementById('exitVal').textContent = inp.exitMult.toFixed(1) + '×';
+
+      const mktCap = DATA.price * DATA.shares;
+      document.getElementById('mktCap').textContent = fmtM(mktCap);
+      document.getElementById('impliedMult').textContent = ((mktCap + DATA.netDebt) / 597).toFixed(1) + '×';
+
+      const divest = activeScenario === 'divest';
+      const status = calcSOTP(inp, false);
+      const post = calcSOTP(inp, true);
+      const result = activeScenario === 'divest' ? post : status;
+
+      if (activeScenario === 'both') {
+        document.getElementById('sotpPrice').textContent = fmtPs(status.perShare) + ' / ' + fmtPs(post.perShare);
+        document.getElementById('sotpUpside').textContent = fmtPct((status.perShare / DATA.price - 1) * 100) + ' / ' + fmtPct((post.perShare / DATA.price - 1) * 100);
+      } else {
+        document.getElementById('sotpPrice').textContent = fmtPs(result.perShare);
+        document.getElementById('sotpUpside').textContent = fmtPct((result.perShare / DATA.price - 1) * 100);
+      }
+
+      const irr = irr7yr(DATA.price, inp.ownerCash, 0.025, 0.02, inp.exitMult);
+      document.getElementById('lawrenceIrr').textContent = irr.toFixed(1) + '%';
+
+      const tbody = document.querySelector('#sotpBridge tbody');
+      tbody.innerHTML = result.lines.map(l =>
+        `<tr><td>${l.label}</td><td>${fmtM(l.ev)}</td><td>${fmtPs(l.ev / DATA.shares)}</td></tr>`
+      ).join('');
+      tbody.innerHTML += `<tr><td>Less net debt</td><td>(${fmtM(result.netDebt)})</td><td>(${fmtPs(result.netDebt / DATA.shares)})</td></tr>`;
+      document.getElementById('totalEv').textContent = fmtM(result.ev);
+      document.getElementById('totalPs').textContent = fmtPs(result.perShare);
+
+      document.getElementById('pocSale').disabled = inp.pocModeIdx !== 1;
+    }
+
+    function initSegmentTable() {
+      const tbody = document.querySelector('#segmentTable tbody');
+      tbody.innerHTML = DATA.segments.map(s =>
+        `<tr>
+          <td>${s.label}</td>
+          <td>${fmtM(s.rev)}</td>
+          <td>${s.pct}%</td>
+          <td>${s.ebitda >= 0 ? fmtM(s.ebitda) : '(' + fmtM(Math.abs(s.ebitda)) + ')'}</td>
+          <td class="${s.tierClass}">${s.tier}</td>
+        </tr>`
+      ).join('');
+    }
+
+    document.querySelectorAll('input[type=range]').forEach(el => el.addEventListener('input', render));
+    document.querySelectorAll('.scenario-tabs button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.scenario-tabs button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeScenario = btn.dataset.scenario;
+        render();
+      });
+    });
+
+    initSegmentTable();
+    render();
+  </script>
+</body>
+</html>
