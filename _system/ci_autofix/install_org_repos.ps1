@@ -17,6 +17,37 @@ Require-Command git
 Require-Command gh
 Require-Command robocopy
 
+function Get-WorkflowNamesForAutofix($RepoPath) {
+    $workflowDir = Join-Path $RepoPath ".github\workflows"
+    if (-not (Test-Path $workflowDir)) {
+        return @()
+    }
+
+    $names = @()
+    foreach ($file in Get-ChildItem -Path $workflowDir -Filter *.yml) {
+        foreach ($line in Get-Content $file.FullName) {
+            if ($line -match '^\s*name:\s*["'']?(.+?)["'']?\s*$') {
+                $name = $matches[1].Trim()
+                if ($name -and $name -ne "CI Autofix") {
+                    $names += $name
+                }
+                break
+            }
+        }
+    }
+
+    return ($names | Sort-Object -Unique)
+}
+
+function Format-WorkflowRunList($WorkflowNames) {
+    if ($WorkflowNames.Count -eq 0) {
+        throw "No source workflows found in .github/workflows. CI Autofix requires at least one workflow_run target."
+    }
+
+    $lines = $WorkflowNames | ForEach-Object { "      - `"$_`"" }
+    return ($lines -join "`n")
+}
+
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $SourceCiDir = Resolve-Path $ScriptDir
 
@@ -52,22 +83,16 @@ foreach ($repo in $repos) {
     robocopy $SourceCiDir (Join-Path $target "_system\ci_autofix") /MIR /XD node_modules /NFL /NDL /NJH /NJS /nc /ns /np | Out-Null
     if ($LASTEXITCODE -gt 7) { throw "robocopy failed for $full with exit code $LASTEXITCODE" }
 
+    $workflowNames = Get-WorkflowNamesForAutofix $target
+    $workflowRunList = Format-WorkflowRunList $workflowNames
+
     $workflow = @"
 name: CI Autofix
 
 on:
   workflow_run:
     workflows:
-      - Batch Marvin Deep Dive
-      - Daily Download & Dashboard Sync
-      - Darwin Portfolio Refresh
-      - Deploy Dashboard (GitHub Pages)
-      - Marvin Daily Deep Dive
-      - Marvin Deep Dive
-      - Marvin Onboard Ticker
-      - Portfolio News Ingest
-      - Research quality (PR)
-      - Vicki IR Harvest
+$workflowRunList
     types: [completed]
     branches: [main]
   workflow_dispatch:
