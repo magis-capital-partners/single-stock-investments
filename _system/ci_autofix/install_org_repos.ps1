@@ -17,6 +17,37 @@ Require-Command git
 Require-Command gh
 Require-Command robocopy
 
+function Get-WorkflowNamesForAutofix($RepoPath) {
+    $workflowDir = Join-Path $RepoPath ".github\workflows"
+    if (-not (Test-Path $workflowDir)) {
+        return @()
+    }
+
+    $names = @()
+    foreach ($file in Get-ChildItem -Path $workflowDir -Filter *.yml) {
+        foreach ($line in Get-Content $file.FullName) {
+            if ($line -match '^\s*name:\s*["'']?(.+?)["'']?\s*$') {
+                $name = $matches[1].Trim()
+                if ($name -and $name -ne "CI Autofix") {
+                    $names += $name
+                }
+                break
+            }
+        }
+    }
+
+    return ($names | Sort-Object -Unique)
+}
+
+function Format-WorkflowRunList($WorkflowNames) {
+    if ($WorkflowNames.Count -eq 0) {
+        throw "No source workflows found in .github/workflows. CI Autofix requires at least one workflow_run target."
+    }
+
+    $lines = $WorkflowNames | ForEach-Object { "      - `"$_`"" }
+    return ($lines -join "`n")
+}
+
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $SourceCiDir = Resolve-Path $ScriptDir
 
@@ -52,12 +83,18 @@ foreach ($repo in $repos) {
     robocopy $SourceCiDir (Join-Path $target "_system\ci_autofix") /MIR /XD node_modules /NFL /NDL /NJH /NJS /nc /ns /np | Out-Null
     if ($LASTEXITCODE -gt 7) { throw "robocopy failed for $full with exit code $LASTEXITCODE" }
 
+    $workflowNames = Get-WorkflowNamesForAutofix $target
+    $workflowRunList = Format-WorkflowRunList $workflowNames
+
     $workflow = @"
 name: CI Autofix
 
 on:
   workflow_run:
+    workflows:
+$workflowRunList
     types: [completed]
+    branches: [main]
   workflow_dispatch:
     inputs:
       run_id:
@@ -76,7 +113,7 @@ permissions:
   checks: read
 
 concurrency:
-  group: ci-autofix-`${{ github.event.workflow_run.id || inputs.run_id }}
+  group: ci-autofix-`${{ github.event.workflow_run.id || github.event.inputs.run_id }}
   cancel-in-progress: false
 
 jobs:
@@ -111,8 +148,8 @@ jobs:
           GITHUB_TOKEN: `${{ github.token }}
           CURSOR_API_KEY: `${{ secrets.CURSOR_API_KEY }}
           SLACK_WEBHOOK_URL: `${{ secrets.SLACK_WEBHOOK_URL }}
-          CI_AUTOFIX_RUN_ID: `${{ inputs.run_id || github.event.workflow_run.id }}
-          CI_AUTOFIX_FORCE_AGENT: `${{ inputs.force_agent || 'false' }}
+          CI_AUTOFIX_RUN_ID: `${{ github.event.inputs.run_id || github.event.workflow_run.id }}
+          CI_AUTOFIX_FORCE_AGENT: `${{ github.event.inputs.force_agent || 'false' }}
         run: node _system/ci_autofix/ci_autofix.mjs
 "@
 

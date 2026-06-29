@@ -2,7 +2,20 @@ name: CI Autofix
 
 on:
   workflow_run:
+    workflows:
+      - Batch Marvin Deep Dive
+      - Daily Download & Dashboard Sync
+      - Darwin Portfolio Refresh
+      - Deploy Dashboard (GitHub Pages)
+      - Drive Intake Sync
+      - Marvin Daily Deep Dive
+      - Marvin Deep Dive
+      - Marvin Onboard Ticker
+      - Portfolio News Ingest
+      - Research quality (PR)
+      - Vicki IR Harvest
     types: [completed]
+    branches: [main]
   workflow_dispatch:
     inputs:
       run_id:
@@ -21,7 +34,7 @@ permissions:
   checks: read
 
 concurrency:
-  group: ci-autofix-${{ github.event.workflow_run.id || inputs.run_id }}
+  group: ci-autofix-${{ github.event.workflow_run.id || github.event.inputs.run_id }}
   cancel-in-progress: false
 
 jobs:
@@ -56,6 +69,6 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          CI_AUTOFIX_RUN_ID: ${{ inputs.run_id || github.event.workflow_run.id }}
-          CI_AUTOFIX_FORCE_AGENT: ${{ inputs.force_agent || 'false' }}
+          CI_AUTOFIX_RUN_ID: ${{ github.event.inputs.run_id || github.event.workflow_run.id }}
+          CI_AUTOFIX_FORCE_AGENT: ${{ github.event.inputs.force_agent || 'false' }}
         run: node _system/ci_autofix/ci_autofix.mjs
