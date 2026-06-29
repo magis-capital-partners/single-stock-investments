@@ -1,0 +1,81 @@
+name: Drive Intake Sync
+
+on:
+  schedule:
+    - cron: "20 * * * *"
+  workflow_dispatch:
+    inputs:
+      kind:
+        description: "Optional intake kind: vic, research, or company"
+        required: false
+        type: string
+      limit:
+        description: "Optional max files to import"
+        required: false
+        default: "0"
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: drive-intake-sync
+  cancel-in-progress: false
+
+jobs:
+  import-drive-intake:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r _system/scripts/requirements.txt
+
+      - name: Configure Google credentials
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
+        run: |
+          if [ -z "$GOOGLE_APPLICATION_CREDENTIALS_JSON" ]; then
+            echo "::error::GOOGLE_APPLICATION_CREDENTIALS_JSON secret is not set."
+            exit 1
+          fi
+          printf '%s' "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > "$RUNNER_TEMP/google-service-account.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/google-service-account.json" >> "$GITHUB_ENV"
+
+      - name: Import Drive intake PDFs
+        env:
+          KIND: ${{ github.event.inputs.kind }}
+          LIMIT: ${{ github.event.inputs.limit }}
+        run: |
+          ARGS=""
+          if [ -n "$KIND" ]; then ARGS="$ARGS --kind $KIND"; fi
+          if [ -n "$LIMIT" ] && [ "$LIMIT" != "0" ]; then ARGS="$ARGS --limit $LIMIT"; fi
+          python _system/scripts/import_drive_intake.py $ARGS
+
+      - name: Rebuild document registry and dashboard data
+        run: |
+          python _system/scripts/build_document_registry.py
+          python _system/scripts/sync_pdf_store_google_drive.py --root-key general_pdfs --workers 4
+          python _system/scripts/build_document_registry.py
+          python _system/scripts/build_insights.py
+          python _system/scripts/build_research_memory.py
+          python _system/scripts/build_dashboard_data.py
+
+      - name: Mirror dashboard to docs
+        shell: bash
+        run: |
+          rsync -a --delete --exclude '.git' --exclude '.wrangler' dashboard/ docs/
+
+      - name: Commit imported documents
+        run: |
+          git add -A
+          bash _system/scripts/ci_push_main.sh "chore: sync Drive intake documents $(date -u +%Y-%m-%d)"
