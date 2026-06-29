@@ -31,8 +31,10 @@ Press reports QuidelOrtho is exploring a **~$1.5 billion** sale of its **point-o
 | Scenario | POC proceeds | Pro forma net debt | SOTP equity / sh (base multiples) |
 |----------|-------------|-------------------|-----------------------------------|
 | Bear | $800M | ~$1,580M | ~$44 |
-| **Base** | **$1,500M** | **~$880M** | **~$52** |
-| Bull | $2,000M | ~$380M | ~$58 |
+| **Base (status quo)** | n/a (hold POC) | $2,380M | **~$49** |
+| **Base (post-POC sale)** | **$1,500M** | **~$880M** | **~$83** |
+| Conservative post-POC | $1,500M | ~$880M | **~$52** (6× core only) |
+| Bull | $2,000M | ~$380M | ~$90+ |
 
 Assumptions: Labs 10× EBITDA ($346M), IH 11× ($136M), molecular option $50M, 67.8M shares. See `qdel_data.json`.
 
@@ -68,7 +70,7 @@ McIntyre **IH sale ~$1.7B** estimate is **not** in Marvin base — no active fil
 
 **Not in base IRR:** Proceeds until 8-K. **In model:** `valuation_model.html` POC slider.
 
-**Returns statement (catalyst sensitivity):** If POC closes at **~$1.5B** and core trades at **10×** on ~**$482M** EBITDA, implied equity **~$52/share** vs **~$13.79** spot (+280%). Base Lawrence path remains **~14%** annual return on owner cash without assuming the sale closes.
+**Returns statement (catalyst sensitivity):** If POC closes at **~$1.5B** and remaining segments hold at **10–11×** EBITDA, implied SOTP equity **~$83/share** vs **~$13.79** spot. If the market only credits debt paydown (~$22/share) without re-rating core, upside is smaller. Base Lawrence path remains **15.4%** annual return without assuming the sale closes.
 
 ## [HUMAN REVIEW]
 

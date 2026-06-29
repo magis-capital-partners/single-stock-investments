@@ -71,8 +71,9 @@
 </head>
 <body>
   <h1>QuidelOrtho (QDEL) — Segment Valuation</h1>
-  <p class="subtitle">
-    Marvin independent model · Data: <code>qdel_data.json</code> · FY2025 10-K segments ·
+    <p class="subtitle">
+    Marvin independent model · Data: <code>qdel_data.json</code> ·
+    <a href="valuation_assumption_ledger.md">Full assumption ledger (traceable)</a> ·
     <span class="badge new">NEW Jun 27, 2026</span> POC divestiture scenario
   </p>
 
@@ -147,7 +148,26 @@
   </div>
 
   <div class="card">
-    <h2>Scenario: POC divestiture</h2>
+    <h2>Assumption trace (base case)</h2>
+    <table id="assumptionTable">
+      <thead><tr><th>#</th><th>Assumption</th><th>Value</th><th>Source</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Share price</td><td>$13.79</td><td>Yahoo ~2026-06-27</td></tr>
+        <tr><td>2</td><td>Shares outstanding</td><td>67.8M</td><td>FY2025 10-K diluted</td></tr>
+        <tr><td>3</td><td>Net debt</td><td>$2,380M</td><td>10-K debt − cash</td></tr>
+        <tr><td>4</td><td>FY25 adj. EBITDA</td><td>$597M</td><td>Q4 FY25 earnings materials</td></tr>
+        <tr><td>5</td><td>FY26 EBITDA guide midpoint</td><td>$622.5M</td><td>Q1 FY26 deck ($615–630M)</td></tr>
+        <tr><td>6</td><td>Owner cash / share</td><td id="ledgerOcf">$1.65</td><td>18% × $622.5M ÷ shares [Assumption]</td></tr>
+        <tr><td>7</td><td>Lawrence growth Y1–5 / Y6–7</td><td>2.5% / 2.0%</td><td>Flat revenue guide + turnaround</td></tr>
+        <tr><td>8</td><td>Lawrence exit multiple (Y7)</td><td id="ledgerExit">9×</td><td>Distressed vs peers 12–18×</td></tr>
+        <tr><td>9</td><td>Segment EBITDA</td><td colspan="2">Labs $346M · IH $136M · POC $84M · Mol (−$40M) · Corp $71M [Assumption]</td></tr>
+        <tr><td>10</td><td>POC divestiture</td><td id="ledgerPoc">$1,500M</td><td>FT Jun 27 2026 — unconfirmed</td></tr>
+      </tbody>
+    </table>
+    <p class="disclaimer">See <code>valuation_assumption_ledger.md</code> for step-by-step math on every line.</p>
+  </div>
+
+  <div class="card">
     <div class="scenario-tabs">
       <button class="active" data-scenario="status">Status quo (hold POC)</button>
       <button data-scenario="divest">Post POC sale</button>
@@ -253,19 +273,19 @@
       lines.push({ label: 'Immunohematology', ev: ihEv });
       ev += labsEv + ihEv;
 
-      let pocEv = 0;
       let debtReduction = 0;
-      if (divest || inp.pocModeIdx === 1) {
-        pocEv = inp.pocSale;
+      const useDivestiture = divest || (activeScenario === 'divest');
+      if (useDivestiture) {
+        lines.push({ label: 'POC divestiture (cash)', ev: inp.pocSale });
+        ev += inp.pocSale;
         debtReduction = inp.pocSale;
-        lines.push({ label: 'POC divestiture (cash)', ev: pocEv });
-      } else if (inp.pocModeIdx === 0) {
-        pocEv = DATA.segments[2].ebitda * inp.pocMult;
-        lines.push({ label: 'Point of Care (operating)', ev: pocEv });
-      } else {
+      } else if (inp.pocModeIdx === 2) {
         lines.push({ label: 'Point of Care (written off)', ev: 0 });
+      } else {
+        const pocEv = DATA.segments[2].ebitda * inp.pocMult;
+        lines.push({ label: 'Point of Care (operating)', ev: pocEv });
+        ev += pocEv;
       }
-      ev += pocEv;
 
       if (inp.molOpt > 0) {
         lines.push({ label: 'Molecular option (LEX)', ev: inp.molOpt });
@@ -292,6 +312,10 @@
       const mktCap = DATA.price * DATA.shares;
       document.getElementById('mktCap').textContent = fmtM(mktCap);
       document.getElementById('impliedMult').textContent = ((mktCap + DATA.netDebt) / 597).toFixed(1) + '×';
+
+      document.getElementById('ledgerOcf').textContent = fmtPs(inp.ownerCash);
+      document.getElementById('ledgerExit').textContent = inp.exitMult.toFixed(1) + '×';
+      document.getElementById('ledgerPoc').textContent = fmtM(inp.pocSale);
 
       const divest = activeScenario === 'divest';
       const status = calcSOTP(inp, false);
