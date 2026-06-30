@@ -1,0 +1,452 @@
+{
+  "ticker": "QDEL",
+  "as_of": "2026-06-29",
+  "method": "full",
+  "valuation_overlay": "segment_cashflow",
+  "lawrence_bucket": "pricing_power",
+  "classification_inputs": {
+    "archetype": "turnaround",
+    "moat": "unproven",
+    "dhando": "partial",
+    "cycle": "-",
+    "payoff_lens": "event"
+  },
+  "inputs": {
+    "price": 13.79,
+    "price_source": "Yahoo ~2026-06-27",
+    "price_as_of": "2026-06-29",
+    "per_share": 1.65,
+    "fcf_per_share": 1.65,
+    "per_share_source": "Marvin filings: FY26 guided EBITDA midpoint x 18% FCF conversion / shares (haircut vs 25% company target)",
+    "shares_millions": 67.8,
+    "normalization_note": "Primary metric = Marvin filings owner cash; McIntyre external context only"
+  },
+  "segment_build": {
+    "as_of": "2026-06-29",
+    "shares": 67800000,
+    "discount_rate": 0.1,
+    "horizon_years": 7,
+    "segments": [
+      {
+        "id": "labs",
+        "label": "Labs",
+        "owner_cash_y0_per_share": 0.95,
+        "growth_y1_5": 0.03,
+        "growth_y6_10": 0.025,
+        "exit_pfcf_y10": 10,
+        "evidence": "FY2025 revenue $1,505.7M (+4.5% YoY); 10-K segment note"
+      },
+      {
+        "id": "immunohematology",
+        "label": "Immunohematology",
+        "owner_cash_y0_per_share": 0.38,
+        "growth_y1_5": 0.03,
+        "growth_y6_10": 0.025,
+        "exit_pfcf_y10": 11,
+        "evidence": "FY2025 revenue $543.8M (+3.1% YoY); transfusion franchise"
+      },
+      {
+        "id": "point_of_care",
+        "label": "Point of Care",
+        "owner_cash_y0_per_share": 0.2,
+        "growth_y1_5": 0.0,
+        "growth_y6_10": -0.02,
+        "exit_pfcf_y10": 7,
+        "evidence": "FY2025 revenue $601.6M (-13.4% YoY); FT Jun 27 2026 divestiture scenario"
+      }
+    ],
+    "options": [
+      {
+        "id": "poc_divestiture",
+        "label": "POC unit sale (unconfirmed)",
+        "option_treatment": "milestone_nav",
+        "base_terminal_value_per_share": 22.1,
+        "base_terminal_rationale": "$1,500M proceeds less attributed net debt paydown / 67.8M shares \u2014 scenario overlay not in Lawrence base",
+        "evidence": "FT report Jun 27 2026 via Seeking Alpha; not company confirmed",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "lex_molecular",
+        "label": "LEX / molecular platform",
+        "option_treatment": "probability_weighted",
+        "p_base": 0.25,
+        "base_terminal_value_per_share": 0.74,
+        "base_terminal_rationale": "P=25% x $200M peak value / shares; company guided ~$50M launch drag 2026",
+        "evidence": "FY2025 molecular revenue $26.5M; Q1 FY2026 commentary",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "donor_wind_down",
+        "label": "Donor screening exit",
+        "option_treatment": "zero",
+        "base_terminal_value_per_share": 0,
+        "base_terminal_rationale": "U.S. business exit in progress; $52.6M FY25 revenue",
+        "evidence": "10-K; company wind-down disclosures",
+        "not_in_lawrence_base": false
+      }
+    ],
+    "corporate_drag_per_share": 0.15,
+    "corporate_drag_note": "Unallocated integration / corp costs",
+    "interactive_model": "QDEL/research/valuation_model.html",
+    "data_json": "QDEL/research/qdel_data.json"
+  },
+  "estimates": {
+    "marvin_floor": {
+      "per_share": 1.05,
+      "return_pct": 10.9,
+      "exit_multiple": 9,
+      "growth_y1_5": 0.04,
+      "growth_y6_10": 0.03,
+      "notes": "Haircut owner cash from guided EBITDA"
+    },
+    "external": [
+      {
+        "source_id": "mcintyre",
+        "source": "McIntyre Partnerships Q1 2026",
+        "path": "QDEL/investor-documents/research-notes/McIntyre_Partnerships_Q1_2026_Letter.pdf",
+        "approved": "2026-05-28",
+        "per_share_2028": 4.0,
+        "price_target": 60,
+        "horizon_years": 2.5,
+        "return_pct_approx": 97,
+        "notes": "15x on 2028 FCF; 2.5yr frame; put hedge on fund position"
+      }
+    ],
+    "blended_best": {
+      "per_share": 1.45,
+      "return_pct": 18.0,
+      "exit_multiple": 10,
+      "growth_y1_5": 0.05,
+      "growth_y6_10": 0.035,
+      "weights": "55% marvin_floor / 45% partial McIntyre normalization",
+      "notes": "Triangulated best judgment per external_view_blend.md"
+    }
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": -0.03,
+      "growth_y6_10": 0.0,
+      "exit_pfcf_y10": 7,
+      "notes": "Marvin floor stress"
+    },
+    "base": {
+      "growth_y1_5": 0.025,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 9,
+      "notes": "Marvin filings primary \u2014 independent of McIntyre normalization"
+    },
+    "bull": {
+      "growth_y1_5": 0.05,
+      "growth_y6_10": 0.03,
+      "exit_pfcf_y10": 10,
+      "notes": "Revenue stabilizes; core re-rating"
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 7.6
+    },
+    "base": {
+      "return_pct": 15.4
+    },
+    "bull": {
+      "return_pct": 19.0
+    }
+  },
+  "implied_return": {
+    "base_pct": 22.38,
+    "label": "7yr IRR (total synthesis)",
+    "display": "22.38% (total synthesis)",
+    "lawrence_stance_gate_pct": 15.4,
+    "falsifier_adjusted_pct": 15.4,
+    "synthesis_pct": 22.38
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": ">20%",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": true
+    },
+    "override_reason": "Blended IRR clears 15% band; moat unproven caps at hold not accumulate"
+  },
+  "overlay_results": [],
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 7.6
+    },
+    "base": {
+      "return_pct": 15.4
+    },
+    "bull": {
+      "return_pct": 19.0
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "POC divestiture process?",
+      "answer": "Yes \u2014 FT Jun 27 2026 ~$1.5B",
+      "treatment": "milestone_nav",
+      "evidence": "Seeking Alpha / FT; not SEC confirmed"
+    },
+    {
+      "q": 2,
+      "question": "LEX molecular platform?",
+      "answer": "Yes \u2014 launch drag",
+      "treatment": "probability_weighted",
+      "evidence": "Company guided ~$50M 2026 drag"
+    },
+    {
+      "q": 3,
+      "question": "Donor screening wind-down?",
+      "answer": "Yes",
+      "treatment": "zero",
+      "evidence": "U.S. exit; $52.6M FY25 revenue"
+    }
+  ],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "marvin_floor",
+        "label": "Marvin floor (filings stress)",
+        "source": "estimates.marvin_floor",
+        "return_pct": 10.9,
+        "weight": 0.25,
+        "type": "numeric",
+        "epistemic_tier": "A (primary filings)",
+        "weight_why": "Stress floor from primary docs; anchors pessimistic bound.",
+        "hard_to_vary": "yes"
+      },
+      {
+        "id": "blended_best_primary",
+        "label": "Blended best estimate (Marvin + external)",
+        "source": "estimates.blended_best @ $1.45/sh",
+        "return_pct": 18.0,
+        "weight": 0.5,
+        "type": "numeric",
+        "notes": "55% marvin_floor / 45% partial McIntyre normalization",
+        "epistemic_tier": "B (triangulated best judgment)",
+        "weight_why": "Primary holding-period path after partial credit for approved external normalization.",
+        "hard_to_vary": "yes"
+      },
+      {
+        "id": "external_mcintyre",
+        "label": "McIntyre Partnerships Q1 2026",
+        "source": "QDEL/investor-documents/research-notes/McIntyre_Partnerships_Q1_2026_Letter.pdf",
+        "return_pct": 97.0,
+        "weight": 0.08,
+        "type": "numeric",
+        "notes": "15x on 2028 FCF; 2.5yr frame; put hedge on fund position",
+        "epistemic_tier": "D (external context)",
+        "weight_why": "Triangulation lane; capped when already in blended_best to avoid double-count.",
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence envelope)",
+        "source": "scenarios.bear",
+        "return_pct": 7.6,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "hard_to_vary": "yes: asymmetric low weight is structural",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ]
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence envelope)",
+        "source": "scenarios.bull",
+        "return_pct": 19.0,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "hard_to_vary": "yes",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ]
+      }
+    ],
+    "qualitative_adjustments": [],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 22.38,
+    "qualitative_pp": 0,
+    "total_synthesis_pct": 22.38,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  },
+  "lawrence_horizon_years": 7,
+  "evidence_refresh": {
+    "synthesis_in_dive": true
+  },
+  "context_overlay": {
+    "as_of": "2026-06-29",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": -0.9,
+            "as_of": "2026-06-26",
+            "yoy_pct": -45.2,
+            "direction": "down",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.372000217437744,
+            "as_of": "2026-06-26",
+            "yoy_pct": 2.8,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.130000114440918,
+            "as_of": "2026-06-26",
+            "yoy_pct": 8.7,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 101.34100341796875,
+            "as_of": "2026-06-29",
+            "yoy_pct": 4.6,
+            "direction": "up",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 18.40999984741211,
+            "as_of": "2026-06-26",
+            "yoy_pct": 11.0,
+            "direction": "up",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": -2.79,
+            "as_of": "2026-06-26",
+            "yoy_pct": -100.7,
+            "direction": "down",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 16.58,
+            "as_of": "2026-06-26",
+            "yoy_pct": 59.1,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "lens_consensus": {
+    "as_of": "2026-06-29",
+    "shared_inputs_ref": "valuation.json@2026-06-29",
+    "valuation_richness": 0.0,
+    "blended_return_pct": 15.81,
+    "band_pct": [
+      7.5,
+      22.34
+    ],
+    "weighted_median_pct": 19.0,
+    "median_mean_flag": true,
+    "stance": "watch",
+    "agreement_pct": 67,
+    "dissent_count": 2,
+    "lawrence_divergence": false,
+    "top_dissents": [
+      {
+        "persona": "pabrai",
+        "label": "Mohnish Pabrai",
+        "verdict": "pass",
+        "return_pct": 7.5,
+        "key_metric": "downside_upside_ratio=0.341",
+        "conviction": 0.375,
+        "falsifier": "dhando -> none OR net-debt/EBITDA > 3 OR bear return < -15%"
+      },
+      {
+        "persona": "munger",
+        "label": "Charlie Munger",
+        "verdict": "pass",
+        "return_pct": 7.5,
+        "key_metric": "moat=unproven",
+        "conviction": 0.225,
+        "falsifier": "Moat eroding/unproven or irr_method pending"
+      }
+    ],
+    "contributor_count": 7,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
+  },
+  "total_return_panel": {
+    "as_of": "2026-06-29",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 0,
+    "distribution_history_sum": 0,
+    "market_cap_m": null,
+    "total_return_annualized_pct": 2.84,
+    "chart": "QDEL/research/charts/total_return_2026-06-29.svg",
+    "panel_json": "QDEL/research/total_return_panel.json"
+  }
+}

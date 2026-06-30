@@ -1,21 +1,94 @@
 {
   "ticker": "QDEL",
-  "as_of": "2026-05-26",
-  "method": "scenario",
+  "as_of": "2026-06-29",
+  "method": "full",
+  "valuation_overlay": "segment_cashflow",
   "lawrence_bucket": "pricing_power",
   "classification_inputs": {
     "archetype": "turnaround",
     "moat": "unproven",
     "dhando": "partial",
-    "cycle": "-"
+    "cycle": "-",
+    "payoff_lens": "event"
   },
   "inputs": {
-    "price": 12.175,
-    "price_source": "Yahoo ~2026-05-26",
-    "per_share": 1.45,
-    "per_share_source": "Blended best estimate (55% Marvin floor $1.05 / 45% partial external normalization)",
+    "price": 13.79,
+    "price_source": "Yahoo ~2026-06-27",
+    "price_as_of": "2026-06-29",
+    "per_share": 1.65,
+    "fcf_per_share": 1.65,
+    "per_share_source": "Marvin filings: FY26 guided EBITDA midpoint x 18% FCF conversion / shares (haircut vs 25% company target)",
     "shares_millions": 67.8,
-    "normalization_note": "Primary metric = blended_best; marvin_floor retained for stress"
+    "normalization_note": "Primary metric = Marvin filings owner cash; McIntyre external context only"
+  },
+  "segment_build": {
+    "as_of": "2026-06-29",
+    "shares": 67800000,
+    "discount_rate": 0.1,
+    "horizon_years": 7,
+    "segments": [
+      {
+        "id": "labs",
+        "label": "Labs",
+        "owner_cash_y0_per_share": 0.95,
+        "growth_y1_5": 0.03,
+        "growth_y6_10": 0.025,
+        "exit_pfcf_y10": 10,
+        "evidence": "FY2025 revenue $1,505.7M (+4.5% YoY); 10-K segment note"
+      },
+      {
+        "id": "immunohematology",
+        "label": "Immunohematology",
+        "owner_cash_y0_per_share": 0.38,
+        "growth_y1_5": 0.03,
+        "growth_y6_10": 0.025,
+        "exit_pfcf_y10": 11,
+        "evidence": "FY2025 revenue $543.8M (+3.1% YoY); transfusion franchise"
+      },
+      {
+        "id": "point_of_care",
+        "label": "Point of Care",
+        "owner_cash_y0_per_share": 0.2,
+        "growth_y1_5": 0.0,
+        "growth_y6_10": -0.02,
+        "exit_pfcf_y10": 7,
+        "evidence": "FY2025 revenue $601.6M (-13.4% YoY); FT Jun 27 2026 divestiture scenario"
+      }
+    ],
+    "options": [
+      {
+        "id": "poc_divestiture",
+        "label": "POC unit sale (unconfirmed)",
+        "option_treatment": "milestone_nav",
+        "base_terminal_value_per_share": 22.1,
+        "base_terminal_rationale": "$1,500M proceeds less attributed net debt paydown / 67.8M shares \u2014 scenario overlay not in Lawrence base",
+        "evidence": "FT report Jun 27 2026 via Seeking Alpha; not company confirmed",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "lex_molecular",
+        "label": "LEX / molecular platform",
+        "option_treatment": "probability_weighted",
+        "p_base": 0.25,
+        "base_terminal_value_per_share": 0.74,
+        "base_terminal_rationale": "P=25% x $200M peak value / shares; company guided ~$50M launch drag 2026",
+        "evidence": "FY2025 molecular revenue $26.5M; Q1 FY2026 commentary",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "donor_wind_down",
+        "label": "Donor screening exit",
+        "option_treatment": "zero",
+        "base_terminal_value_per_share": 0,
+        "base_terminal_rationale": "U.S. business exit in progress; $52.6M FY25 revenue",
+        "evidence": "10-K; company wind-down disclosures",
+        "not_in_lawrence_base": false
+      }
+    ],
+    "corporate_drag_per_share": 0.15,
+    "corporate_drag_note": "Unallocated integration / corp costs",
+    "interactive_model": "QDEL/research/valuation_model.html",
+    "data_json": "QDEL/research/qdel_data.json"
   },
   "estimates": {
     "marvin_floor": {
@@ -53,69 +126,83 @@
     "bear": {
       "growth_y1_5": -0.03,
       "growth_y6_10": 0.0,
-      "exit_multiple": 7,
+      "exit_pfcf_y10": 7,
       "notes": "Marvin floor stress"
     },
     "base": {
-      "growth_y1_5": 0.05,
-      "growth_y6_10": 0.035,
-      "exit_multiple": 10,
-      "notes": "Blended best estimate path"
+      "growth_y1_5": 0.025,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 9,
+      "notes": "Marvin filings primary \u2014 independent of McIntyre normalization"
     },
     "bull": {
-      "growth_y1_5": 0.07,
-      "growth_y6_10": 0.04,
-      "exit_multiple": 11,
-      "notes": "Closer to external if issues clear faster"
+      "growth_y1_5": 0.05,
+      "growth_y6_10": 0.03,
+      "exit_pfcf_y10": 10,
+      "notes": "Revenue stabilizes; core re-rating"
     }
   },
   "results": {
     "bear": {
-      "return_pct": 7.5
+      "return_pct": 7.6
     },
     "base": {
-      "return_pct": 19.0
+      "return_pct": 15.4
     },
     "bull": {
-      "return_pct": 22.0
+      "return_pct": 19.0
     }
   },
   "implied_return": {
-    "base_pct": 22.34,
-    "label": "7yr IRR (total synthesis)",
-    "display": "22.34% (total synthesis)",
-    "lawrence_stance_gate_pct": 19.0,
-    "falsifier_adjusted_pct": 19.0,
-    "synthesis_pct": 22.34
+    "base_pct": 15.4,
+    "label": "7yr IRR (Lawrence base)",
+    "display": "15.4% (Lawrence base)",
+    "lawrence_stance_gate_pct": 15.4,
+    "falsifier_adjusted_pct": 15.4,
+    "synthesis_pct": 17.15
   },
   "stance_proposal": {
     "suggested": "watch",
-    "irr_band": ">20%",
+    "irr_band": "10-15%",
     "gates": {
       "moat_ok": false,
       "dhando_ok": true
     },
-    "override_reason": "Blended IRR clears 15% band; moat unproven caps at hold not accumulate"
+    "override_reason": "Marvin filings primary; moat unproven; POC catalyst unconfirmed"
   },
   "overlay_results": [],
   "results_lawrence_legacy": {
     "bear": {
-      "return_pct": 7.5
+      "return_pct": 7.6
     },
     "base": {
-      "return_pct": 19.0
+      "return_pct": 15.4
     },
     "bull": {
-      "return_pct": 22.0
+      "return_pct": 19.0
     }
   },
   "option_scan": [
     {
-      "q": 0,
-      "question": "Material options after scan?",
-      "answer": "No",
-      "treatment": "n/a",
-      "evidence": "Operating compounder / croupier \u2014 Lawrence full cash-flow path sufficient"
+      "q": 1,
+      "question": "POC divestiture process?",
+      "answer": "Yes \u2014 FT Jun 27 2026 ~$1.5B",
+      "treatment": "milestone_nav",
+      "evidence": "Seeking Alpha / FT; not SEC confirmed"
+    },
+    {
+      "q": 2,
+      "question": "LEX molecular platform?",
+      "answer": "Yes \u2014 launch drag",
+      "treatment": "probability_weighted",
+      "evidence": "Company guided ~$50M 2026 drag"
+    },
+    {
+      "q": 3,
+      "question": "Donor screening wind-down?",
+      "answer": "Yes",
+      "treatment": "zero",
+      "evidence": "U.S. exit; $52.6M FY25 revenue"
     }
   ],
   "synthesis": {
@@ -126,22 +213,22 @@
         "label": "Marvin floor (filings stress)",
         "source": "estimates.marvin_floor",
         "return_pct": 10.9,
-        "weight": 0.25,
+        "weight": 0.3,
         "type": "numeric",
         "epistemic_tier": "A (primary filings)",
         "weight_why": "Stress floor from primary docs; anchors pessimistic bound.",
         "hard_to_vary": "yes"
       },
       {
-        "id": "blended_best_primary",
-        "label": "Blended best estimate (Marvin + external)",
-        "source": "estimates.blended_best @ $1.45/sh",
-        "return_pct": 18.0,
+        "id": "marvin_filings_primary",
+        "label": "Marvin filings primary (segment + owner cash)",
+        "source": "scenarios.base @ $1.65/sh",
+        "return_pct": 15.4,
         "weight": 0.5,
         "type": "numeric",
-        "notes": "55% marvin_floor / 45% partial McIntyre normalization",
-        "epistemic_tier": "B (triangulated best judgment)",
-        "weight_why": "Primary holding-period path after partial credit for approved external normalization.",
+        "notes": "Independent of McIntyre normalization; segment overlay",
+        "epistemic_tier": "A (primary filings)",
+        "weight_why": "Primary holding-period path from SEC filings and guided EBITDA FCF bridge.",
         "hard_to_vary": "yes"
       },
       {
@@ -149,7 +236,7 @@
         "label": "McIntyre Partnerships Q1 2026",
         "source": "QDEL/investor-documents/research-notes/McIntyre_Partnerships_Q1_2026_Letter.pdf",
         "return_pct": 97.0,
-        "weight": 0.08,
+        "weight": 0.05,
         "type": "numeric",
         "notes": "15x on 2028 FCF; 2.5yr frame; put hedge on fund position",
         "epistemic_tier": "D (external context)",
@@ -160,7 +247,7 @@
         "id": "scenario_bear",
         "label": "Bear scenario (Lawrence envelope)",
         "source": "scenarios.bear",
-        "return_pct": 7.5,
+        "return_pct": 7.6,
         "weight": 0.05,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
@@ -174,7 +261,7 @@
         "id": "scenario_bull",
         "label": "Bull scenario (Lawrence envelope)",
         "source": "scenarios.bull",
-        "return_pct": 22.0,
+        "return_pct": 19.0,
         "weight": 0.05,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
@@ -185,21 +272,12 @@
         ]
       }
     ],
-    "qualitative_adjustments": [
-      {
-        "id": "no_predictive_attribute",
-        "factor": "No dated predictive attribute at spot",
-        "pp": -0.2,
-        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
-        "sources": "HK predictive attributes framework",
-        "falsifier": "Cross-check names dated catalyst with timeline"
-      }
-    ],
+    "qualitative_adjustments": [],
     "qualitative_manual": false,
     "qualitative_pp_cap_applied": false,
-    "numeric_weighted_pct": 22.54,
-    "qualitative_pp": -0.2,
-    "total_synthesis_pct": 22.34,
+    "numeric_weighted_pct": 17.15,
+    "qualitative_pp": 0,
+    "total_synthesis_pct": 17.15,
     "human_approval": "pending",
     "weight_audit": {
       "flags": [],
@@ -226,7 +304,7 @@
     "synthesis_in_dive": true
   },
   "context_overlay": {
-    "as_of": "2026-06-25",
+    "as_of": "2026-06-29",
     "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
     "themes": [
       {
@@ -236,9 +314,9 @@
           {
             "id": "hy_oas",
             "label": "High-yield OAS credit spread (%)",
-            "latest": -1.0,
-            "as_of": "2026-06-25",
-            "yoy_pct": -19.0,
+            "latest": -0.9,
+            "as_of": "2026-06-26",
+            "yoy_pct": -45.2,
             "direction": "down",
             "good_for": "risk_regime",
             "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
@@ -248,9 +326,9 @@
           {
             "id": "ust_10y",
             "label": "US Treasury 10Y yield (%)",
-            "latest": 4.377999782562256,
-            "as_of": "2026-06-25",
-            "yoy_pct": 2.0,
+            "latest": 4.372000217437744,
+            "as_of": "2026-06-26",
+            "yoy_pct": 2.8,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^TNX",
@@ -260,9 +338,9 @@
           {
             "id": "ust_2y",
             "label": "US Treasury 2Y yield (%)",
-            "latest": 4.144000053405762,
-            "as_of": "2026-06-25",
-            "yoy_pct": 7.7,
+            "latest": 4.130000114440918,
+            "as_of": "2026-06-26",
+            "yoy_pct": 8.7,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^FVX",
@@ -272,9 +350,9 @@
           {
             "id": "dxy_broad",
             "label": "Trade-weighted USD index (broad)",
-            "latest": 101.32599639892578,
-            "as_of": "2026-06-25",
-            "yoy_pct": 3.7,
+            "latest": 101.34100341796875,
+            "as_of": "2026-06-29",
+            "yoy_pct": 4.6,
             "direction": "up",
             "good_for": "dollar_regime",
             "source": "yahoo:DX-Y.NYB",
@@ -284,9 +362,9 @@
           {
             "id": "vix_level",
             "label": "VIX index level",
-            "latest": 18.690000534057617,
-            "as_of": "2026-06-25",
-            "yoy_pct": 11.5,
+            "latest": 18.40999984741211,
+            "as_of": "2026-06-26",
+            "yoy_pct": 11.0,
             "direction": "up",
             "good_for": "vol_regime",
             "source": "yahoo:^VIX",
@@ -296,9 +374,9 @@
           {
             "id": "credit_impulse_1m",
             "label": "HYG vs TLT 1-month return spread (%)",
-            "latest": -3.18,
-            "as_of": "2026-06-25",
-            "yoy_pct": -60.6,
+            "latest": -2.79,
+            "as_of": "2026-06-26",
+            "yoy_pct": -100.7,
             "direction": "down",
             "good_for": "credit_impulse",
             "source": "spread:HYG-TLT:21d",
@@ -308,9 +386,9 @@
           {
             "id": "spy_20d_realized_vol",
             "label": "SPY 20-day realized vol (annualized %)",
-            "latest": 16.48,
-            "as_of": "2026-06-25",
-            "yoy_pct": 60.8,
+            "latest": 16.58,
+            "as_of": "2026-06-26",
+            "yoy_pct": 59.1,
             "direction": "up",
             "good_for": "equity_vol",
             "source": "realized_vol:SPY:20d",
@@ -322,8 +400,8 @@
     ]
   },
   "lens_consensus": {
-    "as_of": "2026-05-26",
-    "shared_inputs_ref": "valuation.json@2026-05-26",
+    "as_of": "2026-06-29",
+    "shared_inputs_ref": "valuation.json@2026-06-29",
     "valuation_richness": 0.0,
     "blended_return_pct": 15.81,
     "band_pct": [
@@ -361,14 +439,14 @@
     "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
   },
   "total_return_panel": {
-    "as_of": "2026-06-11",
+    "as_of": "2026-06-29",
     "status": "complete",
     "error": null,
     "cumulative_distributions_per_share": 0,
     "distribution_history_sum": 0,
     "market_cap_m": null,
-    "total_return_annualized_pct": 2.69,
-    "chart": "QDEL/research/charts/total_return_2026-06-11.svg",
+    "total_return_annualized_pct": 2.84,
+    "chart": "QDEL/research/charts/total_return_2026-06-29.svg",
     "panel_json": "QDEL/research/total_return_panel.json"
   }
 }

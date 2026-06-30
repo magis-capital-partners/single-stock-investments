@@ -1,0 +1,150 @@
+{
+  "ticker": "QDEL",
+  "as_of": "2026-06-29",
+  "methodology": "Marvin independent segment SOTP + Lawrence owner-cash IRR. Inputs from SEC filings and company guidance only. Third-party letters (McIntyre Q1 2026) are context tier — not blended into primary owner-cash path.",
+  "price": {
+    "value": 13.79,
+    "source": "Yahoo Finance close ~2026-06-27",
+    "prior_deep_dive": 12.175
+  },
+  "shares_millions": 67.8,
+  "shares_source": "FY2025 10-K weighted average diluted; Q1 FY2026 10-Q",
+  "balance_sheet": {
+    "cash_m": 169.8,
+    "cash_as_of": "FY2025 12/28/2025",
+    "cash_q1_m": 140.4,
+    "long_term_debt_m": 2471.9,
+    "total_debt_m": 2550,
+    "stockholders_equity_m": 1920.5,
+    "net_debt_m": 2380,
+    "net_debt_note": "Total debt ~$2,550M less cash $170M per FY2025 10-K; Q1 net debt similar",
+    "source": "investor-documents/sec-edgar/10-K_20260219_rpt20251228_acc0001906324_26_000008.htm"
+  },
+  "consolidated": {
+    "revenue_fy25_m": 2730.2,
+    "revenue_fy24_m": 2782.9,
+    "revenue_yoy_pct": -1.9,
+    "revenue_q1_fy26_m": 619.8,
+    "revenue_q1_prior_m": 692.8,
+    "adj_ebitda_fy25_m": 597.0,
+    "adj_ebitda_margin_pct": 21.9,
+    "guidance_fy26_revenue_low_m": 2700,
+    "guidance_fy26_revenue_high_m": 2750,
+    "guidance_fy26_ebitda_low_m": 615,
+    "guidance_fy26_ebitda_high_m": 630,
+    "interest_expense_m": 185,
+    "capex_m": 130,
+    "maintenance_capex_m": 100,
+    "source": "10-K; Q1 FY2026 earnings presentation 2026-05-05"
+  },
+  "segments_fy25": {
+    "source": "10-K Note 4/5 revenue by business unit (FY2025)",
+    "units": [
+      {
+        "id": "labs",
+        "label": "Labs",
+        "revenue_m": 1505.7,
+        "revenue_pct": 55.1,
+        "yoy_pct": 4.5,
+        "tier": "recurring_core",
+        "economics": "Hospital/central lab instruments + consumables; multi-year contracts; ~95% recurring per company disclosures"
+      },
+      {
+        "id": "immunohematology",
+        "label": "Immunohematology (Transfusion Medicine)",
+        "revenue_m": 543.8,
+        "revenue_pct": 19.9,
+        "yoy_pct": 3.1,
+        "tier": "recurring_core",
+        "economics": "Blood bank / transfusion testing; Ortho heritage; stable installed base"
+      },
+      {
+        "id": "point_of_care",
+        "label": "Point of Care",
+        "revenue_m": 601.6,
+        "revenue_pct": 22.0,
+        "yoy_pct": -13.4,
+        "tier": "volatile",
+        "economics": "Respiratory rapid tests (Sofia, Triage); flu seasonality; post-COVID normalization"
+      },
+      {
+        "id": "molecular",
+        "label": "Molecular Diagnostics",
+        "revenue_m": 26.5,
+        "revenue_pct": 1.0,
+        "yoy_pct": null,
+        "tier": "growth_option",
+        "economics": "Savanna / LEX platform launch; company guided ~$50M launch drag in 2026"
+      },
+      {
+        "id": "donor_screening",
+        "label": "Donor Screening",
+        "revenue_m": 52.6,
+        "revenue_pct": 1.9,
+        "yoy_pct": -54,
+        "tier": "wind_down",
+        "economics": "U.S. business exit in progress"
+      }
+    ],
+    "core_revenue_m": 2049.5,
+    "core_revenue_pct": 75.1
+  },
+  "segment_ebitda_model": {
+    "note": "[Assumption] Segment EBITDA allocated from consolidated $597M using revenue share and margin differentials inferred from business mix — not from external letters",
+    "consolidated_ebitda_m": 597,
+    "units": [
+      {"id": "labs", "ebitda_m": 346, "margin_pct": 23.0, "margin_rationale": "Highest recurring mix; margin expansion from cost program"},
+      {"id": "immunohematology", "ebitda_m": 136, "margin_pct": 25.0, "margin_rationale": "Stable transfusion franchise"},
+      {"id": "point_of_care", "ebitda_m": 84, "margin_pct": 14.0, "margin_rationale": "Flu/COVID volatility; lower than core"},
+      {"id": "molecular", "ebitda_m": -40, "margin_pct": null, "margin_rationale": "LEX launch investment; company guided drag"},
+      {"id": "donor_screening", "ebitda_m": 0, "margin_pct": 0, "margin_rationale": "Wind-down"},
+      {"id": "corporate", "ebitda_m": 71, "margin_pct": null, "margin_rationale": "Unallocated corp / integration"}
+    ]
+  },
+  "catalyst_poc_divestiture": {
+    "date_reported": "2026-06-27",
+    "headline": "QuidelOrtho exploring sale of point-of-care testing unit for ~$1.5B",
+    "source": "Financial Times via Seeking Alpha / GuruFocus — not company confirmed",
+    "status": "unconfirmed_rumor",
+    "buyers_cited": ["Advent International"],
+    "base_proceeds_m": 1500,
+    "bear_proceeds_m": 800,
+    "bull_proceeds_m": 2000,
+    "rationale": "Reduce ~$3.8B merger debt; POC FY25 revenue $601.6M down 13% YoY",
+    "in_base_irr": false,
+    "note": "Modeled as scenario overlay in valuation_model.html; not in Lawrence base IRR until SEC filing"
+  },
+  "owner_cash_bridge": {
+    "note": "Marvin primary path — derived from filings, not McIntyre normalization",
+    "guided_ebitda_mid_m": 622.5,
+    "fcf_conversion_pct": 18,
+    "fcf_conversion_rationale": "Company targets 25% of EBITDA; FY25 actual ~17% due to A/R timing — haircut for LEX and China",
+    "owner_cash_m": 112,
+    "owner_cash_per_share": 1.65,
+    "stress_owner_cash_per_share": 1.05,
+    "stress_note": "25% haircut on owner cash if revenue decline persists through FY26"
+  },
+  "sotp_outputs_base": {
+    "status_quo_equity_per_share": 48.64,
+    "post_poc_sale_equity_per_share": 82.98,
+    "conservative_post_poc_6x_core": 51.5,
+    "debt_paydown_per_share_only": 22.12,
+    "calc_note": "See valuation_assumption_ledger.md Part 5"
+  },
+  "peer_multiples_reference": {
+    "note": "Context only — Marvin base uses discounted multiples vs peers given leverage and turnaround",
+    "diagnostics_ev_ebitda_range": [12, 18],
+    "qdel_implied_ev_ebitda_at_spot": 5.4,
+    "implied_calc": "Market cap ~$935M + net debt ~$2,380M = EV ~$3,315M / $597M EBITDA"
+  },
+  "external_context": [
+    {
+      "id": "mcintyre_q1_2026",
+      "label": "McIntyre Partnerships Q1 2026",
+      "path": "QDEL/investor-documents/research-notes/McIntyre_Partnerships_Q1_2026_Letter.pdf",
+      "approved": "2026-05-28",
+      "use": "Cross-check context only — not primary IRR inputs",
+      "claims_summary": "Five unrelated issues; core 75% healthier; ~$4 FCF/sh by 2028; strategic levers include POC/IH sale"
+    }
+  ]
+}

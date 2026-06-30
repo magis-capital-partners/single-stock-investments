@@ -53,4 +53,7 @@ Logs append to **`_download_log.txt`** at the QDEL root.
 
 ## Research Notes
 
-- **`investor-documents/research-notes/McIntyre_Partnerships_Q1_2026_Letter.pdf`** — Third-party commentary (not primary source)
+- **`investor-documents/research-notes/McIntyre_Partnerships_Q1_2026_Letter.pdf`** — Third-party commentary (context tier; not primary IRR)
+- **`research/valuation_model.html`** — Interactive segment SOTP model (Marvin independent)
+- **`research/valuation_assumption_ledger.md`** — Step-by-step assumption trace (every input + math)
+- **`research/qdel_data.json`** — Model inputs and filing sources
