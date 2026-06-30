@@ -1,42 +1,78 @@
 # Drive Intake
 
-Use this folder structure in the Single Stock Research PDF Store Shared Drive:
+Use this Shared Drive folder as the repo drop zone:
+
+- Folder: https://drive.google.com/drive/folders/1wWZpAvlH5AANn76nRoklTK8IXf5gyPnR
+- Label: Single Stock Research PDF Store
+- Service account: `pdf-store-uploader@single-stock-pdf-store.iam.gserviceaccount.com`
+- Workflow: `Drive Intake Sync` runs hourly at minute 20 UTC and can also be run manually.
+
+The current Drive layout is flat by intake type:
 
 ```text
 Admin/
-  Intake/
-    VIC/
-      TPL/
-        VIC writeup.pdf
-      FRMO/
-        another writeup.pdf
-    Research/
-      TPL/
-        outside report.pdf
-    Company/
-      TPL/
-        company presentation.pdf
+  VIC/
+    TPL.pdf
+    FRMO.pdf
+  Research/
+    TPL.pdf
+  Company/
+    TPL.pdf
 ```
 
-The GitHub workflow `Drive Intake Sync` imports PDFs from those folders into the repo:
+## Where To Drop PDFs
 
-- `Admin/Intake/VIC/{TICKER}` -> `{TICKER}/third-party-analyses/vic`
-- `Admin/Intake/Research/{TICKER}` -> `{TICKER}/third-party-analyses/drive-intake`
-- `Admin/Intake/Company/{TICKER}` -> `{TICKER}/investor-documents/drive-intake`
+Ticker subfolders are also accepted:
 
-Rules:
+```text
+Admin/
+  VIC/
+    TPL/
+      VIC writeup.pdf
+    FRMO/
+      another writeup.pdf
+  Research/
+    TPL/
+      outside report.pdf
+  Company/
+    TPL/
+      company presentation.pdf
+```
 
-- Prefer one ticker folder per upload batch.
-- Use the exact repo ticker, for example `TPL`, `FRMO`, `0388.HK`, `TEQ.ST`.
+Use the exact repo ticker folder name, for example `TPL`, `FRMO`, `0388.HK`, or `TEQ.ST`.
+
+For the flat layout, put the ticker as the filename or as the first clear filename token, such as `TPL.pdf` or `TPL - outside report.pdf`.
+
+## Routing
+
+- `Admin/VIC/{TICKER}.pdf` imports to `{TICKER}/third-party-analyses/vic/`
+- `Admin/Research/{TICKER}.pdf` imports to `{TICKER}/third-party-analyses/drive-intake/`
+- `Admin/Company/{TICKER}.pdf` imports to `{TICKER}/investor-documents/drive-intake/`
+
+The legacy `Admin/Intake/{VIC,Research,Company}/{TICKER}/*.pdf` layout is still accepted.
+
+After local import, the normal registry/upload step links the PDFs back into the PDF store folders used by the dashboard:
+
+- VIC: `Single Stocks/{TICKER}/VIC/`
+- Research: `Single Stocks/{TICKER}/Research/drive-intake/`
+- Company: `Single Stocks/{TICKER}/Company/drive-intake/`
+
+## Automation Flow
+
+1. Drop PDFs into the appropriate Drive intake folder.
+2. `Drive Intake Sync` scans the configured intake folder/root, creates missing intake folders, and imports new PDFs.
+3. Each imported PDF gets a `.source.json` sidecar with Drive source metadata.
+4. `_system/data/drive_intake_manifest.json` records Drive file IDs so the same file is not imported again.
+5. The workflow rebuilds the third-party source inventory, document registry, Drive PDF links, insights, research memory, and dashboard data.
+6. The workflow commits the imported documents and rebuilt dashboard artifacts back to `main`.
+
+## Required GitHub Secret
+
+Drive folder access alone is not enough for GitHub Actions. The repo also needs an Actions secret named `GOOGLE_APPLICATION_CREDENTIALS_JSON` containing the full JSON key for `pdf-store-uploader@single-stock-pdf-store.iam.gserviceaccount.com`.
+
+## Rules
+
 - Upload PDFs only.
-- Leave files in Drive after upload; `_system/data/drive_intake_manifest.json` prevents re-importing the same Drive file.
-- If a file is in `Admin/Intake/VIC` without a ticker folder, the importer tries to infer the ticker from the filename. Folder naming is more reliable.
-
-After import, existing scripts rebuild:
-
-- third-party source inventory
-- document registry
-- Google Drive PDF store links
-- insights
-- research memory
-- dashboard data
+- Leave files in Drive after upload; the manifest prevents duplicate imports.
+- Use existing repo tickers. Unknown ticker folders or filenames are reported in `_system/reference/document-store/drive_intake_latest.json`.
+- Use `VIC` only for Value Investors Club writeups; use `Research` for other outside research PDFs; use `Company` for company presentations or manually collected company PDFs.

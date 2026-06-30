@@ -1,10 +1,18 @@
 #!/usr/bin/env python3
 """Import manually uploaded PDFs from Google Drive intake folders into the repo.
 
-Intake layout under the configured Shared Drive root:
+Current intake layout:
+  Admin/VIC/{TICKER}.pdf
+  Admin/Research/{TICKER}.pdf
+  Admin/Company/{TICKER}.pdf
+
+Legacy intake layout is also accepted:
   Admin/Intake/VIC/{TICKER}/*.pdf
   Admin/Intake/Research/{TICKER}/*.pdf
   Admin/Intake/Company/{TICKER}/*.pdf
+
+Use --ensure-folders to create the Admin drop-zone skeleton before
+scanning for uploaded files.
 
 Canonical repo destinations:
   {TICKER}/third-party-analyses/vic/*.pdf
@@ -16,10 +24,8 @@ from __future__ import annotations
 import argparse
 import hashlib
 import io
-import json
 import re
 import sys
-from datetime import datetime, timezone
 from pathlib import Path
 
 from googleapiclient.http import MediaIoBaseDownload
@@ -30,18 +36,25 @@ MANIFEST_PATH = ROOT / "_system" / "data" / "drive_intake_manifest.json"
 REPORT_PATH = ROOT / "_system" / "reference" / "document-store" / "drive_intake_latest.json"
 TICKER_RE = re.compile(r"^[A-Z0-9][A-Z0-9.\-]{0,24}$")
 PDF_MIME = "application/pdf"
-INTAKE_PREFIX = "Admin/Intake"
+INTAKE_PREFIX = "Admin"
+LEGACY_INTAKE_PREFIX = "Admin/Intake"
 INTAKE_TYPES = {
     "vic": "VIC",
     "research": "Research",
     "company": "Company",
 }
+INTAKE_FOLDER_PATHS = {
+    intake_kind: f"{INTAKE_PREFIX}/{folder_name}"
+    for intake_kind, folder_name in INTAKE_TYPES.items()
+}
+ACCEPTED_INTAKE_PREFIXES = (INTAKE_PREFIX, LEGACY_INTAKE_PREFIX, "")
 
 sys.path.insert(0, str(SCRIPTS))
 from drive_store_common import (  # noqa: E402
     CONFIG_PATH,
     drive_service,
-    execute_with_retry,
+    ensure_folder_path,
+    folder_id_by_parent_name,
     item_paths,
     list_drive_items,
     load_json,
@@ -82,28 +95,39 @@ def infer_ticker_from_name(name: str) -> str | None:
     return None
 
 
-def parse_intake_path(path: str) -> dict | None:
+def intake_path_parts(path: str) -> tuple[str, list[str], str] | None:
     parts = [p for p in path.split("/") if p]
-    if len(parts) < 4 or parts[0:2] != ["Admin", "Intake"]:
+    if len(parts) >= 3 and parts[0] == "Admin" and parts[1].lower() in INTAKE_TYPES:
+        return parts[1].lower(), parts[2:], INTAKE_PREFIX
+    if len(parts) >= 4 and parts[0:2] == ["Admin", "Intake"] and parts[2].lower() in INTAKE_TYPES:
+        return parts[2].lower(), parts[3:], LEGACY_INTAKE_PREFIX
+    if len(parts) >= 2 and parts[0].lower() in INTAKE_TYPES:
+        return parts[0].lower(), parts[1:], "root-relative"
+    return None
+
+
+def parse_intake_path(path: str) -> dict | None:
+    parsed_parts = intake_path_parts(path)
+    if not parsed_parts:
         return None
-    intake_kind = parts[2].lower()
-    if intake_kind not in INTAKE_TYPES:
-        return None
-    filename = parts[-1]
+    intake_kind, rest, intake_prefix = parsed_parts
+    filename = rest[-1]
     if not filename.lower().endswith(".pdf"):
         return None
-    ticker = normalize_ticker(parts[3]) if len(parts) >= 5 else None
+    ticker = normalize_ticker(rest[0]) if len(rest) >= 2 else None
     if not ticker:
         ticker = infer_ticker_from_name(filename)
     if not ticker:
         return {
             "error": "missing_or_unknown_ticker",
             "intake_kind": intake_kind,
+            "intake_prefix": intake_prefix,
             "path": path,
             "filename": filename,
         }
     return {
         "intake_kind": intake_kind,
+        "intake_prefix": intake_prefix,
         "ticker": ticker,
         "filename": filename,
         "path": path,
@@ -145,6 +169,49 @@ def load_manifest() -> dict:
     return manifest
 
 
+def is_dry_run_folder_id(folder_id: str) -> bool:
+    return str(folder_id).startswith("dry-run:")
+
+
+def ensure_intake_folders(service, root_ids: list[str], items: list[dict], dry_run: bool) -> list[dict]:
+    existing = folder_id_by_parent_name(items)
+    ensured: list[dict] = []
+    for root_id in root_ids:
+        root_has_intake_folders = any((root_id, folder_name) in existing for folder_name in INTAKE_TYPES.values())
+        folder_paths = {
+            intake_kind: folder_name if root_has_intake_folders else INTAKE_FOLDER_PATHS[intake_kind]
+            for intake_kind, folder_name in INTAKE_TYPES.items()
+        }
+        for intake_kind, folder_path in folder_paths.items():
+            folder_id = ensure_folder_path(service, root_id, folder_path, dry_run, existing)
+            ensured.append(
+                {
+                    "intake_kind": intake_kind,
+                    "path": folder_path,
+                    "drive_folder_id": folder_id,
+                    "drive_folder_url": None if is_dry_run_folder_id(folder_id) else web_folder_url(folder_id),
+                }
+            )
+    return ensured
+
+
+def configured_intake_root_ids(config: dict) -> list[str]:
+    root_ids: list[str] = []
+    intake = config.get("drive_intake") or {}
+    if intake.get("folder_id"):
+        root_ids.append(intake["folder_id"])
+    for root in (config.get("drive_intake_roots") or {}).values():
+        if root.get("folder_id"):
+            root_ids.append(root["folder_id"])
+    if not root_ids:
+        root_ids = [
+            root.get("folder_id")
+            for root in (config.get("drive_roots") or {}).values()
+            if root.get("folder_id")
+        ]
+    return sorted(set(root_ids))
+
+
 def write_sidecar(dest: Path, item: dict, parsed: dict, digest: str) -> None:
     sidecar = dest.with_suffix(".source.json")
     payload = {
@@ -163,14 +230,24 @@ def write_sidecar(dest: Path, item: dict, parsed: dict, digest: str) -> None:
     write_json(sidecar, payload)
 
 
-def import_intake(dry_run: bool, limit: int, force: bool, include_kinds: set[str]) -> dict:
+def import_intake(
+    dry_run: bool,
+    limit: int,
+    force: bool,
+    include_kinds: set[str],
+    ensure_folders: bool,
+) -> dict:
     config = load_json(CONFIG_PATH)
-    root_ids = [root.get("folder_id") for root in (config.get("drive_roots") or {}).values() if root.get("folder_id")]
-    root_ids = sorted(set(root_ids))
+    root_ids = configured_intake_root_ids(config)
     if not root_ids:
         raise SystemExit(f"No drive roots configured in {CONFIG_PATH}")
-    service = drive_service(readonly=True)
+    service = drive_service(readonly=not ensure_folders or dry_run)
     items = list_drive_items(service, root_ids)
+    ensured_folders: list[dict] = []
+    if ensure_folders:
+        ensured_folders = ensure_intake_folders(service, root_ids, items, dry_run)
+        if not dry_run:
+            items = list_drive_items(service, root_ids)
     paths, _children = item_paths(items, root_ids)
     manifest = load_manifest()
     imported: list[dict] = []
@@ -235,7 +312,10 @@ def import_intake(dry_run: bool, limit: int, force: bool, include_kinds: set[str
         "generated_at": now_iso(),
         "dry_run": dry_run,
         "intake_prefix": INTAKE_PREFIX,
+        "accepted_intake_prefixes": ACCEPTED_INTAKE_PREFIXES,
         "configured_root_folders": [web_folder_url(root_id) for root_id in root_ids],
+        "intake_folder_paths": INTAKE_FOLDER_PATHS,
+        "ensured_intake_folders": ensured_folders,
         "summary": {
             "imported_count": len(imported),
             "skipped_count": len(skipped),
@@ -255,6 +335,11 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Import Drive intake PDFs into canonical repo folders.")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--force", action="store_true")
+    parser.add_argument(
+        "--ensure-folders",
+        action="store_true",
+        help="Create Admin/{VIC,Research,Company} folders before scanning.",
+    )
     parser.add_argument("--limit", type=int, default=0)
     parser.add_argument(
         "--kind",
@@ -264,12 +349,12 @@ def main() -> int:
     )
     args = parser.parse_args()
     include_kinds = set(args.kind or INTAKE_TYPES)
-    report = import_intake(args.dry_run, args.limit, args.force, include_kinds)
+    report = import_intake(args.dry_run, args.limit, args.force, include_kinds, args.ensure_folders)
     print("Drive intake import")
     for key, value in report["summary"].items():
         print(f"  {key}: {value}")
     if report["errors"]:
-        print("  errors: inspect Admin/Intake paths; expected Admin/Intake/{VIC,Research,Company}/{TICKER}/*.pdf")
+        print("  errors: inspect intake paths; expected Admin/{VIC,Research,Company}/{TICKER}.pdf or ticker subfolders")
     return 0 if not report["errors"] else 2
 
 

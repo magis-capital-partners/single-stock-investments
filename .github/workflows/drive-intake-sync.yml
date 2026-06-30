@@ -53,10 +53,10 @@ jobs:
 
       - name: Import Drive intake PDFs
         env:
-          KIND: ${{ github.event.inputs.kind }}
-          LIMIT: ${{ github.event.inputs.limit }}
+          KIND: ${{ github.event.inputs.kind || '' }}
+          LIMIT: ${{ github.event.inputs.limit || '0' }}
         run: |
-          ARGS=""
+          ARGS="--ensure-folders"
           if [ -n "$KIND" ]; then ARGS="$ARGS --kind $KIND"; fi
           if [ -n "$LIMIT" ] && [ "$LIMIT" != "0" ]; then ARGS="$ARGS --limit $LIMIT"; fi
           python _system/scripts/import_drive_intake.py $ARGS

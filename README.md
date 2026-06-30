@@ -68,6 +68,7 @@ You can delete the old `DASHBOARD_SYNC_TOKEN` secret and archive `single-stock-d
 |----------|---------|--------------|
 | [`daily-sync.yml`](.github/workflows/daily-sync.yml) | Daily 12:00 UTC + manual | Download holdings → commit → **auto Marvin refresh** if new docs |
 | [`dashboard-pages.yml`](.github/workflows/dashboard-pages.yml) | Push to `main` (dashboard paths) + manual | Rebuild JSON → deploy `dashboard/` to GitHub Pages |
+| [`drive-intake-sync.yml`](.github/workflows/drive-intake-sync.yml) | Hourly at :20 UTC + manual | Import PDFs dropped in Drive `Admin/VIC`, `Admin/Research`, or `Admin/Company` → rebuild dashboard data |
 | [`marvin-deep-dive.yml`](.github/workflows/marvin-deep-dive.yml) | Manual (ticker input) | Cursor Cloud Agent deep dive → opens PR |
 | [`marvin-daily-deep-dive.yml`](.github/workflows/marvin-daily-deep-dive.yml) | Manual only | Pick on new documents (or **force_rotate**) → cloud agent → PR |
 | [`research-quality.yml`](.github/workflows/research-quality.yml) | PRs touching `**/research/**` | Lint dives + verify cloud prompt sync |
@@ -121,6 +122,7 @@ Push to `main` after downloads or research triggers a Pages deploy automatically
 
 | Secret | Required for | How to get |
 |--------|--------------|------------|
+| `GOOGLE_APPLICATION_CREDENTIALS_JSON` | Drive intake + PDF store sync | Full service-account JSON for `pdf-store-uploader@single-stock-pdf-store.iam.gserviceaccount.com`; folder access is already on the Shared Drive |
 | `CURSOR_API_KEY` | Marvin deep dive in CI (manual + **daily auto**) | [Cursor Dashboard → Integrations](https://cursor.com/dashboard/integrations) |
 | `HK_PDFS_ROOT` | Optional — full HK vault on cloud agent VM (default `/opt/cursor/hk_pdfs`) | [Cursor Dashboard → Cloud Agents → Secrets](https://cursor.com/dashboard/cloud-agents); see `_system/frameworks/hk_cross_reference.md` |
 

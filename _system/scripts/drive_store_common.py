@@ -83,10 +83,16 @@ def drive_ids_for_roots(service, root_ids: list[str]) -> dict[str, str]:
     return out
 
 
-def list_drive_items(service, root_ids: list[str]) -> list[dict]:
-    drive_ids = sorted(set(drive_ids_for_roots(service, root_ids).values()))
-    items: dict[str, dict] = {}
-    for drive_id in drive_ids:
+DRIVE_ITEM_FIELDS = (
+    "nextPageToken,files("
+    "id,name,size,mimeType,webViewLink,webContentLink,appProperties,parents,createdTime,modifiedTime"
+    ")"
+)
+DRIVE_PDF_OR_FOLDER_QUERY = f"(mimeType = 'application/pdf' or mimeType = '{FOLDER_MIME}') and trashed = false"
+
+
+def list_shared_drive_items(service, drive_ids: list[str], items: dict[str, dict]) -> None:
+    for drive_id in sorted(set(drive_ids)):
         page_token = None
         while True:
             res = execute_with_retry(service.files().list(
@@ -94,12 +100,8 @@ def list_drive_items(service, root_ids: list[str]) -> list[dict]:
                 driveId=drive_id,
                 includeItemsFromAllDrives=True,
                 supportsAllDrives=True,
-                q=f"(mimeType = 'application/pdf' or mimeType = '{FOLDER_MIME}') and trashed = false",
-                fields=(
-                    "nextPageToken,files("
-                    "id,name,size,mimeType,webViewLink,webContentLink,appProperties,parents,createdTime,modifiedTime"
-                    ")"
-                ),
+                q=DRIVE_PDF_OR_FOLDER_QUERY,
+                fields=DRIVE_ITEM_FIELDS,
                 pageSize=1000,
                 pageToken=page_token,
             ))
@@ -108,6 +110,52 @@ def list_drive_items(service, root_ids: list[str]) -> list[dict]:
             page_token = res.get("nextPageToken")
             if not page_token:
                 break
+
+
+def list_folder_tree_items(service, root_ids: list[str], items: dict[str, dict]) -> None:
+    queue = list(root_ids)
+    seen_folders: set[str] = set()
+    while queue:
+        parent_id = queue.pop(0)
+        if parent_id in seen_folders:
+            continue
+        seen_folders.add(parent_id)
+        page_token = None
+        while True:
+            res = execute_with_retry(service.files().list(
+                includeItemsFromAllDrives=True,
+                supportsAllDrives=True,
+                q=f"'{drive_quote(parent_id)}' in parents and {DRIVE_PDF_OR_FOLDER_QUERY}",
+                fields=DRIVE_ITEM_FIELDS,
+                pageSize=1000,
+                pageToken=page_token,
+            ))
+            for item in res.get("files") or []:
+                items[item["id"]] = item
+                if item.get("mimeType") == FOLDER_MIME:
+                    queue.append(item["id"])
+            page_token = res.get("nextPageToken")
+            if not page_token:
+                break
+
+
+def list_drive_items(service, root_ids: list[str]) -> list[dict]:
+    items: dict[str, dict] = {}
+    shared_drive_ids: list[str] = []
+    folder_root_ids: list[str] = []
+    for root_id in root_ids:
+        meta = execute_with_retry(service.files().get(
+            fileId=root_id,
+            fields="id,name,driveId,parents",
+            supportsAllDrives=True,
+        ))
+        drive_id = meta.get("driveId")
+        if drive_id and not meta.get("parents"):
+            shared_drive_ids.append(drive_id)
+        else:
+            folder_root_ids.append(root_id)
+    list_shared_drive_items(service, shared_drive_ids, items)
+    list_folder_tree_items(service, folder_root_ids, items)
     return list(items.values())
 
 
@@ -119,6 +167,9 @@ def build_folder_paths(items: list[dict], root_ids: list[str]) -> dict[str, str]
     def path_for(folder_id: str) -> str:
         if folder_id in memo:
             return memo[folder_id]
+        if folder_id in root_set:
+            memo[folder_id] = ""
+            return ""
         item = folders.get(folder_id)
         if not item:
             memo[folder_id] = ""
