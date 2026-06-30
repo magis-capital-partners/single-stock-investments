@@ -1,0 +1,514 @@
+{
+  "ticker": "SOC",
+  "as_of": "2026-06-30",
+  "valuation_mode": "optionality",
+  "method": "yield_curve",
+  "irr_method": "scenario",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "turnaround",
+    "moat": "none",
+    "dhando": "partial",
+    "cycle": "trough",
+    "payoff_lens": "levered",
+    "predictive_attribute": "capital_markets_refinancing_binary"
+  },
+  "inputs": {
+    "price": 6.97,
+    "price_source": "424B5 preliminary prospectus supplement \u2014 NYSE close June 29, 2026",
+    "price_as_of": "2026-06-29",
+    "shares_millions": 150.322,
+    "shares_source": "150,321,586 shares outstanding March 31, 2026 (424B5 capitalization table; Q1 10-Q)",
+    "shares_pro_forma_millions": 165.0,
+    "shares_pro_forma_note": "$100M equity offering at ~$6.97 adds ~14.3M shares before convert dilution [Assumption]",
+    "per_share": -0.85,
+    "fcf_source": "FY2025 net loss $410.2M on 145M weighted shares; Q1 2026 operating loss $119M with minimal revenue \u2014 normalized owner cash negative during restart [Assumption]",
+    "normalization_note": "Lawrence ten-year FCF path not meaningful pre-refi; stance uses dated equity-stub scenarios per equity_stub_valuation.md."
+  },
+  "capital_structure": {
+    "as_of": "2026-06-30",
+    "existing_exxon_term_loan_m": 979.5,
+    "existing_exxon_source": "Outstanding incl. PIK interest May 31, 2026 (424B5)",
+    "existing_maturity": "2026-07-24",
+    "proposed_term_loan_b_m": 675.0,
+    "proposed_term_loan_b_rate_pct": 15.0,
+    "proposed_term_loan_b_maturity": "2028-12-15",
+    "proposed_convert_notes_m": 300.0,
+    "proposed_convert_maturity": "2031",
+    "proposed_equity_m": 100.0,
+    "proposed_equity_option_m": 15.0,
+    "proposed_notes_option_m": 45.0,
+    "sources_uses_total_m": 1075.0,
+    "exxon_repayment_m": 991.8,
+    "post_transaction_debt_m": 975.0,
+    "post_transaction_cash_m": 135.0,
+    "post_transaction_cash_note": "Mar 31 cash $52.2M plus ~$83M excess from sources/uses table [424B5]",
+    "cross_conditioned": true,
+    "syndication_risk": "JPMorgan $675M Term Loan B reportedly faced weak demand late June 2026 [pending third party]"
+  },
+  "production_snapshot": {
+    "as_of": "2026-06-18",
+    "wells_online": 52,
+    "wells_completed": 77,
+    "gross_oil_bpd": 43000,
+    "platforms_online": [
+      "Harmony",
+      "Heritage"
+    ],
+    "platform_hondo_expected": "Q3 2026",
+    "first_oil_sales": "2026-03-29",
+    "source": "424B5 prospectus supplement June 30, 2026"
+  },
+  "scenarios": {
+    "bear": {
+      "price": 6.97,
+      "payoff": 0.5,
+      "years": 2,
+      "probability": 0.3,
+      "notes": "Refi fails or closes then production/regulatory shock; Exxon acceleration or distressed exchange; equity stub near zero"
+    },
+    "base": {
+      "price": 6.97,
+      "payoff": 13.0,
+      "years": 5,
+      "probability": 0.45,
+      "notes": "Cross-conditioned Transactions close by July 24; ~45-50k bbl/d gross oil stabilizes; $975M debt service covered at mid-cycle oil; modest re-rating vs dilution",
+      "sotp_build": {
+        "lines": [
+          {
+            "id": "book",
+            "label": "GAAP book / price anchor",
+            "gaap_per_share": 6.97,
+            "uplift_per_share": 0.0,
+            "math": "Anchor $6.97/sh"
+          },
+          {
+            "id": "operating_path",
+            "label": "Operating / distribution path",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 3.02,
+            "math": "[Assumption] \u2014 see scenario notes in valuation.json"
+          },
+          {
+            "id": "catalyst",
+            "label": "Catalyst or terminal re-rate",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 3.01,
+            "math": "[Assumption] \u2014 see scenario notes in valuation.json"
+          }
+        ],
+        "year5_economic_nav_per_share": 13.0,
+        "years": 5,
+        "notes": "Cross-conditioned Transactions close by July 24; ~45-50k bbl/d gross oil stabilizes; $975M debt service covered at mid-cycle oil; modest re-rating vs dilution"
+      }
+    },
+    "bull": {
+      "price": 6.97,
+      "payoff": 28.0,
+      "years": 5,
+      "probability": 0.25,
+      "notes": "Full SYU ramp incl. Hondo + perforations; oil $75+; Term Loan B amortized from excess cash flow; converts remain out-of-the-money; equity re-rates toward asset NAV"
+    }
+  },
+  "scenario_build": {
+    "bear": {
+      "trigger": "No Term Loan B syndication by July 24, 2026 OR post-close California pipeline/order shutdown",
+      "production_bpd": 0,
+      "net_debt_m": 980,
+      "equity_value_m": 75,
+      "equity_per_share": 0.5,
+      "implied_ev_ebitda": null
+    },
+    "base": {
+      "trigger": "Transactions close on filed terms ($675M TL B + $300M converts + $100M equity)",
+      "production_bpd": 48000,
+      "net_realization_per_bbl": 58,
+      "loe_per_bbl": 24,
+      "ga_m": 75,
+      "cash_interest_m": 125,
+      "ebitda_m": 420,
+      "exit_ev_ebitda": 4.5,
+      "enterprise_value_m": 1890,
+      "net_debt_m": 840,
+      "equity_value_m": 1050,
+      "diluted_shares_m": 175,
+      "equity_per_share": 13.0
+    },
+    "bull": {
+      "trigger": "Full 77-well ramp + Hondo Q3 2026 + perforation program; oil $75 WTI",
+      "production_bpd": 60000,
+      "net_realization_per_bbl": 62,
+      "loe_per_bbl": 22,
+      "ga_m": 70,
+      "cash_interest_m": 120,
+      "ebitda_m": 720,
+      "exit_ev_ebitda": 5.5,
+      "enterprise_value_m": 3960,
+      "net_debt_m": 750,
+      "equity_value_m": 3210,
+      "diluted_shares_m": 185,
+      "equity_per_share": 28.0
+    }
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true,
+      "floor_pass": false,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": "Levered stub: base case ~13% annual return but bear case is capital-structure wipeout; dhando partial only if refi closes"
+  },
+  "optionality_gate": {
+    "framework": "santa_ynez_restart_levered",
+    "floor_pass": false,
+    "floor_metric": "producing_asset_nav_per_share",
+    "floor_value": 4.0,
+    "primary_metric": "lawrence_base",
+    "primary_label": "annualized return",
+    "notes": "Floor uses stressed NAV on 30k bbl/d at $55 net less net debt; not dhando until Exxon loan refinanced",
+    "primary_return_pct": 13.3
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "nav_floor",
+      "evidence": "Oil properties capitalized at cost; restart production not in FY2025 revenue ($0 hydrocarbon sales)"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / perforation upside?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "Up to 41 perforation additions by 2029; 8 ESPs from 2028 (~$40.8M capex) per 424B5"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "FY2025 net loss $410.2M; Q1 2026 operating loss $119M during restart (10-K, 10-Q)"
+    },
+    {
+      "q": 4,
+      "question": "Regulatory / litigation binary?",
+      "answer": "Yes",
+      "treatment": "milestone_nav",
+      "evidence": "California PHMSA litigation, DPA order, federal vs state permitting (10-K Risk Factors)"
+    },
+    {
+      "q": 5,
+      "question": "Capital markets catalyst dated?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "June 30, 2026 424B5: $100M equity + $300M converts + $675M Term Loan B to repay Exxon by July 24"
+    },
+    {
+      "q": 7,
+      "question": "Warrant overhang?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "Warrant liabilities $121M fair value Dec 31, 2025 (10-K); SPAC legacy overhang"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "Payoff depends on Santa Ynez production ramp from 43k bbl/d (June 2026) toward full field capacity, not on Lawrence FCF growth.",
+    "bear_trigger": "Term Loan B syndication fails before July 24, 2026 Exxon maturity.",
+    "bull_trigger": "Platform Hondo online Q3 2026 plus perforation additions raise volumes above 55k bbl/d with mid-cycle oil.",
+    "status": "partial"
+  },
+  "evidence_refresh": {
+    "type": "commodity",
+    "commodities": [
+      "WTI"
+    ]
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -73.2
+    },
+    "base": {
+      "return_pct": 13.3
+    },
+    "bull": {
+      "return_pct": 32.1
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -73.2
+    },
+    "base": {
+      "return_pct": 13.3
+    },
+    "bull": {
+      "return_pct": 32.1
+    }
+  },
+  "implied_return": {
+    "base_pct": 13.3,
+    "label": "annualized return",
+    "display": "13.3% (base)"
+  },
+  "overlay_results": [],
+  "total_return_panel": {
+    "as_of": "2026-06-30",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 0,
+    "distribution_history_sum": 0,
+    "market_cap_m": null,
+    "total_return_annualized_pct": -18.57,
+    "chart": "SOC/research/charts/total_return_2026-06-30.svg",
+    "panel_json": "SOC/research/total_return_panel.json"
+  },
+  "context_overlay": {
+    "as_of": "2026-06-30",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": -0.28,
+            "as_of": "2026-06-30",
+            "yoy_pct": 49.1,
+            "direction": "up",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.415999889373779,
+            "as_of": "2026-06-30",
+            "yoy_pct": 4.4,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.181000232696533,
+            "as_of": "2026-06-30",
+            "yoy_pct": 10.2,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 101.18399810791016,
+            "as_of": "2026-06-30",
+            "yoy_pct": 4.4,
+            "direction": "up",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 16.510000228881836,
+            "as_of": "2026-06-30",
+            "yoy_pct": -1.3,
+            "direction": "down",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": -1.56,
+            "as_of": "2026-06-30",
+            "yoy_pct": -57.6,
+            "direction": "down",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 17.76,
+            "as_of": "2026-06-30",
+            "yoy_pct": 67.5,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "insider_signal": {
+    "as_of": "2026-06-30",
+    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
+    "in_base_irr": false,
+    "window_days": 365,
+    "ics": 2.22,
+    "band": "weak",
+    "bull_case_support": "none",
+    "scenario_confidence": {
+      "priors": {
+        "bear": 0.2,
+        "base": 0.55,
+        "bull": 0.25
+      },
+      "tilted": {
+        "bear": 0.2,
+        "base": 0.55,
+        "bull": 0.25
+      },
+      "bull_delta": 0.0,
+      "bear_delta": 0.0,
+      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
+    },
+    "factors": {
+      "buy_score": 2.935,
+      "sell_score": -1.0,
+      "cluster_bonus": 0.0,
+      "net_buy_usd": 14777318.6,
+      "net_sell_usd": 22759708.23,
+      "price_today": 6.97
+    },
+    "top_buys": [
+      {
+        "insider": "Pilgrim Global ICAV",
+        "date": "2025-10-15",
+        "shares": 563886,
+        "price": 14.74,
+        "value_usd": 8311679.64,
+        "shares_owned_after": 10514635,
+        "contrib": 1.496
+      },
+      {
+        "insider": "Pilgrim Global ICAV",
+        "date": "2025-10-15",
+        "shares": 418759,
+        "price": 15.44,
+        "value_usd": 6465638.96,
+        "shares_owned_after": 10933394,
+        "contrib": 1.439
+      }
+    ],
+    "top_sells": [
+      {
+        "insider": "FLORES JAMES C",
+        "date": "2026-04-29",
+        "shares": 68792,
+        "price": 13.5639,
+        "value_usd": 933087.81,
+        "is_10b5_1": false,
+        "contrib": -0.171
+      },
+      {
+        "insider": "FLORES JAMES C",
+        "date": "2026-04-28",
+        "shares": 71297,
+        "price": 13.3288,
+        "value_usd": 950303.45,
+        "is_10b5_1": false,
+        "contrib": -0.17
+      },
+      {
+        "insider": "Patrinely Gregory D.",
+        "date": "2026-04-29",
+        "shares": 39311,
+        "price": 13.5639,
+        "value_usd": 533210.47,
+        "is_10b5_1": false,
+        "contrib": -0.127
+      },
+      {
+        "insider": "Patrinely Gregory D.",
+        "date": "2026-04-28",
+        "shares": 40743,
+        "price": 13.3288,
+        "value_usd": 543055.3,
+        "is_10b5_1": false,
+        "contrib": -0.126
+      },
+      {
+        "insider": "Patrinely Gregory D.",
+        "date": "2026-03-31",
+        "shares": 279081,
+        "price": 16.6893,
+        "value_usd": 4657666.53,
+        "is_10b5_1": false,
+        "contrib": -0.1
+      }
+    ],
+    "narrative_hooks": [],
+    "transaction_count": 25
+  },
+  "lens_consensus": {
+    "as_of": "2026-06-30",
+    "shared_inputs_ref": "valuation.json@2026-06-30",
+    "valuation_richness": 0.113,
+    "blended_return_pct": -11.7,
+    "band_pct": [
+      -73.2,
+      13.3
+    ],
+    "weighted_median_pct": 13.3,
+    "median_mean_flag": true,
+    "stance": "pass",
+    "agreement_pct": 29,
+    "dissent_count": 4,
+    "lawrence_divergence": true,
+    "top_dissents": [
+      {
+        "persona": "hohn",
+        "label": "Chris Hohn / TCI",
+        "verdict": "watch",
+        "return_pct": 13.3,
+        "key_metric": "fcf_yield=None",
+        "conviction": 0.085,
+        "falsifier": "FCF yield < 0.5% or commoditized archetype (turnaround/optionality only)"
+      },
+      {
+        "persona": "greenblatt",
+        "label": "Joel Greenblatt",
+        "verdict": "watch",
+        "return_pct": 13.3,
+        "key_metric": "earnings_yield=None",
+        "conviction": 0.085,
+        "falsifier": "FCF yield below universe median OR base IRR below median"
+      },
+      {
+        "persona": "lawrence",
+        "label": "Lawrence (house IRR)",
+        "verdict": "watch",
+        "return_pct": 13.3,
+        "key_metric": "synthesis_pct=None",
+        "conviction": 0.085,
+        "falsifier": "Synthesis incomplete or irr_method pending"
+      }
+    ],
+    "contributor_count": 6,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
+  }
+}
