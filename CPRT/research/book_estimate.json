@@ -1,0 +1,52 @@
+{
+  "ticker": "CPRT",
+  "as_of": "2026-06-30",
+  "framework": "current_book_estimate.md",
+  "mark_date_framework": "mark_date_alignment.md",
+  "filing_anchor": {
+    "period_end": "2025-07-31",
+    "measurement_date": "2025-07-31",
+    "source": "investor-documents/sec-edgar/10-K_20250926_rpt20250731_acc0001628280_25_042946.htm",
+    "scope": "consolidated",
+    "book_equity_m": 9187.033,
+    "shares": 977600000,
+    "filed_book_per_share": 9.4
+  },
+  "lines": [
+    {
+      "id": "land_comp_fair_value",
+      "label": "Land \u2014 comp-based fair value vs GAAP historical cost",
+      "method": "manual_value",
+      "source": "FY2025 10-K land at historical cost (filing anchor only); fair land from CPRT/_scripts/roll_up_land_marks.py base case (~17,100 owned ac \u00d7 ~$405K/ac from transaction sample). GAAP cost is not a mark input.",
+      "filing_value_m": 2394.553,
+      "current_value_m": 6917.189,
+      "delta_m": 4522.636,
+      "price_source": "manual_value",
+      "filing_price_date": "2025-07-31",
+      "human_review": true
+    }
+  ],
+  "price_alignment": [],
+  "tie_out": {
+    "markable_filing_sum_m": 2394.553,
+    "static_residual_m": 6792.48,
+    "note": "static_residual = filed equity minus sum of line filing values; should be >= 0"
+  },
+  "summary": {
+    "delta_equity_m": 4522.636,
+    "delta_per_share": 4.63,
+    "delta_pct_of_filed_book": 49.23,
+    "current_book_equity_m": 13709.669,
+    "current_book_per_share": 14.02
+  },
+  "price_comparison": {
+    "market_price": 33.07,
+    "market_price_source": "CPRT/research/valuation.json inputs.price ~May 26 2026",
+    "discount_to_filed_book_pct": -251.9,
+    "discount_to_current_estimate_pct": -135.8,
+    "premium_to_filed_book_pct": 251.9
+  },
+  "staleness_flags": [
+    "land_comp_fair_value: [HUMAN REVIEW]"
+  ]
+}
