@@ -1,0 +1,31 @@
+{
+  "ticker": "CPRT",
+  "enabled": true,
+  "market_price": 33.07,
+  "market_price_source": "CPRT/research/valuation.json inputs.price ~May 26 2026",
+  "filing_anchor": {
+    "period_end": "2025-07-31",
+    "measurement_date": "2025-07-31",
+    "source": "investor-documents/sec-edgar/10-K_20250926_rpt20250731_acc0001628280_25_042946.htm",
+    "scope": "consolidated",
+    "book_equity_m": 9187.033,
+    "shares": 977600000
+  },
+  "land_valuation_ref": "CPRT/research/land_valuation/fair_land_summary.json",
+  "lines": [
+    {
+      "id": "land_comp_fair_value",
+      "label": "Land — comp-based fair value vs GAAP historical cost",
+      "method": "manual_value",
+      "filing_value_m": 2394.553,
+      "current_fair_value_m": 6917.189,
+      "human_review": true,
+      "source": "FY2025 10-K land at historical cost (filing anchor only); fair land from CPRT/_scripts/roll_up_land_marks.py base case (~17,100 owned ac × ~$405K/ac from transaction sample). GAAP cost is not a mark input."
+    }
+  ],
+  "notes": [
+    "Lawrence FCF remains primary stance gate; this is a parallel book/NAV cross-check per current_book_estimate.md.",
+    "Low/base/high fair land: see fair_land_summary.json network_fair_land_m.",
+    "Pilot yard marks cover 7 of 20 yards; network extrapolation uses disclosed ~19,000 ac × ~90% owned."
+  ]
+}

@@ -210,6 +210,8 @@ def resolve_price(line: dict, cache: dict[str, float | None]) -> tuple[float | N
     method = line.get("method", "static")
     if method == "static":
         return None, "static", None
+    if method == "manual_value":
+        return None, "manual_value", None
     if method == "manual_price":
         mp = line.get("current_price")
         if mp is not None:
@@ -242,6 +244,12 @@ def current_value_from_line(line: dict, current_price: float | None) -> float | 
     filing_val = filing_value_from_line(line)
 
     if method == "static":
+        return filing_val
+
+    if method == "manual_value":
+        manual = line.get("current_fair_value_m")
+        if manual is not None:
+            return float(manual)
         return filing_val
 
     if method in ("listed_shares", "manual_price"):
