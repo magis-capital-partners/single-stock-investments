@@ -72,35 +72,7 @@
       "payoff": 13.0,
       "years": 5,
       "probability": 0.45,
-      "notes": "Cross-conditioned Transactions close by July 24; ~45-50k bbl/d gross oil stabilizes; $975M debt service covered at mid-cycle oil; modest re-rating vs dilution",
-      "sotp_build": {
-        "lines": [
-          {
-            "id": "book",
-            "label": "GAAP book / price anchor",
-            "gaap_per_share": 6.97,
-            "uplift_per_share": 0.0,
-            "math": "Anchor $6.97/sh"
-          },
-          {
-            "id": "operating_path",
-            "label": "Operating / distribution path",
-            "gaap_per_share": 0.0,
-            "uplift_per_share": 3.02,
-            "math": "[Assumption] \u2014 see scenario notes in valuation.json"
-          },
-          {
-            "id": "catalyst",
-            "label": "Catalyst or terminal re-rate",
-            "gaap_per_share": 0.0,
-            "uplift_per_share": 3.01,
-            "math": "[Assumption] \u2014 see scenario notes in valuation.json"
-          }
-        ],
-        "year5_economic_nav_per_share": 13.0,
-        "years": 5,
-        "notes": "Cross-conditioned Transactions close by July 24; ~45-50k bbl/d gross oil stabilizes; $975M debt service covered at mid-cycle oil; modest re-rating vs dilution"
-      }
+      "notes": "Cross-conditioned Transactions close by July 24; 54k bbl/d; $975M debt service covered at mid-cycle oil"
     },
     "bull": {
       "price": 6.97,
@@ -110,44 +82,143 @@
       "notes": "Full SYU ramp incl. Hondo + perforations; oil $75+; Term Loan B amortized from excess cash flow; converts remain out-of-the-money; equity re-rates toward asset NAV"
     }
   },
+  "simple_model": {
+    "doc": "SOC/research/scenario_valuation_simple_2026-06-30.md",
+    "shared_facts": {
+      "price_today": 6.97,
+      "shares_outstanding_m": 150.3,
+      "production_jun18_bpd": 43000,
+      "exxon_loan_m": 979.5,
+      "exxon_maturity": "2026-07-24",
+      "term_loan_b_m": 675,
+      "term_loan_b_rate_pct": 15,
+      "convert_notes_m": 300,
+      "equity_raise_m": 100,
+      "post_close_gross_debt_m": 975,
+      "post_close_cash_m": 135,
+      "days_per_year": 365
+    },
+    "bear": {
+      "assumptions": {
+        "refi_closes": false,
+        "production_bpd": 0,
+        "distressed_equity_recovery_m": 75,
+        "share_count_m": 165,
+        "years": 2,
+        "price_today": 6.97
+      },
+      "steps": {
+        "equity_value_m": 75,
+        "value_per_share": 0.5,
+        "total_return_pct": -92.8,
+        "annual_return_pct": -73.2
+      }
+    },
+    "base": {
+      "assumptions": {
+        "refi_closes": true,
+        "production_bpd": 54000,
+        "days_per_year": 365,
+        "net_oil_price_per_bbl": 58,
+        "loe_per_bbl": 23,
+        "ga_m": 70,
+        "exit_ev_ebitda": 5.0,
+        "term_loan_b_m": 675,
+        "convert_notes_m": 300,
+        "cash_m": 135,
+        "cash_interest_m": 125,
+        "share_count_m": 175,
+        "years": 5,
+        "price_today": 6.97
+      },
+      "steps": {
+        "annual_barrels_m": 19.71,
+        "revenue_m": 1143.2,
+        "loe_m": 453.3,
+        "ebitda_m": 619.9,
+        "gross_debt_m": 975,
+        "net_debt_m": 840,
+        "enterprise_value_m": 3099.5,
+        "equity_value_m": 2259.5,
+        "value_per_share": 13.0,
+        "ebitda_minus_interest_m": 494.9,
+        "total_return_pct": 86.5,
+        "annual_return_pct": 13.3
+      }
+    },
+    "bull": {
+      "assumptions": {
+        "refi_closes": true,
+        "production_bpd": 65000,
+        "days_per_year": 365,
+        "net_oil_price_per_bbl": 63,
+        "loe_per_bbl": 20,
+        "ga_m": 60,
+        "exit_ev_ebitda": 6.0,
+        "term_loan_b_at_exit_m": 600,
+        "convert_notes_m": 300,
+        "cash_at_exit_m": 180,
+        "cash_interest_m": 114,
+        "share_count_m": 182,
+        "years": 5,
+        "price_today": 6.97
+      },
+      "steps": {
+        "annual_barrels_m": 23.725,
+        "revenue_m": 1494.7,
+        "loe_m": 474.5,
+        "ebitda_m": 960.2,
+        "gross_debt_m": 900,
+        "net_debt_m": 720,
+        "enterprise_value_m": 5761.2,
+        "equity_value_m": 5041.2,
+        "value_per_share": 28.0,
+        "ebitda_minus_interest_m": 846.2,
+        "total_return_pct": 301.7,
+        "annual_return_pct": 32.1
+      }
+    }
+  },
   "scenario_build": {
     "bear": {
       "trigger": "No Term Loan B syndication by July 24, 2026 OR post-close California pipeline/order shutdown",
       "production_bpd": 0,
-      "net_debt_m": 980,
-      "equity_value_m": 75,
+      "distressed_equity_recovery_m": 75,
+      "diluted_shares_m": 165,
       "equity_per_share": 0.5,
-      "implied_ev_ebitda": null
+      "years": 2
     },
     "base": {
       "trigger": "Transactions close on filed terms ($675M TL B + $300M converts + $100M equity)",
-      "production_bpd": 48000,
+      "production_bpd": 54000,
       "net_realization_per_bbl": 58,
-      "loe_per_bbl": 24,
-      "ga_m": 75,
+      "loe_per_bbl": 23,
+      "ga_m": 70,
       "cash_interest_m": 125,
-      "ebitda_m": 420,
-      "exit_ev_ebitda": 4.5,
-      "enterprise_value_m": 1890,
+      "ebitda_m": 619.9,
+      "exit_ev_ebitda": 5.0,
+      "enterprise_value_m": 3099.5,
       "net_debt_m": 840,
-      "equity_value_m": 1050,
+      "equity_value_m": 2259.5,
       "diluted_shares_m": 175,
-      "equity_per_share": 13.0
+      "equity_per_share": 13.0,
+      "years": 5
     },
     "bull": {
-      "trigger": "Full 77-well ramp + Hondo Q3 2026 + perforation program; oil $75 WTI",
-      "production_bpd": 60000,
-      "net_realization_per_bbl": 62,
-      "loe_per_bbl": 22,
-      "ga_m": 70,
-      "cash_interest_m": 120,
-      "ebitda_m": 720,
-      "exit_ev_ebitda": 5.5,
-      "enterprise_value_m": 3960,
-      "net_debt_m": 750,
-      "equity_value_m": 3210,
-      "diluted_shares_m": 185,
-      "equity_per_share": 28.0
+      "trigger": "Full ramp + Hondo + perforations; oil firm; Term Loan B paydown",
+      "production_bpd": 65000,
+      "net_realization_per_bbl": 63,
+      "loe_per_bbl": 20,
+      "ga_m": 60,
+      "cash_interest_m": 114,
+      "ebitda_m": 960.2,
+      "exit_ev_ebitda": 6.0,
+      "enterprise_value_m": 5761.2,
+      "net_debt_m": 720,
+      "equity_value_m": 5041.2,
+      "diluted_shares_m": 182,
+      "equity_per_share": 28.0,
+      "years": 5
     }
   },
   "stance_proposal": {

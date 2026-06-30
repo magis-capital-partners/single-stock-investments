@@ -24,6 +24,7 @@
 **Status:** Deep dive 2026-06-30 · stance **watch** · base case **~13% per year** (5-year stub) with **30%** bear wipeout weight.
 
 **Key files:**
+- `research/scenario_valuation_simple_2026-06-30.md` (every assumption, step-by-step)
 - `research/deep_dive_2026-06-30.md`
 - `research/valuation.json`
 - `investor-documents/sec-edgar/424B5_20260630_rpt_acc0001628280_26_046144.htm` (Transactions prospectus)
