@@ -14,13 +14,17 @@
     "predictive_attribute": "capital_markets_refinancing_binary"
   },
   "inputs": {
-    "price": 6.97,
-    "price_source": "424B5 preliminary prospectus supplement \u2014 NYSE close June 29, 2026",
-    "price_as_of": "2026-06-29",
+    "price": 3.08,
+    "price_source": "NYSE close June 30, 2026 (stock fell 56% from $6.97 on financing news)",
+    "price_as_of": "2026-06-30",
     "shares_millions": 150.322,
     "shares_source": "150,321,586 shares outstanding March 31, 2026 (424B5 capitalization table; Q1 10-Q)",
-    "shares_pro_forma_millions": 165.0,
-    "shares_pro_forma_note": "$100M equity offering at ~$6.97 adds ~14.3M shares before convert dilution [Assumption]",
+    "net_revenue_interest_pct": 83.6,
+    "net_revenue_interest_source": "10-K: 100% working interest, average 83.6% net revenue interest",
+    "historical_peak_gross_bpd": 29000,
+    "historical_peak_source": "10-K SYU production history (2014 full-year average oil)",
+    "equity_raise_price_assumed": 3.0,
+    "equity_raise_new_shares_m": 33.3,
     "per_share": -0.85,
     "fcf_source": "FY2025 net loss $410.2M on 145M weighted shares; Q1 2026 operating loss $119M with minimal revenue \u2014 normalized owner cash negative during restart [Assumption]",
     "normalization_note": "Lawrence ten-year FCF path not meaningful pre-refi; stance uses dated equity-stub scenarios per equity_stub_valuation.md."
@@ -61,163 +65,219 @@
   },
   "scenarios": {
     "bear": {
-      "price": 6.97,
-      "payoff": 0.5,
+      "price": 3.08,
+      "payoff": 0.35,
       "years": 2,
-      "probability": 0.3,
-      "notes": "Refi fails or closes then production/regulatory shock; Exxon acceleration or distressed exchange; equity stub near zero"
+      "probability": 0.35,
+      "notes": "Refi fails; asset liquidation. $1.25B distressed value less $0.98B Exxon secured less $0.22B other net liabilities = ~$50M residual / 150.3M shares. Highly sensitive to distressed asset value vs $980M secured claim."
     },
     "base": {
-      "price": 6.97,
-      "payoff": 13.0,
+      "price": 3.08,
+      "payoff": 3.73,
       "years": 5,
       "probability": 0.45,
-      "notes": "Cross-conditioned Transactions close by July 24; 54k bbl/d; $975M debt service covered at mid-cycle oil"
+      "notes": "Refi closes; 42k bbl/d gross x 83.6% NRI x $58 net = $743M revenue; $305M EBITDA at 5.0x EV/EBITDA less $840M net debt / 184M diluted shares. Swings -8% to +12% per year on exit multiple alone."
     },
     "bull": {
-      "price": 6.97,
-      "payoff": 28.0,
+      "price": 3.08,
+      "payoff": 10.22,
       "years": 5,
-      "probability": 0.25,
-      "notes": "Full SYU ramp incl. Hondo + perforations; oil $75+; Term Loan B amortized from excess cash flow; converts remain out-of-the-money; equity re-rates toward asset NAV"
+      "probability": 0.2,
+      "notes": "52k bbl/d gross x 83.6% NRI x $64 net = $1,016M revenue; $557M EBITDA at 5.5x; converts convert into ~75M shares (debt drops to $420M net); 258.6M diluted shares."
     }
   },
   "simple_model": {
     "doc": "SOC/research/scenario_valuation_simple_2026-06-30.md",
+    "revision": 2,
+    "revision_notes": "Rev 2: price $3.08 (Jun 30 close), 83.6% net revenue interest applied to revenue, production grounded vs 29k 2014 peak, bear via asset liquidation at 150.3M shares, equity raise + convert dilution at ~$3.",
     "shared_facts": {
-      "price_today": 6.97,
+      "price_today": 3.08,
       "shares_outstanding_m": 150.3,
-      "production_jun18_bpd": 43000,
+      "net_revenue_interest_pct": 83.6,
+      "working_interest_pct": 100,
+      "production_jun18_gross_bpd": 43000,
+      "historical_peak_2014_gross_bpd": 29000,
+      "wti_jun30": 70,
       "exxon_loan_m": 979.5,
       "exxon_maturity": "2026-07-24",
       "term_loan_b_m": 675,
       "term_loan_b_rate_pct": 15,
       "convert_notes_m": 300,
       "equity_raise_m": 100,
+      "equity_raise_price_assumed": 3.0,
+      "equity_raise_new_shares_m": 33.3,
       "post_close_gross_debt_m": 975,
       "post_close_cash_m": 135,
       "days_per_year": 365
     },
     "bear": {
+      "method": "asset_liquidation",
       "assumptions": {
         "refi_closes": false,
         "production_bpd": 0,
-        "distressed_equity_recovery_m": 75,
-        "share_count_m": 165,
+        "distressed_asset_value_m": 1250,
+        "exxon_secured_m": 980,
+        "other_net_liabilities_m": 220,
+        "share_count_m": 150.3,
         "years": 2,
-        "price_today": 6.97
+        "price_today": 3.08
       },
       "steps": {
-        "equity_value_m": 75,
-        "value_per_share": 0.5,
-        "total_return_pct": -92.8,
-        "annual_return_pct": -73.2
-      }
+        "residual_equity_m": 50,
+        "value_per_share": 0.35,
+        "total_return_pct": -88.6,
+        "annual_return_pct": -66.3
+      },
+      "sensitivity": [
+        {
+          "distressed_asset_m": 1100,
+          "value_per_share": 0.0,
+          "annual_return_pct": -100
+        },
+        {
+          "distressed_asset_m": 1250,
+          "value_per_share": 0.35,
+          "annual_return_pct": -66
+        },
+        {
+          "distressed_asset_m": 1500,
+          "value_per_share": 2.0,
+          "annual_return_pct": -19
+        }
+      ]
     },
     "base": {
+      "method": "ev_ebitda",
       "assumptions": {
         "refi_closes": true,
-        "production_bpd": 54000,
+        "gross_production_bpd": 42000,
+        "net_revenue_interest_pct": 83.6,
         "days_per_year": 365,
         "net_oil_price_per_bbl": 58,
-        "loe_per_bbl": 23,
+        "loe_per_gross_bbl": 24,
         "ga_m": 70,
         "exit_ev_ebitda": 5.0,
-        "term_loan_b_m": 675,
-        "convert_notes_m": 300,
+        "gross_debt_m": 975,
         "cash_m": 135,
-        "cash_interest_m": 125,
-        "share_count_m": 175,
+        "cash_interest_m": 122,
+        "diluted_shares_m": 184,
         "years": 5,
-        "price_today": 6.97
+        "price_today": 3.08
       },
       "steps": {
-        "annual_barrels_m": 19.71,
-        "revenue_m": 1143.2,
-        "loe_m": 453.3,
-        "ebitda_m": 619.9,
-        "gross_debt_m": 975,
+        "gross_barrels_m": 15.33,
+        "net_barrels_m": 12.816,
+        "revenue_m": 743.3,
+        "loe_m": 367.9,
+        "ebitda_m": 305.4,
+        "ebitda_minus_interest_m": 183.4,
         "net_debt_m": 840,
-        "enterprise_value_m": 3099.5,
-        "equity_value_m": 2259.5,
-        "value_per_share": 13.0,
-        "ebitda_minus_interest_m": 494.9,
-        "total_return_pct": 86.5,
-        "annual_return_pct": 13.3
-      }
+        "enterprise_value_m": 1527.0,
+        "equity_value_m": 687.0,
+        "value_per_share": 3.73,
+        "total_return_pct": 21.1,
+        "annual_return_pct": 3.9
+      },
+      "multiple_sensitivity": [
+        {
+          "exit_ev_ebitda": 4.0,
+          "value_per_share": 2.08,
+          "annual_return_pct": -7.6
+        },
+        {
+          "exit_ev_ebitda": 5.0,
+          "value_per_share": 3.73,
+          "annual_return_pct": 3.9
+        },
+        {
+          "exit_ev_ebitda": 6.0,
+          "value_per_share": 5.41,
+          "annual_return_pct": 11.9
+        }
+      ]
     },
     "bull": {
+      "method": "ev_ebitda_with_conversion",
       "assumptions": {
         "refi_closes": true,
-        "production_bpd": 65000,
+        "gross_production_bpd": 52000,
+        "net_revenue_interest_pct": 83.6,
         "days_per_year": 365,
-        "net_oil_price_per_bbl": 63,
-        "loe_per_bbl": 20,
+        "net_oil_price_per_bbl": 64,
+        "loe_per_gross_bbl": 21,
         "ga_m": 60,
-        "exit_ev_ebitda": 6.0,
+        "exit_ev_ebitda": 5.5,
         "term_loan_b_at_exit_m": 600,
-        "convert_notes_m": 300,
+        "converts_convert": true,
+        "conversion_price_assumed": 4.0,
+        "convert_new_shares_m": 75,
         "cash_at_exit_m": 180,
-        "cash_interest_m": 114,
-        "share_count_m": 182,
+        "diluted_shares_m": 258.6,
         "years": 5,
-        "price_today": 6.97
+        "price_today": 3.08
       },
       "steps": {
-        "annual_barrels_m": 23.725,
-        "revenue_m": 1494.7,
-        "loe_m": 474.5,
-        "ebitda_m": 960.2,
-        "gross_debt_m": 900,
-        "net_debt_m": 720,
-        "enterprise_value_m": 5761.2,
-        "equity_value_m": 5041.2,
-        "value_per_share": 28.0,
-        "ebitda_minus_interest_m": 846.2,
-        "total_return_pct": 301.7,
-        "annual_return_pct": 32.1
+        "gross_barrels_m": 18.98,
+        "net_barrels_m": 15.867,
+        "revenue_m": 1015.5,
+        "loe_m": 398.6,
+        "ebitda_m": 556.9,
+        "net_debt_m": 420,
+        "enterprise_value_m": 3063.0,
+        "equity_value_m": 2643.0,
+        "value_per_share": 10.22,
+        "total_return_pct": 231.8,
+        "annual_return_pct": 27.1
       }
-    }
+    },
+    "probability_weighted_value_per_share": 3.85
   },
   "scenario_build": {
     "bear": {
       "trigger": "No Term Loan B syndication by July 24, 2026 OR post-close California pipeline/order shutdown",
-      "production_bpd": 0,
-      "distressed_equity_recovery_m": 75,
-      "diluted_shares_m": 165,
-      "equity_per_share": 0.5,
+      "method": "asset_liquidation",
+      "gross_production_bpd": 0,
+      "distressed_asset_value_m": 1250,
+      "exxon_secured_m": 980,
+      "other_net_liabilities_m": 220,
+      "residual_equity_m": 50,
+      "diluted_shares_m": 150.3,
+      "equity_per_share": 0.35,
       "years": 2
     },
     "base": {
       "trigger": "Transactions close on filed terms ($675M TL B + $300M converts + $100M equity)",
-      "production_bpd": 54000,
+      "gross_production_bpd": 42000,
+      "net_revenue_interest_pct": 83.6,
       "net_realization_per_bbl": 58,
-      "loe_per_bbl": 23,
+      "loe_per_gross_bbl": 24,
       "ga_m": 70,
-      "cash_interest_m": 125,
-      "ebitda_m": 619.9,
+      "cash_interest_m": 122,
+      "revenue_m": 743.3,
+      "ebitda_m": 305.4,
       "exit_ev_ebitda": 5.0,
-      "enterprise_value_m": 3099.5,
+      "enterprise_value_m": 1527.0,
       "net_debt_m": 840,
-      "equity_value_m": 2259.5,
-      "diluted_shares_m": 175,
-      "equity_per_share": 13.0,
+      "equity_value_m": 687.0,
+      "diluted_shares_m": 184,
+      "equity_per_share": 3.73,
       "years": 5
     },
     "bull": {
-      "trigger": "Full ramp + Hondo + perforations; oil firm; Term Loan B paydown",
-      "production_bpd": 65000,
-      "net_realization_per_bbl": 63,
-      "loe_per_bbl": 20,
+      "trigger": "Full ramp + Hondo + perforations; oil firm; converts convert to equity",
+      "gross_production_bpd": 52000,
+      "net_revenue_interest_pct": 83.6,
+      "net_realization_per_bbl": 64,
+      "loe_per_gross_bbl": 21,
       "ga_m": 60,
-      "cash_interest_m": 114,
-      "ebitda_m": 960.2,
-      "exit_ev_ebitda": 6.0,
-      "enterprise_value_m": 5761.2,
-      "net_debt_m": 720,
-      "equity_value_m": 5041.2,
-      "diluted_shares_m": 182,
-      "equity_per_share": 28.0,
+      "revenue_m": 1015.5,
+      "ebitda_m": 556.9,
+      "exit_ev_ebitda": 5.5,
+      "enterprise_value_m": 3063.0,
+      "net_debt_m": 420,
+      "equity_value_m": 2643.0,
+      "diluted_shares_m": 258.6,
+      "equity_per_share": 10.22,
       "years": 5
     }
   },
@@ -240,7 +300,7 @@
     "primary_metric": "lawrence_base",
     "primary_label": "annualized return",
     "notes": "Floor uses stressed NAV on 30k bbl/d at $55 net less net debt; not dhando until Exxon loan refinanced",
-    "primary_return_pct": 13.3
+    "primary_return_pct": 3.9
   },
   "option_scan": [
     {
@@ -300,30 +360,30 @@
   },
   "results_lawrence_legacy": {
     "bear": {
-      "return_pct": -73.2
+      "return_pct": -66.3
     },
     "base": {
-      "return_pct": 13.3
+      "return_pct": 3.9
     },
     "bull": {
-      "return_pct": 32.1
+      "return_pct": 27.1
     }
   },
   "results": {
     "bear": {
-      "return_pct": -73.2
+      "return_pct": -66.3
     },
     "base": {
-      "return_pct": 13.3
+      "return_pct": 3.9
     },
     "bull": {
-      "return_pct": 32.1
+      "return_pct": 27.1
     }
   },
   "implied_return": {
-    "base_pct": 13.3,
+    "base_pct": 3.9,
     "label": "annualized return",
-    "display": "13.3% (base)"
+    "display": "3.9% (base)"
   },
   "overlay_results": [],
   "total_return_panel": {

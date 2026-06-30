@@ -49,14 +49,13 @@ re_pass: false
 
 | Check | Expected (valuation.json) | Found in dive | OK? |
 |-------|---------------------------|---------------|-----|
-| Returns statement | 13.3% | 13.3% | Yes |
-| Classification IRR | 13.3% | None% | — |
-| Valuation bridge base | 13.3% | 13.3% | Yes |
+| Returns statement | 3.9% | None% | — |
+| Classification IRR | 3.9% | 3.9% | Yes |
+| Valuation bridge base | 3.9% | None% | — |
 
 **Lint notes:**
-- SOC/research: dive header cites adversarial but file missing
-- SOC/research/deep_dive_2026-06-30.md: executive_summary_first_pct 15.0% vs valuation.json base 13.3% (tol 0.25pp)
-- SOC/research/deep_dive_2026-06-30.md: missing Implied 7yr IRR in Classification
+- SOC/research/deep_dive_2026-06-30.md: executive_summary_first_pct 15.0% vs valuation.json base 3.9% (tol 0.25pp)
+- SOC/research/deep_dive_2026-06-30.md: missing parseable Returns statement IRR
 
 ---
 
