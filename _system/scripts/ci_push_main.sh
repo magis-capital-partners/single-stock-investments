@@ -15,9 +15,18 @@ conflicted_files() {
   git diff --name-only --diff-filter=U
 }
 
-is_generated_dashboard_json() {
+is_regenerable_artifact() {
   case "$1" in
     dashboard/data/*.json|docs/data/*.json)
+      return 0
+      ;;
+    docs/INDEX.csv)
+      return 0
+      ;;
+    */INDEX.csv)
+      return 0
+      ;;
+    _system/portfolio/holdings.md|_system/portfolio/classification.json|_system/portfolio/us_ticker_config.json)
       return 0
       ;;
     *)
@@ -26,14 +35,14 @@ is_generated_dashboard_json() {
   esac
 }
 
-is_regenerable_dashboard_conflict() {
+is_regenerable_conflict() {
   local conflicted file
   conflicted=$(conflicted_files)
   if [ -z "$conflicted" ]; then
     return 1
   fi
   while IFS= read -r file; do
-    if ! is_generated_dashboard_json "$file"; then
+    if ! is_regenerable_artifact "$file"; then
       echo "Non-regenerable rebase conflict in: $file"
       return 1
     fi
@@ -52,19 +61,89 @@ regenerate_dashboard_json() {
   git add docs/data/*.json 2>/dev/null || true
 }
 
+regenerate_folder_indexes() {
+  if [ ! -f "_system/scripts/build_folder_indexes.py" ]; then
+    echo "::error::build_folder_indexes.py not found; cannot auto-resolve INDEX.csv conflicts."
+    return 1
+  fi
+  echo "Regenerating INDEX.csv files to resolve rebase conflicts..."
+  "$PYTHON" _system/scripts/build_folder_indexes.py
+  git add -- ':(glob)*/INDEX.csv' 2>/dev/null || true
+}
+
+regenerate_docs_index() {
+  if [ ! -f "_system/scripts/build_folder_indexes.py" ]; then
+    echo "::error::build_folder_indexes.py not found; cannot auto-resolve docs/INDEX.csv conflicts."
+    return 1
+  fi
+  echo "Regenerating docs/INDEX.csv to resolve rebase conflicts..."
+  "$PYTHON" _system/scripts/build_folder_indexes.py --folder docs
+  git add docs/INDEX.csv 2>/dev/null || true
+}
+
+regenerate_portfolio_artifacts() {
+  if [ ! -f "_system/scripts/sync_portfolio_from_registry.py" ]; then
+    echo "::error::sync_portfolio_from_registry.py not found; cannot auto-resolve portfolio conflicts."
+    return 1
+  fi
+  echo "Regenerating portfolio artifacts to resolve rebase conflicts..."
+  "$PYTHON" _system/scripts/sync_portfolio_from_registry.py
+  git add _system/portfolio/holdings.md _system/portfolio/classification.json _system/portfolio/us_ticker_config.json 2>/dev/null || true
+}
+
+regenerate_conflicted_artifacts() {
+  local conflicted file
+  local needs_dashboard=0
+  local needs_indexes=0
+  local needs_docs_index=0
+  local needs_portfolio=0
+
+  conflicted=$(conflicted_files)
+  while IFS= read -r file; do
+    [ -n "$file" ] || continue
+    case "$file" in
+      dashboard/data/*.json|docs/data/*.json)
+        needs_dashboard=1
+        ;;
+      docs/INDEX.csv)
+        needs_docs_index=1
+        ;;
+      */INDEX.csv)
+        needs_indexes=1
+        ;;
+      _system/portfolio/holdings.md|_system/portfolio/classification.json|_system/portfolio/us_ticker_config.json)
+        needs_portfolio=1
+        ;;
+    esac
+  done <<< "$conflicted"
+
+  if [ "$needs_indexes" -eq 1 ]; then
+    regenerate_folder_indexes
+  fi
+  if [ "$needs_docs_index" -eq 1 ]; then
+    regenerate_docs_index
+  fi
+  if [ "$needs_portfolio" -eq 1 ]; then
+    regenerate_portfolio_artifacts
+  fi
+  if [ "$needs_dashboard" -eq 1 ]; then
+    regenerate_dashboard_json
+  fi
+}
+
 try_resolve_rebase_conflicts() {
   if ! rebase_in_progress; then
     return 1
   fi
-  if ! is_regenerable_dashboard_conflict; then
+  if ! is_regenerable_conflict; then
     return 1
   fi
-  regenerate_dashboard_json
+  regenerate_conflicted_artifacts
   GIT_EDITOR=true git rebase --continue || true
   if ! rebase_in_progress; then
     return 0
   fi
-  is_regenerable_dashboard_conflict
+  is_regenerable_conflict
 }
 
 ci_push_main() {
@@ -82,14 +161,14 @@ ci_push_main() {
     git fetch origin main
     if ! git rebase origin/main; then
       while rebase_in_progress && try_resolve_rebase_conflicts; do
-        echo "Resolved dashboard rebase conflict; continuing rebase (attempt $attempt/$MAX_ATTEMPTS)."
+        echo "Resolved regenerable rebase conflicts; continuing rebase (attempt $attempt/$MAX_ATTEMPTS)."
       done
       if rebase_in_progress; then
         echo "::error::Rebase onto origin/main failed (attempt $attempt/$MAX_ATTEMPTS)."
         git rebase --abort 2>/dev/null || true
         exit 1
       fi
-      echo "Rebase conflicts resolved via dashboard regeneration (attempt $attempt/$MAX_ATTEMPTS)."
+      echo "Rebase conflicts resolved via artifact regeneration (attempt $attempt/$MAX_ATTEMPTS)."
     fi
     if git push origin HEAD:main; then
       echo "Pushed to main (attempt $attempt)."
