@@ -93,6 +93,9 @@ jobs:
           python _system/scripts/build_insights.py
           python _system/scripts/build_research_memory.py
           python _system/scripts/build_dashboard_data.py
+        env:
+          OAUTH_CLIENT_ID: ${{ vars.OAUTH_CLIENT_ID }}
+          OAUTH_PROXY_URL: ${{ vars.OAUTH_PROXY_URL }}
 
       - name: Mirror dashboard to docs
         if: steps.google_creds.outputs.configured == 'true'

@@ -11,11 +11,16 @@ const ALLOW_ORIGINS = new Set([
 ]);
 
 function corsHeaders(origin) {
-  const allow = origin && ALLOW_ORIGINS.has(origin) ? origin : 'https://magis-capital-partners.github.io';
+  // Echo the request origin when allowlisted so browser CORS checks pass.
+  const allow =
+    origin && ALLOW_ORIGINS.has(origin)
+      ? origin
+      : 'https://magis-capital-partners.github.io';
   return {
     'Access-Control-Allow-Origin': allow,
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Accept',
+    Vary: 'Origin',
   };
 }
 

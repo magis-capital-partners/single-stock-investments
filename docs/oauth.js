@@ -90,6 +90,19 @@
     return data;
   }
 
+  function wrapFetchError(err, cfg) {
+    const msg = err && err.message ? err.message : String(err);
+    if (msg === 'Failed to fetch' || err instanceof TypeError) {
+      const proxy = proxyBase(cfg);
+      return new Error(
+        proxy
+          ? `OAuth proxy unreachable (${proxy}). Redeploy dashboard/oauth-proxy to Cloudflare — see dashboard/oauth-proxy/README.md`
+          : 'OAuth proxy not configured. Set OAUTH_PROXY_URL and redeploy the dashboard.'
+      );
+    }
+    return err instanceof Error ? err : new Error(msg);
+  }
+
   function getToken() {
     return global.localStorage.getItem(TOKEN_KEY)
       || global.localStorage.getItem(LEGACY_TOKEN_KEY)
@@ -142,7 +155,7 @@
     const device = await githubOAuthPost(cfg, '/login/device/code', {
       client_id: clientId,
       scope: 'repo',
-    });
+    }).catch(err => { throw wrapFetchError(err, cfg); });
     if (device.error) throw new Error(device.error_description || device.error);
 
     global.sessionStorage.setItem(DEVICE_KEY, JSON.stringify({
