@@ -49,6 +49,21 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  oauth-secrets:
+    runs-on: ubuntu-latest
+    outputs:
+      configured: ${{ steps.check.outputs.configured }}
+    steps:
+      - id: check
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          if [ -n "$CF_TOKEN" ]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+          fi
+
   oauth-changed:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
@@ -59,7 +74,6 @@ jobs:
         with:
           fetch-depth: 0
       - id: check
-        shell: bash
         run: |
           BEFORE="${{ github.event.before }}"
           if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
@@ -73,19 +87,19 @@ jobs:
           fi
 
   oauth-proxy:
-    needs: oauth-changed
+    needs: [oauth-secrets, oauth-changed]
     if: |
       always() &&
+      needs.oauth-secrets.outputs.configured == 'true' &&
       (
         (github.event_name == 'workflow_dispatch' && inputs.deploy_oauth == true) ||
-        (github.event_name == 'push' && needs.oauth-changed.outputs.changed == 'true')
-      ) &&
-      secrets.CLOUDFLARE_API_TOKEN != ''
+        (github.event_name == 'push' && needs.oauth-changed.result != 'failure' && needs.oauth-changed.outputs.changed == 'true')
+      )
     uses: ./.github/workflows/_deploy-oauth.yml
     secrets: inherit
 
   publish:
-    needs: oauth-proxy
+    needs: [oauth-secrets, oauth-proxy]
     if: |
       always() &&
       (needs.oauth-proxy.result == 'success' || needs.oauth-proxy.result == 'skipped') &&
