@@ -1,0 +1,18 @@
+name: Deploy OAuth proxy
+description: Deploy marvin-oauth-proxy Cloudflare Worker via Wrangler
+
+runs:
+  using: composite
+  steps:
+    - name: Deploy Cloudflare Worker
+      uses: cloudflare/wrangler-action@v3
+      with:
+        apiToken: ${{ env.CLOUDFLARE_API_TOKEN }}
+        accountId: ${{ env.CLOUDFLARE_ACCOUNT_ID }}
+        workingDirectory: dashboard/oauth-proxy
+
+    - name: Summary
+      shell: bash
+      run: |
+        echo "OAuth proxy deployed. Set OAUTH_PROXY_URL repo variable to the worker URL if it changed."
+        echo "Deploy Dashboard will bake exchange_url into oauth_config.json on the next run."

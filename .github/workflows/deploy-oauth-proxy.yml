@@ -29,8 +29,13 @@ jobs:
   deploy:
     needs: oauth-secrets
     if: needs.oauth-secrets.outputs.configured == 'true'
-    uses: ./.github/workflows/_deploy-oauth.yml
-    secrets: inherit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/deploy-oauth
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
   skip-no-secrets:
     needs: oauth-secrets

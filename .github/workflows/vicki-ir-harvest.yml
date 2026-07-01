@@ -34,14 +34,10 @@ jobs:
       tickers: ${{ steps.matrix.outputs.tickers }}
       max_parallel: ${{ steps.matrix.outputs.max_parallel }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-
       - name: Build matrix
         id: matrix
         env:
@@ -60,22 +56,25 @@ jobs:
           MAXP="${MAXP:-2}"
           echo "max_parallel=$MAXP" >> "$GITHUB_OUTPUT"
           echo "Vicki tickers: $TICKERS_JSON (max_parallel=$MAXP)"
-
       - name: Skip if empty
         if: steps.matrix.outputs.tickers == '[]'
-        run: |
-          echo "No tickers to process."
-          exit 0
+        run: echo "No tickers to process."
 
   harvest:
     needs: prepare
     if: needs.prepare.outputs.tickers != '[]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
     strategy:
       fail-fast: false
       max-parallel: ${{ fromJson(needs.prepare.outputs.max_parallel) }}
       matrix:
         ticker: ${{ fromJson(needs.prepare.outputs.tickers) }}
-    uses: ./.github/workflows/_vicki-agent.yml
-    with:
-      ticker: ${{ matrix.ticker }}
-    secrets: inherit
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/vicki-agent
+        env:
+          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        with:
+          ticker: ${{ matrix.ticker }}

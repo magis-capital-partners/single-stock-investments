@@ -16,7 +16,7 @@ Force `marvin-deep-dive` for all **22** onboard-pending tickers from batch 2026-
 
 ## After merge
 
-- Actions → **Batch Marvin Deep Dive** should start automatically from the queue file push.
+- Actions → **Marvin Deep Dive** should start automatically from the queue file push (batch mode).
 - Or manually: `gh workflow run batch-marvin-deep-dive.yml -R GoldmanDrew/single-stock-investments`
 - Per-ticker (admin PAT): `_system/scripts/batch_dispatch_deep_dives.sh`
 

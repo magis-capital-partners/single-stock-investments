@@ -76,12 +76,12 @@ See **`_system/reference/ci-workflows.md`** for the full capability matrix, shar
 | [`dashboard-pages.yml`](.github/workflows/dashboard-pages.yml) | Push paths + manual + workflow_run | Optional OAuth deploy → rebuild JSON → GitHub Pages |
 | [`deploy-oauth-proxy.yml`](.github/workflows/deploy-oauth-proxy.yml) | Push oauth-proxy + manual | Cloudflare Worker deploy (or local Wrangler) |
 | [`marvin-onboard.yml`](.github/workflows/marvin-onboard.yml) | Manual + repository_dispatch | Onboard ticker → optional deep dive PR → **chains Deploy Dashboard** |
-| [`marvin-deep-dive.yml`](.github/workflows/marvin-deep-dive.yml) | Manual (ticker input) | Cursor Cloud Agent deep dive → opens PR |
-| [`marvin-daily-deep-dive.yml`](.github/workflows/marvin-daily-deep-dive.yml) | Manual only | Pick on new documents (or **force_rotate**) → cloud agent → PR |
-| [`batch-marvin-deep-dive.yml`](.github/workflows/batch-marvin-deep-dive.yml) | Manual + push queue file | Matrix deep dives → PRs |
+| [`marvin-deep-dive.yml`](.github/workflows/marvin-deep-dive.yml) | Manual (mode: deep-dive / auto-pick / batch) + push queue | Cursor Cloud Agent → PR(s) |
 | [`vicki-ir-harvest.yml`](.github/workflows/vicki-ir-harvest.yml) | Manual + push queue file | Browser IR harvest for ir_gap tickers |
 | [`research-quality.yml`](.github/workflows/research-quality.yml) | PRs touching `**/research/**` | Lint dives + verify cloud prompt sync |
 | [`ci-autofix.yml`](.github/workflows/ci-autofix.yml) | Failed workflow_run + manual | Triage CI failures → optional Cursor autofix |
+
+See [`_system/reference/ci-workflows.md`](_system/reference/ci-workflows.md) for composite actions (hidden from sidebar) and orchestration diagram.
 
 ### Marvin pipeline (local = cloud)
 
@@ -155,7 +155,7 @@ git commit -m "research: YOUR_MESSAGE"
 git push origin main
 ```
 
-Or run **Actions → Marvin Deep Dive** with a ticker; review and merge the PR the cloud agent opens (must end with `marvin_cloud_refresh.py` per runbook).
+Or run **Actions → Marvin Deep Dive** with mode `deep-dive` and a ticker; review and merge the PR the cloud agent opens (must end with `marvin_cloud_refresh.py` per runbook).
 
 Dashboard links use **filename date** (not mtime) for latest `deep_dive_*.md` / `adversarial_*.md`.
 
