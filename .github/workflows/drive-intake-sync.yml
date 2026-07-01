@@ -83,8 +83,13 @@ jobs:
         if: steps.google_creds.outputs.configured == 'true'
         run: |
           python _system/scripts/build_document_registry.py
+          python _system/scripts/audit_drive_pdf_store.py
+          python _system/scripts/build_drive_filename_index.py
+          python _system/scripts/build_letter_drive_links.py
           python _system/scripts/sync_pdf_store_google_drive.py --root-key general_pdfs --workers 4
           python _system/scripts/build_document_registry.py
+          python _system/scripts/build_drive_filename_index.py
+          python _system/scripts/build_letter_drive_links.py
           python _system/scripts/build_insights.py
           python _system/scripts/build_research_memory.py
           python _system/scripts/build_dashboard_data.py
