@@ -82,7 +82,7 @@ jobs:
       - name: Activist scan (SEC + publishers)
         if: steps.google_creds.outputs.configured == 'true'
         run: |
-          python _system/scripts/scan_activist_sources.py --sec-only || true
+          python _system/scripts/scan_activist_sources.py --sec-only --reconcile || true
           python _system/scripts/short_scan_batch.py
 
       - name: Rebuild document registry and dashboard data

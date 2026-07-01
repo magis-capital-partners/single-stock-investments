@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import re
 import time
 import urllib.request
 from pathlib import Path
@@ -12,19 +11,20 @@ from activist_common import (
     ACTIVIST_FORMS,
     activist_reports_dir,
     append_scan_log,
+    firm_name,
     load_ticker_index,
-    match_firm_id,
     now_iso,
     rel,
     save_ticker_index,
-    side_for_firm,
     ticker_meta,
     upsert_report,
 )
+from sec_filer_parse import analyze_sec_filing, should_index_filing
 
 SEC_UA = "MarvinActivistScan contact@example.com"
 SLEEP_SEC = 0.12
 ROOT = Path(__file__).resolve().parents[2]
+READ_LIMIT = 250_000
 
 
 def sec_url(cik_path: str, accession: str, primary: str) -> str:
@@ -55,14 +55,133 @@ def download(url: str, dest: Path) -> bool:
     return True
 
 
-def read_filer_hint(path: Path, limit: int = 12000) -> str:
+def read_filing_text(path: Path) -> str:
     try:
-        return path.read_text(encoding="utf-8", errors="ignore")[:limit]
+        return path.read_text(encoding="utf-8", errors="ignore")[:READ_LIMIT]
     except OSError:
         return ""
 
 
-def scan_ticker_sec(ticker: str, *, min_date: str = "2018-01-01", dry_run: bool = False) -> list[dict]:
+def form_from_filename(name: str) -> str:
+    stem = name.split("_")[0]
+    return stem.replace("-", " ")
+
+
+def is_sec_filing_path(path: str | None) -> bool:
+    if not path:
+        return False
+    name = Path(path).name
+    return name.startswith(("SC-", "DEFC", "PREC", "DFAN"))
+
+
+def reindex_local_sec(ticker: str, *, include_passive: bool = False) -> list[dict]:
+    hits: list[dict] = []
+    index = load_ticker_index(ticker)
+    non_sec = [
+        r
+        for r in (index.get("reports") or [])
+        if r.get("source") not in {"sec_edgar", "local"}
+        or not is_sec_filing_path(r.get("local_file"))
+    ]
+    sec_entries: list[dict] = []
+    for side in ("long", "short"):
+        base = activist_reports_dir(ticker, side)
+        if not base.is_dir():
+            continue
+        for path in sorted(base.iterdir()):
+            if path.suffix.lower() not in {".htm", ".html", ".txt"}:
+                continue
+            if not path.name.startswith(("SC-", "DEFC", "PREC", "DFAN")):
+                continue
+            form = form_from_filename(path.name)
+            text = read_filing_text(path)
+            entry = _entry_from_analysis(
+                ticker,
+                form,
+                path,
+                text,
+                source_url=report_source_url(index, path),
+                accession=_accession_from_name(path.name),
+            )
+            if not entry:
+                continue
+            if not should_index_filing(entry["filing_class"], include_passive=include_passive):
+                continue
+            hits.append(entry)
+            sec_entries.append(entry)
+    index["reports"] = non_sec + sec_entries
+    save_ticker_index(ticker, index)
+    return hits
+
+
+def report_source_url(index: dict, path: Path) -> str | None:
+    rel_path = rel(path)
+    for report in index.get("reports") or []:
+        if report.get("local_file") == rel_path:
+            return report.get("source_url")
+    return None
+
+
+def _accession_from_name(name: str) -> str | None:
+    m = __import__("re").search(r"acc(\d{10}_\d{2}_\d{6})", name)
+    if not m:
+        return None
+    raw = m.group(1).replace("_", "")
+    return f"{raw[:10]}-{raw[10:12]}-{raw[12:]}"
+
+
+def _entry_from_analysis(
+    ticker: str,
+    form: str,
+    dest: Path,
+    text: str,
+    *,
+    source_url: str | None,
+    accession: str | None,
+    filing_date: str | None = None,
+) -> dict | None:
+    analysis = analyze_sec_filing(form, text)
+    if not should_index_filing(analysis["filing_class"], include_passive=False):
+        return None
+    fd = filing_date
+    if not fd:
+        m = __import__("re").search(r"(20\d{6})", dest.name)
+        fd = f"{m.group(1)[:4]}-{m.group(1)[4:6]}-{m.group(1)[6:8]}" if m else now_iso()[:10]
+    title_bits = [analysis["firm_name"], form]
+    if analysis.get("reporting_persons") and analysis["firm_name"] not in analysis["reporting_persons"]:
+        title_bits = [analysis["reporting_persons"][0], form]
+    return {
+        "firm_id": analysis["firm_id"],
+        "firm_name": analysis["firm_name"],
+        "side": "long",
+        "report_date": fd,
+        "title": " — ".join(x for x in title_bits if x),
+        "source": "sec_edgar",
+        "source_url": source_url,
+        "local_pdf": rel(dest) if dest.suffix.lower() == ".pdf" else None,
+        "local_file": rel(dest),
+        "form": form,
+        "accession": accession,
+        "filing_class": analysis["filing_class"],
+        "include_in_feed": analysis["include_in_feed"],
+        "reporting_persons": analysis.get("reporting_persons") or [],
+        "status": "new",
+        "tier": "context",
+        "confidence": analysis["confidence"],
+    }
+
+
+def scan_ticker_sec(
+    ticker: str,
+    *,
+    min_date: str = "2018-01-01",
+    dry_run: bool = False,
+    include_passive: bool = False,
+    reindex_local: bool = False,
+) -> list[dict]:
+    if reindex_local:
+        return reindex_local_sec(ticker, include_passive=include_passive)
+
     meta = ticker_meta(ticker)
     cik = meta.get("cik")
     if not cik:
@@ -91,34 +210,20 @@ def scan_ticker_sec(ticker: str, *, min_date: str = "2018-01-01", dry_run: bool 
             continue
         url = sec_url(cik_path, accession, primary)
         ext = Path(primary).suffix or ".htm"
-        side = "long"
-        if form.startswith("SC 13G"):
-            side = "long"
         dest_name = f"{form.replace(' ', '-')}_{filing_date.replace('-', '')}_acc{accession.replace('-', '_')}{ext}"
-        dest = activist_reports_dir(ticker, side) / dest_name
+        dest = activist_reports_dir(ticker, "long") / dest_name
         if not dry_run:
             ok = download(url, dest)
             if not ok:
                 continue
-        text = read_filer_hint(dest) if dest.exists() else ""
-        firm_id = match_firm_id(text) or "unknown_activist"
-        side = side_for_firm(firm_id, default=side)
-        entry = {
-            "firm_id": firm_id,
-            "firm_name": firm_id.replace("_", " ").title(),
-            "side": side,
-            "report_date": filing_date,
-            "title": f"{form} filing",
-            "source": "sec_edgar",
-            "source_url": url,
-            "local_pdf": rel(dest) if dest.suffix.lower() == ".pdf" else None,
-            "local_file": rel(dest),
-            "form": form,
-            "accession": accession,
-            "status": "new",
-            "tier": "context",
-            "confidence": 0.9 if firm_id != "unknown_activist" else 0.5,
-        }
+        text = read_filing_text(dest) if dest.exists() else ""
+        entry = _entry_from_analysis(
+            ticker, form, dest, text, source_url=url, accession=accession, filing_date=filing_date
+        )
+        if not entry:
+            continue
+        if not should_index_filing(entry["filing_class"], include_passive=include_passive):
+            continue
         hits.append(entry)
         if not dry_run:
             index = load_ticker_index(ticker)
@@ -127,11 +232,23 @@ def scan_ticker_sec(ticker: str, *, min_date: str = "2018-01-01", dry_run: bool 
     return hits
 
 
-def scan_portfolio_sec(tickers: list[str] | None = None, *, dry_run: bool = False) -> dict:
+def scan_portfolio_sec(
+    tickers: list[str] | None = None,
+    *,
+    dry_run: bool = False,
+    include_passive: bool = False,
+    reindex_local: bool = False,
+) -> dict:
     tickers = tickers or []
     all_hits: list[dict] = []
+    skipped_passive = 0
     for ticker in tickers:
-        hits = scan_ticker_sec(ticker, dry_run=dry_run)
+        hits = scan_ticker_sec(
+            ticker,
+            dry_run=dry_run,
+            include_passive=include_passive,
+            reindex_local=reindex_local,
+        )
         for hit in hits:
             hit["ticker"] = ticker
         all_hits.extend(hits)
@@ -140,5 +257,6 @@ def scan_portfolio_sec(tickers: list[str] | None = None, *, dry_run: bool = Fals
         "generated_at": now_iso(),
         "ticker_count": len(tickers),
         "hit_count": len(all_hits),
+        "skipped_passive_count": skipped_passive,
         "hits": all_hits,
     }
