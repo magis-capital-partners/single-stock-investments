@@ -1,38 +1,44 @@
 # AMD — Activist reconciliation (Milly mechanical)
 
 **Date:** 2026-07-01
-**Pending reports reconciled:** 4
+**Pending reports reconciled:** 2
 
 ## Summary
 
 | Firm | Side | Date | Class | Verdict | Path |
 |------|------|------|-------|---------|------|
-| Hindenburg Research | short | 2024-01-01 | publisher_report | needs_human | `AMD/third-party-analyses/activist_reports/short/hindenburg_2024-01-01_smci.html` |
-| Spruce Point Capital | short | 2023-01-01 | publisher_report | needs_human | `AMD/third-party-analyses/activist_reports/short/spruce_point_2023-01-01_super-micro-computer-inc.html` |
-| hindenburg | short | None | — | needs_human | `AMD/third-party-analyses/activist_reports/short/hindenburg_2024-01-01_smci.html` |
-| spruce | short | None | — | needs_human | `AMD/third-party-analyses/activist_reports/short/spruce_point_2023-01-01_super-micro-computer-inc.html` |
+| S I.R.S. IDENTIFICATION NOS. OF ABOVE PERSONS (ENTITIES ONLY) Mubadala Investment Company PJSC | long | 2019-02-07 | activist_13d | needs_human | `AMD/third-party-analyses/activist_reports/long/SC-13D/A_20190207_acc0000947871_19_000079.htm` |
+| S I.R.S. IDENTIFICATION NOS. OF ABOVE PERSONS (ENTITIES ONLY) Mubadala Investment Company PJSC | long | 2018-08-02 | activist_13d | needs_human | `AMD/third-party-analyses/activist_reports/long/SC-13D/A_20180802_acc0000947871_18_000616.htm` |
 
 ## Notes
 
-**Hindenburg Research** (2024-01-01): <!DOCTYPE html>
-<html lang="en-US">
+**S I.R.S. IDENTIFICATION NOS. OF ABOVE PERSONS (ENTITIES ONLY) Mubadala Investment Company PJSC** (2019-02-07): <DOCUMENT>
+<TYPE>SC 13D/A
+<SEQUENCE>1
+<FILENAME>ss124680_13da.htm
+<DESCRIPTION>AMENDMENT NO. 11
+<TEXT>
+<html>
 <head>
+<title></title>
+</head>
+<body style="FONT-FAMILY: 'Times New Roman'; FONT-SIZE: 10pt" bgcolor="#ffffff" text="#000000">
+<div>
+<div style="TEXT-ALIGN: center; FONT-…
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,3…
-
-**Spruce Point Capital** (2023-01-01): <!DOCTYPE html><!-- Last Published: Mon Dec 01 2025 19:36:38 GMT+0000 (Coordinated Universal Time) --><html data-wf-domain="www.sprucepointcap.com" data-wf-page="656f8337d19d02e2b72142ec" data-wf-site="64caafa9c43c9fcf5b7b0d92" lang="en" data-wf-collection="656f8337d19d02e2b72143…
-
-**hindenburg** (None): <!DOCTYPE html>
-<html lang="en-US">
+**S I.R.S. IDENTIFICATION NOS. OF ABOVE PERSONS (ENTITIES ONLY) Mubadala Investment Company PJSC** (2018-08-02): <DOCUMENT>
+<TYPE>SC 13D/A
+<SEQUENCE>1
+<FILENAME>ss101958_13da.htm
+<DESCRIPTION>AMENDMENT NO. 10
+<TEXT>
+<html>
 <head>
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,3…
-
-**spruce** (None): <!DOCTYPE html><!-- Last Published: Mon Dec 01 2025 19:36:38 GMT+0000 (Coordinated Universal Time) --><html data-wf-domain="www.sprucepointcap.com" data-wf-page="656f8337d19d02e2b72142ec" data-wf-site="64caafa9c43c9fcf5b7b0d92" lang="en" data-wf-collection="656f8337d19d02e2b72143…
+<title></title>
+</head>
+<body style="FONT-FAMILY: 'Times New Roman'; FONT-SIZE: 10pt" bgcolor="#ffffff" text="#000000">
+<div>
+<div style="TEXT-ALIGN: center; FONT-…
 
 ## [HUMAN REVIEW]
 

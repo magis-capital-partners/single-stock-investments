@@ -1,7 +1,7 @@
 # ICE — Third-party source inventory
 
 **Date:** 2026-07-01
-**Sources:** 15 total (14 approved, 1 pending, 0 context)
+**Sources:** 12 total (11 approved, 1 pending, 0 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -16,9 +16,6 @@
 | activist_long | S Intercontinental Exchange, Inc. — SC 13D/A | `ICE/third-party-analyses/activist_reports/long/SC-13D/A_20230428_acc0000947871_23_000494.htm` | approved | activist/long — sec_edgar |
 | activist_long | S Intercontinental Exchange, Inc. — SC 13D/A | `ICE/third-party-analyses/activist_reports/long/SC-13D/A_20220505_acc0000947871_22_000508.htm` | approved | activist/long — sec_edgar |
 | activist_long | S Intercontinental Exchange, Inc. — SC 13D | `ICE/third-party-analyses/activist_reports/long/SC-13D_20211021_acc0001193125_21_304172.htm` | approved | activist/long — sec_edgar |
-| activist_short | Abaxx - Letter to the OSC and CIRO Published 5 days ago: Jun | `ICE/third-party-analyses/activist_reports/short/viceroy_2026-01-01_osc-and-ciro.html` | approved | activist/short — publisher_site |
-| activist_short | Abaxx – Cash Bounties Published 1 week ago: Jun 22, 2026 Aba | `ICE/third-party-analyses/activist_reports/short/viceroy_2026-01-01_abaxx-cash-bounties.html` | approved | activist/short — publisher_site |
-| activist_short | Abaxx: Some Assembly Required Published 2 weeks ago: Jun 15, | `ICE/third-party-analyses/activist_reports/short/viceroy_2026-01-01_abaxx-some-assembly-required.html` | approved | activist/short — publisher_site |
-| activist_short | Abaxx - Letter to MAS Published 2 weeks ago: Jun 12, 2026 Ju | `ICE/third-party-analyses/activist_reports/short/viceroy_2026-01-01_abaxx-letter-to-mas.html` | approved | activist/short — publisher_site |
+| activist_short | viceroy | `ICE/third-party-analyses/activist_reports/short/viceroy_2026-01-01_osc-and-ciro.html` | approved | activist/short — local |
 
 Cross-check required: `ICE/research/cross_check_third_party_2026-07-01.md`

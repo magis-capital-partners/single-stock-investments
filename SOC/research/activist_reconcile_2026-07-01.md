@@ -1,113 +1,126 @@
 # SOC — Activist reconciliation (Milly mechanical)
 
 **Date:** 2026-07-01
-**Pending reports reconciled:** 21
+**Pending reports reconciled:** 7
 
 ## Summary
 
 | Firm | Side | Date | Class | Verdict | Path |
 |------|------|------|-------|---------|------|
-| Hindenburg Research | short | 2024-01-01 | publisher_report | needs_human | `SOC/third-party-analyses/activist_reports/short/hindenburg_2024-01-01_sebi-chairperson.html` |
-| Muddy Waters Research | short | 2018-01-01 | publisher_report | needs_human | `SOC/third-party-analyses/activist_reports/short/muddy_waters_2018-01-01_block-on-bloomberg-markets-discussing-la.html` |
-| Spruce Point Capital | short | 2025-01-01 | publisher_report | needs_human | `SOC/third-party-analyses/activist_reports/short/spruce_point_2025-01-01_uranium-energy-corporation.html` |
-| Spruce Point Capital | short | 2025-01-01 | publisher_report | needs_human | `SOC/third-party-analyses/activist_reports/short/spruce_point_2025-01-01_monster-beverage-corp.html` |
-| Spruce Point Capital | short | 2025-01-01 | publisher_report | needs_human | `SOC/third-party-analyses/activist_reports/short/spruce_point_2025-01-01_procept-biorobotics-corp.html` |
-| Spruce Point Capital | short | 2024-01-01 | publisher_report | needs_human | `SOC/third-party-analyses/activist_reports/short/spruce_point_2024-01-01_zebra-technologies-corp.html` |
-| Spruce Point Capital | short | 2023-01-01 | publisher_report | needs_human | `SOC/third-party-analyses/activist_reports/short/spruce_point_2023-01-01_nuvei-corp.html` |
-| Spruce Point Capital | short | 2022-01-01 | publisher_report | needs_human | `SOC/third-party-analyses/activist_reports/short/spruce_point_2022-01-01_stryker-corp.html` |
-| Spruce Point Capital | short | 2021-01-01 | publisher_report | needs_human | `SOC/third-party-analyses/activist_reports/short/spruce_point_2021-01-01_heska-corp.html` |
-| Spruce Point Capital | short | 2021-01-01 | publisher_report | needs_human | `SOC/third-party-analyses/activist_reports/short/spruce_point_2021-01-01_american-battery-metals-corp-comstock-mi.html` |
-| Spruce Point Capital | short | 2020-01-01 | publisher_report | needs_human | `SOC/third-party-analyses/activist_reports/short/spruce_point_2020-01-01_avery-dennison-corp.html` |
-| Spruce Point Capital | short | 2019-01-01 | publisher_report | needs_human | `SOC/third-party-analyses/activist_reports/short/spruce_point_2019-01-01_canadian-tire-corporation-ltd.html` |
-| Spruce Point Capital | short | 2019-01-01 | publisher_report | needs_human | `SOC/third-party-analyses/activist_reports/short/spruce_point_2019-01-01_cintas-corp.html` |
-| Spruce Point Capital | short | 2019-01-01 | publisher_report | needs_human | `SOC/third-party-analyses/activist_reports/short/spruce_point_2019-01-01_a-o-smith-corp.html` |
-| Spruce Point Capital | short | 2019-01-01 | publisher_report | needs_human | `SOC/third-party-analyses/activist_reports/short/spruce_point_2019-01-01_irobot-corp.html` |
-| Spruce Point Capital | short | 2018-01-01 | publisher_report | needs_human | `SOC/third-party-analyses/activist_reports/short/spruce_point_2018-01-01_realty-income-corp.html` |
-| Viceroy Research | short | 2026-01-01 | publisher_report | needs_human | `SOC/third-party-analyses/activist_reports/short/viceroy_2026-01-01_osc-and-ciro.html` |
-| hindenburg | short | None | — | needs_human | `SOC/third-party-analyses/activist_reports/short/hindenburg_2024-01-01_sebi-chairperson.html` |
-| muddy | short | None | — | needs_human | `SOC/third-party-analyses/activist_reports/short/muddy_waters_2018-01-01_block-on-bloomberg-markets-discussing-la.html` |
-| spruce | short | None | — | needs_human | `SOC/third-party-analyses/activist_reports/short/spruce_point_2025-01-01_uranium-energy-corporation.html` |
-| viceroy | short | None | — | needs_human | `SOC/third-party-analyses/activist_reports/short/viceroy_2026-01-01_osc-and-ciro.html` |
+| &#8194 | long | 2024-10-11 | activist_13d | needs_human | `SOC/third-party-analyses/activist_reports/long/SC-13D/A_20241011_acc0001193125_24_236885.htm` |
+| &#8194 | long | 2024-10-07 | activist_13d | needs_human | `SOC/third-party-analyses/activist_reports/long/SC-13D/A_20241007_acc0001193125_24_233379.htm` |
+| &#8194 | long | 2024-02-22 | activist_13d | needs_human | `SOC/third-party-analyses/activist_reports/long/SC-13D_20240222_acc0001193125_24_042948.htm` |
+| &#8194 | long | 2024-02-22 | activist_13d | needs_human | `SOC/third-party-analyses/activist_reports/long/SC-13D_20240222_acc0001193125_24_042861.htm` |
+| Saba Capital Management | long | 2023-02-14 | registry_13g | needs_human | `SOC/third-party-analyses/activist_reports/long/SC-13G/A_20230214_acc0001062993_23_003178.htm` |
+| Saba Capital Management | long | 2022-02-14 | registry_13g | needs_human | `SOC/third-party-analyses/activist_reports/long/SC-13G/A_20220214_acc0001062993_22_003982.htm` |
+| Saba Capital Management | long | 2021-08-27 | registry_13g | needs_human | `SOC/third-party-analyses/activist_reports/long/SC-13G_20210827_acc0001062993_21_007994.htm` |
 
 ## Notes
 
-**Hindenburg Research** (2024-01-01): <!DOCTYPE html>
-<html lang="en-US">
+**&#8194** (2024-10-11): <DOCUMENT>
+<TYPE>SC 13D/A
+<SEQUENCE>1
+<FILENAME>d881061dsc13da.htm
+<DESCRIPTION>SC 13D/A
+<TEXT>
+<HTML><HEAD>
+<TITLE>SC 13D/A</TITLE>
+</HEAD>
+ <BODY BGCOLOR="WHITE" STYLE="line-height:Normal">
+
+
+<Center><DIV STYLE="width:8.5in" align="left">
+ <P STYLE="line-height:1.0pt;margin-top…
+
+**&#8194** (2024-10-07): <DOCUMENT>
+<TYPE>SC 13D/A
+<SEQUENCE>1
+<FILENAME>d869613dsc13da.htm
+<DESCRIPTION>SC 13D/A
+<TEXT>
+<HTML><HEAD>
+<TITLE>SC 13D/A</TITLE>
+</HEAD>
+ <BODY BGCOLOR="WHITE" STYLE="line-height:Normal">
+
+
+<Center><DIV STYLE="width:8.5in" align="left">
+ <P STYLE="line-height:1.0pt;margin-top…
+
+**&#8194** (2024-02-22): <DOCUMENT>
+<TYPE>SC 13D
+<SEQUENCE>1
+<FILENAME>d795697dsc13d.htm
+<DESCRIPTION>SC 13D
+<TEXT>
+<HTML><HEAD>
+<TITLE>SC 13D</TITLE>
+</HEAD>
+ <BODY BGCOLOR="WHITE" STYLE="line-height:Normal">
+
+
+<Center><DIV STYLE="width:8.5in" align="left">
+ <P STYLE="line-height:1.0pt;margin-top:0pt;ma…
+
+**&#8194** (2024-02-22): <DOCUMENT>
+<TYPE>SC 13D
+<SEQUENCE>1
+<FILENAME>d782146dsc13d.htm
+<DESCRIPTION>SC 13D
+<TEXT>
+<HTML><HEAD>
+<TITLE>SC 13D</TITLE>
+</HEAD>
+ <BODY BGCOLOR="WHITE" STYLE="line-height:Normal">
+
+
+<Center><DIV STYLE="width:8.5in" align="left">
+ <P STYLE="line-height:1.0pt;margin-top:0pt;ma…
+
+**Saba Capital Management** (2023-02-14): <DOCUMENT>
+<TYPE>SC 13G/A
+<SEQUENCE>1
+<FILENAME>formsc13ga.htm
+<DESCRIPTION>FORM SC 13G/A
+<TEXT>
+<html>
+
 <head>
+    <title>Saba Capital Management, L.P.: Form SC 13G/A - Filed by newsfilecorp.com</title>
+</head>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,3…
+<body style="font-size:10pt; font-family:'Times New Roman';">
+    <…
 
-**Muddy Waters Research** (2018-01-01): 
-<!doctype html>
+**Saba Capital Management** (2022-02-14): <DOCUMENT>
+<TYPE>SC 13G/A
+<SEQUENCE>1
+<FILENAME>formsc13ga.htm
+<DESCRIPTION>FORM SC 13G/A
+<TEXT>
+<html>
 
-<!--[if lt IE 7]>   <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en-US"> <![endif]-->
-<!--[if IE 7]>      <html class="no-js lt-ie9 lt-ie8" lang="en-US"> <![endif]-->
-<!--[if IE 8]>      <html class="no-js lt-ie9" lang="en-US"> <![endif]-->
-<!--[if gt IE 8]><!…
-
-**Spruce Point Capital** (2025-01-01): <!DOCTYPE html><!-- Last Published: Mon Dec 01 2025 19:36:38 GMT+0000 (Coordinated Universal Time) --><html data-wf-domain="www.sprucepointcap.com" data-wf-page="656f8337d19d02e2b72142ec" data-wf-site="64caafa9c43c9fcf5b7b0d92" lang="en" data-wf-collection="656f8337d19d02e2b72143…
-
-**Spruce Point Capital** (2025-01-01): <!DOCTYPE html><!-- Last Published: Mon Dec 01 2025 19:36:38 GMT+0000 (Coordinated Universal Time) --><html data-wf-domain="www.sprucepointcap.com" data-wf-page="656f8337d19d02e2b72142ec" data-wf-site="64caafa9c43c9fcf5b7b0d92" lang="en" data-wf-collection="656f8337d19d02e2b72143…
-
-**Spruce Point Capital** (2025-01-01): <!DOCTYPE html><!-- Last Published: Mon Dec 01 2025 19:36:38 GMT+0000 (Coordinated Universal Time) --><html data-wf-domain="www.sprucepointcap.com" data-wf-page="656f8337d19d02e2b72142ec" data-wf-site="64caafa9c43c9fcf5b7b0d92" lang="en" data-wf-collection="656f8337d19d02e2b72143…
-
-**Spruce Point Capital** (2024-01-01): <!DOCTYPE html><!-- Last Published: Mon Dec 01 2025 19:36:38 GMT+0000 (Coordinated Universal Time) --><html data-wf-domain="www.sprucepointcap.com" data-wf-page="656f8337d19d02e2b72142ec" data-wf-site="64caafa9c43c9fcf5b7b0d92" lang="en" data-wf-collection="656f8337d19d02e2b72143…
-
-**Spruce Point Capital** (2023-01-01): <!DOCTYPE html><!-- Last Published: Mon Dec 01 2025 19:36:38 GMT+0000 (Coordinated Universal Time) --><html data-wf-domain="www.sprucepointcap.com" data-wf-page="656f8337d19d02e2b72142ec" data-wf-site="64caafa9c43c9fcf5b7b0d92" lang="en" data-wf-collection="656f8337d19d02e2b72143…
-
-**Spruce Point Capital** (2022-01-01): <!DOCTYPE html><!-- Last Published: Mon Dec 01 2025 19:36:38 GMT+0000 (Coordinated Universal Time) --><html data-wf-domain="www.sprucepointcap.com" data-wf-page="656f8337d19d02e2b72142ec" data-wf-site="64caafa9c43c9fcf5b7b0d92" lang="en" data-wf-collection="656f8337d19d02e2b72143…
-
-**Spruce Point Capital** (2021-01-01): <!DOCTYPE html><!-- Last Published: Mon Dec 01 2025 19:36:38 GMT+0000 (Coordinated Universal Time) --><html data-wf-domain="www.sprucepointcap.com" data-wf-page="656f8337d19d02e2b72142ec" data-wf-site="64caafa9c43c9fcf5b7b0d92" lang="en" data-wf-collection="656f8337d19d02e2b72143…
-
-**Spruce Point Capital** (2021-01-01): <!DOCTYPE html><!-- Last Published: Mon Dec 01 2025 19:36:38 GMT+0000 (Coordinated Universal Time) --><html data-wf-domain="www.sprucepointcap.com" data-wf-page="656f8337d19d02e2b72142ec" data-wf-site="64caafa9c43c9fcf5b7b0d92" lang="en" data-wf-collection="656f8337d19d02e2b72143…
-
-**Spruce Point Capital** (2020-01-01): <!DOCTYPE html><!-- Last Published: Mon Dec 01 2025 19:36:38 GMT+0000 (Coordinated Universal Time) --><html data-wf-domain="www.sprucepointcap.com" data-wf-page="656f8337d19d02e2b72142ec" data-wf-site="64caafa9c43c9fcf5b7b0d92" lang="en" data-wf-collection="656f8337d19d02e2b72143…
-
-**Spruce Point Capital** (2019-01-01): <!DOCTYPE html><!-- Last Published: Mon Dec 01 2025 19:36:38 GMT+0000 (Coordinated Universal Time) --><html data-wf-domain="www.sprucepointcap.com" data-wf-page="656f8337d19d02e2b72142ec" data-wf-site="64caafa9c43c9fcf5b7b0d92" lang="en" data-wf-collection="656f8337d19d02e2b72143…
-
-**Spruce Point Capital** (2019-01-01): <!DOCTYPE html><!-- Last Published: Mon Dec 01 2025 19:36:38 GMT+0000 (Coordinated Universal Time) --><html data-wf-domain="www.sprucepointcap.com" data-wf-page="656f8337d19d02e2b72142ec" data-wf-site="64caafa9c43c9fcf5b7b0d92" lang="en" data-wf-collection="656f8337d19d02e2b72143…
-
-**Spruce Point Capital** (2019-01-01): <!DOCTYPE html><!-- Last Published: Mon Dec 01 2025 19:36:38 GMT+0000 (Coordinated Universal Time) --><html data-wf-domain="www.sprucepointcap.com" data-wf-page="656f8337d19d02e2b72142ec" data-wf-site="64caafa9c43c9fcf5b7b0d92" lang="en" data-wf-collection="656f8337d19d02e2b72143…
-
-**Spruce Point Capital** (2019-01-01): <!DOCTYPE html><!-- Last Published: Mon Dec 01 2025 19:36:38 GMT+0000 (Coordinated Universal Time) --><html data-wf-domain="www.sprucepointcap.com" data-wf-page="656f8337d19d02e2b72142ec" data-wf-site="64caafa9c43c9fcf5b7b0d92" lang="en" data-wf-collection="656f8337d19d02e2b72143…
-
-**Spruce Point Capital** (2018-01-01): <!DOCTYPE html><!-- Last Published: Mon Dec 01 2025 19:36:38 GMT+0000 (Coordinated Universal Time) --><html data-wf-domain="www.sprucepointcap.com" data-wf-page="656f8337d19d02e2b72142ec" data-wf-site="64caafa9c43c9fcf5b7b0d92" lang="en" data-wf-collection="656f8337d19d02e2b72143…
-
-**Viceroy Research** (2026-01-01): <!DOCTYPE html>
-<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Abaxx - Letter to the OSC and CIRO</title>
-    <meta name="description" content="June 26, 2026 - Viceroy&#039;s letter to the O…
+    <title>Saba Capital Management, L.P.: Form SC 13G/A - Filed by newsfilecorp.com</title>
+</head>
 
-**hindenburg** (None): <!DOCTYPE html>
-<html lang="en-US">
+<body style="font-size:10pt; font-family:'Times New Roman';">
+    <…
+
+**Saba Capital Management** (2021-08-27): <DOCUMENT>
+<TYPE>SC 13G
+<SEQUENCE>1
+<FILENAME>formsc13g.htm
+<DESCRIPTION>FORM SC 13G
+<TEXT>
+<html>
+
 <head>
+    <title>Saba Capital Management, L.P.: Form SC 13G - Filed by newsfilecorp.com</title>
+</head>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,3…
-
-**muddy** (None): 
-<!doctype html>
-
-<!--[if lt IE 7]>   <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en-US"> <![endif]-->
-<!--[if IE 7]>      <html class="no-js lt-ie9 lt-ie8" lang="en-US"> <![endif]-->
-<!--[if IE 8]>      <html class="no-js lt-ie9" lang="en-US"> <![endif]-->
-<!--[if gt IE 8]><!…
-
-**spruce** (None): <!DOCTYPE html><!-- Last Published: Mon Dec 01 2025 19:36:38 GMT+0000 (Coordinated Universal Time) --><html data-wf-domain="www.sprucepointcap.com" data-wf-page="656f8337d19d02e2b72142ec" data-wf-site="64caafa9c43c9fcf5b7b0d92" lang="en" data-wf-collection="656f8337d19d02e2b72143…
-
-**viceroy** (None): <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Abaxx - Letter to the OSC and CIRO</title>
-    <meta name="description" content="June 26, 2026 - Viceroy&#039;s letter to the O…
+<body style="font-size:10pt; font-family:'Times New Roman';">
+    <hr widt…
 
 ## [HUMAN REVIEW]
 

@@ -1,7 +1,7 @@
 # SMR — Third-party source inventory
 
 **Date:** 2026-07-01
-**Sources:** 11 total (0 approved, 1 pending, 10 context)
+**Sources:** 10 total (0 approved, 1 pending, 9 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -12,7 +12,6 @@
 | activist_long | s Fluor Corporation — SC 13D | `SMR/third-party-analyses/activist_reports/long/SC-13D_20220512_acc0001104659_22_059292.htm` | context | activist/long — sec_edgar |
 | activist_long | Japan NuScale Innovation, LLC — SC 13D | `SMR/third-party-analyses/activist_reports/long/SC-13D_20220512_acc0001104659_22_059185.htm` | context | activist/long — sec_edgar |
 | activist_short | Sep 18, 2025 | `SMR/third-party-analyses/activist_reports/short/spruce_point_2025-01-01_uranium-energy-corporation.html` | context | activist/short — publisher_site |
-| activist_short | Apr 17, 2024 | `SMR/third-party-analyses/activist_reports/short/spruce_point_2024-01-01_powerschool-holdings-inc.html` | context | activist/short — publisher_site |
 | activist_short | Dec 19, 2019 | `SMR/third-party-analyses/activist_reports/short/spruce_point_2019-01-01_plug-power-inc.html` | context | activist/short — publisher_site |
 | activist_short | Dec 5, 2019 | `SMR/third-party-analyses/activist_reports/short/spruce_point_2019-01-01_canadian-tire-corporation-ltd.html` | context | activist/short — publisher_site |
 | activist_short | Oct 9, 2019 | `SMR/third-party-analyses/activist_reports/short/spruce_point_2019-01-01_monolithic-power-systems-inc.html` | context | activist/short — publisher_site |
