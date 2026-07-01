@@ -64,7 +64,8 @@ After local import, the normal registry/upload step links the PDFs back into the
 3. Each imported PDF gets a `.source.json` sidecar with Drive source metadata.
 4. `_system/data/drive_intake_manifest.json` records Drive file IDs so the same file is not imported again.
 5. The workflow rebuilds the third-party source inventory, document registry, Drive PDF links, insights, research memory, and dashboard data.
-6. The workflow commits the imported documents and rebuilt dashboard artifacts back to `main`.
+6. Letter source links use `_system/reference/document-store/drive_filename_index.json` (full Shared Drive PDF scan) and `_system/reference/document-store/letter_drive_links.json` (maps `letters_index.json` paths to Drive file URLs). These refresh during Drive Intake Sync when credentials are present.
+7. The workflow commits the imported documents and rebuilt dashboard artifacts back to `main`.
 
 ## Required GitHub Secret
 

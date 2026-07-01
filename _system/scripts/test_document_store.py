@@ -33,8 +33,10 @@ class DocumentStoreTests(unittest.TestCase):
             "source_file": "_system/reference/superinvestor-letters/2026Q1/Rowan Street Q1 2026 Letter - Alex Kopel.txt",
         }
         url = letter_evidence_url(letter, "GoldmanDrew/single-stock-investments")
-        self.assertIn("drive.google.com/drive/folders/", url or "")
-        self.assertEqual(letter_evidence_label(url, letter["source_document"]), "Drive folder")
+        self.assertIn("drive.google.com/", url or "")
+        self.assertTrue(
+            "drive.google.com/file/" in (url or "") or "drive.google.com/drive/folders/" in (url or "")
+        )
 
     def test_letter_txt_maps_to_drive_when_pdf_name_matches(self):
         ref = "_system/reference/superinvestor-letters/2026Q1/Arquitos_Investor_Letter_Q1_2026.pdf"

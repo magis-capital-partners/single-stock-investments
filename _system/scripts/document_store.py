@@ -8,7 +8,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 REGISTRY_PATH = ROOT / "dashboard" / "data" / "document_registry.json"
 DRIVE_AUDIT_PATH = ROOT / "_system/reference/document-store/drive_audit_latest.json"
+DRIVE_FILENAME_INDEX_PATH = ROOT / "_system/reference/document-store/drive_filename_index.json"
 DRIVE_FOLDER_INDEX_PATH = ROOT / "_system/reference/document-store/drive_folder_index.json"
+LETTER_DRIVE_LINKS_PATH = ROOT / "_system/reference/document-store/letter_drive_links.json"
 LETTERS_INDEX_PATH = ROOT / "_system/reference/superinvestor-letters/letters_index.json"
 
 
@@ -26,8 +28,11 @@ _REGISTRY_CACHE: dict | None = None
 _INDEX_CACHE: dict[int, dict[str, dict[str, dict]]] = {}
 _DRIVE_AUDIT_INDEX: dict[str, str] | None = None
 _DRIVE_AUDIT_BY_FILENAME: dict[str, str] | None = None
+_DRIVE_FILENAME_INDEX: dict[str, str] | None = None
 _DRIVE_FOLDER_INDEX: dict[str, str] | None = None
+_LETTER_DRIVE_LINKS: dict[str, str] | None = None
 _LETTER_SOURCE_INDEX: dict[str, dict] | None = None
+_REGISTRY_BY_FILENAME: dict[str, str] | None = None
 
 
 def load_document_registry() -> dict:
@@ -130,6 +135,57 @@ def drive_audit_links() -> dict[str, str]:
     return index
 
 
+def drive_filename_links() -> dict[str, str]:
+    global _DRIVE_FILENAME_INDEX
+    if _DRIVE_FILENAME_INDEX is not None:
+        return _DRIVE_FILENAME_INDEX
+    index: dict[str, str] = {}
+    if DRIVE_FILENAME_INDEX_PATH.exists():
+        try:
+            payload = json.loads(DRIVE_FILENAME_INDEX_PATH.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            payload = {}
+        for key, row in (payload.get("by_filename") or {}).items():
+            link = (row or {}).get("webViewLink")
+            if link:
+                index[str(key).lower()] = str(link)
+    _DRIVE_FILENAME_INDEX = index
+    return index
+
+
+def letter_drive_links() -> dict[str, str]:
+    global _LETTER_DRIVE_LINKS
+    if _LETTER_DRIVE_LINKS is not None:
+        return _LETTER_DRIVE_LINKS
+    index: dict[str, str] = {}
+    if LETTER_DRIVE_LINKS_PATH.exists():
+        try:
+            payload = json.loads(LETTER_DRIVE_LINKS_PATH.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            payload = {}
+        for key, link in (payload.get("links") or {}).items():
+            if link:
+                index[str(key).replace("\\", "/").lower()] = str(link)
+    _LETTER_DRIVE_LINKS = index
+    return index
+
+
+def registry_filename_links() -> dict[str, str]:
+    global _REGISTRY_BY_FILENAME
+    if _REGISTRY_BY_FILENAME is not None:
+        return _REGISTRY_BY_FILENAME
+    index: dict[str, str] = {}
+    for doc in load_document_registry().get("documents") or []:
+        link = doc.get("drive_web_view_link") or doc.get("drive_web_content_link")
+        if not link:
+            continue
+        for path in [doc.get("local_pdf_path"), *(doc.get("alternate_pdf_paths") or [])]:
+            if path:
+                index[Path(str(path)).name.lower()] = str(link)
+    _REGISTRY_BY_FILENAME = index
+    return index
+
+
 def drive_audit_by_filename() -> dict[str, str]:
     global _DRIVE_AUDIT_BY_FILENAME
     if _DRIVE_AUDIT_BY_FILENAME is not None:
@@ -189,11 +245,21 @@ def letter_source_index() -> dict[str, dict]:
 
 
 def quarter_folder_path(quarter: str | None) -> str | None:
+    paths = quarter_folder_paths(quarter)
+    return paths[0] if paths else None
+
+
+def quarter_folder_paths(quarter: str | None) -> list[str]:
     text = str(quarter or "").strip().upper()
     m = re.match(r"^(20\d{2})Q([1-4])$", text)
     if not m:
-        return None
-    return f"Letters/{m.group(1)} Q{m.group(2)}"
+        return []
+    label = f"{m.group(1)} Q{m.group(2)}"
+    return [
+        f"Letters/{label}",
+        f"Letters/Letters/{label}",
+        f"superinvestor-letters/{text}",
+    ]
 
 
 def quarter_from_ref(ref: str | None) -> str | None:
@@ -207,10 +273,27 @@ def quarter_from_ref(ref: str | None) -> str | None:
 
 
 def drive_link_for_ref(base: str) -> str | None:
-    by_name = drive_audit_by_filename()
+    clean = str(base).replace("\\", "/").lower()
+    letter_links = letter_drive_links()
+    if clean in letter_links:
+        return letter_links[clean]
+
     filename = Path(base).name.lower()
+    if filename in letter_links:
+        return letter_links[filename]
+
+    by_name = drive_filename_links()
     if filename in by_name:
         return by_name[filename]
+
+    registry_links = registry_filename_links()
+    if filename in registry_links:
+        return registry_links[filename]
+
+    audit_by_name = drive_audit_by_filename()
+    if filename in audit_by_name:
+        return audit_by_name[filename]
+
     links = drive_audit_links()
     stem = Path(base).stem.lower()
     norm = _normalize_name(base)
@@ -231,6 +314,14 @@ def drive_link_for_letter(
     if not base:
         return None
 
+    clean = base.replace("\\", "/").lower()
+    letter_links = letter_drive_links()
+    if clean in letter_links:
+        return letter_links[clean]
+    filename = Path(base).name.lower()
+    if filename in letter_links:
+        return letter_links[filename]
+
     doc = document_for_ref(base)
     if doc:
         drive = doc.get("drive_web_view_link") or doc.get("drive_web_content_link")
@@ -244,9 +335,9 @@ def drive_link_for_letter(
             return link
 
     q = quarter or quarter_from_ref(base)
-    folder = quarter_folder_path(q)
-    if folder:
-        folder_link = drive_folder_links().get(folder)
+    folders = drive_folder_links()
+    for folder in quarter_folder_paths(q):
+        folder_link = folders.get(folder)
         if folder_link:
             return folder_link
 
