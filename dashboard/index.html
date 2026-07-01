@@ -693,6 +693,8 @@ let insightsBookOnly = true;
 let insightsSection = 'overview';
 let insightsPdfSourceTab = 'all';
 let insightsPdfTimeMode = 'period';
+let insightsSearchDebounce = null;
+let insightsSearchFocused = false;
 let selectedFundId = null;
 let darwinEquityChart = null;
 let darwinHoldingsChart = null;
@@ -929,7 +931,8 @@ function setView(view) {
     view === 'holdings' && (data.watchlist || []).length ? 'block' : 'none';
 }
 
-function renderInsights() {
+function renderInsights(opts = {}) {
+  const refocusSearch = Boolean(opts.refocusSearch);
   const loading = document.getElementById('insights-loading');
   const content = document.getElementById('insights-content');
   const insights = data.insights;
@@ -970,10 +973,25 @@ function renderInsights() {
   });
   const search = content.querySelector('#fund-registry-search');
   if (search) {
+    search.addEventListener('focus', () => {
+      insightsSearchFocused = true;
+    });
+    search.addEventListener('blur', () => {
+      insightsSearchFocused = false;
+    });
     search.addEventListener('input', () => {
       fundRegistrySearch = search.value;
-      renderInsights();
+      insightsSearchFocused = true;
+      window.clearTimeout(insightsSearchDebounce);
+      insightsSearchDebounce = window.setTimeout(() => {
+        renderInsights({ refocusSearch: insightsSearchFocused });
+      }, 150);
     });
+    if (refocusSearch) {
+      search.focus();
+      const pos = search.value.length;
+      search.setSelectionRange(pos, pos);
+    }
   }
   const bookOnly = content.querySelector('#insights-book-only');
   if (bookOnly) {
