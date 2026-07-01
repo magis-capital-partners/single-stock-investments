@@ -691,6 +691,8 @@ let insightsQuarter = 'latest';
 let fundRegistrySearch = '';
 let insightsBookOnly = true;
 let insightsSection = 'overview';
+let insightsPdfSourceTab = 'all';
+let insightsPdfTimeMode = 'period';
 let selectedFundId = null;
 let darwinEquityChart = null;
 let darwinHoldingsChart = null;
@@ -950,6 +952,8 @@ function renderInsights() {
     tickers: data.tickers || [],
     memory: data.research_memory || null,
     documentCatalog: data.document_catalog || null,
+    pdfSourceTab: insightsPdfSourceTab,
+    pdfTimeMode: insightsPdfTimeMode,
   });
   content.querySelectorAll('[data-insights-quarter]').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -978,6 +982,18 @@ function renderInsights() {
       renderInsights();
     });
   }
+  content.querySelectorAll('[data-pdf-source-tab]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      insightsPdfSourceTab = btn.dataset.pdfSourceTab;
+      renderInsights();
+    });
+  });
+  content.querySelectorAll('[data-pdf-time-mode]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      insightsPdfTimeMode = btn.dataset.pdfTimeMode;
+      renderInsights();
+    });
+  });
   content.querySelectorAll('[data-fund-id]').forEach(el => {
     el.addEventListener('click', (e) => {
       e.stopPropagation();

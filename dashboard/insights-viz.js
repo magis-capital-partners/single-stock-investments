@@ -21,11 +21,32 @@
     macro: 'Macro',
     insider: 'Insider',
     sumzero_research: 'SumZero',
-    third_party: 'Research',
+    third_party: 'VIC / third party',
     company_document: 'Company',
-    pdf: 'PDF',
+    research: 'Research',
+    pdf: 'Other PDFs',
     theme: 'Theme',
     news: 'News',
+  };
+
+  const CATALOG_SOURCE_LABEL = {
+    superinvestor_letter: 'Letters',
+    company_document: 'Company',
+    third_party: 'VIC / third party',
+    sumzero_research: 'SumZero',
+    research: 'Research',
+    dropbox_ingestion: 'Dropbox ingestion',
+    pdf: 'Other PDFs',
+  };
+
+  const CATALOG_SOURCE_SORT = {
+    superinvestor_letter: 0,
+    company_document: 1,
+    third_party: 2,
+    sumzero_research: 3,
+    research: 4,
+    dropbox_ingestion: 5,
+    pdf: 6,
   };
 
   const AXIS_LABEL = {
@@ -892,15 +913,53 @@
       </div>`;
   }
 
+  function catalogSourceLabel(row) {
+    return row?.source_label || CATALOG_SOURCE_LABEL[row?.source_type] || 'Other PDFs';
+  }
+
+  function sortDocumentCatalogRows(rows) {
+    return [...(rows || [])].sort((a, b) => {
+      const ad = a.document_date || '';
+      const bd = b.document_date || '';
+      if (ad && bd && ad !== bd) return bd.localeCompare(ad);
+      if (ad && !bd) return -1;
+      if (!ad && bd) return 1;
+      const sp = (CATALOG_SOURCE_SORT[a.source_type] ?? 99) - (CATALOG_SOURCE_SORT[b.source_type] ?? 99);
+      if (sp) return sp;
+      const ta = (a.ticker || '').localeCompare(b.ticker || '');
+      if (ta) return ta;
+      return (a.title || '').localeCompare(b.title || '');
+    });
+  }
+
   function filterDocumentCatalog(catalog, opts) {
-    const { search = '', quarter = 'all', bookOnly = false, period = null } = opts || {};
+    const {
+      search = '',
+      quarter = 'all',
+      bookOnly = false,
+      period = null,
+      pdfSourceTab = 'all',
+      pdfTimeMode = 'period',
+    } = opts || {};
     const q = search.toLowerCase();
     let rows = catalog?.documents || [];
     if (period && !period.all) {
-      rows = rows.filter(r => periodMatchesRecord(r, period, ['quarter', 'modified_at']));
+      const fields = pdfTimeMode === 'upload'
+        ? ['modified_at']
+        : ['document_quarter', 'quarter', 'document_date'];
+      rows = rows.filter(r => periodMatchesRecord(r, period, fields));
     } else if (quarter && quarter !== 'all') {
       const label = quarter.replace(/^(\d{4})Q([1-4])$/, '$1 Q$2');
-      rows = rows.filter(r => !r.quarter || r.quarter === label || r.quarter === quarter);
+      rows = rows.filter(r => r.document_quarter === quarter || r.quarter === label || r.quarter === quarter);
+    }
+    if (pdfSourceTab === 'letters') {
+      rows = rows.filter(r => r.source_type === 'superinvestor_letter');
+    } else if (pdfSourceTab === 'company') {
+      rows = rows.filter(r => r.source_type === 'company_document');
+    } else if (pdfSourceTab === 'third_party') {
+      rows = rows.filter(r => r.source_type === 'third_party' || r.source_type === 'sumzero_research' || r.source_type === 'research');
+    } else if (pdfSourceTab === 'unclassified') {
+      rows = rows.filter(r => r.period_source === 'unknown' || r.source_type === 'pdf');
     }
     if (bookOnly) {
       rows = rows.filter(r => r.ticker);
@@ -912,25 +971,52 @@
         r.source_label,
         r.source_type,
         r.quarter,
+        r.period_label,
+        r.document_date,
         r.drive_folder_path,
       ].join(' ').toLowerCase().includes(q));
     }
-    return rows;
+    return sortDocumentCatalogRows(rows);
   }
 
   function renderDocumentCatalog(catalog, escapeHtml, linkHtml, opts) {
-    const rows = filterDocumentCatalog(catalog, opts).slice(0, 300);
+    const {
+      pdfSourceTab = 'all',
+      pdfTimeMode = 'period',
+    } = opts || {};
+    const filtered = filterDocumentCatalog(catalog, opts);
+    const rows = filtered.slice(0, 300);
     const summary = catalog?.summary || {};
-    const bySource = summary.by_source_type || {};
-    const cards = Object.entries(bySource)
+    const labelCounts = {};
+    (catalog?.documents || []).forEach(r => {
+      const label = catalogSourceLabel(r);
+      labelCounts[label] = (labelCounts[label] || 0) + 1;
+    });
+    const cards = Object.entries(labelCounts)
       .sort((a, b) => b[1] - a[1])
-      .map(([source, count]) => `<span class="badge badge-us">${escapeHtml(SOURCE_LABEL[source] || source.replace(/_/g, ' '))}: ${count}</span>`)
+      .map(([source, count]) => `<span class="badge badge-us">${escapeHtml(source)}: ${count}</span>`)
       .join('');
-    const byQuarter = summary.by_quarter || {};
-    const quarterCards = Object.entries(byQuarter)
+    const quarterCounts = {};
+    (catalog?.documents || []).forEach(r => {
+      const label = r.period_label && r.period_source !== 'unknown' ? r.period_label : null;
+      if (label) quarterCounts[label] = (quarterCounts[label] || 0) + 1;
+    });
+    const quarterCards = Object.entries(quarterCounts)
       .sort((a, b) => String(b[0]).localeCompare(String(a[0])))
+      .slice(0, 12)
       .map(([quarter, count]) => `<span class="badge badge-purple">${escapeHtml(quarter)}: ${count}</span>`)
       .join('');
+    const sourceTabs = [
+      { id: 'all', label: 'All PDFs' },
+      { id: 'letters', label: 'Letters' },
+      { id: 'company', label: 'Company docs' },
+      { id: 'third_party', label: 'Third-party / VIC' },
+      { id: 'unclassified', label: 'Unclassified' },
+    ];
+    const timeModes = [
+      { id: 'period', label: 'Document period' },
+      { id: 'upload', label: 'Recently uploaded' },
+    ];
     if (!catalog) {
       return '<p class="subhead">PDF catalog not built. Run: python _system/scripts/build_dashboard_data.py</p>';
     }
@@ -939,24 +1025,31 @@
         <h3>PDF library</h3>
         <p class="tier-sub" style="margin-bottom:8px">
           ${summary.document_count || 0} documents · ${summary.uploaded_count || 0} uploaded · ${summary.pending_upload_count || 0} pending
+          · showing ${rows.length} of ${filtered.length} matching
         </p>
+        <nav class="source-pills" id="pdf-source-tabs" style="margin-bottom:8px">
+          ${sourceTabs.map(t => `<button type="button" class="filter-btn source-pill${pdfSourceTab === t.id ? ' active' : ''}" data-pdf-source-tab="${escapeHtml(t.id)}">${escapeHtml(t.label)}</button>`).join('')}
+        </nav>
+        <nav class="source-pills" id="pdf-time-mode-tabs" style="margin-bottom:8px">
+          ${timeModes.map(t => `<button type="button" class="filter-btn source-pill${pdfTimeMode === t.id ? ' active' : ''}" data-pdf-time-mode="${escapeHtml(t.id)}">${escapeHtml(t.label)}</button>`).join('')}
+        </nav>
         <div class="source-card-badges" style="margin-bottom:6px">${cards}</div>
         ${quarterCards ? `<div class="source-card-badges" style="margin-bottom:10px">${quarterCards}</div>` : ''}
         <table class="darwin-table" id="insights-document-catalog">
-          <thead><tr><th>Source</th><th>Ticker</th><th>Quarter</th><th>Title</th><th>Folder</th><th></th></tr></thead>
+          <thead><tr><th>Source</th><th>Ticker</th><th>Period</th><th>Title</th><th>Folder</th><th></th></tr></thead>
           <tbody>
             ${rows.map(r => `
               <tr>
-                <td><span class="badge badge-us">${escapeHtml(r.source_label || r.source_type || 'PDF')}</span></td>
+                <td><span class="badge badge-us">${escapeHtml(catalogSourceLabel(r))}</span></td>
                 <td class="mono">${escapeHtml(r.ticker || '—')}</td>
-                <td class="mono">${escapeHtml(r.quarter || '—')}</td>
+                <td class="mono">${escapeHtml(r.period_label || r.document_date || 'Unknown date')}</td>
                 <td style="min-width:280px">${escapeHtml(r.title || 'Untitled')}</td>
                 <td class="tier-sub">${escapeHtml(r.drive_folder_path || '')}</td>
                 <td>${r.drive_web_view_link ? linkHtml(r.drive_web_view_link, 'PDF', 'source-open-link') : '—'}</td>
               </tr>`).join('')}
           </tbody>
         </table>
-        ${(catalog.documents || []).length > rows.length ? `<p class="tier-sub">${(catalog.documents || []).length - rows.length} more documents outside the current table window.</p>` : ''}
+        ${filtered.length > rows.length ? `<p class="tier-sub">${filtered.length - rows.length} more documents outside the current table window.</p>` : ''}
       </div>`;
   }
 
@@ -1243,6 +1336,8 @@
       tickers = [],
       memory = null,
       documentCatalog = null,
+      pdfSourceTab = 'all',
+      pdfTimeMode = 'period',
     } = options || {};
 
     const profiles = insights?.fund_profiles || {};
@@ -1318,7 +1413,13 @@
     } else if (activeSection === 'funds') {
       body = renderFundRegistry(funds, escapeHtml, linkHtml, ghRepo, bookOnly);
     } else if (activeSection === 'documents') {
-      body = renderDocumentCatalog(documentCatalog, escapeHtml, linkHtml, { search: fundSearch, period, bookOnly });
+      body = renderDocumentCatalog(documentCatalog, escapeHtml, linkHtml, {
+        search: fundSearch,
+        period,
+        bookOnly,
+        pdfSourceTab,
+        pdfTimeMode,
+      });
     } else if (activeSection === 'tickers') {
       body = renderTickerEssentials(tickers, escapeHtml, linkHtml, { search: fundSearch, bookOnly });
     } else if (activeSection === 'memory') {

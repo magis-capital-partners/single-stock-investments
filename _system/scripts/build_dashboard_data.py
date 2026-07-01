@@ -14,6 +14,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 from dated_md import dated_md_label, dated_md_sort_key, latest_dated_md  # noqa: E402
+from document_date import catalog_sort_key, infer_document_period  # noqa: E402
 from document_store import best_document_label, best_document_url, document_id_for_ref  # noqa: E402
 from market_order import sort_market_filters, sort_markets  # noqa: E402
 from valuation_synthesis import website_implied_irr  # noqa: E402
@@ -306,7 +307,7 @@ def build_time_periods(rows: list[dict], folders: dict) -> dict:
         )
 
     for row in rows:
-        qid = normalize_quarter_id(row.get("quarter"))
+        qid = row.get("document_quarter") or normalize_quarter_id(row.get("quarter"))
         if qid:
             bucket(qid)["document_count"] += 1
 
@@ -354,13 +355,19 @@ def build_document_catalog(document_registry: dict | None) -> dict | None:
     for doc in docs:
         source_type = doc.get("source_type") or "pdf"
         ticker = catalog_ticker(doc)
-        quarter = catalog_quarter(doc)
+        period = infer_document_period(doc)
+        quarter = period.quarter_display or catalog_quarter(doc)
         folder_path = doc.get("drive_folder_path")
         row = {
             "document_id": doc.get("document_id"),
             "title": doc.get("title"),
             "ticker": ticker,
             "quarter": quarter,
+            "document_date": period.document_date,
+            "document_year": period.document_year,
+            "document_quarter": period.document_quarter,
+            "period_label": period.period_label,
+            "period_source": period.period_source,
             "source_type": source_type,
             "source_label": source_type_label(source_type),
             "drive_folder_path": folder_path,
@@ -379,7 +386,9 @@ def build_document_catalog(document_registry: dict | None) -> dict | None:
             by_ticker[ticker] += 1
         if quarter:
             by_quarter[quarter] += 1
-    rows.sort(key=lambda r: ((r.get("source_label") or ""), (r.get("ticker") or ""), (r.get("title") or "")))
+        elif period.document_quarter:
+            by_quarter[period.quarter_display or quarter_label(period.document_quarter)] += 1
+    rows.sort(key=catalog_sort_key)
     catalog = {
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "registry_generated_at": document_registry.get("generated_at"),
