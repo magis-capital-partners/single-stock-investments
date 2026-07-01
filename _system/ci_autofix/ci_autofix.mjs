@@ -204,6 +204,7 @@ function classifyFailure({ run, failedJobs, failedLog, skippedWorkflow, forkPr }
       patterns: [
         /secret .* is not set/,
         /.+\ssecret is not set/,
+        /is not configured in settings.*secrets and variables.*actions/,
         /cursor_api_key.*not set/,
         /could not resolve.*secret/,
         /bad credentials/,

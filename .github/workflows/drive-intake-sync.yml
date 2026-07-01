@@ -41,14 +41,20 @@ jobs:
             echo "configured=false" >> "$GITHUB_OUTPUT"
             MSG="GOOGLE_APPLICATION_CREDENTIALS_JSON is not configured in Settings → Secrets and variables → Actions."
             DOC="See README.md and _system/reference/document-store/drive_intake_readme.md."
-            if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-              echo "::error::${MSG} ${DOC}"
-              exit 1
-            fi
             echo "::warning::Skipping Drive Intake Sync — ${MSG} ${DOC}"
           else
             echo "configured=true" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: Skipped summary
+        if: steps.google_creds.outputs.configured != 'true'
+        run: |
+          {
+            echo "## Drive Intake Sync skipped"
+            echo ""
+            echo "Configure \`GOOGLE_APPLICATION_CREDENTIALS_JSON\` in **Settings → Secrets and variables → Actions**."
+            echo "See \`README.md\` and \`_system/reference/document-store/drive_intake_readme.md\`."
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Set up Python
         if: steps.google_creds.outputs.configured == 'true'
