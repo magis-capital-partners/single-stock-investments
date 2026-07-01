@@ -67,12 +67,14 @@
   }
 
   function evidenceLabel(ref, fallback) {
-    if (fallback) return fallback;
     const clean = (ref || '').split('#')[0].toLowerCase();
+    if (clean.includes('drive.google.com')) return 'PDF';
+    if (fallback && fallback !== 'Text') return fallback;
     if (clean.endsWith('.pdf')) return 'PDF';
     if (clean.endsWith('.htm') || clean.endsWith('.html')) return 'HTML';
     if (clean.startsWith('http')) return 'Open';
     if (clean.endsWith('.json')) return 'Index';
+    if (fallback) return fallback;
     return 'Open';
   }
 

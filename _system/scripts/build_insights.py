@@ -181,6 +181,8 @@ def source_document_ref(ref: str | None) -> str | None:
     base = clean.split("#", 1)[0].replace("\\", "/")
     suffix = f"#{clean.split('#', 1)[1]}" if "#" in clean else ""
     path = ROOT / base
+    if "superinvestor-letters" in base and path.suffix.lower() in {".txt", ".md"}:
+        return relative_path(path.with_suffix(".pdf")) + suffix
     candidates: list[Path] = []
     if base.endswith(".pdf.txt"):
         candidates.append(ROOT / base[: -len(".txt")])

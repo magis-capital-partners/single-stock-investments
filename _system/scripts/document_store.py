@@ -2,10 +2,12 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 REGISTRY_PATH = ROOT / "dashboard" / "data" / "document_registry.json"
+DRIVE_AUDIT_PATH = ROOT / "_system/reference/document-store/drive_audit_latest.json"
 
 
 def _clean_ref(ref: str | None) -> tuple[str | None, str]:
@@ -20,6 +22,7 @@ def _clean_ref(ref: str | None) -> tuple[str | None, str]:
 
 _REGISTRY_CACHE: dict | None = None
 _INDEX_CACHE: dict[int, dict[str, dict[str, dict]]] = {}
+_DRIVE_AUDIT_INDEX: dict[str, str] | None = None
 
 
 def load_document_registry() -> dict:
@@ -38,7 +41,6 @@ def load_document_registry() -> dict:
 
 def registry_indexes(registry: dict | None = None) -> dict[str, dict[str, dict]]:
     registry = registry or load_document_registry()
-    # cache the (expensive) index build per registry object identity
     key = id(registry)
     cached = _INDEX_CACHE.get(key)
     if cached is not None:
@@ -88,26 +90,89 @@ def github_blob_url(rel_path: str, github_repo: str) -> str:
     return f"https://github.com/{github_repo}/blob/main/{rel_path.replace(chr(92), '/')}"
 
 
+def _normalize_name(value: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "", Path(value).stem.lower())
+
+
+def drive_audit_links() -> dict[str, str]:
+    global _DRIVE_AUDIT_INDEX
+    if _DRIVE_AUDIT_INDEX is not None:
+        return _DRIVE_AUDIT_INDEX
+    index: dict[str, str] = {}
+    if DRIVE_AUDIT_PATH.exists():
+        try:
+            audit = json.loads(DRIVE_AUDIT_PATH.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            audit = {}
+        for items in audit.values():
+            if not isinstance(items, list):
+                continue
+            for item in items:
+                name = item.get("name")
+                link = item.get("webViewLink") or item.get("webContentLink")
+                if not name or not link or not str(name).lower().endswith(".pdf"):
+                    continue
+                stem = Path(str(name)).stem.lower()
+                norm = _normalize_name(str(name))
+                index[stem] = str(link)
+                index[norm] = str(link)
+    _DRIVE_AUDIT_INDEX = index
+    return index
+
+
+def drive_link_for_ref(base: str) -> str | None:
+    links = drive_audit_links()
+    stem = Path(base).stem.lower()
+    norm = _normalize_name(base)
+    if stem in links:
+        return links[stem]
+    if norm in links:
+        return links[norm]
+    if len(norm) >= 12:
+        for key, link in links.items():
+            if len(key) >= 12 and (norm in key or key in norm):
+                return link
+    return None
+
+
+def pdf_ref_for(base: str) -> str:
+    path = ROOT / base
+    if path.suffix.lower() in {".txt", ".md"}:
+        return str(path.with_suffix(".pdf").relative_to(ROOT)).replace("\\", "/")
+    return base
+
+
+def pdf_github_url(base: str, github_repo: str, anchor: str = "") -> str:
+    return github_blob_url(pdf_ref_for(base), github_repo) + anchor
+
+
 def best_document_url(ref: str | None, github_repo: str, registry: dict | None = None) -> str | None:
     base, anchor = _clean_ref(ref)
     if not base:
         return None
     if base.startswith(("http://", "https://")):
         return base + anchor
+
     doc = document_for_ref(base, registry)
     if doc:
         drive = doc.get("drive_web_view_link") or doc.get("drive_web_content_link")
         if drive:
-            return str(drive)
-        text_path = doc.get("text_extract_path")
-        if text_path:
-            return github_blob_url(str(text_path), github_repo) + anchor
+            return str(drive) + anchor
+        pdf_path = doc.get("local_pdf_path")
+        if pdf_path:
+            drive = drive_link_for_ref(str(pdf_path))
+            if drive:
+                return drive + anchor
+            return github_blob_url(str(pdf_path), github_repo) + anchor
+
+    drive = drive_link_for_ref(base) or drive_link_for_ref(pdf_ref_for(base))
+    if drive:
+        return drive + anchor
+
     path = ROOT / base
-    if path.suffix.lower() == ".pdf" and not path.exists():
-        for candidate in (path.with_suffix(".txt"), Path(str(path) + ".txt")):
-            if candidate.exists():
-                return github_blob_url(str(candidate.relative_to(ROOT)).replace("\\", "/"), github_repo) + anchor
-        return None
+    if path.suffix.lower() in {".pdf", ".txt", ".md"} or "superinvestor-letters" in base:
+        return pdf_github_url(base, github_repo, anchor)
+
     return github_blob_url(base, github_repo) + anchor
 
 
@@ -116,26 +181,23 @@ def best_document_label(ref: str | None, registry: dict | None = None) -> str:
     if not base:
         return "source"
     if base.startswith(("http://", "https://")):
+        if "drive.google.com" in base.lower():
+            return "PDF"
         return "article"
     doc = document_for_ref(base, registry)
-    if doc:
-        if doc.get("drive_web_view_link") or doc.get("drive_web_content_link"):
-            return "PDF"
-        if doc.get("text_extract_path"):
-            return "Text"
-    path = ROOT / base
-    if path.suffix.lower() == ".pdf" and not path.exists():
-        for candidate in (path.with_suffix(".txt"), Path(str(path) + ".txt")):
-            if candidate.exists():
-                return "Text"
-        return "missing"
-    suffix = Path(base).suffix.lower()
-    if suffix == ".pdf":
+    if doc and (doc.get("drive_web_view_link") or doc.get("drive_web_content_link")):
+        return "PDF"
+    if drive_link_for_ref(base) or drive_link_for_ref(pdf_ref_for(base)):
+        return "PDF"
+    suffix = Path(pdf_ref_for(base)).suffix.lower()
+    if suffix == ".pdf" or "superinvestor-letters" in base:
         return "PDF"
     if suffix in {".htm", ".html"}:
         return "HTML"
     if suffix == ".json":
         return "index"
+    if doc and doc.get("text_extract_path"):
+        return "Text"
     return "source"
 
 
