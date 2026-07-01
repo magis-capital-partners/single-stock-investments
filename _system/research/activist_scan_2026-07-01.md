@@ -45,7 +45,7 @@
 | ENX.PA | 0 | 0 | — | no hits |
 | EVR | 0 | 1 | — | 1 indexed |
 | FNV | 0 | 3 | 2025-01-01 | 3 indexed |
-| FRMI | 48 | 0 | 2026-07-01 | 48 indexed |
+| FRMI | 49 | 0 | 2026-07-01 | 49 indexed |
 | FRMO | 0 | 3 | 2025-01-01 | 3 indexed |
 | GCCO | 0 | 1 | — | 1 indexed |
 | GLXY | 0 | 0 | — | no hits |

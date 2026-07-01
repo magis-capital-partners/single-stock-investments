@@ -1,7 +1,7 @@
 # APLD — Activist reconciliation (Milly mechanical)
 
 **Date:** 2026-07-01
-**Pending reports reconciled:** 8
+**Pending reports reconciled:** 7
 
 ## Summary
 
@@ -13,7 +13,6 @@
 | Wesley Cummins | long | 2022-12-05 | activist_13d | needs_human | `APLD/third-party-analyses/activist_reports/long/SC-13D/A_20221205_acc0001144879_22_000100.htm` |
 | Wesley Cummins | long | 2022-04-21 | activist_13d | needs_human | `APLD/third-party-analyses/activist_reports/long/SC-13D_20220421_acc0001104659_22_047984.htm` |
 | Jason Zhang | long | 2023-11-17 | activist_13d | needs_human | `APLD/third-party-analyses/activist_reports/long/SC-13D_20231117_acc0001144879_23_000237.htm` |
-| Oasis Management | long | 2024-05-07 | activist_13d | needs_human | `APLD/third-party-analyses/activist_reports/long/SC-13D_20240507_acc0000902664_24_003324.htm` |
 | Oasis Management | long | 2024-05-07 | activist_13d | needs_human | `APLD/third-party-analyses/activist_reports/long/SC-13D_20240507_acc0000902664_24_003324.htm` |
 
 ## Short markdown cache
@@ -110,23 +109,6 @@
 <!-- Document created using Wdesk -->
 <!-- Copyright 2023 Workiva -->
 <title>Document</title></head><body><div id="i244dc18f49864154be9d9f506bdc06f3_1"></div><div …
-
-**Oasis Management** (2024-05-07): <DOCUMENT>
-<TYPE>SC 13D
-<SEQUENCE>1
-<FILENAME>p24-1647sc13d.htm
-<DESCRIPTION>APPLIED DIGITAL CORPORATION
-<TEXT>
-<HTML>
-<HEAD>
-<TITLE></TITLE>
-</HEAD>
-<BODY>
-
-
-<P STYLE="font: 10pt Courier New, Courier, Monospace; margin: 0">&nbsp;</P>
-
-<TABLE CELLSPACING="0" CELLPADDING="0" STYLE…
 
 **Oasis Management** (2024-05-07): <DOCUMENT>
 <TYPE>SC 13D

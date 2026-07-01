@@ -1,7 +1,7 @@
 # Activist scan review queue
 
 **Date:** 2026-07-01
-**Hits:** 306 new or low-confidence
+**Hits:** 307 new or low-confidence
 
 | Ticker | Side | Firm | Date | Source | Confidence |
 |--------|------|------|------|--------|------------|
@@ -186,6 +186,7 @@
 | DMLP | long | sec_filer:carrollton_mineral_partners_lp | 2024-11-25 | sec_edgar | 0.85 |
 | DMLP | long | sec_filer:carrollton_mineral_partners_lp | 2024-11-07 | sec_edgar | 0.85 |
 | FRMI | long | unknown_activist | 2026-07-01 | sec_edgar | 0.4 |
+| FRMI | long | unknown_activist | 2026-07-01 | sec_edgar | 0.4 |
 | FRMI | long | unknown_activist | 2026-06-30 | sec_edgar | 0.4 |
 | FRMI | long | unknown_activist | 2026-06-30 | sec_edgar | 0.4 |
 | FRMI | long | unknown_activist | 2026-06-29 | sec_edgar | 0.4 |
@@ -204,6 +205,5 @@
 | FRMI | long | unknown_activist | 2026-06-12 | sec_edgar | 0.4 |
 | FRMI | long | unknown_activist | 2026-06-12 | sec_edgar | 0.4 |
 | FRMI | long | unknown_activist | 2026-06-12 | sec_edgar | 0.4 |
-| FRMI | long | unknown_activist | 2026-06-11 | sec_edgar | 0.4 |
 
 Reconcile in `{TICKER}/research/adversarial_{date}.md`.

@@ -1,7 +1,7 @@
 # FRMI — Third-party source inventory
 
 **Date:** 2026-07-01
-**Sources:** 50 total (0 approved, 2 pending, 48 context)
+**Sources:** 51 total (0 approved, 2 pending, 49 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -55,5 +55,6 @@
 | activist_long | Unknown filer — DFAN14A | `FRMI/third-party-analyses/activist_reports/long/DFAN14A_20260508_acc0001213900_26_053848.htm` | context | activist/long — sec_edgar |
 | activist_long | Unknown filer — DFAN14A | `FRMI/third-party-analyses/activist_reports/long/DFAN14A_20260505_acc0001213900_26_052294.htm` | context | activist/long — sec_edgar |
 | activist_long | Unknown filer — PREC14A | `FRMI/third-party-analyses/activist_reports/long/PREC14A_20260505_acc0001213900_26_051937.htm` | context | activist/long — sec_edgar |
+| activist_long | Unknown filer — DFAN14A | `FRMI/third-party-analyses/activist_reports/long/DFAN14A_20260701_acc0001213900_26_074411.htm` | context | activist/long — sec_edgar |
 
 Cross-check required: `FRMI/research/cross_check_third_party_2026-07-01.md`

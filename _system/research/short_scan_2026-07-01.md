@@ -50,7 +50,7 @@
 | ENX.PA | no_hit | — | No activist index hits |
 | EVR | indexed | L0/S1 | 0 long, 1 short in activist index |
 | FNV | indexed | L0/S3 | 0 long, 3 short in activist index |
-| FRMI | indexed | L48/S0 | 48 long, 0 short in activist index |
+| FRMI | indexed | L49/S0 | 49 long, 0 short in activist index |
 | FRMO | indexed | L0/S3 | 0 long, 3 short in activist index |
 | GCCO | indexed | L0/S1 | 0 long, 1 short in activist index |
 | GLXY | no_hit | — | No activist index hits |
