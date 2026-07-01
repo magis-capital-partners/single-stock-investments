@@ -453,6 +453,37 @@
       </table>`;
   }
 
+  function themesForPeriod(byQ, fallback, period) {
+    if (!period || period.all) return byQ?.all || fallback || [];
+    if (period.quarters.length === 1 && byQ?.[period.quarters[0]]) return byQ[period.quarters[0]];
+    const merged = new Map();
+    period.quarters.forEach(qid => {
+      (byQ?.[qid] || []).forEach(t => {
+        const key = t.theme || 'Other';
+        const row = merged.get(key) || {
+          theme: key,
+          letter_count: 0,
+          fund_count: 0,
+          bullish: 0,
+          bearish: 0,
+          neutral: 0,
+          top_tickers: [],
+          _tickers: new Set(),
+        };
+        row.letter_count += Number(t.letter_count || 0);
+        row.fund_count += Number(t.fund_count || 0);
+        row.bullish += Number(t.bullish || 0);
+        row.bearish += Number(t.bearish || 0);
+        row.neutral += Number(t.neutral || 0);
+        (t.top_tickers || []).forEach(tk => row._tickers.add(tk));
+        merged.set(key, row);
+      });
+    });
+    return Array.from(merged.values())
+      .map(row => ({ ...row, top_tickers: Array.from(row._tickers).slice(0, 8), _tickers: undefined }))
+      .sort((a, b) => (b.letter_count - a.letter_count) || String(a.theme).localeCompare(String(b.theme)));
+  }
+
   function renderLetterIndex(rows, escapeHtml, linkHtml, ghRepo, onFundClick) {
     if (!rows?.length) {
       return '<p class="subhead">No letters indexed yet.</p>';
@@ -548,9 +579,171 @@
       </div>`;
   }
 
+  function parseQuarter(value) {
+    const text = String(value || '').trim();
+    if (!text) return null;
+    let m = text.match(/(20\d{2})\s*Q([1-4])/i)
+      || text.match(/(20\d{2})\s*([1-4])Q/i)
+      || text.match(/(20\d{2})Q([1-4])/i);
+    if (m) {
+      const year = Number(m[1]);
+      const quarter = Number(m[2]);
+      return { id: `${year}Q${quarter}`, year, quarter, label: `Q${quarter} ${year}` };
+    }
+    m = text.match(/^(20\d{2})-(\d{2})-\d{2}/);
+    if (m) {
+      const year = Number(m[1]);
+      const month = Number(m[2]);
+      if (month >= 1 && month <= 12) {
+        const quarter = Math.floor((month - 1) / 3) + 1;
+        return { id: `${year}Q${quarter}`, year, quarter, label: `Q${quarter} ${year}` };
+      }
+    }
+    return null;
+  }
+
+  function quarterLabel(id) {
+    const q = parseQuarter(id);
+    return q ? q.label : String(id || 'All history');
+  }
+
+  function addQuarter(map, value, meta) {
+    const q = parseQuarter(value);
+    if (!q) return null;
+    const row = map.get(q.id) || {
+      id: q.id,
+      label: q.label,
+      year: q.year,
+      quarter: q.quarter,
+      indexed_count: 0,
+      document_count: 0,
+      source_folder_count: 0,
+      source_folder_url: null,
+    };
+    row.indexed_count += Number(meta?.indexed_count || 0);
+    row.document_count += Number(meta?.document_count || 0);
+    row.source_folder_count += Number(meta?.source_folder_count || 0);
+    row.source_folder_url = row.source_folder_url || meta?.source_folder_url || null;
+    map.set(q.id, row);
+    return q.id;
+  }
+
+  function buildTimeModel(insights, documentCatalog) {
+    const map = new Map();
+    const timePeriods = documentCatalog?.time_periods || {};
+    (timePeriods.available_quarters || []).forEach(q => {
+      addQuarter(map, q.id || q.label, {
+        document_count: q.document_count,
+        source_folder_count: q.source_folder_count,
+        source_folder_url: q.source_folder_url,
+      });
+    });
+    Object.entries(insights?.theme_rankings_by_quarter || {})
+      .filter(([q]) => q && q !== 'all')
+      .forEach(([q]) => addQuarter(map, q, {}));
+    (insights?.letter_index || []).forEach(r => addQuarter(map, r.quarter || r.letter_date, { indexed_count: 1 }));
+    (insights?.fund_registry || []).forEach(r => addQuarter(map, r.quarter || r.letter_date, {}));
+    (insights?.consensus?.quarters || []).forEach(q => addQuarter(map, q, {}));
+    Object.entries((documentCatalog?.summary || {}).by_quarter || {})
+      .forEach(([q, count]) => addQuarter(map, q, { document_count: count }));
+
+    let quarters = Array.from(map.values()).sort((a, b) => (b.year - a.year) || (b.quarter - a.quarter));
+    if (quarters.length && quarters.length < 12) {
+      const latestYear = quarters[0].year;
+      for (let year = latestYear - 1; year >= latestYear - 12; year -= 1) {
+        for (let q = 4; q >= 1; q -= 1) addQuarter(map, `${year}Q${q}`, {});
+      }
+      quarters = Array.from(map.values()).sort((a, b) => (b.year - a.year) || (b.quarter - a.quarter));
+    }
+    const years = Array.from(new Set(quarters.map(q => q.year))).sort((a, b) => b - a);
+    const byId = Object.fromEntries(quarters.map(q => [q.id, q]));
+    return {
+      quarters,
+      years,
+      byId,
+      latestQuarter: timePeriods.latest_quarter || quarters[0]?.id || null,
+      latestYear: quarters[0]?.year || null,
+    };
+  }
+
+  function periodFromSelection(selection, timeModel) {
+    const raw = selection || 'latest';
+    const allQuarters = timeModel.quarters.map(q => q.id);
+    let ids = [];
+    let label = 'All history';
+    let selectedYear = timeModel.latestYear;
+    if (raw === 'latest') {
+      ids = timeModel.latestQuarter ? [timeModel.latestQuarter] : allQuarters.slice(0, 1);
+      label = ids[0] ? quarterLabel(ids[0]) : 'Latest quarter';
+      selectedYear = parseQuarter(ids[0])?.year || selectedYear;
+    } else if (raw === 'last4') {
+      ids = allQuarters.slice(0, 4);
+      label = 'Last 4 quarters';
+    } else if (raw === 'last8') {
+      ids = allQuarters.slice(0, 8);
+      label = 'Last 8 quarters';
+    } else if (raw === 'since2020') {
+      ids = allQuarters.filter(id => (parseQuarter(id)?.year || 0) >= 2020);
+      label = 'Since 2020';
+    } else if (raw === 'all') {
+      ids = allQuarters;
+      label = 'All history';
+    } else if (raw.startsWith('year:')) {
+      selectedYear = Number(raw.split(':')[1]);
+      ids = allQuarters.filter(id => parseQuarter(id)?.year === selectedYear);
+      label = String(selectedYear);
+    } else {
+      const q = parseQuarter(raw);
+      if (q) {
+        ids = [q.id];
+        label = q.label;
+        selectedYear = q.year;
+      }
+    }
+    return {
+      id: raw,
+      label,
+      quarters: ids,
+      quarterSet: new Set(ids),
+      all: raw === 'all',
+      selectedYear,
+    };
+  }
+
+  function recordQuarter(record, fields) {
+    for (const field of fields) {
+      const q = parseQuarter(record?.[field]);
+      if (q) return q.id;
+    }
+    return null;
+  }
+
+  function periodMatchesRecord(record, period, fields) {
+    if (!period || period.all) return true;
+    const qid = recordQuarter(record, fields);
+    return qid ? period.quarterSet.has(qid) : false;
+  }
+
+  function periodCoverage(period, timeModel, letterIndex, funds) {
+    const letters = (letterIndex || []).filter(r => periodMatchesRecord(r, period, ['quarter', 'letter_date']));
+    const fundRows = (funds || []).filter(r => periodMatchesRecord(r, period, ['quarter', 'letter_date']));
+    const folderCount = period.all
+      ? timeModel.quarters.reduce((sum, q) => sum + (q.source_folder_count || 0), 0)
+      : period.quarters.reduce((sum, id) => sum + (timeModel.byId[id]?.source_folder_count || 0), 0);
+    return {
+      letters: letters.length,
+      funds: fundRows.length,
+      quarters: period.all ? timeModel.quarters.length : period.quarters.length,
+      folderCount,
+    };
+  }
+
   function filterEvents(events, opts) {
-    const { search, bookOnly } = opts || {};
+    const { search, bookOnly, period } = opts || {};
     let list = events || [];
+    if (period && !period.all) {
+      list = list.filter(e => periodMatchesRecord(e, period, ['quarter', 'observed_at', 'date', 'as_of']));
+    }
     if (bookOnly) {
       list = list.filter(e => e.in_our_book || e.portfolio_relevance >= 1);
     }
@@ -700,10 +893,12 @@
   }
 
   function filterDocumentCatalog(catalog, opts) {
-    const { search = '', quarter = 'all', bookOnly = false } = opts || {};
+    const { search = '', quarter = 'all', bookOnly = false, period = null } = opts || {};
     const q = search.toLowerCase();
     let rows = catalog?.documents || [];
-    if (quarter && quarter !== 'all') {
+    if (period && !period.all) {
+      rows = rows.filter(r => periodMatchesRecord(r, period, ['quarter', 'modified_at']));
+    } else if (quarter && quarter !== 'all') {
       const label = quarter.replace(/^(\d{4})Q([1-4])$/, '$1 Q$2');
       rows = rows.filter(r => !r.quarter || r.quarter === label || r.quarter === quarter);
     }
@@ -766,9 +961,12 @@
   }
 
   function renderMemoryLedger(memory, escapeHtml, linkHtml, opts) {
-    const { search = '', bookOnly = false } = opts || {};
+    const { search = '', bookOnly = false, period = null } = opts || {};
     const q = search.toLowerCase();
     let rows = memory?.claim_ledger || [];
+    if (period && !period.all) {
+      rows = rows.filter(r => periodMatchesRecord(r, period, ['quarter', 'date', 'as_of', 'source_date']));
+    }
     if (bookOnly) {
       rows = rows.filter(r => r.claim_type === 'inflection' || r.claim_type === 'risk' || r.claim_type === 'ownership' || r.direction === 'bearish');
     }
@@ -847,9 +1045,11 @@
   }
 
   function filterLetterIndex(rows, opts) {
-    const { quarter, search, bookOnly } = opts || {};
+    const { quarter, search, bookOnly, period } = opts || {};
     let list = rows || [];
-    if (quarter && quarter !== 'all') {
+    if (period && !period.all) {
+      list = list.filter(r => periodMatchesRecord(r, period, ['quarter', 'letter_date']));
+    } else if (quarter && quarter !== 'all') {
       list = list.filter(r => r.quarter === quarter);
     }
     if (bookOnly) {
@@ -877,13 +1077,90 @@
     return `<button type="button" class="linkish mono" data-select-ticker="${escapeHtml(row.ticker)}">${escapeHtml(row.ticker)}</button>${book}`;
   }
 
+  function consensusSentimentFromCounts(buys, sells, shorts) {
+    if (buys > sells + shorts) return 'accumulating';
+    if (sells + shorts > buys) return 'reducing';
+    return (buys || sells || shorts) ? 'mixed' : 'discussed';
+  }
+
+  function mergeConsensusRows(rows) {
+    const byTicker = new Map();
+    rows.forEach(r => {
+      const ticker = r.ticker;
+      if (!ticker) return;
+      const row = byTicker.get(ticker) || {
+        ticker,
+        name: r.name || ticker,
+        in_book: Boolean(r.in_book),
+        fund_count: 0,
+        buy_funds: 0,
+        sell_funds: 0,
+        short_funds: 0,
+        net: 0,
+        funds: new Set(),
+      };
+      row.name = row.name || r.name || ticker;
+      row.in_book = row.in_book || Boolean(r.in_book);
+      row.fund_count += Number(r.fund_count || 0);
+      row.buy_funds += Number(r.buy_funds || 0);
+      row.sell_funds += Number(r.sell_funds || 0);
+      row.short_funds += Number(r.short_funds || 0);
+      (r.funds || []).forEach(f => row.funds.add(f));
+      byTicker.set(ticker, row);
+    });
+    return Array.from(byTicker.values()).map(row => {
+      const funds = Array.from(row.funds);
+      const fundCount = funds.length || row.fund_count;
+      const net = row.buy_funds - row.sell_funds - row.short_funds;
+      return {
+        ...row,
+        fund_count: fundCount,
+        net,
+        sentiment: consensusSentimentFromCounts(row.buy_funds, row.sell_funds, row.short_funds),
+        funds: funds.slice(0, 10),
+      };
+    });
+  }
+
+  function consensusBlockForPeriod(consensus, period, fallbackQuarter) {
+    const byQuarter = consensus?.by_quarter || {};
+    const qids = period?.quarters || [];
+    if (!period || period.all) {
+      return { block: byQuarter.all || {}, scope: 'all history' };
+    }
+    if (qids.length === 1 && byQuarter[qids[0]]) {
+      return { block: byQuarter[qids[0]], scope: quarterLabel(qids[0]) };
+    }
+    if (!qids.length && fallbackQuarter && byQuarter[fallbackQuarter]) {
+      return { block: byQuarter[fallbackQuarter], scope: quarterLabel(fallbackQuarter) };
+    }
+    const blocks = qids.map(qid => byQuarter[qid]).filter(Boolean);
+    if (!blocks.length) {
+      return { block: { letter_count: 0, most_discussed: [], biggest_changes: [], activity: [] }, scope: period.label };
+    }
+    const activity = blocks.flatMap(b => b.activity || [])
+      .sort((a, b) => String(b.letter_date || '').localeCompare(String(a.letter_date || '')));
+    const most = mergeConsensusRows(blocks.flatMap(b => b.most_discussed || []))
+      .sort((a, b) => (b.fund_count - a.fund_count) || (Math.abs(b.net) - Math.abs(a.net)) || String(a.ticker).localeCompare(String(b.ticker)));
+    const changes = most.filter(r => r.net !== 0)
+      .sort((a, b) => (Math.abs(b.net) - Math.abs(a.net)) || (b.fund_count - a.fund_count));
+    return {
+      block: {
+        letter_count: blocks.reduce((sum, b) => sum + Number(b.letter_count || 0), 0),
+        most_discussed: most,
+        biggest_changes: changes,
+        activity,
+      },
+      scope: period.label,
+    };
+  }
+
   function renderConsensus(consensus, escapeHtml, linkHtml, ghRepo, opts) {
-    const { quarter = 'all', bookOnly = false, search = '' } = opts || {};
+    const { quarter = 'all', bookOnly = false, search = '', period = null } = opts || {};
     if (!consensus || !consensus.by_quarter) {
       return '<p class="subhead">No consensus built yet. Run <span class="mono">python _system/scripts/build_insights.py</span>.</p>';
     }
-    const key = consensus.by_quarter[quarter] ? quarter : 'all';
-    const block = consensus.by_quarter[key] || {};
+    const { block, scope } = consensusBlockForPeriod(consensus, period, quarter);
     const q = (search || '').toLowerCase();
     const matchRow = r => !q
       || (r.ticker || '').toLowerCase().includes(q)
@@ -894,7 +1171,6 @@
     const changes = (block.biggest_changes || []).filter(r => bookRow(r) && matchRow(r));
     const activity = (block.activity || []).filter(r => bookRow(r) && matchRow(r));
     const summary = consensus.summary || {};
-    const scope = key === 'all' ? 'all quarters' : key;
 
     const mostRows = most.slice(0, 60).map((r, i) => `
       <tr>
@@ -976,19 +1252,12 @@
 
     const byQ = insights?.theme_rankings_by_quarter || {};
     const letterIndex = insights?.letter_index || [];
-    const catalogQuarters = Object.keys((documentCatalog?.summary?.by_quarter) || {});
-    const consensusQuarters = (insights?.consensus?.quarters) || [];
-    const quarterSet = new Set([
-      ...Object.keys(byQ).filter(q => q && q !== 'all'),
-      ...letterIndex.map(r => r.quarter).filter(Boolean),
-      ...consensusQuarters.filter(Boolean),
-      ...catalogQuarters.filter(q => q && q !== 'all'),
-    ]);
-    const quarters = Array.from(quarterSet).sort().reverse();
-    const effectiveQuarter = quarter === 'latest' ? (quarters[0] || 'all') : quarter;
-    const themes = byQ[effectiveQuarter] || insights?.theme_rankings || [];
+    const timeModel = buildTimeModel(insights, documentCatalog);
+    const period = periodFromSelection(quarter, timeModel);
+    const themes = themesForPeriod(byQ, insights?.theme_rankings || [], period);
     let funds = insights?.fund_registry || [];
-    let letters = filterLetterIndex(letterIndex, { quarter: effectiveQuarter, search: fundSearch, bookOnly });
+    let letters = filterLetterIndex(letterIndex, { period, search: fundSearch, bookOnly });
+    const coverage = periodCoverage(period, timeModel, letterIndex, insights?.fund_registry || []);
 
     if (fundSearch) {
       const q = fundSearch.toLowerCase();
@@ -1001,11 +1270,28 @@
     if (bookOnly) {
       funds = funds.filter(f => (f.our_ticker_count || 0) > 0);
     }
-    if (effectiveQuarter && effectiveQuarter !== 'all') {
-      funds = funds.filter(f => f.quarter === effectiveQuarter);
+    if (period && !period.all) {
+      funds = funds.filter(f => periodMatchesRecord(f, period, ['quarter', 'letter_date']));
     }
 
-    const qTabs = [{ id: 'all', label: 'All' }, ...quarters.map(q => ({ id: q, label: q }))];
+    const rangeTabs = [
+      { id: 'latest', label: 'Latest' },
+      { id: 'last4', label: 'Last 4Q' },
+      { id: 'last8', label: 'Last 8Q' },
+      { id: 'since2020', label: 'Since 2020' },
+      { id: 'all', label: 'All history' },
+    ];
+    const selectedYear = period.selectedYear || timeModel.latestYear;
+    const yearTabs = timeModel.years.map(y => ({ id: `year:${y}`, label: String(y), year: y }));
+    const quarterTabs = selectedYear
+      ? [
+          { id: `year:${selectedYear}`, label: 'Full year' },
+          { id: `${selectedYear}Q1`, label: 'Q1' },
+          { id: `${selectedYear}Q2`, label: 'Q2' },
+          { id: `${selectedYear}Q3`, label: 'Q3' },
+          { id: `${selectedYear}Q4`, label: 'Q4' },
+        ]
+      : [];
     const sections = [
       { id: 'overview', label: 'Overview' },
       { id: 'events', label: 'What changed' },
@@ -1023,21 +1309,20 @@
     if (activeSection === 'overview') {
       body = renderSourceHealth(insights?.source_health || {}, escapeHtml);
     } else if (activeSection === 'events') {
-      body = renderEventQueue(insights?.events || [], escapeHtml, linkHtml, ghRepo, { search: fundSearch, bookOnly });
+      body = renderEventQueue(insights?.events || [], escapeHtml, linkHtml, ghRepo, { search: fundSearch, bookOnly, period });
     } else if (activeSection === 'consensus') {
-      body = renderConsensus(insights?.consensus, escapeHtml, linkHtml, ghRepo, { quarter: effectiveQuarter, bookOnly, search: fundSearch });
+      body = renderConsensus(insights?.consensus, escapeHtml, linkHtml, ghRepo, { quarter, period, bookOnly, search: fundSearch });
     } else if (activeSection === 'letters') {
-      const scope = effectiveQuarter && effectiveQuarter !== 'all' ? effectiveQuarter : 'all quarters';
-      body = `<p class="tier-sub" style="margin-bottom:8px">${letters.length} letter(s) · ${escapeHtml(scope)}${bookOnly ? ' · overlap with our book only' : ''}</p>`
+      body = `<p class="tier-sub" style="margin-bottom:8px">${letters.length} letter(s) &middot; ${escapeHtml(period.label)}${bookOnly ? ' &middot; overlap with our book only' : ''}</p>`
         + renderLetterIndex(letters, escapeHtml, linkHtml, ghRepo, true);
     } else if (activeSection === 'funds') {
       body = renderFundRegistry(funds, escapeHtml, linkHtml, ghRepo, bookOnly);
     } else if (activeSection === 'documents') {
-      body = renderDocumentCatalog(documentCatalog, escapeHtml, linkHtml, { search: fundSearch, quarter: effectiveQuarter, bookOnly });
+      body = renderDocumentCatalog(documentCatalog, escapeHtml, linkHtml, { search: fundSearch, period, bookOnly });
     } else if (activeSection === 'tickers') {
       body = renderTickerEssentials(tickers, escapeHtml, linkHtml, { search: fundSearch, bookOnly });
     } else if (activeSection === 'memory') {
-      body = renderMemoryLedger(memory, escapeHtml, linkHtml, { search: fundSearch, bookOnly })
+      body = renderMemoryLedger(memory, escapeHtml, linkHtml, { search: fundSearch, bookOnly, period })
         + '<div style="height:14px"></div>'
         + renderMemoryReviewQueue(memory, escapeHtml);
     } else if (activeSection === 'themes') {
@@ -1055,15 +1340,26 @@
       <nav class="view-tabs" id="insights-section-tabs" style="margin-bottom:10px">
         ${sections.map(s => `<button type="button" class="view-tab${activeSection === s.id ? ' active' : ''}" data-insights-section="${s.id}">${s.label}</button>`).join('')}
       </nav>
-      <div class="detail-section" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:10px">
-        <nav class="view-tabs" id="insights-quarter-tabs">
-          ${qTabs.map(t => `<button type="button" class="view-tab${effectiveQuarter === t.id ? ' active' : ''}" data-insights-quarter="${escapeHtml(t.id)}">${escapeHtml(t.label)}</button>`).join('')}
+      <div class="detail-section" style="display:grid;gap:8px;margin-bottom:12px">
+        <nav class="source-pills" id="insights-range-tabs" style="margin-bottom:0">
+          ${rangeTabs.map(t => `<button type="button" class="filter-btn source-pill${period.id === t.id ? ' active' : ''}" data-insights-quarter="${escapeHtml(t.id)}">${escapeHtml(t.label)}</button>`).join('')}
         </nav>
-        <label class="tier-sub" style="display:flex;align-items:center;gap:6px">
-          <input type="checkbox" id="insights-book-only" ${bookOnly ? 'checked' : ''} />
-          High-signal only
-        </label>
-        <input class="search" id="fund-registry-search" placeholder="Search ticker, event, fund, theme..." value="${escapeHtml(fundSearch)}" style="max-width:280px" />
+        <nav class="source-pills" id="insights-year-tabs" style="margin-bottom:0">
+          ${yearTabs.map(t => `<button type="button" class="filter-btn source-pill${period.id === t.id ? ' active' : ''}" data-insights-quarter="${escapeHtml(t.id)}">${escapeHtml(t.label)}</button>`).join('')}
+        </nav>
+        ${quarterTabs.length ? `<nav class="source-pills" id="insights-quarter-tabs" style="margin-bottom:0">
+          ${quarterTabs.map(t => `<button type="button" class="filter-btn source-pill${period.id === t.id ? ' active' : ''}" data-insights-quarter="${escapeHtml(t.id)}">${escapeHtml(t.label)}</button>`).join('')}
+        </nav>` : ''}
+        <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+          <label class="tier-sub" style="display:flex;align-items:center;gap:6px">
+            <input type="checkbox" id="insights-book-only" ${bookOnly ? 'checked' : ''} />
+            Our book overlap
+          </label>
+          <input class="search" id="fund-registry-search" placeholder="Search ticker, event, fund, theme, source..." value="${escapeHtml(fundSearch)}" style="max-width:320px" />
+        </div>
+        <div class="tier-sub">
+          Viewing ${escapeHtml(period.label)} &middot; ${coverage.quarters} quarter(s) &middot; ${coverage.letters} indexed letter(s) &middot; ${coverage.funds} fund row(s)${coverage.folderCount ? ` &middot; ${coverage.folderCount} Drive source folder(s)` : ''}
+        </div>
       </div>
       ${body}`;
   }

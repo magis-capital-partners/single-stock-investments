@@ -262,6 +262,72 @@ def catalog_quarter(doc: dict) -> str | None:
     return None
 
 
+QUARTER_PATTERNS = [
+    re.compile(r"(?<!\d)(20\d{2})\s*Q([1-4])(?!\d)", re.IGNORECASE),
+    re.compile(r"(?<!\d)(20\d{2})\s*([1-4])Q(?:\s+Letters)?(?!\d)", re.IGNORECASE),
+    re.compile(r"(?<!\d)(20\d{2})Q([1-4])(?!\d)", re.IGNORECASE),
+]
+
+
+def normalize_quarter_id(value: str | None) -> str | None:
+    text = str(value or "").strip()
+    if not text:
+        return None
+    for pattern in QUARTER_PATTERNS:
+        m = pattern.search(text)
+        if m:
+            return f"{m.group(1)}Q{m.group(2)}"
+    return None
+
+
+def quarter_label(quarter_id: str) -> str:
+    m = re.match(r"^(20\d{2})Q([1-4])$", quarter_id)
+    if not m:
+        return quarter_id
+    return f"Q{m.group(2)} {m.group(1)}"
+
+
+def build_time_periods(rows: list[dict], folders: dict) -> dict:
+    by_quarter: dict[str, dict] = {}
+
+    def bucket(quarter_id: str) -> dict:
+        year, q = int(quarter_id[:4]), int(quarter_id[-1])
+        return by_quarter.setdefault(
+            quarter_id,
+            {
+                "id": quarter_id,
+                "label": quarter_label(quarter_id),
+                "year": year,
+                "quarter": q,
+                "document_count": 0,
+                "source_folder_count": 0,
+                "source_folder_url": None,
+            },
+        )
+
+    for row in rows:
+        qid = normalize_quarter_id(row.get("quarter"))
+        if qid:
+            bucket(qid)["document_count"] += 1
+
+    for path, meta in (folders or {}).items():
+        qid = normalize_quarter_id(path)
+        if not qid:
+            continue
+        b = bucket(qid)
+        b["source_folder_count"] += 1
+        if not b.get("source_folder_url"):
+            b["source_folder_url"] = (meta or {}).get("webViewLink")
+
+    quarters = sorted(by_quarter.values(), key=lambda q: (q["year"], q["quarter"]), reverse=True)
+    years = sorted({q["year"] for q in quarters}, reverse=True)
+    return {
+        "latest_quarter": quarters[0]["id"] if quarters else None,
+        "years": years,
+        "available_quarters": quarters,
+    }
+
+
 def load_drive_folder_index() -> dict:
     if not DRIVE_FOLDER_INDEX_PATH.exists():
         return {"folders": {}, "generated_at": None}
@@ -318,6 +384,7 @@ def build_document_catalog(document_registry: dict | None) -> dict | None:
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "registry_generated_at": document_registry.get("generated_at"),
         "folder_index_generated_at": folder_index.get("generated_at"),
+        "time_periods": build_time_periods(rows, folders),
         "summary": {
             "document_count": len(rows),
             "uploaded_count": (document_registry.get("summary") or {}).get("uploaded_count", 0),
@@ -1533,6 +1600,7 @@ def main() -> None:
             "generated_at": document_catalog.get("generated_at"),
             "registry_generated_at": document_catalog.get("registry_generated_at"),
             "folder_index_generated_at": document_catalog.get("folder_index_generated_at"),
+            "time_periods": document_catalog.get("time_periods"),
             "summary": document_catalog.get("summary"),
             "documents": document_catalog.get("documents"),
         }
