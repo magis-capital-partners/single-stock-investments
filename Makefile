@@ -12,7 +12,7 @@ DATE ?= $(shell date +%Y-%m-%d)
 TICKER ?=
 DATE ?= $(shell date +%Y-%m-%d)
 
-.PHONY: research-check research-check-all depth-check depth-audit evidence milly-repass book-estimate book-estimate-all holdco-uplift short-scan hk-scan hk-cross-check-all hk-extract-refresh third-party-scan-all cross-check-all transcript-sync batch-refresh evidence-check darwin-pit-check darwin-build darwin-pit-audit darwin-sync-external darwin-explore persona-lens persona-insights persona-check document-registry document-sync-drive document-sync-drive-letters document-sync-drive-general document-drive-plan document-drive-migrate document-drive-cleanup document-drive-audit research-memory sumzero-index
+.PHONY: research-check research-check-all depth-check depth-audit evidence milly-repass book-estimate book-estimate-all holdco-uplift short-scan activist-scan activist-scan-all activist-feed hk-scan hk-cross-check-all hk-extract-refresh third-party-scan-all cross-check-all transcript-sync batch-refresh evidence-check darwin-pit-check darwin-build darwin-pit-audit darwin-sync-external darwin-explore persona-lens persona-insights persona-check document-registry document-sync-drive document-sync-drive-letters document-sync-drive-general document-drive-plan document-drive-migrate document-drive-cleanup document-drive-audit research-memory sumzero-index
 
 persona-lens:
 	$(PYTHON) $(SCRIPTS)/fetch_superinvestor_letters.py --all --build
@@ -190,6 +190,31 @@ endif
 
 short-scan:
 	$(PYTHON) $(SCRIPTS)/short_scan_batch.py
+
+activist-scan:
+ifndef TICKER
+	$(PYTHON) $(SCRIPTS)/scan_activist_sources.py
+else
+	$(PYTHON) $(SCRIPTS)/scan_activist_sources.py --ticker $(TICKER)
+endif
+	@echo OK: activist-scan
+
+activist-scan-all:
+	$(PYTHON) $(SCRIPTS)/scan_activist_sources.py
+	$(PYTHON) $(SCRIPTS)/short_scan_batch.py
+	@echo OK: activist-scan-all
+
+activist-feed:
+	$(PYTHON) $(SCRIPTS)/build_activist_feed.py
+	@echo OK: activist-feed
+
+activist-text:
+ifndef TICKER
+	$(PYTHON) $(SCRIPTS)/extract_activist_text.py --all
+else
+	$(PYTHON) $(SCRIPTS)/extract_activist_text.py $(TICKER)
+endif
+	@echo OK: activist-text
 
 hk-scan:
 ifndef TICKER

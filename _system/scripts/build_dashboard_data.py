@@ -238,6 +238,9 @@ def source_type_label(source_type: str | None) -> str:
         "superinvestor_letter": "Letters",
         "company_document": "Company",
         "third_party": "VIC / third party",
+        "activist_long": "Activist (long)",
+        "activist_short": "Activist (short)",
+        "activist_report": "Activist",
         "sumzero_research": "SumZero",
         "research": "Research",
         "dropbox_ingestion": "Dropbox ingestion",
@@ -1527,7 +1530,26 @@ def build_ticker_row(
     row["essential_insights"]["needs_work_reasons"] = reasons
     row["essential_insights"]["needs_work"] = bool(reasons)
     row["research_memory"] = compact_research_memory(ticker, memory_doc)
+    row["activist"] = activist_summary_for_ticker(ticker)
     return row
+
+
+def load_activist_feed() -> dict | None:
+    return _load_json(DATA_DIR / "activist_feed.json")
+
+
+def activist_summary_for_ticker(ticker: str) -> dict:
+    feed = load_activist_feed()
+    by_ticker = (feed or {}).get("by_ticker") or {}
+    summary = by_ticker.get(ticker) or by_ticker.get(ticker.upper()) or {}
+    if summary:
+        return summary
+    return {
+        "long_count": 0,
+        "short_count": 0,
+        "latest": None,
+        "has_unreconciled": False,
+    }
 
 
 def build() -> dict:
@@ -1793,6 +1815,20 @@ def main() -> None:
         payload["nol_screener"] = nol
         payload["summary"]["nol_screener_count"] = nol.get("row_count") or len(
             nol.get("rows") or []
+        )
+    activist_feed = load_activist_feed()
+    if not activist_feed:
+        try:
+            from build_activist_feed import build_feed
+
+            activist_feed = build_feed()
+        except Exception:
+            activist_feed = None
+    if activist_feed:
+        payload["activist_feed"] = activist_feed
+        payload["summary"]["activist_hits"] = (activist_feed.get("summary") or {}).get("portfolio_hits", 0)
+        payload["summary"]["activist_tickers_with_hits"] = (activist_feed.get("summary") or {}).get(
+            "tickers_with_hits", 0
         )
     OUTPUT.write_text(json.dumps(payload, indent=2), encoding="utf-8")
     write_oauth_config()

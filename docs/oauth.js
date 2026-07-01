@@ -187,7 +187,7 @@
       client_id: dev.client_id,
       device_code: dev.device_code,
       grant_type: 'urn:ietf:params:oauth:grant-type:device_code',
-    });
+    }).catch(err => { throw wrapFetchError(err, cfg); });
 
     if (data.error === 'authorization_pending') return { pending: true };
     if (data.error === 'slow_down') return { pending: true, slow: true };

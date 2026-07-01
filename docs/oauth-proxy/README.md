@@ -16,7 +16,13 @@ npx wrangler deploy
 
 5. Copy the worker URL (e.g. `https://marvin-oauth-proxy.yourname.workers.dev`)
 6. Set GitHub repo variable **`OAUTH_PROXY_URL`** to that URL (no trailing slash)
-7. Redeploy dashboard (push to main or run **Deploy Dashboard** workflow)
+7. Set GitHub secrets **`CLOUDFLARE_API_TOKEN`** and **`CLOUDFLARE_ACCOUNT_ID`** (for CI deploy)
+8. Run **Deploy OAuth Proxy (Cloudflare)** workflow, or push changes under `dashboard/oauth-proxy/`
+9. Redeploy dashboard (push to main or run **Deploy Dashboard** workflow)
+
+## CORS note
+
+The worker must echo the browser `Origin` header when it is allowlisted. If sign-in shows **Failed to fetch**, the deployed worker is likely stale — redeploy with the latest `worker.js`.
 
 ## OAuth App
 

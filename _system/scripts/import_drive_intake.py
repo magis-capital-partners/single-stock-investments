@@ -42,6 +42,8 @@ INTAKE_TYPES = {
     "vic": "VIC",
     "research": "Research",
     "company": "Company",
+    "activist_long": "Activist/Long",
+    "activist_short": "Activist/Short",
 }
 INTAKE_FOLDER_PATHS = {
     intake_kind: f"{INTAKE_PREFIX}/{folder_name}"
@@ -63,6 +65,13 @@ from drive_store_common import (  # noqa: E402
     write_json,
 )
 from third_party_inventory import write_inventory  # noqa: E402
+
+try:
+    from activist_common import load_ticker_index, save_ticker_index, upsert_report  # noqa: E402
+    from extract_activist_text import extract_ticker_activist_text  # noqa: E402
+except ImportError:
+    load_ticker_index = save_ticker_index = upsert_report = None  # type: ignore
+    extract_ticker_activist_text = None  # type: ignore
 
 
 def rel(path: Path) -> str:
@@ -97,10 +106,16 @@ def infer_ticker_from_name(name: str) -> str | None:
 
 def intake_path_parts(path: str) -> tuple[str, list[str], str] | None:
     parts = [p for p in path.split("/") if p]
+    if len(parts) >= 4 and parts[0] == "Admin" and parts[1].lower() == "activist":
+        side = parts[2].lower()
+        if side in ("long", "short"):
+            return f"activist_{side}", parts[3:], INTAKE_PREFIX
     if len(parts) >= 3 and parts[0] == "Admin" and parts[1].lower() in INTAKE_TYPES:
         return parts[1].lower(), parts[2:], INTAKE_PREFIX
     if len(parts) >= 4 and parts[0:2] == ["Admin", "Intake"] and parts[2].lower() in INTAKE_TYPES:
         return parts[2].lower(), parts[3:], LEGACY_INTAKE_PREFIX
+    if len(parts) >= 3 and parts[0].lower() == "activist" and parts[1].lower() in ("long", "short"):
+        return f"activist_{parts[1].lower()}", parts[2:], "root-relative"
     if len(parts) >= 2 and parts[0].lower() in INTAKE_TYPES:
         return parts[0].lower(), parts[1:], "root-relative"
     return None
@@ -138,6 +153,10 @@ def destination_for(ticker: str, intake_kind: str, filename: str, *, drive_file_
     safe_name = safe_filename(filename)
     if intake_kind == "vic":
         dest_dir = ROOT / ticker / "third-party-analyses" / "vic"
+    elif intake_kind == "activist_long":
+        dest_dir = ROOT / ticker / "third-party-analyses" / "activist_reports" / "long"
+    elif intake_kind == "activist_short":
+        dest_dir = ROOT / ticker / "third-party-analyses" / "activist_reports" / "short"
     elif intake_kind == "company":
         dest_dir = ROOT / ticker / "investor-documents" / "drive-intake"
     else:
@@ -301,12 +320,35 @@ def import_intake(
         }
         imported.append({**manifest["files"][file_id], "target": rel(dest)})
         touched_tickers.add(parsed["ticker"])
+        if parsed["intake_kind"] in ("activist_long", "activist_short") and upsert_report:
+            side = "long" if parsed["intake_kind"] == "activist_long" else "short"
+            index = load_ticker_index(parsed["ticker"])
+            upsert_report(
+                index,
+                {
+                    "firm_id": "drive_intake",
+                    "firm_name": "Drive intake",
+                    "side": side,
+                    "report_date": (item.get("createdTime") or now_iso())[:10],
+                    "title": parsed["filename"],
+                    "source": "google_drive_intake",
+                    "source_url": item.get("webViewLink"),
+                    "local_pdf": rel(dest),
+                    "local_file": rel(dest),
+                    "status": "new",
+                    "tier": "context",
+                    "confidence": 1.0,
+                },
+            )
+            save_ticker_index(parsed["ticker"], index)
 
     if not dry_run:
         manifest["generated_at"] = now_iso()
         write_json(MANIFEST_PATH, manifest)
         for ticker in sorted(touched_tickers):
             write_inventory(ticker)
+            if extract_ticker_activist_text:
+                extract_ticker_activist_text(ticker)
 
     report = {
         "generated_at": now_iso(),

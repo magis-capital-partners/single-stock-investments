@@ -29,14 +29,19 @@ Admin/
   VIC/
     TPL/
       VIC writeup.pdf
-    FRMO/
-      another writeup.pdf
   Research/
     TPL/
       outside report.pdf
   Company/
     TPL/
       company presentation.pdf
+  Activist/
+    Long/
+      DIS/
+        elliott-proxy-letter.pdf
+    Short/
+      APLD/
+        hindenburg-report.pdf
 ```
 
 Use the exact repo ticker folder name, for example `TPL`, `FRMO`, `0388.HK`, or `TEQ.ST`.
@@ -48,6 +53,8 @@ For the flat layout, put the ticker as the filename or as the first clear filena
 - `Admin/VIC/{TICKER}.pdf` imports to `{TICKER}/third-party-analyses/vic/`
 - `Admin/Research/{TICKER}.pdf` imports to `{TICKER}/third-party-analyses/drive-intake/`
 - `Admin/Company/{TICKER}.pdf` imports to `{TICKER}/investor-documents/drive-intake/`
+- `Admin/Activist/Long/{TICKER}/*.pdf` imports to `{TICKER}/third-party-analyses/activist_reports/long/`
+- `Admin/Activist/Short/{TICKER}/*.pdf` imports to `{TICKER}/third-party-analyses/activist_reports/short/`
 
 The legacy `Admin/Intake/{VIC,Research,Company}/{TICKER}/*.pdf` layout is still accepted.
 
@@ -56,6 +63,8 @@ After local import, the normal registry/upload step links the PDFs back into the
 - VIC: `Single Stocks/{TICKER}/VIC/`
 - Research: `Single Stocks/{TICKER}/Research/drive-intake/`
 - Company: `Single Stocks/{TICKER}/Company/drive-intake/`
+- Activist long: `Single Stocks/{TICKER}/Activist/long/`
+- Activist short: `Single Stocks/{TICKER}/Activist/short/`
 
 ## Automation Flow
 
@@ -76,4 +85,4 @@ Drive folder access alone is not enough for GitHub Actions. The repo also needs 
 - Upload PDFs only.
 - Leave files in Drive after upload; the manifest prevents duplicate imports.
 - Use existing repo tickers. Unknown ticker folders or filenames are reported in `_system/reference/document-store/drive_intake_latest.json`.
-- Use `VIC` only for Value Investors Club writeups; use `Research` for other outside research PDFs; use `Company` for company presentations or manually collected company PDFs.
+- Use `VIC` only for Value Investors Club writeups; use `Research` for other outside research PDFs; use `Company` for company presentations or manually collected company PDFs; use `Activist/Long` or `Activist/Short` for activist letters, proxy fights, and forensic short reports.

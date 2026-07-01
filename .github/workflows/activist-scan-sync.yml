@@ -1,0 +1,69 @@
+name: Activist Scan Sync
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+    inputs:
+      ticker:
+        description: "Optional ticker (repeat workflow for multiple)"
+        required: false
+        type: string
+      sec_only:
+        description: "SEC 13D scan only"
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: activist-scan-sync
+  cancel-in-progress: false
+
+jobs:
+  activist-scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r _system/scripts/requirements.txt
+
+      - name: Run activist scan
+        env:
+          TICKER: ${{ github.event.inputs.ticker || '' }}
+          SEC_ONLY: ${{ github.event.inputs.sec_only || 'false' }}
+        run: |
+          ARGS=""
+          if [ -n "$TICKER" ]; then ARGS="$ARGS --ticker $TICKER"; fi
+          if [ "$SEC_ONLY" = "true" ]; then ARGS="$ARGS --sec-only"; fi
+          python _system/scripts/scan_activist_sources.py $ARGS
+          python _system/scripts/short_scan_batch.py
+
+      - name: Rebuild document registry and dashboard
+        run: |
+          python _system/scripts/build_document_registry.py
+          python _system/scripts/build_activist_feed.py
+          python _system/scripts/build_dashboard_data.py
+        env:
+          OAUTH_CLIENT_ID: ${{ vars.OAUTH_CLIENT_ID }}
+          OAUTH_PROXY_URL: ${{ vars.OAUTH_PROXY_URL }}
+
+      - name: Mirror dashboard to docs
+        run: rsync -a --delete --exclude '.git' --exclude '.wrangler' dashboard/ docs/
+
+      - name: Commit activist scan artifacts
+        run: |
+          git add -A
+          bash _system/scripts/ci_push_main.sh "chore: activist scan sync $(date -u +%Y-%m-%d)"

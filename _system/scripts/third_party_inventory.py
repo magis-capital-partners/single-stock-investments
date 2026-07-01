@@ -119,6 +119,50 @@ def _research_notes(ticker: str) -> list[dict]:
     return out
 
 
+def _activist_reports(ticker: str) -> list[dict]:
+    index_path = ROOT / ticker / "third-party-analyses" / "activist_reports_index.json"
+    if index_path.exists():
+        data = json.loads(index_path.read_text(encoding="utf-8"))
+        out: list[dict] = []
+        for report in data.get("reports") or []:
+            path = report.get("local_pdf") or report.get("local_file")
+            if not path:
+                continue
+            side = report.get("side") or "long"
+            source_id = "activist_long" if side == "long" else "activist_short"
+            out.append(
+                {
+                    "source_id": source_id,
+                    "title": report.get("title") or report.get("firm_name") or report.get("firm_id"),
+                    "path": path,
+                    "status": "context",
+                    "use": f"activist/{side} — {report.get('source', 'scan')}",
+                }
+            )
+        if out:
+            return out
+    base = ROOT / ticker / "third-party-analyses" / "activist_reports"
+    if not base.is_dir():
+        return []
+    out = []
+    for side in ("long", "short"):
+        side_dir = base / side
+        if not side_dir.is_dir():
+            continue
+        source_id = "activist_long" if side == "long" else "activist_short"
+        for f in sorted(side_dir.glob("*.pdf")):
+            out.append(
+                {
+                    "source_id": source_id,
+                    "title": f.stem,
+                    "path": _rel(f),
+                    "status": "context",
+                    "use": f"activist/{side} scan",
+                }
+            )
+    return out
+
+
 def _short_reports(ticker: str) -> list[dict]:
     sr = ROOT / ticker / "third-party-analyses" / "short_reports"
     if not sr.is_dir():
@@ -219,6 +263,7 @@ def collect_third_party_sources(ticker: str) -> dict:
     if ref.exists():
         sources.extend(_parse_md_table_paths(ref.read_text(encoding="utf-8", errors="ignore")))
     sources.extend(_research_notes(ticker))
+    sources.extend(_activist_reports(ticker))
     sources.extend(_short_reports(ticker))
     sources.extend(_hk_sources(ticker))
     sources = _dedupe(sources)
