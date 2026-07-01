@@ -1336,7 +1336,7 @@
     const {
       escapeHtml,
       linkHtml,
-      ghRepo = 'GoldmanDrew/single-stock-investments',
+      ghRepo = 'magis-capital-partners/single-stock-investments',
       quarter = 'all',
       fundSearch = '',
       bookOnly = false,
