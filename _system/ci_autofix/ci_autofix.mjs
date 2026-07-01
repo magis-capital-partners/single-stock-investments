@@ -203,6 +203,7 @@ function classifyFailure({ run, failedJobs, failedLog, skippedWorkflow, forkPr }
       reason: "Missing or invalid secret/token/credential.",
       patterns: [
         /secret .* is not set/,
+        /.+\ssecret is not set/,
         /cursor_api_key.*not set/,
         /could not resolve.*secret/,
         /bad credentials/,

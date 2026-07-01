@@ -32,26 +32,44 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Check Google credentials secret
+        id: google_creds
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
+        run: |
+          if [ -z "$GOOGLE_APPLICATION_CREDENTIALS_JSON" ]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            MSG="GOOGLE_APPLICATION_CREDENTIALS_JSON is not configured in Settings → Secrets and variables → Actions."
+            DOC="See README.md and _system/reference/document-store/drive_intake_readme.md."
+            if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+              echo "::error::${MSG} ${DOC}"
+              exit 1
+            fi
+            echo "::warning::Skipping Drive Intake Sync — ${MSG} ${DOC}"
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Set up Python
+        if: steps.google_creds.outputs.configured == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
       - name: Install dependencies
+        if: steps.google_creds.outputs.configured == 'true'
         run: pip install -r _system/scripts/requirements.txt
 
       - name: Configure Google credentials
+        if: steps.google_creds.outputs.configured == 'true'
         env:
           GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
         run: |
-          if [ -z "$GOOGLE_APPLICATION_CREDENTIALS_JSON" ]; then
-            echo "::error::GOOGLE_APPLICATION_CREDENTIALS_JSON secret is not set."
-            exit 1
-          fi
           printf '%s' "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > "$RUNNER_TEMP/google-service-account.json"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/google-service-account.json" >> "$GITHUB_ENV"
 
       - name: Import Drive intake PDFs
+        if: steps.google_creds.outputs.configured == 'true'
         env:
           KIND: ${{ github.event.inputs.kind || '' }}
           LIMIT: ${{ github.event.inputs.limit || '0' }}
@@ -62,6 +80,7 @@ jobs:
           python _system/scripts/import_drive_intake.py $ARGS
 
       - name: Rebuild document registry and dashboard data
+        if: steps.google_creds.outputs.configured == 'true'
         run: |
           python _system/scripts/build_document_registry.py
           python _system/scripts/sync_pdf_store_google_drive.py --root-key general_pdfs --workers 4
@@ -71,11 +90,13 @@ jobs:
           python _system/scripts/build_dashboard_data.py
 
       - name: Mirror dashboard to docs
+        if: steps.google_creds.outputs.configured == 'true'
         shell: bash
         run: |
           rsync -a --delete --exclude '.git' --exclude '.wrangler' dashboard/ docs/
 
       - name: Commit imported documents
+        if: steps.google_creds.outputs.configured == 'true'
         run: |
           git add -A
           bash _system/scripts/ci_push_main.sh "chore: sync Drive intake documents $(date -u +%Y-%m-%d)"
