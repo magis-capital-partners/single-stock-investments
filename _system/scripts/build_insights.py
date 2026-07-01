@@ -85,6 +85,28 @@ LETTER_BOILERPLATE_PHRASES = (
     "being able to jog",
 )
 
+# Non-letter inventory/readme paths that should not appear in fund registry.
+LETTER_META_SOURCE_FILES = {
+    "_system/reference/superinvestor-letters/readme.md",
+    "_system/reference/superinvestor-letters/readme.pdf",
+}
+
+
+def is_letter_meta_entry(letter: dict) -> bool:
+    """Skip README and other non-letter inventory rows."""
+    for key in ("source_file", "source_document"):
+        ref = str(letter.get(key) or "").replace("\\", "/").lower()
+        if ref in LETTER_META_SOURCE_FILES:
+            return True
+        if ref.endswith("/readme.md") or ref.endswith("/readme.pdf"):
+            return True
+    fund_id = str(letter.get("fund_id") or "").lower()
+    fund = str(letter.get("fund") or "").lower()
+    if fund_id == "readme" or fund == "readme":
+        return True
+    return False
+
+
 COMPANY_STOPWORDS = {
     "inc",
     "corp",
@@ -1649,7 +1671,8 @@ def main() -> int:
     records: list[dict] = []
 
     letters_doc = load_json(LETTERS_INSIGHTS) or {"letters": []}
-    letters = letters_doc.get("letters") or []
+    letters = [l for l in (letters_doc.get("letters") or []) if not is_letter_meta_entry(l)]
+    letters_doc = {**letters_doc, "letters": letters}
     records.extend(from_superinvestor_letters(letters_doc))
     front_tickers = portfolio_tickers(include_watchlist=True)
     company_hints = portfolio_company_hints(include_watchlist=True)
