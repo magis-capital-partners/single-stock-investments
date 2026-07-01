@@ -148,7 +148,8 @@ def resolve_firm(form: str, text: str, filers: list[str]) -> dict:
 
 
 def analyze_sec_filing(form: str, text: str) -> dict:
-    filers = extract_reporting_persons(text)
+    filers = [re.sub(r"^[:;\s]+", "", f).strip() for f in extract_reporting_persons(text)]
+    filers = [f for f in filers if f]
     filing_class = classify_sec_filing(form, text, filers)
     firm = resolve_firm(form, text, filers)
     return {

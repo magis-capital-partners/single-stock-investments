@@ -5,7 +5,7 @@
 
 | Ticker | Long | Short | Latest | Notes |
 |--------|------|-------|--------|-------|
-| APLD | 7 | 0 | 2024-11-29 | 7 indexed |
+| APLD | 8 | 0 | 2024-11-29 | 8 indexed |
 
 Run: `python _system/scripts/scan_activist_sources.py`
 Drive drop: `Admin/Activist/Long/{TICKER}/` or `Admin/Activist/Short/{TICKER}/`

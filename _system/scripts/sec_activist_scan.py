@@ -148,8 +148,6 @@ def _entry_from_analysis(
         m = __import__("re").search(r"(20\d{6})", dest.name)
         fd = f"{m.group(1)[:4]}-{m.group(1)[4:6]}-{m.group(1)[6:8]}" if m else now_iso()[:10]
     title_bits = [analysis["firm_name"], form]
-    if analysis.get("reporting_persons") and analysis["firm_name"] not in analysis["reporting_persons"]:
-        title_bits = [analysis["reporting_persons"][0], form]
     return {
         "firm_id": analysis["firm_id"],
         "firm_name": analysis["firm_name"],
