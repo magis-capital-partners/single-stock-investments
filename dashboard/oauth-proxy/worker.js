@@ -4,13 +4,14 @@
  * Set repo variable OAUTH_PROXY_URL to the worker URL (e.g. https://marvin-oauth-proxy.USER.workers.dev)
  */
 const ALLOW_ORIGINS = new Set([
+  'https://magis-capital-partners.github.io',
   'https://goldmandrew.github.io',
   'http://localhost:8080',
   'http://127.0.0.1:8080',
 ]);
 
 function corsHeaders(origin) {
-  const allow = origin && ALLOW_ORIGINS.has(origin) ? origin : 'https://goldmandrew.github.io';
+  const allow = origin && ALLOW_ORIGINS.has(origin) ? origin : 'https://magis-capital-partners.github.io';
   return {
     'Access-Control-Allow-Origin': allow,
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
