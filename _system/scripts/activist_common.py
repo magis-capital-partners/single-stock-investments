@@ -98,6 +98,46 @@ def portfolio_tickers() -> list[str]:
     return sorted(tickers)
 
 
+GENERIC_COMPANY_TOKENS = frozenset(
+    {
+        "digital",
+        "group",
+        "holdings",
+        "capital",
+        "partners",
+        "management",
+        "investments",
+        "inc",
+        "corp",
+        "company",
+        "international",
+        "global",
+        "services",
+        "technologies",
+        "technology",
+        "resources",
+        "energy",
+        "financial",
+        "trust",
+        "fund",
+        "limited",
+        "ltd",
+        "plc",
+        "the",
+        "and",
+    }
+)
+
+
+def _distinctive_aliases(company: str, ticker: str) -> set[str]:
+    aliases = {ticker.upper(), company}
+    for token in re.split(r"[\s,./]+", company):
+        token = token.strip()
+        if len(token) >= 5 and token.lower() not in GENERIC_COMPANY_TOKENS:
+            aliases.add(token)
+    return aliases
+
+
 def ticker_meta(ticker: str) -> dict:
     ticker = ticker.upper()
     reg = load_json(PORTFOLIO_REGISTRY, {})
@@ -108,15 +148,11 @@ def ticker_meta(ticker: str) -> dict:
     if not cik:
         cik = (us_cfg.get(ticker) or {}).get("cik")
     company = holding.get("company") or ticker
-    aliases = {company, ticker}
-    for token in re.split(r"[\s,./]+", company):
-        if len(token) >= 3:
-            aliases.add(token)
     return {
         "ticker": ticker,
         "company": company,
         "cik": str(cik).strip() if cik else None,
-        "aliases": sorted(aliases, key=len, reverse=True),
+        "aliases": sorted(_distinctive_aliases(company, ticker), key=len, reverse=True),
     }
 
 
@@ -183,15 +219,62 @@ def firm_name(firm_id: str) -> str:
     return firm_id
 
 
-def text_matches_ticker(text: str, meta: dict) -> bool:
-    hay = text.lower()
+def match_report_to_ticker(text: str, meta: dict, *, min_confidence: float = 0.0) -> tuple[bool, float, str]:
+    hay = (text or "").lower()
     ticker = meta["ticker"].lower()
+    company = (meta.get("company") or "").lower()
+
     if re.search(rf"\b{re.escape(ticker)}\b", hay, re.I):
-        return True
+        return True, 1.0, "ticker_symbol"
+
+    ticker_compact = re.sub(r"[.\-]", "", ticker)
+    if ticker_compact and re.search(rf"\b{re.escape(ticker_compact)}\b", hay, re.I):
+        return True, 0.98, "ticker_compact"
+
+    if company and len(company) >= 6 and company in hay:
+        return True, 0.95, "company_name"
+
     for alias in meta.get("aliases") or []:
-        alias = str(alias).strip()
-        if len(alias) >= 4 and alias.lower() in hay:
-            return True
+        alias_l = str(alias).strip().lower()
+        if len(alias_l) < 6 or alias_l in GENERIC_COMPANY_TOKENS:
+            continue
+        if alias_l in hay:
+            return True, 0.82, f"alias:{alias_l}"
+
+    return False, 0.0, "no_match"
+
+
+def text_matches_ticker(text: str, meta: dict) -> bool:
+    matched, confidence, _reason = match_report_to_ticker(text, meta)
+    return matched and confidence >= 0.9
+
+
+def url_target_mismatch(url: str, title: str, meta: dict) -> bool:
+    """True when URL/title clearly names a different company (site false-positive guard)."""
+    from urllib.parse import urlparse
+
+    blob = f"{url} {title}".lower()
+    ticker = meta["ticker"].lower()
+    company = (meta.get("company") or "").lower()
+    if re.search(rf"\b{re.escape(ticker)}\b", blob, re.I):
+        return False
+    if company and len(company) >= 6 and company in blob:
+        return False
+
+    slug = urlparse(url or "").path.strip("/").split("/")[-1].lower()
+    if not slug or re.fullmatch(r"[\d-]+", slug):
+        return False
+    slug_tokens = {t for t in re.split(r"[-_]+", slug) if len(t) >= 3}
+    ours = {ticker.replace(".", "")}
+    ours.update(
+        t.lower()
+        for t in re.split(r"[\s,./]+", company)
+        if len(t) >= 4 and t.lower() not in GENERIC_COMPANY_TOKENS
+    )
+    overlap = slug_tokens & ours
+    distinctive_overlap = {t for t in overlap if t not in GENERIC_COMPANY_TOKENS and len(t) >= 4}
+    if slug_tokens and not distinctive_overlap:
+        return True
     return False
 
 

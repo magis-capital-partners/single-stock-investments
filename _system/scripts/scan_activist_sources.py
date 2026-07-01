@@ -27,6 +27,7 @@ from activist_common import (
 )
 from build_activist_feed import build_feed
 from extract_activist_text import extract_ticker_activist_text
+from milly_activist_reconcile import reconcile_ticker
 from sec_activist_scan import scan_portfolio_sec
 from site_activist_scan import scan_publisher_sites
 from third_party_inventory import write_inventory
@@ -44,6 +45,8 @@ def collect_local_reports(ticker: str) -> list[dict]:
             continue
         for path in sorted(base.iterdir()):
             if not path.is_file() or path.name.startswith("."):
+                continue
+            if path.name.startswith(("SC-", "DEFC", "PREC", "DFAN")):
                 continue
             if path.suffix.lower() not in {".pdf", ".html", ".htm"}:
                 continue
@@ -107,7 +110,7 @@ def write_portfolio_scan_md(all_hits: list[dict], scan_date: str, tickers: list[
     ]
     for ticker in tickers:
         index = load_ticker_index(ticker)
-        reports = index.get("reports") or []
+        reports = [r for r in (index.get("reports") or []) if r.get("include_in_feed", True)]
         long_n = sum(1 for r in reports if r.get("side") == "long")
         short_n = sum(1 for r in reports if r.get("side") == "short")
         latest = max((r.get("report_date") or "" for r in reports), default="")
@@ -133,13 +136,21 @@ def main() -> int:
     parser.add_argument("--sec-only", action="store_true")
     parser.add_argument("--site-only", action="store_true")
     parser.add_argument("--skip-feed", action="store_true")
+    parser.add_argument("--include-passive", action="store_true", help="Index passive SC 13G filings")
+    parser.add_argument("--reindex-local", action="store_true", help="Re-parse local SEC files without re-download")
+    parser.add_argument("--reconcile", action="store_true", help="Run Milly activist mechanical reconcile after scan")
     args = parser.parse_args()
 
     tickers = [t.upper() for t in args.ticker] if args.ticker else portfolio_tickers()
     all_hits: list[dict] = []
 
     if not args.site_only:
-        sec = scan_portfolio_sec(tickers, dry_run=args.dry_run)
+        sec = scan_portfolio_sec(
+            tickers,
+            dry_run=args.dry_run,
+            include_passive=args.include_passive,
+            reindex_local=args.reindex_local,
+        )
         all_hits.extend(sec.get("hits") or [])
 
     if not args.sec_only:
@@ -180,6 +191,17 @@ def main() -> int:
 
     if not args.skip_feed and not args.dry_run:
         build_feed()
+
+    if args.reconcile and not args.dry_run:
+        for ticker in tickers:
+            index = load_ticker_index(ticker)
+            pending = [
+                r
+                for r in (index.get("reports") or [])
+                if r.get("status") in ("new", "cached") and r.get("include_in_feed", True)
+            ]
+            if pending:
+                reconcile_ticker(ticker, args.date, write=True)
 
     print(f"Activist scan complete: {len(tickers)} tickers, {len(all_hits)} hits")
     for ticker in tickers:

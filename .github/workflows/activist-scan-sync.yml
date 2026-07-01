@@ -45,7 +45,7 @@ jobs:
           TICKER: ${{ github.event.inputs.ticker || '' }}
           SEC_ONLY: ${{ github.event.inputs.sec_only || 'false' }}
         run: |
-          ARGS=""
+          ARGS="--reconcile"
           if [ -n "$TICKER" ]; then ARGS="$ARGS --ticker $TICKER"; fi
           if [ "$SEC_ONLY" = "true" ]; then ARGS="$ARGS --sec-only"; fi
           python _system/scripts/scan_activist_sources.py $ARGS

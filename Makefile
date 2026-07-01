@@ -200,7 +200,7 @@ endif
 	@echo OK: activist-scan
 
 activist-scan-all:
-	$(PYTHON) $(SCRIPTS)/scan_activist_sources.py
+	$(PYTHON) $(SCRIPTS)/scan_activist_sources.py --reconcile
 	$(PYTHON) $(SCRIPTS)/short_scan_batch.py
 	@echo OK: activist-scan-all
 
@@ -215,6 +215,20 @@ else
 	$(PYTHON) $(SCRIPTS)/extract_activist_text.py $(TICKER)
 endif
 	@echo OK: activist-text
+
+activist-reconcile:
+ifndef TICKER
+	$(PYTHON) $(SCRIPTS)/milly_activist_reconcile.py --date $(or $(DATE),$(shell date +%Y-%m-%d))
+else
+	$(PYTHON) $(SCRIPTS)/milly_activist_reconcile.py --ticker $(TICKER) --date $(or $(DATE),$(shell date +%Y-%m-%d))
+endif
+	$(PYTHON) $(SCRIPTS)/build_activist_feed.py
+	@echo OK: activist-reconcile
+
+activist-cleanup:
+	$(PYTHON) $(SCRIPTS)/cleanup_activist_false_positives.py
+	$(PYTHON) $(SCRIPTS)/build_activist_feed.py
+	@echo OK: activist-cleanup
 
 hk-scan:
 ifndef TICKER
