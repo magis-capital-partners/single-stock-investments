@@ -23,7 +23,7 @@ npx wrangler deploy
 Enable **Device Flow** on your OAuth App (github.com/settings/developers → your app → Device Flow checkbox).
 
 Callback URL is still required but device flow is primary; keep:
-`https://goldmandrew.github.io/single-stock-investments/oauth/callback.html`
+`https://magis-capital-partners.github.io/single-stock-investments/oauth/callback.html`
 
 ## Repo variables
 
