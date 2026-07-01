@@ -65,6 +65,9 @@ jobs:
       - name: Build Darwin portfolio
         run: python _system/scripts/build_darwin_portfolio.py --fast
 
+      - name: Rebuild NOL screener
+        run: python _system/scripts/build_nol_screener.py --write
+
       - name: Rebuild dashboard JSON
         env:
           OAUTH_CLIENT_ID: ${{ vars.OAUTH_CLIENT_ID }}

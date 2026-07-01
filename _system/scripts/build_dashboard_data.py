@@ -1527,20 +1527,19 @@ def build_darwin_if_missing() -> dict | None:
     return load_darwin_bundle()
 
 
-def build_nol_screener_if_missing() -> dict | None:
+def build_nol_screener() -> dict | None:
+    """Always rebuild NOL screener so SEC filings and prices stay fresh."""
     path = DATA_DIR / "nol_screener.json"
-    if path.exists():
-        return _load_json(path)
     script = ROOT / "_system" / "scripts" / "build_nol_screener.py"
     if not script.exists():
-        return None
+        return _load_json(path)
     import subprocess
 
     subprocess.run(
         [sys.executable, str(script), "--write"],
         cwd=str(ROOT),
         check=False,
-        timeout=300,
+        timeout=900,
     )
     return _load_json(path)
 
@@ -1624,7 +1623,7 @@ def main() -> None:
         payload["darwin"] = bundle["roth"]
     if bundle:
         payload["darwin_accounts"] = bundle
-    nol = build_nol_screener_if_missing()
+    nol = build_nol_screener()
     if nol:
         payload["nol_screener"] = nol
         payload["summary"]["nol_screener_count"] = nol.get("row_count") or len(
