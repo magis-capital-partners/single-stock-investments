@@ -1,5 +1,7 @@
 # Short activist / forensic research registry
 
+**Machine-readable registry:** `_system/frameworks/activist_firm_registry.json` (long + short firms).
+
 **Purpose:** Milly (adversarial reviewer) scans these publishers for reports on **portfolio tickers**. Not every name has coverage on every holding.
 
 **Use:** Cross-reference only. A short report is **evidence to reconcile**, not a veto. Goal = **truth**, not bearishness for its own sake.
@@ -75,4 +77,5 @@ Milly logs **hit / no hit / unclear** per ticker per refresh.
 
 - Add new firms when human discovers quality forensic work.
 - Mark **inactive** firms; keep for historical tickers.
-- Store found reports in `{TICKER}/third-party-analyses/short_reports/` with `source`, `date`, `url`, `summary.md`.
+- Store found reports in `{TICKER}/third-party-analyses/activist_reports/{long|short}/` with metadata in `activist_reports_index.json`.
+- Markdown summaries may also live in `{TICKER}/third-party-analyses/short_reports/` with `source`, `date`, `url`, `summary.md`.

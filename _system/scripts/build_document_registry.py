@@ -47,6 +47,12 @@ def sha256_file(path: Path) -> str:
 def source_type_for(path: Path) -> str:
     r = rel(path)
     parts = path.parts
+    if "activist_reports" in parts:
+        if "short" in parts:
+            return "activist_short"
+        if "long" in parts:
+            return "activist_long"
+        return "activist_report"
     if "_system" in parts and "superinvestor-letters" in parts:
         return "superinvestor_letter"
     if "_system" in parts and "sumzero-research" in parts:
@@ -76,7 +82,7 @@ def drive_roots(config: dict) -> dict:
         "general_pdfs": {
             "folder_id": DEFAULT_GENERAL_DRIVE_FOLDER_ID,
             "label": "General Investment PDFs Hub",
-            "source_types": ["third_party", "company_document", "research", "dropbox_ingestion", "sumzero_research", "pdf"],
+            "source_types": ["third_party", "company_document", "research", "dropbox_ingestion", "sumzero_research", "activist_long", "activist_short", "activist_report", "pdf"],
         },
     }
 
@@ -125,6 +131,9 @@ def drive_folder_path_for(path: Path) -> str:
         return "/".join(["Single Stocks", rest[0], "SumZero", *rest[1:]])
     if len(parts) >= 2 and parts[1] == "third-party-analyses":
         ticker, rest = parts[0], parts[2:]
+        if rest and rest[0].lower() == "activist_reports":
+            side = rest[1] if len(rest) > 1 else "unknown"
+            return "/".join(["Single Stocks", ticker, "Activist", side, *rest[2:]])
         if rest and rest[0].lower() == "vic":
             return "/".join(["Single Stocks", ticker, "VIC", *rest[1:]])
         return "/".join(["Single Stocks", ticker, "Research", *rest])

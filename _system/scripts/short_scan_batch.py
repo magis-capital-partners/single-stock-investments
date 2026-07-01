@@ -1,10 +1,5 @@
 #!/usr/bin/env python3
-"""Build portfolio short-scan index from local short_reports/ + registry holdings.
-
-Usage:
-  python _system/scripts/short_scan_batch.py
-  python _system/scripts/short_scan_batch.py --date 2026-05-28
-"""
+"""Build portfolio activist scan index from activist_reports_index.json + short_reports/."""
 from __future__ import annotations
 
 import argparse
@@ -13,13 +8,6 @@ from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-
-# Pilot + manual notes until per-ticker web pass
-KNOWN: dict[str, tuple[str, str]] = {
-    "APLD": ("stale_hit", "Wolfpack / Bear Cave / Friendly Bear Jul 2023 — see short_reports/"),
-    "QDEL": ("litigation", "2024 securities class actions; no Tier-1 forensic short"),
-    "FRMO": ("no_hit", "No Muddy/Hindenburg; Jan 2026 non-reliance (disclosure, not short)"),
-}
 
 
 def tickers() -> list[str]:
@@ -32,12 +20,27 @@ def tickers() -> list[str]:
     return []
 
 
-def local_short_status(ticker: str) -> str:
+def activist_status(ticker: str) -> tuple[str, str, str]:
+    index_path = ROOT / ticker / "third-party-analyses" / "activist_reports_index.json"
+    long_n = short_n = 0
+    latest = ""
+    if index_path.exists():
+        data = json.loads(index_path.read_text(encoding="utf-8"))
+        reports = data.get("reports") or []
+        long_n = sum(1 for r in reports if r.get("side") == "long")
+        short_n = sum(1 for r in reports if r.get("side") == "short")
+        latest = max((r.get("report_date") or "" for r in reports), default="")
     sr = ROOT / ticker / "third-party-analyses" / "short_reports"
-    if not sr.is_dir():
-        return ""
-    md = list(sr.glob("*.md"))
-    return f"{len(md)} file(s) in short_reports/" if md else ""
+    md_count = len(list(sr.glob("*.md"))) if sr.is_dir() else 0
+    if long_n or short_n:
+        status = "indexed"
+        note = f"{long_n} long, {short_n} short in activist index"
+        if md_count:
+            note += f"; {md_count} short markdown cache"
+        return status, f"L{long_n}/S{short_n}", note
+    if md_count:
+        return "local_cache", f"md:{md_count}", f"{md_count} file(s) in short_reports/"
+    return "no_hit", "—", "No activist index hits"
 
 
 def main() -> None:
@@ -47,36 +50,32 @@ def main() -> None:
 
     out = ROOT / "_system" / "research" / f"short_scan_{args.date}.md"
     lines = [
-        f"# Portfolio short activist scan",
-        f"",
+        "# Portfolio activist scan (long + short)",
+        "",
         f"**Date:** {args.date}  ",
-        f"**Agent:** Milly (`short_scan_batch.py`)  ",
-        f"**Registry:** `_system/frameworks/short_activist_registry.md`",
-        f"",
-        f"**Method:** Local `short_reports/` scan + known hits. Tier-1 web search: run per ticker in Milly pass.",
-        f"",
-        f"## Summary",
-        f"",
-        f"| Ticker | Status | Local cache | Notes |",
-        f"|--------|--------|-------------|-------|",
+        f"**Agent:** `short_scan_batch.py`  ",
+        f"**Registry:** `_system/frameworks/activist_firm_registry.json`",
+        "",
+        "**Method:** `activist_reports_index.json` + local `short_reports/` markdown cache.",
+        "",
+        "## Summary",
+        "",
+        "| Ticker | Status | L/S | Notes |",
+        "|--------|--------|-----|-------|",
     ]
 
     for t in tickers():
-        if t in KNOWN:
-            status, note = KNOWN[t]
-        else:
-            local = local_short_status(t)
-            status = "no_local_hit" if not local else "local_cache"
-            note = local or "Run Milly Tier-1 web scan per registry"
-        lines.append(f"| {t} | {status} | {local_short_status(t) or '—'} | {note} |")
+        status, badge, note = activist_status(t)
+        lines.append(f"| {t} | {status} | {badge} | {note} |")
 
     lines.extend(
         [
             "",
             "## Maintenance",
             "",
-            "- Re-run: `python _system/scripts/short_scan_batch.py`",
-            "- Save hits: `{TICKER}/third-party-analyses/short_reports/{firm}_{date}.md`",
+            "- Re-run scan: `python _system/scripts/scan_activist_sources.py`",
+            "- Re-run index: `python _system/scripts/short_scan_batch.py`",
+            "- Save markdown summaries: `{TICKER}/third-party-analyses/short_reports/{firm}_{date}.md`",
             "- Reconcile in `{TICKER}/research/adversarial_{date}.md`",
             "",
         ]

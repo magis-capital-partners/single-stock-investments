@@ -336,6 +336,8 @@
   .darwin-panel.active { display: block; }
   .insights-panel { padding: 16px 24px 32px; display: none; flex: 1; overflow: auto; }
   .insights-panel.active { display: block; }
+  .activist-panel { padding: 16px 24px 32px; display: none; flex: 1; overflow: auto; }
+  .activist-panel.active { display: block; }
   .clickable-row { cursor: pointer; }
   .clickable-row:hover td { background: rgba(59, 130, 246, 0.06); }
   button.linkish {
@@ -513,6 +515,7 @@
     <button type="button" class="view-tab active" data-view="holdings">Holdings</button>
     <button type="button" class="view-tab" data-view="watchlist">Watchlist</button>
     <button type="button" class="view-tab" data-view="insights">Insights</button>
+    <button type="button" class="view-tab" data-view="activist">Activist</button>
     <button type="button" class="view-tab" data-view="darwin">Darwin</button>
   </nav>
 
@@ -547,6 +550,7 @@
             <th data-sort="essential_insights.freshness_days">Fresh</th>
             <th data-sort="essential_insights.source_mix">Source</th>
             <th data-sort="essential_insights.needs_work">Needs</th>
+            <th data-sort="activist.long_count">Activist</th>
             <th data-sort="deep_dive.date">Deep dive</th>
           </tr>
         </thead>
@@ -572,6 +576,11 @@
   <section class="insights-panel" id="insights-panel">
     <div class="loading" id="insights-loading">Loading insights…</div>
     <div id="insights-content" style="display:none"></div>
+  </section>
+
+  <section class="activist-panel" id="activist-panel">
+    <div class="loading" id="activist-loading">Loading activist feed…</div>
+    <div id="activist-content" style="display:none"></div>
   </section>
 
   <section class="watchlist-panel" id="watchlist-panel">
@@ -626,6 +635,7 @@
 <script src="darwin-viz.js"></script>
 <script src="equity-model-viz.js"></script>
 <script src="insights-viz.js"></script>
+<script src="activist-viz.js"></script>
 <script src="oauth.js"></script>
 <script>
 const GH_REPO = 'magis-capital-partners/single-stock-investments';
@@ -695,6 +705,8 @@ let insightsSection = 'overview';
 let insightsTickerSourceFilter = 'ownership';
 let insightsPdfSourceTab = 'all';
 let insightsPdfTimeMode = 'period';
+let activistSideFilter = 'all';
+let activistSearch = '';
 let insightsSearchDebounce = null;
 let insightsSearchFocused = false;
 let selectedFundId = null;
@@ -909,6 +921,7 @@ async function load() {
   renderTable();
   renderDarwin();
   renderInsights();
+  renderActivist();
   if (data.tickers.length) selectTicker(data.tickers[0].ticker);
 }
 
@@ -928,10 +941,52 @@ function setView(view) {
   document.getElementById('holdings-view').classList.toggle('hidden', view !== 'holdings');
   document.getElementById('darwin-panel').classList.toggle('active', view === 'darwin');
   document.getElementById('insights-panel').classList.toggle('active', view === 'insights');
+  document.getElementById('activist-panel').classList.toggle('active', view === 'activist');
   document.getElementById('watchlist-panel').classList.toggle('active', view === 'watchlist');
   document.getElementById('summary').style.display = view === 'holdings' ? '' : 'none';
   document.getElementById('watchlist-wrap').style.display =
     view === 'holdings' && (data.watchlist || []).length ? 'block' : 'none';
+}
+
+function renderActivist() {
+  const loading = document.getElementById('activist-loading');
+  const content = document.getElementById('activist-content');
+  const feed = data.activist_feed;
+  if (!feed || !window.ActivistViz) {
+    loading.textContent = 'Activist feed not built. Run: python _system/scripts/build_activist_feed.py';
+    content.style.display = 'none';
+    return;
+  }
+  loading.style.display = 'none';
+  content.style.display = 'block';
+  content.innerHTML = ActivistViz.renderActivistPanel(feed, {
+    escapeHtml,
+    linkHtml,
+    side: activistSideFilter,
+    search: activistSearch,
+  });
+  content.querySelectorAll('[data-activist-side]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activistSideFilter = btn.dataset.activistSide || 'all';
+      renderActivist();
+    });
+  });
+  const search = content.querySelector('#activist-search');
+  if (search) {
+    search.addEventListener('input', () => {
+      activistSearch = search.value;
+      window.clearTimeout(insightsSearchDebounce);
+      insightsSearchDebounce = window.setTimeout(renderActivist, 150);
+    });
+  }
+  content.querySelectorAll('[data-select-ticker]').forEach(el => {
+    el.addEventListener('click', () => {
+      const ticker = el.dataset.selectTicker;
+      if (!ticker) return;
+      setView('holdings');
+      selectTicker(ticker);
+    });
+  });
 }
 
 function renderInsights(opts = {}) {
@@ -1515,6 +1570,7 @@ function renderTable() {
       <td>${renderInsightFreshCell(t)}</td>
       <td>${renderInsightSourceCell(t)}</td>
       <td>${renderInsightNeedsCell(t)}</td>
+      <td>${window.ActivistViz ? ActivistViz.renderActivistBadge(t.activist) : '—'}</td>
       <td>${renderDeepDiveCell(t)}</td>
     </tr>`).join('');
   tbody.querySelectorAll('tr').forEach(tr => {
@@ -1619,6 +1675,8 @@ function selectTicker(ticker) {
     ${tier3}
 
     ${renderTotalReturnSection(t)}
+
+    ${window.ActivistViz ? ActivistViz.renderTickerActivistSection(t.activist, { escapeHtml }) : ''}
 
     ${t.deep_dive ? `
     <div class="detail-section">

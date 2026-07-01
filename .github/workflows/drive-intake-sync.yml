@@ -79,6 +79,12 @@ jobs:
           if [ -n "$LIMIT" ] && [ "$LIMIT" != "0" ]; then ARGS="$ARGS --limit $LIMIT"; fi
           python _system/scripts/import_drive_intake.py $ARGS
 
+      - name: Activist scan (SEC + publishers)
+        if: steps.google_creds.outputs.configured == 'true'
+        run: |
+          python _system/scripts/scan_activist_sources.py --sec-only || true
+          python _system/scripts/short_scan_batch.py
+
       - name: Rebuild document registry and dashboard data
         if: steps.google_creds.outputs.configured == 'true'
         run: |
@@ -92,6 +98,7 @@ jobs:
           python _system/scripts/build_letter_drive_links.py
           python _system/scripts/build_insights.py
           python _system/scripts/build_research_memory.py
+          python _system/scripts/build_activist_feed.py
           python _system/scripts/build_dashboard_data.py
         env:
           OAUTH_CLIENT_ID: ${{ vars.OAUTH_CLIENT_ID }}
