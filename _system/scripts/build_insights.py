@@ -19,6 +19,7 @@ from document_store import (  # noqa: E402
     letter_evidence_label,
     letter_evidence_url,
 )
+from insight_format import format_letter_claim  # noqa: E402
 
 OUTPUT = ROOT / "dashboard" / "data" / "insights.json"
 ARCHIVE_OUTPUT = ROOT / "_system" / "reference" / "data-sources" / "insights_record_archive.json"
@@ -312,7 +313,11 @@ def from_superinvestor_letters(doc: dict) -> list[dict]:
                 continue
             action = pos.get("action", "discussed")
             commentary = pos.get("commentary") or pos.get("thesis") or ""
-            claim = commentary if commentary else f"{fund} {action} {tk}"
+            claim = (
+                format_letter_claim(tk, fund, action, letter.get("quarter"), commentary)
+                if commentary
+                else f"{fund} {action} {tk}"
+            )
             out.append(
                 insight_record(
                     source="superinvestor_letter",

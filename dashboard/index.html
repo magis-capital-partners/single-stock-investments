@@ -691,7 +691,7 @@ let activeInsightFilter = 'letters';
 let insightsQuarter = 'latest';
 let fundRegistrySearch = '';
 let insightsBookOnly = true;
-let insightsSection = 'overview';
+let insightsTickerSourceFilter = 'ownership';
 let insightsPdfSourceTab = 'all';
 let insightsPdfTimeMode = 'period';
 let insightsSearchDebounce = null;
@@ -810,11 +810,12 @@ function insightToneClass(tone) {
 function renderInsightCell(t) {
   const e = t.essential_insights || {};
   const status = e.status || { label: 'No insight', tone: 'stale' };
-  const latest = e.latest || (e.bullets || [])[0];
+  const primary = (e.bullets || [])[0] || e.latest || e.owner;
+  const line = primary?.summary || primary?.title || 'No ranked item';
   return `
     <div class="insight-cell">
       <span class="badge ${insightToneClass(status.tone)}">${escapeHtml(status.label || 'Covered')}</span>
-      <span class="sub tier-sub">${escapeHtml(latest?.title || latest?.summary || 'No ranked item')}</span>
+      <span class="sub tier-sub">${escapeHtml(line)}</span>
     </div>`;
 }
 
@@ -958,6 +959,8 @@ function renderInsights(opts = {}) {
     documentCatalog: data.document_catalog || null,
     pdfSourceTab: insightsPdfSourceTab,
     pdfTimeMode: insightsPdfTimeMode,
+    portfolioMacro: data.portfolio_macro || [],
+    tickerSourceFilter: insightsTickerSourceFilter,
   });
   content.querySelectorAll('[data-insights-quarter]').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -1001,6 +1004,12 @@ function renderInsights(opts = {}) {
       renderInsights();
     });
   }
+  content.querySelectorAll('[data-ticker-source-filter]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      insightsTickerSourceFilter = btn.dataset.tickerSourceFilter || 'ownership';
+      renderInsights();
+    });
+  });
   content.querySelectorAll('[data-pdf-source-tab]').forEach(btn => {
     btn.addEventListener('click', () => {
       insightsPdfSourceTab = btn.dataset.pdfSourceTab;

@@ -17,6 +17,13 @@ from dated_md import dated_md_label, dated_md_sort_key, latest_dated_md  # noqa:
 from document_date import catalog_sort_key, infer_document_period  # noqa: E402
 from document_store import best_document_label, best_document_url, document_id_for_ref  # noqa: E402
 from market_order import sort_market_filters, sort_markets  # noqa: E402
+from insight_format import (  # noqa: E402
+    OWNERSHIP_SOURCES,
+    format_letter_position,
+    is_letter_table_debris,
+    is_portfolio_wide,
+    split_insight_rows,
+)
 from valuation_synthesis import website_implied_irr  # noqa: E402
 
 DATA_DIR = ROOT / "dashboard" / "data"
@@ -1067,27 +1074,129 @@ def compact_insight(row: dict | None) -> dict | None:
     }
 
 
+def row_freshness_days(row: dict) -> int | None:
+    value = row.get("freshness_days")
+    if isinstance(value, (int, float)):
+        return int(value)
+    return days_since_iso(insight_date(row))
+
+
+def polish_compact_insight(item: dict | None, row: dict | None, ticker: str) -> dict | None:
+    if not item or not row:
+        return item
+    source = row.get("source")
+    if source == "superinvestor_letter":
+        title, summary = format_letter_position(
+            ticker=ticker,
+            fund=row.get("fund") or item.get("source_name") or "Investor",
+            action=row.get("action") or "discussed",
+            quarter=row.get("quarter"),
+            letter_date=insight_date(row),
+            commentary=insight_claim(row),
+        )
+        item["title"] = title
+        item["summary"] = summary
+        item["source_label"] = "Letter"
+    elif source == "insider":
+        band = row.get("band") or insight_claim(row)
+        item["title"] = f"Insider · {item.get('direction', 'neutral')}"
+        if not item.get("summary") or item["summary"].startswith("Insider conviction"):
+            item["summary"] = str(band)[:320]
+    return item
+
+
+def dedupe_insight_columns(latest: dict | None, bull: dict | None, bear: dict | None) -> tuple[dict | None, dict | None, dict | None]:
+    if latest and bear and latest.get("id") == bear.get("id"):
+        bear = None
+    if latest and bull and latest.get("id") == bull.get("id"):
+        bull = None
+    if bear and bull and bear.get("id") == bull.get("id"):
+        bull = None
+    return latest, bull, bear
+
+
+def letter_claim_quality(row: dict) -> int:
+    commentary = str(row.get("commentary") or row.get("claim") or "")
+    if is_letter_table_debris(commentary):
+        return 0
+    claim = insight_claim(row)
+    if "letter references" in claim.lower() and "table" in claim.lower():
+        return 0
+    if len(claim) >= 80:
+        return 2
+    return 1
+
+
+def best_owner_insight(rows: list[dict]) -> dict | None:
+    candidates = [r for r in rows if r.get("source") in OWNERSHIP_SOURCES]
+    if not candidates:
+        return None
+    action_rank = {"new": 5, "add": 4, "trim": 4, "short": 3, "hold": 2, "discussed": 1}
+
+    def sort_key(row: dict) -> tuple:
+        action = row.get("action") or "discussed"
+        return (
+            letter_claim_quality(row),
+            action_rank.get(str(action), 1),
+            insight_score(row),
+            insight_date(row),
+        )
+
+    candidates.sort(key=sort_key, reverse=True)
+    return candidates[0]
+
+
 def build_essential_insights(
     ticker: str,
     events: list[dict],
     raw_insights: list[dict],
     discussants: list[dict],
 ) -> dict:
-    rows = events if events else raw_insights
+    all_rows = events if events else raw_insights
     source_rows = [*events, *raw_insights]
-    latest = compact_insight(latest_insight(rows))
-    bull = compact_insight(best_insight(rows, lambda r: r.get("direction") == "bullish"))
-    bear = compact_insight(
-        best_insight(
-            rows,
-            lambda r: r.get("direction") == "bearish" or r.get("impact_axis") == "risk",
-        )
+    specific_rows, portfolio_rows = split_insight_rows(all_rows)
+    selection_rows = specific_rows if specific_rows else portfolio_rows
+
+    latest_row = latest_insight(selection_rows)
+    bull_row = best_insight(selection_rows, lambda r: r.get("direction") == "bullish")
+    bear_row = best_insight(
+        selection_rows,
+        lambda r: r.get("direction") == "bearish" or r.get("impact_axis") == "risk",
     )
-    owner = compact_insight(
-        best_insight(rows, lambda r: r.get("source") in {"superinvestor_letter", "insider"})
-    )
+    owner_row = best_owner_insight(all_rows)
+    if not owner_row:
+        owner_row = best_owner_insight(specific_rows)
+
+    latest = polish_compact_insight(compact_insight(latest_row), latest_row, ticker)
+    bull = polish_compact_insight(compact_insight(bull_row), bull_row, ticker)
+    bear = polish_compact_insight(compact_insight(bear_row), bear_row, ticker)
+    latest, bull, bear = dedupe_insight_columns(latest, bull, bear)
+
+    owner = polish_compact_insight(compact_insight(owner_row), owner_row, ticker)
     if not owner and discussants:
-        d0 = discussants[0]
+        action_rank = {"new": 5, "add": 4, "trim": 4, "short": 3, "hold": 2, "discussed": 1}
+
+        def discussant_key(d: dict) -> tuple:
+            fake_row = {
+                "commentary": d.get("commentary") or "",
+                "claim": d.get("commentary") or "",
+                "action": d.get("action") or "discussed",
+            }
+            return (
+                letter_claim_quality(fake_row),
+                action_rank.get(str(d.get("action") or "discussed"), 1),
+                d.get("letter_date") or "",
+            )
+
+        d0 = max(discussants, key=discussant_key)
+        title, summary = format_letter_position(
+            ticker=ticker,
+            fund=d0.get("fund") or "Investor",
+            action=d0.get("action") or "discussed",
+            quarter=d0.get("quarter"),
+            letter_date=d0.get("letter_date"),
+            commentary=d0.get("commentary") or "",
+        )
         owner = {
             "id": f"letter:{ticker}:{d0.get('fund')}",
             "source": "superinvestor_letter",
@@ -1096,11 +1205,13 @@ def build_essential_insights(
             "event_type": "letter_position",
             "impact_axis": "ownership",
             "date": d0.get("letter_date"),
-            "direction": {"add": "bullish", "trim": "bearish"}.get(d0.get("action"), "neutral"),
+            "direction": {"add": "bullish", "trim": "bearish", "new": "bullish", "short": "bearish"}.get(
+                d0.get("action"), "neutral"
+            ),
             "confidence": "med",
             "score": 0,
-            "title": f"{d0.get('fund', 'Investor')} {d0.get('action', 'discussed')}",
-            "summary": (d0.get("commentary") or "")[:320],
+            "title": title,
+            "summary": summary,
             "evidence_url": insight_evidence_url(d0.get("source_document") or d0.get("source_file")) or d0.get("evidence_url"),
             "evidence_label": d0.get("evidence_label") or best_document_label(d0.get("source_document") or d0.get("source_file")),
             "evidence_document_id": d0.get("evidence_document_id") or document_id_for_ref(d0.get("source_document") or d0.get("source_file")),
@@ -1117,30 +1228,45 @@ def build_essential_insights(
             break
 
     source_mix = sorted({r.get("source") for r in source_rows if r.get("source")})
-    freshness_days = None
-    for r in rows:
-        value = r.get("freshness_days")
-        if isinstance(value, (int, float)) and (freshness_days is None or value < freshness_days):
-            freshness_days = int(value)
+    freshness_candidates: list[int] = []
+    for r in specific_rows:
+        days = row_freshness_days(r)
+        if days is not None:
+            freshness_candidates.append(days)
+    for d in discussants:
+        days = days_since_iso(d.get("letter_date"))
+        if days is not None:
+            freshness_candidates.append(days)
+    freshness_days = min(freshness_candidates) if freshness_candidates else None
 
     fresh = freshness_days is not None and freshness_days <= 30
+    macro_only = bool(portfolio_rows and not specific_rows and not discussants)
+    ticker_specific = bool(specific_rows or discussants)
     bear_specific = bool(
         bear
-        and bear.get("source") not in {"macro", "theme"}
+        and not is_portfolio_wide({"source": bear.get("source")})
         and bear.get("impact_axis") in {"risk", "fundamentals", "ownership", "variant_view", None}
     )
     bull_specific = bool(
         bull
-        and bull.get("source") not in {"macro", "theme"}
+        and not is_portfolio_wide({"source": bull.get("source")})
         and bull.get("impact_axis") in {"catalyst", "fundamentals", "ownership", "capital_allocation", "variant_view", None}
     )
+    primary = latest or owner or bull or bear
+    primary_is_ownership = bool(primary and primary.get("source") in OWNERSHIP_SOURCES)
 
-    if not rows and not discussants:
+    if not all_rows and not discussants:
         status = {"label": "No insight", "tone": "stale"}
     elif bear_specific and fresh:
         status = {"label": "Fresh risk", "tone": "risk"}
     elif bull_specific and fresh:
         status = {"label": "Fresh catalyst", "tone": "bullish"}
+    elif primary_is_ownership and owner:
+        status = {"label": "Owner signal", "tone": "ownership"}
+    elif macro_only:
+        status = {"label": "Macro only", "tone": "stale"}
+    elif not ticker_specific:
+        status = {"label": "No ticker signal", "tone": "stale"}
     elif owner:
         status = {"label": "Owner signal", "tone": "ownership"}
     elif freshness_days is not None and freshness_days > 120:
@@ -1157,10 +1283,41 @@ def build_essential_insights(
         "bullets": bullets,
         "source_mix": source_mix,
         "freshness_days": freshness_days,
+        "macro_only": macro_only,
+        "ticker_specific": ticker_specific,
         "event_count": len(events),
         "record_count": len(raw_insights),
         "needs_work": not source_rows or (freshness_days is not None and freshness_days > 90) or len(source_mix) < 2,
     }
+
+
+def collect_portfolio_macro_records(insights_doc: dict | None) -> list[dict]:
+    if not insights_doc:
+        return []
+    seen: set[str] = set()
+    out: list[dict] = []
+    for rows in (insights_doc.get("by_ticker") or {}).values():
+        for row in rows:
+            if row.get("source") != "macro":
+                continue
+            key = str(row.get("claim") or row.get("id") or "")
+            if not key or key in seen:
+                continue
+            seen.add(key)
+            out.append(row)
+    out.sort(key=lambda r: (insight_date(r), insight_score(r)), reverse=True)
+    return out
+
+
+def build_portfolio_macro(insights_doc: dict | None) -> list[dict]:
+    out: list[dict] = []
+    for row in collect_portfolio_macro_records(insights_doc)[:8]:
+        item = compact_insight(row)
+        if not item:
+            continue
+        item["title"] = str(row.get("theme_id") or row.get("event_type") or "Macro")
+        out.append(item)
+    return out
 
 
 def essential_needs_work_reasons(row: dict) -> list[str]:
@@ -1298,6 +1455,7 @@ def build_ticker_row(
     portfolio_class: dict[str, dict],
     insights_doc: dict | None = None,
     memory_doc: dict | None = None,
+    watchlist: dict | None = None,
 ) -> dict:
     ticker_dir = ROOT / ticker
     meta = {**TICKER_META.get(ticker, {}), **holdings.get(ticker, {})}
@@ -1331,6 +1489,8 @@ def build_ticker_row(
         "developments": recent_developments(ticker_dir, ticker),
         "onboard": reconcile_onboard_status(ticker_dir, pdf_count),
         "transcripts": transcript_summary(ticker, ticker_dir),
+        "in_holdings": ticker in holdings,
+        "in_watchlist": bool((watchlist or {}).get(ticker)),
     }
     row["completeness"] = completeness_score(row)
     lenses = load_lenses(ticker_dir)
@@ -1377,8 +1537,12 @@ def build() -> dict:
     tickers = list_tickers()
     insights_doc = _load_json(DATA_DIR / "insights.json")
     memory_doc = _load_json(RESEARCH_MEMORY_PATH)
-    rows = [build_ticker_row(t, holdings, portfolio_class, insights_doc, memory_doc) for t in tickers]
+    rows = [
+        build_ticker_row(t, holdings, portfolio_class, insights_doc, memory_doc, reg.get("watchlist") or {})
+        for t in tickers
+    ]
     watchlist = build_watchlist_rows(reg.get("watchlist") or {})
+    portfolio_macro = build_portfolio_macro(insights_doc)
 
     total_pdfs = sum(r["pdf_count"] for r in rows)
     with_research = sum(1 for r in rows if r["research_dir"])
@@ -1433,6 +1597,7 @@ def build() -> dict:
         },
         "watchlist": watchlist,
         "tickers": rows,
+        "portfolio_macro": portfolio_macro,
         "research_memory": memory_doc,
     }
 
