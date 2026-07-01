@@ -1,0 +1,67 @@
+name: CI Autofix
+
+on:
+  workflow_run:
+    workflows:
+      - "Risk Dashboard"
+      - "EOD PnL Email + Daily Screener"
+      - "Levered ETF Universe Discovery"
+      - "Dashboard Recovery"
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: "Workflow run ID to investigate"
+        required: true
+      force_agent:
+        description: "Force Cursor agent even if classifier would normally notify only"
+        required: false
+        default: "false"
+
+permissions:
+  actions: read
+  contents: write
+  issues: write
+  pull-requests: write
+  checks: read
+
+concurrency:
+  group: ci-autofix-${{ github.event.workflow_run.id || github.event.inputs.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  triage-and-dispatch:
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (
+        github.event.workflow_run.conclusion == 'failure' &&
+        github.event.workflow_run.name != 'CI Autofix'
+      )
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: _system/ci_autofix/package-lock.json
+
+      - name: Install CI Autofix dependencies
+        working-directory: _system/ci_autofix
+        run: npm ci
+
+      - name: Triage failure and dispatch Cursor if appropriate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
+          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          CI_AUTOFIX_RUN_ID: ${{ github.event.inputs.run_id || github.event.workflow_run.id }}
+          CI_AUTOFIX_FORCE_AGENT: ${{ github.event.inputs.force_agent || 'false' }}
+        run: node _system/ci_autofix/ci_autofix.mjs

@@ -1,0 +1,37 @@
+enabled: true
+
+cursor:
+  enabled: true
+  model: composer-2.5
+  draft_pr: true
+  max_log_chars: 45000
+  max_agent_attempts_per_sha: 1
+  skip_fork_prs: true
+  skip_workflows:
+    - CI Autofix
+
+github:
+  create_issue_for_notify_only: true
+  issue_labels:
+    - ci-autofix
+    - needs-attention
+  pr_labels:
+    - ci-autofix
+    - agent-generated
+    - needs-human-review
+
+slack:
+  enabled: true
+  mention: ""
+
+classify:
+  notify_only:
+    - platform
+    - credentials
+    - permissions
+    - human_required
+  transient_retry_first: true
+
+repo_notes: |
+  Primary build entrypoint is build_data.py. Scheduled workflows commit data/ artifacts; verify locally with the same Python version as CI (3.11).
+  Pages deploy bundles site/ with data/ outputs. If a workflow fails on missing API keys or billing, classify as platform/credentials and improve diagnostics only.

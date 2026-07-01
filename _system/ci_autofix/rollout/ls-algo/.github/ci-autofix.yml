@@ -1,0 +1,38 @@
+enabled: true
+
+cursor:
+  enabled: true
+  model: composer-2.5
+  draft_pr: true
+  max_log_chars: 45000
+  max_agent_attempts_per_sha: 1
+  skip_fork_prs: true
+  skip_workflows:
+    - CI Autofix
+
+github:
+  create_issue_for_notify_only: true
+  issue_labels:
+    - ci-autofix
+    - needs-attention
+  pr_labels:
+    - ci-autofix
+    - agent-generated
+    - needs-human-review
+
+slack:
+  enabled: true
+  mention: ""
+
+classify:
+  notify_only:
+    - platform
+    - credentials
+    - permissions
+    - human_required
+  transient_retry_first: true
+
+repo_notes: |
+  Risk Dashboard CI runs: python -m pytest risk_dashboard/tests tests/test_dashboard_accounting_parity.py tests/test_dashboard_phase0_4.py -q
+  bucket_5 is a first-class sleeve in risk_dashboard.metrics.BUCKET_KEYS; tests must include bucket_5 fixtures when asserting sleeve counts or data-quality source completeness.
+  Snapshot commits use messages starting with risk_dashboard: — do not loop CI Autofix on those unless a real failure occurred.
