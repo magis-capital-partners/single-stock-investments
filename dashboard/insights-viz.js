@@ -68,6 +68,9 @@
 
   function evidenceLabel(ref, fallback) {
     const clean = (ref || '').split('#')[0].toLowerCase();
+    const url = String(ref || '');
+    if (url.includes('drive.google.com/drive/folders/')) return 'Drive folder';
+    if (url.includes('drive.google.com')) return 'PDF';
     if (clean.includes('drive.google.com')) return 'PDF';
     if (fallback && fallback !== 'Text') return fallback;
     if (clean.endsWith('.pdf')) return 'PDF';
@@ -81,14 +84,18 @@
   function evidenceLink(ref, linkHtml, ghRepo, label) {
     if (!ref) return '—';
     const text = evidenceLabel(ref, label);
-    if (ref.startsWith('http')) return linkHtml(ref, text, 'source-open-link');
+    if (String(ref).startsWith('http')) return linkHtml(ref, text, 'source-open-link');
     return linkHtml(`https://github.com/${ghRepo}/blob/main/${ref}`, text, 'source-open-link');
   }
 
   function recordEvidenceLink(row, linkHtml, ghRepo) {
-    const ref = row?.evidence_url || row?.source_document || row?.evidence_ref || row?.source_file;
-    if (!ref) return '';
-    return evidenceLink(ref, linkHtml, ghRepo, row.evidence_label);
+    const url = row?.evidence_url;
+    if (url) {
+      return linkHtml(url, evidenceLabel(url, row?.evidence_label), 'source-open-link');
+    }
+    const ref = row?.source_document || row?.evidence_ref || row?.source_file;
+    if (!ref) return '—';
+    return evidenceLink(ref, linkHtml, ghRepo, row?.evidence_label);
   }
 
   function sourceBadgeClass(source) {
@@ -553,7 +560,7 @@
               <td class="mono">${(f.our_tickers || []).join(', ') || '—'}</td>
               <td style="font-size:11px">${(f.themes || []).slice(0, 4).join(', ') || '—'}</td>
               <td style="font-size:11px">${(f.maps_to_persona || []).join(', ') || '—'}</td>
-              <td>${evidenceLink(f.evidence_url || f.evidence_ref, linkHtml, ghRepo, f.evidence_label)}</td>
+              <td>${recordEvidenceLink(f, linkHtml, ghRepo)}</td>
             </tr>`).join('')}
         </tbody>
       </table>
@@ -597,7 +604,7 @@
           </tbody>
         </table>` : ''}
         <p class="tier-sub" style="margin-top:10px">
-          ${(profile.letters || []).length} letter(s) · latest ${escapeHtml(latest.quarter || '—')} · ${evidenceLink(latest.evidence_url || latest.source_document || latest.source_file, linkHtml, ghRepo, latest.evidence_label)}
+          ${(profile.letters || []).length} letter(s) · latest ${escapeHtml(latest.quarter || '—')} · ${recordEvidenceLink(latest, linkHtml, ghRepo)}
         </p>
       </div>`;
   }
@@ -1287,7 +1294,7 @@
         <td><span class="badge ${STANCE_BADGE[r.action] || 'badge-us'}">${escapeHtml(r.action)}</span></td>
         <td>${consensusTickerCell(r, escapeHtml)}</td>
         <td style="font-size:11px;max-width:340px">${escapeHtml((r.commentary || '').slice(0, 180))}</td>
-        <td>${evidenceLink(r.evidence_url, linkHtml, ghRepo, r.evidence_label)}</td>
+        <td>${recordEvidenceLink(r, linkHtml, ghRepo)}</td>
       </tr>`).join('');
 
     const changesRows = changes.slice(0, 24).map(r => `

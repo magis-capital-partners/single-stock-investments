@@ -8,6 +8,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 REGISTRY_PATH = ROOT / "dashboard" / "data" / "document_registry.json"
 DRIVE_AUDIT_PATH = ROOT / "_system/reference/document-store/drive_audit_latest.json"
+DRIVE_FOLDER_INDEX_PATH = ROOT / "_system/reference/document-store/drive_folder_index.json"
+LETTERS_INDEX_PATH = ROOT / "_system/reference/superinvestor-letters/letters_index.json"
 
 
 def _clean_ref(ref: str | None) -> tuple[str | None, str]:
@@ -23,6 +25,9 @@ def _clean_ref(ref: str | None) -> tuple[str | None, str]:
 _REGISTRY_CACHE: dict | None = None
 _INDEX_CACHE: dict[int, dict[str, dict[str, dict]]] = {}
 _DRIVE_AUDIT_INDEX: dict[str, str] | None = None
+_DRIVE_AUDIT_BY_FILENAME: dict[str, str] | None = None
+_DRIVE_FOLDER_INDEX: dict[str, str] | None = None
+_LETTER_SOURCE_INDEX: dict[str, dict] | None = None
 
 
 def load_document_registry() -> dict:
@@ -94,33 +99,118 @@ def _normalize_name(value: str) -> str:
     return re.sub(r"[^a-z0-9]+", "", Path(value).stem.lower())
 
 
+def _load_drive_audit() -> dict:
+    if not DRIVE_AUDIT_PATH.exists():
+        return {}
+    try:
+        return json.loads(DRIVE_AUDIT_PATH.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return {}
+
+
 def drive_audit_links() -> dict[str, str]:
     global _DRIVE_AUDIT_INDEX
     if _DRIVE_AUDIT_INDEX is not None:
         return _DRIVE_AUDIT_INDEX
     index: dict[str, str] = {}
-    if DRIVE_AUDIT_PATH.exists():
-        try:
-            audit = json.loads(DRIVE_AUDIT_PATH.read_text(encoding="utf-8"))
-        except json.JSONDecodeError:
-            audit = {}
-        for items in audit.values():
-            if not isinstance(items, list):
+    audit = _load_drive_audit()
+    for items in audit.values():
+        if not isinstance(items, list):
+            continue
+        for item in items:
+            name = item.get("name")
+            link = item.get("webViewLink") or item.get("webContentLink")
+            if not name or not link or not str(name).lower().endswith(".pdf"):
                 continue
-            for item in items:
-                name = item.get("name")
-                link = item.get("webViewLink") or item.get("webContentLink")
-                if not name or not link or not str(name).lower().endswith(".pdf"):
-                    continue
-                stem = Path(str(name)).stem.lower()
-                norm = _normalize_name(str(name))
-                index[stem] = str(link)
-                index[norm] = str(link)
+            stem = Path(str(name)).stem.lower()
+            norm = _normalize_name(str(name))
+            index[stem] = str(link)
+            index[norm] = str(link)
     _DRIVE_AUDIT_INDEX = index
     return index
 
 
+def drive_audit_by_filename() -> dict[str, str]:
+    global _DRIVE_AUDIT_BY_FILENAME
+    if _DRIVE_AUDIT_BY_FILENAME is not None:
+        return _DRIVE_AUDIT_BY_FILENAME
+    index: dict[str, str] = {}
+    audit = _load_drive_audit()
+    for items in audit.values():
+        if not isinstance(items, list):
+            continue
+        for item in items:
+            name = item.get("name")
+            link = item.get("webViewLink") or item.get("webContentLink")
+            if not name or not link:
+                continue
+            index[str(name).lower()] = str(link)
+    _DRIVE_AUDIT_BY_FILENAME = index
+    return index
+
+
+def drive_folder_links() -> dict[str, str]:
+    global _DRIVE_FOLDER_INDEX
+    if _DRIVE_FOLDER_INDEX is not None:
+        return _DRIVE_FOLDER_INDEX
+    index: dict[str, str] = {}
+    if DRIVE_FOLDER_INDEX_PATH.exists():
+        try:
+            payload = json.loads(DRIVE_FOLDER_INDEX_PATH.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            payload = {}
+        for path, meta in (payload.get("folders") or {}).items():
+            link = (meta or {}).get("webViewLink")
+            if link:
+                index[str(path)] = str(link)
+    _DRIVE_FOLDER_INDEX = index
+    return index
+
+
+def letter_source_index() -> dict[str, dict]:
+    global _LETTER_SOURCE_INDEX
+    if _LETTER_SOURCE_INDEX is not None:
+        return _LETTER_SOURCE_INDEX
+    index: dict[str, dict] = {}
+    if LETTERS_INDEX_PATH.exists():
+        try:
+            rows = json.loads(LETTERS_INDEX_PATH.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            rows = []
+        if isinstance(rows, list):
+            for row in rows:
+                for key in ("source_document", "source_file"):
+                    ref = row.get(key)
+                    if ref:
+                        index[str(ref).replace("\\", "/")] = row
+                        index[Path(str(ref)).name.lower()] = row
+    _LETTER_SOURCE_INDEX = index
+    return index
+
+
+def quarter_folder_path(quarter: str | None) -> str | None:
+    text = str(quarter or "").strip().upper()
+    m = re.match(r"^(20\d{2})Q([1-4])$", text)
+    if not m:
+        return None
+    return f"Letters/{m.group(1)} Q{m.group(2)}"
+
+
+def quarter_from_ref(ref: str | None) -> str | None:
+    base, _anchor = _clean_ref(ref)
+    if not base:
+        return None
+    m = re.search(r"superinvestor-letters/(20\d{2})Q([1-4])/", base, re.I)
+    if m:
+        return f"{m.group(1)}Q{m.group(2)}".upper()
+    return None
+
+
 def drive_link_for_ref(base: str) -> str | None:
+    by_name = drive_audit_by_filename()
+    filename = Path(base).name.lower()
+    if filename in by_name:
+        return by_name[filename]
     links = drive_audit_links()
     stem = Path(base).stem.lower()
     norm = _normalize_name(base)
@@ -128,10 +218,59 @@ def drive_link_for_ref(base: str) -> str | None:
         return links[stem]
     if norm in links:
         return links[norm]
-    if len(norm) >= 12:
-        for key, link in links.items():
-            if len(key) >= 12 and (norm in key or key in norm):
-                return link
+    return None
+
+
+def drive_link_for_letter(
+    *,
+    source_ref: str | None,
+    quarter: str | None = None,
+    fund: str | None = None,
+) -> str | None:
+    base, _anchor = _clean_ref(source_ref)
+    if not base:
+        return None
+
+    doc = document_for_ref(base)
+    if doc:
+        drive = doc.get("drive_web_view_link") or doc.get("drive_web_content_link")
+        if drive:
+            return str(drive)
+
+    pdf_ref = pdf_ref_for(base)
+    for candidate in (base, pdf_ref, Path(base).name, Path(pdf_ref).name):
+        link = drive_link_for_ref(str(candidate))
+        if link:
+            return link
+
+    q = quarter or quarter_from_ref(base)
+    folder = quarter_folder_path(q)
+    if folder:
+        folder_link = drive_folder_links().get(folder)
+        if folder_link:
+            return folder_link
+
+    if fund and q:
+        year = q[:4]
+        qnum = q[-1]
+        tokens = [t for t in re.split(r"[^a-z0-9]+", fund.lower()) if len(t) >= 4]
+        best_score = 0
+        best_link = None
+        for name, link in drive_audit_by_filename().items():
+            if not name.endswith(".pdf"):
+                continue
+            if year not in name:
+                continue
+            if f"q{qnum}" not in name and f"{qnum}q" not in name and f" {qnum} " not in f" {name} ":
+                if f"first quarter" not in name and f"1q" not in name.replace(" ", "") and qnum != "1":
+                    continue
+            score = sum(1 for token in tokens if token in name)
+            if score > best_score:
+                best_score = score
+                best_link = link
+        if best_link and best_score >= 2:
+            return best_link
+
     return None
 
 
@@ -146,12 +285,58 @@ def pdf_github_url(base: str, github_repo: str, anchor: str = "") -> str:
     return github_blob_url(pdf_ref_for(base), github_repo) + anchor
 
 
+def letter_evidence_url(
+    letter: dict | None,
+    github_repo: str,
+    source_ref: str | None = None,
+    registry: dict | None = None,
+) -> str | None:
+    ref = source_ref or (letter or {}).get("source_document") or (letter or {}).get("source_file")
+    base, anchor = _clean_ref(ref)
+    if not base:
+        return None
+    if base.startswith(("http://", "https://")):
+        return base + anchor
+
+    drive = drive_link_for_letter(
+        source_ref=base,
+        quarter=(letter or {}).get("quarter") or quarter_from_ref(base),
+        fund=(letter or {}).get("fund"),
+    )
+    if drive:
+        return drive + anchor
+
+    doc = document_for_ref(base, registry)
+    if doc:
+        pdf_path = doc.get("local_pdf_path")
+        if pdf_path and Path(ROOT / pdf_path).exists():
+            return github_blob_url(str(pdf_path), github_repo) + anchor
+
+    if "superinvestor-letters" in base:
+        return pdf_github_url(base, github_repo, anchor)
+    return best_document_url(base, github_repo, registry)
+
+
+def letter_evidence_label(url: str | None, source_ref: str | None = None) -> str:
+    if not url:
+        return "source"
+    if "drive.google.com/drive/folders/" in url.lower():
+        return "Drive folder"
+    if "drive.google.com" in url.lower():
+        return "PDF"
+    return best_document_label(source_ref)
+
+
 def best_document_url(ref: str | None, github_repo: str, registry: dict | None = None) -> str | None:
     base, anchor = _clean_ref(ref)
     if not base:
         return None
     if base.startswith(("http://", "https://")):
         return base + anchor
+
+    if "superinvestor-letters" in base:
+        meta = letter_source_index().get(base) or letter_source_index().get(Path(base).name.lower())
+        return letter_evidence_url(meta, github_repo, base, registry)
 
     doc = document_for_ref(base, registry)
     if doc:
@@ -163,14 +348,15 @@ def best_document_url(ref: str | None, github_repo: str, registry: dict | None =
             drive = drive_link_for_ref(str(pdf_path))
             if drive:
                 return drive + anchor
-            return github_blob_url(str(pdf_path), github_repo) + anchor
+            if Path(ROOT / pdf_path).exists():
+                return github_blob_url(str(pdf_path), github_repo) + anchor
 
     drive = drive_link_for_ref(base) or drive_link_for_ref(pdf_ref_for(base))
     if drive:
         return drive + anchor
 
     path = ROOT / base
-    if path.suffix.lower() in {".pdf", ".txt", ".md"} or "superinvestor-letters" in base:
+    if path.suffix.lower() in {".pdf", ".txt", ".md"}:
         return pdf_github_url(base, github_repo, anchor)
 
     return github_blob_url(base, github_repo) + anchor

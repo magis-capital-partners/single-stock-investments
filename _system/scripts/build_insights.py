@@ -12,7 +12,13 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "_system" / "scripts"))
-from document_store import best_document_label, best_document_url, document_id_for_ref  # noqa: E402
+from document_store import (  # noqa: E402
+    best_document_label,
+    best_document_url,
+    document_id_for_ref,
+    letter_evidence_label,
+    letter_evidence_url,
+)
 
 OUTPUT = ROOT / "dashboard" / "data" / "insights.json"
 ARCHIVE_OUTPUT = ROOT / "_system" / "reference" / "data-sources" / "insights_record_archive.json"
@@ -26,6 +32,7 @@ TERMINALVALUE_SOURCES = ROOT / "_system" / "reference" / "data-sources" / "termi
 SUMZERO_INDEX = ROOT / "_system" / "reference" / "data-sources" / "sumzero_ideas_index.json"
 DOCUMENT_REGISTRY_PATH = ROOT / "dashboard" / "data" / "document_registry.json"
 DRIVE_AUDIT_PATH = ROOT / "_system" / "reference" / "document-store" / "drive_audit_latest.json"
+GITHUB_REPO = "GoldmanDrew/single-stock-investments"
 SECURITY_MASTER_PATH = ROOT / "_system" / "reference" / "securities" / "security_master.json"
 
 VALID_TICKER_RE = re.compile(r"^[A-Z0-9][A-Z0-9.\-]{0,11}$")
@@ -196,18 +203,39 @@ def source_document_ref(ref: str | None) -> str | None:
     return clean
 
 
-def evidence_url(ref: str | None) -> str | None:
+def evidence_url(ref: str | None, letter: dict | None = None) -> str | None:
+    if letter:
+        source_ref = source_document_ref(letter.get("source_document") or letter.get("source_file"))
+        return letter_evidence_url(letter, GITHUB_REPO, source_ref)
     doc_ref = source_document_ref(ref)
     if not doc_ref:
         return None
-    return best_document_url(doc_ref, "GoldmanDrew/single-stock-investments")
+    return best_document_url(doc_ref, GITHUB_REPO)
 
 
-def evidence_label(ref: str | None) -> str:
+def evidence_label(ref: str | None, letter: dict | None = None, url: str | None = None) -> str:
+    if letter:
+        source_ref = source_document_ref(letter.get("source_document") or letter.get("source_file"))
+        resolved = url or letter_evidence_url(letter, GITHUB_REPO, source_ref)
+        return letter_evidence_label(resolved, source_ref)
     doc_ref = source_document_ref(ref)
     if not doc_ref:
         return "source"
+    resolved = url or best_document_url(doc_ref, GITHUB_REPO)
+    if resolved and "superinvestor-letters" in str(doc_ref):
+        return letter_evidence_label(resolved, doc_ref)
     return best_document_label(doc_ref)
+
+
+def letter_evidence_fields(letter: dict) -> dict:
+    source_ref = source_document_ref(letter.get("source_document") or letter.get("source_file"))
+    url = letter_evidence_url(letter, GITHUB_REPO, source_ref)
+    return {
+        "evidence_ref": source_ref,
+        "evidence_url": url,
+        "evidence_label": letter_evidence_label(url, source_ref),
+        "source_document": source_ref,
+    }
 
 
 def evidence_document_id(ref: str | None) -> str | None:
@@ -257,6 +285,7 @@ def from_superinvestor_letters(doc: dict) -> list[dict]:
         fund_id = letter.get("fund_id") or fund
         as_of = letter.get("letter_date")
         source_ref = source_document_ref(letter.get("source_document") or letter.get("source_file"))
+        letter_ev = letter_evidence_fields(letter)
         for th in letter.get("themes") or []:
             out.append(
                 insight_record(
@@ -267,8 +296,8 @@ def from_superinvestor_letters(doc: dict) -> list[dict]:
                     claim=f"{fund}: {th.get('theme')} — {th.get('stance', 'neutral')}",
                     direction={"constructive": "bullish", "cautious": "bearish"}.get(th.get("stance"), "neutral"),
                     evidence_ref=source_ref,
-                    evidence_url=evidence_url(source_ref),
-                    evidence_label=evidence_label(source_ref),
+                    evidence_url=letter_ev["evidence_url"],
+                    evidence_label=letter_ev["evidence_label"],
                     event_type="letter_theme",
                     impact_axis="macro",
                     fund=fund,
@@ -293,8 +322,8 @@ def from_superinvestor_letters(doc: dict) -> list[dict]:
                     claim=claim,
                     direction={"add": "bullish", "trim": "bearish"}.get(action, "neutral"),
                     evidence_ref=source_ref,
-                    evidence_url=evidence_url(source_ref),
-                    evidence_label=evidence_label(source_ref),
+                    evidence_url=letter_ev["evidence_url"],
+                    evidence_label=letter_ev["evidence_label"],
                     event_type="letter_position",
                     impact_axis="ownership",
                     fund=fund,
@@ -789,6 +818,7 @@ def fund_registry(letters: list[dict], our_tickers: set[str]) -> list[dict]:
         letter_tickers = {str(t).upper() for t in (letter.get("tickers") or [])}
         overlap = sorted(letter_tickers & our_tickers)
         source_ref = source_document_ref(letter.get("source_document") or letter.get("source_file"))
+        letter_ev = letter_evidence_fields(letter)
         row = by_key.setdefault(
             key,
             {
@@ -801,9 +831,9 @@ def fund_registry(letters: list[dict], our_tickers: set[str]) -> list[dict]:
                 "themes": set(),
                 "maps_to_persona": letter.get("maps_to_persona") or [],
                 "lead_summary": letter.get("lead_summary") or "",
-                "evidence_ref": source_ref,
-                "evidence_url": evidence_url(source_ref),
-                "evidence_label": evidence_label(source_ref),
+                "evidence_ref": letter_ev["evidence_ref"],
+                "evidence_url": letter_ev["evidence_url"],
+                "evidence_label": letter_ev["evidence_label"],
                 "letter_date": letter.get("letter_date"),
             },
         )
@@ -845,7 +875,7 @@ def letter_index(letters: list[dict], our_tickers: set[str]) -> list[dict]:
         positions = letter.get("positions") or []
         adds = [p["ticker"] for p in positions if p.get("action") == "add" and p.get("ticker")]
         trims = [p["ticker"] for p in positions if p.get("action") == "trim" and p.get("ticker")]
-        source_ref = source_document_ref(letter.get("source_document") or letter.get("source_file"))
+        letter_ev = letter_evidence_fields(letter)
         rows.append(
             {
                 "fund_id": letter.get("fund_id"),
@@ -861,9 +891,9 @@ def letter_index(letters: list[dict], our_tickers: set[str]) -> list[dict]:
                 "lead_summary": (letter.get("lead_summary") or "")[:320],
                 "maps_to_persona": letter.get("maps_to_persona") or [],
                 "source_file": letter.get("source_file"),
-                "source_document": source_ref,
-                "evidence_url": evidence_url(source_ref),
-                "evidence_label": evidence_label(source_ref),
+                "source_document": letter_ev["source_document"],
+                "evidence_url": letter_ev["evidence_url"],
+                "evidence_label": letter_ev["evidence_label"],
             }
         )
     return sorted(rows, key=lambda x: (x.get("letter_date") or "", x.get("fund") or ""), reverse=True)
@@ -934,9 +964,7 @@ def build_consensus(letters: list[dict], our_tickers: set[str], names: dict[str,
         fund_id = letter.get("fund_id") or fund
         all_funds.add(fund_id)
         letter_date = letter.get("letter_date")
-        source_ref = source_document_ref(letter.get("source_document") or letter.get("source_file"))
-        ev_url = evidence_url(source_ref)
-        ev_label = evidence_label(source_ref)
+        letter_ev = letter_evidence_fields(letter)
         for pos in letter.get("positions") or []:
             tk = str(pos.get("ticker") or "").upper()
             if not tk or not valid_ticker(tk):
@@ -967,8 +995,8 @@ def build_consensus(letters: list[dict], our_tickers: set[str], names: dict[str,
                 "tier": pos.get("tier"),
                 "in_book": tk in our_tickers,
                 "commentary": short_text(pos.get("commentary") or pos.get("thesis"), 280),
-                "evidence_url": ev_url,
-                "evidence_label": ev_label,
+                "evidence_url": letter_ev["evidence_url"],
+                "evidence_label": letter_ev["evidence_label"],
             }
             by_ticker.setdefault(tk, []).append(row)
             if action in ACTIONABLE:
@@ -1029,7 +1057,7 @@ def fund_profiles(letters: list[dict], our_tickers: set[str]) -> dict[str, dict]
         if letter.get("maps_to_persona"):
             profile["maps_to_persona"] = letter["maps_to_persona"]
         tickers = {str(t).upper() for t in (letter.get("tickers") or [])}
-        source_ref = source_document_ref(letter.get("source_document") or letter.get("source_file"))
+        letter_ev = letter_evidence_fields(letter)
         profile["our_tickers"].update(tickers & our_tickers)
         profile["letters"].append(
             {
@@ -1043,9 +1071,9 @@ def fund_profiles(letters: list[dict], our_tickers: set[str]) -> dict[str, dict]
                 "catalysts": letter.get("catalysts") or [],
                 "macro_views": letter.get("macro_views") or [],
                 "source_file": letter.get("source_file"),
-                "source_document": source_ref,
-                "evidence_url": evidence_url(source_ref),
-                "evidence_label": evidence_label(source_ref),
+                "source_document": letter_ev["source_document"],
+                "evidence_url": letter_ev["evidence_url"],
+                "evidence_label": letter_ev["evidence_label"],
             }
         )
     for profile in by_fund.values():
@@ -1177,7 +1205,7 @@ def ticker_discussants(
     for letter in letters:
         fund = letter.get("fund") or "Unknown"
         fund_id = letter.get("fund_id") or fund
-        source_ref = source_document_ref(letter.get("source_document") or letter.get("source_file"))
+        letter_ev = letter_evidence_fields(letter)
         for pos in letter.get("positions") or []:
             tk = str(pos.get("ticker", "")).upper()
             if not tk or tk not in our_tickers or not valid_ticker(tk):
@@ -1204,9 +1232,9 @@ def ticker_discussants(
                     "action": pos.get("action", "discussed"),
                     "commentary": pos.get("commentary") or pos.get("thesis") or "",
                     "source_file": letter.get("source_file"),
-                    "source_document": source_ref,
-                    "evidence_url": evidence_url(source_ref),
-                    "evidence_label": evidence_label(source_ref),
+                    "source_document": letter_ev["source_document"],
+                    "evidence_url": letter_ev["evidence_url"],
+                    "evidence_label": letter_ev["evidence_label"],
                     "in_our_book": tk in our_tickers,
                 },
             )
