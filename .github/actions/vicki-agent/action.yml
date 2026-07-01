@@ -1,0 +1,43 @@
+name: Vicki IR harvest agent
+description: Run Vicki browser IR harvest via Cursor Cloud Agent
+
+inputs:
+  ticker:
+    description: Ticker symbol
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Check Cursor API key
+      shell: bash
+      env:
+        CURSOR_API_KEY: ${{ env.CURSOR_API_KEY }}
+      run: |
+        if [ -z "$CURSOR_API_KEY" ]; then
+          echo "::error::CURSOR_API_KEY secret is not set."
+          exit 1
+        fi
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: "22"
+
+    - name: Install Cursor SDK
+      shell: bash
+      working-directory: _system/scripts
+      run: npm install --no-save @cursor/sdk
+
+    - name: Run Vicki IR harvest
+      shell: bash
+      env:
+        CURSOR_API_KEY: ${{ env.CURSOR_API_KEY }}
+        TICKER: ${{ inputs.ticker }}
+        PICK_REASON: ir_gap
+        GITHUB_REPOSITORY: ${{ env.GITHUB_REPOSITORY }}
+      run: node _system/scripts/vicki_ir_harvest.mjs
+
+    - name: Summary
+      shell: bash
+      run: echo "Vicki IR harvest PR started for ${{ inputs.ticker }}."

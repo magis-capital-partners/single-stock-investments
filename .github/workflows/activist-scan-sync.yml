@@ -19,7 +19,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: activist-scan-sync
+  group: data-commit-main
   cancel-in-progress: false
 
 jobs:
@@ -52,18 +52,18 @@ jobs:
           python _system/scripts/short_scan_batch.py
 
       - name: Rebuild document registry and dashboard
-        run: |
-          python _system/scripts/build_document_registry.py
-          python _system/scripts/build_activist_feed.py
-          python _system/scripts/build_dashboard_data.py
+        uses: ./.github/actions/rebuild-data
         env:
           OAUTH_CLIENT_ID: ${{ vars.OAUTH_CLIENT_ID }}
           OAUTH_PROXY_URL: ${{ vars.OAUTH_PROXY_URL }}
-
-      - name: Mirror dashboard to docs
-        run: rsync -a --delete --exclude '.git' --exclude '.wrangler' dashboard/ docs/
+        with:
+          profile: activist
+          mirror_docs: "true"
 
       - name: Commit activist scan artifacts
-        run: |
-          git add -A
-          bash _system/scripts/ci_push_main.sh "chore: activist scan sync $(date -u +%Y-%m-%d)"
+        uses: ./.github/actions/commit-main
+        with:
+          message: "chore: activist scan sync $(date -u +%Y-%m-%d)"
+
+      - name: Pipeline summary
+        run: echo "Activist Scan Sync complete. Deploy Dashboard chains via workflow_run."

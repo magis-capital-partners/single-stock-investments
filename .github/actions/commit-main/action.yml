@@ -1,0 +1,25 @@
+name: Commit and push to main
+description: Stage changes and push to main with rebase retry (ci_push_main.sh)
+
+inputs:
+  message:
+    description: Commit message
+    required: true
+  git_add:
+    description: Arguments to git add
+    required: false
+    default: "-A"
+
+runs:
+  using: composite
+  steps:
+    - name: Stage and push
+      shell: bash
+      run: |
+        git add ${{ inputs.git_add }}
+        bash _system/scripts/ci_push_main.sh "${{ inputs.message }}"
+
+    - name: Deploy chain note
+      shell: bash
+      run: |
+        echo "Committed to main. Deploy Dashboard (GitHub Pages) will chain via workflow_run."

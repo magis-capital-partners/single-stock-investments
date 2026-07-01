@@ -1,0 +1,30 @@
+name: Marvin cloud agent (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      ticker:
+        required: true
+        type: string
+      pick_reason:
+        required: false
+        type: string
+        default: ""
+
+jobs:
+  deep-dive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Marvin agent
+        uses: ./.github/actions/marvin-agent
+        env:
+          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
+          HK_PDFS_ROOT: ${{ secrets.HK_PDFS_ROOT || '/opt/cursor/hk_pdfs' }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        with:
+          ticker: ${{ inputs.ticker }}
+          pick_reason: ${{ inputs.pick_reason }}

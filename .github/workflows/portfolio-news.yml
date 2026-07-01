@@ -27,8 +27,8 @@ permissions:
   contents: write
 
 concurrency:
-  group: portfolio-news-refresh
-  cancel-in-progress: true
+  group: data-commit-main
+  cancel-in-progress: false
 
 jobs:
   ingest-news:
@@ -104,3 +104,6 @@ jobs:
           git add dashboard/data/portfolio_news.json docs/data/portfolio_news.json _system/data/news_seen.json _system/reviews/pending/news_*.md
           git add '*/research/news/news_index.json' 2>/dev/null || true
           bash _system/scripts/ci_push_main.sh "chore: refresh portfolio news $(date -u +%Y-%m-%d)"
+
+      - name: Pipeline summary
+        run: echo "Portfolio News Ingest complete. Deploy Dashboard chains via workflow_run."

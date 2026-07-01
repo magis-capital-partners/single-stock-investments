@@ -64,14 +64,24 @@ You can delete the old `DASHBOARD_SYNC_TOKEN` secret and archive `single-stock-d
 
 ### Workflows
 
+See **`_system/reference/ci-workflows.md`** for the full capability matrix, shared actions, and orchestration diagram.
+
 | Workflow | Trigger | What it does |
 |----------|---------|--------------|
-| [`daily-sync.yml`](.github/workflows/daily-sync.yml) | Daily 12:00 UTC + manual | Download holdings → commit → **auto Marvin refresh** if new docs |
-| [`dashboard-pages.yml`](.github/workflows/dashboard-pages.yml) | Push to `main` (dashboard paths) + manual | Rebuild JSON → deploy `dashboard/` to GitHub Pages |
-| [`drive-intake-sync.yml`](.github/workflows/drive-intake-sync.yml) | Hourly at :20 UTC + manual | Import PDFs dropped in Drive `Admin/VIC`, `Admin/Research`, or `Admin/Company` → rebuild dashboard data |
+| [`daily-sync.yml`](.github/workflows/daily-sync.yml) | Daily 12:00 UTC + manual | Download holdings → news → auto Marvin refresh if new docs → **chains Deploy Dashboard** |
+| [`drive-intake-sync.yml`](.github/workflows/drive-intake-sync.yml) | Hourly :20 UTC + manual | Import Drive PDFs → activist scan → rebuild → **chains Deploy Dashboard** |
+| [`activist-scan-sync.yml`](.github/workflows/activist-scan-sync.yml) | Daily 06:00 UTC + manual | SEC/publisher activist scan → rebuild → **chains Deploy Dashboard** |
+| [`portfolio-news.yml`](.github/workflows/portfolio-news.yml) | Every 6h :30 UTC + manual | Portfolio news ingest → **chains Deploy Dashboard** |
+| [`darwin-refresh.yml`](.github/workflows/darwin-refresh.yml) | Mon 12:00 UTC + push paths + manual | Full Darwin rebuild → **chains Deploy Dashboard** |
+| [`dashboard-pages.yml`](.github/workflows/dashboard-pages.yml) | Push paths + manual + workflow_run | Optional OAuth deploy → rebuild JSON → GitHub Pages |
+| [`deploy-oauth-proxy.yml`](.github/workflows/deploy-oauth-proxy.yml) | Push oauth-proxy + manual | Cloudflare Worker deploy (or local Wrangler) |
+| [`marvin-onboard.yml`](.github/workflows/marvin-onboard.yml) | Manual + repository_dispatch | Onboard ticker → optional deep dive PR → **chains Deploy Dashboard** |
 | [`marvin-deep-dive.yml`](.github/workflows/marvin-deep-dive.yml) | Manual (ticker input) | Cursor Cloud Agent deep dive → opens PR |
 | [`marvin-daily-deep-dive.yml`](.github/workflows/marvin-daily-deep-dive.yml) | Manual only | Pick on new documents (or **force_rotate**) → cloud agent → PR |
+| [`batch-marvin-deep-dive.yml`](.github/workflows/batch-marvin-deep-dive.yml) | Manual + push queue file | Matrix deep dives → PRs |
+| [`vicki-ir-harvest.yml`](.github/workflows/vicki-ir-harvest.yml) | Manual + push queue file | Browser IR harvest for ir_gap tickers |
 | [`research-quality.yml`](.github/workflows/research-quality.yml) | PRs touching `**/research/**` | Lint dives + verify cloud prompt sync |
+| [`ci-autofix.yml`](.github/workflows/ci-autofix.yml) | Failed workflow_run + manual | Triage CI failures → optional Cursor autofix |
 
 ### Marvin pipeline (local = cloud)
 

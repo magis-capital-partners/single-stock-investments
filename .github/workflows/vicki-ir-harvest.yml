@@ -61,47 +61,21 @@ jobs:
           echo "max_parallel=$MAXP" >> "$GITHUB_OUTPUT"
           echo "Vicki tickers: $TICKERS_JSON (max_parallel=$MAXP)"
 
+      - name: Skip if empty
+        if: steps.matrix.outputs.tickers == '[]'
+        run: |
+          echo "No tickers to process."
+          exit 0
+
   harvest:
     needs: prepare
     if: needs.prepare.outputs.tickers != '[]'
-    runs-on: ubuntu-latest
-    timeout-minutes: 90
     strategy:
       fail-fast: false
       max-parallel: ${{ fromJson(needs.prepare.outputs.max_parallel) }}
       matrix:
         ticker: ${{ fromJson(needs.prepare.outputs.tickers) }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Check Cursor API key
-        env:
-          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
-        run: |
-          if [ -z "$CURSOR_API_KEY" ]; then
-            echo "::error::CURSOR_API_KEY secret is not set."
-            exit 1
-          fi
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-
-      - name: Install Cursor SDK
-        working-directory: _system/scripts
-        run: npm install --no-save @cursor/sdk
-
-      - name: Run Vicki IR harvest (${{ matrix.ticker }})
-        env:
-          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
-          TICKER: ${{ matrix.ticker }}
-          PICK_REASON: ir_gap
-          GITHUB_REPOSITORY: ${{ github.repository }}
-        run: node _system/scripts/vicki_ir_harvest.mjs
-
-      - name: Summary
-        if: success()
-        run: echo "Vicki IR harvest PR started for ${{ matrix.ticker }}."
+    uses: ./.github/workflows/_vicki-agent.yml
+    with:
+      ticker: ${{ matrix.ticker }}
+    secrets: inherit

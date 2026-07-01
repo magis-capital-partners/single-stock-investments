@@ -19,7 +19,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: drive-intake-sync
+  group: data-commit-main
   cancel-in-progress: false
 
 jobs:
@@ -87,31 +87,21 @@ jobs:
 
       - name: Rebuild document registry and dashboard data
         if: steps.google_creds.outputs.configured == 'true'
-        run: |
-          python _system/scripts/build_document_registry.py
-          python _system/scripts/audit_drive_pdf_store.py
-          python _system/scripts/build_drive_filename_index.py
-          python _system/scripts/build_letter_drive_links.py
-          python _system/scripts/sync_pdf_store_google_drive.py --root-key general_pdfs --workers 4
-          python _system/scripts/build_document_registry.py
-          python _system/scripts/build_drive_filename_index.py
-          python _system/scripts/build_letter_drive_links.py
-          python _system/scripts/build_insights.py
-          python _system/scripts/build_research_memory.py
-          python _system/scripts/build_activist_feed.py
-          python _system/scripts/build_dashboard_data.py
+        uses: ./.github/actions/rebuild-data
         env:
           OAUTH_CLIENT_ID: ${{ vars.OAUTH_CLIENT_ID }}
           OAUTH_PROXY_URL: ${{ vars.OAUTH_PROXY_URL }}
-
-      - name: Mirror dashboard to docs
-        if: steps.google_creds.outputs.configured == 'true'
-        shell: bash
-        run: |
-          rsync -a --delete --exclude '.git' --exclude '.wrangler' dashboard/ docs/
+        with:
+          profile: intake-full
+          mirror_docs: "true"
 
       - name: Commit imported documents
         if: steps.google_creds.outputs.configured == 'true'
+        uses: ./.github/actions/commit-main
+        with:
+          message: "chore: sync Drive intake documents $(date -u +%Y-%m-%d)"
+
+      - name: Pipeline summary
+        if: steps.google_creds.outputs.configured == 'true'
         run: |
-          git add -A
-          bash _system/scripts/ci_push_main.sh "chore: sync Drive intake documents $(date -u +%Y-%m-%d)"
+          echo "Drive Intake Sync complete. Deploy Dashboard chains via workflow_run."

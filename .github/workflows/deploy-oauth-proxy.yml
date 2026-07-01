@@ -12,16 +12,16 @@ permissions:
 
 jobs:
   deploy:
+    if: secrets.CLOUDFLARE_API_TOKEN != ''
+    uses: ./.github/workflows/_deploy-oauth.yml
+    secrets: inherit
+
+  skip-no-secrets:
+    if: secrets.CLOUDFLARE_API_TOKEN == ''
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Deploy Cloudflare Worker
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          workingDirectory: dashboard/oauth-proxy
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      - name: Manual deploy required
+        run: |
+          echo "::warning::CLOUDFLARE_API_TOKEN not set — skipping CI deploy."
+          echo "Deploy locally: cd dashboard/oauth-proxy && npx wrangler login && npx wrangler deploy"
+          echo "Then set repo variable OAUTH_PROXY_URL to the worker URL."

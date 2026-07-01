@@ -21,12 +21,21 @@ on:
       - "**/INDEX.csv"
       - "**/document-index.csv"
   workflow_dispatch:
-  # GITHUB_TOKEN pushes from onboard/daily-sync do not trigger push workflows — redeploy here.
+    inputs:
+      deploy_oauth:
+        description: "Redeploy Cloudflare OAuth proxy before dashboard build"
+        required: false
+        type: boolean
+        default: false
+  # GITHUB_TOKEN pushes from data pipelines do not trigger push workflows — redeploy here.
   workflow_run:
     workflows:
-      - "Marvin Onboard Ticker"
-      - "Daily Download & Dashboard Sync"
-      - "Drive Intake Sync"
+      - Marvin Onboard Ticker
+      - Daily Download & Dashboard Sync
+      - Drive Intake Sync
+      - Activist Scan Sync
+      - Portfolio News Ingest
+      - Darwin Portfolio Refresh
     types: [completed]
     branches: [main]
 
@@ -36,53 +45,52 @@ permissions:
   id-token: write
 
 concurrency:
-  group: dashboard-pages
+  group: dashboard-deploy
   cancel-in-progress: false
 
 jobs:
-  deploy:
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+  oauth-changed:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
+    outputs:
+      changed: ${{ steps.check.outputs.changed }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
         with:
-          python-version: "3.12"
+          fetch-depth: 0
+      - id: check
+        shell: bash
+        run: |
+          BEFORE="${{ github.event.before }}"
+          if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if git diff --name-only "$BEFORE" "${{ github.sha }}" | grep -q '^dashboard/oauth-proxy/'; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
 
-      - name: Install Darwin dependencies
-        run: pip install -r _system/scripts/requirements-darwin.txt
+  oauth-proxy:
+    needs: oauth-changed
+    if: |
+      always() &&
+      (
+        (github.event_name == 'workflow_dispatch' && inputs.deploy_oauth == true) ||
+        (github.event_name == 'push' && needs.oauth-changed.outputs.changed == 'true')
+      ) &&
+      secrets.CLOUDFLARE_API_TOKEN != ''
+    uses: ./.github/workflows/_deploy-oauth.yml
+    secrets: inherit
 
-      - name: Download IRA market data (Tier A)
-        run: python _system/scripts/download_ira_research.py --tier A
-        continue-on-error: true
-
-      - name: Build Darwin portfolio
-        run: python _system/scripts/build_darwin_portfolio.py --fast
-
-      - name: Rebuild NOL screener
-        run: python _system/scripts/build_nol_screener.py --write
-
-      - name: Rebuild dashboard JSON
-        env:
-          OAUTH_CLIENT_ID: ${{ vars.OAUTH_CLIENT_ID }}
-          OAUTH_PROXY_URL: ${{ vars.OAUTH_PROXY_URL }}
-        run: python _system/scripts/build_dashboard_data.py
-
-      - name: Validate dashboard JSON
-        run: python _system/scripts/validate_dashboard_data.py
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: dashboard
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+  publish:
+    needs: oauth-proxy
+    if: |
+      always() &&
+      (needs.oauth-proxy.result == 'success' || needs.oauth-proxy.result == 'skipped') &&
+      (
+        github.event_name != 'workflow_run' ||
+        github.event.workflow_run.conclusion == 'success'
+      )
+    uses: ./.github/workflows/_publish-dashboard.yml

@@ -33,36 +33,15 @@ jobs:
           fi
           echo "Ticker: $TICKER"
 
-      - name: Check Cursor API key
-        env:
-          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
-        run: |
-          if [ -z "$CURSOR_API_KEY" ]; then
-            echo "::error::CURSOR_API_KEY secret is not set."
-            echo "Add a Cursor user or service-account API key in repo Settings → Secrets → Actions."
-            echo "Create at: https://cursor.com/dashboard/cloud-agents"
-            exit 1
-          fi
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-
-      - name: Install Cursor SDK
-        working-directory: _system/scripts
-        run: npm install --no-save @cursor/sdk
-
       - name: Run Marvin deep dive (Cloud Agent → PR)
+        uses: ./.github/actions/marvin-agent
         env:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
           HK_PDFS_ROOT: ${{ secrets.HK_PDFS_ROOT || '/opt/cursor/hk_pdfs' }}
-          TICKER: ${{ github.event.inputs.ticker }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: node _system/scripts/marvin_deep_dive.mjs
+        with:
+          ticker: ${{ github.event.inputs.ticker }}
 
       - name: Summary
         if: success()
-        run: |
-          echo "Marvin cloud agent finished. Review and merge the PR it opened."
-          echo "After merge, daily-sync will refresh the dashboard."
+        run: echo "After merge, Deploy Dashboard refreshes via push paths or workflow_run."

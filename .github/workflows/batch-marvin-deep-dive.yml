@@ -70,45 +70,13 @@ jobs:
   deep-dive:
     needs: prepare
     if: needs.prepare.outputs.tickers != '[]'
-    runs-on: ubuntu-latest
-    timeout-minutes: 120
     strategy:
       fail-fast: false
       max-parallel: ${{ fromJson(needs.prepare.outputs.max_parallel) }}
       matrix:
         ticker: ${{ fromJson(needs.prepare.outputs.tickers) }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Check Cursor API key
-        env:
-          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
-        run: |
-          if [ -z "$CURSOR_API_KEY" ]; then
-            echo "::error::CURSOR_API_KEY secret is not set."
-            exit 1
-          fi
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-
-      - name: Install Cursor SDK
-        working-directory: _system/scripts
-        run: npm install --no-save @cursor/sdk
-
-      - name: Run Marvin deep dive (${{ matrix.ticker }})
-        env:
-          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
-          HK_PDFS_ROOT: ${{ secrets.HK_PDFS_ROOT || '/opt/cursor/hk_pdfs' }}
-          TICKER: ${{ matrix.ticker }}
-          PICK_REASON: batch_onboard_pending
-          GITHUB_REPOSITORY: ${{ github.repository }}
-        run: node _system/scripts/marvin_deep_dive.mjs
-
-      - name: Summary
-        if: success()
-        run: echo "Deep dive PR started for ${{ matrix.ticker }}."
+    uses: ./.github/workflows/_marvin-agent.yml
+    with:
+      ticker: ${{ matrix.ticker }}
+      pick_reason: batch_onboard_pending
+    secrets: inherit

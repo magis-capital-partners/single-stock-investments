@@ -1,0 +1,49 @@
+name: Marvin cloud agent
+description: Run Marvin deep dive via Cursor Cloud Agent
+
+inputs:
+  ticker:
+    description: Ticker symbol
+    required: true
+  pick_reason:
+    description: Optional reason string for the agent
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - name: Check Cursor API key
+      shell: bash
+      env:
+        CURSOR_API_KEY: ${{ env.CURSOR_API_KEY }}
+      run: |
+        if [ -z "$CURSOR_API_KEY" ]; then
+          echo "::error::CURSOR_API_KEY secret is not set."
+          echo "Create at: https://cursor.com/dashboard/cloud-agents"
+          exit 1
+        fi
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: "22"
+
+    - name: Install Cursor SDK
+      shell: bash
+      working-directory: _system/scripts
+      run: npm install --no-save @cursor/sdk
+
+    - name: Run Marvin deep dive
+      shell: bash
+      env:
+        CURSOR_API_KEY: ${{ env.CURSOR_API_KEY }}
+        HK_PDFS_ROOT: ${{ env.HK_PDFS_ROOT }}
+        TICKER: ${{ inputs.ticker }}
+        PICK_REASON: ${{ inputs.pick_reason }}
+        GITHUB_REPOSITORY: ${{ env.GITHUB_REPOSITORY }}
+      run: node _system/scripts/marvin_deep_dive.mjs
+
+    - name: Summary
+      shell: bash
+      run: echo "Marvin cloud agent finished for ${{ inputs.ticker }}. Review and merge the PR it opened."

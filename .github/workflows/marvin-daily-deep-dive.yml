@@ -36,16 +36,6 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Check Cursor API key
-        env:
-          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
-        run: |
-          if [ -z "$CURSOR_API_KEY" ]; then
-            echo "::error::CURSOR_API_KEY secret is not set."
-            echo "Create at: https://cursor.com/dashboard/integrations"
-            exit 1
-          fi
-
       - name: Pick ticker (new documents since last deep dive)
         id: pick
         env:
@@ -67,26 +57,16 @@ jobs:
           echo "skip=$SKIP" >> "$GITHUB_OUTPUT"
           echo "reason=$REASON" >> "$GITHUB_OUTPUT"
 
-      - name: Set up Node.js
-        if: steps.pick.outputs.skip != 'true' && steps.pick.outputs.ticker != ''
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-
-      - name: Install Cursor SDK
-        if: steps.pick.outputs.skip != 'true' && steps.pick.outputs.ticker != ''
-        working-directory: _system/scripts
-        run: npm install --no-save @cursor/sdk
-
       - name: Run Marvin deep dive (Cloud Agent → PR)
         if: steps.pick.outputs.skip != 'true' && steps.pick.outputs.ticker != ''
+        uses: ./.github/actions/marvin-agent
         env:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
           HK_PDFS_ROOT: ${{ secrets.HK_PDFS_ROOT || '/opt/cursor/hk_pdfs' }}
-          TICKER: ${{ steps.pick.outputs.ticker }}
-          PICK_REASON: ${{ steps.pick.outputs.reason }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: node _system/scripts/marvin_deep_dive.mjs
+        with:
+          ticker: ${{ steps.pick.outputs.ticker }}
+          pick_reason: ${{ steps.pick.outputs.reason }}
 
       - name: Summary
         if: always()

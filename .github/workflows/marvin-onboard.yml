@@ -124,16 +124,9 @@ jobs:
           python _system/scripts/onboard_ticker.py "${ARGS[@]}"
 
       - name: Commit and push to main
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          if git diff --staged --quiet; then
-            echo "No onboard changes to commit."
-          else
-            git commit -m "feat: onboard ${{ steps.vars.outputs.ticker }} ($(date -u +%Y-%m-%d))"
-            git push origin main
-          fi
+        uses: ./.github/actions/commit-main
+        with:
+          message: "feat: onboard ${{ steps.vars.outputs.ticker }} ($(date -u +%Y-%m-%d))"
 
       - name: Check Cursor API key
         if: steps.vars.outputs.watchlist_only != 'true'
@@ -148,23 +141,19 @@ jobs:
             echo "ready=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Install Cursor SDK
-        if: steps.vars.outputs.watchlist_only != 'true' && steps.cursor.outputs.ready == 'true'
-        working-directory: _system/scripts
-        run: npm install --no-save @cursor/sdk
-
       - name: Run Marvin deep dive (Cloud Agent → PR)
         if: steps.vars.outputs.watchlist_only != 'true' && steps.cursor.outputs.ready == 'true'
+        uses: ./.github/actions/marvin-agent
         env:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
           HK_PDFS_ROOT: ${{ secrets.HK_PDFS_ROOT || '/opt/cursor/hk_pdfs' }}
-          TICKER: ${{ steps.vars.outputs.ticker }}
-          PICK_REASON: onboard
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: node _system/scripts/marvin_deep_dive.mjs
+        with:
+          ticker: ${{ steps.vars.outputs.ticker }}
+          pick_reason: onboard
 
       - name: Summary
         if: success()
         run: |
           echo "Onboard finished for ${{ steps.vars.outputs.ticker }}"
-          echo "Dashboard will refresh on next Pages deploy."
+          echo "Deploy Dashboard chains via workflow_run after this workflow completes."

@@ -1,0 +1,55 @@
+name: Publish dashboard (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      skip_rebuild:
+        description: "Skip rebuild (use committed dashboard/ as-is)"
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        if: inputs.skip_rebuild != true
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Rebuild and validate
+        if: inputs.skip_rebuild != true
+        uses: ./.github/actions/rebuild-data
+        env:
+          OAUTH_CLIENT_ID: ${{ vars.OAUTH_CLIENT_ID }}
+          OAUTH_PROXY_URL: ${{ vars.OAUTH_PROXY_URL }}
+        with:
+          profile: darwin-fast
+          validate: "true"
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dashboard
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Summary
+        run: |
+          echo "Dashboard live at ${{ steps.deployment.outputs.page_url }}"
+          echo "Verify data/oauth_config.json exchange_url matches OAUTH_PROXY_URL repo variable."
