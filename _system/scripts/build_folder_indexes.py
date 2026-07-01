@@ -41,7 +41,20 @@ def main() -> None:
 
     parser = argparse.ArgumentParser(description="Build INDEX.csv per ticker folder")
     parser.add_argument("--ticker", help="Single ticker only (recommended after downloads)")
+    parser.add_argument(
+        "--folder",
+        help="Build INDEX.csv for a single top-level folder (e.g. docs for GitHub Pages)",
+    )
     args = parser.parse_args()
+
+    if args.folder:
+        p = ROOT / args.folder
+        if not p.is_dir():
+            print(f"ERROR: folder {args.folder} not found")
+            raise SystemExit(1)
+        n = build_index_csv(p)
+        print(f"OK {args.folder}/INDEX.csv rows={n}")
+        return
 
     if args.ticker:
         p = ROOT / args.ticker
