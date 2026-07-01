@@ -358,6 +358,7 @@
   .darwin-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 8px; }
   .darwin-table th, .darwin-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: left; }
   .darwin-table th { font-size: 10px; text-transform: uppercase; color: var(--text-muted); }
+  .darwin-table tr.nol-row-muted td { opacity: 0.55; }
 
   .darwin-charts { display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 20px; }
   @media (min-width: 900px) { .darwin-charts.split { grid-template-columns: 1fr 1fr; } }
@@ -690,7 +691,7 @@ let activeInsightFilter = 'letters';
 let insightsQuarter = 'latest';
 let fundRegistrySearch = '';
 let insightsBookOnly = true;
-let insightsSection = 'overview';
+let insightsTickerSourceFilter = 'ownership';
 let insightsPdfSourceTab = 'all';
 let insightsPdfTimeMode = 'period';
 let insightsSearchDebounce = null;
@@ -809,11 +810,12 @@ function insightToneClass(tone) {
 function renderInsightCell(t) {
   const e = t.essential_insights || {};
   const status = e.status || { label: 'No insight', tone: 'stale' };
-  const latest = e.latest || (e.bullets || [])[0];
+  const primary = (e.bullets || [])[0] || e.latest || e.owner;
+  const line = primary?.summary || primary?.title || 'No ranked item';
   return `
     <div class="insight-cell">
       <span class="badge ${insightToneClass(status.tone)}">${escapeHtml(status.label || 'Covered')}</span>
-      <span class="sub tier-sub">${escapeHtml(latest?.title || latest?.summary || 'No ranked item')}</span>
+      <span class="sub tier-sub">${escapeHtml(line)}</span>
     </div>`;
 }
 
@@ -957,6 +959,8 @@ function renderInsights(opts = {}) {
     documentCatalog: data.document_catalog || null,
     pdfSourceTab: insightsPdfSourceTab,
     pdfTimeMode: insightsPdfTimeMode,
+    portfolioMacro: data.portfolio_macro || [],
+    tickerSourceFilter: insightsTickerSourceFilter,
   });
   content.querySelectorAll('[data-insights-quarter]').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -1000,6 +1004,12 @@ function renderInsights(opts = {}) {
       renderInsights();
     });
   }
+  content.querySelectorAll('[data-ticker-source-filter]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      insightsTickerSourceFilter = btn.dataset.tickerSourceFilter || 'ownership';
+      renderInsights();
+    });
+  });
   content.querySelectorAll('[data-pdf-source-tab]').forEach(btn => {
     btn.addEventListener('click', () => {
       insightsPdfSourceTab = btn.dataset.pdfSourceTab;
@@ -1192,31 +1202,46 @@ function renderWatchlistTab() {
       </tbody>
     </table>` : '<p class="form-hint">No registry watchlist entries. Add via onboard modal (watchlist only) or NOL screener below.</p>';
 
+  const hideZeroRealizable = localStorage.getItem('nolHideZeroRealizable') === '1';
+  const filterNolRows = (rows) => hideZeroRealizable
+    ? rows.filter(r => r.is_actionable === true)
+    : rows;
+
   const nolRowHtml = (r) => `
-          <tr>
-            <td class="mono">${escapeHtml(r.ticker)}${r.in_holdings ? ' <span class="badge badge-ok" title="Already a holding">H</span>' : ''}${r.in_watchlist ? ' <span class="badge badge-warn" title="On watchlist">W</span>' : ''}</td>
+          <tr class="${r.fully_reserved ? 'nol-row-muted' : ''}">
+            <td class="mono">${escapeHtml(r.ticker)}${r.in_holdings ? ' <span class="badge badge-ok" title="Already a holding">H</span>' : ''}${r.in_watchlist ? ' <span class="badge badge-warn" title="On watchlist">W</span>' : ''}${r.is_actionable ? ' <span class="badge badge-ok" title="Actionable realizable DTA">A</span>' : ''}</td>
             <td>${escapeHtml(r.company)}</td>
+            <td style="font-size:11px;color:var(--text-secondary);max-width:180px">${escapeHtml(r.notes || '—')}</td>
             <td><span class="badge ${r.is_small_cap ? 'badge-sleeve' : 'badge-warn'}">${escapeHtml(r.cap_bucket || '—')}</span></td>
             <td class="mono">${escapeHtml(r.market_cap_display || '—')}</td>
-            <td class="mono">${escapeHtml(r.dta_gross_display || '—')}</td>
+            <td class="mono">${escapeHtml(r.dta_to_mcap_display || '—')}</td>
             <td class="mono">${escapeHtml(r.dta_realizable_display || '—')}</td>
+            <td class="mono">${escapeHtml(r.dta_per_share_display || '—')}</td>
+            <td class="mono">${escapeHtml(r.allowance_pct_display || '—')}</td>
+            <td class="mono">${escapeHtml(r.nol_dta_display || '—')}</td>
             <td class="mono" style="font-size:11px">${escapeHtml(r.filing_as_of || '—')}</td>
-            <td style="font-size:11px">${escapeHtml(r.screen_status || '—')}</td>
             <td>${r.in_holdings ? '<span class="form-hint">holding</span>' : `<button type="button" class="btn-secondary btn-sm" data-nol-watch="${escapeHtml(r.ticker)}"
               data-company="${escapeHtml(r.company)}" data-market="${escapeHtml(r.market)}">+ Watchlist</button>`}</td>
           </tr>`;
 
   const nolHead = `<thead><tr>
-        <th>Ticker</th><th>Company</th><th>Cap</th><th>Mkt cap</th><th>DTA (gross)</th><th>Realizable DTA</th><th>Filing</th><th>Status</th><th></th>
+        <th>Ticker</th><th>Company</th><th>Notes</th><th>Cap</th><th>Mkt cap</th><th>DTA/mcap</th><th>Realizable DTA</th><th>DTA/sh</th><th>Allowance</th><th>NOL DTA</th><th>Filing</th><th></th>
       </tr></thead>`;
 
-  const smallRows = nolRows.filter(r => r.is_small_cap);
-  const largeRows = nolRows.filter(r => !r.is_small_cap);
+  const visibleRows = filterNolRows(nolRows);
+  const smallRows = visibleRows.filter(r => r.is_small_cap);
+  const largeRows = visibleRows.filter(r => !r.is_small_cap);
+  const actionableCount = nol.actionable_count != null ? nol.actionable_count : nolRows.filter(r => r.is_actionable).length;
   const nolTable = nolRows.length ? `
+    <label class="form-hint" style="display:inline-flex;align-items:center;gap:6px;margin-bottom:10px">
+      <input type="checkbox" id="nol-hide-zero" ${hideZeroRealizable ? 'checked' : ''}>
+      Hide fully reserved / zero realizable DTA
+    </label>
     ${smallRows.length ? `<h4 style="font-size:12px;color:var(--text-muted);margin:12px 0 8px">Small / micro cap (${smallRows.length}) — takeover tax-attribute sleeve</h4>
     <table class="darwin-table">${nolHead}<tbody>${smallRows.map(nolRowHtml).join('')}</tbody></table>` : ''}
     ${largeRows.length ? `<h4 style="font-size:12px;color:var(--text-muted);margin:16px 0 8px">Mid / large cap (${largeRows.length})</h4>
-    <table class="darwin-table">${nolHead}<tbody>${largeRows.map(nolRowHtml).join('')}</tbody></table>` : ''}` : '<p class="form-hint">NOL screener not built. Run: python _system/scripts/build_nol_screener.py --write</p>';
+    <table class="darwin-table">${nolHead}<tbody>${largeRows.map(nolRowHtml).join('')}</tbody></table>` : ''}
+    ${!visibleRows.length ? '<p class="form-hint">No rows match the current filter.</p>' : ''}` : '<p class="form-hint">NOL screener not built. Run: python _system/scripts/build_nol_screener.py --write</p>';
 
   content.innerHTML = `
     <div class="watchlist-section">
@@ -1225,11 +1250,19 @@ function renderWatchlistTab() {
       ${registryTable}
     </div>
     <div class="watchlist-section">
-      <h3>NOL carryforward screener (${nolRows.length}${nol.small_cap_count != null ? ` · ${nol.small_cap_count} small/micro` : ''})</h3>
+      <h3>NOL carryforward screener (${nolRows.length}${nol.small_cap_count != null ? ` · ${nol.small_cap_count} small/micro` : ''}${actionableCount != null ? ` · ${actionableCount} actionable` : ''})</h3>
       <p class="form-hint" style="margin-bottom:10px">${escapeHtml(nol.criteria || 'Deferred tax asset screen from SEC companyfacts + seed list.')}</p>
       ${nolTable}
       <p class="form-hint" style="margin-top:10px">Seed: <code>${escapeHtml(nol.seed_path || '_system/reference/market-data/screens/nol_seed.csv')}</code> · Rebuild: <code>python _system/scripts/build_nol_screener.py --write</code></p>
     </div>`;
+
+  const hideZeroCb = content.querySelector('#nol-hide-zero');
+  if (hideZeroCb) {
+    hideZeroCb.addEventListener('change', () => {
+      localStorage.setItem('nolHideZeroRealizable', hideZeroCb.checked ? '1' : '0');
+      renderWatchlistTab();
+    });
+  }
 
   content.querySelectorAll('[data-onboard-watch]').forEach(btn => {
     btn.addEventListener('click', () => openOnboardModal({

@@ -328,8 +328,9 @@
     return 'badge-us';
   }
 
-  function renderInsightItem(item, escapeHtml, linkHtml) {
-    if (!item) return '<span class="tier-sub">No signal</span>';
+  function renderInsightItem(item, escapeHtml, linkHtml, opts) {
+    const emptyLabel = (opts && opts.emptyLabel) || 'No signal';
+    if (!item) return `<span class="tier-sub">${emptyLabel}</span>`;
     const directionClass = item.direction === 'bullish'
       ? 'badge-ok'
       : (item.direction === 'bearish' ? 'badge-bad' : 'badge-us');
@@ -351,23 +352,25 @@
     if (!essential || !(essential.bullets || []).length) {
       return `
         <div class="detail-section tier-2">
-          <h3>Essential insights</h3>
+          <h3>External context</h3>
           <div class="research-box">
-            <div class="tier-sub">No ranked insight is attached to this ticker yet.</div>
+            <div class="tier-sub">No ranked external context yet. Use Insights → Ticker insights for the portfolio scan.</div>
           </div>
         </div>`;
     }
     const status = essential.status || {};
     const sourceMix = (essential.source_mix || []).map(s => SOURCE_LABEL[s] || s).join(', ') || 'none';
+    const primary = (essential.bullets || [])[0];
     return `
       <div class="detail-section tier-2">
-        <h3>Essential insights</h3>
+        <h3>External context</h3>
         <div class="research-box essential-box">
           <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:10px">
             <span class="badge ${insightToneClass(status.tone)}">${escapeHtml(status.label || 'Covered')}</span>
             <span class="tier-sub">${essential.freshness_days != null ? `${essential.freshness_days}d old` : 'undated'} · ${escapeHtml(sourceMix)}</span>
           </div>
-          ${(essential.bullets || []).slice(0, 3).map(item => renderInsightItem(item, escapeHtml, linkHtml)).join('')}
+          ${renderInsightItem(primary, escapeHtml, linkHtml)}
+          <p class="tier-sub" style="margin-top:8px">Full scan: Insights → Ticker insights. Filtered letter/macro rows below.</p>
         </div>
       </div>`;
   }
@@ -822,10 +825,26 @@
   }
 
   function filterTickerEssentials(tickers, opts) {
-    const { search, bookOnly } = opts || {};
+    const { search, bookOnly, sourceFilter } = opts || {};
     let rows = tickers || [];
     if (bookOnly) {
-      rows = rows.filter(t => t.essential_insights && !t.essential_insights.needs_work);
+      rows = rows.filter(t => t.in_holdings);
+    }
+    if (sourceFilter && sourceFilter !== 'all') {
+      rows = rows.filter(t => {
+        const e = t.essential_insights || {};
+        const sources = new Set(e.source_mix || []);
+        if (sourceFilter === 'ownership') {
+          return sources.has('superinvestor_letter') || sources.has('insider') || e.owner;
+        }
+        if (sourceFilter === 'letters') {
+          return sources.has('superinvestor_letter') || e.owner?.source === 'superinvestor_letter';
+        }
+        if (sourceFilter === 'macro') {
+          return e.macro_only || sources.has('macro');
+        }
+        return sources.has(sourceFilter);
+      });
     }
     if (search) {
       const q = search.toLowerCase();
@@ -844,10 +863,41 @@
     return rows;
   }
 
-  function renderTickerEssentials(tickers, escapeHtml, linkHtml, opts) {
-    const rows = filterTickerEssentials(tickers, opts).slice(0, 160);
-    if (!rows.length) return '<p class="subhead">No ticker essentials match this view.</p>';
+  function renderPortfolioMacroStrip(portfolioMacro, escapeHtml, linkHtml) {
+    const rows = portfolioMacro || [];
+    if (!rows.length) return '';
     return `
+      <div class="detail-section" style="margin-bottom:14px">
+        <h3 style="font-size:14px;margin-bottom:8px">Portfolio macro (shown once)</h3>
+        <div class="research-box essential-box">
+          ${rows.slice(0, 4).map(item => renderInsightItem(item, escapeHtml, linkHtml)).join('')}
+        </div>
+        <p class="tier-sub">Macro indices are portfolio-wide context. They are excluded from per-ticker Latest/Bull/Bear unless no ticker-specific signal exists.</p>
+      </div>`;
+  }
+
+  function renderTickerSourceFilters(activeFilter, escapeHtml) {
+    const filters = [
+      { id: 'ownership', label: 'Letters + insider' },
+      { id: 'letters', label: 'Letters' },
+      { id: 'all', label: 'All sources' },
+      { id: 'macro', label: 'Macro only' },
+    ];
+    return `
+      <nav class="source-pills" id="insights-ticker-source-tabs" style="margin-bottom:10px">
+        ${filters.map(f => `<button type="button" class="filter-btn source-pill${activeFilter === f.id ? ' active' : ''}" data-ticker-source-filter="${escapeHtml(f.id)}">${escapeHtml(f.label)}</button>`).join('')}
+      </nav>`;
+  }
+
+  function renderTickerEssentials(tickers, escapeHtml, linkHtml, opts) {
+    const sourceFilter = (opts && opts.sourceFilter) || 'ownership';
+    const rows = filterTickerEssentials(tickers, opts).slice(0, 160);
+    const sourceTabs = renderTickerSourceFilters(sourceFilter, escapeHtml);
+    if (!rows.length) {
+      return `${sourceTabs}<p class="subhead">No ticker essentials match this view.</p>`;
+    }
+    return `
+      ${sourceTabs}
       <table class="darwin-table" id="insights-ticker-table">
         <thead><tr><th>Ticker</th><th>Status</th><th>Fresh</th><th>Latest</th><th>Bull</th><th>Bear/Risk</th><th>Owner</th></tr></thead>
         <tbody>
@@ -860,8 +910,8 @@
                 <td><span class="badge ${insightToneClass(status.tone)}">${escapeHtml(status.label || 'No insight')}</span></td>
                 <td class="mono">${e.freshness_days != null ? `${e.freshness_days}d` : 'n/a'}</td>
                 <td>${renderInsightItem(e.latest, escapeHtml, linkHtml)}</td>
-                <td>${renderInsightItem(e.bull, escapeHtml, linkHtml)}</td>
-                <td>${renderInsightItem(e.bear, escapeHtml, linkHtml)}</td>
+                <td>${renderInsightItem(e.bull, escapeHtml, linkHtml, { emptyLabel: '—' })}</td>
+                <td>${renderInsightItem(e.bear, escapeHtml, linkHtml, { emptyLabel: '—' })}</td>
                 <td>${renderInsightItem(e.owner, escapeHtml, linkHtml)}</td>
               </tr>`;
           }).join('')}
@@ -1347,6 +1397,8 @@
       documentCatalog = null,
       pdfSourceTab = 'all',
       pdfTimeMode = 'period',
+      portfolioMacro = [],
+      tickerSourceFilter = 'ownership',
     } = options || {};
 
     const profiles = insights?.fund_profiles || {};
@@ -1430,7 +1482,8 @@
         pdfTimeMode,
       });
     } else if (activeSection === 'tickers') {
-      body = renderTickerEssentials(tickers, escapeHtml, linkHtml, { search: fundSearch, bookOnly });
+      body = renderPortfolioMacroStrip(portfolioMacro, escapeHtml, linkHtml)
+        + renderTickerEssentials(tickers, escapeHtml, linkHtml, { search: fundSearch, bookOnly, sourceFilter: tickerSourceFilter });
     } else if (activeSection === 'memory') {
       body = renderMemoryLedger(memory, escapeHtml, linkHtml, { search: fundSearch, bookOnly, period })
         + '<div style="height:14px"></div>'
@@ -1442,6 +1495,9 @@
         + renderDataSourceCandidates(insights?.data_source_candidates || {}, escapeHtml);
     }
 
+    const showPeriodControls = activeSection !== 'tickers';
+    const bookLabel = activeSection === 'tickers' ? 'Holdings only' : 'Our book overlap';
+
     return `
       <h2 style="font-size:18px;margin-bottom:6px">Insights</h2>
       <p class="subhead" style="margin-bottom:14px">
@@ -1451,7 +1507,7 @@
         ${sections.map(s => `<button type="button" class="view-tab${activeSection === s.id ? ' active' : ''}" data-insights-section="${s.id}">${s.label}</button>`).join('')}
       </nav>
       <div class="detail-section" style="display:grid;gap:8px;margin-bottom:12px">
-        <nav class="source-pills" id="insights-range-tabs" style="margin-bottom:0">
+        ${showPeriodControls ? `<nav class="source-pills" id="insights-range-tabs" style="margin-bottom:0">
           ${rangeTabs.map(t => `<button type="button" class="filter-btn source-pill${period.id === t.id ? ' active' : ''}" data-insights-quarter="${escapeHtml(t.id)}">${escapeHtml(t.label)}</button>`).join('')}
         </nav>
         <nav class="source-pills" id="insights-year-tabs" style="margin-bottom:0">
@@ -1459,17 +1515,17 @@
         </nav>
         ${quarterTabs.length ? `<nav class="source-pills" id="insights-quarter-tabs" style="margin-bottom:0">
           ${quarterTabs.map(t => `<button type="button" class="filter-btn source-pill${period.id === t.id ? ' active' : ''}" data-insights-quarter="${escapeHtml(t.id)}">${escapeHtml(t.label)}</button>`).join('')}
-        </nav>` : ''}
+        </nav>` : ''}` : `<p class="tier-sub">Ticker insights use ticker-specific signals by default. Macro indices appear once above the table.</p>`}
         <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
           <label class="tier-sub" style="display:flex;align-items:center;gap:6px">
             <input type="checkbox" id="insights-book-only" ${bookOnly ? 'checked' : ''} />
-            Our book overlap
+            ${escapeHtml(bookLabel)}
           </label>
           <input class="search" id="fund-registry-search" placeholder="Search ticker, event, fund, theme, source..." value="${escapeHtml(fundSearch)}" style="max-width:320px" />
         </div>
-        <div class="tier-sub">
+        ${showPeriodControls ? `<div class="tier-sub">
           Viewing ${escapeHtml(period.label)} &middot; ${coverage.quarters} quarter(s) &middot; ${coverage.letters} indexed letter(s) &middot; ${coverage.funds} fund row(s)${coverage.folderCount ? ` &middot; ${coverage.folderCount} Drive source folder(s)` : ''}
-        </div>
+        </div>` : ''}
       </div>
       ${body}`;
   }
