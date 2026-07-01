@@ -42,6 +42,7 @@ def extract_reporting_persons(text: str, limit: int = 200_000) -> list[str]:
     def add(name: str) -> None:
         name = re.sub(r"\s+", " ", name).strip(" .,-")
         name = re.sub(r"\s+\d+$", "", name)
+        name = re.sub(r"^[:;\s]+", "", name)
         if not name or len(name) < 3:
             return
         low = name.lower()
@@ -122,6 +123,7 @@ def resolve_firm(form: str, text: str, filers: list[str]) -> dict:
     blob = f"{text}\n{' '.join(filers)}"
     registry_id = match_firm_id(blob)
     primary = filers[0] if filers else ""
+    primary = re.sub(r"^[:;\s]+", "", primary).strip()
     if registry_id:
         return {
             "firm_id": registry_id,

@@ -52,6 +52,8 @@
 | `semper_bkrb_2017` | Semper Augustus Investments Group | BKRB | `BKRB/investor-documents/research-notes/Semper_Augustus_2017_double-double-berkshire-charmed-by-tax-deed.pdf` | **2026-06-18** (human: yes - Berkshire deep-dive / tax and valuation context) |
 | `semper_bkrb_2016` | Semper Augustus Investments Group | BKRB | `BKRB/investor-documents/research-notes/Semper_Augustus_2016_sympathy-for-the-dog-brief-berkshire-redux.pdf` | **2026-06-18** (human: yes - Berkshire deep-dive / investment case context) |
 | `semper_bkrb_2015` | Semper Augustus Investments Group | BKRB | `BKRB/investor-documents/research-notes/Semper_Augustus_2015_party-like-1999-deep-dive-into-berkshire-hathaway.pdf` | **2026-06-18** (human: yes - foundational Berkshire deep dive) |
+| `apld_oasis_13d` | Oasis Management (SC 13D/A) | APLD | `APLD/third-party-analyses/activist_reports_index.json` | **2026-07-01** (human: yes — activist governance context; SEC filings in `activist_reports/long/`) |
+| `apld_wolfpack_short` | Wolfpack Research short cache (Jul 2023) | APLD | `APLD/third-party-analyses/short_reports/wolfpack_2023-07.md` | **2026-07-01** (human: yes — stale forensic short; context only, not base IRR) |
 
 ---
 

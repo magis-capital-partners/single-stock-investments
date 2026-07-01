@@ -225,6 +225,11 @@ endif
 	$(PYTHON) $(SCRIPTS)/build_activist_feed.py
 	@echo OK: activist-reconcile
 
+activist-cleanup:
+	$(PYTHON) $(SCRIPTS)/cleanup_activist_false_positives.py
+	$(PYTHON) $(SCRIPTS)/build_activist_feed.py
+	@echo OK: activist-cleanup
+
 hk-scan:
 ifndef TICKER
 	$(error Set TICKER= e.g. make hk-scan TICKER=TPL)

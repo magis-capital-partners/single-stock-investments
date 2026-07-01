@@ -10,13 +10,14 @@ from activist_common import (
     active_firms,
     activist_reports_dir,
     load_ticker_index,
+    match_report_to_ticker,
     now_iso,
     rel,
     safe_report_filename,
     save_ticker_index,
-    text_matches_ticker,
     ticker_meta,
     upsert_report,
+    url_target_mismatch,
 )
 from activist_site_fetchers import fetch_firm_reports
 
@@ -62,7 +63,10 @@ def scan_firm_site(firm: dict, tickers: list[str], *, dry_run: bool = False) -> 
         meta = ticker_meta(ticker)
         for link in links:
             blob = f"{link['title']} {link['url']}"
-            if not text_matches_ticker(blob, meta):
+            if url_target_mismatch(link["url"], link["title"], meta):
+                continue
+            matched, confidence, reason = match_report_to_ticker(blob, meta)
+            if not matched or confidence < 0.9:
                 continue
             report_date = _guess_date(link)
             ext = ".pdf" if link["url"].lower().endswith(".pdf") else ".html"
