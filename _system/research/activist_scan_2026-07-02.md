@@ -14,7 +14,7 @@
 | ALS.TO | 0 | 6 | 2026-01-01 | 6 indexed |
 | AMD | 2 | 2 | 2023-01-01 | 4 indexed |
 | AMZN | 0 | 0 | — | no hits |
-| APLD | 7 | 0 | 2024-11-29 | 7 indexed |
+| APLD | 8 | 0 | 2024-11-29 | 8 indexed |
 | ASX.AX | 0 | 1 | — | 1 indexed |
 | AZLCZ | 0 | 1 | — | 1 indexed |
 | B3SA3.SA | 0 | 0 | — | no hits |
@@ -65,6 +65,7 @@
 | LB | 0 | 1 | — | 1 indexed |
 | LMNR | 0 | 1 | — | 1 indexed |
 | LSEG | 0 | 4 | — | 4 indexed |
+| MCO | 4 | 0 | 2024-02-14 | 4 indexed |
 | META | 0 | 0 | — | no hits |
 | MIAX | 0 | 0 | — | no hits |
 | MRSH | 3 | 3 | 2026-01-01 | 6 indexed |
