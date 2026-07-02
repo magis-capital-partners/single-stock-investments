@@ -74,6 +74,9 @@ regenerate_dashboard_json() {
     "$PYTHON" _system/scripts/build_insights.py
     git add _system/reference/data-sources/insights_record_archive.json 2>/dev/null || true
   fi
+  if [ -f "_system/scripts/build_activist_feed.py" ]; then
+    "$PYTHON" _system/scripts/build_activist_feed.py
+  fi
   "$PYTHON" _system/scripts/build_dashboard_data.py
   git add dashboard/data/ 2>/dev/null || true
   git add docs/data/ 2>/dev/null || true
