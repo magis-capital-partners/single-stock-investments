@@ -250,7 +250,9 @@ def build_feed() -> dict:
         if unreconciled:
             summary["unreconciled_count"] += 1
         for report in visible:
-            local = report.get("local_pdf") or report.get("local_file")
+            local_pdf = report.get("local_pdf")
+            local_file = report.get("local_file") or local_pdf
+            local_is_pdf = bool(local_pdf)
             row = {
                 "ticker": ticker,
                 "firm_id": report.get("firm_id"),
@@ -260,8 +262,10 @@ def build_feed() -> dict:
                 "title": report.get("title"),
                 "source": report.get("source"),
                 "source_url": report.get("source_url"),
-                "local_pdf": local,
-                "github_url": github_blob(local),
+                "local_file": local_file,
+                "local_pdf": local_pdf,
+                "local_is_pdf": local_is_pdf,
+                "github_url": github_blob(local_pdf) if local_pdf else None,
                 "status": report.get("status"),
                 "tier": report.get("tier", "context"),
                 "confidence": report.get("confidence"),

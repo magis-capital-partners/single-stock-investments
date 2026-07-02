@@ -62,6 +62,25 @@
       </div>`;
   }
 
+  function isPdfReport(row) {
+    if (row?.local_is_pdf) return true;
+    const path = row?.local_pdf || row?.github_url || '';
+    return /\.pdf(\?|#|$)/i.test(String(path));
+  }
+
+  function renderReportLinks(row, linkHtml) {
+    if (isPdfReport(row) && row.github_url) {
+      return linkHtml(row.github_url, 'PDF', 'source-open-link');
+    }
+    if (row.source_url) {
+      return linkHtml(row.source_url, 'Source', 'source-open-link');
+    }
+    if (row.github_url) {
+      return linkHtml(row.github_url, 'Source', 'source-open-link');
+    }
+    return '—';
+  }
+
   function sortFeedRows(rows) {
     return rows.slice().sort((a, b) => {
       const da = a.report_date || '';
@@ -124,10 +143,7 @@
               <td>${firmDisplay(r)}${reviewBadge}</td>
               <td>${state.escapeHtml(r.title || '—')}${groupBadge}</td>
               <td>${state.escapeHtml(r.source || '—')}${r.status === 'new' ? ' <span class="badge badge-warn">new</span>' : ''}</td>
-              <td>
-                ${r.github_url ? state.linkHtml(r.github_url, 'PDF', 'source-open-link') : ''}
-                ${r.source_url ? state.linkHtml(r.source_url, 'Source', 'source-open-link') : ''}
-              </td>
+              <td>${renderReportLinks(r, state.linkHtml)}</td>
             </tr>`;
           }).join('')}
         </tbody>
