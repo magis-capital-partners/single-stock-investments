@@ -1,13 +1,12 @@
 # DHR — Activist reconciliation (Milly mechanical)
 
 **Date:** 2026-07-02
-**Pending reports reconciled:** 9
+**Pending reports reconciled:** 8
 
 ## Summary
 
 | Firm | Side | Date | Class | Verdict | Path |
 |------|------|------|-------|---------|------|
-| spruce | short | 2019-01-01 | local_cached | needs_human | `DHR/third-party-analyses/activist_reports/short/spruce_point_2019-01-01_canadian-tire-corporation-ltd.html` |
 | spruce | short | 2019-01-01 | local_cached | needs_human | `DHR/third-party-analyses/activist_reports/short/spruce_point_2019-01-01_canadian-tire-corporation-ltd.html` |
 | ) DANAHER CORPORATION | long | 2026-02-17 | activist_proxy | needs_human | `DHR/third-party-analyses/activist_reports/long/DFAN14A_20260217_acc0001193125_26_055065.htm` |
 | ) DANAHER CORPORATION | long | 2026-02-27 | activist_proxy | needs_human | `DHR/third-party-analyses/activist_reports/long/DFAN14A_20260227_acc0001193125_26_082686.htm` |
@@ -18,8 +17,6 @@
 | I.R.S. Identification Nos. of above persons (entities only). Mitchell P. Rales | long | 2020-05-12 | activist_13d | needs_human | `DHR/third-party-analyses/activist_reports/long/SC-13D_20200512_acc0001193125_20_140405.htm` |
 
 ## Notes
-
-**spruce** (2019-01-01): <!DOCTYPE html><!-- Last Published: Mon Dec 01 2025 19:36:38 GMT+0000 (Coordinated Universal Time) --><html data-wf-domain="www.sprucepointcap.com" data-wf-page="656f8337d19d02e2b72142ec" data-wf-site="64caafa9c43c9fcf5b7b0d92" lang="en" data-wf-collection="656f8337d19d02e2b72143…
 
 **spruce** (2019-01-01): <!DOCTYPE html><!-- Last Published: Mon Dec 01 2025 19:36:38 GMT+0000 (Coordinated Universal Time) --><html data-wf-domain="www.sprucepointcap.com" data-wf-page="656f8337d19d02e2b72142ec" data-wf-site="64caafa9c43c9fcf5b7b0d92" lang="en" data-wf-collection="656f8337d19d02e2b72143…
 

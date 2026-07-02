@@ -1,13 +1,12 @@
 # HKHC — Activist reconciliation (Milly mechanical)
 
 **Date:** 2026-07-02
-**Pending reports reconciled:** 17
+**Pending reports reconciled:** 16
 
 ## Summary
 
 | Firm | Side | Date | Class | Verdict | Path |
 |------|------|------|-------|---------|------|
-| spruce | short | 2019-01-01 | local_cached | needs_human | `HKHC/third-party-analyses/activist_reports/short/spruce_point_2019-01-01_canadian-tire-corporation-ltd.html` |
 | spruce | short | 2019-01-01 | local_cached | needs_human | `HKHC/third-party-analyses/activist_reports/short/spruce_point_2019-01-01_canadian-tire-corporation-ltd.html` |
 | S.S. OR | long | 2019-01-31 | activist_13d | needs_human | `HKHC/third-party-analyses/activist_reports/long/SC-13D/A_20190131_acc0001144204_19_004098.htm` |
 | IsZo Capital LP | long | 2019-11-04 | activist_13d | needs_human | `HKHC/third-party-analyses/activist_reports/long/SC-13D/A_20191104_acc0001013594_19_000670.htm` |
@@ -26,8 +25,6 @@
 | S I.R.S. IDENTIFICATION NOS. OF ABOVE PERSONS (ENTITIES ONLY) AMG 401K Trust | long | 2023-01-11 | activist_13d | needs_human | `HKHC/third-party-analyses/activist_reports/long/SC-13D_20230111_acc0001961261_23_000001.txt` |
 
 ## Notes
-
-**spruce** (2019-01-01): <!DOCTYPE html><!-- Last Published: Mon Dec 01 2025 19:36:38 GMT+0000 (Coordinated Universal Time) --><html data-wf-domain="www.sprucepointcap.com" data-wf-page="656f8337d19d02e2b72142ec" data-wf-site="64caafa9c43c9fcf5b7b0d92" lang="en" data-wf-collection="656f8337d19d02e2b72143…
 
 **spruce** (2019-01-01): <!DOCTYPE html><!-- Last Published: Mon Dec 01 2025 19:36:38 GMT+0000 (Coordinated Universal Time) --><html data-wf-domain="www.sprucepointcap.com" data-wf-page="656f8337d19d02e2b72142ec" data-wf-site="64caafa9c43c9fcf5b7b0d92" lang="en" data-wf-collection="656f8337d19d02e2b72143…
 

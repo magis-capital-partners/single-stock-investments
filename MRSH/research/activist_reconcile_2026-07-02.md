@@ -1,30 +1,18 @@
 # MRSH — Activist reconciliation (Milly mechanical)
 
 **Date:** 2026-07-02
-**Pending reports reconciled:** 5
+**Pending reports reconciled:** 4
 
 ## Summary
 
 | Firm | Side | Date | Class | Verdict | Path |
 |------|------|------|-------|---------|------|
 | Grizzly Research | short | 2026-01-01 | local_cached | needs_human | `MRSH/third-party-analyses/activist_reports/short/grizzly_2026-01-01_academic-studies-find-that-public-compan.html` |
-| Grizzly Research | short | 2026-01-01 | local_cached | needs_human | `MRSH/third-party-analyses/activist_reports/short/grizzly_2026-01-01_academic-studies-find-that-public-compan.html` |
 | Elliott Management | long | 2022-02-07 | registry_13g | needs_human | `MRSH/third-party-analyses/activist_reports/long/SC-13G/A_20220207_acc0000945621_22_000065.htm` |
 | Elliott Management | long | 2023-02-08 | registry_13g | needs_human | `MRSH/third-party-analyses/activist_reports/long/SC-13G/A_20230208_acc0000945621_23_000060.htm` |
 | Elliott Management | long | 2024-02-08 | registry_13g | needs_human | `MRSH/third-party-analyses/activist_reports/long/SC-13G/A_20240208_acc0000945621_24_000206.htm` |
 
 ## Notes
-
-**Grizzly Research** (2026-01-01): <!DOCTYPE html>
-<html lang="en-US">
-<head>
-	<meta charset="UTF-8" />
-
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-
-    <link rel="profile" href="https://gmpg.org/xfn/11" />
-
-    <meta name="google-site-verification" content="PNpuy0syWqSYs8OacrpYR8Euq…
 
 **Grizzly Research** (2026-01-01): <!DOCTYPE html>
 <html lang="en-US">

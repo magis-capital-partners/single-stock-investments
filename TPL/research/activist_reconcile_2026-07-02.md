@@ -1,13 +1,12 @@
 # TPL — Activist reconciliation (Milly mechanical)
 
 **Date:** 2026-07-02
-**Pending reports reconciled:** 9
+**Pending reports reconciled:** 8
 
 ## Summary
 
 | Firm | Side | Date | Class | Verdict | Path |
 |------|------|------|-------|---------|------|
-| spruce | short | 2019-01-01 | local_cached | needs_human | `TPL/third-party-analyses/activist_reports/short/spruce_point_2019-01-01_canadian-tire-corporation-ltd.html` |
 | spruce | short | 2019-01-01 | local_cached | needs_human | `TPL/third-party-analyses/activist_reports/short/spruce_point_2019-01-01_canadian-tire-corporation-ltd.html` |
 | Horizon Kinetics Asset Management LLC 13-3776334 | long | 2023-01-27 | activist_13d | needs_human | `TPL/third-party-analyses/activist_reports/long/SC-13D/A_20230127_acc0001056823_23_000001.htm` |
 | s Horizon Kinetics Asset Management LLC | long | 2023-08-01 | activist_13d | needs_human | `TPL/third-party-analyses/activist_reports/long/SC-13D/A_20230801_acc0001056823_23_000043.htm` |
@@ -18,8 +17,6 @@
 | Bulldog Investors | long | 2024-01-22 | activist_13d | needs_human | `TPL/third-party-analyses/activist_reports/long/SC-13D_20240122_acc0001398344_24_000853.htm` |
 
 ## Notes
-
-**spruce** (2019-01-01): <!DOCTYPE html><!-- Last Published: Mon Dec 01 2025 19:36:38 GMT+0000 (Coordinated Universal Time) --><html data-wf-domain="www.sprucepointcap.com" data-wf-page="656f8337d19d02e2b72142ec" data-wf-site="64caafa9c43c9fcf5b7b0d92" lang="en" data-wf-collection="656f8337d19d02e2b72143…
 
 **spruce** (2019-01-01): <!DOCTYPE html><!-- Last Published: Mon Dec 01 2025 19:36:38 GMT+0000 (Coordinated Universal Time) --><html data-wf-domain="www.sprucepointcap.com" data-wf-page="656f8337d19d02e2b72142ec" data-wf-site="64caafa9c43c9fcf5b7b0d92" lang="en" data-wf-collection="656f8337d19d02e2b72143…
 

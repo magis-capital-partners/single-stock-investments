@@ -1,7 +1,7 @@
 # OR — Activist reconciliation (Milly mechanical)
 
 **Date:** 2026-07-02
-**Pending reports reconciled:** 11
+**Pending reports reconciled:** 9
 
 ## Summary
 
@@ -10,8 +10,6 @@
 | Viceroy Research | short | 2026-01-01 | local_cached | needs_human | `OR/third-party-analyses/activist_reports/short/viceroy_2026-01-01_vedanta-gets-raided.html` |
 | Viceroy Research | short | 2026-01-01 | local_cached | needs_human | `OR/third-party-analyses/activist_reports/short/viceroy_2026-01-01_non-executive-executive-co-chairman.html` |
 | Viceroy Research | short | 2026-01-01 | local_cached | needs_human | `OR/third-party-analyses/activist_reports/short/viceroy_2026-01-01_abaxx-some-assembly-required.html` |
-| Viceroy Research | short | 2026-01-01 | publisher_report | needs_human | `OR/third-party-analyses/activist_reports/short/viceroy_2026-01-01_vedanta-gets-raided.html` |
-| Viceroy Research | short | 2026-01-01 | local_cached | needs_human | `OR/third-party-analyses/activist_reports/short/viceroy_2026-01-01_vedanta-gets-raided.html` |
 | CDP Investissements Inc. | long | 2021-07-07 | activist_13d | needs_human | `OR/third-party-analyses/activist_reports/long/SC-13D/A_20210707_acc0001140361_21_023625.htm` |
 | CDP Investissements Inc. | long | 2021-07-16 | activist_13d | needs_human | `OR/third-party-analyses/activist_reports/long/SC-13D/A_20210716_acc0001140361_21_024617.htm` |
 | CDP Investissements Inc. | long | 2022-11-14 | activist_13d | needs_human | `OR/third-party-analyses/activist_reports/long/SC-13D/A_20221114_acc0001140361_22_041145.htm` |
@@ -44,22 +42,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Abaxx: Some Assembly Required</title>
     <meta name="description" content="Abaxx did not build the Abaxx Exchange. It rented o…
-
-**Viceroy Research** (2026-01-01): <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vedanta Gets Raided </title>
-    <meta name="description" content="Vedanta Limited was raided by the Enforcement Directorate (E…
-
-**Viceroy Research** (2026-01-01): <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vedanta Gets Raided </title>
-    <meta name="description" content="Vedanta Limited was raided by the Enforcement Directorate (E…
 
 **CDP Investissements Inc.** (2021-07-07): <DOCUMENT>
 <TYPE>SC 13D/A
