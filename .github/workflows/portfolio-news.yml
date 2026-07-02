@@ -44,11 +44,16 @@ jobs:
       PORTFOLIO_NEWS_MAX_PAGES: "15"
       PORTFOLIO_NEWS_GOOGLE_MAX_PER_QUERY: "50"
     steps:
-      - name: Checkout (sparse — news JSON only)
-        uses: ./.github/actions/checkout-workspace
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@main
         with:
-          profile: news
+          tool-cache: false
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
           ref: main
+          fetch-depth: 1
 
       - name: Set up Python
         uses: actions/setup-python@v5
