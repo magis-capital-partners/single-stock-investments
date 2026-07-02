@@ -29,6 +29,11 @@ on:
         required: false
         type: boolean
         default: false
+      skip_rebuild:
+        description: "Deploy committed dashboard/ as-is (no Python rebuild; use for config-only changes)"
+        required: false
+        type: boolean
+        default: false
   workflow_run:
     workflows:
       - Marvin Onboard Ticker
@@ -71,6 +76,10 @@ jobs:
     outputs:
       changed: ${{ steps.check.outputs.changed }}
     steps:
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -118,9 +127,26 @@ jobs:
       name: github-pages
       url: ${{ steps.publish.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+      - name: Checkout (config-only deploy)
+        if: github.event_name == 'workflow_dispatch' && inputs.skip_rebuild == true
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: dashboard
+          sparse-checkout-cone-mode: true
+      - name: Checkout (full rebuild)
+        if: github.event_name != 'workflow_dispatch' || inputs.skip_rebuild != true
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
       - id: publish
         uses: ./.github/actions/publish-dashboard
+        with:
+          skip_rebuild: ${{ github.event_name == 'workflow_dispatch' && inputs.skip_rebuild == true && 'true' || 'false' }}
         env:
           OAUTH_CLIENT_ID: ${{ vars.OAUTH_CLIENT_ID }}
           OAUTH_PROXY_URL: ${{ vars.OAUTH_PROXY_URL }}

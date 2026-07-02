@@ -49,8 +49,15 @@ jobs:
     timeout-minutes: 20
 
     steps:
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          sparse-checkout: _system/ci_autofix
+          sparse-checkout-cone-mode: true
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
