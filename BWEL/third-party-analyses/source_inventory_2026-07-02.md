@@ -1,7 +1,7 @@
 # BWEL — Third-party source inventory
 
 **Date:** 2026-07-02
-**Sources:** 7 total (0 approved, 4 pending, 3 context)
+**Sources:** 6 total (0 approved, 4 pending, 2 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -11,6 +11,5 @@
 | research_note | Arax_Wartzman_2003_The_King_of_California_SOURCE.md | `BWEL/investor-documents/research-notes/Arax_Wartzman_2003_The_King_of_California_SOURCE.md` | pending | investor-documents/research-notes |
 | research_note | King_of_California_OL_search_excerpts.md | `BWEL/investor-documents/research-notes/King_of_California_OL_search_excerpts.md` | pending | investor-documents/research-notes |
 | research_note | README.md | `BWEL/investor-documents/research-notes/README.md` | pending | investor-documents/research-notes |
-| activist_short | viceroy | `BWEL/third-party-analyses/activist_reports/short/viceroy_2026-01-01_osc-and-ciro.html` | context | activist/short — local |
 
 Cross-check required: `BWEL/research/cross_check_third_party_2026-07-02.md`

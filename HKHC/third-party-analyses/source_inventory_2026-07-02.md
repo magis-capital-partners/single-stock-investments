@@ -1,14 +1,10 @@
 # HKHC — Third-party source inventory
 
 **Date:** 2026-07-02
-**Sources:** 19 total (0 approved, 0 pending, 19 context)
+**Sources:** 15 total (0 approved, 0 pending, 15 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
-| activist_short | Sep 18, 2025 | `HKHC/third-party-analyses/activist_reports/short/spruce_point_2025-01-01_uranium-energy-corporation.html` | context | activist/short — publisher_site |
-| activist_short | 2019 01 01 canadian tire corporation ltd | `HKHC/third-party-analyses/activist_reports/short/spruce_point_2019-01-01_canadian-tire-corporation-ltd.html` | context | activist/short — local |
-| activist_short | grizzly | `HKHC/third-party-analyses/activist_reports/short/grizzly_2026-01-01_pghn-appendix.html` | context | activist/short — local |
-| activist_short | viceroy | `HKHC/third-party-analyses/activist_reports/short/viceroy_2026-01-01_vedanta-gets-raided.html` | context | activist/short — local |
 | activist_long | S.S. OR — SC 13D/A | `HKHC/third-party-analyses/activist_reports/long/SC-13D/A_20190131_acc0001144204_19_004098.htm` | context | activist/long — sec_edgar |
 | activist_long | IsZo Capital LP — SC 13D/A | `HKHC/third-party-analyses/activist_reports/long/SC-13D/A_20191104_acc0001013594_19_000670.htm` | context | activist/long — sec_edgar |
 | activist_long | I.R.S. IDENTIFICATION NOS. OF ABOVE PERSONS (... — SC 13D/A | `HKHC/third-party-analyses/activist_reports/long/SC-13D/A_20191213_acc0001104659_19_072273.htm` | context | activist/long — sec_edgar |

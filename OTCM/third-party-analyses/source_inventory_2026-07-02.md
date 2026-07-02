@@ -1,7 +1,7 @@
 # OTCM — Third-party source inventory
 
 **Date:** 2026-07-02
-**Sources:** 10 total (0 approved, 1 pending, 9 context)
+**Sources:** 7 total (0 approved, 1 pending, 6 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -12,8 +12,5 @@
 | activist_short | 2017 01 01 block bloomberg markets discussing lates | `OTCM/third-party-analyses/activist_reports/short/muddy_waters_2017-01-01_block-bloomberg-markets-discussing-lates.html` | context | activist/short — local |
 | activist_short | 2017 01 01 block on bloomberg markets noble | `OTCM/third-party-analyses/activist_reports/short/muddy_waters_2017-01-01_block-on-bloomberg-markets-noble.html` | context | activist/short — local |
 | activist_short | 2018 01 01 weis markets inc | `OTCM/third-party-analyses/activist_reports/short/spruce_point_2018-01-01_weis-markets-inc.html` | context | activist/short — local |
-| activist_short | grizzly | `OTCM/third-party-analyses/activist_reports/short/grizzly_2026-01-01_pghn-appendix.html` | context | activist/short — local |
-| activist_short | hindenburg | `OTCM/third-party-analyses/activist_reports/short/hindenburg_2024-01-01_pacs.html` | context | activist/short — local |
-| activist_short | viceroy | `OTCM/third-party-analyses/activist_reports/short/viceroy_2026-01-01_osc-and-ciro.html` | context | activist/short — local |
 
 Cross-check required: `OTCM/research/cross_check_third_party_2026-07-02.md`

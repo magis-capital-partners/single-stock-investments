@@ -1,14 +1,13 @@
 # CBRS — Activist reconciliation (Milly mechanical)
 
 **Date:** 2026-07-02
-**Pending reports reconciled:** 3
+**Pending reports reconciled:** 2
 
 ## Summary
 
 | Firm | Side | Date | Class | Verdict | Path |
 |------|------|------|-------|---------|------|
 | muddy | short | 2017-01-01 | local_cached | needs_human | `CBRS/third-party-analyses/activist_reports/short/muddy_waters_2017-01-01_block-bloomberg-markets-discussing-lates.html` |
-| spruce | short | 2019-01-01 | local_cached | needs_human | `CBRS/third-party-analyses/activist_reports/short/spruce_point_2019-01-01_monolithic-power-systems-inc.html` |
 | spruce | short | 2018-01-01 | local_cached | needs_human | `CBRS/third-party-analyses/activist_reports/short/spruce_point_2018-01-01_mercury-systems-inc.html` |
 
 ## Notes

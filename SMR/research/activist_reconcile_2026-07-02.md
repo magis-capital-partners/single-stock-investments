@@ -1,13 +1,12 @@
 # SMR — Activist reconciliation (Milly mechanical)
 
 **Date:** 2026-07-02
-**Pending reports reconciled:** 7
+**Pending reports reconciled:** 6
 
 ## Summary
 
 | Firm | Side | Date | Class | Verdict | Path |
 |------|------|------|-------|---------|------|
-| spruce | short | 2019-01-01 | local_cached | needs_human | `SMR/third-party-analyses/activist_reports/short/spruce_point_2019-01-01_plug-power-inc.html` |
 | spruce | short | 2019-01-01 | local_cached | needs_human | `SMR/third-party-analyses/activist_reports/short/spruce_point_2019-01-01_monolithic-power-systems-inc.html` |
 | s Fluor Enterprises, Inc. | long | 2022-11-08 | activist_13d | needs_human | `SMR/third-party-analyses/activist_reports/long/SC-13D/A_20221108_acc0001628280_22_028988.htm` |
 | Japan NuScale Innovation, LLC | long | 2022-11-10 | activist_13d | needs_human | `SMR/third-party-analyses/activist_reports/long/SC-13D/A_20221110_acc0001104659_22_116901.htm` |

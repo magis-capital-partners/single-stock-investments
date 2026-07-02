@@ -1,7 +1,7 @@
 # CBOE — Activist reconciliation (Milly mechanical)
 
 **Date:** 2026-07-02
-**Pending reports reconciled:** 6
+**Pending reports reconciled:** 5
 
 ## Summary
 
@@ -12,7 +12,6 @@
 | muddy | short | 2017-01-01 | local_cached | needs_human | `CBOE/third-party-analyses/activist_reports/short/muddy_waters_2017-01-01_block-on-bloomberg-markets-china-interne.html` |
 | muddy | short | 2017-01-01 | local_cached | needs_human | `CBOE/third-party-analyses/activist_reports/short/muddy_waters_2017-01-01_block-bloomberg-markets-discussing-lates.html` |
 | muddy | short | 2017-01-01 | local_cached | needs_human | `CBOE/third-party-analyses/activist_reports/short/muddy_waters_2017-01-01_block-on-bloomberg-markets-noble.html` |
-| spruce | short | 2018-01-01 | local_cached | needs_human | `CBOE/third-party-analyses/activist_reports/short/spruce_point_2018-01-01_weis-markets-inc.html` |
 
 ## Notes
 

@@ -1,7 +1,7 @@
 # TPL — Third-party source inventory
 
 **Date:** 2026-07-02
-**Sources:** 20 total (19 approved, 1 pending, 0 context)
+**Sources:** 18 total (17 approved, 1 pending, 0 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -16,8 +16,6 @@
 | reference | `_system/reference/investment-wisdom/horizon-kinetics/HK-Q1- | `_system/reference/investment-wisdom/horizon-kinetics/HK-Q1-2026-Commentary-extract.txt` | approved | Context (not in base IRR) |
 | reference | `_system/reference/investment-wisdom/horizon-kinetics/Stahl- | `_system/reference/investment-wisdom/horizon-kinetics/Stahl-Worth-The-Time-Predictive-Attributes-extract.txt` | approved | Context (not in base IRR) |
 | reference | `_system/reference/investment-wisdom/horizon-kinetics/HK-Q3- | `_system/reference/investment-wisdom/horizon-kinetics/HK-Q3-2025-Commentary-extract.txt` | approved | Context (not in base IRR) |
-| activist_short | Sep 18, 2025 | `TPL/third-party-analyses/activist_reports/short/spruce_point_2025-01-01_uranium-energy-corporation.html` | approved | activist/short — publisher_site |
-| activist_short | 2019 01 01 canadian tire corporation ltd | `TPL/third-party-analyses/activist_reports/short/spruce_point_2019-01-01_canadian-tire-corporation-ltd.html` | approved | activist/short — local |
 | activist_long | Horizon Kinetics Asset Management LLC 13-3776334 — SC 13D/A | `TPL/third-party-analyses/activist_reports/long/SC-13D/A_20230127_acc0001056823_23_000001.htm` | approved | activist/long — sec_edgar |
 | activist_long | s Horizon Kinetics Asset Management LLC — SC 13D/A | `TPL/third-party-analyses/activist_reports/long/SC-13D/A_20230801_acc0001056823_23_000043.htm` | approved | activist/long — sec_edgar |
 | activist_long | s Horizon Kinetics Asset Management LLC — SC 13D/A | `TPL/third-party-analyses/activist_reports/long/SC-13D/A_20231206_acc0001056823_23_000058.htm` | approved | activist/long — sec_edgar |
