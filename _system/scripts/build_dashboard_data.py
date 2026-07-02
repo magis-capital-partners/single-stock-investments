@@ -412,6 +412,7 @@ def build_document_catalog(document_registry: dict | None) -> dict | None:
             "by_ticker": dict(sorted(by_ticker.items())),
             "by_quarter": dict(sorted(by_quarter.items(), reverse=True)),
         },
+        "known_tickers": sorted(by_ticker.keys()),
         "documents": rows,
     }
     DOCUMENT_CATALOG_PATH.write_text(json.dumps(catalog, indent=2, sort_keys=True) + "\n", encoding="utf-8")
@@ -1797,6 +1798,7 @@ def main() -> None:
             "folder_index_generated_at": document_catalog.get("folder_index_generated_at"),
             "time_periods": document_catalog.get("time_periods"),
             "summary": document_catalog.get("summary"),
+            "known_tickers": document_catalog.get("known_tickers"),
             "documents": document_catalog.get("documents"),
         }
     persona_cal = _load_json(DATA_DIR / "persona_calibration.json")

@@ -772,7 +772,7 @@
   }
 
   function filterEvents(events, opts) {
-    const { search, bookOnly, period } = opts || {};
+    const { search, bookOnly, period, knownTickers } = opts || {};
     let list = events || [];
     if (period && !period.all) {
       list = list.filter(e => periodMatchesRecord(e, period, ['quarter', 'observed_at', 'date', 'as_of']));
@@ -781,14 +781,8 @@
       list = list.filter(e => e.in_our_book || e.portfolio_relevance >= 1);
     }
     if (search) {
-      const q = search.toLowerCase();
-      list = list.filter(e =>
-        (e.ticker || '').toLowerCase().includes(q)
-        || (e.title || '').toLowerCase().includes(q)
-        || (e.summary || '').toLowerCase().includes(q)
-        || (e.source_label || e.source || '').toLowerCase().includes(q)
-        || (e.impact_axis || '').toLowerCase().includes(q)
-      );
+      const tickers = knownTickers || [];
+      list = list.filter(e => SearchMatch.matchEvent(e, search, tickers));
     }
     return list;
   }
@@ -825,7 +819,7 @@
   }
 
   function filterTickerEssentials(tickers, opts) {
-    const { search, bookOnly, sourceFilter } = opts || {};
+    const { search, bookOnly, sourceFilter, knownTickers } = opts || {};
     let rows = tickers || [];
     if (bookOnly) {
       rows = rows.filter(t => t.in_holdings);
@@ -847,18 +841,8 @@
       });
     }
     if (search) {
-      const q = search.toLowerCase();
-      rows = rows.filter(t => {
-        const e = t.essential_insights || {};
-        const text = [
-          t.ticker,
-          t.company,
-          e.status?.label,
-          ...(e.source_mix || []),
-          ...((e.bullets || []).map(b => `${b.title || ''} ${b.summary || ''}`)),
-        ].join(' ').toLowerCase();
-        return text.includes(q);
-      });
+      const tickers = knownTickers || [];
+      rows = rows.filter(t => SearchMatch.matchTickerEssential(t, search, tickers));
     }
     return rows;
   }
@@ -976,8 +960,15 @@
     return row?.source_label || CATALOG_SOURCE_LABEL[row?.source_type] || 'Other PDFs';
   }
 
-  function sortDocumentCatalogRows(rows) {
+  function sortDocumentCatalogRows(rows, opts) {
+    const { search = '', knownTickers = [] } = opts || {};
+    const q = SearchMatch.normalizeQuery(search);
     return [...(rows || [])].sort((a, b) => {
+      if (q) {
+        const scoreDelta = SearchMatch.documentCatalogMatchScore(b, q, knownTickers)
+          - SearchMatch.documentCatalogMatchScore(a, q, knownTickers);
+        if (scoreDelta) return scoreDelta;
+      }
       const ad = a.document_date || '';
       const bd = b.document_date || '';
       if (ad && bd && ad !== bd) return bd.localeCompare(ad);
@@ -1000,7 +991,8 @@
       pdfSourceTab = 'all',
       pdfTimeMode = 'period',
     } = opts || {};
-    const q = search.toLowerCase();
+    const q = SearchMatch.normalizeQuery(search);
+    const knownTickers = SearchMatch.catalogKnownTickers(catalog);
     let rows = catalog?.documents || [];
     if (period && !period.all) {
       const fields = pdfTimeMode === 'upload'
@@ -1024,18 +1016,9 @@
       rows = rows.filter(r => r.ticker);
     }
     if (q) {
-      rows = rows.filter(r => [
-        r.ticker,
-        r.title,
-        r.source_label,
-        r.source_type,
-        r.quarter,
-        r.period_label,
-        r.document_date,
-        r.drive_folder_path,
-      ].join(' ').toLowerCase().includes(q));
+      rows = rows.filter(r => SearchMatch.matchDocumentCatalogRow(r, q, knownTickers));
     }
-    return sortDocumentCatalogRows(rows);
+    return sortDocumentCatalogRows(rows, { search: q, knownTickers });
   }
 
   function renderDocumentCatalog(catalog, escapeHtml, linkHtml, opts) {
@@ -1113,8 +1096,7 @@
   }
 
   function renderMemoryLedger(memory, escapeHtml, linkHtml, opts) {
-    const { search = '', bookOnly = false, period = null } = opts || {};
-    const q = search.toLowerCase();
+    const { search = '', bookOnly = false, period = null, knownTickers = [] } = opts || {};
     let rows = memory?.claim_ledger || [];
     if (period && !period.all) {
       rows = rows.filter(r => periodMatchesRecord(r, period, ['quarter', 'date', 'as_of', 'source_date']));
@@ -1122,8 +1104,8 @@
     if (bookOnly) {
       rows = rows.filter(r => r.claim_type === 'inflection' || r.claim_type === 'risk' || r.claim_type === 'ownership' || r.direction === 'bearish');
     }
-    if (q) {
-      rows = rows.filter(r => [r.ticker, r.claim, r.claim_type, r.source_title, r.source_type].join(' ').toLowerCase().includes(q));
+    if (search) {
+      rows = rows.filter(r => SearchMatch.matchMemoryClaim(r, search, knownTickers));
     }
     rows = rows.slice(0, 160);
     if (!rows.length) return '<p class="subhead">No research-memory claims match this view.</p>';
@@ -1197,7 +1179,7 @@
   }
 
   function filterLetterIndex(rows, opts) {
-    const { quarter, search, bookOnly, period } = opts || {};
+    const { quarter, search, bookOnly, period, knownTickers = [] } = opts || {};
     let list = rows || [];
     if (period && !period.all) {
       list = list.filter(r => periodMatchesRecord(r, period, ['quarter', 'letter_date']));
@@ -1208,13 +1190,7 @@
       list = list.filter(r => (r.our_overlap || []).length > 0);
     }
     if (search) {
-      const q = search.toLowerCase();
-      list = list.filter(r =>
-        (r.fund || '').toLowerCase().includes(q)
-        || (r.tickers || []).some(t => t.toLowerCase().includes(q))
-        || (r.our_overlap || []).some(t => t.toLowerCase().includes(q))
-        || (r.themes || []).some(t => t.toLowerCase().includes(q))
-      );
+      list = list.filter(r => SearchMatch.matchLetterIndexRow(r, search, knownTickers));
     }
     return list;
   }
@@ -1308,16 +1284,12 @@
   }
 
   function renderConsensus(consensus, escapeHtml, linkHtml, ghRepo, opts) {
-    const { quarter = 'all', bookOnly = false, search = '', period = null } = opts || {};
+    const { quarter = 'all', bookOnly = false, search = '', period = null, knownTickers = [] } = opts || {};
     if (!consensus || !consensus.by_quarter) {
       return '<p class="subhead">No consensus built yet. Run <span class="mono">python _system/scripts/build_insights.py</span>.</p>';
     }
     const { block, scope } = consensusBlockForPeriod(consensus, period, quarter);
-    const q = (search || '').toLowerCase();
-    const matchRow = r => !q
-      || (r.ticker || '').toLowerCase().includes(q)
-      || (r.name || '').toLowerCase().includes(q)
-      || (r.fund || '').toLowerCase().includes(q);
+    const matchRow = r => !search || SearchMatch.matchConsensusRow(r, search, knownTickers);
     const bookRow = r => !bookOnly || r.in_book;
     const most = (block.most_discussed || []).filter(r => bookRow(r) && matchRow(r));
     const changes = (block.biggest_changes || []).filter(r => bookRow(r) && matchRow(r));
@@ -1411,17 +1383,13 @@
     const timeModel = buildTimeModel(insights, documentCatalog);
     const period = periodFromSelection(quarter, timeModel);
     const themes = themesForPeriod(byQ, insights?.theme_rankings || [], period);
+    const knownTickers = SearchMatch.catalogKnownTickers(documentCatalog);
     let funds = insights?.fund_registry || [];
-    let letters = filterLetterIndex(letterIndex, { period, search: fundSearch, bookOnly });
+    let letters = filterLetterIndex(letterIndex, { period, search: fundSearch, bookOnly, knownTickers });
     const coverage = periodCoverage(period, timeModel, letterIndex, insights?.fund_registry || []);
 
     if (fundSearch) {
-      const q = fundSearch.toLowerCase();
-      funds = funds.filter(f =>
-        (f.fund || '').toLowerCase().includes(q)
-        || (f.our_tickers || []).some(t => t.toLowerCase().includes(q))
-        || (f.themes || []).some(t => t.toLowerCase().includes(q))
-      );
+      funds = funds.filter(f => SearchMatch.matchFundRegistryRow(f, fundSearch, knownTickers));
     }
     if (bookOnly) {
       funds = funds.filter(f => (f.our_ticker_count || 0) > 0);
@@ -1465,9 +1433,9 @@
     if (activeSection === 'overview') {
       body = renderSourceHealth(insights?.source_health || {}, escapeHtml);
     } else if (activeSection === 'events') {
-      body = renderEventQueue(insights?.events || [], escapeHtml, linkHtml, ghRepo, { search: fundSearch, bookOnly, period });
+      body = renderEventQueue(insights?.events || [], escapeHtml, linkHtml, ghRepo, { search: fundSearch, bookOnly, period, knownTickers });
     } else if (activeSection === 'consensus') {
-      body = renderConsensus(insights?.consensus, escapeHtml, linkHtml, ghRepo, { quarter, period, bookOnly, search: fundSearch });
+      body = renderConsensus(insights?.consensus, escapeHtml, linkHtml, ghRepo, { quarter, period, bookOnly, search: fundSearch, knownTickers });
     } else if (activeSection === 'letters') {
       body = `<p class="tier-sub" style="margin-bottom:8px">${letters.length} letter(s) &middot; ${escapeHtml(period.label)}${bookOnly ? ' &middot; overlap with our book only' : ''}</p>`
         + renderLetterIndex(letters, escapeHtml, linkHtml, ghRepo, true);
@@ -1483,9 +1451,9 @@
       });
     } else if (activeSection === 'tickers') {
       body = renderPortfolioMacroStrip(portfolioMacro, escapeHtml, linkHtml)
-        + renderTickerEssentials(tickers, escapeHtml, linkHtml, { search: fundSearch, bookOnly, sourceFilter: tickerSourceFilter });
+        + renderTickerEssentials(tickers, escapeHtml, linkHtml, { search: fundSearch, bookOnly, sourceFilter: tickerSourceFilter, knownTickers });
     } else if (activeSection === 'memory') {
-      body = renderMemoryLedger(memory, escapeHtml, linkHtml, { search: fundSearch, bookOnly, period })
+      body = renderMemoryLedger(memory, escapeHtml, linkHtml, { search: fundSearch, bookOnly, period, knownTickers })
         + '<div style="height:14px"></div>'
         + renderMemoryReviewQueue(memory, escapeHtml);
     } else if (activeSection === 'themes') {
