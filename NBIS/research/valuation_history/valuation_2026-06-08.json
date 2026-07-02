@@ -1,0 +1,575 @@
+{
+  "ticker": "NBIS",
+  "as_of": "2026-06-08",
+  "valuation_mode": "optionality",
+  "valuation_overlay": "segment_cashflow",
+  "method": "scenario",
+  "irr_method": "scenario",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "unproven",
+    "dhando": "none",
+    "cycle": "trough",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 227.81,
+    "price_source": "Yahoo NBIS close 2026-06-05",
+    "per_share": 0.12,
+    "fcf_source": "Continuing ops OCF $222M minus capex $83M FY2025 \u2248 $139M positive consolidated, but operating loss $286M on ~$96M revenue \u2014 base uses $0.12/sh normalized owner cash after GPU capex trough [Assumption]",
+    "shares_millions": 370.8,
+    "shares_source": "WeightedAverageNumberOfDilutedSharesOutstanding 370,839,686 FY2025 (20-F)",
+    "normalization_note": "Discontinued Yandex ops distort GAAP net income $241M; Lawrence path uses continuing AI cloud only. Deferred revenue $1.32B not in starting cash flow.",
+    "price_as_of": "2026-06-05"
+  },
+  "ai_overlay": {
+    "as_of": "2026-06-07",
+    "status": "partial",
+    "in_model": {
+      "continuing_revenue_m": 96,
+      "deferred_revenue_bn": 1.32,
+      "capex_fy2025_m": 83,
+      "long_term_debt_bn": 4.1,
+      "lawrence_starting_owner_cash_per_share": 0.12
+    },
+    "not_in_model_requires_refresh": [
+      "GPU backlog conversion schedule to revenue",
+      "Microsoft/Meta contract ramp timing in 20-F",
+      "Year-2 capex guide vs $807M prior-year build-out"
+    ],
+    "capex_stress_2026": {
+      "ocf_bn_assumption": 0.22,
+      "capex_bn": 1.5,
+      "implied_fcf_per_share": -3.45,
+      "notes": "Illustrative trough if capex re-accelerates \u2014 not Lawrence FCF0"
+    },
+    "ai_inflection_bull": {
+      "fcf_per_share_y0": 0.85,
+      "growth_y1_5": 0.45,
+      "growth_y6_10": 0.18,
+      "exit_pfcf_y10": 28,
+      "fcf_y0_note": "Backlog conversion + GPU utilization [Assumption]",
+      "computed_return_pct": 28.8
+    }
+  },
+  "optionality_gate": {
+    "framework": "ai_cloud_backlog",
+    "floor_pass": false,
+    "floor_metric": "deferred_revenue_per_share",
+    "floor_value": 3.56,
+    "primary_metric": "lawrence_base",
+    "primary_label": "7yr IRR",
+    "notes": "Deferred revenue $1.32B \u00f7 371M \u2248 $3.56/sh is obligation not owner cash; backlog informs bull only",
+    "primary_return_pct": -12.3
+  },
+  "segment_build": {
+    "horizon_years": 7,
+    "segments": [
+      {
+        "id": "ai_cloud",
+        "label": "AI cloud / GPU infrastructure (continuing ops)",
+        "type": "operating",
+        "owner_cash_y0_per_share": 0.12,
+        "growth_y1_5": 0.35,
+        "growth_y6_10": 0.15,
+        "exit_pfcf_y10": 22,
+        "evidence": "FY2025 continuing revenue ~$96M; deferred revenue $1.32B (20-F); operating loss $286M"
+      }
+    ],
+    "options": [
+      {
+        "id": "backlog_conversion",
+        "label": "Deferred revenue / contracted GPU backlog",
+        "option_treatment": "embedded_in_segment",
+        "annual_drag_per_share": 0,
+        "base_terminal_value_bn": 0,
+        "base_terminal_rationale": "Backlog conversion modeled in segment growth years 1-5, not separate terminal row",
+        "evidence": "DeferredRevenueNoncurrent $1,302M + current $16M (20-F FY2025)",
+        "not_in_lawrence_base": false
+      },
+      {
+        "id": "yandex_overhang",
+        "label": "Russia / legacy Yandex governance overhang",
+        "option_treatment": "zero",
+        "annual_drag_per_share": 0.08,
+        "base_terminal_value_bn": 0,
+        "base_terminal_rationale": "Discontinued ops largely divested; residual legal/governance risk \u2014 zero terminal",
+        "evidence": "20-F discontinued operations net income $540M FY2025; continuing focus AI infra",
+        "not_in_lawrence_base": true
+      }
+    ],
+    "corporate_drag": {
+      "alphabet_level_drag_per_share": 0.25,
+      "notes": "Interest on $4.1B long-term debt; GPU depreciation ramp"
+    }
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.1,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 12,
+      "notes": "Capex overruns; hyperscaler contract slippage; debt refinancing stress"
+    },
+    "base": {
+      "growth_y1_5": 0.35,
+      "growth_y6_10": 0.15,
+      "exit_pfcf_y10": 22,
+      "notes": "Deferred revenue converts over 3-5 years; Finland/US datacenter ramp per 20-F"
+    },
+    "bull": {
+      "growth_y1_5": 0.5,
+      "growth_y6_10": 0.2,
+      "exit_pfcf_y10": 30,
+      "notes": "Full backlog utilization; second-wave GPU clusters at contract pricing"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "GPU datacenter assets on balance sheet; equity $3.25B reflects spinoff capital structure"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / pipeline?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Deferred revenue $1.32B = contracted GPU capacity not yet in revenue (20-F)"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Continuing operating loss $286M on $96M revenue FY2025 \u2014 burden in starting owner cash"
+    },
+    {
+      "q": 4,
+      "question": "Backlog not in cash path?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Deferred revenue growth $1.57B cash-flow adjustment FY2023-25; conversion drives segment growth"
+    },
+    {
+      "q": 5,
+      "question": "Private stakes below fair value?",
+      "answer": "Partial",
+      "treatment": "milestone_nav",
+      "evidence": "Equity securities revaluation gain $599M FY2025 (20-F) \u2014 mark-to-market stakes, not core cloud"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No royalty trust or litigation recovery pattern"
+    },
+    {
+      "q": 7,
+      "question": "Embedded option in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "AI cloud revenue ramp already beginning; backlog accelerates growth assumption"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "GPU datacenter build-out converts $1.32B deferred revenue to operating cash; capex trough then normalization",
+    "base_growth_source": "20-F deferred revenue; [Assumption] 35% years 1-5 on $0.12/sh starting owner cash",
+    "status": "partial",
+    "theory_implied": {
+      "y1_5": 0.35,
+      "y6_10": 0.15,
+      "exit_pfcf_y10_segment_blend": 22.0,
+      "derivation": "segment_build owner-cash weighted blend (growth only; exit from scenarios.base)",
+      "segment_weights": [
+        {
+          "id": "ai_cloud",
+          "weight_pct": 100.0
+        }
+      ]
+    },
+    "lawrence_legacy": {
+      "y1_5": 0.35,
+      "y6_10": 0.15,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.35,
+      "y6_10": 0.15,
+      "exit_pfcf_y10": 22.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": -0.8929,
+      "as_of_filing_facts": "evidence/_text/20-F_20260430_rpt20251231_acc0001104659_26_052948.htm.txt"
+    },
+    "divergence": {
+      "theory_vs_lawrence_y1_5_pp": 0.0,
+      "falsifier_vs_theory_y1_5_pp": 0.0
+    }
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": false,
+      "floor_pass": false,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": null
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -31.7
+    },
+    "base": {
+      "return_pct": -12.3
+    },
+    "bull": {
+      "return_pct": -0.3
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -31.7
+    },
+    "base": {
+      "return_pct": -12.3
+    },
+    "bull": {
+      "return_pct": -0.3
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": -12.3
+    },
+    "falsifier_adjusted": {
+      "return_pct": -12.3
+    }
+  },
+  "implied_return": {
+    "base_pct": -10.62,
+    "label": "7yr IRR (total synthesis)",
+    "display": "-10.62% (total synthesis)",
+    "lawrence_stance_gate_pct": -12.3,
+    "falsifier_adjusted_pct": -12.3,
+    "synthesis_pct": -10.62
+  },
+  "overlay_results": [
+    {
+      "case": "AI inflection",
+      "method": "scenario (normalized FCF)",
+      "key_inputs": "FCF\u2080=$0.85 g1=45% g2=18% exit=28\u00d7",
+      "return_pct": 28.8,
+      "stance_gate": false,
+      "notes": "Backlog conversion + GPU utilization [Assumption]"
+    },
+    {
+      "case": "Capex stress Y0",
+      "method": "illustrative trough",
+      "key_inputs": "OCF 0.22B \u2212 capex 1.5B",
+      "return_pct": null,
+      "display": "FCF ~$-3.45/sh (not 7yr IRR)",
+      "stance_gate": false
+    }
+  ],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Segment-derived growth (pre-falsifier)",
+        "source": "segment_build weighted blend",
+        "return_pct": -12.3,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": -31.7,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": -0.3,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": -10.42,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": -10.62,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  },
+  "context_overlay": {
+    "as_of": "2026-06-25",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": -1.0,
+            "as_of": "2026-06-25",
+            "yoy_pct": -19.0,
+            "direction": "down",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.377999782562256,
+            "as_of": "2026-06-25",
+            "yoy_pct": 2.0,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.144000053405762,
+            "as_of": "2026-06-25",
+            "yoy_pct": 7.7,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 101.32599639892578,
+            "as_of": "2026-06-25",
+            "yoy_pct": 3.7,
+            "direction": "up",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 18.690000534057617,
+            "as_of": "2026-06-25",
+            "yoy_pct": 11.5,
+            "direction": "up",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": -3.18,
+            "as_of": "2026-06-25",
+            "yoy_pct": -60.6,
+            "direction": "down",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 16.48,
+            "as_of": "2026-06-25",
+            "yoy_pct": 60.8,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "insider_signal": {
+    "as_of": "2026-06-25",
+    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
+    "in_base_irr": false,
+    "window_days": 365,
+    "ics": 0.0,
+    "band": "negligible",
+    "bull_case_support": "none",
+    "scenario_confidence": {
+      "priors": {
+        "bear": 0.2,
+        "base": 0.55,
+        "bull": 0.25
+      },
+      "tilted": {
+        "bear": 0.28,
+        "base": 0.47,
+        "bull": 0.25
+      },
+      "bull_delta": 0.0,
+      "bear_delta": 0.08,
+      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
+    },
+    "factors": {
+      "buy_score": 0.0,
+      "sell_score": -1.0,
+      "cluster_bonus": 0.0,
+      "net_buy_usd": 0,
+      "net_sell_usd": 234073320.42,
+      "price_today": 227.81
+    },
+    "top_buys": [],
+    "top_sells": [
+      {
+        "insider": "Alonso Sanchez Maria del Dado",
+        "date": "2026-06-02",
+        "shares": 1509,
+        "price": 276.2002,
+        "value_usd": 416786.1,
+        "is_10b5_1": false,
+        "contrib": -0.175
+      },
+      {
+        "insider": "Volozh Arkadiy",
+        "date": "2026-04-01",
+        "shares": 33358,
+        "price": 103.7314,
+        "value_usd": 3460272.04,
+        "is_10b5_1": false,
+        "contrib": -0.135
+      },
+      {
+        "insider": "Boroditsky Marc",
+        "date": "2026-06-02",
+        "shares": 10776,
+        "price": 276.2002,
+        "value_usd": 2976333.36,
+        "is_10b5_1": false,
+        "contrib": -0.062
+      },
+      {
+        "insider": "Korolenko Andrey",
+        "date": "2026-05-13",
+        "shares": 500000,
+        "price": 203.24,
+        "value_usd": 101620000.0,
+        "is_10b5_1": false,
+        "contrib": -0.052
+      },
+      {
+        "insider": "Boynton John Wilson IV",
+        "date": "2026-06-15",
+        "shares": 100,
+        "price": 246.17,
+        "value_usd": 24617.0,
+        "is_10b5_1": true,
+        "contrib": -0.046
+      }
+    ],
+    "narrative_hooks": [],
+    "transaction_count": 35
+  },
+  "human_review": {
+    "live_price_confirmed": false
+  },
+  "lens_consensus": {
+    "as_of": "2026-06-08",
+    "shared_inputs_ref": "valuation.json@2026-06-08",
+    "valuation_richness": 1.0,
+    "blended_return_pct": -14.64,
+    "band_pct": [
+      -31.7,
+      -10.3
+    ],
+    "weighted_median_pct": -12.3,
+    "median_mean_flag": false,
+    "stance": "pass",
+    "agreement_pct": 100,
+    "dissent_count": 0,
+    "lawrence_divergence": false,
+    "top_dissents": [],
+    "contributor_count": 5,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
+  },
+  "total_return_panel": {
+    "as_of": "2026-06-11",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 0,
+    "distribution_history_sum": 0,
+    "market_cap_m": null,
+    "total_return_annualized_pct": 327.75,
+    "chart": "NBIS/research/charts/total_return_2026-06-11.svg",
+    "panel_json": "NBIS/research/total_return_panel.json"
+  }
+}

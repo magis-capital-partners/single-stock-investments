@@ -1,0 +1,473 @@
+{
+  "ticker": "CMSG",
+  "as_of": "2026-06-08",
+  "method": "scenario",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "unproven",
+    "dhando": "partial",
+    "cycle": "-"
+  },
+  "inputs": {
+    "price": 27.55,
+    "price_source": "Yahoo CMSG close 2026-06-05",
+    "per_share": 1.45,
+    "fcf_source": "Blended best estimate (65% Marvin $1.35 / 35% partial LCI seigniorage-treasury credit)",
+    "shares_millions": 2.25,
+    "normalization_note": "Primary metric = blended_best; marvin_floor retained for stress",
+    "price_as_of": "2026-06-05"
+  },
+  "estimates": {
+    "marvin_floor": {
+      "per_share": 1.35,
+      "return_pct": 7.7,
+      "exit_multiple": 14,
+      "growth_y1_5": 0.08,
+      "growth_y6_10": 0.05,
+      "notes": "Interest + breakeven mining; marks excluded"
+    },
+    "external": [
+      {
+        "source_id": "lci",
+        "source": "Lemon Cakes: FRMO crypto conglomerate + seigniorage",
+        "path": "CMSG/third-party-analyses/references.md",
+        "per_share": null,
+        "return_pct_approx": 18.8,
+        "horizon_years": 10,
+        "notes": "Treasury accrual framing; bull path if BTC re-rates"
+      },
+      {
+        "source_id": "ssi",
+        "source": "SSI: FRMO flywheel (CMSC listing)",
+        "path": "CMSG/third-party-analyses/references.md",
+        "per_share": null,
+        "return_pct_approx": null,
+        "notes": "Catalyst narrative; listing timeline stale vs OTCQX status"
+      }
+    ],
+    "blended_best": {
+      "per_share": 1.45,
+      "return_pct": 8.7,
+      "exit_multiple": 14,
+      "growth_y1_5": 0.08,
+      "growth_y6_10": 0.05,
+      "weights": "65% marvin_floor / 35% approved Substack (LCI/SSI)",
+      "notes": "approved_substacks.md; still below 15% bar"
+    }
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": -0.05,
+      "growth_y6_10": 0.0,
+      "exit_multiple": 8,
+      "notes": "BTC flat; hash-share erosion; related-party fees post-waiver"
+    },
+    "base": {
+      "growth_y1_5": 0.08,
+      "growth_y6_10": 0.05,
+      "exit_multiple": 14,
+      "notes": "Treasury marks normalize; modest scrypt offset; trading toward book value"
+    },
+    "bull": {
+      "growth_y1_5": 0.2,
+      "growth_y6_10": 0.1,
+      "exit_multiple": 18,
+      "notes": "BTC cycle recovery + network-share stabilization; NAV premium restored"
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -9.1
+    },
+    "base": {
+      "return_pct": 7.5
+    },
+    "bull": {
+      "return_pct": 21.1
+    }
+  },
+  "implied_return": {
+    "base_pct": 8.81,
+    "label": "7yr IRR (total synthesis)",
+    "display": "8.81% (total synthesis)",
+    "lawrence_stance_gate_pct": 7.5,
+    "falsifier_adjusted_pct": 7.5,
+    "synthesis_pct": 8.81
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "overlay_results": [],
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -9.1
+    },
+    "base": {
+      "return_pct": 7.5
+    },
+    "bull": {
+      "return_pct": 21.1
+    }
+  },
+  "book_estimate": {
+    "as_of": "2026-06-02",
+    "filing_period_end": "2025-12-31",
+    "filing_source": "investor-documents/otcmarkets/CMSG_OTCQX_Annual_Disclosure_2025-12-31.pdf",
+    "filed_book_per_share": 41.28,
+    "current_book_per_share": 37.89,
+    "delta_per_share": -3.39,
+    "delta_pct_of_filed_book": -8.22,
+    "discount_to_filed_book_pct": 27.3,
+    "discount_to_current_estimate_pct": 20.8,
+    "config_path": "CMSG/research/book_estimate_config.json",
+    "output_path": "CMSG/research/book_estimate.json"
+  },
+  "option_scan": [
+    {
+      "q": 0,
+      "question": "Material options after scan?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating compounder / croupier \u2014 Lawrence full cash-flow path sufficient"
+    }
+  ],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "marvin_floor",
+        "label": "Marvin floor (filings stress)",
+        "source": "estimates.marvin_floor",
+        "return_pct": 7.7,
+        "weight": 0.25,
+        "type": "numeric",
+        "epistemic_tier": "A (primary filings)",
+        "weight_why": "Stress floor from primary docs; anchors pessimistic bound.",
+        "hard_to_vary": "yes"
+      },
+      {
+        "id": "blended_best_primary",
+        "label": "Blended best estimate (Marvin + external)",
+        "source": "estimates.blended_best @ $1.45/sh",
+        "return_pct": 8.7,
+        "weight": 0.5,
+        "type": "numeric",
+        "notes": "65% marvin_floor / 35% approved Substack (LCI/SSI)",
+        "epistemic_tier": "B (triangulated best judgment)",
+        "weight_why": "Primary holding-period path after partial credit for approved external normalization.",
+        "hard_to_vary": "yes"
+      },
+      {
+        "id": "external_lci",
+        "label": "Lemon Cakes: FRMO crypto conglomerate + seigniorage",
+        "source": "CMSG/third-party-analyses/references.md",
+        "return_pct": 18.8,
+        "weight": 0.08,
+        "type": "numeric",
+        "notes": "Treasury accrual framing; bull path if BTC re-rates",
+        "epistemic_tier": "D (external context)",
+        "weight_why": "Triangulation lane; capped when already in blended_best to avoid double-count.",
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence envelope)",
+        "source": "scenarios.bear",
+        "return_pct": -9.1,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "hard_to_vary": "yes: asymmetric low weight is structural",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ]
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence envelope)",
+        "source": "scenarios.bull",
+        "return_pct": 21.1,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "hard_to_vary": "yes",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ]
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 9.01,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 8.81,
+    "human_approval": "approved",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  },
+  "lawrence_horizon_years": 7,
+  "evidence_refresh": {
+    "synthesis_in_dive": true
+  },
+  "context_overlay": {
+    "as_of": "2026-06-25",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": -1.0,
+            "as_of": "2026-06-25",
+            "yoy_pct": -19.0,
+            "direction": "down",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.377999782562256,
+            "as_of": "2026-06-25",
+            "yoy_pct": 2.0,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.144000053405762,
+            "as_of": "2026-06-25",
+            "yoy_pct": 7.7,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 101.32599639892578,
+            "as_of": "2026-06-25",
+            "yoy_pct": 3.7,
+            "direction": "up",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 18.690000534057617,
+            "as_of": "2026-06-25",
+            "yoy_pct": 11.5,
+            "direction": "up",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": -3.18,
+            "as_of": "2026-06-25",
+            "yoy_pct": -60.6,
+            "direction": "down",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 16.48,
+            "as_of": "2026-06-25",
+            "yoy_pct": 60.8,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "btc_overlay": {
+    "as_of": "2026-06-08",
+    "crypto_exposure": "miner",
+    "status": "partial",
+    "disclaimer": "Context only. Crypto and mining metrics inform stance and overlays; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "in_base_irr": false,
+    "themes": [
+      {
+        "theme_id": "btc_network_economics",
+        "label": "Bitcoin network and mining economics",
+        "indicators": [
+          {
+            "id": "btc_spot_usd",
+            "label": "Bitcoin spot (USD)",
+            "latest": 62752.0,
+            "as_of": "2026-06-08",
+            "yoy_pct": -40.7,
+            "direction": "down",
+            "source": "yahoo:BTC-USD",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "btc_hash_rate_eh",
+            "label": "Network hash rate (EH/s, 7d avg)",
+            "latest": 806.9019970486307,
+            "as_of": "2026-06-08",
+            "yoy_pct": null,
+            "direction": "flat",
+            "source": "mempool.space:hashrate",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "btc_difficulty",
+            "label": "Mining difficulty (index)",
+            "latest": 138955357012247.3,
+            "as_of": "2026-06-08",
+            "yoy_pct": null,
+            "direction": "flat",
+            "source": "mempool.space:difficulty",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "btc_avg_fee_per_block_usd",
+            "label": "Avg transaction fees per block (USD)",
+            "latest": 212.5768,
+            "as_of": "2026-06-08",
+            "yoy_pct": null,
+            "direction": "flat",
+            "source": "mempool.space:fees",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "btc_hashprice_usd_ph_day",
+            "label": "Hashprice (USD/PH/day)",
+            "latest": 0.035034,
+            "as_of": "2026-06-08",
+            "yoy_pct": null,
+            "direction": "flat",
+            "source": "computed:hashprice",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "btc_breakeven_power_30jth",
+            "label": "Breakeven power cost at 30 J/TH ($/kWh)",
+            "latest": 0.0487,
+            "as_of": "2026-06-08",
+            "yoy_pct": null,
+            "direction": "flat",
+            "source": "computed:breakeven_30.0jth",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ],
+    "mining_economics_context": {
+      "hash_rate_eh": 806.9019970486307,
+      "difficulty": 138955357012247.3,
+      "avg_fee_per_block_usd": 212.5768,
+      "hashprice_usd_ph_day": 0.035034,
+      "breakeven_power_usd_kwh_30jth": 0.0487,
+      "source": "mempool.space + computed"
+    },
+    "in_model": {},
+    "not_in_model_requires_refresh": [
+      "live_btc_spot_in_price_input",
+      "hashprice_vs_fleet_breakeven",
+      "post_halving_subsidy_schedule"
+    ]
+  },
+  "human_review": {
+    "live_price_confirmed": false
+  },
+  "lens_consensus": {
+    "as_of": "2026-06-08",
+    "shared_inputs_ref": "valuation.json@2026-06-08",
+    "valuation_richness": 0.5,
+    "blended_return_pct": 2.36,
+    "band_pct": [
+      -9.1,
+      9.5
+    ],
+    "weighted_median_pct": 7.5,
+    "median_mean_flag": true,
+    "stance": "pass",
+    "agreement_pct": 100,
+    "dissent_count": 0,
+    "lawrence_divergence": false,
+    "top_dissents": [],
+    "contributor_count": 7,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
+  },
+  "total_return_panel": {
+    "as_of": "2026-06-11",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 0,
+    "distribution_history_sum": 0,
+    "market_cap_m": null,
+    "total_return_annualized_pct": -13.0,
+    "chart": "CMSG/research/charts/total_return_2026-06-11.svg",
+    "panel_json": "CMSG/research/total_return_panel.json"
+  }
+}

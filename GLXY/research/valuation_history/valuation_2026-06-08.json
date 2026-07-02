@@ -1,0 +1,670 @@
+{
+  "ticker": "GLXY",
+  "as_of": "2026-06-08",
+  "method": "scenario",
+  "payoff_lens": "levered",
+  "valuation_mode": "optionality",
+  "valuation_overlay": "segment_cashflow",
+  "lawrence_bucket": "multi_sided",
+  "classification_inputs": {
+    "archetype": "platform",
+    "moat": "unproven",
+    "dhando": "partial",
+    "cycle": "trough",
+    "payoff_lens": "levered"
+  },
+  "inputs": {
+    "price": 25.14,
+    "price_source": "Yahoo GLXY close 2026-06-05",
+    "per_share": 1.05,
+    "fcf_source": "Mid-cycle fee + infrastructure owner cash ex treasury marks; marvin_floor = FY2025 adj EBITDA",
+    "shares_millions": 191,
+    "normalization_note": "FY2025 adj EBITDA $33.7M ($0.18/sh); base normalizes fee/AUM growth and partial HPC cash flow",
+    "price_as_of": "2026-06-05"
+  },
+  "estimates": {
+    "marvin_floor": {
+      "per_share": 0.18,
+      "return_pct": null,
+      "exit_multiple": 8,
+      "growth_y1_5": 0.05,
+      "growth_y6_10": 0.03,
+      "notes": "FY2025 Adjusted EBITDA $33.7M on ~191M Class A shares (10-K)"
+    },
+    "blended_best": {
+      "per_share": 1.05,
+      "return_pct": null,
+      "exit_multiple": 14,
+      "growth_y1_5": 0.12,
+      "growth_y6_10": 0.07,
+      "weights": "100% Marvin normalized base (no approved third party)",
+      "notes": "Filings-only blend; treasury marks excluded from owner-cash start"
+    }
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.0,
+      "growth_y6_10": 0.0,
+      "exit_pfcf_y10": 9,
+      "notes": "Crypto volume slump; HPC delays; treasury marks drag earnings"
+    },
+    "base": {
+      "growth_y1_5": 0.12,
+      "growth_y6_10": 0.07,
+      "exit_pfcf_y10": 14,
+      "notes": "Fee + staking revenue grow; Helios Phase I cash flow from H2 2026; marks neutral"
+    },
+    "bull": {
+      "growth_y1_5": 0.2,
+      "growth_y6_10": 0.1,
+      "exit_pfcf_y10": 18,
+      "notes": "Crypto cycle recovery + CoreWeave Phase II; GalaxyOne retail scale"
+    }
+  },
+  "segment_build": {
+    "horizon_years": 7,
+    "segments": [
+      {
+        "id": "digital_assets",
+        "label": "Digital Assets (Global Markets + Asset Management)",
+        "owner_cash_start_m": 95,
+        "growth_y1_5": 0.14,
+        "growth_y6_10": 0.08,
+        "exit_multiple": 14,
+        "evidence": "FY2025 fees $159M + blockchain rewards $220M; Q1 2026 fees $22M annualizing; AUM $12.3B (10-K)"
+      },
+      {
+        "id": "data_centers",
+        "label": "Data Centers (Helios / HPC)",
+        "owner_cash_start_m": 0,
+        "growth_y1_5": 0.35,
+        "growth_y6_10": 0.12,
+        "exit_multiple": 12,
+        "evidence": "No segment revenue FY2025; CoreWeave lease 133 MW IT load by H1 2026 (10-K)"
+      },
+      {
+        "id": "treasury_corporate",
+        "label": "Treasury and Corporate",
+        "owner_cash_start_m": -40,
+        "growth_y1_5": 0.0,
+        "growth_y6_10": 0.0,
+        "exit_multiple": 0,
+        "evidence": "Net loss on digital assets marks; corporate drag per segment note (10-K Note 24)"
+      }
+    ],
+    "options": [
+      {
+        "id": "helios_phase2",
+        "label": "Helios Phase II (393 MW IT load)",
+        "option_treatment": "probability_weighted",
+        "annual_drag_per_share": 0.0,
+        "base_terminal_value_bn": 0.4,
+        "base_terminal_rationale": "P_base 40% on ERCOT-approved capacity + CoreWeave Phase II lease; not in Lawrence FCF start",
+        "overlay_base_terminal_bn": 0.4,
+        "bull_terminal_value_bn": 1.2,
+        "evidence": "10-K: 600 MW gross for incremental 393 MW leased to CoreWeave",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "treasury_digital_assets",
+        "label": "Treasury digital asset portfolio",
+        "option_treatment": "nav_floor",
+        "annual_drag_per_share": 0.0,
+        "base_terminal_value_bn": 0.0,
+        "base_terminal_rationale": "Marks flow through earnings; excluded from Lawrence owner-cash \u2014 overlay uses fair-value sensitivity only",
+        "overlay_base_terminal_bn": 0.0,
+        "bull_terminal_value_bn": 0.5,
+        "evidence": "Q1 2026 digital assets $3.7B (10-Q); net gain/loss volatile",
+        "not_in_lawrence_base": true
+      }
+    ]
+  },
+  "nav_overlay": {
+    "as_of": "2026-06-03",
+    "status": "complete",
+    "enabled": true,
+    "method": "mark_to_market_treasury",
+    "gaap_book_per_share": 10.2,
+    "digital_assets_billions": 3.7,
+    "overlay_rationale": "Treasury digital assets marked to market on balance sheet; operating franchise valued separately in segment build; book not used as dhando floor",
+    "notes": "Total equity $3.0B includes treasury marks; not used as dhando floor"
+  },
+  "optionality_gate": {
+    "primary_metric": "lawrence_base",
+    "secondary_metric": "segment_overlay",
+    "notes": "Low Lawrence IRR valid if HPC option matures; watch until fee path clears 15% bar",
+    "primary_label": "7yr IRR",
+    "primary_return_pct": 6.2
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "nav_floor",
+      "evidence": "Treasury digital assets marked to market; operating franchise not on balance sheet at fair value"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Yes",
+      "treatment": "zero",
+      "evidence": "Data Centers pre-revenue FY2025; HPC capex drag until CoreWeave ramp"
+    },
+    {
+      "q": 5,
+      "question": "Private stakes below fair value?",
+      "answer": "Yes",
+      "treatment": "milestone_nav",
+      "evidence": "Venture and fund stakes in Treasury segment; marks in digital asset gains"
+    }
+  ],
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": true,
+      "floor_pass": false,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": null
+  },
+  "growth_explanation": {
+    "mechanism": "Fee and staking revenue scale with institutional crypto activity and $12.3B platform AUM; Helios HPC adds recurring lease cash from 2026; treasury marks excluded from base owner-cash path",
+    "sources": [
+      "GLXY/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001859392_26_000016.htm",
+      "GLXY/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001859392_26_000054.htm"
+    ],
+    "lawrence_legacy": {
+      "y1_5": 0.12,
+      "y6_10": 0.07,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.12,
+      "y6_10": 0.07,
+      "exit_pfcf_y10": 14.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": 0.4181,
+      "as_of_filing_facts": "evidence/_text/10-K_20260226_rpt20251231_acc0001859392_26_000016.htm.txt"
+    },
+    "status": "partial"
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -8.6
+    },
+    "base": {
+      "return_pct": 6.2
+    },
+    "bull": {
+      "return_pct": 15.8
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -8.6
+    },
+    "base": {
+      "return_pct": 6.2
+    },
+    "bull": {
+      "return_pct": 15.8
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": 6.2
+    },
+    "falsifier_adjusted": {
+      "return_pct": 6.2
+    }
+  },
+  "implied_return": {
+    "base_pct": 7.65,
+    "label": "7yr IRR (total synthesis)",
+    "display": "7.65% (total synthesis)",
+    "lawrence_stance_gate_pct": 6.2,
+    "falsifier_adjusted_pct": 6.2,
+    "synthesis_pct": 7.65
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Segment-derived growth (pre-falsifier)",
+        "source": "segment_build weighted blend",
+        "return_pct": 6.2,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": -8.6,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 15.8,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 7.85,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 7.65,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  },
+  "context_overlay": {
+    "as_of": "2026-06-25",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": -1.0,
+            "as_of": "2026-06-25",
+            "yoy_pct": -19.0,
+            "direction": "down",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.377999782562256,
+            "as_of": "2026-06-25",
+            "yoy_pct": 2.0,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.144000053405762,
+            "as_of": "2026-06-25",
+            "yoy_pct": 7.7,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 101.32599639892578,
+            "as_of": "2026-06-25",
+            "yoy_pct": 3.7,
+            "direction": "up",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 18.690000534057617,
+            "as_of": "2026-06-25",
+            "yoy_pct": 11.5,
+            "direction": "up",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": -3.18,
+            "as_of": "2026-06-25",
+            "yoy_pct": -60.6,
+            "direction": "down",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 16.48,
+            "as_of": "2026-06-25",
+            "yoy_pct": 60.8,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "insider_signal": {
+    "as_of": "2026-06-25",
+    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
+    "in_base_irr": false,
+    "window_days": 365,
+    "ics": 10.0,
+    "band": "exceptional",
+    "bull_case_support": "moderate",
+    "scenario_confidence": {
+      "priors": {
+        "bear": 0.2,
+        "base": 0.55,
+        "bull": 0.25
+      },
+      "tilted": {
+        "bear": 0.2,
+        "base": 0.4,
+        "bull": 0.4
+      },
+      "bull_delta": 0.15,
+      "bear_delta": 0.0,
+      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
+    },
+    "factors": {
+      "buy_score": 32.482,
+      "sell_score": -1.0,
+      "cluster_bonus": 0.0,
+      "net_buy_usd": 12231788.0,
+      "net_sell_usd": 257424160.14,
+      "price_today": 25.14
+    },
+    "top_buys": [
+      {
+        "insider": "DEASON DOUGLAS R",
+        "date": "2025-11-11",
+        "shares": 9000,
+        "price": 30.82,
+        "value_usd": 277380.0,
+        "shares_owned_after": 19000,
+        "contrib": 2.485
+      },
+      {
+        "insider": "DAFFEY MICHAEL D",
+        "date": "2026-05-22",
+        "shares": 250000,
+        "price": 16.54,
+        "value_usd": 4135000.0,
+        "shares_owned_after": 1755419,
+        "contrib": 2.398
+      },
+      {
+        "insider": "DAFFEY MICHAEL D",
+        "date": "2026-05-21",
+        "shares": 250000,
+        "price": 16.54,
+        "value_usd": 4135000.0,
+        "shares_owned_after": 1755419,
+        "contrib": 2.378
+      },
+      {
+        "insider": "DEASON DOUGLAS R",
+        "date": "2025-11-12",
+        "shares": 8000,
+        "price": 30.42,
+        "value_usd": 243360.0,
+        "shares_owned_after": 27000,
+        "contrib": 2.272
+      },
+      {
+        "insider": "Rico Robert Daniel",
+        "date": "2026-06-15",
+        "shares": 12000,
+        "price": 4.83,
+        "value_usd": 57960.0,
+        "shares_owned_after": 63934,
+        "contrib": 2.262
+      }
+    ],
+    "top_sells": [
+      {
+        "insider": "Novogratz Michael",
+        "date": "2026-06-01",
+        "shares": 4683,
+        "price": 29.58,
+        "value_usd": 138523.14,
+        "is_10b5_1": false,
+        "contrib": -0.225
+      },
+      {
+        "insider": "DAFFEY MICHAEL D",
+        "date": "2026-05-22",
+        "shares": 160765,
+        "price": 28.6599,
+        "value_usd": 4607508.82,
+        "is_10b5_1": false,
+        "contrib": -0.188
+      },
+      {
+        "insider": "DAFFEY MICHAEL D",
+        "date": "2026-05-22",
+        "shares": 89235,
+        "price": 29.2669,
+        "value_usd": 2611631.82,
+        "is_10b5_1": false,
+        "contrib": -0.188
+      },
+      {
+        "insider": "DAFFEY MICHAEL D",
+        "date": "2026-05-21",
+        "shares": 171076,
+        "price": 28.655,
+        "value_usd": 4902182.78,
+        "is_10b5_1": false,
+        "contrib": -0.187
+      },
+      {
+        "insider": "DAFFEY MICHAEL D",
+        "date": "2026-05-21",
+        "shares": 78924,
+        "price": 29.029,
+        "value_usd": 2291084.8,
+        "is_10b5_1": false,
+        "contrib": -0.187
+      }
+    ],
+    "narrative_hooks": [],
+    "transaction_count": 56
+  },
+  "btc_overlay": {
+    "as_of": "2026-06-08",
+    "crypto_exposure": "platform",
+    "status": "partial",
+    "disclaimer": "Context only. Crypto and mining metrics inform stance and overlays; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "in_base_irr": false,
+    "themes": [
+      {
+        "theme_id": "btc_network_economics",
+        "label": "Bitcoin network and mining economics",
+        "indicators": [
+          {
+            "id": "btc_spot_usd",
+            "label": "Bitcoin spot (USD)",
+            "latest": 62752.0,
+            "as_of": "2026-06-08",
+            "yoy_pct": -40.7,
+            "direction": "down",
+            "source": "yahoo:BTC-USD",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "btc_hash_rate_eh",
+            "label": "Network hash rate (EH/s, 7d avg)",
+            "latest": 806.9019970486307,
+            "as_of": "2026-06-08",
+            "yoy_pct": null,
+            "direction": "flat",
+            "source": "mempool.space:hashrate",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "btc_difficulty",
+            "label": "Mining difficulty (index)",
+            "latest": 138955357012247.3,
+            "as_of": "2026-06-08",
+            "yoy_pct": null,
+            "direction": "flat",
+            "source": "mempool.space:difficulty",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "btc_avg_fee_per_block_usd",
+            "label": "Avg transaction fees per block (USD)",
+            "latest": 212.5768,
+            "as_of": "2026-06-08",
+            "yoy_pct": null,
+            "direction": "flat",
+            "source": "mempool.space:fees",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "btc_hashprice_usd_ph_day",
+            "label": "Hashprice (USD/PH/day)",
+            "latest": 0.035034,
+            "as_of": "2026-06-08",
+            "yoy_pct": null,
+            "direction": "flat",
+            "source": "computed:hashprice",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "btc_breakeven_power_30jth",
+            "label": "Breakeven power cost at 30 J/TH ($/kWh)",
+            "latest": 0.0487,
+            "as_of": "2026-06-08",
+            "yoy_pct": null,
+            "direction": "flat",
+            "source": "computed:breakeven_30.0jth",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ],
+    "mining_economics_context": {
+      "hash_rate_eh": 806.9019970486307,
+      "difficulty": 138955357012247.3,
+      "avg_fee_per_block_usd": 212.5768,
+      "hashprice_usd_ph_day": 0.035034,
+      "breakeven_power_usd_kwh_30jth": 0.0487,
+      "source": "mempool.space + computed"
+    },
+    "in_model": {},
+    "not_in_model_requires_refresh": [
+      "live_btc_spot_in_price_input",
+      "hashprice_vs_fleet_breakeven",
+      "post_halving_subsidy_schedule"
+    ]
+  },
+  "human_review": {
+    "live_price_confirmed": false
+  },
+  "lens_consensus": {
+    "as_of": "2026-06-08",
+    "shared_inputs_ref": "valuation.json@2026-06-08",
+    "valuation_richness": 0.587,
+    "blended_return_pct": 2.52,
+    "band_pct": [
+      -8.6,
+      8.2
+    ],
+    "weighted_median_pct": 6.2,
+    "median_mean_flag": true,
+    "stance": "pass",
+    "agreement_pct": 100,
+    "dissent_count": 0,
+    "lawrence_divergence": false,
+    "top_dissents": [],
+    "contributor_count": 8,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
+  },
+  "total_return_panel": {
+    "as_of": "2026-06-11",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 0,
+    "distribution_history_sum": 0,
+    "market_cap_m": null,
+    "total_return_annualized_pct": 34.29,
+    "chart": "GLXY/research/charts/total_return_2026-06-11.svg",
+    "panel_json": "GLXY/research/total_return_panel.json"
+  }
+}

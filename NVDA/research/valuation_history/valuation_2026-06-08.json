@@ -1,0 +1,546 @@
+{
+  "ticker": "NVDA",
+  "as_of": "2026-06-08",
+  "method": "full",
+  "valuation_overlay": "segment_cashflow",
+  "lawrence_bucket": "pricing_power",
+  "payoff_lens": "operating",
+  "classification_inputs": {
+    "archetype": "compounder",
+    "moat": "widening",
+    "dhando": "partial",
+    "cycle": "up"
+  },
+  "inputs": {
+    "price": 205.1,
+    "price_source": "Yahoo NVDA close 2026-06-05",
+    "fcf_per_share": 3.94,
+    "fcf_source": "FY2026 OCF $102.7B \u2212 capex $6.0B \u00f7 24.51B diluted shares (10-K)",
+    "shares_millions": 24514,
+    "normalization_note": "Reported FY2026 FCF/sh; no material capex guide gap vs hyperscalers (supplier, not capex spender)",
+    "price_as_of": "2026-06-05"
+  },
+  "ai_overlay": {
+    "as_of": "2026-06-07",
+    "status": "partial \u2014 Data Center AI demand in segment build; supplier-side capex cycle not applicable",
+    "in_model": {
+      "data_center_growth_y1_5": "18% segment_build (AI accelerator demand)",
+      "consolidated_growth_base": "12%/8% blended; hyperscaler build-out embedded in Data Center",
+      "fy2026_fcf_sh": "$3.94 filing-based Lawrence FCF\u2080",
+      "cuda_software_stack": "Moat narrative; not separate revenue line in math"
+    },
+    "not_in_model_requires_refresh": [
+      "Hyperscaler custom ASIC (TPU/Trainium) share shift vs GPU mix",
+      "China export-control revenue ceiling and geographic rerouting",
+      "Sovereign AI / national cloud GPU tenders as separate backlog schedule",
+      "Omniverse / robotics platform as distinct owner-cash line",
+      "Networking (Spectrum-X) mix shift within Data Center segment",
+      "Blackwell-to-Rubin product cycle gross-margin bridge"
+    ],
+    "capex_stress_2026": {
+      "ocf_bn_assumption": 95,
+      "ocf_assumption_note": "[Assumption] ~8% below FY2026 OCF if Data Center orders pause one quarter",
+      "capex_bn": 8,
+      "capex_source": "FY2026 PP&E $6.0B + [Assumption] $2B incremental supply-chain tooling",
+      "implied_fcf_bn": 87,
+      "implied_fcf_per_share": 3.55
+    },
+    "ai_inflection_bull": {
+      "fcf_per_share_y0": 5.5,
+      "fcf_y0_note": "[Assumption] FY2028 normalized if Data Center revenue sustains 25%+ and margin holds",
+      "growth_y1_5": 0.2,
+      "growth_y6_10": 0.12,
+      "exit_pfcf_y10": 32,
+      "drivers": "Data Center share, networking attach, software licensing scale",
+      "computed_return_pct": 26.0
+    }
+  },
+  "segment_build": {
+    "framework": "speedwell_reverse_dcf",
+    "as_of": "2026-06-07",
+    "horizon_years": 7,
+    "discount_rate_explicit": 0.1,
+    "segments": [
+      {
+        "id": "data_center",
+        "label": "Data Center (AI accelerators, networking, software)",
+        "type": "operating",
+        "revenue_y0_bn": 193.737,
+        "revenue_share_pct": 89.7,
+        "owner_cash_y0_bn": 86.72,
+        "owner_cash_y0_per_share": 3.54,
+        "owner_cash_y0_source": "FY2026 FCF allocated 89.7% by segment revenue share (10-K segment note)",
+        "growth_y1_5": 0.18,
+        "growth_y6_10": 0.1,
+        "exit_pfcf_y10": 30,
+        "pv_per_share_at_10pct": 175.2,
+        "notes": "FY2026 rev $193.7B (+68% YoY); CUDA + Blackwell platform"
+      },
+      {
+        "id": "gaming",
+        "label": "Gaming (GeForce GPUs)",
+        "type": "operating",
+        "revenue_y0_bn": 16.042,
+        "revenue_share_pct": 7.4,
+        "owner_cash_y0_bn": 7.18,
+        "owner_cash_y0_per_share": 0.29,
+        "owner_cash_y0_source": "FY2026 FCF allocated 7.4% by segment revenue share",
+        "growth_y1_5": 0.08,
+        "growth_y6_10": 0.06,
+        "exit_pfcf_y10": 20,
+        "pv_per_share_at_10pct": 11.8,
+        "notes": "FY2026 rev $16.0B; PC gaming cyclicality"
+      },
+      {
+        "id": "professional_visualization",
+        "label": "Professional Visualization (workstation GPUs)",
+        "type": "operating",
+        "revenue_y0_bn": 3.191,
+        "revenue_share_pct": 1.5,
+        "owner_cash_y0_bn": 1.43,
+        "owner_cash_y0_per_share": 0.06,
+        "owner_cash_y0_source": "FY2026 FCF allocated 1.5% by segment revenue share",
+        "growth_y1_5": 0.1,
+        "growth_y6_10": 0.08,
+        "exit_pfcf_y10": 18,
+        "pv_per_share_at_10pct": 2.4,
+        "notes": "FY2026 rev $3.2B"
+      },
+      {
+        "id": "automotive",
+        "label": "Automotive (DRIVE, robotics platforms)",
+        "type": "operating",
+        "revenue_y0_bn": 2.349,
+        "revenue_share_pct": 1.1,
+        "owner_cash_y0_bn": 1.05,
+        "owner_cash_y0_per_share": 0.04,
+        "owner_cash_y0_source": "FY2026 FCF allocated 1.1% by segment revenue share",
+        "growth_y1_5": 0.2,
+        "growth_y6_10": 0.12,
+        "exit_pfcf_y10": 22,
+        "pv_per_share_at_10pct": 3.5,
+        "notes": "FY2026 rev $2.3B; AV/robotics option embedded in growth"
+      }
+    ],
+    "options": [
+      {
+        "id": "omniverse_robotics",
+        "label": "Omniverse / physical AI platform",
+        "option_treatment": "zero",
+        "annual_drag_per_share": 0.0,
+        "base_terminal_value_bn": 0,
+        "base_terminal_rationale": "No separate SEC owner-cash line; robotics revenue inside Automotive segment growth",
+        "pv_drag_per_share_at_10pct": 0,
+        "notes": "Option scan complete; explicit zero after segment embedding choice"
+      }
+    ],
+    "corporate_drag": {
+      "alphabet_level_drag_per_share": 0.0,
+      "pv_drag_per_share_at_10pct": 0,
+      "notes": "Segment FCF allocation sums to consolidated FY2026 FCF; no separate corp drag row"
+    },
+    "reconciliation": {
+      "sum_pv_per_share_at_10pct": 192.9,
+      "implied_business_return_pct": null,
+      "lawrence_base_irr_pct": null,
+      "price_per_share": 140.0,
+      "slack_notes": "Segment sum @10% ~$193 vs $140 placeholder \u2014 segment-implied return exceeds Lawrence base; growth deceleration risk not in segment exit multiples",
+      "sum_pv_per_share_at_explicit_discount": 192.9,
+      "explicit_discount_rate_pct": 10.0
+    }
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.08,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 18,
+      "notes": "AI capex pause; custom ASIC share gains; multiple compression"
+    },
+    "base": {
+      "growth_y1_5": 0.12,
+      "growth_y6_10": 0.08,
+      "exit_pfcf_y10": 24,
+      "notes": "Data Center growth decelerates from FY2026 peak; CUDA moat sustains pricing"
+    },
+    "bull": {
+      "growth_y1_5": 0.18,
+      "growth_y6_10": 0.1,
+      "exit_pfcf_y10": 30,
+      "notes": "Sustained hyperscaler GPU demand + networking attach + software mix"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 4,
+      "question": "Backlog / RPO / AI capex not in FCF path?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Hyperscaler demand embedded in Data Center segment growth"
+    },
+    {
+      "q": 3,
+      "question": "In-business option: Omniverse / robotics platform?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Automotive segment growth path; no separate terminal"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option already in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "AI training/inference in Data Center revenue"
+    }
+  ],
+  "evidence_refresh": {
+    "synthesis_in_dive": false
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 1.3
+    },
+    "base": {
+      "return_pct": 8.6
+    },
+    "bull": {
+      "return_pct": 16.6
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 1.3
+    },
+    "base": {
+      "return_pct": 8.6
+    },
+    "bull": {
+      "return_pct": 16.6
+    }
+  },
+  "implied_return": {
+    "base_pct": 11.9,
+    "label": "7yr IRR (total synthesis)",
+    "display": "11.9% (total synthesis)",
+    "lawrence_stance_gate_pct": 8.6,
+    "falsifier_adjusted_pct": 8.6,
+    "synthesis_pct": 11.9
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "overlay_results": [
+    {
+      "case": "AI inflection",
+      "method": "full (normalized FCF)",
+      "key_inputs": "FCF\u2080=$5.5 g1=20% g2=12% exit=32\u00d7",
+      "return_pct": 26.0,
+      "stance_gate": false,
+      "notes": "[Assumption] FY2028 normalized if Data Center revenue sustains 25%+ and margin holds"
+    },
+    {
+      "case": "Capex stress Y0",
+      "method": "illustrative trough",
+      "key_inputs": "OCF 95B \u2212 capex 8B",
+      "return_pct": null,
+      "display": "FCF ~$3.55/sh (not 7yr IRR)",
+      "stance_gate": false
+    }
+  ],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": 1.3,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 16.6,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 12.1,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 11.9,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  },
+  "context_overlay": {
+    "as_of": "2026-06-25",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": -1.0,
+            "as_of": "2026-06-25",
+            "yoy_pct": -19.0,
+            "direction": "down",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.377999782562256,
+            "as_of": "2026-06-25",
+            "yoy_pct": 2.0,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.144000053405762,
+            "as_of": "2026-06-25",
+            "yoy_pct": 7.7,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 101.32599639892578,
+            "as_of": "2026-06-25",
+            "yoy_pct": 3.7,
+            "direction": "up",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 18.690000534057617,
+            "as_of": "2026-06-25",
+            "yoy_pct": 11.5,
+            "direction": "up",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": -3.18,
+            "as_of": "2026-06-25",
+            "yoy_pct": -60.6,
+            "direction": "down",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 16.48,
+            "as_of": "2026-06-25",
+            "yoy_pct": 60.8,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "insider_signal": {
+    "as_of": "2026-06-25",
+    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
+    "in_base_irr": false,
+    "window_days": 365,
+    "ics": 0.0,
+    "band": "negligible",
+    "bull_case_support": "none",
+    "scenario_confidence": {
+      "priors": {
+        "bear": 0.2,
+        "base": 0.55,
+        "bull": 0.25
+      },
+      "tilted": {
+        "bear": 0.28,
+        "base": 0.47,
+        "bull": 0.25
+      },
+      "bull_delta": 0.0,
+      "bear_delta": 0.08,
+      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
+    },
+    "factors": {
+      "buy_score": 0.0,
+      "sell_score": -1.0,
+      "cluster_bonus": 0.0,
+      "net_buy_usd": 0,
+      "net_sell_usd": 2435410482.26,
+      "price_today": 205.1
+    },
+    "top_buys": [],
+    "top_sells": [
+      {
+        "insider": "STEVENS MARK A",
+        "date": "2026-06-18",
+        "shares": 319385,
+        "price": 209.6952,
+        "value_usd": 66973501.45,
+        "is_10b5_1": false,
+        "contrib": -0.236
+      },
+      {
+        "insider": "STEVENS MARK A",
+        "date": "2026-06-18",
+        "shares": 565615,
+        "price": 210.4372,
+        "value_usd": 119026436.88,
+        "is_10b5_1": false,
+        "contrib": -0.236
+      },
+      {
+        "insider": "STEVENS MARK A",
+        "date": "2026-06-04",
+        "shares": 100000,
+        "price": 217.655,
+        "value_usd": 21765500.0,
+        "is_10b5_1": false,
+        "contrib": -0.21
+      },
+      {
+        "insider": "STEVENS MARK A",
+        "date": "2026-06-04",
+        "shares": 400000,
+        "price": 220.371,
+        "value_usd": 88148400.0,
+        "is_10b5_1": false,
+        "contrib": -0.21
+      },
+      {
+        "insider": "STEVENS MARK A",
+        "date": "2026-06-04",
+        "shares": 307500,
+        "price": 0.0,
+        "value_usd": 0.0,
+        "is_10b5_1": false,
+        "contrib": -0.21
+      }
+    ],
+    "narrative_hooks": [],
+    "transaction_count": 645
+  },
+  "human_review": {
+    "live_price_confirmed": false
+  },
+  "lens_consensus": {
+    "as_of": "2026-06-08",
+    "shared_inputs_ref": "valuation.json@2026-06-08",
+    "valuation_richness": 0.473,
+    "blended_return_pct": 8.6,
+    "band_pct": [
+      1.3,
+      16.6
+    ],
+    "weighted_median_pct": 8.6,
+    "median_mean_flag": false,
+    "stance": "watch",
+    "agreement_pct": 91,
+    "dissent_count": 1,
+    "lawrence_divergence": false,
+    "top_dissents": [
+      {
+        "persona": "stahl",
+        "label": "Murray Stahl",
+        "verdict": "hold",
+        "return_pct": 16.6,
+        "key_metric": "archetype=compounder",
+        "conviction": 0.33,
+        "falsifier": "No asset intensity / pricing power (moat eroding + non-croupier)"
+      }
+    ],
+    "contributor_count": 8,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
+  },
+  "total_return_panel": {
+    "as_of": "2026-06-11",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 0,
+    "distribution_history_sum": 0,
+    "market_cap_m": null,
+    "total_return_annualized_pct": 36.4,
+    "chart": "NVDA/research/charts/total_return_2026-06-11.svg",
+    "panel_json": "NVDA/research/total_return_panel.json"
+  }
+}
