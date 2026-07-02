@@ -24,7 +24,11 @@ def main() -> int:
     registry = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
     insights = {}
     if INSIGHTS_PATH.exists():
-        insights = json.loads(INSIGHTS_PATH.read_text(encoding="utf-8"))
+        raw_insights = INSIGHTS_PATH.read_text(encoding="utf-8")
+        if "<<<<<<<" in raw_insights or ">>>>>>>" in raw_insights:
+            errors.append(f"{INSIGHTS_PATH} contains unresolved git merge conflict markers")
+        else:
+            insights = json.loads(raw_insights)
     elif payload.get("insights"):
         insights = payload["insights"]
     else:
