@@ -172,8 +172,45 @@ test_insights_json_conflict() {
   fi
 }
 
+test_activist_feed_json_conflict() {
+  git checkout -b "$TMP_BRANCH" >/dev/null
+
+  python3 _system/scripts/build_activist_feed.py >/dev/null
+  git add dashboard/data/activist_feed.json
+  git commit -m "test: base activist feed snapshot" >/dev/null
+
+  python3 _system/scripts/build_activist_feed.py >/dev/null
+  git add dashboard/data/activist_feed.json
+  git commit -m "test: local activist feed regen" >/dev/null
+
+  git branch test-main-conflict "$MAIN_REF" >/dev/null
+  git checkout test-main-conflict >/dev/null
+  python3 _system/scripts/build_activist_feed.py >/dev/null
+  git add dashboard/data/activist_feed.json
+  git commit -m "test: main activist feed regen" >/dev/null
+
+  git checkout "$TMP_BRANCH" >/dev/null
+  if git rebase test-main-conflict; then
+    echo "FAIL: expected rebase conflict in dashboard/data/activist_feed.json"
+    exit 1
+  fi
+
+  while rebase_in_progress && try_resolve_rebase_conflicts; do
+    :
+  done
+  if rebase_in_progress; then
+    echo "FAIL: activist_feed.json conflict resolution helper did not finish rebase"
+    exit 1
+  fi
+  if grep -q '^<<<<<<< ' dashboard/data/activist_feed.json; then
+    echo "FAIL: activist_feed.json still contains merge conflict markers after resolution"
+    exit 1
+  fi
+}
+
 run_test "dashboard JSON rebase conflict auto-resolution" test_dashboard_json_conflict
 run_test "insights JSON rebase conflict auto-resolution" test_insights_json_conflict
+run_test "activist feed JSON rebase conflict auto-resolution" test_activist_feed_json_conflict
 run_test "INDEX.csv rebase conflict auto-resolution" test_index_csv_conflict
 run_test "mixed generated artifact rebase conflict auto-resolution" test_mixed_generated_conflict
 

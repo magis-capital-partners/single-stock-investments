@@ -1547,7 +1547,16 @@ def build_ticker_row(
 
 
 def load_activist_feed() -> dict | None:
-    return _load_json(DATA_DIR / "activist_feed.json")
+    path = DATA_DIR / "activist_feed.json"
+    if not path.exists():
+        return None
+    text = path.read_text(encoding="utf-8")
+    if "<<<<<<<" in text or ">>>>>>>" in text:
+        return None
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        return None
 
 
 def activist_summary_for_ticker(ticker: str) -> dict:

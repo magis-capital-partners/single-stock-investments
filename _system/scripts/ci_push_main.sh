@@ -59,9 +59,24 @@ regenerate_insights_artifacts() {
     return 1
   fi
   echo "Regenerating insights artifacts to resolve rebase conflicts..."
+  rm -f dashboard/data/insights.json 2>/dev/null || true
   "$PYTHON" _system/scripts/build_insights.py
   git add dashboard/data/insights.json 2>/dev/null || true
   git add _system/reference/data-sources/insights_record_archive.json 2>/dev/null || true
+}
+
+regenerate_activist_feed_artifacts() {
+  if [ ! -f "_system/scripts/build_activist_feed.py" ]; then
+    echo "::error::build_activist_feed.py not found; cannot auto-resolve activist feed conflicts."
+    return 1
+  fi
+  echo "Regenerating activist feed to resolve rebase conflicts..."
+  rm -f dashboard/data/activist_feed.json 2>/dev/null || true
+  if [ -f "_system/scripts/clean_activist_indexes.py" ]; then
+    "$PYTHON" _system/scripts/clean_activist_indexes.py
+  fi
+  "$PYTHON" _system/scripts/build_activist_feed.py
+  git add dashboard/data/activist_feed.json
 }
 
 regenerate_dashboard_json() {
@@ -72,7 +87,11 @@ regenerate_dashboard_json() {
   echo "Regenerating dashboard JSON to resolve rebase conflicts..."
   if [ -f "_system/scripts/build_insights.py" ]; then
     "$PYTHON" _system/scripts/build_insights.py
+    git add dashboard/data/insights.json 2>/dev/null || true
     git add _system/reference/data-sources/insights_record_archive.json 2>/dev/null || true
+  fi
+  if [ -f "_system/scripts/build_activist_feed.py" ]; then
+    regenerate_activist_feed_artifacts
   fi
   "$PYTHON" _system/scripts/build_dashboard_data.py
   git add dashboard/data/ 2>/dev/null || true
@@ -113,6 +132,7 @@ regenerate_conflicted_artifacts() {
   local conflicted file
   local needs_dashboard=0
   local needs_insights=0
+  local needs_activist=0
   local needs_indexes=0
   local needs_docs_index=0
   local needs_portfolio=0
@@ -123,6 +143,9 @@ regenerate_conflicted_artifacts() {
     case "$file" in
       dashboard/data/insights.json)
         needs_insights=1
+        ;;
+      dashboard/data/activist_feed.json)
+        needs_activist=1
         ;;
       dashboard/data/*.json|docs/data/*.json)
         needs_dashboard=1
@@ -154,9 +177,19 @@ regenerate_conflicted_artifacts() {
   if [ "$needs_insights" -eq 1 ]; then
     regenerate_insights_artifacts
   fi
+  if [ "$needs_activist" -eq 1 ]; then
+    regenerate_activist_feed_artifacts
+  fi
   if [ "$needs_dashboard" -eq 1 ]; then
     regenerate_dashboard_json
   fi
+
+  while IFS= read -r file; do
+    [ -n "$file" ] || continue
+    if is_regenerable_artifact "$file" && [ -f "$file" ]; then
+      git add "$file"
+    fi
+  done <<< "$conflicted"
 }
 
 try_resolve_rebase_conflicts() {
