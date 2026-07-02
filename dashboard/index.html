@@ -716,6 +716,81 @@ let selectedFundId = null;
 let darwinEquityChart = null;
 let darwinHoldingsChart = null;
 
+const ROUTE_STORAGE_KEY = 'ssp_dashboard_route_v1';
+
+function normalizeAppHash(nextHash) {
+  if (nextHash == null || nextHash === '') return '';
+  return nextHash.startsWith('#') ? nextHash : `#${nextHash}`;
+}
+
+/** replaceState avoids polluting browser history (accidental Back leaving the dashboard view). */
+function setAppHash(nextHash) {
+  const normalized = normalizeAppHash(nextHash);
+  const url = `${window.location.pathname}${window.location.search}${normalized}`;
+  if (window.location.hash !== normalized) {
+    window.history.replaceState(null, '', url);
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
+  }
+  try {
+    if (normalized) sessionStorage.setItem(ROUTE_STORAGE_KEY, normalized);
+    else sessionStorage.removeItem(ROUTE_STORAGE_KEY);
+  } catch (_) { /* ignore quota */ }
+}
+
+function parseRouteFromHashString(hash) {
+  const holdingsMatch = /^#\/holdings(?:\/([^/?#]+))?$/i.exec(hash || '');
+  if (holdingsMatch) {
+    return {
+      view: 'holdings',
+      ticker: holdingsMatch[1] ? decodeURIComponent(holdingsMatch[1]).toUpperCase() : null,
+    };
+  }
+  const viewMatch = /^#\/(watchlist|insights|activist|darwin)$/i.exec(hash || '');
+  if (viewMatch) return { view: viewMatch[1].toLowerCase(), ticker: null };
+  return null;
+}
+
+function parseRouteFromHash() {
+  const fromUrl = parseRouteFromHashString(window.location.hash || '');
+  if (fromUrl) return fromUrl;
+  try {
+    return parseRouteFromHashString(sessionStorage.getItem(ROUTE_STORAGE_KEY) || '');
+  } catch (_) {
+    return null;
+  }
+}
+
+function syncRouteHash() {
+  if (activeView === 'holdings') {
+    setAppHash(selected ? `#/holdings/${encodeURIComponent(selected)}` : '#/holdings');
+  } else {
+    setAppHash(`#/${activeView}`);
+  }
+}
+
+function applyRouteFromHash() {
+  if (!data) return false;
+  const route = parseRouteFromHash();
+  if (!route) return false;
+  setView(route.view, { syncHash: false });
+  if (route.view === 'holdings' && route.ticker) {
+    const hit = data.tickers.find(x => x.ticker === route.ticker);
+    if (hit) {
+      selectTicker(route.ticker, { syncHash: false });
+      syncRouteHash();
+      return true;
+    }
+  }
+  if (route.view !== 'holdings') {
+    selected = null;
+    renderTable();
+    document.getElementById('detail').innerHTML = '';
+    syncRouteHash();
+    return true;
+  }
+  return false;
+}
+
 const DARWIN_METHOD_LABELS = {
   ira_marvin: 'IRA Marvin',
   equal_weight: 'Equal weight',
@@ -925,7 +1000,7 @@ async function load() {
   renderDarwin();
   renderInsights();
   renderActivist();
-  if (data.tickers.length) selectTicker(data.tickers[0].ticker);
+  if (!applyRouteFromHash() && data.tickers.length) selectTicker(data.tickers[0].ticker);
 }
 
 function setDarwinAccount(aid) {
@@ -936,7 +1011,7 @@ function setDarwinAccount(aid) {
   renderDarwin();
 }
 
-function setView(view) {
+function setView(view, opts = {}) {
   activeView = view;
   document.querySelectorAll('#view-tabs .view-tab').forEach(b => {
     b.classList.toggle('active', b.dataset.view === view);
@@ -949,6 +1024,7 @@ function setView(view) {
   document.getElementById('summary').style.display = view === 'holdings' ? '' : 'none';
   document.getElementById('watchlist-wrap').style.display =
     view === 'holdings' && (data.watchlist || []).length ? 'block' : 'none';
+  if (opts.syncHash !== false) syncRouteHash();
 }
 
 function renderActivist() {
@@ -1613,7 +1689,7 @@ function wireDetailEvents(ticker) {
   });
 }
 
-function selectTicker(ticker) {
+function selectTicker(ticker, opts = {}) {
   selected = ticker;
   if (typeof EquityModelViz !== 'undefined') EquityModelViz.destroyCharts();
   renderTable();
@@ -1752,6 +1828,7 @@ function selectTicker(ticker) {
     EquityModelViz.afterRender(modelBundle);
   }
   wireDetailEvents(ticker);
+  if (opts.syncHash !== false) syncRouteHash();
 }
 
 function renderMarketFilters() {
@@ -1812,6 +1889,10 @@ document.querySelectorAll('thead th').forEach(th => {
     else { sortKey = key; sortAsc = true; }
     renderTable();
   });
+});
+
+window.addEventListener('hashchange', () => {
+  if (data) applyRouteFromHash();
 });
 
 load().catch(err => {

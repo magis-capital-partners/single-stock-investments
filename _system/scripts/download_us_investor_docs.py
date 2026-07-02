@@ -228,7 +228,11 @@ def harvest_ir_pdfs(ir_roots: list[str], log_file: Path) -> set[str]:
             try:
                 req = urllib.request.Request(feed_url, headers={"User-Agent": IR_UA, "Accept": "application/json"})
                 with urllib.request.urlopen(req, timeout=60) as r:
-                    walk_json_for_pdfs(json.load(r), pdfs)
+                    feed_pdfs: set[str] = set()
+                    walk_json_for_pdfs(json.load(r), feed_pdfs)
+                    for u in feed_pdfs:
+                        if nu := normalize_pdf_url(u, base_host):
+                            pdfs.add(nu)
             except Exception:
                 pass
             time.sleep(SLEEP_SEC)
@@ -251,7 +255,7 @@ def harvest_ir_pdfs(ir_roots: list[str], log_file: Path) -> set[str]:
                     pdfs.add(u)
             time.sleep(SLEEP_SEC)
 
-    return {u for u in pdfs if u.lower().endswith(".pdf")}
+    return {u for u in pdfs if u.lower().startswith("http") and u.lower().endswith(".pdf")}
 
 
 def ir_dest(ir_dir: Path, url: str) -> Path:
