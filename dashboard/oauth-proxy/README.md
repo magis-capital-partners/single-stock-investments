@@ -14,7 +14,7 @@ cd dashboard/oauth-proxy
 npx wrangler deploy
 ```
 
-5. Copy the worker URL (e.g. `https://marvin-oauth-proxy.yourname.workers.dev`)
+5. Copy the worker URL from the deploy output (e.g. `https://marvin-oauth-proxy.<your-subdomain>.workers.dev` — subdomain matches your Cloudflare account, not a fixed name)
 6. Set GitHub repo variable **`OAUTH_PROXY_URL`** to that URL (no trailing slash)
 7. Set GitHub secrets **`CLOUDFLARE_API_TOKEN`** and **`CLOUDFLARE_ACCOUNT_ID`** (for CI deploy)
 8. Run **Deploy OAuth Proxy (Cloudflare)** workflow, or push changes under `dashboard/oauth-proxy/`
@@ -23,6 +23,15 @@ npx wrangler deploy
 ## CORS note
 
 The worker must echo the browser `Origin` header when it is allowlisted. If sign-in shows **Failed to fetch**, the deployed worker is likely stale — redeploy with the latest `worker.js`.
+
+## Troubleshooting "OAuth proxy unreachable"
+
+1. Run `npx wrangler deploy` and note the **exact URL** in the output (your account's `*.workers.dev` subdomain may differ from an older URL in repo variables).
+2. Set GitHub repo variable **`OAUTH_PROXY_URL`** to that URL (Settings → Secrets and variables → Actions → Variables).
+3. Redeploy the dashboard (push to `main` or run **Deploy Dashboard (GitHub Pages)**).
+4. Verify: `curl https://YOUR-PROXY-URL/health` should return `{"ok":true,...}`.
+
+If CI should auto-deploy the proxy on push, also set secrets **`CLOUDFLARE_API_TOKEN`** and **`CLOUDFLARE_ACCOUNT_ID`** (without these, deploy locally with Wrangler).
 
 ## OAuth App
 
@@ -36,4 +45,4 @@ Callback URL is still required but device flow is primary; keep:
 | Variable | Example |
 |----------|---------|
 | `OAUTH_CLIENT_ID` | `Ov23li...` |
-| `OAUTH_PROXY_URL` | `https://marvin-oauth-proxy.yourname.workers.dev` |
+| `OAUTH_PROXY_URL` | `https://marvin-oauth-proxy.<your-subdomain>.workers.dev` (exact URL from `wrangler deploy` output) |
