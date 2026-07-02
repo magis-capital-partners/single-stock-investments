@@ -76,13 +76,10 @@ jobs:
     outputs:
       changed: ${{ steps.check.outputs.changed }}
     steps:
-      - name: Free disk space
-        uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: false
+      - uses: ./.github/actions/prepare-runner
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 2
       - id: check
         run: |
           BEFORE="${{ github.event.before }}"
@@ -107,7 +104,13 @@ jobs:
       )
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: ./.github/actions/checkout-workspace
+        with:
+          profile: minimal
+      - name: Sparse checkout oauth proxy
+        run: |
+          git sparse-checkout add dashboard/oauth-proxy
+          git read-tree -mu HEAD
       - uses: ./.github/actions/deploy-oauth
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -127,22 +130,21 @@ jobs:
       name: github-pages
       url: ${{ steps.publish.outputs.page_url }}
     steps:
-      - name: Free disk space
-        uses: jlumbroso/free-disk-space@main
+      - name: Checkout (sparse — dashboard rebuild, no PDF trees)
+        if: github.event_name != 'workflow_dispatch' || inputs.skip_rebuild != true
+        uses: ./.github/actions/checkout-workspace
         with:
-          tool-cache: false
+          profile: dashboard
       - name: Checkout (config-only deploy)
         if: github.event_name == 'workflow_dispatch' && inputs.skip_rebuild == true
-        uses: actions/checkout@v4
+        uses: ./.github/actions/checkout-workspace
         with:
-          fetch-depth: 1
-          sparse-checkout: dashboard
-          sparse-checkout-cone-mode: true
-      - name: Checkout (full rebuild)
-        if: github.event_name != 'workflow_dispatch' || inputs.skip_rebuild != true
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
+          profile: minimal
+      - name: Sparse checkout dashboard tree
+        if: github.event_name == 'workflow_dispatch' && inputs.skip_rebuild == true
+        run: |
+          git sparse-checkout add dashboard
+          git read-tree -mu HEAD
       - id: publish
         uses: ./.github/actions/publish-dashboard
         with:

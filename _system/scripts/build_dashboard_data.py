@@ -229,8 +229,18 @@ def has_download_script(ticker_dir: Path) -> tuple[bool, str | None]:
     return False, None
 
 
-def count_pdfs(ticker_dir: Path) -> int:
-    return sum(1 for _ in ticker_dir.rglob("*.pdf"))
+def count_pdfs(ticker_dir: Path, registry_docs: list[dict] | None = None) -> int:
+    local = sum(1 for _ in ticker_dir.rglob("*.pdf"))
+    if local > 0:
+        return local
+    if not registry_docs:
+        return 0
+    prefix = f"{ticker_dir.name}/"
+    return sum(
+        1
+        for doc in registry_docs
+        if str(doc.get("local_pdf_path") or "").replace("\\", "/").startswith(prefix)
+    )
 
 
 def source_type_label(source_type: str | None) -> str:
@@ -1460,12 +1470,13 @@ def build_ticker_row(
     insights_doc: dict | None = None,
     memory_doc: dict | None = None,
     watchlist: dict | None = None,
+    registry_docs: list[dict] | None = None,
 ) -> dict:
     ticker_dir = ROOT / ticker
     meta = {**TICKER_META.get(ticker, {}), **holdings.get(ticker, {})}
     dl_script, dl_path = has_download_script(ticker_dir)
     classification = classification_for(ticker, ticker_dir, portfolio_class)
-    pdf_count = count_pdfs(ticker_dir)
+    pdf_count = count_pdfs(ticker_dir, registry_docs)
     deep_dive = latest_deep_dive(ticker_dir, classification)
     row = {
         "ticker": ticker,
@@ -1560,8 +1571,18 @@ def build() -> dict:
     tickers = list_tickers()
     insights_doc = _load_json(DATA_DIR / "insights.json")
     memory_doc = _load_json(RESEARCH_MEMORY_PATH)
+    registry_doc = _load_json(DOCUMENT_REGISTRY_PATH) or {}
+    registry_docs = list(registry_doc.get("documents") or [])
     rows = [
-        build_ticker_row(t, holdings, portfolio_class, insights_doc, memory_doc, reg.get("watchlist") or {})
+        build_ticker_row(
+            t,
+            holdings,
+            portfolio_class,
+            insights_doc,
+            memory_doc,
+            reg.get("watchlist") or {},
+            registry_docs,
+        )
         for t in tickers
     ]
     watchlist = build_watchlist_rows(reg.get("watchlist") or {})

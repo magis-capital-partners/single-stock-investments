@@ -62,10 +62,10 @@ jobs:
     timeout-minutes: 360
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Checkout (full — onboard writes documents)
+        uses: ./.github/actions/checkout-workspace
         with:
-          fetch-depth: 0
+          profile: full
 
       - name: Resolve inputs
         id: vars

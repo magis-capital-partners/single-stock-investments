@@ -3,6 +3,9 @@ name: Portfolio News Ingest
 # Billing guardrail: if ingest-news fails in <10s with no step logs and the
 # annotation "recent account payments have failed", restore GitHub Actions
 # billing for the org — repo code cannot start runners until that is fixed.
+#
+# Standalone schedule (every 6h). Daily download sync no longer duplicates this job;
+# see daily-sync.yml marvin-refresh which runs after downloads only.
 
 on:
   schedule:
@@ -41,10 +44,10 @@ jobs:
       PORTFOLIO_NEWS_MAX_PAGES: "15"
       PORTFOLIO_NEWS_GOOGLE_MAX_PER_QUERY: "50"
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Checkout (sparse — news JSON only)
+        uses: ./.github/actions/checkout-workspace
         with:
-          fetch-depth: 0
+          profile: news
           ref: main
 
       - name: Set up Python
