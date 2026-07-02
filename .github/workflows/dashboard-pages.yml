@@ -76,7 +76,14 @@ jobs:
     outputs:
       changed: ${{ steps.check.outputs.changed }}
     steps:
-      - uses: ./.github/actions/prepare-runner
+      - uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          docker-images: true
+          swap-storage: true
       - uses: actions/checkout@v4
         with:
           fetch-depth: 2

@@ -1,5 +1,7 @@
 name: Checkout workspace
-description: Free runner disk and checkout repo with profile-specific sparse paths
+description: >-
+  Free runner disk and checkout repo with profile-specific sparse paths.
+  Uses only public actions before checkout — never nest ./.github/actions/* here.
 
 inputs:
   profile:
@@ -18,7 +20,15 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: ./.github/actions/prepare-runner
+    # Public action only — local ./.github/actions/* cannot run before checkout.
+    - uses: jlumbroso/free-disk-space@main
+      with:
+        tool-cache: false
+        android: true
+        dotnet: true
+        haskell: true
+        docker-images: true
+        swap-storage: true
 
     - name: Resolve checkout settings
       id: cfg
