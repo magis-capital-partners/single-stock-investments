@@ -109,6 +109,7 @@ GENERIC_COMPANY_TOKENS = frozenset(
         "investments",
         "inc",
         "corp",
+        "corporation",
         "company",
         "international",
         "global",

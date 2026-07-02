@@ -191,6 +191,14 @@ def main() -> int:
     write_portfolio_scan_md(all_hits, args.date, tickers)
     write_review_queue(all_hits, args.date)
 
+    if not args.dry_run:
+        from cleanup_activist_false_positives import cleanup_ticker
+
+        for ticker in tickers:
+            index_path = activist_index_path(ticker)
+            if index_path.exists():
+                cleanup_ticker(ticker, apply=True)
+
     if not args.skip_feed and not args.dry_run:
         build_feed()
 

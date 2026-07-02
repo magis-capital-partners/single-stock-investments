@@ -85,6 +85,16 @@ class ActivistFeedTests(unittest.TestCase):
         url = github_blob("README.md")
         self.assertIn("magis-capital-partners/single-stock-investments", url or "")
 
+    def test_spruce_uranium_does_not_match_nvda(self) -> None:
+        meta = ticker_meta("NVDA")
+        url = "https://sprucepointcap.com/research/uranium-energy-corporation"
+        title = "Sep 18, 2025"
+        blob = f"{title} {url}"
+        self.assertTrue(url_target_mismatch(url, title, meta))
+        ok, _confidence, reason = publisher_match_allowed(url, title, blob, meta)
+        self.assertFalse(ok)
+        self.assertIn(reason, ("url_mismatch", "no_match", "alias:corporation", "alias:nvidia"))
+
 
 if __name__ == "__main__":
     raise SystemExit(unittest.main())
