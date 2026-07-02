@@ -1,15 +1,14 @@
 # DHR — Activist reconciliation (Milly mechanical)
 
 **Date:** 2026-07-02
-**Pending reports reconciled:** 8
+**Pending reports reconciled:** 7
 
 ## Summary
 
 | Firm | Side | Date | Class | Verdict | Path |
 |------|------|------|-------|---------|------|
-| spruce | short | 2019-01-01 | local_cached | needs_human | `DHR/third-party-analyses/activist_reports/short/spruce_point_2019-01-01_canadian-tire-corporation-ltd.html` |
-| ) DANAHER CORPORATION | long | 2026-02-17 | activist_proxy | needs_human | `DHR/third-party-analyses/activist_reports/long/DFAN14A_20260217_acc0001193125_26_055065.htm` |
-| ) DANAHER CORPORATION | long | 2026-02-27 | activist_proxy | needs_human | `DHR/third-party-analyses/activist_reports/long/DFAN14A_20260227_acc0001193125_26_082686.htm` |
+| DANAHER CORPORATION | long | 2026-02-17 | activist_proxy | needs_human | `DHR/third-party-analyses/activist_reports/long/DFAN14A_20260217_acc0001193125_26_055065.htm` |
+| DANAHER CORPORATION | long | 2026-02-27 | activist_proxy | needs_human | `DHR/third-party-analyses/activist_reports/long/DFAN14A_20260227_acc0001193125_26_082686.htm` |
 | I.R.S. Identification Nos. of above persons (entities only). Steven M. Rales | long | 2020-05-14 | activist_13d | needs_human | `DHR/third-party-analyses/activist_reports/long/SC-13D/A_20200514_acc0001193125_20_142830.htm` |
 | I.R.S. Identification Nos. of above persons (entities only). Mitchell P. Rales | long | 2021-06-14 | activist_13d | needs_human | `DHR/third-party-analyses/activist_reports/long/SC-13D/A_20210614_acc0001193125_21_190084.htm` |
 | I.R.S. Identification Nos. of above persons (entities only). Steven M. Rales | long | 2021-06-14 | activist_13d | needs_human | `DHR/third-party-analyses/activist_reports/long/SC-13D/A_20210614_acc0001193125_21_190087.htm` |
@@ -18,9 +17,7 @@
 
 ## Notes
 
-**spruce** (2019-01-01): <!DOCTYPE html><!-- Last Published: Mon Dec 01 2025 19:36:38 GMT+0000 (Coordinated Universal Time) --><html data-wf-domain="www.sprucepointcap.com" data-wf-page="656f8337d19d02e2b72142ec" data-wf-site="64caafa9c43c9fcf5b7b0d92" lang="en" data-wf-collection="656f8337d19d02e2b72143…
-
-**) DANAHER CORPORATION** (2026-02-17): <DOCUMENT>
+**DANAHER CORPORATION** (2026-02-17): <DOCUMENT>
 <TYPE>DFAN14A
 <SEQUENCE>1
 <FILENAME>d17484ddfan14a.htm
@@ -35,7 +32,7 @@
 <Center><DIV STYLE="width:8.5in" align="left">
 <DIV STYLE="line-height:1.0pt;margin-top:0…
 
-**) DANAHER CORPORATION** (2026-02-27): <DOCUMENT>
+**DANAHER CORPORATION** (2026-02-27): <DOCUMENT>
 <TYPE>DFAN14A
 <SEQUENCE>1
 <FILENAME>d19652ddfan14a.htm

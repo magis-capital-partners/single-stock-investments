@@ -1,13 +1,12 @@
 # BN — Activist reconciliation (Milly mechanical)
 
 **Date:** 2026-07-02
-**Pending reports reconciled:** 104
+**Pending reports reconciled:** 103
 
 ## Summary
 
 | Firm | Side | Date | Class | Verdict | Path |
 |------|------|------|-------|---------|------|
-| spruce | short | 2019-01-01 | local_cached | needs_human | `BN/third-party-analyses/activist_reports/short/spruce_point_2019-01-01_canadian-tire-corporation-ltd.html` |
 | Starboard Value | long | 2018-07-31 | activist_proxy | needs_human | `BN/third-party-analyses/activist_reports/long/DFAN14A_20180731_acc0001171843_18_005544.htm` |
 | BROOKFIELD ASSET MANAGEMENT INC. | long | 2018-02-07 | activist_13d | needs_human | `BN/third-party-analyses/activist_reports/long/SC-13D/A_20180207_acc0000950157_18_000203.htm` |
 | Brookfield Asset Management Inc. | long | 2018-02-28 | activist_13d | needs_human | `BN/third-party-analyses/activist_reports/long/SC-13D/A_20180228_acc0001140361_18_010805.htm` |
@@ -113,8 +112,6 @@
 | BAM PARTNERS TRUST | long | 2023-10-10 | activist_13d | needs_human | `BN/third-party-analyses/activist_reports/long/SC-13D_20231010_acc0001104659_23_108358.htm` |
 
 ## Notes
-
-**spruce** (2019-01-01): <!DOCTYPE html><!-- Last Published: Mon Dec 01 2025 19:36:38 GMT+0000 (Coordinated Universal Time) --><html data-wf-domain="www.sprucepointcap.com" data-wf-page="656f8337d19d02e2b72142ec" data-wf-site="64caafa9c43c9fcf5b7b0d92" lang="en" data-wf-collection="656f8337d19d02e2b72143…
 
 **Starboard Value** (2018-07-31): <DOCUMENT>
 <TYPE>DFAN14A

@@ -8,7 +8,7 @@
 | vic | VIC PDF intake - BN - BN VIC PDF | `BN/third-party-analyses/vic/vic_pdf_2026-06-18_bn-vic-pdf_e042fbbb0b.pdf` | pending | VIC local single-page intake; human approval required |
 | activist_short | Sep 18, 2025 | `BN/third-party-analyses/activist_reports/short/spruce_point_2025-01-01_uranium-energy-corporation.html` | context | activist/short — publisher_site |
 | activist_short | 2019 01 01 canadian tire corporation ltd | `BN/third-party-analyses/activist_reports/short/spruce_point_2019-01-01_canadian-tire-corporation-ltd.html` | context | activist/short — local |
-| activist_long | Starboard (+5) — DFAN14A (proxy solicitation) | `BN/third-party-analyses/activist_reports/long/DFAN14A_20180731_acc0001171843_18_005544.htm` | context | activist/long — sec_edgar |
+| activist_long | Starboard (+4) — DFAN14A (proxy solicitation) | `BN/third-party-analyses/activist_reports/long/DFAN14A_20180731_acc0001171843_18_005544.htm` | context | activist/long — sec_edgar |
 | activist_long | BROOKFIELD ASSET MANAGEMENT INC. — SC 13D/A | `BN/third-party-analyses/activist_reports/long/SC-13D/A_20180207_acc0000950157_18_000203.htm` | context | activist/long — sec_edgar |
 | activist_long | Brookfield Asset Management Inc. — SC 13D/A | `BN/third-party-analyses/activist_reports/long/SC-13D/A_20180228_acc0001140361_18_010805.htm` | context | activist/long — sec_edgar |
 | activist_long | BROOKFIELD ASSET MANAGEMENT INC. — SC 13D/A | `BN/third-party-analyses/activist_reports/long/SC-13D/A_20180328_acc0001104659_18_020750.htm` | context | activist/long — sec_edgar |
