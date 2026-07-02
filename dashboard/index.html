@@ -707,6 +707,7 @@ let insightsTickerSourceFilter = 'ownership';
 let insightsPdfSourceTab = 'all';
 let insightsPdfTimeMode = 'period';
 let activistSideFilter = 'all';
+let activistReviewFilter = '';
 let activistSearch = '';
 let insightsSearchDebounce = null;
 let insightsSearchFocused = false;
@@ -964,11 +965,20 @@ function renderActivist() {
     escapeHtml,
     linkHtml,
     side: activistSideFilter,
+    reviewFilter: activistReviewFilter,
     search: activistSearch,
   });
   content.querySelectorAll('[data-activist-side]').forEach(btn => {
     btn.addEventListener('click', () => {
       activistSideFilter = btn.dataset.activistSide || 'all';
+      activistReviewFilter = '';
+      renderActivist();
+    });
+  });
+  content.querySelectorAll('[data-activist-review]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activistReviewFilter = btn.dataset.activistReview || '';
+      activistSideFilter = 'all';
       renderActivist();
     });
   });

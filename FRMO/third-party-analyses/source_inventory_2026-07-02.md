@@ -16,6 +16,6 @@
 | reference | Portfolio review 2023, annual | `https://lemoncakesinvesting.substack.com/p/portfolio-review-2023-annual` | approved | FRMO sleeve performance; HK reverse-merger (SLGD) plan; cash/opportunity cost qu |
 | reference | $TPL: End of an era and opportunity for change | `https://lemoncakesinvesting.substack.com/p/tpl-texas-pacific-land-co-end-of` | approved | Post-Stahl HK leadership; TPL governance (look-through for FRMO) |
 | activist_short | Sep 18, 2025 | `FRMO/third-party-analyses/activist_reports/short/spruce_point_2025-01-01_uranium-energy-corporation.html` | approved | activist/short — publisher_site |
-| activist_short | Dec 5, 2019 | `FRMO/third-party-analyses/activist_reports/short/spruce_point_2019-01-01_canadian-tire-corporation-ltd.html` | approved | activist/short — publisher_site |
+| activist_short | 2019 01 01 canadian tire corporation ltd | `FRMO/third-party-analyses/activist_reports/short/spruce_point_2019-01-01_canadian-tire-corporation-ltd.html` | approved | activist/short — local |
 
 Cross-check required: `FRMO/research/cross_check_third_party_2026-07-02.md`

@@ -6,6 +6,37 @@
     return 'badge-us';
   }
 
+  function formatReportDate(row) {
+    const date = row?.report_date;
+    if (!date) return '—';
+    const precision = row?.date_precision || 'day';
+    if (precision === 'month' && /^\d{4}-\d{2}$/.test(String(date).slice(0, 7))) {
+      const [year, month] = String(date).slice(0, 7).split('-');
+      const monthName = new Date(Number(year), Number(month) - 1, 1).toLocaleString(undefined, { month: 'short' });
+      return `${monthName} ${year}`;
+    }
+    if (precision === 'year' && /^\d{4}/.test(String(date))) {
+      return String(date).slice(0, 4);
+    }
+    return String(date).slice(0, 10);
+  }
+
+  function dateTitle(row) {
+    const bits = [];
+    if (row?.report_date) bits.push(`Date: ${row.report_date}`);
+    if (row?.date_source) bits.push(`Source: ${row.date_source}`);
+    if (row?.date_precision && row.date_precision !== 'day') bits.push(`Precision: ${row.date_precision}`);
+    return bits.join(' · ');
+  }
+
+  function firmDisplay(row) {
+    const name = row?.firm_name || row?.firm_id || '—';
+    const persons = row?.reporting_persons || [];
+    if (persons.length <= 1) return name;
+    const extra = persons.length - 1;
+    return `${name} <span class="tier-sub">(+${extra})</span>`;
+  }
+
   function renderSummary(summary) {
     const s = summary || {};
     return `
@@ -14,31 +45,53 @@
         <div class="metric"><div class="k">Long</div><div class="v mono">${s.long_count || 0}</div></div>
         <div class="metric"><div class="k">Short</div><div class="v mono">${s.short_count || 0}</div></div>
         <div class="metric"><div class="k">Tickers with hits</div><div class="v mono">${s.tickers_with_hits || 0}</div></div>
-        <div class="metric"><div class="k">Unreconciled</div><div class="v mono">${s.unreconciled_count || 0}</div></div>
+        <div class="metric"><div class="k">Unresolved filers</div><div class="v mono">${s.unresolved_filer_count || 0}</div></div>
+        <div class="metric"><div class="k">Missing dates</div><div class="v mono">${s.missing_date_count || 0}</div></div>
       </div>`;
   }
 
   function renderFilters(state) {
+    const reviewActive = state.reviewFilter === 'needs_filer_review';
     return `
       <div class="toolbar" style="margin:12px 0">
         <input class="search" id="activist-search" placeholder="Filter ticker, firm, title…" value="${state.escapeHtml(state.search || '')}" />
-        <button type="button" class="filter-btn${state.side === 'all' ? ' active' : ''}" data-activist-side="all">All</button>
+        <button type="button" class="filter-btn${state.side === 'all' && !reviewActive ? ' active' : ''}" data-activist-side="all">All</button>
         <button type="button" class="filter-btn${state.side === 'long' ? ' active' : ''}" data-activist-side="long">Long</button>
         <button type="button" class="filter-btn${state.side === 'short' ? ' active' : ''}" data-activist-side="short">Short</button>
+        <button type="button" class="filter-btn${reviewActive ? ' active' : ''}" data-activist-review="needs_filer_review">Needs filer review</button>
       </div>`;
+  }
+
+  function sortFeedRows(rows) {
+    return rows.slice().sort((a, b) => {
+      const da = a.report_date || '';
+      const db = b.report_date || '';
+      if (da !== db) return db.localeCompare(da);
+      const ta = (a.ticker || '').localeCompare(b.ticker || '');
+      if (ta) return ta;
+      const fa = (a.firm_name || a.firm_id || '').localeCompare(b.firm_name || b.firm_id || '');
+      if (fa) return fa;
+      return (a.title || '').localeCompare(b.title || '');
+    });
   }
 
   function renderFeed(feed, state) {
     const q = (state.search || '').trim().toLowerCase();
     let rows = Array.isArray(feed) ? feed.slice() : [];
-    if (state.side && state.side !== 'all') {
+    if (state.reviewFilter === 'needs_filer_review') {
+      rows = rows.filter(r => r.needs_filer_review);
+    } else if (state.side && state.side !== 'all') {
       rows = rows.filter(r => r.side === state.side);
     }
     if (q) {
       rows = rows.filter(r =>
-        [r.ticker, r.firm_name, r.firm_id, r.title, r.source].join(' ').toLowerCase().includes(q)
+        [r.ticker, r.firm_name, r.firm_id, r.title, r.source, ...(r.reporting_persons || [])]
+          .join(' ')
+          .toLowerCase()
+          .includes(q)
       );
     }
+    rows = sortFeedRows(rows);
     if (!rows.length) {
       return '<div class="empty">No activist reports match your filters.</div>';
     }
@@ -56,21 +109,30 @@
           </tr>
         </thead>
         <tbody>
-          ${rows.slice(0, 300).map(r => `
+          ${rows.slice(0, 300).map(r => {
+            const groupBadge = r.campaign_group_size > 1
+              ? ` <span class="badge badge-purple" title="Latest in ${r.campaign_group_size}-filing campaign window">×${r.campaign_group_size}</span>`
+              : '';
+            const reviewBadge = r.needs_filer_review
+              ? ' <span class="badge badge-warn" title="Filer unresolved or low confidence">review</span>'
+              : '';
+            return `
             <tr class="clickable-row" data-select-ticker="${state.escapeHtml(r.ticker || '')}">
-              <td class="mono">${state.escapeHtml(r.report_date || '—')}</td>
+              <td class="mono" title="${state.escapeHtml(dateTitle(r))}">${state.escapeHtml(formatReportDate(r))}${r.date_precision && r.date_precision !== 'day' ? ' <span class="tier-sub">~</span>' : ''}</td>
               <td class="mono">${state.escapeHtml(r.ticker || '—')}</td>
               <td><span class="badge ${sideBadge(r.side)}">${state.escapeHtml(r.side || '—')}</span></td>
-              <td>${state.escapeHtml(r.firm_name || r.firm_id || '—')}</td>
-              <td>${state.escapeHtml(r.title || '—')}</td>
+              <td>${firmDisplay(r)}${reviewBadge}</td>
+              <td>${state.escapeHtml(r.title || '—')}${groupBadge}</td>
               <td>${state.escapeHtml(r.source || '—')}${r.status === 'new' ? ' <span class="badge badge-warn">new</span>' : ''}</td>
               <td>
                 ${r.github_url ? state.linkHtml(r.github_url, 'PDF', 'source-open-link') : ''}
                 ${r.source_url ? state.linkHtml(r.source_url, 'Source', 'source-open-link') : ''}
               </td>
-            </tr>`).join('')}
+            </tr>`;
+          }).join('')}
         </tbody>
-      </table>`;
+      </table>
+      ${rows.length > 300 ? `<p class="tier-sub">${rows.length - 300} more reports outside the current table window.</p>` : ''}`;
   }
 
   function renderTickerActivistSection(activist, helpers) {

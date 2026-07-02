@@ -25,6 +25,8 @@ from activist_common import (
     save_ticker_index,
     upsert_report,
 )
+from activist_date_parse import parse_local_report_metadata
+from sec_filer_parse import is_sec_filing_relpath
 from build_activist_feed import build_feed
 from extract_activist_text import extract_ticker_activist_text
 from milly_activist_reconcile import reconcile_ticker
@@ -43,22 +45,22 @@ def collect_local_reports(ticker: str) -> list[dict]:
         base = activist_reports_dir(ticker, side)
         if not base.is_dir():
             continue
-        for path in sorted(base.iterdir()):
+        for path in sorted(base.rglob("*")):
             if not path.is_file() or path.name.startswith("."):
                 continue
-            if path.name.startswith(("SC-", "DEFC", "PREC", "DFAN")):
+            rel_path = str(path.relative_to(ROOT)).replace("\\", "/")
+            if is_sec_filing_relpath(rel_path):
                 continue
             if path.suffix.lower() not in {".pdf", ".html", ".htm"}:
                 continue
-            stem = path.stem
-            firm_id = stem.split("_")[0] if "_" in stem else "unknown"
+            meta = parse_local_report_metadata(path, side)
+            meta["local_file"] = str(path.relative_to(ROOT)).replace("\\", "/")
+            if meta.get("local_pdf"):
+                meta["local_pdf"] = meta["local_file"]
             out.append(
                 {
                     "ticker": ticker,
-                    "firm_id": firm_id,
-                    "side": side,
-                    "local_file": str(path.relative_to(ROOT)).replace("\\", "/"),
-                    "local_pdf": str(path.relative_to(ROOT)).replace("\\", "/") if path.suffix.lower() == ".pdf" else None,
+                    **meta,
                     "source": "local",
                     "status": "cached",
                 }

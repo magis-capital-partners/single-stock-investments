@@ -12,7 +12,7 @@
 | reference | OTCQX annual disclosure | `CMSG/investor-documents/otcmarkets/CMSG_OTCQX_Annual_Disclosure_2025-12-31.pdf` | approved | `CMSG/investor-documents/otcmarkets/CMSG_OTCQX_Annual_Disclosure_2025-12-31.pdf` |
 | reference | Q2 2025 shareholder update | `CMSG/investor-documents/ir-consensusmining/CMSC_Q2_2025_Shareholder_Update.pdf` | approved | `CMSG/investor-documents/ir-consensusmining/CMSC_Q2_2025_Shareholder_Update.pdf` |
 | reference | FRMO look-through | `FRMO/research/deep_dive_2026-05-26.md` | approved | `FRMO/research/deep_dive_2026-05-26.md`; FRMO quarterly summaries |
-| activist_short | Mar 10, 2021 | `CMSG/third-party-analyses/activist_reports/short/spruce_point_2021-01-01_american-battery-metals-corp-comstock-mi.html` | approved | activist/short — publisher_site |
+| activist_short | 2021 01 01 american battery metals corp comstock mi | `CMSG/third-party-analyses/activist_reports/short/spruce_point_2021-01-01_american-battery-metals-corp-comstock-mi.html` | approved | activist/short — local |
 | activist_short | muddy | `CMSG/third-party-analyses/activist_reports/short/muddy_waters_2018-01-01_block-on-bloomberg-markets-discussing-la.html` | approved | activist/short — local |
 | activist_short | viceroy | `CMSG/third-party-analyses/activist_reports/short/viceroy_2026-01-01_osc-and-ciro.html` | approved | activist/short — local |
 

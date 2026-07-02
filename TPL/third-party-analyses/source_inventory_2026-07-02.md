@@ -16,14 +16,14 @@
 | reference | `_system/reference/investment-wisdom/horizon-kinetics/HK-Q1- | `_system/reference/investment-wisdom/horizon-kinetics/HK-Q1-2026-Commentary-extract.txt` | approved | Context (not in base IRR) |
 | reference | `_system/reference/investment-wisdom/horizon-kinetics/Stahl- | `_system/reference/investment-wisdom/horizon-kinetics/Stahl-Worth-The-Time-Predictive-Attributes-extract.txt` | approved | Context (not in base IRR) |
 | reference | `_system/reference/investment-wisdom/horizon-kinetics/HK-Q3- | `_system/reference/investment-wisdom/horizon-kinetics/HK-Q3-2025-Commentary-extract.txt` | approved | Context (not in base IRR) |
-| activist_long | s Horizon Kinetics Asset Management LLC — SC 13D/A | `TPL/third-party-analyses/activist_reports/long/SC-13D/A_20240228_acc0001056823_24_000012.htm` | approved | activist/long — sec_edgar |
-| activist_long | s Horizon Kinetics Asset Management LLC — SC 13D/A | `TPL/third-party-analyses/activist_reports/long/SC-13D/A_20240207_acc0001056823_24_000008.htm` | approved | activist/long — sec_edgar |
-| activist_long | s Horizon Kinetics Asset Management LLC — SC 13D/A | `TPL/third-party-analyses/activist_reports/long/SC-13D/A_20240205_acc0001056823_24_000001.htm` | approved | activist/long — sec_edgar |
-| activist_long | Bulldog Investors, LLP 2. CHECK THE BOX IF MEMBER OF A GROUP | `TPL/third-party-analyses/activist_reports/long/SC-13D_20240122_acc0001398344_24_000853.htm` | approved | activist/long — sec_edgar |
-| activist_long | s Horizon Kinetics Asset Management LLC — SC 13D/A | `TPL/third-party-analyses/activist_reports/long/SC-13D/A_20231206_acc0001056823_23_000058.htm` | approved | activist/long — sec_edgar |
-| activist_long | s Horizon Kinetics Asset Management LLC — SC 13D/A | `TPL/third-party-analyses/activist_reports/long/SC-13D/A_20230801_acc0001056823_23_000043.htm` | approved | activist/long — sec_edgar |
-| activist_long | Horizon Kinetics Asset Management LLC 13-3776334 — SC 13D/A | `TPL/third-party-analyses/activist_reports/long/SC-13D/A_20230127_acc0001056823_23_000001.htm` | approved | activist/long — sec_edgar |
 | activist_short | Sep 18, 2025 | `TPL/third-party-analyses/activist_reports/short/spruce_point_2025-01-01_uranium-energy-corporation.html` | approved | activist/short — publisher_site |
-| activist_short | Dec 5, 2019 | `TPL/third-party-analyses/activist_reports/short/spruce_point_2019-01-01_canadian-tire-corporation-ltd.html` | approved | activist/short — publisher_site |
+| activist_short | 2019 01 01 canadian tire corporation ltd | `TPL/third-party-analyses/activist_reports/short/spruce_point_2019-01-01_canadian-tire-corporation-ltd.html` | approved | activist/short — local |
+| activist_long | Horizon Kinetics Asset Management LLC 13-3776334 — SC 13D/A | `TPL/third-party-analyses/activist_reports/long/SC-13D/A_20230127_acc0001056823_23_000001.htm` | approved | activist/long — sec_edgar |
+| activist_long | s Horizon Kinetics Asset Management LLC — SC 13D/A | `TPL/third-party-analyses/activist_reports/long/SC-13D/A_20230801_acc0001056823_23_000043.htm` | approved | activist/long — sec_edgar |
+| activist_long | s Horizon Kinetics Asset Management LLC — SC 13D/A | `TPL/third-party-analyses/activist_reports/long/SC-13D/A_20231206_acc0001056823_23_000058.htm` | approved | activist/long — sec_edgar |
+| activist_long | s Horizon Kinetics Asset Management LLC — SC 13D/A | `TPL/third-party-analyses/activist_reports/long/SC-13D/A_20240205_acc0001056823_24_000001.htm` | approved | activist/long — sec_edgar |
+| activist_long | s Horizon Kinetics Asset Management LLC — SC 13D/A | `TPL/third-party-analyses/activist_reports/long/SC-13D/A_20240207_acc0001056823_24_000008.htm` | approved | activist/long — sec_edgar |
+| activist_long | s Horizon Kinetics Asset Management LLC — SC 13D/A | `TPL/third-party-analyses/activist_reports/long/SC-13D/A_20240228_acc0001056823_24_000012.htm` | approved | activist/long — sec_edgar |
+| activist_long | Bulldog (+2) — SC 13D | `TPL/third-party-analyses/activist_reports/long/SC-13D_20240122_acc0001398344_24_000853.htm` | approved | activist/long — sec_edgar |
 
 Cross-check required: `TPL/research/cross_check_third_party_2026-07-02.md`

@@ -194,6 +194,15 @@ def report_key(entry: dict) -> str:
 def upsert_report(index: dict, entry: dict) -> bool:
     key = report_key(entry)
     reports = index.setdefault("reports", [])
+    local_file = entry.get("local_file")
+    if local_file and entry.get("source") == "local":
+        for i, existing in enumerate(reports):
+            if existing.get("local_file") == local_file:
+                merged = {**existing, **entry}
+                if merged != existing:
+                    reports[i] = merged
+                    return True
+                return False
     for i, existing in enumerate(reports):
         if report_key(existing) == key:
             merged = {**existing, **entry}

@@ -14,10 +14,10 @@
 | reference | `apld_reiterate_buy` | `investor-documents/research-notes/What Would A Run The Table Scenario Look Like_ Reiterate BUY.pdf` | context | Bull-case framing; cross-check vs filings; **not** sole owner-cash anchor |
 | reference | `apld_wolfpack_short` | `third-party-analyses/short_reports/wolfpack_2023-07.md` | context | Forensic short context; pre-lease pivot; risks section only |
 | reference | Short | `short_reports/wolfpack_2023-07.md` | context | Stale; see `short_reports/wolfpack_2023-07.md` |
-| activist_long | Wesley Cummins — SC 13D/A | `APLD/third-party-analyses/activist_reports/long/SC-13D/A_20241129_acc0001493152_24_048172.htm` | context | activist/long — sec_edgar |
-| activist_long | Jason Zhang — SC 13D/A | `APLD/third-party-analyses/activist_reports/long/SC-13D/A_20241011_acc0001085146_24_004848.htm` | context | activist/long — sec_edgar |
-| activist_long | Oasis Management — SC 13D/A | `APLD/third-party-analyses/activist_reports/long/SC-13D/A_20240716_acc0000902664_24_004729.htm` | context | activist/long — sec_edgar |
 | activist_long | Wesley Cummins — SC 13D/A | `APLD/third-party-analyses/activist_reports/long/SC-13D/A_20221205_acc0001144879_22_000100.htm` | context | activist/long — sec_edgar |
+| activist_long | Oasis Management — SC 13D/A | `APLD/third-party-analyses/activist_reports/long/SC-13D/A_20240716_acc0000902664_24_004729.htm` | context | activist/long — sec_edgar |
+| activist_long | Jason Zhang — SC 13D/A | `APLD/third-party-analyses/activist_reports/long/SC-13D/A_20241011_acc0001085146_24_004848.htm` | context | activist/long — sec_edgar |
+| activist_long | Wesley Cummins — SC 13D/A | `APLD/third-party-analyses/activist_reports/long/SC-13D/A_20241129_acc0001493152_24_048172.htm` | context | activist/long — sec_edgar |
 | activist_long | Wesley Cummins — SC 13D | `APLD/third-party-analyses/activist_reports/long/SC-13D_20220421_acc0001104659_22_047984.htm` | context | activist/long — sec_edgar |
 | activist_long | Jason Zhang — SC 13D | `APLD/third-party-analyses/activist_reports/long/SC-13D_20231117_acc0001144879_23_000237.htm` | context | activist/long — sec_edgar |
 | activist_long | Oasis Management — SC 13D | `APLD/third-party-analyses/activist_reports/long/SC-13D_20240507_acc0000902664_24_003324.htm` | context | activist/long — sec_edgar |

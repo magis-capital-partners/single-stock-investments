@@ -19,7 +19,8 @@ from activist_common import (
     ticker_meta,
     upsert_report,
 )
-from sec_filer_parse import analyze_sec_filing, should_index_filing
+from activist_date_parse import parse_local_report_metadata, normalize_partial_date, resolve_sec_filing_date
+from sec_filer_parse import analyze_sec_filing, build_activist_title, form_from_filing_path, is_sec_filing_relpath, should_index_filing
 
 SEC_UA = "MarvinActivistScan contact@example.com"
 SLEEP_SEC = 0.12
@@ -63,15 +64,11 @@ def read_filing_text(path: Path) -> str:
 
 
 def form_from_filename(name: str) -> str:
+    inferred = form_from_filing_path(name)
+    if inferred:
+        return inferred
     stem = name.split("_")[0]
     return stem.replace("-", " ")
-
-
-def is_sec_filing_path(path: str | None) -> bool:
-    if not path:
-        return False
-    name = Path(path).name
-    return name.startswith(("SC-", "DEFC", "PREC", "DFAN"))
 
 
 def reindex_local_sec(ticker: str, *, include_passive: bool = False) -> list[dict]:
@@ -81,19 +78,20 @@ def reindex_local_sec(ticker: str, *, include_passive: bool = False) -> list[dic
         r
         for r in (index.get("reports") or [])
         if r.get("source") not in {"sec_edgar", "local"}
-        or not is_sec_filing_path(r.get("local_file"))
+        or not is_sec_filing_relpath(r.get("local_file"))
     ]
     sec_entries: list[dict] = []
     for side in ("long", "short"):
         base = activist_reports_dir(ticker, side)
         if not base.is_dir():
             continue
-        for path in sorted(base.iterdir()):
-            if path.suffix.lower() not in {".htm", ".html", ".txt"}:
+        for path in sorted(base.rglob("*")):
+            if not path.is_file() or path.suffix.lower() not in {".htm", ".html", ".txt"}:
                 continue
-            if not path.name.startswith(("SC-", "DEFC", "PREC", "DFAN")):
+            rel_path = rel(path)
+            if not is_sec_filing_relpath(rel_path):
                 continue
-            form = form_from_filename(path.name)
+            form = form_from_filing_path(path) or form_from_filename(path.name)
             text = read_filing_text(path)
             entry = _entry_from_analysis(
                 ticker,
@@ -143,17 +141,15 @@ def _entry_from_analysis(
     analysis = analyze_sec_filing(form, text)
     if not should_index_filing(analysis["filing_class"], include_passive=False):
         return None
-    fd = filing_date
-    if not fd:
-        m = __import__("re").search(r"(20\d{6})", dest.name)
-        fd = f"{m.group(1)[:4]}-{m.group(1)[4:6]}-{m.group(1)[6:8]}" if m else now_iso()[:10]
-    title_bits = [analysis["firm_name"], form]
+    date_meta = resolve_sec_filing_date(dest, text, filing_date=filing_date)
+    fd = date_meta.get("report_date")
+    title = build_activist_title(analysis, form, ticker=ticker, report_date=fd)
     return {
         "firm_id": analysis["firm_id"],
         "firm_name": analysis["firm_name"],
         "side": "long",
         "report_date": fd,
-        "title": " — ".join(x for x in title_bits if x),
+        "title": title,
         "source": "sec_edgar",
         "source_url": source_url,
         "local_pdf": rel(dest) if dest.suffix.lower() == ".pdf" else None,
@@ -163,9 +159,11 @@ def _entry_from_analysis(
         "filing_class": analysis["filing_class"],
         "include_in_feed": analysis["include_in_feed"],
         "reporting_persons": analysis.get("reporting_persons") or [],
+        "filer_resolution": analysis.get("filer_resolution"),
         "status": "new",
         "tier": "context",
         "confidence": analysis["confidence"],
+        **{k: v for k, v in date_meta.items() if k != "report_date"},
     }
 
 
