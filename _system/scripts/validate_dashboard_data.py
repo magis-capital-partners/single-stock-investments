@@ -10,6 +10,7 @@ ROOT = Path(__file__).resolve().parents[2]
 DATA_PATH = ROOT / "dashboard" / "data" / "dashboard_data.json"
 REGISTRY_PATH = ROOT / "_system" / "portfolio" / "registry.json"
 INSIGHTS_PATH = ROOT / "dashboard" / "data" / "insights.json"
+ACTIVIST_FEED_PATH = ROOT / "dashboard" / "data" / "activist_feed.json"
 CONFLICT_MARKERS = ("<<<<<<<", "=======", ">>>>>>>")
 
 
@@ -31,7 +32,7 @@ def main() -> int:
         print(f"ERROR: missing {DATA_PATH}", file=sys.stderr)
         return 1
 
-    for path in (DATA_PATH, INSIGHTS_PATH):
+    for path in (DATA_PATH, INSIGHTS_PATH, ACTIVIST_FEED_PATH):
         conflict = _check_merge_conflict_markers(path)
         if conflict:
             errors.append(conflict)
@@ -142,6 +143,23 @@ def main() -> int:
         provenance = insights.get("provenance") or {}
         if provenance.get("schema_version") != 2:
             errors.append("insights provenance schema_version must be 2")
+
+    if ACTIVIST_FEED_PATH.exists():
+        activist = json.loads(ACTIVIST_FEED_PATH.read_text(encoding="utf-8"))
+        for row in activist.get("feed") or []:
+            local_file = row.get("local_file")
+            github_url = row.get("github_url")
+            file_exists = row.get("file_exists")
+            if github_url and file_exists is False:
+                errors.append(
+                    f"activist feed {row.get('ticker')}/{row.get('firm_id')}: github_url set but file_exists is false"
+                )
+            if local_file and file_exists is True:
+                path = ROOT / str(local_file).replace("\\", "/")
+                if not path.exists():
+                    errors.append(f"activist feed references missing file: {local_file}")
+            if local_file and file_exists is False and github_url:
+                errors.append(f"activist feed ghost github link for missing file: {local_file}")
 
     for msg in warnings:
         print(f"WARN: {msg}")

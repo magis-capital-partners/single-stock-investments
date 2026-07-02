@@ -2,7 +2,10 @@
 """Build dashboard/data/activist_feed.json from per-ticker activist indexes."""
 from __future__ import annotations
 
+import argparse
 import json
+import os
+from collections import Counter
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -11,6 +14,8 @@ from activist_common import (
     load_global_scan,
     load_ticker_index,
     portfolio_tickers,
+    prune_ghost_index_entries,
+    resolve_report_file,
 )
 from activist_date_parse import normalize_partial_date, parse_date_from_stem
 from sec_filer_parse import (
@@ -23,9 +28,10 @@ from sec_filer_parse import (
 
 ROOT = Path(__file__).resolve().parents[2]
 OUTPUT = ROOT / "dashboard" / "data" / "activist_feed.json"
-GITHUB_REPO = "GoldmanDrew/single-stock-investments"
+GITHUB_REPO = os.environ.get("GITHUB_REPOSITORY", "magis-capital-partners/single-stock-investments")
 PROXY_DEDUP_FORMS = frozenset({"DFAN14A", "DEFC14A", "PREC14A"})
 DEDUP_WINDOW_DAYS = 7
+WEAK_MATCH_TICKER_THRESHOLD = 5
 
 
 def github_blob(path: str | None) -> str | None:
@@ -39,6 +45,9 @@ def feed_eligible(report: dict) -> bool:
         return False
     if report.get("filing_class") == "passive_13g":
         return False
+    _ref, _is_pdf, exists = resolve_report_file(report)
+    if not exists and not report.get("source_url"):
+        return False
     return True
 
 
@@ -50,7 +59,7 @@ def enrich_report_metadata(report: dict) -> dict:
         out.setdefault("date_precision", precision)
         out.setdefault("date_source", source or out.get("date_source") or "normalized")
     if not out.get("report_date"):
-        path = out.get("local_file") or out.get("local_pdf") or ""
+        path = out.get("local_file") or out.get("local_pdf") or out.get("canonical_file") or ""
         if path:
             iso, precision, source = parse_date_from_stem(Path(path).stem)
             if iso:
@@ -119,7 +128,7 @@ def enrich_filer_metadata(report: dict, *, ticker: str) -> dict:
     out = enrich_report_metadata(report)
     if out.get("firm_id") != UNRESOLVED_FIRM_ID:
         return out
-    path = out.get("local_file") or out.get("local_pdf") or ""
+    path = out.get("local_file") or out.get("local_pdf") or out.get("canonical_file") or ""
     if not is_sec_filing_relpath(path):
         return out
     full = ROOT / path
@@ -158,7 +167,7 @@ def merge_reports_by_local_file(reports: list[dict]) -> list[dict]:
     merged: dict[str, dict] = {}
     passthrough: list[dict] = []
     for report in reports:
-        path = report.get("local_file") or report.get("local_pdf")
+        path = report.get("canonical_file") or report.get("local_file") or report.get("local_pdf")
         if not path:
             passthrough.append(report)
             continue
@@ -173,20 +182,28 @@ def merge_reports_by_local_file(reports: list[dict]) -> list[dict]:
     return passthrough + list(merged.values())
 
 
-def build_feed() -> dict:
+def _duplicate_stem_counts(all_reports: list[tuple[str, dict]]) -> Counter[tuple[str, str]]:
+    counts: Counter[tuple[str, str]] = Counter()
+    for ticker, report in all_reports:
+        ref, _, _ = resolve_report_file(report)
+        stem = Path(ref or report.get("local_file") or "").name
+        if not stem:
+            continue
+        counts[(report.get("firm_id") or "", stem)] += 1
+    return counts
+
+
+def build_feed(*, prune_indexes: bool = True) -> dict:
     tickers = portfolio_tickers()
-    feed_rows: list[dict] = []
-    summary = {
-        "portfolio_hits": 0,
-        "long_count": 0,
-        "short_count": 0,
-        "tickers_with_hits": 0,
-        "unreconciled_count": 0,
-        "passive_excluded_count": 0,
-        "unresolved_filer_count": 0,
-        "missing_date_count": 0,
-    }
-    per_ticker: dict[str, dict] = {}
+    if prune_indexes:
+        pruned = sum(prune_ghost_index_entries(ticker) for ticker in tickers)
+        if pruned:
+            print(f"Pruned {pruned} ghost activist index entries")
+    else:
+        pruned = 0
+
+    all_reports: list[tuple[str, dict]] = []
+    per_ticker_reports: dict[str, list[dict]] = {}
 
     for ticker in tickers:
         index = load_ticker_index(ticker)
@@ -215,7 +232,35 @@ def build_feed() -> dict:
                         }
                     )
                 )
-        visible = [enrich_filer_metadata(r, ticker=ticker) if r.get("firm_id") == UNRESOLVED_FIRM_ID else r for r in reports if feed_eligible(r)]
+        per_ticker_reports[ticker] = reports
+        for report in reports:
+            all_reports.append((ticker, report))
+
+    duplicate_counts = _duplicate_stem_counts(all_reports)
+
+    feed_rows: list[dict] = []
+    summary = {
+        "portfolio_hits": 0,
+        "long_count": 0,
+        "short_count": 0,
+        "tickers_with_hits": 0,
+        "unreconciled_count": 0,
+        "passive_excluded_count": 0,
+        "unresolved_filer_count": 0,
+        "missing_date_count": 0,
+        "missing_file_count": 0,
+        "weak_match_count": 0,
+        "ghost_pruned_count": pruned,
+    }
+    per_ticker: dict[str, dict] = {}
+
+    for ticker in tickers:
+        reports = per_ticker_reports.get(ticker) or []
+        visible = [
+            enrich_filer_metadata(r, ticker=ticker) if r.get("firm_id") == UNRESOLVED_FIRM_ID else r
+            for r in reports
+            if feed_eligible(r)
+        ]
         summary["passive_excluded_count"] += sum(
             1 for r in reports if r.get("filing_class") == "passive_13g" or r.get("include_in_feed") is False
         )
@@ -250,9 +295,17 @@ def build_feed() -> dict:
         if unreconciled:
             summary["unreconciled_count"] += 1
         for report in visible:
-            local_pdf = report.get("local_pdf")
-            local_file = report.get("local_file") or local_pdf
-            local_is_pdf = bool(local_pdf)
+            file_ref, local_is_pdf, file_exists = resolve_report_file(report)
+            match_reason = report.get("match_reason") or ""
+            stem = Path(file_ref or report.get("local_file") or "").name
+            dup_key = (report.get("firm_id") or "", stem)
+            weak_match = duplicate_counts.get(dup_key, 0) >= WEAK_MATCH_TICKER_THRESHOLD or match_reason.startswith(
+                "alias:"
+            )
+            if not file_exists:
+                summary["missing_file_count"] += 1
+            if weak_match:
+                summary["weak_match_count"] += 1
             row = {
                 "ticker": ticker,
                 "firm_id": report.get("firm_id"),
@@ -262,13 +315,18 @@ def build_feed() -> dict:
                 "title": report.get("title"),
                 "source": report.get("source"),
                 "source_url": report.get("source_url"),
-                "local_file": local_file,
-                "local_pdf": local_pdf,
+                "local_file": file_ref or report.get("local_file"),
+                "local_pdf": report.get("local_pdf") if local_is_pdf else None,
+                "canonical_file": report.get("canonical_file") or file_ref,
                 "local_is_pdf": local_is_pdf,
-                "github_url": github_blob(local_pdf) if local_pdf else None,
+                "file_exists": file_exists,
+                "github_url": github_blob(file_ref) if file_exists and file_ref else None,
                 "status": report.get("status"),
                 "tier": report.get("tier", "context"),
                 "confidence": report.get("confidence"),
+                "match_reason": match_reason or None,
+                "match_confidence": report.get("match_confidence"),
+                "weak_match": weak_match,
                 "form": report.get("form"),
                 "filing_class": report.get("filing_class"),
                 "milly_verdict": report.get("milly_verdict"),
@@ -278,6 +336,7 @@ def build_feed() -> dict:
                 "reporting_persons": report.get("reporting_persons") or [],
                 "needs_filer_review": report.get("firm_id") == "unknown_activist"
                 or (report.get("confidence") or 1) < 0.7,
+                "needs_file": not file_exists and bool(report.get("source_url")),
             }
             if not row["report_date"]:
                 summary["missing_date_count"] += 1
@@ -294,6 +353,7 @@ def build_feed() -> dict:
     payload = {
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "last_scan": global_scan.get("generated_at"),
+        "github_repo": GITHUB_REPO,
         "summary": summary,
         "by_ticker": per_ticker,
         "feed": feed_rows,
@@ -305,14 +365,19 @@ def build_feed() -> dict:
 
 
 def main() -> int:
-    payload = build_feed()
+    parser = argparse.ArgumentParser(description="Build activist dashboard feed JSON.")
+    parser.add_argument("--no-prune", action="store_true", help="Skip ghost index cleanup")
+    args = parser.parse_args()
+    payload = build_feed(prune_indexes=not args.no_prune)
     print(
         f"Wrote {OUTPUT.relative_to(ROOT)} "
         f"({payload['summary']['portfolio_hits']} feed reports, "
         f"{payload['summary']['tickers_with_hits']} tickers, "
         f"{payload['summary']['passive_excluded_count']} passive excluded, "
         f"{payload['summary']['unresolved_filer_count']} unresolved filers, "
-        f"{payload['summary']['missing_date_count']} missing dates)"
+        f"{payload['summary']['missing_date_count']} missing dates, "
+        f"{payload['summary']['missing_file_count']} missing files, "
+        f"{payload['summary']['weak_match_count']} weak matches)"
     )
     return 0
 

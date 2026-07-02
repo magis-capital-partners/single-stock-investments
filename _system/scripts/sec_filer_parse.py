@@ -92,6 +92,7 @@ def _is_noise_name(name: str) -> bool:
 def _add_name(names: list[str], seen: set[str], name: str) -> None:
     name = re.sub(r"\s+", " ", name).strip(" .,-")
     name = re.sub(r"\s+\d+$", "", name)
+    name = re.sub(r"^[:;\)\(]+", "", name).strip()
     name = re.sub(r"^[:;\s]+", "", name)
     if _is_noise_name(name):
         return

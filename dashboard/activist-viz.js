@@ -37,6 +37,19 @@
     return `${name} <span class="tier-sub">(+${extra})</span>`;
   }
 
+  function fileStatusBadge(row) {
+    if (row?.file_exists === false && row?.needs_file) {
+      return ' <span class="badge badge-warn" title="Publisher link only; local copy missing">no file</span>';
+    }
+    if (row?.weak_match) {
+      return ' <span class="badge badge-warn" title="Same report attached to many tickers or weak alias match">weak match</span>';
+    }
+    if (row?.match_reason) {
+      return ` <span class="tier-sub" title="Match: ${row.match_reason}">· ${row.match_reason}</span>`;
+    }
+    return '';
+  }
+
   function renderSummary(summary) {
     const s = summary || {};
     return `
@@ -47,38 +60,41 @@
         <div class="metric"><div class="k">Tickers with hits</div><div class="v mono">${s.tickers_with_hits || 0}</div></div>
         <div class="metric"><div class="k">Unresolved filers</div><div class="v mono">${s.unresolved_filer_count || 0}</div></div>
         <div class="metric"><div class="k">Missing dates</div><div class="v mono">${s.missing_date_count || 0}</div></div>
+        <div class="metric"><div class="k">Missing files</div><div class="v mono">${s.missing_file_count || 0}</div></div>
+        <div class="metric"><div class="k">Weak matches</div><div class="v mono">${s.weak_match_count || 0}</div></div>
       </div>`;
   }
 
   function renderFilters(state) {
-    const reviewActive = state.reviewFilter === 'needs_filer_review';
+    const review = state.reviewFilter || '';
     return `
       <div class="toolbar" style="margin:12px 0">
         <input class="search" id="activist-search" placeholder="Filter ticker, firm, title…" value="${state.escapeHtml(state.search || '')}" />
-        <button type="button" class="filter-btn${state.side === 'all' && !reviewActive ? ' active' : ''}" data-activist-side="all">All</button>
+        <button type="button" class="filter-btn${state.side === 'all' && !review ? ' active' : ''}" data-activist-side="all">All</button>
         <button type="button" class="filter-btn${state.side === 'long' ? ' active' : ''}" data-activist-side="long">Long</button>
         <button type="button" class="filter-btn${state.side === 'short' ? ' active' : ''}" data-activist-side="short">Short</button>
-        <button type="button" class="filter-btn${reviewActive ? ' active' : ''}" data-activist-review="needs_filer_review">Needs filer review</button>
+        <button type="button" class="filter-btn${review === 'needs_filer_review' ? ' active' : ''}" data-activist-review="needs_filer_review">Needs filer review</button>
+        <button type="button" class="filter-btn${review === 'missing_file' ? ' active' : ''}" data-activist-review="missing_file">Missing file</button>
+        <button type="button" class="filter-btn${review === 'weak_match' ? ' active' : ''}" data-activist-review="weak_match">Weak match</button>
       </div>`;
   }
 
   function isPdfReport(row) {
     if (row?.local_is_pdf) return true;
-    const path = row?.local_pdf || row?.github_url || '';
+    const path = row?.local_pdf || row?.local_file || row?.github_url || '';
     return /\.pdf(\?|#|$)/i.test(String(path));
   }
 
   function renderReportLinks(row, linkHtml) {
-    if (isPdfReport(row) && row.github_url) {
-      return linkHtml(row.github_url, 'PDF', 'source-open-link');
-    }
+    const parts = [];
     if (row.source_url) {
-      return linkHtml(row.source_url, 'Source', 'source-open-link');
+      parts.push(linkHtml(row.source_url, 'Publisher', 'source-open-link'));
     }
-    if (row.github_url) {
-      return linkHtml(row.github_url, 'Source', 'source-open-link');
+    if (row.file_exists !== false && row.github_url) {
+      const label = isPdfReport(row) ? 'PDF' : 'Repo file';
+      parts.push(linkHtml(row.github_url, label, 'source-open-link'));
     }
-    return '—';
+    return parts.length ? parts.join(' ') : '—';
   }
 
   function sortFeedRows(rows) {
@@ -99,12 +115,16 @@
     let rows = Array.isArray(feed) ? feed.slice() : [];
     if (state.reviewFilter === 'needs_filer_review') {
       rows = rows.filter(r => r.needs_filer_review);
+    } else if (state.reviewFilter === 'missing_file') {
+      rows = rows.filter(r => r.needs_file || r.file_exists === false);
+    } else if (state.reviewFilter === 'weak_match') {
+      rows = rows.filter(r => r.weak_match);
     } else if (state.side && state.side !== 'all') {
       rows = rows.filter(r => r.side === state.side);
     }
     if (q) {
       rows = rows.filter(r =>
-        [r.ticker, r.firm_name, r.firm_id, r.title, r.source, ...(r.reporting_persons || [])]
+        [r.ticker, r.firm_name, r.firm_id, r.title, r.source, r.match_reason, ...(r.reporting_persons || [])]
           .join(' ')
           .toLowerCase()
           .includes(q)
@@ -140,7 +160,7 @@
               <td class="mono" title="${state.escapeHtml(dateTitle(r))}">${state.escapeHtml(formatReportDate(r))}${r.date_precision && r.date_precision !== 'day' ? ' <span class="tier-sub">~</span>' : ''}</td>
               <td class="mono">${state.escapeHtml(r.ticker || '—')}</td>
               <td><span class="badge ${sideBadge(r.side)}">${state.escapeHtml(r.side || '—')}</span></td>
-              <td>${firmDisplay(r)}${reviewBadge}</td>
+              <td>${firmDisplay(r)}${reviewBadge}${fileStatusBadge(r)}</td>
               <td>${state.escapeHtml(r.title || '—')}${groupBadge}</td>
               <td>${state.escapeHtml(r.source || '—')}${r.status === 'new' ? ' <span class="badge badge-warn">new</span>' : ''}</td>
               <td>${renderReportLinks(r, state.linkHtml)}</td>

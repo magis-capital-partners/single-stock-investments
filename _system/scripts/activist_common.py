@@ -156,8 +156,15 @@ def ticker_meta(ticker: str) -> dict:
     }
 
 
+CANONICAL_REPORTS_DIR = ROOT / "_system" / "reference" / "activist-reports"
+
+
 def activist_reports_dir(ticker: str, side: str) -> Path:
     return ROOT / ticker / "third-party-analyses" / "activist_reports" / side
+
+
+def canonical_report_path(firm_id: str, dest_name: str) -> Path:
+    return CANONICAL_REPORTS_DIR / firm_id / dest_name
 
 
 def activist_index_path(ticker: str) -> Path:
@@ -185,10 +192,70 @@ def report_key(entry: dict) -> str:
             entry.get("firm_id") or "",
             entry.get("report_date") or "",
             entry.get("source_url") or "",
+            entry.get("canonical_file") or "",
             entry.get("local_pdf") or "",
+            entry.get("local_file") or "",
             entry.get("accession") or "",
         ]
     )
+
+
+def resolve_report_file(report: dict) -> tuple[str | None, bool, bool]:
+    """Return (repo-relative path, is_pdf, exists on disk)."""
+    candidates: list[tuple[str, bool]] = []
+    if report.get("canonical_file"):
+        ref = str(report["canonical_file"]).replace("\\", "/")
+        candidates.append((ref, ref.lower().endswith(".pdf")))
+    if report.get("local_pdf"):
+        ref = str(report["local_pdf"]).replace("\\", "/")
+        candidates.append((ref, True))
+    if report.get("local_file"):
+        ref = str(report["local_file"]).replace("\\", "/")
+        candidates.append((ref, ref.lower().endswith(".pdf")))
+    for ref, is_pdf in candidates:
+        path = ROOT / ref
+        if path.exists() and path.stat().st_size > 0:
+            return ref, is_pdf, True
+    if candidates:
+        ref, is_pdf = candidates[0]
+        return ref, is_pdf, False
+    return None, False, False
+
+
+def publisher_match_allowed(url: str, title: str, blob: str, meta: dict) -> tuple[bool, float, str]:
+    if url_target_mismatch(url, title, meta):
+        return False, 0.0, "url_mismatch"
+    matched, confidence, reason = match_report_to_ticker(blob, meta)
+    if not matched or confidence < 0.9:
+        return False, confidence, reason
+    if reason.startswith("alias:"):
+        return False, confidence, reason
+    return True, confidence, reason
+
+
+def prune_ghost_index_entries(ticker: str, *, dry_run: bool = False) -> int:
+    """Drop index rows whose local file is missing and no publisher URL remains."""
+    index = load_ticker_index(ticker)
+    kept: list[dict] = []
+    removed = 0
+    meta = ticker_meta(ticker)
+    for report in index.get("reports") or []:
+        _ref, _is_pdf, exists = resolve_report_file(report)
+        source_url = report.get("source_url")
+        title = report.get("title") or ""
+        url = source_url or report.get("local_file") or ""
+        if not exists and not source_url:
+            removed += 1
+            continue
+        if report.get("source") in ("local", "publisher_site") and url:
+            if url_target_mismatch(url, title, meta) and not exists:
+                removed += 1
+                continue
+        kept.append(report)
+    if removed and not dry_run:
+        index["reports"] = kept
+        save_ticker_index(ticker, index)
+    return removed
 
 
 def upsert_report(index: dict, entry: dict) -> bool:
