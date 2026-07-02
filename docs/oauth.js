@@ -66,9 +66,11 @@
     }
 
     const isDeviceCodeReq = githubPath === '/login/device/code';
+    const isDeviceTokenReq = githubPath === '/login/oauth/access_token'
+      && payload.grant_type === 'urn:ietf:params:oauth:grant-type:device_code';
     const headers = { Accept: 'application/json' };
     let body;
-    if (isDeviceCodeReq) {
+    if (isDeviceCodeReq || isDeviceTokenReq) {
       headers['Content-Type'] = 'application/json';
       body = JSON.stringify(payload);
     } else {
@@ -195,7 +197,12 @@
     if (!data.access_token) throw new Error('No access_token in OAuth response');
 
     global.sessionStorage.removeItem(DEVICE_KEY);
-    await saveToken(data.access_token);
+    global.localStorage.setItem(TOKEN_KEY, data.access_token);
+    global.localStorage.removeItem(LEGACY_TOKEN_KEY);
+    // Fetch user profile after returning so the poll loop can close the modal immediately.
+    fetchUser(data.access_token).then(user => {
+      if (user) global.localStorage.setItem(USER_KEY, JSON.stringify(user));
+    }).catch(() => {});
     return { pending: false, token: data.access_token };
   }
 

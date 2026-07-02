@@ -689,6 +689,7 @@ const INSIGHT_SOURCE_LABEL = {
 let data = null;
 let oauthConfig = null;
 let devicePollTimer = null;
+let devicePollCancelled = false;
 let selected = null;
 let sortKey = 'ticker';
 let sortAsc = true;
@@ -1858,8 +1859,9 @@ document.getElementById('btn-auth').addEventListener('click', async () => {
 });
 
 function stopDevicePoll() {
+  devicePollCancelled = true;
   if (devicePollTimer) {
-    clearInterval(devicePollTimer);
+    clearTimeout(devicePollTimer);
     devicePollTimer = null;
   }
 }
@@ -1872,12 +1874,17 @@ function closeDeviceModal() {
 
 function startDevicePoll(intervalSec) {
   stopDevicePoll();
-  let wait = intervalSec * 1000;
-  devicePollTimer = setInterval(async () => {
+  devicePollCancelled = false;
+  let waitMs = Math.max(1, intervalSec) * 1000;
+  let polling = false;
+
+  const tick = async () => {
+    if (devicePollCancelled || polling) return;
+    polling = true;
     try {
       const result = await MarvinOAuth.pollDeviceAuth(oauthConfig);
       if (result.pending) {
-        if (result.slow) wait = Math.min(wait + 5000, 30000);
+        if (result.slow) waitMs = Math.min(waitMs + 5000, 30000);
         document.getElementById('device-status').textContent = 'Waiting for authorization…';
         return;
       }
@@ -1886,8 +1893,15 @@ function startDevicePoll(intervalSec) {
     } catch (e) {
       document.getElementById('device-status').textContent = e.message || String(e);
       stopDevicePoll();
+    } finally {
+      polling = false;
+      if (!devicePollCancelled) {
+        devicePollTimer = setTimeout(tick, waitMs);
+      }
     }
-  }, wait);
+  };
+
+  devicePollTimer = setTimeout(tick, 0);
 }
 
 document.getElementById('device-cancel').addEventListener('click', closeDeviceModal);
