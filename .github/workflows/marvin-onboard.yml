@@ -62,10 +62,23 @@ jobs:
     timeout-minutes: 360
 
     steps:
-      - name: Checkout (full — onboard writes documents)
-        uses: ./.github/actions/checkout-workspace
+      - uses: jlumbroso/free-disk-space@main
         with:
-          profile: full
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          docker-images: true
+          swap-storage: true
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts/ci_checkout_workspace.sh
+            _system/scripts/ci_sparse_checkout_paths.py
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Checkout workspace (full — onboard writes documents)
+        run: bash _system/scripts/ci_checkout_workspace.sh full
 
       - name: Resolve inputs
         id: vars

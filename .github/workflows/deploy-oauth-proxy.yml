@@ -31,9 +31,23 @@ jobs:
     if: needs.oauth-secrets.outputs.configured == 'true'
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/actions/checkout-workspace
+      - uses: jlumbroso/free-disk-space@main
         with:
-          profile: minimal
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          docker-images: true
+          swap-storage: true
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts/ci_checkout_workspace.sh
+            _system/scripts/ci_sparse_checkout_paths.py
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Checkout workspace (minimal)
+        run: bash _system/scripts/ci_checkout_workspace.sh minimal
       - name: Sparse checkout oauth proxy
         run: |
           git sparse-checkout add dashboard/oauth-proxy

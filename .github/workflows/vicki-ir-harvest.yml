@@ -34,9 +34,23 @@ jobs:
       tickers: ${{ steps.matrix.outputs.tickers }}
       max_parallel: ${{ steps.matrix.outputs.max_parallel }}
     steps:
-      - uses: ./.github/actions/checkout-workspace
+      - uses: jlumbroso/free-disk-space@main
         with:
-          profile: minimal
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          docker-images: true
+          swap-storage: true
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts/ci_checkout_workspace.sh
+            _system/scripts/ci_sparse_checkout_paths.py
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Checkout workspace (minimal)
+        run: bash _system/scripts/ci_checkout_workspace.sh minimal
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -73,9 +87,23 @@ jobs:
       matrix:
         ticker: ${{ fromJson(needs.prepare.outputs.tickers) }}
     steps:
-      - uses: ./.github/actions/checkout-workspace
+      - uses: jlumbroso/free-disk-space@main
         with:
-          profile: marvin-agent
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          docker-images: true
+          swap-storage: true
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts/ci_checkout_workspace.sh
+            _system/scripts/ci_sparse_checkout_paths.py
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Checkout workspace (marvin-agent)
+        run: bash _system/scripts/ci_checkout_workspace.sh marvin-agent
       - uses: ./.github/actions/vicki-agent
         env:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}

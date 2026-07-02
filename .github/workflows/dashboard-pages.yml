@@ -111,9 +111,23 @@ jobs:
       )
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/actions/checkout-workspace
+      - uses: jlumbroso/free-disk-space@main
         with:
-          profile: minimal
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          docker-images: true
+          swap-storage: true
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts/ci_checkout_workspace.sh
+            _system/scripts/ci_sparse_checkout_paths.py
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Checkout workspace (minimal)
+        run: bash _system/scripts/ci_checkout_workspace.sh minimal
       - name: Sparse checkout oauth proxy
         run: |
           git sparse-checkout add dashboard/oauth-proxy
@@ -135,16 +149,27 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - name: Checkout (sparse — dashboard rebuild, no PDF trees)
+      - uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          docker-images: true
+          swap-storage: true
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts/ci_checkout_workspace.sh
+            _system/scripts/ci_sparse_checkout_paths.py
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Checkout workspace (sparse — dashboard rebuild)
         if: github.event_name != 'workflow_dispatch' || inputs.skip_rebuild != true
-        uses: ./.github/actions/checkout-workspace
-        with:
-          profile: dashboard
-      - name: Checkout (config-only deploy)
+        run: bash _system/scripts/ci_checkout_workspace.sh dashboard
+      - name: Checkout workspace (config-only deploy)
         if: github.event_name == 'workflow_dispatch' && inputs.skip_rebuild == true
-        uses: ./.github/actions/checkout-workspace
-        with:
-          profile: minimal
+        run: bash _system/scripts/ci_checkout_workspace.sh minimal
       - name: Sparse checkout dashboard tree
         if: github.event_name == 'workflow_dispatch' && inputs.skip_rebuild == true
         run: |

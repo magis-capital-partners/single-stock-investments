@@ -18,10 +18,23 @@ jobs:
     timeout-minutes: 360
 
     steps:
-      - name: Checkout (full — downloads write PDFs)
-        uses: ./.github/actions/checkout-workspace
+      - uses: jlumbroso/free-disk-space@main
         with:
-          profile: full
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          docker-images: true
+          swap-storage: true
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts/ci_checkout_workspace.sh
+            _system/scripts/ci_sparse_checkout_paths.py
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Checkout workspace (full — downloads write PDFs)
+        run: bash _system/scripts/ci_checkout_workspace.sh full
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -53,11 +66,23 @@ jobs:
       contents: read
 
     steps:
-      - name: Checkout (sparse — pick ticker metadata only)
-        uses: ./.github/actions/checkout-workspace
+      - uses: jlumbroso/free-disk-space@main
         with:
-          profile: marvin-pick
-          ref: main
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          docker-images: true
+          swap-storage: true
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts/ci_checkout_workspace.sh
+            _system/scripts/ci_sparse_checkout_paths.py
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Checkout workspace (sparse — pick ticker metadata only)
+        run: bash _system/scripts/ci_checkout_workspace.sh marvin-pick main
 
       - name: Set up Python
         uses: actions/setup-python@v5

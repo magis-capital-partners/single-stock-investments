@@ -23,10 +23,23 @@ jobs:
   refresh:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout (sparse — research JSON, no PDF trees)
-        uses: ./.github/actions/checkout-workspace
+      - uses: jlumbroso/free-disk-space@main
         with:
-          profile: darwin
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          docker-images: true
+          swap-storage: true
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts/ci_checkout_workspace.sh
+            _system/scripts/ci_sparse_checkout_paths.py
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Checkout workspace (sparse — research JSON, no PDF trees)
+        run: bash _system/scripts/ci_checkout_workspace.sh darwin
 
       - uses: actions/setup-python@v5
         with:

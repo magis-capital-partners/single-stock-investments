@@ -44,16 +44,23 @@ jobs:
       PORTFOLIO_NEWS_MAX_PAGES: "15"
       PORTFOLIO_NEWS_GOOGLE_MAX_PER_QUERY: "50"
     steps:
-      - name: Free disk space
-        uses: jlumbroso/free-disk-space@main
+      - uses: jlumbroso/free-disk-space@main
         with:
           tool-cache: false
-
-      - name: Checkout
-        uses: actions/checkout@v4
+          android: true
+          dotnet: true
+          haskell: true
+          docker-images: true
+          swap-storage: true
+      - uses: actions/checkout@v4
         with:
-          ref: main
+          sparse-checkout: |
+            _system/scripts/ci_checkout_workspace.sh
+            _system/scripts/ci_sparse_checkout_paths.py
+          sparse-checkout-cone-mode: false
           fetch-depth: 1
+      - name: Checkout workspace (sparse — news JSON only)
+        run: bash _system/scripts/ci_checkout_workspace.sh news main
 
       - name: Set up Python
         uses: actions/setup-python@v5
