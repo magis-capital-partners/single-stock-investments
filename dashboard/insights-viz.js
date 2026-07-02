@@ -772,7 +772,7 @@
   }
 
   function filterEvents(events, opts) {
-    const { search, bookOnly, period, knownTickers } = opts || {};
+    const { search, bookOnly, period, knownTickers, needsReviewOnly } = opts || {};
     let list = events || [];
     if (period && !period.all) {
       list = list.filter(e => periodMatchesRecord(e, period, ['quarter', 'observed_at', 'date', 'as_of']));
@@ -780,11 +780,133 @@
     if (bookOnly) {
       list = list.filter(e => e.in_our_book || e.portfolio_relevance >= 1);
     }
+    if (needsReviewOnly) {
+      list = list.filter(e => e.needs_review);
+    }
     if (search) {
       const tickers = knownTickers || [];
       list = list.filter(e => SearchMatch.matchEvent(e, search, tickers));
     }
     return list;
+  }
+
+  function parserConfidenceBadge(confidence) {
+    const level = String(confidence || 'low').toLowerCase();
+    if (level === 'high') return 'badge-ok';
+    if (level === 'medium' || level === 'med') return 'badge-us';
+    return 'badge-warn';
+  }
+
+  function fmtFilingValue(value) {
+    if (value == null || Number.isNaN(Number(value))) return '—';
+    const num = Number(value);
+    if (Math.abs(num) >= 1000) return num.toLocaleString(undefined, { maximumFractionDigits: 0 });
+    if (Math.abs(num % 1) > 0.01) return num.toFixed(2);
+    return String(num);
+  }
+
+  function renderFilingEvidenceLinks(event, linkHtml, ghRepo) {
+    const links = [];
+    const filingRef = event.source_filing_ref || (event.verification && event.verification.source_filing_ref);
+    const extractRef = event.extract_ref || (event.verification && event.verification.extract_ref);
+    const filingLabel = event.evidence_label || (event.verification && event.verification.source_label) || 'Filing';
+    if (filingRef) {
+      links.push(evidenceLink(filingRef, linkHtml, ghRepo, filingLabel));
+    }
+    if (extractRef) {
+      links.push(evidenceLink(extractRef, linkHtml, ghRepo, event.extract_label || 'extract'));
+    }
+    if (!links.length) {
+      return evidenceLink(event.evidence_url || event.evidence_ref, linkHtml, ghRepo, event.evidence_label);
+    }
+    return links.join(' ');
+  }
+
+  function renderEventVerificationStrip(event, escapeHtml) {
+    const v = event.verification;
+    if (!v || event.source !== 'filing') return '';
+    const confClass = parserConfidenceBadge(v.parser_confidence || event.confidence);
+    const confLabel = String(v.parser_confidence || event.confidence || 'low').toUpperCase();
+    const parts = [
+      v.filing_form ? `${v.filing_form}` : null,
+      v.filing_date ? `filed ${v.filing_date}` : null,
+      v.period_end ? `period ${v.period_end}` : null,
+      v.xbrl_tag ? `tag ${v.xbrl_tag}` : null,
+    ].filter(Boolean);
+    const values = (v.prior_value != null && v.current_value != null)
+      ? `Prior ${fmtFilingValue(v.prior_value)} → Current ${fmtFilingValue(v.current_value)} (${v.unit || 'USD thousands'})`
+      : (v.current_value != null ? `Current ${fmtFilingValue(v.current_value)} (${v.unit || 'USD thousands'})` : '');
+    const flags = (v.parser_flags || []).length
+      ? `<span class="badge badge-warn" title="${escapeHtml((v.parser_flags || []).join(', '))}">review</span>`
+      : '';
+    const review = event.needs_review ? '<span class="badge badge-warn">needs review</span>' : '';
+    return `
+      <div class="tier-sub filing-verify-strip" style="margin-top:6px;line-height:1.45">
+        ${parts.length ? `<span>${escapeHtml(parts.join(' · '))}</span>` : ''}
+        ${values ? `<div>${escapeHtml(values)}</div>` : ''}
+        <span class="badge ${confClass}" title="Parser confidence">${escapeHtml(confLabel)}</span>
+        ${flags}
+        ${review}
+        ${v.extract_snippet ? `<button type="button" class="filter-btn source-pill filing-verify-btn" data-verify-event="${escapeHtml(event.id || '')}" style="margin-left:6px;padding:2px 8px;font-size:11px">Verify</button>` : ''}
+      </div>`;
+  }
+
+  function renderFilingVerifyDrawer(events, escapeHtml, linkHtml, ghRepo) {
+    const filingEvents = (events || []).filter(e => e.verification && e.source === 'filing');
+    if (!filingEvents.length) return '';
+    return `
+      <div id="filing-verify-drawer" class="detail-section" style="display:none;margin-top:12px;border:1px solid var(--border);border-radius:8px;padding:12px;background:rgba(255,255,255,0.02)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <strong>Filing verification</strong>
+          <button type="button" class="filter-btn" id="filing-verify-close">Close</button>
+        </div>
+        <div id="filing-verify-body"></div>
+      </div>`;
+  }
+
+  function renderFilingVerifyBody(event, escapeHtml, linkHtml, ghRepo) {
+    const v = event.verification || {};
+    const snippet = String(v.extract_snippet || '').split('\n').map(line => escapeHtml(line)).join('<br>');
+    const allValues = (v.all_values || []).map(val => escapeHtml(fmtFilingValue(val))).join(', ');
+    return `
+      <p class="tier-sub"><strong>${escapeHtml(event.ticker || '')}</strong> · ${escapeHtml(event.title || '')}</p>
+      <p class="tier-sub">${escapeHtml((v.filing_form || 'Filing') + (v.filing_date ? ` filed ${v.filing_date}` : '') + (v.period_end ? ` · period ${v.period_end}` : ''))}</p>
+      <div style="display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));margin-top:10px">
+        <div class="research-box" style="margin:0">
+          <div class="label" style="font-size:11px;color:var(--text-muted);margin-bottom:6px">Extract lines used</div>
+          <pre style="white-space:pre-wrap;margin:0;font-size:12px">${snippet || '—'}</pre>
+        </div>
+        <div class="research-box" style="margin:0">
+          <div class="label" style="font-size:11px;color:var(--text-muted);margin-bottom:6px">Parser context</div>
+          <div class="tier-sub">Tag: <span class="mono">${escapeHtml(v.xbrl_tag || '—')}</span></div>
+          <div class="tier-sub">Confidence: <span class="badge ${parserConfidenceBadge(v.parser_confidence)}">${escapeHtml(String(v.parser_confidence || 'low').toUpperCase())}</span></div>
+          <div class="tier-sub">Flags: ${escapeHtml((v.parser_flags || []).join(', ') || 'none')}</div>
+          <div class="tier-sub">All parsed values: ${allValues || '—'}</div>
+          <div style="margin-top:8px">${renderFilingEvidenceLinks(event, linkHtml, ghRepo)}</div>
+        </div>
+      </div>`;
+  }
+
+  function attachFilingVerifyHandlers(container, events, escapeHtml, linkHtml, ghRepo) {
+    if (!container) return;
+    const drawer = container.querySelector('#filing-verify-drawer');
+    const body = container.querySelector('#filing-verify-body');
+    const closeBtn = container.querySelector('#filing-verify-close');
+    const byId = Object.fromEntries((events || []).map(e => [e.id, e]));
+    container.querySelectorAll('[data-verify-event]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const event = byId[btn.dataset.verifyEvent];
+        if (!event || !drawer || !body) return;
+        body.innerHTML = renderFilingVerifyBody(event, escapeHtml, linkHtml, ghRepo);
+        drawer.style.display = 'block';
+        drawer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+    });
+    if (closeBtn && drawer) {
+      closeBtn.addEventListener('click', () => {
+        drawer.style.display = 'none';
+      });
+    }
   }
 
   function renderEventQueue(events, escapeHtml, linkHtml, ghRepo, opts) {
@@ -794,14 +916,17 @@
     }
     return `
       <table class="darwin-table" id="insights-event-table">
-        <thead><tr><th>Score</th><th>Date</th><th>Ticker</th><th>Source</th><th>Axis</th><th>Event</th><th></th></tr></thead>
+        <thead><tr><th>Score</th><th>Date</th><th>Ticker</th><th>Source</th><th>Axis</th><th>Event</th><th>Evidence</th></tr></thead>
         <tbody>
           ${rows.map(e => {
             const directionClass = e.direction === 'bullish' ? 'badge-ok' : (e.direction === 'bearish' ? 'badge-bad' : 'badge-us');
             const ticker = e.ticker ? `<span class="mono">${escapeHtml(e.ticker)}</span>` : '<span class="tier-sub">portfolio</span>';
+            const confTip = e.verification
+              ? ` title="Parser ${escapeHtml(String(e.verification.parser_confidence || e.confidence || 'med'))}${e.needs_review ? ' · needs review' : ''}"`
+              : '';
             return `
               <tr>
-                <td class="mono">${Number(e.score || 0)}</td>
+                <td class="mono"${confTip}>${Number(e.score || 0)}</td>
                 <td class="mono">${escapeHtml(e.observed_at || 'n/a')}</td>
                 <td>${ticker}</td>
                 <td><span class="badge badge-us">${escapeHtml(e.source_label || SOURCE_LABEL[e.source] || e.source || 'source')}</span></td>
@@ -809,12 +934,14 @@
                 <td style="min-width:280px">
                   <div><span class="badge ${directionClass}">${escapeHtml(e.direction || 'neutral')}</span> <strong>${escapeHtml(e.title || 'Insight')}</strong></div>
                   <div class="tier-sub" style="margin-top:4px">${escapeHtml((e.summary || '').slice(0, 220))}</div>
+                  ${renderEventVerificationStrip(e, escapeHtml)}
                 </td>
-                <td>${evidenceLink(e.evidence_url || e.evidence_ref, linkHtml, ghRepo, e.evidence_label)}</td>
+                <td>${renderFilingEvidenceLinks(e, linkHtml, ghRepo)}</td>
               </tr>`;
           }).join('')}
         </tbody>
       </table>
+      ${renderFilingVerifyDrawer(events, escapeHtml, linkHtml, ghRepo)}
       ${(events || []).length > rows.length ? `<p class="tier-sub">${(events || []).length - rows.length} more events outside the current table window.</p>` : ''}`;
   }
 
@@ -1362,6 +1489,7 @@
       quarter = 'all',
       fundSearch = '',
       bookOnly = false,
+      needsReviewOnly = false,
       selectedFundId = null,
       activeSection = 'events',
       tickers = [],
@@ -1433,7 +1561,7 @@
     if (activeSection === 'overview') {
       body = renderSourceHealth(insights?.source_health || {}, escapeHtml);
     } else if (activeSection === 'events') {
-      body = renderEventQueue(insights?.events || [], escapeHtml, linkHtml, ghRepo, { search: fundSearch, bookOnly, period, knownTickers });
+      body = renderEventQueue(insights?.events || [], escapeHtml, linkHtml, ghRepo, { search: fundSearch, bookOnly, needsReviewOnly, period, knownTickers });
     } else if (activeSection === 'consensus') {
       body = renderConsensus(insights?.consensus, escapeHtml, linkHtml, ghRepo, { quarter, period, bookOnly, search: fundSearch, knownTickers });
     } else if (activeSection === 'letters') {
@@ -1489,6 +1617,10 @@
             <input type="checkbox" id="insights-book-only" ${bookOnly ? 'checked' : ''} />
             ${escapeHtml(bookLabel)}
           </label>
+          ${activeSection === 'events' ? `<label class="tier-sub" style="display:flex;align-items:center;gap:6px">
+            <input type="checkbox" id="insights-needs-review" ${needsReviewOnly ? 'checked' : ''} />
+            Needs review
+          </label>` : ''}
           <input class="search" id="fund-registry-search" placeholder="Search ticker, event, fund, theme, source..." value="${escapeHtml(fundSearch)}" style="max-width:320px" />
         </div>
         ${showPeriodControls ? `<div class="tier-sub">
@@ -1509,6 +1641,7 @@
     renderInsightsPanel,
     renderLetterDiscussants,
     filterInsights,
+    attachFilingVerifyHandlers,
     STANCE_BADGE,
   };
 })(window);

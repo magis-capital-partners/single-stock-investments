@@ -20,6 +20,10 @@ from document_store import (  # noqa: E402
     letter_evidence_url,
 )
 from insight_format import format_letter_claim  # noqa: E402
+from filing_facts import (  # noqa: E402
+    filing_metadata_from_text_path,
+    source_filing_ref_from_text_path,
+)
 
 OUTPUT = ROOT / "dashboard" / "data" / "insights.json"
 ARCHIVE_OUTPUT = ROOT / "_system" / "reference" / "data-sources" / "insights_record_archive.json"
@@ -574,6 +578,103 @@ def pct_change(current: float | None, prior: float | None) -> float | None:
     return (current - prior) / abs(prior) * 100.0
 
 
+FILING_SKIP_FLAGS = {
+    "segment_zero_revenue",
+    "footnote_pairing",
+    "immaterial_prior",
+    "segment_context",
+    "magnitude_mismatch",
+    "legacy_pairing",
+    "non_statement_debt",
+}
+
+
+def filing_metric_confidence(metric: dict) -> str:
+    parser_conf = str(metric.get("parser_confidence") or "low").lower()
+    if parser_conf == "high":
+        return "high"
+    if parser_conf == "medium":
+        return "med"
+    return "low"
+
+
+def filing_metric_needs_review(metric: dict, change: float | None = None) -> bool:
+    flags = set(metric.get("parser_flags") or [])
+    parser_conf = str(metric.get("parser_confidence") or "low").lower()
+    if parser_conf == "low":
+        return True
+    if flags & FILING_SKIP_FLAGS:
+        return True
+    if change is not None and abs(change) > 500:
+        return True
+    return False
+
+
+def filing_metric_passes_sanity(name: str, metric: dict, change: float | None) -> bool:
+    flags = set(metric.get("parser_flags") or [])
+    parser_conf = str(metric.get("parser_confidence") or "low").lower()
+    if parser_conf == "low":
+        return False
+    if flags & FILING_SKIP_FLAGS:
+        return False
+    if change is None:
+        return False
+    if abs(change) > 500:
+        return False
+    if name in {"revenues", "revenue"} and to_float(metric.get("current")) == 0:
+        return False
+    return True
+
+
+def filing_verification_block(ticker: str, doc: dict, metric: dict, name: str) -> dict:
+    source_text = doc.get("source_text")
+    filing_meta = doc.get("filing_meta") or filing_metadata_from_text_path(source_text)
+    source_filing = doc.get("source_filing_ref") or source_filing_ref_from_text_path(ticker, source_text)
+    extract_ref = None
+    if source_text:
+        extract_ref = f"{ticker}/research/{source_text}".replace("\\", "/")
+    filing_label = filing_meta.get("filing_form") or "Filing"
+    return {
+        "filing_form": filing_meta.get("filing_form"),
+        "filing_date": filing_meta.get("filing_date"),
+        "period_end": filing_meta.get("period_end"),
+        "xbrl_tag": metric.get("tag"),
+        "metric": name,
+        "prior_value": metric.get("prior"),
+        "current_value": metric.get("current"),
+        "unit": "USD thousands",
+        "comparison": metric.get("comparison") or "YoY annual",
+        "source_filing_ref": source_filing,
+        "extract_ref": extract_ref,
+        "extract_snippet": metric.get("extract_snippet"),
+        "all_values": metric.get("all_values") or [],
+        "parser_confidence": metric.get("parser_confidence") or "low",
+        "parser_flags": metric.get("parser_flags") or [],
+        "pair_score": metric.get("pair_score"),
+        "source_label": filing_label,
+    }
+
+
+def filing_evidence_fields(ticker: str, doc: dict) -> dict:
+    source_text = doc.get("source_text")
+    source_filing = doc.get("source_filing_ref") or source_filing_ref_from_text_path(ticker, source_text)
+    extract_ref = None
+    if source_text:
+        extract_ref = f"{ticker}/research/{source_text}".replace("\\", "/")
+    filing_meta = doc.get("filing_meta") or filing_metadata_from_text_path(source_text)
+    filing_label = filing_meta.get("filing_form") or "Filing"
+    return {
+        "source_filing_ref": source_filing,
+        "extract_ref": extract_ref,
+        "evidence_ref": source_filing or extract_ref,
+        "evidence_url": evidence_url(source_filing or extract_ref),
+        "evidence_label": filing_label if source_filing else "extract",
+        "extract_url": evidence_url(extract_ref),
+        "extract_label": "extract",
+        "filing_label": filing_label,
+    }
+
+
 def metric_direction(metric: str, change: float) -> str:
     if metric == "long_term_debt":
         return "bearish" if change > 0 else "bullish"
@@ -595,6 +696,7 @@ def from_filing_facts(ticker_dir: Path, ticker: str) -> list[dict]:
         return []
 
     metrics = doc.get("metrics") or {}
+    evidence = filing_evidence_fields(ticker, doc)
     candidates: list[dict] = []
     for name, metric in metrics.items():
         if not isinstance(metric, dict):
@@ -602,7 +704,23 @@ def from_filing_facts(ticker_dir: Path, ticker: str) -> list[dict]:
         current = to_float(metric.get("current"))
         prior = to_float(metric.get("prior"))
         change = pct_change(current, prior)
+        if change is None and current is not None and prior is None and current > 0 and name == "long_term_debt":
+            candidates.append(
+                {
+                    "name": name,
+                    "label": METRIC_LABELS.get(name, name.replace("_", " ").title()),
+                    "current": current,
+                    "prior": prior,
+                    "change": None,
+                    "abs_change": current,
+                    "change_type": "new_balance",
+                    "metric": metric,
+                }
+            )
+            continue
         if change is None:
+            continue
+        if not filing_metric_passes_sanity(name, metric, change):
             continue
         threshold = 10 if name in {"revenues", "revenue", "operating_income", "net_income", "eps_basic", "eps_diluted"} else 20
         if abs(change) < threshold:
@@ -616,32 +734,57 @@ def from_filing_facts(ticker_dir: Path, ticker: str) -> list[dict]:
                 "prior": prior,
                 "change": change,
                 "abs_change": abs(change),
+                "metric": metric,
             }
         )
 
     out: list[dict] = []
     for item in sorted(candidates, key=lambda x: x["abs_change"], reverse=True)[:2]:
-        change = item["change"]
+        metric = item["metric"]
+        verification = filing_verification_block(ticker, doc, metric, item["name"])
+        needs_review = filing_metric_needs_review(metric, item.get("change"))
+        confidence = filing_metric_confidence(metric)
+        if item.get("change_type") == "new_balance":
+            title = f"{item['label']} newly reported at {item['current']:,.1f}"
+            claim = (
+                f"{item['label']} was not reported in the prior period and is now "
+                f"{item['current']:,.1f} (USD thousands)."
+            )
+            direction = "bearish" if item["name"] == "long_term_debt" else "bullish"
+        else:
+            change = item["change"]
+            title = f"{item['label']} {'up' if change > 0 else 'down'} {abs(change):.0f}%"
+            claim = (
+                f"{item['label']} moved {change:+.1f}% versus the prior period "
+                f"({item['prior']:,.1f} to {item['current']:,.1f})."
+            )
+            direction = metric_direction(item["name"], change)
         out.append(
             insight_record(
                 source="filing",
                 as_of=doc.get("as_of"),
                 scope="ticker",
                 ref=ticker,
-                title=f"{item['label']} {'up' if change > 0 else 'down'} {abs(change):.0f}%",
-                claim=(
-                    f"{item['label']} moved {change:+.1f}% versus the prior period "
-                    f"({item['prior']:,.1f} to {item['current']:,.1f})."
-                ),
-                direction=metric_direction(item["name"], change),
-                evidence_ref=relative_path(latest),
+                title=title,
+                claim=claim,
+                direction=direction,
+                evidence_ref=evidence.get("source_filing_ref") or evidence.get("extract_ref") or relative_path(latest),
+                evidence_url=evidence.get("evidence_url"),
+                evidence_label=evidence.get("evidence_label"),
+                source_filing_ref=evidence.get("source_filing_ref"),
+                extract_ref=evidence.get("extract_ref"),
+                extract_url=evidence.get("extract_url"),
+                extract_label=evidence.get("extract_label"),
+                verification=verification,
+                needs_review=needs_review,
                 event_type="filing_metric",
                 impact_axis="fundamentals",
-                confidence="med",
+                confidence=confidence,
             )
         )
 
     if not out and metrics:
+        evidence = filing_evidence_fields(ticker, doc)
         out.append(
             insight_record(
                 source="filing",
@@ -651,10 +794,16 @@ def from_filing_facts(ticker_dir: Path, ticker: str) -> list[dict]:
                 title="Filing facts refreshed",
                 claim=f"Filing parser captured {len(metrics)} metrics from the latest local evidence file.",
                 direction="neutral",
-                evidence_ref=relative_path(latest),
+                evidence_ref=evidence.get("source_filing_ref") or evidence.get("extract_ref") or relative_path(latest),
+                evidence_url=evidence.get("evidence_url"),
+                evidence_label=evidence.get("evidence_label") or "Filing",
+                source_filing_ref=evidence.get("source_filing_ref"),
+                extract_ref=evidence.get("extract_ref"),
+                extract_url=evidence.get("extract_url"),
                 event_type="filing_refresh",
                 impact_axis="fundamentals",
                 confidence="low",
+                needs_review=True,
             )
         )
     return out
@@ -1421,6 +1570,12 @@ def events_from_records(
             "evidence_url": record.get("evidence_url") or evidence_url(record.get("evidence_ref")),
             "evidence_label": record.get("evidence_label") or evidence_label(record.get("evidence_ref")),
             "evidence_document_id": record.get("evidence_document_id") or evidence_document_id(record.get("evidence_ref")),
+            "source_filing_ref": record.get("source_filing_ref"),
+            "extract_ref": record.get("extract_ref"),
+            "extract_url": record.get("extract_url") or evidence_url(record.get("extract_ref")),
+            "extract_label": record.get("extract_label") or "extract",
+            "verification": record.get("verification"),
+            "needs_review": bool(record.get("needs_review")),
             "inventory_ref": record.get("inventory_ref"),
             "source_path": record.get("source_path"),
             "match_tier": record.get("match_tier"),
