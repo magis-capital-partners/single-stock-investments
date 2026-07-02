@@ -192,6 +192,11 @@ jobs:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/actions/deploy-pages-retry
+          sparse-checkout-cone-mode: true
+          fetch-depth: 1
       - id: deploy
         uses: ./.github/actions/deploy-pages-retry
         with:
