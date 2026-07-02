@@ -3,6 +3,8 @@
  * Deploy: npx wrangler deploy
  * Set repo variable OAUTH_PROXY_URL to the worker URL (e.g. https://marvin-oauth-proxy.USER.workers.dev)
  */
+const PROXY_VERSION = '2026-07-02';
+
 const ALLOW_ORIGINS = new Set([
   'https://magis-capital-partners.github.io',
   'https://goldmandrew.github.io',
@@ -46,11 +48,23 @@ export default {
     if (request.method === 'OPTIONS') {
       return new Response(null, { status: 204, headers: corsHeaders(origin) });
     }
+
+    const url = new URL(request.url);
+    if (request.method === 'GET' && (url.pathname === '/health' || url.pathname.endsWith('/health'))) {
+      return new Response(
+        JSON.stringify({
+          ok: true,
+          version: PROXY_VERSION,
+          allowed_origins: [...ALLOW_ORIGINS],
+        }),
+        { status: 200, headers },
+      );
+    }
+
     if (request.method !== 'POST') {
       return new Response(JSON.stringify({ error: 'method_not_allowed' }), { status: 405, headers });
     }
 
-    const url = new URL(request.url);
     let githubPath;
     if (url.pathname === '/device/code' || url.pathname.endsWith('/device/code')) {
       githubPath = '/login/device/code';
