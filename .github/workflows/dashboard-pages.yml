@@ -52,7 +52,7 @@ permissions:
 
 concurrency:
   group: dashboard-deploy
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   oauth-secrets:
@@ -116,7 +116,7 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
-  publish:
+  build:
     needs: [oauth-secrets, oauth-proxy]
     if: |
       always() &&
@@ -126,9 +126,7 @@ jobs:
         github.event.workflow_run.conclusion == 'success'
       )
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.publish.outputs.page_url }}
+    timeout-minutes: 45
     steps:
       - name: Checkout (sparse — dashboard rebuild, no PDF trees)
         if: github.event_name != 'workflow_dispatch' || inputs.skip_rebuild != true
@@ -145,10 +143,25 @@ jobs:
         run: |
           git sparse-checkout add dashboard
           git read-tree -mu HEAD
-      - id: publish
+      - name: Rebuild and upload Pages artifact
         uses: ./.github/actions/publish-dashboard
         with:
           skip_rebuild: ${{ github.event_name == 'workflow_dispatch' && inputs.skip_rebuild == true && 'true' || 'false' }}
+          skip_deploy: "true"
         env:
           OAUTH_CLIENT_ID: ${{ vars.OAUTH_CLIENT_ID }}
           OAUTH_PROXY_URL: ${{ vars.OAUTH_PROXY_URL }}
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: ./.github/actions/deploy-pages-retry
+        with:
+          max_attempts: "3"
+          retry_delay_seconds: "60"

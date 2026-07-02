@@ -1,0 +1,66 @@
+name: Deploy Pages with retry
+description: Retry actions/deploy-pages when GitHub Pages stays deployment_queued
+
+inputs:
+  max_attempts:
+    description: Maximum deploy attempts
+    required: false
+    default: "3"
+  retry_delay_seconds:
+    description: Seconds to wait between attempts
+    required: false
+    default: "60"
+
+outputs:
+  page_url:
+    description: Deployed GitHub Pages URL
+    value: ${{ steps.resolve.outputs.page_url }}
+
+runs:
+  using: composite
+  steps:
+    - name: Deploy attempt 1
+      id: deploy1
+      uses: actions/deploy-pages@v4
+      continue-on-error: true
+
+    - name: Wait before retry 2
+      if: steps.deploy1.outcome == 'failure'
+      shell: bash
+      run: sleep "${{ inputs.retry_delay_seconds }}"
+
+    - name: Deploy attempt 2
+      id: deploy2
+      if: steps.deploy1.outcome == 'failure'
+      uses: actions/deploy-pages@v4
+      continue-on-error: true
+
+    - name: Wait before retry 3
+      if: steps.deploy1.outcome == 'failure' && steps.deploy2.outcome == 'failure'
+      shell: bash
+      run: sleep "${{ inputs.retry_delay_seconds }}"
+
+    - name: Deploy attempt 3
+      id: deploy3
+      if: steps.deploy1.outcome == 'failure' && steps.deploy2.outcome == 'failure'
+      uses: actions/deploy-pages@v4
+      continue-on-error: true
+
+    - name: Resolve deployment result
+      id: resolve
+      shell: bash
+      run: |
+        set -euo pipefail
+        page_url=""
+        if [ "${{ steps.deploy1.outcome }}" = "success" ]; then
+          page_url="${{ steps.deploy1.outputs.page_url }}"
+        elif [ "${{ steps.deploy2.outcome }}" = "success" ]; then
+          page_url="${{ steps.deploy2.outputs.page_url }}"
+        elif [ "${{ steps.deploy3.outcome }}" = "success" ]; then
+          page_url="${{ steps.deploy3.outputs.page_url }}"
+        else
+          echo "All ${{ inputs.max_attempts }} deploy attempts failed (Pages stayed queued or errored)."
+          exit 1
+        fi
+        echo "page_url=${page_url}" >> "$GITHUB_OUTPUT"
+        echo "Dashboard live at ${page_url}"
