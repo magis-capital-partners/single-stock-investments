@@ -10,6 +10,17 @@ ROOT = Path(__file__).resolve().parents[2]
 DATA_PATH = ROOT / "dashboard" / "data" / "dashboard_data.json"
 REGISTRY_PATH = ROOT / "_system" / "portfolio" / "registry.json"
 INSIGHTS_PATH = ROOT / "dashboard" / "data" / "insights.json"
+CONFLICT_MARKERS = ("<<<<<<<", "=======", ">>>>>>>")
+
+
+def _check_merge_conflict_markers(path: Path) -> str | None:
+    if not path.exists():
+        return None
+    text = path.read_text(encoding="utf-8")
+    for marker in CONFLICT_MARKERS:
+        if marker in text:
+            return f"{path.relative_to(ROOT)} contains unresolved git merge conflict markers"
+    return None
 
 
 def main() -> int:
@@ -18,6 +29,15 @@ def main() -> int:
 
     if not DATA_PATH.exists():
         print(f"ERROR: missing {DATA_PATH}", file=sys.stderr)
+        return 1
+
+    for path in (DATA_PATH, INSIGHTS_PATH):
+        conflict = _check_merge_conflict_markers(path)
+        if conflict:
+            errors.append(conflict)
+    if errors:
+        for msg in errors:
+            print(f"ERROR: {msg}", file=sys.stderr)
         return 1
 
     payload = json.loads(DATA_PATH.read_text(encoding="utf-8"))

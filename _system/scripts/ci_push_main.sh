@@ -29,6 +29,9 @@ is_regenerable_artifact() {
     _system/portfolio/holdings.md|_system/portfolio/classification.json|_system/portfolio/us_ticker_config.json)
       return 0
       ;;
+    _system/reference/data-sources/insights_record_archive.json)
+      return 0
+      ;;
     *)
       return 1
       ;;
@@ -50,15 +53,30 @@ is_regenerable_conflict() {
   return 0
 }
 
+regenerate_insights_artifacts() {
+  if [ ! -f "_system/scripts/build_insights.py" ]; then
+    echo "::error::build_insights.py not found; cannot auto-resolve insights conflicts."
+    return 1
+  fi
+  echo "Regenerating insights artifacts to resolve rebase conflicts..."
+  "$PYTHON" _system/scripts/build_insights.py
+  git add dashboard/data/insights.json 2>/dev/null || true
+  git add _system/reference/data-sources/insights_record_archive.json 2>/dev/null || true
+}
+
 regenerate_dashboard_json() {
   if [ ! -f "_system/scripts/build_dashboard_data.py" ]; then
     echo "::error::build_dashboard_data.py not found; cannot auto-resolve dashboard conflicts."
     return 1
   fi
   echo "Regenerating dashboard JSON to resolve rebase conflicts..."
+  if [ -f "_system/scripts/build_insights.py" ]; then
+    "$PYTHON" _system/scripts/build_insights.py
+    git add _system/reference/data-sources/insights_record_archive.json 2>/dev/null || true
+  fi
   "$PYTHON" _system/scripts/build_dashboard_data.py
-  git add dashboard/data/*.json 2>/dev/null || true
-  git add docs/data/*.json 2>/dev/null || true
+  git add dashboard/data/ 2>/dev/null || true
+  git add docs/data/ 2>/dev/null || true
 }
 
 regenerate_folder_indexes() {
@@ -94,6 +112,7 @@ regenerate_portfolio_artifacts() {
 regenerate_conflicted_artifacts() {
   local conflicted file
   local needs_dashboard=0
+  local needs_insights=0
   local needs_indexes=0
   local needs_docs_index=0
   local needs_portfolio=0
@@ -102,8 +121,14 @@ regenerate_conflicted_artifacts() {
   while IFS= read -r file; do
     [ -n "$file" ] || continue
     case "$file" in
+      dashboard/data/insights.json)
+        needs_insights=1
+        ;;
       dashboard/data/*.json|docs/data/*.json)
         needs_dashboard=1
+        ;;
+      _system/reference/data-sources/insights_record_archive.json)
+        needs_insights=1
         ;;
       docs/INDEX.csv)
         needs_docs_index=1
@@ -125,6 +150,9 @@ regenerate_conflicted_artifacts() {
   fi
   if [ "$needs_portfolio" -eq 1 ]; then
     regenerate_portfolio_artifacts
+  fi
+  if [ "$needs_insights" -eq 1 ]; then
+    regenerate_insights_artifacts
   fi
   if [ "$needs_dashboard" -eq 1 ]; then
     regenerate_dashboard_json
