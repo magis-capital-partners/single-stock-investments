@@ -34,7 +34,9 @@ jobs:
       tickers: ${{ steps.matrix.outputs.tickers }}
       max_parallel: ${{ steps.matrix.outputs.max_parallel }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: ./.github/actions/checkout-workspace
+        with:
+          profile: minimal
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -71,7 +73,9 @@ jobs:
       matrix:
         ticker: ${{ fromJson(needs.prepare.outputs.tickers) }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: ./.github/actions/checkout-workspace
+        with:
+          profile: marvin-agent
       - uses: ./.github/actions/vicki-agent
         env:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}

@@ -18,15 +18,10 @@ jobs:
     timeout-minutes: 360
 
     steps:
-      - name: Free disk space
-        uses: jlumbroso/free-disk-space@main
+      - name: Checkout (full — downloads write PDFs)
+        uses: ./.github/actions/checkout-workspace
         with:
-          tool-cache: false
-
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
+          profile: full
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -50,63 +45,19 @@ jobs:
         with:
           message: "chore: daily download sync $(date -u +%Y-%m-%d)"
 
-  portfolio-news:
-    needs: download-and-sync
-    runs-on: ubuntu-latest
-    timeout-minutes: 45
-    env:
-      POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY || secrets.POLYGON_IO_API_KEY }}
-      PORTFOLIO_NEWS_WINDOW_DAYS: "30"
-      PORTFOLIO_NEWS_POLYGON_REQS_PER_MIN: "5"
-      PORTFOLIO_NEWS_MAX_PAGES: "15"
-    steps:
-      - name: Free disk space
-        uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: false
-
-      - name: Checkout latest main
-        uses: actions/checkout@v4
-        with:
-          ref: main
-          fetch-depth: 1
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install dependencies
-        run: pip install -r _system/scripts/requirements-news.txt
-
-      - name: Ingest portfolio news
-        working-directory: _system/scripts
-        run: python ingest_portfolio_news.py
-
-      - name: Commit news artifacts
-        run: |
-          git add dashboard/data/portfolio_news.json docs/data/portfolio_news.json _system/data/news_seen.json _system/reviews/pending/news_*.md
-          git add '*/research/news/news_index.json' 2>/dev/null || true
-          bash _system/scripts/ci_push_main.sh "chore: daily portfolio news $(date -u +%Y-%m-%d)"
-
   marvin-refresh:
-    needs: portfolio-news
+    needs: download-and-sync
     runs-on: ubuntu-latest
     timeout-minutes: 120
     permissions:
       contents: read
 
     steps:
-      - name: Free disk space
-        uses: jlumbroso/free-disk-space@main
+      - name: Checkout (sparse — pick ticker metadata only)
+        uses: ./.github/actions/checkout-workspace
         with:
-          tool-cache: false
-
-      - name: Checkout latest main
-        uses: actions/checkout@v4
-        with:
+          profile: marvin-pick
           ref: main
-          fetch-depth: 1
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -151,4 +102,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Summary
-        run: echo "Daily Download & Dashboard Sync complete. Deploy Dashboard chains via workflow_run."
+        run: echo "Daily Download & Dashboard Sync complete. Portfolio news runs on the 6h schedule. Deploy Dashboard chains via workflow_run."

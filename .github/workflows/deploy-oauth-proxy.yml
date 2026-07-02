@@ -31,7 +31,13 @@ jobs:
     if: needs.oauth-secrets.outputs.configured == 'true'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: ./.github/actions/checkout-workspace
+        with:
+          profile: minimal
+      - name: Sparse checkout oauth proxy
+        run: |
+          git sparse-checkout add dashboard/oauth-proxy
+          git read-tree -mu HEAD
       - uses: ./.github/actions/deploy-oauth
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

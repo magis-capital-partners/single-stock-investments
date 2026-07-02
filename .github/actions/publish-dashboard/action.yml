@@ -1,15 +1,19 @@
 name: Publish dashboard
-description: Rebuild dashboard JSON and deploy to GitHub Pages
+description: Rebuild dashboard JSON and upload GitHub Pages artifact
 
 inputs:
   skip_rebuild:
     description: Skip rebuild (deploy committed dashboard/ as-is)
     required: false
     default: "false"
+  skip_deploy:
+    description: Upload artifact only (deploy in a separate job)
+    required: false
+    default: "false"
 
 outputs:
   page_url:
-    description: Deployed GitHub Pages URL
+    description: Deployed GitHub Pages URL (empty when skip_deploy=true)
     value: ${{ steps.deployment.outputs.page_url }}
 
 runs:
@@ -31,17 +35,25 @@ runs:
         profile: darwin-fast
         validate: "true"
 
+    - name: Configure GitHub Pages
+      uses: actions/configure-pages@v5
+
     - name: Upload Pages artifact
       uses: actions/upload-pages-artifact@v3
       with:
         path: dashboard
 
     - name: Deploy to GitHub Pages
+      if: inputs.skip_deploy != 'true'
       id: deployment
       uses: actions/deploy-pages@v4
 
     - name: Summary
       shell: bash
       run: |
-        echo "Dashboard live at ${{ steps.deployment.outputs.page_url }}"
-        echo "Verify data/oauth_config.json exchange_url matches OAUTH_PROXY_URL repo variable."
+        if [ "${{ inputs.skip_deploy }}" = "true" ]; then
+          echo "Pages artifact uploaded; deploy job will publish."
+        else
+          echo "Dashboard live at ${{ steps.deployment.outputs.page_url }}"
+          echo "Verify data/oauth_config.json exchange_url matches OAUTH_PROXY_URL repo variable."
+        fi

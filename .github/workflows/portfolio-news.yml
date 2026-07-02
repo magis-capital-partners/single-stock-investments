@@ -3,6 +3,9 @@ name: Portfolio News Ingest
 # Billing guardrail: if ingest-news fails in <10s with no step logs and the
 # annotation "recent account payments have failed", restore GitHub Actions
 # billing for the org — repo code cannot start runners until that is fixed.
+#
+# Standalone schedule (every 6h). Daily download sync no longer duplicates this job;
+# see daily-sync.yml marvin-refresh which runs after downloads only.
 
 on:
   schedule:

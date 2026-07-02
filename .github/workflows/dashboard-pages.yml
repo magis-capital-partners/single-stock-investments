@@ -52,7 +52,7 @@ permissions:
 
 concurrency:
   group: dashboard-deploy
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   oauth-secrets:
@@ -76,13 +76,10 @@ jobs:
     outputs:
       changed: ${{ steps.check.outputs.changed }}
     steps:
-      - name: Free disk space
-        uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: false
+      - uses: ./.github/actions/prepare-runner
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 2
       - id: check
         run: |
           BEFORE="${{ github.event.before }}"
@@ -107,13 +104,19 @@ jobs:
       )
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: ./.github/actions/checkout-workspace
+        with:
+          profile: minimal
+      - name: Sparse checkout oauth proxy
+        run: |
+          git sparse-checkout add dashboard/oauth-proxy
+          git read-tree -mu HEAD
       - uses: ./.github/actions/deploy-oauth
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
-  publish:
+  build:
     needs: [oauth-secrets, oauth-proxy]
     if: |
       always() &&
@@ -123,30 +126,42 @@ jobs:
         github.event.workflow_run.conclusion == 'success'
       )
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.publish.outputs.page_url }}
+    timeout-minutes: 45
     steps:
-      - name: Free disk space
-        uses: jlumbroso/free-disk-space@main
+      - name: Checkout (sparse — dashboard rebuild, no PDF trees)
+        if: github.event_name != 'workflow_dispatch' || inputs.skip_rebuild != true
+        uses: ./.github/actions/checkout-workspace
         with:
-          tool-cache: false
+          profile: dashboard
       - name: Checkout (config-only deploy)
         if: github.event_name == 'workflow_dispatch' && inputs.skip_rebuild == true
-        uses: actions/checkout@v4
+        uses: ./.github/actions/checkout-workspace
         with:
-          fetch-depth: 1
-          sparse-checkout: dashboard
-          sparse-checkout-cone-mode: true
-      - name: Checkout (full rebuild)
-        if: github.event_name != 'workflow_dispatch' || inputs.skip_rebuild != true
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-      - id: publish
+          profile: minimal
+      - name: Sparse checkout dashboard tree
+        if: github.event_name == 'workflow_dispatch' && inputs.skip_rebuild == true
+        run: |
+          git sparse-checkout add dashboard
+          git read-tree -mu HEAD
+      - name: Rebuild and upload Pages artifact
         uses: ./.github/actions/publish-dashboard
         with:
           skip_rebuild: ${{ github.event_name == 'workflow_dispatch' && inputs.skip_rebuild == true && 'true' || 'false' }}
+          skip_deploy: "true"
         env:
           OAUTH_CLIENT_ID: ${{ vars.OAUTH_CLIENT_ID }}
           OAUTH_PROXY_URL: ${{ vars.OAUTH_PROXY_URL }}
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: ./.github/actions/deploy-pages-retry
+        with:
+          max_attempts: "3"
+          retry_delay_seconds: "60"

@@ -23,7 +23,10 @@ jobs:
   refresh:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout (sparse — research JSON, no PDF trees)
+        uses: ./.github/actions/checkout-workspace
+        with:
+          profile: darwin
 
       - uses: actions/setup-python@v5
         with:
