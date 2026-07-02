@@ -136,7 +136,44 @@ test_mixed_generated_conflict() {
   fi
 }
 
+test_insights_json_conflict() {
+  git checkout -b "$TMP_BRANCH" >/dev/null
+
+  python3 _system/scripts/build_insights.py >/dev/null
+  git add dashboard/data/insights.json _system/reference/data-sources/insights_record_archive.json
+  git commit -m "test: base insights snapshot" >/dev/null
+
+  python3 _system/scripts/build_insights.py >/dev/null
+  git add dashboard/data/insights.json _system/reference/data-sources/insights_record_archive.json
+  git commit -m "test: local insights regen" >/dev/null
+
+  git branch test-main-conflict "$MAIN_REF" >/dev/null
+  git checkout test-main-conflict >/dev/null
+  python3 _system/scripts/build_insights.py >/dev/null
+  git add dashboard/data/insights.json _system/reference/data-sources/insights_record_archive.json
+  git commit -m "test: main insights regen" >/dev/null
+
+  git checkout "$TMP_BRANCH" >/dev/null
+  if git rebase test-main-conflict; then
+    echo "FAIL: expected rebase conflict in dashboard/data/insights.json"
+    exit 1
+  fi
+
+  while rebase_in_progress && try_resolve_rebase_conflicts; do
+    :
+  done
+  if rebase_in_progress; then
+    echo "FAIL: insights.json conflict resolution helper did not finish rebase"
+    exit 1
+  fi
+  if grep -q '^<<<<<<< ' dashboard/data/insights.json; then
+    echo "FAIL: insights.json still contains merge conflict markers after resolution"
+    exit 1
+  fi
+}
+
 run_test "dashboard JSON rebase conflict auto-resolution" test_dashboard_json_conflict
+run_test "insights JSON rebase conflict auto-resolution" test_insights_json_conflict
 run_test "INDEX.csv rebase conflict auto-resolution" test_index_csv_conflict
 run_test "mixed generated artifact rebase conflict auto-resolution" test_mixed_generated_conflict
 
