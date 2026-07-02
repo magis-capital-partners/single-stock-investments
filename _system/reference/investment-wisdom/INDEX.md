@@ -7,7 +7,7 @@ Last updated: 2026-06-01 — added John Mihaljevic / Manual of Ideas + moi_lens 
 | Charlie Munger | `munger/` | 3 PDFs | Reasoning quality, inversion, psychology, moats |
 | Mohnish Pabrai | `pabrai/` | 37 PDFs | Dhando payoff, letters, concentration discipline |
 | Murray Stahl | `stahl/` | 6 PDFs | Croupiers, exchanges, diversification, spinoffs, philosophy |
-| Horizon Kinetics | `horizon-kinetics/` | 5 extracts | Equity yield curve, predictive attributes, time arbitrage |
+| Horizon Kinetics | `horizon-kinetics/` | 331 PDFs + 5 extracts | Equity yield curve, predictive attributes, time arbitrage |
 | Chris Hohn / TCI | `tci/` | 32 letters + extract | Operating mechanics, thesis pillars, valuation bridge |
 | John Mihaljevic / MOI | `mihaljevic/` | 1 PDF + extract | Idea generation, uses/misuses, special situations |
 
@@ -82,7 +82,7 @@ Partner letters (Jan annual series). Filename pattern `Pabrai-Letter-l_MMDDYY.pd
 
 ## Horizon Kinetics (`horizon-kinetics/`)
 
-Curated **text extracts** from `C:\Users\werdn\Documents\Investing\Horizon Kinetics\hk_pdfs\`. See `horizon-kinetics/README.md` for refresh commands.
+Curated **text extracts** and imported source PDFs from `C:\Users\werdn\Documents\Investing\Horizon Kinetics\hk_pdfs\`. Source PDFs live in `horizon-kinetics/pdfs/`; `horizon-kinetics/pdf_import_manifest.csv` records 338 selected unique HK/Stahl documents, including 7 already represented in `stahl/` or superinvestor letters. See `horizon-kinetics/README.md` for extract refresh commands.
 
 | File | Theme | Apply when |
 |------|-------|------------|

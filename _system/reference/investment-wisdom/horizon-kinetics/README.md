@@ -1,12 +1,12 @@
 # Horizon Kinetics — curated extracts
 
-Text extracts from the full HK vault for Marvin's **Tier 3 mental models** (equity yield curve, predictive attributes, time arbitrage).
+Text extracts and source PDFs from the HK vault for Marvin's **Tier 3 mental models** (equity yield curve, predictive attributes, time arbitrage).
 
 **Full vault (400+ PDFs):** `C:\Users\werdn\Documents\Investing\Horizon Kinetics\hk_pdfs\` (Windows) · `HK_PDFS_ROOT` or `/opt/cursor/hk_pdfs` (cloud)  
 **Ticker index:** `_system/reference/investment-wisdom/hk_ticker_index.json` — run `scan_hk_sources.py {TICKER}` before deep dives  
 **Framework:** `_system/frameworks/hk_cross_reference.md` · `_system/frameworks/mental_models.md`
 
-These are **text extracts** (not PDFs) copied from `hk_pdfs/book/build/text/` for agent readability.
+The files in this directory are curated **text extracts** copied from `hk_pdfs/book/build/text/` for agent readability. Source PDFs imported from the vault live in `pdfs/`; `pdf_import_manifest.csv` records the 338 selected unique HK/Stahl documents, including the 7 already represented elsewhere in the repo.
 
 ## Automatic refresh
 
@@ -25,6 +25,7 @@ Runs before every HK scan (`marvin_cloud_refresh.py`, `scan_third_party_sources.
 | `Stahl-Worth-The-Time-Predictive-Attributes-extract.txt` | Worth The Time interview (Feb 2024) | Predictive vs descriptive attributes |
 
 **Shelf PDFs (Stahl essays):** `_system/reference/investment-wisdom/stahl/`
+**Imported HK PDFs:** `_system/reference/investment-wisdom/horizon-kinetics/pdfs/`
 
 ## Manual refresh (Windows)
 
