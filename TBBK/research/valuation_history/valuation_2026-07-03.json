@@ -1,0 +1,262 @@
+{
+  "ticker": "TBBK",
+  "as_of": "2026-07-03",
+  "method": "full",
+  "lawrence_bucket": "multi_sided",
+  "classification_inputs": {
+    "archetype": "platform",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 63.89,
+    "price_source": "Yahoo TBBK close 2026-07-02",
+    "fcf_per_share": 4.92,
+    "fcf_source": "FY2025 diluted EPS per `tbbk-investor-presentation-q4-2025.pdf` slide 7; corroborated by H1 2025 diluted EPS $2.46 in `TBBK-Q2-2025-10Q.pdf`",
+    "shares_millions": 46.6,
+    "normalization_note": "Owner cash proxied by diluted EPS. Fintech credit sponsorship provisions ($43.2M Q2 2025) offset in non-interest income with no net income impact per 10-Q footnote.",
+    "price_as_of": "2026-07-02"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 11,
+      "notes": "Fintech credit losses exceed fees; NIM compression; buybacks slow above $10B asset cap"
+    },
+    "base": {
+      "growth_y1_5": 0.08,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 13,
+      "notes": "Mid-single-digit organic growth below Apex 2030; ~100% capital return continues; 13x exit on year-10 owner earnings"
+    },
+    "bull": {
+      "growth_y1_5": 0.12,
+      "growth_y6_10": 0.07,
+      "exit_pfcf_y10": 15,
+      "notes": "Embedded finance + credit sponsorship scale; partial Apex 2030 delivery; sustained 25%+ ROE"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Bank marks loans and securities at fair value; shareholders equity $860M at 6/30/2025 per 10-Q"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating bank; no land or royalty reserves"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Consumer fintech credit charge-offs $151.1M in 2025 per investor presentation; matched fee/provision accounting in 10-Q"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / pipeline not in base cash path?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Embedded finance launch and Apex 2030 in bull scenario only; not in Lawrence base growth"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No material holdco stakes disclosed"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Earnings from operating bank franchise"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Fintech fee income ($141M YTD 2025 fintech deposits segment per Q4 2025 presentation) already in owner earnings"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "Fintech partner deposit growth funds low-cost balance sheet; fee income from prepaid/debit sponsorship and credit programs compounds with share count reduction via buybacks",
+    "filing_citation": "TBBK-Q2-2025-10Q.pdf segment note; tbbk-investor-presentation-q4-2025.pdf Apex 2030",
+    "bear_falsifier": "Fintech net charge-offs exceed fee income growth for two consecutive years",
+    "bull_falsifier": "Q4 2026 run-rate EPS reaches $7.00 on sustained ROE above 25%",
+    "lawrence_legacy": {
+      "y1_5": 0.08,
+      "y6_10": 0.05,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.08,
+      "y6_10": 0.05,
+      "exit_pfcf_y10": 13.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": null,
+      "as_of_filing_facts": "evidence/_text/tbbk-investor-presentation-q4-2025.pdf.txt"
+    },
+    "status": "partial"
+  },
+  "estimates": {
+    "external": []
+  },
+  "human_review": {
+    "live_price_confirmed": false
+  },
+  "total_return_panel": {
+    "as_of": "2026-07-03",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 0,
+    "distribution_history_sum": 0,
+    "market_cap_m": null,
+    "total_return_annualized_pct": 6.37,
+    "chart": "TBBK/research/charts/total_return_2026-07-03.svg",
+    "panel_json": "TBBK/research/total_return_panel.json"
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 8.8
+    },
+    "base": {
+      "return_pct": 15.6
+    },
+    "bull": {
+      "return_pct": 21.2
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 8.8
+    },
+    "base": {
+      "return_pct": 15.6
+    },
+    "bull": {
+      "return_pct": 21.2
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": 15.6
+    },
+    "falsifier_adjusted": {
+      "return_pct": 15.6
+    }
+  },
+  "implied_return": {
+    "base_pct": 16.73,
+    "label": "7yr IRR (total synthesis)",
+    "display": "16.73% (total synthesis)",
+    "lawrence_stance_gate_pct": 15.6,
+    "falsifier_adjusted_pct": 15.6,
+    "synthesis_pct": 16.73
+  },
+  "stance_proposal": {
+    "suggested": "hold",
+    "irr_band": "15\u201320%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Growth theory (pre-falsifier)",
+        "source": "growth_explanation + filing revenue YoY",
+        "return_pct": 15.6,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": 8.8,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 21.2,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 16.93,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 16.73,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}
