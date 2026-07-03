@@ -17,7 +17,7 @@
 | ABMD.CVR | no_hit | — | No activist index hits |
 | ABX | no_hit | — | No activist index hits |
 | ADN.TO | no_hit | — | No activist index hits |
-| ALS.TO | indexed | L0/S1 | 0 long, 1 short in activist index |
+| ALS.TO | no_hit | — | No activist index hits |
 | AMD | indexed | L2/S1 | 2 long, 1 short in activist index |
 | AMZN | no_hit | — | No activist index hits |
 | APLD | indexed | L8/S0 | 8 long, 0 short in activist index; 1 short markdown cache |
@@ -32,18 +32,18 @@
 | BN | indexed | L103/S0 | 103 long, 0 short in activist index |
 | BOLSAA.MX | no_hit | — | No activist index hits |
 | BRBR | no_hit | — | No activist index hits |
-| BSM | indexed | L0/S1 | 0 long, 1 short in activist index |
+| BSM | no_hit | — | No activist index hits |
 | BUR | indexed | L0/S3 | 0 long, 3 short in activist index |
 | BVERS | no_hit | — | No activist index hits |
 | BWEL | no_hit | — | No activist index hits |
 | BYMA | no_hit | — | No activist index hits |
-| CBOE | indexed | L0/S10 | 0 long, 10 short in activist index |
-| CBRS | indexed | L0/S7 | 0 long, 7 short in activist index |
+| CBOE | no_hit | — | No activist index hits |
+| CBRS | no_hit | — | No activist index hits |
 | CDZI | no_hit | — | No activist index hits |
-| CHTR | indexed | L28/S1 | 28 long, 1 short in activist index |
+| CHTR | indexed | L28/S0 | 28 long, 0 short in activist index |
 | CKX | indexed | L3/S0 | 3 long, 0 short in activist index |
 | CME | no_hit | — | No activist index hits |
-| CMSG | indexed | L0/S1 | 0 long, 1 short in activist index |
+| CMSG | no_hit | — | No activist index hits |
 | COLD | no_hit | — | No activist index hits |
 | CORBF | no_hit | — | No activist index hits |
 | CPRT | no_hit | — | No activist index hits |
@@ -53,7 +53,7 @@
 | CSU.DB | no_hit | — | No activist index hits |
 | DB1.DE | no_hit | — | No activist index hits |
 | DHR | indexed | L7/S0 | 7 long, 0 short in activist index |
-| DMLP | indexed | L2/S1 | 2 long, 1 short in activist index |
+| DMLP | indexed | L2/S0 | 2 long, 0 short in activist index |
 | DRR.AX | no_hit | — | No activist index hits |
 | ECHO | no_hit | — | No activist index hits |
 | EFOR | no_hit | — | No activist index hits |
@@ -84,7 +84,7 @@
 | GROY | no_hit | — | No activist index hits |
 | GS | no_hit | — | No activist index hits |
 | GTX | no_hit | — | No activist index hits |
-| HE | indexed | L1/S1 | 1 long, 1 short in activist index |
+| HE | indexed | L1/S0 | 1 long, 0 short in activist index |
 | HEE | no_hit | — | No activist index hits |
 | HEI.A | no_hit | — | No activist index hits |
 | HKHC | indexed | L15/S0 | 15 long, 0 short in activist index |
@@ -122,7 +122,7 @@
 | NVDA | no_hit | — | No activist index hits |
 | NZX.NZ | no_hit | — | No activist index hits |
 | OR | indexed | L6/S0 | 6 long, 0 short in activist index |
-| OTCM | indexed | L0/S10 | 0 long, 10 short in activist index |
+| OTCM | no_hit | — | No activist index hits |
 | PBT | indexed | L2/S0 | 2 long, 0 short in activist index |
 | PCH | no_hit | — | No activist index hits |
 | PCYO | no_hit | — | No activist index hits |
@@ -140,7 +140,7 @@
 | SBR | no_hit | — | No activist index hits |
 | SHC | no_hit | — | No activist index hits |
 | SJT | no_hit | — | No activist index hits |
-| SMR | indexed | L5/S1 | 5 long, 1 short in activist index |
+| SMR | indexed | L5/S0 | 5 long, 0 short in activist index |
 | SNOW | no_hit | — | No activist index hits |
 | SOC | indexed | L7/S0 | 7 long, 0 short in activist index |
 | SPGI | no_hit | — | No activist index hits |
@@ -149,7 +149,7 @@
 | TASE | no_hit | — | No activist index hits |
 | TBBK | no_hit | — | No activist index hits |
 | TEQ.ST | no_hit | — | No activist index hits |
-| TFPM | indexed | L0/S1 | 0 long, 1 short in activist index |
+| TFPM | no_hit | — | No activist index hits |
 | TOI | no_hit | — | No activist index hits |
 | TPL | indexed | L7/S0 | 7 long, 0 short in activist index |
 | TRC | indexed | L7/S0 | 7 long, 0 short in activist index |
@@ -158,7 +158,7 @@
 | VTRS | no_hit | — | No activist index hits |
 | WBI | no_hit | — | No activist index hits |
 | WEST | no_hit | — | No activist index hits |
-| WPM | indexed | L0/S1 | 0 long, 1 short in activist index |
+| WPM | no_hit | — | No activist index hits |
 | WRLC | no_hit | — | No activist index hits |
 | X.TO | no_hit | — | No activist index hits |
 | XP | no_hit | — | No activist index hits |
