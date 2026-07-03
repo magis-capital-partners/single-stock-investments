@@ -9,6 +9,7 @@ from activist_common import (
     load_ticker_index,
     match_report_to_ticker,
     portfolio_tickers,
+    publisher_match_blob,
     save_ticker_index,
     ticker_meta,
     url_target_mismatch,
@@ -18,14 +19,7 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 def report_blob(report: dict) -> str:
-    parts = [
-        report.get("title") or "",
-        report.get("source_url") or "",
-        report.get("local_file") or "",
-        report.get("local_pdf") or "",
-        report.get("firm_name") or "",
-    ]
-    return " ".join(p for p in parts if p)
+    return publisher_match_blob(report)
 
 
 def should_keep(report: dict, meta: dict) -> tuple[bool, str]:
@@ -52,6 +46,9 @@ def should_keep(report: dict, meta: dict) -> tuple[bool, str]:
             # Document body never mentions this ticker/company and the title/URL
             # match was weak to begin with: title-only false positive.
             return False, "body_unverified"
+        body_reason = report.get("body_match_reason") or ""
+        if body_reason.startswith("alias:"):
+            return False, f"body_alias_only:{body_reason}"
 
     if source == "local" and not report.get("title") and not report.get("source_url"):
         # Duplicate stub rows from pre-SEC local collector

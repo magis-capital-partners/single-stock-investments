@@ -19,6 +19,7 @@ from activist_common import (  # noqa: E402
     PORTFOLIO_REGISTRY,
     load_json,
     match_report_to_ticker,
+    publisher_match_blob,
     ticker_meta,
     url_target_mismatch,
 )
@@ -42,13 +43,14 @@ def is_publisher_false_positive(row: dict, meta_cache: dict[str, dict]) -> bool:
     title = row.get("title") or ""
     if url_target_mismatch(url, title, meta):
         return True
-    blob = " ".join(
-        str(p)
-        for p in (title, url, row.get("local_file"), row.get("firm_name"))
-        if p
-    )
+    blob = publisher_match_blob(row)
     matched, confidence, _reason = match_report_to_ticker(blob, meta)
-    return not matched or confidence < 0.9
+    if not matched or confidence < 0.9:
+        return True
+    body_reason = row.get("body_match_reason") or ""
+    if body_reason.startswith("alias:"):
+        return True
+    return False
 
 
 def clean_feed_payload(payload: dict) -> dict:

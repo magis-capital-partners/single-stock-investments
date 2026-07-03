@@ -56,6 +56,7 @@ Ref resolution lives in `_system/scripts/ci_resolve_checkout_ref.sh` — **never
 | Change | Required follow-up |
 |--------|-------------------|
 | Edit `ci_checkout_workspace.sh` or `ci_resolve_checkout_ref.sh` | Run `bash _system/scripts/test_ci_checkout_workspace.sh` locally; **CI bootstrap smoke** runs on PR |
+| Edit any workflow bootstrap sparse-checkout block | Run `python _system/scripts/lint_ci_bootstrap.py`; smoke workflow lint job catches missing resolver script |
 | Add a new `pull_request` workflow using bootstrap checkout | Ensure it either relies on the resolver (no explicit ref) or passes `${{ github.head_ref }}` |
 | Add a new sparse profile | Update `ci_sparse_checkout_paths.py` and document in this table |
 | Replace bootstrap with a composite action | **Don't** — composites cannot run before the first checkout |

@@ -111,6 +111,7 @@ GENERIC_COMPANY_TOKENS = frozenset(
         "corp",
         "corporation",
         "company",
+        "companies",
         "international",
         "global",
         "services",
@@ -261,6 +262,20 @@ def resolve_report_file(report: dict) -> tuple[str | None, bool, bool]:
         ref, is_pdf = candidates[0]
         return ref, is_pdf, False
     return None, False, False
+
+
+def publisher_match_blob(report: dict) -> str:
+    """Text used to match publisher/local reports to a ticker (excludes repo paths).
+
+    Including local_file makes every ``{TICKER}/third-party-analyses/...`` path
+    match its folder ticker regardless of document content.
+    """
+    parts = [
+        report.get("title") or "",
+        report.get("source_url") or "",
+        report.get("firm_name") or "",
+    ]
+    return " ".join(p for p in parts if p)
 
 
 def publisher_match_allowed(url: str, title: str, blob: str, meta: dict) -> tuple[bool, float, str]:

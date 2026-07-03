@@ -8,8 +8,8 @@ on:
       - "_system/scripts/ci_resolve_checkout_ref.sh"
       - "_system/scripts/ci_sparse_checkout_paths.py"
       - "_system/scripts/test_ci_checkout_workspace.sh"
-      - ".github/workflows/ci-bootstrap-smoke.yml"
-      - ".github/workflows/research-quality.yml"
+      - "_system/scripts/lint_ci_bootstrap.py"
+      - ".github/workflows/**"
   push:
     branches: [main]
     paths:
@@ -17,8 +17,8 @@ on:
       - "_system/scripts/ci_resolve_checkout_ref.sh"
       - "_system/scripts/ci_sparse_checkout_paths.py"
       - "_system/scripts/test_ci_checkout_workspace.sh"
-      - ".github/workflows/ci-bootstrap-smoke.yml"
-      - ".github/workflows/research-quality.yml"
+      - "_system/scripts/lint_ci_bootstrap.py"
+      - ".github/workflows/**"
 
 permissions:
   contents: read
@@ -32,10 +32,14 @@ jobs:
           sparse-checkout: |
             _system/scripts/ci_resolve_checkout_ref.sh
             _system/scripts/test_ci_checkout_workspace.sh
+            _system/scripts/lint_ci_bootstrap.py
+            .github/workflows
           sparse-checkout-cone-mode: false
           fetch-depth: 1
       - name: Unit test ref resolution
         run: bash _system/scripts/test_ci_checkout_workspace.sh
+      - name: Lint workflow bootstrap blocks
+        run: python _system/scripts/lint_ci_bootstrap.py
 
   checkout-minimal:
     runs-on: ubuntu-latest
