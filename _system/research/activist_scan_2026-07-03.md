@@ -18,7 +18,7 @@
 | APLD | 8 | 0 | 2024-11-29 | 8 indexed |
 | ASPN | 0 | 0 | — | no hits |
 | ASX.AX | 0 | 0 | — | no hits |
-| AXON | 0 | 0 | — | no hits |
+| AXON | 0 | 1 | 2019-01-01 | 1 indexed |
 | AZLCZ | 0 | 0 | — | no hits |
 | B | 0 | 0 | — | no hits |
 | B3SA3.SA | 0 | 0 | — | no hits |
@@ -116,7 +116,7 @@
 | NRP | 0 | 0 | — | no hits |
 | NVDA | 0 | 0 | — | no hits |
 | NZX.NZ | 0 | 0 | — | no hits |
-| OR | 6 | 0 | 2023-01-05 | 6 indexed |
+| OR | 6 | 3 | 2026-01-01 | 9 indexed |
 | OTCM | 0 | 10 | 2019-01-01 | 10 indexed |
 | PBT | 2 | 0 | 2025-11-12 | 2 indexed |
 | PCH | 0 | 0 | — | no hits |

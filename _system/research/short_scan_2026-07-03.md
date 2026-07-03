@@ -23,7 +23,7 @@
 | APLD | indexed | L8/S0 | 8 long, 0 short in activist index; 1 short markdown cache |
 | ASPN | no_hit | — | No activist index hits |
 | ASX.AX | no_hit | — | No activist index hits |
-| AXON | no_hit | — | No activist index hits |
+| AXON | indexed | L0/S1 | 0 long, 1 short in activist index |
 | AZLCZ | no_hit | — | No activist index hits |
 | B | no_hit | — | No activist index hits |
 | B3SA3.SA | no_hit | — | No activist index hits |

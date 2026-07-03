@@ -1,7 +1,7 @@
 # Activist scan review queue
 
 **Date:** 2026-07-03
-**Hits:** 311 new or low-confidence
+**Hits:** 315 new or low-confidence
 
 | Ticker | Side | Firm | Date | Source | Confidence |
 |--------|------|------|------|--------|------------|
