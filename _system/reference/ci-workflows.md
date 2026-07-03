@@ -35,6 +35,33 @@ Agent workflows (open PRs)
 | `.github/actions/marvin-agent/` | Cursor SDK + deep dive |
 | `.github/actions/vicki-agent/` | Cursor SDK + IR harvest |
 
+## CI bootstrap checkout (all jobs)
+
+GitHub requires `actions/checkout` before any `./.github/actions/*` reference. Every job therefore uses this **three-step bootstrap** instead of a composite checkout action:
+
+1. `jlumbroso/free-disk-space@main` (when disk pressure matters)
+2. `actions/checkout@v4` with sparse paths: `ci_checkout_workspace.sh`, **`ci_resolve_checkout_ref.sh`**, `ci_sparse_checkout_paths.py` (all three required)
+3. `bash _system/scripts/ci_checkout_workspace.sh <profile> [ref] [depth]`
+
+Ref resolution lives in `_system/scripts/ci_resolve_checkout_ref.sh` — **never** pass `GITHUB_REF_NAME` directly to `git fetch`. On `pull_request` events GitHub sets `GITHUB_REF_NAME=228/merge`, which is not a fetchable branch; the resolver uses `GITHUB_HEAD_REF` (PR branch) or `pull/N/merge` from `GITHUB_REF`.
+
+| Profile | Sparse paths | Typical use |
+|---------|--------------|-------------|
+| `full` / `history` | disabled (full tree) | lint diffs, onboard |
+| `minimal` / `marvin-agent` | `_system`, `.github` | prompt sync, agents |
+| `news` / `marvin-pick` / `darwin` / `dashboard` | base + ticker paths from `ci_sparse_checkout_paths.py` | portfolio jobs |
+
+### Guardrails (avoid regressions)
+
+| Change | Required follow-up |
+|--------|-------------------|
+| Edit `ci_checkout_workspace.sh` or `ci_resolve_checkout_ref.sh` | Run `bash _system/scripts/test_ci_checkout_workspace.sh` locally; **CI bootstrap smoke** runs on PR |
+| Add a new `pull_request` workflow using bootstrap checkout | Ensure it either relies on the resolver (no explicit ref) or passes `${{ github.head_ref }}` |
+| Add a new sparse profile | Update `ci_sparse_checkout_paths.py` and document in this table |
+| Replace bootstrap with a composite action | **Don't** — composites cannot run before the first checkout |
+
+**CI bootstrap smoke** (`.github/workflows/ci-bootstrap-smoke.yml`) runs unit tests plus a live `minimal` checkout on every PR that touches bootstrap scripts or research-quality workflow paths.
+
 ## Visible workflows (~14)
 
 | Workflow | Schedule / trigger | Commits main? | Chains deploy? |
@@ -50,6 +77,7 @@ Agent workflows (open PRs)
 | Marvin Deep Dive | manual (3 modes), push queue | No (PR) | On merge |
 | Vicki IR Harvest | manual, push queue | No (PR) | On merge |
 | Research quality (PR) | PR paths | No | No |
+| CI bootstrap smoke | PR/push bootstrap paths | No | No |
 | CI Autofix | workflow_run failures, manual | Maybe | No |
 | CI Autofix Reusable | workflow_call only | — | — |
 | pages-build-deployment | GitHub-managed | — | — |

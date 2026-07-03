@@ -4,12 +4,16 @@
 # GitHub Actions cannot use ./.github/actions/* before actions/checkout runs.
 # Every job must bootstrap with public actions, then call this script:
 #   1. jlumbroso/free-disk-space@main
-#   2. actions/checkout@v4 (sparse: this script + ci_sparse_checkout_paths.py)
+#   2. actions/checkout@v4 (sparse: ci_checkout_workspace.sh, ci_resolve_checkout_ref.sh, ci_sparse_checkout_paths.py)
 #   3. bash _system/scripts/ci_checkout_workspace.sh <profile> [ref] [depth]
 #
 # Local actions (commit-main, marvin-agent, publish-dashboard, etc.) are safe
 # after step 3 because .github/ is included in every profile.
 set -euo pipefail
+
+SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+# shellcheck disable=SC1091
+source "$SCRIPT_DIR/ci_resolve_checkout_ref.sh"
 
 PROFILE="${1:?profile required: full|history|news|marvin-pick|minimal|marvin-agent|darwin|dashboard}"
 REF_INPUT="${2:-}"
@@ -23,13 +27,7 @@ if [ -z "$FETCH_DEPTH" ]; then
   fi
 fi
 
-if [ -n "$REF_INPUT" ]; then
-  REF="$REF_INPUT"
-elif [ -n "${GITHUB_REF_NAME:-}" ]; then
-  REF="$GITHUB_REF_NAME"
-else
-  REF="main"
-fi
+REF=$(resolve_checkout_ref "$REF_INPUT")
 
 if [ -n "${GITHUB_WORKSPACE:-}" ]; then
   git config --global --add safe.directory "$GITHUB_WORKSPACE"
