@@ -1,0 +1,68 @@
+name: CI bootstrap smoke
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "_system/scripts/ci_checkout_workspace.sh"
+      - "_system/scripts/ci_resolve_checkout_ref.sh"
+      - "_system/scripts/ci_sparse_checkout_paths.py"
+      - "_system/scripts/test_ci_checkout_workspace.sh"
+      - ".github/workflows/ci-bootstrap-smoke.yml"
+      - ".github/workflows/research-quality.yml"
+  push:
+    branches: [main]
+    paths:
+      - "_system/scripts/ci_checkout_workspace.sh"
+      - "_system/scripts/ci_resolve_checkout_ref.sh"
+      - "_system/scripts/ci_sparse_checkout_paths.py"
+      - "_system/scripts/test_ci_checkout_workspace.sh"
+      - ".github/workflows/ci-bootstrap-smoke.yml"
+      - ".github/workflows/research-quality.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  ref-resolution:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts/ci_resolve_checkout_ref.sh
+            _system/scripts/test_ci_checkout_workspace.sh
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Unit test ref resolution
+        run: bash _system/scripts/test_ci_checkout_workspace.sh
+
+  checkout-minimal:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          docker-images: true
+          swap-storage: true
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts/ci_checkout_workspace.sh
+            _system/scripts/ci_resolve_checkout_ref.sh
+            _system/scripts/ci_sparse_checkout_paths.py
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Checkout workspace (minimal)
+        run: bash _system/scripts/ci_checkout_workspace.sh minimal
+      - name: Assert checkout ref is fetchable
+        run: |
+          set -euo pipefail
+          REF=$(bash _system/scripts/ci_resolve_checkout_ref.sh)
+          echo "Resolved ref: $REF"
+          git rev-parse HEAD
+          test -f _system/scripts/ci_checkout_workspace.sh
+          test -d .github/workflows
