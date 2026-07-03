@@ -63,6 +63,31 @@ If **new_documents** or **new_valuation_news**: focus on what changed for owner 
 4. **Growth:** State mechanism in Business & moat; growth rows in assumption ledger cite filing or **[Assumption]**. Optional `growth_explanation` in `valuation.json` (not rendered in markdown).
 5. **Third-party cross-check (required):** write or complete **`{{TICKER}}/research/cross_check_third_party_{{date}}.md`** per `third_party_cross_reference.md` + `external_view_blend.md`. Existing named cross-checks (McIntyre, Substacks, HK) count if they cover the inventory.
 6. Write or update **`{{TICKER}}/research/deep_dive_{{date}}.md`** with filing-grounded narrative (`_system/prompts/deep_dive_filing_grounded_refresh.md`). Set header **Prior dive:** link to previous file.
+7. **Company dossier (required):** write or refresh **`{{TICKER}}/research/dossier.json`** — the structured company-context file the dashboard renders. Schema:
+
+```json
+{
+  "ticker": "{{TICKER}}",
+  "as_of": "{{date}}",
+  "timeline": [
+    {
+      "date": "YYYY-MM-DD",
+      "type": "capital_allocation | management_change | strategic_pivot | ownership | regulatory | other",
+      "label": "One-line description of the event and why it mattered for owners",
+      "evidence_ref": "path or citation into research/evidence (optional)",
+      "evidence_url": "https:// link if public (optional)"
+    }
+  ],
+  "industry": {
+    "structure": "Competitive structure in 1-3 sentences (concentration, pricing power, entry barriers)",
+    "share_shift": "Who is gaining/losing share and why, 1-2 sentences",
+    "trend": "How the industry is changing right now (tech, regulation, demand), 1-2 sentences",
+    "peers": ["TICKER-or-name", "..."]
+  }
+}
+```
+
+Rules: timeline covers the **relevant history** (capital-allocation decisions, management changes, strategic pivots), newest first, each entry evidence-grounded where possible. Keep 8–20 entries. On refresh, **merge** — preserve prior entries unless filings contradict them; update `industry` to reflect the current state. The pipeline auto-appends recent high-score events between agent runs, so do not duplicate items already covered by insights.
 
 ## Phase 3 — Mechanical pipeline (run last; required)
 
@@ -95,4 +120,5 @@ Fix any lint errors before finishing the PR.
 - [ ] `deep_dive_{{date}}.md` passes `lint_deep_dive.py {{TICKER}}` and `lint_deep_dive_depth.py {{TICKER}}` (≥18/24)
 - [ ] `adversarial_{{date}}.md` present; dive header **Adversarial:** pass|blocked
 - [ ] `classification.json` + `thesis.md` synced
+- [ ] `dossier.json` written/refreshed (timeline + industry)
 - [ ] No secrets in commits

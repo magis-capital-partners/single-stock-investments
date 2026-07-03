@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "updated": "2026-07-02",
+  "notes": "Power zones map investor persona frameworks to the company types where each framework has demonstrated alpha. Rules match against registry classification fields (archetype, moat, dhando, investment_sleeve, cycle, stance). A ticker is in a persona's power zone when at least min_matches rule fields match and no exclusion fires. build_power_zones.py blends rule fit with persona_calibration.json match rates.",
+  "zones": {
+    "pabrai": {
+      "label": "Mohnish Pabrai",
+      "framework": "Dhandho: low-risk high-uncertainty bets, low-cost commodity producers, deep value asymmetry",
+      "rules": {
+        "dhando": ["full", "partial"],
+        "archetype": ["optionality", "turnaround", "commodity_cyclical", "holding_co"],
+        "investment_sleeve": ["real_assets_land", "real_assets_lt", "energy_infrastructure"],
+        "cycle": ["trough", "transition"]
+      },
+      "min_matches": 2
+    },
+    "hohn": {
+      "label": "Chris Hohn",
+      "framework": "TCI: concentrated large-cap quality with irreplaceable infrastructure-like moats",
+      "rules": {
+        "archetype": ["compounder", "croupier", "platform", "infrastructure"],
+        "moat": ["stable", "widening"],
+        "investment_sleeve": ["exchanges_markets", "software_platforms", "financial_services", "energy_infrastructure"]
+      },
+      "exclude": {
+        "dhando": ["full"]
+      },
+      "min_matches": 2
+    },
+    "buffett_weschler": {
+      "label": "Buffett / Weschler",
+      "framework": "Durable moats at fair prices, owner-operator capital allocation, financial strength",
+      "rules": {
+        "archetype": ["compounder", "holding_co", "serial_acquirer", "infrastructure"],
+        "moat": ["stable", "widening"],
+        "investment_sleeve": ["financial_services", "holding_conglomerates", "exchanges_markets"]
+      },
+      "min_matches": 2
+    },
+    "greenblatt": {
+      "label": "Joel Greenblatt",
+      "framework": "Special situations: spin-offs, restructurings, cheap quality via magic-formula economics",
+      "rules": {
+        "archetype": ["turnaround", "optionality", "holding_co"],
+        "dhando": ["full", "partial"],
+        "cycle": ["trough", "transition"]
+      },
+      "min_matches": 2
+    },
+    "munger": {
+      "label": "Charlie Munger",
+      "framework": "Few great businesses held forever; pay up for quality with pricing power",
+      "rules": {
+        "archetype": ["compounder", "platform"],
+        "moat": ["widening", "stable"],
+        "investment_sleeve": ["exchanges_markets", "software_platforms", "technology_ai"]
+      },
+      "exclude": {
+        "moat": ["unproven"]
+      },
+      "min_matches": 2
+    },
+    "hk": {
+      "label": "Horizon Kinetics",
+      "framework": "Hard assets, owner-operators, croupiers and inflation beneficiaries with long-duration optionality",
+      "rules": {
+        "archetype": ["croupier", "holding_co", "optionality", "infrastructure"],
+        "investment_sleeve": ["real_assets_land", "real_assets_lt", "exchanges_markets", "holding_conglomerates"]
+      },
+      "min_matches": 2
+    },
+    "stahl": {
+      "label": "Murray Stahl",
+      "framework": "Royalty and toll-booth economics on scarce assets; anti-indexation positioning",
+      "rules": {
+        "archetype": ["croupier", "optionality", "infrastructure"],
+        "investment_sleeve": ["real_assets_land", "real_assets_lt", "exchanges_markets"]
+      },
+      "min_matches": 2
+    },
+    "lawrence": {
+      "label": "Bryan Lawrence",
+      "framework": "Oakcliff: concentrated positions in predictable cash generators trading below intrinsic value",
+      "rules": {
+        "archetype": ["compounder", "croupier", "serial_acquirer"],
+        "moat": ["stable", "widening"],
+        "dhando": ["partial", "full"]
+      },
+      "min_matches": 2
+    },
+    "moi": {
+      "label": "MOI / Mihaljevic",
+      "framework": "Global deep value and hidden-asset situations off the beaten path",
+      "rules": {
+        "archetype": ["optionality", "turnaround", "holding_co"],
+        "dhando": ["full", "partial"],
+        "cycle": ["trough", "transition"]
+      },
+      "min_matches": 2
+    }
+  }
+}

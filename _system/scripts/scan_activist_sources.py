@@ -33,6 +33,7 @@ from milly_activist_reconcile import reconcile_ticker
 from sec_activist_scan import scan_portfolio_sec
 from site_activist_scan import scan_publisher_sites
 from third_party_inventory import write_inventory
+from verify_activist_reports import verify_ticker
 
 ROOT = Path(__file__).resolve().parents[2]
 REVIEW_DIR = ROOT / "_system" / "research"
@@ -175,6 +176,7 @@ def main() -> int:
         all_hits.extend(local)
         if not args.dry_run:
             extract_ticker_activist_text(ticker)
+            verify_ticker(ticker)
             write_inventory(ticker)
 
     payload = {

@@ -35,6 +35,7 @@ INSIDER_MANIFEST = INSIDER_DIR / "manifest.json"
 EARNINGS_CACHE = ROOT / "_system" / "data" / "earnings_calendar.json"
 TERMINALVALUE_SOURCES = ROOT / "_system" / "reference" / "data-sources" / "terminalvalue_candidates.json"
 SUMZERO_INDEX = ROOT / "_system" / "reference" / "data-sources" / "sumzero_ideas_index.json"
+KPI_TRENDS_PATH = ROOT / "dashboard" / "data" / "kpi_trends.json"
 DOCUMENT_REGISTRY_PATH = ROOT / "dashboard" / "data" / "document_registry.json"
 DRIVE_AUDIT_PATH = ROOT / "_system" / "reference" / "document-store" / "drive_audit_latest.json"
 GITHUB_REPO = "GoldmanDrew/single-stock-investments"
@@ -44,6 +45,7 @@ VALID_TICKER_RE = re.compile(r"^[A-Z0-9][A-Z0-9.\-]{0,11}$")
 DOCUMENT_SUFFIXES = {".pdf", ".htm", ".html", ".md", ".txt", ".json"}
 
 SOURCE_META = {
+    "kpi_trend": {"label": "Inflection", "materiality": 0.95, "quality": 0.92, "axis": "fundamentals"},
     "filing": {"label": "Filing", "materiality": 0.96, "quality": 1.0, "axis": "fundamentals"},
     "earnings": {"label": "Earnings", "materiality": 0.94, "quality": 0.96, "axis": "fundamentals"},
     "insider": {"label": "Insider", "materiality": 0.86, "quality": 0.9, "axis": "ownership"},
@@ -303,6 +305,60 @@ def insight_record(**kwargs) -> dict:
     if base.get("as_of"):
         base["as_of"] = normalize_date(base.get("as_of")) or base.get("as_of")
     return base
+
+
+INVERTED_TREND_METRICS = {"long_term_debt"}
+
+
+def from_kpi_trends(doc: dict | None) -> list[dict]:
+    """Turn second-derivative KPI signals into ranked inflection records."""
+    out: list[dict] = []
+    for ticker, entry in ((doc or {}).get("by_ticker") or {}).items():
+        for metric in entry.get("metrics") or []:
+            trend = metric.get("direction")
+            if trend not in ("accelerating", "decelerating"):
+                continue
+            points = metric.get("points") or []
+            as_of = (points[-1].get("period") if points else None) or (doc or {}).get("generated_at")
+            label = metric.get("label") or metric.get("metric") or "KPI"
+            growth_latest = metric.get("growth_latest")
+            growth_prior = metric.get("growth_prior")
+            good_when_up = metric.get("metric") not in INVERTED_TREND_METRICS
+            if trend == "accelerating":
+                direction = "bullish" if good_when_up else "bearish"
+            else:
+                direction = "bearish" if good_when_up else "bullish"
+            if metric.get("mode") == "diff":
+                growth_text = f"{growth_prior:+.0f} to {growth_latest:+.0f} per period"
+            else:
+                growth_text = f"{growth_prior:+.1%} to {growth_latest:+.1%}"
+            accel = metric.get("accel")
+            threshold = metric.get("threshold") or 0
+            strong = threshold and accel is not None and abs(accel) >= 2 * threshold
+            out.append(
+                insight_record(
+                    source="kpi_trend",
+                    as_of=as_of,
+                    scope="ticker",
+                    ref=str(ticker).upper(),
+                    title=f"{label} {trend}",
+                    claim=(
+                        f"{label} growth moved from {growth_text} — "
+                        f"second derivative is {'positive' if (accel or 0) > 0 else 'negative'} "
+                        f"beyond the series' own noise."
+                    ),
+                    direction=direction,
+                    confidence="high" if strong else "med",
+                    evidence_ref=metric.get("evidence_ref"),
+                    event_type="inflection",
+                    impact_axis="fundamentals",
+                    trend=trend,
+                    trend_metric=metric.get("metric"),
+                    trend_points=points[-8:],
+                    trend_accel=accel,
+                )
+            )
+    return out
 
 
 def from_superinvestor_letters(doc: dict) -> list[dict]:
@@ -1463,6 +1519,9 @@ def event_materiality(record: dict) -> float:
     source = record.get("source")
     base = SOURCE_META.get(source, {}).get("materiality", 0.55)
     event_type = record.get("event_type") or ""
+    if event_type == "inflection":
+        # Second-derivative moves outrank routine records of the same source class.
+        base += 0.1
     if event_type in {"filing_metric", "reported_earnings"}:
         base += 0.08
     if event_type == "form4_transaction" and record.get("direction") == "bullish":
@@ -1649,6 +1708,9 @@ def build_source_health(
     registry_summary = (registry_doc or {}).get("summary") if isinstance(registry_doc, dict) else {}
     drive_audit_summary = (drive_audit_doc or {}).get("summary") if isinstance(drive_audit_doc, dict) else {}
     filing_files = latest_filing_fact_files()
+    kpi_trends_doc = load_json(KPI_TRENDS_PATH)
+    if not isinstance(kpi_trends_doc, dict):
+        kpi_trends_doc = None
     insider_tickers = (insider_manifest or {}).get("tickers") if isinstance(insider_manifest, dict) else {}
     insider_errors = [
         meta.get("error")
@@ -1684,6 +1746,14 @@ def build_source_health(
             "items": len(filing_files),
             "as_of": newest_as_of([p.stem.replace("filing_facts_", "") for p in filing_files]),
             "path": "*/research/evidence/filing_facts_*.json",
+        },
+        "kpi_trends": {
+            "status": "ok" if kpi_trends_doc else "missing",
+            "records": counts.get("kpi_trend", 0),
+            "items": (kpi_trends_doc or {}).get("inflection_count", 0),
+            "as_of": normalize_date((kpi_trends_doc or {}).get("generated_at")),
+            "path": relative_path(KPI_TRENDS_PATH),
+            "notes": "Second-derivative KPI signals from filing facts, equity models and news flow.",
         },
         "earnings_calendar": {
             "status": (earnings_doc or {}).get("access_status") or ("ok" if earnings_doc else "missing"),
@@ -1848,6 +1918,9 @@ def main() -> int:
         records.extend(from_third_party(p, p.name))
 
     records.extend(from_theme_panel())
+    kpi_trends_doc = load_json(KPI_TRENDS_PATH)
+    if isinstance(kpi_trends_doc, dict):
+        records.extend(from_kpi_trends(kpi_trends_doc))
     news_doc = load_json(NEWS_PATH)
     if isinstance(news_doc, dict):
         records.extend(from_news(news_doc))

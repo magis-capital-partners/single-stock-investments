@@ -48,6 +48,10 @@ def should_keep(report: dict, meta: dict) -> tuple[bool, str]:
         matched, confidence, reason = match_report_to_ticker(blob, meta)
         if not matched or confidence < 0.9:
             return False, f"weak_match:{reason}:{confidence:.2f}"
+        if report.get("body_verified") is False and (report.get("confidence") or 0) < 0.9:
+            # Document body never mentions this ticker/company and the title/URL
+            # match was weak to begin with: title-only false positive.
+            return False, "body_unverified"
 
     if source == "local" and not report.get("title") and not report.get("source_url"):
         # Duplicate stub rows from pre-SEC local collector

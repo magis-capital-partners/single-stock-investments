@@ -942,6 +942,89 @@ def load_lenses(ticker_dir: Path) -> dict | None:
     return _load_json(path)
 
 
+def load_dossier(ticker_dir: Path) -> dict | None:
+    path = ticker_dir / "research" / "dossier.json"
+    return _load_json(path)
+
+
+DOSSIER_STALE_DAYS = 180
+DOSSIER_DELTA_MIN_SCORE = 70
+DOSSIER_TIMELINE_CAP = 30
+
+
+def _timeline_dedupe_key(date: str, label: str) -> tuple[str, str]:
+    words = re.sub(r"[^a-z0-9 ]", "", str(label or "").lower()).split()
+    return (str(date or "")[:10], " ".join(words[:6]))
+
+
+def build_dossier_view(dossier: dict | None, insight_events: list[dict]) -> dict | None:
+    """Merge the agent-written dossier with recent high-score insight events.
+
+    The agent refreshes dossier.json on deep-dive runs; between runs this keeps
+    the timeline current by appending high-materiality events automatically.
+    """
+    timeline: list[dict] = []
+    seen: set[tuple[str, str]] = set()
+    for entry in (dossier or {}).get("timeline") or []:
+        date = str(entry.get("date") or "")[:10]
+        label = str(entry.get("label") or "").strip()
+        if not date or not label:
+            continue
+        key = _timeline_dedupe_key(date, label)
+        if key in seen:
+            continue
+        seen.add(key)
+        timeline.append(
+            {
+                "date": date,
+                "type": entry.get("type") or "other",
+                "label": label,
+                "evidence_url": entry.get("evidence_url"),
+                "source": "dossier",
+            }
+        )
+
+    auto_added = 0
+    for ev in insight_events or []:
+        if insight_score(ev) < DOSSIER_DELTA_MIN_SCORE:
+            continue
+        date = insight_date(ev)[:10]
+        label = insight_claim(ev)
+        if not date or not label:
+            continue
+        key = _timeline_dedupe_key(date, label)
+        if key in seen:
+            continue
+        seen.add(key)
+        auto_added += 1
+        timeline.append(
+            {
+                "date": date,
+                "type": ev.get("event_type") or "insight",
+                "label": label,
+                "evidence_url": ev.get("evidence_url"),
+                "source": "auto",
+            }
+        )
+
+    industry = (dossier or {}).get("industry") or None
+    if not timeline and not industry:
+        return None
+
+    timeline.sort(key=lambda e: e["date"], reverse=True)
+    as_of = (dossier or {}).get("as_of")
+    stale_days = days_since_iso(as_of)
+    return {
+        "as_of": as_of,
+        "stale_days": stale_days,
+        "stale": (stale_days is None or stale_days > DOSSIER_STALE_DAYS) if dossier else True,
+        "has_agent_dossier": bool(dossier),
+        "auto_added": auto_added,
+        "timeline": timeline[:DOSSIER_TIMELINE_CAP],
+        "industry": industry,
+    }
+
+
 def load_insights_for_ticker(ticker: str, insights_doc: dict | None) -> list[dict]:
     if not insights_doc:
         return []
@@ -1349,7 +1432,13 @@ def essential_needs_work_reasons(row: dict) -> list[str]:
     outside_research_sources = {"third_party", "sumzero_research"}
     if not (outside_research_sources & set(essential.get("source_mix") or [])):
         reasons.append("no third-party check")
-    return reasons[:4]
+    dossier = row.get("dossier")
+    if row.get("in_holdings"):
+        if not dossier or not dossier.get("has_agent_dossier"):
+            reasons.append("no dossier")
+        elif dossier.get("stale"):
+            reasons.append("stale dossier")
+    return reasons[:5]
 
 
 def build_active_lenses(lenses_doc: dict | None) -> tuple[list[dict], int]:
@@ -1538,12 +1627,51 @@ def build_ticker_row(
         full_insights,
         row["letter_discussants"],
     )
+    row["dossier"] = build_dossier_view(load_dossier(ticker_dir), row["insight_events"])
     reasons = essential_needs_work_reasons(row)
     row["essential_insights"]["needs_work_reasons"] = reasons
     row["essential_insights"]["needs_work"] = bool(reasons)
     row["research_memory"] = compact_research_memory(ticker, memory_doc)
     row["activist"] = activist_summary_for_ticker(ticker)
+    row["kpi_trends"] = kpi_trends_for_ticker(ticker)
+    row["power_zones"] = power_zones_for_ticker(ticker)
     return row
+
+
+_KPI_TRENDS_CACHE: dict | None = None
+
+
+def load_kpi_trends() -> dict | None:
+    global _KPI_TRENDS_CACHE
+    if _KPI_TRENDS_CACHE is None:
+        _KPI_TRENDS_CACHE = _load_json(DATA_DIR / "kpi_trends.json") or {}
+    return _KPI_TRENDS_CACHE or None
+
+
+def kpi_trends_for_ticker(ticker: str) -> dict | None:
+    doc = load_kpi_trends()
+    entry = ((doc or {}).get("by_ticker") or {}).get(ticker)
+    if not entry:
+        return None
+    return {
+        "summary": entry.get("summary"),
+        "metrics": (entry.get("metrics") or [])[:8],
+    }
+
+
+_POWER_ZONES_CACHE: dict | None = None
+
+
+def load_power_zones() -> dict | None:
+    global _POWER_ZONES_CACHE
+    if _POWER_ZONES_CACHE is None:
+        _POWER_ZONES_CACHE = _load_json(DATA_DIR / "power_zones.json") or {}
+    return _POWER_ZONES_CACHE or None
+
+
+def power_zones_for_ticker(ticker: str) -> dict | None:
+    doc = load_power_zones()
+    return ((doc or {}).get("by_ticker") or {}).get(ticker)
 
 
 def load_activist_feed() -> dict | None:
@@ -1834,6 +1962,13 @@ def main() -> None:
     persona_cal = _load_json(DATA_DIR / "persona_calibration.json")
     if persona_cal:
         payload["persona_calibration"] = persona_cal
+    kpi_trends = load_kpi_trends()
+    if kpi_trends:
+        payload["kpi_trends"] = kpi_trends
+        payload["summary"]["kpi_inflections"] = kpi_trends.get("inflection_count", 0)
+    power_zones = load_power_zones()
+    if power_zones:
+        payload["power_zones"] = power_zones
     bundle = load_darwin_bundle() or build_darwin_if_missing() or {}
     serving = bundle.get("serving") or load_darwin_serving()
     if serving:

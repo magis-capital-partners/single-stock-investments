@@ -217,6 +217,41 @@ def short_firm_label(firm_id: str, firm_name_value: str, filers: list[str]) -> s
     return base
 
 
+STAKE_ROW_RE = re.compile(
+    r"PERCENT\s+OF\s+CLASS\s+REPRESENTED\s+BY\s+AMOUNT\s+IN\s+ROW\s*\(?\s*(?:9|11)\s*\)?"
+    r"[^0-9%]{0,80}?(\d{1,2}(?:\.\d+)?)\s*%",
+    re.I,
+)
+STAKE_PROSE_RE = re.compile(
+    r"approximately\s+(\d{1,2}(?:\.\d+)?)\s*%\s+of\s+the\s+(?:issued\s+and\s+)?outstanding",
+    re.I,
+)
+
+
+def parse_stake_percent(text: str) -> float | None:
+    """Extract disclosed ownership percent from a 13D/13G cover page."""
+    plain = strip_html((text or "")[:400_000])
+    best: float | None = None
+    for match in STAKE_ROW_RE.finditer(plain):
+        try:
+            pct = float(match.group(1))
+        except ValueError:
+            continue
+        if 0 < pct <= 100 and (best is None or pct > best):
+            best = pct
+    if best is not None:
+        return best
+    match = STAKE_PROSE_RE.search(plain)
+    if match:
+        try:
+            pct = float(match.group(1))
+        except ValueError:
+            return None
+        if 0 < pct <= 100:
+            return pct
+    return None
+
+
 def classify_sec_filing(form: str, text: str, filers: list[str]) -> str:
     if form in PROXY_FORMS:
         return "activist_proxy"

@@ -15,6 +15,8 @@ import sys
 
 sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 
+from activist_common import PORTFOLIO_REGISTRY, load_json  # noqa: E402
+from activist_materiality import materiality_score, materiality_tier  # noqa: E402
 from build_activist_feed import GITHUB_REPO, dedupe_proxy_amendments, github_blob  # noqa: E402
 from build_activist_feed import WEAK_MATCH_TICKER_THRESHOLD  # noqa: E402
 
@@ -53,6 +55,19 @@ def clean_feed_payload(payload: dict) -> dict:
         kept_rows.append(cleaned)
 
     kept_rows = dedupe_proxy_amendments(kept_rows)
+
+    registry = load_json(PORTFOLIO_REGISTRY, {})
+    holdings = set((registry.get("holdings") or {}).keys())
+    watchlist = set((registry.get("watchlist") or {}).keys())
+    for row in kept_rows:
+        score, _components = materiality_score(
+            row,
+            in_holdings=row.get("ticker") in holdings,
+            in_watchlist=row.get("ticker") in watchlist,
+        )
+        row["materiality"] = score
+        row["tier"] = materiality_tier(score, row)
+
     summary = dict(payload.get("summary") or {})
     summary.update(
         {
@@ -67,6 +82,10 @@ def clean_feed_payload(payload: dict) -> dict:
             "unresolved_filer_count": sum(
                 1 for r in kept_rows if r.get("needs_filer_review") or r.get("firm_id") == "unknown_activist"
             ),
+            "signal_count": sum(1 for r in kept_rows if r.get("tier") == "signal"),
+            "context_count": sum(1 for r in kept_rows if r.get("tier") == "context"),
+            "noise_count": sum(1 for r in kept_rows if r.get("tier") == "noise"),
+            "body_unverified_count": sum(1 for r in kept_rows if r.get("body_verified") is False),
         }
     )
     by_ticker: dict[str, dict] = {}
@@ -74,12 +93,22 @@ def clean_feed_payload(payload: dict) -> dict:
         ticker = row.get("ticker") or ""
         bucket = by_ticker.setdefault(
             ticker,
-            {"long_count": 0, "short_count": 0, "latest": None, "has_unreconciled": False},
+            {
+                "long_count": 0,
+                "short_count": 0,
+                "latest": None,
+                "has_unreconciled": False,
+                "signal_count": 0,
+                "max_materiality": 0,
+            },
         )
         if row.get("side") == "long":
             bucket["long_count"] += 1
         elif row.get("side") == "short":
             bucket["short_count"] += 1
+        if row.get("tier") == "signal":
+            bucket["signal_count"] += 1
+        bucket["max_materiality"] = max(bucket["max_materiality"], row.get("materiality") or 0)
         if row.get("status") in ("new", "cached"):
             bucket["has_unreconciled"] = True
         latest = bucket["latest"]

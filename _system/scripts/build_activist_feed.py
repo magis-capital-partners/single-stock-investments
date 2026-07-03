@@ -10,20 +10,25 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from activist_common import (
+    PORTFOLIO_REGISTRY,
     firm_name,
     load_global_scan,
+    load_json,
     load_ticker_index,
     portfolio_tickers,
     prune_ghost_index_entries,
     resolve_report_file,
 )
 from activist_date_parse import normalize_partial_date, parse_date_from_stem
+from activist_link_health import check_links
+from activist_materiality import materiality_score, materiality_tier
 from sec_filer_parse import (
     UNRESOLVED_FIRM_ID,
     analyze_sec_filing,
     build_activist_title,
     form_from_filing_path,
     is_sec_filing_relpath,
+    parse_stake_percent,
 )
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -124,6 +129,23 @@ def _read_filing_text(path: Path, limit: int = 120_000) -> str:
         return ""
 
 
+_STAKE_CACHE: dict[str, float | None] = {}
+
+
+def stake_for_filing(file_ref: str | None) -> float | None:
+    """Parse disclosed ownership percent from a local SEC filing (cached per path)."""
+    if not file_ref:
+        return None
+    if file_ref in _STAKE_CACHE:
+        return _STAKE_CACHE[file_ref]
+    path = ROOT / file_ref
+    stake = None
+    if path.exists():
+        stake = parse_stake_percent(_read_filing_text(path, limit=400_000))
+    _STAKE_CACHE[file_ref] = stake
+    return stake
+
+
 def enrich_filer_metadata(report: dict, *, ticker: str) -> dict:
     out = enrich_report_metadata(report)
     if out.get("firm_id") != UNRESOLVED_FIRM_ID:
@@ -193,7 +215,7 @@ def _duplicate_stem_counts(all_reports: list[tuple[str, dict]]) -> Counter[tuple
     return counts
 
 
-def build_feed(*, prune_indexes: bool = True) -> dict:
+def build_feed(*, prune_indexes: bool = True, link_check: bool | None = None) -> dict:
     tickers = portfolio_tickers()
     if prune_indexes:
         pruned = sum(prune_ghost_index_entries(ticker) for ticker in tickers)
@@ -251,6 +273,11 @@ def build_feed(*, prune_indexes: bool = True) -> dict:
         "missing_file_count": 0,
         "weak_match_count": 0,
         "ghost_pruned_count": pruned,
+        "signal_count": 0,
+        "context_count": 0,
+        "noise_count": 0,
+        "body_unverified_count": 0,
+        "broken_link_count": 0,
     }
     per_ticker: dict[str, dict] = {}
 
@@ -306,6 +333,9 @@ def build_feed(*, prune_indexes: bool = True) -> dict:
                 summary["missing_file_count"] += 1
             if weak_match:
                 summary["weak_match_count"] += 1
+            stake_percent = None
+            if report.get("source") == "sec_edgar" and file_exists:
+                stake_percent = stake_for_filing(file_ref)
             row = {
                 "ticker": ticker,
                 "firm_id": report.get("firm_id"),
@@ -327,6 +357,9 @@ def build_feed(*, prune_indexes: bool = True) -> dict:
                 "match_reason": match_reason or None,
                 "match_confidence": report.get("match_confidence"),
                 "weak_match": weak_match,
+                "body_verified": report.get("body_verified"),
+                "body_match_reason": report.get("body_match_reason"),
+                "stake_percent": stake_percent,
                 "form": report.get("form"),
                 "filing_class": report.get("filing_class"),
                 "milly_verdict": report.get("milly_verdict"),
@@ -345,9 +378,51 @@ def build_feed(*, prune_indexes: bool = True) -> dict:
             feed_rows.append(row)
 
     feed_rows = dedupe_proxy_amendments(feed_rows)
+
+    registry = load_json(PORTFOLIO_REGISTRY, {})
+    holdings = set((registry.get("holdings") or {}).keys())
+    watchlist = set((registry.get("watchlist") or {}).keys())
+
+    link_health = check_links(
+        [r["source_url"] for r in feed_rows if r.get("source_url")],
+        enabled=link_check,
+    )
+    scored_rows: list[dict] = []
+    for row in feed_rows:
+        health = link_health.get(row.get("source_url") or "") or {}
+        row["source_url_ok"] = health.get("ok")
+        row["source_url_status"] = health.get("status")
+        if row.get("file_exists") is False and (not row.get("source_url") or row.get("source_url_ok") is False):
+            # No local copy and no working publisher link: nothing to show.
+            summary["broken_link_count"] += 1
+            continue
+        score, _components = materiality_score(
+            row,
+            in_holdings=row.get("ticker") in holdings,
+            in_watchlist=row.get("ticker") in watchlist,
+        )
+        row["materiality"] = score
+        row["tier"] = materiality_tier(score, row)
+        summary[f"{row['tier']}_count"] += 1
+        if row.get("body_verified") is False:
+            summary["body_unverified_count"] += 1
+        scored_rows.append(row)
+    feed_rows = scored_rows
+
     summary["portfolio_hits"] = len(feed_rows)
     summary["long_count"] = sum(1 for r in feed_rows if r.get("side") == "long")
     summary["short_count"] = sum(1 for r in feed_rows if r.get("side") == "short")
+
+    for info in per_ticker.values():
+        info["signal_count"] = 0
+        info["max_materiality"] = 0
+    for row in feed_rows:
+        info = per_ticker.get(row.get("ticker"))
+        if not info:
+            continue
+        if row.get("tier") == "signal":
+            info["signal_count"] += 1
+        info["max_materiality"] = max(info["max_materiality"], row.get("materiality") or 0)
 
     global_scan = load_global_scan()
     payload = {
@@ -367,16 +442,24 @@ def build_feed(*, prune_indexes: bool = True) -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Build activist dashboard feed JSON.")
     parser.add_argument("--no-prune", action="store_true", help="Skip ghost index cleanup")
+    parser.add_argument("--no-link-check", action="store_true", help="Skip HTTP link liveness checks")
     args = parser.parse_args()
-    payload = build_feed(prune_indexes=not args.no_prune)
+    payload = build_feed(
+        prune_indexes=not args.no_prune,
+        link_check=False if args.no_link_check else None,
+    )
     print(
         f"Wrote {OUTPUT.relative_to(ROOT)} "
         f"({payload['summary']['portfolio_hits']} feed reports, "
+        f"{payload['summary']['signal_count']} signal / "
+        f"{payload['summary']['context_count']} context / "
+        f"{payload['summary']['noise_count']} noise, "
         f"{payload['summary']['tickers_with_hits']} tickers, "
         f"{payload['summary']['passive_excluded_count']} passive excluded, "
         f"{payload['summary']['unresolved_filer_count']} unresolved filers, "
         f"{payload['summary']['missing_date_count']} missing dates, "
         f"{payload['summary']['missing_file_count']} missing files, "
+        f"{payload['summary']['broken_link_count']} broken links dropped, "
         f"{payload['summary']['weak_match_count']} weak matches)"
     )
     return 0
