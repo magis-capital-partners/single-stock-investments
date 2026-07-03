@@ -320,8 +320,54 @@ INSIGHT_TREND_METRICS = {
     "eps_basic",
     "cfo",
     "news_flow",
+    "op_margin",
+    "cfo_margin",
+    "core_business",
 }
-MAX_INFLECTION_EVENTS_PER_TICKER = 3
+MAX_INFLECTION_EVENTS_PER_TICKER = 2
+
+
+def metric_base_name(metric: str) -> str:
+    return str(metric or "").split(".")[-1]
+
+
+def _kpi_growth_text(metric: dict) -> str:
+    growth_latest = metric.get("growth_latest")
+    growth_prior = metric.get("growth_prior")
+    if growth_latest is None or growth_prior is None:
+        return "recent periods"
+    yoy = metric.get("basis") == "yoy"
+    if metric.get("mode") == "diff":
+        return f"{growth_prior:+.0f} to {growth_latest:+.0f} per period"
+    suffix = " YoY" if yoy else ""
+    return f"{growth_prior:+.1%} to {growth_latest:+.1%}{suffix}"
+
+
+def _kpi_inflection_claim(metric: dict, *, source_label: str) -> str:
+    label = metric.get("label") or metric.get("metric") or "KPI"
+    trend = metric.get("direction") or "steady"
+    growth_text = _kpi_growth_text(metric)
+    signal_tier = metric.get("signal_tier") or "steady"
+    persistence = (
+        "for two consecutive quarters"
+        if signal_tier == "confirmed"
+        else "in the latest quarter"
+    )
+    members = metric.get("composite_members") or []
+    if metric.get("composite") and members:
+        member_labels = ", ".join(m.replace("_", " ") for m in members[:4])
+        lead = (
+            f"Core operating metrics ({member_labels}) are {trend} together — "
+            f"growth moved from {growth_text} {persistence}"
+        )
+    else:
+        lead = f"{label} growth moved from {growth_text} {persistence}"
+    ttm_note = ""
+    if metric.get("ttm_agrees") is True:
+        ttm_note = " Trailing-twelve-month growth confirms the same direction."
+    elif metric.get("ttm_agrees") is False:
+        ttm_note = " Trailing-twelve-month growth does not yet confirm."
+    return f"{lead}.{ttm_note} Source: {source_label}."
 
 
 def from_kpi_trends(doc: dict | None) -> list[dict]:
@@ -333,37 +379,36 @@ def from_kpi_trends(doc: dict | None) -> list[dict]:
             trend = metric.get("direction")
             if trend not in ("accelerating", "decelerating"):
                 continue
+            if not metric.get("display"):
+                continue
             base_name = str(metric.get("metric") or "").split(".")[-1]
             if base_name not in INSIGHT_TREND_METRICS and metric.get("source") != "equity_model":
                 continue
-            strength = abs(metric.get("accel") or 0) / max(metric.get("threshold") or 1e-9, 1e-9)
-            candidates.append((strength, metric))
+            if metric.get("tier") == "excluded":
+                continue
+            metric_strength = metric.get("strength")
+            if metric_strength is None:
+                metric_strength = abs(metric.get("accel") or 0) / max(metric.get("threshold") or 1e-9, 1e-9)
+            signal_tier = metric.get("signal_tier") or "steady"
+            rank = metric_strength + (2.0 if metric.get("composite") else 0.0) + (1.0 if signal_tier == "confirmed" else 0.0)
+            candidates.append((rank, metric))
         candidates.sort(key=lambda x: -x[0])
-        for _strength, metric in candidates[:MAX_INFLECTION_EVENTS_PER_TICKER]:
+        for _rank, metric in candidates[:MAX_INFLECTION_EVENTS_PER_TICKER]:
             trend = metric.get("direction")
             points = metric.get("points") or []
             as_of = (points[-1].get("period") if points else None) or (doc or {}).get("generated_at")
             label = metric.get("label") or metric.get("metric") or "KPI"
-            growth_latest = metric.get("growth_latest")
-            growth_prior = metric.get("growth_prior")
-            good_when_up = metric.get("metric") not in INVERTED_TREND_METRICS
+            good_when_up = metric_base_name(metric.get("metric") or "") not in INVERTED_TREND_METRICS
             if trend == "accelerating":
                 direction = "bullish" if good_when_up else "bearish"
             else:
                 direction = "bearish" if good_when_up else "bullish"
-            yoy = metric.get("basis") == "yoy"
-            if metric.get("mode") == "diff":
-                growth_text = f"{growth_prior:+.0f} to {growth_latest:+.0f} per period"
-            else:
-                growth_text = f"{growth_prior:+.1%} to {growth_latest:+.1%}" + (" YoY" if yoy else "")
-            accel = metric.get("accel")
-            threshold = metric.get("threshold") or 0
-            strong = threshold and accel is not None and abs(accel) >= 2 * threshold
             source_label = {
                 "sec_fundamentals": "SEC XBRL quarterly filings",
                 "equity_model": "the equity model",
                 "news_flow": "news-flow counts",
             }.get(metric.get("source") or "", "the underlying series")
+            confidence = metric.get("confidence") or "med"
             out.append(
                 insight_record(
                     source="kpi_trend",
@@ -371,22 +416,20 @@ def from_kpi_trends(doc: dict | None) -> list[dict]:
                     scope="ticker",
                     ref=str(ticker).upper(),
                     title=f"{label} {trend}",
-                    claim=(
-                        f"{label} growth moved from {growth_text} — "
-                        f"second derivative is {'positive' if (accel or 0) > 0 else 'negative'} "
-                        f"beyond the series' own noise (source: {source_label})."
-                    ),
+                    claim=_kpi_inflection_claim(metric, source_label=source_label),
                     direction=direction,
-                    confidence="high" if strong else "med",
+                    confidence=confidence,
                     evidence_ref=metric.get("evidence_ref"),
                     event_type="inflection",
                     impact_axis="fundamentals",
                     trend=trend,
                     trend_metric=metric.get("metric"),
                     trend_points=points[-8:],
-                    trend_accel=accel,
+                    trend_accel=metric.get("accel"),
                     trend_basis=metric.get("basis"),
                     trend_source=metric.get("source"),
+                    trend_signal_tier=metric.get("signal_tier"),
+                    trend_composite=metric.get("composite"),
                 )
             )
     return out

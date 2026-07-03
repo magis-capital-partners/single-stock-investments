@@ -1034,18 +1034,45 @@
     </svg>`;
   }
 
-  function trendBadge(direction) {
-    if (direction === 'accelerating') return '<span class="badge badge-ok" title="Growth accelerating">▲▲</span>';
-    if (direction === 'decelerating') return '<span class="badge badge-bad" title="Growth decelerating">▼▼</span>';
+  function trendBadge(direction, signalTier) {
+    const tierHint = signalTier === 'confirmed' ? ' (confirmed)' : signalTier === 'emerging' ? ' (emerging)' : '';
+    if (direction === 'accelerating') return `<span class="badge badge-ok" title="Growth accelerating${tierHint}">▲▲</span>`;
+    if (direction === 'decelerating') return `<span class="badge badge-bad" title="Growth decelerating${tierHint}">▼▼</span>`;
     return '<span class="badge badge-us">steady</span>';
   }
 
+  function signalTierBadge(signalTier, escapeHtml) {
+    if (signalTier === 'confirmed') return '<span class="badge badge-ok" title="Two consecutive quarters beyond noise">confirmed</span>';
+    if (signalTier === 'emerging') return `<span class="badge badge-us" title="Latest quarter only">emerging</span>`;
+    return '<span class="tier-sub">—</span>';
+  }
+
+  function strengthLabel(metric) {
+    const s = metric.strength != null
+      ? metric.strength
+      : Math.abs(metric.accel || 0) / Math.max(metric.threshold || 1e-9, 1e-9);
+    if (s >= 2) return `${s.toFixed(1)}× high`;
+    if (s >= 1) return `${s.toFixed(1)}×`;
+    return `${s.toFixed(1)}× weak`;
+  }
+
   function renderTickerTrendBadges(trends, escapeHtml) {
-    const metrics = (trends && trends.metrics) || [];
-    const firing = metrics.filter(m => m.direction === 'accelerating' || m.direction === 'decelerating');
-    if (!firing.length) return '';
-    return firing.slice(0, 3).map(m =>
-      `<span title="${escapeHtml(`${m.label || m.metric}: ${m.direction}`)}" style="margin-right:4px">${trendBadge(m.direction)}</span>`
+    const entry = trends || {};
+    const bms = entry.business_momentum;
+    if (bms && bms.direction && bms.direction !== 'steady') {
+      return `<span title="${escapeHtml(bms.label || bms.direction)}" style="margin-right:4px">${trendBadge(bms.direction, 'confirmed')}</span>`;
+    }
+    const metrics = entry.metrics || [];
+    const firing = metrics.filter(m => m.display && (m.direction === 'accelerating' || m.direction === 'decelerating'));
+    if (!firing.length) {
+      const fallback = metrics.filter(m => m.direction === 'accelerating' || m.direction === 'decelerating');
+      if (!fallback.length) return '';
+      return fallback.slice(0, 2).map(m =>
+        `<span title="${escapeHtml(`${m.label || m.metric}: ${m.direction}`)}" style="margin-right:4px">${trendBadge(m.direction, m.signal_tier)}</span>`
+      ).join('');
+    }
+    return firing.slice(0, 2).map(m =>
+      `<span title="${escapeHtml(`${m.label || m.metric}: ${m.direction}`)}" style="margin-right:4px">${trendBadge(m.direction, m.signal_tier)}</span>`
     ).join('');
   }
 
@@ -1079,13 +1106,70 @@
       `${cov.fundamentals_tickers || 0}/${cov.universe || '?'} tickers with SEC quarterly fundamentals`,
       `${cov.analyzed_tickers || 0} analyzed`,
     ];
+    if (cov.displayed_count != null) parts.push(`${cov.displayed_count} displayed signals`);
+    if (cov.confirmed_count != null) parts.push(`${cov.confirmed_count} confirmed`);
+    if (cov.emerging_count != null) parts.push(`${cov.emerging_count} emerging`);
     if (cov.suspect_points_excluded) parts.push(`${cov.suspect_points_excluded} suspect datapoints excluded`);
-    return `<p class="tier-sub" style="margin-bottom:4px">Coverage: ${parts.join(' · ')}. Non-US and OTC tickers without XBRL filings rely on equity-model or news-flow series only.</p>`;
+    return `<p class="tier-sub" style="margin-bottom:4px">Coverage: ${parts.join(' · ')}. Operating flow metrics prioritized; balance-sheet drift hidden by default.</p>`;
+  }
+
+  function renderInflectionRollup(kpiTrends, escapeHtml) {
+    const byTicker = (kpiTrends && kpiTrends.by_ticker) || {};
+    const rows = Object.entries(byTicker)
+      .map(([ticker, entry]) => {
+        const bms = entry.business_momentum;
+        const displayed = (entry.metrics || []).filter(m => m.display);
+        if (!bms && !displayed.length) return null;
+        const direction = (bms && bms.direction) || (displayed[0] && displayed[0].direction) || 'steady';
+        if (direction !== 'accelerating' && direction !== 'decelerating') return null;
+        const labels = displayed.map(m => m.label || m.metric).slice(0, 3);
+        const score = bms && bms.score != null ? bms.score : null;
+        return { ticker, direction, label: bms && bms.label, labels, score, strength: displayed[0] && displayed[0].strength };
+      })
+      .filter(Boolean)
+      .sort((a, b) => Math.abs(b.score || b.strength || 0) - Math.abs(a.score || a.strength || 0))
+      .slice(0, 24);
+    if (!rows.length) return '';
+    return `
+      <div style="margin-bottom:12px">
+        <h3 style="margin:0 0 6px;font-size:13px">Ticker momentum rollup</h3>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          ${rows.map(r => `
+            <button type="button" class="badge ${r.direction === 'accelerating' ? 'badge-ok' : 'badge-bad'} linkish" data-select-ticker="${escapeHtml(r.ticker)}" title="${escapeHtml(r.label || r.labels.join(', '))}">
+              ${escapeHtml(r.ticker)} ${r.direction === 'accelerating' ? '▲' : '▼'}${r.score != null ? ` ${r.score.toFixed(2)}` : ''}
+            </button>`).join('')}
+        </div>
+      </div>`;
+  }
+
+  function inflectionTierTabs(activeTier, escapeHtml) {
+    const tiers = [
+      { id: 'displayed', label: 'Displayed' },
+      { id: 'confirmed', label: 'Confirmed' },
+      { id: 'emerging', label: 'Emerging' },
+      { id: 'all', label: 'All signals' },
+      { id: 'balance_sheet', label: 'Balance sheet' },
+    ];
+    return `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">
+      ${tiers.map(t => `<button type="button" class="view-tab${activeTier === t.id ? ' active' : ''}" data-inflection-tier="${t.id}">${escapeHtml(t.label)}</button>`).join('')}
+    </div>`;
+  }
+
+  function matchesInflectionTier(row, tier) {
+    if (tier === 'all') return row.direction === 'accelerating' || row.direction === 'decelerating';
+    if (tier === 'balance_sheet') {
+      return (row.tier === 'excluded' || ['cash', 'total_assets', 'stockholders_equity', 'long_term_debt'].includes(String(row.metric || '').split('.').pop()))
+        && (row.direction === 'accelerating' || row.direction === 'decelerating');
+    }
+    if (tier === 'confirmed') return row.signal_tier === 'confirmed';
+    if (tier === 'emerging') return row.signal_tier === 'emerging';
+    return !!row.display;
   }
 
   function renderInflections(kpiTrends, escapeHtml, opts) {
     const byTicker = (kpiTrends && kpiTrends.by_ticker) || {};
     const search = ((opts && opts.search) || '').trim().toLowerCase();
+    const tier = (opts && opts.inflectionTier) || 'displayed';
     const rows = [];
     Object.entries(byTicker).forEach(([ticker, entry]) => {
       (entry.metrics || []).forEach(m => {
@@ -1093,33 +1177,42 @@
         rows.push({ ticker, ...m });
       });
     });
-    let filtered = rows;
+    let filtered = rows.filter(r => matchesInflectionTier(r, tier));
     if (search) {
-      filtered = rows.filter(r => `${r.ticker} ${r.metric} ${r.label} ${r.source}`.toLowerCase().includes(search));
+      filtered = filtered.filter(r => `${r.ticker} ${r.metric} ${r.label} ${r.source}`.toLowerCase().includes(search));
     }
-    filtered.sort((a, b) => Math.abs(b.accel || 0) / Math.max(b.threshold || 1e-9, 1e-9) - Math.abs(a.accel || 0) / Math.max(a.threshold || 1e-9, 1e-9));
+    filtered.sort((a, b) => {
+      const sa = a.strength != null ? a.strength : Math.abs(a.accel || 0) / Math.max(a.threshold || 1e-9, 1e-9);
+      const sb = b.strength != null ? b.strength : Math.abs(b.accel || 0) / Math.max(b.threshold || 1e-9, 1e-9);
+      return sb - sa;
+    });
     if (!filtered.length) {
       if (!kpiTrends) {
         return `<p class="subhead">KPI trend data not built yet — run: python _system/scripts/build_fundamental_series.py then build_kpi_trends.py.</p>`;
       }
-      return `${renderInflectionCoverage(kpiTrends)}<p class="subhead">No significant accelerations or decelerations right now — every analyzed series is within its own noise band.</p>`;
+      return `${renderInflectionCoverage(kpiTrends)}${inflectionTierTabs(tier, escapeHtml)}<p class="subhead">No inflections match this filter — try All signals or Emerging.</p>`;
     }
     const accel = filtered.filter(r => r.direction === 'accelerating').length;
     const decel = filtered.length - accel;
+    const cov = (kpiTrends && kpiTrends.coverage) || {};
     return `
       ${renderInflectionCoverage(kpiTrends)}
+      ${inflectionTierTabs(tier, escapeHtml)}
+      ${tier === 'displayed' || tier === 'confirmed' ? renderInflectionRollup(kpiTrends, escapeHtml) : ''}
       <p class="tier-sub" style="margin-bottom:8px">
-        Second-derivative watch: ${accel} accelerating · ${decel} decelerating · growth is year-over-year per fiscal quarter where the source allows · significance scaled to each series' own volatility
+        ${accel} accelerating · ${decel} decelerating · ${cov.displayed_count || 0} displayed total · YoY quarterly growth with smoothing, materiality gates, persistence confirmation, and TTM cross-check
       </p>
       <table class="darwin-table" id="insights-inflections-table">
-        <thead><tr><th>Ticker</th><th>Metric</th><th>Trend</th><th>Growth (prior → latest)</th><th>2nd deriv</th><th>Last periods</th><th>Source</th></tr></thead>
+        <thead><tr><th>Ticker</th><th>Metric</th><th>Trend</th><th>Tier</th><th>Growth (prior → latest)</th><th>Strength</th><th>2nd deriv</th><th>Last periods</th><th>Source</th></tr></thead>
         <tbody>
           ${filtered.slice(0, 120).map(r => `
             <tr>
               <td><button type="button" class="linkish mono" data-select-ticker="${escapeHtml(r.ticker)}">${escapeHtml(r.ticker)}</button></td>
-              <td>${escapeHtml(r.label || r.metric)}</td>
-              <td>${trendBadge(r.direction)}</td>
-              <td class="mono">${escapeHtml(formatGrowth(r))}</td>
+              <td>${escapeHtml(r.label || r.metric)}${r.composite && r.composite_members ? `<div class="tier-sub">${escapeHtml(r.composite_members.join(', '))}</div>` : ''}</td>
+              <td>${trendBadge(r.direction, r.signal_tier)}</td>
+              <td>${signalTierBadge(r.signal_tier, escapeHtml)}</td>
+              <td class="mono">${escapeHtml(formatGrowth(r))}${r.ttm_agrees === true ? ' ✓TTM' : r.ttm_agrees === false ? ' ✗TTM' : ''}</td>
+              <td class="mono">${escapeHtml(strengthLabel(r))}</td>
               <td class="mono">${r.accel != null ? (r.mode === 'diff' ? r.accel : `${(r.accel * 100).toFixed(1)}pp`) : '—'}</td>
               <td>${renderSparkline(r.points, r.direction)}</td>
               <td>${trendSourceBadge(r.source, escapeHtml)}</td>
@@ -1629,6 +1722,7 @@
       portfolioMacro = [],
       tickerSourceFilter = 'ownership',
       kpiTrends = null,
+      inflectionTier = 'displayed',
     } = options || {};
 
     const profiles = insights?.fund_profiles || {};
@@ -1690,7 +1784,7 @@
 
     let body = '';
     if (activeSection === 'inflections') {
-      body = renderInflections(kpiTrends, escapeHtml, { search: fundSearch, bookOnly });
+      body = renderInflections(kpiTrends, escapeHtml, { search: fundSearch, bookOnly, inflectionTier });
     } else if (activeSection === 'overview') {
       body = renderSourceHealth(insights?.source_health || {}, escapeHtml);
     } else if (activeSection === 'events') {

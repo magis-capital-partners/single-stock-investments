@@ -705,6 +705,7 @@ let fundRegistrySearch = '';
 let insightsBookOnly = true;
 let insightsNeedsReviewOnly = false;
 let insightsSection = 'inflections';
+let insightsInflectionTier = 'displayed';
 let insightsTickerSourceFilter = 'ownership';
 let insightsPdfSourceTab = 'all';
 let insightsPdfTimeMode = 'period';
@@ -1130,6 +1131,7 @@ function renderInsights(opts = {}) {
     portfolioMacro: data.portfolio_macro || [],
     tickerSourceFilter: insightsTickerSourceFilter,
     kpiTrends: data.kpi_trends || null,
+    inflectionTier: insightsInflectionTier,
   });
   content.querySelectorAll('[data-insights-quarter]').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -1141,6 +1143,12 @@ function renderInsights(opts = {}) {
     btn.addEventListener('click', () => {
       insightsSection = btn.dataset.insightsSection;
       selectedFundId = null;
+      renderInsights();
+    });
+  });
+  content.querySelectorAll('[data-inflection-tier]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      insightsInflectionTier = btn.dataset.inflectionTier;
       renderInsights();
     });
   });
