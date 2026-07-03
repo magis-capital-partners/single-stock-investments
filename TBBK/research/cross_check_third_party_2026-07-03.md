@@ -34,13 +34,13 @@ No third-party sources are indexed for TBBK as of 2026-07-03. Marvin stance rest
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | $4.92 owner earnings per share (FY2025) | ~15.6% base over 7 years at $63.89 | hold |
+| Marvin floor | $4.92 owner earnings per share (FY2025) | ~16.73% synthesis over 7 years at $63.89 | hold |
 | External (combined) | — | — | — |
-| **Blended best estimate** | **$4.92 per share normalized owner earnings** | **~15.6% per year (Marvin base only)** | **hold** |
+| **Blended best estimate** | **$4.92 per share normalized owner earnings** | **~16.73% per year (Marvin synthesis)** | **hold** |
 
 **Weights:** 100% Marvin filings floor. No approved or pending third-party sources to weight.
 
-**Returns statement (blended):** At ~$63.89 per share, Marvin base case implies about **15.6% per year** over seven years on FY2025 owner earnings of **$4.92** per share; no external adjustment applied.
+**Returns statement (blended):** At ~$63.89 per share, Marvin synthesis case implies about **16.73% per year** over seven years on FY2025 owner earnings of **$4.92** per share; no external adjustment applied.
 
 ## [HUMAN REVIEW]
 
