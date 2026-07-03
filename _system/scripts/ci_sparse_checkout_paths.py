@@ -78,6 +78,7 @@ def paths_for_profile(profile: str) -> list[str]:
                     f"{ticker}/document-index.csv",
                     f"{ticker}/third-party-analyses/activist_reports_index.json",
                     f"{ticker}/third-party-analyses/activist_reports",
+                    f"{ticker}/third-party-analyses/short_reports",
                 ]
             )
             for name in manifest_files:
