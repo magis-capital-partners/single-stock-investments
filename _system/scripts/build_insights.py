@@ -310,14 +310,37 @@ def insight_record(**kwargs) -> dict:
 INVERTED_TREND_METRICS = {"long_term_debt"}
 
 
+# Flow metrics carry the operating signal; balance-sheet drift stays in the
+# Inflections tab but does not flood the insights event stream.
+INSIGHT_TREND_METRICS = {
+    "revenues",
+    "revenue",
+    "operating_income",
+    "net_income",
+    "eps_basic",
+    "cfo",
+    "news_flow",
+}
+MAX_INFLECTION_EVENTS_PER_TICKER = 3
+
+
 def from_kpi_trends(doc: dict | None) -> list[dict]:
     """Turn second-derivative KPI signals into ranked inflection records."""
     out: list[dict] = []
     for ticker, entry in ((doc or {}).get("by_ticker") or {}).items():
+        candidates = []
         for metric in entry.get("metrics") or []:
             trend = metric.get("direction")
             if trend not in ("accelerating", "decelerating"):
                 continue
+            base_name = str(metric.get("metric") or "").split(".")[-1]
+            if base_name not in INSIGHT_TREND_METRICS and metric.get("source") != "equity_model":
+                continue
+            strength = abs(metric.get("accel") or 0) / max(metric.get("threshold") or 1e-9, 1e-9)
+            candidates.append((strength, metric))
+        candidates.sort(key=lambda x: -x[0])
+        for _strength, metric in candidates[:MAX_INFLECTION_EVENTS_PER_TICKER]:
+            trend = metric.get("direction")
             points = metric.get("points") or []
             as_of = (points[-1].get("period") if points else None) or (doc or {}).get("generated_at")
             label = metric.get("label") or metric.get("metric") or "KPI"
@@ -328,13 +351,19 @@ def from_kpi_trends(doc: dict | None) -> list[dict]:
                 direction = "bullish" if good_when_up else "bearish"
             else:
                 direction = "bearish" if good_when_up else "bullish"
+            yoy = metric.get("basis") == "yoy"
             if metric.get("mode") == "diff":
                 growth_text = f"{growth_prior:+.0f} to {growth_latest:+.0f} per period"
             else:
-                growth_text = f"{growth_prior:+.1%} to {growth_latest:+.1%}"
+                growth_text = f"{growth_prior:+.1%} to {growth_latest:+.1%}" + (" YoY" if yoy else "")
             accel = metric.get("accel")
             threshold = metric.get("threshold") or 0
             strong = threshold and accel is not None and abs(accel) >= 2 * threshold
+            source_label = {
+                "sec_fundamentals": "SEC XBRL quarterly filings",
+                "equity_model": "the equity model",
+                "news_flow": "news-flow counts",
+            }.get(metric.get("source") or "", "the underlying series")
             out.append(
                 insight_record(
                     source="kpi_trend",
@@ -345,7 +374,7 @@ def from_kpi_trends(doc: dict | None) -> list[dict]:
                     claim=(
                         f"{label} growth moved from {growth_text} — "
                         f"second derivative is {'positive' if (accel or 0) > 0 else 'negative'} "
-                        f"beyond the series' own noise."
+                        f"beyond the series' own noise (source: {source_label})."
                     ),
                     direction=direction,
                     confidence="high" if strong else "med",
@@ -356,6 +385,8 @@ def from_kpi_trends(doc: dict | None) -> list[dict]:
                     trend_metric=metric.get("metric"),
                     trend_points=points[-8:],
                     trend_accel=accel,
+                    trend_basis=metric.get("basis"),
+                    trend_source=metric.get("source"),
                 )
             )
     return out
@@ -1753,7 +1784,15 @@ def build_source_health(
             "items": (kpi_trends_doc or {}).get("inflection_count", 0),
             "as_of": normalize_date((kpi_trends_doc or {}).get("generated_at")),
             "path": relative_path(KPI_TRENDS_PATH),
-            "notes": "Second-derivative KPI signals from filing facts, equity models and news flow.",
+            "notes": "Second-derivative KPI signals (YoY basis) from SEC XBRL fundamentals, equity models and news flow.",
+        },
+        "fundamental_series": {
+            "status": "ok" if ((kpi_trends_doc or {}).get("coverage") or {}).get("fundamentals_tickers") else "missing",
+            "records": 0,
+            "items": ((kpi_trends_doc or {}).get("coverage") or {}).get("fundamentals_tickers", 0),
+            "as_of": normalize_date((kpi_trends_doc or {}).get("generated_at")),
+            "path": "_system/reference/market-data/fundamentals/",
+            "notes": "SEC XBRL companyfacts quarterly series (build_fundamental_series.py).",
         },
         "earnings_calendar": {
             "status": (earnings_doc or {}).get("access_status") or ("ok" if earnings_doc else "missing"),

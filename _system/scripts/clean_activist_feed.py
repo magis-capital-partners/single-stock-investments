@@ -15,16 +15,47 @@ import sys
 
 sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 
-from activist_common import PORTFOLIO_REGISTRY, load_json  # noqa: E402
+from activist_common import (  # noqa: E402
+    PORTFOLIO_REGISTRY,
+    load_json,
+    match_report_to_ticker,
+    ticker_meta,
+    url_target_mismatch,
+)
 from activist_materiality import materiality_score, materiality_tier  # noqa: E402
 from build_activist_feed import GITHUB_REPO, dedupe_proxy_amendments, github_blob  # noqa: E402
 from build_activist_feed import WEAK_MATCH_TICKER_THRESHOLD  # noqa: E402
+
+
+def is_publisher_false_positive(row: dict, meta_cache: dict[str, dict]) -> bool:
+    """True when a publisher/local row clearly targets a different company."""
+    if row.get("source") not in ("publisher_site", "local"):
+        return False
+    ticker = (row.get("ticker") or "").upper()
+    if not ticker:
+        return False
+    meta = meta_cache.get(ticker)
+    if meta is None:
+        meta = ticker_meta(ticker)
+        meta_cache[ticker] = meta
+    url = row.get("source_url") or row.get("local_file") or ""
+    title = row.get("title") or ""
+    if url_target_mismatch(url, title, meta):
+        return True
+    blob = " ".join(
+        str(p)
+        for p in (title, url, row.get("local_file"), row.get("firm_name"))
+        if p
+    )
+    matched, confidence, _reason = match_report_to_ticker(blob, meta)
+    return not matched or confidence < 0.9
 
 
 def clean_feed_payload(payload: dict) -> dict:
     rows = payload.get("feed") or []
     stem_counts: Counter[tuple[str, str]] = Counter()
     kept_rows: list[dict] = []
+    meta_cache: dict[str, dict] = {}
 
     for row in rows:
         ref = row.get("canonical_file") or row.get("local_pdf") or row.get("local_file")
@@ -33,12 +64,16 @@ def clean_feed_payload(payload: dict) -> dict:
             stem_counts[(row.get("firm_id") or "", stem)] += 1
 
     removed_ghost = 0
+    removed_false_positive = 0
     for row in rows:
         ref = row.get("canonical_file") or row.get("local_pdf") or row.get("local_file")
         exists = bool(ref) and (ROOT / str(ref).replace("\\", "/")).exists()
         source_url = row.get("source_url")
         if not exists and not source_url:
             removed_ghost += 1
+            continue
+        if is_publisher_false_positive(row, meta_cache):
+            removed_false_positive += 1
             continue
         stem = Path(str(ref or "")).name
         weak_match = stem_counts.get((row.get("firm_id") or "", stem), 0) >= WEAK_MATCH_TICKER_THRESHOLD
@@ -78,6 +113,7 @@ def clean_feed_payload(payload: dict) -> dict:
             "missing_file_count": sum(1 for r in kept_rows if not r.get("file_exists")),
             "weak_match_count": sum(1 for r in kept_rows if r.get("weak_match")),
             "ghost_pruned_count": removed_ghost,
+            "false_positive_pruned_count": removed_false_positive,
             "missing_date_count": sum(1 for r in kept_rows if not r.get("report_date")),
             "unresolved_filer_count": sum(
                 1 for r in kept_rows if r.get("needs_filer_review") or r.get("firm_id") == "unknown_activist"

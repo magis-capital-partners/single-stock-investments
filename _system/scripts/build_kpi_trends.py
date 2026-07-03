@@ -1,15 +1,23 @@
 #!/usr/bin/env python3
 """Build dashboard/data/kpi_trends.json - second-derivative KPI signals per ticker.
 
-Assembles per-ticker time series from:
-  - {TICKER}/research/evidence/filing_facts_*.json  (canonical filing metrics)
-  - dashboard/data/equity_models.json               (model observation series)
-  - dashboard/data/portfolio_news.json              (monthly news-flow counts)
+Sources, in order of trust:
+  - _system/reference/market-data/fundamentals/{TICKER}.json
+        SEC XBRL companyfacts quarterly series (build_fundamental_series.py).
+        Real fiscal period ends; quarterly scope enforced at extraction.
+  - dashboard/data/equity_models.json  (model observation series)
+  - dashboard/data/portfolio_news.json (monthly news-flow counts)
 
-For each series with enough points it computes growth (first derivative) and
-the change in growth (second derivative), with a significance guard scaled to
-the series' own volatility so small wiggles do not fire. The goal is to flag
-accelerations and decelerations before they become consensus.
+Quarterly fundamentals are analyzed on a year-over-year basis: growth compares
+each quarter to the same quarter a year earlier (killing seasonality), and the
+second derivative is the change in YoY growth between consecutive quarters.
+A signal fires only when the latest change clears a threshold scaled to the
+series' own volatility. Degenerate points (near-zero denominators, >500%
+swings) are excluded and counted as suspect rather than published.
+
+The legacy filing_facts_*.json source was removed: those extracts carry no
+fiscal period or scope metadata, which produced false inflections (duplicate
+snapshots + quarterly/annual mixing).
 """
 from __future__ import annotations
 
@@ -21,13 +29,22 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 OUTPUT = ROOT / "dashboard" / "data" / "kpi_trends.json"
+FUNDAMENTALS_DIR = ROOT / "_system" / "reference" / "market-data" / "fundamentals"
 EQUITY_MODELS_PATH = ROOT / "dashboard" / "data" / "equity_models.json"
 NEWS_PATH = ROOT / "dashboard" / "data" / "portfolio_news.json"
 NEWS_HISTORY_PATH = ROOT / "_system" / "reference" / "market-data" / "news_flow_history.json"
+REGISTRY_PATH = ROOT / "_system" / "portfolio" / "registry.json"
 
 MIN_POINTS = 4
 MAX_POINTS = 8
 NEWS_WINDOW_MONTHS = 8
+
+# YoY analysis knobs
+YOY_MIN_QUARTERS = 8          # need 2+ years to compute enough YoY growth points
+YOY_MIN_GROWTH_POINTS = 4     # 3 accels: >=2 history + 1 latest
+YOY_MATCH_WINDOW = (330, 400)  # days between a quarter and its prior-year match
+GROWTH_OUTLIER_CAP = 5.0      # |growth| beyond 500% treated as data artifact
+DENOMINATOR_FLOOR_FRAC = 0.05  # |prior| must be >= 5% of series median scale
 
 METRIC_LABELS = {
     "revenues": "Revenue",
@@ -35,6 +52,7 @@ METRIC_LABELS = {
     "operating_income": "Operating income",
     "net_income": "Net income",
     "eps_basic": "EPS (basic)",
+    "cfo": "Operating cash flow",
     "total_assets": "Total assets",
     "stockholders_equity": "Stockholders' equity",
     "long_term_debt": "Long-term debt",
@@ -54,18 +72,103 @@ def load_json(path: Path, default=None):
 
 def to_float(value) -> float | None:
     try:
-        out = float(value)
+        return float(value)
     except (TypeError, ValueError):
         return None
-    return out
+
+
+def parse_date(period: str) -> datetime | None:
+    try:
+        return datetime.strptime(str(period)[:10], "%Y-%m-%d")
+    except (TypeError, ValueError):
+        return None
+
+
+def classify_accel(latest_accel: float, history: list[float], *, floor: float) -> tuple[str, float]:
+    if len(history) >= 2:
+        vol = statistics.pstdev(history)
+    else:
+        vol = abs(history[0]) if history else 0.0
+    threshold = max(floor, 0.75 * vol)
+    if latest_accel > threshold:
+        return "accelerating", threshold
+    if latest_accel < -threshold:
+        return "decelerating", threshold
+    return "steady", threshold
+
+
+def analyze_quarterly_yoy(series: list[dict]) -> dict | None:
+    """Second derivative of year-over-year growth for a quarterly series.
+
+    series: [{"period": "YYYY-MM-DD", "value": float, ...}] with real fiscal
+    period ends. Returns None when there is not enough clean history.
+    """
+    cleaned: dict[str, float] = {}
+    for point in series:
+        value = to_float(point.get("value"))
+        period = str(point.get("period") or "")[:10]
+        if value is None or not parse_date(period):
+            continue
+        cleaned[period] = value
+    ordered = sorted(cleaned.items())
+    if len(ordered) < YOY_MIN_QUARTERS:
+        return None
+
+    dates = [parse_date(p) for p, _v in ordered]
+    values = [v for _p, v in ordered]
+    nonzero = [abs(v) for v in values if abs(v) > 1e-9]
+    scale = statistics.median(nonzero) if nonzero else 0.0
+    denom_floor = max(1e-9, DENOMINATOR_FLOOR_FRAC * scale)
+
+    growths: list[tuple[str, float]] = []
+    suspect = 0
+    lo, hi = YOY_MATCH_WINDOW
+    for i in range(len(ordered)):
+        match = None
+        for j in range(i - 1, -1, -1):
+            days = (dates[i] - dates[j]).days
+            if lo <= days <= hi:
+                match = j
+                break
+            if days > hi:
+                break
+        if match is None:
+            continue
+        prev, cur = values[match], values[i]
+        if abs(prev) < denom_floor:
+            suspect += 1
+            continue
+        growth = (cur - prev) / abs(prev)
+        if abs(growth) > GROWTH_OUTLIER_CAP:
+            suspect += 1
+            continue
+        growths.append((ordered[i][0], growth))
+
+    if len(growths) < YOY_MIN_GROWTH_POINTS:
+        return None
+
+    gvals = [g for _p, g in growths]
+    accels = [b - a for a, b in zip(gvals, gvals[1:])]
+    direction, threshold = classify_accel(accels[-1], accels[:-1], floor=0.03)
+
+    return {
+        "direction": direction,
+        "basis": "yoy",
+        "growth_latest": round(gvals[-1], 4),
+        "growth_prior": round(gvals[-2], 4),
+        "accel": round(accels[-1], 4),
+        "threshold": round(threshold, 4),
+        "mode": "pct",
+        "suspect_points": suspect,
+        "points": [{"period": p, "value": v} for p, v in ordered[-MAX_POINTS:]],
+    }
 
 
 def analyze_series(points: list[tuple[str, float]], *, mode: str = "pct") -> dict | None:
-    """Compute first/second derivative for a (period, value) series.
+    """Sequential first/second derivative for non-quarterly series.
 
-    mode="pct":  growth as fractional change (financial series)
-    mode="diff": growth as absolute change (count series with zeros)
-    Returns None when the series is too short or degenerate.
+    Used for equity-model observations (arbitrary cadence) and news-flow
+    counts. mode="pct" uses fractional growth; mode="diff" absolute change.
     """
     cleaned: dict[str, float] = {}
     for period, value in points:
@@ -84,69 +187,49 @@ def analyze_series(points: list[tuple[str, float]], *, mode: str = "pct") -> dic
         else:
             if abs(prev) < 1e-9:
                 return None
-            growths.append((cur - prev) / abs(prev))
+            growth = (cur - prev) / abs(prev)
+            if abs(growth) > GROWTH_OUTLIER_CAP:
+                return None
+            growths.append(growth)
     if len(growths) < 3:
         return None
 
     accels = [b - a for a, b in zip(growths, growths[1:])]
-    latest_accel = accels[-1]
-    history = accels[:-1]
-    if len(history) >= 2:
-        vol = statistics.pstdev(history)
-    else:
-        vol = abs(history[0]) if history else 0.0
-
-    if mode == "diff":
-        threshold = max(1.0, 0.75 * vol)
-    else:
-        threshold = max(0.02, 0.75 * vol)
-
-    if latest_accel > threshold:
-        direction = "accelerating"
-    elif latest_accel < -threshold:
-        direction = "decelerating"
-    else:
-        direction = "steady"
+    floor = 1.0 if mode == "diff" else 0.02
+    direction, threshold = classify_accel(accels[-1], accels[:-1], floor=floor)
 
     return {
         "direction": direction,
+        "basis": "seq",
         "growth_latest": round(growths[-1], 4),
         "growth_prior": round(growths[-2], 4),
-        "accel": round(latest_accel, 4),
+        "accel": round(accels[-1], 4),
         "threshold": round(threshold, 4),
         "mode": mode,
         "points": [{"period": p, "value": v} for p, v in ordered],
     }
 
 
-def filing_facts_series(ticker_dir: Path) -> dict[str, list[tuple[str, float]]]:
-    """Assemble per-metric series across all filing_facts_*.json files."""
-    evidence_dir = ticker_dir / "research" / "evidence"
-    if not evidence_dir.is_dir():
-        return {}
-    series: dict[str, dict[str, float]] = {}
-    for path in sorted(evidence_dir.glob("filing_facts_*.json")):
+def fundamentals_series() -> dict[str, dict[str, list[dict]]]:
+    """ticker -> metric -> quarterly series from the XBRL cache."""
+    out: dict[str, dict[str, list[dict]]] = {}
+    if not FUNDAMENTALS_DIR.is_dir():
+        return out
+    for path in sorted(FUNDAMENTALS_DIR.glob("*.json")):
+        if path.stem.startswith("_"):
+            continue
         doc = load_json(path)
-        if not isinstance(doc, dict):
+        metrics = doc.get("metrics") if isinstance(doc, dict) else None
+        if not isinstance(metrics, dict):
             continue
-        meta = doc.get("filing_meta") or {}
-        period = meta.get("period_end") or meta.get("filing_date") or doc.get("as_of")
-        if not period:
-            continue
-        for name, metric in (doc.get("metrics") or {}).items():
-            if not isinstance(metric, dict):
-                continue
-            current = to_float(metric.get("current"))
-            if current is None:
-                continue
-            series.setdefault(name, {})[str(period)[:10]] = current
-    return {name: sorted(points.items()) for name, points in series.items()}
+        out[str(doc.get("ticker") or path.stem).upper()] = metrics
+    return out
 
 
 def equity_model_series(ticker: str, models_doc: dict) -> dict[str, list[tuple[str, float]]]:
     """Extract observation series (lists of {period, <numeric>}) from equity models."""
     entry = ((models_doc or {}).get("tickers") or {}).get(ticker) or {}
-    forms = ((entry.get("production") or {}).get("forms") or {})
+    forms = (entry.get("production") or {}).get("forms") or {}
     out: dict[str, list[tuple[str, float]]] = {}
     for form_key, form in forms.items():
         if not isinstance(form, dict):
@@ -238,20 +321,16 @@ def merged_news_history(news_doc: dict, *, write: bool = True) -> dict[str, list
     return out
 
 
-def portfolio_ticker_dirs() -> list[Path]:
-    out = []
-    for p in sorted(ROOT.iterdir()):
-        if p.is_dir() and not p.name.startswith((".", "_")) and p.name not in ("dashboard", "docs", "terminals"):
-            out.append(p)
-    return out
-
-
 def build_trends() -> dict:
     models_doc = load_json(EQUITY_MODELS_PATH)
     news_doc = load_json(NEWS_PATH)
     news_series = merged_news_history(news_doc if isinstance(news_doc, dict) else {})
+    fundamentals = fundamentals_series()
+    registry = load_json(REGISTRY_PATH, {})
+    universe = sorted((registry.get("holdings") or {}).keys())
 
     by_ticker: dict[str, dict] = {}
+    suspect_excluded = 0
 
     def add_metric(ticker: str, metric: str, source: str, analysis: dict, evidence_ref: str | None) -> None:
         entry = by_ticker.setdefault(
@@ -269,15 +348,26 @@ def build_trends() -> dict:
         )
         entry["summary"][analysis["direction"]] += 1
 
-    for ticker_dir in portfolio_ticker_dirs():
-        ticker = ticker_dir.name
-        for metric, points in filing_facts_series(ticker_dir).items():
-            analysis = analyze_series(points, mode="pct")
-            if analysis:
-                add_metric(ticker, metric, "filing_facts", analysis, f"{ticker}/research/evidence")
+    for ticker, metrics in sorted(fundamentals.items()):
+        for metric, series in sorted(metrics.items()):
+            analysis = analyze_quarterly_yoy(series)
+            if analysis is None:
+                continue
+            suspect_excluded += analysis.pop("suspect_points", 0) or 0
+            add_metric(
+                ticker,
+                metric,
+                "sec_fundamentals",
+                analysis,
+                f"_system/reference/market-data/fundamentals/{ticker}.json",
+            )
+
+    equity_model_tickers = set()
+    for ticker in sorted(((models_doc or {}).get("tickers") or {}).keys()):
         for metric, points in equity_model_series(ticker, models_doc).items():
             analysis = analyze_series(points, mode="pct")
             if analysis:
+                equity_model_tickers.add(ticker)
                 add_metric(ticker, metric, "equity_model", analysis, "dashboard/data/equity_models.json")
 
     for ticker, points in news_series.items():
@@ -295,6 +385,13 @@ def build_trends() -> dict:
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "ticker_count": len(by_ticker),
         "inflection_count": inflection_count,
+        "coverage": {
+            "universe": len(universe),
+            "fundamentals_tickers": len(fundamentals),
+            "equity_model_tickers": len(equity_model_tickers),
+            "analyzed_tickers": len(by_ticker),
+            "suspect_points_excluded": suspect_excluded,
+        },
         "by_ticker": by_ticker,
     }
 
@@ -306,9 +403,11 @@ def main() -> int:
     payload = build_trends()
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    cov = payload["coverage"]
     print(
         f"Wrote {args.output.relative_to(ROOT)} "
-        f"({payload['ticker_count']} tickers, {payload['inflection_count']} inflections)"
+        f"({payload['ticker_count']} tickers, {payload['inflection_count']} inflections, "
+        f"fundamentals {cov['fundamentals_tickers']}/{cov['universe']})"
     )
     return 0
 

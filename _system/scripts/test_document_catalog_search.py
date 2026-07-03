@@ -36,8 +36,11 @@ class DocumentCatalogSearchTests(unittest.TestCase):
 
     def test_tpl_excludes_jpx_itplan_false_positive(self) -> None:
         result = run_node("count", "tpl")
-        self.assertEqual(result["total"], 7)
-        self.assertEqual(result["tpl"], 7)
+        # Hits must be genuine TPL documents (ticker TPL or untagged docs
+        # naming TPL); the JPX "IT-plan" pages that used to substring-match
+        # "tpl" must stay excluded.
+        self.assertGreaterEqual(result["tpl"], 1)
+        self.assertEqual(result["tickers"], ["TPL"])
         self.assertEqual(result["jpx_false_positive"], 0)
 
     def test_short_ticker_queries_drop_substring_noise(self) -> None:

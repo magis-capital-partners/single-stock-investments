@@ -1057,7 +1057,30 @@
       return `${prior >= 0 ? '+' : ''}${prior} → ${latest >= 0 ? '+' : ''}${latest}`;
     }
     const pct = v => `${(v * 100).toFixed(1)}%`;
-    return `${pct(prior)} → ${pct(latest)}`;
+    const suffix = metric.basis === 'yoy' ? ' YoY' : '';
+    return `${pct(prior)} → ${pct(latest)}${suffix}`;
+  }
+
+  const TREND_SOURCE_LABELS = {
+    sec_fundamentals: { label: 'SEC XBRL', title: 'Quarterly fundamentals from SEC companyfacts (real fiscal periods, YoY basis)' },
+    equity_model: { label: 'Equity model', title: 'Model observation series from equity_models.json' },
+    news_flow: { label: 'News flow', title: 'Monthly news item counts (accumulated history)' },
+  };
+
+  function trendSourceBadge(source, escapeHtml) {
+    const meta = TREND_SOURCE_LABELS[source] || { label: source || '?', title: source || '' };
+    return `<span class="badge badge-us" title="${escapeHtml(meta.title)}">${escapeHtml(meta.label)}</span>`;
+  }
+
+  function renderInflectionCoverage(kpiTrends) {
+    const cov = (kpiTrends && kpiTrends.coverage) || null;
+    if (!cov) return '';
+    const parts = [
+      `${cov.fundamentals_tickers || 0}/${cov.universe || '?'} tickers with SEC quarterly fundamentals`,
+      `${cov.analyzed_tickers || 0} analyzed`,
+    ];
+    if (cov.suspect_points_excluded) parts.push(`${cov.suspect_points_excluded} suspect datapoints excluded`);
+    return `<p class="tier-sub" style="margin-bottom:4px">Coverage: ${parts.join(' · ')}. Non-US and OTC tickers without XBRL filings rely on equity-model or news-flow series only.</p>`;
   }
 
   function renderInflections(kpiTrends, escapeHtml, opts) {
@@ -1076,13 +1099,17 @@
     }
     filtered.sort((a, b) => Math.abs(b.accel || 0) / Math.max(b.threshold || 1e-9, 1e-9) - Math.abs(a.accel || 0) / Math.max(a.threshold || 1e-9, 1e-9));
     if (!filtered.length) {
-      return `<p class="subhead">No significant accelerations or decelerations detected${kpiTrends ? '' : ' — run: python _system/scripts/build_kpi_trends.py'}.</p>`;
+      if (!kpiTrends) {
+        return `<p class="subhead">KPI trend data not built yet — run: python _system/scripts/build_fundamental_series.py then build_kpi_trends.py.</p>`;
+      }
+      return `${renderInflectionCoverage(kpiTrends)}<p class="subhead">No significant accelerations or decelerations right now — every analyzed series is within its own noise band.</p>`;
     }
     const accel = filtered.filter(r => r.direction === 'accelerating').length;
     const decel = filtered.length - accel;
     return `
+      ${renderInflectionCoverage(kpiTrends)}
       <p class="tier-sub" style="margin-bottom:8px">
-        Second-derivative watch: ${accel} accelerating · ${decel} decelerating · significance scaled to each series' own volatility
+        Second-derivative watch: ${accel} accelerating · ${decel} decelerating · growth is year-over-year per fiscal quarter where the source allows · significance scaled to each series' own volatility
       </p>
       <table class="darwin-table" id="insights-inflections-table">
         <thead><tr><th>Ticker</th><th>Metric</th><th>Trend</th><th>Growth (prior → latest)</th><th>2nd deriv</th><th>Last periods</th><th>Source</th></tr></thead>
@@ -1095,7 +1122,7 @@
               <td class="mono">${escapeHtml(formatGrowth(r))}</td>
               <td class="mono">${r.accel != null ? (r.mode === 'diff' ? r.accel : `${(r.accel * 100).toFixed(1)}pp`) : '—'}</td>
               <td>${renderSparkline(r.points, r.direction)}</td>
-              <td class="tier-sub">${escapeHtml(r.source || '')}</td>
+              <td>${trendSourceBadge(r.source, escapeHtml)}</td>
             </tr>`).join('')}
         </tbody>
       </table>`;
