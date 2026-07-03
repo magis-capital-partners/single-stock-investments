@@ -169,13 +169,28 @@
       </div>`;
   }
 
-  function renderActiveLensChips(activeLenses, silentCount, expandedPersona, lenses, escapeHtml) {
+  function renderActiveLensChips(activeLenses, silentCount, expandedPersona, lenses, escapeHtml, powerZones) {
     if (!activeLenses?.length && !silentCount) return '';
-    const chips = (activeLenses || []).map(l => {
+    const inZoneIds = new Set((powerZones && powerZones.in_zone) || []);
+    const hasZones = inZoneIds.size > 0;
+    const lensChip = (l, inZone) => {
       const short = (l.label || l.persona || '').split(' ')[0];
       const active = expandedPersona === l.persona ? ' lens-chip-active' : '';
-      return `<button type="button" class="lens-chip${active}" data-lens-persona="${escapeHtml(l.persona)}">${escapeHtml(short)} ${escapeHtml(l.verdict)} ${l.return_pct != null ? fmtPct(l.return_pct) : ''}</button>`;
-    }).join('');
+      const zoneMark = inZone ? ' <span title="In power zone: this persona framework fits this company type">⚡</span>' : '';
+      return `<button type="button" class="lens-chip${active}" data-lens-persona="${escapeHtml(l.persona)}">${escapeHtml(short)}${zoneMark} ${escapeHtml(l.verdict)} ${l.return_pct != null ? fmtPct(l.return_pct) : ''}</button>`;
+    };
+    const zoned = hasZones ? (activeLenses || []).filter(l => inZoneIds.has(l.persona)) : (activeLenses || []);
+    const outside = hasZones ? (activeLenses || []).filter(l => !inZoneIds.has(l.persona)) : [];
+    const chips = zoned.map(l => lensChip(l, hasZones)).join('');
+    const outsideBlock = outside.length
+      ? `<details style="display:inline-block"><summary class="lens-chip-silent" style="cursor:pointer;list-style:none">+${outside.length} outside framework</summary>
+          <div class="lens-chips" style="margin-top:6px">${outside.map(l => lensChip(l, false)).join('')}</div>
+        </details>`
+      : '';
+    const primary = hasZones && zoned.length ? zoned[0] : null;
+    const viewedThrough = primary
+      ? `<p class="tier-sub" style="margin:2px 0 6px">Viewed through: <strong>${escapeHtml(primary.label || primary.persona)}</strong> (in power zone)${primary.return_pct != null ? ` — IRR ${fmtPct(primary.return_pct)}` : ''}</p>`
+      : '';
     const silent = silentCount > 0
       ? `<span class="lens-chip-silent">+${silentCount} silent</span>`
       : '';
@@ -200,7 +215,8 @@
     return `
       <div class="detail-section tier-2">
         <h3>Active lenses</h3>
-        <div class="lens-chips">${chips}${silent}</div>
+        ${viewedThrough}
+        <div class="lens-chips">${chips}${outsideBlock}${silent}</div>
         ${expand}
       </div>`;
   }
@@ -1000,6 +1016,91 @@
       </nav>`;
   }
 
+  function renderSparkline(points, direction) {
+    const values = (points || []).map(p => Number(p.value)).filter(v => Number.isFinite(v));
+    if (values.length < 2) return '';
+    const width = 90;
+    const height = 22;
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const span = max - min || 1;
+    const step = width / (values.length - 1);
+    const coords = values
+      .map((v, i) => `${(i * step).toFixed(1)},${(height - 3 - ((v - min) / span) * (height - 6)).toFixed(1)}`)
+      .join(' ');
+    const color = direction === 'accelerating' ? '#34d399' : direction === 'decelerating' ? '#f87171' : '#818cf8';
+    return `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" style="display:block">
+      <polyline fill="none" stroke="${color}" stroke-width="1.5" points="${coords}" />
+    </svg>`;
+  }
+
+  function trendBadge(direction) {
+    if (direction === 'accelerating') return '<span class="badge badge-ok" title="Growth accelerating">▲▲</span>';
+    if (direction === 'decelerating') return '<span class="badge badge-bad" title="Growth decelerating">▼▼</span>';
+    return '<span class="badge badge-us">steady</span>';
+  }
+
+  function renderTickerTrendBadges(trends, escapeHtml) {
+    const metrics = (trends && trends.metrics) || [];
+    const firing = metrics.filter(m => m.direction === 'accelerating' || m.direction === 'decelerating');
+    if (!firing.length) return '';
+    return firing.slice(0, 3).map(m =>
+      `<span title="${escapeHtml(`${m.label || m.metric}: ${m.direction}`)}" style="margin-right:4px">${trendBadge(m.direction)}</span>`
+    ).join('');
+  }
+
+  function formatGrowth(metric) {
+    const latest = metric.growth_latest;
+    const prior = metric.growth_prior;
+    if (latest == null || prior == null) return '—';
+    if (metric.mode === 'diff') {
+      return `${prior >= 0 ? '+' : ''}${prior} → ${latest >= 0 ? '+' : ''}${latest}`;
+    }
+    const pct = v => `${(v * 100).toFixed(1)}%`;
+    return `${pct(prior)} → ${pct(latest)}`;
+  }
+
+  function renderInflections(kpiTrends, escapeHtml, opts) {
+    const byTicker = (kpiTrends && kpiTrends.by_ticker) || {};
+    const search = ((opts && opts.search) || '').trim().toLowerCase();
+    const rows = [];
+    Object.entries(byTicker).forEach(([ticker, entry]) => {
+      (entry.metrics || []).forEach(m => {
+        if (m.direction !== 'accelerating' && m.direction !== 'decelerating') return;
+        rows.push({ ticker, ...m });
+      });
+    });
+    let filtered = rows;
+    if (search) {
+      filtered = rows.filter(r => `${r.ticker} ${r.metric} ${r.label} ${r.source}`.toLowerCase().includes(search));
+    }
+    filtered.sort((a, b) => Math.abs(b.accel || 0) / Math.max(b.threshold || 1e-9, 1e-9) - Math.abs(a.accel || 0) / Math.max(a.threshold || 1e-9, 1e-9));
+    if (!filtered.length) {
+      return `<p class="subhead">No significant accelerations or decelerations detected${kpiTrends ? '' : ' — run: python _system/scripts/build_kpi_trends.py'}.</p>`;
+    }
+    const accel = filtered.filter(r => r.direction === 'accelerating').length;
+    const decel = filtered.length - accel;
+    return `
+      <p class="tier-sub" style="margin-bottom:8px">
+        Second-derivative watch: ${accel} accelerating · ${decel} decelerating · significance scaled to each series' own volatility
+      </p>
+      <table class="darwin-table" id="insights-inflections-table">
+        <thead><tr><th>Ticker</th><th>Metric</th><th>Trend</th><th>Growth (prior → latest)</th><th>2nd deriv</th><th>Last periods</th><th>Source</th></tr></thead>
+        <tbody>
+          ${filtered.slice(0, 120).map(r => `
+            <tr>
+              <td><button type="button" class="linkish mono" data-select-ticker="${escapeHtml(r.ticker)}">${escapeHtml(r.ticker)}</button></td>
+              <td>${escapeHtml(r.label || r.metric)}</td>
+              <td>${trendBadge(r.direction)}</td>
+              <td class="mono">${escapeHtml(formatGrowth(r))}</td>
+              <td class="mono">${r.accel != null ? (r.mode === 'diff' ? r.accel : `${(r.accel * 100).toFixed(1)}pp`) : '—'}</td>
+              <td>${renderSparkline(r.points, r.direction)}</td>
+              <td class="tier-sub">${escapeHtml(r.source || '')}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>`;
+  }
+
   function renderTickerEssentials(tickers, escapeHtml, linkHtml, opts) {
     const sourceFilter = (opts && opts.sourceFilter) || 'ownership';
     const rows = filterTickerEssentials(tickers, opts).slice(0, 160);
@@ -1010,7 +1111,7 @@
     return `
       ${sourceTabs}
       <table class="darwin-table" id="insights-ticker-table">
-        <thead><tr><th>Ticker</th><th>Status</th><th>Fresh</th><th>Latest</th><th>Bull</th><th>Bear/Risk</th><th>Owner</th></tr></thead>
+        <thead><tr><th>Ticker</th><th>Trend</th><th>Status</th><th>Fresh</th><th>Latest</th><th>Bull</th><th>Bear/Risk</th><th>Owner</th></tr></thead>
         <tbody>
           ${rows.map(t => {
             const e = t.essential_insights || {};
@@ -1018,6 +1119,7 @@
             return `
               <tr>
                 <td><button type="button" class="linkish mono" data-select-ticker="${escapeHtml(t.ticker)}">${escapeHtml(t.ticker)}</button><div class="tier-sub">${escapeHtml(t.company || '')}</div></td>
+                <td>${renderTickerTrendBadges(t.kpi_trends, escapeHtml) || '<span class="tier-sub">—</span>'}</td>
                 <td><span class="badge ${insightToneClass(status.tone)}">${escapeHtml(status.label || 'No insight')}</span></td>
                 <td class="mono">${e.freshness_days != null ? `${e.freshness_days}d` : 'n/a'}</td>
                 <td>${renderInsightItem(e.latest, escapeHtml, linkHtml)}</td>
@@ -1499,6 +1601,7 @@
       pdfTimeMode = 'period',
       portfolioMacro = [],
       tickerSourceFilter = 'ownership',
+      kpiTrends = null,
     } = options || {};
 
     const profiles = insights?.fund_profiles || {};
@@ -1545,6 +1648,7 @@
         ]
       : [];
     const sections = [
+      { id: 'inflections', label: 'Inflections' },
       { id: 'overview', label: 'Overview' },
       { id: 'events', label: 'What changed' },
       { id: 'consensus', label: 'Consensus' },
@@ -1558,7 +1662,9 @@
     ];
 
     let body = '';
-    if (activeSection === 'overview') {
+    if (activeSection === 'inflections') {
+      body = renderInflections(kpiTrends, escapeHtml, { search: fundSearch, bookOnly });
+    } else if (activeSection === 'overview') {
       body = renderSourceHealth(insights?.source_health || {}, escapeHtml);
     } else if (activeSection === 'events') {
       body = renderEventQueue(insights?.events || [], escapeHtml, linkHtml, ghRepo, { search: fundSearch, bookOnly, needsReviewOnly, period, knownTickers });
@@ -1591,7 +1697,7 @@
         + renderDataSourceCandidates(insights?.data_source_candidates || {}, escapeHtml);
     }
 
-    const showPeriodControls = activeSection !== 'tickers';
+    const showPeriodControls = activeSection !== 'tickers' && activeSection !== 'inflections';
     const bookLabel = activeSection === 'tickers' ? 'Holdings only' : 'Our book overlap';
 
     return `
@@ -1640,6 +1746,8 @@
     renderResearchMemory,
     renderInsightsPanel,
     renderLetterDiscussants,
+    renderTickerTrendBadges,
+    renderInflections,
     filterInsights,
     attachFilingVerifyHandlers,
     STANCE_BADGE,

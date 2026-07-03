@@ -704,13 +704,15 @@ let insightsQuarter = 'latest';
 let fundRegistrySearch = '';
 let insightsBookOnly = true;
 let insightsNeedsReviewOnly = false;
-let insightsSection = 'overview';
+let insightsSection = 'inflections';
 let insightsTickerSourceFilter = 'ownership';
 let insightsPdfSourceTab = 'all';
 let insightsPdfTimeMode = 'period';
 let activistSideFilter = 'all';
 let activistReviewFilter = '';
 let activistSearch = '';
+let activistTierFilter = 'signal';
+const activistExpandedGroups = new Set();
 let insightsSearchDebounce = null;
 let insightsSearchFocused = false;
 let selectedFundId = null;
@@ -1045,11 +1047,30 @@ function renderActivist() {
     side: activistSideFilter,
     reviewFilter: activistReviewFilter,
     search: activistSearch,
+    tier: activistTierFilter,
+    expandedGroups: activistExpandedGroups,
   });
   content.querySelectorAll('[data-activist-side]').forEach(btn => {
     btn.addEventListener('click', () => {
-      activistSideFilter = btn.dataset.activistSide || 'all';
+      const side = btn.dataset.activistSide || 'all';
+      activistSideFilter = activistSideFilter === side ? 'all' : side;
       activistReviewFilter = '';
+      renderActivist();
+    });
+  });
+  content.querySelectorAll('[data-activist-tier]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activistTierFilter = btn.dataset.activistTier || 'signal';
+      activistReviewFilter = '';
+      renderActivist();
+    });
+  });
+  content.querySelectorAll('[data-activist-group]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const key = btn.dataset.activistGroup || '';
+      if (activistExpandedGroups.has(key)) activistExpandedGroups.delete(key);
+      else activistExpandedGroups.add(key);
       renderActivist();
     });
   });
@@ -1108,6 +1129,7 @@ function renderInsights(opts = {}) {
     pdfTimeMode: insightsPdfTimeMode,
     portfolioMacro: data.portfolio_macro || [],
     tickerSourceFilter: insightsTickerSourceFilter,
+    kpiTrends: data.kpi_trends || null,
   });
   content.querySelectorAll('[data-insights-quarter]').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -1726,10 +1748,47 @@ function selectTicker(ticker, opts = {}) {
     : '';
   const tier1 = iv ? iv.renderIdentityLine(t.classification, escapeHtml) : '';
   const tier2 = iv && t.lenses
-    ? iv.renderActiveLensChips(t.active_lenses, t.silent_lens_count, expandedPersona, t.lenses, escapeHtml)
+    ? iv.renderActiveLensChips(t.active_lenses, t.silent_lens_count, expandedPersona, t.lenses, escapeHtml, t.power_zones)
     : '';
   const essentialInsights = iv
     ? iv.renderEssentialInsights(t.essential_insights, escapeHtml, linkHtml)
+    : '';
+  const trendBadges = iv && t.kpi_trends ? iv.renderTickerTrendBadges(t.kpi_trends, escapeHtml) : '';
+  const trendSection = trendBadges
+    ? `<div class="detail-section"><h3>KPI trend</h3><div>${trendBadges}<span class="tier-sub" style="margin-left:6px">second-derivative signals — see Insights → Inflections</span></div></div>`
+    : '';
+  const pzPersonas = (data.power_zones?.personas) || {};
+  const pzInZone = (t.power_zones?.in_zone) || [];
+  const powerZoneSection = pzInZone.length
+    ? `<div class="detail-section"><h3>Power zones</h3><div class="lens-chips">${pzInZone.map(pid => {
+        const z = (t.power_zones.zones || {})[pid] || {};
+        const meta = pzPersonas[pid] || {};
+        return `<span class="lens-chip" title="${escapeHtml(meta.framework || '')} · fit ${z.fit != null ? Math.round(z.fit * 100) + '%' : '—'} · matched: ${(z.matched_fields || []).join(', ')}">⚡ ${escapeHtml(meta.label || pid)} · ${z.score != null ? z.score : '—'}</span>`;
+      }).join('')}</div>
+      <p class="tier-sub" style="margin-top:6px">Personas whose framework has demonstrated alpha in this company type; lens IRRs default to these.</p></div>`
+    : '';
+  const dossier = t.dossier;
+  const dossierTimeline = (dossier?.timeline || []).slice(0, 12);
+  const dossierSection = dossier
+    ? `<div class="detail-section">
+      <h3>Company context${dossier.as_of ? ` · <span class="mono" style="font-size:11px">${escapeHtml(dossier.as_of)}</span>` : ''}${dossier.stale ? ' <span class="badge badge-warn">stale</span>' : ''}</h3>
+      ${dossier.industry ? `
+      <div class="research-box" style="margin-bottom:10px">
+        ${dossier.industry.structure ? `<div class="hr-line"><strong>Structure:</strong> ${escapeHtml(dossier.industry.structure)}</div>` : ''}
+        ${dossier.industry.share_shift ? `<div class="hr-line"><strong>Share shift:</strong> ${escapeHtml(dossier.industry.share_shift)}</div>` : ''}
+        ${dossier.industry.trend ? `<div class="hr-line"><strong>Changing now:</strong> ${escapeHtml(dossier.industry.trend)}</div>` : ''}
+        ${(dossier.industry.peers || []).length ? `<div class="hr-line"><strong>Peers:</strong> ${dossier.industry.peers.map(p => escapeHtml(p)).join(' · ')}</div>` : ''}
+      </div>` : ''}
+      ${dossierTimeline.length ? `
+      <ul class="dev-list">
+        ${dossierTimeline.map(e => `
+          <li>
+            <div class="dev-date">${escapeHtml(e.date || '')} · ${escapeHtml((e.type || 'other').replace(/_/g, ' '))}${e.source === 'auto' ? ' · <span title="appended automatically from recent high-score insights">auto</span>' : ''}</div>
+            <div class="dev-label">${e.evidence_url ? linkHtml(e.evidence_url, e.label) : escapeHtml(e.label)}</div>
+          </li>`).join('')}
+      </ul>` : ''}
+      ${!dossier.has_agent_dossier ? `<p class="tier-sub" style="margin-top:6px">No agent dossier yet — timeline assembled from recent high-score insights. A Marvin deep-dive run will write the full history + industry view.</p>` : ''}
+    </div>`
     : '';
   const researchMemory = iv
     ? iv.renderResearchMemory(t.research_memory, escapeHtml, linkHtml)
@@ -1771,6 +1830,12 @@ function selectTicker(ticker, opts = {}) {
     ${tier2}
 
     ${essentialInsights}
+
+    ${trendSection}
+
+    ${powerZoneSection}
+
+    ${dossierSection}
 
     ${researchMemory}
 
