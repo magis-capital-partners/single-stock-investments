@@ -135,7 +135,7 @@
 | SBR | 0 | 0 | — | no hits |
 | SHC | 0 | 0 | — | no hits |
 | SJT | 0 | 0 | — | no hits |
-| SMR | 5 | 2 | 2024-11-27 | 7 indexed |
+| SMR | 5 | 1 | 2024-11-27 | 6 indexed |
 | SNOW | 0 | 0 | — | no hits |
 | SOC | 7 | 0 | 2024-10-11 | 7 indexed |
 | SPGI | 0 | 0 | — | no hits |
