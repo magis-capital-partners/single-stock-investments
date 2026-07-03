@@ -1,0 +1,101 @@
+{
+  "ticker": "TBBK",
+  "as_of": "2026-07-03",
+  "method": "full",
+  "lawrence_bucket": "multi_sided",
+  "classification_inputs": {
+    "archetype": "platform",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 63.89,
+    "price_source": "Yahoo Finance ~2026-07-03",
+    "fcf_per_share": 4.92,
+    "fcf_source": "FY2025 diluted EPS per `tbbk-investor-presentation-q4-2025.pdf` slide 7; corroborated by H1 2025 diluted EPS $2.46 in `TBBK-Q2-2025-10Q.pdf`",
+    "shares_millions": 46.6,
+    "normalization_note": "Owner cash proxied by diluted EPS. Fintech credit sponsorship provisions ($43.2M Q2 2025) offset in non-interest income with no net income impact per 10-Q footnote."
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 11,
+      "notes": "Fintech credit losses exceed fees; NIM compression; buybacks slow above $10B asset cap"
+    },
+    "base": {
+      "growth_y1_5": 0.08,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 13,
+      "notes": "Mid-single-digit organic growth below Apex 2030; ~100% capital return continues; 13x exit on year-10 owner earnings"
+    },
+    "bull": {
+      "growth_y1_5": 0.12,
+      "growth_y6_10": 0.07,
+      "exit_pfcf_y10": 15,
+      "notes": "Embedded finance + credit sponsorship scale; partial Apex 2030 delivery; sustained 25%+ ROE"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Bank marks loans and securities at fair value; shareholders equity $860M at 6/30/2025 per 10-Q"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating bank; no land or royalty reserves"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Consumer fintech credit charge-offs $151.1M in 2025 per investor presentation; matched fee/provision accounting in 10-Q"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / pipeline not in base cash path?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Embedded finance launch and Apex 2030 in bull scenario only; not in Lawrence base growth"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No material holdco stakes disclosed"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Earnings from operating bank franchise"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Fintech fee income ($141M YTD 2025 fintech deposits segment per Q4 2025 presentation) already in owner earnings"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "Fintech partner deposit growth funds low-cost balance sheet; fee income from prepaid/debit sponsorship and credit programs compounds with share count reduction via buybacks",
+    "filing_citation": "TBBK-Q2-2025-10Q.pdf segment note; tbbk-investor-presentation-q4-2025.pdf Apex 2030",
+    "bear_falsifier": "Fintech net charge-offs exceed fee income growth for two consecutive years",
+    "bull_falsifier": "Q4 2026 run-rate EPS reaches $7.00 on sustained ROE above 25%"
+  },
+  "estimates": {
+    "external": []
+  }
+}
