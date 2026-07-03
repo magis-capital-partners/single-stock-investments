@@ -12,7 +12,7 @@
 | ABMD.CVR | 0 | 0 | — | no hits |
 | ABX | 0 | 0 | — | no hits |
 | ADN.TO | 0 | 0 | — | no hits |
-| ALS.TO | 0 | 1 | 2026-01-01 | 1 indexed |
+| ALS.TO | 0 | 0 | — | no hits |
 | AMD | 2 | 1 | 2023-01-01 | 3 indexed |
 | AMZN | 0 | 0 | — | no hits |
 | APLD | 8 | 0 | 2024-11-29 | 8 indexed |
@@ -27,18 +27,18 @@
 | BN | 103 | 0 | 2024-11-12 | 103 indexed |
 | BOLSAA.MX | 0 | 0 | — | no hits |
 | BRBR | 0 | 0 | — | no hits |
-| BSM | 0 | 1 | 2026-01-01 | 1 indexed |
+| BSM | 0 | 0 | — | no hits |
 | BUR | 0 | 3 | 2019-01-01 | 3 indexed |
 | BVERS | 0 | 0 | — | no hits |
 | BWEL | 0 | 0 | — | no hits |
 | BYMA | 0 | 0 | — | no hits |
-| CBOE | 0 | 10 | 2019-01-01 | 10 indexed |
-| CBRS | 0 | 7 | 2019-01-01 | 7 indexed |
+| CBOE | 0 | 0 | — | no hits |
+| CBRS | 0 | 0 | — | no hits |
 | CDZI | 0 | 0 | — | no hits |
-| CHTR | 28 | 1 | 2026-01-01 | 29 indexed |
+| CHTR | 28 | 0 | 2024-11-14 | 28 indexed |
 | CKX | 3 | 0 | 2022-09-13 | 3 indexed |
 | CME | 0 | 0 | — | no hits |
-| CMSG | 0 | 1 | 2021-01-01 | 1 indexed |
+| CMSG | 0 | 0 | — | no hits |
 | COLD | 0 | 0 | — | no hits |
 | CORBF | 0 | 0 | — | no hits |
 | CPRT | 0 | 0 | — | no hits |
@@ -48,7 +48,7 @@
 | CSU.DB | 0 | 0 | — | no hits |
 | DB1.DE | 0 | 0 | — | no hits |
 | DHR | 7 | 0 | 2026-02-27 | 7 indexed |
-| DMLP | 2 | 1 | 2026-01-01 | 3 indexed |
+| DMLP | 2 | 0 | 2024-11-25 | 2 indexed |
 | DRR.AX | 0 | 0 | — | no hits |
 | ECHO | 0 | 0 | — | no hits |
 | EFOR | 0 | 0 | — | no hits |
@@ -79,7 +79,7 @@
 | GROY | 0 | 0 | — | no hits |
 | GS | 0 | 0 | — | no hits |
 | GTX | 0 | 0 | — | no hits |
-| HE | 1 | 1 | 2025-01-01 | 2 indexed |
+| HE | 1 | 0 | 2024-01-26 | 1 indexed |
 | HEE | 0 | 0 | — | no hits |
 | HEI.A | 0 | 0 | — | no hits |
 | HKHC | 15 | 0 | 2024-08-05 | 15 indexed |
@@ -117,7 +117,7 @@
 | NVDA | 0 | 0 | — | no hits |
 | NZX.NZ | 0 | 0 | — | no hits |
 | OR | 6 | 0 | 2023-01-05 | 6 indexed |
-| OTCM | 0 | 10 | 2019-01-01 | 10 indexed |
+| OTCM | 0 | 0 | — | no hits |
 | PBT | 2 | 0 | 2025-11-12 | 2 indexed |
 | PCH | 0 | 0 | — | no hits |
 | PCYO | 0 | 0 | — | no hits |
@@ -135,7 +135,7 @@
 | SBR | 0 | 0 | — | no hits |
 | SHC | 0 | 0 | — | no hits |
 | SJT | 0 | 0 | — | no hits |
-| SMR | 5 | 1 | 2024-11-27 | 6 indexed |
+| SMR | 5 | 0 | 2024-11-27 | 5 indexed |
 | SNOW | 0 | 0 | — | no hits |
 | SOC | 7 | 0 | 2024-10-11 | 7 indexed |
 | SPGI | 0 | 0 | — | no hits |
@@ -144,7 +144,7 @@
 | TASE | 0 | 0 | — | no hits |
 | TBBK | 0 | 0 | — | no hits |
 | TEQ.ST | 0 | 0 | — | no hits |
-| TFPM | 0 | 1 | 2021-01-01 | 1 indexed |
+| TFPM | 0 | 0 | — | no hits |
 | TOI | 0 | 0 | — | no hits |
 | TPL | 7 | 0 | 2024-02-28 | 7 indexed |
 | TRC | 7 | 0 | 2025-05-01 | 7 indexed |
@@ -153,7 +153,7 @@
 | VTRS | 0 | 0 | — | no hits |
 | WBI | 0 | 0 | — | no hits |
 | WEST | 0 | 0 | — | no hits |
-| WPM | 0 | 1 | 2021-01-01 | 1 indexed |
+| WPM | 0 | 0 | — | no hits |
 | WRLC | 0 | 0 | — | no hits |
 | X.TO | 0 | 0 | — | no hits |
 | XP | 0 | 0 | — | no hits |

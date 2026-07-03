@@ -1,11 +1,10 @@
 # CHTR — Third-party source inventory
 
 **Date:** 2026-07-03
-**Sources:** 29 total (0 approved, 0 pending, 29 context)
+**Sources:** 28 total (0 approved, 0 pending, 28 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
-| activist_short | Apr 24, 2026 | `CHTR/third-party-analyses/activist_reports/short/spruce_point_2026-01-01_zoom-communications-inc.html` | context | activist/short — publisher_site |
 | activist_long | S Advance Publications, Inc. — SC 13D/A | `CHTR/third-party-analyses/activist_reports/long/SC-13D/A_20180807_acc0001193125_18_241129.htm` | context | activist/long — sec_edgar |
 | activist_long | S Advance Publications, Inc. — SC 13D/A | `CHTR/third-party-analyses/activist_reports/long/SC-13D/A_20190731_acc0001387131_19_005550.htm` | context | activist/long — sec_edgar |
 | activist_long | S Advance Publications, Inc. — SC 13D/A | `CHTR/third-party-analyses/activist_reports/long/SC-13D/A_20200205_acc0001387131_20_001012.htm` | context | activist/long — sec_edgar |
