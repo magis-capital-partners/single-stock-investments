@@ -91,6 +91,8 @@ def verify_report(report: dict, meta: dict) -> bool:
             report["body_match_reason"] = "no_text"
         return changed
     matched, confidence, reason = match_report_to_ticker(text, meta)
+    if reason.startswith("alias:"):
+        matched = False
     hits = _count_hits(text, meta)
     updates = {
         "body_verified": bool(matched),

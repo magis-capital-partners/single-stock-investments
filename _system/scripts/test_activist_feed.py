@@ -12,10 +12,12 @@ sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 
 from activist_common import (  # noqa: E402
     publisher_match_allowed,
+    publisher_match_blob,
     resolve_report_file,
     ticker_meta,
     url_target_mismatch,
 )
+from cleanup_activist_false_positives import should_keep  # noqa: E402
 from build_activist_feed import build_feed, feed_eligible, github_blob  # noqa: E402
 from sec_filer_parse import _add_name  # noqa: E402
 
@@ -94,6 +96,45 @@ class ActivistFeedTests(unittest.TestCase):
         ok, _confidence, reason = publisher_match_allowed(url, title, blob, meta)
         self.assertFalse(ok)
         self.assertIn(reason, ("url_mismatch", "no_match", "alias:corporation", "alias:nvidia"))
+
+    def test_grizzly_generic_companies_post_does_not_match_mrsh(self) -> None:
+        meta = ticker_meta("MRSH")
+        url = (
+            "https://grizzlyreports.com/academic-studies-find-that-public-companies-"
+            "stocks-perform-worse-if-they-sued-short-sellers-after-critical-publications/"
+        )
+        title = "academic studies find that public compan"
+        blob = publisher_match_blob(
+            {
+                "title": title,
+                "source_url": url,
+                "firm_name": "Grizzly Research",
+                "local_file": (
+                    "MRSH/third-party-analyses/activist_reports/short/"
+                    "grizzly_2026-01-01_academic-studies-find-that-public-compan.html"
+                ),
+            }
+        )
+        self.assertTrue(url_target_mismatch(url, title, meta))
+        ok, _confidence, reason = publisher_match_allowed(url, title, blob, meta)
+        self.assertFalse(ok)
+        self.assertIn(reason, ("url_mismatch", "no_match", "alias:companies"))
+        keep, reject_reason = should_keep(
+            {
+                "source": "local",
+                "source_url": url,
+                "title": title,
+                "local_file": (
+                    "MRSH/third-party-analyses/activist_reports/short/"
+                    "grizzly_2026-01-01_academic-studies-find-that-public-compan.html"
+                ),
+                "body_verified": True,
+                "body_match_reason": "alias:companies",
+            },
+            meta,
+        )
+        self.assertFalse(keep)
+        self.assertIn(reject_reason.split(":")[0], ("weak_match", "url_slug_mismatch", "body_alias_only"))
 
 
 if __name__ == "__main__":
