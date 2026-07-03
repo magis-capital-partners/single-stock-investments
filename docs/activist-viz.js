@@ -81,17 +81,17 @@
 
   function isPdfReport(row) {
     if (row?.local_is_pdf) return true;
-    const path = row?.local_pdf || row?.local_file || row?.github_url || '';
+    const path = row?.local_pdf || '';
     return /\.pdf(\?|#|$)/i.test(String(path));
   }
 
   function renderReportLinks(row, linkHtml) {
     const parts = [];
     if (row.source_url) {
-      parts.push(linkHtml(row.source_url, 'Publisher', 'source-open-link'));
+      parts.push(linkHtml(row.source_url, 'Source', 'source-open-link'));
     }
     if (row.file_exists !== false && row.github_url) {
-      const label = isPdfReport(row) ? 'PDF' : 'Repo file';
+      const label = isPdfReport(row) ? 'PDF' : 'GitHub';
       parts.push(linkHtml(row.github_url, label, 'source-open-link'));
     }
     return parts.length ? parts.join(' ') : '—';

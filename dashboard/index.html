@@ -815,7 +815,7 @@ function stripMd(s) {
 
 function linkHtml(url, label, className = '') {
   if (!url) return label;
-  return `<a href="${url}" target="_blank" rel="noopener" class="${className}">${label}</a>`;
+  return `<a href="${url}" target="_blank" rel="noopener" class="${className}" onclick="event.stopPropagation()">${label}</a>`;
 }
 
 function escapeHtml(s) {
@@ -1069,7 +1069,8 @@ function renderActivist() {
     });
   }
   content.querySelectorAll('[data-select-ticker]').forEach(el => {
-    el.addEventListener('click', () => {
+    el.addEventListener('click', (e) => {
+      if (e.target.closest('a, button, input, select, textarea')) return;
       const ticker = el.dataset.selectTicker;
       if (!ticker) return;
       setView('holdings');
@@ -1189,7 +1190,8 @@ function renderInsights(opts = {}) {
     });
   });
   content.querySelectorAll('[data-select-ticker]').forEach(el => {
-    el.addEventListener('click', () => {
+    el.addEventListener('click', (e) => {
+      if (e.target.closest('a, button, input, select, textarea')) return;
       const ticker = el.dataset.selectTicker;
       if (!ticker) return;
       setView('holdings');
