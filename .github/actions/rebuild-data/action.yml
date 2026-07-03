@@ -91,6 +91,7 @@ runs:
         python _system/scripts/clean_activist_feed.py
         python _system/scripts/build_insights.py
         python _system/scripts/build_dashboard_data.py
+        rsync -a --delete --exclude '.git' --exclude '.wrangler' dashboard/ docs/
 
     - name: Mirror dashboard to docs
       if: inputs.mirror_docs == 'true'

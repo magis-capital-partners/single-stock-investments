@@ -52,7 +52,7 @@ permissions:
 
 concurrency:
   group: dashboard-deploy
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   oauth-secrets:
@@ -148,6 +148,9 @@ jobs:
       )
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    environment:
+      name: github-pages
+      url: ${{ steps.publish.outputs.page_url }}
     steps:
       - uses: jlumbroso/free-disk-space@main
         with:
@@ -175,30 +178,12 @@ jobs:
         run: |
           git sparse-checkout add dashboard
           git read-tree -mu HEAD
-      - name: Rebuild and upload Pages artifact
+      - name: Rebuild and publish to GitHub Pages
+        id: publish
         uses: ./.github/actions/publish-dashboard
         with:
           skip_rebuild: ${{ github.event_name == 'workflow_dispatch' && inputs.skip_rebuild == true && 'true' || 'false' }}
-          skip_deploy: "true"
+          skip_deploy: "false"
         env:
           OAUTH_CLIENT_ID: ${{ vars.OAUTH_CLIENT_ID }}
           OAUTH_PROXY_URL: ${{ vars.OAUTH_PROXY_URL }}
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    timeout-minutes: 40
-    environment:
-      name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          sparse-checkout: .github/actions/deploy-pages-retry
-          sparse-checkout-cone-mode: true
-          fetch-depth: 1
-      - id: deploy
-        uses: ./.github/actions/deploy-pages-retry
-        with:
-          max_attempts: "3"
-          retry_delay_seconds: "60"
