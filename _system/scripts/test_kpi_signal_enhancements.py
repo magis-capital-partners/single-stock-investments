@@ -13,7 +13,9 @@ sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 from kpi_signal_enhancements import (  # noqa: E402
     analyze_growth_regime,
     compute_leadership_risk,
+    earnings_revision_signal,
     passes_materiality,
+    peer_relative_signal,
     resolve_revenue_series,
     series_freshness,
     STALE_SERIES_MAX_DAYS,
@@ -92,6 +94,25 @@ class LeadershipRiskTests(unittest.TestCase):
         risk = compute_leadership_risk("CPRT", news, now=datetime(2026, 7, 3, tzinfo=timezone.utc))
         self.assertIn(risk["level"], ("watch", "elevated"))
         self.assertGreaterEqual(risk["score"], 1.0)
+
+
+class PeerRelativeTests(unittest.TestCase):
+    def test_lagging_peer_triggers_downshift(self) -> None:
+        signal = peer_relative_signal(0.02, [0.12, 0.10, 0.11, 0.09], metric_key="revenues")
+        self.assertIsNotNone(signal)
+        self.assertEqual(signal["direction"], "downshift")
+        self.assertEqual(signal["signal_type"], "peer_relative")
+
+
+class EarningsRevisionTests(unittest.TestCase):
+    def test_consecutive_misses(self) -> None:
+        events = [
+            {"reported": True, "date": "2026-03-01", "actual_eps": -0.20, "estimated_eps": -0.10},
+            {"reported": True, "date": "2026-06-01", "actual_eps": -0.30, "estimated_eps": -0.15},
+        ]
+        signal = earnings_revision_signal(events)
+        self.assertIsNotNone(signal)
+        self.assertEqual(signal["direction"], "decelerating")
 
 
 if __name__ == "__main__":

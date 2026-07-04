@@ -140,6 +140,21 @@ def main() -> int:
             errors.append("insights.source_health must be an object")
         elif "filing_facts" not in source_health or "portfolio_news" not in source_health:
             errors.append("insights.source_health missing expected local sources")
+        letter_count = insights.get("letter_count") or 0
+        letter_index_len = len(insights.get("letter_index") or [])
+        manifest_path = ROOT / "_system/reference/superinvestor-letters/drive_import_manifest.json"
+        manifest_count = 0
+        if manifest_path.exists():
+            try:
+                manifest_count = int(json.loads(manifest_path.read_text(encoding="utf-8")).get("file_count") or 0)
+            except (json.JSONDecodeError, TypeError, ValueError):
+                pass
+        if manifest_count > 0 and letter_index_len == 0:
+            errors.append(
+                f"letter_index empty but drive_import_manifest has {manifest_count} files; run make letter-backfill"
+            )
+        elif letter_count == 0:
+            warnings.append("superinvestor letters empty — run make letter-import-drive")
         provenance = insights.get("provenance") or {}
         if provenance.get("schema_version") != 2:
             errors.append("insights provenance schema_version must be 2")

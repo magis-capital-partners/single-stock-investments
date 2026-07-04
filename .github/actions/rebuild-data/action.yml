@@ -42,7 +42,10 @@ runs:
         python _system/scripts/build_document_registry.py
         python _system/scripts/build_drive_filename_index.py
         python _system/scripts/build_letter_drive_links.py
-        python _system/scripts/build_fundamental_series.py || true
+        python _system/scripts/build_fundamental_series.py
+        python _system/scripts/fetch_insider_transactions.py --offline
+        python _system/scripts/build_equity_model_dashboard.py
+        python _system/scripts/extract_equity_kpi_observations.py
         python _system/scripts/build_kpi_trends.py
         python _system/scripts/build_insights.py
         python _system/scripts/build_research_memory.py
@@ -87,7 +90,10 @@ runs:
         python _system/scripts/download_ira_research.py --tier A || true
         python _system/scripts/build_darwin_portfolio.py --fast
         python _system/scripts/build_nol_screener.py --write
-        python _system/scripts/build_fundamental_series.py || true
+        python _system/scripts/build_fundamental_series.py
+        python _system/scripts/fetch_insider_transactions.py --offline
+        python _system/scripts/build_equity_model_dashboard.py
+        python _system/scripts/extract_equity_kpi_observations.py
         python _system/scripts/build_kpi_trends.py
         python _system/scripts/build_power_zones.py
         python _system/scripts/clean_activist_feed.py

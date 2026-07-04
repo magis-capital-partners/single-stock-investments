@@ -797,9 +797,27 @@
     };
   }
 
+  function dedupeEvents(events) {
+    const best = new Map();
+    for (const event of events || []) {
+      const key = [
+        event.source || '',
+        event.ticker || '',
+        event.event_type || '',
+        event.observed_at || '',
+        event.title || '',
+      ].join('|');
+      const prev = best.get(key);
+      if (!prev || Number(event.score || 0) > Number(prev.score || 0)) {
+        best.set(key, event);
+      }
+    }
+    return Array.from(best.values());
+  }
+
   function filterEvents(events, opts) {
     const { search, bookOnly, period, knownTickers, needsReviewOnly } = opts || {};
-    let list = events || [];
+    let list = dedupeEvents(events);
     if (period && !period.all) {
       list = list.filter(e => periodMatchesRecord(e, period, ['quarter', 'observed_at', 'date', 'as_of']));
     }
@@ -1072,9 +1090,24 @@
     return `${s.toFixed(1)}× weak`;
   }
 
+  function dataTierBadge(trends, escapeHtml) {
+    const tier = trends && trends.data_tier;
+    if (!tier) return '';
+    const meta = {
+      sec_fundamentals: { label: 'SEC', title: 'Quarterly SEC XBRL fundamentals available', cls: 'badge-ok' },
+      equity_model: { label: 'Model', title: 'Equity model / dossier KPI series', cls: 'badge-us' },
+      sec_pending: { label: 'SEC pending', title: 'US CIK resolved but fundamentals not cached yet', cls: 'badge-warn' },
+      news_governance: { label: 'News only', title: 'News/governance signals only — no financial trend series', cls: 'badge-warn' },
+      none: { label: 'No trend data', title: 'No SEC, model, or dossier KPI series for this holding', cls: 'badge-warn' },
+    }[tier] || { label: tier, title: tier, cls: 'badge-us' };
+    return `<span class="badge ${meta.cls}" title="${escapeHtml(meta.title)}" style="margin-right:4px">${escapeHtml(meta.label)}</span>`;
+  }
+
   function renderTickerTrendBadges(trends, escapeHtml) {
     const entry = trends || {};
     const parts = [];
+    const tierBadge = dataTierBadge(entry, escapeHtml);
+    if (tierBadge && !entry.has_trend_data) parts.push(tierBadge);
     const gov = leadershipRiskBadge(entry.leadership_risk, escapeHtml);
     if (gov) parts.push(gov);
     const bms = entry.business_momentum;
@@ -1085,7 +1118,7 @@
     const firing = metrics.filter(m => m.display && (m.direction === 'accelerating' || m.direction === 'decelerating' || m.direction === 'downshift' || m.direction === 'upshift'));
     if (!firing.length) {
       const fallback = metrics.filter(m => m.direction === 'accelerating' || m.direction === 'decelerating' || m.direction === 'downshift');
-      if (!fallback.length) return parts.join('');
+      if (!fallback.length) return parts.join('') || tierBadge;
       return parts.join('') + fallback.slice(0, 2).map(m =>
         `<span title="${escapeHtml(`${m.label || m.metric}: ${m.direction}`)}" style="margin-right:4px">${trendBadge(m.direction, m.signal_tier)}</span>`
       ).join('');
@@ -1111,6 +1144,8 @@
     sec_fundamentals: { label: 'SEC XBRL', title: 'Quarterly fundamentals from SEC companyfacts (real fiscal periods, YoY basis)' },
     equity_model: { label: 'Equity model', title: 'Model observation series from equity_models.json' },
     news_flow: { label: 'News flow', title: 'Monthly news item counts (accumulated history)' },
+    peer_relative: { label: 'Peer rel.', title: 'YoY growth vs investment-sleeve peers' },
+    earnings_revision: { label: 'EPS rev.', title: 'Consensus EPS surprise / revision streak' },
   };
 
   function trendSourceBadge(source, escapeHtml) {
@@ -1122,14 +1157,24 @@
     const cov = (kpiTrends && kpiTrends.coverage) || null;
     if (!cov) return '';
     const parts = [
-      `${cov.fundamentals_tickers || 0}/${cov.universe || '?'} tickers with SEC quarterly fundamentals`,
-      `${cov.analyzed_tickers || 0} analyzed`,
+      cov.resolvable_ciks != null
+        ? `${cov.fundamentals_tickers || 0}/${cov.resolvable_ciks} SEC CIK fundamentals`
+        : `${cov.fundamentals_tickers || 0}/${cov.universe || '?'} tickers with SEC quarterly fundamentals`,
+      `${cov.analyzed_tickers || cov.universe || 0} in universe`,
     ];
     if (cov.displayed_count != null) parts.push(`${cov.displayed_count} displayed signals`);
     if (cov.confirmed_count != null) parts.push(`${cov.confirmed_count} confirmed`);
     if (cov.regime_downshift_count != null) parts.push(`${cov.regime_downshift_count} regime downshifts`);
     if (cov.stale_suppressed_count) parts.push(`${cov.stale_suppressed_count} stale series suppressed`);
     if (cov.leadership_risk_watch) parts.push(`${cov.leadership_risk_watch} leadership/gov watch`);
+    if (cov.missing_fundamentals && cov.missing_fundamentals.length) {
+      parts.push(`${cov.missing_fundamentals.length} resolvable CIK(s) missing fundamentals cache`);
+    }
+    if (cov.no_trend_data && cov.no_trend_data.length) {
+      parts.push(`${cov.no_trend_data.length} without financial trend data`);
+    }
+    if (cov.peer_relative_count != null && cov.peer_relative_count) parts.push(`${cov.peer_relative_count} peer-relative`);
+    if (cov.earnings_revision_count != null && cov.earnings_revision_count) parts.push(`${cov.earnings_revision_count} EPS revision`);
     if (cov.suspect_points_excluded) parts.push(`${cov.suspect_points_excluded} suspect datapoints excluded`);
     return `<p class="tier-sub" style="margin-bottom:4px">Coverage: ${parts.join(' · ')}. Operating flow metrics prioritized; balance-sheet drift hidden by default.</p>`;
   }
@@ -1167,6 +1212,7 @@
     const tiers = [
       { id: 'displayed', label: 'Displayed' },
       { id: 'regime', label: 'Growth regime' },
+      { id: 'peer', label: 'Peer / EPS' },
       { id: 'confirmed', label: 'Confirmed' },
       { id: 'emerging', label: 'Emerging' },
       { id: 'all', label: 'All signals' },
@@ -1186,6 +1232,7 @@
         && (row.direction === 'accelerating' || row.direction === 'decelerating');
     }
     if (tier === 'regime') return row.signal_type === 'regime' && (row.direction === 'downshift' || row.direction === 'upshift');
+    if (tier === 'peer') return row.signal_type === 'peer_relative' || row.signal_type === 'estimate_revision';
     if (tier === 'confirmed') return row.signal_tier === 'confirmed';
     if (tier === 'emerging') return row.signal_tier === 'emerging';
     return !!row.display;

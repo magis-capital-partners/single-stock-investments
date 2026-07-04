@@ -1023,36 +1023,58 @@ def from_insider_transactions(our_tickers: set[str]) -> list[dict]:
                     rows.append(row)
         except OSError:
             continue
-        rows.sort(
-            key=lambda r: (
-                normalize_date(r.get("filing_date") or r.get("transaction_date")) or "",
-                abs(to_float(r.get("value_usd")) or 0.0),
-            ),
-            reverse=True,
-        )
-        for row in rows[:2]:
+        grouped: dict[tuple, dict] = {}
+        for row in rows:
             code = (row.get("transaction_code") or "").upper()
             acquired = (row.get("acquired_disposed") or "").upper()
-            is_buy = code == "P" or acquired == "A"
             value = abs(to_float(row.get("value_usd")) or 0.0)
-            shares = to_float(row.get("shares"))
-            actor = short_text(row.get("insider") or "Insider", 80)
+            if code not in {"P", "S"} and acquired not in {"A", "D"}:
+                continue
+            if value < 25000 and code != "P":
+                continue
+            is_buy = code == "P" or acquired == "A"
             action = "purchase" if is_buy else "sale"
+            actor = short_text(row.get("insider") or "Insider", 80)
+            as_of = normalize_date(row.get("filing_date") or row.get("transaction_date") or meta.get("as_of"))
+            filing_ref = row.get("source_path") or relative_path(csv_path)
+            key = (ticker, as_of or "", actor.lower(), action, filing_ref)
+            bucket = grouped.setdefault(
+                key,
+                {
+                    "ticker": ticker,
+                    "as_of": as_of,
+                    "actor": actor,
+                    "action": action,
+                    "filing_ref": filing_ref,
+                    "shares": 0.0,
+                    "value": 0.0,
+                    "confidence": "low",
+                },
+            )
+            shares = to_float(row.get("shares")) or 0.0
+            bucket["shares"] += shares
+            bucket["value"] += value
+            if value >= 100000:
+                bucket["confidence"] = "med"
+        ranked = sorted(grouped.values(), key=lambda b: (b["value"], b["as_of"] or ""), reverse=True)
+        for bucket in ranked[:2]:
+            value = bucket["value"]
+            shares = bucket["shares"]
             value_text = f"${value:,.0f}" if value else "undisclosed value"
             share_text = f"{shares:,.0f} shares" if shares else "shares"
             out.append(
                 insight_record(
                     source="insider",
-                    as_of=row.get("filing_date") or row.get("transaction_date") or meta.get("as_of"),
+                    as_of=bucket["as_of"] or meta.get("as_of"),
                     scope="ticker",
                     ref=ticker,
-                    title=f"Insider {action}: {actor}",
-                    claim=f"{actor} reported an insider {action} of {share_text} ({value_text}).",
-                    direction="bullish" if is_buy else "bearish",
-                    evidence_ref=row.get("source_path") or relative_path(csv_path),
+                    title=f"Insider {bucket['action']}: {bucket['actor']}",
+                    claim=f"{bucket['actor']} reported an insider {bucket['action']} of {share_text} ({value_text}).",
+                    direction="bullish" if bucket["action"] == "purchase" else "bearish",
+                    evidence_ref=bucket["filing_ref"],
                     event_type="form4_transaction",
                     impact_axis="ownership",
-                    confidence="med" if value >= 100000 else "low",
+                    confidence=bucket["confidence"],
                 )
             )
     return out
@@ -1063,40 +1085,55 @@ def from_earnings_calendar() -> list[dict]:
     global_doc = load_json(EARNINGS_CACHE)
     if isinstance(global_doc, dict):
         docs.append((EARNINGS_CACHE, global_doc))
-    for path in ROOT.glob("*/research/evidence/earnings_calendar.json"):
+    for path in sorted(ROOT.glob("*/research/evidence/earnings_calendar.json")):
         doc = load_json(path)
         if isinstance(doc, dict):
             docs.append((path, doc))
 
-    out: list[dict] = []
-    seen: set[str] = set()
+    best: dict[str, tuple[Path, dict, dict]] = {}
     for path, doc in docs:
         for event in doc.get("events") or []:
             ticker = str(event.get("ticker") or event.get("portfolio_ticker") or doc.get("ticker") or "").upper()
             if not valid_ticker(ticker):
                 continue
-            event_date = event.get("date") or event.get("earnings_date") or event.get("report_date")
-            key = f"{ticker}|{event_date}|{path}"
-            if key in seen:
-                continue
-            seen.add(key)
-            reported = bool(event.get("reported") or event.get("actual_eps") is not None)
-            verified = bool(event.get("verified") or doc.get("verified_only"))
-            out.append(
-                insight_record(
-                    source="earnings",
-                    as_of=event_date or doc.get("as_of"),
-                    scope="ticker",
-                    ref=ticker,
-                    title=("Reported earnings" if reported else "Upcoming earnings"),
-                    claim=short_text(event.get("summary") or event.get("title") or f"{ticker} earnings event tracked."),
-                    direction="neutral",
-                    evidence_ref=relative_path(path),
-                    event_type="reported_earnings" if reported else "earnings_calendar",
-                    impact_axis="fundamentals",
-                    confidence="med" if verified else "low",
-                )
+            event_date = normalize_date(
+                event.get("date") or event.get("earnings_date") or event.get("report_date")
             )
+            reported = bool(event.get("reported") or event.get("actual_eps") is not None)
+            key = f"{ticker}|{event_date or ''}|{'reported' if reported else 'upcoming'}"
+            rank = (
+                1 if path == EARNINGS_CACHE else 0,
+                1 if event.get("verified") else 0,
+                1 if reported else 0,
+            )
+            prev = best.get(key)
+            if prev and prev[0] >= rank:
+                continue
+            best[key] = (rank, path, doc, event)
+
+    out: list[dict] = []
+    for _key, (_rank, path, doc, event) in best.items():
+        ticker = str(event.get("ticker") or event.get("portfolio_ticker") or doc.get("ticker") or "").upper()
+        event_date = normalize_date(
+            event.get("date") or event.get("earnings_date") or event.get("report_date")
+        )
+        reported = bool(event.get("reported") or event.get("actual_eps") is not None)
+        verified = bool(event.get("verified") or doc.get("verified_only"))
+        out.append(
+            insight_record(
+                source="earnings",
+                as_of=event_date or doc.get("as_of"),
+                scope="ticker",
+                ref=ticker,
+                title=("Reported earnings" if reported else "Upcoming earnings"),
+                claim=short_text(event.get("summary") or event.get("title") or f"{ticker} earnings event tracked."),
+                direction="neutral",
+                evidence_ref=relative_path(path),
+                event_type="reported_earnings" if reported else "earnings_calendar",
+                impact_axis="fundamentals",
+                confidence="med" if verified else "low",
+            )
+        )
     return out
 
 
@@ -1711,6 +1748,29 @@ def event_id(record: dict, ticker: str | None) -> str:
     return hashlib.sha1(raw.encode("utf-8")).hexdigest()[:16]
 
 
+def event_dedupe_key(event: dict) -> str:
+    return "|".join(
+        [
+            str(event.get("source") or ""),
+            str(event.get("ticker") or ""),
+            str(event.get("event_type") or ""),
+            str(event.get("observed_at") or ""),
+            str(event.get("title") or ""),
+        ]
+    )
+
+
+def dedupe_events(events: list[dict]) -> list[dict]:
+    """Collapse duplicate ranked events that differ only by evidence path."""
+    best: dict[str, dict] = {}
+    for event in events:
+        key = event_dedupe_key(event)
+        prev = best.get(key)
+        if not prev or (event.get("score") or 0) > (prev.get("score") or 0):
+            best[key] = event
+    return list(best.values())
+
+
 def events_from_records(
     records: list[dict],
     front_tickers: set[str],
@@ -1763,6 +1823,7 @@ def events_from_records(
             "match_tier": record.get("match_tier"),
         }
         events.append(event)
+    events = dedupe_events(events)
     events.sort(key=lambda e: (e["score"], e.get("observed_at") or ""), reverse=True)
     return events[:400]
 

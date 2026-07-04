@@ -146,10 +146,59 @@ def quarter_from_path(path: Path) -> str | None:
     return None
 
 
+STEM_QUARTER_RE = re.compile(
+    r"\b(20\d{2})\s*Q([1-4])\b|\bQ([1-4])\s*['']?(20\d{2})\b|\b([1-4])Q\s*(20\d{2})\b",
+    re.I,
+)
+
+
+def parse_quarter_from_stem(stem: str) -> str | None:
+    text = stem.replace("_", " ").replace("-", " ")
+    m = STEM_QUARTER_RE.search(text)
+    if not m:
+        return None
+    if m.group(1) and m.group(2):
+        return f"{m.group(1)}Q{m.group(2)}"
+    if m.group(3) and m.group(4):
+        return f"{m.group(4)}Q{m.group(3)}"
+    if m.group(5) and m.group(6):
+        return f"{m.group(6)}Q{m.group(5)}"
+    return None
+
+
+def _quarter_from_date(iso: str | None) -> str | None:
+    if not iso:
+        return None
+    try:
+        d = datetime.strptime(iso, "%Y-%m-%d").date()
+    except ValueError:
+        return None
+    return f"{d.year}Q{(d.month - 1) // 3 + 1}"
+
+
+def resolve_quarter(
+    path: Path,
+    stem: str,
+    iso_date: str | None,
+    date_source: str,
+) -> str | None:
+    folder_q = quarter_from_path(path)
+    stem_q = parse_quarter_from_stem(stem)
+    date_q = _quarter_from_date(iso_date)
+    if date_source in ("filename", "content") and date_q:
+        return date_q
+    if stem_q:
+        return stem_q
+    if folder_q:
+        return folder_q
+    return date_q
+
+
 class FundResolver:
     def __init__(self) -> None:
         cfg = load_json(FUNDS_PATH) or {}
-        self.funds: list[dict] = cfg.get("funds") if isinstance(cfg, dict) else (cfg or [])
+        raw = cfg.get("funds") if isinstance(cfg, dict) else None
+        self.funds: list[dict] = raw if isinstance(raw, list) else []
         self._compiled = [
             (f, [re.compile(p, re.I) for p in (f.get("filename_patterns") or [])])
             for f in self.funds
@@ -175,7 +224,7 @@ class FundResolver:
                     "maps_to_persona": fund.get("persona_map") or fund.get("maps_to_persona") or [],
                     "letter_date": iso_date,
                     "date_source": date_source,
-                    "quarter": quarter or _quarter_from_date(iso_date),
+                    "quarter": resolve_quarter(path, stem, iso_date, date_source),
                     "resolution": "curated",
                 }
 
@@ -196,7 +245,7 @@ class FundResolver:
             "maps_to_persona": [],
             "letter_date": iso_date,
             "date_source": date_source,
-            "quarter": quarter or _quarter_from_date(iso_date),
+            "quarter": resolve_quarter(path, stem, iso_date, date_source),
             "resolution": "normalized",
         }
 
@@ -208,13 +257,3 @@ class FundResolver:
             "funds": sorted(self.unresolved.values(), key=lambda x: x["fund_id"]),
         }
         UNRESOLVED_PATH.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
-
-
-def _quarter_from_date(iso: str | None) -> str | None:
-    if not iso:
-        return None
-    try:
-        d = datetime.strptime(iso, "%Y-%m-%d").date()
-    except ValueError:
-        return None
-    return f"{d.year}Q{(d.month - 1) // 3 + 1}"

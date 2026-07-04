@@ -1658,6 +1658,8 @@ def kpi_trends_for_ticker(ticker: str) -> dict | None:
         "metrics": (entry.get("metrics") or [])[:8],
         "business_momentum": entry.get("business_momentum"),
         "leadership_risk": entry.get("leadership_risk"),
+        "data_tier": entry.get("data_tier"),
+        "has_trend_data": entry.get("data_tier") in ("sec_fundamentals", "equity_model"),
     }
 
 

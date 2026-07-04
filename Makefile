@@ -12,7 +12,7 @@ DATE ?= $(shell date +%Y-%m-%d)
 TICKER ?=
 DATE ?= $(shell date +%Y-%m-%d)
 
-.PHONY: research-check research-check-all depth-check depth-audit evidence milly-repass book-estimate book-estimate-all holdco-uplift short-scan activist-scan activist-scan-all activist-feed activist-feed-check hk-scan hk-cross-check-all hk-extract-refresh third-party-scan-all cross-check-all transcript-sync batch-refresh evidence-check darwin-pit-check darwin-build darwin-pit-audit darwin-sync-external darwin-explore persona-lens persona-insights persona-check document-registry document-catalog-search document-sync-drive document-sync-drive-letters document-sync-drive-general document-drive-plan document-drive-migrate document-drive-cleanup document-drive-audit research-memory sumzero-index
+.PHONY: research-check research-check-all depth-check depth-audit evidence milly-repass book-estimate book-estimate-all holdco-uplift short-scan activist-scan activist-scan-all activist-feed activist-feed-check hk-scan hk-cross-check-all hk-extract-refresh third-party-scan-all cross-check-all transcript-sync batch-refresh evidence-check darwin-pit-check darwin-build darwin-pit-audit darwin-sync-external darwin-explore persona-lens persona-insights persona-check document-registry document-catalog-search document-sync-drive document-sync-drive-letters document-sync-drive-general document-drive-plan document-drive-migrate document-drive-cleanup document-drive-audit research-memory sumzero-index letter-import-drive letter-backfill
 
 persona-lens:
 	$(PYTHON) $(SCRIPTS)/fetch_superinvestor_letters.py --all --build
@@ -24,6 +24,20 @@ persona-lens:
 persona-fetch-letters:
 	$(PYTHON) $(SCRIPTS)/fetch_superinvestor_letters.py --all --build
 	@echo OK: persona-fetch-letters
+
+letter-import-drive:
+	$(PYTHON) $(SCRIPTS)/import_drive_letter_orphans.py --all --build
+	@echo OK: letter-import-drive
+
+letter-backfill:
+	$(PYTHON) $(SCRIPTS)/import_drive_letter_orphans.py --all
+	$(PYTHON) $(SCRIPTS)/build_superinvestor_insights.py
+	$(PYTHON) $(SCRIPTS)/build_insights.py
+	$(PYTHON) $(SCRIPTS)/build_document_registry.py
+	$(PYTHON) $(SCRIPTS)/sync_pdf_store_google_drive.py --root-key hedge_fund_letters
+	$(PYTHON) $(SCRIPTS)/build_letter_drive_links.py
+	$(PYTHON) $(SCRIPTS)/build_dashboard_data.py
+	@echo OK: letter-backfill
 
 persona-insights:
 	$(PYTHON) $(SCRIPTS)/fetch_terminalvalue_sources.py

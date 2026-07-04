@@ -355,3 +355,101 @@ def compute_leadership_risk(
         "label": label,
         "factors": factors[:5],
     }
+
+
+def peer_relative_signal(
+    latest_growth: float,
+    peer_growths: list[float],
+    *,
+    metric_key: str = "revenues",
+    min_peers: int = 3,
+) -> dict | None:
+    """Flag when YoY growth materially trails investment-sleeve peers."""
+    clean = [g for g in peer_growths if g is not None]
+    if len(clean) < min_peers:
+        return None
+    median = statistics.median(clean)
+    mad = statistics.median([abs(g - median) for g in clean]) or 0.01
+    threshold = median - REGIME_SIGMA * mad
+    if latest_growth >= threshold:
+        return None
+    gap = threshold - latest_growth
+    strength = min(3.0, gap / max(mad, 0.01))
+    return {
+        "metric": f"{metric_base_name(metric_key)}.peer_relative",
+        "label": f"{metric_base_name(metric_key).replace('_', ' ').title()} vs sleeve peers",
+        "direction": "downshift",
+        "signal_type": "peer_relative",
+        "signal_tier": "confirmed" if gap >= mad * 1.5 else "emerging",
+        "tier": "primary",
+        "display": True,
+        "strength": round(strength, 3),
+        "growth_latest": latest_growth,
+        "growth_prior": median,
+        "basis": "yoy",
+        "mode": "pct",
+        "peer_median": round(median, 4),
+        "peer_threshold": round(threshold, 4),
+        "peer_count": len(clean),
+    }
+
+
+def earnings_revision_signal(events: list[dict]) -> dict | None:
+    """Estimate-revision layer from reported EPS surprises (beat/miss streaks)."""
+    reported: list[tuple[str, float]] = []
+    for event in events:
+        if not event.get("reported"):
+            continue
+        actual = event.get("actual_eps")
+        estimate = event.get("estimated_eps")
+        if actual is None or estimate is None:
+            continue
+        try:
+            actual_f = float(actual)
+            est_f = float(estimate)
+        except (TypeError, ValueError):
+            continue
+        if abs(est_f) < 1e-9:
+            continue
+        surprise = (actual_f - est_f) / abs(est_f)
+        date = str(event.get("date") or "")[:10]
+        reported.append((date, surprise))
+
+    if len(reported) < 2:
+        return None
+    reported.sort(key=lambda x: x[0])
+    surprises = [s for _d, s in reported[-4:]]
+    latest = surprises[-1]
+    prior = surprises[-2]
+    revision = latest - prior
+
+    if latest < -0.05 and prior < -0.05:
+        direction = "decelerating"
+        label = "Consecutive EPS misses vs consensus"
+    elif latest > 0.05 and prior > 0.05:
+        direction = "accelerating"
+        label = "Consecutive EPS beats vs consensus"
+    elif revision <= -0.10:
+        direction = "decelerating"
+        label = "Estimate revision down (EPS surprise worsened)"
+    elif revision >= 0.10:
+        direction = "accelerating"
+        label = "Estimate revision up (EPS surprise improved)"
+    else:
+        return None
+
+    return {
+        "metric": "eps_revision",
+        "label": label,
+        "direction": direction,
+        "signal_type": "estimate_revision",
+        "signal_tier": "confirmed" if abs(revision) >= 0.15 else "emerging",
+        "tier": "secondary",
+        "display": True,
+        "strength": round(min(3.0, abs(revision) * 5), 3),
+        "growth_latest": round(latest, 4),
+        "growth_prior": round(prior, 4),
+        "basis": "surprise",
+        "mode": "pct",
+        "surprise_streak": len(surprises),
+    }

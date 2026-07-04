@@ -1,41 +1,53 @@
 # Superinvestor letters
 
-Structured extracts for the Insights layer. **Raw PDFs stay local** (copyright); commit `insights.json` + `letters_index.json` only.
+Structured hedge-fund letter corpus for Insights ? Letters / Funds / Consensus.
 
-## Drop workflow (automated — preferred)
+## Canonical source: Google Drive
 
-Configured Dropbox folders in `sources.json`. Fetch + extract + build in one command:
+All letter PDFs live in the shared PDF store under `Letters/{YYYY Qn}/` (folder id in `google_drive_config.json` ? `hedge_fund_letters`).
 
-```bash
-python _system/scripts/fetch_superinvestor_letters.py --all --build
-python _system/scripts/fetch_superinvestor_letters.py --quarter 2026Q2 --build
+Import into this repo:
+
+```powershell
+# Preview counts by quarter
+python _system/scripts/import_drive_letter_orphans.py --all --dry-run
+
+# Full import + text extract + insights build
+make letter-import-drive
+
+# Or since a given year only
+python _system/scripts/import_drive_letter_orphans.py --since-year 2023 --all --build
 ```
 
-Mechanism: Dropbox shared folders return a **zip** when `dl=1` is appended to the share URL (~189 PDFs for 2026 Q1).
+Requires `GOOGLE_APPLICATION_CREDENTIALS` for `pdf-store-uploader@single-stock-pdf-store.iam.gserviceaccount.com`, or place the key at `_secrets/google-service-account.json`.
 
-## Manual drop (fallback)
+## Local layout
 
-1. Download letters manually → `INCOMING/` (or `2026Q1/`, `2026Q2/`).
-2. Extract text locally (keep `.txt` alongside PDF; PDFs gitignored).
-3. Run:
+| Path | Committed | Role |
+|------|-----------|------|
+| `{YYYY}Q{n}/*.pdf` | No (gitignored) | Raw letter PDFs |
+| `{YYYY}Q{n}/*.txt` | Yes | Text extracts for matching |
+| `insights.json` | Yes | Parsed letter records |
+| `letters_index.json` | Yes | Compact index |
+| `drive_import_manifest.json` | Yes | Drive file id ? local path map |
+| `funds.json` | Yes | Curated fund identity overrides |
+| `sources.json` | Yes | Optional Dropbox zip URLs for new quarters |
 
-```bash
+## Build pipeline
+
+```powershell
 python _system/scripts/build_superinvestor_insights.py
 python _system/scripts/build_insights.py
-python _system/scripts/relevance_calibration_check.py
+python _system/scripts/build_document_registry.py
+python _system/scripts/build_dashboard_data.py
 ```
 
-## Files
+Or: `make letter-backfill` (import + full rebuild + Drive link refresh).
 
-| File | Committed | Purpose |
-|------|-----------|---------|
-| `INCOMING/` | no (gitignored) | Human drop zone |
-| `2026Q1/*.txt` | yes (text extracts) | Parsed letter text |
-| `2026Q1/*.pdf` | no | Raw letters |
-| `insights.json` | yes | Structured themes/positions |
-| `letters_index.json` | yes | Index for UI |
-| `manifest.csv` | yes | Audit trail |
+## Optional: Dropbox fetch
 
-## Schema
+If a new quarter arrives as a Dropbox zip, add an entry to `sources.json` and run:
 
-See `_system/proposals/persona_lens_consensus_2026-06-08.md` § Insights layer.
+```powershell
+make persona-fetch-letters
+```

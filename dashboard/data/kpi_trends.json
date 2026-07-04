@@ -1,20 +1,163 @@
 {
-  "generated_at": "2026-07-04T02:32:14Z",
-  "ticker_count": 78,
-  "inflection_count": 221,
+  "generated_at": "2026-07-04T02:43:38Z",
+  "ticker_count": 153,
+  "inflection_count": 261,
   "coverage": {
     "universe": 153,
+    "resolvable_ciks": 104,
     "fundamentals_tickers": 86,
-    "equity_model_tickers": 1,
-    "analyzed_tickers": 78,
-    "suspect_points_excluded": 684,
-    "confirmed_count": 141,
-    "emerging_count": 166,
-    "displayed_count": 117,
+    "equity_model_tickers": 0,
+    "analyzed_tickers": 93,
+    "missing_fundamentals": [
+      "BN",
+      "BUR",
+      "ETOR",
+      "FNV",
+      "FRMO",
+      "GROY",
+      "HNFSA",
+      "MTA",
+      "NAN",
+      "OR",
+      "PBT",
+      "PCYO",
+      "SBR",
+      "SJT",
+      "TFPM",
+      "VOXR",
+      "WPM",
+      "XP"
+    ],
+    "missing_cik": [
+      "0388.HK",
+      "3905.T",
+      "7176.T",
+      "8697.T",
+      "ABMD.CVR",
+      "ADN.TO",
+      "ALS.TO",
+      "ASX.AX",
+      "AZLCZ",
+      "B3SA3.SA",
+      "BMYS.KL",
+      "BOLSAA.MX",
+      "BVERS",
+      "BWEL",
+      "BYMA",
+      "CMSG",
+      "CORBF",
+      "CSU",
+      "CSU.DB",
+      "DB1.DE",
+      "DRR.AX",
+      "ENX.PA",
+      "EVR",
+      "FIHO12.MX",
+      "GCCO",
+      "GKTX.PS1",
+      "GKTX.PS2",
+      "GKTX.PS3",
+      "GPW.WA",
+      "HEE",
+      "IDA.AX",
+      "IEX.NS",
+      "JL80.DE",
+      "KEWL",
+      "LMN",
+      "LSEG",
+      "MRTX.CVR",
+      "NZX.NZ",
+      "OTCM",
+      "PDER",
+      "PRVL.CVR",
+      "PSE",
+      "PSK.TO",
+      "RMV.L",
+      "S68.SI",
+      "TASE",
+      "TEQ.ST",
+      "WRLC",
+      "X.TO"
+    ],
+    "no_trend_data": [
+      "0388.HK",
+      "3905.T",
+      "7176.T",
+      "8697.T",
+      "ABMD.CVR",
+      "ADN.TO",
+      "ALS.TO",
+      "ASX.AX",
+      "AZLCZ",
+      "B3SA3.SA",
+      "BMYS.KL",
+      "BN",
+      "BOLSAA.MX",
+      "BUR",
+      "BVERS",
+      "BWEL",
+      "BYMA",
+      "CMSG",
+      "CORBF",
+      "CSU",
+      "CSU.DB",
+      "DB1.DE",
+      "DRR.AX",
+      "ENX.PA",
+      "ETOR",
+      "EVR",
+      "FIHO12.MX",
+      "FNV",
+      "FRMO",
+      "GCCO",
+      "GKTX.PS1",
+      "GKTX.PS2",
+      "GKTX.PS3",
+      "GPW.WA",
+      "GROY",
+      "HEE",
+      "HNFSA",
+      "IDA.AX",
+      "IEX.NS",
+      "JL80.DE",
+      "KEWL",
+      "LMN",
+      "LSEG",
+      "MRTX.CVR",
+      "MTA",
+      "NAN",
+      "NZX.NZ",
+      "OR",
+      "OTCM",
+      "PBT",
+      "PCYO",
+      "PDER",
+      "PRVL.CVR",
+      "PSE",
+      "PSK.TO",
+      "RMV.L",
+      "S68.SI",
+      "SBR",
+      "SJT",
+      "TASE",
+      "TEQ.ST",
+      "TFPM",
+      "VOXR",
+      "WPM",
+      "WRLC",
+      "X.TO",
+      "XP"
+    ],
+    "suspect_points_excluded": 689,
+    "confirmed_count": 165,
+    "emerging_count": 182,
+    "displayed_count": 145,
     "regime_downshift_count": 52,
-    "stale_suppressed_count": 62,
-    "leadership_risk_watch": 27,
-    "avg_strength": 4.89,
+    "peer_relative_count": 16,
+    "earnings_revision_count": 24,
+    "stale_suppressed_count": 65,
+    "leadership_risk_watch": 38,
+    "avg_strength": 4.114,
     "stale_max_days": 200
   },
   "by_ticker": {
@@ -458,15 +601,33 @@
           "revenue_proxy": false,
           "ttm_direction": "decelerating",
           "ttm_growth_latest": 0.3
+        },
+        {
+          "metric": "eps_revision",
+          "label": "Estimate revision down (EPS surprise worsened)",
+          "direction": "decelerating",
+          "signal_type": "estimate_revision",
+          "signal_tier": "confirmed",
+          "tier": "secondary",
+          "display": true,
+          "strength": 0.75,
+          "growth_latest": 0.0,
+          "growth_prior": 0.15,
+          "basis": "surprise",
+          "mode": "pct",
+          "surprise_streak": 2,
+          "source": "earnings_revision",
+          "evidence_ref": "_system/data/earnings_calendar.json"
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 0,
-        "decelerating": 1,
+        "decelerating": 2,
         "steady": 6,
-        "confirmed": 1,
+        "confirmed": 2,
         "emerging": 0,
-        "displayed": 0,
+        "displayed": 1,
         "regime_downshift": 0,
         "stale_suppressed": 0
       },
@@ -1233,6 +1394,7 @@
           "revenue_proxy": false
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 1,
         "decelerating": 2,
@@ -1975,15 +2137,35 @@
           "revenue_proxy": false,
           "ttm_direction": "accelerating",
           "ttm_growth_latest": 0.3062
+        },
+        {
+          "metric": "revenues.peer_relative",
+          "label": "Revenues vs sleeve peers",
+          "direction": "downshift",
+          "signal_type": "peer_relative",
+          "signal_tier": "emerging",
+          "tier": "primary",
+          "display": true,
+          "strength": 0.331,
+          "growth_latest": 0.1661,
+          "growth_prior": 0.3328,
+          "basis": "yoy",
+          "mode": "pct",
+          "peer_median": 0.3328,
+          "peer_threshold": 0.2076,
+          "peer_count": 8,
+          "source": "peer_relative",
+          "evidence_ref": "_system/portfolio/registry.json"
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 3,
         "decelerating": 0,
         "steady": 8,
         "confirmed": 2,
-        "emerging": 1,
-        "displayed": 0,
+        "emerging": 2,
+        "displayed": 1,
         "regime_downshift": 0,
         "stale_suppressed": 0
       },
@@ -2650,6 +2832,7 @@
           "revenue_proxy": false
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 2,
         "decelerating": 3,
@@ -3366,15 +3549,35 @@
           "latest_period": "2026-03-31",
           "series_age_days": 95,
           "revenue_proxy": false
+        },
+        {
+          "metric": "revenues.peer_relative",
+          "label": "Revenues vs sleeve peers",
+          "direction": "downshift",
+          "signal_type": "peer_relative",
+          "signal_tier": "emerging",
+          "tier": "primary",
+          "display": true,
+          "strength": 1.243,
+          "growth_latest": -0.5188,
+          "growth_prior": 0.0465,
+          "basis": "yoy",
+          "mode": "pct",
+          "peer_median": 0.0465,
+          "peer_threshold": -0.2055,
+          "peer_count": 21,
+          "source": "peer_relative",
+          "evidence_ref": "_system/portfolio/registry.json"
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 2,
         "decelerating": 1,
         "steady": 7,
         "confirmed": 2,
-        "emerging": 2,
-        "displayed": 2,
+        "emerging": 3,
+        "displayed": 3,
         "regime_downshift": 1,
         "stale_suppressed": 0
       },
@@ -4143,6 +4346,7 @@
           "revenue_proxy": false
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 0,
         "decelerating": 1,
@@ -4792,6 +4996,7 @@
           "revenue_proxy": false
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 2,
         "decelerating": 1,
@@ -5502,6 +5707,7 @@
           "revenue_proxy": false
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 0,
         "decelerating": 1,
@@ -6088,15 +6294,33 @@
           "latest_period": "2026-03-31",
           "series_age_days": 95,
           "revenue_proxy": false
+        },
+        {
+          "metric": "eps_revision",
+          "label": "Estimate revision down (EPS surprise worsened)",
+          "direction": "decelerating",
+          "signal_type": "estimate_revision",
+          "signal_tier": "confirmed",
+          "tier": "secondary",
+          "display": true,
+          "strength": 3.0,
+          "growth_latest": -0.8696,
+          "growth_prior": 0.1481,
+          "basis": "surprise",
+          "mode": "pct",
+          "surprise_streak": 2,
+          "source": "earnings_revision",
+          "evidence_ref": "_system/data/earnings_calendar.json"
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 2,
-        "decelerating": 0,
+        "decelerating": 1,
         "steady": 6,
-        "confirmed": 2,
+        "confirmed": 3,
         "emerging": 1,
-        "displayed": 1,
+        "displayed": 2,
         "regime_downshift": 1,
         "stale_suppressed": 0
       },
@@ -6804,6 +7028,7 @@
           "revenue_proxy": false
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 5,
         "decelerating": 0,
@@ -7518,15 +7743,33 @@
           "revenue_proxy": false,
           "ttm_direction": "steady",
           "ttm_growth_latest": 0.0797
+        },
+        {
+          "metric": "eps_revision",
+          "label": "Consecutive EPS misses vs consensus",
+          "direction": "decelerating",
+          "signal_type": "estimate_revision",
+          "signal_tier": "confirmed",
+          "tier": "secondary",
+          "display": true,
+          "strength": 2.67,
+          "growth_latest": -0.0909,
+          "growth_prior": -0.625,
+          "basis": "surprise",
+          "mode": "pct",
+          "surprise_streak": 2,
+          "source": "earnings_revision",
+          "evidence_ref": "_system/data/earnings_calendar.json"
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 3,
-        "decelerating": 2,
+        "decelerating": 3,
         "steady": 6,
-        "confirmed": 1,
+        "confirmed": 2,
         "emerging": 4,
-        "displayed": 2,
+        "displayed": 3,
         "regime_downshift": 0,
         "stale_suppressed": 0
       },
@@ -8358,6 +8601,7 @@
           "revenue_proxy": false
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 0,
         "decelerating": 2,
@@ -8440,6 +8684,67 @@
               "value": 170660.0
             }
           ]
+        },
+        {
+          "metric": "burn_rate",
+          "label": "Burn Rate",
+          "source": "sec_fundamentals",
+          "evidence_ref": "_system/reference/market-data/fundamentals/CKX.json",
+          "direction": "accelerating",
+          "basis": "yoy",
+          "growth_latest": 2.7375,
+          "growth_prior": 0.8782,
+          "growth_smoothed_latest": 0.8782,
+          "accel": 0.9628,
+          "accel_raw": 1.8593,
+          "threshold": 0.0866,
+          "mode": "pct",
+          "points": [
+            {
+              "period": "2017-03-31",
+              "value": 52747.0
+            },
+            {
+              "period": "2018-03-31",
+              "value": 43711.0
+            },
+            {
+              "period": "2019-03-31",
+              "value": 40010.0
+            },
+            {
+              "period": "2021-03-31",
+              "value": 150975.0
+            },
+            {
+              "period": "2022-03-31",
+              "value": 48127.0
+            },
+            {
+              "period": "2023-03-31",
+              "value": 90391.0
+            },
+            {
+              "period": "2024-03-31",
+              "value": 337838.0
+            },
+            {
+              "period": "2026-03-31",
+              "value": 52331.0
+            }
+          ],
+          "signal_tier": "confirmed",
+          "tier": "secondary",
+          "material": true,
+          "strength": 11.118,
+          "confidence": "high",
+          "ttm_agrees": null,
+          "display": true,
+          "composite": false,
+          "stale": false,
+          "latest_period": "2026-03-31",
+          "series_age_days": 95,
+          "revenue_proxy": false
         },
         {
           "metric": "cash",
@@ -8745,7 +9050,7 @@
           "strength": 4.047,
           "confidence": "high",
           "ttm_agrees": true,
-          "display": true,
+          "display": false,
           "composite": false,
           "stale": false,
           "latest_period": "2026-03-31",
@@ -9192,15 +9497,35 @@
           "latest_period": "2026-03-31",
           "series_age_days": 95,
           "revenue_proxy": false
+        },
+        {
+          "metric": "revenues.peer_relative",
+          "label": "Revenues vs sleeve peers",
+          "direction": "downshift",
+          "signal_type": "peer_relative",
+          "signal_tier": "confirmed",
+          "tier": "primary",
+          "display": true,
+          "strength": 3.0,
+          "growth_latest": -0.5099,
+          "growth_prior": 0.1605,
+          "basis": "yoy",
+          "mode": "pct",
+          "peer_median": 0.1605,
+          "peer_threshold": 0.1126,
+          "peer_count": 5,
+          "source": "peer_relative",
+          "evidence_ref": "_system/portfolio/registry.json"
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
-        "accelerating": 1,
+        "accelerating": 2,
         "decelerating": 6,
         "steady": 4,
-        "confirmed": 6,
+        "confirmed": 8,
         "emerging": 3,
-        "displayed": 3,
+        "displayed": 4,
         "regime_downshift": 2,
         "stale_suppressed": 0
       },
@@ -9847,6 +10172,7 @@
           "ttm_growth_latest": 0.3792
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 1,
         "decelerating": 2,
@@ -10500,6 +10826,7 @@
           "ttm_growth_latest": 0.0361
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 2,
         "decelerating": 3,
@@ -11275,6 +11602,7 @@
           "revenue_proxy": false
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 0,
         "decelerating": 0,
@@ -11446,15 +11774,33 @@
           "latest_period": "2026-03-31",
           "series_age_days": 95,
           "revenue_proxy": false
+        },
+        {
+          "metric": "eps_revision",
+          "label": "Consecutive EPS beats vs consensus",
+          "direction": "accelerating",
+          "signal_type": "estimate_revision",
+          "signal_tier": "confirmed",
+          "tier": "secondary",
+          "display": true,
+          "strength": 3.0,
+          "growth_latest": 0.2353,
+          "growth_prior": 1.6875,
+          "basis": "surprise",
+          "mode": "pct",
+          "surprise_streak": 2,
+          "source": "earnings_revision",
+          "evidence_ref": "_system/data/earnings_calendar.json"
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
-        "accelerating": 0,
+        "accelerating": 1,
         "decelerating": 1,
         "steady": 1,
-        "confirmed": 0,
+        "confirmed": 1,
         "emerging": 1,
-        "displayed": 0,
+        "displayed": 1,
         "regime_downshift": 0,
         "stale_suppressed": 0
       },
@@ -12035,7 +12381,7 @@
           "strength": 1.697,
           "confidence": "med",
           "ttm_agrees": null,
-          "display": true,
+          "display": false,
           "composite": false,
           "stale": false,
           "latest_period": "2026-03-31",
@@ -12474,14 +12820,32 @@
           "latest_period": "2026-03-31",
           "series_age_days": 95,
           "revenue_proxy": false
+        },
+        {
+          "metric": "eps_revision",
+          "label": "Consecutive EPS beats vs consensus",
+          "direction": "accelerating",
+          "signal_type": "estimate_revision",
+          "signal_tier": "emerging",
+          "tier": "secondary",
+          "display": true,
+          "strength": 0.306,
+          "growth_latest": 0.3529,
+          "growth_prior": 0.2917,
+          "basis": "surprise",
+          "mode": "pct",
+          "surprise_streak": 2,
+          "source": "earnings_revision",
+          "evidence_ref": "_system/data/earnings_calendar.json"
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
-        "accelerating": 4,
+        "accelerating": 5,
         "decelerating": 2,
         "steady": 5,
         "confirmed": 3,
-        "emerging": 8,
+        "emerging": 9,
         "displayed": 3,
         "regime_downshift": 0,
         "stale_suppressed": 0
@@ -13135,15 +13499,35 @@
           "revenue_proxy": false,
           "ttm_direction": "accelerating",
           "ttm_growth_latest": 0.0402
+        },
+        {
+          "metric": "revenues.peer_relative",
+          "label": "Revenues vs sleeve peers",
+          "direction": "downshift",
+          "signal_type": "peer_relative",
+          "signal_tier": "emerging",
+          "tier": "primary",
+          "display": true,
+          "strength": 0.658,
+          "growth_latest": 0.0366,
+          "growth_prior": 0.0822,
+          "basis": "yoy",
+          "mode": "pct",
+          "peer_median": 0.0822,
+          "peer_threshold": 0.0547,
+          "peer_count": 3,
+          "source": "peer_relative",
+          "evidence_ref": "_system/portfolio/registry.json"
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 3,
         "decelerating": 0,
         "steady": 7,
         "confirmed": 3,
-        "emerging": 0,
-        "displayed": 1,
+        "emerging": 1,
+        "displayed": 2,
         "regime_downshift": 0,
         "stale_suppressed": 0
       },
@@ -13782,6 +14166,7 @@
           "revenue_proxy": false
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 0,
         "decelerating": 2,
@@ -14435,6 +14820,7 @@
           "ttm_growth_latest": -0.1911
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 0,
         "decelerating": 4,
@@ -15151,6 +15537,7 @@
           "revenue_proxy": false
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 0,
         "decelerating": 0,
@@ -16050,6 +16437,7 @@
           "revenue_proxy": false
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 1,
         "decelerating": 2,
@@ -16443,7 +16831,7 @@
           "strength": 9.017,
           "confidence": "high",
           "ttm_agrees": null,
-          "display": true,
+          "display": false,
           "composite": false,
           "stale": false,
           "latest_period": "2026-03-31",
@@ -16884,13 +17272,33 @@
           "latest_period": "2026-03-31",
           "series_age_days": 95,
           "revenue_proxy": false
+        },
+        {
+          "metric": "revenues.peer_relative",
+          "label": "Revenues vs sleeve peers",
+          "direction": "downshift",
+          "signal_type": "peer_relative",
+          "signal_tier": "confirmed",
+          "tier": "primary",
+          "display": true,
+          "strength": 1.591,
+          "growth_latest": -0.6065,
+          "growth_prior": 0.0465,
+          "basis": "yoy",
+          "mode": "pct",
+          "peer_median": 0.0465,
+          "peer_threshold": -0.2055,
+          "peer_count": 21,
+          "source": "peer_relative",
+          "evidence_ref": "_system/portfolio/registry.json"
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 1,
         "decelerating": 4,
         "steady": 4,
-        "confirmed": 0,
+        "confirmed": 1,
         "emerging": 9,
         "displayed": 3,
         "regime_downshift": 4,
@@ -17352,6 +17760,7 @@
           "ttm_growth_latest": 0.0366
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 0,
         "decelerating": 0,
@@ -17814,6 +18223,7 @@
           "ttm_growth_latest": 0.0366
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 0,
         "decelerating": 0,
@@ -17835,6 +18245,67 @@
     "FNMAO": {
       "metrics": [
         {
+          "metric": "burn_rate",
+          "label": "Burn Rate",
+          "source": "sec_fundamentals",
+          "evidence_ref": "_system/reference/market-data/fundamentals/FNMAO.json",
+          "direction": "steady",
+          "basis": "yoy",
+          "growth_latest": 1.4908,
+          "growth_prior": -0.0545,
+          "growth_smoothed_latest": -0.0545,
+          "accel": 0.0,
+          "accel_raw": 1.5453,
+          "threshold": 1.1503,
+          "mode": "pct",
+          "points": [
+            {
+              "period": "2009-03-31",
+              "value": 30345000000.0
+            },
+            {
+              "period": "2010-03-31",
+              "value": 30885000000.0
+            },
+            {
+              "period": "2012-03-31",
+              "value": 114000000.0
+            },
+            {
+              "period": "2013-03-31",
+              "value": 6420000000.0
+            },
+            {
+              "period": "2014-03-31",
+              "value": 1321000000.0
+            },
+            {
+              "period": "2015-03-31",
+              "value": 1249000000.0
+            },
+            {
+              "period": "2016-03-31",
+              "value": 3111000000.0
+            },
+            {
+              "period": "2018-03-31",
+              "value": 1409000000.0
+            }
+          ],
+          "signal_tier": "steady",
+          "tier": "secondary",
+          "material": true,
+          "strength": 0.0,
+          "confidence": "med",
+          "ttm_agrees": null,
+          "display": false,
+          "composite": false,
+          "stale": true,
+          "latest_period": "2018-03-31",
+          "series_age_days": 3017,
+          "revenue_proxy": false
+        },
+        {
           "metric": "cash",
           "label": "Cash",
           "source": "sec_fundamentals",
@@ -18337,10 +18808,11 @@
           "revenue_proxy": false
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 0,
         "decelerating": 0,
-        "steady": 7,
+        "steady": 8,
         "confirmed": 0,
         "emerging": 1,
         "displayed": 1,
@@ -18362,6 +18834,67 @@
     "FNMAP": {
       "metrics": [
         {
+          "metric": "burn_rate",
+          "label": "Burn Rate",
+          "source": "sec_fundamentals",
+          "evidence_ref": "_system/reference/market-data/fundamentals/FNMAP.json",
+          "direction": "steady",
+          "basis": "yoy",
+          "growth_latest": 1.4908,
+          "growth_prior": -0.0545,
+          "growth_smoothed_latest": -0.0545,
+          "accel": 0.0,
+          "accel_raw": 1.5453,
+          "threshold": 1.1503,
+          "mode": "pct",
+          "points": [
+            {
+              "period": "2009-03-31",
+              "value": 30345000000.0
+            },
+            {
+              "period": "2010-03-31",
+              "value": 30885000000.0
+            },
+            {
+              "period": "2012-03-31",
+              "value": 114000000.0
+            },
+            {
+              "period": "2013-03-31",
+              "value": 6420000000.0
+            },
+            {
+              "period": "2014-03-31",
+              "value": 1321000000.0
+            },
+            {
+              "period": "2015-03-31",
+              "value": 1249000000.0
+            },
+            {
+              "period": "2016-03-31",
+              "value": 3111000000.0
+            },
+            {
+              "period": "2018-03-31",
+              "value": 1409000000.0
+            }
+          ],
+          "signal_tier": "steady",
+          "tier": "secondary",
+          "material": true,
+          "strength": 0.0,
+          "confidence": "med",
+          "ttm_agrees": null,
+          "display": false,
+          "composite": false,
+          "stale": true,
+          "latest_period": "2018-03-31",
+          "series_age_days": 3017,
+          "revenue_proxy": false
+        },
+        {
           "metric": "cash",
           "label": "Cash",
           "source": "sec_fundamentals",
@@ -18864,10 +19397,11 @@
           "revenue_proxy": false
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 0,
         "decelerating": 0,
-        "steady": 7,
+        "steady": 8,
         "confirmed": 0,
         "emerging": 1,
         "displayed": 1,
@@ -19513,6 +20047,7 @@
           "revenue_proxy": false
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 5,
         "decelerating": 0,
@@ -19537,6 +20072,69 @@
     },
     "GDRZF": {
       "metrics": [
+        {
+          "metric": "burn_rate",
+          "label": "Burn Rate",
+          "source": "sec_fundamentals",
+          "evidence_ref": "_system/reference/market-data/fundamentals/GDRZF.json",
+          "direction": "steady",
+          "basis": "yoy",
+          "growth_latest": 1.607,
+          "growth_prior": 0.4057,
+          "growth_smoothed_latest": 0.4057,
+          "accel": 0.1609,
+          "accel_raw": 1.2013,
+          "threshold": 0.0906,
+          "mode": "pct",
+          "points": [
+            {
+              "period": "2022-06-30",
+              "value": 2022482.0
+            },
+            {
+              "period": "2022-09-30",
+              "value": 1105151.0
+            },
+            {
+              "period": "2023-03-31",
+              "value": 1836932.0
+            },
+            {
+              "period": "2023-06-30",
+              "value": 2173105.0
+            },
+            {
+              "period": "2023-09-30",
+              "value": 1198535.0
+            },
+            {
+              "period": "2024-03-31",
+              "value": 2286627.0
+            },
+            {
+              "period": "2024-06-30",
+              "value": 3054643.0
+            },
+            {
+              "period": "2024-09-30",
+              "value": 3124577.0
+            }
+          ],
+          "signal_tier": "steady",
+          "tier": "secondary",
+          "material": true,
+          "strength": 1.776,
+          "confidence": "med",
+          "ttm_agrees": null,
+          "display": false,
+          "composite": false,
+          "stale": true,
+          "latest_period": "2024-09-30",
+          "series_age_days": 642,
+          "revenue_proxy": false,
+          "ttm_direction": "steady",
+          "ttm_growth_latest": 0.5307
+        },
         {
           "metric": "cash",
           "label": "Cash",
@@ -19914,10 +20512,11 @@
           "ttm_growth_latest": 0.088
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 0,
         "decelerating": 0,
-        "steady": 6,
+        "steady": 7,
         "confirmed": 0,
         "emerging": 0,
         "displayed": 0,
@@ -20500,15 +21099,35 @@
           "revenue_proxy": false,
           "ttm_direction": "accelerating",
           "ttm_growth_latest": 0.3203
+        },
+        {
+          "metric": "revenues.peer_relative",
+          "label": "Revenues vs sleeve peers",
+          "direction": "downshift",
+          "signal_type": "peer_relative",
+          "signal_tier": "emerging",
+          "tier": "primary",
+          "display": true,
+          "strength": 0.755,
+          "growth_latest": 0.1204,
+          "growth_prior": 0.3328,
+          "basis": "yoy",
+          "mode": "pct",
+          "peer_median": 0.3328,
+          "peer_threshold": 0.2117,
+          "peer_count": 8,
+          "source": "peer_relative",
+          "evidence_ref": "_system/portfolio/registry.json"
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 3,
         "decelerating": 0,
         "steady": 6,
         "confirmed": 3,
-        "emerging": 0,
-        "displayed": 0,
+        "emerging": 1,
+        "displayed": 1,
         "regime_downshift": 0,
         "stale_suppressed": 0
       },
@@ -20854,7 +21473,7 @@
           "strength": 3.234,
           "confidence": "high",
           "ttm_agrees": true,
-          "display": true,
+          "display": false,
           "composite": false,
           "stale": false,
           "latest_period": "2026-03-31",
@@ -21234,13 +21853,33 @@
           "latest_period": "2026-03-31",
           "series_age_days": 95,
           "revenue_proxy": false
+        },
+        {
+          "metric": "revenues.peer_relative",
+          "label": "Revenues vs sleeve peers",
+          "direction": "downshift",
+          "signal_type": "peer_relative",
+          "signal_tier": "confirmed",
+          "tier": "primary",
+          "display": true,
+          "strength": 3.0,
+          "growth_latest": -1.0,
+          "growth_prior": 0.0465,
+          "basis": "yoy",
+          "mode": "pct",
+          "peer_median": 0.0465,
+          "peer_threshold": -0.2055,
+          "peer_count": 21,
+          "source": "peer_relative",
+          "evidence_ref": "_system/portfolio/registry.json"
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 2,
         "decelerating": 3,
         "steady": 3,
-        "confirmed": 7,
+        "confirmed": 8,
         "emerging": 1,
         "displayed": 3,
         "regime_downshift": 3,
@@ -21260,6 +21899,67 @@
     },
     "GS": {
       "metrics": [
+        {
+          "metric": "burn_rate",
+          "label": "Burn Rate",
+          "source": "sec_fundamentals",
+          "evidence_ref": "_system/reference/market-data/fundamentals/GS.json",
+          "direction": "steady",
+          "basis": "yoy",
+          "growth_latest": -0.144,
+          "growth_prior": 0.3278,
+          "growth_smoothed_latest": 0.3278,
+          "accel": 0.0,
+          "accel_raw": -0.4719,
+          "threshold": 1.4306,
+          "mode": "pct",
+          "points": [
+            {
+              "period": "2018-03-31",
+              "value": 964000000.0
+            },
+            {
+              "period": "2019-03-31",
+              "value": 44368000000.0
+            },
+            {
+              "period": "2020-03-31",
+              "value": 53031000000.0
+            },
+            {
+              "period": "2021-03-31",
+              "value": 5183000000.0
+            },
+            {
+              "period": "2022-03-31",
+              "value": 19534000000.0
+            },
+            {
+              "period": "2024-03-31",
+              "value": 28038000000.0
+            },
+            {
+              "period": "2025-03-31",
+              "value": 37230000000.0
+            },
+            {
+              "period": "2026-03-31",
+              "value": 31868000000.0
+            }
+          ],
+          "signal_tier": "steady",
+          "tier": "secondary",
+          "material": true,
+          "strength": 0.0,
+          "confidence": "med",
+          "ttm_agrees": null,
+          "display": false,
+          "composite": false,
+          "stale": false,
+          "latest_period": "2026-03-31",
+          "series_age_days": 95,
+          "revenue_proxy": false
+        },
         {
           "metric": "cash",
           "label": "Cash",
@@ -21700,10 +22400,11 @@
           "ttm_growth_latest": 0.0936
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 1,
         "decelerating": 0,
-        "steady": 6,
+        "steady": 7,
         "confirmed": 1,
         "emerging": 0,
         "displayed": 0,
@@ -22166,6 +22867,7 @@
           "ttm_growth_latest": 0.0721
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 2,
         "decelerating": 2,
@@ -22937,6 +23639,7 @@
           "revenue_proxy": false
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 0,
         "decelerating": 0,
@@ -23836,6 +24539,7 @@
           "revenue_proxy": false
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 0,
         "decelerating": 3,
@@ -24735,6 +25439,7 @@
           "revenue_proxy": false
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 5,
         "decelerating": 0,
@@ -25589,6 +26294,7 @@
           "revenue_proxy": false
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 5,
         "decelerating": 0,
@@ -25742,6 +26448,7 @@
           "revenue_proxy": false
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 1,
         "decelerating": 0,
@@ -26206,6 +26913,7 @@
           "ttm_growth_latest": 0.1032
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 0,
         "decelerating": 0,
@@ -26873,15 +27581,33 @@
           "latest_period": "2026-03-31",
           "series_age_days": 95,
           "revenue_proxy": false
+        },
+        {
+          "metric": "eps_revision",
+          "label": "Estimate revision down (EPS surprise worsened)",
+          "direction": "decelerating",
+          "signal_type": "estimate_revision",
+          "signal_tier": "confirmed",
+          "tier": "secondary",
+          "display": true,
+          "strength": 3.0,
+          "growth_latest": -0.8095,
+          "growth_prior": 0.5,
+          "basis": "surprise",
+          "mode": "pct",
+          "surprise_streak": 2,
+          "source": "earnings_revision",
+          "evidence_ref": "_system/data/earnings_calendar.json"
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 0,
-        "decelerating": 3,
+        "decelerating": 4,
         "steady": 5,
-        "confirmed": 4,
+        "confirmed": 5,
         "emerging": 1,
-        "displayed": 2,
+        "displayed": 3,
         "regime_downshift": 2,
         "stale_suppressed": 0
       },
@@ -27016,7 +27742,7 @@
           "strength": 1.294,
           "confidence": "med",
           "ttm_agrees": null,
-          "display": true,
+          "display": false,
           "composite": false,
           "stale": false,
           "latest_period": "2026-03-31",
@@ -27585,13 +28311,31 @@
           "latest_period": "2026-03-31",
           "series_age_days": 95,
           "revenue_proxy": false
+        },
+        {
+          "metric": "eps_revision",
+          "label": "Consecutive EPS beats vs consensus",
+          "direction": "accelerating",
+          "signal_type": "estimate_revision",
+          "signal_tier": "confirmed",
+          "tier": "secondary",
+          "display": true,
+          "strength": 3.0,
+          "growth_latest": 6.6,
+          "growth_prior": 0.92,
+          "basis": "surprise",
+          "mode": "pct",
+          "surprise_streak": 2,
+          "source": "earnings_revision",
+          "evidence_ref": "_system/data/earnings_calendar.json"
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
-        "accelerating": 1,
+        "accelerating": 2,
         "decelerating": 1,
         "steady": 6,
-        "confirmed": 1,
+        "confirmed": 2,
         "emerging": 4,
         "displayed": 3,
         "regime_downshift": 2,
@@ -28037,15 +28781,33 @@
           "latest_period": "2026-03-31",
           "series_age_days": 95,
           "revenue_proxy": false
+        },
+        {
+          "metric": "eps_revision",
+          "label": "Consecutive EPS misses vs consensus",
+          "direction": "decelerating",
+          "signal_type": "estimate_revision",
+          "signal_tier": "confirmed",
+          "tier": "secondary",
+          "display": true,
+          "strength": 1.247,
+          "growth_latest": -0.2051,
+          "growth_prior": -0.4545,
+          "basis": "surprise",
+          "mode": "pct",
+          "surprise_streak": 2,
+          "source": "earnings_revision",
+          "evidence_ref": "_system/data/earnings_calendar.json"
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 1,
-        "decelerating": 0,
+        "decelerating": 1,
         "steady": 6,
-        "confirmed": 0,
+        "confirmed": 1,
         "emerging": 1,
-        "displayed": 0,
+        "displayed": 1,
         "regime_downshift": 0,
         "stale_suppressed": 0
       },
@@ -28686,6 +29448,7 @@
           "revenue_proxy": false
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 0,
         "decelerating": 3,
@@ -28764,7 +29527,7 @@
           "strength": 2.145,
           "confidence": "high",
           "ttm_agrees": true,
-          "display": true,
+          "display": false,
           "composite": false,
           "stale": false,
           "latest_period": "2026-01-31",
@@ -29520,15 +30283,52 @@
           "latest_period": "2026-04-30",
           "series_age_days": 65,
           "revenue_proxy": false
+        },
+        {
+          "metric": "revenues.peer_relative",
+          "label": "Revenues vs sleeve peers",
+          "direction": "downshift",
+          "signal_type": "peer_relative",
+          "signal_tier": "confirmed",
+          "tier": "primary",
+          "display": true,
+          "strength": 3.0,
+          "growth_latest": -0.3291,
+          "growth_prior": 0.1605,
+          "basis": "yoy",
+          "mode": "pct",
+          "peer_median": 0.1605,
+          "peer_threshold": 0.1126,
+          "peer_count": 5,
+          "source": "peer_relative",
+          "evidence_ref": "_system/portfolio/registry.json"
+        },
+        {
+          "metric": "eps_revision",
+          "label": "Consecutive EPS misses vs consensus",
+          "direction": "decelerating",
+          "signal_type": "estimate_revision",
+          "signal_tier": "emerging",
+          "tier": "secondary",
+          "display": true,
+          "strength": 0.182,
+          "growth_latest": -0.2609,
+          "growth_prior": -0.2973,
+          "basis": "surprise",
+          "mode": "pct",
+          "surprise_streak": 2,
+          "source": "earnings_revision",
+          "evidence_ref": "_system/data/earnings_calendar.json"
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 2,
-        "decelerating": 2,
+        "decelerating": 3,
         "steady": 6,
-        "confirmed": 3,
-        "emerging": 4,
-        "displayed": 2,
+        "confirmed": 4,
+        "emerging": 5,
+        "displayed": 3,
         "regime_downshift": 3,
         "stale_suppressed": 0
       },
@@ -30049,6 +30849,7 @@
           "revenue_proxy": false
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 1,
         "decelerating": 0,
@@ -30763,15 +31564,35 @@
           "revenue_proxy": false,
           "ttm_direction": "steady",
           "ttm_growth_latest": 0.0013
+        },
+        {
+          "metric": "revenues.peer_relative",
+          "label": "Revenues vs sleeve peers",
+          "direction": "downshift",
+          "signal_type": "peer_relative",
+          "signal_tier": "emerging",
+          "tier": "primary",
+          "display": true,
+          "strength": 0.765,
+          "growth_latest": 0.0806,
+          "growth_prior": 0.1353,
+          "basis": "yoy",
+          "mode": "pct",
+          "peer_median": 0.1353,
+          "peer_threshold": 0.1043,
+          "peer_count": 5,
+          "source": "peer_relative",
+          "evidence_ref": "_system/portfolio/registry.json"
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 0,
         "decelerating": 1,
         "steady": 10,
         "confirmed": 0,
-        "emerging": 1,
-        "displayed": 0,
+        "emerging": 2,
+        "displayed": 1,
         "regime_downshift": 0,
         "stale_suppressed": 0
       },
@@ -31662,6 +32483,7 @@
           "revenue_proxy": false
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 2,
         "decelerating": 1,
@@ -32378,6 +33200,7 @@
           "ttm_growth_latest": 0.3039
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 3,
         "decelerating": 0,
@@ -33156,6 +33979,7 @@
           "revenue_proxy": false
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 0,
         "decelerating": 1,
@@ -33685,6 +34509,7 @@
           "revenue_proxy": false
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 0,
         "decelerating": 2,
@@ -34265,7 +35090,7 @@
           "strength": 1.758,
           "confidence": "med",
           "ttm_agrees": true,
-          "display": true,
+          "display": false,
           "composite": false,
           "stale": false,
           "latest_period": "2026-03-31",
@@ -34521,14 +35346,34 @@
           "latest_period": "2026-03-31",
           "series_age_days": 95,
           "revenue_proxy": false
+        },
+        {
+          "metric": "revenues.peer_relative",
+          "label": "Revenues vs sleeve peers",
+          "direction": "downshift",
+          "signal_type": "peer_relative",
+          "signal_tier": "emerging",
+          "tier": "primary",
+          "display": true,
+          "strength": 0.765,
+          "growth_latest": 0.1192,
+          "growth_prior": 0.3328,
+          "basis": "yoy",
+          "mode": "pct",
+          "peer_median": 0.3328,
+          "peer_threshold": 0.2117,
+          "peer_count": 8,
+          "source": "peer_relative",
+          "evidence_ref": "_system/portfolio/registry.json"
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 1,
         "decelerating": 1,
         "steady": 9,
         "confirmed": 2,
-        "emerging": 2,
+        "emerging": 3,
         "displayed": 2,
         "regime_downshift": 1,
         "stale_suppressed": 0
@@ -34748,6 +35593,7 @@
           "ttm_growth_latest": -0.4395
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 0,
         "decelerating": 1,
@@ -35464,15 +36310,35 @@
           "revenue_proxy": false,
           "ttm_direction": "steady",
           "ttm_growth_latest": -0.0199
+        },
+        {
+          "metric": "revenues.peer_relative",
+          "label": "Revenues vs sleeve peers",
+          "direction": "downshift",
+          "signal_type": "peer_relative",
+          "signal_tier": "confirmed",
+          "tier": "primary",
+          "display": true,
+          "strength": 2.732,
+          "growth_latest": 0.0196,
+          "growth_prior": 0.1353,
+          "basis": "yoy",
+          "mode": "pct",
+          "peer_median": 0.1353,
+          "peer_threshold": 0.1043,
+          "peer_count": 5,
+          "source": "peer_relative",
+          "evidence_ref": "_system/portfolio/registry.json"
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 1,
         "decelerating": 3,
         "steady": 7,
-        "confirmed": 0,
+        "confirmed": 1,
         "emerging": 4,
-        "displayed": 2,
+        "displayed": 3,
         "regime_downshift": 0,
         "stale_suppressed": 0
       },
@@ -35987,15 +36853,35 @@
           "latest_period": "2026-03-31",
           "series_age_days": 95,
           "revenue_proxy": false
+        },
+        {
+          "metric": "revenues.peer_relative",
+          "label": "Revenues vs sleeve peers",
+          "direction": "downshift",
+          "signal_type": "peer_relative",
+          "signal_tier": "emerging",
+          "tier": "primary",
+          "display": true,
+          "strength": 1.052,
+          "growth_latest": -0.2183,
+          "growth_prior": 0.21955,
+          "basis": "yoy",
+          "mode": "pct",
+          "peer_median": 0.2195,
+          "peer_threshold": 0.0062,
+          "peer_count": 4,
+          "source": "peer_relative",
+          "evidence_ref": "_system/portfolio/registry.json"
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 0,
         "decelerating": 0,
         "steady": 7,
         "confirmed": 1,
-        "emerging": 0,
-        "displayed": 1,
+        "emerging": 1,
+        "displayed": 2,
         "regime_downshift": 1,
         "stale_suppressed": 0
       },
@@ -36762,15 +37648,33 @@
           "latest_period": "2026-04-26",
           "series_age_days": 69,
           "revenue_proxy": false
+        },
+        {
+          "metric": "eps_revision",
+          "label": "Consecutive EPS beats vs consensus",
+          "direction": "accelerating",
+          "signal_type": "estimate_revision",
+          "signal_tier": "emerging",
+          "tier": "secondary",
+          "display": true,
+          "strength": 0.088,
+          "growth_latest": 0.0625,
+          "growth_prior": 0.08,
+          "basis": "surprise",
+          "mode": "pct",
+          "surprise_streak": 2,
+          "source": "earnings_revision",
+          "evidence_ref": "_system/data/earnings_calendar.json"
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
-        "accelerating": 2,
+        "accelerating": 3,
         "decelerating": 0,
         "steady": 7,
         "confirmed": 0,
-        "emerging": 5,
-        "displayed": 1,
+        "emerging": 6,
+        "displayed": 2,
         "regime_downshift": 0,
         "stale_suppressed": 0
       },
@@ -37382,6 +38286,7 @@
           "ttm_growth_latest": -0.0449
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 0,
         "decelerating": 0,
@@ -38033,6 +38938,7 @@
           "ttm_growth_latest": 0.0446
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 0,
         "decelerating": 0,
@@ -38556,15 +39462,35 @@
           "revenue_proxy": false,
           "ttm_direction": "steady",
           "ttm_growth_latest": -0.1108
+        },
+        {
+          "metric": "revenues.peer_relative",
+          "label": "Revenues vs sleeve peers",
+          "direction": "downshift",
+          "signal_type": "peer_relative",
+          "signal_tier": "confirmed",
+          "tier": "primary",
+          "display": true,
+          "strength": 3.0,
+          "growth_latest": -0.1054,
+          "growth_prior": 0.0822,
+          "basis": "yoy",
+          "mode": "pct",
+          "peer_median": 0.0822,
+          "peer_threshold": 0.0547,
+          "peer_count": 3,
+          "source": "peer_relative",
+          "evidence_ref": "_system/portfolio/registry.json"
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 0,
         "decelerating": 2,
         "steady": 6,
-        "confirmed": 0,
+        "confirmed": 1,
         "emerging": 2,
-        "displayed": 1,
+        "displayed": 2,
         "regime_downshift": 0,
         "stale_suppressed": 0
       },
@@ -39579,6 +40505,7 @@
           "revenue_proxy": false
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 3,
         "decelerating": 3,
@@ -40232,6 +41159,7 @@
           "revenue_proxy": false
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 1,
         "decelerating": 0,
@@ -41198,6 +42126,7 @@
           "revenue_proxy": false
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 6,
         "decelerating": 2,
@@ -41918,6 +42847,7 @@
           "revenue_proxy": false
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 2,
         "decelerating": 1,
@@ -42628,15 +43558,33 @@
           "latest_period": "2026-03-31",
           "series_age_days": 95,
           "revenue_proxy": false
+        },
+        {
+          "metric": "eps_revision",
+          "label": "Consecutive EPS misses vs consensus",
+          "direction": "decelerating",
+          "signal_type": "estimate_revision",
+          "signal_tier": "confirmed",
+          "tier": "secondary",
+          "display": true,
+          "strength": 3.0,
+          "growth_latest": -0.0769,
+          "growth_prior": -5.1538,
+          "basis": "surprise",
+          "mode": "pct",
+          "surprise_streak": 2,
+          "source": "earnings_revision",
+          "evidence_ref": "_system/data/earnings_calendar.json"
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 0,
-        "decelerating": 5,
+        "decelerating": 6,
         "steady": 4,
-        "confirmed": 4,
+        "confirmed": 5,
         "emerging": 3,
-        "displayed": 2,
+        "displayed": 3,
         "regime_downshift": 2,
         "stale_suppressed": 0
       },
@@ -42971,7 +43919,7 @@
           "strength": 1.124,
           "confidence": "med",
           "ttm_agrees": null,
-          "display": true,
+          "display": false,
           "composite": false,
           "stale": false,
           "latest_period": "2026-04-30",
@@ -43351,13 +44299,31 @@
           "latest_period": "2026-04-30",
           "series_age_days": 65,
           "revenue_proxy": false
+        },
+        {
+          "metric": "eps_revision",
+          "label": "Consecutive EPS beats vs consensus",
+          "direction": "accelerating",
+          "signal_type": "estimate_revision",
+          "signal_tier": "confirmed",
+          "tier": "secondary",
+          "display": true,
+          "strength": 3.0,
+          "growth_latest": 1.7857,
+          "growth_prior": 4.2,
+          "basis": "surprise",
+          "mode": "pct",
+          "surprise_streak": 2,
+          "source": "earnings_revision",
+          "evidence_ref": "_system/data/earnings_calendar.json"
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
-        "accelerating": 2,
+        "accelerating": 3,
         "decelerating": 1,
         "steady": 5,
-        "confirmed": 2,
+        "confirmed": 3,
         "emerging": 4,
         "displayed": 2,
         "regime_downshift": 0,
@@ -43760,6 +44726,7 @@
           "ttm_growth_latest": 0.1763
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 0,
         "decelerating": 1,
@@ -44478,6 +45445,7 @@
           "ttm_growth_latest": 0.0029
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 0,
         "decelerating": 2,
@@ -45058,7 +46026,7 @@
           "strength": 18.74,
           "confidence": "high",
           "ttm_agrees": true,
-          "display": true,
+          "display": false,
           "composite": false,
           "stale": false,
           "latest_period": "2026-03-31",
@@ -45375,14 +46343,34 @@
           "latest_period": "2026-03-31",
           "series_age_days": 95,
           "revenue_proxy": false
+        },
+        {
+          "metric": "revenues.peer_relative",
+          "label": "Revenues vs sleeve peers",
+          "direction": "downshift",
+          "signal_type": "peer_relative",
+          "signal_tier": "emerging",
+          "tier": "primary",
+          "display": true,
+          "strength": 1.008,
+          "growth_latest": -0.4595,
+          "growth_prior": 0.0465,
+          "basis": "yoy",
+          "mode": "pct",
+          "peer_median": 0.0465,
+          "peer_threshold": -0.2055,
+          "peer_count": 21,
+          "source": "peer_relative",
+          "evidence_ref": "_system/portfolio/registry.json"
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 3,
         "decelerating": 2,
         "steady": 6,
         "confirmed": 5,
-        "emerging": 3,
+        "emerging": 4,
         "displayed": 2,
         "regime_downshift": 1,
         "stale_suppressed": 0
@@ -46026,6 +47014,7 @@
           "revenue_proxy": false
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 1,
         "decelerating": 1,
@@ -46553,6 +47542,7 @@
           "revenue_proxy": false
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 0,
         "decelerating": 2,
@@ -47265,6 +48255,7 @@
           "revenue_proxy": false
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 4,
         "decelerating": 1,
@@ -47794,6 +48785,7 @@
           "ttm_growth_latest": 0.2379
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 2,
         "decelerating": 1,
@@ -48256,7 +49248,7 @@
           "strength": 1.204,
           "confidence": "med",
           "ttm_agrees": null,
-          "display": true,
+          "display": false,
           "composite": false,
           "stale": false,
           "latest_period": "2026-03-31",
@@ -48636,13 +49628,31 @@
           "latest_period": "2026-03-31",
           "series_age_days": 95,
           "revenue_proxy": false
+        },
+        {
+          "metric": "eps_revision",
+          "label": "Consecutive EPS beats vs consensus",
+          "direction": "accelerating",
+          "signal_type": "estimate_revision",
+          "signal_tier": "confirmed",
+          "tier": "secondary",
+          "display": true,
+          "strength": 3.0,
+          "growth_latest": 1.5,
+          "growth_prior": 0.2,
+          "basis": "surprise",
+          "mode": "pct",
+          "surprise_streak": 2,
+          "source": "earnings_revision",
+          "evidence_ref": "_system/data/earnings_calendar.json"
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
-        "accelerating": 3,
+        "accelerating": 4,
         "decelerating": 0,
         "steady": 7,
-        "confirmed": 3,
+        "confirmed": 4,
         "emerging": 3,
         "displayed": 3,
         "regime_downshift": 0,
@@ -49031,7 +50041,7 @@
           "strength": 3.55,
           "confidence": "high",
           "ttm_agrees": null,
-          "display": true,
+          "display": false,
           "composite": false,
           "stale": false,
           "latest_period": "2026-03-31",
@@ -49352,14 +50362,34 @@
           "latest_period": "2026-03-31",
           "series_age_days": 95,
           "revenue_proxy": false
+        },
+        {
+          "metric": "revenues.peer_relative",
+          "label": "Revenues vs sleeve peers",
+          "direction": "downshift",
+          "signal_type": "peer_relative",
+          "signal_tier": "emerging",
+          "tier": "primary",
+          "display": true,
+          "strength": 0.446,
+          "growth_latest": 0.1578,
+          "growth_prior": 0.3328,
+          "basis": "yoy",
+          "mode": "pct",
+          "peer_median": 0.3328,
+          "peer_threshold": 0.2117,
+          "peer_count": 8,
+          "source": "peer_relative",
+          "evidence_ref": "_system/portfolio/registry.json"
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 2,
         "decelerating": 0,
         "steady": 8,
         "confirmed": 1,
-        "emerging": 2,
+        "emerging": 3,
         "displayed": 2,
         "regime_downshift": 0,
         "stale_suppressed": 0
@@ -49767,7 +50797,7 @@
           "strength": 8.218,
           "confidence": "high",
           "ttm_agrees": null,
-          "display": true,
+          "display": false,
           "composite": false,
           "stale": false,
           "latest_period": "2026-03-31",
@@ -49966,14 +50996,32 @@
           "revenue_proxy": false,
           "ttm_direction": "steady",
           "ttm_growth_latest": -0.1158
+        },
+        {
+          "metric": "eps_revision",
+          "label": "Consecutive EPS beats vs consensus",
+          "direction": "accelerating",
+          "signal_type": "estimate_revision",
+          "signal_tier": "emerging",
+          "tier": "secondary",
+          "display": true,
+          "strength": 0.407,
+          "growth_latest": 0.1569,
+          "growth_prior": 0.0755,
+          "basis": "surprise",
+          "mode": "pct",
+          "surprise_streak": 2,
+          "source": "earnings_revision",
+          "evidence_ref": "_system/data/earnings_calendar.json"
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
-        "accelerating": 7,
+        "accelerating": 8,
         "decelerating": 0,
         "steady": 2,
         "confirmed": 3,
-        "emerging": 4,
+        "emerging": 5,
         "displayed": 3,
         "regime_downshift": 0,
         "stale_suppressed": 0
@@ -50688,6 +51736,7 @@
           "revenue_proxy": false
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 1,
         "decelerating": 1,
@@ -50718,6 +51767,69 @@
     },
     "XTIA": {
       "metrics": [
+        {
+          "metric": "burn_rate",
+          "label": "Burn Rate",
+          "source": "sec_fundamentals",
+          "evidence_ref": "_system/reference/market-data/fundamentals/XTIA.json",
+          "direction": "steady",
+          "basis": "yoy",
+          "growth_latest": -0.3141,
+          "growth_prior": 4.9749,
+          "growth_smoothed_latest": 4.5821,
+          "accel": 0.0,
+          "accel_raw": -5.289,
+          "threshold": 0.584,
+          "mode": "pct",
+          "points": [
+            {
+              "period": "2019-03-31",
+              "value": 3493000.0
+            },
+            {
+              "period": "2020-03-31",
+              "value": 4535000.0
+            },
+            {
+              "period": "2021-03-31",
+              "value": 5661000.0
+            },
+            {
+              "period": "2022-03-31",
+              "value": 15319000.0
+            },
+            {
+              "period": "2023-03-31",
+              "value": 457000.0
+            },
+            {
+              "period": "2024-03-31",
+              "value": 2551000.0
+            },
+            {
+              "period": "2025-03-31",
+              "value": 15242000.0
+            },
+            {
+              "period": "2026-03-31",
+              "value": 10454000.0
+            }
+          ],
+          "signal_tier": "steady",
+          "tier": "secondary",
+          "material": true,
+          "strength": 0.0,
+          "confidence": "med",
+          "ttm_agrees": null,
+          "display": false,
+          "composite": false,
+          "stale": false,
+          "latest_period": "2026-03-31",
+          "series_age_days": 95,
+          "revenue_proxy": false,
+          "ttm_direction": "steady",
+          "ttm_growth_latest": -0.1449
+        },
         {
           "metric": "cash",
           "label": "Cash",
@@ -51221,15 +52333,35 @@
           "revenue_proxy": false,
           "ttm_direction": "accelerating",
           "ttm_growth_latest": 1.1175
+        },
+        {
+          "metric": "revenues.peer_relative",
+          "label": "Revenues vs sleeve peers",
+          "direction": "downshift",
+          "signal_type": "peer_relative",
+          "signal_tier": "confirmed",
+          "tier": "primary",
+          "display": true,
+          "strength": 3.0,
+          "growth_latest": -1.0,
+          "growth_prior": 0.0465,
+          "basis": "yoy",
+          "mode": "pct",
+          "peer_median": 0.0465,
+          "peer_threshold": -0.2055,
+          "peer_count": 21,
+          "source": "peer_relative",
+          "evidence_ref": "_system/portfolio/registry.json"
         }
       ],
+      "data_tier": "sec_fundamentals",
       "summary": {
         "accelerating": 1,
         "decelerating": 2,
-        "steady": 5,
-        "confirmed": 1,
+        "steady": 6,
+        "confirmed": 2,
         "emerging": 2,
-        "displayed": 1,
+        "displayed": 2,
         "regime_downshift": 0,
         "stale_suppressed": 0
       },
@@ -51245,55 +52377,144 @@
         "factors": []
       }
     },
-    "7176.T": {
+    "WBI": {
       "metrics": [
         {
-          "metric": "base_fee.base_rate_ann_pct",
-          "label": "Base Fee.Base Rate Ann Pct",
-          "source": "equity_model",
-          "evidence_ref": "dashboard/data/equity_models.json",
-          "direction": "accelerating",
-          "basis": "seq",
-          "growth_latest": 0.1047,
-          "growth_prior": 0.0245,
-          "growth_smoothed_latest": 0.1047,
-          "accel": 0.0802,
-          "accel_raw": 0.0802,
-          "threshold": 0.0375,
-          "mode": "pct",
-          "suspect_points": 0,
-          "points": [
-            {
-              "period": "2024-09-30",
-              "value": 0.5108
-            },
-            {
-              "period": "2025-03-31",
-              "value": 0.5425
-            },
-            {
-              "period": "2025-09-30",
-              "value": 0.5558
-            },
-            {
-              "period": "2026-03-31",
-              "value": 0.614
-            }
-          ],
-          "signal_tier": "emerging",
-          "tier": "primary",
-          "material": true,
-          "strength": 2.139,
-          "confidence": "high",
-          "ttm_agrees": null,
+          "metric": "eps_revision",
+          "label": "Consecutive EPS misses vs consensus",
+          "direction": "decelerating",
+          "signal_type": "estimate_revision",
+          "signal_tier": "confirmed",
+          "tier": "secondary",
           "display": true,
-          "composite": false,
-          "stale": false,
-          "latest_period": null,
-          "series_age_days": null,
-          "revenue_proxy": false
+          "strength": 3.0,
+          "growth_latest": -0.1111,
+          "growth_prior": -7.0,
+          "basis": "surprise",
+          "mode": "pct",
+          "surprise_streak": 2,
+          "source": "earnings_revision",
+          "evidence_ref": "_system/data/earnings_calendar.json"
         }
       ],
+      "data_tier": "sec_fundamentals",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 1,
+        "steady": 0,
+        "confirmed": 1,
+        "emerging": 0,
+        "displayed": 1,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "MTA": {
+      "metrics": [
+        {
+          "metric": "eps_revision",
+          "label": "Consecutive EPS misses vs consensus",
+          "direction": "decelerating",
+          "signal_type": "estimate_revision",
+          "signal_tier": "confirmed",
+          "tier": "secondary",
+          "display": true,
+          "strength": 3.0,
+          "growth_latest": -0.9,
+          "growth_prior": -4.0,
+          "basis": "surprise",
+          "mode": "pct",
+          "surprise_streak": 2,
+          "source": "earnings_revision",
+          "evidence_ref": "_system/data/earnings_calendar.json"
+        }
+      ],
+      "data_tier": "sec_pending",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 1,
+        "steady": 0,
+        "confirmed": 1,
+        "emerging": 0,
+        "displayed": 1,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "VOXR": {
+      "metrics": [
+        {
+          "metric": "eps_revision",
+          "label": "Consecutive EPS beats vs consensus",
+          "direction": "accelerating",
+          "signal_type": "estimate_revision",
+          "signal_tier": "confirmed",
+          "tier": "secondary",
+          "display": true,
+          "strength": 3.0,
+          "growth_latest": 2.6667,
+          "growth_prior": 1.25,
+          "basis": "surprise",
+          "mode": "pct",
+          "surprise_streak": 2,
+          "source": "earnings_revision",
+          "evidence_ref": "_system/data/earnings_calendar.json"
+        }
+      ],
+      "data_tier": "sec_pending",
+      "summary": {
+        "accelerating": 1,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 1,
+        "emerging": 0,
+        "displayed": 1,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "FNV": {
+      "metrics": [
+        {
+          "metric": "eps_revision",
+          "label": "Consecutive EPS beats vs consensus",
+          "direction": "accelerating",
+          "signal_type": "estimate_revision",
+          "signal_tier": "emerging",
+          "tier": "secondary",
+          "display": true,
+          "strength": 0.155,
+          "growth_latest": 0.1388,
+          "growth_prior": 0.1078,
+          "basis": "surprise",
+          "mode": "pct",
+          "surprise_streak": 2,
+          "source": "earnings_revision",
+          "evidence_ref": "_system/data/earnings_calendar.json"
+        }
+      ],
+      "data_tier": "sec_pending",
       "summary": {
         "accelerating": 1,
         "decelerating": 0,
@@ -51301,6 +52522,1717 @@
         "confirmed": 0,
         "emerging": 1,
         "displayed": 1,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "HE": {
+      "metrics": [
+        {
+          "metric": "eps_revision",
+          "label": "Estimate revision down (EPS surprise worsened)",
+          "direction": "decelerating",
+          "signal_type": "estimate_revision",
+          "signal_tier": "confirmed",
+          "tier": "secondary",
+          "display": true,
+          "strength": 1.786,
+          "growth_latest": -0.3571,
+          "growth_prior": 0.0,
+          "basis": "surprise",
+          "mode": "pct",
+          "surprise_streak": 2,
+          "source": "earnings_revision",
+          "evidence_ref": "_system/data/earnings_calendar.json"
+        }
+      ],
+      "data_tier": "sec_fundamentals",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 1,
+        "steady": 0,
+        "confirmed": 1,
+        "emerging": 0,
+        "displayed": 1,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 6.0,
+        "level": "elevated",
+        "label": "Leadership / governance risk elevated",
+        "factors": [
+          {
+            "type": "governance_news",
+            "as_of": "2026-06-18",
+            "title": "Titan Appoints Richard Pozzebon as Chief Financial Officer to Support Strategic Growth and Project Development"
+          },
+          {
+            "type": "governance_news",
+            "as_of": "2026-06-15",
+            "title": "Box CEO Aaron Levie Says AI Restrictions Could Accelerate Global Shift To Open-Weight Models"
+          },
+          {
+            "type": "governance_news",
+            "as_of": "2026-06-06",
+            "title": "Jensen Huang Personally Reviews Pay For All 42,000 Nvidia Employees \u2014 Here's What He Does '100% Of The Time'"
+          }
+        ]
+      }
+    },
+    "BUR": {
+      "metrics": [
+        {
+          "metric": "eps_revision",
+          "label": "Estimate revision up (EPS surprise improved)",
+          "direction": "accelerating",
+          "signal_type": "estimate_revision",
+          "signal_tier": "confirmed",
+          "tier": "secondary",
+          "display": true,
+          "strength": 3.0,
+          "growth_latest": 1.0158,
+          "growth_prior": -1.4474,
+          "basis": "surprise",
+          "mode": "pct",
+          "surprise_streak": 2,
+          "source": "earnings_revision",
+          "evidence_ref": "_system/data/earnings_calendar.json"
+        }
+      ],
+      "data_tier": "sec_pending",
+      "summary": {
+        "accelerating": 1,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 1,
+        "emerging": 0,
+        "displayed": 1,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 2.0,
+        "level": "watch",
+        "label": "Leadership / governance on watch",
+        "factors": [
+          {
+            "type": "governance_news",
+            "as_of": "2026-06-17",
+            "title": "Burford Capital (BUR) CEO settles 121,880 RSUs and updates direct, indirect holdings - Stock Titan"
+          }
+        ]
+      }
+    },
+    "WPM": {
+      "metrics": [
+        {
+          "metric": "eps_revision",
+          "label": "Consecutive EPS beats vs consensus",
+          "direction": "accelerating",
+          "signal_type": "estimate_revision",
+          "signal_tier": "emerging",
+          "tier": "secondary",
+          "display": true,
+          "strength": 0.626,
+          "growth_latest": 0.0612,
+          "growth_prior": 0.1864,
+          "basis": "surprise",
+          "mode": "pct",
+          "surprise_streak": 2,
+          "source": "earnings_revision",
+          "evidence_ref": "_system/data/earnings_calendar.json"
+        }
+      ],
+      "data_tier": "sec_pending",
+      "summary": {
+        "accelerating": 1,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 1,
+        "displayed": 1,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 2.0,
+        "level": "watch",
+        "label": "Leadership / governance on watch",
+        "factors": [
+          {
+            "type": "governance_news",
+            "as_of": "2026-06-08",
+            "title": "3 Multi-Metal Stocks for Income and Long-Term Growth"
+          }
+        ]
+      }
+    },
+    "OTCM": {
+      "metrics": [
+        {
+          "metric": "eps_revision",
+          "label": "Consecutive EPS beats vs consensus",
+          "direction": "accelerating",
+          "signal_type": "estimate_revision",
+          "signal_tier": "emerging",
+          "tier": "secondary",
+          "display": true,
+          "strength": 0.294,
+          "growth_latest": 0.5246,
+          "growth_prior": 0.5833,
+          "basis": "surprise",
+          "mode": "pct",
+          "surprise_streak": 2,
+          "source": "earnings_revision",
+          "evidence_ref": "_system/data/earnings_calendar.json"
+        }
+      ],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 1,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 1,
+        "displayed": 1,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "MIAX": {
+      "metrics": [
+        {
+          "metric": "eps_revision",
+          "label": "Consecutive EPS beats vs consensus",
+          "direction": "accelerating",
+          "signal_type": "estimate_revision",
+          "signal_tier": "emerging",
+          "tier": "secondary",
+          "display": true,
+          "strength": 0.508,
+          "growth_latest": 0.1667,
+          "growth_prior": 0.2683,
+          "basis": "surprise",
+          "mode": "pct",
+          "surprise_streak": 2,
+          "source": "earnings_revision",
+          "evidence_ref": "_system/data/earnings_calendar.json"
+        }
+      ],
+      "data_tier": "sec_fundamentals",
+      "summary": {
+        "accelerating": 1,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 1,
+        "displayed": 1,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 1.5,
+        "level": "watch",
+        "label": "Leadership / governance on watch",
+        "factors": [
+          {
+            "type": "executive_selling_cluster",
+            "as_of": "2026-07-04",
+            "title": "20 executive sales ($22,918,273) in 120d"
+          }
+        ]
+      }
+    },
+    "GROY": {
+      "metrics": [
+        {
+          "metric": "eps_revision",
+          "label": "Estimate revision down (EPS surprise worsened)",
+          "direction": "decelerating",
+          "signal_type": "estimate_revision",
+          "signal_tier": "confirmed",
+          "tier": "secondary",
+          "display": true,
+          "strength": 3.0,
+          "growth_latest": 0.0,
+          "growth_prior": 1.0,
+          "basis": "surprise",
+          "mode": "pct",
+          "surprise_streak": 2,
+          "source": "earnings_revision",
+          "evidence_ref": "_system/data/earnings_calendar.json"
+        }
+      ],
+      "data_tier": "sec_pending",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 1,
+        "steady": 0,
+        "confirmed": 1,
+        "emerging": 0,
+        "displayed": 1,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "0388.HK": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 2.0,
+        "level": "watch",
+        "label": "Leadership / governance on watch",
+        "factors": [
+          {
+            "type": "governance_news",
+            "as_of": "2026-06-09",
+            "title": "Hong Kong: New powers for Chief Executive in \u2018national security\u2019 cases undermine fair trial rights - Amnesty Internation"
+          }
+        ]
+      }
+    },
+    "3905.T": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "7176.T": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "8697.T": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "ABMD.CVR": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "ADN.TO": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "ALS.TO": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "ASX.AX": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "AZLCZ": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "B": {
+      "metrics": [],
+      "data_tier": "sec_fundamentals",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "B3SA3.SA": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "BMYS.KL": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "BN": {
+      "metrics": [],
+      "data_tier": "sec_pending",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 4.0,
+        "level": "elevated",
+        "label": "Leadership / governance risk elevated",
+        "factors": [
+          {
+            "type": "governance_news",
+            "as_of": "2026-06-28",
+            "title": "Is GameStop the Next Berkshire Hathaway?"
+          },
+          {
+            "type": "governance_news",
+            "as_of": "2026-06-09",
+            "title": "The Most Underrated Part of Berkshire Hathaway Has Nothing to Do With Its Cash Pile"
+          }
+        ]
+      }
+    },
+    "BOLSAA.MX": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "BVERS": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "BWEL": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "BYMA": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "CBRS": {
+      "metrics": [],
+      "data_tier": "sec_fundamentals",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 3.5,
+        "level": "elevated",
+        "label": "Leadership / governance risk elevated",
+        "factors": [
+          {
+            "type": "governance_news",
+            "as_of": "2026-06-26",
+            "title": "Cathie Wood Goes Bargain Hunting: 3 Stocks She Just Bought"
+          },
+          {
+            "type": "executive_selling_cluster",
+            "as_of": "2026-07-04",
+            "title": "4 executive sales ($131,974,745) in 120d"
+          }
+        ]
+      }
+    },
+    "CMSG": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "CORBF": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "CSU": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "CSU.DB": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "DB1.DE": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 2.0,
+        "level": "watch",
+        "label": "Leadership / governance on watch",
+        "factors": [
+          {
+            "type": "governance_news",
+            "as_of": "2026-06-24",
+            "title": "Licensable picture: Theodor Weimer, CEO of German stock exchange Deutsche Boerse AG, informs the media about the planned"
+          }
+        ]
+      }
+    },
+    "DRR.AX": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "ENX.PA": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "EQPT": {
+      "metrics": [],
+      "data_tier": "sec_fundamentals",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "ETOR": {
+      "metrics": [],
+      "data_tier": "sec_pending",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "EVR": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "FIHO12.MX": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "FRMI": {
+      "metrics": [],
+      "data_tier": "sec_fundamentals",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 1.5,
+        "level": "watch",
+        "label": "Leadership / governance on watch",
+        "factors": [
+          {
+            "type": "executive_selling_cluster",
+            "as_of": "2026-07-04",
+            "title": "8 executive sales ($12,543,933) in 120d"
+          }
+        ]
+      }
+    },
+    "FRMO": {
+      "metrics": [],
+      "data_tier": "sec_pending",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "GCCO": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "GKTX.PS1": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "GKTX.PS2": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "GKTX.PS3": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "GLXY": {
+      "metrics": [],
+      "data_tier": "sec_fundamentals",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 3.5,
+        "level": "elevated",
+        "label": "Leadership / governance risk elevated",
+        "factors": [
+          {
+            "type": "governance_news",
+            "as_of": "2026-06-08",
+            "title": "GLXY Stock Rallies After CEO Mike Novogratz Touts 'Largest Single-Campus Data Center In America' - TradingView"
+          },
+          {
+            "type": "executive_selling_cluster",
+            "as_of": "2026-07-04",
+            "title": "5 executive sales ($1,562,423) in 120d"
+          }
+        ]
+      }
+    },
+    "GPW.WA": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 2.0,
+        "level": "watch",
+        "label": "Leadership / governance on watch",
+        "factors": [
+          {
+            "type": "governance_news",
+            "as_of": "2026-07-02",
+            "title": "ROBYG Returns to the Warsaw Stock Exchange, Shares Open More Than 5% Higher - CEO Magazyn"
+          }
+        ]
+      }
+    },
+    "HEE": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "HNFSA": {
+      "metrics": [],
+      "data_tier": "sec_pending",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "IDA.AX": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "IEX.NS": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "IPCXR": {
+      "metrics": [],
+      "data_tier": "sec_fundamentals",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "JL80.DE": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "KEWL": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "LMN": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "LSEG": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "MRTX.CVR": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "NAN": {
+      "metrics": [],
+      "data_tier": "sec_pending",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "NZX.NZ": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "OR": {
+      "metrics": [],
+      "data_tier": "sec_pending",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "PBT": {
+      "metrics": [],
+      "data_tier": "sec_pending",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "PCYO": {
+      "metrics": [],
+      "data_tier": "sec_pending",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "PDER": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "PRVL.CVR": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "PSE": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "PSK.TO": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "RMV.L": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "S68.SI": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "SBR": {
+      "metrics": [],
+      "data_tier": "sec_pending",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "SJT": {
+      "metrics": [],
+      "data_tier": "sec_pending",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "TASE": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "TEQ.ST": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "TFPM": {
+      "metrics": [],
+      "data_tier": "sec_pending",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "WRLC": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "X.TO": {
+      "metrics": [],
+      "data_tier": "none",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0
+      },
+      "business_momentum": null,
+      "leadership_risk": {
+        "score": 0.0,
+        "level": "none",
+        "label": "No leadership risk flags",
+        "factors": []
+      }
+    },
+    "XP": {
+      "metrics": [],
+      "data_tier": "sec_pending",
+      "summary": {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
         "regime_downshift": 0,
         "stale_suppressed": 0
       },

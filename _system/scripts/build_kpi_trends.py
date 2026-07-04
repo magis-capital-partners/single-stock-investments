@@ -31,7 +31,9 @@ from kpi_signal_enhancements import (
     analyze_growth_regime,
     compute_leadership_risk,
     cross_metric_freshness,
+    earnings_revision_signal,
     passes_materiality,
+    peer_relative_signal,
     resolve_revenue_series,
     series_freshness,
     STALE_SERIES_MAX_DAYS,
@@ -41,6 +43,8 @@ ROOT = Path(__file__).resolve().parents[2]
 OUTPUT = ROOT / "dashboard" / "data" / "kpi_trends.json"
 FUNDAMENTALS_DIR = ROOT / "_system" / "reference" / "market-data" / "fundamentals"
 EQUITY_MODELS_PATH = ROOT / "dashboard" / "data" / "equity_models.json"
+EQUITY_KPI_SERIES_PATH = ROOT / "dashboard" / "data" / "equity_kpi_series.json"
+EARNINGS_CALENDAR_PATH = ROOT / "_system" / "data" / "earnings_calendar.json"
 NEWS_PATH = ROOT / "dashboard" / "data" / "portfolio_news.json"
 NEWS_HISTORY_PATH = ROOT / "_system" / "reference" / "market-data" / "news_flow_history.json"
 REGISTRY_PATH = ROOT / "_system" / "portfolio" / "registry.json"
@@ -64,7 +68,7 @@ MAX_PRIMARY_DISPLAY = 2
 MAX_SECONDARY_DISPLAY = 1
 
 METRIC_TIER_PRIMARY = frozenset({"revenues", "revenue", "operating_income", "cfo", "op_margin", "cfo_margin"})
-METRIC_TIER_SECONDARY = frozenset({"net_income", "eps_basic", "news_flow"})
+METRIC_TIER_SECONDARY = frozenset({"net_income", "eps_basic", "news_flow", "burn_rate", "eps_revision"})
 METRIC_TIER_EXCLUDED = frozenset({"cash", "total_assets", "stockholders_equity", "long_term_debt"})
 CORE_COLLAPSE_METRICS = frozenset({"revenues", "revenue", "operating_income", "cfo"})
 REGIME_METRICS = frozenset({"revenues", "revenue", "operating_income", "cfo", "net_income", "eps_basic"})
@@ -749,6 +753,172 @@ def fundamentals_series() -> dict[str, dict[str, list[dict]]]:
     return out
 
 
+def derive_burn_rate_series(cfo: list[dict], cash: list[dict]) -> list[dict]:
+    """Quarterly cash burn (positive = consuming cash) for pre-revenue names."""
+    cfo_map = {
+        str(p.get("period") or "")[:10]: to_float(p.get("value"))
+        for p in cfo
+        if to_float(p.get("value")) is not None
+    }
+    out: list[dict] = []
+    for period, value in sorted(cfo_map.items()):
+        if value is None or value >= 0:
+            continue
+        out.append({"period": period, "value": abs(value)})
+    return out
+
+
+def resolve_data_tier(
+    ticker: str,
+    *,
+    has_fundamentals: bool,
+    has_equity: bool,
+    has_news_signal: bool,
+    has_cik: bool,
+) -> str:
+    if has_fundamentals:
+        return "sec_fundamentals"
+    if has_equity:
+        return "equity_model"
+    if has_cik:
+        return "sec_pending"
+    if has_news_signal:
+        return "news_governance"
+    return "none"
+
+
+def equity_panel_series(models_doc: dict) -> dict[str, dict[str, list[tuple[str, float]]]]:
+    """Semi-annual panel rows from equity model bundles."""
+    out: dict[str, dict[str, list[tuple[str, float]]]] = {}
+    for ticker, entry in ((models_doc or {}).get("tickers") or {}).items():
+        panel = entry.get("panel") or []
+        if not isinstance(panel, list):
+            continue
+        by_field: dict[str, list[tuple[str, float]]] = {}
+        for row in panel:
+            if not isinstance(row, dict):
+                continue
+            period = (row.get("period_end") or row.get("period") or "")[:10]
+            if not period:
+                continue
+            for field in ("revenue", "net_income", "ordinary", "base_fee", "perf_fee"):
+                value = to_float(row.get(field))
+                if value is None:
+                    continue
+                metric = "revenues" if field == "revenue" else field
+                by_field.setdefault(metric, []).append((period, value))
+        if by_field:
+            out[str(ticker).upper()] = by_field
+    return out
+
+
+def load_earnings_by_ticker() -> dict[str, list[dict]]:
+    doc = load_json(EARNINGS_CALENDAR_PATH, {})
+    grouped: dict[str, list[dict]] = {}
+    for event in (doc or {}).get("events") or []:
+        ticker = str(event.get("portfolio_ticker") or event.get("ticker") or "").upper()
+        if not ticker:
+            continue
+        grouped.setdefault(ticker, []).append(event)
+    for path in sorted(ROOT.glob("*/research/evidence/earnings_calendar.json")):
+        per_ticker_doc = load_json(path, {})
+        ticker = str(per_ticker_doc.get("ticker") or path.parts[0]).upper()
+        for event in (per_ticker_doc or {}).get("events") or []:
+            grouped.setdefault(ticker, []).append(event)
+    return grouped
+
+
+def apply_peer_relative_overlays(by_ticker: dict[str, dict], registry: dict) -> int:
+    """Compare revenue YoY growth to investment-sleeve peers."""
+    holdings = registry.get("holdings") or {}
+    sleeve_growth: dict[str, list[tuple[str, float]]] = {}
+    for ticker, entry in by_ticker.items():
+        holding = holdings.get(ticker) or {}
+        sleeve = (holding.get("classification") or {}).get("investment_sleeve") or "unclassified"
+        for metric in entry.get("metrics") or []:
+            if metric.get("metric") not in ("revenues", "revenue"):
+                continue
+            if metric.get("direction") not in ("accelerating", "decelerating", "steady"):
+                continue
+            growth = metric.get("growth_latest")
+            if growth is None:
+                continue
+            sleeve_growth.setdefault(sleeve, []).append((ticker, float(growth)))
+
+    added = 0
+    for ticker, entry in by_ticker.items():
+        holding = holdings.get(ticker) or {}
+        sleeve = (holding.get("classification") or {}).get("investment_sleeve") or "unclassified"
+        peers = sleeve_growth.get(sleeve) or []
+        own_growth = None
+        for metric in entry.get("metrics") or []:
+            if metric.get("metric") in ("revenues", "revenue") and metric.get("growth_latest") is not None:
+                own_growth = float(metric["growth_latest"])
+                break
+        if own_growth is None:
+            continue
+        peer_vals = [g for tk, g in peers if tk != ticker]
+        signal = peer_relative_signal(own_growth, peer_vals, metric_key="revenues")
+        if not signal:
+            continue
+        signal["source"] = "peer_relative"
+        signal["evidence_ref"] = "_system/portfolio/registry.json"
+        entry.setdefault("metrics", []).append(signal)
+        added += 1
+    return added
+
+
+def apply_earnings_revision_signals(by_ticker: dict[str, dict], earnings_by_ticker: dict[str, list[dict]]) -> int:
+    added = 0
+    for ticker, events in earnings_by_ticker.items():
+        signal = earnings_revision_signal(events)
+        if not signal:
+            continue
+        entry = by_ticker.setdefault(ticker, {"metrics": []})
+        signal["source"] = "earnings_revision"
+        signal["evidence_ref"] = "_system/data/earnings_calendar.json"
+        entry.setdefault("metrics", []).append(signal)
+        added += 1
+    return added
+
+
+def ensure_universe_coverage(
+    by_ticker: dict[str, dict],
+    universe: list[str],
+    *,
+    fundamentals: set[str],
+    equity_tickers: set[str],
+    resolvable_ciks: set[str],
+    news_doc: dict | None,
+) -> None:
+    for ticker in universe:
+        entry = by_ticker.setdefault(ticker, {"metrics": []})
+        has_fundamentals = ticker in fundamentals
+        has_equity = ticker in equity_tickers
+        has_news = any(
+            m.get("metric") == "news_flow"
+            for m in (entry.get("metrics") or [])
+        )
+        entry["data_tier"] = resolve_data_tier(
+            ticker,
+            has_fundamentals=has_fundamentals,
+            has_equity=has_equity,
+            has_news_signal=has_news,
+            has_cik=ticker in resolvable_ciks,
+        )
+        if not entry.get("summary"):
+            entry["summary"] = {
+                "accelerating": 0,
+                "decelerating": 0,
+                "steady": 0,
+                "confirmed": 0,
+                "emerging": 0,
+                "displayed": 0,
+                "regime_downshift": 0,
+                "stale_suppressed": 0,
+            }
+
+
 def equity_model_series(ticker: str, models_doc: dict) -> dict[str, list[tuple[str, float]]]:
     """Extract observation series (lists of {period, <numeric>}) from equity models."""
     entry = ((models_doc or {}).get("tickers") or {}).get(ticker) or {}
@@ -871,6 +1041,17 @@ def build_trends() -> dict:
             if metrics.get("cfo"):
                 derived["cfo_margin"] = derive_ratio_series(metrics["cfo"], revenue_series)
 
+        rev_latest = to_float(revenue_series[-1].get("value")) if revenue_series else None
+        pre_revenue = (
+            not revenue_series
+            or rev_meta.get("proxy")
+            or (rev_latest is not None and abs(rev_latest) < 1_000_000)
+        )
+        if pre_revenue and metrics.get("cfo"):
+            burn = derive_burn_rate_series(metrics["cfo"], metrics.get("cash") or [])
+            if len(burn) >= MIN_POINTS:
+                derived["burn_rate"] = burn
+
         all_metrics = {**metrics, **derived}
         growths_by_metric: dict[str, list[tuple[str, float]]] = {}
 
@@ -909,23 +1090,73 @@ def build_trends() -> dict:
             if regime:
                 add_metric(ticker, regime["metric"], "sec_fundamentals", regime, evidence_ref)
 
-    equity_model_tickers = set()
+    equity_model_tickers: set[str] = set()
+    equity_kpi_doc = load_json(EQUITY_KPI_SERIES_PATH, {})
+    panel_by_ticker = equity_panel_series(models_doc if isinstance(models_doc, dict) else {})
+
+    def ingest_equity_points(ticker: str, metric: str, points: list[tuple[str, float]], evidence: str) -> None:
+        analysis = analyze_series(points, mode="pct", metric_key=metric)
+        if analysis:
+            equity_model_tickers.add(ticker)
+            add_metric(ticker, metric, "equity_model", analysis, evidence)
+
     for ticker in sorted(((models_doc or {}).get("tickers") or {}).keys()):
         for metric, points in equity_model_series(ticker, models_doc).items():
-            analysis = analyze_series(points, mode="pct", metric_key=metric)
-            if analysis:
-                equity_model_tickers.add(ticker)
-                add_metric(ticker, metric, "equity_model", analysis, "dashboard/data/equity_models.json")
+            ingest_equity_points(ticker, metric, points, "dashboard/data/equity_models.json")
+
+    for ticker, fields in panel_by_ticker.items():
+        for metric, points in fields.items():
+            ingest_equity_points(ticker, metric, points, "dashboard/data/equity_models.json")
+
+    for ticker, block in sorted(((equity_kpi_doc or {}).get("tickers") or {}).items()):
+        tk = str(ticker).upper()
+        for metric, series in (block.get("metrics") or {}).items():
+            points = [
+                (str(row.get("period") or "")[:10], float(row["value"]))
+                for row in series
+                if row.get("period") and to_float(row.get("value")) is not None
+            ]
+            if len(points) >= MIN_POINTS:
+                ingest_equity_points(
+                    tk,
+                    metric,
+                    points,
+                    "dashboard/data/equity_kpi_series.json",
+                )
 
     for ticker, points in news_series.items():
         analysis = analyze_series(points, mode="diff", metric_key="news_flow")
         if analysis and analysis["direction"] != "steady":
             add_metric(ticker, "news_flow", "news_flow", analysis, "dashboard/data/portfolio_news.json")
 
+    from build_fundamental_series import resolve_ciks  # noqa: WPS433
+
+    cik_map = resolve_ciks()
+    resolvable_ciks = set(cik_map.keys())
+    fundamentals_set = set(fundamentals.keys())
+    earnings_by_ticker = load_earnings_by_ticker()
+    peer_overlay_count = apply_peer_relative_overlays(by_ticker, registry)
+    earnings_revision_count = apply_earnings_revision_signals(by_ticker, earnings_by_ticker)
+    ensure_universe_coverage(
+        by_ticker,
+        universe,
+        fundamentals=fundamentals_set,
+        equity_tickers=equity_model_tickers,
+        resolvable_ciks=resolvable_ciks,
+        news_doc=news_doc if isinstance(news_doc, dict) else {},
+    )
+
+    missing_fundamentals = sorted(t for t in resolvable_ciks if t not in fundamentals_set)
+    missing_cik = sorted(t for t in universe if t not in resolvable_ciks)
+    no_trend_data = sorted(
+        t for t in universe if (by_ticker.get(t) or {}).get("data_tier") in ("none", "sec_pending", "news_governance")
+    )
+
     confirmed_count = 0
     emerging_count = 0
     displayed_count = 0
     regime_count = 0
+    peer_relative_count = 0
     stale_suppressed = 0
     leadership_elevated = 0
     strength_values: list[float] = []
@@ -942,6 +1173,8 @@ def build_trends() -> dict:
                 emerging_count += 1
             if metric.get("signal_type") == "regime" and metric.get("direction") == "downshift":
                 regime_count += 1
+            if metric.get("signal_type") == "peer_relative":
+                peer_relative_count += 1
             if metric.get("stale"):
                 stale_suppressed += 1
             if metric.get("display"):
@@ -960,14 +1193,23 @@ def build_trends() -> dict:
         "inflection_count": inflection_count,
         "coverage": {
             "universe": len(universe),
+            "resolvable_ciks": len(resolvable_ciks),
             "fundamentals_tickers": len(fundamentals),
             "equity_model_tickers": len(equity_model_tickers),
-            "analyzed_tickers": len(by_ticker),
+            "analyzed_tickers": sum(
+                1 for t in universe if (by_ticker.get(t) or {}).get("data_tier") == "sec_fundamentals"
+                or any((by_ticker.get(t) or {}).get("metrics"))
+            ),
+            "missing_fundamentals": missing_fundamentals,
+            "missing_cik": missing_cik,
+            "no_trend_data": no_trend_data,
             "suspect_points_excluded": suspect_excluded,
             "confirmed_count": confirmed_count,
             "emerging_count": emerging_count,
             "displayed_count": displayed_count,
             "regime_downshift_count": regime_count,
+            "peer_relative_count": peer_relative_count,
+            "earnings_revision_count": earnings_revision_count,
             "stale_suppressed_count": stale_suppressed,
             "leadership_risk_watch": leadership_elevated,
             "avg_strength": round(statistics.mean(strength_values), 3) if strength_values else 0.0,

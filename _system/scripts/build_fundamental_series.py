@@ -254,10 +254,12 @@ def main() -> int:
             refreshed += 1
 
     covered = sorted(p.stem for p in FUNDAMENTALS_DIR.glob("*.json") if not p.stem.startswith("_"))
+    missing = sorted(t for t in ciks if t not in covered)
     index = {
         "updated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "ticker_count": len(covered),
         "resolvable_ciks": len(ciks),
+        "missing_fundamentals": missing,
         "tickers": covered,
     }
     (FUNDAMENTALS_DIR / "_index.json").write_text(json.dumps(index, indent=1) + "\n", encoding="utf-8")
