@@ -88,8 +88,9 @@ class AnalyzeQuarterlyYoyTests(unittest.TestCase):
         self.assertIsNone(analyze_quarterly_yoy(quarterly([100.0, 105.0, 110.0, 120.0])))
 
     def test_materiality_suppresses_tiny_growth(self) -> None:
-        self.assertFalse(passes_materiality(0.01, "revenues"))
-        self.assertTrue(passes_materiality(0.05, "revenues"))
+        self.assertFalse(passes_materiality(0.01, "revenues", direction="accelerating"))
+        self.assertTrue(passes_materiality(0.05, "revenues", direction="accelerating"))
+        self.assertTrue(passes_materiality(-0.03, "operating_income", direction="decelerating"))
 
 
 class AnalyzeSeriesTests(unittest.TestCase):

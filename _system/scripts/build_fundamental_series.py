@@ -36,9 +36,11 @@ CIK_MAP_MAX_AGE_DAYS = 30
 METRIC_TAGS: dict[str, list[str]] = {
     "revenues": [
         "RevenueFromContractWithCustomerExcludingAssessedTax",
+        "RevenueFromContractWithCustomerIncludingAssessedTax",
         "Revenues",
         "SalesRevenueNet",
-        "RevenueFromContractWithCustomerIncludingAssessedTax",
+        "SalesRevenueServicesNet",
+        "SalesRevenueGoodsNet",
     ],
     "operating_income": ["OperatingIncomeLoss"],
     "net_income": ["NetIncomeLoss"],
@@ -142,49 +144,64 @@ def duration_days(start: str | None, end: str | None) -> int | None:
     return (d1 - d0).days
 
 
+def series_for_tag(gaap: dict, tag: str, *, is_flow: bool) -> dict[str, dict]:
+    """Extract one us-gaap tag into period -> point dict."""
+    node = gaap.get(tag)
+    if not node:
+        return {}
+    by_period: dict[str, dict] = {}
+    for unit_vals in (node.get("units") or {}).values():
+        for fact in unit_vals:
+            form = str(fact.get("form") or "")
+            if form not in ACCEPTED_FORMS:
+                continue
+            end = str(fact.get("end") or "")[:10]
+            if not end:
+                continue
+            val = fact.get("val")
+            if val is None:
+                continue
+            if is_flow:
+                days = duration_days(fact.get("start"), fact.get("end"))
+                if days is None or not (70 <= days <= 100):
+                    continue
+            filed = str(fact.get("filed") or "")
+            prev = by_period.get(end)
+            if prev is None or filed > prev["filed"]:
+                by_period[end] = {
+                    "period": end,
+                    "value": float(val),
+                    "fy": fact.get("fy"),
+                    "fp": fact.get("fp"),
+                    "form": form,
+                    "filed": filed,
+                    "tag": tag,
+                }
+    return by_period
+
+
 def extract_metric_series(facts: dict, metric: str) -> list[dict]:
     """Quarterly series for one metric from a companyfacts us-gaap block.
 
     Flow metrics keep only ~quarter-length durations (70-100 days) so YTD and
     annual figures never mix into the series. Balance metrics keep instant
-    values at each period end. The latest-filed value wins per period end.
+    values at each period end. When multiple tags carry the same metric, pick
+    the tag whose series extends to the latest fiscal period (avoids stale
+    tags like legacy Revenues blocking RevenueFromContractWithCustomer*).
     """
     gaap = (facts.get("facts") or {}).get("us-gaap") or {}
     is_flow = metric in FLOW_METRICS
-    by_period: dict[str, dict] = {}
+    best: dict[str, dict] = {}
+    best_latest = ""
     for tag in METRIC_TAGS[metric]:
-        node = gaap.get(tag)
-        if not node:
+        by_period = series_for_tag(gaap, tag, is_flow=is_flow)
+        if not by_period:
             continue
-        for unit_vals in (node.get("units") or {}).values():
-            for fact in unit_vals:
-                form = str(fact.get("form") or "")
-                if form not in ACCEPTED_FORMS:
-                    continue
-                end = str(fact.get("end") or "")[:10]
-                if not end:
-                    continue
-                val = fact.get("val")
-                if val is None:
-                    continue
-                if is_flow:
-                    days = duration_days(fact.get("start"), fact.get("end"))
-                    if days is None or not (70 <= days <= 100):
-                        continue
-                filed = str(fact.get("filed") or "")
-                prev = by_period.get(end)
-                if prev is None or filed > prev["filed"]:
-                    by_period[end] = {
-                        "period": end,
-                        "value": float(val),
-                        "fy": fact.get("fy"),
-                        "fp": fact.get("fp"),
-                        "form": form,
-                        "filed": filed,
-                    }
-        if by_period:
-            break  # first tag with data wins; avoids mixing tag definitions
-    return [by_period[k] for k in sorted(by_period)]
+        latest = max(by_period)
+        if latest > best_latest or (latest == best_latest and len(by_period) > len(best)):
+            best_latest = latest
+            best = by_period
+    return [best[k] for k in sorted(best)]
 
 
 def build_ticker(ticker: str, cik: str) -> dict | None:

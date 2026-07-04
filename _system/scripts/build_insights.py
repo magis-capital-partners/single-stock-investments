@@ -323,6 +323,7 @@ INSIGHT_TREND_METRICS = {
     "op_margin",
     "cfo_margin",
     "core_business",
+    "growth_regime",
 }
 MAX_INFLECTION_EVENTS_PER_TICKER = 2
 
@@ -348,6 +349,18 @@ def _kpi_inflection_claim(metric: dict, *, source_label: str) -> str:
     trend = metric.get("direction") or "steady"
     growth_text = _kpi_growth_text(metric)
     signal_tier = metric.get("signal_tier") or "steady"
+    if metric.get("signal_type") == "regime":
+        baseline = metric.get("baseline_median")
+        baseline_text = f" (baseline median {baseline:+.1%} YoY)" if baseline is not None else ""
+        persistence = (
+            "for two consecutive quarters"
+            if signal_tier == "confirmed"
+            else "in the latest quarter"
+        )
+        return (
+            f"{label}: YoY growth moved to {growth_text}{baseline_text} {persistence}. "
+            f"Source: {source_label}."
+        )
     persistence = (
         "for two consecutive quarters"
         if signal_tier == "confirmed"
@@ -376,33 +389,50 @@ def from_kpi_trends(doc: dict | None) -> list[dict]:
     for ticker, entry in ((doc or {}).get("by_ticker") or {}).items():
         candidates = []
         for metric in entry.get("metrics") or []:
-            trend = metric.get("direction")
-            if trend not in ("accelerating", "decelerating"):
+            direction_raw = metric.get("direction")
+            is_regime = metric.get("signal_type") == "regime"
+            if is_regime:
+                if direction_raw not in ("downshift", "upshift"):
+                    continue
+            elif direction_raw not in ("accelerating", "decelerating"):
                 continue
             if not metric.get("display"):
                 continue
             base_name = str(metric.get("metric") or "").split(".")[-1]
-            if base_name not in INSIGHT_TREND_METRICS and metric.get("source") != "equity_model":
+            if (
+                base_name not in INSIGHT_TREND_METRICS
+                and not str(metric.get("metric") or "").startswith("growth_regime.")
+                and metric.get("source") != "equity_model"
+            ):
                 continue
-            if metric.get("tier") == "excluded":
+            if metric.get("tier") == "excluded" or metric.get("stale"):
                 continue
             metric_strength = metric.get("strength")
             if metric_strength is None:
                 metric_strength = abs(metric.get("accel") or 0) / max(metric.get("threshold") or 1e-9, 1e-9)
             signal_tier = metric.get("signal_tier") or "steady"
-            rank = metric_strength + (2.0 if metric.get("composite") else 0.0) + (1.0 if signal_tier == "confirmed" else 0.0)
+            rank = metric_strength + (2.0 if metric.get("composite") else 0.0) + (1.5 if is_regime else 0.0) + (1.0 if signal_tier == "confirmed" else 0.0)
             candidates.append((rank, metric))
         candidates.sort(key=lambda x: -x[0])
         for _rank, metric in candidates[:MAX_INFLECTION_EVENTS_PER_TICKER]:
+            is_regime = metric.get("signal_type") == "regime"
             trend = metric.get("direction")
             points = metric.get("points") or []
-            as_of = (points[-1].get("period") if points else None) or (doc or {}).get("generated_at")
+            as_of = metric.get("as_of") or (points[-1].get("period") if points else None) or (doc or {}).get("generated_at")
             label = metric.get("label") or metric.get("metric") or "KPI"
-            good_when_up = metric_base_name(metric.get("metric") or "") not in INVERTED_TREND_METRICS
-            if trend == "accelerating":
-                direction = "bullish" if good_when_up else "bearish"
+            base_name = metric_base_name(metric.get("metric") or "")
+            good_when_up = base_name not in INVERTED_TREND_METRICS
+            if is_regime:
+                direction = "bearish" if trend == "downshift" else "bullish"
+                title = f"{label}"
+                event_type = "regime_shift"
             else:
-                direction = "bearish" if good_when_up else "bullish"
+                if trend == "accelerating":
+                    direction = "bullish" if good_when_up else "bearish"
+                else:
+                    direction = "bearish" if good_when_up else "bullish"
+                title = f"{label} {trend}"
+                event_type = "inflection"
             source_label = {
                 "sec_fundamentals": "SEC XBRL quarterly filings",
                 "equity_model": "the equity model",
@@ -415,12 +445,12 @@ def from_kpi_trends(doc: dict | None) -> list[dict]:
                     as_of=as_of,
                     scope="ticker",
                     ref=str(ticker).upper(),
-                    title=f"{label} {trend}",
+                    title=title,
                     claim=_kpi_inflection_claim(metric, source_label=source_label),
                     direction=direction,
                     confidence=confidence,
                     evidence_ref=metric.get("evidence_ref"),
-                    event_type="inflection",
+                    event_type=event_type,
                     impact_axis="fundamentals",
                     trend=trend,
                     trend_metric=metric.get("metric"),
@@ -430,6 +460,25 @@ def from_kpi_trends(doc: dict | None) -> list[dict]:
                     trend_source=metric.get("source"),
                     trend_signal_tier=metric.get("signal_tier"),
                     trend_composite=metric.get("composite"),
+                )
+            )
+
+        leadership = entry.get("leadership_risk") or {}
+        if leadership.get("level") in ("elevated", "watch"):
+            factors = leadership.get("factors") or []
+            factor_text = "; ".join(f.get("title", "") for f in factors[:2] if f.get("title"))
+            out.append(
+                insight_record(
+                    source="kpi_trend",
+                    as_of=(factors[0].get("as_of") if factors else None) or (doc or {}).get("generated_at"),
+                    scope="ticker",
+                    ref=str(ticker).upper(),
+                    title=leadership.get("label") or "Leadership risk",
+                    claim=f"{leadership.get('label')}. {factor_text}".strip(),
+                    direction="bearish" if leadership.get("level") == "elevated" else "neutral",
+                    confidence="high" if leadership.get("level") == "elevated" else "med",
+                    event_type="leadership_risk",
+                    impact_axis="governance",
                 )
             )
     return out

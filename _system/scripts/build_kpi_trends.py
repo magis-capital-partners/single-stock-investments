@@ -27,6 +27,16 @@ import statistics
 from datetime import datetime, timezone
 from pathlib import Path
 
+from kpi_signal_enhancements import (
+    analyze_growth_regime,
+    compute_leadership_risk,
+    cross_metric_freshness,
+    passes_materiality,
+    resolve_revenue_series,
+    series_freshness,
+    STALE_SERIES_MAX_DAYS,
+)
+
 ROOT = Path(__file__).resolve().parents[2]
 OUTPUT = ROOT / "dashboard" / "data" / "kpi_trends.json"
 FUNDAMENTALS_DIR = ROOT / "_system" / "reference" / "market-data" / "fundamentals"
@@ -57,6 +67,7 @@ METRIC_TIER_PRIMARY = frozenset({"revenues", "revenue", "operating_income", "cfo
 METRIC_TIER_SECONDARY = frozenset({"net_income", "eps_basic", "news_flow"})
 METRIC_TIER_EXCLUDED = frozenset({"cash", "total_assets", "stockholders_equity", "long_term_debt"})
 CORE_COLLAPSE_METRICS = frozenset({"revenues", "revenue", "operating_income", "cfo"})
+REGIME_METRICS = frozenset({"revenues", "revenue", "operating_income", "cfo", "net_income", "eps_basic"})
 
 MATERIALITY_FLOORS: dict[str, float] = {
     "revenues": 0.03,
@@ -93,6 +104,12 @@ METRIC_LABELS = {
     "op_margin": "Operating margin",
     "cfo_margin": "Cash conversion (CFO/revenue)",
     "core_business": "Core business",
+    "growth_regime.revenues": "Revenue growth regime",
+    "growth_regime.revenue": "Revenue growth regime",
+    "growth_regime.operating_income": "Operating income growth regime",
+    "growth_regime.cfo": "Cash flow growth regime",
+    "growth_regime.net_income": "Net income growth regime",
+    "growth_regime.eps_basic": "EPS growth regime",
 }
 
 
@@ -184,28 +201,28 @@ def signal_tier_from_accels(accels: list[float], direction: str, threshold: floa
     return "emerging"
 
 
-def passes_materiality(growth_latest: float | None, metric_key: str) -> bool:
-    if growth_latest is None:
-        return False
-    floor = MATERIALITY_FLOORS.get(metric_base_name(metric_key), 0.03)
-    return abs(growth_latest) >= floor
-
-
 def enrich_analysis(
     analysis: dict,
     *,
     metric_key: str,
     raw_accels: list[float],
     ttm_analysis: dict | None = None,
+    series_meta: dict | None = None,
 ) -> dict:
-    """Attach tier, persistence, materiality, strength, and TTM agreement."""
+    """Attach tier, persistence, materiality, strength, freshness, and TTM agreement."""
     direction = analysis["direction"]
     threshold = analysis["threshold"]
-    material = passes_materiality(analysis.get("growth_latest"), metric_key)
+    material = passes_materiality(analysis.get("growth_latest"), metric_key, direction=direction)
     tier = signal_tier_from_accels(raw_accels, direction, threshold)
     if not material and direction != "steady":
         direction = "steady"
         tier = "steady"
+
+    fresh = series_meta or {}
+    stale = bool(fresh.get("stale"))
+    if stale and direction != "steady":
+        tier = "steady"
+        direction = "steady"
 
     ttm_agrees: bool | None = None
     if ttm_analysis and analysis.get("basis") == "yoy":
@@ -236,6 +253,10 @@ def enrich_analysis(
         "ttm_agrees": ttm_agrees,
         "display": False,
         "composite": False,
+        "stale": stale,
+        "latest_period": fresh.get("latest_period"),
+        "series_age_days": fresh.get("age_days"),
+        "revenue_proxy": bool(fresh.get("proxy")),
     }
     return out
 
@@ -284,6 +305,7 @@ def analyze_growth_values(
     mode: str,
     points: list[dict],
     suspect: int = 0,
+    series_meta: dict | None = None,
 ) -> dict | None:
     min_growth = YOY_MIN_GROWTH_POINTS if basis == "yoy" else 3
     if len(gvals) < min_growth:
@@ -311,7 +333,12 @@ def analyze_growth_values(
         "suspect_points": suspect,
         "points": points,
     }
-    return enrich_analysis(analysis, metric_key=metric_key, raw_accels=accels)
+    return enrich_analysis(
+        analysis,
+        metric_key=metric_key,
+        raw_accels=accels,
+        series_meta=series_meta,
+    )
 
 
 def quarterly_to_ttm(ordered: list[tuple[str, float]]) -> list[tuple[str, float]]:
@@ -320,7 +347,12 @@ def quarterly_to_ttm(ordered: list[tuple[str, float]]) -> list[tuple[str, float]
     return [(ordered[i][0], sum(v for _p, v in ordered[i - 3 : i + 1])) for i in range(3, len(ordered))]
 
 
-def analyze_quarterly_yoy(series: list[dict], *, metric_key: str = "") -> dict | None:
+def analyze_quarterly_yoy(
+    series: list[dict],
+    *,
+    metric_key: str = "",
+    series_meta: dict | None = None,
+) -> dict | None:
     """Second derivative of year-over-year growth for a quarterly series."""
     cleaned: dict[str, float] = {}
     for point in series:
@@ -333,6 +365,7 @@ def analyze_quarterly_yoy(series: list[dict], *, metric_key: str = "") -> dict |
     if len(ordered) < YOY_MIN_QUARTERS:
         return None
 
+    meta = dict(series_meta or series_freshness(series))
     dates = [parse_date(p) for p, _v in ordered]
     values = [v for _p, v in ordered]
     growths, suspect = compute_yoy_growths(ordered, dates, values)
@@ -351,6 +384,7 @@ def analyze_quarterly_yoy(series: list[dict], *, metric_key: str = "") -> dict |
         mode="pct",
         points=points,
         suspect=suspect,
+        series_meta=meta,
     )
     if result is None:
         return None
@@ -369,24 +403,76 @@ def analyze_quarterly_yoy(series: list[dict], *, metric_key: str = "") -> dict |
                 basis="yoy",
                 mode="pct",
                 points=[{"period": p, "value": v} for p, v in ttm_ordered[-MAX_POINTS:]],
+                series_meta=meta,
             )
             if ttm_result:
                 smooth = rolling_median(gvals)
                 ttm_accels = [b - a for a, b in zip(smooth, smooth[1:])] if len(smooth) > 1 else []
                 base = {k: v for k, v in result.items() if k not in (
                     "signal_tier", "tier", "material", "strength", "confidence",
-                    "ttm_agrees", "display", "composite",
+                    "ttm_agrees", "display", "composite", "stale", "latest_period",
+                    "series_age_days", "revenue_proxy",
                 )}
                 result = enrich_analysis(
                     base,
                     metric_key=metric_key,
                     raw_accels=ttm_accels,
                     ttm_analysis=ttm_result,
+                    series_meta=meta,
                 )
                 result["ttm_direction"] = ttm_result.get("direction")
                 result["ttm_growth_latest"] = ttm_result.get("growth_latest")
 
     return result
+
+
+def yoy_growth_series(series: list[dict]) -> list[tuple[str, float]]:
+    cleaned: dict[str, float] = {}
+    for point in series:
+        value = to_float(point.get("value"))
+        period = str(point.get("period") or "")[:10]
+        if value is None or not parse_date(period):
+            continue
+        cleaned[period] = value
+    ordered = sorted(cleaned.items())
+    if len(ordered) < YOY_MIN_QUARTERS:
+        return []
+    dates = [parse_date(p) for p, _v in ordered]
+    values = [v for _p, v in ordered]
+    growths, _ = compute_yoy_growths(ordered, dates, values)
+    return growths
+
+
+def build_regime_metric(
+    growths: list[tuple[str, float]],
+    *,
+    metric_key: str,
+    series: list[dict],
+    evidence_ref: str,
+    series_meta: dict | None = None,
+) -> dict | None:
+    regime = analyze_growth_regime(growths, metric_key=metric_key)
+    if not regime:
+        return None
+    meta = series_meta or series_freshness(series)
+    if meta.get("stale"):
+        return None
+    regime.update(
+        {
+            "source": "sec_fundamentals",
+            "evidence_ref": evidence_ref,
+            "points": [
+                {"period": str(x.get("period") or "")[:10], "value": x.get("value")}
+                for x in series[-MAX_POINTS:]
+                if x.get("period")
+            ],
+            "stale": False,
+            "latest_period": meta.get("latest_period"),
+            "series_age_days": meta.get("age_days"),
+            "revenue_proxy": bool(meta.get("proxy")),
+        }
+    )
+    return regime
 
 
 def analyze_series(
@@ -509,14 +595,19 @@ def collapse_core_signals(metrics: list[dict]) -> list[dict]:
 
 
 def apply_display_cap(metrics: list[dict]) -> None:
-    """Cap visible inflections: composites first, then 2 primary + 1 secondary."""
+    """Cap visible inflections: composites first, then regime, then 2 primary + 1 secondary."""
     for m in metrics:
         if m.get("composite"):
+            continue
+        if m.get("stale"):
+            m["display"] = False
             continue
         if m.get("tier") == "excluded":
             m["display"] = False
             continue
-        if m.get("direction") not in ("accelerating", "decelerating"):
+        if m.get("signal_type") == "regime":
+            continue
+        if m.get("direction") not in ("accelerating", "decelerating", "downshift", "upshift"):
             m["display"] = False
             continue
         if m.get("signal_tier") == "steady":
@@ -525,29 +616,63 @@ def apply_display_cap(metrics: list[dict]) -> None:
         if "display" not in m or m.get("collapsed_into"):
             m["display"] = False
 
+    regime_candidates = sorted(
+        [
+            m
+            for m in metrics
+            if m.get("signal_type") == "regime"
+            and not m.get("stale")
+            and m.get("direction") in ("downshift", "upshift")
+            and m.get("signal_tier") in ("confirmed", "emerging")
+        ],
+        key=lambda m: m.get("strength") or 0,
+        reverse=True,
+    )
+    for m in regime_candidates[:1]:
+        m["display"] = True
+
     candidates = [
         m
         for m in metrics
         if not m.get("composite")
+        and m.get("signal_type") != "regime"
         and m.get("direction") in ("accelerating", "decelerating")
         and m.get("signal_tier") in ("confirmed", "emerging")
         and m.get("tier") != "excluded"
         and not m.get("collapsed_into")
+        and not m.get("stale")
     ]
     primary = sorted([m for m in candidates if m.get("tier") == "primary"], key=strength, reverse=True)
     secondary = sorted([m for m in candidates if m.get("tier") == "secondary"], key=strength, reverse=True)
 
-    for m in primary[:MAX_PRIMARY_DISPLAY]:
+    shown = sum(1 for m in metrics if m.get("display"))
+    for m in primary[: max(0, MAX_PRIMARY_DISPLAY - shown)]:
         m["display"] = True
-    for m in secondary[:MAX_SECONDARY_DISPLAY]:
-        m["display"] = True
+        shown += 1
+    for m in secondary[: max(0, MAX_SECONDARY_DISPLAY - (shown - sum(1 for x in metrics if x.get("display"))))]:
+        if not m.get("display"):
+            m["display"] = True
 
 
 def compute_business_momentum(metrics: list[dict]) -> dict | None:
     score = 0.0
     weight_sum = 0.0
     for m in metrics:
+        if m.get("stale"):
+            continue
         base = metric_base_name(m.get("metric") or "")
+        if m.get("signal_type") == "regime":
+            if m.get("direction") == "downshift":
+                sign = -1.0
+                weight = BMS_WEIGHTS.get(base.replace("growth_regime.", ""), 0.25)
+            elif m.get("direction") == "upshift":
+                sign = 1.0
+                weight = BMS_WEIGHTS.get(base.replace("growth_regime.", ""), 0.25)
+            else:
+                continue
+            score += sign * weight * min(m.get("strength") or 1.0, 3.0)
+            weight_sum += weight
+            continue
         weight = BMS_WEIGHTS.get(base)
         if not weight or m.get("direction") not in ("accelerating", "decelerating"):
             continue
@@ -573,24 +698,39 @@ def compute_business_momentum(metrics: list[dict]) -> dict | None:
     }
 
 
-def finalize_ticker_entry(entry: dict) -> None:
+def finalize_ticker_entry(entry: dict, *, leadership_risk: dict | None = None) -> None:
     metrics = entry.get("metrics") or []
     metrics[:] = collapse_core_signals(metrics)
     apply_display_cap(metrics)
 
-    summary = {"accelerating": 0, "decelerating": 0, "steady": 0, "confirmed": 0, "emerging": 0, "displayed": 0}
+    summary = {
+        "accelerating": 0,
+        "decelerating": 0,
+        "steady": 0,
+        "confirmed": 0,
+        "emerging": 0,
+        "displayed": 0,
+        "regime_downshift": 0,
+        "stale_suppressed": 0,
+    }
     for m in metrics:
         direction = m.get("direction") or "steady"
-        if direction in summary:
+        if m.get("signal_type") == "regime" and direction == "downshift":
+            summary["regime_downshift"] += 1
+        elif direction in summary:
             summary[direction] += 1
         tier = m.get("signal_tier")
         if tier in ("confirmed", "emerging"):
             summary[tier] += 1
+        if m.get("stale") and m.get("direction") not in ("steady", None):
+            summary["stale_suppressed"] += 1
         if m.get("display"):
             summary["displayed"] += 1
 
     entry["summary"] = summary
     entry["business_momentum"] = compute_business_momentum(metrics)
+    if leadership_risk:
+        entry["leadership_risk"] = leadership_risk
 
 
 def fundamentals_series() -> dict[str, dict[str, list[dict]]]:
@@ -721,27 +861,53 @@ def build_trends() -> dict:
         )
 
     for ticker, metrics in sorted(fundamentals.items()):
-        revenue_series = metrics.get("revenues") or metrics.get("revenue")
+        evidence_ref = f"_system/reference/market-data/fundamentals/{ticker}.json"
+        freshness = cross_metric_freshness(metrics)
+        revenue_series, rev_meta = resolve_revenue_series(metrics)
         derived: dict[str, list[dict]] = {}
-        if revenue_series:
+        if revenue_series and not rev_meta.get("proxy"):
             if metrics.get("operating_income"):
                 derived["op_margin"] = derive_ratio_series(metrics["operating_income"], revenue_series)
             if metrics.get("cfo"):
                 derived["cfo_margin"] = derive_ratio_series(metrics["cfo"], revenue_series)
 
         all_metrics = {**metrics, **derived}
+        growths_by_metric: dict[str, list[tuple[str, float]]] = {}
+
         for metric, series in sorted(all_metrics.items()):
-            analysis = analyze_quarterly_yoy(series, metric_key=metric)
+            if metric == "revenues" and rev_meta.get("stale"):
+                continue
+
+            meta = freshness.get(metric) or series_freshness(series)
+            if metric == "revenues" and rev_meta.get("proxy"):
+                meta = {**rev_meta, "proxy": True}
+
+            if metric in REGIME_METRICS and not meta.get("stale"):
+                growths = yoy_growth_series(series)
+                if growths:
+                    growths_by_metric[metric] = growths
+
+            analysis = analyze_quarterly_yoy(series, metric_key=metric, series_meta=meta)
             if analysis is None:
                 continue
+
             suspect_excluded += analysis.pop("suspect_points", 0) or 0
-            add_metric(
-                ticker,
-                metric,
-                "sec_fundamentals",
-                analysis,
-                f"_system/reference/market-data/fundamentals/{ticker}.json",
+            add_metric(ticker, metric, "sec_fundamentals", analysis, evidence_ref)
+
+        for metric, growths in growths_by_metric.items():
+            if metric not in REGIME_METRICS:
+                continue
+            series = all_metrics.get(metric) or []
+            meta = freshness.get(metric) or series_freshness(series)
+            regime = build_regime_metric(
+                growths,
+                metric_key=metric,
+                series=series,
+                evidence_ref=evidence_ref,
+                series_meta=meta,
             )
+            if regime:
+                add_metric(ticker, regime["metric"], "sec_fundamentals", regime, evidence_ref)
 
     equity_model_tickers = set()
     for ticker in sorted(((models_doc or {}).get("tickers") or {}).keys()):
@@ -759,15 +925,25 @@ def build_trends() -> dict:
     confirmed_count = 0
     emerging_count = 0
     displayed_count = 0
+    regime_count = 0
+    stale_suppressed = 0
+    leadership_elevated = 0
     strength_values: list[float] = []
 
-    for entry in by_ticker.values():
-        finalize_ticker_entry(entry)
+    for ticker, entry in by_ticker.items():
+        leadership = compute_leadership_risk(ticker, news_doc if isinstance(news_doc, dict) else {})
+        finalize_ticker_entry(entry, leadership_risk=leadership)
+        if leadership.get("level") in ("elevated", "watch"):
+            leadership_elevated += 1
         for metric in entry.get("metrics") or []:
             if metric.get("signal_tier") == "confirmed":
                 confirmed_count += 1
             elif metric.get("signal_tier") == "emerging":
                 emerging_count += 1
+            if metric.get("signal_type") == "regime" and metric.get("direction") == "downshift":
+                regime_count += 1
+            if metric.get("stale"):
+                stale_suppressed += 1
             if metric.get("display"):
                 displayed_count += 1
                 strength_values.append(metric.get("strength") or 0)
@@ -791,7 +967,11 @@ def build_trends() -> dict:
             "confirmed_count": confirmed_count,
             "emerging_count": emerging_count,
             "displayed_count": displayed_count,
+            "regime_downshift_count": regime_count,
+            "stale_suppressed_count": stale_suppressed,
+            "leadership_risk_watch": leadership_elevated,
             "avg_strength": round(statistics.mean(strength_values), 3) if strength_values else 0.0,
+            "stale_max_days": STALE_SERIES_MAX_DAYS,
         },
         "by_ticker": by_ticker,
     }

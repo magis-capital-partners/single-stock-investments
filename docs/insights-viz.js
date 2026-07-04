@@ -759,31 +759,41 @@
     };
   }
 
-  function recordQuarter(record, fields) {
+  function recordQuarterIds(record, fields) {
+    const ids = new Set();
     for (const field of fields) {
       const q = parseQuarter(record?.[field]);
-      if (q) return q.id;
+      if (q) ids.add(q.id);
     }
-    return null;
+    return ids;
   }
 
   function periodMatchesRecord(record, period, fields) {
     if (!period || period.all) return true;
-    const qid = recordQuarter(record, fields);
-    return qid ? period.quarterSet.has(qid) : false;
+    const ids = recordQuarterIds(record, fields);
+    if (!ids.size) return false;
+    for (const qid of ids) {
+      if (period.quarterSet.has(qid)) return true;
+    }
+    return false;
   }
 
   function periodCoverage(period, timeModel, letterIndex, funds) {
     const letters = (letterIndex || []).filter(r => periodMatchesRecord(r, period, ['quarter', 'letter_date']));
     const fundRows = (funds || []).filter(r => periodMatchesRecord(r, period, ['quarter', 'letter_date']));
-    const folderCount = period.all
-      ? timeModel.quarters.reduce((sum, q) => sum + (q.source_folder_count || 0), 0)
-      : period.quarters.reduce((sum, id) => sum + (timeModel.byId[id]?.source_folder_count || 0), 0);
+    const quarterRows = period.all
+      ? timeModel.quarters
+      : period.quarters.map(id => timeModel.byId[id]).filter(Boolean);
+    const folderCount = quarterRows.reduce((sum, q) => sum + (q.source_folder_count || 0), 0);
+    const drivePdfCount = quarterRows.reduce((sum, q) => sum + (q.document_count || 0), 0);
+    const indexedInPeriod = quarterRows.reduce((sum, q) => sum + (q.indexed_count || 0), 0);
     return {
       letters: letters.length,
       funds: fundRows.length,
       quarters: period.all ? timeModel.quarters.length : period.quarters.length,
       folderCount,
+      drivePdfCount,
+      indexedInPeriod,
     };
   }
 
@@ -1036,9 +1046,15 @@
 
   function trendBadge(direction, signalTier) {
     const tierHint = signalTier === 'confirmed' ? ' (confirmed)' : signalTier === 'emerging' ? ' (emerging)' : '';
-    if (direction === 'accelerating') return `<span class="badge badge-ok" title="Growth accelerating${tierHint}">▲▲</span>`;
-    if (direction === 'decelerating') return `<span class="badge badge-bad" title="Growth decelerating${tierHint}">▼▼</span>`;
+    if (direction === 'accelerating' || direction === 'upshift') return `<span class="badge badge-ok" title="Growth accelerating${tierHint}">▲▲</span>`;
+    if (direction === 'decelerating' || direction === 'downshift') return `<span class="badge badge-bad" title="Growth decelerating${tierHint}">▼▼</span>`;
     return '<span class="badge badge-us">steady</span>';
+  }
+
+  function leadershipRiskBadge(risk, escapeHtml) {
+    if (!risk || !risk.level || risk.level === 'none') return '';
+    const cls = risk.level === 'elevated' ? 'badge-bad' : 'badge-us';
+    return `<span class="badge ${cls}" title="${escapeHtml(risk.label || risk.level)}">gov ${risk.level}</span>`;
   }
 
   function signalTierBadge(signalTier, escapeHtml) {
@@ -1058,20 +1074,23 @@
 
   function renderTickerTrendBadges(trends, escapeHtml) {
     const entry = trends || {};
+    const parts = [];
+    const gov = leadershipRiskBadge(entry.leadership_risk, escapeHtml);
+    if (gov) parts.push(gov);
     const bms = entry.business_momentum;
     if (bms && bms.direction && bms.direction !== 'steady') {
-      return `<span title="${escapeHtml(bms.label || bms.direction)}" style="margin-right:4px">${trendBadge(bms.direction, 'confirmed')}</span>`;
+      parts.push(`<span title="${escapeHtml(bms.label || bms.direction)}" style="margin-right:4px">${trendBadge(bms.direction, 'confirmed')}</span>`);
     }
     const metrics = entry.metrics || [];
-    const firing = metrics.filter(m => m.display && (m.direction === 'accelerating' || m.direction === 'decelerating'));
+    const firing = metrics.filter(m => m.display && (m.direction === 'accelerating' || m.direction === 'decelerating' || m.direction === 'downshift' || m.direction === 'upshift'));
     if (!firing.length) {
-      const fallback = metrics.filter(m => m.direction === 'accelerating' || m.direction === 'decelerating');
-      if (!fallback.length) return '';
-      return fallback.slice(0, 2).map(m =>
+      const fallback = metrics.filter(m => m.direction === 'accelerating' || m.direction === 'decelerating' || m.direction === 'downshift');
+      if (!fallback.length) return parts.join('');
+      return parts.join('') + fallback.slice(0, 2).map(m =>
         `<span title="${escapeHtml(`${m.label || m.metric}: ${m.direction}`)}" style="margin-right:4px">${trendBadge(m.direction, m.signal_tier)}</span>`
       ).join('');
     }
-    return firing.slice(0, 2).map(m =>
+    return parts.join('') + firing.slice(0, 2).map(m =>
       `<span title="${escapeHtml(`${m.label || m.metric}: ${m.direction}`)}" style="margin-right:4px">${trendBadge(m.direction, m.signal_tier)}</span>`
     ).join('');
   }
@@ -1108,7 +1127,9 @@
     ];
     if (cov.displayed_count != null) parts.push(`${cov.displayed_count} displayed signals`);
     if (cov.confirmed_count != null) parts.push(`${cov.confirmed_count} confirmed`);
-    if (cov.emerging_count != null) parts.push(`${cov.emerging_count} emerging`);
+    if (cov.regime_downshift_count != null) parts.push(`${cov.regime_downshift_count} regime downshifts`);
+    if (cov.stale_suppressed_count) parts.push(`${cov.stale_suppressed_count} stale series suppressed`);
+    if (cov.leadership_risk_watch) parts.push(`${cov.leadership_risk_watch} leadership/gov watch`);
     if (cov.suspect_points_excluded) parts.push(`${cov.suspect_points_excluded} suspect datapoints excluded`);
     return `<p class="tier-sub" style="margin-bottom:4px">Coverage: ${parts.join(' · ')}. Operating flow metrics prioritized; balance-sheet drift hidden by default.</p>`;
   }
@@ -1145,6 +1166,7 @@
   function inflectionTierTabs(activeTier, escapeHtml) {
     const tiers = [
       { id: 'displayed', label: 'Displayed' },
+      { id: 'regime', label: 'Growth regime' },
       { id: 'confirmed', label: 'Confirmed' },
       { id: 'emerging', label: 'Emerging' },
       { id: 'all', label: 'All signals' },
@@ -1156,11 +1178,14 @@
   }
 
   function matchesInflectionTier(row, tier) {
-    if (tier === 'all') return row.direction === 'accelerating' || row.direction === 'decelerating';
+    if (tier === 'all') {
+      return row.direction === 'accelerating' || row.direction === 'decelerating' || row.direction === 'downshift' || row.direction === 'upshift';
+    }
     if (tier === 'balance_sheet') {
       return (row.tier === 'excluded' || ['cash', 'total_assets', 'stockholders_equity', 'long_term_debt'].includes(String(row.metric || '').split('.').pop()))
         && (row.direction === 'accelerating' || row.direction === 'decelerating');
     }
+    if (tier === 'regime') return row.signal_type === 'regime' && (row.direction === 'downshift' || row.direction === 'upshift');
     if (tier === 'confirmed') return row.signal_tier === 'confirmed';
     if (tier === 'emerging') return row.signal_tier === 'emerging';
     return !!row.display;
@@ -1173,7 +1198,7 @@
     const rows = [];
     Object.entries(byTicker).forEach(([ticker, entry]) => {
       (entry.metrics || []).forEach(m => {
-        if (m.direction !== 'accelerating' && m.direction !== 'decelerating') return;
+        if (!['accelerating', 'decelerating', 'downshift', 'upshift'].includes(m.direction)) return;
         rows.push({ ticker, ...m });
       });
     });
@@ -1208,7 +1233,7 @@
           ${filtered.slice(0, 120).map(r => `
             <tr>
               <td><button type="button" class="linkish mono" data-select-ticker="${escapeHtml(r.ticker)}">${escapeHtml(r.ticker)}</button></td>
-              <td>${escapeHtml(r.label || r.metric)}${r.composite && r.composite_members ? `<div class="tier-sub">${escapeHtml(r.composite_members.join(', '))}</div>` : ''}</td>
+              <td>${escapeHtml(r.label || r.metric)}${r.composite && r.composite_members ? `<div class="tier-sub">${escapeHtml(r.composite_members.join(', '))}</div>` : ''}${r.stale ? '<div class="tier-sub">stale series</div>' : ''}${r.revenue_proxy ? '<div class="tier-sub">revenue proxy</div>' : ''}${r.signal_type === 'regime' ? '<div class="tier-sub">growth regime</div>' : ''}</td>
               <td>${trendBadge(r.direction, r.signal_tier)}</td>
               <td>${signalTierBadge(r.signal_tier, escapeHtml)}</td>
               <td class="mono">${escapeHtml(formatGrowth(r))}${r.ttm_agrees === true ? ' ✓TTM' : r.ttm_agrees === false ? ' ✗TTM' : ''}</td>
@@ -1851,7 +1876,7 @@
           <input class="search" id="fund-registry-search" placeholder="Search ticker, event, fund, theme, source..." value="${escapeHtml(fundSearch)}" style="max-width:320px" />
         </div>
         ${showPeriodControls ? `<div class="tier-sub">
-          Viewing ${escapeHtml(period.label)} &middot; ${coverage.quarters} quarter(s) &middot; ${coverage.letters} indexed letter(s) &middot; ${coverage.funds} fund row(s)${coverage.folderCount ? ` &middot; ${coverage.folderCount} Drive source folder(s)` : ''}
+          Viewing ${escapeHtml(period.label)} &middot; ${coverage.quarters} quarter(s) &middot; ${coverage.letters} indexed letter(s)${coverage.drivePdfCount ? ` &middot; ${coverage.drivePdfCount} catalog PDF(s)` : ''} &middot; ${coverage.funds} fund row(s)${coverage.folderCount ? ` &middot; ${coverage.folderCount} Drive source folder(s)` : ''}${coverage.letters === 0 && coverage.drivePdfCount > 0 ? ' &middot; <span style="color:var(--accent-amber)">PDFs in Drive — run letter import</span>' : ''}
         </div>` : ''}
       </div>
       ${body}`;
