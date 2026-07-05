@@ -8,6 +8,7 @@ on:
       - "_system/scripts/ci_resolve_checkout_ref.sh"
       - "_system/scripts/ci_sparse_checkout_paths.py"
       - "_system/scripts/test_ci_checkout_workspace.sh"
+      - "_system/scripts/test_ci_checkout_vault.sh"
       - "_system/scripts/lint_ci_bootstrap.py"
       - ".github/workflows/**"
   push:
@@ -17,6 +18,7 @@ on:
       - "_system/scripts/ci_resolve_checkout_ref.sh"
       - "_system/scripts/ci_sparse_checkout_paths.py"
       - "_system/scripts/test_ci_checkout_workspace.sh"
+      - "_system/scripts/test_ci_checkout_vault.sh"
       - "_system/scripts/lint_ci_bootstrap.py"
       - ".github/workflows/**"
 
@@ -38,6 +40,8 @@ jobs:
           fetch-depth: 1
       - name: Unit test ref resolution
         run: bash _system/scripts/test_ci_checkout_workspace.sh
+      - name: Unit test vault checkout URL helpers
+        run: bash _system/scripts/test_ci_checkout_vault.sh
       - name: Unit test vault paths
         run: python _system/scripts/test_vault_paths.py
       - name: Lint workflow bootstrap blocks
