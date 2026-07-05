@@ -2,10 +2,20 @@
 # Commit and push changes in the research-vault working tree.
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+# shellcheck disable=SC1091
+source "$SCRIPT_DIR/ci_checkout_vault_lib.sh"
+
 VAULT_ROOT="${RESEARCH_VAULT_ROOT:-_external/research-vault}"
 MSG="${1:?commit message required}"
 GIT_ADD="${2:--A}"
 MAX_ATTEMPTS="${CI_PUSH_MAX_ATTEMPTS:-5}"
+CLONE_TOKEN="$(trim_clone_token "${RESEARCH_VAULT_CLONE_TOKEN:-}")"
+
+git_auth_args=()
+if [ -n "$CLONE_TOKEN" ]; then
+  git_auth_args=(-c "http.extraHeader=AUTHORIZATION: bearer ${CLONE_TOKEN}")
+fi
 
 if [ ! -d "$VAULT_ROOT/.git" ]; then
   echo "::error::Vault git dir not found at $VAULT_ROOT"
@@ -27,7 +37,7 @@ git commit -m "$MSG"
 
 attempt=1
 while [ "$attempt" -le "$MAX_ATTEMPTS" ]; do
-  git fetch origin main 2>/dev/null || git fetch origin master 2>/dev/null || true
+  git "${git_auth_args[@]}" fetch origin main 2>/dev/null || git "${git_auth_args[@]}" fetch origin master 2>/dev/null || true
   BRANCH=$(git symbolic-ref --short HEAD 2>/dev/null || echo main)
   if git show-ref --verify --quiet "refs/remotes/origin/$BRANCH"; then
     if ! git rebase "origin/$BRANCH"; then
@@ -36,7 +46,7 @@ while [ "$attempt" -le "$MAX_ATTEMPTS" ]; do
       exit 1
     fi
   fi
-  if git push origin "HEAD:$BRANCH"; then
+  if git "${git_auth_args[@]}" push origin "HEAD:$BRANCH"; then
     echo "Vault pushed (attempt $attempt)."
     exit 0
   fi
