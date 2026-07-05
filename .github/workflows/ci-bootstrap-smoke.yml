@@ -8,6 +8,8 @@ on:
       - "_system/scripts/ci_resolve_checkout_ref.sh"
       - "_system/scripts/ci_sparse_checkout_paths.py"
       - "_system/scripts/test_ci_checkout_workspace.sh"
+      - "_system/scripts/test_ci_checkout_vault.sh"
+      - "_system/scripts/ci_checkout_vault.sh"
       - "_system/scripts/lint_ci_bootstrap.py"
       - ".github/workflows/**"
   push:
@@ -17,6 +19,8 @@ on:
       - "_system/scripts/ci_resolve_checkout_ref.sh"
       - "_system/scripts/ci_sparse_checkout_paths.py"
       - "_system/scripts/test_ci_checkout_workspace.sh"
+      - "_system/scripts/test_ci_checkout_vault.sh"
+      - "_system/scripts/ci_checkout_vault.sh"
       - "_system/scripts/lint_ci_bootstrap.py"
       - ".github/workflows/**"
 
@@ -31,13 +35,19 @@ jobs:
         with:
           sparse-checkout: |
             _system/scripts/ci_resolve_checkout_ref.sh
+            _system/scripts/ci_checkout_vault.sh
             _system/scripts/test_ci_checkout_workspace.sh
+            _system/scripts/test_ci_checkout_vault.sh
+            _system/scripts/test_vault_paths.py
+            _system/scripts/vault_paths.py
             _system/scripts/lint_ci_bootstrap.py
             .github/workflows
           sparse-checkout-cone-mode: false
           fetch-depth: 1
       - name: Unit test ref resolution
         run: bash _system/scripts/test_ci_checkout_workspace.sh
+      - name: Unit test vault checkout URL normalization
+        run: bash _system/scripts/test_ci_checkout_vault.sh
       - name: Unit test vault paths
         run: python _system/scripts/test_vault_paths.py
       - name: Lint workflow bootstrap blocks
