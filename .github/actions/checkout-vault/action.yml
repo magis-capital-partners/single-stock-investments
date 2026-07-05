@@ -20,27 +20,13 @@ runs:
           exit 1
         fi
 
+    # Use ci_checkout_vault.sh (bearer PAT + token trim). Nested actions/checkout does
+    # not reliably receive secrets from composite-action env and falls back to GITHUB_TOKEN.
     - name: Clone research vault
-      uses: actions/checkout@v4
-      with:
-        repository: magis-capital-partners/research-vault
-        ref: ${{ inputs.vault_ref }}
-        path: _external/research-vault
-        token: ${{ env.RESEARCH_VAULT_CLONE_TOKEN }}
-        fetch-depth: 1
-
-    - name: Export RESEARCH_VAULT_ROOT
       shell: bash
-      run: |
-        root="${RESEARCH_VAULT_ROOT:-_external/research-vault}"
-        echo "RESEARCH_VAULT_ROOT=$root" >> "$GITHUB_ENV"
-        python3 - <<'PY' || true
-        import json, os, sys
-        sys.path.insert(0, "_system/scripts")
-        os.environ["RESEARCH_VAULT_ROOT"] = os.environ.get("RESEARCH_VAULT_ROOT", "_external/research-vault")
-        from vault_paths import vault_status
-        status = vault_status()
-        print(json.dumps(status, indent=2))
-        if not status.get("letters_exists"):
-            print("::warning::superinvestor-letters missing in cloned research-vault")
-        PY
+      env:
+        RESEARCH_VAULT_REPO_URL: ${{ env.RESEARCH_VAULT_REPO_URL }}
+        RESEARCH_VAULT_CLONE_TOKEN: ${{ env.RESEARCH_VAULT_CLONE_TOKEN }}
+        RESEARCH_VAULT_ROOT: ${{ env.RESEARCH_VAULT_ROOT }}
+        RESEARCH_VAULT_REF: ${{ inputs.vault_ref }}
+      run: bash _system/scripts/ci_checkout_vault.sh
