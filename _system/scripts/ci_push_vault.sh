@@ -16,6 +16,10 @@ cd "$VAULT_ROOT"
 git config user.name "${GIT_AUTHOR_NAME:-github-actions[bot]}"
 git config user.email "${GIT_AUTHOR_EMAIL:-41898282+github-actions[bot]@users.noreply.github.com}"
 
+if [ -n "${RESEARCH_VAULT_CLONE_TOKEN:-}" ] && ! git config --local --get http.https://github.com/.extraheader >/dev/null 2>&1; then
+  git config http.https://github.com/.extraheader "AUTHORIZATION: bearer ${RESEARCH_VAULT_CLONE_TOKEN}"
+fi
+
 git add $GIT_ADD
 
 if git diff --staged --quiet; then
