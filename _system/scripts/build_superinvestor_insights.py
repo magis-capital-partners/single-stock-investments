@@ -21,7 +21,7 @@ sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 
 import letter_matching as lm  # noqa: E402
 from fund_registry import FundResolver  # noqa: E402
-from vault_paths import letters_root  # noqa: E402
+from vault_paths import letters_root, path_to_letters_ref  # noqa: E402
 
 LETTERS_ROOT = letters_root()
 INCOMING = LETTERS_ROOT / "INCOMING"
@@ -177,6 +177,16 @@ def extract_lead_summary(text: str, max_chars: int = 480) -> str:
     return summary[:max_chars].strip()
 
 
+def _stable_ref(path: Path) -> str:
+    ref = path_to_letters_ref(path)
+    if ref:
+        return ref
+    try:
+        return str(path.relative_to(ROOT)).replace("\\", "/")
+    except ValueError:
+        return str(path).replace("\\", "/")
+
+
 def source_document_ref(path: Path) -> str:
     candidates = []
     if path.suffix.lower() in {".txt", ".md"}:
@@ -184,8 +194,8 @@ def source_document_ref(path: Path) -> str:
     candidates.append(path)
     for candidate in candidates:
         if candidate.exists():
-            return str(candidate.relative_to(ROOT)).replace("\\", "/")
-    return str(path.relative_to(ROOT)).replace("\\", "/")
+            return _stable_ref(candidate)
+    return _stable_ref(path)
 
 
 def scan_letter_files() -> list[Path]:
@@ -259,7 +269,7 @@ def build_letter_record(path: Path, resolver: FundResolver, master: lm.SecurityM
         "letter_date": meta.get("letter_date"),
         "date_source": meta.get("date_source"),
         "fund_resolution": meta.get("resolution"),
-        "source_file": str(path.relative_to(ROOT)).replace("\\", "/"),
+        "source_file": _stable_ref(path),
         "source_document": source_document_ref(path),
         "lead_summary": extract_lead_summary(text),
         "themes": themes,

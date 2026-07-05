@@ -24,7 +24,7 @@ from filing_facts import (  # noqa: E402
     filing_metadata_from_text_path,
     source_filing_ref_from_text_path,
 )
-from vault_paths import letters_ref, letters_root  # noqa: E402
+from vault_paths import letters_ref, letters_root, path_to_letters_ref  # noqa: E402
 
 OUTPUT = ROOT / "dashboard" / "data" / "insights.json"
 ARCHIVE_OUTPUT = ROOT / "_system" / "reference" / "data-sources" / "insights_record_archive.json"
@@ -205,7 +205,13 @@ def to_float(value) -> float | None:
 
 
 def relative_path(path: Path) -> str:
-    return str(path.relative_to(ROOT)).replace("\\", "/")
+    try:
+        return str(path.relative_to(ROOT)).replace("\\", "/")
+    except ValueError:
+        ref = path_to_letters_ref(path)
+        if ref:
+            return ref
+        return str(path).replace("\\", "/")
 
 
 def source_document_ref(ref: str | None) -> str | None:
