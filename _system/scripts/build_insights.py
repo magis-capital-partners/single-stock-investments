@@ -24,10 +24,11 @@ from filing_facts import (  # noqa: E402
     filing_metadata_from_text_path,
     source_filing_ref_from_text_path,
 )
+from vault_paths import letters_ref, letters_root  # noqa: E402
 
 OUTPUT = ROOT / "dashboard" / "data" / "insights.json"
 ARCHIVE_OUTPUT = ROOT / "_system" / "reference" / "data-sources" / "insights_record_archive.json"
-LETTERS_INSIGHTS = ROOT / "_system" / "reference" / "superinvestor-letters" / "insights.json"
+LETTERS_INSIGHTS = letters_root() / "insights.json"
 NEWS_PATH = ROOT / "dashboard" / "data" / "portfolio_news.json"
 THEMES_DIR = ROOT / "_system" / "reference" / "market-data" / "themes"
 INSIDER_DIR = ROOT / "_system" / "reference" / "market-data" / "insider"
@@ -92,9 +93,11 @@ LETTER_BOILERPLATE_PHRASES = (
 )
 
 # Non-letter inventory/readme paths that should not appear in fund registry.
+from vault_paths import letters_ref  # noqa: E402
+
 LETTER_META_SOURCE_FILES = {
-    "_system/reference/superinvestor-letters/readme.md",
-    "_system/reference/superinvestor-letters/readme.pdf",
+    letters_ref("readme.md"),
+    letters_ref("readme.pdf"),
 }
 
 

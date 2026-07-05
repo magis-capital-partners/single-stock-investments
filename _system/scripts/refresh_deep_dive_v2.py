@@ -10,12 +10,16 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import sys
 from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "_system" / "scripts"))
+from vault_paths import wisdom_root  # noqa: E402
+
 APPROVED_THIRD_PARTY = ROOT / "_system" / "frameworks" / "third_party_sources.md"
-HK_INDEX = ROOT / "_system" / "reference" / "investment-wisdom" / "hk_ticker_index.json"
+HK_INDEX = wisdom_root() / "hk_ticker_index.json"
 VALUATION_BRIDGE_START = re.compile(r"#### Valuation bridge", re.IGNORECASE)
 HOLDING_CO_KEEP = re.compile(
     r"#### (Look-through snapshot|Sum-of-parts or NAV|Catalyst path)",

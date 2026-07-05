@@ -23,7 +23,10 @@ from urllib.request import Request, urlopen
 
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPTS = Path(__file__).resolve().parent
-LETTERS_ROOT = ROOT / "_system" / "reference" / "superinvestor-letters"
+sys.path.insert(0, str(SCRIPTS))
+from vault_paths import letters_root  # noqa: E402
+
+LETTERS_ROOT = letters_root()
 SOURCES_PATH = LETTERS_ROOT / "sources.json"
 INCOMING = LETTERS_ROOT / "INCOMING"
 FETCH_LOG = LETTERS_ROOT / "fetch_log.jsonl"

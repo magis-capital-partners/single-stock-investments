@@ -28,7 +28,10 @@ from pathlib import Path
 
 SCRIPTS = Path(__file__).resolve().parent
 ROOT = SCRIPTS.parents[1]
-LETTERS_ROOT = ROOT / "_system" / "reference" / "superinvestor-letters"
+sys.path.insert(0, str(SCRIPTS))
+from vault_paths import letters_root  # noqa: E402
+
+LETTERS_ROOT = letters_root()
 MANIFEST_PATH = LETTERS_ROOT / "drive_import_manifest.json"
 IMPORT_LOG = LETTERS_ROOT / "drive_import_log.jsonl"
 FILENAME_INDEX_PATH = ROOT / "_system" / "reference" / "document-store" / "drive_filename_index.json"

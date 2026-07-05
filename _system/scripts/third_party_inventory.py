@@ -3,12 +3,16 @@ from __future__ import annotations
 
 import json
 import re
+import sys
 from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "_system" / "scripts"))
+from vault_paths import wisdom_root  # noqa: E402
+
 THIRD_PARTY_MD = ROOT / "_system" / "frameworks" / "third_party_sources.md"
-HK_INDEX = ROOT / "_system" / "reference" / "investment-wisdom" / "hk_ticker_index.json"
+HK_INDEX = wisdom_root() / "hk_ticker_index.json"
 
 # Human bulk-approved: promote inventory context rows to approved for synthesis blend
 BULK_CONTEXT_APPROVED_TICKERS = frozenset(

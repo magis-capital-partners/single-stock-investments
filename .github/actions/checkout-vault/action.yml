@@ -1,0 +1,20 @@
+name: Checkout research vault
+description: Clone or update magis-capital-partners/research-vault into RESEARCH_VAULT_ROOT
+
+inputs:
+  vault_ref:
+    description: Git ref for vault repo (default main)
+    required: false
+    default: main
+
+runs:
+  using: composite
+  steps:
+    - name: Clone research vault
+      shell: bash
+      env:
+        RESEARCH_VAULT_REPO_URL: ${{ env.RESEARCH_VAULT_REPO_URL }}
+        RESEARCH_VAULT_CLONE_TOKEN: ${{ env.RESEARCH_VAULT_CLONE_TOKEN }}
+        RESEARCH_VAULT_ROOT: ${{ env.RESEARCH_VAULT_ROOT }}
+        RESEARCH_VAULT_REF: ${{ inputs.vault_ref }}
+      run: bash _system/scripts/ci_checkout_vault.sh

@@ -7,6 +7,8 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "_system" / "scripts"))
+from vault_paths import letters_root  # noqa: E402
 DATA_PATH = ROOT / "dashboard" / "data" / "dashboard_data.json"
 REGISTRY_PATH = ROOT / "_system" / "portfolio" / "registry.json"
 INSIGHTS_PATH = ROOT / "dashboard" / "data" / "insights.json"
@@ -142,7 +144,7 @@ def main() -> int:
             errors.append("insights.source_health missing expected local sources")
         letter_count = insights.get("letter_count") or 0
         letter_index_len = len(insights.get("letter_index") or [])
-        manifest_path = ROOT / "_system/reference/superinvestor-letters/drive_import_manifest.json"
+        manifest_path = letters_root() / "drive_import_manifest.json"
         manifest_count = 0
         if manifest_path.exists():
             try:

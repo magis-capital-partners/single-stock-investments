@@ -1,0 +1,20 @@
+name: Commit and push research vault
+description: Stage and push changes in the private research-vault clone
+
+inputs:
+  message:
+    description: Commit message
+    required: true
+  git_add:
+    description: Arguments to git add (relative to vault root)
+    required: false
+    default: "-A"
+
+runs:
+  using: composite
+  steps:
+    - name: Push vault changes
+      shell: bash
+      env:
+        RESEARCH_VAULT_ROOT: ${{ env.RESEARCH_VAULT_ROOT }}
+      run: bash _system/scripts/ci_push_vault.sh "${{ inputs.message }}" "${{ inputs.git_add }}"

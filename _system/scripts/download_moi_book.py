@@ -26,7 +26,10 @@ from datetime import datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-DEST_DIR = ROOT / "_system/reference/investment-wisdom/mihaljevic"
+sys.path.insert(0, str(ROOT / "_system" / "scripts"))
+from vault_paths import wisdom_root  # noqa: E402
+
+DEST_DIR = wisdom_root() / "mihaljevic"
 TARGET_PDF = DEST_DIR / "Manual-of-Ideas-2nd-Edition.pdf"
 TARGET_EPUB = DEST_DIR / "Manual-of-Ideas-1st-Edition-2013.epub"
 FULL_TEXT = DEST_DIR / "Manual-of-Ideas-full-text.txt"

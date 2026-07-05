@@ -7,7 +7,10 @@ from datetime import datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-WISDOM = ROOT / "_system" / "reference" / "investment-wisdom"
+sys.path.insert(0, str(ROOT / "_system" / "scripts"))
+from vault_paths import wisdom_root  # noqa: E402
+
+WISDOM = wisdom_root()
 OUT = WISDOM / "manifest.csv"
 
 THEMES = {

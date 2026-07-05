@@ -38,6 +38,8 @@ jobs:
           fetch-depth: 1
       - name: Unit test ref resolution
         run: bash _system/scripts/test_ci_checkout_workspace.sh
+      - name: Unit test vault paths
+        run: python _system/scripts/test_vault_paths.py
       - name: Lint workflow bootstrap blocks
         run: python _system/scripts/lint_ci_bootstrap.py
 

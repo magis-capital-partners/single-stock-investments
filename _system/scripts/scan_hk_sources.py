@@ -23,12 +23,14 @@ from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-WISDOM = ROOT / "_system" / "reference" / "investment-wisdom"
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from vault_paths import wisdom_root  # noqa: E402
+
+WISDOM = wisdom_root()
 INDEX_PATH = WISDOM / "hk_ticker_index.json"
 PATHS_PATH = WISDOM / "hk_paths.json"
 HK_EXTRACTS = WISDOM / "horizon-kinetics"
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
 from hk_vault_paths import load_paths_cfg, resolve_vault_root  # noqa: E402
 
 HK_SCAN_BEGIN = "<!-- HK_SCAN_BEGIN -->"

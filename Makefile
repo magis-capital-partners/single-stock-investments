@@ -12,7 +12,7 @@ DATE ?= $(shell date +%Y-%m-%d)
 TICKER ?=
 DATE ?= $(shell date +%Y-%m-%d)
 
-.PHONY: research-check research-check-all depth-check depth-audit evidence milly-repass book-estimate book-estimate-all holdco-uplift short-scan activist-scan activist-scan-all activist-feed activist-feed-check hk-scan hk-cross-check-all hk-extract-refresh third-party-scan-all cross-check-all transcript-sync batch-refresh evidence-check darwin-pit-check darwin-build darwin-pit-audit darwin-sync-external darwin-explore persona-lens persona-insights persona-check document-registry document-catalog-search document-sync-drive document-sync-drive-letters document-sync-drive-general document-drive-plan document-drive-migrate document-drive-cleanup document-drive-audit research-memory sumzero-index letter-import-drive letter-backfill
+.PHONY: research-check research-check-all depth-check depth-audit evidence milly-repass book-estimate book-estimate-all holdco-uplift short-scan activist-scan activist-scan-all activist-feed activist-feed-check hk-scan hk-cross-check-all hk-extract-refresh third-party-scan-all cross-check-all transcript-sync batch-refresh evidence-check darwin-pit-check darwin-build darwin-pit-audit darwin-sync-external darwin-explore persona-lens persona-insights persona-check document-registry document-catalog-search document-sync-drive document-sync-drive-letters document-sync-drive-general document-drive-plan document-drive-migrate document-drive-cleanup document-drive-audit research-memory sumzero-index letter-import-drive letter-backfill vault-setup vault-check
 
 persona-lens:
 	$(PYTHON) $(SCRIPTS)/fetch_superinvestor_letters.py --all --build
@@ -284,3 +284,16 @@ transcript-sync:
 pages-sync:
 	$(PYTHON) $(SCRIPTS)/sync_pages_docs.py
 	@echo OK: pages-sync (dashboard/ copied to docs/ for GitHub Pages)
+
+vault-check:
+	PYTHONPATH=$(SCRIPTS) $(PYTHON) $(SCRIPTS)/test_vault_paths.py
+	RESEARCH_VAULT_ROOT="$${RESEARCH_VAULT_ROOT:-../research-vault}" PYTHONPATH=$(SCRIPTS) $(PYTHON) -c "from vault_paths import vault_status; import json, sys; s=vault_status(); print(json.dumps(s, indent=2)); sys.exit(0 if s.get('letters_exists') else 1)"
+	@echo OK: vault-check
+
+vault-extract:
+	bash $(SCRIPTS)/migrate_extract_vault.sh
+	@echo OK: vault-extract — push ../research-vault to GitHub, then make vault-remove-ops
+
+vault-remove-ops:
+	bash $(SCRIPTS)/migrate_remove_vault_from_ops.sh
+	@echo OK: vault-remove-ops

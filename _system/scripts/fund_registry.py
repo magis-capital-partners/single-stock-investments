@@ -17,11 +17,15 @@ from __future__ import annotations
 
 import json
 import re
+import sys
 from datetime import date, datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-LETTERS_ROOT = ROOT / "_system" / "reference" / "superinvestor-letters"
+sys.path.insert(0, str(ROOT / "_system" / "scripts"))
+from vault_paths import letters_root  # noqa: E402
+
+LETTERS_ROOT = letters_root()
 FUNDS_PATH = LETTERS_ROOT / "funds.json"
 UNRESOLVED_PATH = LETTERS_ROOT / "funds_unresolved.json"
 

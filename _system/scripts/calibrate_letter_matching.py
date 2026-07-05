@@ -24,8 +24,9 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 
 import letter_matching as lm  # noqa: E402
+from vault_paths import letters_root  # noqa: E402
 
-LETTERS_ROOT = ROOT / "_system" / "reference" / "superinvestor-letters"
+LETTERS_ROOT = letters_root()
 SECURITY_MASTER_PATH = ROOT / "_system" / "reference" / "securities" / "security_master.json"
 EVAL_DIR = LETTERS_ROOT / "_eval"
 GOLD_PATH = EVAL_DIR / "gold.jsonl"

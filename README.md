@@ -49,10 +49,19 @@ https://magis-capital-partners.github.io/single-stock-investments/
 
 | Item | URL |
 |------|-----|
-| **Repository** | [github.com/magis-capital-partners/single-stock-investments](https://github.com/magis-capital-partners/single-stock-investments) (private) |
+| **Operational repo** | [github.com/magis-capital-partners/single-stock-investments](https://github.com/magis-capital-partners/single-stock-investments) |
+| **Research vault (private)** | [github.com/magis-capital-partners/research-vault](https://github.com/magis-capital-partners/research-vault) — letters, HK PDFs, licensed sources |
 | **Dashboard (Pages)** | [magis-capital-partners.github.io/single-stock-investments](https://magis-capital-partners.github.io/single-stock-investments/) |
 
-Everything lives in one repo: Marvin workspace + `dashboard/` for Pages. **No PAT required** for dashboard sync.
+Sensitive reference corpora live in **`research-vault`**; this repo holds code, portfolio, CI, and dashboard payloads. See [`_system/reference/research-vault-split.md`](_system/reference/research-vault-split.md) for setup.
+
+**Local vault clone:**
+
+```powershell
+git clone git@github.com:magis-capital-partners/research-vault.git ..\research-vault
+$env:RESEARCH_VAULT_ROOT = "..\research-vault"
+powershell -ExecutionPolicy Bypass -File _system/scripts/setup_local.ps1
+```
 
 ### One-time Pages setup
 
@@ -133,6 +142,8 @@ Push to `main` after downloads or research triggers a Pages deploy automatically
 | Secret | Required for | How to get |
 |--------|--------------|------------|
 | `GOOGLE_APPLICATION_CREDENTIALS_JSON` | Drive intake + PDF store sync | Full service-account JSON for `pdf-store-uploader@single-stock-pdf-store.iam.gserviceaccount.com`; folder access is already on the Shared Drive |
+| `RESEARCH_VAULT_REPO_URL` | Letter backfill + insight rebuilds | `https://github.com/magis-capital-partners/research-vault.git` |
+| `RESEARCH_VAULT_CLONE_TOKEN` | Clone/push private vault from CI | Fine-grained PAT with **Contents read+write** on `research-vault` |
 | `CURSOR_API_KEY` | Marvin deep dive in CI (manual + **daily auto**) | [Cursor Dashboard → Integrations](https://cursor.com/dashboard/integrations) |
 | `HK_PDFS_ROOT` | Optional — full HK vault on cloud agent VM (default `/opt/cursor/hk_pdfs`) | [Cursor Dashboard → Cloud Agents → Secrets](https://cursor.com/dashboard/cloud-agents); see `_system/frameworks/hk_cross_reference.md` |
 
@@ -161,7 +172,9 @@ Dashboard links use **filename date** (not mtime) for latest `deep_dive_*.md` / 
 
 ### Public repo note
 
-This repo is private because it contains ticker PDFs, research notes, and `_system/memory/MEMORY.md`. Review GitHub Pages access separately before assuming dashboard data is private.
+This repo contains portfolio research and ticker theses. Licensed letter/HK corpora are in the private **`research-vault`** repo. Review GitHub Pages access separately before assuming dashboard data is private.
+
+For unlimited GitHub Actions minutes, the **operational** repo can be made public (vault stays private). See `_system/reference/research-vault-split.md`.
 
 ## Structure
 

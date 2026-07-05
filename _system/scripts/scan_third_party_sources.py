@@ -25,8 +25,9 @@ sys.path.insert(0, str(SCRIPTS))
 
 from portfolio_registry import load_registry
 from third_party_inventory import write_inventory
+from vault_paths import wisdom_root  # noqa: E402
 
-HK_INDEX = ROOT / "_system" / "reference" / "investment-wisdom" / "hk_ticker_index.json"
+HK_INDEX = wisdom_root() / "hk_ticker_index.json"
 PY = sys.executable
 
 

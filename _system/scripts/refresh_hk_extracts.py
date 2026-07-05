@@ -23,7 +23,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-WISDOM = ROOT / "_system" / "reference" / "investment-wisdom"
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from vault_paths import wisdom_root  # noqa: E402
+
+WISDOM = wisdom_root()
 MANIFEST_PATH = WISDOM / "hk_extract_manifest.json"
 STATUS_PATH = WISDOM / "horizon-kinetics" / "extract_refresh_status.json"
 

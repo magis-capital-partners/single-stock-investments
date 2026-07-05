@@ -4,11 +4,15 @@ from __future__ import annotations
 
 import json
 import re
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-LETTERS_INDEX_PATH = ROOT / "_system/reference/superinvestor-letters/letters_index.json"
+sys.path.insert(0, str(ROOT / "_system" / "scripts"))
+from vault_paths import letters_root  # noqa: E402
+
+LETTERS_INDEX_PATH = letters_root() / "letters_index.json"
 FILENAME_INDEX_PATH = ROOT / "_system/reference/document-store/drive_filename_index.json"
 FOLDER_INDEX_PATH = ROOT / "_system/reference/document-store/drive_folder_index.json"
 OUTPUT_PATH = ROOT / "_system/reference/document-store/letter_drive_links.json"

@@ -29,6 +29,8 @@ Agent workflows (open PRs)
 | Path | Purpose |
 |------|---------|
 | `.github/actions/rebuild-data/` | Dashboard rebuild profiles |
+| `.github/actions/checkout-vault/` | Clone private `research-vault` |
+| `.github/actions/commit-vault/` | Push letter corpus to vault |
 | `.github/actions/commit-main/` | Push to main with rebase retry |
 | `.github/actions/deploy-oauth/` | Wrangler OAuth proxy deploy |
 | `.github/actions/publish-dashboard/` | Rebuild + validate + Pages deploy |
@@ -62,6 +64,12 @@ Ref resolution lives in `_system/scripts/ci_resolve_checkout_ref.sh` — **never
 | Replace bootstrap with a composite action | **Don't** — composites cannot run before the first checkout |
 
 **CI bootstrap smoke** (`.github/workflows/ci-bootstrap-smoke.yml`) runs unit tests plus a live `minimal` checkout on every PR that touches bootstrap scripts or research-quality workflow paths.
+
+## Research vault (two-repo split)
+
+Licensed corpora (superinvestor letters, HK PDFs) live in private **`magis-capital-partners/research-vault`**. CI clones it via `checkout-vault` before insight rebuilds and letter backfill. Operator guide: [`research-vault-split.md`](research-vault-split.md).
+
+Required ops-repo secrets: `RESEARCH_VAULT_REPO_URL`, `RESEARCH_VAULT_CLONE_TOKEN`.
 
 ## Visible workflows (~14)
 

@@ -3,15 +3,19 @@ from __future__ import annotations
 
 import json
 import re
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "_system" / "scripts"))
+from vault_paths import letters_root, resolve_ref_to_path  # noqa: E402
+
 REGISTRY_PATH = ROOT / "dashboard" / "data" / "document_registry.json"
 DRIVE_AUDIT_PATH = ROOT / "_system/reference/document-store/drive_audit_latest.json"
 DRIVE_FILENAME_INDEX_PATH = ROOT / "_system/reference/document-store/drive_filename_index.json"
 DRIVE_FOLDER_INDEX_PATH = ROOT / "_system/reference/document-store/drive_folder_index.json"
 LETTER_DRIVE_LINKS_PATH = ROOT / "_system/reference/document-store/letter_drive_links.json"
-LETTERS_INDEX_PATH = ROOT / "_system/reference/superinvestor-letters/letters_index.json"
+LETTERS_INDEX_PATH = letters_root() / "letters_index.json"
 
 
 def _clean_ref(ref: str | None) -> tuple[str | None, str]:
@@ -84,7 +88,7 @@ def document_for_ref(ref: str | None, registry: dict | None = None) -> dict | No
         return idx["by_pdf"][base]
     if base in idx["by_text"]:
         return idx["by_text"][base]
-    path = ROOT / base
+    path = resolve_ref_to_path(base) or (ROOT / base)
     if path.suffix.lower() in {".txt", ".md"}:
         pdf = str(path.with_suffix(".pdf").relative_to(ROOT)).replace("\\", "/")
         if pdf in idx["by_pdf"]:
@@ -400,7 +404,7 @@ def letter_evidence_url(
     doc = document_for_ref(base, registry)
     if doc:
         pdf_path = doc.get("local_pdf_path")
-        if pdf_path and Path(ROOT / pdf_path).exists():
+        if pdf_path and (resolve_ref_to_path(str(pdf_path)) or (ROOT / pdf_path)).exists():
             return github_blob_url(str(pdf_path), github_repo) + anchor
 
     if "superinvestor-letters" in base:
@@ -446,7 +450,7 @@ def best_document_url(ref: str | None, github_repo: str, registry: dict | None =
     if drive:
         return drive + anchor
 
-    path = ROOT / base
+    path = resolve_ref_to_path(base) or (ROOT / base)
     if path.suffix.lower() in {".pdf", ".txt", ".md"}:
         return pdf_github_url(base, github_repo, anchor)
 

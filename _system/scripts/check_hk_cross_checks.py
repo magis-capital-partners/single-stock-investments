@@ -12,7 +12,10 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-HK_INDEX = ROOT / "_system" / "reference" / "investment-wisdom" / "hk_ticker_index.json"
+sys.path.insert(0, str(ROOT / "_system" / "scripts"))
+from vault_paths import wisdom_root  # noqa: E402
+
+HK_INDEX = wisdom_root() / "hk_ticker_index.json"
 PY = sys.executable
 SCRIPTS = Path(__file__).resolve().parent
 
