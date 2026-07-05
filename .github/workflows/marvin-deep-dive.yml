@@ -50,6 +50,10 @@ jobs:
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'deep-dive'
     runs-on: ubuntu-latest
     timeout-minutes: 120
+    env:
+      RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+      RESEARCH_VAULT_ROOT: _external/research-vault
     steps:
       - uses: jlumbroso/free-disk-space@main
         with:
@@ -79,9 +83,6 @@ jobs:
         env:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
           HK_PDFS_ROOT: ${{ secrets.HK_PDFS_ROOT || '/opt/cursor/hk_pdfs' }}
-          RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
-          RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
-          RESEARCH_VAULT_ROOT: _external/research-vault
           GITHUB_REPOSITORY: ${{ github.repository }}
         with:
           ticker: ${{ github.event.inputs.ticker }}
@@ -90,6 +91,10 @@ jobs:
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'auto-pick'
     runs-on: ubuntu-latest
     timeout-minutes: 120
+    env:
+      RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+      RESEARCH_VAULT_ROOT: _external/research-vault
     steps:
       - uses: jlumbroso/free-disk-space@main
         with:
@@ -137,9 +142,6 @@ jobs:
         env:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
           HK_PDFS_ROOT: ${{ secrets.HK_PDFS_ROOT || '/opt/cursor/hk_pdfs' }}
-          RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
-          RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
-          RESEARCH_VAULT_ROOT: _external/research-vault
           GITHUB_REPOSITORY: ${{ github.repository }}
         with:
           ticker: ${{ steps.pick.outputs.ticker }}
@@ -211,6 +213,10 @@ jobs:
     if: needs.batch-prepare.outputs.tickers != '[]'
     runs-on: ubuntu-latest
     timeout-minutes: 120
+    env:
+      RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+      RESEARCH_VAULT_ROOT: _external/research-vault
     strategy:
       fail-fast: false
       max-parallel: ${{ fromJson(needs.batch-prepare.outputs.max_parallel) }}
@@ -239,9 +245,6 @@ jobs:
         env:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
           HK_PDFS_ROOT: ${{ secrets.HK_PDFS_ROOT || '/opt/cursor/hk_pdfs' }}
-          RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
-          RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
-          RESEARCH_VAULT_ROOT: _external/research-vault
           GITHUB_REPOSITORY: ${{ github.repository }}
         with:
           ticker: ${{ matrix.ticker }}

@@ -29,7 +29,7 @@ from pathlib import Path
 SCRIPTS = Path(__file__).resolve().parent
 ROOT = SCRIPTS.parents[1]
 sys.path.insert(0, str(SCRIPTS))
-from vault_paths import letters_root  # noqa: E402
+from vault_paths import letters_root, path_to_letters_ref  # noqa: E402
 
 LETTERS_ROOT = letters_root()
 MANIFEST_PATH = LETTERS_ROOT / "drive_import_manifest.json"
@@ -364,7 +364,7 @@ def main() -> int:
                 manifest_files[row["file_id"]] = {
                     "drive_file_id": row["file_id"],
                     "drive_path": row["drive_path"],
-                    "local_pdf_path": str(dest.relative_to(ROOT)).replace("\\", "/"),
+                    "local_pdf_path": path_to_letters_ref(dest) or str(dest).replace("\\", "/"),
                     "quarter": quarter,
                     "sha256": sha,
                     "size_bytes": len(data),

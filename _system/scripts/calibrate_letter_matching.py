@@ -24,7 +24,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 
 import letter_matching as lm  # noqa: E402
-from vault_paths import letters_root  # noqa: E402
+from vault_paths import letters_root, path_to_letters_ref  # noqa: E402
 
 LETTERS_ROOT = letters_root()
 SECURITY_MASTER_PATH = ROOT / "_system" / "reference" / "securities" / "security_master.json"
@@ -49,7 +49,13 @@ def scan_letters() -> list[Path]:
 
 
 def rel(path: Path) -> str:
-    return str(path.relative_to(ROOT)).replace("\\", "/")
+    ref = path_to_letters_ref(path)
+    if ref:
+        return ref
+    try:
+        return str(path.relative_to(ROOT)).replace("\\", "/")
+    except ValueError:
+        return str(path).replace("\\", "/")
 
 
 def summary(master: lm.SecurityMaster) -> None:

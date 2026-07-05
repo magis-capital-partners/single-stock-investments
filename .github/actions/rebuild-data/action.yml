@@ -18,18 +18,8 @@ runs:
   using: composite
   steps:
     - name: Checkout research vault (when configured)
-      if: env.RESEARCH_VAULT_REPO_URL != ''
-      shell: bash
-      env:
-        RESEARCH_VAULT_REPO_URL: ${{ env.RESEARCH_VAULT_REPO_URL }}
-        RESEARCH_VAULT_CLONE_TOKEN: ${{ env.RESEARCH_VAULT_CLONE_TOKEN }}
-        RESEARCH_VAULT_ROOT: ${{ env.RESEARCH_VAULT_ROOT }}
-      run: |
-        if [ -n "${RESEARCH_VAULT_REPO_URL:-}" ]; then
-          bash _system/scripts/ci_checkout_vault.sh
-        else
-          echo "RESEARCH_VAULT_REPO_URL not set; using legacy in-repo paths if present."
-        fi
+      if: env.RESEARCH_VAULT_CLONE_TOKEN != ''
+      uses: ./.github/actions/checkout-vault
 
     - name: Install Darwin dependencies
       if: contains(inputs.profile, 'darwin')

@@ -25,18 +25,15 @@ runs:
         fi
 
     - name: Checkout research vault (optional)
+      if: env.RESEARCH_VAULT_CLONE_TOKEN != ''
+      uses: ./.github/actions/checkout-vault
+    - name: Set HK vault path from research vault
+      if: env.RESEARCH_VAULT_CLONE_TOKEN != ''
       shell: bash
-      env:
-        RESEARCH_VAULT_REPO_URL: ${{ env.RESEARCH_VAULT_REPO_URL }}
-        RESEARCH_VAULT_CLONE_TOKEN: ${{ env.RESEARCH_VAULT_CLONE_TOKEN }}
-        RESEARCH_VAULT_ROOT: ${{ env.RESEARCH_VAULT_ROOT }}
       run: |
-        if [ -n "${RESEARCH_VAULT_REPO_URL:-}" ]; then
-          bash _system/scripts/ci_checkout_vault.sh
-          HK="${RESEARCH_VAULT_ROOT}/investment-wisdom/horizon-kinetics/pdfs"
-          if [ -d "$HK" ]; then
-            echo "HK_PDFS_ROOT=$HK" >> "$GITHUB_ENV"
-          fi
+        HK="${RESEARCH_VAULT_ROOT:-_external/research-vault}/investment-wisdom/horizon-kinetics/pdfs"
+        if [ -d "$HK" ]; then
+          echo "HK_PDFS_ROOT=$HK" >> "$GITHUB_ENV"
         fi
 
     - name: Set up Node.js
