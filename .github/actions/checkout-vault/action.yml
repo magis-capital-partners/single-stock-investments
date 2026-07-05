@@ -21,13 +21,13 @@ runs:
         fi
 
     - name: Clone research vault
-      uses: actions/checkout@v4
-      with:
-        repository: magis-capital-partners/research-vault
-        ref: ${{ inputs.vault_ref }}
-        path: _external/research-vault
-        token: ${{ env.RESEARCH_VAULT_CLONE_TOKEN }}
-        fetch-depth: 1
+      shell: bash
+      env:
+        RESEARCH_VAULT_REPO_URL: ${{ env.RESEARCH_VAULT_REPO_URL }}
+        RESEARCH_VAULT_CLONE_TOKEN: ${{ env.RESEARCH_VAULT_CLONE_TOKEN }}
+        RESEARCH_VAULT_ROOT: ${{ env.RESEARCH_VAULT_ROOT }}
+        RESEARCH_VAULT_REF: ${{ inputs.vault_ref }}
+      run: bash _system/scripts/ci_checkout_vault.sh
 
     - name: Export RESEARCH_VAULT_ROOT
       shell: bash
