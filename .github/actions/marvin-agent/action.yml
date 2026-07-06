@@ -27,6 +27,10 @@ runs:
     - name: Checkout research vault (optional)
       if: env.RESEARCH_VAULT_CLONE_TOKEN != ''
       uses: ./.github/actions/checkout-vault
+      env:
+        RESEARCH_VAULT_REPO_URL: ${{ env.RESEARCH_VAULT_REPO_URL }}
+        RESEARCH_VAULT_CLONE_TOKEN: ${{ env.RESEARCH_VAULT_CLONE_TOKEN }}
+        RESEARCH_VAULT_ROOT: ${{ env.RESEARCH_VAULT_ROOT }}
     - name: Set HK vault path from research vault
       if: env.RESEARCH_VAULT_CLONE_TOKEN != ''
       shell: bash
