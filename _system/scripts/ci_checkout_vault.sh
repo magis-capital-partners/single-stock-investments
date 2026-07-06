@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 # Clone or update the private research-vault repo for CI jobs.
 #
-# Prefer the checkout-vault composite action (actions/checkout) in workflows.
-# This script is used for local runs and commit-vault push auth.
+# Used by the checkout-vault composite action, local runs, and commit-vault push auth.
 #
 # Required secrets (ops repo):
 #   RESEARCH_VAULT_CLONE_TOKEN - fine-grained PAT with Contents: Read on research-vault

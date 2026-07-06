@@ -20,6 +20,10 @@ runs:
     - name: Checkout research vault (when configured)
       if: env.RESEARCH_VAULT_CLONE_TOKEN != ''
       uses: ./.github/actions/checkout-vault
+      env:
+        RESEARCH_VAULT_REPO_URL: ${{ env.RESEARCH_VAULT_REPO_URL }}
+        RESEARCH_VAULT_CLONE_TOKEN: ${{ env.RESEARCH_VAULT_CLONE_TOKEN }}
+        RESEARCH_VAULT_ROOT: ${{ env.RESEARCH_VAULT_ROOT }}
 
     - name: Install Darwin dependencies
       if: contains(inputs.profile, 'darwin')
