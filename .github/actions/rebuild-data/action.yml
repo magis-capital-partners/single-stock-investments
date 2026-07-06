@@ -13,12 +13,16 @@ inputs:
     description: Run validate_dashboard_data.py
     required: false
     default: "false"
+  vault_checkout:
+    description: Clone research-vault before rebuild (activist-only profiles skip vault)
+    required: false
+    default: "true"
 
 runs:
   using: composite
   steps:
     - name: Checkout research vault (when configured)
-      if: env.RESEARCH_VAULT_CLONE_TOKEN != ''
+      if: inputs.vault_checkout == 'true' && env.RESEARCH_VAULT_CLONE_TOKEN != ''
       uses: ./.github/actions/checkout-vault
 
     - name: Install Darwin dependencies
