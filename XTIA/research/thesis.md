@@ -1,6 +1,6 @@
 # XTIA — Investment Thesis
 
-**Last updated:** 2026-07-06
+**Last updated:** auto-sync
 
 ## Classification
 
@@ -11,12 +11,13 @@
 | **Dhando** (Pabrai) | none |
 | **Stance** | watch |
 | **Cycle** | trough |
-| **Implied 7yr IRR** (Lawrence) | pending sync |
-| **IRR method** | scenario |
+| **Implied 7yr IRR** (base) | 7.2% (base) |
+| **IRR method** | yield_curve |
 | **Lawrence bucket** | other |
-| **Valuation overlay** | optionality |
 | **Payoff lens** | event |
-| **MOI bucket** (legacy) | pending |
+| **MOI bucket** | pending |
+
+**Deep dive:** `XTIA/research/deep_dive_2026-07-06.md` (auto-sync)
 
 ## One-line thesis
 
