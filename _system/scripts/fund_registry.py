@@ -122,9 +122,10 @@ def parse_letter_date(stem: str, text: str | None, quarter: str | None) -> tuple
     # 3. quarter folder/path -> quarter-end date
     if quarter and re.match(r"20\d{2}Q[1-4]", quarter or "", re.I):
         yr = int(quarter[:4])
-        q = int(quarter[5])
-        mo, dy = QUARTER_END[q]
-        return date(yr, mo, dy).isoformat(), "quarter"
+        if sanity_year(yr) is not None:
+            q = int(quarter[5])
+            mo, dy = QUARTER_END[q]
+            return date(yr, mo, dy).isoformat(), "quarter"
     # 4. scan content head for "as of <date>" / Month DD, YYYY
     if text:
         head = text[:3000]
