@@ -85,17 +85,20 @@ jobs:
 
       - name: Import letters from Google Drive
         run: |
-          ARGS=(--all --build)
+          ARGS=(--all)
           if [ -n "${{ inputs.since_year }}" ]; then
             ARGS+=(--since-year "${{ inputs.since_year }}")
           fi
           if [ -n "${{ inputs.quarter }}" ]; then
-            ARGS=(--quarter "${{ inputs.quarter }}" --build)
+            ARGS=(--quarter "${{ inputs.quarter }}")
           fi
           if [ "${{ inputs.max_files }}" != "0" ] && [ -n "${{ inputs.max_files }}" ]; then
             ARGS+=(--max-files "${{ inputs.max_files }}")
           fi
           python _system/scripts/import_drive_letter_orphans.py "${ARGS[@]}"
+
+      - name: Extract text from local letter PDFs
+        run: python _system/scripts/import_drive_letter_orphans.py --skip-download --build
 
       - name: Sync letter registry to Drive
         run: make document-sync-drive-letters

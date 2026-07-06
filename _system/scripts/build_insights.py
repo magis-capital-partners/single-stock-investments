@@ -2153,7 +2153,7 @@ def main() -> int:
         "by_ticker": ticker_insights(records, front_tickers, company_hints),
     }
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-    _atomic_write(OUTPUT, json.dumps(payload, indent=2) + "\n")
+    _atomic_write(OUTPUT, json.dumps(payload, separators=(",", ":")) + "\n")
     print(f"Wrote {OUTPUT} ({len(records)} insight records, {len(events)} events, {len(letters)} letters)")
     return 0
 

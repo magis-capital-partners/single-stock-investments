@@ -12,7 +12,7 @@ DATE ?= $(shell date +%Y-%m-%d)
 TICKER ?=
 DATE ?= $(shell date +%Y-%m-%d)
 
-.PHONY: research-check research-check-all depth-check depth-audit evidence milly-repass book-estimate book-estimate-all holdco-uplift short-scan activist-scan activist-scan-all activist-triage activist-triage-check activist-feed activist-feed-check activist-registry-audit filing-resolve hk-scan hk-cross-check-all hk-extract-refresh third-party-scan-all cross-check-all transcript-sync batch-refresh evidence-check darwin-pit-check darwin-build darwin-pit-audit darwin-sync-external darwin-explore persona-lens persona-insights persona-check document-registry document-catalog-search document-sync-drive document-sync-drive-letters document-sync-drive-general document-drive-plan document-drive-migrate document-drive-cleanup document-drive-audit research-memory sumzero-index letter-import-drive letter-backfill letter-rebuild letter-repair-dates vault-setup vault-check
+.PHONY: research-check research-check-all depth-check depth-audit evidence milly-repass book-estimate book-estimate-all holdco-uplift short-scan activist-scan activist-scan-all activist-triage activist-triage-check activist-feed activist-feed-check activist-registry-audit filing-resolve hk-scan hk-cross-check-all hk-extract-refresh third-party-scan-all cross-check-all transcript-sync batch-refresh evidence-check darwin-pit-check darwin-build darwin-pit-audit darwin-sync-external darwin-explore persona-lens persona-insights persona-check document-registry document-catalog-search document-sync-drive document-sync-drive-letters document-sync-drive-general document-drive-plan document-drive-migrate document-drive-cleanup document-drive-audit research-memory sumzero-index letter-import-drive letter-extract-text letter-backfill letter-rebuild letter-repair-dates vault-setup vault-check
 
 persona-lens:
 	$(PYTHON) $(SCRIPTS)/fetch_superinvestor_letters.py --all --build
@@ -27,7 +27,12 @@ persona-fetch-letters:
 
 letter-import-drive:
 	$(PYTHON) $(SCRIPTS)/import_drive_letter_orphans.py --all --build
+	$(PYTHON) $(SCRIPTS)/import_drive_letter_orphans.py --skip-download --build
 	@echo OK: letter-import-drive
+
+letter-extract-text:
+	$(PYTHON) $(SCRIPTS)/import_drive_letter_orphans.py --skip-download --build
+	@echo OK: letter-extract-text
 
 letter-repair-dates:
 	$(PYTHON) $(SCRIPTS)/repair_letter_dates.py --apply
@@ -44,6 +49,7 @@ letter-rebuild:
 
 letter-backfill:
 	$(PYTHON) $(SCRIPTS)/import_drive_letter_orphans.py --all
+	$(PYTHON) $(SCRIPTS)/import_drive_letter_orphans.py --skip-download
 	$(PYTHON) $(SCRIPTS)/build_superinvestor_insights.py
 	$(PYTHON) $(SCRIPTS)/repair_letter_dates.py --apply
 	$(PYTHON) $(SCRIPTS)/build_insights.py

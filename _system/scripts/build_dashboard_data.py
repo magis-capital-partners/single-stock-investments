@@ -2001,7 +2001,7 @@ def main() -> None:
         payload["summary"]["activist_tickers_with_hits"] = (activist_feed.get("summary") or {}).get(
             "tickers_with_hits", 0
         )
-    OUTPUT.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    OUTPUT.write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
     write_oauth_config()
     print(f"Wrote {OUTPUT} ({payload['summary']['ticker_count']} tickers)")
 
