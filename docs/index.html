@@ -704,7 +704,13 @@ let insightsQuarter = 'latest';
 let fundRegistrySearch = '';
 let insightsBookOnly = true;
 let insightsNeedsReviewOnly = false;
-let insightsSection = 'inflections';
+let insightsSection = (() => {
+  try {
+    return localStorage.getItem(INSIGHTS_SECTION_KEY) || 'letters';
+  } catch (_) {
+    return 'letters';
+  }
+})();
 let insightsInflectionTier = 'displayed';
 let insightsTickerSourceFilter = 'ownership';
 let insightsPdfSourceTab = 'all';
@@ -721,6 +727,7 @@ let darwinEquityChart = null;
 let darwinHoldingsChart = null;
 
 const ROUTE_STORAGE_KEY = 'ssp_dashboard_route_v1';
+const INSIGHTS_SECTION_KEY = 'ssp_insights_section_v1';
 
 function normalizeAppHash(nextHash) {
   if (nextHash == null || nextHash === '') return '';
@@ -1142,6 +1149,7 @@ function renderInsights(opts = {}) {
   content.querySelectorAll('[data-insights-section]').forEach(btn => {
     btn.addEventListener('click', () => {
       insightsSection = btn.dataset.insightsSection;
+      try { localStorage.setItem(INSIGHTS_SECTION_KEY, insightsSection); } catch (_) { /* ignore */ }
       selectedFundId = null;
       renderInsights();
     });

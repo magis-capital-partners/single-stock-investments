@@ -544,13 +544,18 @@
       .sort((a, b) => (b.letter_count - a.letter_count) || String(a.theme).localeCompare(String(b.theme)));
   }
 
-  function renderLetterIndex(rows, escapeHtml, linkHtml, ghRepo, onFundClick) {
+  function renderLetterIndex(rows, escapeHtml, linkHtml, ghRepo, onFundClick, positionStats) {
     if (!rows?.length) {
       return '<p class="subhead">No letters indexed yet.</p>';
     }
+    const statsLine = positionStats
+      ? `<p class="tier-sub" style="margin-bottom:8px">${positionStats}</p>`
+      : '';
+    const fmtTickers = (list) => (list || []).slice(0, 5).join(', ') || '—';
     return `
+      ${statsLine}
       <table class="darwin-table" id="insights-letter-table">
-        <thead><tr><th>Date</th><th>Fund</th><th>Quarter</th><th>Themes</th><th>Tickers</th><th>Our overlap</th><th>Summary</th><th>Source</th></tr></thead>
+        <thead><tr><th>Date</th><th>Fund</th><th>Quarter</th><th>Themes</th><th>Tickers</th><th>New / Add</th><th>Trim / Exit</th><th>Our overlap</th><th>Summary</th><th>Source</th></tr></thead>
         <tbody>
           ${rows.slice(0, 80).map(r => `
             <tr class="clickable-row" data-fund-id="${escapeHtml(r.fund_id || '')}">
@@ -559,6 +564,8 @@
               <td class="mono">${escapeHtml(r.quarter || '—')}</td>
               <td style="font-size:11px">${(r.themes || []).slice(0, 4).join(', ') || '—'}</td>
               <td class="mono" style="font-size:11px">${(r.tickers || []).slice(0, 5).join(', ') || '—'}</td>
+              <td class="mono" style="font-size:11px;color:var(--accent-green)">${fmtTickers(r.adds)}</td>
+              <td class="mono" style="font-size:11px;color:var(--accent-amber)">${fmtTickers([...(r.trims || []), ...(r.exits || [])])}</td>
               <td class="mono" style="font-size:11px;color:var(--accent-cyan)">${(r.our_overlap || []).join(', ') || '—'}</td>
               <td style="font-size:11px;max-width:240px">${escapeHtml((r.lead_summary || '').slice(0, 120))}</td>
               <td>${recordEvidenceLink(r, linkHtml, ghRepo)}</td>
@@ -1796,7 +1803,7 @@
       bookOnly = false,
       needsReviewOnly = false,
       selectedFundId = null,
-      activeSection = 'events',
+      activeSection = 'letters',
       tickers = [],
       memory = null,
       documentCatalog = null,
@@ -1852,11 +1859,11 @@
         ]
       : [];
     const sections = [
+      { id: 'letters', label: 'Letters' },
       { id: 'inflections', label: 'Inflections' },
       { id: 'overview', label: 'Overview' },
       { id: 'events', label: 'What changed' },
       { id: 'consensus', label: 'Consensus' },
-      { id: 'letters', label: 'Letters' },
       { id: 'funds', label: 'Funds' },
       { id: 'documents', label: 'PDF library' },
       { id: 'tickers', label: 'Ticker insights' },
@@ -1875,8 +1882,13 @@
     } else if (activeSection === 'consensus') {
       body = renderConsensus(insights?.consensus, escapeHtml, linkHtml, ghRepo, { quarter, period, bookOnly, search: fundSearch, knownTickers });
     } else if (activeSection === 'letters') {
-      body = `<p class="tier-sub" style="margin-bottom:8px">${letters.length} letter(s) &middot; ${escapeHtml(period.label)}${bookOnly ? ' &middot; overlap with our book only' : ''}</p>`
-        + renderLetterIndex(letters, escapeHtml, linkHtml, ghRepo, true);
+      const prov = insights?.provenance || {};
+      const posPct = prov.letters_with_positions_pct != null
+        ? `${Math.round(Number(prov.letters_with_positions_pct) * 1000) / 10}% with disclosed positions`
+        : '';
+      const positionStats = [posPct, `${letters.length} letter(s)`, escapeHtml(period.label), bookOnly ? 'overlap with our book only' : ''].filter(Boolean).join(' · ');
+      body = `<p class="tier-sub" style="margin-bottom:8px">${escapeHtml(period.label)}${bookOnly ? ' · overlap with our book only' : ''}</p>`
+        + renderLetterIndex(letters, escapeHtml, linkHtml, ghRepo, true, positionStats);
     } else if (activeSection === 'funds') {
       body = renderFundRegistry(funds, escapeHtml, linkHtml, ghRepo, bookOnly);
     } else if (activeSection === 'documents') {
