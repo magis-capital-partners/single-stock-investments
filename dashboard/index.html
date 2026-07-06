@@ -1991,7 +1991,8 @@ window.addEventListener('hashchange', () => {
 });
 
 load().catch(err => {
-  document.getElementById('detail').innerHTML = `<div class="loading">Failed to load data/dashboard_data.json<br><br>${err}</div>`;
+  const msg = err && err.message ? err.message : String(err);
+  document.getElementById('detail').innerHTML = `<div class="loading">Failed to load data/dashboard_data.json<br><br>${escapeHtml(msg)}</div>`;
 });
 
 document.getElementById('btn-add-holding').addEventListener('click', () => openOnboardModal());

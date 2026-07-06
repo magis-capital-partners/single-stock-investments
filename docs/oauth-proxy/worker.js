@@ -77,8 +77,8 @@ export default {
     try {
       const text = await forwardToGitHub(githubPath, request);
       return new Response(text, { status: 200, headers });
-    } catch (e) {
-      return new Response(JSON.stringify({ error: 'proxy_failed', message: String(e) }), {
+    } catch (_e) {
+      return new Response(JSON.stringify({ error: 'proxy_failed' }), {
         status: 502,
         headers,
       });

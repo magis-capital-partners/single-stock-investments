@@ -66,12 +66,23 @@
     return `${Number(v).toFixed(d)}%`;
   }
 
+  function isDriveGoogleHost(hostname) {
+    const host = String(hostname || '').toLowerCase();
+    return host === 'drive.google.com' || host.endsWith('.drive.google.com');
+  }
+
   function evidenceLabel(ref, fallback) {
     const clean = (ref || '').split('#')[0].toLowerCase();
     const url = String(ref || '');
-    if (url.includes('drive.google.com/drive/folders/')) return 'Drive folder';
-    if (url.includes('drive.google.com')) return 'PDF';
-    if (clean.includes('drive.google.com')) return 'PDF';
+    if (url.startsWith('http')) {
+      try {
+        const parsed = new URL(url);
+        if (isDriveGoogleHost(parsed.hostname) && parsed.pathname.includes('/drive/folders/')) return 'Drive folder';
+        if (isDriveGoogleHost(parsed.hostname)) return 'PDF';
+      } catch (_) {
+        /* fall through */
+      }
+    }
     if (fallback && fallback !== 'Text') return fallback;
     if (clean.endsWith('.pdf')) return 'PDF';
     if (clean.endsWith('.htm') || clean.endsWith('.html')) return 'HTML';
