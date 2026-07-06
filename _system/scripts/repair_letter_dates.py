@@ -34,8 +34,20 @@ def repair_letter_record(letter: dict, text: str | None = None) -> bool:
         if part.upper().startswith("20") and "Q" in part.upper():
             folder_q = part.upper()
             break
-    quarter_hint = letter.get("quarter") or folder_q
+    stored_q = letter.get("quarter")
+    quarter_hint = folder_q
+    if stored_q:
+        try:
+            stored_year = int(str(stored_q)[:4])
+        except ValueError:
+            stored_year = None
+        if stored_year is not None and sanity_year(stored_year) is not None:
+            quarter_hint = stored_q
+        elif not quarter_hint:
+            quarter_hint = stored_q
     iso, date_source = parse_letter_date(stem, text, quarter_hint)
+    if iso and sanity_year(int(iso[:4])) is None:
+        iso, date_source = parse_letter_date(stem, text, folder_q)
     if not iso and folder_q:
         return False
     new_quarter = resolve_quarter(path, stem, iso, date_source or "none")

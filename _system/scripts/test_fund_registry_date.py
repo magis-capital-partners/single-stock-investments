@@ -23,6 +23,12 @@ class FundRegistryDateTests(unittest.TestCase):
         self.assertEqual(iso, "2011-12-31")
         self.assertIn(source, ("filename", "content", "quarter"))
 
+    def test_parse_letter_date_rejects_insane_quarter_hint(self) -> None:
+        stem = "Indaba Capital Quarterly Letter to Investors December 31 2011"
+        iso, source = parse_letter_date(stem, None, "2031Q4")
+        self.assertIsNone(iso)
+        self.assertEqual(source, "none")
+
     def test_resolve_quarter_prefers_folder(self) -> None:
         path = Path("_system/reference/superinvestor-letters/2011Q4/Indaba Capital Quarterly Letter to Investors December 31 2011.txt")
         q = resolve_quarter(path, path.stem, "2031-12-31", "filename")
