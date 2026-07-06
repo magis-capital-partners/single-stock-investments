@@ -18,6 +18,7 @@ from activist_common import (
     portfolio_tickers,
     save_ticker_index,
 )
+from milly_short_claim_check import check_short_claims
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -95,7 +96,8 @@ def reconcile_ticker(ticker: str, scan_date: str, *, write: bool = True) -> dict
         if r.get("include_in_feed", True)
         and (
             r.get("triage_verdict") == "human_review"
-            or r.get("status") in ("new", "cached", "triaged_auto")
+            or r.get("status") in ("new", "cached")
+            or (r.get("status") == "triaged_auto" and not r.get("milly_verdict"))
         )
     ]
     short_md = _short_md_claims(ticker)
@@ -149,8 +151,12 @@ def reconcile_ticker(ticker: str, scan_date: str, *, write: bool = True) -> dict
         lines.extend(["", "## Short markdown cache", ""])
         for block in short_md:
             lines.append(f"### `{block['path']}`")
-            for claim in block["claims"]:
-                lines.append(f"- {claim}")
+            checked = check_short_claims(ticker, block["claims"])
+            for row in checked:
+                lines.append(f"- **{row['verdict']}**: {row['claim'][:200]} ({row.get('cite') or row.get('note')})")
+            if not checked:
+                for claim in block["claims"]:
+                    lines.append(f"- {claim}")
             lines.append("")
     if human_rows:
         lines.extend(["", "## Notes (human review)", ""])

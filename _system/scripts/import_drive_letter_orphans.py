@@ -289,7 +289,38 @@ def main() -> int:
     parser.add_argument("--skip-text", action="store_true", help="Skip PDF -> txt extraction")
     parser.add_argument("--max-files", type=int, help="Limit downloads/extractions (smoke test)")
     parser.add_argument("--build", action="store_true", help="Run insights + dashboard build after import")
+    parser.add_argument("--report", action="store_true", help="Write letter_drive_gaps report without importing")
     args = parser.parse_args()
+
+    if args.report:
+        from datetime import date as date_cls
+
+        report_date = date_cls.today().isoformat()
+        out = ROOT / "_system" / "research" / f"letter_drive_gaps_{report_date}.md"
+        links_path = ROOT / "_system" / "reference" / "document-store" / "letter_drive_links.json"
+        insights_path = ROOT / "dashboard" / "data" / "insights.json"
+        letter_count = 0
+        matched = 0
+        if insights_path.exists():
+            letter_count = len(json.loads(insights_path.read_text(encoding="utf-8")).get("letter_index") or [])
+        if links_path.exists():
+            matched = int(json.loads(links_path.read_text(encoding="utf-8")).get("matched_count") or 0)
+        lines = [
+            "# Letter Drive link gaps",
+            "",
+            f"**Date:** {report_date}",
+            f"**Letter index rows:** {letter_count}",
+            f"**Drive links matched:** {matched}",
+            "",
+        ]
+        if letter_count and matched < letter_count:
+            lines.append(f"Unmatched estimate: {letter_count - matched}")
+        else:
+            lines.append("No gaps detected in summary counts.")
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        print(f"Wrote {out.relative_to(ROOT)}")
+        return 0
 
     if not args.all and not args.quarter and not args.skip_download:
         parser.error("Provide --all, --quarter 2025Q4, or --skip-download")

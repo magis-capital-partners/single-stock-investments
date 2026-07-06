@@ -74,6 +74,31 @@ HOLDINGS_HEADING_RE = re.compile(
     r"top contributors|portfolio composition)\b",
     re.I,
 )
+TABLE_CHANGE_TOKEN_RE = re.compile(
+    r"\b(new|added|add|increased|buy|trimmed|trim|reduced|sold|exit|closed|hold|unchanged|short)\b",
+    re.I,
+)
+TABLE_ROW_TICKER_RE = re.compile(
+    r"(?:\(([A-Z][A-Z0-9.\-]{0,11})\)|\$([A-Z][A-Z0-9.\-]{0,11})|"
+    r"\b([A-Z0-9]{1,6}\.[A-Z]{1,3})\b|"
+    r"\b([A-Z][A-Z0-9.\-]{1,5})\b)",
+)
+TABLE_CHANGE_MAP = {
+    "new": "new",
+    "added": "add",
+    "add": "add",
+    "increased": "add",
+    "buy": "add",
+    "trimmed": "trim",
+    "trim": "trim",
+    "reduced": "trim",
+    "sold": "exit",
+    "exit": "exit",
+    "closed": "exit",
+    "hold": "hold",
+    "unchanged": "hold",
+    "short": "short",
+}
 CONVICTION_HIGH_RE = re.compile(
     r"\b(high(?:est)? conviction|largest position|top position|core (?:holding|position)|"
     r"significant position|concentrated)\b",
@@ -450,6 +475,90 @@ def _classify_action(window: str) -> str | None:
     return None
 
 
+def _table_action_from_cell(cell: str) -> str | None:
+    m = TABLE_CHANGE_TOKEN_RE.search(cell or "")
+    if not m:
+        return None
+    return TABLE_CHANGE_MAP.get(m.group(1).lower())
+
+
+def _holdings_table_block(text: str) -> str:
+    m = HOLDINGS_HEADING_RE.search(text)
+    if not m:
+        return ""
+    start = m.end()
+    tail = text[start : start + 6000]
+    lines = tail.splitlines()
+    block: list[str] = []
+    blank = 0
+    for line in lines[:80]:
+        stripped = line.strip()
+        if not stripped:
+            blank += 1
+            if blank >= 2 and block:
+                break
+            continue
+        blank = 0
+        if block and re.match(r"^[A-Z][A-Za-z0-9 /&\-]{3,40}$", stripped) and "|" not in stripped and "\t" not in stripped:
+            if not TABLE_ROW_TICKER_RE.search(stripped):
+                break
+        block.append(stripped)
+    return "\n".join(block)
+
+
+def parse_holdings_table_rows(text: str, master: SecurityMaster) -> list[dict]:
+    """Parse structured holdings tables into tier-A/B mentions with actions."""
+    block = _holdings_table_block(text)
+    if not block:
+        return []
+    rows: list[dict] = []
+    seen: set[tuple[str, str]] = set()
+    for line in block.splitlines():
+        if len(line) < 4:
+            continue
+        parts = [p.strip() for p in re.split(r"\||\t", line) if p.strip()] if ("|" in line or "\t" in line) else [line]
+        if len(parts) < 1:
+            continue
+        action = None
+        for part in reversed(parts):
+            action = _table_action_from_cell(part)
+            if action:
+                break
+        if len(parts) < 2 and not action:
+            continue
+        blob = " ".join(parts)
+        ticker = None
+        for m in TABLE_ROW_TICKER_RE.finditer(blob):
+            sym = m.group(1) or m.group(2) or m.group(3) or m.group(4)
+            if not sym:
+                continue
+            resolved = master.resolve_symbol(sym) or master.resolve_numeric(sym)
+            if resolved and not is_benchmark(resolved):
+                ticker = resolved
+                break
+        if not ticker:
+            continue
+        key = (ticker, action or "hold")
+        if key in seen:
+            continue
+        seen.add(key)
+        rows.append(
+            {
+                "ticker": ticker,
+                "tier": "A",
+                "rules": ["holdings_table"],
+                "mention_count": 1,
+                "in_holdings_table": True,
+                "action": action or "hold",
+                "conviction": "high" if action in {"new", "add", "trim", "exit", "short"} else "med",
+                "evidence": re.sub(r"\s+", " ", line.strip())[:300],
+                "in_book": master.in_book(ticker),
+                "score": 8.0 + (3.0 if action in {"new", "add", "trim", "exit", "short"} else 0),
+            }
+        )
+    return rows
+
+
 def match_letter(text: str, master: SecurityMaster) -> list[dict]:
     """Return structured, tiered mentions for one letter."""
     holdings_zone = bool(HOLDINGS_HEADING_RE.search(text))
@@ -547,6 +656,18 @@ def match_letter(text: str, master: SecurityMaster) -> list[dict]:
             if b["tier"] == "C":
                 b["tier"] = "B" if near_action else "C"
 
+    # --- holdings table rows (explicit ticker + change column) ---
+    for row in parse_holdings_table_rows(text, master):
+        ticker = row["ticker"]
+        b = bucket(ticker)
+        b["rules"].add("holdings_table")
+        b["mention_count"] += 1
+        b["in_holdings_table"] = True
+        if TIER_RANK.get(row["tier"], 0) > TIER_RANK.get(b["tier"], 0):
+            b["tier"] = row["tier"]
+        if row.get("action") and row["action"] != "discuss":
+            b["table_action"] = row["action"]
+
     # --- finalize each candidate ---
     mentions: list[dict] = []
     for ticker, b in cand.items():
@@ -554,11 +675,12 @@ def match_letter(text: str, master: SecurityMaster) -> list[dict]:
             continue  # benchmark/index codes are not investable positions
         spans = sorted(set(b["spans"]))
         windows = [_window(text, p) for p in spans[:6]]
-        action = None
-        for w in windows:
-            action = _classify_action(w)
-            if action:
-                break
+        action = b.get("table_action")
+        if not action:
+            for w in windows:
+                action = _classify_action(w)
+                if action:
+                    break
         in_table = holdings_zone and any(
             HOLDINGS_HEADING_RE.search(text[max(0, p - 600):p]) for p in spans[:4]
         )

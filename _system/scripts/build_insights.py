@@ -25,6 +25,7 @@ from filing_facts import (  # noqa: E402
     source_filing_ref_from_text_path,
 )
 from vault_paths import letters_ref, letters_root, path_to_letters_ref  # noqa: E402
+from filing_review import filing_metric_needs_review, filing_metric_passes_sanity  # noqa: E402
 
 OUTPUT = ROOT / "dashboard" / "data" / "insights.json"
 ARCHIVE_OUTPUT = ROOT / "_system" / "reference" / "data-sources" / "insights_record_archive.json"
@@ -766,17 +767,6 @@ def pct_change(current: float | None, prior: float | None) -> float | None:
     return (current - prior) / abs(prior) * 100.0
 
 
-FILING_SKIP_FLAGS = {
-    "segment_zero_revenue",
-    "footnote_pairing",
-    "immaterial_prior",
-    "segment_context",
-    "magnitude_mismatch",
-    "legacy_pairing",
-    "non_statement_debt",
-}
-
-
 def filing_metric_confidence(metric: dict) -> str:
     parser_conf = str(metric.get("parser_confidence") or "low").lower()
     if parser_conf == "high":
@@ -784,32 +774,6 @@ def filing_metric_confidence(metric: dict) -> str:
     if parser_conf == "medium":
         return "med"
     return "low"
-
-
-def filing_metric_needs_review(metric: dict, change: float | None = None) -> bool:
-    flags = set(metric.get("parser_flags") or [])
-    parser_conf = str(metric.get("parser_confidence") or "low").lower()
-    if parser_conf == "low" and flags & FILING_SKIP_FLAGS:
-        return True
-    if parser_conf == "low" and change is not None and abs(change) > 200:
-        return True
-    return False
-
-
-def filing_metric_passes_sanity(name: str, metric: dict, change: float | None) -> bool:
-    flags = set(metric.get("parser_flags") or [])
-    parser_conf = str(metric.get("parser_confidence") or "low").lower()
-    if parser_conf == "low":
-        return False
-    if flags & FILING_SKIP_FLAGS:
-        return False
-    if change is None:
-        return False
-    if abs(change) > 500:
-        return False
-    if name in {"revenues", "revenue"} and to_float(metric.get("current")) == 0:
-        return False
-    return True
 
 
 def filing_verification_block(ticker: str, doc: dict, metric: dict, name: str) -> dict:
@@ -1272,8 +1236,10 @@ def letter_index(letters: list[dict], our_tickers: set[str]) -> list[dict]:
         tickers = [str(t).upper() for t in (letter.get("tickers") or [])]
         overlap = sorted(set(tickers) & our_tickers)
         positions = letter.get("positions") or []
-        adds = [p["ticker"] for p in positions if p.get("action") == "add" and p.get("ticker")]
-        trims = [p["ticker"] for p in positions if p.get("action") == "trim" and p.get("ticker")]
+        adds = [p["ticker"] for p in positions if p.get("action") in {"add", "new", "buy"} and p.get("ticker")]
+        trims = [p["ticker"] for p in positions if p.get("action") in {"trim", "exit"} and p.get("ticker")]
+        shorts = [p["ticker"] for p in positions if p.get("action") == "short" and p.get("ticker")]
+        exits = [p["ticker"] for p in positions if p.get("action") == "exit" and p.get("ticker")]
         letter_ev = letter_evidence_fields(letter)
         rows.append(
             {
@@ -1287,6 +1253,8 @@ def letter_index(letters: list[dict], our_tickers: set[str]) -> list[dict]:
                 "our_overlap": overlap,
                 "adds": adds[:8],
                 "trims": trims[:8],
+                "exits": exits[:8],
+                "shorts": shorts[:8],
                 "lead_summary": (letter.get("lead_summary") or "")[:320],
                 "maps_to_persona": letter.get("maps_to_persona") or [],
                 "source_file": letter.get("source_file"),
@@ -2081,8 +2049,8 @@ def write_record_archive(archive_doc: dict) -> dict:
     }
 
 
-def build_provenance(records: list[dict], events: list[dict]) -> dict:
-    return {
+def build_provenance(records: list[dict], events: list[dict], letter_stats: dict | None = None) -> dict:
+    out = {
         "schema_version": 2,
         "pipeline": relative_path(Path(__file__).resolve()),
         "generated_by": "build_insights.py",
@@ -2102,6 +2070,9 @@ def build_provenance(records: list[dict], events: list[dict]) -> dict:
             relative_path(THEMES_DIR),
         ],
     }
+    if letter_stats:
+        out.update(letter_stats)
+    return out
 
 
 def main() -> int:
@@ -2140,6 +2111,20 @@ def main() -> int:
 
     events = events_from_records(records, front_tickers, company_hints)
     archive_meta = write_record_archive(build_record_archive(records, front_tickers, company_hints))
+    letter_count = len(letters) or 1
+    with_positions = sum(1 for letter in letters if letter.get("positions"))
+    actionable = sum(
+        1
+        for letter in letters
+        if any(
+            p.get("action") in {"add", "trim", "new", "exit", "short", "buy"}
+            for p in (letter.get("positions") or [])
+        )
+    )
+    letter_stats = {
+        "letters_with_positions_pct": round(with_positions / letter_count, 4),
+        "letters_with_actionable_pct": round(actionable / letter_count, 4),
+    }
     payload = {
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "record_count": len(records),
@@ -2154,7 +2139,7 @@ def main() -> int:
             archive_meta,
         ),
         "data_source_candidates": terminalvalue_doc or {},
-        "provenance": build_provenance(records, events),
+        "provenance": build_provenance(records, events, letter_stats),
         "record_archive": archive_meta,
         "events": events,
         "events_by_ticker": events_by_ticker(events),

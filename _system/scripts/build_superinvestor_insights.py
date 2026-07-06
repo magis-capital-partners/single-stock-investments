@@ -295,6 +295,18 @@ def main() -> int:
     letters = [build_letter_record(f, resolver, master, persona_cfg) for f in files]
     resolver.write_unresolved()
 
+    with_positions = sum(1 for r in letters if r.get("positions"))
+    actionable = sum(
+        1
+        for r in letters
+        if any(p.get("action") in {"add", "trim", "new", "exit", "short", "buy"} for p in (r.get("positions") or []))
+    )
+    letter_count = len(letters) or 1
+    stats = {
+        "letters_with_positions_pct": round(with_positions / letter_count, 4),
+        "letters_with_actionable_pct": round(actionable / letter_count, 4),
+    }
+
     index = [
         {
             "fund_id": r["fund_id"],
@@ -316,6 +328,7 @@ def main() -> int:
         "letter_count": len(letters),
         "emit_min_tier": EMIT_MIN_TIER,
         "security_master_count": len(master.by_ticker),
+        "stats": stats,
         "letters": letters,
     }
     LETTERS_ROOT.mkdir(parents=True, exist_ok=True)

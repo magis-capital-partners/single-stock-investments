@@ -176,11 +176,27 @@ def main() -> int:
                 matched = int(links_doc.get("matched_count") or 0)
                 if matched == 0:
                     warnings.append("letter_drive_links matched_count=0 — run make letter-backfill")
+                elif letters_root().exists():
+                    ratio = matched / letter_index_len
+                    if ratio < 0.99:
+                        errors.append(
+                            f"letter_drive_links matched {matched}/{letter_index_len} ({ratio:.1%}); run make letter-backfill"
+                        )
             except json.JSONDecodeError:
                 warnings.append("letter_drive_links.json is invalid JSON")
         provenance = insights.get("provenance") or {}
         if provenance.get("schema_version") != 2:
             errors.append("insights provenance schema_version must be 2")
+        pos_pct = provenance.get("letters_with_positions_pct")
+        if pos_pct is not None and float(pos_pct) < 0.25:
+            warnings.append(
+                f"letters_with_positions_pct={float(pos_pct):.1%} below 25% floor — check letter_matching / holdings parser"
+            )
+        pending_legacy = list((ROOT / "_system/reviews/pending").glob("activist_scan_*.md"))
+        if pending_legacy:
+            warnings.append(
+                f"legacy activist_scan review queues still present ({len(pending_legacy)}); delete per pending/README.md"
+            )
 
     if ACTIVIST_FEED_PATH.exists():
         activist = json.loads(ACTIVIST_FEED_PATH.read_text(encoding="utf-8"))
@@ -211,6 +227,31 @@ def main() -> int:
                 errors.append(
                     f"activist feed {row.get('ticker')}/{row.get('firm_id')}: file on disk but file_exists false"
                 )
+            if row.get("triage_verdict") is None and row.get("source") != "short_reports_md":
+                errors.append(
+                    f"activist feed {row.get('ticker')}/{row.get('firm_id')}: missing triage_verdict"
+                )
+            if row.get("triage_verdict") == "auto_passive":
+                errors.append(
+                    f"activist feed {row.get('ticker')}/{row.get('firm_id')}: auto_passive row must not be in feed"
+                )
+        for ticker in holdings:
+            sr = ROOT / ticker / "third-party-analyses" / "short_reports"
+            if not sr.is_dir():
+                continue
+            index_path = ROOT / ticker / "third-party-analyses" / "activist_reports_index.json"
+            indexed_md: set[str] = set()
+            if index_path.exists():
+                idx = json.loads(index_path.read_text(encoding="utf-8"))
+                indexed_md = {
+                    str(r.get("local_file") or "").replace("\\", "/")
+                    for r in (idx.get("reports") or [])
+                    if r.get("source") == "short_reports_md"
+                }
+            for md in sr.glob("*.md"):
+                rel = str(md.relative_to(ROOT)).replace("\\", "/")
+                if rel not in indexed_md:
+                    warnings.append(f"short_reports MD not in activist index: {rel} — run activist scan")
 
     for msg in warnings:
         print(f"WARN: {msg}")

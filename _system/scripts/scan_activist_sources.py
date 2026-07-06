@@ -31,6 +31,7 @@ from build_activist_feed import build_feed
 from extract_activist_text import extract_ticker_activist_text
 from milly_activist_reconcile import reconcile_ticker
 from activist_triage import triage_portfolio
+from activist_short_md import collect_short_markdown_reports
 from sec_activist_scan import scan_portfolio_sec
 from site_activist_scan import scan_publisher_sites
 from third_party_inventory import write_inventory
@@ -158,10 +159,11 @@ def main() -> int:
 
     for ticker in tickers:
         local = collect_local_reports(ticker)
+        short_md = collect_short_markdown_reports(ticker)
         if not args.dry_run:
             index = load_ticker_index(ticker)
             changed = False
-            for hit in local:
+            for hit in local + short_md:
                 entry = {k: v for k, v in hit.items() if k != "ticker"}
                 entry.setdefault("status", "cached")
                 entry.setdefault("tier", "context")
@@ -170,6 +172,7 @@ def main() -> int:
             if changed:
                 save_ticker_index(ticker, index)
         all_hits.extend(local)
+        all_hits.extend(short_md)
         if not args.dry_run:
             extract_ticker_activist_text(ticker)
             verify_ticker(ticker)
@@ -223,7 +226,8 @@ def main() -> int:
                 if r.get("include_in_feed", True)
                 and (
                     r.get("triage_verdict") == "human_review"
-                    or r.get("status") in ("new", "cached", "triaged_auto")
+                    or r.get("status") in ("new", "cached")
+                    or (r.get("status") == "triaged_auto" and not r.get("milly_verdict"))
                 )
             ]
             if pending:

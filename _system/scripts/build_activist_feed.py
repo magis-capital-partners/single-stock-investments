@@ -19,6 +19,7 @@ from activist_common import (
     prune_ghost_index_entries,
     resolve_report_file,
 )
+from activist_short_md import collect_short_markdown_reports, short_md_report_entry
 from activist_date_parse import normalize_partial_date, parse_date_from_stem
 from activist_link_health import check_links
 from activist_materiality import materiality_score, materiality_tier
@@ -235,27 +236,17 @@ def build_feed(*, prune_indexes: bool = True, link_check: bool | None = None) ->
             [enrich_report_metadata(r) for r in (index.get("reports") or [])]
         )
         sr_dir = ROOT / ticker / "third-party-analyses" / "short_reports"
+        indexed_paths = {
+            str(r.get("local_file") or "").replace("\\", "/")
+            for r in reports
+            if r.get("source") == "short_reports_md"
+        }
         if sr_dir.is_dir():
             for md in sorted(sr_dir.glob("*.md")):
-                firm_id = md.stem.split("_")[0] if "_" in md.stem else md.stem
-                raw_date = md.stem.split("_")[-1] if "_" in md.stem else ""
-                reports.append(
-                    enrich_report_metadata(
-                        {
-                            "firm_id": firm_id,
-                            "firm_name": firm_name(firm_id),
-                            "side": "short",
-                            "report_date": raw_date,
-                            "title": md.stem.replace("_", " "),
-                            "source": "short_reports_md",
-                            "local_file": str(md.relative_to(ROOT)).replace("\\", "/"),
-                            "status": "cached",
-                            "tier": "context",
-                            "include_in_feed": True,
-                            "filing_class": "short_markdown",
-                        }
-                    )
-                )
+                rel = str(md.relative_to(ROOT)).replace("\\", "/")
+                if rel in indexed_paths:
+                    continue
+                reports.append(enrich_report_metadata(short_md_report_entry(md, ticker=ticker)))
         per_ticker_reports[ticker] = reports
         for report in reports:
             all_reports.append((ticker, report))

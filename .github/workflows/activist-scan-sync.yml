@@ -66,8 +66,9 @@ jobs:
           ARGS="--reconcile"
           if [ -n "$TICKER" ]; then ARGS="$ARGS --ticker $TICKER"; fi
           if [ "$SEC_ONLY" = "true" ]; then ARGS="$ARGS --sec-only"; fi
-          python _system/scripts/scan_activist_sources.py $ARGS
+          python _system/scripts/scan_activist_sources.py $ARGS --fetch-sec
           python _system/scripts/short_scan_batch.py
+          python _system/scripts/activist_registry_audit.py
 
       - name: Rebuild document registry and dashboard
         uses: ./.github/actions/rebuild-data

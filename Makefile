@@ -12,7 +12,7 @@ DATE ?= $(shell date +%Y-%m-%d)
 TICKER ?=
 DATE ?= $(shell date +%Y-%m-%d)
 
-.PHONY: research-check research-check-all depth-check depth-audit evidence milly-repass book-estimate book-estimate-all holdco-uplift short-scan activist-scan activist-scan-all activist-triage activist-triage-check activist-feed activist-feed-check hk-scan hk-cross-check-all hk-extract-refresh third-party-scan-all cross-check-all transcript-sync batch-refresh evidence-check darwin-pit-check darwin-build darwin-pit-audit darwin-sync-external darwin-explore persona-lens persona-insights persona-check document-registry document-catalog-search document-sync-drive document-sync-drive-letters document-sync-drive-general document-drive-plan document-drive-migrate document-drive-cleanup document-drive-audit research-memory sumzero-index letter-import-drive letter-backfill vault-setup vault-check
+.PHONY: research-check research-check-all depth-check depth-audit evidence milly-repass book-estimate book-estimate-all holdco-uplift short-scan activist-scan activist-scan-all activist-triage activist-triage-check activist-feed activist-feed-check activist-registry-audit filing-resolve hk-scan hk-cross-check-all hk-extract-refresh third-party-scan-all cross-check-all transcript-sync batch-refresh evidence-check darwin-pit-check darwin-build darwin-pit-audit darwin-sync-external darwin-explore persona-lens persona-insights persona-check document-registry document-catalog-search document-sync-drive document-sync-drive-letters document-sync-drive-general document-drive-plan document-drive-migrate document-drive-cleanup document-drive-audit research-memory sumzero-index letter-import-drive letter-backfill letter-rebuild letter-repair-dates vault-setup vault-check
 
 persona-lens:
 	$(PYTHON) $(SCRIPTS)/fetch_superinvestor_letters.py --all --build
@@ -36,6 +36,7 @@ letter-repair-dates:
 letter-rebuild:
 	$(PYTHON) $(SCRIPTS)/build_superinvestor_insights.py
 	$(PYTHON) $(SCRIPTS)/repair_letter_dates.py --apply
+	$(PYTHON) $(SCRIPTS)/auto_resolve_filing_events.py
 	$(PYTHON) $(SCRIPTS)/build_insights.py
 	$(PYTHON) $(SCRIPTS)/build_letter_drive_links.py
 	$(PYTHON) $(SCRIPTS)/build_dashboard_data.py
@@ -224,21 +225,30 @@ short-scan:
 
 activist-scan:
 ifndef TICKER
-	$(PYTHON) $(SCRIPTS)/scan_activist_sources.py
+	$(PYTHON) $(SCRIPTS)/scan_activist_sources.py --fetch-sec
 else
-	$(PYTHON) $(SCRIPTS)/scan_activist_sources.py --ticker $(TICKER)
+	$(PYTHON) $(SCRIPTS)/scan_activist_sources.py --ticker $(TICKER) --fetch-sec
 endif
 	@echo OK: activist-scan
 
 activist-scan-all:
-	$(PYTHON) $(SCRIPTS)/scan_activist_sources.py --reconcile
+	$(PYTHON) $(SCRIPTS)/scan_activist_sources.py --reconcile --fetch-sec
 	$(PYTHON) $(SCRIPTS)/short_scan_batch.py
+	$(PYTHON) $(SCRIPTS)/activist_registry_audit.py
 	@echo OK: activist-scan-all
 
 activist-triage:
-	$(PYTHON) $(SCRIPTS)/activist_triage.py --apply
+	$(PYTHON) $(SCRIPTS)/activist_triage.py --apply --fetch-sec
 	$(PYTHON) $(SCRIPTS)/build_activist_feed.py
 	@echo OK: activist-triage
+
+filing-resolve:
+	$(PYTHON) $(SCRIPTS)/auto_resolve_filing_events.py
+	@echo OK: filing-resolve
+
+activist-registry-audit:
+	$(PYTHON) $(SCRIPTS)/activist_registry_audit.py
+	@echo OK: activist-registry-audit
 
 activist-triage-check:
 	$(PYTHON) -m unittest _system/scripts/test_activist_triage.py _system/scripts/test_activist_feed.py

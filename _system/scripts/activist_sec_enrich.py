@@ -18,7 +18,7 @@ from sec_filer_parse import (
     strip_html,
 )
 
-SEC_UA = "MarvinActivistScan contact@example.com"
+SEC_UA = "MarvinActivistScan marvin@single-stock-investments.local"
 SLEEP_SEC = 0.12
 CACHE_DIR = ROOT / "_system" / "data" / "activist_sec_cache"
 READ_LIMIT = 400_000
