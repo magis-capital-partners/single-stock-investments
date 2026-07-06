@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 
 from fund_registry import parse_letter_date, parse_quarter_from_stem, resolve_quarter, sanity_year  # noqa: E402
+from repair_letter_dates import repair_letter_record  # noqa: E402
 
 
 class FundRegistryDateTests(unittest.TestCase):
@@ -30,6 +31,16 @@ class FundRegistryDateTests(unittest.TestCase):
 
     def test_stem_quarter_rejects_insane_year(self) -> None:
         self.assertIsNone(parse_quarter_from_stem("something 4Q 2031"))
+
+    def test_repair_letter_record_prefers_folder_quarter(self) -> None:
+        letter = {
+            "quarter": "2031Q4",
+            "letter_date": "2031-12-31",
+            "source_file": "_system/reference/superinvestor-letters/2011Q4/Indaba Capital Quarterly Letter to Investors December 31 2011.txt",
+        }
+        self.assertTrue(repair_letter_record(letter))
+        self.assertEqual(letter["quarter"], "2011Q4")
+        self.assertEqual(letter["letter_date"], "2011-12-31")
 
 
 if __name__ == "__main__":

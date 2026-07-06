@@ -219,9 +219,9 @@ def resolve_quarter(
             year = int(iso_date[:4])
         except ValueError:
             year = None
-        if sanity_year(year) is None and folder_q:
+        if sanity_year(year) is None and folder_q and sanity_year(int(folder_q[:4])) is not None:
             return folder_q
-    if folder_q:
+    if folder_q and sanity_year(int(folder_q[:4])) is not None:
         return folder_q
     if date_source in ("filename", "content") and date_q:
         if sanity_year(int(date_q[:4])) is not None:

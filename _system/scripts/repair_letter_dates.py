@@ -34,7 +34,7 @@ def repair_letter_record(letter: dict, text: str | None = None) -> bool:
         if part.upper().startswith("20") and "Q" in part.upper():
             folder_q = part.upper()
             break
-    quarter_hint = letter.get("quarter") or folder_q
+    quarter_hint = folder_q or letter.get("quarter")
     iso, date_source = parse_letter_date(stem, text, quarter_hint)
     if not iso and folder_q:
         return False
