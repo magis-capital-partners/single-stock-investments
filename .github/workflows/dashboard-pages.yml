@@ -153,9 +153,6 @@ jobs:
       RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
       RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
       RESEARCH_VAULT_ROOT: _external/research-vault
-    environment:
-      name: github-pages
-      url: ${{ steps.publish.outputs.page_url }}
     steps:
       - uses: jlumbroso/free-disk-space@main
         with:
@@ -184,12 +181,34 @@ jobs:
         run: |
           git sparse-checkout add dashboard
           git read-tree -mu HEAD
-      - name: Rebuild and publish to GitHub Pages
-        id: publish
+      - name: Rebuild dashboard and upload Pages artifact
         uses: ./.github/actions/publish-dashboard
         with:
           skip_rebuild: ${{ github.event_name == 'workflow_dispatch' && inputs.skip_rebuild == true && 'true' || 'false' }}
-          skip_deploy: "false"
+          skip_deploy: "true"
         env:
           OAUTH_CLIENT_ID: ${{ vars.OAUTH_CLIENT_ID }}
           OAUTH_PROXY_URL: ${{ vars.OAUTH_PROXY_URL }}
+
+  deploy:
+    needs: build
+    if: needs.build.result == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/actions/deploy-pages-retry
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: ./.github/actions/deploy-pages-retry
+        with:
+          max_attempts: "3"
+          retry_delay_seconds: "60"
