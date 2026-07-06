@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Clone or update the private research-vault repo for CI jobs.
 #
-# Prefer the checkout-vault composite action (actions/checkout) in workflows.
+# Prefer the checkout-vault composite action in workflows (this script uses bearer PAT auth).
 # This script is used for local runs and commit-vault push auth.
 #
 # Required secrets (ops repo):

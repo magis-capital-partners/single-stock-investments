@@ -13,21 +13,25 @@ runs:
     - name: Validate vault clone token
       shell: bash
       run: |
-        if [ -z "${{ env.RESEARCH_VAULT_CLONE_TOKEN }}" ]; then
+        # shellcheck disable=SC1091
+        source _system/scripts/ci_checkout_vault_lib.sh
+        token="$(trim_clone_token "${RESEARCH_VAULT_CLONE_TOKEN:-}")"
+        if [ -z "$token" ]; then
           echo "::error::RESEARCH_VAULT_CLONE_TOKEN is required."
           echo "::error::Public single-stock-investments cannot use GITHUB_TOKEN to read private research-vault."
           echo "::error::Add a fine-grained PAT with Contents: Read on magis-capital-partners/research-vault."
           exit 1
         fi
+        echo "RESEARCH_VAULT_CLONE_TOKEN=$token" >> "$GITHUB_ENV"
 
     - name: Clone research vault
-      uses: actions/checkout@v4
-      with:
-        repository: magis-capital-partners/research-vault
-        ref: ${{ inputs.vault_ref }}
-        path: _external/research-vault
-        token: ${{ env.RESEARCH_VAULT_CLONE_TOKEN }}
-        fetch-depth: 1
+      shell: bash
+      env:
+        RESEARCH_VAULT_REPO_URL: ${{ env.RESEARCH_VAULT_REPO_URL }}
+        RESEARCH_VAULT_CLONE_TOKEN: ${{ env.RESEARCH_VAULT_CLONE_TOKEN }}
+        RESEARCH_VAULT_ROOT: ${{ env.RESEARCH_VAULT_ROOT }}
+        RESEARCH_VAULT_REF: ${{ inputs.vault_ref }}
+      run: bash _system/scripts/ci_checkout_vault.sh
 
     - name: Export RESEARCH_VAULT_ROOT
       shell: bash
