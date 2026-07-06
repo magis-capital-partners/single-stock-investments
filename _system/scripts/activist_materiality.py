@@ -128,16 +128,29 @@ def materiality_score(
         "campaign": campaign_factor(row.get("campaign_group_size")),
         "verification": verification_factor(row),
     }
+    campaign_floor = row.get("campaign_freshness_floor")
+    if campaign_floor is not None:
+        components["freshness"] = max(components["freshness"], float(campaign_floor))
     raw = 100.0
     for value in components.values():
         raw *= value
     score = max(1, min(100, round(raw)))
+    floor = row.get("materiality_floor")
+    if floor is not None:
+        score = max(score, int(floor))
     return score, components
 
 
 def materiality_tier(score: int, row: dict) -> str:
     if row.get("body_verified") is False or row.get("weak_match"):
         return "noise"
+    triage = row.get("triage_verdict")
+    if triage == "auto_signal":
+        return "signal"
+    if triage == "auto_passive" or triage == "auto_noise":
+        return "noise"
+    if triage == "auto_context":
+        return "context"
     if score >= SIGNAL_THRESHOLD:
         return "signal"
     if score < NOISE_THRESHOLD:

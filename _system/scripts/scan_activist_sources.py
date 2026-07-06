@@ -30,6 +30,7 @@ from sec_filer_parse import is_sec_filing_relpath
 from build_activist_feed import build_feed
 from extract_activist_text import extract_ticker_activist_text
 from milly_activist_reconcile import reconcile_ticker
+from activist_triage import triage_portfolio
 from sec_activist_scan import scan_portfolio_sec
 from site_activist_scan import scan_publisher_sites
 from third_party_inventory import write_inventory
@@ -70,28 +71,18 @@ def collect_local_reports(ticker: str) -> list[dict]:
 
 
 def write_review_queue(all_hits: list[dict], scan_date: str) -> Path | None:
-    new_hits = [h for h in all_hits if h.get("status") == "new" or h.get("confidence", 1) < 0.7]
-    if not new_hits:
-        return None
-    PENDING_DIR.mkdir(parents=True, exist_ok=True)
-    out = PENDING_DIR / f"activist_scan_{scan_date}.md"
-    lines = [
-        f"# Activist scan review queue",
-        "",
-        f"**Date:** {scan_date}",
-        f"**Hits:** {len(new_hits)} new or low-confidence",
-        "",
-        "| Ticker | Side | Firm | Date | Source | Confidence |",
-        "|--------|------|------|------|--------|------------|",
-    ]
-    for hit in new_hits[:200]:
-        lines.append(
-            f"| {hit.get('ticker', '—')} | {hit.get('side', '—')} | {hit.get('firm_id', '—')} | "
-            f"{hit.get('report_date', '—')} | {hit.get('source', '—')} | {hit.get('confidence', '—')} |"
-        )
-    lines.extend(["", "Reconcile in `{TICKER}/research/adversarial_{date}.md`.", ""])
-    out.write_text("\n".join(lines), encoding="utf-8")
-    return out
+    """Legacy queue — kept for compatibility; triage queue is authoritative."""
+    return None
+
+
+def collect_human_review_rows(tickers: list[str]) -> list[dict]:
+    rows: list[dict] = []
+    for ticker in tickers:
+        index = load_ticker_index(ticker)
+        for report in index.get("reports") or []:
+            if report.get("triage_verdict") == "human_review":
+                rows.append({**report, "ticker": ticker})
+    return rows
 
 
 def write_portfolio_scan_md(all_hits: list[dict], scan_date: str, tickers: list[str]) -> Path:
@@ -142,6 +133,11 @@ def main() -> int:
     parser.add_argument("--include-passive", action="store_true", help="Index passive SC 13G filings")
     parser.add_argument("--reindex-local", action="store_true", help="Re-parse local SEC files without re-download")
     parser.add_argument("--reconcile", action="store_true", help="Run Milly activist mechanical reconcile after scan")
+    parser.add_argument(
+        "--fetch-sec",
+        action="store_true",
+        help="Fetch SEC metadata during triage when local file missing",
+    )
     args = parser.parse_args()
 
     tickers = [t.upper() for t in args.ticker] if args.ticker else portfolio_tickers()
@@ -191,7 +187,6 @@ def main() -> int:
         save_global_scan(payload)
 
     write_portfolio_scan_md(all_hits, args.date, tickers)
-    write_review_queue(all_hits, args.date)
 
     if not args.dry_run:
         from cleanup_activist_false_positives import cleanup_ticker
@@ -200,6 +195,21 @@ def main() -> int:
             index_path = activist_index_path(ticker)
             if index_path.exists():
                 cleanup_ticker(ticker, apply=True)
+
+        triage_summary = triage_portfolio(
+            tickers=tickers,
+            apply=True,
+            fetch_sec=args.fetch_sec,
+            scan_date=args.date,
+        )
+        print(
+            f"Triage: {triage_summary.get('total_reports', 0)} reports "
+            f"({triage_summary.get('counts', {})})"
+        )
+        if triage_summary.get("human_count"):
+            print(f"  Human queue: {triage_summary.get('queue_path')}")
+
+    write_review_queue(all_hits, args.date)
 
     if not args.skip_feed and not args.dry_run:
         build_feed()
@@ -210,7 +220,11 @@ def main() -> int:
             pending = [
                 r
                 for r in (index.get("reports") or [])
-                if r.get("status") in ("new", "cached") and r.get("include_in_feed", True)
+                if r.get("include_in_feed", True)
+                and (
+                    r.get("triage_verdict") == "human_review"
+                    or r.get("status") in ("new", "cached", "triaged_auto")
+                )
             ]
             if pending:
                 reconcile_ticker(ticker, args.date, write=True)

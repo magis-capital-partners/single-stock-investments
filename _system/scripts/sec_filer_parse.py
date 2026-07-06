@@ -252,6 +252,32 @@ def parse_stake_percent(text: str) -> float | None:
     return None
 
 
+def _normalize_name(value: str) -> str:
+    return re.sub(r"[^a-z0-9]+", " ", (value or "").lower()).strip()
+
+
+def is_issuer_self_filing(ticker: str, meta: dict, report: dict) -> bool:
+    """True when the reporting person appears to be the issuer (routine corporate filing)."""
+    company = _normalize_name(meta.get("company") or ticker)
+    if not company or len(company) < 4:
+        return False
+    candidates = [
+        report.get("firm_name") or "",
+        * (report.get("reporting_persons") or []),
+    ]
+    for name in candidates:
+        norm = _normalize_name(name)
+        if not norm:
+            continue
+        if norm == company:
+            return True
+        if company in norm and len(company) >= 8:
+            return True
+        if norm in company and len(norm) >= 8:
+            return True
+    return False
+
+
 def classify_sec_filing(form: str, text: str, filers: list[str]) -> str:
     if form in PROXY_FORMS:
         return "activist_proxy"

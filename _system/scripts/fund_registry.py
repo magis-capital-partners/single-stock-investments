@@ -36,6 +36,9 @@ MONTHS = {
     "october": 10, "nov": 11, "november": 11, "dec": 12, "december": 12,
 }
 QUARTER_END = {1: (3, 31), 2: (6, 30), 3: (9, 30), 4: (12, 31)}
+MIN_SANE_YEAR = 1990
+OCR_YEAR_RE = re.compile(r"\b20\s+1\s+1\b")
+OCR_YEAR_RE2 = re.compile(r"\bfourth quarter of 201\s+1\b", re.I)
 
 # tokens stripped from filenames to derive a stable fund slug
 _BOILERPLATE = re.compile(
@@ -84,8 +87,26 @@ def normalize_fund_key(stem: str) -> tuple[str, str]:
     return fund_id, display
 
 
+def sanity_year(year: int | None, *, today: date | None = None) -> int | None:
+    if year is None:
+        return None
+    today = today or datetime.now(timezone.utc).date()
+    max_year = today.year + 1
+    if year < MIN_SANE_YEAR or year > max_year:
+        return None
+    return year
+
+
+def repair_ocr_years(blob: str) -> str:
+    out = OCR_YEAR_RE.sub("2011", blob)
+    return OCR_YEAR_RE2.sub("fourth quarter of 2011", out)
+
+
 def parse_letter_date(stem: str, text: str | None, quarter: str | None) -> tuple[str | None, str]:
     """Return (iso_date, source). source in {filename, content, quarter, none}."""
+    stem = repair_ocr_years(stem)
+    if text:
+        text = repair_ocr_years(text)
     # 1. explicit m.d.yy or m/d/yyyy in filename
     for m in re.finditer(r"\b(\d{1,2})[._/\-](\d{1,2})[._/\-](\d{2,4})\b", stem):
         d = _coerce_date(m.group(1), m.group(2), m.group(3))
@@ -119,9 +140,9 @@ def parse_letter_date(stem: str, text: str | None, quarter: str | None) -> tuple
 def _coerce_year(y: str) -> int | None:
     y = y.strip()
     if len(y) == 2:
-        return 2000 + int(y)
+        return sanity_year(2000 + int(y))
     if len(y) == 4 and y.startswith("20"):
-        return int(y)
+        return sanity_year(int(y))
     return None
 
 
@@ -162,12 +183,16 @@ def parse_quarter_from_stem(stem: str) -> str | None:
     if not m:
         return None
     if m.group(1) and m.group(2):
-        return f"{m.group(1)}Q{m.group(2)}"
-    if m.group(3) and m.group(4):
-        return f"{m.group(4)}Q{m.group(3)}"
-    if m.group(5) and m.group(6):
-        return f"{m.group(6)}Q{m.group(5)}"
-    return None
+        q = f"{m.group(1)}Q{m.group(2)}"
+    elif m.group(3) and m.group(4):
+        q = f"{m.group(4)}Q{m.group(3)}"
+    elif m.group(5) and m.group(6):
+        q = f"{m.group(6)}Q{m.group(5)}"
+    else:
+        return None
+    if re.match(r"20\d{2}Q[1-4]", q, re.I) and sanity_year(int(q[:4])) is None:
+        return None
+    return q.upper()
 
 
 def _quarter_from_date(iso: str | None) -> str | None:
@@ -189,13 +214,23 @@ def resolve_quarter(
     folder_q = quarter_from_path(path)
     stem_q = parse_quarter_from_stem(stem)
     date_q = _quarter_from_date(iso_date)
-    if date_source in ("filename", "content") and date_q:
-        return date_q
-    if stem_q:
-        return stem_q
+    if iso_date:
+        try:
+            year = int(iso_date[:4])
+        except ValueError:
+            year = None
+        if sanity_year(year) is None and folder_q:
+            return folder_q
     if folder_q:
         return folder_q
-    return date_q
+    if date_source in ("filename", "content") and date_q:
+        if sanity_year(int(date_q[:4])) is not None:
+            return date_q
+    if stem_q:
+        return stem_q
+    if date_q and sanity_year(int(date_q[:4])) is not None:
+        return date_q
+    return folder_q
 
 
 class FundResolver:

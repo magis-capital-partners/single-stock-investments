@@ -789,11 +789,9 @@ def filing_metric_confidence(metric: dict) -> str:
 def filing_metric_needs_review(metric: dict, change: float | None = None) -> bool:
     flags = set(metric.get("parser_flags") or [])
     parser_conf = str(metric.get("parser_confidence") or "low").lower()
-    if parser_conf == "low":
+    if parser_conf == "low" and flags & FILING_SKIP_FLAGS:
         return True
-    if flags & FILING_SKIP_FLAGS:
-        return True
-    if change is not None and abs(change) > 500:
+    if parser_conf == "low" and change is not None and abs(change) > 200:
         return True
     return False
 
@@ -991,7 +989,7 @@ def from_filing_facts(ticker_dir: Path, ticker: str) -> list[dict]:
                 event_type="filing_refresh",
                 impact_axis="fundamentals",
                 confidence="low",
-                needs_review=True,
+                needs_review=False,
             )
         )
     return out
@@ -1908,8 +1906,21 @@ def build_source_health(
     insider_errors = [
         meta.get("error")
         for meta in (insider_tickers or {}).values()
-        if isinstance(meta, dict) and meta.get("error")
+        if isinstance(meta, dict)
+        and meta.get("error")
+        and str(meta.get("error")).lower()
+        not in {"no transactions in window", "offline", "cached"}
     ]
+    insider_cached = any(
+        isinstance(meta, dict) and str(meta.get("error") or "").lower() in {"offline", "cached"}
+        for meta in (insider_tickers or {}).values()
+    )
+    if insider_errors:
+        insider_status = "degraded"
+    elif insider_tickers:
+        insider_status = "cached" if insider_cached else "ok"
+    else:
+        insider_status = "missing"
     return {
         "superinvestor_letters": {
             "status": "ok" if letters else "empty",
@@ -1926,7 +1937,7 @@ def build_source_health(
             "path": relative_path(NEWS_PATH),
         },
         "insider_transactions": {
-            "status": "degraded" if insider_errors else ("ok" if insider_tickers else "missing"),
+            "status": insider_status,
             "records": counts.get("insider", 0),
             "items": len(insider_tickers or {}),
             "as_of": newest_as_of([(m or {}).get("as_of") for m in (insider_tickers or {}).values() if isinstance(m, dict)]),

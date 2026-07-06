@@ -56,6 +56,29 @@ class ActivistFeedTests(unittest.TestCase):
         }
         self.assertTrue(feed_eligible(report))
 
+    def test_file_exists_matches_disk(self) -> None:
+        if not FEED_PATH.exists():
+            self.skipTest("activist_feed.json missing")
+        feed = json.loads(FEED_PATH.read_text(encoding="utf-8"))
+        for row in feed.get("feed") or []:
+            local_file = row.get("local_file")
+            if not local_file:
+                continue
+            path = ROOT / str(local_file).replace("\\", "/")
+            if path.exists():
+                self.assertTrue(row.get("file_exists"), msg=f"stale file_exists on {local_file}")
+
+    def test_tier_counts_match_feed(self) -> None:
+        if not FEED_PATH.exists():
+            self.skipTest("activist_feed.json missing")
+        feed = json.loads(FEED_PATH.read_text(encoding="utf-8"))
+        summary = feed.get("summary") or {}
+        rows = feed.get("feed") or []
+        tier_sum = (summary.get("signal_count") or 0) + (summary.get("context_count") or 0) + (
+            summary.get("noise_count") or 0
+        )
+        self.assertEqual(tier_sum, len(rows))
+
     def test_github_blob_only_when_file_exists_in_feed(self) -> None:
         if not FEED_PATH.exists():
             self.skipTest("activist_feed.json missing")

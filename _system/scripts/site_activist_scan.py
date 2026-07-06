@@ -41,15 +41,29 @@ def download_binary(url: str, dest: Path) -> bool:
 
 def _guess_date(link: dict) -> tuple[str | None, str, str | None]:
     blob = f"{link.get('published', '')} {link.get('url', '')} {link.get('title', '')}"
+    m = re.search(
+        r"\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[a-z]*\.?\s+(\d{1,2}),?\s+(20\d{2})\b",
+        blob,
+        re.I,
+    )
+    if m:
+        month_map = {
+            "jan": "01", "feb": "02", "mar": "03", "apr": "04", "may": "05", "jun": "06",
+            "jul": "07", "aug": "08", "sep": "09", "sept": "09", "oct": "10", "nov": "11", "dec": "12",
+        }
+        month = month_map.get(m.group(1).lower()[:4], month_map.get(m.group(1).lower()[:3], "01"))
+        return f"{m.group(3)}-{month}-{int(m.group(2)):02d}", "day", "publisher"
     m = re.search(r"(20\d{2})[-_/](0[1-9]|1[0-2])[-_/](0[1-9]|[12]\d|3[01])", blob)
     if m:
         return f"{m.group(1)}-{m.group(2)}-{m.group(3)}", "day", "publisher"
     m = re.search(r"(20\d{2})[-_/](0[1-9]|1[0-2])(?:[^0-9]|$)", blob)
     if m:
         return f"{m.group(1)}-{m.group(2)}-01", "month", "publisher"
-    m = re.search(r"\b(20\d{2})\b", blob)
+    m = re.search(r"\b(20[12]\d)\b", blob)
     if m:
-        return f"{m.group(1)}-01-01", "year", "publisher"
+        year = int(m.group(1))
+        if year >= 2010:
+            return f"{year}-01-01", "year", "publisher"
     return None, "unknown", None
 
 

@@ -48,6 +48,8 @@ def github_blob(path: str | None) -> str | None:
 def feed_eligible(report: dict) -> bool:
     if report.get("include_in_feed") is False:
         return False
+    if report.get("triage_verdict") in {"auto_passive"}:
+        return False
     if report.get("filing_class") == "passive_13g":
         return False
     _ref, _is_pdf, exists = resolve_report_file(report)
@@ -278,6 +280,11 @@ def build_feed(*, prune_indexes: bool = True, link_check: bool | None = None) ->
         "noise_count": 0,
         "body_unverified_count": 0,
         "broken_link_count": 0,
+        "triage_auto_signal": 0,
+        "triage_auto_context": 0,
+        "triage_auto_passive": 0,
+        "triage_auto_noise": 0,
+        "triage_human_review": 0,
     }
     per_ticker: dict[str, dict] = {}
 
@@ -301,7 +308,7 @@ def build_feed(*, prune_indexes: bool = True, link_check: bool | None = None) ->
             continue
         long_count = sum(1 for r in visible if r.get("side") == "long")
         short_count = sum(1 for r in visible if r.get("side") == "short")
-        unreconciled = any(r.get("status") in ("new", "cached") for r in visible)
+        unreconciled = any(r.get("triage_verdict") == "human_review" for r in visible)
         latest = max(visible, key=lambda r: r.get("report_date") or "")
         per_ticker[ticker] = {
             "long_count": long_count,
@@ -333,8 +340,8 @@ def build_feed(*, prune_indexes: bool = True, link_check: bool | None = None) ->
                 summary["missing_file_count"] += 1
             if weak_match:
                 summary["weak_match_count"] += 1
-            stake_percent = None
-            if report.get("source") == "sec_edgar" and file_exists:
+            stake_percent = report.get("stake_percent")
+            if stake_percent is None and report.get("source") == "sec_edgar" and file_exists:
                 stake_percent = stake_for_filing(file_ref)
             row = {
                 "ticker": ticker,
@@ -370,6 +377,11 @@ def build_feed(*, prune_indexes: bool = True, link_check: bool | None = None) ->
                 "needs_filer_review": report.get("firm_id") == "unknown_activist"
                 or (report.get("confidence") or 1) < 0.7,
                 "needs_file": not file_exists and bool(report.get("source_url")),
+                "triage_verdict": report.get("triage_verdict"),
+                "triage_rules": report.get("triage_rules") or [],
+                "materiality_floor": report.get("materiality_floor"),
+                "campaign_freshness_floor": report.get("campaign_freshness_floor"),
+                "campaign_group_size": report.get("campaign_group_size"),
             }
             if not row["report_date"]:
                 summary["missing_date_count"] += 1
@@ -404,6 +416,11 @@ def build_feed(*, prune_indexes: bool = True, link_check: bool | None = None) ->
         row["materiality"] = score
         row["tier"] = materiality_tier(score, row)
         summary[f"{row['tier']}_count"] += 1
+        verdict = row.get("triage_verdict")
+        if verdict and verdict.startswith("auto_"):
+            summary[f"triage_{verdict}"] = summary.get(f"triage_{verdict}", 0) + 1
+        elif verdict == "human_review":
+            summary["triage_human_review"] += 1
         if row.get("body_verified") is False:
             summary["body_unverified_count"] += 1
         scored_rows.append(row)
@@ -412,6 +429,14 @@ def build_feed(*, prune_indexes: bool = True, link_check: bool | None = None) ->
     summary["portfolio_hits"] = len(feed_rows)
     summary["long_count"] = sum(1 for r in feed_rows if r.get("side") == "long")
     summary["short_count"] = sum(1 for r in feed_rows if r.get("side") == "short")
+    summary["unreconciled_count"] = sum(
+        1 for info in per_ticker.values() if info.get("has_unreconciled")
+    )
+    tier_total = summary["signal_count"] + summary["context_count"] + summary["noise_count"]
+    if tier_total != len(feed_rows):
+        raise RuntimeError(
+            f"activist feed tier counts ({tier_total}) != feed rows ({len(feed_rows)})"
+        )
 
     for info in per_ticker.values():
         info["signal_count"] = 0

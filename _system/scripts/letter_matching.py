@@ -526,7 +526,7 @@ def match_letter(text: str, master: SecurityMaster) -> list[dict]:
             b["spans"].extend(positions)
             near_action = any(_classify_action(_window(text, p)) for p in positions[:6])
             if b["tier"] == "C":
-                b["tier"] = "B" if (len(positions) >= 2 or near_action) else "C"
+                b["tier"] = "B" if (len(positions) >= 2 or near_action or holdings_zone) else "C"
 
     # --- distinctive single-token names (e.g. "Google") ---
     if master.single_token_re is not None:

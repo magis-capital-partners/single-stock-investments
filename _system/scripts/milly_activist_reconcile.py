@@ -9,14 +9,11 @@ Usage:
 from __future__ import annotations
 
 import argparse
-import json
-import re
 from datetime import date
 from pathlib import Path
 
 from activist_common import (
     activist_index_path,
-    activist_reports_dir,
     load_ticker_index,
     portfolio_tickers,
     save_ticker_index,
@@ -62,7 +59,19 @@ def _short_md_claims(ticker: str) -> list[dict]:
     return out
 
 
-def _verdict_for_report(report: dict, ticker: str) -> str:
+def _verdict_for_report(report: dict) -> str:
+    triage = report.get("triage_verdict")
+    if triage == "auto_passive":
+        return "passive_institutional"
+    if triage == "auto_noise":
+        return "stale_noise"
+    if triage == "auto_signal":
+        return "campaign_active"
+    if triage == "auto_context":
+        return "context"
+    if triage == "human_review":
+        return "needs_human"
+
     side = report.get("side")
     source = report.get("source")
     if source == "sec_edgar":
@@ -80,26 +89,40 @@ def _verdict_for_report(report: dict, ticker: str) -> str:
 def reconcile_ticker(ticker: str, scan_date: str, *, write: bool = True) -> dict:
     index = load_ticker_index(ticker)
     reports = index.get("reports") or []
-    pending = [r for r in reports if r.get("status") in ("new", "cached") and r.get("include_in_feed", True)]
+    pending = [
+        r
+        for r in reports
+        if r.get("include_in_feed", True)
+        and (
+            r.get("triage_verdict") == "human_review"
+            or r.get("status") in ("new", "cached", "triaged_auto")
+        )
+    ]
     short_md = _short_md_claims(ticker)
     rows = []
+    human_rows = []
     for report in pending:
-        verdict = _verdict_for_report(report, ticker)
+        verdict = _verdict_for_report(report)
         excerpt = _report_text(report)[:1200]
-        rows.append(
-            {
-                "firm": report.get("firm_name") or report.get("firm_id"),
-                "side": report.get("side"),
-                "date": report.get("report_date"),
-                "source": report.get("source"),
-                "filing_class": report.get("filing_class"),
-                "path": report.get("local_file") or report.get("local_pdf"),
-                "verdict": verdict,
-                "excerpt": excerpt[:400],
-            }
-        )
+        row = {
+            "firm": report.get("firm_name") or report.get("firm_id"),
+            "side": report.get("side"),
+            "date": report.get("report_date"),
+            "source": report.get("source"),
+            "filing_class": report.get("filing_class"),
+            "triage": report.get("triage_verdict"),
+            "path": report.get("local_file") or report.get("local_pdf"),
+            "verdict": verdict,
+            "excerpt": excerpt[:400],
+        }
+        rows.append(row)
+        if verdict == "needs_human":
+            human_rows.append(row)
         report["milly_verdict"] = verdict
-        report["status"] = "reconciled_milly"
+        if report.get("triage_verdict") != "human_review":
+            report["status"] = "reconciled_milly"
+        else:
+            report["status"] = "human_review"
 
     if write and pending:
         save_ticker_index(ticker, index)
@@ -109,17 +132,18 @@ def reconcile_ticker(ticker: str, scan_date: str, *, write: bool = True) -> dict
         f"# {ticker} — Activist reconciliation (Milly mechanical)",
         "",
         f"**Date:** {scan_date}",
-        f"**Pending reports reconciled:** {len(rows)}",
+        f"**Reports processed:** {len(rows)}",
+        f"**Human review:** {len(human_rows)}",
         "",
         "## Summary",
         "",
-        "| Firm | Side | Date | Class | Verdict | Path |",
-        "|------|------|------|-------|---------|------|",
+        "| Firm | Side | Date | Class | Triage | Verdict | Path |",
+        "|------|------|------|-------|--------|---------|------|",
     ]
     for row in rows:
         lines.append(
             f"| {row['firm']} | {row['side']} | {row['date']} | {row.get('filing_class') or '—'} | "
-            f"{row['verdict']} | `{row.get('path') or '—'}` |"
+            f"{row.get('triage') or '—'} | {row['verdict']} | `{row.get('path') or '—'}` |"
         )
     if short_md:
         lines.extend(["", "## Short markdown cache", ""])
@@ -128,9 +152,9 @@ def reconcile_ticker(ticker: str, scan_date: str, *, write: bool = True) -> dict
             for claim in block["claims"]:
                 lines.append(f"- {claim}")
             lines.append("")
-    if rows:
-        lines.extend(["", "## Notes", ""])
-        for row in rows:
+    if human_rows:
+        lines.extend(["", "## Notes (human review)", ""])
+        for row in human_rows:
             if row.get("excerpt"):
                 lines.append(f"**{row['firm']}** ({row['date']}): {row['excerpt'][:280]}…")
                 lines.append("")
@@ -143,11 +167,16 @@ def reconcile_ticker(ticker: str, scan_date: str, *, write: bool = True) -> dict
             "",
         ]
     )
-    if write:
+    if write and rows:
         out_path.parent.mkdir(parents=True, exist_ok=True)
         out_path.write_text("\n".join(lines), encoding="utf-8")
 
-    return {"ticker": ticker, "reconciled": len(rows), "path": str(out_path.relative_to(ROOT)) if write else None}
+    return {
+        "ticker": ticker,
+        "reconciled": len(rows),
+        "human": len(human_rows),
+        "path": str(out_path.relative_to(ROOT)) if write and rows else None,
+    }
 
 
 def main() -> int:
@@ -158,20 +187,26 @@ def main() -> int:
     args = parser.parse_args()
     tickers = [t.upper() for t in args.ticker] if args.ticker else portfolio_tickers()
     total = 0
+    human_total = 0
     touched = []
     for ticker in tickers:
         index = load_ticker_index(ticker)
         pending = [
             r
             for r in (index.get("reports") or [])
-            if r.get("status") in ("new", "cached") and r.get("include_in_feed", True)
+            if r.get("include_in_feed", True)
+            and (
+                r.get("triage_verdict") == "human_review"
+                or r.get("status") in ("new", "cached", "triaged_auto")
+            )
         ]
         if not pending and not _short_md_claims(ticker):
             continue
         result = reconcile_ticker(ticker, args.date, write=not args.dry_run)
         total += result["reconciled"]
+        human_total += result["human"]
         touched.append(ticker)
-    print(f"Milly activist reconcile: {total} reports across {len(touched)} tickers")
+    print(f"Milly activist reconcile: {total} reports ({human_total} human) across {len(touched)} tickers")
     for t in touched:
         print(f"  {t}: {activist_index_path(t).relative_to(ROOT)}")
     return 0

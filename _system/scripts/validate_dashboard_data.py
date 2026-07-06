@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -157,13 +158,42 @@ def main() -> int:
             )
         elif letter_count == 0:
             warnings.append("superinvestor letters empty — run make letter-import-drive")
+        max_sane_year = datetime.now(timezone.utc).year + 1
+        bad_quarters = [
+            row.get("quarter")
+            for row in (insights.get("letter_index") or [])
+            if row.get("quarter") and str(row.get("quarter"))[:4].isdigit()
+            and int(str(row.get("quarter"))[:4]) > max_sane_year
+        ]
+        if bad_quarters:
+            errors.append(
+                f"insights letter_index has {len(bad_quarters)} future quarter(s); run repair_letter_dates + rebuild"
+            )
+        links_path = ROOT / "_system/reference/document-store/letter_drive_links.json"
+        if links_path.exists() and letter_index_len > 0:
+            try:
+                links_doc = json.loads(links_path.read_text(encoding="utf-8"))
+                matched = int(links_doc.get("matched_count") or 0)
+                if matched == 0:
+                    warnings.append("letter_drive_links matched_count=0 — run make letter-backfill")
+            except json.JSONDecodeError:
+                warnings.append("letter_drive_links.json is invalid JSON")
         provenance = insights.get("provenance") or {}
         if provenance.get("schema_version") != 2:
             errors.append("insights provenance schema_version must be 2")
 
     if ACTIVIST_FEED_PATH.exists():
         activist = json.loads(ACTIVIST_FEED_PATH.read_text(encoding="utf-8"))
-        for row in activist.get("feed") or []:
+        feed = activist.get("feed") or []
+        summary = activist.get("summary") or {}
+        tier_sum = (summary.get("signal_count") or 0) + (summary.get("context_count") or 0) + (
+            summary.get("noise_count") or 0
+        )
+        if tier_sum != len(feed):
+            errors.append(
+                f"activist feed tier counts ({tier_sum}) != feed rows ({len(feed)})"
+            )
+        for row in feed:
             local_file = row.get("local_file")
             github_url = row.get("github_url")
             file_exists = row.get("file_exists")
@@ -177,6 +207,10 @@ def main() -> int:
                     errors.append(f"activist feed references missing file: {local_file}")
             if local_file and file_exists is False and github_url:
                 errors.append(f"activist feed ghost github link for missing file: {local_file}")
+            if local_file and (ROOT / str(local_file).replace("\\", "/")).exists() and file_exists is False:
+                errors.append(
+                    f"activist feed {row.get('ticker')}/{row.get('firm_id')}: file on disk but file_exists false"
+                )
 
     for msg in warnings:
         print(f"WARN: {msg}")

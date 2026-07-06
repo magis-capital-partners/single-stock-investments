@@ -79,6 +79,8 @@
         <div class="metric"><div class="k">Signal</div><div class="v mono">${s.signal_count || 0}</div></div>
         <div class="metric"><div class="k">Context</div><div class="v mono">${s.context_count || 0}</div></div>
         <div class="metric"><div class="k">Noise</div><div class="v mono">${s.noise_count || 0}</div></div>
+        <div class="metric"><div class="k">Human review</div><div class="v mono">${s.triage_human_review || 0}</div></div>
+        <div class="metric"><div class="k">Auto-passive</div><div class="v mono">${s.triage_auto_passive || 0}</div></div>
         <div class="metric"><div class="k">Long</div><div class="v mono">${s.long_count || 0}</div></div>
         <div class="metric"><div class="k">Short</div><div class="v mono">${s.short_count || 0}</div></div>
         <div class="metric"><div class="k">Tickers with hits</div><div class="v mono">${s.tickers_with_hits || 0}</div></div>
