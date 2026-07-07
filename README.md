@@ -116,7 +116,7 @@ python _system/scripts/build_security_master.py        # canonical universe: boo
 python _system/scripts/build_superinvestor_insights.py # tiered per-letter mentions, fund_id + real letter dates
 python _system/scripts/calibrate_letter_matching.py --gold  # precision/recall gate vs _eval/gold.jsonl (must PASS)
 python _system/scripts/build_insights.py               # adds the consensus block (most-discussed / activity / by-ticker)
-python _system/scripts/build_dashboard_data.py          # embeds insights into the dashboard payload
+python _system/scripts/build_dashboard_data.py          # ticker payload; insights load from dashboard/data/insights.json
 ```
 
 Matching logic lives in [`letter_matching.py`](_system/scripts/letter_matching.py) (Tier A = explicit ticker syntax, Tier B = verified company name; word/benchmark/credential collisions are gated out). Curate funds in [`_system/reference/superinvestor-letters/funds.json`](_system/reference/superinvestor-letters/funds.json) (uncurated letters are grouped deterministically and listed in `funds_unresolved.json`). The dashboard **Insights → Consensus** tab renders the result with quarter/book/search facets. Current calibration: precision 0.97 / recall 0.94.

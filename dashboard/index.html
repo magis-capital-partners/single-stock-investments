@@ -1000,6 +1000,12 @@ async function load() {
   MarvinOAuth.refreshAuthUi(document.getElementById('btn-auth'));
   const res = await fetch('data/dashboard_data.json?' + Date.now());
   data = await res.json();
+  try {
+    const insightsRes = await fetch('data/insights.json?' + Date.now());
+    if (insightsRes.ok) data.insights = await insightsRes.json();
+  } catch {
+    data.insights = null;
+  }
   document.getElementById('meta-updated').textContent =
     `Updated ${data.generated_at.replace('T', ' ').replace('Z', ' UTC')} · ${data.summary.ticker_count} tickers`;
   renderMarketFilters();
