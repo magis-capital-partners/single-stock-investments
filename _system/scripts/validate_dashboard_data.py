@@ -193,18 +193,28 @@ def main() -> int:
                 f"insights letter_index has {len(bad_quarters)} future quarter(s); run repair_letter_dates + rebuild"
             )
         links_path = ROOT / "_system/reference/document-store/letter_drive_links.json"
+        si_health = (insights.get("source_health") or {}).get("superinvestor_letters") or {}
+        corpus_preserved = si_health.get("status") == "preserved"
         if links_path.exists() and letter_index_len > 0:
             try:
                 links_doc = json.loads(links_path.read_text(encoding="utf-8"))
                 matched = int(links_doc.get("matched_count") or 0)
                 if matched == 0:
-                    warnings.append("letter_drive_links matched_count=0 — run make letter-backfill")
+                    msg = "letter_drive_links matched_count=0 — run make letter-backfill"
+                    (warnings if corpus_preserved else errors).append(msg)
                 elif letters_root().exists():
                     ratio = matched / letter_index_len
                     if ratio < 0.99:
-                        errors.append(
-                            f"letter_drive_links matched {matched}/{letter_index_len} ({ratio:.1%}); run make letter-backfill"
+                        msg = (
+                            f"letter_drive_links matched {matched}/{letter_index_len} ({ratio:.1%}); "
+                            "run make letter-backfill"
                         )
+                        if corpus_preserved:
+                            warnings.append(
+                                f"{msg} (vault stale; committed letter corpus preserved for deploy)"
+                            )
+                        else:
+                            errors.append(msg)
             except json.JSONDecodeError:
                 warnings.append("letter_drive_links.json is invalid JSON")
         provenance = insights.get("provenance") or {}
