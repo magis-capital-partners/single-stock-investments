@@ -1,0 +1,134 @@
+{
+  "ticker": "WEST",
+  "as_of": "2026-07-07",
+  "method": "scenario",
+  "irr_method": "scenario",
+  "lawrence_bucket": "low_cost",
+  "classification_inputs": {
+    "archetype": "turnaround",
+    "moat": "unproven",
+    "dhando": "partial",
+    "cycle": "trough",
+    "payoff_lens": "operating",
+    "predictive_attribute": "complexity_discount"
+  },
+  "inputs": {
+    "price": 7.04,
+    "price_source": "Yahoo Finance WEST close 2026-07-07",
+    "price_as_of": "2026-07-07",
+    "shares_millions": 97.56,
+    "shares_source": "97,557,962 common shares outstanding at March 31, 2026 (Q1 2026 10-Q cover page)",
+    "cash_m": 28.11,
+    "cash_per_share": 0.29,
+    "cash_source": "Cash and cash equivalents $28.11M at March 31, 2026 (Q1 2026 10-Q balance sheet)",
+    "long_term_debt_m": 375.41,
+    "debt_source": "Long-term debt $375.41M at March 31, 2026 (Q1 2026 10-Q)",
+    "stockholders_equity_m": -20.23,
+    "equity_source": "Stockholders equity ($20.23M) at March 31, 2026 (Q1 2026 10-Q)",
+    "revenue_fy2025_m": 1188.95,
+    "revenue_fy2025_source": "FY2025 consolidated net sales $1,188.95M (FY2025 10-K)",
+    "revenue_q1_2026_m": 308.83,
+    "revenue_q1_2025_m": 213.8,
+    "revenue_q1_source": "Q1 2026 net sales $308.83M vs $213.80M Q1 2025 (Q1 2026 10-Q)",
+    "adj_ebitda_fy2025_m": 69.68,
+    "adj_ebitda_source": "Consolidated Adjusted EBITDA $69.68M FY2025 (FY2025 10-K EBITDA reconciliation)",
+    "operating_income_q1_2026_m": 3.16,
+    "operating_income_q1_source": "Q1 2026 operating income $3.16M (Q1 2026 10-Q)",
+    "interest_expense_fy2025_m": 55.75,
+    "interest_source": "FY2025 interest expense $55.75M (FY2025 10-K)",
+    "capex_fy2025_m": 88.8,
+    "capex_source": "FY2025 additions to property, plant and equipment $88.80M (FY2025 10-K cash flow statement)",
+    "cfo_fy2025_m": -19.01,
+    "cfo_source": "FY2025 net cash used in operating activities $19.01M (FY2025 10-K cash flow statement)",
+    "per_share": 0.15,
+    "fcf_per_share": 0.15,
+    "fcf_source": "Normalized owner cash [Assumption]: post-Conway ramp Adj EBITDA ~$75M less maintenance capex ~$30M less interest ~$50M on 97.6M shares; filing TTM owner cash remains negative",
+    "normalization_note": "Lawrence consolidated path uses forward normalized owner cash after scale-up costs roll off; current GAAP free cash flow is negative due to capex cycle and working capital."
+  },
+  "scenarios": {
+    "bear": {
+      "price": 7.04,
+      "payoff": 4.0,
+      "years": 5,
+      "probability": 0.3,
+      "notes": "Covenant pressure, green-coffee/tariff working-capital squeeze, Conway ramp delays; equity dilution or distressed refinancing"
+    },
+    "base": {
+      "price": 7.04,
+      "payoff": 9.0,
+      "years": 5,
+      "probability": 0.5,
+      "notes": "Revenue growth continues, scale-up costs normalize, secured leverage stays inside amended covenant ladder; modest multiple on improving EBITDA",
+      "growth_y1_5": 0.08,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 16
+    },
+    "bull": {
+      "price": 7.04,
+      "payoff": 14.0,
+      "years": 5,
+      "probability": 0.2,
+      "notes": "Conway facility fully utilized, liquid-extract mix expands margins, deleveraging from operating cash inflection"
+    }
+  },
+  "implied_return": {
+    "base_pct": 5.0,
+    "label": "7yr IRR (total synthesis)",
+    "display": "5.0% (total synthesis)",
+    "lawrence_stance_gate_pct": 5.0,
+    "falsifier_adjusted_pct": 5.0,
+    "synthesis_pct": 5.0
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "option_scan": [
+    {
+      "id": "conway_ramp",
+      "label": "Conway, Arkansas extract and RTD facility utilization",
+      "option_treatment": "embedded_in_segment",
+      "notes": "FY2025 Conway pre-production add-back $24.7M in Adjusted EBITDA reconciliation; scale-up operating costs $15.3M",
+      "evidence": "FY2025 10-K MD&A and EBITDA reconciliation"
+    },
+    {
+      "id": "liquid_extract_growth",
+      "label": "Liquid extracts and cold-brew product platform",
+      "option_treatment": "embedded_in_segment",
+      "notes": "Highest-growth product category cited in 10-K Business section; revenue already in Beverage Solutions segment",
+      "evidence": "FY2025 10-K Item 1 Business"
+    },
+    {
+      "id": "sst_traceability",
+      "label": "SS&T green-coffee traceability and commodity contracts",
+      "option_treatment": "embedded_in_segment",
+      "notes": "SS&T revenue $280.5M FY2025; intersegment sales to Beverage Solutions",
+      "evidence": "FY2025 10-K segment net sales table"
+    },
+    {
+      "id": "covenant_headroom",
+      "label": "Amended credit covenant relief through 2026",
+      "option_treatment": "probability_weighted",
+      "probability_base": 0.65,
+      "notes": "Secured net leverage 3.85x vs 5.50x max at 12/31/2025; relief period with step-downs",
+      "evidence": "FY2025 10-K Liquidity and covenant disclosure"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "Conway facility commercialization and liquid-extract mix shift lift segment margins as scale-up costs roll off; Beverage Solutions revenue grew 37.8% FY2025.",
+    "source": "FY2025 10-K Business and MD&A",
+    "bear_change": "Green-coffee price spike or tariff shock revives working-capital drain and delays margin recovery.",
+    "bull_change": "Faster Conway capacity sell-through plus capex normalization releases consolidated owner cash earlier than base."
+  },
+  "human_review": {
+    "items": [
+      "Confirm latest covenant step-down schedule and liquidity outlook on next earnings call",
+      "Vicki: IR site returned zero PDFs; request investor presentation if dynamic site blocks harvest"
+    ]
+  }
+}
