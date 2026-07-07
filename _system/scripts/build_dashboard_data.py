@@ -1936,6 +1936,18 @@ def build_research_memory() -> dict | None:
     return _load_json(RESEARCH_MEMORY_PATH)
 
 
+def insights_external_ref(insights_doc: dict) -> dict:
+    """Lightweight pointer so dashboard_data.json stays under GitHub's 100 MB limit."""
+    return {
+        "external": True,
+        "path": "dashboard/data/insights.json",
+        "generated_at": insights_doc.get("generated_at"),
+        "record_count": insights_doc.get("record_count"),
+        "event_count": insights_doc.get("event_count"),
+        "letter_count": insights_doc.get("letter_count"),
+    }
+
+
 def main() -> None:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     equity_payload = build_equity_models()
@@ -1950,7 +1962,7 @@ def main() -> None:
     payload["summary"]["equity_models_ready"] = model_ready
     payload["equity_models"] = equity_payload
     if insights_doc:
-        payload["insights"] = insights_doc
+        payload["insights"] = insights_external_ref(insights_doc)
     if memory_doc:
         payload["research_memory"] = memory_doc
     if document_catalog:
