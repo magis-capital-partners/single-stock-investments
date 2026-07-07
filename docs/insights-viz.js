@@ -695,10 +695,21 @@
     return q.id;
   }
 
+  function minIndexedYear(letterIndex) {
+    let min = null;
+    for (const row of letterIndex || []) {
+      const q = parseQuarter(row.quarter || row.letter_date);
+      if (q && (min === null || q.year < min)) min = q.year;
+    }
+    return min ?? 2011;
+  }
+
   function buildTimeModel(insights, documentCatalog) {
+    const floorYear = minIndexedYear(insights?.letter_index);
     const map = new Map();
     const timePeriods = documentCatalog?.time_periods || {};
     (timePeriods.available_quarters || []).forEach(q => {
+      if ((q.year || parseQuarter(q.id || q.label)?.year || 0) < floorYear) return;
       addQuarter(map, q.id || q.label, {
         document_count: q.document_count,
         source_folder_count: q.source_folder_count,
@@ -712,15 +723,22 @@
     (insights?.fund_registry || []).forEach(r => addQuarter(map, r.quarter || r.letter_date, {}));
     (insights?.consensus?.quarters || []).forEach(q => addQuarter(map, q, {}));
     Object.entries((documentCatalog?.summary || {}).by_quarter || {})
-      .forEach(([q, count]) => addQuarter(map, q, { document_count: count }));
+      .forEach(([q, count]) => {
+        if ((parseQuarter(q)?.year || 0) < floorYear) return;
+        addQuarter(map, q, { document_count: count });
+      });
 
-    let quarters = Array.from(map.values()).sort((a, b) => (b.year - a.year) || (b.quarter - a.quarter));
+    let quarters = Array.from(map.values())
+      .filter(q => q.year >= floorYear)
+      .sort((a, b) => (b.year - a.year) || (b.quarter - a.quarter));
     if (quarters.length && quarters.length < 12) {
       const latestYear = quarters[0].year;
-      for (let year = latestYear - 1; year >= latestYear - 12; year -= 1) {
+      for (let year = latestYear - 1; year >= Math.max(latestYear - 12, floorYear); year -= 1) {
         for (let q = 4; q >= 1; q -= 1) addQuarter(map, `${year}Q${q}`, {});
       }
-      quarters = Array.from(map.values()).sort((a, b) => (b.year - a.year) || (b.quarter - a.quarter));
+      quarters = Array.from(map.values())
+        .filter(q => q.year >= floorYear)
+        .sort((a, b) => (b.year - a.year) || (b.quarter - a.quarter));
     }
     const years = Array.from(new Set(quarters.map(q => q.year))).sort((a, b) => b - a);
     const byId = Object.fromEntries(quarters.map(q => [q.id, q]));
