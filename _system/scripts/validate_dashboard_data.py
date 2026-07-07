@@ -16,6 +16,19 @@ INSIGHTS_PATH = ROOT / "dashboard" / "data" / "insights.json"
 ACTIVIST_FEED_PATH = ROOT / "dashboard" / "data" / "activist_feed.json"
 CONFLICT_MARKERS = ("<<<<<<<", "=======", ">>>>>>>")
 MIN_LETTER_CORPUS = 15000
+LETTER_DRIVE_LINKS_MIN_RATIO = 0.99
+
+
+def letter_drive_links_denominator(
+    *,
+    letter_index_len: int,
+    links_letter_count: int,
+    corpus_preserved: bool,
+) -> int:
+    """When deploy preserves a stale vault, links are built for vault letters only."""
+    if corpus_preserved and links_letter_count > 0:
+        return links_letter_count
+    return letter_index_len
 
 
 def _check_merge_conflict_markers(path: Path) -> str | None:
@@ -197,14 +210,26 @@ def main() -> int:
             try:
                 links_doc = json.loads(links_path.read_text(encoding="utf-8"))
                 matched = int(links_doc.get("matched_count") or 0)
+                links_letter_count = int(links_doc.get("letter_count") or 0)
+                si_health = (insights.get("source_health") or {}).get("superinvestor_letters") or {}
+                corpus_preserved = si_health.get("status") == "preserved"
+                compare_len = letter_drive_links_denominator(
+                    letter_index_len=letter_index_len,
+                    links_letter_count=links_letter_count,
+                    corpus_preserved=corpus_preserved,
+                )
                 if matched == 0:
                     warnings.append("letter_drive_links matched_count=0 — run make letter-backfill")
-                elif letters_root().exists():
-                    ratio = matched / letter_index_len
-                    if ratio < 0.99:
-                        errors.append(
-                            f"letter_drive_links matched {matched}/{letter_index_len} ({ratio:.1%}); run make letter-backfill"
+                elif letters_root().exists() and compare_len > 0:
+                    ratio = matched / compare_len
+                    if ratio < LETTER_DRIVE_LINKS_MIN_RATIO:
+                        msg = (
+                            f"letter_drive_links matched {matched}/{compare_len} ({ratio:.1%}); "
+                            "run make letter-backfill"
                         )
+                        if corpus_preserved and compare_len != letter_index_len:
+                            msg += " (vault subset; committed corpus preserved)"
+                        errors.append(msg)
             except json.JSONDecodeError:
                 warnings.append("letter_drive_links.json is invalid JSON")
         provenance = insights.get("provenance") or {}
