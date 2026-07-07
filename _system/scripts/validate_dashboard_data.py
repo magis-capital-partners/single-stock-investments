@@ -15,6 +15,7 @@ REGISTRY_PATH = ROOT / "_system" / "portfolio" / "registry.json"
 INSIGHTS_PATH = ROOT / "dashboard" / "data" / "insights.json"
 ACTIVIST_FEED_PATH = ROOT / "dashboard" / "data" / "activist_feed.json"
 CONFLICT_MARKERS = ("<<<<<<<", "=======", ">>>>>>>")
+MIN_LETTER_CORPUS = 15000
 
 
 def _check_merge_conflict_markers(path: Path) -> str | None:
@@ -145,6 +146,11 @@ def main() -> int:
             errors.append("insights.source_health missing expected local sources")
         letter_count = insights.get("letter_count") or 0
         letter_index_len = len(insights.get("letter_index") or [])
+        if letter_count < MIN_LETTER_CORPUS or letter_index_len < MIN_LETTER_CORPUS:
+            errors.append(
+                f"letter corpus {letter_count} (index {letter_index_len}) below minimum "
+                f"{MIN_LETTER_CORPUS}; deploy rebuild must preserve committed corpus or refresh vault"
+            )
         manifest_path = letters_root() / "drive_import_manifest.json"
         manifest_count = 0
         if manifest_path.exists():
@@ -157,7 +163,7 @@ def main() -> int:
                 f"letter_index empty but drive_import_manifest has {manifest_count} files; run make letter-backfill"
             )
         elif letter_count == 0:
-            warnings.append("superinvestor letters empty — run make letter-import-drive")
+            errors.append("superinvestor letters empty — run make letter-import-drive")
         letters_dir = letters_root()
         if letters_dir.is_dir():
             pdfs_needing_text = 0

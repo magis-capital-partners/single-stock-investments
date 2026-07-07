@@ -30,6 +30,10 @@ from filing_review import filing_metric_needs_review, filing_metric_passes_sanit
 OUTPUT = ROOT / "dashboard" / "data" / "insights.json"
 ARCHIVE_OUTPUT = ROOT / "_system" / "reference" / "data-sources" / "insights_record_archive.json"
 LETTERS_INSIGHTS = letters_root() / "insights.json"
+# Full letter corpus is built offline (letter-backfill) and committed in dashboard/data/.
+# CI vault clones often lag; never regress below this floor on deploy rebuilds.
+MIN_LETTER_CORPUS = 15000
+LETTER_REGRESSION_RATIO = 0.95
 NEWS_PATH = ROOT / "dashboard" / "data" / "portfolio_news.json"
 THEMES_DIR = ROOT / "_system" / "reference" / "market-data" / "themes"
 INSIDER_DIR = ROOT / "_system" / "reference" / "market-data" / "insider"
@@ -302,6 +306,51 @@ def load_json(path: Path) -> dict | list | None:
         return json.loads(path.read_text(encoding="utf-8"))
     except json.JSONDecodeError:
         return None
+
+
+def prior_letter_count(prior: dict | None) -> int:
+    if not prior:
+        return 0
+    return int(prior.get("letter_count") or len(prior.get("letter_index") or []))
+
+
+def count_vault_letters() -> int:
+    letters_doc = load_json(LETTERS_INSIGHTS) or {"letters": []}
+    letters = [letter for letter in (letters_doc.get("letters") or []) if not is_letter_meta_entry(letter)]
+    return len(letters)
+
+
+def should_preserve_letter_corpus(prior: dict | None, vault_count: int) -> tuple[bool, str]:
+    prior_count = prior_letter_count(prior)
+    if prior_count < MIN_LETTER_CORPUS:
+        return False, f"prior corpus {prior_count} below preserve floor {MIN_LETTER_CORPUS}"
+    if vault_count >= prior_count:
+        return False, "vault corpus current"
+    if vault_count < MIN_LETTER_CORPUS:
+        return True, f"vault {vault_count} letters below floor {MIN_LETTER_CORPUS} (prior {prior_count})"
+    if vault_count < int(prior_count * LETTER_REGRESSION_RATIO):
+        return True, f"vault {vault_count} regressed from prior {prior_count}"
+    return False, "vault within tolerance of prior"
+
+
+def load_preserved_letter_records() -> list[dict]:
+    archive = load_json(ARCHIVE_OUTPUT)
+    if not isinstance(archive, dict):
+        return []
+    records = archive.get("records") or []
+    return [record for record in records if record.get("source") == "superinvestor_letter"]
+
+
+def preserved_letter_payload_fields(prior: dict) -> dict:
+    keys = (
+        "letter_count",
+        "letter_index",
+        "consensus",
+        "fund_registry",
+        "fund_profiles",
+        "ticker_discussants",
+    )
+    return {key: prior[key] for key in keys if key in prior}
 
 
 def insight_record(**kwargs) -> dict:
@@ -2078,10 +2127,26 @@ def build_provenance(records: list[dict], events: list[dict], letter_stats: dict
 def main() -> int:
     records: list[dict] = []
 
-    letters_doc = load_json(LETTERS_INSIGHTS) or {"letters": []}
-    letters = [l for l in (letters_doc.get("letters") or []) if not is_letter_meta_entry(l)]
-    letters_doc = {**letters_doc, "letters": letters}
-    records.extend(from_superinvestor_letters(letters_doc))
+    prior = load_json(OUTPUT)
+    prior = prior if isinstance(prior, dict) else None
+    vault_count = count_vault_letters()
+    preserve, preserve_reason = should_preserve_letter_corpus(prior, vault_count)
+    if preserve:
+        print(f"PRESERVE letter corpus: {preserve_reason}", file=sys.stderr)
+        records.extend(load_preserved_letter_records())
+        if not records:
+            print(
+                "WARN: preserve mode but no archived superinvestor_letter records; "
+                "letter insight records may be missing",
+                file=sys.stderr,
+            )
+        letters: list[dict] = []
+    else:
+        letters_doc = load_json(LETTERS_INSIGHTS) or {"letters": []}
+        letters = [letter for letter in (letters_doc.get("letters") or []) if not is_letter_meta_entry(letter)]
+        letters_doc = {**letters_doc, "letters": letters}
+        records.extend(from_superinvestor_letters(letters_doc))
+
     front_tickers = portfolio_tickers(include_watchlist=True)
     company_hints = portfolio_company_hints(include_watchlist=True)
     sumzero_doc = load_json(SUMZERO_INDEX)
@@ -2111,33 +2176,58 @@ def main() -> int:
 
     events = events_from_records(records, front_tickers, company_hints)
     archive_meta = write_record_archive(build_record_archive(records, front_tickers, company_hints))
-    letter_count = len(letters) or 1
-    with_positions = sum(1 for letter in letters if letter.get("positions"))
-    actionable = sum(
-        1
-        for letter in letters
-        if any(
-            p.get("action") in {"add", "trim", "new", "exit", "short", "buy"}
-            for p in (letter.get("positions") or [])
+    if preserve and prior:
+        preserved_fields = preserved_letter_payload_fields(prior)
+        letter_count_value = int(preserved_fields.get("letter_count") or prior_letter_count(prior))
+        prior_prov = prior.get("provenance") or {}
+        letter_stats = {
+            key: prior_prov[key]
+            for key in ("letters_with_positions_pct", "letters_with_actionable_pct")
+            if key in prior_prov
+        }
+    else:
+        preserved_fields = {}
+        letter_count_value = len(letters)
+        letter_count = len(letters) or 1
+        with_positions = sum(1 for letter in letters if letter.get("positions"))
+        actionable = sum(
+            1
+            for letter in letters
+            if any(
+                p.get("action") in {"add", "trim", "new", "exit", "short", "buy"}
+                for p in (letter.get("positions") or [])
+            )
         )
+        letter_stats = {
+            "letters_with_positions_pct": round(with_positions / letter_count, 4),
+            "letters_with_actionable_pct": round(actionable / letter_count, 4),
+        }
+    source_health = build_source_health(
+        records,
+        letters,
+        news_doc if isinstance(news_doc, dict) else None,
+        archive_meta,
     )
-    letter_stats = {
-        "letters_with_positions_pct": round(with_positions / letter_count, 4),
-        "letters_with_actionable_pct": round(actionable / letter_count, 4),
-    }
+    if preserve and prior:
+        si_health = source_health.get("superinvestor_letters") or {}
+        si_health = {
+            **si_health,
+            "status": "preserved",
+            "items": letter_count_value,
+            "notes": (
+                f"Committed dashboard corpus preserved ({preserve_reason}); "
+                f"vault had {vault_count} letters in {relative_path(LETTERS_INSIGHTS)}"
+            ),
+        }
+        source_health["superinvestor_letters"] = si_health
     payload = {
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "record_count": len(records),
         "front_record_count": archive_meta.get("front_record_count"),
         "archived_record_count": archive_meta.get("archived_record_count"),
         "event_count": len(events),
-        "letter_count": len(letters),
-        "source_health": build_source_health(
-            records,
-            letters,
-            news_doc if isinstance(news_doc, dict) else None,
-            archive_meta,
-        ),
+        "letter_count": letter_count_value,
+        "source_health": source_health,
         "data_source_candidates": terminalvalue_doc or {},
         "provenance": build_provenance(records, events, letter_stats),
         "record_archive": archive_meta,
@@ -2152,9 +2242,16 @@ def main() -> int:
         "ticker_discussants": ticker_discussants(letters, front_tickers, company_hints),
         "by_ticker": ticker_insights(records, front_tickers, company_hints),
     }
+    if preserved_fields:
+        payload.update(preserved_fields)
+        payload["letter_count"] = letter_count_value
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     _atomic_write(OUTPUT, json.dumps(payload, separators=(",", ":")) + "\n")
-    print(f"Wrote {OUTPUT} ({len(records)} insight records, {len(events)} events, {len(letters)} letters)")
+    print(
+        f"Wrote {OUTPUT} ({len(records)} insight records, {len(events)} events, "
+        f"{letter_count_value} letters"
+        f"{'; preserved committed corpus' if preserve else ''})"
+    )
     return 0
 
 
