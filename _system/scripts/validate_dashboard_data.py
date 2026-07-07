@@ -158,6 +158,23 @@ def main() -> int:
             )
         elif letter_count == 0:
             warnings.append("superinvestor letters empty — run make letter-import-drive")
+        letters_dir = letters_root()
+        if letters_dir.is_dir():
+            pdfs_needing_text = 0
+            for qdir in letters_dir.iterdir():
+                if not qdir.is_dir() or not qdir.name[:2].isdigit():
+                    continue
+                for pdf in qdir.glob("*.pdf"):
+                    txt = pdf.with_suffix(".txt")
+                    try:
+                        if not txt.exists() or txt.stat().st_mtime < pdf.stat().st_mtime:
+                            pdfs_needing_text += 1
+                    except OSError:
+                        pdfs_needing_text += 1
+            if pdfs_needing_text > 0:
+                warnings.append(
+                    f"{pdfs_needing_text} letter PDF(s) missing text extracts — run make letter-extract-text"
+                )
         max_sane_year = datetime.now(timezone.utc).year + 1
         bad_quarters = [
             row.get("quarter")

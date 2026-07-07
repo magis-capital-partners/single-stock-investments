@@ -337,7 +337,7 @@ def main() -> int:
     since_year = args.since_year
 
     print(f"=== import_drive_letter_orphans (roots={len(root_ids)}) ===", flush=True)
-    service = None if (args.dry_run and args.from_index) else drive_service(readonly=args.dry_run or args.skip_download)
+    service = None if args.skip_download or (args.dry_run and args.from_index) else drive_service(readonly=args.dry_run)
     manifest = load_manifest()
     manifest_files: dict = manifest["files"]
 
