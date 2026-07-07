@@ -208,7 +208,52 @@ test_activist_feed_json_conflict() {
   fi
 }
 
+test_docs_mirror_after_dashboard_conflict() {
+  git checkout -b "$TMP_BRANCH" >/dev/null
+
+  python3 _system/scripts/build_dashboard_data.py >/dev/null
+  mirror_dashboard_to_docs
+  git add dashboard/data/ docs/
+  git commit -m "test: base dashboard+docs snapshot" >/dev/null
+
+  python3 _system/scripts/build_dashboard_data.py >/dev/null
+  mirror_dashboard_to_docs
+  echo '{"__ci_mirror_test_marker__":true}' > docs/data/dashboard_data.json
+  git add dashboard/data/ docs/
+  git commit -m "test: local dashboard with stale docs mirror" >/dev/null
+
+  git branch test-main-conflict "$MAIN_REF" >/dev/null
+  git checkout test-main-conflict >/dev/null
+  python3 _system/scripts/build_dashboard_data.py >/dev/null
+  mirror_dashboard_to_docs
+  git add dashboard/data/ docs/
+  git commit -m "test: main dashboard+docs regen" >/dev/null
+
+  git checkout "$TMP_BRANCH" >/dev/null
+  if git rebase test-main-conflict; then
+    echo "FAIL: expected rebase conflict in dashboard/docs JSON"
+    exit 1
+  fi
+
+  while rebase_in_progress && try_resolve_rebase_conflicts; do
+    :
+  done
+  if rebase_in_progress; then
+    echo "FAIL: docs mirror conflict resolution helper did not finish rebase"
+    exit 1
+  fi
+  if ! cmp -s dashboard/data/dashboard_data.json docs/data/dashboard_data.json; then
+    echo "FAIL: docs/data/dashboard_data.json not mirrored after conflict resolution"
+    exit 1
+  fi
+  if grep -q '__ci_mirror_test_marker__' docs/data/dashboard_data.json 2>/dev/null; then
+    echo "FAIL: stale docs/data/dashboard_data.json survived rebase resolution"
+    exit 1
+  fi
+}
+
 run_test "dashboard JSON rebase conflict auto-resolution" test_dashboard_json_conflict
+run_test "docs mirror after dashboard JSON rebase conflict" test_docs_mirror_after_dashboard_conflict
 run_test "insights JSON rebase conflict auto-resolution" test_insights_json_conflict
 run_test "activist feed JSON rebase conflict auto-resolution" test_activist_feed_json_conflict
 run_test "INDEX.csv rebase conflict auto-resolution" test_index_csv_conflict
