@@ -123,3 +123,5 @@ One row per adversarial or consistency re-pass. Append via `milly_repass.py` or 
 | 2026-06-29 | QDEL | standard_batch | OK | marvin_cloud_refresh |
 | 2026-06-30 | SOC | standard_batch | BLOCKED | marvin_cloud_refresh |
 | 2026-07-03 | TBBK | standard_batch | OK | marvin_cloud_refresh |
+| 2026-07-06 | XTIA | standard_batch | OK | marvin_cloud_refresh |
+| 2026-07-06 | XTIA | standard_batch | OK | marvin_cloud_refresh |

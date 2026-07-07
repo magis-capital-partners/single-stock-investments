@@ -1,0 +1,421 @@
+{
+  "ticker": "XTIA",
+  "as_of": "2026-07-06",
+  "valuation_mode": "optionality",
+  "method": "yield_curve",
+  "irr_method": "scenario",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "turnaround",
+    "moat": "unproven",
+    "dhando": "none",
+    "cycle": "trough",
+    "payoff_lens": "event",
+    "predictive_attribute": "complexity_discount"
+  },
+  "inputs": {
+    "price": 1.59,
+    "price_source": "Yahoo XTIA close 2026-07-06",
+    "price_as_of": "2026-07-06",
+    "shares_millions": 38.48,
+    "shares_source": "38,477,789 common shares outstanding May 14, 2026 (Q1 2026 10-Q cover page)",
+    "cash_m": 15.185,
+    "cash_per_share": 0.39,
+    "cash_source": "Cash and cash equivalents $15.185M at March 31, 2026 (Q1 10-Q balance sheet)",
+    "revenue_fy2025_m": 22.49,
+    "revenue_fy2025_source": "FY2025 consolidated revenue $22.490M (10-K filed 2026-04-15)",
+    "revenue_q1_2026_m": 27.696,
+    "revenue_q1_2025_m": 16.471,
+    "revenue_q1_source": "Q1 2026 revenue $27.696M vs $16.471M Q1 2025 (Q1 10-Q income statement)",
+    "operating_loss_q1_2026_m": 10.39,
+    "operating_loss_q1_source": "Q1 2026 loss from operations $10.390M (Q1 10-Q)",
+    "warrant_liability_q1_m": 64.895,
+    "warrant_liability_source": "Current warrant liability $64.895M at March 31, 2026 (Q1 10-Q)",
+    "stockholders_equity_q1_m": -26.607,
+    "equity_source": "Stockholders equity ($26.607M) at March 31, 2026 (Q1 10-Q)",
+    "short_term_debt_q1_m": 10.569,
+    "per_share": -0.27,
+    "fcf_source": "Q1 2026 cash used in operations ($10.454M) on 38.48M shares \u2248 -$0.27/sh quarterly; excludes $21.4M non-cash warrant fair-value loss (Q1 10-Q cash flow and income statement)",
+    "normalization_note": "Lawrence consolidated owner cash is negative during integration; stance uses dated equity-stub scenarios. GAAP net loss includes warrant mark-to-market not owner cash."
+  },
+  "optionality_gate": {
+    "framework": "drone_platform_plus_ads",
+    "floor_pass": false,
+    "floor_metric": "cash_per_share",
+    "floor_value": 0.39,
+    "primary_metric": "lawrence_base",
+    "primary_label": "annualized return",
+    "overlay_nav_per_share": 2.5,
+    "notes": "Cash $0.39/sh is liquidity not dhando floor; $64.9M warrant overhang and negative equity dominate bear case",
+    "primary_return_pct": 7.2
+  },
+  "nav_overlay": {
+    "status": "complete",
+    "as_of": "2026-07-06",
+    "segments_or_options": [
+      {
+        "id": "drone_nerds_platform",
+        "label": "Drone Nerds commercial UAS distribution (83.4% stake)",
+        "option_treatment": "embedded_in_segment",
+        "nav_per_share": 1.2,
+        "notes": "FY2025 revenue $22.5M; Q1 2026 run-rate $110M annualized [Assumption] on fragmented distributor economics"
+      },
+      {
+        "id": "ads_pipeline",
+        "label": "Autonomous Defense Systems division",
+        "option_treatment": "probability_weighted",
+        "probability_base": 0.12,
+        "milestone_nav_per_share": 8.0,
+        "notes": "No revenue to date; DARPA/AFRL relationships cited in 10-K; explicit zero in Lawrence base"
+      },
+      {
+        "id": "trifan_option",
+        "label": "TriFan 600 VTOL program (paused)",
+        "option_treatment": "zero",
+        "base_terminal_rationale": "Program paused after Drone Nerds pivot; no near-term capital allocated per FY2025 10-K Business section",
+        "notes": "Legacy XTI aircraft IP retained but not in base cash path"
+      },
+      {
+        "id": "cash_floor",
+        "label": "Cash and near-cash",
+        "option_treatment": "nav_floor",
+        "nav_per_share": 0.39,
+        "notes": "Cash $15.2M at 3/31/2026; going-concern disclosure in FY2025 10-K"
+      }
+    ],
+    "not_in_model_requires_refresh": [
+      "ADS prime-contract award timing",
+      "Warrant liability settlement or conversion terms",
+      "Drone Nerds acquisition earn-out and minority buyout"
+    ]
+  },
+  "scenarios": {
+    "bear": {
+      "price": 1.59,
+      "payoff": 0.35,
+      "years": 3,
+      "probability": 0.35,
+      "notes": "Continued dilution from warrants and equity raises; operating burn exhausts cash; ADS and domestic manufacturing divisions produce no revenue"
+    },
+    "base": {
+      "price": 1.59,
+      "payoff": 2.25,
+      "years": 5,
+      "probability": 0.45,
+      "notes": "Drone Nerds reaches low-single-digit operating margin on ~$80M revenue; warrant overhang resolved via conversion or repurchase; ADS remains option-only",
+      "sotp_build": {
+        "shares": 38477789,
+        "lines": [
+          {
+            "id": "cash",
+            "label": "Cash per share (3/31/2026)",
+            "per_share": 0.39,
+            "source": "$15.185M \u00f7 38.48M shares (Q1 10-Q)"
+          },
+          {
+            "id": "drone_distribution",
+            "label": "Drone Nerds normalized operating value",
+            "per_share": 1.36,
+            "source": "~$52M enterprise value on 83.4% stake at 0.6\u00d7 revenue [Assumption]"
+          },
+          {
+            "id": "ads_option",
+            "label": "Probability-weighted ADS milestone (12% \u00d7 $8)",
+            "per_share": 0.5,
+            "source": "No SEC revenue; DARPA/AFRL pipeline cited 10-K [Assumption]"
+          }
+        ],
+        "payoff_per_share": 2.25,
+        "years": 5
+      }
+    },
+    "bull": {
+      "price": 1.59,
+      "payoff": 5.5,
+      "years": 7,
+      "probability": 0.2,
+      "notes": "ADS wins initial procurement award; Drone Nerds margin expansion plus tuck-in M&A; domestic manufacturing division supplies NDAA-compliant platforms"
+    }
+  },
+  "assumption_ledger": {
+    "base": [
+      {
+        "assumption": "Price today",
+        "value": "$1.59",
+        "source": "Yahoo XTIA close 2026-07-06"
+      },
+      {
+        "assumption": "Starting owner cash per share",
+        "value": "($0.27)",
+        "source": "Q1 2026 cash used in operations $10.454M \u00f7 38.48M shares (Q1 10-Q); excludes non-cash warrant fair-value loss"
+      },
+      {
+        "assumption": "Base equity payoff",
+        "value": "$2.25 per share",
+        "source": "Drone Nerds scale + modest margin; warrant overhang resolved [Assumption]"
+      },
+      {
+        "assumption": "Time horizon (base)",
+        "value": "5 years",
+        "source": "Scenario integration timeline in valuation.json"
+      },
+      {
+        "assumption": "Bear payoff",
+        "value": "$0.35 in 3 years",
+        "source": "Dilution spiral [Assumption]"
+      },
+      {
+        "assumption": "Bull payoff",
+        "value": "$5.50 in 7 years",
+        "source": "ADS procurement award + distribution scale [Assumption]"
+      },
+      {
+        "assumption": "Cash floor per share",
+        "value": "$0.39",
+        "source": "Cash $15.185M \u00f7 38.48M shares at March 31, 2026 (Q1 10-Q)"
+      },
+      {
+        "assumption": "Shares outstanding",
+        "value": "38.5 million",
+        "source": "38,477,789 shares May 14, 2026 (Q1 10-Q cover page)"
+      }
+    ]
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "nav_floor",
+      "evidence": "Negative equity ($26.6M) vs $78M total assets; warrant liability $64.9M marks dilution not hidden land"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Distribution and defense services, not mineral royalty"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Yes",
+      "treatment": "zero",
+      "evidence": "ADS and domestic manufacturing divisions generate no revenue; operating loss $10.4M Q1 2026 (10-K Business; Q1 10-Q)"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / RPO not in FCF path?",
+      "answer": "Partial",
+      "treatment": "probability_weighted",
+      "evidence": "Government UAS procurement pipeline cited in 10-K; no contracted backlog in filings"
+    },
+    {
+      "q": 5,
+      "question": "Private stakes below fair value?",
+      "answer": "Yes",
+      "treatment": "milestone_nav",
+      "evidence": "$2M strategic investment in Valkyrie Sciences Holdings LLC (8-K 2025-10-21)"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating pivot, not suspended dividend trust"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option already in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Drone Nerds hardware, training, and repair services are consolidated revenue ($27.7M Q1 2026)"
+    }
+  ],
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": false,
+      "floor_pass": false,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": "Revenue inflecting post-Drone Nerds but negative owner cash, warrant overhang, and negative equity cap stance at watch"
+  },
+  "estimates": {
+    "marvin_floor": {
+      "owner_cash_per_share": -0.27,
+      "return_pct": null,
+      "stance_hint": "watch"
+    },
+    "external": [],
+    "blended": {
+      "owner_cash_per_share": null,
+      "return_pct": null,
+      "stance_hint": "watch",
+      "weights": "100% Marvin floor; no approved third party"
+    }
+  },
+  "growth_explanation": {
+    "years_1_5": "Drone Nerds revenue scale from Q1 2026 run-rate; margin improvement from services mix [Assumption]",
+    "years_6_7": "ADS optionality if procurement awards materialize; otherwise flat distribution economics",
+    "source": "10-K Business section; Q1 2026 10-Q segment revenue",
+    "status": "partial"
+  },
+  "total_return_panel": {
+    "as_of": "2026-07-06",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 0,
+    "distribution_history_sum": 0,
+    "market_cap_m": null,
+    "total_return_annualized_pct": -86.04,
+    "chart": "XTIA/research/charts/total_return_2026-07-06.svg",
+    "panel_json": "XTIA/research/total_return_panel.json"
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -39.6
+    },
+    "base": {
+      "return_pct": 7.2
+    },
+    "bull": {
+      "return_pct": 19.4
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -39.6
+    },
+    "base": {
+      "return_pct": 7.2
+    },
+    "bull": {
+      "return_pct": 19.4
+    }
+  },
+  "implied_return": {
+    "base_pct": 7.2,
+    "label": "annualized return",
+    "display": "7.2% (base)"
+  },
+  "overlay_results": [],
+  "context_overlay": {
+    "as_of": "2026-07-06",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": 0.18,
+            "as_of": "2026-07-06",
+            "yoy_pct": -41.9,
+            "direction": "down",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.479000091552734,
+            "as_of": "2026-07-06",
+            "yoy_pct": 1.9,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.210999965667725,
+            "as_of": "2026-07-06",
+            "yoy_pct": 6.2,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 100.86699676513672,
+            "as_of": "2026-07-06",
+            "yoy_pct": 3.5,
+            "direction": "up",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 15.670000076293945,
+            "as_of": "2026-07-06",
+            "yoy_pct": -11.9,
+            "direction": "down",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": 0.07,
+            "as_of": "2026-07-06",
+            "yoy_pct": -93.5,
+            "direction": "down",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 17.77,
+            "as_of": "2026-07-06",
+            "yoy_pct": 63.0,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "lens_consensus": {
+    "as_of": "2026-07-06",
+    "shared_inputs_ref": "valuation.json@2026-07-06",
+    "valuation_richness": 0.52,
+    "blended_return_pct": -0.6,
+    "band_pct": [
+      -39.6,
+      7.2
+    ],
+    "weighted_median_pct": 7.2,
+    "median_mean_flag": true,
+    "stance": "pass",
+    "agreement_pct": 100,
+    "dissent_count": 0,
+    "lawrence_divergence": false,
+    "top_dissents": [],
+    "contributor_count": 5,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
+  }
+}
