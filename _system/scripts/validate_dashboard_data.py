@@ -16,6 +16,40 @@ INSIGHTS_PATH = ROOT / "dashboard" / "data" / "insights.json"
 ACTIVIST_FEED_PATH = ROOT / "dashboard" / "data" / "activist_feed.json"
 CONFLICT_MARKERS = ("<<<<<<<", "=======", ">>>>>>>")
 MIN_LETTER_CORPUS = 15000
+MIN_LETTER_LINKS_RATIO = 0.99
+
+
+def letter_drive_links_issue(
+    *,
+    matched: int,
+    letter_index_len: int,
+    links_letter_count: int,
+    corpus_preserved: bool,
+) -> tuple[str, str] | None:
+    """Return (severity, message) when letter_drive_links lags the insights corpus."""
+    if matched <= 0 or letter_index_len <= 0:
+        return None
+    insights_ratio = matched / letter_index_len
+    if insights_ratio >= MIN_LETTER_LINKS_RATIO:
+        return None
+    internal_ratio = matched / links_letter_count if links_letter_count > 0 else 0.0
+    links_cover_smaller_corpus = (
+        links_letter_count > 0
+        and letter_index_len > int(links_letter_count * 1.05)
+        and internal_ratio >= MIN_LETTER_LINKS_RATIO
+    )
+    msg = (
+        f"letter_drive_links matched {matched}/{letter_index_len} ({insights_ratio:.1%}); "
+        "run make letter-backfill"
+    )
+    if corpus_preserved:
+        return "warn", f"{msg} (vault stale; committed letter corpus preserved for deploy)"
+    if links_cover_smaller_corpus:
+        return (
+            "warn",
+            f"{msg} (links current for {links_letter_count} letters; insights index has {letter_index_len})",
+        )
+    return "error", msg
 
 
 def _check_merge_conflict_markers(path: Path) -> str | None:
@@ -203,18 +237,16 @@ def main() -> int:
                     msg = "letter_drive_links matched_count=0 — run make letter-backfill"
                     (warnings if corpus_preserved else errors).append(msg)
                 elif letters_root().exists():
-                    ratio = matched / letter_index_len
-                    if ratio < 0.99:
-                        msg = (
-                            f"letter_drive_links matched {matched}/{letter_index_len} ({ratio:.1%}); "
-                            "run make letter-backfill"
-                        )
-                        if corpus_preserved:
-                            warnings.append(
-                                f"{msg} (vault stale; committed letter corpus preserved for deploy)"
-                            )
-                        else:
-                            errors.append(msg)
+                    links_letter_count = int(links_doc.get("letter_count") or 0)
+                    issue = letter_drive_links_issue(
+                        matched=matched,
+                        letter_index_len=letter_index_len,
+                        links_letter_count=links_letter_count,
+                        corpus_preserved=corpus_preserved,
+                    )
+                    if issue:
+                        severity, msg = issue
+                        (warnings if severity == "warn" else errors).append(msg)
             except json.JSONDecodeError:
                 warnings.append("letter_drive_links.json is invalid JSON")
         provenance = insights.get("provenance") or {}
