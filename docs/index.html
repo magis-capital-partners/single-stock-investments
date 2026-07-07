@@ -998,8 +998,17 @@ async function load() {
     oauthConfig = { client_id: '' };
   }
   MarvinOAuth.refreshAuthUi(document.getElementById('btn-auth'));
-  const res = await fetch('data/dashboard_data.json?' + Date.now());
-  data = await res.json();
+  const cacheBust = Date.now();
+  const [dashRes, insightsRes] = await Promise.all([
+    fetch('data/dashboard_data.json?' + cacheBust),
+    fetch('data/insights.json?' + cacheBust),
+  ]);
+  data = await dashRes.json();
+  if (insightsRes.ok) {
+    data.insights = await insightsRes.json();
+  } else if (data.insights?.external) {
+    data.insights = null;
+  }
   document.getElementById('meta-updated').textContent =
     `Updated ${data.generated_at.replace('T', ' ').replace('Z', ' UTC')} · ${data.summary.ticker_count} tickers`;
   renderMarketFilters();

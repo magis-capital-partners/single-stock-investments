@@ -207,6 +207,28 @@ try_resolve_rebase_conflicts() {
   is_regenerable_conflict
 }
 
+GITHUB_HARD_LIMIT=$((100 * 1024 * 1024))
+GITHUB_WARN_LIMIT=$((50 * 1024 * 1024))
+
+check_staged_file_sizes() {
+  local failed=0
+  local file size
+  while IFS= read -r file; do
+    [ -n "$file" ] || continue
+    [ -f "$file" ] || continue
+    size=$(stat -c%s "$file" 2>/dev/null || stat -f%z "$file")
+    if [ "$size" -gt "$GITHUB_HARD_LIMIT" ]; then
+      echo "::error::Staged file ${file} is $((size / 1024 / 1024)) MB; GitHub rejects files over 100 MB."
+      failed=1
+    elif [ "$size" -gt "$GITHUB_WARN_LIMIT" ]; then
+      echo "::warning::Staged file ${file} is $((size / 1024 / 1024)) MB; GitHub recommends staying under 50 MB."
+    fi
+  done < <(git diff --cached --name-only --diff-filter=AM)
+  if [ "$failed" -ne 0 ]; then
+    exit 1
+  fi
+}
+
 ci_push_main() {
   local msg="${1:?commit message required}"
 
@@ -214,6 +236,8 @@ ci_push_main() {
     echo "No staged changes to commit."
     exit 0
   fi
+
+  check_staged_file_sizes
 
   git commit -m "$msg"
 
