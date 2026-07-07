@@ -1950,7 +1950,11 @@ def main() -> None:
     payload["summary"]["equity_models_ready"] = model_ready
     payload["equity_models"] = equity_payload
     if insights_doc:
-        payload["insights"] = insights_doc
+        payload["insights_ref"] = {
+            "path": "dashboard/data/insights.json",
+            "generated_at": insights_doc.get("generated_at"),
+            "record_count": insights_doc.get("record_count"),
+        }
     if memory_doc:
         payload["research_memory"] = memory_doc
     if document_catalog:

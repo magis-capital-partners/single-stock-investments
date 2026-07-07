@@ -16,6 +16,8 @@ INSIGHTS_PATH = ROOT / "dashboard" / "data" / "insights.json"
 ACTIVIST_FEED_PATH = ROOT / "dashboard" / "data" / "activist_feed.json"
 CONFLICT_MARKERS = ("<<<<<<<", "=======", ">>>>>>>")
 MIN_LETTER_CORPUS = 15000
+GITHUB_HARD_LIMIT_BYTES = 100 * 1024 * 1024
+GITHUB_WARN_LIMIT_BYTES = 50 * 1024 * 1024
 
 
 def _check_merge_conflict_markers(path: Path) -> str | None:
@@ -45,8 +47,26 @@ def main() -> int:
             print(f"ERROR: {msg}", file=sys.stderr)
         return 1
 
+    data_size = DATA_PATH.stat().st_size
+    if data_size > GITHUB_HARD_LIMIT_BYTES:
+        errors.append(
+            f"dashboard_data.json is {data_size / (1024 * 1024):.1f}MB; exceeds GitHub 100MB limit"
+        )
+    elif data_size > GITHUB_WARN_LIMIT_BYTES:
+        warnings.append(
+            f"dashboard_data.json is {data_size / (1024 * 1024):.1f}MB; above GitHub 50MB recommendation"
+        )
+
     payload = json.loads(DATA_PATH.read_text(encoding="utf-8"))
     registry = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
+    if payload.get("insights"):
+        errors.append(
+            "dashboard_data.json must not embed insights; load dashboard/data/insights.json separately"
+        )
+    insights_ref = payload.get("insights_ref") or {}
+    if insights_ref and not insights_ref.get("path"):
+        errors.append("insights_ref missing path")
+
     insights = {}
     if INSIGHTS_PATH.exists():
         raw_insights = INSIGHTS_PATH.read_text(encoding="utf-8")
@@ -54,8 +74,6 @@ def main() -> int:
             errors.append(f"{INSIGHTS_PATH} contains unresolved git merge conflict markers")
         else:
             insights = json.loads(raw_insights)
-    elif payload.get("insights"):
-        insights = payload["insights"]
     else:
         errors.append("missing dashboard insights payload")
     holdings = sorted((registry.get("holdings") or {}).keys())
