@@ -35,6 +35,20 @@ class LetterDriveLinksValidationTests(unittest.TestCase):
         self.assertEqual(severity, "warn")
         self.assertIn("links current for 2529 letters", msg)
 
+    def test_darwin_fast_vault_subset_link_mismatch_stays_warn(self):
+        """Deploy Dashboard at c9d24d3cd failed validate with ERROR; must stay WARN."""
+        issue = validator.letter_drive_links_issue(
+            matched=2528,
+            letter_index_len=19359,
+            links_letter_count=2529,
+            corpus_preserved=False,
+        )
+        self.assertIsNotNone(issue)
+        severity, msg = issue
+        self.assertEqual(severity, "warn")
+        self.assertNotEqual(severity, "error")
+        self.assertIn("13.1%", msg)
+
     def test_no_issue_when_preserved_corpus_matches_vault_subset(self):
         self.assertIsNone(
             validator.letter_drive_links_issue(

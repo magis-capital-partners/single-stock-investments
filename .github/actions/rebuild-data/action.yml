@@ -123,4 +123,8 @@ runs:
     - name: Validate dashboard JSON
       if: inputs.validate == 'true'
       shell: bash
-      run: python _system/scripts/validate_dashboard_data.py
+      run: |
+        python -m unittest \
+          _system/scripts/test_validate_dashboard_letters.py \
+          _system/scripts/test_validate_dashboard_payload.py
+        python _system/scripts/validate_dashboard_data.py
