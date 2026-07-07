@@ -1,7 +1,7 @@
 # Filing insights — human review queue
 
 **Date:** 2026-07-07
-**Rows:** 24
+**Rows:** 28
 
 | Ticker | Metric | Change | Confidence | Flags | Reason |
 |--------|--------|--------|------------|-------|--------|
@@ -29,3 +29,7 @@
 | SPGI | Long-term debt | +16533.3% | — | — | low_confidence_or_skip_flags |
 | TRC | Net income | +3486.7% | — | — | low_confidence_or_skip_flags |
 | TRC | cash | +312.3% | — | — | low_confidence_or_skip_flags |
+| WEST | total_assets | -6.3% | low | footnote_pairing | low_confidence_or_skip_flags |
+| WEST | cash | -47.6% | low | footnote_pairing | low_confidence_or_skip_flags |
+| XTIA | total_assets | -70.1% | low | footnote_pairing | low_confidence_or_skip_flags |
+| XTIA | Long-term debt | -85.6% | low | footnote_pairing, non_statement_debt, extreme_pct | low_confidence_or_skip_flags |

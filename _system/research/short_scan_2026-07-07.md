@@ -157,7 +157,7 @@
 | VOXR | no_hit | — | — | No activist index hits |
 | VTRS | no_hit | — | — | No activist index hits |
 | WBI | no_hit | — | — | No activist index hits |
-| WEST | no_hit | — | — | No activist index hits |
+| WEST | indexed | L2/S0 | 2023-08-31 | 2 long, 0 short indexed; 0 short feed-eligible |
 | WPM | no_hit | — | — | No activist index hits |
 | WRLC | no_hit | — | — | No activist index hits |
 | X.TO | no_hit | — | — | No activist index hits |

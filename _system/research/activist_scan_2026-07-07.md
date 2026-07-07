@@ -152,7 +152,7 @@
 | VOXR | 0 | 0 | — | no hits |
 | VTRS | 0 | 0 | — | no hits |
 | WBI | 0 | 0 | — | no hits |
-| WEST | 0 | 0 | — | no hits |
+| WEST | 2 | 0 | 2023-08-31 | 2 indexed |
 | WPM | 0 | 0 | — | no hits |
 | WRLC | 0 | 0 | — | no hits |
 | X.TO | 0 | 0 | — | no hits |
