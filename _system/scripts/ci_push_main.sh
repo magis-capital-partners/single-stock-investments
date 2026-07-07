@@ -207,12 +207,38 @@ try_resolve_rebase_conflicts() {
   is_regenerable_conflict
 }
 
+check_github_file_sizes() {
+  local limit=$((100 * 1024 * 1024))
+  local warn=$((50 * 1024 * 1024))
+  local failed=0
+  local file size
+
+  while IFS= read -r file; do
+    [ -n "$file" ] || continue
+    [ -f "$file" ] || continue
+    size=$(stat -c%s "$file" 2>/dev/null || stat -f%z "$file")
+    if [ "$size" -gt "$limit" ]; then
+      echo "::error::File $file is $((size / 1024 / 1024))MB; exceeds GitHub 100MB limit."
+      failed=1
+    elif [ "$size" -gt "$warn" ]; then
+      echo "::warning::File $file is $((size / 1024 / 1024))MB; above GitHub 50MB recommendation."
+    fi
+  done < <(git diff --cached --name-only --diff-filter=ACM)
+
+  [ "$failed" -eq 0 ]
+}
+
 ci_push_main() {
   local msg="${1:?commit message required}"
 
   if git diff --staged --quiet; then
     echo "No staged changes to commit."
     exit 0
+  fi
+
+  if ! check_github_file_sizes; then
+    echo "::error::Aborting commit: staged files exceed GitHub size limits."
+    exit 1
   fi
 
   git commit -m "$msg"
