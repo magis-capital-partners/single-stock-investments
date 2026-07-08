@@ -1,7 +1,7 @@
 # Filing insights — human review queue
 
 **Date:** 2026-07-08
-**Rows:** 28
+**Rows:** 29
 
 | Ticker | Metric | Change | Confidence | Flags | Reason |
 |--------|--------|--------|------------|-------|--------|
@@ -24,6 +24,7 @@
 | NBIS | EPS (basic) | +250.8% | — | — | low_confidence_or_skip_flags |
 | NBIS | total_assets | +250.3% | — | — | low_confidence_or_skip_flags |
 | NRP | Long-term debt | +577.2% | — | — | low_confidence_or_skip_flags |
+| RDDT | total_assets | -27.9% | low | footnote_pairing | low_confidence_or_skip_flags |
 | RYN | Operating income | +336.9% | — | — | low_confidence_or_skip_flags |
 | SOC | cash | +207.5% | — | — | low_confidence_or_skip_flags |
 | SPGI | Long-term debt | +16533.3% | — | — | low_confidence_or_skip_flags |
