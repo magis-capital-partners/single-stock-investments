@@ -1,18 +1,23 @@
 # RDDT — Investment Thesis
 
-**Last updated:** 2026-07-07
+**Last updated:** 2026-07-08
 
 ## Classification
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
+| **Archetype** (Stahl) | platform |
 | **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Cycle** | mid |
+| **Implied 7yr IRR** (base) | 7.16% (total synthesis) |
+| **IRR method** | full |
+| **Lawrence bucket** | multi_sided |
+| **Payoff lens** | operating |
+| **MOI bucket** | pending |
+
+**Deep dive:** `RDDT/research/deep_dive_2026-07-08.md` (auto-sync)
 
 ## One-line thesis
 
