@@ -132,6 +132,7 @@
 | PSE | no_hit | — | — | No activist index hits |
 | PSK.TO | no_hit | — | — | No activist index hits |
 | QDEL | indexed | L8/S0 | 2024-11-21 | 8 long, 0 short indexed; 0 short feed-eligible |
+| RDDT | indexed | L2/S0 | 2024-08-22 | 2 long, 0 short indexed; 0 short feed-eligible |
 | RGLD | indexed | L6/S0 | 2020-09-30 | 6 long, 0 short indexed; 0 short feed-eligible |
 | RMV.L | no_hit | — | — | No activist index hits |
 | RPRX | indexed | L5/S0 | 2024-07-29 | 5 long, 0 short indexed; 0 short feed-eligible |
@@ -163,6 +164,7 @@
 | X.TO | no_hit | — | — | No activist index hits |
 | XP | no_hit | — | — | No activist index hits |
 | XTIA | no_hit | — | — | No activist index hits |
+| XYZ | no_hit | — | — | No activist index hits |
 
 ## Maintenance
 

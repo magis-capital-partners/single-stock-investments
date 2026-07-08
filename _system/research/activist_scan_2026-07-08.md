@@ -127,6 +127,7 @@
 | PSE | 0 | 0 | — | no hits |
 | PSK.TO | 0 | 0 | — | no hits |
 | QDEL | 8 | 0 | 2024-11-21 | 8 indexed |
+| RDDT | 2 | 0 | 2024-08-22 | 2 indexed |
 | RGLD | 6 | 0 | 2020-09-30 | 6 indexed |
 | RMV.L | 0 | 0 | — | no hits |
 | RPRX | 5 | 0 | 2024-07-29 | 5 indexed |
@@ -158,6 +159,7 @@
 | X.TO | 0 | 0 | — | no hits |
 | XP | 0 | 0 | — | no hits |
 | XTIA | 0 | 0 | — | no hits |
+| XYZ | 0 | 0 | — | no hits |
 
 Run: `python _system/scripts/scan_activist_sources.py`
 Drive drop: `Admin/Activist/Long/{TICKER}/` or `Admin/Activist/Short/{TICKER}/`
