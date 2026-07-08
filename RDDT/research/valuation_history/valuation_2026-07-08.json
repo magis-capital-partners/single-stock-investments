@@ -1,0 +1,241 @@
+{
+  "ticker": "RDDT",
+  "as_of": "2026-07-08",
+  "method": "full",
+  "lawrence_bucket": "multi_sided",
+  "classification_inputs": {
+    "archetype": "platform",
+    "moat": "unproven",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 193.3,
+    "price_source": "Yahoo RDDT close 2026-07-08",
+    "fcf_per_share": 3.67,
+    "fcf_source": "FY2025 free cash flow $684.2M \u00f7 186.4M weighted-average shares (10-K FY2025)",
+    "shares_millions": 186.4,
+    "normalization_note": "FY2025 FCF is first full profitable year; Q1 2026 FCF run-rate ~$1.24B annualized ($311.2M \u00d7 4) \u2014 base uses filed FY2025 to avoid double-counting one strong quarter"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.08,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 20,
+      "notes": "DAUq decelerates; ad pricing pressure; AI licensing commoditizes; multiple compresses"
+    },
+    "base": {
+      "growth_y1_5": 0.14,
+      "growth_y6_10": 0.08,
+      "exit_pfcf_y10": 28,
+      "notes": "ARPU + user growth moderate from Q1 2026 pace; ad stack matures; data licensing steady"
+    },
+    "bull": {
+      "growth_y1_5": 0.2,
+      "growth_y6_10": 0.1,
+      "exit_pfcf_y10": 35,
+      "notes": "International ARPU catch-up; AI data deals scale; logged-in DAU mix improves monetization"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Asset-light platform; $2.5B cash/marketable securities on balance sheet at fair value (10-K FY2025)"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / embedded product option in revenue path?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Data licensing and other revenue in ARPU path; Q1 2026 ARPU $5.23 (+44% YoY) \u2014 modeled via growth, not separate terminal"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No material drag",
+      "treatment": "n/a",
+      "evidence": "Single operating segment; FY2025 net income $529.7M; R&D $207M Q1 2026 is growth spend, not perpetual loss segment"
+    },
+    {
+      "q": 0,
+      "question": "Material separate options after scan?",
+      "answer": "Reddit Answers / search / international monetization",
+      "treatment": "embedded_in_segment",
+      "evidence": "Product options early-stage; no disclosed fair-value marks \u2014 growth in base scenario, zero separate terminal"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "DAUq growth (17% Q1 2026) \u00d7 ARPU expansion (44% Q1 2026) via ad stack automation, vertical diversification, and data licensing",
+    "source": "10-Q Q1 2026; management transcripts on ad product roadmap",
+    "falsifiers": [
+      {
+        "id": "dau_deceleration",
+        "observation": "DAUq growth turns negative for two consecutive quarters",
+        "action": "Cut growth years 1-5 toward bear 8%"
+      },
+      {
+        "id": "arpu_stall",
+        "observation": "ARPU flat while impression growth slows",
+        "action": "Move base case toward bear; cap exit multiple at 20x"
+      },
+      {
+        "id": "policy_inventory",
+        "observation": "Major platform policy change reduces ad inventory",
+        "action": "Downgrade moat to eroding; stance watch or trim"
+      }
+    ],
+    "lawrence_legacy": {
+      "y1_5": 0.14,
+      "y6_10": 0.08,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.14,
+      "y6_10": 0.08,
+      "exit_pfcf_y10": 28.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": 0.694,
+      "as_of_filing_facts": "evidence/_text/10-K_20260206_rpt20251231_acc0001713445_26_000022.htm.txt"
+    },
+    "status": "partial"
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "human_review": {
+    "notes": "First filing-grounded dive; IPO 2024 \u2014 moat unproven at scale; confirm whether to normalize FCF to Q1 2026 run-rate."
+  },
+  "lawrence_horizon_years": 7,
+  "estimates": {
+    "marvin_floor": {
+      "per_share": 3.67,
+      "return_pct": null,
+      "notes": "FY2025 FCF per share; conservative normalization"
+    },
+    "external": [],
+    "blended_best": {
+      "per_share": 3.67,
+      "return_pct": null,
+      "weights": "100% marvin_floor \u2014 no approved third-party in base IRR",
+      "notes": "Activist SC 13D filings are context only"
+    }
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -3.7
+    },
+    "base": {
+      "return_pct": 5.5
+    },
+    "bull": {
+      "return_pct": 13.2
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -3.7
+    },
+    "base": {
+      "return_pct": 5.5
+    },
+    "bull": {
+      "return_pct": 13.2
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": 5.5
+    },
+    "falsifier_adjusted": {
+      "return_pct": 5.5
+    }
+  },
+  "implied_return": {
+    "base_pct": 4.55,
+    "label": "7yr IRR (total synthesis)",
+    "display": "4.55% (total synthesis)",
+    "lawrence_stance_gate_pct": 5.5,
+    "falsifier_adjusted_pct": 5.5,
+    "synthesis_pct": 4.55
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence envelope)",
+        "source": "scenarios.bear",
+        "return_pct": -3.7,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "hard_to_vary": "yes: asymmetric low weight is structural",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ]
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence envelope)",
+        "source": "scenarios.bull",
+        "return_pct": 13.2,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "hard_to_vary": "yes",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ]
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 4.75,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 4.55,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}
