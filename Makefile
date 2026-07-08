@@ -12,7 +12,7 @@ DATE ?= $(shell date +%Y-%m-%d)
 TICKER ?=
 DATE ?= $(shell date +%Y-%m-%d)
 
-.PHONY: research-check research-check-all depth-check depth-audit evidence milly-repass book-estimate book-estimate-all holdco-uplift short-scan activist-scan activist-scan-all activist-triage activist-triage-check activist-feed activist-feed-check activist-registry-audit filing-resolve hk-scan hk-cross-check-all hk-extract-refresh third-party-scan-all cross-check-all transcript-sync batch-refresh evidence-check darwin-pit-check darwin-build darwin-pit-audit darwin-sync-external darwin-explore persona-lens persona-insights persona-check document-registry document-catalog-search document-sync-drive document-sync-drive-letters document-sync-drive-general document-drive-plan document-drive-migrate document-drive-cleanup document-drive-audit research-memory sumzero-index letter-import-drive letter-extract-text letter-backfill letter-rebuild letter-repair-dates letter-date-check vault-setup vault-check
+.PHONY: research-check research-check-all depth-check depth-audit evidence milly-repass book-estimate book-estimate-all holdco-uplift short-scan activist-scan activist-scan-all activist-triage activist-triage-check activist-feed activist-feed-check activist-registry-audit filing-resolve event-triage event-triage-check hk-scan hk-cross-check-all hk-extract-refresh third-party-scan-all cross-check-all transcript-sync batch-refresh evidence-check darwin-pit-check darwin-build darwin-pit-audit darwin-sync-external darwin-explore persona-lens persona-insights persona-check document-registry document-catalog-search document-sync-drive document-sync-drive-letters document-sync-drive-general document-drive-plan document-drive-migrate document-drive-cleanup document-drive-audit research-memory sumzero-index letter-import-drive letter-extract-text letter-backfill letter-rebuild letter-repair-dates letter-date-check vault-setup vault-check
 
 persona-lens:
 	$(PYTHON) $(SCRIPTS)/fetch_superinvestor_letters.py --all --build
@@ -264,6 +264,15 @@ activist-registry-audit:
 activist-triage-check:
 	$(PYTHON) -m unittest _system/scripts/test_activist_triage.py _system/scripts/test_activist_feed.py
 	@echo OK: activist-triage-check
+
+event-triage:
+	$(PYTHON) $(SCRIPTS)/event_triage.py --date $(DATE)
+	$(PYTHON) $(SCRIPTS)/sync_pages_docs.py
+	@echo OK: event-triage
+
+event-triage-check:
+	$(PYTHON) -m unittest _system/scripts/test_event_materiality.py _system/scripts/test_event_triage.py
+	@echo OK: event-triage-check
 
 activist-feed:
 	$(PYTHON) $(SCRIPTS)/build_activist_feed.py

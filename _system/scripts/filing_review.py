@@ -37,6 +37,30 @@ def filing_metric_needs_review(metric: dict, change: float | None = None) -> boo
     return False
 
 
+PL_METRICS = frozenset({"revenues", "revenue", "operating_income", "net_income", "eps_basic", "eps_diluted", "cfo"})
+BALANCE_METRICS = frozenset({"cash", "stockholders_equity", "long_term_debt"})
+
+
+def filing_metric_passes_magnitude(name: str, metric: dict, change: float | None) -> bool:
+    """Stricter magnitude gates aligned with event_triage_rules.json."""
+    if change is None:
+        return True
+    try:
+        prior_abs = abs(float(metric.get("prior") or 0))
+        current = float(metric.get("current") or 0)
+        abs_delta = abs(current - prior_abs)
+    except (TypeError, ValueError):
+        prior_abs = 0.0
+        abs_delta = 0.0
+    if name in PL_METRICS:
+        return abs(change) >= 10
+    if name in BALANCE_METRICS:
+        if prior_abs < 5000:
+            return abs_delta >= 5000
+        return abs(change) >= 25 and abs_delta >= 5000
+    return abs(change) >= 20
+
+
 def filing_metric_passes_sanity(name: str, metric: dict, change: float | None) -> bool:
     flags = set(metric.get("parser_flags") or [])
     parser_conf = str(metric.get("parser_confidence") or "low").lower()

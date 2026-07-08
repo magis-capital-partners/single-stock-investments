@@ -852,7 +852,7 @@
   }
 
   function filterEvents(events, opts) {
-    const { search, bookOnly, period, knownTickers, needsReviewOnly } = opts || {};
+    const { search, bookOnly, period, knownTickers, needsReviewOnly, eventTier } = opts || {};
     let list = dedupeEvents(events);
     if (period && !period.all) {
       list = list.filter(e => periodMatchesRecord(e, period, ['quarter', 'observed_at', 'date', 'as_of']));
@@ -861,13 +861,47 @@
       list = list.filter(e => e.in_our_book || e.portfolio_relevance >= 1);
     }
     if (needsReviewOnly) {
-      list = list.filter(e => e.needs_review);
+      list = list.filter(e => e.needs_review || e.triage_verdict === 'human_review');
+    }
+    const tier = eventTier || 'signal';
+    if (tier === 'signal') {
+      list = list.filter(e => e.tier === 'signal' && e.feed_eligible !== false);
+    } else if (tier === 'context') {
+      list = list.filter(e => e.tier === 'context' && e.feed_eligible !== false);
+    } else if (tier === 'noise') {
+      list = list.filter(e => e.tier === 'noise' || e.feed_eligible === false);
     }
     if (search) {
       const tickers = knownTickers || [];
       list = list.filter(e => SearchMatch.matchEvent(e, search, tickers));
     }
+    list.sort((a, b) => {
+      const da = a.observed_at || '';
+      const db = b.observed_at || '';
+      if (da !== db) return db.localeCompare(da);
+      return Number(b.materiality || b.score || 0) - Number(a.materiality || a.score || 0);
+    });
     return list;
+  }
+
+  function renderEventTierTabs(activeTier, summary, escapeHtml) {
+    const counts = summary || {};
+    const tiers = [
+      { id: 'signal', label: `Signal (${counts.signal || 0})` },
+      { id: 'context', label: `Context (${counts.context || 0})` },
+      { id: 'all', label: 'All' },
+      { id: 'noise', label: `Noise (${counts.noise || 0})` },
+    ];
+    return `<nav class="source-pills" id="insights-event-tier-tabs" style="margin-bottom:10px">
+      ${tiers.map(t => `<button type="button" class="filter-btn source-pill${activeTier === t.id ? ' active' : ''}" data-event-tier="${t.id}">${escapeHtml(t.label)}</button>`).join('')}
+    </nav>`;
+  }
+
+  function eventTierBadge(event) {
+    const tier = event.tier || 'context';
+    if (tier === 'signal') return 'badge-ok';
+    if (tier === 'noise') return 'badge-warn';
+    return 'badge-us';
   }
 
   function parserConfidenceBadge(confidence) {
@@ -990,13 +1024,17 @@
   }
 
   function renderEventQueue(events, escapeHtml, linkHtml, ghRepo, opts) {
+    const eventTier = (opts && opts.eventTier) || 'signal';
+    const triageSummary = (opts && opts.triageSummary) || {};
     const rows = filterEvents(events, opts).slice(0, 120);
+    const tierTabs = renderEventTierTabs(eventTier, triageSummary, escapeHtml);
     if (!rows.length) {
-      return '<p class="subhead">No ranked events match this view.</p>';
+      return `${tierTabs}<p class="subhead">No ranked events match this view.</p>`;
     }
     return `
+      ${tierTabs}
       <table class="darwin-table" id="insights-event-table">
-        <thead><tr><th>Score</th><th>Date</th><th>Ticker</th><th>Source</th><th>Axis</th><th>Event</th><th>Evidence</th></tr></thead>
+        <thead><tr><th>Relevance</th><th>Date</th><th>Ticker</th><th>Source</th><th>Axis</th><th>Event</th><th>Evidence</th></tr></thead>
         <tbody>
           ${rows.map(e => {
             const directionClass = e.direction === 'bullish' ? 'badge-ok' : (e.direction === 'bearish' ? 'badge-bad' : 'badge-us');
@@ -1004,9 +1042,13 @@
             const confTip = e.verification
               ? ` title="Parser ${escapeHtml(String(e.verification.parser_confidence || e.confidence || 'med'))}${e.needs_review ? ' · needs review' : ''}"`
               : '';
+            const tierLabel = String(e.tier || 'context');
+            const reviewBadge = e.triage_verdict === 'human_review'
+              ? ' <span class="badge badge-warn">review</span>'
+              : '';
             return `
               <tr>
-                <td class="mono"${confTip}>${Number(e.score || 0)}</td>
+                <td class="mono"${confTip}><span class="badge ${eventTierBadge(e)}">${escapeHtml(tierLabel)}</span> ${Number(e.materiality || e.score || 0)}${reviewBadge}</td>
                 <td class="mono">${escapeHtml(e.observed_at || 'n/a')}</td>
                 <td>${ticker}</td>
                 <td><span class="badge badge-us">${escapeHtml(e.source_label || SOURCE_LABEL[e.source] || e.source || 'source')}</span></td>
@@ -1831,6 +1873,7 @@
       tickerSourceFilter = 'ownership',
       kpiTrends = null,
       inflectionTier = 'displayed',
+      eventTier = 'signal',
     } = options || {};
 
     const profiles = insights?.fund_profiles || {};
@@ -1896,7 +1939,15 @@
     } else if (activeSection === 'overview') {
       body = renderSourceHealth(insights?.source_health || {}, escapeHtml);
     } else if (activeSection === 'events') {
-      body = renderEventQueue(insights?.events || [], escapeHtml, linkHtml, ghRepo, { search: fundSearch, bookOnly, needsReviewOnly, period, knownTickers });
+      body = renderEventQueue(insights?.events || [], escapeHtml, linkHtml, ghRepo, {
+        search: fundSearch,
+        bookOnly,
+        needsReviewOnly,
+        period,
+        knownTickers,
+        eventTier,
+        triageSummary: (insights?.provenance || {}).event_triage_summary || {},
+      });
     } else if (activeSection === 'consensus') {
       body = renderConsensus(insights?.consensus, escapeHtml, linkHtml, ghRepo, { quarter, period, bookOnly, search: fundSearch, knownTickers });
     } else if (activeSection === 'letters') {

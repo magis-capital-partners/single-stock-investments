@@ -182,13 +182,58 @@ def main() -> int:
         elif not events:
             warnings.append("insights.events is empty")
         else:
-            required = ("id", "source", "event_type", "impact_axis", "title", "summary", "score")
+            required = (
+                "id",
+                "source",
+                "event_type",
+                "impact_axis",
+                "title",
+                "summary",
+                "score",
+                "tier",
+                "materiality",
+                "triage_verdict",
+                "feed_eligible",
+            )
             for idx, event in enumerate(events[:50]):
                 for key in required:
                     if key not in event:
                         errors.append(f"insights.events[{idx}] missing key {key}")
                 if event.get("ticker") and event["ticker"] not in front_tickers:
                     warnings.append(f"insights event references non-portfolio ticker {event['ticker']}")
+            triage_summary = (insights.get("provenance") or {}).get("event_triage_summary") or {}
+            if not triage_summary:
+                warnings.append("insights provenance missing event_triage_summary")
+            else:
+                tier_sum = sum(int(triage_summary.get(k) or 0) for k in ("signal", "context", "noise"))
+                if tier_sum != len(events):
+                    warnings.append(
+                        f"event triage summary counts ({tier_sum}) != events list ({len(events)})"
+                    )
+                signal_n = int(triage_summary.get("signal") or 0)
+                if events and signal_n == 0:
+                    warnings.append("event triage: zero signal-tier events in feed")
+                if events and signal_n / len(events) > 0.35:
+                    warnings.append(
+                        f"event triage: signal tier {signal_n}/{len(events)} "
+                        f"({100 * signal_n / len(events):.0f}%) may be over-promoted"
+                    )
+                for idx, event in enumerate(events[:100]):
+                    if event.get("tier") == "signal" and event.get("source") == "filing":
+                        conf = str(
+                            (event.get("verification") or {}).get("parser_confidence")
+                            or event.get("confidence")
+                            or ""
+                        ).lower()
+                        if conf == "low":
+                            warnings.append(
+                                f"insights.events[{idx}] signal filing with low parser confidence "
+                                f"({event.get('ticker')})"
+                            )
+                    if event.get("feed_eligible") and event.get("tier") == "noise":
+                        errors.append(f"insights.events[{idx}] noise tier marked feed_eligible")
+                    if event.get("triage_verdict") is None:
+                        errors.append(f"insights.events[{idx}] missing triage_verdict")
         if "records" in insights:
             errors.append("insights payload should not include raw records; use record_archive.path")
         archive = insights.get("record_archive") or {}

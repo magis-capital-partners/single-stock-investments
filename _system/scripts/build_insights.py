@@ -25,7 +25,12 @@ from filing_facts import (  # noqa: E402
     source_filing_ref_from_text_path,
 )
 from vault_paths import letters_ref, letters_root, path_to_letters_ref  # noqa: E402
-from filing_review import filing_metric_needs_review, filing_metric_passes_sanity  # noqa: E402
+from filing_review import (  # noqa: E402
+    filing_metric_needs_review,
+    filing_metric_passes_magnitude,
+    filing_metric_passes_sanity,
+)
+from event_triage import triage_events, write_triage_queue  # noqa: E402
 
 OUTPUT = ROOT / "dashboard" / "data" / "insights.json"
 ARCHIVE_OUTPUT = ROOT / "_system" / "reference" / "data-sources" / "insights_record_archive.json"
@@ -599,6 +604,7 @@ def from_superinvestor_letters(doc: dict) -> list[dict]:
                     fund_id=fund_id,
                     quarter=letter.get("quarter"),
                     action=action,
+                    position_action=action,
                     commentary=commentary,
                 )
             )
@@ -921,8 +927,7 @@ def from_filing_facts(ticker_dir: Path, ticker: str) -> list[dict]:
             continue
         if not filing_metric_passes_sanity(name, metric, change):
             continue
-        threshold = 10 if name in {"revenues", "revenue", "operating_income", "net_income", "eps_basic", "eps_diluted"} else 20
-        if abs(change) < threshold:
+        if not filing_metric_passes_magnitude(name, metric, change):
             continue
         label = METRIC_LABELS.get(name, name.replace("_", " ").title())
         candidates.append(
@@ -943,6 +948,7 @@ def from_filing_facts(ticker_dir: Path, ticker: str) -> list[dict]:
         verification = filing_verification_block(ticker, doc, metric, item["name"])
         needs_review = filing_metric_needs_review(metric, item.get("change"))
         confidence = filing_metric_confidence(metric)
+        change = item.get("change")
         if item.get("change_type") == "new_balance":
             title = f"{item['label']} newly reported at {item['current']:,.1f}"
             claim = (
@@ -951,7 +957,6 @@ def from_filing_facts(ticker_dir: Path, ticker: str) -> list[dict]:
             )
             direction = "bearish" if item["name"] == "long_term_debt" else "bullish"
         else:
-            change = item["change"]
             title = f"{item['label']} {'up' if change > 0 else 'down'} {abs(change):.0f}%"
             claim = (
                 f"{item['label']} moved {change:+.1f}% versus the prior period "
@@ -979,6 +984,10 @@ def from_filing_facts(ticker_dir: Path, ticker: str) -> list[dict]:
                 event_type="filing_metric",
                 impact_axis="fundamentals",
                 confidence=confidence,
+                metric_name=item["name"],
+                change_pct=change,
+                prior_value=item["prior"],
+                current_value=item["current"],
             )
         )
 
@@ -1845,11 +1854,30 @@ def events_from_records(
             "inventory_ref": record.get("inventory_ref"),
             "source_path": record.get("source_path"),
             "match_tier": record.get("match_tier"),
+            "metric_name": record.get("metric_name"),
+            "change_pct": record.get("change_pct"),
+            "prior_value": record.get("prior_value"),
+            "current_value": record.get("current_value"),
+            "trend_signal_tier": record.get("trend_signal_tier"),
+            "position_action": record.get("position_action") or record.get("action"),
+            "in_base_irr": record.get("in_base_irr"),
+            "quarter": record.get("quarter"),
         }
         events.append(event)
-    events = dedupe_events(events)
-    events.sort(key=lambda e: (e["score"], e.get("observed_at") or ""), reverse=True)
-    return events[:400]
+    return dedupe_events(events)
+
+
+def finalize_events(events: list[dict], scan_date: str) -> tuple[list[dict], dict]:
+    triaged, _ = triage_events(events)
+    write_triage_queue(triaged, scan_date)
+    feed = triaged[:400]
+    summary = {
+        "signal": sum(1 for e in feed if e.get("tier") == "signal" and e.get("feed_eligible")),
+        "context": sum(1 for e in feed if e.get("tier") == "context" and e.get("feed_eligible")),
+        "noise": sum(1 for e in feed if e.get("tier") == "noise" or not e.get("feed_eligible")),
+        "human_review": sum(1 for e in feed if e.get("triage_verdict") == "human_review"),
+    }
+    return feed, summary
 
 
 def events_by_ticker(events: list[dict]) -> dict[str, list[dict]]:
@@ -2098,14 +2126,20 @@ def write_record_archive(archive_doc: dict) -> dict:
     }
 
 
-def build_provenance(records: list[dict], events: list[dict], letter_stats: dict | None = None) -> dict:
+def build_provenance(
+    records: list[dict],
+    events: list[dict],
+    letter_stats: dict | None = None,
+    *,
+    event_triage_summary: dict | None = None,
+) -> dict:
     out = {
         "schema_version": 2,
         "pipeline": relative_path(Path(__file__).resolve()),
         "generated_by": "build_insights.py",
         "record_count": len(records),
         "event_count": len(events),
-        "event_score": "materiality * confidence * freshness * portfolio_relevance",
+        "event_score": "event_materiality multiplicative model; see _system/data/event_triage_rules.json",
         "inputs": [
             relative_path(LETTERS_INSIGHTS),
             relative_path(NEWS_PATH),
@@ -2121,6 +2155,8 @@ def build_provenance(records: list[dict], events: list[dict], letter_stats: dict
     }
     if letter_stats:
         out.update(letter_stats)
+    if event_triage_summary:
+        out["event_triage_summary"] = event_triage_summary
     return out
 
 
@@ -2174,7 +2210,9 @@ def main() -> int:
         records.extend(from_news(news_doc))
     terminalvalue_doc = load_json(TERMINALVALUE_SOURCES)
 
-    events = events_from_records(records, front_tickers, company_hints)
+    raw_events = events_from_records(records, front_tickers, company_hints)
+    scan_date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    events, event_triage_summary = finalize_events(raw_events, scan_date)
     archive_meta = write_record_archive(build_record_archive(records, front_tickers, company_hints))
     if preserve and prior:
         preserved_fields = preserved_letter_payload_fields(prior)
@@ -2229,7 +2267,9 @@ def main() -> int:
         "letter_count": letter_count_value,
         "source_health": source_health,
         "data_source_candidates": terminalvalue_doc or {},
-        "provenance": build_provenance(records, events, letter_stats),
+        "provenance": build_provenance(
+            records, events, letter_stats, event_triage_summary=event_triage_summary
+        ),
         "record_archive": archive_meta,
         "events": events,
         "events_by_ticker": events_by_ticker(events),

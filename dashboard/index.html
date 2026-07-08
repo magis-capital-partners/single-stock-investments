@@ -712,6 +712,13 @@ let insightsSection = (() => {
   }
 })();
 let insightsInflectionTier = 'displayed';
+let insightsEventTier = (() => {
+  try {
+    return localStorage.getItem(INSIGHTS_EVENT_TIER_KEY) || 'signal';
+  } catch (_) {
+    return 'signal';
+  }
+})();
 let insightsTickerSourceFilter = 'ownership';
 let insightsPdfSourceTab = 'all';
 let insightsPdfTimeMode = 'period';
@@ -728,6 +735,7 @@ let darwinHoldingsChart = null;
 
 const ROUTE_STORAGE_KEY = 'ssp_dashboard_route_v1';
 const INSIGHTS_SECTION_KEY = 'ssp_insights_section_v1';
+const INSIGHTS_EVENT_TIER_KEY = 'ssp_insights_event_tier_v1';
 
 function normalizeAppHash(nextHash) {
   if (nextHash == null || nextHash === '') return '';
@@ -1145,6 +1153,7 @@ function renderInsights(opts = {}) {
     tickerSourceFilter: insightsTickerSourceFilter,
     kpiTrends: data.kpi_trends || null,
     inflectionTier: insightsInflectionTier,
+    eventTier: insightsEventTier,
   });
   content.querySelectorAll('[data-insights-quarter]').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -1163,6 +1172,13 @@ function renderInsights(opts = {}) {
   content.querySelectorAll('[data-inflection-tier]').forEach(btn => {
     btn.addEventListener('click', () => {
       insightsInflectionTier = btn.dataset.inflectionTier;
+      renderInsights();
+    });
+  });
+  content.querySelectorAll('[data-event-tier]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      insightsEventTier = btn.dataset.eventTier;
+      try { localStorage.setItem(INSIGHTS_EVENT_TIER_KEY, insightsEventTier); } catch (_) { /* ignore */ }
       renderInsights();
     });
   });
