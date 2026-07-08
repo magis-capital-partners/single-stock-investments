@@ -430,6 +430,9 @@
   .model-explainer-note { font-size: 11px; color: var(--text-muted); }
   .summary-card.metric-gate { border-color: rgba(16, 185, 129, 0.35); }
   .darwin-table tr.spec-row-active td { background: rgba(59, 130, 246, 0.06); }
+  .consensus-heat-cell { min-width: 44px; padding: 6px 4px !important; }
+  .consensus-spark-dot { display: inline-block; width: 10px; height: 10px; border-radius: 2px; }
+  .consensus-heatmap { min-width: 720px; }
   .chart-card {
     background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 14px;
   }
@@ -730,12 +733,27 @@ const activistExpandedGroups = new Set();
 let insightsSearchDebounce = null;
 let insightsSearchFocused = false;
 let selectedFundId = null;
+let consensusQuarter = (() => {
+  try {
+    const saved = localStorage.getItem(CONSENSUS_QUARTER_KEY);
+    return saved === 'all' ? 'last4' : (saved || 'last4');
+  } catch (_) {
+    return 'last4';
+  }
+})();
+let consensusViewMode = (() => {
+  try { return localStorage.getItem(CONSENSUS_VIEW_KEY) || 'table'; } catch (_) { return 'table'; }
+})();
+let consensusSelectedTicker = null;
+let consensusFundId = null;
 let darwinEquityChart = null;
 let darwinHoldingsChart = null;
 
 const ROUTE_STORAGE_KEY = 'ssp_dashboard_route_v1';
 const INSIGHTS_SECTION_KEY = 'ssp_insights_section_v1';
 const INSIGHTS_EVENT_TIER_KEY = 'ssp_insights_event_tier_v1';
+const CONSENSUS_QUARTER_KEY = 'ssp_consensus_quarter_v1';
+const CONSENSUS_VIEW_KEY = 'ssp_consensus_view_v1';
 
 function normalizeAppHash(nextHash) {
   if (nextHash == null || nextHash === '') return '';
@@ -1138,7 +1156,11 @@ function renderInsights(opts = {}) {
     escapeHtml,
     linkHtml,
     ghRepo: GH_REPO,
-    quarter: insightsQuarter,
+    quarter: insightsSection === 'consensus' ? consensusQuarter : insightsQuarter,
+    consensusQuarter,
+    consensusViewMode,
+    consensusSelectedTicker,
+    consensusFundId,
     fundSearch: fundRegistrySearch,
     bookOnly: insightsBookOnly,
     needsReviewOnly: insightsNeedsReviewOnly,
@@ -1157,7 +1179,13 @@ function renderInsights(opts = {}) {
   });
   content.querySelectorAll('[data-insights-quarter]').forEach(btn => {
     btn.addEventListener('click', () => {
-      insightsQuarter = btn.dataset.insightsQuarter;
+      const q = btn.dataset.insightsQuarter;
+      if (insightsSection === 'consensus') {
+        consensusQuarter = q === 'all' ? 'last4' : q;
+        try { localStorage.setItem(CONSENSUS_QUARTER_KEY, consensusQuarter); } catch (_) { /* ignore */ }
+      } else {
+        insightsQuarter = q;
+      }
       renderInsights();
     });
   });
@@ -1166,6 +1194,10 @@ function renderInsights(opts = {}) {
       insightsSection = btn.dataset.insightsSection;
       try { localStorage.setItem(INSIGHTS_SECTION_KEY, insightsSection); } catch (_) { /* ignore */ }
       selectedFundId = null;
+      if (insightsSection !== 'consensus') {
+        consensusSelectedTicker = null;
+        consensusFundId = null;
+      }
       renderInsights();
     });
   });
@@ -1220,6 +1252,31 @@ function renderInsights(opts = {}) {
   }
   if (window.InsightsViz && insightsSection === 'events') {
     InsightsViz.attachFilingVerifyHandlers(content, insights?.events || [], escapeHtml, linkHtml, GITHUB_REPO);
+  }
+  if (window.InsightsViz && insightsSection === 'consensus') {
+    const timeModel = InsightsViz.buildTimeModel(insights, data.document_catalog);
+    InsightsViz.attachConsensusHandlers(content, insights, {
+      timeModel,
+      onViewMode(mode) {
+        consensusViewMode = mode || 'table';
+        try { localStorage.setItem(CONSENSUS_VIEW_KEY, consensusViewMode); } catch (_) { /* ignore */ }
+        renderInsights();
+      },
+      onTickerSelect(ticker) {
+        consensusSelectedTicker = ticker;
+        renderInsights();
+      },
+      onFundSelect(id) {
+        consensusFundId = id || null;
+        consensusViewMode = 'fund';
+        try { localStorage.setItem(CONSENSUS_VIEW_KEY, consensusViewMode); } catch (_) { /* ignore */ }
+        renderInsights();
+      },
+      onCloseDrawer() {
+        consensusSelectedTicker = null;
+        renderInsights();
+      },
+    });
   }
   content.querySelectorAll('[data-ticker-source-filter]').forEach(btn => {
     btn.addEventListener('click', () => {

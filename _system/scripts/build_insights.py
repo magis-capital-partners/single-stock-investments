@@ -1351,7 +1351,10 @@ def _consensus_bucket(ticker: str, names: dict[str, str], our_tickers: set[str])
 
 
 def _finalize_consensus_row(b: dict) -> dict:
-    buys, sells, shorts = len(b["buy_funds"]), len(b["sell_funds"]), len(b["short_funds"])
+    buy_names = sorted(b["buy_funds"])
+    sell_names = sorted(b["sell_funds"])
+    short_names = sorted(b["short_funds"])
+    buys, sells, shorts = len(buy_names), len(sell_names), len(short_names)
     fund_count = len(b["all_funds"])
     if buys > sells + shorts:
         sentiment = "accumulating"
@@ -1369,8 +1372,63 @@ def _finalize_consensus_row(b: dict) -> dict:
         "short_funds": shorts,
         "net": buys - sells - shorts,
         "sentiment": sentiment,
-        "funds": sorted(b["all_funds"])[:10],
+        "funds": sorted(b["all_funds"]),
+        "buy_fund_names": buy_names,
+        "sell_fund_names": sell_names,
+        "short_fund_names": short_names,
     }
+
+
+def _consensus_row_map(store: dict[str, dict]) -> dict[str, dict]:
+    return {b["ticker"]: _finalize_consensus_row(b) for b in store.values()}
+
+
+def _compute_qoq_shifts(curr: dict[str, dict], prev: dict[str, dict]) -> list[dict]:
+    """Quarter-over-quarter fund positioning shifts between two quarter stores."""
+    curr_map = _consensus_row_map(curr)
+    prev_map = _consensus_row_map(prev)
+    shifts: list[dict] = []
+    for ticker in sorted(set(curr_map) | set(prev_map)):
+        c = curr_map.get(ticker)
+        p = prev_map.get(ticker)
+        c_funds = set(c["funds"]) if c else set()
+        p_funds = set(p["funds"]) if p else set()
+        new_funds = sorted(c_funds - p_funds)
+        dropped_funds = sorted(p_funds - c_funds)
+        c_fc = c["fund_count"] if c else 0
+        p_fc = p["fund_count"] if p else 0
+        c_net = c["net"] if c else 0
+        p_net = p["net"] if p else 0
+        delta_funds = c_fc - p_fc
+        delta_net = c_net - p_net
+        c_sent = c["sentiment"] if c else None
+        p_sent = p["sentiment"] if p else None
+        lean_flip = bool(c_sent and p_sent and c_sent != p_sent)
+        if not (delta_funds or delta_net or new_funds or dropped_funds or lean_flip):
+            continue
+        ref = c or p
+        shifts.append(
+            {
+                "ticker": ticker,
+                "name": ref["name"],
+                "in_book": ref["in_book"],
+                "fund_count": c_fc,
+                "prior_fund_count": p_fc,
+                "delta_funds": delta_funds,
+                "net": c_net,
+                "prior_net": p_net,
+                "delta_net": delta_net,
+                "sentiment": c_sent or "discussed",
+                "prior_sentiment": p_sent,
+                "lean_flip": lean_flip,
+                "new_funds": new_funds[:12],
+                "dropped_funds": dropped_funds[:12],
+            }
+        )
+    return sorted(
+        shifts,
+        key=lambda r: (-abs(r["delta_net"]), -abs(r["delta_funds"]), r["ticker"]),
+    )[:60]
 
 
 def build_consensus(letters: list[dict], our_tickers: set[str], names: dict[str, str]) -> dict:
@@ -1445,9 +1503,28 @@ def build_consensus(letters: list[dict], our_tickers: set[str], names: dict[str,
 
     out_by_q = {q: section(store, q) for q, store in by_q.items()}
     out_by_q["all"] = section(all_q, "all")
+
+    def quarter_sort_key(qid: str) -> tuple:
+        m = re.match(r"^(20\d{2})Q([1-4])$", str(qid))
+        if m:
+            return (int(m.group(1)), int(m.group(2)))
+        return (0, 0)
+
+    sorted_qids = sorted((q for q in by_q if q != "unknown"), key=quarter_sort_key)
+    qoq_by_quarter: dict[str, dict] = {}
+    for i, qid in enumerate(sorted_qids):
+        if i == 0:
+            continue
+        prior_qid = sorted_qids[i - 1]
+        shifts = _compute_qoq_shifts(by_q.get(qid, {}), by_q.get(prior_qid, {}))
+        qoq_by_quarter[qid] = {"prior_quarter": prior_qid, "shifts": shifts}
+        if qid in out_by_q:
+            out_by_q[qid]["qoq_shifts"] = shifts
+            out_by_q[qid]["prior_quarter"] = prior_qid
+
     for tk, rows in by_ticker.items():
         rows.sort(key=lambda r: (r.get("letter_date") or ""), reverse=True)
-        by_ticker[tk] = rows[:20]
+        by_ticker[tk] = rows[:40]
 
     return {
         "as_of": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -1459,6 +1536,7 @@ def build_consensus(letters: list[dict], our_tickers: set[str], names: dict[str,
         },
         "by_quarter": out_by_q,
         "by_ticker": by_ticker,
+        "qoq_by_quarter": qoq_by_quarter,
     }
 
 
