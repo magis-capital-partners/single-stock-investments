@@ -131,6 +131,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-07.
 | RGLD | RGLD/ | Royal Gold Inc. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
 | RMV.L | RMV.L/ | Rightmove PLC | UK | 2026-07-07 | 2026-07-07 | platform | watch |
 | RPRX | RPRX/ | Royalty Pharma plc | US | 2026-07-07 | 2026-07-07 | unknown | watch |
+| RDDT | RDDT/ | Reddit, Inc. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
 | RYN | RYN/ | Rayonier, Inc. | US | 2026-07-07 | 2026-07-07 | optionality | watch |
 | S68.SI | S68.SI/ | Singapore Exchange Limited | EU | 2026-07-07 | 2026-07-07 | unknown | watch |
 | SBR | SBR/ | Sabine Royalty Trust | US | 2026-07-07 | 2026-07-07 | unknown | watch |
@@ -154,10 +155,11 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-07.
 | VTRS | VTRS/ | Viatris Inc | US | 2026-07-07 | 2026-07-07 | turnaround | watch |
 | WBI | WBI/ | WaterBridge Infrastructure | US | 2026-07-07 | 2026-07-07 | infrastructure | watch |
 | WEST | WEST/ | Westrock Coffee Company | US | 2026-07-07 | 2026-07-07 | unknown | watch |
+| XYZ | XYZ/ | Block, Inc. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
 | WPM | WPM/ | Wheaton Precious Metals Corp. | US | 2026-07-07 | 2026-07-07 | compounder | watch |
 | WRLC | WRLC/ | Windrock Land Company | OTC | 2026-07-07 | 2026-07-07 | optionality | watch |
 | X.TO | X.TO/ | TMX Group Limited | CA | 2026-07-07 | 2026-07-07 | unknown | watch |
 | XP | XP/ | XP Inc. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
 
-**153 holdings total.** Registry: `_system/portfolio/registry.json`
+**155 holdings total.** Registry: `_system/portfolio/registry.json`
