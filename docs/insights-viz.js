@@ -1105,7 +1105,7 @@
         <div class="research-box essential-box">
           ${rows.slice(0, 4).map(item => renderInsightItem(item, escapeHtml, linkHtml)).join('')}
         </div>
-        <p class="tier-sub">Macro indices are portfolio-wide context. They are excluded from per-ticker Latest/Bull/Bear unless no ticker-specific signal exists.</p>
+        <p class="tier-sub">Macro indices are portfolio-wide context. Per-ticker rows link here when no ticker-specific signal exists.</p>
       </div>`;
   }
 
@@ -1371,35 +1371,388 @@
       </table>`;
   }
 
+  function formatFreshnessDisplay(days) {
+    if (days == null || !Number.isFinite(Number(days))) {
+      return { label: '—', cls: 'tier-sub', stale: false };
+    }
+    const d = Number(days);
+    if (d <= 7) return { label: `${d}d`, cls: 'fresh-ok', stale: false };
+    if (d <= 30) return { label: `${d}d`, cls: 'fresh-recent', stale: false };
+    if (d <= 365) {
+      const mo = Math.max(1, Math.round(d / 30));
+      return { label: `${mo}mo`, cls: 'fresh-muted', stale: false };
+    }
+    const yr = (d / 365).toFixed(1).replace(/\.0$/, '');
+    return { label: `${yr}y`, cls: 'fresh-stale', stale: true };
+  }
+
+  function tickerAttentionScore(t) {
+    const e = t.essential_insights || {};
+    const status = e.status || {};
+    let score = 0;
+    if (e.needs_work) score += 1000;
+    if (status.tone === 'risk') score += 500;
+    if (status.tone === 'bullish') score += 400;
+    if (status.tone === 'ownership') score += 200;
+    if (e.freshness_days != null && e.freshness_days <= 30) score += 100;
+    if (status.tone === 'stale') score += 80;
+    if (e.freshness_days != null && e.freshness_days > 365) score += 60;
+    return score;
+  }
+
+  function sortTickerEssentialsRows(rows, sortMode) {
+    const list = [...(rows || [])];
+    if (sortMode === 'alpha') {
+      return list.sort((a, b) => String(a.ticker).localeCompare(String(b.ticker)));
+    }
+    if (sortMode === 'fresh') {
+      return list.sort((a, b) => {
+        const ad = a.essential_insights?.freshness_days;
+        const bd = b.essential_insights?.freshness_days;
+        if (ad == null && bd == null) return String(a.ticker).localeCompare(String(b.ticker));
+        if (ad == null) return 1;
+        if (bd == null) return -1;
+        return ad - bd;
+      });
+    }
+    if (sortMode === 'stale') {
+      return list.sort((a, b) => {
+        const ad = a.essential_insights?.freshness_days ?? -1;
+        const bd = b.essential_insights?.freshness_days ?? -1;
+        return bd - ad;
+      });
+    }
+    return list.sort((a, b) => {
+      const scoreDelta = tickerAttentionScore(b) - tickerAttentionScore(a);
+      if (scoreDelta) return scoreDelta;
+      const ad = a.essential_insights?.freshness_days;
+      const bd = b.essential_insights?.freshness_days;
+      if (ad != null && bd != null && ad !== bd) return ad - bd;
+      return String(a.ticker).localeCompare(String(b.ticker));
+    });
+  }
+
+  function pickPrimaryInsight(e) {
+    if (!e) return null;
+    if (e.macro_only) return { macroOnly: true };
+    const status = e.status || {};
+    const fresh = e.freshness_days != null && e.freshness_days <= 30;
+    if (fresh && status.tone === 'risk' && e.bear) return e.bear;
+    if (fresh && status.tone === 'bullish' && e.bull) return e.bull;
+    if (e.owner) return e.owner;
+    if (e.latest) {
+      const ownerId = e.owner && e.owner.id;
+      if (!ownerId || e.latest.id !== ownerId) return e.latest;
+    }
+    return e.bull || e.bear || null;
+  }
+
+  function renderInsightCompact(item, escapeHtml, linkHtml, opts) {
+    const emptyLabel = (opts && opts.emptyLabel) || '—';
+    if (!item) return `<span class="tier-sub">${emptyLabel}</span>`;
+    if (item.macroOnly) {
+      return '<span class="tier-sub" title="Portfolio-wide macro — see strip above">Macro context ↑</span>';
+    }
+    const directionClass = item.direction === 'bullish'
+      ? 'badge-ok'
+      : (item.direction === 'bearish' ? 'badge-bad' : 'badge-us');
+    const link = item.evidence_url
+      ? ` ${linkHtml(item.evidence_url, evidenceLabel(item.evidence_url, item.evidence_label), 'source-open-link')}`
+      : '';
+    const conf = item.confidence && item.confidence !== 'med'
+      ? `<span class="badge badge-us">${escapeHtml(item.confidence)}</span>`
+      : '';
+    const title = escapeHtml(item.title || 'Insight');
+    return `
+      <div class="insight-compact">
+        <div class="insight-compact-meta">
+          <span class="badge ${directionClass}">${escapeHtml(item.direction || 'neutral')}</span>
+          <span class="badge badge-us">${escapeHtml(item.source_label || item.source || 'source')}</span>
+          ${conf}
+          ${item.date ? `<span class="mono tier-sub">${escapeHtml(item.date)}</span>` : ''}
+        </div>
+        <div class="insight-compact-title" title="${title}">${title}${link}</div>
+      </div>`;
+  }
+
+  function renderTickerSourceMix(e, escapeHtml) {
+    const mix = (e.source_mix || []).map(s => SOURCE_LABEL[s] || s);
+    if (!mix.length) return '';
+    return `<span class="ticker-source-mix">${mix.slice(0, 3).map(s => escapeHtml(s)).join(' · ')}</span>`;
+  }
+
+  function filterTickerEssentialsForView(rows, viewMode) {
+    if (viewMode === 'trends') {
+      return rows.filter(t => {
+        const kt = t.kpi_trends || {};
+        if (kt.has_trend_data) return true;
+        return (kt.metrics || []).some(m => m.direction === 'accelerating' || m.direction === 'decelerating' || m.direction === 'downshift');
+      });
+    }
+    if (viewMode === 'gaps') {
+      return rows.filter(t => {
+        const e = t.essential_insights || {};
+        return e.needs_work
+          || e.status?.tone === 'stale'
+          || (e.freshness_days != null && e.freshness_days > 365);
+      });
+    }
+    if (viewMode === 'ownership') {
+      return rows.filter(t => {
+        const e = t.essential_insights || {};
+        return e.owner || (t.letter_discussants || []).length;
+      });
+    }
+    return rows;
+  }
+
+  function renderTickerInsightsDrawer(tickerRow, escapeHtml, linkHtml, ghRepo) {
+    if (!tickerRow) return '';
+    const t = tickerRow;
+    const e = t.essential_insights || {};
+    const events = (t.insight_events || []).slice(0, 12);
+    const discussants = t.letter_discussants || [];
+    const eventRows = events.map(r => `
+      <tr>
+        <td class="mono" style="font-size:11px">${escapeHtml(r.observed_at || r.date || '—')}</td>
+        <td><span class="badge badge-us">${escapeHtml(r.source_label || SOURCE_LABEL[r.source] || r.source || '—')}</span></td>
+        <td><span class="badge ${r.direction === 'bullish' ? 'badge-ok' : (r.direction === 'bearish' ? 'badge-bad' : 'badge-us')}">${escapeHtml(r.direction || 'neutral')}</span></td>
+        <td style="font-size:11px">${escapeHtml((r.title || r.summary || '').slice(0, 120))}</td>
+      </tr>`).join('');
+    const trendHtml = t.kpi_trends?.has_trend_data
+      ? `<div style="margin:8px 0">${renderTickerTrendBadges(t.kpi_trends, escapeHtml)}</div>`
+      : '';
+    const gapReasons = (e.needs_work_reasons || []).length
+      ? `<p class="tier-sub">Gaps: ${e.needs_work_reasons.map(r => escapeHtml(r)).join(', ')}</p>`
+      : '';
+    const primary = pickPrimaryInsight(e);
+    const primaryId = primary && primary.id;
+    return `
+      <div id="ticker-insights-drawer" class="detail-section ticker-insights-drawer">
+        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:8px">
+          <h4 style="margin:0"><span class="mono">${escapeHtml(t.ticker)}</span> · ${escapeHtml((t.company || '').slice(0, 48))}</h4>
+          <button type="button" class="filter-btn" id="ticker-insights-drawer-close">Close</button>
+          <button type="button" class="linkish" data-select-ticker="${escapeHtml(t.ticker)}">Open holding</button>
+          <button type="button" class="linkish" data-insights-goto-consensus data-ticker="${escapeHtml(t.ticker)}">Open in Consensus</button>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+          <span class="badge ${insightToneClass(e.status?.tone)}">${escapeHtml(e.status?.label || 'No insight')}</span>
+          ${formatFreshnessDisplay(e.freshness_days).stale ? '<span class="badge badge-warn">Stale</span>' : ''}
+        </div>
+        ${gapReasons}
+        ${trendHtml}
+        ${renderInsightCompact(primary, escapeHtml, linkHtml, { emptyLabel: 'No signal' })}
+        ${e.bull && e.bull.id !== primaryId ? `<div style="margin-top:8px"><span class="tier-sub">Bull case</span>${renderInsightCompact(e.bull, escapeHtml, linkHtml)}</div>` : ''}
+        ${e.bear && e.bear.id !== primaryId ? `<div style="margin-top:8px"><span class="tier-sub">Bear / risk</span>${renderInsightCompact(e.bear, escapeHtml, linkHtml)}</div>` : ''}
+        ${discussants.length ? renderLetterDiscussants(discussants, escapeHtml, linkHtml, ghRepo) : ''}
+        ${eventRows ? `
+        <h4 style="font-size:12px;color:var(--text-muted);margin:12px 0 6px">Recent events</h4>
+        <table class="darwin-table">
+          <thead><tr><th>Date</th><th>Source</th><th>Direction</th><th>Title</th></tr></thead>
+          <tbody>${eventRows}</tbody>
+        </table>` : ''}
+      </div>`;
+  }
+
+  function renderTickerViewTabs(activeView, escapeHtml) {
+    const views = [
+      { id: 'scan', label: 'Scan' },
+      { id: 'ownership', label: 'Ownership' },
+      { id: 'trends', label: 'Trends' },
+      { id: 'gaps', label: 'Gaps' },
+    ];
+    return `
+      <nav class="source-pills" id="ticker-view-tabs" style="margin-bottom:8px">
+        ${views.map(v => `<button type="button" class="filter-btn source-pill${activeView === v.id ? ' active' : ''}" data-ticker-view="${escapeHtml(v.id)}">${escapeHtml(v.label)}</button>`).join('')}
+      </nav>`;
+  }
+
+  function renderTickerSortTabs(activeSort, escapeHtml) {
+    const sorts = [
+      { id: 'attention', label: 'Needs attention' },
+      { id: 'fresh', label: 'Fresh' },
+      { id: 'stale', label: 'Stale' },
+      { id: 'alpha', label: 'A–Z' },
+    ];
+    return `
+      <nav class="source-pills" id="ticker-sort-tabs" style="margin-bottom:10px">
+        ${sorts.map(s => `<button type="button" class="filter-btn source-pill${activeSort === s.id ? ' active' : ''}" data-ticker-sort="${escapeHtml(s.id)}">${escapeHtml(s.label)}</button>`).join('')}
+      </nav>`;
+  }
+
+  function renderTickerScanTable(rows, escapeHtml, linkHtml) {
+    const body = rows.map(t => {
+      const e = t.essential_insights || {};
+      const status = e.status || {};
+      const fresh = formatFreshnessDisplay(e.freshness_days);
+      const primary = pickPrimaryInsight(e);
+      return `
+        <tr>
+          <td>
+            <button type="button" class="linkish mono" data-ticker-insight="${escapeHtml(t.ticker)}">${escapeHtml(t.ticker)}</button>
+            <div class="tier-sub">${escapeHtml((t.company || '').slice(0, 36))}</div>
+          </td>
+          <td><span class="badge ${insightToneClass(status.tone)}">${escapeHtml(status.label || 'No insight')}</span>${e.needs_work ? ' <span class="badge badge-warn" title="Needs work">!</span>' : ''}</td>
+          <td class="insight-cell">${renderInsightCompact(primary, escapeHtml, linkHtml, { emptyLabel: 'No signal' })}</td>
+          <td class="mono ${fresh.cls}">${escapeHtml(fresh.label)}${fresh.stale ? ' <span class="badge badge-warn">stale</span>' : ''}<div class="tier-sub">${renderTickerSourceMix(e, escapeHtml)}</div></td>
+        </tr>`;
+    }).join('');
+    return `
+      <table class="darwin-table" id="insights-ticker-table">
+        <thead><tr><th>Ticker</th><th>Status</th><th>Signal</th><th>Fresh</th></tr></thead>
+        <tbody>${body}</tbody>
+      </table>`;
+  }
+
+  function renderTickerOwnershipTable(rows, escapeHtml, linkHtml) {
+    const body = rows.map(t => {
+      const e = t.essential_insights || {};
+      const owner = e.owner;
+      const d0 = (t.letter_discussants || [])[0];
+      const fresh = formatFreshnessDisplay(e.freshness_days);
+      const fund = owner?.source_name || d0?.fund || '—';
+      const action = d0?.action || owner?.event_type || '—';
+      const quarter = d0?.quarter || '—';
+      const commentary = owner?.summary || d0?.commentary || '';
+      return `
+        <tr>
+          <td>
+            <button type="button" class="linkish mono" data-ticker-insight="${escapeHtml(t.ticker)}">${escapeHtml(t.ticker)}</button>
+            <div class="tier-sub">${escapeHtml((t.company || '').slice(0, 32))}</div>
+          </td>
+          <td style="font-size:11px">${escapeHtml(fund)}</td>
+          <td><span class="badge ${STANCE_BADGE[action] || 'badge-us'}">${escapeHtml(action)}</span></td>
+          <td class="mono" style="font-size:11px">${escapeHtml(quarter)}</td>
+          <td class="mono ${fresh.cls}">${escapeHtml(fresh.label)}</td>
+          <td class="insight-cell">${renderInsightCompact(owner, escapeHtml, linkHtml)}${commentary && !owner ? `<div class="tier-sub">${escapeHtml(commentary.slice(0, 100))}</div>` : ''}</td>
+        </tr>`;
+    }).join('');
+    return `
+      <table class="darwin-table" id="insights-ticker-table">
+        <thead><tr><th>Ticker</th><th>Fund</th><th>Action</th><th>Quarter</th><th>Fresh</th><th>Letter</th></tr></thead>
+        <tbody>${body}</tbody>
+      </table>`;
+  }
+
+  function renderTickerTrendsTable(rows, escapeHtml) {
+    const body = rows.map(t => {
+      const e = t.essential_insights || {};
+      const fresh = formatFreshnessDisplay(e.freshness_days);
+      const kt = t.kpi_trends || {};
+      const metrics = (kt.metrics || []).filter(m => m.display !== false).slice(0, 2);
+      const metricText = metrics.map(m => `${m.label || m.metric}: ${formatGrowth(m)}`).join(' · ') || '—';
+      return `
+        <tr>
+          <td>
+            <button type="button" class="linkish mono" data-ticker-insight="${escapeHtml(t.ticker)}">${escapeHtml(t.ticker)}</button>
+          </td>
+          <td>${renderTickerTrendBadges(kt, escapeHtml) || '<span class="tier-sub">—</span>'}</td>
+          <td style="font-size:11px;max-width:280px">${escapeHtml(metricText)}</td>
+          <td class="mono ${fresh.cls}">${escapeHtml(fresh.label)}</td>
+          <td><span class="badge ${insightToneClass(e.status?.tone)}">${escapeHtml(e.status?.label || '—')}</span></td>
+        </tr>`;
+    }).join('');
+    return `
+      <table class="darwin-table" id="insights-ticker-table">
+        <thead><tr><th>Ticker</th><th>Trend</th><th>Metrics</th><th>Fresh</th><th>Status</th></tr></thead>
+        <tbody>${body}</tbody>
+      </table>`;
+  }
+
+  function renderTickerGapsTable(rows, escapeHtml, linkHtml) {
+    const body = rows.map(t => {
+      const e = t.essential_insights || {};
+      const fresh = formatFreshnessDisplay(e.freshness_days);
+      const reasons = (e.needs_work_reasons || []).slice(0, 3);
+      const primary = pickPrimaryInsight(e);
+      return `
+        <tr>
+          <td>
+            <button type="button" class="linkish mono" data-ticker-insight="${escapeHtml(t.ticker)}">${escapeHtml(t.ticker)}</button>
+            <div class="tier-sub">${escapeHtml((t.company || '').slice(0, 32))}</div>
+          </td>
+          <td style="font-size:11px">${reasons.length ? reasons.map(r => `<span class="badge badge-warn">${escapeHtml(r)}</span>`).join(' ') : '<span class="badge badge-warn">stale</span>'}</td>
+          <td class="mono ${fresh.cls}">${escapeHtml(fresh.label)}</td>
+          <td class="insight-cell">${renderInsightCompact(primary, escapeHtml, linkHtml)}</td>
+        </tr>`;
+    }).join('');
+    return `
+      <table class="darwin-table" id="insights-ticker-table">
+        <thead><tr><th>Ticker</th><th>Gap</th><th>Fresh</th><th>Last signal</th></tr></thead>
+        <tbody>${body}</tbody>
+      </table>`;
+  }
+
+  function attachTickerInsightsHandlers(container, tickers, options) {
+    const { onViewMode, onSortMode, onTickerSelect, onCloseDrawer, onGotoConsensus } = options || {};
+    if (!container) return;
+    container.querySelectorAll('[data-ticker-view]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (onViewMode) onViewMode(btn.dataset.tickerView || 'scan');
+      });
+    });
+    container.querySelectorAll('[data-ticker-sort]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (onSortMode) onSortMode(btn.dataset.tickerSort || 'attention');
+      });
+    });
+    container.querySelectorAll('[data-ticker-insight]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const ticker = btn.dataset.tickerInsight;
+        if (ticker && onTickerSelect) onTickerSelect(ticker);
+      });
+    });
+    const closeBtn = container.querySelector('#ticker-insights-drawer-close');
+    if (closeBtn) closeBtn.addEventListener('click', () => { if (onCloseDrawer) onCloseDrawer(); });
+    container.querySelectorAll('[data-insights-goto-consensus]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const ticker = btn.dataset.ticker;
+        if (ticker && onGotoConsensus) onGotoConsensus(ticker);
+      });
+    });
+  }
+
   function renderTickerEssentials(tickers, escapeHtml, linkHtml, opts) {
     const sourceFilter = (opts && opts.sourceFilter) || 'ownership';
-    const rows = filterTickerEssentials(tickers, opts).slice(0, 160);
+    const viewMode = (opts && opts.viewMode) || 'scan';
+    const sortMode = (opts && opts.sortMode) || 'attention';
+    const selectedTicker = opts && opts.selectedTicker;
+    const ghRepo = (opts && opts.ghRepo) || '';
+    let rows = filterTickerEssentials(tickers, opts);
+    rows = filterTickerEssentialsForView(rows, viewMode);
+    rows = sortTickerEssentialsRows(rows, sortMode).slice(0, 160);
     const sourceTabs = renderTickerSourceFilters(sourceFilter, escapeHtml);
+    const viewTabs = renderTickerViewTabs(viewMode, escapeHtml);
+    const sortTabs = renderTickerSortTabs(sortMode, escapeHtml);
+    const tickerBySymbol = Object.fromEntries((tickers || []).map(t => [t.ticker, t]));
+    const drawer = selectedTicker && tickerBySymbol[selectedTicker]
+      ? renderTickerInsightsDrawer(tickerBySymbol[selectedTicker], escapeHtml, linkHtml, ghRepo)
+      : '';
     if (!rows.length) {
-      return `${sourceTabs}<p class="subhead">No ticker essentials match this view.</p>`;
+      return `${drawer}${sourceTabs}${viewTabs}${sortTabs}<p class="subhead">No ticker essentials match this view.</p>`;
     }
+    let table = '';
+    if (viewMode === 'ownership') table = renderTickerOwnershipTable(rows, escapeHtml, linkHtml);
+    else if (viewMode === 'trends') table = renderTickerTrendsTable(rows, escapeHtml);
+    else if (viewMode === 'gaps') table = renderTickerGapsTable(rows, escapeHtml, linkHtml);
+    else table = renderTickerScanTable(rows, escapeHtml, linkHtml);
+    const viewHint = {
+      scan: 'One signal per holding — click a ticker for full timeline.',
+      ownership: 'Letter positioning from superinvestor disclosures.',
+      trends: 'KPI inflections and SEC fundamentals where available.',
+      gaps: 'Stale coverage, missing evidence, or needs-work flags.',
+    }[viewMode] || '';
     return `
+      ${drawer}
+      <p class="tier-sub" style="margin-bottom:8px">
+        Portfolio scan · for cross-fund positioning see <strong>Consensus</strong> · ${rows.length} row(s)
+      </p>
       ${sourceTabs}
-      <table class="darwin-table" id="insights-ticker-table">
-        <thead><tr><th>Ticker</th><th>Trend</th><th>Status</th><th>Fresh</th><th>Latest</th><th>Bull</th><th>Bear/Risk</th><th>Owner</th></tr></thead>
-        <tbody>
-          ${rows.map(t => {
-            const e = t.essential_insights || {};
-            const status = e.status || {};
-            return `
-              <tr>
-                <td><button type="button" class="linkish mono" data-select-ticker="${escapeHtml(t.ticker)}">${escapeHtml(t.ticker)}</button><div class="tier-sub">${escapeHtml(t.company || '')}</div></td>
-                <td>${renderTickerTrendBadges(t.kpi_trends, escapeHtml) || '<span class="tier-sub">—</span>'}</td>
-                <td><span class="badge ${insightToneClass(status.tone)}">${escapeHtml(status.label || 'No insight')}</span></td>
-                <td class="mono">${e.freshness_days != null ? `${e.freshness_days}d` : 'n/a'}</td>
-                <td>${renderInsightItem(e.latest, escapeHtml, linkHtml)}</td>
-                <td>${renderInsightItem(e.bull, escapeHtml, linkHtml, { emptyLabel: '—' })}</td>
-                <td>${renderInsightItem(e.bear, escapeHtml, linkHtml, { emptyLabel: '—' })}</td>
-                <td>${renderInsightItem(e.owner, escapeHtml, linkHtml)}</td>
-              </tr>`;
-          }).join('')}
-        </tbody>
-      </table>`;
+      ${viewTabs}
+      ${sortTabs}
+      <p class="tier-sub" style="margin-bottom:8px;color:var(--text-muted)">${escapeHtml(viewHint)}</p>
+      ${table}`;
   }
 
   function renderSourceHealth(health, escapeHtml) {
@@ -2449,7 +2802,16 @@
       });
     } else if (activeSection === 'tickers') {
       body = renderPortfolioMacroStrip(portfolioMacro, escapeHtml, linkHtml)
-        + renderTickerEssentials(tickers, escapeHtml, linkHtml, { search: fundSearch, bookOnly, sourceFilter: tickerSourceFilter, knownTickers });
+        + renderTickerEssentials(tickers, escapeHtml, linkHtml, {
+          search: fundSearch,
+          bookOnly,
+          sourceFilter: tickerSourceFilter,
+          knownTickers,
+          viewMode: options?.tickerViewMode || 'scan',
+          sortMode: options?.tickerSortMode || 'attention',
+          selectedTicker: options?.tickerSelectedTicker || null,
+          ghRepo,
+        });
     } else if (activeSection === 'memory') {
       body = renderMemoryLedger(memory, escapeHtml, linkHtml, { search: fundSearch, bookOnly, period, knownTickers })
         + '<div style="height:14px"></div>'
@@ -2515,6 +2877,7 @@
     filterInsights,
     attachFilingVerifyHandlers,
     attachConsensusHandlers,
+    attachTickerInsightsHandlers,
     buildConsensusCsv,
     buildTimeModel,
     STANCE_BADGE,

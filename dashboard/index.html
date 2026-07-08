@@ -433,6 +433,15 @@
   .consensus-heat-cell { min-width: 44px; padding: 6px 4px !important; }
   .consensus-spark-dot { display: inline-block; width: 10px; height: 10px; border-radius: 2px; }
   .consensus-heatmap { min-width: 720px; }
+  .insight-compact { font-size: 11px; line-height: 1.4; }
+  .insight-compact-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-bottom: 3px; }
+  .insight-compact-title { font-weight: 600; font-size: 11px; max-width: 420px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ticker-source-mix { font-size: 10px; color: var(--text-muted); }
+  .ticker-insights-drawer { margin-bottom: 14px; border: 1px solid var(--border); border-radius: 8px; padding: 12px; background: rgba(255,255,255,0.02); }
+  .fresh-ok { color: var(--accent-green, #4ade80); }
+  .fresh-recent { color: var(--text-secondary); }
+  .fresh-muted { color: var(--text-muted); }
+  .fresh-stale { color: var(--accent-amber, #f59e0b); }
   .chart-card {
     background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 14px;
   }
@@ -723,6 +732,13 @@ let insightsEventTier = (() => {
   }
 })();
 let insightsTickerSourceFilter = 'ownership';
+let insightsTickerViewMode = (() => {
+  try { return localStorage.getItem(TICKER_VIEW_KEY) || 'scan'; } catch (_) { return 'scan'; }
+})();
+let insightsTickerSortMode = (() => {
+  try { return localStorage.getItem(TICKER_SORT_KEY) || 'attention'; } catch (_) { return 'attention'; }
+})();
+let tickerInsightsSelectedTicker = null;
 let insightsPdfSourceTab = 'all';
 let insightsPdfTimeMode = 'period';
 let activistSideFilter = 'all';
@@ -754,6 +770,8 @@ const INSIGHTS_SECTION_KEY = 'ssp_insights_section_v1';
 const INSIGHTS_EVENT_TIER_KEY = 'ssp_insights_event_tier_v1';
 const CONSENSUS_QUARTER_KEY = 'ssp_consensus_quarter_v1';
 const CONSENSUS_VIEW_KEY = 'ssp_consensus_view_v1';
+const TICKER_VIEW_KEY = 'ssp_ticker_view_v1';
+const TICKER_SORT_KEY = 'ssp_ticker_sort_v1';
 
 function normalizeAppHash(nextHash) {
   if (nextHash == null || nextHash === '') return '';
@@ -1173,6 +1191,9 @@ function renderInsights(opts = {}) {
     pdfTimeMode: insightsPdfTimeMode,
     portfolioMacro: data.portfolio_macro || [],
     tickerSourceFilter: insightsTickerSourceFilter,
+    tickerViewMode: insightsTickerViewMode,
+    tickerSortMode: insightsTickerSortMode,
+    tickerSelectedTicker: tickerInsightsSelectedTicker,
     kpiTrends: data.kpi_trends || null,
     inflectionTier: insightsInflectionTier,
     eventTier: insightsEventTier,
@@ -1197,6 +1218,9 @@ function renderInsights(opts = {}) {
       if (insightsSection !== 'consensus') {
         consensusSelectedTicker = null;
         consensusFundId = null;
+      }
+      if (insightsSection !== 'tickers') {
+        tickerInsightsSelectedTicker = null;
       }
       renderInsights();
     });
@@ -1275,6 +1299,36 @@ function renderInsights(opts = {}) {
       onCloseDrawer() {
         consensusSelectedTicker = null;
         renderInsights();
+      },
+    });
+  }
+  if (window.InsightsViz && insightsSection === 'tickers') {
+    InsightsViz.attachTickerInsightsHandlers(content, data.tickers || [], {
+      onViewMode(mode) {
+        insightsTickerViewMode = mode || 'scan';
+        try { localStorage.setItem(TICKER_VIEW_KEY, insightsTickerViewMode); } catch (_) { /* ignore */ }
+        renderInsights();
+      },
+      onSortMode(mode) {
+        insightsTickerSortMode = mode || 'attention';
+        try { localStorage.setItem(TICKER_SORT_KEY, insightsTickerSortMode); } catch (_) { /* ignore */ }
+        renderInsights();
+      },
+      onTickerSelect(ticker) {
+        tickerInsightsSelectedTicker = ticker;
+        renderInsights();
+      },
+      onCloseDrawer() {
+        tickerInsightsSelectedTicker = null;
+        renderInsights();
+      },
+      onGotoConsensus(ticker) {
+        insightsSection = 'consensus';
+        fundRegistrySearch = ticker;
+        consensusSelectedTicker = ticker;
+        tickerInsightsSelectedTicker = null;
+        try { localStorage.setItem(INSIGHTS_SECTION_KEY, 'consensus'); } catch (_) { /* ignore */ }
+        renderInsights({ refocusSearch: true });
       },
     });
   }
