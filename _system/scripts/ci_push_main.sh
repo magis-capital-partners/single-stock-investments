@@ -79,6 +79,21 @@ regenerate_activist_feed_artifacts() {
   git add dashboard/data/activist_feed.json
 }
 
+mirror_dashboard_to_docs() {
+  if [ ! -d dashboard ] || [ ! -d docs ]; then
+    return 0
+  fi
+  echo "Mirroring dashboard/ to docs/ after regeneration..."
+  if command -v rsync >/dev/null 2>&1; then
+    rsync -a --delete --exclude '.git' --exclude '.wrangler' dashboard/ docs/
+    return 0
+  fi
+  echo "rsync not found; falling back to cp for dashboard/ → docs/ mirror"
+  find docs -mindepth 1 -maxdepth 1 ! -name '.git' ! -name '.wrangler' -exec rm -rf {} +
+  cp -a dashboard/. docs/
+  rm -rf docs/.git docs/.wrangler 2>/dev/null || true
+}
+
 regenerate_dashboard_json() {
   if [ ! -f "_system/scripts/build_dashboard_data.py" ]; then
     echo "::error::build_dashboard_data.py not found; cannot auto-resolve dashboard conflicts."
@@ -184,6 +199,11 @@ regenerate_conflicted_artifacts() {
     regenerate_dashboard_json
   fi
 
+  if [ "$needs_dashboard" -eq 1 ] || [ "$needs_insights" -eq 1 ] || [ "$needs_activist" -eq 1 ]; then
+    mirror_dashboard_to_docs
+    git add dashboard/data/ docs/ 2>/dev/null || true
+  fi
+
   while IFS= read -r file; do
     [ -n "$file" ] || continue
     if is_regenerable_artifact "$file" && [ -f "$file" ]; then
@@ -207,7 +227,7 @@ try_resolve_rebase_conflicts() {
   is_regenerable_conflict
 }
 
-check_github_file_sizes() {
+_check_file_sizes_for_paths() {
   local limit=$((100 * 1024 * 1024))
   local warn=$((50 * 1024 * 1024))
   local failed=0
@@ -223,9 +243,17 @@ check_github_file_sizes() {
     elif [ "$size" -gt "$warn" ]; then
       echo "::warning::File $file is $((size / 1024 / 1024))MB; above GitHub 50MB recommendation."
     fi
-  done < <(git diff --cached --name-only --diff-filter=ACM)
+  done
 
   [ "$failed" -eq 0 ]
+}
+
+check_github_file_sizes() {
+  _check_file_sizes_for_paths < <(git diff --cached --name-only --diff-filter=ACM)
+}
+
+check_push_file_sizes() {
+  _check_file_sizes_for_paths < <(git diff --name-only origin/main...HEAD)
 }
 
 ci_push_main() {
@@ -256,6 +284,10 @@ ci_push_main() {
         exit 1
       fi
       echo "Rebase conflicts resolved via artifact regeneration (attempt $attempt/$MAX_ATTEMPTS)."
+    fi
+    if ! check_push_file_sizes; then
+      echo "::error::Aborting push: commits ahead of origin/main exceed GitHub size limits."
+      exit 1
     fi
     if git push origin HEAD:main; then
       echo "Pushed to main (attempt $attempt)."
