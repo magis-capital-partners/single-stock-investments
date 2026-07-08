@@ -64,7 +64,7 @@
 | FNMAO | 0 | 0 | — | no hits |
 | FNMAP | 0 | 0 | — | no hits |
 | FNV | 0 | 0 | — | no hits |
-| FRMI | 50 | 0 | 2026-07-06 | 50 indexed |
+| FRMI | 51 | 0 | 2026-07-08 | 51 indexed |
 | FRMO | 0 | 0 | — | no hits |
 | FTRE | 0 | 0 | — | no hits |
 | GCCO | 0 | 0 | — | no hits |

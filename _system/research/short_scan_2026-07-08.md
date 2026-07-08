@@ -69,7 +69,7 @@
 | FNMAO | no_hit | — | — | No activist index hits |
 | FNMAP | no_hit | — | — | No activist index hits |
 | FNV | no_hit | — | — | No activist index hits |
-| FRMI | indexed | L50/S0 | 2026-07-06 | 50 long, 0 short indexed; 0 short feed-eligible |
+| FRMI | indexed | L51/S0 | 2026-07-08 | 51 long, 0 short indexed; 0 short feed-eligible |
 | FRMO | no_hit | — | — | No activist index hits |
 | FTRE | no_hit | — | — | No activist index hits |
 | GCCO | no_hit | — | — | No activist index hits |

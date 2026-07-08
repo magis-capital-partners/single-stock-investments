@@ -1,7 +1,7 @@
 # FRMI — Third-party source inventory
 
 **Date:** 2026-07-08
-**Sources:** 52 total (0 approved, 2 pending, 50 context)
+**Sources:** 53 total (0 approved, 2 pending, 51 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -57,5 +57,6 @@
 | activist_long | Vicksburg Investments Management — PREC14A (proxy solicitati | `FRMI/third-party-analyses/activist_reports/long/PREC14A_20260505_acc0001213900_26_051937.htm` | context | activist/long — sec_edgar |
 | activist_long | Vicksburg Investments Management — PREC14A (proxy solicitati | `FRMI/third-party-analyses/activist_reports/long/PREC14A_20260515_acc0001213900_26_057963.htm` | context | activist/long — sec_edgar |
 | activist_long | Vicksburg Investments Management — DFAN14A (proxy solicitati | `FRMI/third-party-analyses/activist_reports/long/DFAN14A_20260706_acc0001213900_26_075471.htm` | context | activist/long — sec_edgar |
+| activist_long | Vicksburg Investments Management — DFAN14A (proxy solicitati | `FRMI/third-party-analyses/activist_reports/long/DFAN14A_20260708_acc0001213900_26_076168.htm` | context | activist/long — sec_edgar |
 
 Cross-check required: `FRMI/research/cross_check_third_party_2026-07-08.md`
