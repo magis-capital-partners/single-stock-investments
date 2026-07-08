@@ -114,6 +114,7 @@ python _system/scripts/marvin_cloud_refresh.py TICKER --date 2026-05-29
 ```powershell
 python _system/scripts/build_security_master.py        # canonical universe: book + Tier-A symbols harvested from letters
 python _system/scripts/build_superinvestor_insights.py # tiered per-letter mentions, fund_id + real letter dates
+python _system/scripts/calibrate_letter_dates.py --gold  # letter date parser gate (_eval/letter_date_gold.jsonl)
 python _system/scripts/calibrate_letter_matching.py --gold  # precision/recall gate vs _eval/gold.jsonl (must PASS)
 python _system/scripts/build_insights.py               # adds the consensus block (most-discussed / activity / by-ticker)
 python _system/scripts/build_dashboard_data.py          # ticker payload; insights load from dashboard/data/insights.json

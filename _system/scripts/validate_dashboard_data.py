@@ -247,6 +247,38 @@ def main() -> int:
             errors.append(
                 f"insights letter_index has {len(bad_quarters)} future quarter(s); run repair_letter_dates + rebuild"
             )
+        bad_letter_dates = []
+        mtime_dates = []
+        low_confidence_dates = []
+        for row in insights.get("letter_index") or []:
+            letter_date = row.get("letter_date") or ""
+            quarter = row.get("quarter") or ""
+            if len(letter_date) >= 4 and letter_date[:4].isdigit():
+                date_year = int(letter_date[:4])
+                if date_year > max_sane_year:
+                    bad_letter_dates.append(row)
+                elif len(quarter) >= 4 and quarter[:4].isdigit():
+                    quarter_year = int(quarter[:4])
+                    if date_year - quarter_year >= 2:
+                        bad_letter_dates.append(row)
+            if row.get("date_source") == "mtime":
+                mtime_dates.append(row)
+            conf = row.get("date_confidence")
+            if conf is not None and int(conf) < 50:
+                low_confidence_dates.append(row)
+        if bad_letter_dates:
+            errors.append(
+                f"insights letter_index has {len(bad_letter_dates)} implausible letter_date(s); "
+                "run repair_letter_dates.py --apply && make letter-rebuild"
+            )
+        if mtime_dates:
+            warnings.append(
+                f"{len(mtime_dates)} letter(s) still use mtime as letter_date; run repair_letter_dates + rebuild"
+            )
+        if low_confidence_dates:
+            warnings.append(
+                f"{len(low_confidence_dates)} letter(s) have date_confidence < 50"
+            )
         links_path = ROOT / "_system/reference/document-store/letter_drive_links.json"
         si_health = (insights.get("source_health") or {}).get("superinvestor_letters") or {}
         corpus_preserved = si_health.get("status") == "preserved"

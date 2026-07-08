@@ -268,6 +268,7 @@ def build_letter_record(path: Path, resolver: FundResolver, master: lm.SecurityM
         "quarter": meta.get("quarter") or "unknown",
         "letter_date": meta.get("letter_date"),
         "date_source": meta.get("date_source"),
+        "date_confidence": meta.get("date_confidence"),
         "fund_resolution": meta.get("resolution"),
         "source_file": _stable_ref(path),
         "source_document": source_document_ref(path),

@@ -12,7 +12,8 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 
 from fund_registry import (  # noqa: E402
-    parse_letter_date,
+    letter_date_overrides,
+    parse_letter_date_with_confidence,
     quarter_from_path,
     resolve_quarter,
     sanity_year,
@@ -45,9 +46,13 @@ def repair_letter_record(letter: dict, text: str | None = None) -> bool:
             quarter_hint = stored_q
         elif not quarter_hint:
             quarter_hint = stored_q
-    iso, date_source = parse_letter_date(stem, text, quarter_hint)
+    iso, date_source, date_confidence = parse_letter_date_with_confidence(
+        stem, text, quarter_hint, overrides=letter_date_overrides()
+    )
     if iso and sanity_year(int(iso[:4])) is None:
-        iso, date_source = parse_letter_date(stem, text, folder_q)
+        iso, date_source, date_confidence = parse_letter_date_with_confidence(
+            stem, text, folder_q, overrides=letter_date_overrides()
+        )
     if not iso and folder_q:
         return False
     new_quarter = resolve_quarter(path, stem, iso, date_source or "none")
@@ -55,6 +60,7 @@ def repair_letter_record(letter: dict, text: str | None = None) -> bool:
     if iso and letter.get("letter_date") != iso:
         letter["letter_date"] = iso
         letter["date_source"] = date_source
+        letter["date_confidence"] = date_confidence
         changed = True
     if new_quarter and letter.get("quarter") != new_quarter:
         letter["quarter"] = new_quarter

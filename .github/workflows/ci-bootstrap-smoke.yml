@@ -15,6 +15,12 @@ on:
       - "_system/scripts/test_ci_checkout_vault.sh"
       - "_system/scripts/test_vault_paths.py"
       - "_system/scripts/lint_ci_bootstrap.py"
+      - "_system/scripts/letter_date_parser.py"
+      - "_system/scripts/calibrate_letter_dates.py"
+      - "_system/scripts/test_letter_date_parser.py"
+      - "_system/scripts/test_fund_registry_date.py"
+      - "_system/scripts/_eval/letter_date_gold.jsonl"
+      - "_system/reference/letter_date_overrides.json"
       - ".github/workflows/**"
       - ".github/actions/**"
   push:
@@ -31,6 +37,12 @@ on:
       - "_system/scripts/test_ci_checkout_vault.sh"
       - "_system/scripts/test_vault_paths.py"
       - "_system/scripts/lint_ci_bootstrap.py"
+      - "_system/scripts/letter_date_parser.py"
+      - "_system/scripts/calibrate_letter_dates.py"
+      - "_system/scripts/test_letter_date_parser.py"
+      - "_system/scripts/test_fund_registry_date.py"
+      - "_system/scripts/_eval/letter_date_gold.jsonl"
+      - "_system/reference/letter_date_overrides.json"
       - ".github/workflows/**"
       - ".github/actions/**"
 
@@ -65,6 +77,18 @@ jobs:
         run: python _system/scripts/test_vault_paths.py
       - name: Lint workflow bootstrap blocks
         run: python _system/scripts/lint_ci_bootstrap.py
+
+  letter-date-parser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Letter date parser gold gate
+        run: make letter-date-check
 
   checkout-minimal:
     runs-on: ubuntu-latest

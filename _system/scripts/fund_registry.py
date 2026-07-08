@@ -28,6 +28,8 @@ from vault_paths import letters_root  # noqa: E402
 LETTERS_ROOT = letters_root()
 FUNDS_PATH = LETTERS_ROOT / "funds.json"
 UNRESOLVED_PATH = LETTERS_ROOT / "funds_unresolved.json"
+OVERRIDES_PATH = LETTERS_ROOT / "letters_date_overrides.json"
+FALLBACK_OVERRIDES_PATH = ROOT / "_system" / "reference" / "letter_date_overrides.json"
 
 MONTHS = {
     "jan": 1, "january": 1, "feb": 2, "february": 2, "mar": 3, "march": 3,
@@ -87,82 +89,29 @@ def normalize_fund_key(stem: str) -> tuple[str, str]:
     return fund_id, display
 
 
-def sanity_year(year: int | None, *, today: date | None = None) -> int | None:
-    if year is None:
-        return None
-    today = today or datetime.now(timezone.utc).date()
-    max_year = today.year + 1
-    if year < MIN_SANE_YEAR or year > max_year:
-        return None
-    return year
+from letter_date_parser import (  # noqa: E402
+    load_date_overrides,
+    parse_letter_date_with_confidence,
+    sanity_year,
+)
 
 
-def repair_ocr_years(blob: str) -> str:
-    out = OCR_YEAR_RE.sub("2011", blob)
-    return OCR_YEAR_RE2.sub("fourth quarter of 2011", out)
+def date_overrides_path() -> Path:
+    if OVERRIDES_PATH.exists():
+        return OVERRIDES_PATH
+    return FALLBACK_OVERRIDES_PATH
+
+
+def letter_date_overrides() -> list[dict]:
+    return load_date_overrides(date_overrides_path())
 
 
 def parse_letter_date(stem: str, text: str | None, quarter: str | None) -> tuple[str | None, str]:
-    """Return (iso_date, source). source in {filename, content, quarter, none}."""
-    stem = repair_ocr_years(stem)
-    if text:
-        text = repair_ocr_years(text)
-    # 1. explicit m.d.yy or m/d/yyyy in filename
-    for m in re.finditer(r"\b(\d{1,2})[._/\-](\d{1,2})[._/\-](\d{2,4})\b", stem):
-        d = _coerce_date(m.group(1), m.group(2), m.group(3))
-        if d:
-            return d.isoformat(), "filename"
-    # 2. Month YYYY in filename
-    mm = re.search(r"\b(" + "|".join(MONTHS) + r")[a-z]*\.?\s*'?(\d{2,4})\b", stem, re.I)
-    if mm:
-        month = MONTHS.get(mm.group(1).lower()[:3]) or MONTHS.get(mm.group(1).lower())
-        yr = _coerce_year(mm.group(2))
-        if month and yr:
-            return _month_end(yr, month).isoformat(), "filename"
-    # 3. quarter folder/path -> quarter-end date
-    if quarter and re.match(r"20\d{2}Q[1-4]", quarter or "", re.I):
-        yr = int(quarter[:4])
-        if sanity_year(yr) is not None:
-            q = int(quarter[5])
-            mo, dy = QUARTER_END[q]
-            return date(yr, mo, dy).isoformat(), "quarter"
-    # 4. scan content head for "as of <date>" / Month DD, YYYY
-    if text:
-        head = text[:3000]
-        m = re.search(r"\b(" + "|".join(MONTHS) + r")[a-z]*\.?\s+(\d{1,2}),?\s+(20\d{2})\b", head, re.I)
-        if m:
-            month = MONTHS.get(m.group(1).lower()[:3]) or MONTHS.get(m.group(1).lower())
-            d = _coerce_date(str(month), m.group(2), m.group(3))
-            if d:
-                return d.isoformat(), "content"
-    return None, "none"
-
-
-def _coerce_year(y: str) -> int | None:
-    y = y.strip()
-    if len(y) == 2:
-        return sanity_year(2000 + int(y))
-    if len(y) == 4 and y.startswith("20"):
-        return sanity_year(int(y))
-    return None
-
-
-def _coerce_date(mo: str, dy: str, yr: str) -> date | None:
-    try:
-        month, day = int(mo), int(dy)
-        year = _coerce_year(yr)
-        if year and 1 <= month <= 12 and 1 <= day <= 31:
-            return date(year, month, day)
-    except (ValueError, TypeError):
-        return None
-    return None
-
-
-def _month_end(year: int, month: int) -> date:
-    if month == 12:
-        return date(year, 12, 31)
-    nxt = date(year, month + 1, 1)
-    return date(nxt.year, nxt.month, 1).fromordinal(nxt.toordinal() - 1)
+    """Return (iso_date, source)."""
+    iso, source, _conf = parse_letter_date_with_confidence(
+        stem, text, quarter, overrides=letter_date_overrides()
+    )
+    return iso, source
 
 
 def quarter_from_path(path: Path) -> str | None:
@@ -206,6 +155,12 @@ def _quarter_from_date(iso: str | None) -> str | None:
     return f"{d.year}Q{(d.month - 1) // 3 + 1}"
 
 
+def _date_source_is_specific(date_source: str) -> bool:
+    return date_source in ("filename", "content", "override") or date_source.startswith(
+        ("filename_", "content_")
+    )
+
+
 def resolve_quarter(
     path: Path,
     stem: str,
@@ -224,7 +179,7 @@ def resolve_quarter(
             return folder_q
     if folder_q:
         return folder_q
-    if date_source in ("filename", "content") and date_q:
+    if _date_source_is_specific(date_source) and date_q:
         if sanity_year(int(date_q[:4])) is not None:
             return date_q
     if stem_q:
@@ -248,10 +203,9 @@ class FundResolver:
     def resolve(self, path: Path, text: str | None = None) -> dict:
         stem = path.stem
         quarter = quarter_from_path(path)
-        iso_date, date_source = parse_letter_date(stem, text, quarter)
-        if date_source == "none":
-            iso_date = datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc).strftime("%Y-%m-%d")
-            date_source = "mtime"
+        iso_date, date_source, date_confidence = parse_letter_date_with_confidence(
+            stem, text, quarter, overrides=letter_date_overrides()
+        )
 
         # 1. curated override
         for fund, patterns in self._compiled:
@@ -264,6 +218,7 @@ class FundResolver:
                     "maps_to_persona": fund.get("persona_map") or fund.get("maps_to_persona") or [],
                     "letter_date": iso_date,
                     "date_source": date_source,
+                    "date_confidence": date_confidence,
                     "quarter": resolve_quarter(path, stem, iso_date, date_source),
                     "resolution": "curated",
                 }
@@ -285,6 +240,7 @@ class FundResolver:
             "maps_to_persona": [],
             "letter_date": iso_date,
             "date_source": date_source,
+            "date_confidence": date_confidence,
             "quarter": resolve_quarter(path, stem, iso_date, date_source),
             "resolution": "normalized",
         }
