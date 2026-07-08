@@ -12,7 +12,7 @@ DATE ?= $(shell date +%Y-%m-%d)
 TICKER ?=
 DATE ?= $(shell date +%Y-%m-%d)
 
-.PHONY: research-check research-check-all depth-check depth-audit evidence milly-repass book-estimate book-estimate-all holdco-uplift short-scan activist-scan activist-scan-all activist-triage activist-triage-check activist-feed activist-feed-check activist-registry-audit filing-resolve event-triage event-triage-check hk-scan hk-cross-check-all hk-extract-refresh third-party-scan-all cross-check-all transcript-sync batch-refresh evidence-check darwin-pit-check darwin-build darwin-pit-audit darwin-sync-external darwin-explore persona-lens persona-insights persona-check document-registry document-catalog-search document-sync-drive document-sync-drive-letters document-sync-drive-general document-drive-plan document-drive-migrate document-drive-cleanup document-drive-audit research-memory sumzero-index letter-import-drive letter-extract-text letter-backfill letter-rebuild letter-repair-dates letter-date-check vault-setup vault-check
+.PHONY: research-check research-check-all depth-check depth-audit evidence milly-repass book-estimate book-estimate-all holdco-uplift short-scan activist-scan activist-scan-all activist-triage activist-triage-check activist-feed activist-feed-check activist-registry-audit filing-resolve event-triage event-triage-check hk-scan hk-cross-check-all hk-extract-refresh third-party-scan-all cross-check-all transcript-sync batch-refresh evidence-check darwin-pit-check darwin-build darwin-pit-audit darwin-sync-external darwin-explore persona-lens persona-insights persona-check document-registry document-catalog-search document-sync-drive document-sync-drive-letters document-sync-drive-general document-drive-plan document-drive-migrate document-drive-cleanup document-drive-audit research-memory specialist-13f-ingest sumzero-index letter-import-drive letter-extract-text letter-backfill letter-rebuild letter-repair-dates letter-date-check vault-setup vault-check
 
 persona-lens:
 	$(PYTHON) $(SCRIPTS)/fetch_superinvestor_letters.py --all --build
@@ -49,6 +49,7 @@ letter-rebuild:
 	$(PYTHON) $(SCRIPTS)/auto_resolve_filing_events.py
 	$(PYTHON) $(SCRIPTS)/build_insights.py
 	$(PYTHON) $(SCRIPTS)/build_letter_drive_links.py
+	$(PYTHON) $(SCRIPTS)/build_research_memory.py
 	$(PYTHON) $(SCRIPTS)/build_dashboard_data.py
 	@echo OK: letter-rebuild
 
@@ -61,6 +62,7 @@ letter-backfill:
 	$(PYTHON) $(SCRIPTS)/build_document_registry.py
 	$(PYTHON) $(SCRIPTS)/sync_pdf_store_google_drive.py --root-key hedge_fund_letters
 	$(PYTHON) $(SCRIPTS)/build_letter_drive_links.py
+	$(PYTHON) $(SCRIPTS)/build_research_memory.py
 	$(PYTHON) $(SCRIPTS)/build_dashboard_data.py
 	@echo OK: letter-backfill
 
@@ -132,8 +134,17 @@ document-sync-drive-general:
 research-memory:
 	$(PYTHON) $(SCRIPTS)/build_document_registry.py
 	$(PYTHON) $(SCRIPTS)/build_research_memory.py
+	$(PYTHON) $(SCRIPTS)/validate_research_memory.py
 	$(PYTHON) $(SCRIPTS)/build_dashboard_data.py
 	@echo OK: research-memory
+
+specialist-13f-ingest:
+	$(PYTHON) $(SCRIPTS)/ingest_specialist_13f.py
+	$(PYTHON) $(SCRIPTS)/build_specialist_13f_signals.py
+	$(PYTHON) $(SCRIPTS)/build_insights.py
+	$(PYTHON) $(SCRIPTS)/build_research_memory.py
+	$(PYTHON) $(SCRIPTS)/build_dashboard_data.py
+	@echo OK: specialist-13f-ingest
 
 sumzero-index:
 	$(PYTHON) $(SCRIPTS)/build_sumzero_index.py

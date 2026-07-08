@@ -60,9 +60,38 @@ regenerate_insights_artifacts() {
   fi
   echo "Regenerating insights artifacts to resolve rebase conflicts..."
   rm -f dashboard/data/insights.json 2>/dev/null || true
+  rm -f _system/reference/data-sources/insights_record_archive.json 2>/dev/null || true
   "$PYTHON" _system/scripts/build_insights.py
   git add dashboard/data/insights.json 2>/dev/null || true
   git add _system/reference/data-sources/insights_record_archive.json 2>/dev/null || true
+}
+
+clean_regeneration_side_effects() {
+  # build_insights.py may refresh triage queues; keep them out of intake commits.
+  if [ -d _system/reviews/pending ]; then
+    git restore --worktree _system/reviews/pending/ 2>/dev/null || true
+  fi
+}
+
+prepare_conflicted_files_for_regeneration() {
+  local file
+  while IFS= read -r file; do
+    [ -n "$file" ] || continue
+    if is_regenerable_artifact "$file"; then
+      rm -f "$file" 2>/dev/null || true
+    fi
+  done <<< "$(conflicted_files)"
+}
+
+stage_resolved_conflicts() {
+  local conflicted="$1"
+  local file
+  while IFS= read -r file; do
+    [ -n "$file" ] || continue
+    if is_regenerable_artifact "$file" && [ -f "$file" ]; then
+      git add -f "$file"
+    fi
+  done <<< "$conflicted"
 }
 
 regenerate_activist_feed_artifacts() {
@@ -153,6 +182,7 @@ regenerate_conflicted_artifacts() {
   local needs_portfolio=0
 
   conflicted=$(conflicted_files)
+  prepare_conflicted_files_for_regeneration
   while IFS= read -r file; do
     [ -n "$file" ] || continue
     case "$file" in
@@ -204,12 +234,7 @@ regenerate_conflicted_artifacts() {
     git add dashboard/data/ docs/ 2>/dev/null || true
   fi
 
-  while IFS= read -r file; do
-    [ -n "$file" ] || continue
-    if is_regenerable_artifact "$file" && [ -f "$file" ]; then
-      git add "$file"
-    fi
-  done <<< "$conflicted"
+  stage_resolved_conflicts "$conflicted"
 }
 
 try_resolve_rebase_conflicts() {
@@ -220,6 +245,7 @@ try_resolve_rebase_conflicts() {
     return 1
   fi
   regenerate_conflicted_artifacts
+  clean_regeneration_side_effects
   GIT_EDITOR=true git rebase --continue || true
   if ! rebase_in_progress; then
     return 0

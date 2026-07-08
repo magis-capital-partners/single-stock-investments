@@ -342,8 +342,10 @@ def build_time_periods(rows: list[dict], folders: dict) -> dict:
 
     quarters = sorted(by_quarter.values(), key=lambda q: (q["year"], q["quarter"]), reverse=True)
     years = sorted({q["year"] for q in quarters}, reverse=True)
+    latest_catalog = quarters[0]["id"] if quarters else None
     return {
-        "latest_quarter": quarters[0]["id"] if quarters else None,
+        "latest_quarter": latest_catalog,
+        "latest_catalog_quarter": latest_catalog,
         "years": years,
         "available_quarters": quarters,
     }
@@ -1212,6 +1214,26 @@ def dedupe_insight_columns(latest: dict | None, bull: dict | None, bear: dict | 
     return latest, bull, bear
 
 
+def dedupe_owner_insights(
+    latest: dict | None,
+    bull: dict | None,
+    bear: dict | None,
+    owner: dict | None,
+) -> tuple[dict | None, dict | None, dict | None, dict | None]:
+    """Remove duplicate cards across latest/bull/bear/owner columns."""
+    latest, bull, bear = dedupe_insight_columns(latest, bull, bear)
+    if not owner:
+        return latest, bull, bear, owner
+    owner_id = owner.get("id")
+    if latest and latest.get("id") == owner_id:
+        latest = None
+    if bull and bull.get("id") == owner_id:
+        bull = None
+    if bear and bear.get("id") == owner_id:
+        bear = None
+    return latest, bull, bear, owner
+
+
 def letter_claim_quality(row: dict) -> int:
     commentary = str(row.get("commentary") or row.get("claim") or "")
     if is_letter_table_debris(commentary):
@@ -1314,6 +1336,8 @@ def build_essential_insights(
             "evidence_document_id": d0.get("evidence_document_id") or document_id_for_ref(d0.get("source_document") or d0.get("source_file")),
         }
 
+    latest, bull, bear, owner = dedupe_owner_insights(latest, bull, bear, owner)
+
     bullets: list[dict] = []
     seen: set[str] = set()
     for item in (latest, bear, bull, owner):
@@ -1338,6 +1362,8 @@ def build_essential_insights(
 
     fresh = freshness_days is not None and freshness_days <= 30
     macro_only = bool(portfolio_rows and not specific_rows and not discussants)
+    if macro_only:
+        latest = None
     ticker_specific = bool(specific_rows or discussants)
     bear_specific = bool(
         bear
@@ -1783,7 +1809,6 @@ def build() -> dict:
         "watchlist": watchlist,
         "tickers": rows,
         "portfolio_macro": portfolio_macro,
-        "research_memory": memory_doc,
     }
 
 
@@ -1956,7 +1981,12 @@ def main() -> None:
             "record_count": insights_doc.get("record_count"),
         }
     if memory_doc:
-        payload["research_memory"] = memory_doc
+        payload["research_memory_ref"] = {
+            "path": "dashboard/data/research_memory.json",
+            "evidence_path": "dashboard/data/research_memory_evidence.json",
+            "generated_at": memory_doc.get("generated_at"),
+            "summary": memory_doc.get("summary"),
+        }
     if document_catalog:
         payload["document_catalog"] = {
             "generated_at": document_catalog.get("generated_at"),

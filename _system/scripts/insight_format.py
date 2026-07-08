@@ -5,12 +5,13 @@ import re
 
 PORTFOLIO_WIDE_SOURCES = frozenset({"macro", "theme"})
 
-OWNERSHIP_SOURCES = frozenset({"superinvestor_letter", "insider"})
+OWNERSHIP_SOURCES = frozenset({"superinvestor_letter", "insider", "specialist_13f"})
 
 TICKER_SPECIFIC_SOURCES = frozenset(
     {
         "superinvestor_letter",
         "insider",
+        "specialist_13f",
         "filing",
         "news",
         "third_party",

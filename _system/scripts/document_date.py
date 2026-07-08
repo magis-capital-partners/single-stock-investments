@@ -23,6 +23,7 @@ YYYYMM_RE = re.compile(r"(?<!\d)(20\d{2})([01]\d)(?!\d)")
 YYMMDD_COMPACT_RE = re.compile(r"(?<!\d)([0-2]\d)([01]\d)([0-3]\d)(?!\d)")
 YYMMDD_SEPARATED_RE = re.compile(r"(?<!\d)([0-3]?\d)[._\-/ ]([0-3]?\d)[._\-/ ]([0-2]\d{1,2})(?!\d)")
 FY_RE = re.compile(r"\bFY\s*(20\d{2}|19\d{2})\b", re.IGNORECASE)
+FISCAL_Q_RE = re.compile(r"\bQ([1-4])\s*FY\s*(20\d{2}|19\d{2})\b", re.IGNORECASE)
 HALF_RE = re.compile(r"\b([12])H[\s\-_]*(20\d{2}|19\d{2})\b", re.IGNORECASE)
 BARE_YEAR_RE = re.compile(r"(?<!\d)(20\d{2}|19\d{2})(?!\d)")
 
@@ -206,7 +207,43 @@ def parse_yymmdd(text: str) -> DocumentPeriod | None:
     return _finish(iso, "title")
 
 
+def fiscal_quarter_to_calendar(fiscal_q: int, fiscal_year: int) -> tuple[int, int]:
+    """Approximate calendar (year, quarter) for Qn FY20YY (Jan fiscal year-end default)."""
+    mapping = {
+        1: (fiscal_year - 1, 2),
+        2: (fiscal_year - 1, 3),
+        3: (fiscal_year - 1, 4),
+        4: (fiscal_year, 1),
+    }
+    return mapping[fiscal_q]
+
+
+def parse_fiscal_quarter(text: str) -> DocumentPeriod | None:
+    m = FISCAL_Q_RE.search(text)
+    if not m:
+        return None
+    fiscal_q, fiscal_year = int(m.group(1)), int(m.group(2))
+    if not valid_year(fiscal_year):
+        return None
+    cal_year, cal_q = fiscal_quarter_to_calendar(fiscal_q, fiscal_year)
+    if not valid_year(cal_year):
+        return None
+    month_ends = {1: (3, 31), 2: (6, 30), 3: (9, 30), 4: (12, 31)}
+    month, day = month_ends[cal_q]
+    qid = quarter_id(cal_year, cal_q)
+    return DocumentPeriod(
+        document_date=f"{cal_year}-{month:02d}-{day:02d}",
+        document_year=cal_year,
+        document_quarter=qid,
+        period_label=f"Q{fiscal_q} FY{fiscal_year}",
+        period_source="fy_quarter",
+        quarter_display=quarter_display(qid),
+    )
+
+
 def parse_fy(text: str) -> DocumentPeriod | None:
+    if FISCAL_Q_RE.search(text):
+        return None
     m = FY_RE.search(text)
     if not m:
         return None
@@ -318,6 +355,7 @@ def infer_document_period(doc: dict) -> DocumentPeriod:
     for text, source in candidates:
         for parser in (
             lambda t, s=source: parse_quarter_text(t),
+            lambda t, s=source: parse_fiscal_quarter(t),
             lambda t, s=source: parse_half(t),
             lambda t, s=source: parse_fy(t),
             lambda t, s=source: parse_yyyymm(t),

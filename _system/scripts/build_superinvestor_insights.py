@@ -115,6 +115,26 @@ def theme_stance(text: str, keywords: list[str]) -> str:
     return "neutral"
 
 
+def tickers_near_keyword(text: str, keyword: str, tickers: list[str], window: int = 400) -> list[str]:
+    kw = keyword.strip().lower()
+    if not kw:
+        return []
+    lower = text.lower()
+    idx = lower.find(kw)
+    if idx < 0:
+        return []
+    start = max(0, idx - window)
+    end = min(len(text), idx + len(kw) + window)
+    snippet = text[start:end].upper()
+    found: list[str] = []
+    for ticker in tickers:
+        base = ticker.split(".", 1)[0] if "." in ticker else ticker
+        token = base.upper()
+        if token and token in snippet and ticker not in found:
+            found.append(ticker)
+    return found
+
+
 def extract_themes(text: str, tickers: list[str]) -> list[dict]:
     lower = f" {text.lower()} "
     upper = text.upper()
@@ -124,7 +144,18 @@ def extract_themes(text: str, tickers: list[str]) -> list[dict]:
         if not hits:
             continue
         stance = theme_stance(text, hits)
-        related = [t for t in tickers if (t.split(".", 1)[0] if "." in t else t) in upper][:5]
+        related: list[str] = []
+        for kw in hits:
+            related.extend(tickers_near_keyword(text, kw, tickers))
+        deduped: list[str] = []
+        seen: set[str] = set()
+        for ticker in related:
+            if ticker not in seen:
+                seen.add(ticker)
+                deduped.append(ticker)
+        related = deduped[:5]
+        if not related:
+            related = [t for t in tickers if (t.split(".", 1)[0] if "." in t else t) in upper][:5]
         themes.append({"theme": theme, "stance": stance, "tickers": related, "quote": hits[0].strip()})
     return themes[:10]
 
