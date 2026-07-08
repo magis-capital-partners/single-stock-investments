@@ -252,9 +252,49 @@ test_docs_mirror_after_dashboard_conflict() {
   fi
 }
 
+test_insights_docs_mirror_conflict() {
+  git checkout -b "$TMP_BRANCH" >/dev/null
+
+  python3 _system/scripts/build_insights.py >/dev/null
+  mirror_dashboard_to_docs
+  git add dashboard/data/insights.json _system/reference/data-sources/insights_record_archive.json docs/data/insights.json
+  git commit -m "test: base insights+docs snapshot" >/dev/null
+
+  python3 _system/scripts/build_insights.py >/dev/null
+  mirror_dashboard_to_docs
+  git add dashboard/data/insights.json _system/reference/data-sources/insights_record_archive.json docs/data/insights.json
+  git commit -m "test: local insights+docs regen" >/dev/null
+
+  git branch test-main-conflict "$MAIN_REF" >/dev/null
+  git checkout test-main-conflict >/dev/null
+  python3 _system/scripts/build_insights.py >/dev/null
+  mirror_dashboard_to_docs
+  git add dashboard/data/insights.json _system/reference/data-sources/insights_record_archive.json docs/data/insights.json
+  git commit -m "test: main insights+docs regen" >/dev/null
+
+  git checkout "$TMP_BRANCH" >/dev/null
+  if git rebase test-main-conflict; then
+    echo "FAIL: expected rebase conflict in insights artifacts"
+    exit 1
+  fi
+
+  while rebase_in_progress && try_resolve_rebase_conflicts; do
+    :
+  done
+  if rebase_in_progress; then
+    echo "FAIL: insights+docs mirror conflict resolution helper did not finish rebase"
+    exit 1
+  fi
+  if ! cmp -s dashboard/data/insights.json docs/data/insights.json; then
+    echo "FAIL: docs/data/insights.json not mirrored after conflict resolution"
+    exit 1
+  fi
+}
+
 run_test "dashboard JSON rebase conflict auto-resolution" test_dashboard_json_conflict
 run_test "docs mirror after dashboard JSON rebase conflict" test_docs_mirror_after_dashboard_conflict
 run_test "insights JSON rebase conflict auto-resolution" test_insights_json_conflict
+run_test "insights docs mirror rebase conflict auto-resolution" test_insights_docs_mirror_conflict
 run_test "activist feed JSON rebase conflict auto-resolution" test_activist_feed_json_conflict
 run_test "INDEX.csv rebase conflict auto-resolution" test_index_csv_conflict
 run_test "mixed generated artifact rebase conflict auto-resolution" test_mixed_generated_conflict
