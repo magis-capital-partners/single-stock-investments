@@ -741,6 +741,9 @@ let insightsTickerSortMode = (() => {
 let tickerInsightsSelectedTicker = null;
 let insightsPdfSourceTab = 'all';
 let insightsPdfTimeMode = 'period';
+let insightsThemesViewMode = (() => {
+  try { return localStorage.getItem(THEMES_VIEW_KEY) || 'snapshot'; } catch (_) { return 'snapshot'; }
+})();
 let activistSideFilter = 'all';
 let activistReviewFilter = '';
 let activistSearch = '';
@@ -770,6 +773,7 @@ const INSIGHTS_SECTION_KEY = 'ssp_insights_section_v1';
 const INSIGHTS_EVENT_TIER_KEY = 'ssp_insights_event_tier_v1';
 const CONSENSUS_QUARTER_KEY = 'ssp_consensus_quarter_v1';
 const CONSENSUS_VIEW_KEY = 'ssp_consensus_view_v1';
+const THEMES_VIEW_KEY = 'ssp_themes_view_v1';
 const TICKER_VIEW_KEY = 'ssp_ticker_view_v1';
 const TICKER_SORT_KEY = 'ssp_ticker_sort_v1';
 
@@ -1050,6 +1054,12 @@ async function load() {
   } catch {
     data.insights = null;
   }
+  try {
+    const memoryRes = await fetch('data/research_memory.json?' + Date.now());
+    if (memoryRes.ok) data.research_memory = await memoryRes.json();
+  } catch {
+    data.research_memory = null;
+  }
   document.getElementById('meta-updated').textContent =
     `Updated ${data.generated_at.replace('T', ' ').replace('Z', ' UTC')} · ${data.summary.ticker_count} tickers`;
   renderMarketFilters();
@@ -1197,6 +1207,15 @@ function renderInsights(opts = {}) {
     kpiTrends: data.kpi_trends || null,
     inflectionTier: insightsInflectionTier,
     eventTier: insightsEventTier,
+    themesViewMode: insightsThemesViewMode,
+  });
+  content.querySelectorAll('[data-use-latest-quarter]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const timeModel = InsightsViz.buildTimeModel(insights, data.document_catalog);
+      const latest = timeModel.latestIndexedQuarter;
+      if (latest) insightsQuarter = latest;
+      renderInsights();
+    });
   });
   content.querySelectorAll('[data-insights-quarter]').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -1298,6 +1317,27 @@ function renderInsights(opts = {}) {
       },
       onCloseDrawer() {
         consensusSelectedTicker = null;
+        renderInsights();
+      },
+    });
+  }
+  if (window.InsightsViz && insightsSection === 'themes') {
+    const timeModel = InsightsViz.buildTimeModel(insights, data.document_catalog);
+    InsightsViz.attachThemesHandlers(content, {
+      onThemeDrill(theme) {
+        insightsSection = 'letters';
+        fundRegistrySearch = theme || '';
+        try { localStorage.setItem(INSIGHTS_SECTION_KEY, 'letters'); } catch (_) { /* ignore */ }
+        renderInsights({ refocusSearch: true });
+      },
+      onUseLatestQuarter() {
+        const latest = timeModel.latestIndexedQuarter;
+        if (latest) insightsQuarter = latest;
+        renderInsights();
+      },
+      onViewMode(mode) {
+        insightsThemesViewMode = mode || 'snapshot';
+        try { localStorage.setItem(THEMES_VIEW_KEY, insightsThemesViewMode); } catch (_) { /* ignore */ }
         renderInsights();
       },
     });

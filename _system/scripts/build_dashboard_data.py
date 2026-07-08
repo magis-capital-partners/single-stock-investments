@@ -342,8 +342,10 @@ def build_time_periods(rows: list[dict], folders: dict) -> dict:
 
     quarters = sorted(by_quarter.values(), key=lambda q: (q["year"], q["quarter"]), reverse=True)
     years = sorted({q["year"] for q in quarters}, reverse=True)
+    latest_catalog = quarters[0]["id"] if quarters else None
     return {
-        "latest_quarter": quarters[0]["id"] if quarters else None,
+        "latest_quarter": latest_catalog,
+        "latest_catalog_quarter": latest_catalog,
         "years": years,
         "available_quarters": quarters,
     }
@@ -1807,7 +1809,6 @@ def build() -> dict:
         "watchlist": watchlist,
         "tickers": rows,
         "portfolio_macro": portfolio_macro,
-        "research_memory": memory_doc,
     }
 
 
@@ -1980,7 +1981,12 @@ def main() -> None:
             "record_count": insights_doc.get("record_count"),
         }
     if memory_doc:
-        payload["research_memory"] = memory_doc
+        payload["research_memory_ref"] = {
+            "path": "dashboard/data/research_memory.json",
+            "evidence_path": "dashboard/data/research_memory_evidence.json",
+            "generated_at": memory_doc.get("generated_at"),
+            "summary": memory_doc.get("summary"),
+        }
     if document_catalog:
         payload["document_catalog"] = {
             "generated_at": document_catalog.get("generated_at"),

@@ -60,6 +60,7 @@ SOURCE_META = {
     "filing": {"label": "Filing", "materiality": 0.96, "quality": 1.0, "axis": "fundamentals"},
     "earnings": {"label": "Earnings", "materiality": 0.94, "quality": 0.96, "axis": "fundamentals"},
     "insider": {"label": "Insider", "materiality": 0.86, "quality": 0.9, "axis": "ownership"},
+    "specialist_13f": {"label": "Specialist 13F", "materiality": 0.88, "quality": 0.92, "axis": "ownership"},
     "superinvestor_letter": {"label": "Letter", "materiality": 0.8, "quality": 0.82, "axis": "ownership"},
     "sumzero_research": {"label": "SumZero", "materiality": 0.64, "quality": 0.68, "axis": "variant_view"},
     "news": {"label": "News", "materiality": 0.72, "quality": 0.7, "axis": "catalyst"},
@@ -1109,6 +1110,42 @@ def from_insider_transactions(our_tickers: set[str]) -> list[dict]:
     return out
 
 
+def from_specialist_13f(our_tickers: set[str]) -> list[dict]:
+    records_path = ROOT / "_system" / "reference" / "market-data" / "ownership" / "records" / "latest.json"
+    doc = load_json(records_path)
+    if not isinstance(doc, dict):
+        return []
+    out: list[dict] = []
+    for row in doc.get("records") or []:
+        ticker = str(row.get("ticker") or "").upper()
+        if ticker not in our_tickers:
+            continue
+        change = row.get("change_type") or "unchanged"
+        if change == "unchanged":
+            continue
+        direction = "bullish" if change in {"new", "add"} else "bearish" if change in {"trim", "exit"} else "neutral"
+        fund = row.get("fund") or row.get("fund_id")
+        claim = f"{fund} {change} {ticker} in {row.get('quarter') or 'latest quarter'}"
+        if row.get("change_shares_pct") is not None:
+            claim += f" ({row['change_shares_pct']:+.1f}% shares)."
+        out.append(
+            insight_record(
+                source="specialist_13f",
+                as_of=row.get("filing_date"),
+                scope="ticker",
+                ref=ticker,
+                title=f"Specialist 13F {change}: {fund}",
+                claim=claim,
+                direction=direction,
+                evidence_ref=row.get("source_url"),
+                event_type=f"13f_{change}",
+                impact_axis="ownership",
+                confidence="med" if row.get("fund_id") in {"baker-bros", "ra-capital", "orbimed", "perceptive-advisors"} else "low",
+            )
+        )
+    return out
+
+
 def from_earnings_calendar() -> list[dict]:
     docs: list[tuple[Path, dict]] = []
     global_doc = load_json(EARNINGS_CACHE)
@@ -1203,9 +1240,7 @@ def theme_rankings(records: list[dict], quarter: str | None = None, our_tickers:
     for bucket in by_theme.values():
         all_tickers = sorted(bucket["top_tickers"])
         ours = [t for t in all_tickers if t in holdings]
-        if holdings and not ours:
-            continue
-        top = (ours if holdings else all_tickers)[:8]
+        top = (ours if (holdings and ours) else all_tickers)[:8]
         out.append(
             {
                 "theme": bucket["theme"],
@@ -1225,6 +1260,91 @@ def theme_rankings_by_quarter(records: list[dict], our_tickers: set[str] | None 
     out = {"all": theme_rankings(records, our_tickers=our_tickers)}
     for q in quarters:
         out[q] = theme_rankings(records, quarter=q, our_tickers=our_tickers)
+    return out
+
+
+def _quarter_sort_key(qid: str) -> tuple[int, int]:
+    m = re.match(r"^(20\d{2})Q([1-4])$", str(qid))
+    if m:
+        return (int(m.group(1)), int(m.group(2)))
+    return (0, 0)
+
+
+def build_insights_time_periods(letters: list[dict], theme_by_q: dict[str, list]) -> dict:
+    """Indexed letter quarters — used by Insights 'Latest' (not PDF catalog alone)."""
+    quarters: set[str] = set()
+    for letter in letters:
+        q = letter.get("quarter")
+        if q and re.match(r"^20\d{2}Q[1-4]$", str(q)):
+            quarters.add(str(q))
+    for q in theme_by_q:
+        if q != "all" and re.match(r"^20\d{2}Q[1-4]$", str(q)):
+            quarters.add(str(q))
+    sorted_q = sorted(quarters, key=_quarter_sort_key)
+    return {
+        "latest_indexed_quarter": sorted_q[-1] if sorted_q else None,
+        "indexed_quarters": sorted_q,
+    }
+
+
+def theme_glossary() -> dict[str, list[str]]:
+    try:
+        import build_superinvestor_insights as si  # noqa: WPS433
+
+        return dict(getattr(si, "THEME_KEYWORDS", {}) or {})
+    except Exception:
+        return {}
+
+
+def compute_theme_qoq_shifts(current: list[dict], prior: list[dict]) -> list[dict]:
+    prior_map = {r["theme"]: r for r in prior if r.get("theme")}
+    seen: set[str] = set()
+    shifts: list[dict] = []
+    for row in current:
+        theme = row.get("theme")
+        if not theme:
+            continue
+        seen.add(str(theme))
+        prev = prior_map.get(theme, {})
+        shifts.append(
+            {
+                "theme": theme,
+                "fund_count": row.get("fund_count") or row.get("letter_count") or 0,
+                "delta_funds": (row.get("fund_count") or 0) - (prev.get("fund_count") or 0),
+                "bullish": row.get("bullish") or 0,
+                "delta_bullish": (row.get("bullish") or 0) - (prev.get("bullish") or 0),
+                "bearish": row.get("bearish") or 0,
+                "delta_bearish": (row.get("bearish") or 0) - (prev.get("bearish") or 0),
+                "top_tickers": row.get("top_tickers") or [],
+            }
+        )
+    for theme, prev in prior_map.items():
+        if theme in seen:
+            continue
+        shifts.append(
+            {
+                "theme": theme,
+                "fund_count": 0,
+                "delta_funds": -(prev.get("fund_count") or 0),
+                "bullish": 0,
+                "delta_bullish": -(prev.get("bullish") or 0),
+                "bearish": 0,
+                "delta_bearish": -(prev.get("bearish") or 0),
+                "top_tickers": [],
+            }
+        )
+    return sorted(shifts, key=lambda x: (-abs(x["delta_funds"]), str(x["theme"])))
+
+
+def theme_qoq_by_quarter(theme_by_q: dict[str, list[dict]]) -> dict[str, dict]:
+    qids = sorted((q for q in theme_by_q if q not in ("all", "unknown")), key=_quarter_sort_key)
+    out: dict[str, dict] = {}
+    for i, qid in enumerate(qids):
+        if i == 0:
+            continue
+        prior_qid = qids[i - 1]
+        shifts = compute_theme_qoq_shifts(theme_by_q.get(qid) or [], theme_by_q.get(prior_qid) or [])
+        out[qid] = {"prior_quarter": prior_qid, "shifts": shifts}
     return out
 
 
@@ -2266,6 +2386,7 @@ def main() -> int:
     sumzero_doc = load_json(SUMZERO_INDEX)
     records.extend(from_sumzero_ideas(sumzero_doc if isinstance(sumzero_doc, dict) else None, front_tickers))
     records.extend(from_insider_transactions(front_tickers))
+    records.extend(from_specialist_13f(front_tickers))
     records.extend(from_earnings_calendar())
 
     for p in ROOT.iterdir():
@@ -2336,6 +2457,7 @@ def main() -> int:
             ),
         }
         source_health["superinvestor_letters"] = si_health
+    theme_by_q = theme_rankings_by_quarter(records, front_tickers)
     payload = {
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "record_count": len(records),
@@ -2352,7 +2474,10 @@ def main() -> int:
         "events": events,
         "events_by_ticker": events_by_ticker(events),
         "theme_rankings": theme_rankings(records, our_tickers=front_tickers),
-        "theme_rankings_by_quarter": theme_rankings_by_quarter(records, front_tickers),
+        "theme_rankings_by_quarter": theme_by_q,
+        "theme_qoq_by_quarter": theme_qoq_by_quarter(theme_by_q),
+        "theme_glossary": theme_glossary(),
+        "time_periods": build_insights_time_periods(letters, theme_by_q),
         "letter_index": letter_index(letters, front_tickers),
         "consensus": build_consensus(letters, front_tickers, security_names()),
         "fund_registry": fund_registry(letters, front_tickers),

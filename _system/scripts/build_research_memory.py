@@ -2,100 +2,48 @@
 """Build a compact cross-referenced research memory for the dashboard."""
 from __future__ import annotations
 
-import hashlib
 import json
-import re
 from collections import Counter, defaultdict
-from datetime import datetime, timezone
 from pathlib import Path
 import sys
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "_system" / "scripts"))
+
 from document_store import document_id_for_ref  # noqa: E402
+from memory_claim_sources import supplemental_claim_rows  # noqa: E402
+from memory_common import (  # noqa: E402
+    SPECIALIST_FUND_TERMS,
+    claim_type,
+    confidence_score,
+    dedupe_review_queue,
+    evidence_effect,
+    is_biotech_ticker,
+    is_low_value_claim,
+    now_iso,
+    short_text,
+    slug,
+    source_type,
+    stable_id,
+)
+from ownership_common import (  # noqa: E402
+    FUNDS_PATH,
+    RECORDS_DIR,
+    SIGNALS_PATH,
+    load_json,
+    save_json,
+)
 
 DATA_DIR = ROOT / "dashboard" / "data"
 OUTPUT = DATA_DIR / "research_memory.json"
+EVIDENCE_OUTPUT = DATA_DIR / "research_memory_evidence.json"
 INSIGHTS_PATH = DATA_DIR / "insights.json"
 REGISTRY_PATH = ROOT / "_system" / "portfolio" / "registry.json"
 CLASS_PATH = ROOT / "_system" / "portfolio" / "classification.json"
-BIOTECH_FUNDS_PATH = ROOT / "_system" / "reference" / "market-data" / "ownership" / "biotech_specialist_funds.json"
 
-BIOTECH_TERMS = (
-    "biotech",
-    "biopharma",
-    "pharma",
-    "drug",
-    "clinical",
-    "fda",
-    "pdufa",
-    "phase 1",
-    "phase 2",
-    "phase 3",
-    "therapy",
-    "therapeutics",
-    "diagnostic",
-    "life sciences",
-    "healthcare",
-)
-
-INFLECTION_TERMS = (
-    "accelerat",
-    "inflect",
-    "improv",
-    "recover",
-    "less bad",
-    "decline",
-    "growth",
-    "margin",
-    "revision",
-    "revenue",
-    "earnings",
-    "free cash flow",
-)
-
-
-def load_json(path: Path, default):
-    if not path.exists():
-        return default
-    try:
-        return json.loads(path.read_text(encoding="utf-8"))
-    except json.JSONDecodeError:
-        return default
-
-
-def now_iso() -> str:
-    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-
-
-def short_text(value: str | None, limit: int = 320) -> str:
-    text = re.sub(r"\s+", " ", value or "").strip()
-    if len(text) <= limit:
-        return text
-    return text[: limit - 1].rstrip() + "..."
-
-
-def slug(value: str | None, limit: int = 80) -> str:
-    text = re.sub(r"[^a-z0-9]+", "-", (value or "").lower()).strip("-")
-    return text[:limit].strip("-") or "unknown"
-
-
-def stable_id(*parts: object, size: int = 16) -> str:
-    raw = "|".join(str(p or "") for p in parts)
-    return hashlib.sha1(raw.encode("utf-8")).hexdigest()[:size]
-
-
-def source_type(row: dict) -> str:
-    source = row.get("source") or "source"
-    return {
-        "superinvestor_letter": "letter",
-        "third_party": "third_party_research",
-        "sumzero_research": "third_party_research",
-        "news": "news",
-        "filing": "filing",
-        "earnings": "earnings",
-        "insider": "insider",
-    }.get(source, source)
+MAX_CLAIMS = 12000
+MAX_SOURCES = 4000
+MAX_EVIDENCE = 20000
 
 
 def source_key(row: dict) -> str:
@@ -115,7 +63,10 @@ def source_record(row: dict) -> dict:
     return {
         "source_id": stable_id(key),
         "source_key": key,
-        "title": short_text(row.get("source_name") or row.get("fund") or row.get("publisher") or row.get("title") or source_type(row), 140),
+        "title": short_text(
+            row.get("source_name") or row.get("fund") or row.get("publisher") or row.get("title") or source_type(row),
+            140,
+        ),
         "source_type": source_type(row),
         "date": row.get("observed_at") or row.get("as_of") or row.get("letter_date") or row.get("date"),
         "author": row.get("fund") or row.get("source_name") or row.get("publisher"),
@@ -123,49 +74,6 @@ def source_record(row: dict) -> dict:
         "label": row.get("evidence_label") or "source",
         "document_id": row.get("evidence_document_id") or document_id_for_ref(key),
     }
-
-
-def claim_type(row: dict) -> str:
-    axis = row.get("impact_axis")
-    event = row.get("event_type") or ""
-    text = " ".join([row.get("title") or "", row.get("summary") or "", row.get("claim") or ""]).lower()
-    if row.get("source") in {"superinvestor_letter", "sumzero_research", "third_party"}:
-        return "thesis"
-    if axis == "ownership" or "13f" in text or "insider" in text:
-        return "ownership"
-    if any(t in text for t in INFLECTION_TERMS) or event == "filing_metric":
-        return "inflection"
-    if axis == "risk" or row.get("direction") == "bearish":
-        return "risk"
-    if axis == "catalyst":
-        return "catalyst"
-    return axis or "context"
-
-
-def evidence_effect(row: dict, ctype: str) -> str:
-    direction = row.get("direction") or "neutral"
-    if direction == "bearish" or ctype == "risk":
-        return "disconfirms" if ctype != "risk" else "confirms"
-    if direction == "bullish":
-        return "confirms"
-    if direction == "neutral":
-        return "neutral"
-    return "mixed"
-
-
-def confidence_score(row: dict) -> int:
-    score = int(row.get("score") or 0)
-    source = row.get("source")
-    bonus = {
-        "filing": 20,
-        "earnings": 18,
-        "insider": 14,
-        "superinvestor_letter": 12,
-        "news": 8,
-        "third_party": 7,
-        "sumzero_research": 7,
-    }.get(source, 4)
-    return score + bonus
 
 
 def all_insight_rows(insights: dict) -> list[dict]:
@@ -188,7 +96,25 @@ def all_insight_rows(insights: dict) -> list[dict]:
     return rows
 
 
-def build_entity_map(registry: dict, classification: dict, insights: dict) -> dict:
+def load_ownership_records() -> tuple[list[dict], dict]:
+    latest = load_json(RECORDS_DIR / "latest.json", {"records": []})
+    records = latest.get("records") or []
+    by_ticker: dict[str, list[dict]] = defaultdict(list)
+    for row in records:
+        by_ticker[row.get("ticker") or ""].append(row)
+    return records, dict(by_ticker)
+
+
+def load_biotech_watchlist(registry: dict) -> set[str]:
+    out: set[str] = set()
+    for bucket in ("holdings", "watchlist"):
+        for ticker, meta in (registry.get(bucket) or {}).items():
+            if meta.get("biotech_watchlist"):
+                out.add(ticker.upper())
+    return out
+
+
+def build_entity_map(registry: dict, classification: dict, insights: dict, biotech_funds: list[dict]) -> dict:
     holdings = registry.get("holdings") or {}
     watchlist = registry.get("watchlist") or {}
     tickers = {}
@@ -200,74 +126,103 @@ def build_entity_map(registry: dict, classification: dict, insights: dict) -> di
             "company": meta.get("company", ticker),
             "market": meta.get("market"),
             "exchange": meta.get("exchange"),
-            "aliases": sorted({ticker, meta.get("company", ticker), ticker.replace(".", " ")}),
             "portfolio_section": "holding" if ticker in holdings else "watchlist",
             "investment_sleeve": cls.get("investment_sleeve"),
             "archetype": cls.get("archetype"),
+            "biotech_watchlist": bool(meta.get("biotech_watchlist")),
         }
-    funds = {}
-    for fund in insights.get("fund_registry") or []:
+
+    funds: dict[str, dict] = {}
+    for fund in biotech_funds:
         fid = fund.get("fund_id") or slug(fund.get("fund"))
+        funds[fid] = {
+            "entity_id": f"fund:{fid}",
+            "fund_id": fid,
+            "fund": fund.get("fund"),
+            "specialty": fund.get("specialty"),
+            "signal_role": fund.get("signal_role"),
+            "priority": fund.get("priority"),
+            "our_tickers": [],
+        }
+
+    for fund in insights.get("fund_registry") or []:
+        our = fund.get("our_tickers") or []
+        if not our:
+            continue
+        fid = fund.get("fund_id") or slug(fund.get("fund"))
+        if fid in funds:
+            funds[fid]["our_tickers"] = sorted(set(funds[fid].get("our_tickers") or []) | set(our))
+            continue
         funds[fid] = {
             "entity_id": f"fund:{fid}",
             "fund_id": fid,
             "fund": fund.get("fund"),
             "manager": fund.get("manager"),
             "latest_quarter": fund.get("quarter"),
-            "our_tickers": fund.get("our_tickers") or [],
+            "our_tickers": our,
         }
-    biotech_funds_doc = load_json(BIOTECH_FUNDS_PATH, {"funds": []})
-    for fund in biotech_funds_doc.get("funds") or []:
-        fid = fund.get("fund_id") or slug(fund.get("fund"))
-        funds.setdefault(
-            fid,
-            {
-                "entity_id": f"fund:{fid}",
-                "fund_id": fid,
-                "fund": fund.get("fund"),
-                "manager": fund.get("manager"),
-                "latest_quarter": None,
-                "our_tickers": [],
-            },
-        )
-        funds[fid].update(
-            {
-                "specialty": fund.get("specialty"),
-                "signal_role": fund.get("signal_role"),
-                "notes": fund.get("notes"),
-            }
-        )
     return {"tickers": tickers, "funds": funds}
 
 
-def is_biotech_ticker(ticker: str, entity: dict, rows: list[dict]) -> bool:
-    sleeve = str(entity.get("investment_sleeve") or "").lower()
-    company = str(entity.get("company") or "").lower()
-    if any(term in sleeve or term in company for term in BIOTECH_TERMS):
-        return True
-    text = " ".join(
-        short_text((r.get("title") or "") + " " + (r.get("summary") or "") + " " + (r.get("claim") or ""), 500).lower()
-        for r in rows[:50]
-    )
-    return any(term in text for term in BIOTECH_TERMS)
+def ownership_claim_rows(records: list[dict]) -> list[dict]:
+    rows: list[dict] = []
+    for rec in records:
+        change = rec.get("change_type") or "unchanged"
+        if change == "unchanged":
+            continue
+        direction = "bullish" if change in {"new", "add"} else "bearish" if change in {"trim", "exit"} else "neutral"
+        fund = rec.get("fund") or rec.get("fund_id")
+        ticker = rec.get("ticker")
+        summary = f"{fund} {change} {ticker} ({rec.get('quarter')})"
+        if rec.get("change_shares_pct") is not None:
+            summary += f"; {rec['change_shares_pct']:+.1f}% shares"
+        rows.append(
+            {
+                "ticker": ticker,
+                "source": "specialist_13f",
+                "claim_type": "ownership",
+                "direction": direction,
+                "title": f"Specialist 13F {change}",
+                "summary": summary,
+                "observed_at": rec.get("filing_date"),
+                "impact_axis": "ownership",
+                "evidence_url": rec.get("source_url"),
+                "evidence_label": "13F",
+                "score": 12 if rec.get("fund_id") in {"baker-bros", "ra-capital", "orbimed", "perceptive-advisors"} else 8,
+            }
+        )
+    return rows
 
 
-def build() -> dict:
+def build() -> tuple[dict, dict]:
     insights = load_json(INSIGHTS_PATH, {})
     registry = load_json(REGISTRY_PATH, {"holdings": {}, "watchlist": {}})
     classification = load_json(CLASS_PATH, {})
-    entities = build_entity_map(registry, classification, insights)
+    biotech_funds = load_json(FUNDS_PATH, {"funds": []}).get("funds") or []
+    signals_doc = load_json(SIGNALS_PATH, {})
+    ownership_records, ownership_by_ticker = load_ownership_records()
+    biotech_watchlist = load_biotech_watchlist(registry)
+    entities = build_entity_map(registry, classification, insights, biotech_funds)
+
     rows = all_insight_rows(insights)
+    rows.extend(ownership_claim_rows(ownership_records))
+
+    for ticker in entities["tickers"]:
+        ticker_dir = ROOT / ticker
+        if ticker_dir.is_dir():
+            rows.extend(supplemental_claim_rows(ticker, ticker_dir))
 
     source_registry: dict[str, dict] = {}
     claim_ledger: list[dict] = []
     evidence_ledger: list[dict] = []
-    by_ticker: dict[str, dict] = {}
     rows_by_ticker: dict[str, list[dict]] = defaultdict(list)
 
     for row in rows:
         ticker = (row.get("ticker") or row.get("ref") or "").upper()
         if not ticker or ticker not in entities["tickers"]:
+            continue
+        text = short_text(row.get("summary") or row.get("claim") or row.get("title") or "", 320)
+        if not text or is_low_value_claim(text, row):
             continue
         rows_by_ticker[ticker].append(row)
         src = source_record(row)
@@ -278,11 +233,8 @@ def build() -> dict:
             src["tickers"] = [ticker]
             source_registry[src["source_id"]] = src
 
-        text = short_text(row.get("summary") or row.get("claim") or row.get("title") or "", 320)
-        if not text:
-            continue
         ctype = claim_type(row)
-        cid = stable_id(ticker, ctype, row.get("direction"), text.lower())
+        cid = stable_id(ticker, ctype, row.get("direction"), text.lower(), row.get("source"), src["source_id"])
         claim = {
             "claim_id": cid,
             "ticker": ticker,
@@ -299,6 +251,7 @@ def build() -> dict:
             "evidence_url": src["url"],
             "evidence_label": src["label"],
             "evidence_document_id": src.get("document_id"),
+            "quarter": row.get("quarter"),
         }
         claim_ledger.append(claim)
         evidence_ledger.append(
@@ -321,11 +274,22 @@ def build() -> dict:
     for claim in sorted(claim_ledger, key=lambda c: (c.get("confidence_score") or 0, c.get("date") or ""), reverse=True):
         deduped_claims.setdefault(claim["claim_id"], claim)
     claim_ledger = list(deduped_claims.values())
+    claim_ledger.sort(key=lambda c: (c.get("date") or "", c.get("confidence_score") or 0), reverse=True)
+    if len(claim_ledger) > MAX_CLAIMS:
+        claim_ledger = claim_ledger[:MAX_CLAIMS]
 
-    evidence_by_claim: dict[str, list[dict]] = defaultdict(list)
-    for ev in evidence_ledger:
-        evidence_by_claim[ev["claim_id"]].append(ev)
+    claim_ids = {c["claim_id"] for c in claim_ledger}
+    evidence_ledger = [e for e in evidence_ledger if e["claim_id"] in claim_ids]
+    if len(evidence_ledger) > MAX_EVIDENCE:
+        evidence_ledger = evidence_ledger[:MAX_EVIDENCE]
 
+    source_registry_list = sorted(
+        source_registry.values(), key=lambda s: (s.get("date") or "", s.get("title") or ""), reverse=True
+    )
+    if len(source_registry_list) > MAX_SOURCES:
+        source_registry_list = source_registry_list[:MAX_SOURCES]
+
+    by_ticker: dict[str, dict] = {}
     for ticker, entity in entities["tickers"].items():
         ticker_claims = [c for c in claim_ledger if c["ticker"] == ticker]
         ticker_evidence = [e for e in evidence_ledger if e["ticker"] == ticker]
@@ -336,11 +300,16 @@ def build() -> dict:
         inflection = [c for c in ticker_claims if c["claim_type"] == "inflection"]
         ownership = [c for c in ticker_claims if c["claim_type"] == "ownership"]
         risks = [c for c in ticker_claims if c["claim_type"] == "risk" or c["direction"] == "bearish"]
-        biotech = is_biotech_ticker(ticker, entity, rows_by_ticker.get(ticker, []))
+        meta = (registry.get("holdings") or {}).get(ticker) or (registry.get("watchlist") or {}).get(ticker) or {}
+        biotech = is_biotech_ticker(ticker, entity, meta, biotech_watchlist=biotech_watchlist)
         specialist_mentions = [
-            c for c in ticker_claims
-            if c["source_type"] == "letter" and any(term in (c.get("source_title") or "").lower() for term in ("baker", "perceptive", "ra capital", "orbimed", "ecor1", "redmile", "deerfield", "casdin", "venbio", "samsara"))
+            c
+            for c in ticker_claims
+            if c["source_type"] == "letter"
+            and any(term in (c.get("source_title") or "").lower() for term in SPECIALIST_FUND_TERMS)
         ]
+        ticker_ownership = ownership_by_ticker.get(ticker, [])
+        signal = (signals_doc.get("by_ticker") or {}).get(ticker) or {}
         by_ticker[ticker] = {
             "ticker": ticker,
             "company": entity.get("company"),
@@ -358,60 +327,86 @@ def build() -> dict:
             "ownership_claims": sorted(ownership, key=lambda c: c["confidence_score"], reverse=True)[:3],
             "biotech": {
                 "is_biotech_related": biotech,
-                "specialist_13f_ready": biotech,
+                "awaiting_13f_ingest": biotech and not ticker_ownership,
                 "specialist_mentions": specialist_mentions[:4],
-                "tracked_specialist_fund_count": len(load_json(BIOTECH_FUNDS_PATH, {"funds": []}).get("funds") or []),
-                "ownership_records": [],
+                "tracked_specialist_fund_count": len(biotech_funds),
+                "ownership_records": ticker_ownership[:20],
+                "signals": {
+                    "consensus_score": signal.get("consensus_score"),
+                    "core_fund_holder_count": signal.get("core_fund_holder_count"),
+                    "specialist_holder_count": signal.get("specialist_holder_count"),
+                    "initiation_signal": signal.get("initiation_signal"),
+                    "exit_signal": signal.get("exit_signal"),
+                },
             },
         }
 
-    review_queue = []
+    review_queue: list[dict] = []
+    holdings = set((registry.get("holdings") or {}).keys())
+    watchlist = set((registry.get("watchlist") or {}).keys())
+    book = holdings | watchlist
     for ticker, mem in by_ticker.items():
         if mem["claim_count"] and not mem["source_count"]:
             review_queue.append({"ticker": ticker, "reason": "claims without source", "priority": "high"})
         if mem["disconfirming_count"] > 0:
             review_queue.append({"ticker": ticker, "reason": "disconfirming evidence present", "priority": "high"})
-        if mem["claim_count"] == 0:
+        if mem["claim_count"] == 0 and ticker in book:
             review_queue.append({"ticker": ticker, "reason": "no claims in memory", "priority": "medium"})
         if mem["biotech"]["is_biotech_related"] and not mem["biotech"]["ownership_records"]:
             review_queue.append({"ticker": ticker, "reason": "biotech 13F ownership not loaded", "priority": "medium"})
+    review_queue = dedupe_review_queue(review_queue)
 
-    biotech_funds = load_json(BIOTECH_FUNDS_PATH, {"funds": []}).get("funds") or []
-    return {
+    summary = {
+        "source_count": len(source_registry_list),
+        "entity_count": len(entities["tickers"]) + len(entities["funds"]),
+        "ticker_count": len(entities["tickers"]),
+        "fund_count": len(entities["funds"]),
+        "claim_count": len(claim_ledger),
+        "evidence_count": len(evidence_ledger),
+        "review_queue_count": len(review_queue),
+        "biotech_specialist_count": len(biotech_funds),
+        "biotech_related_ticker_count": sum(1 for v in by_ticker.values() if v["biotech"]["is_biotech_related"]),
+        "ownership_record_count": len(ownership_records),
+    }
+
+    memory_doc = {
         "generated_at": now_iso(),
-        "schema_version": 1,
-        "summary": {
-            "source_count": len(source_registry),
-            "entity_count": len(entities["tickers"]) + len(entities["funds"]),
-            "ticker_count": len(entities["tickers"]),
-            "fund_count": len(entities["funds"]),
-            "claim_count": len(claim_ledger),
-            "evidence_count": len(evidence_ledger),
-            "review_queue_count": len(review_queue),
-            "biotech_specialist_count": len(biotech_funds),
-            "biotech_related_ticker_count": sum(1 for v in by_ticker.values() if v["biotech"]["is_biotech_related"]),
-        },
-        "source_registry": sorted(source_registry.values(), key=lambda s: (s.get("date") or "", s.get("title") or ""), reverse=True),
+        "schema_version": 2,
+        "summary": summary,
+        "source_registry": source_registry_list,
         "entity_map": entities,
-        "claim_ledger": sorted(claim_ledger, key=lambda c: (c.get("date") or "", c.get("confidence_score") or 0), reverse=True),
-        "evidence_ledger": sorted(evidence_ledger, key=lambda e: e.get("date") or "", reverse=True),
+        "claim_ledger": claim_ledger,
         "by_ticker": by_ticker,
         "review_queue": review_queue,
         "biotech": {
             "specialist_funds": biotech_funds,
-            "ownership_records": [],
-            "notes": "13F parser target: populate ownership_records with fund_id, ticker, quarter, market_value, shares, change_type, and source_url.",
+            "ownership_records": ownership_records,
+            "signals": signals_doc,
+            "notes": "13F records stored in _system/reference/market-data/ownership/records/",
         },
     }
+    evidence_doc = {
+        "generated_at": now_iso(),
+        "schema_version": 1,
+        "evidence_ledger": sorted(evidence_ledger, key=lambda e: e.get("date") or "", reverse=True),
+        "evidence_by_claim": {},
+    }
+    by_claim: dict[str, list[dict]] = defaultdict(list)
+    for ev in evidence_doc["evidence_ledger"]:
+        by_claim[ev["claim_id"]].append(ev)
+    evidence_doc["evidence_by_claim"] = {k: v[:6] for k, v in by_claim.items()}
+    return memory_doc, evidence_doc
 
 
 def main() -> None:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
-    payload = build()
-    OUTPUT.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    memory_doc, evidence_doc = build()
+    save_json(OUTPUT, memory_doc)
+    save_json(EVIDENCE_OUTPUT, evidence_doc)
     print(
         f"Wrote {OUTPUT.relative_to(ROOT)} "
-        f"({payload['summary']['claim_count']} claims, {payload['summary']['source_count']} sources)"
+        f"({memory_doc['summary']['claim_count']} claims, {memory_doc['summary']['source_count']} sources, "
+        f"{memory_doc['summary']['ownership_record_count']} 13F records)"
     )
 
 

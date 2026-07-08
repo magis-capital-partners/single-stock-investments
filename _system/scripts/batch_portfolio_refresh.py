@@ -121,6 +121,8 @@ def main() -> int:
         else:
             fail.append(ticker)
 
+    subprocess.run([PY, str(SCRIPTS / "build_insights.py")], cwd=ROOT, check=False)
+    subprocess.run([PY, str(SCRIPTS / "build_research_memory.py")], cwd=ROOT, check=False)
     subprocess.run([PY, str(SCRIPTS / "build_dashboard_data.py")], cwd=ROOT, check=False)
 
     print(f"\n=== Done {args.date} ===")

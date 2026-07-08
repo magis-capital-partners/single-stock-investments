@@ -100,6 +100,13 @@ def main() -> int:
         errors.append(
             "dashboard_data.json must not embed insights; load dashboard/data/insights.json separately"
         )
+    if payload.get("research_memory"):
+        errors.append(
+            "dashboard_data.json must not embed research_memory; load dashboard/data/research_memory.json separately"
+        )
+    memory_ref = payload.get("research_memory_ref") or {}
+    if memory_ref and not memory_ref.get("path"):
+        errors.append("research_memory_ref missing path")
     insights_ref = payload.get("insights_ref") or {}
     if insights_ref and not insights_ref.get("path"):
         errors.append("insights_ref missing path")
@@ -292,6 +299,37 @@ def main() -> int:
             errors.append(
                 f"insights letter_index has {len(bad_quarters)} future quarter(s); run repair_letter_dates + rebuild"
             )
+        time_periods = insights.get("time_periods") or {}
+        if not time_periods.get("latest_indexed_quarter"):
+            warnings.append("insights.time_periods.latest_indexed_quarter missing — run build_insights.py")
+        theme_by_q = insights.get("theme_rankings_by_quarter") or {}
+        sample_q = time_periods.get("latest_indexed_quarter")
+        if sample_q and isinstance(theme_by_q.get(sample_q), list):
+            rows = theme_by_q[sample_q]
+            if len(rows) >= 3:
+                top_sets = [tuple(r.get("top_tickers") or []) for r in rows[:3]]
+                if len({s for s in top_sets if s}) == 1 and len(top_sets[0]) >= 3:
+                    warnings.append(
+                        f"theme top_tickers identical across first 3 themes in {sample_q}; "
+                        "run make letter-rebuild after proximity tagging fix"
+                    )
+        catalog_path = ROOT / "dashboard" / "data" / "document_catalog.json"
+        if catalog_path.exists():
+            try:
+                catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+                cat_latest = ((catalog.get("time_periods") or {}).get("latest_catalog_quarter")
+                                or (catalog.get("time_periods") or {}).get("latest_quarter"))
+                idx_latest = time_periods.get("latest_indexed_quarter")
+                if cat_latest and idx_latest and cat_latest != idx_latest:
+                    cat_year = int(str(cat_latest)[:4]) if str(cat_latest)[:4].isdigit() else 0
+                    idx_year = int(str(idx_latest)[:4]) if str(idx_latest)[:4].isdigit() else 0
+                    if cat_year > idx_year + 1:
+                        warnings.append(
+                            f"document catalog latest ({cat_latest}) far ahead of indexed latest ({idx_latest}); "
+                            "check document_date fiscal parsing"
+                        )
+            except (json.JSONDecodeError, TypeError, ValueError):
+                pass
         bad_letter_dates = []
         mtime_dates = []
         low_confidence_dates = []
