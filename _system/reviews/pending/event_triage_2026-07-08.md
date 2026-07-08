@@ -1,7 +1,7 @@
 # Event triage — human review queue
 
 **Date:** 2026-07-08
-**Rows:** 1222
+**Rows:** 1223
 
 | Date | Ticker | Source | Tier | Materiality | Rules | Title |
 |------|--------|--------|------|-------------|-------|-------|
@@ -10,14 +10,14 @@
 | 2026-07-28 | FRMI | earnings | context | 35 | rule_conflict, activist_cross_link, neutral_low_impact | Upcoming earnings |
 | 2026-07-16 | MRSH | earnings | context | 35 | rule_conflict, activist_cross_link, neutral_low_impact | Upcoming earnings |
 | 2026-07-08 | AXON | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | 2 Stocks Down Over 30% to Buy Right Now and Hold for the Nex |
-| 2026-07-08 | APLD | macro | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Macro: APLD |
-| 2026-07-08 | APLD | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Applied Digital / Marvin shop summary (PF3 PR) |
-| 2026-07-08 | AXON | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Jun 19, 2019 |
-| 2026-07-08 | CHTR | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | S Advance Publications, Inc. — SC 13D/A |
-| 2026-07-08 | FRMI | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Vicksburg Investments Management — DEFC14A (proxy solicitati |
 | 2026-07-08 | MRSH | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Elliott Management — SC 13G/A |
+| 2026-07-08 | AXON | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Jun 19, 2019 |
+| 2026-07-08 | FRMI | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Vicksburg Investments Management — DEFC14A (proxy solicitati |
+| 2026-07-08 | CHTR | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | S Advance Publications, Inc. — SC 13D/A |
 | 2026-07-08 | QDEL | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | McIntyre Partnerships |
 | 2026-07-08 | TRC | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Bulldog (+4) — DEFC14A (proxy solicitation) |
+| 2026-07-08 | APLD | macro | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Macro: APLD |
+| 2026-07-08 | APLD | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Applied Digital / Marvin shop summary (PF3 PR) |
 | 2026-07-07 | CHTR | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Why Charter Communications’ (CHTR) SpaceX Talks Point to Mob |
 | 2026-07-02 | CHTR | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Comcast’s NBCUniversal Split Puts Broadband Back in Focus |
 | 2026-06-17 | GS | superinvestor_letter | context | 46 | rule_conflict, letter_actionable, neutral_low_impact | Letter: GS |
@@ -50,6 +50,7 @@
 | 2026-02-28 | JPM | superinvestor_letter | context | 21 | rule_conflict, letter_actionable, neutral_low_impact | Letter: JPM |
 | 2026-02-12 | SNOW | superinvestor_letter | context | 21 | rule_conflict, letter_actionable, neutral_low_impact | Letter: SNOW |
 | 2026-02-11 | CHTR | superinvestor_letter | context | 20 | rule_conflict, activist_cross_link, neutral_low_impact | Letter: CHTR |
+| 2026-02-05 | APLD | superinvestor_letter | context | 20 | rule_conflict, activist_cross_link, neutral_low_impact | Letter: APLD |
 | 2026-02-04 | AXON | superinvestor_letter | context | 20 | rule_conflict, activist_cross_link, neutral_low_impact | Letter: AXON |
 | 2026-01-31 | SPGI | superinvestor_letter | context | 21 | rule_conflict, letter_actionable, neutral_low_impact | Letter: SPGI |
 | 2026-01-25 | TBBK | superinvestor_letter | context | 21 | rule_conflict, letter_actionable, neutral_low_impact | Letter: TBBK |
@@ -59,7 +60,6 @@
 | 2025-12-31 | IEX.NS | superinvestor_letter | context | 21 | rule_conflict, letter_actionable, neutral_low_impact | Letter: IEX.NS |
 | 2025-12-31 | SMR | superinvestor_letter | context | 21 | rule_conflict, letter_actionable, neutral_low_impact | Letter: SMR |
 | 2025-12-31 | ECHO | superinvestor_letter | context | 21 | rule_conflict, letter_actionable, neutral_low_impact | Letter: ECHO |
-| 2025-12-31 | APLD | superinvestor_letter | context | 20 | rule_conflict, activist_cross_link, neutral_low_impact | Letter: APLD |
 | 2025-12-31 | FRMI | superinvestor_letter | context | 20 | rule_conflict, activist_cross_link, neutral_low_impact | Letter: FRMI |
 | 2025-12-10 | CHTR | superinvestor_letter | context | 21 | rule_conflict, letter_actionable, activist_cross_link, neutral_low_impact | Letter: CHTR |
 | 2025-11-11 | BRBR | superinvestor_letter | context | 21 | rule_conflict, letter_actionable, neutral_low_impact | Letter: BRBR |
@@ -118,9 +118,9 @@
 | 2025-03-31 | TBBK | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, neutral_low_impact, stale_event | Letter: TBBK |
 | 2025-03-31 | BN | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, stale_event | Letter: BN |
 | 2025-03-31 | DRR.AX | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, stale_event | Letter: DRR.AX |
-| 2025-03-31 | CHTR | superinvestor_letter | context | 10 | rule_conflict, activist_cross_link, neutral_low_impact, stale_event | Letter: CHTR |
 | 2025-03-31 | AXON | superinvestor_letter | context | 10 | rule_conflict, activist_cross_link, neutral_low_impact, stale_event | Letter: AXON |
 | 2025-03-31 | MRSH | superinvestor_letter | context | 10 | rule_conflict, activist_cross_link, neutral_low_impact, stale_event | Letter: MRSH |
+| 2025-03-31 | CHTR | superinvestor_letter | context | 10 | rule_conflict, activist_cross_link, neutral_low_impact, stale_event | Letter: CHTR |
 | 2025-03-31 | APLD | superinvestor_letter | context | 10 | rule_conflict, activist_cross_link, neutral_low_impact, stale_event | Letter: APLD |
 | 2025-03-19 | MSTR | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, stale_event | Letter: MSTR |
 | 2025-03-10 | BKRB | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, stale_event | Letter: BKRB |
@@ -150,6 +150,7 @@
 | 2024-11-13 | NBIS | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, neutral_low_impact, stale_event | Letter: NBIS |
 | 2024-11-02 | AMZN | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, stale_event | Letter: AMZN |
 | 2024-10-31 | SOC | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, neutral_low_impact, stale_event | Letter: SOC |
+| 2024-10-30 | BN | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, neutral_low_impact, stale_event | Letter: BN |
 | 2024-10-14 | APLD | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, activist_cross_link, stale_event | Letter: APLD |
 | 2024-10-14 | CME | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, stale_event | Letter: CME |
 | 2024-10-08 | JPM | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, neutral_low_impact, stale_event | Letter: JPM |
@@ -160,25 +161,24 @@
 | 2024-09-30 | META | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, stale_event | Letter: META |
 | 2024-09-30 | NVDA | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, neutral_low_impact, stale_event | Letter: NVDA |
 | 2024-09-30 | EVR | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, neutral_low_impact, stale_event | Letter: EVR |
-| 2024-09-30 | MDB | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, neutral_low_impact, stale_event | Letter: MDB |
 | 2024-09-30 | LBRDK | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, stale_event | Letter: LBRDK |
 | 2024-09-30 | CHTR | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, activist_cross_link, stale_event | Letter: CHTR |
-| 2024-09-30 | BN | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, neutral_low_impact, stale_event | Letter: BN |
+| 2024-09-30 | MDB | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, neutral_low_impact, stale_event | Letter: MDB |
 | 2024-09-30 | CSGP | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, stale_event | Letter: CSGP |
 | 2024-09-30 | AXON | superinvestor_letter | context | 10 | rule_conflict, activist_cross_link, neutral_low_impact, stale_event | Letter: AXON |
 | 2024-08-31 | HKHC | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, neutral_low_impact, stale_event | Letter: HKHC |
 | 2024-08-04 | FLUX | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, neutral_low_impact, stale_event | Letter: FLUX |
 | 2024-08-04 | HKHC | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, neutral_low_impact, stale_event | Letter: HKHC |
-| 2024-07-31 | LBRDK | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, neutral_low_impact, stale_event | Letter: LBRDK |
 | 2024-07-31 | LSEG | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, stale_event | Letter: LSEG |
+| 2024-07-31 | LBRDK | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, neutral_low_impact, stale_event | Letter: LBRDK |
 | 2024-07-31 | GTX | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, neutral_low_impact, stale_event | Letter: GTX |
 | 2024-07-31 | SHC | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, neutral_low_impact, stale_event | Letter: SHC |
 | 2024-07-31 | STHO | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, neutral_low_impact, stale_event | Letter: STHO |
 | 2024-07-30 | TBBK | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, stale_event | Letter: TBBK |
 | 2024-07-29 | TBBK | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, neutral_low_impact, stale_event | Letter: TBBK |
 | 2024-07-23 | BKRB | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, stale_event | Letter: BKRB |
-| 2024-07-23 | BUR | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, neutral_low_impact, stale_event | Letter: BUR |
 | 2024-07-23 | HEI.A | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, neutral_low_impact, stale_event | Letter: HEI.A |
+| 2024-07-23 | BUR | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, neutral_low_impact, stale_event | Letter: BUR |
 | 2024-07-19 | ECHO | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, neutral_low_impact, stale_event | Letter: ECHO |
 | 2024-07-01 | META | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, stale_event | Letter: META |
 | 2024-06-30 | GOOGL | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, neutral_low_impact, stale_event | Letter: GOOGL |
