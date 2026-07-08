@@ -16,9 +16,9 @@
 | 2026-07-08 | CHTR | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | S Advance Publications, Inc. — SC 13D/A |
 | 2026-07-08 | QDEL | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | McIntyre Partnerships |
 | 2026-07-08 | TRC | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Bulldog (+4) — DEFC14A (proxy solicitation) |
+| 2026-07-08 | APLD | macro | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Macro: APLD |
 | 2026-07-08 | APLD | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Applied Digital / Marvin shop summary (PF3 PR) |
 | 2026-07-07 | CHTR | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Why Charter Communications’ (CHTR) SpaceX Talks Point to Mob |
-| 2026-07-07 | APLD | macro | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Macro: APLD |
 | 2026-07-02 | CHTR | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Comcast’s NBCUniversal Split Puts Broadband Back in Focus |
 | 2026-06-17 | GS | superinvestor_letter | context | 46 | rule_conflict, letter_actionable, neutral_low_impact | Letter: GS |
 | 2026-06-17 | CHTR | superinvestor_letter | context | 46 | rule_conflict, letter_actionable, activist_cross_link, neutral_low_impact | Letter: CHTR |
