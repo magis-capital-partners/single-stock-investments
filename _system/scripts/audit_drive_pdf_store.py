@@ -4,18 +4,15 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 from collections import defaultdict
 from pathlib import Path
 
-from google.oauth2 import service_account
-from googleapiclient.discovery import build
+from drive_store_common import configured_root_ids, drive_service, execute_with_retry
 
 ROOT = Path(__file__).resolve().parents[2]
 REGISTRY_PATH = ROOT / "dashboard" / "data" / "document_registry.json"
 CONFIG_PATH = ROOT / "_system" / "reference" / "document-store" / "google_drive_config.json"
 AUDIT_OUTPUT = ROOT / "_system" / "reference" / "document-store" / "drive_audit_latest.json"
-SCOPES = ["https://www.googleapis.com/auth/drive.readonly"]
 
 
 def load_json(path: Path) -> dict:
@@ -24,26 +21,10 @@ def load_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def drive_service():
-    creds_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
-    if not creds_path:
-        raise SystemExit("Set GOOGLE_APPLICATION_CREDENTIALS to the service-account JSON before auditing Drive.")
-    creds = service_account.Credentials.from_service_account_file(creds_path, scopes=SCOPES)
-    return build("drive", "v3", credentials=creds, cache_discovery=False)
-
-
-def configured_root_ids(config: dict) -> list[str]:
-    roots = config.get("drive_roots") or {}
-    ids = []
-    for root in roots.values():
-        root_id = root.get("folder_id")
-        if root_id and root_id not in ids:
-            ids.append(root_id)
-    return ids
-
-
 def drive_id_for_root(service, root_id: str) -> str:
-    meta = service.files().get(fileId=root_id, fields="id,name,driveId", supportsAllDrives=True).execute()
+    meta = execute_with_retry(
+        service.files().get(fileId=root_id, fields="id,name,driveId", supportsAllDrives=True)
+    )
     drive_id = meta.get("driveId")
     if not drive_id:
         raise SystemExit(f"Root {root_id} is not inside a Shared Drive.")
@@ -54,16 +35,18 @@ def list_drive_pdfs(service, drive_id: str) -> list[dict]:
     files: list[dict] = []
     page_token = None
     while True:
-        res = service.files().list(
-            corpora="drive",
-            driveId=drive_id,
-            includeItemsFromAllDrives=True,
-            supportsAllDrives=True,
-            q="mimeType = 'application/pdf' and trashed = false",
-            fields="nextPageToken,files(id,name,size,webViewLink,appProperties,parents)",
-            pageSize=1000,
-            pageToken=page_token,
-        ).execute()
+        res = execute_with_retry(
+            service.files().list(
+                corpora="drive",
+                driveId=drive_id,
+                includeItemsFromAllDrives=True,
+                supportsAllDrives=True,
+                q="mimeType = 'application/pdf' and trashed = false",
+                fields="nextPageToken,files(id,name,size,webViewLink,appProperties,parents)",
+                pageSize=1000,
+                pageToken=page_token,
+            )
+        )
         files.extend(res.get("files") or [])
         page_token = res.get("nextPageToken")
         if not page_token:
@@ -73,7 +56,7 @@ def list_drive_pdfs(service, drive_id: str) -> list[dict]:
 def build_audit(root_id: str | None = None) -> dict:
     registry = load_json(REGISTRY_PATH)
     config = load_json(CONFIG_PATH)
-    service = drive_service()
+    service = drive_service(readonly=True)
     root_ids = [root_id] if root_id else configured_root_ids(config)
     registry_docs = registry.get("documents") or []
     registry_file_ids = {doc.get("drive_file_id") for doc in registry_docs if doc.get("drive_file_id")}
