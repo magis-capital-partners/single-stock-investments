@@ -56,6 +56,18 @@ class DocumentDateTests(unittest.TestCase):
         self.assertEqual(period.period_label, "FY 2024")
         self.assertEqual(period.document_year, 2024)
 
+    def test_q1_fy2027_company_deck(self):
+        period = infer_document_period(
+            {
+                "title": "Q1 FY2027 Investor Presentation vFF",
+                "drive_folder_path": "Single Stocks/SNOW/Company/ir-snow",
+                "source_type": "company_document",
+            }
+        )
+        self.assertEqual(period.document_quarter, "2026Q2")
+        self.assertEqual(period.period_label, "Q1 FY2027")
+        self.assertEqual(period.period_source, "fy_quarter")
+
     def test_unknown_title(self):
         period = infer_document_period({"title": "Investor Overview.pdf"})
         self.assertEqual(period.period_source, "unknown")
