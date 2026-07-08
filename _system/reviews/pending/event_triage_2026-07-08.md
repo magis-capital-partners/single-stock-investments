@@ -9,6 +9,7 @@
 | 2026-07-29 | APLD | earnings | context | 35 | rule_conflict, activist_cross_link, neutral_low_impact | Upcoming earnings |
 | 2026-07-28 | FRMI | earnings | context | 35 | rule_conflict, activist_cross_link, neutral_low_impact | Upcoming earnings |
 | 2026-07-16 | MRSH | earnings | context | 35 | rule_conflict, activist_cross_link, neutral_low_impact | Upcoming earnings |
+| 2026-07-08 | AXON | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | 2 Stocks Down Over 30% to Buy Right Now and Hold for the Nex |
 | 2026-07-08 | MRSH | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Elliott Management — SC 13G/A |
 | 2026-07-08 | AXON | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Jun 19, 2019 |
 | 2026-07-08 | FRMI | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Vicksburg Investments Management — DEFC14A (proxy solicitati |
@@ -18,7 +19,6 @@
 | 2026-07-08 | APLD | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Applied Digital / Marvin shop summary (PF3 PR) |
 | 2026-07-07 | CHTR | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Why Charter Communications’ (CHTR) SpaceX Talks Point to Mob |
 | 2026-07-07 | APLD | macro | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Macro: APLD |
-| 2026-07-05 | AXON | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | 3 Magnificent Growth Stocks to Buy in July |
 | 2026-07-02 | CHTR | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Comcast’s NBCUniversal Split Puts Broadband Back in Focus |
 | 2026-06-17 | GS | superinvestor_letter | context | 46 | rule_conflict, letter_actionable, neutral_low_impact | Letter: GS |
 | 2026-06-17 | CHTR | superinvestor_letter | context | 46 | rule_conflict, letter_actionable, activist_cross_link, neutral_low_impact | Letter: CHTR |
