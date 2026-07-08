@@ -1,165 +1,165 @@
 # Holdings
 
-Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-07.
+Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-08.
 
 **Classification schema:** `_system/frameworks/classification.md` · source map: `_system/portfolio/classification.json`
 
 | Ticker | Folder | Company | Market | Last download | Last research | Archetype | Stance |
 |--------|--------|---------|--------|---------------|---------------|-----------|--------|
-| 0388.HK | 0388.HK/ | Hong Kong Exchanges and Clearing Ltd | EU | 2026-07-07 | 2026-07-07 | croupier | watch |
-| 3905.T | 3905.T/ | DataSection Co., Ltd. | JP | 2026-07-07 | 2026-07-07 | compounder | watch |
-| 7176.T | 7176.T/ | Simplex Financial Holdings Co., Ltd. | JP | 2026-07-07 | 2026-07-07 | unknown | watch |
-| 8697.T | 8697.T/ | Japan Exchange Group | JP | 2026-06-25 | 2026-07-07 | croupier | hold |
-| ABMD.CVR | ABMD.CVR/ | Abiomed CVR (Johnson & Johnson acquisition) | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| ABX | ABX/ | Abacus Life Inc. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| ADN.TO | ADN.TO/ | Acadian Timber Corp. | CA | 2026-07-07 | 2026-07-07 | optionality | watch |
-| ALS.TO | ALS.TO/ | Altius Minerals Corporation | CA | 2026-06-03 | 2026-07-07 | unknown | watch |
-| AMD | AMD/ | Advanced Micro Devices, Inc. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| AMZN | AMZN/ | Amazon.com | US | 2026-07-07 | 2026-07-07 | compounder | hold |
-| APLD | APLD/ | Applied Digital | US | 2026-07-07 | 2026-07-07 | optionality | watch |
-| ASPN | ASPN/ | Aspen Aerogels, Inc. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| ASX.AX | ASX.AX/ | ASX Limited | AU | 2026-07-07 | 2026-07-07 | unknown | watch |
-| AXON | AXON/ | Axon Enterprise, Inc. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| AZLCZ | AZLCZ/ | Aztec Land and Cattle Company | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| B | B/ | Barrick Mining Corporation | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| B3SA3.SA | B3SA3.SA/ | B3 S.A. - Brasil Bolsa Balcao | EU | 2026-07-07 | 2026-07-07 | unknown | watch |
-| BKRB | BKRB/ | Berkshire Hathaway Inc. (Class B) | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| BMYS.KL | BMYS.KL/ | Bursa Malaysia Berhad | EU | 2026-07-07 | 2026-07-07 | unknown | watch |
-| BN | BN/ | Brookfield Corporation | US | 2026-07-07 | 2026-07-07 | platform | hold |
-| BOLSAA.MX | BOLSAA.MX/ | Bolsa Mexicana de Valores SAB de CV | EU | 2026-07-07 | 2026-07-07 | unknown | watch |
-| BRBR | BRBR/ | BellRing Brands, Inc. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| BSM | BSM/ | Black Stone Minerals LP | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| BUR | BUR/ | Burford Capital Limited | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| BVERS | BVERS/ | Beaver Coal Company, Limited | OTC | 2026-07-07 | 2026-07-07 | optionality | watch |
-| BWEL | BWEL/ | J.G. Boswell Company | US | 2026-07-07 | 2026-07-07 | optionality | watch |
-| BYMA | BYMA/ | Bolsas y Mercados Argentinos S.A. | EU | 2026-07-07 | 2026-07-07 | unknown | watch |
-| CBOE | CBOE/ | Cboe Global Markets | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| CBRS | CBRS/ | Cerebras Systems | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| CDZI | CDZI/ | Cadiz Inc. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| CHTR | CHTR/ | Charter Communications, Inc. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| CKX | CKX/ | CKX Lands, Inc. | US | 2026-07-07 | 2026-07-07 | optionality | watch |
-| CME | CME/ | CME Group Inc. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| CMSG | CMSG/ | Consensus Mining & Seigniorage Corp | US | 2026-07-07 | 2026-07-07 | optionality | watch |
-| COLD | COLD/ | Americold Realty Trust, Inc. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| CORBF | CORBF/ | Corbus Pharmaceuticals Holdings, Inc. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| CPRT | CPRT/ | Copart | US | 2026-07-07 | 2026-07-07 | compounder | core |
-| CRCL | CRCL/ | Circle Internet Group, Inc. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| CSGP | CSGP/ | CoStar Group | US | 2026-07-07 | 2026-07-07 | platform | watch |
-| CSU | CSU/ | Constellation Software | CA | 2026-07-07 | 2026-07-07 | compounder | core |
-| CSU.DB | CSU.DB/ | Constellation Software Inc. (Series 1 Debentures) | CA | — | 2026-07-07 | unknown | watch |
-| DB1.DE | DB1.DE/ | Deutsche Boerse AG | EU | 2026-07-07 | 2026-07-07 | unknown | watch |
-| DHR | DHR/ | Danaher Corporation | US | 2026-07-07 | 2026-07-07 | compounder | hold |
-| DMLP | DMLP/ | Dorchester Minerals LP | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| DRR.AX | DRR.AX/ | Deterra Royalties Limited | AU | 2026-06-02 | 2026-07-07 | unknown | watch |
-| ECHO | ECHO/ | EchoStar Corporation | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| EFOR | EFOR/ | Everforth, Inc. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| ENPH | ENPH/ | Enphase Energy, Inc. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| ENX.PA | ENX.PA/ | Euronext N.V. | EU | 2026-07-07 | 2026-07-07 | unknown | watch |
-| EQPT | EQPT/ | EquipmentShare.com Inc | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| ETOR | ETOR/ | eToro Group Ltd. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| EVR | EVR/ | Evolve Royalties Ltd | CA | 2026-06-11 | 2026-07-07 | unknown | watch |
-| FIHO12.MX | FIHO12.MX/ | FibraHotel (Concentradora Fibra Hotelera Mexicana) | EU | — | 2026-07-07 | unknown | watch |
-| FLUX | FLUX/ | Flux Power Holdings, Inc. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| FMCCK | FMCCK/ | Ford Motor Credit Company LLC (Preferred) | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| FMCCL | FMCCL/ | Ford Motor Credit Company LLC (Preferred) | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| FNMAO | FNMAO/ | Federal National Mortgage Association (Preferred) | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| FNMAP | FNMAP/ | Federal National Mortgage Association (Preferred) | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| FNV | FNV/ | Franco-Nevada Corporation | US | 2026-07-07 | 2026-07-07 | optionality | watch |
-| FRMI | FRMI/ | Fermi Inc. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| FRMO | FRMO/ | FRMO Corporation | US | 2026-07-07 | 2026-07-07 | holding_co | hold |
-| FTRE | FTRE/ | Fortrea Holdings Inc. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| GCCO | GCCO/ | Garden City Co. | OTC | 2026-07-07 | 2026-07-07 | optionality | watch |
-| GDRZF | GDRZF/ | Gold Reserve Inc. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| GKTX.PS1 | GKTX.PS1/ | Galapagos NV (Janssen structured security PS1) | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| GKTX.PS2 | GKTX.PS2/ | Galapagos NV (Janssen structured security PS2) | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| GKTX.PS3 | GKTX.PS3/ | Galapagos NV (Janssen structured security PS3) | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| GLXY | GLXY/ | Galaxy Digital Inc. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| GOOGL | GOOGL/ | Alphabet Inc. | US | 2026-07-07 | 2026-07-07 | compounder | hold |
-| GPGI | GPGI/ | GPGI, Inc. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| GPW.WA | GPW.WA/ | Warsaw Stock Exchange | EU | 2026-07-07 | 2026-07-07 | unknown | watch |
-| GROY | GROY/ | Gold Royalty Corp. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| GS | GS/ | Goldman Sachs Group, Inc. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| GTX | GTX/ | Garrett Motion Inc. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| HE | HE/ | Hawaiian Electric Industries | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| HEE | HEE/ | Hellenic Exchanges - Athens Stock Exchange S.A. | EU | 2026-07-07 | 2026-07-07 | unknown | watch |
-| HEI.A | HEI.A/ | HEICO Corporation (Class A) | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| HKHC | HKHC/ | Horizon Kinetics Holding Corporation | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| HL | HL/ | Hecla Mining Company | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| HNFSA | HNFSA/ | Hanover Foods Corporation | OTC | 2026-07-07 | 2026-07-07 | optionality | watch |
-| ICE | ICE/ | Intercontinental Exchange | US | 2026-07-07 | 2026-07-07 | croupier | hold |
-| IDA.AX | IDA.AX/ | Indiana Resources Limited | AU | 2026-07-07 | 2026-07-07 | unknown | watch |
-| IEX.NS | IEX.NS/ | Indian Energy Exchange Limited | IN | 2026-07-07 | 2026-07-07 | unknown | watch |
-| INV | INV/ | Innovex International, Inc. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| IPCXR | IPCXR/ | Inflection Point Acquisition Corp. II (Rights) | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| JL80.DE | JL80.DE/ | Norconsult ASA | EU | — | 2026-07-07 | unknown | watch |
-| JPM | JPM/ | JPMorgan Chase & Co. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| KEWL | KEWL/ | Keweenaw Land Association | US | 2026-07-07 | 2026-07-07 | optionality | watch |
-| KRP | KRP/ | Kimbell Royalty Partners LP | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| LAND | LAND/ | Gladstone Land Corporation | US | 2026-07-07 | 2026-07-07 | infrastructure | watch |
-| LB | LB/ | LandBridge Company LLC | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| LBRDK | LBRDK/ | Liberty Broadband Corporation (Class C) | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| LMN | LMN/ | Lumine Group Inc. | CA | — | 2026-07-07 | unknown | watch |
-| LMNR | LMNR/ | Limoneira Company | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| LSEG | LSEG/ | London Stock Exchange Group | UK | 2026-07-07 | 2026-07-07 | unknown | watch |
-| MCHB | MCHB/ | Mechanics Bancorp | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| MCO | MCO/ | Moody's Corporation | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| MDB | MDB/ | MongoDB, Inc. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| META | META/ | Meta Platforms Inc | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| MIAX | MIAX/ | Miami International Holdings | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| MRSH | MRSH/ | Marsh & McLennan Companies | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| MRTX.CVR | MRTX.CVR/ | Mirati Therapeutics CVR (Bristol-Myers Squibb acquisition) | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| MSB | MSB/ | Mesabi Trust | US | 2026-07-07 | 2026-07-07 | optionality | watch |
-| MSTR | MSTR/ | MicroStrategy Incorporated | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| MTA | MTA/ | Metalla Royalty & Streaming Ltd. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| NAN | NAN/ | Nuveen New York AMT-Free Quality Municipal Income Fund | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| NBIS | NBIS/ | Nebius Group N.V. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| NDAQ | NDAQ/ | Nasdaq Inc. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| NRP | NRP/ | Natural Resource Partners LP | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| NVDA | NVDA/ | NVIDIA Corporation | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| NZX.NZ | NZX.NZ/ | NZX Limited | AU | 2026-07-07 | 2026-07-07 | unknown | watch |
-| OR | OR/ | Osisko Gold Royalties Ltd | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| OTCM | OTCM/ | OTC Markets Group | US | 2026-07-07 | 2026-07-07 | croupier | watch |
-| PBT | PBT/ | Permian Basin Royalty Trust | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| PCH | PCH/ | PotlatchDeltic Corporation | US | 2026-07-07 | 2026-07-07 | optionality | watch |
-| PCYO | PCYO/ | Pure Cycle Corporation | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| PDER | PDER/ | Pardee Resources Company | OTC | 2026-07-07 | 2026-07-07 | optionality | watch |
-| POST | POST/ | Post Holdings, Inc. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| PRVL.CVR | PRVL.CVR/ | Prevail Therapeutics CVR (Eli Lilly acquisition) | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| PSE | PSE/ | Philippine Stock Exchange Inc. | EU | 2026-07-07 | 2026-07-07 | unknown | watch |
-| PSK.TO | PSK.TO/ | PrairieSky Royalty Ltd. | CA | 2026-06-03 | 2026-07-07 | optionality | watch |
-| QDEL | QDEL/ | QuidelOrtho | US | 2026-07-07 | 2026-07-07 | turnaround | hold |
-| RGLD | RGLD/ | Royal Gold Inc. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| RMV.L | RMV.L/ | Rightmove PLC | UK | 2026-07-07 | 2026-07-07 | platform | watch |
-| RPRX | RPRX/ | Royalty Pharma plc | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| RDDT | RDDT/ | Reddit, Inc. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| RYN | RYN/ | Rayonier, Inc. | US | 2026-07-07 | 2026-07-07 | optionality | watch |
-| S68.SI | S68.SI/ | Singapore Exchange Limited | EU | 2026-07-07 | 2026-07-07 | unknown | watch |
-| SBR | SBR/ | Sabine Royalty Trust | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| SHC | SHC/ | Sotera Health Company | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| SJT | SJT/ | San Juan Basin Royalty Trust | US | 2026-07-07 | 2026-07-07 | optionality | watch |
-| SMR | SMR/ | NuScale Power Corporation | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| SNOW | SNOW/ | Snowflake Inc | US | 2026-07-07 | 2026-07-07 | platform | watch |
-| SOC | SOC/ | Sable Offshore Corp. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| SPGI | SPGI/ | S&P Global | US | 2026-07-07 | 2026-07-07 | croupier | hold |
-| SRPT | SRPT/ | Sarepta Therapeutics, Inc. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| STHO | STHO/ | Star Holdings | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| TASE | TASE/ | Tel Aviv Stock Exchange Ltd. | EU | 2026-07-07 | 2026-07-07 | unknown | watch |
-| TBBK | TBBK/ | The Bancorp, Inc. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| TEQ.ST | TEQ.ST/ | Teqnion AB | SE | 2026-07-07 | 2026-07-07 | serial_acquirer | hold |
-| TFPM | TFPM/ | Triple Flag Precious Metals Corp. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| TOI | TOI/ | The Oncology Institute, Inc. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| TPL | TPL/ | Texas Pacific Land Corporation | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| TRC | TRC/ | Tejon Ranch Co. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| TSLA | TSLA/ | Tesla, Inc. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| VOXR | VOXR/ | Vox Royalty Corp | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| VTRS | VTRS/ | Viatris Inc | US | 2026-07-07 | 2026-07-07 | turnaround | watch |
-| WBI | WBI/ | WaterBridge Infrastructure | US | 2026-07-07 | 2026-07-07 | infrastructure | watch |
-| WEST | WEST/ | Westrock Coffee Company | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| XYZ | XYZ/ | Block, Inc. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| WPM | WPM/ | Wheaton Precious Metals Corp. | US | 2026-07-07 | 2026-07-07 | compounder | watch |
-| WRLC | WRLC/ | Windrock Land Company | OTC | 2026-07-07 | 2026-07-07 | optionality | watch |
-| X.TO | X.TO/ | TMX Group Limited | CA | 2026-07-07 | 2026-07-07 | unknown | watch |
-| XP | XP/ | XP Inc. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
-| XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-07 | 2026-07-07 | unknown | watch |
+| 0388.HK | 0388.HK/ | Hong Kong Exchanges and Clearing Ltd | EU | 2026-07-08 | 2026-07-08 | croupier | watch |
+| 3905.T | 3905.T/ | DataSection Co., Ltd. | JP | 2026-07-08 | 2026-07-08 | compounder | watch |
+| 7176.T | 7176.T/ | Simplex Financial Holdings Co., Ltd. | JP | 2026-07-08 | 2026-07-08 | unknown | watch |
+| 8697.T | 8697.T/ | Japan Exchange Group | JP | 2026-06-25 | 2026-07-08 | croupier | hold |
+| ABMD.CVR | ABMD.CVR/ | Abiomed CVR (Johnson & Johnson acquisition) | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| ABX | ABX/ | Abacus Life Inc. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| ADN.TO | ADN.TO/ | Acadian Timber Corp. | CA | 2026-07-08 | 2026-07-08 | optionality | watch |
+| ALS.TO | ALS.TO/ | Altius Minerals Corporation | CA | 2026-06-03 | 2026-07-08 | unknown | watch |
+| AMD | AMD/ | Advanced Micro Devices, Inc. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| AMZN | AMZN/ | Amazon.com | US | 2026-07-08 | 2026-07-08 | compounder | hold |
+| APLD | APLD/ | Applied Digital | US | 2026-07-08 | 2026-07-08 | optionality | watch |
+| ASPN | ASPN/ | Aspen Aerogels, Inc. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| ASX.AX | ASX.AX/ | ASX Limited | AU | 2026-07-08 | 2026-07-08 | unknown | watch |
+| AXON | AXON/ | Axon Enterprise, Inc. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| AZLCZ | AZLCZ/ | Aztec Land and Cattle Company | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| B | B/ | Barrick Mining Corporation | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| B3SA3.SA | B3SA3.SA/ | B3 S.A. - Brasil Bolsa Balcao | EU | 2026-07-08 | 2026-07-08 | unknown | watch |
+| BKRB | BKRB/ | Berkshire Hathaway Inc. (Class B) | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| BMYS.KL | BMYS.KL/ | Bursa Malaysia Berhad | EU | 2026-07-08 | 2026-07-08 | unknown | watch |
+| BN | BN/ | Brookfield Corporation | US | 2026-07-08 | 2026-07-08 | platform | hold |
+| BOLSAA.MX | BOLSAA.MX/ | Bolsa Mexicana de Valores SAB de CV | EU | 2026-07-08 | 2026-07-08 | unknown | watch |
+| BRBR | BRBR/ | BellRing Brands, Inc. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| BSM | BSM/ | Black Stone Minerals LP | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| BUR | BUR/ | Burford Capital Limited | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| BVERS | BVERS/ | Beaver Coal Company, Limited | OTC | 2026-07-08 | 2026-07-08 | optionality | watch |
+| BWEL | BWEL/ | J.G. Boswell Company | US | 2026-07-08 | 2026-07-08 | optionality | watch |
+| BYMA | BYMA/ | Bolsas y Mercados Argentinos S.A. | EU | 2026-07-08 | 2026-07-08 | unknown | watch |
+| CBOE | CBOE/ | Cboe Global Markets | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| CBRS | CBRS/ | Cerebras Systems | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| CDZI | CDZI/ | Cadiz Inc. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| CHTR | CHTR/ | Charter Communications, Inc. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| CKX | CKX/ | CKX Lands, Inc. | US | 2026-07-08 | 2026-07-08 | optionality | watch |
+| CME | CME/ | CME Group Inc. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| CMSG | CMSG/ | Consensus Mining & Seigniorage Corp | US | 2026-07-08 | 2026-07-08 | optionality | watch |
+| COLD | COLD/ | Americold Realty Trust, Inc. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| CORBF | CORBF/ | Corbus Pharmaceuticals Holdings, Inc. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| CPRT | CPRT/ | Copart | US | 2026-07-08 | 2026-07-08 | compounder | core |
+| CRCL | CRCL/ | Circle Internet Group, Inc. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| CSGP | CSGP/ | CoStar Group | US | 2026-07-08 | 2026-07-08 | platform | watch |
+| CSU | CSU/ | Constellation Software | CA | 2026-07-08 | 2026-07-08 | compounder | core |
+| CSU.DB | CSU.DB/ | Constellation Software Inc. (Series 1 Debentures) | CA | — | 2026-07-08 | unknown | watch |
+| DB1.DE | DB1.DE/ | Deutsche Boerse AG | EU | 2026-07-08 | 2026-07-08 | unknown | watch |
+| DHR | DHR/ | Danaher Corporation | US | 2026-07-08 | 2026-07-08 | compounder | hold |
+| DMLP | DMLP/ | Dorchester Minerals LP | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| DRR.AX | DRR.AX/ | Deterra Royalties Limited | AU | 2026-06-02 | 2026-07-08 | unknown | watch |
+| ECHO | ECHO/ | EchoStar Corporation | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| EFOR | EFOR/ | Everforth, Inc. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| ENPH | ENPH/ | Enphase Energy, Inc. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| ENX.PA | ENX.PA/ | Euronext N.V. | EU | 2026-07-08 | 2026-07-08 | unknown | watch |
+| EQPT | EQPT/ | EquipmentShare.com Inc | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| ETOR | ETOR/ | eToro Group Ltd. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| EVR | EVR/ | Evolve Royalties Ltd | CA | 2026-06-11 | 2026-07-08 | unknown | watch |
+| FIHO12.MX | FIHO12.MX/ | FibraHotel (Concentradora Fibra Hotelera Mexicana) | EU | — | 2026-07-08 | unknown | watch |
+| FLUX | FLUX/ | Flux Power Holdings, Inc. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| FMCCK | FMCCK/ | Ford Motor Credit Company LLC (Preferred) | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| FMCCL | FMCCL/ | Ford Motor Credit Company LLC (Preferred) | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| FNMAO | FNMAO/ | Federal National Mortgage Association (Preferred) | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| FNMAP | FNMAP/ | Federal National Mortgage Association (Preferred) | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| FNV | FNV/ | Franco-Nevada Corporation | US | 2026-07-08 | 2026-07-08 | optionality | watch |
+| FRMI | FRMI/ | Fermi Inc. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| FRMO | FRMO/ | FRMO Corporation | US | 2026-07-08 | 2026-07-08 | holding_co | hold |
+| FTRE | FTRE/ | Fortrea Holdings Inc. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| GCCO | GCCO/ | Garden City Co. | OTC | 2026-07-08 | 2026-07-08 | optionality | watch |
+| GDRZF | GDRZF/ | Gold Reserve Inc. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| GKTX.PS1 | GKTX.PS1/ | Galapagos NV (Janssen structured security PS1) | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| GKTX.PS2 | GKTX.PS2/ | Galapagos NV (Janssen structured security PS2) | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| GKTX.PS3 | GKTX.PS3/ | Galapagos NV (Janssen structured security PS3) | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| GLXY | GLXY/ | Galaxy Digital Inc. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| GOOGL | GOOGL/ | Alphabet Inc. | US | 2026-07-08 | 2026-07-08 | compounder | hold |
+| GPGI | GPGI/ | GPGI, Inc. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| GPW.WA | GPW.WA/ | Warsaw Stock Exchange | EU | 2026-07-08 | 2026-07-08 | unknown | watch |
+| GROY | GROY/ | Gold Royalty Corp. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| GS | GS/ | Goldman Sachs Group, Inc. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| GTX | GTX/ | Garrett Motion Inc. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| HE | HE/ | Hawaiian Electric Industries | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| HEE | HEE/ | Hellenic Exchanges - Athens Stock Exchange S.A. | EU | 2026-07-08 | 2026-07-08 | unknown | watch |
+| HEI.A | HEI.A/ | HEICO Corporation (Class A) | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| HKHC | HKHC/ | Horizon Kinetics Holding Corporation | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| HL | HL/ | Hecla Mining Company | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| HNFSA | HNFSA/ | Hanover Foods Corporation | OTC | 2026-07-08 | 2026-07-08 | optionality | watch |
+| ICE | ICE/ | Intercontinental Exchange | US | 2026-07-08 | 2026-07-08 | croupier | hold |
+| IDA.AX | IDA.AX/ | Indiana Resources Limited | AU | 2026-07-08 | 2026-07-08 | unknown | watch |
+| IEX.NS | IEX.NS/ | Indian Energy Exchange Limited | IN | 2026-07-08 | 2026-07-08 | unknown | watch |
+| INV | INV/ | Innovex International, Inc. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| IPCXR | IPCXR/ | Inflection Point Acquisition Corp. II (Rights) | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| JL80.DE | JL80.DE/ | Norconsult ASA | EU | — | 2026-07-08 | unknown | watch |
+| JPM | JPM/ | JPMorgan Chase & Co. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| KEWL | KEWL/ | Keweenaw Land Association | US | 2026-07-08 | 2026-07-08 | optionality | watch |
+| KRP | KRP/ | Kimbell Royalty Partners LP | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| LAND | LAND/ | Gladstone Land Corporation | US | 2026-07-08 | 2026-07-08 | infrastructure | watch |
+| LB | LB/ | LandBridge Company LLC | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| LBRDK | LBRDK/ | Liberty Broadband Corporation (Class C) | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| LMN | LMN/ | Lumine Group Inc. | CA | — | 2026-07-08 | unknown | watch |
+| LMNR | LMNR/ | Limoneira Company | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| LSEG | LSEG/ | London Stock Exchange Group | UK | 2026-07-08 | 2026-07-08 | unknown | watch |
+| MCHB | MCHB/ | Mechanics Bancorp | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| MCO | MCO/ | Moody's Corporation | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| MDB | MDB/ | MongoDB, Inc. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| META | META/ | Meta Platforms Inc | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| MIAX | MIAX/ | Miami International Holdings | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| MRSH | MRSH/ | Marsh & McLennan Companies | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| MRTX.CVR | MRTX.CVR/ | Mirati Therapeutics CVR (Bristol-Myers Squibb acquisition) | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| MSB | MSB/ | Mesabi Trust | US | 2026-07-08 | 2026-07-08 | optionality | watch |
+| MSTR | MSTR/ | MicroStrategy Incorporated | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| MTA | MTA/ | Metalla Royalty & Streaming Ltd. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| NAN | NAN/ | Nuveen New York AMT-Free Quality Municipal Income Fund | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| NBIS | NBIS/ | Nebius Group N.V. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| NDAQ | NDAQ/ | Nasdaq Inc. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| NRP | NRP/ | Natural Resource Partners LP | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| NVDA | NVDA/ | NVIDIA Corporation | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| NZX.NZ | NZX.NZ/ | NZX Limited | AU | 2026-07-08 | 2026-07-08 | unknown | watch |
+| OR | OR/ | Osisko Gold Royalties Ltd | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| OTCM | OTCM/ | OTC Markets Group | US | 2026-07-08 | 2026-07-08 | croupier | watch |
+| PBT | PBT/ | Permian Basin Royalty Trust | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| PCH | PCH/ | PotlatchDeltic Corporation | US | 2026-07-08 | 2026-07-08 | optionality | watch |
+| PCYO | PCYO/ | Pure Cycle Corporation | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| PDER | PDER/ | Pardee Resources Company | OTC | 2026-07-08 | 2026-07-08 | optionality | watch |
+| POST | POST/ | Post Holdings, Inc. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| PRVL.CVR | PRVL.CVR/ | Prevail Therapeutics CVR (Eli Lilly acquisition) | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| PSE | PSE/ | Philippine Stock Exchange Inc. | EU | 2026-07-08 | 2026-07-08 | unknown | watch |
+| PSK.TO | PSK.TO/ | PrairieSky Royalty Ltd. | CA | 2026-06-03 | 2026-07-08 | optionality | watch |
+| QDEL | QDEL/ | QuidelOrtho | US | 2026-07-08 | 2026-07-08 | turnaround | hold |
+| RDDT | RDDT/ | Reddit, Inc. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| RGLD | RGLD/ | Royal Gold Inc. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| RMV.L | RMV.L/ | Rightmove PLC | UK | 2026-07-08 | 2026-07-08 | platform | watch |
+| RPRX | RPRX/ | Royalty Pharma plc | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| RYN | RYN/ | Rayonier, Inc. | US | 2026-07-08 | 2026-07-08 | optionality | watch |
+| S68.SI | S68.SI/ | Singapore Exchange Limited | EU | 2026-07-08 | 2026-07-08 | unknown | watch |
+| SBR | SBR/ | Sabine Royalty Trust | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| SHC | SHC/ | Sotera Health Company | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| SJT | SJT/ | San Juan Basin Royalty Trust | US | 2026-07-08 | 2026-07-08 | optionality | watch |
+| SMR | SMR/ | NuScale Power Corporation | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| SNOW | SNOW/ | Snowflake Inc | US | 2026-07-08 | 2026-07-08 | platform | watch |
+| SOC | SOC/ | Sable Offshore Corp. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| SPGI | SPGI/ | S&P Global | US | 2026-07-08 | 2026-07-08 | croupier | hold |
+| SRPT | SRPT/ | Sarepta Therapeutics, Inc. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| STHO | STHO/ | Star Holdings | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| TASE | TASE/ | Tel Aviv Stock Exchange Ltd. | EU | 2026-07-08 | 2026-07-08 | unknown | watch |
+| TBBK | TBBK/ | The Bancorp, Inc. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| TEQ.ST | TEQ.ST/ | Teqnion AB | SE | 2026-07-08 | 2026-07-08 | serial_acquirer | hold |
+| TFPM | TFPM/ | Triple Flag Precious Metals Corp. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| TOI | TOI/ | The Oncology Institute, Inc. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| TPL | TPL/ | Texas Pacific Land Corporation | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| TRC | TRC/ | Tejon Ranch Co. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| TSLA | TSLA/ | Tesla, Inc. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| VOXR | VOXR/ | Vox Royalty Corp | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| VTRS | VTRS/ | Viatris Inc | US | 2026-07-08 | 2026-07-08 | turnaround | watch |
+| WBI | WBI/ | WaterBridge Infrastructure | US | 2026-07-08 | 2026-07-08 | infrastructure | watch |
+| WEST | WEST/ | Westrock Coffee Company | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| WPM | WPM/ | Wheaton Precious Metals Corp. | US | 2026-07-08 | 2026-07-08 | compounder | watch |
+| WRLC | WRLC/ | Windrock Land Company | OTC | 2026-07-08 | 2026-07-08 | optionality | watch |
+| X.TO | X.TO/ | TMX Group Limited | CA | 2026-07-08 | 2026-07-08 | unknown | watch |
+| XP | XP/ | XP Inc. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
+| XYZ | XYZ/ | Block, Inc. | US | 2026-07-08 | 2026-07-08 | unknown | watch |
 
 **155 holdings total.** Registry: `_system/portfolio/registry.json`
