@@ -21,14 +21,15 @@
 
 ## One-line thesis
 
-Reddit, Inc. — thesis pending Marvin deep dive.
+Reddit is a community platform in early monetization (ARPU +44% Q1 2026); at ~$193 the synthesis IRR is 7.16%, below our 15% bar. **Watch** until price or normalized FCF improves.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest annual report (FY2025 10-K)
+- [x] Read latest quarterly report (Q1 2026 10-Q)
+- [ ] Confirm FCF normalization: FY2025 filed vs Q1 2026 run-rate
+- [ ] Human review: moat upgrade criteria after two years of ARPU + DAUq compound
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-07-07; awaiting deep dive.
+- First filing-grounded dive 2026-07-08; see `deep_dive_2026-07-08.md`.
