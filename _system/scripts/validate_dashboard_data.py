@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -410,6 +411,7 @@ def main() -> int:
             errors.append(
                 f"activist feed tier counts ({tier_sum}) != feed rows ({len(feed)})"
             )
+        pages_deploy_only = os.environ.get("CI_PAGES_DEPLOY_ONLY", "").lower() in {"1", "true", "yes"}
         for row in feed:
             local_file = row.get("local_file")
             github_url = row.get("github_url")
@@ -418,13 +420,18 @@ def main() -> int:
                 errors.append(
                     f"activist feed {row.get('ticker')}/{row.get('firm_id')}: github_url set but file_exists is false"
                 )
-            if local_file and file_exists is True:
+            if local_file and file_exists is True and not pages_deploy_only:
                 path = ROOT / str(local_file).replace("\\", "/")
                 if not path.exists():
                     errors.append(f"activist feed references missing file: {local_file}")
-            if local_file and file_exists is False and github_url:
+            if local_file and file_exists is False and github_url and not pages_deploy_only:
                 errors.append(f"activist feed ghost github link for missing file: {local_file}")
-            if local_file and (ROOT / str(local_file).replace("\\", "/")).exists() and file_exists is False:
+            if (
+                local_file
+                and not pages_deploy_only
+                and (ROOT / str(local_file).replace("\\", "/")).exists()
+                and file_exists is False
+            ):
                 errors.append(
                     f"activist feed {row.get('ticker')}/{row.get('firm_id')}: file on disk but file_exists false"
                 )

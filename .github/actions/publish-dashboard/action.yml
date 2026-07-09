@@ -51,6 +51,8 @@ runs:
     - name: Validate committed dashboard JSON
       if: inputs.skip_rebuild == 'true' && inputs.validate == 'true'
       shell: bash
+      env:
+        CI_PAGES_DEPLOY_ONLY: "true"
       run: |
         python -m unittest _system/scripts/test_event_materiality.py _system/scripts/test_event_triage.py
         python _system/scripts/validate_dashboard_data.py

@@ -123,8 +123,11 @@ runs:
         OAUTH_CLIENT_ID: ${{ env.OAUTH_CLIENT_ID }}
         OAUTH_PROXY_URL: ${{ env.OAUTH_PROXY_URL }}
       run: |
+        python _system/scripts/build_specialist_13f_signals.py
+        python _system/scripts/build_research_memory.py
         python _system/scripts/build_insights.py
         python _system/scripts/build_dashboard_data.py
+        python _system/scripts/validate_research_memory.py
 
     - name: Mirror dashboard to docs
       if: inputs.mirror_docs == 'true'
