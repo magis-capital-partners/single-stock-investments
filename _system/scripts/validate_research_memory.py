@@ -66,6 +66,16 @@ def main() -> int:
     if not EVIDENCE_PATH.exists():
         warnings.append("missing research_memory_evidence.json")
 
+    relative_urls = [
+        c
+        for c in memory.get("claim_ledger") or []
+        if c.get("evidence_url") and not str(c["evidence_url"]).startswith(("http://", "https://"))
+    ]
+    if relative_urls:
+        errors.append(
+            f"{len(relative_urls)} claim(s) have relative evidence_url; rerun build_research_memory.py"
+        )
+
     for msg in warnings:
         print(f"WARN: {msg}", file=sys.stderr)
     for msg in errors:

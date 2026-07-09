@@ -209,6 +209,8 @@
   .source-open-link:hover { text-decoration: underline; }
   .memory-score-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
   .memory-biotech { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 8px 0; }
+  .memory-sub-nav .view-tab { font-size: 13px; padding: 6px 12px; }
+  .memory-filter-row .source-pill { font-size: 12px; }
   @media (max-width: 520px) { .memory-score-row { grid-template-columns: 1fr; } }
   .divergence-flag { color: var(--accent-amber); margin-left: 4px; }
   .lens-delta-warn { color: var(--accent-amber); font-weight: 700; }
@@ -652,6 +654,7 @@
 <script src="oauth.js"></script>
 <script>
 const GH_REPO = 'magis-capital-partners/single-stock-investments';
+const GITHUB_REPO = GH_REPO;
 const DISPATCH_EVENT = 'onboard-ticker';
 const MARKET_BADGE = {
   SE: 'badge-se', AU: 'badge-se', UK: 'badge-us', US: 'badge-us', JP: 'badge-jp',
@@ -776,6 +779,16 @@ const CONSENSUS_VIEW_KEY = 'ssp_consensus_view_v1';
 const THEMES_VIEW_KEY = 'ssp_themes_view_v1';
 const TICKER_VIEW_KEY = 'ssp_ticker_view_v1';
 const TICKER_SORT_KEY = 'ssp_ticker_sort_v1';
+const MEMORY_VIEW_KEY = 'ssp_memory_view_v1';
+const MEMORY_TYPE_KEY = 'ssp_memory_type_v1';
+
+let memoryViewMode = (() => {
+  try { return localStorage.getItem(MEMORY_VIEW_KEY) || 'ledger'; } catch (_) { return 'ledger'; }
+})();
+let memoryTypeFilter = (() => {
+  try { return localStorage.getItem(MEMORY_TYPE_KEY) || 'all'; } catch (_) { return 'all'; }
+})();
+let memoryBiotechOnly = false;
 
 function normalizeAppHash(nextHash) {
   if (nextHash == null || nextHash === '') return '';
@@ -1208,6 +1221,9 @@ function renderInsights(opts = {}) {
     inflectionTier: insightsInflectionTier,
     eventTier: insightsEventTier,
     themesViewMode: insightsThemesViewMode,
+    memoryViewMode,
+    memoryTypeFilter,
+    memoryBiotechOnly,
   });
   content.querySelectorAll('[data-use-latest-quarter]').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -1290,6 +1306,27 @@ function renderInsights(opts = {}) {
   if (needsReview) {
     needsReview.addEventListener('change', () => {
       insightsNeedsReviewOnly = needsReview.checked;
+      renderInsights();
+    });
+  }
+  content.querySelectorAll('[data-memory-view]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      memoryViewMode = btn.dataset.memoryView || 'ledger';
+      try { localStorage.setItem(MEMORY_VIEW_KEY, memoryViewMode); } catch (_) { /* ignore */ }
+      renderInsights();
+    });
+  });
+  content.querySelectorAll('[data-memory-type]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      memoryTypeFilter = btn.dataset.memoryType || 'all';
+      try { localStorage.setItem(MEMORY_TYPE_KEY, memoryTypeFilter); } catch (_) { /* ignore */ }
+      renderInsights();
+    });
+  });
+  const memoryBiotech = content.querySelector('#memory-biotech-only');
+  if (memoryBiotech) {
+    memoryBiotech.addEventListener('change', () => {
+      memoryBiotechOnly = memoryBiotech.checked;
       renderInsights();
     });
   }
@@ -1980,7 +2017,7 @@ function selectTicker(ticker, opts = {}) {
     </div>`
     : '';
   const researchMemory = iv
-    ? iv.renderResearchMemory(t.research_memory, escapeHtml, linkHtml)
+    ? iv.renderResearchMemory(t.research_memory, escapeHtml, linkHtml, GH_REPO)
     : '';
   const discussants = (data.insights?.ticker_discussants || {})[t.ticker]
     || (data.insights?.ticker_discussants || {})[t.ticker.toUpperCase()]

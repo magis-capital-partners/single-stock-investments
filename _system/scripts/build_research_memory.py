@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 from collections import Counter, defaultdict
 from pathlib import Path
 import sys
@@ -10,7 +11,9 @@ import sys
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 
-from document_store import document_id_for_ref  # noqa: E402
+GITHUB_REPO = os.environ.get("GITHUB_REPOSITORY", "magis-capital-partners/single-stock-investments")
+
+from document_store import best_document_label, best_document_url, document_id_for_ref  # noqa: E402
 from memory_claim_sources import supplemental_claim_rows  # noqa: E402
 from memory_common import (  # noqa: E402
     SPECIALIST_FUND_TERMS,
@@ -58,8 +61,26 @@ def source_key(row: dict) -> str:
     )
 
 
+def resolve_evidence_url(row: dict) -> str | None:
+    raw = row.get("evidence_url") or row.get("evidence_ref") or source_key(row)
+    if not raw or raw == "unknown":
+        return None
+    text = str(raw)
+    if text.startswith(("http://", "https://")):
+        return text
+    return best_document_url(text, GITHUB_REPO)
+
+
+def resolve_evidence_label(row: dict, url: str | None = None) -> str:
+    if row.get("evidence_label"):
+        return str(row["evidence_label"])
+    ref = row.get("evidence_ref") or row.get("evidence_url") or source_key(row)
+    return best_document_label(ref) if ref and ref != "unknown" else "source"
+
+
 def source_record(row: dict) -> dict:
     key = source_key(row)
+    url = resolve_evidence_url(row)
     return {
         "source_id": stable_id(key),
         "source_key": key,
@@ -70,8 +91,8 @@ def source_record(row: dict) -> dict:
         "source_type": source_type(row),
         "date": row.get("observed_at") or row.get("as_of") or row.get("letter_date") or row.get("date"),
         "author": row.get("fund") or row.get("source_name") or row.get("publisher"),
-        "url": row.get("evidence_url") or row.get("evidence_ref"),
-        "label": row.get("evidence_label") or "source",
+        "url": url,
+        "label": resolve_evidence_label(row, url),
         "document_id": row.get("evidence_document_id") or document_id_for_ref(key),
     }
 

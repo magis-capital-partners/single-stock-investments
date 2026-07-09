@@ -402,13 +402,13 @@
       </div>`;
   }
 
-  function renderMemoryClaim(claim, escapeHtml, linkHtml) {
+  function renderMemoryClaim(claim, escapeHtml, linkHtml, ghRepo) {
     if (!claim) return '';
     const directionClass = claim.direction === 'bullish'
       ? 'badge-ok'
       : (claim.direction === 'bearish' ? 'badge-bad' : 'badge-us');
     const link = claim.evidence_url
-      ? ` ${linkHtml(claim.evidence_url, evidenceLabel(claim.evidence_url, claim.evidence_label), 'source-open-link')}`
+      ? ` ${evidenceLink(claim.evidence_url, linkHtml, ghRepo, claim.evidence_label)}`
       : '';
     return `<li class="source-card">
       <div class="source-card-head">
@@ -426,7 +426,7 @@
     </li>`;
   }
 
-  function renderResearchMemory(memory, escapeHtml, linkHtml) {
+  function renderResearchMemory(memory, escapeHtml, linkHtml, ghRepo) {
     if (!memory || !memory.claim_count) {
       return `
         <div class="detail-section tier-2">
@@ -457,13 +457,63 @@
           </div>
           <div class="tier-sub" style="margin:8px 0">${escapeHtml(sourceMix)}</div>
           ${biotechHtml}
-          ${ownershipClaims.length ? `<h3 style="margin-top:12px">Ownership claims</h3><ul class="source-stack">${ownershipClaims.map(c => renderMemoryClaim(c, escapeHtml, linkHtml)).join('')}</ul>` : ''}
-          ${inflectionClaims.length ? `<h3 style="margin-top:12px">Inflection claims</h3><ul class="source-stack">${inflectionClaims.map(c => renderMemoryClaim(c, escapeHtml, linkHtml)).join('')}</ul>` : ''}
-          ${riskClaims.length ? `<h3 style="margin-top:12px">Risks / disconfirming</h3><ul class="source-stack">${riskClaims.map(c => renderMemoryClaim(c, escapeHtml, linkHtml)).join('')}</ul>` : ''}
-          ${specialistMentions.length ? `<h3 style="margin-top:12px">Specialist letter mentions</h3><ul class="source-stack">${specialistMentions.map(c => renderMemoryClaim(c, escapeHtml, linkHtml)).join('')}</ul>` : ''}
-          ${!inflectionClaims.length && !riskClaims.length && !ownershipClaims.length ? `<ul class="source-stack">${topClaims.slice(0, 3).map(c => renderMemoryClaim(c, escapeHtml, linkHtml)).join('')}</ul>` : ''}
+          ${ownershipClaims.length ? `<h3 style="margin-top:12px">Ownership claims</h3><ul class="source-stack">${ownershipClaims.map(c => renderMemoryClaim(c, escapeHtml, linkHtml, ghRepo)).join('')}</ul>` : ''}
+          ${inflectionClaims.length ? `<h3 style="margin-top:12px">Inflection claims</h3><ul class="source-stack">${inflectionClaims.map(c => renderMemoryClaim(c, escapeHtml, linkHtml, ghRepo)).join('')}</ul>` : ''}
+          ${riskClaims.length ? `<h3 style="margin-top:12px">Risks / disconfirming</h3><ul class="source-stack">${riskClaims.map(c => renderMemoryClaim(c, escapeHtml, linkHtml, ghRepo)).join('')}</ul>` : ''}
+          ${specialistMentions.length ? `<h3 style="margin-top:12px">Specialist letter mentions</h3><ul class="source-stack">${specialistMentions.map(c => renderMemoryClaim(c, escapeHtml, linkHtml, ghRepo)).join('')}</ul>` : ''}
+          ${!inflectionClaims.length && !riskClaims.length && !ownershipClaims.length ? `<ul class="source-stack">${topClaims.slice(0, 3).map(c => renderMemoryClaim(c, escapeHtml, linkHtml, ghRepo)).join('')}</ul>` : ''}
         </div>
       </div>`;
+  }
+
+  const MEMORY_VIEW_TABS = [
+    { id: 'ledger', label: 'Claim ledger' },
+    { id: 'biotech', label: 'Biotech' },
+    { id: 'review', label: 'Review queue' },
+  ];
+
+  const MEMORY_TYPE_FILTERS = [
+    { id: 'all', label: 'All types' },
+    { id: 'thesis', label: 'Thesis' },
+    { id: 'variant_view', label: 'Variant' },
+    { id: 'risk', label: 'Risk' },
+    { id: 'ownership', label: 'Ownership' },
+    { id: 'fundamentals', label: 'Fundamentals' },
+    { id: 'deep_dive', label: 'Deep dive' },
+  ];
+
+  function memoryClaimMatchesType(row, typeFilter) {
+    if (!typeFilter || typeFilter === 'all') return true;
+    if (typeFilter === 'deep_dive') {
+      return row.source_type === 'deep_dive' || row.source_type === 'adversarial_review';
+    }
+    return row.claim_type === typeFilter;
+  }
+
+  function renderMemorySubNav(activeView, escapeHtml) {
+    const view = activeView || 'ledger';
+    return `
+      <nav class="view-tabs memory-sub-nav" id="memory-view-tabs" style="margin:12px 0 8px">
+        ${MEMORY_VIEW_TABS.map(t => `<button type="button" class="view-tab${view === t.id ? ' active' : ''}" data-memory-view="${t.id}">${escapeHtml(t.label)}</button>`).join('')}
+      </nav>`;
+  }
+
+  function renderMemoryFilters(opts, escapeHtml) {
+    const typeFilter = opts?.memoryTypeFilter || 'all';
+    const biotechOnly = Boolean(opts?.memoryBiotechOnly);
+    const activeView = opts?.memoryViewMode || 'ledger';
+    if (activeView !== 'ledger') return '';
+    return `
+      <div class="memory-filter-row" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px">
+        <nav class="source-pills" id="memory-type-tabs" style="margin:0">
+          ${MEMORY_TYPE_FILTERS.map(t => `<button type="button" class="filter-btn source-pill${typeFilter === t.id ? ' active' : ''}" data-memory-type="${t.id}">${escapeHtml(t.label)}</button>`).join('')}
+        </nav>
+        <label class="tier-sub" style="display:flex;align-items:center;gap:6px;margin-left:4px">
+          <input type="checkbox" id="memory-biotech-only" ${biotechOnly ? 'checked' : ''} />
+          Biotech names only
+        </label>
+      </div>
+      <p class="tier-sub" style="margin-bottom:10px">Claims span all research dates. Use search, type filters, and holdings overlap above.</p>`;
   }
 
   function renderMemorySummary(memory, escapeHtml) {
@@ -2137,7 +2187,16 @@
   }
 
   function renderMemoryLedger(memory, escapeHtml, linkHtml, opts) {
-    const { search = '', bookOnly = false, period = null, knownTickers = [], biotechOnly = false, holdingsTickers = [] } = opts || {};
+    const {
+      search = '',
+      bookOnly = false,
+      period = null,
+      knownTickers = [],
+      biotechOnly = false,
+      holdingsTickers = [],
+      typeFilter = 'all',
+      ghRepo = '',
+    } = opts || {};
     const bookSet = new Set((holdingsTickers || []).map(t => String(t).toUpperCase()));
     let rows = memory?.claim_ledger || [];
     if (period && !period.all) {
@@ -2154,28 +2213,36 @@
       );
       rows = rows.filter(r => biotechTickers.has(String(r.ticker || '').toUpperCase()));
     }
+    if (typeFilter && typeFilter !== 'all') {
+      rows = rows.filter(r => memoryClaimMatchesType(r, typeFilter));
+    }
     if (search) {
       rows = rows.filter(r => SearchMatch.matchMemoryClaim(r, search, knownTickers));
     }
+    const totalFiltered = rows.length;
     rows = rows.slice(0, 160);
     if (!rows.length) {
-      return '<p class="subhead">No research-memory claims match this view. Try Latest, All history, or clear filters.</p>';
+      return '<p class="subhead">No research-memory claims match this view. Try All history, clear filters, or switch type.</p>';
     }
     return `
-      <table class="darwin-table">
-        <thead><tr><th>Ticker</th><th>Type</th><th>Direction</th><th>Claim</th><th>Source</th><th></th></tr></thead>
+      <table class="darwin-table" id="memory-claim-ledger">
+        <thead><tr><th>Ticker</th><th>Type</th><th>Direction</th><th>Claim</th><th>Evidence</th></tr></thead>
         <tbody>${rows.map(r => {
           const cls = r.direction === 'bullish' ? 'badge-ok' : (r.direction === 'bearish' ? 'badge-bad' : 'badge-us');
+          const evLabel = r.evidence_label || evidenceLabel(r.evidence_url, r.source_title);
+          const evidenceCell = r.evidence_url
+            ? evidenceLink(r.evidence_url, linkHtml, ghRepo, evLabel)
+            : escapeHtml(r.source_title || r.source_type || 'source');
           return `<tr>
             <td><button type="button" class="linkish mono" data-select-ticker="${escapeHtml(r.ticker)}">${escapeHtml(r.ticker)}</button></td>
             <td><span class="badge badge-us">${escapeHtml(r.claim_type || 'claim')}</span></td>
             <td><span class="badge ${cls}">${escapeHtml(r.direction || 'neutral')}</span></td>
             <td style="min-width:320px">${escapeHtml(r.claim || '')}</td>
-            <td>${escapeHtml(r.source_title || r.source_type || 'source')}</td>
-            <td>${r.evidence_url ? linkHtml(r.evidence_url, evidenceLabel(r.evidence_url, r.evidence_label), 'source-open-link') : '—'}</td>
+            <td style="min-width:140px">${evidenceCell}<div class="tier-sub">${escapeHtml(r.source_title || '')}</div></td>
           </tr>`;
         }).join('')}</tbody>
-      </table>`;
+      </table>
+      <p class="tier-sub" style="margin-top:8px">Showing ${rows.length} of ${totalFiltered} matching claim(s)${totalFiltered > rows.length ? ' (table capped at 160)' : ''}.</p>`;
   }
 
   function renderMemoryReviewQueue(memory, escapeHtml) {
@@ -2195,7 +2262,7 @@
       </div>`;
   }
 
-  function renderBiotechMemory(memory, escapeHtml, linkHtml) {
+  function renderBiotechMemory(memory, escapeHtml, linkHtml, ghRepo) {
     const funds = memory?.biotech?.specialist_funds || [];
     const signals = memory?.biotech?.signals?.by_ticker || {};
     const tickers = Object.values(memory?.by_ticker || {}).filter(t => t.biotech?.is_biotech_related);
@@ -2244,7 +2311,7 @@
               <td class="mono">${t.claim_count || 0}</td>
               <td class="mono">+${t.confirming_count || 0} / -${t.disconfirming_count || 0}</td>
               <td><span class="badge ${loaded ? 'badge-ok' : 'badge-warn'}">${loaded ? 'loaded' : 'pending'}</span></td>
-              <td>${escapeHtml((top.claim || '').slice(0, 180))} ${top.evidence_url ? linkHtml(top.evidence_url, evidenceLabel(top.evidence_url, top.evidence_label), 'source-open-link') : ''}</td>
+              <td>${escapeHtml((top.claim || '').slice(0, 180))} ${top.evidence_url ? evidenceLink(top.evidence_url, linkHtml, ghRepo, top.evidence_label) : ''}</td>
             </tr>`;
           }).join('')}</tbody>
         </table>
@@ -3044,19 +3111,30 @@
         });
     } else if (activeSection === 'memory') {
       const holdingsTickers = (tickers || []).filter(t => t.in_holdings).map(t => t.ticker);
+      const memoryViewMode = options?.memoryViewMode || 'ledger';
+      const memoryOpts = {
+        search: fundSearch,
+        bookOnly,
+        period,
+        knownTickers,
+        holdingsTickers,
+        biotechOnly: options?.memoryBiotechOnly || false,
+        typeFilter: options?.memoryTypeFilter || 'all',
+        memoryViewMode,
+        memoryTypeFilter: options?.memoryTypeFilter || 'all',
+        memoryBiotechOnly: options?.memoryBiotechOnly || false,
+        ghRepo,
+      };
       body = renderMemorySummary(memory, escapeHtml)
-        + renderMemoryLedger(memory, escapeHtml, linkHtml, {
-          search: fundSearch,
-          bookOnly,
-          period,
-          knownTickers,
-          holdingsTickers,
-          biotechOnly: options?.memoryBiotechOnly || false,
-        })
-        + '<div style="height:14px"></div>'
-        + renderBiotechMemory(memory, escapeHtml, linkHtml)
-        + '<div style="height:14px"></div>'
-        + renderMemoryReviewQueue(memory, escapeHtml);
+        + renderMemorySubNav(memoryViewMode, escapeHtml)
+        + renderMemoryFilters(memoryOpts, escapeHtml);
+      if (memoryViewMode === 'biotech') {
+        body += renderBiotechMemory(memory, escapeHtml, linkHtml, ghRepo);
+      } else if (memoryViewMode === 'review') {
+        body += renderMemoryReviewQueue(memory, escapeHtml);
+      } else {
+        body += renderMemoryLedger(memory, escapeHtml, linkHtml, memoryOpts);
+      }
     } else if (activeSection === 'themes') {
       body = renderThemeRankings(themes, escapeHtml, {
         period,
@@ -3071,7 +3149,7 @@
         + renderDataSourceCandidates(insights?.data_source_candidates || {}, escapeHtml);
     }
 
-    const showPeriodControls = activeSection !== 'tickers' && activeSection !== 'inflections';
+    const showPeriodControls = activeSection !== 'tickers' && activeSection !== 'inflections' && activeSection !== 'memory';
     const bookLabel = activeSection === 'tickers' ? 'Holdings only' : 'Our book overlap';
 
     return `
