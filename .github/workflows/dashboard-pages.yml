@@ -148,7 +148,7 @@ jobs:
         github.event.workflow_run.conclusion == 'success'
       )
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     env:
       RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
       RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
@@ -157,7 +157,40 @@ jobs:
       name: github-pages
       url: ${{ steps.publish.outputs.page_url }}
     steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts/ci_checkout_workspace.sh
+            _system/scripts/ci_resolve_checkout_ref.sh
+            _system/scripts/ci_sparse_checkout_paths.py
+            _system/scripts/ci_dashboard_deploy_mode.sh
+          sparse-checkout-cone-mode: false
+          fetch-depth: ${{ github.event_name == 'push' && 2 || 1 }}
+      - name: Resolve deploy mode
+        id: mode
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            if [ "${{ inputs.skip_rebuild }}" = "true" ]; then
+              echo "mode=deploy-only" >> "$GITHUB_OUTPUT"
+              echo "checkout_profile=pages" >> "$GITHUB_OUTPUT"
+              echo "skip_rebuild=true" >> "$GITHUB_OUTPUT"
+              echo "rebuild_profile=none" >> "$GITHUB_OUTPUT"
+              echo "validate=true" >> "$GITHUB_OUTPUT"
+              echo "needs_disk_cleanup=false" >> "$GITHUB_OUTPUT"
+            else
+              echo "mode=rebuild" >> "$GITHUB_OUTPUT"
+              echo "checkout_profile=dashboard" >> "$GITHUB_OUTPUT"
+              echo "skip_rebuild=false" >> "$GITHUB_OUTPUT"
+              echo "rebuild_profile=pages-fast" >> "$GITHUB_OUTPUT"
+              echo "validate=true" >> "$GITHUB_OUTPUT"
+              echo "needs_disk_cleanup=true" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            bash _system/scripts/ci_dashboard_deploy_mode.sh
+          fi
+          echo "Deploy mode: $(cat "$GITHUB_OUTPUT")"
       - uses: jlumbroso/free-disk-space@main
+        if: steps.mode.outputs.needs_disk_cleanup == 'true'
         with:
           tool-cache: false
           android: true
@@ -165,30 +198,15 @@ jobs:
           haskell: true
           docker-images: true
           swap-storage: true
-      - uses: actions/checkout@v4
-        with:
-          sparse-checkout: |
-            _system/scripts/ci_checkout_workspace.sh
-            _system/scripts/ci_resolve_checkout_ref.sh
-            _system/scripts/ci_sparse_checkout_paths.py
-          sparse-checkout-cone-mode: false
-          fetch-depth: 1
-      - name: Checkout workspace (sparse — dashboard rebuild)
-        if: github.event_name != 'workflow_dispatch' || inputs.skip_rebuild != true
-        run: bash _system/scripts/ci_checkout_workspace.sh dashboard
-      - name: Checkout workspace (config-only deploy)
-        if: github.event_name == 'workflow_dispatch' && inputs.skip_rebuild == true
-        run: bash _system/scripts/ci_checkout_workspace.sh minimal
-      - name: Sparse checkout dashboard tree
-        if: github.event_name == 'workflow_dispatch' && inputs.skip_rebuild == true
-        run: |
-          git sparse-checkout add dashboard
-          git read-tree -mu HEAD
+      - name: Checkout workspace (deploy mode)
+        run: bash _system/scripts/ci_checkout_workspace.sh "${{ steps.mode.outputs.checkout_profile }}"
       - name: Rebuild and publish to GitHub Pages
         id: publish
         uses: ./.github/actions/publish-dashboard
         with:
-          skip_rebuild: ${{ github.event_name == 'workflow_dispatch' && inputs.skip_rebuild == true && 'true' || 'false' }}
+          skip_rebuild: ${{ steps.mode.outputs.skip_rebuild }}
+          rebuild_profile: ${{ steps.mode.outputs.rebuild_profile }}
+          validate: ${{ steps.mode.outputs.validate }}
           skip_deploy: "false"
         env:
           OAUTH_CLIENT_ID: ${{ vars.OAUTH_CLIENT_ID }}

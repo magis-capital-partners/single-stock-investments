@@ -52,6 +52,7 @@ Ref resolution lives in `_system/scripts/ci_resolve_checkout_ref.sh` — **never
 | `full` / `history` | disabled (full tree) | lint diffs, onboard |
 | `minimal` / `marvin-agent` | `_system`, `.github` | prompt sync, agents |
 | `news` / `marvin-pick` / `darwin` / `dashboard` | base + ticker paths from `ci_sparse_checkout_paths.py` | portfolio jobs |
+| `pages` | `_system`, `.github`, `dashboard`, `docs` | GitHub Pages deploy-only (no ticker trees) |
 
 ### Guardrails (avoid regressions)
 
@@ -110,7 +111,23 @@ Daily auto-pick after download still runs inside **Daily Download & Dashboard Sy
 | `intake-full` | Drive Intake Sync |
 | `activist` | Activist Scan Sync |
 | `darwin-full` | Darwin Portfolio Refresh |
-| `darwin-fast` | Deploy Dashboard (publish action) |
+| `darwin-fast` | Legacy full refresh (avoid on deploy) |
+| `pages-fast` | Deploy Dashboard when rebuild is required (`build_insights` + `build_dashboard_data`) |
+
+## Deploy Dashboard speed model
+
+Upstream data pipelines (Drive Intake, Activist Scan, etc.) already run `rebuild-data` and commit `dashboard/data/` before chaining deploy via `workflow_run`. The deploy job must **not** repeat that work.
+
+| Trigger | Checkout | Rebuild | Typical runtime |
+|---------|----------|---------|-----------------|
+| `workflow_run` (chain) | `pages` | none | ~3–5 min |
+| `push` (dashboard/docs only) | `pages` | none + validate | ~5–8 min |
+| `push` (research/scripts) | `dashboard` | `pages-fast` | ~15–25 min |
+| `workflow_dispatch` + skip rebuild | `pages` | none | ~3–5 min |
+
+Mode selection: `_system/scripts/ci_dashboard_deploy_mode.sh` (or workflow_dispatch inputs).
+
+**Previous failure mode:** deploy used `darwin-fast` + full ticker sparse checkout on every chain, exceeding the 45-minute job timeout.
 
 ## Which workflow should I run?
 

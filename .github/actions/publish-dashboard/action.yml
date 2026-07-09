@@ -10,6 +10,14 @@ inputs:
     description: Upload artifact only (deploy in a separate job)
     required: false
     default: "false"
+  rebuild_profile:
+    description: rebuild-data profile when skip_rebuild=false (pages-fast recommended)
+    required: false
+    default: "pages-fast"
+  validate:
+    description: Run validate_dashboard_data.py after rebuild or on deploy-only
+    required: false
+    default: "true"
 
 outputs:
   page_url:
@@ -20,10 +28,15 @@ runs:
   using: composite
   steps:
     - name: Set up Python
-      if: inputs.skip_rebuild != 'true'
+      if: inputs.skip_rebuild != 'true' || inputs.validate == 'true'
       uses: actions/setup-python@v5
       with:
         python-version: "3.12"
+
+    - name: Install validation dependencies
+      if: inputs.skip_rebuild == 'true' && inputs.validate == 'true'
+      shell: bash
+      run: pip install -r _system/scripts/requirements.txt
 
     - name: Rebuild and validate
       if: inputs.skip_rebuild != 'true'
@@ -32,8 +45,15 @@ runs:
         OAUTH_CLIENT_ID: ${{ env.OAUTH_CLIENT_ID }}
         OAUTH_PROXY_URL: ${{ env.OAUTH_PROXY_URL }}
       with:
-        profile: darwin-fast
-        validate: "true"
+        profile: ${{ inputs.rebuild_profile }}
+        validate: ${{ inputs.validate }}
+
+    - name: Validate committed dashboard JSON
+      if: inputs.skip_rebuild == 'true' && inputs.validate == 'true'
+      shell: bash
+      run: |
+        python -m unittest _system/scripts/test_event_materiality.py _system/scripts/test_event_triage.py
+        python _system/scripts/validate_dashboard_data.py
 
     - name: Configure GitHub Pages
       uses: actions/configure-pages@v5

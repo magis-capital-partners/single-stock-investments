@@ -3,7 +3,7 @@ description: Run build_dashboard_data pipeline by profile (same job, shared work
 
 inputs:
   profile:
-    description: intake-full | activist | darwin-full | darwin-fast
+    description: intake-full | activist | darwin-full | darwin-fast | pages-fast | none
     required: true
   mirror_docs:
     description: Mirror dashboard/ to docs/ after rebuild
@@ -27,7 +27,7 @@ runs:
       run: pip install -r _system/scripts/requirements-darwin.txt
 
     - name: Install base dependencies
-      if: inputs.profile == 'intake-full' || inputs.profile == 'activist'
+      if: inputs.profile == 'intake-full' || inputs.profile == 'activist' || inputs.profile == 'pages-fast'
       shell: bash
       run: pip install -r _system/scripts/requirements.txt
 
@@ -115,6 +115,16 @@ runs:
         python _system/scripts/build_insights.py
         python _system/scripts/build_dashboard_data.py
         rsync -a --delete --exclude '.git' --exclude '.wrangler' dashboard/ docs/
+
+    - name: Rebuild (pages-fast)
+      if: inputs.profile == 'pages-fast'
+      shell: bash
+      env:
+        OAUTH_CLIENT_ID: ${{ env.OAUTH_CLIENT_ID }}
+        OAUTH_PROXY_URL: ${{ env.OAUTH_PROXY_URL }}
+      run: |
+        python _system/scripts/build_insights.py
+        python _system/scripts/build_dashboard_data.py
 
     - name: Mirror dashboard to docs
       if: inputs.mirror_docs == 'true'
