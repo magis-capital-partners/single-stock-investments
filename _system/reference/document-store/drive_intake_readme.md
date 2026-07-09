@@ -51,7 +51,7 @@ Use the exact repo ticker folder name, for example `TPL`, `FRMO`, `0388.HK`, or 
 
 For the flat layout, put the ticker as the filename or as the first clear filename token, such as `TPL.pdf` or `TPL - outside report.pdf`.
 
-Do **not** drop bare VIC-id PDFs (for example `163625.pdf`) directly in `Admin/Intake/VIC` without a ticker filename. The importer needs `FRMI.pdf` or `FRMI/...`.
+Arbitrary filenames (including bare VIC ids such as `163625.pdf`) are also accepted when the PDF text uniquely identifies a repo ticker. The importer extracts text (pypdf, with optional OCR fallback), resolves a single ticker, imports locally, and moves the Drive file under `Admin/Intake/{Kind}/{TICKER}/`. Ambiguous or unreadable PDFs stay in place and appear under `warnings` in `drive_intake_latest.json` (non-fatal).
 
 ## Routing
 
@@ -89,5 +89,6 @@ Drive folder access alone is not enough for GitHub Actions. The repo also needs 
 
 - Upload PDFs only.
 - Leave files in Drive after upload; the manifest prevents duplicate imports.
-- Use existing repo tickers. Unknown ticker folders or filenames are reported in `_system/reference/document-store/drive_intake_latest.json`.
+- Use existing repo tickers. Unknown / ambiguous PDFs (after content resolve) are reported as `warnings` in `_system/reference/document-store/drive_intake_latest.json`; operational failures remain `errors`.
+- Use `--strict` on `import_drive_intake.py` to fail the run when any warning remains (local debugging).
 - Use `VIC` only for Value Investors Club writeups; use `Research` for other outside research PDFs; use `Company` for company presentations or manually collected company PDFs; use `Activist/Long` or `Activist/Short` for activist letters, proxy fights, and forensic short reports.
