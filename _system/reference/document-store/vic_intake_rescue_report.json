@@ -6,5 +6,5 @@
   "frmi_drive_intake_path": "Admin/Intake/VIC/FRMI.pdf",
   "frmi_drive_dashboard_path": "Single Stocks/FRMI/VIC/FRMI.pdf",
   "config_fix": "Pointed drive_intake.folder_id at Admin/Intake (1OBaWt7SF...) instead of the VIC child, which had caused nested Admin/VIC under VIC.",
-  "note": "Stranded numeric VIC PDFs remain in Admin/Intake/VIC without ticker filenames; importer correctly errors them until renamed."
+  "note": "Stranded numeric VIC PDFs in Admin/Intake/VIC are now eligible for content-based ticker resolve (parse PDF text → unique repo ticker → import + move under VIC/{TICKER}/). Ambiguous/unreadable files stay as warnings."
 }
