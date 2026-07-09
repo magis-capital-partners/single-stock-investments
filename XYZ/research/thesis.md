@@ -1,6 +1,6 @@
 # XYZ — Investment Thesis
 
-**Last updated:** 2026-07-09
+**Last updated:** auto-sync
 
 ## Classification
 
@@ -11,8 +11,13 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | mid |
-| **MOI bucket** (legacy) | — |
+| **Implied 7yr IRR** (base) | 11.75% (total synthesis) |
+| **IRR method** | full |
+| **Lawrence bucket** | multi_sided |
 | **Payoff lens** | operating |
+| **MOI bucket** | pending |
+
+**Deep dive:** `XYZ/research/deep_dive_2026-07-09.md` (auto-sync)
 
 ## One-line thesis
 
