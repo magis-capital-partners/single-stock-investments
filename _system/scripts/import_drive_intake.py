@@ -25,6 +25,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import io
+import os
 import re
 import sys
 from pathlib import Path
@@ -280,7 +281,16 @@ def import_intake(
         if not parsed:
             continue
         if parsed.get("error"):
-            errors.append({"drive_file_id": file_id, **parsed})
+            if parsed["error"] == "missing_or_unknown_ticker":
+                skipped.append(
+                    {
+                        "drive_file_id": file_id,
+                        "reason": "unknown_ticker",
+                        **{key: value for key, value in parsed.items() if key != "error"},
+                    }
+                )
+            else:
+                errors.append({"drive_file_id": file_id, **parsed})
             continue
         if parsed["intake_kind"] not in include_kinds:
             continue
@@ -359,6 +369,7 @@ def import_intake(
         "summary": {
             "imported_count": len(imported),
             "skipped_count": len(skipped),
+            "unknown_ticker_count": sum(1 for row in skipped if row.get("reason") == "unknown_ticker"),
             "error_count": len(errors),
             "touched_ticker_count": len(touched_tickers),
         },
@@ -387,14 +398,31 @@ def main() -> int:
         action="append",
         help="Restrict to intake kind. May be passed multiple times.",
     )
+    parser.add_argument(
+        "--strict",
+        action="store_true",
+        help="Exit 2 when PDFs have unknown tickers (default: report and continue).",
+    )
     args = parser.parse_args()
     include_kinds = set(args.kind or INTAKE_TYPES)
     report = import_intake(args.dry_run, args.limit, args.force, include_kinds, args.ensure_folders)
     print("Drive intake import")
     for key, value in report["summary"].items():
         print(f"  {key}: {value}")
+    unknown_ticker_count = report["summary"].get("unknown_ticker_count", 0)
+    if unknown_ticker_count:
+        hint = (
+            f"{unknown_ticker_count} PDF(s) skipped — unknown ticker. "
+            "Rename to {TICKER}.pdf or {TICKER}/... under VIC/Research/Company "
+            "(see _system/reference/document-store/drive_intake_readme.md)."
+        )
+        print(f"  unknown_tickers: {hint}")
+        if os.environ.get("GITHUB_ACTIONS"):
+            print(f"::warning title=Drive intake unknown tickers::{hint}")
     if report["errors"]:
         print("  errors: inspect intake paths; expected Admin/{VIC,Research,Company}/{TICKER}.pdf or ticker subfolders")
+    if args.strict and unknown_ticker_count:
+        return 2
     return 0 if not report["errors"] else 2
 
 
