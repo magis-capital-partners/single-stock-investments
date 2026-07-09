@@ -45,10 +45,16 @@ INSIDER_DIR = ROOT / "_system" / "reference" / "market-data" / "insider"
 INSIDER_MANIFEST = INSIDER_DIR / "manifest.json"
 EARNINGS_CACHE = ROOT / "_system" / "data" / "earnings_calendar.json"
 TERMINALVALUE_SOURCES = ROOT / "_system" / "reference" / "data-sources" / "terminalvalue_candidates.json"
+SOURCE_UNIVERSE_PATH = ROOT / "_system" / "reference" / "data-sources" / "source_universe.json"
 SUMZERO_INDEX = ROOT / "_system" / "reference" / "data-sources" / "sumzero_ideas_index.json"
 KPI_TRENDS_PATH = ROOT / "dashboard" / "data" / "kpi_trends.json"
 DOCUMENT_REGISTRY_PATH = ROOT / "dashboard" / "data" / "document_registry.json"
 DRIVE_AUDIT_PATH = ROOT / "_system" / "reference" / "document-store" / "drive_audit_latest.json"
+REDDIT_MENTIONS_PATH = ROOT / "_system" / "reference" / "market-data" / "social" / "reddit_mentions_latest.json"
+TRACKED_FUNDS_RECORDS_PATH = (
+    ROOT / "_system" / "reference" / "market-data" / "ownership" / "tracked_funds" / "records" / "latest.json"
+)
+REDDIT_SOURCES_PATH = ROOT / "_system" / "reference" / "market-data" / "social" / "reddit_sources.json"
 GITHUB_REPO = "GoldmanDrew/single-stock-investments"
 SECURITY_MASTER_PATH = ROOT / "_system" / "reference" / "securities" / "security_master.json"
 
@@ -61,8 +67,10 @@ SOURCE_META = {
     "earnings": {"label": "Earnings", "materiality": 0.94, "quality": 0.96, "axis": "fundamentals"},
     "insider": {"label": "Insider", "materiality": 0.86, "quality": 0.9, "axis": "ownership"},
     "specialist_13f": {"label": "Specialist 13F", "materiality": 0.88, "quality": 0.92, "axis": "ownership"},
+    "tracked_fund_13f": {"label": "Tracked Fund 13F", "materiality": 0.84, "quality": 0.9, "axis": "ownership"},
     "superinvestor_letter": {"label": "Letter", "materiality": 0.8, "quality": 0.82, "axis": "ownership"},
     "sumzero_research": {"label": "SumZero", "materiality": 0.64, "quality": 0.68, "axis": "variant_view"},
+    "reddit_mention": {"label": "Reddit", "materiality": 0.42, "quality": 0.4, "axis": "context"},
     "news": {"label": "News", "materiality": 0.72, "quality": 0.7, "axis": "catalyst"},
     "third_party": {"label": "Research", "materiality": 0.58, "quality": 0.58, "axis": "variant_view"},
     "macro": {"label": "Macro", "materiality": 0.62, "quality": 0.54, "axis": "macro"},
@@ -162,7 +170,13 @@ NEWS_AXIS = {
     "insider_block": "ownership",
     "mna": "catalyst",
     "legal": "risk",
+    "index_inclusion": "catalyst",
+    "index_addition": "catalyst",
+    "index_deletion": "catalyst",
+    "index_change": "catalyst",
 }
+
+INDEX_NEWS_CATEGORIES = {"index_inclusion", "index_addition", "index_deletion", "index_change"}
 
 METRIC_LABELS = {
     "revenues": "Revenue",
@@ -788,33 +802,89 @@ def from_theme_panel() -> list[dict]:
     return out
 
 
+def _index_action_from_text(text: str) -> str | None:
+    low = (text or "").lower()
+    if re.search(r"\b(removed|deleted|dropped|deletion|exclusion)\b", low):
+        return "delete"
+    if re.search(r"\b(added|joins|joining|inclusion|addition|will replace|replaces)\b", low):
+        return "add"
+    return None
+
+
 def from_news(doc: dict) -> list[dict]:
     out: list[dict] = []
     for item in doc.get("items") or doc.get("news") or []:
         tickers = item.get("tickers") or ([item.get("ticker")] if item.get("ticker") else [])
         if not tickers:
             tickers = [None]
+        category = item.get("category") or "news"
+        title = item.get("title") or "News item"
+        summary = item.get("summary") or title
+        event_type = category
+        extra: dict = {}
+        if category in INDEX_NEWS_CATEGORIES or (
+            category == "market_structure"
+            and re.search(r"\b(S&P|Russell|MSCI|Nasdaq|index\s+(inclusion|deletion))\b", f"{title} {summary}", re.I)
+        ):
+            event_type = "index_change"
+            action = _index_action_from_text(f"{title} {summary}")
+            if action:
+                extra["index_action"] = action
+            extra["index_event"] = True
         for ticker in tickers:
+            rec = insight_record(
+                source="news",
+                as_of=item.get("published_utc") or item.get("date"),
+                scope="ticker" if ticker else item.get("scope", "portfolio"),
+                ref=str(ticker).upper() if ticker else item.get("title"),
+                title=title,
+                claim=summary,
+                direction="neutral",
+                evidence_ref=item.get("url"),
+                evidence_url=item.get("url"),
+                evidence_label="article",
+                event_type=event_type,
+                impact_axis=NEWS_AXIS.get(category, "catalyst") if event_type != "index_change" else "catalyst",
+                publisher=item.get("publisher") or item.get("source"),
+                confidence="med" if float(item.get("confidence") or 0) >= 0.8 else "low",
+                match_tier=item.get("match_tier"),
+            )
+            if extra:
+                rec.update(extra)
+            out.append(rec)
+    return out[:120]
+
+
+def from_index_membership(doc: dict) -> list[dict]:
+    """Surface confirmed index events from index_membership.json into the events feed."""
+    out: list[dict] = []
+    for ticker, row in (doc.get("by_ticker") or {}).items():
+        for ev in row.get("confirmed_events") or []:
+            action = ev.get("action") or "change"
+            index_id = ev.get("index") or "index"
+            title = ev.get("title") or f"{ticker} {action} {index_id}"
             out.append(
                 insight_record(
-                    source="news",
-                    as_of=item.get("published_utc") or item.get("date"),
-                    scope="ticker" if ticker else item.get("scope", "portfolio"),
-                    ref=str(ticker).upper() if ticker else item.get("title"),
-                    title=item.get("title") or "News item",
-                    claim=item.get("summary") or item.get("title") or "News item",
-                    direction="neutral",
-                    evidence_ref=item.get("url"),
-                    evidence_url=item.get("url"),
-                    evidence_label="article",
-                    event_type=item.get("category") or "news",
-                    impact_axis=NEWS_AXIS.get(item.get("category"), "catalyst"),
-                    publisher=item.get("publisher") or item.get("source"),
-                    confidence="med" if float(item.get("confidence") or 0) >= 0.8 else "low",
-                    match_tier=item.get("match_tier"),
+                    source="index_membership",
+                    as_of=ev.get("announced") or ev.get("effective") or doc.get("as_of"),
+                    scope="ticker",
+                    ref=str(ticker).upper(),
+                    title=title,
+                    claim=f"{action} {index_id}; effective {ev.get('effective') or 'TBD'} ({ev.get('confidence')})",
+                    direction="bullish" if action == "add" else ("bearish" if action == "delete" else "neutral"),
+                    evidence_ref=ev.get("source_url"),
+                    evidence_url=ev.get("source_url"),
+                    evidence_label="index_notice",
+                    event_type="index_change",
+                    impact_axis="catalyst",
+                    confidence="high" if ev.get("confidence") == "provider_confirmed" else "med",
+                    index_action=action,
+                    index_id=index_id,
+                    index_effective=ev.get("effective"),
+                    index_event=True,
                 )
             )
-    return out[:120]
+    return out[:80]
 
 
 def pct_change(current: float | None, prior: float | None) -> float | None:
@@ -1141,6 +1211,86 @@ def from_specialist_13f(our_tickers: set[str]) -> list[dict]:
                 event_type=f"13f_{change}",
                 impact_axis="ownership",
                 confidence="med" if row.get("fund_id") in {"baker-bros", "ra-capital", "orbimed", "perceptive-advisors"} else "low",
+            )
+        )
+    return out
+
+
+def from_tracked_funds_13f(our_tickers: set[str]) -> list[dict]:
+    doc = load_json(TRACKED_FUNDS_RECORDS_PATH)
+    if not isinstance(doc, dict):
+        return []
+    out: list[dict] = []
+    for row in doc.get("records") or []:
+        ticker = str(row.get("ticker") or "").upper()
+        if ticker not in our_tickers:
+            continue
+        change = row.get("change_type") or "unchanged"
+        if change == "unchanged":
+            continue
+        direction = "bullish" if change in {"new", "add"} else "bearish" if change in {"trim", "exit"} else "neutral"
+        fund = row.get("fund") or row.get("fund_id")
+        claim = f"{fund} {change} {ticker} in {row.get('quarter') or 'latest quarter'}"
+        if row.get("change_shares_pct") is not None:
+            claim += f" ({row['change_shares_pct']:+.1f}% shares)."
+        out.append(
+            insight_record(
+                source="tracked_fund_13f",
+                as_of=row.get("filing_date") or doc.get("generated_at"),
+                scope="ticker",
+                ref=ticker,
+                title=f"Tracked fund 13F {change}: {fund}",
+                claim=claim,
+                direction=direction,
+                evidence_ref=row.get("source_url") or relative_path(TRACKED_FUNDS_RECORDS_PATH),
+                event_type=f"tracked_13f_{change}",
+                impact_axis="ownership",
+                confidence="med"
+                if row.get("fund_id")
+                in {"ruane-cunniff", "dodge-cox", "harris-associates", "first-eagle", "tweedy-browne"}
+                else "low",
+            )
+        )
+    return out
+
+
+def from_reddit_mentions(our_tickers: set[str]) -> list[dict]:
+    doc = load_json(REDDIT_MENTIONS_PATH)
+    if not isinstance(doc, dict):
+        return []
+    sources = load_json(REDDIT_SOURCES_PATH) or {}
+    settings = (sources.get("settings") if isinstance(sources, dict) else None) or {}
+    min_score = int(settings.get("min_score_for_insight") or 25)
+    min_mentions = int(settings.get("min_mentions_for_insight") or 3)
+    out: list[dict] = []
+    as_of = doc.get("as_of") or doc.get("generated_at")
+    for row in doc.get("by_ticker") or []:
+        ticker = str(row.get("ticker") or "").upper()
+        if ticker not in our_tickers:
+            continue
+        mentions = int(row.get("mention_count") or 0)
+        max_score = int(row.get("max_score") or 0)
+        if mentions < min_mentions and max_score < min_score:
+            continue
+        top = (row.get("posts") or [{}])[0] if row.get("posts") else {}
+        subs = ", ".join(row.get("subreddits") or []) or "reddit"
+        claim = f"{ticker} mentioned {mentions}x on {subs} (max score {max_score})."
+        if top.get("title"):
+            claim += f" Top: {top.get('title')}"
+        out.append(
+            insight_record(
+                source="reddit_mention",
+                as_of=as_of,
+                scope="ticker",
+                ref=ticker,
+                title=f"Reddit mentions: {ticker}",
+                claim=claim,
+                direction="neutral",
+                evidence_ref=top.get("url") or relative_path(REDDIT_MENTIONS_PATH),
+                event_type="reddit_mention",
+                impact_axis="context",
+                confidence="low",
+                publisher="Reddit",
             )
         )
     return out
@@ -2134,6 +2284,9 @@ def build_source_health(
     insider_manifest = load_json(INSIDER_MANIFEST)
     earnings_doc = load_json(EARNINGS_CACHE)
     terminalvalue_doc = load_json(TERMINALVALUE_SOURCES)
+    source_universe_doc = load_json(SOURCE_UNIVERSE_PATH)
+    reddit_doc = load_json(REDDIT_MENTIONS_PATH)
+    tracked_funds_doc = load_json(TRACKED_FUNDS_RECORDS_PATH)
     sumzero_doc = load_json(SUMZERO_INDEX)
     registry_doc = load_json(DOCUMENT_REGISTRY_PATH)
     drive_audit_doc = load_json(DRIVE_AUDIT_PATH)
@@ -2273,6 +2426,44 @@ def build_source_health(
             "path": relative_path(TERMINALVALUE_SOURCES),
             "notes": "Provider candidates for fundamentals, filings, transcripts, ownership, news, macro and valuation feeds.",
         },
+        "reddit_mentions": {
+            "status": (
+                (reddit_doc or {}).get("status")
+                if isinstance(reddit_doc, dict) and reddit_doc.get("status")
+                else ("ok" if reddit_doc else "missing")
+            ),
+            "records": counts.get("reddit_mention", 0),
+            "items": (reddit_doc or {}).get("mention_total", 0) if isinstance(reddit_doc, dict) else 0,
+            "as_of": normalize_date((reddit_doc or {}).get("as_of") or (reddit_doc or {}).get("generated_at"))
+            if isinstance(reddit_doc, dict)
+            else None,
+            "path": relative_path(REDDIT_MENTIONS_PATH),
+            "notes": "Context-tier Reddit ticker mention scan (make reddit-ingest). Not for base IRR.",
+        },
+        "tracked_funds_13f": {
+            "status": (
+                (tracked_funds_doc or {}).get("status")
+                if isinstance(tracked_funds_doc, dict) and tracked_funds_doc.get("status")
+                else ("ok" if tracked_funds_doc and (tracked_funds_doc or {}).get("records") else "missing")
+            ),
+            "records": counts.get("tracked_fund_13f", 0),
+            "items": (tracked_funds_doc or {}).get("record_count", 0) if isinstance(tracked_funds_doc, dict) else 0,
+            "as_of": normalize_date((tracked_funds_doc or {}).get("generated_at"))
+            if isinstance(tracked_funds_doc, dict)
+            else None,
+            "path": relative_path(TRACKED_FUNDS_RECORDS_PATH),
+            "notes": "Curated great-fund / value-shop 13F portfolio overlay (make tracked-funds-13f-ingest).",
+        },
+        "source_universe": {
+            "status": "ok" if source_universe_doc else "missing",
+            "records": 0,
+            "items": len((source_universe_doc or {}).get("sources") or []) if isinstance(source_universe_doc, dict) else 0,
+            "as_of": ((source_universe_doc or {}).get("meta") or {}).get("updated_at")
+            if isinstance(source_universe_doc, dict)
+            else None,
+            "path": relative_path(SOURCE_UNIVERSE_PATH),
+            "notes": "Canonical registry of live + evaluation data sources we pull from.",
+        },
         "research_archive": {
             "status": "ok" if archive_meta else "missing",
             "records": (archive_meta or {}).get("record_count", 0),
@@ -2387,6 +2578,8 @@ def main() -> int:
     records.extend(from_sumzero_ideas(sumzero_doc if isinstance(sumzero_doc, dict) else None, front_tickers))
     records.extend(from_insider_transactions(front_tickers))
     records.extend(from_specialist_13f(front_tickers))
+    records.extend(from_tracked_funds_13f(front_tickers))
+    records.extend(from_reddit_mentions(front_tickers))
     records.extend(from_earnings_calendar())
 
     for p in ROOT.iterdir():
@@ -2407,6 +2600,13 @@ def main() -> int:
     news_doc = load_json(NEWS_PATH)
     if isinstance(news_doc, dict):
         records.extend(from_news(news_doc))
+    index_membership_path = ROOT / "dashboard" / "data" / "index_membership.json"
+    if index_membership_path.exists():
+        try:
+            index_doc = json.loads(index_membership_path.read_text(encoding="utf-8"))
+            records.extend(from_index_membership(index_doc))
+        except (json.JSONDecodeError, OSError):
+            pass
     terminalvalue_doc = load_json(TERMINALVALUE_SOURCES)
 
     raw_events = events_from_records(records, front_tickers, company_hints)

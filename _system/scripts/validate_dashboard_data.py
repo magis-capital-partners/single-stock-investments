@@ -15,6 +15,8 @@ DATA_PATH = ROOT / "dashboard" / "data" / "dashboard_data.json"
 REGISTRY_PATH = ROOT / "_system" / "portfolio" / "registry.json"
 INSIGHTS_PATH = ROOT / "dashboard" / "data" / "insights.json"
 ACTIVIST_FEED_PATH = ROOT / "dashboard" / "data" / "activist_feed.json"
+INDEX_MEMBERSHIP_PATH = ROOT / "dashboard" / "data" / "index_membership.json"
+INDEX_STATUS_ENUM = {"member", "inclusion_candidate", "deletion_risk", "ineligible", "n_a"}
 CONFLICT_MARKERS = ("<<<<<<<", "=======", ">>>>>>>")
 MIN_LETTER_CORPUS = 15000
 MIN_LETTER_LINKS_RATIO = 0.99
@@ -306,9 +308,9 @@ def main() -> int:
         theme_by_q = insights.get("theme_rankings_by_quarter") or {}
         sample_q = time_periods.get("latest_indexed_quarter")
         if sample_q and isinstance(theme_by_q.get(sample_q), list):
-            rows = theme_by_q[sample_q]
-            if len(rows) >= 3:
-                top_sets = [tuple(r.get("top_tickers") or []) for r in rows[:3]]
+            theme_rows = theme_by_q[sample_q]
+            if len(theme_rows) >= 3:
+                top_sets = [tuple(r.get("top_tickers") or []) for r in theme_rows[:3]]
                 if len({s for s in top_sets if s}) == 1 and len(top_sets[0]) >= 3:
                     warnings.append(
                         f"theme top_tickers identical across first 3 themes in {sample_q}; "
@@ -460,6 +462,34 @@ def main() -> int:
                 rel = str(md.relative_to(ROOT)).replace("\\", "/")
                 if rel not in indexed_md:
                     warnings.append(f"short_reports MD not in activist index: {rel} — run activist scan")
+
+    if INDEX_MEMBERSHIP_PATH.exists():
+        index_doc = json.loads(INDEX_MEMBERSHIP_PATH.read_text(encoding="utf-8"))
+        if not index_doc.get("rules_as_of"):
+            errors.append("index_membership.json missing rules_as_of")
+        by_ticker = index_doc.get("by_ticker") or {}
+        missing_idx = sorted(set(holdings) - set(by_ticker.keys()))
+        extra_idx = sorted(set(by_ticker.keys()) - set(holdings))
+        if missing_idx:
+            errors.append(f"index_membership missing registry tickers: {', '.join(missing_idx[:20])}")
+        if extra_idx:
+            errors.append(f"index_membership tickers not in registry: {', '.join(extra_idx[:20])}")
+        for ticker, entry in by_ticker.items():
+            for sc in entry.get("scorecards") or []:
+                status = sc.get("status")
+                if status not in INDEX_STATUS_ENUM:
+                    errors.append(f"index_membership {ticker}: bad status {status!r}")
+            for ev in entry.get("confirmed_events") or []:
+                if not ev.get("effective") and ev.get("confidence") == "provider_confirmed":
+                    errors.append(f"index_membership {ticker}: provider_confirmed event missing effective")
+                if not (ev.get("source_url") or ev.get("source_type") or ev.get("title")):
+                    errors.append(f"index_membership {ticker}: confirmed event missing source")
+        for row in rows:
+            im = row.get("index_membership")
+            if im and im.get("badge_status") and im.get("badge_status") not in INDEX_STATUS_ENUM:
+                errors.append(f"{row.get('ticker')}: bad index badge_status {im.get('badge_status')!r}")
+    else:
+        warnings.append("missing dashboard/data/index_membership.json")
 
     for msg in warnings:
         print(f"WARN: {msg}")

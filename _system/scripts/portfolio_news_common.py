@@ -206,9 +206,17 @@ POSITIVE_PATTERNS: dict[str, list[re.Pattern]] = {
         re.compile(r"\bpricing\s+(change|update)\b", re.I),
     ],
     "index_inclusion": [
-        re.compile(r"\badded\s+to\s+(the\s+)?(S&P\s+500|Russell|MSCI|Nasdaq\s+100)\b", re.I),
+        re.compile(r"\badded\s+to\s+(the\s+)?(S&P\s+500|S&P\s+MidCap|S&P\s+SmallCap|Russell|MSCI|Nasdaq\s+100|FTSE|TOPIX|STOXX|TSX)\b", re.I),
         re.compile(r"\bindex\s+inclusion\b", re.I),
-        re.compile(r"\bjoins\s+(the\s+)?(S&P|Russell|MSCI)\b", re.I),
+        re.compile(r"\bjoins\s+(the\s+)?(S&P|Russell|MSCI|Nasdaq|FTSE|TOPIX|STOXX)\b", re.I),
+        re.compile(
+            r"\b(removed|deleted|dropped)\s+from\s+(the\s+)?(S&P|Russell|MSCI|Nasdaq|FTSE|TOPIX|STOXX|TSX)\b",
+            re.I,
+        ),
+        re.compile(r"\bto\s+be\s+(added|removed)\b", re.I),
+        re.compile(r"\bindex\s+(addition|deletion|removal|review|reconstitution)\b", re.I),
+        re.compile(r"\b(set\s+to\s+join|will\s+replace|replaces?)\b.*\b(S&P|Russell|MSCI|Nasdaq)\b", re.I),
+        re.compile(r"\b(under\s+review)\s+for\s+(index|S&P|Russell|MSCI)\b", re.I),
     ],
     "ai_material": [
         re.compile(r"\b(AI|artificial intelligence)\b"),

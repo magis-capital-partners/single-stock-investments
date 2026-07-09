@@ -560,6 +560,7 @@
             <th data-sort="decision_summary.lens_blend_pct">Lens blend</th>
             <th data-sort="decision_summary.lens_delta">Lens Δ</th>
             <th data-sort="classification.stance">Stance</th>
+            <th data-sort="index_membership.priority_score">Index</th>
             <th data-sort="essential_insights.status.label">Insight</th>
             <th data-sort="essential_insights.freshness_days">Fresh</th>
             <th data-sort="essential_insights.source_mix">Source</th>
@@ -650,6 +651,7 @@
 <script src="equity-model-viz.js"></script>
 <script src="search-match.js"></script>
 <script src="insights-viz.js"></script>
+<script src="index-viz.js"></script>
 <script src="activist-viz.js"></script>
 <script src="oauth.js"></script>
 <script>
@@ -1086,6 +1088,12 @@ async function load() {
   } catch {
     data.research_memory = null;
   }
+  try {
+    const indexRes = await fetch('data/index_membership.json?' + Date.now());
+    if (indexRes.ok) data.index_membership = await indexRes.json();
+  } catch {
+    data.index_membership = null;
+  }
   document.getElementById('meta-updated').textContent =
     `Updated ${data.generated_at.replace('T', ' ').replace('Z', ' UTC')} · ${data.summary.ticker_count} tickers`;
   renderMarketFilters();
@@ -1231,6 +1239,7 @@ function renderInsights(opts = {}) {
     tickerSortMode: insightsTickerSortMode,
     tickerSelectedTicker: tickerInsightsSelectedTicker,
     kpiTrends: data.kpi_trends || null,
+    indexMembership: data.index_membership || null,
     inflectionTier: insightsInflectionTier,
     eventTier: insightsEventTier,
     themesViewMode: insightsThemesViewMode,
@@ -2009,6 +2018,11 @@ function filtered() {
     } else if (sortKey === 'deep_dive.date') {
       av = a.deep_dive?.date || '';
       bv = b.deep_dive?.date || '';
+    } else if (sortKey === 'index_membership.priority_score') {
+      av = a.index_membership?.priority_score;
+      bv = b.index_membership?.priority_score;
+      av = av == null ? -Infinity : av;
+      bv = bv == null ? -Infinity : bv;
     } else if (sortKey === 'essential_insights.status.label') {
       av = a.essential_insights?.status?.label || '';
       bv = b.essential_insights?.status?.label || '';
@@ -2060,6 +2074,7 @@ function renderTable() {
       <td>${renderLensBlendCell(t)}</td>
       <td>${renderLensDeltaCell(t)}</td>
       <td><span class="badge ${STANCE_BADGE[t.classification?.stance] || 'badge-warn'}">${t.classification?.stance || '—'}</span></td>
+      <td>${window.IndexViz ? IndexViz.renderHoldingsCell(t.index_membership) : '—'}</td>
       <td>${renderInsightCell(t)}</td>
       <td>${renderInsightFreshCell(t)}</td>
       <td>${renderInsightSourceCell(t)}</td>

@@ -1,0 +1,36 @@
+{
+  "meta": {
+    "version": 1,
+    "purpose": "Canonical registry of data sources we pull from (active pipeline + evaluation). Dashboard Pipeline status health-checks live targets; TerminalValue candidates mirror provider wishlist.",
+    "updated_at": "2026-07-09"
+  },
+  "sources": [
+    {
+      "id": "reddit_mentions",
+      "provider": "Reddit",
+      "role": "Retail / forum ticker mention volume for portfolio names",
+      "status": "live",
+      "priority": "medium",
+      "credential_required": true,
+      "credential_env": ["REDDIT_CLIENT_ID", "REDDIT_CLIENT_SECRET"],
+      "target_pipeline": "_system/reference/market-data/social/",
+      "category": "social",
+      "make_target": "reddit-ingest",
+      "marvin_tier": "context",
+      "notes": "Context tier only — never base IRR."
+    },
+    {
+      "id": "tracked_funds_13f",
+      "provider": "SEC 13F (tracked funds)",
+      "role": "Great mutual-fund / value-shop ownership overlay",
+      "status": "live",
+      "priority": "high",
+      "credential_required": false,
+      "target_pipeline": "_system/reference/market-data/ownership/tracked_funds/",
+      "category": "ownership",
+      "make_target": "tracked-funds-13f-ingest",
+      "marvin_tier": "context",
+      "notes": "Portfolio-ticker overlay only; not base IRR unless a specific fund letter is human-approved."
+    }
+  ]
+}

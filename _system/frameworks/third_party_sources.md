@@ -64,6 +64,8 @@
 |----|-----------|-----|------------|----------|
 | `finra_equity_si` | FINRA Equity Short Interest (biweekly) | Biotech quant short factor | `https://cdn.finra.org/equity/otcmarket/biweekly/shrtYYYYMMDD.csv` → `_system/reference/market-data/ownership/short_interest/` | **2026-07-09** (market data only; diversified short book; **not** base IRR) |
 | `clinicaltrials_gov` | ClinicalTrials.gov API v2 | Peer / cohort similarity | `https://clinicaltrials.gov/api/v2/studies` → `ownership/biotech_clinical_profiles.json` | **2026-07-09** (context tier peer momentum; **not** base IRR) |
+| `reddit_mentions` | Reddit (OAuth API) | Portfolio ticker mention volume / retail attention | `_system/reference/market-data/social/reddit_mentions_latest.json` (`make reddit-ingest`) | **2026-07-09** (context tier social scan; **not** base IRR) |
+| `tracked_funds_13f` | SEC 13F (curated great funds) | Value-shop / mutual-fund ownership overlay | `_system/reference/market-data/ownership/tracked_funds/` (`make tracked-funds-13f-ingest`) | **2026-07-09** (ownership context; **not** base IRR unless a specific fund letter is human-approved) |
 
 ---
 

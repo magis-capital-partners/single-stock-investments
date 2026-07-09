@@ -1661,7 +1661,36 @@ def build_ticker_row(
     row["activist"] = activist_summary_for_ticker(ticker)
     row["kpi_trends"] = kpi_trends_for_ticker(ticker)
     row["power_zones"] = power_zones_for_ticker(ticker)
+    row["index_membership"] = index_membership_for_ticker(ticker)
     return row
+
+
+_INDEX_MEMBERSHIP_CACHE: dict | None = None
+
+
+def load_index_membership() -> dict | None:
+    global _INDEX_MEMBERSHIP_CACHE
+    if _INDEX_MEMBERSHIP_CACHE is None:
+        _INDEX_MEMBERSHIP_CACHE = _load_json(DATA_DIR / "index_membership.json") or {}
+    return _INDEX_MEMBERSHIP_CACHE or None
+
+
+def index_membership_for_ticker(ticker: str) -> dict | None:
+    doc = load_index_membership()
+    entry = ((doc or {}).get("by_ticker") or {}).get(ticker)
+    if not entry:
+        return None
+    return {
+        "badge_status": entry.get("badge_status"),
+        "current_memberships": entry.get("current_memberships") or [],
+        "priority_score": (entry.get("impact_proxy") or {}).get("priority_score"),
+        "demand_shock_pct_of_adv": (entry.get("impact_proxy") or {}).get("demand_shock_pct_of_adv"),
+        "inclusion_probability_band": (entry.get("prediction") or {}).get("inclusion_probability_band"),
+        "next_calendar_event": (entry.get("prediction") or {}).get("next_calendar_event"),
+        "confirmed_events": (entry.get("confirmed_events") or [])[:5],
+        "scorecards": (entry.get("scorecards") or [])[:12],
+        "inputs_missing": entry.get("inputs_missing") or [],
+    }
 
 
 _KPI_TRENDS_CACHE: dict | None = None
@@ -2021,6 +2050,19 @@ def main() -> None:
         payload["summary"]["nol_screener_count"] = nol.get("row_count") or len(
             nol.get("rows") or []
         )
+    index_membership = load_index_membership()
+    if index_membership:
+        payload["index_membership_ref"] = {
+            "path": "dashboard/data/index_membership.json",
+            "generated": index_membership.get("generated"),
+            "rules_as_of": index_membership.get("rules_as_of"),
+        }
+        payload["index_membership_summary"] = index_membership.get("portfolio_summary") or {}
+        payload["index_membership_calendar"] = index_membership.get("calendar") or []
+        payload["index_membership_caption"] = index_membership.get("caption")
+        summary = index_membership.get("portfolio_summary") or {}
+        payload["summary"]["index_inclusion_candidates"] = len(summary.get("inclusion_candidates") or [])
+        payload["summary"]["index_deletion_risks"] = len(summary.get("deletion_risks") or [])
     activist_feed = load_activist_feed()
     if not activist_feed:
         try:

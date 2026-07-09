@@ -91,6 +91,22 @@ SELECTED_TOOL_DEFAULTS = {
         "credential_required": True,
         "target_pipeline": "*/research/valuation.json",
     },
+    "Reddit": {
+        "dashboard_role": "Retail / forum ticker mention volume for portfolio names",
+        "priority": "medium",
+        "credential_required": True,
+        "target_pipeline": "_system/reference/market-data/social/",
+        "integration_status": "live",
+        "category": "social",
+    },
+    "Tracked Funds 13F": {
+        "dashboard_role": "Great mutual-fund / value-shop ownership overlay via SEC 13F",
+        "priority": "high",
+        "credential_required": False,
+        "target_pipeline": "_system/reference/market-data/ownership/tracked_funds/",
+        "integration_status": "live",
+        "category": "ownership",
+    },
 }
 
 
@@ -122,12 +138,19 @@ def merge_selected(existing: dict, fetched: list[dict]) -> dict:
     fetched_by_name = {tool_name(tool): tool for tool in fetched if tool_name(tool)}
     selected = []
     for name in sorted(SELECTED_TOOL_DEFAULTS):
+        defaults = dict(SELECTED_TOOL_DEFAULTS[name])
+        existing = dict(existing_by_name.get(name) or {})
+        # Defaults win for integration_status when explicitly set (e.g. live after wiring).
+        default_status = defaults.pop("integration_status", None)
+        existing_status = existing.pop("integration_status", None)
         base = {
             "name": name,
-            "integration_status": "candidate",
-            **SELECTED_TOOL_DEFAULTS[name],
-            **dict(existing_by_name.get(name) or {}),
+            "integration_status": default_status or existing_status or "candidate",
+            **defaults,
+            **existing,
         }
+        if default_status:
+            base["integration_status"] = default_status
         fetched_tool = fetched_by_name.get(name)
         if fetched_tool:
             base["terminalvalue"] = fetched_tool

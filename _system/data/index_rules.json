@@ -1,0 +1,207 @@
+{
+  "as_of": "2026-07-09",
+  "notes": "Eligibility thresholds for deterministic scorecards. Refresh when providers update bands. Missing inputs yield n_a, never invented values.",
+  "scoring": {
+    "weights": {
+      "boundary_closeness": 0.35,
+      "calendar_proximity": 0.25,
+      "demand_shock": 0.30,
+      "illiquidity": 0.10
+    },
+    "inclusion_probability": {
+      "high": {"max_abs_distance_pct": 5, "max_days_to_event": 45, "min_gates_pass_pct": 0.8},
+      "medium": {"max_abs_distance_pct": 15, "max_days_to_event": 120, "min_gates_pass_pct": 0.5},
+      "low": {"max_abs_distance_pct": 40, "max_days_to_event": 365, "min_gates_pass_pct": 0.0}
+    },
+    "demand_shock_adv_cap": 50.0,
+    "assumed_index_weight_bps_add": 5.0
+  },
+  "ineligible_security_types": [
+    "cvr",
+    "preferred",
+    "debenture",
+    "rights",
+    "otc_pink",
+    "private"
+  ],
+  "indices": {
+    "sp500": {
+      "family": "sp_dji",
+      "label": "S&P 500",
+      "markets": ["US"],
+      "exchanges": ["NYSE", "NYSE Arca", "NYSE American", "NASDAQ", "CBOE", "CME"],
+      "min_company_mcap_usd": 22700000000,
+      "min_float_pct": 0.50,
+      "min_iwf": 0.10,
+      "earnings_rule": "positive_gaap_recent_and_ttm",
+      "liquidity_ratio_min": 1.0,
+      "domicile": "US",
+      "source": "_system/reference/index-effects/methodology/sp_dji_us_indices_methodology.pdf"
+    },
+    "sp400": {
+      "family": "sp_dji",
+      "label": "S&P MidCap 400",
+      "markets": ["US"],
+      "exchanges": ["NYSE", "NYSE Arca", "NYSE American", "NASDAQ", "CBOE", "CME"],
+      "band_usd": [8000000000, 22700000000],
+      "min_float_pct": 0.50,
+      "earnings_rule": "positive_gaap_recent_and_ttm",
+      "liquidity_ratio_min": 1.0,
+      "domicile": "US",
+      "source": "_system/reference/index-effects/methodology/sp_dji_us_indices_methodology.pdf"
+    },
+    "sp600": {
+      "family": "sp_dji",
+      "label": "S&P SmallCap 600",
+      "markets": ["US"],
+      "exchanges": ["NYSE", "NYSE Arca", "NYSE American", "NASDAQ", "CBOE", "CME"],
+      "band_usd": [1200000000, 8000000000],
+      "min_float_pct": 0.50,
+      "earnings_rule": "positive_gaap_recent_and_ttm",
+      "liquidity_ratio_min": 1.0,
+      "domicile": "US",
+      "source": "_system/reference/index-effects/methodology/sp_dji_us_indices_methodology.pdf"
+    },
+    "russell_1000": {
+      "family": "russell",
+      "label": "Russell 1000",
+      "markets": ["US"],
+      "rank_metric": "total_market_cap",
+      "breakpoint_rank": 1000,
+      "band_pct": 0.025,
+      "side": "above",
+      "source": "_system/reference/index-effects/methodology/ftse_russell_us_indexes_construction_and_methodology.pdf"
+    },
+    "russell_2000": {
+      "family": "russell",
+      "label": "Russell 2000",
+      "markets": ["US"],
+      "rank_metric": "total_market_cap",
+      "breakpoint_rank_low": 1001,
+      "breakpoint_rank_high": 3000,
+      "band_pct_1000": 0.025,
+      "band_pct_2000": 0.005,
+      "source": "_system/reference/index-effects/methodology/ftse_russell_us_indexes_construction_and_methodology.pdf"
+    },
+    "nasdaq_100": {
+      "family": "nasdaq",
+      "label": "Nasdaq-100",
+      "markets": ["US"],
+      "exchanges": ["NASDAQ"],
+      "exclude_sectors": ["financials"],
+      "top_n": 100,
+      "min_mcap_usd": 5000000000,
+      "source": "nasdaq_100_methodology_public_summary"
+    },
+    "msci_usa": {
+      "family": "msci",
+      "label": "MSCI USA",
+      "markets": ["US"],
+      "size_segment": "large_mid",
+      "min_mcap_usd": 5000000000,
+      "notes": "FIF and full GIMI cutoffs not licensed; membership-seed + size heuristic only",
+      "source": "msci_gimi_public_summary"
+    },
+    "msci_acwi": {
+      "family": "msci",
+      "label": "MSCI ACWI",
+      "markets": ["US", "CA", "UK", "JP", "EU", "AU", "SE", "IN"],
+      "size_segment": "large_mid",
+      "min_mcap_usd": 3000000000,
+      "notes": "FIF not available; n_a when float unknown",
+      "source": "msci_gimi_public_summary"
+    },
+    "tsx_composite": {
+      "family": "tsx",
+      "label": "S&P/TSX Composite",
+      "markets": ["CA"],
+      "exchanges": ["TSX"],
+      "min_mcap_cad": 100000000,
+      "source": "sp_tsx_composite_public_summary"
+    },
+    "topix": {
+      "family": "jpx",
+      "label": "TOPIX",
+      "markets": ["JP"],
+      "exchanges": ["TSE"],
+      "notes": "Prime/Standard listing membership primarily from seed",
+      "source": "jpx_topix_public_summary"
+    },
+    "ftse_100": {
+      "family": "ftse",
+      "label": "FTSE 100",
+      "markets": ["UK"],
+      "exchanges": ["LSE"],
+      "top_n": 100,
+      "min_mcap_gbp": 4000000000,
+      "source": "ftse_uk_series_public_summary"
+    },
+    "ftse_250": {
+      "family": "ftse",
+      "label": "FTSE 250",
+      "markets": ["UK"],
+      "exchanges": ["LSE"],
+      "rank_low": 101,
+      "rank_high": 350,
+      "source": "ftse_uk_series_public_summary"
+    },
+    "stoxx_europe_600": {
+      "family": "stoxx",
+      "label": "STOXX Europe 600",
+      "markets": ["EU", "UK", "SE"],
+      "min_mcap_eur": 1000000000,
+      "source": "stoxx_europe_600_public_summary"
+    },
+    "asx_200": {
+      "family": "asx",
+      "label": "S&P/ASX 200",
+      "markets": ["AU"],
+      "exchanges": ["ASX"],
+      "top_n": 200,
+      "source": "sp_asx_200_public_summary"
+    },
+    "nzx_50": {
+      "family": "nzx",
+      "label": "S&P/NZX 50",
+      "markets": ["AU"],
+      "exchanges": ["NZX"],
+      "top_n": 50,
+      "source": "sp_nzx_50_public_summary"
+    },
+    "hang_seng": {
+      "family": "hsi",
+      "label": "Hang Seng",
+      "markets": ["EU"],
+      "exchanges": ["HKEX"],
+      "source": "hang_seng_public_summary"
+    },
+    "nifty_500": {
+      "family": "nse",
+      "label": "Nifty 500",
+      "markets": ["IN"],
+      "exchanges": ["NSE"],
+      "source": "nifty_500_public_summary"
+    },
+    "straits_times": {
+      "family": "sgx",
+      "label": "Straits Times Index",
+      "markets": ["EU"],
+      "exchanges": ["SGX"],
+      "source": "sti_public_summary"
+    },
+    "ibovespa": {
+      "family": "b3",
+      "label": "Ibovespa",
+      "markets": ["EU"],
+      "exchanges": ["B3"],
+      "source": "ibovespa_public_summary"
+    },
+    "ipc": {
+      "family": "bmv",
+      "label": "S&P/BMV IPC",
+      "markets": ["EU"],
+      "exchanges": ["BMV"],
+      "source": "ipc_public_summary"
+    }
+  }
+}

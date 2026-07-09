@@ -2,7 +2,9 @@
 
 **Date:** 2026-07-01
 **Author:** Marvin
-**Status:** Proposal (pre-build). Requires [HUMAN REVIEW] before implementation.
+**Status:** Implemented (2026-07-09). Full-universe scorecards + Index Watch UI live.
+**Runbook:** `_system/prompts/index_membership_runbook.md`
+**Lens:** `_system/frameworks/index_membership_lens.md`
 **Research basis:** `_system/reference/index-effects/SYNTHESIS.md` and the papers in
 `_system/reference/index-effects/papers/` (Shleifer 1986; Wurgler & Zhuravskaya 2002;
 Kaul, Mehrotra & Morck 2000; Barberis, Shleifer & Wurgler 2005; Petajisto 2011;
