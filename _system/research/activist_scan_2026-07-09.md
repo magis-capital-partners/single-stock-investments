@@ -116,7 +116,7 @@
 | NRP | 0 | 0 | — | no hits |
 | NVDA | 0 | 0 | — | no hits |
 | NZX.NZ | 0 | 0 | — | no hits |
-| OR | 6 | 0 | 2023-01-05 | 6 indexed |
+| OR | 6 | 3 | 2026-06-17 | 9 indexed |
 | OTCM | 0 | 0 | — | no hits |
 | PBT | 2 | 0 | 2025-11-12 | 2 indexed |
 | PCH | 0 | 0 | — | no hits |
