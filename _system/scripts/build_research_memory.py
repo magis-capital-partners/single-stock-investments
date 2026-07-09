@@ -14,7 +14,11 @@ sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 GITHUB_REPO = os.environ.get("GITHUB_REPOSITORY", "magis-capital-partners/single-stock-investments")
 
 from document_store import best_document_label, best_document_url, document_id_for_ref  # noqa: E402
-from memory_claim_sources import supplemental_claim_rows  # noqa: E402
+from memory_claim_sources import (  # noqa: E402
+    from_biotech_methodology,
+    load_biotech_factor_spec,
+    supplemental_claim_rows,
+)
 from memory_common import (  # noqa: E402
     SPECIALIST_FUND_TERMS,
     claim_type,
@@ -228,6 +232,8 @@ def build() -> tuple[dict, dict]:
 
     rows = all_insight_rows(insights)
     rows.extend(ownership_claim_rows(ownership_records))
+    methodology_rows = from_biotech_methodology()
+    factor_spec = load_biotech_factor_spec()
 
     for ticker in entities["tickers"]:
         ticker_dir = ROOT / ticker
@@ -238,6 +244,34 @@ def build() -> tuple[dict, dict]:
     claim_ledger: list[dict] = []
     evidence_ledger: list[dict] = []
     rows_by_ticker: dict[str, list[dict]] = defaultdict(list)
+    methodology_claims: list[dict] = []
+
+    for row in methodology_rows:
+        text = short_text(row.get("summary") or row.get("title") or "", 320)
+        if not text:
+            continue
+        src = source_record(row)
+        existing = source_registry.get(src["source_id"])
+        if not existing:
+            src["tickers"] = []
+            source_registry[src["source_id"]] = src
+        methodology_claims.append(
+            {
+                "claim_id": stable_id("methodology", text.lower(), src["source_id"]),
+                "ticker": None,
+                "claim": text,
+                "claim_type": "methodology",
+                "direction": "neutral",
+                "confidence": "med",
+                "confidence_score": confidence_score(row),
+                "date": row.get("observed_at"),
+                "source_id": src["source_id"],
+                "source_type": src["source_type"],
+                "source_title": src["title"],
+                "evidence_url": src["url"],
+                "evidence_label": src["label"],
+            }
+        )
 
     for row in rows:
         ticker = (row.get("ticker") or row.get("ref") or "").upper()
@@ -332,7 +366,7 @@ def build() -> tuple[dict, dict]:
         ]
         ticker_ownership = ownership_by_ticker.get(ticker, [])
         signal = (signals_doc.get("by_ticker") or {}).get(ticker) or {}
-        in_quant = is_biotech_quant_universe_ticker(
+        in_quant = bool(signal.get("in_biotech_quant_universe")) or is_biotech_quant_universe_ticker(
             ticker,
             entity,
             meta,
@@ -363,10 +397,16 @@ def build() -> tuple[dict, dict]:
                 "ownership_records": ticker_ownership[:20],
                 "signals": {
                     "consensus_score": signal.get("consensus_score"),
+                    "consensus_quintile": signal.get("consensus_quintile"),
                     "core_fund_holder_count": signal.get("core_fund_holder_count"),
                     "specialist_holder_count": signal.get("specialist_holder_count"),
+                    "spend_value_quintile": signal.get("spend_value_quintile"),
+                    "insider_score": signal.get("insider_score"),
+                    "composite_score": signal.get("composite_score"),
+                    "convergence_flag": signal.get("convergence_flag"),
                     "initiation_signal": signal.get("initiation_signal"),
                     "exit_signal": signal.get("exit_signal"),
+                    "size_bucket": signal.get("size_bucket"),
                 },
             },
         }
@@ -398,14 +438,49 @@ def build() -> tuple[dict, dict]:
         "biotech_related_ticker_count": sum(1 for v in by_ticker.values() if v["biotech"]["is_biotech_related"]),
         "biotech_quant_universe_count": sum(1 for v in by_ticker.values() if v["biotech"]["in_biotech_quant_universe"]),
         "ownership_record_count": len(ownership_records),
+        "methodology_claim_count": len(methodology_claims),
     }
 
     quant_signals = {
         k: v
         for k, v in (signals_doc.get("by_ticker") or {}).items()
-        if (by_ticker.get(k) or {}).get("biotech", {}).get("in_biotech_quant_universe")
+        if v.get("in_biotech_quant_universe")
     }
-    quant_ownership = [r for r in ownership_records if r.get("ticker") in quant_signals]
+    quant_tickers = set(quant_signals) | {
+        t for t, mem in by_ticker.items() if mem["biotech"].get("in_biotech_quant_universe")
+    }
+    quant_ownership = [r for r in ownership_records if r.get("ticker") in quant_tickers]
+
+    live_factors = []
+    for factor in factor_spec.get("factors") or []:
+        keys = factor.get("signal_keys") or []
+        present = False
+        if keys and quant_signals:
+            present = any(
+                row.get(k) is not None
+                for row in quant_signals.values()
+                for k in keys
+            )
+        status = factor.get("status") or "planned"
+        fid = factor.get("id")
+        if fid == "specialist_consensus" and quant_signals:
+            present = True
+        if fid == "spend_value" and any(row.get("spend_value") is not None for row in quant_signals.values()):
+            present = True
+        if fid == "insider_non_ceo" and any(row.get("insider_score") is not None for row in quant_signals.values()):
+            present = True
+        if fid == "short_interest" and any((row.get("short_candidate_score") or 0) > 0 for row in quant_signals.values()):
+            present = True
+        live_factors.append(
+            {
+                "id": fid,
+                "label": factor.get("label") or fid,
+                "status": status,
+                "present": present,
+                "weight_long": factor.get("weight_long"),
+                "weight_short": factor.get("weight_short"),
+            }
+        )
 
     memory_doc = {
         "generated_at": now_iso(),
@@ -414,6 +489,7 @@ def build() -> tuple[dict, dict]:
         "source_registry": source_registry_list,
         "entity_map": entities,
         "claim_ledger": claim_ledger,
+        "methodology_claims": methodology_claims,
         "by_ticker": by_ticker,
         "review_queue": review_queue,
         "biotech": {
@@ -424,6 +500,10 @@ def build() -> tuple[dict, dict]:
                 "by_ticker": quant_signals,
                 "ticker_count": len(quant_signals),
             },
+            "factor_spec": factor_spec,
+            "factor_scoreboard": live_factors,
+            "library_catalog": factor_spec.get("library_catalog") or [],
+            "methodology_claims": methodology_claims,
             "notes": "13F records stored in _system/reference/market-data/ownership/records/",
         },
     }

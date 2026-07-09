@@ -439,11 +439,22 @@
     const inflectionClaims = memory.inflection_claims || [];
     const riskClaims = memory.risk_claims || [];
     const topClaims = memory.top_claims || [];
-    const biotechHtml = biotech.is_biotech_related ? `
+    const sig = biotech.signals || {};
+    const factorChips = biotech.in_biotech_quant_universe ? `
+      <div class="memory-biotech" style="margin-top:8px">
+        <span class="badge badge-purple">Biotech quant</span>
+        ${sig.consensus_score != null ? `<span class="badge badge-us">consensus ${escapeHtml(String(sig.consensus_score))}</span>` : ''}
+        ${sig.consensus_quintile != null ? `<span class="badge badge-us">Q${escapeHtml(String(sig.consensus_quintile))}</span>` : ''}
+        ${sig.spend_value_quintile != null ? `<span class="badge badge-us">spend Q${escapeHtml(String(sig.spend_value_quintile))}</span>` : ''}
+        ${sig.insider_score != null ? `<span class="badge badge-us">insider ${escapeHtml(String(sig.insider_score))}</span>` : ''}
+        ${sig.composite_score != null ? `<span class="badge badge-ok">composite ${escapeHtml(String(sig.composite_score))}</span>` : ''}
+        ${sig.convergence_flag ? '<span class="badge badge-ok">convergence</span>' : ''}
+        <button type="button" class="linkish" data-memory-view="biotech" style="margin-left:6px">Open Biotech tab</button>
+      </div>` : (biotech.is_biotech_related ? `
       <div class="memory-biotech">
-        <span class="badge badge-purple">Biotech</span>
-        <span class="tier-sub">${biotech.tracked_specialist_fund_count || 0} specialist funds tracked · ${biotech.ownership_records?.length || 0} 13F records loaded${biotech.signals?.consensus_score != null ? ` · consensus ${biotech.signals.consensus_score}` : ''}</span>
-      </div>` : '';
+        <span class="badge badge-purple">Biotech-related</span>
+        <span class="tier-sub">Not in specialist 13F quant universe</span>
+      </div>` : '');
     const ownershipClaims = memory.ownership_claims || [];
     const specialistMentions = biotech.specialist_mentions || [];
     return `
@@ -456,7 +467,7 @@
             <div class="metric"><div class="k">Evidence</div><div class="v mono">+${memory.confirming_count || 0} / -${memory.disconfirming_count || 0}</div></div>
           </div>
           <div class="tier-sub" style="margin:8px 0">${escapeHtml(sourceMix)}</div>
-          ${biotechHtml}
+          ${factorChips}
           ${ownershipClaims.length ? `<h3 style="margin-top:12px">Ownership claims</h3><ul class="source-stack">${ownershipClaims.map(c => renderMemoryClaim(c, escapeHtml, linkHtml, ghRepo)).join('')}</ul>` : ''}
           ${inflectionClaims.length ? `<h3 style="margin-top:12px">Inflection claims</h3><ul class="source-stack">${inflectionClaims.map(c => renderMemoryClaim(c, escapeHtml, linkHtml, ghRepo)).join('')}</ul>` : ''}
           ${riskClaims.length ? `<h3 style="margin-top:12px">Risks / disconfirming</h3><ul class="source-stack">${riskClaims.map(c => renderMemoryClaim(c, escapeHtml, linkHtml, ghRepo)).join('')}</ul>` : ''}
@@ -479,6 +490,7 @@
     { id: 'risk', label: 'Risk' },
     { id: 'ownership', label: 'Ownership' },
     { id: 'fundamentals', label: 'Fundamentals' },
+    { id: 'methodology', label: 'Methodology' },
     { id: 'deep_dive', label: 'Deep dive' },
   ];
 
@@ -2268,8 +2280,54 @@
     const tickers = Object.values(memory?.by_ticker || {}).filter(t => t.biotech?.in_biotech_quant_universe);
     const signalRows = Object.values(signals)
       .filter(s => s.in_biotech_quant_universe !== false)
-      .sort((a, b) => (b.consensus_score || 0) - (a.consensus_score || 0));
+      .sort((a, b) => ((b.composite_score ?? b.consensus_score) || 0) - ((a.composite_score ?? a.consensus_score) || 0));
+    const catalog = memory?.biotech?.library_catalog || [];
+    const scoreboard = memory?.biotech?.factor_scoreboard || [];
+    const methodClaims = memory?.biotech?.methodology_claims || memory?.methodology_claims || [];
+    const initiations = signalRows.filter(s => s.initiation_signal).map(s => s.ticker);
+    const libraryHtml = catalog.length ? `
+      <div class="detail-section">
+        <h3>Methodology library</h3>
+        <p class="tier-sub" style="margin-bottom:8px">Context-tier sources. Not used in base IRR until human approval.</p>
+        <table class="darwin-table">
+          <thead><tr><th>Title</th><th>Open</th></tr></thead>
+          <tbody>${catalog.map(c => `<tr>
+            <td>${escapeHtml(c.title || c.id || '')}</td>
+            <td>${c.path ? evidenceLink(c.path, linkHtml, ghRepo, c.label || 'Open') : '—'}</td>
+          </tr>`).join('')}</tbody>
+        </table>
+      </div>` : '';
+    const scoreboardHtml = scoreboard.length ? `
+      <div class="detail-section">
+        <h3>Factor scoreboard</h3>
+        <table class="darwin-table">
+          <thead><tr><th>Factor</th><th>Status</th><th>Long w</th><th>Short w</th><th>In signals</th></tr></thead>
+          <tbody>${scoreboard.map(f => `<tr>
+            <td>${escapeHtml(f.label || f.id || '')}</td>
+            <td><span class="badge ${f.status === 'live' ? 'badge-ok' : 'badge-warn'}">${escapeHtml(f.status || 'planned')}</span></td>
+            <td class="mono">${f.weight_long != null ? f.weight_long : '—'}</td>
+            <td class="mono">${f.weight_short != null ? f.weight_short : '—'}</td>
+            <td>${f.present ? '<span class="badge badge-ok">yes</span>' : '<span class="badge badge-warn">no</span>'}</td>
+          </tr>`).join('')}</tbody>
+        </table>
+      </div>` : '';
+    const methodHtml = methodClaims.length ? `
+      <div class="detail-section">
+        <h3>Methodology claims</h3>
+        <ul class="source-stack">${methodClaims.slice(0, 12).map(c => `<li class="source-card">
+          <div class="source-card-title">${escapeHtml(c.claim || '')} ${c.evidence_url ? evidenceLink(c.evidence_url, linkHtml, ghRepo, c.evidence_label) : ''}</div>
+        </li>`).join('')}</ul>
+      </div>` : '';
+    const deltaHtml = `
+      <div class="detail-section">
+        <h3>Knowledge delta</h3>
+        <p class="tier-sub">${methodClaims.length} methodology claim(s) · ${initiations.length ? `Initiations: ${escapeHtml(initiations.join(', '))}` : 'No core-fund initiations in latest signals'} · ${tickers.length} quant-universe name(s).</p>
+      </div>`;
     return `
+      ${libraryHtml}
+      ${scoreboardHtml}
+      ${methodHtml}
+      ${deltaHtml}
       <div class="detail-section">
         <h3>Biotech specialist registry</h3>
         <p class="tier-sub" style="margin-bottom:8px">${funds.length} specialist funds tracked for 13F ingestion · ${tickers.length} names in biotech quant universe · ${memory?.biotech?.ownership_records?.length || 0} quant-filtered 13F records.</p>
@@ -2286,23 +2344,29 @@
       <div class="detail-section">
         <h3>Biotech quant signals</h3>
         <table class="darwin-table">
-          <thead><tr><th>Ticker</th><th>Consensus</th><th>Core funds</th><th>All specialists</th><th>Net flow</th><th>Flags</th></tr></thead>
+          <thead><tr><th>Ticker</th><th>Composite</th><th>Consensus</th><th>Q</th><th>Core</th><th>Specialists</th><th>Spend Q</th><th>Insider</th><th>Net flow</th><th>Flags</th></tr></thead>
           <tbody>${signalRows.slice(0, 40).map(s => `<tr>
             <td><button type="button" class="linkish mono" data-select-ticker="${escapeHtml(s.ticker)}">${escapeHtml(s.ticker)}</button></td>
+            <td class="mono">${s.composite_score != null ? s.composite_score : '—'}</td>
             <td class="mono">${s.consensus_score ?? '—'}</td>
+            <td class="mono">${s.consensus_quintile ?? '—'}</td>
             <td class="mono">${s.core_fund_holder_count ?? 0}</td>
             <td class="mono">${s.specialist_holder_count ?? 0}</td>
+            <td class="mono">${s.spend_value_quintile ?? '—'}</td>
+            <td class="mono">${s.insider_score != null ? s.insider_score : '—'}</td>
             <td class="mono">${s.net_quarterly_change ?? 0}</td>
             <td>${[
+              s.convergence_flag ? '<span class="badge badge-ok">convergence</span>' : '',
               s.initiation_signal ? '<span class="badge badge-ok">initiation</span>' : '',
               s.exit_signal ? '<span class="badge badge-bad">exit</span>' : '',
               s.concentration_flag ? '<span class="badge badge-warn">concentration</span>' : '',
+              s.short_candidate_score != null && s.short_candidate_score > 0 ? '<span class="badge badge-warn">short-cand</span>' : '',
             ].filter(Boolean).join(' ') || '—'}</td>
-          </tr>`).join('') || '<tr><td colspan="6" class="tier-sub">Run make specialist-13f-ingest to populate signals.</td></tr>'}</tbody>
+          </tr>`).join('') || '<tr><td colspan="10" class="tier-sub">Run make specialist-13f-ingest to populate signals.</td></tr>'}</tbody>
         </table>
       </div>
       <div class="detail-section">
-        <h3>Biotech-related ticker queue</h3>
+        <h3>Biotech quant ticker queue</h3>
         <table class="darwin-table">
           <thead><tr><th>Ticker</th><th>Claims</th><th>Evidence</th><th>13F status</th><th>Top claim</th></tr></thead>
           <tbody>${tickers.map(t => {
@@ -2315,7 +2379,7 @@
               <td><span class="badge ${loaded ? 'badge-ok' : 'badge-warn'}">${loaded ? 'loaded' : 'pending'}</span></td>
               <td>${escapeHtml((top.claim || '').slice(0, 180))} ${top.evidence_url ? evidenceLink(top.evidence_url, linkHtml, ghRepo, top.evidence_label) : ''}</td>
             </tr>`;
-          }).join('')}</tbody>
+          }).join('') || '<tr><td colspan="5" class="tier-sub">No portfolio names currently in the biotech quant universe.</td></tr>'}</tbody>
         </table>
       </div>`;
   }

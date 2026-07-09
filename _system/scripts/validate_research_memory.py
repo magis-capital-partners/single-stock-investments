@@ -47,6 +47,21 @@ def main() -> int:
     if memory.get("schema_version", 1) < 2:
         warnings.append("research_memory schema_version < 2")
 
+    biotech = memory.get("biotech") or {}
+    if not biotech.get("library_catalog"):
+        warnings.append("biotech.library_catalog missing — run biotech-quant library setup")
+    if not biotech.get("methodology_claims") and not memory.get("methodology_claims"):
+        warnings.append("no methodology claims — check SYNTHESIS.md section 5")
+    scoreboard = biotech.get("factor_scoreboard") or []
+    live = [f for f in scoreboard if f.get("status") == "live"]
+    if scoreboard and not live:
+        warnings.append("factor_scoreboard has no live factors")
+    signals = (biotech.get("signals") or {}).get("by_ticker") or {}
+    if signals and len(signals) < 20:
+        warnings.append(f"biotech signals only {len(signals)} names — expect full specialist universe")
+    elif not signals:
+        warnings.append("biotech.signals empty — run make specialist-13f-ingest")
+
     if INSIGHTS_PATH.exists() and MEMORY_PATH.exists():
         insights_mtime = INSIGHTS_PATH.stat().st_mtime
         memory_mtime = MEMORY_PATH.stat().st_mtime

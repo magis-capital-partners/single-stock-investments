@@ -54,7 +54,12 @@ runs:
         python _system/scripts/repair_letter_dates.py --apply
         python _system/scripts/build_superinvestor_insights.py
         python _system/scripts/build_insights.py
+        python _system/scripts/enrich_cusip_ticker_map.py --skip-fetch
         python _system/scripts/build_specialist_13f_signals.py
+        python _system/scripts/build_biotech_spend_value.py
+        python _system/scripts/build_biotech_insider_scores.py
+        python _system/scripts/build_biotech_peer_short_stub.py
+        python _system/scripts/build_biotech_composite.py
         python _system/scripts/build_research_memory.py
         python _system/scripts/build_power_zones.py
         python _system/scripts/clean_activist_indexes.py
@@ -123,7 +128,12 @@ runs:
         OAUTH_CLIENT_ID: ${{ env.OAUTH_CLIENT_ID }}
         OAUTH_PROXY_URL: ${{ env.OAUTH_PROXY_URL }}
       run: |
+        python _system/scripts/enrich_cusip_ticker_map.py --skip-fetch
         python _system/scripts/build_specialist_13f_signals.py
+        python _system/scripts/build_biotech_spend_value.py
+        python _system/scripts/build_biotech_insider_scores.py
+        python _system/scripts/build_biotech_peer_short_stub.py
+        python _system/scripts/build_biotech_composite.py
         python _system/scripts/build_research_memory.py
         python _system/scripts/build_insights.py
         python _system/scripts/build_dashboard_data.py

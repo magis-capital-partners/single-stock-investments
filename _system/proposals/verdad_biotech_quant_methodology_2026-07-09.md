@@ -2,7 +2,7 @@
 
 **Date:** 2026-07-09  
 **Source:** [Investing in Biotech with Verdad Capital](https://www.buysidedigest.com/podcast/investing-in-biotech-with-verdad-capital/) (Yet Another Value Podcast, Feb 2026) + Verdad *Investing in Biotech* paper (linked from show notes)  
-**Status:** Plan — Phase 0–1 partially shipped; Phases 2–8 roadmap below
+**Status:** Implemented Phases A–D (2026-07-09). Source of truth: `_system/reference/biotech-quant/` (`SYNTHESIS.md`, `FACTOR_SPEC.json`).
 
 ---
 

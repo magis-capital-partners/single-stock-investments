@@ -16,8 +16,12 @@ OWNERSHIP_DIR = ROOT / "_system" / "reference" / "market-data" / "ownership"
 FUNDS_PATH = OWNERSHIP_DIR / "biotech_specialist_funds.json"
 CIK_REGISTRY_PATH = OWNERSHIP_DIR / "fund_cik_registry.json"
 RECORDS_DIR = OWNERSHIP_DIR / "records"
+FULL_RECORDS_DIR = OWNERSHIP_DIR / "records" / "full"
 CACHE_DIR = OWNERSHIP_DIR / "cache"
 SIGNALS_PATH = OWNERSHIP_DIR / "signals_latest.json"
+FUNDAMENTALS_PATH = OWNERSHIP_DIR / "biotech_fundamentals.json"
+CLINICAL_PATH = OWNERSHIP_DIR / "biotech_clinical_profiles.json"
+INSIDER_SCORES_PATH = OWNERSHIP_DIR / "biotech_insider_scores.json"
 CUSIP_MAP_PATH = OWNERSHIP_DIR / "cusip_ticker_map.json"
 REGISTRY_PATH = ROOT / "_system" / "portfolio" / "registry.json"
 SEC_TICKER_CIK_PATH = ROOT / "_system" / "reference" / "market-data" / "fundamentals" / "_sec_ticker_cik_map.json"
@@ -223,3 +227,145 @@ def specialist_funds_for_ingest() -> list[dict]:
 
 def sleep() -> None:
     time.sleep(SLEEP_SEC)
+
+
+BIOTECH_ISSUER_KEYWORDS = (
+    "biotech",
+    "biopharm",
+    "therapeutic",
+    "therapeutics",
+    "pharma",
+    "pharmaceutical",
+    "bioscience",
+    "biosciences",
+    "genomic",
+    "genetics",
+    "genome",
+    "oncology",
+    "immuno",
+    "diagnostic",
+    "diagnostics",
+    "lifesci",
+    "life sci",
+    "medical",
+    "medicine",
+    "medicines",
+    "vaccine",
+    "vaccines",
+    "bio ",
+    " bio",
+    "biolog",
+    "antibody",
+    "antibodies",
+    "rna ",
+    "mrna",
+    "gene ",
+    "genes",
+    "cell therapy",
+    "cellular",
+    "neuroscience",
+    "neuro",
+    "hematolog",
+    "cardiolog",
+    "ophthalm",
+    "radiopharm",
+    "molecular",
+    "clinical",
+    "health",
+    "healthcare",
+    "life sciences",
+    "rx ",
+    "drug",
+    "drugs",
+    "amgen",
+    "biogen",
+    "gilead",
+    "regeneron",
+    "vertex",
+    "moderna",
+    "illumina",
+    "biomarin",
+    "incyte",
+    "alexion",
+    "seagen",
+    "sarepta",
+    "alnylam",
+    "ionis",
+    "exelixis",
+    "neurocrine",
+    "united therapeutics",
+    "jazz pharmaceuticals",
+    "bristol myers",
+    "bristol-myers",
+    "eli lilly",
+    "lilly",
+    "pfizer",
+    "merck",
+    "novartis",
+    "roche",
+    "sanofi",
+    "astrazeneca",
+    "abbvie",
+    "takeda",
+    "bayer",
+    "glaxosmithkline",
+    "gsk ",
+    "johnson johnson",
+    "jnj",
+)
+
+NON_BIOTECH_ISSUER_KEYWORDS = (
+    "alphabet",
+    "google",
+    "amazon",
+    "meta platform",
+    "facebook",
+    "nvidia",
+    "microsoft",
+    "apple",
+    "tesla",
+    "advanced micro",
+    "microstrategy",
+    "enphase",
+    "copart",
+    "costar",
+    "berkshire",
+    "bank of",
+    "jpmorgan",
+    "goldman",
+)
+
+
+def issuer_looks_biotech(issuer: str | None) -> bool:
+    text = normalize_name(str(issuer or ""))
+    if not text:
+        return False
+    if any(term in text for term in NON_BIOTECH_ISSUER_KEYWORDS):
+        return False
+    return any(term in text for term in BIOTECH_ISSUER_KEYWORDS)
+
+
+def classify_fund_biotech_share(holdings: list[dict]) -> dict:
+    """Estimate biotech MV share from InfoTable rows using issuer keywords."""
+    total = 0
+    biotech = 0
+    for row in holdings:
+        value = row.get("market_value_usd") or 0
+        try:
+            value = int(value)
+        except (TypeError, ValueError):
+            value = 0
+        total += max(value, 0)
+        if issuer_looks_biotech(row.get("issuer") or row.get("nameOfIssuer")):
+            biotech += max(value, 0)
+    share = (biotech / total) if total else 0.0
+    return {
+        "total_market_value_usd": total,
+        "biotech_market_value_usd": biotech,
+        "biotech_mv_share": round(share, 4),
+        "is_specialist_by_rule": share > 0.50,
+        "holding_count": len(holdings),
+        "biotech_holding_count": sum(
+            1 for r in holdings if issuer_looks_biotech(r.get("issuer") or r.get("nameOfIssuer"))
+        ),
+    }

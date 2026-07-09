@@ -202,3 +202,84 @@ def supplemental_claim_rows(ticker: str, ticker_dir: Path) -> list[dict]:
     rows.extend(from_adversarial(ticker, ticker_dir))
     rows.extend(from_valuation_stance(ticker, ticker_dir))
     return rows
+
+
+BIOTECH_QUANT_DIR = ROOT / "_system" / "reference" / "biotech-quant"
+SYNTHESIS_PATH = BIOTECH_QUANT_DIR / "SYNTHESIS.md"
+FACTOR_SPEC_PATH = BIOTECH_QUANT_DIR / "FACTOR_SPEC.json"
+METHODOLOGY_BULLET_RE = re.compile(
+    r"^##\s*5\.\s*Methodology claim bullets.*?\n+(.*?)(?=\n##\s|\Z)",
+    re.I | re.S,
+)
+NUMBERED_CLAIM_RE = re.compile(r"^\s*\d+\.\s+(.+)$", re.M)
+
+
+def from_biotech_methodology(limit: int = 20) -> list[dict]:
+    """Evergreen methodology claims from the biotech-quant library (context tier)."""
+    rows: list[dict] = []
+    if not SYNTHESIS_PATH.exists():
+        return rows
+    text = SYNTHESIS_PATH.read_text(encoding="utf-8", errors="ignore")
+    section = METHODOLOGY_BULLET_RE.search(text)
+    body = section.group(1) if section else text
+    evidence_ref = str(SYNTHESIS_PATH.relative_to(ROOT)).replace("\\", "/")
+    paper = BIOTECH_QUANT_DIR / "papers" / "verdad_biotech_investing_2026.pdf"
+    if paper.exists():
+        evidence_ref = str(paper.relative_to(ROOT)).replace("\\", "/")
+    for match in NUMBERED_CLAIM_RE.finditer(body):
+        summary = re.sub(r"\s+", " ", match.group(1).strip())[:320]
+        if len(summary) < 24:
+            continue
+        rows.append(
+            {
+                "ticker": None,
+                "source": "biotech_quant_library",
+                "claim_type": "methodology",
+                "direction": "neutral",
+                "title": "Biotech quant methodology",
+                "summary": summary,
+                "observed_at": "2026-07-09",
+                "impact_axis": "variant_view",
+                "evidence_ref": evidence_ref,
+                "evidence_label": "Verdad / synthesis",
+                "score": 18,
+            }
+        )
+        if len(rows) >= limit:
+            break
+    if FACTOR_SPEC_PATH.exists():
+        try:
+            spec = json.loads(FACTOR_SPEC_PATH.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            spec = {}
+        banned = spec.get("banned_for_biotech") or []
+        if banned:
+            rows.append(
+                {
+                    "ticker": None,
+                    "source": "biotech_quant_library",
+                    "claim_type": "methodology",
+                    "direction": "neutral",
+                    "title": "Biotech quant banned metrics",
+                    "summary": (
+                        "Biotech overlay bans traditional metrics: "
+                        + ", ".join(str(b) for b in banned)
+                        + "."
+                    )[:320],
+                    "observed_at": "2026-07-09",
+                    "impact_axis": "variant_view",
+                    "evidence_ref": str(FACTOR_SPEC_PATH.relative_to(ROOT)).replace("\\", "/"),
+                    "evidence_label": "FACTOR_SPEC",
+                    "score": 16,
+                }
+            )
+    return rows[:limit]
+
+
+def load_biotech_factor_spec() -> dict:
+    if not FACTOR_SPEC_PATH.exists():
+        return {}
+    try:
+        return json.loads(FACTOR_SPEC_PATH.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return {}

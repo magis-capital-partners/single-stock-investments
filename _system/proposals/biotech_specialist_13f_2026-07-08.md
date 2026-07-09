@@ -1,7 +1,7 @@
 # Biotech Specialist 13F Quant Layer
 
 **Date:** 2026-07-08  
-**Status:** Implemented (Phases 0–5, 7; Phase 6 Marvin integration deferred)
+**Status:** Implemented (Phases 0–5, 7) + 2026-07-09 knowledge compounding (full InfoTable ingest, consensus v2, spend/insider/composite, methodology library UI). Peer momentum + short interest remain stubs.
 
 ## Goal
 

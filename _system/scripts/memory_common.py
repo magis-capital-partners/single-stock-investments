@@ -205,6 +205,8 @@ def claim_type(row: dict) -> str:
         return row.get("claim_type") or "thesis"
     if source == "specialist_13f":
         return "ownership"
+    if source == "biotech_quant_library" or row.get("claim_type") == "methodology":
+        return "methodology"
     if source in {"superinvestor_letter", "sumzero_research", "third_party"}:
         return "thesis"
     if axis == "ownership" or "13f" in text or "insider" in text:
@@ -285,6 +287,7 @@ def source_type(row: dict) -> str:
         "earnings": "earnings",
         "insider": "insider",
         "specialist_13f": "ownership_13f",
+        "biotech_quant_library": "methodology",
         "deep_dive": "deep_dive",
         "adversarial_review": "adversarial",
         "proposed_belief": "proposed_memory",

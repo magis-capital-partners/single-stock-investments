@@ -12,7 +12,7 @@ DATE ?= $(shell date +%Y-%m-%d)
 TICKER ?=
 DATE ?= $(shell date +%Y-%m-%d)
 
-.PHONY: research-check research-check-all depth-check depth-audit evidence milly-repass book-estimate book-estimate-all holdco-uplift short-scan activist-scan activist-scan-all activist-triage activist-triage-check activist-feed activist-feed-check activist-registry-audit filing-resolve event-triage event-triage-check hk-scan hk-cross-check-all hk-extract-refresh third-party-scan-all cross-check-all transcript-sync batch-refresh evidence-check darwin-pit-check darwin-build darwin-pit-audit darwin-sync-external darwin-explore persona-lens persona-insights persona-check document-registry document-catalog-search document-sync-drive document-sync-drive-letters document-sync-drive-general document-drive-plan document-drive-migrate document-drive-cleanup document-drive-audit research-memory specialist-13f-ingest sumzero-index letter-import-drive letter-extract-text letter-backfill letter-rebuild letter-repair-dates letter-date-check vault-setup vault-check
+.PHONY: research-check research-check-all depth-check depth-audit evidence milly-repass book-estimate book-estimate-all holdco-uplift short-scan activist-scan activist-scan-all activist-triage activist-triage-check activist-feed activist-feed-check activist-registry-audit filing-resolve event-triage event-triage-check hk-scan hk-cross-check-all hk-extract-refresh third-party-scan-all cross-check-all transcript-sync batch-refresh evidence-check darwin-pit-check darwin-build darwin-pit-audit darwin-sync-external darwin-explore persona-lens persona-insights persona-check document-registry document-catalog-search document-sync-drive document-sync-drive-letters document-sync-drive-general document-drive-plan document-drive-migrate document-drive-cleanup document-drive-audit research-memory specialist-13f-ingest biotech-quant-lib biotech-spend biotech-insider biotech-composite sumzero-index letter-import-drive letter-extract-text letter-backfill letter-rebuild letter-repair-dates letter-date-check vault-setup vault-check
 
 persona-lens:
 	$(PYTHON) $(SCRIPTS)/fetch_superinvestor_letters.py --all --build
@@ -140,11 +140,36 @@ research-memory:
 
 specialist-13f-ingest:
 	$(PYTHON) $(SCRIPTS)/ingest_specialist_13f.py
+	$(PYTHON) $(SCRIPTS)/enrich_cusip_ticker_map.py
 	$(PYTHON) $(SCRIPTS)/build_specialist_13f_signals.py
+	$(PYTHON) $(SCRIPTS)/build_biotech_spend_value.py
+	$(PYTHON) $(SCRIPTS)/build_biotech_insider_scores.py
+	$(PYTHON) $(SCRIPTS)/build_biotech_peer_short_stub.py
+	$(PYTHON) $(SCRIPTS)/build_biotech_composite.py
 	$(PYTHON) $(SCRIPTS)/build_insights.py
 	$(PYTHON) $(SCRIPTS)/build_research_memory.py
 	$(PYTHON) $(SCRIPTS)/build_dashboard_data.py
 	@echo OK: specialist-13f-ingest
+
+biotech-quant-lib:
+	$(PYTHON) $(SCRIPTS)/extract_biotech_quant_text.py
+	@echo OK: biotech-quant-lib
+
+biotech-spend:
+	$(PYTHON) $(SCRIPTS)/build_biotech_spend_value.py
+	$(PYTHON) $(SCRIPTS)/build_specialist_13f_signals.py
+	@echo OK: biotech-spend
+
+biotech-insider:
+	$(PYTHON) $(SCRIPTS)/build_biotech_insider_scores.py
+	$(PYTHON) $(SCRIPTS)/build_specialist_13f_signals.py
+	@echo OK: biotech-insider
+
+biotech-composite:
+	$(PYTHON) $(SCRIPTS)/build_biotech_peer_short_stub.py
+	$(PYTHON) $(SCRIPTS)/build_biotech_composite.py
+	$(PYTHON) $(SCRIPTS)/build_research_memory.py
+	@echo OK: biotech-composite
 
 sumzero-index:
 	$(PYTHON) $(SCRIPTS)/build_sumzero_index.py
