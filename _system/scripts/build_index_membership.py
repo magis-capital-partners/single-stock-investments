@@ -15,6 +15,7 @@ import sys
 
 sys.path.insert(0, sys_path_insert)
 
+from index_event_extract import extract_index_events  # noqa: E402
 from index_market_inputs import load_fundamentals_cache, market_inputs_for_ticker  # noqa: E402
 
 DATA_DIR = ROOT / "_system" / "data"
@@ -24,42 +25,27 @@ DOCS_OUT = ROOT / "docs" / "data" / "index_membership.json"
 REGISTRY = ROOT / "_system" / "portfolio" / "registry.json"
 NEWS_PATH = ROOT / "dashboard" / "data" / "portfolio_news.json"
 ANNOUNCEMENTS = DATA_DIR / "index_announcements.jsonl"
+REVIEWS_PENDING = ROOT / "_system" / "reviews" / "pending"
+REVIEWS_APPROVED = ROOT / "_system" / "reviews" / "approved"
+
+# Review / archive title screen (recall for aged headlines; extract is still the gate)
+_ARCHIVE_EVENTISH = re.compile(
+    r"(added to|joins? |joining |removed from|deleted from|dropped from|"
+    r"reclassif|reshuffl|Top 50|Nasdaq-100 Exit|in the Dow|Russell|"
+    r"S&P/TSX|Midcap|Defensive|Index Reclass|index shift|index moves?)",
+    re.I,
+)
+_REVIEW_LINE_RE = re.compile(
+    r"\*\*([A-Z0-9.\-]+)\*\*\s*·\s*`([^`]+)`.*?\[([^\]]+)\]",
+    re.I,
+)
+_REVIEW_DATE_RE = re.compile(r"news_(\d{4}-\d{2}-\d{2})\.md")
 
 STATUS_ENUM = {"member", "inclusion_candidate", "deletion_risk", "ineligible", "n_a"}
 CONF_ENUM = {"rules_only", "news_unconfirmed", "provider_confirmed"}
-
-INDEX_ALIASES = {
-    "s&p 500": "sp500",
-    "s&p500": "sp500",
-    "sp 500": "sp500",
-    "sp500": "sp500",
-    "s&p midcap 400": "sp400",
-    "s&p 400": "sp400",
-    "sp400": "sp400",
-    "s&p smallcap 600": "sp600",
-    "s&p 600": "sp600",
-    "sp600": "sp600",
-    "russell 1000": "russell_1000",
-    "russell1000": "russell_1000",
-    "russell 2000": "russell_2000",
-    "russell2000": "russell_2000",
-    "nasdaq 100": "nasdaq_100",
-    "nasdaq-100": "nasdaq_100",
-    "nasdaq100": "nasdaq_100",
-    "msci": "msci_acwi",
-    "msci usa": "msci_usa",
-    "msci acwi": "msci_acwi",
-    "tsx": "tsx_composite",
-    "s&p/tsx": "tsx_composite",
-    "topix": "topix",
-    "ftse 100": "ftse_100",
-    "ftse 250": "ftse_250",
-    "stoxx": "stoxx_europe_600",
-    "asx 200": "asx_200",
-    "nzx 50": "nzx_50",
-    "hang seng": "hang_seng",
-    "nifty": "nifty_500",
-}
+INDEX_NEWS_CATEGORIES = {"index_inclusion", "index_addition", "index_deletion"}
+DEFAULT_MAX_CANDIDATE_DISTANCE_PCT = 15.0
+NASDAQ_EXCLUDE_TICKERS = {"NDAQ", "CBOE", "CME", "ICE", "MIAX", "SPGI", "MCO"}
 
 
 def now_iso() -> str:
@@ -107,83 +93,225 @@ def load_announcements() -> list[dict]:
     return rows
 
 
-def append_announcement(row: dict) -> None:
+def append_announcement(row: dict, *, existing: list[dict] | None = None) -> bool:
+    """Append if not duplicate (exact key or same triple within 14 days). Returns True if written."""
     ANNOUNCEMENTS.parent.mkdir(parents=True, exist_ok=True)
+    rows = existing if existing is not None else load_announcements()
     key = (
         row.get("ticker"),
         row.get("index"),
         row.get("action"),
         row.get("effective") or row.get("announced"),
     )
-    existing = load_announcements()
-    for e in existing:
+    ann_d = parse_date(row.get("announced"))
+    for e in rows:
         ek = (e.get("ticker"), e.get("index"), e.get("action"), e.get("effective") or e.get("announced"))
         if ek == key:
-            return
+            return False
+        if (
+            e.get("ticker") == row.get("ticker")
+            and e.get("index") == row.get("index")
+            and e.get("action") == row.get("action")
+            and ann_d
+        ):
+            ed = parse_date(e.get("announced") or e.get("effective"))
+            if ed and abs((ann_d - ed).days) <= 14:
+                return False
     with ANNOUNCEMENTS.open("a", encoding="utf-8") as fh:
         fh.write(json.dumps(row, ensure_ascii=False) + "\n")
+    rows.append(row)
+    return True
 
 
-def detect_index_in_text(text: str) -> str | None:
-    low = (text or "").lower()
-    # longer keys first
-    for alias in sorted(INDEX_ALIASES.keys(), key=len, reverse=True):
-        if alias in low:
-            return INDEX_ALIASES[alias]
-    if "russell" in low:
-        return "russell_2000"
-    if "s&p" in low or "s and p" in low:
-        return "sp500"
-    return None
+def rewrite_announcements(rows: list[dict]) -> None:
+    ANNOUNCEMENTS.parent.mkdir(parents=True, exist_ok=True)
+    body = "".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows)
+    ANNOUNCEMENTS.write_text(body, encoding="utf-8")
 
 
-def detect_action(text: str) -> str | None:
-    low = (text or "").lower()
-    if re.search(r"\b(removed|deleted|dropped|deletion|exclusion|to be removed)\b", low):
-        return "delete"
-    if re.search(r"\b(added|joins|joining|inclusion|addition|to be added|will replace|replaces)\b", low):
-        return "add"
-    if re.search(r"\b(under review|index review)\b", low):
-        return "review"
-    return None
+def memberships_lookup(seed: dict) -> dict[str, set[str]]:
+    out: dict[str, set[str]] = {}
+    for t, entry in (seed.get("by_ticker") or {}).items():
+        out[t] = set(entry.get("memberships") or [])
+    return out
 
 
-def harvest_news_announcements(news_doc: dict, today: date) -> list[dict]:
-    harvested = []
+def harvest_news_announcements(
+    news_doc: dict,
+    today: date,
+    *,
+    seed: dict,
+    company_names: dict[str, str],
+    purge: bool = False,
+) -> list[dict]:
+    """Subject-gated harvest. Precision over recall; no default index/action."""
+    harvested: list[dict] = []
+    existing: list[dict] = [] if purge else load_announcements()
+    # Keep provider_confirmed rows across purge
+    if purge:
+        existing = [e for e in load_announcements() if e.get("confidence") == "provider_confirmed"]
+        rewrite_announcements(existing)
+
     for item in news_doc.get("items") or news_doc.get("articles") or news_doc.get("news") or []:
-        cat = item.get("category") or ""
         title = item.get("title") or ""
         summary = item.get("summary") or ""
-        text = f"{title} {summary}"
-        if cat not in {"index_inclusion", "index_addition", "index_deletion", "market_structure"}:
-            if not detect_action(text) or not detect_index_in_text(text):
-                continue
-            if "index" not in text.lower() and "russell" not in text.lower() and "s&p" not in text.lower():
-                continue
         tickers = item.get("tickers") or ([item.get("ticker")] if item.get("ticker") else [])
         tickers = [t for t in tickers if t]
         if not tickers:
             continue
-        index_id = detect_index_in_text(text) or "sp500"
-        action = detect_action(text) or ("delete" if cat == "index_deletion" else "add")
-        if action == "review":
-            continue
+        # Subject extract is the gate. Any category may contribute if extract matches
+        # (Copart reclass headlines often land in management).
         announced = item.get("published_utc") or item.get("published") or item.get("date") or today.isoformat()
         announced = str(announced)[:10]
-        for ticker in tickers:
-            row = {
-                "ticker": ticker,
-                "index": index_id,
-                "action": action,
-                "announced": announced,
-                "effective": None,
-                "source_url": item.get("url") or item.get("link"),
-                "source_type": "news",
-                "confidence": "news_unconfirmed",
-                "title": title,
-            }
-            append_announcement(row)
-            harvested.append(row)
+        harvested.extend(
+            _try_append_extracted(
+                title=title,
+                summary=summary,
+                tickers=tickers,
+                company_names=company_names,
+                announced=announced,
+                source_url=item.get("url") or item.get("link"),
+                source_type="news",
+                seed=seed,
+                existing=existing,
+            )
+        )
+    return harvested
+
+
+def _try_append_extracted(
+    *,
+    title: str,
+    summary: str,
+    tickers: list[str],
+    company_names: dict[str, str],
+    announced: str,
+    source_url: str | None,
+    source_type: str,
+    seed: dict,
+    existing: list[dict],
+) -> list[dict]:
+    """Run subject extract + membership gates; append quality-gated rows. Returns new rows."""
+    mem = memberships_lookup(seed)
+    events = extract_index_events(
+        title,
+        summary,
+        candidate_tickers=tickers,
+        company_names={t: company_names.get(t, "") for t in tickers},
+    )
+    out: list[dict] = []
+    for ev in events:
+        ticker = ev["ticker"]
+        index_id = ev["index"]
+        action = ev["action"]
+        current = mem.get(ticker) or set()
+        if action == "delete" and index_id not in current:
+            if not re.search(r"\b(exit|removed|deleted|dropped)\b", title, re.I):
+                continue
+        row = {
+            "ticker": ticker,
+            "index": index_id,
+            "action": action,
+            "announced": announced,
+            "effective": None,
+            "source_url": source_url,
+            "source_type": source_type,
+            "confidence": "news_unconfirmed",
+            "title": title,
+            "quality_gated": True,
+        }
+        if append_announcement(row, existing=existing):
+            out.append(row)
+    return out
+
+
+def harvest_archive_announcements(
+    *,
+    seed: dict,
+    company_names: dict[str, str],
+    holdings_tickers: set[str] | None = None,
+) -> list[dict]:
+    """
+    Recover aged index events from news-review markdown and per-ticker news_index.json.
+
+    Live portfolio_news.json ages out; AMD/WEST/ALS.TO/CSGP-style headlines often live
+    only in reviews or ticker archives. Same subject-gated extract as live harvest.
+    """
+    tickers = holdings_tickers or set(company_names)
+    existing = load_announcements()
+    harvested: list[dict] = []
+    seen_titles: set[str] = set()
+
+    # 1) Pending + approved news review digests
+    review_dirs = [p for p in (REVIEWS_PENDING, REVIEWS_APPROVED) if p.is_dir()]
+    for rev_dir in review_dirs:
+        for path in sorted(rev_dir.glob("news_*.md")):
+            dm = _REVIEW_DATE_RE.search(path.name)
+            announced = dm.group(1) if dm else date.today().isoformat()
+            try:
+                text = path.read_text(encoding="utf-8", errors="ignore")
+            except OSError:
+                continue
+            for line in text.splitlines():
+                if not _ARCHIVE_EVENTISH.search(line):
+                    continue
+                m = _REVIEW_LINE_RE.search(line)
+                if not m:
+                    continue
+                t, _cat, title = m.group(1), m.group(2), m.group(3)
+                if t not in tickers or title in seen_titles:
+                    continue
+                seen_titles.add(title)
+                harvested.extend(
+                    _try_append_extracted(
+                        title=title,
+                        summary="",
+                        tickers=[t],
+                        company_names=company_names,
+                        announced=announced,
+                        source_url=None,
+                        source_type="news_review_archive",
+                        seed=seed,
+                        existing=existing,
+                    )
+                )
+
+    # 2) Per-ticker research news archives (CSGP Nasdaq exit, etc.)
+    for ticker in sorted(tickers):
+        news_path = ROOT / ticker / "research" / "news" / "news_index.json"
+        if not news_path.exists():
+            continue
+        try:
+            doc = json.loads(news_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        for item in doc.get("items") or doc.get("articles") or []:
+            title = item.get("title") or ""
+            if not title or not _ARCHIVE_EVENTISH.search(title):
+                continue
+            if title in seen_titles:
+                continue
+            seen_titles.add(title)
+            summary = item.get("summary") or ""
+            announced = str(
+                item.get("published_utc") or item.get("published") or item.get("date") or ""
+            )[:10] or date.today().isoformat()
+            item_tickers = item.get("tickers") or [ticker]
+            item_tickers = [t for t in item_tickers if t in tickers] or [ticker]
+            harvested.extend(
+                _try_append_extracted(
+                    title=title,
+                    summary=summary,
+                    tickers=item_tickers,
+                    company_names=company_names,
+                    announced=announced,
+                    source_url=item.get("url") or item.get("link"),
+                    source_type="ticker_news_archive",
+                    seed=seed,
+                    existing=existing,
+                )
+            )
+
     return harvested
 
 
@@ -231,6 +359,8 @@ def scorecard_sp(
     spec: dict,
     mi: dict,
     is_member: bool,
+    *,
+    max_cand_dist: float = DEFAULT_MAX_CANDIDATE_DISTANCE_PCT,
 ) -> dict:
     checks: dict[str, dict] = {}
     mcap = mi.get("market_cap_usd")
@@ -257,7 +387,6 @@ def scorecard_sp(
             elif mcap > hi:
                 dist = ((mcap - hi) / hi) * 100.0
             else:
-                # distance to nearer edge, negative means inside
                 dist = -min(abs(mcap - lo), abs(hi - mcap)) / ((hi - lo) or 1) * 100.0
 
     float_pct = mi.get("float_pct")
@@ -280,7 +409,6 @@ def scorecard_sp(
     else:
         checks["exchange"] = check_result(exch in allowed, exch, allowed)
 
-    # liquidity: dollar ADV / float mcap
     adv = mi.get("adv_dollar")
     if adv is None or mcap is None or float_pct is None:
         checks["liquidity"] = check_result(None, None, spec.get("liquidity_ratio_min"), "missing adv or float")
@@ -293,14 +421,27 @@ def scorecard_sp(
             spec.get("liquidity_ratio_min"),
         )
 
-    return finalize_scorecard(index_id, checks, is_member, dist, missing)
+    return finalize_scorecard(
+        index_id, checks, is_member, dist, missing, max_cand_dist=max_cand_dist, floor_only=(index_id == "sp500")
+    )
 
 
-def scorecard_mcap_min(index_id: str, spec: dict, mi: dict, is_member: bool, key: str = "min_mcap_usd") -> dict:
+def scorecard_mcap_min(
+    index_id: str,
+    spec: dict,
+    mi: dict,
+    is_member: bool,
+    key: str = "min_mcap_usd",
+    *,
+    max_cand_dist: float = DEFAULT_MAX_CANDIDATE_DISTANCE_PCT,
+    excluded: bool = False,
+) -> dict:
     checks: dict[str, dict] = {}
     mcap = mi.get("market_cap_usd")
     thr = spec.get(key)
     dist = None
+    if excluded:
+        checks["excluded"] = check_result(False, mi.get("ticker"), "denylist", "excluded from index eligibility")
     if thr is None:
         checks["market_cap"] = check_result(None, mcap, None, "no public cutoff encoded; membership-seed only")
     elif mcap is None:
@@ -315,7 +456,16 @@ def scorecard_mcap_min(index_id: str, spec: dict, mi: dict, is_member: bool, key
             checks["exchange"] = check_result(None, None, allowed, "missing exchange")
         else:
             checks["exchange"] = check_result(exch in allowed, exch, allowed)
-    return finalize_scorecard(index_id, checks, is_member, dist, mi.get("missing") or [])
+    # Min-mcap families are floor_only: clearing the floor ≠ candidacy
+    return finalize_scorecard(
+        index_id,
+        checks,
+        is_member,
+        dist,
+        mi.get("missing") or [],
+        max_cand_dist=max_cand_dist,
+        floor_only=True,
+    )
 
 
 def scorecard_russell(
@@ -324,39 +474,95 @@ def scorecard_russell(
     mi: dict,
     is_member: bool,
     universe_ranks: dict[str, int],
+    *,
+    max_cand_dist: float = DEFAULT_MAX_CANDIDATE_DISTANCE_PCT,
+    breakpoint_mcap: float | None = None,
 ) -> dict:
+    """
+    Seed membership is ground truth for member.
+    Portfolio-scaled ranks are labeled portfolio_proxy; candidacy only near mcap breakpoint band.
+    """
     checks: dict[str, dict] = {}
     mcap = mi.get("market_cap_usd")
     ticker = mi.get("ticker")
     rank = universe_ranks.get(ticker)
     dist = None
+
     if mcap is None:
-        checks["market_cap"] = check_result(None, None, "total_market_cap rank", "missing market_cap")
+        checks["market_cap"] = check_result(None, None, "total_market_cap", "missing market_cap")
     else:
-        checks["market_cap"] = check_result(True, mcap, "ranked among US holdings with mcap")
-    if rank is None:
-        checks["rank"] = check_result(None, None, spec.get("breakpoint_rank") or spec.get("breakpoint_rank_low"), "rank unavailable")
-    else:
+        checks["market_cap"] = check_result(True, mcap, "observed")
+
+    if is_member:
+        checks["rank"] = check_result(True, rank, "seed_member", "membership from seed")
+        dist = 0.0
+    elif breakpoint_mcap and mcap:
+        # Distance to R1000/R2000 breakpoint mcap among portfolio US names
+        dist = ((mcap - breakpoint_mcap) / breakpoint_mcap) * 100.0
         if index_id == "russell_1000":
-            bp = int(spec.get("breakpoint_rank") or 1000)
-            band = float(spec.get("band_pct") or 0.025)
-            # Within our universe we only have ~117 US names; treat rank vs portfolio as relative signal
-            # Map: lower rank number = larger. Candidate if rank near bp among full market — here use mcap vs median of members heuristic
-            passed = rank <= bp if is_member or rank <= max(bp, len(universe_ranks)) else rank <= bp
-            # Distance: how far rank is from breakpoint as pct of breakpoint
-            dist = ((bp - rank) / bp) * 100.0
-            within_band = abs(dist) <= band * 100
-            checks["rank"] = check_result(passed, rank, bp, f"within_band={within_band}")
+            # Non-members near/above breakpoint are R1000 candidates
+            checks["rank"] = check_result(
+                near_boundary(dist, max_cand_dist) and dist >= -max_cand_dist,
+                rank,
+                f"breakpoint_mcap={breakpoint_mcap:.0f}",
+                "portfolio_proxy",
+            )
         else:
-            lo = int(spec.get("breakpoint_rank_low") or 1001)
-            hi = int(spec.get("breakpoint_rank_high") or 3000)
-            passed = lo <= rank <= hi
-            mid = (lo + hi) / 2
-            dist = ((mid - rank) / mid) * 100.0
-            checks["rank"] = check_result(passed, rank, [lo, hi])
-    sc = finalize_scorecard(index_id, checks, is_member, dist, mi.get("missing") or [])
+            # R2000: non-members near/below breakpoint (small side), not mega-caps far above
+            checks["rank"] = check_result(
+                near_boundary(dist, max_cand_dist) and dist <= max_cand_dist,
+                rank,
+                f"breakpoint_mcap={breakpoint_mcap:.0f}",
+                "portfolio_proxy",
+            )
+    else:
+        checks["rank"] = check_result(None, rank, "breakpoint", "portfolio_proxy unavailable")
+
+    sc = finalize_scorecard(
+        index_id, checks, is_member, dist, mi.get("missing") or [], max_cand_dist=max_cand_dist, floor_only=False
+    )
     sc["rank_estimate"] = rank
+    sc["rank_method"] = "portfolio_proxy"
     return sc
+
+
+def russell_breakpoint_mcap(inputs_by_ticker: dict[str, dict], seed: dict) -> float | None:
+    """Median mcap of seed russell_1000 members as a portfolio-local breakpoint proxy."""
+    caps = []
+    by = seed.get("by_ticker") or {}
+    for t, entry in by.items():
+        mems = entry.get("memberships") or []
+        if "russell_1000" not in mems:
+            continue
+        mi = inputs_by_ticker.get(t) or {}
+        if mi.get("market_cap_usd"):
+            caps.append(float(mi["market_cap_usd"]))
+    if not caps:
+        # Fallback: median of top-third US names by mcap
+        us = sorted(
+            (
+                float(mi["market_cap_usd"])
+                for mi in inputs_by_ticker.values()
+                if mi.get("market") == "US" and mi.get("market_cap_usd")
+            ),
+            reverse=True,
+        )
+        if len(us) < 3:
+            return None
+        return us[max(0, len(us) // 3 - 1)]
+    caps.sort()
+    return caps[len(caps) // 2]
+
+
+def max_candidate_distance(rules: dict) -> float:
+    scoring = rules.get("scoring") or {}
+    return float(scoring.get("max_candidate_distance_pct") or DEFAULT_MAX_CANDIDATE_DISTANCE_PCT)
+
+
+def near_boundary(distance_pct: float | None, max_abs: float) -> bool:
+    if distance_pct is None:
+        return False
+    return abs(float(distance_pct)) <= max_abs
 
 
 def finalize_scorecard(
@@ -365,55 +571,72 @@ def finalize_scorecard(
     is_member: bool,
     distance_pct: float | None,
     missing: list[str],
+    *,
+    max_cand_dist: float = DEFAULT_MAX_CANDIDATE_DISTANCE_PCT,
+    floor_only: bool = False,
 ) -> dict:
+    """
+    Status rules (precision-first):
+    - member / deletion_risk for seed members
+    - inclusion_candidate only when near boundary (|distance| <= max_cand_dist)
+    - floor_only indices (MSCI/Nasdaq min-mcap): never candidate merely for clearing the floor
+    """
     gating = None
     known = []
-    # Addition gates (earnings, mcap band, liquidity) do not force deletion for existing members.
-    member_hard_fails = {"exchange", "security_type", "float"}
+    member_hard_fails = {"exchange", "security_type", "float", "excluded"}
     for name, c in checks.items():
         if c.get("pass") is False:
             if not is_member or name in member_hard_fails:
                 gating = gating or name
         if c.get("pass") is not None:
             known.append(c.get("pass"))
+
     if is_member:
-        if gating:
-            status = "deletion_risk"
-        else:
-            status = "member"
-    else:
-        if mi_ineligible_from_missing(missing) and not known:
-            status = "n_a"
-        elif gating and all(c.get("pass") is not True for c in checks.values() if c.get("pass") is not None):
-            # far from eligibility
-            if distance_pct is not None and distance_pct > -40:
-                status = "inclusion_candidate" if not gating else "n_a"
-            else:
-                status = "n_a" if any(c.get("pass") is None for c in checks.values()) else "ineligible"
-        elif distance_pct is not None and distance_pct >= -15 and (not gating or gating == "earnings_positive"):
-            status = "inclusion_candidate"
-        elif known and all(known) and distance_pct is not None and distance_pct >= -25:
-            status = "inclusion_candidate"
-        elif any(c.get("pass") is None for c in checks.values()) and not known:
-            status = "n_a"
-        else:
-            status = "n_a" if any(c.get("pass") is None for c in checks.values()) else "ineligible"
-
-    # Soften: if member, keep member/deletion_risk only
-    if is_member and status not in {"member", "deletion_risk"}:
         status = "deletion_risk" if gating else "member"
-
-    # If not member and all hard gates pass and close to boundary
-    if not is_member:
+    else:
         fails = [n for n, c in checks.items() if c.get("pass") is False]
         unknowns = [n for n, c in checks.items() if c.get("pass") is None]
         passes = [n for n, c in checks.items() if c.get("pass") is True]
-        if not fails and passes and distance_pct is not None and distance_pct >= -20:
+
+        if "excluded" in fails:
+            status = "ineligible"
+            gating = gating or "excluded"
+        elif mi_ineligible_from_missing(missing) and not known:
+            status = "n_a"
+        elif floor_only:
+            # Clearing a min-mcap floor is not candidacy; need near-boundary only
+            if near_boundary(distance_pct, max_cand_dist) and not fails and passes:
+                # For floor indices, distance is usually largely positive (above floor).
+                # Treat "near" as within max_cand_dist *above* the floor (0..+max), not far above.
+                if distance_pct is not None and 0 <= float(distance_pct) <= max_cand_dist:
+                    status = "inclusion_candidate"
+                    gating = None
+                else:
+                    status = "n_a"
+                    gating = gating or "above_floor_not_near_cutoff"
+            else:
+                status = "n_a" if unknowns or not passes else ("ineligible" if fails else "n_a")
+        elif near_boundary(distance_pct, max_cand_dist) and not fails and passes:
             status = "inclusion_candidate"
             gating = None
-        elif not fails and not passes and unknowns:
+        elif near_boundary(distance_pct, max_cand_dist) and fails and set(fails) <= {"earnings_positive", "float", "liquidity"}:
+            # Near boundary but soft gates unknown/fail → still n_a (don't invent)
+            if unknowns or any(checks.get(f, {}).get("pass") is None for f in ("float", "liquidity", "earnings_positive")):
+                status = "n_a"
+                gating = gating or (unknowns[0] if unknowns else fails[0])
+            else:
+                status = "n_a"
+                gating = gating or fails[0]
+        elif fails and not near_boundary(distance_pct, max_cand_dist):
+            status = "ineligible" if distance_pct is not None and abs(float(distance_pct)) > max_cand_dist * 2 else "n_a"
+        elif unknowns and not passes:
             status = "n_a"
-            gating = unknowns[0]
+            gating = gating or unknowns[0]
+        else:
+            status = "n_a"
+
+    if is_member and status not in {"member", "deletion_risk"}:
+        status = "deletion_risk" if gating else "member"
 
     return {
         "index": index_id,
@@ -634,10 +857,14 @@ def build_for_ticker(
     announcements: list[dict],
     today: date,
     mna_tickers: set[str] | None = None,
+    *,
+    breakpoint_mcap: float | None = None,
 ) -> dict:
     memberships = list((seed_entry or {}).get("memberships") or [])
     sec_type = mi.get("security_type")
     ineligible_types = set(rules.get("ineligible_security_types") or [])
+    max_cand = max_candidate_distance(rules)
+    nasdaq_deny = set((rules.get("indices") or {}).get("nasdaq_100", {}).get("exclude_tickers") or []) | NASDAQ_EXCLUDE_TICKERS
 
     scorecards: list[dict] = []
     if sec_type and sec_type in ineligible_types:
@@ -659,9 +886,28 @@ def build_for_ticker(
             is_member = index_id in memberships
             family = spec.get("family")
             if family == "sp_dji":
-                sc = scorecard_sp(index_id, spec, mi, is_member)
+                if index_id == "djia":
+                    # Price-weighted 30; no mcap band scorecard — seed / notices only
+                    sc = {
+                        "index": index_id,
+                        "status": "member" if is_member else "n_a",
+                        "checks": {},
+                        "gating_check": None if is_member else "membership_seed_only",
+                        "distance_to_boundary_pct": None,
+                        "confidence": "rules_only",
+                    }
+                else:
+                    sc = scorecard_sp(index_id, spec, mi, is_member, max_cand_dist=max_cand)
             elif family == "russell":
-                sc = scorecard_russell(index_id, spec, mi, is_member, universe_ranks)
+                sc = scorecard_russell(
+                    index_id,
+                    spec,
+                    mi,
+                    is_member,
+                    universe_ranks,
+                    max_cand_dist=max_cand,
+                    breakpoint_mcap=breakpoint_mcap,
+                )
             elif family in {"nasdaq", "msci", "tsx", "ftse", "stoxx", "asx", "nzx", "hsi", "nse", "sgx", "b3", "bmv", "jpx"}:
                 key = "min_mcap_usd"
                 if "min_mcap_cad" in spec:
@@ -670,9 +916,11 @@ def build_for_ticker(
                     key = "min_mcap_gbp"
                 elif "min_mcap_eur" in spec:
                     key = "min_mcap_eur"
-                sc = scorecard_mcap_min(index_id, spec, mi, is_member, key=key)
+                excluded = index_id == "nasdaq_100" and ticker.upper() in nasdaq_deny
+                sc = scorecard_mcap_min(
+                    index_id, spec, mi, is_member, key=key, max_cand_dist=max_cand, excluded=excluded
+                )
                 if family in {"jpx", "hsi", "nse", "sgx", "b3", "bmv", "asx", "nzx"} and not spec.get(key):
-                    # membership-seed primary
                     if is_member:
                         sc["status"] = "member"
                     else:
@@ -687,7 +935,6 @@ def build_for_ticker(
                     "distance_to_boundary_pct": None,
                     "confidence": "rules_only",
                 }
-            # If member from seed, force member unless deletion_risk already set
             if is_member and sc.get("status") not in {"deletion_risk"}:
                 sc["status"] = "member"
             scorecards.append(sc)
@@ -695,21 +942,26 @@ def build_for_ticker(
     t_anns = [a for a in announcements if a.get("ticker") == ticker]
     confirmed_events = []
     for a in t_anns:
-        confirmed_events.append(
-            {
-                "index": a.get("index"),
-                "action": a.get("action"),
-                "announced": a.get("announced"),
-                "effective": a.get("effective"),
-                "source_url": a.get("source_url"),
-                "source_type": a.get("source_type"),
-                "confidence": a.get("confidence"),
-                "title": a.get("title"),
-            }
-        )
-        # Mark matching scorecard confidence
+        # Surface provider_confirmed always; news only if quality_gated
+        if a.get("confidence") == "provider_confirmed" or a.get("quality_gated"):
+            confirmed_events.append(
+                {
+                    "ticker": ticker,
+                    "index": a.get("index"),
+                    "action": a.get("action"),
+                    "announced": a.get("announced"),
+                    "effective": a.get("effective"),
+                    "source_url": a.get("source_url"),
+                    "source_type": a.get("source_type"),
+                    "confidence": a.get("confidence"),
+                    "title": a.get("title"),
+                    "quality_gated": bool(a.get("quality_gated") or a.get("confidence") == "provider_confirmed"),
+                }
+            )
         for sc in scorecards:
-            if sc.get("index") == a.get("index"):
+            if sc.get("index") == a.get("index") and (
+                a.get("confidence") == "provider_confirmed" or a.get("quality_gated")
+            ):
                 conf = a.get("confidence") or "news_unconfirmed"
                 if conf == "provider_confirmed" or sc.get("confidence") != "provider_confirmed":
                     sc["confidence"] = conf
@@ -718,7 +970,6 @@ def build_for_ticker(
     next_ev = next_calendar_for_indices(calendar, index_ids, today)
     days_out = next_ev.get("days_out") if next_ev else None
 
-    # Primary watch scorecard for probability
     watch_sc = None
     for sc in scorecards:
         if sc.get("status") in {"inclusion_candidate", "deletion_risk"}:
@@ -735,7 +986,6 @@ def build_for_ticker(
         if d is not None and 0 <= d <= 30:
             confirmed_soon = True
 
-    # Deletion risk from M&A-ish titles in announcements
     for ev in confirmed_events:
         if ev.get("action") == "delete":
             for sc in scorecards:
@@ -750,7 +1000,6 @@ def build_for_ticker(
 
     pscore, shock = priority_score(scorecards, mi, days_out, rules, confirmed_soon)
 
-    # Display badge: worst/most actionable status
     badge = "n_a"
     for pref in ("deletion_risk", "inclusion_candidate", "member", "ineligible", "n_a"):
         if any(sc.get("status") == pref for sc in scorecards):
@@ -779,7 +1028,7 @@ def build_for_ticker(
     }
 
 
-def build(today: date | None = None) -> dict:
+def build(today: date | None = None, *, purge_announcements: bool = True) -> dict:
     today = today or date.today()
     rules = load_json(DATA_DIR / "index_rules.json", {})
     calendar = load_json(DATA_DIR / "index_calendar.json", {})
@@ -787,21 +1036,30 @@ def build(today: date | None = None) -> dict:
     registry = load_json(REGISTRY, {"holdings": {}})
     news = load_json(NEWS_PATH, {})
     fund_cache = load_fundamentals_cache()
+    holdings = registry.get("holdings") or {}
+    company_names = {t: (h.get("company") or "") for t, h in holdings.items()}
 
-    harvest_news_announcements(news, today)
+    harvest_news_announcements(
+        news, today, seed=seed, company_names=company_names, purge=purge_announcements
+    )
+    # After purge/live harvest: recover aged headlines from reviews + ticker news archives
+    harvest_archive_announcements(
+        seed=seed,
+        company_names=company_names,
+        holdings_tickers=set(holdings),
+    )
     announcements = load_announcements()
     seed = apply_confirmed_to_seed(seed, announcements, today)
-    # Persist seed updates from provider-confirmed
     save_json(DATA_DIR / "index_memberships_seed.json", seed)
     mna_tickers = corporate_action_tickers(news)
 
-    holdings = registry.get("holdings") or {}
     inputs_by_ticker = {}
     for ticker, meta in holdings.items():
         inputs_by_ticker[ticker] = market_inputs_for_ticker(
             ticker, holdings_meta=meta, fundamentals_cache=fund_cache
         )
     universe_ranks = build_universe_ranks(inputs_by_ticker)
+    bp_mcap = russell_breakpoint_mcap(inputs_by_ticker, seed)
 
     by_ticker = {}
     for ticker, meta in sorted(holdings.items()):
@@ -816,12 +1074,19 @@ def build(today: date | None = None) -> dict:
             announcements,
             today,
             mna_tickers=mna_tickers,
+            breakpoint_mcap=bp_mcap,
         )
 
+    max_cand = max_candidate_distance(rules)
     inclusion_candidates = sorted(
         t
         for t, row in by_ticker.items()
-        if any(sc.get("status") == "inclusion_candidate" for sc in row.get("scorecards") or [])
+        if row.get("badge_status") == "inclusion_candidate"
+        and any(
+            sc.get("status") == "inclusion_candidate"
+            and near_boundary(sc.get("distance_to_boundary_pct"), max_cand)
+            for sc in row.get("scorecards") or []
+        )
     )
     deletion_risks = sorted(
         t
@@ -843,11 +1108,13 @@ def build(today: date | None = None) -> dict:
     high_priority_watch = [
         t
         for t in high_priority
-        if (by_ticker[t].get("impact_proxy") or {}).get("priority_score", 0) >= 0.35
-        or by_ticker[t].get("badge_status") in {"inclusion_candidate", "deletion_risk"}
+        if by_ticker[t].get("badge_status") in {"inclusion_candidate", "deletion_risk"}
+        or (
+            (by_ticker[t].get("impact_proxy") or {}).get("priority_score") or 0
+        ) >= 0.45
+        and by_ticker[t].get("badge_status") == "inclusion_candidate"
     ][:40]
 
-    # Calendar strip with day counts
     cal_strip = []
     for ev in calendar.get("events") or []:
         eff = parse_date(ev.get("effective"))
@@ -858,6 +1125,13 @@ def build(today: date | None = None) -> dict:
             }
         )
     cal_strip.sort(key=lambda e: (e["days_out"] is None, e["days_out"] if e["days_out"] is not None else 9999))
+
+    quality_events = sum(
+        1
+        for row in by_ticker.values()
+        for ev in row.get("confirmed_events") or []
+        if ev.get("quality_gated")
+    )
 
     payload = {
         "generated": now_iso(),
@@ -874,6 +1148,8 @@ def build(today: date | None = None) -> dict:
             "confirmed_next_30d": sorted(set(confirmed_next_30d)),
             "high_priority_watch": high_priority_watch,
             "ticker_count": len(by_ticker),
+            "quality_gated_events": quality_events,
+            "max_candidate_distance_pct": max_cand,
         },
         "calendar": cal_strip,
     }
@@ -883,9 +1159,14 @@ def build(today: date | None = None) -> dict:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--date", default=None, help="As-of date YYYY-MM-DD")
+    ap.add_argument(
+        "--no-purge",
+        action="store_true",
+        help="Do not purge news_unconfirmed announcements before re-harvest",
+    )
     args = ap.parse_args()
     today = date.fromisoformat(args.date) if args.date else date.today()
-    payload = build(today=today)
+    payload = build(today=today, purge_announcements=not args.no_purge)
     save_json(OUT_PATH, payload)
     if DOCS_OUT.parent.exists():
         save_json(DOCS_OUT, payload)
@@ -894,7 +1175,8 @@ def main() -> int:
         f"Wrote {OUT_PATH} tickers={summary['ticker_count']} "
         f"candidates={len(summary['inclusion_candidates'])} "
         f"deletion_risks={len(summary['deletion_risks'])} "
-        f"high_priority={len(summary['high_priority_watch'])}"
+        f"high_priority={len(summary['high_priority_watch'])} "
+        f"quality_events={summary.get('quality_gated_events', 0)}"
     )
     return 0
 
