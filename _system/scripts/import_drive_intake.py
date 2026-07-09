@@ -53,6 +53,8 @@ INTAKE_FOLDER_PATHS = {
     for intake_kind, folder_name in INTAKE_TYPES.items()
 }
 ACCEPTED_INTAKE_PREFIXES = (INTAKE_PREFIX, LEGACY_INTAKE_PREFIX, "")
+# Misfiled intake PDFs (e.g. bare VIC numeric ids) are reported but must not block CI.
+NON_FATAL_ERRORS = frozenset({"missing_or_unknown_ticker"})
 
 sys.path.insert(0, str(SCRIPTS))
 from drive_store_common import (  # noqa: E402
@@ -270,6 +272,7 @@ def import_intake(
     imported: list[dict] = []
     skipped: list[dict] = []
     errors: list[dict] = []
+    warnings: list[dict] = []
     touched_tickers: set[str] = set()
 
     for item in sorted(items, key=lambda i: paths.get(i.get("id", ""), "")):
@@ -280,7 +283,11 @@ def import_intake(
         if not parsed:
             continue
         if parsed.get("error"):
-            errors.append({"drive_file_id": file_id, **parsed})
+            entry = {"drive_file_id": file_id, **parsed}
+            if parsed["error"] in NON_FATAL_ERRORS:
+                warnings.append(entry)
+            else:
+                errors.append(entry)
             continue
         if parsed["intake_kind"] not in include_kinds:
             continue
@@ -359,11 +366,13 @@ def import_intake(
         "summary": {
             "imported_count": len(imported),
             "skipped_count": len(skipped),
+            "warning_count": len(warnings),
             "error_count": len(errors),
             "touched_ticker_count": len(touched_tickers),
         },
         "imported": imported,
         "skipped": skipped[:200],
+        "warnings": warnings[:200],
         "errors": errors[:200],
     }
     if not dry_run:
@@ -387,14 +396,26 @@ def main() -> int:
         action="append",
         help="Restrict to intake kind. May be passed multiple times.",
     )
+    parser.add_argument(
+        "--strict",
+        action="store_true",
+        help="Exit non-zero when intake PDFs lack a repo ticker filename.",
+    )
     args = parser.parse_args()
     include_kinds = set(args.kind or INTAKE_TYPES)
     report = import_intake(args.dry_run, args.limit, args.force, include_kinds, args.ensure_folders)
     print("Drive intake import")
     for key, value in report["summary"].items():
         print(f"  {key}: {value}")
+    if report["warnings"]:
+        print(
+            "  warnings: rename intake PDFs to repo tickers "
+            "(for example FRMI.pdf or FRMI/writeup.pdf); see drive_intake_latest.json"
+        )
     if report["errors"]:
         print("  errors: inspect intake paths; expected Admin/{VIC,Research,Company}/{TICKER}.pdf or ticker subfolders")
+    if args.strict and report["warnings"]:
+        return 2
     return 0 if not report["errors"] else 2
 
 
