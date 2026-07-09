@@ -3228,6 +3228,7 @@
       { id: 'inflections', label: 'Inflections' },
       { id: 'overview', label: 'Overview' },
       { id: 'events', label: 'What changed' },
+      { id: 'index_watch', label: 'Index Watch' },
       { id: 'consensus', label: 'Consensus' },
       { id: 'funds', label: 'Funds' },
       { id: 'documents', label: 'PDF library' },
@@ -3252,6 +3253,13 @@
         eventTier,
         triageSummary: (insights?.provenance || {}).event_triage_summary || {},
       });
+    } else if (activeSection === 'index_watch') {
+      const indexPayload = options?.indexMembership || null;
+      if (global.IndexViz && indexPayload) {
+        body = global.IndexViz.renderIndexWatch(indexPayload, { escapeHtml, linkHtml });
+      } else {
+        body = '<p class="muted">Index membership not built. Run: python _system/scripts/build_index_membership.py</p>';
+      }
     } else if (activeSection === 'consensus') {
       body = renderConsensus(insights?.consensus, escapeHtml, linkHtml, ghRepo, {
         quarter: periodQuarter,
