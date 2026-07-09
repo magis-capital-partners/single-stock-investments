@@ -28,6 +28,19 @@ def _strip_series(bt: dict) -> dict:
     return {k: bt[k] for k in keys if k in bt}
 
 
+def _method_from_bt(bt: dict) -> dict:
+    if bt.get("error"):
+        return {"error": bt["error"], "stats": _strip_series(bt)}
+    series = bt.get("series") or {}
+    stats_src = {k: v for k, v in bt.items() if k != "series"}
+    return {
+        "stats": _strip_series(stats_src),
+        "dates": series.get("dates") or [],
+        "equity_index": series.get("equity_index") or [],
+        "holdings_snapshots": series.get("holdings_snapshots") or [],
+    }
+
+
 def build_method_visualizations(
     *,
     tickers: list[str],
@@ -38,6 +51,9 @@ def build_method_visualizations(
     falsifier_map: dict[str, int],
     policy_fns: dict[str, PolicyFn],
     rebalance_frequency: str,
+    covered_call_bt: dict | None = None,
+    covered_call_proxy_bt: dict | None = None,
+    covered_call_proxy_key: str = "xyld",
 ) -> dict:
     """Run detailed simulate for each allocation method (dashboard charts)."""
     methods: dict[str, dict] = {}
@@ -79,6 +95,11 @@ def build_method_visualizations(
         }
     else:
         methods["spy"] = {"error": spy_bt.get("error"), "stats": _strip_series(spy_bt)}
+
+    if covered_call_bt and not covered_call_bt.get("error"):
+        methods["covered_call"] = _method_from_bt(covered_call_bt)
+    if covered_call_proxy_bt and not covered_call_proxy_bt.get("error"):
+        methods[covered_call_proxy_key or "xyld"] = _method_from_bt(covered_call_proxy_bt)
 
     return {
         "calendar_start": dates[0] if dates else None,

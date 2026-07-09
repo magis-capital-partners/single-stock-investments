@@ -209,6 +209,8 @@
   .source-open-link:hover { text-decoration: underline; }
   .memory-score-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
   .memory-biotech { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 8px 0; }
+  .memory-sub-nav .view-tab { font-size: 13px; padding: 6px 12px; }
+  .memory-filter-row .source-pill { font-size: 12px; }
   @media (max-width: 520px) { .memory-score-row { grid-template-columns: 1fr; } }
   .divergence-flag { color: var(--accent-amber); margin-left: 4px; }
   .lens-delta-warn { color: var(--accent-amber); font-weight: 700; }
@@ -652,6 +654,7 @@
 <script src="oauth.js"></script>
 <script>
 const GH_REPO = 'magis-capital-partners/single-stock-investments';
+const GITHUB_REPO = GH_REPO;
 const DISPATCH_EVENT = 'onboard-ticker';
 const MARKET_BADGE = {
   SE: 'badge-se', AU: 'badge-se', UK: 'badge-us', US: 'badge-us', JP: 'badge-jp',
@@ -776,6 +779,26 @@ const CONSENSUS_VIEW_KEY = 'ssp_consensus_view_v1';
 const THEMES_VIEW_KEY = 'ssp_themes_view_v1';
 const TICKER_VIEW_KEY = 'ssp_ticker_view_v1';
 const TICKER_SORT_KEY = 'ssp_ticker_sort_v1';
+const MEMORY_VIEW_KEY = 'ssp_memory_view_v1';
+const MEMORY_TYPE_KEY = 'ssp_memory_type_v1';
+const BIOTECH_SCOPE_KEY = 'ssp_biotech_scope_v1';
+
+let memoryViewMode = (() => {
+  try { return localStorage.getItem(MEMORY_VIEW_KEY) || 'ledger'; } catch (_) { return 'ledger'; }
+})();
+let memoryTypeFilter = (() => {
+  try { return localStorage.getItem(MEMORY_TYPE_KEY) || 'all'; } catch (_) { return 'all'; }
+})();
+let memoryBiotechOnly = false;
+let biotechScope = (() => {
+  try { return localStorage.getItem(BIOTECH_SCOPE_KEY) || 'book'; } catch (_) { return 'book'; }
+})();
+let biotechConvergenceOnly = false;
+let biotechSpendQ4 = false;
+let biotechSizeFilter = 'all';
+let biotechIssuerSizeFilter = 'all';
+let biotechSearch = '';
+let biotechShowLimit = 40;
 
 function normalizeAppHash(nextHash) {
   if (nextHash == null || nextHash === '') return '';
@@ -860,6 +883,9 @@ const DARWIN_METHOD_LABELS = {
   ensemble: 'Ensemble',
   champion: 'Champion (live)',
   spy: 'SPY',
+  covered_call: 'Covered call (sim)',
+  xyld: 'XYLD (ETF proxy)',
+  bxm: 'BXM (ETF proxy)',
 };
 
 const CHART_COLORS = [
@@ -1208,6 +1234,16 @@ function renderInsights(opts = {}) {
     inflectionTier: insightsInflectionTier,
     eventTier: insightsEventTier,
     themesViewMode: insightsThemesViewMode,
+    memoryViewMode,
+    memoryTypeFilter,
+    memoryBiotechOnly,
+    biotechScope,
+    biotechConvergenceOnly,
+    biotechSpendQ4,
+    biotechSizeFilter,
+    biotechIssuerSizeFilter,
+    biotechSearch,
+    biotechShowLimit,
   });
   content.querySelectorAll('[data-use-latest-quarter]').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -1290,6 +1326,82 @@ function renderInsights(opts = {}) {
   if (needsReview) {
     needsReview.addEventListener('change', () => {
       insightsNeedsReviewOnly = needsReview.checked;
+      renderInsights();
+    });
+  }
+  content.querySelectorAll('[data-memory-view]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      memoryViewMode = btn.dataset.memoryView || 'ledger';
+      try { localStorage.setItem(MEMORY_VIEW_KEY, memoryViewMode); } catch (_) { /* ignore */ }
+      renderInsights();
+    });
+  });
+  content.querySelectorAll('[data-memory-type]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      memoryTypeFilter = btn.dataset.memoryType || 'all';
+      try { localStorage.setItem(MEMORY_TYPE_KEY, memoryTypeFilter); } catch (_) { /* ignore */ }
+      renderInsights();
+    });
+  });
+  const memoryBiotech = content.querySelector('#memory-biotech-only');
+  if (memoryBiotech) {
+    memoryBiotech.addEventListener('change', () => {
+      memoryBiotechOnly = memoryBiotech.checked;
+      renderInsights();
+    });
+  }
+  content.querySelectorAll('[data-biotech-scope]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      biotechScope = btn.dataset.biotechScope || 'book';
+      try { localStorage.setItem(BIOTECH_SCOPE_KEY, biotechScope); } catch (_) { /* ignore */ }
+      renderInsights();
+    });
+  });
+  const biotechConv = content.querySelector('#biotech-convergence-only');
+  if (biotechConv) {
+    biotechConv.addEventListener('change', () => {
+      biotechConvergenceOnly = biotechConv.checked;
+      renderInsights();
+    });
+  }
+  const biotechSpend = content.querySelector('#biotech-spend-q4');
+  if (biotechSpend) {
+    biotechSpend.addEventListener('change', () => {
+      biotechSpendQ4 = biotechSpend.checked;
+      renderInsights();
+    });
+  }
+  const biotechSize = content.querySelector('#biotech-size-filter');
+  if (biotechSize) {
+    biotechSize.addEventListener('change', () => {
+      biotechSizeFilter = biotechSize.value || 'all';
+      renderInsights();
+    });
+  }
+  const biotechIssuerSize = content.querySelector('#biotech-issuer-size-filter');
+  if (biotechIssuerSize) {
+    biotechIssuerSize.addEventListener('change', () => {
+      biotechIssuerSizeFilter = biotechIssuerSize.value || 'all';
+      renderInsights();
+    });
+  }
+  const biotechSearchEl = content.querySelector('#biotech-search');
+  if (biotechSearchEl) {
+    biotechSearchEl.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Enter') {
+        biotechSearch = biotechSearchEl.value || '';
+        renderInsights();
+      }
+    });
+    biotechSearchEl.addEventListener('change', () => {
+      biotechSearch = biotechSearchEl.value || '';
+      renderInsights();
+    });
+  }
+  const biotechMore = content.querySelector('#biotech-show-more');
+  if (biotechMore) {
+    biotechMore.addEventListener('click', () => {
+      biotechShowLimit += 40;
       renderInsights();
     });
   }
@@ -1442,6 +1554,10 @@ function renderDarwin() {
   const btInception = paper.backtest_at_inception || d.paper_portfolio?.backtest_at_inception || {};
   const acctLabel = activeDarwinAccount === 'roth' ? 'Roth IRA' : 'Taxable';
   const spy = d.benchmarks?.spy || {};
+  const ccBench = d.benchmarks?.covered_call || {};
+  const ccCfg = d.covered_call || {};
+  const proxyKey = (ccCfg.etf_proxy_ticker || '').toLowerCase();
+  const proxyBench = proxyKey ? (d.benchmarks?.[proxyKey] || {}) : {};
   const regime = typeof d.regime === 'object' ? d.regime : { label: d.regime };
   const macro = regime.macro_detail || {};
   const conflicts = d.conflicts || [];
@@ -1449,12 +1565,27 @@ function renderDarwin() {
   const turnoverOk = (d.turnover_used_pct ?? 0) <= (d.turnover_budget_pct ?? 15);
   const excessVsSpy = champ.cumulative_return != null && spy.cumulative_return != null
     ? ((champ.cumulative_return - spy.cumulative_return) * 100).toFixed(1) : null;
+  const excessCcVsSpy = ccBench.cumulative_return != null && spy.cumulative_return != null && !ccBench.error
+    ? ((ccBench.cumulative_return - spy.cumulative_return) * 100).toFixed(1) : null;
+  const univSpec = d.universe_spec || d.mandate?.universe || '—';
+  const univCount = d.universe_count != null ? d.universe_count : (d.weights || []).length;
+  const fmtPct = (v) => v != null && !Number.isNaN(v) ? (v * 100).toFixed(1) + '%' : '—';
+  const fmtSharpe = (v) => v != null ? v : '—';
+  const strategyRows = [
+    { key: 'champion', label: 'Champion (long-only)', b: champ },
+    { key: 'covered_call', label: 'Covered call (sim)', b: ccBench },
+    { key: 'spy', label: 'SPY', b: spy },
+  ];
+  if (proxyKey && proxyBench && !proxyBench.error) {
+    strategyRows.push({ key: proxyKey, label: proxyKey.toUpperCase() + ' (ETF proxy)', b: proxyBench });
+  }
   content.innerHTML = `
     <h2 style="font-size:18px;margin-bottom:6px">Darwin · ${escapeHtml(acctLabel)} paper book</h2>
     <p class="subhead" style="margin-bottom:14px">
       Tier ${escapeHtml(String(d.tier ?? '0'))} · ${escapeHtml(d.generated_at || '')} · phase ${escapeHtml(d.phase || '—')}
       · <span class="badge badge-purple">${escapeHtml(d.account_profile || activeDarwinAccount)}</span>
       · policy <span class="mono">${escapeHtml(d.policy_id || '—')}</span>
+      · universe <span class="mono">${escapeHtml(univSpec)}</span>${univCount != null ? ` · ${univCount} names` : ''}
       ${d.exploration?.enabled ? ' · <span class="badge badge-purple">exploration</span>' : ''}
       ${d.benchmarks?.ml_selected === false && !d.exploration?.enabled ? ' · <span class="badge badge-warn">ML gated</span>' : ''}
       ${d.pit?.audit_pass === false ? ' · <span class="badge badge-warn">PIT leak</span>' : (d.pit?.audit_pass ? ' · <span class="badge badge-ok">PIT ok</span>' : '')}
@@ -1481,9 +1612,9 @@ function renderDarwin() {
     <div class="darwin-grid">
       <div class="summary-card"><div class="label">Regime</div><div class="value" style="font-size:16px">${escapeHtml(regime.label || '—')}</div><div class="sub">research ${escapeHtml(regime.research || '—')} · macro ${escapeHtml(regime.macro || '—')}</div></div>
       <div class="summary-card"><div class="label">Turnover</div><div class="value" style="font-size:16px;color:${turnoverOk ? 'var(--accent-green)' : 'var(--accent-amber)'}">${d.turnover_used_pct ?? '—'}%</div><div class="sub">budget ${d.turnover_budget_pct ?? 15}% · ${escapeHtml(d.rebalance_frequency || '')}</div></div>
-      <div class="summary-card"><div class="label">Sharpe (prod)</div><div class="value" style="font-size:16px">${champ.sharpe_annualized ?? '—'}</div><div class="sub">vs SPY ${spy.sharpe_annualized ?? '—'}</div></div>
+      <div class="summary-card"><div class="label">Sharpe (prod)</div><div class="value" style="font-size:16px">${champ.sharpe_annualized ?? '—'}</div><div class="sub">vs SPY ${spy.sharpe_annualized ?? '—'}${!ccBench.error && ccBench.sharpe_annualized != null ? ' · vs CC ' + ccBench.sharpe_annualized : ''}</div></div>
       <div class="summary-card"><div class="label">Sharpe (PIT OOS)</div><div class="value" style="font-size:16px">${d.pit?.oos_sharpe_genetic ?? '—'}</div><div class="sub">genetic · ${d.pit?.oos_periods ?? '—'} periods</div></div>
-      <div class="summary-card"><div class="label">Cumulative</div><div class="value" style="font-size:16px">${champ.cumulative_return != null ? (champ.cumulative_return * 100).toFixed(1) + '%' : '—'}</div><div class="sub">${excessVsSpy != null ? 'excess vs SPY ' + excessVsSpy + 'pp' : 'log compounding'}</div></div>
+      <div class="summary-card"><div class="label">Cumulative</div><div class="value" style="font-size:16px">${champ.cumulative_return != null ? (champ.cumulative_return * 100).toFixed(1) + '%' : '—'}</div><div class="sub">${excessVsSpy != null ? 'excess vs SPY ' + excessVsSpy + 'pp' : 'log compounding'}${excessCcVsSpy != null ? ' · CC excess ' + excessCcVsSpy + 'pp' : ''}</div></div>
       <div class="summary-card"><div class="label">Macro</div><div class="value" style="font-size:14px">VIX ${macro.vix ?? '—'}</div><div class="sub">10Y ${macro.yield_10y ?? '—'}% · ${macro.as_of_month || 'n/a'}</div></div>
       <div class="summary-card"><div class="label">Evolution</div><div class="value" style="font-size:14px">${d.policy_detail?.population_loaded ?? 0} seeds</div><div class="sub">${(d.price_panel?.months || 0)} mo history</div></div>
     </div>
@@ -1519,13 +1650,63 @@ function renderDarwin() {
       <h3>Benchmarks (in-sample production sim)</h3>
       <table class="darwin-table">
         <thead><tr><th>Policy</th><th>Sharpe</th><th>Cum ret</th><th>Turnover</th></tr></thead>
-        <tbody>${['ira_marvin','equal_weight','irr_ranked','champion','spy'].concat(d.tier === 0 ? [] : ['risk_parity_vol','genetic','ppo','ensemble']).map(k => {
+        <tbody>${['ira_marvin','equal_weight','irr_ranked','champion','spy'].concat(d.tier === 0 ? [] : ['risk_parity_vol','genetic','ppo','ensemble']).concat((!ccBench.error && ccBench.periods) ? ['covered_call'] : []).concat((proxyKey && proxyBench && !proxyBench.error) ? [proxyKey] : []).map(k => {
           const b = d.benchmarks?.[k] || {};
           if (b.error) return '';
           const hi = k === (d.policy_id === 'ensemble' ? 'ensemble' : d.policy_id) || k === 'champion';
-          return `<tr style="${hi ? 'background:var(--bg-card)' : ''}"><td class="mono">${k}${hi ? ' ★' : ''}</td><td>${b.sharpe_annualized ?? '—'}</td><td>${b.cumulative_return != null ? (b.cumulative_return*100).toFixed(1)+'%' : '—'}</td><td>${b.avg_turnover_one_way != null ? (b.avg_turnover_one_way*100).toFixed(1)+'%' : '—'}</td></tr>`;
+          const label = (window.DarwinViz && DarwinViz.labels && DarwinViz.labels[k]) || DARWIN_METHOD_LABELS[k] || k;
+          return `<tr style="${hi ? 'background:var(--bg-card)' : ''}"><td class="mono">${escapeHtml(label)}${hi ? ' ★' : ''}</td><td>${b.sharpe_annualized ?? '—'}</td><td>${b.cumulative_return != null ? (b.cumulative_return*100).toFixed(1)+'%' : '—'}</td><td>${b.avg_turnover_one_way != null ? (b.avg_turnover_one_way*100).toFixed(1)+'%' : '—'}</td></tr>`;
         }).join('')}</tbody>
       </table>
+    </div>
+    <div class="detail-section">
+      <h3>Covered-call strategy (S&amp;P liquidity book)</h3>
+      <p class="subhead" style="margin-bottom:10px">
+        Allocation universe is registry holdings that are also in the S&amp;P 500 (liquidity / SPY-comparable screen from the Darwin AI Ventures meeting).
+        The covered-call track is a <strong>synthetic</strong> monthly buy-write overlay on champion weights (premium + upside cap × coverage).
+        It is <strong>not</strong> the proprietary Darwin AI Ventures neural-network model.
+      </p>
+      ${activeDarwinAccount === 'taxable' ? '<p class="subhead" style="margin-bottom:10px;color:var(--accent-amber)">Taxable note: short-dated covered calls are typically tax-inefficient (mostly short-term gains).</p>' : ''}
+      <table class="darwin-table" style="margin-bottom:12px">
+        <thead><tr><th>Param</th><th>Value</th></tr></thead>
+        <tbody>
+          <tr><td>Mode</td><td class="mono">${escapeHtml(ccCfg.mode || '—')}</td></tr>
+          <tr><td>Premium yield (annual)</td><td class="mono">${ccCfg.premium_yield_annual_pct != null ? ccCfg.premium_yield_annual_pct + '%' : '—'}</td></tr>
+          <tr><td>Upside cap (monthly)</td><td class="mono">${ccCfg.upside_cap_monthly_pct != null ? ccCfg.upside_cap_monthly_pct + '%' : '—'}</td></tr>
+          <tr><td>Coverage fraction</td><td class="mono">${ccCfg.coverage_fraction != null ? (ccCfg.coverage_fraction * 100).toFixed(0) + '%' : '—'}</td></tr>
+          <tr><td>ETF proxy</td><td class="mono">${escapeHtml(ccCfg.etf_proxy_ticker || '—')}${proxyBench.error ? ' (returns missing)' : ''}</td></tr>
+          <tr><td>S&amp;P constituents as-of</td><td class="mono">${escapeHtml((d.sp500 && d.sp500.as_of) || '—')}</td></tr>
+        </tbody>
+      </table>
+      <h4 style="font-size:14px;margin:12px 0 6px">Strategy comparison</h4>
+      <table class="darwin-table" style="margin-bottom:12px">
+        <thead><tr><th>Track</th><th>Cum ret</th><th>Ann vol</th><th>Max DD</th><th>Sharpe</th><th>Excess vs SPY</th></tr></thead>
+        <tbody>${strategyRows.map(row => {
+          const b = row.b || {};
+          if (b.error) return `<tr><td class="mono">${escapeHtml(row.label)}</td><td colspan="5">${escapeHtml(b.error)}</td></tr>`;
+          const xs = b.cumulative_return != null && spy.cumulative_return != null
+            ? ((b.cumulative_return - spy.cumulative_return) * 100).toFixed(1) + 'pp' : '—';
+          return `<tr style="${row.key === 'covered_call' || row.key === 'champion' ? 'background:var(--bg-card)' : ''}">
+            <td class="mono">${escapeHtml(row.label)}</td>
+            <td>${fmtPct(b.cumulative_return)}</td>
+            <td>${fmtPct(b.volatility_annualized)}</td>
+            <td>${fmtPct(b.max_drawdown_pct)}</td>
+            <td>${fmtSharpe(b.sharpe_annualized)}</td>
+            <td>${row.key === 'spy' ? '—' : xs}</td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table>
+      <h4 style="font-size:14px;margin:12px 0 6px">Eligible book (target weights on S&amp;P names)</h4>
+      <table class="darwin-table">
+        <thead><tr><th>Ticker</th><th>Weight</th><th>Stance</th><th>IRR</th></tr></thead>
+        <tbody>${(d.weights || []).map(w => `<tr>
+          <td class="mono ticker-cell">${escapeHtml(w.ticker)}</td>
+          <td class="mono">${w.weight_pct}%</td>
+          <td><span class="badge ${STANCE_BADGE[w.stance] || 'badge-warn'}">${escapeHtml(w.stance || '—')}</span></td>
+          <td class="mono">${w.irr_base_pct != null ? w.irr_base_pct + '%' : '—'}</td>
+        </tr>`).join('') || '<tr><td colspan="4">No S&amp;P-overlap weights</td></tr>'}</tbody>
+      </table>
+      <p class="subhead" style="margin-top:8px">${escapeHtml(ccCfg.disclaimer || 'Synthetic covered-call overlay for research.')}</p>
     </div>
     <div class="detail-section">
       <h3>Factor attribution</h3>
@@ -1980,7 +2161,7 @@ function selectTicker(ticker, opts = {}) {
     </div>`
     : '';
   const researchMemory = iv
-    ? iv.renderResearchMemory(t.research_memory, escapeHtml, linkHtml)
+    ? iv.renderResearchMemory(t.research_memory, escapeHtml, linkHtml, GH_REPO)
     : '';
   const discussants = (data.insights?.ticker_discussants || {})[t.ticker]
     || (data.insights?.ticker_discussants || {})[t.ticker.toUpperCase()]

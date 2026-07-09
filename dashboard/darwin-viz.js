@@ -10,6 +10,9 @@
     ensemble: 'Ensemble',
     champion: 'Champion (live)',
     spy: 'SPY',
+    covered_call: 'Covered call (sim)',
+    xyld: 'XYLD (ETF proxy)',
+    bxm: 'BXM (ETF proxy)',
   };
 
   const CHART_COLORS = [
@@ -188,5 +191,6 @@
     renderPerfTable,
     renderChartsHtml,
     mountCharts,
+    labels: DARWIN_METHOD_LABELS,
   };
 })(window);

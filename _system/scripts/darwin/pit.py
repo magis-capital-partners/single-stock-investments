@@ -42,22 +42,30 @@ def load_registry_raw() -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def holdings_universe_as_of(as_of: str, registry: dict | None = None) -> list[str]:
+def holdings_universe_as_of(
+    as_of: str,
+    registry: dict | None = None,
+    universe_spec: str = "registry_holdings",
+) -> list[str]:
     """Holdings with onboarded <= as_of and not removed before as_of."""
+    from .universe import resolve_universe
+
     reg = registry or load_registry_raw()
     cutoff = parse_iso_date(as_of)
     if not cutoff:
-        return sorted((reg.get("holdings") or {}).keys())
-    out: list[str] = []
-    for ticker, h in (reg.get("holdings") or {}).items():
-        ob = parse_iso_date(h.get("onboarded"))
-        if ob and ob > cutoff:
-            continue
-        rem = parse_iso_date(h.get("removed"))
-        if rem and rem <= cutoff:
-            continue
-        out.append(ticker)
-    return sorted(out)
+        base = sorted((reg.get("holdings") or {}).keys())
+    else:
+        out: list[str] = []
+        for ticker, h in (reg.get("holdings") or {}).items():
+            ob = parse_iso_date(h.get("onboarded"))
+            if ob and ob > cutoff:
+                continue
+            rem = parse_iso_date(h.get("removed"))
+            if rem and rem <= cutoff:
+                continue
+            out.append(ticker)
+        base = sorted(out)
+    return resolve_universe(universe_spec, reg, as_of=as_of, base_tickers=base)
 
 
 def valuation_history_dir(ticker_dir: Path) -> Path:

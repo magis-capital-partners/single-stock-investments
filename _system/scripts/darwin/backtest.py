@@ -169,6 +169,7 @@ def benchmark_buy_hold(
     returns_series: list[float],
     rebalance_frequency: str = "semiannual",
     track_series: bool = False,
+    label: str = "spy_buy_hold",
 ) -> dict:
     """SPY or equal-weight benchmark on same calendar."""
     if len(returns_series) < 4:
@@ -192,7 +193,7 @@ def benchmark_buy_hold(
     if not period_rets:
         return {"error": "no_returns", "periods": 0}
     out = _stats_from_series(period_rets, log_equity)
-    out["label"] = "spy_buy_hold"
+    out["label"] = label
     out["rebalance_frequency"] = rebalance_frequency
     if track_series:
         out["series"] = {
@@ -200,6 +201,86 @@ def benchmark_buy_hold(
             "equity_index": series_equity,
             "holdings_snapshots": [
                 {"date": dates[0] if dates else "", "weights": [{"ticker": "SPY", "weight_pct": 100.0}]}
+            ],
+        }
+    return out
+
+
+def apply_covered_call_overlay(
+    stock_ret: float,
+    premium_monthly: float,
+    upside_cap: float,
+    coverage: float,
+) -> float:
+    """Blend uncovered stock return with a capped covered-call sleeve.
+
+    Covered sleeve: min(stock_ret, upside_cap) + premium_monthly
+    Uncovered sleeve: stock_ret
+    Blend by coverage in [0, 1].
+    """
+    cov = max(0.0, min(1.0, float(coverage)))
+    covered = min(float(stock_ret), float(upside_cap)) + float(premium_monthly)
+    return (1.0 - cov) * float(stock_ret) + cov * covered
+
+
+def benchmark_covered_call(
+    dates: list[str],
+    returns_by_ticker: dict[str, list[float]],
+    weights: dict[str, float],
+    params: dict,
+    rebalance_frequency: str = "semiannual",
+    track_series: bool = False,
+) -> dict:
+    """Synthetic buy-write on a fixed weight book (champion weights)."""
+    if not weights or len(dates) < 4:
+        return {"error": "insufficient_inputs", "periods": 0}
+    annual_prem = float(params.get("premium_yield_annual_pct", 8.0))
+    premium_monthly = annual_prem / 100.0 / 12.0
+    upside_cap = float(params.get("upside_cap_monthly_pct", 2.0)) / 100.0
+    coverage = float(params.get("coverage_fraction", 0.20))
+    freq = rebalance_frequency or "semiannual"
+    rebals = rebalance_points(dates, freq)
+    if len(rebals) < 2:
+        return {"error": "insufficient_dates", "periods": 0}
+
+    period_rets: list[float] = []
+    log_equity = [0.0]
+    series_dates: list[str] = []
+    series_equity: list[float] = []
+    for ri in range(len(rebals) - 1):
+        start, end = rebals[ri], rebals[ri + 1]
+        for mi in range(start, end):
+            r_row = {
+                t: returns_by_ticker[t][mi]
+                for t in weights
+                if t in returns_by_ticker and mi < len(returns_by_ticker.get(t, []))
+            }
+            stock_pr = portfolio_return(weights, r_row)
+            pr = apply_covered_call_overlay(stock_pr, premium_monthly, upside_cap, coverage)
+            period_rets.append(pr)
+            log_equity.append(log_equity[-1] + math.log1p(pr))
+            if track_series:
+                d = dates[mi] if mi < len(dates) else dates[-1]
+                series_dates.append(d)
+                series_equity.append(round(math.exp(log_equity[-1]), 6))
+    if not period_rets:
+        return {"error": "no_returns", "periods": 0}
+    out = _stats_from_series(period_rets, log_equity)
+    out["avg_turnover_one_way"] = 0.0
+    out["rebalance_frequency"] = freq
+    out["label"] = params.get("label") or "synthetic_covered_call"
+    out["covered_call_params"] = {
+        "premium_yield_annual_pct": annual_prem,
+        "upside_cap_monthly_pct": upside_cap * 100.0,
+        "coverage_fraction": coverage,
+        "mode": params.get("mode") or "synthetic",
+    }
+    if track_series:
+        out["series"] = {
+            "dates": series_dates,
+            "equity_index": series_equity,
+            "holdings_snapshots": [
+                {"date": dates[0] if dates else "", "weights": _snapshot_weights(weights)}
             ],
         }
     return out

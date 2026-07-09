@@ -64,7 +64,7 @@ def run_pit_backtest(fast: bool = False) -> dict:
     allow_latent_pit = bool(pit_cfg.get("encoder_in_pit", False))
     events = load_events()
 
-    latest = build_features()
+    latest = build_features(mandate_doc)
     rows_seed = latest["tickers"]
     if not rows_seed:
         return {"error": "no_holdings"}

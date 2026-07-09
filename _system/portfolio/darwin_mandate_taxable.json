@@ -8,7 +8,7 @@
   "mandate": {
     "long_only": true,
     "allow_short": false,
-    "universe": "registry_holdings",
+    "universe": "registry_sp500",
     "min_names": 8,
     "max_names": 12,
     "max_weight_pct": 12.0,
@@ -96,5 +96,14 @@
   "training": {
     "price_history_months": 60
   },
-  "disclaimer": "Taxable paper portfolio / research tool. Not tax or investment advice. Tax-loss harvest flag is advisory only until lot tracking is implemented."
+  "covered_call": {
+    "enabled": true,
+    "mode": "synthetic",
+    "premium_yield_annual_pct": 8.0,
+    "upside_cap_monthly_pct": 2.0,
+    "coverage_fraction": 0.20,
+    "etf_proxy_ticker": "XYLD",
+    "label": "synthetic_covered_call"
+  },
+  "disclaimer": "Taxable paper portfolio / research tool. Not tax or investment advice. Tax-loss harvest flag is advisory only until lot tracking is implemented. Covered-call track is a synthetic overlay for research, not Darwin AI Ventures proprietary model. Short-dated call writing is typically tax-inefficient in taxable accounts."
 }

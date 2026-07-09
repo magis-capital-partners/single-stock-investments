@@ -38,7 +38,7 @@ def run_pit_audit(fast: bool = False) -> dict:
     pit_cfg = pit_mandate_cfg(mandate_doc)
     lag = int(pit_cfg.get("research_publication_lag_days", 0))
 
-    latest = build_features()
+    latest = build_features(mandate_doc)
     rows_latest = latest["tickers"]
     if not rows_latest:
         return {"error": "no_holdings", "leakage_count": 0}
@@ -60,7 +60,7 @@ def run_pit_audit(fast: bool = False) -> dict:
     for ri in range(len(rebals) - 1):
         start = rebals[ri]
         as_of = dates[start] if start < len(dates) else dates[-1]
-        pit_rows = rows_at_rebalance(as_of, lag_days=lag)
+        pit_rows = rows_at_rebalance(as_of, lag_days=lag, mandate=mandate_doc)
         pit_by = {r["ticker"]: r for r in pit_rows}
         static_by = {r["ticker"]: r for r in rows_latest}
 

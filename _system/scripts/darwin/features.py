@@ -312,37 +312,54 @@ def feature_row(
     }
 
 
-def holdings_universe() -> list[str]:
+def _universe_spec_from_mandate(mandate: dict | None) -> str:
+    if not mandate:
+        return "registry_holdings"
+    m = mandate.get("mandate") or mandate
+    return (m.get("universe") or "registry_holdings").strip()
+
+
+def holdings_universe(mandate: dict | None = None) -> list[str]:
+    from .universe import resolve_universe
+
     reg = load_registry()
     holdings = sorted((reg.get("holdings") or {}).keys())
-    if holdings:
-        return holdings
-    return sorted(parse_holdings().keys())
+    if not holdings:
+        holdings = sorted(parse_holdings().keys())
+        reg = {"holdings": {t: {} for t in holdings}}
+    return resolve_universe(_universe_spec_from_mandate(mandate), reg, base_tickers=holdings)
 
 
-def build_features() -> dict:
-    return build_features_as_of(None)
+def build_features(mandate: dict | None = None) -> dict:
+    return build_features_as_of(None, mandate=mandate)
 
 
-def build_features_as_of(as_of: str | None) -> dict:
+def build_features_as_of(as_of: str | None, mandate: dict | None = None) -> dict:
+    from .universe import resolve_universe, sp500_meta, universe_exclusion_sample
+
     holdings_meta = parse_holdings()
     reg = load_registry()
     for t, h in (reg.get("holdings") or {}).items():
         holdings_meta.setdefault(t, {"company": h.get("company", t), "market": h.get("market", "—")})
     portfolio_class = load_classification()
+    spec = _universe_spec_from_mandate(mandate)
     if as_of:
         from .pit import effective_as_of, holdings_universe_as_of, load_registry_snapshot_as_of
 
         eff = effective_as_of(as_of, 0)
         snap_reg = load_registry_snapshot_as_of(eff) or reg
-        tickers = holdings_universe_as_of(eff, snap_reg)
+        tickers = holdings_universe_as_of(eff, snap_reg, universe_spec=spec)
         reg = snap_reg
     else:
-        tickers = holdings_universe()
+        tickers = resolve_universe(spec, reg)
     rows = [feature_row(t, holdings_meta, portfolio_class, as_of=as_of, registry=reg) for t in tickers]
     return {
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "as_of": as_of,
+        "universe_spec": spec,
+        "universe_count": len(rows),
+        "universe_excluded_sample": universe_exclusion_sample(reg, tickers),
+        "sp500": sp500_meta() if "sp500" in spec.lower() else None,
         "ticker_count": len(rows),
         "feature_dim": len(rows[0]["feature_vector"]) if rows else 0,
         "feature_names": rows[0]["feature_names"] if rows else [],
@@ -354,6 +371,7 @@ def rows_at_rebalance(
     rebalance_date: str,
     lag_days: int = 0,
     prefer_snapshot: bool = True,
+    mandate: dict | None = None,
 ) -> list[dict]:
     """PIT feature rows for one rebalance date."""
     from .pit import effective_as_of, load_features_snapshot_as_of
@@ -364,5 +382,19 @@ def rows_at_rebalance(
         if snap and snap.get("tickers"):
             snap_day = (snap.get("generated_at") or "")[:10]
             if snap_day and snap_day <= eff:
+                # Filter snapshot to current universe spec when mandate provided
+                if mandate is not None:
+                    from .universe import resolve_universe
+
+                    reg = load_registry()
+                    spec = _universe_spec_from_mandate(mandate)
+                    allowed = set(
+                        resolve_universe(
+                            spec,
+                            reg,
+                            base_tickers=[r["ticker"] for r in snap["tickers"]],
+                        )
+                    )
+                    return [r for r in snap["tickers"] if r["ticker"] in allowed]
                 return snap["tickers"]
-    return build_features_as_of(eff)["tickers"]
+    return build_features_as_of(eff, mandate=mandate)["tickers"]

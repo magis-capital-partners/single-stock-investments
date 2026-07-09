@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from .attribution import factor_attribution
-from .backtest import benchmark_buy_hold, simulate
+from .backtest import benchmark_buy_hold, benchmark_covered_call, simulate
 from .accounts import AccountCtx, account_ctx, build_serving, load_mandate_for, tier0_production
 from .config import DATA_DIR, FEATURES_PATH, load_mandate
 from .paper_portfolio import update_paper_portfolio
@@ -126,6 +126,8 @@ def write_backtest_report(out: dict, ctx: AccountCtx) -> None:
         "ensemble",
         "champion",
         "spy",
+        "covered_call",
+        "xyld",
     ):
         row = b.get(k) or {}
         if row.get("error"):
@@ -221,7 +223,7 @@ def run_pipeline(
     if shared_features is not None:
         features = shared_features
     else:
-        features = build_features()
+        features = build_features(mandate_doc)
         save_snapshot(features)
         save_registry_snapshot()
     from .features import holdings_universe
@@ -234,14 +236,18 @@ def run_pipeline(
         except Exception as exc:
             external_sync = {"error": str(exc)}
         rebuild_events_log()
-    bootstrap_valuation_history(holdings_universe())
+    bootstrap_valuation_history(holdings_universe(mandate_doc))
     if write_features:
         DATA_DIR.mkdir(parents=True, exist_ok=True)
         FEATURES_PATH.write_text(json.dumps(features, indent=2) + "\n", encoding="utf-8")
 
     rows = features["tickers"]
     if not rows:
-        return {"error": "no_holdings"}
+        return {
+            "error": "no_holdings",
+            "universe_spec": features.get("universe_spec"),
+            "universe_count": 0,
+        }
 
     panel = build_return_panel(
         [
@@ -540,6 +546,34 @@ def run_pipeline(
     rebalance_freq = (mandate_doc.get("mandate") or {}).get("rebalance_frequency", "semiannual")
     bt_spy = benchmark_buy_hold(panel["dates"], spy_rets, rebalance_freq)
 
+    cc_cfg = dict(mandate_doc.get("covered_call") or {})
+    bt_cc: dict = {"error": "disabled", "periods": 0}
+    bt_cc_proxy: dict = {"error": "disabled", "periods": 0}
+    if cc_cfg.get("enabled", False):
+        bt_cc = benchmark_covered_call(
+            panel["dates"],
+            panel["returns_by_ticker"],
+            dict(target_w),
+            cc_cfg,
+            rebalance_freq,
+            track_series=True,
+        )
+        proxy_ticker = (cc_cfg.get("etf_proxy_ticker") or "").strip().upper()
+        if proxy_ticker:
+            loaded_proxy = load_returns_csv(proxy_ticker)
+            if loaded_proxy:
+                d2r = dict(zip(loaded_proxy[0], loaded_proxy[1]))
+                proxy_rets = [d2r.get(d, 0.0) for d in panel["dates"]]
+                bt_cc_proxy = benchmark_buy_hold(
+                    panel["dates"],
+                    proxy_rets,
+                    rebalance_freq,
+                    track_series=True,
+                    label=f"{proxy_ticker.lower()}_buy_hold",
+                )
+            else:
+                bt_cc_proxy = {"error": "missing_returns", "periods": 0, "label": proxy_ticker}
+
     champion_selection = "ira_default"
     if exploration_on and explore.get("champion_mode") == "best_insample":
         champion_selection = "exploration"
@@ -574,6 +608,9 @@ def run_pipeline(
         falsifier_map=falsifier_map,
         policy_fns=policy_fns,
         rebalance_frequency=rebalance_freq,
+        covered_call_bt=bt_cc if not bt_cc.get("error") else None,
+        covered_call_proxy_bt=bt_cc_proxy if not bt_cc_proxy.get("error") else None,
+        covered_call_proxy_key=(cc_cfg.get("etf_proxy_ticker") or "xyld").strip().lower() or "xyld",
     )
 
     portfolio_explanation = build_portfolio_explanation(
@@ -601,12 +638,33 @@ def run_pipeline(
 
     sync_target_weights(ctx, mandate_doc, target_w, features_by_ticker, policy_id, regime)
 
+    # Strip series from benchmark stats blobs (charts use visualization.methods)
+    def _bench_stats(bt: dict) -> dict:
+        if not bt:
+            return {"error": "missing", "periods": 0}
+        if bt.get("error"):
+            return {k: bt[k] for k in bt if k != "series"}
+        out_b = {k: v for k, v in bt.items() if k != "series"}
+        return out_b
+
     out = {
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "account_id": ctx.account_id,
         "tier": mandate_doc.get("tier", 0),
         "phase": "0-tier0" if tier0 else "0-4",
         "mandate": mandate_doc.get("mandate"),
+        "universe_spec": features.get("universe_spec")
+        or (mandate_doc.get("mandate") or {}).get("universe"),
+        "universe_count": features.get("universe_count", len(rows)),
+        "universe_excluded_sample": features.get("universe_excluded_sample") or [],
+        "sp500": features.get("sp500"),
+        "covered_call": {
+            **cc_cfg,
+            "disclaimer": (
+                "Synthetic covered-call overlay on champion weights, "
+                "not Darwin AI Ventures proprietary model"
+            ),
+        },
         "regime": regime,
         "rebalance_frequency": mandate_doc.get("mandate", {}).get("rebalance_frequency", "semiannual"),
         "turnover_budget_pct": mandate_doc.get("mandate", {}).get(
@@ -635,46 +693,55 @@ def run_pipeline(
             "ensemble": bt_ens,
             "champion": champion_bt,
             "spy": bt_spy,
+            "covered_call": _bench_stats(bt_cc),
             "ml_best": ml_best[2],
             "ml_selected": use_ml and not exploration_on,
         },
-        "attribution": attribution,
-        "latent_factors": {
-            "labels": enc_meta.get("factor_labels"),
-            "by_ticker": latent,
-        },
-        "price_panel": {
-            "months": len(panel.get("dates") or []),
-            "sources": panel.get("sources"),
-        },
-        "conflicts": conflicts,
-        "human_review": review_flags,
-        "evolution_log": [
-            {
-                "date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
-                "event": "rebalance",
-                "policy": policy_id,
-                "turnover_pct": round(turnover_used * 100, 2),
-                "note": (
-                    f"Champion {policy_id} Sharpe {champion_bt.get('sharpe_annualized')} "
-                    f"regime {regime.get('label')}"
-                ),
-            }
-        ],
-        "lineage": lineage[-5:],
-        "source_alignment_version": (mandate_doc.get("source_overrides") or {}).get("version"),
-        "disclaimer": mandate_doc.get("disclaimer"),
-        "visualization": viz,
-        "portfolio_explanation": portfolio_explanation,
-        "pit": {
-            "audit_pass": pit_audit.get("pass"),
-            "leakage_count": pit_audit.get("leakage_count"),
-            "oos_sharpe_genetic": pit_bt.get("oos_sharpe_genetic"),
-            "oos_periods": pit_bt.get("oos_periods"),
-            "ml_oos_eligible": pit_bt.get("ml_oos_eligible"),
-            "synthetic_count": (pit_bt.get("price_panel") or {}).get("synthetic_count"),
-        },
     }
+    proxy_key = (cc_cfg.get("etf_proxy_ticker") or "").strip().lower()
+    if proxy_key and not bt_cc_proxy.get("error"):
+        out["benchmarks"][proxy_key] = _bench_stats(bt_cc_proxy)
+
+    out.update(
+        {
+            "attribution": attribution,
+            "latent_factors": {
+                "labels": enc_meta.get("factor_labels"),
+                "by_ticker": latent,
+            },
+            "price_panel": {
+                "months": len(panel.get("dates") or []),
+                "sources": panel.get("sources"),
+            },
+            "conflicts": conflicts,
+            "human_review": review_flags,
+            "evolution_log": [
+                {
+                    "date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+                    "event": "rebalance",
+                    "policy": policy_id,
+                    "turnover_pct": round(turnover_used * 100, 2),
+                    "note": (
+                        f"Champion {policy_id} Sharpe {champion_bt.get('sharpe_annualized')} "
+                        f"regime {regime.get('label')}"
+                    ),
+                }
+            ],
+            "lineage": lineage[-5:],
+            "source_alignment_version": (mandate_doc.get("source_overrides") or {}).get("version"),
+            "disclaimer": mandate_doc.get("disclaimer"),
+            "visualization": viz,
+            "portfolio_explanation": portfolio_explanation,
+            "pit": {
+                "audit_pass": pit_audit.get("pass"),
+                "leakage_count": pit_audit.get("leakage_count"),
+                "oos_sharpe_genetic": pit_bt.get("oos_sharpe_genetic"),
+                "oos_periods": pit_bt.get("oos_periods"),
+                "ml_oos_eligible": pit_bt.get("ml_oos_eligible"),
+                "synthetic_count": (pit_bt.get("price_panel") or {}).get("synthetic_count"),
+            },
+        }
+    )
 
     if run_pit:
         pit_status = _pit_status_from_runs(pit_audit, pit_bt, production=out)
@@ -722,7 +789,8 @@ def run_all_accounts(fast: bool = False, write_features: bool = True) -> dict:
     """Build Roth + taxable Tier 0 books, paper trackers, and L4 serving bundle."""
     from .features import build_features as _build
 
-    features = _build()
+    # Shared features use Roth mandate universe (both accounts now registry_sp500).
+    features = _build(load_mandate_for("roth"))
     results: dict = {}
     for i, aid in enumerate(("roth", "taxable")):
         results[aid] = run_pipeline(

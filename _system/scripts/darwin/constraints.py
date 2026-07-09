@@ -37,7 +37,11 @@ def apply_constraints(
     max_w = m.get("max_weight_pct", 18.0) / 100.0
     min_w = m.get("min_weight_pct", 2.0) / 100.0
     max_names = m.get("max_names", 15)
-    min_names = m.get("min_names", 8)
+    # Clamp floors to available universe so thin S&P overlaps still build
+    n_univ = max(len(tickers), 1)
+    min_names = min(int(m.get("min_names", 8)), n_univ)
+    max_names = min(int(max_names), n_univ)
+    max_names = max(max_names, min_names)
     max_delta = m.get("max_abs_weight_change_pct_per_rebalance", 3.0) / 100.0
     max_turn = m.get("max_one_way_turnover_pct_per_rebalance", 15.0) / 100.0
 
@@ -53,6 +57,10 @@ def apply_constraints(
     keep = [t for t, s in ranked if s > 1e-9][:max_names]
     if len(keep) < min_names:
         keep = [t for t, _ in ranked[: min(min_names, len(tickers))]]
+
+    # If too few names to fill the book under the cap, raise the cap so weights sum to 1
+    if keep and len(keep) * max_w < 1.0 - 1e-9:
+        max_w = 1.0 / len(keep)
 
     total = sum(scores.get(t, 0.0) for t in keep) or 1.0
     out = {t: scores.get(t, 0.0) / total for t in keep}
