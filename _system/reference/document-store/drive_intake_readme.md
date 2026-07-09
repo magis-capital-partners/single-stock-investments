@@ -2,22 +2,24 @@
 
 Use this Shared Drive folder as the repo drop zone:
 
-- Folder: https://drive.google.com/drive/folders/1wWZpAvlH5AANn76nRoklTK8IXf5gyPnR
+- Folder: https://drive.google.com/drive/folders/1OBaWt7SF-OME8hmXkl7tzdFLAfjBrp_C
+- Path on Shared Drive: `Admin/Intake`
 - Label: Single Stock Research PDF Store
 - Service account: `pdf-store-uploader@single-stock-pdf-store.iam.gserviceaccount.com`
 - Workflow: `Drive Intake Sync` runs hourly at minute 20 UTC and can also be run manually.
 
-The current Drive layout is flat by intake type:
+The live Drive layout is under `Admin/Intake` by intake type:
 
 ```text
 Admin/
-  VIC/
-    TPL.pdf
-    FRMO.pdf
-  Research/
-    TPL.pdf
-  Company/
-    TPL.pdf
+  Intake/
+    VIC/
+      TPL.pdf
+      FRMI.pdf
+    Research/
+      TPL.pdf
+    Company/
+      TPL.pdf
 ```
 
 ## Where To Drop PDFs
@@ -26,37 +28,40 @@ Ticker subfolders are also accepted:
 
 ```text
 Admin/
-  VIC/
-    TPL/
-      VIC writeup.pdf
-  Research/
-    TPL/
-      outside report.pdf
-  Company/
-    TPL/
-      company presentation.pdf
-  Activist/
-    Long/
-      DIS/
-        elliott-proxy-letter.pdf
-    Short/
-      APLD/
-        hindenburg-report.pdf
+  Intake/
+    VIC/
+      TPL/
+        VIC writeup.pdf
+    Research/
+      TPL/
+        outside report.pdf
+    Company/
+      TPL/
+        company presentation.pdf
+    Activist/
+      Long/
+        DIS/
+          elliott-proxy-letter.pdf
+      Short/
+        APLD/
+          hindenburg-report.pdf
 ```
 
 Use the exact repo ticker folder name, for example `TPL`, `FRMO`, `0388.HK`, or `TEQ.ST`.
 
 For the flat layout, put the ticker as the filename or as the first clear filename token, such as `TPL.pdf` or `TPL - outside report.pdf`.
 
+Do **not** drop bare VIC-id PDFs (for example `163625.pdf`) directly in `Admin/Intake/VIC` without a ticker filename. The importer needs `FRMI.pdf` or `FRMI/...`.
+
 ## Routing
 
-- `Admin/VIC/{TICKER}.pdf` imports to `{TICKER}/third-party-analyses/vic/`
-- `Admin/Research/{TICKER}.pdf` imports to `{TICKER}/third-party-analyses/drive-intake/`
-- `Admin/Company/{TICKER}.pdf` imports to `{TICKER}/investor-documents/drive-intake/`
-- `Admin/Activist/Long/{TICKER}/*.pdf` imports to `{TICKER}/third-party-analyses/activist_reports/long/`
-- `Admin/Activist/Short/{TICKER}/*.pdf` imports to `{TICKER}/third-party-analyses/activist_reports/short/`
+- `Admin/Intake/VIC/{TICKER}.pdf` (or `VIC/{TICKER}.pdf` relative to the intake root) imports to `{TICKER}/third-party-analyses/vic/`
+- `Admin/Intake/Research/{TICKER}.pdf` imports to `{TICKER}/third-party-analyses/drive-intake/`
+- `Admin/Intake/Company/{TICKER}.pdf` imports to `{TICKER}/investor-documents/drive-intake/`
+- `Admin/Intake/Activist/Long/{TICKER}/*.pdf` imports to `{TICKER}/third-party-analyses/activist_reports/long/`
+- `Admin/Intake/Activist/Short/{TICKER}/*.pdf` imports to `{TICKER}/third-party-analyses/activist_reports/short/`
 
-The legacy `Admin/Intake/{VIC,Research,Company}/{TICKER}/*.pdf` layout is still accepted.
+The older `Admin/{VIC,Research,Company}/...` layout is still accepted if those folders exist.
 
 After local import, the normal registry/upload step links the PDFs back into the PDF store folders used by the dashboard:
 

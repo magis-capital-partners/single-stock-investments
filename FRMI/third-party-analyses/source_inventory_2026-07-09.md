@@ -5,8 +5,8 @@
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
+| vic | VIC PDF intake - FRMI - FRMI.pdf | `FRMI/third-party-analyses/vic/FRMI.pdf` | pending | VIC local single-page intake; human approval required |
 | vic | VIC PDF intake - FRMI - FRMI VIC PDF | `FRMI/third-party-analyses/vic/vic_pdf_2026-06-18_frmi-vic-pdf_abdd5b43c9.pdf` | pending | VIC local single-page intake; human approval required |
-| research_note | FRMI.pdf | `FRMI/investor-documents/research-notes/FRMI.pdf` | pending | investor-documents/research-notes |
 | activist_long | Vicksburg Investments Management — DEFC14A (proxy solicitati | `FRMI/third-party-analyses/activist_reports/long/DEFC14A_20260610_acc0001213900_26_067352.htm` | context | activist/long — sec_edgar |
 | activist_long | Vicksburg Investments Management — DEFC14A (proxy solicitati | `FRMI/third-party-analyses/activist_reports/long/DEFC14A_20260612_acc0001213900_26_067954.htm` | context | activist/long — sec_edgar |
 | activist_long | Vicksburg Investments Management — DFAN14A (proxy solicitati | `FRMI/third-party-analyses/activist_reports/long/DFAN14A_20260505_acc0001213900_26_052294.htm` | context | activist/long — sec_edgar |

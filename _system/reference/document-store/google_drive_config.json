@@ -25,20 +25,23 @@
   },
   "default_drive_root": "general_pdfs",
   "drive_intake": {
-    "folder_id": "1wWZpAvlH5AANn76nRoklTK8IXf5gyPnR",
-    "folder_url": "https://drive.google.com/drive/folders/1wWZpAvlH5AANn76nRoklTK8IXf5gyPnR",
-    "label": "Manual PDF intake",
-    "primary_layout": "Admin/{VIC,Research,Company,Activist/Long,Activist/Short}/{TICKER}.pdf",
+    "folder_id": "1OBaWt7SF-OME8hmXkl7tzdFLAfjBrp_C",
+    "folder_url": "https://drive.google.com/drive/folders/1OBaWt7SF-OME8hmXkl7tzdFLAfjBrp_C",
+    "label": "Manual PDF intake (Admin/Intake)",
+    "primary_layout": "Admin/Intake/{VIC,Research,Company,Activist/Long,Activist/Short}/{TICKER}.pdf",
     "accepted_layouts": [
+      "Admin/Intake/{VIC,Research,Company}/{TICKER}.pdf",
+      "Admin/Intake/{VIC,Research,Company}/{TICKER}/*.pdf",
+      "Admin/Intake/Activist/Long/{TICKER}/*.pdf",
+      "Admin/Intake/Activist/Short/{TICKER}/*.pdf",
+      "{VIC,Research,Company}/{TICKER}.pdf",
+      "{VIC,Research,Company}/{TICKER}/*.pdf",
       "Admin/{VIC,Research,Company}/{TICKER}.pdf",
       "Admin/{VIC,Research,Company}/{TICKER}/*.pdf",
       "Admin/Activist/Long/{TICKER}/*.pdf",
-      "Admin/Activist/Short/{TICKER}/*.pdf",
-      "Admin/Activist/Long/{TICKER}.pdf",
-      "Admin/Activist/Short/{TICKER}.pdf",
-      "{VIC,Research,Company}/{TICKER}.pdf",
-      "Admin/Intake/{VIC,Research,Company}/{TICKER}/*.pdf"
-    ]
+      "Admin/Activist/Short/{TICKER}/*.pdf"
+    ],
+    "notes": "Folder id points at Admin/Intake on the Shared Drive. Drop VIC PDFs in the VIC child (or as VIC/{TICKER}.pdf). Do not point this at the VIC child itself or ensure-folders nests Admin/VIC inside VIC."
   },
   "service_account_email": "pdf-store-uploader@single-stock-pdf-store.iam.gserviceaccount.com",
   "folder_strategy": "mirror_source_path",

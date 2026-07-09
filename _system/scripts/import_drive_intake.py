@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
 """Import manually uploaded PDFs from Google Drive intake folders into the repo.
 
-Current intake layout:
+Configured intake root (google_drive_config.json drive_intake.folder_id) should be
+Admin/Intake on the Shared Drive. Relative paths from that root:
+
+  VIC/{TICKER}.pdf
+  Research/{TICKER}.pdf
+  Company/{TICKER}.pdf
+
+Also accepted (absolute-style paths if the scan root is higher up):
+  Admin/Intake/VIC/{TICKER}.pdf
   Admin/VIC/{TICKER}.pdf
-  Admin/Research/{TICKER}.pdf
-  Admin/Company/{TICKER}.pdf
 
-Legacy intake layout is also accepted:
-  Admin/Intake/VIC/{TICKER}/*.pdf
-  Admin/Intake/Research/{TICKER}/*.pdf
-  Admin/Intake/Company/{TICKER}/*.pdf
-
-Use --ensure-folders to create the Admin drop-zone skeleton before
-scanning for uploaded files.
+Use --ensure-folders to create VIC/Research/Company/Activist drop folders
+under the configured intake root before scanning.
 
 Canonical repo destinations:
   {TICKER}/third-party-analyses/vic/*.pdf
@@ -45,8 +46,10 @@ INTAKE_TYPES = {
     "activist_long": "Activist/Long",
     "activist_short": "Activist/Short",
 }
+# Paths relative to drive_intake.folder_id (Admin/Intake). Do not prepend Admin/
+# here or --ensure-folders nests Admin/VIC inside Intake/VIC.
 INTAKE_FOLDER_PATHS = {
-    intake_kind: f"{INTAKE_PREFIX}/{folder_name}"
+    intake_kind: folder_name
     for intake_kind, folder_name in INTAKE_TYPES.items()
 }
 ACCEPTED_INTAKE_PREFIXES = (INTAKE_PREFIX, LEGACY_INTAKE_PREFIX, "")
@@ -196,12 +199,7 @@ def ensure_intake_folders(service, root_ids: list[str], items: list[dict], dry_r
     existing = folder_id_by_parent_name(items)
     ensured: list[dict] = []
     for root_id in root_ids:
-        root_has_intake_folders = any((root_id, folder_name) in existing for folder_name in INTAKE_TYPES.values())
-        folder_paths = {
-            intake_kind: folder_name if root_has_intake_folders else INTAKE_FOLDER_PATHS[intake_kind]
-            for intake_kind, folder_name in INTAKE_TYPES.items()
-        }
-        for intake_kind, folder_path in folder_paths.items():
+        for intake_kind, folder_path in INTAKE_FOLDER_PATHS.items():
             folder_id = ensure_folder_path(service, root_id, folder_path, dry_run, existing)
             ensured.append(
                 {
