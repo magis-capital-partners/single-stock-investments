@@ -24,13 +24,60 @@ BIOTECH_EXCLUDE_TICKERS = {
     "CHTR",
     "CPRT",
     "CSGP",
+    "ENPH",
+    "GOOG",
+    "GOOGL",
     "ICE",
+    "META",
+    "MSTR",
     "NDAQ",
     "CME",
     "GS",
     "JPM",
+    "NVDA",
+    "TSLA",
+    "XYZ",
     "0388.HK",
 }
+
+BIOTECH_ISSUER_TERMS = (
+    "biotech",
+    "biopharm",
+    "therapeutic",
+    "pharma",
+    "bioscience",
+    "genomic",
+    "genetics",
+    "oncology",
+    "immuno",
+    "diagnostic",
+    "lifesci",
+    "life sci",
+    "medical",
+    "vaccine",
+    "biosciences",
+)
+
+NON_BIOTECH_ISSUER_TERMS = (
+    "alphabet",
+    "google",
+    "amazon",
+    "meta platform",
+    "facebook",
+    "nvidia",
+    "microsoft",
+    "apple",
+    "tesla",
+    "advanced micro",
+    "microstrategy",
+    "enphase",
+    "copart",
+    "costar",
+    "exchange",
+    "financial",
+    "insurance",
+    "bank",
+)
 
 SPECIALIST_FUND_TERMS = (
     "baker",
@@ -114,6 +161,39 @@ def is_biotech_ticker(
         if sleeve not in BIOTECH_EXCLUDE_SLEEVES:
             return True
     return False
+
+
+def normalize_issuer(value: str | None) -> str:
+    text = re.sub(r"[^a-z0-9 ]", " ", (value or "").lower())
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def issuer_is_biotech(issuer: str | None) -> bool:
+    text = normalize_issuer(issuer)
+    if not text:
+        return False
+    if any(term in text for term in NON_BIOTECH_ISSUER_TERMS):
+        return False
+    return any(term in text for term in BIOTECH_ISSUER_TERMS)
+
+
+def is_biotech_quant_universe_ticker(
+    ticker: str,
+    entity: dict,
+    registry_meta: dict | None,
+    *,
+    biotech_watchlist: set[str],
+    ownership_records: list[dict] | None = None,
+) -> bool:
+    """Ticker is in the 13F biotech quant universe (specialist holdings + biotech classification)."""
+    records = ownership_records or []
+    if not records:
+        return False
+    if ticker in BIOTECH_EXCLUDE_TICKERS:
+        return False
+    if is_biotech_ticker(ticker, entity, registry_meta, biotech_watchlist=biotech_watchlist):
+        return True
+    return any(issuer_is_biotech(rec.get("issuer")) for rec in records)
 
 
 def claim_type(row: dict) -> str:

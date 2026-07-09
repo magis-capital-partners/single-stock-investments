@@ -22,6 +22,7 @@ from memory_common import (  # noqa: E402
     dedupe_review_queue,
     evidence_effect,
     is_biotech_ticker,
+    is_biotech_quant_universe_ticker,
     is_low_value_claim,
     now_iso,
     short_text,
@@ -331,6 +332,13 @@ def build() -> tuple[dict, dict]:
         ]
         ticker_ownership = ownership_by_ticker.get(ticker, [])
         signal = (signals_doc.get("by_ticker") or {}).get(ticker) or {}
+        in_quant = is_biotech_quant_universe_ticker(
+            ticker,
+            entity,
+            meta,
+            biotech_watchlist=biotech_watchlist,
+            ownership_records=ticker_ownership,
+        )
         by_ticker[ticker] = {
             "ticker": ticker,
             "company": entity.get("company"),
@@ -348,7 +356,8 @@ def build() -> tuple[dict, dict]:
             "ownership_claims": sorted(ownership, key=lambda c: c["confidence_score"], reverse=True)[:3],
             "biotech": {
                 "is_biotech_related": biotech,
-                "awaiting_13f_ingest": biotech and not ticker_ownership,
+                "in_biotech_quant_universe": in_quant,
+                "awaiting_13f_ingest": in_quant and not ticker_ownership,
                 "specialist_mentions": specialist_mentions[:4],
                 "tracked_specialist_fund_count": len(biotech_funds),
                 "ownership_records": ticker_ownership[:20],
@@ -373,7 +382,7 @@ def build() -> tuple[dict, dict]:
             review_queue.append({"ticker": ticker, "reason": "disconfirming evidence present", "priority": "high"})
         if mem["claim_count"] == 0 and ticker in book:
             review_queue.append({"ticker": ticker, "reason": "no claims in memory", "priority": "medium"})
-        if mem["biotech"]["is_biotech_related"] and not mem["biotech"]["ownership_records"]:
+        if mem["biotech"]["in_biotech_quant_universe"] and not mem["biotech"]["ownership_records"]:
             review_queue.append({"ticker": ticker, "reason": "biotech 13F ownership not loaded", "priority": "medium"})
     review_queue = dedupe_review_queue(review_queue)
 
@@ -387,8 +396,16 @@ def build() -> tuple[dict, dict]:
         "review_queue_count": len(review_queue),
         "biotech_specialist_count": len(biotech_funds),
         "biotech_related_ticker_count": sum(1 for v in by_ticker.values() if v["biotech"]["is_biotech_related"]),
+        "biotech_quant_universe_count": sum(1 for v in by_ticker.values() if v["biotech"]["in_biotech_quant_universe"]),
         "ownership_record_count": len(ownership_records),
     }
+
+    quant_signals = {
+        k: v
+        for k, v in (signals_doc.get("by_ticker") or {}).items()
+        if (by_ticker.get(k) or {}).get("biotech", {}).get("in_biotech_quant_universe")
+    }
+    quant_ownership = [r for r in ownership_records if r.get("ticker") in quant_signals]
 
     memory_doc = {
         "generated_at": now_iso(),
@@ -401,8 +418,12 @@ def build() -> tuple[dict, dict]:
         "review_queue": review_queue,
         "biotech": {
             "specialist_funds": biotech_funds,
-            "ownership_records": ownership_records,
-            "signals": signals_doc,
+            "ownership_records": quant_ownership,
+            "signals": {
+                **signals_doc,
+                "by_ticker": quant_signals,
+                "ticker_count": len(quant_signals),
+            },
             "notes": "13F records stored in _system/reference/market-data/ownership/records/",
         },
     }

@@ -525,7 +525,7 @@
         <div class="metric"><div class="k">Sources</div><div class="v mono">${summary.source_count || 0}</div></div>
         <div class="metric"><div class="k">Review queue</div><div class="v mono">${summary.review_queue_count || 0}</div></div>
         <div class="metric"><div class="k">13F records</div><div class="v mono">${summary.ownership_record_count || 0}</div></div>
-        <div class="metric"><div class="k">Biotech names</div><div class="v mono">${summary.biotech_related_ticker_count || 0}</div></div>
+        <div class="metric"><div class="k">Biotech quant</div><div class="v mono">${summary.biotech_quant_universe_count || summary.biotech_related_ticker_count || 0}</div></div>
       </div>`;
   }
 
@@ -2206,12 +2206,12 @@
       rows = rows.filter(r => bookSet.has(String(r.ticker || '').toUpperCase()));
     }
     if (biotechOnly) {
-      const biotechTickers = new Set(
+      const quantTickers = new Set(
         Object.entries(memory?.by_ticker || {})
-          .filter(([, v]) => v?.biotech?.is_biotech_related)
+          .filter(([, v]) => v?.biotech?.in_biotech_quant_universe)
           .map(([t]) => t.toUpperCase())
       );
-      rows = rows.filter(r => biotechTickers.has(String(r.ticker || '').toUpperCase()));
+      rows = rows.filter(r => quantTickers.has(String(r.ticker || '').toUpperCase()));
     }
     if (typeFilter && typeFilter !== 'all') {
       rows = rows.filter(r => memoryClaimMatchesType(r, typeFilter));
@@ -2265,12 +2265,14 @@
   function renderBiotechMemory(memory, escapeHtml, linkHtml, ghRepo) {
     const funds = memory?.biotech?.specialist_funds || [];
     const signals = memory?.biotech?.signals?.by_ticker || {};
-    const tickers = Object.values(memory?.by_ticker || {}).filter(t => t.biotech?.is_biotech_related);
-    const signalRows = Object.values(signals).sort((a, b) => (b.consensus_score || 0) - (a.consensus_score || 0));
+    const tickers = Object.values(memory?.by_ticker || {}).filter(t => t.biotech?.in_biotech_quant_universe);
+    const signalRows = Object.values(signals)
+      .filter(s => s.in_biotech_quant_universe !== false)
+      .sort((a, b) => (b.consensus_score || 0) - (a.consensus_score || 0));
     return `
       <div class="detail-section">
         <h3>Biotech specialist registry</h3>
-        <p class="tier-sub" style="margin-bottom:8px">${funds.length} specialist funds tracked for 13F ingestion · ${tickers.length} biotech-related tickers in book/watchlist · ${memory?.summary?.ownership_record_count || 0} 13F records loaded.</p>
+        <p class="tier-sub" style="margin-bottom:8px">${funds.length} specialist funds tracked for 13F ingestion · ${tickers.length} names in biotech quant universe · ${memory?.biotech?.ownership_records?.length || 0} quant-filtered 13F records.</p>
         <table class="darwin-table">
           <thead><tr><th>Fund</th><th>Specialty</th><th>Role</th><th>Notes</th></tr></thead>
           <tbody>${funds.slice(0, 28).map(f => `<tr>

@@ -10,6 +10,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 
+from memory_common import is_biotech_quant_universe_ticker  # noqa: E402
 from ownership_common import FUNDS_PATH, RECORDS_DIR, SIGNALS_PATH, load_json, now_iso, portfolio_universe, save_json  # noqa: E402
 
 
@@ -37,10 +38,23 @@ def load_latest_records() -> tuple[str, list[dict]]:
     return doc.get("quarter") or latest.stem, doc.get("records") or []
 
 
+def load_biotech_watchlist(tickers: dict[str, dict]) -> set[str]:
+    return {t.upper() for t, meta in tickers.items() if meta.get("biotech_watchlist")}
+
+
+def entity_for_ticker(ticker: str, tickers: dict[str, dict]) -> dict:
+    meta = tickers.get(ticker) or {}
+    return {
+        "company": meta.get("company"),
+        "investment_sleeve": meta.get("investment_sleeve"),
+    }
+
+
 def build_signals(records: list[dict], quarter: str) -> dict:
     funds_doc = load_json(FUNDS_PATH, {"funds": []})
     fund_meta = {f.get("fund_id"): f for f in funds_doc.get("funds") or []}
     tickers, _ = portfolio_universe()
+    biotech_watchlist = load_biotech_watchlist(tickers)
 
     by_ticker: dict[str, list[dict]] = defaultdict(list)
     for row in records:
@@ -49,6 +63,16 @@ def build_signals(records: list[dict], quarter: str) -> dict:
     ticker_signals: dict[str, dict] = {}
     for ticker in sorted(by_ticker):
         rows = by_ticker[ticker]
+        entity = entity_for_ticker(ticker, tickers)
+        registry_meta = tickers.get(ticker)
+        if not is_biotech_quant_universe_ticker(
+            ticker,
+            entity,
+            registry_meta,
+            biotech_watchlist=biotech_watchlist,
+            ownership_records=rows,
+        ):
+            continue
         core_rows = [r for r in rows if r.get("fund_id") in CORE_FUNDS]
         adds = sum(1 for r in rows if r.get("change_type") in {"new", "add"})
         trims = sum(1 for r in rows if r.get("change_type") in {"trim", "exit"})
@@ -64,6 +88,7 @@ def build_signals(records: list[dict], quarter: str) -> dict:
         ticker_signals[ticker] = {
             "ticker": ticker,
             "company": (tickers.get(ticker) or {}).get("company"),
+            "in_biotech_quant_universe": True,
             "quarter": quarter,
             "specialist_holder_count": specialist_count,
             "core_fund_holder_count": core_count,
