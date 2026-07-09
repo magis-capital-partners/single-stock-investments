@@ -1,0 +1,569 @@
+{
+  "ticker": "XYZ",
+  "as_of": "2026-07-09",
+  "method": "full",
+  "irr_method": "full",
+  "lawrence_bucket": "multi_sided",
+  "valuation_mode": "operating",
+  "classification_inputs": {
+    "archetype": "platform",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 77.43,
+    "price_source": "Yahoo Finance XYZ close 2026-07-09",
+    "price_as_of": "2026-07-09",
+    "fcf_per_share": 3.89,
+    "fcf_source": "FY2025 operating cash flow $2.58B less capital spending $155M, divided by 622.8M diluted shares (10-K filed 2026-02-26)",
+    "shares_millions": 622.8,
+    "shares_source": "FY2025 weighted average diluted shares (10-K)",
+    "normalization_note": "Owner cash uses cash from operations minus capital spending; excludes bitcoin mark-to-market in net income and non-cash stock compensation add-backs in Adjusted EBITDA"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.04,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 14,
+      "notes": "Square GPV slows; Cash App ex-bitcoin growth decelerates; credit losses rise on BNPL book"
+    },
+    "base": {
+      "growth_y1_5": 0.08,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 20,
+      "notes": "Square GPV +10% FY25; Cash App ex-bitcoin net revenue +20% FY25 and +37% Q1-26; gross profit +27% Q1-26"
+    },
+    "bull": {
+      "growth_y1_5": 0.12,
+      "growth_y6_10": 0.07,
+      "exit_pfcf_y10": 25,
+      "notes": "Cash App banking and Afterpay cross-sell accelerate; Square international and vertical software mix improves"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Fintech platform; bitcoin held at fair value on balance sheet per 10-K"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating platform, not resource NAV"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Bitcoin ecosystem revenue is large but low-margin; 2-4% of consolidated gross profit Q1-26 (10-Q)"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / RPO not in FCF path?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Transaction-volume-driven fees, not contracted backlog"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "Partial",
+      "treatment": "milestone_nav",
+      "evidence": "Corporate bitcoin treasury ~8,500 BTC marked to market; FY2025 remeasurement loss $55.9M (10-K)"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No dated legal or trust recovery"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue path?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Afterpay BNPL, Cash App Card, and Square banking embedded in segment revenue paths (10-K segment note)"
+    }
+  ],
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "human_review": {
+    "notes": "First Marvin deep dive 2026-07-09; confirm live price and consumer-credit reserve trends on next 10-Q.",
+    "live_price_confirmed": false
+  },
+  "lawrence_horizon_years": 7,
+  "valuation_overlay": "segment_cashflow",
+  "segment_build": {
+    "framework": "speedwell_reverse_dcf",
+    "as_of": "2026-07-09",
+    "horizon_years": 7,
+    "discount_rate_explicit": 0.1,
+    "segments": [
+      {
+        "id": "cash_app",
+        "label": "Cash App (consumer)",
+        "owner_cash_y0_bn": 1.49,
+        "owner_cash_y0_per_share": 2.39,
+        "owner_cash_y0_source": "62% of consolidated owner cash allocated by FY2025 segment gross profit share ($6.34B of $10.27B)",
+        "growth_y1_5": 0.12,
+        "growth_y6_10": 0.07,
+        "exit_pfcf_y10": 22,
+        "notes": "Ex-bitcoin net revenue +20% FY25; gross profit +21% FY25 and +38% Q1-26"
+      },
+      {
+        "id": "square",
+        "label": "Square (seller)",
+        "owner_cash_y0_bn": 0.93,
+        "owner_cash_y0_per_share": 1.49,
+        "owner_cash_y0_source": "38% of consolidated owner cash allocated by FY2025 segment gross profit share ($3.94B of $10.27B)",
+        "growth_y1_5": 0.09,
+        "growth_y6_10": 0.06,
+        "exit_pfcf_y10": 18,
+        "notes": "Square GPV $250B+ FY25; revenue +10% FY25; Q1 GPV +13%"
+      }
+    ],
+    "options": [
+      {
+        "id": "bitcoin_treasury",
+        "label": "Corporate bitcoin treasury (~8,500 BTC)",
+        "option_treatment": "milestone_nav",
+        "annual_drag_per_share": 0.0,
+        "base_terminal_value_bn": 0,
+        "base_terminal_rationale": "Marked to market on balance sheet; no separate terminal in Lawrence base; bull sensitivity only",
+        "overlay_base_terminal_bn": null,
+        "bull_terminal_value_bn": null,
+        "evidence": "10-K bitcoin investment table; FY2025 remeasurement loss $55.9M",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "bitcoin_ecosystem",
+        "label": "Bitcoin ecosystem revenue (low-margin)",
+        "option_treatment": "embedded_in_segment",
+        "annual_drag_per_share": 0.0,
+        "base_terminal_value_bn": 0,
+        "base_terminal_rationale": "Revenue in Cash App segment; only 2-4% of consolidated gross profit",
+        "evidence": "10-Q Q1-26: bitcoin ecosystem 2% of total gross profit",
+        "not_in_lawrence_base": true
+      }
+    ],
+    "corporate_drag": {
+      "alphabet_level_drag_per_share": 0.01,
+      "notes": "Corporate and other gross profit $89M FY25; unallocated G&A and stock compensation above segment gross profit"
+    },
+    "reconciliation": {
+      "sum_pv_per_share_at_explicit_discount": null,
+      "explicit_discount_rate_pct": 10.0,
+      "implied_business_return_pct": null,
+      "lawrence_base_irr_pct": null
+    }
+  },
+  "estimates": {
+    "marvin_floor": {
+      "per_share": 3.89,
+      "return_pct": null,
+      "notes": "FY2025 OCF $2.58B less capex $155M on 622.8M diluted shares"
+    },
+    "blended_best": {
+      "per_share": 3.89,
+      "return_pct": null,
+      "notes": "Filings only; no approved third-party blend"
+    }
+  },
+  "total_return_panel": {
+    "as_of": "2026-07-09",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 0,
+    "distribution_history_sum": 0,
+    "market_cap_m": null,
+    "total_return_annualized_pct": 18.21,
+    "chart": "XYZ/research/charts/total_return_2026-07-09.svg",
+    "panel_json": "XYZ/research/total_return_panel.json"
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 4.4
+    },
+    "base": {
+      "return_pct": 12.7
+    },
+    "bull": {
+      "return_pct": 19.5
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 4.4
+    },
+    "base": {
+      "return_pct": 12.7
+    },
+    "bull": {
+      "return_pct": 19.5
+    }
+  },
+  "implied_return": {
+    "base_pct": 11.75,
+    "label": "7yr IRR (total synthesis)",
+    "display": "11.75% (total synthesis)",
+    "lawrence_stance_gate_pct": 12.7,
+    "falsifier_adjusted_pct": 12.7,
+    "synthesis_pct": 11.75
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence envelope)",
+        "source": "scenarios.bear",
+        "return_pct": 4.4,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "hard_to_vary": "yes: asymmetric low weight is structural",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ]
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence envelope)",
+        "source": "scenarios.bull",
+        "return_pct": 19.5,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "hard_to_vary": "yes",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ]
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 11.95,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 11.75,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  },
+  "context_overlay": {
+    "as_of": "2026-07-09",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": 0.58,
+            "as_of": "2026-07-09",
+            "yoy_pct": 207.4,
+            "direction": "up",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.539000034332275,
+            "as_of": "2026-07-09",
+            "yoy_pct": 4.5,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.269000053405762,
+            "as_of": "2026-07-09",
+            "yoy_pct": 8.9,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 100.94400024414062,
+            "as_of": "2026-07-09",
+            "yoy_pct": 3.6,
+            "direction": "up",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 15.930000305175781,
+            "as_of": "2026-07-09",
+            "yoy_pct": -0.1,
+            "direction": "flat",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": 0.46,
+            "as_of": "2026-07-09",
+            "yoy_pct": 165.7,
+            "direction": "up",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 15.49,
+            "as_of": "2026-07-09",
+            "yoy_pct": 47.7,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "insider_signal": {
+    "as_of": "2026-07-09",
+    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
+    "in_base_irr": false,
+    "window_days": 365,
+    "ics": 2.61,
+    "band": "weak",
+    "bull_case_support": "none",
+    "scenario_confidence": {
+      "priors": {
+        "bear": 0.2,
+        "base": 0.55,
+        "bull": 0.25
+      },
+      "tilted": {
+        "bear": 0.228,
+        "base": 0.522,
+        "bull": 0.25
+      },
+      "bull_delta": 0.0,
+      "bear_delta": 0.028,
+      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
+    },
+    "factors": {
+      "buy_score": 3.268,
+      "sell_score": -1.0,
+      "cluster_bonus": 0.0,
+      "net_buy_usd": 63870.28,
+      "net_sell_usd": 54254720.05,
+      "price_today": 77.43
+    },
+    "top_buys": [
+      {
+        "insider": "Esperanza Chrysty",
+        "date": "2026-05-15",
+        "shares": 439,
+        "price": 48.46,
+        "value_usd": 21273.94,
+        "shares_owned_after": 268608,
+        "contrib": 0.755
+      },
+      {
+        "insider": "Jennings Owen Britton",
+        "date": "2026-05-15",
+        "shares": 438,
+        "price": 48.46,
+        "value_usd": 21225.48,
+        "shares_owned_after": 499256,
+        "contrib": 0.741
+      },
+      {
+        "insider": "Grassadonia Brian",
+        "date": "2026-05-15",
+        "shares": 438,
+        "price": 48.46,
+        "value_usd": 21225.48,
+        "shares_owned_after": 618770,
+        "contrib": 0.737
+      },
+      {
+        "insider": "Jennings Owen Britton",
+        "date": "2025-11-14",
+        "shares": 1,
+        "price": 48.46,
+        "value_usd": 48.46,
+        "shares_owned_after": 253957,
+        "contrib": 0.345
+      },
+      {
+        "insider": "Grassadonia Brian",
+        "date": "2025-11-14",
+        "shares": 1,
+        "price": 48.46,
+        "value_usd": 48.46,
+        "shares_owned_after": 535897,
+        "contrib": 0.345
+      }
+    ],
+    "top_sells": [
+      {
+        "insider": "Deighton Paul",
+        "date": "2026-06-16",
+        "shares": 1955,
+        "price": 74.68,
+        "value_usd": 145999.4,
+        "is_10b5_1": false,
+        "contrib": -0.206
+      },
+      {
+        "insider": "Ahuja Amrita",
+        "date": "2026-05-20",
+        "shares": 18401,
+        "price": 70.89,
+        "value_usd": 1304446.89,
+        "is_10b5_1": false,
+        "contrib": -0.148
+      },
+      {
+        "insider": "Ahuja Amrita",
+        "date": "2026-04-01",
+        "shares": 1337,
+        "price": 59.54,
+        "value_usd": 79604.98,
+        "is_10b5_1": false,
+        "contrib": -0.101
+      },
+      {
+        "insider": "Ahuja Amrita",
+        "date": "2026-02-20",
+        "shares": 7519,
+        "price": 53.22,
+        "value_usd": 400161.18,
+        "is_10b5_1": false,
+        "contrib": -0.101
+      },
+      {
+        "insider": "Ahuja Amrita",
+        "date": "2026-01-02",
+        "shares": 1101,
+        "price": 63.98,
+        "value_usd": 70441.98,
+        "is_10b5_1": false,
+        "contrib": -0.096
+      }
+    ],
+    "narrative_hooks": [],
+    "transaction_count": 146
+  },
+  "lens_consensus": {
+    "as_of": "2026-07-09",
+    "shared_inputs_ref": "valuation.json@2026-07-09",
+    "valuation_richness": 0.153,
+    "blended_return_pct": 11.32,
+    "band_pct": [
+      4.4,
+      14.7
+    ],
+    "weighted_median_pct": 12.7,
+    "median_mean_flag": false,
+    "stance": "watch",
+    "agreement_pct": 55,
+    "dissent_count": 4,
+    "lawrence_divergence": false,
+    "top_dissents": [
+      {
+        "persona": "stahl",
+        "label": "Murray Stahl",
+        "verdict": "hold",
+        "return_pct": 12.7,
+        "key_metric": "archetype=platform",
+        "conviction": 0.135,
+        "falsifier": "No asset intensity / pricing power (moat eroding + non-croupier)"
+      },
+      {
+        "persona": "hk",
+        "label": "Horizon Kinetics",
+        "verdict": "hold",
+        "return_pct": 14.7,
+        "key_metric": "payoff_lens=pending",
+        "conviction": 0.135,
+        "falsifier": "No dated contractual payoff or royalty/trust structure"
+      },
+      {
+        "persona": "munger",
+        "label": "Charlie Munger",
+        "verdict": "hold",
+        "return_pct": 12.7,
+        "key_metric": "moat=stable",
+        "conviction": 0.035,
+        "falsifier": "Moat eroding/unproven or irr_method pending"
+      }
+    ],
+    "contributor_count": 8,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
+  }
+}
