@@ -54,7 +54,7 @@ runs:
       env:
         CI_PAGES_DEPLOY_ONLY: "true"
       run: |
-        python -m unittest _system/scripts/test_event_materiality.py _system/scripts/test_event_triage.py
+        python -m unittest _system/scripts/test_event_materiality.py _system/scripts/test_event_triage.py _system/scripts/test_validate_dashboard_pages_deploy.py
         python _system/scripts/validate_dashboard_data.py
 
     - name: Configure GitHub Pages

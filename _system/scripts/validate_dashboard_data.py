@@ -22,6 +22,20 @@ GITHUB_HARD_LIMIT_BYTES = 100 * 1024 * 1024
 GITHUB_WARN_LIMIT_BYTES = 50 * 1024 * 1024
 
 
+def pages_deploy_only_mode() -> bool:
+    return os.environ.get("CI_PAGES_DEPLOY_ONLY", "").lower() in {"1", "true", "yes"}
+
+
+def activist_missing_local_file_error(row: dict, root: Path, *, pages_deploy_only: bool) -> str | None:
+    local_file = row.get("local_file")
+    file_exists = row.get("file_exists")
+    if local_file and file_exists is True and not pages_deploy_only:
+        path = root / str(local_file).replace("\\", "/")
+        if not path.exists():
+            return f"activist feed references missing file: {local_file}"
+    return None
+
+
 def letter_drive_links_issue(
     *,
     matched: int,
@@ -411,7 +425,7 @@ def main() -> int:
             errors.append(
                 f"activist feed tier counts ({tier_sum}) != feed rows ({len(feed)})"
             )
-        pages_deploy_only = os.environ.get("CI_PAGES_DEPLOY_ONLY", "").lower() in {"1", "true", "yes"}
+        pages_deploy_only = pages_deploy_only_mode()
         for row in feed:
             local_file = row.get("local_file")
             github_url = row.get("github_url")
@@ -420,10 +434,9 @@ def main() -> int:
                 errors.append(
                     f"activist feed {row.get('ticker')}/{row.get('firm_id')}: github_url set but file_exists is false"
                 )
-            if local_file and file_exists is True and not pages_deploy_only:
-                path = ROOT / str(local_file).replace("\\", "/")
-                if not path.exists():
-                    errors.append(f"activist feed references missing file: {local_file}")
+            missing_local = activist_missing_local_file_error(row, ROOT, pages_deploy_only=pages_deploy_only)
+            if missing_local:
+                errors.append(missing_local)
             if local_file and file_exists is False and github_url and not pages_deploy_only:
                 errors.append(f"activist feed ghost github link for missing file: {local_file}")
             if (
