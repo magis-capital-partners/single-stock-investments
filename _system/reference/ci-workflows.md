@@ -112,7 +112,7 @@ Daily auto-pick after download still runs inside **Daily Download & Dashboard Sy
 | `activist` | Activist Scan Sync |
 | `darwin-full` | Darwin Portfolio Refresh |
 | `darwin-fast` | Legacy full refresh (avoid on deploy) |
-| `pages-fast` | Deploy Dashboard when rebuild is required (`build_insights` + `build_dashboard_data`) |
+| `pages-fast` | Deploy Dashboard when rebuild is required (`repair_letter_dates` + `build_insights` + `build_dashboard_data`) |
 
 ## Deploy Dashboard speed model
 

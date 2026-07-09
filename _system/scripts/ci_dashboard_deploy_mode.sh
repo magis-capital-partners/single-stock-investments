@@ -3,7 +3,7 @@
 #
 # Modes:
 #   deploy-only  — publish committed dashboard/ (no Python rebuild)
-#   rebuild      — pages-fast profile: insights + dashboard_data + validate
+#   rebuild      — pages-fast profile: repair_letter_dates + insights + dashboard_data + validate
 #
 # Writes GITHUB_OUTPUT keys: mode, checkout_profile, skip_rebuild, rebuild_profile, validate, needs_disk_cleanup
 set -euo pipefail

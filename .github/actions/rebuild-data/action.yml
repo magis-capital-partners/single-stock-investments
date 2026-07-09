@@ -123,6 +123,7 @@ runs:
         OAUTH_CLIENT_ID: ${{ env.OAUTH_CLIENT_ID }}
         OAUTH_PROXY_URL: ${{ env.OAUTH_PROXY_URL }}
       run: |
+        python _system/scripts/repair_letter_dates.py --apply
         python _system/scripts/build_insights.py
         python _system/scripts/build_dashboard_data.py
 
