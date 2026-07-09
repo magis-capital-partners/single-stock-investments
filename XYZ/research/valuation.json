@@ -1,0 +1,187 @@
+{
+  "ticker": "XYZ",
+  "as_of": "2026-07-09",
+  "method": "full",
+  "irr_method": "full",
+  "lawrence_bucket": "multi_sided",
+  "valuation_mode": "operating",
+  "classification_inputs": {
+    "archetype": "platform",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 77.43,
+    "price_source": "Yahoo Finance XYZ close 2026-07-09",
+    "price_as_of": "2026-07-09",
+    "fcf_per_share": 3.89,
+    "fcf_source": "FY2025 operating cash flow $2.58B less capital spending $155M, divided by 622.8M diluted shares (10-K filed 2026-02-26)",
+    "shares_millions": 622.8,
+    "shares_source": "FY2025 weighted average diluted shares (10-K)",
+    "normalization_note": "Owner cash uses cash from operations minus capital spending; excludes bitcoin mark-to-market in net income and non-cash stock compensation add-backs in Adjusted EBITDA"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.04,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 14,
+      "notes": "Square GPV slows; Cash App ex-bitcoin growth decelerates; credit losses rise on BNPL book"
+    },
+    "base": {
+      "growth_y1_5": 0.08,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 20,
+      "notes": "Square GPV +10% FY25; Cash App ex-bitcoin net revenue +20% FY25 and +37% Q1-26; gross profit +27% Q1-26"
+    },
+    "bull": {
+      "growth_y1_5": 0.12,
+      "growth_y6_10": 0.07,
+      "exit_pfcf_y10": 25,
+      "notes": "Cash App banking and Afterpay cross-sell accelerate; Square international and vertical software mix improves"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Fintech platform; bitcoin held at fair value on balance sheet per 10-K"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating platform, not resource NAV"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Bitcoin ecosystem revenue is large but low-margin; 2-4% of consolidated gross profit Q1-26 (10-Q)"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / RPO not in FCF path?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Transaction-volume-driven fees, not contracted backlog"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "Partial",
+      "treatment": "milestone_nav",
+      "evidence": "Corporate bitcoin treasury ~8,500 BTC marked to market; FY2025 remeasurement loss $55.9M (10-K)"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No dated legal or trust recovery"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue path?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Afterpay BNPL, Cash App Card, and Square banking embedded in segment revenue paths (10-K segment note)"
+    }
+  ],
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "human_review": {
+    "notes": "First Marvin deep dive 2026-07-09; confirm live price and consumer-credit reserve trends on next 10-Q.",
+    "live_price_confirmed": false
+  },
+  "lawrence_horizon_years": 10,
+  "valuation_overlay": "segment_cashflow",
+  "segment_build": {
+    "framework": "speedwell_reverse_dcf",
+    "as_of": "2026-07-09",
+    "horizon_years": 10,
+    "discount_rate_explicit": 0.1,
+    "segments": [
+      {
+        "id": "cash_app",
+        "label": "Cash App (consumer)",
+        "owner_cash_y0_bn": 1.49,
+        "owner_cash_y0_per_share": 2.39,
+        "owner_cash_y0_source": "62% of consolidated owner cash allocated by FY2025 segment gross profit share ($6.34B of $10.27B)",
+        "growth_y1_5": 0.12,
+        "growth_y6_10": 0.07,
+        "exit_pfcf_y10": 22,
+        "notes": "Ex-bitcoin net revenue +20% FY25; gross profit +21% FY25 and +38% Q1-26"
+      },
+      {
+        "id": "square",
+        "label": "Square (seller)",
+        "owner_cash_y0_bn": 0.93,
+        "owner_cash_y0_per_share": 1.49,
+        "owner_cash_y0_source": "38% of consolidated owner cash allocated by FY2025 segment gross profit share ($3.94B of $10.27B)",
+        "growth_y1_5": 0.09,
+        "growth_y6_10": 0.06,
+        "exit_pfcf_y10": 18,
+        "notes": "Square GPV $250B+ FY25; revenue +10% FY25; Q1 GPV +13%"
+      }
+    ],
+    "options": [
+      {
+        "id": "bitcoin_treasury",
+        "label": "Corporate bitcoin treasury (~8,500 BTC)",
+        "option_treatment": "milestone_nav",
+        "annual_drag_per_share": 0.0,
+        "base_terminal_value_bn": 0,
+        "base_terminal_rationale": "Marked to market on balance sheet; no separate terminal in Lawrence base; bull sensitivity only",
+        "overlay_base_terminal_bn": null,
+        "bull_terminal_value_bn": null,
+        "evidence": "10-K bitcoin investment table; FY2025 remeasurement loss $55.9M",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "bitcoin_ecosystem",
+        "label": "Bitcoin ecosystem revenue (low-margin)",
+        "option_treatment": "embedded_in_segment",
+        "annual_drag_per_share": 0.0,
+        "base_terminal_value_bn": 0,
+        "base_terminal_rationale": "Revenue in Cash App segment; only 2-4% of consolidated gross profit",
+        "evidence": "10-Q Q1-26: bitcoin ecosystem 2% of total gross profit",
+        "not_in_lawrence_base": true
+      }
+    ],
+    "corporate_drag": {
+      "alphabet_level_drag_per_share": 0.01,
+      "notes": "Corporate and other gross profit $89M FY25; unallocated G&A and stock compensation above segment gross profit"
+    },
+    "reconciliation": {
+      "sum_pv_per_share_at_explicit_discount": null,
+      "explicit_discount_rate_pct": 10.0,
+      "implied_business_return_pct": null,
+      "lawrence_base_irr_pct": null
+    }
+  },
+  "estimates": {
+    "marvin_floor": {
+      "per_share": 3.89,
+      "return_pct": null,
+      "notes": "FY2025 OCF $2.58B less capex $155M on 622.8M diluted shares"
+    },
+    "blended_best": {
+      "per_share": 3.89,
+      "return_pct": null,
+      "notes": "Filings only; no approved third-party blend"
+    }
+  }
+}
