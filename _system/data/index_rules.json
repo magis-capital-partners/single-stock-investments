@@ -8,6 +8,7 @@
       "demand_shock": 0.30,
       "illiquidity": 0.10
     },
+    "max_candidate_distance_pct": 15.0,
     "inclusion_probability": {
       "high": {"max_abs_distance_pct": 5, "max_days_to_event": 45, "min_gates_pass_pct": 0.8},
       "medium": {"max_abs_distance_pct": 15, "max_days_to_event": 120, "min_gates_pass_pct": 0.5},
@@ -89,6 +90,7 @@
       "markets": ["US"],
       "exchanges": ["NASDAQ"],
       "exclude_sectors": ["financials"],
+      "exclude_tickers": ["NDAQ", "CBOE", "CME", "ICE", "MIAX", "SPGI", "MCO"],
       "top_n": 100,
       "min_mcap_usd": 5000000000,
       "source": "nasdaq_100_methodology_public_summary"
@@ -118,6 +120,14 @@
       "exchanges": ["TSX"],
       "min_mcap_cad": 100000000,
       "source": "sp_tsx_composite_public_summary"
+    },
+    "djia": {
+      "family": "sp_dji",
+      "label": "Dow Jones Industrial Average",
+      "markets": ["US"],
+      "exchanges": ["NYSE", "NASDAQ"],
+      "notes": "Price-weighted 30; membership from seed / provider notices only",
+      "source": "sp_dji_us_indices_methodology.pdf"
     },
     "topix": {
       "family": "jpx",

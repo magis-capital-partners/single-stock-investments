@@ -48,7 +48,39 @@ When S&P DJI or FTSE Russell publish new mcap bands / methodology:
 
 Dynamic FTSE Russell / S&P DJI notice pages may need a Vicki brief under `{TICKER}/research/shopbot/` or a portfolio-level note. Do not automate licensed provider portals without human OK.
 
-## Guardrails
+## News harvest (precision-first)
 
-- Never invent float, ADV, or earnings in scorecards.
-- UI must keep the Greenwood & Sammon caption (research trigger, not a trade signal).
+News is a **filtered secondary** signal only:
+
+1. Title/summary must pass **subject-gated** extraction (`index_event_extract.py`): the portfolio ticker is the grammatical subject of an add / delete / **reclassify** clause.
+2. Category is **not** required to be `index_inclusion` — Copart-style "CEO + Russell reclassification" headlines often land in `management`. Subject match is the gate.
+3. **Membership gate:** skip contradictory deletes unless the title says exit/removed (seed lag). Adds and reclassifies are allowed even if seed already lists membership (seed often lags or is backfilled from constituents).
+4. Co-mentions (SpaceX joins Nasdaq-100 → AMZN/META tagged) are rejected.
+5. Prefer raising `index_inclusion` category priority above `management` so dual-topic headlines classify as index when patterns match.
+
+### Archive recovery (automatic)
+
+`build_index_membership.py` always runs **archive harvest** after the live `portfolio_news.json` pass:
+
+- `_system/reviews/pending|approved/news_*.md` (aged review digests)
+- `{TICKER}/research/news/news_index.json` (per-ticker archives)
+
+This recovers AMD / WEST / ALS.TO / CSGP-style events that have rolled out of the live feed. Same subject-gated extract; dedupe via `append_announcement`.
+
+Provider-confirmed appends remain the gold standard. After changing harvest logic, rebuild with purge:
+
+```bash
+python _system/scripts/build_index_membership.py --date YYYY-MM-DD
+```
+
+(Default purges prior `news_unconfirmed` rows, re-harvests live news, then re-harvests archives.)
+
+## Scorecard candidacy
+
+`inclusion_candidate` requires `|distance_to_boundary_pct| <= max_candidate_distance_pct` (default 15). Clearing a min-mcap floor alone (MSCI / Nasdaq-100) is **not** candidacy.
+
+## Tests
+
+```bash
+python -m unittest _system.scripts.tests.test_index_event_extract
+```

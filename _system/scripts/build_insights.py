@@ -806,12 +806,20 @@ def _index_action_from_text(text: str) -> str | None:
     low = (text or "").lower()
     if re.search(r"\b(removed|deleted|dropped|deletion|exclusion)\b", low):
         return "delete"
+    if re.search(r"\b(reclass|reshuffl|index\s+shift|index\s+moves?|index\s+change)\b", low):
+        return "reclassify"
     if re.search(r"\b(added|joins|joining|inclusion|addition|will replace|replaces)\b", low):
         return "add"
     return None
 
 
 def from_news(doc: dict) -> list[dict]:
+    """News insights. Index changes only when subject-gated extract matches a portfolio ticker."""
+    try:
+        from index_event_extract import extract_index_events
+    except ImportError:
+        extract_index_events = None  # type: ignore
+
     out: list[dict] = []
     for item in doc.get("items") or doc.get("news") or []:
         tickers = item.get("tickers") or ([item.get("ticker")] if item.get("ticker") else [])
@@ -822,15 +830,27 @@ def from_news(doc: dict) -> list[dict]:
         summary = item.get("summary") or title
         event_type = category
         extra: dict = {}
-        if category in INDEX_NEWS_CATEGORIES or (
-            category == "market_structure"
-            and re.search(r"\b(S&P|Russell|MSCI|Nasdaq|index\s+(inclusion|deletion))\b", f"{title} {summary}", re.I)
-        ):
-            event_type = "index_change"
-            action = _index_action_from_text(f"{title} {summary}")
-            if action:
-                extra["index_action"] = action
-            extra["index_event"] = True
+        subject_events: list[dict] = []
+        # Subject extract is the gate for any category (CPRT reclass often lands in management)
+        if extract_index_events and any(tickers):
+            subject_events = extract_index_events(
+                title,
+                summary,
+                candidate_tickers=[t for t in tickers if t],
+            )
+            if subject_events:
+                event_type = "index_change"
+                extra["index_event"] = True
+                extra["index_action"] = subject_events[0].get("action")
+                extra["index_id"] = subject_events[0].get("index")
+                extra["quality_gated"] = True
+                tickers = [e["ticker"] for e in subject_events]
+            elif category in INDEX_NEWS_CATEGORIES:
+                # Index-tagged news without subject match stays ordinary (no SpaceX→AMZN)
+                event_type = category
+        elif category in INDEX_NEWS_CATEGORIES:
+            # Fallback without extractor: do not promote to index_change
+            event_type = category
         for ticker in tickers:
             rec = insight_record(
                 source="news",
@@ -856,10 +876,12 @@ def from_news(doc: dict) -> list[dict]:
 
 
 def from_index_membership(doc: dict) -> list[dict]:
-    """Surface confirmed index events from index_membership.json into the events feed."""
+    """Surface quality-gated index events from index_membership.json into the events feed."""
     out: list[dict] = []
     for ticker, row in (doc.get("by_ticker") or {}).items():
         for ev in row.get("confirmed_events") or []:
+            if not (ev.get("confidence") == "provider_confirmed" or ev.get("quality_gated")):
+                continue
             action = ev.get("action") or "change"
             index_id = ev.get("index") or "index"
             title = ev.get("title") or f"{ticker} {action} {index_id}"
@@ -882,6 +904,7 @@ def from_index_membership(doc: dict) -> list[dict]:
                     index_id=index_id,
                     index_effective=ev.get("effective"),
                     index_event=True,
+                    quality_gated=True,
                 )
             )
     return out[:80]

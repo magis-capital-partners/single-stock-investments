@@ -206,17 +206,37 @@ POSITIVE_PATTERNS: dict[str, list[re.Pattern]] = {
         re.compile(r"\bpricing\s+(change|update)\b", re.I),
     ],
     "index_inclusion": [
-        re.compile(r"\badded\s+to\s+(the\s+)?(S&P\s+500|S&P\s+MidCap|S&P\s+SmallCap|Russell|MSCI|Nasdaq\s+100|FTSE|TOPIX|STOXX|TSX)\b", re.I),
-        re.compile(r"\bindex\s+inclusion\b", re.I),
-        re.compile(r"\bjoins\s+(the\s+)?(S&P|Russell|MSCI|Nasdaq|FTSE|TOPIX|STOXX)\b", re.I),
         re.compile(
-            r"\b(removed|deleted|dropped)\s+from\s+(the\s+)?(S&P|Russell|MSCI|Nasdaq|FTSE|TOPIX|STOXX|TSX)\b",
+            r"\b(?:added\s+to|joins?|joined|joining|removed\s+from|deleted\s+from|dropped\s+from)\s+"
+            r"(?:the\s+)?(S&P\s+500|S&P\s+MidCap|S&P\s+SmallCap|S&P\s+400|S&P\s+600|"
+            r"Russell\s+1000|Russell\s+2000|Russell\s+3000|MSCI|Nasdaq[-\s]?100|FTSE\s+100|FTSE\s+250|"
+            r"TOPIX|STOXX|TSX)\b",
             re.I,
         ),
-        re.compile(r"\bto\s+be\s+(added|removed)\b", re.I),
-        re.compile(r"\bindex\s+(addition|deletion|removal|review|reconstitution)\b", re.I),
-        re.compile(r"\b(set\s+to\s+join|will\s+replace|replaces?)\b.*\b(S&P|Russell|MSCI|Nasdaq)\b", re.I),
-        re.compile(r"\b(under\s+review)\s+for\s+(index|S&P|Russell|MSCI)\b", re.I),
+        re.compile(
+            r"\b(S&P\s+500|Russell\s+1000|Russell\s+2000|Nasdaq[-\s]?100|MSCI)\b"
+            r".{0,40}\b(?:adds?|will\s+add|adding)\b",
+            re.I,
+        ),
+        re.compile(
+            r"\b(?:set\s+to\s+join|will\s+replace)\b.{0,40}\b(S&P|Russell|MSCI|Nasdaq[-\s]?100)\b",
+            re.I,
+        ),
+        re.compile(
+            r"\b(under\s+review)\s+for\s+(?:the\s+)?(S&P\s+500|Russell\s+1000|Russell\s+2000|MSCI|Nasdaq[-\s]?100)\b",
+            re.I,
+        ),
+        # Style-box / reconstitution language (Copart Russell reclassification)
+        re.compile(
+            r"\b(?:russell|s&p|nasdaq|msci|ftse|index)\s+"
+            r"(?:reclassification|reclass(?:ified)?|reshuffle|shift|moves?|change|migration)\b",
+            re.I,
+        ),
+        re.compile(
+            r"\b(?:index\s+reclassification|index\s+shift|index\s+moves?|"
+            r"style\s+reclassification|russell\s+reshuffle)\b",
+            re.I,
+        ),
     ],
     "ai_material": [
         re.compile(r"\b(AI|artificial intelligence)\b"),
@@ -249,11 +269,11 @@ CATEGORY_PRIORITY = {
     "activist": 80,
     "spinoff": 78,
     "corporate_action": 75,
+    "index_inclusion": 72,  # above management so reclass/CEO+index stories classify as index
     "management": 70,
     "major_contract": 68,
     "capacity_ops": 66,
     "market_structure": 64,
-    "index_inclusion": 63,
     "platform_pricing": 62,
     "buyback": 60,
     "dividend_policy": 58,
