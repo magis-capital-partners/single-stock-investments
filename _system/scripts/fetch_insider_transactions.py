@@ -40,7 +40,7 @@ def registry_us_tickers() -> list[str]:
 def fetch_ticker(ticker: str, *, offline: bool = False) -> str:
     tk = ticker.upper()
     if not cik_for_ticker(tk):
-        return f"skip {tk} (no CIK in us_ticker_config.json)"
+        return f"skip {tk} (no CIK in us_ticker_config.json or SEC map)"
     if offline:
         txs = read_transactions_csv(tk)
         if not txs:
@@ -67,14 +67,34 @@ def fetch_ticker(ticker: str, *, offline: bool = False) -> str:
     return f"OK {tk}: {len(txs)} transaction(s) -> {path.relative_to(ROOT)}"
 
 
+def quant_universe_tickers() -> list[str]:
+    from ownership_common import SIGNALS_PATH, load_json as own_load  # noqa: WPS433
+
+    signals = own_load(SIGNALS_PATH, {"by_ticker": {}})
+    return sorted(
+        t
+        for t, row in (signals.get("by_ticker") or {}).items()
+        if row.get("in_biotech_quant_universe") and ":" not in t
+    )
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("tickers", nargs="*", help="Subset (default: all US CIK holdings)")
     ap.add_argument("--offline", action="store_true", help="Use cached CSV only")
+    ap.add_argument("--quant-universe", action="store_true", help="Fetch Form 4s for biotech quant universe")
+    ap.add_argument("--max-fetch", type=int, default=0, help="Limit tickers (0=all)")
     args = ap.parse_args()
-    targets = [t.upper() for t in args.tickers] if args.tickers else registry_us_tickers()
+    if args.tickers:
+        targets = [t.upper() for t in args.tickers]
+    elif args.quant_universe:
+        targets = quant_universe_tickers()
+    else:
+        targets = registry_us_tickers()
+    if args.max_fetch:
+        targets = targets[: args.max_fetch]
     if not targets:
-        print("No US CIK tickers found.", file=sys.stderr)
+        print("No tickers found.", file=sys.stderr)
         return 1
     for tk in targets:
         print(fetch_ticker(tk, offline=args.offline))

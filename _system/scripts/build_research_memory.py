@@ -36,6 +36,8 @@ from memory_common import (  # noqa: E402
 )
 from ownership_common import (  # noqa: E402
     FUNDS_PATH,
+    OWNERSHIP_DIR,
+    PAPER_BOOK_PATH,
     RECORDS_DIR,
     SIGNALS_PATH,
     load_json,
@@ -469,7 +471,15 @@ def build() -> tuple[dict, dict]:
             present = True
         if fid == "insider_non_ceo" and any(row.get("insider_score") is not None for row in quant_signals.values()):
             present = True
-        if fid == "short_interest" and any((row.get("short_candidate_score") or 0) > 0 for row in quant_signals.values()):
+        if fid == "short_interest" and any(
+            (row.get("short_candidate_score") or 0) > 0 or row.get("short_interest_pct") is not None
+            for row in quant_signals.values()
+        ):
+            present = True
+        if fid == "peer_momentum" and any(
+            row.get("peer_momentum_12m") is not None or row.get("peer_cluster_id") is not None
+            for row in quant_signals.values()
+        ):
             present = True
         live_factors.append(
             {
@@ -481,6 +491,9 @@ def build() -> tuple[dict, dict]:
                 "weight_short": factor.get("weight_short"),
             }
         )
+
+    paper_book = load_json(PAPER_BOOK_PATH, {})
+    knowledge_delta = load_json(OWNERSHIP_DIR / "knowledge_delta_latest.json", {})
 
     memory_doc = {
         "generated_at": now_iso(),
@@ -504,6 +517,8 @@ def build() -> tuple[dict, dict]:
             "factor_scoreboard": live_factors,
             "library_catalog": factor_spec.get("library_catalog") or [],
             "methodology_claims": methodology_claims,
+            "paper_book": paper_book or None,
+            "knowledge_delta": knowledge_delta or None,
             "notes": "13F records stored in _system/reference/market-data/ownership/records/",
         },
     }

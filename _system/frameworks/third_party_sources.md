@@ -58,6 +58,15 @@
 
 ---
 
+## Approved market-data sources (context tier — not IRR)
+
+| ID | Publisher | Use | Path / URL | Approved |
+|----|-----------|-----|------------|----------|
+| `finra_equity_si` | FINRA Equity Short Interest (biweekly) | Biotech quant short factor | `https://cdn.finra.org/equity/otcmarket/biweekly/shrtYYYYMMDD.csv` → `_system/reference/market-data/ownership/short_interest/` | **2026-07-09** (market data only; diversified short book; **not** base IRR) |
+| `clinicaltrials_gov` | ClinicalTrials.gov API v2 | Peer / cohort similarity | `https://clinicaltrials.gov/api/v2/studies` → `ownership/biotech_clinical_profiles.json` | **2026-07-09** (context tier peer momentum; **not** base IRR) |
+
+---
+
 ## Pending registry (human action required)
 
 Marvin scans `{TICKER}/investor-documents/research-notes/` and flags new files here.

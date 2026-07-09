@@ -36,6 +36,16 @@ def cik_for_ticker(ticker: str) -> str | None:
     entry = cfg.get(ticker.upper()) or cfg.get(ticker)
     if isinstance(entry, dict) and entry.get("cik"):
         return str(int(entry["cik"]))
+    # Fall back to SEC company tickers map (biotech quant universe)
+    sec_map_path = ROOT / "_system" / "reference" / "market-data" / "fundamentals" / "_sec_ticker_cik_map.json"
+    if sec_map_path.exists():
+        try:
+            sec_map = json.loads(sec_map_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            sec_map = {}
+        mapped = sec_map.get(ticker.upper()) or sec_map.get(ticker.upper().replace(".", "-"))
+        if mapped:
+            return str(int(str(mapped).lstrip("0") or "0"))
     return None
 
 
@@ -230,6 +240,10 @@ def parse_form4_xml(xml: str, meta: dict) -> list[dict]:
             continue
         after_s = _xml_text(tx, ".//sharesOwnedFollowingTransaction")
         shares_after = int(float(after_s.replace(",", ""))) if after_s else None
+        # Prefer explicit Form 4 transactionCode (P=open-market purchase, A=grant, etc.)
+        tx_code = (_xml_text(tx, ".//transactionCode") or "").upper().strip()
+        if not tx_code:
+            tx_code = "P" if ad_code == "A" else "S"
         txs.append({
             "insider": insider,
             "title": title,
@@ -242,7 +256,7 @@ def parse_form4_xml(xml: str, meta: dict) -> list[dict]:
             "price": price,
             "value_usd": round(shares * price, 2),
             "acquired_disposed": ad_code,
-            "transaction_code": "P" if ad_code == "A" else "S",
+            "transaction_code": tx_code,
             "shares_owned_after": shares_after,
             "is_10b5_1": is_10b5_1,
             "is_proposed_sale": False,

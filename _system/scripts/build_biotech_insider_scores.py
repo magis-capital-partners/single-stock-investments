@@ -10,7 +10,14 @@ import sys
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 
-from ownership_common import INSIDER_SCORES_PATH, SIGNALS_PATH, load_json, now_iso, save_json  # noqa: E402
+from ownership_common import (  # noqa: E402
+    INSIDER_SCORES_PATH,
+    SIGNALS_PATH,
+    assign_quintiles,
+    load_json,
+    now_iso,
+    save_json,
+)
 
 INSIDER_DIR = ROOT / "_system" / "reference" / "market-data" / "insider"
 MANIFEST = INSIDER_DIR / "manifest.json"
@@ -52,24 +59,15 @@ def score_ticker(csv_path: Path, as_of: datetime) -> dict:
     with csv_path.open(encoding="utf-8", newline="") as fh:
         reader = csv.DictReader(fh)
         for row in reader:
-            code = (row.get("transaction_code") or "").upper()
-            acquired = (row.get("acquired_disposed") or "").upper()
-            if code not in {"P", "A"} and acquired != "A":
-                # open-market purchase typically P + A
-                if code != "P":
-                    continue
+            code = (row.get("transaction_code") or "").upper().strip()
+            acquired = (row.get("acquired_disposed") or "").upper().strip()
+            # Open-market purchases only (Form 4 code P). Grants (A) do not count.
+            if code != "P":
+                continue
             if acquired == "D":
                 continue
-            if code == "P" or (acquired == "A" and code in {"P", ""}):
-                pass
-            else:
-                if code != "P":
-                    continue
             dt = parse_date(row.get("transaction_date") or row.get("filing_date"))
             if not dt or dt < cutoff:
-                continue
-            # skip 10b5-1 routine if flagged and not a clear open-market P
-            if str(row.get("is_10b5_1")).lower() in {"true", "1", "yes"} and code != "P":
                 continue
             title = row.get("title") or ""
             if is_ceo_title(title):
@@ -90,7 +88,12 @@ def score_ticker(csv_path: Path, as_of: datetime) -> dict:
 def main() -> int:
     signals = load_json(SIGNALS_PATH, {"by_ticker": {}})
     manifest = load_json(MANIFEST, {"tickers": {}})
-    tickers = set(signals.get("by_ticker") or {}) | set((manifest.get("tickers") or {}).keys())
+    quant = {
+        t
+        for t, row in (signals.get("by_ticker") or {}).items()
+        if row.get("in_biotech_quant_universe")
+    }
+    tickers = set(quant) | set((manifest.get("tickers") or {}).keys()) | set(signals.get("by_ticker") or {})
     as_of = datetime.now(timezone.utc)
     by_ticker: dict[str, dict] = {}
     for ticker in sorted(tickers):
@@ -99,16 +102,31 @@ def main() -> int:
         csv_path = ROOT / "_system" / "reference" / "market-data" / csv_ref.replace("\\", "/")
         if not csv_path.exists():
             csv_path = INSIDER_DIR / f"{ticker}_transactions.csv"
-        if not csv_path.exists():
+        if csv_path.exists():
+            scored = score_ticker(csv_path, as_of)
+        elif ticker in quant:
+            # Live factor keys must exist on universe even before Form 4 harvest
+            scored = {"insider_buy_count_90d": 0, "insider_cfo_buys": 0, "insider_score": 0}
+        else:
             continue
-        scored = score_ticker(csv_path, as_of)
-        if scored["insider_buy_count_90d"] == 0 and scored["insider_score"] == 0:
-            # still record zeros for quant-universe names in signals
-            if ticker not in (signals.get("by_ticker") or {}):
-                continue
         by_ticker[ticker] = {"ticker": ticker, **scored}
 
-    payload = {"generated_at": now_iso(), "ticker_count": len(by_ticker), "by_ticker": by_ticker}
+    # Universe quintiles among quant names with scores
+    score_inputs = {
+        t: float(row.get("insider_score") or 0)
+        for t, row in by_ticker.items()
+        if t in quant
+    }
+    quintiles = assign_quintiles(score_inputs, higher_is_better=True)
+    for ticker, row in by_ticker.items():
+        row["insider_quintile"] = quintiles.get(ticker)
+
+    payload = {
+        "generated_at": now_iso(),
+        "ticker_count": len(by_ticker),
+        "quant_scored": len(score_inputs),
+        "by_ticker": by_ticker,
+    }
     save_json(INSIDER_SCORES_PATH, payload)
 
     if signals.get("by_ticker"):
@@ -117,8 +135,9 @@ def main() -> int:
                 signals["by_ticker"][ticker]["insider_score"] = row.get("insider_score")
                 signals["by_ticker"][ticker]["insider_buy_count_90d"] = row.get("insider_buy_count_90d")
                 signals["by_ticker"][ticker]["insider_cfo_buys"] = row.get("insider_cfo_buys")
+                signals["by_ticker"][ticker]["insider_quintile"] = row.get("insider_quintile")
         save_json(SIGNALS_PATH, signals)
-    print(f"Wrote insider scores for {len(by_ticker)} tickers")
+    print(f"Wrote insider scores for {len(by_ticker)} tickers ({len(score_inputs)} quant quintiled)")
     return 0
 
 

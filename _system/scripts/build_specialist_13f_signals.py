@@ -16,12 +16,15 @@ sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 
 from memory_common import BIOTECH_EXCLUDE_TICKERS  # noqa: E402
 from ownership_common import (  # noqa: E402
+    CLINICAL_PATH,
     FUNDS_PATH,
     FUNDAMENTALS_PATH,
     FULL_RECORDS_DIR,
     INSIDER_SCORES_PATH,
     RECORDS_DIR,
+    SHORT_INTEREST_PATH,
     SIGNALS_PATH,
+    issuer_size_bucket,
     load_json,
     now_iso,
     portfolio_universe,
@@ -77,7 +80,7 @@ def assign_quintiles(values: dict[str, float], higher_is_better: bool = True) ->
     return out
 
 
-def size_bucket(market_value: float | None) -> str:
+def position_size_bucket(market_value: float | None) -> str:
     """Bucket by aggregate specialist-reported position MV (USD, liquidity proxy)."""
     mv = market_value or 0
     if mv >= 500_000_000:
@@ -87,6 +90,10 @@ def size_bucket(market_value: float | None) -> str:
     if mv > 0:
         return "small"
     return "unknown"
+
+
+# Back-compat alias
+size_bucket = position_size_bucket
 
 
 def is_valid_signal_ticker(ticker: str) -> bool:
@@ -150,6 +157,8 @@ def build_signals(book_records: list[dict], quarter: str) -> dict:
     biotech_watchlist = load_biotech_watchlist(tickers)
     fundamentals = load_json(FUNDAMENTALS_PATH, {"by_ticker": {}}).get("by_ticker") or {}
     insider_scores = load_json(INSIDER_SCORES_PATH, {"by_ticker": {}}).get("by_ticker") or {}
+    short_interest = load_json(SHORT_INTEREST_PATH, {"by_ticker": {}}).get("by_ticker") or {}
+    clinical = load_json(CLINICAL_PATH, {"by_ticker": {}}).get("by_ticker") or {}
     fund_class_list = load_json(FULL_RECORDS_DIR / "fund_classifications_latest.json", {"funds": []}).get("funds") or []
     fund_class = {f.get("fund_id"): f for f in fund_class_list}
 
@@ -240,7 +249,11 @@ def build_signals(book_records: list[dict], quarter: str) -> dict:
         )
         funda = fundamentals.get(signal_id) or {}
         insider = insider_scores.get(signal_id) or {}
+        si = short_interest.get(signal_id) or {}
+        clin = clinical.get(signal_id) or {}
+        issuer_mcap = funda.get("issuer_market_cap")
         company = (tickers.get(signal_id) or {}).get("company") or rows[0].get("issuer")
+        pos_bucket = position_size_bucket(total_value)
         row_out = {
             "ticker": signal_id,
             "company": company,
@@ -257,7 +270,10 @@ def build_signals(book_records: list[dict], quarter: str) -> dict:
             "exit_count": len(exits),
             "consensus_score": max(0, consensus),
             "total_market_value_usd": total_value,
-            "size_bucket": size_bucket(total_value),
+            "position_size_bucket": pos_bucket,
+            "size_bucket": pos_bucket,  # back-compat
+            "issuer_market_cap": issuer_mcap,
+            "issuer_size_bucket": funda.get("issuer_size_bucket") or issuer_size_bucket(issuer_mcap),
             "initiation_signal": len(initiations) >= 2,
             "exit_signal": any(r.get("fund_id") in CORE_FUNDS for r in exits),
             "concentration_flag": bool(concentration),
@@ -268,9 +284,13 @@ def build_signals(book_records: list[dict], quarter: str) -> dict:
             "insider_score": insider.get("insider_score"),
             "insider_buy_count_90d": insider.get("insider_buy_count_90d"),
             "insider_cfo_buys": insider.get("insider_cfo_buys"),
-            "peer_momentum_12m": None,
-            "short_interest_pct": None,
-            "short_candidate_score": None,
+            "insider_quintile": insider.get("insider_quintile"),
+            "peer_momentum_12m": clin.get("peer_momentum_12m"),
+            "peer_cluster_id": clin.get("peer_cluster_id"),
+            "short_interest_pct": si.get("short_interest_pct"),
+            "short_interest_quintile": si.get("short_interest_quintile"),
+            "days_to_cover": si.get("days_to_cover"),
+            "short_candidate_score": si.get("short_candidate_score"),
             "holders": sorted(
                 rows,
                 key=lambda r: (r.get("fund_id") in CORE_FUNDS, r.get("market_value_usd") or 0),
@@ -300,18 +320,67 @@ def build_signals(book_records: list[dict], quarter: str) -> dict:
         )
 
     history: dict[str, list[dict]] = defaultdict(list)
-    if RECORDS_DIR.exists():
-        for path in sorted(RECORDS_DIR.glob("*.json")):
-            if path.name == "latest.json":
+    # Prefer multi-quarter full InfoTables for density/consensus trends
+    if FULL_RECORDS_DIR.exists():
+        quarter_holder_counts: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
+        for path in sorted(FULL_RECORDS_DIR.glob("*/*.json")):
+            if path.name in {"latest.json", "cached.json", "unknown.json"}:
+                continue
+            stem = path.stem
+            if not re.fullmatch(r"\d{4}Q[1-4]", stem):
                 continue
             doc = load_json(path, {})
-            q = doc.get("quarter") or path.stem
+            q = doc.get("quarter") or stem
+            if not re.fullmatch(r"\d{4}Q[1-4]", str(q)):
+                continue
+            fid = doc.get("fund_id") or path.parent.name
+            if specialist_ids and fid not in specialist_ids:
+                continue
+            for row in doc.get("records") or []:
+                if not row.get("issuer_is_biotech"):
+                    continue
+                key = universe_key(row)
+                if not key or not is_valid_signal_ticker(key if not key.startswith(("CUSIP:", "ISSUER:")) else (row.get("ticker") or "")):
+                    mapped = (row.get("ticker") or "").upper()
+                    if not mapped or not is_valid_signal_ticker(mapped):
+                        continue
+                    key = mapped
+                elif key.startswith(("CUSIP:", "ISSUER:")):
+                    mapped = (row.get("ticker") or "").upper()
+                    if not mapped:
+                        continue
+                    key = mapped
+                quarter_holder_counts[q][key] += 1
+        for q in sorted(quarter_holder_counts):
+            for ticker, count in quarter_holder_counts[q].items():
+                history[ticker].append({"quarter": q, "specialist_holder_count": count})
+    if RECORDS_DIR.exists() and not history:
+        skip_names = {"latest.json", "cached.json", "unknown.json"}
+        for path in sorted(RECORDS_DIR.glob("*.json")):
+            if path.name in skip_names:
+                continue
+            stem = path.stem
+            if not re.fullmatch(r"\d{4}Q[1-4]", stem):
+                continue
+            doc = load_json(path, {})
+            q = doc.get("quarter") or stem
+            if not re.fullmatch(r"\d{4}Q[1-4]", str(q)):
+                continue
             counts: dict[str, int] = defaultdict(int)
             for row in doc.get("records") or []:
                 counts[row.get("ticker") or ""] += 1
             for ticker, count in counts.items():
                 if ticker:
                     history[ticker].append({"quarter": q, "specialist_holder_count": count})
+
+    # Attach sparkline-friendly history onto signal rows
+    for ticker, row in ticker_signals.items():
+        hist = history.get(ticker) or []
+        row["holder_history"] = hist[-8:]
+        if len(hist) >= 2:
+            prev_n = hist[-2].get("specialist_holder_count") or 0
+            cur_n = hist[-1].get("specialist_holder_count") or row.get("specialist_holder_count") or 0
+            row["holder_count_qoq"] = cur_n - prev_n
 
     return {
         "generated_at": now_iso(),

@@ -123,10 +123,21 @@ def cumulative_sum(points: list[dict], key: str = "value") -> float | None:
 
 
 def market_cap_proxy(ticker: str, signals: dict) -> float | None:
+    """Prefer issuer market cap (SEC×Yahoo), then valuation, then 13F MV sum."""
+    from ownership_common import FUNDAMENTALS_PATH, load_json as own_load  # noqa: WPS433
+
+    funda = (own_load(FUNDAMENTALS_PATH, {"by_ticker": {}}).get("by_ticker") or {}).get(ticker) or {}
+    if funda.get("issuer_market_cap"):
+        try:
+            return float(funda["issuer_market_cap"])
+        except (TypeError, ValueError):
+            pass
     row = (signals.get("by_ticker") or {}).get(ticker) or {}
-    mv = row.get("total_market_value_usd")
-    if mv:
-        return float(mv)
+    if row.get("issuer_market_cap"):
+        try:
+            return float(row["issuer_market_cap"])
+        except (TypeError, ValueError):
+            pass
     # valuation.json price * shares if present
     val_path = ROOT / ticker / "research" / "valuation.json"
     if val_path.exists():
@@ -141,6 +152,10 @@ def market_cap_proxy(ticker: str, signals: dict) -> float | None:
                 return float(price) * float(shares)
         except (TypeError, ValueError):
             pass
+    # Last resort: specialist-reported MV sum (position liquidity, not issuer size)
+    mv = row.get("total_market_value_usd")
+    if mv:
+        return float(mv)
     return None
 
 
@@ -223,9 +238,10 @@ def build(*, fetch_missing: bool = True, max_fetch: int = 80) -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--no-fetch", action="store_true", help="Use local fundamentals only")
+    parser.add_argument("--offline", action="store_true", help="Alias for --no-fetch (CI-safe)")
     parser.add_argument("--max-fetch", type=int, default=80, help="Max SEC companyfacts fetches")
     args = parser.parse_args()
-    payload = build(fetch_missing=not args.no_fetch, max_fetch=args.max_fetch)
+    payload = build(fetch_missing=not (args.no_fetch or args.offline), max_fetch=args.max_fetch)
     save_json(FUNDAMENTALS_PATH, payload)
     # merge into signals if present
     signals = load_json(SIGNALS_PATH, {})

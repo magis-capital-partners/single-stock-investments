@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "source": "Verdad Biotech Investing 2026",
   "source_refs": [
     "_system/reference/biotech-quant/papers/verdad_biotech_investing_2026.pdf",
@@ -37,27 +37,29 @@
     {
       "id": "insider_non_ceo",
       "label": "Insider buys (non-CEO)",
-      "status": "partial",
+      "status": "live",
       "weight_long": 0.1,
       "weight_short": 0.0,
-      "signal_keys": ["insider_buy_count_90d", "insider_score", "insider_cfo_buys"],
-      "notes": "Live for portfolio tickers with Form 4 CSVs; biotech-universe coverage pending broader Form 4 harvest"
+      "signal_keys": ["insider_buy_count_90d", "insider_score", "insider_cfo_buys", "insider_quintile"],
+      "notes": "Universe Form 4 harvest via make biotech-insider-fetch; scores from cache via biotech-insider"
     },
     {
       "id": "peer_momentum",
       "label": "Peer / cohort momentum",
-      "status": "stub",
+      "status": "live",
       "weight_long": 0.15,
       "weight_short": -0.15,
-      "signal_keys": ["peer_momentum_12m", "peer_cluster_id"]
+      "signal_keys": ["peer_momentum_12m", "peer_cluster_id"],
+      "notes": "ClinicalTrials similarity peers; own-price momentum banned"
     },
     {
       "id": "short_interest",
       "label": "Short interest",
-      "status": "stub",
+      "status": "live",
       "weight_long": 0.0,
       "weight_short": 0.2,
-      "signal_keys": ["short_interest_pct", "short_candidate_score"]
+      "signal_keys": ["short_interest_pct", "short_candidate_score", "short_interest_quintile", "days_to_cover"],
+      "notes": "FINRA biweekly Equity Short Interest CDN"
     }
   ],
   "banned_for_biotech": ["pe_ratio", "own_price_momentum_12m", "ev_ebit"],

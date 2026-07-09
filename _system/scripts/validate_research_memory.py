@@ -56,11 +56,22 @@ def main() -> int:
     live = [f for f in scoreboard if f.get("status") == "live"]
     if scoreboard and not live:
         warnings.append("factor_scoreboard has no live factors")
+    for factor in live:
+        if factor.get("present") is False:
+            warnings.append(
+                f"live factor {factor.get('id')} not present in signals — run make specialist-13f-ingest"
+            )
     signals = (biotech.get("signals") or {}).get("by_ticker") or {}
     if signals and len(signals) < 20:
         warnings.append(f"biotech signals only {len(signals)} names — expect full specialist universe")
     elif not signals:
         warnings.append("biotech.signals empty — run make specialist-13f-ingest")
+    paper = biotech.get("paper_book") or {}
+    paper_path = ROOT / "_system" / "reference" / "market-data" / "ownership" / "paper_book_latest.json"
+    if paper_path.exists() and not (paper.get("long") or paper.get("short")):
+        warnings.append("paper_book_latest.json empty — run make biotech-paper")
+    elif not paper_path.exists():
+        warnings.append("paper_book_latest.json missing — run make biotech-paper")
 
     if INSIGHTS_PATH.exists() and MEMORY_PATH.exists():
         insights_mtime = INSIGHTS_PATH.stat().st_mtime

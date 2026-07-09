@@ -23,6 +23,11 @@ FUNDAMENTALS_PATH = OWNERSHIP_DIR / "biotech_fundamentals.json"
 CLINICAL_PATH = OWNERSHIP_DIR / "biotech_clinical_profiles.json"
 INSIDER_SCORES_PATH = OWNERSHIP_DIR / "biotech_insider_scores.json"
 CUSIP_MAP_PATH = OWNERSHIP_DIR / "cusip_ticker_map.json"
+OVERLAYS_DIR = OWNERSHIP_DIR / "overlays"
+PAPER_BOOK_PATH = OWNERSHIP_DIR / "paper_book_latest.json"
+SHORT_INTEREST_DIR = OWNERSHIP_DIR / "short_interest"
+SHORT_INTEREST_PATH = OWNERSHIP_DIR / "biotech_short_interest.json"
+BOOK_QUARTER_RE = re.compile(r"^\d{4}Q[1-4]$")
 REGISTRY_PATH = ROOT / "_system" / "portfolio" / "registry.json"
 SEC_TICKER_CIK_PATH = ROOT / "_system" / "reference" / "market-data" / "fundamentals" / "_sec_ticker_cik_map.json"
 
@@ -369,3 +374,145 @@ def classify_fund_biotech_share(holdings: list[dict]) -> dict:
             1 for r in holdings if issuer_looks_biotech(r.get("issuer") or r.get("nameOfIssuer"))
         ),
     }
+
+
+def yahoo_symbol(ticker: str) -> str:
+    return (ticker or "").upper().replace(".", "-")
+
+
+def fetch_yahoo_price(ticker: str) -> float | None:
+    """Latest regular-market price from Yahoo chart API (v7 quote often blocked)."""
+    sym = yahoo_symbol(ticker)
+    if not sym or ":" in sym:
+        return None
+    url = f"https://query1.finance.yahoo.com/v8/finance/chart/{sym}?interval=1d&range=5d"
+    req = urllib.request.Request(
+        url,
+        headers={
+            "User-Agent": "Mozilla/5.0 (compatible; MarvinResearch/1.0)",
+            "Accept": "application/json",
+        },
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            data = json.load(resp)
+        meta = data["chart"]["result"][0]["meta"]
+        price = meta.get("regularMarketPrice")
+        return float(price) if price is not None else None
+    except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, KeyError, IndexError, TypeError, ValueError, json.JSONDecodeError):
+        return None
+
+
+def sec_shares_outstanding(ticker: str, cik: str | None = None) -> float | None:
+    """Latest shares outstanding from SEC companyfacts."""
+    if not cik:
+        sec_map = load_json(SEC_TICKER_CIK_PATH, {})
+        cik = sec_map.get(ticker.upper()) or sec_map.get(ticker.upper().replace(".", "-"))
+    if not cik:
+        return None
+    padded = cik_padded(cik)
+    url = f"https://data.sec.gov/api/xbrl/companyfacts/CIK{padded}.json"
+    try:
+        facts = sec_fetch_json(url)
+    except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, json.JSONDecodeError):
+        return None
+    us_gaap = (facts.get("facts") or {}).get("us-gaap") or {}
+    best_date = ""
+    best_val: float | None = None
+    for tag in ("EntityCommonStockSharesOutstanding", "CommonStockSharesOutstanding", "WeightedAverageNumberOfSharesOutstandingBasic"):
+        block = us_gaap.get(tag) or {}
+        for unit_key, entries in (block.get("units") or {}).items():
+            if "share" not in unit_key.lower():
+                continue
+            for entry in entries or []:
+                end = entry.get("end") or entry.get("instant") or ""
+                val = entry.get("val")
+                if val is None or not end:
+                    continue
+                try:
+                    fval = float(val)
+                except (TypeError, ValueError):
+                    continue
+                if end >= best_date:
+                    best_date = end
+                    best_val = fval
+    return best_val
+
+
+def issuer_size_bucket(market_cap: float | None) -> str:
+    """Verdad-style issuer market-cap buckets (not position liquidity)."""
+    if market_cap is None or market_cap <= 0:
+        return "unknown"
+    if market_cap < 2_000_000_000:
+        return "small"
+    if market_cap < 10_000_000_000:
+        return "mid"
+    return "large"
+
+
+def fetch_issuer_market_cap(ticker: str, *, offline: bool = False) -> dict:
+    """Prefer SEC shares outstanding × Yahoo price; cache in biotech_fundamentals.json."""
+    tk = (ticker or "").upper()
+    funda = load_json(FUNDAMENTALS_PATH, {"by_ticker": {}})
+    by_ticker = funda.setdefault("by_ticker", {})
+    cached = by_ticker.get(tk) or {}
+    if offline and cached.get("issuer_market_cap"):
+        return {
+            "issuer_market_cap": cached.get("issuer_market_cap"),
+            "market_cap_source": cached.get("market_cap_source") or "cache",
+            "shares_outstanding": cached.get("shares_outstanding"),
+            "price": cached.get("price"),
+        }
+    if offline:
+        return {
+            "issuer_market_cap": cached.get("issuer_market_cap"),
+            "market_cap_source": cached.get("market_cap_source"),
+            "shares_outstanding": cached.get("shares_outstanding"),
+            "price": cached.get("price"),
+        }
+
+    shares = sec_shares_outstanding(tk)
+    sleep()
+    price = fetch_yahoo_price(tk)
+    mcap = None
+    source = None
+    if shares and price and shares > 0 and price > 0:
+        mcap = round(shares * price, 2)
+        source = "sec_shares_x_yahoo"
+    elif cached.get("issuer_market_cap"):
+        mcap = cached.get("issuer_market_cap")
+        source = cached.get("market_cap_source") or "cache"
+        shares = shares or cached.get("shares_outstanding")
+        price = price or cached.get("price")
+
+    if mcap:
+        by_ticker[tk] = {
+            **cached,
+            "ticker": tk,
+            "issuer_market_cap": mcap,
+            "market_cap_source": source,
+            "shares_outstanding": shares,
+            "price": price,
+            "issuer_size_bucket": issuer_size_bucket(mcap),
+            "updated_at": now_iso(),
+        }
+        funda["generated_at"] = now_iso()
+        save_json(FUNDAMENTALS_PATH, funda)
+
+    return {
+        "issuer_market_cap": mcap,
+        "market_cap_source": source,
+        "shares_outstanding": shares,
+        "price": price,
+    }
+
+
+def assign_quintiles(values: dict[str, float], *, higher_is_better: bool = True) -> dict[str, int]:
+    if not values:
+        return {}
+    ordered = sorted(values.items(), key=lambda kv: kv[1], reverse=higher_is_better)
+    n = len(ordered)
+    out: dict[str, int] = {}
+    for i, (ticker, _) in enumerate(ordered):
+        out[ticker] = 5 - min(4, int(i * 5 / max(n, 1)))
+    return out

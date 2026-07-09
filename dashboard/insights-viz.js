@@ -2274,17 +2274,55 @@
       </div>`;
   }
 
-  function renderBiotechMemory(memory, escapeHtml, linkHtml, ghRepo) {
+  function renderBiotechMemory(memory, escapeHtml, linkHtml, ghRepo, opts) {
     const funds = memory?.biotech?.specialist_funds || [];
     const signals = memory?.biotech?.signals?.by_ticker || {};
     const tickers = Object.values(memory?.by_ticker || {}).filter(t => t.biotech?.in_biotech_quant_universe);
-    const signalRows = Object.values(signals)
+    const paperBook = memory?.biotech?.paper_book || null;
+    const scope = opts?.biotechScope || 'book';
+    const convergenceOnly = !!opts?.biotechConvergenceOnly;
+    const spendQ4 = !!opts?.biotechSpendQ4;
+    const sizeFilter = opts?.biotechSizeFilter || 'all';
+    const issuerSizeFilter = opts?.biotechIssuerSizeFilter || 'all';
+    const search = (opts?.biotechSearch || '').trim().toLowerCase();
+    const showLimit = opts?.biotechShowLimit || 40;
+
+    let signalRows = Object.values(signals)
       .filter(s => s.in_biotech_quant_universe !== false)
       .sort((a, b) => ((b.composite_score ?? b.consensus_score) || 0) - ((a.composite_score ?? a.consensus_score) || 0));
+    if (scope === 'book') {
+      signalRows = signalRows.filter(s => s.in_book);
+    }
+    if (convergenceOnly) {
+      signalRows = signalRows.filter(s => s.convergence_flag);
+    }
+    if (spendQ4) {
+      signalRows = signalRows.filter(s => (s.spend_value_quintile || 0) >= 4);
+    }
+    if (sizeFilter !== 'all') {
+      signalRows = signalRows.filter(s => (s.position_size_bucket || s.size_bucket) === sizeFilter);
+    }
+    if (issuerSizeFilter !== 'all') {
+      signalRows = signalRows.filter(s => (s.issuer_size_bucket || 'unknown') === issuerSizeFilter);
+    }
+    if (search) {
+      signalRows = signalRows.filter(s => {
+        const hay = `${s.ticker || ''} ${s.company || ''} ${s.issuer || ''}`.toLowerCase();
+        return hay.includes(search);
+      });
+    }
+    const shortRows = Object.values(signals)
+      .filter(s => (s.short_candidate_score || 0) > 0 || (s.short_interest_quintile || 0) >= 4)
+      .sort((a, b) => (b.short_candidate_score || 0) - (a.short_candidate_score || 0))
+      .slice(0, 25);
     const catalog = memory?.biotech?.library_catalog || [];
     const scoreboard = memory?.biotech?.factor_scoreboard || [];
     const methodClaims = memory?.biotech?.methodology_claims || memory?.methodology_claims || [];
+    const knowledgeDelta = memory?.biotech?.knowledge_delta || null;
     const initiations = signalRows.filter(s => s.initiation_signal).map(s => s.ticker);
+    const visible = signalRows.slice(0, showLimit);
+    const hasMore = signalRows.length > showLimit;
+
     const libraryHtml = catalog.length ? `
       <div class="detail-section">
         <h3>Methodology library</h3>
@@ -2318,19 +2356,96 @@
           <div class="source-card-title">${escapeHtml(c.claim || '')} ${c.evidence_url ? evidenceLink(c.evidence_url, linkHtml, ghRepo, c.evidence_label) : ''}</div>
         </li>`).join('')}</ul>
       </div>` : '';
+    const deltaBits = [];
+    if (knowledgeDelta) {
+      if (knowledgeDelta.new_convergences?.length) deltaBits.push(`New convergence: ${knowledgeDelta.new_convergences.join(', ')}`);
+      if (knowledgeDelta.spend_q_up?.length) deltaBits.push(`Spend Q↑: ${knowledgeDelta.spend_q_up.join(', ')}`);
+      if (knowledgeDelta.paper_book_added?.length) deltaBits.push(`Paper +${knowledgeDelta.paper_book_added.join(', ')}`);
+      if (knowledgeDelta.paper_book_removed?.length) deltaBits.push(`Paper −${knowledgeDelta.paper_book_removed.join(', ')}`);
+    }
     const deltaHtml = `
       <div class="detail-section">
         <h3>Knowledge delta</h3>
-        <p class="tier-sub">${methodClaims.length} methodology claim(s) · ${initiations.length ? `Initiations: ${escapeHtml(initiations.join(', '))}` : 'No core-fund initiations in latest signals'} · ${tickers.length} quant-universe name(s).</p>
+        <p class="tier-sub">${methodClaims.length} methodology claim(s) · ${initiations.length ? `Initiations: ${escapeHtml(initiations.join(', '))}` : 'No core-fund initiations in filtered view'} · ${tickers.length} book quant name(s)${deltaBits.length ? ` · ${escapeHtml(deltaBits.join(' · '))}` : ''}.</p>
       </div>`;
+
+    const paperLong = (paperBook?.long || []).slice(0, 20);
+    const paperShort = (paperBook?.short || []).slice(0, 20);
+    const paperHtml = (paperLong.length || paperShort.length) ? `
+      <div class="detail-section">
+        <h3>Paper book</h3>
+        <p class="tier-sub" style="margin-bottom:8px">Not live trading. Composite-ranked long/short sleeve for research only.${paperBook?.as_of ? ` As of ${escapeHtml(paperBook.as_of)}.` : ''}</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div>
+            <h4 style="margin:0 0 6px">Long (${paperLong.length})</h4>
+            <table class="darwin-table"><thead><tr><th>Ticker</th><th>Composite</th><th>Issuer size</th></tr></thead>
+            <tbody>${paperLong.map(r => `<tr>
+              <td><button type="button" class="linkish mono" data-select-ticker="${escapeHtml(r.ticker)}">${escapeHtml(r.ticker)}</button></td>
+              <td class="mono">${r.composite_score ?? '—'}</td>
+              <td>${escapeHtml(r.issuer_size_bucket || '—')}</td>
+            </tr>`).join('') || '<tr><td colspan="3" class="tier-sub">Empty</td></tr>'}</tbody></table>
+          </div>
+          <div>
+            <h4 style="margin:0 0 6px">Short (${paperShort.length})</h4>
+            <table class="darwin-table"><thead><tr><th>Ticker</th><th>SI / score</th><th>Consensus Q</th></tr></thead>
+            <tbody>${paperShort.map(r => `<tr>
+              <td><button type="button" class="linkish mono" data-select-ticker="${escapeHtml(r.ticker)}">${escapeHtml(r.ticker)}</button></td>
+              <td class="mono">${r.short_interest_pct != null ? r.short_interest_pct : (r.short_candidate_score ?? '—')}</td>
+              <td class="mono">${r.consensus_quintile ?? '—'}</td>
+            </tr>`).join('') || '<tr><td colspan="3" class="tier-sub">Empty</td></tr>'}</tbody></table>
+          </div>
+        </div>
+      </div>` : '';
+
+    const shortHtml = `
+      <div class="detail-section">
+        <h3>Short watchlist</h3>
+        <p class="tier-sub" style="margin-bottom:8px">Diversified short candidates (high SI / weak consensus). Not conviction shorts.</p>
+        <table class="darwin-table">
+          <thead><tr><th>Ticker</th><th>SI %</th><th>Days to cover</th><th>Short score</th><th>Consensus Q</th></tr></thead>
+          <tbody>${shortRows.map(s => `<tr>
+            <td><button type="button" class="linkish mono" data-select-ticker="${escapeHtml(s.ticker)}">${escapeHtml(s.ticker)}</button>${s.in_book ? ' <span class="badge badge-warn">book</span>' : ''}</td>
+            <td class="mono">${s.short_interest_pct != null ? s.short_interest_pct : '—'}</td>
+            <td class="mono">${s.days_to_cover != null ? s.days_to_cover : '—'}</td>
+            <td class="mono">${s.short_candidate_score ?? '—'}</td>
+            <td class="mono">${s.consensus_quintile ?? '—'}</td>
+          </tr>`).join('') || '<tr><td colspan="5" class="tier-sub">No short candidates in current signals.</td></tr>'}</tbody>
+        </table>
+      </div>`;
+
+    const controlsHtml = `
+      <div class="detail-section" style="margin-bottom:10px">
+        <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:8px">
+          <nav class="source-pills" id="biotech-scope-tabs">
+            <button type="button" class="filter-btn source-pill${scope === 'book' ? ' active' : ''}" data-biotech-scope="book">Book</button>
+            <button type="button" class="filter-btn source-pill${scope === 'universe' ? ' active' : ''}" data-biotech-scope="universe">Universe</button>
+          </nav>
+          <label class="tier-sub" style="display:flex;align-items:center;gap:4px"><input type="checkbox" id="biotech-convergence-only" ${convergenceOnly ? 'checked' : ''}/> Convergence</label>
+          <label class="tier-sub" style="display:flex;align-items:center;gap:4px"><input type="checkbox" id="biotech-spend-q4" ${spendQ4 ? 'checked' : ''}/> Spend Q≥4</label>
+          <label class="tier-sub">Pos size
+            <select id="biotech-size-filter">
+              ${['all', 'small', 'mid', 'large'].map(v => `<option value="${v}" ${sizeFilter === v ? 'selected' : ''}>${v}</option>`).join('')}
+            </select>
+          </label>
+          <label class="tier-sub">Issuer size
+            <select id="biotech-issuer-size-filter">
+              ${['all', 'small', 'mid', 'large', 'unknown'].map(v => `<option value="${v}" ${issuerSizeFilter === v ? 'selected' : ''}>${v}</option>`).join('')}
+            </select>
+          </label>
+          <input type="search" id="biotech-search" placeholder="Search ticker / company" value="${escapeHtml(opts?.biotechSearch || '')}" style="min-width:160px"/>
+        </div>
+        <p class="tier-sub">${signalRows.length} matching · showing ${visible.length}${scope === 'book' ? ' (book default)' : ' (full universe)'}</p>
+      </div>`;
+
     return `
       ${libraryHtml}
       ${scoreboardHtml}
       ${methodHtml}
       ${deltaHtml}
+      ${paperHtml}
       <div class="detail-section">
         <h3>Biotech specialist registry</h3>
-        <p class="tier-sub" style="margin-bottom:8px">${funds.length} specialist funds tracked for 13F ingestion · ${tickers.length} names in biotech quant universe · ${memory?.biotech?.ownership_records?.length || 0} quant-filtered 13F records.</p>
+        <p class="tier-sub" style="margin-bottom:8px">${funds.length} specialist funds tracked · ${Object.keys(signals).length} universe signals · ${tickers.length} book quant names · ${memory?.biotech?.ownership_records?.length || 0} book 13F records.</p>
         <table class="darwin-table">
           <thead><tr><th>Fund</th><th>Specialty</th><th>Role</th><th>Notes</th></tr></thead>
           <tbody>${funds.slice(0, 28).map(f => `<tr>
@@ -2343,18 +2458,22 @@
       </div>
       <div class="detail-section">
         <h3>Biotech quant signals</h3>
+        ${controlsHtml}
         <table class="darwin-table">
-          <thead><tr><th>Ticker</th><th>Composite</th><th>Consensus</th><th>Q</th><th>Core</th><th>Specialists</th><th>Spend Q</th><th>Insider</th><th>Net flow</th><th>Flags</th></tr></thead>
-          <tbody>${signalRows.slice(0, 40).map(s => `<tr>
-            <td><button type="button" class="linkish mono" data-select-ticker="${escapeHtml(s.ticker)}">${escapeHtml(s.ticker)}</button></td>
+          <thead><tr><th>Ticker</th><th>Composite</th><th>Consensus</th><th>Q</th><th>Core</th><th>N</th><th>ΔN</th><th>Spend Q</th><th>Insider</th><th>Peer</th><th>Pos</th><th>Issuer</th><th>Flags</th></tr></thead>
+          <tbody>${visible.map(s => `<tr>
+            <td><button type="button" class="linkish mono" data-select-ticker="${escapeHtml(s.ticker)}">${escapeHtml(s.ticker)}</button>${s.in_book ? ' <span class="badge badge-ok">book</span>' : ''}</td>
             <td class="mono">${s.composite_score != null ? s.composite_score : '—'}</td>
             <td class="mono">${s.consensus_score ?? '—'}</td>
             <td class="mono">${s.consensus_quintile ?? '—'}</td>
             <td class="mono">${s.core_fund_holder_count ?? 0}</td>
             <td class="mono">${s.specialist_holder_count ?? 0}</td>
+            <td class="mono">${s.holder_count_qoq != null ? (s.holder_count_qoq > 0 ? '+' : '') + s.holder_count_qoq : (s.initiation_signal ? 'new' : '—')}</td>
             <td class="mono">${s.spend_value_quintile ?? '—'}</td>
             <td class="mono">${s.insider_score != null ? s.insider_score : '—'}</td>
-            <td class="mono">${s.net_quarterly_change ?? 0}</td>
+            <td class="mono">${s.peer_momentum_12m != null ? s.peer_momentum_12m : '—'}</td>
+            <td>${escapeHtml(s.position_size_bucket || s.size_bucket || '—')}</td>
+            <td>${escapeHtml(s.issuer_size_bucket || '—')}</td>
             <td>${[
               s.convergence_flag ? '<span class="badge badge-ok">convergence</span>' : '',
               s.initiation_signal ? '<span class="badge badge-ok">initiation</span>' : '',
@@ -2362,9 +2481,11 @@
               s.concentration_flag ? '<span class="badge badge-warn">concentration</span>' : '',
               s.short_candidate_score != null && s.short_candidate_score > 0 ? '<span class="badge badge-warn">short-cand</span>' : '',
             ].filter(Boolean).join(' ') || '—'}</td>
-          </tr>`).join('') || '<tr><td colspan="10" class="tier-sub">Run make specialist-13f-ingest to populate signals.</td></tr>'}</tbody>
+          </tr>`).join('') || '<tr><td colspan="13" class="tier-sub">No rows match filters. Try Universe scope or clear filters.</td></tr>'}</tbody>
         </table>
+        ${hasMore ? `<button type="button" class="filter-btn" id="biotech-show-more" style="margin-top:8px">Show more (${signalRows.length - showLimit} remaining)</button>` : ''}
       </div>
+      ${shortHtml}
       <div class="detail-section">
         <h3>Biotech quant ticker queue</h3>
         <table class="darwin-table">
@@ -3195,7 +3316,15 @@
         + renderMemorySubNav(memoryViewMode, escapeHtml)
         + renderMemoryFilters(memoryOpts, escapeHtml);
       if (memoryViewMode === 'biotech') {
-        body += renderBiotechMemory(memory, escapeHtml, linkHtml, ghRepo);
+        body += renderBiotechMemory(memory, escapeHtml, linkHtml, ghRepo, {
+          biotechScope: options?.biotechScope || 'book',
+          biotechConvergenceOnly: options?.biotechConvergenceOnly || false,
+          biotechSpendQ4: options?.biotechSpendQ4 || false,
+          biotechSizeFilter: options?.biotechSizeFilter || 'all',
+          biotechIssuerSizeFilter: options?.biotechIssuerSizeFilter || 'all',
+          biotechSearch: options?.biotechSearch || '',
+          biotechShowLimit: options?.biotechShowLimit || 40,
+        });
       } else if (memoryViewMode === 'review') {
         body += renderMemoryReviewQueue(memory, escapeHtml);
       } else {

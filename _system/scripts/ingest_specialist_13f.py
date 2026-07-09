@@ -88,10 +88,45 @@ def load_prior_records(quarter: str) -> dict[tuple[str, str], dict]:
     return out
 
 
+def load_prior_full_by_cusip(fund_id: str, quarter: str) -> dict[str, dict]:
+    """Index prior full InfoTable by CUSIP (preferred) or ticker for QoQ change_type."""
+    path = FULL_RECORDS_DIR / fund_id / f"{quarter}.json"
+    if not path.exists():
+        return {}
+    doc = load_json(path, {})
+    out: dict[str, dict] = {}
+    for row in doc.get("records") or []:
+        cusip = (row.get("cusip") or "").upper().strip()
+        ticker = (row.get("ticker") or "").upper().strip()
+        if cusip:
+            out[f"CUSIP:{cusip}"] = row
+        if ticker:
+            out[f"T:{ticker}"] = row
+    return out
+
+
+def prior_full_quarters(fund_id: str, exclude: str | None = None) -> list[str]:
+    fund_dir = FULL_RECORDS_DIR / fund_id
+    if not fund_dir.exists():
+        return []
+    quarters = sorted(
+        p.stem
+        for p in fund_dir.glob("*.json")
+        if p.stem not in {"latest", "cached", "unknown"} and len(p.stem) == 6 and p.stem[4] == "Q"
+    )
+    if exclude:
+        quarters = [q for q in quarters if q != exclude]
+    return quarters
+
+
 def latest_record_quarter(exclude: str | None = None) -> str | None:
     if not RECORDS_DIR.exists():
         return None
-    quarters = sorted(p.stem for p in RECORDS_DIR.glob("*.json") if p.stem != "latest")
+    quarters = sorted(
+        p.stem
+        for p in RECORDS_DIR.glob("*.json")
+        if p.stem not in {"latest", "cached", "unknown"} and len(p.stem) == 6 and p.stem[4] == "Q"
+    )
     for quarter in reversed(quarters):
         if quarter != exclude:
             return quarter
@@ -124,10 +159,12 @@ def holdings_from_xml(
     prior: dict,
     info_url: str | None,
     book_tickers: set[str] | None = None,
+    prior_full: dict[str, dict] | None = None,
 ) -> tuple[list[dict], list[dict], dict[str, str], dict]:
     raw = parse_13f_info_table_xml(xml_bytes)
     quarter = quarter_from_date((filing or {}).get("filing_date")) or "unknown"
     book_set = {t.upper() for t in (book_tickers or names.keys())}
+    full_prior = prior_full or {}
     full_rows: list[dict] = []
     book_rows: list[dict] = []
     for holding in raw:
@@ -141,6 +178,14 @@ def holdings_from_xml(
             cusip_map[cusip] = ticker
         elif ticker and cusip and cusip not in cusip_map:
             cusip_map[cusip] = ticker
+        # QoQ from prior full table (CUSIP), fall back to book overlay prior
+        prior_row = None
+        if cusip and f"CUSIP:{cusip}" in full_prior:
+            prior_row = full_prior[f"CUSIP:{cusip}"]
+        elif ticker and f"T:{ticker.upper()}" in full_prior:
+            prior_row = full_prior[f"T:{ticker.upper()}"]
+        elif ticker:
+            prior_row = prior.get((fund["fund_id"], ticker))
         full_row = {
             "fund_id": fund["fund_id"],
             "fund": fund.get("fund"),
@@ -155,31 +200,33 @@ def holdings_from_xml(
             "source_url": info_url,
             "cik": cik_padded(fund["cik"]),
             "in_book": bool(ticker and ticker.upper() in book_set),
+            "change_type": change_type(
+                {"shares": shares},
+                prior_row,
+            ),
         }
+        if prior_row and prior_row.get("shares"):
+            full_row["change_shares_pct"] = round(
+                ((shares or 0) - prior_row["shares"]) / prior_row["shares"] * 100,
+                2,
+            )
         full_rows.append(full_row)
         if not ticker or ticker.upper() not in book_set:
             continue
         row = {**full_row}
-        prior_row = prior.get((fund["fund_id"], ticker))
-        row["change_type"] = change_type(row, prior_row)
-        if prior_row and prior_row.get("shares"):
-            row["change_shares_pct"] = round(
-                ((row.get("shares") or 0) - prior_row["shares"]) / prior_row["shares"] * 100,
-                2,
-            )
         book_rows.append(row)
     classification = classify_fund_biotech_share(full_rows)
     return full_rows, book_rows, cusip_map, classification
 
 
-def ingest_fund(
-    fund: dict, names: dict[str, str], cusip_map: dict[str, str], prior: dict
+def ingest_one_filing(
+    fund: dict,
+    filing: dict,
+    names: dict[str, str],
+    cusip_map: dict[str, str],
+    prior: dict,
+    prior_full: dict[str, dict],
 ) -> tuple[list[dict], list[dict], dict[str, str], dict, str]:
-    cik = fund["cik"]
-    filings = latest_13f_filings(cik, limit=2)
-    if not filings:
-        return [], [], cusip_map, {}, "unknown"
-    filing = filings[0]
     quarter = quarter_from_date(filing.get("filing_date")) or "unknown"
     cache_path = CACHE_DIR / f"{fund['fund_id']}_{filing['accession'].replace('-', '')}.xml"
     info_url = filing_info_table_url(filing)
@@ -196,7 +243,15 @@ def ingest_fund(
             return [], [], cusip_map, {}, quarter
         sleep()
     full_rows, book_rows, cusip_map, classification = holdings_from_xml(
-        fund, xml_bytes, filing, names, cusip_map, prior, info_url, book_tickers=set(names)
+        fund,
+        xml_bytes,
+        filing,
+        names,
+        cusip_map,
+        prior,
+        info_url,
+        book_tickers=set(names),
+        prior_full=prior_full,
     )
     return full_rows, book_rows, cusip_map, classification, quarter
 
@@ -205,6 +260,12 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--offline", action="store_true", help="Use cached XML only; do not fetch SEC")
     parser.add_argument("--max-funds", type=int, default=0, help="Limit funds for testing")
+    parser.add_argument(
+        "--backfill-quarters",
+        type=int,
+        default=1,
+        help="Number of recent 13F filings per fund to write under records/full (default 1)",
+    )
     args = parser.parse_args()
 
     if args.offline and not CACHE_DIR.exists():
@@ -225,71 +286,124 @@ def main() -> int:
     fund_classifications: list[dict] = []
     quarter_counts: dict[str, int] = {}
     FULL_RECORDS_DIR.mkdir(parents=True, exist_ok=True)
+    backfill_n = max(1, int(args.backfill_quarters or 1))
 
     for fund in funds:
         prior_quarter = latest_record_quarter()
         prior = load_prior_records(prior_quarter) if prior_quarter else {}
+        latest_quarter_for_fund = None
+        latest_full_rows: list[dict] = []
+        latest_book_rows: list[dict] = []
+        latest_classification: dict = {}
+
         if args.offline:
             cache_files = sorted(CACHE_DIR.glob(f"{fund['fund_id']}_*.xml"), reverse=True)
             if not cache_files:
                 continue
-            xml_bytes = cache_files[0].read_bytes()
-            # Prefer quarter from existing full latest for this fund
-            prior_full = load_json(FULL_RECORDS_DIR / fund["fund_id"] / "latest.json", {})
-            filing_meta = None
-            quarter_hint = prior_full.get("quarter")
-            if prior_full.get("records"):
-                fd = (prior_full["records"][0] or {}).get("filing_date")
-                if fd:
-                    filing_meta = {"filing_date": fd}
-            full_rows, book_rows, cusip_map, classification = holdings_from_xml(
-                fund, xml_bytes, filing_meta, names, cusip_map, {}, None, book_tickers=book_tickers
-            )
-            quarter = (
-                quarter_from_date((filing_meta or {}).get("filing_date"))
-                or (
-                    quarter_hint
-                    if quarter_hint and quarter_hint not in {"unknown", "cached", "latest"}
-                    else None
+            # Process up to backfill_n cached XMLs (newest first)
+            for cache_path in cache_files[:backfill_n]:
+                xml_bytes = cache_path.read_bytes()
+                prior_full_doc = load_json(FULL_RECORDS_DIR / fund["fund_id"] / "latest.json", {})
+                filing_meta = None
+                quarter_hint = prior_full_doc.get("quarter")
+                if prior_full_doc.get("records"):
+                    fd = (prior_full_doc["records"][0] or {}).get("filing_date")
+                    if fd:
+                        filing_meta = {"filing_date": fd}
+                # Prefer accession-derived quarter if we already wrote one
+                existing_qs = prior_full_quarters(fund["fund_id"])
+                prior_full_map = {}
+                if existing_qs:
+                    prior_full_map = load_prior_full_by_cusip(fund["fund_id"], existing_qs[-1])
+                full_rows, book_rows, cusip_map, classification = holdings_from_xml(
+                    fund,
+                    xml_bytes,
+                    filing_meta,
+                    names,
+                    cusip_map,
+                    prior,
+                    None,
+                    book_tickers=book_tickers,
+                    prior_full=prior_full_map,
                 )
-                or "2026Q2"
-            )
-            for row in full_rows + book_rows:
-                row["quarter"] = quarter
+                quarter = (
+                    quarter_from_date((filing_meta or {}).get("filing_date"))
+                    or (
+                        quarter_hint
+                        if quarter_hint and quarter_hint not in {"unknown", "cached", "latest"}
+                        else None
+                    )
+                    or "2026Q2"
+                )
+                for row in full_rows + book_rows:
+                    row["quarter"] = quarter
+                fund_dir = FULL_RECORDS_DIR / fund["fund_id"]
+                fund_dir.mkdir(parents=True, exist_ok=True)
+                full_payload = {
+                    "generated_at": now_iso(),
+                    "fund_id": fund["fund_id"],
+                    "fund": fund.get("fund"),
+                    "quarter": quarter,
+                    "classification": classification,
+                    "record_count": len(full_rows),
+                    "records": full_rows,
+                }
+                save_json(fund_dir / f"{quarter}.json", full_payload)
+                if latest_quarter_for_fund is None:
+                    latest_quarter_for_fund = quarter
+                    latest_full_rows = full_rows
+                    latest_book_rows = book_rows
+                    latest_classification = classification
+                    save_json(fund_dir / "latest.json", full_payload)
         else:
-            full_rows, book_rows, cusip_map, classification, quarter = ingest_fund(
-                fund, names, cusip_map, prior
-            )
-            sleep()
+            filings = latest_13f_filings(fund["cik"], limit=backfill_n + 1)
+            # Process oldest→newest so QoQ prior exists when writing newer quarters
+            for filing in reversed(filings[:backfill_n]):
+                quarter = quarter_from_date(filing.get("filing_date")) or "unknown"
+                existing_qs = prior_full_quarters(fund["fund_id"], exclude=quarter)
+                prior_full_map = load_prior_full_by_cusip(fund["fund_id"], existing_qs[-1]) if existing_qs else {}
+                full_rows, book_rows, cusip_map, classification, quarter = ingest_one_filing(
+                    fund, filing, names, cusip_map, prior, prior_full_map
+                )
+                sleep()
+                if not full_rows and not book_rows:
+                    continue
+                fund_dir = FULL_RECORDS_DIR / fund["fund_id"]
+                fund_dir.mkdir(parents=True, exist_ok=True)
+                full_payload = {
+                    "generated_at": now_iso(),
+                    "fund_id": fund["fund_id"],
+                    "fund": fund.get("fund"),
+                    "quarter": quarter,
+                    "classification": classification,
+                    "record_count": len(full_rows),
+                    "records": full_rows,
+                }
+                save_json(fund_dir / f"{quarter}.json", full_payload)
+                latest_quarter_for_fund = quarter
+                latest_full_rows = full_rows
+                latest_book_rows = book_rows
+                latest_classification = classification
+                save_json(fund_dir / "latest.json", full_payload)
 
-        fund_dir = FULL_RECORDS_DIR / fund["fund_id"]
-        fund_dir.mkdir(parents=True, exist_ok=True)
-        full_payload = {
-            "generated_at": now_iso(),
-            "fund_id": fund["fund_id"],
-            "fund": fund.get("fund"),
-            "quarter": quarter,
-            "classification": classification,
-            "record_count": len(full_rows),
-            "records": full_rows,
-        }
-        save_json(fund_dir / f"{quarter}.json", full_payload)
-        save_json(fund_dir / "latest.json", full_payload)
+        if latest_quarter_for_fund is None:
+            continue
+
         fund_classifications.append(
             {
                 "fund_id": fund["fund_id"],
                 "fund": fund.get("fund"),
-                "quarter": quarter,
-                **classification,
+                "quarter": latest_quarter_for_fund,
+                **latest_classification,
             }
         )
-        all_book.extend(book_rows)
-        for row in book_rows:
-            q = row.get("quarter") or quarter
+        all_book.extend(latest_book_rows)
+        for row in latest_book_rows:
+            q = row.get("quarter") or latest_quarter_for_fund
             quarter_counts[q] = quarter_counts.get(q, 0) + 1
         print(
-            f"{fund['fund_id']}: {len(book_rows)} book / {len(full_rows)} full "
-            f"(biotech_mv_share={classification.get('biotech_mv_share')})"
+            f"{fund['fund_id']}: {len(latest_book_rows)} book / {len(latest_full_rows)} full "
+            f"(biotech_mv_share={latest_classification.get('biotech_mv_share')}, q={latest_quarter_for_fund})"
         )
 
     save_cusip_map(cusip_map)
