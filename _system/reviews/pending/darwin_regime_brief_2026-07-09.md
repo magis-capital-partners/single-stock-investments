@@ -16,10 +16,10 @@
 
 ## Questions that changed
 
-- **AMZN**: see `AMZN\research\open_questions.md`
-- **CSGP**: see `CSGP\research\open_questions.md`
-- **DHR**: see `DHR\research\open_questions.md`
-- **GOOGL**: see `GOOGL\research\open_questions.md`
-- **ICE**: see `ICE\research\open_questions.md`
-- **META**: see `META\research\open_questions.md`
+- **AMZN**: see `AMZN/research/open_questions.md`
+- **CSGP**: see `CSGP/research/open_questions.md`
+- **DHR**: see `DHR/research/open_questions.md`
+- **GOOGL**: see `GOOGL/research/open_questions.md`
+- **ICE**: see `ICE/research/open_questions.md`
+- **META**: see `META/research/open_questions.md`
 
