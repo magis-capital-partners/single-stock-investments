@@ -53,6 +53,7 @@ INTAKE_FOLDER_PATHS = {
     for intake_kind, folder_name in INTAKE_TYPES.items()
 }
 ACCEPTED_INTAKE_PREFIXES = (INTAKE_PREFIX, LEGACY_INTAKE_PREFIX, "")
+INTAKE_VALIDATION_ERRORS = frozenset({"missing_or_unknown_ticker"})
 
 sys.path.insert(0, str(SCRIPTS))
 from drive_store_common import (  # noqa: E402
@@ -371,6 +372,17 @@ def import_intake(
     return report
 
 
+def partition_intake_errors(errors: list[dict]) -> tuple[list[dict], list[dict]]:
+    validation_errors = [error for error in errors if error.get("error") in INTAKE_VALIDATION_ERRORS]
+    fatal_errors = [error for error in errors if error.get("error") not in INTAKE_VALIDATION_ERRORS]
+    return validation_errors, fatal_errors
+
+
+def exit_code_for_report(report: dict) -> int:
+    _, fatal_errors = partition_intake_errors(report.get("errors") or [])
+    return 2 if fatal_errors else 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Import Drive intake PDFs into canonical repo folders.")
     parser.add_argument("--dry-run", action="store_true")
@@ -393,9 +405,22 @@ def main() -> int:
     print("Drive intake import")
     for key, value in report["summary"].items():
         print(f"  {key}: {value}")
-    if report["errors"]:
-        print("  errors: inspect intake paths; expected Admin/{VIC,Research,Company}/{TICKER}.pdf or ticker subfolders")
-    return 0 if not report["errors"] else 2
+    validation_errors, fatal_errors = partition_intake_errors(report.get("errors") or [])
+    if validation_errors:
+        print(
+            "  intake_validation_errors: "
+            f"{len(validation_errors)} PDF(s) skipped (missing or unknown ticker). "
+            f"Rename to {{TICKER}}.pdf or {{TICKER}}/file.pdf; see {REPORT_PATH.relative_to(ROOT)}"
+        )
+        print(
+            f"::warning::{len(validation_errors)} Drive intake PDF(s) skipped — "
+            "missing or unknown ticker. See _system/reference/document-store/drive_intake_latest.json"
+        )
+    if fatal_errors:
+        print(
+            "  fatal_errors: inspect intake paths; expected Admin/{VIC,Research,Company}/{TICKER}.pdf or ticker subfolders"
+        )
+    return exit_code_for_report(report)
 
 
 if __name__ == "__main__":
