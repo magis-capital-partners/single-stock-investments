@@ -609,19 +609,29 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | VTRS | VTRS/ | Viatris Inc | US | 2026-07-09 | 2026-07-09 | turnaround | watch |
 | VZ | VZ/ | Verizon | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | WAB | WAB/ | Wabtec | US | 2026-07-10 | 2026-07-10 | unknown | watch |
-| WAT | WAT/ | Waters Corporation | US | — | — | unknown | watch |
+| WAT | WAT/ | Waters Corporation | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | WBD | WBD/ | Warner Bros. Discovery | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | WBI | WBI/ | WaterBridge Infrastructure | US | 2026-07-09 | 2026-07-10 | infrastructure | watch |
+| WDAY | WDAY/ | Workday, Inc. | US | — | — | unknown | watch |
+| WDC | WDC/ | Western Digital | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| WEC | WEC/ | WEC Energy Group | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| WELL | WELL/ | Welltower | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | WEST | WEST/ | Westrock Coffee Company | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| WFC | WFC/ | Wells Fargo | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | WM | WM/ | Waste Management | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| WMB | WMB/ | Williams Companies | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | WMT | WMT/ | Walmart | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | WPM | WPM/ | Wheaton Precious Metals Corp. | US | 2026-07-09 | 2026-07-09 | compounder | watch |
 | WRB | WRB/ | W. R. Berkley Corporation | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | WRLC | WRLC/ | Windrock Land Company | OTC | 2026-07-09 | 2026-07-09 | optionality | watch |
+| WSM | WSM/ | Williams-Sonoma, Inc. | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| WST | WST/ | West Pharmaceutical Services | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| WTW | WTW/ | Willis Towers Watson | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| WY | WY/ | Weyerhaeuser | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | X.TO | X.TO/ | TMX Group Limited | CA | 2026-07-09 | 2026-07-10 | unknown | watch |
 | XOM | XOM/ | ExxonMobil | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | XP | XP/ | XP Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 
-**617 holdings total.** Registry: `_system/portfolio/registry.json`
+**627 holdings total.** Registry: `_system/portfolio/registry.json`
