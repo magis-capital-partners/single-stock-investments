@@ -1,6 +1,6 @@
 # MO — Investment Thesis
 
-**Last updated:** 2026-07-10
+**Last updated:** auto-sync
 
 ## Classification
 
@@ -11,8 +11,13 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | mature |
-| **MOI bucket** (legacy) | pricing_power |
+| **Implied 7yr IRR** (base) | 7.64% (total synthesis) |
+| **IRR method** | full |
+| **Lawrence bucket** | pricing_power |
 | **Payoff lens** | operating |
+| **MOI bucket** | pending |
+
+**Deep dive:** `MO/research/deep_dive_2026-07-10.md` (auto-sync)
 
 ## One-line thesis
 
