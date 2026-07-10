@@ -152,6 +152,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | CRCL | CRCL/ | Circle Internet Group, Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CRH | CRH/ | CRH plc | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CRL | CRL/ | Charles River Laboratories | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| CRM | CRM/ | Salesforce | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | CRWD | CRWD/ | CrowdStrike | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CSCO | CSCO/ | Cisco | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CSGP | CSGP/ | CoStar Group | US | 2026-07-09 | 2026-07-10 | platform | watch |
@@ -427,6 +428,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | NI | NI/ | NiSource | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | NKE | NKE/ | Nike, Inc. | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | NOC | NOC/ | Northrop Grumman | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| NOW | NOW/ | ServiceNow | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | NRG | NRG/ | NRG Energy | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | NRP | NRP/ | Natural Resource Partners LP | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | NSC | NSC/ | Norfolk Southern | US | 2026-07-10 | 2026-07-10 | unknown | watch |
@@ -490,7 +492,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | Q | Q/ | Qnity Electronics | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | QCOM | QCOM/ | Qualcomm | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | QDEL | QDEL/ | QuidelOrtho | US | 2026-07-09 | 2026-07-10 | turnaround | hold |
-| RCL | RCL/ | Royal Caribbean Group | US | — | — | unknown | watch |
+| RCL | RCL/ | Royal Caribbean Group | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | RDDT | RDDT/ | Reddit, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | REG | REG/ | Regency Centers | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | REGN | REGN/ | Regeneron Pharmaceuticals | US | 2026-07-10 | 2026-07-10 | unknown | watch |
@@ -510,17 +512,25 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | RVTY | RVTY/ | Revvity | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | RYN | RYN/ | Rayonier, Inc. | US | 2026-07-09 | 2026-07-09 | optionality | watch |
 | S68.SI | S68.SI/ | Singapore Exchange Limited | EU | 2026-07-09 | 2026-07-10 | unknown | watch |
+| SBAC | SBAC/ | SBA Communications | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | SBR | SBR/ | Sabine Royalty Trust | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | SCHW | SCHW/ | Charles Schwab Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | SHC | SHC/ | Sotera Health Company | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| SHW | SHW/ | Sherwin-Williams | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | SJT | SJT/ | San Juan Basin Royalty Trust | US | 2026-07-09 | 2026-07-10 | optionality | watch |
+| SLB | SLB/ | Schlumberger | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | SMR | SMR/ | NuScale Power Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| SNDK | SNDK/ | Sandisk | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | SNOW | SNOW/ | Snowflake Inc | US | 2026-07-09 | 2026-07-10 | platform | watch |
 | SOC | SOC/ | Sable Offshore Corp. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| SPG | SPG/ | Simon Property Group | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | SPGI | SPGI/ | S&P Global | US | 2026-07-09 | 2026-07-10 | croupier | hold |
+| SRE | SRE/ | Sempra | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | SRPT | SRPT/ | Sarepta Therapeutics, Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | STHO | STHO/ | Star Holdings | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| STX | STX/ | Seagate Technology | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | STZ | STZ/ | Constellation Brands | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| SWKS | SWKS/ | Skyworks Solutions | US | — | — | unknown | watch |
 | T | T/ | AT&T | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | TAP | TAP/ | Molson Coors Beverage Company | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | TASE | TASE/ | Tel Aviv Stock Exchange Ltd. | EU | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -544,4 +554,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 
-**537 holdings total.** Registry: `_system/portfolio/registry.json`
+**547 holdings total.** Registry: `_system/portfolio/registry.json`
