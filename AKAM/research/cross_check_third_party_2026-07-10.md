@@ -9,9 +9,9 @@
 
 ## Executive summary
 
-No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (10-K, 10-Q, IR). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+No third-party sources are indexed for AKAM as of 2026-07-10. Marvin stance rests on **primary filings only** (FY2025 10-K, Q1 2026 10-Q, proxy). Cross-check confirms no approved external IRR inputs to blend.
 
-**Synthesis:** Marvin floor only; no external blend.
+**Synthesis:** Marvin floor only; no external blend. Base case **~13% per year** at **~$129.52** on **$6.88** FY2025 free cash flow per share with 6%/4% growth and 22× exit — see `AKAM/research/valuation.json`.
 
 ## Sources in scope
 
@@ -33,13 +33,13 @@ No third-party sources are indexed for this ticker as of this scan. Marvin stanc
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | — | — | — |
+| Marvin floor | ~$6.88 FCF/sh FY2025 | ~13% / 7yr base | watch |
 | External (combined) | — | — | — |
-| **Blended best estimate** | **—** | **—** | **—** |
+| **Blended best estimate** | **~$6.88 FCF/sh** | **~13% / 7yr** | **watch** |
 
-**Weights:** *[Document why]*
+**Weights:** 100% Marvin (no approved third-party sources).
 
-**Returns statement (blended):** *[One sentence; pending sources not in base IRR]*
+**Returns statement (blended):** At today's price, Marvin base case is **~13% per year** with no external adjustment.
 
 ## [HUMAN REVIEW]
 

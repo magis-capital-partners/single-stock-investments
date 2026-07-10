@@ -1,0 +1,73 @@
+{
+  "ticker": "AKAM",
+  "as_of": "2026-07-10",
+  "method": "full",
+  "lawrence_bucket": "multi_sided",
+  "classification_inputs": {
+    "archetype": "platform",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 129.52,
+    "price_source": "NASDAQ close 2026-07-09 (Yahoo Finance chart)",
+    "fcf_per_share": 6.88,
+    "fcf_source": "FY2025: cash from operations $1,519M minus capital spending $508M, divided by 147.0M diluted shares (10-K FY2025)",
+    "shares_millions": 147.0,
+    "normalization_note": "FY2025 reported free cash flow; Q1 2026 operating margin compressed on compute build-out and cost of revenue — not using peak margin year"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 18,
+      "notes": "Compute growth slows; security pricing pressure; multiple stays depressed"
+    },
+    "base": {
+      "growth_y1_5": 0.06,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 22,
+      "notes": "Compute mix continues; security stabilizes; modest re-rate from buybacks"
+    },
+    "bull": {
+      "growth_y1_5": 0.09,
+      "growth_y6_10": 0.06,
+      "exit_pfcf_y10": 28,
+      "notes": "GPU/cloud infrastructure share gains; margin recovery; premium platform multiple"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Goodwill $3.2B and operating lease ROU $1.47B are on balance sheet at recognized values; no land/NAV misstatement pattern (10-K FY2025)"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / RPO not in FCF path?",
+      "answer": "Partial yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Remaining performance obligation ~$5.2B at FY2025; conversion timing in revenue growth assumptions [Assumption] (10-K FY2025, 10-Q Q1 2026)"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Compute segment $2.24B FY2025 (+10% YoY) already in consolidated revenue; GPU/cloud ramp in segment growth rows"
+    }
+  ],
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  }
+}
