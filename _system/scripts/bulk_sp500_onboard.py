@@ -103,10 +103,21 @@ def onboard_one(ticker: str, company: str, *, skip_download: bool) -> int:
         "--market",
         "US",
         "--no-deep-dive",
+        "--skip-indexes",
+        "--skip-dashboard",
     ]
     if skip_download:
         cmd.append("--skip-download")
     return subprocess.run(cmd, cwd=ROOT).returncode
+
+
+def finalize_batch_indexes(tickers: list[str]) -> None:
+    for t in tickers:
+        subprocess.run(
+            [PY, str(SCRIPTS / "build_folder_indexes.py"), "--ticker", t],
+            cwd=ROOT,
+            check=False,
+        )
 
 
 def fetch_returns(ticker: str) -> tuple[bool, str]:
@@ -206,6 +217,8 @@ def main() -> int:
             if rc != 0:
                 return rc
             batch_num += 1
+        if args.loop_until_done:
+            subprocess.run([PY, str(SCRIPTS / "build_dashboard_data.py")], cwd=ROOT, check=False)
         return 0
 
     return main_inner(args, args.offset // max(args.batch_size, 1))
@@ -267,6 +280,9 @@ def main_inner(args: argparse.Namespace, batch_num: int) -> int:
 
     failed = len(batch) - len(ok_tickers)
     print(f"\nBatch done: ok={len(ok_tickers)} failed={failed}")
+
+    if ok_tickers:
+        finalize_batch_indexes(ok_tickers)
 
     if args.git_commit and ok_tickers:
         paths = [

@@ -433,20 +433,24 @@ def onboard(args: argparse.Namespace) -> int:
             else:
                 write_status(ticker_dir, "failed", error=detail)
                 write_pending_review(ticker, company, market, False, detail)
-                run_cmd([PY, str(SCRIPTS / "build_folder_indexes.py")], "indexes")
-                run_cmd([PY, str(SCRIPTS / "build_dashboard_data.py")], "dashboard")
+                if not args.skip_indexes:
+                    run_cmd([PY, str(SCRIPTS / "build_folder_indexes.py"), "--ticker", ticker], "indexes")
+                if not args.skip_dashboard:
+                    run_cmd([PY, str(SCRIPTS / "build_dashboard_data.py")], "dashboard")
                 return 2
     else:
         ok, detail = True, "skipped"
 
-    run_cmd([PY, str(SCRIPTS / "build_folder_indexes.py")], "indexes")
+    if not args.skip_indexes:
+        run_cmd([PY, str(SCRIPTS / "build_folder_indexes.py"), "--ticker", ticker], "indexes")
     write_status(
         ticker_dir,
         "complete",
         extra={"download_detail": detail, "deep_dive_pending": True},
     )
     review_path = write_pending_review(ticker, company, market, ok, detail)
-    run_cmd([PY, str(SCRIPTS / "build_dashboard_data.py")], "dashboard")
+    if not args.skip_dashboard:
+        run_cmd([PY, str(SCRIPTS / "build_dashboard_data.py")], "dashboard")
     log(f"Onboard complete: {ticker}")
     log(f"Review: {review_path.relative_to(ROOT)}")
 
@@ -476,6 +480,8 @@ def main() -> None:
     parser.add_argument("--watchlist-only", action="store_true", help="Add to watchlist without onboarding")
     parser.add_argument("--download-8k-exhibits", action="store_true")
     parser.add_argument("--skip-download", action="store_true")
+    parser.add_argument("--skip-indexes", action="store_true", help="Skip INDEX.csv rebuild (batch drivers)")
+    parser.add_argument("--skip-dashboard", action="store_true", help="Skip dashboard rebuild (batch drivers)")
     parser.add_argument("--deep-dive", action="store_true", default=True)
     parser.add_argument("--no-deep-dive", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
