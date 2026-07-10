@@ -235,7 +235,10 @@ darwin-sp500-refresh:
 	$(PYTHON) $(SCRIPTS)/darwin/refresh_sp500_constituents.py
 
 sp500-onboard-batch:
-	$(PYTHON) $(SCRIPTS)/bulk_sp500_onboard.py --batch-size $(or $(BATCH),8) --offset $(or $(OFFSET),0) --trigger-deep-dive
+	$(PYTHON) $(SCRIPTS)/bulk_sp500_onboard.py --batch-size $(or $(BATCH),8) --offset $(or $(OFFSET),0) --trigger-deep-dive --git-commit --git-push
+
+sp500-onboard-loop:
+	$(PYTHON) $(SCRIPTS)/bulk_sp500_onboard.py --batch-size $(or $(BATCH),8) --offset 0 --sleep 0.5 --trigger-deep-dive --git-commit --git-push --loop-until-done
 
 darwin-build:
 	$(PYTHON) $(SCRIPTS)/build_darwin_portfolio.py --fast --account all
