@@ -6,24 +6,27 @@
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
-| **Stance** | watch |
-| **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Archetype** (Stahl) | compounder |
+| **Moat** (Munger) | stable |
+| **Dhando** (Pabrai) | partial |
+| **Stance** | accumulate |
+| **Cycle** | mid |
+| **Lawrence bucket** | pricing_power |
+| **Payoff lens** | operating |
+| **Implied IRR (base)** | 20.5% |
 
 ## One-line thesis
 
-ADOBE INC. — thesis pending Marvin deep dive.
+Adobe is a subscription software compounder with $23.77B FY2025 revenue, $9.85B free cash flow, and durable Creative Cloud pricing power; at model price $380 base return clears our bar, but live quote sync and AI competition require human review.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest annual report (FY2025 10-K)
+- [x] Read latest quarterly report (Q2 FY2026 10-Q)
+- [x] Apply decision stack and option scan
+- [ ] Confirm stance after live price sync
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-07-10; awaiting deep dive.
+- Stance **accumulate** at placeholder price $380; re-gate after `marvin_cloud_refresh.py`.
+- No third-party cross-check sources; Marvin floor only.
