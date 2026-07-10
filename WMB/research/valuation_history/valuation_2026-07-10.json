@@ -1,0 +1,270 @@
+{
+  "ticker": "WMB",
+  "as_of": "2026-07-10",
+  "method": "full",
+  "irr_method": "full",
+  "lawrence_bucket": "low_cost",
+  "valuation_mode": "operating",
+  "classification_inputs": {
+    "archetype": "infrastructure",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating",
+    "predictive_attribute": "none"
+  },
+  "inputs": {
+    "price": 57.0,
+    "price_source": "Yahoo WMB close pending mechanical refresh",
+    "price_as_of": "2026-07-09",
+    "fcf_per_share": 3.05,
+    "fcf_source": "FY2025 cash from operations $5,898M less estimated maintenance capital spending $1,200M [Assumption], divided by 1,222M weighted-average diluted shares (10-K filed 2026-02-24); expansion capex $4,893M excluded from owner-cash start",
+    "shares_millions": 1222.0,
+    "shares_source": "1,222,998,265 shares outstanding 2026-03-31 (10-Q); FY2025 weighted-average diluted 1,225M (10-K)",
+    "dividend_per_share_annual": 2.0,
+    "dividend_source": "Cash dividends declared $2.00 per share in 2025; payments $2,442M (10-K)",
+    "revenue_fy2025_m": 11950.0,
+    "operating_income_fy2025_m": 4196.0,
+    "net_income_fy2025_m": 2618.0,
+    "long_term_debt_m": 27316.0,
+    "interest_expense_fy2025_m": 1442.0,
+    "normalization_note": "Midstream infrastructure: Lawrence uses cash from operations minus maintenance capital spending, not total growth capex. FY2026 growth capital guide $6.1-6.7B is embedded in segment growth assumptions, not FCF\u2080."
+  },
+  "growth_explanation": {
+    "years_1_5": "Transco and Gulf Coast transmission expansions under firm transportation contracts; Power Innovation data-center projects (1.9 GW Ohio/Utah, up to 12.5-year fixed-price agreements); Haynesville and Northeast G&P volume growth.",
+    "years_6_10": "LNG and industrial load on Gulf pipelines; contracted backlog converts to tariff revenue; dividend grows with distributable cash as expansion capex moderates.",
+    "source": "WMB/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0000107263_26_000006.htm Company Outlook and Business Segments",
+    "status": "partial",
+    "lawrence_legacy": {
+      "y1_5": 0.06,
+      "y6_10": 0.04,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.06,
+      "y6_10": 0.04,
+      "exit_pfcf_y10": 14.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": 0.1378,
+      "as_of_filing_facts": "evidence/_text/10-K_20260224_rpt20251231_acc0000107263_26_000006.htm.txt"
+    }
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 12,
+      "notes": "FERC certificate delays, gas price weakness, leverage at 65% debt-to-cap ceiling, expansion capex overruns without tariff recovery"
+    },
+    "base": {
+      "growth_y1_5": 0.06,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 14,
+      "notes": "FY2025 revenue +13.8% and operating income +25.7%; contracted Transco and Power Innovation backlog; dividend $2.00/sh with mid-single-digit growth"
+    },
+    "bull": {
+      "growth_y1_5": 0.08,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 16,
+      "notes": "Faster data-center/power load adoption; Haynesville volumes; leverage stable as EBITDA scales; multiple re-rating on AI-power gas demand narrative"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Pipeline and processing plant on balance sheet at $42.0B net PP&E (10-K); no land-at-zero pattern"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Midstream toll roads on contracted capacity, not mineral royalty trust"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "All reportable segments revenue-positive FY2025; operating income $4,196M consolidated"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF path?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Revenue remaining performance obligation $4,589M; 2026 growth capex $6.1-6.7B on firm transportation and Power Innovation contracts (10-K Outlook)"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Equity-method investments $4.5B (10-K); Gulf Coast storage and JVs flow through segment EBITDA, not separate terminal"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Stable growing dividend; no suspended payout"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option already in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Power Innovation onsite gas and generation infrastructure earns through Transmission & Gulf segment growth path"
+    }
+  ],
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "human_review": {
+    "live_price_confirmed": false,
+    "maintenance_capex_assumption": true
+  },
+  "total_return_panel": {
+    "as_of": "2026-07-10",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 2.0,
+    "distribution_history_sum": 2.0,
+    "market_cap_m": null,
+    "total_return_annualized_pct": 7.24,
+    "chart": "WMB/research/charts/total_return_2026-07-10.svg",
+    "panel_json": "WMB/research/total_return_panel.json"
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 3.0
+    },
+    "base": {
+      "return_pct": 7.6
+    },
+    "bull": {
+      "return_pct": 11.0
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 3.0
+    },
+    "base": {
+      "return_pct": 7.6
+    },
+    "bull": {
+      "return_pct": 11.0
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": 7.6
+    },
+    "falsifier_adjusted": {
+      "return_pct": 7.6
+    }
+  },
+  "implied_return": {
+    "base_pct": 8.11,
+    "label": "7yr IRR (total synthesis)",
+    "display": "8.11% (total synthesis)",
+    "lawrence_stance_gate_pct": 7.6,
+    "falsifier_adjusted_pct": 7.6,
+    "synthesis_pct": 8.11
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Growth theory (pre-falsifier)",
+        "source": "growth_explanation + filing revenue YoY",
+        "return_pct": 7.6,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": 3.0,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 11.0,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 8.31,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 8.11,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}
