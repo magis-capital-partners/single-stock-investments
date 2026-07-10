@@ -591,9 +591,19 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | UPS | UPS/ | United Parcel Service | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | URI | URI/ | United Rentals | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | USB | USB/ | U.S. Bancorp | US | 2026-07-10 | 2026-07-10 | unknown | watch |
-| VLO | VLO/ | Valero Energy | US | — | — | unknown | watch |
+| V | V/ | Visa Inc. | US | — | — | unknown | watch |
+| VEEV | VEEV/ | Veeva Systems | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| VICI | VICI/ | Vici Properties | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| VLO | VLO/ | Valero Energy | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| VLTO | VLTO/ | Veralto | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | VOXR | VOXR/ | Vox Royalty Corp | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| VRSK | VRSK/ | Verisk Analytics | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| VRSN | VRSN/ | Verisign | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| VRT | VRT/ | Vertiv | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| VRTX | VRTX/ | Vertex Pharmaceuticals | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| VTR | VTR/ | Ventas | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | VTRS | VTRS/ | Viatris Inc | US | 2026-07-09 | 2026-07-09 | turnaround | watch |
+| VZ | VZ/ | Verizon | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | WBI | WBI/ | WaterBridge Infrastructure | US | 2026-07-09 | 2026-07-10 | infrastructure | watch |
 | WEST | WEST/ | Westrock Coffee Company | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | WPM | WPM/ | Wheaton Precious Metals Corp. | US | 2026-07-09 | 2026-07-09 | compounder | watch |
@@ -604,4 +614,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 
-**597 holdings total.** Registry: `_system/portfolio/registry.json`
+**607 holdings total.** Registry: `_system/portfolio/registry.json`
