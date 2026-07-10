@@ -1,0 +1,262 @@
+{
+  "ticker": "MMM",
+  "as_of": "2026-07-10",
+  "method": "full",
+  "lawrence_bucket": "pricing_power",
+  "classification_inputs": {
+    "archetype": "turnaround",
+    "moat": "narrow",
+    "dhando": "partial",
+    "cycle": "recovery",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 155.34,
+    "price_source": "Yahoo MMM close 2026-07-09",
+    "fcf_per_share": 2.58,
+    "fcf_source": "FY2025 cash from operations $2.306B minus capital spending $0.910B, divided by 541.3M diluted shares (10-K FY2025)",
+    "shares_millions": 541.3,
+    "normalization_note": "Filing FCF only; excludes litigation normalization. Dividends ($6.12/sh FY2025) exceed owner cash.",
+    "price_as_of": "2026-07-09"
+  },
+  "growth_explanation": {
+    "years_1_5": "Post-Solventum focus on three segments; Safety and Industrial operating income +14% YoY in FY2025; Q1 2026 consolidated operating income +12% YoY (10-Q). Growth assumes modest volume and price, not heroic margin expansion.",
+    "years_6_7": "Step-down after PFAS manufacturing exit and litigation payment cadence normalizes.",
+    "source": "10-K FY2025 segment table; Q1 2026 10-Q",
+    "status": "partial",
+    "lawrence_legacy": {
+      "y1_5": 0.03,
+      "y6_10": 0.025,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.03,
+      "y6_10": 0.025,
+      "exit_pfcf_y10": 14.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": null,
+      "as_of_filing_facts": null
+    }
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": -0.01,
+      "growth_y6_10": 0.0,
+      "exit_pfcf_y10": 12,
+      "notes": "PFAS payments accelerate; industrial recession; multiple compresses"
+    },
+    "base": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.025,
+      "exit_pfcf_y10": 14,
+      "notes": "Litigation cadence manageable; post-spin operating improvement continues at low single-digit cash growth"
+    },
+    "bull": {
+      "growth_y1_5": 0.05,
+      "growth_y6_10": 0.035,
+      "exit_pfcf_y10": 18,
+      "notes": "PFAS tail bounded; margin lift from portfolio simplification and buybacks shrink share count"
+    }
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": "Narrow moat and partial dhando; base Lawrence return deeply below 15% hurdle at today's price despite operating recovery"
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Industrial manufacturer; assets at depreciated cost, not land/NAV misstatement pattern"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating segments, not resource royalty"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Corporate and unallocated costs; PFAS exit costs in segment/corporate drag (10-K)"
+    },
+    {
+      "q": 4,
+      "question": "Backlog not in FCF path?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Short-cycle industrial products; revenue recognized on shipment"
+    },
+    {
+      "q": 5,
+      "question": "Private / illiquid stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Solventum spin completed; no material retained stake in continuing 10-K"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "Yes",
+      "treatment": "zero",
+      "evidence": "PFAS public-water and related litigation settlements; cash outflows not in normalized owner-cash growth path",
+      "base_terminal_rationale": "Litigation payments are burden on reported cash flow, not upside option in Lawrence base"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No pre-revenue platform segment post-Health Care spin"
+    }
+  ],
+  "estimates": {
+    "marvin_floor": {
+      "per_share": 2.58,
+      "return_pct": null,
+      "notes": "FY2025 filing FCF per share; stance gate computed by marvin_valuation.py"
+    },
+    "blended_best": {
+      "per_share": 2.58,
+      "return_pct": null,
+      "weights": "100% Marvin floor; no approved third-party blend",
+      "notes": "Primary filings only as of 2026-07-10"
+    }
+  },
+  "human_review": {
+    "notes": [
+      "Dividend yield (~4%) exceeds owner cash yield (~1.7%); payout sustainability depends on litigation cadence and balance sheet",
+      "Normalized owner cash above filing FCF requires human approval before base-case promotion"
+    ],
+    "live_price_confirmed": false
+  },
+  "lawrence_horizon_years": 7,
+  "total_return_panel": {
+    "as_of": "2026-07-10",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 0,
+    "distribution_history_sum": 0,
+    "market_cap_m": null,
+    "total_return_annualized_pct": 6.01,
+    "chart": "MMM/research/charts/total_return_2026-07-10.svg",
+    "panel_json": "MMM/research/total_return_panel.json"
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -17.7
+    },
+    "base": {
+      "return_pct": -13.1
+    },
+    "bull": {
+      "return_pct": -8.9
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -17.7
+    },
+    "base": {
+      "return_pct": -13.1
+    },
+    "bull": {
+      "return_pct": -8.9
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": -13.1
+    },
+    "falsifier_adjusted": {
+      "return_pct": -13.1
+    }
+  },
+  "implied_return": {
+    "base_pct": -13.5,
+    "label": "7yr IRR (total synthesis)",
+    "display": "-13.5% (total synthesis)",
+    "lawrence_stance_gate_pct": -13.1,
+    "falsifier_adjusted_pct": -13.1,
+    "synthesis_pct": -13.5
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence envelope)",
+        "source": "scenarios.bear",
+        "return_pct": -17.7,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "hard_to_vary": "yes: asymmetric low weight is structural",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ]
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence envelope)",
+        "source": "scenarios.bull",
+        "return_pct": -8.9,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "hard_to_vary": "yes",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ]
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": -13.3,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": -13.5,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}

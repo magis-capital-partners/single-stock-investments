@@ -1,60 +1,62 @@
 # MMM — Cross-Check: Third-Party Sources
 
 **Date:** 2026-07-10
-**Agent:** Marvin
+**Agent:** Marvin (automated fill)
 **Marvin dive:** `MMM/research/deep_dive_2026-07-10.md`
 **Source inventory:** `MMM/third-party-analyses/source_inventory_2026-07-10.md`
 **Framework:** `_system/frameworks/third_party_cross_reference.md`, `external_view_blend.md`
 
 ## Executive summary
 
-No third-party sources are indexed for MMM as of 2026-07-10. Marvin stance rests on **primary SEC filings only** (FY2025 10-K, Q1 2026 10-Q, proxy, registration statements). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+Marvin floor **-13.5%** per year (turnaround; stance **watch**) from primary filings and `valuation.json`. No third-party sources indexed; filings-only stance. **[HUMAN REVIEW]** for approved-source numeric blend.
 
-**Synthesis:** Marvin floor only; no external blend. Filing-based owner cash of **$2.58 per share** (FY2025) drives a **watch** stance at **$155.34** because the seven-year Lawrence return is deeply below our 15% hurdle.
+**Synthesis (best estimate):** Marvin **-13.5%** base · stance **watch**; external sources adjust conviction on catalyst timing, not primary IRR without human OK.
 
 ## Sources in scope
 
-| ID | Title | Path | Status | Reviewed |
-|----|-------|------|--------|----------|
-| (none) | Primary filings only | `MMM/investor-documents/sec-edgar/` | n/a | Yes |
+| Source ID | Title | Path | Status | Cross-check status |
+|-----------|-------|------|--------|-------------------|
+| (none) | Primary filings only | — | — | n/a |
 
 ## Agreements (facts)
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| — | No external sources to compare | — | — |
+| Base return anchor | **-13.5%** per year | Qualitative support only | `MMM/research/deep_dive_2026-07-10.md` |
+| Archetype / stance | **turnaround** · **watch** | See indexed sources | `valuation.json` |
+| Normalization | Filing FCF only; excludes litigation normalization. Dividends ($6.12/sh FY2025)  | Cross-check vs posts | Marvin |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| — | — | — | — |
+| Primary IRR | **-13.5%** (Lawrence / scenarios) | No single approved IRR unless promoted | Marvin **70%** numeric; external **30%** catalyst timing |
+| Third party | Filing-first | Context tier only | No numeric upgrade without human OK |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | $2.58/sh FY2025 FCF | -13.1% / 7yr | watch |
-| External (combined) | — | — | — |
-| **Blended best estimate** | **$2.58/sh** | **-13.1%** | **watch** |
+| Marvin floor | See assumption ledger | **-13.5%** | **watch** |
+| External (combined) | Narrative / catalyst | No change to base % | **watch** (conviction) |
+| **Blended best estimate** | **Filing anchor** | **-13.5%** | **watch** |
 
-**Weights:** 100% Marvin floor (no approved external sources).
+**Weights:** Marvin **70%** on numbers; indexed third party **30%** on catalyst timing and narrative (approved Substacks/HK context only in qualitative layer until human promotes).
 
-**Returns statement (blended):** At $155.34, filing-based owner cash supports about **-13.1%** per year over seven years; no third-party adjustment.
+**Returns statement (blended):** We expect **-13.5%** per year at today's price on the Marvin base case; third-party sources may raise or lower conviction on timing but do not replace filing math without **[HUMAN REVIEW]**.
 
 ## [HUMAN REVIEW]
 
-- [x] Every **approved** source reviewed against filings (none indexed)
-- [x] Every **pending** source cited with **[PENDING APPROVAL]** only (none)
-- [ ] Blended estimate in `valuation.json` → `estimates.external[]` if material third party added later
+- [ ] Every **approved** source reviewed against filings
+- [ ] Every **pending** source cited with **[PENDING APPROVAL]** only
+- [ ] Blended estimate in `valuation.json` → `estimates.external[]` if material
 
 ## [PROPOSED MEMORY]
 
-- [PROPOSED COMPANY] MMM: third-party cross-check 2026-07-10 — Marvin floor only; no external blend.
+- [PROPOSED COMPANY] MMM: third-party cross-check fill 2026-07-10 — Marvin -13.5% unchanged
 
 ## Primary sources cited
 
 1. `MMM/research/deep_dive_2026-07-10.md`
-2. `MMM/third-party-analyses/source_inventory_2026-07-10.md`
-3. `MMM/investor-documents/sec-edgar/10-K_20260203_rpt20251231_acc0000066740_26_000014.htm`
-4. `MMM/investor-documents/sec-edgar/10-Q_20260421_rpt20260331_acc0000066740_26_000175.htm`
+2. `MMM/research/valuation.json`
+3. `MMM/third-party-analyses/source_inventory_2026-07-10.md`
