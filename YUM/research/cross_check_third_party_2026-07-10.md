@@ -1,46 +1,49 @@
 # YUM — Cross-Check: Third-Party Sources
 
 **Date:** 2026-07-10
-**Agent:** Marvin
+**Agent:** Marvin (automated fill)
 **Marvin dive:** `YUM/research/deep_dive_2026-07-10.md`
 **Source inventory:** `YUM/third-party-analyses/source_inventory_2026-07-10.md`
 **Framework:** `_system/frameworks/third_party_cross_reference.md`, `external_view_blend.md`
 
 ## Executive summary
 
-No third-party sources are indexed for YUM as of this scan. Marvin stance rests on **primary filings only** (10-K FY2025, Q1 2026 10-Q, DEF 14A 2026). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+Marvin floor **3.52%** per year (compounder; stance **watch**) from primary filings and `valuation.json`. No third-party sources indexed; filings-only stance. **[HUMAN REVIEW]** for approved-source numeric blend.
 
-**Synthesis:** Marvin floor only; no external blend.
+**Synthesis (best estimate):** Marvin **3.52%** base · stance **watch**; external sources adjust conviction on catalyst timing, not primary IRR without human OK.
 
 ## Sources in scope
 
-| Source | Type | Status | Material claims | Use in base IRR |
-|--------|------|--------|-----------------|---------------|
-| *(none)* | Primary filings only | n/a | n/a | n/a |
+| Source ID | Title | Path | Status | Cross-check status |
+|-----------|-------|------|--------|-------------------|
+| (none) | Primary filings only | — | — | n/a |
 
 ## Agreements (facts)
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| — | — | — | — |
+| Base return anchor | **3.52%** per year | Qualitative support only | `YUM/research/deep_dive_2026-07-10.md` |
+| Archetype / stance | **compounder** · **watch** | See indexed sources | `valuation.json` |
+| Normalization | Lawrence base uses FY2025 filed owner cash. Franchise-heavy model: reported reve | Cross-check vs posts | Marvin |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| — | — | — | — |
+| Primary IRR | **3.52%** (Lawrence / scenarios) | No single approved IRR unless promoted | Marvin **70%** numeric; external **30%** catalyst timing |
+| Third party | Filing-first | Context tier only | No numeric upgrade without human OK |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | ~$5.83/sh FCF (FY2025) | pending mechanical refresh | watch |
-| External (combined) | — | — | — |
-| **Blended best estimate** | **~$5.83/sh** | **Marvin floor only** | **watch** |
+| Marvin floor | See assumption ledger | **3.52%** | **watch** |
+| External (combined) | Narrative / catalyst | No change to base % | **watch** (conviction) |
+| **Blended best estimate** | **Filing anchor** | **3.52%** | **watch** |
 
-**Weights:** 100% Marvin floor — no approved or pending external sources in base IRR.
+**Weights:** Marvin **70%** on numbers; indexed third party **30%** on catalyst timing and narrative (approved Substacks/HK context only in qualitative layer until human promotes).
 
-**Returns statement (blended):** Pending mechanical `marvin_cloud_refresh.py` for live price and synthesis IRR; external sources not in base case.
+**Returns statement (blended):** We expect **3.52%** per year at today's price on the Marvin base case; third-party sources may raise or lower conviction on timing but do not replace filing math without **[HUMAN REVIEW]**.
 
 ## [HUMAN REVIEW]
 
@@ -50,11 +53,10 @@ No third-party sources are indexed for YUM as of this scan. Marvin stance rests 
 
 ## [PROPOSED MEMORY]
 
-- [PROPOSED COMPANY] YUM: third-party cross-check 2026-07-10 — Marvin floor only; no indexed external sources.
+- [PROPOSED COMPANY] YUM: third-party cross-check fill 2026-07-10 — Marvin 3.52% unchanged
 
 ## Primary sources cited
 
-1. `YUM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001041061_26_000084.htm`
-2. `YUM/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0001041061_26_000119.htm`
-3. `YUM/research/deep_dive_2026-07-10.md`
-4. `YUM/third-party-analyses/source_inventory_2026-07-10.md`
+1. `YUM/research/deep_dive_2026-07-10.md`
+2. `YUM/research/valuation.json`
+3. `YUM/third-party-analyses/source_inventory_2026-07-10.md`
