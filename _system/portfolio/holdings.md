@@ -522,10 +522,12 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | SJM | SJM/ | J.M. Smucker Company (The) | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | SJT | SJT/ | San Juan Basin Royalty Trust | US | 2026-07-09 | 2026-07-10 | optionality | watch |
 | SLB | SLB/ | Schlumberger | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| SMCI | SMCI/ | Supermicro | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | SMR | SMR/ | NuScale Power Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | SNA | SNA/ | Snap-on | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | SNDK | SNDK/ | Sandisk | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | SNOW | SNOW/ | Snowflake Inc | US | 2026-07-09 | 2026-07-10 | platform | watch |
+| SNPS | SNPS/ | Synopsys | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | SO | SO/ | Southern Company | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | SOC | SOC/ | Sable Offshore Corp. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | SOLV | SOLV/ | Solventum | US | 2026-07-10 | 2026-07-10 | unknown | watch |
@@ -533,14 +535,18 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | SPGI | SPGI/ | S&P Global | US | 2026-07-09 | 2026-07-10 | croupier | hold |
 | SRE | SRE/ | Sempra | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | SRPT | SRPT/ | Sarepta Therapeutics, Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| STE | STE/ | Steris | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | STHO | STHO/ | Star Holdings | US | 2026-07-09 | 2026-07-09 | unknown | watch |
-| STLD | STLD/ | Steel Dynamics | US | — | — | unknown | watch |
+| STLD | STLD/ | Steel Dynamics | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | STT | STT/ | State Street Corporation | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | STX | STX/ | Seagate Technology | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | STZ | STZ/ | Constellation Brands | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | SW | SW/ | Smurfit Westrock | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | SWK | SWK/ | Stanley Black & Decker | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | SWKS | SWKS/ | Skyworks Solutions | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| SYF | SYF/ | Synchrony Financial | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| SYK | SYK/ | Stryker Corporation | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| SYY | SYY/ | Sysco | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | T | T/ | AT&T | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | TAP | TAP/ | Molson Coors Beverage Company | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | TASE | TASE/ | Tel Aviv Stock Exchange Ltd. | EU | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -548,10 +554,14 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | TECH | TECH/ | Bio-Techne | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | TEQ.ST | TEQ.ST/ | Teqnion AB | SE | 2026-07-09 | 2026-07-09 | serial_acquirer | hold |
 | TFPM | TFPM/ | Triple Flag Precious Metals Corp. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| TMUS | TMUS/ | T-Mobile US | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | TOI | TOI/ | The Oncology Institute, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | TPL | TPL/ | Texas Pacific Land Corporation | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| TPR | TPR/ | Tapestry, Inc. | US | — | — | unknown | watch |
 | TRC | TRC/ | Tejon Ranch Co. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| TROW | TROW/ | T. Rowe Price | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | TSLA | TSLA/ | Tesla, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| TTWO | TTWO/ | Take-Two Interactive | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | VOXR | VOXR/ | Vox Royalty Corp | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | VTRS | VTRS/ | Viatris Inc | US | 2026-07-09 | 2026-07-09 | turnaround | watch |
 | WBI | WBI/ | WaterBridge Infrastructure | US | 2026-07-09 | 2026-07-10 | infrastructure | watch |
@@ -564,4 +574,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 
-**557 holdings total.** Registry: `_system/portfolio/registry.json`
+**567 holdings total.** Registry: `_system/portfolio/registry.json`
