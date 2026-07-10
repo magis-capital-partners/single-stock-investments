@@ -19,14 +19,20 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | ACN | ACN/ | Accenture | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ADBE | ADBE/ | Adobe Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ADN.TO | ADN.TO/ | Acadian Timber Corp. | CA | 2026-07-09 | 2026-07-09 | optionality | watch |
+| AEE | AEE/ | Ameren | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| AEP | AEP/ | American Electric Power | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | AES | AES/ | AES Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | AFL | AFL/ | Aflac | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| AIG | AIG/ | American International Group | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | AKAM | AKAM/ | Akamai Technologies | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ALB | ALB/ | Albemarle Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ALGN | ALGN/ | Align Technology | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| ALL | ALL/ | Allstate | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ALLE | ALLE/ | Allegion | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ALS.TO | ALS.TO/ | Altius Minerals Corporation | CA | 2026-06-03 | 2026-07-09 | unknown | watch |
+| AMCR | AMCR/ | Amcor | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | AMD | AMD/ | Advanced Micro Devices, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| AMT | AMT/ | American Tower | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | AMZN | AMZN/ | Amazon.com | US | 2026-07-09 | 2026-07-09 | compounder | hold |
 | AOS | AOS/ | A. O. Smith | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | APD | APD/ | Air Products | US | 2026-07-09 | 2026-07-10 | unknown | watch |
@@ -35,6 +41,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | ASPN | ASPN/ | Aspen Aerogels, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | ASX.AX | ASX.AX/ | ASX Limited | AU | 2026-07-09 | 2026-07-09 | unknown | watch |
 | AXON | AXON/ | Axon Enterprise, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| AXP | AXP/ | American Express | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | AZLCZ | AZLCZ/ | Aztec Land and Cattle Company | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | B | B/ | Barrick Mining Corporation | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | B3SA3.SA | B3SA3.SA/ | B3 S.A. - Brasil Bolsa Balcao | EU | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -89,6 +96,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | GKTX.PS2 | GKTX.PS2/ | Galapagos NV (Janssen structured security PS2) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | GKTX.PS3 | GKTX.PS3/ | Galapagos NV (Janssen structured security PS3) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | GLXY | GLXY/ | Galaxy Digital Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| GOOG | GOOG/ | Alphabet Inc. (Class C) | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | GOOGL | GOOGL/ | Alphabet Inc. | US | 2026-07-09 | 2026-07-09 | compounder | hold |
 | GPGI | GPGI/ | GPGI, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | GPW.WA | GPW.WA/ | Warsaw Stock Exchange | EU | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -115,6 +123,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | LBRDK | LBRDK/ | Liberty Broadband Corporation (Class C) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | LMN | LMN/ | Lumine Group Inc. | CA | — | 2026-07-09 | unknown | watch |
 | LMNR | LMNR/ | Limoneira Company | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| LNT | LNT/ | Alliant Energy | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | LSEG | LSEG/ | London Stock Exchange Group | UK | 2026-07-09 | 2026-07-09 | unknown | watch |
 | MCHB | MCHB/ | Mechanics Bancorp | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | MCO | MCO/ | Moody's Corporation | US | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -122,6 +131,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | META | META/ | Meta Platforms Inc | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | MIAX | MIAX/ | Miami International Holdings | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | MMM | MMM/ | 3M | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| MO | MO/ | Altria | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | MRSH | MRSH/ | Marsh & McLennan Companies | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | MRTX.CVR | MRTX.CVR/ | Mirati Therapeutics CVR (Bristol-Myers Squibb acquisition) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | MSB | MSB/ | Mesabi Trust | US | 2026-07-09 | 2026-07-09 | optionality | watch |
@@ -178,4 +188,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 
-**171 holdings total.** Registry: `_system/portfolio/registry.json`
+**181 holdings total.** Registry: `_system/portfolio/registry.json`
