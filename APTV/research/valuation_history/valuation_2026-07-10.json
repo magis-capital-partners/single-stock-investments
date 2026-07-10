@@ -1,0 +1,325 @@
+{
+  "ticker": "APTV",
+  "as_of": "2026-07-10",
+  "method": "full",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "compounder",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating",
+    "predictive_attribute": "Post-Versigent spin complexity discount; Wind River impairment marks software optionality reset"
+  },
+  "valuation_overlay": "segment_cashflow",
+  "inputs": {
+    "price": 59.86,
+    "price_source": "NYSE close 2026-07-09 (Yahoo Finance chart API)",
+    "fcf_per_share": 5.15,
+    "fcf_source": "FY2025 pro forma post-Versigent: consolidated OCF $2,185M minus capex $656M = $1,529M; remaining segments ~73% of adj. operating income ($1,787M / $2,461M) \u2192 ~$1,102M \u00f7 ~214M diluted shares (10-K FY2025; 8-K spin 2026-04-01)",
+    "shares_millions": 213.8,
+    "normalization_note": "Excludes Versigent (Electrical Distribution Systems) after April 1, 2026 spin; excludes $648M Wind River goodwill impairment (non-cash); uses cash from operations less capital spending, not GAAP net income $165M"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.02,
+      "growth_y6_10": 0.01,
+      "exit_pfcf_y10": 12,
+      "notes": "Auto production down-cycle, OEM price-downs, China volume shock; multiple stays at trough industrial-tech levels"
+    },
+    "base": {
+      "growth_y1_5": 0.06,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 15,
+      "notes": "Post-spin focus on Intelligent Systems + Engineered Components; mid-single-digit volume plus content growth; exit ~15\u00d7 normalized owner cash"
+    },
+    "bull": {
+      "growth_y1_5": 0.09,
+      "growth_y6_10": 0.06,
+      "exit_pfcf_y10": 18,
+      "notes": "Software-defined vehicle adoption accelerates Wind River and ADAS mix; margin expansion in Engineered Components; buybacks at discount"
+    }
+  },
+  "segment_build": {
+    "framework": "speedwell_reverse_dcf",
+    "as_of": "2026-07-10",
+    "horizon_years": 7,
+    "discount_rate_explicit": 0.1,
+    "segments": [
+      {
+        "id": "intelligent_systems",
+        "label": "Intelligent Systems (formerly Advanced Safety and User Experience)",
+        "type": "operating",
+        "owner_cash_y0_bn": 0.408,
+        "owner_cash_y0_per_share": 1.91,
+        "owner_cash_y0_source": "FY2025 segment adj. OI $658M; pro forma FCF allocated 36.8% by segment OI share [Assumption]",
+        "growth_y1_5": 0.07,
+        "growth_y6_10": 0.05,
+        "exit_pfcf_y10": 16,
+        "notes": "Sensors, compute, ADAS, Wind River edge software; $648M goodwill impairment in FY2025"
+      },
+      {
+        "id": "engineered_components",
+        "label": "Engineered Components (connection systems, interconnects, cable management)",
+        "type": "operating",
+        "owner_cash_y0_bn": 0.702,
+        "owner_cash_y0_per_share": 3.24,
+        "owner_cash_y0_source": "FY2025 segment adj. OI $1,129M; pro forma FCF allocated 63.2% by segment OI share [Assumption]",
+        "growth_y1_5": 0.05,
+        "growth_y6_10": 0.03,
+        "exit_pfcf_y10": 14,
+        "notes": "Higher-margin interconnect franchise; electrification content tailwind"
+      }
+    ],
+    "options": [
+      {
+        "id": "wind_river_software",
+        "label": "Wind River edge software platform",
+        "option_treatment": "embedded_in_segment",
+        "annual_drag_per_share": 0,
+        "base_terminal_value_bn": 0,
+        "base_terminal_rationale": "Software economics embedded in Intelligent Systems growth after FY2025 impairment reset; no separate terminal after $648M write-down",
+        "evidence": "10-K FY2025 Note goodwill impairment Wind River reporting unit $648M",
+        "not_in_lawrence_base": false
+      },
+      {
+        "id": "motional_stake",
+        "label": "Motional autonomous driving JV (equity method)",
+        "option_treatment": "zero",
+        "annual_drag_per_share": 0.05,
+        "base_terminal_value_bn": 0,
+        "base_terminal_rationale": "Equity loss drag; no disclosed fair-value mark or monetization path in base case after scan",
+        "evidence": "10-K FY2025 equity loss net of tax $38M; Motional AD LLC equity method investee",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "versigent_spin",
+        "label": "Versigent (EDS) spin-off value",
+        "option_treatment": "milestone_nav",
+        "annual_drag_per_share": 0,
+        "base_terminal_value_bn": 0,
+        "base_terminal_rationale": "Completed April 1, 2026; value received via distributed Versigent shares (VGNT), not in remaining APTV Lawrence path",
+        "evidence": "8-K 2026-04-01 spin completion; Separation and Distribution Agreement",
+        "not_in_lawrence_base": true
+      }
+    ],
+    "notes": "Pre-spin FY2025 segment table; post-spin APTV retains Intelligent Systems + Engineered Components only"
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Industrial operating assets; goodwill impairment taken on Wind River in FY2025"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating supplier; no land/NAV floor"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment / zero",
+      "evidence": "Wind River embedded in Intelligent Systems after impairment; Motional equity loss drag"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF path?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Automotive programs flow through segment revenue; RPO $172M per 10-K"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "Yes",
+      "treatment": "zero",
+      "evidence": "Motional JV; equity method without base-case terminal"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "Yes",
+      "treatment": "milestone_nav",
+      "evidence": "Versigent tax-free spin April 1, 2026; value in distributed shares not APTV FCF"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Electrification and software content in segment growth paths"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "Post-spin APTV participates in software-defined vehicle, ADAS, and electrification content per vehicle; Engineered Components benefits from higher connection counts in EV architectures",
+    "source": "10-K FY2025 Business Strategy; Q1 2026 10-Q segment rename to Intelligent Systems",
+    "bear_trigger": "Global auto production decline >5% for two consecutive years",
+    "bull_trigger": "Intelligent Systems revenue growth >10% for four quarters with stable margins",
+    "theory_implied": {
+      "y1_5": 0.0574,
+      "y6_10": 0.0374,
+      "exit_pfcf_y10_segment_blend": 14.7,
+      "derivation": "segment_build owner-cash weighted blend (growth only; exit from scenarios.base)",
+      "segment_weights": [
+        {
+          "id": "intelligent_systems",
+          "weight_pct": 37.1
+        },
+        {
+          "id": "engineered_components",
+          "weight_pct": 62.9
+        }
+      ]
+    },
+    "lawrence_legacy": {
+      "y1_5": 0.06,
+      "y6_10": 0.04,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.0574,
+      "y6_10": 0.0374,
+      "exit_pfcf_y10": 15.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": 0.0347,
+      "as_of_filing_facts": "evidence/_text/10-K_20260206_rpt20251231_acc0001521332_26_000009.htm.txt"
+    },
+    "status": "partial",
+    "divergence": {
+      "theory_vs_lawrence_y1_5_pp": -0.3,
+      "falsifier_vs_theory_y1_5_pp": 0.0
+    }
+  },
+  "estimates": {
+    "external": []
+  },
+  "stance_proposal": {
+    "suggested": "hold",
+    "irr_band": "15\u201320%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 10.9
+    },
+    "base": {
+      "return_pct": 17.7
+    },
+    "bull": {
+      "return_pct": 23.2
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 10.9
+    },
+    "base": {
+      "return_pct": 17.7
+    },
+    "bull": {
+      "return_pct": 23.2
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": 17.4
+    },
+    "falsifier_adjusted": {
+      "return_pct": 17.4
+    }
+  },
+  "implied_return": {
+    "base_pct": 18.88,
+    "label": "7yr IRR (total synthesis)",
+    "display": "18.88% (total synthesis)",
+    "lawrence_stance_gate_pct": 17.7,
+    "falsifier_adjusted_pct": 17.7,
+    "synthesis_pct": 18.88
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Segment-derived growth (pre-falsifier)",
+        "source": "segment_build weighted blend",
+        "return_pct": 17.4,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": 10.9,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 23.2,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 18.88,
+    "qualitative_pp": 0,
+    "total_synthesis_pct": 18.88,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}
