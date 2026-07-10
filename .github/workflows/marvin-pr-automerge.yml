@@ -1,56 +1,90 @@
-name: Marvin PR automerge
-
-# Squash-merge Cursor cloud-agent deep dive PRs after research-quality CI passes.
-
-on:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
-    branches: [main]
-
-permissions:
-  contents: write
-  pull-requests: write
-  checks: read
-
-concurrency:
-  group: marvin-automerge-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
-
-jobs:
-  automerge:
-    if: startsWith(github.head_ref, 'cursor/')
-    runs-on: ubuntu-latest
-    timeout-minutes: 45
-    steps:
-      - name: Mark draft PR ready (Cursor cloud agent opens drafts)
-        if: github.event.pull_request.draft == true
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh pr ready "${{ github.event.pull_request.number }}" \
-            --repo "${{ github.repository }}"
-
-      - name: Wait for research quality checks
-        if: github.event.pull_request.draft == false
-        uses: lewagon/wait-on-check-action@v1.3.4
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          wait-interval: 30
-          check-regexp: (cloud-prompt-sync|research-lint)
-          allowed-conclusions: success,skipped
-
-      - name: Squash merge and delete branch
-        if: github.event.pull_request.draft == false
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh pr merge "${{ github.event.pull_request.number }}" \
-            --repo "${{ github.repository }}" \
-            --squash \
-            --delete-branch
-
-      - name: Summary
-        if: github.event.pull_request.draft == false
-        run: |
-          echo "Merged PR #${{ github.event.pull_request.number }} (${{ github.head_ref }}) into main."
+name: Marvin PR automerge
+
+# Squash-merge Cursor cloud-agent deep dive PRs after research-quality CI passes.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: PR number to automerge (cursor/* branches only)
+        required: true
+        type: number
+
+permissions:
+  contents: write
+  pull-requests: write
+  checks: read
+
+concurrency:
+  group: marvin-automerge-${{ github.event.pull_request.number || inputs.pr_number }}
+  cancel-in-progress: true
+
+jobs:
+  automerge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Resolve PR number
+        id: pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "number=${{ inputs.pr_number }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "number=${{ github.event.pull_request.number }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Load PR metadata
+        id: meta
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR="${{ steps.pr.outputs.number }}"
+          HEAD_REF=$(gh pr view "$PR" --repo "${{ github.repository }}" --json headRefName,isDraft,headRefOid --jq '.headRefName')
+          IS_DRAFT=$(gh pr view "$PR" --repo "${{ github.repository }}" --json isDraft --jq '.isDraft')
+          HEAD_SHA=$(gh pr view "$PR" --repo "${{ github.repository }}" --json headRefOid --jq '.headRefOid')
+          if [[ ! "$HEAD_REF" =~ ^cursor/ ]]; then
+            echo "::error::PR #$PR head ref '$HEAD_REF' is not a cursor/* branch — skipping."
+            exit 1
+          fi
+          echo "head_ref=$HEAD_REF" >> "$GITHUB_OUTPUT"
+          echo "is_draft=$IS_DRAFT" >> "$GITHUB_OUTPUT"
+          echo "head_sha=$HEAD_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Mark draft PR ready (Cursor cloud agent opens drafts)
+        if: steps.meta.outputs.is_draft == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr ready "${{ steps.pr.outputs.number }}" \
+            --repo "${{ github.repository }}"
+
+      - name: Wait for research quality checks
+        if: steps.meta.outputs.is_draft == 'false'
+        uses: lewagon/wait-on-check-action@v1.3.4
+        with:
+          ref: ${{ steps.meta.outputs.head_sha }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 30
+          check-regexp: (cloud-prompt-sync|research-lint)
+          allowed-conclusions: success,skipped
+
+      - name: Squash merge and delete branch
+        if: steps.meta.outputs.is_draft == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr merge "${{ steps.pr.outputs.number }}" \
+            --repo "${{ github.repository }}" \
+            --squash \
+            --delete-branch
+
+      - name: Summary
+        if: steps.meta.outputs.is_draft == 'false'
+        run: |
+          echo "Merged PR #${{ steps.pr.outputs.number }} (${{ steps.meta.outputs.head_ref }}) into main."
+
