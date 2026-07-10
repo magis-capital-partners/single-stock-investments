@@ -1,6 +1,6 @@
 # ACN — Investment Thesis
 
-**Last updated:** 2026-07-10
+**Last updated:** auto-sync
 
 ## Classification
 
@@ -11,9 +11,13 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | accumulate |
 | **Cycle** | it_spending |
+| **Implied 7yr IRR** (base) | 26.61% (total synthesis) |
+| **IRR method** | full |
 | **Lawrence bucket** | platform |
 | **Payoff lens** | operating |
-| **Implied IRR** (base) | 26.6% |
+| **MOI bucket** | pending |
+
+**Deep dive:** `ACN/research/deep_dive_2026-07-10.md` (auto-sync)
 
 ## One-line thesis
 
