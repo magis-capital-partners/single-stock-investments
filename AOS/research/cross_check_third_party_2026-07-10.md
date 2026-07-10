@@ -9,37 +9,42 @@
 
 ## Executive summary
 
-No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (10-K, 10-Q, IR). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+No third-party sources are indexed for AOS as of 2026-07-10. Marvin stance rests on **primary filings only** (FY2025 10-K, Q1 2026 10-Q). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
 
-**Synthesis:** Marvin floor only; no external blend.
+**Synthesis:** Marvin floor only; no external blend. Base annual return **13.9%** per year at **$59.02** on FY2025 free cash flow **$3.85** per share → **watch**.
 
 ## Sources in scope
 
-| (none) | Primary filings only | — | — | n/a |
+| ID | Title | Path | Status | Use |
+|----|-------|------|--------|-----|
+| primary | FY2025 10-K | `investor-documents/sec-edgar/10-K_20260210_rpt20251231_acc0000091142_26_000008.htm` | filing | Segment margins, FCF, outlook |
+| primary | Q1 2026 10-Q | `investor-documents/sec-edgar/10-Q_20260430_rpt20260331_acc0000091142_26_000084.htm` | filing | Latest quarterly trend |
 
 ## Agreements (facts)
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| — | — | — | — |
+| FY2025 FCF | $546.0M ($3.85/sh) | n/a | 10-K FY2025 |
+| NA segment margin | 24.4% | n/a | 10-K segment note |
+| 2026 sales outlook | +2–5% | n/a | 10-K outlook |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| — | — | — | — |
+| — | No external views | — | Marvin floor stands |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | — | — | — |
+| Marvin floor | $3.85 FCF/sh FY2025 | 13.9% / 7yr | watch |
 | External (combined) | — | — | — |
-| **Blended best estimate** | **—** | **—** | **—** |
+| **Blended best estimate** | **$3.85 FCF/sh** | **13.9%** | **watch** |
 
-**Weights:** *[Document why]*
+**Weights:** 100% Marvin floor (no approved third-party sources).
 
-**Returns statement (blended):** *[One sentence; pending sources not in base IRR]*
+**Returns statement (blended):** At **$59.02**, filed FY2025 owner cash supports **13.9%** per year in the base case — below our **15%** bar; **watch**.
 
 ## [HUMAN REVIEW]
 
