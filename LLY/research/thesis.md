@@ -1,29 +1,21 @@
-# LLY — Investment Thesis
+# LLY — Investment thesis
 
-**Last updated:** 2026-07-10
+**One line:** Best-in-class GLP-1/GIP compounder priced for perfection; watch until IRR clears 15% hurdle.
+
+**Status:** watch (Marvin proposal 2026-07-10)
 
 ## Classification
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Archetype** (Stahl) | compounder |
+| **Moat** (Munger) | widening |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Cycle** | up |
+| **Implied 7yr IRR** (Lawrence) | pending mechanical write |
+| **IRR method** | full |
+| **Lawrence bucket** | pricing_power |
+| **Payoff lens** | operating |
 
-## One-line thesis
-
-Lilly (Eli) — thesis pending Marvin deep dive.
-
-## Key questions
-
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
-
-## [HUMAN REVIEW]
-
-- Onboarded 2026-07-10; awaiting deep dive.
+**Latest dive:** `LLY/research/deep_dive_2026-07-10.md`
