@@ -385,6 +385,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | MCK | MCK/ | McKesson Corporation | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | MCO | MCO/ | Moody's Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | MDB | MDB/ | MongoDB, Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| MDLZ | MDLZ/ | Mondelez International | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | MDT | MDT/ | Medtronic | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | MET | MET/ | MetLife | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | META | META/ | Meta Platforms Inc | US | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -393,15 +394,21 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | MKC | MKC/ | McCormick & Company | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | MLM | MLM/ | Martin Marietta Materials | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | MMM | MMM/ | 3M | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| MNST | MNST/ | Monster Beverage | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | MO | MO/ | Altria | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| MOS | MOS/ | Mosaic Company (The) | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | MPC | MPC/ | Marathon Petroleum | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| MPWR | MPWR/ | Monolithic Power Systems | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | MRK | MRK/ | Merck & Co. | US | 2026-07-10 | 2026-07-10 | unknown | watch |
-| MRNA | MRNA/ | Moderna | US | — | — | unknown | watch |
+| MRNA | MRNA/ | Moderna | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | MRSH | MRSH/ | Marsh & McLennan Companies | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | MRTX.CVR | MRTX.CVR/ | Mirati Therapeutics CVR (Bristol-Myers Squibb acquisition) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | MRVL | MRVL/ | Marvell Technology | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| MS | MS/ | Morgan Stanley | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | MSB | MSB/ | Mesabi Trust | US | 2026-07-09 | 2026-07-09 | optionality | watch |
+| MSCI | MSCI/ | MSCI Inc. | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | MSFT | MSFT/ | Microsoft | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| MSI | MSI/ | Motorola Solutions | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | MSTR | MSTR/ | MicroStrategy Incorporated | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | MTA | MTA/ | Metalla Royalty & Streaming Ltd. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | MTB | MTB/ | M&T Bank | US | 2026-07-10 | 2026-07-10 | unknown | watch |
@@ -410,7 +417,9 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | NAN | NAN/ | Nuveen New York AMT-Free Quality Municipal Income Fund | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | NBIS | NBIS/ | Nebius Group N.V. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | NDAQ | NDAQ/ | Nasdaq Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| NFLX | NFLX/ | Netflix | US | — | — | unknown | watch |
 | NRP | NRP/ | Natural Resource Partners LP | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| NTAP | NTAP/ | NetApp | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | NVDA | NVDA/ | NVIDIA Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | NZX.NZ | NZX.NZ/ | NZX Limited | AU | 2026-07-09 | 2026-07-09 | unknown | watch |
 | OR | OR/ | Osisko Gold Royalties Ltd | US | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -443,6 +452,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | STHO | STHO/ | Star Holdings | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | STZ | STZ/ | Constellation Brands | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | T | T/ | AT&T | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| TAP | TAP/ | Molson Coors Beverage Company | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | TASE | TASE/ | Tel Aviv Stock Exchange Ltd. | EU | 2026-07-09 | 2026-07-09 | unknown | watch |
 | TBBK | TBBK/ | The Bancorp, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | TECH | TECH/ | Bio-Techne | US | 2026-07-09 | 2026-07-10 | unknown | watch |
@@ -464,4 +474,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 
-**457 holdings total.** Registry: `_system/portfolio/registry.json`
+**467 holdings total.** Registry: `_system/portfolio/registry.json`
