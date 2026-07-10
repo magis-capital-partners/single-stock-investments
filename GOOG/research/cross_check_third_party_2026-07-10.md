@@ -10,7 +10,7 @@
 
 No third-party sources are indexed for GOOG as of this scan. Marvin stance rests on **primary SEC filings** in `GOOG/investor-documents/sec-edgar/` (same CIK as GOOGL). Company-level external context may exist under `GOOGL/third-party-analyses/` but is **not** approved for GOOG base return without human promotion to `third_party_sources.md`.
 
-**Synthesis:** Marvin floor only; no external blend. Base seven-year annual return approximately **-1%** on FY2025 free cash flow per share at spot (see `GOOG/research/valuation.json`).
+**Synthesis:** Marvin floor only; no external blend. Base seven-year annual return **-0.28%** on FY2025 free cash flow per share at $356.24 (see `GOOG/research/valuation.json`).
 
 ## Sources in scope
 
@@ -37,13 +37,13 @@ No third-party sources are indexed for GOOG as of this scan. Marvin stance rests
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | FY2025 FCF ~$5.85/sh | ~-1% / 7yr base | watch |
+| Marvin floor | FY2025 FCF ~$5.85/sh | -0.28% / 7yr base | watch |
 | External (combined) | — | — | — |
-| **Blended best estimate** | **FY2025 FCF base** | **~-1% / 7yr** | **watch** |
+| **Blended best estimate** | **FY2025 FCF base** | **-0.28% / 7yr** | **watch** |
 
 **Weights:** 100% Marvin floor (no approved external sources).
 
-**Returns statement (blended):** At today's price on FY2025 owner cash, we expect roughly **-1%** per year over seven years; pending third-party sources would not change base IRR without human approval.
+**Returns statement (blended):** At **$356.24**, we expect **-0.28%** per year over seven years on FY2025 owner cash; pending third-party sources would not change base IRR without human approval.
 
 ## [HUMAN REVIEW]
 
