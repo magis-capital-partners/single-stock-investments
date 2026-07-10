@@ -1,47 +1,49 @@
 # WTW — Cross-Check: Third-Party Sources
 
 **Date:** 2026-07-10
-**Agent:** Marvin
+**Agent:** Marvin (automated fill)
 **Marvin dive:** `WTW/research/deep_dive_2026-07-10.md`
 **Source inventory:** `WTW/third-party-analyses/source_inventory_2026-07-10.md`
 **Framework:** `_system/frameworks/third_party_cross_reference.md`, `external_view_blend.md`
 
 ## Executive summary
 
-No third-party sources are indexed for WTW as of this scan. Marvin stance rests on **primary filings only** (FY2025 10-K, Q1 2026 10-Q, DEF 14A 2026). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+Marvin floor **9.71%** per year (compounder; stance **watch**) from primary filings and `valuation.json`. No third-party sources indexed; filings-only stance. **[HUMAN REVIEW]** for approved-source numeric blend.
 
-**Synthesis:** Marvin floor only; no external blend. Base Lawrence synthesis **10.09%** per year at ~$290 on FY2025 owner cash → **watch**.
+**Synthesis (best estimate):** Marvin **9.71%** base · stance **watch**; external sources adjust conviction on catalyst timing, not primary IRR without human OK.
 
 ## Sources in scope
 
-| Source | Type | Status | Role |
-|--------|------|--------|------|
-| Primary filings | 10-K FY2025, 10-Q Q1 2026, DEF 14A 2026 | approved (primary) | Marvin floor |
-| Third party | — | none indexed | n/a |
+| Source ID | Title | Path | Status | Cross-check status |
+|-----------|-------|------|--------|-------------------|
+| (none) | Primary filings only | — | — | n/a |
 
 ## Agreements (facts)
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| — | — | — | — |
+| Base return anchor | **9.71%** per year | Qualitative support only | `WTW/research/deep_dive_2026-07-10.md` |
+| Archetype / stance | **compounder** · **watch** | See indexed sources | `valuation.json` |
+| Normalization | Lawrence base uses FY2025 filed owner cash. FY2024 included $1.0B goodwill impai | Cross-check vs posts | Marvin |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| — | — | — | — |
+| Primary IRR | **9.71%** (Lawrence / scenarios) | No single approved IRR unless promoted | Marvin **70%** numeric; external **30%** catalyst timing |
+| Third party | Filing-first | Context tier only | No numeric upgrade without human OK |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | ~$15.62/sh FY2025 FCF | 10.09% / 7yr synthesis | watch |
-| External (combined) | — | — | — |
-| **Blended best estimate** | **~$15.62/sh** | **10.09% per year** | **watch** |
+| Marvin floor | See assumption ledger | **9.71%** | **watch** |
+| External (combined) | Narrative / catalyst | No change to base % | **watch** (conviction) |
+| **Blended best estimate** | **Filing anchor** | **9.71%** | **watch** |
 
-**Weights:** 100% Marvin floor (no approved external sources).
+**Weights:** Marvin **70%** on numbers; indexed third party **30%** on catalyst timing and narrative (approved Substacks/HK context only in qualitative layer until human promotes).
 
-**Returns statement (blended):** At ~$290 per share, filing-based owner cash supports about **10.1%** per year over seven years; below the **15%** accumulate hurdle → **watch**.
+**Returns statement (blended):** We expect **9.71%** per year at today's price on the Marvin base case; third-party sources may raise or lower conviction on timing but do not replace filing math without **[HUMAN REVIEW]**.
 
 ## [HUMAN REVIEW]
 
@@ -51,11 +53,10 @@ No third-party sources are indexed for WTW as of this scan. Marvin stance rests 
 
 ## [PROPOSED MEMORY]
 
-- [PROPOSED COMPANY] WTW: third-party cross-check 2026-07-10 — Marvin floor only; no external blend.
+- [PROPOSED COMPANY] WTW: third-party cross-check fill 2026-07-10 — Marvin 9.71% unchanged
 
 ## Primary sources cited
 
 1. `WTW/research/deep_dive_2026-07-10.md`
-2. `WTW/third-party-analyses/source_inventory_2026-07-10.md`
-3. `WTW/investor-documents/sec-edgar/10-K_20260225_rpt20251231_acc0001193125_26_069307.htm`
-4. `WTW/investor-documents/sec-edgar/10-Q_20260430_rpt20260331_acc0001193125_26_195310.htm`
+2. `WTW/research/valuation.json`
+3. `WTW/third-party-analyses/source_inventory_2026-07-10.md`
