@@ -77,7 +77,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | BAX | BAX/ | Baxter International | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | BBY | BBY/ | Best Buy | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | BDX | BDX/ | Becton Dickinson | US | 2026-07-09 | 2026-07-10 | unknown | watch |
-| BF.B | BF.B/ | Brown–Forman | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| BF.B | BF.B/ | Brown–Forman | US | — | — | unknown | watch |
 | BG | BG/ | Bunge Global | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | BIIB | BIIB/ | Biogen | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | BKNG | BKNG/ | Booking Holdings | US | 2026-07-09 | 2026-07-10 | unknown | watch |
@@ -92,7 +92,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | BOLSAA.MX | BOLSAA.MX/ | Bolsa Mexicana de Valores SAB de CV | EU | 2026-07-09 | 2026-07-09 | unknown | watch |
 | BR | BR/ | Broadridge Financial Solutions | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | BRBR | BRBR/ | BellRing Brands, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
-| BRK.B | BRK.B/ | Berkshire Hathaway | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| BRK.B | BRK.B/ | Berkshire Hathaway | US | — | — | unknown | watch |
 | BRO | BRO/ | Brown & Brown | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | BSM | BSM/ | Black Stone Minerals LP | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | BSX | BSX/ | Boston Scientific | US | 2026-07-09 | 2026-07-10 | unknown | watch |
@@ -115,8 +115,9 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | CDNS | CDNS/ | Cadence Design Systems | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CDW | CDW/ | CDW Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CDZI | CDZI/ | Cadiz Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| CEG | CEG/ | Constellation Energy | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CF | CF/ | CF Industries | US | 2026-07-09 | 2026-07-10 | unknown | watch |
-| CFG | CFG/ | Citizens Financial Group | US | — | — | unknown | watch |
+| CFG | CFG/ | Citizens Financial Group | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CHD | CHD/ | Church & Dwight | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CHRW | CHRW/ | C.H. Robinson | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CHTR | CHTR/ | Charter Communications, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -131,8 +132,11 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | CNP | CNP/ | CenterPoint Energy | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | COF | COF/ | Capital One | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | COLD | COLD/ | Americold Realty Trust, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| COO | COO/ | Cooper Companies (The) | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| COP | COP/ | ConocoPhillips | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | COR | COR/ | Cencora | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CORBF | CORBF/ | Corbus Pharmaceuticals Holdings, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| CPAY | CPAY/ | Corpay | US | — | — | unknown | watch |
 | CPRT | CPRT/ | Copart | US | 2026-07-09 | 2026-07-09 | compounder | core |
 | CPT | CPT/ | Camden Property Trust | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CRCL | CRCL/ | Circle Internet Group, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -149,6 +153,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | DMLP | DMLP/ | Dorchester Minerals LP | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | DRR.AX | DRR.AX/ | Deterra Royalties Limited | AU | 2026-06-02 | 2026-07-09 | unknown | watch |
 | ECHO | ECHO/ | EchoStar Corporation | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| ED | ED/ | Consolidated Edison | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | EFOR | EFOR/ | Everforth, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | ENPH | ENPH/ | Enphase Energy, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | ENX.PA | ENX.PA/ | Euronext N.V. | EU | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -156,6 +161,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | ETOR | ETOR/ | eToro Group Ltd. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | EVR | EVR/ | Evolve Royalties Ltd | CA | 2026-06-11 | 2026-07-09 | unknown | watch |
 | FIHO12.MX | FIHO12.MX/ | FibraHotel (Concentradora Fibra Hotelera Mexicana) | EU | — | 2026-07-09 | unknown | watch |
+| FIX | FIX/ | Comfort Systems USA | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | FLUX | FLUX/ | Flux Power Holdings, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | FMCCK | FMCCK/ | Ford Motor Credit Company LLC (Preferred) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | FMCCL | FMCCL/ | Ford Motor Credit Company LLC (Preferred) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -170,6 +176,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | GKTX.PS1 | GKTX.PS1/ | Galapagos NV (Janssen structured security PS1) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | GKTX.PS2 | GKTX.PS2/ | Galapagos NV (Janssen structured security PS2) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | GKTX.PS3 | GKTX.PS3/ | Galapagos NV (Janssen structured security PS3) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| GLW | GLW/ | Corning Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | GLXY | GLXY/ | Galaxy Digital Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | GOOG | GOOG/ | Alphabet Inc. (Class C) | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | GOOGL | GOOGL/ | Alphabet Inc. | US | 2026-07-09 | 2026-07-09 | compounder | hold |
@@ -245,6 +252,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | SPGI | SPGI/ | S&P Global | US | 2026-07-09 | 2026-07-09 | croupier | hold |
 | SRPT | SRPT/ | Sarepta Therapeutics, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | STHO | STHO/ | Star Holdings | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| STZ | STZ/ | Constellation Brands | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | T | T/ | AT&T | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | TASE | TASE/ | Tel Aviv Stock Exchange Ltd. | EU | 2026-07-09 | 2026-07-09 | unknown | watch |
 | TBBK | TBBK/ | The Bancorp, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -266,4 +274,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 
-**259 holdings total.** Registry: `_system/portfolio/registry.json`
+**267 holdings total.** Registry: `_system/portfolio/registry.json`
