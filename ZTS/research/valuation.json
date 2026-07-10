@@ -1,0 +1,125 @@
+{
+  "ticker": "ZTS",
+  "as_of": "2026-07-10",
+  "method": "full",
+  "irr_method": "full",
+  "lawrence_bucket": "pricing_power",
+  "valuation_mode": "operating",
+  "classification_inputs": {
+    "archetype": "compounder",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating",
+    "predictive_attribute": "none"
+  },
+  "inputs": {
+    "price": 76.59,
+    "price_source": "Yahoo Finance ZTS close 2026-07-10",
+    "price_as_of": "2026-07-10",
+    "fcf_per_share": 5.14,
+    "fcf_source": "FY2025 cash from operations $2,904M less capital spending $621M, divided by 443.8M weighted-average diluted shares (10-K filed 2026-02-12)",
+    "shares_millions": 443.8,
+    "shares_source": "FY2025 weighted-average diluted shares 443,835,000 (10-K)",
+    "dividend_per_share_annual": 2.03,
+    "dividend_source": "Cash dividends $2.03 per share in 2025 (10-K)",
+    "revenue_fy2025_m": 9467.0,
+    "net_income_fy2025_m": 2673.0,
+    "long_term_debt_m": 9042.0,
+    "normalization_note": "Owner cash uses cash from operations minus property, plant and equipment purchases ($621M). FY2025 investing cash flow was positive ($748M) on divestiture proceeds; Lawrence base uses maintenance capex only, not M&A cash."
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.02,
+      "growth_y6_10": 0.01,
+      "exit_pfcf_y10": 16,
+      "notes": "U.S. companion animal softness persists; Librela OA franchise flat; livestock normalizes; leverage limits buybacks"
+    },
+    "base": {
+      "growth_y1_5": 0.05,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 22,
+      "notes": "2026 guidance +3-5% operational revenue and +3-6% adjusted net income; Simparica and international companion offset U.S. dermatology pressure; share count falls ~2% annually"
+    },
+    "bull": {
+      "growth_y1_5": 0.07,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 26,
+      "notes": "Librela re-acceleration; Long-Acting Cytopoint and Simparica DUO launches; livestock ex-MFA sustains high single digits; buybacks continue at scale"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Animal health compounder; intangibles $998M and goodwill on balance sheet reflect acquisitions, not hidden land/NAV (10-K FY2025)"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating pharma; pipeline valued through R&D spend ($698M FY2025)"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Companion animal and livestock segments both revenue-positive; gross profit $4,255M on $9,467M revenue (10-K)"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / pipeline not in FCF path?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "Expected blockbusters: Long-Acting Cytopoint, Simparica DUO (Q4 FY2025 presentation); upside in bull only"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No holdco stakes disclosed"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating compounder; routine product liability reserves"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option already in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Simparica franchise (+12% operational FY2025), Apoquel/Cytopoint dermatology (+6%) already in segment revenue"
+    }
+  ],
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "pending",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "growth_explanation": {
+    "mechanism": "Companion animal parasiticides and dermatology (Simparica Trio, Apoquel, Cytopoint) compound per-share cash; international companion and livestock offset periodic U.S. softness; buybacks amplify EPS.",
+    "base_growth_source": "FY2025 revenue +2% reported / +3% operational; 2026 guidance +3-5% operational revenue (Q4 FY2025 presentation)",
+    "bear_trigger": "Prolonged U.S. companion decline and Librela OA franchise stagnation",
+    "bull_trigger": "New blockbuster launches and livestock ex-MFA sustain high single-digit growth with continued $3B+ repurchases",
+    "lawrence_legacy": {
+      "y1_5": 0.05,
+      "y6_10": 0.04,
+      "return_pct": null
+    }
+  },
+  "evidence_refresh": {
+    "synthesis_in_dive": true
+  }
+}
