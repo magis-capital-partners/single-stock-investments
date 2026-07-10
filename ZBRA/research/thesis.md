@@ -1,28 +1,33 @@
 # ZBRA — Investment Thesis
 
-**Last updated:** 2026-07-10
+**Last updated:** auto-sync
 
 ## Classification
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Archetype** (Stahl) | compounder |
+| **Moat** (Munger) | stable |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Cycle** | industrial_automation |
+| **Implied 7yr IRR** (base) | 13.15% (total synthesis) |
+| **IRR method** | full |
+| **Lawrence bucket** | pricing_power |
+| **Payoff lens** | operating |
+| **MOI bucket** | — |
+
+**Deep dive:** `ZBRA/research/deep_dive_2026-07-10.md` (auto-sync)
 
 ## One-line thesis
 
-Zebra Technologies — thesis pending Marvin deep dive.
+Enterprise asset intelligence compounder (CF + AVA segments); FY2025 FCF ~$16.23/sh; synthesis **13.15%** at ~$275 → **watch** (below 15% hurdle).
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest annual report (FY2025 10-K)
+- [x] Read latest quarterly report (Q1 2026 10-Q)
+- [x] Marvin deep dive 2026-07-10
 
 ## [HUMAN REVIEW]
 
