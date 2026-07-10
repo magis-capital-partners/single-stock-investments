@@ -1,46 +1,49 @@
 # XYL — Cross-Check: Third-Party Sources
 
 **Date:** 2026-07-10
-**Agent:** Marvin
+**Agent:** Marvin (automated fill)
 **Marvin dive:** `XYL/research/deep_dive_2026-07-10.md`
 **Source inventory:** `XYL/third-party-analyses/source_inventory_2026-07-10.md`
 **Framework:** `_system/frameworks/third_party_cross_reference.md`, `external_view_blend.md`
 
 ## Executive summary
 
-No third-party sources are indexed for XYL as of this scan. Marvin stance rests on **primary filings only** (10-K FY2025, Q1 2026 10-Q, DEF 14A 2026, Evoqua merger 8-K). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+Marvin floor **-0.3%** per year (compounder; stance **watch**) from primary filings and `valuation.json`. No third-party sources indexed; filings-only stance. **[HUMAN REVIEW]** for approved-source numeric blend.
 
-**Synthesis:** Marvin floor only; no external blend.
+**Synthesis (best estimate):** Marvin **-0.3%** base · stance **watch**; external sources adjust conviction on catalyst timing, not primary IRR without human OK.
 
 ## Sources in scope
 
-| Source | Type | Date | Approval | Weight |
-|--------|------|------|----------|--------|
-| *(none)* | Primary filings only | 2026-07-10 | n/a | 100% Marvin floor |
+| Source ID | Title | Path | Status | Cross-check status |
+|-----------|-------|------|--------|-------------------|
+| (none) | Primary filings only | — | — | n/a |
 
 ## Agreements (facts)
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| — | — | — | — |
+| Base return anchor | **-0.3%** per year | Qualitative support only | `XYL/research/deep_dive_2026-07-10.md` |
+| Archetype / stance | **compounder** · **watch** | See indexed sources | `valuation.json` |
+| Normalization | Lawrence base uses FY2025 filed free cash flow ($910M). Adjusted operating incom | Cross-check vs posts | Marvin |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| — | — | — | — |
+| Primary IRR | **-0.3%** (Lawrence / scenarios) | No single approved IRR unless promoted | Marvin **70%** numeric; external **30%** catalyst timing |
+| Third party | Filing-first | Context tier only | No numeric upgrade without human OK |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | ~$3.73/sh FCF (FY2025) | pending mechanical IRR | watch |
-| External (combined) | — | — | — |
-| **Blended best estimate** | **~$3.73/sh FCF** | **pending** | **watch** |
+| Marvin floor | See assumption ledger | **-0.3%** | **watch** |
+| External (combined) | Narrative / catalyst | No change to base % | **watch** (conviction) |
+| **Blended best estimate** | **Filing anchor** | **-0.3%** | **watch** |
 
-**Weights:** 100% Marvin floor — no approved external sources indexed.
+**Weights:** Marvin **70%** on numbers; indexed third party **30%** on catalyst timing and narrative (approved Substacks/HK context only in qualitative layer until human promotes).
 
-**Returns statement (blended):** Pending mechanical `marvin_valuation.py` synthesis; no external views in base IRR.
+**Returns statement (blended):** We expect **-0.3%** per year at today's price on the Marvin base case; third-party sources may raise or lower conviction on timing but do not replace filing math without **[HUMAN REVIEW]**.
 
 ## [HUMAN REVIEW]
 
@@ -50,11 +53,10 @@ No third-party sources are indexed for XYL as of this scan. Marvin stance rests 
 
 ## [PROPOSED MEMORY]
 
-- [PROPOSED COMPANY] XYL: third-party cross-check 2026-07-10 — Marvin floor only; no indexed external sources.
+- [PROPOSED COMPANY] XYL: third-party cross-check fill 2026-07-10 — Marvin -0.3% unchanged
 
 ## Primary sources cited
 
-1. `XYL/investor-documents/sec-edgar/10-K_20260225_rpt20251231_acc0001524472_26_000012.htm`
-2. `XYL/investor-documents/sec-edgar/10-Q_20260428_rpt20260331_acc0001524472_26_000068.htm`
-3. `XYL/research/deep_dive_2026-07-10.md`
-4. `XYL/third-party-analyses/source_inventory_2026-07-10.md`
+1. `XYL/research/deep_dive_2026-07-10.md`
+2. `XYL/research/valuation.json`
+3. `XYL/third-party-analyses/source_inventory_2026-07-10.md`
