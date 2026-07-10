@@ -323,17 +323,25 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | INVH | INVH/ | Invitation Homes | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | IP | IP/ | International Paper | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | IPCXR | IPCXR/ | Inflection Point Acquisition Corp. II (Rights) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
-| IQV | IQV/ | IQVIA | US | — | — | unknown | watch |
+| IQV | IQV/ | IQVIA | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | IR | IR/ | Ingersoll Rand | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| IRM | IRM/ | Iron Mountain | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | ISRG | ISRG/ | Intuitive Surgical | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | IT | IT/ | Gartner | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | ITW | ITW/ | Illinois Tool Works | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | IVZ | IVZ/ | Invesco | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| J | J/ | Jacobs Solutions | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| JBHT | JBHT/ | J.B. Hunt | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| JBL | JBL/ | Jabil | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| JCI | JCI/ | Johnson Controls | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| JKHY | JKHY/ | Jack Henry & Associates | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | JL80.DE | JL80.DE/ | Norconsult ASA | EU | — | 2026-07-09 | unknown | watch |
+| JNJ | JNJ/ | Johnson & Johnson | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | JPM | JPM/ | JPMorgan Chase & Co. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | KEWL | KEWL/ | Keweenaw Land Association | US | 2026-07-09 | 2026-07-09 | optionality | watch |
 | KO | KO/ | Coca-Cola Company (The) | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | KRP | KRP/ | Kimbell Royalty Partners LP | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| KVUE | KVUE/ | Kenvue | US | — | — | unknown | watch |
 | LAND | LAND/ | Gladstone Land Corporation | US | 2026-07-09 | 2026-07-09 | infrastructure | watch |
 | LB | LB/ | LandBridge Company LLC | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | LBRDK | LBRDK/ | Liberty Broadband Corporation (Class C) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -410,4 +418,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 
-**403 holdings total.** Registry: `_system/portfolio/registry.json`
+**411 holdings total.** Registry: `_system/portfolio/registry.json`
