@@ -1,6 +1,6 @@
 # Holdings
 
-Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-09.
+Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 
 **Classification schema:** `_system/frameworks/classification.md` · source map: `_system/portfolio/classification.json`
 
@@ -10,12 +10,17 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-09.
 | 3905.T | 3905.T/ | DataSection Co., Ltd. | JP | 2026-07-09 | 2026-07-09 | compounder | watch |
 | 7176.T | 7176.T/ | Simplex Financial Holdings Co., Ltd. | JP | 2026-07-09 | 2026-07-09 | unknown | watch |
 | 8697.T | 8697.T/ | Japan Exchange Group | JP | 2026-06-25 | 2026-07-09 | croupier | hold |
+| ABBV | ABBV/ | AbbVie | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ABMD.CVR | ABMD.CVR/ | Abiomed CVR (Johnson & Johnson acquisition) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| ABT | ABT/ | Abbott Laboratories | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ABX | ABX/ | Abacus Life Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| ACN | ACN/ | Accenture | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| ADBE | ADBE/ | Adobe Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ADN.TO | ADN.TO/ | Acadian Timber Corp. | CA | 2026-07-09 | 2026-07-09 | optionality | watch |
 | ALS.TO | ALS.TO/ | Altius Minerals Corporation | CA | 2026-06-03 | 2026-07-09 | unknown | watch |
 | AMD | AMD/ | Advanced Micro Devices, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | AMZN | AMZN/ | Amazon.com | US | 2026-07-09 | 2026-07-09 | compounder | hold |
+| AOS | AOS/ | A. O. Smith | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | APLD | APLD/ | Applied Digital | US | 2026-07-09 | 2026-07-09 | optionality | watch |
 | ASPN | ASPN/ | Aspen Aerogels, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | ASX.AX | ASX.AX/ | ASX Limited | AU | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -106,6 +111,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-09.
 | MDB | MDB/ | MongoDB, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | META | META/ | Meta Platforms Inc | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | MIAX | MIAX/ | Miami International Holdings | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| MMM | MMM/ | 3M | US | — | 2026-07-10 | unknown | watch |
 | MRSH | MRSH/ | Marsh & McLennan Companies | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | MRTX.CVR | MRTX.CVR/ | Mirati Therapeutics CVR (Bristol-Myers Squibb acquisition) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | MSB | MSB/ | Mesabi Trust | US | 2026-07-09 | 2026-07-09 | optionality | watch |
@@ -162,4 +168,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-09.
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 
-**155 holdings total.** Registry: `_system/portfolio/registry.json`
+**161 holdings total.** Registry: `_system/portfolio/registry.json`
