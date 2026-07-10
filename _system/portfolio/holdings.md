@@ -612,7 +612,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | WAT | WAT/ | Waters Corporation | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | WBD | WBD/ | Warner Bros. Discovery | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | WBI | WBI/ | WaterBridge Infrastructure | US | 2026-07-09 | 2026-07-10 | infrastructure | watch |
-| WDAY | WDAY/ | Workday, Inc. | US | — | — | unknown | watch |
+| WDAY | WDAY/ | Workday, Inc. | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | WDC | WDC/ | Western Digital | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | WEC | WEC/ | WEC Energy Group | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | WELL | WELL/ | Welltower | US | 2026-07-10 | 2026-07-10 | unknown | watch |
@@ -628,10 +628,17 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | WST | WST/ | West Pharmaceutical Services | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | WTW | WTW/ | Willis Towers Watson | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | WY | WY/ | Weyerhaeuser | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| WYNN | WYNN/ | Wynn Resorts | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | X.TO | X.TO/ | TMX Group Limited | CA | 2026-07-09 | 2026-07-10 | unknown | watch |
+| XEL | XEL/ | Xcel Energy | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | XOM | XOM/ | ExxonMobil | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | XP | XP/ | XP Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| XYL | XYL/ | Xylem Inc. | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| YUM | YUM/ | Yum! Brands | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| ZBH | ZBH/ | Zimmer Biomet | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| ZBRA | ZBRA/ | Zebra Technologies | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| ZTS | ZTS/ | Zoetis | US | — | — | unknown | watch |
 
-**627 holdings total.** Registry: `_system/portfolio/registry.json`
+**634 holdings total.** Registry: `_system/portfolio/registry.json`
