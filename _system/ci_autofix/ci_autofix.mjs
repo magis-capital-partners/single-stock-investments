@@ -209,7 +209,8 @@ function classifyFailure({ run, failedJobs, failedLog, skippedWorkflow, forkPr }
         /bad credentials/,
         /invalid token/,
         /authentication failed/,
-        /unauthorized/,
+        /usage_limit_exceeded/,
+        /usage-based pricing required/,
       ],
     },
     {

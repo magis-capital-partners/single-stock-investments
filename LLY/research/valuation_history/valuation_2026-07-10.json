@@ -1,0 +1,261 @@
+{
+  "ticker": "LLY",
+  "as_of": "2026-07-10",
+  "method": "full",
+  "irr_method": "full",
+  "lawrence_bucket": "pricing_power",
+  "valuation_mode": "operating",
+  "classification_inputs": {
+    "archetype": "compounder",
+    "moat": "widening",
+    "dhando": "partial",
+    "cycle": "up",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 1187.18,
+    "price_source": "Yahoo Finance LLY close 2026-07-10",
+    "price_as_of": "2026-07-10",
+    "fcf_per_share": 9.98,
+    "fcf_source": "FY2025 operating cash flow $16.813B less capital spending $7.841B (PaymentsToAcquireOtherPropertyPlantAndEquipment), divided by 899.3M weighted average diluted shares (10-K filed 2026-02-12)",
+    "shares_millions": 899.3,
+    "shares_source": "FY2025 weighted average diluted shares (10-K)",
+    "normalization_note": "Owner cash uses cash from operations minus property/plant/equipment capital spending; excludes in-process R&D acquisition payments ($3.008B) and share repurchases ($4.108B) which are separate capital allocation choices"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.04,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 22,
+      "notes": "Tirzepatide competition from Novo and oral GLP-1 entrants; IRA pricing pressure; manufacturing bottlenecks cap volume"
+    },
+    "base": {
+      "growth_y1_5": 0.12,
+      "growth_y6_10": 0.06,
+      "exit_pfcf_y10": 28,
+      "notes": "Mounjaro + Zepbound sustain high-teens revenue growth; Trulicity erosion continues; capex moderates after 2027"
+    },
+    "bull": {
+      "growth_y1_5": 0.18,
+      "growth_y6_10": 0.1,
+      "exit_pfcf_y10": 32,
+      "notes": "Oral GLP-1 and Alzheimer's Kisunla add new legs; international obesity penetration; margin leverage on fixed R&D base"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Stockholders equity $26.5B on $112.5B assets; manufacturing PP&E $24.7B reflects real capacity build (10-K FY2025)"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating pharma; pipeline valued through R&D spend"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Income before taxes $25.7B FY2025; single reportable segment profitable (10-K)"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / R&D pipeline not in FCF path?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "Kisunla (donanemab) Alzheimer's launch; orforglipron oral GLP-1 Phase 3; retatrutide triple agonist \u2014 upside in bull only"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Jardiance collaboration with Boehringer Ingelheim; profit share in cardiometabolic revenue (10-K product table)"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "Partial",
+      "treatment": "n/a",
+      "evidence": "Product liability and patent litigation reserves; no dated recovery catalyst (10-K commitments)"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option already in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Mounjaro ($22.9B global FY2025) and Zepbound ($13.5B U.S. FY2025) growth already in reported revenue and OCF"
+    }
+  ],
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "growth_explanation": {
+    "years_1_5": "Tirzepatide franchise (Mounjaro diabetes + Zepbound obesity) drives cardiometabolic revenue; Q1 2026 revenue +55.5% YoY; manufacturing capacity coming online.",
+    "years_6_7": "Growth normalizes as obesity TAM penetration matures; oncology (Verzenio) and immunology provide mix; oral GLP-1 optionality in bull.",
+    "source": "10-K FY2025 product revenue table and Q1 2026 10-Q",
+    "status": "partial",
+    "lawrence_legacy": {
+      "y1_5": 0.12,
+      "y6_10": 0.06,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.12,
+      "y6_10": 0.06,
+      "exit_pfcf_y10": 28.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": 0.447,
+      "as_of_filing_facts": "evidence/_text/10-K_20260212_rpt20251231_acc0000059478_26_000013.htm.txt"
+    }
+  },
+  "evidence_refresh": {
+    "synthesis_in_dive": true
+  },
+  "total_return_panel": {
+    "as_of": "2026-07-10",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 0,
+    "distribution_history_sum": 0,
+    "market_cap_m": null,
+    "total_return_annualized_pct": 11.07,
+    "chart": "LLY/research/charts/total_return_2026-07-10.svg",
+    "panel_json": "LLY/research/total_return_panel.json"
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -16.7
+    },
+    "base": {
+      "return_pct": -8.4
+    },
+    "bull": {
+      "return_pct": -2.2
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -16.7
+    },
+    "base": {
+      "return_pct": -8.4
+    },
+    "bull": {
+      "return_pct": -2.2
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": -8.4
+    },
+    "falsifier_adjusted": {
+      "return_pct": -8.4
+    }
+  },
+  "implied_return": {
+    "base_pct": -7.28,
+    "label": "7yr IRR (total synthesis)",
+    "display": "-7.28% (total synthesis)",
+    "lawrence_stance_gate_pct": -8.4,
+    "falsifier_adjusted_pct": -8.4,
+    "synthesis_pct": -7.28
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Growth theory (pre-falsifier)",
+        "source": "growth_explanation + filing revenue YoY",
+        "return_pct": -8.4,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": -16.7,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": -2.2,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": -7.08,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": -7.28,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}
