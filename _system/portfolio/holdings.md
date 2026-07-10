@@ -125,18 +125,24 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | CIEN | CIEN/ | Ciena | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CINF | CINF/ | Cincinnati Financial | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CKX | CKX/ | CKX Lands, Inc. | US | 2026-07-09 | 2026-07-09 | optionality | watch |
+| CL | CL/ | Colgate-Palmolive | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| CLX | CLX/ | Clorox | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| CMCSA | CMCSA/ | Comcast | US | — | — | unknown | watch |
 | CME | CME/ | CME Group Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | CMG | CMG/ | Chipotle Mexican Grill | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| CMS | CMS/ | CMS Energy | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CMSG | CMSG/ | Consensus Mining & Seigniorage Corp | US | 2026-07-09 | 2026-07-09 | optionality | watch |
 | CNC | CNC/ | Centene Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CNP | CNP/ | CenterPoint Energy | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | COF | COF/ | Capital One | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| COHR | COHR/ | Coherent Corp. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| COIN | COIN/ | Coinbase | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | COLD | COLD/ | Americold Realty Trust, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | COO | COO/ | Cooper Companies (The) | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | COP | COP/ | ConocoPhillips | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | COR | COR/ | Cencora | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CORBF | CORBF/ | Corbus Pharmaceuticals Holdings, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
-| CPAY | CPAY/ | Corpay | US | — | — | unknown | watch |
+| CPAY | CPAY/ | Corpay | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CPRT | CPRT/ | Copart | US | 2026-07-09 | 2026-07-09 | compounder | core |
 | CPT | CPT/ | Camden Property Trust | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CRCL | CRCL/ | Circle Internet Group, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -146,6 +152,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | CSU | CSU/ | Constellation Software | CA | 2026-07-09 | 2026-07-09 | compounder | core |
 | CSU.DB | CSU.DB/ | Constellation Software Inc. (Series 1 Debentures) | CA | — | 2026-07-09 | unknown | watch |
 | CTAS | CTAS/ | Cintas | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| CTSH | CTSH/ | Cognizant | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CVNA | CVNA/ | Carvana | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CVX | CVX/ | Chevron Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | DB1.DE | DB1.DE/ | Deutsche Boerse AG | EU | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -199,6 +206,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | JL80.DE | JL80.DE/ | Norconsult ASA | EU | — | 2026-07-09 | unknown | watch |
 | JPM | JPM/ | JPMorgan Chase & Co. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | KEWL | KEWL/ | Keweenaw Land Association | US | 2026-07-09 | 2026-07-09 | optionality | watch |
+| KO | KO/ | Coca-Cola Company (The) | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | KRP | KRP/ | Kimbell Royalty Partners LP | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | LAND | LAND/ | Gladstone Land Corporation | US | 2026-07-09 | 2026-07-09 | infrastructure | watch |
 | LB | LB/ | LandBridge Company LLC | US | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -274,4 +282,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 
-**267 holdings total.** Registry: `_system/portfolio/registry.json`
+**275 holdings total.** Registry: `_system/portfolio/registry.json`
