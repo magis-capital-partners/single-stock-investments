@@ -416,6 +416,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | MU | MU/ | Micron Technology | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | NAN | NAN/ | Nuveen New York AMT-Free Quality Municipal Income Fund | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | NBIS | NBIS/ | Nebius Group N.V. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| NCLH | NCLH/ | Norwegian Cruise Line Holdings | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | NDAQ | NDAQ/ | Nasdaq Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | NDSN | NDSN/ | Nordson Corporation | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | NEE | NEE/ | NextEra Energy | US | 2026-07-10 | 2026-07-10 | unknown | watch |
@@ -423,17 +424,26 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | NFLX | NFLX/ | Netflix | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | NI | NI/ | NiSource | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | NKE | NKE/ | Nike, Inc. | US | 2026-07-10 | 2026-07-10 | unknown | watch |
-| NOC | NOC/ | Northrop Grumman | US | — | — | unknown | watch |
+| NOC | NOC/ | Northrop Grumman | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| NRG | NRG/ | NRG Energy | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | NRP | NRP/ | Natural Resource Partners LP | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | NSC | NSC/ | Norfolk Southern | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | NTAP | NTAP/ | NetApp | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | NTRS | NTRS/ | Northern Trust | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| NUE | NUE/ | Nucor | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | NVDA | NVDA/ | NVIDIA Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| NVR | NVR/ | NVR, Inc. | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | NWS | NWS/ | News Corp (Class B) | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | NWSA | NWSA/ | News Corp (Class A) | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| NXPI | NXPI/ | NXP Semiconductors | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | NZX.NZ | NZX.NZ/ | NZX Limited | AU | 2026-07-09 | 2026-07-09 | unknown | watch |
+| ODFL | ODFL/ | Old Dominion | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| OMC | OMC/ | Omnicom Group | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| ON | ON/ | ON Semiconductor | US | — | — | unknown | watch |
 | OR | OR/ | Osisko Gold Royalties Ltd | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| ORLY | ORLY/ | O’Reilly Automotive | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | OTCM | OTCM/ | OTC Markets Group | US | 2026-07-09 | 2026-07-09 | croupier | watch |
+| OXY | OXY/ | Occidental Petroleum | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | PBT | PBT/ | Permian Basin Royalty Trust | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | PCH | PCH/ | PotlatchDeltic Corporation | US | 2026-07-09 | 2026-07-09 | optionality | watch |
 | PCYO | PCYO/ | Pure Cycle Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
@@ -484,4 +494,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 
-**477 holdings total.** Registry: `_system/portfolio/registry.json`
+**487 holdings total.** Registry: `_system/portfolio/registry.json`
