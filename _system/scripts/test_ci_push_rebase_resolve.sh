@@ -291,6 +291,77 @@ test_insights_docs_mirror_conflict() {
   fi
 }
 
+test_returns_csv_is_regenerable() {
+  is_regenerable_artifact "_system/reference/market-data/returns/SPY.csv" || {
+    echo "FAIL: SPY.csv should be classified as regenerable"
+    exit 1
+  }
+  is_regenerable_artifact "_system/reference/market-data/returns/7176_T.csv" || {
+    echo "FAIL: ticker returns CSV should be classified as regenerable"
+    exit 1
+  }
+  if is_regenerable_artifact "_system/portfolio/registry.json"; then
+    echo "FAIL: registry.json should not be classified as regenerable"
+    exit 1
+  fi
+}
+
+test_mixed_returns_and_dashboard_conflict() {
+  local returns_file="_system/reference/market-data/returns/SPY.csv"
+  if [ ! -f "$returns_file" ]; then
+    echo "SKIP: mixed returns+dashboard conflict test ($returns_file missing)"
+    return 0
+  fi
+  if ! python3 -c "import urllib.request; urllib.request.urlopen('https://query1.finance.yahoo.com', timeout=8)" 2>/dev/null; then
+    echo "SKIP: mixed returns+dashboard conflict test (offline)"
+    return 0
+  fi
+
+  git checkout -b "$TMP_BRANCH" >/dev/null
+
+  git add "$returns_file"
+  python3 _system/scripts/build_dashboard_data.py >/dev/null
+  stage_dashboard_only
+  git commit -m "test: base returns+dashboard snapshot" >/dev/null
+
+  printf 'date,monthly_return,source\n2099-01-01,0.001,yahoo\n' > "$returns_file"
+  git add "$returns_file"
+  python3 _system/scripts/build_dashboard_data.py >/dev/null
+  stage_dashboard_only
+  git commit -m "test: local returns+dashboard regen" >/dev/null
+
+  git branch test-main-conflict "$MAIN_REF" >/dev/null
+  git checkout test-main-conflict >/dev/null
+  printf 'date,monthly_return,source\n2099-02-01,0.002,yahoo\n' > "$returns_file"
+  git add "$returns_file"
+  python3 _system/scripts/build_dashboard_data.py >/dev/null
+  stage_dashboard_only
+  git commit -m "test: main returns+dashboard regen" >/dev/null
+
+  git checkout "$TMP_BRANCH" >/dev/null
+  if git rebase test-main-conflict; then
+    echo "FAIL: expected mixed rebase conflict in returns CSV and dashboard JSON"
+    exit 1
+  fi
+
+  while rebase_in_progress && try_resolve_rebase_conflicts; do
+    :
+  done
+  if rebase_in_progress; then
+    echo "FAIL: mixed returns+dashboard conflict resolution helper did not finish rebase"
+    exit 1
+  fi
+  if grep -q '^2099-' "$returns_file"; then
+    echo "FAIL: SPY.csv still contains synthetic conflict data after resolution"
+    exit 1
+  fi
+  if grep -q '^<<<<<<< ' dashboard/data/dashboard_data.json 2>/dev/null; then
+    echo "FAIL: dashboard_data.json still contains merge conflict markers after resolution"
+    exit 1
+  fi
+}
+
+run_test "returns CSV classified as regenerable" test_returns_csv_is_regenerable
 run_test "dashboard JSON rebase conflict auto-resolution" test_dashboard_json_conflict
 run_test "docs mirror after dashboard JSON rebase conflict" test_docs_mirror_after_dashboard_conflict
 run_test "insights JSON rebase conflict auto-resolution" test_insights_json_conflict
@@ -298,5 +369,6 @@ run_test "insights docs mirror rebase conflict auto-resolution" test_insights_do
 run_test "activist feed JSON rebase conflict auto-resolution" test_activist_feed_json_conflict
 run_test "INDEX.csv rebase conflict auto-resolution" test_index_csv_conflict
 run_test "mixed generated artifact rebase conflict auto-resolution" test_mixed_generated_conflict
+run_test "mixed returns CSV and dashboard JSON rebase conflict auto-resolution" test_mixed_returns_and_dashboard_conflict
 
 echo "All ci_push_main rebase resolution smoke tests passed."
