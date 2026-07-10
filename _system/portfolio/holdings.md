@@ -11,6 +11,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | 7176.T | 7176.T/ | Simplex Financial Holdings Co., Ltd. | JP | 2026-07-09 | 2026-07-09 | unknown | watch |
 | 8697.T | 8697.T/ | Japan Exchange Group | JP | 2026-06-25 | 2026-07-09 | croupier | hold |
 | A | A/ | Agilent Technologies | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| AAPL | AAPL/ | Apple Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ABBV | ABBV/ | AbbVie | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ABMD.CVR | ABMD.CVR/ | Abiomed CVR (Johnson & Johnson acquisition) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | ABNB | ABNB/ | Airbnb | US | 2026-07-09 | 2026-07-10 | unknown | watch |
@@ -18,6 +19,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | ABX | ABX/ | Abacus Life Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | ACN | ACN/ | Accenture | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ADBE | ADBE/ | Adobe Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| ADI | ADI/ | Analog Devices | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ADN.TO | ADN.TO/ | Acadian Timber Corp. | CA | 2026-07-09 | 2026-07-09 | optionality | watch |
 | AEE | AEE/ | Ameren | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | AEP | AEP/ | American Electric Power | US | 2026-07-09 | 2026-07-10 | unknown | watch |
@@ -32,14 +34,22 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | ALS.TO | ALS.TO/ | Altius Minerals Corporation | CA | 2026-06-03 | 2026-07-09 | unknown | watch |
 | AMCR | AMCR/ | Amcor | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | AMD | AMD/ | Advanced Micro Devices, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| AME | AME/ | Ametek | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| AMGN | AMGN/ | Amgen | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| AMP | AMP/ | Ameriprise Financial | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | AMT | AMT/ | American Tower | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | AMZN | AMZN/ | Amazon.com | US | 2026-07-09 | 2026-07-09 | compounder | hold |
+| AON | AON/ | Aon plc | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | AOS | AOS/ | A. O. Smith | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| APA | APA/ | APA Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | APD | APD/ | Air Products | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| APH | APH/ | Amphenol | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | APLD | APLD/ | Applied Digital | US | 2026-07-09 | 2026-07-09 | optionality | watch |
+| APO | APO/ | Apollo Global Management | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ARE | ARE/ | Alexandria Real Estate Equities | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ASPN | ASPN/ | Aspen Aerogels, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | ASX.AX | ASX.AX/ | ASX Limited | AU | 2026-07-09 | 2026-07-09 | unknown | watch |
+| AWK | AWK/ | American Water Works | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | AXON | AXON/ | Axon Enterprise, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | AXP | AXP/ | American Express | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | AZLCZ | AZLCZ/ | Aztec Land and Cattle Company | US | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -188,4 +198,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 
-**181 holdings total.** Registry: `_system/portfolio/registry.json`
+**191 holdings total.** Registry: `_system/portfolio/registry.json`
