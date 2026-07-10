@@ -23,6 +23,8 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | ADI | ADI/ | Analog Devices | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ADM | ADM/ | Archer Daniels Midland | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ADN.TO | ADN.TO/ | Acadian Timber Corp. | CA | 2026-07-09 | 2026-07-09 | optionality | watch |
+| ADP | ADP/ | Automatic Data Processing | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| ADSK | ADSK/ | Autodesk | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | AEE | AEE/ | Ameren | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | AEP | AEP/ | American Electric Power | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | AES | AES/ | AES Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
@@ -58,12 +60,20 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | ARES | ARES/ | Ares Management | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ASPN | ASPN/ | Aspen Aerogels, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | ASX.AX | ASX.AX/ | ASX Limited | AU | 2026-07-09 | 2026-07-09 | unknown | watch |
+| ATO | ATO/ | Atmos Energy | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| AVB | AVB/ | AvalonBay Communities | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| AVY | AVY/ | Avery Dennison | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | AWK | AWK/ | American Water Works | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | AXON | AXON/ | Axon Enterprise, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | AXP | AXP/ | American Express | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | AZLCZ | AZLCZ/ | Aztec Land and Cattle Company | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| AZO | AZO/ | AutoZone | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | B | B/ | Barrick Mining Corporation | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | B3SA3.SA | B3SA3.SA/ | B3 S.A. - Brasil Bolsa Balcao | EU | 2026-07-09 | 2026-07-09 | unknown | watch |
+| BAC | BAC/ | Bank of America | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| BALL | BALL/ | Ball Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| BAX | BAX/ | Baxter International | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| BKR | BKR/ | Baker Hughes | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | BKRB | BKRB/ | Berkshire Hathaway Inc. (Class B) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | BMYS.KL | BMYS.KL/ | Bursa Malaysia Berhad | EU | 2026-07-09 | 2026-07-09 | unknown | watch |
 | BN | BN/ | Brookfield Corporation | US | 2026-07-09 | 2026-07-09 | platform | hold |
@@ -208,4 +218,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 
-**201 holdings total.** Registry: `_system/portfolio/registry.json`
+**211 holdings total.** Registry: `_system/portfolio/registry.json`
