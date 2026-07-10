@@ -188,16 +188,24 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | DVA | DVA/ | DaVita | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | DVN | DVN/ | Devon Energy | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | DXCM | DXCM/ | Dexcom | US | 2026-07-09 | 2026-07-10 | unknown | watch |
-| EBAY | EBAY/ | eBay Inc. | US | — | — | unknown | watch |
+| EA | EA/ | Electronic Arts | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| EBAY | EBAY/ | eBay Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ECHO | ECHO/ | EchoStar Corporation | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| ECL | ECL/ | Ecolab | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ED | ED/ | Consolidated Edison | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | EFOR | EFOR/ | Everforth, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| EIX | EIX/ | Edison International | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| ELV | ELV/ | Elevance Health | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| EME | EME/ | Emcor | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| EMR | EMR/ | Emerson Electric | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ENPH | ENPH/ | Enphase Energy, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | ENX.PA | ENX.PA/ | Euronext N.V. | EU | 2026-07-09 | 2026-07-09 | unknown | watch |
 | EQPT | EQPT/ | EquipmentShare.com Inc | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | ETN | ETN/ | Eaton Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ETOR | ETOR/ | eToro Group Ltd. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| ETR | ETR/ | Entergy | US | — | — | unknown | watch |
 | EVR | EVR/ | Evolve Royalties Ltd | CA | 2026-06-11 | 2026-07-09 | unknown | watch |
+| EW | EW/ | Edwards Lifesciences | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | FANG | FANG/ | Diamondback Energy | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | FIHO12.MX | FIHO12.MX/ | FibraHotel (Concentradora Fibra Hotelera Mexicana) | EU | — | 2026-07-09 | unknown | watch |
 | FIX | FIX/ | Comfort Systems USA | US | 2026-07-09 | 2026-07-10 | unknown | watch |
@@ -314,4 +322,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 
-**307 holdings total.** Registry: `_system/portfolio/registry.json`
+**315 holdings total.** Registry: `_system/portfolio/registry.json`
