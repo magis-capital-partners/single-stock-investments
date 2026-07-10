@@ -6,24 +6,32 @@
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
-| **Stance** | watch |
-| **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Archetype** (Stahl) | platform |
+| **Moat** (Munger) | stable |
+| **Dhando** (Pabrai) | partial |
+| **Stance** | hold |
+| **Cycle** | mid |
+| **Implied 7yr IRR** (Lawrence) | 15.83% (total synthesis) |
+| **IRR method** | full |
+| **Lawrence bucket** | multi_sided |
+| **Payoff lens** | operating |
+| **MOI bucket** | — |
+
+**Deep dive:** `AKAM/research/deep_dive_2026-07-10.md`
 
 ## One-line thesis
 
-Akamai Technologies — thesis pending Marvin deep dive.
+Akamai is a profitable edge platform (Compute >50% of revenue) trading at ~19× FY2025 free cash flow; synthesis **15.83%** supports **hold** while Q1 2026 margin compression warrants monitoring.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest annual report (FY2025 10-K)
+- [x] Read latest quarterly report (Q1 2026 10-Q)
+- [ ] Confirm FY2026 operating margin guidance after Q1 cost spike
+- [ ] Security segment stabilization vs Cloudflare/hyperscaler bundles
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-07-10; awaiting deep dive.
+- Lawrence floor ~13% vs synthesis 15.83% (bull scenario weighting). Confirm stance **hold** vs **watch**.
+- Incentive plan +8M shares approved May 2026.
+- No third-party sources indexed.
