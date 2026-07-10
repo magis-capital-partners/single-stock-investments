@@ -36,13 +36,13 @@ No third-party sources are indexed for Workday as of this scan. Marvin stance re
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | ~$10.36/sh FCF FY2026 | 7yr Lawrence base *[mechanical]* | watch |
+| Marvin floor | ~$10.36/sh FCF FY2026 | 16.38% synthesis / 7yr | hold |
 | External (combined) | — | — | — |
-| **Blended best estimate** | **~$10.36/sh** | **Marvin base only** | **watch** |
+| **Blended best estimate** | **~$10.36/sh** | **16.38% per year (7yr)** | **hold** |
 
 **Weights:** 100% Marvin floor (no approved external sources per `third_party_sources.md`).
 
-**Returns statement (blended):** Base return follows Marvin Lawrence path on FY2026 owner cash; no external adjustment until sources are indexed and approved.
+**Returns statement (blended):** We expect **16.38%** per year over seven years at ~$230 on FY2026 owner cash; Marvin floor only (no external blend).
 
 ## [HUMAN REVIEW]
 
