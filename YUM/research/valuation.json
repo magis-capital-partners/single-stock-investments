@@ -1,0 +1,150 @@
+{
+  "ticker": "YUM",
+  "as_of": "2026-07-10",
+  "method": "full",
+  "irr_method": "full",
+  "lawrence_bucket": "multi_sided",
+  "valuation_mode": "operating",
+  "classification_inputs": {
+    "archetype": "compounder",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating",
+    "predictive_attribute": "none"
+  },
+  "inputs": {
+    "price": 148.0,
+    "price_source": "Placeholder pre-refresh; marvin_cloud_refresh fetches live quote",
+    "price_as_of": "2026-07-10",
+    "fcf_per_share": 5.83,
+    "fcf_source": "FY2025 free cash flow: cash from operations $2,010M minus capital spending $371M = $1,639M, divided by 281M diluted weighted-average shares (10-K filed 2026-02-20, fiscal year ended 2025-12-31)",
+    "shares_millions": 281,
+    "shares_source": "FY2025 weighted average diluted shares (10-K)",
+    "dividend_per_share_annual": 2.84,
+    "dividend_source": "Cash dividends declared $2.84 per share in fiscal 2025 (10-K)",
+    "revenue_fy2025_b": 8.214,
+    "net_earnings_fy2025_b": 1.559,
+    "system_sales_fy2025_b": 68.295,
+    "same_store_sales_fy2025_pct": 3,
+    "long_term_debt_b": 11.872,
+    "normalization_note": "Lawrence base uses FY2025 filed owner cash. Franchise-heavy model: reported revenue is franchise fees and company-store sales, not system sales ($68.3B). Q1 2026 revenue +15% YoY and EPS +72% include lapping and mix; base case uses FY2025 FCF starting point, not Q1 run-rate."
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.02,
+      "growth_y6_10": 0.015,
+      "exit_pfcf_y10": 18,
+      "notes": "Pizza Hut softness persists; unit growth slows; leverage limits buybacks; multiple compresses toward leveraged consumer peers"
+    },
+    "base": {
+      "growth_y1_5": 0.04,
+      "growth_y6_10": 0.03,
+      "exit_pfcf_y10": 20,
+      "notes": "Mid-single-digit system sales growth converts to mid-single-digit owner cash via unit development (63K+ units) and +3% same-store sales; Taco Bell U.S. strength offsets Pizza Hut; debt service stable"
+    },
+    "bull": {
+      "growth_y1_5": 0.06,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 22,
+      "notes": "Taco Bell comp acceleration + international KFC unit growth; buybacks at $550M+ pace; digital/AI order tools lift franchisee productivity"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Franchise intangible assets and leases at GAAP; no land NAV misstatement (10-K FY2025)"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating franchisor; no resource royalty"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Habit Burger & Grill division ~$706M system sales, thin division operating profit (~$13M FY2025); 79% company-owned U.S. — burden in segment, not separate terminal (10-K segment note)"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / embedded product option in revenue path?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "63,285-unit development pipeline and digital ordering (Byte by Yum!, AI tools) embedded in franchise growth assumptions (10-K, IR)"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No material private equity stakes disclosed"
+    },
+    {
+      "q": 6,
+      "question": "Transitory legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating compounder; ongoing dividend policy"
+    },
+    {
+      "q": 7,
+      "question": "Product option already in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Digital delivery and loyalty already in system sales and franchise fee growth; not sized as separate option terminal"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "Asset-light franchise model compounds owner cash when net unit growth (~4% system sales FY2025) and same-store sales (+3%) flow through royalty and franchise fees; Taco Bell U.S. and international KFC drive mix; capital returns ($552M buybacks, $789M dividends) on top of organic FCF growth.",
+    "source": "10-K FY2025: system sales $68.3B (+4% reported); same-store +3%; revenues $8.2B (+8.8%); OCF $2.01B; 97% of 63,285 units franchised",
+    "falsifiers": [
+      {
+        "id": "pizza_hut_decay",
+        "observation": "Pizza Hut same-store sales negative two consecutive years with franchisee closures accelerating",
+        "action": "Cut growth years 1-5 toward bear 2%; cap exit multiple at 18x"
+      },
+      {
+        "id": "leverage_stress",
+        "observation": "Long-term debt exceeds $13B without EBITDA growth or buyback reduction",
+        "action": "Trim bull case; flag capital allocation in [HUMAN REVIEW]"
+      },
+      {
+        "id": "habit_drag",
+        "observation": "Habit division operating losses widen beyond $50M annually without closure plan",
+        "action": "Model explicit Habit drag in bear scenario; review moat assessment"
+      }
+    ],
+    "status": "partial",
+    "lawrence_legacy": {
+      "y1_5": 0.04,
+      "y6_10": 0.03,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.04,
+      "y6_10": 0.03,
+      "exit_pfcf_y10": 20.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": 0.088,
+      "as_of_filing_facts": "evidence/_text/10-K_20260220_rpt20251231_acc0001041061_26_000084.htm.txt"
+    }
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "lawrence_horizon_years": 7
+}
