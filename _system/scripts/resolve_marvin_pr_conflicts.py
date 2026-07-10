@@ -16,7 +16,23 @@ MILLY = "_system/research/milly_log.md"
 
 
 def run(cmd: list[str], *, check: bool = True) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(cmd, cwd=ROOT, text=True, capture_output=True, check=check)
+    proc = subprocess.run(cmd, cwd=ROOT, text=True, capture_output=True, check=False)
+    if check and proc.returncode != 0:
+        raise subprocess.CalledProcessError(
+            proc.returncode, cmd, output=proc.stdout, stderr=proc.stderr
+        )
+    return proc
+
+
+def push_branch(head_ref: str) -> None:
+    push = run(["git", "push", "origin", f"HEAD:{head_ref}"], check=False)
+    if push.returncode == 0:
+        return
+    combined = (push.stderr or "") + (push.stdout or "")
+    if "non-fast-forward" not in combined and "stale info" not in combined:
+        raise subprocess.CalledProcessError(push.returncode, push.args, push.stdout, push.stderr)
+    run(["git", "fetch", "origin", head_ref])
+    run(["git", "push", "origin", f"HEAD:{head_ref}", "--force-with-lease"])
 
 
 def gh_json(args: list[str]) -> dict:
@@ -142,7 +158,7 @@ def resolve(pr_number: str, ticker: str | None = None) -> None:
     status = run(["git", "status", "--porcelain"], check=False)
     if status.stdout.strip():
         run(["git", "commit", "-m", f"fix: resolve {ticker} deep dive conflicts with main"])
-    run(["git", "push", "origin", f"HEAD:{head_ref}"])
+    push_branch(head_ref)
     print(f"Pushed conflict resolution for PR #{pr_number} ({ticker})")
 
 

@@ -150,6 +150,34 @@ jobs:
           check-regexp: (cloud-prompt-sync|research-lint)
           allowed-conclusions: success,skipped
 
+      - name: Ensure mergeable before squash
+        if: |
+          steps.meta.outputs.is_draft == 'false' ||
+          github.event_name == 'workflow_dispatch' ||
+          (github.event_name == 'pull_request' && github.event.action != 'opened')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR="${{ steps.pr.outputs.number }}"
+          REPO="${{ github.repository }}"
+          for attempt in 1 2 3 4 5; do
+            MERGEABLE=$(gh pr view "$PR" --repo "$REPO" --json mergeable -q .mergeable)
+            if [ "$MERGEABLE" = "MERGEABLE" ]; then
+              exit 0
+            fi
+            if [ "$MERGEABLE" = "CONFLICTING" ]; then
+              python _system/scripts/resolve_marvin_pr_conflicts.py "$PR"
+              sleep 10
+            else
+              sleep 5
+            fi
+          done
+          MERGEABLE=$(gh pr view "$PR" --repo "$REPO" --json mergeable -q .mergeable)
+          if [ "$MERGEABLE" != "MERGEABLE" ]; then
+            echo "::error::PR #$PR still not mergeable ($MERGEABLE) after retries."
+            exit 1
+          fi
+
       - name: Squash merge and delete branch
         if: |
           steps.meta.outputs.is_draft == 'false' ||
@@ -161,11 +189,6 @@ jobs:
           PR="${{ steps.pr.outputs.number }}"
           REPO="${{ github.repository }}"
           HEAD_REF="${{ steps.meta.outputs.head_ref }}"
-          MERGEABLE=$(gh pr view "$PR" --repo "$REPO" --json mergeable -q .mergeable)
-          if [ "$MERGEABLE" != "MERGEABLE" ]; then
-            echo "::error::PR #$PR still not mergeable ($MERGEABLE) after conflict resolution."
-            exit 1
-          fi
 
           gh api --method PUT "repos/${REPO}/pulls/${PR}/merge" \
             -f merge_method=squash
