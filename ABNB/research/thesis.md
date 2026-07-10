@@ -1,6 +1,6 @@
 # ABNB — Investment Thesis
 
-**Last updated:** 2026-07-10
+**Last updated:** auto-sync
 
 ## Classification
 
@@ -11,8 +11,13 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | mid |
-| **MOI bucket** (legacy) | — |
+| **Implied 7yr IRR** (base) | 14.1% (total synthesis) |
+| **IRR method** | full |
+| **Lawrence bucket** | multi_sided |
 | **Payoff lens** | operating |
+| **MOI bucket** | pending |
+
+**Deep dive:** `ABNB/research/deep_dive_2026-07-10.md` (auto-sync)
 
 ## One-line thesis
 
