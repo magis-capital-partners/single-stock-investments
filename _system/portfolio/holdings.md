@@ -179,6 +179,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | DLR | DLR/ | Digital Realty | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | DLTR | DLTR/ | Dollar Tree | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | DMLP | DMLP/ | Dorchester Minerals LP | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| DOC | DOC/ | Healthpeak Properties | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | DOV | DOV/ | Dover Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | DOW | DOW/ | Dow Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | DPZ | DPZ/ | Domino's | US | 2026-07-09 | 2026-07-10 | unknown | watch |
@@ -284,14 +285,21 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | GTX | GTX/ | Garrett Motion Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | HAL | HAL/ | Halliburton | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | HAS | HAS/ | Hasbro | US | 2026-07-10 | 2026-07-10 | unknown | watch |
-| HCA | HCA/ | HCA Healthcare | US | — | — | unknown | watch |
+| HCA | HCA/ | HCA Healthcare | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| HD | HD/ | Home Depot (The) | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | HE | HE/ | Hawaiian Electric Industries | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | HEE | HEE/ | Hellenic Exchanges - Athens Stock Exchange S.A. | EU | 2026-07-09 | 2026-07-09 | unknown | watch |
 | HEI.A | HEI.A/ | HEICO Corporation (Class A) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | HIG | HIG/ | Hartford (The) | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | HKHC | HKHC/ | Horizon Kinetics Holding Corporation | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | HL | HL/ | Hecla Mining Company | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| HLT | HLT/ | Hilton Worldwide | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | HNFSA | HNFSA/ | Hanover Foods Corporation | OTC | 2026-07-09 | 2026-07-09 | optionality | watch |
+| HON | HON/ | Honeywell Technologies | US | — | — | unknown | watch |
+| HONA | HONA/ | Honeywell Aerospace | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| HPE | HPE/ | Hewlett Packard Enterprise | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| HSIC | HSIC/ | Henry Schein | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| HSY | HSY/ | Hershey Company (The) | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | ICE | ICE/ | Intercontinental Exchange | US | 2026-07-09 | 2026-07-09 | croupier | hold |
 | IDA.AX | IDA.AX/ | Indiana Resources Limited | AU | 2026-07-09 | 2026-07-09 | unknown | watch |
 | IEX.NS | IEX.NS/ | Indian Energy Exchange Limited | IN | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -378,4 +386,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 
-**371 holdings total.** Registry: `_system/portfolio/registry.json`
+**379 holdings total.** Registry: `_system/portfolio/registry.json`
