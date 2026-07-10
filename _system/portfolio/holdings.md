@@ -308,19 +308,27 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | HUBB | HUBB/ | Hubbell Incorporated | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | HUM | HUM/ | Humana | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | HWM | HWM/ | Howmet Aerospace | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| IBKR | IBKR/ | Interactive Brokers | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | IBM | IBM/ | IBM | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | ICE | ICE/ | Intercontinental Exchange | US | 2026-07-09 | 2026-07-09 | croupier | hold |
 | IDA.AX | IDA.AX/ | Indiana Resources Limited | AU | 2026-07-09 | 2026-07-09 | unknown | watch |
 | IDXX | IDXX/ | Idexx Laboratories | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | IEX | IEX/ | IDEX Corporation | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | IEX.NS | IEX.NS/ | Indian Energy Exchange Limited | IN | 2026-07-09 | 2026-07-09 | unknown | watch |
+| IFF | IFF/ | International Flavors & Fragrances | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | INCY | INCY/ | Incyte | US | 2026-07-10 | 2026-07-10 | unknown | watch |
-| INTC | INTC/ | Intel | US | — | — | unknown | watch |
+| INTC | INTC/ | Intel | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| INTU | INTU/ | Intuit | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | INV | INV/ | Innovex International, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| INVH | INVH/ | Invitation Homes | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| IP | IP/ | International Paper | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | IPCXR | IPCXR/ | Inflection Point Acquisition Corp. II (Rights) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| IQV | IQV/ | IQVIA | US | — | — | unknown | watch |
 | IR | IR/ | Ingersoll Rand | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| ISRG | ISRG/ | Intuitive Surgical | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | IT | IT/ | Gartner | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | ITW | ITW/ | Illinois Tool Works | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| IVZ | IVZ/ | Invesco | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | JL80.DE | JL80.DE/ | Norconsult ASA | EU | — | 2026-07-09 | unknown | watch |
 | JPM | JPM/ | JPMorgan Chase & Co. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | KEWL | KEWL/ | Keweenaw Land Association | US | 2026-07-09 | 2026-07-09 | optionality | watch |
@@ -402,4 +410,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 
-**395 holdings total.** Registry: `_system/portfolio/registry.json`
+**403 holdings total.** Registry: `_system/portfolio/registry.json`
