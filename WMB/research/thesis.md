@@ -21,14 +21,16 @@
 
 ## One-line thesis
 
-Williams Companies — thesis pending Marvin deep dive.
+Williams is a contracted U.S. natural gas midstream toll road (Transco-led) with Power Innovation data-center optionality embedded in transmission growth; **8.11%** synthesis IRR at **$57** → **watch** below 15% hurdle.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest annual report (10-K FY2025)
+- [x] Read latest quarterly report (10-Q Q1 2026)
+- [ ] Confirm maintenance vs growth capex split from IR materials
+- [ ] Validate Power Innovation in-service dates and returns
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-07-10; awaiting deep dive.
+- Maintenance capex **~$1.2B** is [Assumption] — not separately filed in 10-K.
+- Onboarded 2026-07-10; first deep dive completed 2026-07-10.
