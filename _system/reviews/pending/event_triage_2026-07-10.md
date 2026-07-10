@@ -10,14 +10,14 @@
 | 2026-07-28 | FRMI | earnings | context | 35 | rule_conflict, activist_cross_link, neutral_low_impact | Upcoming earnings |
 | 2026-07-16 | MRSH | earnings | context | 35 | rule_conflict, activist_cross_link, neutral_low_impact | Upcoming earnings |
 | 2026-07-10 | AXON | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Insider Sell Alert: Patrick Smith Sells 10,000 Shares of Axo |
-| 2026-07-09 | QDEL | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | McIntyre Partnerships |
-| 2026-07-09 | MRSH | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Elliott Management — SC 13G/A |
-| 2026-07-09 | TRC | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Bulldog (+4) — DEFC14A (proxy solicitation) |
+| 2026-07-09 | APLD | macro | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Macro: APLD |
+| 2026-07-09 | APLD | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Applied Digital / Marvin shop summary (PF3 PR) |
 | 2026-07-09 | AXON | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Jun 19, 2019 |
 | 2026-07-09 | CHTR | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | S Advance Publications, Inc. — SC 13D/A |
 | 2026-07-09 | FRMI | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Vicksburg Investments Management — DEFC14A (proxy solicitati |
-| 2026-07-09 | APLD | macro | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Macro: APLD |
-| 2026-07-09 | APLD | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Applied Digital / Marvin shop summary (PF3 PR) |
+| 2026-07-09 | MRSH | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Elliott Management — SC 13G/A |
+| 2026-07-09 | QDEL | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | McIntyre Partnerships |
+| 2026-07-09 | TRC | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Bulldog (+4) — DEFC14A (proxy solicitation) |
 | 2026-06-17 | GS | superinvestor_letter | context | 46 | rule_conflict, letter_actionable, neutral_low_impact | Letter: GS |
 | 2026-06-17 | CHTR | superinvestor_letter | context | 46 | rule_conflict, letter_actionable, activist_cross_link, neutral_low_impact | Letter: CHTR |
 | 2026-06-17 | MDB | superinvestor_letter | context | 46 | rule_conflict, letter_actionable, neutral_low_impact | Letter: MDB |

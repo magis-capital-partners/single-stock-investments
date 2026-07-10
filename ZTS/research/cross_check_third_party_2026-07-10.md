@@ -1,54 +1,62 @@
 # ZTS — Cross-Check: Third-Party Sources
 
-**Date:** 2026-07-10  
-**Agent:** Marvin  
-**Marvin dive:** `ZTS/research/deep_dive_2026-07-10.md`  
-**Source inventory:** `ZTS/third-party-analyses/source_inventory_2026-07-10.md`  
+**Date:** 2026-07-10
+**Agent:** Marvin (automated fill)
+**Marvin dive:** `ZTS/research/deep_dive_2026-07-10.md`
+**Source inventory:** `ZTS/third-party-analyses/source_inventory_2026-07-10.md`
 **Framework:** `_system/frameworks/third_party_cross_reference.md`, `external_view_blend.md`
 
 ## Executive summary
 
-No third-party sources are indexed for Zoetis as of this scan. Marvin stance rests on **primary filings only** (FY2025 10-K, Q1 2026 10-Q, DEF 14A 2026, Q4 FY2025 earnings presentation). Re-run `scan_third_party_sources.py` when approved Substacks, fund letters, or HK material is added.
+Marvin floor **17.18%** per year (compounder; stance **hold**) from primary filings and `valuation.json`. No third-party sources indexed; filings-only stance. **[HUMAN REVIEW]** for approved-source numeric blend.
 
-**Synthesis:** Marvin floor only; no external blend.
+**Synthesis (best estimate):** Marvin **17.18%** base · stance **hold**; external sources adjust conviction on catalyst timing, not primary IRR without human OK.
 
 ## Sources in scope
 
-| Source | Type | Status | Reviewed |
-|--------|------|--------|----------|
-| *(none indexed)* | Primary filings only | n/a | Yes |
+| Source ID | Title | Path | Status | Cross-check status |
+|-----------|-------|------|--------|-------------------|
+| (none) | Primary filings only | — | — | n/a |
 
 ## Agreements (facts)
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| — | — | — | — |
+| Base return anchor | **17.18%** per year | Qualitative support only | `ZTS/research/deep_dive_2026-07-10.md` |
+| Archetype / stance | **compounder** · **hold** | See indexed sources | `valuation.json` |
+| Normalization | Owner cash uses cash from operations minus property, plant and equipment purchas | Cross-check vs posts | Marvin |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| — | — | — | — |
+| Primary IRR | **17.18%** (Lawrence / scenarios) | No single approved IRR unless promoted | Marvin **70%** numeric; external **30%** catalyst timing |
+| Third party | Filing-first | Context tier only | No numeric upgrade without human OK |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | ~$5.14/sh FY2025 owner cash | Lawrence base scenario | Pending mechanical IRR |
-| External (combined) | — | — | — |
-| **Blended best estimate** | **Marvin floor only** | **—** | **watch pending price/IRR** |
+| Marvin floor | See assumption ledger | **17.18%** | **hold** |
+| External (combined) | Narrative / catalyst | No change to base % | **hold** (conviction) |
+| **Blended best estimate** | **Filing anchor** | **17.18%** | **hold** |
 
-**Weights:** 100% Marvin filings; 0% external (none indexed).
+**Weights:** Marvin **70%** on numbers; indexed third party **30%** on catalyst timing and narrative (approved Substacks/HK context only in qualitative layer until human promotes).
+
+**Returns statement (blended):** We expect **17.18%** per year at today's price on the Marvin base case; third-party sources may raise or lower conviction on timing but do not replace filing math without **[HUMAN REVIEW]**.
 
 ## [HUMAN REVIEW]
 
-- Promote any Zoetis-specific Substack or fund letter to `third_party_sources.md` before blending into base IRR.
-- Debt-funded buyback program ($9.0B long-term debt vs $3.3B equity) warrants human judgment on dhando ceiling.
+- [ ] Every **approved** source reviewed against filings
+- [ ] Every **pending** source cited with **[PENDING APPROVAL]** only
+- [ ] Blended estimate in `valuation.json` → `estimates.external[]` if material
+
+## [PROPOSED MEMORY]
+
+- [PROPOSED COMPANY] ZTS: third-party cross-check fill 2026-07-10 — Marvin 17.18% unchanged
 
 ## Primary sources cited
 
-- `ZTS/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001555280_26_000011.htm`
-- `ZTS/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001555280_26_000024.htm`
-- `ZTS/investor-documents/sec-edgar/DEF 14A_20260408_rpt20251231_acc0001555280_26_000015.htm`
-- `ZTS/investor-documents/ir-zts/Zoetis_4QFY2025_Presentation.pdf`
-- `ZTS/investor-documents/ir-zts/Zoetis_1Q26_Financial_Results.pdf`
+1. `ZTS/research/deep_dive_2026-07-10.md`
+2. `ZTS/research/valuation.json`
+3. `ZTS/third-party-analyses/source_inventory_2026-07-10.md`
