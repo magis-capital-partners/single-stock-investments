@@ -256,31 +256,39 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | FTV | FTV/ | Fortive | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | GCCO | GCCO/ | Garden City Co. | OTC | 2026-07-09 | 2026-07-09 | optionality | watch |
 | GD | GD/ | General Dynamics | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| GDDY | GDDY/ | GoDaddy | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | GDRZF | GDRZF/ | Gold Reserve Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | GE | GE/ | GE Aerospace | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | GEHC | GEHC/ | GE HealthCare | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | GEN | GEN/ | Gen Digital | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | GEV | GEV/ | GE Vernova | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| GILD | GILD/ | Gilead Sciences | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | GIS | GIS/ | General Mills | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | GKTX.PS1 | GKTX.PS1/ | Galapagos NV (Janssen structured security PS1) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | GKTX.PS2 | GKTX.PS2/ | Galapagos NV (Janssen structured security PS2) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | GKTX.PS3 | GKTX.PS3/ | Galapagos NV (Janssen structured security PS3) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| GL | GL/ | Globe Life | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | GLW | GLW/ | Corning Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | GLXY | GLXY/ | Galaxy Digital Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | GM | GM/ | General Motors | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | GNRC | GNRC/ | Generac | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | GOOG | GOOG/ | Alphabet Inc. (Class C) | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | GOOGL | GOOGL/ | Alphabet Inc. | US | 2026-07-09 | 2026-07-09 | compounder | hold |
-| GPC | GPC/ | Genuine Parts Company | US | — | — | unknown | watch |
+| GPC | GPC/ | Genuine Parts Company | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | GPGI | GPGI/ | GPGI, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| GPN | GPN/ | Global Payments | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | GPW.WA | GPW.WA/ | Warsaw Stock Exchange | EU | 2026-07-09 | 2026-07-09 | unknown | watch |
 | GRMN | GRMN/ | Garmin | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | GROY | GROY/ | Gold Royalty Corp. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | GS | GS/ | Goldman Sachs Group, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | GTX | GTX/ | Garrett Motion Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| HAL | HAL/ | Halliburton | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| HAS | HAS/ | Hasbro | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| HCA | HCA/ | HCA Healthcare | US | — | — | unknown | watch |
 | HE | HE/ | Hawaiian Electric Industries | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | HEE | HEE/ | Hellenic Exchanges - Athens Stock Exchange S.A. | EU | 2026-07-09 | 2026-07-09 | unknown | watch |
 | HEI.A | HEI.A/ | HEICO Corporation (Class A) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| HIG | HIG/ | Hartford (The) | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | HKHC | HKHC/ | Horizon Kinetics Holding Corporation | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | HL | HL/ | Hecla Mining Company | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | HNFSA | HNFSA/ | Hanover Foods Corporation | OTC | 2026-07-09 | 2026-07-09 | optionality | watch |
@@ -370,4 +378,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 
-**363 holdings total.** Registry: `_system/portfolio/registry.json`
+**371 holdings total.** Registry: `_system/portfolio/registry.json`
