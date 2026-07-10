@@ -53,10 +53,35 @@ def find_open_pr_for_ticker(ticker: str) -> tuple[str, str] | None:
     return None
 
 
+def list_open_cursor_prs() -> list[str]:
+    import json
+
+    out = run(
+        ["gh", "pr", "list", "--state", "open", "--json", "number,headRefName", "--limit", "100"],
+        check=False,
+    )
+    numbers: list[int] = []
+    for row in json.loads(out.stdout or "[]"):
+        if (row.get("headRefName") or "").startswith("cursor/"):
+            numbers.append(int(row["number"]))
+    return [str(n) for n in sorted(numbers)]
+
+
+def drain_open_cursor_prs() -> None:
+    open_prs = list_open_cursor_prs()
+    if not open_prs:
+        return
+    print(f"Draining {len(open_prs)} open cursor PR(s) oldest-first: {', '.join(f'#{n}' for n in open_prs)}")
+    for pr_number in open_prs:
+        ensure_pr_ready(pr_number)
+        trigger_automerge(pr_number)
+        wait_for_pr_merged(pr_number)
+
+
 def ensure_pr_ready(pr_number: str) -> None:
     data = gh_json(["pr", "view", pr_number, "--json", "isDraft"])
     if data.get("isDraft"):
-        print(f"PR #{pr_number} is draft — marking ready.")
+        print(f"PR #{pr_number} is draft - marking ready.")
         run(["gh", "pr", "ready", pr_number], check=False)
 
 
@@ -99,7 +124,7 @@ def wait_for_pr_merged(pr_number: str, *, timeout_sec: int = 5400, poll_sec: int
         checks = data.get("statusCheckRollup") or []
 
         if mergeable == "CONFLICTING":
-            print(f"PR #{pr_number} is CONFLICTING — running conflict resolver...")
+            print(f"PR #{pr_number} is CONFLICTING ? running conflict resolver...")
             proc = run([sys.executable, str(RESOLVE_PY), pr_number], check=False)
             if proc.returncode != 0:
                 print(proc.stderr or proc.stdout, file=sys.stderr)
@@ -158,6 +183,7 @@ def main() -> None:
         return
 
     print(f"Sequential drain: {len(tickers)} tickers")
+    drain_open_cursor_prs()
     failures: list[str] = []
 
     for i, ticker in enumerate(tickers, 1):
@@ -175,7 +201,7 @@ def main() -> None:
     if failures:
         print(f"\nFailed ({len(failures)}): {', '.join(failures)}", file=sys.stderr)
         raise SystemExit(1)
-    print(f"\nDone ? {len(tickers)} tickers merged.")
+    print(f"\nDone - {len(tickers)} tickers merged.")
 
 
 if __name__ == "__main__":
