@@ -1,0 +1,245 @@
+{
+  "ticker": "AMAT",
+  "as_of": "2026-07-10",
+  "method": "full",
+  "valuation_overlay": "segment_cashflow",
+  "lawrence_bucket": "pricing_power",
+  "payoff_lens": "operating",
+  "classification_inputs": {
+    "archetype": "compounder",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "up"
+  },
+  "inputs": {
+    "price": 588.66,
+    "price_source": "Yahoo AMAT close 2026-07-09",
+    "price_as_of": "2026-07-09",
+    "fcf_per_share": 7.05,
+    "fcf_source": "FY2025 OCF $7.958B minus capital spending $2.260B divided by 808M diluted shares (10-K FY2025)",
+    "shares_millions": 808,
+    "normalization_note": "FY2025 filing-based owner cash; goodwill impairment $41M and elevated tax rate treated as non-recurring in narrative only"
+  },
+  "segment_build": {
+    "framework": "speedwell_reverse_dcf",
+    "as_of": "2026-07-10",
+    "horizon_years": 7,
+    "discount_rate_explicit": 0.1,
+    "segments": [
+      {
+        "id": "semiconductor_systems",
+        "label": "Semiconductor Systems (WFE tools: deposition, etch, CMP, inspection, packaging)",
+        "type": "operating",
+        "revenue_y0_bn": 20.798,
+        "revenue_share_pct": 73.3,
+        "operating_income_y0_bn": 7.379,
+        "owner_cash_y0_bn": 4.18,
+        "owner_cash_y0_per_share": 5.17,
+        "owner_cash_y0_source": "FY2025 consolidated FCF allocated 73.3% by segment revenue share (10-K Note 15)",
+        "growth_y1_5": 0.08,
+        "growth_y6_10": 0.05,
+        "exit_pfcf_y10": 20,
+        "pv_per_share_at_10pct": null,
+        "notes": "FY2025 rev $20.8B (+4.5% YoY); OI margin 35.5%; foundry/logic 67% of segment revenue"
+      },
+      {
+        "id": "applied_global_services",
+        "label": "Applied Global Services (spares, services, factory automation software)",
+        "type": "operating",
+        "revenue_y0_bn": 6.385,
+        "revenue_share_pct": 22.5,
+        "operating_income_y0_bn": 1.792,
+        "owner_cash_y0_bn": 1.28,
+        "owner_cash_y0_per_share": 1.58,
+        "owner_cash_y0_source": "FY2025 consolidated FCF allocated 22.5% by segment revenue share",
+        "growth_y1_5": 0.06,
+        "growth_y6_10": 0.05,
+        "exit_pfcf_y10": 16,
+        "pv_per_share_at_10pct": null,
+        "notes": "FY2025 rev $6.4B (+2.6% YoY); recurring service mix; margin 28.1%"
+      }
+    ],
+    "options": [
+      {
+        "id": "ai_wfe_backlog",
+        "label": "AI-driven wafer fab equipment backlog conversion",
+        "option_treatment": "embedded_in_segment",
+        "annual_drag_per_share": 0.0,
+        "base_terminal_value_bn": 0,
+        "base_terminal_rationale": "Backlog and AI WFE demand embedded in Semiconductor Systems growth path",
+        "pv_drag_per_share_at_10pct": 0,
+        "notes": "Contract liabilities $2.57B at Oct 2025; not separately terminal-valued"
+      }
+    ],
+    "corporate_drag": {
+      "alphabet_level_drag_per_share": 0.0,
+      "pv_drag_per_share_at_10pct": 0,
+      "notes": "Corporate and Other operating income $882M offsets reconciling items; no extra drag row"
+    },
+    "reconciliation": {
+      "sum_pv_per_share_at_10pct": null,
+      "implied_business_return_pct": null,
+      "lawrence_base_irr_pct": null,
+      "price_per_share": 175.0,
+      "slack_notes": "Segment sum cross-check after marvin_valuation.py --write"
+    }
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 16,
+      "notes": "WFE spending pause; China export restrictions deepen; memory capex cuts"
+    },
+    "base": {
+      "growth_y1_5": 0.07,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 20,
+      "notes": "AI and advanced packaging sustain mid-single-digit WFE growth; AGS recurring mix stable"
+    },
+    "bull": {
+      "growth_y1_5": 0.11,
+      "growth_y6_10": 0.07,
+      "exit_pfcf_y10": 24,
+      "notes": "WFE supercycle on HBM, gate-all-around, and packaging; share gains vs peers"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF path?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Contract liabilities $2.57B; Semiconductor Systems growth 8% years 1-5"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option already in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "AI-driven WFE demand in Semiconductor Systems revenue and MD&A"
+    },
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Standard equipment manufacturer balance sheet; no land/NAV misstatement"
+    }
+  ],
+  "evidence_refresh": {
+    "synthesis_in_dive": false
+  },
+  "lawrence_horizon_years": 7,
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "human_review": {
+    "live_price_confirmed": false
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -16.2
+    },
+    "base": {
+      "return_pct": -10.7
+    },
+    "bull": {
+      "return_pct": -5.7
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -16.2
+    },
+    "base": {
+      "return_pct": -10.7
+    },
+    "bull": {
+      "return_pct": -5.7
+    }
+  },
+  "implied_return": {
+    "base_pct": -8.99,
+    "label": "7yr IRR (total synthesis)",
+    "display": "-8.99% (total synthesis)",
+    "lawrence_stance_gate_pct": -10.7,
+    "falsifier_adjusted_pct": -10.7,
+    "synthesis_pct": -8.99
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": -16.2,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": -5.7,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": -8.79,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": -8.99,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}
