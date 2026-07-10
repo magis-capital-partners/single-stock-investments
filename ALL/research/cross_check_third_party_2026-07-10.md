@@ -9,9 +9,9 @@
 
 ## Executive summary
 
-No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (10-K, 10-Q, IR). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (10-K FY2025, 10-Q Q1 2026). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
 
-**Synthesis:** Marvin floor only; no external blend.
+**Synthesis (best estimate):** Marvin floor only. Base IRR **19.82%** (total synthesis) at **$248.64** on normalized owner cash **$30.00**/sh from FY2025 filings. No external blend; no approved third party in base IRR.
 
 ## Sources in scope
 
