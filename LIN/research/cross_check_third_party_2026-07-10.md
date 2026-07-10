@@ -10,7 +10,7 @@
 
 No third-party sources are indexed for Linde as of this scan. Marvin stance rests on **primary SEC filings only** (FY2025 10-K, Q1 2026 10-Q, 2026 proxy). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
 
-**Synthesis:** Marvin floor only; no external blend. Base Lawrence return **-0.7%** per year at placeholder **$470** on FY2025 free cash flow **$10.78** per share → stance **watch**.
+**Synthesis:** Marvin floor only; no external blend. Synthesis return **-2.11%** per year at **$531.30** on FY2025 free cash flow **$10.78** per share → stance **watch**.
 
 ## Sources in scope
 
@@ -37,13 +37,13 @@ No third-party sources are indexed for Linde as of this scan. Marvin stance rest
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | $10.78/sh FCF FY2025 | -0.7% / 7yr at ~$470 | watch |
+| Marvin floor | $10.78/sh FCF FY2025 | -2.11% synthesis / 7yr at $531.30 | watch |
 | External (combined) | — | — | — |
-| **Blended best estimate** | **$10.78/sh** | **-0.7%** | **watch** |
+| **Blended best estimate** | **$10.78/sh** | **-2.11%** | **watch** |
 
 **Weights:** 100% Marvin floor (no approved third-party sources).
 
-**Returns statement (blended):** At today's price near **$470**, we expect about **-0.7%** per year over 7 years on filing free cash flow; no external views change that floor.
+**Returns statement (blended):** At **$531.30** (2026-07-10), we expect about **-2.11%** per year over 7 years on filing free cash flow; no external views change that floor.
 
 ## [HUMAN REVIEW]
 
