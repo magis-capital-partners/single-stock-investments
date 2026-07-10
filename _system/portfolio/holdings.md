@@ -77,6 +77,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | BAX | BAX/ | Baxter International | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | BBY | BBY/ | Best Buy | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | BDX | BDX/ | Becton Dickinson | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| BEN | BEN/ | Franklin Resources | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | BF.B | BF.B/ | Brown–Forman | US | — | — | unknown | watch |
 | BG | BG/ | Bunge Global | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | BIIB | BIIB/ | Biogen | US | 2026-07-09 | 2026-07-10 | unknown | watch |
@@ -225,6 +226,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | F | F/ | Ford Motor Company | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | FANG | FANG/ | Diamondback Energy | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | FAST | FAST/ | Fastenal | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| FCX | FCX/ | Freeport-McMoRan | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | FDS | FDS/ | FactSet | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | FDX | FDX/ | FedEx | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | FDXF | FDXF/ | FedEx Freight | US | 2026-07-09 | 2026-07-10 | unknown | watch |
@@ -243,14 +245,18 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | FNMAO | FNMAO/ | Federal National Mortgage Association (Preferred) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | FNMAP | FNMAP/ | Federal National Mortgage Association (Preferred) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | FNV | FNV/ | Franco-Nevada Corporation | US | 2026-07-09 | 2026-07-09 | optionality | watch |
+| FOX | FOX/ | Fox Corporation (Class B) | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| FOXA | FOXA/ | Fox Corporation (Class A) | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | FRMI | FRMI/ | Fermi Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | FRMO | FRMO/ | FRMO Corporation | US | 2026-07-09 | 2026-07-09 | holding_co | hold |
 | FRT | FRT/ | Federal Realty Investment Trust | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | FSLR | FSLR/ | First Solar | US | 2026-07-10 | 2026-07-10 | unknown | watch |
-| FTNT | FTNT/ | Fortinet | US | — | — | unknown | watch |
+| FTNT | FTNT/ | Fortinet | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | FTRE | FTRE/ | Fortrea Holdings Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| FTV | FTV/ | Fortive | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | GCCO | GCCO/ | Garden City Co. | OTC | 2026-07-09 | 2026-07-09 | optionality | watch |
 | GDRZF | GDRZF/ | Gold Reserve Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| GE | GE/ | GE Aerospace | US | — | — | unknown | watch |
 | GKTX.PS1 | GKTX.PS1/ | Galapagos NV (Janssen structured security PS1) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | GKTX.PS2 | GKTX.PS2/ | Galapagos NV (Janssen structured security PS2) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | GKTX.PS3 | GKTX.PS3/ | Galapagos NV (Janssen structured security PS3) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -260,6 +266,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | GOOGL | GOOGL/ | Alphabet Inc. | US | 2026-07-09 | 2026-07-09 | compounder | hold |
 | GPGI | GPGI/ | GPGI, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | GPW.WA | GPW.WA/ | Warsaw Stock Exchange | EU | 2026-07-09 | 2026-07-09 | unknown | watch |
+| GRMN | GRMN/ | Garmin | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | GROY | GROY/ | Gold Royalty Corp. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | GS | GS/ | Goldman Sachs Group, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | GTX | GTX/ | Garrett Motion Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -274,6 +281,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | IEX.NS | IEX.NS/ | Indian Energy Exchange Limited | IN | 2026-07-09 | 2026-07-09 | unknown | watch |
 | INV | INV/ | Innovex International, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | IPCXR | IPCXR/ | Inflection Point Acquisition Corp. II (Rights) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| IT | IT/ | Gartner | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | JL80.DE | JL80.DE/ | Norconsult ASA | EU | — | 2026-07-09 | unknown | watch |
 | JPM | JPM/ | JPMorgan Chase & Co. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | KEWL | KEWL/ | Keweenaw Land Association | US | 2026-07-09 | 2026-07-09 | optionality | watch |
@@ -354,4 +362,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 
-**347 holdings total.** Registry: `_system/portfolio/registry.json`
+**355 holdings total.** Registry: `_system/portfolio/registry.json`
