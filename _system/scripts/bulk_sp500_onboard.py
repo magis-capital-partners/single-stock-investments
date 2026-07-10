@@ -120,11 +120,26 @@ def write_manifest(batch_id: str, rows: list[dict]) -> Path:
     MANIFEST_DIR.mkdir(parents=True, exist_ok=True)
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     path = MANIFEST_DIR / f"batch_{batch_id}_{today}.json"
+    if path.exists():
+        path = MANIFEST_DIR / f"batch_{batch_id}_{today}_{datetime.now(timezone.utc).strftime('%H%M%S')}.json"
     path.write_text(
         json.dumps({"date": today, "batch_id": batch_id, "tickers": rows}, indent=2) + "\n",
         encoding="utf-8",
     )
     return path
+
+
+def git_push_batch() -> int:
+    stash = subprocess.run(["git", "stash", "push", "-m", "sp500-onboard-wip"], cwd=ROOT)
+    pull = subprocess.run(["git", "pull", "--rebase", "origin", "main"], cwd=ROOT)
+    if pull.returncode != 0:
+        if stash.returncode == 0:
+            subprocess.run(["git", "stash", "pop"], cwd=ROOT)
+        return pull.returncode
+    push = subprocess.run(["git", "push", "origin", "main"], cwd=ROOT)
+    if stash.returncode == 0:
+        subprocess.run(["git", "stash", "pop"], cwd=ROOT)
+    return push.returncode
 
 
 def main() -> int:
@@ -136,14 +151,49 @@ def main() -> int:
     ap.add_argument("--trigger-deep-dive", action="store_true", help="gh workflow run batch after onboard")
     ap.add_argument("--max-parallel", type=int, default=3)
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument(
+        "--git-commit",
+        action="store_true",
+        help="Stage onboarded tickers + returns and commit (does not push)",
+    )
+    ap.add_argument(
+        "--git-push",
+        action="store_true",
+        help="After --git-commit, pull --rebase and push to origin main",
+    )
+    ap.add_argument(
+        "--loop-until-done",
+        action="store_true",
+        help="Repeat batches at offset 0 until no missing tickers (uses --git-commit if set)",
+    )
     args = ap.parse_args()
+
+    if args.loop_until_done:
+        batch_num = len(list(MANIFEST_DIR.glob("batch_*_*.json")))
+        while True:
+            pending = missing_rows()
+            if not pending:
+                print("All S&P 500 names onboarded.")
+                return 0
+            print(f"\n=== Loop batch {batch_num} · {len(pending)} still missing ===")
+            loop_args = argparse.Namespace(**{**vars(args), "offset": 0, "loop_until_done": False})
+            rc = main_inner(loop_args, batch_num)
+            if rc != 0:
+                return rc
+            batch_num += 1
+        return 0
+
+    return main_inner(args, args.offset // max(args.batch_size, 1))
+
+
+def main_inner(args: argparse.Namespace, batch_num: int) -> int:
 
     pending = missing_rows()
     total_missing = len(pending)
     batch = pending[args.offset : args.offset + args.batch_size]
-    batch_id = f"{args.offset // max(args.batch_size, 1)}"
+    batch_id = str(batch_num)
 
-    print(f"SP500 missing: {total_missing} · batch offset {args.offset} size {len(batch)}")
+    print(f"SP500 missing: {total_missing} · batch {batch_id} offset {args.offset} size {len(batch)}")
     if not batch:
         print("Nothing to onboard in this batch.")
         return 0
@@ -192,6 +242,33 @@ def main() -> int:
 
     failed = len(batch) - len(ok_tickers)
     print(f"\nBatch done: ok={len(ok_tickers)} failed={failed}")
+
+    if args.git_commit and ok_tickers:
+        paths = [
+            "_system/portfolio/registry.json",
+            "_system/portfolio/holdings.md",
+            "_system/portfolio/sp500_onboard_status.jsonl",
+            str(manifest_path.relative_to(ROOT)),
+            "_system/data/deep_dive_dispatch_queue.json",
+        ]
+        for t in ok_tickers:
+            paths.append(t)
+            key = t.replace(".", "_")
+            paths.append(f"_system/reference/market-data/returns/{key}.csv")
+            paths.append(f"_system/reviews/pending/{t}_onboard_{datetime.now(timezone.utc).strftime('%Y-%m-%d')}.md")
+        stage = [PY, "-c", "import subprocess,sys; [subprocess.run(['git','add',p]) for p in sys.argv[1:]]", *paths]
+        subprocess.run(stage, cwd=ROOT)
+        msg = f"onboard(sp500): batch {batch_id} — {', '.join(ok_tickers)}"
+        commit = subprocess.run(["git", "commit", "-m", msg], cwd=ROOT)
+        if commit.returncode != 0:
+            print("git commit failed", file=sys.stderr)
+            return commit.returncode
+        if args.git_push:
+            rc = git_push_batch()
+            if rc != 0:
+                print("git push failed", file=sys.stderr)
+                return rc
+
     return 1 if failed and not ok_tickers else 0
 
 
