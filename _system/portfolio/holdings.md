@@ -222,15 +222,21 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | EXPD | EXPD/ | Expeditors International | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | EXPE | EXPE/ | Expedia Group | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | EXR | EXR/ | Extra Space Storage | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| F | F/ | Ford Motor Company | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | FANG | FANG/ | Diamondback Energy | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | FAST | FAST/ | Fastenal | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | FDS | FDS/ | FactSet | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | FDX | FDX/ | FedEx | US | 2026-07-09 | 2026-07-10 | unknown | watch |
-| FDXF | FDXF/ | FedEx Freight | US | — | — | unknown | watch |
+| FDXF | FDXF/ | FedEx Freight | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| FE | FE/ | FirstEnergy | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | FFIV | FFIV/ | F5, Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | FICO | FICO/ | Fair Isaac | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | FIHO12.MX | FIHO12.MX/ | FibraHotel (Concentradora Fibra Hotelera Mexicana) | EU | — | 2026-07-09 | unknown | watch |
+| FIS | FIS/ | Fidelity National Information Services | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| FISV | FISV/ | Fiserv | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| FITB | FITB/ | Fifth Third Bancorp | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | FIX | FIX/ | Comfort Systems USA | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| FLEX | FLEX/ | Flex Ltd. | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | FLUX | FLUX/ | Flux Power Holdings, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | FMCCK | FMCCK/ | Ford Motor Credit Company LLC (Preferred) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | FMCCL | FMCCL/ | Ford Motor Credit Company LLC (Preferred) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -240,6 +246,8 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | FRMI | FRMI/ | Fermi Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | FRMO | FRMO/ | FRMO Corporation | US | 2026-07-09 | 2026-07-09 | holding_co | hold |
 | FRT | FRT/ | Federal Realty Investment Trust | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| FSLR | FSLR/ | First Solar | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| FTNT | FTNT/ | Fortinet | US | — | — | unknown | watch |
 | FTRE | FTRE/ | Fortrea Holdings Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | GCCO | GCCO/ | Garden City Co. | OTC | 2026-07-09 | 2026-07-09 | optionality | watch |
 | GDRZF | GDRZF/ | Gold Reserve Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -346,4 +354,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 
-**339 holdings total.** Registry: `_system/portfolio/registry.json`
+**347 holdings total.** Registry: `_system/portfolio/registry.json`
