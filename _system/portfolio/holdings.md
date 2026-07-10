@@ -174,6 +174,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | DECK | DECK/ | Deckers Brands | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | DELL | DELL/ | Dell Technologies | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | DG | DG/ | Dollar General | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| DGX | DGX/ | Quest Diagnostics | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | DHI | DHI/ | D. R. Horton | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | DHR | DHR/ | Danaher Corporation | US | 2026-07-09 | 2026-07-09 | compounder | hold |
 | DLR | DLR/ | Digital Realty | US | 2026-07-09 | 2026-07-10 | unknown | watch |
@@ -437,6 +438,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | NWSA | NWSA/ | News Corp (Class A) | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | NXPI | NXPI/ | NXP Semiconductors | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | NZX.NZ | NZX.NZ/ | NZX Limited | AU | 2026-07-09 | 2026-07-09 | unknown | watch |
+| O | O/ | Realty Income | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | ODFL | ODFL/ | Old Dominion | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | OKE | OKE/ | Oneok | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | OMC | OMC/ | Omnicom Group | US | 2026-07-10 | 2026-07-10 | unknown | watch |
@@ -462,7 +464,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | PG | PG/ | Procter & Gamble | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | PGR | PGR/ | Progressive Corporation | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | PH | PH/ | Parker Hannifin | US | 2026-07-10 | 2026-07-10 | unknown | watch |
-| PHM | PHM/ | PulteGroup | US | — | — | unknown | watch |
+| PHM | PHM/ | PulteGroup | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | PKG | PKG/ | Packaging Corporation of America | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | PLD | PLD/ | Prologis | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | PLTR | PLTR/ | Palantir Technologies | US | 2026-07-10 | 2026-07-10 | unknown | watch |
@@ -482,12 +484,20 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | PSKY | PSKY/ | Paramount Skydance Corporation | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | PSX | PSX/ | Phillips 66 | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | PTC | PTC/ | PTC Inc. | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| PWR | PWR/ | Quanta Services | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | PYPL | PYPL/ | PayPal | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| Q | Q/ | Qnity Electronics | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| QCOM | QCOM/ | Qualcomm | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | QDEL | QDEL/ | QuidelOrtho | US | 2026-07-09 | 2026-07-10 | turnaround | hold |
 | RDDT | RDDT/ | Reddit, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| REG | REG/ | Regency Centers | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| REGN | REGN/ | Regeneron Pharmaceuticals | US | — | — | unknown | watch |
 | RGLD | RGLD/ | Royal Gold Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| RJF | RJF/ | Raymond James Financial | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| RL | RL/ | Ralph Lauren Corporation | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | RMV.L | RMV.L/ | Rightmove PLC | UK | 2026-07-09 | 2026-07-10 | platform | watch |
 | RPRX | RPRX/ | Royalty Pharma plc | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| RTX | RTX/ | RTX Corporation | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | RYN | RYN/ | Rayonier, Inc. | US | 2026-07-09 | 2026-07-09 | optionality | watch |
 | S68.SI | S68.SI/ | Singapore Exchange Limited | EU | 2026-07-09 | 2026-07-10 | unknown | watch |
 | SBR | SBR/ | Sabine Royalty Trust | US | 2026-07-09 | 2026-07-10 | unknown | watch |
@@ -524,4 +534,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 
-**517 holdings total.** Registry: `_system/portfolio/registry.json`
+**527 holdings total.** Registry: `_system/portfolio/registry.json`
