@@ -1,0 +1,121 @@
+{
+  "ticker": "ZBRA",
+  "as_of": "2026-07-10",
+  "method": "full",
+  "lawrence_bucket": "pricing_power",
+  "classification_inputs": {
+    "archetype": "compounder",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "industrial_automation",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 320.0,
+    "price_source": "placeholder pre-refresh; marvin_cloud_refresh fetches Yahoo",
+    "price_as_of": "2026-07-09",
+    "fcf_per_share": 16.23,
+    "fcf_source": "FY2025 OCF $917M minus capital spending $86M divided by 51.2M diluted shares (10-K FY2025)",
+    "shares_millions": 51.2,
+    "normalization_note": "Filed owner cash; FY2025 includes Elo acquisition closing Q4 and elevated integration/amortization; Q1 2026 revenue +14% YoY supports base growth path"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 18,
+      "notes": "Leverage limits buybacks; Elo integration drags margins; AVA mix stays low-margin"
+    },
+    "base": {
+      "growth_y1_5": 0.06,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 20,
+      "notes": "Services/software mix rises; CF organic mid-single digits; Photoneo cross-sell in AVA"
+    },
+    "bull": {
+      "growth_y1_5": 0.08,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 22,
+      "notes": "Automation + machine vision acceleration; margin recovery post-Elo; sustained repurchases"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Goodwill and intangibles reflect Elo/Photoneo purchase accounting; no land/NAV mismatch (10-K FY2025)"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / RPO not in FCF path?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Remaining performance obligation ~$1.17B (10-K FY2025); deferred revenue in services growth path"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Both CF and AVA segments profitable at operating level; AVA margin thin but positive (~$115M OI on $2.4B sales)"
+    },
+    {
+      "q": 0,
+      "question": "Material separate options after scan?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Elo and Photoneo economics embedded in segment revenue paths, not separate terminals"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "Installed-base refresh cycles on mobile computers and printers; recurring services/software attach; Elo self-service touchscreens and Photoneo 3D vision expand TAM in CF and AVA segments",
+    "source": "10-K FY2025 segment MD&A; Q1 2026 10-Q revenue +14% YoY",
+    "falsifiers": [
+      {
+        "id": "elo_integration",
+        "observation": "CF gross margin falls below 45% for two consecutive years post-Elo",
+        "action": "Cut growth years 1-5 toward bear 3%"
+      },
+      {
+        "id": "leverage_cap",
+        "observation": "Net debt/EBITDA above 3.5x with buybacks paused",
+        "action": "Lower exit multiple toward 18x"
+      }
+    ],
+    "lawrence_legacy": {
+      "y1_5": 0.06,
+      "y6_10": 0.04,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.06,
+      "y6_10": 0.04,
+      "exit_pfcf_y10": 20.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": 0.083,
+      "as_of_filing_facts": "evidence/_text/10-K_20260212_rpt20251231_acc0001628280_26_007668.htm.txt"
+    },
+    "status": "partial"
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "lawrence_horizon_years": 7,
+  "estimates": {
+    "marvin_floor": {
+      "owner_cash_per_share": 16.23,
+      "method": "full",
+      "source": "FY2025 10-K OCF minus capex"
+    },
+    "external": []
+  }
+}
