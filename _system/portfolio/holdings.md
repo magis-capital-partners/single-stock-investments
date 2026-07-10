@@ -106,27 +106,36 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | CARR | CARR/ | Carrier Global | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CASY | CASY/ | Casey's | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CAT | CAT/ | Caterpillar Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| CB | CB/ | Chubb Limited | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CBOE | CBOE/ | Cboe Global Markets | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | CBRE | CBRE/ | CBRE Group | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CBRS | CBRS/ | Cerebras Systems | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | CCL | CCL/ | Carnival Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CDNS | CDNS/ | Cadence Design Systems | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| CDW | CDW/ | CDW Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CDZI | CDZI/ | Cadiz Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| CF | CF/ | CF Industries | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CHRW | CHRW/ | C.H. Robinson | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CHTR | CHTR/ | Charter Communications, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | CKX | CKX/ | CKX Lands, Inc. | US | 2026-07-09 | 2026-07-09 | optionality | watch |
 | CME | CME/ | CME Group Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| CMG | CMG/ | Chipotle Mexican Grill | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CMSG | CMSG/ | Consensus Mining & Seigniorage Corp | US | 2026-07-09 | 2026-07-09 | optionality | watch |
+| CNC | CNC/ | Centene Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| CNP | CNP/ | CenterPoint Energy | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | COF | COF/ | Capital One | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | COLD | COLD/ | Americold Realty Trust, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| COR | COR/ | Cencora | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CORBF | CORBF/ | Corbus Pharmaceuticals Holdings, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | CPRT | CPRT/ | Copart | US | 2026-07-09 | 2026-07-09 | compounder | core |
 | CPT | CPT/ | Camden Property Trust | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CRCL | CRCL/ | Circle Internet Group, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| CRL | CRL/ | Charles River Laboratories | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CSGP | CSGP/ | CoStar Group | US | 2026-07-09 | 2026-07-09 | platform | watch |
 | CSU | CSU/ | Constellation Software | CA | 2026-07-09 | 2026-07-09 | compounder | core |
 | CSU.DB | CSU.DB/ | Constellation Software Inc. (Series 1 Debentures) | CA | — | 2026-07-09 | unknown | watch |
 | CVNA | CVNA/ | Carvana | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| CVX | CVX/ | Chevron Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | DB1.DE | DB1.DE/ | Deutsche Boerse AG | EU | 2026-07-09 | 2026-07-09 | unknown | watch |
 | DHR | DHR/ | Danaher Corporation | US | 2026-07-09 | 2026-07-09 | compounder | hold |
 | DMLP | DMLP/ | Dorchester Minerals LP | US | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -219,6 +228,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | RYN | RYN/ | Rayonier, Inc. | US | 2026-07-09 | 2026-07-09 | optionality | watch |
 | S68.SI | S68.SI/ | Singapore Exchange Limited | EU | 2026-07-09 | 2026-07-09 | unknown | watch |
 | SBR | SBR/ | Sabine Royalty Trust | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| SCHW | SCHW/ | Charles Schwab Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | SHC | SHC/ | Sotera Health Company | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | SJT | SJT/ | San Juan Basin Royalty Trust | US | 2026-07-09 | 2026-07-09 | optionality | watch |
 | SMR | SMR/ | NuScale Power Corporation | US | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -248,4 +258,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 
-**241 holdings total.** Registry: `_system/portfolio/registry.json`
+**251 holdings total.** Registry: `_system/portfolio/registry.json`
