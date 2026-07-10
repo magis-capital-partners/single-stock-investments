@@ -7,7 +7,7 @@
 ## Research book stress
 - Stale dive share: 0%
 - Open falsifiers: 0
-- Human review pending: 17
+- Human review pending: 41
 
 ## External risk (ls-algo / MAGIS)
 - Gross exposure % NAV: 4.532908458844346
