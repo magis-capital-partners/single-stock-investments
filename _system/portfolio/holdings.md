@@ -62,6 +62,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | ASX.AX | ASX.AX/ | ASX Limited | AU | 2026-07-09 | 2026-07-09 | unknown | watch |
 | ATO | ATO/ | Atmos Energy | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | AVB | AVB/ | AvalonBay Communities | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| AVGO | AVGO/ | Broadcom | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | AVY | AVY/ | Avery Dennison | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | AWK | AWK/ | American Water Works | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | AXON | AXON/ | Axon Enterprise, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -76,26 +77,35 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | BAX | BAX/ | Baxter International | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | BBY | BBY/ | Best Buy | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | BDX | BDX/ | Becton Dickinson | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| BF.B | BF.B/ | Brown–Forman | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| BG | BG/ | Bunge Global | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | BIIB | BIIB/ | Biogen | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | BKNG | BKNG/ | Booking Holdings | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | BKR | BKR/ | Baker Hughes | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | BKRB | BKRB/ | Berkshire Hathaway Inc. (Class B) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| BLDR | BLDR/ | Builders FirstSource | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | BLK | BLK/ | BlackRock | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| BMY | BMY/ | Bristol Myers Squibb | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | BMYS.KL | BMYS.KL/ | Bursa Malaysia Berhad | EU | 2026-07-09 | 2026-07-09 | unknown | watch |
 | BN | BN/ | Brookfield Corporation | US | 2026-07-09 | 2026-07-09 | platform | hold |
 | BNY | BNY/ | BNY Mellon | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | BOLSAA.MX | BOLSAA.MX/ | Bolsa Mexicana de Valores SAB de CV | EU | 2026-07-09 | 2026-07-09 | unknown | watch |
+| BR | BR/ | Broadridge Financial Solutions | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | BRBR | BRBR/ | BellRing Brands, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | BRK.B | BRK.B/ | Berkshire Hathaway | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| BRO | BRO/ | Brown & Brown | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | BSM | BSM/ | Black Stone Minerals LP | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| BSX | BSX/ | Boston Scientific | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | BUR | BUR/ | Burford Capital Limited | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | BVERS | BVERS/ | Beaver Coal Company, Limited | OTC | 2026-07-09 | 2026-07-09 | optionality | watch |
 | BWEL | BWEL/ | J.G. Boswell Company | US | 2026-07-09 | 2026-07-09 | optionality | watch |
 | BX | BX/ | Blackstone Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| BXP | BXP/ | BXP, Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | BYMA | BYMA/ | Bolsas y Mercados Argentinos S.A. | EU | 2026-07-09 | 2026-07-09 | unknown | watch |
 | CBOE | CBOE/ | Cboe Global Markets | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | CBRS | CBRS/ | Cerebras Systems | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | CDZI | CDZI/ | Cadiz Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| CHRW | CHRW/ | C.H. Robinson | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CHTR | CHTR/ | Charter Communications, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | CKX | CKX/ | CKX Lands, Inc. | US | 2026-07-09 | 2026-07-09 | optionality | watch |
 | CME | CME/ | CME Group Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -228,4 +238,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 
-**221 holdings total.** Registry: `_system/portfolio/registry.json`
+**231 holdings total.** Registry: `_system/portfolio/registry.json`
