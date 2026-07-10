@@ -1,0 +1,113 @@
+{
+  "ticker": "WSM",
+  "as_of": "2026-07-10",
+  "method": "full",
+  "irr_method": "full",
+  "lawrence_bucket": "pricing_power",
+  "valuation_mode": "operating",
+  "classification_inputs": {
+    "archetype": "compounder",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating",
+    "predictive_attribute": "none"
+  },
+  "inputs": {
+    "price": 217.06,
+    "price_source": "Williams-Sonoma IR stock quote 2026-07-08 (pre-mechanical refresh; marvin_cloud_refresh updates spot)",
+    "price_as_of": "2026-07-10",
+    "fcf_per_share": 8.57,
+    "fcf_source": "FY2025 cash from operations $1,314.9M minus capital spending $259.4M = $1,055.5M free cash flow divided by 123.2M diluted weighted-average shares (10-K filed 2026-03-26, fiscal year ended 2026-02-01)",
+    "shares_millions": 123.2,
+    "shares_source": "FY2025 weighted average diluted shares (10-K FY2025)",
+    "dividend_per_share_annual": 2.64,
+    "dividend_source": "Cash dividends declared $2.64 per share in fiscal 2025; quarterly dividend raised 15% in March 2026 (10-K, 8-K 2026-03-18)",
+    "revenue_fy2025_b": 7.807,
+    "net_earnings_fy2025_b": 1.088,
+    "comp_sales_fy2025_pct": 3.5,
+    "long_term_debt_b": 0.0,
+    "normalization_note": "Lawrence base uses FY2025 filed free cash flow. FY2025 included one fewer week versus fiscal 2024 (~$117M revenue headwind per 10-K). Q1 FY2026 company comparable brand revenue +4.8% on net revenue +4.4%; not used as FCF starting point."
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.01,
+      "growth_y6_10": 0.01,
+      "exit_pfcf_y10": 16,
+      "notes": "Housing and discretionary spend soften; brand comps turn negative; tariff and freight pressure on gross margin; buybacks slow as comps weaken"
+    },
+    "base": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.025,
+      "exit_pfcf_y10": 20,
+      "notes": "Mid-single-digit company comp on omnichannel strength; Pottery Barn and West Elm grow modestly; continued buybacks and dividend; operating margin ~18%"
+    },
+    "bull": {
+      "growth_y1_5": 0.05,
+      "growth_y6_10": 0.035,
+      "exit_pfcf_y10": 22,
+      "notes": "Sustained furniture and kitchen momentum (Williams Sonoma +6.9% FY2025 brand comp); e-commerce mix stays above 65%; aggressive capital return continues"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Retail inventory, leased stores, and distribution assets at GAAP; no land NAV misstatement (10-K FY2025)"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating omnichannel home retailer; no resource royalty"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "All reportable brand segments profitable; operating income $1.416B FY2025 (10-K segment note)"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / embedded product option in revenue path?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Business-to-business and franchise revenues embedded in brand segments; The Key Rewards loyalty program drives repeat purchase (10-K)"
+    },
+    {
+      "q": 5,
+      "question": "Private stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No material private equity stakes on balance sheet (10-K)"
+    },
+    {
+      "q": 6,
+      "question": "Transitory legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating compounder; no dated litigation recovery"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option already in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Emerging brands Rejuvenation, Mark and Graham, GreenRow flow through All Other segment revenue; modeled via growth not separate terminal (10-K)"
+    }
+  ],
+  "stance_proposal": {
+    "suggested": "watch",
+    "rationale": "Mechanical Lawrence synthesis below 15% hurdle at premium multiple on FY2025 owner cash despite strong comp trends and capital return"
+  },
+  "growth_explanation": {
+    "mechanism": "Company comparable brand revenue growth from omnichannel furniture, kitchen, and collaboration assortments across Pottery Barn, West Elm, and Williams Sonoma; partially offset by store closures and franchise revenue decline.",
+    "filing_anchor": "FY2025 company comp +3.5%; Q1 FY2026 company comp +4.8% (10-K FY2025, Q1 FY2026 10-Q)",
+    "bear_trigger": "Housing turnover and tariff-driven gross margin compression push brand comps negative for four quarters.",
+    "bull_trigger": "Sustained furniture cycle and Williams Sonoma kitchen strength lift company comp above 5% while buybacks shrink share count 3%+ annually."
+  }
+}
