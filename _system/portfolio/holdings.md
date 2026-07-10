@@ -165,29 +165,37 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | CVX | CVX/ | Chevron Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | D | D/ | Dominion Energy | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | DAL | DAL/ | Delta Air Lines | US | 2026-07-09 | 2026-07-10 | unknown | watch |
-| DASH | DASH/ | DoorDash | US | — | — | unknown | watch |
+| DASH | DASH/ | DoorDash | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | DB1.DE | DB1.DE/ | Deutsche Boerse AG | EU | 2026-07-09 | 2026-07-09 | unknown | watch |
+| DD | DD/ | DuPont | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | DDOG | DDOG/ | Datadog | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | DE | DE/ | Deere & Company | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | DECK | DECK/ | Deckers Brands | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | DELL | DELL/ | Dell Technologies | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | DG | DG/ | Dollar General | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| DHI | DHI/ | D. R. Horton | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | DHR | DHR/ | Danaher Corporation | US | 2026-07-09 | 2026-07-09 | compounder | hold |
 | DLR | DLR/ | Digital Realty | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | DLTR | DLTR/ | Dollar Tree | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | DMLP | DMLP/ | Dorchester Minerals LP | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| DOV | DOV/ | Dover Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| DOW | DOW/ | Dow Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | DPZ | DPZ/ | Domino's | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | DRI | DRI/ | Darden Restaurants | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | DRR.AX | DRR.AX/ | Deterra Royalties Limited | AU | 2026-06-02 | 2026-07-09 | unknown | watch |
+| DTE | DTE/ | DTE Energy | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| DUK | DUK/ | Duke Energy | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | DVA | DVA/ | DaVita | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | DVN | DVN/ | Devon Energy | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | DXCM | DXCM/ | Dexcom | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| EBAY | EBAY/ | eBay Inc. | US | — | — | unknown | watch |
 | ECHO | ECHO/ | EchoStar Corporation | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | ED | ED/ | Consolidated Edison | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | EFOR | EFOR/ | Everforth, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | ENPH | ENPH/ | Enphase Energy, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | ENX.PA | ENX.PA/ | Euronext N.V. | EU | 2026-07-09 | 2026-07-09 | unknown | watch |
 | EQPT | EQPT/ | EquipmentShare.com Inc | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| ETN | ETN/ | Eaton Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ETOR | ETOR/ | eToro Group Ltd. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | EVR | EVR/ | Evolve Royalties Ltd | CA | 2026-06-11 | 2026-07-09 | unknown | watch |
 | FANG | FANG/ | Diamondback Energy | US | 2026-07-09 | 2026-07-10 | unknown | watch |
@@ -306,4 +314,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 
-**299 holdings total.** Registry: `_system/portfolio/registry.json`
+**307 holdings total.** Registry: `_system/portfolio/registry.json`
