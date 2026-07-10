@@ -130,7 +130,7 @@ def write_manifest(batch_id: str, rows: list[dict]) -> Path:
 
 
 def git_push_batch() -> int:
-    stash = subprocess.run(["git", "stash", "push", "-m", "sp500-onboard-wip"], cwd=ROOT)
+    stash = subprocess.run(["git", "stash", "push", "-u", "-m", "sp500-onboard-wip"], cwd=ROOT)
     pull = subprocess.run(["git", "pull", "--rebase", "origin", "main"], cwd=ROOT)
     if pull.returncode != 0:
         if stash.returncode == 0:
