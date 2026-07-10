@@ -22,7 +22,16 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
+      - name: Mark draft PR ready (Cursor cloud agent opens drafts)
+        if: github.event.pull_request.draft == true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr ready "${{ github.event.pull_request.number }}" \
+            --repo "${{ github.repository }}"
+
       - name: Wait for research quality checks
+        if: github.event.pull_request.draft == false
         uses: lewagon/wait-on-check-action@v1.3.4
         with:
           ref: ${{ github.event.pull_request.head.sha }}
@@ -32,6 +41,7 @@ jobs:
           allowed-conclusions: success,skipped
 
       - name: Squash merge and delete branch
+        if: github.event.pull_request.draft == false
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -41,5 +51,6 @@ jobs:
             --delete-branch
 
       - name: Summary
+        if: github.event.pull_request.draft == false
         run: |
           echo "Merged PR #${{ github.event.pull_request.number }} (${{ github.head_ref }}) into main."
