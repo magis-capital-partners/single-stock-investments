@@ -139,7 +139,12 @@ def discard_onboard_noise() -> None:
         if len(line) < 4 or line[:2] not in {" M", "MM", "AM"}:
             continue
         path = line[3:].strip()
-        if path.endswith("INDEX.csv") or path.startswith("dashboard/data/"):
+        if (
+            path.endswith("INDEX.csv")
+            or path.startswith("dashboard/data/")
+            or path == "_system/portfolio/classification.json"
+            or path == "_system/scripts/us_ticker_config.json"
+        ):
             subprocess.run(["git", "restore", "--staged", "--worktree", path], cwd=ROOT)
 
 
@@ -148,20 +153,8 @@ def git_push_batch() -> int:
     push = subprocess.run(["git", "push", "origin", "main"], cwd=ROOT)
     if push.returncode == 0:
         return 0
-    stash = subprocess.run(
-        [
-            "git",
-            "stash",
-            "push",
-            "-u",
-            "-m",
-            "sp500-onboard-wip",
-            "--",
-            ".",
-            f":!{LOOP_LOG.relative_to(ROOT).as_posix()}",
-        ],
-        cwd=ROOT,
-    )
+    # Log file is gitignored; plain -u stash works on Windows (pathspec :! breaks).
+    stash = subprocess.run(["git", "stash", "push", "-u", "-m", "sp500-onboard-wip"], cwd=ROOT)
     pull = subprocess.run(["git", "pull", "--rebase", "origin", "main"], cwd=ROOT)
     if pull.returncode != 0:
         if stash.returncode == 0:
