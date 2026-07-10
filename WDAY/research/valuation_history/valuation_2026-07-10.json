@@ -1,0 +1,255 @@
+{
+  "ticker": "WDAY",
+  "as_of": "2026-07-10",
+  "method": "full",
+  "lawrence_bucket": "pricing_power",
+  "classification_inputs": {
+    "archetype": "compounder",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 230.0,
+    "price_source": "Yahoo WDAY close 2026-07-09 (pending mechanical refresh)",
+    "fcf_per_share": 10.36,
+    "fcf_source": "FY2026 (ended 2026-01-31): cash from operations $2,939M minus capital spending $162M, divided by 268.1M diluted shares (10-K FY2026)",
+    "shares_millions": 268.1,
+    "normalization_note": "Lawrence uses reported free cash flow; stock-based compensation $1,626M is already a non-cash add-back in cash from operations",
+    "price_as_of": "2026-07-09"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.06,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 22,
+      "notes": "HCM/finance competition from Oracle and SAP caps net-new logos; operating margin stalls near 8%; multiple compresses"
+    },
+    "base": {
+      "growth_y1_5": 0.1,
+      "growth_y6_10": 0.06,
+      "exit_pfcf_y10": 25,
+      "notes": "RPO $28.1B supports double-digit subscription growth; Illuminate AI embedded in renewals; buybacks offset dilution"
+    },
+    "bull": {
+      "growth_y1_5": 0.13,
+      "growth_y6_10": 0.08,
+      "exit_pfcf_y10": 28,
+      "notes": "AI upsell lifts ARPU; finance cloud share gains versus legacy ERP; sustained $2B+ annual repurchases"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Asset-light subscription software; equity investments $924M at fair value (10-K FY2026)"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / RPO not in FCF path?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "RPO $28.1B; ~31% expected within 12 months \u2014 modeled via subscription growth, not separate terminal (10-K FY2026)"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No material drag",
+      "treatment": "n/a",
+      "evidence": "Single profitable operating segment; consolidated operating margin 7.5% FY2026, expanding"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "Yes (Illuminate AI / agent platform)",
+      "treatment": "embedded_in_segment",
+      "evidence": "AI features embedded in HCM and Financials renewals \u2014 growth in base scenario"
+    },
+    {
+      "q": 0,
+      "question": "Material separate options after scan?",
+      "answer": "No dated NAV or binary bets",
+      "treatment": "n/a",
+      "evidence": "Acquisition intangibles ($681M) amortize in segment; no disclosed fair-value marks on in-business AI options"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "Subscription RPO ($28.1B) converts to recognized revenue; HCM and Financial Management upsell on unified data model; Illuminate AI and platform extensions raise renewal rates; capital returns via buybacks",
+    "source": "10-K FY2026; Q1 FY2027 revenue +13.5% YoY",
+    "falsifiers": [
+      {
+        "id": "rpo_deceleration",
+        "observation": "RPO growth falls below subscription revenue growth for two consecutive quarters",
+        "action": "Cut growth years 1-5 toward bear 6%"
+      },
+      {
+        "id": "margin_stall",
+        "observation": "Operating margin fails to expand despite revenue growth in two consecutive 10-Q filings",
+        "action": "Cap exit multiple at 22x; downgrade moat to eroding"
+      }
+    ],
+    "lawrence_legacy": {
+      "y1_5": 0.1,
+      "y6_10": 0.06,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.1,
+      "y6_10": 0.06,
+      "exit_pfcf_y10": 25.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": 0.1309,
+      "as_of_filing_facts": "evidence/_text/10-K_20260306_rpt20260131_acc0001327811_26_000014.htm.txt"
+    },
+    "status": "partial"
+  },
+  "stance_proposal": {
+    "suggested": "hold",
+    "irr_band": "15\u201320%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "lawrence_horizon_years": 7,
+  "human_review": {
+    "live_price_confirmed": false
+  },
+  "total_return_panel": {
+    "as_of": "2026-07-10",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 0,
+    "distribution_history_sum": 0,
+    "market_cap_m": null,
+    "total_return_annualized_pct": 7.88,
+    "chart": "WDAY/research/charts/total_return_2026-07-10.svg",
+    "panel_json": "WDAY/research/total_return_panel.json"
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 10.1
+    },
+    "base": {
+      "return_pct": 15.5
+    },
+    "bull": {
+      "return_pct": 20.0
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 10.1
+    },
+    "base": {
+      "return_pct": 15.5
+    },
+    "bull": {
+      "return_pct": 20.0
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": 15.5
+    },
+    "falsifier_adjusted": {
+      "return_pct": 15.5
+    }
+  },
+  "implied_return": {
+    "base_pct": 16.38,
+    "label": "7yr IRR (total synthesis)",
+    "display": "16.38% (total synthesis)",
+    "lawrence_stance_gate_pct": 15.5,
+    "falsifier_adjusted_pct": 15.5,
+    "synthesis_pct": 16.38
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Growth theory (pre-falsifier)",
+        "source": "growth_explanation + filing revenue YoY",
+        "return_pct": 15.5,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": 10.1,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 20.0,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 16.58,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 16.38,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}
