@@ -292,7 +292,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | HEE | HEE/ | Hellenic Exchanges - Athens Stock Exchange S.A. | EU | 2026-07-09 | 2026-07-09 | unknown | watch |
 | HEI.A | HEI.A/ | HEICO Corporation (Class A) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | HIG | HIG/ | Hartford (The) | US | 2026-07-10 | 2026-07-10 | unknown | watch |
-| HII | HII/ | Huntington Ingalls Industries | US | — | — | unknown | watch |
+| HII | HII/ | Huntington Ingalls Industries | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | HKHC | HKHC/ | Horizon Kinetics Holding Corporation | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | HL | HL/ | Hecla Mining Company | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | HLT | HLT/ | Hilton Worldwide | US | 2026-07-10 | 2026-07-10 | unknown | watch |
@@ -308,12 +308,19 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | HUBB | HUBB/ | Hubbell Incorporated | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | HUM | HUM/ | Humana | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | HWM | HWM/ | Howmet Aerospace | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| IBM | IBM/ | IBM | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | ICE | ICE/ | Intercontinental Exchange | US | 2026-07-09 | 2026-07-09 | croupier | hold |
 | IDA.AX | IDA.AX/ | Indiana Resources Limited | AU | 2026-07-09 | 2026-07-09 | unknown | watch |
+| IDXX | IDXX/ | Idexx Laboratories | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| IEX | IEX/ | IDEX Corporation | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | IEX.NS | IEX.NS/ | Indian Energy Exchange Limited | IN | 2026-07-09 | 2026-07-09 | unknown | watch |
+| INCY | INCY/ | Incyte | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| INTC | INTC/ | Intel | US | — | — | unknown | watch |
 | INV | INV/ | Innovex International, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | IPCXR | IPCXR/ | Inflection Point Acquisition Corp. II (Rights) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| IR | IR/ | Ingersoll Rand | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | IT | IT/ | Gartner | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| ITW | ITW/ | Illinois Tool Works | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | JL80.DE | JL80.DE/ | Norconsult ASA | EU | — | 2026-07-09 | unknown | watch |
 | JPM | JPM/ | JPMorgan Chase & Co. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | KEWL | KEWL/ | Keweenaw Land Association | US | 2026-07-09 | 2026-07-09 | optionality | watch |
@@ -350,6 +357,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | PCH | PCH/ | PotlatchDeltic Corporation | US | 2026-07-09 | 2026-07-09 | optionality | watch |
 | PCYO | PCYO/ | Pure Cycle Corporation | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | PDER | PDER/ | Pardee Resources Company | OTC | 2026-07-09 | 2026-07-09 | optionality | watch |
+| PODD | PODD/ | Insulet Corporation | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | POST | POST/ | Post Holdings, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | PRVL.CVR | PRVL.CVR/ | Prevail Therapeutics CVR (Eli Lilly acquisition) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | PSE | PSE/ | Philippine Stock Exchange Inc. | EU | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -394,4 +402,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 
-**387 holdings total.** Registry: `_system/portfolio/registry.json`
+**395 holdings total.** Registry: `_system/portfolio/registry.json`
