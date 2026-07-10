@@ -455,10 +455,16 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | PCH | PCH/ | PotlatchDeltic Corporation | US | 2026-07-09 | 2026-07-09 | optionality | watch |
 | PCYO | PCYO/ | Pure Cycle Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | PDER | PDER/ | Pardee Resources Company | OTC | 2026-07-09 | 2026-07-09 | optionality | watch |
+| PEG | PEG/ | Public Service Enterprise Group | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | PEP | PEP/ | PepsiCo | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | PFE | PFE/ | Pfizer | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| PFG | PFG/ | Principal Financial Group | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| PG | PG/ | Procter & Gamble | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| PGR | PGR/ | Progressive Corporation | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | PH | PH/ | Parker Hannifin | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| PHM | PHM/ | PulteGroup | US | — | — | unknown | watch |
 | PKG | PKG/ | Packaging Corporation of America | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| PLD | PLD/ | Prologis | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | PLTR | PLTR/ | Palantir Technologies | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | PM | PM/ | Philip Morris International | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | PNC | PNC/ | PNC Financial Services | US | 2026-07-10 | 2026-07-10 | unknown | watch |
@@ -466,12 +472,16 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | PNW | PNW/ | Pinnacle West Capital | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | PODD | PODD/ | Insulet Corporation | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | POST | POST/ | Post Holdings, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
-| PPG | PPG/ | PPG Industries | US | — | — | unknown | watch |
+| PPG | PPG/ | PPG Industries | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| PPL | PPL/ | PPL Corporation | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| PRU | PRU/ | Prudential Financial | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | PRVL.CVR | PRVL.CVR/ | Prevail Therapeutics CVR (Eli Lilly acquisition) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| PSA | PSA/ | Public Storage | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | PSE | PSE/ | Philippine Stock Exchange Inc. | EU | 2026-07-09 | 2026-07-10 | unknown | watch |
 | PSK.TO | PSK.TO/ | PrairieSky Royalty Ltd. | CA | 2026-06-03 | 2026-07-09 | optionality | watch |
 | PSKY | PSKY/ | Paramount Skydance Corporation | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | PSX | PSX/ | Phillips 66 | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| PTC | PTC/ | PTC Inc. | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | PYPL | PYPL/ | PayPal | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | QDEL | QDEL/ | QuidelOrtho | US | 2026-07-09 | 2026-07-10 | turnaround | hold |
 | RDDT | RDDT/ | Reddit, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -514,4 +524,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 
-**507 holdings total.** Registry: `_system/portfolio/registry.json`
+**517 holdings total.** Registry: `_system/portfolio/registry.json`
