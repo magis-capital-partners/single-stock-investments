@@ -9,37 +9,39 @@
 
 ## Executive summary
 
-No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (10-K, 10-Q, IR). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+No third-party sources are indexed for ABT as of 2026-07-10. Marvin stance rests on **primary filings only** (FY2025 10-K, Q1 2026 10-Q, DEF 14A). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
 
-**Synthesis:** Marvin floor only; no external blend.
+**Synthesis:** Marvin floor only; no external blend. Base IRR and **watch** stance come from Lawrence owner-cash model on FY2025 filings (`valuation.json`).
 
 ## Sources in scope
 
-| (none) | Primary filings only | — | — | n/a |
+| ID | Title | Path | Status | Use |
+|----|-------|------|--------|-----|
+| (none) | Primary filings only | `ABT/investor-documents/sec-edgar/` | n/a | Marvin floor |
 
 ## Agreements (facts)
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| — | — | — | — |
+| — | — | — | No external sources indexed |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| — | — | — | — |
+| — | — | — | N/A until sources added |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | — | — | — |
+| Marvin floor | ~$4.23 FCF/sh FY2025 | 7yr model; see `valuation.json` | watch |
 | External (combined) | — | — | — |
-| **Blended best estimate** | **—** | **—** | **—** |
+| **Blended best estimate** | **Marvin floor** | **Same as Lawrence base** | **watch** |
 
-**Weights:** *[Document why]*
+**Weights:** 100% Marvin floor (no approved external).
 
-**Returns statement (blended):** *[One sentence; pending sources not in base IRR]*
+**Returns statement (blended):** Base annual return at today's price is below the 15% hold band; no external view changes that floor.
 
 ## [HUMAN REVIEW]
 
