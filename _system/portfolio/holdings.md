@@ -221,8 +221,14 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | EXE | EXE/ | Expand Energy | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | EXPD | EXPD/ | Expeditors International | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | EXPE | EXPE/ | Expedia Group | US | 2026-07-09 | 2026-07-10 | unknown | watch |
-| EXR | EXR/ | Extra Space Storage | US | — | — | unknown | watch |
+| EXR | EXR/ | Extra Space Storage | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | FANG | FANG/ | Diamondback Energy | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| FAST | FAST/ | Fastenal | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| FDS | FDS/ | FactSet | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| FDX | FDX/ | FedEx | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| FDXF | FDXF/ | FedEx Freight | US | — | — | unknown | watch |
+| FFIV | FFIV/ | F5, Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| FICO | FICO/ | Fair Isaac | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | FIHO12.MX | FIHO12.MX/ | FibraHotel (Concentradora Fibra Hotelera Mexicana) | EU | — | 2026-07-09 | unknown | watch |
 | FIX | FIX/ | Comfort Systems USA | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | FLUX | FLUX/ | Flux Power Holdings, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -233,6 +239,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | FNV | FNV/ | Franco-Nevada Corporation | US | 2026-07-09 | 2026-07-09 | optionality | watch |
 | FRMI | FRMI/ | Fermi Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | FRMO | FRMO/ | FRMO Corporation | US | 2026-07-09 | 2026-07-09 | holding_co | hold |
+| FRT | FRT/ | Federal Realty Investment Trust | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | FTRE | FTRE/ | Fortrea Holdings Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | GCCO | GCCO/ | Garden City Co. | OTC | 2026-07-09 | 2026-07-09 | optionality | watch |
 | GDRZF | GDRZF/ | Gold Reserve Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -334,8 +341,9 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | WPM | WPM/ | Wheaton Precious Metals Corp. | US | 2026-07-09 | 2026-07-09 | compounder | watch |
 | WRLC | WRLC/ | Windrock Land Company | OTC | 2026-07-09 | 2026-07-09 | optionality | watch |
 | X.TO | X.TO/ | TMX Group Limited | CA | 2026-07-09 | 2026-07-09 | unknown | watch |
+| XOM | XOM/ | ExxonMobil | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | XP | XP/ | XP Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 
-**331 holdings total.** Registry: `_system/portfolio/registry.json`
+**339 holdings total.** Registry: `_system/portfolio/registry.json`
