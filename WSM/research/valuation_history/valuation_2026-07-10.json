@@ -1,0 +1,266 @@
+{
+  "ticker": "WSM",
+  "as_of": "2026-07-10",
+  "method": "full",
+  "irr_method": "full",
+  "lawrence_bucket": "pricing_power",
+  "valuation_mode": "operating",
+  "classification_inputs": {
+    "archetype": "compounder",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating",
+    "predictive_attribute": "none"
+  },
+  "inputs": {
+    "price": 217.06,
+    "price_source": "Williams-Sonoma IR stock quote 2026-07-08 (pre-mechanical refresh; marvin_cloud_refresh updates spot)",
+    "price_as_of": "2026-07-10",
+    "fcf_per_share": 8.57,
+    "fcf_source": "FY2025 cash from operations $1,314.9M minus capital spending $259.4M = $1,055.5M free cash flow divided by 123.2M diluted weighted-average shares (10-K filed 2026-03-26, fiscal year ended 2026-02-01)",
+    "shares_millions": 123.2,
+    "shares_source": "FY2025 weighted average diluted shares (10-K FY2025)",
+    "dividend_per_share_annual": 2.64,
+    "dividend_source": "Cash dividends declared $2.64 per share in fiscal 2025; quarterly dividend raised 15% in March 2026 (10-K, 8-K 2026-03-18)",
+    "revenue_fy2025_b": 7.807,
+    "net_earnings_fy2025_b": 1.088,
+    "comp_sales_fy2025_pct": 3.5,
+    "long_term_debt_b": 0.0,
+    "normalization_note": "Lawrence base uses FY2025 filed free cash flow. FY2025 included one fewer week versus fiscal 2024 (~$117M revenue headwind per 10-K). Q1 FY2026 company comparable brand revenue +4.8% on net revenue +4.4%; not used as FCF starting point."
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.01,
+      "growth_y6_10": 0.01,
+      "exit_pfcf_y10": 16,
+      "notes": "Housing and discretionary spend soften; brand comps turn negative; tariff and freight pressure on gross margin; buybacks slow as comps weaken"
+    },
+    "base": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.025,
+      "exit_pfcf_y10": 20,
+      "notes": "Mid-single-digit company comp on omnichannel strength; Pottery Barn and West Elm grow modestly; continued buybacks and dividend; operating margin ~18%"
+    },
+    "bull": {
+      "growth_y1_5": 0.05,
+      "growth_y6_10": 0.035,
+      "exit_pfcf_y10": 22,
+      "notes": "Sustained furniture and kitchen momentum (Williams Sonoma +6.9% FY2025 brand comp); e-commerce mix stays above 65%; aggressive capital return continues"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Retail inventory, leased stores, and distribution assets at GAAP; no land NAV misstatement (10-K FY2025)"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating omnichannel home retailer; no resource royalty"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "All reportable brand segments profitable; operating income $1.416B FY2025 (10-K segment note)"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / embedded product option in revenue path?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Business-to-business and franchise revenues embedded in brand segments; The Key Rewards loyalty program drives repeat purchase (10-K)"
+    },
+    {
+      "q": 5,
+      "question": "Private stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No material private equity stakes on balance sheet (10-K)"
+    },
+    {
+      "q": 6,
+      "question": "Transitory legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating compounder; no dated litigation recovery"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option already in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Emerging brands Rejuvenation, Mark and Graham, GreenRow flow through All Other segment revenue; modeled via growth not separate terminal (10-K)"
+    }
+  ],
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "growth_explanation": {
+    "mechanism": "Company comparable brand revenue growth from omnichannel furniture, kitchen, and collaboration assortments across Pottery Barn, West Elm, and Williams Sonoma; partially offset by store closures and franchise revenue decline.",
+    "filing_anchor": "FY2025 company comp +3.5%; Q1 FY2026 company comp +4.8% (10-K FY2025, Q1 FY2026 10-Q)",
+    "bear_trigger": "Housing turnover and tariff-driven gross margin compression push brand comps negative for four quarters.",
+    "bull_trigger": "Sustained furniture cycle and Williams Sonoma kitchen strength lift company comp above 5% while buybacks shrink share count 3%+ annually.",
+    "lawrence_legacy": {
+      "y1_5": 0.03,
+      "y6_10": 0.025,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.03,
+      "y6_10": 0.025,
+      "exit_pfcf_y10": 20.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": 0.0124,
+      "as_of_filing_facts": "evidence/_text/10-K_20260326_rpt20260201_acc0000719955_26_000059.htm.txt"
+    },
+    "status": "partial"
+  },
+  "total_return_panel": {
+    "as_of": "2026-07-10",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 2.64,
+    "distribution_history_sum": 2.64,
+    "market_cap_m": null,
+    "total_return_annualized_pct": 15.18,
+    "chart": "WSM/research/charts/total_return_2026-07-10.svg",
+    "panel_json": "WSM/research/total_return_panel.json"
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -0.6
+    },
+    "base": {
+      "return_pct": 3.9
+    },
+    "bull": {
+      "return_pct": 6.9
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -0.6
+    },
+    "base": {
+      "return_pct": 3.9
+    },
+    "bull": {
+      "return_pct": 6.9
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": 3.9
+    },
+    "falsifier_adjusted": {
+      "return_pct": 3.9
+    }
+  },
+  "implied_return": {
+    "base_pct": 4.24,
+    "label": "7yr IRR (total synthesis)",
+    "display": "4.24% (total synthesis)",
+    "lawrence_stance_gate_pct": 3.9,
+    "falsifier_adjusted_pct": 3.9,
+    "synthesis_pct": 4.24
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Growth theory (pre-falsifier)",
+        "source": "growth_explanation + filing revenue YoY",
+        "return_pct": 3.9,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": -0.6,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 6.9,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 4.44,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 4.24,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}
