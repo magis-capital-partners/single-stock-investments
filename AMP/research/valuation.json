@@ -1,0 +1,139 @@
+{
+  "ticker": "AMP",
+  "as_of": "2026-07-10",
+  "method": "full",
+  "irr_method": "full",
+  "lawrence_bucket": "pricing_power",
+  "valuation_mode": "operating",
+  "classification_inputs": {
+    "archetype": "compounder",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": null,
+    "price_source": "pending marvin_cloud_refresh.py equity fetch",
+    "price_as_of": "2026-07-10",
+    "fcf_per_share": 39.29,
+    "fcf_source": "FY2025 adjusted operating earnings per diluted share $39.29; 98.2M diluted shares (Q4 2025 earnings release filed 2026-01-29)",
+    "shares_millions": 98.2,
+    "shares_source": "FY2025 weighted average diluted shares (Q4 2025 earnings release)",
+    "normalization_note": "Lawrence base uses company-adjusted operating earnings, not GAAP operating cash flow ($8.3B FY2025), which includes policyholder account and insurance liability movements. FY2025 return of capital to shareholders was $3.4B (88% of adjusted operating earnings)."
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 14,
+      "notes": "Equity market drawdown compresses fee-based revenue; advisor recruiting slows; multiple compression to ~14x owner earnings"
+    },
+    "base": {
+      "growth_y1_5": 0.06,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 18,
+      "notes": "Client assets +13% FY2025; wrap flows +9%; adjusted operating EPS +14%; advisor productivity +8% to $1.1M TTM"
+    },
+    "bull": {
+      "growth_y1_5": 0.08,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 22,
+      "notes": "Sustained wrap inflows near 7% annualized rate; asset management margin expansion; continued 80%+ capital return"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Insurance and separate-account assets are marked; equity is thin vs total assets by design (10-K FY2025)"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating wealth and asset management franchise"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Closed Blocks (long-term care, fixed annuities) drag in Corporate & Other; FY2025 LTC AO earnings $28M ex-unlocking (Q4 2025 release)"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / RPO not in FCF path?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Fee revenue tied to client assets and transactional activity, not contracted backlog"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No material private stake SOTP in filings"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No dated legal recovery catalyst"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue path?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "RiverSource annuities and protection products embedded in Advice & Wealth Management and Retirement & Protection flows (10-K)"
+    }
+  ],
+  "lawrence_horizon_years": 7,
+  "payoff_lens": "operating",
+  "growth_explanation": {
+    "mechanism": "Fee-based wrap and advisory revenue scales with $1.2T Advice & Wealth Management client assets and $670B wrap platform; Columbia Threadneedle asset management adds institutional and retail flows; spread income from bank and certificate company supplements fees.",
+    "source": "Q4 2025 earnings release (SEC exhibit q42025er.htm); 10-K FY2025 segment discussion",
+    "lawrence_legacy": {
+      "y1_5": 0.06,
+      "y6_10": 0.04,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.06,
+      "y6_10": 0.04,
+      "exit_pfcf_y10": 18.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": 0.055,
+      "as_of_filing_facts": "evidence/_text/10-K-A_20260312_rpt20251231_acc0000820027_26_000016.htm.txt"
+    },
+    "status": "partial"
+  },
+  "optionality_gate": {
+    "primary_metric": "lawrence_base",
+    "primary_label": "7yr IRR",
+    "primary_return_pct": null
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "human_review": {
+    "notes": [
+      "Owner cash uses adjusted operating earnings, not GAAP OCF; validate against next company FCF reconciliation",
+      "High ROE (53% adjusted) and 88% payout may justify premium multiple; Lawrence model uses conservative 18x year-10 exit",
+      "Market sensitivity: fee revenue tied to client asset levels and equity markets"
+    ],
+    "fcf_per_share": "pending_validation"
+  }
+}

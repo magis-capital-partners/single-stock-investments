@@ -6,24 +6,26 @@
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Archetype** (Stahl) | compounder |
+| **Moat** (Munger) | stable |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Cycle** | mid |
+| **MOI bucket** (legacy) | pricing_power |
+| **Payoff lens** | operating |
 
 ## One-line thesis
 
-Ameriprise Financial — thesis pending Marvin deep dive.
+Ameriprise is a high-ROE wealth and asset management compounder with **$1.2T** client assets and disciplined **80%+** capital return, but at spot the Lawrence IRR is below our **15%** hurdle — **watch** for a better entry.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest annual report (10-K-A FY2025)
+- [x] Read latest quarterly report (10-Q Q1 2026)
+- [x] Apply decision stack and option scan
+- [ ] Validate owner cash vs company FCF reconciliation when available
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-07-10; awaiting deep dive.
+- Owner cash uses adjusted operating earnings; GAAP OCF not used
+- Mechanical IRR and price sync pending `marvin_cloud_refresh.py`

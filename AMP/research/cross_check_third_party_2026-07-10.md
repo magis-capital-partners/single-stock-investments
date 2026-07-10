@@ -9,37 +9,42 @@
 
 ## Executive summary
 
-No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (10-K, 10-Q, IR). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+No third-party sources are indexed for AMP as of 2026-07-10. Marvin stance rests on **primary filings only** (10-K-A FY2025, Q1 2026 10-Q, DEF 14A 2026, Q4 2025 earnings release exhibit). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
 
-**Synthesis:** Marvin floor only; no external blend.
+**Synthesis:** Marvin floor only; no external blend. Base IRR and stance come from Lawrence model on adjusted operating earnings per share (**$39.29** FY2025) at mechanical price.
 
 ## Sources in scope
 
-| (none) | Primary filings only | — | — | n/a |
+| ID | Source | Type | Status | Reviewed |
+|----|--------|------|--------|----------|
+| — | Primary filings only | SEC | n/a | Yes |
 
 ## Agreements (facts)
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| — | — | — | — |
+| FY2025 adjusted operating EPS | $39.29 (+14% YoY) | — | Q4 2025 earnings release (`q42025er.htm`) |
+| Capital return | $3.4B (88% of AO earnings) | — | Q4 2025 earnings release |
+| AWM client assets | $1.2T (+13%) | — | Q4 2025 earnings release |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| — | — | — | — |
+| Owner cash metric | Adjusted operating EPS $39.29 | — | No external view to blend |
+| Stance | watch (sub-15% Lawrence IRR at spot) | — | Filings-only |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | — | — | — |
+| Marvin floor | $39.29/sh adjusted operating earnings | 7yr Lawrence full model | watch |
 | External (combined) | — | — | — |
-| **Blended best estimate** | **—** | **—** | **—** |
+| **Blended best estimate** | **Marvin floor only** | **Pending mechanical IRR** | **watch** |
 
-**Weights:** *[Document why]*
+**Weights:** 100% Marvin (no approved or pending third-party indexed)
 
-**Returns statement (blended):** *[One sentence; pending sources not in base IRR]*
+**Returns statement (blended):** At today's price, Marvin's base case implies a return below our 15% accumulate hurdle; stance **watch** pending price and mechanical IRR sync.
 
 ## [HUMAN REVIEW]
 
