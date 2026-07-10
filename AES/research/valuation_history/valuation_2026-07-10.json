@@ -19,7 +19,7 @@
     "shares_outstanding": 713137865,
     "shares_source": "AES/investor-documents/sec-edgar/10-Q_20260505_rpt20260331_acc0000874761_26_000120.htm",
     "fcf_per_share": 0.45,
-    "fcf_source": "Standalone reference only: FY2025 OCF $4.306B less capex $5.929B = negative owner cash; normalized $0.45/sh uses adj. EBITDA less maintenance capex [Assumption]; not stance gate while merger pending",
+    "fcf_source": "Standalone reference only: FY2025 OCF $4.306B less capex $5.929B = negative owner cash; normalized $0.45/sh uses adj. EBITDA less maintenance capex [Assumption] \u2014 not stance gate while merger pending",
     "adjusted_ebitda_bn": 2.89,
     "adjusted_ebitda_source": "FY2025 segment Adjusted EBITDA sum $2,890M (Renewables $932M, Utilities $863M, Energy Infrastructure $1,130M, New Energy Technologies $(35)M) per 10-K FY2025",
     "revenue_bn": 12.233,
@@ -28,17 +28,17 @@
     "merger_buyer": "GIP + EQT Infrastructure VI (Horizon Parent, L.P.)",
     "merger_announcement": "2026-03-01",
     "expected_close": "late 2026 or early 2027",
-    "normalization_note": "March 1, 2026 merger agreement at $15.00 cash supersedes standalone Lawrence path for stance gate. J.P. Morgan fairness range $11.31 to $16.39/sh (DEF 14A proxy materials, June 2026)."
+    "normalization_note": "March 1, 2026 merger agreement at $15.00 cash supersedes standalone Lawrence path for stance gate. J.P. Morgan fairness range $11.31\u2013$16.39/sh (DEF 14A proxy materials, June 2026)."
   },
   "scenarios": {
     "bear": {
-      "price": 14.73,
+      "price": 14.25,
       "payoff": 14.5,
       "years": 1.25,
       "notes": "Regulatory delay past June 2027 outside date; spread widens; partial deal risk"
     },
     "base": {
-      "price": 14.73,
+      "price": 14.25,
       "payoff": 15.0,
       "years": 0.75,
       "notes": "Merger closes late 2026 or early 2027 per 8-K 2026-03-02; $15.00 cash consideration",
@@ -47,9 +47,9 @@
           {
             "id": "book",
             "label": "GAAP book / price anchor",
-            "gaap_per_share": 14.73,
+            "gaap_per_share": 14.25,
             "uplift_per_share": 0.0,
-            "math": "Anchor $14.73/sh"
+            "math": "Anchor $14.25/sh"
           },
           {
             "id": "operating_path",
@@ -72,7 +72,7 @@
       }
     },
     "bull": {
-      "price": 14.73,
+      "price": 14.25,
       "payoff": 15.0,
       "years": 0.5,
       "notes": "Accelerated regulatory approvals; close by year-end 2026"
@@ -88,13 +88,13 @@
   },
   "catalyst_scenarios": {
     "merger_close": {
-      "price": 14.73,
+      "price": 14.25,
       "payoff": 15.0,
       "years": 0.75,
       "notes": "Primary event path; no go-shop period identified in merger agreement"
     },
     "deal_break": {
-      "price": 14.73,
+      "price": 14.25,
       "payoff": 11.0,
       "years": 0.25,
       "notes": "Bear sensitivity: buyer termination or regulatory failure; parent termination fee up to ~$588M [Assumption on equity impact]"
@@ -207,203 +207,5 @@
     "label": "annualized return",
     "display": "7.1% (base)"
   },
-  "overlay_results": [],
-  "context_overlay": {
-    "as_of": "2026-07-10",
-    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
-    "themes": [
-      {
-        "theme_id": "macro_regime",
-        "label": "Macro risk regime",
-        "indicators": [
-          {
-            "id": "hy_oas",
-            "label": "High-yield OAS credit spread (%)",
-            "latest": 0.59,
-            "as_of": "2026-07-09",
-            "yoy_pct": 209.3,
-            "direction": "up",
-            "good_for": "risk_regime",
-            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "ust_10y",
-            "label": "US Treasury 10Y yield (%)",
-            "latest": 4.539000034332275,
-            "as_of": "2026-07-09",
-            "yoy_pct": 4.5,
-            "direction": "up",
-            "good_for": "rates_regime",
-            "source": "yahoo:^TNX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "ust_2y",
-            "label": "US Treasury 2Y yield (%)",
-            "latest": 4.269000053405762,
-            "as_of": "2026-07-09",
-            "yoy_pct": 8.9,
-            "direction": "up",
-            "good_for": "rates_regime",
-            "source": "yahoo:^FVX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "dxy_broad",
-            "label": "Trade-weighted USD index (broad)",
-            "latest": 100.91799926757812,
-            "as_of": "2026-07-10",
-            "yoy_pct": 3.3,
-            "direction": "up",
-            "good_for": "dollar_regime",
-            "source": "yahoo:DX-Y.NYB",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "vix_level",
-            "label": "VIX index level",
-            "latest": 15.84000015258789,
-            "as_of": "2026-07-09",
-            "yoy_pct": -0.6,
-            "direction": "flat",
-            "good_for": "vol_regime",
-            "source": "yahoo:^VIX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "credit_impulse_1m",
-            "label": "HYG vs TLT 1-month return spread (%)",
-            "latest": 0.42,
-            "as_of": "2026-07-09",
-            "yoy_pct": 160.0,
-            "direction": "up",
-            "good_for": "credit_impulse",
-            "source": "spread:HYG-TLT:21d",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "spy_20d_realized_vol",
-            "label": "SPY 20-day realized vol (annualized %)",
-            "latest": 15.53,
-            "as_of": "2026-07-09",
-            "yoy_pct": 48.0,
-            "direction": "up",
-            "good_for": "equity_vol",
-            "source": "realized_vol:SPY:20d",
-            "stale": false,
-            "in_base_irr": false
-          }
-        ]
-      }
-    ]
-  },
-  "insider_signal": {
-    "as_of": "2026-07-10",
-    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
-    "in_base_irr": false,
-    "window_days": 365,
-    "ics": 0.0,
-    "band": "negligible",
-    "bull_case_support": "none",
-    "scenario_confidence": {
-      "priors": {
-        "bear": 0.2,
-        "base": 0.55,
-        "bull": 0.25
-      },
-      "tilted": {
-        "bear": 0.28,
-        "base": 0.47,
-        "bull": 0.25
-      },
-      "bull_delta": 0.0,
-      "bear_delta": 0.08,
-      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
-    },
-    "factors": {
-      "buy_score": 0.0,
-      "sell_score": -1.0,
-      "cluster_bonus": 0.0,
-      "net_buy_usd": 0,
-      "net_sell_usd": 217095203.79,
-      "price_today": 14.73
-    },
-    "top_buys": [],
-    "top_sells": [
-      {
-        "insider": "AES CORP",
-        "date": "2026-05-15",
-        "shares": 10066414,
-        "price": 21.0,
-        "value_usd": 211394694.0,
-        "is_10b5_1": false,
-        "contrib": -0.125
-      },
-      {
-        "insider": "Coughlin Stephen",
-        "date": "2026-02-24",
-        "shares": 1669,
-        "price": 16.27,
-        "value_usd": 27154.63,
-        "is_10b5_1": false,
-        "contrib": -0.101
-      },
-      {
-        "insider": "Coughlin Stephen",
-        "date": "2026-02-20",
-        "shares": 15425,
-        "price": 16.51,
-        "value_usd": 254666.75,
-        "is_10b5_1": false,
-        "contrib": -0.101
-      },
-      {
-        "insider": "Coughlin Stephen",
-        "date": "2026-02-20",
-        "shares": 4682,
-        "price": 16.51,
-        "value_usd": 77299.82,
-        "is_10b5_1": false,
-        "contrib": -0.101
-      },
-      {
-        "insider": "Coughlin Stephen",
-        "date": "2026-02-20",
-        "shares": 7073,
-        "price": 16.51,
-        "value_usd": 116775.23,
-        "is_10b5_1": false,
-        "contrib": -0.101
-      }
-    ],
-    "narrative_hooks": [],
-    "transaction_count": 56
-  },
-  "lens_consensus": {
-    "as_of": "2026-07-10",
-    "shared_inputs_ref": "valuation.json@2026-07-10",
-    "valuation_richness": 0.382,
-    "blended_return_pct": 5.38,
-    "band_pct": [
-      1.4,
-      8.05
-    ],
-    "weighted_median_pct": 7.1,
-    "median_mean_flag": false,
-    "stance": "watch",
-    "agreement_pct": 100,
-    "dissent_count": 0,
-    "lawrence_divergence": false,
-    "top_dissents": [],
-    "contributor_count": 7,
-    "in_base_irr": false,
-    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
-  }
+  "overlay_results": []
 }

@@ -1,6 +1,6 @@
 # AES — Investment Thesis
 
-**Last updated:** 2026-07-10
+**Last updated:** auto-sync
 
 ## Classification
 
@@ -11,12 +11,17 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | mid |
-| **MOI bucket** (legacy) | event |
+| **Implied 7yr IRR** (base) | 7.1% (base) |
+| **IRR method** | yield_curve |
+| **Lawrence bucket** | regulated_utility |
 | **Payoff lens** | event |
+| **MOI bucket** | pending |
+
+**Deep dive:** `AES/research/deep_dive_2026-07-10.md` (auto-sync)
 
 ## One-line thesis
 
-AES is a contracted renewables and U.S. utility platform with a **$15.00** cash take-private pending; at a tight spread to the deal price, merger-arb return is below our hurdle — **watch**.
+AES is a contracted renewables and U.S. utility platform with a **$15.00** cash take-private pending; at a tight spread to the deal price, merger-arb return is below our hurdle. **Watch**.
 
 ## Key questions
 
