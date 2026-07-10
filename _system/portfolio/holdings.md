@@ -178,6 +178,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | DGX | DGX/ | Quest Diagnostics | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | DHI | DHI/ | D. R. Horton | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | DHR | DHR/ | Danaher Corporation | US | 2026-07-09 | 2026-07-09 | compounder | hold |
+| DIS | DIS/ | Walt Disney Company (The) | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | DLR | DLR/ | Digital Realty | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | DLTR | DLTR/ | Dollar Tree | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | DMLP | DMLP/ | Dorchester Minerals LP | US | 2026-07-09 | 2026-07-10 | unknown | watch |
@@ -285,6 +286,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | GROY | GROY/ | Gold Royalty Corp. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | GS | GS/ | Goldman Sachs Group, Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | GTX | GTX/ | Garrett Motion Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| GWW | GWW/ | W. W. Grainger | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | HAL | HAL/ | Halliburton | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | HAS | HAS/ | Hasbro | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | HBAN | HBAN/ | Huntington Bancshares | US | 2026-07-10 | 2026-07-10 | unknown | watch |
@@ -591,22 +593,30 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | UPS | UPS/ | United Parcel Service | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | URI | URI/ | United Rentals | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | USB | USB/ | U.S. Bancorp | US | 2026-07-10 | 2026-07-10 | unknown | watch |
-| V | V/ | Visa Inc. | US | — | — | unknown | watch |
+| V | V/ | Visa Inc. | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | VEEV | VEEV/ | Veeva Systems | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | VICI | VICI/ | Vici Properties | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | VLO | VLO/ | Valero Energy | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | VLTO | VLTO/ | Veralto | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| VMC | VMC/ | Vulcan Materials Company | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | VOXR | VOXR/ | Vox Royalty Corp | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | VRSK | VRSK/ | Verisk Analytics | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | VRSN | VRSN/ | Verisign | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | VRT | VRT/ | Vertiv | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | VRTX | VRTX/ | Vertex Pharmaceuticals | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| VST | VST/ | Vistra Corp. | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | VTR | VTR/ | Ventas | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | VTRS | VTRS/ | Viatris Inc | US | 2026-07-09 | 2026-07-09 | turnaround | watch |
 | VZ | VZ/ | Verizon | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| WAB | WAB/ | Wabtec | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| WAT | WAT/ | Waters Corporation | US | — | — | unknown | watch |
+| WBD | WBD/ | Warner Bros. Discovery | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | WBI | WBI/ | WaterBridge Infrastructure | US | 2026-07-09 | 2026-07-10 | infrastructure | watch |
 | WEST | WEST/ | Westrock Coffee Company | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| WM | WM/ | Waste Management | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| WMT | WMT/ | Walmart | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | WPM | WPM/ | Wheaton Precious Metals Corp. | US | 2026-07-09 | 2026-07-09 | compounder | watch |
+| WRB | WRB/ | W. R. Berkley Corporation | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | WRLC | WRLC/ | Windrock Land Company | OTC | 2026-07-09 | 2026-07-09 | optionality | watch |
 | X.TO | X.TO/ | TMX Group Limited | CA | 2026-07-09 | 2026-07-10 | unknown | watch |
 | XOM | XOM/ | ExxonMobil | US | 2026-07-09 | 2026-07-10 | unknown | watch |
@@ -614,4 +624,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 
-**607 holdings total.** Registry: `_system/portfolio/registry.json`
+**617 holdings total.** Registry: `_system/portfolio/registry.json`
