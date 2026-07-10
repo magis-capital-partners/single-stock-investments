@@ -1,0 +1,45 @@
+name: Marvin PR automerge
+
+# Squash-merge Cursor cloud-agent deep dive PRs after research-quality CI passes.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+  checks: read
+
+concurrency:
+  group: marvin-automerge-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  automerge:
+    if: startsWith(github.head_ref, 'cursor/')
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Wait for research quality checks
+        uses: lewagon/wait-on-check-action@v1.3.4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 30
+          check-regexp: (cloud-prompt-sync|research-lint)
+          allowed-conclusions: success,skipped
+
+      - name: Squash merge and delete branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr merge "${{ github.event.pull_request.number }}" \
+            --repo "${{ github.repository }}" \
+            --squash \
+            --delete-branch
+
+      - name: Summary
+        run: |
+          echo "Merged PR #${{ github.event.pull_request.number }} (${{ github.head_ref }}) into main."
