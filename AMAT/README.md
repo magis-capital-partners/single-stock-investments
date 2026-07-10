@@ -1,4 +1,4 @@
-# Applied Materials (AMAT)
+# Applied Materials, Inc. (AMAT)
 
 **Ticker:** AMAT | **Market:** US
 **Last updated:** 2026-07-10
