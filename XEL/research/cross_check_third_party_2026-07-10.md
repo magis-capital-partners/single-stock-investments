@@ -1,57 +1,65 @@
 # XEL — Cross-Check: Third-Party Sources
 
-**Date:** 2026-07-10
-**Agent:** Marvin
-**Marvin dive:** `XEL/research/deep_dive_2026-07-10.md`
-**Source inventory:** `XEL/third-party-analyses/source_inventory_2026-07-10.md`
+**Date:** 2026-07-10  
+**Agent:** Marvin  
+**Marvin dive:** `XEL/research/deep_dive_2026-07-10.md`  
+**Source inventory:** `XEL/third-party-analyses/source_inventory_2026-07-10.md`  
 **Framework:** `_system/frameworks/third_party_cross_reference.md`, `external_view_blend.md`
-<!-- THIRD_PARTY_CROSS_CHECK_STUB -->
 
 ## Executive summary
 
-No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (10-K, 10-Q, IR). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+No third-party sources are indexed for XEL as of this scan. Marvin stance rests on **primary filings only** (FY2025 10-K, Q1 2026 10-Q, DEF 14A 2026). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
 
 **Synthesis:** Marvin floor only; no external blend.
 
 ## Sources in scope
 
-| (none) | Primary filings only | — | — | n/a |
+| Source | Type | Status | Material to base IRR? |
+|--------|------|--------|----------------------|
+| SEC filings (10-K, 10-Q, proxy) | Primary | reviewed | yes (sole input) |
+| Third-party inventory | scan | empty | no |
 
 ## Agreements (facts)
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| — | — | — | — |
+| FY2025 ongoing EPS | $3.80/sh | n/a | 10-K FY2025 Non-GAAP reconciliation |
+| Base capex 2026-2030 | $60B | n/a | 10-K capital forecast table |
+| Marshall wildfire charge | $287M (PSCo, Q3 2025) | n/a | 10-K Non-GAAP table |
+| 2026 ongoing EPS guidance | $4.04-$4.16 | n/a | 10-K earnings guidance |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| — | — | — | — |
+| Owner-cash anchor | Ongoing EPS $3.80 (ex-wildfire) | n/a | Filings-only; GAAP $3.42 not used in base |
+| Stance | watch (~6.5% synthesis at ~$80) | n/a | No external view to blend |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | — | — | — |
+| Marvin floor | $3.80/sh ongoing EPS | ~6.5% / 7yr (pending mechanical) | watch |
 | External (combined) | — | — | — |
-| **Blended best estimate** | **—** | **—** | **—** |
+| **Blended best estimate** | **$3.80/sh** | **~6.5% / 7yr** | **watch** |
 
-**Weights:** *[Document why]*
+**Weights:** 100% Marvin floor (no approved external sources).
 
-**Returns statement (blended):** *[One sentence; pending sources not in base IRR]*
+**Returns statement (blended):** At ~$80 per share, Marvin filings-only base case implies roughly **6.5% per year** over seven years on **$3.80** ongoing owner cash; stance **watch** pending mechanical refresh.
 
 ## [HUMAN REVIEW]
 
-- [ ] Every **approved** source reviewed against filings
+- [ ] Every **approved** source reviewed against filings (none indexed)
 - [ ] Every **pending** source cited with **[PENDING APPROVAL]** only
 - [ ] Blended estimate in `valuation.json` → `estimates.external[]` if material
 
 ## [PROPOSED MEMORY]
 
-- [PROPOSED COMPANY] XEL: third-party cross-check 2026-07-10
+- [PROPOSED COMPANY] XEL third-party cross-check 2026-07-10: filings-only floor; no indexed external sources.
 
 ## Primary sources cited
 
-1. `XEL/research/deep_dive_2026-07-10.md`
-2. `XEL/third-party-analyses/source_inventory_2026-07-10.md`
+1. `XEL/investor-documents/sec-edgar/10-K_20260225_rpt20251231_acc0000072903_26_000009.htm`
+2. `XEL/investor-documents/sec-edgar/10-Q_20260430_rpt20260331_acc0000072903_26_000073.htm`
+3. `XEL/research/deep_dive_2026-07-10.md`
+4. `XEL/third-party-analyses/source_inventory_2026-07-10.md`

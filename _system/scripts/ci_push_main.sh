@@ -32,6 +32,9 @@ is_regenerable_artifact() {
     _system/reference/data-sources/insights_record_archive.json)
       return 0
       ;;
+    _system/reference/market-data/returns/*.csv)
+      return 0
+      ;;
     *)
       return 1
       ;;
@@ -172,6 +175,16 @@ regenerate_portfolio_artifacts() {
   git add _system/portfolio/holdings.md _system/portfolio/classification.json _system/portfolio/us_ticker_config.json 2>/dev/null || true
 }
 
+regenerate_market_returns() {
+  if [ ! -f "_system/scripts/download_ira_research.py" ]; then
+    echo "::error::download_ira_research.py not found; cannot auto-resolve returns CSV conflicts."
+    return 1
+  fi
+  echo "Regenerating market returns CSVs to resolve rebase conflicts..."
+  "$PYTHON" _system/scripts/download_ira_research.py --tier A
+  git add _system/reference/market-data/returns/ 2>/dev/null || true
+}
+
 regenerate_conflicted_artifacts() {
   local conflicted file
   local needs_dashboard=0
@@ -180,6 +193,7 @@ regenerate_conflicted_artifacts() {
   local needs_indexes=0
   local needs_docs_index=0
   local needs_portfolio=0
+  local needs_market_returns=0
 
   conflicted=$(conflicted_files)
   prepare_conflicted_files_for_regeneration
@@ -207,9 +221,15 @@ regenerate_conflicted_artifacts() {
       _system/portfolio/holdings.md|_system/portfolio/classification.json|_system/portfolio/us_ticker_config.json)
         needs_portfolio=1
         ;;
+      _system/reference/market-data/returns/*.csv)
+        needs_market_returns=1
+        ;;
     esac
   done <<< "$conflicted"
 
+  if [ "$needs_market_returns" -eq 1 ]; then
+    regenerate_market_returns
+  fi
   if [ "$needs_indexes" -eq 1 ]; then
     regenerate_folder_indexes
   fi
