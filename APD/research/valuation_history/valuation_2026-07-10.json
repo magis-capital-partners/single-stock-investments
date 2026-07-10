@@ -1,0 +1,263 @@
+{
+  "ticker": "APD",
+  "as_of": "2026-07-10",
+  "method": "full",
+  "lawrence_bucket": "pricing_power",
+  "classification_inputs": {
+    "archetype": "infrastructure",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 296.75,
+    "price_source": "Yahoo APD close 2026-07-10",
+    "price_as_of": "2026-07-10",
+    "fcf_per_share": 8.62,
+    "fcf_source": "FY2025 cash from operations $3.26B less estimated maintenance capital spending $1.35B, divided by 222.7M diluted shares (10-K FY2025); GAAP FCF negative due to NEOM/JIGPC growth capex",
+    "shares_millions": 222.7,
+    "normalization_note": "Core industrial gases earn adjusted operating income $2.9B and adjusted diluted EPS $12.03; Lawrence base uses maintenance-level owner cash, not growth project spend or FY2025 $3.7B project-exit charges"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.03,
+      "exit_pfcf_y10": 17,
+      "notes": "Further clean-energy write-downs; merchant volumes soft; multiple compresses toward industrial peers"
+    },
+    "base": {
+      "growth_y1_5": 0.05,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 19,
+      "notes": "Core on-site/merchant oligopoly persists; project exits reduce growth capex drag; NEOM option not in base cash path"
+    },
+    "bull": {
+      "growth_y1_5": 0.07,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 22,
+      "notes": "NEOM hydrogen-ammonia ramps; pricing holds; capital discipline after Louisiana/Casa Grande exits"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial \u2014 large project VIE/JV stakes",
+      "treatment": "milestone_nav",
+      "evidence": "NEOM Green Hydrogen VIE; JIGPC 55% equity affiliate \u2014 fair value not fully marked in Lawrence base (10-K FY2025 Note 3, Note 26)"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant assets?",
+      "answer": "Yes \u2014 NEOM green hydrogen-ammonia complex",
+      "treatment": "probability_weighted",
+      "evidence": "Multi-billion-dollar NEOM facility under construction; 8-K 2026-06-30 project update \u2014 not in base owner cash"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Yes \u2014 corporate/clean-energy drag",
+      "treatment": "zero",
+      "treatment_rationale": "Louisiana, Casa Grande, World Energy exits; corporate operating loss $367M FY2025 \u2014 burden in GAAP, excluded from normalized base",
+      "evidence": "8-K 2026-06-26 up to $2.9B pre-tax charge; FY2025 business and asset actions $3.7B (10-K Note 5)"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF path?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "On-site take-or-pay and merchant contracts; financing revenue $1.14B FY2025 in Americas segment \u2014 modeled via core growth, not separate terminal"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "Yes \u2014 JIGPC joint venture",
+      "treatment": "milestone_nav",
+      "evidence": "55% JIGPC interest; $1.6B initial plus $908M follow-on investments (10-K segment note)"
+    },
+    {
+      "q": 0,
+      "question": "Material options after scan?",
+      "answer": "NEOM hydrogen option; core gases sufficient for Lawrence gate",
+      "treatment": "probability_weighted",
+      "evidence": "Option overlay separate from conservative Lawrence base; base uses maintenance owner cash only"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "Core industrial gases: on-site take-or-pay volumes plus merchant pricing (2% non-helium FY2025) and energy cost pass-through; growth capped by project-exit cycle and capital allocation reset",
+    "source": "10-K FY2025 MD&A; 10-Q Q2 FY2026 adjusted EPS +19% YoY",
+    "falsifiers": [
+      {
+        "id": "merchant_pricing_roll",
+        "observation": "Merchant pricing turns negative two consecutive fiscal years outside helium",
+        "action": "Cut growth years 1-5 toward bear 3%"
+      },
+      {
+        "id": "repeat_impairments",
+        "observation": "Additional multi-billion project charges beyond June 2026 Louisiana/Casa Grande exit",
+        "action": "Downgrade moat to eroding; cap exit multiple at 15x"
+      }
+    ],
+    "lawrence_legacy": {
+      "y1_5": 0.05,
+      "y6_10": 0.04,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.05,
+      "y6_10": 0.04,
+      "exit_pfcf_y10": 19.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": -0.0396,
+      "as_of_filing_facts": "evidence/_text/10-K_20251120_rpt20250930_acc0000002969_25_000055.htm.txt"
+    },
+    "status": "partial"
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "evidence_refresh": {
+    "synthesis_in_dive": true
+  },
+  "total_return_panel": {
+    "as_of": "2026-07-10",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 0,
+    "distribution_history_sum": 0,
+    "market_cap_m": null,
+    "total_return_annualized_pct": 9.74,
+    "chart": "APD/research/charts/total_return_2026-07-10.svg",
+    "panel_json": "APD/research/total_return_panel.json"
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -2.8
+    },
+    "base": {
+      "return_pct": 0.1
+    },
+    "bull": {
+      "return_pct": 3.6
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -2.8
+    },
+    "base": {
+      "return_pct": 0.1
+    },
+    "bull": {
+      "return_pct": 3.6
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": 0.1
+    },
+    "falsifier_adjusted": {
+      "return_pct": 0.1
+    }
+  },
+  "implied_return": {
+    "base_pct": 1.0,
+    "label": "7yr IRR (total synthesis)",
+    "display": "1.0% (total synthesis)",
+    "lawrence_stance_gate_pct": 0.1,
+    "falsifier_adjusted_pct": 0.1,
+    "synthesis_pct": 1.0
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Growth theory (pre-falsifier)",
+        "source": "growth_explanation + filing revenue YoY",
+        "return_pct": 0.1,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": -2.8,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 3.6,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 1.2,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 1.0,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}
