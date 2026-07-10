@@ -1,29 +1,25 @@
-# ZTS — Investment Thesis
+# ZTS — Zoetis
 
-**Last updated:** 2026-07-10
+**Last updated:** auto-sync
 
 ## Classification
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
-| **Stance** | watch |
-| **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Archetype** (Stahl) | compounder |
+| **Moat** (Munger) | stable |
+| **Dhando** (Pabrai) | partial |
+| **Stance** | hold |
+| **Cycle** | mid |
+| **Implied 7yr IRR** (base) | 17.18% (total synthesis) |
+| **IRR method** | full |
+| **Lawrence bucket** | pricing_power |
+| **Payoff lens** | operating |
+| **MOI bucket** | — |
 
-## One-line thesis
+**Deep dive:** `ZTS/research/deep_dive_2026-07-10.md` (auto-sync)
 
-Zoetis — thesis pending Marvin deep dive.
+**Thesis:** Global animal health leader; filing-grounded owner cash ~$5.14/sh; synthesis **17.2%** at ~$77 → stance **hold** ([HUMAN REVIEW] on leverage).
 
-## Key questions
+**Status:** First Marvin deep dive 2026-07-10.
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
-
-## [HUMAN REVIEW]
-
-- Onboarded 2026-07-10; awaiting deep dive.
