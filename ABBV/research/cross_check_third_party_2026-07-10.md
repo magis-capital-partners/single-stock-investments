@@ -9,37 +9,41 @@
 
 ## Executive summary
 
-No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (10-K, 10-Q, IR). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+No third-party sources are indexed for AbbVie as of 2026-07-10. Marvin stance rests on **primary filings only** (FY2025 10-K, Q1 2026 10-Q, 2026 proxy). Immunology transition (Skyrizi/Rinvoq replacing Humira) and owner cash of about **$10.05 per share** drive a **watch** stance at **~$250** (~**7%** base annual return), below the **15%** hurdle.
 
 **Synthesis:** Marvin floor only; no external blend.
 
 ## Sources in scope
 
-| (none) | Primary filings only | — | — | n/a |
+| ID | Source | Type | Status | Reviewed |
+|----|--------|------|--------|----------|
+| — | Primary filings only | SEC | n/a | yes |
 
 ## Agreements (facts)
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| — | — | — | — |
+| Immunology growth | Skyrizi +50% and Rinvoq +39% FY2025 net revenues | — | `10-K_20260220_rpt20251231` product table |
+| Humira cliff | Humira -49% FY2025; U.S. -57% to $3.1B | — | Same |
+| Owner cash | OCF $19.0B less capex $1.21B | — | FY2025 10-K cash flow |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| — | — | — | — |
+| — | — | — | No external view to blend |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | — | — | — |
+| Marvin floor | ~$10.05/sh owner cash | ~7% base over 7 years | watch |
 | External (combined) | — | — | — |
-| **Blended best estimate** | **—** | **—** | **—** |
+| **Blended best estimate** | **~$10.05/sh** | **~7%** | **watch** |
 
-**Weights:** *[Document why]*
+**Weights:** 100% Marvin (no approved third party)
 
-**Returns statement (blended):** *[One sentence; pending sources not in base IRR]*
+**Returns statement (blended):** At about **$250** per share, Marvin's filing-based base case implies about **7% per year**, below accumulate; stance **watch**.
 
 ## [HUMAN REVIEW]
 
