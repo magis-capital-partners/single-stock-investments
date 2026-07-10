@@ -551,15 +551,17 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | TAP | TAP/ | Molson Coors Beverage Company | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | TASE | TASE/ | Tel Aviv Stock Exchange Ltd. | EU | 2026-07-09 | 2026-07-09 | unknown | watch |
 | TBBK | TBBK/ | The Bancorp, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| TDG | TDG/ | TransDigm Group | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | TDY | TDY/ | Teledyne Technologies | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | TECH | TECH/ | Bio-Techne | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | TEL | TEL/ | TE Connectivity | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | TEQ.ST | TEQ.ST/ | Teqnion AB | SE | 2026-07-09 | 2026-07-09 | serial_acquirer | hold |
 | TER | TER/ | Teradyne | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| TFC | TFC/ | Truist Financial | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | TFPM | TFPM/ | Triple Flag Precious Metals Corp. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | TGT | TGT/ | Target Corporation | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | TJX | TJX/ | TJX Companies | US | 2026-07-10 | 2026-07-10 | unknown | watch |
-| TKO | TKO/ | TKO Group Holdings | US | — | — | unknown | watch |
+| TKO | TKO/ | TKO Group Holdings | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | TMO | TMO/ | Thermo Fisher Scientific | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | TMUS | TMUS/ | T-Mobile US | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | TOI | TOI/ | The Oncology Institute, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -567,11 +569,19 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | TPR | TPR/ | Tapestry, Inc. | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | TRC | TRC/ | Tejon Ranch Co. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | TRGP | TRGP/ | Targa Resources | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| TRMB | TRMB/ | Trimble Inc. | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | TROW | TROW/ | T. Rowe Price | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| TRV | TRV/ | Travelers Companies (The) | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| TSCO | TSCO/ | Tractor Supply | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | TSLA | TSLA/ | Tesla, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| TSN | TSN/ | Tyson Foods | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| TT | TT/ | Trane Technologies | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| TTD | TTD/ | Trade Desk (The) | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | TTWO | TTWO/ | Take-Two Interactive | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | TXN | TXN/ | Texas Instruments | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | TXT | TXT/ | Textron | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| TYL | TYL/ | Tyler Technologies | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| USB | USB/ | U.S. Bancorp | US | — | — | unknown | watch |
 | VOXR | VOXR/ | Vox Royalty Corp | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | VTRS | VTRS/ | Viatris Inc | US | 2026-07-09 | 2026-07-09 | turnaround | watch |
 | WBI | WBI/ | WaterBridge Infrastructure | US | 2026-07-09 | 2026-07-10 | infrastructure | watch |
@@ -584,4 +594,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 
-**577 holdings total.** Registry: `_system/portfolio/registry.json`
+**587 holdings total.** Registry: `_system/portfolio/registry.json`
