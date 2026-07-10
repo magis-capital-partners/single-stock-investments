@@ -1,0 +1,111 @@
+{
+  "ticker": "WDC",
+  "as_of": "2026-07-10",
+  "method": "full",
+  "lawrence_bucket": "low_cost",
+  "payoff_lens": "operating",
+  "classification_inputs": {
+    "archetype": "compounder",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "up"
+  },
+  "inputs": {
+    "price": 581.87,
+    "price_source": "Yahoo WDC close (fetch pending mechanical refresh)",
+    "price_as_of": "2026-07-09",
+    "fcf_per_share": 3.56,
+    "fcf_source": "FY2025 continuing OCF $1.691B minus capital spending $412M divided by 359M diluted shares (10-K FY2025 ended 2025-06-27)",
+    "shares_millions": 359,
+    "normalization_note": "Continuing HDD operations after SanDisk spin; 9M FY2026 annualized owner cash ~$8.6/sh flagged [HUMAN REVIEW] for cycle peak vs normalized base"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.02,
+      "growth_y6_10": 0.01,
+      "exit_pfcf_y10": 14,
+      "notes": "HDD shipment pause after cloud nearline build-out; pricing pressure in duopoly"
+    },
+    "base": {
+      "growth_y1_5": 0.06,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 18,
+      "notes": "Nearline exabyte growth moderates; margin holds on WDC+Seagate duopoly; buybacks continue"
+    },
+    "bull": {
+      "growth_y1_5": 0.10,
+      "growth_y6_10": 0.06,
+      "exit_pfcf_y10": 22,
+      "notes": "AI data-center nearline HDD demand sustains double-digit exabyte growth and pricing"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "28.8% retained Sandisk stake after flash spin-off (10-K FY2025); SNDK trades separately"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option already in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Cloud/nearline HDD demand in continuing revenue $9.52B FY2025 (+50.6% YoY)"
+    },
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Standard manufacturer balance sheet post-spin; no land/NAV misstatement"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF path?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "HDD sales recognized on shipment; no material deferred-revenue backlog"
+    }
+  ],
+  "nav_overlay": {
+    "options": [
+      {
+        "id": "sandisk_retained_stake",
+        "label": "28.8% retained Sandisk Corporation equity (post spin-off)",
+        "option_treatment": "probability_weighted",
+        "p_base": 0.7,
+        "base_terminal_value_bn": null,
+        "base_terminal_rationale": "Retained flash stake marked at fair value through earnings; not in Lawrence FCF₀ — overlay uses SNDK market cap × 28.8% with haircut for lock-up/tax",
+        "not_in_lawrence_base": true,
+        "evidence": "10-K FY2025 DiscontinuedOperationEquitySecuritiesFVNIOwnershipInterestInSharesAfterDisposal: 28.8%"
+      }
+    ]
+  },
+  "growth_explanation": {
+    "mechanism": "Cloud and AI data-center nearline HDD demand drives exabyte shipments and mix shift to higher-capacity drives; duopoly with Seagate supports pricing.",
+    "source": "10-K FY2025 continuing revenue +50.6% YoY; Q3 FY2026 9M revenue $9.17B vs $6.92B prior",
+    "stress": "Bear assumes nearline digestion and cyclical volume decline like prior HDD downcycles"
+  },
+  "evidence_refresh": {
+    "synthesis_in_dive": false
+  },
+  "lawrence_horizon_years": 7,
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "human_review": {
+    "live_price_confirmed": false,
+    "normalized_fcf_note": "9M FY2026 annualized owner cash ~$8.6/sh vs FY2025 $3.56/sh — confirm cycle normalization before stance change"
+  },
+  "estimates": {
+    "external": []
+  }
+}
