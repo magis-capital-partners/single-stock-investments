@@ -375,6 +375,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | LRCX | LRCX/ | Lam Research | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | LSEG | LSEG/ | London Stock Exchange Group | UK | 2026-07-09 | 2026-07-09 | unknown | watch |
 | LULU | LULU/ | Lululemon Athletica | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| LUV | LUV/ | Southwest Airlines | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | LVS | LVS/ | Las Vegas Sands | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | LYB | LYB/ | LyondellBasell | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | LYV | LYV/ | Live Nation Entertainment | US | 2026-07-10 | 2026-07-10 | unknown | watch |
@@ -514,23 +515,32 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | S68.SI | S68.SI/ | Singapore Exchange Limited | EU | 2026-07-09 | 2026-07-10 | unknown | watch |
 | SBAC | SBAC/ | SBA Communications | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | SBR | SBR/ | Sabine Royalty Trust | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| SBUX | SBUX/ | Starbucks | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | SCHW | SCHW/ | Charles Schwab Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | SHC | SHC/ | Sotera Health Company | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | SHW | SHW/ | Sherwin-Williams | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| SJM | SJM/ | J.M. Smucker Company (The) | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | SJT | SJT/ | San Juan Basin Royalty Trust | US | 2026-07-09 | 2026-07-10 | optionality | watch |
 | SLB | SLB/ | Schlumberger | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | SMR | SMR/ | NuScale Power Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| SNA | SNA/ | Snap-on | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | SNDK | SNDK/ | Sandisk | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | SNOW | SNOW/ | Snowflake Inc | US | 2026-07-09 | 2026-07-10 | platform | watch |
+| SO | SO/ | Southern Company | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | SOC | SOC/ | Sable Offshore Corp. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| SOLV | SOLV/ | Solventum | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | SPG | SPG/ | Simon Property Group | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | SPGI | SPGI/ | S&P Global | US | 2026-07-09 | 2026-07-10 | croupier | hold |
 | SRE | SRE/ | Sempra | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | SRPT | SRPT/ | Sarepta Therapeutics, Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | STHO | STHO/ | Star Holdings | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| STLD | STLD/ | Steel Dynamics | US | — | — | unknown | watch |
+| STT | STT/ | State Street Corporation | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | STX | STX/ | Seagate Technology | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | STZ | STZ/ | Constellation Brands | US | 2026-07-09 | 2026-07-10 | unknown | watch |
-| SWKS | SWKS/ | Skyworks Solutions | US | — | — | unknown | watch |
+| SW | SW/ | Smurfit Westrock | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| SWK | SWK/ | Stanley Black & Decker | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| SWKS | SWKS/ | Skyworks Solutions | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | T | T/ | AT&T | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | TAP | TAP/ | Molson Coors Beverage Company | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | TASE | TASE/ | Tel Aviv Stock Exchange Ltd. | EU | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -554,4 +564,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 
-**547 holdings total.** Registry: `_system/portfolio/registry.json`
+**557 holdings total.** Registry: `_system/portfolio/registry.json`
