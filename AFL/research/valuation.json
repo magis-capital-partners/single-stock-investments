@@ -1,0 +1,76 @@
+{
+  "ticker": "AFL",
+  "as_of": "2026-07-10",
+  "method": "full",
+  "lawrence_bucket": "pricing_power",
+  "classification_inputs": {
+    "archetype": "compounder",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 121.99,
+    "price_source": "Yahoo AFL close 2026-07-09 (fetch_equity_prices.py)",
+    "fcf_per_share": 5.85,
+    "fcf_source": "FY2025 operating income $3.44B plus normalized net investment income contribution, divided by ~535M diluted shares (10-K FY2025); bridges GAAP OCF $4.78/sh and operating income $6.44/sh",
+    "shares_millions": 534.6,
+    "normalization_note": "FY2025 GAAP net income fell to $3.65B (EPS $6.82) from $5.44B on investment marks; owner cash uses underwriting plus recurring investment spread, not peak 2024 GAAP earnings"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.025,
+      "exit_pfcf_y10": 15,
+      "notes": "Japan persistency pressure, yen headwind, multiple compresses toward mid-teens free cash flow multiple"
+    },
+    "base": {
+      "growth_y1_5": 0.05,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 18,
+      "notes": "Low-single-digit premium growth in Japan and U.S. worksite channel; investment portfolio supports mid-single-digit owner-cash growth"
+    },
+    "bull": {
+      "growth_y1_5": 0.06,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 20,
+      "notes": "U.S. supplemental penetration accelerates, Japan third-sector products grow, buybacks continue at premium multiple"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No separate land/NAV gap",
+      "treatment": "n/a",
+      "evidence": "Insurance assets and liabilities marked through investment portfolio; no historical-cost land floor issue"
+    },
+    {
+      "q": 4,
+      "question": "Investment portfolio spread not in owner-cash path?",
+      "answer": "Embedded",
+      "treatment": "embedded_in_segment",
+      "evidence": "Net investment income $4.08B in FY2025 revenues; normalized in starting owner cash per share"
+    },
+    {
+      "q": 0,
+      "question": "Material separate options after scan?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Supplemental insurance compounder; Lawrence full cash-flow path sufficient"
+    }
+  ],
+  "lawrence_horizon_years": 7,
+  "payoff_lens": "operating",
+  "growth_explanation": {
+    "mechanism": "Japan cancer and medical supplemental persistency plus U.S. worksite accident and hospital indemnity sales; owner cash grows with earned premium and net investment income on the $104B portfolio.",
+    "source": "10-K FY2025 segment revenues; Q1 2026 10-Q premium and investment income trends",
+    "lawrence_legacy": {
+      "y1_5": 0.05,
+      "y6_10": 0.04,
+      "return_pct": null
+    },
+    "status": "partial"
+  }
+}
