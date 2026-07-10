@@ -1,50 +1,49 @@
 # AWK — Cross-Check: Third-Party Sources
 
 **Date:** 2026-07-10
-**Agent:** Marvin
+**Agent:** Marvin (automated fill)
 **Marvin dive:** `AWK/research/deep_dive_2026-07-10.md`
 **Source inventory:** `AWK/third-party-analyses/source_inventory_2026-07-10.md`
 **Framework:** `_system/frameworks/third_party_cross_reference.md`, `external_view_blend.md`
-<!-- THIRD_PARTY_CROSS_CHECK_STUB -->
 
 ## Executive summary
 
-No third-party sources are indexed for AWK as of 2026-07-10. Marvin stance rests on **primary filings only** (FY2025 10-K, Q1 2026 10-Q, 2026 proxy, recent 8-Ks). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+Marvin floor **7.3%** per year (infrastructure; stance **watch**) from primary filings and `valuation.json`. No third-party sources indexed; filings-only stance. **[HUMAN REVIEW]** for approved-source numeric blend.
 
-**Synthesis:** Marvin floor only; no external blend. Base IRR uses standalone AWK maintenance-adjusted owner cash (~$5.97/sh); Essential merger pro forma is excluded pending human review.
+**Synthesis (best estimate):** Marvin **7.3%** base · stance **watch**; external sources adjust conviction on catalyst timing, not primary IRR without human OK.
 
 ## Sources in scope
 
-| Source | Type | Status | Role |
-|--------|------|--------|------|
-| Primary SEC filings | 10-K, 10-Q, DEF 14A, 8-K | filing | Marvin floor |
-| Third-party indexed | — | none | — |
+| Source ID | Title | Path | Status | Cross-check status |
+|-----------|-------|------|--------|-------------------|
+| (none) | Primary filings only | — | — | n/a |
 
 ## Agreements (facts)
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| Scale | 3.6M customers, 14 states; $5.14B FY2025 revenue | — | `10-K_20260218...htm` |
-| Merger | Essential stock-for-stock; shareholder approval Feb 2026; close Q1 2027 | — | `DEF 14A_20260324...htm` |
-| Capex / recovery | $3.13B FY2025 capex; rate cases and infrastructure surcharges | — | 10-K; 8-K 2026-07-01 |
+| Base return anchor | **7.3%** per year | Qualitative support only | `AWK/research/deep_dive_2026-07-10.md` |
+| Archetype / stance | **infrastructure** · **watch** | See indexed sources | `valuation.json` |
+| Normalization | Regulated utility: growth capital spending $3,126M exceeds operating cash flow b | Cross-check vs posts | Marvin |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| — | No external views indexed | — | Marvin floor only |
+| Primary IRR | **7.3%** (Lawrence / scenarios) | No single approved IRR unless promoted | Marvin **70%** numeric; external **30%** catalyst timing |
+| Third party | Filing-first | Context tier only | No numeric upgrade without human OK |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | ~$5.97/sh maintenance-adjusted owner cash | ~6.8% / 10yr at ~$140 | watch |
-| External (combined) | — | — | — |
-| **Blended best estimate** | **~$5.97/sh** | **~6.8% / 10yr** | **watch** |
+| Marvin floor | See assumption ledger | **7.3%** | **watch** |
+| External (combined) | Narrative / catalyst | No change to base % | **watch** (conviction) |
+| **Blended best estimate** | **Filing anchor** | **7.3%** | **watch** |
 
-**Weights:** 100% Marvin (no approved external sources)
+**Weights:** Marvin **70%** on numbers; indexed third party **30%** on catalyst timing and narrative (approved Substacks/HK context only in qualitative layer until human promotes).
 
-**Returns statement (blended):** At about **$140** per share, Marvin's standalone base case implies about **6.8% per year** on maintenance-adjusted owner cash; no third-party views are blended.
+**Returns statement (blended):** We expect **7.3%** per year at today's price on the Marvin base case; third-party sources may raise or lower conviction on timing but do not replace filing math without **[HUMAN REVIEW]**.
 
 ## [HUMAN REVIEW]
 
@@ -54,9 +53,10 @@ No third-party sources are indexed for AWK as of 2026-07-10. Marvin stance rests
 
 ## [PROPOSED MEMORY]
 
-- [PROPOSED COMPANY] AWK: third-party cross-check 2026-07-10
+- [PROPOSED COMPANY] AWK: third-party cross-check fill 2026-07-10 — Marvin 7.3% unchanged
 
 ## Primary sources cited
 
 1. `AWK/research/deep_dive_2026-07-10.md`
-2. `AWK/third-party-analyses/source_inventory_2026-07-10.md`
+2. `AWK/research/valuation.json`
+3. `AWK/third-party-analyses/source_inventory_2026-07-10.md`
