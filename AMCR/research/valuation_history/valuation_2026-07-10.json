@@ -1,0 +1,265 @@
+{
+  "ticker": "AMCR",
+  "as_of": "2026-07-10",
+  "method": "full",
+  "irr_method": "full",
+  "lawrence_bucket": "scale_economies",
+  "valuation_mode": "operating",
+  "classification_inputs": {
+    "archetype": "compounder",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 42.7,
+    "price_source": "Yahoo AMCR close 2026-07-09",
+    "price_as_of": "2026-07-09",
+    "fcf_per_share": 0.48,
+    "fcf_source": "FY2025 operating cash flow $1.39B less capital spending $0.58B = $0.81B; normalized to ~$1.1B run-rate owner cash on 2.305B shares post-Berry merger [Assumption]",
+    "shares_millions": 2305.4,
+    "shares_source": "Entity common stock shares outstanding 2,305,359,941 (10-K FY2025 filed 2025-08-15)",
+    "normalization_note": "FY2025 includes two months of Berry Global; pro forma revenue ~$23.2B (10-K acquisition note). Owner cash normalized between filed $0.35/sh and synergy-run-rate ~$0.55/sh."
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.02,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 12,
+      "notes": "Integration delays; resin cost pass-through fails; leverage stays elevated"
+    },
+    "base": {
+      "growth_y1_5": 0.05,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 14,
+      "notes": "Berry synergies phase in; 9M FY2026 revenue $17.1B (+72% YoY); operating income $1.25B (+36% YoY)"
+    },
+    "bull": {
+      "growth_y1_5": 0.08,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 16,
+      "notes": "Full synergy capture; rigid packaging mix improves; deleveraging frees cash for buybacks"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Packaging PP&E and intangibles recorded at acquisition fair value; goodwill $10.4B from Berry merger (10-K)"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating packaging manufacturer, not resource NAV"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Both flexible and rigid segments report positive operating income (Q3 FY2026 10-Q segment table)"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / RPO not in FCF path?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Contract manufacturing tied to customer volumes, not disclosed backlog option"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Minor equity-method investments; no material hidden holdco stakes (10-K)"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No dated legal recovery or trust distribution"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue path?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Sustainable packaging and healthcare packaging growth embedded in flexible segment revenue path [Assumption]"
+    }
+  ],
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "growth_explanation": {
+    "mechanism": "Berry Global merger (closed 2025-04-30) adds rigid consumer/healthcare packaging scale; synergy realization and resin pass-through drive owner-cash growth.",
+    "source": "10-K FY2025 acquisition note; Q3 FY2026 10-Q segment revenue",
+    "bear_trigger": "Integration costs exceed synergy run-rate; leverage above 3.5x EBITDA persists",
+    "bull_trigger": "Synergy program hits high case; FCF conversion improves as capex normalizes post-merger",
+    "lawrence_legacy": {
+      "y1_5": 0.05,
+      "y6_10": 0.04,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.05,
+      "y6_10": 0.04,
+      "exit_pfcf_y10": 14.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": 0.1004,
+      "as_of_filing_facts": "evidence/_text/10-K_20250815_rpt20250630_acc0001748790_25_000023.htm.txt"
+    },
+    "status": "partial"
+  },
+  "estimates": {
+    "external": []
+  },
+  "human_review": {
+    "live_price_confirmed": false
+  },
+  "total_return_panel": {
+    "as_of": "2026-07-10",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 0,
+    "distribution_history_sum": 0,
+    "market_cap_m": null,
+    "total_return_annualized_pct": 0.73,
+    "chart": "AMCR/research/charts/total_return_2026-07-10.svg",
+    "panel_json": "AMCR/research/total_return_panel.json"
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -20.3
+    },
+    "base": {
+      "return_pct": -16.7
+    },
+    "bull": {
+      "return_pct": -13.4
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -20.3
+    },
+    "base": {
+      "return_pct": -16.7
+    },
+    "bull": {
+      "return_pct": -13.4
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": -16.7
+    },
+    "falsifier_adjusted": {
+      "return_pct": -16.7
+    }
+  },
+  "implied_return": {
+    "base_pct": -16.04,
+    "label": "7yr IRR (total synthesis)",
+    "display": "-16.04% (total synthesis)",
+    "lawrence_stance_gate_pct": -16.7,
+    "falsifier_adjusted_pct": -16.7,
+    "synthesis_pct": -16.04
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Growth theory (pre-falsifier)",
+        "source": "growth_explanation + filing revenue YoY",
+        "return_pct": -16.7,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": -20.3,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": -13.4,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": -15.84,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": -16.04,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}

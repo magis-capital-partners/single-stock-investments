@@ -5,20 +5,18 @@
 **Marvin dive:** `AMCR/research/deep_dive_2026-07-10.md`
 **Source inventory:** `AMCR/third-party-analyses/source_inventory_2026-07-10.md`
 **Framework:** `_system/frameworks/third_party_cross_reference.md`, `external_view_blend.md`
-<!-- THIRD_PARTY_CROSS_CHECK_STUB -->
 
 ## Executive summary
 
-No third-party sources are indexed for AMCR as of 2026-07-10. Marvin stance rests on **primary filings only** (FY2025 10-K, Q3 FY2026 10-Q, merger 8-Ks). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+Marvin floor **3.04%** per year (compounder; stance **watch**) from primary filings and `valuation.json`. No third-party sources indexed; filings-only stance. **[HUMAN REVIEW]** for approved-source numeric blend.
 
-**Synthesis:** Marvin floor only; no external blend. Base IRR and **watch** stance come from normalized post-merger owner cash in `valuation.json`.
+**Synthesis (best estimate):** Marvin **3.04%** base · stance **watch**; external sources adjust conviction on catalyst timing, not primary IRR without human OK.
 
 ## Sources in scope
 
-| ID | Source | Type | Status | Reviewed |
-|----|--------|------|--------|----------|
-| — | Primary SEC filings | filing | n/a | yes |
-| — | Third-party inventory empty | — | — | n/a |
+| Source ID | Title | Path | Status | Cross-check status |
+|-----------|-------|------|--------|-------------------|
+| (none) | Primary filings only | — | — | n/a |
 
 ## Agreements (facts)
 
@@ -28,25 +26,26 @@ No third-party sources are indexed for AMCR as of 2026-07-10. Marvin stance rest
 | FY2025 net sales $15.0B | Yes | — | FY2025 10-K |
 | Pro forma revenue ~$23.2B | Yes | — | 10-K acquisition note |
 | Long-term debt $13.8B post-merger | Yes | — | FY2025 10-K |
+| Base return anchor | **3.04%** per year | — | `valuation.json` |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| Owner cash normalization | $0.48/sh mid-point [Assumption] | — | No external view to blend |
-| Stance | watch (<15% base IRR) | — | Filings-only gate |
+| Primary IRR | **3.04%** (Lawrence / synthesis) | No external IRR | Marvin 100% numeric |
+| Owner cash per share | **$1.75** on 462M shares | — | Filing anchor |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | ~$0.48/sh normalized owner cash | ~8% base (7-yr model) | watch |
+| Marvin floor | ~$1.75/sh owner cash | **3.04%** | **watch** |
 | External (combined) | — | — | — |
-| **Blended best estimate** | **Marvin floor** | **~8% base** | **watch** |
+| **Blended best estimate** | **Filing anchor** | **3.04%** | **watch** |
 
 **Weights:** 100% Marvin (no approved external sources).
 
-**Returns statement (blended):** At today's price, normalized owner cash supports roughly **8% per year** in the base case — below accumulate hurdle; **watch** until synergy proof or better price.
+**Returns statement (blended):** We expect **3.04%** per year at about **$43** on filed owner cash; third-party sources may raise conviction on synergy timing but do not replace filing math without **[HUMAN REVIEW]**.
 
 ## [HUMAN REVIEW]
 
@@ -56,9 +55,10 @@ No third-party sources are indexed for AMCR as of 2026-07-10. Marvin stance rest
 
 ## [PROPOSED MEMORY]
 
-- [PROPOSED COMPANY] AMCR: third-party cross-check 2026-07-10
+- [PROPOSED COMPANY] AMCR: third-party cross-check 2026-07-10 — Marvin 3.04% filings-only
 
 ## Primary sources cited
 
 1. `AMCR/research/deep_dive_2026-07-10.md`
-2. `AMCR/third-party-analyses/source_inventory_2026-07-10.md`
+2. `AMCR/research/valuation.json`
+3. `AMCR/third-party-analyses/source_inventory_2026-07-10.md`
