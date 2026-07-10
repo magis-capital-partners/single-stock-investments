@@ -1,0 +1,474 @@
+{
+  "ticker": "MO",
+  "as_of": "2026-07-10",
+  "method": "full",
+  "lawrence_bucket": "pricing_power",
+  "classification_inputs": {
+    "archetype": "compounder",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mature",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 71.59,
+    "price_source": "Yahoo MO close 2026-07-09",
+    "price_as_of": "2026-07-09",
+    "fcf_per_share": 5.42,
+    "fcf_source": "FY2025 cash from operations $9,290M minus capital spending $216M, divided by 1,674.3M diluted shares (10-K FY2025)",
+    "shares_millions": 1674.3,
+    "normalization_note": "FY2025 owner cash as base; Q1 2026 adjusted diluted EPS $1.32 (+7.3% YoY) supports low-single-digit run-rate but base uses filed annual FCF to avoid quarterly noise from ABI equity income"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": -0.02,
+      "growth_y6_10": -0.01,
+      "exit_pfcf_y10": 8,
+      "notes": "Accelerated cigarette volume decline; menthol ban; dividend cut; ABI impairment; multiple compression"
+    },
+    "base": {
+      "growth_y1_5": 0.02,
+      "growth_y6_10": 0.01,
+      "exit_pfcf_y10": 11,
+      "notes": "Pricing offsets volume decline; oral/on! mix improves margins; dividend payout ~80% of FCF; mid-single-digit adjusted EPS path per management Vision"
+    },
+    "bull": {
+      "growth_y1_5": 0.04,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 13,
+      "notes": "on! share gains; oral OCI margin sustains; ABI mark recovery; buybacks at discount"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "milestone_nav",
+      "evidence": "ABI equity method stake carried below pre-impairment marks; Cronos stake small; not used as dhando floor (10-K FY2025 equity method note)"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating tobacco manufacturer, not resource royalty"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Yes (e-vapor)",
+      "treatment": "zero",
+      "evidence": "NJOY/e-vapor goodwill and intangible impairments in FY2025; segment moved back to all other Q1 2026 (10-K Note 2; Q1 2026 10-Q)",
+      "base_terminal_rationale": "Post-impairment e-vapor path uncertain; explicit zero separate terminal after scan"
+    },
+    {
+      "q": 4,
+      "question": "Backlog not in FCF path?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Tobacco revenue recognized on shipment"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "ABI ~10% stake; equity income $498M FY2025; impairment history \u2014 overlay only, not in Lawrence FCF0"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "Partial",
+      "treatment": "zero",
+      "evidence": "Tobacco litigation settlements episodic; excluded from normalized owner cash",
+      "base_terminal_rationale": "Settlement flows not in 7-year run rate"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "on! oral nicotine pouches in oral tobacco segment revenue/OCI growth (oral rev $2,802M FY2025; OCI $1,828M)"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "Cigarette list-price increases and mix offset ~10% smokeable volume decline; oral segment grows via on! pouches; management targets mid-single-digit adjusted diluted EPS CAGR to 2028 from $4.87 recast 2022 base",
+    "source": "10-K FY2025 shipment volumes; Q1 2026 adjusted EPS $1.32 (+7.3% YoY); Vision 2028 framework",
+    "falsifiers": [
+      {
+        "id": "volume_collapse",
+        "observation": "Smokeable shipment volume down >12% for two consecutive years without price/mix offset",
+        "action": "Cut growth years 1-5 toward bear -2%"
+      },
+      {
+        "id": "dividend_cut",
+        "observation": "Board reduces annualized dividend rate",
+        "action": "Downgrade dhando to none; stance watch or trim"
+      },
+      {
+        "id": "menthol_ban",
+        "observation": "FDA final menthol rule with near-term implementation",
+        "action": "Move base toward bear; cap exit multiple at 8x"
+      }
+    ],
+    "status": "partial",
+    "lawrence_legacy": {
+      "y1_5": 0.02,
+      "y6_10": 0.01,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.02,
+      "y6_10": 0.01,
+      "exit_pfcf_y10": 11.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": null,
+      "as_of_filing_facts": "evidence/_text/10-K-A_20260527_rpt20251231_acc0000764180_26_000077.htm.txt"
+    }
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "evidence_refresh": {
+    "synthesis_in_dive": true
+  },
+  "total_return_panel": {
+    "as_of": "2026-07-10",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 0,
+    "distribution_history_sum": 0,
+    "market_cap_m": null,
+    "total_return_annualized_pct": 9.74,
+    "chart": "MO/research/charts/total_return_2026-07-10.svg",
+    "panel_json": "MO/research/total_return_panel.json"
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 0.5
+    },
+    "base": {
+      "return_pct": 7.4
+    },
+    "bull": {
+      "return_pct": 11.2
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 0.5
+    },
+    "base": {
+      "return_pct": 7.4
+    },
+    "bull": {
+      "return_pct": 11.2
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": 7.4
+    },
+    "falsifier_adjusted": {
+      "return_pct": 7.4
+    }
+  },
+  "implied_return": {
+    "base_pct": 7.64,
+    "label": "7yr IRR (total synthesis)",
+    "display": "7.64% (total synthesis)",
+    "lawrence_stance_gate_pct": 7.4,
+    "falsifier_adjusted_pct": 7.4,
+    "synthesis_pct": 7.64
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Growth theory (pre-falsifier)",
+        "source": "growth_explanation + filing revenue YoY",
+        "return_pct": 7.4,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": 0.5,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 11.2,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 7.84,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 7.64,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  },
+  "context_overlay": {
+    "as_of": "2026-07-10",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": 0.59,
+            "as_of": "2026-07-09",
+            "yoy_pct": 209.3,
+            "direction": "up",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.539000034332275,
+            "as_of": "2026-07-09",
+            "yoy_pct": 4.5,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.269000053405762,
+            "as_of": "2026-07-09",
+            "yoy_pct": 8.9,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 100.93299865722656,
+            "as_of": "2026-07-10",
+            "yoy_pct": 3.4,
+            "direction": "up",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 15.84000015258789,
+            "as_of": "2026-07-09",
+            "yoy_pct": -0.6,
+            "direction": "flat",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": 0.42,
+            "as_of": "2026-07-09",
+            "yoy_pct": 160.0,
+            "direction": "up",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 15.53,
+            "as_of": "2026-07-09",
+            "yoy_pct": 48.0,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "insider_signal": {
+    "as_of": "2026-07-10",
+    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
+    "in_base_irr": false,
+    "window_days": 365,
+    "ics": 0.0,
+    "band": "negligible",
+    "bull_case_support": "none",
+    "scenario_confidence": {
+      "priors": {
+        "bear": 0.2,
+        "base": 0.55,
+        "bull": 0.25
+      },
+      "tilted": {
+        "bear": 0.28,
+        "base": 0.47,
+        "bull": 0.25
+      },
+      "bull_delta": 0.0,
+      "bear_delta": 0.08,
+      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
+    },
+    "factors": {
+      "buy_score": 0.0,
+      "sell_score": -1.0,
+      "cluster_bonus": 0.0,
+      "net_buy_usd": 0,
+      "net_sell_usd": 13417649.04,
+      "price_today": 71.59
+    },
+    "top_buys": [],
+    "top_sells": [
+      {
+        "insider": "Strahlman Ellen R",
+        "date": "2026-05-26",
+        "shares": 2000,
+        "price": 72.559,
+        "value_usd": 145118.0,
+        "is_10b5_1": false,
+        "contrib": -0.172
+      },
+      {
+        "insider": "KELLY ENNIS DEBRA J",
+        "date": "2026-05-26",
+        "shares": 5790,
+        "price": 72.2483,
+        "value_usd": 418317.66,
+        "is_10b5_1": false,
+        "contrib": -0.172
+      },
+      {
+        "insider": "Gifford William F. Jr.",
+        "date": "2026-02-26",
+        "shares": 61849,
+        "price": 69.7,
+        "value_usd": 4310875.3,
+        "is_10b5_1": false,
+        "contrib": -0.124
+      },
+      {
+        "insider": "Gifford William F. Jr.",
+        "date": "2026-02-04",
+        "shares": 15700,
+        "price": 0.0,
+        "value_usd": 0.0,
+        "is_10b5_1": false,
+        "contrib": -0.124
+      },
+      {
+        "insider": "Mancuso Salvatore",
+        "date": "2026-02-26",
+        "shares": 17385,
+        "price": 69.7,
+        "value_usd": 1211734.5,
+        "is_10b5_1": false,
+        "contrib": -0.101
+      }
+    ],
+    "narrative_hooks": [],
+    "transaction_count": 38
+  },
+  "lens_consensus": {
+    "as_of": "2026-07-10",
+    "shared_inputs_ref": "valuation.json@2026-07-10",
+    "valuation_richness": 0.507,
+    "blended_return_pct": 6.55,
+    "band_pct": [
+      0.5,
+      9.57
+    ],
+    "weighted_median_pct": 7.4,
+    "median_mean_flag": false,
+    "stance": "watch",
+    "agreement_pct": 100,
+    "dissent_count": 0,
+    "lawrence_divergence": false,
+    "top_dissents": [],
+    "contributor_count": 8,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
+  }
+}
