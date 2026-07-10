@@ -72,9 +72,29 @@ jobs:
         run: |
           echo "Draft promoted to ready; automerge continues on ready_for_review after CI starts."
 
+      - name: Reload PR metadata after ready promotion
+        id: meta2
+        if: |
+          steps.meta.outputs.is_draft == 'false' ||
+          github.event_name == 'workflow_dispatch' ||
+          (github.event_name == 'pull_request' && github.event.action != 'opened')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR="${{ steps.pr.outputs.number }}"
+          sleep 3
+          IS_DRAFT=$(gh pr view "$PR" --repo "${{ github.repository }}" --json isDraft --jq '.isDraft')
+          HEAD_SHA=$(gh pr view "$PR" --repo "${{ github.repository }}" --json headRefOid --jq '.headRefOid')
+          if [ "$IS_DRAFT" = "true" ]; then
+            echo "::error::PR #$PR is still a draft after ready promotion."
+            exit 1
+          fi
+          echo "head_sha=$HEAD_SHA" >> "$GITHUB_OUTPUT"
+
       - uses: actions/checkout@v4
         if: |
           steps.meta.outputs.is_draft == 'false' ||
+          github.event_name == 'workflow_dispatch' ||
           (github.event_name == 'pull_request' && github.event.action != 'opened')
         with:
           fetch-depth: 0
@@ -82,36 +102,15 @@ jobs:
       - uses: actions/setup-python@v5
         if: |
           steps.meta.outputs.is_draft == 'false' ||
+          github.event_name == 'workflow_dispatch' ||
           (github.event_name == 'pull_request' && github.event.action != 'opened')
         with:
           python-version: "3.12"
 
-      - name: Refresh head SHA
-        if: |
-          steps.meta.outputs.is_draft == 'false' ||
-          (github.event_name == 'pull_request' && github.event.action != 'opened')
-        id: head
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          SHA=$(gh pr view "${{ steps.pr.outputs.number }}" --repo "${{ github.repository }}" --json headRefOid -q .headRefOid)
-          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
-
-      - name: Wait for research quality checks
-        if: |
-          steps.meta.outputs.is_draft == 'false' ||
-          (github.event_name == 'pull_request' && github.event.action != 'opened')
-        uses: lewagon/wait-on-check-action@v1.3.4
-        with:
-          ref: ${{ steps.head.outputs.sha }}
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          wait-interval: 30
-          check-regexp: (cloud-prompt-sync|research-lint)
-          allowed-conclusions: success,skipped
-
       - name: Resolve merge conflicts with main
         if: |
           steps.meta.outputs.is_draft == 'false' ||
+          github.event_name == 'workflow_dispatch' ||
           (github.event_name == 'pull_request' && github.event.action != 'opened')
         id: resolve
         env:
@@ -126,26 +125,26 @@ jobs:
             echo "resolved=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Refresh head SHA after conflict fix
+      - name: Refresh head SHA
         if: |
-          (steps.meta.outputs.is_draft == 'false' ||
-           (github.event_name == 'pull_request' && github.event.action != 'opened')) &&
-          steps.resolve.outputs.resolved == 'true'
-        id: head_after
+          steps.meta.outputs.is_draft == 'false' ||
+          github.event_name == 'workflow_dispatch' ||
+          (github.event_name == 'pull_request' && github.event.action != 'opened')
+        id: head
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           SHA=$(gh pr view "${{ steps.pr.outputs.number }}" --repo "${{ github.repository }}" --json headRefOid -q .headRefOid)
           echo "sha=$SHA" >> "$GITHUB_OUTPUT"
 
-      - name: Wait for checks after conflict fix
+      - name: Wait for research quality checks
         if: |
-          (steps.meta.outputs.is_draft == 'false' ||
-           (github.event_name == 'pull_request' && github.event.action != 'opened')) &&
-          steps.resolve.outputs.resolved == 'true'
+          steps.meta.outputs.is_draft == 'false' ||
+          github.event_name == 'workflow_dispatch' ||
+          (github.event_name == 'pull_request' && github.event.action != 'opened')
         uses: lewagon/wait-on-check-action@v1.3.4
         with:
-          ref: ${{ steps.head_after.outputs.sha }}
+          ref: ${{ steps.head.outputs.sha }}
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           wait-interval: 30
           check-regexp: (cloud-prompt-sync|research-lint)
@@ -154,6 +153,7 @@ jobs:
       - name: Squash merge and delete branch
         if: |
           steps.meta.outputs.is_draft == 'false' ||
+          github.event_name == 'workflow_dispatch' ||
           (github.event_name == 'pull_request' && github.event.action != 'opened')
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -176,6 +176,7 @@ jobs:
       - name: Summary
         if: |
           steps.meta.outputs.is_draft == 'false' ||
+          github.event_name == 'workflow_dispatch' ||
           (github.event_name == 'pull_request' && github.event.action != 'opened')
         run: |
           echo "Merged PR #${{ steps.pr.outputs.number }} (${{ steps.meta.outputs.head_ref }}) into main."

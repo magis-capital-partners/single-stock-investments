@@ -53,10 +53,38 @@ def find_open_pr_for_ticker(ticker: str) -> tuple[str, str] | None:
     return None
 
 
+def ensure_pr_ready(pr_number: str) -> None:
+    data = gh_json(["pr", "view", pr_number, "--json", "isDraft"])
+    if data.get("isDraft"):
+        print(f"PR #{pr_number} is draft — marking ready.")
+        run(["gh", "pr", "ready", pr_number], check=False)
+
+
+def check_conclusion(checks: list[dict], name: str) -> str | None:
+    for row in checks:
+        if row.get("name") == name:
+            return row.get("conclusion") or row.get("status")
+    return None
+
+
+def research_checks_passed(checks: list[dict]) -> bool:
+    lint = check_conclusion(checks, "research-lint")
+    sync = check_conclusion(checks, "cloud-prompt-sync")
+    return lint in ("SUCCESS", "SKIPPED") and sync in ("SUCCESS", "SKIPPED")
+
+
+def trigger_automerge(pr_number: str) -> None:
+    run(
+        ["gh", "workflow", "run", "marvin-pr-automerge.yml", "-f", f"pr_number={pr_number}"],
+        check=False,
+    )
+
+
 def wait_for_pr_merged(pr_number: str, *, timeout_sec: int = 5400, poll_sec: int = 30) -> None:
     deadline = time.time() + timeout_sec
+    automerge_dispatched = False
     while time.time() < deadline:
-        data = gh_json(["pr", "view", pr_number, "--json", "state,mergeable,statusCheckRollup"])
+        data = gh_json(["pr", "view", pr_number, "--json", "state,mergeable,isDraft,statusCheckRollup"])
         state = data.get("state")
         mergeable = data.get("mergeable")
 
@@ -64,20 +92,23 @@ def wait_for_pr_merged(pr_number: str, *, timeout_sec: int = 5400, poll_sec: int
             print(f"PR #{pr_number} merged.")
             return
 
+        if data.get("isDraft"):
+            ensure_pr_ready(pr_number)
+            automerge_dispatched = False
+
+        checks = data.get("statusCheckRollup") or []
+
         if mergeable == "CONFLICTING":
-            print(f"PR #{pr_number} is CONFLICTING ? running conflict resolver...")
+            print(f"PR #{pr_number} is CONFLICTING — running conflict resolver...")
             proc = run([sys.executable, str(RESOLVE_PY), pr_number], check=False)
             if proc.returncode != 0:
                 print(proc.stderr or proc.stdout, file=sys.stderr)
-                run(["gh", "workflow", "run", "marvin-pr-automerge.yml", "-f", f"pr_number={pr_number}"], check=False)
-        elif mergeable == "MERGEABLE":
-            checks = data.get("statusCheckRollup") or []
-            lint_ok = any(
-                c.get("name") in ("research-lint", "cloud-prompt-sync") and c.get("conclusion") == "SUCCESS"
-                for c in checks
-            )
-            if lint_ok:
-                run(["gh", "workflow", "run", "marvin-pr-automerge.yml", "-f", f"pr_number={pr_number}"], check=False)
+            automerge_dispatched = False
+            trigger_automerge(pr_number)
+            automerge_dispatched = True
+        elif mergeable == "MERGEABLE" and research_checks_passed(checks) and not automerge_dispatched:
+            trigger_automerge(pr_number)
+            automerge_dispatched = True
 
         print(f"Waiting on PR #{pr_number} (state={state}, mergeable={mergeable})...")
         time.sleep(poll_sec)
@@ -134,6 +165,8 @@ def main() -> None:
         try:
             _url, pr_number = run_agent(ticker, args.pick_reason)
             print(f"Agent PR: #{pr_number}")
+            ensure_pr_ready(pr_number)
+            trigger_automerge(pr_number)
             wait_for_pr_merged(pr_number)
         except Exception as exc:
             print(f"::error::{ticker} failed: {exc}", file=sys.stderr)
