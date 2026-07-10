@@ -6,24 +6,26 @@
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Archetype** (Stahl) | compounder |
+| **Moat** (Munger) | widening |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | - |
 | **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Payoff lens** | operating |
 
 ## One-line thesis
 
-Alphabet Inc. (Class C) — thesis pending Marvin deep dive.
+Alphabet Class C (GOOG): dual-engine compounder (Services + Cloud) priced for AI optionality; Lawrence base **-0.28%** at $356.24 on FY2025 owner cash; **watch** until post-capex FCF visible.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest annual report (`10-K_20260205`)
+- [x] Read latest quarterly report (`10-Q_20260430`)
+- [x] Segment overlay + AI infrastructure model coverage
+- [ ] Confirm GOOG vs GOOGL price spread at live quote
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-07-10; awaiting deep dive.
+- Class C non-voting; same economics as GOOGL.
+- 2026 capex guide $180 to $190B depresses near-term FCF; base model uses FY2025 FCF/sh.
