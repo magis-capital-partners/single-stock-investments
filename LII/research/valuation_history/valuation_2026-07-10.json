@@ -1,0 +1,268 @@
+{
+  "ticker": "LII",
+  "as_of": "2026-07-10",
+  "method": "full",
+  "valuation_mode": "operating",
+  "lawrence_bucket": "pricing_power",
+  "classification_inputs": {
+    "archetype": "compounder",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating",
+    "predictive_attribute": "none"
+  },
+  "inputs": {
+    "price": 552.22,
+    "price_source": "Yahoo Finance LII regular market price 2026-07-10",
+    "price_as_of": "2026-07-10",
+    "fcf_per_share": 18.05,
+    "fcf_source": "FY2025 free cash flow $638.8M (OCF $757.6M minus capex $118.8M) \u00f7 35.4M diluted weighted-average shares (10-K filed 2026-02-17)",
+    "shares_millions": 35.4,
+    "shares_source": "FY2025 diluted weighted-average shares 35,400,000 (10-K)",
+    "dividend_per_share_annual": 4.55,
+    "dividend_source": "Cash dividends $4.55 per share in 2025; raised from $4.36 effective July 2025 (10-K)",
+    "revenue_fy2025_m": 5195.3,
+    "net_earnings_fy2025_m": 805.8,
+    "operating_income_fy2025_m": 1041.5,
+    "hcs_segment_sales_m": 3343.4,
+    "hcs_segment_profit_m": 728.5,
+    "bcs_segment_sales_m": 1851.9,
+    "bcs_segment_profit_m": 434.2,
+    "normalization_note": "Lawrence base uses FY2025 filed free cash flow. OCF fell to $757.6M from $945.7M in 2024 on working-capital timing; capex $118.8M. Q1 2026 diluted EPS $3.35 vs $3.63 prior year \u2014 not used as FCF starting point."
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.0,
+      "growth_y6_10": 0.0,
+      "exit_pfcf_y10": 18,
+      "notes": "Residential HVAC volumes stay soft; Home Comfort profit flat; multiple compresses toward mid-cycle peers"
+    },
+    "base": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 22,
+      "notes": "Building Climate price/mix offsets Home Comfort volume; buybacks ~2% annual; segment margins hold low-20s / mid-20s"
+    },
+    "bull": {
+      "growth_y1_5": 0.05,
+      "growth_y6_10": 0.03,
+      "exit_pfcf_y10": 24,
+      "notes": "Volume recovery in residential; BCS commercial/refrigeration mix lifts margin; $1B buyback authorization deployed"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Manufacturing PP&E and leases on balance sheet; no land/NAV misstatement (10-K FY2025)"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating HVAC manufacturer; no resource royalty"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Home Comfort 21.8% margin; Building Climate 23.4% margin FY2025 (10-K segment note)"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / embedded product option in revenue path?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Heat pumps, cold-chain refrigeration, connected controls in segment growth; Duro Dyne/Supco bolt-ons in BCS"
+    },
+    {
+      "q": 5,
+      "question": "Private stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No holdco stakes"
+    },
+    {
+      "q": 6,
+      "question": "Transitory legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating compounder"
+    },
+    {
+      "q": 7,
+      "question": "Product option already in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Electrification and efficiency product mix modeled via growth assumptions, not separate terminal"
+    }
+  ],
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "growth_explanation": {
+    "mechanism": "Price/mix and share repurchases compound per-share owner cash while residential volumes cycle; Building Climate commercial/refrigeration provides offset.",
+    "base_growth_source": "FY2025 segment profit +5% consolidated; BCS +9% profit; buybacks $482M",
+    "bear_trigger": "Prolonged Home Comfort volume decline without price offset",
+    "bull_trigger": "Residential replacement rebound plus BCS mix above 24% margin",
+    "lawrence_legacy": {
+      "y1_5": 0.03,
+      "y6_10": 0.02,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.03,
+      "y6_10": 0.02,
+      "exit_pfcf_y10": 22.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": 0.0,
+      "as_of_filing_facts": "evidence/_text/10-K_20260217_rpt20251231_acc0001069202_26_000028.htm.txt"
+    },
+    "status": "partial"
+  },
+  "total_return_panel": {
+    "as_of": "2026-07-10",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 4.55,
+    "distribution_history_sum": 4.55,
+    "market_cap_m": null,
+    "total_return_annualized_pct": 13.41,
+    "chart": "LII/research/charts/total_return_2026-07-10.svg",
+    "panel_json": "LII/research/total_return_panel.json"
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -3.2
+    },
+    "base": {
+      "return_pct": 1.9
+    },
+    "bull": {
+      "return_pct": 4.7
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -3.2
+    },
+    "base": {
+      "return_pct": 1.9
+    },
+    "bull": {
+      "return_pct": 4.7
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": 1.9
+    },
+    "falsifier_adjusted": {
+      "return_pct": 1.9
+    }
+  },
+  "implied_return": {
+    "base_pct": 2.02,
+    "label": "7yr IRR (total synthesis)",
+    "display": "2.02% (total synthesis)",
+    "lawrence_stance_gate_pct": 1.9,
+    "falsifier_adjusted_pct": 1.9,
+    "synthesis_pct": 2.02
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Growth theory (pre-falsifier)",
+        "source": "growth_explanation + filing revenue YoY",
+        "return_pct": 1.9,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": -3.2,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 4.7,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 2.22,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 2.02,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}
