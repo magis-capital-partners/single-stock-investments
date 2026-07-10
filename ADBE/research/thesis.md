@@ -1,6 +1,6 @@
 # ADBE — Investment Thesis
 
-**Last updated:** 2026-07-10
+**Last updated:** auto-sync
 
 ## Classification
 
@@ -11,22 +11,26 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | accumulate |
 | **Cycle** | mid |
+| **Implied 7yr IRR** (base) | 33.28% (total synthesis) |
+| **IRR method** | full |
 | **Lawrence bucket** | pricing_power |
 | **Payoff lens** | operating |
-| **Implied IRR (base)** | 20.5% |
+| **MOI bucket** | pending |
+
+**Deep dive:** `ADBE/research/deep_dive_2026-07-10.md` (auto-sync)
 
 ## One-line thesis
 
-Adobe is a subscription software compounder with $23.77B FY2025 revenue, $9.85B free cash flow, and durable Creative Cloud pricing power; at model price $380 base return clears our bar, but live quote sync and AI competition require human review.
+Adobe is a subscription compounder with $23.77B FY2025 revenue and $9.85B free cash flow; at $222.65 synthesis IRR is 33.28% per year, above our bar, but generative-AI competition warrants monitoring.
 
 ## Key questions
 
 - [x] Read latest annual report (FY2025 10-K)
 - [x] Read latest quarterly report (Q2 FY2026 10-Q)
 - [x] Apply decision stack and option scan
-- [ ] Confirm stance after live price sync
+- [x] Confirm stance after live price sync ($222.65)
 
 ## [HUMAN REVIEW]
 
-- Stance **accumulate** at placeholder price $380; re-gate after `marvin_cloud_refresh.py`.
+- Stance **accumulate** at $222.65 (Yahoo 2026-07-09).
 - No third-party cross-check sources; Marvin floor only.

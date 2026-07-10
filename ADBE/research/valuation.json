@@ -11,12 +11,13 @@
     "payoff_lens": "operating"
   },
   "inputs": {
-    "price": 380.0,
-    "price_source": "NASDAQ placeholder \u2014 marvin_cloud_refresh updates live quote",
+    "price": 222.65,
+    "price_source": "Yahoo ADBE close 2026-07-09",
     "fcf_per_share": 23.07,
     "fcf_source": "FY2025: cash from operations $10.031B minus capital spending $179M, divided by 427M diluted shares (10-K FY2025)",
     "shares_millions": 427,
-    "normalization_note": "Lawrence uses reported free cash flow; stock-based compensation $1.942B is already a non-cash add-back in cash from operations"
+    "normalization_note": "Lawrence uses reported free cash flow; stock-based compensation $1.942B is already a non-cash add-back in cash from operations",
+    "price_as_of": "2026-07-09"
   },
   "scenarios": {
     "bear": {
@@ -118,41 +119,41 @@
   "lawrence_horizon_years": 7,
   "results_lawrence_legacy": {
     "bear": {
-      "return_pct": 13.3
+      "return_pct": 24.3
     },
     "base": {
-      "return_pct": 20.5
+      "return_pct": 32.0
     },
     "bull": {
-      "return_pct": 26.3
+      "return_pct": 38.3
     }
   },
   "results": {
     "bear": {
-      "return_pct": 13.3
+      "return_pct": 24.3
     },
     "base": {
-      "return_pct": 20.5
+      "return_pct": 32.0
     },
     "bull": {
-      "return_pct": 26.3
+      "return_pct": 38.3
     }
   },
   "results_growth_theory": {
     "theory_implied": {
-      "return_pct": 20.5
+      "return_pct": 32.0
     },
     "falsifier_adjusted": {
-      "return_pct": 20.5
+      "return_pct": 32.0
     }
   },
   "implied_return": {
-    "base_pct": 21.64,
+    "base_pct": 33.28,
     "label": "7yr IRR (total synthesis)",
-    "display": "21.64% (total synthesis)",
-    "lawrence_stance_gate_pct": 20.5,
-    "falsifier_adjusted_pct": 20.5,
-    "synthesis_pct": 21.64
+    "display": "33.28% (total synthesis)",
+    "lawrence_stance_gate_pct": 32.0,
+    "falsifier_adjusted_pct": 32.0,
+    "synthesis_pct": 33.28
   },
   "overlay_results": [],
   "synthesis": {
@@ -162,7 +163,7 @@
         "id": "theory_implied",
         "label": "Growth theory (pre-falsifier)",
         "source": "growth_explanation + filing revenue YoY",
-        "return_pct": 20.5,
+        "return_pct": 32.0,
         "weight": 0.08,
         "type": "numeric",
         "epistemic_tier": "B (pre-falsifier derivation)",
@@ -176,7 +177,7 @@
         "id": "scenario_bear",
         "label": "Bear scenario (Lawrence)",
         "source": "scenarios.bear",
-        "return_pct": 13.3,
+        "return_pct": 24.3,
         "weight": 0.05,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
@@ -190,7 +191,7 @@
         "id": "scenario_bull",
         "label": "Bull scenario (Lawrence)",
         "source": "scenarios.bull",
-        "return_pct": 26.3,
+        "return_pct": 38.3,
         "weight": 0.12,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
@@ -213,9 +214,9 @@
     ],
     "qualitative_manual": false,
     "qualitative_pp_cap_applied": false,
-    "numeric_weighted_pct": 21.84,
+    "numeric_weighted_pct": 33.48,
     "qualitative_pp": -0.2,
-    "total_synthesis_pct": 21.64,
+    "total_synthesis_pct": 33.28,
     "human_approval": "pending",
     "weight_audit": {
       "flags": [],
@@ -236,5 +237,237 @@
       }
     },
     "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  },
+  "human_review": {
+    "live_price_confirmed": false
+  },
+  "total_return_panel": {
+    "as_of": "2026-07-10",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 0,
+    "distribution_history_sum": 0,
+    "market_cap_m": null,
+    "total_return_annualized_pct": 19.06,
+    "chart": "ADBE/research/charts/total_return_2026-07-10.svg",
+    "panel_json": "ADBE/research/total_return_panel.json"
+  },
+  "context_overlay": {
+    "as_of": "2026-07-10",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": 0.59,
+            "as_of": "2026-07-09",
+            "yoy_pct": 209.3,
+            "direction": "up",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.539000034332275,
+            "as_of": "2026-07-09",
+            "yoy_pct": 4.5,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.269000053405762,
+            "as_of": "2026-07-09",
+            "yoy_pct": 8.9,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 100.93699645996094,
+            "as_of": "2026-07-10",
+            "yoy_pct": 3.4,
+            "direction": "up",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 15.84000015258789,
+            "as_of": "2026-07-09",
+            "yoy_pct": -0.6,
+            "direction": "flat",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": 0.42,
+            "as_of": "2026-07-09",
+            "yoy_pct": 160.0,
+            "direction": "up",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 15.53,
+            "as_of": "2026-07-09",
+            "yoy_pct": 48.0,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "insider_signal": {
+    "as_of": "2026-07-10",
+    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
+    "in_base_irr": false,
+    "window_days": 365,
+    "ics": 2.73,
+    "band": "weak",
+    "bull_case_support": "none",
+    "scenario_confidence": {
+      "priors": {
+        "bear": 0.2,
+        "base": 0.55,
+        "bull": 0.25
+      },
+      "tilted": {
+        "bear": 0.225,
+        "base": 0.525,
+        "bull": 0.25
+      },
+      "bull_delta": 0.0,
+      "bear_delta": 0.025,
+      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
+    },
+    "factors": {
+      "buy_score": 3.376,
+      "sell_score": -1.0,
+      "cluster_bonus": 0.0,
+      "net_buy_usd": 1945130.0,
+      "net_sell_usd": 53961271.84,
+      "price_today": 222.65
+    },
+    "top_buys": [
+      {
+        "insider": "Ricks David A",
+        "date": "2026-06-25",
+        "shares": 10000,
+        "price": 194.513,
+        "value_usd": 1945130.0,
+        "shares_owned_after": 17655,
+        "contrib": 3.376
+      }
+    ],
+    "top_sells": [
+      {
+        "insider": "Day Steven",
+        "date": "2026-06-15",
+        "shares": 116,
+        "price": 206.36,
+        "value_usd": 23937.76,
+        "is_10b5_1": false,
+        "contrib": -0.183
+      },
+      {
+        "insider": "Day Steven",
+        "date": "2026-06-15",
+        "shares": 154,
+        "price": 206.36,
+        "value_usd": 31779.44,
+        "is_10b5_1": false,
+        "contrib": -0.183
+      },
+      {
+        "insider": "NARAYEN SHANTANU",
+        "date": "2026-04-28",
+        "shares": 51422,
+        "price": 243.1937,
+        "value_usd": 12505506.44,
+        "is_10b5_1": false,
+        "contrib": -0.156
+      },
+      {
+        "insider": "NARAYEN SHANTANU",
+        "date": "2026-04-28",
+        "shares": 13237,
+        "price": 243.8936,
+        "value_usd": 3228419.58,
+        "is_10b5_1": false,
+        "contrib": -0.156
+      },
+      {
+        "insider": "NARAYEN SHANTANU",
+        "date": "2026-04-28",
+        "shares": 10341,
+        "price": 244.7837,
+        "value_usd": 2531308.24,
+        "is_10b5_1": false,
+        "contrib": -0.156
+      }
+    ],
+    "narrative_hooks": [],
+    "transaction_count": 253
+  },
+  "lens_consensus": {
+    "as_of": "2026-07-10",
+    "shared_inputs_ref": "valuation.json@2026-07-10",
+    "valuation_richness": 0.0,
+    "blended_return_pct": 29.66,
+    "band_pct": [
+      18.36,
+      34.0
+    ],
+    "weighted_median_pct": 32.0,
+    "median_mean_flag": false,
+    "stance": "accumulate",
+    "agreement_pct": 91,
+    "dissent_count": 1,
+    "lawrence_divergence": false,
+    "top_dissents": [
+      {
+        "persona": "greenblatt",
+        "label": "Joel Greenblatt",
+        "verdict": "hold",
+        "return_pct": 18.36,
+        "key_metric": "earnings_yield=10.36",
+        "conviction": 0.168,
+        "falsifier": "FCF yield below universe median OR base IRR below median"
+      }
+    ],
+    "contributor_count": 8,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
   }
 }
