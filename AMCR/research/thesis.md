@@ -1,22 +1,27 @@
 # AMCR — Investment Thesis
 
-**Last updated:** 2026-07-10
+**Last updated:** auto-sync
 
 ## Classification
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Archetype** (Stahl) | compounder |
+| **Moat** (Munger) | stable |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Cycle** | mid |
+| **Implied 7yr IRR** (base) | 3.04% (total synthesis) |
+| **IRR method** | full |
+| **Lawrence bucket** | scale_economies |
+| **Payoff lens** | operating |
+| **MOI bucket** | pending |
+
+**Deep dive:** `AMCR/research/deep_dive_2026-07-10.md` (auto-sync)
 
 ## One-line thesis
 
-Amcor — thesis pending Marvin deep dive.
+Global packaging compounder post-Berry merger (~$23B pro forma sales); **watch** at ~3% base IRR on $1.75/sh owner cash at ~$43.
 
 ## Key questions
 
