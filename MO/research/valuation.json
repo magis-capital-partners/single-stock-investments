@@ -1,0 +1,129 @@
+{
+  "ticker": "MO",
+  "as_of": "2026-07-10",
+  "method": "full",
+  "lawrence_bucket": "pricing_power",
+  "classification_inputs": {
+    "archetype": "compounder",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mature",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 71.59,
+    "price_source": "Yahoo MO close 2026-07-09",
+    "price_as_of": "2026-07-09",
+    "fcf_per_share": 5.42,
+    "fcf_source": "FY2025 cash from operations $9,290M minus capital spending $216M, divided by 1,674.3M diluted shares (10-K FY2025)",
+    "shares_millions": 1674.3,
+    "normalization_note": "FY2025 owner cash as base; Q1 2026 adjusted diluted EPS $1.32 (+7.3% YoY) supports low-single-digit run-rate but base uses filed annual FCF to avoid quarterly noise from ABI equity income"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": -0.02,
+      "growth_y6_10": -0.01,
+      "exit_pfcf_y10": 8,
+      "notes": "Accelerated cigarette volume decline; menthol ban; dividend cut; ABI impairment; multiple compression"
+    },
+    "base": {
+      "growth_y1_5": 0.02,
+      "growth_y6_10": 0.01,
+      "exit_pfcf_y10": 11,
+      "notes": "Pricing offsets volume decline; oral/on! mix improves margins; dividend payout ~80% of FCF; mid-single-digit adjusted EPS path per management Vision"
+    },
+    "bull": {
+      "growth_y1_5": 0.04,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 13,
+      "notes": "on! share gains; oral OCI margin sustains; ABI mark recovery; buybacks at discount"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "milestone_nav",
+      "evidence": "ABI equity method stake carried below pre-impairment marks; Cronos stake small; not used as dhando floor (10-K FY2025 equity method note)"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating tobacco manufacturer, not resource royalty"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Yes (e-vapor)",
+      "treatment": "zero",
+      "evidence": "NJOY/e-vapor goodwill and intangible impairments in FY2025; segment moved back to all other Q1 2026 (10-K Note 2; Q1 2026 10-Q)",
+      "base_terminal_rationale": "Post-impairment e-vapor path uncertain; explicit zero separate terminal after scan"
+    },
+    {
+      "q": 4,
+      "question": "Backlog not in FCF path?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Tobacco revenue recognized on shipment"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "ABI ~10% stake; equity income $498M FY2025; impairment history — overlay only, not in Lawrence FCF0"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "Partial",
+      "treatment": "zero",
+      "evidence": "Tobacco litigation settlements episodic; excluded from normalized owner cash",
+      "base_terminal_rationale": "Settlement flows not in 7-year run rate"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "on! oral nicotine pouches in oral tobacco segment revenue/OCI growth (oral rev $2,802M FY2025; OCI $1,828M)"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "Cigarette list-price increases and mix offset ~10% smokeable volume decline; oral segment grows via on! pouches; management targets mid-single-digit adjusted diluted EPS CAGR to 2028 from $4.87 recast 2022 base",
+    "source": "10-K FY2025 shipment volumes; Q1 2026 adjusted EPS $1.32 (+7.3% YoY); Vision 2028 framework",
+    "falsifiers": [
+      {
+        "id": "volume_collapse",
+        "observation": "Smokeable shipment volume down >12% for two consecutive years without price/mix offset",
+        "action": "Cut growth years 1-5 toward bear -2%"
+      },
+      {
+        "id": "dividend_cut",
+        "observation": "Board reduces annualized dividend rate",
+        "action": "Downgrade dhando to none; stance watch or trim"
+      },
+      {
+        "id": "menthol_ban",
+        "observation": "FDA final menthol rule with near-term implementation",
+        "action": "Move base toward bear; cap exit multiple at 8x"
+      }
+    ],
+    "status": "partial"
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "evidence_refresh": {
+    "synthesis_in_dive": true
+  }
+}
