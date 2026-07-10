@@ -581,7 +581,17 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | TXN | TXN/ | Texas Instruments | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | TXT | TXT/ | Textron | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | TYL | TYL/ | Tyler Technologies | US | 2026-07-10 | 2026-07-10 | unknown | watch |
-| USB | USB/ | U.S. Bancorp | US | — | — | unknown | watch |
+| UAL | UAL/ | United Airlines Holdings | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| UBER | UBER/ | Uber | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| UDR | UDR/ | UDR, Inc. | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| UHS | UHS/ | Universal Health Services | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| ULTA | ULTA/ | Ulta Beauty | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| UNH | UNH/ | UnitedHealth Group | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| UNP | UNP/ | Union Pacific Corporation | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| UPS | UPS/ | United Parcel Service | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| URI | URI/ | United Rentals | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| USB | USB/ | U.S. Bancorp | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| VLO | VLO/ | Valero Energy | US | — | — | unknown | watch |
 | VOXR | VOXR/ | Vox Royalty Corp | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | VTRS | VTRS/ | Viatris Inc | US | 2026-07-09 | 2026-07-09 | turnaround | watch |
 | WBI | WBI/ | WaterBridge Infrastructure | US | 2026-07-09 | 2026-07-10 | infrastructure | watch |
@@ -594,4 +604,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 
-**587 holdings total.** Registry: `_system/portfolio/registry.json`
+**597 holdings total.** Registry: `_system/portfolio/registry.json`
