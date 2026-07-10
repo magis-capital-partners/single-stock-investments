@@ -1,4 +1,4 @@
-# AppLovin (APP)
+# AppLovin Corporation (APP)
 
 **Ticker:** APP | **Market:** US
 **Last updated:** 2026-07-10
