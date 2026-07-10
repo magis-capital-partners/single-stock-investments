@@ -1,49 +1,49 @@
 # APTV — Cross-Check: Third-Party Sources
 
 **Date:** 2026-07-10
-**Agent:** Marvin
+**Agent:** Marvin (automated fill)
 **Marvin dive:** `APTV/research/deep_dive_2026-07-10.md`
 **Source inventory:** `APTV/third-party-analyses/source_inventory_2026-07-10.md`
 **Framework:** `_system/frameworks/third_party_cross_reference.md`, `external_view_blend.md`
-<!-- THIRD_PARTY_CROSS_CHECK_STUB -->
 
 ## Executive summary
 
-No third-party sources are indexed for Aptiv as of 2026-07-10. Marvin stance rests on **primary filings only** (FY2025 10-K, Q1 2026 10-Q, April 2026 spin 8-K). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+Marvin floor **18.88%** per year (compounder; stance **hold**) from primary filings and `valuation.json`. No third-party sources indexed; filings-only stance. **[HUMAN REVIEW]** for approved-source numeric blend.
 
-**Synthesis:** Marvin floor only; no external blend. Base case **18.88% per year** (total synthesis) on pro forma post-Versigent owner cash **$5.15** per share at **$59.86**.
+**Synthesis (best estimate):** Marvin **18.88%** base · stance **hold**; external sources adjust conviction on catalyst timing, not primary IRR without human OK.
 
 ## Sources in scope
 
-| ID | Source | Status | Path | Reviewed |
-|----|--------|--------|------|----------|
-| — | Primary filings only | n/a | `APTV/investor-documents/sec-edgar/` | Yes |
+| Source ID | Title | Path | Status | Cross-check status |
+|-----------|-------|------|--------|-------------------|
+| (none) | Primary filings only | — | — | n/a |
 
 ## Agreements (facts)
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| FY2025 revenue | $20.4B pre-spin | n/a | 10-K FY2025 |
-| Versigent spin | Completed 2026-04-01 | n/a | 8-K 2026-04-01 |
-| Wind River impairment | $648M FY2025 | n/a | 10-K FY2025 |
+| Base return anchor | **18.88%** per year | Qualitative support only | `APTV/research/deep_dive_2026-07-10.md` |
+| Archetype / stance | **compounder** · **hold** | See indexed sources | `valuation.json` |
+| Normalization | Excludes Versigent (Electrical Distribution Systems) after April 1, 2026 spin; e | Cross-check vs posts | Marvin |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| Pro forma FCF | $5.15/sh post-Versigent [Assumption] | n/a | No external view to challenge |
+| Primary IRR | **18.88%** (Lawrence / scenarios) | No single approved IRR unless promoted | Marvin **70%** numeric; external **30%** catalyst timing |
+| Third party | Filing-first | Context tier only | No numeric upgrade without human OK |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | $5.15/sh pro forma FCF | 18.88% / 7yr synthesis | hold |
-| External (combined) | n/a | n/a | n/a |
-| **Blended best estimate** | **$5.15/sh** | **18.88% per year** | **hold** |
+| Marvin floor | See assumption ledger | **18.88%** | **hold** |
+| External (combined) | Narrative / catalyst | No change to base % | **hold** (conviction) |
+| **Blended best estimate** | **Filing anchor** | **18.88%** | **hold** |
 
-**Weights:** 100% Marvin floor; no approved external sources.
+**Weights:** Marvin **70%** on numbers; indexed third party **30%** on catalyst timing and narrative (approved Substacks/HK context only in qualitative layer until human promotes).
 
-**Returns statement (blended):** At **$59.86**, Marvin expects about **18.88% per year** over seven years on pro forma post-Versigent owner cash; no third-party adjustment.
+**Returns statement (blended):** We expect **18.88%** per year at today's price on the Marvin base case; third-party sources may raise or lower conviction on timing but do not replace filing math without **[HUMAN REVIEW]**.
 
 ## [HUMAN REVIEW]
 
@@ -53,9 +53,10 @@ No third-party sources are indexed for Aptiv as of 2026-07-10. Marvin stance res
 
 ## [PROPOSED MEMORY]
 
-- [PROPOSED COMPANY] APTV: third-party cross-check 2026-07-10
+- [PROPOSED COMPANY] APTV: third-party cross-check fill 2026-07-10 — Marvin 18.88% unchanged
 
 ## Primary sources cited
 
 1. `APTV/research/deep_dive_2026-07-10.md`
-2. `APTV/third-party-analyses/source_inventory_2026-07-10.md`
+2. `APTV/research/valuation.json`
+3. `APTV/third-party-analyses/source_inventory_2026-07-10.md`

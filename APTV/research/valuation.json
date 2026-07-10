@@ -14,11 +14,12 @@
   "valuation_overlay": "segment_cashflow",
   "inputs": {
     "price": 59.86,
-    "price_source": "NYSE close 2026-07-09 (Yahoo Finance chart API)",
+    "price_source": "Yahoo APTV close 2026-07-09",
     "fcf_per_share": 5.15,
     "fcf_source": "FY2025 pro forma post-Versigent: consolidated OCF $2,185M minus capex $656M = $1,529M; remaining segments ~73% of adj. operating income ($1,787M / $2,461M) \u2192 ~$1,102M \u00f7 ~214M diluted shares (10-K FY2025; 8-K spin 2026-04-01)",
     "shares_millions": 213.8,
-    "normalization_note": "Excludes Versigent (Electrical Distribution Systems) after April 1, 2026 spin; excludes $648M Wind River goodwill impairment (non-cash); uses cash from operations less capital spending, not GAAP net income $165M"
+    "normalization_note": "Excludes Versigent (Electrical Distribution Systems) after April 1, 2026 spin; excludes $648M Wind River goodwill impairment (non-cash); uses cash from operations less capital spending, not GAAP net income $165M",
+    "price_as_of": "2026-07-09"
   },
   "scenarios": {
     "bear": {
@@ -321,5 +322,255 @@
       }
     },
     "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  },
+  "human_review": {
+    "live_price_confirmed": false
+  },
+  "total_return_panel": {
+    "as_of": "2026-07-10",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 0,
+    "distribution_history_sum": 0,
+    "market_cap_m": null,
+    "total_return_annualized_pct": 8.6,
+    "chart": "APTV/research/charts/total_return_2026-07-10.svg",
+    "panel_json": "APTV/research/total_return_panel.json"
+  },
+  "context_overlay": {
+    "as_of": "2026-07-10",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": 0.59,
+            "as_of": "2026-07-09",
+            "yoy_pct": 209.3,
+            "direction": "up",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.539000034332275,
+            "as_of": "2026-07-09",
+            "yoy_pct": 4.5,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.269000053405762,
+            "as_of": "2026-07-09",
+            "yoy_pct": 8.9,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 100.9280014038086,
+            "as_of": "2026-07-10",
+            "yoy_pct": 3.4,
+            "direction": "up",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 15.84000015258789,
+            "as_of": "2026-07-09",
+            "yoy_pct": -0.6,
+            "direction": "flat",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": 0.42,
+            "as_of": "2026-07-09",
+            "yoy_pct": 160.0,
+            "direction": "up",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 15.53,
+            "as_of": "2026-07-09",
+            "yoy_pct": 48.0,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "insider_signal": {
+    "as_of": "2026-07-10",
+    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
+    "in_base_irr": false,
+    "window_days": 365,
+    "ics": 3.57,
+    "band": "weak",
+    "bull_case_support": "none",
+    "scenario_confidence": {
+      "priors": {
+        "bear": 0.2,
+        "base": 0.55,
+        "bull": 0.25
+      },
+      "tilted": {
+        "bear": 0.209,
+        "base": 0.541,
+        "bull": 0.25
+      },
+      "bull_delta": 0.0,
+      "bear_delta": 0.009,
+      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
+    },
+    "factors": {
+      "buy_score": 4.106,
+      "sell_score": -1.0,
+      "cluster_bonus": 0.0,
+      "net_buy_usd": 649070.6,
+      "net_sell_usd": 23454062.72,
+      "price_today": 59.86
+    },
+    "top_buys": [
+      {
+        "insider": "Agnevall Hakan",
+        "date": "2026-05-08",
+        "shares": 6100,
+        "price": 57.73,
+        "value_usd": 352153.0,
+        "shares_owned_after": 13697,
+        "contrib": 2.087
+      },
+      {
+        "insider": "Agnevall Hakan",
+        "date": "2025-12-12",
+        "shares": 3700,
+        "price": 80.248,
+        "value_usd": 296917.6,
+        "shares_owned_after": 4655,
+        "contrib": 2.019
+      }
+    ],
+    "top_sells": [
+      {
+        "insider": "Louissaint Obed D.",
+        "date": "2026-06-15",
+        "shares": 3000,
+        "price": 69.6,
+        "value_usd": 208800.0,
+        "is_10b5_1": false,
+        "contrib": -0.162
+      },
+      {
+        "insider": "Ramundo Katherine H",
+        "date": "2026-06-03",
+        "shares": 2000,
+        "price": 78.3,
+        "value_usd": 156600.0,
+        "is_10b5_1": false,
+        "contrib": -0.147
+      },
+      {
+        "insider": "CLARK KEVIN P",
+        "date": "2026-03-03",
+        "shares": 83988,
+        "price": 0.0,
+        "value_usd": 0.0,
+        "is_10b5_1": false,
+        "contrib": -0.129
+      },
+      {
+        "insider": "Massaro Joseph R",
+        "date": "2026-02-28",
+        "shares": 31568,
+        "price": 73.54,
+        "value_usd": 2321510.72,
+        "is_10b5_1": false,
+        "contrib": -0.129
+      },
+      {
+        "insider": "CLARK KEVIN P",
+        "date": "2026-02-28",
+        "shares": 80115,
+        "price": 73.54,
+        "value_usd": 5891657.1,
+        "is_10b5_1": false,
+        "contrib": -0.129
+      }
+    ],
+    "narrative_hooks": [],
+    "transaction_count": 70
+  },
+  "lens_consensus": {
+    "as_of": "2026-07-10",
+    "shared_inputs_ref": "valuation.json@2026-07-10",
+    "valuation_richness": 0.0,
+    "blended_return_pct": 16.15,
+    "band_pct": [
+      10.9,
+      18.88
+    ],
+    "weighted_median_pct": 17.7,
+    "median_mean_flag": false,
+    "stance": "hold",
+    "agreement_pct": 70,
+    "dissent_count": 2,
+    "lawrence_divergence": false,
+    "top_dissents": [
+      {
+        "persona": "pabrai",
+        "label": "Mohnish Pabrai",
+        "verdict": "watch",
+        "return_pct": 10.9,
+        "key_metric": "downside_upside_ratio=0.47",
+        "conviction": 0.205,
+        "falsifier": "dhando -> none OR net-debt/EBITDA > 3 OR bear return < -15%"
+      },
+      {
+        "persona": "greenblatt",
+        "label": "Joel Greenblatt",
+        "verdict": "watch",
+        "return_pct": 14.6,
+        "key_metric": "earnings_yield=8.6",
+        "conviction": 0.02,
+        "falsifier": "FCF yield below universe median OR base IRR below median"
+      }
+    ],
+    "contributor_count": 7,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
   }
 }
