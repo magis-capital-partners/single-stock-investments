@@ -1,0 +1,188 @@
+{
+  "ticker": "AKAM",
+  "as_of": "2026-07-10",
+  "method": "full",
+  "lawrence_bucket": "multi_sided",
+  "classification_inputs": {
+    "archetype": "platform",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 129.52,
+    "price_source": "Yahoo AKAM close 2026-07-09",
+    "fcf_per_share": 6.88,
+    "fcf_source": "FY2025: cash from operations $1,519M minus capital spending $508M, divided by 147.0M diluted shares (10-K FY2025)",
+    "shares_millions": 147.0,
+    "normalization_note": "FY2025 reported free cash flow; Q1 2026 operating margin compressed on compute build-out and cost of revenue \u2014 not using peak margin year",
+    "price_as_of": "2026-07-09"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 18,
+      "notes": "Compute growth slows; security pricing pressure; multiple stays depressed"
+    },
+    "base": {
+      "growth_y1_5": 0.06,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 22,
+      "notes": "Compute mix continues; security stabilizes; modest re-rate from buybacks"
+    },
+    "bull": {
+      "growth_y1_5": 0.09,
+      "growth_y6_10": 0.06,
+      "exit_pfcf_y10": 28,
+      "notes": "GPU/cloud infrastructure share gains; margin recovery; premium platform multiple"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Goodwill $3.2B and operating lease ROU $1.47B are on balance sheet at recognized values; no land/NAV misstatement pattern (10-K FY2025)"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / RPO not in FCF path?",
+      "answer": "Partial yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Remaining performance obligation ~$5.2B at FY2025; conversion timing in revenue growth assumptions [Assumption] (10-K FY2025, 10-Q Q1 2026)"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Compute segment $2.24B FY2025 (+10% YoY) already in consolidated revenue; GPU/cloud ramp in segment growth rows"
+    }
+  ],
+  "stance_proposal": {
+    "suggested": "hold",
+    "irr_band": "15\u201320%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "human_review": {
+    "live_price_confirmed": false
+  },
+  "total_return_panel": {
+    "as_of": "2026-07-10",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 0,
+    "distribution_history_sum": 0,
+    "market_cap_m": null,
+    "total_return_annualized_pct": -0.43,
+    "chart": "AKAM/research/charts/total_return_2026-07-10.svg",
+    "panel_json": "AKAM/research/total_return_panel.json"
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 7.7
+    },
+    "base": {
+      "return_pct": 13.1
+    },
+    "bull": {
+      "return_pct": 19.5
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 7.7
+    },
+    "base": {
+      "return_pct": 13.1
+    },
+    "bull": {
+      "return_pct": 19.5
+    }
+  },
+  "implied_return": {
+    "base_pct": 15.83,
+    "label": "7yr IRR (total synthesis)",
+    "display": "15.83% (total synthesis)",
+    "lawrence_stance_gate_pct": 13.1,
+    "falsifier_adjusted_pct": 13.1,
+    "synthesis_pct": 15.83
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": 7.7,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 19.5,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 16.03,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 15.83,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}
