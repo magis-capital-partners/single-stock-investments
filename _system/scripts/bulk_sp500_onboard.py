@@ -129,8 +129,39 @@ def write_manifest(batch_id: str, rows: list[dict]) -> Path:
     return path
 
 
+LOOP_LOG = ROOT / "_system" / "portfolio" / "sp500_onboard_loop.log"
+
+
+def discard_onboard_noise() -> None:
+    """Drop INDEX/dashboard churn left by per-ticker onboard_ticker rebuilds."""
+    proc = subprocess.run(["git", "status", "--porcelain"], cwd=ROOT, capture_output=True, text=True)
+    for line in proc.stdout.splitlines():
+        if len(line) < 4 or line[:2] not in {" M", "MM", "AM"}:
+            continue
+        path = line[3:].strip()
+        if path.endswith("INDEX.csv") or path.startswith("dashboard/data/"):
+            subprocess.run(["git", "restore", "--staged", "--worktree", path], cwd=ROOT)
+
+
 def git_push_batch() -> int:
-    stash = subprocess.run(["git", "stash", "push", "-u", "-m", "sp500-onboard-wip"], cwd=ROOT)
+    discard_onboard_noise()
+    push = subprocess.run(["git", "push", "origin", "main"], cwd=ROOT)
+    if push.returncode == 0:
+        return 0
+    stash = subprocess.run(
+        [
+            "git",
+            "stash",
+            "push",
+            "-u",
+            "-m",
+            "sp500-onboard-wip",
+            "--",
+            ".",
+            f":!{LOOP_LOG.relative_to(ROOT).as_posix()}",
+        ],
+        cwd=ROOT,
+    )
     pull = subprocess.run(["git", "pull", "--rebase", "origin", "main"], cwd=ROOT)
     if pull.returncode != 0:
         if stash.returncode == 0:
@@ -139,6 +170,7 @@ def git_push_batch() -> int:
     push = subprocess.run(["git", "push", "origin", "main"], cwd=ROOT)
     if stash.returncode == 0:
         subprocess.run(["git", "stash", "pop"], cwd=ROOT)
+    discard_onboard_noise()
     return push.returncode
 
 
