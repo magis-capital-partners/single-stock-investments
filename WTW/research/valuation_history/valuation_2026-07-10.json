@@ -1,0 +1,150 @@
+{
+  "ticker": "WTW",
+  "as_of": "2026-07-10",
+  "method": "full",
+  "lawrence_bucket": "platform",
+  "classification_inputs": {
+    "archetype": "compounder",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 289.6,
+    "price_source": "Yahoo WTW close 2026-07-09",
+    "price_as_of": "2026-07-09",
+    "fcf_per_share": 15.62,
+    "fcf_source": "FY2025 OCF $1,775M minus capex and capitalized software $229M divided by ~99M diluted shares",
+    "shares_millions": 99
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.02,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 16,
+      "notes": "P&C soft market; broking commissions flat"
+    },
+    "base": {
+      "growth_y1_5": 0.04,
+      "growth_y6_10": 0.035,
+      "exit_pfcf_y10": 18,
+      "notes": "Organic mid-single-digit growth; stable margins"
+    },
+    "bull": {
+      "growth_y1_5": 0.06,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 20,
+      "notes": "Hard market + Newfront synergies; buybacks continue"
+    }
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 5.7
+    },
+    "base": {
+      "return_pct": 9.1
+    },
+    "bull": {
+      "return_pct": 12.2
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 5.7
+    },
+    "base": {
+      "return_pct": 9.1
+    },
+    "bull": {
+      "return_pct": 12.2
+    }
+  },
+  "implied_return": {
+    "base_pct": 10.09,
+    "label": "7yr IRR (total synthesis)",
+    "display": "10.09% (total synthesis)",
+    "lawrence_stance_gate_pct": 9.1,
+    "falsifier_adjusted_pct": 9.1,
+    "synthesis_pct": 10.09
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": 5.7,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 12.2,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 10.29,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 10.09,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}
