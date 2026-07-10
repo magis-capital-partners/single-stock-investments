@@ -376,27 +376,37 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | LYB | LYB/ | LyondellBasell | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | LYV | LYV/ | Live Nation Entertainment | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | MA | MA/ | Mastercard | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| MAA | MAA/ | Mid-America Apartment Communities | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | MAR | MAR/ | Marriott International | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | MAS | MAS/ | Masco | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | MCD | MCD/ | McDonald's | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | MCHB | MCHB/ | Mechanics Bancorp | US | 2026-07-09 | 2026-07-10 | unknown | watch |
-| MCK | MCK/ | McKesson Corporation | US | — | — | unknown | watch |
+| MCHP | MCHP/ | Microchip Technology | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| MCK | MCK/ | McKesson Corporation | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | MCO | MCO/ | Moody's Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | MDB | MDB/ | MongoDB, Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| MDT | MDT/ | Medtronic | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| MET | MET/ | MetLife | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | META | META/ | Meta Platforms Inc | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| MGM | MGM/ | MGM Resorts | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | MIAX | MIAX/ | Miami International Holdings | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | MKC | MKC/ | McCormick & Company | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | MLM | MLM/ | Martin Marietta Materials | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | MMM | MMM/ | 3M | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | MO | MO/ | Altria | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | MPC | MPC/ | Marathon Petroleum | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| MRK | MRK/ | Merck & Co. | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| MRNA | MRNA/ | Moderna | US | — | — | unknown | watch |
 | MRSH | MRSH/ | Marsh & McLennan Companies | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | MRTX.CVR | MRTX.CVR/ | Mirati Therapeutics CVR (Bristol-Myers Squibb acquisition) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | MRVL | MRVL/ | Marvell Technology | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | MSB | MSB/ | Mesabi Trust | US | 2026-07-09 | 2026-07-09 | optionality | watch |
+| MSFT | MSFT/ | Microsoft | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | MSTR | MSTR/ | MicroStrategy Incorporated | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | MTA | MTA/ | Metalla Royalty & Streaming Ltd. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | MTB | MTB/ | M&T Bank | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| MTD | MTD/ | Mettler Toledo | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| MU | MU/ | Micron Technology | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | NAN | NAN/ | Nuveen New York AMT-Free Quality Municipal Income Fund | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | NBIS | NBIS/ | Nebius Group N.V. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | NDAQ | NDAQ/ | Nasdaq Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
@@ -454,4 +464,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 
-**447 holdings total.** Registry: `_system/portfolio/registry.json`
+**457 holdings total.** Registry: `_system/portfolio/registry.json`
