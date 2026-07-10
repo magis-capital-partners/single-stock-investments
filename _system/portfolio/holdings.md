@@ -352,19 +352,27 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | KR | KR/ | Kroger | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | KRP | KRP/ | Kimbell Royalty Partners LP | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | KVUE | KVUE/ | Kenvue | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| L | L/ | Loews Corporation | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | LAND | LAND/ | Gladstone Land Corporation | US | 2026-07-09 | 2026-07-09 | infrastructure | watch |
 | LB | LB/ | LandBridge Company LLC | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | LBRDK | LBRDK/ | Liberty Broadband Corporation (Class C) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | LDOS | LDOS/ | Leidos | US | 2026-07-10 | 2026-07-10 | unknown | watch |
-| LEN | LEN/ | Lennar | US | — | — | unknown | watch |
+| LEN | LEN/ | Lennar | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | LH | LH/ | Labcorp | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | LHX | LHX/ | L3Harris | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| LII | LII/ | Lennox International | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| LIN | LIN/ | Linde plc | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| LLY | LLY/ | Lilly (Eli) | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | LMN | LMN/ | Lumine Group Inc. | CA | — | 2026-07-09 | unknown | watch |
 | LMNR | LMNR/ | Limoneira Company | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| LMT | LMT/ | Lockheed Martin | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | LNT | LNT/ | Alliant Energy | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| LOW | LOW/ | Lowe's | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | LRCX | LRCX/ | Lam Research | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | LSEG | LSEG/ | London Stock Exchange Group | UK | 2026-07-09 | 2026-07-09 | unknown | watch |
+| LULU | LULU/ | Lululemon Athletica | US | — | — | unknown | watch |
 | LVS | LVS/ | Las Vegas Sands | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| LYV | LYV/ | Live Nation Entertainment | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | MCHB | MCHB/ | Mechanics Bancorp | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | MCO | MCO/ | Moody's Corporation | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | MDB | MDB/ | MongoDB, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -434,4 +442,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 
-**427 holdings total.** Registry: `_system/portfolio/registry.json`
+**435 holdings total.** Registry: `_system/portfolio/registry.json`
