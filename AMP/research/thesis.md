@@ -1,6 +1,6 @@
 # AMP — Investment Thesis
 
-**Last updated:** 2026-07-10
+**Last updated:** auto-sync
 
 ## Classification
 
@@ -9,14 +9,19 @@
 | **Archetype** (Stahl) | compounder |
 | **Moat** (Munger) | stable |
 | **Dhando** (Pabrai) | partial |
-| **Stance** | watch |
+| **Stance** | hold |
 | **Cycle** | mid |
-| **MOI bucket** (legacy) | pricing_power |
+| **Implied 7yr IRR** (base) | 18.94% (total synthesis) |
+| **IRR method** | full |
+| **Lawrence bucket** | pricing_power |
 | **Payoff lens** | operating |
+| **MOI bucket** | pending |
+
+**Deep dive:** `AMP/research/deep_dive_2026-07-10.md` (auto-sync)
 
 ## One-line thesis
 
-Ameriprise is a high-ROE wealth and asset management compounder with **$1.2T** client assets and disciplined **80%+** capital return, but at spot the Lawrence IRR is below our **15%** hurdle — **watch** for a better entry.
+Ameriprise is a high-ROE wealth and asset management compounder with **$1.2T** client assets and disciplined **80%+** capital return; at ~**$500** the Lawrence IRR is **18.1%** — **hold**.
 
 ## Key questions
 
