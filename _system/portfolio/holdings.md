@@ -102,21 +102,31 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | BX | BX/ | Blackstone Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | BXP | BXP/ | BXP, Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | BYMA | BYMA/ | Bolsas y Mercados Argentinos S.A. | EU | 2026-07-09 | 2026-07-09 | unknown | watch |
+| CAH | CAH/ | Cardinal Health | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| CARR | CARR/ | Carrier Global | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| CASY | CASY/ | Casey's | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| CAT | CAT/ | Caterpillar Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CBOE | CBOE/ | Cboe Global Markets | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| CBRE | CBRE/ | CBRE Group | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CBRS | CBRS/ | Cerebras Systems | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| CCL | CCL/ | Carnival Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| CDNS | CDNS/ | Cadence Design Systems | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CDZI | CDZI/ | Cadiz Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | CHRW | CHRW/ | C.H. Robinson | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CHTR | CHTR/ | Charter Communications, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | CKX | CKX/ | CKX Lands, Inc. | US | 2026-07-09 | 2026-07-09 | optionality | watch |
 | CME | CME/ | CME Group Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | CMSG | CMSG/ | Consensus Mining & Seigniorage Corp | US | 2026-07-09 | 2026-07-09 | optionality | watch |
+| COF | COF/ | Capital One | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | COLD | COLD/ | Americold Realty Trust, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | CORBF | CORBF/ | Corbus Pharmaceuticals Holdings, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | CPRT | CPRT/ | Copart | US | 2026-07-09 | 2026-07-09 | compounder | core |
+| CPT | CPT/ | Camden Property Trust | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CRCL | CRCL/ | Circle Internet Group, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | CSGP | CSGP/ | CoStar Group | US | 2026-07-09 | 2026-07-09 | platform | watch |
 | CSU | CSU/ | Constellation Software | CA | 2026-07-09 | 2026-07-09 | compounder | core |
 | CSU.DB | CSU.DB/ | Constellation Software Inc. (Series 1 Debentures) | CA | — | 2026-07-09 | unknown | watch |
+| CVNA | CVNA/ | Carvana | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | DB1.DE | DB1.DE/ | Deutsche Boerse AG | EU | 2026-07-09 | 2026-07-09 | unknown | watch |
 | DHR | DHR/ | Danaher Corporation | US | 2026-07-09 | 2026-07-09 | compounder | hold |
 | DMLP | DMLP/ | Dorchester Minerals LP | US | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -238,4 +248,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 
-**231 holdings total.** Registry: `_system/portfolio/registry.json`
+**241 holdings total.** Registry: `_system/portfolio/registry.json`
