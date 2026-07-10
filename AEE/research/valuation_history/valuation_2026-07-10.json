@@ -1,0 +1,258 @@
+{
+  "ticker": "AEE",
+  "as_of": "2026-07-10",
+  "method": "full",
+  "lawrence_bucket": "regulated_utility",
+  "classification_inputs": {
+    "archetype": "infrastructure",
+    "moat": "narrow",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 111.77,
+    "price_source": "Yahoo AEE close 2026-07-09",
+    "fcf_per_share": 5.1,
+    "fcf_source": "FY2025 diluted EPS $5.35 (10-K) less ~5% haircut for equity-plan dilution and regulatory lag [Assumption]; OCF $3,353M and capex $4,128M imply negative raw free cash flow during rate-base growth cycle",
+    "shares_millions": 276.4,
+    "normalization_note": "Regulated utility: Lawrence uses filing earnings power per share, not OCF minus total capital spending. Heavy 2026-2030 capex ($30.5-33.1B) is recovered through PISA, MYRP, and transmission formula rates.",
+    "price_as_of": "2026-07-09"
+  },
+  "growth_explanation": {
+    "years_1_5": "Rate-base growth from $30.5-33.1B five-year capital plan (Missouri Smart Energy Plan ~$20.8B, Illinois distribution/transmission, ATXI) recovered via allowed ROEs (Illinois electric 8.72%, transmission 10.48%, Missouri trackers/PISA).",
+    "years_6_10": "Load growth from data-center/large-load tariffs (1.5 GW by 2032 per 10-K) and grid modernization sustain mid-single-digit earnings after initial capex wave.",
+    "source": "AEE/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001002910_26_000009.htm Outlook and Liquidity sections",
+    "status": "partial",
+    "lawrence_legacy": {
+      "y1_5": 0.06,
+      "y6_10": 0.05,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.06,
+      "y6_10": 0.05,
+      "exit_pfcf_y10": 17.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": 0.1543,
+      "as_of_filing_facts": "evidence/_text/10-K_20260218_rpt20251231_acc0001002910_26_000009.htm.txt"
+    }
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.04,
+      "growth_y6_10": 0.03,
+      "exit_pfcf_y10": 14,
+      "notes": "Regulatory lag, Illinois MYRP appeals, equity dilution at top of $4B plan, affordability pushback on rates"
+    },
+    "base": {
+      "growth_y1_5": 0.06,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 17,
+      "notes": "Rate-base CAGR from filed capex plan; dividend payout 50-60% of earnings"
+    },
+    "bull": {
+      "growth_y1_5": 0.07,
+      "growth_y6_10": 0.06,
+      "exit_pfcf_y10": 18,
+      "notes": "Faster large-load interconnections, constructive Missouri PPRA implementation, minimal dilution via ATM/DRPlus"
+    }
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Regulated rate base on balance sheet; no land-at-cost pattern"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Integrated regulated wires and generation; no royalty trust"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "All reporting segments profitable FY2025"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF path?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Large-load/data-center interconnection pipeline (1.5 GW by 2032) flows through rate-base growth, not separate option"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No material unlisted stakes in 10-K"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Stable regulated dividend; no suspended payout"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option already in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Renewable additions and grid upgrades earn through Missouri PISA and Illinois MYRP"
+    }
+  ],
+  "human_review": {
+    "live_price_confirmed": false
+  },
+  "total_return_panel": {
+    "as_of": "2026-07-10",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 0,
+    "distribution_history_sum": 0,
+    "market_cap_m": null,
+    "total_return_annualized_pct": 3.42,
+    "chart": "AEE/research/charts/total_return_2026-07-10.svg",
+    "panel_json": "AEE/research/total_return_panel.json"
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 3.0
+    },
+    "base": {
+      "return_pct": 7.3
+    },
+    "bull": {
+      "return_pct": 9.1
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 3.0
+    },
+    "base": {
+      "return_pct": 7.3
+    },
+    "bull": {
+      "return_pct": 9.1
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": 7.3
+    },
+    "falsifier_adjusted": {
+      "return_pct": 7.3
+    }
+  },
+  "implied_return": {
+    "base_pct": 7.1,
+    "label": "7yr IRR (total synthesis)",
+    "display": "7.1% (total synthesis)",
+    "lawrence_stance_gate_pct": 7.3,
+    "falsifier_adjusted_pct": 7.3,
+    "synthesis_pct": 7.1
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Growth theory (pre-falsifier)",
+        "source": "growth_explanation + filing revenue YoY",
+        "return_pct": 7.3,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": 3.0,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 9.1,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 7.3,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 7.1,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}
