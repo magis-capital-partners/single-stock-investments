@@ -1,6 +1,6 @@
 # WYNN — Investment Thesis
 
-**Last updated:** 2026-07-10
+**Last updated:** auto-sync
 
 ## Classification
 
@@ -11,10 +11,13 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | mid |
-| **Implied 7yr IRR** (Lawrence) | 12.5% (total synthesis) |
+| **Implied 7yr IRR** (base) | 12.5% (total synthesis) |
 | **IRR method** | full |
 | **Lawrence bucket** | pricing_power |
 | **Payoff lens** | operating |
+| **MOI bucket** | — |
+
+**Deep dive:** `WYNN/research/deep_dive_2026-07-10.md` (auto-sync)
 
 ## One-line thesis
 
