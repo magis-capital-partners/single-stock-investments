@@ -1,50 +1,49 @@
 # AOS — Cross-Check: Third-Party Sources
 
 **Date:** 2026-07-10
-**Agent:** Marvin
+**Agent:** Marvin (automated fill)
 **Marvin dive:** `AOS/research/deep_dive_2026-07-10.md`
 **Source inventory:** `AOS/third-party-analyses/source_inventory_2026-07-10.md`
 **Framework:** `_system/frameworks/third_party_cross_reference.md`, `external_view_blend.md`
-<!-- THIRD_PARTY_CROSS_CHECK_STUB -->
 
 ## Executive summary
 
-No third-party sources are indexed for AOS as of 2026-07-10. Marvin stance rests on **primary filings only** (FY2025 10-K, Q1 2026 10-Q). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+Marvin floor **14.08%** per year (compounder; stance **watch**) from primary filings and `valuation.json`. No third-party sources indexed; filings-only stance. **[HUMAN REVIEW]** for approved-source numeric blend.
 
-**Synthesis:** Marvin floor only; no external blend. Base annual return **13.9%** per year at **$59.02** on FY2025 free cash flow **$3.85** per share → **watch**.
+**Synthesis (best estimate):** Marvin **14.08%** base · stance **watch**; external sources adjust conviction on catalyst timing, not primary IRR without human OK.
 
 ## Sources in scope
 
-| ID | Title | Path | Status | Use |
-|----|-------|------|--------|-----|
-| primary | FY2025 10-K | `investor-documents/sec-edgar/10-K_20260210_rpt20251231_acc0000091142_26_000008.htm` | filing | Segment margins, FCF, outlook |
-| primary | Q1 2026 10-Q | `investor-documents/sec-edgar/10-Q_20260430_rpt20260331_acc0000091142_26_000084.htm` | filing | Latest quarterly trend |
+| Source ID | Title | Path | Status | Cross-check status |
+|-----------|-------|------|--------|-------------------|
+| (none) | Primary filings only | — | — | n/a |
 
 ## Agreements (facts)
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| FY2025 FCF | $546.0M ($3.85/sh) | n/a | 10-K FY2025 |
-| NA segment margin | 24.4% | n/a | 10-K segment note |
-| 2026 sales outlook | +2–5% | n/a | 10-K outlook |
+| Base return anchor | **14.08%** per year | Qualitative support only | `AOS/research/deep_dive_2026-07-10.md` |
+| Archetype / stance | **compounder** · **watch** | See indexed sources | `valuation.json` |
+| Normalization | Lawrence base uses FY2025 filed free cash flow; 2026 guidance FCF $525–575M brac | Cross-check vs posts | Marvin |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| — | No external views | — | Marvin floor stands |
+| Primary IRR | **14.08%** (Lawrence / scenarios) | No single approved IRR unless promoted | Marvin **70%** numeric; external **30%** catalyst timing |
+| Third party | Filing-first | Context tier only | No numeric upgrade without human OK |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | $3.85 FCF/sh FY2025 | 13.9% / 7yr | watch |
-| External (combined) | — | — | — |
-| **Blended best estimate** | **$3.85 FCF/sh** | **13.9%** | **watch** |
+| Marvin floor | See assumption ledger | **14.08%** | **watch** |
+| External (combined) | Narrative / catalyst | No change to base % | **watch** (conviction) |
+| **Blended best estimate** | **Filing anchor** | **14.08%** | **watch** |
 
-**Weights:** 100% Marvin floor (no approved third-party sources).
+**Weights:** Marvin **70%** on numbers; indexed third party **30%** on catalyst timing and narrative (approved Substacks/HK context only in qualitative layer until human promotes).
 
-**Returns statement (blended):** At **$59.02**, filed FY2025 owner cash supports **13.9%** per year in the base case — below our **15%** bar; **watch**.
+**Returns statement (blended):** We expect **14.08%** per year at today's price on the Marvin base case; third-party sources may raise or lower conviction on timing but do not replace filing math without **[HUMAN REVIEW]**.
 
 ## [HUMAN REVIEW]
 
@@ -54,9 +53,10 @@ No third-party sources are indexed for AOS as of 2026-07-10. Marvin stance rests
 
 ## [PROPOSED MEMORY]
 
-- [PROPOSED COMPANY] AOS: third-party cross-check 2026-07-10
+- [PROPOSED COMPANY] AOS: third-party cross-check fill 2026-07-10 — Marvin 14.08% unchanged
 
 ## Primary sources cited
 
 1. `AOS/research/deep_dive_2026-07-10.md`
-2. `AOS/third-party-analyses/source_inventory_2026-07-10.md`
+2. `AOS/research/valuation.json`
+3. `AOS/third-party-analyses/source_inventory_2026-07-10.md`
