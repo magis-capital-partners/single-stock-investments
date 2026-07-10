@@ -438,21 +438,31 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | NXPI | NXPI/ | NXP Semiconductors | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | NZX.NZ | NZX.NZ/ | NZX Limited | AU | 2026-07-09 | 2026-07-09 | unknown | watch |
 | ODFL | ODFL/ | Old Dominion | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| OKE | OKE/ | Oneok | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | OMC | OMC/ | Omnicom Group | US | 2026-07-10 | 2026-07-10 | unknown | watch |
-| ON | ON/ | ON Semiconductor | US | — | — | unknown | watch |
+| ON | ON/ | ON Semiconductor | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | OR | OR/ | Osisko Gold Royalties Ltd | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| ORCL | ORCL/ | Oracle Corporation | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | ORLY | ORLY/ | O’Reilly Automotive | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | OTCM | OTCM/ | OTC Markets Group | US | 2026-07-09 | 2026-07-09 | croupier | watch |
+| OTIS | OTIS/ | Otis Worldwide | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | OXY | OXY/ | Occidental Petroleum | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| PANW | PANW/ | Palo Alto Networks | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| PAYX | PAYX/ | Paychex | US | — | — | unknown | watch |
 | PBT | PBT/ | Permian Basin Royalty Trust | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| PCAR | PCAR/ | Paccar | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | PCH | PCH/ | PotlatchDeltic Corporation | US | 2026-07-09 | 2026-07-09 | optionality | watch |
 | PCYO | PCYO/ | Pure Cycle Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | PDER | PDER/ | Pardee Resources Company | OTC | 2026-07-09 | 2026-07-09 | optionality | watch |
+| PH | PH/ | Parker Hannifin | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| PKG | PKG/ | Packaging Corporation of America | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| PLTR | PLTR/ | Palantir Technologies | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | PODD | PODD/ | Insulet Corporation | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | POST | POST/ | Post Holdings, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | PRVL.CVR | PRVL.CVR/ | Prevail Therapeutics CVR (Eli Lilly acquisition) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | PSE | PSE/ | Philippine Stock Exchange Inc. | EU | 2026-07-09 | 2026-07-10 | unknown | watch |
 | PSK.TO | PSK.TO/ | PrairieSky Royalty Ltd. | CA | 2026-06-03 | 2026-07-09 | optionality | watch |
+| PSKY | PSKY/ | Paramount Skydance Corporation | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | QDEL | QDEL/ | QuidelOrtho | US | 2026-07-09 | 2026-07-10 | turnaround | hold |
 | RDDT | RDDT/ | Reddit, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | RGLD | RGLD/ | Royal Gold Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
@@ -494,4 +504,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 
-**487 holdings total.** Registry: `_system/portfolio/registry.json`
+**497 holdings total.** Registry: `_system/portfolio/registry.json`
