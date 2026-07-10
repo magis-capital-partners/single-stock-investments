@@ -1,0 +1,115 @@
+{
+  "ticker": "LII",
+  "as_of": "2026-07-10",
+  "method": "full",
+  "valuation_mode": "operating",
+  "lawrence_bucket": "pricing_power",
+  "classification_inputs": {
+    "archetype": "compounder",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating",
+    "predictive_attribute": "none"
+  },
+  "inputs": {
+    "price": 552.22,
+    "price_source": "Yahoo Finance LII regular market price 2026-07-10",
+    "price_as_of": "2026-07-10",
+    "fcf_per_share": 18.05,
+    "fcf_source": "FY2025 free cash flow $638.8M (OCF $757.6M minus capex $118.8M) \u00f7 35.4M diluted weighted-average shares (10-K filed 2026-02-17)",
+    "shares_millions": 35.4,
+    "shares_source": "FY2025 diluted weighted-average shares 35,400,000 (10-K)",
+    "dividend_per_share_annual": 4.55,
+    "dividend_source": "Cash dividends $4.55 per share in 2025; raised from $4.36 effective July 2025 (10-K)",
+    "revenue_fy2025_m": 5195.3,
+    "net_earnings_fy2025_m": 805.8,
+    "operating_income_fy2025_m": 1041.5,
+    "hcs_segment_sales_m": 3343.4,
+    "hcs_segment_profit_m": 728.5,
+    "bcs_segment_sales_m": 1851.9,
+    "bcs_segment_profit_m": 434.2,
+    "normalization_note": "Lawrence base uses FY2025 filed free cash flow. OCF fell to $757.6M from $945.7M in 2024 on working-capital timing; capex $118.8M. Q1 2026 diluted EPS $3.35 vs $3.63 prior year \u2014 not used as FCF starting point."
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.0,
+      "growth_y6_10": 0.0,
+      "exit_pfcf_y10": 18,
+      "notes": "Residential HVAC volumes stay soft; Home Comfort profit flat; multiple compresses toward mid-cycle peers"
+    },
+    "base": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 22,
+      "notes": "Building Climate price/mix offsets Home Comfort volume; buybacks ~2% annual; segment margins hold low-20s / mid-20s"
+    },
+    "bull": {
+      "growth_y1_5": 0.05,
+      "growth_y6_10": 0.03,
+      "exit_pfcf_y10": 24,
+      "notes": "Volume recovery in residential; BCS commercial/refrigeration mix lifts margin; $1B buyback authorization deployed"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Manufacturing PP&E and leases on balance sheet; no land/NAV misstatement (10-K FY2025)"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating HVAC manufacturer; no resource royalty"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Home Comfort 21.8% margin; Building Climate 23.4% margin FY2025 (10-K segment note)"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / embedded product option in revenue path?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Heat pumps, cold-chain refrigeration, connected controls in segment growth; Duro Dyne/Supco bolt-ons in BCS"
+    },
+    {
+      "q": 5,
+      "question": "Private stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No holdco stakes"
+    },
+    {
+      "q": 6,
+      "question": "Transitory legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating compounder"
+    },
+    {
+      "q": 7,
+      "question": "Product option already in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Electrification and efficiency product mix modeled via growth assumptions, not separate terminal"
+    }
+  ],
+  "stance_proposal": {
+    "suggested": "watch",
+    "rationale": "Premium multiple (~31\u00d7 FY2025 free cash flow) leaves base Lawrence IRR below 15% hurdle despite pricing power and buybacks"
+  },
+  "growth_explanation": {
+    "mechanism": "Price/mix and share repurchases compound per-share owner cash while residential volumes cycle; Building Climate commercial/refrigeration provides offset.",
+    "base_growth_source": "FY2025 segment profit +5% consolidated; BCS +9% profit; buybacks $482M",
+    "bear_trigger": "Prolonged Home Comfort volume decline without price offset",
+    "bull_trigger": "Residential replacement rebound plus BCS mix above 24% margin"
+  }
+}
