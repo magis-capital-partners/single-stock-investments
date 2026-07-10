@@ -194,16 +194,24 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | ECL | ECL/ | Ecolab | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ED | ED/ | Consolidated Edison | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | EFOR | EFOR/ | Everforth, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| EFX | EFX/ | Equifax | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | EIX | EIX/ | Edison International | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| EL | EL/ | Estée Lauder Companies (The) | US | — | — | unknown | watch |
 | ELV | ELV/ | Elevance Health | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | EME | EME/ | Emcor | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | EMR | EMR/ | Emerson Electric | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ENPH | ENPH/ | Enphase Energy, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | ENX.PA | ENX.PA/ | Euronext N.V. | EU | 2026-07-09 | 2026-07-09 | unknown | watch |
+| EOG | EOG/ | EOG Resources | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| EQIX | EQIX/ | Equinix | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | EQPT | EQPT/ | EquipmentShare.com Inc | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| EQR | EQR/ | Equity Residential | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| EQT | EQT/ | EQT Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| ERIE | ERIE/ | Erie Indemnity | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| ESS | ESS/ | Essex Property Trust | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ETN | ETN/ | Eaton Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ETOR | ETOR/ | eToro Group Ltd. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
-| ETR | ETR/ | Entergy | US | — | — | unknown | watch |
+| ETR | ETR/ | Entergy | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | EVR | EVR/ | Evolve Royalties Ltd | CA | 2026-06-11 | 2026-07-09 | unknown | watch |
 | EW | EW/ | Edwards Lifesciences | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | FANG | FANG/ | Diamondback Energy | US | 2026-07-09 | 2026-07-10 | unknown | watch |
@@ -322,4 +330,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 
-**315 holdings total.** Registry: `_system/portfolio/registry.json`
+**323 holdings total.** Registry: `_system/portfolio/registry.json`
