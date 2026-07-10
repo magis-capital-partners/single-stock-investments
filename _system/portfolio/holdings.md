@@ -342,21 +342,29 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | KEWL | KEWL/ | Keweenaw Land Association | US | 2026-07-09 | 2026-07-09 | optionality | watch |
 | KEY | KEY/ | KeyCorp | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | KEYS | KEYS/ | Keysight Technologies | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| KHC | KHC/ | Kraft Heinz | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | KIM | KIM/ | Kimco Realty | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | KKR | KKR/ | KKR & Co. | US | 2026-07-10 | 2026-07-10 | unknown | watch |
-| KLAC | KLAC/ | KLA Corporation | US | — | — | unknown | watch |
+| KLAC | KLAC/ | KLA Corporation | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | KMB | KMB/ | Kimberly-Clark | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | KMI | KMI/ | Kinder Morgan | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | KO | KO/ | Coca-Cola Company (The) | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| KR | KR/ | Kroger | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | KRP | KRP/ | Kimbell Royalty Partners LP | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | KVUE | KVUE/ | Kenvue | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | LAND | LAND/ | Gladstone Land Corporation | US | 2026-07-09 | 2026-07-09 | infrastructure | watch |
 | LB | LB/ | LandBridge Company LLC | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | LBRDK | LBRDK/ | Liberty Broadband Corporation (Class C) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| LDOS | LDOS/ | Leidos | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| LEN | LEN/ | Lennar | US | — | — | unknown | watch |
+| LH | LH/ | Labcorp | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| LHX | LHX/ | L3Harris | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | LMN | LMN/ | Lumine Group Inc. | CA | — | 2026-07-09 | unknown | watch |
 | LMNR | LMNR/ | Limoneira Company | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | LNT | LNT/ | Alliant Energy | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| LRCX | LRCX/ | Lam Research | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | LSEG | LSEG/ | London Stock Exchange Group | UK | 2026-07-09 | 2026-07-09 | unknown | watch |
+| LVS | LVS/ | Las Vegas Sands | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | MCHB | MCHB/ | Mechanics Bancorp | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | MCO | MCO/ | Moody's Corporation | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | MDB | MDB/ | MongoDB, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -426,4 +434,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 
-**419 holdings total.** Registry: `_system/portfolio/registry.json`
+**427 holdings total.** Registry: `_system/portfolio/registry.json`
