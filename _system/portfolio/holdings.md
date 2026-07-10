@@ -70,19 +70,28 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | AZO | AZO/ | AutoZone | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | B | B/ | Barrick Mining Corporation | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | B3SA3.SA | B3SA3.SA/ | B3 S.A. - Brasil Bolsa Balcao | EU | 2026-07-09 | 2026-07-09 | unknown | watch |
+| BA | BA/ | Boeing | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | BAC | BAC/ | Bank of America | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | BALL | BALL/ | Ball Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | BAX | BAX/ | Baxter International | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| BBY | BBY/ | Best Buy | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| BDX | BDX/ | Becton Dickinson | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| BIIB | BIIB/ | Biogen | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| BKNG | BKNG/ | Booking Holdings | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | BKR | BKR/ | Baker Hughes | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | BKRB | BKRB/ | Berkshire Hathaway Inc. (Class B) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| BLK | BLK/ | BlackRock | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | BMYS.KL | BMYS.KL/ | Bursa Malaysia Berhad | EU | 2026-07-09 | 2026-07-09 | unknown | watch |
 | BN | BN/ | Brookfield Corporation | US | 2026-07-09 | 2026-07-09 | platform | hold |
+| BNY | BNY/ | BNY Mellon | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | BOLSAA.MX | BOLSAA.MX/ | Bolsa Mexicana de Valores SAB de CV | EU | 2026-07-09 | 2026-07-09 | unknown | watch |
 | BRBR | BRBR/ | BellRing Brands, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| BRK.B | BRK.B/ | Berkshire Hathaway | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | BSM | BSM/ | Black Stone Minerals LP | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | BUR | BUR/ | Burford Capital Limited | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | BVERS | BVERS/ | Beaver Coal Company, Limited | OTC | 2026-07-09 | 2026-07-09 | optionality | watch |
 | BWEL | BWEL/ | J.G. Boswell Company | US | 2026-07-09 | 2026-07-09 | optionality | watch |
+| BX | BX/ | Blackstone Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | BYMA | BYMA/ | Bolsas y Mercados Argentinos S.A. | EU | 2026-07-09 | 2026-07-09 | unknown | watch |
 | CBOE | CBOE/ | Cboe Global Markets | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | CBRS | CBRS/ | Cerebras Systems | US | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -201,6 +210,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | T | T/ | AT&T | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | TASE | TASE/ | Tel Aviv Stock Exchange Ltd. | EU | 2026-07-09 | 2026-07-09 | unknown | watch |
 | TBBK | TBBK/ | The Bancorp, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| TECH | TECH/ | Bio-Techne | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | TEQ.ST | TEQ.ST/ | Teqnion AB | SE | 2026-07-09 | 2026-07-09 | serial_acquirer | hold |
 | TFPM | TFPM/ | Triple Flag Precious Metals Corp. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | TOI | TOI/ | The Oncology Institute, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -218,4 +228,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 
-**211 holdings total.** Registry: `_system/portfolio/registry.json`
+**221 holdings total.** Registry: `_system/portfolio/registry.json`
