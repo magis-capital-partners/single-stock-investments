@@ -1,0 +1,687 @@
+{
+  "ticker": "WY",
+  "as_of": "2026-07-10",
+  "valuation_mode": "optionality",
+  "valuation_overlay": "segment_cashflow",
+  "method": "full",
+  "lawrence_horizon_years": 7,
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "trough",
+    "payoff_lens": "asset",
+    "investment_sleeve": "real_assets_land",
+    "predictive_attribute": "timberland_acreage_reit_integrated_mills"
+  },
+  "inputs": {
+    "price": 23.51,
+    "price_source": "Yahoo Finance WY close 2026-07-10 (mechanical refresh will sync)",
+    "price_as_of": "2026-07-10",
+    "fcf_per_share": 0.65,
+    "fcf_source": "Normalized Adjusted FAD: FY2024 $567M ($0.78/sh on 728M shares) haircut ~17% for sustained Wood Products weakness (Adjusted EBITDA $250M vs $661M FY2024) and lower log prices; FY2025 spot Adjusted FAD $397M ($0.55/sh) is trough (10-K 2026-02-13 Adjusted FAD reconciliation)",
+    "shares_outstanding": 723162000,
+    "shares_source": "10-K 2026-02-13: basic shares outstanding 723,162 (thousands)",
+    "book_per_share": 13.04,
+    "book_per_share_caveat": "Stockholders equity $9,426M / 723.2M shares; timberlands at depletion cost ($11,533M) not fair-value NAV",
+    "dividend_per_share_annual": 0.72,
+    "dividend_source": "Base quarterly dividend $0.18/sh ($0.72 annual) plus variable supplemental under 75-80% Adjusted FAD framework (10-K cash return framework)",
+    "acres_owned": 10000000,
+    "acres_licensed_canada": 14000000,
+    "acres_source": "10-K Item 1: more than 10 million acres U.S.; long-term licenses covering more than 14 million acres Canada",
+    "timber_timberlands_net_m": 11533,
+    "long_term_debt_m": 5572,
+    "cash_m": 464,
+    "net_debt_m": 5108,
+    "adjusted_fad_m_fy2025": 397,
+    "adjusted_fad_m_fy2024": 567,
+    "consolidated_adjusted_ebitda_m": 1021,
+    "monticello_capex_m": 109,
+    "monticello_total_investment_m": 500,
+    "repurchase_authorization_remaining_m": 938,
+    "normalization_note": "Lawrence base uses normalized Adjusted FAD, not GAAP EPS ($0.45 FY2025) or lumpy timberland sale gains ($266M FY2025 per MD&A)"
+  },
+  "optionality_gate": {
+    "framework": "timber_reit_nav_floor_option",
+    "floor_pass": true,
+    "floor_metric": "book_equity_per_share",
+    "floor_value": 13.04,
+    "floor_value_note": "GAAP equity ~$13.04/sh at 2025-12-31; timberlands at depletion basis ~$1,153/acre on books vs transaction comps often higher",
+    "primary_metric": "lawrence_base",
+    "primary_label": "7yr IRR",
+    "overlay_nav_per_share": 28.0,
+    "overlay_nav_note": "[Assumption] timberland fair value ~$1,800/acre on 10M acres less ~$7/sh net debt; not GAAP book",
+    "notes": "Price ~80% above GAAP book; stance gate uses normalized Adjusted FAD ten-year path, not book floor alone",
+    "primary_return_pct": -8.4
+  },
+  "nav_overlay": {
+    "as_of": "2026-07-10",
+    "status": "complete",
+    "gaap_vs_fair_value": {
+      "timber_timberlands_net_m": 11533,
+      "acres_disclosed": 10000000,
+      "gaap_per_acre": 1153,
+      "policy_source": "10-K Note 1: timber and timberlands at cost, less depletion",
+      "source": "investor-documents/sec-edgar/10-K_20260213_rpt20251231_acc0001193125_26_051422.htm"
+    },
+    "in_model": {
+      "lawrence_irr_on_operating_cash": true,
+      "gaap_book_in_dhando": false,
+      "segment_operating_pv": false,
+      "undeveloped_acreage_in_lawrence_growth": false
+    },
+    "not_in_model_requires_refresh": [
+      "Per-acre fair marks on 10M-acre portfolio vs Virginia Feb 2026 sale ($1,778/acre on 108k acres)",
+      "Monticello TimberStrand EWP capacity uplift from 2027 operations",
+      "Mid-cycle normalized lumber pricing for Wood Products segment",
+      "Carbon solutions and renewable energy lease monetization beyond run-rate"
+    ],
+    "segments_or_options": [
+      {
+        "id": "timberlands_core",
+        "label": "10M+ acre U.S. timberlands (West, South, North)",
+        "option_treatment": "embedded_in_segment",
+        "evidence": "FY2025 Adjusted EBITDA $581M; 6.7M acres Southern U.S.",
+        "not_in_lawrence_base": false
+      },
+      {
+        "id": "real_estate_enr",
+        "label": "Real Estate & ENR (HBU, energy, natural resources)",
+        "option_treatment": "probability_weighted",
+        "p_base": 0.45,
+        "nav_per_share_full": 4.5,
+        "overlay_value_per_share": 2.0,
+        "evidence": "FY2025 Adjusted EBITDA $411M; Virginia 108k-acre sale $192M Q1 2026",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "wood_products",
+        "label": "Wood Products (lumber, OSB, EWP mills)",
+        "option_treatment": "burden_in_cf",
+        "evidence": "FY2025 Adjusted EBITDA $250M vs $661M FY2024 at lumber trough; net sales $4.957B",
+        "not_in_lawrence_base": false
+      },
+      {
+        "id": "monticello_ewp",
+        "label": "Monticello TimberStrand facility (~$500M, ops 2027)",
+        "option_treatment": "milestone_nav",
+        "p_base": 0.6,
+        "nav_per_share_full": 1.5,
+        "overlay_value_per_share": 0.9,
+        "evidence": "10-K MD&A: $500M investment, +10M cubic feet EWP capacity, $109M capex in 2025 excluded from Adjusted FAD",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "canada_licenses",
+        "label": "14M+ acres Canadian long-term licenses",
+        "option_treatment": "nav_floor",
+        "nav_per_share": 2.0,
+        "nav_assumption": "Licensed harvest rights not fully on U.S. timber book",
+        "evidence": "10-K Item 1 business description",
+        "not_in_lawrence_base": true
+      }
+    ]
+  },
+  "segment_build": {
+    "as_of": "2026-07-10",
+    "segments": [
+      {
+        "id": "timberlands",
+        "label": "Timberlands",
+        "adjusted_ebitda_m_fy2025": 581,
+        "owner_cash_per_share_annual": 0.42,
+        "growth_y1_5": 0.025,
+        "growth_y6_10": 0.015,
+        "exit_multiple": 12,
+        "option_treatment": "embedded_in_segment",
+        "evidence": "10-K segment Adjusted EBITDA table FY2025"
+      },
+      {
+        "id": "real_estate_enr",
+        "label": "Real Estate & ENR",
+        "adjusted_ebitda_m_fy2025": 411,
+        "owner_cash_per_share_annual": 0.18,
+        "growth_y1_5": 0.0,
+        "growth_y6_10": -0.01,
+        "exit_multiple": 10,
+        "option_treatment": "probability_weighted",
+        "p_base": 0.4,
+        "evidence": "Lumpy HBU and ENR monetization; Q1 2026 Virginia sale gain $58M"
+      },
+      {
+        "id": "wood_products",
+        "label": "Wood Products",
+        "adjusted_ebitda_m_fy2025": 250,
+        "owner_cash_per_share_annual": 0.12,
+        "growth_y1_5": 0.03,
+        "growth_y6_10": 0.01,
+        "exit_multiple": 8,
+        "option_treatment": "burden_in_cf",
+        "evidence": "Cyclical mill segment at lumber trough; positive EBITDDA but down from $661M FY2024"
+      }
+    ],
+    "options": [
+      {
+        "id": "monticello_ewp",
+        "label": "Monticello engineered wood products capacity",
+        "option_treatment": "milestone_nav",
+        "annual_drag_per_share": 0.0,
+        "base_terminal_value_bn": 0.35,
+        "base_terminal_rationale": "P_base 0.6 x incremental EWP cash flow from 2027 startup",
+        "overlay_base_terminal_bn": 0.35,
+        "bull_terminal_value_bn": 0.75,
+        "evidence": "10-K MD&A Monticello $500M facility target ops 2027",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "hbu_land_bank",
+        "label": "Higher-and-better-use land bank",
+        "option_treatment": "probability_weighted",
+        "annual_drag_per_share": 0.0,
+        "base_terminal_value_bn": 0.5,
+        "base_terminal_rationale": "P_base 0.45 x incremental HBU value above normalized timber run-rate",
+        "overlay_base_terminal_bn": 0.5,
+        "bull_terminal_value_bn": 1.2,
+        "evidence": "FY2025 timberland sale gains $266M; Strategic Land Solutions segment",
+        "not_in_lawrence_base": true
+      }
+    ],
+    "corporate_drag_per_share": 0.15,
+    "corporate_drag_note": "Interest on $5.57B debt (5.11% weighted avg), unallocated items ($221M Adjusted EBITDA drag), corporate G&A",
+    "horizon_years": 7
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": -0.01,
+      "growth_y6_10": -0.02,
+      "exit_pfcf_y10": 10,
+      "notes": "Prolonged lumber trough; Wood Products EBITDA stays depressed; leverage limits buybacks; spot FAD ~$0.55/sh persists"
+    },
+    "base": {
+      "growth_y1_5": 0.02,
+      "growth_y6_10": 0.015,
+      "exit_pfcf_y10": 12,
+      "notes": "Normalized Adjusted FAD $0.65/sh; lumber cycle normalizes from FY2025 trough; Monticello ops 2027"
+    },
+    "bull": {
+      "growth_y1_5": 0.04,
+      "growth_y6_10": 0.025,
+      "exit_pfcf_y10": 14,
+      "notes": "Lumber rebound + HBU sales; Adjusted FAD $0.80+ mid-cycle; multiple re-rate; $938M buyback authorization deployed"
+    }
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true,
+      "floor_pass": true,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": null
+  },
+  "human_review": {
+    "notes": "First filing-grounded dive. Normalized Adjusted FAD excludes Monticello growth capex and one-time pension settlement ($145M). Leverage rose to $5.57B in 2025 (term loan issuances).",
+    "live_price_confirmed": false
+  },
+  "growth_explanation": {
+    "base_mechanism": "Sustainable harvest on 10M+ U.S. acres; integrated Wood Products internal fiber; periodic HBU/ENR land sales; lumber cycle normalization from 2025 trough; Monticello EWP from 2027",
+    "bear_risk": "Wood Products cyclicality ($250M vs $661M Adjusted EBITDA); $5.57B long-term debt; housing starts softness; log price pressure",
+    "source": "10-K 2026-02-13 segment tables and Adjusted FAD reconciliation",
+    "status": "partial",
+    "lawrence_legacy": {
+      "y1_5": 0.02,
+      "y6_10": 0.015,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.02,
+      "y6_10": 0.015,
+      "exit_pfcf_y10": 12.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": -0.0717,
+      "as_of_filing_facts": "evidence/_text/10-K_20260213_rpt20251231_acc0001193125_26_051422.htm.txt"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Yes",
+      "treatment": "nav_overlay",
+      "evidence": "Timber at depletion cost $11.5B (~$1,153/acre); Virginia sale implied ~$1,778/acre Feb 2026"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / acreage?",
+      "answer": "Yes",
+      "treatment": "nav_floor",
+      "evidence": "10M+ U.S. acres plus 14M Canadian licenses; Strategic Land Solutions and HBU real estate not fully in run-rate FAD"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Wood Products still generated $250M Adjusted EBITDA FY2025 despite lumber trough"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF path?",
+      "answer": "Partial",
+      "treatment": "milestone_nav",
+      "evidence": "Monticello EWP facility ops target 2027; ENR lease contracts"
+    },
+    {
+      "q": 5,
+      "question": "Private stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No material private equity stakes disclosed"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution?",
+      "answer": "Partial",
+      "treatment": "yield_curve",
+      "evidence": "Base dividend $0.72/sh; supplemental variable under 75-80% Adjusted FAD framework; FY2025 FAD $0.55/sh below dividend"
+    },
+    {
+      "q": 7,
+      "question": "Embedded in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Timber harvest and mill sales in operating segments ($6.9B net sales FY2025)"
+    }
+  ],
+  "estimates": {
+    "external": []
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -13.0
+    },
+    "base": {
+      "return_pct": -8.4
+    },
+    "bull": {
+      "return_pct": -5.2
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -13.0
+    },
+    "base": {
+      "return_pct": -8.4
+    },
+    "bull": {
+      "return_pct": -5.2
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": -8.4
+    },
+    "falsifier_adjusted": {
+      "return_pct": -8.4
+    }
+  },
+  "implied_return": {
+    "base_pct": -4.84,
+    "label": "7yr IRR (total synthesis)",
+    "display": "-4.84% (total synthesis)",
+    "lawrence_stance_gate_pct": -8.4,
+    "falsifier_adjusted_pct": -8.4,
+    "synthesis_pct": -4.84
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Segment-derived growth (pre-falsifier)",
+        "source": "segment_build weighted blend",
+        "return_pct": -8.4,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": -13.0,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": -5.2,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      },
+      {
+        "id": "nav_overlay_payoff",
+        "label": "NAV overlay dated payoff (7yr to overlay base)",
+        "source": "nav_overlay ~$28.0/sh vs price $23.51",
+        "return_pct": 2.53,
+        "weight": 0.1,
+        "type": "numeric",
+        "epistemic_tier": "D (alternate theory: dated asset payoff)",
+        "weight_why": "Answers a different question (NAV convergence) than 7yr cash-flow IRR; capped weight to avoid theory conflation.",
+        "weight_falsifiers": [
+          "NAV overlay base not updated when segment build or filings change >10%",
+          "floor_pass false but weight above 15% without [HUMAN REVIEW]"
+        ],
+        "hard_to_vary": "yes: separate theory type"
+      }
+    ],
+    "qualitative_adjustments": [],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": -4.84,
+    "qualitative_pp": 0,
+    "total_synthesis_pct": -4.84,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [
+        "NAV overlay is a different theory (asset payoff vs cash-flow IRR); weight capped at 10% to limit theory conflation."
+      ],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  },
+  "total_return_panel": {
+    "as_of": "2026-07-10",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 0.72,
+    "distribution_history_sum": 0.72,
+    "market_cap_m": 17001.54,
+    "total_return_annualized_pct": 0.45,
+    "chart": "WY/research/charts/total_return_2026-07-10.svg",
+    "panel_json": "WY/research/total_return_panel.json"
+  },
+  "context_overlay": {
+    "as_of": "2026-07-10",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": 0.92,
+            "as_of": "2026-07-10",
+            "yoy_pct": 330.0,
+            "direction": "up",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.568999767303467,
+            "as_of": "2026-07-10",
+            "yoy_pct": 5.1,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.308000087738037,
+            "as_of": "2026-07-10",
+            "yoy_pct": 9.6,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 100.95999908447266,
+            "as_of": "2026-07-10",
+            "yoy_pct": 3.4,
+            "direction": "up",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 15.229999542236328,
+            "as_of": "2026-07-10",
+            "yoy_pct": -3.5,
+            "direction": "down",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": 0.86,
+            "as_of": "2026-07-10",
+            "yoy_pct": 204.9,
+            "direction": "up",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 14.55,
+            "as_of": "2026-07-10",
+            "yoy_pct": 40.6,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "insider_signal": {
+    "as_of": "2026-07-10",
+    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
+    "in_base_irr": false,
+    "window_days": 365,
+    "ics": 10.0,
+    "band": "exceptional",
+    "bull_case_support": "moderate",
+    "scenario_confidence": {
+      "priors": {
+        "bear": 0.2,
+        "base": 0.55,
+        "bull": 0.25
+      },
+      "tilted": {
+        "bear": 0.2,
+        "base": 0.4,
+        "bull": 0.4
+      },
+      "bull_delta": 0.15,
+      "bear_delta": 0.0,
+      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
+    },
+    "factors": {
+      "buy_score": 12.12,
+      "sell_score": -1.0,
+      "cluster_bonus": 0.0,
+      "net_buy_usd": 3362308.67,
+      "net_sell_usd": 6992280.06,
+      "price_today": 23.51
+    },
+    "top_buys": [
+      {
+        "insider": "BECKWITT RICHARD",
+        "date": "2026-02-19",
+        "shares": 20000,
+        "price": 25.7,
+        "value_usd": 514000.0,
+        "shares_owned_after": 24065,
+        "contrib": 2.025
+      },
+      {
+        "insider": "O'Rourke James Calvin",
+        "date": "2026-05-15",
+        "shares": 4926,
+        "price": 22.98,
+        "value_usd": 113199.48,
+        "shares_owned_after": 41378,
+        "contrib": 1.632
+      },
+      {
+        "insider": "Lewis Sara Grootwassink",
+        "date": "2025-08-11",
+        "shares": 4000,
+        "price": 25.285,
+        "value_usd": 101140.0,
+        "shares_owned_after": 21478,
+        "contrib": 1.541
+      },
+      {
+        "insider": "Lewis Sara Grootwassink",
+        "date": "2025-12-17",
+        "shares": 4500,
+        "price": 23.6058,
+        "value_usd": 106226.1,
+        "shares_owned_after": 25978,
+        "contrib": 1.533
+      },
+      {
+        "insider": "O'Rourke James Calvin",
+        "date": "2026-02-20",
+        "shares": 4000,
+        "price": 25.35,
+        "value_usd": 101400.0,
+        "shares_owned_after": 28661,
+        "contrib": 1.477
+      }
+    ],
+    "top_sells": [
+      {
+        "insider": "Chaney Brian K",
+        "date": "2026-06-03",
+        "shares": 3491,
+        "price": 24.39,
+        "value_usd": 85145.49,
+        "is_10b5_1": false,
+        "contrib": -0.147
+      },
+      {
+        "insider": "Wold David M",
+        "date": "2026-05-16",
+        "shares": 1062,
+        "price": 22.68,
+        "value_usd": 24086.16,
+        "is_10b5_1": false,
+        "contrib": -0.142
+      },
+      {
+        "insider": "Williams Kim",
+        "date": "2026-05-09",
+        "shares": 106,
+        "price": 23.53,
+        "value_usd": 2494.18,
+        "is_10b5_1": false,
+        "contrib": -0.119
+      },
+      {
+        "insider": "SELZER LAWRENCE A",
+        "date": "2026-05-09",
+        "shares": 106,
+        "price": 23.53,
+        "value_usd": 2494.18,
+        "is_10b5_1": false,
+        "contrib": -0.119
+      },
+      {
+        "insider": "PIASECKI NICOLE WEYERHAEUSER",
+        "date": "2026-05-09",
+        "shares": 106,
+        "price": 23.53,
+        "value_usd": 2494.18,
+        "is_10b5_1": false,
+        "contrib": -0.119
+      }
+    ],
+    "narrative_hooks": [],
+    "transaction_count": 59
+  },
+  "lens_consensus": {
+    "as_of": "2026-07-10",
+    "shared_inputs_ref": "valuation.json@2026-07-10",
+    "valuation_richness": 0.655,
+    "blended_return_pct": -8.63,
+    "band_pct": [
+      -13.0,
+      -4.84
+    ],
+    "weighted_median_pct": -8.4,
+    "median_mean_flag": false,
+    "stance": "pass",
+    "agreement_pct": 100,
+    "dissent_count": 0,
+    "lawrence_divergence": false,
+    "top_dissents": [],
+    "contributor_count": 6,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
+  }
+}
