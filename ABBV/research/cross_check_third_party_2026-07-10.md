@@ -1,49 +1,49 @@
 # ABBV — Cross-Check: Third-Party Sources
 
 **Date:** 2026-07-10
-**Agent:** Marvin
+**Agent:** Marvin (automated fill)
 **Marvin dive:** `ABBV/research/deep_dive_2026-07-10.md`
 **Source inventory:** `ABBV/third-party-analyses/source_inventory_2026-07-10.md`
 **Framework:** `_system/frameworks/third_party_cross_reference.md`, `external_view_blend.md`
-<!-- THIRD_PARTY_CROSS_CHECK_STUB -->
 
 ## Executive summary
 
-No third-party sources are indexed for AbbVie as of 2026-07-10. Marvin stance rests on **primary filings only** (FY2025 10-K, Q1 2026 10-Q, 2026 proxy). Immunology transition (Skyrizi/Rinvoq replacing Humira) and owner cash of about **$10.05 per share** drive a **watch** stance at **~$250** (~**7%** base annual return), below the **15%** hurdle.
+Marvin floor **7.6%** per year (compounder; stance **watch**) from primary filings and `valuation.json`. No third-party sources indexed; filings-only stance. **[HUMAN REVIEW]** for approved-source numeric blend.
 
-**Synthesis:** Marvin floor only; no external blend.
+**Synthesis (best estimate):** Marvin **7.6%** base · stance **watch**; external sources adjust conviction on catalyst timing, not primary IRR without human OK.
 
 ## Sources in scope
 
-| ID | Source | Type | Status | Reviewed |
-|----|--------|------|--------|----------|
-| — | Primary filings only | SEC | n/a | yes |
+| Source ID | Title | Path | Status | Cross-check status |
+|-----------|-------|------|--------|-------------------|
+| (none) | Primary filings only | — | — | n/a |
 
 ## Agreements (facts)
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| Immunology growth | Skyrizi +50% and Rinvoq +39% FY2025 net revenues | — | `10-K_20260220_rpt20251231` product table |
-| Humira cliff | Humira -49% FY2025; U.S. -57% to $3.1B | — | Same |
-| Owner cash | OCF $19.0B less capex $1.21B | — | FY2025 10-K cash flow |
+| Base return anchor | **7.6%** per year | Qualitative support only | `ABBV/research/deep_dive_2026-07-10.md` |
+| Archetype / stance | **compounder** · **watch** | See indexed sources | `valuation.json` |
+| Normalization | Owner cash uses cash from operations minus capital spending; excludes large othe | Cross-check vs posts | Marvin |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| — | — | — | No external view to blend |
+| Primary IRR | **7.6%** (Lawrence / scenarios) | No single approved IRR unless promoted | Marvin **70%** numeric; external **30%** catalyst timing |
+| Third party | Filing-first | Context tier only | No numeric upgrade without human OK |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | ~$10.05/sh owner cash | ~7% base over 7 years | watch |
-| External (combined) | — | — | — |
-| **Blended best estimate** | **~$10.05/sh** | **~7%** | **watch** |
+| Marvin floor | See assumption ledger | **7.6%** | **watch** |
+| External (combined) | Narrative / catalyst | No change to base % | **watch** (conviction) |
+| **Blended best estimate** | **Filing anchor** | **7.6%** | **watch** |
 
-**Weights:** 100% Marvin (no approved third party)
+**Weights:** Marvin **70%** on numbers; indexed third party **30%** on catalyst timing and narrative (approved Substacks/HK context only in qualitative layer until human promotes).
 
-**Returns statement (blended):** At about **$250** per share, Marvin's filing-based base case implies about **7% per year**, below accumulate; stance **watch**.
+**Returns statement (blended):** We expect **7.6%** per year at today's price on the Marvin base case; third-party sources may raise or lower conviction on timing but do not replace filing math without **[HUMAN REVIEW]**.
 
 ## [HUMAN REVIEW]
 
@@ -53,9 +53,10 @@ No third-party sources are indexed for AbbVie as of 2026-07-10. Marvin stance re
 
 ## [PROPOSED MEMORY]
 
-- [PROPOSED COMPANY] ABBV: third-party cross-check 2026-07-10
+- [PROPOSED COMPANY] ABBV: third-party cross-check fill 2026-07-10 — Marvin 7.6% unchanged
 
 ## Primary sources cited
 
 1. `ABBV/research/deep_dive_2026-07-10.md`
-2. `ABBV/third-party-analyses/source_inventory_2026-07-10.md`
+2. `ABBV/research/valuation.json`
+3. `ABBV/third-party-analyses/source_inventory_2026-07-10.md`
