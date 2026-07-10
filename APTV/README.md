@@ -1,4 +1,4 @@
-# Aptiv (APTV)
+# Aptiv PLC (APTV)
 
 **Ticker:** APTV | **Market:** US
 **Last updated:** 2026-07-10
