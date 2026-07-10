@@ -21,14 +21,15 @@
 
 ## One-line thesis
 
-Ametek — thesis pending Marvin deep dive.
+Serial-acquirer industrial compounder with record FCF and backlog; premium multiple caps IRR to **5.78%** at spot → **watch**.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest annual report (FY2025 10-K)
+- [x] Read latest quarterly report (Q1 2026 10-Q)
+- [x] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-07-10; awaiting deep dive.
+- Confirm 22× exit multiple vs historical trading range.
+- No approved third-party sources; filings-only synthesis.
