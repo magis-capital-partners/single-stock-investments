@@ -1,29 +1,36 @@
 # ABT — Investment Thesis
 
-**Last updated:** 2026-07-10
+**Last updated:** auto-sync
 
 ## Classification
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Archetype** (Stahl) | compounder |
+| **Moat** (Munger) | stable |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Cycle** | healthcare |
+| **Implied 7yr IRR** (base) | 12.24% (total synthesis) |
+| **IRR method** | full |
+| **Lawrence bucket** | pricing_power |
+| **Payoff lens** | operating |
+| **MOI bucket** | pending |
+
+**Deep dive:** `ABT/research/deep_dive_2026-07-10.md` (auto-sync)
 
 ## One-line thesis
 
-ABBOTT LABORATORIES — thesis pending Marvin deep dive.
+Abbott is a four-segment healthcare compounder (devices-led) with durable owner cash (~$4.23/sh FY2025) but sub-15% base return at today's price — **watch** for a better entry.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest annual report (FY2025 10-K)
+- [x] Read latest quarterly report (Q1 2026 10-Q)
+- [x] Apply mental models (moat, option scan, Lawrence IRR)
+- [ ] Third-party cross-check when sources indexed
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-07-10; awaiting deep dive.
+- First deep dive 2026-07-10; confirm IRR after price refresh.
+- Q1 2026 margin compression warrants follow-up.
