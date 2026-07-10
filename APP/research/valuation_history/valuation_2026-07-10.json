@@ -1,0 +1,257 @@
+{
+  "ticker": "APP",
+  "as_of": "2026-07-10",
+  "method": "full",
+  "irr_method": "full",
+  "lawrence_bucket": "multi_sided",
+  "classification_inputs": {
+    "archetype": "platform",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating",
+    "predictive_attribute": "complexity_discount"
+  },
+  "inputs": {
+    "price": 520.43,
+    "price_source": "Yahoo APP close 2026-07-09",
+    "price_as_of": "2026-07-09",
+    "shares_millions": 338.0,
+    "shares_source": "338 million Class A and Class B common shares outstanding at December 31, 2025 (Financial-Update-Q4-2025.pdf)",
+    "cash_m": 2487.1,
+    "cash_source": "Cash and cash equivalents $2,487.1M at December 31, 2025 (Financial-Update-Q4-2025.pdf balance sheet)",
+    "revenue_fy2025_m": 5481.0,
+    "revenue_fy2025_source": "FY2025 revenue $5.481B (+70% YoY) (Financial-Update-Q4-2025.pdf)",
+    "revenue_q1_2026_m": 1842.0,
+    "revenue_q1_source": "Q1 2026 revenue $1.842B (+59% YoY) (1Q26-Earnings-Press-Release.pdf)",
+    "adj_ebitda_fy2025_m": 4510.0,
+    "adj_ebitda_source": "FY2025 Adjusted EBITDA $4.51B, 82% margin (Financial-Update-Q4-2025.pdf)",
+    "cfo_fy2025_m": 3971.0,
+    "cfo_source": "FY2025 cash flow from operations $3.971B (Financial-Update-Q4-2025.pdf)",
+    "fcf_fy2025_m": 3971.0,
+    "fcf_source": "FY2025 free cash flow $3.971B (press release and financial update; capex immaterial vs CFO)",
+    "per_share": 11.75,
+    "fcf_per_share": 11.75,
+    "fcf_per_share_calc": "FY2025 free cash flow $3.971B \u00f7 338M shares = $11.75 per share",
+    "normalization_note": "Lawrence base uses filed FY2025 owner cash, not Q1 2026 run-rate ($1.3B quarterly FCF would annualize to ~$15.48/sh on 336M shares) to avoid double-counting one strong quarter."
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.06,
+      "growth_y6_10": 0.03,
+      "exit_pfcf_y10": 20,
+      "notes": "Mobile ad auction competition intensifies; Apple/Google privacy rules compress targeting; Apps segment drag persists; multiple compresses toward mature ad-tech"
+    },
+    "base": {
+      "growth_y1_5": 0.12,
+      "growth_y6_10": 0.06,
+      "exit_pfcf_y10": 28,
+      "notes": "AXON recommendation engine sustains share gains in performance marketing; Advertising segment 85%+ margins normalize slowly; buybacks offset dilution"
+    },
+    "bull": {
+      "growth_y1_5": 0.18,
+      "growth_y6_10": 0.08,
+      "exit_pfcf_y10": 35,
+      "notes": "Wurl CTV and non-gaming verticals scale; Apps portfolio sale removes distraction; AXON expands to retail/e-commerce advertisers globally"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Asset-light ad-tech platform; $2.5B cash at fair value on balance sheet (Financial-Update-Q4-2025.pdf)"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Apps segment smaller but profitable",
+      "treatment": "embedded_in_segment",
+      "evidence": "Apps Adjusted EBITDA $277M FY2024 (32% of revenue segment); strategic portfolio review ongoing (10-K FY2024 Item 1)"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / embedded product option in revenue path?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Wurl CTV platform and AXON expansion into new verticals; growth modeled in base scenario, not separate terminal"
+    },
+    {
+      "q": 5,
+      "question": "Portfolio divestiture / strategic review option?",
+      "answer": "Yes",
+      "treatment": "milestone_nav",
+      "evidence": "Management conducting strategic review of Apps portfolio (10-K FY2024); no disclosed transaction price \u2014 context only, not in Lawrence base"
+    },
+    {
+      "q": 0,
+      "question": "Material separate options after scan?",
+      "answer": "Apps sale + CTV ramp",
+      "treatment": "embedded_in_segment",
+      "evidence": "No SEC marks on divestiture; CTV revenue early \u2014 growth assumptions carry optionality, zero separate terminal without filing evidence"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "AXON AI engine improves advertiser return on spend, attracting more demand into AppDiscovery/MAX auctions; data flywheel from ~1.6B daily active users strengthens matching efficiency; Wurl adds connected-TV inventory",
+    "source": "10-K FY2024 Item 1 Business; Q1 2026 financial update revenue +59% YoY at 85% Adjusted EBITDA margin",
+    "falsifiers": [
+      {
+        "id": "privacy_compression",
+        "observation": "IDFA/privacy changes reduce targeting efficacy for two consecutive quarters",
+        "action": "Cut growth years 1-5 toward bear 6%; cap exit multiple at 20x"
+      },
+      {
+        "id": "margin_peak",
+        "observation": "Adjusted EBITDA margin falls below 75% while revenue growth decelerates below 20%",
+        "action": "Downgrade moat to eroding; move stance toward trim"
+      },
+      {
+        "id": "apps_drag",
+        "observation": "Apps segment operating losses re-emerge without divestiture",
+        "action": "Add explicit loss drag to owner cash normalization"
+      }
+    ],
+    "status": "partial",
+    "lawrence_legacy": {
+      "y1_5": 0.12,
+      "y6_10": 0.06,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.12,
+      "y6_10": 0.06,
+      "exit_pfcf_y10": 28.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": null,
+      "as_of_filing_facts": null
+    }
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "human_review": {
+    "notes": "First filing-grounded dive; confirm whether to normalize FCF to Q1 2026 run-rate vs FY2025 filed; superinvestor letters cite APP as top contributor but are context-only pending approval.",
+    "live_price_confirmed": false
+  },
+  "lawrence_horizon_years": 7,
+  "estimates": {
+    "marvin_floor": {
+      "per_share": 11.75,
+      "return_pct": null,
+      "notes": "FY2025 free cash flow per share on 338M shares"
+    },
+    "external": [],
+    "blended_best": {
+      "per_share": 11.75,
+      "return_pct": null,
+      "weights": "100% marvin_floor \u2014 no approved third-party in base IRR",
+      "notes": "Fund letters mentioning APP are context tier only"
+    }
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -2.7
+    },
+    "base": {
+      "return_pct": 6.4
+    },
+    "bull": {
+      "return_pct": 14.3
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -2.7
+    },
+    "base": {
+      "return_pct": 6.4
+    },
+    "bull": {
+      "return_pct": 14.3
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": 6.4
+    },
+    "falsifier_adjusted": {
+      "return_pct": 6.4
+    }
+  },
+  "implied_return": {
+    "base_pct": 5.8,
+    "label": "7yr IRR (total synthesis)",
+    "display": "5.8% (total synthesis)",
+    "lawrence_stance_gate_pct": 6.4,
+    "falsifier_adjusted_pct": 6.4,
+    "synthesis_pct": 5.8
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence envelope)",
+        "source": "scenarios.bear",
+        "return_pct": -2.7,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "hard_to_vary": "yes: asymmetric low weight is structural",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ]
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence envelope)",
+        "source": "scenarios.bull",
+        "return_pct": 14.3,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "hard_to_vary": "yes",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ]
+      }
+    ],
+    "qualitative_adjustments": [],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 5.8,
+    "qualitative_pp": 0,
+    "total_synthesis_pct": 5.8,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}
