@@ -1,0 +1,158 @@
+{
+  "ticker": "XYL",
+  "as_of": "2026-07-10",
+  "method": "full",
+  "valuation_mode": "operating",
+  "lawrence_bucket": "pricing_power",
+  "classification_inputs": {
+    "archetype": "compounder",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating",
+    "predictive_attribute": "none"
+  },
+  "inputs": {
+    "price": 130.0,
+    "price_source": "Yahoo Finance XYL regular market price 2026-07-09 (mechanical refresh will update)",
+    "price_as_of": "2026-07-10",
+    "fcf_per_share": 3.73,
+    "fcf_source": "FY2025 operating cash flow $1,241M minus capital spending $331M = $910M free cash flow ÷ ~244.1M diluted shares (10-K filed 2026-02-25)",
+    "shares_millions": 244.1,
+    "shares_source": "FY2025 net income $957M ÷ diluted EPS $3.92 (10-K)",
+    "dividend_per_share_annual": 1.72,
+    "dividend_source": "Q1 2026 declared dividend $0.43 per share; dividends per share paid increased 11% in 2025 (10-K)",
+    "revenue_fy2025_m": 9035.0,
+    "net_earnings_fy2025_m": 957.0,
+    "operating_income_fy2025_m": 1223.0,
+    "adjusted_operating_income_fy2025_m": 1612.0,
+    "long_term_debt_m": 1408.0,
+    "current_debt_maturities_m": 534.0,
+    "normalization_note": "Lawrence base uses FY2025 filed free cash flow ($910M). Adjusted operating income $1,612M (17.8% margin) reflects post-Evoqua integration benefits but is not used as FCF starting point."
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.01,
+      "growth_y6_10": 0.01,
+      "exit_pfcf_y10": 16,
+      "notes": "Municipal capex slows; Measurement margin stays compressed; multiple reverts toward mid-cycle industrial peers"
+    },
+    "base": {
+      "growth_y1_5": 0.04,
+      "growth_y6_10": 0.03,
+      "exit_pfcf_y10": 20,
+      "notes": "Mid-single-digit revenue growth; adjusted operating margin holds near high-teens; services and smart metering mix support per-share cash; debt paydown continues"
+    },
+    "bull": {
+      "growth_y1_5": 0.06,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 22,
+      "notes": "Water infrastructure and WSS services accelerate; Measurement analytics mix lifts margin; bolt-on M&A adds revenue without leverage spike"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Manufacturing and service assets on balance sheet at cost; no land/NAV misstatement pattern (10-K FY2025)"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Water technology equipment and services; no resource royalty"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Corporate operating loss $97M FY2025; Measurement segment operating margin 11.7% vs 13.2% prior year — burden in consolidated path, not separate zero terminal"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / embedded product option in revenue path?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Remaining performance obligation $1,957M at Q1 2026 (10-Q); smart metering and outsourced water services in growth assumptions"
+    },
+    {
+      "q": 5,
+      "question": "Private stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No material private equity stakes requiring SOTP"
+    },
+    {
+      "q": 6,
+      "question": "Transitory legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating compounder; recurring dividend policy"
+    },
+    {
+      "q": 7,
+      "question": "Product option already in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Smart meters, analytics software, and WSS service contracts already in segment revenue; growth in base scenario"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "Post-Evoqua four-segment platform compounds owner cash through utility and industrial water demand, services mix (WSS margin expansion to 12.3% operating / 17.1% adjusted), and Water Infrastructure margin recovery (17.5% operating / 22.1% adjusted), partially offset by Measurement margin pressure.",
+    "source": "10-K FY2025 segment operating income table; revenue $9,035M (+5.5% YoY); adjusted EBITDA $2,009M (22.2% margin)",
+    "falsifiers": [
+      {
+        "id": "muni_capex",
+        "observation": "U.S. municipal water capex budgets decline two consecutive years",
+        "action": "Cut growth years 1–5 toward bear 1%; cap exit multiple at 16×"
+      },
+      {
+        "id": "measurement_margin",
+        "observation": "Measurement and Control Solutions operating margin falls below 10% for two years",
+        "action": "Downgrade moat to eroding; move base toward bear"
+      },
+      {
+        "id": "integration_charges",
+        "observation": "Restructuring and realignment costs exceed $150M annually without margin lift",
+        "action": "Trim FCF growth 1–2 pp; cap stance at watch"
+      }
+    ],
+    "status": "partial",
+    "lawrence_legacy": {
+      "y1_5": 0.04,
+      "y6_10": 0.03,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.04,
+      "y6_10": 0.03,
+      "exit_pfcf_y10": 20.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": 0.055,
+      "as_of_filing_facts": "evidence/_text/10-K_20260225_rpt20251231_acc0001524472_26_000012.htm.txt"
+    }
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {},
+  "results": {},
+  "implied_return": {},
+  "overlay_results": [],
+  "synthesis": {
+    "status": "pending",
+    "notes": "Pending marvin_valuation.py --write"
+  }
+}
