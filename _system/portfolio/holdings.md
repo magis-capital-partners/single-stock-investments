@@ -300,6 +300,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | HNFSA | HNFSA/ | Hanover Foods Corporation | OTC | 2026-07-09 | 2026-07-09 | optionality | watch |
 | HON | HON/ | Honeywell Technologies | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | HONA | HONA/ | Honeywell Aerospace | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| HOOD | HOOD/ | Robinhood Markets | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | HPE | HPE/ | Hewlett Packard Enterprise | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | HPQ | HPQ/ | HP Inc. | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | HRL | HRL/ | Hormel Foods | US | 2026-07-10 | 2026-07-10 | unknown | watch |
@@ -489,15 +490,24 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | Q | Q/ | Qnity Electronics | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | QCOM | QCOM/ | Qualcomm | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | QDEL | QDEL/ | QuidelOrtho | US | 2026-07-09 | 2026-07-10 | turnaround | hold |
+| RCL | RCL/ | Royal Caribbean Group | US | — | — | unknown | watch |
 | RDDT | RDDT/ | Reddit, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | REG | REG/ | Regency Centers | US | 2026-07-10 | 2026-07-10 | unknown | watch |
-| REGN | REGN/ | Regeneron Pharmaceuticals | US | — | — | unknown | watch |
+| REGN | REGN/ | Regeneron Pharmaceuticals | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| RF | RF/ | Regions Financial Corporation | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | RGLD | RGLD/ | Royal Gold Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | RJF | RJF/ | Raymond James Financial | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | RL | RL/ | Ralph Lauren Corporation | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| RMD | RMD/ | ResMed | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | RMV.L | RMV.L/ | Rightmove PLC | UK | 2026-07-09 | 2026-07-10 | platform | watch |
+| ROK | ROK/ | Rockwell Automation | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| ROL | ROL/ | Rollins, Inc. | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| ROP | ROP/ | Roper Technologies | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| ROST | ROST/ | Ross Stores | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | RPRX | RPRX/ | Royalty Pharma plc | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| RSG | RSG/ | Republic Services | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | RTX | RTX/ | RTX Corporation | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| RVTY | RVTY/ | Revvity | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | RYN | RYN/ | Rayonier, Inc. | US | 2026-07-09 | 2026-07-09 | optionality | watch |
 | S68.SI | S68.SI/ | Singapore Exchange Limited | EU | 2026-07-09 | 2026-07-10 | unknown | watch |
 | SBR | SBR/ | Sabine Royalty Trust | US | 2026-07-09 | 2026-07-10 | unknown | watch |
@@ -534,4 +544,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 
-**527 holdings total.** Registry: `_system/portfolio/registry.json`
+**537 holdings total.** Registry: `_system/portfolio/registry.json`
