@@ -234,6 +234,9 @@ persona-check:
 darwin-sp500-refresh:
 	$(PYTHON) $(SCRIPTS)/darwin/refresh_sp500_constituents.py
 
+sp500-onboard-batch:
+	$(PYTHON) $(SCRIPTS)/bulk_sp500_onboard.py --batch-size $(or $(BATCH),8) --offset $(or $(OFFSET),0) --trigger-deep-dive
+
 darwin-build:
 	$(PYTHON) $(SCRIPTS)/build_darwin_portfolio.py --fast --account all
 	$(PYTHON) $(SCRIPTS)/build_dashboard_data.py

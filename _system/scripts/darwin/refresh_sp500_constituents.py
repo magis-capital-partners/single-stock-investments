@@ -28,7 +28,7 @@ def _normalize_ticker(raw: str) -> str:
     return t
 
 
-def fetch_wikipedia_tickers() -> list[str]:
+def fetch_wikipedia_constituents() -> list[dict]:
     req = urllib.request.Request(
         WIKI_URL,
         headers={"User-Agent": "MarvinDarwin/1.0 (research dashboard; local refresh)"},
@@ -43,27 +43,33 @@ def fetch_wikipedia_tickers() -> list[str]:
         raise RuntimeError("Could not find S&P 500 wikitable")
     body = m.group(1)
     rows = re.findall(r"<tr[^>]*>(.*?)</tr>", body, re.S | re.I)
-    tickers: list[str] = []
+    out: list[dict] = []
+    seen: set[str] = set()
     for row in rows[1:]:
         cells = re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", row, re.S | re.I)
-        if not cells:
+        if len(cells) < 2:
             continue
-        cell = re.sub(r"<[^>]+>", "", cells[0])
-        cell = re.sub(r"&#\d+;", "", cell)
-        cell = cell.replace("&amp;", "&").replace("\n", "").strip()
-        t = _normalize_ticker(cell)
-        if t and re.match(r"^[A-Z][A-Z0-9.\-]{0,7}$", t):
-            tickers.append(t)
-    # Dedupe preserving order
-    seen: set[str] = set()
-    out: list[str] = []
-    for t in tickers:
-        if t not in seen:
-            seen.add(t)
-            out.append(t)
+
+        def _cell_text(c: str) -> str:
+            c = re.sub(r"<[^>]+>", "", c)
+            c = re.sub(r"&#\d+;", "", c)
+            return c.replace("&amp;", "&").replace("\n", " ").strip()
+
+        sym = _normalize_ticker(_cell_text(cells[0]))
+        company = _cell_text(cells[1])
+        if not sym or not re.match(r"^[A-Z][A-Z0-9.\-]{0,7}$", sym):
+            continue
+        if sym in seen:
+            continue
+        seen.add(sym)
+        out.append({"ticker": sym, "company": company or sym})
     if len(out) < 400:
         raise RuntimeError(f"Unexpectedly few tickers ({len(out)}); aborting write")
     return out
+
+
+def fetch_wikipedia_tickers() -> list[str]:
+    return [r["ticker"] for r in fetch_wikipedia_constituents()]
 
 
 def registry_overlap(tickers: list[str]) -> tuple[list[str], int]:
@@ -83,13 +89,17 @@ def registry_overlap(tickers: list[str]) -> tuple[list[str], int]:
     return overlap, len(holdings)
 
 
-def write_constituents(tickers: list[str], source: str) -> Path:
+def write_constituents(rows: list[dict], source: str) -> Path:
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
+    tickers = [r["ticker"] for r in rows]
+    companies = {r["ticker"]: r["company"] for r in rows}
     payload = {
         "as_of": date.today().isoformat(),
         "source": source,
         "count": len(tickers),
         "tickers": tickers,
+        "companies": companies,
+        "rows": rows,
     }
     OUT_PATH.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
     return OUT_PATH
@@ -112,9 +122,10 @@ def main() -> int:
         tickers = data.get("tickers") or []
         source = data.get("source", "existing")
     else:
-        tickers = fetch_wikipedia_tickers()
+        rows = fetch_wikipedia_constituents()
         source = "wikipedia_list_of_sp500_companies"
-        write_constituents(tickers, source)
+        write_constituents(rows, source)
+        tickers = [r["ticker"] for r in rows]
 
     overlap, n_hold = registry_overlap(tickers)
     print(f"Wrote/loaded {len(tickers)} S&P 500 tickers ({source})")
