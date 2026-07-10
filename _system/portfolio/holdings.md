@@ -338,10 +338,18 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | JL80.DE | JL80.DE/ | Norconsult ASA | EU | — | 2026-07-09 | unknown | watch |
 | JNJ | JNJ/ | Johnson & Johnson | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | JPM | JPM/ | JPMorgan Chase & Co. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| KDP | KDP/ | Keurig Dr Pepper | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | KEWL | KEWL/ | Keweenaw Land Association | US | 2026-07-09 | 2026-07-09 | optionality | watch |
+| KEY | KEY/ | KeyCorp | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| KEYS | KEYS/ | Keysight Technologies | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| KIM | KIM/ | Kimco Realty | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| KKR | KKR/ | KKR & Co. | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| KLAC | KLAC/ | KLA Corporation | US | — | — | unknown | watch |
+| KMB | KMB/ | Kimberly-Clark | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| KMI | KMI/ | Kinder Morgan | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | KO | KO/ | Coca-Cola Company (The) | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | KRP | KRP/ | Kimbell Royalty Partners LP | US | 2026-07-09 | 2026-07-09 | unknown | watch |
-| KVUE | KVUE/ | Kenvue | US | — | — | unknown | watch |
+| KVUE | KVUE/ | Kenvue | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | LAND | LAND/ | Gladstone Land Corporation | US | 2026-07-09 | 2026-07-09 | infrastructure | watch |
 | LB | LB/ | LandBridge Company LLC | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | LBRDK | LBRDK/ | Liberty Broadband Corporation (Class C) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -418,4 +426,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 
-**411 holdings total.** Registry: `_system/portfolio/registry.json`
+**419 holdings total.** Registry: `_system/portfolio/registry.json`
