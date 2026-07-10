@@ -1,0 +1,159 @@
+{
+  "ticker": "AME",
+  "as_of": "2026-07-10",
+  "method": "full",
+  "lawrence_bucket": "pricing_power",
+  "classification_inputs": {
+    "archetype": "compounder",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "-",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 233.0,
+    "price_source": "NYSE close ~July 10, 2026 (Yahoo Finance)",
+    "fcf_per_share": 7.23,
+    "fcf_source": "FY2025 OCF $1,801.8M minus capital spending $130.2M divided by 231.3M diluted shares (10-K FY2025)",
+    "shares_millions": 231.3,
+    "normalization_note": "Filed owner cash; acquisition integration costs modest; FARO/LKC deals additive to growth path"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.04,
+      "growth_y6_10": 0.03,
+      "exit_pfcf_y10": 20,
+      "notes": "Industrial slowdown; M&A pause; multiple compression"
+    },
+    "base": {
+      "growth_y1_5": 0.07,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 22,
+      "notes": "Organic mid-single + tuck-in M&A treadmill; margins hold via Operational Excellence"
+    },
+    "bull": {
+      "growth_y1_5": 0.09,
+      "growth_y6_10": 0.06,
+      "exit_pfcf_y10": 25,
+      "notes": "Aerospace/medical recovery + sustained large-deal cadence (FARO scale)"
+    }
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 0.8
+    },
+    "base": {
+      "return_pct": 4.7
+    },
+    "bull": {
+      "return_pct": 8.1
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 0.8
+    },
+    "base": {
+      "return_pct": 4.7
+    },
+    "bull": {
+      "return_pct": 8.1
+    }
+  },
+  "implied_return": {
+    "base_pct": 5.75,
+    "label": "7yr IRR (total synthesis)",
+    "display": "5.75% (total synthesis)",
+    "lawrence_stance_gate_pct": 4.7,
+    "falsifier_adjusted_pct": 4.7,
+    "synthesis_pct": 5.75
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "overlay_results": [],
+  "option_scan": [
+    {
+      "q": 0,
+      "question": "Material options after scan?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating compounder; backlog embedded in segment growth; no NAV or holdco overlay"
+    }
+  ],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": 0.8,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 8.1,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 5.95,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 5.75,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}
