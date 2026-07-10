@@ -195,8 +195,9 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | ED | ED/ | Consolidated Edison | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | EFOR | EFOR/ | Everforth, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | EFX | EFX/ | Equifax | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| EG | EG/ | Everest Group | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | EIX | EIX/ | Edison International | US | 2026-07-09 | 2026-07-10 | unknown | watch |
-| EL | EL/ | Estée Lauder Companies (The) | US | — | — | unknown | watch |
+| EL | EL/ | Estée Lauder Companies (The) | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ELV | ELV/ | Elevance Health | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | EME | EME/ | Emcor | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | EMR | EMR/ | Emerson Electric | US | 2026-07-09 | 2026-07-10 | unknown | watch |
@@ -208,12 +209,19 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | EQR | EQR/ | Equity Residential | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | EQT | EQT/ | EQT Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ERIE | ERIE/ | Erie Indemnity | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| ES | ES/ | Eversource Energy | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ESS | ESS/ | Essex Property Trust | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ETN | ETN/ | Eaton Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ETOR | ETOR/ | eToro Group Ltd. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | ETR | ETR/ | Entergy | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | EVR | EVR/ | Evolve Royalties Ltd | CA | 2026-06-11 | 2026-07-09 | unknown | watch |
+| EVRG | EVRG/ | Evergy | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | EW | EW/ | Edwards Lifesciences | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| EXC | EXC/ | Exelon | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| EXE | EXE/ | Expand Energy | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| EXPD | EXPD/ | Expeditors International | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| EXPE | EXPE/ | Expedia Group | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| EXR | EXR/ | Extra Space Storage | US | — | — | unknown | watch |
 | FANG | FANG/ | Diamondback Energy | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | FIHO12.MX | FIHO12.MX/ | FibraHotel (Concentradora Fibra Hotelera Mexicana) | EU | — | 2026-07-09 | unknown | watch |
 | FIX | FIX/ | Comfort Systems USA | US | 2026-07-09 | 2026-07-10 | unknown | watch |
@@ -330,4 +338,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 
-**323 holdings total.** Registry: `_system/portfolio/registry.json`
+**331 holdings total.** Registry: `_system/portfolio/registry.json`
