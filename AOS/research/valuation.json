@@ -1,0 +1,552 @@
+{
+  "ticker": "AOS",
+  "as_of": "2026-07-10",
+  "method": "full",
+  "valuation_mode": "operating",
+  "lawrence_bucket": "pricing_power",
+  "classification_inputs": {
+    "archetype": "compounder",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating",
+    "predictive_attribute": "none"
+  },
+  "inputs": {
+    "price": 59.02,
+    "price_source": "Yahoo Finance AOS regular market price 2026-07-10",
+    "price_as_of": "2026-07-10",
+    "fcf_per_share": 3.85,
+    "fcf_source": "FY2025 free cash flow $546.0M \u00f7 141.9M diluted weighted-average shares (10-K filed 2026-02-10)",
+    "shares_millions": 141.9,
+    "shares_source": "FY2025 diluted weighted-average shares 141,914,840 (10-K)",
+    "dividend_per_share_annual": 1.38,
+    "dividend_source": "Cash dividends $1.38 per share in 2025; six percent increase in Q4 2025 (10-K)",
+    "revenue_fy2025_m": 3830.2,
+    "net_earnings_fy2025_m": 546.2,
+    "na_segment_margin_pct": 24.4,
+    "row_segment_margin_pct": 8.7,
+    "normalization_note": "Lawrence base uses FY2025 filed free cash flow; 2026 guidance FCF $525\u2013575M brackets base. Q1 2026 diluted EPS $0.85 vs $0.95 prior year \u2014 not used as FCF starting point."
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.01,
+      "growth_y6_10": 0.01,
+      "exit_pfcf_y10": 16,
+      "notes": "U.S. housing starts soften; China volumes stay weak; multiple compresses toward mid-cycle industrial peers"
+    },
+    "base": {
+      "growth_y1_5": 0.04,
+      "growth_y6_10": 0.03,
+      "exit_pfcf_y10": 20,
+      "notes": "2\u20135% sales growth per 2026 outlook; North America margin 24\u201324.5%; share repurchases ~2% annual; heat pump mix gradual"
+    },
+    "bull": {
+      "growth_y1_5": 0.06,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 22,
+      "notes": "Boiler and heat-pump mix lifts margin; Rest of World margin toward 9%; buybacks at ~$400M pace continue"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Manufacturing assets on balance sheet at cost; no land/NAV misstatement pattern (10-K FY2025)"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating manufacturer; no resource royalty"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Both segments profitable; Rest of World margin 8.7% FY2025 (10-K segment note)"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / embedded product option in revenue path?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Heat pumps, boilers, water treatment in North America growth path; DOE regulatory buy-ahead in 2026 \u2014 modeled via growth, not separate terminal"
+    },
+    {
+      "q": 5,
+      "question": "Private stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No material private equity stakes"
+    },
+    {
+      "q": 6,
+      "question": "Transitory legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating compounder; dividend is ongoing policy"
+    },
+    {
+      "q": 7,
+      "question": "Product option already in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "High-efficiency and heat-pump products already in segment sales; growth in base scenario"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "North America pricing power and boiler/heat-pump mix (24.4% segment margin) plus modest Rest of World recovery and ~3% annual share reduction via buybacks compound owner cash above flat revenue years.",
+    "source": "10-K FY2025 segment margins; 2026 outlook sales +2\u20135%; repurchases 5.9M shares for $400.8M in 2025",
+    "falsifiers": [
+      {
+        "id": "housing_starts",
+        "observation": "U.S. residential housing starts decline two consecutive years",
+        "action": "Cut growth years 1\u20135 toward bear 1%; cap exit multiple at 16\u00d7"
+      },
+      {
+        "id": "china_margin",
+        "observation": "Rest of World segment margin falls below 7% for two years",
+        "action": "Downgrade moat to eroding; move base toward bear"
+      },
+      {
+        "id": "input_cost_spike",
+        "observation": "Steel/copper costs rise without successful price pass-through",
+        "action": "North America margin misses 24% guide; trim growth 1\u20132 pp"
+      }
+    ],
+    "status": "partial",
+    "lawrence_legacy": {
+      "y1_5": 0.04,
+      "y6_10": 0.03,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.04,
+      "y6_10": 0.03,
+      "exit_pfcf_y10": 20.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": -0.009,
+      "as_of_filing_facts": "evidence/_text/10-K_20260210_rpt20251231_acc0000091142_26_000008.htm.txt"
+    }
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 8.1
+    },
+    "base": {
+      "return_pct": 13.9
+    },
+    "bull": {
+      "return_pct": 17.1
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 8.1
+    },
+    "base": {
+      "return_pct": 13.9
+    },
+    "bull": {
+      "return_pct": 17.1
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": 13.9
+    },
+    "falsifier_adjusted": {
+      "return_pct": 13.9
+    }
+  },
+  "implied_return": {
+    "base_pct": 14.08,
+    "label": "7yr IRR (total synthesis)",
+    "display": "14.08% (total synthesis)",
+    "lawrence_stance_gate_pct": 13.9,
+    "falsifier_adjusted_pct": 13.9,
+    "synthesis_pct": 14.08
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Growth theory (pre-falsifier)",
+        "source": "growth_explanation + filing revenue YoY",
+        "return_pct": 13.9,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": 8.1,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 17.1,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 14.28,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 14.08,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  },
+  "total_return_panel": {
+    "as_of": "2026-07-10",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 1.38,
+    "distribution_history_sum": 1.38,
+    "market_cap_m": null,
+    "total_return_annualized_pct": 9.86,
+    "chart": "AOS/research/charts/total_return_2026-07-10.svg",
+    "panel_json": "AOS/research/total_return_panel.json"
+  },
+  "context_overlay": {
+    "as_of": "2026-07-10",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": 0.59,
+            "as_of": "2026-07-09",
+            "yoy_pct": 209.3,
+            "direction": "up",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.539000034332275,
+            "as_of": "2026-07-09",
+            "yoy_pct": 4.5,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.269000053405762,
+            "as_of": "2026-07-09",
+            "yoy_pct": 8.9,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 100.91500091552734,
+            "as_of": "2026-07-10",
+            "yoy_pct": 3.3,
+            "direction": "up",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 15.84000015258789,
+            "as_of": "2026-07-09",
+            "yoy_pct": -0.6,
+            "direction": "flat",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": 0.42,
+            "as_of": "2026-07-09",
+            "yoy_pct": 160.0,
+            "direction": "up",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 15.53,
+            "as_of": "2026-07-09",
+            "yoy_pct": 48.0,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "insider_signal": {
+    "as_of": "2026-07-10",
+    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
+    "in_base_irr": false,
+    "window_days": 365,
+    "ics": 10.0,
+    "band": "exceptional",
+    "bull_case_support": "moderate",
+    "scenario_confidence": {
+      "priors": {
+        "bear": 0.2,
+        "base": 0.55,
+        "bull": 0.25
+      },
+      "tilted": {
+        "bear": 0.2,
+        "base": 0.4,
+        "bull": 0.4
+      },
+      "bull_delta": 0.15,
+      "bear_delta": 0.0,
+      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
+    },
+    "factors": {
+      "buy_score": 21.267,
+      "sell_score": -0.945,
+      "cluster_bonus": 0.0,
+      "net_buy_usd": 2627045.14,
+      "net_sell_usd": 5425500.13,
+      "price_today": 59.02
+    },
+    "top_buys": [
+      {
+        "insider": "Fister Todd W",
+        "date": "2026-04-13",
+        "shares": 2262,
+        "price": 66.32,
+        "value_usd": 150015.84,
+        "shares_owned_after": 6356,
+        "contrib": 2.374
+      },
+      {
+        "insider": "MARTIN LOIS M",
+        "date": "2026-04-13",
+        "shares": 2262,
+        "price": 66.32,
+        "value_usd": 150015.84,
+        "shares_owned_after": 6445,
+        "contrib": 2.369
+      },
+      {
+        "insider": "MAPES CHRISTOPHER L",
+        "date": "2026-04-13",
+        "shares": 2262,
+        "price": 66.32,
+        "value_usd": 150015.84,
+        "shares_owned_after": 8684,
+        "contrib": 2.259
+      },
+      {
+        "insider": "Wheeler Kevin J.",
+        "date": "2026-02-13",
+        "shares": 8598,
+        "price": 79.885,
+        "value_usd": 686851.23,
+        "shares_owned_after": 128348,
+        "contrib": 2.208
+      },
+      {
+        "insider": "Kadri Ilham",
+        "date": "2026-04-13",
+        "shares": 2262,
+        "price": 66.32,
+        "value_usd": 150015.84,
+        "shares_owned_after": 23579,
+        "contrib": 1.963
+      }
+    ],
+    "top_sells": [
+      {
+        "insider": "Wheeler Kevin J.",
+        "date": "2026-02-13",
+        "shares": 16942,
+        "price": 79.885,
+        "value_usd": 1353411.67,
+        "is_10b5_1": false,
+        "contrib": -0.129
+      },
+      {
+        "insider": "Wheeler Kevin J.",
+        "date": "2025-07-30",
+        "shares": 22200,
+        "price": 71.2553,
+        "value_usd": 1581867.66,
+        "is_10b5_1": false,
+        "contrib": -0.129
+      },
+      {
+        "insider": "SMITH MARK D",
+        "date": "2025-07-29",
+        "shares": 2400,
+        "price": 71.36,
+        "value_usd": 171264.0,
+        "is_10b5_1": false,
+        "contrib": -0.113
+      },
+      {
+        "insider": "Lauber Charles T",
+        "date": "2026-02-13",
+        "shares": 4447,
+        "price": 79.885,
+        "value_usd": 355248.6,
+        "is_10b5_1": false,
+        "contrib": -0.101
+      },
+      {
+        "insider": "Lauber Charles T",
+        "date": "2025-07-31",
+        "shares": 2074,
+        "price": 70.79,
+        "value_usd": 146818.46,
+        "is_10b5_1": false,
+        "contrib": -0.101
+      }
+    ],
+    "narrative_hooks": [],
+    "transaction_count": 37
+  },
+  "lens_consensus": {
+    "as_of": "2026-07-10",
+    "shared_inputs_ref": "valuation.json@2026-07-10",
+    "valuation_richness": 0.073,
+    "blended_return_pct": 12.74,
+    "band_pct": [
+      8.1,
+      15.9
+    ],
+    "weighted_median_pct": 13.9,
+    "median_mean_flag": false,
+    "stance": "watch",
+    "agreement_pct": 55,
+    "dissent_count": 4,
+    "lawrence_divergence": false,
+    "top_dissents": [
+      {
+        "persona": "stahl",
+        "label": "Murray Stahl",
+        "verdict": "hold",
+        "return_pct": 13.9,
+        "key_metric": "archetype=compounder",
+        "conviction": 0.195,
+        "falsifier": "No asset intensity / pricing power (moat eroding + non-croupier)"
+      },
+      {
+        "persona": "hk",
+        "label": "Horizon Kinetics",
+        "verdict": "hold",
+        "return_pct": 15.9,
+        "key_metric": "payoff_lens=pending",
+        "conviction": 0.195,
+        "falsifier": "No dated contractual payoff or royalty/trust structure"
+      },
+      {
+        "persona": "munger",
+        "label": "Charlie Munger",
+        "verdict": "hold",
+        "return_pct": 13.9,
+        "key_metric": "moat=stable",
+        "conviction": 0.095,
+        "falsifier": "Moat eroding/unproven or irr_method pending"
+      }
+    ],
+    "contributor_count": 8,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
+  }
+}
