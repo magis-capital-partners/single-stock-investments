@@ -6,24 +6,27 @@
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Archetype** (Stahl) | infrastructure |
+| **Moat** (Munger) | narrow |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Cycle** | mid |
+| **Implied 7yr IRR** (Lawrence) | 7.84% (total synthesis) |
+| **IRR method** | full |
+| **Lawrence bucket** | regulated_utility |
+| **Payoff lens** | operating |
 
 ## One-line thesis
 
-Xcel Energy — thesis pending Marvin deep dive.
+Multi-state regulated utility compounding rate base through a **$60B** 2026-2030 capex plan; **watch** at ~$80 (**7.84%** synthesis IRR) until price dislocation or clearer wildfire recovery.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest annual report (10-K FY2025)
+- [x] Read latest quarterly report (10-Q Q1 2026)
+- [x] Apply decision stack and Lawrence IRR model
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-07-10; awaiting deep dive.
+- Ongoing EPS ($3.80) vs GAAP ($3.42) as owner-cash anchor after Marshall wildfire charge.
+- Marshall wildfire regulatory recovery timeline in Colorado.
