@@ -1,0 +1,489 @@
+{
+  "ticker": "APD",
+  "as_of": "2026-07-10",
+  "method": "full",
+  "lawrence_bucket": "pricing_power",
+  "classification_inputs": {
+    "archetype": "infrastructure",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 296.75,
+    "price_source": "Yahoo APD close 2026-07-10",
+    "price_as_of": "2026-07-10",
+    "fcf_per_share": 8.62,
+    "fcf_source": "FY2025 cash from operations $3.26B less estimated maintenance capital spending $1.35B, divided by 222.7M diluted shares (10-K FY2025); GAAP FCF negative due to NEOM/JIGPC growth capex",
+    "shares_millions": 222.7,
+    "normalization_note": "Core industrial gases earn adjusted operating income $2.9B and adjusted diluted EPS $12.03; Lawrence base uses maintenance-level owner cash, not growth project spend or FY2025 $3.7B project-exit charges"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.03,
+      "exit_pfcf_y10": 17,
+      "notes": "Further clean-energy write-downs; merchant volumes soft; multiple compresses toward industrial peers"
+    },
+    "base": {
+      "growth_y1_5": 0.05,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 19,
+      "notes": "Core on-site/merchant oligopoly persists; project exits reduce growth capex drag; NEOM option not in base cash path"
+    },
+    "bull": {
+      "growth_y1_5": 0.07,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 22,
+      "notes": "NEOM hydrogen-ammonia ramps; pricing holds; capital discipline after Louisiana/Casa Grande exits"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial \u2014 large project VIE/JV stakes",
+      "treatment": "milestone_nav",
+      "evidence": "NEOM Green Hydrogen VIE; JIGPC 55% equity affiliate \u2014 fair value not fully marked in Lawrence base (10-K FY2025 Note 3, Note 26)"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant assets?",
+      "answer": "Yes \u2014 NEOM green hydrogen-ammonia complex",
+      "treatment": "probability_weighted",
+      "evidence": "Multi-billion-dollar NEOM facility under construction; 8-K 2026-06-30 project update \u2014 not in base owner cash"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Yes \u2014 corporate/clean-energy drag",
+      "treatment": "zero",
+      "treatment_rationale": "Louisiana, Casa Grande, World Energy exits; corporate operating loss $367M FY2025 \u2014 burden in GAAP, excluded from normalized base",
+      "evidence": "8-K 2026-06-26 up to $2.9B pre-tax charge; FY2025 business and asset actions $3.7B (10-K Note 5)"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF path?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "On-site take-or-pay and merchant contracts; financing revenue $1.14B FY2025 in Americas segment \u2014 modeled via core growth, not separate terminal"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "Yes \u2014 JIGPC joint venture",
+      "treatment": "milestone_nav",
+      "evidence": "55% JIGPC interest; $1.6B initial plus $908M follow-on investments (10-K segment note)"
+    },
+    {
+      "q": 0,
+      "question": "Material options after scan?",
+      "answer": "NEOM hydrogen option; core gases sufficient for Lawrence gate",
+      "treatment": "probability_weighted",
+      "evidence": "Option overlay separate from conservative Lawrence base; base uses maintenance owner cash only"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "Core industrial gases: on-site take-or-pay volumes plus merchant pricing (2% non-helium FY2025) and energy cost pass-through; growth capped by project-exit cycle and capital allocation reset",
+    "source": "10-K FY2025 MD&A; 10-Q Q2 FY2026 adjusted EPS +19% YoY",
+    "falsifiers": [
+      {
+        "id": "merchant_pricing_roll",
+        "observation": "Merchant pricing turns negative two consecutive fiscal years outside helium",
+        "action": "Cut growth years 1-5 toward bear 3%"
+      },
+      {
+        "id": "repeat_impairments",
+        "observation": "Additional multi-billion project charges beyond June 2026 Louisiana/Casa Grande exit",
+        "action": "Downgrade moat to eroding; cap exit multiple at 15x"
+      }
+    ],
+    "lawrence_legacy": {
+      "y1_5": 0.05,
+      "y6_10": 0.04,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.05,
+      "y6_10": 0.04,
+      "exit_pfcf_y10": 19.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": -0.0396,
+      "as_of_filing_facts": "evidence/_text/10-K_20251120_rpt20250930_acc0000002969_25_000055.htm.txt"
+    },
+    "status": "partial"
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "evidence_refresh": {
+    "synthesis_in_dive": true
+  },
+  "total_return_panel": {
+    "as_of": "2026-07-10",
+    "status": "complete",
+    "error": null,
+    "cumulative_distributions_per_share": 0,
+    "distribution_history_sum": 0,
+    "market_cap_m": null,
+    "total_return_annualized_pct": 9.74,
+    "chart": "APD/research/charts/total_return_2026-07-10.svg",
+    "panel_json": "APD/research/total_return_panel.json"
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -2.8
+    },
+    "base": {
+      "return_pct": 0.1
+    },
+    "bull": {
+      "return_pct": 3.6
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -2.8
+    },
+    "base": {
+      "return_pct": 0.1
+    },
+    "bull": {
+      "return_pct": 3.6
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": 0.1
+    },
+    "falsifier_adjusted": {
+      "return_pct": 0.1
+    }
+  },
+  "implied_return": {
+    "base_pct": 1.0,
+    "label": "7yr IRR (total synthesis)",
+    "display": "1.0% (total synthesis)",
+    "lawrence_stance_gate_pct": 0.1,
+    "falsifier_adjusted_pct": 0.1,
+    "synthesis_pct": 1.0
+  },
+  "overlay_results": [],
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Growth theory (pre-falsifier)",
+        "source": "growth_explanation + filing revenue YoY",
+        "return_pct": 0.1,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": -2.8,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 3.6,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 1.2,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 1.0,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  },
+  "context_overlay": {
+    "as_of": "2026-07-10",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": 0.59,
+            "as_of": "2026-07-09",
+            "yoy_pct": 209.3,
+            "direction": "up",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.539000034332275,
+            "as_of": "2026-07-09",
+            "yoy_pct": 4.5,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.269000053405762,
+            "as_of": "2026-07-09",
+            "yoy_pct": 8.9,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 100.93699645996094,
+            "as_of": "2026-07-10",
+            "yoy_pct": 3.4,
+            "direction": "up",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 15.84000015258789,
+            "as_of": "2026-07-09",
+            "yoy_pct": -0.6,
+            "direction": "flat",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": 0.42,
+            "as_of": "2026-07-09",
+            "yoy_pct": 160.0,
+            "direction": "up",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 15.53,
+            "as_of": "2026-07-09",
+            "yoy_pct": 48.0,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "insider_signal": {
+    "as_of": "2026-07-10",
+    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
+    "in_base_irr": false,
+    "window_days": 365,
+    "ics": 0.0,
+    "band": "negligible",
+    "bull_case_support": "none",
+    "scenario_confidence": {
+      "priors": {
+        "bear": 0.2,
+        "base": 0.55,
+        "bull": 0.25
+      },
+      "tilted": {
+        "bear": 0.28,
+        "base": 0.47,
+        "bull": 0.25
+      },
+      "bull_delta": 0.0,
+      "bear_delta": 0.08,
+      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
+    },
+    "factors": {
+      "buy_score": 0.0,
+      "sell_score": -0.895,
+      "cluster_bonus": 0.0,
+      "net_buy_usd": 0,
+      "net_sell_usd": 22023161.14,
+      "price_today": 296.75
+    },
+    "top_buys": [],
+    "top_sells": [
+      {
+        "insider": "Schaeffer Melissa N.",
+        "date": "2026-05-01",
+        "shares": 2714,
+        "price": 303.76,
+        "value_usd": 824404.64,
+        "is_10b5_1": false,
+        "contrib": -0.119
+      },
+      {
+        "insider": "Mantle Ridge LP",
+        "date": "2026-02-12",
+        "shares": 3943847,
+        "price": 0.0,
+        "value_usd": 0.0,
+        "is_10b5_1": false,
+        "contrib": -0.113
+      },
+      {
+        "insider": "Mantle Ridge LP",
+        "date": "2026-02-12",
+        "shares": 70175,
+        "price": 284.21,
+        "value_usd": 19944436.75,
+        "is_10b5_1": false,
+        "contrib": -0.113
+      },
+      {
+        "insider": "Mantle Ridge LP",
+        "date": "2026-02-12",
+        "shares": 1759,
+        "price": 0.0,
+        "value_usd": 0.0,
+        "is_10b5_1": false,
+        "contrib": -0.113
+      },
+      {
+        "insider": "Schaeffer Melissa N.",
+        "date": "2025-12-02",
+        "shares": 709,
+        "price": 261.28,
+        "value_usd": 185247.52,
+        "is_10b5_1": false,
+        "contrib": -0.101
+      }
+    ],
+    "narrative_hooks": [],
+    "transaction_count": 29
+  },
+  "lens_consensus": {
+    "as_of": "2026-07-10",
+    "shared_inputs_ref": "valuation.json@2026-07-10",
+    "valuation_richness": 0.634,
+    "blended_return_pct": -0.19,
+    "band_pct": [
+      -2.8,
+      2.1
+    ],
+    "weighted_median_pct": 0.1,
+    "median_mean_flag": false,
+    "stance": "pass",
+    "agreement_pct": 20,
+    "dissent_count": 6,
+    "lawrence_divergence": true,
+    "top_dissents": [
+      {
+        "persona": "hohn",
+        "label": "Chris Hohn / TCI",
+        "verdict": "watch",
+        "return_pct": 0.1,
+        "key_metric": "fcf_yield=2.9",
+        "conviction": 0.745,
+        "falsifier": "FCF yield < 0.5% or commoditized archetype (turnaround/optionality only)"
+      },
+      {
+        "persona": "lawrence",
+        "label": "Lawrence (house IRR)",
+        "verdict": "watch",
+        "return_pct": 1.0,
+        "key_metric": "synthesis_pct=1.0",
+        "conviction": 0.7,
+        "falsifier": "Synthesis incomplete or irr_method pending"
+      },
+      {
+        "persona": "munger",
+        "label": "Charlie Munger",
+        "verdict": "watch",
+        "return_pct": 0.1,
+        "key_metric": "moat=stable",
+        "conviction": 0.595,
+        "falsifier": "Moat eroding/unproven or irr_method pending"
+      }
+    ],
+    "contributor_count": 7,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
+  }
+}
