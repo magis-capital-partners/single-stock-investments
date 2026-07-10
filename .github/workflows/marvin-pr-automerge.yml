@@ -20,8 +20,8 @@ permissions:
   checks: read
 
 concurrency:
-  group: marvin-automerge-${{ github.event.pull_request.number || inputs.pr_number }}
-  cancel-in-progress: true
+  group: marvin-automerge-queue
+  cancel-in-progress: false
 
 jobs:
   automerge:
