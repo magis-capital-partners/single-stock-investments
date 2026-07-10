@@ -38,7 +38,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | ALL | ALL/ | Allstate | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ALLE | ALLE/ | Allegion | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ALS.TO | ALS.TO/ | Altius Minerals Corporation | CA | 2026-06-03 | 2026-07-09 | unknown | watch |
-| AMAT | AMAT/ | Applied Materials | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| AMAT | AMAT/ | Applied Materials | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | AMCR | AMCR/ | Amcor | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | AMD | AMD/ | Advanced Micro Devices, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | AME | AME/ | Ametek | US | 2026-07-09 | 2026-07-10 | unknown | watch |
@@ -54,8 +54,8 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | APH | APH/ | Amphenol | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | APLD | APLD/ | Applied Digital | US | 2026-07-09 | 2026-07-09 | optionality | watch |
 | APO | APO/ | Apollo Global Management | US | 2026-07-09 | 2026-07-10 | unknown | watch |
-| APP | APP/ | AppLovin | US | 2026-07-09 | 2026-07-10 | unknown | watch |
-| APTV | APTV/ | Aptiv | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| APP | APP/ | AppLovin | US | 2026-07-10 | 2026-07-10 | unknown | watch |
+| APTV | APTV/ | Aptiv | US | 2026-07-10 | 2026-07-10 | unknown | watch |
 | ARE | ARE/ | Alexandria Real Estate Equities | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ARES | ARES/ | Ares Management | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ASPN | ASPN/ | Aspen Aerogels, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -161,12 +161,20 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | CTSH | CTSH/ | Cognizant | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CTVA | CTVA/ | Corteva | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CVNA | CVNA/ | Carvana | US | 2026-07-09 | 2026-07-10 | unknown | watch |
-| CVS | CVS/ | CVS Health | US | — | — | unknown | watch |
+| CVS | CVS/ | CVS Health | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CVX | CVX/ | Chevron Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| DAL | DAL/ | Delta Air Lines | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | DB1.DE | DB1.DE/ | Deutsche Boerse AG | EU | 2026-07-09 | 2026-07-09 | unknown | watch |
+| DDOG | DDOG/ | Datadog | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| DE | DE/ | Deere & Company | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| DECK | DECK/ | Deckers Brands | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| DELL | DELL/ | Dell Technologies | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | DHR | DHR/ | Danaher Corporation | US | 2026-07-09 | 2026-07-09 | compounder | hold |
 | DMLP | DMLP/ | Dorchester Minerals LP | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| DRI | DRI/ | Darden Restaurants | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | DRR.AX | DRR.AX/ | Deterra Royalties Limited | AU | 2026-06-02 | 2026-07-09 | unknown | watch |
+| DVA | DVA/ | DaVita | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| DVN | DVN/ | Devon Energy | US | — | — | unknown | watch |
 | ECHO | ECHO/ | EchoStar Corporation | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | ED | ED/ | Consolidated Edison | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | EFOR | EFOR/ | Everforth, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -290,4 +298,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 
-**283 holdings total.** Registry: `_system/portfolio/registry.json`
+**291 holdings total.** Registry: `_system/portfolio/registry.json`
