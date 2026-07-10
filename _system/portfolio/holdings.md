@@ -111,6 +111,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | CBOE | CBOE/ | Cboe Global Markets | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | CBRE | CBRE/ | CBRE Group | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CBRS | CBRS/ | Cerebras Systems | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| CCI | CCI/ | Crown Castle | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CCL | CCL/ | Carnival Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CDNS | CDNS/ | Cadence Design Systems | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CDW | CDW/ | CDW Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
@@ -127,9 +128,10 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | CKX | CKX/ | CKX Lands, Inc. | US | 2026-07-09 | 2026-07-09 | optionality | watch |
 | CL | CL/ | Colgate-Palmolive | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CLX | CLX/ | Clorox | US | 2026-07-09 | 2026-07-10 | unknown | watch |
-| CMCSA | CMCSA/ | Comcast | US | — | — | unknown | watch |
+| CMCSA | CMCSA/ | Comcast | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CME | CME/ | CME Group Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | CMG | CMG/ | Chipotle Mexican Grill | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| CMI | CMI/ | Cummins | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CMS | CMS/ | CMS Energy | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CMSG | CMSG/ | Consensus Mining & Seigniorage Corp | US | 2026-07-09 | 2026-07-09 | optionality | watch |
 | CNC | CNC/ | Centene Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
@@ -142,18 +144,24 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | COP | COP/ | ConocoPhillips | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | COR | COR/ | Cencora | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CORBF | CORBF/ | Corbus Pharmaceuticals Holdings, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| COST | COST/ | Costco | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CPAY | CPAY/ | Corpay | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CPRT | CPRT/ | Copart | US | 2026-07-09 | 2026-07-09 | compounder | core |
 | CPT | CPT/ | Camden Property Trust | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CRCL | CRCL/ | Circle Internet Group, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| CRH | CRH/ | CRH plc | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CRL | CRL/ | Charles River Laboratories | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| CRWD | CRWD/ | CrowdStrike | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CSCO | CSCO/ | Cisco | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CSGP | CSGP/ | CoStar Group | US | 2026-07-09 | 2026-07-09 | platform | watch |
 | CSU | CSU/ | Constellation Software | CA | 2026-07-09 | 2026-07-09 | compounder | core |
 | CSU.DB | CSU.DB/ | Constellation Software Inc. (Series 1 Debentures) | CA | — | 2026-07-09 | unknown | watch |
+| CSX | CSX/ | CSX Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CTAS | CTAS/ | Cintas | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CTSH | CTSH/ | Cognizant | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| CTVA | CTVA/ | Corteva | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | CVNA | CVNA/ | Carvana | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| CVS | CVS/ | CVS Health | US | — | — | unknown | watch |
 | CVX | CVX/ | Chevron Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | DB1.DE | DB1.DE/ | Deutsche Boerse AG | EU | 2026-07-09 | 2026-07-09 | unknown | watch |
 | DHR | DHR/ | Danaher Corporation | US | 2026-07-09 | 2026-07-09 | compounder | hold |
@@ -282,4 +290,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 
-**275 holdings total.** Registry: `_system/portfolio/registry.json`
+**283 holdings total.** Registry: `_system/portfolio/registry.json`
