@@ -5,6 +5,8 @@ set -euo pipefail
 ROOT=$(cd "$(dirname "$0")/../.." && pwd)
 cd "$ROOT"
 
+export CI_PUSH_SKIP_SELF_REFRESH=1
+
 # shellcheck disable=SC1091
 source _system/scripts/ci_push_main.sh
 
@@ -306,6 +308,11 @@ test_returns_csv_is_regenerable() {
   fi
 }
 
+test_sync_self_refresh_disabled() {
+  export CI_PUSH_SKIP_SELF_REFRESH=1
+  sync_self_from_origin_main
+}
+
 test_mixed_returns_and_dashboard_conflict() {
   local returns_file="_system/reference/market-data/returns/SPY.csv"
   if [ ! -f "$returns_file" ]; then
@@ -362,6 +369,7 @@ test_mixed_returns_and_dashboard_conflict() {
 }
 
 run_test "returns CSV classified as regenerable" test_returns_csv_is_regenerable
+run_test "sync self refresh disabled no-op" test_sync_self_refresh_disabled
 run_test "dashboard JSON rebase conflict auto-resolution" test_dashboard_json_conflict
 run_test "docs mirror after dashboard JSON rebase conflict" test_docs_mirror_after_dashboard_conflict
 run_test "insights JSON rebase conflict auto-resolution" test_insights_json_conflict

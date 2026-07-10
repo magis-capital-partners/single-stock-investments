@@ -302,8 +302,37 @@ check_push_file_sizes() {
   _check_file_sizes_for_paths < <(git diff --name-only origin/main...HEAD)
 }
 
+sync_self_from_origin_main() {
+  if [ "${CI_PUSH_SKIP_SELF_REFRESH:-0}" = "1" ]; then
+    return 0
+  fi
+  if ! git rev-parse --git-dir >/dev/null 2>&1; then
+    return 0
+  fi
+  git fetch origin main >/dev/null 2>&1 || return 0
+  if ! git cat-file -e "origin/main:_system/scripts/ci_push_main.sh" 2>/dev/null; then
+    return 0
+  fi
+  local dest="_system/scripts/ci_push_main.sh"
+  local tmp
+  tmp=$(mktemp)
+  git show "origin/main:_system/scripts/ci_push_main.sh" > "$tmp"
+  if cmp -s "$tmp" "$dest"; then
+    rm -f "$tmp"
+    return 0
+  fi
+  echo "Syncing ci_push_main.sh from origin/main (conflict resolver update)."
+  cp "$tmp" "$dest"
+  chmod +x "$dest"
+  rm -f "$tmp"
+  # shellcheck disable=SC1091
+  source "$dest"
+}
+
 ci_push_main() {
   local msg="${1:?commit message required}"
+
+  sync_self_from_origin_main
 
   if git diff --staged --quiet; then
     echo "No staged changes to commit."
@@ -321,6 +350,7 @@ ci_push_main() {
   while [ "$attempt" -le "$MAX_ATTEMPTS" ]; do
     git fetch origin main
     if ! git rebase origin/main; then
+      sync_self_from_origin_main
       while rebase_in_progress && try_resolve_rebase_conflicts; do
         echo "Resolved regenerable rebase conflicts; continuing rebase (attempt $attempt/$MAX_ATTEMPTS)."
       done
