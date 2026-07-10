@@ -10,18 +10,28 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | 3905.T | 3905.T/ | DataSection Co., Ltd. | JP | 2026-07-09 | 2026-07-09 | compounder | watch |
 | 7176.T | 7176.T/ | Simplex Financial Holdings Co., Ltd. | JP | 2026-07-09 | 2026-07-09 | unknown | watch |
 | 8697.T | 8697.T/ | Japan Exchange Group | JP | 2026-06-25 | 2026-07-09 | croupier | hold |
+| A | A/ | Agilent Technologies | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ABBV | ABBV/ | AbbVie | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ABMD.CVR | ABMD.CVR/ | Abiomed CVR (Johnson & Johnson acquisition) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
+| ABNB | ABNB/ | Airbnb | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ABT | ABT/ | Abbott Laboratories | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ABX | ABX/ | Abacus Life Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | ACN | ACN/ | Accenture | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ADBE | ADBE/ | Adobe Inc. | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ADN.TO | ADN.TO/ | Acadian Timber Corp. | CA | 2026-07-09 | 2026-07-09 | optionality | watch |
+| AES | AES/ | AES Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| AFL | AFL/ | Aflac | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| AKAM | AKAM/ | Akamai Technologies | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| ALB | ALB/ | Albemarle Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| ALGN | ALGN/ | Align Technology | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| ALLE | ALLE/ | Allegion | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ALS.TO | ALS.TO/ | Altius Minerals Corporation | CA | 2026-06-03 | 2026-07-09 | unknown | watch |
 | AMD | AMD/ | Advanced Micro Devices, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | AMZN | AMZN/ | Amazon.com | US | 2026-07-09 | 2026-07-09 | compounder | hold |
 | AOS | AOS/ | A. O. Smith | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| APD | APD/ | Air Products | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | APLD | APLD/ | Applied Digital | US | 2026-07-09 | 2026-07-09 | optionality | watch |
+| ARE | ARE/ | Alexandria Real Estate Equities | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ASPN | ASPN/ | Aspen Aerogels, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | ASX.AX | ASX.AX/ | ASX Limited | AU | 2026-07-09 | 2026-07-09 | unknown | watch |
 | AXON | AXON/ | Axon Enterprise, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
@@ -111,7 +121,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | MDB | MDB/ | MongoDB, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | META | META/ | Meta Platforms Inc | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | MIAX | MIAX/ | Miami International Holdings | US | 2026-07-09 | 2026-07-09 | unknown | watch |
-| MMM | MMM/ | 3M | US | — | 2026-07-10 | unknown | watch |
+| MMM | MMM/ | 3M | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | MRSH | MRSH/ | Marsh & McLennan Companies | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | MRTX.CVR | MRTX.CVR/ | Mirati Therapeutics CVR (Bristol-Myers Squibb acquisition) | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | MSB | MSB/ | Mesabi Trust | US | 2026-07-09 | 2026-07-09 | optionality | watch |
@@ -168,4 +178,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-10.
 | XTIA | XTIA/ | XTI Aerospace, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | XYZ | XYZ/ | Block, Inc. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 
-**161 holdings total.** Registry: `_system/portfolio/registry.json`
+**171 holdings total.** Registry: `_system/portfolio/registry.json`

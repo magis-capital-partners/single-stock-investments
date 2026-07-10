@@ -293,6 +293,7 @@ def main() -> int:
     ap.add_argument("--skip-download", action="store_true", help="Scaffold+returns only")
     ap.add_argument("--sleep", type=float, default=0.8, help="Sleep after Yahoo fetch")
     ap.add_argument("--no-dashboard", action="store_true", help="Skip end-of-batch dashboard rebuild")
+    ap.add_argument("--skip-indexes", action="store_true", help="Skip full-tree build_folder_indexes (faster, less dirty)")
     ap.add_argument("--list-only", action="store_true")
     args = ap.parse_args()
 
@@ -335,9 +336,11 @@ def main() -> int:
         log(f"  -> {row.get('status')} returns={row.get('returns_ok')} {row.get('download') or row.get('detail') or ''}")
 
     # Once per batch (token + time efficient)
-    log("\n=== batch finalize: sync + indexes ===")
+    log("\n=== batch finalize: sync portfolio ===")
     subprocess.run([PY, str(SCRIPTS / "sync_portfolio_from_registry.py")], cwd=ROOT, check=False)
-    subprocess.run([PY, str(SCRIPTS / "build_folder_indexes.py")], cwd=ROOT, check=False)
+    if not args.skip_indexes:
+        log("=== folder indexes ===")
+        subprocess.run([PY, str(SCRIPTS / "build_folder_indexes.py")], cwd=ROOT, check=False)
     if not args.no_dashboard:
         log("=== dashboard rebuild ===")
         subprocess.run([PY, str(SCRIPTS / "build_dashboard_data.py")], cwd=ROOT, check=False)
