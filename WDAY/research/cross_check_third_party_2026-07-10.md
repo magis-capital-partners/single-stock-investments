@@ -5,53 +5,58 @@
 **Marvin dive:** `WDAY/research/deep_dive_2026-07-10.md`
 **Source inventory:** `WDAY/third-party-analyses/source_inventory_2026-07-10.md`
 **Framework:** `_system/frameworks/third_party_cross_reference.md`, `external_view_blend.md`
-<!-- THIRD_PARTY_CROSS_CHECK_STUB -->
 
 ## Executive summary
 
-No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (10-K, 10-Q, IR). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+No third-party sources are indexed for Workday as of this scan. Marvin stance rests on **primary filings only** (10-K FY2026, Q1 FY2027 10-Q, DEF 14A 2026, 8-K acquisition cluster). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
 
 **Synthesis:** Marvin floor only; no external blend.
 
 ## Sources in scope
 
-| (none) | Primary filings only | — | — | n/a |
+| Source | Type | Date | Stance hint | In base IRR? |
+|--------|------|------|-------------|--------------|
+| *(none)* | Primary filings only | 2026-07-10 | watch (Marvin) | n/a |
 
 ## Agreements (facts)
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| — | — | — | — |
+| Revenue growth | FY2026 +13.1% to $9.55B | — | `10-K_20260306_*.htm` |
+| Backlog scale | RPO $28.1B | — | `10-K_20260306_*.htm` |
+| Margin expansion | Operating income $721M (+73% YoY) | — | `10-K_20260306_*.htm` |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| — | — | — | — |
+| — | — | — | No external views to reconcile |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | — | — | — |
+| Marvin floor | ~$10.36/sh FCF FY2026 | 7yr Lawrence base *[mechanical]* | watch |
 | External (combined) | — | — | — |
-| **Blended best estimate** | **—** | **—** | **—** |
+| **Blended best estimate** | **~$10.36/sh** | **Marvin base only** | **watch** |
 
-**Weights:** *[Document why]*
+**Weights:** 100% Marvin floor (no approved external sources per `third_party_sources.md`).
 
-**Returns statement (blended):** *[One sentence; pending sources not in base IRR]*
+**Returns statement (blended):** Base return follows Marvin Lawrence path on FY2026 owner cash; no external adjustment until sources are indexed and approved.
 
 ## [HUMAN REVIEW]
 
 - [ ] Every **approved** source reviewed against filings
-- [ ] Every **pending** source cited with **[PENDING APPROVAL]** only
+- [x] Every **pending** source cited with **[PENDING APPROVAL]** only (none indexed)
 - [ ] Blended estimate in `valuation.json` → `estimates.external[]` if material
 
 ## [PROPOSED MEMORY]
 
-- [PROPOSED COMPANY] WDAY: third-party cross-check 2026-07-10
+- [PROPOSED COMPANY] WDAY third-party cross-check 2026-07-10: Marvin floor only; no indexed external sources.
 
 ## Primary sources cited
 
-1. `WDAY/research/deep_dive_2026-07-10.md`
-2. `WDAY/third-party-analyses/source_inventory_2026-07-10.md`
+1. `WDAY/investor-documents/sec-edgar/10-K_20260306_rpt20260131_acc0001327811_26_000014.htm`
+2. `WDAY/investor-documents/sec-edgar/10-Q_20260522_rpt20260430_acc0001327811_26_000026.htm`
+3. `WDAY/research/deep_dive_2026-07-10.md`
+4. `WDAY/third-party-analyses/source_inventory_2026-07-10.md`
