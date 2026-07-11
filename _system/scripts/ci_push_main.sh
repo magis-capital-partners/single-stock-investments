@@ -257,6 +257,22 @@ regenerate_conflicted_artifacts() {
   stage_resolved_conflicts "$conflicted"
 }
 
+resolve_unmerged_regenerable_paths() {
+  local f
+  while IFS= read -r f; do
+    [ -n "$f" ] || continue
+    if ! is_regenerable_artifact "$f"; then
+      continue
+    fi
+    if [ -f "$f" ]; then
+      git add -f "$f"
+    else
+      git rm -f --cached "$f" 2>/dev/null || true
+      git rm -f "$f" 2>/dev/null || true
+    fi
+  done <<< "$(git diff --name-only --diff-filter=U)"
+}
+
 try_resolve_rebase_conflicts() {
   if ! rebase_in_progress; then
     return 1
@@ -266,6 +282,7 @@ try_resolve_rebase_conflicts() {
   fi
   regenerate_conflicted_artifacts
   clean_regeneration_side_effects
+  resolve_unmerged_regenerable_paths
   git add dashboard/data/ docs/data/ 2>/dev/null || true
   git add -- ':(glob)*/INDEX.csv' 2>/dev/null || true
   git add _system/portfolio/holdings.md _system/portfolio/classification.json _system/portfolio/us_ticker_config.json 2>/dev/null || true
