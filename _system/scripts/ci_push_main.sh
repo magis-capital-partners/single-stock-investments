@@ -266,6 +266,11 @@ try_resolve_rebase_conflicts() {
   fi
   regenerate_conflicted_artifacts
   clean_regeneration_side_effects
+  git add dashboard/data/ docs/data/ 2>/dev/null || true
+  git add -- ':(glob)*/INDEX.csv' 2>/dev/null || true
+  git add _system/portfolio/holdings.md _system/portfolio/classification.json _system/portfolio/us_ticker_config.json 2>/dev/null || true
+  git add _system/reference/market-data/returns/ 2>/dev/null || true
+  git add _system/reference/data-sources/insights_record_archive.json 2>/dev/null || true
   GIT_EDITOR=true git rebase --continue || true
   if ! rebase_in_progress; then
     return 0
