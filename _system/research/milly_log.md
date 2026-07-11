@@ -152,3 +152,4 @@ One row per adversarial or consistency re-pass. Append via `milly_repass.py` or 
 | 2026-07-11 | XEL | standard_batch | OK | marvin_cloud_refresh |
 | 2026-07-11 | WYNN | standard_batch | OK | marvin_cloud_refresh |
 | 2026-07-11 | ZBH | standard_batch | OK | marvin_cloud_refresh |
+| 2026-07-11 | ZBRA | standard_batch | OK | marvin_cloud_refresh |
