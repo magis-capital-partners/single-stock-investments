@@ -313,6 +313,62 @@ test_returns_csv_is_regenerable() {
   fi
 }
 
+test_ticker_research_prefers_upstream() {
+  is_prefer_upstream_on_rebase "YUM/research/dossier.json" || {
+    echo "FAIL: ticker dossier.json should prefer upstream during rebase"
+    exit 1
+  }
+  is_prefer_upstream_on_rebase "ZTS/research/valuation.json" || {
+    echo "FAIL: ticker valuation.json should prefer upstream during rebase"
+    exit 1
+  }
+  if is_prefer_upstream_on_rebase "_system/scripts/ci_push_main.sh"; then
+    echo "FAIL: ci_push_main.sh should not prefer upstream during rebase"
+    exit 1
+  fi
+}
+
+test_ticker_research_rebase_conflict() {
+  local ticker="ABX"
+  local research_file="$ticker/research/dossier.json"
+  mkdir -p "$ticker/research"
+  git checkout -b "$TMP_BRANCH" >/dev/null
+
+  printf '{"ticker":"%s","timeline":[],"source":"local"}\n' "$ticker" > "$research_file"
+  git add "$research_file"
+  git commit -m "test: base dossier snapshot" >/dev/null
+
+  printf '{"ticker":"%s","timeline":[{"date":"2099-01-01","label":"local regen"}],"source":"local"}\n' "$ticker" > "$research_file"
+  git add "$research_file"
+  git commit -m "test: local dossier regen" >/dev/null
+
+  git branch test-main-conflict "$MAIN_REF" >/dev/null
+  git checkout test-main-conflict >/dev/null
+  printf '{"ticker":"%s","timeline":[{"date":"2099-02-01","label":"main regen"}],"source":"main"}\n' "$ticker" > "$research_file"
+  git add "$research_file"
+  git commit -m "test: main dossier regen" >/dev/null
+
+  git checkout "$TMP_BRANCH" >/dev/null
+  if git rebase test-main-conflict; then
+    echo "FAIL: expected rebase conflict in $research_file"
+    exit 1
+  fi
+
+  while rebase_in_progress && try_resolve_rebase_conflicts; do
+    :
+  done
+  if rebase_in_progress; then
+    echo "FAIL: ticker research conflict resolution helper did not finish rebase"
+    exit 1
+  fi
+  if ! grep -q '"label":"main regen"' "$research_file"; then
+    echo "FAIL: dossier.json should keep origin/main version after rebase conflict resolution"
+    exit 1
+  fi
+  git checkout -- "$research_file" 2>/dev/null || true
+  git restore --staged "$research_file" 2>/dev/null || true
+}
+
 test_sync_self_refresh_disabled() {
   export CI_PUSH_SKIP_SELF_REFRESH=1
   sync_self_from_origin_main
@@ -374,6 +430,7 @@ test_mixed_returns_and_dashboard_conflict() {
 }
 
 run_test "returns CSV classified as regenerable" test_returns_csv_is_regenerable
+run_test "ticker research prefers upstream on rebase" test_ticker_research_prefers_upstream
 run_test "sync self refresh disabled no-op" test_sync_self_refresh_disabled
 run_test "dashboard JSON rebase conflict auto-resolution" test_dashboard_json_conflict
 run_test "docs mirror after dashboard JSON rebase conflict" test_docs_mirror_after_dashboard_conflict
@@ -382,6 +439,7 @@ run_test "insights docs mirror rebase conflict auto-resolution" test_insights_do
 run_test "activist feed JSON rebase conflict auto-resolution" test_activist_feed_json_conflict
 run_test "INDEX.csv rebase conflict auto-resolution" test_index_csv_conflict
 run_test "mixed generated artifact rebase conflict auto-resolution" test_mixed_generated_conflict
+run_test "ticker research rebase conflict prefers upstream" test_ticker_research_rebase_conflict
 run_test "mixed returns CSV and dashboard JSON rebase conflict auto-resolution" test_mixed_returns_and_dashboard_conflict
 
 echo "All ci_push_main rebase resolution smoke tests passed."

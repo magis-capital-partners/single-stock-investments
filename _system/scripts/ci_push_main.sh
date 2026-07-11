@@ -35,25 +35,83 @@ is_regenerable_artifact() {
     _system/reference/market-data/returns/*.csv)
       return 0
       ;;
+    _system/portfolio/research_events.jsonl)
+      return 0
+      ;;
+    _system/reference/market-data/external/sync_report.json)
+      return 0
+      ;;
     *)
       return 1
       ;;
   esac
 }
 
-is_regenerable_conflict() {
+# During rebase onto origin/main, --ours is upstream (main). Prefer main for Marvin-owned
+# ticker research when Darwin refresh races concurrent deep-dive merges.
+is_prefer_upstream_on_rebase() {
+  case "$1" in
+    */research/*|*/third-party-analyses/*)
+      return 0
+      ;;
+    _system/memory/daily/*|_system/research/milly_log.md)
+      return 0
+      ;;
+    _system/data/transcript_sync_summary.json)
+      return 0
+      ;;
+    _system/lenses/universe_percentiles.json)
+      return 0
+      ;;
+    _system/reference/investment-wisdom/*/extract_refresh_status.json)
+      return 0
+      ;;
+    _system/reference/market-data/themes/*|_system/reference/market-data/peers/*|_system/reference/market-data/commodities/*|_system/reference/market-data/insider/*)
+      return 0
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+is_resolvable_rebase_conflict() {
   local conflicted file
   conflicted=$(conflicted_files)
   if [ -z "$conflicted" ]; then
     return 1
   fi
   while IFS= read -r file; do
-    if ! is_regenerable_artifact "$file"; then
-      echo "Non-regenerable rebase conflict in: $file"
-      return 1
+    if is_regenerable_artifact "$file" || is_prefer_upstream_on_rebase "$file"; then
+      continue
     fi
+    echo "Non-resolvable rebase conflict in: $file"
+    return 1
   done <<< "$conflicted"
   return 0
+}
+
+is_regenerable_conflict() {
+  is_resolvable_rebase_conflict
+}
+
+resolve_prefer_upstream_conflicts() {
+  local file resolved=0
+  while IFS= read -r file; do
+    [ -n "$file" ] || continue
+    if ! is_prefer_upstream_on_rebase "$file"; then
+      continue
+    fi
+    echo "Preferring origin/main for rebase conflict: $file"
+    git checkout --ours -- "$file" 2>/dev/null || true
+    if [ -f "$file" ]; then
+      git add -- "$file"
+    else
+      git rm -f -- "$file" 2>/dev/null || true
+    fi
+    resolved=1
+  done <<< "$(conflicted_files)"
+  [ "$resolved" -eq 1 ]
 }
 
 regenerate_insights_artifacts() {
@@ -185,6 +243,24 @@ regenerate_market_returns() {
   git add _system/reference/market-data/returns/ 2>/dev/null || true
 }
 
+regenerate_research_events_log() {
+  echo "Regenerating research_events.jsonl to resolve rebase conflicts..."
+  (
+    cd _system/scripts
+    "$PYTHON" -c "from darwin.research_events import rebuild_events_log; rebuild_events_log()"
+  )
+  git add _system/portfolio/research_events.jsonl 2>/dev/null || true
+}
+
+regenerate_external_sync_report() {
+  echo "Regenerating external market sync_report.json to resolve rebase conflicts..."
+  (
+    cd _system/scripts
+    "$PYTHON" -m darwin.import_external_data
+  ) || true
+  git add _system/reference/market-data/external/sync_report.json 2>/dev/null || true
+}
+
 regenerate_conflicted_artifacts() {
   local conflicted file
   local needs_dashboard=0
@@ -194,6 +270,8 @@ regenerate_conflicted_artifacts() {
   local needs_docs_index=0
   local needs_portfolio=0
   local needs_market_returns=0
+  local needs_research_events=0
+  local needs_external_sync=0
 
   conflicted=$(conflicted_files)
   prepare_conflicted_files_for_regeneration
@@ -224,6 +302,12 @@ regenerate_conflicted_artifacts() {
       _system/reference/market-data/returns/*.csv)
         needs_market_returns=1
         ;;
+      _system/portfolio/research_events.jsonl)
+        needs_research_events=1
+        ;;
+      _system/reference/market-data/external/sync_report.json)
+        needs_external_sync=1
+        ;;
     esac
   done <<< "$conflicted"
 
@@ -238,6 +322,12 @@ regenerate_conflicted_artifacts() {
   fi
   if [ "$needs_portfolio" -eq 1 ]; then
     regenerate_portfolio_artifacts
+  fi
+  if [ "$needs_research_events" -eq 1 ]; then
+    regenerate_research_events_log
+  fi
+  if [ "$needs_external_sync" -eq 1 ]; then
+    regenerate_external_sync_report
   fi
   if [ "$needs_insights" -eq 1 ]; then
     regenerate_insights_artifacts
@@ -277,9 +367,10 @@ try_resolve_rebase_conflicts() {
   if ! rebase_in_progress; then
     return 1
   fi
-  if ! is_regenerable_conflict; then
+  if ! is_resolvable_rebase_conflict; then
     return 1
   fi
+  resolve_prefer_upstream_conflicts || true
   regenerate_conflicted_artifacts
   clean_regeneration_side_effects
   resolve_unmerged_regenerable_paths
@@ -288,11 +379,13 @@ try_resolve_rebase_conflicts() {
   git add _system/portfolio/holdings.md _system/portfolio/classification.json _system/portfolio/us_ticker_config.json 2>/dev/null || true
   git add _system/reference/market-data/returns/ 2>/dev/null || true
   git add _system/reference/data-sources/insights_record_archive.json 2>/dev/null || true
+  git add _system/portfolio/research_events.jsonl 2>/dev/null || true
+  git add _system/reference/market-data/external/sync_report.json 2>/dev/null || true
   GIT_EDITOR=true git rebase --continue || true
   if ! rebase_in_progress; then
     return 0
   fi
-  is_regenerable_conflict
+  is_resolvable_rebase_conflict
 }
 
 _check_file_sizes_for_paths() {
