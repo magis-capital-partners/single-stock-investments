@@ -17,7 +17,7 @@
 | **Payoff lens** | operating |
 | **MOI bucket** | — |
 
-**Deep dive:** `XYL/research/deep_dive_2026-07-10.md` (auto-sync)
+**Deep dive:** `XYL/research/deep_dive_2026-07-11.md` (auto-sync)
 
 ## One-line thesis
 
