@@ -257,6 +257,22 @@ regenerate_conflicted_artifacts() {
   stage_resolved_conflicts "$conflicted"
 }
 
+resolve_unmerged_regenerable_paths() {
+  local f
+  while IFS= read -r f; do
+    [ -n "$f" ] || continue
+    if ! is_regenerable_artifact "$f"; then
+      continue
+    fi
+    if [ -f "$f" ]; then
+      git add -f "$f"
+    else
+      git rm -f --cached "$f" 2>/dev/null || true
+      git rm -f "$f" 2>/dev/null || true
+    fi
+  done <<< "$(git diff --name-only --diff-filter=U)"
+}
+
 try_resolve_rebase_conflicts() {
   if ! rebase_in_progress; then
     return 1
@@ -266,6 +282,12 @@ try_resolve_rebase_conflicts() {
   fi
   regenerate_conflicted_artifacts
   clean_regeneration_side_effects
+  resolve_unmerged_regenerable_paths
+  git add dashboard/data/ docs/data/ 2>/dev/null || true
+  git add -- ':(glob)*/INDEX.csv' 2>/dev/null || true
+  git add _system/portfolio/holdings.md _system/portfolio/classification.json _system/portfolio/us_ticker_config.json 2>/dev/null || true
+  git add _system/reference/market-data/returns/ 2>/dev/null || true
+  git add _system/reference/data-sources/insights_record_archive.json 2>/dev/null || true
   GIT_EDITOR=true git rebase --continue || true
   if ! rebase_in_progress; then
     return 0
@@ -302,8 +324,37 @@ check_push_file_sizes() {
   _check_file_sizes_for_paths < <(git diff --name-only origin/main...HEAD)
 }
 
+sync_self_from_origin_main() {
+  if [ "${CI_PUSH_SKIP_SELF_REFRESH:-0}" = "1" ]; then
+    return 0
+  fi
+  if ! git rev-parse --git-dir >/dev/null 2>&1; then
+    return 0
+  fi
+  git fetch origin main >/dev/null 2>&1 || return 0
+  if ! git cat-file -e "origin/main:_system/scripts/ci_push_main.sh" 2>/dev/null; then
+    return 0
+  fi
+  local dest="_system/scripts/ci_push_main.sh"
+  local tmp
+  tmp=$(mktemp)
+  git show "origin/main:_system/scripts/ci_push_main.sh" > "$tmp"
+  if cmp -s "$tmp" "$dest"; then
+    rm -f "$tmp"
+    return 0
+  fi
+  echo "Syncing ci_push_main.sh from origin/main (conflict resolver update)."
+  cp "$tmp" "$dest"
+  chmod +x "$dest"
+  rm -f "$tmp"
+  # shellcheck disable=SC1091
+  source "$dest"
+}
+
 ci_push_main() {
   local msg="${1:?commit message required}"
+
+  sync_self_from_origin_main
 
   if git diff --staged --quiet; then
     echo "No staged changes to commit."
@@ -321,6 +372,7 @@ ci_push_main() {
   while [ "$attempt" -le "$MAX_ATTEMPTS" ]; do
     git fetch origin main
     if ! git rebase origin/main; then
+      sync_self_from_origin_main
       while rebase_in_progress && try_resolve_rebase_conflicts; do
         echo "Resolved regenerable rebase conflicts; continuing rebase (attempt $attempt/$MAX_ATTEMPTS)."
       done

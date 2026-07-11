@@ -19,6 +19,8 @@ on:
       - "_system/scripts/calibrate_letter_dates.py"
       - "_system/scripts/test_letter_date_parser.py"
       - "_system/scripts/test_fund_registry_date.py"
+      - "_system/scripts/test_ci_push_rebase_resolve.sh"
+      - "_system/scripts/ci_push_main.sh"
       - "_system/scripts/_eval/letter_date_gold.jsonl"
       - "_system/reference/letter_date_overrides.json"
       - ".github/workflows/**"
@@ -41,6 +43,8 @@ on:
       - "_system/scripts/calibrate_letter_dates.py"
       - "_system/scripts/test_letter_date_parser.py"
       - "_system/scripts/test_fund_registry_date.py"
+      - "_system/scripts/test_ci_push_rebase_resolve.sh"
+      - "_system/scripts/ci_push_main.sh"
       - "_system/scripts/_eval/letter_date_gold.jsonl"
       - "_system/reference/letter_date_overrides.json"
       - ".github/workflows/**"
@@ -77,6 +81,22 @@ jobs:
         run: python _system/scripts/test_vault_paths.py
       - name: Lint workflow bootstrap blocks
         run: python _system/scripts/lint_ci_bootstrap.py
+
+  ci-push-rebase:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Fetch main for rebase smoke tests
+        run: git fetch origin main --depth=50
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: CI push rebase conflict resolver smoke tests
+        env:
+          CI_PUSH_SKIP_SELF_REFRESH: "1"
+        run: bash _system/scripts/test_ci_push_rebase_resolve.sh
 
   letter-date-parser:
     runs-on: ubuntu-latest
