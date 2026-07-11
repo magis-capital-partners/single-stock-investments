@@ -1,6 +1,6 @@
 # XEL — Investment Thesis
 
-**Last updated:** 2026-07-10
+**Last updated:** auto-sync
 
 ## Classification
 
@@ -11,10 +11,13 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | mid |
-| **Implied 7yr IRR** (Lawrence) | 7.84% (total synthesis) |
+| **Implied 7yr IRR** (base) | 7.84% (total synthesis) |
 | **IRR method** | full |
 | **Lawrence bucket** | regulated_utility |
 | **Payoff lens** | operating |
+| **MOI bucket** | — |
+
+**Deep dive:** `XEL/research/deep_dive_2026-07-11.md` (auto-sync)
 
 ## One-line thesis
 

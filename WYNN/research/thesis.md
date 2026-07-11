@@ -17,7 +17,7 @@
 | **Payoff lens** | operating |
 | **MOI bucket** | — |
 
-**Deep dive:** `WYNN/research/deep_dive_2026-07-10.md` (auto-sync)
+**Deep dive:** `WYNN/research/deep_dive_2026-07-11.md` (auto-sync)
 
 ## One-line thesis
 
