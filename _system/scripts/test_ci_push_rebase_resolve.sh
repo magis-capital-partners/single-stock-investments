@@ -21,7 +21,12 @@ run_test() {
   shift
   TMP_BRANCH="ci-push-rebase-test-$$-${RANDOM}"
   export TMP_BRANCH
-  MAIN_REF=$(git rev-parse main)
+  git fetch origin main --depth=50 2>/dev/null || git fetch origin main
+  if git rev-parse --verify main >/dev/null 2>&1; then
+    MAIN_REF=$(git rev-parse main)
+  else
+    MAIN_REF=$(git rev-parse origin/main)
+  fi
   export MAIN_REF
   trap cleanup_test_branches RETURN
   "$@"
