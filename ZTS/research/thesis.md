@@ -17,7 +17,7 @@
 | **Payoff lens** | operating |
 | **MOI bucket** | — |
 
-**Deep dive:** `ZTS/research/deep_dive_2026-07-10.md` (auto-sync)
+**Deep dive:** `ZTS/research/deep_dive_2026-07-11.md` (auto-sync)
 
 **Thesis:** Global animal health leader; filing-grounded owner cash ~$5.14/sh; synthesis **17.2%** at ~$77 → stance **hold** ([HUMAN REVIEW] on leverage).
 
