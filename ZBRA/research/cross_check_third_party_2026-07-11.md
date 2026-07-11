@@ -8,9 +8,7 @@
 
 ## Executive summary
 
-No third-party sources are indexed for ZBRA as of this scan. Marvin stance rests on **primary filings only** (FY2025 10-K, Q1 2026 10-Q, DEF 14A 2026). No new documents since 2026-07-10 onboard.
-
-**Synthesis (best estimate):** Marvin floor only; no external blend. Stance **watch** on Lawrence synthesis below **15%** band.
+Marvin floor **14.38%** per year (compounder; stance **watch**) from primary filings and `valuation.json`. No third-party sources indexed; filings-only stance.
 
 ## Sources in scope
 
@@ -25,27 +23,27 @@ No third-party sources are indexed for ZBRA as of this scan. Marvin stance rests
 | FY2025 revenue growth | +8.3% to $5.40B | — | `10-K FY2025` |
 | Elo acquisition | ~$1.30B cash, Sep 2025 | — | `10-K FY2025` Note 5 |
 | Q1 2026 revenue | +14.3% YoY | — | `10-Q Q1 2026` |
-| Base return anchor | *(post-refresh)* per year | Qualitative support only | `ZBRA/research/deep_dive_2026-07-11.md` |
+| Base return anchor | **14.38%** per year | Qualitative support only | `ZBRA/research/deep_dive_2026-07-11.md` |
 | Archetype / stance | **compounder** · **watch** | See indexed sources | `valuation.json` |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| Primary IRR | Lawrence / scenarios | No single approved IRR unless promoted | Marvin **100%** numeric; no external blend |
+| Primary IRR | **14.38%** (Lawrence / scenarios) | No single approved IRR unless promoted | Marvin **100%** numeric; no external blend |
 | Third party | Filing-first | Context tier only | No numeric upgrade without human OK |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | ~$16.23/sh FCF (FY2025) | *(post-refresh)* | **watch** |
+| Marvin floor | ~$16.23/sh FCF (FY2025) | **14.38%** | **watch** |
 | External (combined) | — | — | — |
-| **Blended best estimate** | **Marvin floor only** | ***(post-refresh)*** | **watch** |
+| **Blended best estimate** | **Marvin floor only** | **14.38%** | **watch** |
 
 **Weights:** 100% Marvin (no approved third-party sources).
 
-**Returns statement (blended):** Base case follows Marvin Lawrence synthesis on filed owner cash; no external views in base IRR.
+**Returns statement (blended):** We expect **14.38%** per year at today's price on the Marvin base case; no external views in base IRR.
 
 ## [HUMAN REVIEW]
 
