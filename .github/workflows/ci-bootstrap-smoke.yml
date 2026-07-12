@@ -22,6 +22,7 @@ on:
       - "_system/scripts/test_letter_date_parser.py"
       - "_system/scripts/test_fund_registry_date.py"
       - "_system/scripts/test_ci_push_rebase_resolve.sh"
+      - "_system/scripts/test_ci_push_self_source_guard.sh"
       - "_system/scripts/ci_push_main.sh"
       - "_system/scripts/_eval/letter_date_gold.jsonl"
       - "_system/reference/letter_date_overrides.json"
@@ -48,6 +49,7 @@ on:
       - "_system/scripts/test_letter_date_parser.py"
       - "_system/scripts/test_fund_registry_date.py"
       - "_system/scripts/test_ci_push_rebase_resolve.sh"
+      - "_system/scripts/test_ci_push_self_source_guard.sh"
       - "_system/scripts/ci_push_main.sh"
       - "_system/scripts/_eval/letter_date_gold.jsonl"
       - "_system/reference/letter_date_overrides.json"
@@ -104,6 +106,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: CI push self-source guard smoke test
+        run: bash _system/scripts/test_ci_push_self_source_guard.sh
       - name: CI push rebase conflict resolver smoke tests
         env:
           CI_PUSH_SKIP_SELF_REFRESH: "1"

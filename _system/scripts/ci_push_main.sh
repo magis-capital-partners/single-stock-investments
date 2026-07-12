@@ -530,6 +530,8 @@ ci_push_main() {
   exit 1
 }
 
-if [[ "${BASH_SOURCE[0]}" == "${0}" ]] && [[ "${CI_PUSH_SOURCING:-0}" != "1" ]]; then
+# Only auto-run at top-level execution. Self-sync sources this file from inside
+# ci_push_main(); then $0 still matches BASH_SOURCE[0] but the stack depth is >1.
+if ((${#BASH_SOURCE[@]} == 1)); then
   ci_push_main "$@"
 fi
