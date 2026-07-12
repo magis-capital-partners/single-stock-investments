@@ -9,7 +9,7 @@
 | 3905.T | 0 | 0 | — | no hits |
 | 7176.T | 0 | 0 | — | no hits |
 | 8697.T | 0 | 0 | — | no hits |
-| A | 0 | 17 | 2026-06-30 | 17 indexed |
+| A | 0 | 9 | 2026-06-12 | 9 indexed |
 | AAPL | 0 | 0 | — | no hits |
 | ABBV | 0 | 0 | — | no hits |
 | ABMD.CVR | 0 | 0 | — | no hits |
@@ -55,7 +55,7 @@
 | APO | 41 | 0 | 2024-12-11 | 41 indexed |
 | APP | 0 | 0 | — | no hits |
 | APTV | 0 | 0 | — | no hits |
-| ARE | 4 | 6 | 2026-06-30 | 10 indexed |
+| ARE | 4 | 0 | 2024-04-01 | 4 indexed |
 | ARES | 0 | 0 | — | no hits |
 | ASPN | 0 | 0 | — | no hits |
 | ASX.AX | 0 | 0 | — | no hits |
@@ -228,7 +228,7 @@
 | EXR | 0 | 0 | — | no hits |
 | F | 0 | 1 | 2023-11-09 | 1 indexed |
 | FANG | 0 | 0 | — | no hits |
-| FAST | 0 | 1 | 2026-06-26 | 1 indexed |
+| FAST | 0 | 0 | — | no hits |
 | FCX | 0 | 0 | — | no hits |
 | FDS | 0 | 0 | — | no hits |
 | FDX | 0 | 0 | — | no hits |
@@ -287,7 +287,7 @@
 | GTX | 0 | 0 | — | no hits |
 | GWW | 0 | 0 | — | no hits |
 | HAL | 0 | 0 | — | no hits |
-| HAS | 0 | 1 | 2026-06-22 | 1 indexed |
+| HAS | 0 | 0 | — | no hits |
 | HBAN | 0 | 0 | — | no hits |
 | HCA | 0 | 0 | — | no hits |
 | HD | 0 | 0 | — | no hits |
@@ -331,7 +331,7 @@
 | IR | 0 | 0 | — | no hits |
 | IRM | 0 | 0 | — | no hits |
 | ISRG | 0 | 0 | — | no hits |
-| IT | 0 | 4 | 2026-06-22 | 4 indexed |
+| IT | 0 | 1 | 2026-06-22 | 1 indexed |
 | ITW | 0 | 0 | — | no hits |
 | IVZ | 0 | 0 | — | no hits |
 | J | 0 | 0 | — | no hits |
@@ -430,7 +430,7 @@
 | NI | 0 | 0 | — | no hits |
 | NKE | 0 | 0 | — | no hits |
 | NOC | 0 | 0 | — | no hits |
-| NOW | 0 | 3 | 2026-06-22 | 3 indexed |
+| NOW | 0 | 1 | 2024-01-01 | 1 indexed |
 | NRG | 0 | 0 | — | no hits |
 | NRP | 0 | 0 | — | no hits |
 | NSC | 0 | 0 | — | no hits |
@@ -447,8 +447,8 @@
 | ODFL | 0 | 0 | — | no hits |
 | OKE | 0 | 0 | — | no hits |
 | OMC | 0 | 0 | — | no hits |
-| ON | 0 | 15 | 2026-06-30 | 15 indexed |
-| OR | 6 | 3 | 2026-06-17 | 9 indexed |
+| ON | 0 | 13 | 2026-06-30 | 13 indexed |
+| OR | 6 | 0 | 2023-01-05 | 6 indexed |
 | ORCL | 0 | 0 | — | no hits |
 | ORLY | 0 | 0 | — | no hits |
 | OTCM | 0 | 0 | — | no hits |
@@ -529,7 +529,7 @@
 | SNDK | 0 | 0 | — | no hits |
 | SNOW | 0 | 0 | — | no hits |
 | SNPS | 0 | 0 | — | no hits |
-| SO | 0 | 2 | 2026-06-22 | 2 indexed |
+| SO | 0 | 0 | — | no hits |
 | SOC | 7 | 0 | 2024-10-11 | 7 indexed |
 | SOLV | 0 | 0 | — | no hits |
 | SPG | 0 | 0 | — | no hits |
@@ -548,7 +548,7 @@
 | SYF | 0 | 0 | — | no hits |
 | SYK | 0 | 0 | — | no hits |
 | SYY | 0 | 0 | — | no hits |
-| T | 0 | 2 | 2026-06-22 | 2 indexed |
+| T | 0 | 1 | 2026-06-12 | 1 indexed |
 | TAP | 0 | 0 | — | no hits |
 | TASE | 0 | 0 | — | no hits |
 | TBBK | 0 | 0 | — | no hits |

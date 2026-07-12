@@ -1,10 +1,10 @@
 # URI — Third-party source inventory
 
 **Date:** 2026-07-12
-**Sources:** 0 total (0 approved, 0 pending, 0 context)
+**Sources:** 1 total (0 approved, 1 pending, 0 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
-| (none) | — | — | — | Primary filings only |
+| vic | URI - 163611 | `URI/third-party-analyses/vic/URI - 163611.pdf` | pending | VIC local single-page intake; human approval required |
 
 Cross-check required: `URI/research/cross_check_third_party_2026-07-12.md`

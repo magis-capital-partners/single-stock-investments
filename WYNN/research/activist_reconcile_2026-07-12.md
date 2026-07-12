@@ -1,14 +1,13 @@
 # WYNN — Activist reconciliation (Milly mechanical)
 
 **Date:** 2026-07-12
-**Reports processed:** 30
+**Reports processed:** 23
 **Human review:** 23
 
 ## Summary
 
 | Firm | Side | Date | Class | Triage | Verdict | Path |
 |------|------|------|-------|--------|---------|------|
-| Elaine P. Wynn | long | 2018-07-09 | activist_13d | auto_context | context | `WYNN/third-party-analyses/activist_reports/long/SC-13D/A_20180709_acc0001213900_18_008881.htm` |
 | Unresolved SEC filer | long | 2018-05-14 | activist_proxy | human_review | needs_human | `WYNN/third-party-analyses/activist_reports/long/DFAN14A_20180514_acc0001213900_18_006050.htm` |
 | Unresolved SEC filer | long | 2018-05-14 | activist_proxy | human_review | needs_human | `WYNN/third-party-analyses/activist_reports/long/DFAN14A_20180514_acc0001213900_18_006004.htm` |
 | Unresolved SEC filer | long | 2018-05-11 | activist_proxy | human_review | needs_human | `WYNN/third-party-analyses/activist_reports/long/DFAN14A_20180511_acc0001213900_18_006000.htm` |
@@ -27,16 +26,10 @@
 | Unresolved SEC filer | long | 2018-05-02 | activist_proxy | human_review | needs_human | `WYNN/third-party-analyses/activist_reports/long/DFAN14A_20180502_acc0001213900_18_005382.htm` |
 | Unresolved SEC filer | long | 2018-05-02 | activist_proxy | human_review | needs_human | `WYNN/third-party-analyses/activist_reports/long/DFAN14A_20180502_acc0001213900_18_005380.htm` |
 | Unresolved SEC filer | long | 2018-04-30 | activist_proxy | human_review | needs_human | `WYNN/third-party-analyses/activist_reports/long/DFAN14A_20180430_acc0001213900_18_005109.htm` |
-| Universal Entertainment Corp | long | 2018-04-30 | activist_proxy | auto_context | context | `WYNN/third-party-analyses/activist_reports/long/DEFC14A_20180430_acc0001213900_18_005097.htm` |
 | Unresolved SEC filer | long | 2018-04-23 | activist_proxy | human_review | needs_human | `WYNN/third-party-analyses/activist_reports/long/DFAN14A_20180423_acc0001213900_18_004808.htm` |
-| Elaine P. Wynn | long | 2018-04-17 | activist_proxy | auto_context | context | `WYNN/third-party-analyses/activist_reports/long/DFAN14A_20180417_acc0000905148_18_000442.htm` |
-| Stephen A. Wynn | long | 2018-03-23 | activist_13d | auto_context | context | `WYNN/third-party-analyses/activist_reports/long/SC-13D/A_20180323_acc0001193125_18_092762.htm` |
-| Stephen A. Wynn | long | 2018-03-22 | activist_13d | auto_context | context | `WYNN/third-party-analyses/activist_reports/long/SC-13D/A_20180322_acc0001193125_18_091270.htm` |
 | Unresolved SEC filer | long | 2018-03-21 | activist_13d | human_review | needs_human | `WYNN/third-party-analyses/activist_reports/long/SC-13D/A_20180321_acc0001193125_18_089645.htm` |
-| ELAINE P. WYNN | long | 2018-03-20 | activist_13d | auto_context | context | `WYNN/third-party-analyses/activist_reports/long/SC-13D/A_20180320_acc0000905148_18_000374.htm` |
 | Unresolved SEC filer | long | 2018-03-15 | activist_13d | human_review | needs_human | `WYNN/third-party-analyses/activist_reports/long/SC-13D/A_20180315_acc0001193125_18_083321.htm` |
 | Unresolved SEC filer | long | 2018-02-20 | activist_13d | human_review | needs_human | `WYNN/third-party-analyses/activist_reports/long/SC-13D/A_20180220_acc0001193125_18_050403.htm` |
-| Stephen A. Wynn | long | 2018-02-12 | activist_13d | auto_context | context | `WYNN/third-party-analyses/activist_reports/long/SC-13D/A_20180212_acc0001193125_18_038404.htm` |
 | Unresolved SEC filer | long | 2018-02-08 | activist_13d | human_review | needs_human | `WYNN/third-party-analyses/activist_reports/long/SC-13D/A_20180208_acc0001193125_18_035135.htm` |
 
 ## Notes (human review)

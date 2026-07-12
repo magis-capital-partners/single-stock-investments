@@ -1,21 +1,16 @@
 # CNP — Activist reconciliation (Milly mechanical)
 
 **Date:** 2026-07-12
-**Reports processed:** 8
+**Reports processed:** 3
 **Human review:** 3
 
 ## Summary
 
 | Firm | Side | Date | Class | Triage | Verdict | Path |
 |------|------|------|-------|--------|---------|------|
-| S.S. OR | long | 2021-12-03 | activist_13d | auto_context | context | `CNP/third-party-analyses/activist_reports/long/SC-13D/A_20211203_acc0001193125_21_347988.htm` |
-| S.S. OR | long | 2020-12-04 | activist_13d | auto_context | context | `CNP/third-party-analyses/activist_reports/long/SC-13D/A_20201204_acc0001193125_20_309978.htm` |
-| S.S. OR | long | 2019-08-05 | activist_13d | auto_context | context | `CNP/third-party-analyses/activist_reports/long/SC-13D/A_20190805_acc0001193125_19_213020.htm` |
-| S.S. OR | long | 2018-09-10 | activist_13d | auto_context | context | `CNP/third-party-analyses/activist_reports/long/SC-13D/A_20180910_acc0001193125_18_270058.htm` |
 | Unresolved SEC filer | long | 2018-06-28 | activist_proxy | human_review | needs_human | `CNP/third-party-analyses/activist_reports/long/DFAN14A_20180628_acc0001193125_18_207683.htm` |
 | Unresolved SEC filer | long | 2018-06-18 | activist_proxy | human_review | needs_human | `CNP/third-party-analyses/activist_reports/long/DFAN14A_20180618_acc0001193125_18_195802.htm` |
 | Unresolved SEC filer | long | 2018-04-23 | activist_proxy | human_review | needs_human | `CNP/third-party-analyses/activist_reports/long/DFAN14A_20180423_acc0001193125_18_125805.htm` |
-| S.S. OR | long | 2018-02-27 | activist_13d | auto_context | context | `CNP/third-party-analyses/activist_reports/long/SC-13D/A_20180227_acc0001193125_18_060937.htm` |
 
 ## Notes (human review)
 
