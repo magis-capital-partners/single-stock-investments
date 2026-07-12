@@ -48,9 +48,13 @@ is_regenerable_artifact() {
 }
 
 # During rebase onto origin/main, --ours is upstream (main). Prefer main for Marvin-owned
-# ticker research when Darwin refresh races concurrent deep-dive merges.
+# ticker research when Darwin refresh races concurrent deep-dive merges, and for Darwin
+# source/config when Drive Intake Sync races Darwin refresh on data-commit-main.
 is_prefer_upstream_on_rebase() {
   case "$1" in
+    Makefile)
+      return 0
+      ;;
     */research/*|*/third-party-analyses/*)
       return 0
       ;;
@@ -63,10 +67,25 @@ is_prefer_upstream_on_rebase() {
     _system/lenses/universe_percentiles.json)
       return 0
       ;;
+    _system/frameworks/darwin_*)
+      return 0
+      ;;
+    _system/scripts/darwin/*|_system/scripts/build_darwin_portfolio.py|_system/scripts/build_dashboard_data.py)
+      return 0
+      ;;
+    _system/portfolio/darwin_mandate*.json|_system/portfolio/roth_target_weights.json|_system/portfolio/paper/*)
+      return 0
+      ;;
     _system/reference/investment-wisdom/*/extract_refresh_status.json)
       return 0
       ;;
     _system/reference/market-data/themes/*|_system/reference/market-data/peers/*|_system/reference/market-data/commodities/*|_system/reference/market-data/insider/*)
+      return 0
+      ;;
+    _system/reference/market-data/external/*|_system/reference/market-data/options/*|_system/reference/market-data/index/*)
+      return 0
+      ;;
+    dashboard/index.html|docs/index.html)
       return 0
       ;;
     *)

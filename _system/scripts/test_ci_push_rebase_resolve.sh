@@ -328,6 +328,37 @@ test_ticker_research_prefers_upstream() {
   fi
 }
 
+test_darwin_paths_prefers_upstream() {
+  is_prefer_upstream_on_rebase "Makefile" || {
+    echo "FAIL: Makefile should prefer upstream during rebase"
+    exit 1
+  }
+  is_prefer_upstream_on_rebase "_system/frameworks/darwin_dual_accounts.md" || {
+    echo "FAIL: Darwin framework docs should prefer upstream during rebase"
+    exit 1
+  }
+  is_prefer_upstream_on_rebase "_system/scripts/darwin/pipeline.py" || {
+    echo "FAIL: Darwin scripts should prefer upstream during rebase"
+    exit 1
+  }
+  is_prefer_upstream_on_rebase "_system/scripts/build_darwin_portfolio.py" || {
+    echo "FAIL: build_darwin_portfolio.py should prefer upstream during rebase"
+    exit 1
+  }
+  is_prefer_upstream_on_rebase "_system/portfolio/darwin_mandate_roth.json" || {
+    echo "FAIL: Darwin mandate JSON should prefer upstream during rebase"
+    exit 1
+  }
+  is_prefer_upstream_on_rebase "_system/reference/market-data/external/sources_manifest.json" || {
+    echo "FAIL: external sources_manifest.json should prefer upstream during rebase"
+    exit 1
+  }
+  is_prefer_upstream_on_rebase "dashboard/index.html" || {
+    echo "FAIL: dashboard/index.html should prefer upstream during rebase"
+    exit 1
+  }
+}
+
 test_ticker_research_rebase_conflict() {
   local ticker="ABX"
   local research_file="$ticker/research/dossier.json"
@@ -431,6 +462,7 @@ test_mixed_returns_and_dashboard_conflict() {
 
 run_test "returns CSV classified as regenerable" test_returns_csv_is_regenerable
 run_test "ticker research prefers upstream on rebase" test_ticker_research_prefers_upstream
+run_test "Darwin paths prefer upstream on rebase" test_darwin_paths_prefers_upstream
 run_test "sync self refresh disabled no-op" test_sync_self_refresh_disabled
 run_test "dashboard JSON rebase conflict auto-resolution" test_dashboard_json_conflict
 run_test "docs mirror after dashboard JSON rebase conflict" test_docs_mirror_after_dashboard_conflict
