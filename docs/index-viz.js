@@ -107,20 +107,25 @@
       .sort()
       .forEach((t) => {
         (byTicker[t].confirmed_events || []).forEach((ev) => {
-          rows.push({ ticker: t, ...ev });
+          // Precision gate: provider_confirmed OR quality_gated news only
+          if (ev.confidence === 'provider_confirmed' || ev.quality_gated) {
+            rows.push({ ticker: t, ...ev });
+          }
         });
       });
     rows.sort((a, b) => String(b.announced || '').localeCompare(String(a.announced || '')));
     if (!rows.length) {
-      return '<p class="muted">No confirmed or news-sourced index events yet.</p>';
+      return '<p class="muted">No quality-gated index events. Provider notices and subject-matched news only.</p>';
     }
     const body = rows
       .slice(0, 40)
       .map((r) => {
+        const confLabel =
+          r.confidence === 'provider_confirmed' ? 'provider_confirmed' : 'news_gated';
         const src =
           r.source_url && linkHtml
-            ? linkHtml(r.source_url, r.confidence || 'source')
-            : e(r.confidence || '—');
+            ? linkHtml(r.source_url, confLabel)
+            : e(confLabel);
         return `<tr>
           <td class="mono">${e(r.ticker)}</td>
           <td>${e(r.index)}</td>
@@ -140,7 +145,10 @@
     const e = escapeHtml || esc;
     const dir = (filter && filter.direction) || 'all';
     const indexFilter = (filter && filter.index) || '';
+    const showWeak = !!(filter && filter.showWeak);
+    const maxDist = (filter && filter.maxDistanceAbs) != null ? Number(filter.maxDistanceAbs) : 15;
     const rows = [];
+    const weakRows = [];
     Object.keys(byTicker || {}).forEach((t) => {
       const entry = byTicker[t];
       (entry.scorecards || []).forEach((sc) => {
@@ -148,7 +156,9 @@
         if (dir === 'inclusion' && sc.status !== 'inclusion_candidate') return;
         if (dir === 'exclusion' && sc.status !== 'deletion_risk') return;
         if (indexFilter && sc.index !== indexFilter) return;
-        rows.push({
+        const dist = sc.distance_to_boundary_pct;
+        const near = dist != null && Math.abs(Number(dist)) <= maxDist;
+        const row = {
           ticker: t,
           company: entry.company,
           priority: (entry.impact_proxy || {}).priority_score || 0,
@@ -156,14 +166,20 @@
           band: (entry.prediction || {}).inclusion_probability_band,
           next: (entry.prediction || {}).next_calendar_event,
           ...sc,
-        });
+        };
+        if (near || sc.status === 'deletion_risk') rows.push(row);
+        else weakRows.push(row);
       });
     });
     rows.sort((a, b) => b.priority - a.priority);
-    if (!rows.length) {
-      return '<p class="muted">No inclusion candidates or deletion risks at current thresholds.</p>';
+    weakRows.sort((a, b) => b.priority - a.priority);
+    const display = showWeak ? rows.concat(weakRows) : rows;
+    if (!display.length) {
+      return `<p class="muted">No near-boundary candidates (|distance| ≤ ${e(String(maxDist))}%).${
+        weakRows.length ? ` ${weakRows.length} weak floor-pass hits hidden.` : ''
+      }</p>`;
     }
-    const body = rows
+    const body = display
       .slice(0, 60)
       .map((r) => {
         const nextLabel = r.next
@@ -182,9 +198,12 @@
         </tr>`;
       })
       .join('');
+    const weakNote = !showWeak && weakRows.length
+      ? `<p class="muted" style="margin-top:6px">${weakRows.length} weak (far-from-boundary) hits hidden. Pass showWeak to expand.</p>`
+      : '';
     return `<table class="insights-table"><thead><tr>
       <th>Ticker</th><th>Index</th><th>Status</th><th>Gate</th><th>Distance</th><th>Priority</th><th>Shock</th><th>Prob</th><th>Next event</th>
-    </tr></thead><tbody>${body}</tbody></table>`;
+    </tr></thead><tbody>${body}</tbody></table>${weakNote}`;
   }
 
   function renderIndexWatch(payload, options) {
@@ -196,12 +215,14 @@
       'The average large-cap S&P 500 index effect has fallen to near zero since 2010; treat these as research triggers, weighted by demand-shock size, not mechanical trades.';
     const byTicker = (payload && payload.by_ticker) || {};
     const calendar = (payload && payload.calendar) || [];
+    const maxDist = summary.max_candidate_distance_pct != null ? summary.max_candidate_distance_pct : 15;
 
     const stats = [
       `Candidates: <strong>${(summary.inclusion_candidates || []).length}</strong>`,
       `Deletion risks: <strong>${(summary.deletion_risks || []).length}</strong>`,
       `Confirmed ≤30d: <strong>${(summary.confirmed_next_30d || []).length}</strong>`,
       `High priority: <strong>${(summary.high_priority_watch || []).length}</strong>`,
+      `Gated events: <strong>${summary.quality_gated_events != null ? summary.quality_gated_events : '—'}</strong>`,
     ].join(' · ');
 
     return `<div class="index-watch-panel">
@@ -209,11 +230,16 @@
       <p style="margin-bottom:8px">${stats}</p>
       <h3 style="margin:12px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary)">Reconstitution calendar</h3>
       ${renderCalendarStrip(calendar, escapeHtml)}
-      <h3 style="margin:12px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary)">Confirmed / news events</h3>
+      <h3 style="margin:12px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary)">Confirmed events</h3>
+      <p class="muted" style="margin-bottom:6px">Provider notices and subject-matched news only. Co-mentions and already-member adds are suppressed.</p>
       ${renderConfirmedTable(byTicker, escapeHtml, linkHtml)}
-      <h3 style="margin:16px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary)">Potential (proximity scorecards)</h3>
-      <p class="muted" style="margin-bottom:8px">Sorted by demand-shock priority. Missing float/ADV/earnings show as n/a — never invented.</p>
-      ${renderPotentialTable(byTicker, escapeHtml, options && options.filter)}
+      <h3 style="margin:16px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary)">Potential (near-boundary)</h3>
+      <p class="muted" style="margin-bottom:8px">Only |distance| ≤ ${escapeHtml(String(maxDist))}%. Min-mcap floor passes alone are not candidates.</p>
+      ${renderPotentialTable(byTicker, escapeHtml, {
+        ...(options && options.filter),
+        maxDistanceAbs: maxDist,
+        showWeak: !!(options && options.filter && options.filter.showWeak),
+      })}
     </div>`;
   }
 
