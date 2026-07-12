@@ -122,7 +122,10 @@ regenerate_insights_artifacts() {
   echo "Regenerating insights artifacts to resolve rebase conflicts..."
   rm -f dashboard/data/insights.json 2>/dev/null || true
   rm -f _system/reference/data-sources/insights_record_archive.json 2>/dev/null || true
-  "$PYTHON" _system/scripts/build_insights.py
+  if ! "$PYTHON" _system/scripts/build_insights.py; then
+    echo "::error::build_insights.py failed while resolving a rebase conflict."
+    return 1
+  fi
   git add dashboard/data/insights.json 2>/dev/null || true
   git add _system/reference/data-sources/insights_record_archive.json 2>/dev/null || true
 }
@@ -163,9 +166,15 @@ regenerate_activist_feed_artifacts() {
   echo "Regenerating activist feed to resolve rebase conflicts..."
   rm -f dashboard/data/activist_feed.json 2>/dev/null || true
   if [ -f "_system/scripts/clean_activist_indexes.py" ]; then
-    "$PYTHON" _system/scripts/clean_activist_indexes.py
+    if ! "$PYTHON" _system/scripts/clean_activist_indexes.py; then
+      echo "::error::clean_activist_indexes.py failed while resolving a rebase conflict."
+      return 1
+    fi
   fi
-  "$PYTHON" _system/scripts/build_activist_feed.py
+  if ! "$PYTHON" _system/scripts/build_activist_feed.py; then
+    echo "::error::build_activist_feed.py failed while resolving a rebase conflict."
+    return 1
+  fi
   git add dashboard/data/activist_feed.json
 }
 
@@ -191,14 +200,20 @@ regenerate_dashboard_json() {
   fi
   echo "Regenerating dashboard JSON to resolve rebase conflicts..."
   if [ -f "_system/scripts/build_insights.py" ]; then
-    "$PYTHON" _system/scripts/build_insights.py
+    if ! "$PYTHON" _system/scripts/build_insights.py; then
+      echo "::error::build_insights.py failed while rebuilding dashboard artifacts."
+      return 1
+    fi
     git add dashboard/data/insights.json 2>/dev/null || true
     git add _system/reference/data-sources/insights_record_archive.json 2>/dev/null || true
   fi
   if [ -f "_system/scripts/build_activist_feed.py" ]; then
-    regenerate_activist_feed_artifacts
+    regenerate_activist_feed_artifacts || return 1
   fi
-  "$PYTHON" _system/scripts/build_dashboard_data.py
+  if ! "$PYTHON" _system/scripts/build_dashboard_data.py; then
+    echo "::error::build_dashboard_data.py failed while resolving a rebase conflict."
+    return 1
+  fi
   git add dashboard/data/ 2>/dev/null || true
   git add docs/data/ 2>/dev/null || true
 }
@@ -209,7 +224,10 @@ regenerate_folder_indexes() {
     return 1
   fi
   echo "Regenerating INDEX.csv files to resolve rebase conflicts..."
-  "$PYTHON" _system/scripts/build_folder_indexes.py
+  if ! "$PYTHON" _system/scripts/build_folder_indexes.py; then
+    echo "::error::build_folder_indexes.py failed while resolving a rebase conflict."
+    return 1
+  fi
   git add -- ':(glob)*/INDEX.csv' 2>/dev/null || true
 }
 
@@ -219,7 +237,10 @@ regenerate_docs_index() {
     return 1
   fi
   echo "Regenerating docs/INDEX.csv to resolve rebase conflicts..."
-  "$PYTHON" _system/scripts/build_folder_indexes.py --folder docs
+  if ! "$PYTHON" _system/scripts/build_folder_indexes.py --folder docs; then
+    echo "::error::build_folder_indexes.py failed while resolving a rebase conflict."
+    return 1
+  fi
   git add docs/INDEX.csv 2>/dev/null || true
 }
 
@@ -229,7 +250,10 @@ regenerate_portfolio_artifacts() {
     return 1
   fi
   echo "Regenerating portfolio artifacts to resolve rebase conflicts..."
-  "$PYTHON" _system/scripts/sync_portfolio_from_registry.py
+  if ! "$PYTHON" _system/scripts/sync_portfolio_from_registry.py; then
+    echo "::error::sync_portfolio_from_registry.py failed while resolving a rebase conflict."
+    return 1
+  fi
   git add _system/portfolio/holdings.md _system/portfolio/classification.json _system/portfolio/us_ticker_config.json 2>/dev/null || true
 }
 
@@ -239,7 +263,10 @@ regenerate_market_returns() {
     return 1
   fi
   echo "Regenerating market returns CSVs to resolve rebase conflicts..."
-  "$PYTHON" _system/scripts/download_ira_research.py --tier A
+  if ! "$PYTHON" _system/scripts/download_ira_research.py --tier A; then
+    echo "::error::download_ira_research.py failed while resolving a rebase conflict."
+    return 1
+  fi
   git add _system/reference/market-data/returns/ 2>/dev/null || true
 }
 
@@ -312,31 +339,31 @@ regenerate_conflicted_artifacts() {
   done <<< "$conflicted"
 
   if [ "$needs_market_returns" -eq 1 ]; then
-    regenerate_market_returns
+    regenerate_market_returns || return 1
   fi
   if [ "$needs_indexes" -eq 1 ]; then
-    regenerate_folder_indexes
+    regenerate_folder_indexes || return 1
   fi
   if [ "$needs_docs_index" -eq 1 ]; then
-    regenerate_docs_index
+    regenerate_docs_index || return 1
   fi
   if [ "$needs_portfolio" -eq 1 ]; then
-    regenerate_portfolio_artifacts
+    regenerate_portfolio_artifacts || return 1
   fi
   if [ "$needs_research_events" -eq 1 ]; then
-    regenerate_research_events_log
+    regenerate_research_events_log || return 1
   fi
   if [ "$needs_external_sync" -eq 1 ]; then
-    regenerate_external_sync_report
+    regenerate_external_sync_report || return 1
   fi
   if [ "$needs_insights" -eq 1 ]; then
-    regenerate_insights_artifacts
+    regenerate_insights_artifacts || return 1
   fi
   if [ "$needs_activist" -eq 1 ]; then
-    regenerate_activist_feed_artifacts
+    regenerate_activist_feed_artifacts || return 1
   fi
   if [ "$needs_dashboard" -eq 1 ]; then
-    regenerate_dashboard_json
+    regenerate_dashboard_json || return 1
   fi
 
   if [ "$needs_dashboard" -eq 1 ] || [ "$needs_insights" -eq 1 ] || [ "$needs_activist" -eq 1 ]; then
@@ -371,7 +398,10 @@ try_resolve_rebase_conflicts() {
     return 1
   fi
   resolve_prefer_upstream_conflicts || true
-  regenerate_conflicted_artifacts
+  if ! regenerate_conflicted_artifacts; then
+    echo "::error::Artifact regeneration failed; rebase remains open."
+    return 1
+  fi
   clean_regeneration_side_effects
   resolve_unmerged_regenerable_paths
   git add dashboard/data/ docs/data/ 2>/dev/null || true
@@ -381,7 +411,12 @@ try_resolve_rebase_conflicts() {
   git add _system/reference/data-sources/insights_record_archive.json 2>/dev/null || true
   git add _system/portfolio/research_events.jsonl 2>/dev/null || true
   git add _system/reference/market-data/external/sync_report.json 2>/dev/null || true
-  GIT_EDITOR=true git rebase --continue || true
+  if ! GIT_EDITOR=true git rebase --continue; then
+    echo "::error::git rebase --continue failed after conflict resolution."
+    echo "::error::Unresolved paths:"
+    conflicted_files || true
+    return 1
+  fi
   if ! rebase_in_progress; then
     return 0
   fi

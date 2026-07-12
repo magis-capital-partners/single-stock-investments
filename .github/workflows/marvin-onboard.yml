@@ -53,7 +53,8 @@ permissions:
   contents: write
 
 concurrency:
-  group: marvin-onboard-${{ github.event.inputs.ticker || github.event.client_payload.ticker }}
+  # This workflow writes directly to main before it starts the PR-only deep dive.
+  group: data-commit-main
   cancel-in-progress: false
 
 jobs:

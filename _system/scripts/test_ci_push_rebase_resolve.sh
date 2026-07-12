@@ -429,6 +429,31 @@ test_mixed_returns_and_dashboard_conflict() {
   fi
 }
 
+test_main_writer_workflows_share_lock() {
+  local workflow
+  local -a writer_workflows=(
+    activist-scan-sync.yml
+    batch-onboard-pdfs.yml
+    daily-sync.yml
+    darwin-refresh.yml
+    drive-intake-sync.yml
+    letter-backfill.yml
+    marvin-onboard.yml
+    portfolio-news.yml
+  )
+
+  for workflow in "${writer_workflows[@]}"; do
+    if ! grep -A2 '^concurrency:' ".github/workflows/$workflow" | grep -qx '  group: data-commit-main'; then
+      echo "FAIL: $workflow must use the shared data-commit-main lock"
+      exit 1
+    fi
+    if ! grep -A2 '^concurrency:' ".github/workflows/$workflow" | grep -qx '  cancel-in-progress: false'; then
+      echo "FAIL: $workflow must keep queued writers instead of cancelling them"
+      exit 1
+    fi
+  done
+}
+
 run_test "returns CSV classified as regenerable" test_returns_csv_is_regenerable
 run_test "ticker research prefers upstream on rebase" test_ticker_research_prefers_upstream
 run_test "sync self refresh disabled no-op" test_sync_self_refresh_disabled
@@ -441,5 +466,6 @@ run_test "INDEX.csv rebase conflict auto-resolution" test_index_csv_conflict
 run_test "mixed generated artifact rebase conflict auto-resolution" test_mixed_generated_conflict
 run_test "ticker research rebase conflict prefers upstream" test_ticker_research_rebase_conflict
 run_test "mixed returns CSV and dashboard JSON rebase conflict auto-resolution" test_mixed_returns_and_dashboard_conflict
+run_test "all direct-to-main writers share the data commit lock" test_main_writer_workflows_share_lock
 
 echo "All ci_push_main rebase resolution smoke tests passed."

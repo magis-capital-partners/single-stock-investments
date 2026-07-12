@@ -7,7 +7,8 @@ permissions:
   contents: write
 
 concurrency:
-  group: batch-onboard-pdfs
+  # All workflows that commit to main share this lock to avoid rebase races.
+  group: data-commit-main
   cancel-in-progress: false
 
 jobs:
