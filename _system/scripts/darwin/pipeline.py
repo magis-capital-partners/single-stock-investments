@@ -24,7 +24,7 @@ from .research_events import rebuild_events_log
 from .bias_scan import run_bias_scan
 from .import_external_data import sync_external_market_data
 from .observatory import build_observatory, save_observatory, write_regime_brief
-from .policies import apply_policy, policy_equal_weight, policy_irr_ranked, policy_risk_parity_vol
+from .policies import apply_policy, ira_marvin_ineligible, policy_equal_weight, policy_irr_ranked, policy_risk_parity_vol
 from .questions import scaffold_all_questions
 from .scorecard import append_scorecard
 from .simulation import run_stress_simulation
@@ -33,7 +33,11 @@ from .prices import build_return_panel, load_returns_csv
 from .explanation import build_portfolio_explanation
 from .regime import latest_macro_state, merge_regime, regime_constraint_overrides
 from .visualization import build_method_visualizations
-
+from .covered_call import resolve_cc_cfg
+from .options_cache import cache_coverage_report, iv_by_ticker
+from .proxy_returns import ensure_proxy_returns
+from .cc_lab import run_cc_knob_lab
+from .universe import load_liquidity_map
 
 def _research_regime_label(rows: list[dict], mandate: dict) -> str:
     thresh = (mandate.get("regime") or {}).get("falsifier_stress_threshold", 3)
@@ -272,16 +276,49 @@ def run_pipeline(
     mandate_effective = {**mandate_doc, "mandate": regime_constraint_overrides(regime, mandate_doc)}
 
     ira_scoring = mandate_doc.get("ira_scoring") or {}
+    cc_sel = mandate_doc.get("covered_call") or {}
+    prefer_cc_policy = bool(cc_sel.get("dual_score_selection")) and (
+        (mandate_doc.get("mandate") or {}).get("preferred_policy") in ("ira_marvin_cc", "ira_marvin")
+    )
+    liq_map_raw = load_liquidity_map()
+    liquidity_by_ticker = {
+        t: str((liq_map_raw.get(t) or {}).get("liquidity_bucket") or "B")
+        for t in tickers
+    }
+    iv_map = iv_by_ticker(tickers)
     ira_genome = {
         **(mandate_doc.get("mandate") or {}),
         "ira_scoring": ira_scoring,
         "top_k": (mandate_doc.get("mandate") or {}).get("max_names", 12),
+        "max_names_cc": (mandate_doc.get("mandate") or {}).get("max_names_cc"),
+        "min_names_cc": (mandate_doc.get("mandate") or {}).get("min_names_cc"),
+        "cc_dual_score": prefer_cc_policy or (mandate_doc.get("mandate") or {}).get("preferred_policy") == "ira_marvin_cc",
+        "iv_by_ticker": iv_map,
+        "liquidity_by_ticker": liquidity_by_ticker,
     }
-    ira_raw = apply_policy("ira_marvin", rows, ira_genome)
+    irr_stance_miss = ira_marvin_ineligible(rows, ira_genome)
+    univ_excl = dict(features.get("universe_exclusions") or {})
+    if univ_excl:
+        by_reason = dict(univ_excl.get("by_reason") or {})
+        by_reason["irr_stance_miss"] = len(irr_stance_miss)
+        samples = dict(univ_excl.get("samples") or {})
+        samples["irr_stance_miss"] = irr_stance_miss[:12]
+        univ_excl["by_reason"] = by_reason
+        univ_excl["samples"] = samples
+        univ_excl["excluded_total"] = sum(int(v or 0) for v in by_reason.values())
+    features = {**features, "universe_exclusions": univ_excl}
+
+    ira_policy_name = "ira_marvin_cc" if ira_genome.get("cc_dual_score") else "ira_marvin"
+    ira_raw = apply_policy(ira_policy_name, rows, ira_genome)
     ira_w, _ = apply_constraints(tickers, ira_raw, None, mandate_effective, falsifier_map)
 
+    # Scenario: long-only 12-name vs CC-concentrated book (Phase C)
+    scenario_genome = {**ira_genome, "cc_dual_score": True, "max_names_cc": (mandate_doc.get("mandate") or {}).get("max_names_cc") or 8}
+    scenario_raw = apply_policy("ira_marvin_cc", rows, scenario_genome)
+    scenario_w, _ = apply_constraints(tickers, scenario_raw, None, mandate_effective, falsifier_map)
+
     def ira_fn(ts, _i):
-        return apply_policy("ira_marvin", rows, ira_genome)
+        return apply_policy(ira_policy_name, rows, ira_genome)
 
     bt_ira = simulate(
         tickers, panel["dates"], panel["returns_by_ticker"], ira_fn, mandate_effective, falsifier_map
@@ -497,7 +534,12 @@ def run_pipeline(
     elif use_ml:
         policy_id, target_w, champion_bt = ml_best
     else:
-        policy_id, target_w, champion_bt = preferred, ira_w, bt_ira
+        pid = (
+            ira_policy_name
+            if preferred in ("ira_marvin", "ira_marvin_cc")
+            else preferred
+        )
+        policy_id, target_w, champion_bt = pid, ira_w, bt_ira
 
     prev_w = load_previous_weights(ctx)
     if not prev_w:
@@ -546,9 +588,12 @@ def run_pipeline(
     rebalance_freq = (mandate_doc.get("mandate") or {}).get("rebalance_frequency", "semiannual")
     bt_spy = benchmark_buy_hold(panel["dates"], spy_rets, rebalance_freq)
 
-    cc_cfg = dict(mandate_doc.get("covered_call") or {})
+    cc_cfg = resolve_cc_cfg(mandate_doc, regime)
     bt_cc: dict = {"error": "disabled", "periods": 0}
     bt_cc_proxy: dict = {"error": "disabled", "periods": 0}
+    bt_qyld: dict = {"error": "disabled", "periods": 0}
+    proxy_status = ensure_proxy_returns(list(cc_cfg.get("proxy_tickers") or ["XYLD", "QYLD"]))
+    features_by_ticker = {r["ticker"]: r for r in rows}
     if cc_cfg.get("enabled", False):
         bt_cc = benchmark_covered_call(
             panel["dates"],
@@ -557,22 +602,115 @@ def run_pipeline(
             cc_cfg,
             rebalance_freq,
             track_series=True,
+            features_by_ticker=features_by_ticker,
+            iv_by_ticker=iv_map,
+            liquidity_by_ticker=liquidity_by_ticker,
+            regime=regime,
         )
-        proxy_ticker = (cc_cfg.get("etf_proxy_ticker") or "").strip().upper()
-        if proxy_ticker:
+        for proxy_ticker, bt_slot in (
+            ((cc_cfg.get("etf_proxy_ticker") or "XYLD").strip().upper(), "xyld"),
+            ("QYLD", "qyld"),
+        ):
             loaded_proxy = load_returns_csv(proxy_ticker)
             if loaded_proxy:
                 d2r = dict(zip(loaded_proxy[0], loaded_proxy[1]))
                 proxy_rets = [d2r.get(d, 0.0) for d in panel["dates"]]
-                bt_cc_proxy = benchmark_buy_hold(
+                bt = benchmark_buy_hold(
                     panel["dates"],
                     proxy_rets,
                     rebalance_freq,
                     track_series=True,
                     label=f"{proxy_ticker.lower()}_buy_hold",
                 )
-            else:
+                if bt_slot == "xyld" or proxy_ticker == (cc_cfg.get("etf_proxy_ticker") or "XYLD").upper():
+                    bt_cc_proxy = bt
+                if proxy_ticker == "QYLD":
+                    bt_qyld = bt
+            elif bt_slot == "xyld":
                 bt_cc_proxy = {"error": "missing_returns", "periods": 0, "label": proxy_ticker}
+
+    # Phase C: PIT OOS gate before promoting CC dual-score to production champion
+    cc_oos_gate = {
+        "enabled": bool(cc_cfg.get("require_oos_for_dual_score", True)),
+        "passed": False,
+        "reason": "not_evaluated",
+        "promote_dual_score": False,
+    }
+    oos_cc = (pit_bt.get("benchmarks") or {}).get("oos", {}).get("ira_marvin") or {}
+    oos_sharpe = oos_cc.get("sharpe_annualized")
+    spy_sharpe = (bt_spy or {}).get("sharpe_annualized")
+    min_oos = float(cc_cfg.get("oos_min_sharpe", 0.0))
+    if not cc_cfg.get("dual_score_selection"):
+        cc_oos_gate["reason"] = "dual_score_selection_disabled"
+    elif oos_sharpe is None:
+        cc_oos_gate["reason"] = "missing_oos_ira_marvin"
+    elif spy_sharpe is not None and oos_sharpe < spy_sharpe and cc_cfg.get("oos_require_beat_spy", True):
+        cc_oos_gate["reason"] = f"oos_sharpe_{oos_sharpe}_below_spy_{spy_sharpe}"
+    elif oos_sharpe < min_oos:
+        cc_oos_gate["reason"] = f"oos_sharpe_{oos_sharpe}_below_min_{min_oos}"
+    else:
+        cc_oos_gate["passed"] = True
+        cc_oos_gate["promote_dual_score"] = True
+        cc_oos_gate["reason"] = "oos_ok"
+
+    # If dual score requested but OOS gate fails, keep long-only ira_marvin weights for paper
+    if ira_genome.get("cc_dual_score") and cc_cfg.get("require_oos_for_dual_score", True) and not cc_oos_gate["passed"]:
+        if preferred in ("ira_marvin", "ira_marvin_cc") and policy_id in ("ira_marvin", "ira_marvin_cc"):
+            # Rebuild without CC multiplier for production paper book
+            plain_genome = {**ira_genome, "cc_dual_score": False, "max_names_cc": None}
+            plain_raw = apply_policy("ira_marvin", rows, plain_genome)
+            plain_w, _ = apply_constraints(tickers, plain_raw, prev_w, mandate_effective, falsifier_map)
+            target_w = apply_ira_stance_caps(plain_w, features_by_ticker, mandate_doc)
+            policy_id = "ira_marvin"
+            cc_oos_gate["production_policy"] = "ira_marvin_gated"
+            # refresh CC bench on gated weights
+            if cc_cfg.get("enabled", False):
+                bt_cc = benchmark_covered_call(
+                    panel["dates"],
+                    panel["returns_by_ticker"],
+                    dict(target_w),
+                    cc_cfg,
+                    rebalance_freq,
+                    track_series=True,
+                    features_by_ticker=features_by_ticker,
+                    iv_by_ticker=iv_map,
+                    liquidity_by_ticker=liquidity_by_ticker,
+                    regime=regime,
+                )
+
+    cc_lab = run_cc_knob_lab(
+        panel["dates"],
+        panel["returns_by_ticker"],
+        dict(target_w),
+        mandate_doc,
+        features_by_ticker=features_by_ticker,
+        iv_by_ticker=iv_map,
+        liquidity_by_ticker=liquidity_by_ticker,
+        regime=regime,
+        n_trials=int((mandate_doc.get("evolution") or {}).get("cc_ga_trials", 12)),
+    )
+
+    scenarios = {
+        "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "long_only_max_names": (mandate_doc.get("mandate") or {}).get("max_names", 12),
+        "cc_concentrated_max_names": (mandate_doc.get("mandate") or {}).get("max_names_cc") or 8,
+        "production_policy": policy_id,
+        "cc_oos_gate": cc_oos_gate,
+        "scenario_cc_weights": [
+            {"ticker": t, "weight_pct": round(w * 100, 2)}
+            for t, w in sorted(scenario_w.items(), key=lambda x: -x[1])
+        ],
+        "scenario_vs_production": {
+            "scenario_names": len(scenario_w),
+            "production_names": len(target_w),
+            "overlap": sorted(set(scenario_w) & set(target_w)),
+        },
+        "human_approve_note": "Approve scenario_cc_weights before changing live paper book.",
+    }
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    (DATA_DIR / "darwin_cc_scenarios.json").write_text(json.dumps(scenarios, indent=2) + "\n", encoding="utf-8")
+
+    options_report = cache_coverage_report(list(target_w.keys()) or tickers[:12])
 
     champion_selection = "ira_default"
     if exploration_on and explore.get("champion_mode") == "best_insample":
@@ -655,16 +793,27 @@ def run_pipeline(
         "mandate": mandate_doc.get("mandate"),
         "universe_spec": features.get("universe_spec")
         or (mandate_doc.get("mandate") or {}).get("universe"),
+        "universe_spec_effective": features.get("universe_spec_effective")
+        or features.get("universe_spec"),
         "universe_count": features.get("universe_count", len(rows)),
         "universe_excluded_sample": features.get("universe_excluded_sample") or [],
+        "universe_exclusions": features.get("universe_exclusions") or {},
         "sp500": features.get("sp500"),
+        "liquidity": features.get("liquidity"),
         "covered_call": {
             **cc_cfg,
             "disclaimer": (
                 "Synthetic covered-call overlay on champion weights, "
                 "not Darwin AI Ventures proprietary model"
             ),
+            "stress_cases": (bt_cc.get("stress_cases") if isinstance(bt_cc, dict) else None),
+            "name_level_sample": (bt_cc.get("name_level_sample") if isinstance(bt_cc, dict) else None),
+            "proxy_returns_status": proxy_status,
+            "options_cache": options_report,
+            "oos_gate": cc_oos_gate,
         },
+        "cc_scenarios": scenarios,
+        "cc_lab": {k: v for k, v in (cc_lab or {}).items() if k != "trials"} if cc_lab else {"enabled": False},
         "regime": regime,
         "rebalance_frequency": mandate_doc.get("mandate", {}).get("rebalance_frequency", "semiannual"),
         "turnover_budget_pct": mandate_doc.get("mandate", {}).get(
@@ -682,7 +831,7 @@ def run_pipeline(
             "population_loaded": len(pop),
         },
         "weights": weights_to_list(target_w, features_by_ticker, prev_w),
-        "account_profile": mandate_doc.get("account_profile", "taxable"),
+        "account_profile": mandate_doc.get("account_profile", "roth"),
         "benchmarks": {
             "ira_marvin": bt_ira,
             "equal_weight": bt_eq,
@@ -701,6 +850,21 @@ def run_pipeline(
     proxy_key = (cc_cfg.get("etf_proxy_ticker") or "").strip().lower()
     if proxy_key and not bt_cc_proxy.get("error"):
         out["benchmarks"][proxy_key] = _bench_stats(bt_cc_proxy)
+    if not bt_qyld.get("error"):
+        out["benchmarks"]["qyld"] = _bench_stats(bt_qyld)
+
+    # Phase C: flag high CC suitability + watch stance for human review
+    for t in list(ira_genome.get("_cc_high_suitability_watch") or []):
+        review_flags.append(
+            {
+                "ticker": t,
+                "severity": "warn",
+                "reason": "high_cc_suitability_with_watch_stance",
+            }
+        )
+    conflicts = [f for f in review_flags if f.get("severity") == "review"]
+    out["conflicts"] = conflicts
+    out["human_review"] = review_flags
 
     out.update(
         {
@@ -786,13 +950,13 @@ def run_pipeline(
 
 
 def run_all_accounts(fast: bool = False, write_features: bool = True) -> dict:
-    """Build Roth + taxable Tier 0 books, paper trackers, and L4 serving bundle."""
+    """Build Roth IRA Tier 0 book, paper tracker, and L4 serving bundle (IRA-only)."""
+    from .accounts import ACCOUNT_IDS
     from .features import build_features as _build
 
-    # Shared features use Roth mandate universe (both accounts now registry_sp500).
     features = _build(load_mandate_for("roth"))
     results: dict = {}
-    for i, aid in enumerate(("roth", "taxable")):
+    for i, aid in enumerate(ACCOUNT_IDS):
         results[aid] = run_pipeline(
             account_id=aid,
             fast=fast,

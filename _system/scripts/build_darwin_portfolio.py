@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build Darwin portfolio JSON for Roth IRA + taxable paper accounts.
+"""Build Darwin portfolio JSON for the Roth IRA paper account (IRA-only).
 
   python3 _system/scripts/build_darwin_portfolio.py
   python3 _system/scripts/build_darwin_portfolio.py --fast
@@ -26,7 +26,7 @@ def main() -> None:
         "--account",
         choices=list(ACCOUNT_IDS) + ["all"],
         default="all",
-        help="Which paper account to build (default: all)",
+        help="Which paper account to build (default: all = Roth IRA only)",
     )
     parser.add_argument(
         "--download",
@@ -64,7 +64,7 @@ def main() -> None:
                     ),
                     "paper_inception": (s.get("accounts") or {}).get(aid, {}).get("paper_inception"),
                 }
-                for aid in ("roth", "taxable")
+                for aid in ACCOUNT_IDS
             },
             indent=2,
         ))

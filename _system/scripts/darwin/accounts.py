@@ -1,4 +1,8 @@
-"""Per-account paths and serving bundle (Roth + taxable)."""
+"""Per-account paths and serving bundle (Roth IRA only).
+
+Taxable Darwin paper book was retired 2026-07-11 — strategy is IRA-only.
+Historical taxable artifacts may remain on disk for audit; they are not rebuilt.
+"""
 from __future__ import annotations
 
 import json
@@ -8,11 +12,14 @@ from pathlib import Path
 
 from .config import DATA_DIR, PORTFOLIO_DIR
 
-ACCOUNT_IDS = ("roth", "taxable")
+# Production Darwin track: Roth IRA paper book only.
+ACCOUNT_IDS = ("roth",)
+
+# Retired accounts kept for path helpers / audit of old files (not in ACCOUNT_IDS).
+RETIRED_ACCOUNT_IDS = ("taxable",)
 
 MANDATE_FILES = {
     "roth": PORTFOLIO_DIR / "darwin_mandate_roth.json",
-    "taxable": PORTFOLIO_DIR / "darwin_mandate_taxable.json",
 }
 
 SERVING_PATH = DATA_DIR / "darwin_serving.json"
@@ -32,7 +39,10 @@ class AccountCtx:
 def account_ctx(account_id: str) -> AccountCtx:
     aid = account_id.lower()
     if aid not in ACCOUNT_IDS:
-        raise ValueError(f"Unknown account_id {account_id!r}; use one of {ACCOUNT_IDS}")
+        raise ValueError(
+            f"Unknown or retired account_id {account_id!r}; "
+            f"production accounts: {ACCOUNT_IDS} (retired: {RETIRED_ACCOUNT_IDS})"
+        )
     return AccountCtx(
         account_id=aid,
         mandate_path=MANDATE_FILES[aid],
@@ -55,9 +65,11 @@ def tier0_production(mandate_doc: dict) -> bool:
 
 
 def build_serving(portfolios: dict[str, dict]) -> dict:
-    """L4: single artifact for dashboard."""
+    """L4: single artifact for dashboard (IRA-only)."""
     accounts: dict[str, dict] = {}
     for aid, port in portfolios.items():
+        if aid not in ACCOUNT_IDS:
+            continue
         ctx = account_ctx(aid)
         paper = {}
         if ctx.paper_state_path.exists():
@@ -80,6 +92,8 @@ def build_serving(portfolios: dict[str, dict]) -> dict:
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "accounts": accounts,
         "default_account": "roth",
+        "account_scope": "ira_only",
+        "retired_accounts": list(RETIRED_ACCOUNT_IDS),
     }
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     SERVING_PATH.write_text(json.dumps(bundle, indent=2) + "\n", encoding="utf-8")

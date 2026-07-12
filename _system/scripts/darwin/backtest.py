@@ -211,16 +211,12 @@ def apply_covered_call_overlay(
     premium_monthly: float,
     upside_cap: float,
     coverage: float,
+    assignment_bps: float = 0.0,
 ) -> float:
-    """Blend uncovered stock return with a capped covered-call sleeve.
+    """Blend uncovered stock return with a capped covered-call sleeve."""
+    from .covered_call import apply_covered_call_overlay as _apply
 
-    Covered sleeve: min(stock_ret, upside_cap) + premium_monthly
-    Uncovered sleeve: stock_ret
-    Blend by coverage in [0, 1].
-    """
-    cov = max(0.0, min(1.0, float(coverage)))
-    covered = min(float(stock_ret), float(upside_cap)) + float(premium_monthly)
-    return (1.0 - cov) * float(stock_ret) + cov * covered
+    return _apply(stock_ret, premium_monthly, upside_cap, coverage, assignment_bps=assignment_bps)
 
 
 def benchmark_covered_call(
@@ -230,51 +226,102 @@ def benchmark_covered_call(
     params: dict,
     rebalance_frequency: str = "semiannual",
     track_series: bool = False,
+    features_by_ticker: dict | None = None,
+    iv_by_ticker: dict[str, float] | None = None,
+    liquidity_by_ticker: dict[str, str] | None = None,
+    regime: dict | None = None,
 ) -> dict:
-    """Synthetic buy-write on a fixed weight book (champion weights)."""
+    """Synthetic buy-write on a weight book with tenor-aware, name-level overlay.
+
+    Equity weights stay fixed between mandate rebalances; call rolls are modeled
+    inside each monthly return via tenor→monthly premium mapping (Phase B).
+    """
+    from .covered_call import (
+        name_level_cc_params,
+        portfolio_name_level_overlay,
+        resolve_cc_cfg,
+        stress_case_returns,
+        tenor_premium_monthly,
+        upside_cap_from_otm,
+    )
+
     if not weights or len(dates) < 4:
         return {"error": "insufficient_inputs", "periods": 0}
-    annual_prem = float(params.get("premium_yield_annual_pct", 8.0))
-    premium_monthly = annual_prem / 100.0 / 12.0
-    upside_cap = float(params.get("upside_cap_monthly_pct", 2.0)) / 100.0
-    coverage = float(params.get("coverage_fraction", 0.20))
-    freq = rebalance_frequency or "semiannual"
-    rebals = rebalance_points(dates, freq)
-    if len(rebals) < 2:
-        return {"error": "insufficient_dates", "periods": 0}
 
+    cc = resolve_cc_cfg({"covered_call": params}, regime)
+    # Use effective coverage after regime mult as base for name-level
+    base = {**params, **cc, "coverage_fraction": cc.get("coverage_fraction_effective", params.get("coverage_fraction", 0.2))}
+    assignment_bps = float(base.get("assignment_bps", 5.0))
+    feats = features_by_ticker or {}
+    ivs = iv_by_ticker or {}
+    liq = liquidity_by_ticker or {}
+
+    name_params: dict[str, dict] = {}
+    for t in weights:
+        hist = returns_by_ticker.get(t) or []
+        name_params[t] = name_level_cc_params(
+            t,
+            base,
+            feats.get(t),
+            hist,
+            iv_hint=ivs.get(t.upper()) or ivs.get(t),
+            liquidity_bucket=liq.get(t.upper()) or liq.get(t),
+        )
+
+    # Roll calendar is independent of equity rebalance: we mark every month
+    # (monthly equity returns already aggregate intra-month call rolls via tenor map).
     period_rets: list[float] = []
     log_equity = [0.0]
     series_dates: list[str] = []
     series_equity: list[float] = []
-    for ri in range(len(rebals) - 1):
-        start, end = rebals[ri], rebals[ri + 1]
-        for mi in range(start, end):
-            r_row = {
-                t: returns_by_ticker[t][mi]
-                for t in weights
-                if t in returns_by_ticker and mi < len(returns_by_ticker.get(t, []))
-            }
-            stock_pr = portfolio_return(weights, r_row)
-            pr = apply_covered_call_overlay(stock_pr, premium_monthly, upside_cap, coverage)
-            period_rets.append(pr)
-            log_equity.append(log_equity[-1] + math.log1p(pr))
-            if track_series:
-                d = dates[mi] if mi < len(dates) else dates[-1]
-                series_dates.append(d)
-                series_equity.append(round(math.exp(log_equity[-1]), 6))
+    for mi in range(len(dates)):
+        r_row = {
+            t: returns_by_ticker[t][mi]
+            for t in weights
+            if t in returns_by_ticker and mi < len(returns_by_ticker.get(t, []))
+        }
+        if not r_row:
+            continue
+        pr = portfolio_name_level_overlay(weights, r_row, name_params, assignment_bps=assignment_bps)
+        period_rets.append(pr)
+        log_equity.append(log_equity[-1] + math.log1p(pr))
+        if track_series:
+            series_dates.append(dates[mi])
+            series_equity.append(round(math.exp(log_equity[-1]), 6))
+
     if not period_rets:
         return {"error": "no_returns", "periods": 0}
     out = _stats_from_series(period_rets, log_equity)
     out["avg_turnover_one_way"] = 0.0
-    out["rebalance_frequency"] = freq
+    out["rebalance_frequency"] = "monthly_marks_tenor_rolls"
+    out["equity_rebalance_frequency"] = rebalance_frequency
     out["label"] = params.get("label") or "synthetic_covered_call"
     out["covered_call_params"] = {
-        "premium_yield_annual_pct": annual_prem,
-        "upside_cap_monthly_pct": upside_cap * 100.0,
-        "coverage_fraction": coverage,
+        "premium_yield_annual_pct": float(base.get("premium_yield_annual_pct", 8.0)),
+        "tenor_days": int(base.get("tenor_days", 7)),
+        "otm_pct": float(base.get("otm_pct", 2.0)),
+        "bid_ask_haircut": float(base.get("bid_ask_haircut", 0.15)),
+        "assignment_bps": assignment_bps,
+        "coverage_fraction": float(base.get("coverage_fraction", 0.2)),
+        "coverage_fraction_base": float(params.get("coverage_fraction", 0.2)),
+        "regime_coverage_mult": base.get("regime_coverage_mult", 1.0),
+        "roll_frequency": base.get("roll_frequency", "weekly"),
         "mode": params.get("mode") or "synthetic",
+        "flat_premium_monthly": tenor_premium_monthly(
+            float(base.get("premium_yield_annual_pct", 8.0)),
+            int(base.get("tenor_days", 7)),
+            float(base.get("bid_ask_haircut", 0.15)),
+        ),
+        "flat_upside_cap": upside_cap_from_otm(
+            float(base.get("otm_pct", 2.0)),
+            int(base.get("tenor_days", 7)),
+        ),
     }
+    out["name_level_sample"] = {
+        t: {k: (round(v, 6) if isinstance(v, float) else v) for k, v in p.items()}
+        for t, p in list(name_params.items())[:8]
+    }
+    out["stress_cases"] = stress_case_returns(base)
     if track_series:
         out["series"] = {
             "dates": series_dates,
@@ -284,3 +331,12 @@ def benchmark_covered_call(
             ],
         }
     return out
+
+
+def benchmark_etf_sleeve(
+    dates: list[str],
+    etf_returns: list[float],
+    label: str = "xyld",
+) -> dict:
+    """Buy-and-hold sleeve for covered-call ETF proxy comparison (Phase D)."""
+    return benchmark_buy_hold(dates, etf_returns, "semiannual", track_series=True, label=label)

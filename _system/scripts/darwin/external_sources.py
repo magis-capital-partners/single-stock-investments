@@ -32,7 +32,17 @@ def _first_existing(candidates: list[Path]) -> Path | None:
 
 
 def etf_dashboard_root() -> Path | None:
-    return _first_existing([p for p in DEFAULT_PATHS if p])
+    """Prefer a root that actually has data/ (skip empty _external stubs)."""
+    candidates = [p for p in DEFAULT_PATHS if p]
+    # First pass: directory with options_cache or vrp_health
+    for p in candidates:
+        if not p or str(p) == ".":
+            continue
+        if not p.is_dir():
+            continue
+        if (p / "data" / "options_cache.json").exists() or (p / "data" / "vrp_health.json").exists():
+            return p.resolve()
+    return _first_existing(candidates)
 
 
 def ls_algo_root() -> Path | None:

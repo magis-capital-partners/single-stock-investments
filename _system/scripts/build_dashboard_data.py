@@ -1902,8 +1902,8 @@ def load_darwin_bundle() -> dict:
                     "inception_date": row.get("paper_inception"),
                 }
         return bundle
-    bundle: dict = {"default_account": "roth"}
-    for aid in ("roth", "taxable"):
+    bundle: dict = {"default_account": "roth", "account_scope": "ira_only"}
+    for aid in ("roth",):
         p = _load_json(DATA_DIR / f"darwin_portfolio_{aid}.json")
         if p:
             bundle[aid] = p

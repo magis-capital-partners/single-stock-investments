@@ -1,9 +1,9 @@
 # Darwin IRA — research download plan & optimization roadmap
 
-**Account type:** Simple tax-advantaged IRA (Traditional or Roth — same turnover discipline; Roth has no RMD during life).  
+**Account type:** Roth IRA paper book only (taxable Darwin retired 2026-07-11). Traditional IRA would use the same turnover discipline if added later.  
 **Objective:** 8–12 high-conviction single stocks, **≤10% one-way turnover per semiannual rebalance**, Marvin-grounded expected return, Darwin encoder/GA/PPO as **sanity check** not sole driver.
 
-**Status:** Data-science tuning applied in `_system/portfolio/darwin_mandate.json` (`account_profile: ira`). Rebuild: `python3 _system/scripts/build_darwin_portfolio.py`.
+**Status:** IRA-only production via `_system/portfolio/darwin_mandate_roth.json` (`account_profile: roth`). Rebuild: `make darwin-build` or `python3 _system/scripts/build_darwin_portfolio.py`.
 
 ---
 

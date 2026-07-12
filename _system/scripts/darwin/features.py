@@ -335,7 +335,12 @@ def build_features(mandate: dict | None = None) -> dict:
 
 
 def build_features_as_of(as_of: str | None, mandate: dict | None = None) -> dict:
-    from .universe import resolve_universe, sp500_meta, universe_exclusion_sample
+    from .universe import (
+        compute_universe_exclusions,
+        resolve_universe_detail,
+        sp500_meta,
+        universe_exclusion_sample,
+    )
 
     holdings_meta = parse_holdings()
     reg = load_registry()
@@ -350,16 +355,24 @@ def build_features_as_of(as_of: str | None, mandate: dict | None = None) -> dict
         snap_reg = load_registry_snapshot_as_of(eff) or reg
         tickers = holdings_universe_as_of(eff, snap_reg, universe_spec=spec)
         reg = snap_reg
+        detail = resolve_universe_detail(spec, reg, base_tickers=tickers)
+        # PIT path already filtered; keep detail aligned to resolved list
+        detail = {**detail, "tickers": tickers, "eligible_count": len(tickers)}
     else:
-        tickers = resolve_universe(spec, reg)
+        detail = resolve_universe_detail(spec, reg)
+        tickers = detail["tickers"]
     rows = [feature_row(t, holdings_meta, portfolio_class, as_of=as_of, registry=reg) for t in tickers]
+    exclusions = compute_universe_exclusions(reg, tickers, spec, detail=detail)
     return {
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "as_of": as_of,
         "universe_spec": spec,
+        "universe_spec_effective": detail.get("spec_effective") or spec,
         "universe_count": len(rows),
         "universe_excluded_sample": universe_exclusion_sample(reg, tickers),
+        "universe_exclusions": exclusions,
         "sp500": sp500_meta() if "sp500" in spec.lower() else None,
+        "liquidity": detail.get("liquidity"),
         "ticker_count": len(rows),
         "feature_dim": len(rows[0]["feature_vector"]) if rows else 0,
         "feature_names": rows[0]["feature_names"] if rows else [],

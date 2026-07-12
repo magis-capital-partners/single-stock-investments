@@ -580,10 +580,9 @@
   </div>
 
   <section class="darwin-panel" id="darwin-panel">
-    <nav class="view-tabs" id="darwin-account-tabs" style="margin-bottom:12px">
-      <button type="button" class="view-tab active" data-darwin-account="roth">Roth IRA (paper)</button>
-      <button type="button" class="view-tab" data-darwin-account="taxable">Taxable (paper)</button>
-    </nav>
+    <p class="subhead" id="darwin-account-badge" style="margin-bottom:12px">
+      <span class="badge badge-purple">Roth IRA</span> paper book · Darwin is IRA-only (taxable track retired)
+    </p>
     <div class="loading" id="darwin-loading">Loading Darwin portfolio…</div>
     <div id="darwin-content" style="display:none"></div>
   </section>
@@ -1108,11 +1107,9 @@ async function load() {
   if (!applyRouteFromHash() && data.tickers.length) selectTicker(data.tickers[0].ticker);
 }
 
-function setDarwinAccount(aid) {
-  activeDarwinAccount = aid;
-  document.querySelectorAll('#darwin-account-tabs .view-tab').forEach(b => {
-    b.classList.toggle('active', b.dataset.darwinAccount === aid);
-  });
+function setDarwinAccount(_aid) {
+  // IRA-only: production track is always Roth.
+  activeDarwinAccount = 'roth';
   renderDarwin();
 }
 
@@ -1561,7 +1558,7 @@ function renderDarwin() {
   const champ = d.benchmarks?.champion || {};
   const paperMark = paper.last_mark || d.paper_portfolio?.last_mark || {};
   const btInception = paper.backtest_at_inception || d.paper_portfolio?.backtest_at_inception || {};
-  const acctLabel = activeDarwinAccount === 'roth' ? 'Roth IRA' : 'Taxable';
+  const acctLabel = 'Roth IRA';
   const spy = d.benchmarks?.spy || {};
   const ccBench = d.benchmarks?.covered_call || {};
   const ccCfg = d.covered_call || {};
@@ -1577,7 +1574,13 @@ function renderDarwin() {
   const excessCcVsSpy = ccBench.cumulative_return != null && spy.cumulative_return != null && !ccBench.error
     ? ((ccBench.cumulative_return - spy.cumulative_return) * 100).toFixed(1) : null;
   const univSpec = d.universe_spec || d.mandate?.universe || '—';
+  const univSpecEff = d.universe_spec_effective || univSpec;
   const univCount = d.universe_count != null ? d.universe_count : (d.weights || []).length;
+  const univEx = d.universe_exclusions || {};
+  const univBy = univEx.by_reason || {};
+  const univSamples = univEx.samples || {};
+  const liqFallback = !!univEx.liquidity_fallback;
+  const coverageOk = univEx.coverage_gate_ok !== false;
   const fmtPct = (v) => v != null && !Number.isNaN(v) ? (v * 100).toFixed(1) + '%' : '—';
   const fmtSharpe = (v) => v != null ? v : '—';
   const strategyRows = [
@@ -1588,19 +1591,49 @@ function renderDarwin() {
   if (proxyKey && proxyBench && !proxyBench.error) {
     strategyRows.push({ key: proxyKey, label: proxyKey.toUpperCase() + ' (ETF proxy)', b: proxyBench });
   }
+  const exclusionRows = [
+    { key: 'not_in_sp500', label: 'Not in S&P 500' },
+    { key: 'adr_otc', label: 'ADR / OTC' },
+    { key: 'liquidity_miss', label: 'Liquidity miss (bucket C/D)' },
+    { key: 'no_options', label: 'No options flag' },
+    { key: 'returns_missing', label: 'Missing returns CSV' },
+    { key: 'irr_stance_miss', label: 'IRR / stance gate' },
+  ];
   content.innerHTML = `
     <h2 style="font-size:18px;margin-bottom:6px">Darwin · ${escapeHtml(acctLabel)} paper book</h2>
     <p class="subhead" style="margin-bottom:14px">
       Tier ${escapeHtml(String(d.tier ?? '0'))} · ${escapeHtml(d.generated_at || '')} · phase ${escapeHtml(d.phase || '—')}
       · <span class="badge badge-purple">${escapeHtml(d.account_profile || activeDarwinAccount)}</span>
       · policy <span class="mono">${escapeHtml(d.policy_id || '—')}</span>
-      · universe <span class="mono">${escapeHtml(univSpec)}</span>${univCount != null ? ` · ${univCount} names` : ''}
+      · universe <span class="mono">${escapeHtml(univSpec)}</span>${univSpecEff && univSpecEff !== univSpec ? ` → <span class="mono">${escapeHtml(univSpecEff)}</span>` : ''}${univCount != null ? ` · ${univCount} eligible` : ''}
+      ${liqFallback ? ' · <span class="badge badge-warn">liquidity fallback</span>' : ''}
+      ${!coverageOk ? ' · <span class="badge badge-warn">coverage gate</span>' : ' · <span class="badge badge-ok">coverage ≥20</span>'}
       ${d.exploration?.enabled ? ' · <span class="badge badge-purple">exploration</span>' : ''}
       ${d.benchmarks?.ml_selected === false && !d.exploration?.enabled ? ' · <span class="badge badge-warn">ML gated</span>' : ''}
       ${d.pit?.audit_pass === false ? ' · <span class="badge badge-warn">PIT leak</span>' : (d.pit?.audit_pass ? ' · <span class="badge badge-ok">PIT ok</span>' : '')}
       ${d.pit?.ml_oos_eligible ? ' · <span class="badge badge-ok">OOS ML</span>' : ''}
       ${d.policy_detail?.ensemble ? ' · <span class="badge badge-ok">ensemble</span>' : ''}
     </p>
+    ${liqFallback ? `<div class="liquidity-banner"><strong>Liquidity file missing or stale</strong> — using <span class="mono">registry_sp500</span> fallback (buckets A/B filter skipped). Refresh with <span class="mono">make darwin-sp500-liquidity</span>.</div>` : ''}
+    <div class="detail-section">
+      <h3>Universe eligibility (Phase A)</h3>
+      <p class="subhead" style="margin-bottom:10px">
+        Eligible ${univEx.eligible_count ?? univCount ?? '—'}
+        · with returns ${univEx.eligible_with_returns ?? '—'}
+        · excluded total ${univEx.excluded_total ?? '—'}
+        · liquidity as-of ${escapeHtml((univEx.liquidity && univEx.liquidity.as_of) || (d.liquidity && d.liquidity.as_of) || '—')}
+        · SPX ${escapeHtml((d.sp500 && d.sp500.as_of) || '—')} (${(d.sp500 && d.sp500.count) || '—'} names)
+      </p>
+      <table class="darwin-table">
+        <thead><tr><th>Reason</th><th>Count</th><th>Sample</th></tr></thead>
+        <tbody>${exclusionRows.map(row => {
+          const n = univBy[row.key];
+          if (n == null) return '';
+          const sample = (univSamples[row.key] || []).slice(0, 8).join(', ') || '—';
+          return `<tr><td>${escapeHtml(row.label)}</td><td class="mono">${n}</td><td class="mono" style="font-size:11px">${escapeHtml(sample)}</td></tr>`;
+        }).join('')}</tbody>
+      </table>
+    </div>
     ${conflicts.length ? `<div class="conflict-banner"><strong>Marvin conflicts — review before trade</strong><ul style="margin-top:8px;padding-left:18px">${conflicts.map(c => `<li>${escapeHtml(c.ticker)}: ${escapeHtml(c.reason || '')} (${c.weight_pct || '?'}%)</li>`).join('')}</ul></div>` : ''}
     ${reviews.filter(r => r.severity === 'warn').length ? `<div class="conflict-banner" style="border-color:rgba(245,158,11,0.4);background:rgba(245,158,11,0.08)"><strong>Warnings</strong><ul style="margin-top:8px;padding-left:18px">${reviews.filter(r => r.severity === 'warn').map(r => `<li>${escapeHtml(r.ticker)}: ${escapeHtml(r.reason)}</li>`).join('')}</ul></div>` : ''}
     <div class="detail-section">
@@ -1674,8 +1707,8 @@ function renderDarwin() {
         Allocation universe is registry holdings that are also in the S&amp;P 500 (liquidity / SPY-comparable screen from the Darwin AI Ventures meeting).
         The covered-call track is a <strong>synthetic</strong> monthly buy-write overlay on champion weights (premium + upside cap × coverage).
         It is <strong>not</strong> the proprietary Darwin AI Ventures neural-network model.
+        Short-dated call writing is researched here inside an IRA (no capital-gains drag inside the account).
       </p>
-      ${activeDarwinAccount === 'taxable' ? '<p class="subhead" style="margin-bottom:10px;color:var(--accent-amber)">Taxable note: short-dated covered calls are typically tax-inefficient (mostly short-term gains).</p>' : ''}
       <table class="darwin-table" style="margin-bottom:12px">
         <thead><tr><th>Param</th><th>Value</th></tr></thead>
         <tbody>
@@ -1683,10 +1716,33 @@ function renderDarwin() {
           <tr><td>Premium yield (annual)</td><td class="mono">${ccCfg.premium_yield_annual_pct != null ? ccCfg.premium_yield_annual_pct + '%' : '—'}</td></tr>
           <tr><td>Upside cap (monthly)</td><td class="mono">${ccCfg.upside_cap_monthly_pct != null ? ccCfg.upside_cap_monthly_pct + '%' : '—'}</td></tr>
           <tr><td>Coverage fraction</td><td class="mono">${ccCfg.coverage_fraction != null ? (ccCfg.coverage_fraction * 100).toFixed(0) + '%' : '—'}</td></tr>
+          <tr><td>Tenor / OTM</td><td class="mono">${ccCfg.tenor_days != null ? ccCfg.tenor_days + 'd' : '—'} / ${ccCfg.otm_pct != null ? ccCfg.otm_pct + '%' : '—'}</td></tr>
+          <tr><td>Bid-ask haircut / assignment</td><td class="mono">${ccCfg.bid_ask_haircut != null ? (ccCfg.bid_ask_haircut * 100).toFixed(0) + '%' : '—'} / ${ccCfg.assignment_bps != null ? ccCfg.assignment_bps + ' bps' : '—'}</td></tr>
+          <tr><td>Coverage (base → effective)</td><td class="mono">${ccCfg.coverage_fraction != null ? (ccCfg.coverage_fraction * 100).toFixed(0) + '%' : '—'}${ccCfg.coverage_fraction_effective != null ? ' → ' + (ccCfg.coverage_fraction_effective * 100).toFixed(0) + '%' : ''}${ccCfg.regime_coverage_mult != null ? ' (regime ×' + ccCfg.regime_coverage_mult + ')' : ''}</td></tr>
           <tr><td>ETF proxy</td><td class="mono">${escapeHtml(ccCfg.etf_proxy_ticker || '—')}${proxyBench.error ? ' (returns missing)' : ''}</td></tr>
+          <tr><td>OOS dual-score gate</td><td class="mono">${escapeHtml((ccCfg.oos_gate && ccCfg.oos_gate.reason) || '—')}${ccCfg.oos_gate && ccCfg.oos_gate.passed ? ' ✓' : ''}</td></tr>
+          <tr><td>Options cache IV hits</td><td class="mono">${(ccCfg.options_cache && ccCfg.options_cache.iv_hit) != null ? ccCfg.options_cache.iv_hit + '/' + (ccCfg.options_cache.requested || '—') : '—'}</td></tr>
           <tr><td>S&amp;P constituents as-of</td><td class="mono">${escapeHtml((d.sp500 && d.sp500.as_of) || '—')}</td></tr>
         </tbody>
       </table>
+      <h4 style="font-size:14px;margin:12px 0 6px">Stress cases (synthetic payoff shape)</h4>
+      <table class="darwin-table" style="margin-bottom:12px">
+        <thead><tr><th>Case</th><th>Stock</th><th>CC</th><th>Lag vs stock</th></tr></thead>
+        <tbody>${Object.entries(ccCfg.stress_cases || {}).map(([k, v]) => `<tr>
+          <td class="mono">${escapeHtml(k)}</td>
+          <td>${fmtPct(v.stock_ret)}</td>
+          <td>${fmtPct(v.cc_ret)}</td>
+          <td>${fmtPct(v.lag_vs_stock)}</td>
+        </tr>`).join('') || '<tr><td colspan="4">—</td></tr>'}</tbody>
+      </table>
+      ${(d.cc_scenarios) ? `<h4 style="font-size:14px;margin:12px 0 6px">CC concentration scenario (max ${d.cc_scenarios.cc_concentrated_max_names || 8})</h4>
+      <p class="subhead" style="margin-bottom:8px">${escapeHtml(d.cc_scenarios.human_approve_note || '')} · production ${d.cc_scenarios.scenario_vs_production?.production_names ?? '—'} names · scenario ${d.cc_scenarios.scenario_vs_production?.scenario_names ?? '—'}</p>
+      <table class="darwin-table" style="margin-bottom:12px">
+        <thead><tr><th>Ticker</th><th>Scenario weight</th></tr></thead>
+        <tbody>${(d.cc_scenarios.scenario_cc_weights || []).slice(0, 10).map(w => `<tr>
+          <td class="mono">${escapeHtml(w.ticker)}</td><td class="mono">${w.weight_pct}%</td>
+        </tr>`).join('') || '<tr><td colspan="2">—</td></tr>'}</tbody>
+      </table>` : ''}
       <h4 style="font-size:14px;margin:12px 0 6px">Strategy comparison</h4>
       <table class="darwin-table" style="margin-bottom:12px">
         <thead><tr><th>Track</th><th>Cum ret</th><th>Ann vol</th><th>Max DD</th><th>Sharpe</th><th>Excess vs SPY</th></tr></thead>
@@ -2454,9 +2510,6 @@ document.getElementById('device-cancel').addEventListener('click', closeDeviceMo
 
 document.querySelectorAll('#view-tabs .view-tab').forEach(btn => {
   btn.addEventListener('click', () => setView(btn.dataset.view));
-});
-document.querySelectorAll('#darwin-account-tabs .view-tab').forEach(btn => {
-  btn.addEventListener('click', () => setDarwinAccount(btn.dataset.darwinAccount));
 });
 </script>
 </body>

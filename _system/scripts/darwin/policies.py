@@ -112,9 +112,90 @@ def policy_softmax_latent(
     return {tickers[i]: exps[i] / s for i in range(len(tickers))}
 
 
+def ira_marvin_ineligible(rows: list[dict], genome: dict | None = None) -> list[str]:
+    """Tickers in the feature universe that fail IRA IRR/stance gates (not merely top_k cut)."""
+    g = genome or {}
+    min_irr = g.get("min_irr_pct_for_weight", 6.0)
+    allow_stances = set(g.get("exclude_negative_irr_unless_stance") or ["core", "accumulate"])
+    allow_watch = set(g.get("allow_watch_stances") or [])
+    miss: list[str] = []
+    for r in rows:
+        t = r.get("ticker")
+        if not t:
+            continue
+        irr = r.get("irr_falsifier_pct")
+        if irr is None:
+            irr = r.get("irr_base_pct")
+        cl = r.get("classification") or {}
+        stance = (cl.get("stance") or "watch").lower()
+        if irr is None:
+            miss.append(t)
+            continue
+        if irr < 0 and stance not in allow_stances:
+            miss.append(t)
+            continue
+        if irr < min_irr and stance not in allow_stances:
+            miss.append(t)
+            continue
+        if stance in ("watch", "trim", "exit") and stance not in allow_stances and stance not in allow_watch:
+            miss.append(t)
+            continue
+    return miss
+
+
+def cc_suitability_score(
+    row: dict,
+    genome: dict | None = None,
+    iv_hint: float | None = None,
+    liquidity_bucket: str | None = None,
+) -> float:
+    """Buy-write suitability in [~0.4, ~1.6]: liquidity, vol, stance upside willingness."""
+    g = genome or {}
+    cl = row.get("classification") or {}
+    stance = (cl.get("stance") or "hold").lower()
+    # Willing to sell upside on hold/watch more than core compounders
+    stance_cc = {
+        "core": 0.75,
+        "accumulate": 0.85,
+        "hold": 1.05,
+        "watch": 1.15,
+        "trim": 1.2,
+        "exit": 0.3,
+    }.get(stance, 1.0)
+    bucket = (liquidity_bucket or row.get("liquidity_bucket") or "B").upper()
+    bucket_m = {"A": 1.2, "B": 1.0, "C": 0.65, "D": 0.4}.get(bucket, 1.0)
+    # Prefer moderate-high vol for premium; extreme vol penalized slightly
+    vol = iv_hint
+    if vol is None:
+        vol = row.get("realized_vol_annual")
+    vol_m = 1.0
+    if isinstance(vol, (int, float)) and vol > 0:
+        # Peak around 25–40% IV
+        if vol < 0.12:
+            vol_m = 0.7
+        elif vol < 0.25:
+            vol_m = 0.95 + (vol - 0.12) * 2
+        elif vol < 0.45:
+            vol_m = 1.15
+        else:
+            vol_m = 1.0
+    # Light dividend drag proxy: high yield names slightly better for covered calls
+    dy = row.get("dividend_yield_pct")
+    div_m = 1.0
+    if isinstance(dy, (int, float)):
+        div_m = 1.0 + min(0.1, max(0.0, float(dy) / 100.0))
+    score = stance_cc * bucket_m * vol_m * div_m
+    # Genome knobs
+    score *= float(g.get("cc_suitability_scale", 1.0))
+    return max(0.35, min(1.75, score))
+
+
 def policy_ira_marvin(rows: list[dict], genome: dict | None = None) -> dict[str, float]:
     """IRA: Marvin IRR × stance × dhando; drop negative IRR watch names."""
     g = genome or {}
+    use_cc = bool(g.get("cc_dual_score"))
+    iv_map = g.get("iv_by_ticker") or {}
+    liq_map = g.get("liquidity_by_ticker") or {}
     mandate_scoring = g.get("ira_scoring") or {}
     stance_m = mandate_scoring.get("stance_multipliers") or {
         "core": 1.25,
@@ -133,9 +214,12 @@ def policy_ira_marvin(rows: list[dict], genome: dict | None = None) -> dict[str,
     market_m = mandate_scoring.get("market_multipliers") or {}
     min_irr = g.get("min_irr_pct_for_weight", 6.0)
     allow_stances = set(g.get("exclude_negative_irr_unless_stance") or ["core", "accumulate"])
-    top_k = int(g.get("top_k", 12))
+    top_k = int(g.get("top_k", g.get("max_names_cc") if use_cc and g.get("max_names_cc") else g.get("max_names", 12)))
+    if use_cc and g.get("max_names_cc"):
+        top_k = int(g.get("max_names_cc"))
 
     scored: list[tuple[str, float]] = []
+    high_cc_watch: list[str] = []
     for r in rows:
         irr = r.get("irr_falsifier_pct") or r.get("irr_base_pct")
         if irr is None:
@@ -161,11 +245,28 @@ def policy_ira_marvin(rows: list[dict], genome: dict | None = None) -> dict[str,
         score -= mandate_scoring.get("falsifier_penalty", 0.6) * (r.get("falsifier_count") or 0)
         if r.get("human_review_pending"):
             score *= 1.0 - mandate_scoring.get("human_review_discount", 0.25)
+        if use_cc:
+            t = r["ticker"]
+            cc_s = cc_suitability_score(
+                r,
+                g,
+                iv_hint=iv_map.get(t.upper()) or iv_map.get(t),
+                liquidity_bucket=liq_map.get(t.upper()) or liq_map.get(t),
+            )
+            score *= cc_s
+            if stance == "watch" and cc_s >= float(g.get("cc_watch_review_threshold", 1.2)):
+                high_cc_watch.append(t)
         scored.append((r["ticker"], max(score, 1e-6)))
+
+    # Stash review hints on genome for pipeline (mutable dict)
+    if use_cc and isinstance(g, dict):
+        g["_cc_high_suitability_watch"] = high_cc_watch
 
     scored.sort(key=lambda x: -x[1])
     keep = scored[:top_k]
     min_names = int(g.get("min_names", 8))
+    if use_cc and g.get("min_names_cc") is not None:
+        min_names = int(g.get("min_names_cc"))
     if len(keep) < min_names and len(scored) >= min_names:
         keep = scored[:min_names]
     elif len(keep) < min_names:
@@ -174,12 +275,20 @@ def policy_ira_marvin(rows: list[dict], genome: dict | None = None) -> dict[str,
     return {t: s / total for t, s in keep}
 
 
+def policy_ira_marvin_cc(rows: list[dict], genome: dict | None = None) -> dict[str, float]:
+    """IRA Marvin × covered-call suitability (Phase C dual score)."""
+    g = dict(genome or {})
+    g["cc_dual_score"] = True
+    return policy_ira_marvin(rows, g)
+
+
 POLICY_FNS = {
     "equal_weight": policy_equal_weight,
     "irr_ranked": policy_irr_ranked,
     "archetype_risk_parity": policy_archetype_risk_parity,
     "risk_parity_vol": policy_risk_parity_vol,
     "ira_marvin": policy_ira_marvin,
+    "ira_marvin_cc": policy_ira_marvin_cc,
 }
 
 
