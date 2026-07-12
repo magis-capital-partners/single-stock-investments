@@ -7,6 +7,8 @@ on:
       - "_system/scripts/ci_checkout_workspace.sh"
       - "_system/scripts/ci_resolve_checkout_ref.sh"
       - "_system/scripts/ci_sparse_checkout_paths.py"
+      - "_system/scripts/ci_rebuild_profile.py"
+      - "_system/scripts/test_pages_fast_rebuild_steps.py"
       - "_system/scripts/ci_checkout_vault.sh"
       - "_system/scripts/ci_checkout_vault_lib.sh"
       - "_system/scripts/ci_push_vault.sh"
@@ -31,6 +33,8 @@ on:
       - "_system/scripts/ci_checkout_workspace.sh"
       - "_system/scripts/ci_resolve_checkout_ref.sh"
       - "_system/scripts/ci_sparse_checkout_paths.py"
+      - "_system/scripts/ci_rebuild_profile.py"
+      - "_system/scripts/test_pages_fast_rebuild_steps.py"
       - "_system/scripts/ci_checkout_vault.sh"
       - "_system/scripts/ci_checkout_vault_lib.sh"
       - "_system/scripts/ci_push_vault.sh"
@@ -81,6 +85,13 @@ jobs:
         run: python _system/scripts/test_vault_paths.py
       - name: Lint workflow bootstrap blocks
         run: python _system/scripts/lint_ci_bootstrap.py
+      - name: Guard darwin sparse path count
+        run: |
+          COUNT=$(python _system/scripts/ci_sparse_checkout_paths.py --count darwin)
+          echo "darwin sparse extra paths=$COUNT"
+          test "$COUNT" -le 200
+      - name: Guard rebuild profiles
+        run: python _system/scripts/test_pages_fast_rebuild_steps.py
 
   ci-push-rebase:
     runs-on: ubuntu-latest

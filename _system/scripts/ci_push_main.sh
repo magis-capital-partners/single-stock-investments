@@ -475,8 +475,10 @@ sync_self_from_origin_main() {
   cp "$tmp" "$dest"
   chmod +x "$dest"
   rm -f "$tmp"
+  # Reload functions only. Guard bottom-of-file re-entry: sourcing from inside a
+  # zero-arg function left $@ empty and re-invoked ci_push_main with no message.
   # shellcheck disable=SC1091
-  source "$dest"
+  CI_PUSH_SOURCING=1 source "$dest"
 }
 
 ci_push_main() {
@@ -528,6 +530,6 @@ ci_push_main() {
   exit 1
 }
 
-if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]] && [[ "${CI_PUSH_SOURCING:-0}" != "1" ]]; then
   ci_push_main "$@"
 fi

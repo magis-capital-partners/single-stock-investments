@@ -3,7 +3,7 @@
 #
 # Modes:
 #   deploy-only  — publish committed dashboard/ (no Python rebuild)
-#   rebuild      — pages-fast profile: insights + dashboard_data + validate
+#   rebuild      — insights profile: index/insights/research_memory + dashboard_data
 #
 # Writes GITHUB_OUTPUT keys: mode, checkout_profile, skip_rebuild, rebuild_profile, validate, needs_disk_cleanup
 set -euo pipefail
@@ -39,7 +39,7 @@ if [ "$EVENT" = "push" ]; then
   BEFORE="${GITHUB_EVENT_BEFORE:-}"
   SHA="${GITHUB_SHA:-}"
   if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
-    write_outputs "rebuild" "dashboard" "false" "pages-fast" "true" "true"
+    write_outputs "rebuild" "pages" "false" "insights" "true" "true"
     exit 0
   fi
   git fetch --depth=1 origin "$BEFORE" >/dev/null 2>&1 || true
@@ -48,8 +48,9 @@ if [ "$EVENT" = "push" ]; then
     write_outputs "deploy-only" "pages" "true" "none" "true" "false"
     exit 0
   fi
-  write_outputs "rebuild" "dashboard" "false" "pages-fast" "true" "true"
+  # Script-only pushes: light insights rebuild (not darwin-fast / full ticker trees).
+  write_outputs "rebuild" "pages" "false" "insights" "true" "true"
   exit 0
 fi
 
-write_outputs "rebuild" "dashboard" "false" "pages-fast" "true" "true"
+write_outputs "rebuild" "pages" "false" "insights" "true" "true"

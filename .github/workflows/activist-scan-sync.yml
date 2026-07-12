@@ -1,8 +1,7 @@
 name: Activist Scan Sync
 
+# Scheduled work moved to Data Pipeline (daily 06:00 UTC). Manual fallback only.
 on:
-  schedule:
-    - cron: "0 6 * * *"
   workflow_dispatch:
     inputs:
       ticker:
@@ -86,4 +85,4 @@ jobs:
           message: "chore: activist scan sync $(date -u +%Y-%m-%d)"
 
       - name: Pipeline summary
-        run: echo "Activist Scan Sync complete. Deploy Dashboard chains via workflow_run."
+        run: echo "Activist Scan Sync complete. Prefer Data Pipeline for scheduled runs."

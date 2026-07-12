@@ -1,8 +1,7 @@
 name: Drive Intake Sync
 
+# Scheduled work moved to Data Pipeline (daily 14:00 UTC). Manual fallback only.
 on:
-  schedule:
-    - cron: "20 * * * *"
   workflow_dispatch:
     inputs:
       kind:
@@ -57,29 +56,20 @@ jobs:
         run: |
           if [ -z "$GOOGLE_APPLICATION_CREDENTIALS_JSON" ]; then
             echo "configured=false" >> "$GITHUB_OUTPUT"
-            MSG="GOOGLE_APPLICATION_CREDENTIALS_JSON is not configured in Settings → Secrets and variables → Actions."
-            DOC="See README.md and _system/reference/document-store/drive_intake_readme.md."
-            if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-              echo "::error::${MSG} ${DOC}"
-              exit 1
-            fi
-            echo "::warning::Skipping Drive Intake Sync — ${MSG} ${DOC}"
-          else
-            echo "configured=true" >> "$GITHUB_OUTPUT"
+            echo "::error::GOOGLE_APPLICATION_CREDENTIALS_JSON is not configured."
+            exit 1
           fi
+          echo "configured=true" >> "$GITHUB_OUTPUT"
 
       - name: Set up Python
-        if: steps.google_creds.outputs.configured == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
       - name: Install dependencies
-        if: steps.google_creds.outputs.configured == 'true'
         run: pip install -r _system/scripts/requirements.txt
 
       - name: Configure Google credentials
-        if: steps.google_creds.outputs.configured == 'true'
         env:
           GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
         run: |
@@ -87,7 +77,7 @@ jobs:
           echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/google-service-account.json" >> "$GITHUB_ENV"
 
       - name: Import Drive intake PDFs
-        if: steps.google_creds.outputs.configured == 'true'
+        id: import
         env:
           KIND: ${{ github.event.inputs.kind || '' }}
           LIMIT: ${{ github.event.inputs.limit || '0' }}
@@ -96,30 +86,25 @@ jobs:
           if [ -n "$KIND" ]; then ARGS="$ARGS --kind $KIND"; fi
           if [ -n "$LIMIT" ] && [ "$LIMIT" != "0" ]; then ARGS="$ARGS --limit $LIMIT"; fi
           python _system/scripts/import_drive_intake.py $ARGS
+          COUNT=$(python -c "import json; from pathlib import Path; p=Path('_system/reference/document-store/drive_intake_latest.json'); print(json.loads(p.read_text())['summary'].get('imported_count',0) if p.exists() else 0)")
+          echo "imported=$COUNT" >> "$GITHUB_OUTPUT"
 
-      - name: Activist scan (SEC + publishers)
-        if: steps.google_creds.outputs.configured == 'true'
-        run: |
-          python _system/scripts/scan_activist_sources.py --sec-only --reconcile || true
-          python _system/scripts/short_scan_batch.py
-
-      - name: Rebuild document registry and dashboard data
-        if: steps.google_creds.outputs.configured == 'true'
+      - name: Rebuild insights (only when files imported)
+        if: steps.import.outputs.imported != '0'
         uses: ./.github/actions/rebuild-data
         env:
           OAUTH_CLIENT_ID: ${{ vars.OAUTH_CLIENT_ID }}
           OAUTH_PROXY_URL: ${{ vars.OAUTH_PROXY_URL }}
         with:
-          profile: intake-full
+          profile: insights
           mirror_docs: "true"
 
       - name: Commit imported documents
-        if: steps.google_creds.outputs.configured == 'true'
+        if: steps.import.outputs.imported != '0'
         uses: ./.github/actions/commit-main
         with:
           message: "chore: sync Drive intake documents $(date -u +%Y-%m-%d)"
 
-      - name: Pipeline summary
-        if: steps.google_creds.outputs.configured == 'true'
-        run: |
-          echo "Drive Intake Sync complete. Deploy Dashboard chains via workflow_run."
+      - name: Skip note
+        if: steps.import.outputs.imported == '0'
+        run: echo "No Drive files imported; skipping rebuild and commit."

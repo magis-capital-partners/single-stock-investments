@@ -5,8 +5,8 @@ on:
     workflows:
       - Activist Scan Sync
       - Daily Download & Dashboard Sync
+      - Data Pipeline
       - Darwin Portfolio Refresh
-      - Deploy Dashboard (GitHub Pages)
       - Deploy OAuth Proxy (Cloudflare)
       - Drive Intake Sync
       - Marvin Deep Dive
@@ -49,15 +49,31 @@ jobs:
     timeout-minutes: 20
 
     steps:
-      - uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: false
-          android: true
-          dotnet: true
-          haskell: true
-          docker-images: true
-          swap-storage: true
+      - name: Skip fast failures
+        if: github.event_name == 'workflow_run'
+        id: duration
+        env:
+          RUN_ID: ${{ github.event.workflow_run.id }}
+          CREATED: ${{ github.event.workflow_run.created_at }}
+          UPDATED: ${{ github.event.workflow_run.updated_at }}
+        run: |
+          set -euo pipefail
+          # Skip autofix for failures that ended in under 5 minutes (checkout flakes, cancel races).
+          python3 - <<'PY'
+          import os, datetime
+          created = os.environ["CREATED"].replace("Z", "+00:00")
+          updated = os.environ["UPDATED"].replace("Z", "+00:00")
+          c = datetime.datetime.fromisoformat(created)
+          u = datetime.datetime.fromisoformat(updated)
+          secs = (u - c).total_seconds()
+          print(f"upstream_duration_sec={secs:.0f}")
+          open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8").write(
+              f"long_enough={'true' if secs >= 300 else 'false'}\n"
+          )
+          PY
+
       - name: Checkout
+        if: github.event_name == 'workflow_dispatch' || steps.duration.outputs.long_enough == 'true'
         uses: actions/checkout@v4
         with:
           sparse-checkout: _system/ci_autofix
@@ -65,6 +81,7 @@ jobs:
           filter: blob:none
 
       - name: Set up Node.js
+        if: github.event_name == 'workflow_dispatch' || steps.duration.outputs.long_enough == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: "22"
@@ -72,10 +89,12 @@ jobs:
           cache-dependency-path: _system/ci_autofix/package-lock.json
 
       - name: Install CI Autofix dependencies
+        if: github.event_name == 'workflow_dispatch' || steps.duration.outputs.long_enough == 'true'
         working-directory: _system/ci_autofix
         run: npm ci
 
       - name: Triage failure and dispatch Cursor if appropriate
+        if: github.event_name == 'workflow_dispatch' || steps.duration.outputs.long_enough == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           GITHUB_TOKEN: ${{ github.token }}
@@ -84,3 +103,7 @@ jobs:
           CI_AUTOFIX_RUN_ID: ${{ github.event.inputs.run_id || github.event.workflow_run.id }}
           CI_AUTOFIX_FORCE_AGENT: ${{ github.event.inputs.force_agent || 'false' }}
         run: node _system/ci_autofix/ci_autofix.mjs
+
+      - name: Skipped short failure
+        if: github.event_name == 'workflow_run' && steps.duration.outputs.long_enough != 'true'
+        run: echo "Skipping CI Autofix — upstream failure shorter than 5 minutes."

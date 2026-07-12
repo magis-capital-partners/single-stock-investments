@@ -2,10 +2,13 @@
 """Emit git sparse-checkout paths for CI profiles (one path per line).
 
 Profiles:
-  news         — portfolio news ingest (JSON only, no PDF trees)
-  marvin-pick  — marvin_pick_ticker metadata (research md/json, manifests)
-  darwin       — Darwin refresh + dashboard rebuild without PDF blobs
-  dashboard    — same as darwin (alias)
+  news         — portfolio news ingest (holdings news JSON only)
+  marvin-pick  — marvin_pick_ticker metadata (holdings research md/json)
+  darwin       — Darwin refresh: no per-ticker trees (base paths only)
+  dashboard    — deploy rebuild checkout (base paths only; alias of darwin)
+
+Base paths (_system, .github, dashboard, docs) are always set by
+ci_checkout_workspace.sh; this script only emits extra ticker paths.
 """
 from __future__ import annotations
 
@@ -16,7 +19,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 REGISTRY_PATH = ROOT / "_system" / "portfolio" / "registry.json"
 
-SKIP_TICKER_DIRS = {"_system", "dashboard", "docs", ".github", ".git", ".cursor"}
+# Soft cap for darwin/dashboard (must stay tiny — SPX-scale explosion caused 5h checkouts).
+DARWIN_PATH_CAP = 200
 
 
 def load_holdings() -> list[str]:
@@ -26,29 +30,17 @@ def load_holdings() -> list[str]:
     return sorted((reg.get("holdings") or {}).keys())
 
 
-def list_ticker_dirs() -> list[str]:
-    tickers = set(load_holdings())
-    for path in ROOT.iterdir():
-        if not path.is_dir():
-            continue
-        name = path.name
-        if name.startswith(".") or name in SKIP_TICKER_DIRS:
-            continue
-        tickers.add(name)
-    return sorted(tickers)
-
-
 def paths_for_profile(profile: str) -> list[str]:
-    tickers = list_ticker_dirs()
+    holdings = load_holdings()
     paths: list[str] = []
 
     if profile == "news":
-        for ticker in tickers:
+        for ticker in holdings:
             paths.append(f"{ticker}/research/news")
         return paths
 
     if profile == "marvin-pick":
-        for ticker in tickers:
+        for ticker in holdings:
             paths.extend(
                 [
                     f"{ticker}/research/news",
@@ -63,40 +55,41 @@ def paths_for_profile(profile: str) -> list[str]:
         return paths
 
     if profile in {"darwin", "dashboard"}:
-        manifest_files = (
-            "DOWNLOAD_MANIFEST.json",
-            "TRANSCRIPT_MANIFEST.json",
-        )
-        for ticker in tickers:
-            paths.extend(
-                [
-                    f"{ticker}/research",
-                    f"{ticker}/.onboard_status.json",
-                    f"{ticker}/INDEX.csv",
-                    f"{ticker}/_download_log.txt",
-                    f"{ticker}/README.md",
-                    f"{ticker}/document-index.csv",
-                    f"{ticker}/third-party-analyses/activist_reports_index.json",
-                    f"{ticker}/third-party-analyses/activist_reports",
-                    f"{ticker}/third-party-analyses/short_reports",
-                ]
-            )
-            for name in manifest_files:
-                paths.append(f"{ticker}/investor-documents/{name}")
-        return paths
+        # Darwin + pages rebuild read market-data / portfolio / dashboard under
+        # _system and dashboard/ (already in base sparse set). No ticker trees.
+        return []
 
     raise SystemExit(f"Unknown sparse profile: {profile}")
 
 
 def main() -> None:
-    if len(sys.argv) != 2:
-        raise SystemExit(f"Usage: {sys.argv[0]} <profile>")
-    profile = sys.argv[1].strip()
+    args = [a for a in sys.argv[1:] if a]
+    count_only = False
+    if args and args[0] == "--count":
+        count_only = True
+        args = args[1:]
+    if len(args) != 1:
+        raise SystemExit(f"Usage: {sys.argv[0]} [--count] <profile>")
+    profile = args[0].strip()
     seen: set[str] = set()
+    out: list[str] = []
     for path in paths_for_profile(profile):
         if path not in seen:
             seen.add(path)
-            print(path)
+            out.append(path)
+
+    if profile in {"darwin", "dashboard"} and len(out) > DARWIN_PATH_CAP:
+        raise SystemExit(
+            f"ERROR: sparse profile {profile!r} has {len(out)} paths "
+            f"(cap {DARWIN_PATH_CAP}). Refusing SPX-scale checkout explosion."
+        )
+
+    if count_only:
+        print(len(out))
+        return
+
+    for path in out:
+        print(path)
 
 
 if __name__ == "__main__":

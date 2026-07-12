@@ -2,33 +2,33 @@
 
 Shared logic lives in **composite actions** (`.github/actions/`) — these do **not** appear in the GitHub Actions sidebar. Only top-level workflow files in `.github/workflows/` are listed.
 
-## Architecture
+## Architecture (2026-07-12 consolidation)
 
 ```
-Data pipelines (commit to main)
-  Daily Download & Dashboard Sync
-  Drive Intake Sync
-  Activist Scan Sync
-  Portfolio News Ingest
-  Darwin Portfolio Refresh
-  Marvin Onboard Ticker
+Data Pipeline (single scheduled writer lane)
+  ├─ 03:00 UTC  intake-full (nightly)
+  ├─ 06:00 UTC  activist
+  ├─ 12:00 UTC  downloads  ──workflow_run──► Daily Sync (Marvin pick)
+  ├─ 14:00 UTC  drive intake (daily; skip rebuild if 0 imports)
+  └─ :30 /6h    portfolio news
         │
         │ workflow_run (success)
         ▼
-Deploy Dashboard (GitHub Pages)
-  ├─ optional: deploy-oauth composite action
-  └─ publish-dashboard composite action
+Deploy Dashboard (GitHub Pages) — deploy-only by default
+
+Manual only
+  Darwin Portfolio Refresh
+  Legacy wrappers: Drive / Activist / News (emergency)
 
 Agent workflows (open PRs)
-  Marvin Deep Dive (modes: deep-dive | auto-pick | batch)
-  Vicki IR Harvest
+  Marvin Deep Dive, Vicki IR Harvest, Marvin Onboard
 ```
 
 ## Composite actions (hidden from sidebar)
 
 | Path | Purpose |
 |------|---------|
-| `.github/actions/rebuild-data/` | Dashboard rebuild profiles |
+| `.github/actions/rebuild-data/` | Dashboard rebuild via `ci_rebuild_profile.py` |
 | `.github/actions/checkout-vault/` | Clone private `research-vault` |
 | `.github/actions/commit-vault/` | Push letter corpus to vault |
 | `.github/actions/commit-main/` | Push to main with rebase retry |
@@ -41,102 +41,66 @@ Agent workflows (open PRs)
 
 GitHub requires `actions/checkout` before any `./.github/actions/*` reference. Every job therefore uses this **three-step bootstrap** instead of a composite checkout action:
 
-1. `jlumbroso/free-disk-space@main` (when disk pressure matters)
+1. `jlumbroso/free-disk-space@main` (heavy profiles only: full tree, intake-full, darwin)
 2. `actions/checkout@v4` with sparse paths: `ci_checkout_workspace.sh`, **`ci_resolve_checkout_ref.sh`**, `ci_sparse_checkout_paths.py` (all three required)
 3. `bash _system/scripts/ci_checkout_workspace.sh <profile> [ref] [depth]`
 
-Ref resolution lives in `_system/scripts/ci_resolve_checkout_ref.sh` — **never** pass `GITHUB_REF_NAME` directly to `git fetch`. On `pull_request` events GitHub sets `GITHUB_REF_NAME=228/merge`, which is not a fetchable branch; the resolver uses `GITHUB_HEAD_REF` (PR branch) or `pull/N/merge` from `GITHUB_REF`.
+Sparse ticker paths are applied with **`git sparse-checkout set --stdin`** (batched). Never loop `sparse-checkout add` per path.
 
 | Profile | Sparse paths | Typical use |
 |---------|--------------|-------------|
-| `full` / `history` | disabled (full tree) | lint diffs, onboard |
-| `minimal` / `marvin-agent` | `_system`, `.github` | prompt sync, agents |
-| `news` / `marvin-pick` / `darwin` / `dashboard` | base + ticker paths from `ci_sparse_checkout_paths.py` | portfolio jobs |
-| `pages` | `_system`, `.github`, `dashboard`, `docs` | GitHub Pages deploy-only (no ticker trees) |
+| `full` / `history` | disabled (full tree) | downloads, intake-full, activist |
+| `minimal` / `marvin-agent` | `_system`, `.github` | agents |
+| `news` / `marvin-pick` | base + **holdings-only** ticker paths | news / Marvin pick |
+| `darwin` / `dashboard` | base only (`_system`, `.github`, `dashboard`, `docs`) | Darwin refresh |
+| `pages` | `_system`, `.github`, `dashboard`, `docs` | Pages deploy-only |
 
-### Guardrails (avoid regressions)
+`darwin` / `dashboard` must stay under **200** extra paths (`ci_sparse_checkout_paths.py --count`).
 
-| Change | Required follow-up |
-|--------|-------------------|
-| Edit `ci_checkout_workspace.sh` or `ci_resolve_checkout_ref.sh` | Run `bash _system/scripts/test_ci_checkout_workspace.sh` locally; **CI bootstrap smoke** runs on PR |
-| Edit any workflow bootstrap sparse-checkout block | Run `python _system/scripts/lint_ci_bootstrap.py`; smoke workflow lint job catches missing resolver script |
-| Add a new `pull_request` workflow using bootstrap checkout | Ensure it either relies on the resolver (no explicit ref) or passes `${{ github.head_ref }}` |
-| Add a new sparse profile | Update `ci_sparse_checkout_paths.py` and document in this table |
-| Replace bootstrap with a composite action | **Don't** — composites cannot run before the first checkout |
-
-**CI bootstrap smoke** (`.github/workflows/ci-bootstrap-smoke.yml`) runs unit tests plus a live `minimal` checkout on every PR that touches bootstrap scripts or research-quality workflow paths.
-
-## Research vault (two-repo split)
-
-Licensed corpora (superinvestor letters, HK PDFs) live in private **`magis-capital-partners/research-vault`**. CI clones it via `checkout-vault` before insight rebuilds and letter backfill. Operator guide: [`research-vault-split.md`](research-vault-split.md).
-
-Required ops-repo secrets: `RESEARCH_VAULT_REPO_URL`, `RESEARCH_VAULT_CLONE_TOKEN`.
-
-## Visible workflows (~14)
+## Visible workflows
 
 | Workflow | Schedule / trigger | Commits main? | Chains deploy? |
 |----------|-------------------|---------------|----------------|
-| Daily Download & Dashboard Sync | 12:00 UTC, manual | Yes | Yes |
-| Drive Intake Sync | :20 hourly, manual | Yes | Yes |
-| Activist Scan Sync | 06:00 UTC, manual | Yes | Yes |
-| Portfolio News Ingest | :30 every 6h, manual | Yes | Yes |
-| Darwin Portfolio Refresh | Mon 12:00 UTC, push paths, manual | Yes | Yes |
-| Deploy Dashboard (GitHub Pages) | push paths, manual, workflow_run | No | N/A |
+| **Data Pipeline** | multiple crons + manual job picker | Yes | Yes |
+| Daily Download & Dashboard Sync | after Data Pipeline downloads / manual | No (Marvin PR) | No |
+| Darwin Portfolio Refresh | **manual only** | Yes | Yes |
+| Drive / Activist / News | manual fallback only | Yes | Yes |
+| Deploy Dashboard (GitHub Pages) | narrow push, manual, workflow_run | No | N/A |
 | Deploy OAuth Proxy (Cloudflare) | push oauth-proxy, manual | No | No |
-| Marvin Onboard Ticker | manual, repository_dispatch | Yes | Yes |
-| Marvin Deep Dive | manual (3 modes), push queue | No (PR) | On merge |
-| Vicki IR Harvest | manual, push queue | No (PR) | On merge |
+| Marvin Onboard / Deep Dive / Vicki | manual / queue | varies | On merge |
 | Research quality (PR) | PR paths | No | No |
 | CI bootstrap smoke | PR/push bootstrap paths | No | No |
-| CI Autofix | workflow_run failures, manual | Maybe | No |
-| CI Autofix Reusable | workflow_call only | — | — |
-| pages-build-deployment | GitHub-managed | — | — |
+| CI Autofix | upstream **failures ≥5 min** (not Deploy Dashboard) | Maybe | No |
 
-## Marvin Deep Dive modes
+## Rebuild profiles (`ci_rebuild_profile.py`)
 
-| Mode | When to use |
-|------|-------------|
-| `deep-dive` | Single ticker (requires `ticker` input) |
-| `auto-pick` | Pick holding with new docs; optional `force_rotate` |
-| `batch` | Matrix from queue file or comma-separated `tickers` |
+| Profile | Alias | Used by |
+|---------|-------|---------|
+| `full` | `intake-full` | Data Pipeline nightly |
+| `activist` | — | Data Pipeline / manual activist |
+| `darwin` | `darwin-full` | Darwin Portfolio Refresh |
+| `insights` | `pages-fast` | Deploy rebuild, Drive (when imports > 0) |
+| `minimal` | — | light dashboard_data only |
 
-Queue file push (`_system/data/deep_dive_dispatch_queue.json`) auto-runs **batch** mode.
-
-Daily auto-pick after download still runs inside **Daily Download & Dashboard Sync** (`marvin-refresh` job).
-
-## Rebuild profiles
-
-| Profile | Used by |
-|---------|---------|
-| `intake-full` | Drive Intake Sync |
-| `activist` | Activist Scan Sync |
-| `darwin-full` | Darwin Portfolio Refresh |
-| `darwin-fast` | Legacy full refresh (avoid on deploy) |
-| `pages-fast` | Deploy Dashboard when rebuild is required (`build_insights` + `build_dashboard_data`) |
+**Removed:** `darwin-fast`.
 
 ## Deploy Dashboard speed model
 
-Upstream data pipelines (Drive Intake, Activist Scan, etc.) already run `rebuild-data` and commit `dashboard/data/` before chaining deploy via `workflow_run`. The deploy job must **not** repeat that work.
-
 | Trigger | Checkout | Rebuild | Typical runtime |
 |---------|----------|---------|-----------------|
-| `workflow_run` (chain) | `pages` | none | ~3–5 min |
-| `push` (dashboard/docs only) | `pages` | none + validate | ~5–8 min |
-| `push` (research/scripts) | `dashboard` | `pages-fast` | ~15–25 min |
+| `workflow_run` (chain) | `pages` | none | ~1–5 min |
+| `push` (dashboard/docs only) | `pages` | none + validate | ~3–8 min |
+| `push` (deploy scripts) | `pages` | `insights` | ~10–20 min |
 | `workflow_dispatch` + skip rebuild | `pages` | none | ~3–5 min |
 
-Mode selection: `_system/scripts/ci_dashboard_deploy_mode.sh` (or workflow_dispatch inputs).
-
-**Previous failure mode:** deploy used `darwin-fast` + full ticker sparse checkout on every chain, exceeding the 45-minute job timeout.
+Mode selection: `_system/scripts/ci_dashboard_deploy_mode.sh`.
 
 ## Which workflow should I run?
 
 | Task | Workflow |
 |------|----------|
-| Live site stale | Deploy Dashboard (GitHub Pages) |
-| OAuth sign-in fails | Deploy OAuth Proxy, then Deploy Dashboard |
-| Onboard new ticker | Marvin Onboard Ticker |
-| Deep dive one ticker | Marvin Deep Dive → mode `deep-dive` |
-| Auto-pick new docs | Marvin Deep Dive → mode `auto-pick` |
-| Batch from queue | Marvin Deep Dive → mode `batch` (or push queue file) |
-| IR gap harvest | Vicki IR Harvest |
+| Nightly full rebuild | Data Pipeline → `intake-full` (auto 03:00) |
+| Drive PDFs | Data Pipeline → `drive` (auto 14:00) or Drive Intake Sync manual |
+| Darwin refresh | **Darwin Portfolio Refresh** (manual) |
+| Live site stale | Deploy Dashboard (skip rebuild) |
+| Deep dive | Marvin Deep Dive |

@@ -1,66 +1,55 @@
 name: Daily Download & Dashboard Sync
 
+# Downloads moved to Data Pipeline (12:00 UTC). This workflow runs Marvin
+# auto-pick after a successful downloads job (or on manual dispatch).
+
 on:
-  schedule:
-    - cron: "0 12 * * *"  # Daily 12:00 UTC
   workflow_dispatch:
+  workflow_run:
+    workflows: ["Data Pipeline"]
+    types: [completed]
+    branches: [main]
 
 permissions:
-  contents: write
+  contents: read
+  actions: read
 
 concurrency:
-  group: data-commit-main
-  cancel-in-progress: false
+  group: marvin-daily-refresh
+  cancel-in-progress: true
 
 jobs:
-  download-and-sync:
+  gate:
     runs-on: ubuntu-latest
-    timeout-minutes: 360
-
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
+    outputs:
+      run_marvin: ${{ steps.check.outputs.run_marvin }}
     steps:
-      - uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: false
-          android: true
-          dotnet: true
-          haskell: true
-          docker-images: true
-          swap-storage: true
-      - uses: actions/checkout@v4
-        with:
-          sparse-checkout: |
-            _system/scripts/ci_checkout_workspace.sh
-            _system/scripts/ci_resolve_checkout_ref.sh
-            _system/scripts/ci_sparse_checkout_paths.py
-          sparse-checkout-cone-mode: false
-          fetch-depth: 1
-      - name: Checkout workspace (full — downloads write PDFs)
-        run: bash _system/scripts/ci_checkout_workspace.sh full
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install transcript pipeline dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y tesseract-ocr poppler-utils
-          pip install -r _system/scripts/requirements.txt -r _system/scripts/requirements-transcripts.txt
-
-      - name: Run portfolio downloads
+      - id: check
         env:
-          POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY || secrets.POLYGON_IO_API_KEY }}
-          POLYGON_EARNINGS_CACHE_MAX_AGE_HOURS: "36"
-        run: python _system/scripts/download_all_holdings.py
-
-      - name: Commit and push workspace
-        uses: ./.github/actions/commit-main
-        with:
-          message: "chore: daily download sync $(date -u +%Y-%m-%d)"
+          GH_TOKEN: ${{ github.token }}
+          EVENT_NAME: ${{ github.event_name }}
+          RUN_ID: ${{ github.event.workflow_run.id || '' }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            echo "run_marvin=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          JOBS=$(gh api "repos/${{ github.repository }}/actions/runs/${RUN_ID}/jobs" \
+            --jq '.jobs[] | select(.name=="downloads") | .conclusion' 2>/dev/null || true)
+          if echo "$JOBS" | grep -qx success; then
+            echo "run_marvin=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run_marvin=false" >> "$GITHUB_OUTPUT"
+            echo "Skipping Marvin — upstream Data Pipeline did not complete downloads."
+          fi
 
   marvin-refresh:
-    needs: download-and-sync
+    needs: gate
+    if: needs.gate.outputs.run_marvin == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 120
     env:
@@ -71,14 +60,6 @@ jobs:
       contents: read
 
     steps:
-      - uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: false
-          android: true
-          dotnet: true
-          haskell: true
-          docker-images: true
-          swap-storage: true
       - uses: actions/checkout@v4
         with:
           sparse-checkout: |
@@ -126,11 +107,3 @@ jobs:
           elif [ -n "${{ steps.pick.outputs.ticker }}" ]; then
             echo "Refresh PR started for ${{ steps.pick.outputs.ticker }} (${{ steps.pick.outputs.reason }})."
           fi
-
-  pipeline-summary:
-    needs: marvin-refresh
-    if: always()
-    runs-on: ubuntu-latest
-    steps:
-      - name: Summary
-        run: echo "Daily Download & Dashboard Sync complete. Portfolio news runs on the 6h schedule. Deploy Dashboard chains via workflow_run."

@@ -1,16 +1,8 @@
 name: Darwin Portfolio Refresh
 
+# Manual only — no schedule, no push. Run when Darwin code/mandate needs a full rebuild.
 on:
-  schedule:
-    - cron: "0 12 * * 1"
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - "_system/scripts/darwin/**"
-      - "_system/portfolio/darwin_mandate.json"
-      - "**/research/valuation.json"
-      - "_system/portfolio/registry.json"
 
 permissions:
   contents: write
@@ -22,6 +14,7 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-latest
+    timeout-minutes: 90
     env:
       RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
       RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
@@ -43,8 +36,17 @@ jobs:
             _system/scripts/ci_sparse_checkout_paths.py
           sparse-checkout-cone-mode: false
           fetch-depth: 1
-      - name: Checkout workspace (sparse — research JSON, no PDF trees)
-        run: bash _system/scripts/ci_checkout_workspace.sh darwin
+      - name: Checkout workspace (sparse — no ticker PDF trees)
+        timeout-minutes: 15
+        run: |
+          set -euo pipefail
+          COUNT=$(python3 _system/scripts/ci_sparse_checkout_paths.py --count darwin)
+          echo "darwin sparse extra paths=$COUNT (cap 200)"
+          if [ "$COUNT" -gt 200 ]; then
+            echo "::error::darwin sparse profile exploded ($COUNT paths). Aborting."
+            exit 1
+          fi
+          bash _system/scripts/ci_checkout_workspace.sh darwin
 
       - uses: actions/setup-python@v5
         with:

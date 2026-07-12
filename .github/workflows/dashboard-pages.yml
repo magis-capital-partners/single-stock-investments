@@ -4,32 +4,18 @@ on:
   push:
     branches: [main]
     paths:
+      # Deploy-only / light rebuild when committed dashboard or deploy scripts change.
+      # Heavy research/data rebuilds happen in Data Pipeline before workflow_run deploy.
       - "dashboard/**"
+      - "docs/**"
       - "_system/scripts/build_dashboard_data.py"
-      - "_system/scripts/build_index_membership.py"
-      - "_system/scripts/harvest_index_constituents.py"
-      - "_system/scripts/index_market_inputs.py"
-      - "_system/scripts/build_nol_screener.py"
       - "_system/scripts/validate_dashboard_data.py"
-      - "_system/data/index_rules.json"
-      - "_system/data/index_calendar.json"
-      - "_system/data/index_memberships_seed.json"
-      - "_system/data/index_announcements.jsonl"
-      - "_system/reference/market-data/index/**"
-      - "_system/portfolio/investment_sleeves.json"
-      - "_system/reference/market-data/screens/**"
-      - "_system/scripts/build_darwin_portfolio.py"
-      - "_system/scripts/darwin/**"
-      - "_system/portfolio/darwin_mandate.json"
-      - "_system/portfolio/registry.json"
-      - "_system/portfolio/holdings.md"
-      - "_system/portfolio/classification.json"
-      - "**/research/**"
-      - "**/_download_log.txt"
-      - "**/INDEX.csv"
-      - "**/document-index.csv"
+      - "_system/scripts/ci_dashboard_deploy_mode.sh"
+      - "_system/scripts/ci_rebuild_profile.py"
       - ".github/workflows/dashboard-pages.yml"
-      - ".github/actions/**"
+      - ".github/actions/publish-dashboard/**"
+      - ".github/actions/rebuild-data/**"
+      - ".github/actions/deploy-pages-retry/**"
   workflow_dispatch:
     inputs:
       deploy_oauth:
@@ -44,12 +30,12 @@ on:
         default: false
   workflow_run:
     workflows:
-      - Marvin Onboard Ticker
-      - Daily Download & Dashboard Sync
+      - Data Pipeline
       - Drive Intake Sync
       - Activist Scan Sync
       - Portfolio News Ingest
       - Darwin Portfolio Refresh
+      - Daily Download & Dashboard Sync
     types: [completed]
     branches: [main]
 
@@ -60,7 +46,7 @@ permissions:
 
 concurrency:
   group: dashboard-deploy
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   oauth-secrets:
@@ -84,14 +70,6 @@ jobs:
     outputs:
       changed: ${{ steps.check.outputs.changed }}
     steps:
-      - uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: false
-          android: true
-          dotnet: true
-          haskell: true
-          docker-images: true
-          swap-storage: true
       - uses: actions/checkout@v4
         with:
           fetch-depth: 2
@@ -119,14 +97,6 @@ jobs:
       )
     runs-on: ubuntu-latest
     steps:
-      - uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: false
-          android: true
-          dotnet: true
-          haskell: true
-          docker-images: true
-          swap-storage: true
       - uses: actions/checkout@v4
         with:
           sparse-checkout: |
@@ -187,9 +157,9 @@ jobs:
               echo "needs_disk_cleanup=false" >> "$GITHUB_OUTPUT"
             else
               echo "mode=rebuild" >> "$GITHUB_OUTPUT"
-              echo "checkout_profile=dashboard" >> "$GITHUB_OUTPUT"
+              echo "checkout_profile=pages" >> "$GITHUB_OUTPUT"
               echo "skip_rebuild=false" >> "$GITHUB_OUTPUT"
-              echo "rebuild_profile=pages-fast" >> "$GITHUB_OUTPUT"
+              echo "rebuild_profile=insights" >> "$GITHUB_OUTPUT"
               echo "validate=true" >> "$GITHUB_OUTPUT"
               echo "needs_disk_cleanup=true" >> "$GITHUB_OUTPUT"
             fi

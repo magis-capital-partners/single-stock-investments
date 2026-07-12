@@ -3,7 +3,7 @@
 #
 # GitHub Actions cannot use ./.github/actions/* before actions/checkout runs.
 # Every job must bootstrap with public actions, then call this script:
-#   1. jlumbroso/free-disk-space@main
+#   1. jlumbroso/free-disk-space@main (optional; heavy profiles only)
 #   2. actions/checkout@v4 (sparse: ci_checkout_workspace.sh, ci_resolve_checkout_ref.sh, ci_sparse_checkout_paths.py)
 #   3. bash _system/scripts/ci_checkout_workspace.sh <profile> [ref] [depth]
 #
@@ -45,6 +45,24 @@ checkout_ref() {
   git checkout -B "$REF" "origin/$REF" 2>/dev/null || git checkout FETCH_HEAD
 }
 
+apply_sparse_paths() {
+  local paths_file
+  paths_file=$(mktemp)
+  {
+    echo "_system"
+    echo ".github"
+    echo "dashboard"
+    echo "docs"
+    python3 "$SCRIPT_DIR/ci_sparse_checkout_paths.py" "$PROFILE"
+  } >"$paths_file"
+  local count
+  count=$(grep -c . "$paths_file" || true)
+  echo "Sparse profile=$PROFILE path_count=$count (batched set --stdin)"
+  git sparse-checkout init --no-cone
+  git sparse-checkout set --stdin <"$paths_file"
+  rm -f "$paths_file"
+}
+
 case "$PROFILE" in
   full|history)
     git sparse-checkout disable 2>/dev/null || true
@@ -65,16 +83,11 @@ case "$PROFILE" in
     ;;
   news|marvin-pick|darwin|dashboard)
     git sparse-checkout init --no-cone
+    # Seed with base dirs so fetch can resolve scripts before path list runs.
     git sparse-checkout set _system .github dashboard docs
     git fetch --depth="$FETCH_DEPTH" --filter=blob:none origin "$REF"
     checkout_ref
-    ADDED=0
-    while IFS= read -r path; do
-      [ -z "$path" ] && continue
-      git sparse-checkout add "$path"
-      ADDED=$((ADDED + 1))
-    done < <(python3 _system/scripts/ci_sparse_checkout_paths.py "$PROFILE")
-    echo "Sparse profile=$PROFILE added_paths=$ADDED"
+    apply_sparse_paths
     git read-tree -mu HEAD
     ;;
   *)

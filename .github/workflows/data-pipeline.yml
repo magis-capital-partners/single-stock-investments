@@ -1,0 +1,383 @@
+name: Data Pipeline
+
+# Single writer lane for scheduled data jobs. Darwin is manual-only
+# (see darwin-refresh.yml). Marvin pick stays in daily-sync.yml after downloads.
+
+on:
+  schedule:
+    - cron: "0 3 * * *"     # nightly intake-full
+    - cron: "0 6 * * *"     # activist scan
+    - cron: "0 12 * * *"    # portfolio downloads
+    - cron: "0 14 * * *"    # drive intake (daily)
+    - cron: "30 */6 * * *"  # portfolio news
+  workflow_dispatch:
+    inputs:
+      job:
+        description: "Which pipeline job to run"
+        required: true
+        type: choice
+        default: intake-full
+        options:
+          - intake-full
+          - activist
+          - downloads
+          - drive
+          - news
+          - all
+
+permissions:
+  contents: write
+
+# Serialize writers across workflows without cancelling a long downloads run.
+# Each committing job opts into data-commit-main below.
+
+jobs:
+  decide:
+    runs-on: ubuntu-latest
+    outputs:
+      intake_full: ${{ steps.pick.outputs.intake_full }}
+      activist: ${{ steps.pick.outputs.activist }}
+      downloads: ${{ steps.pick.outputs.downloads }}
+      drive: ${{ steps.pick.outputs.drive }}
+      news: ${{ steps.pick.outputs.news }}
+    steps:
+      - id: pick
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          SCHEDULE: ${{ github.event.schedule }}
+          JOB: ${{ github.event.inputs.job || '' }}
+        run: |
+          set -euo pipefail
+          intake_full=false; activist=false; downloads=false; drive=false; news=false
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            case "$JOB" in
+              intake-full) intake_full=true ;;
+              activist) activist=true ;;
+              downloads) downloads=true ;;
+              drive) drive=true ;;
+              news) news=true ;;
+              all)
+                intake_full=true; activist=true; downloads=true; drive=true; news=true
+                ;;
+              *) echo "::error::Unknown job=$JOB"; exit 1 ;;
+            esac
+          else
+            case "$SCHEDULE" in
+              "0 3 * * *") intake_full=true ;;
+              "0 6 * * *") activist=true ;;
+              "0 12 * * *") downloads=true ;;
+              "0 14 * * *") drive=true ;;
+              "30 */6 * * *") news=true ;;
+              *)
+                echo "::warning::Unrecognized schedule='$SCHEDULE'; defaulting to intake-full"
+                intake_full=true
+                ;;
+            esac
+          fi
+          {
+            echo "intake_full=$intake_full"
+            echo "activist=$activist"
+            echo "downloads=$downloads"
+            echo "drive=$drive"
+            echo "news=$news"
+          } >> "$GITHUB_OUTPUT"
+          echo "Selected: intake_full=$intake_full activist=$activist downloads=$downloads drive=$drive news=$news"
+
+  intake-full:
+    needs: decide
+    if: needs.decide.outputs.intake_full == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    concurrency:
+      group: data-commit-main
+      cancel-in-progress: false
+    env:
+      RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+      RESEARCH_VAULT_ROOT: _external/research-vault
+    steps:
+      - uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          docker-images: true
+          swap-storage: true
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts/ci_checkout_workspace.sh
+            _system/scripts/ci_resolve_checkout_ref.sh
+            _system/scripts/ci_sparse_checkout_paths.py
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Checkout workspace (full)
+        run: bash _system/scripts/ci_checkout_workspace.sh full
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Nightly intake-full rebuild
+        uses: ./.github/actions/rebuild-data
+        env:
+          OAUTH_CLIENT_ID: ${{ vars.OAUTH_CLIENT_ID }}
+          OAUTH_PROXY_URL: ${{ vars.OAUTH_PROXY_URL }}
+        with:
+          profile: full
+          mirror_docs: "true"
+          validate: "true"
+      - name: Commit artifacts
+        uses: ./.github/actions/commit-main
+        with:
+          message: "chore: nightly intake-full $(date -u +%Y-%m-%d)"
+
+  activist:
+    needs: decide
+    if: needs.decide.outputs.activist == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    concurrency:
+      group: data-commit-main
+      cancel-in-progress: false
+    env:
+      RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+      RESEARCH_VAULT_ROOT: _external/research-vault
+    steps:
+      - uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          docker-images: true
+          swap-storage: true
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts/ci_checkout_workspace.sh
+            _system/scripts/ci_resolve_checkout_ref.sh
+            _system/scripts/ci_sparse_checkout_paths.py
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Checkout workspace (full)
+        run: bash _system/scripts/ci_checkout_workspace.sh full
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: pip install -r _system/scripts/requirements.txt
+      - name: Run activist scan
+        env:
+          TICKER: ""
+          SEC_ONLY: "false"
+        run: |
+          python _system/scripts/scan_activist_sources.py --reconcile --fetch-sec
+          python _system/scripts/short_scan_batch.py
+          python _system/scripts/activist_registry_audit.py
+      - name: Rebuild activist dashboard slice
+        uses: ./.github/actions/rebuild-data
+        env:
+          OAUTH_CLIENT_ID: ${{ vars.OAUTH_CLIENT_ID }}
+          OAUTH_PROXY_URL: ${{ vars.OAUTH_PROXY_URL }}
+        with:
+          profile: activist
+          mirror_docs: "true"
+          validate: "true"
+      - name: Commit artifacts
+        uses: ./.github/actions/commit-main
+        with:
+          message: "chore: activist scan sync $(date -u +%Y-%m-%d)"
+
+  downloads:
+    needs: decide
+    if: needs.decide.outputs.downloads == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    concurrency:
+      group: data-commit-main
+      cancel-in-progress: false
+    steps:
+      - uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          docker-images: true
+          swap-storage: true
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts/ci_checkout_workspace.sh
+            _system/scripts/ci_resolve_checkout_ref.sh
+            _system/scripts/ci_sparse_checkout_paths.py
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Checkout workspace (full)
+        run: bash _system/scripts/ci_checkout_workspace.sh full
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install transcript pipeline dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tesseract-ocr poppler-utils
+          pip install -r _system/scripts/requirements.txt -r _system/scripts/requirements-transcripts.txt
+      - name: Run portfolio downloads
+        env:
+          POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY || secrets.POLYGON_IO_API_KEY }}
+          POLYGON_EARNINGS_CACHE_MAX_AGE_HOURS: "36"
+        run: python _system/scripts/download_all_holdings.py
+      - name: Commit and push workspace
+        uses: ./.github/actions/commit-main
+        with:
+          message: "chore: daily download sync $(date -u +%Y-%m-%d)"
+
+  drive:
+    needs: decide
+    if: needs.decide.outputs.drive == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    concurrency:
+      group: data-commit-main
+      cancel-in-progress: false
+    env:
+      RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+      RESEARCH_VAULT_ROOT: _external/research-vault
+    steps:
+      - uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          docker-images: true
+          swap-storage: true
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts/ci_checkout_workspace.sh
+            _system/scripts/ci_resolve_checkout_ref.sh
+            _system/scripts/ci_sparse_checkout_paths.py
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Checkout workspace (full)
+        run: bash _system/scripts/ci_checkout_workspace.sh full
+      - name: Check Google credentials secret
+        id: google_creds
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
+        run: |
+          if [ -z "$GOOGLE_APPLICATION_CREDENTIALS_JSON" ]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            MSG="GOOGLE_APPLICATION_CREDENTIALS_JSON is not configured."
+            if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+              echo "::error::${MSG}"
+              exit 1
+            fi
+            echo "::warning::Skipping Drive Intake — ${MSG}"
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/setup-python@v5
+        if: steps.google_creds.outputs.configured == 'true'
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        if: steps.google_creds.outputs.configured == 'true'
+        run: pip install -r _system/scripts/requirements.txt
+      - name: Configure Google credentials
+        if: steps.google_creds.outputs.configured == 'true'
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
+        run: |
+          printf '%s' "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > "$RUNNER_TEMP/google-service-account.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/google-service-account.json" >> "$GITHUB_ENV"
+      - name: Import Drive intake PDFs
+        if: steps.google_creds.outputs.configured == 'true'
+        id: import
+        env:
+          KIND: ${{ github.event.inputs.kind || '' }}
+          LIMIT: ${{ github.event.inputs.limit || '0' }}
+        run: |
+          ARGS="--ensure-folders"
+          if [ -n "${KIND:-}" ]; then ARGS="$ARGS --kind $KIND"; fi
+          if [ -n "${LIMIT:-}" ] && [ "$LIMIT" != "0" ]; then ARGS="$ARGS --limit $LIMIT"; fi
+          python _system/scripts/import_drive_intake.py $ARGS
+          COUNT=$(python -c "import json; from pathlib import Path; p=Path('_system/reference/document-store/drive_intake_latest.json'); print(json.loads(p.read_text())['summary'].get('imported_count',0) if p.exists() else 0)")
+          echo "imported=$COUNT" >> "$GITHUB_OUTPUT"
+          echo "Drive imported_count=$COUNT"
+      - name: Rebuild insights (only when files imported)
+        if: steps.google_creds.outputs.configured == 'true' && steps.import.outputs.imported != '0'
+        uses: ./.github/actions/rebuild-data
+        env:
+          OAUTH_CLIENT_ID: ${{ vars.OAUTH_CLIENT_ID }}
+          OAUTH_PROXY_URL: ${{ vars.OAUTH_PROXY_URL }}
+        with:
+          profile: insights
+          mirror_docs: "true"
+          validate: "true"
+      - name: Commit imported documents
+        if: steps.google_creds.outputs.configured == 'true' && steps.import.outputs.imported != '0'
+        uses: ./.github/actions/commit-main
+        with:
+          message: "chore: sync Drive intake documents $(date -u +%Y-%m-%d)"
+      - name: Skip note
+        if: steps.google_creds.outputs.configured == 'true' && steps.import.outputs.imported == '0'
+        run: echo "No Drive files imported; skipping rebuild and commit."
+
+  news:
+    needs: decide
+    if: needs.decide.outputs.news == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    concurrency:
+      group: data-commit-main
+      cancel-in-progress: false
+    env:
+      POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY || secrets.POLYGON_IO_API_KEY }}
+      PORTFOLIO_NEWS_WINDOW_DAYS: "30"
+      PORTFOLIO_NEWS_POLYGON_REQS_PER_MIN: "5"
+      PORTFOLIO_NEWS_MAX_PAGES: "15"
+      PORTFOLIO_NEWS_GOOGLE_MAX_PER_QUERY: "50"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts/ci_checkout_workspace.sh
+            _system/scripts/ci_resolve_checkout_ref.sh
+            _system/scripts/ci_sparse_checkout_paths.py
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Checkout workspace (sparse — news JSON only)
+        run: bash _system/scripts/ci_checkout_workspace.sh news main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: pip install -r _system/scripts/requirements-news.txt
+      - name: Ingest portfolio news
+        working-directory: _system/scripts
+        run: python ingest_portfolio_news.py
+      - name: Commit news artifacts
+        run: |
+          git add dashboard/data/portfolio_news.json docs/data/portfolio_news.json _system/data/news_seen.json _system/reviews/pending/news_*.md
+          git add '*/research/news/news_index.json' 2>/dev/null || true
+          bash _system/scripts/ci_push_main.sh "chore: refresh portfolio news $(date -u +%Y-%m-%d)"
+
+  pipeline-summary:
+    needs: [decide, intake-full, activist, downloads, drive, news]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Summary
+        run: |
+          echo "Data Pipeline complete."
+          echo "intake_full=${{ needs.decide.outputs.intake_full }} result=${{ needs.intake-full.result }}"
+          echo "activist=${{ needs.decide.outputs.activist }} result=${{ needs.activist.result }}"
+          echo "downloads=${{ needs.decide.outputs.downloads }} result=${{ needs.downloads.result }}"
+          echo "drive=${{ needs.decide.outputs.drive }} result=${{ needs.drive.result }}"
+          echo "news=${{ needs.decide.outputs.news }} result=${{ needs.news.result }}"
+          echo "Deploy Dashboard chains via workflow_run on successful commits."
