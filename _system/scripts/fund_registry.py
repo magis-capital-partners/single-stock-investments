@@ -51,7 +51,8 @@ _BOILERPLATE = re.compile(
     re.I,
 )
 _DATE_TOKENS = re.compile(
-    r"\b20\d{2}\b|\b\d{1,2}[._/\-]\d{1,2}[._/\-]\d{2,4}\b|\b\d{1,2}[._/\-]\d{2,4}\b|"
+    r"(?:19|20)\d{2}\s*q[1-4]|[1-4]q\s*(?:19|20)\d{2}|"
+    r"\b(?:19|20)\d{2}\b|\b\d{1,2}[._/\-]\d{1,2}[._/\-]\d{2,4}\b|\b\d{1,2}[._/\-]\d{2,4}\b|"
     r"\b(?:" + "|".join(MONTHS) + r")\b|\b\d{2}\b",
     re.I,
 )
@@ -87,6 +88,34 @@ def normalize_fund_key(stem: str) -> tuple[str, str]:
     display = " ".join(w.capitalize() for w in tokens[:4])
     fund_id = slugify(" ".join(tokens[:4]))
     return fund_id, display
+
+
+_COMPACT_QUARTER_TOKEN = re.compile(
+    r"(?i)(?:(?:19|20)\d{2}\s*q[1-4]|[1-4]q\s*(?:19|20)\d{2})"
+)
+
+
+def canonicalize_fund_identity(fund_id: str | None, fund: str | None) -> tuple[str, str]:
+    """Collapse legacy quarter-stamped identities into one stable fund.
+
+    Older letter imports allowed compact tokens such as ``2016q2`` and
+    ``3q2024`` to leak into both the id and display label.  Those records are
+    otherwise valid, so normalize them at read time as well as during future
+    imports.  Non-quarter fund identities pass through unchanged.
+    """
+    raw_id = str(fund_id or "").strip()
+    raw_name = str(fund or "").strip()
+    if not (_COMPACT_QUARTER_TOKEN.search(raw_id) or _COMPACT_QUARTER_TOKEN.search(raw_name)):
+        stable_id = raw_id or slugify(raw_name)
+        return stable_id, raw_name or stable_id
+
+    clean_id = _COMPACT_QUARTER_TOKEN.sub("-", raw_id)
+    clean_id = re.sub(r"[-_. ]+", "-", clean_id).strip("-")
+    clean_name = _COMPACT_QUARTER_TOKEN.sub(" ", raw_name)
+    clean_name = re.sub(r"[-_. ]+", " ", clean_name).strip()
+    stable_id = slugify(clean_id or clean_name)
+    display = clean_name or re.sub(r"[-_]+", " ", stable_id).strip().title()
+    return stable_id, display
 
 
 from letter_date_parser import (  # noqa: E402

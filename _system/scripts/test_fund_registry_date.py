@@ -10,7 +10,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 
-from fund_registry import parse_letter_date, parse_quarter_from_stem, resolve_quarter, sanity_year  # noqa: E402
+from fund_registry import (  # noqa: E402
+    canonicalize_fund_identity,
+    normalize_fund_key,
+    parse_letter_date,
+    parse_quarter_from_stem,
+    resolve_quarter,
+    sanity_year,
+)
 
 
 class FundRegistryDateTests(unittest.TestCase):
@@ -44,6 +51,29 @@ class FundRegistryDateTests(unittest.TestCase):
 
     def test_stem_quarter_rejects_insane_year(self) -> None:
         self.assertIsNone(parse_quarter_from_stem("something 4Q 2031"))
+
+    def test_normalize_fund_key_strips_compact_quarter(self) -> None:
+        fund_id, display = normalize_fund_key("683Capital_Letter_2016Q2")
+        self.assertEqual(fund_id, "683capital")
+        self.assertEqual(display, "683capital")
+
+    def test_canonicalize_legacy_suffix_quarter(self) -> None:
+        self.assertEqual(
+            canonicalize_fund_identity("683capital-2016q2", "683capital 2016q2"),
+            ("683capital", "683capital"),
+        )
+
+    def test_canonicalize_legacy_prefix_quarter(self) -> None:
+        self.assertEqual(
+            canonicalize_fund_identity("2024q1-nishkama", "2024q1 Nishkama"),
+            ("nishkama", "Nishkama"),
+        )
+
+    def test_canonicalize_quarter_attached_to_name(self) -> None:
+        self.assertEqual(
+            canonicalize_fund_identity("gator2012q4", "Gator2012q4"),
+            ("gator", "Gator"),
+        )
 
 
 if __name__ == "__main__":

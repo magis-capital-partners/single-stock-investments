@@ -3045,23 +3045,29 @@
     if (!shifts.length) {
       return '<p class="subhead">No meaningful shifts vs the prior period for this filter.</p>';
     }
-    const rows = shifts.slice(0, 48).map(r => `
-      <tr>
-        <td>${consensusTickerCell(r, escapeHtml)}</td>
-        <td style="font-size:11px">${escapeHtml((r.name || '').slice(0, 36))}</td>
-        <td class="mono" style="text-align:center">${r.prior_fund_count ?? '—'} → ${r.fund_count ?? 0}</td>
-        <td style="text-align:center">${formatConsensusDelta(r.delta_funds)}</td>
-        <td class="mono" style="text-align:center">${r.prior_net > 0 ? '+' : ''}${r.prior_net ?? 0} → ${r.net > 0 ? '+' : ''}${r.net ?? 0}</td>
-        <td style="text-align:center">${formatConsensusDelta(r.delta_net)}</td>
-        <td>${r.lean_flip ? `${consensusSentimentChip(r.prior_sentiment, escapeHtml)} → ${consensusSentimentChip(r.sentiment, escapeHtml)}` : consensusSentimentChip(r.sentiment, escapeHtml)}</td>
-        <td style="font-size:10px;color:var(--text-muted);max-width:200px">${r.new_funds?.length ? `+${r.new_funds.map(f => escapeHtml(f)).join(', ')}` : ''}${r.dropped_funds?.length ? `${r.new_funds?.length ? ' · ' : ''}−${r.dropped_funds.map(f => escapeHtml(f)).join(', ')}` : ''}</td>
-      </tr>`).join('');
+    const rows = shifts.slice(0, 48).map(r => {
+      const direction = r.delta_net > 0 ? 'strengthening' : r.delta_net < 0 ? 'weakening' : 'coverage changed';
+      const directionClass = r.delta_net > 0 ? 'positive' : r.delta_net < 0 ? 'negative' : 'neutral';
+      const fundChanges = [
+        r.new_funds?.length ? `Added: ${r.new_funds.map(f => escapeHtml(f)).join(', ')}` : '',
+        r.dropped_funds?.length ? `Dropped: ${r.dropped_funds.map(f => escapeHtml(f)).join(', ')}` : '',
+      ].filter(Boolean).join(' &middot; ');
+      return `<article class="consensus-signal-row${r.in_book ? ' book-conflict' : ''}">
+        <div class="consensus-signal-identity">
+          <div>${consensusTickerCell(r, escapeHtml)} <strong>${escapeHtml((r.name || '').slice(0, 42))}</strong></div>
+          <div class="consensus-signal-meta">${r.prior_fund_count ?? 0} &rarr; ${r.fund_count ?? 0} funds &middot; net ${r.prior_net > 0 ? '+' : ''}${r.prior_net ?? 0} &rarr; ${r.net > 0 ? '+' : ''}${r.net ?? 0}</div>
+        </div>
+        <div class="consensus-signal-change ${directionClass}">
+          <strong>${r.delta_net > 0 ? '&uarr;' : r.delta_net < 0 ? '&darr;' : '&rarr;'} ${direction}</strong>
+          <span>${formatConsensusDelta(r.delta_net)} net &middot; ${formatConsensusDelta(r.delta_funds)} funds</span>
+        </div>
+        <div class="consensus-signal-lean">${r.lean_flip ? `${consensusSentimentChip(r.prior_sentiment, escapeHtml)} &rarr; ${consensusSentimentChip(r.sentiment, escapeHtml)}` : consensusSentimentChip(r.sentiment, escapeHtml)}</div>
+        ${fundChanges ? `<div class="consensus-signal-evidence">${fundChanges}</div>` : ''}
+      </article>`;
+    }).join('');
     return `
-      <p class="tier-sub" style="margin-bottom:8px">Shifts vs <strong>${escapeHtml(priorLabel || 'prior period')}</strong> · new fund entrants and lean flips</p>
-      <table class="darwin-table">
-        <thead><tr><th>Ticker</th><th>Name</th><th>Funds</th><th>Δ Funds</th><th>Net</th><th>Δ Net</th><th>Lean</th><th>New / dropped</th></tr></thead>
-        <tbody>${rows}</tbody>
-      </table>`;
+      <div class="consensus-section-heading"><div><strong>What changed</strong><span> versus ${escapeHtml(priorLabel || 'the prior period')}</span></div><span>${shifts.length} material shifts</span></div>
+      <div class="consensus-signal-list">${rows}</div>`;
   }
 
   function renderConsensusHeatmap(consensus, escapeHtml, opts) {
@@ -3121,9 +3127,9 @@
     }
     funds.sort((a, b) => String(a.fund || '').localeCompare(String(b.fund || '')));
     const profile = selectedFundId ? fundProfiles[selectedFundId] : null;
-    const fundOptions = funds.slice(0, 200).map(f => {
-      const sel = f.fund_id === selectedFundId ? ' selected' : '';
-      return `<option value="${escapeHtml(f.fund_id)}"${sel}>${escapeHtml(f.fund || f.fund_id)}</option>`;
+    const fundOptions = funds.map(f => {
+      const label = `${f.fund || f.fund_id}${f.manager ? ` - ${f.manager}` : ''}`;
+      return `<option value="${escapeHtml(label)}" data-fund-id="${escapeHtml(f.fund_id)}"></option>`;
     }).join('');
     let trajectory = '';
     if (profile) {
@@ -3156,14 +3162,13 @@
       </table>` : '<p class="subhead">No position commentary for this fund in the selected period.</p>';
     }
     return `
-      <p class="tier-sub" style="margin-bottom:8px">Fund positioning over time from letter disclosures</p>
-      <label class="tier-sub" style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-        Fund
-        <select id="consensus-fund-select" class="search" style="max-width:320px">
-          <option value="">Select a fund…</option>
-          ${fundOptions}
-        </select>
+      <div class="consensus-section-heading"><div><strong>Fund trajectory</strong><span> one canonical fund across every letter and alias</span></div><span>${funds.length} funds</span></div>
+      <label class="tier-sub consensus-fund-picker">
+        <span>Find a fund</span>
+        <input id="consensus-fund-search" class="search" list="consensus-fund-options" autocomplete="off" placeholder="Type a fund name..." value="${escapeHtml(profile?.fund || '')}" />
+        <datalist id="consensus-fund-options">${fundOptions}</datalist>
       </label>
+      ${profile ? `<p class="tier-sub" style="margin-bottom:10px"><strong>${escapeHtml(profile.fund || profile.fund_id)}</strong> &middot; ${profile.letters?.length || 0} letters &middot; ${profile.latest_quarter ? `latest ${escapeHtml(profile.latest_quarter)}` : 'no dated letters'}</p>` : '<p class="tier-sub" style="margin-bottom:10px">Quarter-stamped aliases are consolidated into one continuous history.</p>'}
       ${trajectory}`;
   }
 
@@ -3253,11 +3258,16 @@
         URL.revokeObjectURL(url);
       });
     }
-    const fundSelect = container.querySelector('#consensus-fund-select');
-    if (fundSelect) {
-      fundSelect.addEventListener('change', () => {
-        if (onFundSelect) onFundSelect(fundSelect.value || null, 'fund');
-      });
+    const fundSearch = container.querySelector('#consensus-fund-search');
+    if (fundSearch) {
+      const selectExactFund = () => {
+        const options = Array.from(container.querySelectorAll('#consensus-fund-options option'));
+        const value = fundSearch.value.trim().toLowerCase();
+        const match = options.find(option => option.value.trim().toLowerCase() === value);
+        if (match && onFundSelect) onFundSelect(match.dataset.fundId || null, 'fund');
+      };
+      fundSearch.addEventListener('input', selectExactFund);
+      fundSearch.addEventListener('change', selectExactFund);
     }
   }
 
@@ -3304,30 +3314,24 @@
     const showDelta = viewMode === 'table' && qoqShifts.length > 0;
 
     const viewTabs = [
-      { id: 'table', label: 'Snapshot' },
-      { id: 'shifted', label: 'What shifted' },
-      { id: 'heatmap', label: '8Q heatmap' },
-      { id: 'fund', label: 'Fund trajectory' },
+      { id: 'shifted', label: 'Changes' },
+      { id: 'table', label: 'Current' },
+      { id: 'heatmap', label: 'History' },
+      { id: 'fund', label: 'By fund' },
     ];
 
     const mostRows = most.slice(0, 60).map((r, i) => {
       const qoq = qoqByTicker.get(r.ticker);
-      const deltaCols = showDelta ? `
-        <td style="text-align:center">${qoq ? formatConsensusDelta(qoq.delta_funds) : '<span class="mono" style="color:var(--text-muted)">—</span>'}</td>
-        <td style="text-align:center">${qoq ? formatConsensusDelta(qoq.delta_net) : '<span class="mono" style="color:var(--text-muted)">—</span>'}</td>` : '';
-      return `
-      <tr>
-        <td class="mono" style="color:var(--text-muted)">${i + 1}</td>
-        <td>${consensusTickerCell(r, escapeHtml)}</td>
-        <td style="font-size:11px;max-width:200px">${escapeHtml((r.name || '').slice(0, 40))}</td>
-        <td class="mono" style="text-align:center">${r.fund_count}</td>
-        <td class="mono" style="text-align:center;color:var(--accent-green,#4ade80)">${r.buy_funds || 0}</td>
-        <td class="mono" style="text-align:center;color:var(--accent-red,#f87171)">${(r.sell_funds || 0) + (r.short_funds || 0)}</td>
-        <td class="mono" style="text-align:center">${r.net > 0 ? '+' : ''}${r.net}</td>
-        ${deltaCols}
-        <td>${consensusSentimentChip(r.sentiment, escapeHtml)}</td>
-        <td style="font-size:10px;color:var(--text-muted);max-width:220px">${(r.funds || []).slice(0, 6).map(f => escapeHtml(f)).join(', ')}</td>
-      </tr>`;
+      const delta = qoq ? `${qoq.delta_net > 0 ? '&uarr;' : qoq.delta_net < 0 ? '&darr;' : '&rarr;'} ${formatConsensusDelta(qoq.delta_net)} net` : '&rarr; stable';
+      return `<article class="consensus-signal-row${r.in_book && r.sentiment === 'reducing' ? ' book-conflict' : ''}">
+        <div class="consensus-rank">${i + 1}</div>
+        <div class="consensus-signal-identity">
+          <div>${consensusTickerCell(r, escapeHtml)} <strong>${escapeHtml((r.name || '').slice(0, 44))}</strong></div>
+          <div class="consensus-signal-meta">${r.fund_count} funds &middot; ${r.buy_funds || 0} adding &middot; ${(r.sell_funds || 0) + (r.short_funds || 0)} reducing &middot; net ${r.net > 0 ? '+' : ''}${r.net}</div>
+        </div>
+        <div class="consensus-signal-change ${qoq?.delta_net > 0 ? 'positive' : qoq?.delta_net < 0 ? 'negative' : 'neutral'}"><strong>${delta}</strong><span>${qoq ? `${formatConsensusDelta(qoq.delta_funds)} funds vs prior` : 'no prior comparison'}</span></div>
+        <div class="consensus-signal-lean">${consensusSentimentChip(r.sentiment, escapeHtml)}</div>
+      </article>`;
     }).join('');
 
     const activityRows = activity.slice(0, 120).map(r => `
@@ -3366,35 +3370,34 @@
       });
     } else {
       body = `
-      <h4 style="font-size:12px;color:var(--text-muted);margin:6px 0">MOST DISCUSSED</h4>
-      ${most.length ? `<table class="darwin-table">
-        <thead><tr><th>#</th><th>Ticker</th><th>Name</th><th title="Distinct funds">Funds</th><th title="Funds buying">Buy</th><th title="Funds selling/short">Sell</th><th title="Buy minus sell funds">Net</th>${showDelta ? '<th title="Change in fund count vs prior period">Δ Funds</th><th title="Change in net vs prior period">Δ Net</th>' : ''}<th>Lean</th><th>Who</th></tr></thead>
-        <tbody>${mostRows}</tbody>
-      </table>` : '<p class="subhead">No securities match this filter.</p>'}
-      ${changes.length ? `
-      <h4 style="font-size:12px;color:var(--text-muted);margin:18px 0 6px">BIGGEST NET MOVES (within period)</h4>
-      <table class="darwin-table">
-        <thead><tr><th>Ticker</th><th>Name</th><th title="Net buying funds minus selling funds">Net funds</th><th>Lean</th></tr></thead>
-        <tbody>${changesRows}</tbody>
-      </table>` : ''}
-      ${activity.length ? `
-      <h4 style="font-size:12px;color:var(--text-muted);margin:18px 0 6px">POSITION ACTIVITY (NEW · ADD · TRIM · EXIT · SHORT)</h4>
-      <table class="darwin-table">
-        <thead><tr><th>Date</th><th>Fund</th><th>Action</th><th>Ticker</th><th>Commentary</th><th>Source</th></tr></thead>
-        <tbody>${activityRows}</tbody>
-      </table>
-      ${activity.length > 120 ? `<p class="tier-sub">${activity.length - 120} more — refine with search or quarter</p>` : ''}` : ''}`;
+      <div class="consensus-section-heading"><div><strong>Current consensus</strong><span> ranked by breadth and conviction</span></div><span>${most.length} securities</span></div>
+      ${most.length ? `<div class="consensus-signal-list">${mostRows}</div>` : '<p class="subhead">No securities match this filter.</p>'}`;
     }
+
+    const reducingBook = most.filter(r => r.in_book && r.sentiment === 'reducing').length;
+    const reversals = qoqShifts.filter(r => r.lean_flip).length;
+    const largestDrop = qoqShifts.slice().sort((a, b) => a.delta_net - b.delta_net)[0];
+    const disagreement = most.filter(r => (r.buy_funds || 0) > 0 && ((r.sell_funds || 0) + (r.short_funds || 0)) > 0)
+      .sort((a, b) => ((b.buy_funds || 0) + (b.sell_funds || 0) + (b.short_funds || 0)) - ((a.buy_funds || 0) + (a.sell_funds || 0) + (a.short_funds || 0)))[0];
+    const brief = reducingBook
+      ? `${reducingBook} portfolio holding${reducingBook === 1 ? ' is' : 's are'} being reduced by outside investors${largestDrop ? `; ${largestDrop.ticker} weakened most versus the prior period` : ''}.`
+      : largestDrop
+        ? `${largestDrop.ticker} showed the largest deterioration versus the prior period; no portfolio-wide reduction signal is present.`
+        : 'No material portfolio conflict is visible in the selected period.';
 
     return `
       ${drawer}
-      <p class="tier-sub" style="margin-bottom:6px">
-        Superinvestor letter positioning (aggregated) · ${summary.fund_count || 0} funds · ${summary.tickers_covered || 0} securities · scope <strong>${escapeHtml(scope)}</strong>${bookOnly ? ' · our book only' : ''}
-      </p>
-      <p class="tier-sub" style="margin-bottom:10px;color:var(--text-muted)">
-        Cross-fund consensus from letters only. For multi-source events (filings, news), use <strong>What changed</strong>. Click a ticker for history and CSV export.
-      </p>
-      <nav class="source-pills" id="consensus-view-tabs" style="margin-bottom:12px">
+      <section class="consensus-brief">
+        <div><span class="consensus-eyebrow">Investor brief</span><strong>${escapeHtml(brief)}</strong></div>
+        <span>${summary.fund_count || 0} canonical funds &middot; ${escapeHtml(scope)}${bookOnly ? ' &middot; our book only' : ''}</span>
+      </section>
+      <div class="consensus-kpis">
+        <button type="button" data-consensus-view="table"><span>Holdings reducing</span><strong>${reducingBook}</strong><small>current conflicts</small></button>
+        <button type="button" data-consensus-view="shifted"><span>Lean reversals</span><strong>${reversals}</strong><small>vs prior period</small></button>
+        <button type="button" data-consensus-view="shifted"><span>Largest deterioration</span><strong>${escapeHtml(largestDrop?.ticker || 'None')}</strong><small>${largestDrop ? `net ${largestDrop.delta_net > 0 ? '+' : ''}${largestDrop.delta_net}` : 'no material shift'}</small></button>
+        <button type="button" data-consensus-view="table"><span>Most disputed</span><strong>${escapeHtml(disagreement?.ticker || 'None')}</strong><small>${disagreement ? `${disagreement.buy_funds || 0} adding / ${(disagreement.sell_funds || 0) + (disagreement.short_funds || 0)} reducing` : 'no two-way action'}</small></button>
+      </div>
+      <nav class="source-pills consensus-view-tabs" id="consensus-view-tabs">
         ${viewTabs.map(t => `<button type="button" class="filter-btn source-pill${viewMode === t.id ? ' active' : ''}" data-consensus-view="${escapeHtml(t.id)}">${escapeHtml(t.label)}</button>`).join('')}
       </nav>
       ${body}`;
@@ -3635,8 +3638,16 @@
       <nav class="view-tabs" id="insights-section-tabs" style="margin-bottom:10px">
         ${sections.map(s => `<button type="button" class="view-tab${activeSection === s.id ? ' active' : ''}" data-insights-section="${s.id}">${s.label}</button>`).join('')}
       </nav>
-      <div class="detail-section" style="display:grid;gap:8px;margin-bottom:12px">
-        ${showPeriodControls ? `<nav class="source-pills" id="insights-range-tabs" style="margin-bottom:0">
+      <div class="detail-section${activeSection === 'consensus' ? ' consensus-toolbar' : ''}" style="display:grid;gap:8px;margin-bottom:12px">
+        ${activeSection === 'consensus' ? `<div class="consensus-toolbar-main">
+          <label><span>Period</span><select id="consensus-period-select" class="search">
+            ${[...rangeTabs, ...yearTabs, ...quarterTabs.filter(t => t.id !== `year:${selectedYear}`)].map(t => `<option value="${escapeHtml(t.id)}"${period.id === t.id ? ' selected' : ''}>${escapeHtml(t.label)}</option>`).join('')}
+          </select></label>
+          <label class="tier-sub consensus-book-toggle"><input type="checkbox" id="insights-book-only" ${bookOnly ? 'checked' : ''} /> Our book only</label>
+          <input class="search consensus-search" id="fund-registry-search" placeholder="Search ticker or fund..." value="${escapeHtml(fundSearch)}" />
+          <details class="consensus-coverage"><summary>Coverage</summary><div>Viewing ${escapeHtml(period.label)} &middot; ${coverage.quarters} quarter(s) &middot; ${coverage.letters} indexed letters &middot; ${coverage.funds} fund rows</div></details>
+        </div>` : ''}
+        ${showPeriodControls && activeSection !== 'consensus' ? `<nav class="source-pills" id="insights-range-tabs" style="margin-bottom:0">
           ${rangeTabs.map(t => `<button type="button" class="filter-btn source-pill${period.id === t.id ? ' active' : ''}" data-insights-quarter="${escapeHtml(t.id)}">${escapeHtml(t.label)}</button>`).join('')}
         </nav>
         <nav class="source-pills" id="insights-year-tabs" style="margin-bottom:0">
@@ -3644,15 +3655,15 @@
         </nav>
         ${quarterTabs.length ? `<nav class="source-pills" id="insights-quarter-tabs" style="margin-bottom:0">
           ${quarterTabs.map(t => `<button type="button" class="filter-btn source-pill${period.id === t.id ? ' active' : ''}" data-insights-quarter="${escapeHtml(t.id)}">${escapeHtml(t.label)}</button>`).join('')}
-        </nav>` : ''}` : (activeSection === 'events' ? '' : `<p class="tier-sub">Ticker insights use ticker-specific signals by default. Macro indices appear once above the table.</p>`)}
-        <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+        </nav>` : ''}` : (activeSection === 'events' || activeSection === 'consensus' ? '' : `<p class="tier-sub">Ticker insights use ticker-specific signals by default. Macro indices appear once above the table.</p>`)}
+        ${activeSection !== 'consensus' ? `<div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
           ${activeSection !== 'events' ? `<label class="tier-sub" style="display:flex;align-items:center;gap:6px">
             <input type="checkbox" id="insights-book-only" ${bookOnly ? 'checked' : ''} />
             ${escapeHtml(bookLabel)}
           </label>` : ''}
           <input class="search" id="fund-registry-search" placeholder="Search ticker, event, fund, theme, source..." value="${escapeHtml(fundSearch)}" style="max-width:320px" />
-        </div>
-        ${showPeriodControls ? `<div class="tier-sub">
+        </div>` : ''}
+        ${showPeriodControls && activeSection !== 'consensus' ? `<div class="tier-sub">
           Viewing ${escapeHtml(period.label)} &middot; ${coverage.quarters} quarter(s) &middot; ${coverage.letters} indexed letter(s)${coverage.drivePdfCount ? ` &middot; ${coverage.drivePdfCount} catalog PDF(s)` : ''} &middot; ${coverage.funds} fund row(s)${coverage.folderCount ? ` &middot; ${coverage.folderCount} Drive source folder(s)` : ''}${coverage.letters === 0 && coverage.drivePdfCount > 0 ? ' &middot; <span style="color:var(--accent-amber)">PDFs cataloged — run make letter-extract-text</span>' : ''}${period.id === 'latest' && timeModel.latestCatalogQuarter && timeModel.latestIndexedQuarter && timeModel.latestCatalogQuarter !== timeModel.latestIndexedQuarter ? ` &middot; <span style="color:var(--text-muted)">Latest indexed: ${escapeHtml(quarterLabel(timeModel.latestIndexedQuarter))}</span>` : ''}
         </div>` : ''}
       </div>

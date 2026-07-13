@@ -20,6 +20,7 @@ from document_store import (  # noqa: E402
     letter_evidence_url,
 )
 from insight_format import format_letter_claim  # noqa: E402
+from fund_registry import canonicalize_fund_identity  # noqa: E402
 from filing_facts import (  # noqa: E402
     filing_metadata_from_text_path,
     source_filing_ref_from_text_path,
@@ -133,6 +134,14 @@ def is_letter_meta_entry(letter: dict) -> bool:
     if fund_id == "readme" or fund == "readme":
         return True
     return False
+
+
+def canonicalize_letter_fund(letter: dict) -> dict:
+    """Return a letter with legacy quarter-specific fund aliases collapsed."""
+    fund_id, fund = canonicalize_fund_identity(letter.get("fund_id"), letter.get("fund"))
+    if fund_id == letter.get("fund_id") and fund == letter.get("fund"):
+        return letter
+    return {**letter, "fund_id": fund_id, "fund": fund}
 
 
 COMPANY_STOPWORDS = {
@@ -2687,7 +2696,11 @@ def main() -> int:
         letters: list[dict] = []
     else:
         letters_doc = load_json(LETTERS_INSIGHTS) or {"letters": []}
-        letters = [letter for letter in (letters_doc.get("letters") or []) if not is_letter_meta_entry(letter)]
+        letters = [
+            canonicalize_letter_fund(letter)
+            for letter in (letters_doc.get("letters") or [])
+            if not is_letter_meta_entry(letter)
+        ]
         letters_doc = {**letters_doc, "letters": letters}
         records.extend(from_superinvestor_letters(letters_doc))
 

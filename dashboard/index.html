@@ -436,6 +436,55 @@
   .consensus-heat-cell { min-width: 44px; padding: 6px 4px !important; }
   .consensus-spark-dot { display: inline-block; width: 10px; height: 10px; border-radius: 2px; }
   .consensus-heatmap { min-width: 720px; }
+  .consensus-toolbar { padding: 8px 10px; }
+  .consensus-toolbar-main { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+  .consensus-toolbar-main > label:first-child { display: flex; align-items: center; gap: 7px; font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; }
+  .consensus-toolbar-main select { min-width: 126px; }
+  .consensus-book-toggle { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .consensus-search { flex: 1 1 240px; max-width: 400px; }
+  .consensus-coverage { position: relative; font-size: 11px; color: var(--text-muted); }
+  .consensus-coverage summary { cursor: pointer; list-style: none; padding: 6px 8px; border: 1px solid var(--border); border-radius: 5px; }
+  .consensus-coverage summary::-webkit-details-marker { display: none; }
+  .consensus-coverage[open] div { position: absolute; right: 0; z-index: 5; width: 310px; margin-top: 6px; padding: 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-card); box-shadow: 0 10px 25px rgba(0,0,0,.28); }
+  .consensus-brief { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 14px 16px; margin-bottom: 10px; border: 1px solid rgba(59,130,246,.34); border-radius: 8px; background: linear-gradient(90deg, rgba(59,130,246,.11), rgba(59,130,246,.025)); }
+  .consensus-brief > div { display: grid; gap: 5px; }
+  .consensus-brief strong { font-size: 14px; line-height: 1.45; }
+  .consensus-brief > span { flex: 0 0 auto; font-size: 10px; color: var(--text-muted); }
+  .consensus-eyebrow { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: var(--accent-blue); }
+  .consensus-kpis { display: grid; grid-template-columns: repeat(4, minmax(130px, 1fr)); gap: 8px; margin-bottom: 10px; }
+  .consensus-kpis button { display: grid; gap: 3px; text-align: left; padding: 10px 12px; color: var(--text-primary); background: var(--bg-card); border: 1px solid var(--border); border-radius: 7px; cursor: pointer; }
+  .consensus-kpis button:hover { border-color: var(--accent-blue); background: rgba(59,130,246,.07); }
+  .consensus-kpis span, .consensus-kpis small { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .45px; }
+  .consensus-kpis strong { font: 700 18px/1.1 var(--font-mono, monospace); }
+  .consensus-view-tabs { margin: 0 0 12px; }
+  .consensus-section-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin: 12px 0 6px; font-size: 12px; color: var(--text-muted); }
+  .consensus-section-heading strong { color: var(--text-primary); text-transform: uppercase; letter-spacing: .5px; }
+  .consensus-section-heading > span { font-size: 10px; }
+  .consensus-signal-list { border-top: 1px solid var(--border); }
+  .consensus-signal-row { display: grid; grid-template-columns: minmax(300px, 1.5fr) minmax(150px, .7fr) minmax(110px, auto); align-items: center; gap: 14px; min-height: 58px; padding: 9px 12px; border-bottom: 1px solid var(--border); }
+  .consensus-signal-row:has(.consensus-rank) { grid-template-columns: 26px minmax(300px, 1.5fr) minmax(150px, .7fr) minmax(110px, auto); }
+  .consensus-signal-row.book-conflict { box-shadow: inset 2px 0 0 rgba(248,113,113,.68); background: rgba(248,113,113,.025); }
+  .consensus-rank { font: 11px var(--font-mono, monospace); color: var(--text-muted); }
+  .consensus-signal-identity > div:first-child { display: flex; align-items: center; gap: 7px; font-size: 11px; }
+  .consensus-signal-meta { margin-top: 5px; font-size: 10px; color: var(--text-muted); }
+  .consensus-signal-change { display: grid; gap: 4px; font-size: 10px; }
+  .consensus-signal-change strong { font-size: 11px; }
+  .consensus-signal-change span { color: var(--text-muted); }
+  .consensus-signal-change.positive strong { color: var(--accent-green); }
+  .consensus-signal-change.negative strong { color: var(--accent-red); }
+  .consensus-signal-change.neutral strong { color: var(--text-secondary); }
+  .consensus-signal-lean { justify-self: end; white-space: nowrap; }
+  .consensus-signal-evidence { grid-column: 1 / -1; margin-top: -6px; padding-left: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 9px; color: var(--text-muted); }
+  .consensus-fund-picker { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .consensus-fund-picker input { width: min(460px, 70vw); }
+  @media (max-width: 900px) {
+    .consensus-kpis { grid-template-columns: repeat(2, minmax(130px, 1fr)); }
+    .consensus-signal-row, .consensus-signal-row:has(.consensus-rank) { grid-template-columns: 26px 1fr auto; }
+    .consensus-signal-row:not(:has(.consensus-rank)) { grid-template-columns: 1fr auto; }
+    .consensus-signal-change { grid-column: 2; }
+    .consensus-signal-row:not(:has(.consensus-rank)) .consensus-signal-change { grid-column: 1; }
+    .consensus-brief { align-items: flex-start; flex-direction: column; }
+  }
   .insight-compact { font-size: 11px; line-height: 1.4; }
   .insight-compact-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-bottom: 3px; }
   .insight-compact-title { font-weight: 600; font-size: 11px; max-width: 420px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -801,7 +850,7 @@ let consensusQuarter = (() => {
   }
 })();
 let consensusViewMode = (() => {
-  try { return localStorage.getItem(CONSENSUS_VIEW_KEY) || 'table'; } catch (_) { return 'table'; }
+  try { return localStorage.getItem(CONSENSUS_VIEW_KEY) || 'shifted'; } catch (_) { return 'shifted'; }
 })();
 let consensusSelectedTicker = null;
 let consensusFundId = null;
@@ -1326,6 +1375,14 @@ function renderInsights(opts = {}) {
       renderInsights();
     });
   });
+  const consensusPeriodSelect = content.querySelector('#consensus-period-select');
+  if (consensusPeriodSelect) {
+    consensusPeriodSelect.addEventListener('change', () => {
+      consensusQuarter = consensusPeriodSelect.value || 'last4';
+      try { localStorage.setItem(CONSENSUS_QUARTER_KEY, consensusQuarter); } catch (_) { /* ignore */ }
+      renderInsights();
+    });
+  }
   content.querySelectorAll('[data-insights-section]').forEach(btn => {
     btn.addEventListener('click', () => {
       insightsSection = btn.dataset.insightsSection;
