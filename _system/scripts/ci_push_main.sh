@@ -412,6 +412,12 @@ try_resolve_rebase_conflicts() {
   git add _system/portfolio/research_events.jsonl 2>/dev/null || true
   git add _system/reference/market-data/external/sync_report.json 2>/dev/null || true
   if ! GIT_EDITOR=true git rebase --continue; then
+    # A later commit in the same rebase can introduce another resolvable
+    # conflict. Leave it for the caller's resolution loop instead of treating
+    # that normal rebase state as a fatal error.
+    if rebase_in_progress && is_resolvable_rebase_conflict; then
+      return 0
+    fi
     echo "::error::git rebase --continue failed after conflict resolution."
     echo "::error::Unresolved paths:"
     conflicted_files || true
