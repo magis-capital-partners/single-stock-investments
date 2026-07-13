@@ -39,7 +39,8 @@ if [ "$EVENT" = "push" ]; then
   BEFORE="${GITHUB_EVENT_BEFORE:-}"
   SHA="${GITHUB_SHA:-}"
   if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
-    write_outputs "rebuild" "pages" "false" "insights" "true" "true"
+    # Sparse pages checkout has no ticker trees — never rescan holdings here.
+    write_outputs "deploy-only" "pages" "true" "none" "true" "false"
     exit 0
   fi
   git fetch --depth=1 origin "$BEFORE" >/dev/null 2>&1 || true
@@ -48,9 +49,12 @@ if [ "$EVENT" = "push" ]; then
     write_outputs "deploy-only" "pages" "true" "none" "true" "false"
     exit 0
   fi
-  # Script-only pushes: light insights rebuild (not darwin-fast / full ticker trees).
-  write_outputs "rebuild" "pages" "false" "insights" "true" "true"
+  # Script/CI-only pushes: deploy committed dashboard/. Rebuilding insights or
+  # dashboard_data on the sparse pages checkout zeros PDF/readme/research stats.
+  # Full regenerations belong in Data Pipeline / jobs with ticker trees present.
+  write_outputs "deploy-only" "pages" "true" "none" "true" "false"
   exit 0
 fi
 
-write_outputs "rebuild" "pages" "false" "insights" "true" "true"
+# Unknown events: publish committed dashboard/ only (safe default on sparse pages).
+write_outputs "deploy-only" "pages" "true" "none" "true" "false"

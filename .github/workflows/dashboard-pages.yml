@@ -72,9 +72,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          filter: blob:none
-          sparse-checkout: dashboard/oauth-proxy
-          sparse-checkout-cone-mode: true
           fetch-depth: 2
       - id: check
         run: |
@@ -151,20 +148,22 @@ jobs:
         id: mode
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            if [ "${{ inputs.skip_rebuild }}" = "true" ]; then
-              echo "mode=deploy-only" >> "$GITHUB_OUTPUT"
-              echo "checkout_profile=pages" >> "$GITHUB_OUTPUT"
-              echo "skip_rebuild=true" >> "$GITHUB_OUTPUT"
-              echo "rebuild_profile=none" >> "$GITHUB_OUTPUT"
-              echo "validate=true" >> "$GITHUB_OUTPUT"
-              echo "needs_disk_cleanup=false" >> "$GITHUB_OUTPUT"
-            else
+            # Default to deploy-only. Sparse pages checkout cannot safely rebuild
+            # dashboard_data (no ticker trees). Use Data Pipeline for regenerations.
+            if [ "${{ inputs.skip_rebuild }}" = "false" ]; then
               echo "mode=rebuild" >> "$GITHUB_OUTPUT"
               echo "checkout_profile=pages" >> "$GITHUB_OUTPUT"
               echo "skip_rebuild=false" >> "$GITHUB_OUTPUT"
               echo "rebuild_profile=insights" >> "$GITHUB_OUTPUT"
               echo "validate=true" >> "$GITHUB_OUTPUT"
               echo "needs_disk_cleanup=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "mode=deploy-only" >> "$GITHUB_OUTPUT"
+              echo "checkout_profile=pages" >> "$GITHUB_OUTPUT"
+              echo "skip_rebuild=true" >> "$GITHUB_OUTPUT"
+              echo "rebuild_profile=none" >> "$GITHUB_OUTPUT"
+              echo "validate=true" >> "$GITHUB_OUTPUT"
+              echo "needs_disk_cleanup=false" >> "$GITHUB_OUTPUT"
             fi
           else
             bash _system/scripts/ci_dashboard_deploy_mode.sh
