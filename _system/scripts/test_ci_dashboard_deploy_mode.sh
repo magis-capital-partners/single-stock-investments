@@ -40,8 +40,19 @@ echo "OK: workflow_run deploy-only"
 PARENT=$(git rev-parse HEAD~1 2>/dev/null || echo "")
 if [ -n "$PARENT" ]; then
   OUT=$(run_mode push "$PARENT")
-  assert_contains "$OUT" "mode="
-  echo "OK: push mode resolved"
+  assert_contains "$OUT" "mode=deploy-only"
+  assert_contains "$OUT" "skip_rebuild=true"
+  echo "OK: push mode is deploy-only on sparse pages"
 fi
+
+OUT=$(run_mode push "0000000000000000000000000000000000000000")
+assert_contains "$OUT" "mode=deploy-only"
+assert_contains "$OUT" "skip_rebuild=true"
+echo "OK: initial push is deploy-only"
+
+OUT=$(run_mode schedule)
+assert_contains "$OUT" "mode=deploy-only"
+assert_contains "$OUT" "skip_rebuild=true"
+echo "OK: unknown events default to deploy-only"
 
 echo "All ci_dashboard_deploy_mode smoke tests passed."

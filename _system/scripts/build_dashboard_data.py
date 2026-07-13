@@ -243,6 +243,87 @@ def count_pdfs(ticker_dir: Path, registry_docs: list[dict] | None = None) -> int
     )
 
 
+# Infra fields that collapse to empty when ticker trees are absent (sparse CI).
+_INFRA_PRESERVE_KEYS = (
+    "pdf_count",
+    "readme",
+    "research_dir",
+    "sec_filings",
+    "completeness",
+    "index_file",
+    "download_script",
+    "download_script_path",
+    "last_download",
+    "last_research",
+    "recent_files",
+)
+
+
+def load_prior_dashboard_rows() -> dict[str, dict]:
+    prior = _load_json(OUTPUT) or {}
+    rows = prior.get("tickers") or []
+    return {str(r.get("ticker")): r for r in rows if r.get("ticker")}
+
+
+def ticker_dirs_present(tickers: list[str]) -> int:
+    return sum(1 for t in tickers if (ROOT / t).is_dir())
+
+
+def workspace_is_sparse(tickers: list[str]) -> bool:
+    """True when most holding folders are missing (pages/darwin sparse checkout)."""
+    if not tickers:
+        return False
+    present = ticker_dirs_present(tickers)
+    floor = max(50, len(tickers) // 5)
+    return present < floor
+
+
+def preserve_infra_from_prior(rows: list[dict], prior_by_ticker: dict[str, dict]) -> int:
+    """Copy prior infra stats onto rows when the current scan found empty trees."""
+    restored = 0
+    for row in rows:
+        prior = prior_by_ticker.get(row["ticker"])
+        if not prior:
+            continue
+        prior_pdfs = int(prior.get("pdf_count") or 0)
+        prior_research = bool(prior.get("research_dir"))
+        prior_readme = bool(prior.get("readme"))
+        empty_now = (
+            int(row.get("pdf_count") or 0) == 0
+            and not row.get("research_dir")
+            and not row.get("readme")
+        )
+        had_infra = prior_pdfs > 0 or prior_research or prior_readme
+        if not (empty_now and had_infra):
+            continue
+        for key in _INFRA_PRESERVE_KEYS:
+            if key in prior:
+                row[key] = prior[key]
+        restored += 1
+    return restored
+
+
+def refuse_infra_collapse(payload: dict, prior_by_ticker: dict[str, dict]) -> None:
+    """Abort write when a sparse rebuild would publish empty holdings infra."""
+    summary = payload.get("summary") or {}
+    total_pdfs = int(summary.get("total_pdfs") or 0)
+    with_research = int(summary.get("with_research") or 0)
+    ticker_count = int(summary.get("ticker_count") or 0)
+    prior_pdfs = sum(int(r.get("pdf_count") or 0) for r in prior_by_ticker.values())
+    prior_research = sum(1 for r in prior_by_ticker.values() if r.get("research_dir"))
+    if ticker_count < 50:
+        return
+    collapsed = total_pdfs == 0 and with_research < max(20, ticker_count // 10)
+    prior_healthy = prior_pdfs >= 100 or prior_research >= max(20, ticker_count // 10)
+    if collapsed and prior_healthy:
+        raise SystemExit(
+            "Refusing to write dashboard_data.json: sparse/empty ticker checkout would "
+            f"clobber infra stats (new pdfs={total_pdfs} research={with_research}; "
+            f"prior pdfs={prior_pdfs} research={prior_research}). "
+            "Rebuild with ticker trees present, or deploy committed dashboard/ as-is."
+        )
+
+
 def source_type_label(source_type: str | None) -> str:
     labels = {
         "superinvestor_letter": "Letters",
@@ -1781,6 +1862,15 @@ def build() -> dict:
         )
         for t in tickers
     ]
+    prior_by_ticker = load_prior_dashboard_rows()
+    if workspace_is_sparse(tickers) and prior_by_ticker:
+        restored = preserve_infra_from_prior(rows, prior_by_ticker)
+        if restored:
+            print(
+                f"WARN: sparse checkout ({ticker_dirs_present(tickers)}/{len(tickers)} "
+                f"ticker dirs); preserved infra stats for {restored} tickers from prior "
+                f"{OUTPUT.relative_to(ROOT)}"
+            )
     watchlist = build_watchlist_rows(reg.get("watchlist") or {})
     portfolio_macro = build_portfolio_macro(insights_doc)
 
@@ -1993,11 +2083,13 @@ def build_research_memory() -> dict | None:
 def main() -> None:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     equity_payload = build_equity_models()
+    prior_by_ticker = load_prior_dashboard_rows()
     document_registry = build_document_registry()
     document_catalog = build_document_catalog(document_registry)
     insights_doc = _load_json(DATA_DIR / "insights.json")
     memory_doc = build_research_memory()
     payload = build()
+    refuse_infra_collapse(payload, prior_by_ticker)
     attach_pdf_store_rows(payload["tickers"], document_catalog)
     merge_equity_model_rows(payload["tickers"], equity_payload)
     model_ready = sum(1 for r in payload["tickers"] if (r.get("equity_model") or {}).get("ready"))
