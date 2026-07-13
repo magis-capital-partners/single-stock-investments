@@ -7,8 +7,8 @@ from pathlib import Path
 
 from activist_common import (
     load_ticker_index,
-    match_report_to_ticker,
     portfolio_tickers,
+    publisher_match_allowed,
     publisher_match_blob,
     save_ticker_index,
     ticker_meta,
@@ -39,12 +39,10 @@ def should_keep(report: dict, meta: dict) -> tuple[bool, str]:
         return False, "url_slug_mismatch"
 
     if source in {"publisher_site", "local"}:
-        matched, confidence, reason = match_report_to_ticker(blob, meta)
-        if not matched or confidence < 0.9:
+        matched, confidence, reason = publisher_match_allowed(url, title, blob, meta)
+        if not matched:
             return False, f"weak_match:{reason}:{confidence:.2f}"
-        if report.get("body_verified") is False and (report.get("confidence") or 0) < 0.9:
-            # Document body never mentions this ticker/company and the title/URL
-            # match was weak to begin with: title-only false positive.
+        if source == "publisher_site" and report.get("body_verified") is not True:
             return False, "body_unverified"
         body_reason = report.get("body_match_reason") or ""
         if body_reason.startswith("alias:"):
@@ -71,15 +69,9 @@ def cleanup_ticker(ticker: str, *, apply: bool) -> dict:
             kept.append(report)
             continue
         removed.append({**report, "reject_reason": reason})
-        if apply:
-            for key in ("local_file", "local_pdf"):
-                rel_path = report.get(key)
-                if not rel_path:
-                    continue
-                path = ROOT / rel_path
-                if path.exists() and path.suffix.lower() in {".html", ".htm"}:
-                    path.unlink()
-                    deleted_files.append(rel_path)
+        # Canonical publisher documents are shared by every ticker assignment.
+        # Removing a bad mapping must never delete the archive used by a valid
+        # mapping for another issuer; orphan cleanup is a separate operation.
 
     if apply and removed:
         index["reports"] = kept

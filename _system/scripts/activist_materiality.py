@@ -103,6 +103,8 @@ def campaign_factor(group_size: int | None) -> float:
 
 def verification_factor(row: dict) -> float:
     factor = 1.0
+    if row.get("source") in {"publisher_site", "local"} and not row.get("target_verified"):
+        factor *= 0.1
     if row.get("body_verified") is False:
         factor *= 0.45
     if row.get("weak_match"):
@@ -136,12 +138,15 @@ def materiality_score(
         raw *= value
     score = max(1, min(100, round(raw)))
     floor = row.get("materiality_floor")
-    if floor is not None:
+    floor_allowed = row.get("source") not in {"publisher_site", "local"} or row.get("target_verified") is True
+    if floor is not None and floor_allowed:
         score = max(score, int(floor))
     return score, components
 
 
 def materiality_tier(score: int, row: dict) -> str:
+    if row.get("source") in {"publisher_site", "local"} and not row.get("target_verified"):
+        return "noise"
     if row.get("body_verified") is False or row.get("weak_match"):
         return "noise"
     triage = row.get("triage_verdict")

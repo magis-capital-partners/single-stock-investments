@@ -752,6 +752,8 @@ let activistSideFilter = 'all';
 let activistReviewFilter = '';
 let activistSearch = '';
 let activistTierFilter = 'signal';
+let activistViewFilter = 'active';
+let activistSortMode = 'materiality';
 const activistExpandedGroups = new Set();
 let insightsSearchDebounce = null;
 let insightsSearchFocused = false;
@@ -1147,6 +1149,8 @@ function renderActivist() {
     reviewFilter: activistReviewFilter,
     search: activistSearch,
     tier: activistTierFilter,
+    view: activistViewFilter,
+    sortMode: activistSortMode,
     expandedGroups: activistExpandedGroups,
   });
   content.querySelectorAll('[data-activist-side]').forEach(btn => {
@@ -1164,6 +1168,20 @@ function renderActivist() {
       renderActivist();
     });
   });
+  content.querySelectorAll('[data-activist-view]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activistViewFilter = btn.dataset.activistView || 'active';
+      activistReviewFilter = '';
+      renderActivist();
+    });
+  });
+  const sortSelect = content.querySelector('#activist-sort');
+  if (sortSelect) {
+    sortSelect.addEventListener('change', () => {
+      activistSortMode = sortSelect.value || 'materiality';
+      renderActivist();
+    });
+  }
   content.querySelectorAll('[data-activist-group]').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();

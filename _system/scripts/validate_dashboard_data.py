@@ -11,6 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 from vault_paths import letters_root  # noqa: E402
+from activist_common import classify_publisher_page  # noqa: E402
 DATA_PATH = ROOT / "dashboard" / "data" / "dashboard_data.json"
 REGISTRY_PATH = ROOT / "_system" / "portfolio" / "registry.json"
 INSIGHTS_PATH = ROOT / "dashboard" / "data" / "insights.json"
@@ -116,6 +117,15 @@ def main() -> int:
 
     insights = {}
     if INSIGHTS_PATH.exists():
+        insights_size = INSIGHTS_PATH.stat().st_size
+        if insights_size >= GITHUB_HARD_LIMIT_BYTES:
+            errors.append(
+                f"insights.json is {insights_size / (1024 * 1024):.1f}MB and exceeds GitHub's 100MB limit"
+            )
+        elif insights_size >= 95 * 1024 * 1024:
+            warnings.append(
+                f"insights.json is {insights_size / (1024 * 1024):.1f}MB; reduce retained event history before it reaches 100MB"
+            )
         raw_insights = INSIGHTS_PATH.read_text(encoding="utf-8")
         if "<<<<<<<" in raw_insights or ">>>>>>>" in raw_insights:
             errors.append(f"{INSIGHTS_PATH} contains unresolved git merge conflict markers")
@@ -244,6 +254,36 @@ def main() -> int:
                         errors.append(f"insights.events[{idx}] noise tier marked feed_eligible")
                     if event.get("triage_verdict") is None:
                         errors.append(f"insights.events[{idx}] missing triage_verdict")
+                    for key in (
+                        "decision_priority",
+                        "event_kind",
+                        "portfolio_scope",
+                        "template_id",
+                        "story_id",
+                        "evidence_status",
+                        "why_it_matters",
+                        "recommended_follow_up",
+                    ):
+                        if key not in event:
+                            errors.append(f"insights.events[{idx}] missing decision-feed field {key}")
+                    if event.get("tier") == "signal" and event.get("evidence_status") == "missing":
+                        warnings.append(
+                            f"insights.events[{idx}] signal explicitly missing evidence ({event.get('ticker')})"
+                        )
+                    if event.get("tier") == "signal" and event.get("entity_verified") is False:
+                        errors.append(f"insights.events[{idx}] entity-mismatched event promoted to signal")
+                    if (
+                        event.get("tier") == "signal"
+                        and event.get("event_kind") == "scheduled"
+                        and event.get("direction") in {None, "neutral"}
+                    ):
+                        errors.append(f"insights.events[{idx}] neutral scheduled event promoted to signal")
+                if events and not triage_summary.get("history_start"):
+                    errors.append("event triage summary missing history_start")
+                if events and not triage_summary.get("history_end"):
+                    errors.append("event triage summary missing history_end")
+                if int(triage_summary.get("retained_event_count") or 0) != len(events):
+                    errors.append("event triage retained_event_count does not match events list")
         if "records" in insights:
             errors.append("insights payload should not include raw records; use record_archive.path")
         archive = insights.get("record_archive") or {}
@@ -405,6 +445,7 @@ def main() -> int:
     if ACTIVIST_FEED_PATH.exists():
         activist = json.loads(ACTIVIST_FEED_PATH.read_text(encoding="utf-8"))
         feed = activist.get("feed") or []
+        review_queue = activist.get("review_queue") or []
         summary = activist.get("summary") or {}
         tier_sum = (summary.get("signal_count") or 0) + (summary.get("context_count") or 0) + (
             summary.get("noise_count") or 0
@@ -414,6 +455,7 @@ def main() -> int:
                 f"activist feed tier counts ({tier_sum}) != feed rows ({len(feed)})"
             )
         pages_deploy_only = os.environ.get("CI_PAGES_DEPLOY_ONLY", "").lower() in {"1", "true", "yes"}
+        publisher_targets_by_url: dict[str, set[str]] = {}
         for row in feed:
             local_file = row.get("local_file")
             github_url = row.get("github_url")
@@ -444,6 +486,40 @@ def main() -> int:
             if row.get("triage_verdict") == "auto_passive":
                 errors.append(
                     f"activist feed {row.get('ticker')}/{row.get('firm_id')}: auto_passive row must not be in feed"
+                )
+            if row.get("needs_filer_review"):
+                errors.append(
+                    f"activist feed {row.get('ticker')}/{row.get('firm_id')}: review row must be in review_queue"
+                )
+            for key in ("report_id", "campaign_id", "report_kind", "target_company", "link_relevance"):
+                if not row.get(key):
+                    errors.append(
+                        f"activist feed {row.get('ticker')}/{row.get('firm_id')}: missing {key}"
+                    )
+            if row.get("tier") == "signal" and not row.get("target_verified"):
+                errors.append(
+                    f"activist signal {row.get('ticker')}/{row.get('firm_id')}: target not verified"
+                )
+            if row.get("source") == "publisher_site":
+                is_report, reason = classify_publisher_page(
+                    row.get("source_url") or "", row.get("title") or ""
+                )
+                if not is_report:
+                    errors.append(
+                        f"activist publisher row is not a report ({reason}): {row.get('source_url')}"
+                    )
+                url = str(row.get("source_url") or "").rstrip("/")
+                if url:
+                    publisher_targets_by_url.setdefault(url, set()).add(row.get("ticker") or "")
+        for url, target_tickers in publisher_targets_by_url.items():
+            if len(target_tickers) > 1:
+                errors.append(
+                    f"activist publisher URL maps to multiple tickers ({', '.join(sorted(target_tickers))}): {url}"
+                )
+        for row in review_queue:
+            if not row.get("needs_filer_review"):
+                errors.append(
+                    f"activist review_queue {row.get('ticker')}/{row.get('firm_id')}: row does not need review"
                 )
         for ticker in holdings:
             sr = ROOT / ticker / "third-party-analyses" / "short_reports"

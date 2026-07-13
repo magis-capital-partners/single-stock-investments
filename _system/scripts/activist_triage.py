@@ -234,7 +234,11 @@ def triage_report(
         promote_rules.append("stake_large_registry")
 
     if report.get("source") in {"publisher_site", "local", "short_reports_md"} and side == "short":
-        if registry_firm and tier <= tier_max_signal and report.get("body_verified") is not False:
+        publisher_verified = (
+            report.get("source") == "short_reports_md"
+            or report.get("target_verified") is True
+        )
+        if registry_firm and tier <= tier_max_signal and publisher_verified:
             promote_rules.append("publisher_short_t1_verified")
 
     if campaign >= campaign_min:

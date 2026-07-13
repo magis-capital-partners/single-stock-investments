@@ -51,6 +51,7 @@ class MaterialityScoreTests(unittest.TestCase):
             "source": "publisher_site",
             "file_exists": True,
             "body_verified": True,
+            "target_verified": True,
         }
         score, _ = materiality_score(row, in_holdings=True, now=NOW)
         self.assertGreaterEqual(score, SIGNAL_THRESHOLD)
@@ -90,6 +91,22 @@ class MaterialityScoreTests(unittest.TestCase):
             "file_exists": True,
         }
         score, _ = materiality_score(row, in_holdings=True, now=NOW)
+        self.assertEqual(materiality_tier(score, row), "noise")
+
+    def test_materiality_floor_cannot_rescue_unverified_publisher_target(self) -> None:
+        row = {
+            "firm_id": "viceroy",
+            "filing_class": "publisher_report",
+            "report_date": _iso(1),
+            "source": "publisher_site",
+            "body_verified": True,
+            "target_verified": False,
+            "materiality_floor": 60,
+            "triage_verdict": "auto_signal",
+            "file_exists": True,
+        }
+        score, _ = materiality_score(row, in_holdings=True, now=NOW)
+        self.assertLess(score, SIGNAL_THRESHOLD)
         self.assertEqual(materiality_tier(score, row), "noise")
 
     def test_stake_scales_score(self) -> None:

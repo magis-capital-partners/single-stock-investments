@@ -278,7 +278,63 @@ def publisher_match_blob(report: dict) -> str:
     return " ".join(p for p in parts if p)
 
 
+NON_REPORT_SLUGS = frozenset(
+    {
+        "about",
+        "authors",
+        "careers",
+        "contact",
+        "items",
+        "legal",
+        "legal-disclaimer",
+        "lostpassword",
+        "news",
+        "newsroom",
+        "podcast",
+        "privacy",
+        "privacy-policy",
+        "products",
+        "publications",
+        "research",
+        "single-project",
+        "social-media-disclaimer",
+        "team",
+        "terms",
+        "terms-of-use",
+    }
+)
+
+
+def classify_publisher_page(url: str, title: str = "") -> tuple[bool, str]:
+    """Reject publisher navigation/policy pages before ticker matching."""
+    from urllib.parse import urlparse
+
+    parsed = urlparse(url or "")
+    path = parsed.path.strip("/")
+    slug = path.split("/")[-1].lower() if path else ""
+    normalized_title = re.sub(r"\s+", " ", title or "").strip().lower()
+    if not slug:
+        return False, "publisher_homepage"
+    if slug in NON_REPORT_SLUGS:
+        return False, f"non_report_slug:{slug}"
+    if any(
+        phrase in normalized_title
+        for phrase in (
+            "legal disclaimer",
+            "privacy policy",
+            "social media disclaimer",
+            "all rights reserved",
+            "page not found",
+        )
+    ):
+        return False, "non_report_title"
+    return True, "report_candidate"
+
+
 def publisher_match_allowed(url: str, title: str, blob: str, meta: dict) -> tuple[bool, float, str]:
+    is_report, page_reason = classify_publisher_page(url, title)
+    if not is_report:
+        return False, 0.0, page_reason
     if url_target_mismatch(url, title, meta):
         return False, 0.0, "url_mismatch"
     matched, confidence, reason = match_report_to_ticker(blob, meta)
@@ -356,15 +412,26 @@ def match_report_to_ticker(text: str, meta: dict, *, min_confidence: float = 0.0
     ticker = meta["ticker"].lower()
     company = (meta.get("company") or "").lower()
 
-    if re.search(rf"\b{re.escape(ticker)}\b", hay, re.I):
-        return True, 1.0, "ticker_symbol"
+    # Resolve the issuer name before ticker symbols.  Short symbols such as A,
+    # T, ON, IT, ED, and MAR are ordinary prose/month tokens and are never
+    # sufficient without explicit market notation.
+    if company and len(company) >= 6 and company in hay:
+        return True, 0.98, "company_name"
+
+    explicit_patterns = (
+        rf"\${re.escape(ticker)}\b",
+        rf"\b(?:nyse|nasdaq|amex|tsx|lse|asx)\s*[:\-]\s*{re.escape(ticker)}\b",
+        rf"\b(?:ticker|symbol)\s*[:\-]\s*{re.escape(ticker)}\b",
+    )
+    if any(re.search(pattern, hay, re.I) for pattern in explicit_patterns):
+        return True, 0.99, "ticker_explicit"
+
+    if len(ticker) >= 4 and re.search(rf"\b{re.escape(ticker)}\b", hay, re.I):
+        return True, 0.94, "ticker_symbol"
 
     ticker_compact = re.sub(r"[.\-]", "", ticker)
-    if ticker_compact and re.search(rf"\b{re.escape(ticker_compact)}\b", hay, re.I):
+    if len(ticker_compact) >= 4 and re.search(rf"\b{re.escape(ticker_compact)}\b", hay, re.I):
         return True, 0.98, "ticker_compact"
-
-    if company and len(company) >= 6 and company in hay:
-        return True, 0.95, "company_name"
 
     for alias in meta.get("aliases") or []:
         alias_l = str(alias).strip().lower()
@@ -388,7 +455,7 @@ def url_target_mismatch(url: str, title: str, meta: dict) -> bool:
     blob = f"{url} {title}".lower()
     ticker = meta["ticker"].lower()
     company = (meta.get("company") or "").lower()
-    if re.search(rf"\b{re.escape(ticker)}\b", blob, re.I):
+    if len(ticker) >= 4 and re.search(rf"\b{re.escape(ticker)}\b", blob, re.I):
         return False
     if company and len(company) >= 6 and company in blob:
         return False

@@ -11,6 +11,8 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 
 from activist_common import (  # noqa: E402
+    classify_publisher_page,
+    match_report_to_ticker,
     publisher_match_allowed,
     publisher_match_blob,
     resolve_report_file,
@@ -18,13 +20,52 @@ from activist_common import (  # noqa: E402
     url_target_mismatch,
 )
 from cleanup_activist_false_positives import should_keep  # noqa: E402
-from build_activist_feed import build_feed, feed_eligible, github_blob  # noqa: E402
+from build_activist_feed import build_feed, dedupe_canonical_reports, feed_eligible, github_blob  # noqa: E402
 from sec_filer_parse import _add_name  # noqa: E402
 
 FEED_PATH = ROOT / "dashboard" / "data" / "activist_feed.json"
 
 
 class ActivistFeedTests(unittest.TestCase):
+    def test_short_tickers_do_not_match_ordinary_prose(self) -> None:
+        examples = {
+            "A": "Carvana: A Father-Son Accounting Grift",
+            "ON": "Appendix to Our Report on Partners Group Holding AG",
+            "IT": "It then promotes LNG contract indexing",
+            "ED": "the Enforcement Directorate (ED) raided Vedanta",
+            "MAR": "Published Mar 25, 2026",
+            "T": "Today Viceroy sent a letter to MAS",
+        }
+        for ticker, text in examples.items():
+            matched, _confidence, reason = match_report_to_ticker(text, ticker_meta(ticker))
+            self.assertFalse(matched, msg=f"{ticker} matched via {reason}: {text}")
+
+    def test_short_ticker_requires_explicit_market_notation(self) -> None:
+        matched, confidence, reason = match_report_to_ticker(
+            "Initiating coverage of NYSE: T", ticker_meta("T")
+        )
+        self.assertTrue(matched)
+        self.assertGreaterEqual(confidence, 0.99)
+        self.assertEqual(reason, "ticker_explicit")
+
+    def test_non_report_publisher_routes_are_rejected(self) -> None:
+        for url, title in (
+            ("https://sprucepointcap.com/legal-disclaimer", "Legal Disclaimer | All Rights Reserved"),
+            ("https://viceroyresearch.org/publications", "Publications"),
+            ("https://example.com/terms", "Terms"),
+        ):
+            is_report, _reason = classify_publisher_page(url, title)
+            self.assertFalse(is_report)
+
+    def test_cross_ticker_publisher_url_is_quarantined(self) -> None:
+        rows = [
+            {"ticker": "A", "source": "publisher_site", "source_url": "https://example.com/report"},
+            {"ticker": "T", "source": "publisher_site", "source_url": "https://example.com/report"},
+        ]
+        kept, _duplicates, conflicts = dedupe_canonical_reports(rows)
+        self.assertEqual(kept, [])
+        self.assertEqual(conflicts, 2)
+
     def test_viceroy_osc_ciro_does_not_match_azlcz(self) -> None:
         meta = ticker_meta("AZLCZ")
         url = "https://viceroyresearch.org/osc-and-ciro/"
@@ -78,6 +119,19 @@ class ActivistFeedTests(unittest.TestCase):
             summary.get("noise_count") or 0
         )
         self.assertEqual(tier_sum, len(rows))
+
+    def test_signal_rows_have_verified_targets_and_unique_publisher_urls(self) -> None:
+        if not FEED_PATH.exists():
+            self.skipTest("activist_feed.json missing")
+        feed = json.loads(FEED_PATH.read_text(encoding="utf-8"))
+        publisher_targets: dict[str, set[str]] = {}
+        for row in feed.get("feed") or []:
+            if row.get("tier") == "signal":
+                self.assertTrue(row.get("target_verified"), msg=f"unverified signal: {row}")
+            if row.get("source") == "publisher_site" and row.get("source_url"):
+                publisher_targets.setdefault(row["source_url"].rstrip("/"), set()).add(row.get("ticker"))
+        conflicts = {url: targets for url, targets in publisher_targets.items() if len(targets) > 1}
+        self.assertEqual(conflicts, {})
 
     def test_github_blob_only_when_file_exists_in_feed(self) -> None:
         if not FEED_PATH.exists():

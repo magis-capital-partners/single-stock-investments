@@ -99,6 +99,9 @@ def verify_report(report: dict, meta: dict) -> bool:
         "body_match_reason": reason,
         "body_match_confidence": confidence,
         "body_hits": hits,
+        "target_verified": bool(matched),
+        "target_match_evidence": reason,
+        "target_match_confidence": confidence,
     }
     changed = any(report.get(k) != v for k, v in updates.items())
     report.update(updates)

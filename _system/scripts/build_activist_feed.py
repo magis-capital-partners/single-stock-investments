@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 from collections import Counter
@@ -16,8 +17,11 @@ from activist_common import (
     load_json,
     load_ticker_index,
     portfolio_tickers,
+    publisher_match_allowed,
+    publisher_match_blob,
     prune_ghost_index_entries,
     resolve_report_file,
+    ticker_meta,
 )
 from activist_short_md import collect_short_markdown_reports, short_md_report_entry
 from activist_date_parse import normalize_partial_date, parse_date_from_stem
@@ -57,6 +61,80 @@ def feed_eligible(report: dict) -> bool:
     if not exists and not report.get("source_url"):
         return False
     return True
+
+
+def publisher_target_verdict(report: dict, *, ticker: str) -> tuple[bool, float, str]:
+    """Require both report-page and document-body evidence for publisher rows."""
+    if report.get("source") not in {"publisher_site", "local"}:
+        return True, 1.0, "authoritative_source" if report.get("source") == "sec_edgar" else "curated_local"
+    meta = ticker_meta(ticker)
+    url = report.get("source_url") or report.get("local_file") or ""
+    matched, confidence, reason = publisher_match_allowed(
+        url,
+        report.get("title") or "",
+        publisher_match_blob(report),
+        meta,
+    )
+    if not matched:
+        return False, confidence, reason
+    if report.get("body_verified") is not True:
+        return False, confidence, "body_unverified"
+    body_reason = report.get("body_match_reason") or ""
+    if body_reason in {"no_match", "ticker_symbol"} and len(ticker.replace(".", "")) <= 3:
+        return False, confidence, f"unsafe_body_match:{body_reason}"
+    return True, min(confidence, float(report.get("body_match_confidence") or confidence)), reason
+
+
+def report_kind(row: dict) -> str:
+    if row.get("side") == "short":
+        return "short_report"
+    if row.get("filing_class") == "activist_proxy" or (row.get("form") or "").upper() in PROXY_DEDUP_FORMS:
+        return "proxy_campaign"
+    if row.get("filing_class") in {"activist_13d", "activist_13g", "registry_13g"}:
+        return "ownership_filing"
+    return "activist_report"
+
+
+def stable_report_id(row: dict) -> str:
+    seed = "|".join(
+        str(row.get(key) or "")
+        for key in ("ticker", "source_url", "local_file", "accession", "firm_id", "report_date")
+    )
+    return hashlib.sha1(seed.encode("utf-8")).hexdigest()[:16]
+
+
+def dedupe_canonical_reports(rows: list[dict]) -> tuple[list[dict], int, int]:
+    """Deduplicate exact URLs and quarantine cross-ticker publisher conflicts."""
+    groups: dict[str, list[dict]] = {}
+    passthrough: list[dict] = []
+    for row in rows:
+        url = row.get("source_url")
+        if row.get("source") != "publisher_site" or not url:
+            passthrough.append(row)
+            continue
+        groups.setdefault(url.rstrip("/"), []).append(row)
+
+    kept = list(passthrough)
+    duplicates = 0
+    conflicts = 0
+    for group in groups.values():
+        tickers = {row.get("ticker") for row in group}
+        if len(tickers) > 1:
+            conflicts += len(group)
+            continue
+        group.sort(
+            key=lambda row: (
+                float(row.get("target_match_confidence") or 0),
+                bool(row.get("file_exists")),
+                row.get("report_date") or "",
+            ),
+            reverse=True,
+        )
+        winner = dict(group[0])
+        winner["duplicate_count"] = len(group)
+        kept.append(winner)
+        duplicates += max(0, len(group) - 1)
+    return kept, duplicates, conflicts
 
 
 def enrich_report_metadata(report: dict) -> dict:
@@ -271,6 +349,10 @@ def build_feed(*, prune_indexes: bool = True, link_check: bool | None = None) ->
         "noise_count": 0,
         "body_unverified_count": 0,
         "broken_link_count": 0,
+        "non_report_excluded_count": 0,
+        "target_unverified_excluded_count": 0,
+        "canonical_duplicate_count": 0,
+        "cross_ticker_conflict_count": 0,
         "triage_auto_signal": 0,
         "triage_auto_context": 0,
         "triage_auto_passive": 0,
@@ -281,11 +363,30 @@ def build_feed(*, prune_indexes: bool = True, link_check: bool | None = None) ->
 
     for ticker in tickers:
         reports = per_ticker_reports.get(ticker) or []
-        visible = [
-            enrich_filer_metadata(r, ticker=ticker) if r.get("firm_id") == UNRESOLVED_FIRM_ID else r
-            for r in reports
-            if feed_eligible(r)
-        ]
+        meta = ticker_meta(ticker)
+        visible: list[dict] = []
+        for source_report in reports:
+            if not feed_eligible(source_report):
+                continue
+            report = (
+                enrich_filer_metadata(source_report, ticker=ticker)
+                if source_report.get("firm_id") == UNRESOLVED_FIRM_ID
+                else dict(source_report)
+            )
+            target_ok, target_confidence, target_reason = publisher_target_verdict(
+                report, ticker=ticker
+            )
+            if not target_ok:
+                if str(target_reason).startswith("non_report_"):
+                    summary["non_report_excluded_count"] += 1
+                else:
+                    summary["target_unverified_excluded_count"] += 1
+                continue
+            report["target_verified"] = True
+            report["target_match_confidence"] = target_confidence
+            report["target_match_evidence"] = target_reason
+            report["target_company"] = meta.get("company") or ticker
+            visible.append(report)
         summary["passive_excluded_count"] += sum(
             1 for r in reports if r.get("filing_class") == "passive_13g" or r.get("include_in_feed") is False
         )
@@ -336,6 +437,10 @@ def build_feed(*, prune_indexes: bool = True, link_check: bool | None = None) ->
                 stake_percent = stake_for_filing(file_ref)
             row = {
                 "ticker": ticker,
+                "target_company": report.get("target_company") or meta.get("company") or ticker,
+                "target_verified": bool(report.get("target_verified")),
+                "target_match_confidence": report.get("target_match_confidence"),
+                "target_match_evidence": report.get("target_match_evidence"),
                 "firm_id": report.get("firm_id"),
                 "firm_name": report.get("firm_name") or firm_name(report.get("firm_id") or ""),
                 "side": report.get("side"),
@@ -374,6 +479,14 @@ def build_feed(*, prune_indexes: bool = True, link_check: bool | None = None) ->
                 "campaign_freshness_floor": report.get("campaign_freshness_floor"),
                 "campaign_group_size": report.get("campaign_group_size"),
             }
+            row["report_kind"] = report_kind(row)
+            row["campaign_id"] = "|".join(
+                str(row.get(key) or "") for key in ("ticker", "firm_id", "side", "report_kind")
+            )
+            row["report_id"] = stable_report_id(row)
+            row["original_url"] = row.get("source_url")
+            row["archive_url"] = row.get("github_url")
+            row["link_relevance"] = "verified" if row.get("target_verified") else "unverified"
             if not row["report_date"]:
                 summary["missing_date_count"] += 1
             if row["needs_filer_review"]:
@@ -381,6 +494,9 @@ def build_feed(*, prune_indexes: bool = True, link_check: bool | None = None) ->
             feed_rows.append(row)
 
     feed_rows = dedupe_proxy_amendments(feed_rows)
+    feed_rows, duplicate_count, conflict_count = dedupe_canonical_reports(feed_rows)
+    summary["canonical_duplicate_count"] = duplicate_count
+    summary["cross_ticker_conflict_count"] = conflict_count
 
     registry = load_json(PORTFOLIO_REGISTRY, {})
     holdings = set((registry.get("holdings") or {}).keys())
@@ -395,17 +511,22 @@ def build_feed(*, prune_indexes: bool = True, link_check: bool | None = None) ->
         health = link_health.get(row.get("source_url") or "") or {}
         row["source_url_ok"] = health.get("ok")
         row["source_url_status"] = health.get("status")
+        row["link_liveness"] = (
+            "working" if health.get("ok") is True else "broken" if health.get("ok") is False else "unknown"
+        )
         if row.get("file_exists") is False and (not row.get("source_url") or row.get("source_url_ok") is False):
             # No local copy and no working publisher link: nothing to show.
             summary["broken_link_count"] += 1
             continue
-        score, _components = materiality_score(
+        score, components = materiality_score(
             row,
             in_holdings=row.get("ticker") in holdings,
             in_watchlist=row.get("ticker") in watchlist,
         )
         row["materiality"] = score
+        row["materiality_components"] = components
         row["tier"] = materiality_tier(score, row)
+        row["eligibility_status"] = "eligible"
         summary[f"{row['tier']}_count"] += 1
         verdict = row.get("triage_verdict")
         if verdict and verdict.startswith("auto_"):
@@ -417,12 +538,21 @@ def build_feed(*, prune_indexes: bool = True, link_check: bool | None = None) ->
         scored_rows.append(row)
     feed_rows = scored_rows
 
+    # Unresolved filers belong in an explicit review queue, not the ranked
+    # actionable feed.  The dashboard can still display them in its Review
+    # view without allowing them to compete with verified campaigns.
+    review_queue = [row for row in feed_rows if row.get("needs_filer_review")]
+    feed_rows = [row for row in feed_rows if not row.get("needs_filer_review")]
+
     summary["portfolio_hits"] = len(feed_rows)
     summary["long_count"] = sum(1 for r in feed_rows if r.get("side") == "long")
     summary["short_count"] = sum(1 for r in feed_rows if r.get("side") == "short")
-    summary["unreconciled_count"] = sum(
-        1 for info in per_ticker.values() if info.get("has_unreconciled")
-    )
+    summary["unreconciled_count"] = len(review_queue)
+    summary["unresolved_filer_count"] = len(review_queue)
+    summary["signal_count"] = sum(1 for r in feed_rows if r.get("tier") == "signal")
+    summary["context_count"] = sum(1 for r in feed_rows if r.get("tier") == "context")
+    summary["noise_count"] = sum(1 for r in feed_rows if r.get("tier") == "noise")
+    summary["triage_human_review"] = len(review_queue)
     tier_total = summary["signal_count"] + summary["context_count"] + summary["noise_count"]
     if tier_total != len(feed_rows):
         raise RuntimeError(
@@ -448,6 +578,7 @@ def build_feed(*, prune_indexes: bool = True, link_check: bool | None = None) ->
         "summary": summary,
         "by_ticker": per_ticker,
         "feed": feed_rows,
+        "review_queue": review_queue,
         "firms_active": len({r.get("firm_id") for r in feed_rows if r.get("firm_id")}),
     }
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)

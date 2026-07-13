@@ -9,6 +9,7 @@ from urllib.parse import urlparse
 from activist_common import (
     active_firms,
     canonical_report_path,
+    classify_publisher_page,
     load_ticker_index,
     now_iso,
     publisher_match_allowed,
@@ -78,6 +79,9 @@ def scan_firm_site(firm: dict, tickers: list[str], *, dry_run: bool = False) -> 
 
     for link in links:
         url = link["url"]
+        is_report, _page_reason = classify_publisher_page(url, link.get("title") or "")
+        if not is_report:
+            continue
         report_date, date_precision, date_source = _guess_date(link)
         ext = ".pdf" if url.lower().endswith(".pdf") else ".html"
         stem = Path(urlparse(url).path).stem[:40]
