@@ -412,6 +412,13 @@ try_resolve_rebase_conflicts() {
   git add _system/portfolio/research_events.jsonl 2>/dev/null || true
   git add _system/reference/market-data/external/sync_report.json 2>/dev/null || true
   if ! continue_rebase_after_resolution; then
+    # `git rebase --continue` returns non-zero when the next commit also
+    # conflicts. That is progress, not a failed resolution, provided the new
+    # conflict is another artifact set this helper knows how to regenerate.
+    if rebase_in_progress && is_resolvable_rebase_conflict; then
+      echo "Advanced to another regenerable rebase conflict; resolving the next commit."
+      return 0
+    fi
     echo "::error::git rebase --continue failed after conflict resolution."
     echo "::error::Unresolved paths:"
     conflicted_files || true
