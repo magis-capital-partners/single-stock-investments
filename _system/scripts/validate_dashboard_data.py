@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -26,6 +27,39 @@ MIN_TOTAL_PDFS_FLOOR = 100
 MIN_RESEARCH_DIR_RATIO = 0.10
 GITHUB_HARD_LIMIT_BYTES = 100 * 1024 * 1024
 GITHUB_WARN_LIMIT_BYTES = 50 * 1024 * 1024
+
+
+def sparse_checkout_enabled(root: Path = ROOT) -> bool:
+    """Return whether Git intentionally omitted tracked files from this worktree."""
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(root), "config", "--bool", "core.sparseCheckout"],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+    except OSError:
+        return False
+    return result.returncode == 0 and result.stdout.strip().lower() == "true"
+
+
+def repository_file_exists(root: Path, relative_path: str) -> bool:
+    """Accept a materialized file, or a tracked file omitted by sparse checkout."""
+    normalized = str(relative_path).replace("\\", "/").lstrip("/")
+    if (root / normalized).exists():
+        return True
+    if not sparse_checkout_enabled(root):
+        return False
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(root), "ls-files", "--error-unmatch", "--", normalized],
+            check=False,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+    except OSError:
+        return False
+    return result.returncode == 0
 
 
 def letter_drive_links_issue(
@@ -147,12 +181,12 @@ def main() -> int:
     if ticker_count >= 50 and total_pdfs < MIN_TOTAL_PDFS_FLOOR:
         errors.append(
             f"summary.total_pdfs={total_pdfs} below floor {MIN_TOTAL_PDFS_FLOOR} for "
-            f"{ticker_count} tickers — sparse rebuild likely clobbered holdings infra"
+            f"{ticker_count} tickers - sparse rebuild likely clobbered holdings infra"
         )
     if ticker_count >= 50 and with_research < max(1, int(ticker_count * MIN_RESEARCH_DIR_RATIO)):
         errors.append(
             f"summary.with_research={with_research} too low for {ticker_count} tickers "
-            f"(need >= {MIN_RESEARCH_DIR_RATIO:.0%}) — sparse rebuild likely clobbered infra"
+            f"(need >= {MIN_RESEARCH_DIR_RATIO:.0%}) - sparse rebuild likely clobbered infra"
         )
 
     for pseudo in dash_tickers:
@@ -482,8 +516,7 @@ def main() -> int:
                     f"activist feed {row.get('ticker')}/{row.get('firm_id')}: github_url set but file_exists is false"
                 )
             if local_file and file_exists is True and not pages_deploy_only:
-                path = ROOT / str(local_file).replace("\\", "/")
-                if not path.exists():
+                if not repository_file_exists(ROOT, str(local_file)):
                     errors.append(f"activist feed references missing file: {local_file}")
             if local_file and file_exists is False and github_url and not pages_deploy_only:
                 errors.append(f"activist feed ghost github link for missing file: {local_file}")
