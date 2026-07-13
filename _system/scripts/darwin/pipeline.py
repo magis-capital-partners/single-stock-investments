@@ -542,7 +542,8 @@ def run_pipeline(
         )
         policy_id, target_w, champion_bt = pid, ira_w, bt_ira
 
-    prev_w = load_previous_weights(ctx)
+    approved_prev_w = load_previous_weights(ctx)
+    prev_w = approved_prev_w
     if not prev_w:
         prev_w = irr_w if irr_w else prev_equal
 
@@ -560,6 +561,15 @@ def run_pipeline(
         c_notes["turnover_capped_output"] = True
         c_notes["turnover_one_way"] = round(max_turn, 4)
     target_w, cash_weight = apply_research_freshness_caps(target_w, features_by_ticker, mandate_doc)
+    data_integrity: dict = {"status": "ok"}
+    if not target_w and approved_prev_w:
+        target_w = dict(approved_prev_w)
+        cash_weight = max(0.0, 1.0 - sum(target_w.values()))
+        data_integrity = {
+            "status": "blocked_preserved_prior_weights",
+            "reason": "zero_research_eligible_names",
+            "action": "Rebuild the compact research snapshot from a full checkout before rebalancing.",
+        }
     turnover_used = (
         c_notes.get("turnover_one_way")
         if c_notes.get("turnover_capped_output")
@@ -827,6 +837,7 @@ def run_pipeline(
         },
         "weights": weights_to_list(target_w, features_by_ticker, prev_w),
         "cash_weight_pct": round(cash_weight * 100, 2),
+        "data_integrity": data_integrity,
         "research_queue": research_queue(rows, mandate_doc.get("mandate") or {}),
         "account_profile": mandate_doc.get("account_profile", "roth"),
         "benchmarks": {

@@ -19,6 +19,7 @@ from dated_md import dated_md_label, latest_dated_md  # noqa: E402
 CLASS_PATH = ROOT / "_system" / "portfolio" / "classification.json"
 REGISTRY_PATH = ROOT / "_system" / "portfolio" / "registry.json"
 HOLDINGS_PATH = ROOT / "_system" / "portfolio" / "holdings.md"
+RESEARCH_SNAPSHOT_PATH = ROOT / "_system" / "reference" / "market-data" / "darwin" / "research_features.json"
 
 
 def load_registry() -> dict:
@@ -330,11 +331,11 @@ def holdings_universe(mandate: dict | None = None) -> list[str]:
     return resolve_universe(_universe_spec_from_mandate(mandate), reg, base_tickers=holdings)
 
 
-def build_features(mandate: dict | None = None) -> dict:
-    return build_features_as_of(None, mandate=mandate)
+def build_features(mandate: dict | None = None, use_snapshot: bool = True) -> dict:
+    return build_features_as_of(None, mandate=mandate, use_snapshot=use_snapshot)
 
 
-def build_features_as_of(as_of: str | None, mandate: dict | None = None) -> dict:
+def build_features_as_of(as_of: str | None, mandate: dict | None = None, use_snapshot: bool = True) -> dict:
     from .universe import (
         compute_universe_exclusions,
         resolve_universe_detail,
@@ -342,6 +343,13 @@ def build_features_as_of(as_of: str | None, mandate: dict | None = None) -> dict
         universe_exclusion_sample,
     )
 
+    if use_snapshot and not as_of and RESEARCH_SNAPSHOT_PATH.exists():
+        try:
+            snap = json.loads(RESEARCH_SNAPSHOT_PATH.read_text(encoding="utf-8"))
+            if snap.get("schema_version") == 1 and snap.get("tickers"):
+                return snap
+        except json.JSONDecodeError:
+            pass
     holdings_meta = parse_holdings()
     reg = load_registry()
     for t, h in (reg.get("holdings") or {}).items():

@@ -1,0 +1,32 @@
+name: Darwin Research Snapshot
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "20 3 * * 1-5"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: data-commit-main
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build compact research contract from full checkout
+        run: python _system/scripts/build_darwin_research_snapshot.py
+      - name: Commit research contract
+        uses: ./.github/actions/commit-main
+        with:
+          message: "chore(darwin): refresh compact research snapshot"
+          git_add: "_system/reference/market-data/darwin/research_features.json"
