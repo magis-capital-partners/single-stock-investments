@@ -34,9 +34,7 @@ Path(sys.argv[2]).write_text(patched)
 PY
 chmod +x "$TMP"
 
-export CI_PUSH_SKIP_SELF_REFRESH=1
-
-if ! out=$(bash "$SCRIPT" "direct-msg" 2>&1); then
+if ! out=$(CI_PUSH_SKIP_SELF_REFRESH=1 bash "$SCRIPT" "direct-msg" 2>&1); then
   echo "FAIL: direct ci_push_main invocation should not error on message"
   echo "$out"
   exit 1
@@ -47,7 +45,7 @@ if echo "$out" | grep -q "commit message required"; then
   exit 1
 fi
 
-if ! out=$(bash "$TMP" "harness-msg" 2>&1); then
+if ! out=$(env -u CI_PUSH_SKIP_SELF_REFRESH bash "$TMP" "harness-msg" 2>&1); then
   if echo "$out" | grep -q "commit message required"; then
     echo "FAIL: old-style self-source re-entered ci_push_main without message"
     echo "$out"
