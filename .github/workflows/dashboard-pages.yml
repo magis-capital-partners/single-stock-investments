@@ -72,6 +72,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          filter: blob:none
+          sparse-checkout: dashboard/oauth-proxy
+          sparse-checkout-cone-mode: true
           fetch-depth: 2
       - id: check
         run: |
