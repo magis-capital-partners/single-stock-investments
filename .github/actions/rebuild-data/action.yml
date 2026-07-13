@@ -38,6 +38,20 @@ runs:
       shell: bash
       run: pip install -r _system/scripts/requirements.txt
 
+    - name: Configure Google credentials (full profile)
+      if: inputs.profile == 'full' || inputs.profile == 'intake-full'
+      shell: bash
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ env.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
+      run: |
+        if [ -z "${GOOGLE_APPLICATION_CREDENTIALS_JSON}" ]; then
+          echo "::error::GOOGLE_APPLICATION_CREDENTIALS_JSON is required for profile ${{ inputs.profile }}."
+          echo "::error::The full rebuild runs Drive audit/sync scripts that need the pdf-store service account."
+          exit 1
+        fi
+        printf '%s' "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > "$RUNNER_TEMP/google-service-account.json"
+        echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/google-service-account.json" >> "$GITHUB_ENV"
+
     - name: Rebuild profile
       if: inputs.profile != 'none'
       shell: bash
