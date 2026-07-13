@@ -1597,7 +1597,7 @@ function renderDarwin() {
     { key: 'liquidity_miss', label: 'Liquidity miss (bucket C/D)' },
     { key: 'no_options', label: 'No options flag' },
     { key: 'returns_missing', label: 'Missing returns CSV' },
-    { key: 'irr_stance_miss', label: 'IRR / stance gate' },
+    { key: 'research_eligibility_miss', label: 'Deep-dive research gate' },
   ];
   content.innerHTML = `
     <h2 style="font-size:18px;margin-bottom:6px">Darwin · ${escapeHtml(acctLabel)} paper book</h2>
@@ -1659,6 +1659,7 @@ function renderDarwin() {
       <div class="summary-card"><div class="label">Cumulative</div><div class="value" style="font-size:16px">${champ.cumulative_return != null ? (champ.cumulative_return * 100).toFixed(1) + '%' : '—'}</div><div class="sub">${excessVsSpy != null ? 'excess vs SPY ' + excessVsSpy + 'pp' : 'log compounding'}${excessCcVsSpy != null ? ' · CC excess ' + excessCcVsSpy + 'pp' : ''}</div></div>
       <div class="summary-card"><div class="label">Macro</div><div class="value" style="font-size:14px">VIX ${macro.vix ?? '—'}</div><div class="sub">10Y ${macro.yield_10y ?? '—'}% · ${macro.as_of_month || 'n/a'}</div></div>
       <div class="summary-card"><div class="label">Evolution</div><div class="value" style="font-size:14px">${d.policy_detail?.population_loaded ?? 0} seeds</div><div class="sub">${(d.price_panel?.months || 0)} mo history</div></div>
+      <div class="summary-card"><div class="label">Cash reserve</div><div class="value" style="font-size:16px">${d.cash_weight_pct != null ? d.cash_weight_pct + '%' : '0%'}</div><div class="sub">unallocated when research caps limit exposure</div></div>
     </div>
     <div class="detail-section">
       <h3>Target weights (Marvin + Darwin)</h3>

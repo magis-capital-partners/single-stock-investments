@@ -4,6 +4,8 @@ from __future__ import annotations
 import math
 from typing import Any
 
+from .research_eligibility import adjusted_irr, is_allocatable
+
 
 def _score_row(row: dict, genome: dict | None = None) -> float:
     g = genome or {}
@@ -113,34 +115,9 @@ def policy_softmax_latent(
 
 
 def ira_marvin_ineligible(rows: list[dict], genome: dict | None = None) -> list[str]:
-    """Tickers in the feature universe that fail IRA IRR/stance gates (not merely top_k cut)."""
+    """Tickers that lack a current, deep-dive-backed allocatable return."""
     g = genome or {}
-    min_irr = g.get("min_irr_pct_for_weight", 6.0)
-    allow_stances = set(g.get("exclude_negative_irr_unless_stance") or ["core", "accumulate"])
-    allow_watch = set(g.get("allow_watch_stances") or [])
-    miss: list[str] = []
-    for r in rows:
-        t = r.get("ticker")
-        if not t:
-            continue
-        irr = r.get("irr_falsifier_pct")
-        if irr is None:
-            irr = r.get("irr_base_pct")
-        cl = r.get("classification") or {}
-        stance = (cl.get("stance") or "watch").lower()
-        if irr is None:
-            miss.append(t)
-            continue
-        if irr < 0 and stance not in allow_stances:
-            miss.append(t)
-            continue
-        if irr < min_irr and stance not in allow_stances:
-            miss.append(t)
-            continue
-        if stance in ("watch", "trim", "exit") and stance not in allow_stances and stance not in allow_watch:
-            miss.append(t)
-            continue
-    return miss
+    return [r["ticker"] for r in rows if r.get("ticker") and not is_allocatable(r, g)]
 
 
 def cc_suitability_score(
@@ -151,17 +128,6 @@ def cc_suitability_score(
 ) -> float:
     """Buy-write suitability in [~0.4, ~1.6]: liquidity, vol, stance upside willingness."""
     g = genome or {}
-    cl = row.get("classification") or {}
-    stance = (cl.get("stance") or "hold").lower()
-    # Willing to sell upside on hold/watch more than core compounders
-    stance_cc = {
-        "core": 0.75,
-        "accumulate": 0.85,
-        "hold": 1.05,
-        "watch": 1.15,
-        "trim": 1.2,
-        "exit": 0.3,
-    }.get(stance, 1.0)
     bucket = (liquidity_bucket or row.get("liquidity_bucket") or "B").upper()
     bucket_m = {"A": 1.2, "B": 1.0, "C": 0.65, "D": 0.4}.get(bucket, 1.0)
     # Prefer moderate-high vol for premium; extreme vol penalized slightly
@@ -184,7 +150,7 @@ def cc_suitability_score(
     div_m = 1.0
     if isinstance(dy, (int, float)):
         div_m = 1.0 + min(0.1, max(0.0, float(dy) / 100.0))
-    score = stance_cc * bucket_m * vol_m * div_m
+    score = bucket_m * vol_m * div_m
     # Genome knobs
     score *= float(g.get("cc_suitability_scale", 1.0))
     return max(0.35, min(1.75, score))
@@ -196,24 +162,6 @@ def policy_ira_marvin(rows: list[dict], genome: dict | None = None) -> dict[str,
     use_cc = bool(g.get("cc_dual_score"))
     iv_map = g.get("iv_by_ticker") or {}
     liq_map = g.get("liquidity_by_ticker") or {}
-    mandate_scoring = g.get("ira_scoring") or {}
-    stance_m = mandate_scoring.get("stance_multipliers") or {
-        "core": 1.25,
-        "accumulate": 1.15,
-        "hold": 1.0,
-        "watch": 0.45,
-        "trim": 0.2,
-        "exit": 0.0,
-    }
-    dhando_m = mandate_scoring.get("dhando_multipliers") or {
-        "full": 1.12,
-        "partial": 1.05,
-        "none": 0.85,
-        "pending": 0.9,
-    }
-    market_m = mandate_scoring.get("market_multipliers") or {}
-    min_irr = g.get("min_irr_pct_for_weight", 6.0)
-    allow_stances = set(g.get("exclude_negative_irr_unless_stance") or ["core", "accumulate"])
     top_k = int(g.get("top_k", g.get("max_names_cc") if use_cc and g.get("max_names_cc") else g.get("max_names", 12)))
     if use_cc and g.get("max_names_cc"):
         top_k = int(g.get("max_names_cc"))
@@ -221,30 +169,12 @@ def policy_ira_marvin(rows: list[dict], genome: dict | None = None) -> dict[str,
     scored: list[tuple[str, float]] = []
     high_cc_watch: list[str] = []
     for r in rows:
-        irr = r.get("irr_falsifier_pct") or r.get("irr_base_pct")
-        if irr is None:
+        if not is_allocatable(r, g):
             continue
-        cl = r.get("classification") or {}
-        stance = (cl.get("stance") or "watch").lower()
-        if irr < 0 and stance not in allow_stances:
+        irr = adjusted_irr(r)
+        if irr is None:  # Defensive: is_allocatable already guarantees this.
             continue
-        if irr < min_irr and stance not in allow_stances:
-            continue
-        if stance in ("watch", "trim", "exit") and stance not in allow_stances:
-            continue
-        score = max(float(irr), 0.1)
-        score *= stance_m.get(stance, 0.5)
-        score *= dhando_m.get((cl.get("dhando") or "pending").lower(), 0.9)
-        score *= market_m.get(r.get("market", "US"), 1.0)
-        moat = (cl.get("moat") or "").lower()
-        if moat in ("widening", "stable"):
-            score *= 1.0 + mandate_scoring.get("moat_bonus", 0.12)
-        score -= mandate_scoring.get("staleness_penalty_per_year", 0.04) * (
-            (r.get("days_since_deep_dive") or 0) / 365.0
-        )
-        score -= mandate_scoring.get("falsifier_penalty", 0.6) * (r.get("falsifier_count") or 0)
-        if r.get("human_review_pending"):
-            score *= 1.0 - mandate_scoring.get("human_review_discount", 0.25)
+        score = max(irr, 0.1)
         if use_cc:
             t = r["ticker"]
             cc_s = cc_suitability_score(
@@ -254,7 +184,7 @@ def policy_ira_marvin(rows: list[dict], genome: dict | None = None) -> dict[str,
                 liquidity_bucket=liq_map.get(t.upper()) or liq_map.get(t),
             )
             score *= cc_s
-            if stance == "watch" and cc_s >= float(g.get("cc_watch_review_threshold", 1.2)):
+            if cc_s >= float(g.get("cc_watch_review_threshold", 1.2)):
                 high_cc_watch.append(t)
         scored.append((r["ticker"], max(score, 1e-6)))
 

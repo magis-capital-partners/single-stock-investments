@@ -319,15 +319,15 @@ def compute_universe_exclusions(
     included: list[str],
     spec: str,
     detail: dict | None = None,
-    irr_stance_miss: list[str] | None = None,
+    research_eligibility_miss: list[str] | None = None,
 ) -> dict:
     """Structured exclusions for serving / dashboard (Phase A)."""
     d = detail or resolve_universe_detail(spec, registry)
-    irr_miss = list(irr_stance_miss or [])
+    research_miss = list(research_eligibility_miss or [])
     by_reason = dict(d.get("by_reason") or {})
-    by_reason["irr_stance_miss"] = len(irr_miss)
+    by_reason["research_eligibility_miss"] = len(research_miss)
     samples = dict(d.get("samples") or {})
-    samples["irr_stance_miss"] = irr_miss[:12]
+    samples["research_eligibility_miss"] = research_miss[:12]
     return {
         "eligible_count": d.get("eligible_count", len(included)),
         "eligible_with_returns": d.get("eligible_with_returns"),

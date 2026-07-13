@@ -25,8 +25,9 @@ def _top_holdings(target_w: dict[str, float], features_by_ticker: dict, n: int =
 def _policy_mechanism(policy_id: str, ensemble_detail: list | None) -> str:
     mechanisms = {
         "ira_marvin": (
-            "IRA Marvin policy ranks names using Marvin deep-dive IRR, moat, dhando, "
-            "staleness, and falsifier penalties, then applies mandate caps (max weight, min IRR, stance)."
+            "IRA Marvin admits only completed, current deep dives with a published "
+            "falsifier-adjusted IRR above the mandate threshold, ranks them by that IRR, "
+            "and applies research-freshness, diversification, and cash caps."
         ),
         "irr_ranked": "IRR-ranked policy overweight names with higher falsifier-adjusted IRR scores.",
         "equal_weight": "Equal-weight spreads risk across the full registry with no IRR tilt.",
@@ -136,11 +137,11 @@ def build_portfolio_explanation(
         "excluded_count": len(excluded),
         "excluded_sample": excluded[:8],
         "drivers": [
-            {"factor": "Marvin IRR (base)", "role": "Primary rank input for IRA / IRR policies"},
-            {"factor": "Moat / dhando", "role": "Score multipliers in policy genomes"},
-            {"factor": "Falsifiers", "role": f"Book total {falsifier_total}; per-name penalties"},
-            {"factor": "Staleness", "role": f"{stale} names with deep dive older than review threshold"},
-            {"factor": "Mandate caps", "role": "Max weight, min names, turnover, stance caps"},
+            {"factor": "Falsifier-adjusted IRR", "role": "Sole selection rank input for the IRA policy"},
+            {"factor": "Deep-dive validity", "role": "Completed valuation required; no proxy returns for unresearched names"},
+            {"factor": "Research freshness", "role": f"{stale} names beyond review threshold; aging research has a lower cap"},
+            {"factor": "Falsifiers", "role": f"Book total {falsifier_total}; critical evidence prevents allocation"},
+            {"factor": "Mandate caps", "role": "Position, diversification, turnover, and cash limits; stance is context only"},
             {"factor": "Macro regime", "role": f"Label {regime.get('label')} adjusts constraint overrides"},
         ],
         "popper_falsifiers": falsifiers,

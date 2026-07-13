@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import math
 
+from .research_eligibility import allocation_cap, research_status
+
 
 def enforce_max_weight_sum(weights: dict[str, float], max_w: float) -> dict[str, float]:
     """Cap each name at max_w then renormalize (iterative)."""
@@ -107,37 +109,25 @@ def apply_constraints(
     return out, notes
 
 
-def apply_ira_stance_caps(
+def apply_research_freshness_caps(
     weights: dict[str, float],
     features_by_ticker: dict[str, dict],
     mandate: dict,
-) -> dict[str, float]:
-    """Cap watch/trim names; boost redistribution to hold+."""
+) -> tuple[dict[str, float], float]:
+    """Apply published research caps and leave any unallocatable balance as cash.
+
+    This deliberately does not redistribute a capped amount: cash is preferable to
+    increasing exposure beyond the evidence supported by current deep dives.
+    """
     m = mandate.get("mandate") or mandate
-    max_watch = m.get("max_weight_pct_watch", 5.0) / 100.0
-    allow_watch = set(m.get("allow_watch_stances") or [])
-    if not max_watch:
-        return weights
-    excess = 0.0
-    out = dict(weights)
-    receivers = []
-    for t, w in list(out.items()):
-        f = features_by_ticker.get(t, {})
-        stance = ((f.get("classification") or {}).get("stance") or "watch").lower()
-        if stance in ("watch", "trim") and stance not in allow_watch and w > max_watch:
-            excess += w - max_watch
-            out[t] = max_watch
-        elif stance in ("core", "accumulate", "hold"):
-            receivers.append(t)
-    if excess > 0 and receivers:
-        add = excess / len(receivers)
-        for t in receivers:
-            out[t] = out.get(t, 0.0) + add
-    s = sum(out.values()) or 1.0
-    out = {t: out[t] / s for t in out}
-    max_w = m.get("max_weight_pct", 15.0) / 100.0
-    out = enforce_max_weight_sum(out, max_w)
-    return {t: v for t, v in out.items() if v > 1e-4}
+    out: dict[str, float] = {}
+    for ticker, weight in weights.items():
+        cap = allocation_cap(features_by_ticker.get(ticker, {}), m)
+        if cap is None:
+            continue
+        out[ticker] = min(max(float(weight), 0.0), cap)
+    invested = min(sum(out.values()), 1.0)
+    return {t: w for t, w in out.items() if w > 1e-4}, max(0.0, 1.0 - invested)
 
 
 def weights_to_list(
@@ -159,6 +149,9 @@ def weights_to_list(
                 "delta": round(w - prev.get(t, 0.0), 4),
                 "stance": cl.get("stance"),
                 "irr_base_pct": f.get("irr_base_pct"),
+                "irr_falsifier_pct": f.get("irr_falsifier_pct"),
+                "research_status": research_status(f),
+                "days_since_deep_dive": f.get("days_since_deep_dive"),
                 "falsifier_count": f.get("falsifier_count", 0),
                 "trade_suggested": abs(w - prev.get(t, 0.0)) >= 0.005,
             }

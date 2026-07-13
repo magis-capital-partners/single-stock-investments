@@ -10,7 +10,7 @@ from .backtest import benchmark_buy_hold, benchmark_covered_call, simulate
 from .accounts import AccountCtx, account_ctx, build_serving, load_mandate_for, tier0_production
 from .config import DATA_DIR, FEATURES_PATH, load_mandate
 from .paper_portfolio import update_paper_portfolio
-from .constraints import apply_constraints, apply_ira_stance_caps, weights_to_list
+from .constraints import apply_constraints, apply_research_freshness_caps, weights_to_list
 from .encoder import train_encoder
 from .ensemble import blend_weights, deflated_sharpe
 from .features import build_features
@@ -25,6 +25,7 @@ from .bias_scan import run_bias_scan
 from .import_external_data import sync_external_market_data
 from .observatory import build_observatory, save_observatory, write_regime_brief
 from .policies import apply_policy, ira_marvin_ineligible, policy_equal_weight, policy_irr_ranked, policy_risk_parity_vol
+from .research_eligibility import research_queue
 from .questions import scaffold_all_questions
 from .scorecard import append_scorecard
 from .simulation import run_stress_simulation
@@ -275,7 +276,6 @@ def run_pipeline(
     regime = merge_regime(research_regime, macro, mandate_doc)
     mandate_effective = {**mandate_doc, "mandate": regime_constraint_overrides(regime, mandate_doc)}
 
-    ira_scoring = mandate_doc.get("ira_scoring") or {}
     cc_sel = mandate_doc.get("covered_call") or {}
     prefer_cc_policy = bool(cc_sel.get("dual_score_selection")) and (
         (mandate_doc.get("mandate") or {}).get("preferred_policy") in ("ira_marvin_cc", "ira_marvin")
@@ -288,7 +288,6 @@ def run_pipeline(
     iv_map = iv_by_ticker(tickers)
     ira_genome = {
         **(mandate_doc.get("mandate") or {}),
-        "ira_scoring": ira_scoring,
         "top_k": (mandate_doc.get("mandate") or {}).get("max_names", 12),
         "max_names_cc": (mandate_doc.get("mandate") or {}).get("max_names_cc"),
         "min_names_cc": (mandate_doc.get("mandate") or {}).get("min_names_cc"),
@@ -296,13 +295,15 @@ def run_pipeline(
         "iv_by_ticker": iv_map,
         "liquidity_by_ticker": liquidity_by_ticker,
     }
-    irr_stance_miss = ira_marvin_ineligible(rows, ira_genome)
+    research_ineligible = ira_marvin_ineligible(rows, ira_genome)
     univ_excl = dict(features.get("universe_exclusions") or {})
     if univ_excl:
         by_reason = dict(univ_excl.get("by_reason") or {})
-        by_reason["irr_stance_miss"] = len(irr_stance_miss)
+        by_reason["research_eligibility_miss"] = len(research_ineligible)
+        by_reason.pop("irr_stance_miss", None)
         samples = dict(univ_excl.get("samples") or {})
-        samples["irr_stance_miss"] = irr_stance_miss[:12]
+        samples["research_eligibility_miss"] = research_ineligible[:12]
+        samples.pop("irr_stance_miss", None)
         univ_excl["by_reason"] = by_reason
         univ_excl["samples"] = samples
         univ_excl["excluded_total"] = sum(int(v or 0) for v in by_reason.values())
@@ -558,13 +559,7 @@ def run_pipeline(
         target_w, _ = apply_constraints(tickers, target_w, prev_w, mandate_effective, falsifier_map)
         c_notes["turnover_capped_output"] = True
         c_notes["turnover_one_way"] = round(max_turn, 4)
-    target_w = apply_ira_stance_caps(target_w, features_by_ticker, mandate_doc)
-    max_w = m.get("max_weight_pct", 15.0) / 100.0
-    if max_w:
-        for t in list(target_w):
-            target_w[t] = min(target_w[t], max_w)
-        s = sum(target_w.values()) or 1.0
-        target_w = {t: target_w[t] / s for t in target_w}
+    target_w, cash_weight = apply_research_freshness_caps(target_w, features_by_ticker, mandate_doc)
     turnover_used = (
         c_notes.get("turnover_one_way")
         if c_notes.get("turnover_capped_output")
@@ -660,7 +655,7 @@ def run_pipeline(
             plain_genome = {**ira_genome, "cc_dual_score": False, "max_names_cc": None}
             plain_raw = apply_policy("ira_marvin", rows, plain_genome)
             plain_w, _ = apply_constraints(tickers, plain_raw, prev_w, mandate_effective, falsifier_map)
-            target_w = apply_ira_stance_caps(plain_w, features_by_ticker, mandate_doc)
+            target_w, cash_weight = apply_research_freshness_caps(plain_w, features_by_ticker, mandate_doc)
             policy_id = "ira_marvin"
             cc_oos_gate["production_policy"] = "ira_marvin_gated"
             # refresh CC bench on gated weights
@@ -831,6 +826,8 @@ def run_pipeline(
             "population_loaded": len(pop),
         },
         "weights": weights_to_list(target_w, features_by_ticker, prev_w),
+        "cash_weight_pct": round(cash_weight * 100, 2),
+        "research_queue": research_queue(rows, mandate_doc.get("mandate") or {}),
         "account_profile": mandate_doc.get("account_profile", "roth"),
         "benchmarks": {
             "ira_marvin": bt_ira,
@@ -853,13 +850,13 @@ def run_pipeline(
     if not bt_qyld.get("error"):
         out["benchmarks"]["qyld"] = _bench_stats(bt_qyld)
 
-    # Phase C: flag high CC suitability + watch stance for human review
+    # Covered-call suitability is a separate overlay; it does not affect eligibility.
     for t in list(ira_genome.get("_cc_high_suitability_watch") or []):
         review_flags.append(
             {
                 "ticker": t,
                 "severity": "warn",
-                "reason": "high_cc_suitability_with_watch_stance",
+                "reason": "high_covered_call_suitability",
             }
         )
     conflicts = [f for f in review_flags if f.get("severity") == "review"]
