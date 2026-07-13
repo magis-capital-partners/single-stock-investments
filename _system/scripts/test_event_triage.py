@@ -10,7 +10,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 
-from event_triage import cross_source_dedupe, load_rules, triage_event, triage_events  # noqa: E402
+from event_triage import (  # noqa: E402
+    cross_source_dedupe,
+    enrich_decision_fields,
+    load_rules,
+    triage_event,
+    triage_events,
+)
 
 GOLDEN = ROOT / "_system" / "scripts" / "fixtures" / "event_triage_golden.jsonl"
 
@@ -51,6 +57,8 @@ class EventTriageTests(unittest.TestCase):
             "source": "kpi_trend",
             "event_type": "inflection",
             "impact_axis": "growth",
+            "title": "Margin inflection confirmed",
+            "summary": "Operating margin inflection confirmed by new evidence",
             "ticker": "ICE",
             "observed_at": "2026-06-01",
             "trend_signal_tier": "confirmed",
@@ -62,8 +70,10 @@ class EventTriageTests(unittest.TestCase):
         loser = {
             "id": "lose",
             "source": "news",
-            "event_type": "context",
+            "event_type": "inflection",
             "impact_axis": "growth",
+            "title": "Margin inflection confirmed",
+            "summary": "Operating margin inflection confirmed by new evidence",
             "ticker": "ICE",
             "observed_at": "2026-06-02",
             "confidence": "med",
@@ -77,6 +87,90 @@ class EventTriageTests(unittest.TestCase):
         self.assertEqual(len(superseded), 1)
         self.assertEqual(superseded[0]["tier"], "noise")
         self.assertFalse(superseded[0]["feed_eligible"])
+        winner_row = next(e for e in merged if not e.get("superseded_by"))
+        self.assertEqual(winner_row["corroboration_count"], 2)
+
+    def test_distinct_same_axis_events_are_preserved(self) -> None:
+        base = {
+            "ticker": "ICE",
+            "impact_axis": "fundamentals",
+            "observed_at": "2026-06-01",
+            "confidence": "high",
+            "in_our_book": True,
+            "portfolio_relevance": 1.0,
+            "freshness_days": 10,
+        }
+        rows = cross_source_dedupe(
+            [
+                {**base, "id": "revenue", "source": "filing", "event_type": "filing_metric", "title": "Revenue up 15%"},
+                {**base, "id": "margin", "source": "kpi_trend", "event_type": "inflection", "title": "Margin inflection confirmed"},
+            ],
+            rules=self.rules,
+        )
+        self.assertEqual(len(rows), 2)
+        self.assertFalse(any(row.get("superseded_by") for row in rows))
+
+    def test_routine_governance_watch_is_context(self) -> None:
+        result = self._triage(
+            {
+                "id": "routine-governance", "source": "kpi_trend", "event_type": "leadership_risk",
+                "impact_axis": "governance", "title": "Leadership / governance on watch",
+                "summary": "Two executive sales in 120d", "ticker": "ICE", "direction": "neutral",
+                "confidence": "med", "freshness_days": 1, "in_our_book": True,
+                "portfolio_relevance": 1.0,
+            }
+        )
+        self.assertEqual(result["tier"], "context")
+        self.assertEqual(result["triage_verdict"], "auto_context")
+
+    def test_entity_mismatch_is_noise(self) -> None:
+        result = self._triage(
+            {
+                "id": "bad-match", "source": "third_party", "event_type": "context",
+                "impact_axis": "variant_view", "title": "Unrelated issuer research", "ticker": "ICE",
+                "entity_verified": False, "confidence": "med", "freshness_days": 1,
+                "in_our_book": True, "portfolio_relevance": 1.0,
+            }
+        )
+        self.assertEqual(result["tier"], "noise")
+        self.assertFalse(result["feed_eligible"])
+
+    def test_scheduled_neutral_event_is_context(self) -> None:
+        result = self._triage(
+            {
+                "id": "upcoming", "source": "earnings", "event_type": "upcoming_earnings",
+                "impact_axis": "fundamentals", "title": "Upcoming earnings", "ticker": "ICE",
+                "event_kind": "scheduled", "direction": "neutral", "confidence": "high",
+                "freshness_days": -10, "in_our_book": True, "portfolio_relevance": 1.0,
+            }
+        )
+        self.assertEqual(result["tier"], "context")
+        self.assertTrue(result["feed_eligible"])
+
+    def test_emerging_regime_shift_stays_context(self) -> None:
+        result = self._triage(
+            {
+                "id": "emerging-regime", "source": "kpi_trend", "event_type": "regime_shift",
+                "impact_axis": "fundamentals", "title": "Growth regime strengthening", "ticker": "ICE",
+                "trend_signal_tier": "emerging", "direction": "bullish", "confidence": "high",
+                "freshness_days": 2, "in_our_book": True, "portfolio_relevance": 1.0,
+            }
+        )
+        self.assertEqual(result["tier"], "context")
+
+    def test_decision_fields_explain_priority(self) -> None:
+        event = {
+            "id": "decision", "source": "filing", "source_label": "Filing",
+            "event_type": "filing_metric", "impact_axis": "fundamentals",
+            "title": "Revenue up 15%", "summary": "Revenue moved versus the prior period.",
+            "ticker": "ICE", "direction": "bullish", "materiality": 80,
+            "evidence_url": "https://example.com/filing",
+        }
+        enriched = enrich_decision_fields([event])[0]
+        self.assertGreater(enriched["decision_priority"], 0)
+        self.assertEqual(enriched["evidence_status"], "linked")
+        self.assertTrue(enriched["why_it_matters"])
+        self.assertTrue(enriched["recommended_follow_up"])
 
     def test_triage_summary_counts(self) -> None:
         events = []

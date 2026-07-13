@@ -6,6 +6,7 @@
 <title>Single Stock Portfolio Dashboard</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='85'>📊</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="insights-events.css" rel="stylesheet">
 <style>
   :root {
     --bg-primary: #0a0e17;
@@ -701,6 +702,18 @@ const INSIGHT_SOURCE_LABEL = {
   theme: 'theme',
   pdf: 'PDF',
 };
+const INSIGHTS_EVENT_FILTERS_KEY = 'ssp_insights_event_filters_v2';
+const INSIGHTS_EVENT_WORKFLOW_KEY = 'ssp_insights_event_workflow_v2';
+const INSIGHTS_EVENT_LAST_SEEN_KEY = 'ssp_insights_event_last_seen_v2';
+
+function readLocalJson(key, fallback) {
+  try {
+    const value = JSON.parse(localStorage.getItem(key) || 'null');
+    return value && typeof value === 'object' ? value : fallback;
+  } catch (_) {
+    return fallback;
+  }
+}
 
 let data = null;
 let oauthConfig = null;
@@ -720,6 +733,27 @@ let insightsQuarter = 'latest';
 let fundRegistrySearch = '';
 let insightsBookOnly = true;
 let insightsNeedsReviewOnly = false;
+let insightsEventFilters = {
+  eventRange: 'last7',
+  eventScope: 'holdings',
+  eventKind: 'observed',
+  eventSource: 'all',
+  eventAxis: 'all',
+  eventDirection: 'all',
+  eventConfidence: 'all',
+  eventReview: 'unreviewed',
+  ...readLocalJson(INSIGHTS_EVENT_FILTERS_KEY, {}),
+};
+let insightsEventWorkflow = {
+  reviewed: {},
+  saved: {},
+  mutedTemplates: {},
+  notes: {},
+  ...readLocalJson(INSIGHTS_EVENT_WORKFLOW_KEY, {}),
+};
+let insightsEventLastSeenAt = (() => {
+  try { return localStorage.getItem(INSIGHTS_EVENT_LAST_SEEN_KEY); } catch (_) { return null; }
+})();
 let insightsSection = (() => {
   try {
     return localStorage.getItem(INSIGHTS_SECTION_KEY) || 'letters';
@@ -1257,6 +1291,9 @@ function renderInsights(opts = {}) {
     indexMembership: data.index_membership || null,
     inflectionTier: insightsInflectionTier,
     eventTier: insightsEventTier,
+    ...insightsEventFilters,
+    eventReviewState: insightsEventWorkflow,
+    eventLastSeenAt: insightsEventLastSeenAt,
     themesViewMode: insightsThemesViewMode,
     memoryViewMode,
     memoryTypeFilter,
@@ -1430,7 +1467,48 @@ function renderInsights(opts = {}) {
     });
   }
   if (window.InsightsViz && insightsSection === 'events') {
-    InsightsViz.attachFilingVerifyHandlers(content, insights?.events || [], escapeHtml, linkHtml, GITHUB_REPO);
+    InsightsViz.attachEventHandlers(content, insights?.events || [], escapeHtml, linkHtml, GITHUB_REPO, {
+      reviewState: insightsEventWorkflow,
+      onFilter(name, value) {
+        insightsEventFilters = { ...insightsEventFilters, [name]: value };
+        try { localStorage.setItem(INSIGHTS_EVENT_FILTERS_KEY, JSON.stringify(insightsEventFilters)); } catch (_) { /* ignore */ }
+        renderInsights();
+      },
+      onReset() {
+        insightsEventFilters = {
+          eventRange: 'last7', eventScope: 'holdings', eventKind: 'observed',
+          eventSource: 'all', eventAxis: 'all', eventDirection: 'all',
+          eventConfidence: 'all', eventReview: 'unreviewed',
+        };
+        fundRegistrySearch = '';
+        try { localStorage.setItem(INSIGHTS_EVENT_FILTERS_KEY, JSON.stringify(insightsEventFilters)); } catch (_) { /* ignore */ }
+        renderInsights();
+      },
+      onMarkFeedSeen() {
+        insightsEventLastSeenAt = insights?.generated_at || new Date().toISOString();
+        try { localStorage.setItem(INSIGHTS_EVENT_LAST_SEEN_KEY, insightsEventLastSeenAt); } catch (_) { /* ignore */ }
+        renderInsights();
+      },
+      onAction(action, id, value) {
+        if (action === 'note') {
+          insightsEventWorkflow.notes = { ...insightsEventWorkflow.notes, [id]: value };
+        } else {
+          const field = action === 'muted' ? 'mutedTemplates' : action;
+          const current = { ...(insightsEventWorkflow[field] || {}) };
+          if (current[id]) delete current[id]; else current[id] = new Date().toISOString();
+          insightsEventWorkflow[field] = current;
+        }
+        try { localStorage.setItem(INSIGHTS_EVENT_WORKFLOW_KEY, JSON.stringify(insightsEventWorkflow)); } catch (_) { /* ignore */ }
+        renderInsights();
+      },
+      onOpenTicker(ticker) {
+        if (!ticker) return;
+        insightsSection = 'tickers';
+        tickerInsightsSelectedTicker = ticker;
+        try { localStorage.setItem(INSIGHTS_SECTION_KEY, insightsSection); } catch (_) { /* ignore */ }
+        renderInsights();
+      },
+    });
   }
   if (window.InsightsViz && insightsSection === 'consensus') {
     const timeModel = InsightsViz.buildTimeModel(insights, data.document_catalog);

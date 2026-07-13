@@ -2071,9 +2071,16 @@ def freshness_weight(days: int | None) -> float:
     return 0.2
 
 
-def event_relevance(ticker: str | None, scope: str | None, our_tickers: set[str]) -> float:
-    if ticker and ticker in our_tickers:
+def event_relevance(
+    ticker: str | None,
+    scope: str | None,
+    holdings_tickers: set[str],
+    front_tickers: set[str],
+) -> float:
+    if ticker and ticker in holdings_tickers:
         return 1.0
+    if ticker and ticker in front_tickers:
+        return 0.82
     if scope == "portfolio":
         return 0.72
     return 0.45
@@ -2114,7 +2121,12 @@ def model_impact_weight(record: dict) -> float:
     return max(0.65, min(weight, 1.25))
 
 
-def event_score(record: dict, ticker: str | None, our_tickers: set[str]) -> int:
+def event_score(
+    record: dict,
+    ticker: str | None,
+    holdings_tickers: set[str],
+    front_tickers: set[str],
+) -> int:
     days = freshness_days(record.get("as_of"))
     score = (
         100
@@ -2122,7 +2134,7 @@ def event_score(record: dict, ticker: str | None, our_tickers: set[str]) -> int:
         * event_materiality(record)
         * confidence_weight(record.get("confidence"))
         * freshness_weight(days)
-        * event_relevance(ticker, record.get("scope"), our_tickers)
+        * event_relevance(ticker, record.get("scope"), holdings_tickers, front_tickers)
         * model_impact_weight(record)
     )
     return max(1, round(score))
@@ -2178,6 +2190,7 @@ def dedupe_events(events: list[dict]) -> list[dict]:
 def events_from_records(
     records: list[dict],
     front_tickers: set[str],
+    holdings_tickers: set[str],
     company_hints: dict[str, set[str]],
 ) -> list[dict]:
     events: list[dict] = []
@@ -2195,23 +2208,52 @@ def events_from_records(
             continue
         days = freshness_days(record.get("as_of"))
         axis = record.get("impact_axis") or SOURCE_META.get(source, {}).get("axis") or "context"
+        observed_at = normalize_date(record.get("as_of"))
+        event_kind = "scheduled" if days is not None and days < 0 else "observed"
+        structured_source = source in {
+            "filing",
+            "earnings",
+            "insider",
+            "kpi_trend",
+            "specialist_13f",
+            "tracked_fund_13f",
+            "superinvestor_letter",
+        }
+        entity_text = " ".join(
+            str(record.get(key) or "") for key in ("title", "claim", "summary", "commentary")
+        )
+        entity_verified = bool(
+            not ticker
+            or structured_source
+            or contains_ticker_token(entity_text, ticker)
+            or has_company_hint(entity_text, ticker, company_hints)
+        )
+        in_holdings = bool(ticker and ticker in holdings_tickers)
+        in_watchlist = bool(ticker and ticker in front_tickers and ticker not in holdings_tickers)
         event = {
             "id": event_id(record, ticker),
             "ticker": ticker,
-            "in_our_book": bool(ticker and ticker in front_tickers),
+            "in_our_book": in_holdings,
+            "in_holdings": in_holdings,
+            "in_watchlist": in_watchlist,
+            "portfolio_scope": "holdings" if in_holdings else ("watchlist" if in_watchlist else "portfolio"),
             "source": source,
             "source_label": SOURCE_META.get(source, {}).get("label", source or "Insight"),
             "source_name": record.get("publisher") or record.get("fund") or SOURCE_META.get(source, {}).get("label"),
             "event_type": record.get("event_type") or source or "insight",
             "impact_axis": axis,
-            "observed_at": normalize_date(record.get("as_of")),
+            "observed_at": observed_at,
+            "published_at": observed_at if event_kind == "observed" else normalize_date(record.get("published_at")),
+            "effective_at": observed_at if event_kind == "scheduled" else normalize_date(record.get("effective_at")),
+            "event_kind": event_kind,
             "freshness_days": days,
             "title": event_title(record),
             "summary": short_text(record.get("claim"), 320),
             "direction": record.get("direction") or "neutral",
             "confidence": record.get("confidence") or "med",
-            "portfolio_relevance": event_relevance(ticker, scope, front_tickers),
-            "score": event_score(record, ticker, front_tickers),
+            "portfolio_relevance": event_relevance(ticker, scope, holdings_tickers, front_tickers),
+            "score": event_score(record, ticker, holdings_tickers, front_tickers),
+            "entity_verified": entity_verified,
             "evidence_ref": record.get("evidence_ref"),
             "evidence_url": record.get("evidence_url") or evidence_url(record.get("evidence_ref")),
             "evidence_label": record.get("evidence_label") or evidence_label(record.get("evidence_ref")),
@@ -2238,15 +2280,69 @@ def events_from_records(
     return dedupe_events(events)
 
 
+def _retained_event_history(events: list[dict], max_events: int = 1800) -> list[dict]:
+    """Retain a useful current feed plus representative older history and upcoming events."""
+    scheduled = [e for e in events if e.get("event_kind") == "scheduled"]
+    eligible = [e for e in events if e.get("event_kind") != "scheduled" and e.get("feed_eligible")]
+    noise = [e for e in events if e.get("event_kind") != "scheduled" and not e.get("feed_eligible")]
+
+    def decision_rank(event: dict) -> tuple:
+        return (
+            int(event.get("decision_priority") or event.get("materiality") or 0),
+            event.get("observed_at") or "",
+        )
+
+    chosen: list[dict] = []
+    seen: set[str] = set()
+
+    def add(rows: list[dict], limit: int) -> None:
+        for event in sorted(rows, key=decision_rank, reverse=True)[:limit]:
+            event_id = str(event.get("id") or "")
+            if event_id and event_id in seen:
+                continue
+            if event_id:
+                seen.add(event_id)
+            chosen.append(event)
+
+    add(scheduled, 150)
+    add(eligible, 1000)
+
+    by_year: dict[str, list[dict]] = {}
+    for event in events:
+        year = str(event.get("observed_at") or "unknown")[:4]
+        by_year.setdefault(year, []).append(event)
+    for year in sorted(by_year, reverse=True):
+        add(by_year[year], 35)
+
+    add(noise, 220)
+    retained = chosen[:max_events]
+    retained.sort(
+        key=lambda e: (
+            e.get("observed_at") or "",
+            int(e.get("decision_priority") or e.get("materiality") or 0),
+        ),
+        reverse=True,
+    )
+    return retained
+
+
 def finalize_events(events: list[dict], scan_date: str) -> tuple[list[dict], dict]:
     triaged, _ = triage_events(events)
     write_triage_queue(triaged, scan_date)
-    feed = triaged[:400]
+    feed = _retained_event_history(triaged)
+    dates = sorted(e.get("observed_at") for e in feed if e.get("observed_at"))
     summary = {
         "signal": sum(1 for e in feed if e.get("tier") == "signal" and e.get("feed_eligible")),
         "context": sum(1 for e in feed if e.get("tier") == "context" and e.get("feed_eligible")),
         "noise": sum(1 for e in feed if e.get("tier") == "noise" or not e.get("feed_eligible")),
         "human_review": sum(1 for e in feed if e.get("triage_verdict") == "human_review"),
+        "scheduled": sum(1 for e in feed if e.get("event_kind") == "scheduled"),
+        "missing_evidence": sum(1 for e in feed if e.get("evidence_status") == "missing"),
+        "raw_event_count": len(events),
+        "triaged_event_count": len(triaged),
+        "retained_event_count": len(feed),
+        "history_start": dates[0] if dates else None,
+        "history_end": dates[-1] if dates else None,
     }
     return feed, summary
 
@@ -2596,6 +2692,7 @@ def main() -> int:
         records.extend(from_superinvestor_letters(letters_doc))
 
     front_tickers = portfolio_tickers(include_watchlist=True)
+    holdings_tickers = our_holdings_tickers()
     company_hints = portfolio_company_hints(include_watchlist=True)
     sumzero_doc = load_json(SUMZERO_INDEX)
     records.extend(from_sumzero_ideas(sumzero_doc if isinstance(sumzero_doc, dict) else None, front_tickers))
@@ -2632,7 +2729,7 @@ def main() -> int:
             pass
     terminalvalue_doc = load_json(TERMINALVALUE_SOURCES)
 
-    raw_events = events_from_records(records, front_tickers, company_hints)
+    raw_events = events_from_records(records, front_tickers, holdings_tickers, company_hints)
     scan_date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     events, event_triage_summary = finalize_events(raw_events, scan_date)
     archive_meta = write_record_archive(build_record_archive(records, front_tickers, company_hints))

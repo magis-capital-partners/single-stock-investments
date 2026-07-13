@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import hashlib
+import math
 import re
 from datetime import date, datetime, timezone
 from pathlib import Path
@@ -19,6 +21,146 @@ CORE_FILING_METRICS = frozenset(
     {"revenues", "revenue", "operating_income", "net_income", "eps_basic", "eps_diluted", "cfo"}
 )
 BALANCE_METRICS = frozenset({"cash", "stockholders_equity", "long_term_debt"})
+
+STRUCTURED_ENTITY_SOURCES = frozenset(
+    {"filing", "earnings", "insider", "kpi_trend", "specialist_13f", "tracked_fund_13f"}
+)
+
+
+def _normalized_story_text(event: dict) -> str:
+    text = " ".join(
+        str(event.get(key) or "")
+        for key in ("title", "summary", "metric_name", "position_action")
+    ).lower()
+    text = re.sub(r"\$[\d,.]+", " amount ", text)
+    text = re.sub(r"\b\d+(?:\.\d+)?%?\b", " number ", text)
+    tokens = [token for token in re.findall(r"[a-z][a-z0-9]{2,}", text) if token not in {"the", "and", "for", "with"}]
+    return " ".join(tokens[:18]) or str(event.get("event_type") or "event")
+
+
+def event_template_id(event: dict) -> str:
+    raw = "|".join(
+        [
+            str(event.get("event_type") or ""),
+            str(event.get("impact_axis") or ""),
+            _normalized_story_text(event),
+        ]
+    )
+    return hashlib.sha1(raw.encode("utf-8")).hexdigest()[:12]
+
+
+def event_story_id(event: dict) -> str:
+    raw = "|".join(
+        [
+            str(event.get("ticker") or "portfolio"),
+            str(event.get("event_kind") or "observed"),
+            _normalized_story_text(event),
+        ]
+    )
+    return hashlib.sha1(raw.encode("utf-8")).hexdigest()[:16]
+
+
+def _evidence_items(event: dict) -> list[dict]:
+    items = list(event.get("evidence_items") or [])
+    url = event.get("evidence_url") or event.get("evidence_ref")
+    if url:
+        candidate = {
+            "label": event.get("evidence_label") or event.get("source_label") or "Source",
+            "url": event.get("evidence_url"),
+            "ref": event.get("evidence_ref"),
+            "source": event.get("source"),
+        }
+        if candidate not in items:
+            items.append(candidate)
+    return items
+
+
+def _why_it_matters(event: dict) -> str:
+    axis = event.get("impact_axis") or "context"
+    direction = event.get("direction") or "neutral"
+    messages = {
+        "fundamentals": "May change earnings power, cash generation, or the valuation range.",
+        "governance": "May change confidence in management alignment, oversight, or execution.",
+        "ownership": "May reveal informed capital flows or a change in investor sponsorship.",
+        "catalyst": "May alter the timing or probability of a near-term catalyst.",
+        "risk": "May increase the probability or severity of a thesis downside case.",
+        "variant_view": "Adds an outside view that can challenge the current thesis assumptions.",
+        "macro": "May affect the external conditions supporting the investment case.",
+    }
+    base = messages.get(axis, "Adds new information that may warrant a thesis check.")
+    if direction == "bullish":
+        return f"Positive evidence. {base}"
+    if direction == "bearish":
+        return f"Negative evidence. {base}"
+    return base
+
+
+def _recommended_follow_up(event: dict) -> str:
+    if event.get("event_kind") == "scheduled":
+        return "Prepare the key questions and compare the result with current estimates after the event."
+    source = event.get("source")
+    axis = event.get("impact_axis")
+    if source == "filing":
+        return "Verify the filing extract and reconcile the change with the model and prior period."
+    if axis == "governance":
+        return "Check transaction context, trading plans, and whether the pattern is unusual for this issuer."
+    if source in {"third_party", "news"}:
+        return "Open the primary evidence, validate the ticker match, and record any thesis disagreement."
+    if axis in {"fundamentals", "risk", "catalyst"}:
+        return "Compare this development with the thesis, falsifiers, and valuation assumptions."
+    return "Review the evidence and decide whether the ticker needs a research note or thesis update."
+
+
+def enrich_decision_fields(events: list[dict]) -> list[dict]:
+    """Attach decision-useful metadata after triage without hiding the underlying score."""
+    frequencies: dict[str, int] = {}
+    for event in events:
+        template = event.get("template_id") or event_template_id(event)
+        event["template_id"] = template
+        event["story_id"] = event.get("story_id") or event_story_id(event)
+        frequencies[template] = frequencies.get(template, 0) + 1
+
+    for event in events:
+        frequency = frequencies.get(event["template_id"], 1)
+        novelty = max(0.35, min(1.0, 1.35 / math.sqrt(frequency)))
+        event_type = event.get("event_type") or ""
+        axis = event.get("impact_axis") or ""
+        actionability = 0.55
+        if event_type in {"filing_metric", "regime_shift", "inflection", "reported_earnings"}:
+            actionability = 1.0
+        elif event_type in {"letter_position", "form4_transaction"}:
+            actionability = 0.85
+        elif axis in {"risk", "catalyst", "fundamentals"}:
+            actionability = 0.8
+        elif axis == "governance" and event.get("direction") == "neutral":
+            actionability = 0.5
+        if event.get("event_kind") == "scheduled":
+            actionability = min(actionability, 0.65)
+
+        evidence = _evidence_items(event)
+        corroboration = max(1, int(event.get("corroboration_count") or len(set(event.get("corroborating_sources") or [])) or 1))
+        evidence_factor = 1.0 if evidence else 0.72
+        corroboration_bonus = min(8, (corroboration - 1) * 3)
+        materiality = int(event.get("materiality") or event.get("score") or 0)
+        priority = round(
+            materiality * (0.52 + 0.28 * actionability + 0.2 * novelty) * evidence_factor
+            + corroboration_bonus
+        )
+
+        event.update(
+            {
+                "template_frequency": frequency,
+                "novelty_score": round(novelty, 3),
+                "actionability_score": round(actionability, 3),
+                "decision_priority": max(1, min(100, priority)),
+                "evidence_items": evidence,
+                "evidence_count": len(evidence),
+                "evidence_status": "linked" if evidence else "missing",
+                "why_it_matters": event.get("why_it_matters") or _why_it_matters(event),
+                "recommended_follow_up": event.get("recommended_follow_up") or _recommended_follow_up(event),
+            }
+        )
+    return events
 
 
 def _quarter_from_date(value: str | None) -> str | None:
@@ -86,6 +228,12 @@ def triage_event(event: dict, *, rules: dict, activist_tickers: set[str]) -> dic
     parser_conf = _parser_conf(event)
     flags = set((event.get("verification") or {}).get("parser_flags") or [])
 
+    if source not in STRUCTURED_ENTITY_SOURCES and event.get("ticker") and event.get("entity_verified") is False:
+        demote.append("entity_mismatch")
+
+    if event.get("event_kind") == "scheduled" and event.get("direction") in {None, "neutral"}:
+        demote.append("scheduled_context")
+
     if event_type == "filing_refresh":
         demote.append("filing_refresh_only")
 
@@ -122,11 +270,19 @@ def triage_event(event: dict, *, rules: dict, activist_tickers: set[str]) -> dic
     if event_type == "inflection" and event.get("trend_signal_tier") == "confirmed":
         promote.append("inflection_confirmed")
 
-    if event_type == "regime_shift":
+    if event_type == "regime_shift" and event.get("trend_signal_tier") == "confirmed":
         promote.append("inflection_regime")
+    elif event_type == "regime_shift":
+        demote.append("regime_watch")
 
     if event_type == "leadership_risk" and event.get("impact_axis") == "governance":
-        promote.append("governance_risk")
+        title = str(event.get("title") or "").lower()
+        confirmed = event.get("trend_signal_tier") == "confirmed"
+        elevated = event.get("direction") == "bearish" or "elevated" in title
+        if confirmed or elevated:
+            promote.append("governance_risk")
+        else:
+            demote.append("routine_governance_watch")
 
     action = event.get("position_action") or ""
     if source == "superinvestor_letter" and action in ACTIONABLE_LETTER and event.get("in_our_book"):
@@ -163,9 +319,13 @@ def triage_event(event: dict, *, rules: dict, activist_tickers: set[str]) -> dic
         human.append("large_move_med_conf")
 
     if event.get("impact_axis") == "governance" and source == "kpi_trend" and not event.get("verification"):
-        if event_type == "leadership_risk":
+        if event_type == "leadership_risk" and (
+            event.get("trend_signal_tier") == "confirmed"
+            or event.get("direction") == "bearish"
+            or "elevated" in str(event.get("title") or "").lower()
+        ):
             promote.append("governance_risk")
-        else:
+        elif event_type != "leadership_risk":
             human.append("governance_only")
 
     score, components = materiality_score(event, rules=rules)
@@ -177,10 +337,14 @@ def triage_event(event: dict, *, rules: dict, activist_tickers: set[str]) -> dic
         rules_fired = human + promote + demote
         feed_eligible = True
     elif demote and not promote:
-        if "filing_refresh_only" in demote or "parser_skip_flags" in demote:
+        if any(rule in demote for rule in ("filing_refresh_only", "parser_skip_flags", "entity_mismatch")):
             verdict = "auto_noise"
             tier = "noise"
             feed_eligible = False
+        elif any(rule in demote for rule in ("scheduled_context", "routine_governance_watch", "regime_watch")):
+            verdict = "auto_context"
+            tier = "context"
+            feed_eligible = True
         elif "stale_event" in demote:
             verdict = "auto_context"
             tier = "noise"
@@ -277,12 +441,12 @@ def _event_rank(event: dict, rules: dict) -> tuple:
 
 
 def cross_source_dedupe(events: list[dict], *, rules: dict) -> list[dict]:
+    """Suppress only the same story, preserving distinct events in the same quarter/axis."""
     groups: dict[str, list[dict]] = {}
     for event in events:
-        ticker = event.get("ticker") or "portfolio"
-        quarter = event.get("quarter") or _quarter_from_date(event.get("observed_at")) or "unknown"
-        axis = event.get("impact_axis") or "context"
-        key = f"{ticker}|{quarter}|{axis}"
+        event["template_id"] = event.get("template_id") or event_template_id(event)
+        event["story_id"] = event.get("story_id") or event_story_id(event)
+        key = event["story_id"]
         groups.setdefault(key, []).append(event)
 
     out: list[dict] = []
@@ -291,7 +455,17 @@ def cross_source_dedupe(events: list[dict], *, rules: dict) -> list[dict]:
             out.append(rows[0])
             continue
         ranked = sorted(rows, key=lambda e: _pre_dedupe_rank(e, rules), reverse=True)
-        winner = ranked[0]
+        winner = dict(ranked[0])
+        sources = sorted({str(row.get("source") or "unknown") for row in ranked})
+        evidence: list[dict] = []
+        for row in ranked:
+            for item in _evidence_items(row):
+                if item not in evidence:
+                    evidence.append(item)
+        winner["corroboration_count"] = len(ranked)
+        winner["corroborating_sources"] = sources
+        winner["corroborating_event_ids"] = [row.get("id") for row in ranked[1:] if row.get("id")]
+        winner["evidence_items"] = evidence
         out.append(winner)
         for loser in ranked[1:]:
             copy = dict(loser)
@@ -309,13 +483,21 @@ def triage_events(events: list[dict], *, activist_tickers: set[str] | None = Non
     for event in staged:
         triaged.append(triage_event(event, rules=rules, activist_tickers=activist_tickers))
 
+    enrich_decision_fields(triaged)
+
     summary = {
         "signal": sum(1 for e in triaged if e.get("tier") == "signal" and e.get("feed_eligible")),
         "context": sum(1 for e in triaged if e.get("tier") == "context" and e.get("feed_eligible")),
         "noise": sum(1 for e in triaged if e.get("tier") == "noise" or not e.get("feed_eligible")),
         "human_review": sum(1 for e in triaged if e.get("triage_verdict") == "human_review"),
     }
-    triaged.sort(key=lambda e: (e.get("observed_at") or "", int(e.get("materiality") or 0)), reverse=True)
+    triaged.sort(
+        key=lambda e: (
+            e.get("observed_at") or "",
+            int(e.get("decision_priority") or e.get("materiality") or 0),
+        ),
+        reverse=True,
+    )
     return triaged, summary
 
 
