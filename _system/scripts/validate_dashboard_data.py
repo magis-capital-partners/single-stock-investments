@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -23,6 +24,39 @@ MIN_LETTER_CORPUS = 15000
 MIN_LETTER_LINKS_RATIO = 0.99
 GITHUB_HARD_LIMIT_BYTES = 100 * 1024 * 1024
 GITHUB_WARN_LIMIT_BYTES = 50 * 1024 * 1024
+
+
+def sparse_checkout_enabled(root: Path = ROOT) -> bool:
+    """Return whether Git intentionally omitted tracked files from this worktree."""
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(root), "config", "--bool", "core.sparseCheckout"],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+    except OSError:
+        return False
+    return result.returncode == 0 and result.stdout.strip().lower() == "true"
+
+
+def repository_file_exists(root: Path, relative_path: str) -> bool:
+    """Accept a materialized file, or a tracked file omitted by sparse checkout."""
+    normalized = str(relative_path).replace("\\", "/").lstrip("/")
+    if (root / normalized).exists():
+        return True
+    if not sparse_checkout_enabled(root):
+        return False
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(root), "ls-files", "--error-unmatch", "--", normalized],
+            check=False,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+    except OSError:
+        return False
+    return result.returncode == 0
 
 
 def letter_drive_links_issue(
@@ -465,8 +499,7 @@ def main() -> int:
                     f"activist feed {row.get('ticker')}/{row.get('firm_id')}: github_url set but file_exists is false"
                 )
             if local_file and file_exists is True and not pages_deploy_only:
-                path = ROOT / str(local_file).replace("\\", "/")
-                if not path.exists():
+                if not repository_file_exists(ROOT, str(local_file)):
                     errors.append(f"activist feed references missing file: {local_file}")
             if local_file and file_exists is False and github_url and not pages_deploy_only:
                 errors.append(f"activist feed ghost github link for missing file: {local_file}")

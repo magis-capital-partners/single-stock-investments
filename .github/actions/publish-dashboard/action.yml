@@ -44,6 +44,7 @@ runs:
       env:
         OAUTH_CLIENT_ID: ${{ env.OAUTH_CLIENT_ID }}
         OAUTH_PROXY_URL: ${{ env.OAUTH_PROXY_URL }}
+        CI_PAGES_DEPLOY_ONLY: "true"
       with:
         profile: ${{ inputs.rebuild_profile }}
         validate: ${{ inputs.validate }}
@@ -54,7 +55,7 @@ runs:
       env:
         CI_PAGES_DEPLOY_ONLY: "true"
       run: |
-        python -m unittest _system/scripts/test_event_materiality.py _system/scripts/test_event_triage.py _system/scripts/test_event_feed_history.py _system/scripts/test_event_feed_ui.py
+        python -m unittest _system/scripts/test_event_materiality.py _system/scripts/test_event_triage.py _system/scripts/test_event_feed_history.py _system/scripts/test_event_feed_ui.py _system/scripts/test_validate_dashboard_sparse.py
         python _system/scripts/validate_dashboard_data.py
 
     - name: Configure GitHub Pages

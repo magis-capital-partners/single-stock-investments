@@ -411,7 +411,7 @@ try_resolve_rebase_conflicts() {
   git add _system/reference/data-sources/insights_record_archive.json 2>/dev/null || true
   git add _system/portfolio/research_events.jsonl 2>/dev/null || true
   git add _system/reference/market-data/external/sync_report.json 2>/dev/null || true
-  if ! GIT_EDITOR=true git rebase --continue; then
+  if ! continue_rebase_after_resolution; then
     echo "::error::git rebase --continue failed after conflict resolution."
     echo "::error::Unresolved paths:"
     conflicted_files || true
@@ -421,6 +421,18 @@ try_resolve_rebase_conflicts() {
     return 0
   fi
   is_resolvable_rebase_conflict
+}
+
+continue_rebase_after_resolution() {
+  # Regeneration can reproduce origin/main byte-for-byte. In that case the
+  # rebased commit is intentionally empty and must be skipped rather than
+  # treated as a failed conflict resolution.
+  if git diff --cached --quiet; then
+    echo "Resolved rebase commit is empty after regeneration; skipping it."
+    GIT_EDITOR=true git rebase --skip
+  else
+    GIT_EDITOR=true git rebase --continue
+  fi
 }
 
 _check_file_sizes_for_paths() {

@@ -22,6 +22,8 @@ on:
       - "_system/scripts/test_letter_date_parser.py"
       - "_system/scripts/test_fund_registry_date.py"
       - "_system/scripts/test_ci_push_rebase_resolve.sh"
+      - "_system/scripts/test_ci_push_empty_rebase.sh"
+      - "_system/scripts/test_validate_dashboard_sparse.py"
       - "_system/scripts/ci_push_main.sh"
       - "_system/scripts/_eval/letter_date_gold.jsonl"
       - "_system/reference/letter_date_overrides.json"
@@ -48,6 +50,8 @@ on:
       - "_system/scripts/test_letter_date_parser.py"
       - "_system/scripts/test_fund_registry_date.py"
       - "_system/scripts/test_ci_push_rebase_resolve.sh"
+      - "_system/scripts/test_ci_push_empty_rebase.sh"
+      - "_system/scripts/test_validate_dashboard_sparse.py"
       - "_system/scripts/ci_push_main.sh"
       - "_system/scripts/_eval/letter_date_gold.jsonl"
       - "_system/reference/letter_date_overrides.json"
@@ -73,6 +77,8 @@ jobs:
             _system/scripts/test_ci_checkout_vault.sh
             _system/scripts/test_vault_paths.py
             _system/scripts/lint_ci_bootstrap.py
+            _system/scripts/ci_sparse_checkout_paths.py
+            _system/scripts/test_pages_fast_rebuild_steps.py
             .github/workflows
             .github/actions
           sparse-checkout-cone-mode: false
@@ -107,7 +113,9 @@ jobs:
       - name: CI push rebase conflict resolver smoke tests
         env:
           CI_PUSH_SKIP_SELF_REFRESH: "1"
-        run: bash _system/scripts/test_ci_push_rebase_resolve.sh
+        run: |
+          bash _system/scripts/test_ci_push_empty_rebase.sh
+          bash _system/scripts/test_ci_push_rebase_resolve.sh
 
   letter-date-parser:
     runs-on: ubuntu-latest
