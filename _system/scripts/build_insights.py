@@ -346,7 +346,11 @@ def prior_letter_count(prior: dict | None) -> int:
 
 def count_vault_letters() -> int:
     letters_doc = load_json(LETTERS_INSIGHTS) or {"letters": []}
-    letters = [letter for letter in (letters_doc.get("letters") or []) if not is_letter_meta_entry(letter)]
+    letters = [
+        letter
+        for letter in (letters_doc.get("letters") or [])
+        if not is_letter_meta_entry(letter) and letter.get("letter_eligible", True)
+    ]
     return len(letters)
 
 
@@ -1802,7 +1806,7 @@ def build_consensus(letters: list[dict], our_tickers: set[str], names: dict[str,
             "letter_count": sum(1 for letter in letters if (q == "all" or letter.get("quarter") == q)),
             "most_discussed": most[:80],
             "biggest_changes": changes[:40],
-            "activity": activity[:250],
+            "activity": activity[:20],
         }
 
     out_by_q = {q: section(store, q) for q, store in by_q.items()}
@@ -1828,7 +1832,7 @@ def build_consensus(letters: list[dict], our_tickers: set[str], names: dict[str,
 
     for tk, rows in by_ticker.items():
         rows.sort(key=lambda r: (r.get("letter_date") or ""), reverse=True)
-        by_ticker[tk] = rows[:40]
+        by_ticker[tk] = rows[:8]
 
     return {
         "as_of": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -1870,15 +1874,23 @@ def fund_profiles(letters: list[dict], our_tickers: set[str]) -> dict[str, dict]
             {
                 "quarter": letter.get("quarter"),
                 "letter_date": letter.get("letter_date"),
-                "lead_summary": letter.get("lead_summary") or "",
-                "themes": letter.get("themes") or [],
-                "positions": letter.get("positions") or [],
-                "tickers": letter.get("tickers") or [],
-                "risks": letter.get("risks") or [],
-                "catalysts": letter.get("catalysts") or [],
-                "macro_views": letter.get("macro_views") or [],
-                "source_file": letter.get("source_file"),
-                "source_document": letter_ev["source_document"],
+                "lead_summary": short_text(letter.get("lead_summary"), 320),
+                "themes": [
+                    {"theme": theme.get("theme"), "stance": theme.get("stance")}
+                    for theme in (letter.get("themes") or [])[:8]
+                    if isinstance(theme, dict) and theme.get("theme")
+                ],
+                "positions": [
+                    {
+                        "ticker": pos.get("ticker"),
+                        "action": pos.get("action"),
+                        "commentary": short_text(pos.get("commentary") or pos.get("thesis"), 280),
+                    }
+                    for pos in (letter.get("positions") or [])[:10]
+                    if isinstance(pos, dict) and pos.get("ticker")
+                ],
+                "risks": [short_text(value, 240) for value in (letter.get("risks") or [])[:5]],
+                "catalysts": [short_text(value, 240) for value in (letter.get("catalysts") or [])[:5]],
                 "evidence_url": letter_ev["evidence_url"],
                 "evidence_label": letter_ev["evidence_label"],
             }
@@ -1999,7 +2011,25 @@ def ticker_insights(
         if not tk or not re.match(r"^[A-Z0-9][A-Z0-9.\-]{0,11}$", tk):
             continue
         by_ticker.setdefault(tk, []).append(r)
-    return by_ticker
+    def record_rank(record: dict) -> tuple:
+        observed = (
+            record.get("observed_at")
+            or record.get("published_at")
+            or record.get("letter_date")
+            or record.get("quarter")
+            or ""
+        )
+        confidence = record.get("confidence")
+        confidence_rank = {"high": 3, "med": 2, "medium": 2, "low": 1}.get(
+            str(confidence or "").lower(),
+            float(confidence) if isinstance(confidence, (int, float)) else 0,
+        )
+        return (str(observed), confidence_rank, str(record.get("id") or ""))
+
+    return {
+        ticker: sorted(rows, key=record_rank, reverse=True)[:35]
+        for ticker, rows in by_ticker.items()
+    }
 
 
 def ticker_discussants(
@@ -2633,7 +2663,23 @@ def build_record_archive(
 
 def write_record_archive(archive_doc: dict) -> dict:
     ARCHIVE_OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-    ARCHIVE_OUTPUT.write_text(json.dumps(archive_doc, indent=2) + "\n", encoding="utf-8")
+    temporary_output = ARCHIVE_OUTPUT.with_suffix(ARCHIVE_OUTPUT.suffix + ".tmp")
+    backup_output = ARCHIVE_OUTPUT.with_suffix(ARCHIVE_OUTPUT.suffix + ".swap-backup")
+    with temporary_output.open("w", encoding="utf-8") as handle:
+        json.dump(archive_doc, handle, separators=(",", ":"))
+        handle.write("\n")
+    if backup_output.exists():
+        backup_output.unlink()
+    if ARCHIVE_OUTPUT.exists():
+        ARCHIVE_OUTPUT.rename(backup_output)
+    try:
+        temporary_output.rename(ARCHIVE_OUTPUT)
+    except OSError:
+        if backup_output.exists() and not ARCHIVE_OUTPUT.exists():
+            backup_output.rename(ARCHIVE_OUTPUT)
+        raise
+    if backup_output.exists():
+        backup_output.unlink()
     return {
         "generated_at": archive_doc.get("generated_at"),
         "record_count": archive_doc.get("record_count"),
@@ -2684,8 +2730,13 @@ def main() -> int:
 
     prior = load_json(OUTPUT)
     prior = prior if isinstance(prior, dict) else None
+    letters_source_doc = load_json(LETTERS_INSIGHTS) or {"letters": []}
     vault_count = count_vault_letters()
     preserve, preserve_reason = should_preserve_letter_corpus(prior, vault_count)
+    classification_policy_version = int(letters_source_doc.get("classification_policy_version") or 0)
+    if classification_policy_version >= 4:
+        preserve = False
+        preserve_reason = "intentional classified-letter corpus rebuild"
     if preserve:
         print(f"PRESERVE letter corpus: {preserve_reason}", file=sys.stderr)
         records.extend(load_preserved_letter_records())
@@ -2698,11 +2749,11 @@ def main() -> int:
         letters: list[dict] = []
         fund_identity_audit = (prior or {}).get("fund_identity_audit") or {}
     else:
-        letters_doc = load_json(LETTERS_INSIGHTS) or {"letters": []}
+        letters_doc = letters_source_doc
         letters = [
             canonicalize_letter_fund(letter)
             for letter in (letters_doc.get("letters") or [])
-            if not is_letter_meta_entry(letter)
+            if not is_letter_meta_entry(letter) and letter.get("letter_eligible", True)
         ]
         letters, fund_identity_audit = consolidate_letter_funds(letters)
         if fund_identity_audit.get("residual_redundancy_groups") or not fund_identity_audit.get("idempotent"):
@@ -2799,6 +2850,7 @@ def main() -> int:
     theme_by_q = theme_rankings_by_quarter(records, front_tickers)
     payload = {
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "classification_policy_version": classification_policy_version,
         "record_count": len(records),
         "front_record_count": archive_meta.get("front_record_count"),
         "archived_record_count": archive_meta.get("archived_record_count"),

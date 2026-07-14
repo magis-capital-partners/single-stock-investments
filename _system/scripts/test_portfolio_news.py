@@ -2,12 +2,16 @@
 """Smoke tests for portfolio news classification and matching."""
 from __future__ import annotations
 
+import json
 import sys
+import tempfile
 from pathlib import Path
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from portfolio_news_common import (  # noqa: E402
+    POLICY_VERSION,
     classify_text,
     is_refresh_eligible,
     load_holding_configs,
@@ -125,17 +129,69 @@ def test_rejects_opinion_spinoff_headline():
 
 
 def test_persist_mirrors_docs_portfolio_news():
-    from ingest_portfolio_news import persist  # noqa: WPS433
-
-    from portfolio_news_common import DOCS_PORTFOLIO_NEWS_PATH, PORTFOLIO_NEWS_PATH
+    import ingest_portfolio_news as ingest  # noqa: WPS433
 
     configs = load_holding_configs()
-    persist([], configs)
-    assert PORTFOLIO_NEWS_PATH.exists()
-    assert DOCS_PORTFOLIO_NEWS_PATH.exists()
-    assert PORTFOLIO_NEWS_PATH.read_text(encoding="utf-8") == DOCS_PORTFOLIO_NEWS_PATH.read_text(
-        encoding="utf-8"
-    )
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        dashboard_path = root / "dashboard" / "portfolio_news.json"
+        docs_path = root / "docs" / "portfolio_news.json"
+        docs_path.parent.mkdir(parents=True)
+        seen_path = root / "news_seen.json"
+        with (
+            patch.object(ingest, "PORTFOLIO_NEWS_PATH", dashboard_path),
+            patch.object(ingest, "DOCS_PORTFOLIO_NEWS_PATH", docs_path),
+            patch.object(ingest, "NEWS_SEEN_PATH", seen_path),
+        ):
+            ingest.persist([], configs)
+        assert dashboard_path.exists()
+        assert docs_path.exists()
+        assert dashboard_path.read_text(encoding="utf-8") == docs_path.read_text(encoding="utf-8")
+
+
+def test_sanitize_existing_news_reassigns_or_quarantines_legacy_rows():
+    import ingest_portfolio_news as ingest  # noqa: WPS433
+
+    configs = load_holding_configs()
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        source = root / "source.json"
+        dashboard = root / "dashboard.json"
+        docs = root / "docs.json"
+        source.write_text(
+            json.dumps(
+                {
+                    "policy_version": 3,
+                    "items": [
+                        {
+                            "id": "wrong-a",
+                            "tickers": ["A"],
+                            "title": "GoDaddy launches a new commerce product",
+                            "summary": "GoDaddy expands its merchant platform.",
+                            "url": "https://example.com/godaddy",
+                        },
+                        {
+                            "id": "unrelated-a",
+                            "tickers": ["A"],
+                            "title": "Eli Lilly raises annual guidance",
+                            "summary": "Mounjaro sales accelerated.",
+                            "url": "https://example.com/lilly",
+                        },
+                    ],
+                }
+            ),
+            encoding="utf-8",
+        )
+        kept, reassigned, dropped = ingest.sanitize_existing_news(
+            configs,
+            source_path=source,
+            output_paths=(dashboard, docs),
+        )
+        assert (kept, reassigned, dropped) == (1, 1, 1)
+        result = json.loads(dashboard.read_text(encoding="utf-8"))
+        assert result["items"][0]["tickers"] == ["GDDY"]
+        assert result["policy_version"] == POLICY_VERSION
+        assert dashboard.read_text(encoding="utf-8") == docs.read_text(encoding="utf-8")
 
 
 if __name__ == "__main__":
@@ -152,4 +208,5 @@ if __name__ == "__main__":
     test_rejects_sec_filing_roundup()
     test_rejects_opinion_spinoff_headline()
     test_persist_mirrors_docs_portfolio_news()
+    test_sanitize_existing_news_reassigns_or_quarantines_legacy_rows()
     print("ok")

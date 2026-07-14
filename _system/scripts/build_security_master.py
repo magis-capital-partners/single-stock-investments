@@ -100,6 +100,23 @@ def company_name_before(text: str, span_start: int) -> str:
 
 # These explicit rules always MINT a new security.
 STRONG_HARVEST_RULES = {"dollar", "paren_exch", "exch_prefix", "dotted"}
+ALLOWED_DOTTED_SUFFIXES = {
+    "HK", "T", "TO", "L", "LS", "AX", "DE", "PA", "AS", "MI", "ST", "HE",
+    "OL", "CO", "WA", "SA", "MX", "NS", "KL", "SI", "BK", "TW", "KS",
+}
+CANONICAL_SYMBOL_OVERRIDES = {
+    "ACHC.O": "ACHC",  # Reuters venue suffix
+    "HKCH": "HKHC",    # recurring OCR/transposition for Horizon Kinetics
+    "TVK.TO": "TVK",   # letter convention uses TSE:TVK
+}
+
+
+def canonical_harvest_symbol(symbol: str) -> str:
+    canon = symbol.upper().replace("-", ".")
+    canon = CANONICAL_SYMBOL_OVERRIDES.get(canon, canon)
+    if canon.endswith((".O", ".N")):
+        canon = canon.rsplit(".", 1)[0]
+    return canon
 
 
 def paren_company_is_real(text: str, span_start: int, symbol: str) -> bool:
@@ -123,6 +140,8 @@ def skip_harvest_symbol(canon: str, master: dict[str, dict]) -> bool:
         return True
     if "." in canon:
         base, suffix = canon.split(".", 1)
+        if suffix not in ALLOWED_DOTTED_SUFFIXES:
+            return True
         if base.isalpha() and len(base) < 2:
             return True  # e.g. "A.B", "A.T" sentence initials
         if base.isdigit():
@@ -190,7 +209,7 @@ def build() -> dict:
                     pass  # guarded company-paren harvest
                 else:
                     continue  # weak parenthetical rules mint acronym junk
-            canon = sym.upper().replace("-", ".")
+            canon = canonical_harvest_symbol(sym)
             if skip_harvest_symbol(canon, master):
                 continue
             # if it resolves to an existing book symbol, skip

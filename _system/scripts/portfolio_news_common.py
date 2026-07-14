@@ -15,7 +15,7 @@ PORTFOLIO_NEWS_PATH = ROOT / "dashboard" / "data" / "portfolio_news.json"
 DOCS_PORTFOLIO_NEWS_PATH = ROOT / "docs" / "data" / "portfolio_news.json"
 NEWS_SEEN_PATH = ROOT / "_system" / "data" / "news_seen.json"
 
-POLICY_VERSION = 3
+POLICY_VERSION = 4
 FEED_MIN_CONFIDENCE = 0.80
 REFRESH_MIN_CONFIDENCE = 0.85
 OTC_EXPLICIT_ONLY = frozenset({"FRMO", "KEWL", "OTCM"})
@@ -597,6 +597,14 @@ def _token_in_text(token: str, text: str) -> bool:
     return bool(pat.search(text))
 
 
+def _uppercase_token_in_text(token: str, text: str) -> bool:
+    token = token.strip().upper()
+    if not token:
+        return False
+    pat = re.compile(rf"(?<![A-Za-z0-9.\-]){re.escape(token)}(?![A-Za-z0-9.\-])")
+    return bool(pat.search(text))
+
+
 def _extract_tickers_from_text(text: str) -> set[str]:
     out: set[str] = set()
     for regex in (_PAREN_TICKER_RE, _EXCHANGE_TICKER_RE, _DOLLAR_TICKER_RE):
@@ -622,42 +630,44 @@ def match_holding(
     url_l = (url or "").lower()
     poly = {_norm_ticker(t) for t in (polygon_tickers or [])}
 
-    explicit_hits: list[str] = []
-    high_hits: list[str] = []
+    title = blob.splitlines()[0][:500]
+    explicit_symbols = {_norm_ticker(t) for t in _extract_tickers_from_text(blob)}
+    scored: dict[str, tuple[int, str]] = {}
 
     for ticker, cfg in configs.items():
         if cfg.exclude_patterns and any(p.search(blob) for p in cfg.exclude_patterns):
             continue
 
-        title_explicit = False
+        best_score = 0
+        best_tier: str | None = None
         for token in cfg.ticker_tokens:
-            if _token_in_text(token, blob) or _token_in_text(f"${token}", blob):
-                title_explicit = True
-                break
             norm = _norm_ticker(token)
-            if norm in {_norm_ticker(t) for t in _extract_tickers_from_text(blob)}:
-                title_explicit = True
-                break
+            if norm in explicit_symbols:
+                best_score, best_tier = max((best_score, best_tier or ""), (120, "explicit"))
+            bare = norm.replace("-", "").replace(".", "")
+            if len(bare) >= 3 and _uppercase_token_in_text(token, title):
+                best_score, best_tier = max((best_score, best_tier or ""), (100, "explicit"))
 
-        if cfg.polygon_ticker and _norm_ticker(cfg.polygon_ticker) in poly:
-            title_explicit = True
-
-        if title_explicit:
-            explicit_hits.append(ticker)
-            continue
-
-        if any(_name_in_text(name, blob) for name in cfg.search_names):
+        if any(_name_in_text(name, title) for name in cfg.search_names):
+            best_score, best_tier = max((best_score, best_tier or ""), (90, "high"))
+        elif any(_name_in_text(name, blob) for name in cfg.search_names):
             if cfg.ir_domains and any(d in url_l for d in cfg.ir_domains):
-                high_hits.append(ticker)
+                best_score, best_tier = max((best_score, best_tier or ""), (85, "high"))
             elif "sec.gov" in url_l:
-                high_hits.append(ticker)
-            elif any(_name_in_text(name, blob[:200]) for name in cfg.search_names):
-                high_hits.append(ticker)
+                best_score, best_tier = max((best_score, best_tier or ""), (85, "high"))
 
-    if explicit_hits:
-        return sorted(set(explicit_hits))[0], "explicit"
-    if high_hits:
-        return sorted(set(high_hits))[0], "high"
+        # Provider tags are candidate generators and tie-breakers, never proof.
+        provider_symbols = {_norm_ticker(cfg.polygon_ticker or ""), _norm_ticker(ticker)}
+        if poly & provider_symbols and best_score:
+            best_score += 5
+        if best_score >= 85 and best_tier:
+            scored[ticker] = (best_score, best_tier)
+
+    if scored:
+        ranked = sorted(scored.items(), key=lambda row: (-row[1][0], row[0]))
+        if len(ranked) > 1 and ranked[0][1][0] == ranked[1][1][0]:
+            return None, None
+        return ranked[0][0], ranked[0][1][1]
     return None, None
 
 

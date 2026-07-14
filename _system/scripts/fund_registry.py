@@ -206,13 +206,15 @@ def resolve_quarter(
             year = None
         if sanity_year(year) is None and folder_q:
             return folder_q
+    if date_q and (date_source == "override" or date_source.startswith("filename")):
+        return date_q
+    if stem_q:
+        return stem_q
     if folder_q:
         return folder_q
     if _date_source_is_specific(date_source) and date_q:
         if sanity_year(int(date_q[:4])) is not None:
             return date_q
-    if stem_q:
-        return stem_q
     if date_q and sanity_year(int(date_q[:4])) is not None:
         return date_q
     return folder_q

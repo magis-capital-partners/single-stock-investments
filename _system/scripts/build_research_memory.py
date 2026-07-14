@@ -107,9 +107,17 @@ def source_record(row: dict) -> dict:
 def all_insight_rows(insights: dict) -> list[dict]:
     rows: list[dict] = []
     seen: set[str] = set()
+
+    def canonical_key(row: dict, ticker: str | None = None) -> str:
+        return stable_id(
+            str(row.get("ticker") or row.get("ref") or ticker or "").upper(),
+            str(row.get("claim") or row.get("summary") or row.get("title") or "").strip().lower(),
+            row.get("evidence_url") or row.get("evidence_ref") or row.get("source_document"),
+        )
+
     for row in insights.get("events") or []:
         if row.get("ticker"):
-            key = row.get("id") or stable_id(row.get("ticker"), row.get("title"), row.get("evidence_url"))
+            key = canonical_key(row)
             if key not in seen:
                 seen.add(key)
                 rows.append(row)
@@ -117,7 +125,7 @@ def all_insight_rows(insights: dict) -> list[dict]:
         for row in ticker_rows or []:
             if not row.get("ref") and not row.get("ticker"):
                 row = {**row, "ref": ticker}
-            key = row.get("id") or stable_id(row.get("ref") or ticker, row.get("claim"), row.get("evidence_url"))
+            key = canonical_key(row, ticker)
             if key not in seen:
                 seen.add(key)
                 rows.append(row)
@@ -338,6 +346,15 @@ def build() -> tuple[dict, dict]:
 
     claim_ids = {c["claim_id"] for c in claim_ledger}
     evidence_ledger = [e for e in evidence_ledger if e["claim_id"] in claim_ids]
+    deduped_evidence: dict[str, dict] = {}
+    for evidence in evidence_ledger:
+        key = stable_id(
+            evidence.get("claim_id"),
+            evidence.get("source_id"),
+            str(evidence.get("summary") or "").strip().lower(),
+        )
+        deduped_evidence.setdefault(key, evidence)
+    evidence_ledger = list(deduped_evidence.values())
     if len(evidence_ledger) > MAX_EVIDENCE:
         evidence_ledger = evidence_ledger[:MAX_EVIDENCE]
 

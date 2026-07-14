@@ -347,10 +347,12 @@ def main() -> int:
             errors.append("insights.source_health missing expected local sources")
         letter_count = insights.get("letter_count") or 0
         letter_index_len = len(insights.get("letter_index") or [])
-        if letter_count < MIN_LETTER_CORPUS or letter_index_len < MIN_LETTER_CORPUS:
+        classification_policy_version = int(insights.get("classification_policy_version") or 0)
+        min_letter_corpus = 12000 if classification_policy_version >= 4 else MIN_LETTER_CORPUS
+        if letter_count < min_letter_corpus or letter_index_len < min_letter_corpus:
             errors.append(
                 f"letter corpus {letter_count} (index {letter_index_len}) below minimum "
-                f"{MIN_LETTER_CORPUS}; deploy rebuild must preserve committed corpus or refresh vault"
+                f"{min_letter_corpus}; deploy rebuild must preserve committed corpus or refresh vault"
             )
         manifest_path = letters_root() / "drive_import_manifest.json"
         manifest_count = 0

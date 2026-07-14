@@ -31,6 +31,7 @@ MONTH_YEAR_ONLY_RE = re.compile(
     re.I,
 )
 ISO_IN_TEXT_RE = re.compile(r"\b(20\d{2})-(\d{2})-(\d{2})\b")
+COMPACT_YYYYMM_RE = re.compile(r"(?<!\d)(20\d{2})(0[1-9]|1[0-2])(?!\d)")
 STEM_QUARTER_RE = re.compile(
     r"\b(20\d{2})\s*Q([1-4])\b|\bQ([1-4])\s*['']?(20\d{2})\b|\b([1-4])Q\s*(20\d{2})\b",
     re.I,
@@ -134,7 +135,13 @@ def _consistency_bonus(iso: str, folder_q: str | None, source: str) -> int:
         return 0
     delta = date_year - folder_year
     if delta == 0:
-        return 10
+        month = int(iso[5:7])
+        date_q = f"{date_year}Q{(month - 1) // 3 + 1}"
+        if date_q == folder_q.upper():
+            return 15
+        # Body text contains benchmark, chart, and publication dates.  A date
+        # outside the containing quarter is weak evidence even in the same year.
+        return -25 if source.startswith("content") else -5
     if abs(delta) == 1:
         return 5
     if abs(delta) >= 2:
@@ -150,6 +157,12 @@ def _add_candidate(
     folder_q: str | None,
 ) -> None:
     if not iso or sanity_year(int(iso[:4])) is None:
+        return
+    try:
+        candidate_date = date.fromisoformat(iso)
+    except ValueError:
+        return
+    if source.startswith("content") and candidate_date > datetime.now(timezone.utc).date():
         return
     bonus = _consistency_bonus(iso, folder_q, source)
     if any(c.iso_date == iso and c.source == source for c in out):
@@ -206,6 +219,11 @@ def collect_date_candidates(
     ):
         if not blob:
             continue
+        if source == "filename":
+            for m in COMPACT_YYYYMM_RE.finditer(blob):
+                end = _month_end(int(m.group(1)), int(m.group(2)))
+                if end:
+                    _add_candidate(out, end.isoformat(), "filename_compact_month", 92, folder_q)
         for m in NUMERIC_DATE_RE.finditer(blob):
             yr = _coerce_year_token(m.group(3))
             if yr is None:
@@ -228,7 +246,7 @@ def collect_date_candidates(
                 end = _month_end(yr, month)
                 if end:
                     tag = "filename_month_year" if source == "filename" else "content_month_year"
-                    _add_candidate(out, end.isoformat(), tag, 70, folder_q)
+                    _add_candidate(out, end.isoformat(), tag, 88 if source == "filename" else 60, folder_q)
         for m in ISO_IN_TEXT_RE.finditer(blob):
             d = _safe_date(int(m.group(1)), int(m.group(2)), int(m.group(3)))
             if d:

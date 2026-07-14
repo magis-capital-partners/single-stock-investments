@@ -11,8 +11,10 @@ from __future__ import annotations
 
 import csv
 import json
+import os
 import re
 import sys
+from concurrent.futures import ProcessPoolExecutor
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -31,8 +33,32 @@ INDEX_PATH = LETTERS_ROOT / "letters_index.json"
 MANIFEST_PATH = LETTERS_ROOT / "manifest.csv"
 SECURITY_MASTER_PATH = ROOT / "_system" / "reference" / "securities" / "security_master.json"
 
+_WORKER_MASTER: lm.SecurityMaster | None = None
+_WORKER_RESOLVER: FundResolver | None = None
+_WORKER_PERSONA_CFG: dict | None = None
+
 # Minimum tier emitted into tickers / positions (consensus uses the same floor).
 EMIT_MIN_TIER = "B"
+CLASSIFICATION_POLICY_VERSION = 4
+
+NONLETTER_FILENAME_RULES: list[tuple[str, re.Pattern[str]]] = [
+    ("conference_idea", re.compile(r"\b(conference|sohn|idea dinner|conference recap)\b", re.I)),
+    ("monitor", re.compile(r"\b(monitors?|event driven trades|ed monitor)\b", re.I)),
+    ("transcript", re.compile(r"\b(transcript|meeting notes?)\b", re.I)),
+    ("product_marketing", re.compile(r"\b(presentation|factsheet|fact sheet|prospectus|tear sheet|deck)\b", re.I)),
+    ("sell_side_research", re.compile(r"\b(primer|playbook|white paper|blackbook|guide|survey|research report)\b", re.I)),
+]
+LETTER_FILENAME_RE = re.compile(
+    r"\b(investor|partner|shareholder|fund)\b.{0,35}\b(letter|newsletter|commentary|update)\b|"
+    r"\b(letter|newsletter)\b",
+    re.I,
+)
+LETTER_BODY_RE = re.compile(
+    r"\b(dear (?:investor|partner|shareholder)s?|to our (?:investor|partner|shareholder)s?|"
+    r"the fund (?:returned|gained|declined|appreciated|lost)|portfolio (?:returned|gained|declined))\b",
+    re.I,
+)
+FUND_REPORT_RE = re.compile(r"\b(?:annual|semi[- ]?annual) report\b", re.I)
 
 THEME_KEYWORDS: dict[str, list[str]] = {
     "AI": ["artificial intelligence", " ai ", "gpu", "hyperscaler", "large language model", "llm"],
@@ -102,7 +128,7 @@ def theme_stance(text: str, keywords: list[str]) -> str:
     windows: list[str] = []
     for kw in keywords:
         idx = lower.find(kw.strip())
-        while idx >= 0:
+        while idx >= 0 and len(windows) < 24:
             start = max(0, idx - 120)
             end = min(len(lower), idx + len(kw) + 120)
             windows.append(lower[start:end])
@@ -117,6 +143,33 @@ def theme_stance(text: str, keywords: list[str]) -> str:
     if bear > bull + 1:
         return "cautious"
     return "neutral"
+
+
+def classify_document(path: Path, text: str) -> tuple[str, bool, str]:
+    """Classify a PDF extract independently of its storage folder.
+
+    The Drive letter folder also contains decks, monitors, conference notes,
+    product literature, and sell-side research.  Those remain catalogued but
+    must not create fund holdings or consensus observations.
+    """
+    label = path.stem.replace("_", " ").replace("-", " ")
+    for kind, pattern in NONLETTER_FILENAME_RULES:
+        if pattern.search(label):
+            return kind, False, f"filename:{kind}"
+    head = text[:5000]
+    if LETTER_FILENAME_RE.search(label) or LETTER_BODY_RE.search(head):
+        return "investor_letter", True, "letter_signal"
+    if FUND_REPORT_RE.search(label) and re.search(r"\b(fund|portfolio|net assets|holdings)\b", head, re.I):
+        return "fund_report", True, "fund_report_signal"
+    return "other_research", False, "no_letter_signal"
+
+
+def _theme_keyword_matches(text: str, keyword: str) -> list[re.Match[str]]:
+    clean = keyword.strip()
+    if not clean:
+        return []
+    pattern = re.compile(rf"(?<![A-Za-z0-9]){re.escape(clean)}(?![A-Za-z0-9])", re.I)
+    return list(pattern.finditer(text))
 
 
 def tickers_near_keyword(text: str, keyword: str, tickers: list[str], window: int = 400) -> list[str]:
@@ -140,13 +193,21 @@ def tickers_near_keyword(text: str, keyword: str, tickers: list[str], window: in
 
 
 def extract_themes(text: str, tickers: list[str]) -> list[dict]:
-    lower = f" {text.lower()} "
-    upper = text.upper()
     themes: list[dict] = []
     for theme, kws in THEME_KEYWORDS.items():
-        hits = [k for k in kws if k in lower]
-        if not hits:
+        matches = {k: _theme_keyword_matches(text, k) for k in kws}
+        matches = {k: rows for k, rows in matches.items() if rows}
+        total_hits = sum(len(rows) for rows in matches.values())
+        paragraph_hits = {
+            text.count("\n\n", 0, row.start())
+            for rows in matches.values()
+            for row in rows
+        }
+        # A theme must be central enough to recur, use multiple distinct
+        # signals, or span paragraphs.  One generic word no longer tags a PDF.
+        if total_hits < 2 or not (len(matches) >= 2 or total_hits >= 3 or len(paragraph_hits) >= 2):
             continue
+        hits = list(matches)
         stance = theme_stance(text, hits)
         related: list[str] = []
         for kw in hits:
@@ -158,9 +219,18 @@ def extract_themes(text: str, tickers: list[str]) -> list[dict]:
                 seen.add(ticker)
                 deduped.append(ticker)
         related = deduped[:5]
-        if not related:
-            related = [t for t in tickers if (t.split(".", 1)[0] if "." in t else t) in upper][:5]
-        themes.append({"theme": theme, "stance": stance, "tickers": related, "quote": hits[0].strip()})
+        first = min((row for rows in matches.values() for row in rows), key=lambda row: row.start())
+        quote = re.sub(r"\s+", " ", text[max(0, first.start() - 100):first.end() + 180]).strip()[:300]
+        themes.append(
+            {
+                "theme": theme,
+                "stance": stance,
+                "tickers": related,
+                "quote": quote,
+                "confidence": "high" if len(matches) >= 2 and len(paragraph_hits) >= 2 else "med",
+                "hit_count": total_hits,
+            }
+        )
     return themes[:10]
 
 
@@ -277,13 +347,23 @@ def mentions_to_positions(mentions: list[dict]) -> list[dict]:
 def build_letter_record(path: Path, resolver: FundResolver, master: lm.SecurityMaster, persona_cfg: dict) -> dict:
     text = path.read_text(encoding="utf-8", errors="ignore")
     meta = resolver.resolve(path, text)
+    document_type, letter_eligible, classification_reason = classify_document(path, text)
 
-    all_mentions = lm.match_letter(text, master)
-    emitted = lm.emitted_mentions(all_mentions, EMIT_MIN_TIER)
-    tickers = [m["ticker"] for m in emitted][:40]
-    positions = mentions_to_positions(emitted)
-    themes = extract_themes(text, tickers)
-    sections = extract_sections(text)
+    if letter_eligible:
+        all_mentions = lm.match_letter(text, master)
+        emitted = lm.emitted_mentions(all_mentions, EMIT_MIN_TIER)
+        tickers = [m["ticker"] for m in emitted][:40]
+        positions = mentions_to_positions(emitted)
+        themes = extract_themes(text, tickers)
+        sections = extract_sections(text)
+    else:
+        # Non-letter documents remain discoverable through the document
+        # catalog/PDF library, but cannot leak into fund holdings or consensus.
+        all_mentions = []
+        tickers = []
+        positions = []
+        themes = []
+        sections = {}
 
     personas = meta.get("maps_to_persona") or []
     if not personas:
@@ -305,6 +385,10 @@ def build_letter_record(path: Path, resolver: FundResolver, master: lm.SecurityM
         "date_source": meta.get("date_source"),
         "date_confidence": meta.get("date_confidence"),
         "fund_resolution": meta.get("resolution"),
+        "fund_confidence": "high" if meta.get("resolution") == "curated" else "med",
+        "document_type": document_type,
+        "letter_eligible": letter_eligible,
+        "classification_reason": classification_reason,
         "source_file": _stable_ref(path),
         "source_document": source_document_ref(path),
         "lead_summary": extract_lead_summary(text),
@@ -319,6 +403,26 @@ def build_letter_record(path: Path, resolver: FundResolver, master: lm.SecurityM
     }
 
 
+def _worker_init() -> None:
+    global _WORKER_MASTER, _WORKER_RESOLVER, _WORKER_PERSONA_CFG
+    from persona_lens_common import load_personas
+
+    _WORKER_MASTER = load_security_master()
+    _WORKER_RESOLVER = FundResolver()
+    _WORKER_PERSONA_CFG = load_personas()
+
+
+def _worker_build(path_text: str) -> dict:
+    if _WORKER_MASTER is None or _WORKER_RESOLVER is None or _WORKER_PERSONA_CFG is None:
+        _worker_init()
+    return build_letter_record(
+        Path(path_text),
+        _WORKER_RESOLVER,  # type: ignore[arg-type]
+        _WORKER_MASTER,  # type: ignore[arg-type]
+        _WORKER_PERSONA_CFG,  # type: ignore[arg-type]
+    )
+
+
 def main() -> int:
     sys_path = ROOT / "_system" / "scripts"
     sys.path.insert(0, str(sys_path))
@@ -328,7 +432,26 @@ def main() -> int:
     master = load_security_master()
     resolver = FundResolver()
     files = scan_letter_files()
-    letters = [build_letter_record(f, resolver, master, persona_cfg) for f in files]
+    workers = max(1, min(int(os.environ.get("LETTER_BUILD_WORKERS", "8")), os.cpu_count() or 1))
+    if workers == 1:
+        letters = [build_letter_record(f, resolver, master, persona_cfg) for f in files]
+    else:
+        with ProcessPoolExecutor(max_workers=workers, initializer=_worker_init) as pool:
+            letters = list(pool.map(_worker_build, (str(f) for f in files), chunksize=8))
+        # Worker-local unresolved queues are reconstructed deterministically
+        # from their returned normalized identities before writing the review file.
+        for row in letters:
+            if row.get("fund_resolution") != "normalized":
+                continue
+            fund_id = row.get("fund_id") or "unknown-fund"
+            resolver.unresolved.setdefault(
+                fund_id,
+                {"fund_id": fund_id, "fund": row.get("fund") or fund_id, "examples": []},
+            )
+            examples = resolver.unresolved[fund_id]["examples"]
+            example = Path(str(row.get("source_file") or "")).stem
+            if example and example not in examples and len(examples) < 5:
+                examples.append(example)
     resolver.write_unresolved()
     letters, fund_identity_audit = consolidate_letter_funds(letters)
     if fund_identity_audit.get("residual_redundancy_groups") or not fund_identity_audit.get("idempotent"):
@@ -364,6 +487,7 @@ def main() -> int:
 
     payload = {
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "classification_policy_version": CLASSIFICATION_POLICY_VERSION,
         "letter_count": len(letters),
         "emit_min_tier": EMIT_MIN_TIER,
         "security_master_count": len(master.by_ticker),

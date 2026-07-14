@@ -207,8 +207,10 @@ def phase_polygon_news(
             polygon_tickers=portfolio_tickers,
         )
         if not ticker:
-            ticker = portfolio_tickers[0]
-            tier = "explicit"
+            # Polygon may attach broad or erroneous related-ticker tags (most
+            # visibly the one-letter symbol A).  Unresolved rows are quarantined
+            # rather than assigned to the alphabetically first portfolio name.
+            continue
 
         cfg = configs[ticker]
         pub = row.get("publisher") or {}
@@ -581,6 +583,78 @@ def write_review_markdown(items: list[NewsItem]) -> Path:
     return path
 
 
+def sanitize_existing_news(
+    configs: dict[str, HoldingNewsConfig],
+    *,
+    source_path: Path = PORTFOLIO_NEWS_PATH,
+    output_paths: tuple[Path, ...] = (PORTFOLIO_NEWS_PATH, DOCS_PORTFOLIO_NEWS_PATH),
+) -> tuple[int, int, int]:
+    """Reclassify the saved feed using the current subject-matching policy."""
+    if not source_path.exists():
+        return 0, 0, 0
+    payload = json.loads(source_path.read_text(encoding="utf-8"))
+    sanitized: dict[str, dict] = {}
+    reassigned = 0
+    dropped = 0
+    for raw in payload.get("items") or []:
+        title = str(raw.get("title") or "").strip()
+        summary = str(raw.get("summary") or "").strip()
+        blob = f"{title}\n{summary}"
+        blob_folded = blob.casefold()
+        old_tickers = [str(t).strip().upper() for t in (raw.get("tickers") or []) if str(t).strip()]
+        explicit_symbols = {
+            sym.upper().replace(".", "-")
+            for sym in re.findall(
+                r"(?:\$|\b(?:NYSE|NASDAQ|TSX|TSXV|LSE|ASX|HKEX)\s*[:\-]\s*|\()([A-Z][A-Z0-9.\-]{0,9})(?:\)|\b)",
+                blob,
+            )
+        }
+        candidates = {
+            ticker: cfg
+            for ticker, cfg in configs.items()
+            if any(name.casefold() in blob_folded for name in cfg.search_names)
+            or any(
+                token.upper().replace(".", "-") in explicit_symbols
+                for token in cfg.ticker_tokens
+            )
+        }
+        ticker, tier = match_holding(
+            blob,
+            raw.get("url"),
+            candidates,
+            polygon_tickers=old_tickers,
+        )
+        if not ticker:
+            dropped += 1
+            continue
+        row = dict(raw)
+        if old_tickers != [ticker]:
+            reassigned += 1
+        row["tickers"] = [ticker]
+        row["company"] = configs[ticker].company
+        row["match_tier"] = tier
+        row["policy_version"] = POLICY_VERSION
+        item_id = str(row.get("id") or normalize_url(row.get("url")) or f"news:{ticker}:{title}")
+        prior = sanitized.get(item_id)
+        if prior is None or float(row.get("confidence") or 0) > float(prior.get("confidence") or 0):
+            sanitized[item_id] = row
+
+    items = sorted(
+        sanitized.values(),
+        key=lambda row: parse_published_iso(row.get("published_utc")) or "",
+        reverse=True,
+    )
+    result = dict(payload)
+    result["build_time"] = datetime.now(UTC).isoformat()
+    result["policy_version"] = POLICY_VERSION
+    result["items"] = items
+    encoded = json.dumps(result, indent=2) + "\n"
+    for path in output_paths:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(encoded, encoding="utf-8")
+    return len(items), reassigned, dropped
+
+
 def main() -> None:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
     parser = argparse.ArgumentParser(description="Ingest portfolio news")
@@ -592,7 +666,24 @@ def main() -> None:
     parser.add_argument("--skip-polygon", action="store_true")
     parser.add_argument("--skip-google", action="store_true")
     parser.add_argument("--no-review", action="store_true", help="Skip pending review markdown")
+    parser.add_argument(
+        "--sanitize-existing",
+        action="store_true",
+        help="Reclassify the saved feed without making network requests",
+    )
     args = parser.parse_args()
+
+    configs = load_holding_configs()
+    if args.sanitize_existing:
+        kept, reassigned, dropped = sanitize_existing_news(configs)
+        LOGGER.info(
+            "sanitized existing feed: kept=%d reassigned=%d quarantined=%d policy=v%d",
+            kept,
+            reassigned,
+            dropped,
+            POLICY_VERSION,
+        )
+        return
 
     global ENABLE_POLYGON, ENABLE_GOOGLE  # noqa: PLW0603
     if args.skip_polygon:
@@ -601,7 +692,6 @@ def main() -> None:
         ENABLE_GOOGLE = False
 
     subset = [t.strip() for t in args.tickers.split(",") if t.strip()] or None
-    configs = load_holding_configs()
     if subset:
         configs = {k: v for k, v in configs.items() if k in subset}
 

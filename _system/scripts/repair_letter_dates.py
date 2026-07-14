@@ -24,6 +24,17 @@ LETTERS_ROOT = letters_root()
 INSIGHTS_PATH = LETTERS_ROOT / "insights.json"
 
 
+def has_invalid_quarter_year(letter: dict) -> bool:
+    quarter = str(letter.get("quarter") or "").strip()
+    if not quarter or quarter.lower() == "unknown":
+        return False
+    try:
+        year = int(quarter[:4])
+    except ValueError:
+        return True
+    return sanity_year(year) is None
+
+
 def repair_letter_record(letter: dict, text: str | None = None) -> bool:
     source = letter.get("source_file") or letter.get("path") or ""
     path = Path(str(source).replace("\\", "/"))
@@ -83,7 +94,7 @@ def main() -> int:
     bad_before = sum(
         1
         for letter in letters
-        if letter.get("quarter") and sanity_year(int(str(letter.get("quarter"))[:4])) is None
+        if has_invalid_quarter_year(letter)
     )
     for letter in letters:
         if repair_letter_record(letter):
@@ -91,7 +102,7 @@ def main() -> int:
     bad_after = sum(
         1
         for letter in letters
-        if letter.get("quarter") and sanity_year(int(str(letter.get("quarter"))[:4])) is None
+        if has_invalid_quarter_year(letter)
     )
     print(f"Repaired {fixed} letter records ({bad_before} bad quarters -> {bad_after})")
     if apply and fixed:

@@ -24,7 +24,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 
 import letter_matching as lm  # noqa: E402
-from vault_paths import letters_root, path_to_letters_ref  # noqa: E402
+from vault_paths import letters_root, path_to_letters_ref, resolve_ref_to_path  # noqa: E402
 
 LETTERS_ROOT = letters_root()
 SECURITY_MASTER_PATH = ROOT / "_system" / "reference" / "securities" / "security_master.json"
@@ -32,8 +32,9 @@ EVAL_DIR = LETTERS_ROOT / "_eval"
 GOLD_PATH = EVAL_DIR / "gold.jsonl"
 DUMP_PATH = EVAL_DIR / "match_review.jsonl"
 
-PRECISION_FLOOR = 0.90
-RECALL_FLOOR = 0.80
+PRECISION_FLOOR = 0.97
+RECALL_FLOOR = 0.90
+MIN_LABELED_LETTERS = 5
 
 
 def load_master() -> lm.SecurityMaster:
@@ -113,12 +114,16 @@ def evaluate(master: lm.SecurityMaster) -> int:
         return 1
     gold = [json.loads(ln) for ln in GOLD_PATH.read_text(encoding="utf-8").splitlines() if ln.strip()]
     tp = fp = fn = 0
+    missing = 0
+    processed = 0
     per_letter: list[dict] = []
     for row in gold:
-        path = ROOT / row["source_file"]
-        if not path.exists():
+        path = resolve_ref_to_path(row["source_file"])
+        if path is None or not path.exists():
             print(f"  ! missing {row['source_file']}")
+            missing += 1
             continue
+        processed += 1
         text = path.read_text(encoding="utf-8", errors="ignore")
         emitted = {m["ticker"] for m in lm.emitted_mentions(lm.match_letter(text, master))}
         truth = {str(t).upper() for t in row.get("true_tickers", [])}
@@ -129,7 +134,7 @@ def evaluate(master: lm.SecurityMaster) -> int:
         per_letter.append({"file": row["source_file"], "fp": sorted(l_fp), "fn": sorted(l_fn)})
     precision = tp / (tp + fp) if (tp + fp) else 1.0
     recall = tp / (tp + fn) if (tp + fn) else 1.0
-    print(f"labeled letters : {len(gold)}")
+    print(f"labeled letters : {processed}/{len(gold)}")
     print(f"TP/FP/FN        : {tp}/{fp}/{fn}")
     print(f"precision       : {precision:.3f}  (floor {PRECISION_FLOOR})")
     print(f"recall          : {recall:.3f}  (floor {RECALL_FLOOR})")
@@ -140,7 +145,13 @@ def evaluate(master: lm.SecurityMaster) -> int:
                 print(f"     false positives: {row['fp']}")
             if row["fn"]:
                 print(f"     false negatives: {row['fn']}")
-    ok = precision >= PRECISION_FLOOR and recall >= RECALL_FLOOR
+    coverage_ok = missing == 0 and processed >= MIN_LABELED_LETTERS and (tp + fp + fn) > 0
+    if not coverage_ok:
+        print(
+            f"coverage gate    : FAIL (missing={missing}, processed={processed}, "
+            f"minimum={MIN_LABELED_LETTERS}, decisions={tp + fp + fn})"
+        )
+    ok = coverage_ok and precision >= PRECISION_FLOOR and recall >= RECALL_FLOOR
     print("\nRESULT:", "PASS" if ok else "FAIL")
     return 0 if ok else 2
 

@@ -38,7 +38,7 @@ EXCHANGE_NAMES = (
 _EXCH_RE = re.compile(rf"\b(?:{EXCHANGE_NAMES})\b", re.I)
 
 # $TICKER
-DOLLAR_TICKER_RE = re.compile(r"\$([A-Za-z][A-Za-z0-9.\-]{0,11})\b")
+DOLLAR_TICKER_RE = re.compile(r"\$([A-Z][A-Z0-9.\-]{0,11})\b")
 # (EXCH: TICKER) or (EXCH:TICKER) with optional "Exchange"
 PAREN_EXCH_TICKER_RE = re.compile(
     rf"\(\s*(?:{EXCHANGE_NAMES})(?:\s*Exchange)?\s*[:\s]\s*([A-Za-z0-9][A-Za-z0-9.\-]{{0,11}})\s*\)",
@@ -143,7 +143,7 @@ _SINGLE_TOKEN_STOP: frozenset[str] = frozenset(
         "partners", "holdings", "global", "international", "financial", "markets",
         "fund", "trust", "company", "corporation", "growth", "value", "income",
         "russell", "treasury", "benchmark", "beyond", "focus", "summit", "vista",
-        "peak", "edge", "select", "advantage", "frontier",
+        "peak", "edge", "select", "advantage", "frontier", "bancorp", "target",
     }
 )
 
@@ -151,6 +151,13 @@ _SINGLE_TOKEN_STOP: frozenset[str] = frozenset(
 # ---------------------------------------------------------------------------
 # Security master access
 # ---------------------------------------------------------------------------
+SYMBOL_CORRECTIONS = {
+    "HKCH": "HKHC",
+    "ACHC.O": "ACHC",
+    "TVK.TO": "TVK",
+}
+
+
 @dataclass
 class SecurityMaster:
     """Lookup tables + precompiled combined regexes from security_master.json."""
@@ -185,15 +192,15 @@ class SecurityMaster:
             if symbol.isdigit():
                 numeric_to_ticker.setdefault(symbol.lstrip("0") or symbol, ticker)
                 numeric_to_ticker.setdefault(symbol, ticker)
+            trusted = bool(meta.get("in_book")) or meta.get("source") in ("book", "manual")
             # bare uppercase symbol: alpha, len>=3, non-collision only
             collision = bool(meta["is_word_collision"]) if "is_word_collision" in meta else is_word_collision(ticker)
-            if symbol.isalpha() and len(symbol) >= 3 and not collision:
+            if trusted and symbol.isalpha() and len(symbol) >= 3 and not collision:
                 bare_symbols.setdefault(symbol.upper(), ticker)
             # Only trusted names feed the name/alias matchers. Harvested company
             # names are unreliable (DIS->"Software", CRM->"AgentForce") and would
             # match the generic word everywhere, so harvested securities match
             # by explicit symbol only.
-            trusted = bool(meta.get("in_book")) or meta.get("source") in ("book", "manual")
             names = set(meta.get("aliases") or [])  # curated aliases always trusted
             if trusted and meta.get("name"):
                 names.add(meta["name"])
@@ -250,9 +257,15 @@ class SecurityMaster:
     def resolve_symbol(self, sym: str) -> str | None:
         if not sym:
             return None
+        sym = SYMBOL_CORRECTIONS.get(sym.strip().upper().replace("-", "."), sym)
         s = sym.strip().upper().replace("-", ".")
         if s in self.by_ticker:
             return s
+        # A dotted token is meaningful only when the complete exchange/class
+        # symbol is canonical.  Falling back to the base converted academic
+        # credentials such as ``B.S.`` into the one-letter equity ``B``.
+        if "." in s:
+            return None
         bare = s.split(".", 1)[0]
         return self.symbol_to_ticker.get(s) or self.symbol_to_ticker.get(bare)
 
@@ -379,6 +392,16 @@ def parenthetical_is_ticker(text: str, span_start: int, symbol: str, min_words: 
         return False
     if _BENCHMARK_WORDS.search(phrase):
         return False  # "MSCI World", "Sharpe Ratio", "... Total Return Index"
+    if symbol.upper() not in {re.sub(r"[^A-Za-z0-9]", "", w).upper() for w in words}:
+        significant = [
+            re.sub(r"[^A-Za-z0-9]", "", w)
+            for w in words
+            if w.lower().strip(".,") not in {"fund", "lp", "llc", "ltd", "inc", "group", "strategy"}
+        ]
+        for start in range(len(significant)):
+            for end in range(start + 2, min(len(significant), start + 5) + 1):
+                if "".join(w[0] for w in significant[start:end] if w).upper() == symbol.upper():
+                    return False  # acronym definition, e.g. Credit Macro Event (CME)
     tail = words[-5:]
     for n in range(2, len(tail) + 1):
         if "".join(w[0] for w in tail[-n:]).upper() == symbol.upper():
@@ -455,6 +478,38 @@ def extract_explicit_symbols(text: str) -> list[dict]:
 # Full matcher
 # ---------------------------------------------------------------------------
 TIER_RANK = {"A": 3, "B": 2, "C": 1}
+
+INVESTMENT_CONTEXT_RE = re.compile(
+    r"\b(position|holding|investment|portfolio|shares?|stock|equity|stake|weight|"
+    r"contributor|detractor|winner|loser|holding period|valuation|earnings|revenue|cash flow|market cap|"
+    r"initiated|added|increased|trimmed|reduced|exited|sold|bought|purchased)\b|\d+(?:\.\d+)?%",
+    re.I,
+)
+OWNERSHIP_CONTEXT_RE = re.compile(
+    r"\b(our|portfolio)\s+(?:largest\s+|new\s+)?(?:position|holding|investment)|"
+    r"\bportfolio weight\b|\d+(?:\.\d+)?%\s+(?:position|weight)",
+    re.I,
+)
+BOILERPLATE_ATTRIBUTION_RE = re.compile(
+    r"\b(source\s*:|according to|administrat(?:or|ion)|calculated by|data (?:from|provided by)|"
+    r"research (?:report|team|source))\b",
+    re.I,
+)
+
+
+def _has_investment_context(text: str, positions: list[int], *, radius: int = 220) -> bool:
+    return any(INVESTMENT_CONTEXT_RE.search(_window(text, p, radius)) for p in positions[:8])
+
+
+def _has_ownership_context(text: str, positions: list[int], *, radius: int = 140) -> bool:
+    return any(OWNERSHIP_CONTEXT_RE.search(_window(text, p, radius)) for p in positions[:8])
+
+
+def _parenthetical_matches_master(text: str, pos: int, ticker: str, master: SecurityMaster) -> bool:
+    pre = _norm_name(text[max(0, pos - 100):pos])
+    meta = master.by_ticker.get(ticker, {})
+    names = [meta.get("name"), *(meta.get("aliases") or [])]
+    return any((norm := _norm_name(str(name or ""))) and norm in pre for name in names)
 
 
 def _sentences(text: str) -> list[tuple[int, str]]:
@@ -587,16 +642,22 @@ def match_letter(text: str, master: SecurityMaster) -> list[dict]:
             ticker = master.resolve_symbol(hit["symbol"])
         if not ticker:
             continue
+        if hit["rule"] == "paren_company" and not parenthetical_is_ticker(
+            text, hit["span"][0], hit["symbol"], min_words=1
+        ):
+            pos = hit["span"][0]
+            if not (
+                _parenthetical_matches_master(text, pos, ticker, master)
+                or INVESTMENT_CONTEXT_RE.search(_window(text, pos, 180))
+            ):
+                continue
         symbol = ticker.split(".", 1)[0]
         short = symbol.isalpha() and len(symbol) <= 2
         # short symbols are ambiguous: footnote "(B)"/"(a)", "$M" millions.
         # Trust them when in the book, or when written as "Company Name (KD)"
         # (guarded), but never as a bare footnote marker.
         if short:
-            if hit["rule"] == "paren_company":
-                if not parenthetical_is_ticker(text, hit["span"][0], symbol, min_words=1):
-                    continue
-            elif not master.in_book(ticker):
+            if hit["rule"] != "paren_company" and not master.in_book(ticker):
                 continue
         b = bucket(ticker)
         b["tier"] = "A"
@@ -618,7 +679,7 @@ def match_letter(text: str, master: SecurityMaster) -> list[dict]:
             b["mention_count"] += len(positions)
             b["spans"].extend(positions)
             if b["tier"] == "C":
-                b["tier"] = "B" if len(positions) >= 2 else "C"
+                b["tier"] = "B" if len(positions) >= 2 and _has_investment_context(text, positions) else "C"
 
     # --- Company-name matches (combined regex, mapped back via normalization) ---
     if master.name_re is not None:
@@ -634,8 +695,19 @@ def match_letter(text: str, master: SecurityMaster) -> list[dict]:
             b["mention_count"] += len(positions)
             b["spans"].extend(positions)
             near_action = any(_classify_action(_window(text, p)) for p in positions[:6])
+            investment_context = _has_investment_context(text, positions)
+            ownership_context = _has_ownership_context(text, positions)
+            attribution_only = all(
+                BOILERPLATE_ATTRIBUTION_RE.search(_window(text, p, 100)) for p in positions[:6]
+            )
             if b["tier"] == "C":
-                b["tier"] = "B" if (len(positions) >= 2 or near_action or holdings_zone) else "C"
+                # Repetition alone is not evidence that the security is an
+                # investment.  It commonly represents an administrator,
+                # research citation, auditor, competitor, or disclaimer.
+                b["tier"] = "B" if (
+                    not attribution_only
+                    and (ownership_context or near_action or (len(positions) >= 2 and investment_context))
+                ) else "C"
 
     # --- distinctive single-token names (e.g. "Google") ---
     if master.single_token_re is not None:
@@ -652,9 +724,11 @@ def match_letter(text: str, master: SecurityMaster) -> list[dict]:
             # single-token brand mentions ("Google", "Amazon") are only promoted
             # to Tier B with explicit position/action context; bare repetition
             # (e.g. a name cited as a comparison) stays Tier C.
-            near_action = any(_classify_action(_window(text, p)) for p in positions[:8])
+            near_action = any(_classify_action(_window(text, p, 80)) for p in positions[:8])
+            investment_context = _has_investment_context(text, positions, radius=100)
+            ownership_context = _has_ownership_context(text, positions, radius=80)
             if b["tier"] == "C":
-                b["tier"] = "B" if near_action else "C"
+                b["tier"] = "B" if (ownership_context or (near_action and investment_context)) else "C"
 
     # --- holdings table rows (explicit ticker + change column) ---
     for row in parse_holdings_table_rows(text, master):
