@@ -3500,7 +3500,6 @@
       { id: 'documents', label: 'PDF library' },
       { id: 'tickers', label: 'Ticker insights' },
       { id: 'memory', label: 'Research memory' },
-      { id: 'themes', label: 'Themes' },
       { id: 'sources', label: 'Pipeline status' },
     ];
 
@@ -3613,15 +3612,6 @@
       } else {
         body += renderMemoryLedger(memory, escapeHtml, linkHtml, memoryOpts);
       }
-    } else if (activeSection === 'themes') {
-      body = renderThemeRankings(themes, escapeHtml, {
-        period,
-        timeModel,
-        viewMode: themesViewMode,
-        themeQoq: themeQoqForPeriod(insights?.theme_qoq_by_quarter || {}, period),
-        search: fundSearch,
-        glossary: insights?.theme_glossary || null,
-      });
     } else {
       body = renderSourceHealth(insights?.source_health || {}, escapeHtml)
         + renderDataSourceCandidates(insights?.data_source_candidates || {}, escapeHtml);

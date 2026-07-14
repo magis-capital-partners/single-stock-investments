@@ -805,7 +805,8 @@ let insightsEventLastSeenAt = (() => {
 })();
 let insightsSection = (() => {
   try {
-    return localStorage.getItem(INSIGHTS_SECTION_KEY) || 'letters';
+    const stored = localStorage.getItem(INSIGHTS_SECTION_KEY) || 'letters';
+    return stored === 'themes' ? 'letters' : stored;
   } catch (_) {
     return 'letters';
   }
@@ -1588,27 +1589,6 @@ function renderInsights(opts = {}) {
       },
       onCloseDrawer() {
         consensusSelectedTicker = null;
-        renderInsights();
-      },
-    });
-  }
-  if (window.InsightsViz && insightsSection === 'themes') {
-    const timeModel = InsightsViz.buildTimeModel(insights, data.document_catalog);
-    InsightsViz.attachThemesHandlers(content, {
-      onThemeDrill(theme) {
-        insightsSection = 'letters';
-        fundRegistrySearch = theme || '';
-        try { localStorage.setItem(INSIGHTS_SECTION_KEY, 'letters'); } catch (_) { /* ignore */ }
-        renderInsights({ refocusSearch: true });
-      },
-      onUseLatestQuarter() {
-        const latest = timeModel.latestIndexedQuarter;
-        if (latest) insightsQuarter = latest;
-        renderInsights();
-      },
-      onViewMode(mode) {
-        insightsThemesViewMode = mode || 'snapshot';
-        try { localStorage.setItem(THEMES_VIEW_KEY, insightsThemesViewMode); } catch (_) { /* ignore */ }
         renderInsights();
       },
     });

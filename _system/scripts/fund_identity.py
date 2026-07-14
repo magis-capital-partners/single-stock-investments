@@ -346,3 +346,38 @@ def consolidate_letter_funds(letters: list[dict], *, _verify: bool = True) -> tu
         "second_pass_changes": sorted(set(changed_again)),
     }
     return output, audit
+
+
+def consolidate_letter_funds_stable(
+    letters: list[dict], *, max_passes: int = 5
+) -> tuple[list[dict], dict]:
+    """Iterate corpus identity resolution until aliases reach a fixed point.
+
+    Exact document deduplication can remove the recurrence that previously
+    anchored one filename alias.  A bounded fixed-point pass makes identity
+    resolution independent of duplicate source counts while retaining the
+    existing residual and idempotence gates.
+    """
+    current = letters
+    audits: list[dict] = []
+    for pass_number in range(1, max_passes + 1):
+        current, audit = consolidate_letter_funds(current)
+        audits.append(audit)
+        if not audit.get("residual_redundancy_groups") and audit.get("idempotent"):
+            return current, {
+                **audit,
+                "convergence_passes": pass_number,
+                "pass_summaries": [
+                    {
+                        "pass": idx + 1,
+                        "canonical_profiles": row.get("canonical_profiles"),
+                        "profiles_consolidated": row.get("profiles_consolidated"),
+                        "residual_redundancy_groups": row.get("residual_redundancy_groups"),
+                        "idempotent": row.get("idempotent"),
+                    }
+                    for idx, row in enumerate(audits)
+                ],
+            }
+    raise RuntimeError(
+        f"Fund identity consolidation did not converge after {max_passes} passes"
+    )

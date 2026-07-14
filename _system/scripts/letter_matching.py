@@ -144,6 +144,7 @@ _SINGLE_TOKEN_STOP: frozenset[str] = frozenset(
         "fund", "trust", "company", "corporation", "growth", "value", "income",
         "russell", "treasury", "benchmark", "beyond", "focus", "summit", "vista",
         "peak", "edge", "select", "advantage", "frontier", "bancorp", "target",
+        "southern",
     }
 )
 
@@ -192,17 +193,24 @@ class SecurityMaster:
             if symbol.isdigit():
                 numeric_to_ticker.setdefault(symbol.lstrip("0") or symbol, ticker)
                 numeric_to_ticker.setdefault(symbol, ticker)
-            trusted = bool(meta.get("in_book")) or meta.get("source") in ("book", "manual")
+            bare_trusted = bool(meta.get("in_book")) or meta.get("source") in ("book", "manual")
+            entity_type = str(meta.get("entity_type") or "equity")
             # bare uppercase symbol: alpha, len>=3, non-collision only
             collision = bool(meta["is_word_collision"]) if "is_word_collision" in meta else is_word_collision(ticker)
-            if trusted and symbol.isalpha() and len(symbol) >= 3 and not collision:
+            if (
+                bare_trusted
+                and entity_type in {"equity", "etf"}
+                and symbol.isalpha()
+                and len(symbol) >= 3
+                and not collision
+            ):
                 bare_symbols.setdefault(symbol.upper(), ticker)
             # Only trusted names feed the name/alias matchers. Harvested company
             # names are unreliable (DIS->"Software", CRM->"AgentForce") and would
             # match the generic word everywhere, so harvested securities match
             # by explicit symbol only.
-            names = set(meta.get("aliases") or [])  # curated aliases always trusted
-            if trusted and meta.get("name"):
+            names = set(meta.get("aliases") or []) if bare_trusted else set()
+            if bare_trusted and meta.get("name"):
                 names.add(meta["name"])
             for name in names:
                 norm = _norm_name(name)
@@ -282,6 +290,34 @@ class SecurityMaster:
             return bool(meta["is_word_collision"])
         return is_word_collision(ticker)
 
+    def entity_type(self, ticker: str) -> str:
+        meta = self.by_ticker.get(ticker, {})
+        if meta.get("entity_type"):
+            return str(meta["entity_type"])
+        base = ticker.split(".", 1)[0].upper()
+        if base in NON_SECURITY_CODES:
+            return "non_security"
+        if meta.get("in_book") or meta.get("source") in {"book", "manual"}:
+            return "equity"
+        if base in BENCHMARK_CODES:
+            return "index"
+        return "unvalidated"
+
+    def validated(self, ticker: str) -> bool:
+        meta = self.by_ticker.get(ticker, {})
+        status = meta.get("validation_status")
+        if status:
+            return status in {"validated", "manual"}
+        return bool(meta.get("in_book")) or meta.get("source") in {"book", "manual"}
+
+    def active_on(self, ticker: str, as_of: str | None) -> bool:
+        if not as_of:
+            return True
+        meta = self.by_ticker.get(ticker, {})
+        valid_from = str(meta.get("valid_from") or "")
+        valid_to = str(meta.get("valid_to") or "")
+        return not ((valid_from and as_of < valid_from) or (valid_to and as_of > valid_to))
+
 
 def _norm_name(name: str) -> str:
     clean = re.sub(r"\([^)]*\)", " ", name or "")
@@ -340,6 +376,10 @@ HARVEST_BLOCKLIST: frozenset[str] = frozenset(
         # professional credentials / titles written like "Name, CFA"
         "CFA", "CPA", "CAIA", "CMT", "FRM", "MBA", "PHD", "CTO", "COO", "CIO",
         "SVP", "EVP", "JD", "MD", "ESQ",
+        # legal/entity suffixes, regulators, standards, table labels, currencies
+        "TR", "QP", "RHS", "FINRA", "GICS", "GIPS", "ITD", "FDA", "FINMA",
+        "SPDJI", "BIS", "DOJ", "LONG", "SHORT", "LP", "MTD", "LTD",
+        "ZAR", "RUB", "MXN", "BRL", "INR", "KRW", "SGD", "NZD",
     }
 )
 
@@ -363,9 +403,23 @@ BENCHMARK_CODES: frozenset[str] = frozenset(
         "MSCI", "MEAA", "EDOF", "RFR", "MXWO", "MXEF", "MXWD", "M1WD", "MXAP",
         "SPX", "SPTR", "NDX", "CCMP", "RTY", "RUT", "RUI", "RUA", "RUJ", "RUO",
         "INDU", "DJIA", "SX5E", "SXXP", "UKX", "NKY", "TPX", "HSI", "DAX", "CAC",
-        "VIX", "TNX", "GSPC", "GDDUWI", "NDDUWI", "HFR", "HFRI", "BBgAgg",
+        "VIX", "TNX", "GSPC", "GDDUWI", "NDDUWI", "HFR", "HFRI", "BBGAGG",
+        "MXFM", "MXLA", "SX7E", "SX5E", "M1EF", "MXCN", "MXSO", "SOX",
     }
 )
+
+# Tokens that are entities or finance vocabulary, but never single-stock
+# issuers.  They are classified explicitly so adding a same-symbol company to
+# the portfolio can never disable the exclusion.
+NON_SECURITY_CODES: frozenset[str] = frozenset(
+    {
+        "TR", "QP", "NY", "RHS", "FINRA", "GICS", "LP", "GIPS", "ITD", "FDA",
+        "LONG", "SHORT", "FINMA", "SPDJI", "BIS", "DOJ", "MTD", "LTD",
+        "ZAR", "RUB", "MXN", "BRL", "INR", "KRW", "SGD", "NZD",
+    }
+)
+
+ROLE_COLLISION_CODES: frozenset[str] = frozenset({"COO", "CEO", "CFO", "CIO", "CTO"})
 
 
 def is_benchmark(ticker: str) -> bool:
@@ -523,6 +577,139 @@ def _window(text: str, pos: int, radius: int = 130) -> str:
     return text[max(0, pos - radius):min(len(text), pos + radius)]
 
 
+AMBIGUOUS_RAW_COMPANY_PATTERNS: dict[str, re.Pattern[str]] = {
+    "MSCI": re.compile(r"\bMSCI\s*,?\s+Inc(?:\.|\b)", re.I),
+    "COO": re.compile(r"\b(?:The\s+)?Cooper Compan(?:y|ies)\b", re.I),
+    "SO": re.compile(r"\b(?:The\s+)?Southern Company\b", re.I),
+    "LB": re.compile(r"\bLandBridge(?: Company)?\b", re.I),
+    "OR": re.compile(r"\bOsisko Gold Royalt(?:y|ies)\b", re.I),
+}
+
+MSCI_BENCHMARK_CONTEXT_RE = re.compile(
+    r"\bMSCI\s+(?:World|China|Emerging|EM\b|ACWI|EAFE|USA|Europe|Asia|All Country|"
+    r"Frontier|Index|indices|methodology)|\b(?:index|benchmark|methodology|copyright|"
+    r"trademark|all rights reserved|source\s*:)\b.{0,80}\bMSCI\b",
+    re.I,
+)
+
+
+def _semantic_entity_allowed(
+    text: str,
+    ticker: str,
+    bucket: dict,
+    master: SecurityMaster,
+    as_of: str | None,
+) -> bool:
+    """Resolve symbols whose company and non-company senses share a token."""
+    if not master.validated(ticker) or not master.active_on(ticker, as_of):
+        return False
+    entity_type = master.entity_type(ticker)
+    if entity_type not in {"equity", "etf"}:
+        return False
+
+    base = ticker.split(".", 1)[0].upper()
+    rules = set(bucket.get("rules") or [])
+    strong_explicit = bool(rules & {"dollar", "paren_exch", "exch_prefix"})
+    spans = sorted(set(bucket.get("spans") or []))
+    windows = [_window(text, pos, 180) for pos in spans[:12]]
+
+    if base == "MSCI":
+        if strong_explicit:
+            return True
+        positive = False
+        for window in windows:
+            if not re.search(r"\bMSCI\s*,?\s+Inc(?:\.|\b)|\bMSCI\s*\(\s*MSCI\s*\)", window, re.I):
+                continue
+            if MSCI_BENCHMARK_CONTEXT_RE.search(window) or re.search(
+                r"\b(?:copyright|trademark|all rights reserved)\b", window, re.I
+            ):
+                continue
+            if re.search(
+                r"\b(?:position|holding|shares?|stock|short|long|portfolio|revenue|earnings|"
+                r"valuation|provides|business|company|contributor|detractor)\b|\d+(?:\.\d+)?%",
+                window,
+                re.I,
+            ):
+                positive = True
+                break
+        return positive
+
+    if base == "COO":
+        return strong_explicit or any(
+            re.search(r"\b(?:The\s+)?Cooper Compan(?:y|ies)\b", window, re.I)
+            for window in windows
+        )
+
+    if base == "SO":
+        return strong_explicit or any(
+            re.search(r"\b(?:The\s+)?Southern Company\b", window, re.I)
+            for window in windows
+        )
+
+    if base == "LB":
+        if re.search(r"\bL Brands\b", text, re.I) and not re.search(r"\bLandBridge\b", text, re.I):
+            return False
+        return strong_explicit or any(re.search(r"\bLandBridge\b", window, re.I) for window in windows)
+
+    if base == "OR":
+        if any(re.search(r"\bOperating Ratio\s*\(\s*OR\s*\)", window, re.I) for window in windows):
+            return False
+        return strong_explicit or any(
+            re.search(r"\bOsisko Gold Royalt(?:y|ies)\b", window, re.I) for window in windows
+        )
+
+    return True
+
+
+def _relation_action(text: str, pos: int) -> str | None:
+    """Classify only fund-to-security actions in the same local clause."""
+    start = max(0, pos - 150)
+    end = min(len(text), pos + 150)
+    snippet = text[start:end]
+    local_pos = pos - start
+    candidates: list[tuple[int, str]] = []
+    for action, pattern in ACTION_PATTERNS:
+        for match in pattern.finditer(snippet):
+            distance = min(abs(match.start() - local_pos), abs(match.end() - local_pos))
+            if distance > 100:
+                continue
+            clause_start = max(0, min(match.start(), local_pos) - 70)
+            clause_end = min(len(snippet), max(match.end(), local_pos) + 70)
+            clause = snippet[clause_start:clause_end]
+            if action == "short":
+                if not re.search(r"\b(?:our short|we short(?:ed)?|short position|short holding)\b", clause, re.I):
+                    continue
+            else:
+                actor_prefix = snippet[max(0, match.start() - 45) : match.start()]
+                actor_direct = match.start() < local_pos and bool(
+                    re.search(
+                        r"\b(?:we|the fund|our fund|the portfolio|our portfolio)\s+"
+                        r"(?:also\s+|fully\s+|meaningfully\s+|recently\s+)?$",
+                        actor_prefix,
+                        re.I,
+                    )
+                )
+                between = snippet[min(match.end(), local_pos) : max(match.start(), local_pos)]
+                position_link = bool(
+                    re.search(r"\b(?:position|holding|stake|shares)\b", between, re.I)
+                    or re.search(
+                        r"\b(?:position|holding|stake)\b.{0,35}\b(?:was|were)\s+"
+                        r"(?:fully\s+|meaningfully\s+)?(?:added|increased|trimmed|reduced|sold|exited)",
+                        clause,
+                        re.I,
+                    )
+                    or re.search(
+                        r"\b(?:was|were)\s+(?:added|introduced)\s+to\s+(?:our|the)\s+portfolio\b",
+                        clause,
+                        re.I,
+                    )
+                )
+                if not (actor_direct or position_link):
+                    continue
+            candidates.append((distance, {"buy": "add"}.get(action, action)))
+    return min(candidates, default=(0, None), key=lambda row: row[0])[1]
+
+
 def _classify_action(window: str) -> str | None:
     for action, pat in ACTION_PATTERNS:
         if pat.search(window):
@@ -588,7 +775,12 @@ def parse_holdings_table_rows(text: str, master: SecurityMaster) -> list[dict]:
             if not sym:
                 continue
             resolved = master.resolve_symbol(sym) or master.resolve_numeric(sym)
-            if resolved and not is_benchmark(resolved):
+            if (
+                resolved
+                and master.validated(resolved)
+                and master.entity_type(resolved) in {"equity", "etf"}
+                and not is_benchmark(resolved)
+            ):
                 ticker = resolved
                 break
         if not ticker:
@@ -614,7 +806,7 @@ def parse_holdings_table_rows(text: str, master: SecurityMaster) -> list[dict]:
     return rows
 
 
-def match_letter(text: str, master: SecurityMaster) -> list[dict]:
+def match_letter(text: str, master: SecurityMaster, as_of: str | None = None) -> list[dict]:
     """Return structured, tiered mentions for one letter."""
     holdings_zone = bool(HOLDINGS_HEADING_RE.search(text))
     # candidate ticker -> aggregation bucket
@@ -694,7 +886,7 @@ def match_letter(text: str, master: SecurityMaster) -> list[dict]:
             b["rules"].add("company_name")
             b["mention_count"] += len(positions)
             b["spans"].extend(positions)
-            near_action = any(_classify_action(_window(text, p)) for p in positions[:6])
+            near_action = any(_relation_action(text, p) for p in positions[:6])
             investment_context = _has_investment_context(text, positions)
             ownership_context = _has_ownership_context(text, positions)
             attribution_only = all(
@@ -724,11 +916,29 @@ def match_letter(text: str, master: SecurityMaster) -> list[dict]:
             # single-token brand mentions ("Google", "Amazon") are only promoted
             # to Tier B with explicit position/action context; bare repetition
             # (e.g. a name cited as a comparison) stays Tier C.
-            near_action = any(_classify_action(_window(text, p, 80)) for p in positions[:8])
+            near_action = any(_relation_action(text, p) for p in positions[:8])
             investment_context = _has_investment_context(text, positions, radius=100)
             ownership_context = _has_ownership_context(text, positions, radius=80)
             if b["tier"] == "C":
                 b["tier"] = "B" if (ownership_context or (near_action and investment_context)) else "C"
+
+    # --- raw names for company/non-company symbol collisions ---
+    # Normal company-name normalization intentionally strips suffixes such as
+    # "Company" and "Inc".  For ambiguous symbols that would leave a generic
+    # token ("southern") or a short token ("msci"), retain the exact raw issuer
+    # phrase and let the semantic gate below decide whether the sense is valid.
+    for ticker, pattern in AMBIGUOUS_RAW_COMPANY_PATTERNS.items():
+        if ticker not in master.by_ticker:
+            continue
+        matches = list(pattern.finditer(text))
+        if not matches:
+            continue
+        b = bucket(ticker)
+        b["rules"].add("raw_company_name")
+        b["mention_count"] += len(matches)
+        b["spans"].extend(match.start() for match in matches)
+        if b["tier"] == "C":
+            b["tier"] = "B"
 
     # --- holdings table rows (explicit ticker + change column) ---
     for row in parse_holdings_table_rows(text, master):
@@ -745,14 +955,14 @@ def match_letter(text: str, master: SecurityMaster) -> list[dict]:
     # --- finalize each candidate ---
     mentions: list[dict] = []
     for ticker, b in cand.items():
-        if is_benchmark(ticker) and not master.in_book(ticker):
-            continue  # benchmark/index codes are not investable positions
+        if not _semantic_entity_allowed(text, ticker, b, master, as_of):
+            continue
         spans = sorted(set(b["spans"]))
         windows = [_window(text, p) for p in spans[:6]]
         action = b.get("table_action")
         if not action:
-            for w in windows:
-                action = _classify_action(w)
+            for pos in spans[:8]:
+                action = _relation_action(text, pos)
                 if action:
                     break
         in_table = holdings_zone and any(
@@ -777,6 +987,9 @@ def match_letter(text: str, master: SecurityMaster) -> list[dict]:
                 "conviction": conviction,
                 "evidence": evidence,
                 "in_book": b["in_book"],
+                "entity_type": master.entity_type(ticker),
+                "validation_status": master.by_ticker.get(ticker, {}).get("validation_status")
+                or ("manual" if master.validated(ticker) else "quarantined"),
                 "score": _score(b, action, in_table),
             }
         )

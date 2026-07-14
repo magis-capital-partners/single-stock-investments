@@ -44,6 +44,7 @@ letter-date-check:
 	@echo OK: letter-date-check
 
 letter-rebuild:
+	$(PYTHON) $(SCRIPTS)/build_security_master.py --refresh-sec
 	$(PYTHON) $(SCRIPTS)/build_superinvestor_insights.py
 	$(PYTHON) $(SCRIPTS)/repair_letter_dates.py --apply
 	$(PYTHON) $(SCRIPTS)/auto_resolve_filing_events.py
@@ -56,6 +57,7 @@ letter-rebuild:
 letter-backfill:
 	$(PYTHON) $(SCRIPTS)/import_drive_letter_orphans.py --all
 	$(PYTHON) $(SCRIPTS)/import_drive_letter_orphans.py --skip-download
+	$(PYTHON) $(SCRIPTS)/build_security_master.py --refresh-sec
 	$(PYTHON) $(SCRIPTS)/build_superinvestor_insights.py
 	$(PYTHON) $(SCRIPTS)/repair_letter_dates.py --apply
 	$(PYTHON) $(SCRIPTS)/build_insights.py

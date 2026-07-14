@@ -21,7 +21,7 @@ from document_store import (  # noqa: E402
 )
 from insight_format import format_letter_claim  # noqa: E402
 from fund_registry import canonicalize_fund_identity  # noqa: E402
-from fund_identity import consolidate_letter_funds  # noqa: E402
+from fund_identity import consolidate_letter_funds_stable  # noqa: E402
 from filing_facts import (  # noqa: E402
     filing_metadata_from_text_path,
     source_filing_ref_from_text_path,
@@ -35,6 +35,7 @@ from filing_review import (  # noqa: E402
 from event_triage import triage_events, write_triage_queue  # noqa: E402
 
 OUTPUT = ROOT / "dashboard" / "data" / "insights.json"
+DOCS_OUTPUT = ROOT / "docs" / "data" / "insights.json"
 ARCHIVE_OUTPUT = ROOT / "_system" / "reference" / "data-sources" / "insights_record_archive.json"
 LETTERS_INSIGHTS = letters_root() / "insights.json"
 # Full letter corpus is built offline (letter-backfill) and committed in dashboard/data/.
@@ -1627,9 +1628,32 @@ def letter_index(letters: list[dict], our_tickers: set[str]) -> list[dict]:
                 "source_document": letter_ev["source_document"],
                 "evidence_url": letter_ev["evidence_url"],
                 "evidence_label": letter_ev["evidence_label"],
+                "canonical_document_id": letter.get("canonical_document_id"),
+                "duplicate_count": int(letter.get("duplicate_count") or 0),
             }
         )
     return sorted(rows, key=lambda x: (x.get("letter_date") or "", x.get("fund") or ""), reverse=True)
+
+
+def dedupe_canonical_letters(letters: list[dict]) -> tuple[list[dict], int]:
+    """Final safety net: one rendered/aggregated row per canonical document."""
+    output: list[dict] = []
+    seen: set[str] = set()
+    suppressed = 0
+    for letter in letters:
+        key = str(
+            letter.get("canonical_document_id")
+            or letter.get("content_hash")
+            or letter.get("source_file")
+            or ""
+        )
+        if key and key in seen:
+            suppressed += 1
+            continue
+        if key:
+            seen.add(key)
+        output.append(letter)
+    return output, suppressed
 
 
 def security_names() -> dict[str, str]:
@@ -2755,9 +2779,8 @@ def main() -> int:
             for letter in (letters_doc.get("letters") or [])
             if not is_letter_meta_entry(letter) and letter.get("letter_eligible", True)
         ]
-        letters, fund_identity_audit = consolidate_letter_funds(letters)
-        if fund_identity_audit.get("residual_redundancy_groups") or not fund_identity_audit.get("idempotent"):
-            raise RuntimeError("Fund identity consolidation did not reach a clean, stable result")
+        letters, fund_identity_audit = consolidate_letter_funds_stable(letters)
+        letters, downstream_duplicates_suppressed = dedupe_canonical_letters(letters)
         letters_doc = {**letters_doc, "letters": letters}
         records.extend(from_superinvestor_letters(letters_doc))
 
@@ -2874,6 +2897,12 @@ def main() -> int:
         "fund_registry": fund_registry(letters, front_tickers),
         "fund_profiles": fund_profiles(letters, front_tickers),
         "fund_identity_audit": fund_identity_audit,
+        "document_dedup_audit": {
+            **(letters_source_doc.get("document_dedup_audit") or {}),
+            "downstream_duplicates_suppressed": (
+                downstream_duplicates_suppressed if not preserve else 0
+            ),
+        },
         "ticker_discussants": ticker_discussants(letters, front_tickers, company_hints),
         "by_ticker": ticker_insights(records, front_tickers, company_hints),
     }
@@ -2881,7 +2910,12 @@ def main() -> int:
         payload.update(preserved_fields)
         payload["letter_count"] = letter_count_value
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-    _atomic_write(OUTPUT, json.dumps(payload, separators=(",", ":")) + "\n")
+    serialized_payload = json.dumps(payload, separators=(",", ":")) + "\n"
+    _atomic_write(OUTPUT, serialized_payload)
+    # The published GitHub Pages directory is a first-class dashboard build,
+    # not a stale snapshot of the local dashboard directory.
+    DOCS_OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+    _atomic_write(DOCS_OUTPUT, serialized_payload)
     print(
         f"Wrote {OUTPUT} ({len(records)} insight records, {len(events)} events, "
         f"{letter_count_value} letters"

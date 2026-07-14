@@ -22,8 +22,9 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 
 import letter_matching as lm  # noqa: E402
+from letter_dedup import deduplicate_letter_files, deduplicate_letter_records  # noqa: E402
 from fund_registry import FundResolver  # noqa: E402
-from fund_identity import consolidate_letter_funds  # noqa: E402
+from fund_identity import consolidate_letter_funds_stable  # noqa: E402
 from vault_paths import letters_root, path_to_letters_ref  # noqa: E402
 
 LETTERS_ROOT = letters_root()
@@ -31,6 +32,7 @@ INCOMING = LETTERS_ROOT / "INCOMING"
 INSIGHTS_PATH = LETTERS_ROOT / "insights.json"
 INDEX_PATH = LETTERS_ROOT / "letters_index.json"
 MANIFEST_PATH = LETTERS_ROOT / "manifest.csv"
+DUPLICATE_AUDIT_PATH = LETTERS_ROOT / "duplicate_audit.json"
 SECURITY_MASTER_PATH = ROOT / "_system" / "reference" / "securities" / "security_master.json"
 
 _WORKER_MASTER: lm.SecurityMaster | None = None
@@ -39,7 +41,7 @@ _WORKER_PERSONA_CFG: dict | None = None
 
 # Minimum tier emitted into tickers / positions (consensus uses the same floor).
 EMIT_MIN_TIER = "B"
-CLASSIFICATION_POLICY_VERSION = 4
+CLASSIFICATION_POLICY_VERSION = 5
 
 NONLETTER_FILENAME_RULES: list[tuple[str, re.Pattern[str]]] = [
     ("conference_idea", re.compile(r"\b(conference|sohn|idea dinner|conference recap)\b", re.I)),
@@ -338,19 +340,27 @@ def mentions_to_positions(mentions: list[dict]) -> list[dict]:
                 "conviction": m.get("conviction", "low"),
                 "tier": m.get("tier"),
                 "in_book": m.get("in_book", False),
+                "entity_type": m.get("entity_type"),
+                "validation_status": m.get("validation_status"),
                 "direction": ACTION_DIRECTION.get(action, "neutral"),
             }
         )
     return positions[:30]
 
 
-def build_letter_record(path: Path, resolver: FundResolver, master: lm.SecurityMaster, persona_cfg: dict) -> dict:
+def build_letter_record(
+    path: Path,
+    resolver: FundResolver,
+    master: lm.SecurityMaster,
+    persona_cfg: dict,
+    document_meta: dict | None = None,
+) -> dict:
     text = path.read_text(encoding="utf-8", errors="ignore")
     meta = resolver.resolve(path, text)
     document_type, letter_eligible, classification_reason = classify_document(path, text)
 
     if letter_eligible:
-        all_mentions = lm.match_letter(text, master)
+        all_mentions = lm.match_letter(text, master, as_of=meta.get("letter_date"))
         emitted = lm.emitted_mentions(all_mentions, EMIT_MIN_TIER)
         tickers = [m["ticker"] for m in emitted][:40]
         positions = mentions_to_positions(emitted)
@@ -375,6 +385,7 @@ def build_letter_record(path: Path, resolver: FundResolver, master: lm.SecurityM
                 personas = ps
                 break
 
+    document_meta = document_meta or {}
     return {
         "fund_id": meta["fund_id"],
         "fund": meta["fund"],
@@ -391,6 +402,11 @@ def build_letter_record(path: Path, resolver: FundResolver, master: lm.SecurityM
         "classification_reason": classification_reason,
         "source_file": _stable_ref(path),
         "source_document": source_document_ref(path),
+        "canonical_document_id": document_meta.get("canonical_document_id"),
+        "content_hash": document_meta.get("content_hash"),
+        "content_length": document_meta.get("content_length"),
+        "duplicate_sources": document_meta.get("duplicate_sources") or [],
+        "duplicate_count": int(document_meta.get("duplicate_count") or 0),
         "lead_summary": extract_lead_summary(text),
         "themes": themes,
         "positions": positions,
@@ -412,14 +428,16 @@ def _worker_init() -> None:
     _WORKER_PERSONA_CFG = load_personas()
 
 
-def _worker_build(path_text: str) -> dict:
+def _worker_build(task: tuple[str, dict]) -> dict:
     if _WORKER_MASTER is None or _WORKER_RESOLVER is None or _WORKER_PERSONA_CFG is None:
         _worker_init()
+    path_text, document_meta = task
     return build_letter_record(
         Path(path_text),
         _WORKER_RESOLVER,  # type: ignore[arg-type]
         _WORKER_MASTER,  # type: ignore[arg-type]
         _WORKER_PERSONA_CFG,  # type: ignore[arg-type]
+        document_meta,
     )
 
 
@@ -431,13 +449,21 @@ def main() -> int:
     persona_cfg = load_personas()
     master = load_security_master()
     resolver = FundResolver()
-    files = scan_letter_files()
+    source_files = scan_letter_files()
+    files, document_meta_by_path, duplicate_audit = deduplicate_letter_files(source_files)
+    tasks = [
+        (str(path), document_meta_by_path.get(str(path.resolve()).lower(), {}))
+        for path in files
+    ]
     workers = max(1, min(int(os.environ.get("LETTER_BUILD_WORKERS", "8")), os.cpu_count() or 1))
     if workers == 1:
-        letters = [build_letter_record(f, resolver, master, persona_cfg) for f in files]
+        letters = [
+            build_letter_record(path, resolver, master, persona_cfg, document_meta)
+            for path, (_path_text, document_meta) in zip(files, tasks)
+        ]
     else:
         with ProcessPoolExecutor(max_workers=workers, initializer=_worker_init) as pool:
-            letters = list(pool.map(_worker_build, (str(f) for f in files), chunksize=8))
+            letters = list(pool.map(_worker_build, tasks, chunksize=8))
         # Worker-local unresolved queues are reconstructed deterministically
         # from their returned normalized identities before writing the review file.
         for row in letters:
@@ -453,9 +479,11 @@ def main() -> int:
             if example and example not in examples and len(examples) < 5:
                 examples.append(example)
     resolver.write_unresolved()
-    letters, fund_identity_audit = consolidate_letter_funds(letters)
-    if fund_identity_audit.get("residual_redundancy_groups") or not fund_identity_audit.get("idempotent"):
-        raise RuntimeError("Fund identity consolidation did not reach a clean, stable result")
+    letters, fund_identity_audit = consolidate_letter_funds_stable(letters)
+    letters, duplicate_audit = deduplicate_letter_records(letters, duplicate_audit)
+    DUPLICATE_AUDIT_PATH.write_text(
+        json.dumps(duplicate_audit, indent=2) + "\n", encoding="utf-8"
+    )
 
     with_positions = sum(1 for r in letters if r.get("positions"))
     actionable = sum(
@@ -493,6 +521,7 @@ def main() -> int:
         "security_master_count": len(master.by_ticker),
         "stats": stats,
         "fund_identity_audit": fund_identity_audit,
+        "document_dedup_audit": duplicate_audit,
         "letters": letters,
     }
     LETTERS_ROOT.mkdir(parents=True, exist_ok=True)

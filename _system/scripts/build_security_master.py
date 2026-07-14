@@ -11,9 +11,12 @@ SEC company_tickers.json if present at _system/reference/securities/sec_company_
 """
 from __future__ import annotations
 
+import argparse
 import json
+import os
 import re
 import sys
+import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -26,8 +29,10 @@ from vault_paths import letters_root  # noqa: E402
 LETTERS_ROOT = letters_root()
 SECURITIES_DIR = ROOT / "_system" / "reference" / "securities"
 MASTER_PATH = SECURITIES_DIR / "security_master.json"
+QUARANTINE_PATH = SECURITIES_DIR / "security_master_quarantine.json"
 SEC_TICKERS_PATH = SECURITIES_DIR / "sec_company_tickers.json"
 REGISTRY_PATH = ROOT / "_system" / "portfolio" / "registry.json"
+SEC_TICKERS_URL = "https://www.sec.gov/files/company_tickers.json"
 
 MANUAL_ALIASES: dict[str, list[str]] = {
     "GOOGL": ["Google", "Alphabet"],
@@ -41,6 +46,7 @@ MANUAL_ALIASES: dict[str, list[str]] = {
     "NVDA": ["Nvidia"],
     "AMD": ["Advanced Micro Devices"],
     "TSLA": ["Tesla"],
+    "TVK": ["TerraVest Industries"],
 }
 
 
@@ -51,6 +57,25 @@ def load_json(path: Path):
         return json.loads(path.read_text(encoding="utf-8"))
     except json.JSONDecodeError:
         return None
+
+
+def refresh_sec_tickers() -> None:
+    """Refresh the official SEC symbol reference used to validate US equities."""
+    user_agent = os.environ.get(
+        "SEC_USER_AGENT", "Magis Capital research engineering contact@magiscapital.com"
+    )
+    request = urllib.request.Request(
+        SEC_TICKERS_URL,
+        headers={"User-Agent": user_agent},
+    )
+    with urllib.request.urlopen(request, timeout=45) as response:
+        raw = response.read()
+    # Validate before replacing the local cache.
+    payload = json.loads(raw.decode("utf-8"))
+    if not isinstance(payload, dict) or len(payload) < 1000:
+        raise RuntimeError("SEC company ticker response failed validation")
+    SECURITIES_DIR.mkdir(parents=True, exist_ok=True)
+    SEC_TICKERS_PATH.write_text(json.dumps(payload, separators=(",", ":")) + "\n", encoding="utf-8")
 
 
 def load_book() -> dict[str, dict]:
@@ -103,6 +128,12 @@ STRONG_HARVEST_RULES = {"dollar", "paren_exch", "exch_prefix", "dotted"}
 ALLOWED_DOTTED_SUFFIXES = {
     "HK", "T", "TO", "L", "LS", "AX", "DE", "PA", "AS", "MI", "ST", "HE",
     "OL", "CO", "WA", "SA", "MX", "NS", "KL", "SI", "BK", "TW", "KS",
+}
+
+MANUAL_SECURITY_METADATA: dict[str, dict] = {
+    # LandBridge began trading under LB in 2024.  Earlier LB references belong
+    # to L Brands and must not overlap the current portfolio security.
+    "LB": {"valid_from": "2024-06-28"},
 }
 CANONICAL_SYMBOL_OVERRIDES = {
     "ACHC.O": "ACHC",  # Reuters venue suffix
@@ -173,6 +204,9 @@ def build() -> dict:
             "is_word_collision": lm.is_word_collision(ticker),
             "in_book": True,
             "source": "book",
+            "entity_type": "equity",
+            "validation_status": "manual",
+            **MANUAL_SECURITY_METADATA.get(ticker, {}),
         }
 
     # ensure manual-alias-only tickers exist even if not in book
@@ -186,6 +220,9 @@ def build() -> dict:
                 "is_word_collision": lm.is_word_collision(ticker),
                 "in_book": False,
                 "source": "manual",
+                "entity_type": "equity",
+                "validation_status": "manual",
+                **MANUAL_SECURITY_METADATA.get(ticker, {}),
             }
 
     sec = load_json(SEC_TICKERS_PATH)
@@ -226,6 +263,12 @@ def build() -> dict:
             if name and len(name) > len(harvested_names.get(canon, "")):
                 harvested_names[canon] = name
             if canon not in master:
+                syntax_validated = (
+                    "." in canon
+                    and canon.split(".", 1)[1] in ALLOWED_DOTTED_SUFFIXES
+                    and hit["rule"] == "dotted"
+                )
+                validated = canon in sec_by_symbol or syntax_validated
                 master[canon] = {
                     "name": harvested_names.get(canon) or canon,
                     "exchange": exchange_of(canon),
@@ -234,6 +277,8 @@ def build() -> dict:
                     "is_word_collision": lm.is_word_collision(canon),
                     "in_book": False,
                     "source": "harvested",
+                    "entity_type": "equity" if validated else "unvalidated",
+                    "validation_status": "validated" if validated else "quarantined",
                 }
                 harvested += 1
             else:
@@ -248,13 +293,26 @@ def build() -> dict:
     payload = dict(sorted(master.items()))
     SECURITIES_DIR.mkdir(parents=True, exist_ok=True)
     MASTER_PATH.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    quarantined = {
+        ticker: meta
+        for ticker, meta in payload.items()
+        if meta.get("validation_status") == "quarantined"
+    }
+    QUARANTINE_PATH.write_text(json.dumps(quarantined, indent=2) + "\n", encoding="utf-8")
     in_book = sum(1 for v in master.values() if v.get("in_book"))
+    validated = sum(1 for v in master.values() if v.get("validation_status") in {"validated", "manual"})
     print(
         f"Wrote {MASTER_PATH.relative_to(ROOT)}: {len(master)} securities "
-        f"({in_book} in-book, {harvested} harvested from letters)"
+        f"({in_book} in-book, {validated} validated/manual, "
+        f"{len(quarantined)} quarantined, {harvested} harvested from letters)"
     )
     return payload
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--refresh-sec", action="store_true")
+    args = parser.parse_args()
+    if args.refresh_sec or not SEC_TICKERS_PATH.exists():
+        refresh_sec_tickers()
     build()

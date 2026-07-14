@@ -54,6 +54,66 @@ class ClassificationPrecisionTests(unittest.TestCase):
         text = "ESG Credit Macro Event Fund LP (CME) publishes this CME monthly update."
         self.assertNotIn("CME", self.emitted(text))
 
+    def test_msci_benchmark_is_not_msci_inc(self) -> None:
+        text = (
+            "The fund returned 4.0% versus the MSCI China Index at 3.0%. "
+            "MSCI World Index performance was 2.0% and long/short exposure was stable."
+        )
+        self.assertNotIn("MSCI", self.emitted(text))
+
+    def test_msci_inc_position_remains_true_positive(self) -> None:
+        text = (
+            "We initiated a new position in MSCI Inc. during the quarter. "
+            "MSCI Inc. provides investment decision support tools and recurring data services."
+        )
+        mentions = {m["ticker"]: m for m in lm.emitted_mentions(lm.match_letter(text, self.master))}
+        self.assertIn("MSCI", mentions)
+        self.assertEqual(mentions["MSCI"]["action"], "new")
+
+    def test_officer_title_is_not_cooper_companies(self) -> None:
+        text = (
+            "Our portfolio manager met Jane Smith (COO) during diligence. "
+            "The COO discussed operations and revenue with the investment team."
+        )
+        self.assertNotIn("COO", self.emitted(text))
+
+    def test_cooper_companies_position_remains_true_positive(self) -> None:
+        text = "We added to our position in The Cooper Companies (COO) during the quarter."
+        mentions = {m["ticker"]: m for m in lm.emitted_mentions(lm.match_letter(text, self.master))}
+        self.assertIn("COO", mentions)
+        self.assertEqual(mentions["COO"]["action"], "add")
+
+    def test_generic_southern_is_not_southern_company(self) -> None:
+        self.assertNotIn(
+            "SO",
+            self.emitted("Our portfolio companies expanded across southern regional markets."),
+        )
+
+    def test_southern_company_position_remains_true_positive(self) -> None:
+        text = "We initiated a new position in Southern Company during the quarter."
+        self.assertIn("SO", self.emitted(text))
+
+    def test_operating_ratio_is_not_osisko(self) -> None:
+        text = "The railroad improved its Operating Ratio (OR), a key portfolio operating metric."
+        self.assertNotIn("OR", self.emitted(text))
+
+    def test_historical_l_brands_does_not_map_to_landbridge(self) -> None:
+        text = "We initiated a new position in L Brands (LB), owner of Victoria's Secret."
+        emitted = {
+            m["ticker"]
+            for m in lm.emitted_mentions(lm.match_letter(text, self.master, as_of="2021-03-31"))
+        }
+        self.assertNotIn("LB", emitted)
+
+    def test_company_action_requires_fund_entity_relation(self) -> None:
+        text = (
+            "Our portfolio holding Ibotta added Kroger to its retailer network. "
+            "Kroger remains an important commercial partner."
+        )
+        mentions = {m["ticker"]: m for m in lm.emitted_mentions(lm.match_letter(text, self.master))}
+        if "KR" in mentions:
+            self.assertEqual(mentions["KR"]["action"], "discuss")
+
     def test_single_generic_theme_keyword_does_not_tag_document(self) -> None:
         self.assertEqual(bsi.extract_themes("The bank mailed a notice.", []), [])
 
