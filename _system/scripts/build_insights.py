@@ -21,6 +21,7 @@ from document_store import (  # noqa: E402
 )
 from insight_format import format_letter_claim  # noqa: E402
 from fund_registry import canonicalize_fund_identity  # noqa: E402
+from fund_identity import consolidate_letter_funds  # noqa: E402
 from filing_facts import (  # noqa: E402
     filing_metadata_from_text_path,
     source_filing_ref_from_text_path,
@@ -377,6 +378,7 @@ def preserved_letter_payload_fields(prior: dict) -> dict:
         "consensus",
         "fund_registry",
         "fund_profiles",
+        "fund_identity_audit",
         "ticker_discussants",
     )
     return {key: prior[key] for key in keys if key in prior}
@@ -2694,6 +2696,7 @@ def main() -> int:
                 file=sys.stderr,
             )
         letters: list[dict] = []
+        fund_identity_audit = (prior or {}).get("fund_identity_audit") or {}
     else:
         letters_doc = load_json(LETTERS_INSIGHTS) or {"letters": []}
         letters = [
@@ -2701,6 +2704,9 @@ def main() -> int:
             for letter in (letters_doc.get("letters") or [])
             if not is_letter_meta_entry(letter)
         ]
+        letters, fund_identity_audit = consolidate_letter_funds(letters)
+        if fund_identity_audit.get("residual_redundancy_groups") or not fund_identity_audit.get("idempotent"):
+            raise RuntimeError("Fund identity consolidation did not reach a clean, stable result")
         letters_doc = {**letters_doc, "letters": letters}
         records.extend(from_superinvestor_letters(letters_doc))
 
@@ -2815,6 +2821,7 @@ def main() -> int:
         "consensus": build_consensus(letters, front_tickers, security_names()),
         "fund_registry": fund_registry(letters, front_tickers),
         "fund_profiles": fund_profiles(letters, front_tickers),
+        "fund_identity_audit": fund_identity_audit,
         "ticker_discussants": ticker_discussants(letters, front_tickers, company_hints),
         "by_ticker": ticker_insights(records, front_tickers, company_hints),
     }

@@ -21,6 +21,7 @@ sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 
 import letter_matching as lm  # noqa: E402
 from fund_registry import FundResolver  # noqa: E402
+from fund_identity import consolidate_letter_funds  # noqa: E402
 from vault_paths import letters_root, path_to_letters_ref  # noqa: E402
 
 LETTERS_ROOT = letters_root()
@@ -329,6 +330,9 @@ def main() -> int:
     files = scan_letter_files()
     letters = [build_letter_record(f, resolver, master, persona_cfg) for f in files]
     resolver.write_unresolved()
+    letters, fund_identity_audit = consolidate_letter_funds(letters)
+    if fund_identity_audit.get("residual_redundancy_groups") or not fund_identity_audit.get("idempotent"):
+        raise RuntimeError("Fund identity consolidation did not reach a clean, stable result")
 
     with_positions = sum(1 for r in letters if r.get("positions"))
     actionable = sum(
@@ -364,6 +368,7 @@ def main() -> int:
         "emit_min_tier": EMIT_MIN_TIER,
         "security_master_count": len(master.by_ticker),
         "stats": stats,
+        "fund_identity_audit": fund_identity_audit,
         "letters": letters,
     }
     LETTERS_ROOT.mkdir(parents=True, exist_ok=True)
