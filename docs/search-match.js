@@ -137,7 +137,7 @@
   function matchEvent(event, q, knownTickers) {
     return matchTextRecord(event, q, {
       knownTickers,
-      fields: ['ticker', 'title', 'summary', 'source_label', 'source', 'impact_axis'],
+      fields: ['ticker', 'title', 'summary', 'source_label', 'source', 'impact_axis', 'why_it_matters', 'recommended_follow_up', 'portfolio_scope'],
       tickerField: 'ticker',
       titleField: 'title',
     });

@@ -61,11 +61,15 @@
     if (score == null) return '<td class="mono">—</td>';
     const tier = row?.tier || 'context';
     const pct = Math.max(2, Math.min(100, Number(score) || 0));
+    const scoreExplain = Object.entries(row?.materiality_components || {})
+      .map(([key, value]) => `${key} ${Number(value).toFixed(2)}`)
+      .join(' · ');
     const stake = row?.stake_percent != null ? ` · stake ${row.stake_percent}%` : '';
     return `
       <td title="${escapeHtml(`Materiality ${score}/100 · tier: ${tier}${stake}`)}">
         <span class="mono">${score}</span>
         <span class="badge ${tierBadge(tier)}" style="margin-left:4px">${escapeHtml(tier)}</span>
+        ${scoreExplain ? `<span class="tier-sub" title="${escapeHtml(scoreExplain)}"> why</span>` : ''}
         <div style="height:3px;margin-top:3px;border-radius:2px;background:rgba(148,163,184,.18);max-width:72px">
           <div style="height:100%;width:${pct}%;border-radius:2px;background:${tier === 'signal' ? '#34d399' : tier === 'noise' ? '#64748b' : '#818cf8'}"></div>
         </div>
@@ -86,13 +90,30 @@
         <div class="metric"><div class="k">Tickers with hits</div><div class="v mono">${s.tickers_with_hits || 0}</div></div>
         <div class="metric"><div class="k">Broken links dropped</div><div class="v mono">${s.broken_link_count || 0}</div></div>
         <div class="metric"><div class="k">Body unverified</div><div class="v mono">${s.body_unverified_count || 0}</div></div>
+        <div class="metric"><div class="k">Targets rejected</div><div class="v mono">${s.target_unverified_excluded_count || 0}</div></div>
+        <div class="metric"><div class="k">Non-reports rejected</div><div class="v mono">${s.non_report_excluded_count || 0}</div></div>
+        <div class="metric"><div class="k">Duplicates removed</div><div class="v mono">${s.canonical_duplicate_count || 0}</div></div>
+        <div class="metric"><div class="k">Cross-ticker conflicts</div><div class="v mono">${s.cross_ticker_conflict_count || 0}</div></div>
       </div>`;
   }
 
   function renderFilters(state) {
     const review = state.reviewFilter || '';
     const tier = state.tier || 'signal';
+    const view = state.view || 'active';
+    const sortMode = state.sortMode || 'materiality';
     return `
+      <div class="toolbar" style="margin:12px 0 0">
+        <button type="button" class="filter-btn${view === 'active' ? ' active' : ''}" data-activist-view="active">Active campaigns</button>
+        <button type="button" class="filter-btn${view === 'short' ? ' active' : ''}" data-activist-view="short">Short reports</button>
+        <button type="button" class="filter-btn${view === 'ownership' ? ' active' : ''}" data-activist-view="ownership">Ownership filings</button>
+        <button type="button" class="filter-btn${view === 'review' ? ' active' : ''}" data-activist-view="review">Review queue</button>
+        <label class="tier-sub" for="activist-sort">Sort</label>
+        <select id="activist-sort" class="search" style="max-width:150px;padding:6px 9px">
+          <option value="materiality"${sortMode === 'materiality' ? ' selected' : ''}>Materiality</option>
+          <option value="newest"${sortMode === 'newest' ? ' selected' : ''}>Newest</option>
+        </select>
+      </div>
       <div class="toolbar" style="margin:12px 0">
         <input class="search" id="activist-search" placeholder="Filter ticker, firm, title…" value="${state.escapeHtml(state.search || '')}" />
         <button type="button" class="filter-btn${tier === 'signal' && !review ? ' active' : ''}" data-activist-tier="signal">Signal</button>
@@ -116,10 +137,10 @@
   function renderReportLinks(row, linkHtml) {
     const parts = [];
     if (row.source_url && row.source_url_ok !== false) {
-      parts.push(linkHtml(row.source_url, 'Source', 'source-open-link'));
+      parts.push(linkHtml(row.source_url, row.source === 'sec_edgar' ? 'SEC filing' : 'Original', 'source-open-link'));
     }
     if (row.file_exists !== false && row.github_url) {
-      const label = isPdfReport(row) ? 'PDF' : 'GitHub';
+      const label = isPdfReport(row) ? 'Archived PDF' : 'Archived copy';
       parts.push(linkHtml(row.github_url, label, 'source-open-link'));
     }
     if (!parts.length) {
@@ -128,13 +149,14 @@
     return parts.join(' ');
   }
 
-  function sortFeedRows(rows) {
+  function sortFeedRows(rows, sortMode) {
     return rows.slice().sort((a, b) => {
+      const da = a.report_date || '';
+      const db = b.report_date || '';
+      if (sortMode === 'newest' && da !== db) return db.localeCompare(da);
       const ma = a.materiality == null ? -1 : Number(a.materiality);
       const mb = b.materiality == null ? -1 : Number(b.materiality);
       if (ma !== mb) return mb - ma;
-      const da = a.report_date || '';
-      const db = b.report_date || '';
       if (da !== db) return db.localeCompare(da);
       const ta = (a.ticker || '').localeCompare(b.ticker || '');
       if (ta) return ta;
@@ -148,7 +170,7 @@
     const groups = new Map();
     const order = [];
     rows.forEach(r => {
-      const key = `${r.ticker || ''}|${r.firm_id || ''}|${r.side || ''}`;
+      const key = r.campaign_id || `${r.ticker || ''}|${r.firm_id || ''}|${r.side || ''}`;
       if (!groups.has(key)) {
         groups.set(key, []);
         order.push(key);
@@ -171,7 +193,7 @@
         <td class="mono">${state.escapeHtml(r.ticker || '—')}</td>
         ${materialityCell(r, state.escapeHtml)}
         <td><span class="badge ${sideBadge(r.side)}">${state.escapeHtml(r.side || '—')}</span></td>
-        <td>${firmDisplay(r)}${reviewBadge}${fileStatusBadge(r)}</td>
+        <td><div>${firmDisplay(r)}${reviewBadge}${fileStatusBadge(r)}</div><div class="tier-sub">Target: ${state.escapeHtml(r.target_company || r.ticker || '')} · ${state.escapeHtml(r.target_match_evidence || 'unverified')} · ${state.escapeHtml((r.report_kind || 'activist_report').replaceAll('_', ' '))}</div></td>
         <td>${state.escapeHtml(r.title || '—')}${groupBadge}${extra?.expander || ''}</td>
         <td>${state.escapeHtml(r.source || '—')}${r.status === 'new' ? ' <span class="badge badge-warn">new</span>' : ''}</td>
         <td>${renderReportLinks(r, state.linkHtml)}</td>
@@ -181,14 +203,24 @@
   function renderFeed(feed, state) {
     const q = (state.search || '').trim().toLowerCase();
     const tier = state.tier || 'signal';
+    const view = state.view || 'active';
     let rows = Array.isArray(feed) ? feed.slice() : [];
+    if (view === 'short') {
+      rows = rows.filter(r => r.report_kind === 'short_report' && !r.needs_filer_review);
+    } else if (view === 'ownership') {
+      rows = rows.filter(r => r.report_kind === 'ownership_filing' && !r.needs_filer_review);
+    } else if (view === 'review') {
+      rows = rows.filter(r => r.needs_filer_review || !r.target_verified || r.weak_match || r.body_verified === false);
+    } else {
+      rows = rows.filter(r => !r.needs_filer_review && (r.tier === 'signal' || Number(r.campaign_group_size || 1) > 1));
+    }
     if (state.reviewFilter === 'needs_filer_review') {
       rows = rows.filter(r => r.needs_filer_review);
     } else if (state.reviewFilter === 'missing_file') {
       rows = rows.filter(r => r.needs_file || r.file_exists === false);
     } else if (state.reviewFilter === 'weak_match') {
       rows = rows.filter(r => r.weak_match || r.body_verified === false);
-    } else {
+    } else if (view !== 'review') {
       if (tier === 'signal') {
         rows = rows.filter(r => (r.tier || 'context') === 'signal');
       } else if (tier === 'noise') {
@@ -200,13 +232,13 @@
     }
     if (q) {
       rows = rows.filter(r =>
-        [r.ticker, r.firm_name, r.firm_id, r.title, r.source, r.match_reason, ...(r.reporting_persons || [])]
+        [r.ticker, r.target_company, r.firm_name, r.firm_id, r.title, r.source, r.report_kind, r.target_match_evidence, ...(r.reporting_persons || [])]
           .join(' ')
           .toLowerCase()
           .includes(q)
       );
     }
-    rows = sortFeedRows(rows);
+    rows = sortFeedRows(rows, state.sortMode || 'materiality');
     if (!rows.length) {
       return tier === 'signal' && !q && !state.reviewFilter
         ? '<div class="empty">No signal-tier activist reports right now. Switch to All to browse context and noise tiers.</div>'
@@ -293,7 +325,7 @@
       <div class="subhead">Materiality-ranked activist filings and short reports · signal tier shown by default</div>
       ${renderSummary(feedDoc.summary)}
       ${renderFilters(state)}
-      ${renderFeed(feedDoc.feed, state)}
+      ${renderFeed([...(feedDoc.feed || []), ...(feedDoc.review_queue || [])], state)}
       <div class="tier-sub" style="margin-top:12px">Last scan: ${state.escapeHtml(feedDoc.last_scan || feedDoc.generated_at || '—')}</div>`;
   }
 

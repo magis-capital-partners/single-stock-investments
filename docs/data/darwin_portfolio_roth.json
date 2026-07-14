@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-12T01:47:05Z",
+  "generated_at": "2026-07-13T14:15:52Z",
   "account_id": "roth",
   "tier": 0,
   "phase": "0-tier0",
@@ -22,12 +22,12 @@
     "falsifier_exit": true,
     "core_stance_max_delta_without_review_pct": 2.5,
     "min_irr_pct_for_weight": 6.0,
-    "max_weight_pct_watch": 5.0,
-    "allow_watch_stances": [],
-    "exclude_negative_irr_unless_stance": [
-      "core",
-      "accumulate"
-    ],
+    "research_policy_version": 1,
+    "deep_dive_required": true,
+    "current_deep_dive_days": 120,
+    "stale_deep_dive_days": 180,
+    "aging_max_weight_pct": 7.5,
+    "allow_cash_when_research_limited": true,
     "preferred_policy": "ira_marvin",
     "ml_champion_min_sharpe": 0.25,
     "ml_champion_min_periods": 24,
@@ -53,15 +53,15 @@
   ],
   "universe_exclusions": {
     "eligible_count": 502,
-    "eligible_with_returns": 490,
-    "excluded_total": 642,
+    "eligible_with_returns": 498,
+    "excluded_total": 638,
     "by_reason": {
       "not_in_sp500": 131,
       "adr_otc": 0,
       "liquidity_miss": 0,
       "no_options": 1,
-      "returns_missing": 12,
-      "irr_stance_miss": 498
+      "returns_missing": 4,
+      "research_eligibility_miss": 502
     },
     "samples": {
       "not_in_sp500": [
@@ -87,17 +87,9 @@
         "BF.B",
         "BRK.B",
         "FDXF",
-        "GWW",
-        "HONA",
-        "LYB",
-        "MSI",
-        "O",
-        "RJF",
-        "RTX",
-        "SMCI",
-        "WBD"
+        "HONA"
       ],
-      "irr_stance_miss": [
+      "research_eligibility_miss": [
         "A",
         "AAPL",
         "ABBV",
@@ -119,7 +111,7 @@
       "as_of": "2026-07-11",
       "source": "yahoo_chart_adv_proxy",
       "stale": false,
-      "age_days": 0,
+      "age_days": 2,
       "stale_after_days": 30,
       "eligible_buckets": [
         "A",
@@ -133,7 +125,7 @@
       },
       "eligible_ab": 502,
       "ticker_count": 503,
-      "path": "C:\\Users\\drewg\\Projects\\dashboards\\single-stock-investments\\_system\\reference\\market-data\\index\\sp500_options_liquidity.json"
+      "path": "/home/runner/work/single-stock-investments/single-stock-investments/_system/reference/market-data/index/sp500_options_liquidity.json"
     },
     "coverage_gate_ok": true,
     "coverage_gate": {
@@ -150,7 +142,7 @@
     "as_of": "2026-07-11",
     "source": "yahoo_chart_adv_proxy",
     "stale": false,
-    "age_days": 0,
+    "age_days": 2,
     "stale_after_days": 30,
     "eligible_buckets": [
       "A",
@@ -164,7 +156,7 @@
     },
     "eligible_ab": 502,
     "ticker_count": 503,
-    "path": "C:\\Users\\drewg\\Projects\\dashboards\\single-stock-investments\\_system\\reference\\market-data\\index\\sp500_options_liquidity.json"
+    "path": "/home/runner/work/single-stock-investments/single-stock-investments/_system/reference/market-data/index/sp500_options_liquidity.json"
   },
   "covered_call": {
     "enabled": true,
@@ -194,89 +186,27 @@
     "coverage_fraction_effective": 0.22999999999999998,
     "regime_coverage_mult": 1.15,
     "disclaimer": "Synthetic covered-call overlay on champion weights, not Darwin AI Ventures proprietary model",
-    "stress_cases": {
-      "bull_month": {
-        "stock_ret": 0.1,
-        "cc_ret": 0.08788951386276514,
-        "lag_vs_stock": -0.012110486137234866,
-        "premium_monthly": 0.005666666666666666,
-        "upside_cap": 0.041679045780138216,
-        "coverage": 0.22999999999999998
-      },
-      "crash_month": {
-        "stock_ret": -0.12,
-        "cc_ret": -0.11869666666666666,
-        "lag_vs_stock": 0.001303333333333337,
-        "premium_monthly": 0.005666666666666666,
-        "upside_cap": 0.041679045780138216,
-        "coverage": 0.22999999999999998
-      },
-      "sideways": {
-        "stock_ret": 0.005,
-        "cc_ret": 0.006303333333333333,
-        "lag_vs_stock": 0.0013033333333333326,
-        "premium_monthly": 0.005666666666666666,
-        "upside_cap": 0.041679045780138216,
-        "coverage": 0.22999999999999998
-      }
-    },
-    "name_level_sample": {
-      "ICE": {
-        "premium_monthly": 0.008368,
-        "upside_cap": 0.041679,
-        "coverage": 0.2645,
-        "vol_annual": 0.295342,
-        "vol_scale": 1.476712,
-        "stance": "hold",
-        "liquidity_bucket": "A"
-      },
-      "CPRT": {
-        "premium_monthly": 0.006315,
-        "upside_cap": 0.041679,
-        "coverage": 0.145475,
-        "vol_annual": 0.222895,
-        "vol_scale": 1.114477,
-        "stance": "core",
-        "liquidity_bucket": "A"
-      },
-      "DHR": {
-        "premium_monthly": 0.005111,
-        "upside_cap": 0.041679,
-        "coverage": 0.2645,
-        "vol_annual": 0.180398,
-        "vol_scale": 0.901992,
-        "stance": "hold",
-        "liquidity_bucket": "A"
-      },
-      "SPGI": {
-        "premium_monthly": 0.007603,
-        "upside_cap": 0.041679,
-        "coverage": 0.2645,
-        "vol_annual": 0.268357,
-        "vol_scale": 1.341787,
-        "stance": "hold",
-        "liquidity_bucket": "A"
-      }
-    },
+    "stress_cases": null,
+    "name_level_sample": null,
     "proxy_returns_status": {
       "XYLD": {
         "status": "exists",
-        "path": "C:\\Users\\drewg\\Projects\\dashboards\\single-stock-investments\\_system\\reference\\market-data\\returns\\XYLD.csv"
+        "path": "/home/runner/work/single-stock-investments/single-stock-investments/_system/reference/market-data/returns/XYLD.csv"
       },
       "QYLD": {
         "status": "exists",
-        "path": "C:\\Users\\drewg\\Projects\\dashboards\\single-stock-investments\\_system\\reference\\market-data\\returns\\QYLD.csv"
+        "path": "/home/runner/work/single-stock-investments/single-stock-investments/_system/reference/market-data/returns/QYLD.csv"
       }
     },
     "options_cache": {
-      "requested": 4,
+      "requested": 12,
       "local_symbols": 0,
-      "etf_dashboard_symbols": 301,
+      "etf_dashboard_symbols": 0,
       "merged_hit": 0,
       "iv_hit": 0,
       "iv_by_ticker": {},
-      "etf_dashboard_available": true,
-      "local_cache_path": "C:\\Users\\drewg\\Projects\\dashboards\\single-stock-investments\\_system\\reference\\market-data\\options\\options_cache.json",
+      "etf_dashboard_available": false,
+      "local_cache_path": "/home/runner/work/single-stock-investments/single-stock-investments/_system/reference/market-data/options/options_cache.json",
       "source_priority": [
         "etf_dashboard_options_cache",
         "ssi_local_options_cache",
@@ -286,77 +216,38 @@
     "oos_gate": {
       "enabled": true,
       "passed": false,
-      "reason": "oos_sharpe_-0.323_below_spy_0.902",
+      "reason": "oos_sharpe_0.0_below_spy_0.902",
       "promote_dual_score": false,
       "production_policy": "ira_marvin_gated"
     }
   },
   "cc_scenarios": {
-    "generated_at": "2026-07-12T01:47:05Z",
+    "generated_at": "2026-07-13T14:15:52Z",
     "long_only_max_names": 12,
     "cc_concentrated_max_names": 8,
     "production_policy": "ira_marvin",
     "cc_oos_gate": {
       "enabled": true,
       "passed": false,
-      "reason": "oos_sharpe_-0.323_below_spy_0.902",
+      "reason": "oos_sharpe_0.0_below_spy_0.902",
       "promote_dual_score": false,
       "production_policy": "ira_marvin_gated"
     },
-    "scenario_cc_weights": [
-      {
-        "ticker": "ICE",
-        "weight_pct": 25.0
-      },
-      {
-        "ticker": "DHR",
-        "weight_pct": 25.0
-      },
-      {
-        "ticker": "SPGI",
-        "weight_pct": 25.0
-      },
-      {
-        "ticker": "CPRT",
-        "weight_pct": 25.0
-      }
-    ],
+    "scenario_cc_weights": [],
     "scenario_vs_production": {
-      "scenario_names": 4,
-      "production_names": 4,
-      "overlap": [
-        "CPRT",
-        "DHR",
-        "ICE",
-        "SPGI"
-      ]
+      "scenario_names": 0,
+      "production_names": 0,
+      "overlap": []
     },
     "human_approve_note": "Approve scenario_cc_weights before changing live paper book."
   },
   "cc_lab": {
-    "generated_at": "2026-07-12T01:47:05Z",
+    "generated_at": "2026-07-13T14:15:52Z",
     "lab": "cc_knob_ga",
     "disclaimer": "Lab only. Does not overwrite Marvin stance or production weights.",
     "n_trials": 12,
-    "best": {
-      "genome": {
-        "premium_yield_annual_pct": 10.7,
-        "tenor_days": 5,
-        "otm_pct": 2.83,
-        "bid_ask_haircut": 0.08,
-        "coverage_fraction": 0.36,
-        "assignment_bps": 5,
-        "etf_proxy_ticker": "XYLD",
-        "mode": "synthetic_lab",
-        "label": "cc_knob_lab",
-        "enabled": true
-      },
-      "sharpe_annualized": -0.884,
-      "cumulative_return": -0.1179,
-      "max_drawdown_pct": 0.2199,
-      "error": null
-    },
-    "path": "C:\\Users\\drewg\\Projects\\dashboards\\single-stock-investments\\dashboard\\data\\darwin_cc_lab_scenarios.json"
+    "best": null,
+    "path": "/home/runner/work/single-stock-investments/single-stock-investments/dashboard/data/darwin_cc_lab_scenarios.json"
   },
   "regime": {
     "label": "calm",
@@ -374,7 +265,7 @@
   },
   "rebalance_frequency": "semiannual",
   "turnover_budget_pct": 10.0,
-  "turnover_used_pct": 0.0,
+  "turnover_used_pct": 10.0,
   "policy_id": "ira_marvin",
   "policy_detail": {
     "champion": "ira_marvin",
@@ -385,62 +276,370 @@
     "ensemble": null,
     "population_loaded": 8
   },
-  "weights": [
+  "weights": [],
+  "cash_weight_pct": 100.0,
+  "research_queue": [
     {
-      "ticker": "ICE",
-      "company": "Intercontinental Exchange",
-      "weight": 0.25,
-      "weight_pct": 25.0,
-      "delta": 0.0,
-      "stance": "hold",
-      "irr_base_pct": 14.18,
-      "falsifier_count": 0,
-      "trade_suggested": false
+      "ticker": "A",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
     },
     {
-      "ticker": "CPRT",
-      "company": "Copart",
-      "weight": 0.25,
-      "weight_pct": 25.0,
-      "delta": 0.0,
-      "stance": "core",
-      "irr_base_pct": 10.78,
-      "falsifier_count": 0,
-      "trade_suggested": false
+      "ticker": "AAPL",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
     },
     {
-      "ticker": "DHR",
-      "company": "Danaher Corporation",
-      "weight": 0.25,
-      "weight_pct": 25.0,
-      "delta": 0.0,
-      "stance": "hold",
-      "irr_base_pct": 12.01,
-      "falsifier_count": 0,
-      "trade_suggested": false
+      "ticker": "ABBV",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
     },
     {
-      "ticker": "SPGI",
-      "company": "S&P Global",
-      "weight": 0.25,
-      "weight_pct": 25.0,
-      "delta": 0.0,
-      "stance": "hold",
-      "irr_base_pct": 11.24,
-      "falsifier_count": 0,
-      "trade_suggested": false
+      "ticker": "ABNB",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "ABT",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "ACGL",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "ACN",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "ADBE",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "ADI",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "ADM",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "ADP",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "ADSK",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "AEE",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "AEP",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "AES",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "AFL",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "AIG",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "AIZ",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "AJG",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "AKAM",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "ALB",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "ALGN",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "ALL",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "ALLE",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "AMAT",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "AMCR",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "AMD",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "AME",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "AMGN",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "AMP",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "AMT",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "AMZN",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "ANET",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "AON",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "AOS",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "APA",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "APD",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "APH",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "APO",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "APP",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "APTV",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "ARE",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "ARES",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "ATO",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "AVB",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "AVGO",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "AVY",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "AWK",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "AXON",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
+    },
+    {
+      "ticker": "AXP",
+      "reason": "research_missing",
+      "days_since_deep_dive": null,
+      "has_falsifier_adjusted_irr": false,
+      "priority": 2
     }
   ],
   "account_profile": "roth",
   "benchmarks": {
     "ira_marvin": {
       "periods": 8,
-      "mean_monthly_return": -0.025452,
-      "volatility_annualized": 0.1565,
-      "sharpe_annualized": -1.951,
-      "cumulative_return": -0.1925,
-      "max_drawdown_log": 0.2696,
-      "max_drawdown_pct": 0.2363,
+      "mean_monthly_return": 0.0,
+      "volatility_annualized": 0.0,
+      "sharpe_annualized": 0.0,
+      "cumulative_return": 0.0,
+      "max_drawdown_log": 0.0,
+      "max_drawdown_pct": 0.0,
       "avg_turnover_one_way": 0.0,
       "rebalance_frequency": "semiannual"
     },
@@ -457,12 +656,12 @@
     },
     "irr_ranked": {
       "periods": 8,
-      "mean_monthly_return": -0.030163,
-      "volatility_annualized": 0.1023,
-      "sharpe_annualized": -3.539,
-      "cumulative_return": -0.2198,
-      "max_drawdown_log": 0.2485,
-      "max_drawdown_pct": 0.2201,
+      "mean_monthly_return": -0.023709,
+      "volatility_annualized": 0.1331,
+      "sharpe_annualized": -2.137,
+      "cumulative_return": -0.1791,
+      "max_drawdown_log": 0.2189,
+      "max_drawdown_pct": 0.1966,
       "avg_turnover_one_way": 0.0,
       "rebalance_frequency": "semiannual"
     },
@@ -488,12 +687,12 @@
     },
     "champion": {
       "periods": 8,
-      "mean_monthly_return": -0.025452,
-      "volatility_annualized": 0.1565,
-      "sharpe_annualized": -1.951,
-      "cumulative_return": -0.1925,
-      "max_drawdown_log": 0.2696,
-      "max_drawdown_pct": 0.2363,
+      "mean_monthly_return": 0.0,
+      "volatility_annualized": 0.0,
+      "sharpe_annualized": 0.0,
+      "cumulative_return": 0.0,
+      "max_drawdown_log": 0.0,
+      "max_drawdown_pct": 0.0,
       "avg_turnover_one_way": 0.0,
       "rebalance_frequency": "semiannual"
     },
@@ -509,104 +708,17 @@
       "rebalance_frequency": "semiannual"
     },
     "covered_call": {
-      "periods": 9,
-      "mean_monthly_return": -0.015658,
-      "volatility_annualized": 0.1717,
-      "sharpe_annualized": -1.094,
-      "cumulative_return": -0.1412,
-      "max_drawdown_log": 0.2617,
-      "max_drawdown_pct": 0.2303,
-      "avg_turnover_one_way": 0.0,
-      "rebalance_frequency": "monthly_marks_tenor_rolls",
-      "equity_rebalance_frequency": "semiannual",
-      "label": "synthetic_covered_call",
-      "covered_call_params": {
-        "premium_yield_annual_pct": 8.0,
-        "tenor_days": 7,
-        "otm_pct": 2.0,
-        "bid_ask_haircut": 0.15,
-        "assignment_bps": 5.0,
-        "coverage_fraction": 0.22999999999999998,
-        "coverage_fraction_base": 0.2,
-        "regime_coverage_mult": 1.15,
-        "roll_frequency": "weekly",
-        "mode": "synthetic",
-        "flat_premium_monthly": 0.005666666666666666,
-        "flat_upside_cap": 0.041679045780138216
-      },
-      "name_level_sample": {
-        "ICE": {
-          "premium_monthly": 0.008368,
-          "upside_cap": 0.041679,
-          "coverage": 0.2645,
-          "vol_annual": 0.295342,
-          "vol_scale": 1.476712,
-          "stance": "hold",
-          "liquidity_bucket": "A"
-        },
-        "CPRT": {
-          "premium_monthly": 0.006315,
-          "upside_cap": 0.041679,
-          "coverage": 0.145475,
-          "vol_annual": 0.222895,
-          "vol_scale": 1.114477,
-          "stance": "core",
-          "liquidity_bucket": "A"
-        },
-        "DHR": {
-          "premium_monthly": 0.005111,
-          "upside_cap": 0.041679,
-          "coverage": 0.2645,
-          "vol_annual": 0.180398,
-          "vol_scale": 0.901992,
-          "stance": "hold",
-          "liquidity_bucket": "A"
-        },
-        "SPGI": {
-          "premium_monthly": 0.007603,
-          "upside_cap": 0.041679,
-          "coverage": 0.2645,
-          "vol_annual": 0.268357,
-          "vol_scale": 1.341787,
-          "stance": "hold",
-          "liquidity_bucket": "A"
-        }
-      },
-      "stress_cases": {
-        "bull_month": {
-          "stock_ret": 0.1,
-          "cc_ret": 0.08788951386276514,
-          "lag_vs_stock": -0.012110486137234866,
-          "premium_monthly": 0.005666666666666666,
-          "upside_cap": 0.041679045780138216,
-          "coverage": 0.22999999999999998
-        },
-        "crash_month": {
-          "stock_ret": -0.12,
-          "cc_ret": -0.11869666666666666,
-          "lag_vs_stock": 0.001303333333333337,
-          "premium_monthly": 0.005666666666666666,
-          "upside_cap": 0.041679045780138216,
-          "coverage": 0.22999999999999998
-        },
-        "sideways": {
-          "stock_ret": 0.005,
-          "cc_ret": 0.006303333333333333,
-          "lag_vs_stock": 0.0013033333333333326,
-          "premium_monthly": 0.005666666666666666,
-          "upside_cap": 0.041679045780138216,
-          "coverage": 0.22999999999999998
-        }
-      }
+      "error": "insufficient_inputs",
+      "periods": 0
     },
     "ml_best": {
       "periods": 8,
-      "mean_monthly_return": -0.005868,
-      "volatility_annualized": 0.1128,
-      "sharpe_annualized": -0.624,
-      "cumulative_return": -0.0496,
-      "max_drawdown_log": 0.0966,
-      "max_drawdown_pct": 0.092,
+      "mean_monthly_return": 0.0,
+      "volatility_annualized": 0.0,
+      "sharpe_annualized": 0.0,
+      "cumulative_return": 0.0,
+      "max_drawdown_log": 0.0,
+      "max_drawdown_pct": 0.0,
       "avg_turnover_one_way": 0.0,
       "rebalance_frequency": "semiannual"
     },
@@ -634,46 +746,8 @@
       "rebalance_frequency": "semiannual"
     }
   },
-  "conflicts": [
-    {
-      "ticker": "CPRT",
-      "severity": "review",
-      "reason": "human_review_pending",
-      "weight_pct": 25.0
-    },
-    {
-      "ticker": "DHR",
-      "severity": "review",
-      "reason": "human_review_pending",
-      "weight_pct": 25.0
-    },
-    {
-      "ticker": "SPGI",
-      "severity": "review",
-      "reason": "human_review_pending",
-      "weight_pct": 25.0
-    }
-  ],
-  "human_review": [
-    {
-      "ticker": "CPRT",
-      "severity": "review",
-      "reason": "human_review_pending",
-      "weight_pct": 25.0
-    },
-    {
-      "ticker": "DHR",
-      "severity": "review",
-      "reason": "human_review_pending",
-      "weight_pct": 25.0
-    },
-    {
-      "ticker": "SPGI",
-      "severity": "review",
-      "reason": "human_review_pending",
-      "weight_pct": 25.0
-    }
-  ],
+  "conflicts": [],
+  "human_review": [],
   "attribution": [],
   "latent_factors": {
     "labels": [],
@@ -900,7 +974,7 @@
       "GPN": "csv_vault",
       "GRMN": "csv_vault",
       "GS": "csv_vault",
-      "GWW": "yahoo",
+      "GWW": "csv_vault",
       "HAL": "csv_vault",
       "HAS": "csv_vault",
       "HBAN": "csv_vault",
@@ -973,7 +1047,7 @@
       "LULU": "csv_vault",
       "LUV": "csv_vault",
       "LVS": "csv_vault",
-      "LYB": "yahoo",
+      "LYB": "csv_vault",
       "LYV": "csv_vault",
       "MA": "csv_vault",
       "MAA": "csv_vault",
@@ -1003,7 +1077,7 @@
       "MS": "csv_vault",
       "MSCI": "csv_vault",
       "MSFT": "csv_vault",
-      "MSI": "yahoo",
+      "MSI": "csv_vault",
       "MTB": "csv_vault",
       "MTD": "csv_vault",
       "MU": "csv_vault",
@@ -1027,7 +1101,7 @@
       "NWS": "csv_vault",
       "NWSA": "csv_vault",
       "NXPI": "csv_vault",
-      "O": "yahoo",
+      "O": "csv_vault",
       "ODFL": "csv_vault",
       "OKE": "csv_vault",
       "OMC": "csv_vault",
@@ -1071,7 +1145,7 @@
       "REG": "csv_vault",
       "REGN": "csv_vault",
       "RF": "csv_vault",
-      "RJF": "yahoo",
+      "RJF": "csv_vault",
       "RL": "csv_vault",
       "RMD": "csv_vault",
       "ROK": "csv_vault",
@@ -1079,7 +1153,7 @@
       "ROP": "csv_vault",
       "ROST": "csv_vault",
       "RSG": "csv_vault",
-      "RTX": "yahoo",
+      "RTX": "csv_vault",
       "RVTY": "csv_vault",
       "SBAC": "csv_vault",
       "SBUX": "csv_vault",
@@ -1087,7 +1161,7 @@
       "SHW": "csv_vault",
       "SJM": "csv_vault",
       "SLB": "csv_vault",
-      "SMCI": "yahoo",
+      "SMCI": "csv_vault",
       "SNA": "csv_vault",
       "SNDK": "csv_vault",
       "SNPS": "csv_vault",
@@ -1161,7 +1235,7 @@
       "VZ": "csv_vault",
       "WAB": "csv_vault",
       "WAT": "csv_vault",
-      "WBD": "yahoo",
+      "WBD": "csv_vault",
       "WDAY": "csv_vault",
       "WDC": "csv_vault",
       "WEC": "csv_vault",
@@ -1188,32 +1262,14 @@
   },
   "evolution_log": [
     {
-      "date": "2026-07-12",
+      "date": "2026-07-13",
       "event": "rebalance",
       "policy": "ira_marvin",
-      "turnover_pct": 0.0,
-      "note": "Champion ira_marvin Sharpe -1.951 regime calm"
+      "turnover_pct": 10.0,
+      "note": "Champion ira_marvin Sharpe 0.0 regime calm"
     }
   ],
   "lineage": [
-    {
-      "event": "rebalance",
-      "policy": "ira_marvin",
-      "regime": "calm",
-      "turnover_pct": 0.0,
-      "champion_sharpe": -0.693,
-      "population_size": 8,
-      "ts": "2026-07-10T08:05:39Z"
-    },
-    {
-      "event": "rebalance",
-      "policy": "ira_marvin",
-      "regime": "calm",
-      "turnover_pct": 0.0,
-      "champion_sharpe": -0.693,
-      "population_size": 8,
-      "ts": "2026-07-10T08:05:39Z"
-    },
     {
       "event": "rebalance",
       "policy": "ira_marvin",
@@ -1240,6 +1296,24 @@
       "champion_sharpe": -1.951,
       "population_size": 8,
       "ts": "2026-07-12T01:47:05Z"
+    },
+    {
+      "event": "rebalance",
+      "policy": "ira_marvin",
+      "regime": "calm",
+      "turnover_pct": 0.0,
+      "champion_sharpe": -1.951,
+      "population_size": 8,
+      "ts": "2026-07-13T13:08:04Z"
+    },
+    {
+      "event": "rebalance",
+      "policy": "ira_marvin",
+      "regime": "calm",
+      "turnover_pct": 10.0,
+      "champion_sharpe": 0.0,
+      "population_size": 8,
+      "ts": "2026-07-13T14:15:52Z"
     }
   ],
   "source_alignment_version": null,
@@ -1252,12 +1326,12 @@
       "ira_marvin": {
         "stats": {
           "periods": 8,
-          "mean_monthly_return": -0.025452,
-          "volatility_annualized": 0.1565,
-          "sharpe_annualized": -1.951,
-          "cumulative_return": -0.1925,
-          "max_drawdown_log": 0.2696,
-          "max_drawdown_pct": 0.2363,
+          "mean_monthly_return": 0.0,
+          "volatility_annualized": 0.0,
+          "sharpe_annualized": 0.0,
+          "cumulative_return": 0.0,
+          "max_drawdown_log": 0.0,
+          "max_drawdown_pct": 0.0,
           "avg_turnover_one_way": 0.0,
           "rebalance_frequency": "semiannual"
         },
@@ -1272,78 +1346,27 @@
           "2026-06-01"
         ],
         "equity_index": [
-          1.014586,
-          1.037681,
-          1.057304,
-          0.97342,
-          0.898605,
-          0.889645,
-          0.873849,
-          0.807476
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
         ],
         "holdings_snapshots": [
           {
             "date": "2025-11-01",
-            "weights": [
-              {
-                "ticker": "ICE",
-                "weight_pct": 25.0
-              },
-              {
-                "ticker": "DHR",
-                "weight_pct": 25.0
-              },
-              {
-                "ticker": "SPGI",
-                "weight_pct": 25.0
-              },
-              {
-                "ticker": "CPRT",
-                "weight_pct": 25.0
-              }
-            ]
+            "weights": []
           },
           {
             "date": "2025-12-01",
-            "weights": [
-              {
-                "ticker": "ICE",
-                "weight_pct": 25.0
-              },
-              {
-                "ticker": "DHR",
-                "weight_pct": 25.0
-              },
-              {
-                "ticker": "SPGI",
-                "weight_pct": 25.0
-              },
-              {
-                "ticker": "CPRT",
-                "weight_pct": 25.0
-              }
-            ]
+            "weights": []
           },
           {
             "date": "2026-06-01",
-            "weights": [
-              {
-                "ticker": "ICE",
-                "weight_pct": 25.0
-              },
-              {
-                "ticker": "DHR",
-                "weight_pct": 25.0
-              },
-              {
-                "ticker": "SPGI",
-                "weight_pct": 25.0
-              },
-              {
-                "ticker": "CPRT",
-                "weight_pct": 25.0
-              }
-            ]
+            "weights": []
           }
         ]
       },
@@ -1544,12 +1567,12 @@
       "irr_ranked": {
         "stats": {
           "periods": 8,
-          "mean_monthly_return": -0.030163,
-          "volatility_annualized": 0.1023,
-          "sharpe_annualized": -3.539,
-          "cumulative_return": -0.2198,
-          "max_drawdown_log": 0.2485,
-          "max_drawdown_pct": 0.2201,
+          "mean_monthly_return": -0.023709,
+          "volatility_annualized": 0.1331,
+          "sharpe_annualized": -2.137,
+          "cumulative_return": -0.1791,
+          "max_drawdown_log": 0.2189,
+          "max_drawdown_pct": 0.1966,
           "avg_turnover_one_way": 0.0,
           "rebalance_frequency": "semiannual"
         },
@@ -1564,14 +1587,14 @@
           "2026-06-01"
         ],
         "equity_index": [
-          0.983829,
-          1.000277,
-          0.971257,
-          0.925622,
-          0.86428,
-          0.842447,
-          0.83778,
-          0.780158
+          0.995716,
+          1.021715,
+          0.992737,
+          0.948461,
+          0.905701,
+          0.88128,
+          0.901717,
+          0.820852
         ],
         "holdings_snapshots": [
           {
@@ -1579,51 +1602,51 @@
             "weights": [
               {
                 "ticker": "ADBE",
-                "weight_pct": 14.18
+                "weight_pct": 14.13
               },
               {
                 "ticker": "ACN",
-                "weight_pct": 11.38
+                "weight_pct": 11.29
               },
               {
                 "ticker": "ZBH",
-                "weight_pct": 9.13
+                "weight_pct": 9.06
               },
               {
                 "ticker": "ALL",
-                "weight_pct": 8.59
+                "weight_pct": 8.41
               },
               {
                 "ticker": "AMP",
-                "weight_pct": 8.02
+                "weight_pct": 8.04
               },
               {
                 "ticker": "APTV",
-                "weight_pct": 7.84
+                "weight_pct": 8.01
               },
               {
                 "ticker": "MRSH",
-                "weight_pct": 7.57
+                "weight_pct": 7.63
               },
               {
                 "ticker": "ZTS",
-                "weight_pct": 7.44
+                "weight_pct": 7.29
               },
               {
                 "ticker": "WDAY",
-                "weight_pct": 6.87
+                "weight_pct": 6.95
+              },
+              {
+                "ticker": "AKAM",
+                "weight_pct": 6.72
               },
               {
                 "ticker": "ICE",
-                "weight_pct": 6.67
+                "weight_pct": 6.47
               },
               {
-                "ticker": "AOS",
-                "weight_pct": 6.16
-              },
-              {
-                "ticker": "ZBRA",
-                "weight_pct": 6.16
+                "ticker": "ABNB",
+                "weight_pct": 5.98
               }
             ]
           },
@@ -1632,51 +1655,51 @@
             "weights": [
               {
                 "ticker": "ADBE",
-                "weight_pct": 14.18
+                "weight_pct": 14.13
               },
               {
                 "ticker": "ACN",
-                "weight_pct": 11.38
+                "weight_pct": 11.29
               },
               {
                 "ticker": "ZBH",
-                "weight_pct": 9.13
+                "weight_pct": 9.06
               },
               {
                 "ticker": "ALL",
-                "weight_pct": 8.59
+                "weight_pct": 8.41
               },
               {
                 "ticker": "AMP",
-                "weight_pct": 8.02
+                "weight_pct": 8.04
               },
               {
                 "ticker": "APTV",
-                "weight_pct": 7.84
+                "weight_pct": 8.01
               },
               {
                 "ticker": "MRSH",
-                "weight_pct": 7.57
+                "weight_pct": 7.63
               },
               {
                 "ticker": "ZTS",
-                "weight_pct": 7.44
+                "weight_pct": 7.29
               },
               {
                 "ticker": "WDAY",
-                "weight_pct": 6.87
+                "weight_pct": 6.95
+              },
+              {
+                "ticker": "AKAM",
+                "weight_pct": 6.72
               },
               {
                 "ticker": "ICE",
-                "weight_pct": 6.67
+                "weight_pct": 6.47
               },
               {
-                "ticker": "AOS",
-                "weight_pct": 6.16
-              },
-              {
-                "ticker": "ZBRA",
-                "weight_pct": 6.16
+                "ticker": "ABNB",
+                "weight_pct": 5.98
               }
             ]
           },
@@ -1685,51 +1708,51 @@
             "weights": [
               {
                 "ticker": "ADBE",
-                "weight_pct": 14.18
+                "weight_pct": 14.13
               },
               {
                 "ticker": "ACN",
-                "weight_pct": 11.38
+                "weight_pct": 11.29
               },
               {
                 "ticker": "ZBH",
-                "weight_pct": 9.13
+                "weight_pct": 9.06
               },
               {
                 "ticker": "ALL",
-                "weight_pct": 8.59
+                "weight_pct": 8.41
               },
               {
                 "ticker": "AMP",
-                "weight_pct": 8.02
+                "weight_pct": 8.04
               },
               {
                 "ticker": "APTV",
-                "weight_pct": 7.84
+                "weight_pct": 8.01
               },
               {
                 "ticker": "MRSH",
-                "weight_pct": 7.57
+                "weight_pct": 7.63
               },
               {
                 "ticker": "ZTS",
-                "weight_pct": 7.44
+                "weight_pct": 7.29
               },
               {
                 "ticker": "WDAY",
-                "weight_pct": 6.87
+                "weight_pct": 6.95
+              },
+              {
+                "ticker": "AKAM",
+                "weight_pct": 6.72
               },
               {
                 "ticker": "ICE",
-                "weight_pct": 6.67
+                "weight_pct": 6.47
               },
               {
-                "ticker": "AOS",
-                "weight_pct": 6.16
-              },
-              {
-                "ticker": "ZBRA",
-                "weight_pct": 6.16
+                "ticker": "ABNB",
+                "weight_pct": 5.98
               }
             ]
           }
@@ -1932,12 +1955,12 @@
       "champion": {
         "stats": {
           "periods": 8,
-          "mean_monthly_return": -0.025452,
-          "volatility_annualized": 0.1565,
-          "sharpe_annualized": -1.951,
-          "cumulative_return": -0.1925,
-          "max_drawdown_log": 0.2696,
-          "max_drawdown_pct": 0.2363,
+          "mean_monthly_return": 0.0,
+          "volatility_annualized": 0.0,
+          "sharpe_annualized": 0.0,
+          "cumulative_return": 0.0,
+          "max_drawdown_log": 0.0,
+          "max_drawdown_pct": 0.0,
           "avg_turnover_one_way": 0.0,
           "rebalance_frequency": "semiannual"
         },
@@ -1952,78 +1975,27 @@
           "2026-06-01"
         ],
         "equity_index": [
-          1.014586,
-          1.037681,
-          1.057304,
-          0.97342,
-          0.898605,
-          0.889645,
-          0.873849,
-          0.807476
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
         ],
         "holdings_snapshots": [
           {
             "date": "2025-11-01",
-            "weights": [
-              {
-                "ticker": "CPRT",
-                "weight_pct": 25.0
-              },
-              {
-                "ticker": "DHR",
-                "weight_pct": 25.0
-              },
-              {
-                "ticker": "ICE",
-                "weight_pct": 25.0
-              },
-              {
-                "ticker": "SPGI",
-                "weight_pct": 25.0
-              }
-            ]
+            "weights": []
           },
           {
             "date": "2025-12-01",
-            "weights": [
-              {
-                "ticker": "CPRT",
-                "weight_pct": 25.0
-              },
-              {
-                "ticker": "DHR",
-                "weight_pct": 25.0
-              },
-              {
-                "ticker": "ICE",
-                "weight_pct": 25.0
-              },
-              {
-                "ticker": "SPGI",
-                "weight_pct": 25.0
-              }
-            ]
+            "weights": []
           },
           {
             "date": "2026-06-01",
-            "weights": [
-              {
-                "ticker": "CPRT",
-                "weight_pct": 25.0
-              },
-              {
-                "ticker": "DHR",
-                "weight_pct": 25.0
-              },
-              {
-                "ticker": "ICE",
-                "weight_pct": 25.0
-              },
-              {
-                "ticker": "SPGI",
-                "weight_pct": 25.0
-              }
-            ]
+            "weights": []
           }
         ]
       },
@@ -2052,12 +2024,12 @@
         "equity_index": [
           1.00195,
           0.999795,
-          1.014529,
+          1.01453,
           1.005762,
           0.953494,
           1.053661,
           1.109111,
-          1.094874
+          1.094875
         ],
         "holdings_snapshots": [
           {
@@ -2066,65 +2038,6 @@
               {
                 "ticker": "SPY",
                 "weight_pct": 100.0
-              }
-            ]
-          }
-        ]
-      },
-      "covered_call": {
-        "stats": {
-          "periods": 9,
-          "mean_monthly_return": -0.015658,
-          "volatility_annualized": 0.1717,
-          "sharpe_annualized": -1.094,
-          "cumulative_return": -0.1412,
-          "max_drawdown_log": 0.2617,
-          "max_drawdown_pct": 0.2303,
-          "avg_turnover_one_way": 0.0,
-          "rebalance_frequency": "monthly_marks_tenor_rolls",
-          "label": "synthetic_covered_call"
-        },
-        "dates": [
-          "2025-11-01",
-          "2025-12-01",
-          "2026-01-01",
-          "2026-02-01",
-          "2026-03-01",
-          "2026-04-01",
-          "2026-05-01",
-          "2026-06-01",
-          "2026-07-01"
-        ],
-        "equity_index": [
-          1.013128,
-          1.037317,
-          1.056349,
-          0.974131,
-          0.900729,
-          0.893105,
-          0.878593,
-          0.813121,
-          0.858775
-        ],
-        "holdings_snapshots": [
-          {
-            "date": "2025-11-01",
-            "weights": [
-              {
-                "ticker": "ICE",
-                "weight_pct": 25.0
-              },
-              {
-                "ticker": "CPRT",
-                "weight_pct": 25.0
-              },
-              {
-                "ticker": "DHR",
-                "weight_pct": 25.0
-              },
-              {
-                "ticker": "SPGI",
-                "weight_pct": 25.0
               }
             ]
           }
@@ -2177,49 +2090,12 @@
     }
   },
   "portfolio_explanation": {
-    "summary": "We hold 4 names under **ira_marvin** in a **calm** regime. IRA Marvin policy ranks names using Marvin deep-dive IRR, moat, dhando, staleness, and falsifier penalties, then applies mandate caps (max weight, min IRR, stance). Largest positions: ICE 25.0%, CPRT 25.0%, DHR 25.0%.",
-    "mechanism": "IRA Marvin policy ranks names using Marvin deep-dive IRR, moat, dhando, staleness, and falsifier penalties, then applies mandate caps (max weight, min IRR, stance).",
+    "summary": "We hold 0 names under **ira_marvin** in a **calm** regime. IRA Marvin admits only completed, current deep dives with a published falsifier-adjusted IRR above the mandate threshold, ranks them by that IRR, and applies research-freshness, diversification, and cash caps. Largest positions: .",
+    "mechanism": "IRA Marvin admits only completed, current deep dives with a published falsifier-adjusted IRR above the mandate threshold, ranks them by that IRR, and applies research-freshness, diversification, and cash caps.",
     "champion_selection": "ira_default",
     "regime": "calm",
-    "top_holdings": [
-      {
-        "ticker": "ICE",
-        "weight_pct": 25.0,
-        "stance": "hold",
-        "irr_base_pct": 14.18,
-        "archetype": "croupier",
-        "moat": "stable",
-        "dhando": "partial"
-      },
-      {
-        "ticker": "CPRT",
-        "weight_pct": 25.0,
-        "stance": "core",
-        "irr_base_pct": 10.78,
-        "archetype": "compounder",
-        "moat": "stable",
-        "dhando": "full"
-      },
-      {
-        "ticker": "DHR",
-        "weight_pct": 25.0,
-        "stance": "hold",
-        "irr_base_pct": 12.01,
-        "archetype": "compounder",
-        "moat": "stable",
-        "dhando": "partial"
-      },
-      {
-        "ticker": "SPGI",
-        "weight_pct": 25.0,
-        "stance": "hold",
-        "irr_base_pct": 11.24,
-        "archetype": "croupier",
-        "moat": "stable",
-        "dhando": "partial"
-      }
-    ],
-    "excluded_count": 498,
+    "top_holdings": [],
+    "excluded_count": 502,
     "excluded_sample": [
       "A",
       "AAPL",
@@ -2232,24 +2108,24 @@
     ],
     "drivers": [
       {
-        "factor": "Marvin IRR (base)",
-        "role": "Primary rank input for IRA / IRR policies"
+        "factor": "Falsifier-adjusted IRR",
+        "role": "Sole selection rank input for the IRA policy"
       },
       {
-        "factor": "Moat / dhando",
-        "role": "Score multipliers in policy genomes"
+        "factor": "Deep-dive validity",
+        "role": "Completed valuation required; no proxy returns for unresearched names"
+      },
+      {
+        "factor": "Research freshness",
+        "role": "0 names beyond review threshold; aging research has a lower cap"
       },
       {
         "factor": "Falsifiers",
-        "role": "Book total 0; per-name penalties"
-      },
-      {
-        "factor": "Staleness",
-        "role": "0 names with deep dive older than review threshold"
+        "role": "Book total 0; critical evidence prevents allocation"
       },
       {
         "factor": "Mandate caps",
-        "role": "Max weight, min names, turnover, stance caps"
+        "role": "Position, diversification, turnover, and cash limits; stance is context only"
       },
       {
         "factor": "Macro regime",
@@ -2261,7 +2137,9 @@
       "If turnover budget is breached, next rebalance scales trades toward prior weights.",
       "If regime shifts to stressed, turnover multiplier and caps tighten automatically."
     ],
-    "flags": [],
+    "flags": [
+      "Turnover cap applied: one-way trade limited to about 10.0%."
+    ],
     "deutsch_checks": {
       "hard_to_vary": true,
       "falsifiable": true,
@@ -2278,7 +2156,7 @@
     "synthetic_count": 0
   },
   "pit_status": {
-    "generated_at": "2026-07-12T01:47:05Z",
+    "generated_at": "2026-07-13T14:15:52Z",
     "audit_pass": true,
     "leakage_count": 0,
     "synthetic_tickers": [
@@ -2306,7 +2184,7 @@
       "TASE"
     ],
     "oos_sharpe_genetic": 0.323,
-    "oos_sharpe_ira_marvin": -0.323,
+    "oos_sharpe_ira_marvin": 0.0,
     "oos_periods": 115,
     "ml_oos_eligible": true,
     "production_policy": "ira_marvin",
@@ -2314,37 +2192,18 @@
     "pit_error": null
   },
   "bias_scan": {
-    "generated_at": "2026-07-12T01:47:05Z",
-    "flag_count": 3,
+    "generated_at": "2026-07-13T14:15:52Z",
+    "flag_count": 0,
     "by_severity": {
-      "review": 3,
+      "review": 0,
       "warn": 0,
       "info": 0
     },
-    "flags": [
-      {
-        "ticker": "CPRT",
-        "bias": "human_review_with_weight",
-        "severity": "review",
-        "weight_pct": 25.0
-      },
-      {
-        "ticker": "DHR",
-        "bias": "human_review_with_weight",
-        "severity": "review",
-        "weight_pct": 25.0
-      },
-      {
-        "ticker": "SPGI",
-        "bias": "human_review_with_weight",
-        "severity": "review",
-        "weight_pct": 25.0
-      }
-    ],
-    "pass": false
+    "flags": [],
+    "pass": true
   },
   "observatory": {
-    "generated_at": "2026-07-12T01:47:05Z",
+    "generated_at": "2026-07-13T14:15:52Z",
     "regime": {
       "label": "calm",
       "research": "calm",
@@ -2370,7 +2229,7 @@
     "research_stress": {
       "stale_research_pct": 0.0,
       "falsifier_count_total": 0,
-      "human_review_pending": 59
+      "human_review_pending": 0
     },
     "vrp_health": {
       "build_time": "2026-06-07T00:30:07.576981Z",
@@ -13323,9 +13182,9 @@
       "GLD",
       "HYG"
     ],
-    "sources_manifest": "C:\\Users\\drewg\\Projects\\dashboards\\single-stock-investments\\_system\\reference\\market-data\\external\\sources_manifest.json"
+    "sources_manifest": "/home/runner/work/single-stock-investments/single-stock-investments/_system/reference/market-data/external/sources_manifest.json"
   },
-  "regime_brief": "_system\\reviews\\pending\\darwin_regime_brief_2026-07-12.md",
+  "regime_brief": "_system/reviews/pending/darwin_regime_brief_2026-07-13.md",
   "exploration": {
     "enabled": false,
     "champion_mode": null
@@ -13335,10 +13194,10 @@
     "account_id": "roth",
     "inception_date": "2026-06-03",
     "last_mark": {
-      "date": "2026-07-12",
-      "nav_usd": 139428.89,
-      "period_return_pct": 6.375,
-      "cumulative_return_pct": 39.429
+      "date": "2026-07-13",
+      "nav_usd": 147692.0,
+      "period_return_pct": 0.0,
+      "cumulative_return_pct": 47.692
     },
     "backtest_at_inception": {
       "cumulative_return_pct": -18.48,
@@ -13348,8 +13207,8 @@
       "as_of": "2026-06-03T20:44:35Z"
     },
     "backtest_latest": {
-      "cumulative_return_pct": -19.25,
-      "sharpe_annualized": -1.951,
+      "cumulative_return_pct": 0,
+      "sharpe_annualized": 0.0,
       "policy_id": "ira_marvin"
     },
     "policy_id": "ira_marvin"
