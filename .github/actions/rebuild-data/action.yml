@@ -38,6 +38,21 @@ runs:
       shell: bash
       run: pip install -r _system/scripts/requirements.txt
 
+    - name: Configure Google credentials
+      if: >
+        inputs.profile == 'intake-full' ||
+        inputs.profile == 'full'
+      shell: bash
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ env.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
+      run: |
+        if [ -z "${GOOGLE_APPLICATION_CREDENTIALS_JSON:-}" ]; then
+          echo "::warning::GOOGLE_APPLICATION_CREDENTIALS_JSON not set; Drive audit/sync steps will be skipped."
+          exit 0
+        fi
+        printf '%s' "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > "$RUNNER_TEMP/google-service-account.json"
+        echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/google-service-account.json" >> "$GITHUB_ENV"
+
     - name: Rebuild profile
       if: inputs.profile != 'none'
       shell: bash
