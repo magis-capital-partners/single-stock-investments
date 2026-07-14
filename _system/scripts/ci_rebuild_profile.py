@@ -26,6 +26,14 @@ ALIASES = {
     "intake-full": "full",
 }
 
+# Steps that require GOOGLE_APPLICATION_CREDENTIALS (Shared Drive API).
+DRIVE_API_STEPS = frozenset(
+    {
+        "_system/scripts/audit_drive_pdf_store.py",
+        "_system/scripts/sync_pdf_store_google_drive.py",
+    }
+)
+
 # Each entry is argv after `python` (script path relative to repo root + args).
 PROFILES: dict[str, list[list[str]]] = {
     "minimal": [
@@ -109,6 +117,15 @@ def resolve_profile(name: str) -> str:
     return ALIASES.get(key, key)
 
 
+def drive_api_configured() -> bool:
+    return bool(os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"))
+
+
+def should_skip_step(step: list[str]) -> bool:
+    script = step[0] if step else ""
+    return script in DRIVE_API_STEPS and not drive_api_configured()
+
+
 def run_profile(profile: str, *, dry_run: bool = False) -> int:
     resolved = resolve_profile(profile)
     steps = PROFILES.get(resolved)
@@ -119,6 +136,9 @@ def run_profile(profile: str, *, dry_run: bool = False) -> int:
     print(f"ci_rebuild_profile: profile={profile} resolved={resolved} steps={len(steps)}")
     env = os.environ.copy()
     for step in steps:
+        if should_skip_step(step):
+            print(f"~ skip (no GOOGLE_APPLICATION_CREDENTIALS): {' '.join(step)}")
+            continue
         cmd = [sys.executable, *step]
         print("+", " ".join(cmd))
         if dry_run:

@@ -2,6 +2,9 @@
 """Guard insights/pages-fast CI rebuild: repair letter dates before build_insights."""
 from __future__ import annotations
 
+import os
+import subprocess
+import sys
 import unittest
 from pathlib import Path
 
@@ -36,6 +39,27 @@ class InsightsRebuildStepsTests(unittest.TestCase):
         # Rejection path remains in resolve_profile
         self.assertIn("darwin-fast", text)
         self.assertIn("profile 'darwin-fast' was removed", text)
+
+    def test_full_profile_skips_drive_steps_without_google_credentials(self) -> None:
+        env = os.environ.copy()
+        env.pop("GOOGLE_APPLICATION_CREDENTIALS", None)
+        proc = subprocess.run(
+            [sys.executable, str(REBUILD), "full", "--dry-run"],
+            cwd=ROOT,
+            env=env,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        out = proc.stdout
+        self.assertIn("~ skip (no GOOGLE_APPLICATION_CREDENTIALS): _system/scripts/audit_drive_pdf_store.py", out)
+        self.assertIn(
+            "~ skip (no GOOGLE_APPLICATION_CREDENTIALS): _system/scripts/sync_pdf_store_google_drive.py",
+            out,
+        )
+        self.assertIn("+", out, "non-Drive steps should still run")
+        self.assertNotIn("+ _system/scripts/audit_drive_pdf_store.py", out)
+        self.assertNotIn("+ _system/scripts/sync_pdf_store_google_drive.py", out)
 
 
 if __name__ == "__main__":
