@@ -369,6 +369,82 @@ COMPONENT_REVIEW_ROUTING = {
 }
 
 
+def _driver_component_range_per_share(valuation: dict, shares: float | None) -> dict[str, float]:
+    """Value a component from auditable economic drivers.
+
+    The scarce-strategic-asset power zone uses three deliberately small models:
+    revenue DCFs for producing assets, unit NAVs for dormant assets, and
+    probability-weighted outcomes for pre-contract projects.  Each scenario is
+    calculated independently; the engine never interpolates an analyst's base.
+    """
+    model = valuation.get("driver_model") or {}
+    model_type = model.get("type")
+    scenarios = model.get("scenarios") or {}
+    if not shares or shares <= 0:
+        raise ValueError("driver_model requires inputs.shares_outstanding")
+    missing = [key for key in COMPONENT_RANGE_KEYS if key not in scenarios]
+    if missing:
+        raise ValueError(f"driver_model missing scenarios: {', '.join(missing)}")
+
+    def revenue_dcf(case: dict) -> float:
+        revenue = float(model["starting_revenue_m"])
+        margin = float(case["after_tax_owner_cash_margin"])
+        growth_1 = float(case["growth_y1_5"])
+        growth_2 = float(case["growth_y6_10"])
+        terminal_multiple = float(case["terminal_owner_cash_multiple"])
+        discount_rate = float(case["discount_rate"])
+        years = int(model.get("horizon_years", 10))
+        incremental_roic = case.get("incremental_after_tax_roic")
+        prior_owner_cash = revenue * margin
+        present_value_m = 0.0
+        owner_cash = prior_owner_cash
+        for year in range(1, years + 1):
+            growth = growth_1 if year <= 5 else growth_2
+            revenue *= 1 + growth
+            pre_growth_investment_cash = revenue * margin
+            growth_investment = 0.0
+            if incremental_roic is not None:
+                roic = float(incremental_roic)
+                if roic <= 0:
+                    raise ValueError("incremental_after_tax_roic must be positive")
+                incremental_cash = max(0.0, pre_growth_investment_cash - prior_owner_cash)
+                growth_investment = incremental_cash / roic
+            owner_cash = pre_growth_investment_cash - growth_investment
+            present_value_m += owner_cash / (1 + discount_rate) ** year
+            prior_owner_cash = pre_growth_investment_cash
+        present_value_m += owner_cash * terminal_multiple / (1 + discount_rate) ** years
+        return present_value_m * 1_000_000 / shares
+
+    def unit_nav(case: dict) -> float:
+        units = float(model["units"])
+        gross_value = units * float(case["value_per_unit"])
+        realization = float(case.get("realization_probability", 1.0))
+        friction = float(case.get("friction_pct", 0.0))
+        claim = float(case.get("economic_claim_pct", 1.0))
+        return gross_value * realization * (1 - friction) * claim / shares
+
+    def project_option(case: dict) -> float:
+        success_value_m = float(case["success_value_m"])
+        probability = float(case["success_probability"])
+        ownership = float(case.get("ownership_pct", 1.0))
+        remaining_cost_m = float(case.get("remaining_cost_m", 0.0))
+        value_m = success_value_m * probability * ownership - remaining_cost_m
+        return value_m * 1_000_000 / shares
+
+    calculators = {
+        "revenue_owner_cash_dcf": revenue_dcf,
+        "reinvestment_return_dcf": revenue_dcf,
+        "unit_nav": unit_nav,
+        "milestone_project_option": project_option,
+    }
+    if model_type not in calculators:
+        raise ValueError(f"unsupported driver_model type: {model_type}")
+    values = {key: calculators[model_type](scenarios[key]) for key in COMPONENT_RANGE_KEYS}
+    if not values["low"] <= values["base"] <= values["high"]:
+        raise ValueError("driver_model range must satisfy low <= base <= high")
+    return {key: round(value, 2) for key, value in values.items()}
+
+
 def _component_range_per_share(component: dict, shares: float | None) -> dict[str, float]:
     """Return a component's low/base/high range per share.
 
@@ -377,6 +453,8 @@ def _component_range_per_share(component: dict, shares: float | None) -> dict[st
     owners without forcing a synthetic per-share input upstream.
     """
     valuation = component.get("valuation") or {}
+    if valuation.get("driver_model"):
+        return _driver_component_range_per_share(valuation, shares)
     basis = valuation.get("basis", "per_share")
     missing = [key for key in COMPONENT_RANGE_KEYS if valuation.get(key) is None]
     if missing:
@@ -447,6 +525,9 @@ def compute_component_valuation(data: dict) -> dict | None:
             "evidence_tier": valuation.get("evidence_tier", "analyst_estimate"),
             "evidence": valuation["evidence"],
             "cross_check": valuation.get("cross_check"),
+            "driver_model_type": (valuation.get("driver_model") or {}).get("type"),
+            "assumption_summary": valuation.get("assumption_summary"),
+            "scenario_assumptions": (valuation.get("driver_model") or {}).get("scenarios"),
             "low_per_share": values["low"],
             "base_per_share": values["base"],
             "high_per_share": values["high"],
@@ -1004,6 +1085,7 @@ def main() -> None:
         computed["human_review"] = prior_human
 
     if args.write:
+        path = path.resolve()
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(computed, indent=2) + "\n", encoding="utf-8")
         print(f"Wrote {path.relative_to(ROOT)}")

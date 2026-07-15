@@ -1,5 +1,5 @@
 {
-  "version": "1.0",
+  "version": "1.1",
   "portfolio_bar_pct": 15,
   "max_high_relevance": 3,
   "personas": {
@@ -109,6 +109,48 @@
       "falsifier": "No dated contractual payoff or royalty/trust structure",
       "key_metrics": ["payoff_lens", "base_return_pct", "predictive_attribute"]
     },
+    "marathon_capital_cycle": {
+      "label": "Marathon / Capital Returns",
+      "source": "_system/frameworks/investment_committee_personas.md#marathon--capital-cycle",
+      "horizon_base_yrs": 7,
+      "bar_min_return_pct": 12,
+      "return_fn": "capital_cycle_return",
+      "criteria": [
+        {"id": "capacity_sensitive", "check": "archetype_any", "values": ["commodity_cyclical", "infrastructure", "croupier", "serial_acquirer"]},
+        {"id": "reinvestment_material", "check": "capex_or_reinvestment_material"},
+        {"id": "cycle_known", "check": "cycle_not", "values": ["unknown"]}
+      ],
+      "falsifier": "Supply response, reinvestment requirements, or incremental returns cannot be measured.",
+      "key_metrics": ["incremental_roic", "maintenance_capex_pct", "industry_capacity_growth", "cycle"]
+    },
+    "marks_credit_cycle": {
+      "label": "Howard Marks / Oaktree",
+      "source": "_system/frameworks/investment_committee_personas.md#howard-marks--credit-cycle",
+      "horizon_base_yrs": 5,
+      "bar_min_return_pct": 12,
+      "return_fn": "credit_stressed_equity_return",
+      "criteria": [
+        {"id": "credit_material", "check": "leverage_or_fixed_claims_material"},
+        {"id": "cycle_known", "check": "cycle_not", "values": ["unknown"]},
+        {"id": "stress_modelable", "check": "bear_case_present"}
+      ],
+      "falsifier": "Debt maturities, refinancing exposure, liquidity, or downside recovery cannot be reconciled.",
+      "key_metrics": ["net_debt_ebitda", "interest_coverage", "maturity_wall", "bear_return_pct"]
+    },
+    "klarman_asset_value": {
+      "label": "Klarman / Baupost",
+      "source": "_system/frameworks/investment_committee_personas.md#klarman--catalyst-backed-asset-value",
+      "horizon_base_yrs": 4,
+      "bar_min_return_pct": 15,
+      "return_fn": "catalyst_backed_asset_value",
+      "criteria": [
+        {"id": "asset_value", "check": "payoff_lens_any", "values": ["asset", "event"]},
+        {"id": "realization_path", "check": "catalyst_present"},
+        {"id": "downside_discount", "check": "dhando_any", "values": ["full", "partial"]}
+      ],
+      "falsifier": "Asset value lacks an independently evidenced realization path or is already capitalized in operating cash flow.",
+      "key_metrics": ["asset_nav_per_share", "realization_probability", "time_to_catalyst", "downside_upside_ratio"]
+    },
     "lawrence": {
       "label": "Lawrence (house IRR)",
       "source": "_system/frameworks/lawrence_irr.md",
@@ -125,14 +167,17 @@
   "fund_persona_map": {
     "pershing square": ["buffett_weschler", "hohn"],
     "ackman": ["buffett_weschler", "hohn"],
-    "baupost": ["pabrai", "moi"],
-    "klarman": ["pabrai", "moi"],
+    "baupost": ["klarman_asset_value", "pabrai", "moi"],
+    "klarman": ["klarman_asset_value", "pabrai", "moi"],
     "third point": ["hohn", "moi"],
     "lone pine": ["buffett_weschler", "hohn"],
     "tiger global": ["hohn", "buffett_weschler"],
     "coatue": ["hohn"],
     "valueact": ["hohn", "buffett_weschler"],
     "horizon kinetics": ["hk", "stahl"],
-    "horizon": ["hk", "stahl"]
+    "horizon": ["hk", "stahl"],
+    "oaktree": ["marks_credit_cycle"],
+    "howard marks": ["marks_credit_cycle"],
+    "marathon": ["marathon_capital_cycle"]
   }
 }

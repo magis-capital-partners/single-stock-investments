@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "committee_outcome_v1",
+  "title": "Dividend-aware committee outcome",
+  "type": "object",
+  "required": ["ticker", "decision_date", "measurement_date", "horizon_days", "return_status", "total_return_pct", "return_evidence_ref", "votes"],
+  "properties": {
+    "ticker": {"type": "string", "minLength": 1},
+    "decision_date": {"type": "string", "format": "date"},
+    "measurement_date": {"type": "string", "format": "date"},
+    "horizon_days": {"type": "integer", "minimum": 1},
+    "return_status": {"enum": ["complete", "partial", "evidence_blocked"]},
+    "total_return_pct": {"type": ["number", "null"]},
+    "return_evidence_ref": {"type": "string"},
+    "votes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["persona", "vote"],
+        "properties": {
+          "persona": {"type": "string"},
+          "vote": {"enum": ["approve", "watch", "defer", "reject"]}
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

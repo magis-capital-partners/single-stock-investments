@@ -1,7 +1,19 @@
 {
   "schema_version": 1,
-  "updated": "2026-07-02",
+  "updated": "2026-07-14",
   "notes": "Power zones map investor persona frameworks to the company types where each framework has demonstrated alpha. Rules match against registry classification fields (archetype, moat, dhando, investment_sleeve, cycle, stance). A ticker is in a persona's power zone when at least min_matches rule fields match and no exclusion fires. build_power_zones.py blends rule fit with persona_calibration.json match rates.",
+  "valuation_profiles": {
+    "scarce_strategic_asset": {
+      "label": "Scarce strategic asset owner",
+      "framework_path": "_system/frameworks/scarce_strategic_asset_valuation.md",
+      "required_tests": ["scarcity", "duration", "public_shareholder_economic_claim", "observable_monetization"],
+      "preferred_archetypes": ["croupier", "optionality", "infrastructure", "holding_co"],
+      "preferred_sleeves": ["real_assets_land", "real_assets_lt", "energy_infrastructure"],
+      "reference_ticker": "TPL",
+      "pilot_candidates": ["LB", "WBI", "AZLCZ"],
+      "warning": "Acreage or infrastructure ownership alone is insufficient; leveraged merchant assets and sponsor-controlled structures require security-specific debt and economic-claim adjustments."
+    }
+  },
   "zones": {
     "pabrai": {
       "label": "Mohnish Pabrai",

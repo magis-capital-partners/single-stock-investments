@@ -732,6 +732,8 @@ def valuation_component_summary(ticker_dir: Path) -> dict | None:
             "treatment": row.get("treatment"),
             "method": row.get("method"),
             "evidence_tier": row.get("evidence_tier"),
+            "driver_model_type": row.get("driver_model_type"),
+            "assumption_summary": row.get("assumption_summary"),
             "low_per_share": row.get("low_per_share"),
             "base_per_share": row.get("base_per_share"),
             "high_per_share": row.get("high_per_share"),
@@ -751,6 +753,31 @@ def valuation_component_summary(ticker_dir: Path) -> dict | None:
         "components": components,
         "review_status": queue.get("status"),
         "review_open_count": len([x for x in queue.get("items", []) if x.get("status") == "open"]),
+    }
+
+
+def investment_committee_summary(ticker_dir: Path) -> dict | None:
+    """Latest committee result, reduced to decision-relevant presentation fields."""
+    research = ticker_dir / "research"
+    paths = sorted(research.glob("committee_????-??-??.json"))
+    if not paths:
+        return None
+    try:
+        record = json.loads(paths[-1].read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return None
+    synthesis = record.get("synthesis") or {}
+    decision = record.get("human_decision") or {}
+    return {
+        "as_of": (record.get("review") or {}).get("as_of"),
+        "state": record.get("final_state"),
+        "vote_split": synthesis.get("vote_split") or {},
+        "score_medians": synthesis.get("score_medians") or {},
+        "strongest_dissent": synthesis.get("strongest_dissent"),
+        "unresolved_items": synthesis.get("unresolved_items") or [],
+        "owner_status": decision.get("status"),
+        "owner_decision": decision.get("decision"),
+        "selected_raters": [r.get("persona") for r in record.get("selected_raters", [])],
     }
 
 
@@ -1735,6 +1762,7 @@ def build_ticker_row(
         "links": _research_links(ticker, ticker_dir),
         "deep_dive": deep_dive,
         "human_review": valuation_human_review(ticker_dir),
+        "investment_committee": investment_committee_summary(ticker_dir),
         "component_valuation": valuation_component_summary(ticker_dir),
         "total_return_panel": valuation_total_return_panel(ticker, ticker_dir),
         "recent_files": recent_files(ticker_dir),

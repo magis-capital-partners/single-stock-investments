@@ -5,8 +5,10 @@
   "valuation_mode": "optionality",
   "valuation_overlay": "segment_cashflow",
   "valuation_methodology": {
-    "version": "2.0",
+    "version": "3.0",
     "mode": "separated_views",
+    "profile": "scarce_strategic_asset",
+    "security_type": "resource_and_land_owner",
     "horizon_years": 7,
     "entry_hurdles_pct": [
       10,
@@ -14,64 +16,138 @@
       15
     ],
     "owner_cash_definition": "FY2025 company-defined free cash flow less share-based compensation; fixed-asset purchases and related payable changes are deducted",
-    "decision_rule": "Use operating returns, a complete component schedule, and reverse expectations as separate views. Every material component receives a low/base/high estimate; do not average the views.",
+    "decision_rule": "Keep current operating engines, reinvestment economics, unit inventory NAV, milestone project options, whole-security returns, and reverse expectations separate. Every material component receives an evidence-linked range; do not average the views.",
     "asset_ledger": []
   },
   "component_valuation": {
-    "version": "1.0",
+    "version": "2.0",
     "all_material_components_identified": true,
     "methodology_note": "Every material component receives a low/base/high present-value estimate. Range width reflects evidence quality, realization timing, and commercial uncertainty; it is not a zero-value placeholder.",
     "components": [
       {
-        "id": "land_resource_operations",
-        "label": "Producing royalties, easements, and land-resource operations",
+        "id": "producing_royalty_operations",
+        "label": "Producing oil and gas royalties",
         "category": "operating_business",
-        "overlap_key": "land_resource_operations",
+        "overlap_key": "producing_royalty_operations",
         "treatment": "additive",
         "valuation": {
-          "basis": "per_share",
-          "method": "segment_owner_cash_dcf",
-          "low": 84.97,
-          "base": 94.63,
-          "high": 105.71,
+          "method": "capital_free_revenue_driver_dcf",
           "evidence_tier": "filing_segment_cash_flow",
-          "evidence": "FY2025 Land & Resource net income plus D&A, with 3%/2% growth and 20x terminal value; 12%/10%/8% discount-rate range.",
-          "cross_check": "FY2025 royalties $411.7M and easements $78.2M; producing economics are fully captured here."
+          "evidence": "FY2025 oil and gas royalty revenue was $411.7M. TPL bears no drilling capital; the scenario driver is royalty revenue growth, after-tax owner-cash conversion, duration, and discount rate.",
+          "cross_check": "Do not add undeveloped royalty inventory that is already contributing to the $411.7M producing run-rate.",
+          "assumption_summary": "Capital-free royalty cash flow. Base: 4% revenue growth in years 1-5, 2.5% in years 6-10, 78% after-tax owner-cash margin, 22x terminal owner cash, 10% discount rate.",
+          "driver_model": {
+            "type": "revenue_owner_cash_dcf",
+            "starting_revenue_m": 411.7,
+            "horizon_years": 10,
+            "scenarios": {
+              "low": {
+                "after_tax_owner_cash_margin": 0.72,
+                "growth_y1_5": -0.02,
+                "growth_y6_10": 0.0,
+                "terminal_owner_cash_multiple": 16,
+                "discount_rate": 0.12
+              },
+              "base": {
+                "after_tax_owner_cash_margin": 0.78,
+                "growth_y1_5": 0.04,
+                "growth_y6_10": 0.025,
+                "terminal_owner_cash_multiple": 22,
+                "discount_rate": 0.1
+              },
+              "high": {
+                "after_tax_owner_cash_margin": 0.82,
+                "growth_y1_5": 0.07,
+                "growth_y6_10": 0.04,
+                "terminal_owner_cash_multiple": 28,
+                "discount_rate": 0.08
+              }
+            }
+          }
         }
       },
       {
-        "id": "water_operations",
-        "label": "Water Services and Operations",
+        "id": "existing_surface_and_easement_operations",
+        "label": "Existing surface, easement, and land-use operations",
         "category": "operating_business",
-        "overlap_key": "water_operations",
+        "overlap_key": "existing_surface_and_easement_operations",
         "treatment": "additive",
         "valuation": {
-          "basis": "per_share",
-          "method": "segment_owner_cash_dcf",
-          "low": 21.71,
-          "base": 31.86,
-          "high": 46.6,
+          "method": "land_use_revenue_driver_dcf",
           "evidence_tier": "filing_segment_cash_flow",
-          "evidence": "May 2026 investor presentation: FY2025 Water post-tax cash flow $177M less $20M/$15M/$10M maintenance capex = $2.15/$2.35/$2.55 per share. Low/base/high use 2%/4%/6% early growth, 10x/12x/14x terminal values, and 12%/10%/8% discount rates.",
-          "cross_check": "FY2025 water revenue $307.5M, water-sales revenue $170M, produced-water royalty revenue $124M with essentially zero direct operating expense or capex, and net PP&E $164.5M. Growth capex remains excluded from maintenance owner cash and must earn an explicit return."
+          "evidence": "FY2025 easement and other surface-related revenue was approximately $78.2M. TPL's May 2026 presentation shows recurring monetization across the well lifecycle plus emerging pipeline, power, communications, and industrial uses.",
+          "cross_check": "Named uncontracted corridors and data-center projects remain in separate option components.",
+          "assumption_summary": "Base: 6% growth in years 1-5 and 3.5% thereafter, 65% after-tax owner-cash conversion, 20x terminal owner cash, 10% discount rate.",
+          "driver_model": {
+            "type": "revenue_owner_cash_dcf",
+            "starting_revenue_m": 78.2,
+            "horizon_years": 10,
+            "scenarios": {
+              "low": {
+                "after_tax_owner_cash_margin": 0.55,
+                "growth_y1_5": 0.02,
+                "growth_y6_10": 0.01,
+                "terminal_owner_cash_multiple": 14,
+                "discount_rate": 0.12
+              },
+              "base": {
+                "after_tax_owner_cash_margin": 0.65,
+                "growth_y1_5": 0.06,
+                "growth_y6_10": 0.035,
+                "terminal_owner_cash_multiple": 20,
+                "discount_rate": 0.1
+              },
+              "high": {
+                "after_tax_owner_cash_margin": 0.7,
+                "growth_y1_5": 0.1,
+                "growth_y6_10": 0.06,
+                "terminal_owner_cash_multiple": 24,
+                "discount_rate": 0.08
+              }
+            }
+          }
         }
       },
       {
-        "id": "water_infrastructure_cross_check",
-        "label": "Water infrastructure replacement-cost cross-check",
-        "category": "infrastructure",
-        "overlap_key": "water_infrastructure_cross_check",
-        "treatment": "embedded",
-        "included_in_component_id": "water_operations",
+        "id": "produced_water_royalties",
+        "label": "Produced-water royalty stream",
+        "category": "operating_business",
+        "overlap_key": "produced_water_royalties",
+        "treatment": "additive",
         "valuation": {
-          "basis": "per_share",
-          "method": "depreciated_replacement_cost",
-          "low": 2.0,
-          "base": 2.4,
-          "high": 4.0,
-          "evidence_tier": "filing_balance_sheet",
-          "evidence": "FY2025 net PP&E of $164.5M; value is a floor cross-check and is embedded in Water operations, not additive.",
-          "cross_check": "Operating DCF of Water Services already capitalizes returns on this infrastructure."
+          "method": "capital_free_produced_water_driver_dcf",
+          "evidence_tier": "company_volume_and_revenue_disclosure",
+          "evidence": "FY2025 produced-water royalty revenue was approximately $124M on 4.3M barrels per day of royalty volume, with essentially no direct operating expense or capital. Presented volume grew from 433 MBbl/d in 2018 to 4,292 MBbl/d in 2025.",
+          "cross_check": "The base growth rate is far below the 2018-2025 historical volume CAGR and must be tested against basin oil volumes, water-oil ratios, AMI coverage, and realized royalty per barrel.",
+          "assumption_summary": "Capital-free stream. Base: 12% revenue growth in years 1-5 and 5% thereafter, 78% after-tax owner-cash margin, 24x terminal owner cash, 10% discount rate.",
+          "driver_model": {
+            "type": "revenue_owner_cash_dcf",
+            "starting_revenue_m": 124.0,
+            "horizon_years": 10,
+            "scenarios": {
+              "low": {
+                "after_tax_owner_cash_margin": 0.72,
+                "growth_y1_5": 0.06,
+                "growth_y6_10": 0.02,
+                "terminal_owner_cash_multiple": 18,
+                "discount_rate": 0.12
+              },
+              "base": {
+                "after_tax_owner_cash_margin": 0.78,
+                "growth_y1_5": 0.12,
+                "growth_y6_10": 0.05,
+                "terminal_owner_cash_multiple": 24,
+                "discount_rate": 0.1
+              },
+              "high": {
+                "after_tax_owner_cash_margin": 0.82,
+                "growth_y1_5": 0.18,
+                "growth_y6_10": 0.08,
+                "terminal_owner_cash_multiple": 30,
+                "discount_rate": 0.08
+              }
+            }
+          }
         }
       },
       {
@@ -92,37 +168,290 @@
         }
       },
       {
-        "id": "undeveloped_nra_option",
-        "label": "Undeveloped net royalty acreage",
-        "category": "real_option",
-        "overlap_key": "undeveloped_nra_option",
+        "id": "operated_water_sales",
+        "label": "Operated water sales and services",
+        "category": "operating_business",
+        "overlap_key": "operated_water_sales",
         "treatment": "additive",
         "valuation": {
-          "basis": "per_share",
-          "method": "probability_weighted_transaction_nav",
-          "low": 9.63,
-          "base": 16.05,
-          "high": 22.47,
-          "evidence_tier": "limited_company_transaction",
-          "evidence": "224,000 NRA multiplied by the March 2025 177-NRA acquisition mark of $19,775/NRA, then risked at 15%/25%/35% for development timing, quality, taxes, and realization.",
-          "cross_check": "The range is deliberately below the un-risked $64.2/sh transaction extrapolation."
+          "method": "reinvestment_return_driver_dcf",
+          "evidence_tier": "company_revenue_margin_and_capex_disclosure",
+          "evidence": "Water-sales revenue grew from approximately $55M in 2020 to $170M in 2025. TPL disclosed $0.50-$1.00/bbl pricing, $0.10-$0.20/bbl direct cost, 63%-75% quarterly gross margins, maintenance capital near 10% of sales, and growth capital tied to line-of-sight demand.",
+          "cross_check": "The model charges growth investment explicitly; higher growth creates value only when the assumed incremental after-tax return on capital is earned.",
+          "assumption_summary": "Base: 10% revenue growth in years 1-5 and 4% thereafter, 35% after-tax owner-cash margin after maintenance capital, 30% incremental after-tax ROIC, 18x terminal owner cash, 10% discount rate.",
+          "driver_model": {
+            "type": "reinvestment_return_dcf",
+            "starting_revenue_m": 170.0,
+            "horizon_years": 10,
+            "scenarios": {
+              "low": {
+                "after_tax_owner_cash_margin": 0.25,
+                "growth_y1_5": 0.05,
+                "growth_y6_10": 0.02,
+                "incremental_after_tax_roic": 0.18,
+                "terminal_owner_cash_multiple": 12,
+                "discount_rate": 0.12
+              },
+              "base": {
+                "after_tax_owner_cash_margin": 0.35,
+                "growth_y1_5": 0.1,
+                "growth_y6_10": 0.04,
+                "incremental_after_tax_roic": 0.3,
+                "terminal_owner_cash_multiple": 18,
+                "discount_rate": 0.1
+              },
+              "high": {
+                "after_tax_owner_cash_margin": 0.42,
+                "growth_y1_5": 0.16,
+                "growth_y6_10": 0.07,
+                "incremental_after_tax_roic": 0.45,
+                "terminal_owner_cash_multiple": 24,
+                "discount_rate": 0.08
+              }
+            }
+          }
         }
       },
       {
-        "id": "surface_acreage_option",
-        "label": "Surface acreage",
-        "category": "real_option",
-        "overlap_key": "surface_acreage_option",
+        "id": "water_infrastructure_cross_check",
+        "label": "Water infrastructure replacement-cost cross-check",
+        "category": "infrastructure",
+        "overlap_key": "water_infrastructure_cross_check",
+        "treatment": "embedded",
+        "included_in_component_id": "operated_water_sales",
+        "valuation": {
+          "basis": "per_share",
+          "method": "depreciated_replacement_cost",
+          "low": 2.0,
+          "base": 2.4,
+          "high": 4.0,
+          "evidence_tier": "filing_balance_sheet",
+          "evidence": "FY2025 net PP&E of $164.5M; this is an embedded floor cross-check and not additive value.",
+          "cross_check": "The operated-water DCF already capitalizes returns on installed infrastructure."
+        }
+      },
+      {
+        "id": "contracted_data_center_receivable",
+        "label": "Contracted data-center land-financing receivable",
+        "category": "financial_asset",
+        "overlap_key": "contracted_data_center_receivable",
         "treatment": "additive",
         "valuation": {
           "basis": "per_share",
-          "method": "risked_land_nav",
-          "low": 9.58,
-          "base": 19.16,
-          "high": 31.93,
-          "evidence_tier": "limited_company_transaction",
-          "evidence": "882,000 acres at $750/$1,500/$2,500 per acre. The May 2025 787-acre sale at $5,718/acre is a ceiling cross-check, not a portfolio-wide mark.",
-          "cross_check": "The base is materially below the observed small-parcel sale and requires a future acreage-use segmentation refresh."
+          "method": "discounted_contract_value",
+          "low": 0.27,
+          "base": 0.3,
+          "high": 0.32,
+          "evidence_tier": "company_contract_disclosure",
+          "evidence": "Only the risked present value of disclosed contracted economics is included here.",
+          "cross_check": "Uncontracted data-center and power development remains in the separate project option."
+        }
+      },
+      {
+        "id": "visible_royalty_inventory_option",
+        "label": "Visible undeveloped royalty inventory",
+        "category": "real_option",
+        "overlap_key": "visible_royalty_inventory_option",
+        "treatment": "additive",
+        "valuation": {
+          "method": "unit_inventory_nav",
+          "evidence_tier": "limited_transaction_and_operator_activity",
+          "evidence": "A provisional 70,000 NRA visible bucket is valued against the March 2025 177-NRA acquisition mark of approximately $19,775/NRA and risked for conversion timing and tract quality.",
+          "cross_check": "The 70,000/154,000 NRA split is provisional and must be replaced by a tract-level producing, visible, and dormant roll-forward.",
+          "assumption_summary": "70,000 visible NRA; transaction mark risked at 25%/40%/60%, with 15%/10%/8% realization friction.",
+          "driver_model": {
+            "type": "unit_nav",
+            "units": 70000,
+            "scenarios": {
+              "low": {
+                "value_per_unit": 19775,
+                "realization_probability": 0.25,
+                "friction_pct": 0.15
+              },
+              "base": {
+                "value_per_unit": 19775,
+                "realization_probability": 0.4,
+                "friction_pct": 0.1
+              },
+              "high": {
+                "value_per_unit": 19775,
+                "realization_probability": 0.6,
+                "friction_pct": 0.08
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "dormant_royalty_inventory_option",
+        "label": "Dormant and long-dated royalty inventory",
+        "category": "real_option",
+        "overlap_key": "dormant_royalty_inventory_option",
+        "treatment": "additive",
+        "valuation": {
+          "method": "long_duration_unit_option_nav",
+          "evidence_tier": "company_acreage_and_limited_transaction",
+          "evidence": "The provisional residual 154,000 NRA is treated as a long-duration option, not as near-term inventory. It receives a lower unit value and probability than visible inventory.",
+          "cross_check": "Visible and dormant acreage sum to 224,000 NRA and are mutually exclusive.",
+          "assumption_summary": "154,000 dormant NRA with scenario-specific unit values, conversion probabilities, and realization friction.",
+          "driver_model": {
+            "type": "unit_nav",
+            "units": 154000,
+            "scenarios": {
+              "low": {
+                "value_per_unit": 10000,
+                "realization_probability": 0.12,
+                "friction_pct": 0.2
+              },
+              "base": {
+                "value_per_unit": 15000,
+                "realization_probability": 0.25,
+                "friction_pct": 0.15
+              },
+              "high": {
+                "value_per_unit": 19775,
+                "realization_probability": 0.4,
+                "friction_pct": 0.1
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "residual_surface_land_option",
+        "label": "Residual uncontracted surface land",
+        "category": "real_option",
+        "overlap_key": "residual_surface_land_option",
+        "treatment": "additive",
+        "valuation": {
+          "method": "portfolio_discounted_unit_nav",
+          "evidence_tier": "company_acreage_and_limited_transaction",
+          "evidence": "TPL owns approximately 882,000 surface acres. The May 2025 787-acre sale at roughly $5,718/acre is a small-parcel ceiling; portfolio marks remain far below it.",
+          "cross_check": "Per-acre marks represent only residual value after recurring operations and named project options; they are not a second capitalization of existing easement cash flow.",
+          "assumption_summary": "882,000 acres at $750/$1,500/$2,500 per acre less 15%/10%/8% portfolio realization friction.",
+          "driver_model": {
+            "type": "unit_nav",
+            "units": 882000,
+            "scenarios": {
+              "low": {
+                "value_per_unit": 750,
+                "realization_probability": 1.0,
+                "friction_pct": 0.15
+              },
+              "base": {
+                "value_per_unit": 1500,
+                "realization_probability": 1.0,
+                "friction_pct": 0.1
+              },
+              "high": {
+                "value_per_unit": 2500,
+                "realization_probability": 1.0,
+                "friction_pct": 0.08
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "future_infrastructure_corridors",
+        "label": "Future infrastructure corridors and easements",
+        "category": "real_option",
+        "overlap_key": "future_infrastructure_corridors",
+        "treatment": "additive",
+        "valuation": {
+          "method": "milestone_probability_weighted_option",
+          "evidence_tier": "company_activity_and_regional_demand",
+          "evidence": "Only incremental, uncontracted pipeline, transmission, road, fiber, and logistics opportunities are included.",
+          "cross_check": "Each project graduates into existing surface/easement operations once contracted.",
+          "assumption_summary": "Probability-weighted successful-project PV less remaining development cost.",
+          "driver_model": {
+            "type": "milestone_project_option",
+            "scenarios": {
+              "low": {
+                "success_value_m": 300,
+                "success_probability": 0.25,
+                "remaining_cost_m": 20
+              },
+              "base": {
+                "success_value_m": 750,
+                "success_probability": 0.45,
+                "remaining_cost_m": 30
+              },
+              "high": {
+                "success_value_m": 1500,
+                "success_probability": 0.65,
+                "remaining_cost_m": 45
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "data_center_power_water_option",
+        "label": "Data-center, power, and water co-location option",
+        "category": "real_option",
+        "overlap_key": "data_center_power_water_option",
+        "treatment": "additive",
+        "valuation": {
+          "method": "milestone_probability_weighted_option",
+          "evidence_tier": "early_project_and_partner_disclosure",
+          "evidence": "TPL disclosed a $50M Bolt investment, active LOIs/RFPs, site diligence, turbine and infrastructure work, and potential gigawatt-scale projects. These are not yet treated as contracted cash flow.",
+          "cross_check": "The separately modeled receivable and the balance-sheet value of the Bolt investment are excluded from this incremental option.",
+          "assumption_summary": "Success value is probability-weighted for customer, power, interconnection, water, capital, permitting, and commissioning milestones.",
+          "driver_model": {
+            "type": "milestone_project_option",
+            "scenarios": {
+              "low": {
+                "success_value_m": 1000,
+                "success_probability": 0.02,
+                "remaining_cost_m": 5
+              },
+              "base": {
+                "success_value_m": 2500,
+                "success_probability": 0.06,
+                "remaining_cost_m": 10
+              },
+              "high": {
+                "success_value_m": 6000,
+                "success_probability": 0.15,
+                "remaining_cost_m": 20
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "desalination_and_water_technology_option",
+        "label": "Desalination and water-technology platform",
+        "category": "real_option",
+        "overlap_key": "desalination_and_water_technology_option",
+        "treatment": "additive",
+        "valuation": {
+          "method": "stage_gated_milestone_option",
+          "evidence_tier": "completed_demonstration_facility",
+          "evidence": "Phase 1 achieved strong water-quality results; the approximately 10,000-bbl/day Phase 2 facility was completed for May 2026 operation. Phase 3 at approximately 100,000 bbl/day remains subject to Phase 2 economics and FID.",
+          "cross_check": "Commercial value requires repeatable unit economics and a capital-light license, cost-plus, JV, or spin structure; technical success alone is insufficient.",
+          "assumption_summary": "Probability-weighted platform value less remaining commercialization cost; the asset state is demonstration, not research-only.",
+          "driver_model": {
+            "type": "milestone_project_option",
+            "scenarios": {
+              "low": {
+                "success_value_m": 200,
+                "success_probability": 0.02,
+                "remaining_cost_m": 25
+              },
+              "base": {
+                "success_value_m": 1000,
+                "success_probability": 0.1,
+                "remaining_cost_m": 20
+              },
+              "high": {
+                "success_value_m": 3000,
+                "success_probability": 0.25,
+                "remaining_cost_m": 25
+              }
+            }
+          }
         }
       },
       {
@@ -167,8 +496,8 @@
     "framework": "separated_operating_asset_expectations",
     "floor_pass": false,
     "floor_metric": "complete_component_value_base",
-    "floor_value": 163.02,
-    "floor_value_note": "Complete component schedule includes risked low/base/high estimates for undeveloped NRA and surface acreage; it is not a liquidation guarantee.",
+    "floor_value": 203.7,
+    "floor_value_note": "The driver-based component base includes current royalty, surface, and water cash engines plus risked unit inventory and milestone options. It is a modeled value, not a liquidation guarantee.",
     "primary_metric": "lawrence_base",
     "primary_label": "7yr IRR",
     "primary_return_pct": -7.5,
@@ -937,14 +1266,52 @@
     "disclaimer": "Advisory persona context only. It does not replace the operating stance gate or enter valuation_views."
   },
   "total_return_panel": {
-    "as_of": "2026-06-11",
+    "schema_version": "2.0",
+    "ticker": "TPL",
+    "as_of": "2026-07-14",
     "status": "complete",
     "error": null,
-    "cumulative_distributions_per_share": 0,
-    "distribution_history_sum": 0,
+    "price_source": "yahoo:TPL",
+    "currency": "USD",
+    "return_currency": "USD",
+    "fx_basis": "listing_currency_nominal",
+    "history_start": "2020-01-02",
+    "history_end": "2026-07-14",
+    "price_points": 1640,
+    "price_interval": "1d",
+    "return_contract": "split-adjusted close excluding dividends; event amounts normalized for later splits; cash reinvested at ex-date close; pre-tax nominal",
+    "coverage": {
+      "status": "complete",
+      "start": "2020-01-02",
+      "end": "2026-07-14",
+      "note": "Cash totals, special-dividend classification, and both splits reconciled to TPL releases and SEC filings; ex-dates cross-checked to the market-data event feed. The plot begins in 2020 because earlier primary-source event coverage has not yet been established.",
+      "ledger_path": "TPL/research/distribution_events.json"
+    },
+    "event_count": 29,
+    "event_counts": {
+      "regular_dividend": 23,
+      "special_dividend": 4,
+      "split": 2
+    },
+    "cash_distributions_on_initial_share_path": 18.6261,
+    "distribution_contribution_by_type": {
+      "regular_dividend": 10.877324,
+      "special_dividend": 7.748808
+    },
+    "cumulative_distributions_per_share": 18.6261,
+    "start_price": 86.1244,
+    "end_price": 415.93,
+    "price_index_end": 482.94,
+    "total_return_index_end": 535.62,
+    "benchmark": "SPY",
+    "benchmark_index_end": 254.04,
+    "price_only_annualized_pct": 27.27,
+    "total_return_annualized_pct": 29.31,
+    "benchmark_annualized_pct": 15.35,
     "market_cap_m": 27127.8,
-    "total_return_annualized_pct": 14.29,
-    "chart": "TPL/research/charts/total_return_2026-06-11.svg",
+    "shares_outstanding": 69027492,
+    "price_for_market_cap": 393.0,
+    "chart": "TPL/research/charts/total_return_2026-07-14.svg",
     "panel_json": "TPL/research/total_return_panel.json"
   },
   "valuation_views": {
@@ -974,32 +1341,121 @@
       "all_material_components_identified": true,
       "additive_components": [
         {
-          "id": "land_resource_operations",
-          "label": "Producing royalties, easements, and land-resource operations",
+          "id": "producing_royalty_operations",
+          "label": "Producing oil and gas royalties",
           "category": "operating_business",
           "treatment": "additive",
           "included_in_component_id": null,
-          "method": "segment_owner_cash_dcf",
+          "method": "capital_free_revenue_driver_dcf",
           "evidence_tier": "filing_segment_cash_flow",
-          "evidence": "FY2025 Land & Resource net income plus D&A, with 3%/2% growth and 20x terminal value; 12%/10%/8% discount-rate range.",
-          "cross_check": "FY2025 royalties $411.7M and easements $78.2M; producing economics are fully captured here.",
-          "low_per_share": 84.97,
-          "base_per_share": 94.63,
-          "high_per_share": 105.71
+          "evidence": "FY2025 oil and gas royalty revenue was $411.7M. TPL bears no drilling capital; the scenario driver is royalty revenue growth, after-tax owner-cash conversion, duration, and discount rate.",
+          "cross_check": "Do not add undeveloped royalty inventory that is already contributing to the $411.7M producing run-rate.",
+          "driver_model_type": "revenue_owner_cash_dcf",
+          "assumption_summary": "Capital-free royalty cash flow. Base: 4% revenue growth in years 1-5, 2.5% in years 6-10, 78% after-tax owner-cash margin, 22x terminal owner cash, 10% discount rate.",
+          "scenario_assumptions": {
+            "low": {
+              "after_tax_owner_cash_margin": 0.72,
+              "growth_y1_5": -0.02,
+              "growth_y6_10": 0.0,
+              "terminal_owner_cash_multiple": 16,
+              "discount_rate": 0.12
+            },
+            "base": {
+              "after_tax_owner_cash_margin": 0.78,
+              "growth_y1_5": 0.04,
+              "growth_y6_10": 0.025,
+              "terminal_owner_cash_multiple": 22,
+              "discount_rate": 0.1
+            },
+            "high": {
+              "after_tax_owner_cash_margin": 0.82,
+              "growth_y1_5": 0.07,
+              "growth_y6_10": 0.04,
+              "terminal_owner_cash_multiple": 28,
+              "discount_rate": 0.08
+            }
+          },
+          "low_per_share": 42.58,
+          "base_per_share": 88.33,
+          "high_per_share": 152.89
         },
         {
-          "id": "water_operations",
-          "label": "Water Services and Operations",
+          "id": "existing_surface_and_easement_operations",
+          "label": "Existing surface, easement, and land-use operations",
           "category": "operating_business",
           "treatment": "additive",
           "included_in_component_id": null,
-          "method": "segment_owner_cash_dcf",
+          "method": "land_use_revenue_driver_dcf",
           "evidence_tier": "filing_segment_cash_flow",
-          "evidence": "May 2026 investor presentation: FY2025 Water post-tax cash flow $177M less $20M/$15M/$10M maintenance capex = $2.15/$2.35/$2.55 per share. Low/base/high use 2%/4%/6% early growth, 10x/12x/14x terminal values, and 12%/10%/8% discount rates.",
-          "cross_check": "FY2025 water revenue $307.5M, water-sales revenue $170M, produced-water royalty revenue $124M with essentially zero direct operating expense or capex, and net PP&E $164.5M. Growth capex remains excluded from maintenance owner cash and must earn an explicit return.",
-          "low_per_share": 21.71,
-          "base_per_share": 31.86,
-          "high_per_share": 46.6
+          "evidence": "FY2025 easement and other surface-related revenue was approximately $78.2M. TPL's May 2026 presentation shows recurring monetization across the well lifecycle plus emerging pipeline, power, communications, and industrial uses.",
+          "cross_check": "Named uncontracted corridors and data-center projects remain in separate option components.",
+          "driver_model_type": "revenue_owner_cash_dcf",
+          "assumption_summary": "Base: 6% growth in years 1-5 and 3.5% thereafter, 65% after-tax owner-cash conversion, 20x terminal owner cash, 10% discount rate.",
+          "scenario_assumptions": {
+            "low": {
+              "after_tax_owner_cash_margin": 0.55,
+              "growth_y1_5": 0.02,
+              "growth_y6_10": 0.01,
+              "terminal_owner_cash_multiple": 14,
+              "discount_rate": 0.12
+            },
+            "base": {
+              "after_tax_owner_cash_margin": 0.65,
+              "growth_y1_5": 0.06,
+              "growth_y6_10": 0.035,
+              "terminal_owner_cash_multiple": 20,
+              "discount_rate": 0.1
+            },
+            "high": {
+              "after_tax_owner_cash_margin": 0.7,
+              "growth_y1_5": 0.1,
+              "growth_y6_10": 0.06,
+              "terminal_owner_cash_multiple": 24,
+              "discount_rate": 0.08
+            }
+          },
+          "low_per_share": 7.08,
+          "base_per_share": 14.88,
+          "high_per_share": 27.3
+        },
+        {
+          "id": "produced_water_royalties",
+          "label": "Produced-water royalty stream",
+          "category": "operating_business",
+          "treatment": "additive",
+          "included_in_component_id": null,
+          "method": "capital_free_produced_water_driver_dcf",
+          "evidence_tier": "company_volume_and_revenue_disclosure",
+          "evidence": "FY2025 produced-water royalty revenue was approximately $124M on 4.3M barrels per day of royalty volume, with essentially no direct operating expense or capital. Presented volume grew from 433 MBbl/d in 2018 to 4,292 MBbl/d in 2025.",
+          "cross_check": "The base growth rate is far below the 2018-2025 historical volume CAGR and must be tested against basin oil volumes, water-oil ratios, AMI coverage, and realized royalty per barrel.",
+          "driver_model_type": "revenue_owner_cash_dcf",
+          "assumption_summary": "Capital-free stream. Base: 12% revenue growth in years 1-5 and 5% thereafter, 78% after-tax owner-cash margin, 24x terminal owner cash, 10% discount rate.",
+          "scenario_assumptions": {
+            "low": {
+              "after_tax_owner_cash_margin": 0.72,
+              "growth_y1_5": 0.06,
+              "growth_y6_10": 0.02,
+              "terminal_owner_cash_multiple": 18,
+              "discount_rate": 0.12
+            },
+            "base": {
+              "after_tax_owner_cash_margin": 0.78,
+              "growth_y1_5": 0.12,
+              "growth_y6_10": 0.05,
+              "terminal_owner_cash_multiple": 24,
+              "discount_rate": 0.1
+            },
+            "high": {
+              "after_tax_owner_cash_margin": 0.82,
+              "growth_y1_5": 0.18,
+              "growth_y6_10": 0.08,
+              "terminal_owner_cash_multiple": 30,
+              "discount_rate": 0.08
+            }
+          },
+          "low_per_share": 20.32,
+          "base_per_share": 43.24,
+          "high_per_share": 89.96
         },
         {
           "id": "cash_and_investments",
@@ -1011,37 +1467,269 @@
           "evidence_tier": "filing_balance_sheet",
           "evidence": "Q1 2026 cash $247.6M ($3.59/sh) plus $50M equity-method investment ($0.72/sh).",
           "cross_check": "No debt is disclosed in the FY2025 balance-sheet bridge.",
+          "driver_model_type": null,
+          "assumption_summary": null,
+          "scenario_assumptions": null,
           "low_per_share": 3.6,
           "base_per_share": 4.32,
           "high_per_share": 4.32
         },
         {
-          "id": "undeveloped_nra_option",
-          "label": "Undeveloped net royalty acreage",
-          "category": "real_option",
+          "id": "operated_water_sales",
+          "label": "Operated water sales and services",
+          "category": "operating_business",
           "treatment": "additive",
           "included_in_component_id": null,
-          "method": "probability_weighted_transaction_nav",
-          "evidence_tier": "limited_company_transaction",
-          "evidence": "224,000 NRA multiplied by the March 2025 177-NRA acquisition mark of $19,775/NRA, then risked at 15%/25%/35% for development timing, quality, taxes, and realization.",
-          "cross_check": "The range is deliberately below the un-risked $64.2/sh transaction extrapolation.",
-          "low_per_share": 9.63,
-          "base_per_share": 16.05,
-          "high_per_share": 22.47
+          "method": "reinvestment_return_driver_dcf",
+          "evidence_tier": "company_revenue_margin_and_capex_disclosure",
+          "evidence": "Water-sales revenue grew from approximately $55M in 2020 to $170M in 2025. TPL disclosed $0.50-$1.00/bbl pricing, $0.10-$0.20/bbl direct cost, 63%-75% quarterly gross margins, maintenance capital near 10% of sales, and growth capital tied to line-of-sight demand.",
+          "cross_check": "The model charges growth investment explicitly; higher growth creates value only when the assumed incremental after-tax return on capital is earned.",
+          "driver_model_type": "reinvestment_return_dcf",
+          "assumption_summary": "Base: 10% revenue growth in years 1-5 and 4% thereafter, 35% after-tax owner-cash margin after maintenance capital, 30% incremental after-tax ROIC, 18x terminal owner cash, 10% discount rate.",
+          "scenario_assumptions": {
+            "low": {
+              "after_tax_owner_cash_margin": 0.25,
+              "growth_y1_5": 0.05,
+              "growth_y6_10": 0.02,
+              "incremental_after_tax_roic": 0.18,
+              "terminal_owner_cash_multiple": 12,
+              "discount_rate": 0.12
+            },
+            "base": {
+              "after_tax_owner_cash_margin": 0.35,
+              "growth_y1_5": 0.1,
+              "growth_y6_10": 0.04,
+              "incremental_after_tax_roic": 0.3,
+              "terminal_owner_cash_multiple": 18,
+              "discount_rate": 0.1
+            },
+            "high": {
+              "after_tax_owner_cash_margin": 0.42,
+              "growth_y1_5": 0.16,
+              "growth_y6_10": 0.07,
+              "incremental_after_tax_roic": 0.45,
+              "terminal_owner_cash_multiple": 24,
+              "discount_rate": 0.08
+            }
+          },
+          "low_per_share": 6.37,
+          "base_per_share": 16.41,
+          "high_per_share": 39.56
         },
         {
-          "id": "surface_acreage_option",
-          "label": "Surface acreage",
+          "id": "contracted_data_center_receivable",
+          "label": "Contracted data-center land-financing receivable",
+          "category": "financial_asset",
+          "treatment": "additive",
+          "included_in_component_id": null,
+          "method": "discounted_contract_value",
+          "evidence_tier": "company_contract_disclosure",
+          "evidence": "Only the risked present value of disclosed contracted economics is included here.",
+          "cross_check": "Uncontracted data-center and power development remains in the separate project option.",
+          "driver_model_type": null,
+          "assumption_summary": null,
+          "scenario_assumptions": null,
+          "low_per_share": 0.27,
+          "base_per_share": 0.3,
+          "high_per_share": 0.32
+        },
+        {
+          "id": "visible_royalty_inventory_option",
+          "label": "Visible undeveloped royalty inventory",
           "category": "real_option",
           "treatment": "additive",
           "included_in_component_id": null,
-          "method": "risked_land_nav",
-          "evidence_tier": "limited_company_transaction",
-          "evidence": "882,000 acres at $750/$1,500/$2,500 per acre. The May 2025 787-acre sale at $5,718/acre is a ceiling cross-check, not a portfolio-wide mark.",
-          "cross_check": "The base is materially below the observed small-parcel sale and requires a future acreage-use segmentation refresh.",
-          "low_per_share": 9.58,
-          "base_per_share": 19.16,
-          "high_per_share": 31.93
+          "method": "unit_inventory_nav",
+          "evidence_tier": "limited_transaction_and_operator_activity",
+          "evidence": "A provisional 70,000 NRA visible bucket is valued against the March 2025 177-NRA acquisition mark of approximately $19,775/NRA and risked for conversion timing and tract quality.",
+          "cross_check": "The 70,000/154,000 NRA split is provisional and must be replaced by a tract-level producing, visible, and dormant roll-forward.",
+          "driver_model_type": "unit_nav",
+          "assumption_summary": "70,000 visible NRA; transaction mark risked at 25%/40%/60%, with 15%/10%/8% realization friction.",
+          "scenario_assumptions": {
+            "low": {
+              "value_per_unit": 19775,
+              "realization_probability": 0.25,
+              "friction_pct": 0.15
+            },
+            "base": {
+              "value_per_unit": 19775,
+              "realization_probability": 0.4,
+              "friction_pct": 0.1
+            },
+            "high": {
+              "value_per_unit": 19775,
+              "realization_probability": 0.6,
+              "friction_pct": 0.08
+            }
+          },
+          "low_per_share": 4.26,
+          "base_per_share": 7.22,
+          "high_per_share": 11.07
+        },
+        {
+          "id": "dormant_royalty_inventory_option",
+          "label": "Dormant and long-dated royalty inventory",
+          "category": "real_option",
+          "treatment": "additive",
+          "included_in_component_id": null,
+          "method": "long_duration_unit_option_nav",
+          "evidence_tier": "company_acreage_and_limited_transaction",
+          "evidence": "The provisional residual 154,000 NRA is treated as a long-duration option, not as near-term inventory. It receives a lower unit value and probability than visible inventory.",
+          "cross_check": "Visible and dormant acreage sum to 224,000 NRA and are mutually exclusive.",
+          "driver_model_type": "unit_nav",
+          "assumption_summary": "154,000 dormant NRA with scenario-specific unit values, conversion probabilities, and realization friction.",
+          "scenario_assumptions": {
+            "low": {
+              "value_per_unit": 10000,
+              "realization_probability": 0.12,
+              "friction_pct": 0.2
+            },
+            "base": {
+              "value_per_unit": 15000,
+              "realization_probability": 0.25,
+              "friction_pct": 0.15
+            },
+            "high": {
+              "value_per_unit": 19775,
+              "realization_probability": 0.4,
+              "friction_pct": 0.1
+            }
+          },
+          "low_per_share": 2.14,
+          "base_per_share": 7.11,
+          "high_per_share": 15.88
+        },
+        {
+          "id": "residual_surface_land_option",
+          "label": "Residual uncontracted surface land",
+          "category": "real_option",
+          "treatment": "additive",
+          "included_in_component_id": null,
+          "method": "portfolio_discounted_unit_nav",
+          "evidence_tier": "company_acreage_and_limited_transaction",
+          "evidence": "TPL owns approximately 882,000 surface acres. The May 2025 787-acre sale at roughly $5,718/acre is a small-parcel ceiling; portfolio marks remain far below it.",
+          "cross_check": "Per-acre marks represent only residual value after recurring operations and named project options; they are not a second capitalization of existing easement cash flow.",
+          "driver_model_type": "unit_nav",
+          "assumption_summary": "882,000 acres at $750/$1,500/$2,500 per acre less 15%/10%/8% portfolio realization friction.",
+          "scenario_assumptions": {
+            "low": {
+              "value_per_unit": 750,
+              "realization_probability": 1.0,
+              "friction_pct": 0.15
+            },
+            "base": {
+              "value_per_unit": 1500,
+              "realization_probability": 1.0,
+              "friction_pct": 0.1
+            },
+            "high": {
+              "value_per_unit": 2500,
+              "realization_probability": 1.0,
+              "friction_pct": 0.08
+            }
+          },
+          "low_per_share": 8.15,
+          "base_per_share": 17.25,
+          "high_per_share": 29.39
+        },
+        {
+          "id": "future_infrastructure_corridors",
+          "label": "Future infrastructure corridors and easements",
+          "category": "real_option",
+          "treatment": "additive",
+          "included_in_component_id": null,
+          "method": "milestone_probability_weighted_option",
+          "evidence_tier": "company_activity_and_regional_demand",
+          "evidence": "Only incremental, uncontracted pipeline, transmission, road, fiber, and logistics opportunities are included.",
+          "cross_check": "Each project graduates into existing surface/easement operations once contracted.",
+          "driver_model_type": "milestone_project_option",
+          "assumption_summary": "Probability-weighted successful-project PV less remaining development cost.",
+          "scenario_assumptions": {
+            "low": {
+              "success_value_m": 300,
+              "success_probability": 0.25,
+              "remaining_cost_m": 20
+            },
+            "base": {
+              "success_value_m": 750,
+              "success_probability": 0.45,
+              "remaining_cost_m": 30
+            },
+            "high": {
+              "success_value_m": 1500,
+              "success_probability": 0.65,
+              "remaining_cost_m": 45
+            }
+          },
+          "low_per_share": 0.8,
+          "base_per_share": 4.45,
+          "high_per_share": 13.47
+        },
+        {
+          "id": "data_center_power_water_option",
+          "label": "Data-center, power, and water co-location option",
+          "category": "real_option",
+          "treatment": "additive",
+          "included_in_component_id": null,
+          "method": "milestone_probability_weighted_option",
+          "evidence_tier": "early_project_and_partner_disclosure",
+          "evidence": "TPL disclosed a $50M Bolt investment, active LOIs/RFPs, site diligence, turbine and infrastructure work, and potential gigawatt-scale projects. These are not yet treated as contracted cash flow.",
+          "cross_check": "The separately modeled receivable and the balance-sheet value of the Bolt investment are excluded from this incremental option.",
+          "driver_model_type": "milestone_project_option",
+          "assumption_summary": "Success value is probability-weighted for customer, power, interconnection, water, capital, permitting, and commissioning milestones.",
+          "scenario_assumptions": {
+            "low": {
+              "success_value_m": 1000,
+              "success_probability": 0.02,
+              "remaining_cost_m": 5
+            },
+            "base": {
+              "success_value_m": 2500,
+              "success_probability": 0.06,
+              "remaining_cost_m": 10
+            },
+            "high": {
+              "success_value_m": 6000,
+              "success_probability": 0.15,
+              "remaining_cost_m": 20
+            }
+          },
+          "low_per_share": 0.22,
+          "base_per_share": 2.03,
+          "high_per_share": 12.75
+        },
+        {
+          "id": "desalination_and_water_technology_option",
+          "label": "Desalination and water-technology platform",
+          "category": "real_option",
+          "treatment": "additive",
+          "included_in_component_id": null,
+          "method": "stage_gated_milestone_option",
+          "evidence_tier": "completed_demonstration_facility",
+          "evidence": "Phase 1 achieved strong water-quality results; the approximately 10,000-bbl/day Phase 2 facility was completed for May 2026 operation. Phase 3 at approximately 100,000 bbl/day remains subject to Phase 2 economics and FID.",
+          "cross_check": "Commercial value requires repeatable unit economics and a capital-light license, cost-plus, JV, or spin structure; technical success alone is insufficient.",
+          "driver_model_type": "milestone_project_option",
+          "assumption_summary": "Probability-weighted platform value less remaining commercialization cost; the asset state is demonstration, not research-only.",
+          "scenario_assumptions": {
+            "low": {
+              "success_value_m": 200,
+              "success_probability": 0.02,
+              "remaining_cost_m": 25
+            },
+            "base": {
+              "success_value_m": 1000,
+              "success_probability": 0.1,
+              "remaining_cost_m": 20
+            },
+            "high": {
+              "success_value_m": 3000,
+              "success_probability": 0.25,
+              "remaining_cost_m": 25
+            }
+          },
+          "low_per_share": -0.3,
+          "base_per_share": 1.16,
+          "high_per_share": 10.5
         },
         {
           "id": "realization_and_corporate_reserve",
@@ -1053,6 +1741,9 @@
           "evidence_tier": "analyst_estimate",
           "evidence": "Reserve for taxes, transaction costs, and corporate friction when latent land and royalty value is realized; no debt is separately deducted.",
           "cross_check": "Low case absorbs more of the gross option value as realization cost.",
+          "driver_model_type": null,
+          "assumption_summary": null,
+          "scenario_assumptions": null,
           "low_per_share": -5.0,
           "base_per_share": -3.0,
           "high_per_share": -1.0
@@ -1064,29 +1755,32 @@
           "label": "Water infrastructure replacement-cost cross-check",
           "category": "infrastructure",
           "treatment": "embedded",
-          "included_in_component_id": "water_operations",
+          "included_in_component_id": "operated_water_sales",
           "method": "depreciated_replacement_cost",
           "evidence_tier": "filing_balance_sheet",
-          "evidence": "FY2025 net PP&E of $164.5M; value is a floor cross-check and is embedded in Water operations, not additive.",
-          "cross_check": "Operating DCF of Water Services already capitalizes returns on this infrastructure.",
+          "evidence": "FY2025 net PP&E of $164.5M; this is an embedded floor cross-check and not additive value.",
+          "cross_check": "The operated-water DCF already capitalizes returns on installed infrastructure.",
+          "driver_model_type": null,
+          "assumption_summary": null,
+          "scenario_assumptions": null,
           "low_per_share": 2.0,
           "base_per_share": 2.4,
           "high_per_share": 4.0
         }
       ],
       "total_equity_value_per_share": {
-        "low": 124.49,
-        "base": 163.02,
-        "high": 210.03
+        "low": 90.49,
+        "base": 203.7,
+        "high": 406.41
       },
-      "material_component_count": 7,
-      "additive_component_count": 6,
+      "material_component_count": 14,
+      "additive_component_count": 13,
       "embedded_component_count": 1,
       "market_price_per_share": 393.0,
       "upside_downside_pct": {
-        "low": -68.3,
-        "base": -58.5,
-        "high": -46.6
+        "low": -77.0,
+        "base": -48.2,
+        "high": 3.4
       }
     },
     "reverse_expectations": {
@@ -1113,32 +1807,121 @@
     "all_material_components_identified": true,
     "additive_components": [
       {
-        "id": "land_resource_operations",
-        "label": "Producing royalties, easements, and land-resource operations",
+        "id": "producing_royalty_operations",
+        "label": "Producing oil and gas royalties",
         "category": "operating_business",
         "treatment": "additive",
         "included_in_component_id": null,
-        "method": "segment_owner_cash_dcf",
+        "method": "capital_free_revenue_driver_dcf",
         "evidence_tier": "filing_segment_cash_flow",
-        "evidence": "FY2025 Land & Resource net income plus D&A, with 3%/2% growth and 20x terminal value; 12%/10%/8% discount-rate range.",
-        "cross_check": "FY2025 royalties $411.7M and easements $78.2M; producing economics are fully captured here.",
-        "low_per_share": 84.97,
-        "base_per_share": 94.63,
-        "high_per_share": 105.71
+        "evidence": "FY2025 oil and gas royalty revenue was $411.7M. TPL bears no drilling capital; the scenario driver is royalty revenue growth, after-tax owner-cash conversion, duration, and discount rate.",
+        "cross_check": "Do not add undeveloped royalty inventory that is already contributing to the $411.7M producing run-rate.",
+        "driver_model_type": "revenue_owner_cash_dcf",
+        "assumption_summary": "Capital-free royalty cash flow. Base: 4% revenue growth in years 1-5, 2.5% in years 6-10, 78% after-tax owner-cash margin, 22x terminal owner cash, 10% discount rate.",
+        "scenario_assumptions": {
+          "low": {
+            "after_tax_owner_cash_margin": 0.72,
+            "growth_y1_5": -0.02,
+            "growth_y6_10": 0.0,
+            "terminal_owner_cash_multiple": 16,
+            "discount_rate": 0.12
+          },
+          "base": {
+            "after_tax_owner_cash_margin": 0.78,
+            "growth_y1_5": 0.04,
+            "growth_y6_10": 0.025,
+            "terminal_owner_cash_multiple": 22,
+            "discount_rate": 0.1
+          },
+          "high": {
+            "after_tax_owner_cash_margin": 0.82,
+            "growth_y1_5": 0.07,
+            "growth_y6_10": 0.04,
+            "terminal_owner_cash_multiple": 28,
+            "discount_rate": 0.08
+          }
+        },
+        "low_per_share": 42.58,
+        "base_per_share": 88.33,
+        "high_per_share": 152.89
       },
       {
-        "id": "water_operations",
-        "label": "Water Services and Operations",
+        "id": "existing_surface_and_easement_operations",
+        "label": "Existing surface, easement, and land-use operations",
         "category": "operating_business",
         "treatment": "additive",
         "included_in_component_id": null,
-        "method": "segment_owner_cash_dcf",
+        "method": "land_use_revenue_driver_dcf",
         "evidence_tier": "filing_segment_cash_flow",
-        "evidence": "May 2026 investor presentation: FY2025 Water post-tax cash flow $177M less $20M/$15M/$10M maintenance capex = $2.15/$2.35/$2.55 per share. Low/base/high use 2%/4%/6% early growth, 10x/12x/14x terminal values, and 12%/10%/8% discount rates.",
-        "cross_check": "FY2025 water revenue $307.5M, water-sales revenue $170M, produced-water royalty revenue $124M with essentially zero direct operating expense or capex, and net PP&E $164.5M. Growth capex remains excluded from maintenance owner cash and must earn an explicit return.",
-        "low_per_share": 21.71,
-        "base_per_share": 31.86,
-        "high_per_share": 46.6
+        "evidence": "FY2025 easement and other surface-related revenue was approximately $78.2M. TPL's May 2026 presentation shows recurring monetization across the well lifecycle plus emerging pipeline, power, communications, and industrial uses.",
+        "cross_check": "Named uncontracted corridors and data-center projects remain in separate option components.",
+        "driver_model_type": "revenue_owner_cash_dcf",
+        "assumption_summary": "Base: 6% growth in years 1-5 and 3.5% thereafter, 65% after-tax owner-cash conversion, 20x terminal owner cash, 10% discount rate.",
+        "scenario_assumptions": {
+          "low": {
+            "after_tax_owner_cash_margin": 0.55,
+            "growth_y1_5": 0.02,
+            "growth_y6_10": 0.01,
+            "terminal_owner_cash_multiple": 14,
+            "discount_rate": 0.12
+          },
+          "base": {
+            "after_tax_owner_cash_margin": 0.65,
+            "growth_y1_5": 0.06,
+            "growth_y6_10": 0.035,
+            "terminal_owner_cash_multiple": 20,
+            "discount_rate": 0.1
+          },
+          "high": {
+            "after_tax_owner_cash_margin": 0.7,
+            "growth_y1_5": 0.1,
+            "growth_y6_10": 0.06,
+            "terminal_owner_cash_multiple": 24,
+            "discount_rate": 0.08
+          }
+        },
+        "low_per_share": 7.08,
+        "base_per_share": 14.88,
+        "high_per_share": 27.3
+      },
+      {
+        "id": "produced_water_royalties",
+        "label": "Produced-water royalty stream",
+        "category": "operating_business",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "capital_free_produced_water_driver_dcf",
+        "evidence_tier": "company_volume_and_revenue_disclosure",
+        "evidence": "FY2025 produced-water royalty revenue was approximately $124M on 4.3M barrels per day of royalty volume, with essentially no direct operating expense or capital. Presented volume grew from 433 MBbl/d in 2018 to 4,292 MBbl/d in 2025.",
+        "cross_check": "The base growth rate is far below the 2018-2025 historical volume CAGR and must be tested against basin oil volumes, water-oil ratios, AMI coverage, and realized royalty per barrel.",
+        "driver_model_type": "revenue_owner_cash_dcf",
+        "assumption_summary": "Capital-free stream. Base: 12% revenue growth in years 1-5 and 5% thereafter, 78% after-tax owner-cash margin, 24x terminal owner cash, 10% discount rate.",
+        "scenario_assumptions": {
+          "low": {
+            "after_tax_owner_cash_margin": 0.72,
+            "growth_y1_5": 0.06,
+            "growth_y6_10": 0.02,
+            "terminal_owner_cash_multiple": 18,
+            "discount_rate": 0.12
+          },
+          "base": {
+            "after_tax_owner_cash_margin": 0.78,
+            "growth_y1_5": 0.12,
+            "growth_y6_10": 0.05,
+            "terminal_owner_cash_multiple": 24,
+            "discount_rate": 0.1
+          },
+          "high": {
+            "after_tax_owner_cash_margin": 0.82,
+            "growth_y1_5": 0.18,
+            "growth_y6_10": 0.08,
+            "terminal_owner_cash_multiple": 30,
+            "discount_rate": 0.08
+          }
+        },
+        "low_per_share": 20.32,
+        "base_per_share": 43.24,
+        "high_per_share": 89.96
       },
       {
         "id": "cash_and_investments",
@@ -1150,37 +1933,269 @@
         "evidence_tier": "filing_balance_sheet",
         "evidence": "Q1 2026 cash $247.6M ($3.59/sh) plus $50M equity-method investment ($0.72/sh).",
         "cross_check": "No debt is disclosed in the FY2025 balance-sheet bridge.",
+        "driver_model_type": null,
+        "assumption_summary": null,
+        "scenario_assumptions": null,
         "low_per_share": 3.6,
         "base_per_share": 4.32,
         "high_per_share": 4.32
       },
       {
-        "id": "undeveloped_nra_option",
-        "label": "Undeveloped net royalty acreage",
-        "category": "real_option",
+        "id": "operated_water_sales",
+        "label": "Operated water sales and services",
+        "category": "operating_business",
         "treatment": "additive",
         "included_in_component_id": null,
-        "method": "probability_weighted_transaction_nav",
-        "evidence_tier": "limited_company_transaction",
-        "evidence": "224,000 NRA multiplied by the March 2025 177-NRA acquisition mark of $19,775/NRA, then risked at 15%/25%/35% for development timing, quality, taxes, and realization.",
-        "cross_check": "The range is deliberately below the un-risked $64.2/sh transaction extrapolation.",
-        "low_per_share": 9.63,
-        "base_per_share": 16.05,
-        "high_per_share": 22.47
+        "method": "reinvestment_return_driver_dcf",
+        "evidence_tier": "company_revenue_margin_and_capex_disclosure",
+        "evidence": "Water-sales revenue grew from approximately $55M in 2020 to $170M in 2025. TPL disclosed $0.50-$1.00/bbl pricing, $0.10-$0.20/bbl direct cost, 63%-75% quarterly gross margins, maintenance capital near 10% of sales, and growth capital tied to line-of-sight demand.",
+        "cross_check": "The model charges growth investment explicitly; higher growth creates value only when the assumed incremental after-tax return on capital is earned.",
+        "driver_model_type": "reinvestment_return_dcf",
+        "assumption_summary": "Base: 10% revenue growth in years 1-5 and 4% thereafter, 35% after-tax owner-cash margin after maintenance capital, 30% incremental after-tax ROIC, 18x terminal owner cash, 10% discount rate.",
+        "scenario_assumptions": {
+          "low": {
+            "after_tax_owner_cash_margin": 0.25,
+            "growth_y1_5": 0.05,
+            "growth_y6_10": 0.02,
+            "incremental_after_tax_roic": 0.18,
+            "terminal_owner_cash_multiple": 12,
+            "discount_rate": 0.12
+          },
+          "base": {
+            "after_tax_owner_cash_margin": 0.35,
+            "growth_y1_5": 0.1,
+            "growth_y6_10": 0.04,
+            "incremental_after_tax_roic": 0.3,
+            "terminal_owner_cash_multiple": 18,
+            "discount_rate": 0.1
+          },
+          "high": {
+            "after_tax_owner_cash_margin": 0.42,
+            "growth_y1_5": 0.16,
+            "growth_y6_10": 0.07,
+            "incremental_after_tax_roic": 0.45,
+            "terminal_owner_cash_multiple": 24,
+            "discount_rate": 0.08
+          }
+        },
+        "low_per_share": 6.37,
+        "base_per_share": 16.41,
+        "high_per_share": 39.56
       },
       {
-        "id": "surface_acreage_option",
-        "label": "Surface acreage",
+        "id": "contracted_data_center_receivable",
+        "label": "Contracted data-center land-financing receivable",
+        "category": "financial_asset",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "discounted_contract_value",
+        "evidence_tier": "company_contract_disclosure",
+        "evidence": "Only the risked present value of disclosed contracted economics is included here.",
+        "cross_check": "Uncontracted data-center and power development remains in the separate project option.",
+        "driver_model_type": null,
+        "assumption_summary": null,
+        "scenario_assumptions": null,
+        "low_per_share": 0.27,
+        "base_per_share": 0.3,
+        "high_per_share": 0.32
+      },
+      {
+        "id": "visible_royalty_inventory_option",
+        "label": "Visible undeveloped royalty inventory",
         "category": "real_option",
         "treatment": "additive",
         "included_in_component_id": null,
-        "method": "risked_land_nav",
-        "evidence_tier": "limited_company_transaction",
-        "evidence": "882,000 acres at $750/$1,500/$2,500 per acre. The May 2025 787-acre sale at $5,718/acre is a ceiling cross-check, not a portfolio-wide mark.",
-        "cross_check": "The base is materially below the observed small-parcel sale and requires a future acreage-use segmentation refresh.",
-        "low_per_share": 9.58,
-        "base_per_share": 19.16,
-        "high_per_share": 31.93
+        "method": "unit_inventory_nav",
+        "evidence_tier": "limited_transaction_and_operator_activity",
+        "evidence": "A provisional 70,000 NRA visible bucket is valued against the March 2025 177-NRA acquisition mark of approximately $19,775/NRA and risked for conversion timing and tract quality.",
+        "cross_check": "The 70,000/154,000 NRA split is provisional and must be replaced by a tract-level producing, visible, and dormant roll-forward.",
+        "driver_model_type": "unit_nav",
+        "assumption_summary": "70,000 visible NRA; transaction mark risked at 25%/40%/60%, with 15%/10%/8% realization friction.",
+        "scenario_assumptions": {
+          "low": {
+            "value_per_unit": 19775,
+            "realization_probability": 0.25,
+            "friction_pct": 0.15
+          },
+          "base": {
+            "value_per_unit": 19775,
+            "realization_probability": 0.4,
+            "friction_pct": 0.1
+          },
+          "high": {
+            "value_per_unit": 19775,
+            "realization_probability": 0.6,
+            "friction_pct": 0.08
+          }
+        },
+        "low_per_share": 4.26,
+        "base_per_share": 7.22,
+        "high_per_share": 11.07
+      },
+      {
+        "id": "dormant_royalty_inventory_option",
+        "label": "Dormant and long-dated royalty inventory",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "long_duration_unit_option_nav",
+        "evidence_tier": "company_acreage_and_limited_transaction",
+        "evidence": "The provisional residual 154,000 NRA is treated as a long-duration option, not as near-term inventory. It receives a lower unit value and probability than visible inventory.",
+        "cross_check": "Visible and dormant acreage sum to 224,000 NRA and are mutually exclusive.",
+        "driver_model_type": "unit_nav",
+        "assumption_summary": "154,000 dormant NRA with scenario-specific unit values, conversion probabilities, and realization friction.",
+        "scenario_assumptions": {
+          "low": {
+            "value_per_unit": 10000,
+            "realization_probability": 0.12,
+            "friction_pct": 0.2
+          },
+          "base": {
+            "value_per_unit": 15000,
+            "realization_probability": 0.25,
+            "friction_pct": 0.15
+          },
+          "high": {
+            "value_per_unit": 19775,
+            "realization_probability": 0.4,
+            "friction_pct": 0.1
+          }
+        },
+        "low_per_share": 2.14,
+        "base_per_share": 7.11,
+        "high_per_share": 15.88
+      },
+      {
+        "id": "residual_surface_land_option",
+        "label": "Residual uncontracted surface land",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "portfolio_discounted_unit_nav",
+        "evidence_tier": "company_acreage_and_limited_transaction",
+        "evidence": "TPL owns approximately 882,000 surface acres. The May 2025 787-acre sale at roughly $5,718/acre is a small-parcel ceiling; portfolio marks remain far below it.",
+        "cross_check": "Per-acre marks represent only residual value after recurring operations and named project options; they are not a second capitalization of existing easement cash flow.",
+        "driver_model_type": "unit_nav",
+        "assumption_summary": "882,000 acres at $750/$1,500/$2,500 per acre less 15%/10%/8% portfolio realization friction.",
+        "scenario_assumptions": {
+          "low": {
+            "value_per_unit": 750,
+            "realization_probability": 1.0,
+            "friction_pct": 0.15
+          },
+          "base": {
+            "value_per_unit": 1500,
+            "realization_probability": 1.0,
+            "friction_pct": 0.1
+          },
+          "high": {
+            "value_per_unit": 2500,
+            "realization_probability": 1.0,
+            "friction_pct": 0.08
+          }
+        },
+        "low_per_share": 8.15,
+        "base_per_share": 17.25,
+        "high_per_share": 29.39
+      },
+      {
+        "id": "future_infrastructure_corridors",
+        "label": "Future infrastructure corridors and easements",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "milestone_probability_weighted_option",
+        "evidence_tier": "company_activity_and_regional_demand",
+        "evidence": "Only incremental, uncontracted pipeline, transmission, road, fiber, and logistics opportunities are included.",
+        "cross_check": "Each project graduates into existing surface/easement operations once contracted.",
+        "driver_model_type": "milestone_project_option",
+        "assumption_summary": "Probability-weighted successful-project PV less remaining development cost.",
+        "scenario_assumptions": {
+          "low": {
+            "success_value_m": 300,
+            "success_probability": 0.25,
+            "remaining_cost_m": 20
+          },
+          "base": {
+            "success_value_m": 750,
+            "success_probability": 0.45,
+            "remaining_cost_m": 30
+          },
+          "high": {
+            "success_value_m": 1500,
+            "success_probability": 0.65,
+            "remaining_cost_m": 45
+          }
+        },
+        "low_per_share": 0.8,
+        "base_per_share": 4.45,
+        "high_per_share": 13.47
+      },
+      {
+        "id": "data_center_power_water_option",
+        "label": "Data-center, power, and water co-location option",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "milestone_probability_weighted_option",
+        "evidence_tier": "early_project_and_partner_disclosure",
+        "evidence": "TPL disclosed a $50M Bolt investment, active LOIs/RFPs, site diligence, turbine and infrastructure work, and potential gigawatt-scale projects. These are not yet treated as contracted cash flow.",
+        "cross_check": "The separately modeled receivable and the balance-sheet value of the Bolt investment are excluded from this incremental option.",
+        "driver_model_type": "milestone_project_option",
+        "assumption_summary": "Success value is probability-weighted for customer, power, interconnection, water, capital, permitting, and commissioning milestones.",
+        "scenario_assumptions": {
+          "low": {
+            "success_value_m": 1000,
+            "success_probability": 0.02,
+            "remaining_cost_m": 5
+          },
+          "base": {
+            "success_value_m": 2500,
+            "success_probability": 0.06,
+            "remaining_cost_m": 10
+          },
+          "high": {
+            "success_value_m": 6000,
+            "success_probability": 0.15,
+            "remaining_cost_m": 20
+          }
+        },
+        "low_per_share": 0.22,
+        "base_per_share": 2.03,
+        "high_per_share": 12.75
+      },
+      {
+        "id": "desalination_and_water_technology_option",
+        "label": "Desalination and water-technology platform",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "stage_gated_milestone_option",
+        "evidence_tier": "completed_demonstration_facility",
+        "evidence": "Phase 1 achieved strong water-quality results; the approximately 10,000-bbl/day Phase 2 facility was completed for May 2026 operation. Phase 3 at approximately 100,000 bbl/day remains subject to Phase 2 economics and FID.",
+        "cross_check": "Commercial value requires repeatable unit economics and a capital-light license, cost-plus, JV, or spin structure; technical success alone is insufficient.",
+        "driver_model_type": "milestone_project_option",
+        "assumption_summary": "Probability-weighted platform value less remaining commercialization cost; the asset state is demonstration, not research-only.",
+        "scenario_assumptions": {
+          "low": {
+            "success_value_m": 200,
+            "success_probability": 0.02,
+            "remaining_cost_m": 25
+          },
+          "base": {
+            "success_value_m": 1000,
+            "success_probability": 0.1,
+            "remaining_cost_m": 20
+          },
+          "high": {
+            "success_value_m": 3000,
+            "success_probability": 0.25,
+            "remaining_cost_m": 25
+          }
+        },
+        "low_per_share": -0.3,
+        "base_per_share": 1.16,
+        "high_per_share": 10.5
       },
       {
         "id": "realization_and_corporate_reserve",
@@ -1192,6 +2207,9 @@
         "evidence_tier": "analyst_estimate",
         "evidence": "Reserve for taxes, transaction costs, and corporate friction when latent land and royalty value is realized; no debt is separately deducted.",
         "cross_check": "Low case absorbs more of the gross option value as realization cost.",
+        "driver_model_type": null,
+        "assumption_summary": null,
+        "scenario_assumptions": null,
         "low_per_share": -5.0,
         "base_per_share": -3.0,
         "high_per_share": -1.0
@@ -1203,29 +2221,32 @@
         "label": "Water infrastructure replacement-cost cross-check",
         "category": "infrastructure",
         "treatment": "embedded",
-        "included_in_component_id": "water_operations",
+        "included_in_component_id": "operated_water_sales",
         "method": "depreciated_replacement_cost",
         "evidence_tier": "filing_balance_sheet",
-        "evidence": "FY2025 net PP&E of $164.5M; value is a floor cross-check and is embedded in Water operations, not additive.",
-        "cross_check": "Operating DCF of Water Services already capitalizes returns on this infrastructure.",
+        "evidence": "FY2025 net PP&E of $164.5M; this is an embedded floor cross-check and not additive value.",
+        "cross_check": "The operated-water DCF already capitalizes returns on installed infrastructure.",
+        "driver_model_type": null,
+        "assumption_summary": null,
+        "scenario_assumptions": null,
         "low_per_share": 2.0,
         "base_per_share": 2.4,
         "high_per_share": 4.0
       }
     ],
     "total_equity_value_per_share": {
-      "low": 124.49,
-      "base": 163.02,
-      "high": 210.03
+      "low": 90.49,
+      "base": 203.7,
+      "high": 406.41
     },
-    "material_component_count": 7,
-    "additive_component_count": 6,
+    "material_component_count": 14,
+    "additive_component_count": 13,
     "embedded_component_count": 1,
     "market_price_per_share": 393.0,
     "upside_downside_pct": {
-      "low": -68.3,
-      "base": -58.5,
-      "high": -46.6
+      "low": -77.0,
+      "base": -48.2,
+      "high": 3.4
     }
   },
   "component_review_queue": {
@@ -1233,15 +2254,15 @@
     "decision_rule": "Each assigned rater records accept, challenge, or reject with a proposed range and evidence. The aggregator may not silently average disputed ranges.",
     "items": [
       {
-        "component_id": "land_resource_operations",
-        "label": "Producing royalties, easements, and land-resource operations",
+        "component_id": "producing_royalty_operations",
+        "label": "Producing oil and gas royalties",
         "treatment": "additive",
         "range_per_share": {
-          "low": 84.97,
-          "base": 94.63,
-          "high": 105.71
+          "low": 42.58,
+          "base": 88.33,
+          "high": 152.89
         },
-        "range_width_pct_of_base": 21.9,
+        "range_width_pct_of_base": 124.9,
         "evidence_tier": "filing_segment_cash_flow",
         "recommended_raters": [
           "hohn",
@@ -1256,16 +2277,39 @@
         "status": "open"
       },
       {
-        "component_id": "water_operations",
-        "label": "Water Services and Operations",
+        "component_id": "existing_surface_and_easement_operations",
+        "label": "Existing surface, easement, and land-use operations",
         "treatment": "additive",
         "range_per_share": {
-          "low": 21.71,
-          "base": 31.86,
-          "high": 46.6
+          "low": 7.08,
+          "base": 14.88,
+          "high": 27.3
         },
-        "range_width_pct_of_base": 78.1,
+        "range_width_pct_of_base": 135.9,
         "evidence_tier": "filing_segment_cash_flow",
+        "recommended_raters": [
+          "hohn",
+          "marathon_capital_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "produced_water_royalties",
+        "label": "Produced-water royalty stream",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 20.32,
+          "base": 43.24,
+          "high": 89.96
+        },
+        "range_width_pct_of_base": 161.1,
+        "evidence_tier": "company_volume_and_revenue_disclosure",
         "recommended_raters": [
           "hohn",
           "marathon_capital_cycle"
@@ -1302,16 +2346,62 @@
         "status": "open"
       },
       {
-        "component_id": "undeveloped_nra_option",
-        "label": "Undeveloped net royalty acreage",
+        "component_id": "operated_water_sales",
+        "label": "Operated water sales and services",
         "treatment": "additive",
         "range_per_share": {
-          "low": 9.63,
-          "base": 16.05,
-          "high": 22.47
+          "low": 6.37,
+          "base": 16.41,
+          "high": 39.56
         },
-        "range_width_pct_of_base": 80.0,
-        "evidence_tier": "limited_company_transaction",
+        "range_width_pct_of_base": 202.3,
+        "evidence_tier": "company_revenue_margin_and_capex_disclosure",
+        "recommended_raters": [
+          "hohn",
+          "marathon_capital_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "contracted_data_center_receivable",
+        "label": "Contracted data-center land-financing receivable",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 0.27,
+          "base": 0.3,
+          "high": 0.32
+        },
+        "range_width_pct_of_base": 16.7,
+        "evidence_tier": "company_contract_disclosure",
+        "recommended_raters": [
+          "greenblatt",
+          "marks_credit_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "visible_royalty_inventory_option",
+        "label": "Visible undeveloped royalty inventory",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 4.26,
+          "base": 7.22,
+          "high": 11.07
+        },
+        "range_width_pct_of_base": 94.3,
+        "evidence_tier": "limited_transaction_and_operator_activity",
         "recommended_raters": [
           "klarman_asset_value",
           "hk"
@@ -1325,16 +2415,108 @@
         "status": "open"
       },
       {
-        "component_id": "surface_acreage_option",
-        "label": "Surface acreage",
+        "component_id": "dormant_royalty_inventory_option",
+        "label": "Dormant and long-dated royalty inventory",
         "treatment": "additive",
         "range_per_share": {
-          "low": 9.58,
-          "base": 19.16,
-          "high": 31.93
+          "low": 2.14,
+          "base": 7.11,
+          "high": 15.88
         },
-        "range_width_pct_of_base": 116.6,
-        "evidence_tier": "limited_company_transaction",
+        "range_width_pct_of_base": 193.2,
+        "evidence_tier": "company_acreage_and_limited_transaction",
+        "recommended_raters": [
+          "klarman_asset_value",
+          "hk"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "residual_surface_land_option",
+        "label": "Residual uncontracted surface land",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 8.15,
+          "base": 17.25,
+          "high": 29.39
+        },
+        "range_width_pct_of_base": 123.1,
+        "evidence_tier": "company_acreage_and_limited_transaction",
+        "recommended_raters": [
+          "klarman_asset_value",
+          "hk"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "future_infrastructure_corridors",
+        "label": "Future infrastructure corridors and easements",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 0.8,
+          "base": 4.45,
+          "high": 13.47
+        },
+        "range_width_pct_of_base": 284.7,
+        "evidence_tier": "company_activity_and_regional_demand",
+        "recommended_raters": [
+          "klarman_asset_value",
+          "hk"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "data_center_power_water_option",
+        "label": "Data-center, power, and water co-location option",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 0.22,
+          "base": 2.03,
+          "high": 12.75
+        },
+        "range_width_pct_of_base": 617.2,
+        "evidence_tier": "early_project_and_partner_disclosure",
+        "recommended_raters": [
+          "klarman_asset_value",
+          "hk"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "desalination_and_water_technology_option",
+        "label": "Desalination and water-technology platform",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": -0.3,
+          "base": 1.16,
+          "high": 10.5
+        },
+        "range_width_pct_of_base": 931.0,
+        "evidence_tier": "completed_demonstration_facility",
         "recommended_raters": [
           "klarman_asset_value",
           "hk"

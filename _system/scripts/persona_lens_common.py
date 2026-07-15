@@ -92,6 +92,9 @@ def extract_shared_context(val: dict) -> dict:
         for q in qual
     )
     catalyst_present = val.get("payoff_lens") in ("asset", "event") or predictive_attribute
+    capex = _num(inputs.get("capex") or inputs.get("capital_expenditures"))
+    revenue = _num(inputs.get("revenue") or inputs.get("sales"))
+    capex_to_sales = capex / revenue if capex is not None and revenue and revenue > 0 else None
 
     return {
         "archetype": (ci.get("archetype") or "unknown").lower(),
@@ -114,6 +117,26 @@ def extract_shared_context(val: dict) -> dict:
         "roic_proxy": round(roic_proxy, 2) if roic_proxy is not None else None,
         "predictive_attribute": predictive_attribute,
         "catalyst_present": catalyst_present,
+        "bear_case_present": bear is not None,
+        "capex_to_sales": capex_to_sales,
+        "reinvestment_material": bool(
+            ci.get("reinvestment_material")
+            or ci.get("capacity_sensitive")
+            or (capex_to_sales is not None and abs(capex_to_sales) >= 0.05)
+        ),
+        "credit_material": bool(
+            ci.get("credit_material")
+            or (net_debt_ebitda is not None and net_debt_ebitda >= 1.5)
+            or inputs.get("fixed_claims_material")
+        ),
+        "incremental_roic": _num(inputs.get("incremental_roic")),
+        "maintenance_capex_pct": _num(inputs.get("maintenance_capex_pct")),
+        "industry_capacity_growth": _num(inputs.get("industry_capacity_growth")),
+        "interest_coverage": _num(inputs.get("interest_coverage")),
+        "maturity_wall": inputs.get("maturity_wall") or inputs.get("next_material_maturity"),
+        "asset_nav_per_share": _num(inputs.get("asset_nav_per_share")),
+        "realization_probability": _num(inputs.get("realization_probability")),
+        "time_to_catalyst": _num(inputs.get("time_to_catalyst_years")),
         "earnings_yield": round(fcf_yield, 2) if fcf_yield is not None else None,
         "owner_earnings_yield": round(fcf_yield, 2) if fcf_yield is not None else None,
     }
@@ -196,6 +219,17 @@ def _criterion_met(criterion: dict, ctx: dict, stats: dict) -> bool:
         return ctx.get("irr_method") not in {v.lower() for v in criterion.get("values", [])}
     if check == "predictive_attribute_or_asset":
         return ctx.get("predictive_attribute") or ctx.get("payoff_lens") == "asset"
+    if check == "capex_or_reinvestment_material":
+        return bool(ctx.get("reinvestment_material"))
+    if check == "leverage_or_fixed_claims_material":
+        return bool(ctx.get("credit_material"))
+    if check == "cycle_not":
+        value = str(ctx.get("cycle") or "unknown").lower()
+        return value not in {str(v).lower() for v in criterion.get("values", [])}
+    if check == "bear_case_present":
+        return bool(ctx.get("bear_case_present"))
+    if check == "catalyst_present":
+        return bool(ctx.get("catalyst_present"))
     if check == "fcf_yield_percentile_gte":
         p = (stats.get("fcf_yield") or {}).get("p66")
         v = ctx.get("fcf_yield")
@@ -360,6 +394,15 @@ def build_key_metrics(names: list[str], ctx: dict, limit: int) -> list[dict]:
         "filing_gate_pct": ctx.get("filing_gate_pct"),
         "catalyst_present": ctx.get("catalyst_present"),
         "predictive_attribute": ctx.get("predictive_attribute"),
+        "incremental_roic": ctx.get("incremental_roic"),
+        "maintenance_capex_pct": ctx.get("maintenance_capex_pct"),
+        "industry_capacity_growth": ctx.get("industry_capacity_growth"),
+        "cycle": ctx.get("cycle"),
+        "interest_coverage": ctx.get("interest_coverage"),
+        "maturity_wall": ctx.get("maturity_wall"),
+        "asset_nav_per_share": ctx.get("asset_nav_per_share"),
+        "realization_probability": ctx.get("realization_probability"),
+        "time_to_catalyst": ctx.get("time_to_catalyst"),
     }
     out = []
     for name in names[:limit]:

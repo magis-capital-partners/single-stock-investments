@@ -88,11 +88,11 @@ class SeparatedValuationTests(unittest.TestCase):
         components = out["component_valuation_results"]
         self.assertEqual(components["status"], "complete")
         self.assertTrue(components["all_material_components_identified"])
-        self.assertEqual(components["total_equity_value_per_share"]["base"], 163.02)
-        self.assertEqual(components["material_component_count"], 7)
+        self.assertEqual(components["total_equity_value_per_share"]["base"], 203.7)
+        self.assertEqual(components["material_component_count"], 14)
         queue = out["component_review_queue"]
         self.assertEqual(queue["status"], "ready_for_committee_review")
-        self.assertEqual(len(queue["items"]), 7)
+        self.assertEqual(len(queue["items"]), 14)
         self.assertEqual(queue["items"][0]["status"], "open")
         self.assertEqual(out["synthesis"]["status"], "disabled_separated_views")
         self.assertLess(out["results"]["base"]["return_pct"], 0)
@@ -115,6 +115,62 @@ class SeparatedValuationTests(unittest.TestCase):
         data["component_valuation"]["components"][0]["valuation"].pop("high")
         with self.assertRaisesRegex(ValueError, "missing valuation.high"):
             compute_valuation(data)
+
+    def test_driver_models_calculate_ranges_instead_of_accepting_marks(self):
+        data = fixture()
+        data["inputs"]["shares_outstanding"] = 10_000_000
+        data["component_valuation"] = {
+            "all_material_components_identified": True,
+            "components": [{
+                "id": "royalty",
+                "label": "Royalty",
+                "category": "operating_business",
+                "overlap_key": "royalty",
+                "treatment": "additive",
+                "valuation": {
+                    "method": "driver_dcf",
+                    "evidence": "filing",
+                    "driver_model": {
+                        "type": "revenue_owner_cash_dcf",
+                        "starting_revenue_m": 10,
+                        "horizon_years": 10,
+                        "scenarios": {
+                            "low": {"after_tax_owner_cash_margin": .5, "growth_y1_5": 0, "growth_y6_10": 0, "terminal_owner_cash_multiple": 10, "discount_rate": .12},
+                            "base": {"after_tax_owner_cash_margin": .6, "growth_y1_5": .04, "growth_y6_10": .02, "terminal_owner_cash_multiple": 15, "discount_rate": .10},
+                            "high": {"after_tax_owner_cash_margin": .7, "growth_y1_5": .08, "growth_y6_10": .04, "terminal_owner_cash_multiple": 20, "discount_rate": .08},
+                        },
+                    },
+                },
+            }],
+        }
+        out = compute_valuation(data)
+        result = out["component_valuation_results"]
+        self.assertGreater(result["total_equity_value_per_share"]["base"], 8)
+        self.assertEqual(result["additive_components"][0]["driver_model_type"], "revenue_owner_cash_dcf")
+
+    def test_reinvestment_model_charges_growth_capital(self):
+        data = fixture()
+        data["inputs"]["shares_outstanding"] = 10_000_000
+        common = {
+            "after_tax_owner_cash_margin": .4,
+            "growth_y1_5": .10,
+            "growth_y6_10": .05,
+            "terminal_owner_cash_multiple": 15,
+            "discount_rate": .10,
+        }
+        components = []
+        for component_id, model_type, roic in (("free", "revenue_owner_cash_dcf", None), ("funded", "reinvestment_return_dcf", .25)):
+            scenarios = {key: {**common, **({"incremental_after_tax_roic": roic} if roic else {})} for key in ("low", "base", "high")}
+            components.append({
+                "id": component_id, "label": component_id, "category": "operating_business",
+                "overlap_key": component_id, "treatment": "additive",
+                "valuation": {"method": "driver_dcf", "evidence": "filing", "driver_model": {
+                    "type": model_type, "starting_revenue_m": 10, "scenarios": scenarios,
+                }},
+            })
+        data["component_valuation"] = {"all_material_components_identified": True, "components": components}
+        out = compute_valuation(data)["component_valuation_results"]["additive_components"]
+        self.assertGreater(out[0]["base_per_share"], out[1]["base_per_share"])
 
     def test_full_valuation_gets_a_universal_operating_fallback(self):
         data = fixture()
