@@ -15,7 +15,7 @@ import sys
 
 sys.path.insert(0, sys_path_insert)
 
-from index_event_extract import extract_index_events  # noqa: E402
+from index_event_extract import extract_index_events, _is_style_or_subset_index  # noqa: E402
 from index_market_inputs import load_fundamentals_cache, market_inputs_for_ticker  # noqa: E402
 
 DATA_DIR = ROOT / "_system" / "data"
@@ -218,11 +218,54 @@ def _try_append_extracted(
             "source_type": source_type,
             "confidence": "news_unconfirmed",
             "title": title,
-            "quality_gated": True,
+            # Style/factor subset moves are tracked but not Confirmed parent events
+            "quality_gated": not (
+                action == "reclassify" and _is_style_or_subset_index(title)
+            ),
         }
         if append_announcement(row, existing=existing):
             out.append(row)
     return out
+
+
+def lint_announcement_conflicts(rows: list[dict]) -> list[str]:
+    """Return human-readable warnings for impossible parent membership pairs."""
+    from collections import defaultdict
+
+    warnings: list[str] = []
+    by_key: dict[tuple, list[dict]] = defaultdict(list)
+    for r in rows:
+        if not r.get("quality_gated") and r.get("confidence") != "provider_confirmed":
+            continue
+        key = (r.get("ticker"), r.get("index"), r.get("announced") or r.get("effective"))
+        by_key[key].append(r)
+    for key, evs in by_key.items():
+        actions = {e.get("action") for e in evs}
+        if "add" in actions and "delete" in actions:
+            warnings.append(
+                f"conflict add+delete for {key[0]} / {key[1]} on {key[2]}"
+            )
+    by_add: dict[tuple, set[str]] = defaultdict(set)
+    for r in rows:
+        if r.get("action") != "add":
+            continue
+        if not r.get("quality_gated") and r.get("confidence") != "provider_confirmed":
+            continue
+        by_add[(r.get("ticker"), r.get("announced"))].add(r.get("index"))
+    mutex = [
+        {"russell_1000", "russell_2000"},
+        {"ftse_100", "ftse_250"},
+        {"sp500", "sp400"},
+        {"sp500", "sp600"},
+        {"sp400", "sp600"},
+    ]
+    for key, idxs in by_add.items():
+        for pair in mutex:
+            if pair.issubset(idxs):
+                warnings.append(
+                    f"mutex dual-add {key[0]} on {key[1]}: {sorted(pair)}"
+                )
+    return warnings
 
 
 def harvest_archive_announcements(
@@ -1178,6 +1221,8 @@ def main() -> int:
         f"high_priority={len(summary['high_priority_watch'])} "
         f"quality_events={summary.get('quality_gated_events', 0)}"
     )
+    for warn in lint_announcement_conflicts(load_announcements()):
+        print(f"WARN index conflict: {warn}")
     return 0
 
 

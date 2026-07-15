@@ -27,6 +27,12 @@ from filing_facts import (  # noqa: E402
     source_filing_ref_from_text_path,
 )
 from vault_paths import letters_ref, letters_root, path_to_letters_ref  # noqa: E402
+from fund_families import (  # noqa: E402
+    consensus_vote_key,
+    family_display,
+    family_id_for_fund,
+    normalize_commentary,
+)
 from filing_review import (  # noqa: E402
     filing_metric_needs_review,
     filing_metric_passes_magnitude,
@@ -1777,7 +1783,9 @@ def build_consensus(letters: list[dict], our_tickers: set[str], names: dict[str,
         quarters.add(q)
         fund = letter.get("fund") or "Unknown"
         fund_id = letter.get("fund_id") or fund
-        all_funds.add(fund_id)
+        fam_id = family_id_for_fund(fund_id, family_id=letter.get("family_id"))
+        vote_key = consensus_vote_key(fund_id, fund, family_id=fam_id)
+        all_funds.add(vote_key)
         letter_date = letter.get("letter_date")
         letter_ev = letter_evidence_fields(letter)
         for pos in letter.get("positions") or []:
@@ -1788,20 +1796,23 @@ def build_consensus(letters: list[dict], our_tickers: set[str], names: dict[str,
             for store in (by_q.setdefault(q, {}), all_q):
                 b = store.get(tk) or _consensus_bucket(tk, names, our_tickers)
                 store[tk] = b
-                b["all_funds"].add(fund)
+                b["all_funds"].add(vote_key)
                 if action in BUY_ACTIONS:
-                    b["buy_funds"].add(fund)
+                    b["buy_funds"].add(vote_key)
                 elif action in SELL_ACTIONS:
-                    b["sell_funds"].add(fund)
+                    b["sell_funds"].add(vote_key)
                 elif action in SHORT_ACTIONS:
-                    b["short_funds"].add(fund)
+                    b["short_funds"].add(vote_key)
                 else:
-                    b["neutral_funds"].add(fund)
+                    b["neutral_funds"].add(vote_key)
+            commentary = short_text(pos.get("commentary") or pos.get("thesis"), 280)
             row = {
                 "ticker": tk,
                 "name": names.get(tk, tk),
                 "fund": fund,
                 "fund_id": fund_id,
+                "family_id": fam_id,
+                "family": family_display(fam_id) if fam_id else None,
                 "quarter": q,
                 "letter_date": letter_date,
                 "action": action,
@@ -1809,7 +1820,7 @@ def build_consensus(letters: list[dict], our_tickers: set[str], names: dict[str,
                 "conviction": pos.get("conviction") or "low",
                 "tier": pos.get("tier"),
                 "in_book": tk in our_tickers,
-                "commentary": short_text(pos.get("commentary") or pos.get("thesis"), 280),
+                "commentary": commentary,
                 "evidence_url": letter_ev["evidence_url"],
                 "evidence_label": letter_ev["evidence_label"],
             }
@@ -1830,7 +1841,7 @@ def build_consensus(letters: list[dict], our_tickers: set[str], names: dict[str,
             "letter_count": sum(1 for letter in letters if (q == "all" or letter.get("quarter") == q)),
             "most_discussed": most[:80],
             "biggest_changes": changes[:40],
-            "activity": activity[:20],
+            "activity": _collapse_consensus_rows(activity)[:20],
         }
 
     out_by_q = {q: section(store, q) for q, store in by_q.items()}
@@ -1856,7 +1867,7 @@ def build_consensus(letters: list[dict], our_tickers: set[str], names: dict[str,
 
     for tk, rows in by_ticker.items():
         rows.sort(key=lambda r: (r.get("letter_date") or ""), reverse=True)
-        by_ticker[tk] = rows[:8]
+        by_ticker[tk] = _collapse_consensus_rows(rows)[:8]
 
     return {
         "as_of": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -1870,6 +1881,57 @@ def build_consensus(letters: list[dict], our_tickers: set[str], names: dict[str,
         "by_ticker": by_ticker,
         "qoq_by_quarter": qoq_by_quarter,
     }
+
+
+def _collapse_consensus_rows(rows: list[dict]) -> list[dict]:
+    """Collapse identical commentary from sibling funds into one row."""
+    if not rows:
+        return []
+    groups: dict[tuple, dict] = {}
+    order: list[tuple] = []
+    for row in rows:
+        commentary = normalize_commentary(row.get("commentary"))
+        fam = row.get("family_id") or family_id_for_fund(row.get("fund_id"))
+        # Same quarter + identical snippet → one row (family cluster or exact text)
+        key = (
+            row.get("ticker"),
+            row.get("quarter"),
+            row.get("letter_date") or "",
+            commentary,
+            fam or (row.get("fund_id") if not commentary else "text"),
+        )
+        if key not in groups:
+            keep = dict(row)
+            keep["sibling_funds"] = []
+            groups[key] = keep
+            order.append(key)
+            continue
+        keep = groups[key]
+        label = row.get("fund") or row.get("fund_id")
+        primary = keep.get("fund") or keep.get("fund_id")
+        sibs = keep.setdefault("sibling_funds", [])
+        if label and label != primary and label not in sibs:
+            sibs.append(label)
+        if len(row.get("commentary") or "") > len(keep.get("commentary") or ""):
+            keep["commentary"] = row.get("commentary")
+            keep["evidence_url"] = row.get("evidence_url") or keep.get("evidence_url")
+            keep["evidence_label"] = row.get("evidence_label") or keep.get("evidence_label")
+
+    out: list[dict] = []
+    for key in order:
+        row = groups[key]
+        sibs = list(row.get("sibling_funds") or [])
+        fam = row.get("family_id") or family_id_for_fund(row.get("fund_id"))
+        if sibs:
+            total = 1 + len(sibs)
+            if fam:
+                row["fund"] = f"{family_display(fam) or fam.title()} ({total} strategies)"
+                row["family"] = family_display(fam) or fam.title()
+            else:
+                row["fund"] = f"{row.get('fund')} (+{len(sibs)})"
+            row["sibling_funds"] = sibs
+        out.append(row)
+    return out
 
 
 def fund_profiles(letters: list[dict], our_tickers: set[str]) -> dict[str, dict]:

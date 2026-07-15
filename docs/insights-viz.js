@@ -124,7 +124,7 @@
 
   function renderDecisionSummary(ds, humanReview, helpers) {
     if (!ds) return '';
-    const { escapeHtml, renderIrrCell, classification } = helpers;
+    const { escapeHtml } = helpers;
     const stanceBadge = STANCE_BADGE[ds.stance] || 'badge-warn';
     let stanceHtml = `<span class="badge ${stanceBadge}">${escapeHtml(ds.stance || '—')}</span>`;
     if (ds.stance_source === 'approved' && ds.lens_stance && ds.lens_stance !== ds.stance) {
@@ -132,25 +132,15 @@
     } else if (humanReview?.approved_stance) {
       stanceHtml += `<div class="tier-sub">approved</div>`;
     }
-    const band = ds.lens_band_pct;
-    const blendStr = ds.lens_blend_pct != null
-      ? `${fmtPct(ds.lens_blend_pct)}${band ? ` [${fmtPct(band[0])}–${fmtPct(band[1])}]` : ''}`
-      : '—';
     const dissent = ds.top_dissent;
     const dissentStr = dissent
       ? `${escapeHtml(dissent.label || dissent.persona)} ${escapeHtml(dissent.verdict || '')}`
       : '—';
-    const houseWarn = ds.divergence ? ' <span class="divergence-flag" title="House IRR diverges from lens blend">⚠</span>' : '';
-    const houseHtml = classification
-      ? renderIrrCell({ classification }) + houseWarn
-      : fmtPct(ds.house_irr_pct) + houseWarn;
     return `
       <div class="detail-section tier-0">
         <div class="metric-grid metric-grid-3">
           <div class="metric"><div class="k">Stance</div><div class="v">${stanceHtml}</div></div>
-          <div class="metric"><div class="k">House IRR</div><div class="v">${houseHtml}</div></div>
-          <div class="metric"><div class="k">Lens blend</div><div class="v mono">${blendStr}</div></div>
-          <div class="metric"><div class="k">Agreement</div><div class="v">${ds.agreement_pct != null ? ds.agreement_pct + '%' : '—'}</div></div>
+          <div class="metric"><div class="k">Committee agreement</div><div class="v">${ds.agreement_pct != null ? ds.agreement_pct + '%' : '—'}</div></div>
           <div class="metric"><div class="k">Dissent</div><div class="v" style="font-size:12px">${dissentStr}</div></div>
           <div class="metric"><div class="k">As of</div><div class="v mono">${escapeHtml(ds.as_of || '—')}</div></div>
         </div>
@@ -3009,15 +2999,24 @@
     const quarterIds = (timeModel?.quarters || []).slice(0, 12).map(q => q.id);
     const quarterly = consensusQuarterlyRows(consensus, ticker, quarterIds);
     const name = history[0]?.name || quarterly.find(q => q.row)?.row?.name || ticker;
-    const timelineRows = history.map(r => `
+    const timelineRows = history.map(r => {
+      const sibs = (r.sibling_funds || []).filter(Boolean);
+      const fundTitle = sibs.length
+        ? `${r.fund || ''} · strategies: ${[r.fund_id, ...sibs].filter(Boolean).join(', ')}`
+        : (r.fund || '');
+      const fundCell = r.fund_id
+        ? `<button type="button" class="linkish" data-consensus-fund-id="${escapeHtml(r.fund_id)}" title="${escapeHtml(fundTitle)}">${escapeHtml(r.fund)}</button>`
+        : escapeHtml(r.fund);
+      return `
       <tr>
         <td class="mono" style="font-size:11px">${escapeHtml(r.letter_date || '—')}</td>
         <td class="mono" style="font-size:11px">${escapeHtml(r.quarter || '—')}</td>
-        <td>${r.fund_id ? `<button type="button" class="linkish" data-consensus-fund-id="${escapeHtml(r.fund_id)}">${escapeHtml(r.fund)}</button>` : escapeHtml(r.fund)}</td>
+        <td>${fundCell}</td>
         <td><span class="badge ${STANCE_BADGE[r.action] || 'badge-us'}">${escapeHtml(r.action || '—')}</span></td>
         <td style="font-size:11px;max-width:300px">${escapeHtml((r.commentary || '').slice(0, 200))}</td>
         <td>${recordEvidenceLink(r, linkHtml, ghRepo)}</td>
-      </tr>`).join('');
+      </tr>`;
+    }).join('');
     const sparkCells = quarterly.slice().reverse().map(q => {
       if (!q.row) return `<span class="consensus-spark-dot" style="background:rgba(148,163,184,0.25)" title="${escapeHtml(q.label)}: no mention"></span>`;
       const color = q.row.sentiment === 'accumulating' ? '#4ade80'
