@@ -21,6 +21,15 @@ class CommitteeCalibrationTests(unittest.TestCase):
         self.assertEqual(result["methods"]["hk"]["directional_accuracy_pct"], 100.0)
         self.assertEqual(result["methods"]["pabrai"]["directional_accuracy_pct"], 0.0)
 
+    def test_expected_return_range_is_calibrated(self):
+        rows = [{"return_status": "complete", "total_return_pct": 15, "votes": [
+            {"persona": "hk", "vote": "approve", "expected_return_range_pct": [10, 20]}
+        ]}]
+        result = summarize(rows)["methods"]["hk"]
+        self.assertEqual(result["expected_range_hit_rate_pct"], 100.0)
+        self.assertEqual(result["mean_absolute_midpoint_error_pct"], 0.0)
+        self.assertEqual(result["calibration_use"], "descriptive")
+
 
 if __name__ == "__main__":
     unittest.main()

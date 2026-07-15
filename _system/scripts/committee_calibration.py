@@ -26,11 +26,19 @@ def summarize(rows: list[dict]) -> dict:
     for persona, votes in sorted(by_persona.items()):
         actionable = [v for v in votes if v.get("vote") in ("approve", "reject")]
         correct = [v for v in actionable if (v["vote"] == "approve") == (v["total_return_pct"] > 0)]
+        ranged = [v for v in votes if isinstance(v.get("expected_return_range_pct"), list) and len(v["expected_return_range_pct"]) == 2]
+        range_hits = [v for v in ranged if float(v["expected_return_range_pct"][0]) <= v["total_return_pct"] <= float(v["expected_return_range_pct"][1])]
+        midpoint_errors = [abs(sum(map(float, v["expected_return_range_pct"])) / 2 - v["total_return_pct"]) for v in ranged]
         methods[persona] = {
             "completed_outcomes": len(votes),
             "actionable_votes": len(actionable),
+            "abstention_or_watch_rate_pct": round(100 * (len(votes) - len(actionable)) / len(votes), 1),
             "directional_accuracy_pct": round(100 * len(correct) / len(actionable), 1) if actionable else None,
+            "expected_range_observations": len(ranged),
+            "expected_range_hit_rate_pct": round(100 * len(range_hits) / len(ranged), 1) if ranged else None,
+            "mean_absolute_midpoint_error_pct": round(sum(midpoint_errors) / len(midpoint_errors), 2) if midpoint_errors else None,
             "mean_total_return_pct": round(sum(v["total_return_pct"] for v in votes) / len(votes), 2),
+            "calibration_use": "descriptive" if len(votes) < 20 else "eligible_for_review",
         }
     return {
         "status": "ready" if valid else "insufficient_outcomes",

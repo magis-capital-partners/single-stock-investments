@@ -1,9 +1,18 @@
 {
-  "version": "2.0",
+  "version": "3.0",
   "purpose": "Starting component maps. Replace every placeholder with an evidence-backed low/base/high range before a schedule is complete.",
   "templates": {
     "operating_company": [
       "core operating segments", "cash and investments", "non-operating assets", "debt and liabilities", "corporate reserve"
+    ],
+    "capital_light_compounder": [
+      "current owner-cash engine", "reinvestment runway", "cash and investments", "debt and other claims", "competitive-fade reserve"
+    ],
+    "cyclical_or_commodity": [
+      "mid-cycle operating value", "low-cost reserves or productive capacity", "working-capital normalization", "net debt and refinancing claims", "down-cycle liquidity reserve"
+    ],
+    "infrastructure_network": [
+      "existing contracted network", "brownfield reinvestment cohorts", "uncontracted expansion options", "net debt and minority claims", "execution reserve"
     ],
     "bank_or_insurer": [
       "franchise or excess-return value", "tangible equity", "investment portfolio", "credit-loss reserve", "debt and preferred claims"
@@ -27,6 +36,8 @@
   "required_component_fields": [
     "id", "label", "category", "overlap_key", "treatment", "valuation.method", "valuation.evidence"
   ],
+  "economic_value_contract": "Every explicit component schedule also requires economic_value.schema_version 1.0, an exact economic claim, GAAP role, exhaustive non-overlapping component groups, comparable adjustments where applicable, and the generated valuation-proof table.",
+  "falsifier_rule": "valuation.falsifier may override the deterministic category/method falsifier; one is always emitted in the valuation proof.",
   "valuation_range_rule": "Supply either valuation.low/base/high with a supported basis or valuation.driver_model with low/base/high scenarios.",
   "driver_models": {
     "revenue_owner_cash_dcf": "Capital-free royalty, toll, or lease revenue converted to after-tax owner cash.",

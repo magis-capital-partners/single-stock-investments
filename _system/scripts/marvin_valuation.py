@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 
 from growth_theory import enrich_growth_explanation, load_filing_facts, theory_scenario  # noqa: E402
+from economic_value_framework import build_economic_value_analysis  # noqa: E402
 from lawrence_horizon import LAWRENCE_HORIZON_YEARS, RETURN_LABEL, SYNTHESIS_LABEL  # noqa: E402
 from valuation_synthesis import compute_synthesis  # noqa: E402
 CLASS_PATH = ROOT / "_system" / "portfolio" / "classification.json"
@@ -519,6 +520,7 @@ def compute_component_valuation(data: dict) -> dict | None:
             "id": component_id,
             "label": component["label"],
             "category": component["category"],
+            "overlap_key": overlap_key,
             "treatment": treatment,
             "included_in_component_id": component.get("included_in_component_id"),
             "method": valuation["method"],
@@ -526,7 +528,9 @@ def compute_component_valuation(data: dict) -> dict | None:
             "evidence": valuation["evidence"],
             "cross_check": valuation.get("cross_check"),
             "driver_model_type": (valuation.get("driver_model") or {}).get("type"),
+            "driver_model": valuation.get("driver_model"),
             "assumption_summary": valuation.get("assumption_summary"),
+            "falsifier": valuation.get("falsifier"),
             "scenario_assumptions": (valuation.get("driver_model") or {}).get("scenarios"),
             "low_per_share": values["low"],
             "base_per_share": values["base"],
@@ -593,7 +597,10 @@ def build_component_review_queue(data: dict) -> dict | None:
             "recommended_raters": COMPONENT_REVIEW_ROUTING.get(category, ["pabrai", "greenblatt"]),
             "mandatory_checks": [
                 "Is the valuation method appropriate for this economic claim?",
+                "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
                 "Does the evidence support the low/base/high range and its timing?",
+                "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+                "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
                 "Is the component additive, or already embedded in another component?",
                 "What observation would move the base estimate materially?",
             ],
@@ -978,6 +985,7 @@ def compute_valuation(data: dict) -> dict:
 
     data["overlay_results"] = compute_ai_overlay_rows(data, results)
     compute_component_valuation(data) or infer_minimal_component_valuation(data)
+    build_economic_value_analysis(data)
     build_component_review_queue(data)
     separated_views = compute_separated_valuation_views(data)
 
@@ -1102,7 +1110,7 @@ def main() -> None:
                         ticker_name,
                         "valuation_refresh",
                         str(computed["as_of"])[:10],
-                        str(path.relative_to(ROOT)),
+                        path.relative_to(ROOT).as_posix(),
                     )
             except ImportError:
                 pass

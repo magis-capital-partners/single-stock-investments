@@ -1183,6 +1183,56 @@ function renderInvestmentCommittee(t) {
     </div>`;
 }
 
+function renderPricingAnalysis(t) {
+  const p = t.pricing_analysis;
+  if (!p) return '';
+  const values = p.component_value_per_share || {};
+  const entry = p.entry_prices?.base || {};
+  const economic = p.economic_value_bridge || {};
+  const grossNav = economic.gross_comparable_nav_per_share || {};
+  const convergence = economic.nav_convergence_entry_prices?.base || {};
+  const economicGroups = (economic.component_groups || []).map(group => {
+    const comparable = group.comparable_value_per_share?.base;
+    const risked = group.risked_present_value_per_share?.base;
+    return `<tr><td><strong>${escapeHtml(group.label || group.id || 'Component')}</strong></td><td>${escapeHtml(group.valuation_basis || '—')}</td><td>${comparable == null ? '—' : '$' + fmtNum(comparable)}</td><td>${risked == null ? '—' : '$' + fmtNum(risked)}</td></tr>`;
+  }).join('');
+  const economicHtml = economic.method ? `
+      <div class="economic-value-bridge" style="margin-top:14px">
+        <h4 style="margin:0 0 8px">Economic value bridge</h4>
+        <div class="tier-sub"><strong>GAAP role:</strong> ${escapeHtml(economic.gaap_role || 'Reference only')}</div>
+        ${grossNav.base == null ? '' : `<div class="metric-grid metric-grid-3" style="margin-top:10px">
+          <div class="metric"><div class="k">Comparable NAV low</div><div class="v mono">$${fmtNum(grossNav.low)}</div></div>
+          <div class="metric"><div class="k">Comparable NAV base</div><div class="v mono">$${fmtNum(grossNav.base)}</div><div class="tier-sub">${fmtPct(economic.gross_comparable_upside_downside_pct?.base)} vs price</div></div>
+          <div class="metric"><div class="k">Comparable NAV high</div><div class="v mono">$${fmtNum(grossNav.high)}</div></div>
+        </div>`}
+        ${convergence['15pct'] == null ? '' : `<div class="tier-sub" style="margin-top:8px"><strong>15% base NAV-convergence entry:</strong> $${fmtNum(convergence['15pct'])} · separate from owner-cash entry</div>`}
+        ${economicGroups ? `<table class="component-table" style="margin-top:10px"><thead><tr><th>Economic component</th><th class="component-method-col">Comparable basis</th><th>Comparable base</th><th>Risked base</th></tr></thead><tbody>${economicGroups}</tbody></table>` : ''}
+      </div>` : '';
+  const decision = String(p.decision || 'pending').replace(/_/g, ' ');
+  const badgeClass = String(p.decision || '').startsWith('reject') ? 'badge-bad' : 'badge-warn';
+  return `
+    <div class="detail-section component-value-card">
+      <h3>Pricing decision <span class="badge ${badgeClass}">${escapeHtml(decision)}</span></h3>
+      <div class="metric-grid metric-grid-3">
+        <div class="metric"><div class="k">Current price</div><div class="v mono">$${fmtNum(p.price)}</div></div>
+        <div class="metric"><div class="k">Base component value</div><div class="v mono">$${fmtNum(values.base)}</div><div class="tier-sub">${fmtPct(p.upside_downside_pct?.base)} vs price</div></div>
+        <div class="metric"><div class="k">15% owner-cash entry</div><div class="v mono">$${fmtNum(p.entry_price_15pct_base)}</div></div>
+      </div>
+      <div class="metric-grid" style="margin-top:10px">
+        <div class="metric"><div class="k">10% hurdle</div><div class="v mono">$${fmtNum(entry['10pct'])}</div></div>
+        <div class="metric"><div class="k">12% hurdle</div><div class="v mono">$${fmtNum(entry['12pct'])}</div></div>
+        <div class="metric"><div class="k">15% hurdle</div><div class="v mono">$${fmtNum(entry['15pct'])}</div></div>
+        <div class="metric"><div class="k">20% hurdle</div><div class="v mono">$${fmtNum(entry['20pct'])}</div></div>
+      </div>
+      <div class="summary" style="margin-top:12px">${escapeHtml(p.conclusion || '')}</div>
+      ${economicHtml}
+      <div class="tier-sub" style="margin-top:8px"><strong>Price-implied owner-cash growth:</strong> ${fmtPct(p.implied_growth_pct)} · <strong>Current/contracted support:</strong> $${fmtNum(p.current_supported_value)} · <strong>Price paid for growth/options:</strong> $${fmtNum(p.market_price_above_supported_value)}</div>
+      <div class="tier-sub" style="margin-top:8px"><strong>Strongest counter-case:</strong> ${escapeHtml(p.strongest_counter_explanation || '—')}</div>
+      <div class="tier-sub" style="margin-top:8px"><strong>Economic claim:</strong> ${escapeHtml(p.economic_claim_note || '—')}</div>
+      ${p.committee_routing ? `<div class="tier-sub" style="margin-top:8px"><strong>Committee:</strong> ${escapeHtml(String(p.committee_routing.stage || 'pending').replace(/_/g, ' '))} · ${(p.committee_routing.selected_raters || []).map(x => escapeHtml(String(x).replace(/_/g, ' '))).join(' · ')}</div>` : ''}
+    </div>`;
+}
+
 function renderComponentValuation(t) {
   const cv = t.component_valuation;
   if (!cv) return '';
@@ -1215,6 +1265,24 @@ function renderComponentValuation(t) {
   const badge = cv.status === 'complete' && cv.all_material_components_identified
     ? '<span class="badge badge-ok">complete schedule</span>'
     : '<span class="badge badge-warn">operating fallback</span>';
+  const economic = cv.economic_value || {};
+  const proof = economic.valuation_proof || [];
+  const economicBadge = economic.status === 'complete'
+    ? '<span class="badge badge-ok">economic proof complete</span>'
+    : economic.status ? `<span class="badge badge-warn">${escapeHtml(economic.status.replace(/_/g, ' '))}</span>` : '';
+  const proofRows = proof.map(row => `<tr>
+    <td><strong>${escapeHtml(row.economic_claim || row.component_id || 'Claim')}</strong><div class="component-method">${escapeHtml(row.quantity?.value == null ? '—' : `${row.quantity.value} ${row.quantity.unit || ''}`)}</div></td>
+    <td class="component-method-col"><div>${escapeHtml(row.method || '—')}</div><div class="component-method">${escapeHtml((row.comparable_ids || []).join(' · ') || row.comparable_role || '—')}</div><div class="component-assumption">${escapeHtml(row.adjustment || '')}</div></td>
+    <td class="mono">$${fmtNum(row.range_per_share?.low)}</td><td class="mono">$${fmtNum(row.range_per_share?.base)}</td><td class="mono">$${fmtNum(row.range_per_share?.high)}</td>
+    <td><div class="component-method">${escapeHtml(row.overlap_control || row.overlap_key || '—')}</div>${row.risk_and_timing ? `<div class="component-assumption"><strong>Risk/timing:</strong> ${row.risk_and_timing.success_probability == null ? 'risked range' : fmtPct(Number(row.risk_and_timing.success_probability) * 100)} · ${escapeHtml(row.risk_and_timing.timing_basis || 'timing in range')} · ${row.risk_and_timing.remaining_capital_m == null ? escapeHtml(row.risk_and_timing.remaining_capital_basis || 'capital in range') : '$' + fmtNum(row.risk_and_timing.remaining_capital_m) + 'M remaining capital'}</div>` : ''}<div class="component-assumption"><strong>Falsifier:</strong> ${escapeHtml(row.falsifier || '—')}</div></td>
+  </tr>`).join('');
+  const economicHtml = economic.status ? `<div class="economic-value-bridge" style="margin-top:14px">
+    <h4 style="margin:0 0 8px">Economic valuation proof ${economicBadge}</h4>
+    <div class="tier-sub"><strong>Economic claim:</strong> ${escapeHtml(economic.economic_claim?.description || 'Not stated')}</div>
+    <div class="tier-sub" style="margin-top:4px"><strong>GAAP role:</strong> ${escapeHtml((economic.gaap_role || 'not stated').replace(/_/g, ' '))}${economic.accounting_reference ? ` · ${escapeHtml(economic.accounting_reference)}` : ''}</div>
+    ${(economic.validation_errors || []).length ? `<div class="summary" style="margin-top:8px;color:var(--danger)"><strong>Blocked:</strong> ${(economic.validation_errors || []).map(escapeHtml).join(' · ')}</div>` : ''}
+    ${proofRows ? `<details style="margin-top:10px"><summary>Show complete valuation proof (${proof.length} claims)</summary><table class="component-table" style="margin-top:10px"><thead><tr><th>Economic claim / quantity</th><th class="component-method-col">Method / comparable / adjustment</th><th>Low</th><th>Base</th><th>High</th><th>Overlap / falsifier</th></tr></thead><tbody>${proofRows}</tbody></table></details>` : ''}
+  </div>` : '';
   return `
     <div class="detail-section component-value-card">
       <h3>Valuation ${badge}</h3>
@@ -1228,6 +1296,7 @@ function renderComponentValuation(t) {
         ${priceLeft == null ? '' : `<div class="component-price-marker" style="left:${priceLeft}%"><span class="component-price-label">price $${fmtNum(price)}</span></div>`}
       </div>
       <div class="component-buckets">${bucketHtml}</div>
+      ${economicHtml}
       <div class="tier-sub">${escapeHtml(cv.decision_rule || '')}</div>
       ${cv.review_status ? `<div class="tier-sub" style="margin-top:6px">Committee component review: ${escapeHtml(cv.review_status.replace(/_/g, ' '))} · ${cv.review_open_count || 0} open item(s)</div>` : ''}
       <table class="component-table">
@@ -2529,6 +2598,8 @@ function selectTicker(ticker, opts = {}) {
     </div>`}
 
     ${tier1}
+
+    ${renderPricingAnalysis(t)}
 
     ${renderInvestmentCommittee(t)}
 

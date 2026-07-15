@@ -88,7 +88,7 @@ class SeparatedValuationTests(unittest.TestCase):
         components = out["component_valuation_results"]
         self.assertEqual(components["status"], "complete")
         self.assertTrue(components["all_material_components_identified"])
-        self.assertEqual(components["total_equity_value_per_share"]["base"], 203.7)
+        self.assertEqual(components["total_equity_value_per_share"]["base"], 246.21)
         self.assertEqual(components["material_component_count"], 14)
         queue = out["component_review_queue"]
         self.assertEqual(queue["status"], "ready_for_committee_review")

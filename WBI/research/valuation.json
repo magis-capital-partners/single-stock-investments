@@ -1,6 +1,6 @@
 {
   "ticker": "WBI",
-  "as_of": "2026-06-02",
+  "as_of": "2026-07-15",
   "method": "full",
   "lawrence_bucket": "low_cost",
   "classification_inputs": {
@@ -10,55 +10,59 @@
     "cycle": "mid"
   },
   "inputs": {
-    "price": 29.96,
-    "price_source": "NYSE close 2026-06-02 (Stooq wbi.us)",
-    "fcf_per_share": 2.13,
-    "fcf_source": "FY2025 OCF $159.7M less est. maintenance capex ~$60M = ~$100M \u00f7 47.0M Class A shares",
+    "price": 34.46,
+    "price_source": "Market quote 2026-07-15 17:22 UTC",
+    "fcf_per_share": 1.46,
+    "fcf_source": "Normalized maintenance equity cash of approximately $180M divided by 123.456M economic units; 2026 growth capex is excluded from distributable owner cash but charged through the reinvestment assessment.",
     "shares_millions": 47.0,
-    "normalization_note": "Merchant infrastructure \u2014 no regulated RAB. Maintenance capex estimated (~25% of growth capex); LLC/Class B structure means economic attribution is approximate. Q1 2026 run-rate Adj EBITDA ~$412M not used as starting FCF."
+    "normalization_note": "Merchant infrastructure \u2014 no regulated RAB. Maintenance capex estimated (~25% of growth capex); LLC/Class B structure means economic attribution is approximate. Q1 2026 run-rate Adj EBITDA ~$412M not used as starting FCF.",
+    "shares_outstanding": 123456209,
+    "shares_source": "Q1 2026 10-Q: 47,016,059 Class A plus 76,440,150 Class B/OpCo units",
+    "net_debt_millions": 1424.3,
+    "ebitda_millions": 445
   },
   "scenarios": {
     "bear": {
       "growth_y1_5": 0.02,
       "growth_y6_10": 0.01,
       "exit_pfcf_y10": 10,
-      "notes": "Delaware rig count \u221230%, volume cliff, deleveraging overhang, sponsor conflict"
+      "notes": "Volume softness, capex overruns, and slow deleveraging."
     },
     "base": {
-      "growth_y1_5": 0.06,
+      "growth_y1_5": 0.08,
       "growth_y6_10": 0.04,
-      "exit_pfcf_y10": 14,
-      "notes": "Mid-cycle volumes, Speedway Phase II, maintenance FCF yield ~6.9% + growth"
+      "exit_pfcf_y10": 12,
+      "notes": "2026 build completes near budget and contracted volumes support moderate growth."
     },
     "bull": {
-      "growth_y1_5": 0.1,
+      "growth_y1_5": 0.12,
       "growth_y6_10": 0.06,
-      "exit_pfcf_y10": 18,
-      "notes": "Sustained Permian water intensity, producer-owned system acquisitions, deleveraging + distributions"
+      "exit_pfcf_y10": 15,
+      "notes": "High water intensity, successful Speedway/Devon cohorts, and rapid deleveraging."
     }
   },
   "results": {
     "bear": {
-      "return_pct": 5.2
+      "return_pct": -3.8
     },
     "base": {
-      "return_pct": 13.0
+      "return_pct": 3.2
     },
     "bull": {
-      "return_pct": 20.0
+      "return_pct": 9.2
     }
   },
   "implied_return": {
-    "base_pct": 15.45,
+    "base_pct": 6.59,
     "label": "7yr IRR (total synthesis)",
-    "display": "15.45% (total synthesis)",
-    "lawrence_stance_gate_pct": 13.0,
-    "falsifier_adjusted_pct": 13.0,
-    "synthesis_pct": 15.45
+    "display": "6.59% (total synthesis)",
+    "lawrence_stance_gate_pct": 3.2,
+    "falsifier_adjusted_pct": 3.2,
+    "synthesis_pct": 6.59
   },
   "stance_proposal": {
     "suggested": "watch",
-    "irr_band": "15\u201320%",
+    "irr_band": "<15%",
     "gates": {
       "moat_ok": false,
       "dhando_ok": true
@@ -68,13 +72,13 @@
   "overlay_results": [],
   "results_lawrence_legacy": {
     "bear": {
-      "return_pct": 5.2
+      "return_pct": -3.8
     },
     "base": {
-      "return_pct": 13.0
+      "return_pct": 3.2
     },
     "bull": {
-      "return_pct": 20.0
+      "return_pct": 9.2
     }
   },
   "option_scan": [
@@ -93,7 +97,7 @@
         "id": "scenario_bear",
         "label": "Bear scenario (Lawrence)",
         "source": "scenarios.bear",
-        "return_pct": 5.2,
+        "return_pct": -3.8,
         "weight": 0.05,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
@@ -107,7 +111,7 @@
         "id": "scenario_bull",
         "label": "Bull scenario (Lawrence)",
         "source": "scenarios.bull",
-        "return_pct": 20.0,
+        "return_pct": 9.2,
         "weight": 0.12,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
@@ -116,6 +120,22 @@
           "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
         ],
         "hard_to_vary": "yes"
+      },
+      {
+        "id": "third_party_context",
+        "label": "Third-party approved (HK + Substacks + inventory)",
+        "source": "source_inventory (1 sources); cross_check blend",
+        "return_pct": 9.2,
+        "weight": 0.1,
+        "type": "numeric",
+        "notes": "Proxy: upside case when strategic third party has no spot IRR",
+        "epistemic_tier": "D (external triangulation)",
+        "weight_why": "Context-tier HK/Substacks until human promotes in third_party_sources.md; numeric proxy is weak.",
+        "weight_falsifiers": [
+          "Using bull scenario as HK proxy when cross_check synthesis says no IRR upgrade",
+          "Weight above 15% while human_approval pending"
+        ],
+        "hard_to_vary": "no: proxy return is instrumentalist; prefer qualitative pp until approved blend"
       }
     ],
     "qualitative_adjustments": [
@@ -130,16 +150,18 @@
     ],
     "qualitative_manual": false,
     "qualitative_pp_cap_applied": false,
-    "numeric_weighted_pct": 15.65,
+    "numeric_weighted_pct": 6.79,
     "qualitative_pp": -0.2,
-    "total_synthesis_pct": 15.45,
+    "total_synthesis_pct": 6.59,
     "human_approval": "pending",
     "weight_audit": {
-      "flags": [],
+      "flags": [
+        "Third-party numeric path proxies bull scenario (instrumentalist); HK cross-check says no base IRR upgrade. Prefer qualitative pp only until approved blend."
+      ],
       "deutsch_checks": {
-        "hard_to_vary": true,
+        "hard_to_vary": false,
         "falsifiable": true,
-        "not_instrumentalist": true,
+        "not_instrumentalist": false,
         "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
       },
       "qualitative_audit": {
@@ -545,14 +567,1112 @@
     "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
   },
   "total_return_panel": {
-    "as_of": "2026-06-11",
-    "status": "complete",
-    "error": null,
-    "cumulative_distributions_per_share": 0,
-    "distribution_history_sum": 0,
-    "market_cap_m": null,
-    "total_return_annualized_pct": 49.99,
-    "chart": "WBI/research/charts/total_return_2026-06-11.svg",
+    "schema_version": "2.0",
+    "ticker": "WBI",
+    "as_of": "2026-07-15",
+    "status": "partial",
+    "error": "Vendor events are discovery evidence; primary-source completeness has not been established.",
+    "price_source": "yahoo:WBI",
+    "currency": "USD",
+    "return_currency": "USD",
+    "fx_basis": "listing_currency_nominal",
+    "history_start": "2025-09-17",
+    "history_end": "2026-07-15",
+    "price_points": 207,
+    "price_interval": "1d",
+    "return_contract": "split-adjusted close excluding dividends; event amounts normalized for later splits; cash reinvested at ex-date close; pre-tax nominal",
+    "coverage": {
+      "status": "vendor_only",
+      "start": null,
+      "end": null,
+      "note": "Vendor events are discovery evidence; primary-source completeness has not been established.",
+      "ledger_path": null
+    },
+    "event_count": 2,
+    "event_counts": {
+      "regular_dividend": 2
+    },
+    "cash_distributions_on_initial_share_path": 0.1001,
+    "distribution_contribution_by_type": {
+      "regular_dividend": 0.1001
+    },
+    "cumulative_distributions_per_share": 0.1001,
+    "start_price": 22.83,
+    "end_price": 34.53,
+    "price_index_end": 151.25,
+    "total_return_index_end": 151.8,
+    "benchmark": "SPY",
+    "benchmark_index_end": 115.77,
+    "price_only_annualized_pct": 65.21,
+    "total_return_annualized_pct": 65.94,
+    "benchmark_annualized_pct": 19.45,
+    "market_cap_m": 4254.3,
+    "shares_outstanding": 123456209,
+    "price_for_market_cap": 34.46,
+    "chart": "WBI/research/charts/total_return_2026-07-15.svg",
     "panel_json": "WBI/research/total_return_panel.json"
+  },
+  "component_valuation": {
+    "all_material_components_identified": true,
+    "components": [
+      {
+        "id": "core_water_network",
+        "label": "Existing produced-water network enterprise value",
+        "category": "infrastructure",
+        "overlap_key": "wbi_core_network",
+        "treatment": "additive",
+        "valuation": {
+          "basis": "total_value_m",
+          "low": 3040,
+          "base": 4450,
+          "high": 6000,
+          "method": "normalized_ebitda_enterprise_value",
+          "evidence_tier": "q1_2026_guidance",
+          "evidence": "2026 adjusted EBITDA guidance is $425M-$465M. Values use $380M at 8x, $445M at 10x, and $500M at 12x.",
+          "cross_check": "Q1 2026 EBITDA was $102.9M on 2.5M bbl/d; merchant infrastructure is not a regulated rate base."
+        }
+      },
+      {
+        "id": "net_debt",
+        "label": "Net debt",
+        "category": "liability_or_reserve",
+        "overlap_key": "wbi_net_debt",
+        "treatment": "additive",
+        "valuation": {
+          "basis": "per_share",
+          "low": -12.5,
+          "base": -11.54,
+          "high": -10.5,
+          "method": "balance_sheet_claim",
+          "evidence_tier": "q1_2026_10q",
+          "evidence": "March 2026 principal debt was $1.475B and cash was $50.7M.",
+          "cross_check": "Base net debt is approximately $1.424B, or $11.54 per economic unit."
+        }
+      },
+      {
+        "id": "contracted_growth_projects",
+        "label": "Speedway, Devon, and contracted growth beyond 2026",
+        "category": "real_option",
+        "overlap_key": "wbi_contracted_growth",
+        "treatment": "additive",
+        "valuation": {
+          "basis": "per_share",
+          "low": 0.0,
+          "base": 3.0,
+          "high": 8.0,
+          "method": "milestone_project_option",
+          "evidence_tier": "company_contract_and_capex_guidance",
+          "evidence": "2026 capex guidance is $430M-$490M and includes Speedway plus projects supporting a Devon agreement beginning in 2027.",
+          "cross_check": "Only value beyond the normalized 2026 EBITDA run-rate is added; the core network value already includes the 2026 guide."
+        }
+      },
+      {
+        "id": "capex_execution_reserve",
+        "label": "Growth-capex execution reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "wbi_capex_reserve",
+        "treatment": "additive",
+        "valuation": {
+          "basis": "per_share",
+          "low": -3.0,
+          "base": -1.0,
+          "high": 0.0,
+          "method": "capital_cycle_reserve",
+          "evidence_tier": "analyst_stress",
+          "evidence": "Reserve for cost overruns, delayed in-service dates, and returns below the cost of capital on the $430M-$490M program.",
+          "cross_check": "Released only after cohort-level capital and EBITDA are disclosed."
+        }
+      },
+      {
+        "id": "replacement_cost_crosscheck",
+        "label": "Network replacement-cost cross-check",
+        "category": "infrastructure",
+        "overlap_key": "wbi_replacement_crosscheck",
+        "treatment": "embedded",
+        "included_in_component_id": "core_water_network",
+        "valuation": {
+          "basis": "per_share",
+          "low": 10.0,
+          "base": 18.0,
+          "high": 28.0,
+          "method": "depreciated_replacement_cost",
+          "evidence_tier": "filing_pp_and_e",
+          "evidence": "Pipelines, disposal capacity, rights-of-way, and permits provide an embedded asset floor but are already monetized by the core network.",
+          "cross_check": "Not additive to enterprise value."
+        }
+      }
+    ]
+  },
+  "component_valuation_results": {
+    "status": "complete",
+    "decision_rule": "Use the complete low/base/high component schedule. Embedded components are estimated but not added twice.",
+    "all_material_components_identified": true,
+    "additive_components": [
+      {
+        "id": "core_water_network",
+        "label": "Existing produced-water network enterprise value",
+        "category": "infrastructure",
+        "overlap_key": "wbi_core_network",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "normalized_ebitda_enterprise_value",
+        "evidence_tier": "q1_2026_guidance",
+        "evidence": "2026 adjusted EBITDA guidance is $425M-$465M. Values use $380M at 8x, $445M at 10x, and $500M at 12x.",
+        "cross_check": "Q1 2026 EBITDA was $102.9M on 2.5M bbl/d; merchant infrastructure is not a regulated rate base.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": null,
+        "falsifier": null,
+        "scenario_assumptions": null,
+        "low_per_share": 24.62,
+        "base_per_share": 36.05,
+        "high_per_share": 48.6
+      },
+      {
+        "id": "net_debt",
+        "label": "Net debt",
+        "category": "liability_or_reserve",
+        "overlap_key": "wbi_net_debt",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "balance_sheet_claim",
+        "evidence_tier": "q1_2026_10q",
+        "evidence": "March 2026 principal debt was $1.475B and cash was $50.7M.",
+        "cross_check": "Base net debt is approximately $1.424B, or $11.54 per economic unit.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": null,
+        "falsifier": null,
+        "scenario_assumptions": null,
+        "low_per_share": -12.5,
+        "base_per_share": -11.54,
+        "high_per_share": -10.5
+      },
+      {
+        "id": "contracted_growth_projects",
+        "label": "Speedway, Devon, and contracted growth beyond 2026",
+        "category": "real_option",
+        "overlap_key": "wbi_contracted_growth",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "milestone_project_option",
+        "evidence_tier": "company_contract_and_capex_guidance",
+        "evidence": "2026 capex guidance is $430M-$490M and includes Speedway plus projects supporting a Devon agreement beginning in 2027.",
+        "cross_check": "Only value beyond the normalized 2026 EBITDA run-rate is added; the core network value already includes the 2026 guide.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": null,
+        "falsifier": null,
+        "scenario_assumptions": null,
+        "low_per_share": 0.0,
+        "base_per_share": 3.0,
+        "high_per_share": 8.0
+      },
+      {
+        "id": "capex_execution_reserve",
+        "label": "Growth-capex execution reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "wbi_capex_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "capital_cycle_reserve",
+        "evidence_tier": "analyst_stress",
+        "evidence": "Reserve for cost overruns, delayed in-service dates, and returns below the cost of capital on the $430M-$490M program.",
+        "cross_check": "Released only after cohort-level capital and EBITDA are disclosed.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": null,
+        "falsifier": null,
+        "scenario_assumptions": null,
+        "low_per_share": -3.0,
+        "base_per_share": -1.0,
+        "high_per_share": 0.0
+      }
+    ],
+    "embedded_components": [
+      {
+        "id": "replacement_cost_crosscheck",
+        "label": "Network replacement-cost cross-check",
+        "category": "infrastructure",
+        "overlap_key": "wbi_replacement_crosscheck",
+        "treatment": "embedded",
+        "included_in_component_id": "core_water_network",
+        "method": "depreciated_replacement_cost",
+        "evidence_tier": "filing_pp_and_e",
+        "evidence": "Pipelines, disposal capacity, rights-of-way, and permits provide an embedded asset floor but are already monetized by the core network.",
+        "cross_check": "Not additive to enterprise value.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": null,
+        "falsifier": null,
+        "scenario_assumptions": null,
+        "low_per_share": 10.0,
+        "base_per_share": 18.0,
+        "high_per_share": 28.0
+      }
+    ],
+    "total_equity_value_per_share": {
+      "low": 9.12,
+      "base": 26.51,
+      "high": 46.1
+    },
+    "material_component_count": 5,
+    "additive_component_count": 4,
+    "embedded_component_count": 1,
+    "market_price_per_share": 34.46,
+    "upside_downside_pct": {
+      "low": -73.5,
+      "base": -23.1,
+      "high": 33.8
+    }
+  },
+  "component_review_queue": {
+    "status": "ready_for_committee_review",
+    "decision_rule": "Each assigned rater records accept, challenge, or reject with a proposed range and evidence. The aggregator may not silently average disputed ranges.",
+    "items": [
+      {
+        "component_id": "core_water_network",
+        "label": "Existing produced-water network enterprise value",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 24.62,
+          "base": 36.05,
+          "high": 48.6
+        },
+        "range_width_pct_of_base": 66.5,
+        "evidence_tier": "q1_2026_guidance",
+        "recommended_raters": [
+          "hohn",
+          "marathon_capital_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "net_debt",
+        "label": "Net debt",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": -12.5,
+          "base": -11.54,
+          "high": -10.5
+        },
+        "range_width_pct_of_base": 17.3,
+        "evidence_tier": "q1_2026_10q",
+        "recommended_raters": [
+          "marks_credit_cycle",
+          "pabrai"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "contracted_growth_projects",
+        "label": "Speedway, Devon, and contracted growth beyond 2026",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 3.0,
+          "high": 8.0
+        },
+        "range_width_pct_of_base": 266.7,
+        "evidence_tier": "company_contract_and_capex_guidance",
+        "recommended_raters": [
+          "klarman_asset_value",
+          "hk"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "capex_execution_reserve",
+        "label": "Growth-capex execution reserve",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": -3.0,
+          "base": -1.0,
+          "high": 0.0
+        },
+        "range_width_pct_of_base": 300.0,
+        "evidence_tier": "analyst_stress",
+        "recommended_raters": [
+          "marks_credit_cycle",
+          "pabrai"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "replacement_cost_crosscheck",
+        "label": "Network replacement-cost cross-check",
+        "treatment": "embedded",
+        "range_per_share": {
+          "low": 10.0,
+          "base": 18.0,
+          "high": 28.0
+        },
+        "range_width_pct_of_base": 100.0,
+        "evidence_tier": "filing_pp_and_e",
+        "recommended_raters": [
+          "hohn",
+          "marathon_capital_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      }
+    ]
+  },
+  "pricing_analysis": {
+    "schema_version": "1.0",
+    "as_of": "2026-07-15",
+    "price": 34.46,
+    "price_source": "Market quote 2026-07-15 17:22 UTC",
+    "economic_units": 123456209,
+    "economic_claim_note": "Each Class A share corresponds economically to one OpCo unit. Valuation uses 47.016 million Class A plus 76.440 million Class B/OpCo units. The prior Class-A-only denominator materially overstated consolidated free cash flow per listed share.",
+    "component_value_per_share": {
+      "low": 9.12,
+      "base": 26.51,
+      "high": 46.1
+    },
+    "upside_downside_pct": {
+      "low": -73.5,
+      "base": -23.1,
+      "high": 33.8
+    },
+    "base_value_supported_by_current_or_contracted_assets": 23.51,
+    "market_price_above_current_or_contracted_value": 10.95,
+    "market_implied_constant_owner_cash_growth_pct": 3.7,
+    "implied_growth_contract": "Constant 7-year owner-cash growth with a 12x terminal owner-cash multiple; diagnostic, not forecast.",
+    "entry_prices_by_hurdle_and_case": {
+      "bear": {
+        "10pct": 16.05,
+        "12pct": 14.57,
+        "15pct": 12.67,
+        "20pct": 10.2
+      },
+      "base": {
+        "10pct": 23.65,
+        "12pct": 21.33,
+        "15pct": 18.37,
+        "20pct": 14.55
+      },
+      "bull": {
+        "10pct": 32.98,
+        "12pct": 29.61,
+        "15pct": 25.32,
+        "20pct": 19.79
+      }
+    },
+    "primary_entry_price_15pct_base": 18.37,
+    "decision": "watch_below_base_value",
+    "strongest_counter_explanation": "The network may compound faster and with less risk than the model assumes because long-term dedications, MVCs, water intensity, and contiguous scale allow high-return brownfield expansion and rapid deleveraging after the 2026 build cycle.",
+    "falsifiers": [
+      "Maintenance capital is demonstrated below $80M while 2026 EBITDA reaches or exceeds $465M.",
+      "Net leverage falls below 2.5x without reducing the contracted growth program.",
+      "Speedway and Devon cohorts earn incremental after-tax ROIC above 18% on disclosed capital."
+    ],
+    "pricing_conclusion": "WaterBridge has valuable scale and contracted growth, but $34.46 is above the $26.51 base equity value and assumes successful execution of a $430M-$490M capital program with limited cost overruns. A base-case 15% entry price is materially lower; the current quote is a watch rather than an approval.",
+    "economic_value_bridge": {
+      "schema_version": "1.0",
+      "status": "complete",
+      "trigger": {
+        "required": true,
+        "reasons": [
+          "explicit_component_schedule"
+        ],
+        "policy": "A complete economic-value analysis is required when any trigger fires; otherwise it is recommended."
+      },
+      "method": "contracted_infrastructure_cash_flow_plus_replacement_cost_crosscheck",
+      "economic_claim": {
+        "description": "Each Class A share corresponds economically to one OpCo unit. Valuation uses 47.016 million Class A plus 76.440 million Class B/OpCo units. The prior Class-A-only denominator materially overstated consolidated free cash flow per listed share.",
+        "unit_label": "common economic unit",
+        "unit_count": 123456209,
+        "unit_source": "valuation.inputs.shares_outstanding",
+        "enterprise_to_equity_reconciliation": "The complete additive component schedule includes operating assets, financial assets, debt or financing claims, minority interests where applicable, and realization reserves before division by the stated economic units."
+      },
+      "gaap_role": "reference_only",
+      "accounting_reference": "The network includes approximately 2,500 miles of pipeline, 197 facilities, more than 4.5M bpd of capacity, and long-term dedications; tangible book value is not the primary valuation method.",
+      "comparable_hierarchy": [
+        "issuer_arm_length_transaction",
+        "same_asset_transaction",
+        "public_peer",
+        "replacement_cost",
+        "approved_external_analysis"
+      ],
+      "gross_comparable_nav_per_share": null,
+      "risked_present_value_per_share": {
+        "low": 9.12,
+        "base": 26.51,
+        "high": 46.1
+      },
+      "component_groups": [
+        {
+          "id": "network",
+          "label": "Existing produced-water network",
+          "component_ids": [
+            "core_water_network"
+          ],
+          "valuation_basis": "$380M/$445M/$500M normalized EBITDA at 8x/10x/12x. A January 2025 Gravity Water transaction printed near 5.5x run-rate EBITDA, so WaterBridge's base requires a premium for scale, contracts, and network effects.",
+          "overlap_control": "The $10/$18/$28 per-share replacement-cost cross-check is embedded and never added to enterprise value.",
+          "economic_claim": "Existing produced-water network",
+          "adjustments": "Apply the production, contract, location, capital-intensity, ownership, timing, and realization adjustments described in _system/reviews/economic_value_comparable_audit_2026-07-15.md.",
+          "comparable_ids": [
+            "gravity_water_2025"
+          ],
+          "risk_and_timing": {
+            "probability_basis": "The component low/base/high range or milestone driver explicitly risks realization; uncertainty widens the range rather than creating a zero.",
+            "timing_basis": "Discounting, realization friction, and the component assumptions reflect the time required to contract, develop, or monetize the claim.",
+            "remaining_capital_basis": "Remaining owner-funded capital is deducted in the driver where disclosed; otherwise the range and realization reserve reflect the unresolved capital burden."
+          },
+          "risked_present_value_per_share": {
+            "low": 24.62,
+            "base": 36.05,
+            "high": 48.6
+          }
+        },
+        {
+          "id": "debt",
+          "label": "Net debt",
+          "component_ids": [
+            "net_debt"
+          ],
+          "valuation_basis": "March 2026 debt principal less cash across all 123.456M economic units.",
+          "overlap_control": "Deducted once from network enterprise value.",
+          "economic_claim": "Net debt",
+          "adjustments": "Apply the production, contract, location, capital-intensity, ownership, timing, and realization adjustments described in _system/reviews/economic_value_comparable_audit_2026-07-15.md.",
+          "comparable_ids": [],
+          "risk_and_timing": {
+            "probability_basis": "The component low/base/high range or milestone driver explicitly risks realization; uncertainty widens the range rather than creating a zero.",
+            "timing_basis": "Discounting, realization friction, and the component assumptions reflect the time required to contract, develop, or monetize the claim.",
+            "remaining_capital_basis": "Remaining owner-funded capital is deducted in the driver where disclosed; otherwise the range and realization reserve reflect the unresolved capital burden."
+          },
+          "risked_present_value_per_share": {
+            "low": -12.5,
+            "base": -11.54,
+            "high": -10.5
+          }
+        },
+        {
+          "id": "contracted_growth",
+          "label": "Speedway, Devon, and contracted projects beyond 2026",
+          "component_ids": [
+            "contracted_growth_projects"
+          ],
+          "valuation_basis": "Only value beyond normalized 2026 EBITDA; project value must ultimately be supported by incremental EBITDA and after-tax ROIC.",
+          "overlap_control": "2026 guidance and projects already contributing to it stay in the core network.",
+          "economic_claim": "Speedway, Devon, and contracted projects beyond 2026",
+          "adjustments": "Apply the production, contract, location, capital-intensity, ownership, timing, and realization adjustments described in _system/reviews/economic_value_comparable_audit_2026-07-15.md.",
+          "comparable_ids": [],
+          "risk_and_timing": {
+            "probability_basis": "The component low/base/high range or milestone driver explicitly risks realization; uncertainty widens the range rather than creating a zero.",
+            "timing_basis": "Discounting, realization friction, and the component assumptions reflect the time required to contract, develop, or monetize the claim.",
+            "remaining_capital_basis": "Remaining owner-funded capital is deducted in the driver where disclosed; otherwise the range and realization reserve reflect the unresolved capital burden."
+          },
+          "risked_present_value_per_share": {
+            "low": 0.0,
+            "base": 3.0,
+            "high": 8.0
+          }
+        },
+        {
+          "id": "execution_reserve",
+          "label": "Growth-capex execution reserve",
+          "component_ids": [
+            "capex_execution_reserve"
+          ],
+          "valuation_basis": "Reserve against the $430M-$490M 2026 program until cohort-level capital and returns are disclosed.",
+          "overlap_control": "Offsets only project execution risk, not recurring maintenance capital already reflected in normalized owner cash.",
+          "economic_claim": "Growth-capex execution reserve",
+          "adjustments": "Apply the production, contract, location, capital-intensity, ownership, timing, and realization adjustments described in _system/reviews/economic_value_comparable_audit_2026-07-15.md.",
+          "comparable_ids": [],
+          "risk_and_timing": {
+            "probability_basis": "The component low/base/high range or milestone driver explicitly risks realization; uncertainty widens the range rather than creating a zero.",
+            "timing_basis": "Discounting, realization friction, and the component assumptions reflect the time required to contract, develop, or monetize the claim.",
+            "remaining_capital_basis": "Remaining owner-funded capital is deducted in the driver where disclosed; otherwise the range and realization reserve reflect the unresolved capital burden."
+          },
+          "risked_present_value_per_share": {
+            "low": -3.0,
+            "base": -1.0,
+            "high": 0.0
+          }
+        }
+      ],
+      "valuation_proof": [
+        {
+          "component_id": "core_water_network",
+          "economic_claim": "Existing produced-water network",
+          "quantity": {
+            "value": 1,
+            "unit": "per-share economic claim"
+          },
+          "method": "normalized_ebitda_enterprise_value",
+          "evidence_tier": "q1_2026_guidance",
+          "evidence": "2026 adjusted EBITDA guidance is $425M-$465M. Values use $380M at 8x, $445M at 10x, and $500M at 12x.",
+          "comparable_role": "primary_or_cross_check",
+          "comparable_ids": [
+            "gravity_water_2025"
+          ],
+          "adjustment": "Apply the production, contract, location, capital-intensity, ownership, timing, and realization adjustments described in _system/reviews/economic_value_comparable_audit_2026-07-15.md.",
+          "range_per_share": {
+            "low": 24.62,
+            "base": 36.05,
+            "high": 48.6
+          },
+          "treatment": "additive",
+          "overlap_key": "wbi_core_network",
+          "overlap_control": "The $10/$18/$28 per-share replacement-cost cross-check is embedded and never added to enterprise value.",
+          "falsifier": "Utilization, incremental after-tax return on capital, or contract economics fall below the low-case assumptions.",
+          "risk_and_timing": null
+        },
+        {
+          "component_id": "net_debt",
+          "economic_claim": "Net debt",
+          "quantity": {
+            "value": 1,
+            "unit": "per-share economic claim"
+          },
+          "method": "balance_sheet_claim",
+          "evidence_tier": "q1_2026_10q",
+          "evidence": "March 2026 principal debt was $1.475B and cash was $50.7M.",
+          "comparable_role": "not_applicable",
+          "comparable_ids": [],
+          "adjustment": "Apply the production, contract, location, capital-intensity, ownership, timing, and realization adjustments described in _system/reviews/economic_value_comparable_audit_2026-07-15.md.",
+          "range_per_share": {
+            "low": -12.5,
+            "base": -11.54,
+            "high": -10.5
+          },
+          "treatment": "additive",
+          "overlap_key": "wbi_net_debt",
+          "overlap_control": "Deducted once from network enterprise value.",
+          "falsifier": "The obligation, financing claim, tax, or realization friction is materially larger than the low-case reserve.",
+          "risk_and_timing": null
+        },
+        {
+          "component_id": "contracted_growth_projects",
+          "economic_claim": "Speedway, Devon, and contracted projects beyond 2026",
+          "quantity": {
+            "value": 1,
+            "unit": "per-share economic claim"
+          },
+          "method": "milestone_project_option",
+          "evidence_tier": "company_contract_and_capex_guidance",
+          "evidence": "2026 capex guidance is $430M-$490M and includes Speedway plus projects supporting a Devon agreement beginning in 2027.",
+          "comparable_role": "not_applicable",
+          "comparable_ids": [],
+          "adjustment": "Apply the production, contract, location, capital-intensity, ownership, timing, and realization adjustments described in _system/reviews/economic_value_comparable_audit_2026-07-15.md.",
+          "range_per_share": {
+            "low": 0.0,
+            "base": 3.0,
+            "high": 8.0
+          },
+          "treatment": "additive",
+          "overlap_key": "wbi_contracted_growth",
+          "overlap_control": "2026 guidance and projects already contributing to it stay in the core network.",
+          "falsifier": "The next decision milestone fails, remaining capital rises materially, or the stated success probability no longer fits observable progress.",
+          "risk_and_timing": {
+            "success_probability": null,
+            "remaining_capital_m": null,
+            "timing_basis": "Discounting, realization friction, and the component assumptions reflect the time required to contract, develop, or monetize the claim.",
+            "probability_basis": "The component low/base/high range or milestone driver explicitly risks realization; uncertainty widens the range rather than creating a zero.",
+            "remaining_capital_basis": "Remaining owner-funded capital is deducted in the driver where disclosed; otherwise the range and realization reserve reflect the unresolved capital burden."
+          }
+        },
+        {
+          "component_id": "capex_execution_reserve",
+          "economic_claim": "Growth-capex execution reserve",
+          "quantity": {
+            "value": 1,
+            "unit": "per-share economic claim"
+          },
+          "method": "capital_cycle_reserve",
+          "evidence_tier": "analyst_stress",
+          "evidence": "Reserve for cost overruns, delayed in-service dates, and returns below the cost of capital on the $430M-$490M program.",
+          "comparable_role": "not_applicable",
+          "comparable_ids": [],
+          "adjustment": "Apply the production, contract, location, capital-intensity, ownership, timing, and realization adjustments described in _system/reviews/economic_value_comparable_audit_2026-07-15.md.",
+          "range_per_share": {
+            "low": -3.0,
+            "base": -1.0,
+            "high": 0.0
+          },
+          "treatment": "additive",
+          "overlap_key": "wbi_capex_reserve",
+          "overlap_control": "Offsets only project execution risk, not recurring maintenance capital already reflected in normalized owner cash.",
+          "falsifier": "The obligation, financing claim, tax, or realization friction is materially larger than the low-case reserve.",
+          "risk_and_timing": null
+        },
+        {
+          "component_id": "replacement_cost_crosscheck",
+          "economic_claim": "Existing produced-water network",
+          "quantity": {
+            "value": 1,
+            "unit": "per-share economic claim"
+          },
+          "method": "depreciated_replacement_cost",
+          "evidence_tier": "filing_pp_and_e",
+          "evidence": "Pipelines, disposal capacity, rights-of-way, and permits provide an embedded asset floor but are already monetized by the core network.",
+          "comparable_role": "primary_or_cross_check",
+          "comparable_ids": [
+            "gravity_water_2025"
+          ],
+          "adjustment": "Apply the production, contract, location, capital-intensity, ownership, timing, and realization adjustments described in _system/reviews/economic_value_comparable_audit_2026-07-15.md.",
+          "range_per_share": {
+            "low": 10.0,
+            "base": 18.0,
+            "high": 28.0
+          },
+          "treatment": "embedded",
+          "overlap_key": "wbi_replacement_crosscheck",
+          "overlap_control": "The $10/$18/$28 per-share replacement-cost cross-check is embedded and never added to enterprise value.",
+          "falsifier": "Utilization, incremental after-tax return on capital, or contract economics fall below the low-case assumptions.",
+          "risk_and_timing": null
+        }
+      ],
+      "wisdom_applied": [
+        "Marathon/Capital Returns: a large build program creates value only when incremental returns exceed the cost of capital.",
+        "Marks/Oaktree: leverage and refinancing claims are deducted before attributing network optionality to common units.",
+        "Hohn: density, long-term contracts, and brownfield expansion can create a moat, but maintenance and growth capital must be separated.",
+        "Groundbreaker context: local water scarcity supports terminal relevance; it does not convert a capital-intensive operator into a capital-free royalty company."
+      ],
+      "limitations": [
+        "Public cohort-level capex and EBITDA data are insufficient to verify management's incremental return claims.",
+        "The Gravity Water transaction is smaller and less contracted than WaterBridge, while public midstream peers have different commodity, basin, and contract mixes.",
+        "Replacement cost is not liquidation value and can exceed economic value when capacity is underutilized."
+      ],
+      "complete_component_coverage": true,
+      "validation_errors": [],
+      "registry_version": "1.0"
+    },
+    "committee_routing": {
+      "stage": "round_one_open",
+      "packet_hash": "5959e286b0ac6a76573e2578890a30b15477345ad71ec11ee376c4e4e0925d7d",
+      "selected_raters": [
+        "hohn",
+        "marathon_capital_cycle",
+        "marks_credit_cycle"
+      ],
+      "independence_groups": [
+        "competitive_advantage",
+        "capital_cycle",
+        "credit_cycle"
+      ]
+    }
+  },
+  "economic_value": {
+    "schema_version": "1.0",
+    "method": "contracted_infrastructure_cash_flow_plus_replacement_cost_crosscheck",
+    "economic_claim": {
+      "description": "Each Class A share corresponds economically to one OpCo unit. Valuation uses 47.016 million Class A plus 76.440 million Class B/OpCo units. The prior Class-A-only denominator materially overstated consolidated free cash flow per listed share.",
+      "unit_label": "common economic unit",
+      "unit_count": 123456209,
+      "unit_source": "valuation.inputs.shares_outstanding",
+      "enterprise_to_equity_reconciliation": "The complete additive component schedule includes operating assets, financial assets, debt or financing claims, minority interests where applicable, and realization reserves before division by the stated economic units."
+    },
+    "gaap_role": "reference_only",
+    "gaap_role_explanation": "Secondary cross-check only. Net PP&E and acquisition accounting do not capture assembled rights-of-way, permits, dedication density, or the value of a connected network, but unlike a royalty owner WaterBridge must fund substantial capital.",
+    "accounting_reference": "The network includes approximately 2,500 miles of pipeline, 197 facilities, more than 4.5M bpd of capacity, and long-term dedications; tangible book value is not the primary valuation method.",
+    "comparable_hierarchy": [
+      "issuer_arm_length_transaction",
+      "same_asset_transaction",
+      "public_peer",
+      "replacement_cost",
+      "approved_external_analysis"
+    ],
+    "component_groups": [
+      {
+        "id": "network",
+        "label": "Existing produced-water network",
+        "component_ids": [
+          "core_water_network"
+        ],
+        "valuation_basis": "$380M/$445M/$500M normalized EBITDA at 8x/10x/12x. A January 2025 Gravity Water transaction printed near 5.5x run-rate EBITDA, so WaterBridge's base requires a premium for scale, contracts, and network effects.",
+        "overlap_control": "The $10/$18/$28 per-share replacement-cost cross-check is embedded and never added to enterprise value.",
+        "economic_claim": "Existing produced-water network",
+        "adjustments": "Apply the production, contract, location, capital-intensity, ownership, timing, and realization adjustments described in _system/reviews/economic_value_comparable_audit_2026-07-15.md.",
+        "comparable_ids": [
+          "gravity_water_2025"
+        ],
+        "risk_and_timing": {
+          "probability_basis": "The component low/base/high range or milestone driver explicitly risks realization; uncertainty widens the range rather than creating a zero.",
+          "timing_basis": "Discounting, realization friction, and the component assumptions reflect the time required to contract, develop, or monetize the claim.",
+          "remaining_capital_basis": "Remaining owner-funded capital is deducted in the driver where disclosed; otherwise the range and realization reserve reflect the unresolved capital burden."
+        }
+      },
+      {
+        "id": "debt",
+        "label": "Net debt",
+        "component_ids": [
+          "net_debt"
+        ],
+        "valuation_basis": "March 2026 debt principal less cash across all 123.456M economic units.",
+        "overlap_control": "Deducted once from network enterprise value.",
+        "economic_claim": "Net debt",
+        "adjustments": "Apply the production, contract, location, capital-intensity, ownership, timing, and realization adjustments described in _system/reviews/economic_value_comparable_audit_2026-07-15.md.",
+        "comparable_ids": [],
+        "risk_and_timing": {
+          "probability_basis": "The component low/base/high range or milestone driver explicitly risks realization; uncertainty widens the range rather than creating a zero.",
+          "timing_basis": "Discounting, realization friction, and the component assumptions reflect the time required to contract, develop, or monetize the claim.",
+          "remaining_capital_basis": "Remaining owner-funded capital is deducted in the driver where disclosed; otherwise the range and realization reserve reflect the unresolved capital burden."
+        }
+      },
+      {
+        "id": "contracted_growth",
+        "label": "Speedway, Devon, and contracted projects beyond 2026",
+        "component_ids": [
+          "contracted_growth_projects"
+        ],
+        "valuation_basis": "Only value beyond normalized 2026 EBITDA; project value must ultimately be supported by incremental EBITDA and after-tax ROIC.",
+        "overlap_control": "2026 guidance and projects already contributing to it stay in the core network.",
+        "economic_claim": "Speedway, Devon, and contracted projects beyond 2026",
+        "adjustments": "Apply the production, contract, location, capital-intensity, ownership, timing, and realization adjustments described in _system/reviews/economic_value_comparable_audit_2026-07-15.md.",
+        "comparable_ids": [],
+        "risk_and_timing": {
+          "probability_basis": "The component low/base/high range or milestone driver explicitly risks realization; uncertainty widens the range rather than creating a zero.",
+          "timing_basis": "Discounting, realization friction, and the component assumptions reflect the time required to contract, develop, or monetize the claim.",
+          "remaining_capital_basis": "Remaining owner-funded capital is deducted in the driver where disclosed; otherwise the range and realization reserve reflect the unresolved capital burden."
+        }
+      },
+      {
+        "id": "execution_reserve",
+        "label": "Growth-capex execution reserve",
+        "component_ids": [
+          "capex_execution_reserve"
+        ],
+        "valuation_basis": "Reserve against the $430M-$490M 2026 program until cohort-level capital and returns are disclosed.",
+        "overlap_control": "Offsets only project execution risk, not recurring maintenance capital already reflected in normalized owner cash.",
+        "economic_claim": "Growth-capex execution reserve",
+        "adjustments": "Apply the production, contract, location, capital-intensity, ownership, timing, and realization adjustments described in _system/reviews/economic_value_comparable_audit_2026-07-15.md.",
+        "comparable_ids": [],
+        "risk_and_timing": {
+          "probability_basis": "The component low/base/high range or milestone driver explicitly risks realization; uncertainty widens the range rather than creating a zero.",
+          "timing_basis": "Discounting, realization friction, and the component assumptions reflect the time required to contract, develop, or monetize the claim.",
+          "remaining_capital_basis": "Remaining owner-funded capital is deducted in the driver where disclosed; otherwise the range and realization reserve reflect the unresolved capital burden."
+        }
+      }
+    ],
+    "wisdom_applied": [
+      "Marathon/Capital Returns: a large build program creates value only when incremental returns exceed the cost of capital.",
+      "Marks/Oaktree: leverage and refinancing claims are deducted before attributing network optionality to common units.",
+      "Hohn: density, long-term contracts, and brownfield expansion can create a moat, but maintenance and growth capital must be separated.",
+      "Groundbreaker context: local water scarcity supports terminal relevance; it does not convert a capital-intensive operator into a capital-free royalty company."
+    ],
+    "limitations": [
+      "Public cohort-level capex and EBITDA data are insufficient to verify management's incremental return claims.",
+      "The Gravity Water transaction is smaller and less contracted than WaterBridge, while public midstream peers have different commodity, basin, and contract mixes.",
+      "Replacement cost is not liquidation value and can exceed economic value when capacity is underutilized."
+    ]
+  },
+  "economic_value_analysis": {
+    "schema_version": "1.0",
+    "status": "complete",
+    "trigger": {
+      "required": true,
+      "reasons": [
+        "explicit_component_schedule"
+      ],
+      "policy": "A complete economic-value analysis is required when any trigger fires; otherwise it is recommended."
+    },
+    "method": "contracted_infrastructure_cash_flow_plus_replacement_cost_crosscheck",
+    "economic_claim": {
+      "description": "Each Class A share corresponds economically to one OpCo unit. Valuation uses 47.016 million Class A plus 76.440 million Class B/OpCo units. The prior Class-A-only denominator materially overstated consolidated free cash flow per listed share.",
+      "unit_label": "common economic unit",
+      "unit_count": 123456209,
+      "unit_source": "valuation.inputs.shares_outstanding",
+      "enterprise_to_equity_reconciliation": "The complete additive component schedule includes operating assets, financial assets, debt or financing claims, minority interests where applicable, and realization reserves before division by the stated economic units."
+    },
+    "gaap_role": "reference_only",
+    "accounting_reference": "The network includes approximately 2,500 miles of pipeline, 197 facilities, more than 4.5M bpd of capacity, and long-term dedications; tangible book value is not the primary valuation method.",
+    "comparable_hierarchy": [
+      "issuer_arm_length_transaction",
+      "same_asset_transaction",
+      "public_peer",
+      "replacement_cost",
+      "approved_external_analysis"
+    ],
+    "gross_comparable_nav_per_share": null,
+    "risked_present_value_per_share": {
+      "low": 9.12,
+      "base": 26.51,
+      "high": 46.1
+    },
+    "component_groups": [
+      {
+        "id": "network",
+        "label": "Existing produced-water network",
+        "component_ids": [
+          "core_water_network"
+        ],
+        "valuation_basis": "$380M/$445M/$500M normalized EBITDA at 8x/10x/12x. A January 2025 Gravity Water transaction printed near 5.5x run-rate EBITDA, so WaterBridge's base requires a premium for scale, contracts, and network effects.",
+        "overlap_control": "The $10/$18/$28 per-share replacement-cost cross-check is embedded and never added to enterprise value.",
+        "economic_claim": "Existing produced-water network",
+        "adjustments": "Apply the production, contract, location, capital-intensity, ownership, timing, and realization adjustments described in _system/reviews/economic_value_comparable_audit_2026-07-15.md.",
+        "comparable_ids": [
+          "gravity_water_2025"
+        ],
+        "risk_and_timing": {
+          "probability_basis": "The component low/base/high range or milestone driver explicitly risks realization; uncertainty widens the range rather than creating a zero.",
+          "timing_basis": "Discounting, realization friction, and the component assumptions reflect the time required to contract, develop, or monetize the claim.",
+          "remaining_capital_basis": "Remaining owner-funded capital is deducted in the driver where disclosed; otherwise the range and realization reserve reflect the unresolved capital burden."
+        },
+        "risked_present_value_per_share": {
+          "low": 24.62,
+          "base": 36.05,
+          "high": 48.6
+        }
+      },
+      {
+        "id": "debt",
+        "label": "Net debt",
+        "component_ids": [
+          "net_debt"
+        ],
+        "valuation_basis": "March 2026 debt principal less cash across all 123.456M economic units.",
+        "overlap_control": "Deducted once from network enterprise value.",
+        "economic_claim": "Net debt",
+        "adjustments": "Apply the production, contract, location, capital-intensity, ownership, timing, and realization adjustments described in _system/reviews/economic_value_comparable_audit_2026-07-15.md.",
+        "comparable_ids": [],
+        "risk_and_timing": {
+          "probability_basis": "The component low/base/high range or milestone driver explicitly risks realization; uncertainty widens the range rather than creating a zero.",
+          "timing_basis": "Discounting, realization friction, and the component assumptions reflect the time required to contract, develop, or monetize the claim.",
+          "remaining_capital_basis": "Remaining owner-funded capital is deducted in the driver where disclosed; otherwise the range and realization reserve reflect the unresolved capital burden."
+        },
+        "risked_present_value_per_share": {
+          "low": -12.5,
+          "base": -11.54,
+          "high": -10.5
+        }
+      },
+      {
+        "id": "contracted_growth",
+        "label": "Speedway, Devon, and contracted projects beyond 2026",
+        "component_ids": [
+          "contracted_growth_projects"
+        ],
+        "valuation_basis": "Only value beyond normalized 2026 EBITDA; project value must ultimately be supported by incremental EBITDA and after-tax ROIC.",
+        "overlap_control": "2026 guidance and projects already contributing to it stay in the core network.",
+        "economic_claim": "Speedway, Devon, and contracted projects beyond 2026",
+        "adjustments": "Apply the production, contract, location, capital-intensity, ownership, timing, and realization adjustments described in _system/reviews/economic_value_comparable_audit_2026-07-15.md.",
+        "comparable_ids": [],
+        "risk_and_timing": {
+          "probability_basis": "The component low/base/high range or milestone driver explicitly risks realization; uncertainty widens the range rather than creating a zero.",
+          "timing_basis": "Discounting, realization friction, and the component assumptions reflect the time required to contract, develop, or monetize the claim.",
+          "remaining_capital_basis": "Remaining owner-funded capital is deducted in the driver where disclosed; otherwise the range and realization reserve reflect the unresolved capital burden."
+        },
+        "risked_present_value_per_share": {
+          "low": 0.0,
+          "base": 3.0,
+          "high": 8.0
+        }
+      },
+      {
+        "id": "execution_reserve",
+        "label": "Growth-capex execution reserve",
+        "component_ids": [
+          "capex_execution_reserve"
+        ],
+        "valuation_basis": "Reserve against the $430M-$490M 2026 program until cohort-level capital and returns are disclosed.",
+        "overlap_control": "Offsets only project execution risk, not recurring maintenance capital already reflected in normalized owner cash.",
+        "economic_claim": "Growth-capex execution reserve",
+        "adjustments": "Apply the production, contract, location, capital-intensity, ownership, timing, and realization adjustments described in _system/reviews/economic_value_comparable_audit_2026-07-15.md.",
+        "comparable_ids": [],
+        "risk_and_timing": {
+          "probability_basis": "The component low/base/high range or milestone driver explicitly risks realization; uncertainty widens the range rather than creating a zero.",
+          "timing_basis": "Discounting, realization friction, and the component assumptions reflect the time required to contract, develop, or monetize the claim.",
+          "remaining_capital_basis": "Remaining owner-funded capital is deducted in the driver where disclosed; otherwise the range and realization reserve reflect the unresolved capital burden."
+        },
+        "risked_present_value_per_share": {
+          "low": -3.0,
+          "base": -1.0,
+          "high": 0.0
+        }
+      }
+    ],
+    "valuation_proof": [
+      {
+        "component_id": "core_water_network",
+        "economic_claim": "Existing produced-water network",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "normalized_ebitda_enterprise_value",
+        "evidence_tier": "q1_2026_guidance",
+        "evidence": "2026 adjusted EBITDA guidance is $425M-$465M. Values use $380M at 8x, $445M at 10x, and $500M at 12x.",
+        "comparable_role": "primary_or_cross_check",
+        "comparable_ids": [
+          "gravity_water_2025"
+        ],
+        "adjustment": "Apply the production, contract, location, capital-intensity, ownership, timing, and realization adjustments described in _system/reviews/economic_value_comparable_audit_2026-07-15.md.",
+        "range_per_share": {
+          "low": 24.62,
+          "base": 36.05,
+          "high": 48.6
+        },
+        "treatment": "additive",
+        "overlap_key": "wbi_core_network",
+        "overlap_control": "The $10/$18/$28 per-share replacement-cost cross-check is embedded and never added to enterprise value.",
+        "falsifier": "Utilization, incremental after-tax return on capital, or contract economics fall below the low-case assumptions.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "net_debt",
+        "economic_claim": "Net debt",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "balance_sheet_claim",
+        "evidence_tier": "q1_2026_10q",
+        "evidence": "March 2026 principal debt was $1.475B and cash was $50.7M.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Apply the production, contract, location, capital-intensity, ownership, timing, and realization adjustments described in _system/reviews/economic_value_comparable_audit_2026-07-15.md.",
+        "range_per_share": {
+          "low": -12.5,
+          "base": -11.54,
+          "high": -10.5
+        },
+        "treatment": "additive",
+        "overlap_key": "wbi_net_debt",
+        "overlap_control": "Deducted once from network enterprise value.",
+        "falsifier": "The obligation, financing claim, tax, or realization friction is materially larger than the low-case reserve.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "contracted_growth_projects",
+        "economic_claim": "Speedway, Devon, and contracted projects beyond 2026",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "milestone_project_option",
+        "evidence_tier": "company_contract_and_capex_guidance",
+        "evidence": "2026 capex guidance is $430M-$490M and includes Speedway plus projects supporting a Devon agreement beginning in 2027.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Apply the production, contract, location, capital-intensity, ownership, timing, and realization adjustments described in _system/reviews/economic_value_comparable_audit_2026-07-15.md.",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 3.0,
+          "high": 8.0
+        },
+        "treatment": "additive",
+        "overlap_key": "wbi_contracted_growth",
+        "overlap_control": "2026 guidance and projects already contributing to it stay in the core network.",
+        "falsifier": "The next decision milestone fails, remaining capital rises materially, or the stated success probability no longer fits observable progress.",
+        "risk_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "Discounting, realization friction, and the component assumptions reflect the time required to contract, develop, or monetize the claim.",
+          "probability_basis": "The component low/base/high range or milestone driver explicitly risks realization; uncertainty widens the range rather than creating a zero.",
+          "remaining_capital_basis": "Remaining owner-funded capital is deducted in the driver where disclosed; otherwise the range and realization reserve reflect the unresolved capital burden."
+        }
+      },
+      {
+        "component_id": "capex_execution_reserve",
+        "economic_claim": "Growth-capex execution reserve",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "capital_cycle_reserve",
+        "evidence_tier": "analyst_stress",
+        "evidence": "Reserve for cost overruns, delayed in-service dates, and returns below the cost of capital on the $430M-$490M program.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Apply the production, contract, location, capital-intensity, ownership, timing, and realization adjustments described in _system/reviews/economic_value_comparable_audit_2026-07-15.md.",
+        "range_per_share": {
+          "low": -3.0,
+          "base": -1.0,
+          "high": 0.0
+        },
+        "treatment": "additive",
+        "overlap_key": "wbi_capex_reserve",
+        "overlap_control": "Offsets only project execution risk, not recurring maintenance capital already reflected in normalized owner cash.",
+        "falsifier": "The obligation, financing claim, tax, or realization friction is materially larger than the low-case reserve.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "replacement_cost_crosscheck",
+        "economic_claim": "Existing produced-water network",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "depreciated_replacement_cost",
+        "evidence_tier": "filing_pp_and_e",
+        "evidence": "Pipelines, disposal capacity, rights-of-way, and permits provide an embedded asset floor but are already monetized by the core network.",
+        "comparable_role": "primary_or_cross_check",
+        "comparable_ids": [
+          "gravity_water_2025"
+        ],
+        "adjustment": "Apply the production, contract, location, capital-intensity, ownership, timing, and realization adjustments described in _system/reviews/economic_value_comparable_audit_2026-07-15.md.",
+        "range_per_share": {
+          "low": 10.0,
+          "base": 18.0,
+          "high": 28.0
+        },
+        "treatment": "embedded",
+        "overlap_key": "wbi_replacement_crosscheck",
+        "overlap_control": "The $10/$18/$28 per-share replacement-cost cross-check is embedded and never added to enterprise value.",
+        "falsifier": "Utilization, incremental after-tax return on capital, or contract economics fall below the low-case assumptions.",
+        "risk_and_timing": null
+      }
+    ],
+    "wisdom_applied": [
+      "Marathon/Capital Returns: a large build program creates value only when incremental returns exceed the cost of capital.",
+      "Marks/Oaktree: leverage and refinancing claims are deducted before attributing network optionality to common units.",
+      "Hohn: density, long-term contracts, and brownfield expansion can create a moat, but maintenance and growth capital must be separated.",
+      "Groundbreaker context: local water scarcity supports terminal relevance; it does not convert a capital-intensive operator into a capital-free royalty company."
+    ],
+    "limitations": [
+      "Public cohort-level capex and EBITDA data are insufficient to verify management's incremental return claims.",
+      "The Gravity Water transaction is smaller and less contracted than WaterBridge, while public midstream peers have different commodity, basin, and contract mixes.",
+      "Replacement cost is not liquidation value and can exceed economic value when capacity is underutilized."
+    ],
+    "complete_component_coverage": true,
+    "validation_errors": [],
+    "registry_version": "1.0"
   }
 }

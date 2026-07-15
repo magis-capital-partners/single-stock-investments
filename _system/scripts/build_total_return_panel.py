@@ -176,6 +176,43 @@ def coverage_status(coverage: dict, history_start: str | None, history_end: str 
     return "complete", None
 
 
+def compute_period_total_return(ticker: str, start: str, end: str) -> dict:
+    """Compute a decision-date total return using the same verified event ledger as the dashboard."""
+    t = ticker.upper()
+    row = registry_row(t) or {}
+    symbol = yahoo_symbol_for(t, row.get("market", "US"), row.get("exchange", ""))
+    dates, prices, vendor_events, meta, source = fetch_yahoo_history(symbol)
+    events, coverage = load_event_ledger(t, vendor_events)
+    selected = [i for i, day in enumerate(dates) if start <= day <= end]
+    if len(selected) < 2:
+        return {"return_status": "evidence_blocked", "error": "fewer than two trading dates in measurement window"}
+    first, last = selected[0], selected[-1]
+    period_dates, period_prices = dates[first:last + 1], prices[first:last + 1]
+    # A decision made at the close does not receive a same-day ex-date distribution.
+    period_events = [event for event in events if period_dates[0] < (event.get("ex_date") or "") <= period_dates[-1]]
+    status, error = coverage_status(coverage, period_dates[0], period_dates[-1], period_events)
+    wealth = build_wealth_series(period_dates, period_prices, period_events)
+    total_index = wealth.get("total_return_index") or []
+    span_days = (date.fromisoformat(period_dates[-1]) - date.fromisoformat(period_dates[0])).days
+    total_return = total_index[-1] - 100 if total_index else None
+    return {
+        "return_status": "complete" if status == "complete" and total_return is not None else status,
+        "error": error,
+        "ticker": t,
+        "decision_date": start,
+        "measurement_date": end,
+        "actual_start_date": period_dates[0],
+        "actual_end_date": period_dates[-1],
+        "horizon_days": span_days,
+        "total_return_pct": round(total_return, 2) if total_return is not None else None,
+        "annualized_total_return_pct": round(annualized_from_index(total_index[-1], span_days), 2) if total_index and span_days else None,
+        "return_evidence_ref": coverage.get("ledger_path") or source,
+        "return_contract": "split-adjusted close plus every verified cash distribution reinvested at ex-date close; pre-tax nominal",
+        "currency": meta.get("currency"),
+        "event_counts": wealth.get("event_counts") or {},
+    }
+
+
 def _polyline(values: list[float], n: int, x_at, y_at, color: str, width: int = 2) -> str:
     if not values:
         return ""

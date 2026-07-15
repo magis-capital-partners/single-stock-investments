@@ -128,7 +128,8 @@ Rules:
 3. Score explanatory strength, evidence sufficiency, downside control, and return versus alternatives from 1-5 with a rationale.
 4. Use `insufficient_evidence` or `outside_power_zone` when appropriate; abstention is valid.
 5. State the strongest counter-explanation and the single most important missing fact.
-6. Return only one JSON object matching the committee schema vote definition.
+6. Audit the economic claim, every valuation-proof row, comparable adjustments, capital requirements, option probabilities, and overlap controls before voting.
+7. Return only one JSON object matching the committee schema vote definition.
 """
 
 
@@ -246,7 +247,18 @@ def assemble(work: Path) -> Path:
     dissent = min(round_two, key=lambda v: (v["scores"]["return_vs_alternatives"]["value"], v["scores"]["downside_control"]["value"]))
     unresolved = sorted({v["most_important_missing_fact"] for v in round_two if v["most_important_missing_fact"]})
     valuation = read_json(ROOT / ticker / "research" / "valuation.json")
-    blocked = any(v["evidence_status"] == "insufficient_evidence" for v in round_two)
+    economic = valuation.get("economic_value_analysis") or {}
+    component = valuation.get("component_valuation_results") or {}
+    proof = economic.get("valuation_proof") or []
+    options = [row for row in proof if row.get("treatment") == "additive" and "option" in str(row.get("method", "")).lower()]
+    economic_complete = economic.get("status") == "complete"
+    component_complete = component.get("status") == "complete" and component.get("all_material_components_identified")
+    comparable_complete = economic_complete and all(
+        row.get("comparable_role") == "not_applicable" or row.get("comparable_ids")
+        for row in proof
+    )
+    option_complete = all(row.get("falsifier") and row.get("range_per_share") for row in options)
+    blocked = any(v["evidence_status"] == "insufficient_evidence" for v in round_two) or not economic_complete or not component_complete
     record = {
         "schema_version": "1.0",
         "protocol_version": "production-2.0",
@@ -273,6 +285,10 @@ def assemble(work: Path) -> Path:
             "shares": "pass" if (valuation.get("inputs") or {}).get("shares_outstanding") else "blocked",
             "reporting_period": "pass",
             "filing_reconciliation": "pass",
+            "economic_claim": "pass" if economic_complete else "blocked",
+            "component_completeness": "pass" if component_complete else "blocked",
+            "comparable_evidence": "pass" if comparable_complete else "partial",
+            "option_risking": "pass" if option_complete else "blocked",
             "disclosure_scan": "partial",
             "short_scan": "partial",
             "pre_mortem": "pass",

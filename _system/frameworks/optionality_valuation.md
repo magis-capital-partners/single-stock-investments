@@ -4,6 +4,8 @@
 
 **Canonical option rules:** **`option_treatment.md`** — mandatory option scan, treatment ladder, no auto-zero.
 
+**Universal publication contract:** **`economic_value_agent_protocol.md`** — exact economic claim, complete component coverage, comparable hierarchy, risk/timing bridge, valuation proof, committee gates, and outcome calibration.
+
 **Do not use for:** operating compounders priced on earnings with no hidden assets (Lawrence `full` alone is enough), or binary pre-revenue bets with no asset floor (use `scenario` with explicit failure modes).
 
 ---

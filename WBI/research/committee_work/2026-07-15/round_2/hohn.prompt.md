@@ -1,0 +1,20 @@
+# WBI - isolated committee round 2
+
+You are the **hohn** method, independence group **competitive_advantage**.
+
+Evidence packet: `38c67904f3a47847b52182f41898f076d37c2d4d46a77b7ffa090b658e1fc5df`
+
+- `WBI/research/deep_dive_2026-06-04.md`
+- `WBI/research/adversarial_2026-06-02.md`
+- `WBI/research/valuation.json`
+- `WBI/research/evidence/filing_facts_2026-06-02.json`
+
+Rules:
+
+1. Do not inspect another rater's output or any synthesis.
+2. Ignore time already spent on the idea and prior portfolio ownership.
+3. Score explanatory strength, evidence sufficiency, downside control, and return versus alternatives from 1-5 with a rationale.
+4. Use `insufficient_evidence` or `outside_power_zone` when appropriate; abstention is valid.
+5. State the strongest counter-explanation and the single most important missing fact.
+6. Audit the economic claim, every valuation-proof row, comparable adjustments, capital requirements, option probabilities, and overlap controls before voting.
+7. Return only one JSON object matching the committee schema vote definition.

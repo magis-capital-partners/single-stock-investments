@@ -1,0 +1,86 @@
+{
+  "as_of": "2026-07-15",
+  "economic_claim_note": "Each Class A share corresponds economically to one OpCo unit. Valuation uses 47.016 million Class A plus 76.440 million Class B/OpCo units. The prior Class-A-only denominator materially overstated consolidated free cash flow per listed share.",
+  "decision": "watch_below_base_value",
+  "pricing_conclusion": "WaterBridge has valuable scale and contracted growth, but $34.46 is above the $26.51 base equity value and assumes successful execution of a $430M-$490M capital program with limited cost overruns. A base-case 15% entry price is materially lower; the current quote is a watch rather than an approval.",
+  "strongest_counter_explanation": "The network may compound faster and with less risk than the model assumes because long-term dedications, MVCs, water intensity, and contiguous scale allow high-return brownfield expansion and rapid deleveraging after the 2026 build cycle.",
+  "falsifiers": [
+    "Maintenance capital is demonstrated below $80M while 2026 EBITDA reaches or exceeds $465M.",
+    "Net leverage falls below 2.5x without reducing the contracted growth program.",
+    "Speedway and Devon cohorts earn incremental after-tax ROIC above 18% on disclosed capital."
+  ],
+  "economic_value_bridge": {
+    "method": "contracted_infrastructure_cash_flow_plus_replacement_cost_crosscheck",
+    "gaap_role": "Secondary cross-check only. Net PP&E and acquisition accounting do not capture assembled rights-of-way, permits, dedication density, or the value of a connected network, but unlike a royalty owner WaterBridge must fund substantial capital.",
+    "accounting_reference": "The network includes approximately 2,500 miles of pipeline, 197 facilities, more than 4.5M bpd of capacity, and long-term dedications; tangible book value is not the primary valuation method.",
+    "require_complete_component_coverage": true,
+    "component_groups": [
+      {
+        "id": "network",
+        "label": "Existing produced-water network",
+        "component_ids": ["core_water_network"],
+        "valuation_basis": "$380M/$445M/$500M normalized EBITDA at 8x/10x/12x. A January 2025 Gravity Water transaction printed near 5.5x run-rate EBITDA, so WaterBridge's base requires a premium for scale, contracts, and network effects.",
+        "overlap_control": "The $10/$18/$28 per-share replacement-cost cross-check is embedded and never added to enterprise value."
+      },
+      {
+        "id": "debt",
+        "label": "Net debt",
+        "component_ids": ["net_debt"],
+        "valuation_basis": "March 2026 debt principal less cash across all 123.456M economic units.",
+        "overlap_control": "Deducted once from network enterprise value."
+      },
+      {
+        "id": "contracted_growth",
+        "label": "Speedway, Devon, and contracted projects beyond 2026",
+        "component_ids": ["contracted_growth_projects"],
+        "valuation_basis": "Only value beyond normalized 2026 EBITDA; project value must ultimately be supported by incremental EBITDA and after-tax ROIC.",
+        "overlap_control": "2026 guidance and projects already contributing to it stay in the core network."
+      },
+      {
+        "id": "execution_reserve",
+        "label": "Growth-capex execution reserve",
+        "component_ids": ["capex_execution_reserve"],
+        "valuation_basis": "Reserve against the $430M-$490M 2026 program until cohort-level capital and returns are disclosed.",
+        "overlap_control": "Offsets only project execution risk, not recurring maintenance capital already reflected in normalized owner cash."
+      }
+    ],
+    "wisdom_applied": [
+      "Marathon/Capital Returns: a large build program creates value only when incremental returns exceed the cost of capital.",
+      "Marks/Oaktree: leverage and refinancing claims are deducted before attributing network optionality to common units.",
+      "Hohn: density, long-term contracts, and brownfield expansion can create a moat, but maintenance and growth capital must be separated.",
+      "Groundbreaker context: local water scarcity supports terminal relevance; it does not convert a capital-intensive operator into a capital-free royalty company."
+    ],
+    "limitations": [
+      "Public cohort-level capex and EBITDA data are insufficient to verify management's incremental return claims.",
+      "The Gravity Water transaction is smaller and less contracted than WaterBridge, while public midstream peers have different commodity, basin, and contract mixes.",
+      "Replacement cost is not liquidation value and can exceed economic value when capacity is underutilized."
+    ]
+  },
+  "valuation_patch": {
+    "inputs": {
+      "price": 34.46,
+      "price_source": "Market quote 2026-07-15 17:22 UTC",
+      "shares_outstanding": 123456209,
+      "shares_source": "Q1 2026 10-Q: 47,016,059 Class A plus 76,440,150 Class B/OpCo units",
+      "fcf_per_share": 1.46,
+      "fcf_source": "Normalized maintenance equity cash of approximately $180M divided by 123.456M economic units; 2026 growth capex is excluded from distributable owner cash but charged through the reinvestment assessment.",
+      "net_debt_millions": 1424.3,
+      "ebitda_millions": 445
+    },
+    "scenarios": {
+      "bear": {"growth_y1_5": 0.02, "growth_y6_10": 0.01, "exit_pfcf_y10": 10, "notes": "Volume softness, capex overruns, and slow deleveraging."},
+      "base": {"growth_y1_5": 0.08, "growth_y6_10": 0.04, "exit_pfcf_y10": 12, "notes": "2026 build completes near budget and contracted volumes support moderate growth."},
+      "bull": {"growth_y1_5": 0.12, "growth_y6_10": 0.06, "exit_pfcf_y10": 15, "notes": "High water intensity, successful Speedway/Devon cohorts, and rapid deleveraging."}
+    },
+    "component_valuation": {
+      "all_material_components_identified": true,
+      "components": [
+        {"id":"core_water_network","label":"Existing produced-water network enterprise value","category":"infrastructure","overlap_key":"wbi_core_network","treatment":"additive","valuation":{"basis":"total_value_m","low":3040,"base":4450,"high":6000,"method":"normalized_ebitda_enterprise_value","evidence_tier":"q1_2026_guidance","evidence":"2026 adjusted EBITDA guidance is $425M-$465M. Values use $380M at 8x, $445M at 10x, and $500M at 12x.","cross_check":"Q1 2026 EBITDA was $102.9M on 2.5M bbl/d; merchant infrastructure is not a regulated rate base."}},
+        {"id":"net_debt","label":"Net debt","category":"liability_or_reserve","overlap_key":"wbi_net_debt","treatment":"additive","valuation":{"basis":"per_share","low":-12.50,"base":-11.54,"high":-10.50,"method":"balance_sheet_claim","evidence_tier":"q1_2026_10q","evidence":"March 2026 principal debt was $1.475B and cash was $50.7M.","cross_check":"Base net debt is approximately $1.424B, or $11.54 per economic unit."}},
+        {"id":"contracted_growth_projects","label":"Speedway, Devon, and contracted growth beyond 2026","category":"real_option","overlap_key":"wbi_contracted_growth","treatment":"additive","valuation":{"basis":"per_share","low":0.00,"base":3.00,"high":8.00,"method":"milestone_project_option","evidence_tier":"company_contract_and_capex_guidance","evidence":"2026 capex guidance is $430M-$490M and includes Speedway plus projects supporting a Devon agreement beginning in 2027.","cross_check":"Only value beyond the normalized 2026 EBITDA run-rate is added; the core network value already includes the 2026 guide."}},
+        {"id":"capex_execution_reserve","label":"Growth-capex execution reserve","category":"liability_or_reserve","overlap_key":"wbi_capex_reserve","treatment":"additive","valuation":{"basis":"per_share","low":-3.00,"base":-1.00,"high":0.00,"method":"capital_cycle_reserve","evidence_tier":"analyst_stress","evidence":"Reserve for cost overruns, delayed in-service dates, and returns below the cost of capital on the $430M-$490M program.","cross_check":"Released only after cohort-level capital and EBITDA are disclosed."}},
+        {"id":"replacement_cost_crosscheck","label":"Network replacement-cost cross-check","category":"infrastructure","overlap_key":"wbi_replacement_crosscheck","treatment":"embedded","included_in_component_id":"core_water_network","valuation":{"basis":"per_share","low":10.00,"base":18.00,"high":28.00,"method":"depreciated_replacement_cost","evidence_tier":"filing_pp_and_e","evidence":"Pipelines, disposal capacity, rights-of-way, and permits provide an embedded asset floor but are already monetized by the core network.","cross_check":"Not additive to enterprise value."}}
+      ]
+    }
+  }
+}
