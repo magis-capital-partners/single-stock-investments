@@ -714,6 +714,46 @@ def valuation_human_review(ticker_dir: Path) -> dict | None:
     }
 
 
+def valuation_component_summary(ticker_dir: Path) -> dict | None:
+    """Small, presentation-safe component valuation payload for the dashboard."""
+    val = load_valuation(ticker_dir)
+    if not val:
+        return None
+    result = val.get("component_valuation_results") or {}
+    if not result:
+        return None
+    total = result.get("total_equity_value_per_share") or {}
+    components = []
+    for row in [*(result.get("additive_components") or []), *(result.get("embedded_components") or [])]:
+        components.append({
+            "id": row.get("id"),
+            "label": row.get("label"),
+            "category": row.get("category"),
+            "treatment": row.get("treatment"),
+            "method": row.get("method"),
+            "evidence_tier": row.get("evidence_tier"),
+            "low_per_share": row.get("low_per_share"),
+            "base_per_share": row.get("base_per_share"),
+            "high_per_share": row.get("high_per_share"),
+            "cross_check": row.get("cross_check"),
+        })
+    queue = val.get("component_review_queue") or {}
+    return {
+        "status": result.get("status"),
+        "all_material_components_identified": result.get("all_material_components_identified", False),
+        "decision_rule": result.get("decision_rule"),
+        "market_price_per_share": result.get("market_price_per_share"),
+        "total_equity_value_per_share": total,
+        "upside_downside_pct": result.get("upside_downside_pct"),
+        "material_component_count": result.get("material_component_count", 0),
+        "additive_component_count": result.get("additive_component_count", 0),
+        "embedded_component_count": result.get("embedded_component_count", 0),
+        "components": components,
+        "review_status": queue.get("status"),
+        "review_open_count": len([x for x in queue.get("items", []) if x.get("status") == "open"]),
+    }
+
+
 def valuation_total_return_panel(ticker: str, ticker_dir: Path) -> dict | None:
     val = load_valuation(ticker_dir)
     if not val:
@@ -1695,6 +1735,7 @@ def build_ticker_row(
         "links": _research_links(ticker, ticker_dir),
         "deep_dive": deep_dive,
         "human_review": valuation_human_review(ticker_dir),
+        "component_valuation": valuation_component_summary(ticker_dir),
         "total_return_panel": valuation_total_return_panel(ticker, ticker_dir),
         "recent_files": recent_files(ticker_dir),
         "developments": recent_developments(ticker_dir, ticker),

@@ -1,0 +1,340 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "committee_schema_v1",
+  "title": "Investment committee record",
+  "description": "One frozen evidence packet, isolated votes, dissent-first synthesis, and an owner-controlled final state.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "protocol_version",
+    "ticker",
+    "review",
+    "evidence_packet",
+    "proposer",
+    "selected_raters",
+    "round_one",
+    "pre_mortem",
+    "research_loop",
+    "round_two",
+    "synthesis",
+    "gates",
+    "human_decision",
+    "final_state",
+    "provenance"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "protocol_version": {"const": "manual-pilot-1.0"},
+    "ticker": {"type": "string", "minLength": 1},
+    "review": {
+      "type": "object",
+      "required": ["level", "trigger", "as_of", "owner"],
+      "properties": {
+        "level": {"enum": ["screen", "focused_refresh", "full_ic"]},
+        "trigger": {"type": "string", "minLength": 1},
+        "as_of": {"type": "string", "format": "date"},
+        "owner": {"type": ["string", "null"]}
+      },
+      "additionalProperties": false
+    },
+    "evidence_packet": {"$ref": "#/$defs/evidence_packet"},
+    "proposer": {
+      "type": "object",
+      "required": ["recommendation_hidden_in_round_one", "thesis", "explanation_contracts", "open_questions"],
+      "properties": {
+        "recommendation_hidden_in_round_one": {"const": true},
+        "thesis": {"type": "string"},
+        "explanation_contracts": {"type": "array", "items": {"$ref": "#/$defs/explanation_contract"}},
+        "open_questions": {"type": "array", "items": {"type": "string"}}
+      },
+      "additionalProperties": false
+    },
+    "selected_raters": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {"$ref": "#/$defs/selected_rater"}
+    },
+    "round_one": {"$ref": "#/$defs/vote_round"},
+    "pre_mortem": {"$ref": "#/$defs/pre_mortem"},
+    "research_loop": {
+      "type": "object",
+      "required": ["loop_count", "questions", "responses", "evidence_hash_after"],
+      "properties": {
+        "loop_count": {"type": "integer", "minimum": 0, "maximum": 1},
+        "questions": {"type": "array", "items": {"type": "string"}},
+        "responses": {"type": "array", "items": {"$ref": "#/$defs/research_response"}},
+        "evidence_hash_after": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      },
+      "additionalProperties": false
+    },
+    "round_two": {"$ref": "#/$defs/vote_round"},
+    "synthesis": {
+      "type": "object",
+      "required": ["strongest_dissent", "unresolved_items", "vote_split", "score_medians", "score_ranges", "dissent_ledger"],
+      "properties": {
+        "strongest_dissent": {"type": "string"},
+        "unresolved_items": {"type": "array", "items": {"type": "string"}},
+        "vote_split": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 0}},
+        "score_medians": {"$ref": "#/$defs/score_values"},
+        "score_ranges": {"type": "object", "additionalProperties": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "integer", "minimum": 1, "maximum": 5}}},
+        "dissent_ledger": {"type": "array", "items": {"$ref": "#/$defs/dissent_item"}}
+      },
+      "additionalProperties": false
+    },
+    "component_review": {"$ref": "#/$defs/component_review"},
+    "gates": {
+      "type": "object",
+      "required": ["price", "shares", "reporting_period", "filing_reconciliation", "disclosure_scan", "short_scan", "pre_mortem", "explanation_contracts", "independent_groups", "owner"],
+      "properties": {
+        "price": {"$ref": "#/$defs/gate_status"},
+        "shares": {"$ref": "#/$defs/gate_status"},
+        "reporting_period": {"$ref": "#/$defs/gate_status"},
+        "filing_reconciliation": {"$ref": "#/$defs/gate_status"},
+        "disclosure_scan": {"$ref": "#/$defs/gate_status"},
+        "short_scan": {"$ref": "#/$defs/gate_status"},
+        "pre_mortem": {"$ref": "#/$defs/gate_status"},
+        "explanation_contracts": {"$ref": "#/$defs/gate_status"},
+        "independent_groups": {"$ref": "#/$defs/gate_status"},
+        "owner": {"$ref": "#/$defs/gate_status"}
+      },
+      "additionalProperties": false
+    },
+    "human_decision": {
+      "type": "object",
+      "required": ["status", "decision", "sizing", "top_dissent_response", "decided_at"],
+      "properties": {
+        "status": {"enum": ["pending", "complete"]},
+        "decision": {"type": ["string", "null"], "enum": [null, "approve", "watch", "defer", "reject"]},
+        "sizing": {"type": ["string", "number", "null"]},
+        "top_dissent_response": {"type": ["string", "null"]},
+        "decided_at": {"type": ["string", "null"], "format": "date-time"}
+      },
+      "additionalProperties": false
+    },
+    "final_state": {
+      "enum": ["draft", "evidence_blocked", "committee_complete_decision_pending", "final"],
+      "description": "final is allowed only when every required gate passes and the human decision is complete. evidence_blocked means decision-critical evidence is missing. committee_complete_decision_pending is the normal unattended-agent terminal state."
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["prompt_version", "model", "schema_path", "persona_registry_version"],
+      "properties": {
+        "prompt_version": {"type": "string"},
+        "model": {"type": "string"},
+        "schema_path": {"const": "_system/templates/committee_schema.json"},
+        "persona_registry_version": {"type": "string"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "x-score-anchors": {
+    "explanatory_strength": {
+      "1": "Generic narrative; mechanism absent or contradicted.",
+      "2": "Plausible mechanism, but alternatives are not distinguished and falsifiers are weak.",
+      "3": "Specific causal mechanism with some discriminating evidence and usable falsifiers.",
+      "4": "Primary evidence supports a hard-to-vary mechanism; strongest alternative is directly tested.",
+      "5": "Mechanism has survived decisive out-of-sample tests and competing explanations are materially weaker."
+    },
+    "evidence_sufficiency": {
+      "1": "Decision-critical primary evidence is absent or stale; abstention required.",
+      "2": "Large gaps remain in price, filings, disclosures, or key operating facts.",
+      "3": "Core primary evidence is present, with explicit non-blocking gaps.",
+      "4": "Current primary evidence covers all material claims and reconciles cleanly.",
+      "5": "Independent primary sources triangulate every material claim with no unresolved factual warnings."
+    },
+    "downside_control": {
+      "1": "Permanent loss is plausible and neither bounded nor quantified.",
+      "2": "A downside case exists but financing, legal, binary, or valuation exposure can overwhelm it.",
+      "3": "Main loss paths are quantified; meaningful uncertainty or tail risk remains.",
+      "4": "Conservative value, liquidity, and financing support survival with favorable asymmetry.",
+      "5": "Downside is contractually or structurally protected and survives severe, relevant stress tests."
+    },
+    "return_vs_alternatives": {
+      "1": "Expected range is unavailable or clearly below the portfolio hurdle.",
+      "2": "Upper case may clear the hurdle, but base economics do not.",
+      "3": "Base is near the hurdle and sensitive to a small number of explicit assumptions.",
+      "4": "Conservative base clears the hurdle after uncertainty and opportunity cost.",
+      "5": "Bear/base distribution clearly dominates available alternatives with multiple independent return paths."
+    }
+  },
+  "$defs": {
+    "evidence_packet": {
+      "type": "object",
+      "required": ["frozen_at", "hash_method", "packet_hash", "freshness_status", "references"],
+      "properties": {
+        "frozen_at": {"type": "string", "format": "date-time"},
+        "hash_method": {"const": "sha256(canonical-json(sorted(path,sha256,bytes)))"},
+        "packet_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "freshness_status": {"enum": ["current", "mixed", "stale", "insufficient_evidence"]},
+        "references": {"type": "array", "items": {"$ref": "#/$defs/evidence_reference"}}
+      },
+      "additionalProperties": false
+    },
+    "evidence_reference": {
+      "type": "object",
+      "required": ["path", "sha256", "bytes", "role", "status"],
+      "properties": {
+        "path": {"type": "string"},
+        "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "bytes": {"type": "integer", "minimum": 0},
+        "role": {"type": "string"},
+        "status": {"enum": ["available", "missing", "stale", "unresolved"]}
+      },
+      "additionalProperties": false
+    },
+    "explanation_contract": {
+      "type": "object",
+      "required": ["id", "mechanism", "evidence_paths", "distinguishing_test", "counter_explanation", "falsifier", "valuation_link"],
+      "properties": {
+        "id": {"type": "string"},
+        "mechanism": {"type": "string", "minLength": 1},
+        "evidence_paths": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "distinguishing_test": {"type": "string", "minLength": 1},
+        "counter_explanation": {"type": "string", "minLength": 1},
+        "falsifier": {"type": "string", "minLength": 1},
+        "valuation_link": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "selected_rater": {
+      "type": "object",
+      "required": ["persona", "independence_group", "selection_reason", "required_inputs_status"],
+      "properties": {
+        "persona": {"type": "string"},
+        "independence_group": {"type": "string"},
+        "selection_reason": {"type": "string"},
+        "required_inputs_status": {"enum": ["complete", "partial", "missing"]}
+      },
+      "additionalProperties": false
+    },
+    "vote_round": {
+      "type": "object",
+      "required": ["evidence_hash", "peer_outputs_visible", "votes"],
+      "properties": {
+        "evidence_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "peer_outputs_visible": {"const": false},
+        "votes": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"$ref": "#/$defs/vote"}}
+      },
+      "additionalProperties": false
+    },
+    "vote": {
+      "type": "object",
+      "required": ["persona", "independence_group", "evidence_status", "scores", "vote", "expected_return_range_pct", "horizon_years", "claims", "strongest_counter_explanation", "most_important_missing_fact", "falsifiers", "specialist_findings", "confidence"],
+      "properties": {
+        "persona": {"type": "string"},
+        "independence_group": {"type": "string"},
+        "evidence_status": {"enum": ["sufficient", "insufficient_evidence", "outside_power_zone"]},
+        "scores": {"$ref": "#/$defs/scores"},
+        "vote": {"enum": ["approve", "watch", "defer", "reject"]},
+        "expected_return_range_pct": {"type": ["array", "null"], "minItems": 2, "maxItems": 2, "items": {"type": "number"}},
+        "horizon_years": {"type": ["number", "null"], "exclusiveMinimum": 0},
+        "claims": {"type": "array", "minItems": 1, "maxItems": 3, "items": {"$ref": "#/$defs/claim"}},
+        "strongest_counter_explanation": {"type": "string"},
+        "most_important_missing_fact": {"type": "string"},
+        "falsifiers": {"type": "array", "items": {"type": "string"}},
+        "specialist_findings": {"type": "string"},
+        "confidence": {"enum": ["low", "medium", "high"]}
+      },
+      "additionalProperties": false
+    },
+    "scores": {
+      "type": "object",
+      "required": ["explanatory_strength", "evidence_sufficiency", "downside_control", "return_vs_alternatives"],
+      "properties": {
+        "explanatory_strength": {"$ref": "#/$defs/score"},
+        "evidence_sufficiency": {"$ref": "#/$defs/score"},
+        "downside_control": {"$ref": "#/$defs/score"},
+        "return_vs_alternatives": {"$ref": "#/$defs/score"}
+      },
+      "additionalProperties": false
+    },
+    "score": {
+      "type": "object",
+      "required": ["value", "rationale"],
+      "properties": {"value": {"type": "integer", "minimum": 1, "maximum": 5}, "rationale": {"type": "string", "minLength": 1}},
+      "additionalProperties": false
+    },
+    "score_values": {
+      "type": "object",
+      "required": ["explanatory_strength", "evidence_sufficiency", "downside_control", "return_vs_alternatives"],
+      "additionalProperties": {"type": "number", "minimum": 1, "maximum": 5}
+    },
+    "claim": {
+      "type": "object",
+      "required": ["claim", "evidence_paths"],
+      "properties": {"claim": {"type": "string"}, "evidence_paths": {"type": "array", "minItems": 1, "items": {"type": "string"}}},
+      "additionalProperties": false
+    },
+    "pre_mortem": {
+      "type": "object",
+      "required": ["status", "failure_story", "earliest_warning_signals", "forensic_checks", "short_source_coverage", "unresolved_items"],
+      "properties": {
+        "status": {"enum": ["complete", "partial", "not_run"]},
+        "failure_story": {"type": "string"},
+        "earliest_warning_signals": {"type": "array", "items": {"type": "string"}},
+        "forensic_checks": {"type": "array", "items": {"type": "string"}},
+        "short_source_coverage": {"enum": ["complete", "partial", "not_run"]},
+        "unresolved_items": {"type": "array", "items": {"type": "string"}}
+      },
+      "additionalProperties": false
+    },
+    "research_response": {
+      "type": "object",
+      "required": ["question", "answer", "evidence_paths", "status"],
+      "properties": {
+        "question": {"type": "string"},
+        "answer": {"type": "string"},
+        "evidence_paths": {"type": "array", "items": {"type": "string"}},
+        "status": {"enum": ["answered", "partially_answered", "unresolved"]}
+      },
+      "additionalProperties": false
+    },
+    "dissent_item": {
+      "type": "object",
+      "required": ["issue", "impact", "status", "owner_response"],
+      "properties": {
+        "issue": {"type": "string"},
+        "impact": {"enum": ["low", "medium", "high"]},
+        "status": {"enum": ["answered", "accepted", "unresolved"]},
+        "owner_response": {"type": ["string", "null"]}
+      },
+      "additionalProperties": false
+    },
+    "component_review": {
+      "type": "object",
+      "required": ["status", "decision_rule", "items"],
+      "properties": {
+        "status": {"enum": ["ready_for_committee_review", "complete"]},
+        "decision_rule": {"type": "string", "minLength": 1},
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["component_id", "label", "treatment", "range_per_share", "evidence_tier", "recommended_raters", "mandatory_checks", "status"],
+            "properties": {
+              "component_id": {"type": "string"},
+              "label": {"type": "string"},
+              "treatment": {"enum": ["additive", "embedded"]},
+              "range_per_share": {
+                "type": "object",
+                "required": ["low", "base", "high"],
+                "properties": {"low": {"type": "number"}, "base": {"type": "number"}, "high": {"type": "number"}},
+                "additionalProperties": false
+              },
+              "range_width_pct_of_base": {"type": "number"},
+              "evidence_tier": {"type": "string"},
+              "recommended_raters": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+              "mandatory_checks": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+              "status": {"enum": ["open", "accepted", "challenged", "rejected"]}
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "gate_status": {"enum": ["pass", "partial", "not_run", "blocked", "not_applicable"]}
+  }
+}

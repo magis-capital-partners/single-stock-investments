@@ -4,6 +4,146 @@
   "method": "full",
   "valuation_mode": "optionality",
   "valuation_overlay": "segment_cashflow",
+  "valuation_methodology": {
+    "version": "2.0",
+    "mode": "separated_views",
+    "horizon_years": 7,
+    "entry_hurdles_pct": [
+      10,
+      12,
+      15
+    ],
+    "owner_cash_definition": "FY2025 company-defined free cash flow less share-based compensation; fixed-asset purchases and related payable changes are deducted",
+    "decision_rule": "Use operating returns, a complete component schedule, and reverse expectations as separate views. Every material component receives a low/base/high estimate; do not average the views.",
+    "asset_ledger": []
+  },
+  "component_valuation": {
+    "version": "1.0",
+    "all_material_components_identified": true,
+    "methodology_note": "Every material component receives a low/base/high present-value estimate. Range width reflects evidence quality, realization timing, and commercial uncertainty; it is not a zero-value placeholder.",
+    "components": [
+      {
+        "id": "land_resource_operations",
+        "label": "Producing royalties, easements, and land-resource operations",
+        "category": "operating_business",
+        "overlap_key": "land_resource_operations",
+        "treatment": "additive",
+        "valuation": {
+          "basis": "per_share",
+          "method": "segment_owner_cash_dcf",
+          "low": 84.97,
+          "base": 94.63,
+          "high": 105.71,
+          "evidence_tier": "filing_segment_cash_flow",
+          "evidence": "FY2025 Land & Resource net income plus D&A, with 3%/2% growth and 20x terminal value; 12%/10%/8% discount-rate range.",
+          "cross_check": "FY2025 royalties $411.7M and easements $78.2M; producing economics are fully captured here."
+        }
+      },
+      {
+        "id": "water_operations",
+        "label": "Water Services and Operations",
+        "category": "operating_business",
+        "overlap_key": "water_operations",
+        "treatment": "additive",
+        "valuation": {
+          "basis": "per_share",
+          "method": "segment_owner_cash_dcf",
+          "low": 21.71,
+          "base": 31.86,
+          "high": 46.6,
+          "evidence_tier": "filing_segment_cash_flow",
+          "evidence": "May 2026 investor presentation: FY2025 Water post-tax cash flow $177M less $20M/$15M/$10M maintenance capex = $2.15/$2.35/$2.55 per share. Low/base/high use 2%/4%/6% early growth, 10x/12x/14x terminal values, and 12%/10%/8% discount rates.",
+          "cross_check": "FY2025 water revenue $307.5M, water-sales revenue $170M, produced-water royalty revenue $124M with essentially zero direct operating expense or capex, and net PP&E $164.5M. Growth capex remains excluded from maintenance owner cash and must earn an explicit return."
+        }
+      },
+      {
+        "id": "water_infrastructure_cross_check",
+        "label": "Water infrastructure replacement-cost cross-check",
+        "category": "infrastructure",
+        "overlap_key": "water_infrastructure_cross_check",
+        "treatment": "embedded",
+        "included_in_component_id": "water_operations",
+        "valuation": {
+          "basis": "per_share",
+          "method": "depreciated_replacement_cost",
+          "low": 2.0,
+          "base": 2.4,
+          "high": 4.0,
+          "evidence_tier": "filing_balance_sheet",
+          "evidence": "FY2025 net PP&E of $164.5M; value is a floor cross-check and is embedded in Water operations, not additive.",
+          "cross_check": "Operating DCF of Water Services already capitalizes returns on this infrastructure."
+        }
+      },
+      {
+        "id": "cash_and_investments",
+        "label": "Cash and equity-method investment",
+        "category": "financial_asset",
+        "overlap_key": "cash_and_investments",
+        "treatment": "additive",
+        "valuation": {
+          "basis": "per_share",
+          "method": "balance_sheet_mark",
+          "low": 3.6,
+          "base": 4.32,
+          "high": 4.32,
+          "evidence_tier": "filing_balance_sheet",
+          "evidence": "Q1 2026 cash $247.6M ($3.59/sh) plus $50M equity-method investment ($0.72/sh).",
+          "cross_check": "No debt is disclosed in the FY2025 balance-sheet bridge."
+        }
+      },
+      {
+        "id": "undeveloped_nra_option",
+        "label": "Undeveloped net royalty acreage",
+        "category": "real_option",
+        "overlap_key": "undeveloped_nra_option",
+        "treatment": "additive",
+        "valuation": {
+          "basis": "per_share",
+          "method": "probability_weighted_transaction_nav",
+          "low": 9.63,
+          "base": 16.05,
+          "high": 22.47,
+          "evidence_tier": "limited_company_transaction",
+          "evidence": "224,000 NRA multiplied by the March 2025 177-NRA acquisition mark of $19,775/NRA, then risked at 15%/25%/35% for development timing, quality, taxes, and realization.",
+          "cross_check": "The range is deliberately below the un-risked $64.2/sh transaction extrapolation."
+        }
+      },
+      {
+        "id": "surface_acreage_option",
+        "label": "Surface acreage",
+        "category": "real_option",
+        "overlap_key": "surface_acreage_option",
+        "treatment": "additive",
+        "valuation": {
+          "basis": "per_share",
+          "method": "risked_land_nav",
+          "low": 9.58,
+          "base": 19.16,
+          "high": 31.93,
+          "evidence_tier": "limited_company_transaction",
+          "evidence": "882,000 acres at $750/$1,500/$2,500 per acre. The May 2025 787-acre sale at $5,718/acre is a ceiling cross-check, not a portfolio-wide mark.",
+          "cross_check": "The base is materially below the observed small-parcel sale and requires a future acreage-use segmentation refresh."
+        }
+      },
+      {
+        "id": "realization_and_corporate_reserve",
+        "label": "Corporate, tax, and realization reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "realization_and_corporate_reserve",
+        "treatment": "additive",
+        "valuation": {
+          "basis": "per_share",
+          "method": "conservative_reserve",
+          "low": -5.0,
+          "base": -3.0,
+          "high": -1.0,
+          "evidence_tier": "analyst_estimate",
+          "evidence": "Reserve for taxes, transaction costs, and corporate friction when latent land and royalty value is realized; no debt is separately deducted.",
+          "cross_check": "Low case absorbs more of the gross option value as realization cost."
+        }
+      }
+    ]
+  },
   "lawrence_bucket": "pricing_power",
   "classification_inputs": {
     "archetype": "infrastructure",
@@ -15,31 +155,33 @@
   "inputs": {
     "price": 393.0,
     "price_source": "Stooq TPL.US close 2026-05-29",
-    "fcf_per_share": 7.91,
-    "fcf_source": "FY2025 cash from operations $545.9M \u00f7 ~69.0M diluted shares (10-K FY2025); asset-light, minimal maintenance capital spending",
+    "fcf_per_share": 7.02,
+    "fcf_source": "FY2025 company-defined FCF $498.333M less $13.817M share-based compensation = $484.516M / 69.027M diluted shares (10-K FY2025)",
     "shares_outstanding": 69027492,
     "book_per_share": 21.14,
     "book_per_share_caveat": "GAAP book excludes Assigned 1888 land and royalty interests (zero on balance sheet); not a fair-value or dhando floor",
     "dividend_per_share_fy2025": 2.13,
-    "normalization_note": "Lawrence base on reported operating cash flow per share; FY2025 included $50M equity-method investment (non-recurring scale) not deducted from base."
+    "normalization_note": "Owner cash deducts $59.531M fixed-asset purchases, $6.417M increase in related payables, and $13.817M share-based compensation. Acquisitions and the $50M equity-method investment are excluded from recurring owner cash."
   },
   "optionality_gate": {
-    "framework": "mineral_floor_option",
+    "framework": "separated_operating_asset_expectations",
     "floor_pass": false,
-    "floor_metric": "nav_per_share",
-    "floor_value": 106.2,
-    "floor_value_note": "Conservative asset floor: Q1 2026 cash $3.59/sh + NRA acquisition comp $64.2/sh (royalty asset mark); excludes surface and producing PV to avoid double-count with segment build",
+    "floor_metric": "complete_component_value_base",
+    "floor_value": 163.02,
+    "floor_value_note": "Complete component schedule includes risked low/base/high estimates for undeveloped NRA and surface acreage; it is not a liquidation guarantee.",
     "primary_metric": "lawrence_base",
     "primary_label": "7yr IRR",
-    "primary_return_pct": -4.0,
-    "overlay_nav_per_share": 210.5,
-    "overlay_nav_note": "Segment operating PV $162 + cash $3.6 + undeveloped NRA option $16 + surface $32 [Assumption]; price $393 embeds ~87% premium to overlay base",
-    "notes": "GAAP book ~$21/sh is retained earnings + PPE/water + acquired royalties only. Price well above filing-backed NAV overlay; Lawrence IRR remains stance gate.",
+    "primary_return_pct": -7.5,
+    "overlay_nav_per_share": null,
+    "overlay_nav_note": "Legacy $210.5 estimate retired because it mixed operating value with thinly supported acreage extrapolations",
+    "notes": "Operating return remains the stance gate. The component schedule separately estimates every material asset and reserve.",
     "lawrence_legacy_pct": -1.0
   },
   "nav_overlay": {
     "as_of": "2026-06-01",
-    "status": "complete",
+    "status": "retired_thin_transaction_evidence",
+    "decision_use": false,
+    "retirement_note": "Legacy illustrative marks retained for audit history only. They do not enter valuation_views or the stance gate.",
     "gaap_vs_fair_value": {
       "assigned_land_and_royalties_on_balance_sheet": 0,
       "policy_source": "10-K FY2025: fair market value not determined in 1888; no value assigned to Assigned land and royalty interests",
@@ -171,19 +313,18 @@
     "as_of": "2026-06-01",
     "horizon_years": 7,
     "discount_rate_explicit": 0.1,
-    "allocation_method": "FY2025 segment revenue share of consolidated OCF $545.9M",
+    "allocation_method": "FY2025 segment net income plus segment D&A, less fixed-asset purchases allocated to Water; $6.555M tax-timing reconciliation held separately",
     "segments": [
       {
         "id": "land_resource",
         "label": "Land & Resource (royalties + easements + land sales)",
         "type": "operating",
         "revenue_share_fy2025": 0.615,
-        "owner_cash_y0_per_share": 4.86,
-        "owner_cash_y0_source": "FY2025 OCF $7.91/sh \u00d7 61.5% Land & Resource revenue share [Assumption]",
-        "growth_y1_5": 0.04,
-        "growth_y6_10": 0.03,
-        "exit_pfcf_y10": 24,
-        "pv_per_share_at_10pct": 99.2,
+        "owner_cash_y0_per_share": 5.32,
+        "owner_cash_y0_source": "FY2025 LRM net income $322.415M + D&A $44.555M = $366.970M / 69.027M shares; royalty acquisitions excluded",
+        "growth_y1_5": 0.03,
+        "growth_y6_end": 0.02,
+        "exit_pfcf_end": 20,
         "notes": "FY2025 segment $490.7M: royalties $411.7M, easements $78.2M; cyclical Permian toll"
       },
       {
@@ -191,12 +332,11 @@
         "label": "Water Services and Operations (TPWR)",
         "type": "operating",
         "revenue_share_fy2025": 0.385,
-        "owner_cash_y0_per_share": 3.05,
-        "owner_cash_y0_source": "FY2025 OCF $7.91/sh \u00d7 38.5% Water revenue share [Assumption]",
+        "owner_cash_y0_per_share": 1.61,
+        "owner_cash_y0_source": "FY2025 WSO net income $158.961M + D&A $17.978M - fixed-asset purchases/payable change $65.948M = $110.991M / 69.027M shares",
         "growth_y1_5": 0.06,
-        "growth_y6_10": 0.04,
-        "exit_pfcf_y10": 20,
-        "pv_per_share_at_10pct": 62.6,
+        "growth_y6_end": 0.04,
+        "exit_pfcf_end": 18,
         "notes": "FY2025 Water $307.5M (+16% YoY); embedded_in_segment for water ramp \u2014 not separate zero terminal"
       }
     ],
@@ -222,55 +362,50 @@
       }
     ],
     "reconciliation": {
-      "sum_pv_per_share_at_10pct": 161.8,
-      "sum_pv_per_share_at_explicit_discount": 161.9,
+      "sum_pv_per_share_at_explicit_discount": 125.8,
       "explicit_discount_rate_pct": 10.0,
-      "nav_options_add_per_share": 48.0,
-      "overlay_base_per_share": 210.5,
-      "implied_business_return_pct": -0.84,
-      "lawrence_base_irr_pct": -1.0,
-      "price_per_share": 393.0,
-      "slack_notes": "Segment operating PV $162 @ 10% vs $393 price \u2014 gap is scarcity premium + undeveloped optionality; segment implied return -0.8% vs Lawrence -1.0% (tie-out within 0.2pp)"
+      "implied_business_return_pct": -8.28,
+      "lawrence_base_irr_pct": -7.5,
+      "owner_cash_segment_sum_per_share": 6.93,
+      "owner_cash_total_per_share": 7.02,
+      "slack_notes": "Segment cross-check excludes the small consolidated tax-timing reconciliation; no asset-option value is included."
     }
   },
   "scenarios": {
     "bear": {
-      "growth_y1_5": 0.02,
-      "growth_y6_10": 0.0,
-      "exit_pfcf_y10": 18,
-      "notes": "Permian activity flat; multiple compresses toward high-teens cash-flow multiple"
+      "growth_y1_5": 0.01,
+      "growth_y6_end": 0.0,
+      "exit_pfcf_end": 16,
+      "notes": "Permian activity weakens; water growth slows; year-7 exit multiple compresses"
     },
     "base": {
-      "growth_y1_5": 0.05,
-      "growth_y6_10": 0.03,
-      "exit_pfcf_y10": 22,
-      "notes": "Mid-single-digit cash-flow growth; water + easements offset slower royalty growth; re-rate modest"
+      "growth_y1_5": 0.04,
+      "growth_y6_end": 0.03,
+      "exit_pfcf_end": 20,
+      "notes": "Low-to-mid-single-digit owner-cash growth; water and easements offset slower royalties; year-7 exit"
     },
     "bull": {
-      "growth_y1_5": 0.08,
-      "growth_y6_10": 0.05,
-      "exit_pfcf_y10": 28,
-      "notes": "Permian volumes + water infrastructure step-up; premium toll multiple sustained"
+      "growth_y1_5": 0.07,
+      "growth_y6_end": 0.05,
+      "exit_pfcf_end": 24,
+      "notes": "Permian volumes and water infrastructure outperform; premium year-7 toll multiple sustained"
     }
   },
   "results": {
     "bear": {
-      "return_pct": -9.0
+      "return_pct": -12.6
     },
     "base": {
-      "return_pct": -4.0
+      "return_pct": -7.5
     },
     "bull": {
-      "return_pct": 1.5
+      "return_pct": -2.9
     }
   },
   "implied_return": {
-    "base_pct": -2.85,
-    "label": "7yr IRR (total synthesis)",
-    "display": "-2.85% (total synthesis)",
-    "lawrence_stance_gate_pct": -4.0,
-    "falsifier_adjusted_pct": -4.0,
-    "synthesis_pct": -2.85
+    "base_pct": -7.5,
+    "label": "7yr IRR",
+    "display": "-7.5% (base)"
   },
   "stance_proposal": {
     "suggested": "watch",
@@ -285,7 +420,7 @@
   },
   "growth_explanation": {
     "as_of": "2026-06-01",
-    "status": "complete",
+    "status": "context_only_separated_views",
     "assumption_ids": [
       "growth_y1_5",
       "growth_y6_10"
@@ -360,29 +495,29 @@
       "not_instrumentalist": true
     },
     "theory_implied": {
-      "y1_5": 0.0477,
-      "y6_10": 0.0339,
-      "exit_pfcf_y10_segment_blend": 22.5,
+      "y1_5": 0.037,
+      "y6_10": 0.0,
+      "exit_pfcf_y10_segment_blend": 22.0,
       "derivation": "segment_build owner-cash weighted blend (growth only; exit from scenarios.base)",
       "segment_weights": [
         {
           "id": "land_resource",
-          "weight_pct": 61.4
+          "weight_pct": 76.8
         },
         {
           "id": "water",
-          "weight_pct": 38.6
+          "weight_pct": 23.2
         }
       ]
     },
     "lawrence_legacy": {
-      "y1_5": 0.05,
-      "y6_10": 0.03,
+      "y1_5": 0.04,
+      "y6_10": null,
       "return_pct": null
     },
     "falsifier_adjusted": {
-      "y1_5": 0.0477,
-      "y6_10": 0.0339,
+      "y1_5": 0.037,
+      "y6_10": 0.0,
       "exit_pfcf_y10": 22.0,
       "adjustments": [],
       "triggered": [],
@@ -390,28 +525,21 @@
       "as_of_filing_facts": "evidence/_text/10-Q_20260506_rpt20260331_acc0001811074_26_000035.htm.txt"
     },
     "divergence": {
-      "theory_vs_lawrence_y1_5_pp": -0.2,
+      "theory_vs_lawrence_y1_5_pp": -0.3,
       "falsifier_vs_theory_y1_5_pp": 0.0
-    }
+    },
+    "decision_use": false
   },
   "overlay_results": [],
   "results_lawrence_legacy": {
     "bear": {
-      "return_pct": -9.0
+      "return_pct": -12.6
     },
     "base": {
-      "return_pct": -4.0
+      "return_pct": -7.5
     },
     "bull": {
-      "return_pct": 1.5
-    }
-  },
-  "results_growth_theory": {
-    "theory_implied": {
-      "return_pct": -4.0
-    },
-    "falsifier_adjusted": {
-      "return_pct": -4.0
+      "return_pct": -2.9
     }
   },
   "option_scan": [
@@ -431,143 +559,8 @@
     }
   ],
   "synthesis": {
-    "status": "complete",
-    "paths": [
-      {
-        "id": "theory_implied",
-        "label": "Segment-derived growth (pre-falsifier)",
-        "source": "segment_build weighted blend",
-        "return_pct": -4.0,
-        "weight": 0.08,
-        "type": "numeric",
-        "epistemic_tier": "B (pre-falsifier derivation)",
-        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
-        "weight_falsifiers": [
-          "Included at full weight alongside falsifier-adjusted without divergence note"
-        ],
-        "hard_to_vary": "partial"
-      },
-      {
-        "id": "scenario_bear",
-        "label": "Bear scenario (Lawrence)",
-        "source": "scenarios.bear",
-        "return_pct": -9.0,
-        "weight": 0.05,
-        "type": "numeric",
-        "epistemic_tier": "C (scenario envelope)",
-        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
-        "weight_falsifiers": [
-          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
-        ],
-        "hard_to_vary": "yes: asymmetric low weight is structural"
-      },
-      {
-        "id": "scenario_bull",
-        "label": "Bull scenario (Lawrence)",
-        "source": "scenarios.bull",
-        "return_pct": 1.5,
-        "weight": 0.12,
-        "type": "numeric",
-        "epistemic_tier": "C (scenario envelope)",
-        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
-        "weight_falsifiers": [
-          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
-        ],
-        "hard_to_vary": "yes"
-      },
-      {
-        "id": "segment_implied",
-        "label": "Segment cash-flow build (reverse DCF)",
-        "source": "segment_build @ explicit discount",
-        "return_pct": -0.84,
-        "weight": 0.2,
-        "type": "numeric",
-        "epistemic_tier": "B (independent derivation)",
-        "weight_why": "Reverse DCF from segment filing data; cross-checks consolidated growth without replacing falsifier path.",
-        "weight_falsifiers": [
-          "Segment sum PV tie-out fails vs consolidated OCF",
-          "Implied return moves >1pp when segment growth matches filing falsifier-adjusted exactly (double-count signal)"
-        ],
-        "hard_to_vary": "partial: shares growth inputs with Tier A; weight kept below filing path"
-      },
-      {
-        "id": "nav_overlay_payoff",
-        "label": "NAV overlay dated payoff (7yr to overlay base)",
-        "source": "nav_overlay ~$210.5/sh vs price $393.0",
-        "return_pct": -8.53,
-        "weight": 0.1,
-        "type": "numeric",
-        "epistemic_tier": "D (alternate theory: dated asset payoff)",
-        "weight_why": "Answers a different question (NAV convergence) than 7yr cash-flow IRR; capped weight to avoid theory conflation.",
-        "weight_falsifiers": [
-          "NAV overlay base not updated when segment build or filings change >10%",
-          "floor_pass false but weight above 15% without [HUMAN REVIEW]"
-        ],
-        "hard_to_vary": "yes: separate theory type"
-      },
-      {
-        "id": "third_party_context",
-        "label": "Third-party approved (HK + Substacks + inventory)",
-        "source": "source_inventory (8 sources); cross_check blend",
-        "return_pct": 1.5,
-        "weight": 0.1,
-        "type": "numeric",
-        "notes": "Proxy: upside case when strategic third party has no spot IRR",
-        "epistemic_tier": "D (external triangulation)",
-        "weight_why": "Context-tier HK/Substacks until human promotes in third_party_sources.md; numeric proxy is weak.",
-        "weight_falsifiers": [
-          "Using bull scenario as HK proxy when cross_check synthesis says no IRR upgrade",
-          "Weight above 15% while human_approval pending"
-        ],
-        "hard_to_vary": "no: proxy return is instrumentalist; prefer qualitative pp until approved blend"
-      }
-    ],
-    "qualitative_adjustments": [
-      {
-        "id": "governance_transition",
-        "factor": "Governance transition (post-Stahl)",
-        "pp": -0.4,
-        "rationale": "Capital allocation uncertainty until proven",
-        "sources": "https://lemoncakesinvesting.substack.com/p/tpl-texas-pacific-land-co-end-of",
-        "falsifier": "Proxy/filings show stable capital allocation for 4+ quarters"
-      },
-      {
-        "id": "no_predictive_attribute",
-        "factor": "No dated predictive attribute at spot",
-        "pp": -0.2,
-        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
-        "sources": "HK predictive attributes framework",
-        "falsifier": "Cross-check names dated catalyst with timeline"
-      }
-    ],
-    "qualitative_manual": false,
-    "qualitative_pp_cap_applied": false,
-    "numeric_weighted_pct": -2.25,
-    "qualitative_pp": -0.6,
-    "total_synthesis_pct": -2.85,
-    "human_approval": "approved",
-    "weight_audit": {
-      "flags": [
-        "Third-party numeric path proxies bull scenario (instrumentalist); HK cross-check says no base IRR upgrade. Prefer qualitative pp only until approved blend.",
-        "NAV overlay is a different theory (asset payoff vs cash-flow IRR); weight capped at 10% to limit theory conflation."
-      ],
-      "deutsch_checks": {
-        "hard_to_vary": false,
-        "falsifiable": true,
-        "not_instrumentalist": false,
-        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
-      },
-      "qualitative_audit": {
-        "flags": [],
-        "deutsch_checks": {
-          "hard_to_vary": true,
-          "falsifiable": true,
-          "not_double_count": true,
-          "small_band": true
-        }
-      }
-    },
-    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+    "status": "disabled_separated_views",
+    "reason": "Correlated operating paths and unsupported asset options must not be averaged into a consensus return."
   },
   "lawrence_horizon_years": 7,
   "evidence_refresh": {
@@ -941,7 +934,7 @@
     "top_dissents": [],
     "contributor_count": 7,
     "in_base_irr": false,
-    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
+    "disclaimer": "Advisory persona context only. It does not replace the operating stance gate or enter valuation_views."
   },
   "total_return_panel": {
     "as_of": "2026-06-11",
@@ -953,5 +946,453 @@
     "total_return_annualized_pct": 14.29,
     "chart": "TPL/research/charts/total_return_2026-06-11.svg",
     "panel_json": "TPL/research/total_return_panel.json"
+  },
+  "valuation_views": {
+    "decision_rule": "Do not average operating returns, component value, and reverse expectations.",
+    "operating": {
+      "owner_cash_per_share": 7.02,
+      "scenario_returns_pct": {
+        "bear": -12.6,
+        "base": -7.5,
+        "bull": -2.9
+      },
+      "segment_cross_check": {
+        "sum_pv_per_share_at_explicit_discount": 125.8,
+        "explicit_discount_rate_pct": 10.0,
+        "implied_business_return_pct": -8.28,
+        "lawrence_base_irr_pct": -7.5
+      }
+    },
+    "assets": {
+      "legacy_supported_decision_value_per_share": 0.0,
+      "ledger": [],
+      "legacy_non_supported_count": 0
+    },
+    "components": {
+      "status": "complete",
+      "decision_rule": "Use the complete low/base/high component schedule. Embedded components are estimated but not added twice.",
+      "all_material_components_identified": true,
+      "additive_components": [
+        {
+          "id": "land_resource_operations",
+          "label": "Producing royalties, easements, and land-resource operations",
+          "category": "operating_business",
+          "treatment": "additive",
+          "included_in_component_id": null,
+          "method": "segment_owner_cash_dcf",
+          "evidence_tier": "filing_segment_cash_flow",
+          "evidence": "FY2025 Land & Resource net income plus D&A, with 3%/2% growth and 20x terminal value; 12%/10%/8% discount-rate range.",
+          "cross_check": "FY2025 royalties $411.7M and easements $78.2M; producing economics are fully captured here.",
+          "low_per_share": 84.97,
+          "base_per_share": 94.63,
+          "high_per_share": 105.71
+        },
+        {
+          "id": "water_operations",
+          "label": "Water Services and Operations",
+          "category": "operating_business",
+          "treatment": "additive",
+          "included_in_component_id": null,
+          "method": "segment_owner_cash_dcf",
+          "evidence_tier": "filing_segment_cash_flow",
+          "evidence": "May 2026 investor presentation: FY2025 Water post-tax cash flow $177M less $20M/$15M/$10M maintenance capex = $2.15/$2.35/$2.55 per share. Low/base/high use 2%/4%/6% early growth, 10x/12x/14x terminal values, and 12%/10%/8% discount rates.",
+          "cross_check": "FY2025 water revenue $307.5M, water-sales revenue $170M, produced-water royalty revenue $124M with essentially zero direct operating expense or capex, and net PP&E $164.5M. Growth capex remains excluded from maintenance owner cash and must earn an explicit return.",
+          "low_per_share": 21.71,
+          "base_per_share": 31.86,
+          "high_per_share": 46.6
+        },
+        {
+          "id": "cash_and_investments",
+          "label": "Cash and equity-method investment",
+          "category": "financial_asset",
+          "treatment": "additive",
+          "included_in_component_id": null,
+          "method": "balance_sheet_mark",
+          "evidence_tier": "filing_balance_sheet",
+          "evidence": "Q1 2026 cash $247.6M ($3.59/sh) plus $50M equity-method investment ($0.72/sh).",
+          "cross_check": "No debt is disclosed in the FY2025 balance-sheet bridge.",
+          "low_per_share": 3.6,
+          "base_per_share": 4.32,
+          "high_per_share": 4.32
+        },
+        {
+          "id": "undeveloped_nra_option",
+          "label": "Undeveloped net royalty acreage",
+          "category": "real_option",
+          "treatment": "additive",
+          "included_in_component_id": null,
+          "method": "probability_weighted_transaction_nav",
+          "evidence_tier": "limited_company_transaction",
+          "evidence": "224,000 NRA multiplied by the March 2025 177-NRA acquisition mark of $19,775/NRA, then risked at 15%/25%/35% for development timing, quality, taxes, and realization.",
+          "cross_check": "The range is deliberately below the un-risked $64.2/sh transaction extrapolation.",
+          "low_per_share": 9.63,
+          "base_per_share": 16.05,
+          "high_per_share": 22.47
+        },
+        {
+          "id": "surface_acreage_option",
+          "label": "Surface acreage",
+          "category": "real_option",
+          "treatment": "additive",
+          "included_in_component_id": null,
+          "method": "risked_land_nav",
+          "evidence_tier": "limited_company_transaction",
+          "evidence": "882,000 acres at $750/$1,500/$2,500 per acre. The May 2025 787-acre sale at $5,718/acre is a ceiling cross-check, not a portfolio-wide mark.",
+          "cross_check": "The base is materially below the observed small-parcel sale and requires a future acreage-use segmentation refresh.",
+          "low_per_share": 9.58,
+          "base_per_share": 19.16,
+          "high_per_share": 31.93
+        },
+        {
+          "id": "realization_and_corporate_reserve",
+          "label": "Corporate, tax, and realization reserve",
+          "category": "liability_or_reserve",
+          "treatment": "additive",
+          "included_in_component_id": null,
+          "method": "conservative_reserve",
+          "evidence_tier": "analyst_estimate",
+          "evidence": "Reserve for taxes, transaction costs, and corporate friction when latent land and royalty value is realized; no debt is separately deducted.",
+          "cross_check": "Low case absorbs more of the gross option value as realization cost.",
+          "low_per_share": -5.0,
+          "base_per_share": -3.0,
+          "high_per_share": -1.0
+        }
+      ],
+      "embedded_components": [
+        {
+          "id": "water_infrastructure_cross_check",
+          "label": "Water infrastructure replacement-cost cross-check",
+          "category": "infrastructure",
+          "treatment": "embedded",
+          "included_in_component_id": "water_operations",
+          "method": "depreciated_replacement_cost",
+          "evidence_tier": "filing_balance_sheet",
+          "evidence": "FY2025 net PP&E of $164.5M; value is a floor cross-check and is embedded in Water operations, not additive.",
+          "cross_check": "Operating DCF of Water Services already capitalizes returns on this infrastructure.",
+          "low_per_share": 2.0,
+          "base_per_share": 2.4,
+          "high_per_share": 4.0
+        }
+      ],
+      "total_equity_value_per_share": {
+        "low": 124.49,
+        "base": 163.02,
+        "high": 210.03
+      },
+      "material_component_count": 7,
+      "additive_component_count": 6,
+      "embedded_component_count": 1,
+      "market_price_per_share": 393.0,
+      "upside_downside_pct": {
+        "low": -68.3,
+        "base": -58.5,
+        "high": -46.6
+      }
+    },
+    "reverse_expectations": {
+      "price": 393.0,
+      "exit_multiple": 20.0,
+      "constant_owner_cash_growth_required_pct": 12.1,
+      "warning": "Required growth is a diagnostic, not a forecast."
+    },
+    "entry_prices": {
+      "10%": 132.37,
+      "12%": 118.79,
+      "15%": 101.56
+    }
+  },
+  "legacy_output_policy": {
+    "results_lawrence_legacy": "compatibility alias of the current operating scenarios; not a separate valuation",
+    "growth_explanation": "qualitative scenario context only; legacy numerical paths do not enter the decision",
+    "nav_overlay": "audit history only when decision_use is false",
+    "option_scan": "inventory disclosure only; asset value enters only through valuation_views.assets"
+  },
+  "component_valuation_results": {
+    "status": "complete",
+    "decision_rule": "Use the complete low/base/high component schedule. Embedded components are estimated but not added twice.",
+    "all_material_components_identified": true,
+    "additive_components": [
+      {
+        "id": "land_resource_operations",
+        "label": "Producing royalties, easements, and land-resource operations",
+        "category": "operating_business",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "segment_owner_cash_dcf",
+        "evidence_tier": "filing_segment_cash_flow",
+        "evidence": "FY2025 Land & Resource net income plus D&A, with 3%/2% growth and 20x terminal value; 12%/10%/8% discount-rate range.",
+        "cross_check": "FY2025 royalties $411.7M and easements $78.2M; producing economics are fully captured here.",
+        "low_per_share": 84.97,
+        "base_per_share": 94.63,
+        "high_per_share": 105.71
+      },
+      {
+        "id": "water_operations",
+        "label": "Water Services and Operations",
+        "category": "operating_business",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "segment_owner_cash_dcf",
+        "evidence_tier": "filing_segment_cash_flow",
+        "evidence": "May 2026 investor presentation: FY2025 Water post-tax cash flow $177M less $20M/$15M/$10M maintenance capex = $2.15/$2.35/$2.55 per share. Low/base/high use 2%/4%/6% early growth, 10x/12x/14x terminal values, and 12%/10%/8% discount rates.",
+        "cross_check": "FY2025 water revenue $307.5M, water-sales revenue $170M, produced-water royalty revenue $124M with essentially zero direct operating expense or capex, and net PP&E $164.5M. Growth capex remains excluded from maintenance owner cash and must earn an explicit return.",
+        "low_per_share": 21.71,
+        "base_per_share": 31.86,
+        "high_per_share": 46.6
+      },
+      {
+        "id": "cash_and_investments",
+        "label": "Cash and equity-method investment",
+        "category": "financial_asset",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "balance_sheet_mark",
+        "evidence_tier": "filing_balance_sheet",
+        "evidence": "Q1 2026 cash $247.6M ($3.59/sh) plus $50M equity-method investment ($0.72/sh).",
+        "cross_check": "No debt is disclosed in the FY2025 balance-sheet bridge.",
+        "low_per_share": 3.6,
+        "base_per_share": 4.32,
+        "high_per_share": 4.32
+      },
+      {
+        "id": "undeveloped_nra_option",
+        "label": "Undeveloped net royalty acreage",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "probability_weighted_transaction_nav",
+        "evidence_tier": "limited_company_transaction",
+        "evidence": "224,000 NRA multiplied by the March 2025 177-NRA acquisition mark of $19,775/NRA, then risked at 15%/25%/35% for development timing, quality, taxes, and realization.",
+        "cross_check": "The range is deliberately below the un-risked $64.2/sh transaction extrapolation.",
+        "low_per_share": 9.63,
+        "base_per_share": 16.05,
+        "high_per_share": 22.47
+      },
+      {
+        "id": "surface_acreage_option",
+        "label": "Surface acreage",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "risked_land_nav",
+        "evidence_tier": "limited_company_transaction",
+        "evidence": "882,000 acres at $750/$1,500/$2,500 per acre. The May 2025 787-acre sale at $5,718/acre is a ceiling cross-check, not a portfolio-wide mark.",
+        "cross_check": "The base is materially below the observed small-parcel sale and requires a future acreage-use segmentation refresh.",
+        "low_per_share": 9.58,
+        "base_per_share": 19.16,
+        "high_per_share": 31.93
+      },
+      {
+        "id": "realization_and_corporate_reserve",
+        "label": "Corporate, tax, and realization reserve",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "conservative_reserve",
+        "evidence_tier": "analyst_estimate",
+        "evidence": "Reserve for taxes, transaction costs, and corporate friction when latent land and royalty value is realized; no debt is separately deducted.",
+        "cross_check": "Low case absorbs more of the gross option value as realization cost.",
+        "low_per_share": -5.0,
+        "base_per_share": -3.0,
+        "high_per_share": -1.0
+      }
+    ],
+    "embedded_components": [
+      {
+        "id": "water_infrastructure_cross_check",
+        "label": "Water infrastructure replacement-cost cross-check",
+        "category": "infrastructure",
+        "treatment": "embedded",
+        "included_in_component_id": "water_operations",
+        "method": "depreciated_replacement_cost",
+        "evidence_tier": "filing_balance_sheet",
+        "evidence": "FY2025 net PP&E of $164.5M; value is a floor cross-check and is embedded in Water operations, not additive.",
+        "cross_check": "Operating DCF of Water Services already capitalizes returns on this infrastructure.",
+        "low_per_share": 2.0,
+        "base_per_share": 2.4,
+        "high_per_share": 4.0
+      }
+    ],
+    "total_equity_value_per_share": {
+      "low": 124.49,
+      "base": 163.02,
+      "high": 210.03
+    },
+    "material_component_count": 7,
+    "additive_component_count": 6,
+    "embedded_component_count": 1,
+    "market_price_per_share": 393.0,
+    "upside_downside_pct": {
+      "low": -68.3,
+      "base": -58.5,
+      "high": -46.6
+    }
+  },
+  "component_review_queue": {
+    "status": "ready_for_committee_review",
+    "decision_rule": "Each assigned rater records accept, challenge, or reject with a proposed range and evidence. The aggregator may not silently average disputed ranges.",
+    "items": [
+      {
+        "component_id": "land_resource_operations",
+        "label": "Producing royalties, easements, and land-resource operations",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 84.97,
+          "base": 94.63,
+          "high": 105.71
+        },
+        "range_width_pct_of_base": 21.9,
+        "evidence_tier": "filing_segment_cash_flow",
+        "recommended_raters": [
+          "hohn",
+          "marathon_capital_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "water_operations",
+        "label": "Water Services and Operations",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 21.71,
+          "base": 31.86,
+          "high": 46.6
+        },
+        "range_width_pct_of_base": 78.1,
+        "evidence_tier": "filing_segment_cash_flow",
+        "recommended_raters": [
+          "hohn",
+          "marathon_capital_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "cash_and_investments",
+        "label": "Cash and equity-method investment",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 3.6,
+          "base": 4.32,
+          "high": 4.32
+        },
+        "range_width_pct_of_base": 16.7,
+        "evidence_tier": "filing_balance_sheet",
+        "recommended_raters": [
+          "greenblatt",
+          "marks_credit_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "undeveloped_nra_option",
+        "label": "Undeveloped net royalty acreage",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 9.63,
+          "base": 16.05,
+          "high": 22.47
+        },
+        "range_width_pct_of_base": 80.0,
+        "evidence_tier": "limited_company_transaction",
+        "recommended_raters": [
+          "klarman_asset_value",
+          "hk"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "surface_acreage_option",
+        "label": "Surface acreage",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 9.58,
+          "base": 19.16,
+          "high": 31.93
+        },
+        "range_width_pct_of_base": 116.6,
+        "evidence_tier": "limited_company_transaction",
+        "recommended_raters": [
+          "klarman_asset_value",
+          "hk"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "realization_and_corporate_reserve",
+        "label": "Corporate, tax, and realization reserve",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": -5.0,
+          "base": -3.0,
+          "high": -1.0
+        },
+        "range_width_pct_of_base": 133.3,
+        "evidence_tier": "analyst_estimate",
+        "recommended_raters": [
+          "marks_credit_cycle",
+          "pabrai"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "water_infrastructure_cross_check",
+        "label": "Water infrastructure replacement-cost cross-check",
+        "treatment": "embedded",
+        "range_per_share": {
+          "low": 2.0,
+          "base": 2.4,
+          "high": 4.0
+        },
+        "range_width_pct_of_base": 83.3,
+        "evidence_tier": "filing_balance_sheet",
+        "recommended_raters": [
+          "hohn",
+          "marathon_capital_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      }
+    ]
   }
 }

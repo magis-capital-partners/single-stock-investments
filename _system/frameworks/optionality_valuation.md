@@ -25,6 +25,71 @@ Set `valuation_mode: optionality` in `{TICKER}/research/valuation.json` and docu
 
 ---
 
+## Separated-views method (default for operating business + hidden assets)
+
+When an operating business also owns poorly observed land, royalties, stakes, or other options, use `valuation_methodology.mode: separated_views`.
+
+The output has three views that must never be averaged:
+
+1. **Operating owner cash.** Start with cash available to owners after fixed-asset spending and share-based compensation. Model segment economics when margins or capital intensity differ.
+2. **Complete component schedule.** Give every material component a unique `overlap_key`, a valuation method, evidence, and low/base/high estimate. An asset with weak evidence receives a wider range; it never receives an implicit value of zero merely because the evidence is incomplete. Components already represented in an operating value are marked `embedded` and identify their additive parent.
+3. **Reverse expectations.** At the quoted price, solve the owner-cash growth required for a stated end-of-horizon multiple. This is a diagnostic, not a forecast.
+
+Required decision outputs:
+
+- operating bear/base/bull return range
+- segment owner-cash reconciliation
+- complete low/base/high component value, including risked latent assets
+- market-implied constant owner-cash growth
+- entry prices for 10%, 12%, and 15% returns
+
+The operating base return and the complete component value are separate decision views. `synthesis.status` must be `disabled_separated_views`; correlated DCFs, NAV illustrations, and third-party narratives cannot be blended into a consensus return.
+
+## Universal component valuation schedule
+
+Use `component_valuation` for any security where a whole-company conclusion needs more than a single operating-cash-flow model. It is deliberately method-neutral: operating companies can use owner-cash DCF, banks can use excess-return or book-value methods, funds can use look-through NAV, and asset owners can use risked transaction NAV.
+
+Start from the matching component map in `_system/templates/component_valuation_templates.json`. It covers operating companies, banks/insurers, holding companies, resource and land owners, biotech/pre-profit issuers, and dated-payoff situations. The template is a checklist, not a valuation: every placeholder must be replaced with an evidence-backed range.
+
+```json
+{
+  "component_valuation": {
+    "version": "1.0",
+    "all_material_components_identified": true,
+    "components": [{
+      "id": "unique_component_id",
+      "label": "Plain-English component name",
+      "category": "operating_business | financial_asset | real_option | liability_or_reserve",
+      "overlap_key": "unique_economic_claim",
+      "treatment": "additive | embedded",
+      "included_in_component_id": "required only when embedded",
+      "valuation": {
+        "basis": "per_share | total_value_m",
+        "method": "dcf | market_value | risked_nav | excess_return | manual",
+        "low": 0,
+        "base": 0,
+        "high": 0,
+        "evidence_tier": "filing | transaction | analyst_estimate",
+        "evidence": "specific source and reasoning",
+        "cross_check": "independent check"
+      }
+    }]
+  }
+}
+```
+
+Required rules:
+
+- Each material component has `low <= base <= high`, an evidence statement, and a method.
+- Additive components sum to total equity value. Liabilities use negative values.
+- Embedded components still receive an estimate, but are not added because their value is already in the identified parent component.
+- A schedule fails validation if a material component is omitted, has no range, duplicates an economic claim, or embeds into a non-additive parent.
+- For a new issuer without an explicit schedule, the engine emits an operating-business fallback. It is compatible with every `full` or `scenario` valuation, but it is explicitly incomplete and cannot support an asset-level conclusion.
+
+Use horizon-neutral keys for new work: `growth_y6_end` and `exit_pfcf_end`. Legacy `growth_y6_10` and `exit_pfcf_y10` remain readable for older valuations.
+
+---
+
 ## Three archetype overlays
 
 ### A. Holdco flywheel + catalyst stack (FRMO)

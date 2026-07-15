@@ -13,6 +13,7 @@ SCRIPTS = Path(__file__).resolve().parent
 sys.path.insert(0, str(SCRIPTS))
 
 from marvin_pipeline_common import has_evidence_refresh_config, ticker_needs_commodity_inputs  # noqa: E402
+from marvin_valuation import compute_component_valuation  # noqa: E402
 from optionality_evidence_common import max_residual_allowed, residual_slack_per_share  # noqa: E402
 
 
@@ -71,12 +72,25 @@ def check(ticker: str, *, dive_date: str | None = None, strict: bool = False) ->
                 errs.append(f"{commodity} spot as_of {cu.get('as_of')} stale ({age}d)")
 
     nav = val.get("nav_overlay") or {}
-    if mode == "optionality" and nav:
+    if mode == "optionality" and nav and not val.get("component_valuation"):
         if nav.get("status") != "complete":
             errs.append(f"nav_overlay status={nav.get('status')}")
         og = val.get("optionality_gate") or {}
         if og.get("floor_metric") == "book_per_share" and nav.get("gaap_vs_fair_value"):
             errs.append("floor_metric still book_per_share with economic misstatement")
+
+    methodology = val.get("valuation_methodology") or {}
+    if methodology.get("mode") == "separated_views":
+        if not val.get("component_valuation"):
+            errs.append("separated_views requires a complete component_valuation schedule")
+        else:
+            try:
+                computed = json.loads(json.dumps(val))
+                result = compute_component_valuation(computed)
+                if not result or result.get("status") != "complete":
+                    errs.append("component_valuation is not complete")
+            except ValueError as exc:
+                errs.append(f"component_valuation invalid: {exc}")
 
     stance_gate = (cfg.get("base_payoff_mode") or "") == "fixed_stance_gate"
     slack = residual_slack_per_share(val)
