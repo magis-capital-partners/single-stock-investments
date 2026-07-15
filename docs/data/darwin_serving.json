@@ -1,21 +1,21 @@
 {
-  "generated_at": "2026-07-13T14:15:52Z",
+  "generated_at": "2026-07-14T22:58:14Z",
   "accounts": {
     "roth": {
       "policy_id": "ira_marvin",
       "regime": "calm",
       "tier": 0,
-      "backtest_cumulative_pct": 0,
-      "backtest_sharpe": 0.0,
+      "backtest_cumulative_pct": -20.87,
+      "backtest_sharpe": -4.02,
       "paper": {
-        "date": "2026-07-13",
-        "nav_usd": 147692.0,
-        "period_return_pct": 0.0,
-        "cumulative_return_pct": 47.692
+        "date": "2026-07-14",
+        "nav_usd": 155464.85,
+        "period_return_pct": 5.263,
+        "cumulative_return_pct": 55.465
       },
       "paper_inception": "2026-06-03",
       "portfolio": {
-        "generated_at": "2026-07-13T14:15:52Z",
+        "generated_at": "2026-07-14T22:58:14Z",
         "account_id": "roth",
         "tier": 0,
         "phase": "0-tier0",
@@ -23,12 +23,13 @@
           "long_only": true,
           "allow_short": false,
           "universe": "registry_sp500_liquid",
-          "min_names": 8,
-          "max_names": 12,
+          "min_names": 10,
+          "max_names": 40,
           "max_names_cc": 8,
           "min_names_cc": 6,
-          "max_weight_pct": 15.0,
-          "min_weight_pct": 3.0,
+          "max_weight_pct": 10.0,
+          "min_weight_pct": 2.0,
+          "normal_cash_ceiling_pct": 5.0,
           "rebalance_frequency": "semiannual",
           "max_one_way_turnover_pct_per_rebalance": 10.0,
           "max_abs_weight_change_pct_per_rebalance": 2.5,
@@ -70,14 +71,14 @@
         "universe_exclusions": {
           "eligible_count": 502,
           "eligible_with_returns": 498,
-          "excluded_total": 638,
+          "excluded_total": 602,
           "by_reason": {
             "not_in_sp500": 131,
             "adr_otc": 0,
             "liquidity_miss": 0,
             "no_options": 1,
             "returns_missing": 4,
-            "research_eligibility_miss": 502
+            "research_eligibility_miss": 466
           },
           "samples": {
             "not_in_sp500": [
@@ -108,16 +109,16 @@
             "research_eligibility_miss": [
               "A",
               "AAPL",
-              "ABBV",
-              "ABNB",
-              "ABT",
               "ACGL",
-              "ACN",
-              "ADBE",
               "ADI",
               "ADM",
               "ADP",
-              "ADSK"
+              "ADSK",
+              "AEP",
+              "AES",
+              "AIG",
+              "AIZ",
+              "AJG"
             ]
           },
           "liquidity_fallback": false,
@@ -141,7 +142,7 @@
             },
             "eligible_ab": 502,
             "ticker_count": 503,
-            "path": "/home/runner/work/single-stock-investments/single-stock-investments/_system/reference/market-data/index/sp500_options_liquidity.json"
+            "path": "C:\\Users\\drewg\\Projects\\dashboards\\single-stock-investments\\_system\\reference\\market-data\\index\\sp500_options_liquidity.json"
           },
           "coverage_gate_ok": true,
           "coverage_gate": {
@@ -172,7 +173,7 @@
           },
           "eligible_ab": 502,
           "ticker_count": 503,
-          "path": "/home/runner/work/single-stock-investments/single-stock-investments/_system/reference/market-data/index/sp500_options_liquidity.json"
+          "path": "C:\\Users\\drewg\\Projects\\dashboards\\single-stock-investments\\_system\\reference\\market-data\\index\\sp500_options_liquidity.json"
         },
         "covered_call": {
           "enabled": true,
@@ -202,8 +203,106 @@
           "coverage_fraction_effective": 0.22999999999999998,
           "regime_coverage_mult": 1.15,
           "disclaimer": "Synthetic covered-call overlay on champion weights, not Darwin AI Ventures proprietary model",
-          "stress_cases": null,
-          "name_level_sample": null,
+          "stress_cases": {
+            "bull_month": {
+              "stock_ret": 0.1,
+              "cc_ret": 0.08788951386276514,
+              "lag_vs_stock": -0.012110486137234866,
+              "premium_monthly": 0.005666666666666666,
+              "upside_cap": 0.041679045780138216,
+              "coverage": 0.22999999999999998
+            },
+            "crash_month": {
+              "stock_ret": -0.12,
+              "cc_ret": -0.11869666666666666,
+              "lag_vs_stock": 0.001303333333333337,
+              "premium_monthly": 0.005666666666666666,
+              "upside_cap": 0.041679045780138216,
+              "coverage": 0.22999999999999998
+            },
+            "sideways": {
+              "stock_ret": 0.005,
+              "cc_ret": 0.006303333333333333,
+              "lag_vs_stock": 0.0013033333333333326,
+              "premium_monthly": 0.005666666666666666,
+              "upside_cap": 0.041679045780138216,
+              "coverage": 0.22999999999999998
+            }
+          },
+          "name_level_sample": {
+            "ADBE": {
+              "premium_monthly": 0.010531,
+              "upside_cap": 0.045847,
+              "coverage": 0.330625,
+              "vol_annual": 0.371674,
+              "vol_scale": 1.858372,
+              "stance": "watch",
+              "liquidity_bucket": "A"
+            },
+            "ACN": {
+              "premium_monthly": 0.011333,
+              "upside_cap": 0.045847,
+              "coverage": 0.330625,
+              "vol_annual": 0.47982,
+              "vol_scale": 2.0,
+              "stance": "watch",
+              "liquidity_bucket": "A"
+            },
+            "ZBH": {
+              "premium_monthly": 0.007296,
+              "upside_cap": 0.041679,
+              "coverage": 0.330625,
+              "vol_annual": 0.257508,
+              "vol_scale": 1.287539,
+              "stance": "watch",
+              "liquidity_bucket": "A"
+            },
+            "ALL": {
+              "premium_monthly": 0.007296,
+              "upside_cap": 0.041679,
+              "coverage": 0.330625,
+              "vol_annual": 0.257518,
+              "vol_scale": 1.287592,
+              "stance": "watch",
+              "liquidity_bucket": "A"
+            },
+            "AMP": {
+              "premium_monthly": 0.007726,
+              "upside_cap": 0.041679,
+              "coverage": 0.330625,
+              "vol_annual": 0.272672,
+              "vol_scale": 1.36336,
+              "stance": "watch",
+              "liquidity_bucket": "A"
+            },
+            "APTV": {
+              "premium_monthly": 0.007088,
+              "upside_cap": 0.041679,
+              "coverage": 0.330625,
+              "vol_annual": 0.250159,
+              "vol_scale": 1.250797,
+              "stance": "watch",
+              "liquidity_bucket": "A"
+            },
+            "MRSH": {
+              "premium_monthly": 0.004386,
+              "upside_cap": 0.041679,
+              "coverage": 0.330625,
+              "vol_annual": 0.154818,
+              "vol_scale": 0.774088,
+              "stance": "watch",
+              "liquidity_bucket": "A"
+            },
+            "ZTS": {
+              "premium_monthly": 0.010962,
+              "upside_cap": 0.045847,
+              "coverage": 0.330625,
+              "vol_annual": 0.386893,
+              "vol_scale": 1.934467,
+              "stance": "watch",
+              "liquidity_bucket": "A"
+            }
+          },
           "proxy_returns_status": {
             "XYLD": {
               "status": "exists",
@@ -215,7 +314,7 @@
             }
           },
           "options_cache": {
-            "requested": 12,
+            "requested": 25,
             "local_symbols": 0,
             "etf_dashboard_symbols": 0,
             "merged_hit": 0,
@@ -238,8 +337,8 @@
           }
         },
         "cc_scenarios": {
-          "generated_at": "2026-07-13T14:15:52Z",
-          "long_only_max_names": 12,
+          "generated_at": "2026-07-14T22:58:14Z",
+          "long_only_max_names": 40,
           "cc_concentrated_max_names": 8,
           "production_policy": "ira_marvin",
           "cc_oos_gate": {
@@ -249,20 +348,79 @@
             "promote_dual_score": false,
             "production_policy": "ira_marvin_gated"
           },
-          "scenario_cc_weights": [],
+          "scenario_cc_weights": [
+            {
+              "ticker": "ADBE",
+              "weight_pct": 12.5
+            },
+            {
+              "ticker": "ACN",
+              "weight_pct": 12.5
+            },
+            {
+              "ticker": "ZBH",
+              "weight_pct": 12.5
+            },
+            {
+              "ticker": "ALL",
+              "weight_pct": 12.5
+            },
+            {
+              "ticker": "AMP",
+              "weight_pct": 12.5
+            },
+            {
+              "ticker": "APTV",
+              "weight_pct": 12.5
+            },
+            {
+              "ticker": "MRSH",
+              "weight_pct": 12.5
+            },
+            {
+              "ticker": "ZTS",
+              "weight_pct": 12.5
+            }
+          ],
           "scenario_vs_production": {
-            "scenario_names": 0,
-            "production_names": 0,
-            "overlap": []
+            "scenario_names": 8,
+            "production_names": 25,
+            "overlap": [
+              "ACN",
+              "ADBE",
+              "ALL",
+              "AMP",
+              "APTV",
+              "MRSH",
+              "ZBH",
+              "ZTS"
+            ]
           },
           "human_approve_note": "Approve scenario_cc_weights before changing live paper book."
         },
         "cc_lab": {
-          "generated_at": "2026-07-13T14:15:52Z",
+          "generated_at": "2026-07-14T22:58:14Z",
           "lab": "cc_knob_ga",
           "disclaimer": "Lab only. Does not overwrite Marvin stance or production weights.",
           "n_trials": 12,
-          "best": null,
+          "best": {
+            "genome": {
+              "premium_yield_annual_pct": 10.7,
+              "tenor_days": 5,
+              "otm_pct": 2.83,
+              "bid_ask_haircut": 0.08,
+              "coverage_fraction": 0.36,
+              "assignment_bps": 5,
+              "etf_proxy_ticker": "XYLD",
+              "mode": "synthetic_lab",
+              "label": "cc_knob_lab",
+              "enabled": true
+            },
+            "sharpe_annualized": -0.838,
+            "cumulative_return": -0.0781,
+            "max_drawdown_pct": 0.1411,
+            "error": null
+          },
           "path": "/home/runner/work/single-stock-investments/single-stock-investments/dashboard/data/darwin_cc_lab_scenarios.json"
         },
         "regime": {
@@ -292,15 +450,369 @@
           "ensemble": null,
           "population_loaded": 8
         },
-        "weights": [],
-        "cash_weight_pct": 100.0,
+        "weights": [
+          {
+            "ticker": "ADBE",
+            "company": "Adobe Inc.",
+            "weight": 0.0864,
+            "weight_pct": 8.64,
+            "delta": -0.0006,
+            "stance": "watch",
+            "irr_base_pct": 33.28,
+            "irr_falsifier_pct": 32.0,
+            "research_status": "current",
+            "days_since_deep_dive": 3,
+            "falsifier_count": 0,
+            "trade_suggested": false
+          },
+          {
+            "ticker": "ACN",
+            "company": "Accenture",
+            "weight": 0.0694,
+            "weight_pct": 6.94,
+            "delta": -0.0005,
+            "stance": "watch",
+            "irr_base_pct": 26.61,
+            "irr_falsifier_pct": 25.7,
+            "research_status": "current",
+            "days_since_deep_dive": 3,
+            "falsifier_count": 0,
+            "trade_suggested": false
+          },
+          {
+            "ticker": "ZBH",
+            "company": "Zimmer Biomet",
+            "weight": 0.0556,
+            "weight_pct": 5.56,
+            "delta": -0.0004,
+            "stance": "watch",
+            "irr_base_pct": 21.35,
+            "irr_falsifier_pct": 20.6,
+            "research_status": "current",
+            "days_since_deep_dive": 2,
+            "falsifier_count": 0,
+            "trade_suggested": false
+          },
+          {
+            "ticker": "ALL",
+            "company": "Allstate",
+            "weight": 0.0524,
+            "weight_pct": 5.24,
+            "delta": -0.0004,
+            "stance": "watch",
+            "irr_base_pct": 19.82,
+            "irr_falsifier_pct": 19.4,
+            "research_status": "current",
+            "days_since_deep_dive": 3,
+            "falsifier_count": 0,
+            "trade_suggested": false
+          },
+          {
+            "ticker": "AMP",
+            "company": "Ameriprise Financial",
+            "weight": 0.0489,
+            "weight_pct": 4.89,
+            "delta": -0.0003,
+            "stance": "watch",
+            "irr_base_pct": 18.94,
+            "irr_falsifier_pct": 18.1,
+            "research_status": "current",
+            "days_since_deep_dive": 3,
+            "falsifier_count": 0,
+            "trade_suggested": false
+          },
+          {
+            "ticker": "APTV",
+            "company": "Aptiv",
+            "weight": 0.0478,
+            "weight_pct": 4.78,
+            "delta": -0.0003,
+            "stance": "watch",
+            "irr_base_pct": 18.88,
+            "irr_falsifier_pct": 17.7,
+            "research_status": "current",
+            "days_since_deep_dive": 3,
+            "falsifier_count": 0,
+            "trade_suggested": false
+          },
+          {
+            "ticker": "MRSH",
+            "company": "Marsh & McLennan Companies",
+            "weight": 0.0462,
+            "weight_pct": 4.62,
+            "delta": -0.0003,
+            "stance": "watch",
+            "irr_base_pct": 17.98,
+            "irr_falsifier_pct": 17.1,
+            "research_status": "current",
+            "days_since_deep_dive": 39,
+            "falsifier_count": 0,
+            "trade_suggested": false
+          },
+          {
+            "ticker": "ZTS",
+            "company": "Zoetis",
+            "weight": 0.0454,
+            "weight_pct": 4.54,
+            "delta": -0.0003,
+            "stance": "watch",
+            "irr_base_pct": 17.18,
+            "irr_falsifier_pct": 16.8,
+            "research_status": "current",
+            "days_since_deep_dive": 2,
+            "falsifier_count": 0,
+            "trade_suggested": false
+          },
+          {
+            "ticker": "WDAY",
+            "company": "Workday, Inc.",
+            "weight": 0.0419,
+            "weight_pct": 4.19,
+            "delta": -0.0003,
+            "stance": "watch",
+            "irr_base_pct": 16.38,
+            "irr_falsifier_pct": 15.5,
+            "research_status": "current",
+            "days_since_deep_dive": 3,
+            "falsifier_count": 0,
+            "trade_suggested": false
+          },
+          {
+            "ticker": "AOS",
+            "company": "A. O. Smith",
+            "weight": 0.0375,
+            "weight_pct": 3.75,
+            "delta": -0.0003,
+            "stance": "watch",
+            "irr_base_pct": 14.08,
+            "irr_falsifier_pct": 13.9,
+            "research_status": "current",
+            "days_since_deep_dive": 3,
+            "falsifier_count": 0,
+            "trade_suggested": false
+          },
+          {
+            "ticker": "ZBRA",
+            "company": "Zebra Technologies",
+            "weight": 0.0375,
+            "weight_pct": 3.75,
+            "delta": -0.0003,
+            "stance": "watch",
+            "irr_base_pct": 14.38,
+            "irr_falsifier_pct": 13.9,
+            "research_status": "current",
+            "days_since_deep_dive": 2,
+            "falsifier_count": 0,
+            "trade_suggested": false
+          },
+          {
+            "ticker": "CBOE",
+            "company": "Cboe Global Markets",
+            "weight": 0.0356,
+            "weight_pct": 3.56,
+            "delta": -0.0002,
+            "stance": "watch",
+            "irr_base_pct": 13.42,
+            "irr_falsifier_pct": 13.2,
+            "research_status": "current",
+            "days_since_deep_dive": 40,
+            "falsifier_count": 0,
+            "trade_suggested": false
+          },
+          {
+            "ticker": "AKAM",
+            "company": "Akamai Technologies",
+            "weight": 0.0354,
+            "weight_pct": 3.54,
+            "delta": -0.0002,
+            "stance": "watch",
+            "irr_base_pct": 15.83,
+            "irr_falsifier_pct": 13.1,
+            "research_status": "current",
+            "days_since_deep_dive": 3,
+            "falsifier_count": 0,
+            "trade_suggested": false
+          },
+          {
+            "ticker": "ABNB",
+            "company": "Airbnb",
+            "weight": 0.0348,
+            "weight_pct": 3.48,
+            "delta": -0.0002,
+            "stance": "watch",
+            "irr_base_pct": 14.1,
+            "irr_falsifier_pct": 12.9,
+            "research_status": "current",
+            "days_since_deep_dive": 3,
+            "falsifier_count": 0,
+            "trade_suggested": false
+          },
+          {
+            "ticker": "VTRS",
+            "company": "Viatris Inc",
+            "weight": 0.0343,
+            "weight_pct": 3.43,
+            "delta": -0.0002,
+            "stance": "watch",
+            "irr_base_pct": 13.11,
+            "irr_falsifier_pct": 12.7,
+            "research_status": "current",
+            "days_since_deep_dive": 39,
+            "falsifier_count": 0,
+            "trade_suggested": false
+          },
+          {
+            "ticker": "XYZ",
+            "company": "Block, Inc.",
+            "weight": 0.0343,
+            "weight_pct": 3.43,
+            "delta": -0.0002,
+            "stance": "watch",
+            "irr_base_pct": 11.75,
+            "irr_falsifier_pct": 12.7,
+            "research_status": "current",
+            "days_since_deep_dive": 4,
+            "falsifier_count": 0,
+            "trade_suggested": false
+          },
+          {
+            "ticker": "ABT",
+            "company": "Abbott Laboratories",
+            "weight": 0.0308,
+            "weight_pct": 3.08,
+            "delta": -0.0002,
+            "stance": "watch",
+            "irr_base_pct": 12.24,
+            "irr_falsifier_pct": 11.4,
+            "research_status": "current",
+            "days_since_deep_dive": 3,
+            "falsifier_count": 0,
+            "trade_suggested": false
+          },
+          {
+            "ticker": "WYNN",
+            "company": "Wynn Resorts",
+            "weight": 0.0308,
+            "weight_pct": 3.08,
+            "delta": -0.0002,
+            "stance": "watch",
+            "irr_base_pct": 12.5,
+            "irr_falsifier_pct": 11.4,
+            "research_status": "current",
+            "days_since_deep_dive": 2,
+            "falsifier_count": 0,
+            "trade_suggested": false
+          },
+          {
+            "ticker": "CME",
+            "company": "CME Group Inc.",
+            "weight": 0.0302,
+            "weight_pct": 3.02,
+            "delta": -0.0002,
+            "stance": "watch",
+            "irr_base_pct": 12.01,
+            "irr_falsifier_pct": 11.2,
+            "research_status": "current",
+            "days_since_deep_dive": 40,
+            "falsifier_count": 0,
+            "trade_suggested": false
+          },
+          {
+            "ticker": "ICE",
+            "company": "Intercontinental Exchange",
+            "weight": 0.0302,
+            "weight_pct": 3.02,
+            "delta": -0.0107,
+            "stance": "hold",
+            "irr_base_pct": 14.18,
+            "irr_falsifier_pct": 11.2,
+            "research_status": "current",
+            "days_since_deep_dive": 39,
+            "falsifier_count": 0,
+            "trade_suggested": true
+          },
+          {
+            "ticker": "LOW",
+            "company": "Lowe's",
+            "weight": 0.03,
+            "weight_pct": 3.0,
+            "delta": -0.0002,
+            "stance": "watch",
+            "irr_base_pct": 11.8,
+            "irr_falsifier_pct": 11.1,
+            "research_status": "current",
+            "days_since_deep_dive": 3,
+            "falsifier_count": 0,
+            "trade_suggested": false
+          },
+          {
+            "ticker": "DHR",
+            "company": "Danaher Corporation",
+            "weight": 0.0275,
+            "weight_pct": 2.75,
+            "delta": -0.0023,
+            "stance": "hold",
+            "irr_base_pct": 12.01,
+            "irr_falsifier_pct": 10.2,
+            "research_status": "current",
+            "days_since_deep_dive": 39,
+            "falsifier_count": 0,
+            "trade_suggested": false
+          },
+          {
+            "ticker": "SPGI",
+            "company": "S&P Global",
+            "weight": 0.0275,
+            "weight_pct": 2.75,
+            "delta": -0.0023,
+            "stance": "hold",
+            "irr_base_pct": 11.24,
+            "irr_falsifier_pct": 10.2,
+            "research_status": "current",
+            "days_since_deep_dive": 39,
+            "falsifier_count": 0,
+            "trade_suggested": false
+          },
+          {
+            "ticker": "CPRT",
+            "company": "Copart",
+            "weight": 0.0248,
+            "weight_pct": 2.48,
+            "delta": -0.0033,
+            "stance": "core",
+            "irr_base_pct": 10.78,
+            "irr_falsifier_pct": 9.2,
+            "research_status": "current",
+            "days_since_deep_dive": 13,
+            "falsifier_count": 0,
+            "trade_suggested": false
+          },
+          {
+            "ticker": "WTW",
+            "company": "Willis Towers Watson",
+            "weight": 0.0246,
+            "weight_pct": 2.46,
+            "delta": 0.0246,
+            "stance": "watch",
+            "irr_base_pct": 9.71,
+            "irr_falsifier_pct": 9.1,
+            "research_status": "current",
+            "days_since_deep_dive": 3,
+            "falsifier_count": 0,
+            "trade_suggested": true
+          }
+        ],
+        "cash_weight_pct": 0.0,
+        "data_integrity": {
+          "status": "ok"
+        },
         "research_queue": [
           {
-            "ticker": "A",
-            "reason": "research_missing",
-            "days_since_deep_dive": null,
+            "ticker": "AES",
+            "reason": "valuation_incomplete",
+            "days_since_deep_dive": 3,
             "has_falsifier_adjusted_irr": false,
-            "priority": 2
+            "priority": 1
           },
           {
             "ticker": "AAPL",
@@ -310,42 +822,7 @@
             "priority": 2
           },
           {
-            "ticker": "ABBV",
-            "reason": "research_missing",
-            "days_since_deep_dive": null,
-            "has_falsifier_adjusted_irr": false,
-            "priority": 2
-          },
-          {
-            "ticker": "ABNB",
-            "reason": "research_missing",
-            "days_since_deep_dive": null,
-            "has_falsifier_adjusted_irr": false,
-            "priority": 2
-          },
-          {
-            "ticker": "ABT",
-            "reason": "research_missing",
-            "days_since_deep_dive": null,
-            "has_falsifier_adjusted_irr": false,
-            "priority": 2
-          },
-          {
             "ticker": "ACGL",
-            "reason": "research_missing",
-            "days_since_deep_dive": null,
-            "has_falsifier_adjusted_irr": false,
-            "priority": 2
-          },
-          {
-            "ticker": "ACN",
-            "reason": "research_missing",
-            "days_since_deep_dive": null,
-            "has_falsifier_adjusted_irr": false,
-            "priority": 2
-          },
-          {
-            "ticker": "ADBE",
             "reason": "research_missing",
             "days_since_deep_dive": null,
             "has_falsifier_adjusted_irr": false,
@@ -380,28 +857,7 @@
             "priority": 2
           },
           {
-            "ticker": "AEE",
-            "reason": "research_missing",
-            "days_since_deep_dive": null,
-            "has_falsifier_adjusted_irr": false,
-            "priority": 2
-          },
-          {
             "ticker": "AEP",
-            "reason": "research_missing",
-            "days_since_deep_dive": null,
-            "has_falsifier_adjusted_irr": false,
-            "priority": 2
-          },
-          {
-            "ticker": "AES",
-            "reason": "research_missing",
-            "days_since_deep_dive": null,
-            "has_falsifier_adjusted_irr": false,
-            "priority": 2
-          },
-          {
-            "ticker": "AFL",
             "reason": "research_missing",
             "days_since_deep_dive": null,
             "has_falsifier_adjusted_irr": false,
@@ -429,13 +885,6 @@
             "priority": 2
           },
           {
-            "ticker": "AKAM",
-            "reason": "research_missing",
-            "days_since_deep_dive": null,
-            "has_falsifier_adjusted_irr": false,
-            "priority": 2
-          },
-          {
             "ticker": "ALB",
             "reason": "research_missing",
             "days_since_deep_dive": null,
@@ -450,42 +899,7 @@
             "priority": 2
           },
           {
-            "ticker": "ALL",
-            "reason": "research_missing",
-            "days_since_deep_dive": null,
-            "has_falsifier_adjusted_irr": false,
-            "priority": 2
-          },
-          {
             "ticker": "ALLE",
-            "reason": "research_missing",
-            "days_since_deep_dive": null,
-            "has_falsifier_adjusted_irr": false,
-            "priority": 2
-          },
-          {
-            "ticker": "AMAT",
-            "reason": "research_missing",
-            "days_since_deep_dive": null,
-            "has_falsifier_adjusted_irr": false,
-            "priority": 2
-          },
-          {
-            "ticker": "AMCR",
-            "reason": "research_missing",
-            "days_since_deep_dive": null,
-            "has_falsifier_adjusted_irr": false,
-            "priority": 2
-          },
-          {
-            "ticker": "AMD",
-            "reason": "research_missing",
-            "days_since_deep_dive": null,
-            "has_falsifier_adjusted_irr": false,
-            "priority": 2
-          },
-          {
-            "ticker": "AME",
             "reason": "research_missing",
             "days_since_deep_dive": null,
             "has_falsifier_adjusted_irr": false,
@@ -499,21 +913,7 @@
             "priority": 2
           },
           {
-            "ticker": "AMP",
-            "reason": "research_missing",
-            "days_since_deep_dive": null,
-            "has_falsifier_adjusted_irr": false,
-            "priority": 2
-          },
-          {
             "ticker": "AMT",
-            "reason": "research_missing",
-            "days_since_deep_dive": null,
-            "has_falsifier_adjusted_irr": false,
-            "priority": 2
-          },
-          {
-            "ticker": "AMZN",
             "reason": "research_missing",
             "days_since_deep_dive": null,
             "has_falsifier_adjusted_irr": false,
@@ -534,21 +934,7 @@
             "priority": 2
           },
           {
-            "ticker": "AOS",
-            "reason": "research_missing",
-            "days_since_deep_dive": null,
-            "has_falsifier_adjusted_irr": false,
-            "priority": 2
-          },
-          {
             "ticker": "APA",
-            "reason": "research_missing",
-            "days_since_deep_dive": null,
-            "has_falsifier_adjusted_irr": false,
-            "priority": 2
-          },
-          {
-            "ticker": "APD",
             "reason": "research_missing",
             "days_since_deep_dive": null,
             "has_falsifier_adjusted_irr": false,
@@ -563,20 +949,6 @@
           },
           {
             "ticker": "APO",
-            "reason": "research_missing",
-            "days_since_deep_dive": null,
-            "has_falsifier_adjusted_irr": false,
-            "priority": 2
-          },
-          {
-            "ticker": "APP",
-            "reason": "research_missing",
-            "days_since_deep_dive": null,
-            "has_falsifier_adjusted_irr": false,
-            "priority": 2
-          },
-          {
-            "ticker": "APTV",
             "reason": "research_missing",
             "days_since_deep_dive": null,
             "has_falsifier_adjusted_irr": false,
@@ -625,13 +997,6 @@
             "priority": 2
           },
           {
-            "ticker": "AWK",
-            "reason": "research_missing",
-            "days_since_deep_dive": null,
-            "has_falsifier_adjusted_irr": false,
-            "priority": 2
-          },
-          {
             "ticker": "AXON",
             "reason": "research_missing",
             "days_since_deep_dive": null,
@@ -644,40 +1009,187 @@
             "days_since_deep_dive": null,
             "has_falsifier_adjusted_irr": false,
             "priority": 2
+          },
+          {
+            "ticker": "AZO",
+            "reason": "research_missing",
+            "days_since_deep_dive": null,
+            "has_falsifier_adjusted_irr": false,
+            "priority": 2
+          },
+          {
+            "ticker": "BA",
+            "reason": "research_missing",
+            "days_since_deep_dive": null,
+            "has_falsifier_adjusted_irr": false,
+            "priority": 2
+          },
+          {
+            "ticker": "BAC",
+            "reason": "research_missing",
+            "days_since_deep_dive": null,
+            "has_falsifier_adjusted_irr": false,
+            "priority": 2
+          },
+          {
+            "ticker": "BALL",
+            "reason": "research_missing",
+            "days_since_deep_dive": null,
+            "has_falsifier_adjusted_irr": false,
+            "priority": 2
+          },
+          {
+            "ticker": "BAX",
+            "reason": "research_missing",
+            "days_since_deep_dive": null,
+            "has_falsifier_adjusted_irr": false,
+            "priority": 2
+          },
+          {
+            "ticker": "BBY",
+            "reason": "research_missing",
+            "days_since_deep_dive": null,
+            "has_falsifier_adjusted_irr": false,
+            "priority": 2
+          },
+          {
+            "ticker": "BDX",
+            "reason": "research_missing",
+            "days_since_deep_dive": null,
+            "has_falsifier_adjusted_irr": false,
+            "priority": 2
+          },
+          {
+            "ticker": "BEN",
+            "reason": "research_missing",
+            "days_since_deep_dive": null,
+            "has_falsifier_adjusted_irr": false,
+            "priority": 2
+          },
+          {
+            "ticker": "BF.B",
+            "reason": "research_missing",
+            "days_since_deep_dive": null,
+            "has_falsifier_adjusted_irr": false,
+            "priority": 2
+          },
+          {
+            "ticker": "BG",
+            "reason": "research_missing",
+            "days_since_deep_dive": null,
+            "has_falsifier_adjusted_irr": false,
+            "priority": 2
+          },
+          {
+            "ticker": "BIIB",
+            "reason": "research_missing",
+            "days_since_deep_dive": null,
+            "has_falsifier_adjusted_irr": false,
+            "priority": 2
+          },
+          {
+            "ticker": "BKNG",
+            "reason": "research_missing",
+            "days_since_deep_dive": null,
+            "has_falsifier_adjusted_irr": false,
+            "priority": 2
+          },
+          {
+            "ticker": "BKR",
+            "reason": "research_missing",
+            "days_since_deep_dive": null,
+            "has_falsifier_adjusted_irr": false,
+            "priority": 2
+          },
+          {
+            "ticker": "BLDR",
+            "reason": "research_missing",
+            "days_since_deep_dive": null,
+            "has_falsifier_adjusted_irr": false,
+            "priority": 2
+          },
+          {
+            "ticker": "BLK",
+            "reason": "research_missing",
+            "days_since_deep_dive": null,
+            "has_falsifier_adjusted_irr": false,
+            "priority": 2
+          },
+          {
+            "ticker": "BMY",
+            "reason": "research_missing",
+            "days_since_deep_dive": null,
+            "has_falsifier_adjusted_irr": false,
+            "priority": 2
+          },
+          {
+            "ticker": "BNY",
+            "reason": "research_missing",
+            "days_since_deep_dive": null,
+            "has_falsifier_adjusted_irr": false,
+            "priority": 2
+          },
+          {
+            "ticker": "BR",
+            "reason": "research_missing",
+            "days_since_deep_dive": null,
+            "has_falsifier_adjusted_irr": false,
+            "priority": 2
+          },
+          {
+            "ticker": "BRK.B",
+            "reason": "research_missing",
+            "days_since_deep_dive": null,
+            "has_falsifier_adjusted_irr": false,
+            "priority": 2
+          },
+          {
+            "ticker": "BRO",
+            "reason": "research_missing",
+            "days_since_deep_dive": null,
+            "has_falsifier_adjusted_irr": false,
+            "priority": 2
+          },
+          {
+            "ticker": "BSX",
+            "reason": "research_missing",
+            "days_since_deep_dive": null,
+            "has_falsifier_adjusted_irr": false,
+            "priority": 2
           }
         ],
         "account_profile": "roth",
         "benchmarks": {
           "ira_marvin": {
             "periods": 8,
-            "mean_monthly_return": 0.0,
-            "volatility_annualized": 0.0,
-            "sharpe_annualized": 0.0,
-            "cumulative_return": 0.0,
-            "max_drawdown_log": 0.0,
-            "max_drawdown_pct": 0.0,
+            "mean_monthly_return": -0.028566,
+            "volatility_annualized": 0.0853,
+            "sharpe_annualized": -4.02,
+            "cumulative_return": -0.2087,
+            "max_drawdown_log": 0.2364,
+            "max_drawdown_pct": 0.2106,
             "avg_turnover_one_way": 0.0,
             "rebalance_frequency": "semiannual"
           },
           "equal_weight": {
             "periods": 8,
-            "mean_monthly_return": -0.005868,
-            "volatility_annualized": 0.1128,
-            "sharpe_annualized": -0.624,
-            "cumulative_return": -0.0496,
-            "max_drawdown_log": 0.0966,
-            "max_drawdown_pct": 0.092,
+            "mean_monthly_return": 0.016776,
+            "volatility_annualized": 0.1029,
+            "sharpe_annualized": 1.956,
+            "cumulative_return": 0.1389,
+            "max_drawdown_log": 0.0438,
+            "max_drawdown_pct": 0.0428,
             "avg_turnover_one_way": 0.0,
             "rebalance_frequency": "semiannual"
           },
           "irr_ranked": {
             "periods": 8,
-            "mean_monthly_return": -0.023709,
-            "volatility_annualized": 0.1331,
-            "sharpe_annualized": -2.137,
-            "cumulative_return": -0.1791,
-            "max_drawdown_log": 0.2189,
-            "max_drawdown_pct": 0.1966,
+            "mean_monthly_return": -0.027864,
+            "volatility_annualized": 0.088,
+            "sharpe_annualized": -3.801,
+            "cumulative_return": -0.2042,
+            "max_drawdown_log": 0.2285,
+            "max_drawdown_pct": 0.2042,
             "avg_turnover_one_way": 0.0,
             "rebalance_frequency": "semiannual"
           },
@@ -689,12 +1201,12 @@
           },
           "risk_parity_vol": {
             "periods": 8,
-            "mean_monthly_return": -0.024633,
-            "volatility_annualized": 0.1337,
-            "sharpe_annualized": -2.212,
-            "cumulative_return": -0.1854,
-            "max_drawdown_log": 0.2263,
-            "max_drawdown_pct": 0.2025,
+            "mean_monthly_return": -0.019054,
+            "volatility_annualized": 0.1064,
+            "sharpe_annualized": -2.149,
+            "cumulative_return": -0.1456,
+            "max_drawdown_log": 0.1696,
+            "max_drawdown_pct": 0.156,
             "avg_turnover_one_way": 0.0,
             "rebalance_frequency": "semiannual"
           },
@@ -703,12 +1215,12 @@
           },
           "champion": {
             "periods": 8,
-            "mean_monthly_return": 0.0,
-            "volatility_annualized": 0.0,
-            "sharpe_annualized": 0.0,
-            "cumulative_return": 0.0,
-            "max_drawdown_log": 0.0,
-            "max_drawdown_pct": 0.0,
+            "mean_monthly_return": -0.028566,
+            "volatility_annualized": 0.0853,
+            "sharpe_annualized": -4.02,
+            "cumulative_return": -0.2087,
+            "max_drawdown_log": 0.2364,
+            "max_drawdown_pct": 0.2106,
             "avg_turnover_one_way": 0.0,
             "rebalance_frequency": "semiannual"
           },
@@ -724,17 +1236,140 @@
             "rebalance_frequency": "semiannual"
           },
           "covered_call": {
-            "error": "insufficient_inputs",
-            "periods": 0
+            "periods": 9,
+            "mean_monthly_return": -0.012715,
+            "volatility_annualized": 0.1201,
+            "sharpe_annualized": -1.27,
+            "cumulative_return": -0.1132,
+            "max_drawdown_log": 0.1764,
+            "max_drawdown_pct": 0.1617,
+            "avg_turnover_one_way": 0.0,
+            "rebalance_frequency": "monthly_marks_tenor_rolls",
+            "equity_rebalance_frequency": "semiannual",
+            "label": "synthetic_covered_call",
+            "covered_call_params": {
+              "premium_yield_annual_pct": 8.0,
+              "tenor_days": 7,
+              "otm_pct": 2.0,
+              "bid_ask_haircut": 0.15,
+              "assignment_bps": 5.0,
+              "coverage_fraction": 0.22999999999999998,
+              "coverage_fraction_base": 0.2,
+              "regime_coverage_mult": 1.15,
+              "roll_frequency": "weekly",
+              "mode": "synthetic",
+              "flat_premium_monthly": 0.005666666666666666,
+              "flat_upside_cap": 0.041679045780138216
+            },
+            "name_level_sample": {
+              "ADBE": {
+                "premium_monthly": 0.010531,
+                "upside_cap": 0.045847,
+                "coverage": 0.330625,
+                "vol_annual": 0.371674,
+                "vol_scale": 1.858372,
+                "stance": "watch",
+                "liquidity_bucket": "A"
+              },
+              "ACN": {
+                "premium_monthly": 0.011333,
+                "upside_cap": 0.045847,
+                "coverage": 0.330625,
+                "vol_annual": 0.47982,
+                "vol_scale": 2.0,
+                "stance": "watch",
+                "liquidity_bucket": "A"
+              },
+              "ZBH": {
+                "premium_monthly": 0.007296,
+                "upside_cap": 0.041679,
+                "coverage": 0.330625,
+                "vol_annual": 0.257508,
+                "vol_scale": 1.287539,
+                "stance": "watch",
+                "liquidity_bucket": "A"
+              },
+              "ALL": {
+                "premium_monthly": 0.007296,
+                "upside_cap": 0.041679,
+                "coverage": 0.330625,
+                "vol_annual": 0.257518,
+                "vol_scale": 1.287592,
+                "stance": "watch",
+                "liquidity_bucket": "A"
+              },
+              "AMP": {
+                "premium_monthly": 0.007726,
+                "upside_cap": 0.041679,
+                "coverage": 0.330625,
+                "vol_annual": 0.272672,
+                "vol_scale": 1.36336,
+                "stance": "watch",
+                "liquidity_bucket": "A"
+              },
+              "APTV": {
+                "premium_monthly": 0.007088,
+                "upside_cap": 0.041679,
+                "coverage": 0.330625,
+                "vol_annual": 0.250159,
+                "vol_scale": 1.250797,
+                "stance": "watch",
+                "liquidity_bucket": "A"
+              },
+              "MRSH": {
+                "premium_monthly": 0.004386,
+                "upside_cap": 0.041679,
+                "coverage": 0.330625,
+                "vol_annual": 0.154818,
+                "vol_scale": 0.774088,
+                "stance": "watch",
+                "liquidity_bucket": "A"
+              },
+              "ZTS": {
+                "premium_monthly": 0.010962,
+                "upside_cap": 0.045847,
+                "coverage": 0.330625,
+                "vol_annual": 0.386893,
+                "vol_scale": 1.934467,
+                "stance": "watch",
+                "liquidity_bucket": "A"
+              }
+            },
+            "stress_cases": {
+              "bull_month": {
+                "stock_ret": 0.1,
+                "cc_ret": 0.08788951386276514,
+                "lag_vs_stock": -0.012110486137234866,
+                "premium_monthly": 0.005666666666666666,
+                "upside_cap": 0.041679045780138216,
+                "coverage": 0.22999999999999998
+              },
+              "crash_month": {
+                "stock_ret": -0.12,
+                "cc_ret": -0.11869666666666666,
+                "lag_vs_stock": 0.001303333333333337,
+                "premium_monthly": 0.005666666666666666,
+                "upside_cap": 0.041679045780138216,
+                "coverage": 0.22999999999999998
+              },
+              "sideways": {
+                "stock_ret": 0.005,
+                "cc_ret": 0.006303333333333333,
+                "lag_vs_stock": 0.0013033333333333326,
+                "premium_monthly": 0.005666666666666666,
+                "upside_cap": 0.041679045780138216,
+                "coverage": 0.22999999999999998
+              }
+            }
           },
           "ml_best": {
             "periods": 8,
-            "mean_monthly_return": 0.0,
-            "volatility_annualized": 0.0,
-            "sharpe_annualized": 0.0,
-            "cumulative_return": 0.0,
-            "max_drawdown_log": 0.0,
-            "max_drawdown_pct": 0.0,
+            "mean_monthly_return": 0.016776,
+            "volatility_annualized": 0.1029,
+            "sharpe_annualized": 1.956,
+            "cumulative_return": 0.1389,
+            "max_drawdown_log": 0.0438,
+            "max_drawdown_pct": 0.0428,
             "avg_turnover_one_way": 0.0,
             "rebalance_frequency": "semiannual"
           },
@@ -762,8 +1397,62 @@
             "rebalance_frequency": "semiannual"
           }
         },
-        "conflicts": [],
-        "human_review": [],
+        "conflicts": [
+          {
+            "ticker": "ACN",
+            "severity": "review",
+            "reason": "human_review_pending",
+            "weight_pct": 8.0
+          },
+          {
+            "ticker": "ACN",
+            "severity": "review",
+            "reason": "high_weight_low_stance",
+            "weight_pct": 8.0,
+            "stance": "watch"
+          },
+          {
+            "ticker": "ADBE",
+            "severity": "review",
+            "reason": "human_review_pending",
+            "weight_pct": 9.4
+          },
+          {
+            "ticker": "ADBE",
+            "severity": "review",
+            "reason": "high_weight_low_stance",
+            "weight_pct": 9.4,
+            "stance": "watch"
+          }
+        ],
+        "human_review": [
+          {
+            "ticker": "ACN",
+            "severity": "review",
+            "reason": "human_review_pending",
+            "weight_pct": 8.0
+          },
+          {
+            "ticker": "ACN",
+            "severity": "review",
+            "reason": "high_weight_low_stance",
+            "weight_pct": 8.0,
+            "stance": "watch"
+          },
+          {
+            "ticker": "ADBE",
+            "severity": "review",
+            "reason": "human_review_pending",
+            "weight_pct": 9.4
+          },
+          {
+            "ticker": "ADBE",
+            "severity": "review",
+            "reason": "high_weight_low_stance",
+            "weight_pct": 9.4,
+            "stance": "watch"
+          }
+        ],
         "attribution": [],
         "latent_factors": {
           "labels": [],
@@ -1278,23 +1967,14 @@
         },
         "evolution_log": [
           {
-            "date": "2026-07-13",
+            "date": "2026-07-14",
             "event": "rebalance",
             "policy": "ira_marvin",
             "turnover_pct": 10.0,
-            "note": "Champion ira_marvin Sharpe 0.0 regime calm"
+            "note": "Champion ira_marvin Sharpe -4.02 regime calm"
           }
         ],
         "lineage": [
-          {
-            "event": "rebalance",
-            "policy": "ira_marvin",
-            "regime": "calm",
-            "turnover_pct": 0.0,
-            "champion_sharpe": -1.951,
-            "population_size": 8,
-            "ts": "2026-07-12T01:29:34Z"
-          },
           {
             "event": "rebalance",
             "policy": "ira_marvin",
@@ -1330,6 +2010,15 @@
             "champion_sharpe": 0.0,
             "population_size": 8,
             "ts": "2026-07-13T14:15:52Z"
+          },
+          {
+            "event": "rebalance",
+            "policy": "ira_marvin",
+            "regime": "calm",
+            "turnover_pct": 10.0,
+            "champion_sharpe": -4.02,
+            "population_size": 8,
+            "ts": "2026-07-14T22:58:14Z"
           }
         ],
         "source_alignment_version": null,
@@ -1342,12 +2031,12 @@
             "ira_marvin": {
               "stats": {
                 "periods": 8,
-                "mean_monthly_return": 0.0,
-                "volatility_annualized": 0.0,
-                "sharpe_annualized": 0.0,
-                "cumulative_return": 0.0,
-                "max_drawdown_log": 0.0,
-                "max_drawdown_pct": 0.0,
+                "mean_monthly_return": -0.028566,
+                "volatility_annualized": 0.0853,
+                "sharpe_annualized": -4.02,
+                "cumulative_return": -0.2087,
+                "max_drawdown_log": 0.2364,
+                "max_drawdown_pct": 0.2106,
                 "avg_turnover_one_way": 0.0,
                 "rebalance_frequency": "semiannual"
               },
@@ -1362,39 +2051,138 @@
                 "2026-06-01"
               ],
               "equity_index": [
-                1.0,
-                1.0,
-                1.0,
-                1.0,
-                1.0,
-                1.0,
-                1.0,
-                1.0
+                0.98803,
+                1.002335,
+                0.980026,
+                0.955565,
+                0.89363,
+                0.865574,
+                0.837791,
+                0.791286
               ],
               "holdings_snapshots": [
                 {
                   "date": "2025-11-01",
-                  "weights": []
+                  "weights": [
+                    {
+                      "ticker": "ADBE",
+                      "weight_pct": 12.5
+                    },
+                    {
+                      "ticker": "ACN",
+                      "weight_pct": 12.5
+                    },
+                    {
+                      "ticker": "ZBH",
+                      "weight_pct": 12.5
+                    },
+                    {
+                      "ticker": "ALL",
+                      "weight_pct": 12.5
+                    },
+                    {
+                      "ticker": "AMP",
+                      "weight_pct": 12.5
+                    },
+                    {
+                      "ticker": "APTV",
+                      "weight_pct": 12.5
+                    },
+                    {
+                      "ticker": "MRSH",
+                      "weight_pct": 12.5
+                    },
+                    {
+                      "ticker": "ZTS",
+                      "weight_pct": 12.5
+                    }
+                  ]
                 },
                 {
                   "date": "2025-12-01",
-                  "weights": []
+                  "weights": [
+                    {
+                      "ticker": "ADBE",
+                      "weight_pct": 12.5
+                    },
+                    {
+                      "ticker": "ACN",
+                      "weight_pct": 12.5
+                    },
+                    {
+                      "ticker": "ZBH",
+                      "weight_pct": 12.5
+                    },
+                    {
+                      "ticker": "ALL",
+                      "weight_pct": 12.5
+                    },
+                    {
+                      "ticker": "AMP",
+                      "weight_pct": 12.5
+                    },
+                    {
+                      "ticker": "APTV",
+                      "weight_pct": 12.5
+                    },
+                    {
+                      "ticker": "MRSH",
+                      "weight_pct": 12.5
+                    },
+                    {
+                      "ticker": "ZTS",
+                      "weight_pct": 12.5
+                    }
+                  ]
                 },
                 {
                   "date": "2026-06-01",
-                  "weights": []
+                  "weights": [
+                    {
+                      "ticker": "ADBE",
+                      "weight_pct": 12.5
+                    },
+                    {
+                      "ticker": "ACN",
+                      "weight_pct": 12.5
+                    },
+                    {
+                      "ticker": "ZBH",
+                      "weight_pct": 12.5
+                    },
+                    {
+                      "ticker": "ALL",
+                      "weight_pct": 12.5
+                    },
+                    {
+                      "ticker": "AMP",
+                      "weight_pct": 12.5
+                    },
+                    {
+                      "ticker": "APTV",
+                      "weight_pct": 12.5
+                    },
+                    {
+                      "ticker": "MRSH",
+                      "weight_pct": 12.5
+                    },
+                    {
+                      "ticker": "ZTS",
+                      "weight_pct": 12.5
+                    }
+                  ]
                 }
               ]
             },
             "equal_weight": {
               "stats": {
                 "periods": 8,
-                "mean_monthly_return": -0.005868,
-                "volatility_annualized": 0.1128,
-                "sharpe_annualized": -0.624,
-                "cumulative_return": -0.0496,
-                "max_drawdown_log": 0.0966,
-                "max_drawdown_pct": 0.092,
+                "mean_monthly_return": 0.016776,
+                "volatility_annualized": 0.1029,
+                "sharpe_annualized": 1.956,
+                "cumulative_return": 0.1389,
+                "max_drawdown_log": 0.0438,
+                "max_drawdown_pct": 0.0428,
                 "avg_turnover_one_way": 0.0,
                 "rebalance_frequency": "semiannual"
               },
@@ -1409,14 +2197,14 @@
                 "2026-06-01"
               ],
               "equity_index": [
-                1.020364,
-                1.031986,
-                1.005536,
-                0.990015,
-                0.936992,
-                0.958159,
-                0.991175,
-                0.950416
+                1.031734,
+                1.042886,
+                1.061675,
+                1.073121,
+                1.027161,
+                1.092352,
+                1.123558,
+                1.138912
               ],
               "holdings_snapshots": [
                 {
@@ -1424,51 +2212,59 @@
                   "weights": [
                     {
                       "ticker": "A",
-                      "weight_pct": 8.33
+                      "weight_pct": 2.5
                     },
                     {
                       "ticker": "AAPL",
-                      "weight_pct": 8.33
+                      "weight_pct": 2.5
                     },
                     {
                       "ticker": "ABBV",
-                      "weight_pct": 8.33
+                      "weight_pct": 2.5
                     },
                     {
                       "ticker": "ABNB",
-                      "weight_pct": 8.33
+                      "weight_pct": 2.5
                     },
                     {
                       "ticker": "ABT",
-                      "weight_pct": 8.33
+                      "weight_pct": 2.5
                     },
                     {
                       "ticker": "ACGL",
-                      "weight_pct": 8.33
+                      "weight_pct": 2.5
                     },
                     {
                       "ticker": "ACN",
-                      "weight_pct": 8.33
+                      "weight_pct": 2.5
                     },
                     {
                       "ticker": "ADBE",
-                      "weight_pct": 8.33
+                      "weight_pct": 2.5
                     },
                     {
                       "ticker": "ADI",
-                      "weight_pct": 8.33
+                      "weight_pct": 2.5
                     },
                     {
                       "ticker": "ADM",
-                      "weight_pct": 8.33
+                      "weight_pct": 2.5
                     },
                     {
                       "ticker": "ADP",
-                      "weight_pct": 8.33
+                      "weight_pct": 2.5
                     },
                     {
                       "ticker": "ADSK",
-                      "weight_pct": 8.33
+                      "weight_pct": 2.5
+                    },
+                    {
+                      "ticker": "AEE",
+                      "weight_pct": 2.5
+                    },
+                    {
+                      "ticker": "AEP",
+                      "weight_pct": 2.5
                     }
                   ]
                 },
@@ -1477,51 +2273,59 @@
                   "weights": [
                     {
                       "ticker": "A",
-                      "weight_pct": 8.33
+                      "weight_pct": 2.5
                     },
                     {
                       "ticker": "AAPL",
-                      "weight_pct": 8.33
+                      "weight_pct": 2.5
                     },
                     {
                       "ticker": "ABBV",
-                      "weight_pct": 8.33
+                      "weight_pct": 2.5
                     },
                     {
                       "ticker": "ABNB",
-                      "weight_pct": 8.33
+                      "weight_pct": 2.5
                     },
                     {
                       "ticker": "ABT",
-                      "weight_pct": 8.33
+                      "weight_pct": 2.5
                     },
                     {
                       "ticker": "ACGL",
-                      "weight_pct": 8.33
+                      "weight_pct": 2.5
                     },
                     {
                       "ticker": "ACN",
-                      "weight_pct": 8.33
+                      "weight_pct": 2.5
                     },
                     {
                       "ticker": "ADBE",
-                      "weight_pct": 8.33
+                      "weight_pct": 2.5
                     },
                     {
                       "ticker": "ADI",
-                      "weight_pct": 8.33
+                      "weight_pct": 2.5
                     },
                     {
                       "ticker": "ADM",
-                      "weight_pct": 8.33
+                      "weight_pct": 2.5
                     },
                     {
                       "ticker": "ADP",
-                      "weight_pct": 8.33
+                      "weight_pct": 2.5
                     },
                     {
                       "ticker": "ADSK",
-                      "weight_pct": 8.33
+                      "weight_pct": 2.5
+                    },
+                    {
+                      "ticker": "AEE",
+                      "weight_pct": 2.5
+                    },
+                    {
+                      "ticker": "AEP",
+                      "weight_pct": 2.5
                     }
                   ]
                 },
@@ -1530,51 +2334,59 @@
                   "weights": [
                     {
                       "ticker": "A",
-                      "weight_pct": 8.33
+                      "weight_pct": 2.5
                     },
                     {
                       "ticker": "AAPL",
-                      "weight_pct": 8.33
+                      "weight_pct": 2.5
                     },
                     {
                       "ticker": "ABBV",
-                      "weight_pct": 8.33
+                      "weight_pct": 2.5
                     },
                     {
                       "ticker": "ABNB",
-                      "weight_pct": 8.33
+                      "weight_pct": 2.5
                     },
                     {
                       "ticker": "ABT",
-                      "weight_pct": 8.33
+                      "weight_pct": 2.5
                     },
                     {
                       "ticker": "ACGL",
-                      "weight_pct": 8.33
+                      "weight_pct": 2.5
                     },
                     {
                       "ticker": "ACN",
-                      "weight_pct": 8.33
+                      "weight_pct": 2.5
                     },
                     {
                       "ticker": "ADBE",
-                      "weight_pct": 8.33
+                      "weight_pct": 2.5
                     },
                     {
                       "ticker": "ADI",
-                      "weight_pct": 8.33
+                      "weight_pct": 2.5
                     },
                     {
                       "ticker": "ADM",
-                      "weight_pct": 8.33
+                      "weight_pct": 2.5
                     },
                     {
                       "ticker": "ADP",
-                      "weight_pct": 8.33
+                      "weight_pct": 2.5
                     },
                     {
                       "ticker": "ADSK",
-                      "weight_pct": 8.33
+                      "weight_pct": 2.5
+                    },
+                    {
+                      "ticker": "AEE",
+                      "weight_pct": 2.5
+                    },
+                    {
+                      "ticker": "AEP",
+                      "weight_pct": 2.5
                     }
                   ]
                 }
@@ -1583,12 +2395,12 @@
             "irr_ranked": {
               "stats": {
                 "periods": 8,
-                "mean_monthly_return": -0.023709,
-                "volatility_annualized": 0.1331,
-                "sharpe_annualized": -2.137,
-                "cumulative_return": -0.1791,
-                "max_drawdown_log": 0.2189,
-                "max_drawdown_pct": 0.1966,
+                "mean_monthly_return": -0.027864,
+                "volatility_annualized": 0.088,
+                "sharpe_annualized": -3.801,
+                "cumulative_return": -0.2042,
+                "max_drawdown_log": 0.2285,
+                "max_drawdown_pct": 0.2042,
                 "avg_turnover_one_way": 0.0,
                 "rebalance_frequency": "semiannual"
               },
@@ -1603,14 +2415,14 @@
                 "2026-06-01"
               ],
               "equity_index": [
-                0.995716,
-                1.021715,
-                0.992737,
-                0.948461,
-                0.905701,
-                0.88128,
-                0.901717,
-                0.820852
+                0.985624,
+                0.996987,
+                0.974822,
+                0.935214,
+                0.87319,
+                0.850914,
+                0.842653,
+                0.795752
               ],
               "holdings_snapshots": [
                 {
@@ -1618,51 +2430,51 @@
                   "weights": [
                     {
                       "ticker": "ADBE",
-                      "weight_pct": 14.13
+                      "weight_pct": 10.0
                     },
                     {
                       "ticker": "ACN",
-                      "weight_pct": 11.29
+                      "weight_pct": 10.0
                     },
                     {
                       "ticker": "ZBH",
-                      "weight_pct": 9.06
+                      "weight_pct": 9.68
                     },
                     {
                       "ticker": "ALL",
-                      "weight_pct": 8.41
+                      "weight_pct": 9.15
                     },
                     {
                       "ticker": "AMP",
-                      "weight_pct": 8.04
+                      "weight_pct": 8.57
                     },
                     {
                       "ticker": "APTV",
-                      "weight_pct": 8.01
+                      "weight_pct": 8.4
                     },
                     {
                       "ticker": "MRSH",
-                      "weight_pct": 7.63
+                      "weight_pct": 8.13
                     },
                     {
                       "ticker": "ZTS",
-                      "weight_pct": 7.29
+                      "weight_pct": 8.0
                     },
                     {
                       "ticker": "WDAY",
-                      "weight_pct": 6.95
-                    },
-                    {
-                      "ticker": "AKAM",
-                      "weight_pct": 6.72
+                      "weight_pct": 7.42
                     },
                     {
                       "ticker": "ICE",
-                      "weight_pct": 6.47
+                      "weight_pct": 7.22
                     },
                     {
-                      "ticker": "ABNB",
-                      "weight_pct": 5.98
+                      "ticker": "ZBRA",
+                      "weight_pct": 6.71
+                    },
+                    {
+                      "ticker": "AOS",
+                      "weight_pct": 6.71
                     }
                   ]
                 },
@@ -1671,51 +2483,51 @@
                   "weights": [
                     {
                       "ticker": "ADBE",
-                      "weight_pct": 14.13
+                      "weight_pct": 10.0
                     },
                     {
                       "ticker": "ACN",
-                      "weight_pct": 11.29
+                      "weight_pct": 10.0
                     },
                     {
                       "ticker": "ZBH",
-                      "weight_pct": 9.06
+                      "weight_pct": 9.68
                     },
                     {
                       "ticker": "ALL",
-                      "weight_pct": 8.41
+                      "weight_pct": 9.15
                     },
                     {
                       "ticker": "AMP",
-                      "weight_pct": 8.04
+                      "weight_pct": 8.57
                     },
                     {
                       "ticker": "APTV",
-                      "weight_pct": 8.01
+                      "weight_pct": 8.4
                     },
                     {
                       "ticker": "MRSH",
-                      "weight_pct": 7.63
+                      "weight_pct": 8.13
                     },
                     {
                       "ticker": "ZTS",
-                      "weight_pct": 7.29
+                      "weight_pct": 8.0
                     },
                     {
                       "ticker": "WDAY",
-                      "weight_pct": 6.95
-                    },
-                    {
-                      "ticker": "AKAM",
-                      "weight_pct": 6.72
+                      "weight_pct": 7.42
                     },
                     {
                       "ticker": "ICE",
-                      "weight_pct": 6.47
+                      "weight_pct": 7.22
                     },
                     {
-                      "ticker": "ABNB",
-                      "weight_pct": 5.98
+                      "ticker": "ZBRA",
+                      "weight_pct": 6.71
+                    },
+                    {
+                      "ticker": "AOS",
+                      "weight_pct": 6.71
                     }
                   ]
                 },
@@ -1724,51 +2536,51 @@
                   "weights": [
                     {
                       "ticker": "ADBE",
-                      "weight_pct": 14.13
+                      "weight_pct": 10.0
                     },
                     {
                       "ticker": "ACN",
-                      "weight_pct": 11.29
+                      "weight_pct": 10.0
                     },
                     {
                       "ticker": "ZBH",
-                      "weight_pct": 9.06
+                      "weight_pct": 9.68
                     },
                     {
                       "ticker": "ALL",
-                      "weight_pct": 8.41
+                      "weight_pct": 9.15
                     },
                     {
                       "ticker": "AMP",
-                      "weight_pct": 8.04
+                      "weight_pct": 8.57
                     },
                     {
                       "ticker": "APTV",
-                      "weight_pct": 8.01
+                      "weight_pct": 8.4
                     },
                     {
                       "ticker": "MRSH",
-                      "weight_pct": 7.63
+                      "weight_pct": 8.13
                     },
                     {
                       "ticker": "ZTS",
-                      "weight_pct": 7.29
+                      "weight_pct": 8.0
                     },
                     {
                       "ticker": "WDAY",
-                      "weight_pct": 6.95
-                    },
-                    {
-                      "ticker": "AKAM",
-                      "weight_pct": 6.72
+                      "weight_pct": 7.42
                     },
                     {
                       "ticker": "ICE",
-                      "weight_pct": 6.47
+                      "weight_pct": 7.22
                     },
                     {
-                      "ticker": "ABNB",
-                      "weight_pct": 5.98
+                      "ticker": "ZBRA",
+                      "weight_pct": 6.71
+                    },
+                    {
+                      "ticker": "AOS",
+                      "weight_pct": 6.71
                     }
                   ]
                 }
@@ -1777,12 +2589,12 @@
             "risk_parity_vol": {
               "stats": {
                 "periods": 8,
-                "mean_monthly_return": -0.024633,
-                "volatility_annualized": 0.1337,
-                "sharpe_annualized": -2.212,
-                "cumulative_return": -0.1854,
-                "max_drawdown_log": 0.2263,
-                "max_drawdown_pct": 0.2025,
+                "mean_monthly_return": -0.019054,
+                "volatility_annualized": 0.1064,
+                "sharpe_annualized": -2.149,
+                "cumulative_return": -0.1456,
+                "max_drawdown_log": 0.1696,
+                "max_drawdown_pct": 0.156,
                 "avg_turnover_one_way": 0.0,
                 "rebalance_frequency": "semiannual"
               },
@@ -1797,14 +2609,14 @@
                 "2026-06-01"
               ],
               "equity_index": [
-                1.005759,
-                1.021477,
-                0.995776,
-                0.947992,
-                0.903758,
-                0.870183,
-                0.893466,
-                0.814619
+                0.997355,
+                1.012272,
+                0.997599,
+                0.970195,
+                0.909667,
+                0.90311,
+                0.913812,
+                0.854383
               ],
               "holdings_snapshots": [
                 {
@@ -1812,51 +2624,59 @@
                   "weights": [
                     {
                       "ticker": "ADBE",
-                      "weight_pct": 12.59
+                      "weight_pct": 6.92
                     },
                     {
                       "ticker": "ACN",
-                      "weight_pct": 10.53
+                      "weight_pct": 5.78
                     },
                     {
                       "ticker": "ZBH",
-                      "weight_pct": 8.83
+                      "weight_pct": 4.85
                     },
                     {
                       "ticker": "ALL",
-                      "weight_pct": 8.32
+                      "weight_pct": 4.57
                     },
                     {
                       "ticker": "AMP",
-                      "weight_pct": 8.02
+                      "weight_pct": 4.41
                     },
                     {
                       "ticker": "APTV",
-                      "weight_pct": 8.0
+                      "weight_pct": 4.4
                     },
                     {
                       "ticker": "MRSH",
-                      "weight_pct": 7.69
+                      "weight_pct": 4.23
                     },
                     {
                       "ticker": "ICE",
-                      "weight_pct": 7.57
+                      "weight_pct": 4.16
                     },
                     {
                       "ticker": "ZTS",
-                      "weight_pct": 7.42
+                      "weight_pct": 4.08
                     },
                     {
                       "ticker": "WDAY",
-                      "weight_pct": 7.14
+                      "weight_pct": 3.92
                     },
                     {
                       "ticker": "DHR",
-                      "weight_pct": 6.96
+                      "weight_pct": 3.83
                     },
                     {
                       "ticker": "AKAM",
-                      "weight_pct": 6.95
+                      "weight_pct": 3.82
+                    },
+                    {
+                      "ticker": "ZBRA",
+                      "weight_pct": 3.54
+                    },
+                    {
+                      "ticker": "CPRT",
+                      "weight_pct": 3.51
                     }
                   ]
                 },
@@ -1865,51 +2685,59 @@
                   "weights": [
                     {
                       "ticker": "ADBE",
-                      "weight_pct": 12.59
+                      "weight_pct": 6.92
                     },
                     {
                       "ticker": "ACN",
-                      "weight_pct": 10.53
+                      "weight_pct": 5.78
                     },
                     {
                       "ticker": "ZBH",
-                      "weight_pct": 8.83
+                      "weight_pct": 4.85
                     },
                     {
                       "ticker": "ALL",
-                      "weight_pct": 8.32
+                      "weight_pct": 4.57
                     },
                     {
                       "ticker": "AMP",
-                      "weight_pct": 8.02
+                      "weight_pct": 4.41
                     },
                     {
                       "ticker": "APTV",
-                      "weight_pct": 8.0
+                      "weight_pct": 4.4
                     },
                     {
                       "ticker": "MRSH",
-                      "weight_pct": 7.69
+                      "weight_pct": 4.23
                     },
                     {
                       "ticker": "ICE",
-                      "weight_pct": 7.57
+                      "weight_pct": 4.16
                     },
                     {
                       "ticker": "ZTS",
-                      "weight_pct": 7.42
+                      "weight_pct": 4.08
                     },
                     {
                       "ticker": "WDAY",
-                      "weight_pct": 7.14
+                      "weight_pct": 3.92
                     },
                     {
                       "ticker": "DHR",
-                      "weight_pct": 6.96
+                      "weight_pct": 3.83
                     },
                     {
                       "ticker": "AKAM",
-                      "weight_pct": 6.95
+                      "weight_pct": 3.82
+                    },
+                    {
+                      "ticker": "ZBRA",
+                      "weight_pct": 3.54
+                    },
+                    {
+                      "ticker": "CPRT",
+                      "weight_pct": 3.51
                     }
                   ]
                 },
@@ -1918,51 +2746,59 @@
                   "weights": [
                     {
                       "ticker": "ADBE",
-                      "weight_pct": 12.59
+                      "weight_pct": 6.92
                     },
                     {
                       "ticker": "ACN",
-                      "weight_pct": 10.53
+                      "weight_pct": 5.78
                     },
                     {
                       "ticker": "ZBH",
-                      "weight_pct": 8.83
+                      "weight_pct": 4.85
                     },
                     {
                       "ticker": "ALL",
-                      "weight_pct": 8.32
+                      "weight_pct": 4.57
                     },
                     {
                       "ticker": "AMP",
-                      "weight_pct": 8.02
+                      "weight_pct": 4.41
                     },
                     {
                       "ticker": "APTV",
-                      "weight_pct": 8.0
+                      "weight_pct": 4.4
                     },
                     {
                       "ticker": "MRSH",
-                      "weight_pct": 7.69
+                      "weight_pct": 4.23
                     },
                     {
                       "ticker": "ICE",
-                      "weight_pct": 7.57
+                      "weight_pct": 4.16
                     },
                     {
                       "ticker": "ZTS",
-                      "weight_pct": 7.42
+                      "weight_pct": 4.08
                     },
                     {
                       "ticker": "WDAY",
-                      "weight_pct": 7.14
+                      "weight_pct": 3.92
                     },
                     {
                       "ticker": "DHR",
-                      "weight_pct": 6.96
+                      "weight_pct": 3.83
                     },
                     {
                       "ticker": "AKAM",
-                      "weight_pct": 6.95
+                      "weight_pct": 3.82
+                    },
+                    {
+                      "ticker": "ZBRA",
+                      "weight_pct": 3.54
+                    },
+                    {
+                      "ticker": "CPRT",
+                      "weight_pct": 3.51
                     }
                   ]
                 }
@@ -1971,12 +2807,12 @@
             "champion": {
               "stats": {
                 "periods": 8,
-                "mean_monthly_return": 0.0,
-                "volatility_annualized": 0.0,
-                "sharpe_annualized": 0.0,
-                "cumulative_return": 0.0,
-                "max_drawdown_log": 0.0,
-                "max_drawdown_pct": 0.0,
+                "mean_monthly_return": -0.017782,
+                "volatility_annualized": 0.1049,
+                "sharpe_annualized": -2.033,
+                "cumulative_return": -0.1366,
+                "max_drawdown_log": 0.1624,
+                "max_drawdown_pct": 0.1499,
                 "avg_turnover_one_way": 0.0,
                 "rebalance_frequency": "semiannual"
               },
@@ -1991,27 +2827,198 @@
                 "2026-06-01"
               ],
               "equity_index": [
-                1.0,
-                1.0,
-                1.0,
-                1.0,
-                1.0,
-                1.0,
-                1.0,
-                1.0
+                0.998902,
+                1.015566,
+                0.997439,
+                0.979858,
+                0.918284,
+                0.909308,
+                0.920483,
+                0.863375
               ],
               "holdings_snapshots": [
                 {
                   "date": "2025-11-01",
-                  "weights": []
+                  "weights": [
+                    {
+                      "ticker": "ADBE",
+                      "weight_pct": 8.64
+                    },
+                    {
+                      "ticker": "ACN",
+                      "weight_pct": 6.94
+                    },
+                    {
+                      "ticker": "ZBH",
+                      "weight_pct": 5.56
+                    },
+                    {
+                      "ticker": "ALL",
+                      "weight_pct": 5.24
+                    },
+                    {
+                      "ticker": "AMP",
+                      "weight_pct": 4.89
+                    },
+                    {
+                      "ticker": "APTV",
+                      "weight_pct": 4.78
+                    },
+                    {
+                      "ticker": "MRSH",
+                      "weight_pct": 4.62
+                    },
+                    {
+                      "ticker": "ZTS",
+                      "weight_pct": 4.54
+                    },
+                    {
+                      "ticker": "WDAY",
+                      "weight_pct": 4.19
+                    },
+                    {
+                      "ticker": "AOS",
+                      "weight_pct": 3.75
+                    },
+                    {
+                      "ticker": "ZBRA",
+                      "weight_pct": 3.75
+                    },
+                    {
+                      "ticker": "CBOE",
+                      "weight_pct": 3.56
+                    },
+                    {
+                      "ticker": "AKAM",
+                      "weight_pct": 3.54
+                    },
+                    {
+                      "ticker": "ABNB",
+                      "weight_pct": 3.48
+                    }
+                  ]
                 },
                 {
                   "date": "2025-12-01",
-                  "weights": []
+                  "weights": [
+                    {
+                      "ticker": "ADBE",
+                      "weight_pct": 8.64
+                    },
+                    {
+                      "ticker": "ACN",
+                      "weight_pct": 6.94
+                    },
+                    {
+                      "ticker": "ZBH",
+                      "weight_pct": 5.56
+                    },
+                    {
+                      "ticker": "ALL",
+                      "weight_pct": 5.24
+                    },
+                    {
+                      "ticker": "AMP",
+                      "weight_pct": 4.89
+                    },
+                    {
+                      "ticker": "APTV",
+                      "weight_pct": 4.78
+                    },
+                    {
+                      "ticker": "MRSH",
+                      "weight_pct": 4.62
+                    },
+                    {
+                      "ticker": "ZTS",
+                      "weight_pct": 4.54
+                    },
+                    {
+                      "ticker": "WDAY",
+                      "weight_pct": 4.19
+                    },
+                    {
+                      "ticker": "AOS",
+                      "weight_pct": 3.75
+                    },
+                    {
+                      "ticker": "ZBRA",
+                      "weight_pct": 3.75
+                    },
+                    {
+                      "ticker": "CBOE",
+                      "weight_pct": 3.56
+                    },
+                    {
+                      "ticker": "AKAM",
+                      "weight_pct": 3.54
+                    },
+                    {
+                      "ticker": "ABNB",
+                      "weight_pct": 3.48
+                    }
+                  ]
                 },
                 {
                   "date": "2026-06-01",
-                  "weights": []
+                  "weights": [
+                    {
+                      "ticker": "ADBE",
+                      "weight_pct": 8.64
+                    },
+                    {
+                      "ticker": "ACN",
+                      "weight_pct": 6.94
+                    },
+                    {
+                      "ticker": "ZBH",
+                      "weight_pct": 5.56
+                    },
+                    {
+                      "ticker": "ALL",
+                      "weight_pct": 5.24
+                    },
+                    {
+                      "ticker": "AMP",
+                      "weight_pct": 4.89
+                    },
+                    {
+                      "ticker": "APTV",
+                      "weight_pct": 4.78
+                    },
+                    {
+                      "ticker": "MRSH",
+                      "weight_pct": 4.62
+                    },
+                    {
+                      "ticker": "ZTS",
+                      "weight_pct": 4.54
+                    },
+                    {
+                      "ticker": "WDAY",
+                      "weight_pct": 4.19
+                    },
+                    {
+                      "ticker": "AOS",
+                      "weight_pct": 3.75
+                    },
+                    {
+                      "ticker": "ZBRA",
+                      "weight_pct": 3.75
+                    },
+                    {
+                      "ticker": "CBOE",
+                      "weight_pct": 3.56
+                    },
+                    {
+                      "ticker": "AKAM",
+                      "weight_pct": 3.54
+                    },
+                    {
+                      "ticker": "ABNB",
+                      "weight_pct": 3.48
+                    }
+                  ]
                 }
               ]
             },
@@ -2054,6 +3061,105 @@
                     {
                       "ticker": "SPY",
                       "weight_pct": 100.0
+                    }
+                  ]
+                }
+              ]
+            },
+            "covered_call": {
+              "stats": {
+                "periods": 9,
+                "mean_monthly_return": -0.012715,
+                "volatility_annualized": 0.1201,
+                "sharpe_annualized": -1.27,
+                "cumulative_return": -0.1132,
+                "max_drawdown_log": 0.1764,
+                "max_drawdown_pct": 0.1617,
+                "avg_turnover_one_way": 0.0,
+                "rebalance_frequency": "monthly_marks_tenor_rolls",
+                "label": "synthetic_covered_call"
+              },
+              "dates": [
+                "2025-11-01",
+                "2025-12-01",
+                "2026-01-01",
+                "2026-02-01",
+                "2026-03-01",
+                "2026-04-01",
+                "2026-05-01",
+                "2026-06-01",
+                "2026-07-01"
+              ],
+              "equity_index": [
+                0.997522,
+                1.01139,
+                0.992547,
+                0.971895,
+                0.911929,
+                0.901302,
+                0.905221,
+                0.847835,
+                0.886817
+              ],
+              "holdings_snapshots": [
+                {
+                  "date": "2025-11-01",
+                  "weights": [
+                    {
+                      "ticker": "ADBE",
+                      "weight_pct": 8.64
+                    },
+                    {
+                      "ticker": "ACN",
+                      "weight_pct": 6.94
+                    },
+                    {
+                      "ticker": "ZBH",
+                      "weight_pct": 5.56
+                    },
+                    {
+                      "ticker": "ALL",
+                      "weight_pct": 5.24
+                    },
+                    {
+                      "ticker": "AMP",
+                      "weight_pct": 4.89
+                    },
+                    {
+                      "ticker": "APTV",
+                      "weight_pct": 4.78
+                    },
+                    {
+                      "ticker": "MRSH",
+                      "weight_pct": 4.62
+                    },
+                    {
+                      "ticker": "ZTS",
+                      "weight_pct": 4.54
+                    },
+                    {
+                      "ticker": "WDAY",
+                      "weight_pct": 4.19
+                    },
+                    {
+                      "ticker": "AOS",
+                      "weight_pct": 3.75
+                    },
+                    {
+                      "ticker": "ZBRA",
+                      "weight_pct": 3.75
+                    },
+                    {
+                      "ticker": "CBOE",
+                      "weight_pct": 3.56
+                    },
+                    {
+                      "ticker": "AKAM",
+                      "weight_pct": 3.54
+                    },
+                    {
+                      "ticker": "ABNB",
+                      "weight_pct": 3.48
                     }
                   ]
                 }
@@ -2106,21 +3212,67 @@
           }
         },
         "portfolio_explanation": {
-          "summary": "We hold 0 names under **ira_marvin** in a **calm** regime. IRA Marvin admits only completed, current deep dives with a published falsifier-adjusted IRR above the mandate threshold, ranks them by that IRR, and applies research-freshness, diversification, and cash caps. Largest positions: .",
+          "summary": "We hold 25 names under **ira_marvin** in a **calm** regime. IRA Marvin admits only completed, current deep dives with a published falsifier-adjusted IRR above the mandate threshold, ranks them by that IRR, and applies research-freshness, diversification, and cash caps. Largest positions: ADBE 8.64%, ACN 6.94%, ZBH 5.56%.",
           "mechanism": "IRA Marvin admits only completed, current deep dives with a published falsifier-adjusted IRR above the mandate threshold, ranks them by that IRR, and applies research-freshness, diversification, and cash caps.",
           "champion_selection": "ira_default",
           "regime": "calm",
-          "top_holdings": [],
-          "excluded_count": 502,
+          "top_holdings": [
+            {
+              "ticker": "ADBE",
+              "weight_pct": 8.64,
+              "stance": "watch",
+              "irr_base_pct": 33.28,
+              "archetype": "unknown",
+              "moat": "unproven",
+              "dhando": "partial"
+            },
+            {
+              "ticker": "ACN",
+              "weight_pct": 6.94,
+              "stance": "watch",
+              "irr_base_pct": 26.61,
+              "archetype": "unknown",
+              "moat": "unproven",
+              "dhando": "partial"
+            },
+            {
+              "ticker": "ZBH",
+              "weight_pct": 5.56,
+              "stance": "watch",
+              "irr_base_pct": 21.35,
+              "archetype": "unknown",
+              "moat": "unproven",
+              "dhando": "partial"
+            },
+            {
+              "ticker": "ALL",
+              "weight_pct": 5.24,
+              "stance": "watch",
+              "irr_base_pct": 19.82,
+              "archetype": "unknown",
+              "moat": "unproven",
+              "dhando": "partial"
+            },
+            {
+              "ticker": "AMP",
+              "weight_pct": 4.89,
+              "stance": "watch",
+              "irr_base_pct": 18.94,
+              "archetype": "unknown",
+              "moat": "unproven",
+              "dhando": "partial"
+            }
+          ],
+          "excluded_count": 477,
           "excluded_sample": [
             "A",
             "AAPL",
             "ABBV",
-            "ABNB",
-            "ABT",
             "ACGL",
-            "ACN",
-            "ADBE"
+            "ADI",
+            "ADM",
+            "ADP",
+            "ADSK"
           ],
           "drivers": [
             {
@@ -2166,60 +3318,73 @@
         "pit": {
           "audit_pass": true,
           "leakage_count": 0,
-          "oos_sharpe_genetic": 0.323,
-          "oos_periods": 115,
-          "ml_oos_eligible": true,
+          "oos_sharpe_genetic": -1.309,
+          "oos_periods": 7,
+          "ml_oos_eligible": false,
           "synthetic_count": 0
         },
         "pit_status": {
-          "generated_at": "2026-07-13T14:15:52Z",
+          "generated_at": "2026-07-14T22:58:14Z",
           "audit_pass": true,
           "leakage_count": 0,
           "synthetic_tickers": [
-            "ABMD.CVR",
             "BF.B",
-            "BKRB",
-            "BMYS.KL",
             "BRK.B",
-            "BYMA",
-            "CBRS",
-            "CMSG",
-            "CSU.DB",
             "FDXF",
-            "GKTX.PS1",
-            "GKTX.PS2",
-            "GKTX.PS3",
-            "HEI.A",
-            "HONA",
-            "IPCXR",
-            "JL80.DE",
-            "LMN",
-            "MRTX.CVR",
-            "PCH",
-            "PRVL.CVR",
-            "TASE"
+            "HONA"
           ],
-          "oos_sharpe_genetic": 0.323,
+          "oos_sharpe_genetic": -1.309,
           "oos_sharpe_ira_marvin": 0.0,
-          "oos_periods": 115,
-          "ml_oos_eligible": true,
+          "oos_periods": 7,
+          "ml_oos_eligible": false,
           "production_policy": "ira_marvin",
           "production_sharpe_insample": null,
           "pit_error": null
         },
         "bias_scan": {
-          "generated_at": "2026-07-13T14:15:52Z",
-          "flag_count": 0,
+          "generated_at": "2026-07-14T22:58:14Z",
+          "flag_count": 5,
           "by_severity": {
-            "review": 0,
+            "review": 4,
             "warn": 0,
-            "info": 0
+            "info": 1
           },
-          "flags": [],
-          "pass": true
+          "flags": [
+            {
+              "ticker": "ACN",
+              "bias": "human_review_with_weight",
+              "severity": "review",
+              "weight_pct": 6.94
+            },
+            {
+              "ticker": "ADBE",
+              "bias": "human_review_with_weight",
+              "severity": "review",
+              "weight_pct": 8.64
+            },
+            {
+              "ticker": "ADBE",
+              "bias": "high_irr_watch_capped",
+              "severity": "info",
+              "irr": 33.28
+            },
+            {
+              "ticker": "ALL",
+              "bias": "human_review_with_weight",
+              "severity": "review",
+              "weight_pct": 5.24
+            },
+            {
+              "ticker": "ZBH",
+              "bias": "human_review_with_weight",
+              "severity": "review",
+              "weight_pct": 5.56
+            }
+          ],
+          "pass": false
         },
         "observatory": {
-          "generated_at": "2026-07-13T14:15:52Z",
+          "generated_at": "2026-07-14T22:58:14Z",
           "regime": {
             "label": "calm",
             "research": "calm",
@@ -2245,7 +3410,7 @@
           "research_stress": {
             "stale_research_pct": 0.0,
             "falsifier_count_total": 0,
-            "human_review_pending": 0
+            "human_review_pending": 59
           },
           "vrp_health": {
             "build_time": "2026-06-07T00:30:07.576981Z",
@@ -13200,7 +14365,7 @@
           ],
           "sources_manifest": "/home/runner/work/single-stock-investments/single-stock-investments/_system/reference/market-data/external/sources_manifest.json"
         },
-        "regime_brief": "_system/reviews/pending/darwin_regime_brief_2026-07-13.md",
+        "regime_brief": "_system/reviews/pending/darwin_regime_brief_2026-07-14.md",
         "exploration": {
           "enabled": false,
           "champion_mode": null
@@ -13210,10 +14375,10 @@
           "account_id": "roth",
           "inception_date": "2026-06-03",
           "last_mark": {
-            "date": "2026-07-13",
-            "nav_usd": 147692.0,
-            "period_return_pct": 0.0,
-            "cumulative_return_pct": 47.692
+            "date": "2026-07-14",
+            "nav_usd": 155464.85,
+            "period_return_pct": 5.263,
+            "cumulative_return_pct": 55.465
           },
           "backtest_at_inception": {
             "cumulative_return_pct": -18.48,
@@ -13223,8 +14388,8 @@
             "as_of": "2026-06-03T20:44:35Z"
           },
           "backtest_latest": {
-            "cumulative_return_pct": 0,
-            "sharpe_annualized": 0.0,
+            "cumulative_return_pct": -20.87,
+            "sharpe_annualized": -4.02,
             "policy_id": "ira_marvin"
           },
           "policy_id": "ira_marvin"
