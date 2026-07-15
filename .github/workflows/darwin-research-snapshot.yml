@@ -23,6 +23,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Install Darwin dependencies
+        run: pip install -r _system/scripts/requirements-darwin.txt
       - name: Build compact research contract from full checkout
         run: python _system/scripts/build_darwin_research_snapshot.py
       - name: Commit research contract
