@@ -1,0 +1,54 @@
+{
+  "schema_version": "1.0",
+  "ticker": "HGBL",
+  "as_of": "2026-07-16",
+  "purpose": "First-pass universal-contract valuation after onboard.",
+  "method_profile": "quality_reinvestment",
+  "primary_sources": [
+    {
+      "title": "Q1 2026 Form 10-Q",
+      "path": "HGBL/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_211813.htm",
+      "period": "2026-03-31"
+    },
+    {
+      "title": "FY2025 Form 10-K",
+      "path": "HGBL/investor-documents/sec-edgar/10-K_20260312_rpt20251231_acc0001193125_26_104062.htm",
+      "period": "2025-12-31"
+    }
+  ],
+  "resolved_facts": [
+    "Price $1.26 on 2026-07-16; 34,734,754 shares; book equity $67.77M ($1.95/sh).",
+    "FY2025 revenue $51.0M; op. income $5.711M; net income $3.587M.",
+    "FY2025 segment op. income: Auction $2.671M, ALT $1.659M, NLEX $6.116M, Specialty $0.230M, Corp ($4.965M).",
+    "Q1 2026: cash $11.6M; notes $8.6M; EMI $19.4M; debt $4.1M; DebtX acquired for ~$8.5M."
+  ],
+  "gap_assessments": [
+    {
+      "gap_id": "fee_earnings_power_and_multiple",
+      "status": "partially_met",
+      "reconciliation": "FY segment operating income rebuilt. Through-cycle normalization, cash tax, and peer multiples remain provisional.",
+      "falsifier": "Sustained fee earnings below the capitalized low case.",
+      "monitoring_source": "Quarterly segment note; 10-K."
+    },
+    {
+      "gap_id": "emi_and_notes_realization",
+      "status": "partially_met",
+      "reconciliation": "Carrying values primary-sourced. Asset-level JV schedules and credit detail incomplete.",
+      "falsifier": "Realizations clear below low-case haircuts.",
+      "monitoring_source": "10-Q notes receivable / EMI footnotes."
+    },
+    {
+      "gap_id": "debtx_earn_in",
+      "status": "not_met",
+      "reconciliation": "Purchase price ~$8.5M and Q1 Commercial Loans loss disclosed; no earn-in bridge yet.",
+      "falsifier": "Impairment or continued losses erase incremental value.",
+      "monitoring_source": "10-Q Note 3 acquisition; Commercial Loans segment."
+    }
+  ],
+  "acceptance_summary": {
+    "fee_earnings_power_and_multiple": "not_met",
+    "emi_and_notes_realization": "not_met",
+    "debtx_earn_in": "not_met"
+  },
+  "committee_conclusion": "First-pass component schedule built post-onboard; evidence-blocked pending earnings-power, EMI/notes, and DebtX acceptance tests."
+}

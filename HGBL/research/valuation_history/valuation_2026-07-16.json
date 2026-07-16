@@ -1,0 +1,1673 @@
+{
+  "ticker": "HGBL",
+  "as_of": "2026-07-16",
+  "valuation_mode": "economic_value",
+  "method": "pending",
+  "method_profile": "quality_reinvestment",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "croupier",
+    "moat": "narrow",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "earnings"
+  },
+  "inputs": {
+    "price": 1.26,
+    "price_source": "Yahoo HGBL close 2026-07-16",
+    "price_as_of": "2026-07-16",
+    "book_per_share": 1.95,
+    "book_per_share_filed": 1.95,
+    "shares_outstanding": 34734754,
+    "shares_source": "HGBL Q1 2026 10-Q outstanding shares 34,734,754 as of 2026-03-31",
+    "equity_m": 67.77,
+    "normalization_note": "FY2025 net income $3.587M; operating income $5.711M. Q1 2026 net income $0.717M. Multi-segment asset services + specialty lending."
+  },
+  "valuation_methodology": {
+    "mode": "component_economic_value",
+    "horizon_years": 5,
+    "decision_rule": "Use one complete component schedule; keep evidence-blocked until critical gaps close."
+  },
+  "approved_stance": "watch",
+  "component_valuation": {
+    "schema_version": "1.0",
+    "all_material_components_identified": true,
+    "coverage_statement": "Fee franchises (auction, lab resale, NLEX), specialty lending notes, equity-method investments, net tangible operating assets, debt/leases, preferred claim, and DebtX option valued once.",
+    "components": [
+      {
+        "id": "fee_franchises_after_corporate",
+        "label": "Auction, ALT, and NLEX fee franchises (after corporate overhead)",
+        "category": "operating_business",
+        "overlap_key": "fee_franchises_after_corporate",
+        "treatment": "additive",
+        "valuation": {
+          "method": "owner_earnings_multiple",
+          "basis": "per_share",
+          "low": 0.8,
+          "base": 1.05,
+          "high": 1.35,
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "FACT FY2025 10-K segment op. income: Auction/Liquidation $2.671M, Refurbishment & Resale $1.659M, Brokerage (NLEX) $6.116M; corporate ($4.965M). CALC fee segments after corporate = $5.481M; after ~25% tax proxy \u2248 $4.11M. JUDGMENT low/base/high \u2248 8\u00d7/10\u00d7/12\u00d7 that after-tax run-rate ($0.95/$1.18/$1.42 before rounding). Q1 2026 still profitable but softer (NI $0.717M). Sources: 10-K FY2025 segment note; 10-Q Q1 2026.",
+          "assumption_summary": "Low/base/high change earnings power and exit multiple; not a single terminal multiple on revenue.",
+          "cross_check": "Range must be reconciled to primary filings and through-cycle earnings before IC approval.",
+          "falsifier": "Through-cycle after-tax fee earnings fall such that capitalized value is below the low case."
+        }
+      },
+      {
+        "id": "specialty_lending_notes",
+        "label": "Specialty lending notes receivable",
+        "category": "financial_asset",
+        "overlap_key": "specialty_lending_notes",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": 0.15,
+          "base": 0.2,
+          "high": 0.24,
+          "evidence_tier": "primary_derived",
+          "evidence": "FACT Q1 2026: current notes receivable net $4.369M + non-current $4.182M = $8.551M ($0.25/sh). Specialty Lending FY2025 op. income only $0.230M. JUDGMENT haircut carrying for credit/collection risk.",
+          "assumption_summary": "Low/base/high vary recovery vs carrying on the notes book.",
+          "cross_check": "Range must be reconciled to primary filings and through-cycle earnings before IC approval.",
+          "falsifier": "Primary evidence supports economics below the low case or reveals an omitted claim."
+        }
+      },
+      {
+        "id": "equity_method_investments",
+        "label": "Equity-method investments (JVs / participating interests)",
+        "category": "financial_asset",
+        "overlap_key": "equity_method_investments",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": 0.3,
+          "base": 0.45,
+          "high": 0.56,
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "FACT Q1 2026 carrying value $19.442M ($0.56/sh). FY2025 equity-method earnings only $0.123M (vs $2.688M in 2024). JUDGMENT: base discounts carrying for illiquidity and lumpy realizations; high near carrying after recent DLZ exit evidence.",
+          "assumption_summary": "Cases vary realizable value of JV / participating interests vs carrying.",
+          "cross_check": "Range must be reconciled to primary filings and through-cycle earnings before IC approval.",
+          "falsifier": "Primary evidence supports economics below the low case or reveals an omitted claim."
+        }
+      },
+      {
+        "id": "cash_inventory_ppe_net_working",
+        "label": "Cash, inventory, PP&E net of operating working liabilities",
+        "category": "financial_asset",
+        "overlap_key": "cash_inventory_ppe_net_working",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": 0.25,
+          "base": 0.35,
+          "high": 0.45,
+          "evidence_tier": "primary_derived",
+          "evidence": "FACT Q1: cash $11.566M + inventory $5.348M + AR $1.725M + PP&E $12.029M = $30.668M; less AP $5.174M + payables to sellers $5.317M + other current liab $0.896M = $11.387M \u2192 net \u2248 $19.3M ($0.56/sh) before debt/leases. JUDGMENT haircut for inventory realization and PP&E specialized-use risk.",
+          "assumption_summary": "Low/base/high vary inventory and PP&E realization; cash near face.",
+          "cross_check": "Range must be reconciled to primary filings and through-cycle earnings before IC approval.",
+          "falsifier": "Primary evidence supports economics below the low case or reveals an omitted claim."
+        }
+      },
+      {
+        "id": "debt_and_leases",
+        "label": "Third-party debt and lease liabilities",
+        "category": "liability_or_reserve",
+        "overlap_key": "debt_and_leases",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_debt",
+          "basis": "per_share",
+          "low": -0.2,
+          "base": -0.17,
+          "high": -0.14,
+          "evidence_tier": "audited",
+          "evidence": "FACT Q1: non-current third-party debt $4.100M; lease liabilities current $0.818M + non-current $0.619M = $1.437M; total \u2248 $5.537M ($0.16/sh).",
+          "assumption_summary": "Cases vary paydown pace and lease run-off.",
+          "cross_check": "Range must be reconciled to primary filings and through-cycle earnings before IC approval.",
+          "falsifier": "Primary evidence supports economics below the low case or reveals an omitted claim."
+        }
+      },
+      {
+        "id": "preferred_liquidation_claim",
+        "label": "Series N preferred liquidation preference",
+        "category": "liability_or_reserve",
+        "overlap_key": "preferred_liquidation_claim",
+        "treatment": "additive",
+        "valuation": {
+          "method": "senior_claim",
+          "basis": "per_share",
+          "low": -0.02,
+          "base": -0.02,
+          "high": -0.02,
+          "evidence_tier": "audited",
+          "evidence": "FACT Q1: 563 Series N preferred shares with $1,000/share liquidation preference over common = $0.563M ($0.02/sh).",
+          "assumption_summary": "Fixed senior claim at stated preference.",
+          "cross_check": "Range must be reconciled to primary filings and through-cycle earnings before IC approval.",
+          "falsifier": "Primary evidence supports economics below the low case or reveals an omitted claim."
+        }
+      },
+      {
+        "id": "debtx_commercial_loan_platform",
+        "label": "DebtX commercial-loan brokerage platform (2026 acquisition)",
+        "category": "real_option",
+        "overlap_key": "debtx_commercial_loan_platform",
+        "treatment": "additive",
+        "valuation": {
+          "method": "probability_weighted_acquisition_earnout",
+          "basis": "per_share",
+          "low": 0.0,
+          "base": 0.05,
+          "high": 0.25,
+          "evidence_tier": "speculative",
+          "evidence": "FACT: Jan 1, 2026 acquired substantially all assets of The Debt Exchange Inc. for ~$8.5M (10-Q). Q1 Commercial Loans segment op. loss ($0.606M). Goodwill rose to $12.747M; intangibles to $6.066M. JUDGMENT: only incremental value beyond fee-franchise / tangible assets already counted; failure value zero if platform does not scale.",
+          "assumption_summary": "Low failure; base modest earn-in; high assumes platform approaches NLEX-like contribution over time.",
+          "cross_check": "Range must be reconciled to primary filings and through-cycle earnings before IC approval.",
+          "falsifier": "DebtX remains loss-making and impaired below the low case (zero)."
+        }
+      }
+    ]
+  },
+  "economic_value": {
+    "schema_version": "1.0",
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One diluted common share of HGBL after Series N preference.",
+      "unit_label": "diluted share",
+      "unit_count": 34734754,
+      "unit_source": "Q1 2026 10-Q outstanding shares; diluted WADSS 34,991,982 used only for EPS context.",
+      "enterprise_to_equity_reconciliation": "Fee franchises capitalized once; notes and EMI valued as assets; cash/inventory/PP&E net of working liabilities; debt, leases, and preferred deducted; DebtX incremental only."
+    },
+    "gaap_role": "cross_check",
+    "accounting_reference": "HGBL Q1 2026 Form 10-Q; FY2025 Form 10-K.",
+    "wisdom_applied": [
+      "Stahl: croupier / market-making fees on financial and industrial asset flows.",
+      "Greenblatt: earnings power value for fee franchises plus asset value for lending/JVs."
+    ],
+    "limitations": [
+      "First-pass multiples are provisional; no IC freeze.",
+      "DebtX earn-in and EMI realization paths need more primary detail.",
+      "FY tax rate exceeded the 25% proxy; cash-tax path needs reconciliation."
+    ],
+    "component_groups": [
+      {
+        "id": "fee_franchises_after_corporate",
+        "label": "Auction, ALT, and NLEX fee franchises (after corporate overhead)",
+        "component_ids": [
+          "fee_franchises_after_corporate"
+        ],
+        "economic_claim": "Auction, ALT, and NLEX fee franchises (after corporate overhead)",
+        "valuation_basis": "Low/base/high change earnings power and exit multiple; not a single terminal multiple on revenue.",
+        "adjustments": "Low/base/high incorporate ownership, financing, tax, and realization adjustments in evidence.",
+        "overlap_control": "Unique overlap key fee_franchises_after_corporate."
+      },
+      {
+        "id": "specialty_lending_notes",
+        "label": "Specialty lending notes receivable",
+        "component_ids": [
+          "specialty_lending_notes"
+        ],
+        "economic_claim": "Specialty lending notes receivable",
+        "valuation_basis": "Low/base/high vary recovery vs carrying on the notes book.",
+        "adjustments": "Low/base/high incorporate ownership, financing, tax, and realization adjustments in evidence.",
+        "overlap_control": "Unique overlap key specialty_lending_notes."
+      },
+      {
+        "id": "equity_method_investments",
+        "label": "Equity-method investments (JVs / participating interests)",
+        "component_ids": [
+          "equity_method_investments"
+        ],
+        "economic_claim": "Equity-method investments (JVs / participating interests)",
+        "valuation_basis": "Cases vary realizable value of JV / participating interests vs carrying.",
+        "adjustments": "Low/base/high incorporate ownership, financing, tax, and realization adjustments in evidence.",
+        "overlap_control": "Unique overlap key equity_method_investments."
+      },
+      {
+        "id": "cash_inventory_ppe_net_working",
+        "label": "Cash, inventory, PP&E net of operating working liabilities",
+        "component_ids": [
+          "cash_inventory_ppe_net_working"
+        ],
+        "economic_claim": "Cash, inventory, PP&E net of operating working liabilities",
+        "valuation_basis": "Low/base/high vary inventory and PP&E realization; cash near face.",
+        "adjustments": "Low/base/high incorporate ownership, financing, tax, and realization adjustments in evidence.",
+        "overlap_control": "Unique overlap key cash_inventory_ppe_net_working."
+      },
+      {
+        "id": "debt_and_leases",
+        "label": "Third-party debt and lease liabilities",
+        "component_ids": [
+          "debt_and_leases"
+        ],
+        "economic_claim": "Third-party debt and lease liabilities",
+        "valuation_basis": "Cases vary paydown pace and lease run-off.",
+        "adjustments": "Low/base/high incorporate ownership, financing, tax, and realization adjustments in evidence.",
+        "overlap_control": "Unique overlap key debt_and_leases."
+      },
+      {
+        "id": "preferred_liquidation_claim",
+        "label": "Series N preferred liquidation preference",
+        "component_ids": [
+          "preferred_liquidation_claim"
+        ],
+        "economic_claim": "Series N preferred liquidation preference",
+        "valuation_basis": "Fixed senior claim at stated preference.",
+        "adjustments": "Low/base/high incorporate ownership, financing, tax, and realization adjustments in evidence.",
+        "overlap_control": "Unique overlap key preferred_liquidation_claim."
+      },
+      {
+        "id": "debtx_commercial_loan_platform",
+        "label": "DebtX commercial-loan brokerage platform (2026 acquisition)",
+        "component_ids": [
+          "debtx_commercial_loan_platform"
+        ],
+        "economic_claim": "DebtX commercial-loan brokerage platform (2026 acquisition)",
+        "valuation_basis": "Low failure; base modest earn-in; high assumes platform approaches NLEX-like contribution over time.",
+        "adjustments": "Low/base/high incorporate ownership, financing, tax, and realization adjustments in evidence.",
+        "overlap_control": "Unique overlap key debtx_commercial_loan_platform."
+      }
+    ]
+  },
+  "scenarios": {
+    "bear": {
+      "price": 1.26,
+      "payoff": 1.3,
+      "years": 5,
+      "notes": "Fee earnings compress; EMI/notes haircuts; DebtX fails"
+    },
+    "base": {
+      "price": 1.26,
+      "payoff": 1.9,
+      "years": 5,
+      "notes": "Fee franchises earn ~10x after-tax; assets near carrying haircuts"
+    },
+    "bull": {
+      "price": 1.26,
+      "payoff": 2.7,
+      "years": 4,
+      "notes": "NLEX/auction re-rate; DebtX scales; EMI realizations"
+    }
+  },
+  "results_lawrence_legacy": {},
+  "results": {},
+  "implied_return": {
+    "base_pct": null,
+    "label": "pending",
+    "display": "pending"
+  },
+  "stance_proposal": {
+    "suggested": "pending",
+    "irr_band": "pending",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null,
+    "approved_stance": "watch"
+  },
+  "overlay_results": [],
+  "component_valuation_results": {
+    "status": "complete",
+    "decision_rule": "Use the complete low/base/high component schedule. Embedded components are estimated but not added twice.",
+    "all_material_components_identified": true,
+    "additive_components": [
+      {
+        "id": "fee_franchises_after_corporate",
+        "label": "Auction, ALT, and NLEX fee franchises (after corporate overhead)",
+        "category": "operating_business",
+        "overlap_key": "fee_franchises_after_corporate",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "owner_earnings_multiple",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "FACT FY2025 10-K segment op. income: Auction/Liquidation $2.671M, Refurbishment & Resale $1.659M, Brokerage (NLEX) $6.116M; corporate ($4.965M). CALC fee segments after corporate = $5.481M; after ~25% tax proxy \u2248 $4.11M. JUDGMENT low/base/high \u2248 8\u00d7/10\u00d7/12\u00d7 that after-tax run-rate ($0.95/$1.18/$1.42 before rounding). Q1 2026 still profitable but softer (NI $0.717M). Sources: 10-K FY2025 segment note; 10-Q Q1 2026.",
+        "cross_check": "Range must be reconciled to primary filings and through-cycle earnings before IC approval.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Low/base/high change earnings power and exit multiple; not a single terminal multiple on revenue.",
+        "falsifier": "Through-cycle after-tax fee earnings fall such that capitalized value is below the low case.",
+        "scenario_assumptions": null,
+        "low_per_share": 0.8,
+        "base_per_share": 1.05,
+        "high_per_share": 1.35
+      },
+      {
+        "id": "specialty_lending_notes",
+        "label": "Specialty lending notes receivable",
+        "category": "financial_asset",
+        "overlap_key": "specialty_lending_notes",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "net_asset_value",
+        "evidence_tier": "primary_derived",
+        "evidence": "FACT Q1 2026: current notes receivable net $4.369M + non-current $4.182M = $8.551M ($0.25/sh). Specialty Lending FY2025 op. income only $0.230M. JUDGMENT haircut carrying for credit/collection risk.",
+        "cross_check": "Range must be reconciled to primary filings and through-cycle earnings before IC approval.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Low/base/high vary recovery vs carrying on the notes book.",
+        "falsifier": "Primary evidence supports economics below the low case or reveals an omitted claim.",
+        "scenario_assumptions": null,
+        "low_per_share": 0.15,
+        "base_per_share": 0.2,
+        "high_per_share": 0.24
+      },
+      {
+        "id": "equity_method_investments",
+        "label": "Equity-method investments (JVs / participating interests)",
+        "category": "financial_asset",
+        "overlap_key": "equity_method_investments",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "net_asset_value",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "FACT Q1 2026 carrying value $19.442M ($0.56/sh). FY2025 equity-method earnings only $0.123M (vs $2.688M in 2024). JUDGMENT: base discounts carrying for illiquidity and lumpy realizations; high near carrying after recent DLZ exit evidence.",
+        "cross_check": "Range must be reconciled to primary filings and through-cycle earnings before IC approval.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Cases vary realizable value of JV / participating interests vs carrying.",
+        "falsifier": "Primary evidence supports economics below the low case or reveals an omitted claim.",
+        "scenario_assumptions": null,
+        "low_per_share": 0.3,
+        "base_per_share": 0.45,
+        "high_per_share": 0.56
+      },
+      {
+        "id": "cash_inventory_ppe_net_working",
+        "label": "Cash, inventory, PP&E net of operating working liabilities",
+        "category": "financial_asset",
+        "overlap_key": "cash_inventory_ppe_net_working",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "net_asset_value",
+        "evidence_tier": "primary_derived",
+        "evidence": "FACT Q1: cash $11.566M + inventory $5.348M + AR $1.725M + PP&E $12.029M = $30.668M; less AP $5.174M + payables to sellers $5.317M + other current liab $0.896M = $11.387M \u2192 net \u2248 $19.3M ($0.56/sh) before debt/leases. JUDGMENT haircut for inventory realization and PP&E specialized-use risk.",
+        "cross_check": "Range must be reconciled to primary filings and through-cycle earnings before IC approval.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Low/base/high vary inventory and PP&E realization; cash near face.",
+        "falsifier": "Primary evidence supports economics below the low case or reveals an omitted claim.",
+        "scenario_assumptions": null,
+        "low_per_share": 0.25,
+        "base_per_share": 0.35,
+        "high_per_share": 0.45
+      },
+      {
+        "id": "debt_and_leases",
+        "label": "Third-party debt and lease liabilities",
+        "category": "liability_or_reserve",
+        "overlap_key": "debt_and_leases",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "net_debt",
+        "evidence_tier": "audited",
+        "evidence": "FACT Q1: non-current third-party debt $4.100M; lease liabilities current $0.818M + non-current $0.619M = $1.437M; total \u2248 $5.537M ($0.16/sh).",
+        "cross_check": "Range must be reconciled to primary filings and through-cycle earnings before IC approval.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Cases vary paydown pace and lease run-off.",
+        "falsifier": "Primary evidence supports economics below the low case or reveals an omitted claim.",
+        "scenario_assumptions": null,
+        "low_per_share": -0.2,
+        "base_per_share": -0.17,
+        "high_per_share": -0.14
+      },
+      {
+        "id": "preferred_liquidation_claim",
+        "label": "Series N preferred liquidation preference",
+        "category": "liability_or_reserve",
+        "overlap_key": "preferred_liquidation_claim",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "senior_claim",
+        "evidence_tier": "audited",
+        "evidence": "FACT Q1: 563 Series N preferred shares with $1,000/share liquidation preference over common = $0.563M ($0.02/sh).",
+        "cross_check": "Range must be reconciled to primary filings and through-cycle earnings before IC approval.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Fixed senior claim at stated preference.",
+        "falsifier": "Primary evidence supports economics below the low case or reveals an omitted claim.",
+        "scenario_assumptions": null,
+        "low_per_share": -0.02,
+        "base_per_share": -0.02,
+        "high_per_share": -0.02
+      },
+      {
+        "id": "debtx_commercial_loan_platform",
+        "label": "DebtX commercial-loan brokerage platform (2026 acquisition)",
+        "category": "real_option",
+        "overlap_key": "debtx_commercial_loan_platform",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "probability_weighted_acquisition_earnout",
+        "evidence_tier": "speculative",
+        "evidence": "FACT: Jan 1, 2026 acquired substantially all assets of The Debt Exchange Inc. for ~$8.5M (10-Q). Q1 Commercial Loans segment op. loss ($0.606M). Goodwill rose to $12.747M; intangibles to $6.066M. JUDGMENT: only incremental value beyond fee-franchise / tangible assets already counted; failure value zero if platform does not scale.",
+        "cross_check": "Range must be reconciled to primary filings and through-cycle earnings before IC approval.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Low failure; base modest earn-in; high assumes platform approaches NLEX-like contribution over time.",
+        "falsifier": "DebtX remains loss-making and impaired below the low case (zero).",
+        "scenario_assumptions": null,
+        "low_per_share": 0.0,
+        "base_per_share": 0.05,
+        "high_per_share": 0.25
+      }
+    ],
+    "embedded_components": [],
+    "total_equity_value_per_share": {
+      "low": 1.28,
+      "base": 1.91,
+      "high": 2.69
+    },
+    "material_component_count": 7,
+    "additive_component_count": 7,
+    "embedded_component_count": 0,
+    "market_price_per_share": 1.26,
+    "upside_downside_pct": {
+      "low": 1.6,
+      "base": 51.6,
+      "high": 113.5
+    }
+  },
+  "economic_value_analysis": {
+    "schema_version": "1.0",
+    "status": "evidence_blocked",
+    "trigger": {
+      "required": true,
+      "reasons": [
+        "explicit_component_schedule"
+      ],
+      "policy": "A complete economic-value analysis is required when any trigger fires; otherwise it is recommended."
+    },
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One diluted common share of HGBL after Series N preference.",
+      "unit_label": "diluted share",
+      "unit_count": 34734754,
+      "unit_source": "Q1 2026 10-Q outstanding shares; diluted WADSS 34,991,982 used only for EPS context.",
+      "enterprise_to_equity_reconciliation": "Fee franchises capitalized once; notes and EMI valued as assets; cash/inventory/PP&E net of working liabilities; debt, leases, and preferred deducted; DebtX incremental only."
+    },
+    "gaap_role": "cross_check",
+    "accounting_reference": "HGBL Q1 2026 Form 10-Q; FY2025 Form 10-K.",
+    "comparable_hierarchy": [
+      "issuer_arm_length_transaction",
+      "same_asset_transaction",
+      "public_peer",
+      "replacement_cost",
+      "approved_external_analysis"
+    ],
+    "gross_comparable_nav_per_share": null,
+    "risked_present_value_per_share": {
+      "low": 1.28,
+      "base": 1.91,
+      "high": 2.69
+    },
+    "component_groups": [
+      {
+        "id": "fee_franchises_after_corporate",
+        "label": "Auction, ALT, and NLEX fee franchises (after corporate overhead)",
+        "component_ids": [
+          "fee_franchises_after_corporate"
+        ],
+        "economic_claim": "Auction, ALT, and NLEX fee franchises (after corporate overhead)",
+        "valuation_basis": "Low/base/high change earnings power and exit multiple; not a single terminal multiple on revenue.",
+        "adjustments": "Low/base/high incorporate ownership, financing, tax, and realization adjustments in evidence.",
+        "overlap_control": "Unique overlap key fee_franchises_after_corporate.",
+        "risked_present_value_per_share": {
+          "low": 0.8,
+          "base": 1.05,
+          "high": 1.35
+        }
+      },
+      {
+        "id": "specialty_lending_notes",
+        "label": "Specialty lending notes receivable",
+        "component_ids": [
+          "specialty_lending_notes"
+        ],
+        "economic_claim": "Specialty lending notes receivable",
+        "valuation_basis": "Low/base/high vary recovery vs carrying on the notes book.",
+        "adjustments": "Low/base/high incorporate ownership, financing, tax, and realization adjustments in evidence.",
+        "overlap_control": "Unique overlap key specialty_lending_notes.",
+        "risked_present_value_per_share": {
+          "low": 0.15,
+          "base": 0.2,
+          "high": 0.24
+        }
+      },
+      {
+        "id": "equity_method_investments",
+        "label": "Equity-method investments (JVs / participating interests)",
+        "component_ids": [
+          "equity_method_investments"
+        ],
+        "economic_claim": "Equity-method investments (JVs / participating interests)",
+        "valuation_basis": "Cases vary realizable value of JV / participating interests vs carrying.",
+        "adjustments": "Low/base/high incorporate ownership, financing, tax, and realization adjustments in evidence.",
+        "overlap_control": "Unique overlap key equity_method_investments.",
+        "risked_present_value_per_share": {
+          "low": 0.3,
+          "base": 0.45,
+          "high": 0.56
+        }
+      },
+      {
+        "id": "cash_inventory_ppe_net_working",
+        "label": "Cash, inventory, PP&E net of operating working liabilities",
+        "component_ids": [
+          "cash_inventory_ppe_net_working"
+        ],
+        "economic_claim": "Cash, inventory, PP&E net of operating working liabilities",
+        "valuation_basis": "Low/base/high vary inventory and PP&E realization; cash near face.",
+        "adjustments": "Low/base/high incorporate ownership, financing, tax, and realization adjustments in evidence.",
+        "overlap_control": "Unique overlap key cash_inventory_ppe_net_working.",
+        "risked_present_value_per_share": {
+          "low": 0.25,
+          "base": 0.35,
+          "high": 0.45
+        }
+      },
+      {
+        "id": "debt_and_leases",
+        "label": "Third-party debt and lease liabilities",
+        "component_ids": [
+          "debt_and_leases"
+        ],
+        "economic_claim": "Third-party debt and lease liabilities",
+        "valuation_basis": "Cases vary paydown pace and lease run-off.",
+        "adjustments": "Low/base/high incorporate ownership, financing, tax, and realization adjustments in evidence.",
+        "overlap_control": "Unique overlap key debt_and_leases.",
+        "risked_present_value_per_share": {
+          "low": -0.2,
+          "base": -0.17,
+          "high": -0.14
+        }
+      },
+      {
+        "id": "preferred_liquidation_claim",
+        "label": "Series N preferred liquidation preference",
+        "component_ids": [
+          "preferred_liquidation_claim"
+        ],
+        "economic_claim": "Series N preferred liquidation preference",
+        "valuation_basis": "Fixed senior claim at stated preference.",
+        "adjustments": "Low/base/high incorporate ownership, financing, tax, and realization adjustments in evidence.",
+        "overlap_control": "Unique overlap key preferred_liquidation_claim.",
+        "risked_present_value_per_share": {
+          "low": -0.02,
+          "base": -0.02,
+          "high": -0.02
+        }
+      },
+      {
+        "id": "debtx_commercial_loan_platform",
+        "label": "DebtX commercial-loan brokerage platform (2026 acquisition)",
+        "component_ids": [
+          "debtx_commercial_loan_platform"
+        ],
+        "economic_claim": "DebtX commercial-loan brokerage platform (2026 acquisition)",
+        "valuation_basis": "Low failure; base modest earn-in; high assumes platform approaches NLEX-like contribution over time.",
+        "adjustments": "Low/base/high incorporate ownership, financing, tax, and realization adjustments in evidence.",
+        "overlap_control": "Unique overlap key debtx_commercial_loan_platform.",
+        "risked_present_value_per_share": {
+          "low": 0.0,
+          "base": 0.05,
+          "high": 0.25
+        }
+      }
+    ],
+    "valuation_proof": [
+      {
+        "component_id": "fee_franchises_after_corporate",
+        "economic_claim": "Auction, ALT, and NLEX fee franchises (after corporate overhead)",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "owner_earnings_multiple",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "FACT FY2025 10-K segment op. income: Auction/Liquidation $2.671M, Refurbishment & Resale $1.659M, Brokerage (NLEX) $6.116M; corporate ($4.965M). CALC fee segments after corporate = $5.481M; after ~25% tax proxy \u2248 $4.11M. JUDGMENT low/base/high \u2248 8\u00d7/10\u00d7/12\u00d7 that after-tax run-rate ($0.95/$1.18/$1.42 before rounding). Q1 2026 still profitable but softer (NI $0.717M). Sources: 10-K FY2025 segment note; 10-Q Q1 2026.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Low/base/high incorporate ownership, financing, tax, and realization adjustments in evidence.",
+        "range_per_share": {
+          "low": 0.8,
+          "base": 1.05,
+          "high": 1.35
+        },
+        "treatment": "additive",
+        "overlap_key": "fee_franchises_after_corporate",
+        "overlap_control": "Unique overlap key fee_franchises_after_corporate.",
+        "falsifier": "Through-cycle after-tax fee earnings fall such that capitalized value is below the low case.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "specialty_lending_notes",
+        "economic_claim": "Specialty lending notes receivable",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "evidence_tier": "primary_derived",
+        "evidence": "FACT Q1 2026: current notes receivable net $4.369M + non-current $4.182M = $8.551M ($0.25/sh). Specialty Lending FY2025 op. income only $0.230M. JUDGMENT haircut carrying for credit/collection risk.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Low/base/high incorporate ownership, financing, tax, and realization adjustments in evidence.",
+        "range_per_share": {
+          "low": 0.15,
+          "base": 0.2,
+          "high": 0.24
+        },
+        "treatment": "additive",
+        "overlap_key": "specialty_lending_notes",
+        "overlap_control": "Unique overlap key specialty_lending_notes.",
+        "falsifier": "Primary evidence supports economics below the low case or reveals an omitted claim.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "equity_method_investments",
+        "economic_claim": "Equity-method investments (JVs / participating interests)",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "FACT Q1 2026 carrying value $19.442M ($0.56/sh). FY2025 equity-method earnings only $0.123M (vs $2.688M in 2024). JUDGMENT: base discounts carrying for illiquidity and lumpy realizations; high near carrying after recent DLZ exit evidence.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Low/base/high incorporate ownership, financing, tax, and realization adjustments in evidence.",
+        "range_per_share": {
+          "low": 0.3,
+          "base": 0.45,
+          "high": 0.56
+        },
+        "treatment": "additive",
+        "overlap_key": "equity_method_investments",
+        "overlap_control": "Unique overlap key equity_method_investments.",
+        "falsifier": "Primary evidence supports economics below the low case or reveals an omitted claim.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "cash_inventory_ppe_net_working",
+        "economic_claim": "Cash, inventory, PP&E net of operating working liabilities",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "evidence_tier": "primary_derived",
+        "evidence": "FACT Q1: cash $11.566M + inventory $5.348M + AR $1.725M + PP&E $12.029M = $30.668M; less AP $5.174M + payables to sellers $5.317M + other current liab $0.896M = $11.387M \u2192 net \u2248 $19.3M ($0.56/sh) before debt/leases. JUDGMENT haircut for inventory realization and PP&E specialized-use risk.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Low/base/high incorporate ownership, financing, tax, and realization adjustments in evidence.",
+        "range_per_share": {
+          "low": 0.25,
+          "base": 0.35,
+          "high": 0.45
+        },
+        "treatment": "additive",
+        "overlap_key": "cash_inventory_ppe_net_working",
+        "overlap_control": "Unique overlap key cash_inventory_ppe_net_working.",
+        "falsifier": "Primary evidence supports economics below the low case or reveals an omitted claim.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "debt_and_leases",
+        "economic_claim": "Third-party debt and lease liabilities",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_debt",
+        "evidence_tier": "audited",
+        "evidence": "FACT Q1: non-current third-party debt $4.100M; lease liabilities current $0.818M + non-current $0.619M = $1.437M; total \u2248 $5.537M ($0.16/sh).",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Low/base/high incorporate ownership, financing, tax, and realization adjustments in evidence.",
+        "range_per_share": {
+          "low": -0.2,
+          "base": -0.17,
+          "high": -0.14
+        },
+        "treatment": "additive",
+        "overlap_key": "debt_and_leases",
+        "overlap_control": "Unique overlap key debt_and_leases.",
+        "falsifier": "Primary evidence supports economics below the low case or reveals an omitted claim.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "preferred_liquidation_claim",
+        "economic_claim": "Series N preferred liquidation preference",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "senior_claim",
+        "evidence_tier": "audited",
+        "evidence": "FACT Q1: 563 Series N preferred shares with $1,000/share liquidation preference over common = $0.563M ($0.02/sh).",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Low/base/high incorporate ownership, financing, tax, and realization adjustments in evidence.",
+        "range_per_share": {
+          "low": -0.02,
+          "base": -0.02,
+          "high": -0.02
+        },
+        "treatment": "additive",
+        "overlap_key": "preferred_liquidation_claim",
+        "overlap_control": "Unique overlap key preferred_liquidation_claim.",
+        "falsifier": "Primary evidence supports economics below the low case or reveals an omitted claim.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "debtx_commercial_loan_platform",
+        "economic_claim": "DebtX commercial-loan brokerage platform (2026 acquisition)",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "probability_weighted_acquisition_earnout",
+        "evidence_tier": "speculative",
+        "evidence": "FACT: Jan 1, 2026 acquired substantially all assets of The Debt Exchange Inc. for ~$8.5M (10-Q). Q1 Commercial Loans segment op. loss ($0.606M). Goodwill rose to $12.747M; intangibles to $6.066M. JUDGMENT: only incremental value beyond fee-franchise / tangible assets already counted; failure value zero if platform does not scale.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Low/base/high incorporate ownership, financing, tax, and realization adjustments in evidence.",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 0.05,
+          "high": 0.25
+        },
+        "treatment": "additive",
+        "overlap_key": "debtx_commercial_loan_platform",
+        "overlap_control": "Unique overlap key debtx_commercial_loan_platform.",
+        "falsifier": "DebtX remains loss-making and impaired below the low case (zero).",
+        "risk_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": null,
+          "probability_basis": null,
+          "remaining_capital_basis": null
+        }
+      }
+    ],
+    "wisdom_applied": [
+      "Stahl: croupier / market-making fees on financial and industrial asset flows.",
+      "Greenblatt: earnings power value for fee franchises plus asset value for lending/JVs."
+    ],
+    "limitations": [
+      "First-pass multiples are provisional; no IC freeze.",
+      "DebtX earn-in and EMI realization paths need more primary detail.",
+      "FY tax rate exceeded the 25% proxy; cash-tax path needs reconciliation."
+    ],
+    "complete_component_coverage": true,
+    "validation_errors": [
+      "option component debtx_commercial_loan_platform requires probability, timing, and remaining-capital treatment"
+    ],
+    "registry_version": "1.0"
+  },
+  "component_review_queue": {
+    "status": "ready_for_committee_review",
+    "decision_rule": "Each assigned rater records accept, challenge, or reject with a proposed range and evidence. The aggregator may not silently average disputed ranges.",
+    "items": [
+      {
+        "component_id": "fee_franchises_after_corporate",
+        "label": "Auction, ALT, and NLEX fee franchises (after corporate overhead)",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 0.8,
+          "base": 1.05,
+          "high": 1.35
+        },
+        "range_width_pct_of_base": 52.4,
+        "evidence_tier": "mixed_primary_and_estimate",
+        "recommended_raters": [
+          "hohn",
+          "marathon_capital_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "specialty_lending_notes",
+        "label": "Specialty lending notes receivable",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 0.15,
+          "base": 0.2,
+          "high": 0.24
+        },
+        "range_width_pct_of_base": 45.0,
+        "evidence_tier": "primary_derived",
+        "recommended_raters": [
+          "greenblatt",
+          "marks_credit_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "equity_method_investments",
+        "label": "Equity-method investments (JVs / participating interests)",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 0.3,
+          "base": 0.45,
+          "high": 0.56
+        },
+        "range_width_pct_of_base": 57.8,
+        "evidence_tier": "mixed_primary_and_estimate",
+        "recommended_raters": [
+          "greenblatt",
+          "marks_credit_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "cash_inventory_ppe_net_working",
+        "label": "Cash, inventory, PP&E net of operating working liabilities",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 0.25,
+          "base": 0.35,
+          "high": 0.45
+        },
+        "range_width_pct_of_base": 57.1,
+        "evidence_tier": "primary_derived",
+        "recommended_raters": [
+          "greenblatt",
+          "marks_credit_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "debt_and_leases",
+        "label": "Third-party debt and lease liabilities",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": -0.2,
+          "base": -0.17,
+          "high": -0.14
+        },
+        "range_width_pct_of_base": 35.3,
+        "evidence_tier": "audited",
+        "recommended_raters": [
+          "marks_credit_cycle",
+          "pabrai"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "preferred_liquidation_claim",
+        "label": "Series N preferred liquidation preference",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": -0.02,
+          "base": -0.02,
+          "high": -0.02
+        },
+        "range_width_pct_of_base": 0.0,
+        "evidence_tier": "audited",
+        "recommended_raters": [
+          "marks_credit_cycle",
+          "pabrai"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "debtx_commercial_loan_platform",
+        "label": "DebtX commercial-loan brokerage platform (2026 acquisition)",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 0.05,
+          "high": 0.25
+        },
+        "range_width_pct_of_base": 500.0,
+        "evidence_tier": "speculative",
+        "recommended_raters": [
+          "klarman_asset_value",
+          "hk"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      }
+    ]
+  },
+  "valuation_method_route": {
+    "schema_version": "1.0",
+    "status": "routed",
+    "profile_id": "scarce_asset_optionality",
+    "label": "Scarce assets, royalties, and optionality",
+    "score": 7.0,
+    "reasons": [
+      "archetype=croupier",
+      "component categories=real_option"
+    ],
+    "primary_methods": [
+      "component_owner_cash_and_unit_nav"
+    ],
+    "corroborating_methods": [
+      "comparable_transactions",
+      "replacement_cost_or_reverse_nav"
+    ],
+    "primary_personas": [
+      "hk",
+      "stahl"
+    ],
+    "cross_check_personas": [
+      "klarman_asset_value",
+      "marks_credit_cycle"
+    ],
+    "silent_personas": [
+      "buffett_weschler",
+      "greenblatt",
+      "hohn",
+      "marathon_capital_cycle",
+      "munger",
+      "pabrai"
+    ],
+    "required_evidence": [
+      "legal economic claim",
+      "non-overlapping physical inventory",
+      "unit economics",
+      "realization timing",
+      "remaining owner capital"
+    ],
+    "failure_modes": [
+      "gross asset value mistaken for shareholder value",
+      "operating cash flow and NAV counted twice",
+      "remote options treated as contracted cash"
+    ],
+    "secondary_profiles": [
+      {
+        "profile_id": "quality_reinvestment",
+        "score": 7.0,
+        "reasons": [
+          "archetype=croupier",
+          "component categories=operating_business"
+        ]
+      },
+      {
+        "profile_id": "credit_and_normalized_returns",
+        "score": 2.0,
+        "reasons": [
+          "component categories=financial_asset, liability_or_reserve"
+        ]
+      }
+    ],
+    "scorecard": {
+      "scarce_asset_optionality": {
+        "score": 7.0,
+        "reasons": [
+          "archetype=croupier",
+          "component categories=real_option"
+        ]
+      },
+      "quality_reinvestment": {
+        "score": 7.0,
+        "reasons": [
+          "archetype=croupier",
+          "component categories=operating_business"
+        ]
+      },
+      "capital_cycle": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
+      },
+      "credit_and_normalized_returns": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=financial_asset, liability_or_reserve"
+        ]
+      },
+      "catalyst_asset_value": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=financial_asset"
+        ]
+      },
+      "predictable_cash_flow": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
+      },
+      "binary_milestone": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=probability"
+        ]
+      }
+    },
+    "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+  },
+  "universal_valuation_contract": {
+    "schema_version": "1.0",
+    "status": "evidence_blocked",
+    "ticker": "HGBL",
+    "as_of": "2026-07-16",
+    "economic_ownership_map": [
+      {
+        "component_id": "fee_franchises_after_corporate",
+        "label": "Auction, ALT, and NLEX fee franchises (after corporate overhead)",
+        "category": "operating_business",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Auction, ALT, and NLEX fee franchises (after corporate overhead)",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 1.05
+        },
+        "growth_driver": "Low/base/high change earnings power and exit multiple; not a single terminal multiple on revenue.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "owner_earnings_multiple",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.8,
+          "base": 1.05,
+          "high": 1.35
+        },
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "FACT FY2025 10-K segment op. income: Auction/Liquidation $2.671M, Refurbishment & Resale $1.659M, Brokerage (NLEX) $6.116M; corporate ($4.965M). CALC fee segments after corporate = $5.481M; after ~25% tax proxy \u2248 $4.11M. JUDGMENT low/base/high \u2248 8\u00d7/10\u00d7/12\u00d7 that after-tax run-rate ($0.95/$1.18/$1.42 before rounding). Q1 2026 still profitable but softer (NI $0.717M). Sources: 10-K FY2025 segment note; 10-Q Q1 2026.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Low/base/high incorporate ownership, financing, tax, and realization adjustments in evidence.",
+        "falsifier": "Through-cycle after-tax fee earnings fall such that capitalized value is below the low case.",
+        "overlap_key": "fee_franchises_after_corporate",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "specialty_lending_notes",
+        "label": "Specialty lending notes receivable",
+        "category": "financial_asset",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Specialty lending notes receivable",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 0.2
+        },
+        "growth_driver": "Low/base/high vary recovery vs carrying on the notes book.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "net_asset_value",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.15,
+          "base": 0.2,
+          "high": 0.24
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "FACT Q1 2026: current notes receivable net $4.369M + non-current $4.182M = $8.551M ($0.25/sh). Specialty Lending FY2025 op. income only $0.230M. JUDGMENT haircut carrying for credit/collection risk.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Low/base/high incorporate ownership, financing, tax, and realization adjustments in evidence.",
+        "falsifier": "Primary evidence supports economics below the low case or reveals an omitted claim.",
+        "overlap_key": "specialty_lending_notes",
+        "assumption_type": "fact"
+      },
+      {
+        "component_id": "equity_method_investments",
+        "label": "Equity-method investments (JVs / participating interests)",
+        "category": "financial_asset",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Equity-method investments (JVs / participating interests)",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 0.45
+        },
+        "growth_driver": "Cases vary realizable value of JV / participating interests vs carrying.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "net_asset_value",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.3,
+          "base": 0.45,
+          "high": 0.56
+        },
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "FACT Q1 2026 carrying value $19.442M ($0.56/sh). FY2025 equity-method earnings only $0.123M (vs $2.688M in 2024). JUDGMENT: base discounts carrying for illiquidity and lumpy realizations; high near carrying after recent DLZ exit evidence.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Low/base/high incorporate ownership, financing, tax, and realization adjustments in evidence.",
+        "falsifier": "Primary evidence supports economics below the low case or reveals an omitted claim.",
+        "overlap_key": "equity_method_investments",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "cash_inventory_ppe_net_working",
+        "label": "Cash, inventory, PP&E net of operating working liabilities",
+        "category": "financial_asset",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Cash, inventory, PP&E net of operating working liabilities",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 0.35
+        },
+        "growth_driver": "Low/base/high vary inventory and PP&E realization; cash near face.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "net_asset_value",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.25,
+          "base": 0.35,
+          "high": 0.45
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "FACT Q1: cash $11.566M + inventory $5.348M + AR $1.725M + PP&E $12.029M = $30.668M; less AP $5.174M + payables to sellers $5.317M + other current liab $0.896M = $11.387M \u2192 net \u2248 $19.3M ($0.56/sh) before debt/leases. JUDGMENT haircut for inventory realization and PP&E specialized-use risk.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Low/base/high incorporate ownership, financing, tax, and realization adjustments in evidence.",
+        "falsifier": "Primary evidence supports economics below the low case or reveals an omitted claim.",
+        "overlap_key": "cash_inventory_ppe_net_working",
+        "assumption_type": "fact"
+      },
+      {
+        "component_id": "debt_and_leases",
+        "label": "Third-party debt and lease liabilities",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Third-party debt and lease liabilities",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": -0.17
+        },
+        "growth_driver": "Cases vary paydown pace and lease run-off.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "net_debt",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": -0.2,
+          "base": -0.17,
+          "high": -0.14
+        },
+        "evidence_tier": "audited",
+        "evidence_level": "primary_verified",
+        "evidence": "FACT Q1: non-current third-party debt $4.100M; lease liabilities current $0.818M + non-current $0.619M = $1.437M; total \u2248 $5.537M ($0.16/sh).",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Low/base/high incorporate ownership, financing, tax, and realization adjustments in evidence.",
+        "falsifier": "Primary evidence supports economics below the low case or reveals an omitted claim.",
+        "overlap_key": "debt_and_leases",
+        "assumption_type": "fact"
+      },
+      {
+        "component_id": "preferred_liquidation_claim",
+        "label": "Series N preferred liquidation preference",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Series N preferred liquidation preference",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": -0.02
+        },
+        "growth_driver": "Fixed senior claim at stated preference.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "senior_claim",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": -0.02,
+          "base": -0.02,
+          "high": -0.02
+        },
+        "evidence_tier": "audited",
+        "evidence_level": "primary_verified",
+        "evidence": "FACT Q1: 563 Series N preferred shares with $1,000/share liquidation preference over common = $0.563M ($0.02/sh).",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Low/base/high incorporate ownership, financing, tax, and realization adjustments in evidence.",
+        "falsifier": "Primary evidence supports economics below the low case or reveals an omitted claim.",
+        "overlap_key": "preferred_liquidation_claim",
+        "assumption_type": "fact"
+      },
+      {
+        "component_id": "debtx_commercial_loan_platform",
+        "label": "DebtX commercial-loan brokerage platform (2026 acquisition)",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "DebtX commercial-loan brokerage platform (2026 acquisition)",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 0.05
+        },
+        "growth_driver": "Low failure; base modest earn-in; high assumes platform approaches NLEX-like contribution over time.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "probability_weighted_acquisition_earnout",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.0,
+          "base": 0.05,
+          "high": 0.25
+        },
+        "evidence_tier": "speculative",
+        "evidence_level": "speculative",
+        "evidence": "FACT: Jan 1, 2026 acquired substantially all assets of The Debt Exchange Inc. for ~$8.5M (10-Q). Q1 Commercial Loans segment op. loss ($0.606M). Goodwill rose to $12.747M; intangibles to $6.066M. JUDGMENT: only incremental value beyond fee-franchise / tangible assets already counted; failure value zero if platform does not scale.",
+        "probability_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": null,
+          "probability_basis": null,
+          "remaining_capital_basis": null
+        },
+        "tax_and_realization_adjustments": "Low/base/high incorporate ownership, financing, tax, and realization adjustments in evidence.",
+        "falsifier": "DebtX remains loss-making and impaired below the low case (zero).",
+        "overlap_key": "debtx_commercial_loan_platform",
+        "assumption_type": "judgment"
+      }
+    ],
+    "component_coverage": {
+      "all_material_components_identified": true,
+      "material_component_count": 7,
+      "additive_component_count": 7,
+      "embedded_component_count": 0,
+      "unvalued_component_count": 0,
+      "double_counting_flags": []
+    },
+    "input_classification": {
+      "facts": [
+        {
+          "component_id": "specialty_lending_notes",
+          "label": "Specialty lending notes receivable",
+          "kind": "fact",
+          "evidence_tier": "primary_derived",
+          "evidence": "FACT Q1 2026: current notes receivable net $4.369M + non-current $4.182M = $8.551M ($0.25/sh). Specialty Lending FY2025 op. income only $0.230M. JUDGMENT haircut carrying for credit/collection risk.",
+          "method": "net_asset_value"
+        },
+        {
+          "component_id": "cash_inventory_ppe_net_working",
+          "label": "Cash, inventory, PP&E net of operating working liabilities",
+          "kind": "fact",
+          "evidence_tier": "primary_derived",
+          "evidence": "FACT Q1: cash $11.566M + inventory $5.348M + AR $1.725M + PP&E $12.029M = $30.668M; less AP $5.174M + payables to sellers $5.317M + other current liab $0.896M = $11.387M \u2192 net \u2248 $19.3M ($0.56/sh) before debt/leases. JUDGMENT haircut for inventory realization and PP&E specialized-use risk.",
+          "method": "net_asset_value"
+        },
+        {
+          "component_id": "debt_and_leases",
+          "label": "Third-party debt and lease liabilities",
+          "kind": "fact",
+          "evidence_tier": "audited",
+          "evidence": "FACT Q1: non-current third-party debt $4.100M; lease liabilities current $0.818M + non-current $0.619M = $1.437M; total \u2248 $5.537M ($0.16/sh).",
+          "method": "net_debt"
+        },
+        {
+          "component_id": "preferred_liquidation_claim",
+          "label": "Series N preferred liquidation preference",
+          "kind": "fact",
+          "evidence_tier": "audited",
+          "evidence": "FACT Q1: 563 Series N preferred shares with $1,000/share liquidation preference over common = $0.563M ($0.02/sh).",
+          "method": "senior_claim"
+        }
+      ],
+      "estimates": [],
+      "judgments": [
+        {
+          "component_id": "fee_franchises_after_corporate",
+          "label": "Auction, ALT, and NLEX fee franchises (after corporate overhead)",
+          "kind": "judgment",
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "FACT FY2025 10-K segment op. income: Auction/Liquidation $2.671M, Refurbishment & Resale $1.659M, Brokerage (NLEX) $6.116M; corporate ($4.965M). CALC fee segments after corporate = $5.481M; after ~25% tax proxy \u2248 $4.11M. JUDGMENT low/base/high \u2248 8\u00d7/10\u00d7/12\u00d7 that after-tax run-rate ($0.95/$1.18/$1.42 before rounding). Q1 2026 still profitable but softer (NI $0.717M). Sources: 10-K FY2025 segment note; 10-Q Q1 2026.",
+          "method": "owner_earnings_multiple"
+        },
+        {
+          "component_id": "equity_method_investments",
+          "label": "Equity-method investments (JVs / participating interests)",
+          "kind": "judgment",
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "FACT Q1 2026 carrying value $19.442M ($0.56/sh). FY2025 equity-method earnings only $0.123M (vs $2.688M in 2024). JUDGMENT: base discounts carrying for illiquidity and lumpy realizations; high near carrying after recent DLZ exit evidence.",
+          "method": "net_asset_value"
+        },
+        {
+          "component_id": "debtx_commercial_loan_platform",
+          "label": "DebtX commercial-loan brokerage platform (2026 acquisition)",
+          "kind": "judgment",
+          "evidence_tier": "speculative",
+          "evidence": "FACT: Jan 1, 2026 acquired substantially all assets of The Debt Exchange Inc. for ~$8.5M (10-Q). Q1 Commercial Loans segment op. loss ($0.606M). Goodwill rose to $12.747M; intangibles to $6.066M. JUDGMENT: only incremental value beyond fee-franchise / tangible assets already counted; failure value zero if platform does not scale.",
+          "method": "probability_weighted_acquisition_earnout"
+        }
+      ]
+    },
+    "method_route": {
+      "schema_version": "1.0",
+      "status": "routed",
+      "profile_id": "scarce_asset_optionality",
+      "label": "Scarce assets, royalties, and optionality",
+      "score": 7.0,
+      "reasons": [
+        "archetype=croupier",
+        "component categories=real_option"
+      ],
+      "primary_methods": [
+        "component_owner_cash_and_unit_nav"
+      ],
+      "corroborating_methods": [
+        "comparable_transactions",
+        "replacement_cost_or_reverse_nav"
+      ],
+      "primary_personas": [
+        "hk",
+        "stahl"
+      ],
+      "cross_check_personas": [
+        "klarman_asset_value",
+        "marks_credit_cycle"
+      ],
+      "silent_personas": [
+        "buffett_weschler",
+        "greenblatt",
+        "hohn",
+        "marathon_capital_cycle",
+        "munger",
+        "pabrai"
+      ],
+      "required_evidence": [
+        "legal economic claim",
+        "non-overlapping physical inventory",
+        "unit economics",
+        "realization timing",
+        "remaining owner capital"
+      ],
+      "failure_modes": [
+        "gross asset value mistaken for shareholder value",
+        "operating cash flow and NAV counted twice",
+        "remote options treated as contracted cash"
+      ],
+      "secondary_profiles": [
+        {
+          "profile_id": "quality_reinvestment",
+          "score": 7.0,
+          "reasons": [
+            "archetype=croupier",
+            "component categories=operating_business"
+          ]
+        },
+        {
+          "profile_id": "credit_and_normalized_returns",
+          "score": 2.0,
+          "reasons": [
+            "component categories=financial_asset, liability_or_reserve"
+          ]
+        }
+      ],
+      "scorecard": {
+        "scarce_asset_optionality": {
+          "score": 7.0,
+          "reasons": [
+            "archetype=croupier",
+            "component categories=real_option"
+          ]
+        },
+        "quality_reinvestment": {
+          "score": 7.0,
+          "reasons": [
+            "archetype=croupier",
+            "component categories=operating_business"
+          ]
+        },
+        "capital_cycle": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=operating_business"
+          ]
+        },
+        "credit_and_normalized_returns": {
+          "score": 2.0,
+          "reasons": [
+            "component categories=financial_asset, liability_or_reserve"
+          ]
+        },
+        "catalyst_asset_value": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=financial_asset"
+          ]
+        },
+        "predictable_cash_flow": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=operating_business"
+          ]
+        },
+        "binary_milestone": {
+          "score": 2.0,
+          "reasons": [
+            "component categories=real_option",
+            "existing methods=probability"
+          ]
+        }
+      },
+      "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+    },
+    "market": {
+      "price_per_share": 1.26,
+      "fully_diluted_shares": 34734754,
+      "market_cap_m": 43.77,
+      "enterprise_value_m": null
+    },
+    "valuation": {
+      "value_per_share": {
+        "low": 1.28,
+        "base": 1.91,
+        "high": 2.69
+      },
+      "probability_weighted_value_per_share": 1.91,
+      "expected_distributions_per_share": 0.0,
+      "annualized_return_at_price_pct": {
+        "low": 0.32,
+        "base": 8.68,
+        "high": 16.38
+      },
+      "downside_to_low_pct": 1.59,
+      "horizon_years": 5
+    },
+    "scenario_contract": {
+      "rule": "Cases must change causal operating, capital, probability, timing, or financing drivers\u2014not only the terminal multiple.",
+      "top_value_drivers": [
+        {
+          "component_id": "fee_franchises_after_corporate",
+          "label": "Auction, ALT, and NLEX fee franchises (after corporate overhead)",
+          "base_per_share": 1.05,
+          "range_width_per_share": 0.55,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "equity_method_investments",
+          "label": "Equity-method investments (JVs / participating interests)",
+          "base_per_share": 0.45,
+          "range_width_per_share": 0.26,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "debtx_commercial_loan_platform",
+          "label": "DebtX commercial-loan brokerage platform (2026 acquisition)",
+          "base_per_share": 0.05,
+          "range_width_per_share": 0.25,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "cash_inventory_ppe_net_working",
+          "label": "Cash, inventory, PP&E net of operating working liabilities",
+          "base_per_share": 0.35,
+          "range_width_per_share": 0.2,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "specialty_lending_notes",
+          "label": "Specialty lending notes receivable",
+          "base_per_share": 0.2,
+          "range_width_per_share": 0.09,
+          "scenario_assumptions": null
+        }
+      ],
+      "reverse_expectations": null
+    },
+    "evidence": {
+      "unresolved_count": 1,
+      "blockers": [
+        "option component debtx_commercial_loan_platform requires probability, timing, and remaining-capital treatment"
+      ],
+      "validation_errors": [
+        "option component debtx_commercial_loan_platform requires probability, timing, and remaining-capital treatment"
+      ]
+    },
+    "monitoring": {
+      "falsifiers": [
+        "Through-cycle after-tax fee earnings fall such that capitalized value is below the low case.",
+        "Primary evidence supports economics below the low case or reveals an omitted claim.",
+        "Primary evidence supports economics below the low case or reveals an omitted claim.",
+        "Primary evidence supports economics below the low case or reveals an omitted claim.",
+        "Primary evidence supports economics below the low case or reveals an omitted claim.",
+        "Primary evidence supports economics below the low case or reveals an omitted claim.",
+        "DebtX remains loss-making and impaired below the low case (zero)."
+      ],
+      "required_refresh_triggers": [
+        "new filing or material operating update",
+        "capital-structure change",
+        "material price move",
+        "component milestone or falsifier"
+      ]
+    },
+    "decision_rule": "No security is decision-grade until every material economic claim is valued exactly once and every material evidence blocker is resolved."
+  },
+  "synthesis": {
+    "status": "incomplete",
+    "reason": "no numeric paths"
+  }
+}
