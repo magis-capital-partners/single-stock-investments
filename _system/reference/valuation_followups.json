@@ -1,0 +1,282 @@
+{
+  "schema_version": "1.0",
+  "measurement_horizons_months": [6, 12, 24],
+  "minimum_persona_outcomes_before_reweighting": 20,
+  "method_profiles": {
+    "scarce_asset_optionality": {
+      "label": "Scarce assets and long-dated optionality",
+      "primary_personas": ["hk", "klarman_asset_value"],
+      "cross_check_personas": ["marks_credit_cycle", "hohn"],
+      "applicability_tests": [
+        "The security owns a legally enforceable economic claim on scarce assets or royalties.",
+        "Material value is omitted or poorly represented by current GAAP earnings.",
+        "Asset quantities, ownership, overlap, timing, and remaining capital can be reconciled.",
+        "Comparable values can be adjusted for location, quality, control, liquidity, and realization time."
+      ],
+      "failure_modes": [
+        "Capitalizing the same economics in operating cash flow and asset NAV.",
+        "Using headline acreage or capacity without ownership and development probability.",
+        "Treating remote optionality as equivalent to contracted cash flow."
+      ]
+    },
+    "infrastructure_compounder": {
+      "label": "Infrastructure reinvestment and contracted growth",
+      "primary_personas": ["hohn", "marathon_capital_cycle"],
+      "cross_check_personas": ["marks_credit_cycle", "klarman_asset_value"],
+      "applicability_tests": [
+        "Incremental capital can be tied to identifiable projects, cohorts, or contracted capacity.",
+        "Returns on new capital can be separated from returns on the installed base.",
+        "Contract duration, volume protection, pricing, and counterparty risk are observable.",
+        "Leverage and future owner-funded capital are explicitly deducted."
+      ],
+      "failure_modes": [
+        "Valuing EBITDA growth without the capital required to produce it.",
+        "Assuming historical margins apply to immature projects.",
+        "Ignoring refinancing and contract-renewal risk."
+      ]
+    },
+    "credit_and_normalized_returns": {
+      "label": "Credit, funding, and normalized financial returns",
+      "primary_personas": ["marks_credit_cycle", "buffett_weschler"],
+      "cross_check_personas": ["klarman_asset_value", "greenblatt"],
+      "applicability_tests": [
+        "The balance sheet and funding structure are the operating engine rather than a financing afterthought.",
+        "Credit losses, reserve adequacy, and normalized returns can be measured through a cycle.",
+        "Regulatory capital and distributable excess capital can be reconciled.",
+        "Asset marks, liabilities, off-balance-sheet claims, and dilution are included once."
+      ],
+      "failure_modes": [
+        "Applying an industrial-company enterprise multiple to a financial balance sheet.",
+        "Treating current credit losses or peak returns as normalized.",
+        "Counting regulatory capital as freely distributable cash."
+      ]
+    },
+    "quality_reinvestment": {
+      "label": "Quality, owner earnings, and reinvestment",
+      "primary_personas": ["hohn", "buffett_weschler"],
+      "cross_check_personas": ["marathon_capital_cycle", "pabrai"],
+      "applicability_tests": [
+        "Owner earnings can be separated from stock compensation, working capital, and maintenance capital.",
+        "Incremental returns on retained capital are observable and durable.",
+        "The competitive advantage explains pricing, retention, share, or cost outcomes.",
+        "Terminal value is supported by a reinvestment runway rather than an unexplained multiple."
+      ],
+      "failure_modes": [
+        "Projecting historical growth without measuring incremental capital and returns.",
+        "Adding a strategic-option value already embedded in the terminal cash flow.",
+        "Ignoring dilution or acquisition consideration in owner earnings."
+      ]
+    },
+    "capital_cycle": {
+      "label": "Capital cycle and normalized industry economics",
+      "primary_personas": ["marathon_capital_cycle", "marks_credit_cycle"],
+      "cross_check_personas": ["hohn", "pabrai"],
+      "applicability_tests": [
+        "Industry capacity, additions, closures, and replacement costs can be measured.",
+        "Current margins can be located relative to a cycle rather than extrapolated.",
+        "Maintenance and growth capital are separated.",
+        "Leverage and liquidity survive the low case."
+      ],
+      "failure_modes": [
+        "Capitalizing peak earnings as if they were durable.",
+        "Ignoring the supply response caused by attractive current returns.",
+        "Using replacement cost without testing whether capacity earns its cost of capital."
+      ]
+    },
+    "probability_weighted_special_situation": {
+      "label": "Probability-weighted catalyst or binary outcome",
+      "primary_personas": ["greenblatt", "pabrai"],
+      "cross_check_personas": ["klarman_asset_value", "marks_credit_cycle"],
+      "applicability_tests": [
+        "Outcomes and catalysts can be stated as a finite, non-overlapping event tree.",
+        "Probabilities have base rates or evidence rather than narrative confidence.",
+        "Time to outcome, interim cash burn, financing, and dilution are explicit.",
+        "Failure and delay cases are valued independently."
+      ],
+      "failure_modes": [
+        "Multiplying an optimistic success value by an unsupported probability.",
+        "Ignoring time, cash burn, financing, or dilution before the catalyst.",
+        "Adding pipeline or catalyst value already reflected in the operating forecast."
+      ]
+    }
+  },
+  "archetype_profile_map": {
+    "compounder": "quality_reinvestment",
+    "serial_acquirer": "quality_reinvestment",
+    "platform": "quality_reinvestment",
+    "croupier": "quality_reinvestment",
+    "infrastructure": "infrastructure_compounder",
+    "optionality": "scarce_asset_optionality",
+    "holding_co": "scarce_asset_optionality",
+    "turnaround": "capital_cycle"
+  },
+  "validation_cohort": [
+    {
+      "ticker": "MSB",
+      "archetype": "royalty_asset",
+      "primary_profile": "scarce_asset_optionality",
+      "purpose": "Test depletion, commodity exposure, finite reserves, and royalty-unit reconciliation.",
+      "status": "queued"
+    },
+    {
+      "ticker": "C",
+      "archetype": "financial_balance_sheet",
+      "primary_profile": "credit_and_normalized_returns",
+      "purpose": "Test tangible capital, credit losses, funding, regulation, and excess-capital realization.",
+      "status": "queued"
+    },
+    {
+      "ticker": "NVR",
+      "archetype": "quality_reinvestment",
+      "primary_profile": "quality_reinvestment",
+      "purpose": "Test owner earnings, capital-light reinvestment, cyclicality, and buyback value creation.",
+      "status": "queued"
+    },
+    {
+      "ticker": "NUE",
+      "archetype": "capital_cycle",
+      "primary_profile": "capital_cycle",
+      "purpose": "Test normalized margins, industry supply response, replacement cost, and reinvestment timing.",
+      "status": "queued"
+    },
+    {
+      "ticker": "BIIB",
+      "archetype": "binary_special_situation",
+      "primary_profile": "probability_weighted_special_situation",
+      "purpose": "Test product concentration, pipeline probabilities, patent cliffs, and catalyst timing.",
+      "status": "queued"
+    }
+  ],
+  "tickers": {
+    "TPL": {
+      "method_profile": "scarce_asset_optionality",
+      "evidence_gaps": [
+        {
+          "id": "tract_level_royalty_inventory",
+          "priority": "critical",
+          "component_ids": ["visible_royalty_inventory_option", "dormant_royalty_inventory_option"],
+          "question": "How much royalty acreage is economically developable, at what royalty interest, and on what cadence?",
+          "evidence_required": "Tract-level or county-level acreage, royalty-interest, operator activity, well inventory, and development-cadence reconciliation.",
+          "acceptance_test": "Every acreage bucket has a unique ownership claim, activity class, probability, timing range, and no overlap with producing royalty cash flow.",
+          "valuation_effect": "Re-estimates undeveloped royalty quantity, probability, and timing rather than applying one blanket per-acre value.",
+          "status": "open"
+        },
+        {
+          "id": "water_economic_separation",
+          "priority": "high",
+          "component_ids": ["produced_water_royalties", "operated_water_sales", "water_infrastructure_cross_check"],
+          "question": "Are produced-water royalties, operated services, and infrastructure value separated without double counting?",
+          "evidence_required": "Volume, price, margin, capital intensity, ownership, and transfer-pricing bridge for royalty and operated water activities.",
+          "acceptance_test": "Royalty and service cash flows reconcile to disclosure, infrastructure is only a cross-check, and required growth capital is deducted once.",
+          "valuation_effect": "Separates high-return royalty economics from capital-consuming service growth.",
+          "status": "open"
+        },
+        {
+          "id": "option_milestones_and_capital",
+          "priority": "high",
+          "component_ids": ["data_center_power_water_option", "desalination_and_water_technology_option", "future_infrastructure_corridors"],
+          "question": "Which optional projects have enforceable milestones, and how much owner capital remains before cash realization?",
+          "evidence_required": "Contracts, counterparties, permitting, power and water commitments, milestone dates, ownership share, and remaining owner-funded capital.",
+          "acceptance_test": "Each option has a dated milestone tree, success probability, time-to-cash range, capital requirement, and zero value when the first falsifier occurs.",
+          "valuation_effect": "Reallocates value among probability, timing, and capital rather than embedding optimism in a single multiple.",
+          "status": "open"
+        }
+      ]
+    },
+    "LB": {
+      "method_profile": "scarce_asset_optionality",
+      "evidence_gaps": [
+        {
+          "id": "alpha_digital_lease_economics",
+          "priority": "critical",
+          "component_ids": ["alpha_digital_option"],
+          "question": "What enforceable economics accrue to LB from the Alpha Digital campus?",
+          "evidence_required": "Executed lease or development agreement, acreage, MW phasing, rent or participation formula, commencement conditions, counterparty, capital obligations, and termination rights.",
+          "acceptance_test": "Low, base, and high cases are tied to contractual milestones and LB's net ownership after all required capital.",
+          "valuation_effect": "Replaces powered-land headline comparisons with the present value of LB's actual contractual claim.",
+          "status": "open"
+        },
+        {
+          "id": "fee_engine_unit_economics",
+          "priority": "high",
+          "component_ids": ["current_fee_engine"],
+          "question": "How much of current fee growth is recurring volume, price, mix, and one-time activity?",
+          "evidence_required": "Fee revenue bridge by activity, recurring contract terms, incremental margins, maintenance capital, and customer concentration.",
+          "acceptance_test": "Normalized owner cash is reconciled to disclosed revenue and capital needs across a cycle.",
+          "valuation_effect": "Determines the durable earnings base before adding land-use options.",
+          "status": "open"
+        }
+      ]
+    },
+    "WBI": {
+      "method_profile": "infrastructure_compounder",
+      "evidence_gaps": [
+        {
+          "id": "project_cohort_roic",
+          "priority": "critical",
+          "component_ids": ["core_water_network", "contracted_growth_projects", "capex_execution_reserve"],
+          "question": "What cash return has each major project cohort earned on total installed capital?",
+          "evidence_required": "Project-level invested capital, in-service date, utilization, EBITDA, maintenance capital, taxes, and contract contribution for mature and ramping cohorts.",
+          "acceptance_test": "Incremental ROIC is shown by cohort and reconciles to consolidated cash flow without counting contracted backlog as completed assets.",
+          "valuation_effect": "Distinguishes genuine high-return reinvestment from EBITDA growth purchased with capital.",
+          "status": "open"
+        },
+        {
+          "id": "contract_quality",
+          "priority": "high",
+          "component_ids": ["core_water_network", "contracted_growth_projects"],
+          "question": "How protected are price, volume, duration, and capital recovery under customer contracts?",
+          "evidence_required": "Contract duration, minimum-volume or take-or-pay terms, escalators, acreage dedications, renewal rights, counterparty concentration, and termination provisions.",
+          "acceptance_test": "Contracted and merchant cash flows are valued separately with explicit renewal and utilization assumptions.",
+          "valuation_effect": "Sets the appropriate cash-flow duration, multiple, and downside case.",
+          "status": "open"
+        },
+        {
+          "id": "refinancing_and_funding",
+          "priority": "high",
+          "component_ids": ["net_debt", "contracted_growth_projects"],
+          "question": "Can growth be funded through a stress case without diluting equity value?",
+          "evidence_required": "Debt maturities, fixed/floating mix, covenant headroom, liquidity, committed capex, funding sources, and downside interest coverage.",
+          "acceptance_test": "The downside case funds committed capital and refinances maturities while preserving explicit covenant headroom.",
+          "valuation_effect": "Deducts financing cost and dilution risk from project value.",
+          "status": "open"
+        }
+      ]
+    },
+    "AZLCZ": {
+      "method_profile": "scarce_asset_optionality",
+      "evidence_gaps": [
+        {
+          "id": "contract_and_ownership_waterfalls",
+          "priority": "critical",
+          "component_ids": ["current_lease_cash", "incremental_renewable_projects", "railway_and_notes"],
+          "question": "What net economic claim belongs to AZLCZ after project ownership, partner waterfalls, taxes, and related-party claims?",
+          "evidence_required": "Executed contracts, ownership percentages, partner waterfalls, project capital obligations, related-party terms, and cash remittance history.",
+          "acceptance_test": "Every project value reconciles from gross asset economics to cash attributable to one AZLCZ share.",
+          "valuation_effect": "Prevents gross project value from being mistaken for shareholder value.",
+          "status": "open"
+        },
+        {
+          "id": "residual_acreage_overlap",
+          "priority": "high",
+          "component_ids": ["current_lease_cash", "incremental_renewable_projects", "residual_surface_acreage"],
+          "question": "Which acres remain economically available after current leases, project footprints, access, conservation, and unusable parcels?",
+          "evidence_required": "Parcel map and acreage bridge covering leased, optioned, encumbered, inaccessible, environmentally constrained, and residual land.",
+          "acceptance_test": "Residual acreage is a non-overlapping balance with location and realizability adjustments by parcel class.",
+          "valuation_effect": "Replaces a gross-acre multiplier with a realizable parcel inventory.",
+          "status": "open"
+        },
+        {
+          "id": "water_right_realization",
+          "priority": "high",
+          "component_ids": ["water_option"],
+          "question": "What water quantity is legally transferable, economically deliverable, and realizable by AZLCZ?",
+          "evidence_required": "Legal entitlement, priority, consumptive-use history, transfer restrictions, infrastructure requirements, buyer demand, ownership share, and adjudication timeline.",
+          "acceptance_test": "Risked value uses transferable volume, net ownership, delivery capital, probability, and a dated realization range.",
+          "valuation_effect": "Separates legal, physical, commercial, and timing risk in the water option.",
+          "status": "open"
+        }
+      ]
+    }
+  }
+}

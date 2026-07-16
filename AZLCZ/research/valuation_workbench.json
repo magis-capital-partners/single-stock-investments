@@ -1,0 +1,218 @@
+{
+  "schema_version": "1.0",
+  "ticker": "AZLCZ",
+  "as_of": "2026-07-15",
+  "committee": {
+    "status": "independent_review_open",
+    "as_of": "2026-07-15",
+    "packet_hash": "c98bbcbe8e30e586540d6bee8fa15ac942b5080b1eadd7f8829f91425045a53c",
+    "stage": "round_one_open",
+    "selected_raters": [
+      "klarman_asset_value",
+      "hk",
+      "marks_credit_cycle"
+    ],
+    "analysis_progress": {
+      "completed": 0,
+      "required": 9
+    },
+    "completed_outputs": [],
+    "missing_outputs": [
+      "round_1/klarman_asset_value.json",
+      "round_1/hk.json",
+      "round_1/marks_credit_cycle.json",
+      "round_2/klarman_asset_value.json",
+      "round_2/hk.json",
+      "round_2/marks_credit_cycle.json",
+      "proposer.json",
+      "pre_mortem.json",
+      "research_response.json"
+    ],
+    "owner_status": "pending",
+    "owner_decision": null,
+    "strongest_dissent": null,
+    "unresolved_items": [],
+    "next_action": "Complete isolated rater outputs, proposer case, pre-mortem, and research response without sharing peer votes.",
+    "record_ref": null,
+    "previous_record_ref": null,
+    "manifest_ref": "AZLCZ/research/committee_work/2026-07-15/manifest.json"
+  },
+  "evidence": {
+    "status": "critical_gaps_open",
+    "open_count": 3,
+    "critical_count": 1,
+    "gaps": [
+      {
+        "id": "contract_and_ownership_waterfalls",
+        "priority": "critical",
+        "component_ids": [
+          "current_lease_cash",
+          "incremental_renewable_projects",
+          "railway_and_notes"
+        ],
+        "question": "What net economic claim belongs to AZLCZ after project ownership, partner waterfalls, taxes, and related-party claims?",
+        "evidence_required": "Executed contracts, ownership percentages, partner waterfalls, project capital obligations, related-party terms, and cash remittance history.",
+        "acceptance_test": "Every project value reconciles from gross asset economics to cash attributable to one AZLCZ share.",
+        "valuation_effect": "Prevents gross project value from being mistaken for shareholder value.",
+        "status": "open",
+        "base_value_exposure_per_share": 925.0,
+        "current_methods": [
+          "normalized_owner_cash_capitalization",
+          "strategic_right_of_way_plus_collectible_notes",
+          "timing_and_completion_discounted_renewable_nav"
+        ],
+        "source": "curated_followup"
+      },
+      {
+        "id": "residual_acreage_overlap",
+        "priority": "high",
+        "component_ids": [
+          "current_lease_cash",
+          "incremental_renewable_projects",
+          "residual_surface_acreage"
+        ],
+        "question": "Which acres remain economically available after current leases, project footprints, access, conservation, and unusable parcels?",
+        "evidence_required": "Parcel map and acreage bridge covering leased, optioned, encumbered, inaccessible, environmentally constrained, and residual land.",
+        "acceptance_test": "Residual acreage is a non-overlapping balance with location and realizability adjustments by parcel class.",
+        "valuation_effect": "Replaces a gross-acre multiplier with a realizable parcel inventory.",
+        "status": "open",
+        "base_value_exposure_per_share": 1800.0,
+        "current_methods": [
+          "normalized_owner_cash_capitalization",
+          "segmented_comparable_land_nav_with_realization_discount",
+          "timing_and_completion_discounted_renewable_nav"
+        ],
+        "source": "curated_followup"
+      },
+      {
+        "id": "water_right_realization",
+        "priority": "high",
+        "component_ids": [
+          "water_option"
+        ],
+        "question": "What water quantity is legally transferable, economically deliverable, and realizable by AZLCZ?",
+        "evidence_required": "Legal entitlement, priority, consumptive-use history, transfer restrictions, infrastructure requirements, buyer demand, ownership share, and adjudication timeline.",
+        "acceptance_test": "Risked value uses transferable volume, net ownership, delivery capital, probability, and a dated realization range.",
+        "valuation_effect": "Separates legal, physical, commercial, and timing risk in the water option.",
+        "status": "open",
+        "base_value_exposure_per_share": 100.0,
+        "current_methods": [
+          "risked_legal_and_transaction_nav"
+        ],
+        "source": "curated_followup"
+      }
+    ]
+  },
+  "method_fit": {
+    "profile_id": "scarce_asset_optionality",
+    "label": "Scarce assets and long-dated optionality",
+    "current_archetype": "optionality",
+    "primary_personas": [
+      "hk",
+      "klarman_asset_value"
+    ],
+    "cross_check_personas": [
+      "marks_credit_cycle",
+      "hohn"
+    ],
+    "applicability_tests": [
+      "The security owns a legally enforceable economic claim on scarce assets or royalties.",
+      "Material value is omitted or poorly represented by current GAAP earnings.",
+      "Asset quantities, ownership, overlap, timing, and remaining capital can be reconciled.",
+      "Comparable values can be adjusted for location, quality, control, liquidity, and realization time."
+    ],
+    "failure_modes": [
+      "Capitalizing the same economics in operating cash flow and asset NAV.",
+      "Using headline acreage or capacity without ownership and development probability.",
+      "Treating remote optionality as equivalent to contracted cash flow."
+    ],
+    "validation_cohort": [
+      {
+        "ticker": "MSB",
+        "archetype": "royalty_asset",
+        "primary_profile": "scarce_asset_optionality",
+        "purpose": "Test depletion, commodity exposure, finite reserves, and royalty-unit reconciliation.",
+        "status": "queued"
+      },
+      {
+        "ticker": "C",
+        "archetype": "financial_balance_sheet",
+        "primary_profile": "credit_and_normalized_returns",
+        "purpose": "Test tangible capital, credit losses, funding, regulation, and excess-capital realization.",
+        "status": "queued"
+      },
+      {
+        "ticker": "NVR",
+        "archetype": "quality_reinvestment",
+        "primary_profile": "quality_reinvestment",
+        "purpose": "Test owner earnings, capital-light reinvestment, cyclicality, and buyback value creation.",
+        "status": "queued"
+      },
+      {
+        "ticker": "NUE",
+        "archetype": "capital_cycle",
+        "primary_profile": "capital_cycle",
+        "purpose": "Test normalized margins, industry supply response, replacement cost, and reinvestment timing.",
+        "status": "queued"
+      },
+      {
+        "ticker": "BIIB",
+        "archetype": "binary_special_situation",
+        "primary_profile": "probability_weighted_special_situation",
+        "purpose": "Test product concentration, pipeline probabilities, patent cliffs, and catalyst timing.",
+        "status": "queued"
+      }
+    ],
+    "rule": "Use the universal economic-value contract for every security; change the primary method and raters only when the applicability tests support it."
+  },
+  "outcomes": {
+    "status": "waiting_for_owner_decision",
+    "decision_date": null,
+    "schedule": [
+      {
+        "horizon_months": 6,
+        "target_date": null,
+        "status": "waiting_for_owner_decision",
+        "measurement_date": null,
+        "total_return_pct": null,
+        "return_status": null
+      },
+      {
+        "horizon_months": 12,
+        "target_date": null,
+        "status": "waiting_for_owner_decision",
+        "measurement_date": null,
+        "total_return_pct": null,
+        "return_status": null
+      },
+      {
+        "horizon_months": 24,
+        "target_date": null,
+        "status": "waiting_for_owner_decision",
+        "measurement_date": null,
+        "total_return_pct": null,
+        "return_status": null
+      }
+    ],
+    "recorded_outcome_count": 0,
+    "minimum_persona_outcomes_before_reweighting": 20,
+    "personas_eligible_for_weight_review": [],
+    "weighting_rule": "Do not change persona weights until at least 20 attributable outcomes exist for that persona."
+  },
+  "attribution": {
+    "status": "baseline_established",
+    "current": {
+      "as_of": "2026-07-15",
+      "low": 925.0,
+      "base": 1935.0,
+      "high": 4280.0
+    },
+    "prior": null,
+    "base_change_per_share": null,
+    "base_change_pct": null,
+    "drivers": [],
+    "category_totals_per_share": {},
+    "unexplained_per_share": null,
+    "explanation": "The current component schedule is the first decision-grade baseline; attribution begins with the next dated valuation snapshot."
+  }
+}

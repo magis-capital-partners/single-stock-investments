@@ -248,6 +248,11 @@ def main() -> int:
             "economic pricing analysis",
             [PY, str(SCRIPTS / "build_power_zone_pricing.py"), ticker],
         )
+    ok &= run(
+        "valuation workbench",
+        [PY, str(SCRIPTS / "build_valuation_workbench.py"), ticker, "--date", args.date],
+        optional=True,
+    )
     if ticker_has_theme_tag(ticker):
         run(
             "etf-dashboard sync",

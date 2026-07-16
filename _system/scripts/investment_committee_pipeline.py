@@ -16,6 +16,8 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 from statistics import median
 
+from build_valuation_workbench import write as write_valuation_workbench
+
 ROOT = Path(__file__).resolve().parents[2]
 DIMS = ("explanatory_strength", "evidence_sufficiency", "downside_control", "return_vs_alternatives")
 GROUPS = {
@@ -324,13 +326,16 @@ def main() -> int:
     args = parser.parse_args()
     if args.command == "init":
         print(initialize(args.ticker, args.date).relative_to(ROOT))
+        write_valuation_workbench(args.ticker, args.date)
         return 0
     work = ROOT / args.ticker.upper() / "research" / "committee_work" / args.date
     if args.command == "validate":
         errors = validate_work(work)
+        write_valuation_workbench(args.ticker, args.date)
         print("valid" if not errors else "\n".join(errors))
         return 0 if not errors else 1
     print(assemble(work).relative_to(ROOT))
+    write_valuation_workbench(args.ticker, args.date)
     return 0
 
 

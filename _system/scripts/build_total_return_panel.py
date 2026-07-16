@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Build a split- and distribution-aware wealth series and dashboard panel.
+"""Build an inception-to-date split- and distribution-aware return panel.
 
 Yahoo closes are split-adjusted but exclude dividends. Historical cash events are
 normalized to that same share basis and reinvested at the ex-date close. The
-plotted ending wealth is the sole source for cumulative and annualized return.
+chart always begins with the earliest available trading history; distribution
+verification coverage is reported separately and never truncates the plot.
 """
 from __future__ import annotations
 
@@ -11,6 +12,7 @@ import argparse
 import bisect
 import html
 import json
+import math
 import sys
 import urllib.request
 from collections import Counter
@@ -220,42 +222,52 @@ def _polyline(values: list[float], n: int, x_at, y_at, color: str, width: int = 
     return f'<polyline fill="none" stroke="{color}" stroke-width="{width}" points="{points}"/>'
 
 
-def svg_chart(dates: list[str], price_idx: list[float], total_idx: list[float], benchmark_idx: list[float], *, ticker: str, contributions: dict, width: int = 820, height: int = 410) -> str:
+def _return_label(index_value: float) -> str:
+    value = index_value - 100
+    if abs(value) >= 1_000:
+        return f"{value:+,.0f}%"
+    return f"{value:+.1f}%" if value else "0%"
+
+
+def _log_ticks(ymin: float, ymax: float, count: int = 7) -> list[float]:
+    if ymin <= 0 or ymax <= 0 or ymin >= ymax:
+        return [ymin]
+    low, high = math.log(ymin), math.log(ymax)
+    raw = [math.exp(low + i / (count - 1) * (high - low)) for i in range(count)]
+    return sorted(set([ymin, 100.0 if ymin <= 100 <= ymax else ymin, ymax, *raw]))
+
+
+def svg_chart(dates: list[str], price_idx: list[float], total_idx: list[float], *, ticker: str, contributions: dict, width: int = 820, height: int = 410) -> str:
     if len(dates) < 2:
         return f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}"><text x="20" y="40">Insufficient price history for {html.escape(ticker)}</text></svg>'
-    margin = {"l": 60, "r": 24, "t": 54, "b": 78}
+    margin = {"l": 78, "r": 24, "t": 62, "b": 78}
     plot_w, plot_h = width - margin["l"] - margin["r"], height - margin["t"] - margin["b"]
-    all_values = price_idx + total_idx + benchmark_idx
+    all_values = [value for value in price_idx + total_idx if value > 0]
     ymin, ymax = min(all_values), max(all_values)
-    pad = (ymax - ymin) * .08 or 5
-    ymin, ymax = ymin - pad, ymax + pad
+    log_pad = max((math.log(ymax) - math.log(ymin)) * .06, .04)
+    ymin, ymax = math.exp(math.log(ymin) - log_pad), math.exp(math.log(ymax) + log_pad)
     x_at = lambda i: margin["l"] + i / (len(dates) - 1) * plot_w
-    y_at = lambda v: margin["t"] + plot_h - (v - ymin) / (ymax - ymin) * plot_h
+    y_at = lambda v: margin["t"] + plot_h - (math.log(max(v, ymin)) - math.log(ymin)) / (math.log(ymax) - math.log(ymin)) * plot_h
     ticks = sorted(set([0, len(dates)//4, len(dates)//2, 3*len(dates)//4, len(dates)-1]))
     labels = "".join(f'<text x="{x_at(i):.0f}" y="{height-48}" font-size="11" text-anchor="middle" fill="#64748b">{dates[i][:7]}</text>' for i in ticks)
+    y_grid = "".join(
+        f'<line x1="{margin["l"]}" y1="{y_at(value):.1f}" x2="{margin["l"]+plot_w}" y2="{y_at(value):.1f}" stroke="#e2e8f0"/>'
+        f'<text x="{margin["l"]-8}" y="{y_at(value)+4:.1f}" font-size="10" text-anchor="end" fill="#64748b">{html.escape(_return_label(value))}</text>'
+        for value in _log_ticks(ymin, ymax)
+    )
     regular = sum(v for k, v in contributions.items() if k in ("regular_dividend", "trust_distribution"))
     special = contributions.get("special_dividend", 0)
     other = sum(v for k, v in contributions.items() if k not in ("regular_dividend", "trust_distribution", "special_dividend"))
-    contribution = f"Regular ${regular:,.2f} · Special ${special:,.2f} · Other ${other:,.2f} per initial share path"
+    return_summary = f"Total return {_return_label(total_idx[-1])} | Price-only {_return_label(price_idx[-1])} | logarithmic scale"
+    cash_note = f"Regular ${regular:,.2f} | Special ${special:,.2f} | Other ${other:,.2f} per initial share path"
     return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">
-<rect width="{width}" height="{height}" fill="#fafafa"/><text x="{margin['l']}" y="24" font-size="14" font-family="sans-serif" fill="#0f172a">{html.escape(ticker)} wealth index · dividends reinvested on ex-date</text>
-<text x="{margin['l']}" y="42" font-size="10" font-family="sans-serif" fill="#64748b">{html.escape(contribution)}</text>
+<rect width="{width}" height="{height}" fill="#fafafa"/><text x="{margin['l']}" y="22" font-size="14" font-family="sans-serif" fill="#0f172a">{html.escape(ticker)} cumulative return since {dates[0]} | dividends reinvested</text>
+<text x="{margin['l']}" y="40" font-size="11" font-family="sans-serif" fill="#334155">{html.escape(return_summary)}</text>
+<text x="{margin['l']}" y="54" font-size="9" font-family="sans-serif" fill="#64748b">{html.escape(cash_note)}</text>
+{y_grid}
 <line x1="{margin['l']}" y1="{margin['t']+plot_h}" x2="{margin['l']+plot_w}" y2="{margin['t']+plot_h}" stroke="#cbd5e1"/>
-{_polyline(price_idx, len(dates), x_at, y_at, '#2563eb')}{_polyline(total_idx, len(dates), x_at, y_at, '#16a34a', 3)}{_polyline(benchmark_idx, len(dates), x_at, y_at, '#94a3b8')}
-<text x="{margin['l']}" y="{height-18}" font-size="11" fill="#2563eb">Price + splits</text><text x="{margin['l']+100}" y="{height-18}" font-size="11" fill="#16a34a">Total return</text><text x="{margin['l']+190}" y="{height-18}" font-size="11" fill="#64748b">SPY total return</text>{labels}</svg>'''
-
-
-def align_benchmark(main_dates: list[str], benchmark_dates: list[str], benchmark_values: list[float]) -> list[float]:
-    if not main_dates or not benchmark_dates or not benchmark_values:
-        return []
-    by_day = dict(zip(benchmark_dates, benchmark_values))
-    available = sorted(by_day)
-    out = []
-    for day in main_dates:
-        idx = bisect.bisect_right(available, day) - 1
-        out.append(by_day[available[max(0, idx)]])
-    base = out[0]
-    return [100 * value / base for value in out] if base else []
+{_polyline(price_idx, len(dates), x_at, y_at, '#2563eb')}{_polyline(total_idx, len(dates), x_at, y_at, '#16a34a', 3)}
+<text x="{margin['l']}" y="{height-18}" font-size="11" fill="#16a34a">Total return {_return_label(total_idx[-1])}</text><text x="{margin['l']+190}" y="{height-18}" font-size="11" fill="#2563eb">Price-only {_return_label(price_idx[-1])}</text>{labels}</svg>'''
 
 
 def build_panel(ticker: str, as_of: str | None = None, *, merge: bool = True) -> bool:
@@ -269,21 +281,14 @@ def build_panel(ticker: str, as_of: str | None = None, *, merge: bool = True) ->
     symbol = yahoo_symbol_for(t, row.get("market", "US"), row.get("exchange", ""))
     dates, prices, vendor_events, meta, source = fetch_yahoo_history(symbol)
     events, coverage = load_event_ledger(t, vendor_events)
-    # A verified ledger may intentionally define a shorter honest plot window.
-    if dates and coverage.get("status") == "complete" and coverage.get("start"):
-        start_idx = bisect.bisect_left(dates, coverage["start"])
-        dates, prices = dates[start_idx:], prices[start_idx:]
-        events = [e for e in events if (e.get("ex_date") or "") >= coverage["start"]]
+    # Always plot the complete available trading history. Primary-source event
+    # coverage is reported separately and may be shorter than the vendor series.
     wealth = build_wealth_series(dates, prices, events)
     price_idx, total_idx = wealth["price_index"], wealth["total_return_index"]
-    b_dates, b_prices, b_events, _, _ = fetch_yahoo_history("SPY")
-    b_wealth = build_wealth_series(b_dates, b_prices, b_events)
-    benchmark_idx = align_benchmark(dates, b_dates, b_wealth["total_return_index"])
     status, error = coverage_status(coverage, dates[0] if dates else None, dates[-1] if dates else None, events)
     span_days = (date.fromisoformat(dates[-1]) - date.fromisoformat(dates[0])).days if len(dates) > 1 else 0
     price_ann = annualized_from_index(price_idx[-1] if price_idx else None, span_days)
     total_ann = annualized_from_index(total_idx[-1] if total_idx else None, span_days)
-    benchmark_ann = annualized_from_index(benchmark_idx[-1] if benchmark_idx else None, span_days)
     price = inputs.get("price")
     if price is None:
         price, _, _ = fetch_price(t)
@@ -293,22 +298,24 @@ def build_panel(ticker: str, as_of: str | None = None, *, merge: bool = True) ->
     chart_rel = f"{t}/research/charts/total_return_{as_of}.svg"
     chart_path = ROOT / chart_rel
     chart_path.parent.mkdir(parents=True, exist_ok=True)
-    chart_path.write_text(svg_chart(dates, price_idx, total_idx, benchmark_idx, ticker=t, contributions=wealth["cash_by_type"]), encoding="utf-8")
+    chart_path.write_text(svg_chart(dates, price_idx, total_idx, ticker=t, contributions=wealth["cash_by_type"]), encoding="utf-8")
     cumulative_cash = round(sum(wealth["cash_by_type"].values()), 4)
     panel = {
-        "schema_version": "2.0", "ticker": t, "as_of": as_of, "status": status, "error": error,
+        "schema_version": "3.0", "ticker": t, "as_of": as_of, "status": status, "error": error,
         "price_source": source, "currency": meta.get("currency"), "return_currency": meta.get("currency"), "fx_basis": "listing_currency_nominal",
         "history_start": dates[0] if dates else None, "history_end": dates[-1] if dates else None, "price_points": len(prices), "price_interval": "1d",
+        "history_basis": "earliest_available_vendor_trading_history", "chart_scale": "logarithmic", "chart_y_axis": "cumulative_return_pct",
+        "chart_series": ["total_return", "price_only"],
         "return_contract": "split-adjusted close excluding dividends; event amounts normalized for later splits; cash reinvested at ex-date close; pre-tax nominal",
         "coverage": coverage, "event_count": sum(wealth["event_counts"].values()), "event_counts": wealth["event_counts"],
         "cash_distributions_on_initial_share_path": cumulative_cash, "distribution_contribution_by_type": wealth["cash_by_type"],
         "cumulative_distributions_per_share": cumulative_cash,
         "start_price": round(prices[0], 4) if prices else None, "end_price": round(prices[-1], 4) if prices else None,
         "price_index_end": round(price_idx[-1], 2) if price_idx else None, "total_return_index_end": round(total_idx[-1], 2) if total_idx else None,
-        "benchmark": "SPY", "benchmark_index_end": round(benchmark_idx[-1], 2) if benchmark_idx else None,
+        "cumulative_price_return_pct": round(price_idx[-1] - 100, 2) if price_idx else None,
+        "cumulative_total_return_pct": round(total_idx[-1] - 100, 2) if total_idx else None,
         "price_only_annualized_pct": round(price_ann, 2) if price_ann is not None else None,
         "total_return_annualized_pct": round(total_ann, 2) if total_ann is not None else None,
-        "benchmark_annualized_pct": round(benchmark_ann, 2) if benchmark_ann is not None else None,
         "market_cap_m": market_cap_m, "shares_outstanding": shares, "price_for_market_cap": price, "chart": chart_rel,
     }
     panel_path = research / "total_return_panel.json"

@@ -8,6 +8,7 @@ from datetime import date
 from pathlib import Path
 
 from build_total_return_panel import compute_period_total_return
+from build_valuation_workbench import write as write_valuation_workbench
 from committee_calibration import summarize
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -26,8 +27,12 @@ def latest_committee(ticker: str, committee_date: str | None = None) -> tuple[Pa
 
 
 def upsert(rows: list[dict], record: dict) -> list[dict]:
-    key = (record["ticker"], record["decision_date"], record["measurement_date"])
-    kept = [row for row in rows if (row.get("ticker"), row.get("decision_date"), row.get("measurement_date")) != key]
+    def key(row: dict) -> tuple:
+        measurement_key = ("horizon", row.get("horizon_months")) if row.get("horizon_months") else ("date", row.get("measurement_date"))
+        return row.get("ticker"), row.get("decision_date"), measurement_key
+
+    record_key = key(record)
+    kept = [row for row in rows if key(row) != record_key]
     kept.append(record)
     return sorted(kept, key=lambda row: (row["measurement_date"], row["ticker"], row["decision_date"]))
 
@@ -37,11 +42,15 @@ def main() -> int:
     parser.add_argument("ticker")
     parser.add_argument("--committee-date")
     parser.add_argument("--measurement-date", default=date.today().isoformat())
+    parser.add_argument("--horizon-months", type=int, choices=(6, 12, 24))
     parser.add_argument("--write", action="store_true")
     args = parser.parse_args()
     ticker = args.ticker.upper()
     committee_path, committee = latest_committee(ticker, args.committee_date)
-    decision_date = (committee.get("review") or {}).get("as_of")
+    human_decision = committee.get("human_decision") or {}
+    if human_decision.get("status") != "complete" or not human_decision.get("decision"):
+        raise ValueError("committee owner decision must be complete before measuring an outcome")
+    decision_date = human_decision.get("decided_at") or (committee.get("review") or {}).get("as_of")
     if not decision_date:
         raise ValueError("committee review.as_of is required")
     outcome = compute_period_total_return(ticker, decision_date, args.measurement_date)
@@ -52,7 +61,10 @@ def main() -> int:
         "ticker": ticker,
         "decision_date": decision_date,
         "measurement_date": args.measurement_date,
+        "horizon_months": args.horizon_months,
         "committee_ref": str(committee_path.relative_to(ROOT)).replace("\\", "/"),
+        "owner_decision": human_decision.get("decision"),
+        "owner_sizing": human_decision.get("sizing"),
         "decision_price": (valuation.get("inputs") or {}).get("price"),
         "decision_value_range_per_share": component.get("total_equity_value_per_share"),
         "economic_value_status": (valuation.get("economic_value_analysis") or {}).get("status"),
@@ -67,6 +79,7 @@ def main() -> int:
     LEDGER.parent.mkdir(parents=True, exist_ok=True)
     LEDGER.write_text("".join(json.dumps(row, sort_keys=True) + "\n" for row in rows), encoding="utf-8")
     CALIBRATION.write_text(json.dumps(summarize(rows), indent=2) + "\n", encoding="utf-8")
+    write_valuation_workbench(ticker, args.measurement_date)
     print(f"Wrote {LEDGER} and {CALIBRATION}")
     return 0
 

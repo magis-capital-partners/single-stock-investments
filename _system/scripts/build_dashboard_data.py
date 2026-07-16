@@ -813,6 +813,26 @@ def investment_committee_summary(ticker_dir: Path) -> dict | None:
     }
 
 
+def valuation_workbench_summary(ticker_dir: Path) -> dict | None:
+    """Consolidated committee, evidence, method-fit, outcome, and attribution views."""
+    path = ticker_dir / "research" / "valuation_workbench.json"
+    if not path.exists():
+        return None
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return None
+    return {
+        "as_of": data.get("as_of"),
+        "committee": data.get("committee") or {},
+        "evidence": data.get("evidence") or {},
+        "method_fit": data.get("method_fit") or {},
+        "outcomes": data.get("outcomes") or {},
+        "attribution": data.get("attribution") or {},
+        "github_url": github_blob_url(path.relative_to(ROOT).as_posix()),
+    }
+
+
 def pricing_analysis_summary(ticker_dir: Path) -> dict | None:
     path = ticker_dir / "research" / "pricing_analysis.json"
     if not path.exists():
@@ -1823,6 +1843,7 @@ def build_ticker_row(
         "human_review": valuation_human_review(ticker_dir),
         "pricing_analysis": pricing_analysis_summary(ticker_dir),
         "investment_committee": investment_committee_summary(ticker_dir),
+        "valuation_workbench": valuation_workbench_summary(ticker_dir),
         "component_valuation": valuation_component_summary(ticker_dir),
         "total_return_panel": valuation_total_return_panel(ticker, ticker_dir),
         "recent_files": recent_files(ticker_dir),

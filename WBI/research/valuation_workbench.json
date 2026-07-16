@@ -1,0 +1,218 @@
+{
+  "schema_version": "1.0",
+  "ticker": "WBI",
+  "as_of": "2026-07-15",
+  "committee": {
+    "status": "independent_review_open",
+    "as_of": "2026-07-15",
+    "packet_hash": "38c67904f3a47847b52182f41898f076d37c2d4d46a77b7ffa090b658e1fc5df",
+    "stage": "round_one_open",
+    "selected_raters": [
+      "hohn",
+      "marathon_capital_cycle",
+      "marks_credit_cycle"
+    ],
+    "analysis_progress": {
+      "completed": 0,
+      "required": 9
+    },
+    "completed_outputs": [],
+    "missing_outputs": [
+      "round_1/hohn.json",
+      "round_1/marathon_capital_cycle.json",
+      "round_1/marks_credit_cycle.json",
+      "round_2/hohn.json",
+      "round_2/marathon_capital_cycle.json",
+      "round_2/marks_credit_cycle.json",
+      "proposer.json",
+      "pre_mortem.json",
+      "research_response.json"
+    ],
+    "owner_status": "pending",
+    "owner_decision": null,
+    "strongest_dissent": null,
+    "unresolved_items": [],
+    "next_action": "Complete isolated rater outputs, proposer case, pre-mortem, and research response without sharing peer votes.",
+    "record_ref": null,
+    "previous_record_ref": null,
+    "manifest_ref": "WBI/research/committee_work/2026-07-15/manifest.json"
+  },
+  "evidence": {
+    "status": "critical_gaps_open",
+    "open_count": 3,
+    "critical_count": 1,
+    "gaps": [
+      {
+        "id": "project_cohort_roic",
+        "priority": "critical",
+        "component_ids": [
+          "core_water_network",
+          "contracted_growth_projects",
+          "capex_execution_reserve"
+        ],
+        "question": "What cash return has each major project cohort earned on total installed capital?",
+        "evidence_required": "Project-level invested capital, in-service date, utilization, EBITDA, maintenance capital, taxes, and contract contribution for mature and ramping cohorts.",
+        "acceptance_test": "Incremental ROIC is shown by cohort and reconciles to consolidated cash flow without counting contracted backlog as completed assets.",
+        "valuation_effect": "Distinguishes genuine high-return reinvestment from EBITDA growth purchased with capital.",
+        "status": "open",
+        "base_value_exposure_per_share": 38.05,
+        "current_methods": [
+          "capital_cycle_reserve",
+          "milestone_project_option",
+          "normalized_ebitda_enterprise_value"
+        ],
+        "source": "curated_followup"
+      },
+      {
+        "id": "contract_quality",
+        "priority": "high",
+        "component_ids": [
+          "core_water_network",
+          "contracted_growth_projects"
+        ],
+        "question": "How protected are price, volume, duration, and capital recovery under customer contracts?",
+        "evidence_required": "Contract duration, minimum-volume or take-or-pay terms, escalators, acreage dedications, renewal rights, counterparty concentration, and termination provisions.",
+        "acceptance_test": "Contracted and merchant cash flows are valued separately with explicit renewal and utilization assumptions.",
+        "valuation_effect": "Sets the appropriate cash-flow duration, multiple, and downside case.",
+        "status": "open",
+        "base_value_exposure_per_share": 39.05,
+        "current_methods": [
+          "milestone_project_option",
+          "normalized_ebitda_enterprise_value"
+        ],
+        "source": "curated_followup"
+      },
+      {
+        "id": "refinancing_and_funding",
+        "priority": "high",
+        "component_ids": [
+          "net_debt",
+          "contracted_growth_projects"
+        ],
+        "question": "Can growth be funded through a stress case without diluting equity value?",
+        "evidence_required": "Debt maturities, fixed/floating mix, covenant headroom, liquidity, committed capex, funding sources, and downside interest coverage.",
+        "acceptance_test": "The downside case funds committed capital and refinances maturities while preserving explicit covenant headroom.",
+        "valuation_effect": "Deducts financing cost and dilution risk from project value.",
+        "status": "open",
+        "base_value_exposure_per_share": -8.54,
+        "current_methods": [
+          "balance_sheet_claim",
+          "milestone_project_option"
+        ],
+        "source": "curated_followup"
+      }
+    ]
+  },
+  "method_fit": {
+    "profile_id": "infrastructure_compounder",
+    "label": "Infrastructure reinvestment and contracted growth",
+    "current_archetype": "infrastructure",
+    "primary_personas": [
+      "hohn",
+      "marathon_capital_cycle"
+    ],
+    "cross_check_personas": [
+      "marks_credit_cycle",
+      "klarman_asset_value"
+    ],
+    "applicability_tests": [
+      "Incremental capital can be tied to identifiable projects, cohorts, or contracted capacity.",
+      "Returns on new capital can be separated from returns on the installed base.",
+      "Contract duration, volume protection, pricing, and counterparty risk are observable.",
+      "Leverage and future owner-funded capital are explicitly deducted."
+    ],
+    "failure_modes": [
+      "Valuing EBITDA growth without the capital required to produce it.",
+      "Assuming historical margins apply to immature projects.",
+      "Ignoring refinancing and contract-renewal risk."
+    ],
+    "validation_cohort": [
+      {
+        "ticker": "MSB",
+        "archetype": "royalty_asset",
+        "primary_profile": "scarce_asset_optionality",
+        "purpose": "Test depletion, commodity exposure, finite reserves, and royalty-unit reconciliation.",
+        "status": "queued"
+      },
+      {
+        "ticker": "C",
+        "archetype": "financial_balance_sheet",
+        "primary_profile": "credit_and_normalized_returns",
+        "purpose": "Test tangible capital, credit losses, funding, regulation, and excess-capital realization.",
+        "status": "queued"
+      },
+      {
+        "ticker": "NVR",
+        "archetype": "quality_reinvestment",
+        "primary_profile": "quality_reinvestment",
+        "purpose": "Test owner earnings, capital-light reinvestment, cyclicality, and buyback value creation.",
+        "status": "queued"
+      },
+      {
+        "ticker": "NUE",
+        "archetype": "capital_cycle",
+        "primary_profile": "capital_cycle",
+        "purpose": "Test normalized margins, industry supply response, replacement cost, and reinvestment timing.",
+        "status": "queued"
+      },
+      {
+        "ticker": "BIIB",
+        "archetype": "binary_special_situation",
+        "primary_profile": "probability_weighted_special_situation",
+        "purpose": "Test product concentration, pipeline probabilities, patent cliffs, and catalyst timing.",
+        "status": "queued"
+      }
+    ],
+    "rule": "Use the universal economic-value contract for every security; change the primary method and raters only when the applicability tests support it."
+  },
+  "outcomes": {
+    "status": "waiting_for_owner_decision",
+    "decision_date": null,
+    "schedule": [
+      {
+        "horizon_months": 6,
+        "target_date": null,
+        "status": "waiting_for_owner_decision",
+        "measurement_date": null,
+        "total_return_pct": null,
+        "return_status": null
+      },
+      {
+        "horizon_months": 12,
+        "target_date": null,
+        "status": "waiting_for_owner_decision",
+        "measurement_date": null,
+        "total_return_pct": null,
+        "return_status": null
+      },
+      {
+        "horizon_months": 24,
+        "target_date": null,
+        "status": "waiting_for_owner_decision",
+        "measurement_date": null,
+        "total_return_pct": null,
+        "return_status": null
+      }
+    ],
+    "recorded_outcome_count": 0,
+    "minimum_persona_outcomes_before_reweighting": 20,
+    "personas_eligible_for_weight_review": [],
+    "weighting_rule": "Do not change persona weights until at least 20 attributable outcomes exist for that persona."
+  },
+  "attribution": {
+    "status": "baseline_established",
+    "current": {
+      "as_of": "2026-07-15",
+      "low": 9.12,
+      "base": 26.51,
+      "high": 46.1
+    },
+    "prior": null,
+    "base_change_per_share": null,
+    "base_change_pct": null,
+    "drivers": [],
+    "category_totals_per_share": {},
+    "unexplained_per_share": null,
+    "explanation": "The current component schedule is the first decision-grade baseline; attribution begins with the next dated valuation snapshot."
+  }
+}

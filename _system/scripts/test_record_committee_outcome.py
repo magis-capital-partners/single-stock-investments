@@ -15,6 +15,18 @@ class RecordCommitteeOutcomeTests(unittest.TestCase):
         self.assertEqual(len(rows), 1)
         self.assertEqual(rows[0]["total_return_pct"], 12)
 
+    def test_distinct_horizons_remain_distinct_measurements(self):
+        six = {"ticker": "TPL", "decision_date": "2026-01-01", "measurement_date": "2026-07-01", "horizon_months": 6}
+        twelve = {"ticker": "TPL", "decision_date": "2026-01-01", "measurement_date": "2027-01-01", "horizon_months": 12}
+        self.assertEqual(len(upsert([six], twelve)), 2)
+
+    def test_same_horizon_replaces_prior_measurement_date(self):
+        original = {"ticker": "TPL", "decision_date": "2026-01-01", "measurement_date": "2026-07-01", "horizon_months": 6}
+        revised = {**original, "measurement_date": "2026-07-02"}
+        rows = upsert([original], revised)
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["measurement_date"], "2026-07-02")
+
 
 if __name__ == "__main__":
     unittest.main()

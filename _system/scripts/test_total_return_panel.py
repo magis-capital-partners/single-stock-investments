@@ -4,10 +4,20 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from build_total_return_panel import annualized_from_index, build_wealth_series, coverage_status
+from build_total_return_panel import annualized_from_index, build_wealth_series, coverage_status, svg_chart
 
 
 class TotalReturnPanelTests(unittest.TestCase):
+    def test_chart_is_logarithmic_percentage_return_without_spy(self):
+        chart = svg_chart(
+            ["1980-01-01", "2026-01-01"], [100, 250], [100, 400],
+            ticker="TPL", contributions={"regular_dividend": 10, "special_dividend": 2},
+        )
+        self.assertIn("logarithmic scale", chart)
+        self.assertIn("Total return +300.0%", chart)
+        self.assertIn("Price-only +150.0%", chart)
+        self.assertNotIn("SPY", chart)
+
     def test_split_does_not_change_wealth(self):
         result = build_wealth_series(
             ["2024-01-01", "2024-01-02"], [50, 50],
