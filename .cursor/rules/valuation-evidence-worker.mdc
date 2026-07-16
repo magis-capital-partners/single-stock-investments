@@ -1,0 +1,26 @@
+---
+description: One-ticker / one-gap valuation evidence worker — no silent acceptance of weak evidence
+globs: "**/research/valuation.json,**/research/valuation_*.json,**/research/evidence_reconciliation*,**/_system/reference/valuation_followups.json,**/_system/prompts/cursor_valuation_evidence_worker.md"
+alwaysApply: false
+---
+
+# Valuation evidence worker
+
+When improving valuation evidence, follow `_system/prompts/cursor_valuation_evidence_worker.md`.
+
+## Hard constraints
+
+1. **One security and one written acceptance test** per task.
+2. Keep **facts**, **calculations**, **estimates**, and **judgments** separate.
+3. Prefer primary filings, contracts, regulatory and legal documents. Cite path, date, page/section, and show the arithmetic.
+4. Never mark a gap `accepted` / `resolved` because a document merely discusses the topic. Apply the gap’s written acceptance test in `_system/reference/valuation_followups.json`.
+5. If evidence is incomplete: keep provisional low/base/high, leave the gap open (or document `partially_met` in the reconciliation), and keep the security **evidence-blocked**.
+6. Do not invent values, sources, claimed amounts, reserve lives, or probabilities.
+7. Do not double-count owner cash, NAV, cash, options, or ordinary royalties vs legal recoveries.
+8. Do not edit `human_decision.json`.
+9. Do not commit until `marvin_valuation.py`, cohort/workbench refresh, and the valuation unit tests pass.
+10. Never put multiple “independent” IC personas in one shared context.
+
+## Deliverable minimum
+
+Update or create `{TICKER}/research/evidence_reconciliation_YYYY-MM-DD.md` with status, evidence, source, calculation, remaining uncertainty, affected components, valuation consequence, and falsifier for the assigned acceptance test.
