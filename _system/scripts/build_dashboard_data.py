@@ -843,6 +843,130 @@ def valuation_workbench_summary(ticker_dir: Path) -> dict | None:
     }
 
 
+CLOSED_GAP_STATUSES = frozenset({"resolved", "accepted", "not_applicable", "met"})
+
+
+def valuation_decision_summary(
+    ticker: str,
+    ticker_dir: Path,
+    workbench: dict | None = None,
+    component: dict | None = None,
+) -> dict:
+    """Slim readiness payload for holdings-table badges and filters."""
+    wb = workbench if workbench is not None else valuation_workbench_summary(ticker_dir)
+    cv = component if component is not None else valuation_component_summary(ticker_dir)
+    followups_path = ROOT / "_system" / "reference" / "valuation_followups.json"
+    followups = {}
+    if followups_path.exists():
+        try:
+            followups = json.loads(followups_path.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            followups = {}
+    ticker_cfg = (followups.get("tickers") or {}).get(ticker) or (followups.get("tickers") or {}).get(ticker.upper()) or {}
+    gaps = list(ticker_cfg.get("evidence_gaps") or [])
+    open_gaps = [g for g in gaps if g.get("status") not in CLOSED_GAP_STATUSES]
+    critical = [g for g in open_gaps if g.get("priority") == "critical"]
+    decision = (wb or {}).get("decision") or {}
+    evidence = (wb or {}).get("evidence") or {}
+    method = (wb or {}).get("method_fit") or {}
+    open_count = int(evidence.get("open_count") if evidence.get("open_count") is not None else len(open_gaps))
+    critical_count = int(evidence.get("critical_count") if evidence.get("critical_count") is not None else len(critical))
+    status = decision.get("status")
+    if critical_count > 0 or open_count > 0:
+        status = "evidence_blocked"
+    elif status == "decision_grade":
+        status = "decision_grade"
+    elif wb:
+        status = status or "evidence_blocked"
+    elif cv:
+        status = "provisional"
+    else:
+        # First-pass inventory without workbench
+        phase2 = ticker_dir / "research"
+        first_pass = list(phase2.glob("evidence_reconciliation_*_phase2_first_pass.json")) if phase2.exists() else []
+        if first_pass or ticker_cfg.get("rollout_wave"):
+            status = "provisional"
+        else:
+            status = "missing"
+    next_gap = None
+    for gap in critical + open_gaps:
+        next_gap = gap.get("id")
+        break
+    if not next_gap and (evidence.get("gaps") or []):
+        next_gap = (evidence["gaps"][0] or {}).get("id")
+    return {
+        "status": status,
+        "provisional": status in {"evidence_blocked", "provisional"},
+        "open_gap_count": open_count,
+        "critical_gap_count": critical_count,
+        "method_profile": ticker_cfg.get("method_profile") or method.get("profile_id"),
+        "primary_power_zone": decision.get("primary_power_zone") or method.get("label"),
+        "value_per_share": decision.get("value_per_share") or (cv or {}).get("total_equity_value_per_share"),
+        "upside_downside_pct": (cv or {}).get("upside_downside_pct"),
+        "price_per_share": decision.get("price_per_share") or (cv or {}).get("market_price_per_share"),
+        "next_action": decision.get("next_action"),
+        "next_gap_id": next_gap,
+        "rollout_wave": ticker_cfg.get("rollout_wave"),
+        "in_validation_cohort": any(
+            (row.get("ticker") or "").upper() == ticker.upper()
+            for row in (followups.get("validation_cohort") or [])
+        ) or ticker.upper() in {
+            "TPL", "LB", "WBI", "AZLCZ", "MSB", "C", "NVR", "NUE", "BIIB",
+        },
+    }
+
+
+def valuation_queue_summary(rows: list[dict]) -> dict:
+    """Portfolio Valuation Queue built from followups + per-ticker decision summaries."""
+    followups_path = ROOT / "_system" / "reference" / "valuation_followups.json"
+    try:
+        followups = json.loads(followups_path.read_text(encoding="utf-8")) if followups_path.exists() else {}
+    except (json.JSONDecodeError, OSError):
+        followups = {}
+    by_ticker = {str(r.get("ticker") or "").upper(): r for r in rows}
+    items = []
+    for ticker, cfg in (followups.get("tickers") or {}).items():
+        row = by_ticker.get(str(ticker).upper()) or {}
+        decision = row.get("valuation_decision") or {}
+        gaps = [g for g in (cfg.get("evidence_gaps") or []) if g.get("status") not in CLOSED_GAP_STATUSES]
+        critical = [g for g in gaps if g.get("priority") == "critical"]
+        items.append({
+            "ticker": ticker,
+            "company": row.get("company") or ticker,
+            "method_profile": cfg.get("method_profile") or decision.get("method_profile"),
+            "rollout_wave": cfg.get("rollout_wave") or decision.get("rollout_wave") or (
+                "validation_cohort" if decision.get("in_validation_cohort") else "followups"
+            ),
+            "decision_status": decision.get("status") or ("evidence_blocked" if gaps else "missing"),
+            "open_gap_count": decision.get("open_gap_count", len(gaps)),
+            "critical_gap_count": decision.get("critical_gap_count", len(critical)),
+            "next_gap_id": decision.get("next_gap_id") or ((critical[0] if critical else (gaps[0] if gaps else {})).get("id")),
+            "next_gap_question": ((critical[0] if critical else (gaps[0] if gaps else {})).get("question")),
+            "value_per_share": decision.get("value_per_share"),
+            "primary_power_zone": decision.get("primary_power_zone"),
+            "in_validation_cohort": bool(decision.get("in_validation_cohort")),
+        })
+    items.sort(key=lambda r: (
+        0 if r.get("in_validation_cohort") else 1,
+        -(r.get("critical_gap_count") or 0),
+        str(r.get("ticker") or ""),
+    ))
+    waves = followups.get("expansion_waves") or {}
+    return {
+        "generated_from": "_system/reference/valuation_followups.json",
+        "counts": {
+            "tickers": len(items),
+            "evidence_blocked": sum(1 for r in items if r.get("decision_status") == "evidence_blocked"),
+            "decision_grade": sum(1 for r in items if r.get("decision_status") == "decision_grade"),
+            "provisional": sum(1 for r in items if r.get("decision_status") == "provisional"),
+            "open_gaps": sum(int(r.get("open_gap_count") or 0) for r in items),
+            "critical_gaps": sum(int(r.get("critical_gap_count") or 0) for r in items),
+        },
+        "expansion_waves": waves,
+        "items": items,
+    }
+
+
 def pricing_analysis_summary(ticker_dir: Path) -> dict | None:
     path = ticker_dir / "research" / "pricing_analysis.json"
     if not path.exists():
@@ -1960,6 +2084,8 @@ def build_ticker_row(
         "valuation_workbench": valuation_workbench_summary(ticker_dir),
         "component_valuation": valuation_component_summary(ticker_dir),
         "total_return_panel": valuation_total_return_panel(ticker, ticker_dir),
+        # filled below after workbench/component are known
+        "valuation_decision": None,
         "recent_files": recent_files(ticker_dir),
         "developments": recent_developments(ticker_dir, ticker),
         "onboard": reconcile_onboard_status(ticker_dir, pdf_count),
@@ -1967,6 +2093,12 @@ def build_ticker_row(
         "in_holdings": ticker in holdings,
         "in_watchlist": bool((watchlist or {}).get(ticker)),
     }
+    row["valuation_decision"] = valuation_decision_summary(
+        ticker,
+        ticker_dir,
+        workbench=row.get("valuation_workbench"),
+        component=row.get("component_valuation"),
+    )
     row["completeness"] = completeness_score(row)
     lenses = load_lenses(ticker_dir)
     val = load_valuation(ticker_dir)
@@ -2175,6 +2307,7 @@ def build() -> dict:
         )
         sleeve_filters.append({"id": sleeve_id, "label": label, "count": count})
 
+    valuation_queue = valuation_queue_summary(rows)
     return {
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "workspace": str(ROOT),
@@ -2191,9 +2324,13 @@ def build() -> dict:
             "github_repo": GITHUB_REPO,
             "onboard_workflow": ONBOARD_WORKFLOW,
             "onboard_dispatch_event": "onboard-ticker",
+            "valuation_queue_tickers": (valuation_queue.get("counts") or {}).get("tickers"),
+            "valuation_evidence_blocked": (valuation_queue.get("counts") or {}).get("evidence_blocked"),
+            "valuation_critical_gaps": (valuation_queue.get("counts") or {}).get("critical_gaps"),
         },
         "watchlist": watchlist,
         "tickers": rows,
+        "valuation_queue": valuation_queue,
         "portfolio_macro_regime": portfolio_macro_regime,
         "portfolio_macro": portfolio_macro,
     }

@@ -149,13 +149,14 @@ def evidence_view(ticker_cfg: dict, valuation: dict, committee: dict) -> dict:
             "base_value_exposure_per_share": None, "current_methods": [], "source": "validator",
         })
     gaps.sort(key=lambda row: (PRIORITY_ORDER.get(row.get("priority"), 9), row.get("id", "")))
-    open_gaps = [row for row in gaps if row.get("status") not in {"resolved", "not_applicable"}]
+    closed = {"resolved", "accepted", "not_applicable", "met"}
+    open_gaps = [row for row in gaps if row.get("status") not in closed]
     critical = sum(row.get("priority") == "critical" for row in open_gaps)
     return {
         "status": "critical_gaps_open" if critical else ("gaps_open" if open_gaps else "clear"),
         "open_count": len(open_gaps),
         "critical_count": critical,
-        "gaps": gaps,
+        "gaps": open_gaps,
     }
 
 
@@ -428,16 +429,24 @@ def build(ticker: str, as_of: str | None = None) -> dict:
     ticker_cfg = (config.get("tickers") or {}).get(ticker) or {}
     effective_date = (as_of or date.today().isoformat())[:10]
     committee = committee_view(research)
+    evidence = evidence_view(ticker_cfg, valuation, committee)
+    decision = decision_view(valuation, committee)
+    # Followups / evidence gaps are the readiness authority for the dashboard.
+    decision["unresolved_evidence_count"] = evidence.get("open_count") or 0
+    if (evidence.get("open_count") or 0) > 0 or (evidence.get("critical_count") or 0) > 0:
+        decision["status"] = "evidence_blocked"
+        if not decision.get("next_action"):
+            decision["next_action"] = "Close critical evidence gaps before freezing a decision-grade packet."
     return {
         "schema_version": "2.0",
         "ticker": ticker,
         "as_of": effective_date,
-        "decision": decision_view(valuation, committee),
+        "decision": decision,
         "business": business_view(valuation),
         "valuation": valuation_view(valuation),
         "optionality": optionality_view(valuation),
         "committee": committee,
-        "evidence": evidence_view(ticker_cfg, valuation, committee),
+        "evidence": evidence,
         "method_fit": method_fit_view(config, ticker_cfg, valuation),
         "outcomes": outcome_view(ticker, config, committee, effective_date),
         "attribution": attribution_view(research, valuation),

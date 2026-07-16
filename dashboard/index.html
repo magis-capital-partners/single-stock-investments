@@ -602,6 +602,11 @@
     padding: 12px; background: var(--bg-card); border-radius: 8px;
     text-align: center; margin: 12px 0; color: var(--accent-blue);
   }
+  .valuation-panel { padding: 16px 24px 32px; display: none; flex: 1; overflow: auto; }
+  .valuation-panel.active { display: block; }
+  .valuation-status-cell { display: flex; flex-direction: column; gap: 2px; }
+  .valuation-decision-strip .workbench-callout { margin-top: 10px; }
+  .valuation-filter-group { display: inline-flex; flex-wrap: wrap; gap: 6px; margin-left: 6px; }
 </style>
 </head>
 <body>
@@ -624,6 +629,7 @@
 
   <nav class="view-tabs" id="view-tabs">
     <button type="button" class="view-tab active" data-view="holdings">Holdings</button>
+    <button type="button" class="view-tab" data-view="valuation">Valuation</button>
     <button type="button" class="view-tab" data-view="watchlist">Watchlist</button>
     <button type="button" class="view-tab" data-view="insights">Insights</button>
     <button type="button" class="view-tab" data-view="activist">Activist</button>
@@ -637,6 +643,7 @@
     <input class="search" id="search" placeholder="Search ticker or company…" />
     <span id="market-filter-group" class="market-filter-group"></span>
     <span id="sleeve-filter-group" class="sleeve-filter-group"></span>
+    <span id="valuation-filter-group" class="valuation-filter-group"></span>
     <button class="filter-btn" data-filter="needs-work">Needs work</button>
   </div>
 
@@ -682,6 +689,11 @@
     </p>
     <div class="loading" id="darwin-loading">Loading Darwin portfolio…</div>
     <div id="darwin-content" style="display:none"></div>
+  </section>
+
+  <section class="valuation-panel" id="valuation-panel">
+    <div class="loading" id="valuation-loading">Loading valuation queue…</div>
+    <div id="valuation-content" style="display:none"></div>
   </section>
 
   <section class="insights-panel" id="insights-panel">
@@ -747,6 +759,7 @@
 <script src="equity-model-viz.js"></script>
 <script src="search-match.js"></script>
 <script src="insights-viz.js"></script>
+<script src="valuation-viz.js"></script>
 <script src="index-viz.js"></script>
 <script src="activist-viz.js"></script>
 <script src="oauth.js"></script>
@@ -820,8 +833,10 @@ let sortKey = 'ticker';
 let sortAsc = true;
 let marketFilter = 'ALL';
 let sleeveFilter = 'ALL';
+let valuationFilter = 'ALL';
 let needsWork = false;
 let activeView = 'holdings';
+let valuationOpenEvidenceTab = false;
 let activeDarwinAccount = 'roth';
 let expandedPersona = null;
 let activeInsightFilter = 'letters';
@@ -1076,13 +1091,26 @@ function irrClass(pct) {
   return 'irr-fail';
 }
 
+function valuationHelpers() {
+  return {
+    escapeHtml,
+    fmtNum,
+    fmtPct,
+    fmtSignedDollar,
+    linkHtml,
+    ghRepo: (data && data.summary && data.summary.github_repo) || '',
+  };
+}
+
 function renderValueRangeCell(t) {
+  if (window.ValuationViz) return ValuationViz.renderValueRangeCell(t, fmtNum);
   const r = t.component_valuation?.total_equity_value_per_share;
   if (!r || r.low == null || r.base == null || r.high == null) return '<span class="mono" style="color:var(--text-muted)">incomplete</span>';
   return `<span class="mono">$${fmtNum(r.low,0)}–$${fmtNum(r.high,0)}<span class="irr-sub">base $${fmtNum(r.base,0)}</span></span>`;
 }
 
 function renderPriceToBaseCell(t) {
+  if (window.ValuationViz) return ValuationViz.renderPriceToBaseCell(t, fmtPct);
   const pct = t.component_valuation?.upside_downside_pct?.base;
   if (pct == null) return '<span class="mono" style="color:var(--text-muted)">—</span>';
   const cls = pct >= 0 ? 'irr-pass' : 'irr-fail';
@@ -1090,10 +1118,10 @@ function renderPriceToBaseCell(t) {
 }
 
 function renderValuationStatusCell(t) {
+  if (window.ValuationViz) return ValuationViz.renderValuationStatusCell(t, escapeHtml);
   const cv = t.component_valuation;
   if (!cv) return '<span class="badge badge-warn">missing</span>';
-  if (cv.status === 'complete' && cv.all_material_components_identified) return '<span class="badge badge-ok">complete</span>';
-  return '<span class="badge badge-warn">operating-only</span>';
+  return '<span class="badge badge-warn">provisional</span>';
 }
 
 function renderIrrCell(t) {
@@ -1198,102 +1226,8 @@ function workbenchStatusBadge(status) {
 }
 
 function renderValuationWorkbench(t) {
-  const wb = t.valuation_workbench;
-  if (!wb) return '';
-  const decision = wb.decision || {};
-  const business = wb.business || {};
-  const valuation = wb.valuation || {};
-  const optionality = wb.optionality || {};
-  const committee = wb.committee || {};
-  const evidence = wb.evidence || {};
-  const method = wb.method_fit || {};
-  const outcomes = wb.outcomes || {};
-  const attribution = wb.attribution || {};
-  const progress = committee.analysis_progress || {};
-  const progressPct = progress.required ? Math.min(100, Number(progress.completed || 0) / Number(progress.required) * 100) : 0;
-  const decisionPage = `
-    <div class="metric-grid metric-grid-3">
-      <div class="metric"><div class="k">Decision readiness</div><div class="v">${workbenchStatusBadge(decision.status)}</div></div>
-      <div class="metric"><div class="k">Price / base value</div><div class="v mono">$${fmtNum(decision.price_per_share)} / $${fmtNum(decision.value_per_share?.base)}</div></div>
-      <div class="metric"><div class="k">Base annual return</div><div class="v mono">${fmtPct(decision.annualized_return_at_price_pct?.base)}</div></div>
-    </div>
-    <div class="metric-grid metric-grid-3" style="margin-top:9px">
-      <div class="metric"><div class="k">Low / high value</div><div class="v mono">$${fmtNum(decision.value_per_share?.low)} / $${fmtNum(decision.value_per_share?.high)}</div></div>
-      <div class="metric"><div class="k">Unvalued components</div><div class="v mono">${Number(decision.unvalued_component_count || 0)}</div></div>
-      <div class="metric"><div class="k">Evidence blockers</div><div class="v mono">${Number(decision.unresolved_evidence_count || 0)}</div></div>
-    </div>
-    <div class="workbench-callout"><strong>Power zone:</strong> ${escapeHtml(decision.primary_power_zone || 'review required')}<br><strong>Next:</strong> ${escapeHtml(decision.next_action || 'Complete evidence and committee gates.')}</div>`;
-  const ownershipRows = (business.components || []).map(row => `<tr><td><strong>${escapeHtml(row.label || row.component_id)}</strong><div class="tier-sub">${escapeHtml(row.category || '')} · ${escapeHtml(row.treatment || '')}</div></td><td>${escapeHtml(row.ownership_claim || '')}</td><td class="mono">$${fmtNum(row.range_per_share?.low)} / $${fmtNum(row.range_per_share?.base)} / $${fmtNum(row.range_per_share?.high)}</td><td>${escapeHtml(row.assumption_type || '')}</td></tr>`).join('');
-  const businessPage = `<div class="metric-grid metric-grid-3"><div class="metric"><div class="k">Ownership map</div><div class="v">${workbenchStatusBadge(business.status)}</div></div><div class="metric"><div class="k">Facts / estimates</div><div class="v mono">${(business.facts || []).length} / ${(business.estimates || []).length}</div></div><div class="metric"><div class="k">Judgments</div><div class="v mono">${(business.judgments || []).length}</div></div></div><table class="workbench-table"><thead><tr><th>Component</th><th>Economic claim</th><th>Low / base / high</th><th>Input type</th></tr></thead><tbody>${ownershipRows}</tbody></table>`;
-  const valueDrivers = (valuation.scenario_contract?.top_value_drivers || []).map(row => `<tr><td><strong>${escapeHtml(row.label || row.component_id)}</strong></td><td class="mono">$${fmtNum(row.base_per_share)}</td><td class="mono">$${fmtNum(row.range_width_per_share)}</td></tr>`).join('');
-  const valuationPage = `<div class="metric-grid metric-grid-3"><div class="metric"><div class="k">Market cap</div><div class="v mono">${valuation.market?.market_cap_m == null ? '—' : '$' + fmtNum(valuation.market.market_cap_m) + 'm'}</div></div><div class="metric"><div class="k">Base value</div><div class="v mono">$${fmtNum(valuation.valuation?.value_per_share?.base)}</div></div><div class="metric"><div class="k">Low-case downside</div><div class="v mono">${fmtPct(valuation.valuation?.downside_to_low_pct)}</div></div></div><div class="workbench-callout">${escapeHtml(valuation.scenario_contract?.rule || '')}</div>${valueDrivers ? `<h4 style="margin:13px 0 0">Largest uncertainty drivers</h4><table class="workbench-table"><thead><tr><th>Component</th><th>Base / share</th><th>Range width</th></tr></thead><tbody>${valueDrivers}</tbody></table>` : ''}`;
-  const optionRows = (optionality.options || []).map(row => `<tr><td><strong>${escapeHtml(row.label || row.component_id)}</strong></td><td>${escapeHtml(row.method || '')}</td><td class="mono">$${fmtNum(row.range_per_share?.low)} / $${fmtNum(row.range_per_share?.base)} / $${fmtNum(row.range_per_share?.high)}</td><td>${escapeHtml(row.falsifier || '')}</td></tr>`).join('');
-  const optionalityPage = `<div class="metric-grid metric-grid-3"><div class="metric"><div class="k">Optionality</div><div class="v">${workbenchStatusBadge(optionality.status)}</div></div><div class="metric"><div class="k">Explicit options</div><div class="v mono">${Number(optionality.option_count || 0)}</div></div></div><div class="workbench-callout">${escapeHtml(optionality.rule || '')}</div>${optionRows ? `<table class="workbench-table"><thead><tr><th>Option</th><th>Method</th><th>Low / base / high</th><th>Falsifier</th></tr></thead><tbody>${optionRows}</tbody></table>` : '<div class="summary" style="margin-top:10px">No separately material option has been identified; this is an explicit treatment, not an unvalued asset.</div>'}`;
-  const committeePage = `
-    <div class="metric-grid metric-grid-3">
-      <div class="metric"><div class="k">Committee state</div><div class="v">${workbenchStatusBadge(committee.status)}</div></div>
-      <div class="metric"><div class="k">Independent outputs</div><div class="v mono">${Number(progress.completed || 0)} / ${Number(progress.required || 0)}</div><div class="workbench-progress"><span style="width:${progressPct}%"></span></div></div>
-      <div class="metric"><div class="k">Owner decision</div><div class="v">${escapeHtml(committee.owner_decision || committee.owner_status || 'pending')}</div></div>
-    </div>
-    <div class="workbench-callout"><strong>Next action:</strong> ${escapeHtml(committee.next_action || 'Freeze evidence and begin independent review.')}</div>
-    ${(committee.selected_raters || []).length ? `<div class="tier-sub" style="margin-top:9px"><strong>Independent methods:</strong> ${committee.selected_raters.map(x => escapeHtml(String(x).replace(/_/g, ' '))).join(' &middot; ')}</div>` : ''}
-    ${(committee.missing_outputs || []).length ? `<details style="margin-top:9px"><summary class="tier-sub">Missing review outputs (${committee.missing_outputs.length})</summary><div class="workbench-item-meta mono">${committee.missing_outputs.map(escapeHtml).join('<br>')}</div></details>` : ''}
-    ${committee.strongest_dissent ? `<div class="workbench-item" style="margin-top:10px"><div class="workbench-item-title">Strongest dissent</div><p>${escapeHtml(committee.strongest_dissent)}</p></div>` : ''}`;
-  const gapRows = (evidence.gaps || []).map(gap => `
-    <div class="workbench-item">
-      <div class="workbench-item-head"><div class="workbench-item-title">${escapeHtml(gap.question || gap.id)}</div><span class="badge ${gap.priority === 'critical' ? 'badge-bad' : 'badge-warn'}">${escapeHtml(gap.priority || 'open')}</span></div>
-      <p><strong>Need:</strong> ${escapeHtml(gap.evidence_required || 'Primary evidence required.')}</p>
-      <p><strong>Close when:</strong> ${escapeHtml(gap.acceptance_test || 'Evidence is reconciled to the valuation.')}</p>
-      <div class="workbench-item-meta">Value exposed: ${gap.base_value_exposure_per_share == null ? 'not isolated' : '$' + fmtNum(gap.base_value_exposure_per_share) + ' / share'}${(gap.component_ids || []).length ? ` &middot; ${(gap.component_ids || []).map(escapeHtml).join(' &middot; ')}` : ''}</div>
-    </div>`).join('');
-  const evidencePage = `
-    <div class="metric-grid metric-grid-3">
-      <div class="metric"><div class="k">Evidence status</div><div class="v">${workbenchStatusBadge(evidence.status)}</div></div>
-      <div class="metric"><div class="k">Open gaps</div><div class="v mono">${Number(evidence.open_count || 0)}</div></div>
-      <div class="metric"><div class="k">Critical gaps</div><div class="v mono">${Number(evidence.critical_count || 0)}</div></div>
-    </div><div class="workbench-list">${gapRows || '<div class="summary">No open evidence gaps.</div>'}</div>`;
-  const cohortRows = (method.validation_cohort || []).map(row => `<tr><td><strong>${escapeHtml(row.ticker || '—')}</strong></td><td>${escapeHtml(String(row.archetype || '').replace(/_/g, ' '))}</td><td>${escapeHtml(row.purpose || '')}</td><td>${workbenchStatusBadge(row.status)}</td></tr>`).join('');
-  const methodPage = `
-    <div class="metric-grid metric-grid-3">
-      <div class="metric"><div class="k">Primary power zone</div><div class="v">${escapeHtml(method.label || 'Unclassified')}</div></div>
-      <div class="metric"><div class="k">Primary methods</div><div class="v" style="font-size:11px">${(method.primary_personas || []).map(x => escapeHtml(String(x).replace(/_/g, ' '))).join(' &middot; ') || '—'}</div></div>
-      <div class="metric"><div class="k">Cross-check methods</div><div class="v" style="font-size:11px">${(method.cross_check_personas || []).map(x => escapeHtml(String(x).replace(/_/g, ' '))).join(' &middot; ') || '—'}</div></div>
-    </div>
-    <div class="workbench-callout">${escapeHtml(method.rule || '')}</div>
-    <div class="workbench-item" style="margin-top:10px"><div class="workbench-item-title">Applicability tests</div><ol class="workbench-checks">${(method.applicability_tests || []).map(x => `<li>${escapeHtml(x)}</li>`).join('')}</ol></div>
-    <div class="workbench-item" style="margin-top:8px"><div class="workbench-item-title">Known failure modes</div><ul class="workbench-checks">${(method.failure_modes || []).map(x => `<li>${escapeHtml(x)}</li>`).join('')}</ul></div>
-    ${cohortRows ? `<h4 style="margin:13px 0 0">Cross-archetype validation queue</h4><table class="workbench-table"><thead><tr><th>Ticker</th><th>Archetype</th><th>What it tests</th><th>Status</th></tr></thead><tbody>${cohortRows}</tbody></table>` : ''}`;
-  const outcomeRows = (outcomes.schedule || []).map(slot => `<tr><td>${Number(slot.horizon_months || 0)} months</td><td class="mono">${escapeHtml(slot.target_date || 'starts after owner decision')}</td><td>${workbenchStatusBadge(slot.status)}</td><td class="mono">${slot.total_return_pct == null ? '—' : fmtPct(slot.total_return_pct)}</td></tr>`).join('');
-  const outcomesPage = `
-    <div class="metric-grid metric-grid-3">
-      <div class="metric"><div class="k">Tracking state</div><div class="v">${workbenchStatusBadge(outcomes.status)}</div></div>
-      <div class="metric"><div class="k">Recorded outcomes</div><div class="v mono">${Number(outcomes.recorded_outcome_count || 0)}</div></div>
-      <div class="metric"><div class="k">Reweighting threshold</div><div class="v mono">${Number(outcomes.minimum_persona_outcomes_before_reweighting || 20)} / persona</div></div>
-    </div>
-    <table class="workbench-table"><thead><tr><th>Horizon</th><th>Target</th><th>Status</th><th>Total return</th></tr></thead><tbody>${outcomeRows}</tbody></table>
-    <div class="workbench-callout">${escapeHtml(outcomes.weighting_rule || '')}</div>`;
-  const attributionDrivers = (attribution.drivers || []).slice(0, 10).map(row => `<tr><td><strong>${escapeHtml(row.label || row.component_id)}</strong></td><td class="mono">${fmtSignedDollar(row.change_per_share)}</td><td>${(row.causes || []).map(x => escapeHtml(String(x).replace(/_/g, ' '))).join(' &middot; ')}</td></tr>`).join('');
-  const categoryRows = Object.entries(attribution.category_totals_per_share || {}).map(([key, value]) => `<div class="metric"><div class="k">${escapeHtml(key.replace(/_/g, ' '))}</div><div class="v mono">${fmtSignedDollar(value)}</div></div>`).join('');
-  const attributionPage = attribution.status === 'baseline_established' ? `
-    <div class="metric-grid metric-grid-3"><div class="metric"><div class="k">Current baseline</div><div class="v mono">$${fmtNum(attribution.current?.base)}</div></div><div class="metric"><div class="k">As of</div><div class="v mono">${escapeHtml(attribution.current?.as_of || '—')}</div></div><div class="metric"><div class="k">Attribution</div><div class="v">${workbenchStatusBadge(attribution.status)}</div></div></div>
-    <div class="workbench-callout">${escapeHtml(attribution.explanation || '')}</div>` : `
-    <div class="metric-grid metric-grid-3"><div class="metric"><div class="k">Prior base</div><div class="v mono">$${fmtNum(attribution.prior?.base)}</div><div class="tier-sub">${escapeHtml(attribution.prior?.as_of || '—')}</div></div><div class="metric"><div class="k">Current base</div><div class="v mono">$${fmtNum(attribution.current?.base)}</div><div class="tier-sub">${escapeHtml(attribution.current?.as_of || '—')}</div></div><div class="metric"><div class="k">Base change</div><div class="v mono">${fmtSignedDollar(attribution.base_change_per_share)}</div><div class="tier-sub">${fmtPct(attribution.base_change_pct)}</div></div></div>
-    ${categoryRows ? `<div class="metric-grid" style="margin-top:9px">${categoryRows}</div>` : ''}
-    ${attributionDrivers ? `<table class="workbench-table"><thead><tr><th>Component</th><th>Change / share</th><th>Observed cause</th></tr></thead><tbody>${attributionDrivers}</tbody></table>` : ''}
-    <div class="tier-sub" style="margin-top:8px">Unexplained reconciliation: ${fmtSignedDollar(attribution.unexplained_per_share)} &middot; ${escapeHtml(attribution.explanation || '')}</div>`;
-  return `<div class="detail-section valuation-workbench">
-    <div class="workbench-head"><div><h3>Valuation workbench ${workbenchStatusBadge(committee.status)}</h3><div class="tier-sub">One review surface for decisions, evidence, method fit, measured outcomes, and valuation changes &middot; ${escapeHtml(wb.as_of || '—')}</div></div>${wb.github_url ? `<a class="research-link" href="${wb.github_url}" target="_blank" rel="noopener">Audit file &rarr;</a>` : ''}</div>
-    <div class="workbench-tabs" role="tablist">${[['decision','Decision'],['business','Business'],['valuation','Valuation'],['optionality','Optionality'],['evidence','Evidence'],['method','Method fit'],['committee','Committee'],['outcomes','Outcomes'],['attribution','Value changes']].map(([id,label], index) => `<button type="button" class="workbench-tab ${index === 0 ? 'active' : ''}" data-workbench-tab="${id}">${label}</button>`).join('')}</div>
-    <div class="workbench-page active" data-workbench-page="decision">${decisionPage}</div>
-    <div class="workbench-page" data-workbench-page="business">${businessPage}</div>
-    <div class="workbench-page" data-workbench-page="valuation">${valuationPage}</div>
-    <div class="workbench-page" data-workbench-page="optionality">${optionalityPage}</div>
-    <div class="workbench-page" data-workbench-page="committee">${committeePage}</div>
-    <div class="workbench-page" data-workbench-page="evidence">${evidencePage}</div>
-    <div class="workbench-page" data-workbench-page="method">${methodPage}</div>
-    <div class="workbench-page" data-workbench-page="outcomes">${outcomesPage}</div>
-    <div class="workbench-page" data-workbench-page="attribution">${attributionPage}</div>
-  </div>`;
+  if (window.ValuationViz) return ValuationViz.renderValuationWorkbench(t, valuationHelpers());
+  return '';
 }
 
 function renderInvestmentCommittee(t) {
@@ -1354,7 +1288,7 @@ function renderPricingAnalysis(t) {
   const badgeClass = String(p.decision || '').startsWith('reject') ? 'badge-bad' : 'badge-warn';
   return `
     <div class="detail-section component-value-card">
-      <h3>Pricing decision <span class="badge ${badgeClass}">${escapeHtml(decision)}</span></h3>
+      <h3>Pricing cross-check <span class="badge badge-us">not the economic schedule</span> <span class="badge ${badgeClass}">${escapeHtml(decision)}</span></h3>
       <div class="metric-grid metric-grid-3">
         <div class="metric"><div class="k">Current price</div><div class="v mono">$${fmtNum(p.price)}</div></div>
         <div class="metric"><div class="k">Base component value</div><div class="v mono">$${fmtNum(values.base)}</div><div class="tier-sub">${fmtPct(p.upside_downside_pct?.base)} vs price</div></div>
@@ -1530,6 +1464,7 @@ async function load() {
     `Updated ${data.generated_at.replace('T', ' ').replace('Z', ' UTC')} · ${data.summary.ticker_count} tickers`;
   renderMarketFilters();
   renderSleeveFilters();
+  renderValuationFilters();
   renderSummary();
   renderWatchlist();
   renderWatchlistTab();
@@ -1556,10 +1491,35 @@ function setView(view, opts = {}) {
   document.getElementById('insights-panel').classList.toggle('active', view === 'insights');
   document.getElementById('activist-panel').classList.toggle('active', view === 'activist');
   document.getElementById('watchlist-panel').classList.toggle('active', view === 'watchlist');
-  document.getElementById('summary').style.display = view === 'holdings' ? '' : 'none';
+  const valuationPanel = document.getElementById('valuation-panel');
+  if (valuationPanel) valuationPanel.classList.toggle('active', view === 'valuation');
+  document.getElementById('summary').style.display = (view === 'holdings' || view === 'valuation') ? '' : 'none';
   document.getElementById('watchlist-wrap').style.display =
     view === 'holdings' && (data.watchlist || []).length ? 'block' : 'none';
+  if (view === 'valuation') renderValuationQueue();
   if (opts.syncHash !== false) syncRouteHash();
+}
+
+function renderValuationQueue() {
+  const loading = document.getElementById('valuation-loading');
+  const content = document.getElementById('valuation-content');
+  if (!loading || !content) return;
+  if (!window.ValuationViz) {
+    loading.textContent = 'ValuationViz not loaded.';
+    content.style.display = 'none';
+    return;
+  }
+  loading.style.display = 'none';
+  content.style.display = 'block';
+  content.innerHTML = ValuationViz.renderQueuePanel(data.valuation_queue, valuationHelpers());
+  content.querySelectorAll('[data-valuation-queue-ticker]').forEach((row) => {
+    row.addEventListener('click', () => {
+      const ticker = row.dataset.valuationQueueTicker;
+      valuationOpenEvidenceTab = true;
+      setView('holdings', { syncHash: false });
+      selectTicker(ticker);
+    });
+  });
 }
 
 function renderActivist() {
@@ -2499,6 +2459,13 @@ function renderSummary() {
   if (s.equity_models_ready > 0) {
     cards.push({ label: 'Equity models', value: s.equity_models_ready, sub: 'click ticker to view' });
   }
+  if (s.valuation_queue_tickers != null) {
+    cards.push({
+      label: 'Valuation queue',
+      value: s.valuation_queue_tickers,
+      sub: `${s.valuation_evidence_blocked || 0} blocked · ${s.valuation_critical_gaps || 0} critical gaps`,
+    });
+  }
   const catalog = data.document_catalog?.summary;
   if (catalog) {
     cards.push({
@@ -2528,6 +2495,7 @@ function filtered() {
       }
     }
     if (needsWork && t.completeness >= 80 && !t.essential_insights?.needs_work) return false;
+    if (window.ValuationViz && !ValuationViz.matchesValuationFilter(t, valuationFilter)) return false;
     if (q) {
       const e = t.essential_insights || {};
       const haystack = [
@@ -2582,9 +2550,22 @@ function filtered() {
     } else if (sortKey === 'essential_insights.source_mix') {
       av = (a.essential_insights?.source_mix || []).join(',');
       bv = (b.essential_insights?.source_mix || []).join(',');
-    } else if (sortKey === 'essential_insights.needs_work') {
+    } else     if (sortKey === 'essential_insights.needs_work') {
       av = a.essential_insights?.needs_work ? 1 : 0;
       bv = b.essential_insights?.needs_work ? 1 : 0;
+    } else if (sortKey === 'component_valuation.status' || sortKey === 'valuation_decision.status') {
+      av = a.valuation_decision?.status || '';
+      bv = b.valuation_decision?.status || '';
+    } else if (sortKey === 'component_valuation.total_equity_value_per_share.base') {
+      av = a.valuation_decision?.value_per_share?.base ?? a.component_valuation?.total_equity_value_per_share?.base;
+      bv = b.valuation_decision?.value_per_share?.base ?? b.component_valuation?.total_equity_value_per_share?.base;
+      av = av == null ? -Infinity : av;
+      bv = bv == null ? -Infinity : bv;
+    } else if (sortKey === 'component_valuation.upside_downside_pct.base') {
+      av = a.valuation_decision?.upside_downside_pct?.base ?? a.component_valuation?.upside_downside_pct?.base;
+      bv = b.valuation_decision?.upside_downside_pct?.base ?? b.component_valuation?.upside_downside_pct?.base;
+      av = av == null ? -Infinity : av;
+      bv = bv == null ? -Infinity : bv;
     } else {
       if (typeof av === 'string') av = av.toLowerCase();
       if (typeof bv === 'string') bv = bv.toLowerCase();
@@ -2663,6 +2644,11 @@ function wireDetailEvents(ticker) {
       detail.querySelectorAll('[data-workbench-page]').forEach(x => x.classList.toggle('active', x.dataset.workbenchPage === page));
     });
   });
+  if (valuationOpenEvidenceTab) {
+    valuationOpenEvidenceTab = false;
+    const evidenceBtn = detail.querySelector('[data-workbench-tab="evidence"]');
+    if (evidenceBtn) evidenceBtn.click();
+  }
 }
 
 function selectTicker(ticker, opts = {}) {
@@ -2754,17 +2740,20 @@ function selectTicker(ticker, opts = {}) {
       <div class="metric-grid metric-grid-3">
         <div class="metric"><div class="k">Stance</div><div class="v"><span class="badge ${STANCE_BADGE[t.classification?.stance] || 'badge-warn'}">${t.classification?.stance || '—'}</span></div></div>
         <div class="metric"><div class="k">Valuation status</div><div class="v">${renderValuationStatusCell(t)}</div></div>
-        <div class="metric"><div class="k">As of</div><div class="v mono">${escapeHtml(t.classification?.analysis_as_of || '—')}</div></div>
+        <div class="metric"><div class="k">As of</div><div class="v mono">${escapeHtml(t.valuation_workbench?.as_of || t.classification?.analysis_as_of || '—')}</div></div>
       </div>
     </div>`}
 
     ${tier1}
 
-    ${renderPricingAnalysis(t)}
+    ${window.ValuationViz ? ValuationViz.renderDecisionStrip(t, valuationHelpers()) : ''}
 
     ${renderValuationWorkbench(t)}
 
-    ${renderComponentValuation(t)}
+    ${renderPricingAnalysis(t)}
+
+    ${window.ValuationViz ? ValuationViz.renderLegacyComponentNote(t, escapeHtml) : ''}
+    ${t.valuation_workbench ? '' : renderComponentValuation(t)}
 
     ${tier2}
 
@@ -2852,7 +2841,7 @@ function renderMarketFilters() {
   if (!group || !data) return;
   const filters = data.summary.market_filters || DEFAULT_MARKET_FILTERS;
   group.innerHTML = filters.map(m => {
-    const active = marketFilter === m && !needsWork && sleeveFilter === 'ALL' ? ' active' : '';
+    const active = marketFilter === m && !needsWork && sleeveFilter === 'ALL' && valuationFilter === 'ALL' ? ' active' : '';
     return `<button type="button" class="filter-btn${active}" data-market="${m}">${m === 'ALL' ? 'All' : m}</button>`;
   }).join('');
 }
@@ -2866,9 +2855,26 @@ function renderSleeveFilters() {
     return;
   }
   group.innerHTML = filters.map(s => {
-    const active = sleeveFilter === s.id && !needsWork ? ' active' : '';
+    const active = sleeveFilter === s.id && !needsWork && valuationFilter === 'ALL' ? ' active' : '';
     const count = s.count != null ? ` (${s.count})` : '';
     return `<button type="button" class="filter-btn${active}" data-sleeve="${s.id}">${escapeHtml(s.label)}${count}</button>`;
+  }).join('');
+}
+
+function renderValuationFilters() {
+  const group = document.getElementById('valuation-filter-group');
+  if (!group || !data) return;
+  const filters = [
+    { id: 'ALL', label: 'All vals' },
+    { id: 'evidence-blocked', label: 'Evidence blocked' },
+    { id: 'cohort', label: 'Cohort' },
+    { id: 'phase2', label: 'Phase 2' },
+    { id: 'provisional', label: 'Provisional' },
+    { id: 'decision-grade', label: 'Decision-grade' },
+  ];
+  group.innerHTML = filters.map((f) => {
+    const active = valuationFilter === f.id && !needsWork ? ' active' : '';
+    return `<button type="button" class="filter-btn${active}" data-valuation-filter="${f.id}">${escapeHtml(f.label)}</button>`;
   }).join('');
 }
 
@@ -2878,18 +2884,30 @@ function onFilterClick(btn) {
   if (btn.dataset.market) {
     marketFilter = btn.dataset.market;
     sleeveFilter = 'ALL';
+    valuationFilter = 'ALL';
     needsWork = false;
   }
   if (btn.dataset.sleeve) {
     sleeveFilter = btn.dataset.sleeve;
     marketFilter = 'ALL';
+    valuationFilter = 'ALL';
+    needsWork = false;
+  }
+  if (btn.dataset.valuationFilter) {
+    valuationFilter = btn.dataset.valuationFilter;
+    marketFilter = 'ALL';
+    sleeveFilter = 'ALL';
     needsWork = false;
   }
   if (btn.dataset.filter === 'needs-work') {
     needsWork = true;
     marketFilter = 'ALL';
     sleeveFilter = 'ALL';
+    valuationFilter = 'ALL';
   }
+  renderMarketFilters();
+  renderSleeveFilters();
+  renderValuationFilters();
   renderTable();
 }
 
