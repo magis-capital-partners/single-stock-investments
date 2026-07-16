@@ -1,0 +1,148 @@
+{
+  "schema_version": "1.0",
+  "ticker": "STHO",
+  "as_of": "2026-07-16",
+  "purpose": "Primary-source retrieval for STHO critical blockers; correct cash/debt NAV error; split Magnolia/Asbury residual.",
+  "method_profile": "catalyst_asset_value",
+  "primary_sources": [
+    {
+      "title": "Q1 2026 Form 10-Q",
+      "path": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+      "period": "2026-03-31"
+    },
+    {
+      "title": "FY2025 Form 10-K",
+      "path": "STHO/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001953366_26_000003.htm",
+      "period": "2025-12-31"
+    },
+    {
+      "title": "Asbury deconsolidation 8-K Ex-99.1",
+      "path": "STHO/investor-documents/sec-edgar/8-K_20260401_exhibit_stho-20260327xex99d1.htm_acc0001953366_26_000006.htm",
+      "period": "2026-03-27"
+    },
+    {
+      "title": "Yahoo SAFE close",
+      "path": "market",
+      "period": "2026-07-16",
+      "price": 16.93
+    }
+  ],
+  "arithmetic_corrections": [
+    {
+      "item": "cash_net_debt_per_share",
+      "prior_incorrect": -1.19,
+      "corrected_q1": -12.0,
+      "math": "(62059000 - 207001000) / 12081333"
+    }
+  ],
+  "resolved_facts": [
+    "Implied SAFE shares 13,525,499 from $183.0M / $13.53.",
+    "Current SAFE mark $16.93 \u2192 $229.0M = $18.95/STHO share.",
+    "Margin Loan $92.8M SOFR+3.50% pledged by Safe Shares; Safe Credit $115M @ 8%; debt net $207.0M.",
+    "MD&A monetizing portfolio $71.4M; residual Magnolia/Asbury carrying $153.6M.",
+    "Management fee schedule $25/$15/$10/$7.5M then 2% GBV ex-SAFE; termination overhang ~$5M before 2027-03-31.",
+    "DTA valuation allowance to zero; 2025 cash taxes $0.2M."
+  ],
+  "gap_assessments": [
+    {
+      "gap_id": "safe_stake_mark_and_margin_loan",
+      "status": "partially_met",
+      "reconciliation": "Gross mark and debt stack reproduced from Note 7/9 plus current SAFE price. Exact share count and numeric LTV triggers still open.",
+      "calculation": {
+        "implied_safe_shares": 13525499,
+        "gross_mark_now_m": 229.0,
+        "gross_mark_now_per_share": 18.95,
+        "margin_loan_m": 92.777,
+        "safe_credit_m": 115.0,
+        "debt_net_per_share": -17.13,
+        "safe_net_of_margin_only_per_share": 11.27
+      },
+      "remaining_uncertainty": "Integer share count; LTV trigger percentages; make-whole.",
+      "affected_components": [
+        "safehold_equity_stake",
+        "senior_debt"
+      ],
+      "valuation_consequence": "SAFE base marked near current market; senior debt corrected from -1.19 to about -17.1.",
+      "falsifier": "Collateral/forced-sale path nets below low SAFE component.",
+      "monitoring_source": "SAFE market price; STHO 10-Q Note 7/9."
+    },
+    {
+      "gap_id": "legacy_asset_sale_schedule",
+      "status": "partially_met",
+      "reconciliation": "MD&A monetizing schedule and Magnolia/Asbury residual carrying rebuilt from 10-Q/10-K/8-K. No primary bid sheet.",
+      "calculation": {
+        "monetizing_m": 71.4,
+        "monetizing_per_share": 5.91,
+        "residual_dev_ops_m": 153.6,
+        "residual_dev_ops_per_share": 12.72
+      },
+      "remaining_uncertainty": "Asset-level sale prices and timing for Magnolia lots and Asbury residual ops/sites.",
+      "affected_components": [
+        "legacy_monetizing_portfolio",
+        "magnolia_asbury_development_ops",
+        "zero_carry_and_entitlement_option"
+      ],
+      "valuation_consequence": "Split monetizing vs Magnolia/Asbury residual so ~$12.7/sh carrying is no longer hidden.",
+      "falsifier": "Sales clear below low-case recovery after costs.",
+      "monitoring_source": "8-K asset sales; 10-Q Notes 4\u20136; Magnolia lot closings."
+    },
+    {
+      "gap_id": "fee_tax_and_related_party_waterfall",
+      "status": "partially_met",
+      "reconciliation": "Contractual fee schedule, termination formula, and DTA/cash-tax facts retrieved. Multi-year 2% GBV path and sale-tax friction remain estimates.",
+      "calculation": {
+        "current_annual_fee_m": 7.5,
+        "q1_2026_fee_m": 2.5,
+        "termination_overhang_approx_m": 5.0,
+        "illustrative_5y_fee_sum_per_share": 1.63
+      },
+      "remaining_uncertainty": "GBV fee base after year four; gain tax on sales; whether termination path is used.",
+      "affected_components": [
+        "wind_down_fee_and_friction_reserve"
+      ],
+      "valuation_consequence": "Fee reserve anchored to $7.5M then 2% GBV path (~$1\u20132.5/sh).",
+      "falsifier": "Fee/tax leakage exceeds $2.50/sh PV.",
+      "monitoring_source": "Note 1 Management Agreement; tax note; fee line in 10-Q."
+    }
+  ],
+  "acceptance_summary": {
+    "safe_stake_mark_and_margin_loan": "partially_met",
+    "legacy_asset_sale_schedule": "partially_met",
+    "fee_tax_and_related_party_waterfall": "partially_met"
+  },
+  "committee_conclusion": "Human thesis points evaluated: $25 SAFE deal mark is a real spin-day cross-check; duration/rate sensitivity supports high case only; land sales above COS support milder RE haircuts; manager contestability is a 2027-03-31 cliff (RFP prep in H2 2026). Still evidence-blocked.",
+  "thesis_evaluation": {
+    "safe_deal_mark": {
+      "status": "fact_plus_judgment",
+      "deal_safe_price": 25.0,
+      "deal_safe_close_yahoo_2023_03_31": 25.8,
+      "implied_stho_per_share_at_25": 27.99,
+      "current_safe": 16.93,
+      "current_stho_per_share": 18.95,
+      "discount_to_deal_pct": 32.3,
+      "note": "High SAFE component uses ~$25 path; not a put. Rate-driven."
+    },
+    "ground_lease_duration": {
+      "status": "inference",
+      "evidence": "SAFE IR: ~99-year typical leases; ~91\u201392 year W.A. extended term. Long-duration equity mark."
+    },
+    "real_estate_book_understatement": {
+      "status": "partially_supported",
+      "land_sale_gross_profit_m": {
+        "2025": 17.6,
+        "2024": 11.3,
+        "2023": 9.7,
+        "q1_2026": 1.7
+      },
+      "accum_depreciation_q1_m": 39.3,
+      "operating_re_sales_evidence": "none_in_2025_or_2023"
+    },
+    "management_contestability": {
+      "status": "fact_plus_judgment",
+      "termination_fee_window_ends": "2027-03-31",
+      "notice_days": 180,
+      "vote": "two_thirds_independent_trustees",
+      "practical_rfp_window": "H2 2026 for post-2027-03-31 effective date"
+    }
+  }
+}

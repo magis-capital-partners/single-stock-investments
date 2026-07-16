@@ -1,0 +1,1687 @@
+{
+  "ticker": "STHO",
+  "as_of": "2026-07-16",
+  "valuation_mode": "economic_value",
+  "method": "pending",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "holding_co",
+    "moat": "n/a",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "event"
+  },
+  "inputs": {
+    "price": 9.2392,
+    "price_source": "Yahoo STHO close 2026-07-16",
+    "book_per_share": 19.88,
+    "book_per_share_filed": 19.88,
+    "shares_outstanding": 12081333,
+    "shares_source": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm (May 6, 2026)",
+    "equity_m": 240.153,
+    "normalization_note": "Q1 2026 stockholders' equity $240.2M; wind-down legacy iStar assets + ~13.5M Safehold shares; not normalized operating FCF.",
+    "price_as_of": "2026-07-16"
+  },
+  "optionality_gate": {
+    "framework": "holdco_sotp",
+    "floor_pass": true,
+    "floor_metric": "book_per_share",
+    "floor_value": 19.88,
+    "primary_metric": "lawrence_base",
+    "primary_label": "pending",
+    "primary_return_pct": null,
+    "incumbent_sleeve": false,
+    "notes": "Price ~57% below Q1 2026 book; asset-sale and repurchase path; margin loan on SAFE stake caps downside vs zero but adds complexity.",
+    "discount_to_book_pct": 57.0
+  },
+  "approved_stance": "watch",
+  "nav_overlay": {
+    "status": "complete",
+    "as_of": "2026-03-31",
+    "source": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+    "lines": [
+      {
+        "id": "safe_stake",
+        "label": "Safehold Inc. stake (~13.5M shares)",
+        "fair_value_m": 183.0,
+        "per_share": 15.15,
+        "option_treatment": "milestone_nav",
+        "evidence": "Fair value $183.0M at SAFE $13.53 (3/31/2026); collateral for margin loan"
+      },
+      {
+        "id": "legacy_portfolio",
+        "label": "Monetizing legacy loans, properties, land",
+        "carrying_value_m": 71.5,
+        "per_share": 5.92,
+        "option_treatment": "probability_weighted",
+        "evidence": "Aggregate carrying value ~$71.5M; includes zero-carry assets per 10-Q"
+      },
+      {
+        "id": "cash_net_debt",
+        "label": "Cash and restricted cash less long-term debt",
+        "net_m": -139.8,
+        "per_share": -1.19,
+        "option_treatment": "nav_floor",
+        "evidence": "Cash+restricted $67.2M less margin/Safe credit debt $207.0M (Q1 2026)"
+      }
+    ],
+    "sum_per_share": 19.88,
+    "price_discount_pct": 57.0
+  },
+  "scenarios": {
+    "bear": {
+      "price": 9.2392,
+      "payoff": 10.0,
+      "years": 5,
+      "notes": "Slow legacy sales; SAFE mark compression; buybacks stall"
+    },
+    "base": {
+      "price": 9.2392,
+      "payoff": 15.0,
+      "years": 5,
+      "notes": "~75% of Q1 book realized via asset sales, SAFE dividends, and repurchases",
+      "sotp_build": {
+        "shares": 12081333,
+        "shares_source": "10-Q 2026-05-08",
+        "book_equity_m": 240.153,
+        "book_per_share": 19.88,
+        "lines": [
+          {
+            "id": "book",
+            "label": "Q1 2026 GAAP equity (anchor)",
+            "gaap_per_share": 19.88,
+            "uplift_per_share": 0.0,
+            "math": "$240.153M / 12.081M shares"
+          },
+          {
+            "id": "safe_stake",
+            "label": "Safehold stake mark",
+            "gaap_per_share": 15.15,
+            "uplift_per_share": 0.0,
+            "math": "Fair value $183M in nav_overlay"
+          },
+          {
+            "id": "legacy_portfolio",
+            "label": "Legacy monetizing portfolio",
+            "gaap_per_share": 5.92,
+            "uplift_per_share": 0.0,
+            "math": "Carrying value $71.5M per 10-Q"
+          },
+          {
+            "id": "cash_net_debt",
+            "label": "Cash less long-term debt",
+            "gaap_per_share": -1.19,
+            "uplift_per_share": 0.0,
+            "math": "Net $67.2M cash vs $207M debt"
+          },
+          {
+            "id": "realization_haircut",
+            "label": "Wind-down realization haircut",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": -4.88,
+            "math": "Base assumes 75% of book ($15/sh) not full $19.88"
+          }
+        ],
+        "year5_economic_nav_per_share": 15.0,
+        "years": 5,
+        "notes": "Yield-curve base; not Lawrence 10yr FCF"
+      }
+    },
+    "bull": {
+      "price": 9.2392,
+      "payoff": 20.0,
+      "years": 4,
+      "notes": "Near-full NAV monetization; accelerated repurchases"
+    }
+  },
+  "results": {},
+  "implied_return": {
+    "base_pct": null,
+    "label": "pending",
+    "display": "pending"
+  },
+  "stance_proposal": {
+    "suggested": "pending",
+    "irr_band": "pending",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": "Externally managed by Safehold affiliate; wind-down timing uncertain despite book discount",
+    "approved_stance": "watch"
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "partial",
+      "treatment": "nav_floor",
+      "evidence": "Some legacy assets at zero carrying value; SAFE marked to market"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / acreage / dormant royalty?",
+      "answer": "yes",
+      "treatment": "probability_weighted",
+      "evidence": "Magnolia Green ~1,900 acres entitled; Asbury Park waterfront venture deconsolidated 3/27/2026"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "no",
+      "treatment": "zero",
+      "evidence": "Single wind-down segment; Q1 net loss driven by SAFE mark and operating costs"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / RPO not in FCF path?",
+      "answer": "no",
+      "treatment": "embedded_in_segment",
+      "evidence": "n/a \u2014 asset monetization vehicle"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "yes",
+      "treatment": "milestone_nav",
+      "evidence": "13.5M SAFE shares $183M fair value; margin loan limits sale timing"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "no",
+      "treatment": "yield_curve",
+      "evidence": "Capital return via repurchases, not recurring distributions"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "no",
+      "treatment": "zero",
+      "evidence": "Revenue from leases, loan interest, SAFE dividends"
+    }
+  ],
+  "estimates": {
+    "external": []
+  },
+  "human_review": {
+    "live_price_confirmed": false
+  },
+  "catalyst_paths": [
+    {
+      "event": "Base catalyst path",
+      "timing": "5 years",
+      "impact": "~75% of Q1 book realized via asset sales, SAFE dividends, and repurchases"
+    },
+    {
+      "event": "Failure mode",
+      "timing": "bear scenario",
+      "impact": "Slow legacy sales; SAFE mark compression; buybacks stall"
+    }
+  ],
+  "total_return_panel": {
+    "schema_version": "3.0",
+    "ticker": "STHO",
+    "as_of": "2026-07-15",
+    "status": "partial",
+    "error": "Vendor events are discovery evidence; primary-source completeness has not been established.",
+    "price_source": "yahoo:STHO",
+    "currency": "USD",
+    "return_currency": "USD",
+    "fx_basis": "listing_currency_nominal",
+    "history_start": "2023-03-28",
+    "history_end": "2026-07-15",
+    "price_points": 827,
+    "price_interval": "1d",
+    "history_basis": "earliest_available_vendor_trading_history",
+    "chart_scale": "logarithmic",
+    "chart_y_axis": "cumulative_return_pct",
+    "chart_series": [
+      "total_return",
+      "price_only"
+    ],
+    "return_contract": "split-adjusted close excluding dividends; event amounts normalized for later splits; cash reinvested at ex-date close; pre-tax nominal",
+    "coverage": {
+      "status": "vendor_only",
+      "start": null,
+      "end": null,
+      "note": "Vendor events are discovery evidence; primary-source completeness has not been established.",
+      "ledger_path": null
+    },
+    "event_count": 0,
+    "event_counts": {},
+    "cash_distributions_on_initial_share_path": 0,
+    "distribution_contribution_by_type": {},
+    "cumulative_distributions_per_share": 0,
+    "start_price": 20.0,
+    "end_price": 9.18,
+    "price_index_end": 45.9,
+    "total_return_index_end": 45.9,
+    "cumulative_price_return_pct": -54.1,
+    "cumulative_total_return_pct": -54.1,
+    "price_only_annualized_pct": -21.02,
+    "total_return_annualized_pct": -21.02,
+    "market_cap_m": 110.54,
+    "shares_outstanding": 12081333,
+    "price_for_market_cap": 9.15,
+    "chart": "STHO/research/charts/total_return_2026-07-15.svg",
+    "panel_json": "STHO/research/total_return_panel.json"
+  },
+  "results_lawrence_legacy": {},
+  "overlay_results": [],
+  "context_overlay": {
+    "as_of": "2026-07-09",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": 0.51,
+            "as_of": "2026-07-09",
+            "yoy_pct": 194.4,
+            "direction": "up",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.536999702453613,
+            "as_of": "2026-07-09",
+            "yoy_pct": 4.5,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.269000053405762,
+            "as_of": "2026-07-09",
+            "yoy_pct": 8.9,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 100.91400146484375,
+            "as_of": "2026-07-09",
+            "yoy_pct": 3.5,
+            "direction": "up",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 16.059999465942383,
+            "as_of": "2026-07-09",
+            "yoy_pct": 0.8,
+            "direction": "flat",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": 0.33,
+            "as_of": "2026-07-09",
+            "yoy_pct": 147.1,
+            "direction": "up",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 15.46,
+            "as_of": "2026-07-09",
+            "yoy_pct": 47.4,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "lens_consensus": {
+    "as_of": "2026-06-12",
+    "shared_inputs_ref": "valuation.json@2026-06-12",
+    "valuation_richness": 0.207,
+    "blended_return_pct": 8.8,
+    "band_pct": [
+      3.2,
+      11.9
+    ],
+    "weighted_median_pct": 11.9,
+    "median_mean_flag": true,
+    "stance": "watch",
+    "agreement_pct": 89,
+    "dissent_count": 1,
+    "lawrence_divergence": false,
+    "top_dissents": [
+      {
+        "persona": "stahl",
+        "label": "Murray Stahl",
+        "verdict": "hold",
+        "return_pct": 11.9,
+        "key_metric": "archetype=holding_co",
+        "conviction": 0.095,
+        "falsifier": "No asset intensity / pricing power (moat eroding + non-croupier)"
+      }
+    ],
+    "contributor_count": 7,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
+  },
+  "method_profile": "catalyst_asset_value",
+  "valuation_methodology": {
+    "mode": "component_economic_value",
+    "horizon_years": 5,
+    "decision_rule": "Use one complete component schedule; preserve the range and evidence block until every material assumption is reconciled."
+  },
+  "component_valuation": {
+    "schema_version": "1.0",
+    "all_material_components_identified": true,
+    "coverage_statement": "Every currently identified material ownership claim, liability, and option is valued once. Unknown claims remain an evidence blocker, not an unvalued line item.",
+    "components": [
+      {
+        "id": "safehold_equity_stake",
+        "label": "Safehold Inc. equity stake (~13.5M shares)",
+        "category": "financial_asset",
+        "overlap_key": "safehold_equity_stake",
+        "treatment": "additive",
+        "valuation": {
+          "method": "marked_equity_nav",
+          "basis": "per_share",
+          "low": 11.0,
+          "base": 14.0,
+          "high": 17.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "Q1 2026 10-Q: Safehold stake fair value $183.0M at SAFE $13.53 (3/31/2026), or ~$15.15/share of STHO before realization haircuts. Stake collateralizes margin loan. STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+          "assumption_summary": "Low/base/high vary SAFE mark and forced-sale / margin-loan friction; base discounts the 3/31 mark for realization friction.",
+          "cross_check": "Range must be reconciled to primary filings, mark-to-market updates, and realization evidence before IC approval.",
+          "falsifier": "SAFE mark falls such that collateral call or sale proceeds net of debt are below the low case."
+        }
+      },
+      {
+        "id": "legacy_monetizing_portfolio",
+        "label": "Legacy loans, operating properties, and land",
+        "category": "financial_asset",
+        "overlap_key": "legacy_monetizing_portfolio",
+        "treatment": "additive",
+        "valuation": {
+          "method": "probability_weighted_asset_nav",
+          "basis": "per_share",
+          "low": 2.5,
+          "base": 3.5,
+          "high": 5.0,
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Q1 2026 10-Q aggregate carrying value ~$71.5M (~$5.92/share) for monetizing legacy portfolio; includes zero-carry assets. Asbury Park seller-financed venture deconsolidated 3/27/2026.",
+          "assumption_summary": "Low/base/high change sale timing, buyer discounts, and zero-carry recovery\u2014not a single multiple on book.",
+          "cross_check": "Range must be reconciled to primary filings, mark-to-market updates, and realization evidence before IC approval.",
+          "falsifier": "Legacy sales clear at proceeds implying value below the low case after fees and taxes."
+        }
+      },
+      {
+        "id": "cash_less_margin_debt",
+        "label": "Cash and restricted cash less long-term debt",
+        "category": "liability_or_reserve",
+        "overlap_key": "cash_less_margin_debt",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_debt",
+          "basis": "per_share",
+          "low": -2.5,
+          "base": -1.5,
+          "high": -1.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "Q1 2026: cash+restricted $67.2M less margin/Safe credit debt $207.0M (~-$1.19/share at filing). Range reflects operating liquidity and debt-paydown path.",
+          "assumption_summary": "Deduct senior debt claims net of cash; cases vary required liquidity and repayment pace.",
+          "cross_check": "Range must be reconciled to primary filings, mark-to-market updates, and realization evidence before IC approval.",
+          "falsifier": "Net debt after required liquidity exceeds the low-case deduction."
+        }
+      },
+      {
+        "id": "wind_down_fee_and_friction_reserve",
+        "label": "Wind-down fees, tax, and realization friction",
+        "category": "liability_or_reserve",
+        "overlap_key": "wind_down_fee_and_friction_reserve",
+        "treatment": "additive",
+        "valuation": {
+          "method": "realization_reserve",
+          "basis": "per_share",
+          "low": -1.5,
+          "base": -1.0,
+          "high": -0.5,
+          "evidence_tier": "analyst_estimate",
+          "evidence": "External management by Safehold affiliate (~$2.5M Q1 fee noted in deep dive); buybacks and asset sales incur friction. Provisional reserve pending fee-schedule and tax bridge.",
+          "assumption_summary": "Explicit deduction for management fees, transaction costs, and tax leakage during monetization.",
+          "cross_check": "Range must be reconciled to primary filings, mark-to-market updates, and realization evidence before IC approval.",
+          "falsifier": "Fees, taxes, or related-party costs consume more equity value than the reserve."
+        }
+      },
+      {
+        "id": "land_and_entitlement_option",
+        "label": "Magnolia Green / residual land entitlement optionality",
+        "category": "real_option",
+        "overlap_key": "land_and_entitlement_option",
+        "treatment": "additive",
+        "valuation": {
+          "method": "probability_weighted_land_option",
+          "basis": "per_share",
+          "low": 0.0,
+          "base": 0.0,
+          "high": 1.5,
+          "evidence_tier": "speculative",
+          "evidence": "Deep dive / 10-K: Magnolia Green ~1,900 acres entitled; Asbury Park waterfront venture deconsolidated. Incremental value beyond carrying amounts is not contracted.",
+          "assumption_summary": "Only credit probability-weighted surplus above carrying value already in the legacy portfolio component; failure value is zero.",
+          "cross_check": "Range must be reconciled to primary filings, mark-to-market updates, and realization evidence before IC approval.",
+          "falsifier": "Entitlement or sale process shows no surplus to carrying value, or capital calls erase the option."
+        }
+      }
+    ]
+  },
+  "economic_value": {
+    "schema_version": "1.0",
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One diluted share of STHO, including every identified asset, liability, and option in the wind-down vehicle.",
+      "unit_label": "diluted share",
+      "unit_count": 12081333,
+      "unit_source": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm (May 6, 2026)",
+      "enterprise_to_equity_reconciliation": "SAFE stake and legacy assets valued once; cash, margin debt, fees, and land optionality are separate components."
+    },
+    "gaap_role": "cross_check",
+    "accounting_reference": "STHO Q1 2026 Form 10-Q (period ended 2026-03-31) and FY2025 Form 10-K.",
+    "component_groups": [
+      {
+        "id": "safehold_equity_stake",
+        "label": "Safehold Inc. equity stake (~13.5M shares)",
+        "component_ids": [
+          "safehold_equity_stake"
+        ],
+        "economic_claim": "Safehold Inc. equity stake (~13.5M shares)",
+        "valuation_basis": "Low/base/high vary SAFE mark and forced-sale / margin-loan friction; base discounts the 3/31 mark for realization friction.",
+        "adjustments": "Low/base/high incorporate ownership, financing, tax, and realization adjustments described in the component evidence.",
+        "overlap_control": "Unique overlap key safehold_equity_stake; no other component capitalizes the same claim."
+      },
+      {
+        "id": "legacy_monetizing_portfolio",
+        "label": "Legacy loans, operating properties, and land",
+        "component_ids": [
+          "legacy_monetizing_portfolio"
+        ],
+        "economic_claim": "Legacy loans, operating properties, and land",
+        "valuation_basis": "Low/base/high change sale timing, buyer discounts, and zero-carry recovery\u2014not a single multiple on book.",
+        "adjustments": "Low/base/high incorporate ownership, financing, tax, and realization adjustments described in the component evidence.",
+        "overlap_control": "Unique overlap key legacy_monetizing_portfolio; no other component capitalizes the same claim."
+      },
+      {
+        "id": "cash_less_margin_debt",
+        "label": "Cash and restricted cash less long-term debt",
+        "component_ids": [
+          "cash_less_margin_debt"
+        ],
+        "economic_claim": "Cash and restricted cash less long-term debt",
+        "valuation_basis": "Deduct senior debt claims net of cash; cases vary required liquidity and repayment pace.",
+        "adjustments": "Low/base/high incorporate ownership, financing, tax, and realization adjustments described in the component evidence.",
+        "overlap_control": "Unique overlap key cash_less_margin_debt; no other component capitalizes the same claim."
+      },
+      {
+        "id": "wind_down_fee_and_friction_reserve",
+        "label": "Wind-down fees, tax, and realization friction",
+        "component_ids": [
+          "wind_down_fee_and_friction_reserve"
+        ],
+        "economic_claim": "Wind-down fees, tax, and realization friction",
+        "valuation_basis": "Explicit deduction for management fees, transaction costs, and tax leakage during monetization.",
+        "adjustments": "Low/base/high incorporate ownership, financing, tax, and realization adjustments described in the component evidence.",
+        "overlap_control": "Unique overlap key wind_down_fee_and_friction_reserve; no other component capitalizes the same claim."
+      },
+      {
+        "id": "land_and_entitlement_option",
+        "label": "Magnolia Green / residual land entitlement optionality",
+        "component_ids": [
+          "land_and_entitlement_option"
+        ],
+        "economic_claim": "Magnolia Green / residual land entitlement optionality",
+        "valuation_basis": "Only credit probability-weighted surplus above carrying value already in the legacy portfolio component; failure value is zero.",
+        "adjustments": "Low/base/high incorporate ownership, financing, tax, and realization adjustments described in the component evidence.",
+        "overlap_control": "Unique overlap key land_and_entitlement_option; no other component capitalizes the same claim."
+      }
+    ],
+    "wisdom_applied": [
+      "Klarman: book is an anchor, not automatically realizable value.",
+      "Greenblatt: finite asset-sale / capital-return event tree.",
+      "Horizon Kinetics: market-structure discount on a post-spin orphan."
+    ],
+    "limitations": [
+      "Starter/provisional component ranges remain evidence-blocked until SAFE mark, legacy sale schedule, and fee/tax bridges are refreshed from primary sources.",
+      "Do not treat GAAP book as decision-grade equity value."
+    ]
+  },
+  "component_valuation_results": {
+    "status": "complete",
+    "decision_rule": "Use the complete low/base/high component schedule. Embedded components are estimated but not added twice.",
+    "all_material_components_identified": true,
+    "additive_components": [
+      {
+        "id": "safehold_equity_stake",
+        "label": "Safehold Inc. equity stake (~13.5M shares)",
+        "category": "financial_asset",
+        "overlap_key": "safehold_equity_stake",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "marked_equity_nav",
+        "evidence_tier": "primary_derived",
+        "evidence": "Q1 2026 10-Q: Safehold stake fair value $183.0M at SAFE $13.53 (3/31/2026), or ~$15.15/share of STHO before realization haircuts. Stake collateralizes margin loan. STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+        "cross_check": "Range must be reconciled to primary filings, mark-to-market updates, and realization evidence before IC approval.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Low/base/high vary SAFE mark and forced-sale / margin-loan friction; base discounts the 3/31 mark for realization friction.",
+        "falsifier": "SAFE mark falls such that collateral call or sale proceeds net of debt are below the low case.",
+        "scenario_assumptions": null,
+        "low_per_share": 11.0,
+        "base_per_share": 14.0,
+        "high_per_share": 17.0
+      },
+      {
+        "id": "legacy_monetizing_portfolio",
+        "label": "Legacy loans, operating properties, and land",
+        "category": "financial_asset",
+        "overlap_key": "legacy_monetizing_portfolio",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "probability_weighted_asset_nav",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Q1 2026 10-Q aggregate carrying value ~$71.5M (~$5.92/share) for monetizing legacy portfolio; includes zero-carry assets. Asbury Park seller-financed venture deconsolidated 3/27/2026.",
+        "cross_check": "Range must be reconciled to primary filings, mark-to-market updates, and realization evidence before IC approval.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Low/base/high change sale timing, buyer discounts, and zero-carry recovery\u2014not a single multiple on book.",
+        "falsifier": "Legacy sales clear at proceeds implying value below the low case after fees and taxes.",
+        "scenario_assumptions": null,
+        "low_per_share": 2.5,
+        "base_per_share": 3.5,
+        "high_per_share": 5.0
+      },
+      {
+        "id": "cash_less_margin_debt",
+        "label": "Cash and restricted cash less long-term debt",
+        "category": "liability_or_reserve",
+        "overlap_key": "cash_less_margin_debt",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "net_debt",
+        "evidence_tier": "primary_derived",
+        "evidence": "Q1 2026: cash+restricted $67.2M less margin/Safe credit debt $207.0M (~-$1.19/share at filing). Range reflects operating liquidity and debt-paydown path.",
+        "cross_check": "Range must be reconciled to primary filings, mark-to-market updates, and realization evidence before IC approval.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Deduct senior debt claims net of cash; cases vary required liquidity and repayment pace.",
+        "falsifier": "Net debt after required liquidity exceeds the low-case deduction.",
+        "scenario_assumptions": null,
+        "low_per_share": -2.5,
+        "base_per_share": -1.5,
+        "high_per_share": -1.0
+      },
+      {
+        "id": "wind_down_fee_and_friction_reserve",
+        "label": "Wind-down fees, tax, and realization friction",
+        "category": "liability_or_reserve",
+        "overlap_key": "wind_down_fee_and_friction_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "realization_reserve",
+        "evidence_tier": "analyst_estimate",
+        "evidence": "External management by Safehold affiliate (~$2.5M Q1 fee noted in deep dive); buybacks and asset sales incur friction. Provisional reserve pending fee-schedule and tax bridge.",
+        "cross_check": "Range must be reconciled to primary filings, mark-to-market updates, and realization evidence before IC approval.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Explicit deduction for management fees, transaction costs, and tax leakage during monetization.",
+        "falsifier": "Fees, taxes, or related-party costs consume more equity value than the reserve.",
+        "scenario_assumptions": null,
+        "low_per_share": -1.5,
+        "base_per_share": -1.0,
+        "high_per_share": -0.5
+      },
+      {
+        "id": "land_and_entitlement_option",
+        "label": "Magnolia Green / residual land entitlement optionality",
+        "category": "real_option",
+        "overlap_key": "land_and_entitlement_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "probability_weighted_land_option",
+        "evidence_tier": "speculative",
+        "evidence": "Deep dive / 10-K: Magnolia Green ~1,900 acres entitled; Asbury Park waterfront venture deconsolidated. Incremental value beyond carrying amounts is not contracted.",
+        "cross_check": "Range must be reconciled to primary filings, mark-to-market updates, and realization evidence before IC approval.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Only credit probability-weighted surplus above carrying value already in the legacy portfolio component; failure value is zero.",
+        "falsifier": "Entitlement or sale process shows no surplus to carrying value, or capital calls erase the option.",
+        "scenario_assumptions": null,
+        "low_per_share": 0.0,
+        "base_per_share": 0.0,
+        "high_per_share": 1.5
+      }
+    ],
+    "embedded_components": [],
+    "total_equity_value_per_share": {
+      "low": 9.5,
+      "base": 15.0,
+      "high": 22.0
+    },
+    "material_component_count": 5,
+    "additive_component_count": 5,
+    "embedded_component_count": 0,
+    "market_price_per_share": 9.2392,
+    "upside_downside_pct": {
+      "low": 2.8,
+      "base": 62.4,
+      "high": 138.1
+    }
+  },
+  "economic_value_analysis": {
+    "schema_version": "1.0",
+    "status": "evidence_blocked",
+    "trigger": {
+      "required": true,
+      "reasons": [
+        "explicit_component_schedule",
+        "optionality_or_nav_overlay"
+      ],
+      "policy": "A complete economic-value analysis is required when any trigger fires; otherwise it is recommended."
+    },
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One diluted share of STHO, including every identified asset, liability, and option in the wind-down vehicle.",
+      "unit_label": "diluted share",
+      "unit_count": 12081333,
+      "unit_source": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm (May 6, 2026)",
+      "enterprise_to_equity_reconciliation": "SAFE stake and legacy assets valued once; cash, margin debt, fees, and land optionality are separate components."
+    },
+    "gaap_role": "cross_check",
+    "accounting_reference": "STHO Q1 2026 Form 10-Q (period ended 2026-03-31) and FY2025 Form 10-K.",
+    "comparable_hierarchy": [
+      "issuer_arm_length_transaction",
+      "same_asset_transaction",
+      "public_peer",
+      "replacement_cost",
+      "approved_external_analysis"
+    ],
+    "gross_comparable_nav_per_share": null,
+    "risked_present_value_per_share": {
+      "low": 9.5,
+      "base": 15.0,
+      "high": 22.0
+    },
+    "component_groups": [
+      {
+        "id": "safehold_equity_stake",
+        "label": "Safehold Inc. equity stake (~13.5M shares)",
+        "component_ids": [
+          "safehold_equity_stake"
+        ],
+        "economic_claim": "Safehold Inc. equity stake (~13.5M shares)",
+        "valuation_basis": "Low/base/high vary SAFE mark and forced-sale / margin-loan friction; base discounts the 3/31 mark for realization friction.",
+        "adjustments": "Low/base/high incorporate ownership, financing, tax, and realization adjustments described in the component evidence.",
+        "overlap_control": "Unique overlap key safehold_equity_stake; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": 11.0,
+          "base": 14.0,
+          "high": 17.0
+        }
+      },
+      {
+        "id": "legacy_monetizing_portfolio",
+        "label": "Legacy loans, operating properties, and land",
+        "component_ids": [
+          "legacy_monetizing_portfolio"
+        ],
+        "economic_claim": "Legacy loans, operating properties, and land",
+        "valuation_basis": "Low/base/high change sale timing, buyer discounts, and zero-carry recovery\u2014not a single multiple on book.",
+        "adjustments": "Low/base/high incorporate ownership, financing, tax, and realization adjustments described in the component evidence.",
+        "overlap_control": "Unique overlap key legacy_monetizing_portfolio; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": 2.5,
+          "base": 3.5,
+          "high": 5.0
+        }
+      },
+      {
+        "id": "cash_less_margin_debt",
+        "label": "Cash and restricted cash less long-term debt",
+        "component_ids": [
+          "cash_less_margin_debt"
+        ],
+        "economic_claim": "Cash and restricted cash less long-term debt",
+        "valuation_basis": "Deduct senior debt claims net of cash; cases vary required liquidity and repayment pace.",
+        "adjustments": "Low/base/high incorporate ownership, financing, tax, and realization adjustments described in the component evidence.",
+        "overlap_control": "Unique overlap key cash_less_margin_debt; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": -2.5,
+          "base": -1.5,
+          "high": -1.0
+        }
+      },
+      {
+        "id": "wind_down_fee_and_friction_reserve",
+        "label": "Wind-down fees, tax, and realization friction",
+        "component_ids": [
+          "wind_down_fee_and_friction_reserve"
+        ],
+        "economic_claim": "Wind-down fees, tax, and realization friction",
+        "valuation_basis": "Explicit deduction for management fees, transaction costs, and tax leakage during monetization.",
+        "adjustments": "Low/base/high incorporate ownership, financing, tax, and realization adjustments described in the component evidence.",
+        "overlap_control": "Unique overlap key wind_down_fee_and_friction_reserve; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": -1.5,
+          "base": -1.0,
+          "high": -0.5
+        }
+      },
+      {
+        "id": "land_and_entitlement_option",
+        "label": "Magnolia Green / residual land entitlement optionality",
+        "component_ids": [
+          "land_and_entitlement_option"
+        ],
+        "economic_claim": "Magnolia Green / residual land entitlement optionality",
+        "valuation_basis": "Only credit probability-weighted surplus above carrying value already in the legacy portfolio component; failure value is zero.",
+        "adjustments": "Low/base/high incorporate ownership, financing, tax, and realization adjustments described in the component evidence.",
+        "overlap_control": "Unique overlap key land_and_entitlement_option; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": 0.0,
+          "base": 0.0,
+          "high": 1.5
+        }
+      }
+    ],
+    "valuation_proof": [
+      {
+        "component_id": "safehold_equity_stake",
+        "economic_claim": "Safehold Inc. equity stake (~13.5M shares)",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "marked_equity_nav",
+        "evidence_tier": "primary_derived",
+        "evidence": "Q1 2026 10-Q: Safehold stake fair value $183.0M at SAFE $13.53 (3/31/2026), or ~$15.15/share of STHO before realization haircuts. Stake collateralizes margin loan. STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Low/base/high incorporate ownership, financing, tax, and realization adjustments described in the component evidence.",
+        "range_per_share": {
+          "low": 11.0,
+          "base": 14.0,
+          "high": 17.0
+        },
+        "treatment": "additive",
+        "overlap_key": "safehold_equity_stake",
+        "overlap_control": "Unique overlap key safehold_equity_stake; no other component capitalizes the same claim.",
+        "falsifier": "SAFE mark falls such that collateral call or sale proceeds net of debt are below the low case.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "legacy_monetizing_portfolio",
+        "economic_claim": "Legacy loans, operating properties, and land",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "probability_weighted_asset_nav",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Q1 2026 10-Q aggregate carrying value ~$71.5M (~$5.92/share) for monetizing legacy portfolio; includes zero-carry assets. Asbury Park seller-financed venture deconsolidated 3/27/2026.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Low/base/high incorporate ownership, financing, tax, and realization adjustments described in the component evidence.",
+        "range_per_share": {
+          "low": 2.5,
+          "base": 3.5,
+          "high": 5.0
+        },
+        "treatment": "additive",
+        "overlap_key": "legacy_monetizing_portfolio",
+        "overlap_control": "Unique overlap key legacy_monetizing_portfolio; no other component capitalizes the same claim.",
+        "falsifier": "Legacy sales clear at proceeds implying value below the low case after fees and taxes.",
+        "risk_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": null,
+          "probability_basis": null,
+          "remaining_capital_basis": null
+        }
+      },
+      {
+        "component_id": "cash_less_margin_debt",
+        "economic_claim": "Cash and restricted cash less long-term debt",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_debt",
+        "evidence_tier": "primary_derived",
+        "evidence": "Q1 2026: cash+restricted $67.2M less margin/Safe credit debt $207.0M (~-$1.19/share at filing). Range reflects operating liquidity and debt-paydown path.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Low/base/high incorporate ownership, financing, tax, and realization adjustments described in the component evidence.",
+        "range_per_share": {
+          "low": -2.5,
+          "base": -1.5,
+          "high": -1.0
+        },
+        "treatment": "additive",
+        "overlap_key": "cash_less_margin_debt",
+        "overlap_control": "Unique overlap key cash_less_margin_debt; no other component capitalizes the same claim.",
+        "falsifier": "Net debt after required liquidity exceeds the low-case deduction.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "wind_down_fee_and_friction_reserve",
+        "economic_claim": "Wind-down fees, tax, and realization friction",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "realization_reserve",
+        "evidence_tier": "analyst_estimate",
+        "evidence": "External management by Safehold affiliate (~$2.5M Q1 fee noted in deep dive); buybacks and asset sales incur friction. Provisional reserve pending fee-schedule and tax bridge.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Low/base/high incorporate ownership, financing, tax, and realization adjustments described in the component evidence.",
+        "range_per_share": {
+          "low": -1.5,
+          "base": -1.0,
+          "high": -0.5
+        },
+        "treatment": "additive",
+        "overlap_key": "wind_down_fee_and_friction_reserve",
+        "overlap_control": "Unique overlap key wind_down_fee_and_friction_reserve; no other component capitalizes the same claim.",
+        "falsifier": "Fees, taxes, or related-party costs consume more equity value than the reserve.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "land_and_entitlement_option",
+        "economic_claim": "Magnolia Green / residual land entitlement optionality",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "probability_weighted_land_option",
+        "evidence_tier": "speculative",
+        "evidence": "Deep dive / 10-K: Magnolia Green ~1,900 acres entitled; Asbury Park waterfront venture deconsolidated. Incremental value beyond carrying amounts is not contracted.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Low/base/high incorporate ownership, financing, tax, and realization adjustments described in the component evidence.",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 0.0,
+          "high": 1.5
+        },
+        "treatment": "additive",
+        "overlap_key": "land_and_entitlement_option",
+        "overlap_control": "Unique overlap key land_and_entitlement_option; no other component capitalizes the same claim.",
+        "falsifier": "Entitlement or sale process shows no surplus to carrying value, or capital calls erase the option.",
+        "risk_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": null,
+          "probability_basis": null,
+          "remaining_capital_basis": null
+        }
+      }
+    ],
+    "wisdom_applied": [
+      "Klarman: book is an anchor, not automatically realizable value.",
+      "Greenblatt: finite asset-sale / capital-return event tree.",
+      "Horizon Kinetics: market-structure discount on a post-spin orphan."
+    ],
+    "limitations": [
+      "Starter/provisional component ranges remain evidence-blocked until SAFE mark, legacy sale schedule, and fee/tax bridges are refreshed from primary sources.",
+      "Do not treat GAAP book as decision-grade equity value."
+    ],
+    "complete_component_coverage": true,
+    "validation_errors": [
+      "option component land_and_entitlement_option requires probability, timing, and remaining-capital treatment",
+      "option component legacy_monetizing_portfolio requires probability, timing, and remaining-capital treatment"
+    ],
+    "registry_version": "1.0"
+  },
+  "component_review_queue": {
+    "status": "ready_for_committee_review",
+    "decision_rule": "Each assigned rater records accept, challenge, or reject with a proposed range and evidence. The aggregator may not silently average disputed ranges.",
+    "items": [
+      {
+        "component_id": "safehold_equity_stake",
+        "label": "Safehold Inc. equity stake (~13.5M shares)",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 11.0,
+          "base": 14.0,
+          "high": 17.0
+        },
+        "range_width_pct_of_base": 42.9,
+        "evidence_tier": "primary_derived",
+        "recommended_raters": [
+          "greenblatt",
+          "marks_credit_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "legacy_monetizing_portfolio",
+        "label": "Legacy loans, operating properties, and land",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 2.5,
+          "base": 3.5,
+          "high": 5.0
+        },
+        "range_width_pct_of_base": 71.4,
+        "evidence_tier": "mixed_primary_and_estimate",
+        "recommended_raters": [
+          "greenblatt",
+          "marks_credit_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "cash_less_margin_debt",
+        "label": "Cash and restricted cash less long-term debt",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": -2.5,
+          "base": -1.5,
+          "high": -1.0
+        },
+        "range_width_pct_of_base": 100.0,
+        "evidence_tier": "primary_derived",
+        "recommended_raters": [
+          "marks_credit_cycle",
+          "pabrai"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "wind_down_fee_and_friction_reserve",
+        "label": "Wind-down fees, tax, and realization friction",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": -1.5,
+          "base": -1.0,
+          "high": -0.5
+        },
+        "range_width_pct_of_base": 100.0,
+        "evidence_tier": "analyst_estimate",
+        "recommended_raters": [
+          "marks_credit_cycle",
+          "pabrai"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "land_and_entitlement_option",
+        "label": "Magnolia Green / residual land entitlement optionality",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 0.0,
+          "high": 1.5
+        },
+        "range_width_pct_of_base": 15000.0,
+        "evidence_tier": "speculative",
+        "recommended_raters": [
+          "klarman_asset_value",
+          "hk"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      }
+    ]
+  },
+  "valuation_method_route": {
+    "schema_version": "1.0",
+    "status": "routed",
+    "profile_id": "scarce_asset_optionality",
+    "label": "Scarce assets, royalties, and optionality",
+    "score": 9.0,
+    "reasons": [
+      "archetype=holding_co",
+      "component categories=real_option",
+      "existing methods=land, option"
+    ],
+    "primary_methods": [
+      "component_owner_cash_and_unit_nav"
+    ],
+    "corroborating_methods": [
+      "comparable_transactions",
+      "replacement_cost_or_reverse_nav"
+    ],
+    "primary_personas": [
+      "hk",
+      "stahl"
+    ],
+    "cross_check_personas": [
+      "klarman_asset_value",
+      "marks_credit_cycle"
+    ],
+    "silent_personas": [
+      "buffett_weschler",
+      "greenblatt",
+      "hohn",
+      "marathon_capital_cycle",
+      "munger",
+      "pabrai"
+    ],
+    "required_evidence": [
+      "legal economic claim",
+      "non-overlapping physical inventory",
+      "unit economics",
+      "realization timing",
+      "remaining owner capital"
+    ],
+    "failure_modes": [
+      "gross asset value mistaken for shareholder value",
+      "operating cash flow and NAV counted twice",
+      "remote options treated as contracted cash"
+    ],
+    "secondary_profiles": [
+      {
+        "profile_id": "catalyst_asset_value",
+        "score": 7.0,
+        "reasons": [
+          "archetype=holding_co",
+          "component categories=financial_asset"
+        ]
+      },
+      {
+        "profile_id": "credit_and_normalized_returns",
+        "score": 2.0,
+        "reasons": [
+          "component categories=financial_asset, liability_or_reserve"
+        ]
+      }
+    ],
+    "scorecard": {
+      "scarce_asset_optionality": {
+        "score": 9.0,
+        "reasons": [
+          "archetype=holding_co",
+          "component categories=real_option",
+          "existing methods=land, option"
+        ]
+      },
+      "quality_reinvestment": {
+        "score": 0.0,
+        "reasons": []
+      },
+      "capital_cycle": {
+        "score": 0.0,
+        "reasons": []
+      },
+      "credit_and_normalized_returns": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=financial_asset, liability_or_reserve"
+        ]
+      },
+      "catalyst_asset_value": {
+        "score": 7.0,
+        "reasons": [
+          "archetype=holding_co",
+          "component categories=financial_asset"
+        ]
+      },
+      "predictable_cash_flow": {
+        "score": 0.0,
+        "reasons": []
+      },
+      "binary_milestone": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=probability"
+        ]
+      }
+    },
+    "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+  },
+  "universal_valuation_contract": {
+    "schema_version": "1.0",
+    "status": "evidence_blocked",
+    "ticker": "STHO",
+    "as_of": "2026-07-16",
+    "economic_ownership_map": [
+      {
+        "component_id": "safehold_equity_stake",
+        "label": "Safehold Inc. equity stake (~13.5M shares)",
+        "category": "financial_asset",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Safehold Inc. equity stake (~13.5M shares)",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 14.0
+        },
+        "growth_driver": "Low/base/high vary SAFE mark and forced-sale / margin-loan friction; base discounts the 3/31 mark for realization friction.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "marked_equity_nav",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 11.0,
+          "base": 14.0,
+          "high": 17.0
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Q1 2026 10-Q: Safehold stake fair value $183.0M at SAFE $13.53 (3/31/2026), or ~$15.15/share of STHO before realization haircuts. Stake collateralizes margin loan. STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Low/base/high incorporate ownership, financing, tax, and realization adjustments described in the component evidence.",
+        "falsifier": "SAFE mark falls such that collateral call or sale proceeds net of debt are below the low case.",
+        "overlap_key": "safehold_equity_stake",
+        "assumption_type": "fact"
+      },
+      {
+        "component_id": "legacy_monetizing_portfolio",
+        "label": "Legacy loans, operating properties, and land",
+        "category": "financial_asset",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Legacy loans, operating properties, and land",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 3.5
+        },
+        "growth_driver": "Low/base/high change sale timing, buyer discounts, and zero-carry recovery\u2014not a single multiple on book.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "probability_weighted_asset_nav",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 2.5,
+          "base": 3.5,
+          "high": 5.0
+        },
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "Q1 2026 10-Q aggregate carrying value ~$71.5M (~$5.92/share) for monetizing legacy portfolio; includes zero-carry assets. Asbury Park seller-financed venture deconsolidated 3/27/2026.",
+        "probability_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": null,
+          "probability_basis": null,
+          "remaining_capital_basis": null
+        },
+        "tax_and_realization_adjustments": "Low/base/high incorporate ownership, financing, tax, and realization adjustments described in the component evidence.",
+        "falsifier": "Legacy sales clear at proceeds implying value below the low case after fees and taxes.",
+        "overlap_key": "legacy_monetizing_portfolio",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "cash_less_margin_debt",
+        "label": "Cash and restricted cash less long-term debt",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Cash and restricted cash less long-term debt",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": -1.5
+        },
+        "growth_driver": "Deduct senior debt claims net of cash; cases vary required liquidity and repayment pace.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "net_debt",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": -2.5,
+          "base": -1.5,
+          "high": -1.0
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Q1 2026: cash+restricted $67.2M less margin/Safe credit debt $207.0M (~-$1.19/share at filing). Range reflects operating liquidity and debt-paydown path.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Low/base/high incorporate ownership, financing, tax, and realization adjustments described in the component evidence.",
+        "falsifier": "Net debt after required liquidity exceeds the low-case deduction.",
+        "overlap_key": "cash_less_margin_debt",
+        "assumption_type": "fact"
+      },
+      {
+        "component_id": "wind_down_fee_and_friction_reserve",
+        "label": "Wind-down fees, tax, and realization friction",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Wind-down fees, tax, and realization friction",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": -1.0
+        },
+        "growth_driver": "Explicit deduction for management fees, transaction costs, and tax leakage during monetization.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "realization_reserve",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": -1.5,
+          "base": -1.0,
+          "high": -0.5
+        },
+        "evidence_tier": "analyst_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "External management by Safehold affiliate (~$2.5M Q1 fee noted in deep dive); buybacks and asset sales incur friction. Provisional reserve pending fee-schedule and tax bridge.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Low/base/high incorporate ownership, financing, tax, and realization adjustments described in the component evidence.",
+        "falsifier": "Fees, taxes, or related-party costs consume more equity value than the reserve.",
+        "overlap_key": "wind_down_fee_and_friction_reserve",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "land_and_entitlement_option",
+        "label": "Magnolia Green / residual land entitlement optionality",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Magnolia Green / residual land entitlement optionality",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 0.0
+        },
+        "growth_driver": "Only credit probability-weighted surplus above carrying value already in the legacy portfolio component; failure value is zero.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "probability_weighted_land_option",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.0,
+          "base": 0.0,
+          "high": 1.5
+        },
+        "evidence_tier": "speculative",
+        "evidence_level": "speculative",
+        "evidence": "Deep dive / 10-K: Magnolia Green ~1,900 acres entitled; Asbury Park waterfront venture deconsolidated. Incremental value beyond carrying amounts is not contracted.",
+        "probability_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": null,
+          "probability_basis": null,
+          "remaining_capital_basis": null
+        },
+        "tax_and_realization_adjustments": "Low/base/high incorporate ownership, financing, tax, and realization adjustments described in the component evidence.",
+        "falsifier": "Entitlement or sale process shows no surplus to carrying value, or capital calls erase the option.",
+        "overlap_key": "land_and_entitlement_option",
+        "assumption_type": "judgment"
+      }
+    ],
+    "component_coverage": {
+      "all_material_components_identified": true,
+      "material_component_count": 5,
+      "additive_component_count": 5,
+      "embedded_component_count": 0,
+      "unvalued_component_count": 0,
+      "double_counting_flags": []
+    },
+    "input_classification": {
+      "facts": [
+        {
+          "component_id": "safehold_equity_stake",
+          "label": "Safehold Inc. equity stake (~13.5M shares)",
+          "kind": "fact",
+          "evidence_tier": "primary_derived",
+          "evidence": "Q1 2026 10-Q: Safehold stake fair value $183.0M at SAFE $13.53 (3/31/2026), or ~$15.15/share of STHO before realization haircuts. Stake collateralizes margin loan. STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+          "method": "marked_equity_nav"
+        },
+        {
+          "component_id": "cash_less_margin_debt",
+          "label": "Cash and restricted cash less long-term debt",
+          "kind": "fact",
+          "evidence_tier": "primary_derived",
+          "evidence": "Q1 2026: cash+restricted $67.2M less margin/Safe credit debt $207.0M (~-$1.19/share at filing). Range reflects operating liquidity and debt-paydown path.",
+          "method": "net_debt"
+        }
+      ],
+      "estimates": [],
+      "judgments": [
+        {
+          "component_id": "legacy_monetizing_portfolio",
+          "label": "Legacy loans, operating properties, and land",
+          "kind": "judgment",
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Q1 2026 10-Q aggregate carrying value ~$71.5M (~$5.92/share) for monetizing legacy portfolio; includes zero-carry assets. Asbury Park seller-financed venture deconsolidated 3/27/2026.",
+          "method": "probability_weighted_asset_nav"
+        },
+        {
+          "component_id": "wind_down_fee_and_friction_reserve",
+          "label": "Wind-down fees, tax, and realization friction",
+          "kind": "judgment",
+          "evidence_tier": "analyst_estimate",
+          "evidence": "External management by Safehold affiliate (~$2.5M Q1 fee noted in deep dive); buybacks and asset sales incur friction. Provisional reserve pending fee-schedule and tax bridge.",
+          "method": "realization_reserve"
+        },
+        {
+          "component_id": "land_and_entitlement_option",
+          "label": "Magnolia Green / residual land entitlement optionality",
+          "kind": "judgment",
+          "evidence_tier": "speculative",
+          "evidence": "Deep dive / 10-K: Magnolia Green ~1,900 acres entitled; Asbury Park waterfront venture deconsolidated. Incremental value beyond carrying amounts is not contracted.",
+          "method": "probability_weighted_land_option"
+        }
+      ]
+    },
+    "method_route": {
+      "schema_version": "1.0",
+      "status": "routed",
+      "profile_id": "scarce_asset_optionality",
+      "label": "Scarce assets, royalties, and optionality",
+      "score": 9.0,
+      "reasons": [
+        "archetype=holding_co",
+        "component categories=real_option",
+        "existing methods=land, option"
+      ],
+      "primary_methods": [
+        "component_owner_cash_and_unit_nav"
+      ],
+      "corroborating_methods": [
+        "comparable_transactions",
+        "replacement_cost_or_reverse_nav"
+      ],
+      "primary_personas": [
+        "hk",
+        "stahl"
+      ],
+      "cross_check_personas": [
+        "klarman_asset_value",
+        "marks_credit_cycle"
+      ],
+      "silent_personas": [
+        "buffett_weschler",
+        "greenblatt",
+        "hohn",
+        "marathon_capital_cycle",
+        "munger",
+        "pabrai"
+      ],
+      "required_evidence": [
+        "legal economic claim",
+        "non-overlapping physical inventory",
+        "unit economics",
+        "realization timing",
+        "remaining owner capital"
+      ],
+      "failure_modes": [
+        "gross asset value mistaken for shareholder value",
+        "operating cash flow and NAV counted twice",
+        "remote options treated as contracted cash"
+      ],
+      "secondary_profiles": [
+        {
+          "profile_id": "catalyst_asset_value",
+          "score": 7.0,
+          "reasons": [
+            "archetype=holding_co",
+            "component categories=financial_asset"
+          ]
+        },
+        {
+          "profile_id": "credit_and_normalized_returns",
+          "score": 2.0,
+          "reasons": [
+            "component categories=financial_asset, liability_or_reserve"
+          ]
+        }
+      ],
+      "scorecard": {
+        "scarce_asset_optionality": {
+          "score": 9.0,
+          "reasons": [
+            "archetype=holding_co",
+            "component categories=real_option",
+            "existing methods=land, option"
+          ]
+        },
+        "quality_reinvestment": {
+          "score": 0.0,
+          "reasons": []
+        },
+        "capital_cycle": {
+          "score": 0.0,
+          "reasons": []
+        },
+        "credit_and_normalized_returns": {
+          "score": 2.0,
+          "reasons": [
+            "component categories=financial_asset, liability_or_reserve"
+          ]
+        },
+        "catalyst_asset_value": {
+          "score": 7.0,
+          "reasons": [
+            "archetype=holding_co",
+            "component categories=financial_asset"
+          ]
+        },
+        "predictable_cash_flow": {
+          "score": 0.0,
+          "reasons": []
+        },
+        "binary_milestone": {
+          "score": 2.0,
+          "reasons": [
+            "component categories=real_option",
+            "existing methods=probability"
+          ]
+        }
+      },
+      "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+    },
+    "market": {
+      "price_per_share": 9.2392,
+      "fully_diluted_shares": 12081333,
+      "market_cap_m": 111.62,
+      "enterprise_value_m": null
+    },
+    "valuation": {
+      "value_per_share": {
+        "low": 9.5,
+        "base": 15.0,
+        "high": 22.0
+      },
+      "probability_weighted_value_per_share": 15.0,
+      "expected_distributions_per_share": 0.0,
+      "annualized_return_at_price_pct": {
+        "low": 0.56,
+        "base": 10.18,
+        "high": 18.95
+      },
+      "downside_to_low_pct": 2.82,
+      "horizon_years": 5
+    },
+    "scenario_contract": {
+      "rule": "Cases must change causal operating, capital, probability, timing, or financing drivers\u2014not only the terminal multiple.",
+      "top_value_drivers": [
+        {
+          "component_id": "safehold_equity_stake",
+          "label": "Safehold Inc. equity stake (~13.5M shares)",
+          "base_per_share": 14.0,
+          "range_width_per_share": 6.0,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "legacy_monetizing_portfolio",
+          "label": "Legacy loans, operating properties, and land",
+          "base_per_share": 3.5,
+          "range_width_per_share": 2.5,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "cash_less_margin_debt",
+          "label": "Cash and restricted cash less long-term debt",
+          "base_per_share": -1.5,
+          "range_width_per_share": 1.5,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "land_and_entitlement_option",
+          "label": "Magnolia Green / residual land entitlement optionality",
+          "base_per_share": 0.0,
+          "range_width_per_share": 1.5,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "wind_down_fee_and_friction_reserve",
+          "label": "Wind-down fees, tax, and realization friction",
+          "base_per_share": -1.0,
+          "range_width_per_share": 1.0,
+          "scenario_assumptions": null
+        }
+      ],
+      "reverse_expectations": null
+    },
+    "evidence": {
+      "unresolved_count": 2,
+      "blockers": [
+        "option component land_and_entitlement_option requires probability, timing, and remaining-capital treatment",
+        "option component legacy_monetizing_portfolio requires probability, timing, and remaining-capital treatment"
+      ],
+      "validation_errors": [
+        "option component land_and_entitlement_option requires probability, timing, and remaining-capital treatment",
+        "option component legacy_monetizing_portfolio requires probability, timing, and remaining-capital treatment"
+      ]
+    },
+    "monitoring": {
+      "falsifiers": [
+        "SAFE mark falls such that collateral call or sale proceeds net of debt are below the low case.",
+        "Legacy sales clear at proceeds implying value below the low case after fees and taxes.",
+        "Net debt after required liquidity exceeds the low-case deduction.",
+        "Fees, taxes, or related-party costs consume more equity value than the reserve.",
+        "Entitlement or sale process shows no surplus to carrying value, or capital calls erase the option."
+      ],
+      "required_refresh_triggers": [
+        "new filing or material operating update",
+        "capital-structure change",
+        "material price move",
+        "component milestone or falsifier"
+      ]
+    },
+    "decision_rule": "No security is decision-grade until every material economic claim is valued exactly once and every material evidence blocker is resolved."
+  },
+  "synthesis": {
+    "status": "incomplete",
+    "reason": "no numeric paths"
+  }
+}
