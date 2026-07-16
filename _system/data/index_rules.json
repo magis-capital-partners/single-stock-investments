@@ -15,7 +15,13 @@
       "low": {"max_abs_distance_pct": 40, "max_days_to_event": 365, "min_gates_pass_pct": 0.0}
     },
     "demand_shock_adv_cap": 50.0,
-    "assumed_index_weight_bps_add": 5.0
+    "assumed_index_weight_bps_add": 5.0,
+    "float_impact": {
+      "enabled": true,
+      "default_display_tier": "base",
+      "aum_config": "_system/data/index_aum.json",
+      "notes": "Prefer computed float-impact demand shock over assumed_index_weight_bps_add when float_pct/ADV/AUM available (HK reconstitution axioms)."
+    }
   },
   "ineligible_security_types": [
     "cvr",

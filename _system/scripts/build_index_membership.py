@@ -16,6 +16,11 @@ import sys
 sys.path.insert(0, sys_path_insert)
 
 from index_event_extract import extract_index_events, _is_style_or_subset_index  # noqa: E402
+from index_flow_impact import (  # noqa: E402
+    attach_float_impact,
+    demand_shock_from_float_impact,
+    load_aum_registry,
+)
 from index_market_inputs import load_fundamentals_cache, market_inputs_for_ticker  # noqa: E402
 
 DATA_DIR = ROOT / "_system" / "data"
@@ -748,6 +753,8 @@ def priority_score(
     days_out: int | None,
     rules: dict,
     confirmed_soon: bool,
+    *,
+    float_impact_shock: float | None = None,
 ) -> tuple[float, float | None]:
     weights = (rules.get("scoring") or {}).get("weights") or {}
     w_b = float(weights.get("boundary_closeness") or 0.35)
@@ -775,15 +782,19 @@ def priority_score(
     else:
         cal = max(0.0, 1.0 - days_out / 180.0)
 
-    # Demand shock proxy: assumed weight * mcap / ADV
+    # Demand shock: prefer computed float-impact (|net flow| / ADV);
+    # fall back to flat assumed_index_weight_bps_add when n_a.
     mcap = mi.get("market_cap_usd")
     adv = mi.get("adv_dollar")
     bps = float((rules.get("scoring") or {}).get("assumed_index_weight_bps_add") or 5.0)
+    cap = float((rules.get("scoring") or {}).get("demand_shock_adv_cap") or 50.0)
     shock = None
-    if mcap and adv and adv > 0:
+    if float_impact_shock is not None:
+        shock = float(float_impact_shock)
+        demand = min(1.0, shock / cap)
+    elif mcap and adv and adv > 0:
         assumed_notional = mcap * (bps / 10000.0)
         shock = (assumed_notional / adv) * 100.0  # pct of one-day ADV
-        cap = float((rules.get("scoring") or {}).get("demand_shock_adv_cap") or 50.0)
         demand = min(1.0, shock / cap)
     else:
         demand = 0.15 if any(sc.get("status") == "inclusion_candidate" for sc in scorecards) else 0.0
@@ -984,23 +995,26 @@ def build_for_ticker(
 
     t_anns = [a for a in announcements if a.get("ticker") == ticker]
     confirmed_events = []
+    news_notes = []
     for a in t_anns:
+        row_ev = {
+            "ticker": ticker,
+            "index": a.get("index"),
+            "action": a.get("action"),
+            "announced": a.get("announced"),
+            "effective": a.get("effective"),
+            "source_url": a.get("source_url"),
+            "source_type": a.get("source_type"),
+            "confidence": a.get("confidence"),
+            "title": a.get("title"),
+            "quality_gated": bool(a.get("quality_gated") or a.get("confidence") == "provider_confirmed"),
+            "style_subset": bool(a.get("style_subset")),
+        }
         # Surface provider_confirmed always; news only if quality_gated
         if a.get("confidence") == "provider_confirmed" or a.get("quality_gated"):
-            confirmed_events.append(
-                {
-                    "ticker": ticker,
-                    "index": a.get("index"),
-                    "action": a.get("action"),
-                    "announced": a.get("announced"),
-                    "effective": a.get("effective"),
-                    "source_url": a.get("source_url"),
-                    "source_type": a.get("source_type"),
-                    "confidence": a.get("confidence"),
-                    "title": a.get("title"),
-                    "quality_gated": bool(a.get("quality_gated") or a.get("confidence") == "provider_confirmed"),
-                }
-            )
+            confirmed_events.append(row_ev)
+        else:
+            news_notes.append(row_ev)
         for sc in scorecards:
             if sc.get("index") == a.get("index") and (
                 a.get("confidence") == "provider_confirmed" or a.get("quality_gated")
@@ -1041,6 +1055,7 @@ def build_for_ticker(
                 sc["status"] = "deletion_risk"
                 sc["gating_check"] = sc.get("gating_check") or "corporate_action_news"
 
+    # Priority score recomputed after float_impact attach in build(); fallback here.
     pscore, shock = priority_score(scorecards, mi, days_out, rules, confirmed_soon)
 
     badge = "n_a"
@@ -1060,14 +1075,20 @@ def build_for_ticker(
         "impact_proxy": {
             "demand_shock_pct_of_adv": shock,
             "priority_score": pscore,
+            "demand_shock_source": "assumed_bps_fallback",
         },
         "confirmed_events": confirmed_events,
+        "news_notes": news_notes,
         "prediction": {
             "next_calendar_event": next_ev,
             "inclusion_probability_band": prob,
         },
         "inputs_missing": mi.get("missing") or [],
         "security_type": sec_type,
+        "_priority_inputs": {
+            "days_out": days_out,
+            "confirmed_soon": confirmed_soon,
+        },
     }
 
 
@@ -1119,6 +1140,29 @@ def build(today: date | None = None, *, purge_announcements: bool = True) -> dic
             mna_tickers=mna_tickers,
             breakpoint_mcap=bp_mcap,
         )
+
+    # Phase 3: float-impact forced-flow model (HK reconstitution axioms)
+    aum_registry = load_aum_registry()
+    float_summary = attach_float_impact(by_ticker, inputs_by_ticker, aum_registry)
+    for ticker, row in by_ticker.items():
+        fi = row.get("float_impact") or {}
+        shock_fi = demand_shock_from_float_impact(fi)
+        pri = row.pop("_priority_inputs", None) or {}
+        if shock_fi is not None:
+            pscore, shock = priority_score(
+                row.get("scorecards") or [],
+                inputs_by_ticker.get(ticker) or {},
+                pri.get("days_out"),
+                rules,
+                bool(pri.get("confirmed_soon")),
+                float_impact_shock=shock_fi,
+            )
+            row["impact_proxy"] = {
+                "demand_shock_pct_of_adv": shock,
+                "priority_score": pscore,
+                "demand_shock_source": "float_impact",
+                "pct_of_float_base": (fi.get("primary") or {}).get("pct_of_float_base"),
+            }
 
     max_cand = max_candidate_distance(rules)
     inclusion_candidates = sorted(
@@ -1175,6 +1219,7 @@ def build(today: date | None = None, *, purge_announcements: bool = True) -> dic
         for ev in row.get("confirmed_events") or []
         if ev.get("quality_gated")
     )
+    news_note_count = sum(len(row.get("news_notes") or []) for row in by_ticker.values())
 
     payload = {
         "generated": now_iso(),
@@ -1182,7 +1227,9 @@ def build(today: date | None = None, *, purge_announcements: bool = True) -> dic
         "as_of": today.isoformat(),
         "caption": (
             "The average large-cap S&P 500 index effect has fallen to near zero since 2010; "
-            "treat these as research triggers, weighted by demand-shock size, not mechanical trades."
+            "treat these as research triggers, weighted by demand-shock size, not mechanical trades. "
+            "Migrations across the Russell 1000/2000 breakpoint are typically net-negative for the "
+            "promoted stock (Horizon Kinetics 2013)."
         ),
         "by_ticker": by_ticker,
         "portfolio_summary": {
@@ -1192,7 +1239,11 @@ def build(today: date | None = None, *, purge_announcements: bool = True) -> dic
             "high_priority_watch": high_priority_watch,
             "ticker_count": len(by_ticker),
             "quality_gated_events": quality_events,
+            "news_notes": news_note_count,
             "max_candidate_distance_pct": max_cand,
+            "top_float_impacts": float_summary.get("top_float_impacts") or [],
+            "aum_as_of": float_summary.get("aum_as_of"),
+            "aum_stale": float_summary.get("aum_stale"),
         },
         "calendar": cal_strip,
     }

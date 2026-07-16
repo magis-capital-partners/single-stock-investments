@@ -10,6 +10,9 @@ ROOT = Path(__file__).resolve().parents[2]
 FUNDAMENTALS_PATH = (
     ROOT / "_system" / "reference" / "market-data" / "ownership" / "biotech_fundamentals.json"
 )
+INDEX_FLOAT_ADV_PATH = (
+    ROOT / "_system" / "reference" / "market-data" / "fundamentals" / "index_float_adv.json"
+)
 
 
 def _load_json(path: Path) -> dict:
@@ -19,6 +22,12 @@ def _load_json(path: Path) -> dict:
         return json.loads(path.read_text(encoding="utf-8"))
     except (json.JSONDecodeError, OSError):
         return {}
+
+
+def load_index_float_adv_cache() -> dict[str, dict]:
+    """Secondary cache: float_pct / ADV for index float-impact math (never invent)."""
+    doc = _load_json(INDEX_FLOAT_ADV_PATH)
+    return dict(doc.get("by_ticker") or {})
 
 
 def _security_type(ticker: str, exchange: str | None, company: str | None) -> str | None:
@@ -45,8 +54,15 @@ def _security_type(ticker: str, exchange: str | None, company: str | None) -> st
 
 
 def load_fundamentals_cache() -> dict[str, dict]:
+    """Merge biotech ownership cache with index float/ADV cache (index wins on overlap)."""
     doc = _load_json(FUNDAMENTALS_PATH)
-    return dict(doc.get("by_ticker") or {})
+    merged = dict(doc.get("by_ticker") or {})
+    for t, row in load_index_float_adv_cache().items():
+        key = str(t).upper()
+        base = dict(merged.get(key) or {})
+        base.update({k: v for k, v in row.items() if v is not None})
+        merged[key] = base
+    return merged
 
 
 def market_inputs_for_ticker(
@@ -112,6 +128,7 @@ def market_inputs_for_ticker(
         except (TypeError, ValueError):
             pass
 
+    # Prefer index_float_adv / cache float when valuation lacks it (Phase 4 coverage)
     float_pct = None
     for src in (valuation, panel, cache, meta):
         for key in ("float_pct", "float_percent", "iwf", "free_float"):
@@ -125,6 +142,13 @@ def market_inputs_for_ticker(
                     pass
         if float_pct is not None:
             break
+    if float_pct is None and cache.get("float_shares") and shares:
+        try:
+            float_pct = float(cache["float_shares"]) / float(shares)
+            if float_pct > 1.0:
+                float_pct = None
+        except (TypeError, ValueError, ZeroDivisionError):
+            pass
 
     adv_shares = None
     adv_dollar = None
@@ -148,6 +172,14 @@ def market_inputs_for_ticker(
     if adv_dollar is None and adv_shares is not None and price is not None:
         try:
             adv_dollar = float(adv_shares) * float(price)
+        except (TypeError, ValueError):
+            pass
+    # Fill shares from float/ADV cache when valuation omits them (never invent float_pct)
+    if shares is None and cache.get("shares_outstanding") is not None:
+        try:
+            shares = float(cache["shares_outstanding"])
+            if mcap is None and price is not None:
+                mcap = float(price) * shares
         except (TypeError, ValueError):
             pass
 

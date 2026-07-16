@@ -142,3 +142,38 @@ STOXX for our international holdings. Not yet encoded.
   Likely Russell 2000/1000, S&P 400/600, MSCI, plus home-market indices (TOPIX, FTSE, STOXX).
 - Do we have (or want to license) benchmark AUM data to compute true BMI, or approximate it?
 - Source of record for confirmed announcements: provider RSS/press pages vs Polygon/Google News.
+
+---
+
+## 6. Model validation — float-impact forced flow (2026-07-15)
+
+Implements Horizon Kinetics *Russell 2000 Index Construction* (Jan 2013) axioms in
+`_system/scripts/index_flow_impact.py` + `_system/data/index_aum.json`.
+
+### Axiom check (APLD June 2026 graduation)
+
+| Check | Result |
+|-------|--------|
+| Both sides modeled (R2000 sell + R1000/Midcap buy) | Pass |
+| Microcap skipped for top-of-R2000 weight | Pass |
+| Net flow negative (graduation ≠ inflow) | Pass |
+| Low (ETF-observed) % of float | **−3.3%** (target −3% to −5%) |
+| Base (ETF + index-fund est.) % of float | **−6.4%** |
+| High (BMI ×1.75) % of float | **−11.4%** (scenario only) |
+| HK weight-cliff ratio (sell demand / buy demand) | **~10×** |
+| Within ±50% of observed ETF share-count estimate (~3% float from IWM+IWO+IWN+VTWO) | Pass on **low** tier |
+
+### Other June 2026 cases
+
+| Ticker | Event | Modeled note |
+|--------|-------|--------------|
+| APLD | R2000 → R1000/Midcap | Validated above; float_pct + ADV in `index_float_adv.json` |
+| BE (Bloom Energy) | R2000 → R1000 (LSEG commentary) | Seeded approximate float; refine when exact float/ADV available |
+| R1000 → R2000 demotion | Unit-tested synthetic | Net % float positive (buying), opposite of graduation |
+
+### Residuals / caveats
+
+- Cap-weighted pure single-index adds share the same % of float (= AUM / index_total_mcap), independent of stock size. Rank top impacts by |$ flow| and prefer migrations / confirmed events.
+- Index total mcap is total (not float-adj) from recon summaries → weights slightly understated.
+- BMI high tier is scenario-only; default display is **base**.
+- Unit tests: `_system/scripts/tests/test_index_flow_impact.py`.

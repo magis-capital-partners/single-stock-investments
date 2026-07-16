@@ -1,0 +1,300 @@
+{
+  "as_of": "2026-07-15",
+  "stale_after_days": 120,
+  "notes": "Passive AUM and index total market caps for float-impact forced-flow math. Never invent values — omit tiers when unknown. Style products (IWO/IWN) are folded into parent etf_observed AUM so Midcap/style are not double-counted against parent. Refresh quarterly and at each reconstitution. Index total mcap is total (not float-adj) from provider recon summaries; weights therefore slightly understate true float-adj weights (~10-15%).",
+  "hk_axioms": {
+    "source": "Horizon Kinetics Russell 2000 Index Construction white paper (Jan 2013)",
+    "weight_cliff_r2000_top_vs_r1000_bottom": "~20x",
+    "aum_asymmetry_r2000_vs_r1000_products": "~1.5-2.5x",
+    "compounded_demand_differential": "~40x",
+    "implication": "R2000→R1000 graduation is typically net forced selling"
+  },
+  "indices": {
+    "russell_2000": {
+      "label": "Russell 2000",
+      "family": "russell",
+      "index_total_mcap_usd": 3500000000000,
+      "mcap_source": "LSEG June 2026 Russell US Indexes reconstitution summary",
+      "mcap_as_of": "2026-04-30",
+      "overlap_parent": null,
+      "tiers": {
+        "etf_observed": {
+          "aum_usd": 130000000000,
+          "products": ["IWM", "VTWO", "IWO", "IWN"],
+          "confidence": "observed",
+          "source": "iShares/Vanguard product pages ~Jul 2026; IWO+IWN included as style sleeves of R2000 (not additive to IWM for double-count — AUM is aggregate of distinct funds)",
+          "note": "IWM~$82B + VTWO~$18B + IWO~$15B + IWN~$14B ≈ $129B"
+        },
+        "index_funds_est": {
+          "aum_usd": 250000000000,
+          "confidence": "estimate",
+          "source": "ETF observed + mutual-fund share classes / smaller R2000 trackers (order-of-magnitude)",
+          "note": "Includes etf_observed; do not add tiers — base stack uses max(etf, funds) or funds alone when funds ≥ etf"
+        },
+        "benchmarked_bmi": {
+          "multiplier": 1.75,
+          "confidence": "scenario",
+          "source": "Pavlova & Sikorskaya BMI logic — active managers hugging R2000",
+          "note": "Applied to base (index_funds_est), not summed as separate AUM"
+        }
+      }
+    },
+    "russell_1000": {
+      "label": "Russell 1000",
+      "family": "russell",
+      "index_total_mcap_usd": 72100000000000,
+      "mcap_source": "LSEG June 2026 Russell US Indexes reconstitution summary",
+      "mcap_as_of": "2026-04-30",
+      "overlap_parent": null,
+      "tiers": {
+        "etf_observed": {
+          "aum_usd": 56000000000,
+          "products": ["IWB", "VONE"],
+          "confidence": "observed",
+          "source": "iShares IWB ~$48B + Vanguard VONE ~$8B ~Jul 2026",
+          "note": "Dedicated R1000 products are thinner than R2000; many large-cap dollars use S&P 500 instead"
+        },
+        "index_funds_est": {
+          "aum_usd": 120000000000,
+          "confidence": "estimate",
+          "source": "ETF observed + institutional R1000 index mandates (order-of-magnitude)",
+          "note": "Includes etf_observed"
+        },
+        "benchmarked_bmi": {
+          "multiplier": 1.5,
+          "confidence": "scenario",
+          "source": "Pavlova & Sikorskaya BMI — lower than R2000 because S&P 500 absorbs much large-cap benchmarking",
+          "note": "Applied to base"
+        }
+      }
+    },
+    "russell_midcap": {
+      "label": "Russell Midcap",
+      "family": "russell",
+      "index_total_mcap_usd": 14800000000000,
+      "mcap_source": "LSEG June 2026 Russell US Indexes reconstitution summary",
+      "mcap_as_of": "2026-04-30",
+      "overlap_parent": "russell_1000",
+      "overlap_note": "Midcap ⊂ R1000. Count Midcap product AUM as ADDITIONAL flow (separate products like IWR), not as part of R1000 weight. Weight = float_mcap / midcap_total_mcap.",
+      "tiers": {
+        "etf_observed": {
+          "aum_usd": 45000000000,
+          "products": ["IWR"],
+          "confidence": "observed",
+          "source": "iShares Russell Midcap ETF AUM ~mid-2026 order-of-magnitude",
+          "note": "Separate from IWB — additive buy/sell for Midcap membership changes"
+        },
+        "index_funds_est": {
+          "aum_usd": 80000000000,
+          "confidence": "estimate",
+          "source": "ETF + Midcap index mandates",
+          "note": "Includes etf_observed"
+        },
+        "benchmarked_bmi": {
+          "multiplier": 1.5,
+          "confidence": "scenario",
+          "source": "BMI scenario",
+          "note": "Applied to base"
+        }
+      }
+    },
+    "russell_microcap": {
+      "label": "Russell Microcap",
+      "family": "russell",
+      "index_total_mcap_usd": 400000000000,
+      "mcap_source": "Approximate; Microcap ≈ bottom of R2000 + next 1000 — only material for bottom-half R2000 names",
+      "mcap_as_of": "2026-04-30",
+      "overlap_parent": "russell_2000",
+      "overlap_note": "Microcap ∩ bottom half of R2000. Top-of-R2000 graduates are NOT in Microcap — skip Microcap leg unless announcement explicitly cites it AND name is not top-of-R2000.",
+      "skip_if_also": ["russell_2000"],
+      "tiers": {
+        "etf_observed": {
+          "aum_usd": 5000000000,
+          "products": ["IWC"],
+          "confidence": "estimate",
+          "source": "iShares Microcap order-of-magnitude",
+          "note": "Small product; often immaterial vs R2000 leg"
+        },
+        "index_funds_est": {
+          "aum_usd": 10000000000,
+          "confidence": "estimate",
+          "source": "ETF + microcap mandates",
+          "note": "Includes etf_observed"
+        },
+        "benchmarked_bmi": {
+          "multiplier": 1.5,
+          "confidence": "scenario",
+          "source": "BMI scenario",
+          "note": "Applied to base"
+        }
+      }
+    },
+    "sp500": {
+      "label": "S&P 500",
+      "family": "sp_dji",
+      "index_total_mcap_usd": 55000000000000,
+      "mcap_source": "Approximate S&P 500 aggregate mcap mid-2026",
+      "mcap_as_of": "2026-07-01",
+      "overlap_parent": null,
+      "tiers": {
+        "etf_observed": {
+          "aum_usd": 1200000000000,
+          "products": ["SPY", "IVV", "VOO", "SPLG"],
+          "confidence": "observed",
+          "source": "Major S&P 500 ETF AUM aggregate ~2026",
+          "note": "Large; but Greenwood-Sammon migrations often offset via MidCap 400"
+        },
+        "index_funds_est": {
+          "aum_usd": 3500000000000,
+          "confidence": "estimate",
+          "source": "ETF + institutional S&P 500 index mandates",
+          "note": "Includes etf_observed"
+        },
+        "benchmarked_bmi": {
+          "multiplier": 1.3,
+          "confidence": "scenario",
+          "source": "BMI — many actives already hug S&P 500",
+          "note": "Applied to base"
+        }
+      }
+    },
+    "sp400": {
+      "label": "S&P MidCap 400",
+      "family": "sp_dji",
+      "index_total_mcap_usd": 3000000000000,
+      "mcap_source": "Approximate",
+      "mcap_as_of": "2026-07-01",
+      "overlap_parent": null,
+      "migration_offset_for": "sp500",
+      "tiers": {
+        "etf_observed": {
+          "aum_usd": 80000000000,
+          "products": ["IJH", "MDY"],
+          "confidence": "observed",
+          "source": "S&P MidCap ETF AUM aggregate",
+          "note": "Often the offsetting sell when a name is promoted to S&P 500"
+        },
+        "index_funds_est": {
+          "aum_usd": 150000000000,
+          "confidence": "estimate",
+          "source": "ETF + MidCap index mandates",
+          "note": "Includes etf_observed"
+        },
+        "benchmarked_bmi": {
+          "multiplier": 1.5,
+          "confidence": "scenario",
+          "source": "BMI scenario",
+          "note": "Applied to base"
+        }
+      }
+    },
+    "sp600": {
+      "label": "S&P SmallCap 600",
+      "family": "sp_dji",
+      "index_total_mcap_usd": 1200000000000,
+      "mcap_source": "Approximate",
+      "mcap_as_of": "2026-07-01",
+      "overlap_parent": null,
+      "tiers": {
+        "etf_observed": {
+          "aum_usd": 70000000000,
+          "products": ["IJR", "SLY"],
+          "confidence": "observed",
+          "source": "S&P SmallCap ETF AUM aggregate",
+          "note": ""
+        },
+        "index_funds_est": {
+          "aum_usd": 120000000000,
+          "confidence": "estimate",
+          "source": "ETF + SmallCap index mandates",
+          "note": "Includes etf_observed"
+        },
+        "benchmarked_bmi": {
+          "multiplier": 1.5,
+          "confidence": "scenario",
+          "source": "BMI scenario",
+          "note": "Applied to base"
+        }
+      }
+    },
+    "nasdaq_100": {
+      "label": "Nasdaq-100",
+      "family": "nasdaq",
+      "index_total_mcap_usd": 30000000000000,
+      "mcap_source": "Approximate",
+      "mcap_as_of": "2026-07-01",
+      "overlap_parent": null,
+      "tiers": {
+        "etf_observed": {
+          "aum_usd": 350000000000,
+          "products": ["QQQ", "QQQM"],
+          "confidence": "observed",
+          "source": "Invesco QQQ complex AUM",
+          "note": "Concentrated; weight of a new mid-size add is still small vs mega-caps"
+        },
+        "index_funds_est": {
+          "aum_usd": 450000000000,
+          "confidence": "estimate",
+          "source": "ETF + Nasdaq-100 mandates",
+          "note": "Includes etf_observed"
+        },
+        "benchmarked_bmi": {
+          "multiplier": 1.3,
+          "confidence": "scenario",
+          "source": "BMI scenario",
+          "note": "Applied to base"
+        }
+      }
+    },
+    "msci_usa": {
+      "label": "MSCI USA",
+      "family": "msci",
+      "index_total_mcap_usd": 50000000000000,
+      "mcap_source": "Approximate",
+      "mcap_as_of": "2026-07-01",
+      "overlap_parent": null,
+      "tiers": {
+        "etf_observed": {
+          "aum_usd": 100000000000,
+          "products": [],
+          "confidence": "estimate",
+          "source": "MSCI USA ETF/mandate aggregate order-of-magnitude",
+          "note": "Lower confidence — FIF/licensing gaps"
+        },
+        "index_funds_est": {
+          "aum_usd": 400000000000,
+          "confidence": "estimate",
+          "source": "Institutional MSCI USA mandates",
+          "note": "Includes etf_observed"
+        },
+        "benchmarked_bmi": {
+          "multiplier": 1.4,
+          "confidence": "scenario",
+          "source": "BMI scenario",
+          "note": "Applied to base"
+        }
+      }
+    }
+  },
+  "migration_pairs": {
+    "russell_1000": {
+      "typical_from": ["russell_2000"],
+      "typical_with": ["russell_midcap"],
+      "typical_drop": ["russell_microcap"]
+    },
+    "russell_2000": {
+      "typical_from": ["russell_microcap"],
+      "typical_to_up": ["russell_1000", "russell_midcap"],
+      "typical_to_down": ["russell_microcap"]
+    },
+    "sp500": {
+      "typical_from": ["sp400"],
+      "typical_with": [],
+      "note": "Greenwood-Sammon: >80% of recent S&P 500 adds leave MidCap 400 — model both sides"
+    },
+    "sp400": {
+      "typical_from": ["sp600"],
+      "typical_to_up": ["sp500"]
+    }
+  }
+}
