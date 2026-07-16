@@ -1927,8 +1927,7 @@ def build_consensus(letters: list[dict], our_tickers: set[str], names: dict[str,
         fund = letter.get("fund") or "Unknown"
         fund_id = letter.get("fund_id") or fund
         fam_id = family_id_for_fund(fund_id, family_id=letter.get("family_id"))
-        vote_key = consensus_vote_key(fund_id, fund, family_id=fam_id)
-        all_funds.add(vote_key)        letter_date = letter.get("letter_date")
+        letter_date = letter.get("letter_date")
         letter_ev = letter_evidence_fields(letter)
         for pos in letter.get("positions") or []:
             tk = str(pos.get("ticker") or "").upper()
@@ -1947,16 +1946,18 @@ def build_consensus(letters: list[dict], our_tickers: set[str], names: dict[str,
             for store in (by_q.setdefault(q, {}), all_q):
                 b = store.get(tk) or _consensus_bucket(tk, names, our_tickers)
                 store[tk] = b
-                b["all_funds"].add(vote_key)
-                if action in BUY_ACTIONS:
-                    b["buy_funds"].add(vote_key)
-                elif action in SELL_ACTIONS:
-                    b["sell_funds"].add(vote_key)
-                elif action in SHORT_ACTIONS:
-                    b["short_funds"].add(vote_key)
+                if vote_key:
+                    b["all_funds"].add(vote_key)
+                    all_vote_keys.add(vote_key)
+                    if action in BUY_ACTIONS:
+                        b["buy_funds"].add(vote_key)
+                    elif action in SELL_ACTIONS:
+                        b["sell_funds"].add(vote_key)
+                    elif action in SHORT_ACTIONS:
+                        b["short_funds"].add(vote_key)
                 else:
-                    b["neutral_funds"].add(vote_key)
-            commentary = short_text(pos.get("commentary") or pos.get("thesis"), 280)            row = {
+                    b["mentioned_funds"].add(mention_key)
+            row = {
                 "ticker": tk,
                 "name": names.get(tk, tk),
                 "fund": fund,
@@ -2021,6 +2022,10 @@ def build_consensus(letters: list[dict], our_tickers: set[str], names: dict[str,
     for tk, rows in by_ticker.items():
         rows.sort(key=lambda r: (r.get("letter_date") or ""), reverse=True)
         by_ticker[tk] = _collapse_consensus_rows(rows)[:8]
+
+    as_of = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    proposals = propose_fund_families(letters, as_of=as_of)
+    write_family_proposals(proposals, as_of=as_of)
 
     return {
         "as_of": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
