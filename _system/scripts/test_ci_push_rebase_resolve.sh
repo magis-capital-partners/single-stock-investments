@@ -328,6 +328,80 @@ test_ticker_research_prefers_upstream() {
   fi
 }
 
+test_index_membership_prefers_upstream() {
+  is_prefer_upstream_on_rebase "_system/data/index_announcements.jsonl" || {
+    echo "FAIL: index_announcements.jsonl should prefer upstream during rebase"
+    exit 1
+  }
+  is_prefer_upstream_on_rebase "_system/data/index_rules.json" || {
+    echo "FAIL: index_rules.json should prefer upstream during rebase"
+    exit 1
+  }
+  is_prefer_upstream_on_rebase "_system/scripts/build_index_membership.py" || {
+    echo "FAIL: build_index_membership.py should prefer upstream during rebase"
+    exit 1
+  }
+  is_prefer_upstream_on_rebase "dashboard/index-viz.js" || {
+    echo "FAIL: dashboard/index-viz.js should prefer upstream during rebase"
+    exit 1
+  }
+  if is_prefer_upstream_on_rebase "_system/reviews/pending/activist_triage_2026-07-16.md"; then
+    echo "FAIL: activist triage review should not prefer upstream during rebase"
+    exit 1
+  fi
+}
+
+test_index_membership_json_is_regenerable() {
+  is_regenerable_artifact "dashboard/data/index_membership.json" || {
+    echo "FAIL: index_membership.json should be classified as regenerable"
+    exit 1
+  }
+  is_regenerable_artifact "docs/data/index_membership.json" || {
+    echo "FAIL: docs index_membership.json should be classified as regenerable"
+    exit 1
+  }
+  if is_regenerable_artifact "_system/data/index_announcements.jsonl"; then
+    echo "FAIL: index_announcements.jsonl should not be classified as regenerable"
+    exit 1
+  fi
+}
+
+test_index_membership_json_conflict() {
+  git checkout -b "$TMP_BRANCH" >/dev/null
+
+  python3 _system/scripts/build_index_membership.py >/dev/null
+  git add dashboard/data/index_membership.json docs/data/index_membership.json
+  git commit -m "test: base index membership snapshot" >/dev/null
+
+  python3 _system/scripts/build_index_membership.py >/dev/null
+  git add dashboard/data/index_membership.json docs/data/index_membership.json
+  git commit -m "test: local index membership regen" >/dev/null
+
+  git branch test-main-conflict "$MAIN_REF" >/dev/null
+  git checkout test-main-conflict >/dev/null
+  python3 _system/scripts/build_index_membership.py >/dev/null
+  git add dashboard/data/index_membership.json docs/data/index_membership.json
+  git commit -m "test: main index membership regen" >/dev/null
+
+  git checkout "$TMP_BRANCH" >/dev/null
+  if git rebase test-main-conflict; then
+    echo "FAIL: expected rebase conflict in dashboard/data/index_membership.json"
+    exit 1
+  fi
+
+  while rebase_in_progress && try_resolve_rebase_conflicts; do
+    :
+  done
+  if rebase_in_progress; then
+    echo "FAIL: index_membership.json conflict resolution helper did not finish rebase"
+    exit 1
+  fi
+  if grep -q '^<<<<<<< ' dashboard/data/index_membership.json; then
+    echo "FAIL: index_membership.json still contains merge conflict markers after resolution"
+    exit 1
+  fi
+}
+
 test_ticker_research_rebase_conflict() {
   local ticker="ABX"
   local research_file="$ticker/research/dossier.json"
@@ -456,12 +530,15 @@ test_main_writer_workflows_share_lock() {
 
 run_test "returns CSV classified as regenerable" test_returns_csv_is_regenerable
 run_test "ticker research prefers upstream on rebase" test_ticker_research_prefers_upstream
+run_test "index membership prefers upstream on rebase" test_index_membership_prefers_upstream
+run_test "index membership JSON classified as regenerable" test_index_membership_json_is_regenerable
 run_test "sync self refresh disabled no-op" test_sync_self_refresh_disabled
 run_test "dashboard JSON rebase conflict auto-resolution" test_dashboard_json_conflict
 run_test "docs mirror after dashboard JSON rebase conflict" test_docs_mirror_after_dashboard_conflict
 run_test "insights JSON rebase conflict auto-resolution" test_insights_json_conflict
 run_test "insights docs mirror rebase conflict auto-resolution" test_insights_docs_mirror_conflict
 run_test "activist feed JSON rebase conflict auto-resolution" test_activist_feed_json_conflict
+run_test "index membership JSON rebase conflict auto-resolution" test_index_membership_json_conflict
 run_test "INDEX.csv rebase conflict auto-resolution" test_index_csv_conflict
 run_test "mixed generated artifact rebase conflict auto-resolution" test_mixed_generated_conflict
 run_test "ticker research rebase conflict prefers upstream" test_ticker_research_rebase_conflict

@@ -69,6 +69,27 @@ is_prefer_upstream_on_rebase() {
     _system/reference/market-data/themes/*|_system/reference/market-data/peers/*|_system/reference/market-data/commodities/*|_system/reference/market-data/insider/*)
       return 0
       ;;
+    _system/data/index_*)
+      return 0
+      ;;
+    _system/frameworks/index_*)
+      return 0
+      ;;
+    _system/reference/index-effects/*)
+      return 0
+      ;;
+    _system/reference/valuation_followups.json)
+      return 0
+      ;;
+    _system/research/valuation_validation_cohort.json)
+      return 0
+      ;;
+    _system/scripts/build_index_membership.py|_system/scripts/index_*.py)
+      return 0
+      ;;
+    dashboard/index-viz.js|docs/index-viz.js)
+      return 0
+      ;;
     *)
       return 1
       ;;
@@ -158,6 +179,20 @@ stage_resolved_conflicts() {
   done <<< "$conflicted"
 }
 
+regenerate_index_membership_artifacts() {
+  if [ ! -f "_system/scripts/build_index_membership.py" ]; then
+    echo "::error::build_index_membership.py not found; cannot auto-resolve index membership conflicts."
+    return 1
+  fi
+  echo "Regenerating index membership to resolve rebase conflicts..."
+  rm -f dashboard/data/index_membership.json docs/data/index_membership.json 2>/dev/null || true
+  if ! "$PYTHON" _system/scripts/build_index_membership.py; then
+    echo "::error::build_index_membership.py failed while resolving a rebase conflict."
+    return 1
+  fi
+  git add dashboard/data/index_membership.json docs/data/index_membership.json 2>/dev/null || true
+}
+
 regenerate_activist_feed_artifacts() {
   if [ ! -f "_system/scripts/build_activist_feed.py" ]; then
     echo "::error::build_activist_feed.py not found; cannot auto-resolve activist feed conflicts."
@@ -209,6 +244,9 @@ regenerate_dashboard_json() {
   fi
   if [ -f "_system/scripts/build_activist_feed.py" ]; then
     regenerate_activist_feed_artifacts || return 1
+  fi
+  if [ -f "_system/scripts/build_index_membership.py" ]; then
+    regenerate_index_membership_artifacts || return 1
   fi
   if ! "$PYTHON" _system/scripts/build_dashboard_data.py; then
     echo "::error::build_dashboard_data.py failed while resolving a rebase conflict."
@@ -293,6 +331,7 @@ regenerate_conflicted_artifacts() {
   local needs_dashboard=0
   local needs_insights=0
   local needs_activist=0
+  local needs_index_membership=0
   local needs_indexes=0
   local needs_docs_index=0
   local needs_portfolio=0
@@ -310,6 +349,9 @@ regenerate_conflicted_artifacts() {
         ;;
       dashboard/data/activist_feed.json)
         needs_activist=1
+        ;;
+      dashboard/data/index_membership.json|docs/data/index_membership.json)
+        needs_index_membership=1
         ;;
       dashboard/data/*.json|docs/data/*.json)
         needs_dashboard=1
@@ -362,11 +404,14 @@ regenerate_conflicted_artifacts() {
   if [ "$needs_activist" -eq 1 ]; then
     regenerate_activist_feed_artifacts || return 1
   fi
+  if [ "$needs_index_membership" -eq 1 ]; then
+    regenerate_index_membership_artifacts || return 1
+  fi
   if [ "$needs_dashboard" -eq 1 ]; then
     regenerate_dashboard_json || return 1
   fi
 
-  if [ "$needs_dashboard" -eq 1 ] || [ "$needs_insights" -eq 1 ] || [ "$needs_activist" -eq 1 ]; then
+  if [ "$needs_dashboard" -eq 1 ] || [ "$needs_insights" -eq 1 ] || [ "$needs_activist" -eq 1 ] || [ "$needs_index_membership" -eq 1 ]; then
     mirror_dashboard_to_docs
     git add dashboard/data/ docs/ 2>/dev/null || true
   fi
