@@ -22,7 +22,7 @@
     "shares_outstanding": 84086286,
     "shares_source": "10-Q cover: 84,086,286 common shares outstanding at 2026-05-11",
     "book_per_share": 0.28,
-    "book_per_share_caveat": "Stockholders equity $23.3M at 2025-12-31 / shares; 46,000-acre land and 220-mile pipeline carried at historical cost \u2014 not fair-value NAV",
+    "book_per_share_caveat": "Stockholders equity $23.3M at 2025-12-31 / shares; 46,000-acre land and 220-mile pipeline carried at historical cost — not fair-value NAV",
     "cash_per_share": 0.2,
     "cash_source": "Cash $8.6M at 2025-12-31 / 83.2M shares; Q1 2026 $16.5M after equity raises",
     "debt_total_m": 78.3,
@@ -50,7 +50,7 @@
     "gaap_book_per_share": 0.28,
     "overlay_nav_per_share": 5.5,
     "overlay_nav_bull_per_share": 9.0,
-    "overlay_rationale": "Book understates permitted water supply (2.5M AF), 46,000 acres, and Northern Pipeline; overlay sizes contracted 21,275 AFY supply path and MWI equity option \u2014 not full 50,000 AFY ramp.",
+    "overlay_rationale": "Book understates permitted water supply (2.5M AF), 46,000 acres, and Northern Pipeline; overlay sizes contracted 21,275 AFY supply path and MWI equity option — not full 50,000 AFY ramp.",
     "gaap_vs_fair_value": {
       "water_land_segment_assets_m": 130.9,
       "water_treatment_segment_assets_m": 10.0,
@@ -77,12 +77,12 @@
     "segments_or_options": [
       {
         "id": "mojave_contracted_supply",
-        "label": "Mojave Groundwater Bank \u2014 21,275 AFY contracted supply",
+        "label": "Mojave Groundwater Bank — 21,275 AFY contracted supply",
         "option_treatment": "probability_weighted",
         "p_base": 0.45,
         "nav_per_share_full": 4.0,
         "overlay_value_per_share": 1.8,
-        "nav_assumption": "21,275 AFY \u00d7 $850/AF net \u2248 $18M/year gross at wellhead; 45% probability of partial ramp by year 7 [Assumption]",
+        "nav_assumption": "21,275 AFY × $850/AF net ≈ $18M/year gross at wellhead; 45% probability of partial ramp by year 7 [Assumption]",
         "not_in_lawrence_base": true,
         "evidence": "10-K FY2025 Item 1: 2024 supply agreements; FEIR permits 50,000 AFY"
       },
@@ -116,7 +116,7 @@
         "id": "storage_banking",
         "label": "Up to 1M AF groundwater storage / banking fees",
         "option_treatment": "zero",
-        "base_terminal_rationale": "No storage contracts signed; discussions only \u2014 explicit zero in overlay base after scan",
+        "base_terminal_rationale": "No storage contracts signed; discussions only — explicit zero in overlay base after scan",
         "nav_per_share": 0,
         "not_in_lawrence_base": true,
         "evidence": "10-K FY2025: banking capacity permitted; no executed storage agreements"
@@ -218,7 +218,7 @@
             "label": "Contracted water toll (probability-weighted)",
             "gaap_per_share": 0.0,
             "uplift_per_share": 1.8,
-            "math": "45% \u00d7 $4.0/sh full value on 21,275 AFY path"
+            "math": "45% × $4.0/sh full value on 21,275 AFY path"
           },
           {
             "id": "mwi_close",
@@ -564,5 +564,76 @@
     "contributor_count": 6,
     "in_base_irr": false,
     "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
+  },
+  "property_register": {
+    "status": "ok",
+    "as_of": "2026-05-11",
+    "source": "Cadiz 10-K FY2025 Item 1; nav_overlay as_of 2026-06-11",
+    "in_base_irr": false,
+    "property_count": 4,
+    "total_fair_value_usd": 450427887.0,
+    "total_fair_value_m": 450.428,
+    "types": {
+      "land": 1,
+      "water_rights": 1,
+      "pipeline": 1,
+      "equity_stake": 1
+    },
+    "reconciliation": {
+      "ok": true,
+      "unknown_targets": [],
+      "lines": [
+        {
+          "nav_overlay_line": "gaap:water_land_segment_assets_m",
+          "property_ids": [
+            "cadiz-ranch"
+          ],
+          "sum_usd": 130900000.0,
+          "target_usd": 130900000.0,
+          "delta_usd": 0.0,
+          "tolerance_usd": 6545000.0,
+          "source": "nav_overlay.gaap_vs_fair_value.water_land_segment_assets_m",
+          "status": "ok"
+        },
+        {
+          "nav_overlay_line": "mojave_contracted_supply",
+          "property_ids": [
+            "mojave-contracted-supply"
+          ],
+          "sum_usd": 151355315.0,
+          "target_usd": 151355314.8,
+          "delta_usd": 0.2,
+          "tolerance_usd": 7567765.74,
+          "source": "nav_overlay.segments_or_options[mojave_contracted_supply]",
+          "status": "ok"
+        },
+        {
+          "nav_overlay_line": "mwi_equity_stake",
+          "property_ids": [
+            "mwi-equity"
+          ],
+          "sum_usd": 100903543.0,
+          "target_usd": 100903543.2,
+          "delta_usd": -0.2,
+          "tolerance_usd": 5045177.16,
+          "source": "nav_overlay.segments_or_options[mwi_equity_stake]",
+          "status": "ok"
+        },
+        {
+          "nav_overlay_line": "northern_pipeline",
+          "property_ids": [
+            "northern-pipeline"
+          ],
+          "sum_usd": 67269029.0,
+          "target_usd": 67269028.8,
+          "delta_usd": 0.2,
+          "tolerance_usd": 3363451.44,
+          "source": "nav_overlay.segments_or_options[northern_pipeline]",
+          "status": "ok"
+        }
+      ]
+    },
+    "updated_at": "2026-07-16T15:48:41Z",
+    "register_path": "CDZI/research/properties.json"
   }
 }

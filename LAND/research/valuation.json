@@ -426,7 +426,7 @@
         "hard_to_vary": true,
         "falsifiable": true,
         "not_instrumentalist": true,
-        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+        "reach": "Weights encode evidence tier (A primary → D external), not fitted to hit a target IRR"
       },
       "qualitative_audit": {
         "flags": [],
@@ -511,5 +511,50 @@
     "price_for_market_cap": 9.225,
     "chart": "LAND/research/charts/total_return_2026-07-15.svg",
     "panel_json": "LAND/research/total_return_panel.json"
+  },
+  "property_register": {
+    "status": "ok",
+    "as_of": "2026-03-31",
+    "source": "Gladstone Land 10-K FY2025; Q1 2026; nav_overlay as_of 2026-06-10",
+    "in_base_irr": false,
+    "property_count": 2,
+    "total_fair_value_usd": 1150338771.5,
+    "total_fair_value_m": 1150.339,
+    "types": {
+      "farmland": 1,
+      "water_rights": 1
+    },
+    "reconciliation": {
+      "ok": true,
+      "unknown_targets": [],
+      "lines": [
+        {
+          "nav_overlay_line": "ca_water_rights",
+          "property_ids": [
+            "ca-water-rights"
+          ],
+          "sum_usd": 62638771.5,
+          "target_usd": 62638771.5,
+          "delta_usd": 0.0,
+          "tolerance_usd": 3131938.58,
+          "source": "nav_overlay.segments_or_options[ca_water_rights]",
+          "status": "ok"
+        },
+        {
+          "nav_overlay_line": "gaap:real_estate_investment_net_m",
+          "property_ids": [
+            "farm-portfolio"
+          ],
+          "sum_usd": 1087700000.0,
+          "target_usd": 1087700000.0,
+          "delta_usd": 0.0,
+          "tolerance_usd": 54385000.0,
+          "source": "nav_overlay.gaap_vs_fair_value.real_estate_investment_net_m",
+          "status": "ok"
+        }
+      ]
+    },
+    "updated_at": "2026-07-16T15:48:41Z",
+    "register_path": "LAND/research/properties.json"
   }
 }

@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "ticker": "LAND",
+  "as_of": "2026-03-31",
+  "source": "Gladstone Land 10-K FY2025; Q1 2026; nav_overlay as_of 2026-06-10",
+  "notes": "Portfolio-level register (144 farms). Schedule III farm-by-farm detail can be expanded later; water rights mapped to ca_water_rights segment.",
+  "in_base_irr": false,
+  "properties": [
+    {
+      "id": "farm-portfolio",
+      "name": "Leased farmland portfolio (144 farms)",
+      "type": "farmland",
+      "location": "United States (multi-state)",
+      "units": { "acres": 98688 },
+      "carrying_value_usd": 1087700000,
+      "estimated_fair_value_usd": {
+        "low": 1087700000,
+        "base": 1087700000,
+        "high": 1171000000
+      },
+      "income": { "annualized_cash_noi_usd": null },
+      "valuation_basis": "Real estate investment net $1,087.7M; cost $1,143.8M. No company fair-value NAV disclosed — base equals carrying; high illustrative cost.",
+      "source": "10-K FY2025; nav_overlay.gaap_vs_fair_value",
+      "status": "held",
+      "nav_overlay_line": "gaap:real_estate_investment_net_m",
+      "flags": ["Carrying value used as base — fair marks [HUMAN REVIEW]"]
+    },
+    {
+      "id": "ca-water-rights",
+      "name": "California water portfolio (~55,649 acre-feet)",
+      "type": "water_rights",
+      "location": "California",
+      "units": { "acre_feet": 55649 },
+      "carrying_value_usd": null,
+      "estimated_fair_value_usd": {
+        "low": 41759181,
+        "base": 62638771.5,
+        "high": 83518362
+      },
+      "income": { "annualized_cash_noi_usd": null },
+      "valuation_basis": "nav_overlay ca_water_rights $1.50/sh × 41,759,181 shares; FY2025 purchased 1,530 AF at ~$381/AF",
+      "source": "8-K 2026-02-24 Ex. 99.1; nav_overlay.segments_or_options.ca_water_rights",
+      "status": "held",
+      "nav_overlay_line": "ca_water_rights",
+      "flags": ["Assumption"]
+    }
+  ]
+}

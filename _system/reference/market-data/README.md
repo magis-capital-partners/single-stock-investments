@@ -11,6 +11,7 @@ Populated by `_system/scripts/download_ira_research.py`.
 | `macro/` | FRED CPI, 10Y, VIX |
 | `commodities/` | Spot inputs (copper) via `fetch_market_inputs.py` |
 | `themes/` | Thematic indicator panels (`fetch_theme_panel.py`) + `manifest.json` |
+| `real-estate/` | Deal-implied cap rates and comps (context tier; `in_base_irr: false`) |
 | `ira_download_manifest.json` | Last download log |
 
 See `_system/frameworks/darwin_ira_research_plan.md`.

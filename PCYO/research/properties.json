@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "ticker": "PCYO",
+  "as_of": "2026-02-28",
+  "source": "Pure Cycle 10-K FY2025; 10-Q Feb 28, 2026; nav_overlay as_of 2026-06-03",
+  "notes": "Sky Ranch land/water and Arkansas minerals. Related-party receivables included as monetizable claim mapped to milestone_nav segment.",
+  "in_base_irr": false,
+  "properties": [
+    {
+      "id": "sky-ranch-land-water",
+      "name": "Sky Ranch undeveloped phases + water/wastewater systems",
+      "type": "land_development",
+      "location": "Arapahoe County, CO (Sky Ranch)",
+      "units": { "acre_feet": 30602 },
+      "carrying_value_usd": 71298000,
+      "estimated_fair_value_usd": {
+        "low": 71298000,
+        "base": 71298000,
+        "high": 120000000
+      },
+      "income": { "annualized_cash_noi_usd": null },
+      "valuation_basis": "Investment in water and wastewater systems net $71.3M; lot delivery economics embedded in segment growth — high is illustrative only",
+      "source": "10-K FY2025; nav_overlay.gaap_vs_fair_value",
+      "status": "development",
+      "nav_overlay_line": "gaap:investment_water_wastewater_net_m",
+      "flags": ["High FV illustrative — not a filing mark", "Segment sky_ranch_undeveloped is embedded_in_segment with $0 separate NAV"]
+    },
+    {
+      "id": "arkansas-minerals",
+      "name": "Arkansas River Valley mineral interests (~13,900 acres)",
+      "type": "mineral_rights",
+      "location": "Arkansas River Valley, AR",
+      "units": { "acres": 13900 },
+      "carrying_value_usd": 0,
+      "estimated_fair_value_usd": {
+        "low": 6025977,
+        "base": 12051954,
+        "high": 24103908
+      },
+      "income": { "annualized_cash_noi_usd": null },
+      "valuation_basis": "Impaired to zero in FY2020; nav_overlay floor $0.50/sh × 24,103,908 shares",
+      "source": "10-K FY2025; nav_overlay.segments_or_options.mineral_arkansas",
+      "status": "held",
+      "nav_overlay_line": "mineral_arkansas",
+      "flags": ["Assumption"]
+    },
+    {
+      "id": "sky-ranch-cab-receivables",
+      "name": "Sky Ranch CAB / Rangeview reimbursable advances",
+      "type": "loan",
+      "location": "Sky Ranch, CO",
+      "units": {},
+      "carrying_value_usd": 56289000,
+      "estimated_fair_value_usd": {
+        "low": 24103908,
+        "base": 36155862,
+        "high": 56289000
+      },
+      "income": { "annualized_cash_noi_usd": null },
+      "valuation_basis": "Related-party notes receivable $56.3M; base uses $1.50/sh partial mark from nav_overlay",
+      "source": "10-Q Feb 28, 2026; nav_overlay.segments_or_options.related_party_receivables",
+      "status": "held",
+      "nav_overlay_line": "related_party_receivables",
+      "flags": ["Assumption"]
+    }
+  ]
+}

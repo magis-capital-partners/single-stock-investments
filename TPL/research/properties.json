@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "ticker": "TPL",
+  "as_of": "2026-06-01",
+  "source": "TPL 10-K FY2025 Item 1 Business; nav_overlay illustrative comps",
+  "notes": "Surface and NRA inventory from filing acreage. Fair values use nav_overlay assumptions (surface $2,500/ac; NRA at Mar 2025 acquisition comp, probability-weighted for undeveloped). in_base_irr stays false — register does not inflate Lawrence IRR.",
+  "in_base_irr": false,
+  "properties": [
+    {
+      "id": "permian-surface",
+      "name": "Permian Basin surface acreage (~882k acres)",
+      "type": "land",
+      "location": "Permian Basin, TX / NM",
+      "units": { "acres": 882000 },
+      "carrying_value_usd": 0,
+      "estimated_fair_value_usd": {
+        "low": 1764000000,
+        "base": 2205000000,
+        "high": 5043318000
+      },
+      "income": { "annualized_cash_noi_usd": null },
+      "valuation_basis": "Base 882k × $2,500/ac [Assumption]; high uses May 2025 sale comp $5,718/ac on 787 acres; GAAP assigned land is zero",
+      "source": "10-K FY2025 Item 1; nav_overlay.illustrative_comps.may_2025_land_sale",
+      "status": "held",
+      "nav_overlay_line": "surface_acres",
+      "flags": ["Assumption", "not_in_lawrence_base"]
+    },
+    {
+      "id": "undeveloped-nra",
+      "name": "Undeveloped / incremental net royalty acres (~224k NRA)",
+      "type": "royalty_acres",
+      "location": "Permian Basin, TX / NM",
+      "units": { "nra": 224000, "acres": null },
+      "carrying_value_usd": 0,
+      "estimated_fair_value_usd": {
+        "low": 553250000,
+        "base": 1107400000,
+        "high": 4426400000
+      },
+      "income": { "annualized_cash_noi_usd": null },
+      "valuation_basis": "224k NRA × $19,775 Mar 2025 acquisition comp; base applies 25% probability for incremental drilling not in FY2025 run-rate",
+      "source": "10-K FY2025; nav_overlay.segments_or_options.undeveloped_nra",
+      "status": "option",
+      "nav_overlay_line": "undeveloped_nra",
+      "flags": ["Assumption", "not_in_lawrence_base", "Do not double-count with producing royalty DCF"]
+    }
+  ]
+}

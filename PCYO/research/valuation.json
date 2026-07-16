@@ -15,10 +15,10 @@
     "price": 10.09,
     "price_source": "Stooq PCYO.US close 2026-06-03",
     "fcf_per_share": 0.5,
-    "fcf_source": "FY2025 net income $13.1M \u00f7 ~24.1M diluted shares; 27th consecutive profitable quarter; H1 FY2026 EPS $0.23",
+    "fcf_source": "FY2025 net income $13.1M ÷ ~24.1M diluted shares; 27th consecutive profitable quarter; H1 FY2026 EPS $0.23",
     "shares_outstanding": 24103908,
     "book_per_share": 6.17,
-    "book_source": "FY2025 shareholders' equity $142.7M \u00f7 shares (10-K); Q2 FY2026 equity $148.7M",
+    "book_source": "FY2025 shareholders' equity $142.7M ÷ shares (10-K); Q2 FY2026 equity $148.7M",
     "normalization_note": "Lawrence uses filing net income per share, not OCF $13.2M (working-capital and related-party note swings). Sky Ranch lot capex is largely reimbursed via Sky Ranch CAB / Rangeview notes over time."
   },
   "nav_overlay": {
@@ -293,7 +293,7 @@
         "hard_to_vary": true,
         "falsifiable": true,
         "not_instrumentalist": true,
-        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+        "reach": "Weights encode evidence tier (A primary → D external), not fitted to hit a target IRR"
       },
       "qualitative_audit": {
         "flags": [],
@@ -472,5 +472,63 @@
     "price_for_market_cap": 10.09,
     "chart": "PCYO/research/charts/total_return_2026-07-15.svg",
     "panel_json": "PCYO/research/total_return_panel.json"
+  },
+  "property_register": {
+    "status": "ok",
+    "as_of": "2026-02-28",
+    "source": "Pure Cycle 10-K FY2025; 10-Q Feb 28, 2026; nav_overlay as_of 2026-06-03",
+    "in_base_irr": false,
+    "property_count": 3,
+    "total_fair_value_usd": 119505816.0,
+    "total_fair_value_m": 119.506,
+    "types": {
+      "land_development": 1,
+      "mineral_rights": 1,
+      "loan": 1
+    },
+    "reconciliation": {
+      "ok": true,
+      "unknown_targets": [],
+      "lines": [
+        {
+          "nav_overlay_line": "gaap:investment_water_wastewater_net_m",
+          "property_ids": [
+            "sky-ranch-land-water"
+          ],
+          "sum_usd": 71298000.0,
+          "target_usd": 71298000.0,
+          "delta_usd": 0.0,
+          "tolerance_usd": 3564900.0,
+          "source": "nav_overlay.gaap_vs_fair_value.investment_water_wastewater_net_m",
+          "status": "ok"
+        },
+        {
+          "nav_overlay_line": "mineral_arkansas",
+          "property_ids": [
+            "arkansas-minerals"
+          ],
+          "sum_usd": 12051954.0,
+          "target_usd": 12051954.0,
+          "delta_usd": 0.0,
+          "tolerance_usd": 1000000.0,
+          "source": "nav_overlay.segments_or_options[mineral_arkansas]",
+          "status": "ok"
+        },
+        {
+          "nav_overlay_line": "related_party_receivables",
+          "property_ids": [
+            "sky-ranch-cab-receivables"
+          ],
+          "sum_usd": 36155862.0,
+          "target_usd": 36155862.0,
+          "delta_usd": 0.0,
+          "tolerance_usd": 1807793.1,
+          "source": "nav_overlay.segments_or_options[related_party_receivables]",
+          "status": "ok"
+        }
+      ]
+    },
+    "updated_at": "2026-07-16T15:48:41Z",
+    "register_path": "PCYO/research/properties.json"
   }
 }

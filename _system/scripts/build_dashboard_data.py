@@ -742,6 +742,65 @@ def valuation_human_review(ticker_dir: Path) -> dict | None:
     }
 
 
+def property_register_summary(ticker_dir: Path) -> dict | None:
+    """Property inventory for the Valuation drawer (from properties.json + valuation summary)."""
+    reg_path = ticker_dir / "research" / "properties.json"
+    if not reg_path.exists():
+        return None
+    try:
+        reg = json.loads(reg_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return None
+    val = load_valuation(ticker_dir) or {}
+    summary = val.get("property_register") or {}
+    props = []
+    for row in reg.get("properties") or []:
+        fv = row.get("estimated_fair_value_usd") or {}
+        income = row.get("income") or {}
+        units = row.get("units") or {}
+        props.append({
+            "id": row.get("id"),
+            "name": row.get("name"),
+            "type": row.get("type"),
+            "location": row.get("location"),
+            "status": row.get("status"),
+            "nav_overlay_line": row.get("nav_overlay_line"),
+            "carrying_value_usd": row.get("carrying_value_usd"),
+            "fair_value_usd": {
+                "low": fv.get("low") if isinstance(fv, dict) else None,
+                "base": fv.get("base") if isinstance(fv, dict) else None,
+                "high": fv.get("high") if isinstance(fv, dict) else None,
+            },
+            "annualized_cash_noi_usd": income.get("annualized_cash_noi_usd"),
+            "annualized_cash_rent_usd": income.get("annualized_cash_rent_usd"),
+            "units": {
+                "acres": units.get("acres"),
+                "sqft": units.get("sqft"),
+                "acre_feet": units.get("acre_feet"),
+                "nra": units.get("nra"),
+            },
+            "valuation_basis": row.get("valuation_basis"),
+            "source": row.get("source"),
+            "flags": row.get("flags") or [],
+        })
+    recon = summary.get("reconciliation") or {}
+    return {
+        "as_of": summary.get("as_of") or reg.get("as_of"),
+        "source": summary.get("source") or reg.get("source"),
+        "status": summary.get("status") or ("ok" if props else "missing"),
+        "in_base_irr": bool(summary.get("in_base_irr", reg.get("in_base_irr", False))),
+        "property_count": summary.get("property_count") or len(props),
+        "total_fair_value_usd": summary.get("total_fair_value_usd"),
+        "total_fair_value_m": summary.get("total_fair_value_m"),
+        "types": summary.get("types") or {},
+        "reconciliation_ok": recon.get("ok"),
+        "unknown_targets": recon.get("unknown_targets") or [],
+        "properties": props,
+        "github_url": github_blob_url(reg_path.relative_to(ROOT).as_posix()) if reg_path.exists() else None,
+        "updated_at": summary.get("updated_at"),
+    }
+
+
 def valuation_component_summary(ticker_dir: Path) -> dict | None:
     """Small, presentation-safe component valuation payload for the dashboard."""
     val = load_valuation(ticker_dir)
@@ -2083,6 +2142,7 @@ def build_ticker_row(
         "investment_committee": investment_committee_summary(ticker_dir),
         "valuation_workbench": valuation_workbench_summary(ticker_dir),
         "component_valuation": valuation_component_summary(ticker_dir),
+        "properties": property_register_summary(ticker_dir),
         "total_return_panel": valuation_total_return_panel(ticker, ticker_dir),
         # filled below after workbench/component are known
         "valuation_decision": None,
@@ -2308,6 +2368,7 @@ def build() -> dict:
         sleeve_filters.append({"id": sleeve_id, "label": label, "count": count})
 
     valuation_queue = valuation_queue_summary(rows)
+    with_property_register = sum(1 for r in rows if r.get("properties"))
     return {
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "workspace": str(ROOT),
@@ -2317,6 +2378,7 @@ def build() -> dict:
             "total_pdfs": total_pdfs,
             "with_readme": with_readme,
             "with_research": with_research,
+            "with_property_register": with_property_register,
             "avg_completeness": avg_complete,
             "markets": sort_markets({r["market"] for r in rows}),
             "market_filters": sort_market_filters({r["market"] for r in rows}),

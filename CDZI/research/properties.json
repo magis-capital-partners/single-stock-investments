@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "ticker": "CDZI",
+  "as_of": "2026-05-11",
+  "source": "Cadiz 10-K FY2025 Item 1; nav_overlay as_of 2026-06-11",
+  "notes": "Cadiz Ranch land, Mojave contracted supply option, and Northern Pipeline. Fair values use probability-weighted overlay_value_per_share × shares — not full permit capacity.",
+  "in_base_irr": false,
+  "properties": [
+    {
+      "id": "cadiz-ranch",
+      "name": "Cadiz Ranch land (~46,000 acres)",
+      "type": "land",
+      "location": "San Bernardino County, CA",
+      "units": { "acres": 46000, "acre_feet": 2500000 },
+      "carrying_value_usd": 130900000,
+      "estimated_fair_value_usd": {
+        "low": 130900000,
+        "base": 130900000,
+        "high": 200000000
+      },
+      "income": { "annualized_cash_noi_usd": null },
+      "valuation_basis": "Water and Land Resources segment assets $130.9M at cost; permitted supply 2.5M AF / 1M AF storage. High illustrative only.",
+      "source": "10-K FY2025 Item 1; nav_overlay.gaap_vs_fair_value",
+      "status": "held",
+      "nav_overlay_line": "gaap:water_land_segment_assets_m",
+      "flags": ["Land carrying shared with water project — do not add full water PV on top without adjustment"]
+    },
+    {
+      "id": "mojave-contracted-supply",
+      "name": "Mojave Groundwater Bank — 21,275 AFY contracted supply",
+      "type": "water_rights",
+      "location": "Mojave Desert, CA",
+      "units": { "acre_feet": 21275 },
+      "carrying_value_usd": null,
+      "estimated_fair_value_usd": {
+        "low": 75677657,
+        "base": 151355315,
+        "high": 336345144
+      },
+      "income": { "annualized_cash_rent_usd": 18083750 },
+      "valuation_basis": "overlay_value_per_share $1.80 base / $4.00 full × 84,086,286 shares; income 21,275 AFY × $850/AF net wellhead [Assumption path]",
+      "source": "10-K FY2025; nav_overlay.segments_or_options.mojave_contracted_supply",
+      "status": "option",
+      "nav_overlay_line": "mojave_contracted_supply",
+      "flags": ["Assumption", "probability_weighted"]
+    },
+    {
+      "id": "northern-pipeline",
+      "name": "220-mile Northern Pipeline (idle, conversion permitted)",
+      "type": "pipeline",
+      "location": "Southern California",
+      "units": {},
+      "carrying_value_usd": null,
+      "estimated_fair_value_usd": {
+        "low": 33634514,
+        "base": 67269029,
+        "high": 100903543
+      },
+      "income": { "annualized_cash_noi_usd": null },
+      "valuation_basis": "nav_overlay northern_pipeline $0.80/sh × 84,086,286 shares",
+      "source": "10-K FY2025; nav_overlay.segments_or_options.northern_pipeline",
+      "status": "option",
+      "nav_overlay_line": "northern_pipeline",
+      "flags": ["Assumption"]
+    },
+    {
+      "id": "mwi-equity",
+      "name": "MWI equity + pipeline reimbursement at financing close",
+      "type": "equity_stake",
+      "location": "Mojave Water Infrastructure",
+      "units": {},
+      "carrying_value_usd": 0,
+      "estimated_fair_value_usd": {
+        "low": 50451772,
+        "base": 100903543,
+        "high": 252258858
+      },
+      "income": { "annualized_cash_noi_usd": null },
+      "valuation_basis": "overlay_value_per_share $1.20 base / $3.00 full × 84,086,286 shares; MWI not yet capitalized",
+      "source": "10-K FY2025; nav_overlay.segments_or_options.mwi_equity_stake",
+      "status": "option",
+      "nav_overlay_line": "mwi_equity_stake",
+      "flags": ["Assumption", "milestone_nav"]
+    }
+  ]
+}

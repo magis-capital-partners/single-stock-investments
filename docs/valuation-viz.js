@@ -339,6 +339,71 @@
     </div>`;
   }
 
+  function fmtUsdCompact(n, fmtNum) {
+    if (n == null || Number.isNaN(Number(n))) return '—';
+    const v = Number(n);
+    if (Math.abs(v) >= 1e9) return '$' + fmtNum(v / 1e9, 2) + 'B';
+    if (Math.abs(v) >= 1e6) return '$' + fmtNum(v / 1e6, 1) + 'M';
+    if (Math.abs(v) >= 1e3) return '$' + fmtNum(v / 1e3, 0) + 'K';
+    return '$' + fmtNum(v, 0);
+  }
+
+  function propertyUnitsLabel(units) {
+    if (!units) return '';
+    const parts = [];
+    if (units.acres != null) parts.push(`${Number(units.acres).toLocaleString()} acres`);
+    if (units.nra != null) parts.push(`${Number(units.nra).toLocaleString()} NRA`);
+    if (units.acre_feet != null) parts.push(`${Number(units.acre_feet).toLocaleString()} AF`);
+    if (units.sqft != null) parts.push(`${Number(units.sqft).toLocaleString()} sqft`);
+    return parts.join(' · ');
+  }
+
+  function renderPropertiesPanel(t, helpers) {
+    const { escapeHtml, fmtNum } = helpers;
+    const reg = t.properties;
+    if (!reg || !(reg.properties || []).length) return '';
+    const reconOk = reg.reconciliation_ok;
+    const reconBadge = reconOk === true
+      ? '<span class="badge badge-ok">reconciled</span>'
+      : reconOk === false
+        ? '<span class="badge badge-warn">needs review</span>'
+        : '<span class="badge badge-warn">unchecked</span>';
+    const rows = (reg.properties || []).map((p) => {
+      const fv = p.fair_value_usd || {};
+      const units = propertyUnitsLabel(p.units);
+      const flags = (p.flags || []).length
+        ? `<div class="tier-sub">${escapeHtml((p.flags || []).join(' · ').slice(0, 180))}</div>`
+        : '';
+      return `<tr>
+        <td><strong>${escapeHtml(p.name || p.id || '—')}</strong>
+          <div class="tier-sub">${escapeHtml((p.type || '').replace(/_/g, ' '))}${p.location ? ' · ' + escapeHtml(p.location) : ''}${units ? ' · ' + escapeHtml(units) : ''}</div>
+          ${flags}
+        </td>
+        <td>${escapeHtml(p.status || '—')}</td>
+        <td class="mono">${escapeHtml(p.nav_overlay_line || '—')}</td>
+        <td class="mono">${fmtUsdCompact(p.carrying_value_usd, fmtNum)}</td>
+        <td class="mono">${fmtUsdCompact(fv.low, fmtNum)} / ${fmtUsdCompact(fv.base, fmtNum)} / ${fmtUsdCompact(fv.high, fmtNum)}</td>
+      </tr>`;
+    }).join('');
+    return `<div class="detail-section property-register">
+      <div class="workbench-head">
+        <div>
+          <h3>Properties ${reconBadge}</h3>
+          <div class="tier-sub">${Number(reg.property_count || 0)} assets · total fair value ${fmtUsdCompact(reg.total_fair_value_usd, fmtNum)} · as of ${escapeHtml(reg.as_of || '—')}${reg.in_base_irr ? '' : ' · context / NAV inventory only'}</div>
+        </div>
+        ${reg.github_url ? `<a class="research-link" href="${reg.github_url}" target="_blank" rel="noopener">properties.json →</a>` : ''}
+      </div>
+      <p class="tier-sub" style="margin:0 0 10px">Maps to <code>nav_overlay</code> lines for reconciliation. Does not auto-inflate base IRR.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Property</th><th>Status</th><th>Overlay line</th><th>Carrying</th><th>Fair value L/B/H</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+      ${(reg.unknown_targets || []).length ? `<p class="tier-sub" style="margin-top:8px">Unknown overlay targets: ${escapeHtml((reg.unknown_targets || []).join(', '))}</p>` : ''}
+    </div>`;
+  }
+
   function renderQueuePanel(queue, helpers) {
     const { escapeHtml, fmtNum } = helpers;
     if (!queue || !(queue.items || []).length) {
@@ -403,6 +468,7 @@
     renderDecisionStrip,
     renderValuationWorkbench,
     renderLegacyComponentNote,
+    renderPropertiesPanel,
     renderQueuePanel,
     matchesValuationFilter,
     workbenchStatusBadge,

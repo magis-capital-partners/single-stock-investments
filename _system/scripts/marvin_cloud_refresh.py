@@ -301,6 +301,12 @@ def main() -> int:
             "optionality evidence refresh",
             [PY, str(SCRIPTS / "refresh_optionality_valuation.py"), ticker],
         )
+    if (research / "properties.json").exists():
+        ok &= run(
+            "property register",
+            [PY, str(SCRIPTS / "build_property_register.py"), ticker],
+            optional=True,
+        )
     book_cfg = research / "book_estimate_config.json"
     if book_cfg.exists():
         ok &= run(

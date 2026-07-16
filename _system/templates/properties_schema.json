@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "properties_register_v1",
+  "title": "Property register",
+  "description": "Per-ticker real-estate / land / water property inventory. Each row maps to a nav_overlay line or segment via nav_overlay_line so fair values reconcile to valuation.json.",
+  "type": "object",
+  "required": ["schema_version", "ticker", "as_of", "properties"],
+  "additionalProperties": true,
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "ticker": { "type": "string", "minLength": 1 },
+    "as_of": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "source": { "type": "string" },
+    "notes": { "type": "string" },
+    "in_base_irr": {
+      "type": "boolean",
+      "description": "Must stay false unless human promotes; register is inventory + NAV reconciliation, not an IRR driver."
+    },
+    "properties": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "type", "status", "nav_overlay_line"],
+        "additionalProperties": true,
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "name": { "type": "string", "minLength": 1 },
+          "type": {
+            "type": "string",
+            "enum": [
+              "land",
+              "land_development",
+              "operating_real_estate",
+              "farmland",
+              "ground_lease",
+              "water_rights",
+              "mineral_rights",
+              "royalty_acres",
+              "pipeline",
+              "equity_stake",
+              "loan",
+              "securities",
+              "other"
+            ]
+          },
+          "location": { "type": ["string", "null"] },
+          "units": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "acres": { "type": ["number", "null"] },
+              "sqft": { "type": ["number", "null"] },
+              "acre_feet": { "type": ["number", "null"] },
+              "nra": { "type": ["number", "null"] },
+              "keys": { "type": ["number", "null"] },
+              "units": { "type": ["number", "null"] }
+            }
+          },
+          "carrying_value_usd": { "type": ["number", "null"] },
+          "estimated_fair_value_usd": {
+            "type": "object",
+            "properties": {
+              "low": { "type": ["number", "null"] },
+              "base": { "type": ["number", "null"] },
+              "high": { "type": ["number", "null"] }
+            }
+          },
+          "income": {
+            "type": "object",
+            "properties": {
+              "annualized_cash_noi_usd": { "type": ["number", "null"] },
+              "annualized_cash_rent_usd": { "type": ["number", "null"] }
+            }
+          },
+          "valuation_basis": { "type": ["string", "null"] },
+          "source": { "type": ["string", "null"] },
+          "status": {
+            "type": "string",
+            "enum": ["held", "under_contract", "sold", "option", "mark", "development"]
+          },
+          "nav_overlay_line": {
+            "type": "string",
+            "description": "Must match nav_overlay.lines[].id or nav_overlay.segments_or_options[].id"
+          },
+          "flags": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Use Assumption or HUMAN REVIEW when values are not filing-exact."
+          }
+        }
+      }
+    }
+  }
+}

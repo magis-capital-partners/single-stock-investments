@@ -2750,6 +2750,8 @@ function selectTicker(ticker, opts = {}) {
 
     ${renderValuationWorkbench(t)}
 
+    ${window.ValuationViz ? ValuationViz.renderPropertiesPanel(t, valuationHelpers()) : ''}
+
     ${renderPricingAnalysis(t)}
 
     ${window.ValuationViz ? ValuationViz.renderLegacyComponentNote(t, escapeHtml) : ''}
