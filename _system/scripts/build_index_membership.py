@@ -213,6 +213,9 @@ def _try_append_extracted(
         if action == "delete" and index_id not in current:
             if not re.search(r"\b(exit|removed|deleted|dropped)\b", title, re.I):
                 continue
+        style_subset = bool(ev.get("style_subset")) or (
+            action == "reclassify" and _is_style_or_subset_index(title)
+        )
         row = {
             "ticker": ticker,
             "index": index_id,
@@ -223,17 +226,17 @@ def _try_append_extracted(
             "source_type": source_type,
             "confidence": "news_unconfirmed",
             "title": title,
-            # Style/factor subset moves are tracked but not Confirmed parent events
-            "quality_gated": not (
-                action == "reclassify" and _is_style_or_subset_index(title)
-            ),
+            "style_subset": style_subset,
+            # Style/factor subset moves are tracked but never Confirmed parent events
+            "quality_gated": (not style_subset)
+            and not (action == "reclassify" and _is_style_or_subset_index(title)),
         }
         if append_announcement(row, existing=existing):
             out.append(row)
     return out
 
 
-def lint_announcement_conflicts(rows: list[dict]) -> list[str]:
+def lint_announcement_conflicts(rows: list[dict], seed: dict | None = None) -> list[str]:
     """Return human-readable warnings for impossible parent membership pairs."""
     from collections import defaultdict
 
@@ -270,7 +273,73 @@ def lint_announcement_conflicts(rows: list[dict]) -> list[str]:
                 warnings.append(
                     f"mutex dual-add {key[0]} on {key[1]}: {sorted(pair)}"
                 )
+    mem = memberships_lookup(seed) if seed else {}
+    for r in rows:
+        t = r.get("ticker")
+        idx = r.get("index")
+        if (
+            r.get("action") == "add"
+            and t
+            and idx
+            and idx in (mem.get(t) or set())
+            and (r.get("quality_gated") or r.get("confidence") == "provider_confirmed")
+        ):
+            warnings.append(f"add targets already-member {t} / {idx}")
+        if r.get("action") == "reclassify" and not r.get("style_subset"):
+            title = r.get("title") or ""
+            if not re.search(
+                r"from\s+.*russell|russell\s*2000.*1000|russell\s*1000.*2000", title, re.I
+            ):
+                warnings.append(
+                    f"reclassify without style_subset or explicit pair: {t} / {idx}"
+                )
     return warnings
+
+
+def retag_announcements_style_subset() -> int:
+    """One-time / idempotent: re-run titles through extractor; set style_subset on each row."""
+    path = ANNOUNCEMENTS
+    if not path.exists():
+        return 0
+    lines = path.read_text(encoding="utf-8").splitlines()
+    changed = 0
+    out_lines: list[str] = []
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            row = json.loads(line)
+        except json.JSONDecodeError:
+            out_lines.append(line)
+            continue
+        title = row.get("title") or ""
+        ticker = row.get("ticker")
+        if not title or not ticker:
+            out_lines.append(json.dumps(row, ensure_ascii=False))
+            continue
+        events = extract_index_events(title, "", candidate_tickers=[ticker])
+        style = False
+        for ev in events:
+            if ev.get("ticker") == ticker and (
+                ev.get("index") == row.get("index") or not row.get("index")
+            ):
+                style = bool(ev.get("style_subset"))
+                break
+        if not style:
+            style = _is_style_or_subset_index(title) or (
+                (row.get("action") == "reclassify")
+                and not re.search(r"\brussell\s*1000\b|\brussell\s*2000\b", title, re.I)
+            )
+        prev = bool(row.get("style_subset"))
+        row["style_subset"] = style
+        if style:
+            row["quality_gated"] = False
+        if prev != style:
+            changed += 1
+        out_lines.append(json.dumps(row, ensure_ascii=False))
+    path.write_text("\n".join(out_lines) + ("\n" if out_lines else ""), encoding="utf-8")
+    return changed
 
 
 def harvest_archive_announcements(
@@ -525,57 +594,89 @@ def scorecard_russell(
     *,
     max_cand_dist: float = DEFAULT_MAX_CANDIDATE_DISTANCE_PCT,
     breakpoint_mcap: float | None = None,
+    breakpoint_source: str = "config",
+    band_usd: list[float] | None = None,
 ) -> dict:
     """
     Seed membership is ground truth for member.
-    Portfolio-scaled ranks are labeled portfolio_proxy; candidacy only near mcap breakpoint band.
+    Candidacy uses dated Russell breakpoint mcap (config), not portfolio-median proxy.
     """
     checks: dict[str, dict] = {}
     mcap = mi.get("market_cap_usd")
     ticker = mi.get("ticker")
     rank = universe_ranks.get(ticker)
     dist = None
+    rank_method = "config_breakpoint" if breakpoint_source == "config" else "portfolio_proxy_fallback"
 
     if mcap is None:
         checks["market_cap"] = check_result(None, None, "total_market_cap", "missing market_cap")
     else:
         checks["market_cap"] = check_result(True, mcap, "observed")
 
+    band = band_usd or spec.get("band_usd") or []
+    band_low = float(band[0]) if len(band) >= 1 else None
+    band_high = float(band[1]) if len(band) >= 2 else None
+
     if is_member:
         checks["rank"] = check_result(True, rank, "seed_member", "membership from seed")
         dist = 0.0
     elif breakpoint_mcap and mcap:
-        # Distance to R1000/R2000 breakpoint mcap among portfolio US names
-        dist = ((mcap - breakpoint_mcap) / breakpoint_mcap) * 100.0
+        dist = ((float(mcap) - float(breakpoint_mcap)) / float(breakpoint_mcap)) * 100.0
         if index_id == "russell_1000":
-            # Non-members near/above breakpoint are R1000 candidates
+            # Non-members near/above breakpoint are R1000 candidates (not mega-caps far above)
+            near = near_boundary(dist, max_cand_dist) and dist >= -max_cand_dist
             checks["rank"] = check_result(
-                near_boundary(dist, max_cand_dist) and dist >= -max_cand_dist,
+                near,
                 rank,
                 f"breakpoint_mcap={breakpoint_mcap:.0f}",
-                "portfolio_proxy",
+                rank_method,
             )
         else:
-            # R2000: non-members near/below breakpoint (small side), not mega-caps far above
+            # R2000: only names inside [band_low, breakpoint] (or near below breakpoint).
+            # Mega-caps far above breakpoint are never R2000 candidates.
+            in_r2000_band = True
+            if band_low is not None and band_high is not None:
+                in_r2000_band = band_low <= float(mcap) <= float(breakpoint_mcap) * (1 + max_cand_dist / 100.0)
+            elif float(mcap) > float(breakpoint_mcap) * (1 + max_cand_dist / 100.0):
+                in_r2000_band = False
+            near = near_boundary(dist, max_cand_dist) and dist <= max_cand_dist and in_r2000_band
             checks["rank"] = check_result(
-                near_boundary(dist, max_cand_dist) and dist <= max_cand_dist,
+                near,
                 rank,
                 f"breakpoint_mcap={breakpoint_mcap:.0f}",
-                "portfolio_proxy",
+                rank_method,
             )
     else:
-        checks["rank"] = check_result(None, rank, "breakpoint", "portfolio_proxy unavailable")
+        checks["rank"] = check_result(None, rank, "breakpoint", "breakpoint unavailable")
+        rank_method = "n_a"
 
     sc = finalize_scorecard(
         index_id, checks, is_member, dist, mi.get("missing") or [], max_cand_dist=max_cand_dist, floor_only=False
     )
     sc["rank_estimate"] = rank
-    sc["rank_method"] = "portfolio_proxy"
+    sc["rank_method"] = rank_method
+    # Fallback proxy candidates are suppressed from float-impact + Potential display
+    if rank_method == "portfolio_proxy_fallback" and sc.get("status") == "inclusion_candidate":
+        sc["status"] = "n_a"
+        sc["gating_check"] = "portfolio_proxy_fallback_suppressed"
     return sc
 
 
-def russell_breakpoint_mcap(inputs_by_ticker: dict[str, dict], seed: dict) -> float | None:
-    """Median mcap of seed russell_1000 members as a portfolio-local breakpoint proxy."""
+def russell_breakpoint_mcap(
+    inputs_by_ticker: dict[str, dict],
+    seed: dict,
+    rules: dict | None = None,
+) -> tuple[float | None, str]:
+    """Return (breakpoint_mcap, source). Prefer dated config; portfolio median is last resort."""
+    rules = rules or {}
+    r1 = (rules.get("indices") or {}).get("russell_1000") or {}
+    cfg_bp = r1.get("breakpoint_mcap_usd")
+    if cfg_bp is not None:
+        try:
+            return float(cfg_bp), "config"
+        except (TypeError, ValueError):
+            pass
+    # Last-resort portfolio-local proxy (labeled; candidates suppressed)
     caps = []
     by = seed.get("by_ticker") or {}
     for t, entry in by.items():
@@ -586,7 +687,6 @@ def russell_breakpoint_mcap(inputs_by_ticker: dict[str, dict], seed: dict) -> fl
         if mi.get("market_cap_usd"):
             caps.append(float(mi["market_cap_usd"]))
     if not caps:
-        # Fallback: median of top-third US names by mcap
         us = sorted(
             (
                 float(mi["market_cap_usd"])
@@ -596,10 +696,10 @@ def russell_breakpoint_mcap(inputs_by_ticker: dict[str, dict], seed: dict) -> fl
             reverse=True,
         )
         if len(us) < 3:
-            return None
-        return us[max(0, len(us) // 3 - 1)]
+            return None, "n_a"
+        return us[max(0, len(us) // 3 - 1)], "portfolio_proxy_fallback"
     caps.sort()
-    return caps[len(caps) // 2]
+    return caps[len(caps) // 2], "portfolio_proxy_fallback"
 
 
 def max_candidate_distance(rules: dict) -> float:
@@ -913,6 +1013,7 @@ def build_for_ticker(
     mna_tickers: set[str] | None = None,
     *,
     breakpoint_mcap: float | None = None,
+    breakpoint_source: str = "config",
 ) -> dict:
     memberships = list((seed_entry or {}).get("memberships") or [])
     sec_type = mi.get("security_type")
@@ -961,6 +1062,8 @@ def build_for_ticker(
                     universe_ranks,
                     max_cand_dist=max_cand,
                     breakpoint_mcap=breakpoint_mcap,
+                    breakpoint_source=breakpoint_source,
+                    band_usd=spec.get("band_usd"),
                 )
             elif family in {"nasdaq", "msci", "tsx", "ftse", "stoxx", "asx", "nzx", "hsi", "nse", "sgx", "b3", "bmv", "jpx"}:
                 key = "min_mcap_usd"
@@ -1007,15 +1110,23 @@ def build_for_ticker(
             "source_type": a.get("source_type"),
             "confidence": a.get("confidence"),
             "title": a.get("title"),
-            "quality_gated": bool(a.get("quality_gated") or a.get("confidence") == "provider_confirmed"),
             "style_subset": bool(a.get("style_subset")),
+            "quality_gated": (
+                False
+                if a.get("style_subset")
+                else bool(a.get("quality_gated") or a.get("confidence") == "provider_confirmed")
+            ),
         }
-        # Surface provider_confirmed always; news only if quality_gated
-        if a.get("confidence") == "provider_confirmed" or a.get("quality_gated"):
+        # Surface provider_confirmed always; news only if quality_gated.
+        # Style/subset never upgrades scorecards or confirmed_soon.
+        is_style = bool(row_ev.get("style_subset"))
+        if (a.get("confidence") == "provider_confirmed" or row_ev.get("quality_gated")) and not is_style:
             confirmed_events.append(row_ev)
         else:
             news_notes.append(row_ev)
         for sc in scorecards:
+            if is_style:
+                continue
             if sc.get("index") == a.get("index") and (
                 a.get("confidence") == "provider_confirmed" or a.get("quality_gated")
             ):
@@ -1038,6 +1149,8 @@ def build_for_ticker(
 
     confirmed_soon = False
     for ev in confirmed_events:
+        if ev.get("style_subset"):
+            continue
         eff = parse_date(ev.get("effective"))
         d = days_until(eff, today)
         if d is not None and 0 <= d <= 30:
@@ -1112,6 +1225,9 @@ def build(today: date | None = None, *, purge_announcements: bool = True) -> dic
         company_names=company_names,
         holdings_tickers=set(holdings),
     )
+    n_retag = retag_announcements_style_subset()
+    if n_retag:
+        print(f"Retagged style_subset on {n_retag} announcement rows")
     announcements = load_announcements()
     seed = apply_confirmed_to_seed(seed, announcements, today)
     save_json(DATA_DIR / "index_memberships_seed.json", seed)
@@ -1123,7 +1239,7 @@ def build(today: date | None = None, *, purge_announcements: bool = True) -> dic
             ticker, holdings_meta=meta, fundamentals_cache=fund_cache
         )
     universe_ranks = build_universe_ranks(inputs_by_ticker)
-    bp_mcap = russell_breakpoint_mcap(inputs_by_ticker, seed)
+    bp_mcap, bp_source = russell_breakpoint_mcap(inputs_by_ticker, seed, rules)
 
     by_ticker = {}
     for ticker, meta in sorted(holdings.items()):
@@ -1139,11 +1255,12 @@ def build(today: date | None = None, *, purge_announcements: bool = True) -> dic
             today,
             mna_tickers=mna_tickers,
             breakpoint_mcap=bp_mcap,
+            breakpoint_source=bp_source,
         )
 
-    # Phase 3: float-impact forced-flow model (HK reconstitution axioms)
+    # Float-impact forced-flow model (HK reconstitution axioms)
     aum_registry = load_aum_registry()
-    float_summary = attach_float_impact(by_ticker, inputs_by_ticker, aum_registry)
+    float_summary = attach_float_impact(by_ticker, inputs_by_ticker, aum_registry, rules=rules)
     for ticker, row in by_ticker.items():
         fi = row.get("float_impact") or {}
         shock_fi = demand_shock_from_float_impact(fi)
@@ -1272,7 +1389,8 @@ def main() -> int:
         f"high_priority={len(summary['high_priority_watch'])} "
         f"quality_events={summary.get('quality_gated_events', 0)}"
     )
-    for warn in lint_announcement_conflicts(load_announcements()):
+    seed_final = load_json(DATA_DIR / "index_memberships_seed.json", {"by_ticker": {}})
+    for warn in lint_announcement_conflicts(load_announcements(), seed=seed_final):
         print(f"WARN index conflict: {warn}")
     return 0
 

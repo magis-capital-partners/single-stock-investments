@@ -171,9 +171,26 @@ Implements Horizon Kinetics *Russell 2000 Index Construction* (Jan 2013) axioms 
 | BE (Bloom Energy) | R2000 → R1000 (LSEG commentary) | Seeded approximate float; refine when exact float/ADV available |
 | R1000 → R2000 demotion | Unit-tested synthetic | Net % float positive (buying), opposite of graduation |
 
+### False-positive fix (2026-07-16)
+
+Dashboard showed identical −6.4% / +7.1% blocks because style/subset headlines and a
+broken portfolio-median breakpoint (~$86.5B) fed the calculator. Fixes:
+
+| Gate | Behavior |
+|------|----------|
+| `style_subset` events (Top 50, Defensive, 2500, Value Benchmark, bare reclass) | `n_a` — no size-migration legs |
+| Ambiguous `reclassify` without explicit R1000↔R2000 pair | `n_a` |
+| `add` when seed already lists membership | `n_a` (`already_member`) |
+| Inferred R2000 exit when membership unknown | only if mcap ≤ 4× breakpoint (~$22.8B) |
+| Russell breakpoint | dated **$5.7B** in `index_rules.json` (LSEG June 2026), not portfolio median |
+| Display | `~+X.X%*` muted when `float_unknown`; HK cliff badge only on genuine breakpoint + float_adj |
+
+Post-fix: AMD/AMAT/AMP/CPRT/HE/WEST style rows → "—"; mega-cap R2000 candidates gone; APLD unchanged.
+
 ### Residuals / caveats
 
-- Cap-weighted pure single-index adds share the same % of float (= AUM / index_total_mcap), independent of stock size. Rank top impacts by |$ flow| and prefer migrations / confirmed events.
+- Cap-weighted pure single-index adds share the same % of float (= AUM / index_total_mcap), independent of stock size. Rank top impacts by |$ flow| and prefer migrations / confirmed events. Asterisk display when float unknown.
 - Index total mcap is total (not float-adj) from recon summaries → weights slightly understated.
 - BMI high tier is scenario-only; default display is **base**.
-- Unit tests: `_system/scripts/tests/test_index_flow_impact.py`.
+- Unit tests: `_system/scripts/tests/test_index_flow_impact.py`, `test_index_event_extract.py`.
+- Float/ADV refresh: `python _system/scripts/fetch_float_adv.py` (Yahoo primary, SEC shares fallback).

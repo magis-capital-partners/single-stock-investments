@@ -56,6 +56,7 @@ class TestIndexEventExtract(unittest.TestCase):
         self.assertEqual(ev[0]["ticker"], "APLD")
         self.assertEqual(ev[0]["index"], "russell_1000")
         self.assertEqual(ev[0]["action"], "add")
+        self.assertFalse(ev[0].get("style_subset"))
 
     def test_echo_added_to_russell(self):
         ev = extract_index_events(
@@ -68,6 +69,7 @@ class TestIndexEventExtract(unittest.TestCase):
         self.assertEqual(ev[0]["ticker"], "ECHO")
         self.assertEqual(ev[0]["action"], "reclassify")
         self.assertEqual(ev[0]["index"], "russell_1000")
+        self.assertTrue(ev[0].get("style_subset"))
 
     def test_he_joins_russell_defensive(self):
         ev = extract_index_events(
@@ -80,6 +82,7 @@ class TestIndexEventExtract(unittest.TestCase):
         self.assertEqual(ev[0]["ticker"], "HE")
         self.assertEqual(ev[0]["action"], "reclassify")
         self.assertEqual(ev[0]["index"], "russell_1000")
+        self.assertTrue(ev[0].get("style_subset"))
 
     def test_spacex_summary_not_or(self):
         ev = extract_index_events(
@@ -101,6 +104,7 @@ class TestIndexEventExtract(unittest.TestCase):
         self.assertEqual(ev[0]["ticker"], "CPRT")
         self.assertEqual(ev[0]["action"], "reclassify")
         self.assertEqual(ev[0]["index"], "russell_1000")
+        self.assertTrue(ev[0].get("style_subset"))
 
     def test_cprt_russell_reclassification_impact(self):
         ev = extract_index_events(
@@ -165,6 +169,7 @@ class TestIndexEventExtract(unittest.TestCase):
         self.assertEqual(len(ev), 1)
         self.assertEqual(ev[0]["ticker"], "AMD")
         self.assertEqual(ev[0]["action"], "reclassify")
+        self.assertTrue(ev[0].get("style_subset"))
 
     def test_west_russell_2500_reclassify(self):
         ev = extract_index_events(
@@ -177,6 +182,7 @@ class TestIndexEventExtract(unittest.TestCase):
         self.assertEqual(ev[0]["ticker"], "WEST")
         self.assertEqual(ev[0]["index"], "russell_1000")
         self.assertEqual(ev[0]["action"], "reclassify")
+        self.assertTrue(ev[0].get("style_subset"))
 
     def test_mkc_dynamic_reclassify(self):
         ev = extract_index_events(

@@ -15,23 +15,25 @@ INDEX_ALIASES: dict[str, str] = {
     "s&p smallcap 600": "sp600",
     "s&p smallcap": "sp600",
     "s&p 600": "sp600",
-    # Parent Russell indexes only. Style/factor/subset phrases are detected
-    # separately and forced to action=reclassify (see _is_style_or_subset_index).
+    # Parent Russell indexes (size migrations). Style/factor/subset phrases are
+    # detected separately and forced to action=reclassify + style_subset=true.
     "russell 3000": "russell_1000",
     "russell 1000": "russell_1000",
     "russell1000": "russell_1000",
     "russell 2000": "russell_2000",
     "russell2000": "russell_2000",
-    # Style / subset aliases keep a parent id for context, but must reclassify.
+    # Midcap has its own AUM config — do not collapse into russell_1000.
+    "russell midcap": "russell_midcap",
+    # Style / subset aliases keep a parent id for context, but must reclassify
+    # with style_subset=true (never size-migration float impact).
     "russell 3000e": "russell_1000",
     "russell 2500": "russell_1000",
     "russell2500": "russell_1000",
-    "russell midcap": "russell_1000",
     "russell defensive": "russell_1000",
     "russell top 50": "russell_1000",
     "russell growth": "russell_1000",
     "russell value": "russell_1000",
-    "russell": "russell_1000",  # bare "Russell reclassification" → R1000 family watch
+    "russell": "russell_1000",  # bare "Russell reclassification" → style watch
     "nasdaq-100": "nasdaq_100",
     "nasdaq 100": "nasdaq_100",
     "nasdaq100": "nasdaq_100",
@@ -58,6 +60,8 @@ INDEX_ALIASES: dict[str, str] = {
 }
 
 # Factor / style-box / subset indexes are not parent membership flips.
+# Bare "Russell Midcap" is a real size index (has AUM config) — not style.
+# "Midcap Growth/Value Benchmark" remains style.
 _STYLE_OR_SUBSET = re.compile(
     r"\b(?:"
     r"dynamic(?:\s+index)?|"
@@ -65,7 +69,7 @@ _STYLE_OR_SUBSET = re.compile(
     r"defensive(?:\s+index(?:es)?)?|"
     r"growth\s+benchmark|"
     r"value\s+benchmark|"
-    r"midcap(?:\s+(?:growth|value))?(?:\s+benchmark)?|"
+    r"midcap\s+(?:growth|value)(?:\s+benchmark)?|"
     r"2500|"
     r"3000e|"
     r"top\s+50"
@@ -214,9 +218,9 @@ def _is_style_or_subset_index(text: str, index_raw: str = "") -> bool:
             window = low[pos : pos + len(idx) + 48]
             if _STYLE_OR_SUBSET.search(window):
                 return True
-    # Aliases that are themselves style/subset families
+    # Aliases that are themselves style/subset families (not bare Midcap)
     if re.search(
-        r"\b(?:russell\s+(?:2500|3000e|midcap|defensive|top\s+50)|"
+        r"\b(?:russell\s+(?:2500|3000e|defensive|top\s+50)|"
         r"russell\s+(?:growth|value)\b(?!\s*1000|\s*2000))",
         low,
     ):
@@ -332,25 +336,34 @@ def _verb_to_action(verb: str) -> str | None:
     return None
 
 
-def _default_index_from_text(text: str) -> str | None:
-    """When reclass headlines omit 1000/2000 (or say only 'index shift')."""
+def _default_index_from_text(text: str) -> tuple[str | None, bool]:
+    """When reclass headlines omit 1000/2000 (or say only 'index shift').
+
+    Returns (index_id, style_subset_forced). Bare 'russell' / 'index reclass'
+    defaults always force style_subset — they never assert a parent membership flip.
+    """
     low = (text or "").lower()
+    # Explicit parent size indexes first
+    if re.search(r"\brussell\s*2000\b", low):
+        return "russell_2000", False
+    if re.search(r"\brussell\s*1000\b", low) and not _is_style_or_subset_index(text):
+        return "russell_1000", False
     if "russell" in low:
-        return "russell_1000"
+        return "russell_1000", True
     if "nasdaq" in low:
-        return "nasdaq_100"
+        return "nasdaq_100", False
     if "s&p" in low or "s and p" in low:
-        return "sp500"
+        return "sp500", False
     if "msci" in low:
-        return "msci_usa"
-    # Bare index reclass / shift / moves (Copart simplywall titles) → Russell family watch
+        return "msci_usa", False
+    # Bare index reclass / shift / moves → Russell family style watch
     if re.search(
         r"\b(?:index\s+reclass|index\s+shift|index\s+moves?|index\s+change|"
         r"style\s+reclass|reclassification|reshuffl)",
         low,
     ):
-        return "russell_1000"
-    return None
+        return "russell_1000", True
+    return None, False
 
 
 def extract_index_events(
@@ -362,7 +375,7 @@ def extract_index_events(
     """
     Extract index add/delete/reclassify events where a portfolio ticker is the subject.
 
-    Returns list of {ticker, index, action}. Empty if no subject-gated match.
+    Returns list of {ticker, index, action, style_subset}. Empty if no subject-gated match.
     Precision over recall: co-mentions of mega-caps in SpaceX/CoreWeave stories return [].
     """
     text = f"{title or ''} {summary or ''}".strip()
@@ -375,16 +388,34 @@ def extract_index_events(
     found: list[dict[str, Any]] = []
     seen: set[tuple[str, str, str]] = set()
 
-    def _push(sub_raw: str, index_raw: str, verb: str, *, default_index: str | None = None) -> None:
+    def _push(
+        sub_raw: str,
+        index_raw: str,
+        verb: str,
+        *,
+        default_index: str | None = None,
+        force_style_subset: bool = False,
+    ) -> None:
         index_id = resolve_index_alias(index_raw) if index_raw else None
         if not index_id:
             index_id = default_index
         action = _verb_to_action(verb)
         if not index_id or not action:
             return
-        # Dynamic / Defensive / Benchmark / 2500 / Midcap / Top 50 → style reclass
-        if action in ("add", "delete") and _is_style_or_subset_index(text, index_raw):
+        style = bool(force_style_subset) or _is_style_or_subset_index(text, index_raw)
+        # Dynamic / Defensive / Benchmark / 2500 / Top 50 → style reclass
+        if action in ("add", "delete") and style:
             action = "reclassify"
+        # Bare-default / ambiguous reclass paths are always style_subset
+        if action == "reclassify" and (
+            force_style_subset
+            or not index_raw
+            or _is_style_or_subset_index(text, index_raw)
+        ):
+            style = True
+        # Parent size add/delete with no style cues → not style_subset
+        if action in ("add", "delete") and not style:
+            style = False
         ticker = _subject_to_ticker(sub_raw, candidates, company_names)
         if not ticker:
             return
@@ -392,7 +423,14 @@ def extract_index_events(
         if key in seen:
             return
         seen.add(key)
-        found.append({"ticker": ticker, "index": index_id, "action": action})
+        found.append(
+            {
+                "ticker": ticker,
+                "index": index_id,
+                "action": action,
+                "style_subset": bool(style),
+            }
+        )
 
     for pat in (_PAT_SUBJECT_JOINS, _PAT_ADDED_TO_INDEX, _PAT_HAS_BEEN_ADDED):
         for m in pat.finditer(text):
@@ -411,13 +449,19 @@ def extract_index_events(
             _push(tk, gd.get("index") or "", gd.get("verb") or "joins")
 
     # Reclassification / index shift (subject must still resolve to a candidate)
-    default_idx = _default_index_from_text(text)
+    default_idx, default_style = _default_index_from_text(text)
     for pat in (_PAT_RECLASS_TICKER_PAREN, _PAT_RECLASS_THEN_TICKER):
         for m in pat.finditer(text):
             gd = m.groupdict()
             tk = _normalize_ticker_token(gd.get("ticker") or "")
             sub = gd.get("sub") or tk
-            _push(sub, gd.get("index") or "", "reclassification", default_index=default_idx)
+            _push(
+                sub,
+                gd.get("index") or "",
+                "reclassification",
+                default_index=default_idx,
+                force_style_subset=default_style or not gd.get("index"),
+            )
 
     for m in _PAT_RECLASS_COMPANY.finditer(text):
         gd = m.groupdict()
@@ -425,7 +469,13 @@ def extract_index_events(
         # "Joins Russell Top 50" is a mega-cap subset move, not a parent-index add
         if re.search(r"top\s+50", text, re.I):
             verb = "joins russell top 50"
-        _push(gd.get("sub") or "", gd.get("index") or "", verb, default_index=default_idx)
+        _push(
+            gd.get("sub") or "",
+            gd.get("index") or "",
+            verb,
+            default_index=default_idx,
+            force_style_subset=True,
+        )
 
     for m in _PAT_EXIT_SHORT.finditer(text):
         gd = m.groupdict()
@@ -442,10 +492,13 @@ def extract_index_events(
     deduped: list[dict[str, Any]] = []
     seen_ti: set[tuple[str, str]] = set()
     for ev in found:
-        if ev.get("index") == "russell_1000" and re.search(
+        if ev.get("index") in {"russell_1000", "russell_midcap"} and re.search(
             r"russell\s+top\s+50|top\s+50", text, re.I
         ):
             ev["action"] = "reclassify"
+            ev["style_subset"] = True
+        if ev.get("action") == "reclassify" and ev.get("style_subset") is None:
+            ev["style_subset"] = True
         key = (ev["ticker"], ev["index"])
         # Prefer reclassify over add for same ticker+index in one headline
         if key in seen_ti:
@@ -453,6 +506,7 @@ def extract_index_events(
                 if prev["ticker"] == ev["ticker"] and prev["index"] == ev["index"]:
                     if ev["action"] == "reclassify":
                         prev["action"] = "reclassify"
+                        prev["style_subset"] = True
                     break
             continue
         seen_ti.add(key)

@@ -20,7 +20,8 @@
       "enabled": true,
       "default_display_tier": "base",
       "aum_config": "_system/data/index_aum.json",
-      "notes": "Prefer computed float-impact demand shock over assumed_index_weight_bps_add when float_pct/ADV/AUM available (HK reconstitution axioms)."
+      "graduation_mcap_ceiling_multiple": 4.0,
+      "notes": "Prefer computed float-impact demand shock over assumed_index_weight_bps_add when float_pct/ADV/AUM available (HK reconstitution axioms). Graduation mcap ceiling = 4× russell_1000.breakpoint_mcap_usd (~$22.8B) — keeps APLD-class graduates; excludes mega-caps when membership unknown."
     }
   },
   "ineligible_security_types": [
@@ -75,8 +76,12 @@
       "markets": ["US"],
       "rank_metric": "total_market_cap",
       "breakpoint_rank": 1000,
+      "breakpoint_mcap_usd": 5700000000,
+      "band_usd": [2700000000, 9600000000],
       "band_pct": 0.025,
       "side": "above",
+      "breakpoint_as_of": "2026-06-26",
+      "breakpoint_source": "LSEG June 2026 Russell reconstitution summary",
       "source": "_system/reference/index-effects/methodology/ftse_russell_us_indexes_construction_and_methodology.pdf"
     },
     "russell_2000": {
@@ -86,8 +91,12 @@
       "rank_metric": "total_market_cap",
       "breakpoint_rank_low": 1001,
       "breakpoint_rank_high": 3000,
+      "breakpoint_mcap_usd": 5700000000,
+      "band_usd": [2700000000, 9600000000],
       "band_pct_1000": 0.025,
       "band_pct_2000": 0.005,
+      "breakpoint_as_of": "2026-06-26",
+      "breakpoint_source": "LSEG June 2026 Russell reconstitution summary",
       "source": "_system/reference/index-effects/methodology/ftse_russell_us_indexes_construction_and_methodology.pdf"
     },
     "nasdaq_100": {

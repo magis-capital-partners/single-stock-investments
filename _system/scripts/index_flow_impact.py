@@ -7,6 +7,11 @@ Encodes Horizon Kinetics R2000 Index Construction wisdom:
   - Both sides of every migration must be modeled
   - Float-adjusted weight for flow; total mcap for rank
   - % of float is the right denominator
+
+Hard gates (2026-07-16 fix):
+  - style_subset / ambiguous reclassify → n_a (no size-migration legs)
+  - already_member adds → n_a
+  - inferred R2000 exit only when membership, explicit cue, or mcap ≤ ceiling
 """
 from __future__ import annotations
 
@@ -19,17 +24,32 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = ROOT / "_system" / "data"
 AUM_PATH = DATA_DIR / "index_aum.json"
+RULES_PATH = DATA_DIR / "index_rules.json"
 
 # Russell breakpoint pair — HK graduation / demotion diagnostic
 RUSSELL_BREAKPOINT_PAIR = {"russell_1000", "russell_2000"}
 
-# Title cues that a "join R1000" announcement is a graduation (also leaves R2000)
+# Explicit graduation cues only — never bare "reclassif" (style headlines pollute)
 _GRADUATION_CUES = re.compile(
     r"joins?\s+russell\s*1000|added\s+to\s+(?:the\s+)?russell\s*1000|"
     r"removed\s+from\s+(?:the\s+)?russell\s*2000|dropped\s+from\s+(?:the\s+)?russell\s*2000|"
-    r"market\s+profile\s+shifts|reclassif",
+    r"graduat(?:e|es|ed|ing)|moves?\s+up\s+to\s+(?:the\s+)?russell\s*1000|"
+    r"market\s+profile\s+shifts",
     re.I,
 )
+
+# Explicit two-sided size migration in a reclassify headline
+_EXPLICIT_SIZE_MIGRATE = re.compile(
+    r"(?:from\s+(?:the\s+)?russell\s*2000\s+to\s+(?:the\s+)?russell\s*1000|"
+    r"from\s+(?:the\s+)?russell\s*1000\s+to\s+(?:the\s+)?russell\s*2000|"
+    r"russell\s*2000\s*(?:→|->|to)\s*russell\s*1000|"
+    r"russell\s*1000\s*(?:→|->|to)\s*russell\s*2000)",
+    re.I,
+)
+
+# Default: 4× June-2026 breakpoint (~$5.7B → ~$22.8B). Keeps APLD-class graduates;
+# excludes mega-caps. Band-top ($9.6B) is too tight for inferred graduations.
+DEFAULT_GRADUATION_MCAP_CEILING_USD = 22.8e9
 
 
 def load_aum_registry(path: Path | None = None) -> dict:
@@ -37,6 +57,34 @@ def load_aum_registry(path: Path | None = None) -> dict:
     if not p.exists():
         return {"as_of": None, "indices": {}, "migration_pairs": {}}
     return json.loads(p.read_text(encoding="utf-8"))
+
+
+def load_rules(path: Path | None = None) -> dict:
+    p = path or RULES_PATH
+    if not p.exists():
+        return {}
+    return json.loads(p.read_text(encoding="utf-8"))
+
+
+def graduation_mcap_ceiling_usd(rules: dict | None = None) -> float:
+    """Ceiling for inferred R2000→R1000 graduation when membership unknown."""
+    rules = rules or load_rules()
+    scoring = rules.get("scoring") or {}
+    fi = scoring.get("float_impact") or {}
+    if fi.get("graduation_mcap_ceiling_usd") is not None:
+        try:
+            return float(fi["graduation_mcap_ceiling_usd"])
+        except (TypeError, ValueError):
+            pass
+    r1 = (rules.get("indices") or {}).get("russell_1000") or {}
+    bp = r1.get("breakpoint_mcap_usd")
+    mult = fi.get("graduation_mcap_ceiling_multiple") or 4.0
+    if bp is not None:
+        try:
+            return float(bp) * float(mult)
+        except (TypeError, ValueError):
+            pass
+    return DEFAULT_GRADUATION_MCAP_CEILING_USD
 
 
 def aum_stale(registry: dict, today: date | None = None) -> bool:
@@ -127,6 +175,18 @@ def tier_aum_usd(index_cfg: dict, stack: str) -> tuple[float | None, float | Non
     return None, None
 
 
+def _mcap_usd(mi: dict | None) -> float | None:
+    if not mi:
+        return None
+    v = mi.get("market_cap_usd")
+    if v is None:
+        return None
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        return None
+
+
 def expand_migration_legs(
     primary_index: str,
     action: str,
@@ -135,16 +195,21 @@ def expand_migration_legs(
     registry: dict,
     current_memberships: list[str] | None = None,
     explicit_paired: list[dict] | None = None,
-) -> list[dict]:
+    market_cap_usd: float | None = None,
+    rules: dict | None = None,
+    style_subset: bool = False,
+) -> tuple[list[dict], dict]:
     """Build signed legs: +1 = buy (add weight), -1 = sell (remove weight).
 
-    Never models only one side of a Russell breakpoint migration (HK axiom 2).
+    Returns (legs, meta) where meta may include assumed_graduation / skip_reason.
+    Never models only one side of a genuine Russell breakpoint migration (HK axiom 2).
     """
     pairs = registry.get("migration_pairs") or {}
     indices = registry.get("indices") or {}
     mems = set(current_memberships or [])
     legs: list[dict] = []
     seen: set[tuple[str, int]] = set()
+    meta: dict[str, Any] = {"assumed_graduation": False}
 
     def add_leg(index_id: str, sign: int, reason: str) -> None:
         if index_id not in indices:
@@ -152,14 +217,13 @@ def expand_migration_legs(
         key = (index_id, sign)
         if key in seen:
             return
-        # Skip Microcap when R2000 also in play (top-of-R2000 not in Microcap)
         cfg = indices[index_id]
         skip_if = set(cfg.get("skip_if_also") or [])
         active_ids = {lg["index"] for lg in legs} | {index_id}
         if skip_if & (active_ids - {index_id}):
-            # only skip micro when russell_2000 is also a leg
             if "russell_2000" in skip_if and "russell_2000" in (
-                {lg["index"] for lg in legs} | ({primary_index} if primary_index == "russell_2000" else set())
+                {lg["index"] for lg in legs}
+                | ({primary_index} if primary_index == "russell_2000" else set())
             ):
                 if index_id == "russell_microcap":
                     return
@@ -169,23 +233,32 @@ def expand_migration_legs(
     action_l = (action or "").lower()
     title_s = title or ""
 
+    if style_subset:
+        meta["skip_reason"] = "style_subset"
+        return [], meta
+
     if explicit_paired:
         for p in explicit_paired:
             add_leg(p["index"], int(p["sign"]), p.get("reason") or "explicit")
-        return legs
+        return legs, meta
 
     if action_l in {"add", "inclusion"}:
         add_leg(primary_index, +1, "announced_add")
-        # Graduation into R1000: also leave R2000 (+ Midcap join, drop Microcap if cited)
-        if primary_index == "russell_1000" and (
-            "russell_2000" in mems
-            or _GRADUATION_CUES.search(title_s)
-            or not mems  # unknown prior membership — HK-default treat join R1000 news as graduation
-        ):
-            add_leg("russell_2000", -1, "hk_graduation_from_r2000")
-            add_leg("russell_midcap", +1, "typical_with_r1000_add")
-            if re.search(r"microcap", title_s, re.I):
-                add_leg("russell_microcap", -1, "announced_microcap_drop")
+        # Graduation into R1000: also leave R2000 (+ Midcap join)
+        if primary_index == "russell_1000":
+            explicit_grad = bool(_GRADUATION_CUES.search(title_s))
+            in_r2000 = "russell_2000" in mems
+            ceiling = graduation_mcap_ceiling_usd(rules)
+            mcap_ok = market_cap_usd is not None and market_cap_usd <= ceiling
+            # Infer graduation only when membership unknown AND mcap sane (not mega-cap)
+            infer = (not mems) and mcap_ok
+            if in_r2000 or explicit_grad or infer:
+                add_leg("russell_2000", -1, "hk_graduation_from_r2000")
+                add_leg("russell_midcap", +1, "typical_with_r1000_add")
+                if infer and not in_r2000 and not explicit_grad:
+                    meta["assumed_graduation"] = True
+                if re.search(r"microcap", title_s, re.I):
+                    add_leg("russell_microcap", -1, "announced_microcap_drop")
         # S&P 500 add often leaves MidCap 400
         if primary_index == "sp500":
             mp = pairs.get("sp500") or {}
@@ -203,7 +276,6 @@ def expand_migration_legs(
 
     elif action_l in {"delete", "deletion", "remove", "removed"}:
         add_leg(primary_index, -1, "announced_delete")
-        # Demotion into R2000 from R1000
         if primary_index == "russell_1000":
             add_leg("russell_2000", +1, "hk_demotion_to_r2000")
             add_leg("russell_midcap", -1, "leave_midcap_with_r1000")
@@ -211,22 +283,24 @@ def expand_migration_legs(
             add_leg("sp400", +1, "sp_demotion_offset")
 
     elif action_l in {"reclassify", "migrate", "migration"}:
-        # Ambiguous reclassify — if title points at R1000 join, treat as graduation
-        if _GRADUATION_CUES.search(title_s) or primary_index == "russell_1000":
-            add_leg("russell_1000", +1, "reclassify_to_r1000")
-            add_leg("russell_2000", -1, "reclassify_from_r2000")
-            add_leg("russell_midcap", +1, "reclassify_midcap")
-        elif primary_index == "russell_2000":
-            add_leg("russell_2000", +1, "reclassify_to_r2000")
-            add_leg("russell_1000", -1, "reclassify_from_r1000")
-            add_leg("russell_midcap", -1, "reclassify_leave_midcap")
+        # Only compute size legs with explicit two-sided evidence
+        if _EXPLICIT_SIZE_MIGRATE.search(title_s):
+            if re.search(r"2000.*1000|to\s+(?:the\s+)?russell\s*1000", title_s, re.I):
+                add_leg("russell_1000", +1, "reclassify_to_r1000")
+                add_leg("russell_2000", -1, "reclassify_from_r2000")
+                add_leg("russell_midcap", +1, "reclassify_midcap")
+            else:
+                add_leg("russell_2000", +1, "reclassify_to_r2000")
+                add_leg("russell_1000", -1, "reclassify_from_r1000")
+                add_leg("russell_midcap", -1, "reclassify_leave_midcap")
         else:
-            add_leg(primary_index, +1, "reclassify_primary")
+            meta["skip_reason"] = "reclassify_ambiguous"
+            return [], meta
 
     else:
         add_leg(primary_index, +1 if action_l == "add" else -1, f"action_{action_l}")
 
-    return legs
+    return legs, meta
 
 
 def compute_event_impact(
@@ -242,10 +316,14 @@ def compute_event_impact(
     announced: str | None = None,
     effective: str | None = None,
     source_url: str | None = None,
+    style_subset: bool = False,
+    rules: dict | None = None,
 ) -> dict[str, Any]:
     """Compute low/base/high net forced flow for one index event."""
     f_mcap, float_flag = float_mcap_usd(mi)
     indices = registry.get("indices") or {}
+    mems = list(current_memberships or [])
+    rules = rules if rules is not None else load_rules()
 
     out: dict[str, Any] = {
         "ticker": ticker,
@@ -256,6 +334,7 @@ def compute_event_impact(
         "announced": announced,
         "effective": effective,
         "source_url": source_url,
+        "style_subset": bool(style_subset),
         "float_flag": float_flag,
         "float_mcap_usd": f_mcap,
         "status": "ok",
@@ -263,9 +342,41 @@ def compute_event_impact(
         "stacks": {},
         "hk_weight_cliff_ratio": None,
         "is_russell_breakpoint_migration": False,
+        "assumed_graduation": False,
         "aum_as_of": registry.get("as_of"),
         "aum_stale": aum_stale(registry),
     }
+
+    if style_subset:
+        out["status"] = "n_a"
+        out["reason"] = "style_subset"
+        return out
+
+    action_l = (action or "").lower()
+    title_s = title or ""
+    # Completed migrations: seed already updated, but title/cues show a real size move
+    # (e.g. APLD graduation after seed flipped to R1000). Still model the flow.
+    completed_migration = False
+    mems_for_legs = list(mems)
+    if action_l in {"add", "inclusion"} and primary_index in mems:
+        mcap_now = _mcap_usd(mi)
+        ceiling = graduation_mcap_ceiling_usd(rules)
+        # Completed R1000 graduation: seed already updated, but title shows size move.
+        # Require mcap ≤ ceiling so mega-cap false "joins R1000" headlines stay n_a.
+        if (
+            primary_index == "russell_1000"
+            and (_GRADUATION_CUES.search(title_s) or _EXPLICIT_SIZE_MIGRATE.search(title_s))
+            and mcap_now is not None
+            and mcap_now <= ceiling
+        ):
+            completed_migration = True
+            # Reconstruct pre-migration book: was R2000, not yet R1000/Midcap
+            mems_for_legs = ["russell_2000"]
+            out["completed_migration"] = True
+        else:
+            out["status"] = "n_a"
+            out["reason"] = "already_member"
+            return out
 
     if f_mcap is None:
         out["status"] = "n_a"
@@ -276,13 +387,23 @@ def compute_event_impact(
         out["reason"] = f"no_aum_config:{primary_index}"
         return out
 
-    legs = expand_migration_legs(
+    legs, meta = expand_migration_legs(
         primary_index,
         action,
         title=title,
         registry=registry,
-        current_memberships=current_memberships,
+        current_memberships=mems_for_legs,
+        market_cap_usd=_mcap_usd(mi),
+        rules=rules,
+        style_subset=False,
     )
+    out["assumed_graduation"] = bool(meta.get("assumed_graduation"))
+    if meta.get("assumed_graduation") and confidence != "provider_confirmed":
+        out["confidence"] = "news_unconfirmed"
+    if meta.get("skip_reason"):
+        out["status"] = "n_a"
+        out["reason"] = meta["skip_reason"]
+        return out
     if not legs:
         out["status"] = "n_a"
         out["reason"] = "no_legs"
@@ -306,7 +427,6 @@ def compute_event_impact(
                 }
             )
             continue
-        # Skip Microcap leg for top-of-R2000 style names (weight in R2000 > ~15 bps)
         if lg["index"] == "russell_microcap" and "russell_2000" in index_ids_in_legs:
             r2_cfg = indices.get("russell_2000") or {}
             w_r2 = index_weight(f_mcap, r2_cfg)
@@ -320,13 +440,11 @@ def compute_event_impact(
             "overlap_parent": cfg.get("overlap_parent"),
             "status": "ok",
         }
-        # Per-stack notional for this leg
         for stack in ("low", "base", "high"):
             aum, _ = tier_aum_usd(cfg, stack)
             if aum is None:
                 row[f"flow_usd_{stack}"] = None
             else:
-                # sign +1 buy, -1 sell; flow_usd positive = buy pressure
                 row[f"flow_usd_{stack}"] = lg["sign"] * w * aum
         leg_details.append(row)
 
@@ -336,7 +454,6 @@ def compute_event_impact(
     for stack in ("low", "base", "high"):
         flows = [lg.get(f"flow_usd_{stack}") for lg in leg_details if lg.get("status") == "ok"]
         if not flows or any(f is None for f in flows):
-            # degrade: use available legs only
             usable = [f for f in flows if f is not None]
             if not usable:
                 stacks[stack] = {
@@ -356,7 +473,6 @@ def compute_event_impact(
         }
     out["stacks"] = stacks
 
-    # Days of ADV (use |base| net)
     adv = mi.get("adv_dollar")
     base_net = (stacks.get("base") or {}).get("net_flow_usd")
     if adv and base_net is not None:
@@ -373,7 +489,6 @@ def compute_event_impact(
         if not adv:
             out["adv_missing"] = True
 
-    # HK weight-cliff ratio for Russell breakpoint migrations
     if out["is_russell_breakpoint_migration"]:
         sell_demand = 0.0
         buy_demand = 0.0
@@ -394,7 +509,6 @@ def compute_event_impact(
             out["hk_weight_cliff_ratio"] = None
             out["hk_cliff_note"] = "infinite_sell_vs_zero_buy"
 
-    # Display helpers
     base = stacks.get("base") or {}
     out["pct_of_float_base"] = base.get("pct_of_float")
     out["pct_of_float_low"] = (stacks.get("low") or {}).get("pct_of_float")
@@ -415,14 +529,20 @@ def events_from_ticker_row(
     row: dict,
     mi: dict,
     registry: dict,
+    rules: dict | None = None,
 ) -> list[dict]:
     """Build float-impact events from confirmed_events, news_notes, and candidates."""
     events: list[dict] = []
     mems = list(row.get("current_memberships") or [])
     seen_keys: set[tuple] = set()
+    rules = rules if rules is not None else load_rules()
 
     def _key(idx, action, announced):
         return (idx, action, announced or "")
+
+    def _append(impact: dict) -> None:
+        # Keep n_a rows so UI can show reason; do not promote them as primary display
+        events.append(impact)
 
     # 1) Confirmed / quality-gated
     for ev in row.get("confirmed_events") or []:
@@ -434,23 +554,25 @@ def events_from_ticker_row(
         if k in seen_keys:
             continue
         seen_keys.add(k)
-        events.append(
-            compute_event_impact(
-                ticker=ticker,
-                mi=mi,
-                primary_index=idx,
-                action=action,
-                registry=registry,
-                title=ev.get("title"),
-                current_memberships=mems,
-                confidence=ev.get("confidence") or "provider_confirmed",
-                announced=ev.get("announced"),
-                effective=ev.get("effective"),
-                source_url=ev.get("source_url"),
-            )
+        impact = compute_event_impact(
+            ticker=ticker,
+            mi=mi,
+            primary_index=idx,
+            action=action,
+            registry=registry,
+            title=ev.get("title"),
+            current_memberships=mems,
+            confidence=ev.get("confidence") or "provider_confirmed",
+            announced=ev.get("announced"),
+            effective=ev.get("effective"),
+            source_url=ev.get("source_url"),
+            style_subset=bool(ev.get("style_subset")),
+            rules=rules,
         )
+        impact["event_source"] = "confirmed"
+        _append(impact)
 
-    # 2) News notes (unconfirmed)
+    # 2) News notes (unconfirmed) — style_subset never produces size flow
     for ev in row.get("news_notes") or []:
         idx = ev.get("index")
         action = ev.get("action") or "add"
@@ -458,11 +580,6 @@ def events_from_ticker_row(
             continue
         k = _key(idx, action, ev.get("announced"))
         if k in seen_keys:
-            continue
-        # Skip pure style/subset if already covered by parent migration
-        if ev.get("style_subset") and any(
-            e.get("primary_index") in {"russell_1000", "russell_2000", "sp500"} for e in events
-        ):
             continue
         seen_keys.add(k)
         impact = compute_event_impact(
@@ -477,11 +594,13 @@ def events_from_ticker_row(
             announced=ev.get("announced"),
             effective=ev.get("effective"),
             source_url=ev.get("source_url"),
+            style_subset=bool(ev.get("style_subset")),
+            rules=rules,
         )
         impact["event_source"] = "news_note"
-        events.append(impact)
+        _append(impact)
 
-    # 3) Pre-announcement candidates (anticipation edge)
+    # 3) Pre-announcement candidates (expected impact before it happens)
     for sc in row.get("scorecards") or []:
         status = sc.get("status")
         if status not in {"inclusion_candidate", "deletion_risk"}:
@@ -489,14 +608,15 @@ def events_from_ticker_row(
         idx = sc.get("index")
         if not idx or idx not in (registry.get("indices") or {}):
             continue
+        # Suppress candidates from portfolio_proxy_fallback breakpoint (Phase D)
+        if sc.get("rank_method") == "portfolio_proxy_fallback":
+            continue
         action = "add" if status == "inclusion_candidate" else "delete"
         k = _key(idx, action, "candidate")
         if k in seen_keys:
             continue
-        # Banding: only flag Russell migrations when outside / near band (distance available)
         dist = sc.get("distance_to_boundary_pct")
         if idx in RUSSELL_BREAKPOINT_PAIR and dist is not None:
-            # Within ±2.5% band → banding holds; skip predicted migration
             if abs(float(dist)) < 2.5 and status == "inclusion_candidate":
                 continue
         seen_keys.add(k)
@@ -512,10 +632,12 @@ def events_from_ticker_row(
             announced=None,
             effective=None,
             source_url=None,
+            style_subset=False,
+            rules=rules,
         )
         impact["event_source"] = "candidate"
         impact["distance_to_boundary_pct"] = dist
-        events.append(impact)
+        _append(impact)
 
     return events
 
@@ -524,23 +646,25 @@ def attach_float_impact(
     by_ticker: dict,
     inputs_by_ticker: dict,
     registry: dict | None = None,
+    rules: dict | None = None,
 ) -> dict:
     """Mutate by_ticker rows with float_impact; return portfolio_summary extras."""
     registry = registry or load_aum_registry()
+    rules = rules if rules is not None else load_rules()
     top: list[dict] = []
 
     for ticker, row in by_ticker.items():
         mi = inputs_by_ticker.get(ticker) or {}
-        events = events_from_ticker_row(ticker, row, mi, registry)
-        # Pick primary display event: prefer confirmed/news with largest |pct_of_float_base|
+        events = events_from_ticker_row(ticker, row, mi, registry, rules=rules)
         display = None
         best_abs = -1.0
         for ev in events:
+            if ev.get("status") == "n_a":
+                continue
             pct = ev.get("pct_of_float_base")
             if pct is None:
                 continue
             a = abs(pct)
-            # Prefer non-candidate when close
             src_boost = 0.0 if ev.get("event_source") == "candidate" else 0.01
             if a + src_boost > best_abs:
                 best_abs = a + src_boost
@@ -561,24 +685,28 @@ def attach_float_impact(
                     "pct_of_adv_days": display.get("pct_of_adv_days"),
                     "net_flow_usd_base": display.get("net_flow_usd_base"),
                     "hk_weight_cliff_ratio": display.get("hk_weight_cliff_ratio"),
-                    "is_russell_breakpoint_migration": display.get("is_russell_breakpoint_migration"),
+                    "is_russell_breakpoint_migration": display.get(
+                        "is_russell_breakpoint_migration"
+                    ),
+                    "assumed_graduation": display.get("assumed_graduation"),
                     "primary_index": display.get("primary_index"),
                     "action": display.get("action"),
                     "confidence": display.get("confidence"),
                     "event_source": display.get("event_source"),
                     "float_flag": display.get("float_flag"),
+                    "status": display.get("status"),
                 }
             )
 
     def _rank(r: dict) -> tuple:
-        # Prefer confirmed/news migrations with real float over identical pure-add % floats
         src = r.get("event_source") or (
-            "confirmed" if r.get("confidence") in {"provider_confirmed", "news_unconfirmed"} else "candidate"
+            "confirmed"
+            if r.get("confidence") in {"provider_confirmed", "news_unconfirmed"}
+            else "candidate"
         )
         src_rank = 0 if src != "candidate" else 1
         mig = 0 if r.get("is_russell_breakpoint_migration") else 1
         float_ok = 0 if r.get("float_flag") == "float_adj" else 1
-        # Cap-weighted pure adds share the same % float (= AUM/index_mcap); rank by |$| then ADV days
         dollars = abs(r.get("net_flow_usd_base") or 0)
         adv = r.get("pct_of_adv_days") or 0
         pct = abs(r.get("pct_of_float_base") or 0)
@@ -601,14 +729,12 @@ def demand_shock_from_float_impact(float_impact: dict | None) -> float | None:
     if days is None:
         return None
     try:
-        # priority_score expects "pct of one-day ADV" — days*100 = percent of ADV
         return float(days) * 100.0
     except (TypeError, ValueError):
         return None
 
 
 if __name__ == "__main__":
-    # Quick smoke: APLD graduation
     reg = load_aum_registry()
     mi = {
         "market_cap_usd": 285.77e6 * 37.77,
@@ -625,20 +751,25 @@ if __name__ == "__main__":
         current_memberships=["russell_2000"],
         confidence="news_unconfirmed",
     )
-    print(json.dumps({
-        "status": impact["status"],
-        "stacks": impact["stacks"],
-        "hk_weight_cliff_ratio": impact["hk_weight_cliff_ratio"],
-        "is_russell_breakpoint_migration": impact["is_russell_breakpoint_migration"],
-        "legs": [
+    print(
+        json.dumps(
             {
-                "index": lg["index"],
-                "sign": lg["sign"],
-                "weight_bps": lg.get("weight_bps"),
-                "flow_usd_base": lg.get("flow_usd_base"),
-                "reason": lg.get("reason"),
-            }
-            for lg in impact["legs"]
-        ],
-        "pct_of_adv_days": impact.get("pct_of_adv_days"),
-    }, indent=2))
+                "status": impact["status"],
+                "stacks": impact["stacks"],
+                "hk_weight_cliff_ratio": impact["hk_weight_cliff_ratio"],
+                "is_russell_breakpoint_migration": impact["is_russell_breakpoint_migration"],
+                "legs": [
+                    {
+                        "index": lg["index"],
+                        "sign": lg["sign"],
+                        "weight_bps": lg.get("weight_bps"),
+                        "flow_usd_base": lg.get("flow_usd_base"),
+                        "reason": lg.get("reason"),
+                    }
+                    for lg in impact["legs"]
+                ],
+                "pct_of_adv_days": impact.get("pct_of_adv_days"),
+            },
+            indent=2,
+        )
+    )

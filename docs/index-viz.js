@@ -70,15 +70,19 @@
     return (entry && entry.float_impact && entry.float_impact.primary) || null;
   }
 
-  function formatPctFloat(pct) {
+  function formatPctFloat(pct, floatFlag) {
     if (pct == null || Number.isNaN(Number(pct))) return '—';
     const n = Number(pct);
     const sign = n > 0 ? '+' : '';
-    return `${sign}${n.toFixed(1)}%`;
+    const core = `${sign}${n.toFixed(1)}%`;
+    // Cap-weighted constant when float unknown — asterisk + muted
+    if (floatFlag === 'float_unknown') return `~${core}*`;
+    return core;
   }
 
-  function pctFloatTone(pct) {
+  function pctFloatTone(pct, floatFlag) {
     if (pct == null) return '';
+    if (floatFlag === 'float_unknown') return 'color:var(--text-muted, #888)';
     const n = Number(pct);
     if (n < -1) return 'color:var(--accent-red, #c44)';
     if (n > 1) return 'color:var(--accent-green, #2a7)';
@@ -87,26 +91,45 @@
 
   function pctFloatTooltip(fi) {
     if (!fi) return 'No float-impact estimate (missing float, ADV, or AUM)';
+    if (fi.status === 'n_a') {
+      return `n/a: ${fi.reason || 'no size-migration flow'}`;
+    }
     const low = fi.pct_of_float_low;
     const base = fi.pct_of_float_base;
     const high = fi.pct_of_float_high;
     const adv = fi.pct_of_adv_days;
     const cliff = fi.hk_weight_cliff_ratio;
     const parts = [
-      `low ${formatPctFloat(low)} / base ${formatPctFloat(base)} / high ${formatPctFloat(high)} of float`,
+      `low ${formatPctFloat(low, fi.float_flag)} / base ${formatPctFloat(base, fi.float_flag)} / high ${formatPctFloat(high, fi.float_flag)} of float`,
     ];
     if (adv != null) parts.push(`${Number(adv).toFixed(2)} days ADV`);
-    if (cliff != null) parts.push(`HK cliff ${Number(cliff).toFixed(1)}x`);
+    if (
+      cliff != null &&
+      fi.is_russell_breakpoint_migration &&
+      fi.float_flag === 'float_adj'
+    ) {
+      parts.push(`HK cliff ${Number(cliff).toFixed(1)}x`);
+    }
     if (fi.aum_stale) parts.push('AUM registry stale');
-    if (fi.float_flag === 'float_unknown') parts.push('float unknown — upper bound');
+    if (fi.float_flag === 'float_unknown') {
+      parts.push('Cap-weighted constant (AUM ÷ index mcap); not stock-specific — float/ADV missing');
+    }
+    if (fi.assumed_graduation) parts.push('pair inferred (assumed graduation)');
+    if (fi.reason) parts.push(fi.reason);
     return parts.join(' · ');
   }
 
   function renderPctFloatCell(fi) {
+    if (fi && fi.status === 'n_a') {
+      const tip = pctFloatTooltip(fi);
+      return `<td class="mono muted" title="${esc(tip)}">—</td>`;
+    }
     const pct = fi && fi.pct_of_float_base;
     const tip = pctFloatTooltip(fi);
-    const tone = pctFloatTone(pct);
-    return `<td class="mono" style="${tone}" title="${esc(tip)}">${esc(formatPctFloat(pct))}</td>`;
+    const tone = pctFloatTone(pct, fi && fi.float_flag);
+    return `<td class="mono" style="${tone}" title="${esc(tip)}">${esc(
+      formatPctFloat(pct, fi && fi.float_flag)
+    )}</td>`;
   }
 
   function renderHoldingsCell(entry) {
@@ -115,7 +138,9 @@
     const mem = (entry.current_memberships || []).slice(0, 2).join(', ');
     const fi = primaryFloatImpact(entry);
     const floatBit =
-      fi && fi.pct_of_float_base != null ? ` · float ${formatPctFloat(fi.pct_of_float_base)}` : '';
+      fi && fi.pct_of_float_base != null && fi.status !== 'n_a'
+        ? ` · float ${formatPctFloat(fi.pct_of_float_base, fi.float_flag)}`
+        : '';
     const title = mem
       ? `In: ${mem}${floatBit}`
       : (entry.scorecards || [])
@@ -154,7 +179,11 @@
 
   function renderFlowBridge(fi, escapeHtml) {
     const e = escapeHtml || esc;
-    if (!fi || !fi.legs || !fi.legs.length) {
+    if (!fi || fi.status === 'n_a') {
+      const why = fi && fi.reason ? fi.reason : 'no size-migration flow';
+      return `<p class="muted" title="${e(why)}">— (${e(why)})</p>`;
+    }
+    if (!fi.legs || !fi.legs.length) {
       return '<p class="muted">No flow legs.</p>';
     }
     const body = fi.legs
@@ -173,14 +202,17 @@
       })
       .join('');
     const cliff =
+      fi.is_russell_breakpoint_migration &&
+      fi.float_flag === 'float_adj' &&
       fi.hk_weight_cliff_ratio != null
         ? `<p style="margin:8px 0 0"><span class="badge badge-warn" title="Horizon Kinetics weight cliff × AUM asymmetry">HK graduation penalty: ~${e(
             Number(fi.hk_weight_cliff_ratio).toFixed(1)
           )}× demand differential</span></p>`
         : '';
-    const band = `low ${formatPctFloat(fi.pct_of_float_low)} · base ${formatPctFloat(
-      fi.pct_of_float_base
-    )} · high ${formatPctFloat(fi.pct_of_float_high)} of float`;
+    const band = `low ${formatPctFloat(fi.pct_of_float_low, fi.float_flag)} · base ${formatPctFloat(
+      fi.pct_of_float_base,
+      fi.float_flag
+    )} · high ${formatPctFloat(fi.pct_of_float_high, fi.float_flag)} of float`;
     const adv =
       fi.pct_of_adv_days != null ? ` · ${Number(fi.pct_of_adv_days).toFixed(2)} days ADV` : '';
     const aum = fi.aum_as_of
@@ -301,30 +333,37 @@
         ? ` <span class="muted">AUM as-of ${e(summary.aum_as_of)}</span>`
         : '';
     const body = rows
-      .slice(0, 25)
+      .slice(0, 40)
       .map((r) => {
         const entry = byTicker[r.ticker] || {};
         const fi = primaryFloatImpact(entry) || r;
-        const cliff =
-          r.hk_weight_cliff_ratio != null
-            ? `<span class="badge badge-warn" title="HK weight cliff">~${e(
-                Number(r.hk_weight_cliff_ratio).toFixed(1)
-              )}×</span>`
-            : '—';
+        const showCliff =
+          r.is_russell_breakpoint_migration &&
+          r.float_flag === 'float_adj' &&
+          r.hk_weight_cliff_ratio != null;
+        const cliff = showCliff
+          ? `<span class="badge badge-warn" title="HK weight cliff">~${e(
+              Number(r.hk_weight_cliff_ratio).toFixed(1)
+            )}×</span>`
+          : '—';
+        const inferred = r.assumed_graduation
+          ? ' <span class="badge badge-purple" title="R2000 exit inferred from mcap">pair inferred</span>'
+          : '';
+        const src = r.event_source === 'candidate' ? 'candidate' : r.confidence || '—';
         return `<tr>
-          <td class="mono">${e(r.ticker)}</td>
+          <td class="mono">${e(r.ticker)}${inferred}</td>
           <td>${e(r.primary_index || '—')}</td>
           <td>${e(r.action || '—')}</td>
           ${renderPctFloatCell(fi)}
           <td class="mono">${r.pct_of_adv_days == null ? '—' : e(Number(r.pct_of_adv_days).toFixed(2))}</td>
           <td>${cliff}</td>
-          <td>${e(r.confidence || '—')}</td>
+          <td>${e(src)}</td>
           <td>${renderFlowBridge(fi, e)}</td>
         </tr>`;
       })
       .join('');
     return `<h3 style="margin:16px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary)">Float impact (forced flow)</h3>
-      <p class="muted" style="margin-bottom:8px">Expected net index demand as % of company float. Negative = net forced selling. Both sides of Russell migrations modeled per Horizon Kinetics (2013).${stale}</p>
+      <p class="muted" style="margin-bottom:8px">Actual (confirmed/news) and expected (near-boundary candidates) net index demand as % of company float. Negative = net forced selling. Both sides of Russell migrations modeled per Horizon Kinetics (2013). Asterisk (*) = float unknown — cap-weighted constant, not stock-specific.${stale}</p>
       <table class="insights-table"><thead><tr>
         <th>Ticker</th><th>Index</th><th>Action</th><th>% float</th><th>ADV days</th><th>HK cliff</th><th>Conf</th><th>Detail</th>
       </tr></thead><tbody>${body}</tbody></table>`;

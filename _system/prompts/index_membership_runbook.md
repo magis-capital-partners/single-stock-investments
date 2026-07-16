@@ -7,8 +7,11 @@
 ## Daily / CI
 
 1. Portfolio news ingest (existing `portfolio-news.yml`) classifies index adds/deletes into `index_inclusion`.
-2. `build_index_membership.py` runs before `build_insights.py` / `build_dashboard_data.py` in rebuild profiles.
-3. Output: `dashboard/data/index_membership.json` (mirrored to `docs/` via rsync).
+2. Optional float/ADV refresh (Yahoo crumb + SEC shares fallback): `python _system/scripts/fetch_float_adv.py --only-events --max 80`
+3. `build_index_membership.py` runs before `build_insights.py` / `build_dashboard_data.py` in rebuild profiles.
+4. Output: `dashboard/data/index_membership.json` (mirrored to `docs/` via rsync).
+
+Russell breakpoint mcap lives in `index_rules.json` (`russell_1000.breakpoint_mcap_usd`, dated). Style/subset headlines never produce size-migration float impact.
 
 ## Refresh constituent lists
 

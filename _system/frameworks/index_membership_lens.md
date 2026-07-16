@@ -51,6 +51,8 @@ Per event in `by_ticker.{T}.float_impact` and `portfolio_summary.top_float_impac
 | `pct_of_adv_days` | `|net_flow_base| / ADV` |
 | `hk_weight_cliff_ratio` | Sell-side demand ÷ buy-side demand on Russell breakpoint migrations |
 | `legs[]` | Per-index buy/sell bridge (both sides of migrations required) |
+| `style_subset` / `reason` | Style-box moves and ambiguous reclass → `status: n_a` (no size flow) |
+| `assumed_graduation` | R2000 exit inferred (membership unknown + mcap ≤ 4× breakpoint) |
 
 ### Horizon Kinetics axioms (normative)
 
@@ -61,6 +63,10 @@ Per event in `by_ticker.{T}.float_impact` and `portfolio_summary.top_float_impac
 5. **% of float** is the right denominator (not % of market cap)
 
 AUM tiers in `index_aum.json`: `low` = observed ETFs; `base` = + index-fund estimate (default display); `high` = base × BMI scenario multiplier. Never invent float, ADV, or AUM — emit `n_a` / omit tier.
+
+**Breakpoint:** use dated `russell_1000.breakpoint_mcap_usd` in `index_rules.json` ($5.7B as of 2026-06-26). Never use portfolio-median mcap as the Russell breakpoint for candidacy.
+
+**Event gates:** style/subset (Top 50, Defensive, 2500, Growth/Value Benchmark) and bare "index reclassification" never produce size-migration float impact. Candidates (expected impact) and confirmed/news (actual impact) both appear in the float-impacts table.
 
 ## Inclusion probability band
 
