@@ -12,6 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from build_dashboard_data import (
     DOSSIER_DELTA_MIN_SCORE,
     build_dossier_view,
+    coverage_gap_reasons,
     essential_needs_work_reasons,
 )
 
@@ -125,32 +126,54 @@ class NeedsWorkReasonTests(unittest.TestCase):
                 "bullets": [{"evidence_url": "https://example.com"}],
                 "freshness_days": 5,
                 "source_mix": ["third_party"],
+                "ticker_specific": True,
             },
             "classification": {"analysis_as_of": recent_date(5)},
         }
 
-    def test_missing_dossier_flagged_for_holdings(self):
+    def test_missing_dossier_not_in_attention(self):
         row = self.base_row()
         row["dossier"] = None
-        self.assertIn("no dossier", essential_needs_work_reasons(row))
+        self.assertNotIn("no dossier", essential_needs_work_reasons(row))
+        self.assertIn("no dossier", coverage_gap_reasons(row))
 
-    def test_stale_dossier_flagged(self):
+    def test_stale_dossier_in_coverage_only(self):
         row = self.base_row()
         row["dossier"] = {"has_agent_dossier": True, "stale": True}
-        self.assertIn("stale dossier", essential_needs_work_reasons(row))
+        self.assertNotIn("stale dossier", essential_needs_work_reasons(row))
+        self.assertIn("stale dossier", coverage_gap_reasons(row))
 
-    def test_fresh_dossier_not_flagged(self):
+    def test_fresh_dossier_not_in_coverage(self):
         row = self.base_row()
         row["dossier"] = {"has_agent_dossier": True, "stale": False}
-        reasons = essential_needs_work_reasons(row)
-        self.assertNotIn("no dossier", reasons)
-        self.assertNotIn("stale dossier", reasons)
+        self.assertNotIn("no dossier", coverage_gap_reasons(row))
+        self.assertNotIn("stale dossier", coverage_gap_reasons(row))
 
-    def test_watchlist_not_flagged_for_missing_dossier(self):
+    def test_watchlist_not_flagged(self):
         row = self.base_row()
         row["in_holdings"] = False
         row["dossier"] = None
-        self.assertNotIn("no dossier", essential_needs_work_reasons(row))
+        self.assertEqual(essential_needs_work_reasons(row), [])
+        self.assertEqual(coverage_gap_reasons(row), [])
+
+    def test_no_ticker_coverage_is_attention(self):
+        row = self.base_row()
+        row["essential_insights"]["ticker_specific"] = False
+        self.assertIn("no ticker coverage", essential_needs_work_reasons(row))
+
+    def test_stale_valuation_180d(self):
+        row = self.base_row()
+        row["classification"]["analysis_as_of"] = recent_date(100)
+        self.assertNotIn("stale valuation", essential_needs_work_reasons(row))
+        row["classification"]["analysis_as_of"] = recent_date(200)
+        self.assertIn("stale valuation", essential_needs_work_reasons(row))
+
+    def test_third_party_in_coverage_only(self):
+        row = self.base_row()
+        row["essential_insights"]["source_mix"] = ["insider"]
+        row["dossier"] = {"has_agent_dossier": True, "stale": False}
+        self.assertNotIn("no third-party check", essential_needs_work_reasons(row))
+        self.assertIn("no third-party check", coverage_gap_reasons(row))
 
 
 if __name__ == "__main__":

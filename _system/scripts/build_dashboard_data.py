@@ -25,6 +25,12 @@ from insight_format import (  # noqa: E402
     split_insight_rows,
 )
 from valuation_synthesis import website_implied_irr  # noqa: E402
+from macro_regime_panel import (  # noqa: E402
+    build_portfolio_macro_regime,
+    regime_to_compat_macro_list,
+)
+from insider_materiality import SIGNAL_THRESHOLD as INSIDER_SIGNAL_THRESHOLD  # noqa: E402
+from event_materiality import materiality_score as event_materiality_score  # noqa: E402
 
 DATA_DIR = ROOT / "dashboard" / "data"
 OUTPUT = DATA_DIR / "dashboard_data.json"
@@ -1233,7 +1239,7 @@ def compact_insight(row: dict | None) -> dict | None:
         return None
     source = row.get("source")
     label = row.get("source_label") or source or "Insight"
-    return {
+    item = {
         "id": row.get("id") or f"{source}:{row.get('event_type') or row.get('ref') or insight_date(row)}",
         "source": source,
         "source_label": row.get("source_label") or source or "Insight",
@@ -1252,6 +1258,15 @@ def compact_insight(row: dict | None) -> dict | None:
         "match_tier": row.get("match_tier"),
         "inventory_ref": row.get("inventory_ref"),
     }
+    if row.get("materiality") is not None:
+        item["materiality"] = row.get("materiality")
+    if row.get("tier"):
+        item["tier"] = row.get("tier")
+    if row.get("materiality_components"):
+        item["materiality_components"] = row.get("materiality_components")
+    if row.get("ics") is not None:
+        item["ics"] = row.get("ics")
+    return item
 
 
 def row_freshness_days(row: dict) -> int | None:
@@ -1306,11 +1321,23 @@ def dedupe_owner_insights(
     if not owner:
         return latest, bull, bear, owner
     owner_id = owner.get("id")
-    if latest and latest.get("id") == owner_id:
+    owner_claim = re.sub(r"\s+", " ", str(owner.get("summary") or owner.get("claim") or "").lower()).strip()
+
+    def _overlaps(card: dict | None) -> bool:
+        if not card:
+            return False
+        if owner_id and card.get("id") == owner_id:
+            return True
+        other = re.sub(r"\s+", " ", str(card.get("summary") or card.get("claim") or "").lower()).strip()
+        if owner_claim and other and (owner_claim in other or other in owner_claim):
+            return len(owner_claim) >= 40 and len(other) >= 40
+        return False
+
+    if _overlaps(latest):
         latest = None
-    if bull and bull.get("id") == owner_id:
+    if _overlaps(bull):
         bull = None
-    if bear and bear.get("id") == owner_id:
+    if _overlaps(bear):
         bear = None
     return latest, bull, bear, owner
 
@@ -1344,6 +1371,41 @@ def best_owner_insight(rows: list[dict]) -> dict | None:
 
     candidates.sort(key=sort_key, reverse=True)
     return candidates[0]
+
+
+def insight_materiality(row: dict | None) -> int | None:
+    """Best available materiality for Fresh risk / catalyst gating."""
+    if not row:
+        return None
+    if row.get("materiality") is not None:
+        try:
+            return int(row["materiality"])
+        except (TypeError, ValueError):
+            pass
+    # Compact cards may only carry score; prefer explicit materiality on raw rows.
+    try:
+        score, _ = event_materiality_score(row)
+        return int(score)
+    except Exception:
+        raw = row.get("score")
+        try:
+            return int(raw) if raw is not None else None
+        except (TypeError, ValueError):
+            return None
+
+
+def material_enough_for_fresh_status(row: dict | None) -> bool:
+    """Fresh risk/catalyst only when materiality clears the activist-style signal bar."""
+    if not row:
+        return False
+    mat = insight_materiality(row)
+    if mat is None:
+        # Ownership Form 4 without score: do not escalate to Fresh risk.
+        if row.get("source") == "insider":
+            return False
+        return False
+    threshold = INSIDER_SIGNAL_THRESHOLD
+    return mat >= threshold
 
 
 def build_essential_insights(
@@ -1459,11 +1521,17 @@ def build_essential_insights(
     primary = latest or owner or bull or bear
     primary_is_ownership = bool(primary and primary.get("source") in OWNERSHIP_SOURCES)
 
+    # Resolve raw rows for materiality gate (compact cards may lack full score inputs).
+    bear_raw = bear_row
+    bull_raw = bull_row
+    fresh_risk_ok = bear_specific and fresh and material_enough_for_fresh_status(bear_raw or bear)
+    fresh_catalyst_ok = bull_specific and fresh and material_enough_for_fresh_status(bull_raw or bull)
+
     if not all_rows and not discussants:
         status = {"label": "No insight", "tone": "stale"}
-    elif bear_specific and fresh:
+    elif fresh_risk_ok:
         status = {"label": "Fresh risk", "tone": "risk"}
-    elif bull_specific and fresh:
+    elif fresh_catalyst_ok:
         status = {"label": "Fresh catalyst", "tone": "bullish"}
     elif primary_is_ownership and owner:
         status = {"label": "Owner signal", "tone": "ownership"}
@@ -1478,6 +1546,25 @@ def build_essential_insights(
     else:
         status = {"label": "Covered", "tone": "neutral"}
 
+    # Best insider materiality among ticker-specific rows for Scan columns.
+    insider_materiality = None
+    insider_tier = None
+    insider_ics = None
+    for r in specific_rows:
+        if r.get("source") != "insider":
+            continue
+        mat = r.get("materiality")
+        if mat is None:
+            continue
+        try:
+            mat_i = int(mat)
+        except (TypeError, ValueError):
+            continue
+        if insider_materiality is None or mat_i > insider_materiality:
+            insider_materiality = mat_i
+            insider_tier = r.get("tier")
+            insider_ics = r.get("ics")
+
     return {
         "status": status,
         "latest": latest,
@@ -1491,7 +1578,10 @@ def build_essential_insights(
         "ticker_specific": ticker_specific,
         "event_count": len(events),
         "record_count": len(raw_insights),
-        "needs_work": not source_rows or (freshness_days is not None and freshness_days > 90) or len(source_mix) < 2,
+        "insider_materiality": insider_materiality,
+        "insider_tier": insider_tier,
+        "insider_ics": insider_ics,
+        "needs_work": False,  # set from essential reasons below
     }
 
 
@@ -1504,7 +1594,8 @@ def collect_portfolio_macro_records(insights_doc: dict | None) -> list[dict]:
         for row in rows:
             if row.get("source") != "macro":
                 continue
-            key = str(row.get("claim") or row.get("id") or "")
+            # Dedupe by series/theme id when present, else claim.
+            key = str(row.get("theme_id") or row.get("series_id") or row.get("claim") or row.get("id") or "")
             if not key or key in seen:
                 continue
             seen.add(key)
@@ -1514,6 +1605,11 @@ def collect_portfolio_macro_records(insights_doc: dict | None) -> list[dict]:
 
 
 def build_portfolio_macro(insights_doc: dict | None) -> list[dict]:
+    """Legacy compat list — prefer portfolio_macro_regime in the UI."""
+    regime = build_portfolio_macro_regime()
+    compat = regime_to_compat_macro_list(regime)
+    if compat:
+        return compat
     out: list[dict] = []
     for row in collect_portfolio_macro_records(insights_doc)[:8]:
         item = compact_insight(row)
@@ -1525,26 +1621,40 @@ def build_portfolio_macro(insights_doc: dict | None) -> list[dict]:
 
 
 def essential_needs_work_reasons(row: dict) -> list[str]:
+    """Holdings-critical Attention gaps only (plan 1A)."""
+    if not row.get("in_holdings"):
+        return []
     essential = row.get("essential_insights") or {}
     reasons: list[str] = []
+    if not essential.get("ticker_specific"):
+        reasons.append("no ticker coverage")
     bullets = essential.get("bullets") or []
-    if not bullets or any(not b.get("evidence_url") for b in bullets):
+    primary = bullets[0] if bullets else None
+    if primary and not primary.get("evidence_url"):
         reasons.append("missing evidence")
+    valuation_days = days_since_iso((row.get("classification") or {}).get("analysis_as_of"))
+    if valuation_days is None or valuation_days > 180:
+        reasons.append("stale valuation")
+    return reasons[:5]
+
+
+def coverage_gap_reasons(row: dict) -> list[str]:
+    """Completeness audit gaps — demoted from Needs Attention."""
+    if not row.get("in_holdings"):
+        return []
+    essential = row.get("essential_insights") or {}
+    reasons: list[str] = []
     freshness = essential.get("freshness_days")
     if isinstance(freshness, int) and freshness > 90:
         reasons.append("stale source")
-    valuation_days = days_since_iso((row.get("classification") or {}).get("analysis_as_of"))
-    if valuation_days is None or valuation_days > 90:
-        reasons.append("stale valuation")
     outside_research_sources = {"third_party", "sumzero_research"}
     if not (outside_research_sources & set(essential.get("source_mix") or [])):
         reasons.append("no third-party check")
     dossier = row.get("dossier")
-    if row.get("in_holdings"):
-        if not dossier or not dossier.get("has_agent_dossier"):
-            reasons.append("no dossier")
-        elif dossier.get("stale"):
-            reasons.append("stale dossier")
+    if not dossier or not dossier.get("has_agent_dossier"):
+        reasons.append("no dossier")
+    elif dossier.get("stale"):
+        reasons.append("stale dossier")
     return reasons[:5]
 
 
@@ -1736,7 +1846,9 @@ def build_ticker_row(
     )
     row["dossier"] = build_dossier_view(load_dossier(ticker_dir), row["insight_events"])
     reasons = essential_needs_work_reasons(row)
+    coverage = coverage_gap_reasons(row)
     row["essential_insights"]["needs_work_reasons"] = reasons
+    row["essential_insights"]["coverage_gaps"] = coverage
     row["essential_insights"]["needs_work"] = bool(reasons)
     row["research_memory"] = compact_research_memory(ticker, memory_doc)
     row["activist"] = activist_summary_for_ticker(ticker)
@@ -1872,6 +1984,7 @@ def build() -> dict:
                 f"{OUTPUT.relative_to(ROOT)}"
             )
     watchlist = build_watchlist_rows(reg.get("watchlist") or {})
+    portfolio_macro_regime = build_portfolio_macro_regime()
     portfolio_macro = build_portfolio_macro(insights_doc)
 
     total_pdfs = sum(r["pdf_count"] for r in rows)
@@ -1927,6 +2040,7 @@ def build() -> dict:
         },
         "watchlist": watchlist,
         "tickers": rows,
+        "portfolio_macro_regime": portfolio_macro_regime,
         "portfolio_macro": portfolio_macro,
     }
 

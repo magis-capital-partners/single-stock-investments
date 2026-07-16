@@ -27,12 +27,23 @@ from filing_facts import (  # noqa: E402
     source_filing_ref_from_text_path,
 )
 from vault_paths import letters_ref, letters_root, path_to_letters_ref  # noqa: E402
+from fund_families import (  # noqa: E402
+    collapse_display_label,
+    commentary_hash,
+    consensus_vote_key,
+    family_display,
+    family_id_for_fund,
+    normalize_commentary,
+    propose_fund_families,
+    write_family_proposals,
+)
 from filing_review import (  # noqa: E402
     filing_metric_needs_review,
     filing_metric_passes_magnitude,
     filing_metric_passes_sanity,
 )
 from event_triage import triage_events, write_triage_queue  # noqa: E402
+from insider_materiality import score_form4_event  # noqa: E402
 
 OUTPUT = ROOT / "dashboard" / "data" / "insights.json"
 DOCS_OUTPUT = ROOT / "docs" / "data" / "insights.json"
@@ -643,42 +654,52 @@ def from_superinvestor_letters(doc: dict) -> list[dict]:
 
 
 def from_valuation_context(ticker: str, val: dict) -> list[dict]:
+    """Ticker valuation context for Insights.
+
+    Portfolio macro lives in dashboard ``portfolio_macro_regime`` (not per-ticker
+    macro fan-out). Only non-negligible insider conviction bands are emitted here.
+    """
     out: list[dict] = []
     overlay = val.get("context_overlay") or {}
     as_of = overlay.get("as_of") or val.get("as_of")
-    for theme in overlay.get("themes") or []:
-        for ind in theme.get("indicators") or []:
-            if ind.get("latest") is None:
-                continue
-            out.append(
-                insight_record(
-                    source="macro",
-                    as_of=ind.get("as_of") or as_of,
-                    scope="ticker",
-                    ref=ticker,
-                    claim=f"{ind.get('label')}: {ind.get('latest')} ({ind.get('direction', 'flat')})",
-                    direction={"up": "bullish", "down": "bearish"}.get(ind.get("direction"), "neutral"),
-                    evidence_ref=f"{ticker}/research/valuation.json#context_overlay",
-                    event_type="macro_signal",
-                    impact_axis="macro",
-                    theme_id=theme.get("theme_id"),
-                )
-            )
+    # Intentionally skip theme/macro indicators — see macro_regime_panel.py.
 
     insider = val.get("insider_signal") or {}
     if insider.get("band") and insider.get("band") != "negligible":
+        ics = insider.get("ics")
+        try:
+            ics_f = float(ics) if ics is not None else None
+        except (TypeError, ValueError):
+            ics_f = None
+        scored = score_form4_event(
+            {
+                "action": "purchase" if (ics_f or 0) >= 4 else "sale",
+                "transaction_code": "P" if (ics_f or 0) >= 4 else "S",
+                "value_usd": None,
+                "as_of": insider.get("as_of") or as_of,
+                "ics": ics_f,
+            },
+            in_holdings=True,
+            ics=ics_f,
+        )
         out.append(
             insight_record(
                 source="insider",
                 as_of=insider.get("as_of") or as_of,
                 scope="ticker",
                 ref=ticker,
+                title=f"Insider conviction: {insider.get('band')}",
                 claim=f"Insider conviction band: {insider.get('band')} (ICS {insider.get('ics')})",
-                direction="bearish" if insider.get("ics", 0) < 0 else "bullish",
+                direction="bearish" if (ics_f or 0) < 4 else "bullish",
                 evidence_ref=f"{ticker}/research/valuation.json#insider_signal",
                 event_type="insider_signal",
                 impact_axis="ownership",
                 confidence="low",
+                ics=ics_f,
+                band=insider.get("band"),
+                materiality=scored["materiality"],
+                materiality_components=scored["materiality_components"],
+                tier=scored["tier"],
             )
         )
     return out
@@ -1136,10 +1157,29 @@ def insider_csv_path(csv_ref: str | None) -> Path | None:
     return INSIDER_DIR / ref
 
 
-def from_insider_transactions(our_tickers: set[str]) -> list[dict]:
+def _insider_ics_for_ticker(ticker: str) -> float | None:
+    val_path = ROOT / ticker / "research" / "valuation.json"
+    if not val_path.exists():
+        return None
+    val = load_json(val_path)
+    if not isinstance(val, dict):
+        return None
+    ics = (val.get("insider_signal") or {}).get("ics")
+    try:
+        return float(ics) if ics is not None else None
+    except (TypeError, ValueError):
+        return None
+
+
+def from_insider_transactions(
+    our_tickers: set[str],
+    *,
+    holdings_tickers: set[str] | None = None,
+) -> list[dict]:
     manifest = load_json(INSIDER_MANIFEST)
     if not isinstance(manifest, dict):
         return []
+    holdings = holdings_tickers or set()
     out: list[dict] = []
     for ticker, meta in (manifest.get("tickers") or {}).items():
         ticker = str(ticker).upper()
@@ -1163,6 +1203,7 @@ def from_insider_transactions(our_tickers: set[str]) -> list[dict]:
         except OSError:
             continue
         grouped: dict[tuple, dict] = {}
+        actors_by_day: dict[str, set[str]] = {}
         for row in rows:
             code = (row.get("transaction_code") or "").upper()
             acquired = (row.get("acquired_disposed") or "").upper()
@@ -1176,6 +1217,7 @@ def from_insider_transactions(our_tickers: set[str]) -> list[dict]:
             actor = short_text(row.get("insider") or "Insider", 80)
             as_of = normalize_date(row.get("filing_date") or row.get("transaction_date") or meta.get("as_of"))
             filing_ref = row.get("source_path") or relative_path(csv_path)
+            is_10b5 = str(row.get("is_10b5_1") or "").lower() in {"1", "true", "yes"}
             key = (ticker, as_of or "", actor.lower(), action, filing_ref)
             bucket = grouped.setdefault(
                 key,
@@ -1188,19 +1230,52 @@ def from_insider_transactions(our_tickers: set[str]) -> list[dict]:
                     "shares": 0.0,
                     "value": 0.0,
                     "confidence": "low",
+                    "transaction_code": code or ("P" if is_buy else "S"),
+                    "acquired_disposed": acquired or ("A" if is_buy else "D"),
+                    "is_10b5_1": is_10b5,
+                    "is_director": str(row.get("is_director") or "").lower() in {"1", "true", "yes"},
+                    "is_officer": str(row.get("is_officer") or "").lower() in {"1", "true", "yes"},
+                    "title": row.get("officer_title") or row.get("title") or "",
                 },
             )
             shares = to_float(row.get("shares")) or 0.0
             bucket["shares"] += shares
             bucket["value"] += value
+            bucket["is_10b5_1"] = bucket["is_10b5_1"] or is_10b5
             if value >= 100000:
                 bucket["confidence"] = "med"
+            if as_of:
+                actors_by_day.setdefault(as_of, set()).add(actor.lower())
+        distinct_insiders = len({b["actor"].lower() for b in grouped.values()})
+        cluster_size = max((len(v) for v in actors_by_day.values()), default=1)
+        ics = _insider_ics_for_ticker(ticker)
+        in_holdings = ticker in holdings
+        in_watchlist = bool(our_tickers and ticker in our_tickers and not in_holdings)
         ranked = sorted(grouped.values(), key=lambda b: (b["value"], b["as_of"] or ""), reverse=True)
         for bucket in ranked[:2]:
             value = bucket["value"]
             shares = bucket["shares"]
             value_text = f"${value:,.0f}" if value else "undisclosed value"
             share_text = f"{shares:,.0f} shares" if shares else "shares"
+            score_row = {
+                "action": bucket["action"],
+                "transaction_code": bucket.get("transaction_code"),
+                "acquired_disposed": bucket.get("acquired_disposed"),
+                "value_usd": value,
+                "as_of": bucket["as_of"] or meta.get("as_of"),
+                "is_10b5_1": bucket.get("is_10b5_1"),
+                "is_director": bucket.get("is_director"),
+                "is_officer": bucket.get("is_officer"),
+                "title": bucket.get("title"),
+                "cluster_size": cluster_size,
+                "distinct_insiders": distinct_insiders,
+            }
+            scored = score_form4_event(
+                score_row,
+                in_holdings=in_holdings,
+                in_watchlist=in_watchlist,
+                ics=ics,
+            )
             out.append(
                 insight_record(
                     source="insider",
@@ -1214,6 +1289,12 @@ def from_insider_transactions(our_tickers: set[str]) -> list[dict]:
                     event_type="form4_transaction",
                     impact_axis="ownership",
                     confidence=bucket["confidence"],
+                    value_usd=value,
+                    action=bucket["action"],
+                    ics=ics,
+                    materiality=scored["materiality"],
+                    materiality_components=scored["materiality_components"],
+                    tier=scored["tier"],
                 )
             )
     return out
@@ -1678,6 +1759,7 @@ def _consensus_bucket(ticker: str, names: dict[str, str], our_tickers: set[str])
         "sell_funds": set(),
         "short_funds": set(),
         "neutral_funds": set(),
+        "mentioned_funds": set(),
         "all_funds": set(),
     }
 
@@ -1686,29 +1768,100 @@ def _finalize_consensus_row(b: dict) -> dict:
     buy_names = sorted(b["buy_funds"])
     sell_names = sorted(b["sell_funds"])
     short_names = sorted(b["short_funds"])
+    mentioned_names = sorted(b.get("mentioned_funds") or [])
     buys, sells, shorts = len(buy_names), len(sell_names), len(short_names)
+    # fund_count / lean: actionable votes only (discussed is mentioned, not a vote)
     fund_count = len(b["all_funds"])
     if buys > sells + shorts:
         sentiment = "accumulating"
     elif sells + shorts > buys:
         sentiment = "reducing"
+    elif buys or sells or shorts:
+        sentiment = "mixed"
     else:
-        sentiment = "mixed" if (buys or sells or shorts) else "discussed"
+        sentiment = "mentioned" if mentioned_names else "discussed"
     return {
         "ticker": b["ticker"],
         "name": b["name"],
         "in_book": b["in_book"],
         "fund_count": fund_count,
+        "mentioned_count": len(mentioned_names),
         "buy_funds": buys,
         "sell_funds": sells,
         "short_funds": shorts,
         "net": buys - sells - shorts,
         "sentiment": sentiment,
         "funds": sorted(b["all_funds"]),
+        "mentioned_funds": mentioned_names,
         "buy_fund_names": buy_names,
         "sell_fund_names": sell_names,
         "short_fund_names": short_names,
     }
+
+
+def _collapse_consensus_rows(rows: list[dict]) -> list[dict]:
+    """Collapse identical commentary across any funds into one row."""
+    if not rows:
+        return []
+    groups: dict[tuple, dict] = {}
+    order: list[tuple] = []
+    for row in rows:
+        commentary = normalize_commentary(row.get("commentary"))
+        fam = row.get("family_id") or family_id_for_fund(row.get("fund_id"))
+        ch = commentary_hash(row.get("commentary"))
+        if ch:
+            # Universal text collapse when snippet is long enough
+            key = (
+                row.get("ticker"),
+                row.get("quarter"),
+                row.get("letter_date") or "",
+                ch,
+            )
+        else:
+            key = (
+                row.get("ticker"),
+                row.get("quarter"),
+                row.get("letter_date") or "",
+                fam or row.get("fund_id") or row.get("fund"),
+                commentary or row.get("fund_id"),
+            )
+        if key not in groups:
+            keep = dict(row)
+            keep["sibling_funds"] = []
+            if fam:
+                keep["family_id"] = fam
+                keep["family"] = family_display(fam) or fam
+            groups[key] = keep
+            order.append(key)
+            continue
+        keep = groups[key]
+        label = row.get("fund") or row.get("fund_id")
+        primary = keep.get("fund") or keep.get("fund_id")
+        sibs = keep.setdefault("sibling_funds", [])
+        if label and label != primary and label not in sibs:
+            sibs.append(label)
+        if len(row.get("commentary") or "") > len(keep.get("commentary") or ""):
+            keep["commentary"] = row.get("commentary")
+            keep["evidence_url"] = row.get("evidence_url") or keep.get("evidence_url")
+            keep["evidence_label"] = row.get("evidence_label") or keep.get("evidence_label")
+        if not keep.get("family_id") and fam:
+            keep["family_id"] = fam
+            keep["family"] = family_display(fam) or fam
+
+    out: list[dict] = []
+    for key in order:
+        row = groups[key]
+        sibs = list(row.get("sibling_funds") or [])
+        if sibs:
+            row["fund"] = collapse_display_label(
+                row.get("fund"),
+                row.get("fund_id"),
+                len(sibs),
+                family_id=row.get("family_id"),
+            )
+            row["sibling_funds"] = sibs
+        out.append(row)
+    return out
 
 
 def _consensus_row_map(store: dict[str, dict]) -> dict[str, dict]:
@@ -1750,7 +1903,7 @@ def _compute_qoq_shifts(curr: dict[str, dict], prev: dict[str, dict]) -> list[di
                 "net": c_net,
                 "prior_net": p_net,
                 "delta_net": delta_net,
-                "sentiment": c_sent or "discussed",
+                "sentiment": c_sent or "mentioned",
                 "prior_sentiment": p_sent,
                 "lean_flip": lean_flip,
                 "new_funds": new_funds[:12],
@@ -1770,14 +1923,14 @@ def build_consensus(letters: list[dict], our_tickers: set[str], names: dict[str,
     all_q: dict[str, dict] = {}
     activity_by_q: dict[str, list[dict]] = {}
     by_ticker: dict[str, list[dict]] = {}
-    all_funds: set[str] = set()
+    all_vote_keys: set[str] = set()
 
     for letter in letters:
         q = letter.get("quarter") or "unknown"
         quarters.add(q)
         fund = letter.get("fund") or "Unknown"
         fund_id = letter.get("fund_id") or fund
-        all_funds.add(fund_id)
+        fam_id = family_id_for_fund(fund_id, family_id=letter.get("family_id"))
         letter_date = letter.get("letter_date")
         letter_ev = letter_evidence_fields(letter)
         for pos in letter.get("positions") or []:
@@ -1785,23 +1938,36 @@ def build_consensus(letters: list[dict], our_tickers: set[str], names: dict[str,
             if not tk or not valid_ticker(tk):
                 continue
             action = pos.get("action") or "discussed"
+            commentary = short_text(pos.get("commentary") or pos.get("thesis"), 280)
+            vote_key = consensus_vote_key(
+                fund_id,
+                fund,
+                family_id=fam_id,
+                commentary=commentary,
+                action=action,
+            )
+            mention_key = family_display(fam_id) if fam_id else (fund or fund_id)
             for store in (by_q.setdefault(q, {}), all_q):
                 b = store.get(tk) or _consensus_bucket(tk, names, our_tickers)
                 store[tk] = b
-                b["all_funds"].add(fund)
-                if action in BUY_ACTIONS:
-                    b["buy_funds"].add(fund)
-                elif action in SELL_ACTIONS:
-                    b["sell_funds"].add(fund)
-                elif action in SHORT_ACTIONS:
-                    b["short_funds"].add(fund)
+                if vote_key:
+                    b["all_funds"].add(vote_key)
+                    all_vote_keys.add(vote_key)
+                    if action in BUY_ACTIONS:
+                        b["buy_funds"].add(vote_key)
+                    elif action in SELL_ACTIONS:
+                        b["sell_funds"].add(vote_key)
+                    elif action in SHORT_ACTIONS:
+                        b["short_funds"].add(vote_key)
                 else:
-                    b["neutral_funds"].add(fund)
+                    b["mentioned_funds"].add(mention_key)
             row = {
                 "ticker": tk,
                 "name": names.get(tk, tk),
                 "fund": fund,
                 "fund_id": fund_id,
+                "family_id": fam_id,
+                "family": family_display(fam_id) if fam_id else None,
                 "quarter": q,
                 "letter_date": letter_date,
                 "action": action,
@@ -1809,7 +1975,7 @@ def build_consensus(letters: list[dict], our_tickers: set[str], names: dict[str,
                 "conviction": pos.get("conviction") or "low",
                 "tier": pos.get("tier"),
                 "in_book": tk in our_tickers,
-                "commentary": short_text(pos.get("commentary") or pos.get("thesis"), 280),
+                "commentary": commentary,
                 "evidence_url": letter_ev["evidence_url"],
                 "evidence_label": letter_ev["evidence_label"],
             }
@@ -1819,7 +1985,10 @@ def build_consensus(letters: list[dict], our_tickers: set[str], names: dict[str,
 
     def section(store: dict[str, dict], q: str) -> dict:
         rows = [_finalize_consensus_row(b) for b in store.values()]
-        most = sorted(rows, key=lambda r: (-r["fund_count"], -abs(r["net"]), r["ticker"]))
+        most = sorted(
+            rows,
+            key=lambda r: (-r["fund_count"], -r.get("mentioned_count", 0), -abs(r["net"]), r["ticker"]),
+        )
         changes = sorted([r for r in rows if r["net"] != 0], key=lambda r: (-abs(r["net"]), -r["fund_count"]))
         activity = sorted(
             activity_by_q.get(q, []) if q != "all" else [r for rs in activity_by_q.values() for r in rs],
@@ -1830,7 +1999,7 @@ def build_consensus(letters: list[dict], our_tickers: set[str], names: dict[str,
             "letter_count": sum(1 for letter in letters if (q == "all" or letter.get("quarter") == q)),
             "most_discussed": most[:80],
             "biggest_changes": changes[:40],
-            "activity": activity[:20],
+            "activity": _collapse_consensus_rows(activity)[:20],
         }
 
     out_by_q = {q: section(store, q) for q, store in by_q.items()}
@@ -1856,15 +2025,20 @@ def build_consensus(letters: list[dict], our_tickers: set[str], names: dict[str,
 
     for tk, rows in by_ticker.items():
         rows.sort(key=lambda r: (r.get("letter_date") or ""), reverse=True)
-        by_ticker[tk] = rows[:8]
+        by_ticker[tk] = _collapse_consensus_rows(rows)[:8]
+
+    as_of = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    proposals = propose_fund_families(letters, as_of=as_of)
+    write_family_proposals(proposals, as_of=as_of)
 
     return {
         "as_of": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "quarters": sorted(quarters),
         "summary": {
             "tickers_covered": len(all_q),
-            "fund_count": len(all_funds),
+            "fund_count": len(all_vote_keys),
             "book_tickers_discussed": sorted(t for t in all_q if t in our_tickers),
+            "family_proposals": len(proposals),
         },
         "by_quarter": out_by_q,
         "by_ticker": by_ticker,
@@ -1923,9 +2097,13 @@ def fund_profiles(letters: list[dict], our_tickers: set[str]) -> dict[str, dict]
         profile["our_tickers"] = sorted(profile["our_tickers"])
         profile["letters"] = sorted(
             profile["letters"],
-            key=lambda x: (x.get("letter_date") or "", x.get("quarter") or ""),
+            key=lambda row: (row.get("letter_date") or "", row.get("quarter") or ""),
             reverse=True,
         )
+        quarters = {row.get("quarter") for row in profile["letters"] if row.get("quarter")}
+        # Extra letters beyond one-per-quarter are near-dups / monthly copies
+        profile["duplicate_count"] = max(0, len(profile["letters"]) - max(len(quarters), 1))
+        profile["letter_count"] = len(profile["letters"])
         profile["latest_quarter"] = profile["letters"][0].get("quarter") if profile["letters"] else None
     return by_fund
 
@@ -2066,6 +2244,7 @@ def ticker_discussants(
     for letter in letters:
         fund = letter.get("fund") or "Unknown"
         fund_id = letter.get("fund_id") or fund
+        fam_id = family_id_for_fund(fund_id, family_id=letter.get("family_id"))
         letter_ev = letter_evidence_fields(letter)
         for pos in letter.get("positions") or []:
             tk = str(pos.get("ticker", "")).upper()
@@ -2082,16 +2261,22 @@ def ticker_discussants(
             }
             if not strong_letter_ticker_evidence(position_record, company_hints):
                 continue
+            commentary = pos.get("commentary") or pos.get("thesis") or ""
+            ch = commentary_hash(commentary)
+            # Collapse siblings / identical snippets into one discussant slot
+            bucket_key = ch or fam_id or fund_id
             bucket = by_ticker.setdefault(tk, {})
             entry = bucket.setdefault(
-                fund_id,
+                bucket_key,
                 {
                     "fund": fund,
                     "fund_id": fund_id,
+                    "family_id": fam_id,
+                    "sibling_funds": [],
                     "quarter": letter.get("quarter"),
                     "letter_date": letter.get("letter_date"),
                     "action": pos.get("action", "discussed"),
-                    "commentary": pos.get("commentary") or pos.get("thesis") or "",
+                    "commentary": commentary,
                     "source_file": letter.get("source_file"),
                     "source_document": letter_ev["source_document"],
                     "evidence_url": letter_ev["evidence_url"],
@@ -2099,12 +2284,27 @@ def ticker_discussants(
                     "in_our_book": tk in our_tickers,
                 },
             )
-            if pos.get("commentary") and len(pos["commentary"]) > len(entry.get("commentary") or ""):
-                entry["commentary"] = pos["commentary"]
+            if fund_id != entry.get("fund_id"):
+                label = fund
+                if label and label != entry.get("fund") and label not in entry["sibling_funds"]:
+                    entry["sibling_funds"].append(label)
+            if commentary and len(commentary) > len(entry.get("commentary") or ""):
+                entry["commentary"] = commentary
                 entry["action"] = pos.get("action", entry["action"])
     out: dict[str, list[dict]] = {}
     for tk, funds in by_ticker.items():
-        rows = sorted(funds.values(), key=lambda x: (x.get("letter_date") or ""), reverse=True)
+        rows = []
+        for entry in funds.values():
+            sibs = entry.get("sibling_funds") or []
+            if sibs:
+                entry["fund"] = collapse_display_label(
+                    entry.get("fund"),
+                    entry.get("fund_id"),
+                    len(sibs),
+                    family_id=entry.get("family_id"),
+                )
+            rows.append(entry)
+        rows = sorted(rows, key=lambda x: (x.get("letter_date") or ""), reverse=True)
         out[tk] = rows[:12]
     return out
 
@@ -2230,13 +2430,17 @@ def event_id(record: dict, ticker: str | None) -> str:
 
 
 def event_dedupe_key(event: dict) -> str:
+    title = str(event.get("title") or event.get("claim") or event.get("summary") or "")
+    norm = re.sub(r"\s+", " ", title.strip().lower())
+    # Strip volatile punctuation / wire suffixes so 13F headline variants collapse
+    norm = re.sub(r"[^\w\s]", "", norm)
+    norm = re.sub(r"\b(update|breaking|exclusive|sources?)\b", "", norm).strip()
     return "|".join(
         [
-            str(event.get("source") or ""),
             str(event.get("ticker") or ""),
             str(event.get("event_type") or ""),
-            str(event.get("observed_at") or ""),
-            str(event.get("title") or ""),
+            str(event.get("observed_at") or "")[:10],
+            norm[:160],
         ]
     )
 
@@ -2341,6 +2545,21 @@ def events_from_records(
             "in_base_irr": record.get("in_base_irr"),
             "quarter": record.get("quarter"),
         }
+        # Preserve activist-parity Form 4 / ICS materiality into the event queue.
+        if record.get("materiality") is not None:
+            event["materiality"] = record.get("materiality")
+        if record.get("materiality_components"):
+            event["materiality_components"] = record.get("materiality_components")
+        if record.get("tier"):
+            event["tier"] = record.get("tier")
+        if record.get("ics") is not None:
+            event["ics"] = record.get("ics")
+        if record.get("value_usd") is not None:
+            event["value_usd"] = record.get("value_usd")
+        if record.get("action"):
+            event["action"] = record.get("action")
+        if record.get("band"):
+            event["band"] = record.get("band")
         events.append(event)
     return dedupe_events(events)
 
@@ -2349,7 +2568,7 @@ def _retained_event_history(events: list[dict], max_events: int = 1800) -> list[
     """Retain a useful current feed plus representative older history and upcoming events."""
     scheduled = [e for e in events if e.get("event_kind") == "scheduled"]
     eligible = [e for e in events if e.get("event_kind") != "scheduled" and e.get("feed_eligible")]
-    noise = [e for e in events if e.get("event_kind") != "scheduled" and not e.get("feed_eligible")]
+    # Noise excluded from default Insights feed (triage queue / archive retain full set)
 
     def decision_rank(event: dict) -> tuple:
         return (
@@ -2379,7 +2598,7 @@ def _retained_event_history(events: list[dict], max_events: int = 1800) -> list[
     for year in sorted(by_year, reverse=True):
         add(by_year[year], 35)
 
-    add(noise, 220)
+    # Noise stays out of the default Insights feed (Pipeline/archive keep full triage)
     retained = chosen[:max_events]
     retained.sort(
         key=lambda e: (
@@ -2789,7 +3008,7 @@ def main() -> int:
     company_hints = portfolio_company_hints(include_watchlist=True)
     sumzero_doc = load_json(SUMZERO_INDEX)
     records.extend(from_sumzero_ideas(sumzero_doc if isinstance(sumzero_doc, dict) else None, front_tickers))
-    records.extend(from_insider_transactions(front_tickers))
+    records.extend(from_insider_transactions(front_tickers, holdings_tickers=holdings_tickers))
     records.extend(from_specialist_13f(front_tickers))
     records.extend(from_tracked_funds_13f(front_tickers))
     records.extend(from_reddit_mentions(front_tickers))

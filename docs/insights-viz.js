@@ -778,32 +778,33 @@
 
   function renderFundRegistry(funds, escapeHtml, linkHtml, ghRepo, bookOnly) {
     if (!funds?.length) {
-      return '<p class="subhead">No fund letter registry yet.</p>';
+      return '<p class="subhead">No fund profiles yet.</p>';
     }
     let list = funds;
     if (bookOnly) {
-      list = list.filter(f => (f.our_ticker_count || 0) > 0);
+      list = list.filter(f => (f.our_ticker_count || (f.our_tickers || []).length || 0) > 0);
     }
     return `
+      <p class="muted" style="margin-bottom:8px">One row per fund profile (not every quarter letter). Sibling strategies stay separate; identical commentary collapses in Consensus.</p>
       <table class="darwin-table" id="insights-fund-table">
-        <thead><tr><th>Fund</th><th>Quarter</th><th>In our book</th><th>Themes</th><th>Personas</th><th></th></tr></thead>
+        <thead><tr><th>Fund</th><th>Letters</th><th>In our book</th><th>Dupes</th><th>Personas</th><th></th></tr></thead>
         <tbody>
-          ${list.slice(0, 60).map(f => `
+          ${list.slice(0, 80).map(f => `
             <tr class="clickable-row" data-fund-id="${escapeHtml(f.fund_id || '')}">
               <td>
                 <button type="button" class="linkish" data-fund-id="${escapeHtml(f.fund_id || '')}">${escapeHtml(f.fund)}</button>
                 ${f.manager ? `<div class="tier-sub">${escapeHtml(f.manager)}</div>` : ''}
               </td>
-              <td class="mono">${escapeHtml(f.quarter || '—')}</td>
-              <td class="mono">${(f.our_tickers || []).join(', ') || '—'}</td>
-              <td style="font-size:11px">${(f.themes || []).slice(0, 4).join(', ') || '—'}</td>
+              <td class="mono">${escapeHtml(String(f.letter_count != null ? f.letter_count : ((f.letters || []).length || f.quarter || '—')))}</td>
+              <td class="mono">${(f.our_tickers || []).slice(0, 6).join(', ') || '—'}</td>
+              <td class="mono">${f.duplicate_count != null ? f.duplicate_count : (f.near_dup_count != null ? f.near_dup_count : '—')}</td>
               <td style="font-size:11px">${(f.maps_to_persona || []).join(', ') || '—'}</td>
               <td>${recordEvidenceLink(f, linkHtml, ghRepo)}</td>
             </tr>`).join('')}
         </tbody>
       </table>
-      ${list.length > 60 ? `<p class="tier-sub">${list.length - 60} more — refine search</p>` : ''}
-      ${bookOnly && !list.length ? '<p class="subhead">No funds with overlap to your holdings this quarter.</p>' : ''}`;
+      ${list.length > 80 ? `<p class="tier-sub">${list.length - 80} more — refine search</p>` : ''}
+      ${bookOnly && !list.length ? '<p class="subhead">No funds with overlap to your holdings.</p>' : ''}`;
   }
 
   function renderFundDetail(profile, escapeHtml, linkHtml, ghRepo) {
@@ -1600,17 +1601,68 @@
     return rows;
   }
 
-  function renderPortfolioMacroStrip(portfolioMacro, escapeHtml, linkHtml) {
+  function renderPortfolioMacroStrip(portfolioMacroRegime, escapeHtml, linkHtml, portfolioMacro) {
+    const regime = portfolioMacroRegime || null;
+    if (regime && (regime.label || (regime.series || []).length)) {
+      const label = regime.label || 'calm';
+      const labelCls = label === 'stressed' ? 'badge-bad' : (label === 'adapting' ? 'badge-warn' : 'badge-ok');
+      const series = (regime.series || []).slice(0, 4);
+      const seriesRows = series.map(s => {
+        const signed = s.signed_direction || 'neutral';
+        const chipCls = signed === 'risk_off' ? 'badge-bad' : (signed === 'risk_on' ? 'badge-ok' : 'badge-us');
+        const chip = signed === 'risk_off' ? 'risk-off' : (signed === 'risk_on' ? 'risk-on' : 'neutral');
+        return `
+          <tr>
+            <td style="font-size:12px">${escapeHtml(s.label || s.id || 'Series')}</td>
+            <td class="mono">${escapeHtml(s.value != null ? String(s.value) : '—')}</td>
+            <td class="mono tier-sub">${escapeHtml(s.delta_label || '')}</td>
+            <td><span class="badge ${chipCls}">${escapeHtml(chip)}</span></td>
+            <td class="tier-sub">${escapeHtml(s.why || '')}</td>
+          </tr>`;
+      }).join('');
+      return `
+        <div class="detail-section portfolio-macro-regime" style="margin-bottom:14px">
+          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:8px">
+            <h3 style="font-size:14px;margin:0">Portfolio macro</h3>
+            <span class="badge ${labelCls}" style="font-size:13px;padding:4px 10px">${escapeHtml(label)}</span>
+            ${regime.as_of ? `<span class="mono tier-sub">${escapeHtml(String(regime.as_of))}</span>` : ''}
+          </div>
+          <p style="margin:0 0 10px;font-size:13px;max-width:720px">${escapeHtml(regime.summary || '')}</p>
+          ${seriesRows ? `
+          <table class="darwin-table" style="max-width:820px">
+            <thead><tr><th>Series</th><th>Level</th><th>Change</th><th>Signal</th><th>Why</th></tr></thead>
+            <tbody>${seriesRows}</tbody>
+          </table>` : ''}
+          <p class="tier-sub" style="margin-top:8px">Portfolio-wide context shown once — not repeated on every ticker.</p>
+        </div>`;
+    }
+    // Fallback: legacy card list
     const rows = portfolioMacro || [];
     if (!rows.length) return '';
     return `
       <div class="detail-section" style="margin-bottom:14px">
-        <h3 style="font-size:14px;margin-bottom:8px">Portfolio macro (shown once)</h3>
+        <h3 style="font-size:14px;margin-bottom:8px">Portfolio macro</h3>
         <div class="research-box essential-box">
           ${rows.slice(0, 4).map(item => renderInsightItem(item, escapeHtml, linkHtml)).join('')}
         </div>
-        <p class="tier-sub">Macro indices are portfolio-wide context. Per-ticker rows link here when no ticker-specific signal exists.</p>
       </div>`;
+  }
+
+  function insiderMaterialityCell(e, escapeHtml) {
+    const score = e && e.insider_materiality;
+    if (score == null) return '<td class="mono tier-sub">—</td>';
+    const tier = e.insider_tier || 'context';
+    const pct = Math.max(2, Math.min(100, Number(score) || 0));
+    const tierCls = tier === 'signal' ? 'badge-ok' : (tier === 'noise' ? 'badge-warn' : 'badge-us');
+    const ics = e.insider_ics != null ? ` · ICS ${e.insider_ics}` : '';
+    return `
+      <td title="${escapeHtml(`Insider materiality ${score}/100 · tier: ${tier}${ics}`)}">
+        <span class="mono">${score}</span>
+        <span class="badge ${tierCls}" style="margin-left:4px">${escapeHtml(tier)}</span>
+        <div style="height:3px;margin-top:3px;border-radius:2px;background:rgba(148,163,184,.18);max-width:72px">
+          <div style="height:100%;width:${pct}%;border-radius:2px;background:${tier === 'signal' ? '#34d399' : tier === 'noise' ? '#64748b' : '#818cf8'}"></div>
+        </div>
+      </td>`;
   }
 
   function renderTickerSourceFilters(activeFilter, escapeHtml) {
@@ -1966,12 +2018,16 @@
     const conf = item.confidence && item.confidence !== 'med'
       ? `<span class="badge badge-us">${escapeHtml(item.confidence)}</span>`
       : '';
+    const mat = item.materiality != null
+      ? `<span class="badge ${item.tier === 'signal' ? 'badge-ok' : (item.tier === 'noise' ? 'badge-warn' : 'badge-us')}" title="Materiality">${escapeHtml(String(item.materiality))}${item.tier ? ' ' + escapeHtml(item.tier) : ''}</span>`
+      : '';
     const title = escapeHtml(item.title || 'Insight');
     return `
       <div class="insight-compact">
         <div class="insight-compact-meta">
           <span class="badge ${directionClass}">${escapeHtml(item.direction || 'neutral')}</span>
           <span class="badge badge-us">${escapeHtml(item.source_label || item.source || 'source')}</span>
+          ${mat}
           ${conf}
           ${item.date ? `<span class="mono tier-sub">${escapeHtml(item.date)}</span>` : ''}
         </div>
@@ -1985,7 +2041,7 @@
     return `<span class="ticker-source-mix">${mix.slice(0, 3).map(s => escapeHtml(s)).join(' · ')}</span>`;
   }
 
-  function filterTickerEssentialsForView(rows, viewMode) {
+  function filterTickerEssentialsForView(rows, viewMode, gapsMode) {
     if (viewMode === 'trends') {
       return rows.filter(t => {
         const kt = t.kpi_trends || {};
@@ -1996,9 +2052,12 @@
     if (viewMode === 'gaps') {
       return rows.filter(t => {
         const e = t.essential_insights || {};
+        if (gapsMode === 'coverage') {
+          return (e.coverage_gaps || []).length > 0;
+        }
         return e.needs_work
-          || e.status?.tone === 'stale'
-          || (e.freshness_days != null && e.freshness_days > 365);
+          || (e.needs_work_reasons || []).length > 0
+          || e.status?.tone === 'stale';
       });
     }
     if (viewMode === 'ownership') {
@@ -2084,8 +2143,20 @@
       </nav>`;
   }
 
-  function renderTickerScanTable(rows, escapeHtml, linkHtml) {
-    const body = rows.map(t => {
+  function renderTickerScanTable(rows, escapeHtml, linkHtml, opts) {
+    const sourceFilter = (opts && opts.sourceFilter) || 'ownership';
+    const insiderTier = (opts && opts.insiderTier) || 'signal';
+    const showInsiderMat = sourceFilter === 'ownership' || sourceFilter === 'all';
+    let list = rows;
+    if (showInsiderMat && insiderTier === 'signal') {
+      // Prefer signal-tier insider when filtering ownership; keep rows without insider score.
+      list = rows.filter(t => {
+        const e = t.essential_insights || {};
+        if (e.insider_materiality == null) return true;
+        return e.insider_tier === 'signal';
+      });
+    }
+    const body = list.map(t => {
       const e = t.essential_insights || {};
       const status = e.status || {};
       const fresh = formatFreshnessDisplay(e.freshness_days);
@@ -2098,12 +2169,13 @@
           </td>
           <td><span class="badge ${insightToneClass(status.tone)}">${escapeHtml(status.label || 'No insight')}</span>${e.needs_work ? ' <span class="badge badge-warn" title="Needs work">!</span>' : ''}</td>
           <td class="insight-cell">${renderInsightCompact(primary, escapeHtml, linkHtml, { emptyLabel: 'No signal' })}</td>
+          ${showInsiderMat ? insiderMaterialityCell(e, escapeHtml) : ''}
           <td class="mono ${fresh.cls}">${escapeHtml(fresh.label)}${fresh.stale ? ' <span class="badge badge-warn">stale</span>' : ''}<div class="tier-sub">${renderTickerSourceMix(e, escapeHtml)}</div></td>
         </tr>`;
     }).join('');
     return `
       <table class="darwin-table" id="insights-ticker-table">
-        <thead><tr><th>Ticker</th><th>Status</th><th>Signal</th><th>Fresh</th></tr></thead>
+        <thead><tr><th>Ticker</th><th>Status</th><th>Signal</th>${showInsiderMat ? '<th>Insider</th>' : ''}<th>Fresh</th></tr></thead>
         <tbody>${body}</tbody>
       </table>`;
   }
@@ -2163,11 +2235,14 @@
       </table>`;
   }
 
-  function renderTickerGapsTable(rows, escapeHtml, linkHtml) {
+  function renderTickerGapsTable(rows, escapeHtml, linkHtml, gapsMode) {
+    const mode = gapsMode || 'attention';
     const body = rows.map(t => {
       const e = t.essential_insights || {};
       const fresh = formatFreshnessDisplay(e.freshness_days);
-      const reasons = (e.needs_work_reasons || []).slice(0, 3);
+      const reasons = mode === 'coverage'
+        ? (e.coverage_gaps || []).slice(0, 4)
+        : (e.needs_work_reasons || []).slice(0, 3);
       const primary = pickPrimaryInsight(e);
       return `
         <tr>
@@ -2175,20 +2250,42 @@
             <button type="button" class="linkish mono" data-ticker-insight="${escapeHtml(t.ticker)}">${escapeHtml(t.ticker)}</button>
             <div class="tier-sub">${escapeHtml((t.company || '').slice(0, 32))}</div>
           </td>
-          <td style="font-size:11px">${reasons.length ? reasons.map(r => `<span class="badge badge-warn">${escapeHtml(r)}</span>`).join(' ') : '<span class="badge badge-warn">stale</span>'}</td>
+          <td style="font-size:11px">${reasons.length ? reasons.map(r => `<span class="badge badge-warn">${escapeHtml(r)}</span>`).join(' ') : '<span class="tier-sub">—</span>'}</td>
           <td class="mono ${fresh.cls}">${escapeHtml(fresh.label)}</td>
           <td class="insight-cell">${renderInsightCompact(primary, escapeHtml, linkHtml)}</td>
         </tr>`;
     }).join('');
     return `
       <table class="darwin-table" id="insights-ticker-table">
-        <thead><tr><th>Ticker</th><th>Gap</th><th>Fresh</th><th>Last signal</th></tr></thead>
+        <thead><tr><th>Ticker</th><th>${mode === 'coverage' ? 'Coverage' : 'Attention gap'}</th><th>Fresh</th><th>Last signal</th></tr></thead>
         <tbody>${body}</tbody>
       </table>`;
   }
 
+  function renderGapsModeTabs(activeMode, escapeHtml) {
+    const modes = [
+      { id: 'attention', label: 'Attention' },
+      { id: 'coverage', label: 'Coverage audit' },
+    ];
+    return `
+      <nav class="source-pills" id="gaps-mode-tabs" style="margin-bottom:8px">
+        ${modes.map(m => `<button type="button" class="filter-btn source-pill${activeMode === m.id ? ' active' : ''}" data-gaps-mode="${escapeHtml(m.id)}">${escapeHtml(m.label)}</button>`).join('')}
+      </nav>`;
+  }
+
+  function renderInsiderTierTabs(activeTier, escapeHtml) {
+    const tiers = [
+      { id: 'signal', label: 'Insider signal' },
+      { id: 'all', label: 'All insider' },
+    ];
+    return `
+      <nav class="source-pills" id="insider-tier-tabs" style="margin-bottom:8px">
+        ${tiers.map(t => `<button type="button" class="filter-btn source-pill${activeTier === t.id ? ' active' : ''}" data-insider-tier="${escapeHtml(t.id)}">${escapeHtml(t.label)}</button>`).join('')}
+      </nav>`;
+  }
+
   function attachTickerInsightsHandlers(container, tickers, options) {
-    const { onViewMode, onSortMode, onTickerSelect, onCloseDrawer, onGotoConsensus } = options || {};
+    const { onViewMode, onSortMode, onTickerSelect, onCloseDrawer, onGotoConsensus, onGapsMode, onInsiderTier } = options || {};
     if (!container) return;
     container.querySelectorAll('[data-ticker-view]').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -2198,6 +2295,16 @@
     container.querySelectorAll('[data-ticker-sort]').forEach(btn => {
       btn.addEventListener('click', () => {
         if (onSortMode) onSortMode(btn.dataset.tickerSort || 'attention');
+      });
+    });
+    container.querySelectorAll('[data-gaps-mode]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (onGapsMode) onGapsMode(btn.dataset.gapsMode || 'attention');
+      });
+    });
+    container.querySelectorAll('[data-insider-tier]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (onInsiderTier) onInsiderTier(btn.dataset.insiderTier || 'signal');
       });
     });
     container.querySelectorAll('[data-ticker-insight]').forEach(btn => {
@@ -2221,31 +2328,50 @@
     const sourceFilter = (opts && opts.sourceFilter) || 'ownership';
     const viewMode = (opts && opts.viewMode) || 'scan';
     const sortMode = (opts && opts.sortMode) || 'attention';
+    const gapsMode = (opts && opts.gapsMode) || 'attention';
+    const insiderTier = (opts && opts.insiderTier) || 'signal';
     const selectedTicker = opts && opts.selectedTicker;
     const ghRepo = (opts && opts.ghRepo) || '';
     let rows = filterTickerEssentials(tickers, opts);
-    rows = filterTickerEssentialsForView(rows, viewMode);
-    rows = sortTickerEssentialsRows(rows, sortMode).slice(0, 160);
+    rows = filterTickerEssentialsForView(rows, viewMode, gapsMode);
+    if (viewMode === 'scan' && (sourceFilter === 'ownership' || sourceFilter === 'all')) {
+      rows = [...rows].sort((a, b) => {
+        const scoreDelta = tickerAttentionScore(b) - tickerAttentionScore(a);
+        if (scoreDelta) return scoreDelta;
+        const ma = a.essential_insights?.insider_materiality ?? -1;
+        const mb = b.essential_insights?.insider_materiality ?? -1;
+        if (mb !== ma) return mb - ma;
+        return String(a.ticker).localeCompare(String(b.ticker));
+      }).slice(0, 160);
+    } else {
+      rows = sortTickerEssentialsRows(rows, sortMode).slice(0, 160);
+    }
     const sourceTabs = renderTickerSourceFilters(sourceFilter, escapeHtml);
     const viewTabs = renderTickerViewTabs(viewMode, escapeHtml);
     const sortTabs = renderTickerSortTabs(sortMode, escapeHtml);
+    const gapsTabs = viewMode === 'gaps' ? renderGapsModeTabs(gapsMode, escapeHtml) : '';
+    const insiderTabs = (viewMode === 'scan' && (sourceFilter === 'ownership' || sourceFilter === 'all'))
+      ? renderInsiderTierTabs(insiderTier, escapeHtml)
+      : '';
     const tickerBySymbol = Object.fromEntries((tickers || []).map(t => [t.ticker, t]));
     const drawer = selectedTicker && tickerBySymbol[selectedTicker]
       ? renderTickerInsightsDrawer(tickerBySymbol[selectedTicker], escapeHtml, linkHtml, ghRepo)
       : '';
     if (!rows.length) {
-      return `${drawer}${sourceTabs}${viewTabs}${sortTabs}<p class="subhead">No ticker essentials match this view.</p>`;
+      return `${drawer}${sourceTabs}${viewTabs}${sortTabs}${gapsTabs}${insiderTabs}<p class="subhead">No ticker essentials match this view.</p>`;
     }
     let table = '';
     if (viewMode === 'ownership') table = renderTickerOwnershipTable(rows, escapeHtml, linkHtml);
     else if (viewMode === 'trends') table = renderTickerTrendsTable(rows, escapeHtml);
-    else if (viewMode === 'gaps') table = renderTickerGapsTable(rows, escapeHtml, linkHtml);
-    else table = renderTickerScanTable(rows, escapeHtml, linkHtml);
+    else if (viewMode === 'gaps') table = renderTickerGapsTable(rows, escapeHtml, linkHtml, gapsMode);
+    else table = renderTickerScanTable(rows, escapeHtml, linkHtml, { sourceFilter, insiderTier });
     const viewHint = {
       scan: 'One signal per holding — click a ticker for full timeline.',
       ownership: 'Letter positioning from superinvestor disclosures.',
       trends: 'KPI inflections and SEC fundamentals where available.',
-      gaps: 'Stale coverage, missing evidence, or needs-work flags.',
+      gaps: gapsMode === 'coverage'
+        ? 'Completeness audit (dossier, third-party, stale source) — not Needs Attention.'
+        : 'Holdings-critical attention gaps only.',
     }[viewMode] || '';
     return `
       ${drawer}
@@ -2255,6 +2381,8 @@
       ${sourceTabs}
       ${viewTabs}
       ${sortTabs}
+      ${gapsTabs}
+      ${insiderTabs}
       <p class="tier-sub" style="margin-bottom:8px;color:var(--text-muted)">${escapeHtml(viewHint)}</p>
       ${table}`;
   }
@@ -3009,21 +3137,34 @@
     const quarterIds = (timeModel?.quarters || []).slice(0, 12).map(q => q.id);
     const quarterly = consensusQuarterlyRows(consensus, ticker, quarterIds);
     const name = history[0]?.name || quarterly.find(q => q.row)?.row?.name || ticker;
-    const timelineRows = history.map(r => `
+    const timelineRows = history.map(r => {
+      const sibs = (r.sibling_funds || []).filter(Boolean);
+      const fundTitle = sibs.length
+        ? `${r.fund || ''} · also: ${sibs.join(', ')}`
+        : (r.fund || '');
+      const fundCell = r.fund_id
+        ? `<button type="button" class="linkish" data-consensus-fund-id="${escapeHtml(r.fund_id)}" title="${escapeHtml(fundTitle)}">${escapeHtml(r.fund)}</button>`
+        : escapeHtml(r.fund);
+      return `
       <tr>
         <td class="mono" style="font-size:11px">${escapeHtml(r.letter_date || '—')}</td>
         <td class="mono" style="font-size:11px">${escapeHtml(r.quarter || '—')}</td>
-        <td>${r.fund_id ? `<button type="button" class="linkish" data-consensus-fund-id="${escapeHtml(r.fund_id)}">${escapeHtml(r.fund)}</button>` : escapeHtml(r.fund)}</td>
+        <td>${fundCell}</td>
         <td><span class="badge ${STANCE_BADGE[r.action] || 'badge-us'}">${escapeHtml(r.action || '—')}</span></td>
         <td style="font-size:11px;max-width:300px">${escapeHtml((r.commentary || '').slice(0, 200))}</td>
         <td>${recordEvidenceLink(r, linkHtml, ghRepo)}</td>
-      </tr>`).join('');
+      </tr>`;
+    }).join('');
     const sparkCells = quarterly.slice().reverse().map(q => {
       if (!q.row) return `<span class="consensus-spark-dot" style="background:rgba(148,163,184,0.25)" title="${escapeHtml(q.label)}: no mention"></span>`;
       const color = q.row.sentiment === 'accumulating' ? '#4ade80'
         : q.row.sentiment === 'reducing' ? '#f87171'
-          : q.row.sentiment === 'mixed' ? '#f59e0b' : '#94a3b8';
-      return `<span class="consensus-spark-dot" style="background:${color}" title="${escapeHtml(q.label)}: ${escapeHtml(q.row.sentiment)} (${q.row.fund_count} funds)"></span>`;
+          : q.row.sentiment === 'mixed' ? '#f59e0b'
+            : q.row.sentiment === 'mentioned' ? '#64748b' : '#94a3b8';
+      const leanLabel = q.row.fund_count
+        ? `${q.row.fund_count} lean`
+        : `${q.row.mentioned_count || 0} mentioned`;
+      return `<span class="consensus-spark-dot" style="background:${color}" title="${escapeHtml(q.label)}: ${escapeHtml(q.row.sentiment)} (${leanLabel})"></span>`;
     }).join('');
     return `
       <div id="consensus-ticker-drawer" class="detail-section" style="margin-bottom:14px;border:1px solid var(--border);border-radius:8px;padding:12px;background:rgba(255,255,255,0.02)">
@@ -3420,6 +3561,7 @@
       pdfSourceTab = 'all',
       pdfTimeMode = 'period',
       portfolioMacro = [],
+      portfolioMacroRegime = null,
       tickerSourceFilter = 'ownership',
       kpiTrends = null,
       inflectionTier = 'displayed',
@@ -3454,7 +3596,17 @@
       bookOnly,
     );
     const knownTickers = SearchMatch.catalogKnownTickers(documentCatalog);
-    let funds = insights?.fund_registry || [];
+    let funds = Object.values(insights?.fund_profiles || {});
+    if (!funds.length) {
+      funds = insights?.fund_registry || [];
+    } else {
+      funds = funds.map(p => ({
+        ...p,
+        letter_count: (p.letters || []).length,
+        our_ticker_count: (p.our_tickers || []).length,
+        duplicate_count: p.duplicate_count || p.near_dup_count || 0,
+      })).sort((a, b) => String(a.fund || '').localeCompare(String(b.fund || '')));
+    }
     let letters = filterLetterIndex(letterIndex, { period, search: fundSearch, bookOnly, knownTickers });
     const coverage = periodCoverage(period, timeModel, letterIndex, insights?.fund_registry || []);
 
@@ -3492,7 +3644,6 @@
     const sections = [
       { id: 'letters', label: 'Letters' },
       { id: 'inflections', label: 'Inflections' },
-      { id: 'overview', label: 'Overview' },
       { id: 'events', label: 'What changed' },
       { id: 'index_watch', label: 'Index Watch' },
       { id: 'consensus', label: 'Consensus' },
@@ -3503,11 +3654,12 @@
       { id: 'sources', label: 'Pipeline status' },
     ];
 
+    // Overview merged into Pipeline status
+    if (activeSection === 'overview') activeSection = 'sources';
+
     let body = '';
     if (activeSection === 'inflections') {
       body = renderInflections(kpiTrends, escapeHtml, { search: fundSearch, bookOnly, inflectionTier });
-    } else if (activeSection === 'overview') {
-      body = renderSourceHealth(insights?.source_health || {}, escapeHtml);
     } else if (activeSection === 'events') {
       body = renderDecisionEventQueue(insights?.events || [], escapeHtml, linkHtml, ghRepo, {
         search: fundSearch,
@@ -3567,7 +3719,7 @@
         pdfTimeMode,
       });
     } else if (activeSection === 'tickers') {
-      body = renderPortfolioMacroStrip(portfolioMacro, escapeHtml, linkHtml)
+      body = renderPortfolioMacroStrip(portfolioMacroRegime, escapeHtml, linkHtml, portfolioMacro)
         + renderTickerEssentials(tickers, escapeHtml, linkHtml, {
           search: fundSearch,
           bookOnly,
@@ -3575,6 +3727,8 @@
           knownTickers,
           viewMode: options?.tickerViewMode || 'scan',
           sortMode: options?.tickerSortMode || 'attention',
+          gapsMode: options?.tickerGapsMode || 'attention',
+          insiderTier: options?.tickerInsiderTier || 'signal',
           selectedTicker: options?.tickerSelectedTicker || null,
           ghRepo,
         });

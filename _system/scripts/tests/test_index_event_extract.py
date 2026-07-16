@@ -66,7 +66,8 @@ class TestIndexEventExtract(unittest.TestCase):
         )
         self.assertEqual(len(ev), 1)
         self.assertEqual(ev[0]["ticker"], "ECHO")
-        self.assertEqual(ev[0]["action"], "add")
+        self.assertEqual(ev[0]["action"], "reclassify")
+        self.assertEqual(ev[0]["index"], "russell_1000")
 
     def test_he_joins_russell_defensive(self):
         ev = extract_index_events(
@@ -77,7 +78,7 @@ class TestIndexEventExtract(unittest.TestCase):
         )
         self.assertEqual(len(ev), 1)
         self.assertEqual(ev[0]["ticker"], "HE")
-        self.assertEqual(ev[0]["action"], "add")
+        self.assertEqual(ev[0]["action"], "reclassify")
 
     def test_spacex_summary_not_or(self):
         ev = extract_index_events(
@@ -164,7 +165,7 @@ class TestIndexEventExtract(unittest.TestCase):
         self.assertEqual(ev[0]["ticker"], "AMD")
         self.assertEqual(ev[0]["action"], "reclassify")
 
-    def test_west_russell_2500_add(self):
+    def test_west_russell_2500_reclassify(self):
         ev = extract_index_events(
             "Westrock Coffee Company(NasdaqGM: WEST) added to Russell 2500 Value Benchmark",
             "",
@@ -173,8 +174,27 @@ class TestIndexEventExtract(unittest.TestCase):
         )
         self.assertEqual(len(ev), 1)
         self.assertEqual(ev[0]["ticker"], "WEST")
-        self.assertEqual(ev[0]["index"], "russell_2000")
-        self.assertEqual(ev[0]["action"], "add")
+        self.assertEqual(ev[0]["index"], "russell_1000")
+        self.assertEqual(ev[0]["action"], "reclassify")
+
+    def test_mkc_dynamic_reclassify(self):
+        ev = extract_index_events(
+            "McCormick & Company, Incorporated(NYSE: MKC) added to Russell 1000 Dynamic Index",
+            "",
+            ["MKC"],
+            {"MKC": "McCormick"},
+        )
+        self.assertEqual(len(ev), 1)
+        self.assertEqual(ev[0]["action"], "reclassify")
+
+    def test_bfa_not_mapped_to_bfb(self):
+        ev = extract_index_events(
+            "Brown-Forman Corporation(NYSE: BF.A) added to Russell 1000 Dynamic Index",
+            "",
+            ["BF.B"],
+            {"BF.B": "Brown-Forman"},
+        )
+        self.assertEqual(ev, [])
 
     def test_als_tsx_add(self):
         ev = extract_index_events(

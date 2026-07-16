@@ -15,20 +15,21 @@ INDEX_ALIASES: dict[str, str] = {
     "s&p smallcap 600": "sp600",
     "s&p smallcap": "sp600",
     "s&p 600": "sp600",
-    "russell 3000e": "russell_2000",  # growth/value subsets still map to R2000 family for watch
+    # Parent Russell indexes only. Style/factor/subset → reclassify via _is_style_or_subset_index.
     "russell 3000": "russell_1000",
     "russell 1000": "russell_1000",
     "russell1000": "russell_1000",
     "russell 2000": "russell_2000",
     "russell2000": "russell_2000",
-    "russell 2500": "russell_2000",  # mid+small; small-cap adds watch R2000
-    "russell2500": "russell_2000",
+    "russell 3000e": "russell_1000",
+    "russell 2500": "russell_1000",
+    "russell2500": "russell_1000",
     "russell midcap": "russell_1000",
-    "russell defensive": "russell_2000",
-    "russell top 50": "russell_1000",  # mega-cap subset; treat as R1000-family reclass
+    "russell defensive": "russell_1000",
+    "russell top 50": "russell_1000",
     "russell growth": "russell_1000",
     "russell value": "russell_1000",
-    "russell": "russell_1000",  # bare "Russell reclassification" → R1000 family watch
+    "russell": "russell_1000",
     "nasdaq-100": "nasdaq_100",
     "nasdaq 100": "nasdaq_100",
     "nasdaq100": "nasdaq_100",
@@ -53,6 +54,22 @@ INDEX_ALIASES: dict[str, str] = {
     "hang seng": "hang_seng",
     "nifty 500": "nifty_500",
 }
+
+# Factor / style-box / subset indexes are not parent membership flips.
+_STYLE_OR_SUBSET = re.compile(
+    r"\b(?:"
+    r"dynamic(?:\s+index)?|"
+    r"value[- ]?defensive|"
+    r"defensive(?:\s+index(?:es)?)?|"
+    r"growth\s+benchmark|"
+    r"value\s+benchmark|"
+    r"midcap(?:\s+(?:growth|value))?(?:\s+benchmark)?|"
+    r"2500|"
+    r"3000e|"
+    r"top\s+50"
+    r")\b",
+    re.I,
+)
 
 # Longest aliases first for regex alternation
 _INDEX_ALT = "|".join(
@@ -183,9 +200,29 @@ def resolve_index_alias(raw: str) -> str | None:
     return None
 
 
+def _is_style_or_subset_index(text: str, index_raw: str = "") -> bool:
+    """True when the headline refers to a factor/style/subset, not bare parent membership."""
+    low = (text or "").lower()
+    idx = (index_raw or "").strip().lower()
+    if idx and _STYLE_OR_SUBSET.search(idx):
+        return True
+    if idx:
+        pos = low.find(idx)
+        if pos >= 0:
+            window = low[pos : pos + len(idx) + 48]
+            if _STYLE_OR_SUBSET.search(window):
+                return True
+    if re.search(
+        r"\b(?:russell\s+(?:2500|3000e|midcap|defensive|top\s+50)|"
+        r"russell\s+(?:growth|value)\b(?!\s*1000|\s*2000))",
+        low,
+    ):
+        return True
+    return bool(_STYLE_OR_SUBSET.search(low) and re.search(r"\brussell\b", low))
+
+
 def _normalize_ticker_token(token: str) -> str:
     t = (token or "").strip().upper()
-    # Strip exchange prefixes like NASDAQGS: ECHO
     if ":" in t:
         t = t.split(":")[-1].strip()
     return t
@@ -208,7 +245,6 @@ def _subject_to_ticker(
         "HAVE", "HAD", "WAS", "WERE", "BEEN", "BEING", "WILL", "CAN", "MAY", "ITS",
     }
 
-    # Prefer explicit (TICKER) in subject
     m = _SUBJECT_TICKER_PAREN.search(subject_raw or "")
     if m:
         tk = _normalize_ticker_token(m.group("ticker"))
@@ -216,8 +252,12 @@ def _subject_to_ticker(
             return cand_upper[tk]
         bare = tk.split(".")[0]
         for cu, orig in cand_upper.items():
-            if cu == tk or cu.split(".")[0] == bare:
+            if cu == tk:
                 return orig
+            # Bare headline → exchange-suffixed candidate (RMV → RMV.L); never BF.A → BF.B
+            if "." not in tk and cu.split(".")[0] == bare and "." in cu:
+                return orig
+        return None
 
     sub = (subject_raw or "").strip()
     sub_up = sub.upper()
@@ -330,6 +370,8 @@ def extract_index_events(
         action = _verb_to_action(verb)
         if not index_id or not action:
             return
+        if action in ("add", "delete") and _is_style_or_subset_index(text, index_raw):
+            action = "reclassify"
         ticker = _subject_to_ticker(sub_raw, candidates, company_names)
         if not ticker:
             return

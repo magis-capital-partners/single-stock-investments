@@ -14,6 +14,7 @@ sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 GITHUB_REPO = os.environ.get("GITHUB_REPOSITORY", "magis-capital-partners/single-stock-investments")
 
 from document_store import best_document_label, best_document_url, document_id_for_ref  # noqa: E402
+from insight_format import is_letter_table_debris  # noqa: E402
 from memory_claim_sources import (  # noqa: E402
     from_biotech_methodology,
     load_biotech_factor_spec,
@@ -288,7 +289,7 @@ def build() -> tuple[dict, dict]:
         if not ticker or ticker not in entities["tickers"]:
             continue
         text = short_text(row.get("summary") or row.get("claim") or row.get("title") or "", 320)
-        if not text or is_low_value_claim(text, row):
+        if not text or is_low_value_claim(text, row) or is_letter_table_debris(text):
             continue
         rows_by_ticker[ticker].append(row)
         src = source_record(row)
@@ -300,7 +301,8 @@ def build() -> tuple[dict, dict]:
             source_registry[src["source_id"]] = src
 
         ctype = claim_type(row)
-        cid = stable_id(ticker, ctype, row.get("direction"), text.lower(), row.get("source"), src["source_id"])
+        # Collapse identical claim text across sibling strategy letters (ignore source_id)
+        cid = stable_id(ticker, ctype, row.get("direction"), text.lower().strip())
         claim = {
             "claim_id": cid,
             "ticker": ticker,

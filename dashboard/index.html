@@ -826,6 +826,8 @@ let insightsTickerViewMode = (() => {
 let insightsTickerSortMode = (() => {
   try { return localStorage.getItem(TICKER_SORT_KEY) || 'attention'; } catch (_) { return 'attention'; }
 })();
+let insightsTickerGapsMode = 'attention';
+let insightsTickerInsiderTier = 'signal';
 let tickerInsightsSelectedTicker = null;
 let insightsPdfSourceTab = 'all';
 let insightsPdfTimeMode = 'period';
@@ -1333,9 +1335,12 @@ function renderInsights(opts = {}) {
     pdfSourceTab: insightsPdfSourceTab,
     pdfTimeMode: insightsPdfTimeMode,
     portfolioMacro: data.portfolio_macro || [],
+    portfolioMacroRegime: data.portfolio_macro_regime || null,
     tickerSourceFilter: insightsTickerSourceFilter,
     tickerViewMode: insightsTickerViewMode,
     tickerSortMode: insightsTickerSortMode,
+    tickerGapsMode: insightsTickerGapsMode,
+    tickerInsiderTier: insightsTickerInsiderTier,
     tickerSelectedTicker: tickerInsightsSelectedTicker,
     kpiTrends: data.kpi_trends || null,
     indexMembership: data.index_membership || null,
@@ -1603,6 +1608,14 @@ function renderInsights(opts = {}) {
       onSortMode(mode) {
         insightsTickerSortMode = mode || 'attention';
         try { localStorage.setItem(TICKER_SORT_KEY, insightsTickerSortMode); } catch (_) { /* ignore */ }
+        renderInsights();
+      },
+      onGapsMode(mode) {
+        insightsTickerGapsMode = mode || 'attention';
+        renderInsights();
+      },
+      onInsiderTier(tier) {
+        insightsTickerInsiderTier = tier || 'signal';
         renderInsights();
       },
       onTickerSelect(ticker) {

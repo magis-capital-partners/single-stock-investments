@@ -328,8 +328,28 @@ def triage_event(event: dict, *, rules: dict, activist_tickers: set[str]) -> dic
         elif event_type != "leadership_risk":
             human.append("governance_only")
 
-    score, components = materiality_score(event, rules=rules)
+    pre_mat = event.get("materiality")
+    pre_comp = event.get("materiality_components") or {}
+    # Form 4 / ICS rows are scored by insider_materiality.py (activist-parity).
+    # Do not overwrite with the generic event_materiality multiplicative model.
+    preserve_insider = (
+        event.get("source") == "insider"
+        and event.get("event_type") in {"form4_transaction", "insider_signal"}
+        and pre_mat is not None
+        and any(k in pre_comp for k in ("type", "plan", "ics", "role", "size"))
+    )
+    if preserve_insider:
+        try:
+            score = int(pre_mat)
+        except (TypeError, ValueError):
+            score, components = materiality_score(event, rules=rules)
+            pre_comp = components
+        else:
+            components = pre_comp
+    else:
+        score, components = materiality_score(event, rules=rules)
     event = {**event, "materiality": score, "materiality_components": components, "score": score}
+    preserved_insider_tier = event.get("tier") if preserve_insider else None
 
     if human:
         verdict = "human_review"
@@ -397,6 +417,17 @@ def triage_event(event: dict, *, rules: dict, activist_tickers: set[str]) -> dic
         tier = "noise"
         feed_eligible = False
         rules_fired = rules_fired + ["superseded_by_stronger_signal"]
+
+    if preserved_insider_tier in {"signal", "context", "noise"} and not event.get("superseded_by"):
+        tier = preserved_insider_tier
+        if tier == "signal":
+            verdict = "auto_signal"
+        elif tier == "context":
+            verdict = "auto_context"
+        else:
+            verdict = "auto_noise"
+        feed_eligible = tier != "noise"
+        rules_fired = list(rules_fired or []) + ["insider_materiality"]
 
     event.update(
         {

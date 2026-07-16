@@ -15,7 +15,7 @@ import sys
 
 sys.path.insert(0, sys_path_insert)
 
-from index_event_extract import extract_index_events  # noqa: E402
+from index_event_extract import extract_index_events, _is_style_or_subset_index  # noqa: E402
 from index_market_inputs import load_fundamentals_cache, market_inputs_for_ticker  # noqa: E402
 
 DATA_DIR = ROOT / "_system" / "data"
@@ -218,11 +218,47 @@ def _try_append_extracted(
             "source_type": source_type,
             "confidence": "news_unconfirmed",
             "title": title,
-            "quality_gated": True,
+            # News never quality-gates Confirmed; style reclass stays audit-only
+            "quality_gated": False,
+            "style_subset": bool(_is_style_or_subset_index(title)),
         }
         if append_announcement(row, existing=existing):
             out.append(row)
     return out
+
+
+def lint_announcement_conflicts(rows: list[dict]) -> list[str]:
+    """Return warnings for impossible parent membership pairs among provider rows."""
+    from collections import defaultdict
+
+    warnings: list[str] = []
+    by_key: dict[tuple, list[dict]] = defaultdict(list)
+    for r in rows:
+        if r.get("confidence") != "provider_confirmed":
+            continue
+        key = (r.get("ticker"), r.get("index"), r.get("announced") or r.get("effective"))
+        by_key[key].append(r)
+    for key, evs in by_key.items():
+        actions = {e.get("action") for e in evs}
+        if "add" in actions and "delete" in actions:
+            warnings.append(f"conflict add+delete for {key[0]} / {key[1]} on {key[2]}")
+    by_add: dict[tuple, set[str]] = defaultdict(set)
+    for r in rows:
+        if r.get("action") != "add" or r.get("confidence") != "provider_confirmed":
+            continue
+        by_add[(r.get("ticker"), r.get("announced"))].add(r.get("index"))
+    mutex = [
+        {"russell_1000", "russell_2000"},
+        {"ftse_100", "ftse_250"},
+        {"sp500", "sp400"},
+        {"sp500", "sp600"},
+        {"sp400", "sp600"},
+    ]
+    for key, idxs in by_add.items():
+        for pair in mutex:
+            if pair.issubset(idxs):
+                warnings.append(f"mutex dual-add {key[0]} on {key[1]}: {sorted(pair)}")
+    return warnings
 
 
 def harvest_archive_announcements(
@@ -941,30 +977,28 @@ def build_for_ticker(
 
     t_anns = [a for a in announcements if a.get("ticker") == ticker]
     confirmed_events = []
+    news_notes = []
     for a in t_anns:
-        # Surface provider_confirmed always; news only if quality_gated
-        if a.get("confidence") == "provider_confirmed" or a.get("quality_gated"):
-            confirmed_events.append(
-                {
-                    "ticker": ticker,
-                    "index": a.get("index"),
-                    "action": a.get("action"),
-                    "announced": a.get("announced"),
-                    "effective": a.get("effective"),
-                    "source_url": a.get("source_url"),
-                    "source_type": a.get("source_type"),
-                    "confidence": a.get("confidence"),
-                    "title": a.get("title"),
-                    "quality_gated": bool(a.get("quality_gated") or a.get("confidence") == "provider_confirmed"),
-                }
-            )
+        ev = {
+            "ticker": ticker,
+            "index": a.get("index"),
+            "action": a.get("action"),
+            "announced": a.get("announced"),
+            "effective": a.get("effective"),
+            "source_url": a.get("source_url"),
+            "source_type": a.get("source_type"),
+            "confidence": a.get("confidence"),
+            "title": a.get("title"),
+            "quality_gated": a.get("confidence") == "provider_confirmed",
+            "style_subset": bool(a.get("style_subset") or _is_style_or_subset_index(a.get("title") or "")),
+        }
+        if a.get("confidence") == "provider_confirmed":
+            confirmed_events.append(ev)
+        elif a.get("confidence") == "news_unconfirmed":
+            news_notes.append(ev)
         for sc in scorecards:
-            if sc.get("index") == a.get("index") and (
-                a.get("confidence") == "provider_confirmed" or a.get("quality_gated")
-            ):
-                conf = a.get("confidence") or "news_unconfirmed"
-                if conf == "provider_confirmed" or sc.get("confidence") != "provider_confirmed":
-                    sc["confidence"] = conf
+            if sc.get("index") == a.get("index") and a.get("confidence") == "provider_confirmed":
+                sc["confidence"] = "provider_confirmed"
 
     index_ids = [sc["index"] for sc in scorecards if sc.get("index") != "_security"]
     next_ev = next_calendar_for_indices(calendar, index_ids, today)
@@ -1019,6 +1053,7 @@ def build_for_ticker(
             "priority_score": pscore,
         },
         "confirmed_events": confirmed_events,
+        "news_notes": news_notes,
         "prediction": {
             "next_calendar_event": next_ev,
             "inclusion_probability_band": prob,
@@ -1130,7 +1165,10 @@ def build(today: date | None = None, *, purge_announcements: bool = True) -> dic
         1
         for row in by_ticker.values()
         for ev in row.get("confirmed_events") or []
-        if ev.get("quality_gated")
+        if ev.get("confidence") == "provider_confirmed"
+    )
+    news_note_count = sum(
+        1 for row in by_ticker.values() for _ev in row.get("news_notes") or []
     )
 
     payload = {
@@ -1149,6 +1187,8 @@ def build(today: date | None = None, *, purge_announcements: bool = True) -> dic
             "high_priority_watch": high_priority_watch,
             "ticker_count": len(by_ticker),
             "quality_gated_events": quality_events,
+            "provider_confirmed_events": quality_events,
+            "news_notes": news_note_count,
             "max_candidate_distance_pct": max_cand,
         },
         "calendar": cal_strip,
@@ -1176,8 +1216,11 @@ def main() -> int:
         f"candidates={len(summary['inclusion_candidates'])} "
         f"deletion_risks={len(summary['deletion_risks'])} "
         f"high_priority={len(summary['high_priority_watch'])} "
-        f"quality_events={summary.get('quality_gated_events', 0)}"
+        f"provider_events={summary.get('provider_confirmed_events', 0)} "
+        f"news_notes={summary.get('news_notes', 0)}"
     )
+    for warn in lint_announcement_conflicts(load_announcements()):
+        print(f"WARN index conflict: {warn}")
     return 0
 
 

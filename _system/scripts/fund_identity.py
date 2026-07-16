@@ -69,6 +69,19 @@ GENERIC_SINGLE_ANCHORS = {
 }
 ROMAN_TOKENS = {"i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x"}
 
+# Explicit OCR / slug twins that should share one fund_id (not multi-strategy shops).
+CURATED_ALIAS_PAIRS: list[tuple[str, str]] = [
+    ("silver-ring-value", "silverringvaluepartners"),
+    ("silver-ring-value-partners", "silverringvaluepartners"),
+    ("laughing-water", "lwc-end"),
+    ("laughing-water-capital", "lwc-end"),
+    ("manor-road", "mrc"),
+    ("manor-road-capital", "mrc"),
+    ("fairlight", "farlight"),
+    ("masiff", "massif"),
+    ("massif-capital", "masiff-capital"),
+]
+
 
 def slugify(value: str) -> str:
     value = re.sub(r"[^a-z0-9]+", "-", (value or "").lower()).strip("-")
@@ -200,6 +213,24 @@ def consolidate_letter_funds(letters: list[dict], *, _verify: bool = True) -> tu
 
     methods: dict[tuple[str, str], str] = {}
     union = _UnionFind(set(core_stats))
+
+    # Curated OCR / slug twins (not multi-strategy shops)
+    for left_id, right_id in CURATED_ALIAS_PAIRS:
+        left_cores = {
+            core
+            for _letter, rid, _name, core in rows
+            if rid.lower() == left_id or core == left_id or identity_core(rid) == left_id
+        }
+        right_cores = {
+            core
+            for _letter, rid, _name, core in rows
+            if rid.lower() == right_id or core == right_id or identity_core(rid) == right_id
+        }
+        for lc in left_cores:
+            for rc in right_cores:
+                if lc != rc and lc in core_stats and rc in core_stats:
+                    union.union(lc, rc)
+                    methods[(lc, rc)] = "curated_alias"
 
     # A recurrent exact identity can safely absorb titled/profile-specific
     # variants beneath it.  Longest anchors win; generic single words cannot.

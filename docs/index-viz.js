@@ -107,36 +107,70 @@
       .sort()
       .forEach((t) => {
         (byTicker[t].confirmed_events || []).forEach((ev) => {
-          // Precision gate: provider_confirmed OR quality_gated news only
-          if (ev.confidence === 'provider_confirmed' || ev.quality_gated) {
+          if (ev.confidence === 'provider_confirmed') {
             rows.push({ ticker: t, ...ev });
           }
         });
       });
     rows.sort((a, b) => String(b.announced || '').localeCompare(String(a.announced || '')));
     if (!rows.length) {
-      return '<p class="muted">No quality-gated index events. Provider notices and subject-matched news only.</p>';
+      return '<p class="muted">No provider-confirmed index events yet. News headlines appear under News notes.</p>';
     }
     const body = rows
       .slice(0, 40)
       .map((r) => {
-        const confLabel =
-          r.confidence === 'provider_confirmed' ? 'provider_confirmed' : 'news_gated';
         const src =
           r.source_url && linkHtml
-            ? linkHtml(r.source_url, confLabel)
-            : e(confLabel);
+            ? linkHtml(r.source_url, 'provider_confirmed')
+            : e('provider_confirmed');
         return `<tr>
           <td class="mono">${e(r.ticker)}</td>
           <td>${e(r.index)}</td>
           <td>${e(r.action)}</td>
           <td class="mono">${e(r.announced || '—')}</td>
-          <td class="mono">${e(r.effective || 'TBD')}</td>
+          <td class="mono">${e(r.effective || '—')}</td>
           <td>${src}</td>
         </tr>`;
       })
       .join('');
-    return `<table class="insights-table"><thead><tr>
+    return `<h4 style="margin:12px 0 6px;font-size:13px">Confirmed (provider)</h4>
+      <table class="insights-table"><thead><tr>
+      <th>Ticker</th><th>Index</th><th>Action</th><th>Announced</th><th>Effective</th><th>Source</th>
+    </tr></thead><tbody>${body}</tbody></table>`;
+  }
+
+  function renderNewsNotesTable(byTicker, escapeHtml, linkHtml) {
+    const e = escapeHtml || esc;
+    const rows = [];
+    Object.keys(byTicker || {})
+      .sort()
+      .forEach((t) => {
+        (byTicker[t].news_notes || []).forEach((ev) => {
+          rows.push({ ticker: t, ...ev });
+        });
+      });
+    rows.sort((a, b) => String(b.announced || '').localeCompare(String(a.announced || '')));
+    if (!rows.length) {
+      return '<p class="muted">No news index notes.</p>';
+    }
+    const body = rows
+      .slice(0, 40)
+      .map((r) => {
+        const label = r.style_subset ? 'style/subset' : 'news';
+        const src =
+          r.source_url && linkHtml ? linkHtml(r.source_url, label) : e(label);
+        return `<tr>
+          <td class="mono">${e(r.ticker)}</td>
+          <td>${e(r.index)}</td>
+          <td>${e(r.action)}</td>
+          <td class="mono">${e(r.announced || '—')}</td>
+          <td class="mono">${e(r.effective || 'unknown')}</td>
+          <td>${src}</td>
+        </tr>`;
+      })
+      .join('');
+    return `<h4 style="margin:16px 0 6px;font-size:13px">News notes (unconfirmed)</h4>
+      <table class="insights-table"><thead><tr>
       <th>Ticker</th><th>Index</th><th>Action</th><th>Announced</th><th>Effective</th><th>Source</th>
     </tr></thead><tbody>${body}</tbody></table>`;
   }
@@ -221,8 +255,8 @@
       `Candidates: <strong>${(summary.inclusion_candidates || []).length}</strong>`,
       `Deletion risks: <strong>${(summary.deletion_risks || []).length}</strong>`,
       `Confirmed ≤30d: <strong>${(summary.confirmed_next_30d || []).length}</strong>`,
-      `High priority: <strong>${(summary.high_priority_watch || []).length}</strong>`,
-      `Gated events: <strong>${summary.quality_gated_events != null ? summary.quality_gated_events : '—'}</strong>`,
+      `Provider events: <strong>${summary.provider_confirmed_events != null ? summary.provider_confirmed_events : (summary.quality_gated_events != null ? summary.quality_gated_events : '—')}</strong>`,
+      `News notes: <strong>${summary.news_notes != null ? summary.news_notes : '—'}</strong>`,
     ].join(' · ');
 
     return `<div class="index-watch-panel">
@@ -230,9 +264,10 @@
       <p style="margin-bottom:8px">${stats}</p>
       <h3 style="margin:12px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary)">Reconstitution calendar</h3>
       ${renderCalendarStrip(calendar, escapeHtml)}
-      <h3 style="margin:12px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary)">Confirmed events</h3>
-      <p class="muted" style="margin-bottom:6px">Provider notices and subject-matched news only. Co-mentions and already-member adds are suppressed.</p>
+      <h3 style="margin:12px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary)">Index events</h3>
+      <p class="muted" style="margin-bottom:6px">Confirmed = provider notices with effective dates. News notes are unconfirmed headlines (style-box moves included).</p>
       ${renderConfirmedTable(byTicker, escapeHtml, linkHtml)}
+      ${renderNewsNotesTable(byTicker, escapeHtml, linkHtml)}
       <h3 style="margin:16px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary)">Potential (near-boundary)</h3>
       <p class="muted" style="margin-bottom:8px">Only |distance| ≤ ${escapeHtml(String(maxDist))}%. Min-mcap floor passes alone are not candidates.</p>
       ${renderPotentialTable(byTicker, escapeHtml, {
