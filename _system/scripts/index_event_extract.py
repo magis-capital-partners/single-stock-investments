@@ -15,12 +15,14 @@ INDEX_ALIASES: dict[str, str] = {
     "s&p smallcap 600": "sp600",
     "s&p smallcap": "sp600",
     "s&p 600": "sp600",
-    # Parent Russell indexes only. Style/factor/subset → reclassify via _is_style_or_subset_index.
+    # Parent Russell indexes only. Style/factor/subset phrases are detected
+    # separately and forced to action=reclassify (see _is_style_or_subset_index).
     "russell 3000": "russell_1000",
     "russell 1000": "russell_1000",
     "russell1000": "russell_1000",
     "russell 2000": "russell_2000",
     "russell2000": "russell_2000",
+    # Style / subset aliases keep a parent id for context, but must reclassify.
     "russell 3000e": "russell_1000",
     "russell 2500": "russell_1000",
     "russell2500": "russell_1000",
@@ -29,7 +31,7 @@ INDEX_ALIASES: dict[str, str] = {
     "russell top 50": "russell_1000",
     "russell growth": "russell_1000",
     "russell value": "russell_1000",
-    "russell": "russell_1000",
+    "russell": "russell_1000",  # bare "Russell reclassification" → R1000 family watch
     "nasdaq-100": "nasdaq_100",
     "nasdaq 100": "nasdaq_100",
     "nasdaq100": "nasdaq_100",
@@ -212,6 +214,7 @@ def _is_style_or_subset_index(text: str, index_raw: str = "") -> bool:
             window = low[pos : pos + len(idx) + 48]
             if _STYLE_OR_SUBSET.search(window):
                 return True
+    # Aliases that are themselves style/subset families
     if re.search(
         r"\b(?:russell\s+(?:2500|3000e|midcap|defensive|top\s+50)|"
         r"russell\s+(?:growth|value)\b(?!\s*1000|\s*2000))",
@@ -223,6 +226,7 @@ def _is_style_or_subset_index(text: str, index_raw: str = "") -> bool:
 
 def _normalize_ticker_token(token: str) -> str:
     t = (token or "").strip().upper()
+    # Strip exchange prefixes like NASDAQGS: ECHO
     if ":" in t:
         t = t.split(":")[-1].strip()
     return t
@@ -245,6 +249,7 @@ def _subject_to_ticker(
         "HAVE", "HAD", "WAS", "WERE", "BEEN", "BEING", "WILL", "CAN", "MAY", "ITS",
     }
 
+    # Prefer explicit (TICKER) in subject
     m = _SUBJECT_TICKER_PAREN.search(subject_raw or "")
     if m:
         tk = _normalize_ticker_token(m.group("ticker"))
@@ -254,9 +259,16 @@ def _subject_to_ticker(
         for cu, orig in cand_upper.items():
             if cu == tk:
                 return orig
-            # Bare headline → exchange-suffixed candidate (RMV → RMV.L); never BF.A → BF.B
+            # Allow bare headline ticker → exchange-suffixed candidate (RMV → RMV.L)
+            # but never map distinct share classes (BF.A ↛ BF.B).
             if "." not in tk and cu.split(".")[0] == bare and "." in cu:
                 return orig
+            # Candidate bare, headline has exchange suffix (ALS.TO news tagged ALS) — already handled above
+            if "." not in cu and tk.split(".")[0] == cu and "." in tk:
+                # Headline is ALS.TO-style but candidate is ALS — rare; skip
+                pass
+        # Explicit ticker that is not a candidate: do not fall through to company-name match
+        # (avoids BF.A headlines attributing to BF.B via "Brown-Forman").
         return None
 
     sub = (subject_raw or "").strip()
@@ -370,6 +382,7 @@ def extract_index_events(
         action = _verb_to_action(verb)
         if not index_id or not action:
             return
+        # Dynamic / Defensive / Benchmark / 2500 / Midcap / Top 50 → style reclass
         if action in ("add", "delete") and _is_style_or_subset_index(text, index_raw):
             action = "reclassify"
         ticker = _subject_to_ticker(sub_raw, candidates, company_names)

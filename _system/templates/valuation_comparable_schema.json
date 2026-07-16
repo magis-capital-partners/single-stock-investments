@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "valuation_comparable_registry_v1",
+  "title": "Valuation comparable registry",
+  "type": "object",
+  "required": ["schema_version", "hierarchy", "comparables"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "hierarchy": {"type": "array", "minItems": 5, "items": {"type": "string"}},
+    "comparables": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "as_of", "source_tier", "source_ref", "economic_claim", "metric", "adjustments_required"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z0-9_]+$"},
+          "label": {"type": "string", "minLength": 1},
+          "as_of": {"type": "string", "format": "date"},
+          "source_tier": {"enum": ["issuer_arm_length_transaction", "same_asset_transaction", "public_peer", "replacement_cost", "approved_external_analysis"]},
+          "source_ref": {"type": "string", "minLength": 1},
+          "economic_claim": {"type": "string", "minLength": 1},
+          "metric": {"type": "string", "minLength": 1},
+          "value": {"type": ["number", "null"]},
+          "currency": {"type": "string"},
+          "adjustments_required": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+          "applicable_archetypes": {"type": "array", "items": {"type": "string"}}
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": false
+}

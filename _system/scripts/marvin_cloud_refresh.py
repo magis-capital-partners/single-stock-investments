@@ -25,6 +25,7 @@ from marvin_pipeline_common import (  # noqa: E402
     ticker_has_crypto_tag,
     ticker_needs_commodity_inputs,
 )
+from economic_value_framework import economic_value_trigger  # noqa: E402
 
 
 def run(label: str, cmd: list[str], *, optional: bool = False, cwd: Path | None = None) -> bool:
@@ -242,6 +243,16 @@ def main() -> int:
         "valuation write",
         [PY, str(SCRIPTS / "marvin_valuation.py"), "--ticker", ticker, "--write"],
     )
+    if (research / "pricing_model.json").exists():
+        ok &= run(
+            "economic pricing analysis",
+            [PY, str(SCRIPTS / "build_power_zone_pricing.py"), ticker],
+        )
+    ok &= run(
+        "valuation workbench",
+        [PY, str(SCRIPTS / "build_valuation_workbench.py"), ticker, "--date", args.date],
+        optional=True,
+    )
     if ticker_has_theme_tag(ticker):
         run(
             "etf-dashboard sync",
@@ -327,7 +338,7 @@ def main() -> int:
         "evidence completeness",
         [PY, str(SCRIPTS / "check_evidence_completeness.py"), ticker, "--date", args.date]
         + (["--strict"] if strict_evidence else []),
-        optional=not strict_evidence,
+        optional=not (strict_evidence or economic_value_trigger(val)["required"]),
     )
     ok &= run(
         "sync classification",
@@ -350,6 +361,12 @@ def main() -> int:
     ok &= run_script(
         "persona calibration",
         "relevance_calibration_check.py",
+        [],
+        optional=True,
+    )
+    ok &= run_script(
+        "committee outcome calibration",
+        "committee_calibration.py",
         [],
         optional=True,
     )

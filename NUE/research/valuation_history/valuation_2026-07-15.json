@@ -1,0 +1,1470 @@
+{
+  "ticker": "NUE",
+  "as_of": "2026-07-15",
+  "method": "pending",
+  "valuation_mode": "economic_value",
+  "method_profile": "capital_cycle",
+  "classification_inputs": {
+    "archetype": "capital_cycle",
+    "cycle": "mid"
+  },
+  "inputs": {
+    "price": 236.87,
+    "price_source": "Market close retrieved 2026-07-15",
+    "shares_outstanding": 230900000
+  },
+  "valuation_methodology": {
+    "mode": "component_economic_value",
+    "horizon_years": 7,
+    "decision_rule": "Use one complete component schedule; preserve the range and evidence block until every material assumption is reconciled."
+  },
+  "component_valuation": {
+    "schema_version": "1.0",
+    "all_material_components_identified": true,
+    "coverage_statement": "Every currently identified material ownership claim, liability, and option is valued once. Unknown claims remain an evidence blocker, not an unvalued line item.",
+    "components": [
+      {
+        "id": "steel_mills",
+        "label": "Steel mills through-cycle value",
+        "category": "operating_business",
+        "overlap_key": "steel_mills",
+        "treatment": "additive",
+        "valuation": {
+          "method": "normalized_segment_earnings",
+          "basis": "per_share",
+          "low": 70,
+          "base": 110,
+          "high": 170,
+          "evidence_tier": "analyst_estimate",
+          "evidence": "Nucor FY2025 results and segment operating statistics.",
+          "assumption_summary": "Normalize shipments, spread, utilization, maintenance capital, and tax across a full steel cycle rather than capitalizing 2025 or spot margins.",
+          "cross_check": "Range must be reconciled to primary filings, normalized economics, and relevant transaction or public-market evidence before IC approval.",
+          "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim."
+        }
+      },
+      {
+        "id": "steel_products",
+        "label": "Downstream steel products",
+        "category": "operating_business",
+        "overlap_key": "steel_products",
+        "treatment": "additive",
+        "valuation": {
+          "method": "normalized_segment_earnings",
+          "basis": "per_share",
+          "low": 35,
+          "base": 65,
+          "high": 105,
+          "evidence_tier": "analyst_estimate",
+          "evidence": "FY2025 steel-products pretax income of $1.229bn and product-volume disclosures.",
+          "assumption_summary": "Value downstream earnings separately using normalized backlog, margins, and maintenance capital.",
+          "cross_check": "Range must be reconciled to primary filings, normalized economics, and relevant transaction or public-market evidence before IC approval.",
+          "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim."
+        }
+      },
+      {
+        "id": "raw_materials",
+        "label": "Raw materials and recycling",
+        "category": "operating_business",
+        "overlap_key": "raw_materials",
+        "treatment": "additive",
+        "valuation": {
+          "method": "normalized_segment_earnings",
+          "basis": "per_share",
+          "low": 0,
+          "base": 8,
+          "high": 20,
+          "evidence_tier": "analyst_estimate",
+          "evidence": "FY2025 raw-materials pretax income of $153m; commodity and outage normalization pending.",
+          "assumption_summary": "Use through-cycle DRI, scrap, and brokerage economics after sustaining capital.",
+          "cross_check": "Range must be reconciled to primary filings, normalized economics, and relevant transaction or public-market evidence before IC approval.",
+          "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim."
+        }
+      },
+      {
+        "id": "net_debt_and_leases",
+        "label": "Net debt and lease claims",
+        "category": "liability_or_reserve",
+        "overlap_key": "net_debt_and_leases",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_debt",
+          "basis": "per_share",
+          "low": -22,
+          "base": -19,
+          "high": -16,
+          "evidence_tier": "analyst_estimate",
+          "evidence": "FY2025 cash/investments of $2.699bn and debt/lease obligations of $7.121bn.",
+          "assumption_summary": "Deduct all debt and finance leases net of cash and short-term investments; range reflects required operating liquidity.",
+          "cross_check": "Range must be reconciled to primary filings, normalized economics, and relevant transaction or public-market evidence before IC approval.",
+          "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim."
+        }
+      },
+      {
+        "id": "new_project_ramp",
+        "label": "New-project ramp and replacement-cost optionality",
+        "category": "real_option",
+        "overlap_key": "new_project_ramp",
+        "treatment": "additive",
+        "valuation": {
+          "method": "risked_incremental_roic",
+          "basis": "per_share",
+          "low": 5,
+          "base": 25,
+          "high": 55,
+          "evidence_tier": "analyst_estimate",
+          "evidence": "Management identified new rebar, melt-shop, towers, and coating projects; project-level invested capital and returns remain to be reconciled.",
+          "assumption_summary": "Credit only probability-weighted after-tax cash returns above the cost of capital, net of remaining spend and ramp losses.",
+          "cross_check": "Range must be reconciled to primary filings, normalized economics, and relevant transaction or public-market evidence before IC approval.",
+          "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim."
+        }
+      },
+      {
+        "id": "supply_response_and_downcycle_reserve",
+        "label": "Supply-response and downcycle reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "supply_response_and_downcycle_reserve",
+        "treatment": "additive",
+        "valuation": {
+          "method": "capital_cycle_reserve",
+          "basis": "per_share",
+          "low": -20,
+          "base": -10,
+          "high": 0,
+          "evidence_tier": "analyst_estimate",
+          "evidence": "Steel is cyclical and exposed to global capacity, imports, and new domestic supply.",
+          "assumption_summary": "Explicitly deduct for margin mean reversion, supply response, and projects earning below their cost of capital.",
+          "cross_check": "Range must be reconciled to primary filings, normalized economics, and relevant transaction or public-market evidence before IC approval.",
+          "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim."
+        }
+      }
+    ]
+  },
+  "economic_value": {
+    "schema_version": "1.0",
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One diluted share of NUE, including every identified operating claim, asset, liability, and option.",
+      "unit_label": "diluted share",
+      "unit_count": 230900000,
+      "unit_source": "Nucor FY2025 results: 230.9m diluted shares, segment pretax income of $2.383bn steel mills, $1.229bn steel products, and $153m raw materials; $2.699bn cash/investments and $7.121bn debt/lease obligations.",
+      "enterprise_to_equity_reconciliation": "Operating and asset claims are valued once; cash, debt, financing, reserves, and other senior claims are included as separate components or within the stated equity basis."
+    },
+    "gaap_role": "cross_check",
+    "accounting_reference": "Nucor FY2025 results: 230.9m diluted shares, segment pretax income of $2.383bn steel mills, $1.229bn steel products, and $153m raw materials; $2.699bn cash/investments and $7.121bn debt/lease obligations.",
+    "component_groups": [
+      {
+        "id": "steel_mills",
+        "label": "Steel mills through-cycle value",
+        "component_ids": [
+          "steel_mills"
+        ],
+        "economic_claim": "Steel mills through-cycle value",
+        "valuation_basis": "Normalize shipments, spread, utilization, maintenance capital, and tax across a full steel cycle rather than capitalizing 2025 or spot margins.",
+        "adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "overlap_control": "Unique overlap key steel_mills; no other component capitalizes the same claim."
+      },
+      {
+        "id": "steel_products",
+        "label": "Downstream steel products",
+        "component_ids": [
+          "steel_products"
+        ],
+        "economic_claim": "Downstream steel products",
+        "valuation_basis": "Value downstream earnings separately using normalized backlog, margins, and maintenance capital.",
+        "adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "overlap_control": "Unique overlap key steel_products; no other component capitalizes the same claim."
+      },
+      {
+        "id": "raw_materials",
+        "label": "Raw materials and recycling",
+        "component_ids": [
+          "raw_materials"
+        ],
+        "economic_claim": "Raw materials and recycling",
+        "valuation_basis": "Use through-cycle DRI, scrap, and brokerage economics after sustaining capital.",
+        "adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "overlap_control": "Unique overlap key raw_materials; no other component capitalizes the same claim."
+      },
+      {
+        "id": "net_debt_and_leases",
+        "label": "Net debt and lease claims",
+        "component_ids": [
+          "net_debt_and_leases"
+        ],
+        "economic_claim": "Net debt and lease claims",
+        "valuation_basis": "Deduct all debt and finance leases net of cash and short-term investments; range reflects required operating liquidity.",
+        "adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "overlap_control": "Unique overlap key net_debt_and_leases; no other component capitalizes the same claim."
+      },
+      {
+        "id": "new_project_ramp",
+        "label": "New-project ramp and replacement-cost optionality",
+        "component_ids": [
+          "new_project_ramp"
+        ],
+        "economic_claim": "New-project ramp and replacement-cost optionality",
+        "valuation_basis": "Credit only probability-weighted after-tax cash returns above the cost of capital, net of remaining spend and ramp losses.",
+        "adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "overlap_control": "Unique overlap key new_project_ramp; no other component capitalizes the same claim.",
+        "risk_and_timing": {
+          "probability_basis": "Starter probability is an explicit analyst judgment pending base-rate and milestone reconciliation.",
+          "timing_basis": "Scenario range includes delay and failure outcomes.",
+          "remaining_capital_basis": "Remaining capital and financing are deducted in the stated option range."
+        }
+      },
+      {
+        "id": "supply_response_and_downcycle_reserve",
+        "label": "Supply-response and downcycle reserve",
+        "component_ids": [
+          "supply_response_and_downcycle_reserve"
+        ],
+        "economic_claim": "Supply-response and downcycle reserve",
+        "valuation_basis": "Explicitly deduct for margin mean reversion, supply response, and projects earning below their cost of capital.",
+        "adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "overlap_control": "Unique overlap key supply_response_and_downcycle_reserve; no other component capitalizes the same claim."
+      }
+    ],
+    "wisdom_applied": [
+      "Marathon/Capital Returns: supply response and reinvestment determine normalized value.",
+      "Howard Marks/Oaktree: liquidity and debt must survive the low case.",
+      "Greenblatt: segment separation prevents a blended multiple from hiding weak capital allocation."
+    ],
+    "limitations": [
+      "Starter ranges are analyst estimates, not committee-approved price targets.",
+      "The model remains evidence-blocked until primary-source normalization, comparable selection, and downside cases pass independent review."
+    ]
+  },
+  "results_lawrence_legacy": {},
+  "results": {},
+  "implied_return": {
+    "base_pct": null,
+    "label": "pending",
+    "display": "pending"
+  },
+  "stance_proposal": {
+    "suggested": "pending",
+    "irr_band": "pending",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "overlay_results": [],
+  "component_valuation_results": {
+    "status": "complete",
+    "decision_rule": "Use the complete low/base/high component schedule. Embedded components are estimated but not added twice.",
+    "all_material_components_identified": true,
+    "additive_components": [
+      {
+        "id": "steel_mills",
+        "label": "Steel mills through-cycle value",
+        "category": "operating_business",
+        "overlap_key": "steel_mills",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "normalized_segment_earnings",
+        "evidence_tier": "analyst_estimate",
+        "evidence": "Nucor FY2025 results and segment operating statistics.",
+        "cross_check": "Range must be reconciled to primary filings, normalized economics, and relevant transaction or public-market evidence before IC approval.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Normalize shipments, spread, utilization, maintenance capital, and tax across a full steel cycle rather than capitalizing 2025 or spot margins.",
+        "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "scenario_assumptions": null,
+        "low_per_share": 70.0,
+        "base_per_share": 110.0,
+        "high_per_share": 170.0
+      },
+      {
+        "id": "steel_products",
+        "label": "Downstream steel products",
+        "category": "operating_business",
+        "overlap_key": "steel_products",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "normalized_segment_earnings",
+        "evidence_tier": "analyst_estimate",
+        "evidence": "FY2025 steel-products pretax income of $1.229bn and product-volume disclosures.",
+        "cross_check": "Range must be reconciled to primary filings, normalized economics, and relevant transaction or public-market evidence before IC approval.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Value downstream earnings separately using normalized backlog, margins, and maintenance capital.",
+        "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "scenario_assumptions": null,
+        "low_per_share": 35.0,
+        "base_per_share": 65.0,
+        "high_per_share": 105.0
+      },
+      {
+        "id": "raw_materials",
+        "label": "Raw materials and recycling",
+        "category": "operating_business",
+        "overlap_key": "raw_materials",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "normalized_segment_earnings",
+        "evidence_tier": "analyst_estimate",
+        "evidence": "FY2025 raw-materials pretax income of $153m; commodity and outage normalization pending.",
+        "cross_check": "Range must be reconciled to primary filings, normalized economics, and relevant transaction or public-market evidence before IC approval.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Use through-cycle DRI, scrap, and brokerage economics after sustaining capital.",
+        "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "scenario_assumptions": null,
+        "low_per_share": 0.0,
+        "base_per_share": 8.0,
+        "high_per_share": 20.0
+      },
+      {
+        "id": "net_debt_and_leases",
+        "label": "Net debt and lease claims",
+        "category": "liability_or_reserve",
+        "overlap_key": "net_debt_and_leases",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "net_debt",
+        "evidence_tier": "analyst_estimate",
+        "evidence": "FY2025 cash/investments of $2.699bn and debt/lease obligations of $7.121bn.",
+        "cross_check": "Range must be reconciled to primary filings, normalized economics, and relevant transaction or public-market evidence before IC approval.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Deduct all debt and finance leases net of cash and short-term investments; range reflects required operating liquidity.",
+        "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "scenario_assumptions": null,
+        "low_per_share": -22.0,
+        "base_per_share": -19.0,
+        "high_per_share": -16.0
+      },
+      {
+        "id": "new_project_ramp",
+        "label": "New-project ramp and replacement-cost optionality",
+        "category": "real_option",
+        "overlap_key": "new_project_ramp",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "risked_incremental_roic",
+        "evidence_tier": "analyst_estimate",
+        "evidence": "Management identified new rebar, melt-shop, towers, and coating projects; project-level invested capital and returns remain to be reconciled.",
+        "cross_check": "Range must be reconciled to primary filings, normalized economics, and relevant transaction or public-market evidence before IC approval.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Credit only probability-weighted after-tax cash returns above the cost of capital, net of remaining spend and ramp losses.",
+        "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "scenario_assumptions": null,
+        "low_per_share": 5.0,
+        "base_per_share": 25.0,
+        "high_per_share": 55.0
+      },
+      {
+        "id": "supply_response_and_downcycle_reserve",
+        "label": "Supply-response and downcycle reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "supply_response_and_downcycle_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "capital_cycle_reserve",
+        "evidence_tier": "analyst_estimate",
+        "evidence": "Steel is cyclical and exposed to global capacity, imports, and new domestic supply.",
+        "cross_check": "Range must be reconciled to primary filings, normalized economics, and relevant transaction or public-market evidence before IC approval.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Explicitly deduct for margin mean reversion, supply response, and projects earning below their cost of capital.",
+        "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "scenario_assumptions": null,
+        "low_per_share": -20.0,
+        "base_per_share": -10.0,
+        "high_per_share": 0.0
+      }
+    ],
+    "embedded_components": [],
+    "total_equity_value_per_share": {
+      "low": 68.0,
+      "base": 179.0,
+      "high": 334.0
+    },
+    "material_component_count": 6,
+    "additive_component_count": 6,
+    "embedded_component_count": 0,
+    "market_price_per_share": 236.87,
+    "upside_downside_pct": {
+      "low": -71.3,
+      "base": -24.4,
+      "high": 41.0
+    }
+  },
+  "economic_value_analysis": {
+    "schema_version": "1.0",
+    "status": "complete",
+    "trigger": {
+      "required": true,
+      "reasons": [
+        "explicit_component_schedule"
+      ],
+      "policy": "A complete economic-value analysis is required when any trigger fires; otherwise it is recommended."
+    },
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One diluted share of NUE, including every identified operating claim, asset, liability, and option.",
+      "unit_label": "diluted share",
+      "unit_count": 230900000,
+      "unit_source": "Nucor FY2025 results: 230.9m diluted shares, segment pretax income of $2.383bn steel mills, $1.229bn steel products, and $153m raw materials; $2.699bn cash/investments and $7.121bn debt/lease obligations.",
+      "enterprise_to_equity_reconciliation": "Operating and asset claims are valued once; cash, debt, financing, reserves, and other senior claims are included as separate components or within the stated equity basis."
+    },
+    "gaap_role": "cross_check",
+    "accounting_reference": "Nucor FY2025 results: 230.9m diluted shares, segment pretax income of $2.383bn steel mills, $1.229bn steel products, and $153m raw materials; $2.699bn cash/investments and $7.121bn debt/lease obligations.",
+    "comparable_hierarchy": [
+      "issuer_arm_length_transaction",
+      "same_asset_transaction",
+      "public_peer",
+      "replacement_cost",
+      "approved_external_analysis"
+    ],
+    "gross_comparable_nav_per_share": null,
+    "risked_present_value_per_share": {
+      "low": 68.0,
+      "base": 179.0,
+      "high": 334.0
+    },
+    "component_groups": [
+      {
+        "id": "steel_mills",
+        "label": "Steel mills through-cycle value",
+        "component_ids": [
+          "steel_mills"
+        ],
+        "economic_claim": "Steel mills through-cycle value",
+        "valuation_basis": "Normalize shipments, spread, utilization, maintenance capital, and tax across a full steel cycle rather than capitalizing 2025 or spot margins.",
+        "adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "overlap_control": "Unique overlap key steel_mills; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": 70.0,
+          "base": 110.0,
+          "high": 170.0
+        }
+      },
+      {
+        "id": "steel_products",
+        "label": "Downstream steel products",
+        "component_ids": [
+          "steel_products"
+        ],
+        "economic_claim": "Downstream steel products",
+        "valuation_basis": "Value downstream earnings separately using normalized backlog, margins, and maintenance capital.",
+        "adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "overlap_control": "Unique overlap key steel_products; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": 35.0,
+          "base": 65.0,
+          "high": 105.0
+        }
+      },
+      {
+        "id": "raw_materials",
+        "label": "Raw materials and recycling",
+        "component_ids": [
+          "raw_materials"
+        ],
+        "economic_claim": "Raw materials and recycling",
+        "valuation_basis": "Use through-cycle DRI, scrap, and brokerage economics after sustaining capital.",
+        "adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "overlap_control": "Unique overlap key raw_materials; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": 0.0,
+          "base": 8.0,
+          "high": 20.0
+        }
+      },
+      {
+        "id": "net_debt_and_leases",
+        "label": "Net debt and lease claims",
+        "component_ids": [
+          "net_debt_and_leases"
+        ],
+        "economic_claim": "Net debt and lease claims",
+        "valuation_basis": "Deduct all debt and finance leases net of cash and short-term investments; range reflects required operating liquidity.",
+        "adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "overlap_control": "Unique overlap key net_debt_and_leases; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": -22.0,
+          "base": -19.0,
+          "high": -16.0
+        }
+      },
+      {
+        "id": "new_project_ramp",
+        "label": "New-project ramp and replacement-cost optionality",
+        "component_ids": [
+          "new_project_ramp"
+        ],
+        "economic_claim": "New-project ramp and replacement-cost optionality",
+        "valuation_basis": "Credit only probability-weighted after-tax cash returns above the cost of capital, net of remaining spend and ramp losses.",
+        "adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "overlap_control": "Unique overlap key new_project_ramp; no other component capitalizes the same claim.",
+        "risk_and_timing": {
+          "probability_basis": "Starter probability is an explicit analyst judgment pending base-rate and milestone reconciliation.",
+          "timing_basis": "Scenario range includes delay and failure outcomes.",
+          "remaining_capital_basis": "Remaining capital and financing are deducted in the stated option range."
+        },
+        "risked_present_value_per_share": {
+          "low": 5.0,
+          "base": 25.0,
+          "high": 55.0
+        }
+      },
+      {
+        "id": "supply_response_and_downcycle_reserve",
+        "label": "Supply-response and downcycle reserve",
+        "component_ids": [
+          "supply_response_and_downcycle_reserve"
+        ],
+        "economic_claim": "Supply-response and downcycle reserve",
+        "valuation_basis": "Explicitly deduct for margin mean reversion, supply response, and projects earning below their cost of capital.",
+        "adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "overlap_control": "Unique overlap key supply_response_and_downcycle_reserve; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": -20.0,
+          "base": -10.0,
+          "high": 0.0
+        }
+      }
+    ],
+    "valuation_proof": [
+      {
+        "component_id": "steel_mills",
+        "economic_claim": "Steel mills through-cycle value",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "normalized_segment_earnings",
+        "evidence_tier": "analyst_estimate",
+        "evidence": "Nucor FY2025 results and segment operating statistics.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "range_per_share": {
+          "low": 70.0,
+          "base": 110.0,
+          "high": 170.0
+        },
+        "treatment": "additive",
+        "overlap_key": "steel_mills",
+        "overlap_control": "Unique overlap key steel_mills; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "steel_products",
+        "economic_claim": "Downstream steel products",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "normalized_segment_earnings",
+        "evidence_tier": "analyst_estimate",
+        "evidence": "FY2025 steel-products pretax income of $1.229bn and product-volume disclosures.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "range_per_share": {
+          "low": 35.0,
+          "base": 65.0,
+          "high": 105.0
+        },
+        "treatment": "additive",
+        "overlap_key": "steel_products",
+        "overlap_control": "Unique overlap key steel_products; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "raw_materials",
+        "economic_claim": "Raw materials and recycling",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "normalized_segment_earnings",
+        "evidence_tier": "analyst_estimate",
+        "evidence": "FY2025 raw-materials pretax income of $153m; commodity and outage normalization pending.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 8.0,
+          "high": 20.0
+        },
+        "treatment": "additive",
+        "overlap_key": "raw_materials",
+        "overlap_control": "Unique overlap key raw_materials; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "net_debt_and_leases",
+        "economic_claim": "Net debt and lease claims",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_debt",
+        "evidence_tier": "analyst_estimate",
+        "evidence": "FY2025 cash/investments of $2.699bn and debt/lease obligations of $7.121bn.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "range_per_share": {
+          "low": -22.0,
+          "base": -19.0,
+          "high": -16.0
+        },
+        "treatment": "additive",
+        "overlap_key": "net_debt_and_leases",
+        "overlap_control": "Unique overlap key net_debt_and_leases; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "new_project_ramp",
+        "economic_claim": "New-project ramp and replacement-cost optionality",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "risked_incremental_roic",
+        "evidence_tier": "analyst_estimate",
+        "evidence": "Management identified new rebar, melt-shop, towers, and coating projects; project-level invested capital and returns remain to be reconciled.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "range_per_share": {
+          "low": 5.0,
+          "base": 25.0,
+          "high": 55.0
+        },
+        "treatment": "additive",
+        "overlap_key": "new_project_ramp",
+        "overlap_control": "Unique overlap key new_project_ramp; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "risk_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "Scenario range includes delay and failure outcomes.",
+          "probability_basis": "Starter probability is an explicit analyst judgment pending base-rate and milestone reconciliation.",
+          "remaining_capital_basis": "Remaining capital and financing are deducted in the stated option range."
+        }
+      },
+      {
+        "component_id": "supply_response_and_downcycle_reserve",
+        "economic_claim": "Supply-response and downcycle reserve",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "capital_cycle_reserve",
+        "evidence_tier": "analyst_estimate",
+        "evidence": "Steel is cyclical and exposed to global capacity, imports, and new domestic supply.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "range_per_share": {
+          "low": -20.0,
+          "base": -10.0,
+          "high": 0.0
+        },
+        "treatment": "additive",
+        "overlap_key": "supply_response_and_downcycle_reserve",
+        "overlap_control": "Unique overlap key supply_response_and_downcycle_reserve; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "risk_and_timing": null
+      }
+    ],
+    "wisdom_applied": [
+      "Marathon/Capital Returns: supply response and reinvestment determine normalized value.",
+      "Howard Marks/Oaktree: liquidity and debt must survive the low case.",
+      "Greenblatt: segment separation prevents a blended multiple from hiding weak capital allocation."
+    ],
+    "limitations": [
+      "Starter ranges are analyst estimates, not committee-approved price targets.",
+      "The model remains evidence-blocked until primary-source normalization, comparable selection, and downside cases pass independent review."
+    ],
+    "complete_component_coverage": true,
+    "validation_errors": [],
+    "registry_version": "1.0"
+  },
+  "component_review_queue": {
+    "status": "ready_for_committee_review",
+    "decision_rule": "Each assigned rater records accept, challenge, or reject with a proposed range and evidence. The aggregator may not silently average disputed ranges.",
+    "items": [
+      {
+        "component_id": "steel_mills",
+        "label": "Steel mills through-cycle value",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 70.0,
+          "base": 110.0,
+          "high": 170.0
+        },
+        "range_width_pct_of_base": 90.9,
+        "evidence_tier": "analyst_estimate",
+        "recommended_raters": [
+          "hohn",
+          "marathon_capital_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "steel_products",
+        "label": "Downstream steel products",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 35.0,
+          "base": 65.0,
+          "high": 105.0
+        },
+        "range_width_pct_of_base": 107.7,
+        "evidence_tier": "analyst_estimate",
+        "recommended_raters": [
+          "hohn",
+          "marathon_capital_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "raw_materials",
+        "label": "Raw materials and recycling",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 8.0,
+          "high": 20.0
+        },
+        "range_width_pct_of_base": 250.0,
+        "evidence_tier": "analyst_estimate",
+        "recommended_raters": [
+          "hohn",
+          "marathon_capital_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "net_debt_and_leases",
+        "label": "Net debt and lease claims",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": -22.0,
+          "base": -19.0,
+          "high": -16.0
+        },
+        "range_width_pct_of_base": 31.6,
+        "evidence_tier": "analyst_estimate",
+        "recommended_raters": [
+          "marks_credit_cycle",
+          "pabrai"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "new_project_ramp",
+        "label": "New-project ramp and replacement-cost optionality",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 5.0,
+          "base": 25.0,
+          "high": 55.0
+        },
+        "range_width_pct_of_base": 200.0,
+        "evidence_tier": "analyst_estimate",
+        "recommended_raters": [
+          "klarman_asset_value",
+          "hk"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "supply_response_and_downcycle_reserve",
+        "label": "Supply-response and downcycle reserve",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": -20.0,
+          "base": -10.0,
+          "high": 0.0
+        },
+        "range_width_pct_of_base": 200.0,
+        "evidence_tier": "analyst_estimate",
+        "recommended_raters": [
+          "marks_credit_cycle",
+          "pabrai"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      }
+    ]
+  },
+  "valuation_method_route": {
+    "schema_version": "1.0",
+    "status": "routed",
+    "profile_id": "capital_cycle",
+    "label": "Capital cycle and normalized industry economics",
+    "score": 2.0,
+    "reasons": [
+      "component categories=operating_business",
+      "existing methods=cycle"
+    ],
+    "primary_methods": [
+      "midcycle_capacity_value"
+    ],
+    "corroborating_methods": [
+      "replacement_cost",
+      "downcycle_liquidity_stress"
+    ],
+    "primary_personas": [
+      "marathon_capital_cycle"
+    ],
+    "cross_check_personas": [
+      "marks_credit_cycle",
+      "pabrai"
+    ],
+    "silent_personas": [
+      "buffett_weschler",
+      "greenblatt",
+      "hk",
+      "hohn",
+      "klarman_asset_value",
+      "munger",
+      "stahl"
+    ],
+    "required_evidence": [
+      "industry capacity and additions",
+      "utilization",
+      "normalized unit margins",
+      "maintenance versus growth capital",
+      "low-case liquidity"
+    ],
+    "failure_modes": [
+      "peak margins capitalized",
+      "supply response ignored",
+      "replacement cost used for assets that cannot earn their cost of capital"
+    ],
+    "secondary_profiles": [
+      {
+        "profile_id": "scarce_asset_optionality",
+        "score": 1.0,
+        "reasons": [
+          "component categories=real_option"
+        ]
+      },
+      {
+        "profile_id": "quality_reinvestment",
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
+      }
+    ],
+    "scorecard": {
+      "scarce_asset_optionality": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=real_option"
+        ]
+      },
+      "quality_reinvestment": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
+      },
+      "capital_cycle": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=cycle"
+        ]
+      },
+      "credit_and_normalized_returns": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=liability_or_reserve"
+        ]
+      },
+      "catalyst_asset_value": {
+        "score": 0.0,
+        "reasons": []
+      },
+      "predictable_cash_flow": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
+      },
+      "binary_milestone": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=real_option"
+        ]
+      }
+    },
+    "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+  },
+  "universal_valuation_contract": {
+    "schema_version": "1.0",
+    "status": "decision_grade",
+    "ticker": "NUE",
+    "as_of": "2026-07-15",
+    "economic_ownership_map": [
+      {
+        "component_id": "steel_mills",
+        "label": "Steel mills through-cycle value",
+        "category": "operating_business",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Steel mills through-cycle value",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 110.0
+        },
+        "growth_driver": "Normalize shipments, spread, utilization, maintenance capital, and tax across a full steel cycle rather than capitalizing 2025 or spot margins.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "normalized_segment_earnings",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 70.0,
+          "base": 110.0,
+          "high": 170.0
+        },
+        "evidence_tier": "analyst_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "Nucor FY2025 results and segment operating statistics.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "overlap_key": "steel_mills",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "steel_products",
+        "label": "Downstream steel products",
+        "category": "operating_business",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Downstream steel products",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 65.0
+        },
+        "growth_driver": "Value downstream earnings separately using normalized backlog, margins, and maintenance capital.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "normalized_segment_earnings",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 35.0,
+          "base": 65.0,
+          "high": 105.0
+        },
+        "evidence_tier": "analyst_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "FY2025 steel-products pretax income of $1.229bn and product-volume disclosures.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "overlap_key": "steel_products",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "raw_materials",
+        "label": "Raw materials and recycling",
+        "category": "operating_business",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Raw materials and recycling",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 8.0
+        },
+        "growth_driver": "Use through-cycle DRI, scrap, and brokerage economics after sustaining capital.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "normalized_segment_earnings",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.0,
+          "base": 8.0,
+          "high": 20.0
+        },
+        "evidence_tier": "analyst_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "FY2025 raw-materials pretax income of $153m; commodity and outage normalization pending.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "overlap_key": "raw_materials",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "net_debt_and_leases",
+        "label": "Net debt and lease claims",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Net debt and lease claims",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": -19.0
+        },
+        "growth_driver": "Deduct all debt and finance leases net of cash and short-term investments; range reflects required operating liquidity.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "net_debt",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": -22.0,
+          "base": -19.0,
+          "high": -16.0
+        },
+        "evidence_tier": "analyst_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "FY2025 cash/investments of $2.699bn and debt/lease obligations of $7.121bn.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "overlap_key": "net_debt_and_leases",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "new_project_ramp",
+        "label": "New-project ramp and replacement-cost optionality",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "New-project ramp and replacement-cost optionality",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 25.0
+        },
+        "growth_driver": "Credit only probability-weighted after-tax cash returns above the cost of capital, net of remaining spend and ramp losses.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "risked_incremental_roic",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 5.0,
+          "base": 25.0,
+          "high": 55.0
+        },
+        "evidence_tier": "analyst_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "Management identified new rebar, melt-shop, towers, and coating projects; project-level invested capital and returns remain to be reconciled.",
+        "probability_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "Scenario range includes delay and failure outcomes.",
+          "probability_basis": "Starter probability is an explicit analyst judgment pending base-rate and milestone reconciliation.",
+          "remaining_capital_basis": "Remaining capital and financing are deducted in the stated option range."
+        },
+        "tax_and_realization_adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "overlap_key": "new_project_ramp",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "supply_response_and_downcycle_reserve",
+        "label": "Supply-response and downcycle reserve",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Supply-response and downcycle reserve",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": -10.0
+        },
+        "growth_driver": "Explicitly deduct for margin mean reversion, supply response, and projects earning below their cost of capital.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "capital_cycle_reserve",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": -20.0,
+          "base": -10.0,
+          "high": 0.0
+        },
+        "evidence_tier": "analyst_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "Steel is cyclical and exposed to global capacity, imports, and new domestic supply.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "overlap_key": "supply_response_and_downcycle_reserve",
+        "assumption_type": "judgment"
+      }
+    ],
+    "component_coverage": {
+      "all_material_components_identified": true,
+      "material_component_count": 6,
+      "additive_component_count": 6,
+      "embedded_component_count": 0,
+      "unvalued_component_count": 0,
+      "double_counting_flags": []
+    },
+    "input_classification": {
+      "facts": [],
+      "estimates": [],
+      "judgments": [
+        {
+          "component_id": "steel_mills",
+          "label": "Steel mills through-cycle value",
+          "kind": "judgment",
+          "evidence_tier": "analyst_estimate",
+          "evidence": "Nucor FY2025 results and segment operating statistics.",
+          "method": "normalized_segment_earnings"
+        },
+        {
+          "component_id": "steel_products",
+          "label": "Downstream steel products",
+          "kind": "judgment",
+          "evidence_tier": "analyst_estimate",
+          "evidence": "FY2025 steel-products pretax income of $1.229bn and product-volume disclosures.",
+          "method": "normalized_segment_earnings"
+        },
+        {
+          "component_id": "raw_materials",
+          "label": "Raw materials and recycling",
+          "kind": "judgment",
+          "evidence_tier": "analyst_estimate",
+          "evidence": "FY2025 raw-materials pretax income of $153m; commodity and outage normalization pending.",
+          "method": "normalized_segment_earnings"
+        },
+        {
+          "component_id": "net_debt_and_leases",
+          "label": "Net debt and lease claims",
+          "kind": "judgment",
+          "evidence_tier": "analyst_estimate",
+          "evidence": "FY2025 cash/investments of $2.699bn and debt/lease obligations of $7.121bn.",
+          "method": "net_debt"
+        },
+        {
+          "component_id": "new_project_ramp",
+          "label": "New-project ramp and replacement-cost optionality",
+          "kind": "judgment",
+          "evidence_tier": "analyst_estimate",
+          "evidence": "Management identified new rebar, melt-shop, towers, and coating projects; project-level invested capital and returns remain to be reconciled.",
+          "method": "risked_incremental_roic"
+        },
+        {
+          "component_id": "supply_response_and_downcycle_reserve",
+          "label": "Supply-response and downcycle reserve",
+          "kind": "judgment",
+          "evidence_tier": "analyst_estimate",
+          "evidence": "Steel is cyclical and exposed to global capacity, imports, and new domestic supply.",
+          "method": "capital_cycle_reserve"
+        }
+      ]
+    },
+    "method_route": {
+      "schema_version": "1.0",
+      "status": "routed",
+      "profile_id": "capital_cycle",
+      "label": "Capital cycle and normalized industry economics",
+      "score": 2.0,
+      "reasons": [
+        "component categories=operating_business",
+        "existing methods=cycle"
+      ],
+      "primary_methods": [
+        "midcycle_capacity_value"
+      ],
+      "corroborating_methods": [
+        "replacement_cost",
+        "downcycle_liquidity_stress"
+      ],
+      "primary_personas": [
+        "marathon_capital_cycle"
+      ],
+      "cross_check_personas": [
+        "marks_credit_cycle",
+        "pabrai"
+      ],
+      "silent_personas": [
+        "buffett_weschler",
+        "greenblatt",
+        "hk",
+        "hohn",
+        "klarman_asset_value",
+        "munger",
+        "stahl"
+      ],
+      "required_evidence": [
+        "industry capacity and additions",
+        "utilization",
+        "normalized unit margins",
+        "maintenance versus growth capital",
+        "low-case liquidity"
+      ],
+      "failure_modes": [
+        "peak margins capitalized",
+        "supply response ignored",
+        "replacement cost used for assets that cannot earn their cost of capital"
+      ],
+      "secondary_profiles": [
+        {
+          "profile_id": "scarce_asset_optionality",
+          "score": 1.0,
+          "reasons": [
+            "component categories=real_option"
+          ]
+        },
+        {
+          "profile_id": "quality_reinvestment",
+          "score": 1.0,
+          "reasons": [
+            "component categories=operating_business"
+          ]
+        }
+      ],
+      "scorecard": {
+        "scarce_asset_optionality": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=real_option"
+          ]
+        },
+        "quality_reinvestment": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=operating_business"
+          ]
+        },
+        "capital_cycle": {
+          "score": 2.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=cycle"
+          ]
+        },
+        "credit_and_normalized_returns": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=liability_or_reserve"
+          ]
+        },
+        "catalyst_asset_value": {
+          "score": 0.0,
+          "reasons": []
+        },
+        "predictable_cash_flow": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=operating_business"
+          ]
+        },
+        "binary_milestone": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=real_option"
+          ]
+        }
+      },
+      "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+    },
+    "market": {
+      "price_per_share": 236.87,
+      "fully_diluted_shares": 230900000,
+      "market_cap_m": 54693.28,
+      "enterprise_value_m": null
+    },
+    "valuation": {
+      "value_per_share": {
+        "low": 68.0,
+        "base": 179.0,
+        "high": 334.0
+      },
+      "probability_weighted_value_per_share": 179.0,
+      "expected_distributions_per_share": 0.0,
+      "annualized_return_at_price_pct": {
+        "low": -16.33,
+        "base": -3.92,
+        "high": 5.03
+      },
+      "downside_to_low_pct": -71.29,
+      "horizon_years": 7
+    },
+    "scenario_contract": {
+      "rule": "Cases must change causal operating, capital, probability, timing, or financing drivers\u2014not only the terminal multiple.",
+      "top_value_drivers": [
+        {
+          "component_id": "steel_mills",
+          "label": "Steel mills through-cycle value",
+          "base_per_share": 110.0,
+          "range_width_per_share": 100.0,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "steel_products",
+          "label": "Downstream steel products",
+          "base_per_share": 65.0,
+          "range_width_per_share": 70.0,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "new_project_ramp",
+          "label": "New-project ramp and replacement-cost optionality",
+          "base_per_share": 25.0,
+          "range_width_per_share": 50.0,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "raw_materials",
+          "label": "Raw materials and recycling",
+          "base_per_share": 8.0,
+          "range_width_per_share": 20.0,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "supply_response_and_downcycle_reserve",
+          "label": "Supply-response and downcycle reserve",
+          "base_per_share": -10.0,
+          "range_width_per_share": 20.0,
+          "scenario_assumptions": null
+        }
+      ],
+      "reverse_expectations": null
+    },
+    "evidence": {
+      "unresolved_count": 0,
+      "blockers": [],
+      "validation_errors": []
+    },
+    "monitoring": {
+      "falsifiers": [
+        "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim."
+      ],
+      "required_refresh_triggers": [
+        "new filing or material operating update",
+        "capital-structure change",
+        "material price move",
+        "component milestone or falsifier"
+      ]
+    },
+    "decision_rule": "No security is decision-grade until every material economic claim is valued exactly once and every material evidence blocker is resolved."
+  },
+  "synthesis": {
+    "status": "incomplete",
+    "reason": "no numeric paths"
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "economic_value_v1",
+  "title": "Universal economic-value specification",
+  "type": "object",
+  "required": ["schema_version", "economic_claim", "gaap_role", "component_groups"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "method": {"type": "string"},
+    "economic_claim": {
+      "type": "object",
+      "required": ["description", "unit_label", "unit_count", "unit_source", "enterprise_to_equity_reconciliation"],
+      "properties": {
+        "description": {"type": "string", "minLength": 1},
+        "unit_label": {"type": "string", "minLength": 1},
+        "unit_count": {"type": "number", "exclusiveMinimum": 0},
+        "unit_source": {"type": "string", "minLength": 1},
+        "enterprise_to_equity_reconciliation": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": true
+    },
+    "gaap_role": {"enum": ["primary", "cross_check", "reference_only", "misleading_historical_cost"]},
+    "accounting_reference": {"type": "string"},
+    "gross_comparable_nav_per_share": {"$ref": "#/$defs/range"},
+    "component_groups": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "component_ids", "economic_claim", "valuation_basis", "adjustments", "overlap_control"],
+        "properties": {
+          "id": {"type": "string"},
+          "label": {"type": "string"},
+          "component_ids": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+          "economic_claim": {"type": "string", "minLength": 1},
+          "valuation_basis": {"type": "string", "minLength": 1},
+          "adjustments": {"type": "string", "minLength": 1},
+          "overlap_control": {"type": "string", "minLength": 1},
+          "risk_and_timing": {
+            "type": "object",
+            "required": ["probability_basis", "timing_basis", "remaining_capital_basis"],
+            "properties": {
+              "probability_basis": {"type": "string", "minLength": 1},
+              "timing_basis": {"type": "string", "minLength": 1},
+              "remaining_capital_basis": {"type": "string", "minLength": 1}
+            },
+            "additionalProperties": true
+          },
+          "comparable_ids": {"type": "array", "items": {"type": "string"}},
+          "comparable_value_per_share": {"$ref": "#/$defs/range"}
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "$defs": {
+    "range": {
+      "type": "object",
+      "required": ["low", "base", "high"],
+      "properties": {"low": {"type": "number"}, "base": {"type": "number"}, "high": {"type": "number"}},
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": true
+}

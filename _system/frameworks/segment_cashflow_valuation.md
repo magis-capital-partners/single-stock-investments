@@ -92,10 +92,13 @@ Rules:
 - **Cite** 10-K segment op income; show ÷ consolidated shares for **$/sh** if helpful.
 - If segment FCF is **not** disclosed, bridge from op income and label **[Assumption]** (capex share, SBC, D&A).
 - **Do not** double-count: intersegment revenue eliminations stay in filing totals; sum of segment revenues should tie to consolidated within rounding.
+- **Do not allocate consolidated owner cash by revenue share** when segment margins or capital intensity differ. Bridge from segment operating income or net income, segment D&A, working capital, taxes, and fixed-asset spending.
+- Treat share-based compensation as an owner cost. If management's non-GAAP FCF adds it back, subtract it in the owner-cash bridge or demonstrate that per-share dilution fully captures it.
+- Separate maintenance capital from growth capital when evidence permits. If it does not, deduct total fixed-asset spending and show the conservatism explicitly.
 
-### 3. Project each segment (10 years default)
+### 3. Project each segment (one explicit horizon)
 
-Per segment, same Lawrence shape as consolidated (can differ by segment):
+Per segment, use the same explicitly declared horizon as the consolidated model. New seven-year models use `growth_y6_end` and `exit_pfcf_end`; do not label a year-seven terminal multiple as year ten.
 
 | Input | Typical segment-specific |
 |-------|-------------------------|

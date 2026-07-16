@@ -65,6 +65,23 @@ class SparseInfraGuardTests(unittest.TestCase):
         prior = {f"T{i}": {"pdf_count": 5, "research_dir": True} for i in range(80)}
         bdd.refuse_infra_collapse(payload, prior)  # no raise
 
+    def test_sparse_payload_updates_present_rows_without_deleting_absent_rows(self):
+        prior = {
+            "generated_at": "old",
+            "summary": {"ticker_count": 60},
+            "tickers": [{"ticker": f"T{i}", "pdf_count": 1, "completeness": 50} for i in range(60)],
+        }
+        current = {
+            "generated_at": "new",
+            "summary": {"ticker_count": 1},
+            "tickers": [{"ticker": "T1", "pdf_count": 3, "completeness": 100}],
+        }
+        merged = bdd.merge_sparse_payload(current, prior)
+        self.assertEqual(merged["generated_at"], "new")
+        self.assertEqual(len(merged["tickers"]), 60)
+        self.assertEqual(next(row for row in merged["tickers"] if row["ticker"] == "T1")["pdf_count"], 3)
+        self.assertEqual(merged["summary"]["total_pdfs"], 62)
+
 
 if __name__ == "__main__":
     raise SystemExit(unittest.main())

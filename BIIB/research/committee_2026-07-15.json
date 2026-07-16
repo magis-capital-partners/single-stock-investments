@@ -1,0 +1,863 @@
+{
+  "schema_version": "1.0",
+  "protocol_version": "production-2.0",
+  "ticker": "BIIB",
+  "review": {
+    "level": "full_ic",
+    "trigger": "production committee pipeline",
+    "as_of": "2026-07-15",
+    "owner": null
+  },
+  "evidence_packet": {
+    "frozen_at": "2026-07-16T01:39:55.796315+00:00",
+    "hash_method": "sha256(canonical-json(sorted(path,sha256,bytes)))",
+    "packet_hash": "69276376107c19f425af75741b288a8e16d20ad3fd02a54303ca57d23ca8e6ca",
+    "freshness_status": "mixed",
+    "references": [
+      {
+        "path": "BIIB/research/valuation.json",
+        "sha256": "edf47aa9b6bea0d943dcf4158130a25460685a32905c95b0ae0608019bc6576e",
+        "bytes": 69321,
+        "role": "frozen local evidence",
+        "status": "available"
+      },
+      {
+        "path": "BIIB/research/thesis.md",
+        "sha256": "9a3a635713c45824b13faace23b136e6122d82c4527a41d955906cbab0067677",
+        "bytes": 635,
+        "role": "frozen local evidence",
+        "status": "available"
+      },
+      {
+        "path": "BIIB/research/cross_check_third_party_2026-07-10.md",
+        "sha256": "40bb4c57f68ca516b5c0e0c7b0da2b17da297e4bf49ebfdbdaafd1469b929434",
+        "bytes": 1964,
+        "role": "frozen local evidence",
+        "status": "available"
+      },
+      {
+        "path": "BIIB/research/evidence_reconciliation_2026-07-15.json",
+        "sha256": "ae99ae75c8265dc57de063f3b61e4af64da4405f0f41095c69da56d233421f4c",
+        "bytes": 7080,
+        "role": "frozen local evidence",
+        "status": "available"
+      }
+    ]
+  },
+  "proposer": {
+    "recommendation_hidden_in_round_one": true,
+    "thesis": "Biogen has meaningful marketed and pipeline optionality, but current product cash-flow schedules, indication-level probabilities and the post-Apellis closing balance sheet are insufficient to reproduce the wide component ranges.",
+    "explanation_contracts": [
+      {
+        "id": "biib_primary_mechanism",
+        "mechanism": "Biogen has meaningful marketed and pipeline optionality, but current product cash-flow schedules, indication-level probabilities and the post-Apellis closing balance sheet are insufficient to reproduce the wide component ranges.",
+        "evidence_paths": [
+          "BIIB/research/evidence_reconciliation_2026-07-15.json",
+          "BIIB/research/valuation.json"
+        ],
+        "distinguishing_test": "What product-level net cash-flow and patent schedule reproduces legacy and growth values?",
+        "counter_explanation": "The model may count a portfolio narrative as diversified optionality even though clinical, reimbursement, patent and financing outcomes are correlated and the closing claims are not yet known.",
+        "falsifier": "Growth products fail to offset legacy erosion",
+        "valuation_link": "Primary method: product-level DCF plus non-overlapping milestone probability trees, less senior claims and correlated-downside reserve; do not accept the current range until its component bridges reproduce."
+      }
+    ],
+    "open_questions": [
+      "What product-level net cash-flow and patent schedule reproduces legacy and growth values?",
+      "What independent clinical base rates, dependencies, remaining R&D and launch capital reproduce each event branch?",
+      "What post-close debt, CVR liability, integration cost and required liquidity reconcile senior claims?"
+    ]
+  },
+  "selected_raters": [
+    {
+      "persona": "hohn",
+      "independence_group": "competitive_advantage",
+      "selection_reason": "Selected before scoring from component coverage and a distinct error profile.",
+      "required_inputs_status": "partial"
+    },
+    {
+      "persona": "marathon_capital_cycle",
+      "independence_group": "capital_cycle",
+      "selection_reason": "Selected before scoring from component coverage and a distinct error profile.",
+      "required_inputs_status": "partial"
+    },
+    {
+      "persona": "klarman_asset_value",
+      "independence_group": "asset_realization",
+      "selection_reason": "Selected before scoring from component coverage and a distinct error profile.",
+      "required_inputs_status": "partial"
+    }
+  ],
+  "round_one": {
+    "evidence_hash": "69276376107c19f425af75741b288a8e16d20ad3fd02a54303ca57d23ca8e6ca",
+    "peer_outputs_visible": false,
+    "votes": [
+      {
+        "persona": "hohn",
+        "independence_group": "competitive_advantage",
+        "evidence_status": "insufficient_evidence",
+        "scores": {
+          "explanatory_strength": {
+            "value": 3,
+            "rationale": "The mechanism is specific and falsifiable, but key alternatives remain observationally unresolved."
+          },
+          "evidence_sufficiency": {
+            "value": 2,
+            "rationale": "Primary anchors are present, yet decision-critical low/base/high bridges cannot be reproduced."
+          },
+          "downside_control": {
+            "value": 2,
+            "rationale": "A downside case exists, but missing cycle, funding, claim or probability evidence can overwhelm it."
+          },
+          "return_vs_alternatives": {
+            "value": 2,
+            "rationale": "The stated range is too assumption-sensitive to establish a base return above alternatives."
+          }
+        },
+        "vote": "defer",
+        "expected_return_range_pct": null,
+        "horizon_years": null,
+        "claims": [
+          {
+            "claim": "2025 total revenue was $9.891 billion and free cash flow approximately $2.1 billion before the Apellis closing.",
+            "evidence_paths": [
+              "BIIB/research/evidence_reconciliation_2026-07-15.json"
+            ]
+          },
+          {
+            "claim": "MS product revenue fell 7.1% while rare-disease product revenue rose 8.4%; growth products increased 19%.",
+            "evidence_paths": [
+              "BIIB/research/evidence_reconciliation_2026-07-15.json"
+            ]
+          }
+        ],
+        "strongest_counter_explanation": "The model may count a portfolio narrative as diversified optionality even though clinical, reimbursement, patent and financing outcomes are correlated and the closing claims are not yet known.",
+        "most_important_missing_fact": "Product-level rebates, margins, sustaining cost and post-exclusivity tails do not reproduce marketed-product values.",
+        "falsifiers": [
+          "Growth products fail to offset legacy erosion",
+          "Phase 3 efficacy, safety or timing misses"
+        ],
+        "specialist_findings": "The competitive-advantage mechanism is plausible, but incremental returns cannot be separated from favorable conditions with current evidence.",
+        "confidence": "low"
+      },
+      {
+        "persona": "marathon_capital_cycle",
+        "independence_group": "capital_cycle",
+        "evidence_status": "insufficient_evidence",
+        "scores": {
+          "explanatory_strength": {
+            "value": 3,
+            "rationale": "The mechanism is specific and falsifiable, but key alternatives remain observationally unresolved."
+          },
+          "evidence_sufficiency": {
+            "value": 2,
+            "rationale": "Primary anchors are present, yet decision-critical low/base/high bridges cannot be reproduced."
+          },
+          "downside_control": {
+            "value": 2,
+            "rationale": "A downside case exists, but missing cycle, funding, claim or probability evidence can overwhelm it."
+          },
+          "return_vs_alternatives": {
+            "value": 2,
+            "rationale": "The stated range is too assumption-sensitive to establish a base return above alternatives."
+          }
+        },
+        "vote": "defer",
+        "expected_return_range_pct": null,
+        "horizon_years": null,
+        "claims": [
+          {
+            "claim": "2025 total revenue was $9.891 billion and free cash flow approximately $2.1 billion before the Apellis closing.",
+            "evidence_paths": [
+              "BIIB/research/evidence_reconciliation_2026-07-15.json"
+            ]
+          },
+          {
+            "claim": "MS product revenue fell 7.1% while rare-disease product revenue rose 8.4%; growth products increased 19%.",
+            "evidence_paths": [
+              "BIIB/research/evidence_reconciliation_2026-07-15.json"
+            ]
+          }
+        ],
+        "strongest_counter_explanation": "The model may count a portfolio narrative as diversified optionality even though clinical, reimbursement, patent and financing outcomes are correlated and the closing claims are not yet known.",
+        "most_important_missing_fact": "Product-level rebates, margins, sustaining cost and post-exclusivity tails do not reproduce marketed-product values.",
+        "falsifiers": [
+          "Growth products fail to offset legacy erosion",
+          "Phase 3 efficacy, safety or timing misses"
+        ],
+        "specialist_findings": "The capital and supply response is not measured well enough to distinguish durable returns from a cycle.",
+        "confidence": "low"
+      },
+      {
+        "persona": "klarman_asset_value",
+        "independence_group": "asset_realization",
+        "evidence_status": "insufficient_evidence",
+        "scores": {
+          "explanatory_strength": {
+            "value": 3,
+            "rationale": "The mechanism is specific and falsifiable, but key alternatives remain observationally unresolved."
+          },
+          "evidence_sufficiency": {
+            "value": 2,
+            "rationale": "Primary anchors are present, yet decision-critical low/base/high bridges cannot be reproduced."
+          },
+          "downside_control": {
+            "value": 2,
+            "rationale": "A downside case exists, but missing cycle, funding, claim or probability evidence can overwhelm it."
+          },
+          "return_vs_alternatives": {
+            "value": 2,
+            "rationale": "The stated range is too assumption-sensitive to establish a base return above alternatives."
+          }
+        },
+        "vote": "defer",
+        "expected_return_range_pct": null,
+        "horizon_years": null,
+        "claims": [
+          {
+            "claim": "2025 total revenue was $9.891 billion and free cash flow approximately $2.1 billion before the Apellis closing.",
+            "evidence_paths": [
+              "BIIB/research/evidence_reconciliation_2026-07-15.json"
+            ]
+          },
+          {
+            "claim": "MS product revenue fell 7.1% while rare-disease product revenue rose 8.4%; growth products increased 19%.",
+            "evidence_paths": [
+              "BIIB/research/evidence_reconciliation_2026-07-15.json"
+            ]
+          }
+        ],
+        "strongest_counter_explanation": "The model may count a portfolio narrative as diversified optionality even though clinical, reimbursement, patent and financing outcomes are correlated and the closing claims are not yet known.",
+        "most_important_missing_fact": "Product-level rebates, margins, sustaining cost and post-exclusivity tails do not reproduce marketed-product values.",
+        "falsifiers": [
+          "Growth products fail to offset legacy erosion",
+          "Phase 3 efficacy, safety or timing misses"
+        ],
+        "specialist_findings": "Asset and claim values are not tied to independently reproducible realization cash flows.",
+        "confidence": "low"
+      }
+    ]
+  },
+  "pre_mortem": {
+    "status": "complete",
+    "failure_story": "Legacy erosion accelerates, growth launches disappoint, correlated Phase 3 programs fail or delay, and the debt-funded Apellis purchase consumes cash while CVR/integration claims prove larger than modeled.",
+    "earliest_warning_signals": [
+      "Growth products fail to offset legacy erosion",
+      "Phase 3 efficacy, safety or timing misses",
+      "Post-close net debt and integration cost exceed model",
+      "SYFOVRE uptake diverges from CVR-consistent assumptions"
+    ],
+    "forensic_checks": [
+      "Build product-level patent and after-tax cash-flow schedules",
+      "Use independent indication base rates and correlated event trees",
+      "Reconcile Q2 acquisition footnote, debt and CVR liability"
+    ],
+    "short_source_coverage": "partial",
+    "unresolved_items": [
+      "Product-level rebates, margins, sustaining cost and post-exclusivity tails do not reproduce marketed-product values.",
+      "Material indication probabilities, dependencies and remaining costs are not independently reconciled.",
+      "The first post-close balance sheet and purchase-price allocation were unavailable as of the evidence date."
+    ]
+  },
+  "evidence_tribunal": {
+    "status": "blocked",
+    "resolved_facts": [
+      {
+        "fact": "2025 total revenue was $9.891 billion and free cash flow approximately $2.1 billion before the Apellis closing.",
+        "evidence_paths": [
+          "BIIB/research/evidence_reconciliation_2026-07-15.json"
+        ]
+      },
+      {
+        "fact": "MS product revenue fell 7.1% while rare-disease product revenue rose 8.4%; growth products increased 19%.",
+        "evidence_paths": [
+          "BIIB/research/evidence_reconciliation_2026-07-15.json"
+        ]
+      },
+      {
+        "fact": "Biogen completed the approximately $5.6 billion Apellis acquisition on May 14, 2026, financed with cash and borrowings, with contractual SYFOVRE sales-based CVRs up to $4 per Apellis share.",
+        "evidence_paths": [
+          "BIIB/research/evidence_reconciliation_2026-07-15.json"
+        ]
+      }
+    ],
+    "disputed_facts": [
+      {
+        "issue": "The valuation component ranges are analyst estimates, not values reproduced by the cited primary facts.",
+        "evidence_paths": [
+          "BIIB/research/evidence_reconciliation_2026-07-15.json",
+          "BIIB/research/valuation.json"
+        ]
+      }
+    ],
+    "unresolved_material_facts": [
+      "Product-level rebates, margins, sustaining cost and post-exclusivity tails do not reproduce marketed-product values.",
+      "Material indication probabilities, dependencies and remaining costs are not independently reconciled.",
+      "The first post-close balance sheet and purchase-price allocation were unavailable as of the evidence date."
+    ],
+    "evidence_paths": [
+      "BIIB/research/evidence_reconciliation_2026-07-15.json",
+      "BIIB/research/valuation.json"
+    ]
+  },
+  "research_loop": {
+    "loop_count": 1,
+    "questions": [
+      "What product-level net cash-flow and patent schedule reproduces legacy and growth values?",
+      "What independent clinical base rates, dependencies, remaining R&D and launch capital reproduce each event branch?",
+      "What post-close debt, CVR liability, integration cost and required liquidity reconcile senior claims?"
+    ],
+    "responses": [
+      {
+        "question": "What product-level net cash-flow and patent schedule reproduces legacy and growth values?",
+        "answer": "Primary evidence improved the factual anchor, but product-level rebates, margins, sustaining cost and post-exclusivity tails do not reproduce marketed-product values.",
+        "evidence_paths": [
+          "BIIB/research/evidence_reconciliation_2026-07-15.json"
+        ],
+        "status": "partially_answered"
+      },
+      {
+        "question": "What independent clinical base rates, dependencies, remaining R&D and launch capital reproduce each event branch?",
+        "answer": "Primary evidence improved the factual anchor, but material indication probabilities, dependencies and remaining costs are not independently reconciled.",
+        "evidence_paths": [
+          "BIIB/research/evidence_reconciliation_2026-07-15.json"
+        ],
+        "status": "partially_answered"
+      },
+      {
+        "question": "What post-close debt, CVR liability, integration cost and required liquidity reconcile senior claims?",
+        "answer": "Primary evidence improved the factual anchor, but the first post-close balance sheet and purchase-price allocation were unavailable as of the evidence date.",
+        "evidence_paths": [
+          "BIIB/research/evidence_reconciliation_2026-07-15.json"
+        ],
+        "status": "partially_answered"
+      }
+    ],
+    "evidence_hash_after": "69276376107c19f425af75741b288a8e16d20ad3fd02a54303ca57d23ca8e6ca"
+  },
+  "round_two": {
+    "evidence_hash": "69276376107c19f425af75741b288a8e16d20ad3fd02a54303ca57d23ca8e6ca",
+    "peer_outputs_visible": false,
+    "votes": [
+      {
+        "persona": "hohn",
+        "independence_group": "competitive_advantage",
+        "evidence_status": "insufficient_evidence",
+        "scores": {
+          "explanatory_strength": {
+            "value": 3,
+            "rationale": "The reconciliation sharpened the mechanism and overlap controls, but did not close the decisive factual gaps."
+          },
+          "evidence_sufficiency": {
+            "value": 2,
+            "rationale": "Primary anchors are present, yet decision-critical low/base/high bridges cannot be reproduced."
+          },
+          "downside_control": {
+            "value": 2,
+            "rationale": "A downside case exists, but missing cycle, funding, claim or probability evidence can overwhelm it."
+          },
+          "return_vs_alternatives": {
+            "value": 2,
+            "rationale": "The stated range is too assumption-sensitive to establish a base return above alternatives."
+          }
+        },
+        "vote": "defer",
+        "expected_return_range_pct": null,
+        "horizon_years": null,
+        "claims": [
+          {
+            "claim": "2025 total revenue was $9.891 billion and free cash flow approximately $2.1 billion before the Apellis closing.",
+            "evidence_paths": [
+              "BIIB/research/evidence_reconciliation_2026-07-15.json"
+            ]
+          },
+          {
+            "claim": "MS product revenue fell 7.1% while rare-disease product revenue rose 8.4%; growth products increased 19%.",
+            "evidence_paths": [
+              "BIIB/research/evidence_reconciliation_2026-07-15.json"
+            ]
+          }
+        ],
+        "strongest_counter_explanation": "The model may count a portfolio narrative as diversified optionality even though clinical, reimbursement, patent and financing outcomes are correlated and the closing claims are not yet known.",
+        "most_important_missing_fact": "Product-level rebates, margins, sustaining cost and post-exclusivity tails do not reproduce marketed-product values.",
+        "falsifiers": [
+          "Growth products fail to offset legacy erosion",
+          "Phase 3 efficacy, safety or timing misses"
+        ],
+        "specialist_findings": "The competitive-advantage mechanism is plausible, but incremental returns cannot be separated from favorable conditions with current evidence.",
+        "confidence": "low"
+      },
+      {
+        "persona": "marathon_capital_cycle",
+        "independence_group": "capital_cycle",
+        "evidence_status": "insufficient_evidence",
+        "scores": {
+          "explanatory_strength": {
+            "value": 3,
+            "rationale": "The reconciliation sharpened the mechanism and overlap controls, but did not close the decisive factual gaps."
+          },
+          "evidence_sufficiency": {
+            "value": 2,
+            "rationale": "Primary anchors are present, yet decision-critical low/base/high bridges cannot be reproduced."
+          },
+          "downside_control": {
+            "value": 2,
+            "rationale": "A downside case exists, but missing cycle, funding, claim or probability evidence can overwhelm it."
+          },
+          "return_vs_alternatives": {
+            "value": 2,
+            "rationale": "The stated range is too assumption-sensitive to establish a base return above alternatives."
+          }
+        },
+        "vote": "defer",
+        "expected_return_range_pct": null,
+        "horizon_years": null,
+        "claims": [
+          {
+            "claim": "2025 total revenue was $9.891 billion and free cash flow approximately $2.1 billion before the Apellis closing.",
+            "evidence_paths": [
+              "BIIB/research/evidence_reconciliation_2026-07-15.json"
+            ]
+          },
+          {
+            "claim": "MS product revenue fell 7.1% while rare-disease product revenue rose 8.4%; growth products increased 19%.",
+            "evidence_paths": [
+              "BIIB/research/evidence_reconciliation_2026-07-15.json"
+            ]
+          }
+        ],
+        "strongest_counter_explanation": "The model may count a portfolio narrative as diversified optionality even though clinical, reimbursement, patent and financing outcomes are correlated and the closing claims are not yet known.",
+        "most_important_missing_fact": "Product-level rebates, margins, sustaining cost and post-exclusivity tails do not reproduce marketed-product values.",
+        "falsifiers": [
+          "Growth products fail to offset legacy erosion",
+          "Phase 3 efficacy, safety or timing misses"
+        ],
+        "specialist_findings": "The capital and supply response is not measured well enough to distinguish durable returns from a cycle.",
+        "confidence": "low"
+      },
+      {
+        "persona": "klarman_asset_value",
+        "independence_group": "asset_realization",
+        "evidence_status": "insufficient_evidence",
+        "scores": {
+          "explanatory_strength": {
+            "value": 3,
+            "rationale": "The reconciliation sharpened the mechanism and overlap controls, but did not close the decisive factual gaps."
+          },
+          "evidence_sufficiency": {
+            "value": 2,
+            "rationale": "Primary anchors are present, yet decision-critical low/base/high bridges cannot be reproduced."
+          },
+          "downside_control": {
+            "value": 2,
+            "rationale": "A downside case exists, but missing cycle, funding, claim or probability evidence can overwhelm it."
+          },
+          "return_vs_alternatives": {
+            "value": 2,
+            "rationale": "The stated range is too assumption-sensitive to establish a base return above alternatives."
+          }
+        },
+        "vote": "defer",
+        "expected_return_range_pct": null,
+        "horizon_years": null,
+        "claims": [
+          {
+            "claim": "2025 total revenue was $9.891 billion and free cash flow approximately $2.1 billion before the Apellis closing.",
+            "evidence_paths": [
+              "BIIB/research/evidence_reconciliation_2026-07-15.json"
+            ]
+          },
+          {
+            "claim": "MS product revenue fell 7.1% while rare-disease product revenue rose 8.4%; growth products increased 19%.",
+            "evidence_paths": [
+              "BIIB/research/evidence_reconciliation_2026-07-15.json"
+            ]
+          }
+        ],
+        "strongest_counter_explanation": "The model may count a portfolio narrative as diversified optionality even though clinical, reimbursement, patent and financing outcomes are correlated and the closing claims are not yet known.",
+        "most_important_missing_fact": "Product-level rebates, margins, sustaining cost and post-exclusivity tails do not reproduce marketed-product values.",
+        "falsifiers": [
+          "Growth products fail to offset legacy erosion",
+          "Phase 3 efficacy, safety or timing misses"
+        ],
+        "specialist_findings": "Asset and claim values are not tied to independently reproducible realization cash flows.",
+        "confidence": "low"
+      }
+    ]
+  },
+  "valuation_reconciliation": {
+    "status": "blocked",
+    "disagreements": [
+      {
+        "type": "factual",
+        "issue": "Product-level rebates, margins, sustaining cost and post-exclusivity tails do not reproduce marketed-product values.",
+        "effect": "Primary value range cannot be reproduced."
+      },
+      {
+        "type": "assumption_based",
+        "issue": "Material indication probabilities, dependencies and remaining costs are not independently reconciled.",
+        "effect": "Optional or cycle value remains highly judgmental."
+      },
+      {
+        "type": "risk_tolerance_based",
+        "issue": "The first post-close balance sheet and purchase-price allocation were unavailable as of the evidence date.",
+        "effect": "Downside and senior claims are not bounded."
+      }
+    ],
+    "selected_primary_method": "product-level DCF plus non-overlapping milestone probability trees, less senior claims and correlated-downside reserve",
+    "rejected_averages": [
+      "Do not average the low/base/high schedule with narrative or market-multiple outputs.",
+      "Do not average rater views while evidence sufficiency is below decision grade."
+    ],
+    "unresolved_material_facts": [
+      "Product-level rebates, margins, sustaining cost and post-exclusivity tails do not reproduce marketed-product values.",
+      "Material indication probabilities, dependencies and remaining costs are not independently reconciled.",
+      "The first post-close balance sheet and purchase-price allocation were unavailable as of the evidence date."
+    ]
+  },
+  "adversarial_review": {
+    "status": "complete_with_residual_risks",
+    "tests": [
+      {
+        "test": "Build product-level patent and after-tax cash-flow schedules",
+        "result": "Not passed with current packet; retained as a residual risk."
+      },
+      {
+        "test": "Use independent indication base rates and correlated event trees",
+        "result": "Not passed with current packet; retained as a residual risk."
+      },
+      {
+        "test": "Reconcile Q2 acquisition footnote, debt and CVR liability",
+        "result": "Not passed with current packet; retained as a residual risk."
+      }
+    ],
+    "residual_risks": [
+      "Product-level rebates, margins, sustaining cost and post-exclusivity tails do not reproduce marketed-product values.",
+      "Material indication probabilities, dependencies and remaining costs are not independently reconciled.",
+      "The first post-close balance sheet and purchase-price allocation were unavailable as of the evidence date."
+    ],
+    "strongest_failure_path": "Legacy erosion accelerates, growth launches disappoint, correlated Phase 3 programs fail or delay, and the debt-funded Apellis purchase consumes cash while CVR/integration claims prove larger than modeled."
+  },
+  "chair_synthesis": {
+    "status": "blocked",
+    "primary_method": "product-level DCF plus non-overlapping milestone probability trees, less senior claims and correlated-downside reserve",
+    "weighting_rationale": "Use the routed primary method only after the decision-critical bridges reproduce; corroborating methods may bound outputs but cannot cure missing facts.",
+    "agreed_facts": [
+      "2025 total revenue was $9.891 billion and free cash flow approximately $2.1 billion before the Apellis closing.",
+      "MS product revenue fell 7.1% while rare-disease product revenue rose 8.4%; growth products increased 19%.",
+      "Biogen completed the approximately $5.6 billion Apellis acquisition on May 14, 2026, financed with cash and borrowings, with contractual SYFOVRE sales-based CVRs up to $4 per Apellis share."
+    ],
+    "disputed_facts": [
+      "Product-level rebates, margins, sustaining cost and post-exclusivity tails do not reproduce marketed-product values.",
+      "Material indication probabilities, dependencies and remaining costs are not independently reconciled.",
+      "The first post-close balance sheet and purchase-price allocation were unavailable as of the evidence date."
+    ],
+    "recommendation": "evidence_blocked",
+    "monitoring_plan": {
+      "operational_milestones": [
+        "Quarterly product revenue and collaboration economics",
+        "Litifilimab and other registrational readouts",
+        "Post-Apellis debt, integration and CVR liability"
+      ],
+      "evidence_refresh_dates": [
+        "2026-07-31",
+        "2026-10-31",
+        "2027-02-28"
+      ],
+      "valuation_refresh_triggers": [
+        "Q2 2026 Form 10-Q",
+        "Material trial or regulatory result",
+        "Patent or reimbursement change"
+      ],
+      "price_review_thresholds": [
+        "Re-underwrite after a 20% price move or material probability update"
+      ],
+      "thesis_break_conditions": [
+        "Growth products do not offset legacy erosion after commercial cost",
+        "Post-close claims exceed value of acquired assets",
+        "Multiple material late-stage branches fail together"
+      ],
+      "expected_catalyst_dates": [
+        "Q2 2026 Form 10-Q",
+        "Second-half 2026 litifilimab SLE readouts",
+        "2027 CLE and renal readouts"
+      ],
+      "outcome_horizons_months": [
+        6,
+        12,
+        24
+      ]
+    }
+  },
+  "synthesis": {
+    "strongest_dissent": "The model may count a portfolio narrative as diversified optionality even though clinical, reimbursement, patent and financing outcomes are correlated and the closing claims are not yet known.",
+    "unresolved_items": [
+      "Product-level rebates, margins, sustaining cost and post-exclusivity tails do not reproduce marketed-product values."
+    ],
+    "vote_split": {
+      "defer": 3
+    },
+    "score_medians": {
+      "explanatory_strength": 3,
+      "evidence_sufficiency": 2,
+      "downside_control": 2,
+      "return_vs_alternatives": 2
+    },
+    "score_ranges": {
+      "explanatory_strength": [
+        3,
+        3
+      ],
+      "evidence_sufficiency": [
+        2,
+        2
+      ],
+      "downside_control": [
+        2,
+        2
+      ],
+      "return_vs_alternatives": [
+        2,
+        2
+      ]
+    },
+    "dissent_ledger": [
+      {
+        "issue": "Product-level rebates, margins, sustaining cost and post-exclusivity tails do not reproduce marketed-product values.",
+        "impact": "high",
+        "status": "unresolved",
+        "owner_response": null
+      }
+    ]
+  },
+  "component_review": {
+    "status": "ready_for_committee_review",
+    "decision_rule": "Each assigned rater records accept, challenge, or reject with a proposed range and evidence. The aggregator may not silently average disputed ranges.",
+    "items": [
+      {
+        "component_id": "legacy_products",
+        "label": "Legacy marketed products",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 35.0,
+          "base": 55.0,
+          "high": 75.0
+        },
+        "range_width_pct_of_base": 72.7,
+        "evidence_tier": "analyst_estimate",
+        "recommended_raters": [
+          "hohn",
+          "marathon_capital_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "growth_products",
+        "label": "Growth marketed products",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 25.0,
+          "base": 55.0,
+          "high": 95.0
+        },
+        "range_width_pct_of_base": 127.3,
+        "evidence_tier": "analyst_estimate",
+        "recommended_raters": [
+          "hohn",
+          "marathon_capital_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "pipeline",
+        "label": "Research pipeline",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 20.0,
+          "base": 60.0,
+          "high": 130.0
+        },
+        "range_width_pct_of_base": 183.3,
+        "evidence_tier": "analyst_estimate",
+        "recommended_raters": [
+          "klarman_asset_value",
+          "hk"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "apellis_assets",
+        "label": "Apellis marketed and pipeline assets",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 20.0,
+          "base": 45.0,
+          "high": 75.0
+        },
+        "range_width_pct_of_base": 122.2,
+        "evidence_tier": "analyst_estimate",
+        "recommended_raters": [
+          "klarman_asset_value",
+          "hk"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "net_debt_acquisition_and_cvrs",
+        "label": "Net debt, acquisition financing, and CVRs",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": -70.0,
+          "base": -55.0,
+          "high": -40.0
+        },
+        "range_width_pct_of_base": 54.5,
+        "evidence_tier": "analyst_estimate",
+        "recommended_raters": [
+          "marks_credit_cycle",
+          "pabrai"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "patent_failure_and_burn_reserve",
+        "label": "Patent, clinical-failure, and cash-burn reserve",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": -25.0,
+          "base": -15.0,
+          "high": -5.0
+        },
+        "range_width_pct_of_base": 133.3,
+        "evidence_tier": "analyst_estimate",
+        "recommended_raters": [
+          "marks_credit_cycle",
+          "pabrai"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      }
+    ]
+  },
+  "gates": {
+    "price": "pass",
+    "shares": "pass",
+    "reporting_period": "pass",
+    "filing_reconciliation": "pass",
+    "economic_claim": "pass",
+    "component_completeness": "pass",
+    "comparable_evidence": "pass",
+    "option_risking": "pass",
+    "disclosure_scan": "partial",
+    "short_scan": "partial",
+    "pre_mortem": "pass",
+    "evidence_tribunal": "blocked",
+    "valuation_reconciliation": "blocked",
+    "adversarial_review": "pass",
+    "chair_synthesis": "blocked",
+    "explanation_contracts": "pass",
+    "independent_groups": "pass",
+    "owner": "not_run"
+  },
+  "human_decision": {
+    "status": "pending",
+    "decision": null,
+    "sizing": null,
+    "top_dissent_response": null,
+    "decided_at": null
+  },
+  "monitoring_plan": {
+    "operational_milestones": [
+      "Quarterly product revenue and collaboration economics",
+      "Litifilimab and other registrational readouts",
+      "Post-Apellis debt, integration and CVR liability"
+    ],
+    "evidence_refresh_dates": [
+      "2026-07-31",
+      "2026-10-31",
+      "2027-02-28"
+    ],
+    "valuation_refresh_triggers": [
+      "Q2 2026 Form 10-Q",
+      "Material trial or regulatory result",
+      "Patent or reimbursement change"
+    ],
+    "price_review_thresholds": [
+      "Re-underwrite after a 20% price move or material probability update"
+    ],
+    "thesis_break_conditions": [
+      "Growth products do not offset legacy erosion after commercial cost",
+      "Post-close claims exceed value of acquired assets",
+      "Multiple material late-stage branches fail together"
+    ],
+    "expected_catalyst_dates": [
+      "Q2 2026 Form 10-Q",
+      "Second-half 2026 litifilimab SLE readouts",
+      "2027 CLE and renal readouts"
+    ],
+    "outcome_horizons_months": [
+      6,
+      12,
+      24
+    ]
+  },
+  "final_state": "evidence_blocked",
+  "provenance": {
+    "prompt_version": "production-isolated-rater-2",
+    "model": "external isolated raters assembled deterministically",
+    "schema_path": "_system/templates/committee_schema.json",
+    "persona_registry_version": "1.1"
+  }
+}

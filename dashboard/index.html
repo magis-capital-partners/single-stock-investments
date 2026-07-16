@@ -549,6 +549,53 @@
     flex-wrap: wrap;
     gap: 12px;
   }
+  .component-value-card { overflow: hidden; }
+  .valuation-workbench {
+    overflow: hidden; border: 1px solid rgba(59, 130, 246, .42); border-radius: 10px;
+    background: linear-gradient(145deg, rgba(59, 130, 246, .08), rgba(15, 23, 42, .35));
+    padding: 14px;
+  }
+  .workbench-head { display: flex; justify-content: space-between; gap: 14px; align-items: flex-start; }
+  .workbench-head h3 { margin-bottom: 4px; }
+  .workbench-head .research-link { flex: 0 0 auto; }
+  .workbench-tabs { display: flex; gap: 5px; overflow-x: auto; margin: 13px -14px 0; padding: 0 14px; border-bottom: 1px solid var(--border); }
+  .workbench-tab { border: 0; border-bottom: 2px solid transparent; color: var(--text-muted); background: transparent; padding: 8px 9px; font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+  .workbench-tab.active { color: var(--accent-cyan); border-bottom-color: var(--accent-cyan); }
+  .workbench-page { display: none; padding-top: 13px; }
+  .workbench-page.active { display: block; }
+  .workbench-callout { padding: 10px 12px; margin-top: 10px; border-left: 3px solid var(--accent-blue); border-radius: 0 6px 6px 0; background: rgba(59, 130, 246, .08); font-size: 12px; line-height: 1.5; }
+  .workbench-progress { height: 6px; background: var(--border); border-radius: 999px; overflow: hidden; margin-top: 7px; }
+  .workbench-progress > span { display: block; height: 100%; background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan)); }
+  .workbench-list { display: grid; gap: 8px; margin-top: 10px; }
+  .workbench-item { padding: 10px 11px; border: 1px solid var(--border); border-radius: 7px; background: rgba(13, 20, 36, .62); }
+  .workbench-item-head { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
+  .workbench-item-title { font-size: 12px; font-weight: 700; line-height: 1.4; }
+  .workbench-item p { margin-top: 6px; color: var(--text-secondary); font-size: 11px; line-height: 1.5; }
+  .workbench-item-meta { margin-top: 6px; color: var(--text-muted); font-size: 10px; line-height: 1.45; }
+  .workbench-checks { margin: 8px 0 0 18px; color: var(--text-secondary); font-size: 11px; line-height: 1.5; }
+  .workbench-checks li { margin-bottom: 5px; }
+  .workbench-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 11px; }
+  .workbench-table th, .workbench-table td { padding: 7px 6px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .workbench-table th { color: var(--text-muted); font-size: 9px; text-transform: uppercase; letter-spacing: .5px; }
+  @media (max-width: 620px) { .workbench-head { display: block; } .workbench-head .research-link { margin-top: 7px; } }
+  .component-range-track { position: relative; height: 18px; margin: 18px 4px 6px; border-radius: 999px; background: var(--bg-card); border: 1px solid var(--border); }
+  .component-range-band { position: absolute; top: 3px; bottom: 3px; border-radius: 999px; background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan)); opacity: .85; }
+  .component-price-marker { position: absolute; top: -7px; bottom: -7px; width: 2px; background: var(--accent-amber); }
+  .component-price-label { position: absolute; top: -23px; transform: translateX(-50%); color: var(--accent-amber); font: 700 10px var(--mono); white-space: nowrap; }
+  .component-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 12px; }
+  .component-table th { color: var(--text-muted); font-size: 10px; text-transform: uppercase; letter-spacing: .5px; text-align: right; padding: 6px 5px; border-bottom: 1px solid var(--border); }
+  .component-table th:first-child, .component-table td:first-child { text-align: left; }
+  .component-table td { padding: 8px 5px; border-bottom: 1px solid var(--border); text-align: right; vertical-align: top; }
+  .component-method { color: var(--text-muted); font-size: 10px; margin-top: 2px; }
+  .component-driver { display: inline-block; margin-top: 4px; padding: 2px 6px; border: 1px solid var(--border); border-radius: 999px; color: var(--accent-cyan); font: 700 9px var(--mono); text-transform: uppercase; letter-spacing: .35px; }
+  .component-assumption { max-width: 520px; margin-top: 5px; color: var(--text-secondary); font-size: 10px; line-height: 1.45; }
+  .component-buckets { display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 8px; margin: 14px 0 8px; }
+  .component-bucket { padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-card); }
+  .component-bucket .k { color: var(--text-muted); font-size: 9px; text-transform: uppercase; letter-spacing: .5px; }
+  .component-bucket .v { margin-top: 4px; font: 700 17px var(--mono); }
+  .component-bucket-bar { height: 4px; margin-top: 8px; border-radius: 999px; background: var(--accent-blue); opacity: .85; }
+  .component-embedded { color: var(--accent-purple); font-size: 10px; font-weight: 700; }
+  @media (max-width: 620px) { .component-table .component-method-col { display: none; } }
   .device-code-box { margin: 16px 0; line-height: 1.6; }
   .device-code {
     font-size: 28px; letter-spacing: 4px; font-weight: 700;
@@ -606,9 +653,9 @@
             <th data-sort="last_download">Download</th>
             <th data-sort="classification.archetype">Archetype</th>
             <th data-sort="classification.investment_sleeve_label">Sleeve</th>
-            <th data-sort="classification.analysis_irr_pct">House IRR</th>
-            <th data-sort="decision_summary.lens_blend_pct">Lens blend</th>
-            <th data-sort="decision_summary.lens_delta">Lens Δ</th>
+            <th data-sort="component_valuation.total_equity_value_per_share.base">Value range</th>
+            <th data-sort="component_valuation.upside_downside_pct.base">Price vs base</th>
+            <th data-sort="component_valuation.status">Valuation</th>
             <th data-sort="classification.stance">Stance</th>
             <th data-sort="index_membership.priority_score">Index</th>
             <th data-sort="essential_insights.status.label">Insight</th>
@@ -1029,6 +1076,26 @@ function irrClass(pct) {
   return 'irr-fail';
 }
 
+function renderValueRangeCell(t) {
+  const r = t.component_valuation?.total_equity_value_per_share;
+  if (!r || r.low == null || r.base == null || r.high == null) return '<span class="mono" style="color:var(--text-muted)">incomplete</span>';
+  return `<span class="mono">$${fmtNum(r.low,0)}–$${fmtNum(r.high,0)}<span class="irr-sub">base $${fmtNum(r.base,0)}</span></span>`;
+}
+
+function renderPriceToBaseCell(t) {
+  const pct = t.component_valuation?.upside_downside_pct?.base;
+  if (pct == null) return '<span class="mono" style="color:var(--text-muted)">—</span>';
+  const cls = pct >= 0 ? 'irr-pass' : 'irr-fail';
+  return `<span class="irr-cell ${cls}">${pct > 0 ? '+' : ''}${fmtPct(pct)}</span>`;
+}
+
+function renderValuationStatusCell(t) {
+  const cv = t.component_valuation;
+  if (!cv) return '<span class="badge badge-warn">missing</span>';
+  if (cv.status === 'complete' && cv.all_material_components_identified) return '<span class="badge badge-ok">complete</span>';
+  return '<span class="badge badge-warn">operating-only</span>';
+}
+
 function renderIrrCell(t) {
   const implied = t.classification?.implied_irr;
   const pct = t.classification?.analysis_irr_pct ?? parseIrrPct(implied);
@@ -1117,6 +1184,274 @@ function fmtPct(v) {
   return `${Number(v).toFixed(1)}%`;
 }
 
+function fmtSignedDollar(v) {
+  if (v == null || Number.isNaN(Number(v))) return '—';
+  const n = Number(v);
+  return `${n > 0 ? '+' : n < 0 ? '−' : ''}$${fmtNum(Math.abs(n))}`;
+}
+
+function workbenchStatusBadge(status) {
+  const text = String(status || 'pending').replace(/_/g, ' ');
+  const good = ['outcome_tracking', 'ready_to_assemble', 'measured', 'complete', 'clear'];
+  const bad = ['critical_gaps_open', 'due'];
+  return `<span class="badge ${good.includes(status) ? 'badge-ok' : bad.includes(status) ? 'badge-bad' : 'badge-warn'}">${escapeHtml(text)}</span>`;
+}
+
+function renderValuationWorkbench(t) {
+  const wb = t.valuation_workbench;
+  if (!wb) return '';
+  const decision = wb.decision || {};
+  const business = wb.business || {};
+  const valuation = wb.valuation || {};
+  const optionality = wb.optionality || {};
+  const committee = wb.committee || {};
+  const evidence = wb.evidence || {};
+  const method = wb.method_fit || {};
+  const outcomes = wb.outcomes || {};
+  const attribution = wb.attribution || {};
+  const progress = committee.analysis_progress || {};
+  const progressPct = progress.required ? Math.min(100, Number(progress.completed || 0) / Number(progress.required) * 100) : 0;
+  const decisionPage = `
+    <div class="metric-grid metric-grid-3">
+      <div class="metric"><div class="k">Decision readiness</div><div class="v">${workbenchStatusBadge(decision.status)}</div></div>
+      <div class="metric"><div class="k">Price / base value</div><div class="v mono">$${fmtNum(decision.price_per_share)} / $${fmtNum(decision.value_per_share?.base)}</div></div>
+      <div class="metric"><div class="k">Base annual return</div><div class="v mono">${fmtPct(decision.annualized_return_at_price_pct?.base)}</div></div>
+    </div>
+    <div class="metric-grid metric-grid-3" style="margin-top:9px">
+      <div class="metric"><div class="k">Low / high value</div><div class="v mono">$${fmtNum(decision.value_per_share?.low)} / $${fmtNum(decision.value_per_share?.high)}</div></div>
+      <div class="metric"><div class="k">Unvalued components</div><div class="v mono">${Number(decision.unvalued_component_count || 0)}</div></div>
+      <div class="metric"><div class="k">Evidence blockers</div><div class="v mono">${Number(decision.unresolved_evidence_count || 0)}</div></div>
+    </div>
+    <div class="workbench-callout"><strong>Power zone:</strong> ${escapeHtml(decision.primary_power_zone || 'review required')}<br><strong>Next:</strong> ${escapeHtml(decision.next_action || 'Complete evidence and committee gates.')}</div>`;
+  const ownershipRows = (business.components || []).map(row => `<tr><td><strong>${escapeHtml(row.label || row.component_id)}</strong><div class="tier-sub">${escapeHtml(row.category || '')} · ${escapeHtml(row.treatment || '')}</div></td><td>${escapeHtml(row.ownership_claim || '')}</td><td class="mono">$${fmtNum(row.range_per_share?.low)} / $${fmtNum(row.range_per_share?.base)} / $${fmtNum(row.range_per_share?.high)}</td><td>${escapeHtml(row.assumption_type || '')}</td></tr>`).join('');
+  const businessPage = `<div class="metric-grid metric-grid-3"><div class="metric"><div class="k">Ownership map</div><div class="v">${workbenchStatusBadge(business.status)}</div></div><div class="metric"><div class="k">Facts / estimates</div><div class="v mono">${(business.facts || []).length} / ${(business.estimates || []).length}</div></div><div class="metric"><div class="k">Judgments</div><div class="v mono">${(business.judgments || []).length}</div></div></div><table class="workbench-table"><thead><tr><th>Component</th><th>Economic claim</th><th>Low / base / high</th><th>Input type</th></tr></thead><tbody>${ownershipRows}</tbody></table>`;
+  const valueDrivers = (valuation.scenario_contract?.top_value_drivers || []).map(row => `<tr><td><strong>${escapeHtml(row.label || row.component_id)}</strong></td><td class="mono">$${fmtNum(row.base_per_share)}</td><td class="mono">$${fmtNum(row.range_width_per_share)}</td></tr>`).join('');
+  const valuationPage = `<div class="metric-grid metric-grid-3"><div class="metric"><div class="k">Market cap</div><div class="v mono">${valuation.market?.market_cap_m == null ? '—' : '$' + fmtNum(valuation.market.market_cap_m) + 'm'}</div></div><div class="metric"><div class="k">Base value</div><div class="v mono">$${fmtNum(valuation.valuation?.value_per_share?.base)}</div></div><div class="metric"><div class="k">Low-case downside</div><div class="v mono">${fmtPct(valuation.valuation?.downside_to_low_pct)}</div></div></div><div class="workbench-callout">${escapeHtml(valuation.scenario_contract?.rule || '')}</div>${valueDrivers ? `<h4 style="margin:13px 0 0">Largest uncertainty drivers</h4><table class="workbench-table"><thead><tr><th>Component</th><th>Base / share</th><th>Range width</th></tr></thead><tbody>${valueDrivers}</tbody></table>` : ''}`;
+  const optionRows = (optionality.options || []).map(row => `<tr><td><strong>${escapeHtml(row.label || row.component_id)}</strong></td><td>${escapeHtml(row.method || '')}</td><td class="mono">$${fmtNum(row.range_per_share?.low)} / $${fmtNum(row.range_per_share?.base)} / $${fmtNum(row.range_per_share?.high)}</td><td>${escapeHtml(row.falsifier || '')}</td></tr>`).join('');
+  const optionalityPage = `<div class="metric-grid metric-grid-3"><div class="metric"><div class="k">Optionality</div><div class="v">${workbenchStatusBadge(optionality.status)}</div></div><div class="metric"><div class="k">Explicit options</div><div class="v mono">${Number(optionality.option_count || 0)}</div></div></div><div class="workbench-callout">${escapeHtml(optionality.rule || '')}</div>${optionRows ? `<table class="workbench-table"><thead><tr><th>Option</th><th>Method</th><th>Low / base / high</th><th>Falsifier</th></tr></thead><tbody>${optionRows}</tbody></table>` : '<div class="summary" style="margin-top:10px">No separately material option has been identified; this is an explicit treatment, not an unvalued asset.</div>'}`;
+  const committeePage = `
+    <div class="metric-grid metric-grid-3">
+      <div class="metric"><div class="k">Committee state</div><div class="v">${workbenchStatusBadge(committee.status)}</div></div>
+      <div class="metric"><div class="k">Independent outputs</div><div class="v mono">${Number(progress.completed || 0)} / ${Number(progress.required || 0)}</div><div class="workbench-progress"><span style="width:${progressPct}%"></span></div></div>
+      <div class="metric"><div class="k">Owner decision</div><div class="v">${escapeHtml(committee.owner_decision || committee.owner_status || 'pending')}</div></div>
+    </div>
+    <div class="workbench-callout"><strong>Next action:</strong> ${escapeHtml(committee.next_action || 'Freeze evidence and begin independent review.')}</div>
+    ${(committee.selected_raters || []).length ? `<div class="tier-sub" style="margin-top:9px"><strong>Independent methods:</strong> ${committee.selected_raters.map(x => escapeHtml(String(x).replace(/_/g, ' '))).join(' &middot; ')}</div>` : ''}
+    ${(committee.missing_outputs || []).length ? `<details style="margin-top:9px"><summary class="tier-sub">Missing review outputs (${committee.missing_outputs.length})</summary><div class="workbench-item-meta mono">${committee.missing_outputs.map(escapeHtml).join('<br>')}</div></details>` : ''}
+    ${committee.strongest_dissent ? `<div class="workbench-item" style="margin-top:10px"><div class="workbench-item-title">Strongest dissent</div><p>${escapeHtml(committee.strongest_dissent)}</p></div>` : ''}`;
+  const gapRows = (evidence.gaps || []).map(gap => `
+    <div class="workbench-item">
+      <div class="workbench-item-head"><div class="workbench-item-title">${escapeHtml(gap.question || gap.id)}</div><span class="badge ${gap.priority === 'critical' ? 'badge-bad' : 'badge-warn'}">${escapeHtml(gap.priority || 'open')}</span></div>
+      <p><strong>Need:</strong> ${escapeHtml(gap.evidence_required || 'Primary evidence required.')}</p>
+      <p><strong>Close when:</strong> ${escapeHtml(gap.acceptance_test || 'Evidence is reconciled to the valuation.')}</p>
+      <div class="workbench-item-meta">Value exposed: ${gap.base_value_exposure_per_share == null ? 'not isolated' : '$' + fmtNum(gap.base_value_exposure_per_share) + ' / share'}${(gap.component_ids || []).length ? ` &middot; ${(gap.component_ids || []).map(escapeHtml).join(' &middot; ')}` : ''}</div>
+    </div>`).join('');
+  const evidencePage = `
+    <div class="metric-grid metric-grid-3">
+      <div class="metric"><div class="k">Evidence status</div><div class="v">${workbenchStatusBadge(evidence.status)}</div></div>
+      <div class="metric"><div class="k">Open gaps</div><div class="v mono">${Number(evidence.open_count || 0)}</div></div>
+      <div class="metric"><div class="k">Critical gaps</div><div class="v mono">${Number(evidence.critical_count || 0)}</div></div>
+    </div><div class="workbench-list">${gapRows || '<div class="summary">No open evidence gaps.</div>'}</div>`;
+  const cohortRows = (method.validation_cohort || []).map(row => `<tr><td><strong>${escapeHtml(row.ticker || '—')}</strong></td><td>${escapeHtml(String(row.archetype || '').replace(/_/g, ' '))}</td><td>${escapeHtml(row.purpose || '')}</td><td>${workbenchStatusBadge(row.status)}</td></tr>`).join('');
+  const methodPage = `
+    <div class="metric-grid metric-grid-3">
+      <div class="metric"><div class="k">Primary power zone</div><div class="v">${escapeHtml(method.label || 'Unclassified')}</div></div>
+      <div class="metric"><div class="k">Primary methods</div><div class="v" style="font-size:11px">${(method.primary_personas || []).map(x => escapeHtml(String(x).replace(/_/g, ' '))).join(' &middot; ') || '—'}</div></div>
+      <div class="metric"><div class="k">Cross-check methods</div><div class="v" style="font-size:11px">${(method.cross_check_personas || []).map(x => escapeHtml(String(x).replace(/_/g, ' '))).join(' &middot; ') || '—'}</div></div>
+    </div>
+    <div class="workbench-callout">${escapeHtml(method.rule || '')}</div>
+    <div class="workbench-item" style="margin-top:10px"><div class="workbench-item-title">Applicability tests</div><ol class="workbench-checks">${(method.applicability_tests || []).map(x => `<li>${escapeHtml(x)}</li>`).join('')}</ol></div>
+    <div class="workbench-item" style="margin-top:8px"><div class="workbench-item-title">Known failure modes</div><ul class="workbench-checks">${(method.failure_modes || []).map(x => `<li>${escapeHtml(x)}</li>`).join('')}</ul></div>
+    ${cohortRows ? `<h4 style="margin:13px 0 0">Cross-archetype validation queue</h4><table class="workbench-table"><thead><tr><th>Ticker</th><th>Archetype</th><th>What it tests</th><th>Status</th></tr></thead><tbody>${cohortRows}</tbody></table>` : ''}`;
+  const outcomeRows = (outcomes.schedule || []).map(slot => `<tr><td>${Number(slot.horizon_months || 0)} months</td><td class="mono">${escapeHtml(slot.target_date || 'starts after owner decision')}</td><td>${workbenchStatusBadge(slot.status)}</td><td class="mono">${slot.total_return_pct == null ? '—' : fmtPct(slot.total_return_pct)}</td></tr>`).join('');
+  const outcomesPage = `
+    <div class="metric-grid metric-grid-3">
+      <div class="metric"><div class="k">Tracking state</div><div class="v">${workbenchStatusBadge(outcomes.status)}</div></div>
+      <div class="metric"><div class="k">Recorded outcomes</div><div class="v mono">${Number(outcomes.recorded_outcome_count || 0)}</div></div>
+      <div class="metric"><div class="k">Reweighting threshold</div><div class="v mono">${Number(outcomes.minimum_persona_outcomes_before_reweighting || 20)} / persona</div></div>
+    </div>
+    <table class="workbench-table"><thead><tr><th>Horizon</th><th>Target</th><th>Status</th><th>Total return</th></tr></thead><tbody>${outcomeRows}</tbody></table>
+    <div class="workbench-callout">${escapeHtml(outcomes.weighting_rule || '')}</div>`;
+  const attributionDrivers = (attribution.drivers || []).slice(0, 10).map(row => `<tr><td><strong>${escapeHtml(row.label || row.component_id)}</strong></td><td class="mono">${fmtSignedDollar(row.change_per_share)}</td><td>${(row.causes || []).map(x => escapeHtml(String(x).replace(/_/g, ' '))).join(' &middot; ')}</td></tr>`).join('');
+  const categoryRows = Object.entries(attribution.category_totals_per_share || {}).map(([key, value]) => `<div class="metric"><div class="k">${escapeHtml(key.replace(/_/g, ' '))}</div><div class="v mono">${fmtSignedDollar(value)}</div></div>`).join('');
+  const attributionPage = attribution.status === 'baseline_established' ? `
+    <div class="metric-grid metric-grid-3"><div class="metric"><div class="k">Current baseline</div><div class="v mono">$${fmtNum(attribution.current?.base)}</div></div><div class="metric"><div class="k">As of</div><div class="v mono">${escapeHtml(attribution.current?.as_of || '—')}</div></div><div class="metric"><div class="k">Attribution</div><div class="v">${workbenchStatusBadge(attribution.status)}</div></div></div>
+    <div class="workbench-callout">${escapeHtml(attribution.explanation || '')}</div>` : `
+    <div class="metric-grid metric-grid-3"><div class="metric"><div class="k">Prior base</div><div class="v mono">$${fmtNum(attribution.prior?.base)}</div><div class="tier-sub">${escapeHtml(attribution.prior?.as_of || '—')}</div></div><div class="metric"><div class="k">Current base</div><div class="v mono">$${fmtNum(attribution.current?.base)}</div><div class="tier-sub">${escapeHtml(attribution.current?.as_of || '—')}</div></div><div class="metric"><div class="k">Base change</div><div class="v mono">${fmtSignedDollar(attribution.base_change_per_share)}</div><div class="tier-sub">${fmtPct(attribution.base_change_pct)}</div></div></div>
+    ${categoryRows ? `<div class="metric-grid" style="margin-top:9px">${categoryRows}</div>` : ''}
+    ${attributionDrivers ? `<table class="workbench-table"><thead><tr><th>Component</th><th>Change / share</th><th>Observed cause</th></tr></thead><tbody>${attributionDrivers}</tbody></table>` : ''}
+    <div class="tier-sub" style="margin-top:8px">Unexplained reconciliation: ${fmtSignedDollar(attribution.unexplained_per_share)} &middot; ${escapeHtml(attribution.explanation || '')}</div>`;
+  return `<div class="detail-section valuation-workbench">
+    <div class="workbench-head"><div><h3>Valuation workbench ${workbenchStatusBadge(committee.status)}</h3><div class="tier-sub">One review surface for decisions, evidence, method fit, measured outcomes, and valuation changes &middot; ${escapeHtml(wb.as_of || '—')}</div></div>${wb.github_url ? `<a class="research-link" href="${wb.github_url}" target="_blank" rel="noopener">Audit file &rarr;</a>` : ''}</div>
+    <div class="workbench-tabs" role="tablist">${[['decision','Decision'],['business','Business'],['valuation','Valuation'],['optionality','Optionality'],['evidence','Evidence'],['method','Method fit'],['committee','Committee'],['outcomes','Outcomes'],['attribution','Value changes']].map(([id,label], index) => `<button type="button" class="workbench-tab ${index === 0 ? 'active' : ''}" data-workbench-tab="${id}">${label}</button>`).join('')}</div>
+    <div class="workbench-page active" data-workbench-page="decision">${decisionPage}</div>
+    <div class="workbench-page" data-workbench-page="business">${businessPage}</div>
+    <div class="workbench-page" data-workbench-page="valuation">${valuationPage}</div>
+    <div class="workbench-page" data-workbench-page="optionality">${optionalityPage}</div>
+    <div class="workbench-page" data-workbench-page="committee">${committeePage}</div>
+    <div class="workbench-page" data-workbench-page="evidence">${evidencePage}</div>
+    <div class="workbench-page" data-workbench-page="method">${methodPage}</div>
+    <div class="workbench-page" data-workbench-page="outcomes">${outcomesPage}</div>
+    <div class="workbench-page" data-workbench-page="attribution">${attributionPage}</div>
+  </div>`;
+}
+
+function renderInvestmentCommittee(t) {
+  const ic = t.investment_committee;
+  if (!ic) return '';
+  const blocked = ic.state === 'evidence_blocked';
+  const badge = blocked
+    ? '<span class="badge badge-warn">evidence blocked</span>'
+    : ic.owner_status === 'complete'
+      ? '<span class="badge badge-ok">owner decided</span>'
+      : '<span class="badge badge-warn">decision pending</span>';
+  const split = Object.entries(ic.vote_split || {}).map(([k, v]) => `${v} ${k}`).join(' · ') || '—';
+  const scores = Object.entries(ic.score_medians || {}).map(([k, v]) =>
+    `<div class="metric"><div class="k">${escapeHtml(k.replace(/_/g, ' '))}</div><div class="v mono">${fmtNum(v, 1)} / 5</div></div>`
+  ).join('');
+  const unresolved = (ic.unresolved_items || []).slice(0, 4);
+  return `
+    <div class="detail-section committee-card">
+      <h3>Investment Committee ${badge}</h3>
+      <div class="metric-grid metric-grid-3">
+        <div class="metric"><div class="k">Second-round vote</div><div class="v">${escapeHtml(split)}</div></div>
+        <div class="metric"><div class="k">Owner decision</div><div class="v">${escapeHtml(ic.owner_decision || 'pending')}</div></div>
+        <div class="metric"><div class="k">As of</div><div class="v mono">${escapeHtml(ic.as_of || '—')}</div></div>
+      </div>
+      ${scores ? `<div class="metric-grid" style="margin-top:10px">${scores}</div>` : ''}
+      <div class="summary" style="margin-top:12px"><strong>Strongest dissent:</strong> ${escapeHtml(ic.strongest_dissent || 'Not recorded.')}</div>
+      ${unresolved.length ? `<div class="tier-sub" style="margin-top:8px"><strong>Unresolved:</strong> ${unresolved.map(escapeHtml).join(' · ')}</div>` : ''}
+      <div class="tier-sub" style="margin-top:6px">Independent methods: ${(ic.selected_raters || []).map(x => escapeHtml(String(x).replace(/_/g, ' '))).join(' · ') || '—'}</div>
+    </div>`;
+}
+
+function renderPricingAnalysis(t) {
+  const p = t.pricing_analysis;
+  if (!p) return '';
+  const values = p.component_value_per_share || {};
+  const entry = p.entry_prices?.base || {};
+  const economic = p.economic_value_bridge || {};
+  const grossNav = economic.gross_comparable_nav_per_share || {};
+  const convergence = economic.nav_convergence_entry_prices?.base || {};
+  const economicGroups = (economic.component_groups || []).map(group => {
+    const comparable = group.comparable_value_per_share?.base;
+    const risked = group.risked_present_value_per_share?.base;
+    return `<tr><td><strong>${escapeHtml(group.label || group.id || 'Component')}</strong></td><td>${escapeHtml(group.valuation_basis || '—')}</td><td>${comparable == null ? '—' : '$' + fmtNum(comparable)}</td><td>${risked == null ? '—' : '$' + fmtNum(risked)}</td></tr>`;
+  }).join('');
+  const economicHtml = economic.method ? `
+      <div class="economic-value-bridge" style="margin-top:14px">
+        <h4 style="margin:0 0 8px">Economic value bridge</h4>
+        <div class="tier-sub"><strong>GAAP role:</strong> ${escapeHtml(economic.gaap_role || 'Reference only')}</div>
+        ${grossNav.base == null ? '' : `<div class="metric-grid metric-grid-3" style="margin-top:10px">
+          <div class="metric"><div class="k">Comparable NAV low</div><div class="v mono">$${fmtNum(grossNav.low)}</div></div>
+          <div class="metric"><div class="k">Comparable NAV base</div><div class="v mono">$${fmtNum(grossNav.base)}</div><div class="tier-sub">${fmtPct(economic.gross_comparable_upside_downside_pct?.base)} vs price</div></div>
+          <div class="metric"><div class="k">Comparable NAV high</div><div class="v mono">$${fmtNum(grossNav.high)}</div></div>
+        </div>`}
+        ${convergence['15pct'] == null ? '' : `<div class="tier-sub" style="margin-top:8px"><strong>15% base NAV-convergence entry:</strong> $${fmtNum(convergence['15pct'])} · separate from owner-cash entry</div>`}
+        ${economicGroups ? `<table class="component-table" style="margin-top:10px"><thead><tr><th>Economic component</th><th class="component-method-col">Comparable basis</th><th>Comparable base</th><th>Risked base</th></tr></thead><tbody>${economicGroups}</tbody></table>` : ''}
+      </div>` : '';
+  const decision = String(p.decision || 'pending').replace(/_/g, ' ');
+  const badgeClass = String(p.decision || '').startsWith('reject') ? 'badge-bad' : 'badge-warn';
+  return `
+    <div class="detail-section component-value-card">
+      <h3>Pricing decision <span class="badge ${badgeClass}">${escapeHtml(decision)}</span></h3>
+      <div class="metric-grid metric-grid-3">
+        <div class="metric"><div class="k">Current price</div><div class="v mono">$${fmtNum(p.price)}</div></div>
+        <div class="metric"><div class="k">Base component value</div><div class="v mono">$${fmtNum(values.base)}</div><div class="tier-sub">${fmtPct(p.upside_downside_pct?.base)} vs price</div></div>
+        <div class="metric"><div class="k">15% owner-cash entry</div><div class="v mono">$${fmtNum(p.entry_price_15pct_base)}</div></div>
+      </div>
+      <div class="metric-grid" style="margin-top:10px">
+        <div class="metric"><div class="k">10% hurdle</div><div class="v mono">$${fmtNum(entry['10pct'])}</div></div>
+        <div class="metric"><div class="k">12% hurdle</div><div class="v mono">$${fmtNum(entry['12pct'])}</div></div>
+        <div class="metric"><div class="k">15% hurdle</div><div class="v mono">$${fmtNum(entry['15pct'])}</div></div>
+        <div class="metric"><div class="k">20% hurdle</div><div class="v mono">$${fmtNum(entry['20pct'])}</div></div>
+      </div>
+      <div class="summary" style="margin-top:12px">${escapeHtml(p.conclusion || '')}</div>
+      ${economicHtml}
+      <div class="tier-sub" style="margin-top:8px"><strong>Price-implied owner-cash growth:</strong> ${fmtPct(p.implied_growth_pct)} · <strong>Current/contracted support:</strong> $${fmtNum(p.current_supported_value)} · <strong>Price paid for growth/options:</strong> $${fmtNum(p.market_price_above_supported_value)}</div>
+      <div class="tier-sub" style="margin-top:8px"><strong>Strongest counter-case:</strong> ${escapeHtml(p.strongest_counter_explanation || '—')}</div>
+      <div class="tier-sub" style="margin-top:8px"><strong>Economic claim:</strong> ${escapeHtml(p.economic_claim_note || '—')}</div>
+      ${p.committee_routing ? `<div class="tier-sub" style="margin-top:8px"><strong>Committee:</strong> ${escapeHtml(String(p.committee_routing.stage || 'pending').replace(/_/g, ' '))} · ${(p.committee_routing.selected_raters || []).map(x => escapeHtml(String(x).replace(/_/g, ' '))).join(' · ')}</div>` : ''}
+    </div>`;
+}
+
+function renderComponentValuation(t) {
+  const cv = t.component_valuation;
+  if (!cv) return '';
+  const total = cv.total_equity_value_per_share || {};
+  const low = Number(total.low), base = Number(total.base), high = Number(total.high);
+  if (![low, base, high].every(Number.isFinite)) return '';
+  const price = Number(cv.market_price_per_share);
+  const scale = Math.max(high, Number.isFinite(price) ? price : 0, 1) * 1.08;
+  const left = Math.max(0, Math.min(100, low / scale * 100));
+  const right = Math.max(left, Math.min(100, high / scale * 100));
+  const priceLeft = Number.isFinite(price) ? Math.max(0, Math.min(100, price / scale * 100)) : null;
+  const upside = cv.upside_downside_pct || {};
+  const components = cv.components || [];
+  const bucketDefs = [
+    ['Operating engines', ['operating_business', 'infrastructure'], 'var(--accent-cyan)'],
+    ['Strategic options', ['real_option'], 'var(--accent-purple)'],
+    ['Cash & contracts', ['financial_asset'], 'var(--accent-blue)'],
+    ['Reserves', ['liability_or_reserve'], 'var(--accent-amber)'],
+  ];
+  const bucketValues = bucketDefs.map(([label, categories, color]) => ({
+    label, color,
+    value: components.filter(c => c.treatment !== 'embedded' && categories.includes(c.category))
+      .reduce((sum, c) => sum + (Number(c.base_per_share) || 0), 0),
+  }));
+  const maxBucket = Math.max(...bucketValues.map(x => Math.abs(x.value)), 1);
+  const bucketHtml = bucketValues.map(x => `<div class="component-bucket">
+    <div class="k">${escapeHtml(x.label)}</div><div class="v">${x.value < 0 ? '−' : ''}$${fmtNum(Math.abs(x.value))}</div>
+    <div class="component-bucket-bar" style="width:${Math.max(3, Math.abs(x.value) / maxBucket * 100)}%;background:${x.color}"></div>
+  </div>`).join('');
+  const badge = cv.status === 'complete' && cv.all_material_components_identified
+    ? '<span class="badge badge-ok">complete schedule</span>'
+    : '<span class="badge badge-warn">operating fallback</span>';
+  const economic = cv.economic_value || {};
+  const proof = economic.valuation_proof || [];
+  const economicBadge = economic.status === 'complete'
+    ? '<span class="badge badge-ok">economic proof complete</span>'
+    : economic.status ? `<span class="badge badge-warn">${escapeHtml(economic.status.replace(/_/g, ' '))}</span>` : '';
+  const proofRows = proof.map(row => `<tr>
+    <td><strong>${escapeHtml(row.economic_claim || row.component_id || 'Claim')}</strong><div class="component-method">${escapeHtml(row.quantity?.value == null ? '—' : `${row.quantity.value} ${row.quantity.unit || ''}`)}</div></td>
+    <td class="component-method-col"><div>${escapeHtml(row.method || '—')}</div><div class="component-method">${escapeHtml((row.comparable_ids || []).join(' · ') || row.comparable_role || '—')}</div><div class="component-assumption">${escapeHtml(row.adjustment || '')}</div></td>
+    <td class="mono">$${fmtNum(row.range_per_share?.low)}</td><td class="mono">$${fmtNum(row.range_per_share?.base)}</td><td class="mono">$${fmtNum(row.range_per_share?.high)}</td>
+    <td><div class="component-method">${escapeHtml(row.overlap_control || row.overlap_key || '—')}</div>${row.risk_and_timing ? `<div class="component-assumption"><strong>Risk/timing:</strong> ${row.risk_and_timing.success_probability == null ? 'risked range' : fmtPct(Number(row.risk_and_timing.success_probability) * 100)} · ${escapeHtml(row.risk_and_timing.timing_basis || 'timing in range')} · ${row.risk_and_timing.remaining_capital_m == null ? escapeHtml(row.risk_and_timing.remaining_capital_basis || 'capital in range') : '$' + fmtNum(row.risk_and_timing.remaining_capital_m) + 'M remaining capital'}</div>` : ''}<div class="component-assumption"><strong>Falsifier:</strong> ${escapeHtml(row.falsifier || '—')}</div></td>
+  </tr>`).join('');
+  const economicHtml = economic.status ? `<div class="economic-value-bridge" style="margin-top:14px">
+    <h4 style="margin:0 0 8px">Economic valuation proof ${economicBadge}</h4>
+    <div class="tier-sub"><strong>Economic claim:</strong> ${escapeHtml(economic.economic_claim?.description || 'Not stated')}</div>
+    <div class="tier-sub" style="margin-top:4px"><strong>GAAP role:</strong> ${escapeHtml((economic.gaap_role || 'not stated').replace(/_/g, ' '))}${economic.accounting_reference ? ` · ${escapeHtml(economic.accounting_reference)}` : ''}</div>
+    ${(economic.validation_errors || []).length ? `<div class="summary" style="margin-top:8px;color:var(--danger)"><strong>Blocked:</strong> ${(economic.validation_errors || []).map(escapeHtml).join(' · ')}</div>` : ''}
+    ${proofRows ? `<details style="margin-top:10px"><summary>Show complete valuation proof (${proof.length} claims)</summary><table class="component-table" style="margin-top:10px"><thead><tr><th>Economic claim / quantity</th><th class="component-method-col">Method / comparable / adjustment</th><th>Low</th><th>Base</th><th>High</th><th>Overlap / falsifier</th></tr></thead><tbody>${proofRows}</tbody></table></details>` : ''}
+  </div>` : '';
+  return `
+    <div class="detail-section component-value-card">
+      <h3>Valuation ${badge}</h3>
+      <div class="metric-grid metric-grid-3">
+        <div class="metric"><div class="k">Low value / share</div><div class="v mono">$${fmtNum(low)}</div><div class="tier-sub">${fmtPct(upside.low)} vs price</div></div>
+        <div class="metric"><div class="k">Base value / share</div><div class="v mono">$${fmtNum(base)}</div><div class="tier-sub">${fmtPct(upside.base)} vs price</div></div>
+        <div class="metric"><div class="k">High value / share</div><div class="v mono">$${fmtNum(high)}</div><div class="tier-sub">${fmtPct(upside.high)} vs price</div></div>
+      </div>
+      <div class="component-range-track" aria-label="Component valuation range">
+        <div class="component-range-band" style="left:${left}%;width:${right-left}%"></div>
+        ${priceLeft == null ? '' : `<div class="component-price-marker" style="left:${priceLeft}%"><span class="component-price-label">price $${fmtNum(price)}</span></div>`}
+      </div>
+      <div class="component-buckets">${bucketHtml}</div>
+      ${economicHtml}
+      <div class="tier-sub">${escapeHtml(cv.decision_rule || '')}</div>
+      ${cv.review_status ? `<div class="tier-sub" style="margin-top:6px">Committee component review: ${escapeHtml(cv.review_status.replace(/_/g, ' '))} · ${cv.review_open_count || 0} open item(s)</div>` : ''}
+      <table class="component-table">
+        <thead><tr><th>Component</th><th class="component-method-col">Method / evidence</th><th>Low</th><th>Base</th><th>High</th></tr></thead>
+        <tbody>${components.map(c => `<tr>
+          <td><strong>${escapeHtml(c.label || c.id || 'Component')}</strong>${c.treatment === 'embedded' ? '<div class="component-embedded">embedded — not added twice</div>' : ''}</td>
+          <td class="component-method-col"><div>${escapeHtml(c.method || '—')}</div><div class="component-method">${escapeHtml(c.evidence_tier || '')}</div>${c.driver_model_type ? `<div class="component-driver">${escapeHtml(c.driver_model_type.replace(/_/g, ' '))}</div>` : ''}${c.assumption_summary ? `<div class="component-assumption">${escapeHtml(c.assumption_summary)}</div>` : ''}</td>
+          <td class="mono">$${fmtNum(c.low_per_share)}</td><td class="mono">$${fmtNum(c.base_per_share)}</td><td class="mono">$${fmtNum(c.high_per_share)}</td>
+        </tr>`).join('')}</tbody>
+      </table>
+    </div>`;
+}
+
 function renderTotalReturnSection(t) {
   const tr = t.total_return_panel;
   if (!tr) {
@@ -1129,28 +1464,38 @@ function renderTotalReturnSection(t) {
   const status = tr.status || 'pending';
   const statusBadge = status === 'complete'
     ? '<span class="badge badge-ok">complete</span>'
-    : '<span class="badge badge-warn">partial</span>';
-  const chartImg = tr.chart_raw_url && status === 'complete'
+    : `<span class="badge badge-warn">${escapeHtml(status.replace(/_/g, ' '))}</span>`;
+  const chartImg = tr.chart_raw_url && Number(tr.price_points || 0) >= 2
     ? `<div class="tr-chart"><img loading="lazy" src="${tr.chart_raw_url}" alt="${t.ticker} total return chart" /></div>`
     : '';
   const note = status !== 'complete'
-    ? `Price history incomplete (${escapeHtml(tr.error || 'unknown')}). Panel still includes distributions and market-cap estimate when available.`
-    : `History ${escapeHtml(tr.history_start || '—')} to ${escapeHtml(tr.history_end || '—')}.`;
+    ? `${tr.error || 'Distribution coverage is incomplete.'} The return is shown for diagnosis but is not decision-grade.`
+    : `Verified history ${tr.history_start || '—'} to ${tr.history_end || '—'}. ${tr.return_contract || ''}`;
+  const contrib = tr.distribution_contribution_by_type || {};
+  const regular = Number(contrib.regular_dividend || 0) + Number(contrib.trust_distribution || 0);
+  const special = Number(contrib.special_dividend || 0);
+  const other = Object.entries(contrib).filter(([k]) => !['regular_dividend', 'trust_distribution', 'special_dividend'].includes(k)).reduce((s, [,v]) => s + Number(v || 0), 0);
   return `
     <div class="detail-section total-return-panel">
       <h3>Total return panel ${statusBadge}</h3>
       <div class="tr-grid">
-        <div class="metric"><div class="k">Cumulative distributions/share</div><div class="v mono">${fmtNum(tr.cumulative_distributions_per_share)}</div></div>
+        <div class="metric"><div class="k">Cumulative total return</div><div class="v mono">${fmtPct(tr.cumulative_total_return_pct)}</div></div>
         <div class="metric"><div class="k">Total return annualized</div><div class="v mono">${fmtPct(tr.total_return_annualized_pct)}</div></div>
-        <div class="metric"><div class="k">Price-only annualized</div><div class="v mono">${fmtPct(tr.price_only_annualized_pct)}</div></div>
-        <div class="metric"><div class="k">Market cap estimate</div><div class="v mono">${tr.market_cap_m != null ? `$${fmtNum(tr.market_cap_m)}M` : '—'}</div></div>
+        <div class="metric"><div class="k">Cumulative price-only return</div><div class="v mono">${fmtPct(tr.cumulative_price_return_pct)}</div></div>
+        <div class="metric"><div class="k">History begins</div><div class="v mono">${escapeHtml(tr.history_start || '—')}</div><div class="tier-sub">earliest available trading history</div></div>
+      </div>
+      <div class="component-buckets">
+        <div class="component-bucket"><div class="k">Regular distributions</div><div class="v mono">$${fmtNum(regular)}</div></div>
+        <div class="component-bucket"><div class="k">Special distributions</div><div class="v mono">$${fmtNum(special)}</div></div>
+        <div class="component-bucket"><div class="k">Other distributions</div><div class="v mono">$${fmtNum(other)}</div></div>
+        <div class="component-bucket"><div class="k">Events reconciled</div><div class="v mono">${Number(tr.event_count || 0)}</div></div>
       </div>
       ${chartImg}
       <div class="tr-links">
         ${tr.panel_github_url ? `<a class="research-link" href="${tr.panel_github_url}" target="_blank" rel="noopener">Panel JSON →</a>` : ''}
         ${tr.chart_github_url ? `<a class="research-link" href="${tr.chart_github_url}" target="_blank" rel="noopener">Chart file →</a>` : ''}
       </div>
-      <div class="tr-note">${escapeHtml(note)}</div>
+      <div class="tr-note">${escapeHtml(note)} · logarithmic cumulative-return scale · ${escapeHtml(tr.return_currency || tr.currency || '—')} · ${escapeHtml((tr.fx_basis || 'currency basis unknown').replace(/_/g, ' '))}</div>
     </div>`;
 }
 
@@ -2273,9 +2618,9 @@ function renderTable() {
       <td>${t.classification?.investment_sleeve_label && t.classification.investment_sleeve_label !== '—'
         ? `<span class="badge badge-sleeve">${escapeHtml(t.classification.investment_sleeve_label)}</span>`
         : '<span style="color:var(--text-muted)">—</span>'}</td>
-      <td>${renderIrrCell(t)}</td>
-      <td>${renderLensBlendCell(t)}</td>
-      <td>${renderLensDeltaCell(t)}</td>
+      <td>${renderValueRangeCell(t)}</td>
+      <td>${renderPriceToBaseCell(t)}</td>
+      <td>${renderValuationStatusCell(t)}</td>
       <td><span class="badge ${STANCE_BADGE[t.classification?.stance] || 'badge-warn'}">${t.classification?.stance || '—'}</span></td>
       <td>${window.IndexViz ? IndexViz.renderHoldingsCell(t.index_membership) : '—'}</td>
       <td>${renderInsightCell(t)}</td>
@@ -2311,6 +2656,13 @@ function wireDetailEvents(ticker) {
       selectTicker(ticker);
     });
   });
+  detail.querySelectorAll('[data-workbench-tab]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const page = btn.dataset.workbenchTab;
+      detail.querySelectorAll('[data-workbench-tab]').forEach(x => x.classList.toggle('active', x === btn));
+      detail.querySelectorAll('[data-workbench-page]').forEach(x => x.classList.toggle('active', x.dataset.workbenchPage === page));
+    });
+  });
 }
 
 function selectTicker(ticker, opts = {}) {
@@ -2321,23 +2673,16 @@ function selectTicker(ticker, opts = {}) {
   if (!t) return;
   const modelBundle = getEquityModelBundle(ticker);
   const hasModel = modelBundle && modelBundle.model_ready;
-  document.getElementById('main-grid').classList.toggle('model-expanded', !!hasModel);
+  const hasValuationWorkbench = !!t.valuation_workbench;
+  document.getElementById('main-grid').classList.toggle('model-expanded', !!hasModel || hasValuationWorkbench);
   const modelHtml = (typeof EquityModelViz !== 'undefined' && hasModel)
     ? EquityModelViz.renderSection(modelBundle, { escapeHtml, linkHtml })
     : '';
   const developments = detailDevelopments(t);
   const iv = window.InsightsViz;
-  const tier0 = iv && t.decision_summary
-    ? iv.renderDecisionSummary(t.decision_summary, t.human_review, {
-        escapeHtml,
-        renderIrrCell,
-        classification: t.classification,
-      })
-    : '';
+  const tier0 = '';
   const tier1 = iv ? iv.renderIdentityLine(t.classification, escapeHtml) : '';
-  const tier2 = iv && t.lenses
-    ? iv.renderActiveLensChips(t.active_lenses, t.silent_lens_count, expandedPersona, t.lenses, escapeHtml, t.power_zones)
-    : '';
+  const tier2 = '';
   const essentialInsights = iv
     ? iv.renderEssentialInsights(t.essential_insights, escapeHtml, linkHtml)
     : '';
@@ -2408,12 +2753,18 @@ function selectTicker(ticker, opts = {}) {
     <div class="detail-section tier-0">
       <div class="metric-grid metric-grid-3">
         <div class="metric"><div class="k">Stance</div><div class="v"><span class="badge ${STANCE_BADGE[t.classification?.stance] || 'badge-warn'}">${t.classification?.stance || '—'}</span></div></div>
-        <div class="metric"><div class="k">House IRR</div><div class="v">${renderIrrCell(t)}${filingRef}</div></div>
+        <div class="metric"><div class="k">Valuation status</div><div class="v">${renderValuationStatusCell(t)}</div></div>
         <div class="metric"><div class="k">As of</div><div class="v mono">${escapeHtml(t.classification?.analysis_as_of || '—')}</div></div>
       </div>
     </div>`}
 
     ${tier1}
+
+    ${renderPricingAnalysis(t)}
+
+    ${renderValuationWorkbench(t)}
+
+    ${renderComponentValuation(t)}
 
     ${tier2}
 
@@ -2450,8 +2801,6 @@ function selectTicker(ticker, opts = {}) {
         </div>
       </div>
     </div>` : ''}
-
-    ${consensusDetail}
 
     ${modelHtml}
 

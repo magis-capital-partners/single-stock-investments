@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0",
+  "ticker": "TPL",
+  "as_of": "2026-07-15",
+  "status": "evidence_blocked",
+  "purpose": "Reconcile inception-to-present cash distributions and splits separately from vendor total-return calculations.",
+  "verified_periods": [
+    {
+      "start": "2020-01-01",
+      "end": "2026-07-15",
+      "status": "event_level_primary_verified",
+      "source_ref": "TPL/research/distribution_events.json"
+    },
+    {
+      "start": "2017-01-01",
+      "end": "2019-12-31",
+      "status": "annual_total_primary_verified_event_dates_incomplete",
+      "annual_totals_per_pre_2024_split_share": {"2017": 1.35, "2018": 4.05, "2019": 6.0},
+      "regular_and_special_detail": {
+        "2017": {"regular": 0.35, "special": 1.0},
+        "2018": {"regular": 1.05, "special": 3.0},
+        "2019": {"regular": 1.75, "special": 4.25}
+      },
+      "source_url": "https://www.sec.gov/Archives/edgar/data/1811074/000181107421000013/tpl-20201231.htm"
+    },
+    {
+      "start": "2003-01-01",
+      "end": "2007-12-31",
+      "status": "annual_total_primary_verified_event_dates_incomplete",
+      "annual_totals_per_2007_split_adjusted_share": {"2003": 0.15, "2004": 0.45, "2005": 0.11, "2006": 0.55, "2007": 0.16},
+      "source_url": "https://d1io3yog0oux5.cloudfront.net/_9f2766a0e4d31e602fa2b19adad46c06/tpltrust/db/734/5978/annual_report/b1548126676835fbe638394635b24a2d.pdf"
+    }
+  ],
+  "split_controls": [
+    {"effective_date": "1980-02-25", "factor": 3, "status": "primary_verified"},
+    {"effective_date": "2007-07-02", "factor": 5, "status": "primary_verified"},
+    {"effective_date": "2024-03-27", "factor": 3, "status": "primary_verified"},
+    {"effective_date": "2025-12-23", "factor": 3, "status": "primary_verified"}
+  ],
+  "open_periods": [
+    {"start": "1980-03-17", "end": "2002-12-31", "missing": "Primary annual totals and event dates."},
+    {"start": "2003-01-01", "end": "2007-12-31", "missing": "Exact ex-dates and pay dates for each annual distribution."},
+    {"start": "2008-01-01", "end": "2016-12-31", "missing": "Primary annual totals, regular/special classification, and event dates."},
+    {"start": "2017-01-01", "end": "2019-12-31", "missing": "Exact ex-dates for reinvestment reconciliation."}
+  ],
+  "acceptance_test": "Every distribution since the first plotted trading date has a primary-source amount, type, ex-date, pay date where available, split basis, and reconciliation to annual audited totals.",
+  "chart_policy": "Continue displaying earliest vendor trading history, but retain evidence_blocked status until every open period passes the acceptance test. Never invent an event date from an annual total."
+}

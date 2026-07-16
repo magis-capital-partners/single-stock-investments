@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-06-02",
+  "as_of": "2026-07-15",
   "consensus": {
     "agreement_pct": 100,
     "dissents": [],
@@ -9,7 +9,7 @@
   },
   "lenses": [
     {
-      "conviction": 0.795,
+      "conviction": 0.85,
       "criteria_audit": [
         {
           "check": "archetype_any",
@@ -34,7 +34,7 @@
       "key_metrics": [
         {
           "name": "fcf_yield",
-          "value": 2.49
+          "value": 2.3
         }
       ],
       "label": "Chris Hohn / TCI",
@@ -42,7 +42,7 @@
       "metric_count": 1,
       "persona": "hohn",
       "relevance": 1.0,
-      "return_pct": -0.9,
+      "return_pct": -2.0,
       "source": "_system/reference/investment-wisdom/tci/",
       "verdict": "pass"
     },
@@ -72,7 +72,7 @@
       "key_metrics": [
         {
           "name": "downside_upside_ratio",
-          "value": 2.102
+          "value": 2.192
         }
       ],
       "label": "Mohnish Pabrai",
@@ -80,12 +80,12 @@
       "metric_count": 1,
       "persona": "pabrai",
       "relevance": 1.0,
-      "return_pct": -10.3,
+      "return_pct": -11.4,
       "source": "_system/reference/investment-wisdom/pabrai/",
       "verdict": "pass"
     },
     {
-      "conviction": 0.545,
+      "conviction": 0.6,
       "criteria_audit": [
         {
           "check": "archetype_any",
@@ -101,7 +101,7 @@
       "criteria_met": 1,
       "criteria_total": 2,
       "falsifier": "No asset intensity / pricing power (moat eroding + non-croupier)",
-      "horizon_yrs": 7,
+      "horizon_yrs": 6,
       "key_metrics": [
         {
           "name": "archetype",
@@ -113,7 +113,7 @@
       "metric_count": 1,
       "persona": "stahl",
       "relevance": 0.5,
-      "return_pct": -0.9,
+      "return_pct": -2.0,
       "source": "_system/reference/investment-wisdom/stahl/",
       "verdict": "pass"
     },
@@ -134,7 +134,7 @@
       "criteria_met": 1,
       "criteria_total": 2,
       "falsifier": "Moat eroding/unproven or irr_method pending",
-      "horizon_yrs": 7,
+      "horizon_yrs": 6,
       "key_metrics": [
         {
           "name": "moat",
@@ -146,7 +146,7 @@
       "metric_count": 1,
       "persona": "munger",
       "relevance": 0.5,
-      "return_pct": -10.3,
+      "return_pct": -11.4,
       "source": "_system/reference/investment-wisdom/munger/",
       "verdict": "pass"
     },
@@ -171,7 +171,7 @@
       "key_metrics": [
         {
           "name": "earnings_yield",
-          "value": 2.49
+          "value": 2.3
         }
       ],
       "label": "Joel Greenblatt",
@@ -185,7 +185,7 @@
       "why_silent": "Universe criteria not met: earnings_yield_high, quality_proxy"
     },
     {
-      "conviction": 0.638,
+      "conviction": 0.685,
       "criteria_audit": [
         {
           "check": "moat_any",
@@ -206,11 +206,11 @@
       "criteria_met": 1,
       "criteria_total": 3,
       "falsifier": "Eroding moat or dhando none",
-      "horizon_yrs": 7,
+      "horizon_yrs": 6,
       "key_metrics": [
         {
           "name": "owner_earnings_yield",
-          "value": 2.49
+          "value": 2.3
         }
       ],
       "label": "Buffett / Weschler",
@@ -218,7 +218,7 @@
       "metric_count": 1,
       "persona": "buffett_weschler",
       "relevance": 0.5,
-      "return_pct": -0.77,
+      "return_pct": -1.7,
       "source": "_system/reference/investment-wisdom/buffett/",
       "verdict": "pass"
     },
@@ -286,7 +286,121 @@
       "why_silent": "Universe criteria not met: asset_or_event, dated_payoff"
     },
     {
-      "conviction": 0.775,
+      "conviction": 0.7,
+      "criteria_audit": [
+        {
+          "check": "archetype_any",
+          "id": "capacity_sensitive",
+          "met": true
+        },
+        {
+          "check": "capex_or_reinvestment_material",
+          "id": "reinvestment_material",
+          "met": false
+        },
+        {
+          "check": "cycle_not",
+          "id": "cycle_known",
+          "met": true
+        }
+      ],
+      "criteria_met": 2,
+      "criteria_total": 3,
+      "falsifier": "Supply response, reinvestment requirements, or incremental returns cannot be measured.",
+      "horizon_yrs": 5,
+      "key_metrics": [
+        {
+          "name": "incremental_roic",
+          "value": null
+        }
+      ],
+      "label": "Marathon / Capital Returns",
+      "meets_bar": false,
+      "metric_count": 1,
+      "persona": "marathon_capital_cycle",
+      "relevance": 0.5,
+      "return_pct": -2.0,
+      "source": "_system/frameworks/investment_committee_personas.md#marathon--capital-cycle",
+      "verdict": "pass"
+    },
+    {
+      "conviction": 0.7,
+      "criteria_audit": [
+        {
+          "check": "leverage_or_fixed_claims_material",
+          "id": "credit_material",
+          "met": false
+        },
+        {
+          "check": "cycle_not",
+          "id": "cycle_known",
+          "met": true
+        },
+        {
+          "check": "bear_case_present",
+          "id": "stress_modelable",
+          "met": true
+        }
+      ],
+      "criteria_met": 2,
+      "criteria_total": 3,
+      "falsifier": "Debt maturities, refinancing exposure, liquidity, or downside recovery cannot be reconciled.",
+      "horizon_yrs": 3,
+      "key_metrics": [
+        {
+          "name": "net_debt_ebitda",
+          "value": null
+        }
+      ],
+      "label": "Howard Marks / Oaktree",
+      "meets_bar": false,
+      "metric_count": 1,
+      "persona": "marks_credit_cycle",
+      "relevance": 0.5,
+      "return_pct": -2.0,
+      "source": "_system/frameworks/investment_committee_personas.md#howard-marks--credit-cycle",
+      "verdict": "pass"
+    },
+    {
+      "conviction": 0.85,
+      "criteria_audit": [
+        {
+          "check": "payoff_lens_any",
+          "id": "asset_value",
+          "met": false
+        },
+        {
+          "check": "catalyst_present",
+          "id": "realization_path",
+          "met": false
+        },
+        {
+          "check": "dhando_any",
+          "id": "downside_discount",
+          "met": true
+        }
+      ],
+      "criteria_met": 1,
+      "criteria_total": 3,
+      "falsifier": "Asset value lacks an independently evidenced realization path or is already capitalized in operating cash flow.",
+      "horizon_yrs": 3,
+      "key_metrics": [
+        {
+          "name": "asset_nav_per_share",
+          "value": null
+        }
+      ],
+      "label": "Klarman / Baupost",
+      "meets_bar": false,
+      "metric_count": 1,
+      "persona": "klarman_asset_value",
+      "relevance": 0.5,
+      "return_pct": -2.0,
+      "source": "_system/frameworks/investment_committee_personas.md#klarman--catalyst-backed-asset-value",
+      "verdict": "pass"
+    },
+    {
+      "conviction": 0.734,
       "criteria_audit": [
         {
           "check": "always",
@@ -301,7 +415,7 @@
       "key_metrics": [
         {
           "name": "synthesis_pct",
-          "value": -0.5
+          "value": 0.31
         }
       ],
       "label": "Lawrence (house IRR)",
@@ -309,60 +423,81 @@
       "metric_count": 1,
       "persona": "lawrence",
       "relevance": 1.0,
-      "return_pct": -0.5,
+      "return_pct": 0.31,
       "source": "_system/frameworks/lawrence_irr.md",
       "verdict": "pass"
     }
   ],
-  "shared_inputs_ref": "valuation.json@2026-06-02",
+  "shared_inputs_ref": "valuation.json@2026-07-15",
   "ticker": "LB",
   "valuation_blend": {
     "band_pct": [
-      -10.3,
-      -0.5
+      -11.4,
+      0.31
     ],
-    "blended_return_pct": -3.93,
+    "blended_return_pct": -3.94,
     "contributors": [
       {
         "label": "Chris Hohn / TCI",
         "persona": "hohn",
         "relevance": 1.0,
-        "return_pct": -0.9,
+        "return_pct": -2.0,
         "verdict": "pass"
       },
       {
         "label": "Mohnish Pabrai",
         "persona": "pabrai",
         "relevance": 1.0,
-        "return_pct": -10.3,
+        "return_pct": -11.4,
         "verdict": "pass"
       },
       {
         "label": "Murray Stahl",
         "persona": "stahl",
         "relevance": 0.5,
-        "return_pct": -0.9,
+        "return_pct": -2.0,
         "verdict": "pass"
       },
       {
         "label": "Charlie Munger",
         "persona": "munger",
         "relevance": 0.5,
-        "return_pct": -10.3,
+        "return_pct": -11.4,
         "verdict": "pass"
       },
       {
         "label": "Buffett / Weschler",
         "persona": "buffett_weschler",
         "relevance": 0.5,
-        "return_pct": -0.77,
+        "return_pct": -1.7,
+        "verdict": "pass"
+      },
+      {
+        "label": "Marathon / Capital Returns",
+        "persona": "marathon_capital_cycle",
+        "relevance": 0.5,
+        "return_pct": -2.0,
+        "verdict": "pass"
+      },
+      {
+        "label": "Howard Marks / Oaktree",
+        "persona": "marks_credit_cycle",
+        "relevance": 0.5,
+        "return_pct": -2.0,
+        "verdict": "pass"
+      },
+      {
+        "label": "Klarman / Baupost",
+        "persona": "klarman_asset_value",
+        "relevance": 0.5,
+        "return_pct": -2.0,
         "verdict": "pass"
       },
       {
         "label": "Lawrence (house IRR)",
         "persona": "lawrence",
         "relevance": 1.0,
-        "return_pct": -0.5,
+        "return_pct": 0.31,
         "verdict": "pass"
       }
     ],
@@ -372,9 +507,9 @@
       "hk"
     ],
     "low_coverage": false,
-    "median_mean_flag": true,
+    "median_mean_flag": false,
     "unit": "expected_annual_return_at_price",
-    "weighted_median_pct": -0.9
+    "weighted_median_pct": -2.0
   },
-  "valuation_richness": 0.689
+  "valuation_richness": 0.713
 }

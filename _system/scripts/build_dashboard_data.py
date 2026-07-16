@@ -108,7 +108,7 @@ TICKER_META = {
 }
 
 
-SKIP_TICKER_DIRS = {"_system", "dashboard", ".git", ".github", ".cursor", "_external"}
+SKIP_TICKER_DIRS = {"_system", "dashboard", "docs", ".git", ".github", ".cursor", "_external"}
 
 
 def list_tickers() -> list[str]:
@@ -269,6 +269,28 @@ def load_prior_dashboard_rows() -> dict[str, dict]:
     prior = _load_json(OUTPUT) or {}
     rows = prior.get("tickers") or []
     return {str(r.get("ticker")): r for r in rows if r.get("ticker")}
+
+
+def merge_sparse_payload(current: dict, prior: dict) -> dict:
+    """Update present ticker rows without deleting absent rows in a sparse worktree."""
+    current_rows = current.get("tickers") or []
+    prior_rows = prior.get("tickers") or []
+    if len(prior_rows) < 50 or len(current_rows) * 2 >= len(prior_rows):
+        return current
+    updates = {row.get("ticker"): row for row in current_rows if row.get("ticker")}
+    merged = dict(prior)
+    merged["generated_at"] = current.get("generated_at")
+    merged_rows = [updates.pop(row.get("ticker"), row) for row in prior_rows]
+    merged_rows.extend(updates.values())
+    merged["tickers"] = merged_rows
+    summary = dict(prior.get("summary") or {})
+    summary["ticker_count"] = len(merged_rows)
+    summary["total_pdfs"] = sum(int(row.get("pdf_count") or 0) for row in merged_rows)
+    summary["with_readme"] = sum(bool(row.get("readme")) for row in merged_rows)
+    summary["with_research"] = sum(bool(row.get("research_dir")) for row in merged_rows)
+    summary["avg_completeness"] = round(sum(float(row.get("completeness") or 0) for row in merged_rows) / len(merged_rows)) if merged_rows else 0
+    merged["summary"] = summary
+    return merged
 
 
 def ticker_dirs_present(tickers: list[str]) -> int:
@@ -717,6 +739,134 @@ def valuation_human_review(ticker_dir: Path) -> dict | None:
         "live_price_confirmed": hr.get("live_price_confirmed"),
         "approved_date": hr.get("approved_date"),
         "notes": hr.get("notes"),
+    }
+
+
+def valuation_component_summary(ticker_dir: Path) -> dict | None:
+    """Small, presentation-safe component valuation payload for the dashboard."""
+    val = load_valuation(ticker_dir)
+    if not val:
+        return None
+    result = val.get("component_valuation_results") or {}
+    if not result:
+        return None
+    total = result.get("total_equity_value_per_share") or {}
+    components = []
+    for row in [*(result.get("additive_components") or []), *(result.get("embedded_components") or [])]:
+        components.append({
+            "id": row.get("id"),
+            "label": row.get("label"),
+            "category": row.get("category"),
+            "treatment": row.get("treatment"),
+            "method": row.get("method"),
+            "evidence_tier": row.get("evidence_tier"),
+            "driver_model_type": row.get("driver_model_type"),
+            "assumption_summary": row.get("assumption_summary"),
+            "low_per_share": row.get("low_per_share"),
+            "base_per_share": row.get("base_per_share"),
+            "high_per_share": row.get("high_per_share"),
+            "cross_check": row.get("cross_check"),
+        })
+    queue = val.get("component_review_queue") or {}
+    economic = val.get("economic_value_analysis") or {}
+    return {
+        "status": result.get("status"),
+        "all_material_components_identified": result.get("all_material_components_identified", False),
+        "decision_rule": result.get("decision_rule"),
+        "market_price_per_share": result.get("market_price_per_share"),
+        "total_equity_value_per_share": total,
+        "upside_downside_pct": result.get("upside_downside_pct"),
+        "material_component_count": result.get("material_component_count", 0),
+        "additive_component_count": result.get("additive_component_count", 0),
+        "embedded_component_count": result.get("embedded_component_count", 0),
+        "components": components,
+        "review_status": queue.get("status"),
+        "review_open_count": len([x for x in queue.get("items", []) if x.get("status") == "open"]),
+        "economic_value": {
+            "status": economic.get("status"),
+            "gaap_role": economic.get("gaap_role"),
+            "accounting_reference": economic.get("accounting_reference"),
+            "economic_claim": economic.get("economic_claim"),
+            "valuation_proof": economic.get("valuation_proof") or [],
+            "validation_errors": economic.get("validation_errors") or [],
+            "complete_component_coverage": economic.get("complete_component_coverage"),
+        } if economic else None,
+    }
+
+
+def investment_committee_summary(ticker_dir: Path) -> dict | None:
+    """Latest committee result, reduced to decision-relevant presentation fields."""
+    research = ticker_dir / "research"
+    paths = sorted(research.glob("committee_????-??-??.json"))
+    if not paths:
+        return None
+    try:
+        record = json.loads(paths[-1].read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return None
+    synthesis = record.get("synthesis") or {}
+    decision = record.get("human_decision") or {}
+    return {
+        "as_of": (record.get("review") or {}).get("as_of"),
+        "state": record.get("final_state"),
+        "vote_split": synthesis.get("vote_split") or {},
+        "score_medians": synthesis.get("score_medians") or {},
+        "strongest_dissent": synthesis.get("strongest_dissent"),
+        "unresolved_items": synthesis.get("unresolved_items") or [],
+        "owner_status": decision.get("status"),
+        "owner_decision": decision.get("decision"),
+        "selected_raters": [r.get("persona") for r in record.get("selected_raters", [])],
+    }
+
+
+def valuation_workbench_summary(ticker_dir: Path) -> dict | None:
+    """Consolidated committee, evidence, method-fit, outcome, and attribution views."""
+    path = ticker_dir / "research" / "valuation_workbench.json"
+    if not path.exists():
+        return None
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return None
+    return {
+        "as_of": data.get("as_of"),
+        "decision": data.get("decision") or {},
+        "business": data.get("business") or {},
+        "valuation": data.get("valuation") or {},
+        "optionality": data.get("optionality") or {},
+        "committee": data.get("committee") or {},
+        "evidence": data.get("evidence") or {},
+        "method_fit": data.get("method_fit") or {},
+        "outcomes": data.get("outcomes") or {},
+        "attribution": data.get("attribution") or {},
+        "github_url": github_blob_url(path.relative_to(ROOT).as_posix()),
+    }
+
+
+def pricing_analysis_summary(ticker_dir: Path) -> dict | None:
+    path = ticker_dir / "research" / "pricing_analysis.json"
+    if not path.exists():
+        return None
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return None
+    return {
+        "as_of": data.get("as_of"),
+        "price": data.get("price"),
+        "component_value_per_share": data.get("component_value_per_share"),
+        "upside_downside_pct": data.get("upside_downside_pct"),
+        "current_supported_value": data.get("base_value_supported_by_current_or_contracted_assets"),
+        "market_price_above_supported_value": data.get("market_price_above_current_or_contracted_value"),
+        "implied_growth_pct": data.get("market_implied_constant_owner_cash_growth_pct"),
+        "entry_prices": data.get("entry_prices_by_hurdle_and_case"),
+        "entry_price_15pct_base": data.get("primary_entry_price_15pct_base"),
+        "decision": data.get("decision"),
+        "conclusion": data.get("pricing_conclusion"),
+        "strongest_counter_explanation": data.get("strongest_counter_explanation"),
+        "economic_claim_note": data.get("economic_claim_note"),
+        "economic_value_bridge": data.get("economic_value_bridge"),
+        "committee_routing": data.get("committee_routing"),
     }
 
 
@@ -1805,6 +1955,10 @@ def build_ticker_row(
         "links": _research_links(ticker, ticker_dir),
         "deep_dive": deep_dive,
         "human_review": valuation_human_review(ticker_dir),
+        "pricing_analysis": pricing_analysis_summary(ticker_dir),
+        "investment_committee": investment_committee_summary(ticker_dir),
+        "valuation_workbench": valuation_workbench_summary(ticker_dir),
+        "component_valuation": valuation_component_summary(ticker_dir),
         "total_return_panel": valuation_total_return_panel(ticker, ticker_dir),
         "recent_files": recent_files(ticker_dir),
         "developments": recent_developments(ticker_dir, ticker),
@@ -2197,7 +2351,8 @@ def build_research_memory() -> dict | None:
 def main() -> None:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     equity_payload = build_equity_models()
-    prior_by_ticker = load_prior_dashboard_rows()
+    prior_payload = _load_json(OUTPUT) or {}
+    prior_by_ticker = {str(row.get("ticker")): row for row in prior_payload.get("tickers") or [] if row.get("ticker")}
     document_registry = build_document_registry()
     document_catalog = build_document_catalog(document_registry)
     insights_doc = _load_json(DATA_DIR / "insights.json")
@@ -2283,6 +2438,7 @@ def main() -> None:
         payload["summary"]["activist_tickers_with_hits"] = (activist_feed.get("summary") or {}).get(
             "tickers_with_hits", 0
         )
+    payload = merge_sparse_payload(payload, prior_payload)
     OUTPUT.write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
     write_oauth_config()
     print(f"Wrote {OUTPUT} ({payload['summary']['ticker_count']} tickers)")

@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "distribution_event_ledger_v1",
+  "title": "Security distribution and split event ledger",
+  "type": "object",
+  "required": ["schema_version", "ticker", "currency", "coverage", "events"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "ticker": {"type": "string", "minLength": 1},
+    "currency": {"type": "string", "minLength": 3},
+    "coverage": {
+      "type": "object",
+      "required": ["status", "start", "end", "note"],
+      "properties": {
+        "status": {"enum": ["complete", "partial", "evidence_blocked"]},
+        "start": {"type": ["string", "null"], "format": "date"},
+        "end": {"type": ["string", "null"], "format": "date"},
+        "note": {"type": "string"}
+      },
+      "additionalProperties": true
+    },
+    "sources": {"type": "array", "items": {"type": "string"}},
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["ex_date", "type", "source_tier", "reconciliation_status"],
+        "properties": {
+          "ex_date": {"type": "string", "format": "date"},
+          "record_date": {"type": "string", "format": "date"},
+          "pay_date": {"type": "string", "format": "date"},
+          "type": {"enum": ["regular_dividend", "special_dividend", "trust_distribution", "return_of_capital", "liquidating_distribution", "stock_distribution", "spin_off", "split"]},
+          "amount_per_share": {"type": "number"},
+          "currency": {"type": "string"},
+          "split_factor": {"type": "number", "exclusiveMinimum": 0},
+          "fair_value_per_parent_share": {"type": "number", "minimum": 0},
+          "source": {"type": "string"},
+          "source_tier": {"enum": ["company_primary", "sec_primary", "exchange_primary", "vendor"]},
+          "reconciliation_status": {"enum": ["reconciled", "discovered", "unresolved", "not_applicable"]}
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

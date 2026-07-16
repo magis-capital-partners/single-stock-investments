@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Valuation workbench",
+  "type": "object",
+  "required": ["schema_version", "ticker", "as_of", "decision", "business", "valuation", "optionality", "committee", "evidence", "method_fit", "outcomes", "attribution"],
+  "properties": {
+    "schema_version": {"const": "2.0"},
+    "ticker": {"type": "string", "minLength": 1},
+    "as_of": {"type": "string", "format": "date"},
+    "decision": {"type": "object", "required": ["status", "value_per_share", "unvalued_component_count", "unresolved_evidence_count"]},
+    "business": {"type": "object", "required": ["status", "components", "component_coverage", "facts", "estimates", "judgments"]},
+    "valuation": {"type": "object", "required": ["status", "market", "valuation", "components", "scenario_contract"]},
+    "optionality": {"type": "object", "required": ["status", "option_count", "options", "rule"]},
+    "committee": {
+      "type": "object",
+      "required": ["status", "analysis_progress", "next_action"],
+      "properties": {
+        "status": {"enum": ["not_started", "independent_review_open", "ready_to_assemble", "owner_decision_pending", "outcome_tracking"]},
+        "analysis_progress": {
+          "type": "object",
+          "required": ["completed", "required"],
+          "properties": {"completed": {"type": "integer", "minimum": 0}, "required": {"type": "integer", "minimum": 0}}
+        },
+        "next_action": {"type": "string", "minLength": 1}
+      }
+    },
+    "evidence": {"type": "object", "required": ["status", "gaps"], "properties": {"status": {"type": "string"}, "gaps": {"type": "array"}}},
+    "method_fit": {"type": "object", "required": ["profile_id", "label", "applicability_tests", "failure_modes"]},
+    "outcomes": {"type": "object", "required": ["status", "schedule", "minimum_persona_outcomes_before_reweighting"]},
+    "attribution": {"type": "object", "required": ["status", "current"]}
+  },
+  "additionalProperties": true
+}

@@ -1,16 +1,21 @@
 #!/usr/bin/env python3
-"""Build total-return panel: dividend sum, price vs total-return index, market cap.
+"""Build an inception-to-date split- and distribution-aware return panel.
 
-Reads distribution history from valuation.json, fetches Yahoo full-history daily prices,
-writes {TICKER}/research/total_return_panel.json, charts/total_return_{date}.svg,
-and merges summary into valuation.json -> total_return_panel.
+Yahoo closes are split-adjusted but exclude dividends. Historical cash events are
+normalized to that same share basis and reinvested at the ex-date close. The
+chart always begins with the earliest available trading history; distribution
+verification coverage is reported separately and never truncates the plot.
 """
 from __future__ import annotations
 
 import argparse
+import bisect
+import html
 import json
+import math
 import sys
 import urllib.request
+from collections import Counter
 from datetime import date, datetime, timezone
 from pathlib import Path
 
@@ -22,8 +27,9 @@ if str(SCRIPTS) not in sys.path:
 from fetch_equity_prices import fetch_price, yahoo_symbol_for  # noqa: E402
 from portfolio_registry import load_registry  # noqa: E402
 
-UA = "MarvinResearch/1.0 (total-return-panel)"
+UA = "MarvinResearch/2.0 (dividend-aware-total-return)"
 YAHOO_CHART = "https://query1.finance.yahoo.com/v8/finance/chart"
+CASH_TYPES = {"regular_dividend", "special_dividend", "trust_distribution", "return_of_capital", "liquidating_distribution"}
 
 
 def registry_row(ticker: str) -> dict | None:
@@ -31,16 +37,16 @@ def registry_row(ticker: str) -> dict | None:
 
 
 def tickers_from_registry() -> list[str]:
-    holdings = (load_registry().get("holdings") or {})
-    return sorted(holdings.keys())
+    return sorted((load_registry().get("holdings") or {}).keys())
 
 
-def fetch_yahoo_daily_closes(symbol: str) -> tuple[list[str], list[float], str]:
+def _iso_day(timestamp: int) -> str:
+    return datetime.fromtimestamp(timestamp, tz=timezone.utc).strftime("%Y-%m-%d")
+
+
+def fetch_yahoo_history(symbol: str) -> tuple[list[str], list[float], list[dict], dict, str]:
     end = datetime.now(timezone.utc)
-    url = (
-        f"{YAHOO_CHART}/{symbol}?period1=0"
-        f"&period2={int(end.timestamp())}&interval=1d"
-    )
+    url = f"{YAHOO_CHART}/{symbol}?period1=0&period2={int(end.timestamp())}&interval=1d&events=div%2Csplits"
     req = urllib.request.Request(url, headers={"User-Agent": UA})
     try:
         payload = json.loads(urllib.request.urlopen(req, timeout=30).read())
@@ -48,287 +54,292 @@ def fetch_yahoo_daily_closes(symbol: str) -> tuple[list[str], list[float], str]:
         timestamps = result["timestamp"]
         closes = result["indicators"]["quote"][0]["close"]
     except Exception as exc:
-        return [], [], f"yahoo_error:{exc}"
-
-    by_day: dict[str, float] = {}
-    for ts, close in zip(timestamps, closes):
-        if close is None:
-            continue
-        d = datetime.fromtimestamp(ts, tz=timezone.utc).strftime("%Y-%m-%d")
-        by_day[d] = float(close)
-
-    days = sorted(by_day.keys())
-    if len(days) < 2:
-        return [], [], "yahoo_insufficient"
-    dates = days
-    prices = [by_day[d] for d in days]
-    return dates, prices, f"yahoo:{symbol}"
-
-
-def distribution_map(val: dict) -> dict[int, float]:
-    """Year -> per-share distribution from inputs.distribution_history."""
-    inputs = val.get("inputs") or {}
-    hist = inputs.get("distribution_history") or []
-    out: dict[int, float] = {}
-    for row in hist:
-        try:
-            yr = int(row.get("year") or row.get("fiscal_year"))
-            amt = float(row["amount_per_share"])
-        except (TypeError, ValueError, KeyError):
-            continue
-        out[yr] = amt
-    if not out and inputs.get("dividend_per_share_annual"):
-        try:
-            yr = int(str(inputs.get("last_filing", ""))[:4] or date.today().year)
-        except ValueError:
-            yr = date.today().year
-        out[yr] = float(inputs["dividend_per_share_annual"])
-    return out
+        return [], [], [], {}, f"yahoo_error:{exc}"
+    by_day = {_iso_day(ts): float(close) for ts, close in zip(timestamps, closes) if close is not None}
+    dates = sorted(by_day)
+    events: list[dict] = []
+    raw_events = result.get("events") or {}
+    for row in (raw_events.get("dividends") or {}).values():
+        events.append({
+            "ex_date": _iso_day(int(row["date"])), "amount_per_share": float(row["amount"]),
+            "currency": (result.get("meta") or {}).get("currency"), "type": "regular_dividend",
+            "source": f"yahoo:{symbol}", "source_tier": "vendor", "reconciliation_status": "discovered",
+        })
+    for row in (raw_events.get("splits") or {}).values():
+        numerator = float(row.get("numerator") or 0)
+        denominator = float(row.get("denominator") or 0)
+        ratio = numerator / denominator if numerator > 0 and denominator > 0 else float(row.get("splitRatio", "1:1").split(":")[0]) / float(row.get("splitRatio", "1:1").split(":")[1])
+        events.append({
+            "ex_date": _iso_day(int(row["date"])), "type": "split", "split_factor": ratio,
+            "source": f"yahoo:{symbol}", "source_tier": "vendor", "reconciliation_status": "discovered",
+        })
+    return dates, [by_day[d] for d in dates], sorted(events, key=lambda x: x["ex_date"]), result.get("meta") or {}, f"yahoo:{symbol}"
 
 
-def build_series(
-    dates: list[str],
-    prices: list[float],
-    dist_by_year: dict[int, float],
-) -> tuple[list[float], list[float], float]:
-    """Price index and total-return index (rebased 100). cum_div = sum of all distributions."""
-    if not prices:
-        return [], [], 0.0
-    base = prices[0]
-    price_idx = [100.0 * p / base for p in prices]
-    tr_idx: list[float] = []
-    tr_level = 100.0
-    year_last_idx: dict[int, int] = {}
-    for i, d in enumerate(dates):
-        year_last_idx[int(d[:4])] = i
-    for i, (d, p) in enumerate(zip(dates, prices)):
-        if i > 0 and prices[i - 1] > 0:
-            tr_level *= p / prices[i - 1]
-        yr = int(d[:4])
-        if year_last_idx.get(yr) == i and yr in dist_by_year and p > 0:
-            tr_level *= 1.0 + dist_by_year[yr] / p
-        tr_idx.append(tr_level)
-    cum_div = sum(dist_by_year.values())
-    return price_idx, tr_idx, cum_div
+def load_event_ledger(ticker: str, vendor_events: list[dict]) -> tuple[list[dict], dict]:
+    path = ROOT / ticker / "research" / "distribution_events.json"
+    local = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+    overrides = local.get("events") or []
+    # A primary-source row replaces a vendor row on date/type family; splits remain separate.
+    override_dates = {(r.get("ex_date"), "cash" if r.get("type") in CASH_TYPES else r.get("type")) for r in overrides}
+    events = [r for r in vendor_events if (r.get("ex_date"), "cash" if r.get("type") in CASH_TYPES else r.get("type")) not in override_dates]
+    events.extend(overrides)
+    events.sort(key=lambda x: (x.get("ex_date") or "", x.get("type") or ""))
+    coverage = local.get("coverage") or {
+        "status": "vendor_only", "start": None, "end": None,
+        "note": "Vendor events are discovery evidence; primary-source completeness has not been established.",
+    }
+    return events, {**coverage, "ledger_path": f"{ticker}/research/distribution_events.json" if path.exists() else None}
 
 
-def svg_chart(
-    dates: list[str],
-    price_idx: list[float],
-    tr_idx: list[float],
-    *,
-    ticker: str,
-    market_cap_m: float | None,
-    cum_div: float,
-    width: int = 720,
-    height: int = 360,
-) -> str:
-    margin = {"l": 56, "r": 24, "t": 48, "b": 52}
-    plot_w = width - margin["l"] - margin["r"]
-    plot_h = height - margin["t"] - margin["b"]
-    n = len(dates)
-    if n < 2:
-        return (
-            f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}">'
-            f'<text x="20" y="40">Insufficient price history for {ticker}</text></svg>'
-        )
+def effective_event_index(dates: list[str], event_date: str) -> int | None:
+    idx = bisect.bisect_left(dates, event_date)
+    return idx if idx < len(dates) else None
 
-    all_vals = price_idx + tr_idx
-    ymin = min(all_vals)
-    ymax = max(all_vals)
-    pad = (ymax - ymin) * 0.08 or 5.0
-    ymin -= pad
-    ymax += pad
 
-    def x_at(i: int) -> float:
-        return margin["l"] + (i / (n - 1)) * plot_w
-
-    def y_at(v: float) -> float:
-        return margin["t"] + plot_h - ((v - ymin) / (ymax - ymin)) * plot_h
-
-    def poly(vals: list[float], color: str) -> str:
-        pts = " ".join(f"{x_at(i):.1f},{y_at(v):.1f}" for i, v in enumerate(vals))
-        return f'<polyline fill="none" stroke="{color}" stroke-width="2" points="{pts}"/>'
-
-    ticks = [0, n // 4, n // 2, 3 * n // 4, n - 1]
-    x_labels = "".join(
-        f'<text x="{x_at(i):.0f}" y="{height - 12}" font-size="11" text-anchor="middle" fill="#444">'
-        f"{dates[i][:7]}</text>"
-        for i in ticks
-    )
-    mcap_txt = f"${market_cap_m:.1f}M" if market_cap_m is not None else "n/a"
-    title = (
-        f"{ticker} total return (rebased 100) · cumulative distributions ${cum_div:,.2f}/sh"
-        f" · market cap {mcap_txt}"
+def build_wealth_series(dates: list[str], prices: list[float], events: list[dict], *, prices_split_adjusted: bool = True) -> dict:
+    if not dates or not prices or len(dates) != len(prices):
+        return {"price_index": [], "total_return_index": [], "cash_by_type": {}, "event_counts": {}}
+    events_at: dict[int, list[dict]] = {}
+    for event in events:
+        idx = effective_event_index(dates, event.get("ex_date") or "")
+        if idx is not None:
+            events_at.setdefault(idx, []).append(event)
+    split_events = sorted(
+        (e for e in events if e.get("type") == "split" and float(e.get("split_factor") or 1) > 0),
+        key=lambda e: e.get("ex_date") or "",
     )
 
-    return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">
-  <rect width="{width}" height="{height}" fill="#fafafa"/>
-  <text x="{margin['l']}" y="22" font-size="13" font-family="sans-serif" fill="#222">{title}</text>
-  <line x1="{margin['l']}" y1="{margin['t'] + plot_h}" x2="{margin['l'] + plot_w}" y2="{margin['t'] + plot_h}" stroke="#ccc"/>
-  <line x1="{margin['l']}" y1="{margin['t']}" x2="{margin['l']}" y2="{margin['t'] + plot_h}" stroke="#ccc"/>
-  {poly(price_idx, "#2563eb")}
-  {poly(tr_idx, "#16a34a")}
-  <text x="{margin['l'] + 4}" y="{margin['t'] + 14}" font-size="11" fill="#2563eb">Price index</text>
-  <text x="{margin['l'] + 90}" y="{margin['t'] + 14}" font-size="11" fill="#16a34a">Total return (price + distributions)</text>
-  {x_labels}
-</svg>
-"""
+    def amount_on_price_basis(event: dict) -> float:
+        amount = float(event.get("amount_per_share") or 0)
+        if not prices_split_adjusted:
+            return amount
+        future_factor = 1.0
+        for split in split_events:
+            if (split.get("ex_date") or "") > (event.get("ex_date") or ""):
+                future_factor *= float(split["split_factor"])
+        return amount / future_factor
+    price_shares = total_shares = 1.0
+    initial_price = prices[0]
+    price_idx: list[float] = []
+    total_idx: list[float] = []
+    cash_by_type: Counter = Counter()
+    counts: Counter = Counter()
+    for i, price in enumerate(prices):
+        day_events = events_at.get(i, [])
+        # Every same-day cash entitlement uses the pre-reinvestment share count.
+        entitlement_shares = total_shares
+        day_cash = 0.0
+        for event in day_events:
+            kind = event.get("type")
+            counts[kind] += 1
+            if kind == "split":
+                factor = float(event.get("split_factor") or 1)
+                if factor > 0 and not prices_split_adjusted:
+                    price_shares *= factor
+                    total_shares *= factor
+            elif kind in CASH_TYPES:
+                amount = amount_on_price_basis(event)
+                cash = entitlement_shares * amount
+                cash_by_type[kind] += cash
+                day_cash += cash
+            elif kind == "spin_off":
+                value = float(event.get("fair_value_per_parent_share") or 0) * total_shares
+                cash_by_type[kind] += value
+                if price > 0:
+                    total_shares += value / price
+        if day_cash and price > 0:
+            total_shares += day_cash / price
+        price_idx.append(100 * price_shares * price / initial_price)
+        total_idx.append(100 * total_shares * price / initial_price)
+    return {
+        "price_index": price_idx, "total_return_index": total_idx,
+        "cash_by_type": {k: round(v, 6) for k, v in cash_by_type.items()},
+        "event_counts": dict(counts),
+    }
 
 
-def annualized_return(start_price: float, end_price: float, years: float, cum_div: float) -> float | None:
-    if start_price <= 0 or years <= 0:
+def annualized_from_index(index_end: float | None, span_days: int) -> float | None:
+    if index_end is None or index_end <= 0 or span_days <= 0:
         return None
-    total = (end_price + cum_div) / start_price
-    if total <= 0:
-        return None
-    return (total ** (1.0 / years) - 1.0) * 100.0
+    return ((index_end / 100) ** (365.25 / span_days) - 1) * 100
+
+
+def coverage_status(coverage: dict, history_start: str | None, history_end: str | None, events: list[dict]) -> tuple[str, str | None]:
+    if not history_start or not history_end:
+        return "insufficient_price_history", "price history unavailable"
+    if coverage.get("status") != "complete":
+        return "partial", coverage.get("note") or "distribution history is not primary-source complete"
+    if not coverage.get("start") or coverage["start"] > history_start or not coverage.get("end") or coverage["end"] < history_end:
+        return "evidence_blocked", "verified distribution coverage does not span the plotted price history"
+    unresolved = [e for e in events if e.get("reconciliation_status") not in ("reconciled", "not_applicable")]
+    if unresolved:
+        return "evidence_blocked", f"{len(unresolved)} distribution or split event(s) remain unreconciled"
+    return "complete", None
+
+
+def compute_period_total_return(ticker: str, start: str, end: str) -> dict:
+    """Compute a decision-date total return using the same verified event ledger as the dashboard."""
+    t = ticker.upper()
+    row = registry_row(t) or {}
+    symbol = yahoo_symbol_for(t, row.get("market", "US"), row.get("exchange", ""))
+    dates, prices, vendor_events, meta, source = fetch_yahoo_history(symbol)
+    events, coverage = load_event_ledger(t, vendor_events)
+    selected = [i for i, day in enumerate(dates) if start <= day <= end]
+    if len(selected) < 2:
+        return {"return_status": "evidence_blocked", "error": "fewer than two trading dates in measurement window"}
+    first, last = selected[0], selected[-1]
+    period_dates, period_prices = dates[first:last + 1], prices[first:last + 1]
+    # A decision made at the close does not receive a same-day ex-date distribution.
+    period_events = [event for event in events if period_dates[0] < (event.get("ex_date") or "") <= period_dates[-1]]
+    status, error = coverage_status(coverage, period_dates[0], period_dates[-1], period_events)
+    wealth = build_wealth_series(period_dates, period_prices, period_events)
+    total_index = wealth.get("total_return_index") or []
+    span_days = (date.fromisoformat(period_dates[-1]) - date.fromisoformat(period_dates[0])).days
+    total_return = total_index[-1] - 100 if total_index else None
+    return {
+        "return_status": "complete" if status == "complete" and total_return is not None else status,
+        "error": error,
+        "ticker": t,
+        "decision_date": start,
+        "measurement_date": end,
+        "actual_start_date": period_dates[0],
+        "actual_end_date": period_dates[-1],
+        "horizon_days": span_days,
+        "total_return_pct": round(total_return, 2) if total_return is not None else None,
+        "annualized_total_return_pct": round(annualized_from_index(total_index[-1], span_days), 2) if total_index and span_days else None,
+        "return_evidence_ref": coverage.get("ledger_path") or source,
+        "return_contract": "split-adjusted close plus every verified cash distribution reinvested at ex-date close; pre-tax nominal",
+        "currency": meta.get("currency"),
+        "event_counts": wealth.get("event_counts") or {},
+    }
+
+
+def _polyline(values: list[float], n: int, x_at, y_at, color: str, width: int = 2) -> str:
+    if not values:
+        return ""
+    points = " ".join(f"{x_at(i):.1f},{y_at(v):.1f}" for i, v in enumerate(values[:n]))
+    return f'<polyline fill="none" stroke="{color}" stroke-width="{width}" points="{points}"/>'
+
+
+def _return_label(index_value: float) -> str:
+    value = index_value - 100
+    if abs(value) >= 1_000:
+        return f"{value:+,.0f}%"
+    return f"{value:+.1f}%" if value else "0%"
+
+
+def _log_ticks(ymin: float, ymax: float, count: int = 7) -> list[float]:
+    if ymin <= 0 or ymax <= 0 or ymin >= ymax:
+        return [ymin]
+    low, high = math.log(ymin), math.log(ymax)
+    raw = [math.exp(low + i / (count - 1) * (high - low)) for i in range(count)]
+    return sorted(set([ymin, 100.0 if ymin <= 100 <= ymax else ymin, ymax, *raw]))
+
+
+def svg_chart(dates: list[str], price_idx: list[float], total_idx: list[float], *, ticker: str, contributions: dict, width: int = 820, height: int = 410) -> str:
+    if len(dates) < 2:
+        return f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}"><text x="20" y="40">Insufficient price history for {html.escape(ticker)}</text></svg>'
+    margin = {"l": 78, "r": 24, "t": 62, "b": 78}
+    plot_w, plot_h = width - margin["l"] - margin["r"], height - margin["t"] - margin["b"]
+    all_values = [value for value in price_idx + total_idx if value > 0]
+    ymin, ymax = min(all_values), max(all_values)
+    log_pad = max((math.log(ymax) - math.log(ymin)) * .06, .04)
+    ymin, ymax = math.exp(math.log(ymin) - log_pad), math.exp(math.log(ymax) + log_pad)
+    x_at = lambda i: margin["l"] + i / (len(dates) - 1) * plot_w
+    y_at = lambda v: margin["t"] + plot_h - (math.log(max(v, ymin)) - math.log(ymin)) / (math.log(ymax) - math.log(ymin)) * plot_h
+    ticks = sorted(set([0, len(dates)//4, len(dates)//2, 3*len(dates)//4, len(dates)-1]))
+    labels = "".join(f'<text x="{x_at(i):.0f}" y="{height-48}" font-size="11" text-anchor="middle" fill="#64748b">{dates[i][:7]}</text>' for i in ticks)
+    y_grid = "".join(
+        f'<line x1="{margin["l"]}" y1="{y_at(value):.1f}" x2="{margin["l"]+plot_w}" y2="{y_at(value):.1f}" stroke="#e2e8f0"/>'
+        f'<text x="{margin["l"]-8}" y="{y_at(value)+4:.1f}" font-size="10" text-anchor="end" fill="#64748b">{html.escape(_return_label(value))}</text>'
+        for value in _log_ticks(ymin, ymax)
+    )
+    regular = sum(v for k, v in contributions.items() if k in ("regular_dividend", "trust_distribution"))
+    special = contributions.get("special_dividend", 0)
+    other = sum(v for k, v in contributions.items() if k not in ("regular_dividend", "trust_distribution", "special_dividend"))
+    return_summary = f"Total return {_return_label(total_idx[-1])} | Price-only {_return_label(price_idx[-1])} | logarithmic scale"
+    cash_note = f"Regular ${regular:,.2f} | Special ${special:,.2f} | Other ${other:,.2f} per initial share path"
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">
+<rect width="{width}" height="{height}" fill="#fafafa"/><text x="{margin['l']}" y="22" font-size="14" font-family="sans-serif" fill="#0f172a">{html.escape(ticker)} cumulative return since {dates[0]} | dividends reinvested</text>
+<text x="{margin['l']}" y="40" font-size="11" font-family="sans-serif" fill="#334155">{html.escape(return_summary)}</text>
+<text x="{margin['l']}" y="54" font-size="9" font-family="sans-serif" fill="#64748b">{html.escape(cash_note)}</text>
+{y_grid}
+<line x1="{margin['l']}" y1="{margin['t']+plot_h}" x2="{margin['l']+plot_w}" y2="{margin['t']+plot_h}" stroke="#cbd5e1"/>
+{_polyline(price_idx, len(dates), x_at, y_at, '#2563eb')}{_polyline(total_idx, len(dates), x_at, y_at, '#16a34a', 3)}
+<text x="{margin['l']}" y="{height-18}" font-size="11" fill="#16a34a">Total return {_return_label(total_idx[-1])}</text><text x="{margin['l']+190}" y="{height-18}" font-size="11" fill="#2563eb">Price-only {_return_label(price_idx[-1])}</text>{labels}</svg>'''
 
 
 def build_panel(ticker: str, as_of: str | None = None, *, merge: bool = True) -> bool:
     t = ticker.upper()
-    research = ROOT / t / "research"
-    vpath = research / "valuation.json"
+    research, vpath = ROOT / t / "research", ROOT / t / "research" / "valuation.json"
     if not vpath.exists():
         print(f"SKIP {t}: no valuation.json")
         return False
-
     val = json.loads(vpath.read_text(encoding="utf-8"))
-    inputs = val.get("inputs") or {}
-    row = registry_row(t) or {}
-    market = row.get("market", "US")
-    exchange = row.get("exchange", "")
-    ysym = yahoo_symbol_for(t, market, exchange)
-
-    dates, prices, src = fetch_yahoo_daily_closes(ysym)
-    dist = distribution_map(val)
-    panel_status = "complete"
-    panel_error = None
-    price_idx: list[float] = []
-    tr_idx: list[float] = []
-    cum_div = sum(dist.values())
-    if len(prices) >= 2:
-        price_idx, tr_idx, cum_div = build_series(dates, prices, dist)
-    else:
-        panel_status = "insufficient_price_history"
-        panel_error = src
-
+    inputs, row = val.get("inputs") or {}, registry_row(t) or {}
+    symbol = yahoo_symbol_for(t, row.get("market", "US"), row.get("exchange", ""))
+    dates, prices, vendor_events, meta, source = fetch_yahoo_history(symbol)
+    events, coverage = load_event_ledger(t, vendor_events)
+    # Always plot the complete available trading history. Primary-source event
+    # coverage is reported separately and may be shorter than the vendor series.
+    wealth = build_wealth_series(dates, prices, events)
+    price_idx, total_idx = wealth["price_index"], wealth["total_return_index"]
+    status, error = coverage_status(coverage, dates[0] if dates else None, dates[-1] if dates else None, events)
+    span_days = (date.fromisoformat(dates[-1]) - date.fromisoformat(dates[0])).days if len(dates) > 1 else 0
+    price_ann = annualized_from_index(price_idx[-1] if price_idx else None, span_days)
+    total_ann = annualized_from_index(total_idx[-1] if total_idx else None, span_days)
     price = inputs.get("price")
     if price is None:
-        live, _, _ = fetch_price(t)
-        price = live
+        price, _, _ = fetch_price(t)
     shares = inputs.get("shares_outstanding")
-    market_cap_m = None
-    if price and shares:
-        market_cap_m = round(float(price) * float(shares) / 1_000_000, 2)
-
-    start_price = prices[0] if prices else None
-    end_price = prices[-1] if prices else None
-    if len(dates) >= 2:
-        span_days = max(1, (date.fromisoformat(dates[-1]) - date.fromisoformat(dates[0])).days)
-        span_years = max(0.5, span_days / 365.25)
-    else:
-        span_years = None
-    price_ann = (
-        annualized_return(start_price, end_price, span_years, 0.0)
-        if start_price is not None and end_price is not None and span_years is not None
-        else None
-    )
-    tr_ann = (
-        annualized_return(start_price, end_price, span_years, cum_div)
-        if start_price is not None and end_price is not None and span_years is not None
-        else None
-    )
-
+    market_cap_m = round(float(price) * float(shares) / 1_000_000, 2) if price and shares else None
     as_of = as_of or date.today().isoformat()
-    charts_dir = research / "charts"
-    charts_dir.mkdir(parents=True, exist_ok=True)
-    chart_name = f"total_return_{as_of}.svg"
-    chart_path = charts_dir / chart_name
-    svg = svg_chart(
-        dates,
-        price_idx,
-        tr_idx,
-        ticker=t,
-        market_cap_m=market_cap_m,
-        cum_div=cum_div,
-    )
-    chart_path.write_text(svg, encoding="utf-8")
-
+    chart_rel = f"{t}/research/charts/total_return_{as_of}.svg"
+    chart_path = ROOT / chart_rel
+    chart_path.parent.mkdir(parents=True, exist_ok=True)
+    chart_path.write_text(svg_chart(dates, price_idx, total_idx, ticker=t, contributions=wealth["cash_by_type"]), encoding="utf-8")
+    cumulative_cash = round(sum(wealth["cash_by_type"].values()), 4)
     panel = {
-        "ticker": t,
-        "as_of": as_of,
-        "price_source": src,
-        "status": panel_status,
-        "error": panel_error,
-        "history_start": dates[0] if dates else None,
-        "history_end": dates[-1] if dates else None,
-        "price_points": len(prices),
-        "price_interval": "1d",
-        "start_price": round(start_price, 4) if start_price is not None else None,
-        "end_price": round(end_price, 4) if end_price is not None else None,
-        "cumulative_distributions_per_share": round(cum_div, 4),
-        "distribution_years": len(dist),
-        "distribution_history_sum": round(sum(dist.values()), 4),
-        "price_index_end": round(price_idx[-1], 2) if price_idx else None,
-        "total_return_index_end": round(tr_idx[-1], 2) if tr_idx else None,
+        "schema_version": "3.0", "ticker": t, "as_of": as_of, "status": status, "error": error,
+        "price_source": source, "currency": meta.get("currency"), "return_currency": meta.get("currency"), "fx_basis": "listing_currency_nominal",
+        "history_start": dates[0] if dates else None, "history_end": dates[-1] if dates else None, "price_points": len(prices), "price_interval": "1d",
+        "history_basis": "earliest_available_vendor_trading_history", "chart_scale": "logarithmic", "chart_y_axis": "cumulative_return_pct",
+        "chart_series": ["total_return", "price_only"],
+        "return_contract": "split-adjusted close excluding dividends; event amounts normalized for later splits; cash reinvested at ex-date close; pre-tax nominal",
+        "coverage": coverage, "event_count": sum(wealth["event_counts"].values()), "event_counts": wealth["event_counts"],
+        "cash_distributions_on_initial_share_path": cumulative_cash, "distribution_contribution_by_type": wealth["cash_by_type"],
+        "cumulative_distributions_per_share": cumulative_cash,
+        "start_price": round(prices[0], 4) if prices else None, "end_price": round(prices[-1], 4) if prices else None,
+        "price_index_end": round(price_idx[-1], 2) if price_idx else None, "total_return_index_end": round(total_idx[-1], 2) if total_idx else None,
+        "cumulative_price_return_pct": round(price_idx[-1] - 100, 2) if price_idx else None,
+        "cumulative_total_return_pct": round(total_idx[-1] - 100, 2) if total_idx else None,
         "price_only_annualized_pct": round(price_ann, 2) if price_ann is not None else None,
-        "total_return_annualized_pct": round(tr_ann, 2) if tr_ann is not None else None,
-        "market_cap_m": market_cap_m,
-        "shares_outstanding": shares,
-        "price_for_market_cap": price,
-        "chart": f"{t}/research/charts/{chart_name}",
+        "total_return_annualized_pct": round(total_ann, 2) if total_ann is not None else None,
+        "market_cap_m": market_cap_m, "shares_outstanding": shares, "price_for_market_cap": price, "chart": chart_rel,
     }
-
     panel_path = research / "total_return_panel.json"
     panel_path.write_text(json.dumps(panel, indent=2) + "\n", encoding="utf-8")
-
     if merge:
-        val["total_return_panel"] = {
-            "as_of": as_of,
-            "status": panel_status,
-            "error": panel_error,
-            "cumulative_distributions_per_share": panel["cumulative_distributions_per_share"],
-            "distribution_history_sum": panel["distribution_history_sum"],
-            "market_cap_m": market_cap_m,
-            "total_return_annualized_pct": panel["total_return_annualized_pct"],
-            "chart": panel["chart"],
-            "panel_json": f"{t}/research/total_return_panel.json",
-        }
+        val["total_return_panel"] = {**panel, "panel_json": f"{t}/research/total_return_panel.json"}
         vpath.write_text(json.dumps(val, indent=2) + "\n", encoding="utf-8")
-
-    if panel_status == "complete":
-        print(
-            f"OK {t}: cum_div=${cum_div:.2f}/sh market_cap={market_cap_m}M "
-            f"chart={chart_path.relative_to(ROOT)}"
-        )
-        return True
-    print(f"WARN {t}: {panel_status} ({panel_error})")
-    return False
+    print(f"{'OK' if status == 'complete' else 'WARN'} {t}: {status}; total={total_ann}; events={panel['event_count']}")
+    return status == "complete"
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("tickers", nargs="*")
-    ap.add_argument("--all", action="store_true", help="Build panels for all registry holdings")
-    ap.add_argument("--date", default=date.today().isoformat())
-    ap.add_argument("--no-merge", action="store_true")
-    args = ap.parse_args()
-    tickers = [t.upper() for t in args.tickers]
-    if args.all:
-        tickers = tickers_from_registry()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("tickers", nargs="*")
+    parser.add_argument("--all", action="store_true")
+    parser.add_argument("--date", default=date.today().isoformat())
+    parser.add_argument("--no-merge", action="store_true")
+    args = parser.parse_args()
+    tickers = tickers_from_registry() if args.all else [t.upper() for t in args.tickers]
     if not tickers:
-        ap.error("provide tickers or use --all")
-
-    ok = 0
-    warn = 0
-    for t in tickers:
-        if build_panel(t, args.date, merge=not args.no_merge):
-            ok += 1
-        else:
-            warn += 1
-    print(f"SUMMARY: ok={ok} warn={warn} total={len(tickers)}")
-    return 0 if ok > 0 else 1
+        parser.error("provide tickers or use --all")
+    results = [build_panel(t, args.date, merge=not args.no_merge) for t in tickers]
+    print(f"SUMMARY: complete={sum(results)} partial={len(results)-sum(results)} total={len(results)}")
+    return 0
 
 
 if __name__ == "__main__":

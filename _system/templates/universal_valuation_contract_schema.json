@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "universal_valuation_contract_v1",
+  "title": "Universal security valuation and decision contract",
+  "type": "object",
+  "required": ["schema_version", "status", "ticker", "economic_ownership_map", "component_coverage", "input_classification", "method_route", "market", "valuation", "scenario_contract", "evidence", "monitoring", "decision_rule"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "status": {"enum": ["decision_grade", "evidence_blocked"]},
+    "ticker": {"type": ["string", "null"]},
+    "economic_ownership_map": {"type": "array"},
+    "component_coverage": {
+      "type": "object",
+      "required": ["all_material_components_identified", "unvalued_component_count", "double_counting_flags"],
+      "properties": {
+        "all_material_components_identified": {"type": "boolean"},
+        "unvalued_component_count": {"type": "integer", "minimum": 0},
+        "double_counting_flags": {"type": "array"}
+      }
+    },
+    "input_classification": {
+      "type": "object",
+      "required": ["facts", "estimates", "judgments"],
+      "properties": {"facts": {"type": "array"}, "estimates": {"type": "array"}, "judgments": {"type": "array"}}
+    },
+    "method_route": {"type": "object", "required": ["profile_id", "primary_methods", "corroborating_methods", "silent_personas"]},
+    "market": {"type": "object"},
+    "valuation": {"type": "object", "required": ["value_per_share", "annualized_return_at_price_pct", "downside_to_low_pct"]},
+    "scenario_contract": {"type": "object"},
+    "evidence": {"type": "object", "required": ["unresolved_count", "blockers"]},
+    "monitoring": {"type": "object", "required": ["falsifiers", "required_refresh_triggers"]},
+    "decision_rule": {"type": "string", "minLength": 1}
+  },
+  "additionalProperties": true
+}

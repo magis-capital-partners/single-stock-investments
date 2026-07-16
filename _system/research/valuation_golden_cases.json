@@ -1,0 +1,80 @@
+{
+  "schema_version": "1.0",
+  "purpose": "Cross-archetype regression cases for the universal economic-value contract.",
+  "cases": [
+    {
+      "id": "compounder",
+      "archetype": "compounder",
+      "gaap_role": "cross_check",
+      "components": [
+        {"id": "operations", "category": "operating_business", "method": "owner_cash_dcf", "range": [80, 100, 130]}
+      ]
+    },
+    {
+      "id": "bank",
+      "archetype": "bank",
+      "gaap_role": "primary",
+      "components": [
+        {"id": "tangible_equity", "category": "financial_asset", "method": "adjusted_tangible_book", "range": [35, 42, 48]},
+        {"id": "franchise", "category": "operating_business", "method": "excess_return_value", "range": [5, 15, 25]},
+        {"id": "credit_reserve", "category": "liability_or_reserve", "method": "stress_loss_reserve", "range": [-12, -7, -3]}
+      ]
+    },
+    {
+      "id": "holding_company",
+      "archetype": "holding_company",
+      "gaap_role": "misleading_historical_cost",
+      "components": [
+        {"id": "listed_holdings", "category": "financial_asset", "method": "look_through_market_value", "range": [60, 70, 80]},
+        {"id": "private_holdings", "category": "real_option", "method": "transaction_nav", "range": [10, 25, 50]},
+        {"id": "holdco_reserve", "category": "liability_or_reserve", "method": "tax_and_holdco_discount", "range": [-20, -12, -5]}
+      ]
+    },
+    {
+      "id": "resource_land",
+      "archetype": "resource",
+      "gaap_role": "misleading_historical_cost",
+      "components": [
+        {"id": "producing", "category": "operating_business", "method": "royalty_owner_cash_dcf", "range": [20, 35, 55]},
+        {"id": "undeveloped", "category": "real_option", "method": "unit_nav", "range": [5, 15, 35], "comparable_ids": ["tpl_royalty_acquisitions_2024_2025"]}
+      ]
+    },
+    {
+      "id": "biotech",
+      "archetype": "biotech",
+      "gaap_role": "cross_check",
+      "components": [
+        {"id": "net_cash", "category": "financial_asset", "method": "net_cash", "range": [8, 8, 8]},
+        {"id": "approved_product", "category": "operating_business", "method": "product_owner_cash_dcf", "range": [5, 15, 30]},
+        {"id": "pipeline", "category": "real_option", "method": "milestone_probability_option", "range": [0, 10, 45]}
+      ]
+    },
+    {
+      "id": "special_situation",
+      "archetype": "special_situation",
+      "gaap_role": "reference_only",
+      "components": [
+        {"id": "dated_payoff", "category": "dated_payoff", "method": "probability_weighted_payoff", "range": [20, 30, 35]},
+        {"id": "break_value", "category": "liability_or_reserve", "method": "break_case_reserve", "range": [-15, -7, -2]}
+      ]
+    },
+    {
+      "id": "cyclical",
+      "archetype": "cyclical",
+      "gaap_role": "cross_check",
+      "components": [
+        {"id": "midcycle_operations", "category": "operating_business", "method": "midcycle_owner_cash", "range": [15, 30, 50]},
+        {"id": "cycle_reserve", "category": "liability_or_reserve", "method": "downcycle_liquidity_reserve", "range": [-10, -5, -2]}
+      ]
+    },
+    {
+      "id": "infrastructure",
+      "archetype": "infrastructure",
+      "gaap_role": "reference_only",
+      "components": [
+        {"id": "network", "category": "infrastructure", "method": "network_ebitda_and_reinvestment_value", "range": [25, 45, 65], "comparable_ids": ["gravity_water_2025"]},
+        {"id": "net_debt", "category": "liability_or_reserve", "method": "net_debt", "range": [-20, -18, -16]}
+      ]
+    }
+  ]
+}
