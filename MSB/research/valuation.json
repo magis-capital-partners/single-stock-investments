@@ -1,461 +1,1150 @@
 {
   "ticker": "MSB",
-  "as_of": "2026-05-26",
-  "valuation_mode": "optionality",
-  "method": "yield_curve",
-  "lawrence_bucket": "other",
+  "as_of": "2026-07-15",
+  "method": "pending",
+  "valuation_mode": "economic_value",
+  "method_profile": "scarce_asset_optionality",
   "classification_inputs": {
-    "archetype": "optionality",
-    "moat": "n/a",
-    "dhando": "partial",
+    "archetype": "resource",
     "cycle": "mid"
   },
   "inputs": {
     "price": 25.68,
-    "price_source": "Stooq MSB.US close 2026-05-26",
-    "normalized_distribution_per_share": 2.16,
-    "normalization_note": "HK overlay: normalized dist yield + equity yield curve; not Q1-26 bonus=$0 run-rate alone."
+    "price_source": "Market close retrieved 2026-07-15",
+    "shares_outstanding": 13120010,
+    "shares_source": "Mesabi Trust 2026 Form 10-K: 13,120,010 units outstanding at April 21, 2026."
   },
-  "optionality_gate": {
-    "framework": "hk_royalty_curve",
-    "floor_pass": true,
-    "floor_metric": "normalized_distribution_yield",
-    "floor_value": 8.0,
-    "primary_metric": "lawrence_base",
-    "primary_label": "annualized return",
-    "primary_return_pct": 10.3,
-    "incumbent_sleeve": true,
-    "notes": ">$2/unit/yr normalized at ~$26 (HK); 40yr TR ~9.8%; transitory bonus gap + Sep-2025 arbitration."
+  "valuation_methodology": {
+    "mode": "component_economic_value",
+    "horizon_years": 7,
+    "decision_rule": "Use one complete component schedule; preserve the range and evidence block until every material assumption is reconciled."
   },
-  "scenarios": {
-    "bear": {
-      "price": 25.68,
-      "payoff": 30.0,
-      "years": 5,
-      "notes": "$1/unit/yr dist + terminal ~$25; sub-threshold pricing persists"
-    },
-    "base": {
-      "price": 25.68,
-      "payoff": 42.0,
-      "years": 5,
-      "notes": "Normalized ~$2/unit/yr cumulative + terminal ~$32",
-      "sotp_build": {
-        "lines": [
-          {
-            "id": "book",
-            "label": "GAAP book / price anchor",
-            "gaap_per_share": 25.68,
-            "uplift_per_share": 0.0,
-            "math": "Anchor $25.68/sh"
-          },
-          {
-            "id": "dist_cumulative",
-            "label": "Normalized ~$2.16/unit cumulative distributions",
-            "gaap_per_share": 0.0,
-            "uplift_per_share": 10.0,
-            "math": "[Assumption] \u2014 see scenario notes in valuation.json"
-          },
-          {
-            "id": "terminal_rerate",
-            "label": "Terminal re-rate on normalized yield",
-            "gaap_per_share": 0.0,
-            "uplift_per_share": 6.32,
-            "math": "[Assumption] \u2014 see scenario notes in valuation.json"
-          }
-        ],
-        "year5_economic_nav_per_share": 42.0,
-        "years": 5,
-        "notes": "HK yield curve; bonus/arbitration in bull only"
-      }
-    },
-    "bull": {
-      "price": 25.68,
-      "payoff": 55.0,
-      "years": 5,
-      "notes": "Bonus restored + partial arbitration recovery + iron recovery"
-    }
-  },
-  "results": {
-    "bear": {
-      "return_pct": 3.2
-    },
-    "base": {
-      "return_pct": 10.3
-    },
-    "bull": {
-      "return_pct": 16.5
-    }
-  },
-  "implied_return": {
-    "base_pct": 10.3,
-    "label": "annualized return",
-    "display": "10.3% (base)"
-  },
-  "stance_proposal": {
-    "suggested": "hold",
-    "irr_band": "optionality",
-    "gates": {
-      "moat_ok": true,
-      "dhando_ok": true,
-      "floor_pass": true,
-      "valuation_mode": "optionality"
-    },
-    "override_reason": null
-  },
-  "results_lawrence_legacy": {
-    "bear": {
-      "return_pct": 3.2
-    },
-    "base": {
-      "return_pct": 10.3
-    },
-    "bull": {
-      "return_pct": 16.5
-    }
-  },
-  "overlay_results": [],
-  "option_scan": [
-    {
-      "q": 1,
-      "question": "GAAP book misstates core assets?",
-      "answer": "Partial",
-      "treatment": "yield_curve",
-      "evidence": "Trust/royalty; distributions not steady-state GAAP earnings"
-    },
-    {
-      "q": 2,
-      "question": "Undeveloped reserves / acreage / dormant royalty?",
-      "answer": "No",
-      "treatment": "yield_curve",
-      "evidence": "Mesabi royalty on taconite"
-    },
-    {
-      "q": 6,
-      "question": "Transitory distribution / legal recovery?",
-      "answer": "Yes",
-      "treatment": "yield_curve",
-      "evidence": "Bonus gap / arbitration / excess-cost recovery [Assumption]"
-    }
-  ],
-  "catalyst_paths": [
-    {
-      "event": "Normalized bonus / base distribution restored",
-      "timing": "1\u20133 years",
-      "impact": "~$2/unit run-rate"
-    },
-    {
-      "event": "Arbitration / legal recovery",
-      "timing": "uncertain",
-      "impact": "One-time uplift"
-    },
-    {
-      "event": "Iron ore price cycle",
-      "timing": "cyclical",
-      "impact": "Distribution volatility"
-    }
-  ],
-  "synthesis": {
-    "status": "complete",
-    "paths": [
+  "component_valuation": {
+    "schema_version": "1.0",
+    "all_material_components_identified": true,
+    "coverage_statement": "Every currently identified material ownership claim, liability, and option is valued once. Unknown claims remain an evidence blocker, not an unvalued line item.",
+    "components": [
       {
-        "id": "scenario_bear",
-        "label": "Bear scenario (Lawrence)",
-        "source": "scenarios.bear",
-        "return_pct": 3.2,
-        "weight": 0.05,
-        "type": "numeric",
-        "epistemic_tier": "C (scenario envelope)",
-        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
-        "weight_falsifiers": [
-          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
-        ],
-        "hard_to_vary": "yes: asymmetric low weight is structural"
+        "id": "producing_royalty_stream",
+        "label": "Producing royalty and bonus stream",
+        "category": "operating_business",
+        "overlap_key": "producing_royalty_stream",
+        "treatment": "additive",
+        "valuation": {
+          "method": "royalty_distribution_curve",
+          "basis": "per_share",
+          "low": 30,
+          "base": 35,
+          "high": 42,
+          "evidence_tier": "analyst_estimate",
+          "evidence": "Trust distribution history and royalty terms; reserve and production reconciliation pending.",
+          "assumption_summary": "Present value of after-trust royalty distributions under explicit volume, pellet-price, bonus, and discount-rate cases.",
+          "cross_check": "Range must be reconciled to primary filings, normalized economics, and relevant transaction or public-market evidence before IC approval.",
+          "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim."
+        }
       },
       {
-        "id": "scenario_bull",
-        "label": "Bull scenario (Lawrence)",
-        "source": "scenarios.bull",
-        "return_pct": 16.5,
-        "weight": 0.12,
-        "type": "numeric",
-        "epistemic_tier": "C (scenario envelope)",
-        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
-        "weight_falsifiers": [
-          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
-        ],
-        "hard_to_vary": "yes"
+        "id": "depletion_and_concentration_reserve",
+        "label": "Finite reserve and counterparty concentration reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "depletion_and_concentration_reserve",
+        "treatment": "additive",
+        "valuation": {
+          "method": "depletion_reserve",
+          "basis": "per_share",
+          "low": -5,
+          "base": -3,
+          "high": -1,
+          "evidence_tier": "analyst_estimate",
+          "evidence": "Finite mineral claim and concentrated operator exposure.",
+          "assumption_summary": "Deduction for depletion, operator concentration, interruption, and terminal-value uncertainty.",
+          "cross_check": "Range must be reconciled to primary filings, normalized economics, and relevant transaction or public-market evidence before IC approval.",
+          "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim."
+        }
       },
       {
-        "id": "third_party_context",
-        "label": "Third-party context (HK + Substacks inventory)",
-        "source": "source_inventory (4 sources); cross_check blend",
-        "return_pct": 16.5,
-        "weight": 0.1,
-        "type": "numeric",
-        "notes": "Proxy: upside case when strategic third party has no spot IRR",
-        "epistemic_tier": "D (external triangulation)",
-        "weight_why": "Context-tier HK/Substacks until human promotes in third_party_sources.md; numeric proxy is weak.",
-        "weight_falsifiers": [
-          "Using bull scenario as HK proxy when cross_check synthesis says no IRR upgrade",
-          "Weight above 15% while human_approval pending"
-        ],
-        "hard_to_vary": "no: proxy return is instrumentalist; prefer qualitative pp until approved blend"
-      }
-    ],
-    "qualitative_adjustments": [
-      {
-        "factor": "Partial dhando (HK hard-asset / hidden NAV)",
-        "pp": 0.5,
-        "rationale": "Third-party confirms asset quality not in GAAP book; not full floor at spot price",
-        "sources": "cross_check_HK; hk_scan; HK Q1 2025/2026"
+        "id": "arbitration_and_bonus_option",
+        "label": "Arbitration and bonus-payment option",
+        "category": "real_option",
+        "overlap_key": "arbitration_and_bonus_option",
+        "treatment": "additive",
+        "valuation": {
+          "method": "probability_weighted_legal_option",
+          "basis": "per_share",
+          "low": 0,
+          "base": 7,
+          "high": 13,
+          "evidence_tier": "analyst_estimate",
+          "evidence": "September 2025 arbitration and bonus-payment research; legal record and collectible amount pending.",
+          "assumption_summary": "Risked present value of incremental distributions only; ordinary producing royalties remain in the core stream.",
+          "cross_check": "Range must be reconciled to primary filings, normalized economics, and relevant transaction or public-market evidence before IC approval.",
+          "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim."
+        }
       },
       {
-        "factor": "No dated predictive attribute at spot",
-        "pp": -0.2,
-        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
-        "sources": "HK predictive attributes framework"
-      }
-    ],
-    "numeric_weighted_pct": 14.04,
-    "qualitative_pp": 0.3,
-    "total_synthesis_pct": 14.34,
-    "human_approval": "approved",
-    "weight_audit": {
-      "flags": [
-        "Third-party numeric path proxies bull scenario (instrumentalist); HK cross-check says no base IRR upgrade. Prefer qualitative pp only until approved blend."
-      ],
-      "deutsch_checks": {
-        "hard_to_vary": false,
-        "falsifiable": true,
-        "not_instrumentalist": false,
-        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
-      }
-    },
-    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
-  },
-  "evidence_refresh": {
-    "synthesis_in_dive": true
-  },
-  "market_inputs": {},
-  "market_inputs_as_of": "2026-07-09",
-  "context_overlay": {
-    "as_of": "2026-07-09",
-    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
-    "themes": [
-      {
-        "theme_id": "macro_regime",
-        "label": "Macro risk regime",
-        "indicators": [
-          {
-            "id": "hy_oas",
-            "label": "High-yield OAS credit spread (%)",
-            "latest": 0.51,
-            "as_of": "2026-07-09",
-            "yoy_pct": 194.4,
-            "direction": "up",
-            "good_for": "risk_regime",
-            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "ust_10y",
-            "label": "US Treasury 10Y yield (%)",
-            "latest": 4.536999702453613,
-            "as_of": "2026-07-09",
-            "yoy_pct": 4.5,
-            "direction": "up",
-            "good_for": "rates_regime",
-            "source": "yahoo:^TNX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "ust_2y",
-            "label": "US Treasury 2Y yield (%)",
-            "latest": 4.269000053405762,
-            "as_of": "2026-07-09",
-            "yoy_pct": 8.9,
-            "direction": "up",
-            "good_for": "rates_regime",
-            "source": "yahoo:^FVX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "dxy_broad",
-            "label": "Trade-weighted USD index (broad)",
-            "latest": 100.91400146484375,
-            "as_of": "2026-07-09",
-            "yoy_pct": 3.5,
-            "direction": "up",
-            "good_for": "dollar_regime",
-            "source": "yahoo:DX-Y.NYB",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "vix_level",
-            "label": "VIX index level",
-            "latest": 16.059999465942383,
-            "as_of": "2026-07-09",
-            "yoy_pct": 0.8,
-            "direction": "flat",
-            "good_for": "vol_regime",
-            "source": "yahoo:^VIX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "credit_impulse_1m",
-            "label": "HYG vs TLT 1-month return spread (%)",
-            "latest": 0.33,
-            "as_of": "2026-07-09",
-            "yoy_pct": 147.1,
-            "direction": "up",
-            "good_for": "credit_impulse",
-            "source": "spread:HYG-TLT:21d",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "spy_20d_realized_vol",
-            "label": "SPY 20-day realized vol (annualized %)",
-            "latest": 15.46,
-            "as_of": "2026-07-09",
-            "yoy_pct": 47.4,
-            "direction": "up",
-            "good_for": "equity_vol",
-            "source": "realized_vol:SPY:20d",
-            "stale": false,
-            "in_base_irr": false
-          }
-        ]
-      },
-      {
-        "theme_id": "gold_royalties",
-        "label": "Gold royalty sentiment",
-        "indicators": [
-          {
-            "id": "gold_spot_usd",
-            "label": "Gold spot (USD/oz)",
-            "latest": 378.4200134277344,
-            "as_of": "2026-07-09",
-            "yoy_pct": 23.9,
-            "direction": "up",
-            "good_for": "gold_price",
-            "source": "yahoo:GLD (GLD price proxy when London fix unavailable)",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "gdx_etf",
-            "label": "GDX miners ETF (USD)",
-            "latest": 75.70999908447266,
-            "as_of": "2026-07-09",
-            "yoy_pct": 47.0,
-            "direction": "up",
-            "good_for": "royalty_sentiment",
-            "source": "yahoo:GDX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "gdx_gld_ratio",
-            "label": "GDX / GLD ratio (miners vs bullion)",
-            "latest": 0.2001,
-            "as_of": "2026-07-09",
-            "yoy_pct": 18.7,
-            "direction": "up",
-            "good_for": "royalty_multiple_sentiment",
-            "source": "ratio:GDX/GLD",
-            "stale": false,
-            "in_base_irr": false
-          }
-        ]
+        "id": "trust_cash_and_other_claims",
+        "label": "Trust cash and other net claims",
+        "category": "financial_asset",
+        "overlap_key": "trust_cash_and_other_claims",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": 1,
+          "base": 2,
+          "high": 3,
+          "evidence_tier": "audited",
+          "evidence": "The 2026 Annual Report reports a $20.403 million unallocated reserve, including $19.751 million unallocated cash, across 13,120,010 units, or approximately $1.555 per unit.",
+          "assumption_summary": "The $1/$2/$3 range brackets audited net trust assets and allows for reserve changes and contingent expenses.",
+          "cross_check": "Audited unallocated reserve divided by disclosed units reproduces approximately $1.555 per unit.",
+          "falsifier": "Material contingent legal costs or other senior liabilities consume the unallocated reserve."
+        }
       }
     ]
   },
-  "lens_consensus": {
-    "as_of": "2026-05-26",
-    "shared_inputs_ref": "valuation.json@2026-05-26",
-    "valuation_richness": 0.313,
-    "blended_return_pct": 8.88,
-    "band_pct": [
-      3.2,
-      14.34
-    ],
-    "weighted_median_pct": 10.3,
-    "median_mean_flag": false,
-    "stance": "watch",
-    "agreement_pct": 89,
-    "dissent_count": 1,
-    "lawrence_divergence": false,
-    "top_dissents": [
+  "economic_value": {
+    "schema_version": "1.0",
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One diluted share of MSB, including every identified operating claim, asset, liability, and option.",
+      "unit_label": "diluted share",
+      "unit_count": 13120010,
+      "unit_source": "Mesabi Trust 2026 Form 10-K: 13,120,010 units outstanding at April 21, 2026.",
+      "enterprise_to_equity_reconciliation": "Operating and asset claims are valued once; cash, debt, financing, reserves, and other senior claims are included as separate components or within the stated equity basis."
+    },
+    "gaap_role": "cross_check",
+    "accounting_reference": "Mesabi Trust 2026 Form 10-K and Annual Report, including the audited unallocated reserve bridge.",
+    "component_groups": [
       {
-        "persona": "hk",
-        "label": "Horizon Kinetics",
-        "verdict": "hold",
-        "return_pct": 12.3,
-        "key_metric": "payoff_lens=pending",
-        "conviction": 0.015,
-        "falsifier": "No dated contractual payoff or royalty/trust structure"
+        "id": "producing_royalty_stream",
+        "label": "Producing royalty and bonus stream",
+        "component_ids": [
+          "producing_royalty_stream"
+        ],
+        "economic_claim": "Producing royalty and bonus stream",
+        "valuation_basis": "Present value of after-trust royalty distributions under explicit volume, pellet-price, bonus, and discount-rate cases.",
+        "adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "overlap_control": "Unique overlap key producing_royalty_stream; no other component capitalizes the same claim."
+      },
+      {
+        "id": "depletion_and_concentration_reserve",
+        "label": "Finite reserve and counterparty concentration reserve",
+        "component_ids": [
+          "depletion_and_concentration_reserve"
+        ],
+        "economic_claim": "Finite reserve and counterparty concentration reserve",
+        "valuation_basis": "Deduction for depletion, operator concentration, interruption, and terminal-value uncertainty.",
+        "adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "overlap_control": "Unique overlap key depletion_and_concentration_reserve; no other component capitalizes the same claim."
+      },
+      {
+        "id": "arbitration_and_bonus_option",
+        "label": "Arbitration and bonus-payment option",
+        "component_ids": [
+          "arbitration_and_bonus_option"
+        ],
+        "economic_claim": "Arbitration and bonus-payment option",
+        "valuation_basis": "Risked present value of incremental distributions only; ordinary producing royalties remain in the core stream.",
+        "adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "overlap_control": "Unique overlap key arbitration_and_bonus_option; no other component capitalizes the same claim.",
+        "risk_and_timing": {
+          "probability_basis": "Starter probability is an explicit analyst judgment pending base-rate and milestone reconciliation.",
+          "timing_basis": "Scenario range includes delay and failure outcomes.",
+          "remaining_capital_basis": "Remaining capital and financing are deducted in the stated option range."
+        }
+      },
+      {
+        "id": "trust_cash_and_other_claims",
+        "label": "Trust cash and other net claims",
+        "component_ids": [
+          "trust_cash_and_other_claims"
+        ],
+        "economic_claim": "Trust cash and other net claims",
+        "valuation_basis": "Net realizable trust assets after administrative costs and non-royalty claims.",
+        "adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "overlap_control": "Unique overlap key trust_cash_and_other_claims; no other component capitalizes the same claim."
       }
     ],
-    "contributor_count": 7,
-    "in_base_irr": false,
-    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
+    "wisdom_applied": [
+      "Horizon Kinetics: treat the royalty as a long-lived economic claim rather than a one-year yield security.",
+      "Marathon/Capital Returns: production and reserve response determine duration.",
+      "Klarman: legal recovery is separate, probability-weighted optionality."
+    ],
+    "limitations": [
+      "Starter ranges are analyst estimates, not committee-approved price targets.",
+      "The model remains evidence-blocked until primary-source normalization, comparable selection, and downside cases pass independent review."
+    ]
   },
-  "total_return_panel": {
-    "schema_version": "3.0",
+  "results_lawrence_legacy": {},
+  "results": {},
+  "implied_return": {
+    "base_pct": null,
+    "label": "pending",
+    "display": "pending"
+  },
+  "stance_proposal": {
+    "suggested": "pending",
+    "irr_band": "pending",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "overlay_results": [],
+  "component_valuation_results": {
+    "status": "complete",
+    "decision_rule": "Use the complete low/base/high component schedule. Embedded components are estimated but not added twice.",
+    "all_material_components_identified": true,
+    "additive_components": [
+      {
+        "id": "producing_royalty_stream",
+        "label": "Producing royalty and bonus stream",
+        "category": "operating_business",
+        "overlap_key": "producing_royalty_stream",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "royalty_distribution_curve",
+        "evidence_tier": "analyst_estimate",
+        "evidence": "Trust distribution history and royalty terms; reserve and production reconciliation pending.",
+        "cross_check": "Range must be reconciled to primary filings, normalized economics, and relevant transaction or public-market evidence before IC approval.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Present value of after-trust royalty distributions under explicit volume, pellet-price, bonus, and discount-rate cases.",
+        "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "scenario_assumptions": null,
+        "low_per_share": 30.0,
+        "base_per_share": 35.0,
+        "high_per_share": 42.0
+      },
+      {
+        "id": "depletion_and_concentration_reserve",
+        "label": "Finite reserve and counterparty concentration reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "depletion_and_concentration_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "depletion_reserve",
+        "evidence_tier": "analyst_estimate",
+        "evidence": "Finite mineral claim and concentrated operator exposure.",
+        "cross_check": "Range must be reconciled to primary filings, normalized economics, and relevant transaction or public-market evidence before IC approval.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Deduction for depletion, operator concentration, interruption, and terminal-value uncertainty.",
+        "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "scenario_assumptions": null,
+        "low_per_share": -5.0,
+        "base_per_share": -3.0,
+        "high_per_share": -1.0
+      },
+      {
+        "id": "arbitration_and_bonus_option",
+        "label": "Arbitration and bonus-payment option",
+        "category": "real_option",
+        "overlap_key": "arbitration_and_bonus_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "probability_weighted_legal_option",
+        "evidence_tier": "analyst_estimate",
+        "evidence": "September 2025 arbitration and bonus-payment research; legal record and collectible amount pending.",
+        "cross_check": "Range must be reconciled to primary filings, normalized economics, and relevant transaction or public-market evidence before IC approval.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Risked present value of incremental distributions only; ordinary producing royalties remain in the core stream.",
+        "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "scenario_assumptions": null,
+        "low_per_share": 0.0,
+        "base_per_share": 7.0,
+        "high_per_share": 13.0
+      },
+      {
+        "id": "trust_cash_and_other_claims",
+        "label": "Trust cash and other net claims",
+        "category": "financial_asset",
+        "overlap_key": "trust_cash_and_other_claims",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "net_asset_value",
+        "evidence_tier": "audited",
+        "evidence": "The 2026 Annual Report reports a $20.403 million unallocated reserve, including $19.751 million unallocated cash, across 13,120,010 units, or approximately $1.555 per unit.",
+        "cross_check": "Audited unallocated reserve divided by disclosed units reproduces approximately $1.555 per unit.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "The $1/$2/$3 range brackets audited net trust assets and allows for reserve changes and contingent expenses.",
+        "falsifier": "Material contingent legal costs or other senior liabilities consume the unallocated reserve.",
+        "scenario_assumptions": null,
+        "low_per_share": 1.0,
+        "base_per_share": 2.0,
+        "high_per_share": 3.0
+      }
+    ],
+    "embedded_components": [],
+    "total_equity_value_per_share": {
+      "low": 26.0,
+      "base": 41.0,
+      "high": 57.0
+    },
+    "material_component_count": 4,
+    "additive_component_count": 4,
+    "embedded_component_count": 0,
+    "market_price_per_share": 25.68,
+    "upside_downside_pct": {
+      "low": 1.2,
+      "base": 59.7,
+      "high": 122.0
+    }
+  },
+  "economic_value_analysis": {
+    "schema_version": "1.0",
+    "status": "complete",
+    "trigger": {
+      "required": true,
+      "reasons": [
+        "explicit_component_schedule",
+        "economic_archetype:resource"
+      ],
+      "policy": "A complete economic-value analysis is required when any trigger fires; otherwise it is recommended."
+    },
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One diluted share of MSB, including every identified operating claim, asset, liability, and option.",
+      "unit_label": "diluted share",
+      "unit_count": 13120010,
+      "unit_source": "Mesabi Trust 2026 Form 10-K: 13,120,010 units outstanding at April 21, 2026.",
+      "enterprise_to_equity_reconciliation": "Operating and asset claims are valued once; cash, debt, financing, reserves, and other senior claims are included as separate components or within the stated equity basis."
+    },
+    "gaap_role": "cross_check",
+    "accounting_reference": "Mesabi Trust 2026 Form 10-K and Annual Report, including the audited unallocated reserve bridge.",
+    "comparable_hierarchy": [
+      "issuer_arm_length_transaction",
+      "same_asset_transaction",
+      "public_peer",
+      "replacement_cost",
+      "approved_external_analysis"
+    ],
+    "gross_comparable_nav_per_share": null,
+    "risked_present_value_per_share": {
+      "low": 26.0,
+      "base": 41.0,
+      "high": 57.0
+    },
+    "component_groups": [
+      {
+        "id": "producing_royalty_stream",
+        "label": "Producing royalty and bonus stream",
+        "component_ids": [
+          "producing_royalty_stream"
+        ],
+        "economic_claim": "Producing royalty and bonus stream",
+        "valuation_basis": "Present value of after-trust royalty distributions under explicit volume, pellet-price, bonus, and discount-rate cases.",
+        "adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "overlap_control": "Unique overlap key producing_royalty_stream; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": 30.0,
+          "base": 35.0,
+          "high": 42.0
+        }
+      },
+      {
+        "id": "depletion_and_concentration_reserve",
+        "label": "Finite reserve and counterparty concentration reserve",
+        "component_ids": [
+          "depletion_and_concentration_reserve"
+        ],
+        "economic_claim": "Finite reserve and counterparty concentration reserve",
+        "valuation_basis": "Deduction for depletion, operator concentration, interruption, and terminal-value uncertainty.",
+        "adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "overlap_control": "Unique overlap key depletion_and_concentration_reserve; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": -5.0,
+          "base": -3.0,
+          "high": -1.0
+        }
+      },
+      {
+        "id": "arbitration_and_bonus_option",
+        "label": "Arbitration and bonus-payment option",
+        "component_ids": [
+          "arbitration_and_bonus_option"
+        ],
+        "economic_claim": "Arbitration and bonus-payment option",
+        "valuation_basis": "Risked present value of incremental distributions only; ordinary producing royalties remain in the core stream.",
+        "adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "overlap_control": "Unique overlap key arbitration_and_bonus_option; no other component capitalizes the same claim.",
+        "risk_and_timing": {
+          "probability_basis": "Starter probability is an explicit analyst judgment pending base-rate and milestone reconciliation.",
+          "timing_basis": "Scenario range includes delay and failure outcomes.",
+          "remaining_capital_basis": "Remaining capital and financing are deducted in the stated option range."
+        },
+        "risked_present_value_per_share": {
+          "low": 0.0,
+          "base": 7.0,
+          "high": 13.0
+        }
+      },
+      {
+        "id": "trust_cash_and_other_claims",
+        "label": "Trust cash and other net claims",
+        "component_ids": [
+          "trust_cash_and_other_claims"
+        ],
+        "economic_claim": "Trust cash and other net claims",
+        "valuation_basis": "Net realizable trust assets after administrative costs and non-royalty claims.",
+        "adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "overlap_control": "Unique overlap key trust_cash_and_other_claims; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": 1.0,
+          "base": 2.0,
+          "high": 3.0
+        }
+      }
+    ],
+    "valuation_proof": [
+      {
+        "component_id": "producing_royalty_stream",
+        "economic_claim": "Producing royalty and bonus stream",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "royalty_distribution_curve",
+        "evidence_tier": "analyst_estimate",
+        "evidence": "Trust distribution history and royalty terms; reserve and production reconciliation pending.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "range_per_share": {
+          "low": 30.0,
+          "base": 35.0,
+          "high": 42.0
+        },
+        "treatment": "additive",
+        "overlap_key": "producing_royalty_stream",
+        "overlap_control": "Unique overlap key producing_royalty_stream; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "depletion_and_concentration_reserve",
+        "economic_claim": "Finite reserve and counterparty concentration reserve",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "depletion_reserve",
+        "evidence_tier": "analyst_estimate",
+        "evidence": "Finite mineral claim and concentrated operator exposure.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "range_per_share": {
+          "low": -5.0,
+          "base": -3.0,
+          "high": -1.0
+        },
+        "treatment": "additive",
+        "overlap_key": "depletion_and_concentration_reserve",
+        "overlap_control": "Unique overlap key depletion_and_concentration_reserve; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "arbitration_and_bonus_option",
+        "economic_claim": "Arbitration and bonus-payment option",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "probability_weighted_legal_option",
+        "evidence_tier": "analyst_estimate",
+        "evidence": "September 2025 arbitration and bonus-payment research; legal record and collectible amount pending.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 7.0,
+          "high": 13.0
+        },
+        "treatment": "additive",
+        "overlap_key": "arbitration_and_bonus_option",
+        "overlap_control": "Unique overlap key arbitration_and_bonus_option; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "risk_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "Scenario range includes delay and failure outcomes.",
+          "probability_basis": "Starter probability is an explicit analyst judgment pending base-rate and milestone reconciliation.",
+          "remaining_capital_basis": "Remaining capital and financing are deducted in the stated option range."
+        }
+      },
+      {
+        "component_id": "trust_cash_and_other_claims",
+        "economic_claim": "Trust cash and other net claims",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "evidence_tier": "audited",
+        "evidence": "The 2026 Annual Report reports a $20.403 million unallocated reserve, including $19.751 million unallocated cash, across 13,120,010 units, or approximately $1.555 per unit.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "range_per_share": {
+          "low": 1.0,
+          "base": 2.0,
+          "high": 3.0
+        },
+        "treatment": "additive",
+        "overlap_key": "trust_cash_and_other_claims",
+        "overlap_control": "Unique overlap key trust_cash_and_other_claims; no other component capitalizes the same claim.",
+        "falsifier": "Material contingent legal costs or other senior liabilities consume the unallocated reserve.",
+        "risk_and_timing": null
+      }
+    ],
+    "wisdom_applied": [
+      "Horizon Kinetics: treat the royalty as a long-lived economic claim rather than a one-year yield security.",
+      "Marathon/Capital Returns: production and reserve response determine duration.",
+      "Klarman: legal recovery is separate, probability-weighted optionality."
+    ],
+    "limitations": [
+      "Starter ranges are analyst estimates, not committee-approved price targets.",
+      "The model remains evidence-blocked until primary-source normalization, comparable selection, and downside cases pass independent review."
+    ],
+    "complete_component_coverage": true,
+    "validation_errors": [],
+    "registry_version": "1.0"
+  },
+  "component_review_queue": {
+    "status": "ready_for_committee_review",
+    "decision_rule": "Each assigned rater records accept, challenge, or reject with a proposed range and evidence. The aggregator may not silently average disputed ranges.",
+    "items": [
+      {
+        "component_id": "producing_royalty_stream",
+        "label": "Producing royalty and bonus stream",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 30.0,
+          "base": 35.0,
+          "high": 42.0
+        },
+        "range_width_pct_of_base": 34.3,
+        "evidence_tier": "analyst_estimate",
+        "recommended_raters": [
+          "hohn",
+          "marathon_capital_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "depletion_and_concentration_reserve",
+        "label": "Finite reserve and counterparty concentration reserve",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": -5.0,
+          "base": -3.0,
+          "high": -1.0
+        },
+        "range_width_pct_of_base": 133.3,
+        "evidence_tier": "analyst_estimate",
+        "recommended_raters": [
+          "marks_credit_cycle",
+          "pabrai"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "arbitration_and_bonus_option",
+        "label": "Arbitration and bonus-payment option",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 7.0,
+          "high": 13.0
+        },
+        "range_width_pct_of_base": 185.7,
+        "evidence_tier": "analyst_estimate",
+        "recommended_raters": [
+          "klarman_asset_value",
+          "hk"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "trust_cash_and_other_claims",
+        "label": "Trust cash and other net claims",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 1.0,
+          "base": 2.0,
+          "high": 3.0
+        },
+        "range_width_pct_of_base": 100.0,
+        "evidence_tier": "audited",
+        "recommended_raters": [
+          "greenblatt",
+          "marks_credit_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      }
+    ]
+  },
+  "valuation_method_route": {
+    "schema_version": "1.0",
+    "status": "routed",
+    "profile_id": "scarce_asset_optionality",
+    "label": "Scarce assets, royalties, and optionality",
+    "score": 9.0,
+    "reasons": [
+      "archetype=resource",
+      "component categories=real_option",
+      "existing methods=option, royalty"
+    ],
+    "primary_methods": [
+      "component_owner_cash_and_unit_nav"
+    ],
+    "corroborating_methods": [
+      "comparable_transactions",
+      "replacement_cost_or_reverse_nav"
+    ],
+    "primary_personas": [
+      "hk",
+      "stahl"
+    ],
+    "cross_check_personas": [
+      "klarman_asset_value",
+      "marks_credit_cycle"
+    ],
+    "silent_personas": [
+      "buffett_weschler",
+      "greenblatt",
+      "hohn",
+      "marathon_capital_cycle",
+      "munger",
+      "pabrai"
+    ],
+    "required_evidence": [
+      "legal economic claim",
+      "non-overlapping physical inventory",
+      "unit economics",
+      "realization timing",
+      "remaining owner capital"
+    ],
+    "failure_modes": [
+      "gross asset value mistaken for shareholder value",
+      "operating cash flow and NAV counted twice",
+      "remote options treated as contracted cash"
+    ],
+    "secondary_profiles": [
+      {
+        "profile_id": "credit_and_normalized_returns",
+        "score": 2.0,
+        "reasons": [
+          "component categories=financial_asset, liability_or_reserve"
+        ]
+      },
+      {
+        "profile_id": "binary_milestone",
+        "score": 2.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=probability"
+        ]
+      }
+    ],
+    "scorecard": {
+      "scarce_asset_optionality": {
+        "score": 9.0,
+        "reasons": [
+          "archetype=resource",
+          "component categories=real_option",
+          "existing methods=option, royalty"
+        ]
+      },
+      "quality_reinvestment": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
+      },
+      "capital_cycle": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
+      },
+      "credit_and_normalized_returns": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=financial_asset, liability_or_reserve"
+        ]
+      },
+      "catalyst_asset_value": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=financial_asset"
+        ]
+      },
+      "predictable_cash_flow": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
+      },
+      "binary_milestone": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=probability"
+        ]
+      }
+    },
+    "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+  },
+  "universal_valuation_contract": {
+    "schema_version": "1.0",
+    "status": "decision_grade",
     "ticker": "MSB",
     "as_of": "2026-07-15",
-    "status": "partial",
-    "error": "Vendor events are discovery evidence; primary-source completeness has not been established.",
-    "price_source": "yahoo:MSB",
-    "currency": "USD",
-    "return_currency": "USD",
-    "fx_basis": "listing_currency_nominal",
-    "history_start": "1973-02-21",
-    "history_end": "2026-07-15",
-    "price_points": 13462,
-    "price_interval": "1d",
-    "history_basis": "earliest_available_vendor_trading_history",
-    "chart_scale": "logarithmic",
-    "chart_y_axis": "cumulative_return_pct",
-    "chart_series": [
-      "total_return",
-      "price_only"
+    "economic_ownership_map": [
+      {
+        "component_id": "producing_royalty_stream",
+        "label": "Producing royalty and bonus stream",
+        "category": "operating_business",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Producing royalty and bonus stream",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 35.0
+        },
+        "growth_driver": "Present value of after-trust royalty distributions under explicit volume, pellet-price, bonus, and discount-rate cases.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "royalty_distribution_curve",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 30.0,
+          "base": 35.0,
+          "high": 42.0
+        },
+        "evidence_tier": "analyst_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "Trust distribution history and royalty terms; reserve and production reconciliation pending.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "overlap_key": "producing_royalty_stream",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "depletion_and_concentration_reserve",
+        "label": "Finite reserve and counterparty concentration reserve",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Finite reserve and counterparty concentration reserve",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": -3.0
+        },
+        "growth_driver": "Deduction for depletion, operator concentration, interruption, and terminal-value uncertainty.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "depletion_reserve",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": -5.0,
+          "base": -3.0,
+          "high": -1.0
+        },
+        "evidence_tier": "analyst_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "Finite mineral claim and concentrated operator exposure.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "overlap_key": "depletion_and_concentration_reserve",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "arbitration_and_bonus_option",
+        "label": "Arbitration and bonus-payment option",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Arbitration and bonus-payment option",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 7.0
+        },
+        "growth_driver": "Risked present value of incremental distributions only; ordinary producing royalties remain in the core stream.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "probability_weighted_legal_option",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.0,
+          "base": 7.0,
+          "high": 13.0
+        },
+        "evidence_tier": "analyst_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "September 2025 arbitration and bonus-payment research; legal record and collectible amount pending.",
+        "probability_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "Scenario range includes delay and failure outcomes.",
+          "probability_basis": "Starter probability is an explicit analyst judgment pending base-rate and milestone reconciliation.",
+          "remaining_capital_basis": "Remaining capital and financing are deducted in the stated option range."
+        },
+        "tax_and_realization_adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "overlap_key": "arbitration_and_bonus_option",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "trust_cash_and_other_claims",
+        "label": "Trust cash and other net claims",
+        "category": "financial_asset",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Trust cash and other net claims",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 2.0
+        },
+        "growth_driver": "The $1/$2/$3 range brackets audited net trust assets and allows for reserve changes and contingent expenses.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "net_asset_value",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 1.0,
+          "base": 2.0,
+          "high": 3.0
+        },
+        "evidence_tier": "audited",
+        "evidence_level": "primary_verified",
+        "evidence": "The 2026 Annual Report reports a $20.403 million unallocated reserve, including $19.751 million unallocated cash, across 13,120,010 units, or approximately $1.555 per unit.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "falsifier": "Material contingent legal costs or other senior liabilities consume the unallocated reserve.",
+        "overlap_key": "trust_cash_and_other_claims",
+        "assumption_type": "fact"
+      }
     ],
-    "return_contract": "split-adjusted close excluding dividends; event amounts normalized for later splits; cash reinvested at ex-date close; pre-tax nominal",
-    "coverage": {
-      "status": "vendor_only",
-      "start": null,
-      "end": null,
-      "note": "Vendor events are discovery evidence; primary-source completeness has not been established.",
-      "ledger_path": null
+    "component_coverage": {
+      "all_material_components_identified": true,
+      "material_component_count": 4,
+      "additive_component_count": 4,
+      "embedded_component_count": 0,
+      "unvalued_component_count": 0,
+      "double_counting_flags": []
     },
-    "event_count": 124,
-    "event_counts": {
-      "regular_dividend": 124
+    "input_classification": {
+      "facts": [
+        {
+          "component_id": "trust_cash_and_other_claims",
+          "label": "Trust cash and other net claims",
+          "kind": "fact",
+          "evidence_tier": "audited",
+          "evidence": "The 2026 Annual Report reports a $20.403 million unallocated reserve, including $19.751 million unallocated cash, across 13,120,010 units, or approximately $1.555 per unit.",
+          "method": "net_asset_value"
+        }
+      ],
+      "estimates": [],
+      "judgments": [
+        {
+          "component_id": "producing_royalty_stream",
+          "label": "Producing royalty and bonus stream",
+          "kind": "judgment",
+          "evidence_tier": "analyst_estimate",
+          "evidence": "Trust distribution history and royalty terms; reserve and production reconciliation pending.",
+          "method": "royalty_distribution_curve"
+        },
+        {
+          "component_id": "depletion_and_concentration_reserve",
+          "label": "Finite reserve and counterparty concentration reserve",
+          "kind": "judgment",
+          "evidence_tier": "analyst_estimate",
+          "evidence": "Finite mineral claim and concentrated operator exposure.",
+          "method": "depletion_reserve"
+        },
+        {
+          "component_id": "arbitration_and_bonus_option",
+          "label": "Arbitration and bonus-payment option",
+          "kind": "judgment",
+          "evidence_tier": "analyst_estimate",
+          "evidence": "September 2025 arbitration and bonus-payment research; legal record and collectible amount pending.",
+          "method": "probability_weighted_legal_option"
+        }
+      ]
     },
-    "cash_distributions_on_initial_share_path": 545.1116,
-    "distribution_contribution_by_type": {
-      "regular_dividend": 545.111632
+    "method_route": {
+      "schema_version": "1.0",
+      "status": "routed",
+      "profile_id": "scarce_asset_optionality",
+      "label": "Scarce assets, royalties, and optionality",
+      "score": 9.0,
+      "reasons": [
+        "archetype=resource",
+        "component categories=real_option",
+        "existing methods=option, royalty"
+      ],
+      "primary_methods": [
+        "component_owner_cash_and_unit_nav"
+      ],
+      "corroborating_methods": [
+        "comparable_transactions",
+        "replacement_cost_or_reverse_nav"
+      ],
+      "primary_personas": [
+        "hk",
+        "stahl"
+      ],
+      "cross_check_personas": [
+        "klarman_asset_value",
+        "marks_credit_cycle"
+      ],
+      "silent_personas": [
+        "buffett_weschler",
+        "greenblatt",
+        "hohn",
+        "marathon_capital_cycle",
+        "munger",
+        "pabrai"
+      ],
+      "required_evidence": [
+        "legal economic claim",
+        "non-overlapping physical inventory",
+        "unit economics",
+        "realization timing",
+        "remaining owner capital"
+      ],
+      "failure_modes": [
+        "gross asset value mistaken for shareholder value",
+        "operating cash flow and NAV counted twice",
+        "remote options treated as contracted cash"
+      ],
+      "secondary_profiles": [
+        {
+          "profile_id": "credit_and_normalized_returns",
+          "score": 2.0,
+          "reasons": [
+            "component categories=financial_asset, liability_or_reserve"
+          ]
+        },
+        {
+          "profile_id": "binary_milestone",
+          "score": 2.0,
+          "reasons": [
+            "component categories=real_option",
+            "existing methods=probability"
+          ]
+        }
+      ],
+      "scorecard": {
+        "scarce_asset_optionality": {
+          "score": 9.0,
+          "reasons": [
+            "archetype=resource",
+            "component categories=real_option",
+            "existing methods=option, royalty"
+          ]
+        },
+        "quality_reinvestment": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=operating_business"
+          ]
+        },
+        "capital_cycle": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=operating_business"
+          ]
+        },
+        "credit_and_normalized_returns": {
+          "score": 2.0,
+          "reasons": [
+            "component categories=financial_asset, liability_or_reserve"
+          ]
+        },
+        "catalyst_asset_value": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=financial_asset"
+          ]
+        },
+        "predictable_cash_flow": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=operating_business"
+          ]
+        },
+        "binary_milestone": {
+          "score": 2.0,
+          "reasons": [
+            "component categories=real_option",
+            "existing methods=probability"
+          ]
+        }
+      },
+      "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
     },
-    "cumulative_distributions_per_share": 545.1116,
-    "start_price": 9.5,
-    "end_price": 25.07,
-    "price_index_end": 263.89,
-    "total_return_index_end": 6999.67,
-    "cumulative_price_return_pct": 163.89,
-    "cumulative_total_return_pct": 6899.67,
-    "price_only_annualized_pct": 1.83,
-    "total_return_annualized_pct": 8.28,
-    "market_cap_m": null,
-    "shares_outstanding": null,
-    "price_for_market_cap": 25.68,
-    "chart": "MSB/research/charts/total_return_2026-07-15.svg",
-    "panel_json": "MSB/research/total_return_panel.json"
+    "market": {
+      "price_per_share": 25.68,
+      "fully_diluted_shares": 13120010,
+      "market_cap_m": 336.92,
+      "enterprise_value_m": null
+    },
+    "valuation": {
+      "value_per_share": {
+        "low": 26.0,
+        "base": 41.0,
+        "high": 57.0
+      },
+      "probability_weighted_value_per_share": 41.0,
+      "expected_distributions_per_share": 0.0,
+      "annualized_return_at_price_pct": {
+        "low": 0.18,
+        "base": 6.91,
+        "high": 12.06
+      },
+      "downside_to_low_pct": 1.25,
+      "horizon_years": 7
+    },
+    "scenario_contract": {
+      "rule": "Cases must change causal operating, capital, probability, timing, or financing drivers\u2014not only the terminal multiple.",
+      "top_value_drivers": [
+        {
+          "component_id": "arbitration_and_bonus_option",
+          "label": "Arbitration and bonus-payment option",
+          "base_per_share": 7.0,
+          "range_width_per_share": 13.0,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "producing_royalty_stream",
+          "label": "Producing royalty and bonus stream",
+          "base_per_share": 35.0,
+          "range_width_per_share": 12.0,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "depletion_and_concentration_reserve",
+          "label": "Finite reserve and counterparty concentration reserve",
+          "base_per_share": -3.0,
+          "range_width_per_share": 4.0,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "trust_cash_and_other_claims",
+          "label": "Trust cash and other net claims",
+          "base_per_share": 2.0,
+          "range_width_per_share": 2.0,
+          "scenario_assumptions": null
+        }
+      ],
+      "reverse_expectations": null
+    },
+    "evidence": {
+      "unresolved_count": 0,
+      "blockers": [],
+      "validation_errors": []
+    },
+    "monitoring": {
+      "falsifiers": [
+        "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "Material contingent legal costs or other senior liabilities consume the unallocated reserve."
+      ],
+      "required_refresh_triggers": [
+        "new filing or material operating update",
+        "capital-structure change",
+        "material price move",
+        "component milestone or falsifier"
+      ]
+    },
+    "decision_rule": "No security is decision-grade until every material economic claim is valued exactly once and every material evidence blocker is resolved."
+  },
+  "synthesis": {
+    "status": "incomplete",
+    "reason": "zero weights"
   }
 }

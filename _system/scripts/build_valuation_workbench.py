@@ -10,6 +10,9 @@ from collections import defaultdict
 from datetime import date, datetime
 from pathlib import Path
 
+from universal_valuation_contract import build_universal_valuation_contract
+from valuation_method_router import route_valuation
+
 ROOT = Path(__file__).resolve().parents[2]
 CONFIG = ROOT / "_system" / "reference" / "valuation_followups.json"
 LEDGER = ROOT / "_system" / "research" / "committee_outcomes.jsonl"
@@ -47,7 +50,10 @@ def committee_view(research: Path) -> dict:
     required = []
     for round_number in (1, 2):
         required.extend(f"round_{round_number}/{row.get('persona')}.json" for row in raters if row.get("persona"))
-    required.extend(["proposer.json", "pre_mortem.json", "research_response.json"])
+    required.extend([
+        "proposer.json", "pre_mortem.json", "evidence_tribunal.json", "research_response.json",
+        "valuation_reconciliation.json", "adversarial_review.json", "chair_synthesis.json",
+    ])
     completed = [name for name in required if work and (work / name).exists()]
     missing = [name for name in required if name not in completed]
     record_path, record = latest_committee_record(research)
@@ -157,16 +163,77 @@ def method_fit_view(config: dict, ticker_cfg: dict, valuation: dict) -> dict:
     archetype = (valuation.get("classification_inputs") or {}).get("archetype")
     profile_id = ticker_cfg.get("method_profile") or (config.get("archetype_profile_map") or {}).get(archetype) or "unclassified"
     profile = (config.get("method_profiles") or {}).get(profile_id) or {}
+    route = route_valuation(valuation, profile_id) if profile_id != "unclassified" else (valuation.get("valuation_method_route") or route_valuation(valuation))
     return {
-        "profile_id": profile_id,
-        "label": profile.get("label") or profile_id.replace("_", " ").title(),
+        "profile_id": route.get("profile_id") or profile_id,
+        "label": route.get("label") or profile.get("label") or profile_id.replace("_", " ").title(),
         "current_archetype": archetype,
-        "primary_personas": profile.get("primary_personas") or [],
-        "cross_check_personas": profile.get("cross_check_personas") or [],
+        "primary_methods": route.get("primary_methods") or [],
+        "corroborating_methods": route.get("corroborating_methods") or [],
+        "primary_personas": route.get("primary_personas") or profile.get("primary_personas") or [],
+        "cross_check_personas": route.get("cross_check_personas") or profile.get("cross_check_personas") or [],
+        "silent_personas": route.get("silent_personas") or [],
+        "routing_reasons": route.get("reasons") or [],
+        "required_evidence": route.get("required_evidence") or [],
         "applicability_tests": profile.get("applicability_tests") or [],
-        "failure_modes": profile.get("failure_modes") or [],
+        "failure_modes": route.get("failure_modes") or profile.get("failure_modes") or [],
         "validation_cohort": config.get("validation_cohort") or [],
-        "rule": "Use the universal economic-value contract for every security; change the primary method and raters only when the applicability tests support it.",
+        "rule": route.get("decision_rule") or "Use the universal economic-value contract for every security; change the primary method and raters only when the applicability tests support it.",
+    }
+
+
+def decision_view(valuation: dict, committee: dict) -> dict:
+    contract = valuation.get("universal_valuation_contract") or build_universal_valuation_contract(valuation)
+    values = (contract.get("valuation") or {}).get("value_per_share") or {}
+    returns = (contract.get("valuation") or {}).get("annualized_return_at_price_pct") or {}
+    return {
+        "status": contract.get("status"),
+        "price_per_share": (contract.get("market") or {}).get("price_per_share"),
+        "market_cap_m": (contract.get("market") or {}).get("market_cap_m"),
+        "enterprise_value_m": (contract.get("market") or {}).get("enterprise_value_m"),
+        "value_per_share": values,
+        "annualized_return_at_price_pct": returns,
+        "downside_to_low_pct": (contract.get("valuation") or {}).get("downside_to_low_pct"),
+        "unvalued_component_count": (contract.get("component_coverage") or {}).get("unvalued_component_count"),
+        "unresolved_evidence_count": (contract.get("evidence") or {}).get("unresolved_count"),
+        "primary_power_zone": (contract.get("method_route") or {}).get("label"),
+        "owner_decision": committee.get("owner_decision"),
+        "next_action": committee.get("next_action"),
+    }
+
+
+def business_view(valuation: dict) -> dict:
+    contract = valuation.get("universal_valuation_contract") or build_universal_valuation_contract(valuation)
+    rows = contract.get("economic_ownership_map") or []
+    return {
+        "status": "complete" if not (contract.get("component_coverage") or {}).get("unvalued_component_count") else "incomplete",
+        "components": rows,
+        "component_coverage": contract.get("component_coverage") or {},
+        "facts": (contract.get("input_classification") or {}).get("facts") or [],
+        "estimates": (contract.get("input_classification") or {}).get("estimates") or [],
+        "judgments": (contract.get("input_classification") or {}).get("judgments") or [],
+    }
+
+
+def valuation_view(valuation: dict) -> dict:
+    contract = valuation.get("universal_valuation_contract") or build_universal_valuation_contract(valuation)
+    return {
+        "status": contract.get("status"),
+        "market": contract.get("market") or {},
+        "valuation": contract.get("valuation") or {},
+        "components": contract.get("economic_ownership_map") or [],
+        "scenario_contract": contract.get("scenario_contract") or {},
+    }
+
+
+def optionality_view(valuation: dict) -> dict:
+    contract = valuation.get("universal_valuation_contract") or build_universal_valuation_contract(valuation)
+    options = [row for row in contract.get("economic_ownership_map") or [] if row.get("category") in {"real_option", "dated_payoff"}]
+    return {
+        "status": "present" if options else "not_material_or_separately_identified",
+        "option_count": len(options),
+        "options": options,
+        "rule": "Every option requires a beneficiary, probability, timing, remaining capital, failure case, and non-overlap control; absence of option value must be explicit rather than unvalued.",
     }
 
 
@@ -208,9 +275,10 @@ def outcome_view(ticker: str, config: dict, committee: dict, as_of: str) -> dict
             "return_status": measured.get("return_status") if measured else None,
         })
     calibration = read_json(CALIBRATION)
-    persona_rows = calibration.get("personas") or {}
+    persona_rows = calibration.get("methods") or calibration.get("personas") or {}
     threshold = int(config.get("minimum_persona_outcomes_before_reweighting") or 20)
-    eligible = sorted(persona for persona, row in persona_rows.items() if int(row.get("n") or 0) >= threshold)
+    eligible = sorted(persona for persona, row in persona_rows.items() if int(row.get("completed_outcomes") or row.get("n") or 0) >= threshold)
+    zone_eligible = sorted(key for key, row in (calibration.get("persona_power_zones") or {}).items() if int(row.get("completed_outcomes") or 0) >= threshold)
     return {
         "status": "tracking" if decision_date else "waiting_for_owner_decision",
         "decision_date": decision_date,
@@ -218,7 +286,8 @@ def outcome_view(ticker: str, config: dict, committee: dict, as_of: str) -> dict
         "recorded_outcome_count": len(rows),
         "minimum_persona_outcomes_before_reweighting": threshold,
         "personas_eligible_for_weight_review": eligible,
-        "weighting_rule": f"Do not change persona weights until at least {threshold} attributable outcomes exist for that persona.",
+        "persona_power_zones_eligible_for_weight_review": zone_eligible,
+        "weighting_rule": f"Do not change a persona's relevance within a power zone until at least {threshold} attributable, dividend-aware outcomes exist there; never reweight automatically.",
     }
 
 
@@ -323,16 +392,50 @@ def build(ticker: str, as_of: str | None = None) -> dict:
     ticker = ticker.upper()
     research = ROOT / ticker / "research"
     valuation = read_json(research / "valuation.json")
-    if not valuation:
-        raise FileNotFoundError(f"{ticker}: valuation.json missing")
+    reviewed_contract = read_json(research / "valuation_contract.json")
+    if reviewed_contract:
+        # The cohort contract merges curated evidence follow-ups and the
+        # explicitly reviewed power-zone route.  Prefer it to the raw model's
+        # computed contract so the dashboard cannot call an unresolved case
+        # decision-grade merely because the arithmetic schedule is complete.
+        valuation["universal_valuation_contract"] = reviewed_contract
+    scaffold = read_json(research / "valuation_model_scaffold.json")
+    if not valuation or (scaffold and not valuation.get("method")):
+        if not scaffold:
+            raise FileNotFoundError(f"{ticker}: valuation.json and valuation_model_scaffold.json missing")
+        effective_date = (as_of or date.today().isoformat())[:10]
+        route = scaffold.get("method_route") or {}
+        gap = {
+            "id": "complete_component_model_required", "priority": "critical", "component_ids": [],
+            "question": "A complete primary-sourced component valuation has not been built.",
+            "evidence_required": "; ".join(scaffold.get("required_component_map") or []),
+            "acceptance_test": "Every material economic claim is valued exactly once with causal low/base/high assumptions and primary evidence.",
+            "valuation_effect": "Blocks decision-grade value and committee voting.", "status": "open", "source": "cohort_scaffold",
+        }
+        return {
+            "schema_version": "2.0", "ticker": ticker, "as_of": effective_date,
+            "decision": {"status": "evidence_blocked", "price_per_share": None, "market_cap_m": None, "enterprise_value_m": None, "value_per_share": {}, "annualized_return_at_price_pct": {}, "downside_to_low_pct": None, "unvalued_component_count": 1, "unresolved_evidence_count": 1, "primary_power_zone": route.get("label"), "owner_decision": None, "next_action": scaffold.get("next_action")},
+            "business": {"status": "incomplete", "components": [], "component_coverage": {"unvalued_component_count": 1}, "facts": [], "estimates": [], "judgments": []},
+            "valuation": {"status": "evidence_blocked", "market": {}, "valuation": {}, "components": [], "scenario_contract": {"rule": "Build causal low/base/high scenarios before drawing a conclusion."}},
+            "optionality": {"status": "not_yet_mapped", "option_count": 0, "options": [], "rule": "Optionality remains unvalued until the component map is complete."},
+            "committee": {"status": "not_started", "analysis_progress": {"completed": 0, "required": 0}, "owner_status": "pending", "owner_decision": None, "next_action": "Complete the component model before freezing an IC evidence packet."},
+            "evidence": {"status": "critical_gaps_open", "open_count": 1, "critical_count": 1, "gaps": [gap]},
+            "method_fit": {"profile_id": route.get("profile_id"), "label": route.get("label"), "primary_methods": route.get("primary_methods") or [], "corroborating_methods": route.get("corroborating_methods") or [], "primary_personas": route.get("primary_personas") or [], "cross_check_personas": route.get("cross_check_personas") or [], "silent_personas": route.get("silent_personas") or [], "routing_reasons": route.get("reasons") or [], "required_evidence": route.get("required_evidence") or [], "applicability_tests": [], "failure_modes": route.get("failure_modes") or [], "validation_cohort": [], "rule": route.get("decision_rule")},
+            "outcomes": {"status": "waiting_for_owner_decision", "schedule": [], "recorded_outcome_count": 0, "minimum_persona_outcomes_before_reweighting": 20, "personas_eligible_for_weight_review": [], "weighting_rule": "No calibration before a completed IC decision and measured dividend-aware outcome."},
+            "attribution": {"status": "waiting_for_baseline", "current": {"as_of": effective_date, "low": None, "base": None, "high": None}, "drivers": [], "explanation": "Attribution begins after the first decision-grade baseline."},
+        }
     config = read_json(CONFIG)
     ticker_cfg = (config.get("tickers") or {}).get(ticker) or {}
     effective_date = (as_of or date.today().isoformat())[:10]
     committee = committee_view(research)
     return {
-        "schema_version": "1.0",
+        "schema_version": "2.0",
         "ticker": ticker,
         "as_of": effective_date,
+        "decision": decision_view(valuation, committee),
+        "business": business_view(valuation),
+        "valuation": valuation_view(valuation),
+        "optionality": optionality_view(valuation),
         "committee": committee,
         "evidence": evidence_view(ticker_cfg, valuation, committee),
         "method_fit": method_fit_view(config, ticker_cfg, valuation),

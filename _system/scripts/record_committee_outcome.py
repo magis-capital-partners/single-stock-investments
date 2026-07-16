@@ -43,6 +43,7 @@ def main() -> int:
     parser.add_argument("--committee-date")
     parser.add_argument("--measurement-date", default=date.today().isoformat())
     parser.add_argument("--horizon-months", type=int, choices=(6, 12, 24))
+    parser.add_argument("--error-attribution", action="append", choices=("economic_claim", "cash_flow", "capital_intensity", "comparable", "option_probability", "timing", "leverage", "governance", "other"), default=[])
     parser.add_argument("--write", action="store_true")
     args = parser.parse_args()
     ticker = args.ticker.upper()
@@ -56,6 +57,12 @@ def main() -> int:
     outcome = compute_period_total_return(ticker, decision_date, args.measurement_date)
     valuation = json.loads((ROOT / ticker / "research" / "valuation.json").read_text(encoding="utf-8"))
     component = valuation.get("component_valuation_results") or {}
+    contract = valuation.get("universal_valuation_contract") or {}
+    power_zone = (contract.get("method_route") or valuation.get("valuation_method_route") or {}).get("profile_id")
+    expected_ranges = [v.get("expected_return_range_pct") for v in (committee.get("round_two") or {}).get("votes") or [] if isinstance(v.get("expected_return_range_pct"), list)]
+    expected_midpoint = None
+    if expected_ranges:
+        expected_midpoint = round(sum((float(r[0]) + float(r[1])) / 2 for r in expected_ranges) / len(expected_ranges), 2)
     record = {
         **outcome,
         "ticker": ticker,
@@ -68,8 +75,13 @@ def main() -> int:
         "decision_price": (valuation.get("inputs") or {}).get("price"),
         "decision_value_range_per_share": component.get("total_equity_value_per_share"),
         "economic_value_status": (valuation.get("economic_value_analysis") or {}).get("status"),
+        "universal_contract_status": contract.get("status"),
+        "power_zone": power_zone,
+        "expected_return_midpoint_pct": expected_midpoint,
+        "forecast_midpoint_error_pct": round(float(outcome["total_return_pct"]) - expected_midpoint, 2) if outcome.get("total_return_pct") is not None and expected_midpoint is not None else None,
+        "component_forecast_snapshot": component.get("additive_components") or [],
         "votes": (committee.get("round_two") or {}).get("votes") or [],
-        "error_attribution": [],
+        "error_attribution": sorted(set(args.error_attribution)),
     }
     print(json.dumps(record, indent=2))
     if not args.write:

@@ -2,11 +2,14 @@
 
 You are the **hk** method, independence group **scarce_assets**.
 
-Evidence packet: `3026aae7c097448640d885d00c5329fa39ff751f45b25764248a3ae1f28e6e57`
+Evidence packet: `2afb6ab80981a3f358c13a31ff20dcbbaa86bc394a58a3acc641989fb6f9f85b`
 
 - `LB/research/deep_dive_2026-06-04.md`
 - `LB/research/adversarial_2026-06-02.md`
 - `LB/research/valuation.json`
+- `LB/research/thesis.md`
+- `LB/research/cross_check_third_party_2026-06-02.md`
+- `LB/research/evidence_reconciliation_2026-07-15.json`
 - `LB/research/evidence/filing_facts_2026-06-02.json`
 - `LB/research/evidence/management_facts_2026-06-02.json`
 

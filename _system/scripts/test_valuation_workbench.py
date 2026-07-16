@@ -20,11 +20,29 @@ class ValuationWorkbenchTests(unittest.TestCase):
             with self.subTest(ticker=ticker):
                 row = workbench.build(ticker, "2026-07-15")
                 self.assertEqual(row["ticker"], ticker)
+                self.assertEqual(row["decision"]["status"], "evidence_blocked")
+                self.assertGreater(row["decision"]["unresolved_evidence_count"], 0)
                 self.assertIn(row["committee"]["status"], {"independent_review_open", "owner_decision_pending"})
                 self.assertGreater(row["evidence"]["open_count"], 0)
                 self.assertEqual(row["outcomes"]["status"], "waiting_for_owner_decision")
                 self.assertTrue(all(slot["target_date"] is None for slot in row["outcomes"]["schedule"]))
                 self.assertEqual(row["attribution"]["status"], "baseline_established")
+
+    def test_cross_power_zone_cohort_values_every_component_but_stays_blocked(self):
+        expected = {
+            "MSB": "scarce_asset_optionality",
+            "C": "credit_and_normalized_returns",
+            "NVR": "quality_reinvestment",
+            "NUE": "capital_cycle",
+            "BIIB": "binary_milestone",
+        }
+        for ticker, profile in expected.items():
+            with self.subTest(ticker=ticker):
+                row = workbench.build(ticker, "2026-07-15")
+                self.assertEqual(row["decision"]["status"], "evidence_blocked")
+                self.assertEqual(row["decision"]["unvalued_component_count"], 0)
+                self.assertGreater(row["decision"]["unresolved_evidence_count"], 0)
+                self.assertEqual(row["method_fit"]["profile_id"], profile)
 
     def test_attribution_identifies_probability_change(self):
         with tempfile.TemporaryDirectory() as tmp:

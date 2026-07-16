@@ -2,11 +2,14 @@
 
 You are the **marks_credit_cycle** method, independence group **credit_cycle**.
 
-Evidence packet: `c98bbcbe8e30e586540d6bee8fa15ac942b5080b1eadd7f8829f91425045a53c`
+Evidence packet: `a298a04fdbff10c90d2d62960827387b4ca774c911559ee98631724938f90b9f`
 
 - `AZLCZ/research/deep_dive_2026-06-07.md`
 - `AZLCZ/research/adversarial_2026-06-07.md`
 - `AZLCZ/research/valuation.json`
+- `AZLCZ/research/thesis.md`
+- `AZLCZ/research/cross_check_third_party_2026-06-05.md`
+- `AZLCZ/research/evidence_reconciliation_2026-07-15.json`
 - `AZLCZ/research/evidence/filing_facts_2026-06-07.json`
 - `AZLCZ/research/evidence/management_facts_2026-06-07.json`
 

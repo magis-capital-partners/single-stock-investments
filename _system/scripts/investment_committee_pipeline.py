@@ -71,6 +71,11 @@ def discover_evidence(ticker: str) -> list[Path]:
         latest(research, "deep_dive_*.md", exclude="deep_dive_committee_"),
         latest(research, "adversarial_*.md"),
         research / "valuation.json",
+        research / "thesis.md",
+        latest(research, "cross_check_third_party_*.md"),
+        research / "cross_check_third_party.md",
+        latest(research, "*evidence_reconciliation*.json"),
+        latest(research, "*evidence_reconciliation*.md"),
         latest(research / "evidence", "filing_facts_*.json"),
         latest(research / "evidence", "management_facts_*.json"),
     ]
@@ -161,7 +166,11 @@ def initialize(ticker: str, as_of: str) -> Path:
         "required_files": {
             "proposer": "proposer.json",
             "pre_mortem": "pre_mortem.json",
+            "evidence_tribunal": "evidence_tribunal.json",
             "research_response": "research_response.json",
+            "valuation_reconciliation": "valuation_reconciliation.json",
+            "adversarial_review": "adversarial_review.json",
+            "chair_synthesis": "chair_synthesis.json",
             "human_decision": "human_decision.json",
         },
     }
@@ -174,6 +183,22 @@ def initialize(ticker: str, as_of: str) -> Path:
             (round_dir / f"{row['persona']}.prompt.md").write_text(prompt, encoding="utf-8")
     (work / "pre_mortem.prompt.md").write_text(
         f"# {ticker} mandatory pre-mortem\n\nPacket `{frozen_hash}`. Assume the investment failed severely. Explain the causal failure, earliest warnings, forensic checks, short-source coverage, and unresolved items. Do not read rater outputs. Return the committee schema pre_mortem object only.\n",
+        encoding="utf-8",
+    )
+    (work / "evidence_tribunal.prompt.md").write_text(
+        f"# {ticker} evidence tribunal\n\nPacket `{frozen_hash}`. Resolve disputed quantities, ownership, distributions, comparable validity, option beneficiary, and overlap before valuation debate. Separate resolved facts from material unresolved facts and cite packet paths. Return evidence_tribunal.json only.\n",
+        encoding="utf-8",
+    )
+    (work / "valuation_reconciliation.prompt.md").write_text(
+        f"# {ticker} valuation reconciliation\n\nClassify every material difference among isolated outputs as factual, methodological, assumption-based, horizon-based, risk-tolerance-based, or power-zone mismatch. Do not average incompatible estimates. Return valuation_reconciliation.json only.\n",
+        encoding="utf-8",
+    )
+    (work / "adversarial_review.prompt.md").write_text(
+        f"# {ticker} adversarial review\n\nTest double counting, peak-cycle extrapolation, reinvestment, multiple dependence, hidden capital, dilution, governance, tax, macro sensitivity, beneficiary mismatch, and comparable-cycle bias. Return adversarial_review.json only.\n",
+        encoding="utf-8",
+    )
+    (work / "chair_synthesis.prompt.md").write_text(
+        f"# {ticker} chair synthesis\n\nSelect the primary method, explain why it dominates corroborating methods, preserve dissent, state agreed and disputed facts, value and entry ranges, recommendation, and monitoring plan. Never average methods solely to create consensus. Return chair_synthesis.json only.\n",
         encoding="utf-8",
     )
     return work
@@ -223,7 +248,10 @@ def validate_work(work: Path) -> list[str]:
     for round_number in (1, 2):
         _, round_errors = load_round(work, round_number, raters)
         errors.extend(round_errors)
-    for name in ("proposer.json", "pre_mortem.json", "research_response.json"):
+    for name in (
+        "proposer.json", "pre_mortem.json", "evidence_tribunal.json", "research_response.json",
+        "valuation_reconciliation.json", "adversarial_review.json", "chair_synthesis.json",
+    ):
         if not (work / name).exists():
             errors.append(f"missing {name}")
     current_refs = [file_reference(ROOT / row["path"]) for row in manifest["evidence"]]
@@ -243,7 +271,11 @@ def assemble(work: Path) -> Path:
     round_two, _ = load_round(work, 2, raters)
     proposer = read_json(work / "proposer.json")
     pre_mortem = read_json(work / "pre_mortem.json")
+    evidence_tribunal = read_json(work / "evidence_tribunal.json")
     research_loop = read_json(work / "research_response.json")
+    valuation_reconciliation = read_json(work / "valuation_reconciliation.json")
+    adversarial_review = read_json(work / "adversarial_review.json")
+    chair_synthesis = read_json(work / "chair_synthesis.json")
     medians = {dim: median(v["scores"][dim]["value"] for v in round_two) for dim in DIMS}
     ranges = {dim: [min(v["scores"][dim]["value"] for v in round_two), max(v["scores"][dim]["value"] for v in round_two)] for dim in DIMS}
     dissent = min(round_two, key=lambda v: (v["scores"]["return_vs_alternatives"]["value"], v["scores"]["downside_control"]["value"]))
@@ -260,7 +292,10 @@ def assemble(work: Path) -> Path:
         for row in proof
     )
     option_complete = all(row.get("falsifier") and row.get("range_per_share") for row in options)
-    blocked = any(v["evidence_status"] == "insufficient_evidence" for v in round_two) or not economic_complete or not component_complete
+    tribunal_blocked = bool(evidence_tribunal.get("unresolved_material_facts")) or evidence_tribunal.get("status") != "complete"
+    adversarial_blocked = adversarial_review.get("status") not in {"complete", "complete_with_residual_risks"}
+    chair_blocked = chair_synthesis.get("status") != "complete"
+    blocked = any(v["evidence_status"] == "insufficient_evidence" for v in round_two) or not economic_complete or not component_complete or tribunal_blocked or adversarial_blocked or chair_blocked
     record = {
         "schema_version": "1.0",
         "protocol_version": "production-2.0",
@@ -271,8 +306,12 @@ def assemble(work: Path) -> Path:
         "selected_raters": raters,
         "round_one": {"evidence_hash": manifest["packet_hash"], "peer_outputs_visible": False, "votes": round_one},
         "pre_mortem": pre_mortem,
+        "evidence_tribunal": evidence_tribunal,
         "research_loop": research_loop,
         "round_two": {"evidence_hash": manifest["packet_hash"], "peer_outputs_visible": False, "votes": round_two},
+        "valuation_reconciliation": valuation_reconciliation,
+        "adversarial_review": adversarial_review,
+        "chair_synthesis": chair_synthesis,
         "synthesis": {
             "strongest_dissent": dissent["strongest_counter_explanation"],
             "unresolved_items": unresolved,
@@ -294,11 +333,24 @@ def assemble(work: Path) -> Path:
             "disclosure_scan": "partial",
             "short_scan": "partial",
             "pre_mortem": "pass",
+            "evidence_tribunal": "blocked" if tribunal_blocked else "pass",
+            "valuation_reconciliation": "pass" if valuation_reconciliation.get("status") == "complete" else "blocked",
+            "adversarial_review": "blocked" if adversarial_blocked else "pass",
+            "chair_synthesis": "blocked" if chair_blocked else "pass",
             "explanation_contracts": "pass",
             "independent_groups": "pass",
             "owner": "not_run",
         },
         "human_decision": {"status": "pending", "decision": None, "sizing": None, "top_dissent_response": None, "decided_at": None},
+        "monitoring_plan": chair_synthesis.get("monitoring_plan") or {
+            "operational_milestones": [],
+            "evidence_refresh_dates": [],
+            "valuation_refresh_triggers": ["material filing", "capital-structure change", "thesis falsifier"],
+            "price_review_thresholds": [],
+            "thesis_break_conditions": [],
+            "expected_catalyst_dates": [],
+            "outcome_horizons_months": [6, 12, 24],
+        },
         "final_state": "evidence_blocked" if blocked else "committee_complete_decision_pending",
         "provenance": {"prompt_version": "production-isolated-rater-2", "model": "external isolated raters assembled deterministically", "schema_path": "_system/templates/committee_schema.json", "persona_registry_version": "1.1"},
     }

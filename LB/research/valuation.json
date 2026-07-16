@@ -1898,5 +1898,594 @@
     "complete_component_coverage": true,
     "validation_errors": [],
     "registry_version": "1.0"
+  },
+  "valuation_method_route": {
+    "schema_version": "1.0",
+    "status": "routed",
+    "profile_id": "predictable_cash_flow",
+    "label": "Predictable cash-flow security",
+    "score": 7.0,
+    "reasons": [
+      "archetype=infrastructure",
+      "component categories=operating_business"
+    ],
+    "primary_methods": [
+      "owner_cash_or_dividend_discount"
+    ],
+    "corroborating_methods": [
+      "regulated_asset_base",
+      "yield_and_reverse_dcf"
+    ],
+    "primary_personas": [
+      "buffett_weschler",
+      "hohn"
+    ],
+    "cross_check_personas": [
+      "marks_credit_cycle"
+    ],
+    "silent_personas": [
+      "greenblatt",
+      "hk",
+      "klarman_asset_value",
+      "marathon_capital_cycle",
+      "munger",
+      "pabrai",
+      "stahl"
+    ],
+    "required_evidence": [
+      "cash-flow durability",
+      "maintenance capital",
+      "funding plan",
+      "distribution policy",
+      "contract or regulatory reset terms"
+    ],
+    "failure_modes": [
+      "dividend treated as earning power",
+      "growth capital and dilution omitted",
+      "contract renewal or regulatory reset ignored"
+    ],
+    "secondary_profiles": [
+      {
+        "profile_id": "scarce_asset_optionality",
+        "score": 3.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=option, unit_nav"
+        ]
+      },
+      {
+        "profile_id": "binary_milestone",
+        "score": 2.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=milestone"
+        ]
+      }
+    ],
+    "scorecard": {
+      "scarce_asset_optionality": {
+        "score": 3.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=option, unit_nav"
+        ]
+      },
+      "quality_reinvestment": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
+      },
+      "capital_cycle": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
+      },
+      "credit_and_normalized_returns": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=liability_or_reserve"
+        ]
+      },
+      "catalyst_asset_value": {
+        "score": 0.0,
+        "reasons": []
+      },
+      "predictable_cash_flow": {
+        "score": 7.0,
+        "reasons": [
+          "archetype=infrastructure",
+          "component categories=operating_business"
+        ]
+      },
+      "binary_milestone": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=milestone"
+        ]
+      }
+    },
+    "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+  },
+  "universal_valuation_contract": {
+    "schema_version": "1.0",
+    "status": "decision_grade",
+    "ticker": "LB",
+    "as_of": "2026-07-15",
+    "economic_ownership_map": [
+      {
+        "component_id": "current_fee_engine",
+        "label": "Current surface, resource, and royalty fee engine",
+        "category": "operating_business",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Current surface, resource, and royalty fee engine",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 42.85
+        },
+        "growth_driver": "Enterprise value before net debt; the base multiple is deliberately generous for scarce, capital-light acreage.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "normalized_ebitda_enterprise_value",
+        "comparable_ids": [
+          "lb_q4_packages_2024",
+          "lb_wolf_bone_2024"
+        ],
+        "range_per_share": {
+          "low": 23.37,
+          "base": 42.85,
+          "high": 62.32
+        },
+        "evidence_tier": "company_guidance_and_filings",
+        "evidence_level": "primary_verified",
+        "evidence": "2026 adjusted EBITDA guidance is $210M-$230M; values use $180M at 10x, $220M at 15x, and $240M at 20x.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Apply the production, contract, location, capital-intensity, ownership, timing, and realization adjustments described in _system/reviews/economic_value_comparable_audit_2026-07-15.md.",
+        "falsifier": "Utilization, incremental after-tax return on capital, or contract economics fall below the low-case assumptions.",
+        "overlap_key": "lb_current_operations",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "net_debt",
+        "label": "Net debt and financing claims",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Net debt and financing claims",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": -6.56
+        },
+        "growth_driver": null,
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "balance_sheet_claim",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": -7.5,
+          "base": -6.56,
+          "high": -5.8
+        },
+        "evidence_tier": "q1_2026_filing",
+        "evidence_level": "primary_verified",
+        "evidence": "Q1 2026 long-term debt was approximately $535M; year-end cash was $30.7M.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Apply the production, contract, location, capital-intensity, ownership, timing, and realization adjustments described in _system/reviews/economic_value_comparable_audit_2026-07-15.md.",
+        "falsifier": "The obligation, financing claim, tax, or realization friction is materially larger than the low-case reserve.",
+        "overlap_key": "lb_net_debt",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "dormant_acreage",
+        "label": "Dormant and under-monetized acreage inventory",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Dormant and under-monetized acreage",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 2.8
+        },
+        "growth_driver": null,
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "transaction_anchored_risked_unit_nav",
+        "comparable_ids": [
+          "lb_reeves_800_2025",
+          "lb_lea_3000_2025",
+          "lb_1918_ranch_2025"
+        ],
+        "range_per_share": {
+          "low": 0.6,
+          "base": 2.8,
+          "high": 6.0
+        },
+        "evidence_tier": "company_10k_transactions",
+        "evidence_level": "analyst_estimated",
+        "evidence": "LandBridge purchases ranged from approximately $875 per acre for an 800-acre bolt-on to roughly $7,100 per fee acre in the 1918 Ranch allocation. Only an illustrative 20% of 320k acres is separately marked after overlap and realization discounts.",
+        "probability_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "Discounting, realization friction, and the component assumptions reflect the time required to contract, develop, or monetize the claim.",
+          "probability_basis": "The component low/base/high range or milestone driver explicitly risks realization; uncertainty widens the range rather than creating a zero.",
+          "remaining_capital_basis": "Remaining owner-funded capital is deducted in the driver where disclosed; otherwise the range and realization reserve reflect the unresolved capital burden."
+        },
+        "tax_and_realization_adjustments": "Apply the production, contract, location, capital-intensity, ownership, timing, and realization adjustments described in _system/reviews/economic_value_comparable_audit_2026-07-15.md.",
+        "falsifier": "The next decision milestone fails, remaining capital rises materially, or the stated success probability no longer fits observable progress.",
+        "overlap_key": "lb_dormant_acreage",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "alpha_digital_option",
+        "label": "Alpha Digital 2 GW campus option",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Alpha Digital powered-land option",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 3.0
+        },
+        "growth_driver": null,
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "milestone_option_mark",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.0,
+          "base": 3.0,
+          "high": 12.0
+        },
+        "evidence_tier": "company_development_agreement_plus_powered_land_context",
+        "evidence_level": "analyst_estimated",
+        "evidence": "PowerBridge holds an option over up to 3,400 acres; first power is targeted for 2027 and scaled generation for 2028. Powered land is scarce, but customer, rent, capital, and enforceable full-campus economics remain undisclosed.",
+        "probability_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "Discounting, realization friction, and the component assumptions reflect the time required to contract, develop, or monetize the claim.",
+          "probability_basis": "The component low/base/high range or milestone driver explicitly risks realization; uncertainty widens the range rather than creating a zero.",
+          "remaining_capital_basis": "Remaining owner-funded capital is deducted in the driver where disclosed; otherwise the range and realization reserve reflect the unresolved capital burden."
+        },
+        "tax_and_realization_adjustments": "Apply the production, contract, location, capital-intensity, ownership, timing, and realization adjustments described in _system/reviews/economic_value_comparable_audit_2026-07-15.md.",
+        "falsifier": "The next decision milestone fails, remaining capital rises materially, or the stated success probability no longer fits observable progress.",
+        "overlap_key": "lb_alpha_digital",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "pore_space_other_options",
+        "label": "Pore space and other new-use options",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Pore space, water, fiber, and other new uses",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 1.5
+        },
+        "growth_driver": null,
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "portfolio_option_reserve",
+        "comparable_ids": [
+          "lb_1918_ranch_2025",
+          "intrepid_south_ranch_2026"
+        ],
+        "range_per_share": {
+          "low": 0.0,
+          "base": 1.5,
+          "high": 5.0
+        },
+        "evidence_tier": "company_commentary_and_land_water_transactions",
+        "evidence_level": "analyst_estimated",
+        "evidence": "Contiguous acreage may support pore space, power, fiber, water, and other industrial uses. The 1918 Ranch and Intrepid South Ranch transactions establish that these rights have non-zero value even before full monetization.",
+        "probability_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "Discounting, realization friction, and the component assumptions reflect the time required to contract, develop, or monetize the claim.",
+          "probability_basis": "The component low/base/high range or milestone driver explicitly risks realization; uncertainty widens the range rather than creating a zero.",
+          "remaining_capital_basis": "Remaining owner-funded capital is deducted in the driver where disclosed; otherwise the range and realization reserve reflect the unresolved capital burden."
+        },
+        "tax_and_realization_adjustments": "Apply the production, contract, location, capital-intensity, ownership, timing, and realization adjustments described in _system/reviews/economic_value_comparable_audit_2026-07-15.md.",
+        "falsifier": "The next decision milestone fails, remaining capital rises materially, or the stated success probability no longer fits observable progress.",
+        "overlap_key": "lb_other_options",
+        "assumption_type": "judgment"
+      }
+    ],
+    "component_coverage": {
+      "all_material_components_identified": true,
+      "material_component_count": 5,
+      "additive_component_count": 5,
+      "embedded_component_count": 0,
+      "unvalued_component_count": 0,
+      "double_counting_flags": []
+    },
+    "input_classification": {
+      "facts": [],
+      "estimates": [],
+      "judgments": [
+        {
+          "component_id": "current_fee_engine",
+          "label": "Current surface, resource, and royalty fee engine",
+          "kind": "judgment",
+          "evidence_tier": "company_guidance_and_filings",
+          "evidence": "2026 adjusted EBITDA guidance is $210M-$230M; values use $180M at 10x, $220M at 15x, and $240M at 20x.",
+          "method": "normalized_ebitda_enterprise_value"
+        },
+        {
+          "component_id": "net_debt",
+          "label": "Net debt and financing claims",
+          "kind": "judgment",
+          "evidence_tier": "q1_2026_filing",
+          "evidence": "Q1 2026 long-term debt was approximately $535M; year-end cash was $30.7M.",
+          "method": "balance_sheet_claim"
+        },
+        {
+          "component_id": "dormant_acreage",
+          "label": "Dormant and under-monetized acreage inventory",
+          "kind": "judgment",
+          "evidence_tier": "company_10k_transactions",
+          "evidence": "LandBridge purchases ranged from approximately $875 per acre for an 800-acre bolt-on to roughly $7,100 per fee acre in the 1918 Ranch allocation. Only an illustrative 20% of 320k acres is separately marked after overlap and realization discounts.",
+          "method": "transaction_anchored_risked_unit_nav"
+        },
+        {
+          "component_id": "alpha_digital_option",
+          "label": "Alpha Digital 2 GW campus option",
+          "kind": "judgment",
+          "evidence_tier": "company_development_agreement_plus_powered_land_context",
+          "evidence": "PowerBridge holds an option over up to 3,400 acres; first power is targeted for 2027 and scaled generation for 2028. Powered land is scarce, but customer, rent, capital, and enforceable full-campus economics remain undisclosed.",
+          "method": "milestone_option_mark"
+        },
+        {
+          "component_id": "pore_space_other_options",
+          "label": "Pore space and other new-use options",
+          "kind": "judgment",
+          "evidence_tier": "company_commentary_and_land_water_transactions",
+          "evidence": "Contiguous acreage may support pore space, power, fiber, water, and other industrial uses. The 1918 Ranch and Intrepid South Ranch transactions establish that these rights have non-zero value even before full monetization.",
+          "method": "portfolio_option_reserve"
+        }
+      ]
+    },
+    "method_route": {
+      "schema_version": "1.0",
+      "status": "routed",
+      "profile_id": "predictable_cash_flow",
+      "label": "Predictable cash-flow security",
+      "score": 7.0,
+      "reasons": [
+        "archetype=infrastructure",
+        "component categories=operating_business"
+      ],
+      "primary_methods": [
+        "owner_cash_or_dividend_discount"
+      ],
+      "corroborating_methods": [
+        "regulated_asset_base",
+        "yield_and_reverse_dcf"
+      ],
+      "primary_personas": [
+        "buffett_weschler",
+        "hohn"
+      ],
+      "cross_check_personas": [
+        "marks_credit_cycle"
+      ],
+      "silent_personas": [
+        "greenblatt",
+        "hk",
+        "klarman_asset_value",
+        "marathon_capital_cycle",
+        "munger",
+        "pabrai",
+        "stahl"
+      ],
+      "required_evidence": [
+        "cash-flow durability",
+        "maintenance capital",
+        "funding plan",
+        "distribution policy",
+        "contract or regulatory reset terms"
+      ],
+      "failure_modes": [
+        "dividend treated as earning power",
+        "growth capital and dilution omitted",
+        "contract renewal or regulatory reset ignored"
+      ],
+      "secondary_profiles": [
+        {
+          "profile_id": "scarce_asset_optionality",
+          "score": 3.0,
+          "reasons": [
+            "component categories=real_option",
+            "existing methods=option, unit_nav"
+          ]
+        },
+        {
+          "profile_id": "binary_milestone",
+          "score": 2.0,
+          "reasons": [
+            "component categories=real_option",
+            "existing methods=milestone"
+          ]
+        }
+      ],
+      "scorecard": {
+        "scarce_asset_optionality": {
+          "score": 3.0,
+          "reasons": [
+            "component categories=real_option",
+            "existing methods=option, unit_nav"
+          ]
+        },
+        "quality_reinvestment": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=operating_business"
+          ]
+        },
+        "capital_cycle": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=operating_business"
+          ]
+        },
+        "credit_and_normalized_returns": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=liability_or_reserve"
+          ]
+        },
+        "catalyst_asset_value": {
+          "score": 0.0,
+          "reasons": []
+        },
+        "predictable_cash_flow": {
+          "score": 7.0,
+          "reasons": [
+            "archetype=infrastructure",
+            "component categories=operating_business"
+          ]
+        },
+        "binary_milestone": {
+          "score": 2.0,
+          "reasons": [
+            "component categories=real_option",
+            "existing methods=milestone"
+          ]
+        }
+      },
+      "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+    },
+    "market": {
+      "price_per_share": 78.12,
+      "fully_diluted_shares": 77017004,
+      "market_cap_m": 6016.57,
+      "enterprise_value_m": null
+    },
+    "valuation": {
+      "value_per_share": {
+        "low": 16.47,
+        "base": 43.59,
+        "high": 79.52
+      },
+      "probability_weighted_value_per_share": 43.59,
+      "expected_distributions_per_share": 0.0,
+      "annualized_return_at_price_pct": {
+        "low": -19.94,
+        "base": -8.0,
+        "high": 0.25
+      },
+      "downside_to_low_pct": -78.92,
+      "horizon_years": 7
+    },
+    "scenario_contract": {
+      "rule": "Cases must change causal operating, capital, probability, timing, or financing drivers\u2014not only the terminal multiple.",
+      "top_value_drivers": [
+        {
+          "component_id": "current_fee_engine",
+          "label": "Current surface, resource, and royalty fee engine",
+          "base_per_share": 42.85,
+          "range_width_per_share": 38.95,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "alpha_digital_option",
+          "label": "Alpha Digital 2 GW campus option",
+          "base_per_share": 3.0,
+          "range_width_per_share": 12.0,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "dormant_acreage",
+          "label": "Dormant and under-monetized acreage inventory",
+          "base_per_share": 2.8,
+          "range_width_per_share": 5.4,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "pore_space_other_options",
+          "label": "Pore space and other new-use options",
+          "base_per_share": 1.5,
+          "range_width_per_share": 5.0,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "net_debt",
+          "label": "Net debt and financing claims",
+          "base_per_share": -6.56,
+          "range_width_per_share": 1.7,
+          "scenario_assumptions": null
+        }
+      ],
+      "reverse_expectations": null
+    },
+    "evidence": {
+      "unresolved_count": 0,
+      "blockers": [],
+      "validation_errors": []
+    },
+    "monitoring": {
+      "falsifiers": [
+        "Utilization, incremental after-tax return on capital, or contract economics fall below the low-case assumptions.",
+        "The obligation, financing claim, tax, or realization friction is materially larger than the low-case reserve.",
+        "The next decision milestone fails, remaining capital rises materially, or the stated success probability no longer fits observable progress.",
+        "The next decision milestone fails, remaining capital rises materially, or the stated success probability no longer fits observable progress.",
+        "The next decision milestone fails, remaining capital rises materially, or the stated success probability no longer fits observable progress."
+      ],
+      "required_refresh_triggers": [
+        "new filing or material operating update",
+        "capital-structure change",
+        "material price move",
+        "component milestone or falsifier"
+      ]
+    },
+    "decision_rule": "No security is decision-grade until every material economic claim is valued exactly once and every material evidence blocker is resolved."
   }
 }

@@ -12,6 +12,42 @@
       "reference_ticker": "TPL",
       "pilot_candidates": ["LB", "WBI", "AZLCZ"],
       "warning": "Acreage or infrastructure ownership alone is insufficient; leveraged merchant assets and sponsor-controlled structures require security-specific debt and economic-claim adjustments."
+    },
+    "quality_reinvestment": {
+      "label": "High-return compounder",
+      "required_tests": ["normalized_owner_earnings", "incremental_roic", "reinvestment_runway", "competitive_advantage", "dilution"],
+      "preferred_archetypes": ["compounder", "platform", "serial_acquirer", "croupier"],
+      "warning": "Historical growth is not a valuation driver unless retained capital and incremental returns reconcile."
+    },
+    "capital_cycle": {
+      "label": "Capital cycle and normalized industry economics",
+      "required_tests": ["capacity", "supply_response", "midcycle_margin", "maintenance_capital", "downcycle_liquidity"],
+      "preferred_archetypes": ["commodity_cyclical", "cyclical", "turnaround"],
+      "warning": "Peak earnings and replacement cost are not sustainable value without a supply-response and cost-of-capital test."
+    },
+    "credit_and_normalized_returns": {
+      "label": "Credit, funding, and normalized returns",
+      "required_tests": ["capital_structure", "maturities", "stress_losses", "funding_cost", "distributable_capital"],
+      "preferred_archetypes": ["bank", "insurer", "leveraged_equity"],
+      "warning": "Regulatory capital and gross asset value are not freely distributable shareholder value."
+    },
+    "catalyst_asset_value": {
+      "label": "Catalyst-backed asset value",
+      "required_tests": ["finite_event_tree", "catalyst_control", "break_value", "tax_and_legal_claims", "timing"],
+      "preferred_archetypes": ["special_situation", "holding_co", "turnaround"],
+      "warning": "Asset value belongs in the base case only when a credible catalyst, beneficiary, and realization path exist."
+    },
+    "predictable_cash_flow": {
+      "label": "Predictable cash-flow security",
+      "required_tests": ["cash_duration", "maintenance_capital", "funding_plan", "distribution_policy", "reset_terms"],
+      "preferred_archetypes": ["regulated_utility", "utility", "infrastructure", "mature_cash_generator"],
+      "warning": "A stable dividend does not prove sustainable earning power or eliminate funding and dilution risk."
+    },
+    "binary_milestone": {
+      "label": "Binary and milestone-driven assets",
+      "required_tests": ["asset_milestones", "base_rate_probability", "cash_runway", "dilution", "failure_recovery"],
+      "preferred_archetypes": ["biotech", "pre_profit", "exploration"],
+      "warning": "Probability, time, remaining cash burn, and dilution must be explicit for every asset."
     }
   },
   "zones": {
@@ -105,6 +141,36 @@
       "framework": "Global deep value and hidden-asset situations off the beaten path",
       "rules": {
         "archetype": ["optionality", "turnaround", "holding_co"],
+        "dhando": ["full", "partial"],
+        "cycle": ["trough", "transition"]
+      },
+      "min_matches": 2
+    },
+    "marathon_capital_cycle": {
+      "label": "Marathon / Capital Returns",
+      "framework": "Supply response, industry capacity, replacement economics, and reinvestment-cycle mistakes",
+      "rules": {
+        "archetype": ["commodity_cyclical", "cyclical", "turnaround", "infrastructure"],
+        "cycle": ["peak", "trough", "transition"],
+        "investment_sleeve": ["energy_infrastructure", "real_assets_lt"]
+      },
+      "min_matches": 2
+    },
+    "marks_credit_cycle": {
+      "label": "Howard Marks / Oaktree",
+      "framework": "Leverage, refinancing, cycle position, liquidity, and downside under stress",
+      "rules": {
+        "archetype": ["bank", "insurer", "commodity_cyclical", "turnaround", "infrastructure"],
+        "cycle": ["peak", "trough", "transition"],
+        "dhando": ["partial", "full"]
+      },
+      "min_matches": 2
+    },
+    "klarman_asset_value": {
+      "label": "Klarman / Baupost",
+      "framework": "Catalyst-backed asset value, conservative NAV, realization friction, and downside recovery",
+      "rules": {
+        "archetype": ["special_situation", "holding_co", "optionality", "turnaround"],
         "dhando": ["full", "partial"],
         "cycle": ["trough", "transition"]
       },

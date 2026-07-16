@@ -1,0 +1,993 @@
+{
+  "schema_version": "1.0",
+  "protocol_version": "production-2.0",
+  "ticker": "AZLCZ",
+  "review": {
+    "level": "full_ic",
+    "trigger": "production committee pipeline",
+    "as_of": "2026-07-15",
+    "owner": null
+  },
+  "evidence_packet": {
+    "frozen_at": "2026-07-16T01:42:14.758137+00:00",
+    "hash_method": "sha256(canonical-json(sorted(path,sha256,bytes)))",
+    "packet_hash": "a298a04fdbff10c90d2d62960827387b4ca774c911559ee98631724938f90b9f",
+    "freshness_status": "mixed",
+    "references": [
+      {
+        "path": "AZLCZ/research/deep_dive_2026-06-07.md",
+        "sha256": "9e482ba16d5d1cda1feebc2d79f7e9ceffb0a45eab2bff6feb6c15385d64f222",
+        "bytes": 29260,
+        "role": "frozen local evidence",
+        "status": "available"
+      },
+      {
+        "path": "AZLCZ/research/adversarial_2026-06-07.md",
+        "sha256": "22c6f70974286121686ffc075aad0eb25590b3515c28784834924fb13daf7b67",
+        "bytes": 1659,
+        "role": "frozen local evidence",
+        "status": "available"
+      },
+      {
+        "path": "AZLCZ/research/valuation.json",
+        "sha256": "7827903b3922adcbc404292c364825e7545a86a606c8675e394013a74c90bb61",
+        "bytes": 158312,
+        "role": "frozen local evidence",
+        "status": "available"
+      },
+      {
+        "path": "AZLCZ/research/thesis.md",
+        "sha256": "39908cf4e1e3686fe13d9b033ab7e65395cb1e1932b1f4224a88edc03a751eac",
+        "bytes": 1125,
+        "role": "frozen local evidence",
+        "status": "available"
+      },
+      {
+        "path": "AZLCZ/research/cross_check_third_party_2026-06-05.md",
+        "sha256": "615381a49184daf3d69e63b8296ff0fb88dfdec7e2ef512b964379d8edd589ae",
+        "bytes": 3609,
+        "role": "frozen local evidence",
+        "status": "available"
+      },
+      {
+        "path": "AZLCZ/research/evidence_reconciliation_2026-07-15.json",
+        "sha256": "2f5f4f81603beeae1f5cb6d676bf70c4f107f272b08873026da1b981d5b79cd8",
+        "bytes": 4050,
+        "role": "frozen local evidence",
+        "status": "available"
+      },
+      {
+        "path": "AZLCZ/research/evidence/filing_facts_2026-06-07.json",
+        "sha256": "fa017c88bb3870d9cdf4ec301950d0aa9c62d5e99bac2882dd76023db7655be5",
+        "bytes": 364,
+        "role": "frozen local evidence",
+        "status": "available"
+      },
+      {
+        "path": "AZLCZ/research/evidence/management_facts_2026-06-07.json",
+        "sha256": "e759be57af7072561e3849be2f0fd83c87023fb09bd90ff7dc020a85c0b4924f",
+        "bytes": 92,
+        "role": "frozen local evidence",
+        "status": "available"
+      }
+    ]
+  },
+  "proposer": {
+    "recommendation_hidden_in_round_one": true,
+    "thesis": "AZLCZ owns an unusual portfolio of Arizona land, renewable leases, mineral rights, railway interests, related-party notes, and possible water rights. Value must be reconciled from each legal/entity claim to cash attributable to one share after partner waterfalls, taxes, capital, and realization friction.",
+    "explanation_contracts": [
+      {
+        "id": "entity_claim",
+        "mechanism": "Only the net economic interest owned for AZLCZ shareholders\u2014not collective gross assets across related entities\u2014is additive value.",
+        "evidence_paths": [
+          "AZLCZ/research/evidence_reconciliation_2026-07-15.json"
+        ],
+        "distinguishing_test": "Executed ownership and partner waterfalls must reconcile each project to per-share remittable cash.",
+        "counter_explanation": "Collective acreage and project economics may accrue partly to related entities or partners.",
+        "falsifier": "Any gross project value cannot reconcile to AZLCZ's legal ownership and capital obligations.",
+        "valuation_link": "current_lease_cash, incremental_renewable_projects, railway_and_notes"
+      },
+      {
+        "id": "residual_land",
+        "mechanism": "Residual land is valuable only after subtracting leased, optioned, inaccessible, constrained, and non-owned parcels.",
+        "evidence_paths": [
+          "AZLCZ/research/evidence_reconciliation_2026-07-15.json"
+        ],
+        "distinguishing_test": "A parcel map must produce a non-overlapping residual balance by realizability class.",
+        "counter_explanation": "A gross-acre comparable can overstate checkerboard and minority-controlled land.",
+        "falsifier": "Residual acres cannot reconcile to the collective control total or transactions do not support adjusted unit values.",
+        "valuation_link": "residual_surface_acreage"
+      },
+      {
+        "id": "water_claim",
+        "mechanism": "Water has option value only to the extent legally transferable, physically deliverable, commercially demanded, and attributable to AZLCZ.",
+        "evidence_paths": [
+          "AZLCZ/research/evidence_reconciliation_2026-07-15.json"
+        ],
+        "distinguishing_test": "Legal priority, consumptive history, transfer restrictions, delivery capex, buyers, ownership, and timing must be evidenced.",
+        "counter_explanation": "Water headlines may describe nontransferable or uneconomic rights.",
+        "falsifier": "Adjudication, transfer restriction, absent demand, or delivery capital eliminates the net claim.",
+        "valuation_link": "water_option"
+      }
+    ],
+    "open_questions": [
+      "Build project-by-project gross-to-net ownership and cash waterfalls.",
+      "Map every parcel into leased, optioned, constrained, related-entity-owned, and residual categories.",
+      "Establish legally transferable and economically deliverable water volume with cost and timing.",
+      "Independently test related-party note collectability and railway realization value."
+    ]
+  },
+  "selected_raters": [
+    {
+      "persona": "klarman_asset_value",
+      "independence_group": "asset_realization",
+      "selection_reason": "Selected before scoring from component coverage and a distinct error profile.",
+      "required_inputs_status": "partial"
+    },
+    {
+      "persona": "hk",
+      "independence_group": "scarce_assets",
+      "selection_reason": "Selected before scoring from component coverage and a distinct error profile.",
+      "required_inputs_status": "partial"
+    },
+    {
+      "persona": "marks_credit_cycle",
+      "independence_group": "credit_cycle",
+      "selection_reason": "Selected before scoring from component coverage and a distinct error profile.",
+      "required_inputs_status": "partial"
+    }
+  ],
+  "round_one": {
+    "evidence_hash": "a298a04fdbff10c90d2d62960827387b4ca774c911559ee98631724938f90b9f",
+    "peer_outputs_visible": false,
+    "votes": [
+      {
+        "persona": "klarman_asset_value",
+        "independence_group": "asset_realization",
+        "evidence_status": "insufficient_evidence",
+        "scores": {
+          "explanatory_strength": {
+            "value": 3,
+            "rationale": "The component map is coherent, but asset realization mechanisms are not contractually established."
+          },
+          "evidence_sufficiency": {
+            "value": 2,
+            "rationale": "Current primary disclosure resolves control totals but leaves decision-critical ownership or contract evidence absent."
+          },
+          "downside_control": {
+            "value": 1,
+            "rationale": "The low case remains exposed to realization delay, beneficiary mismatch, and premium valuation."
+          },
+          "return_vs_alternatives": {
+            "value": 2,
+            "rationale": "The base case does not clearly clear the hurdle at the observed price, and the high case relies on unresolved claims."
+          }
+        },
+        "vote": "defer",
+        "expected_return_range_pct": [
+          -12.5,
+          8.9
+        ],
+        "horizon_years": 7,
+        "claims": [
+          {
+            "claim": "The legal shareholder claim, realization path, and catalyst are not established for the widest NAV components.",
+            "evidence_paths": [
+              "AZLCZ/research/valuation.json",
+              "AZLCZ/research/evidence_reconciliation_2026-07-15.json"
+            ]
+          },
+          {
+            "claim": "At 2355 per share, the modeled return range does not justify treating unresolved optionality as cash-equivalent value.",
+            "evidence_paths": [
+              "AZLCZ/research/valuation.json"
+            ]
+          }
+        ],
+        "strongest_counter_explanation": "The asset inventory may be real, but collective gross acreage, related entities, cancellable leases, and absent realization catalysts make the shareholder claim much less certain than the headline NAV.",
+        "most_important_missing_fact": "No project-level ownership and partner waterfall converts gross economics to per-share cash.",
+        "falsifiers": [
+          "Build project-by-project gross-to-net ownership and cash waterfalls.",
+          "Map every parcel into leased, optioned, constrained, related-entity-owned, and residual categories."
+        ],
+        "specialist_findings": "Independent review: abstain from approval until the named acceptance test is met.",
+        "confidence": "medium"
+      },
+      {
+        "persona": "hk",
+        "independence_group": "scarce_assets",
+        "evidence_status": "insufficient_evidence",
+        "scores": {
+          "explanatory_strength": {
+            "value": 3,
+            "rationale": "Scarcity and third-party-funded development provide a specific mechanism, but optionality is not yet hard to vary."
+          },
+          "evidence_sufficiency": {
+            "value": 2,
+            "rationale": "The inventory and current cash facts are useful, while project-level ownership and milestone evidence remain incomplete."
+          },
+          "downside_control": {
+            "value": 2,
+            "rationale": "Existing cash streams provide support, but headline NAV and option marks can compress materially."
+          },
+          "return_vs_alternatives": {
+            "value": 2,
+            "rationale": "The market price already embeds material successful realization relative to the evidence-backed base."
+          }
+        },
+        "vote": "defer",
+        "expected_return_range_pct": [
+          -12.5,
+          8.9
+        ],
+        "horizon_years": 7,
+        "claims": [
+          {
+            "claim": "Scarce-asset optionality is plausible only after non-overlap, beneficiary, probability, timing, and capital are proven.",
+            "evidence_paths": [
+              "AZLCZ/research/valuation.json",
+              "AZLCZ/research/evidence_reconciliation_2026-07-15.json"
+            ]
+          },
+          {
+            "claim": "At 2355 per share, the modeled return range does not justify treating unresolved optionality as cash-equivalent value.",
+            "evidence_paths": [
+              "AZLCZ/research/valuation.json"
+            ]
+          }
+        ],
+        "strongest_counter_explanation": "The asset inventory may be real, but collective gross acreage, related entities, cancellable leases, and absent realization catalysts make the shareholder claim much less certain than the headline NAV.",
+        "most_important_missing_fact": "No parcel-level map supports a non-overlapping residual-acre balance.",
+        "falsifiers": [
+          "Build project-by-project gross-to-net ownership and cash waterfalls.",
+          "Map every parcel into leased, optioned, constrained, related-entity-owned, and residual categories."
+        ],
+        "specialist_findings": "Independent review: abstain from approval until the named acceptance test is met.",
+        "confidence": "medium"
+      },
+      {
+        "persona": "marks_credit_cycle",
+        "independence_group": "credit_cycle",
+        "evidence_status": "insufficient_evidence",
+        "scores": {
+          "explanatory_strength": {
+            "value": 3,
+            "rationale": "The asset thesis is specific, but the cash realization and funding path is incomplete."
+          },
+          "evidence_sufficiency": {
+            "value": 2,
+            "rationale": "Audited statements expose claims but do not prove collectability, waterfall, or realization timing."
+          },
+          "downside_control": {
+            "value": 1,
+            "rationale": "Illiquidity and related-party claims can produce permanent impairment despite asset coverage."
+          },
+          "return_vs_alternatives": {
+            "value": 2,
+            "rationale": "The base annualized return is below the hurdle and realization may take longer than modeled."
+          }
+        },
+        "vote": "defer",
+        "expected_return_range_pct": [
+          -12.5,
+          8.9
+        ],
+        "horizon_years": 7,
+        "claims": [
+          {
+            "claim": "Illiquidity, related-party claims, realization duration, and funding can overwhelm gross NAV.",
+            "evidence_paths": [
+              "AZLCZ/research/valuation.json",
+              "AZLCZ/research/evidence_reconciliation_2026-07-15.json"
+            ]
+          },
+          {
+            "claim": "At 2355 per share, the modeled return range does not justify treating unresolved optionality as cash-equivalent value.",
+            "evidence_paths": [
+              "AZLCZ/research/valuation.json"
+            ]
+          }
+        ],
+        "strongest_counter_explanation": "The asset inventory may be real, but collective gross acreage, related entities, cancellable leases, and absent realization catalysts make the shareholder claim much less certain than the headline NAV.",
+        "most_important_missing_fact": "Related-party note collectability and railway realizability remain insufficiently tested.",
+        "falsifiers": [
+          "Build project-by-project gross-to-net ownership and cash waterfalls.",
+          "Map every parcel into leased, optioned, constrained, related-entity-owned, and residual categories."
+        ],
+        "specialist_findings": "Independent review: abstain from approval until the named acceptance test is met.",
+        "confidence": "medium"
+      }
+    ]
+  },
+  "pre_mortem": {
+    "status": "complete",
+    "failure_story": "Gross collective acreage and project values are attributed to shareholders despite related-entity ownership, cancellable leases, parcel overlap, water restrictions, and illiquid related-party claims; realization takes far longer and costs more than modeled.",
+    "earliest_warning_signals": [
+      "Lease cash fails to convert from development to operating terms.",
+      "Related-party receivables decline or new related-party debt grows.",
+      "No parcel or water-right evidence emerges while option values rise."
+    ],
+    "forensic_checks": [
+      "Trace every entity, ownership percentage, partner waterfall, and remittance.",
+      "Map lease/project footprints and residual parcels.",
+      "Obtain water-title, transfer, engineering, capex, demand, and adjudication records.",
+      "Stress note collectability, railway value, tax, and OTC liquidity."
+    ],
+    "short_source_coverage": "partial",
+    "unresolved_items": [
+      "No project-level ownership and partner waterfall converts gross economics to per-share cash.",
+      "No parcel-level map supports a non-overlapping residual-acre balance.",
+      "No legal/engineering record supports transferable water quantity, delivery economics, and dated realization.",
+      "Related-party note collectability and railway realizability remain insufficiently tested."
+    ]
+  },
+  "evidence_tribunal": {
+    "status": "blocked",
+    "resolved_facts": [
+      "The Corporation and related entities collectively report approximately 239,000 surface acres and 318,000 mineral acres.",
+      "FY2025 statements disclose 141,666 shares, rental cash, related-party notes receivable/payable, railway and mineral investments.",
+      "Renewable projects occupy different stages; development/construction leases can be cancelled, while one solar project entered a 30-year operating term in 2025.",
+      "The statements use an income-tax basis and differ materially from GAAP treatment."
+    ],
+    "disputed_facts": [
+      "The valuation ranges are analyst judgments; they are not resolved facts merely because all components have numerical estimates."
+    ],
+    "unresolved_material_facts": [
+      "No project-level ownership and partner waterfall converts gross economics to per-share cash.",
+      "No parcel-level map supports a non-overlapping residual-acre balance.",
+      "No legal/engineering record supports transferable water quantity, delivery economics, and dated realization.",
+      "Related-party note collectability and railway realizability remain insufficiently tested."
+    ],
+    "evidence_paths": [
+      "AZLCZ/research/evidence_reconciliation_2026-07-15.json",
+      "AZLCZ/research/valuation.json"
+    ]
+  },
+  "research_loop": {
+    "loop_count": 1,
+    "questions": [
+      "What portion of each project and asset legally belongs to AZLCZ shareholders?",
+      "Which parcels are genuinely residual and realizable?",
+      "What water volume can be transferred and delivered, at what cost and when?",
+      "What are the enforceable terms and recovery values of related-party claims?"
+    ],
+    "responses": [
+      {
+        "question": "What portion of each project and asset legally belongs to AZLCZ shareholders?",
+        "answer": "Primary-source reconciliation narrowed the issue but did not meet the acceptance test: No project-level ownership and partner waterfall converts gross economics to per-share cash.",
+        "evidence_paths": [
+          "AZLCZ/research/evidence_reconciliation_2026-07-15.json"
+        ],
+        "status": "partially_answered"
+      },
+      {
+        "question": "Which parcels are genuinely residual and realizable?",
+        "answer": "Primary-source reconciliation narrowed the issue but did not meet the acceptance test: No parcel-level map supports a non-overlapping residual-acre balance.",
+        "evidence_paths": [
+          "AZLCZ/research/evidence_reconciliation_2026-07-15.json"
+        ],
+        "status": "partially_answered"
+      },
+      {
+        "question": "What water volume can be transferred and delivered, at what cost and when?",
+        "answer": "Primary-source reconciliation narrowed the issue but did not meet the acceptance test: No legal/engineering record supports transferable water quantity, delivery economics, and dated realization.",
+        "evidence_paths": [
+          "AZLCZ/research/evidence_reconciliation_2026-07-15.json"
+        ],
+        "status": "partially_answered"
+      },
+      {
+        "question": "What are the enforceable terms and recovery values of related-party claims?",
+        "answer": "Primary-source reconciliation narrowed the issue but did not meet the acceptance test: Related-party note collectability and railway realizability remain insufficiently tested.",
+        "evidence_paths": [
+          "AZLCZ/research/evidence_reconciliation_2026-07-15.json"
+        ],
+        "status": "partially_answered"
+      }
+    ],
+    "evidence_hash_after": "a298a04fdbff10c90d2d62960827387b4ca774c911559ee98631724938f90b9f"
+  },
+  "round_two": {
+    "evidence_hash": "a298a04fdbff10c90d2d62960827387b4ca774c911559ee98631724938f90b9f",
+    "peer_outputs_visible": false,
+    "votes": [
+      {
+        "persona": "klarman_asset_value",
+        "independence_group": "asset_realization",
+        "evidence_status": "insufficient_evidence",
+        "scores": {
+          "explanatory_strength": {
+            "value": 3,
+            "rationale": "The component map is coherent, but asset realization mechanisms are not contractually established."
+          },
+          "evidence_sufficiency": {
+            "value": 2,
+            "rationale": "Current primary disclosure resolves control totals but leaves decision-critical ownership or contract evidence absent. The focused research response confirms rather than closes the key gap."
+          },
+          "downside_control": {
+            "value": 1,
+            "rationale": "The low case remains exposed to realization delay, beneficiary mismatch, and premium valuation."
+          },
+          "return_vs_alternatives": {
+            "value": 2,
+            "rationale": "The base case does not clearly clear the hurdle at the observed price, and the high case relies on unresolved claims."
+          }
+        },
+        "vote": "defer",
+        "expected_return_range_pct": [
+          -12.5,
+          8.9
+        ],
+        "horizon_years": 7,
+        "claims": [
+          {
+            "claim": "The legal shareholder claim, realization path, and catalyst are not established for the widest NAV components.",
+            "evidence_paths": [
+              "AZLCZ/research/valuation.json",
+              "AZLCZ/research/evidence_reconciliation_2026-07-15.json"
+            ]
+          },
+          {
+            "claim": "At 2355 per share, the modeled return range does not justify treating unresolved optionality as cash-equivalent value.",
+            "evidence_paths": [
+              "AZLCZ/research/valuation.json"
+            ]
+          }
+        ],
+        "strongest_counter_explanation": "The asset inventory may be real, but collective gross acreage, related entities, cancellable leases, and absent realization catalysts make the shareholder claim much less certain than the headline NAV.",
+        "most_important_missing_fact": "No project-level ownership and partner waterfall converts gross economics to per-share cash.",
+        "falsifiers": [
+          "Build project-by-project gross-to-net ownership and cash waterfalls.",
+          "Map every parcel into leased, optioned, constrained, related-entity-owned, and residual categories."
+        ],
+        "specialist_findings": "After the one-loop research response, classification improved but the decisive fact remains unresolved; the vote remains defer.",
+        "confidence": "medium"
+      },
+      {
+        "persona": "hk",
+        "independence_group": "scarce_assets",
+        "evidence_status": "insufficient_evidence",
+        "scores": {
+          "explanatory_strength": {
+            "value": 3,
+            "rationale": "Scarcity and third-party-funded development provide a specific mechanism, but optionality is not yet hard to vary."
+          },
+          "evidence_sufficiency": {
+            "value": 2,
+            "rationale": "The inventory and current cash facts are useful, while project-level ownership and milestone evidence remain incomplete. The focused research response confirms rather than closes the key gap."
+          },
+          "downside_control": {
+            "value": 2,
+            "rationale": "Existing cash streams provide support, but headline NAV and option marks can compress materially."
+          },
+          "return_vs_alternatives": {
+            "value": 2,
+            "rationale": "The market price already embeds material successful realization relative to the evidence-backed base."
+          }
+        },
+        "vote": "defer",
+        "expected_return_range_pct": [
+          -12.5,
+          8.9
+        ],
+        "horizon_years": 7,
+        "claims": [
+          {
+            "claim": "Scarce-asset optionality is plausible only after non-overlap, beneficiary, probability, timing, and capital are proven.",
+            "evidence_paths": [
+              "AZLCZ/research/valuation.json",
+              "AZLCZ/research/evidence_reconciliation_2026-07-15.json"
+            ]
+          },
+          {
+            "claim": "At 2355 per share, the modeled return range does not justify treating unresolved optionality as cash-equivalent value.",
+            "evidence_paths": [
+              "AZLCZ/research/valuation.json"
+            ]
+          }
+        ],
+        "strongest_counter_explanation": "The asset inventory may be real, but collective gross acreage, related entities, cancellable leases, and absent realization catalysts make the shareholder claim much less certain than the headline NAV.",
+        "most_important_missing_fact": "No parcel-level map supports a non-overlapping residual-acre balance.",
+        "falsifiers": [
+          "Build project-by-project gross-to-net ownership and cash waterfalls.",
+          "Map every parcel into leased, optioned, constrained, related-entity-owned, and residual categories."
+        ],
+        "specialist_findings": "After the one-loop research response, classification improved but the decisive fact remains unresolved; the vote remains defer.",
+        "confidence": "medium"
+      },
+      {
+        "persona": "marks_credit_cycle",
+        "independence_group": "credit_cycle",
+        "evidence_status": "insufficient_evidence",
+        "scores": {
+          "explanatory_strength": {
+            "value": 3,
+            "rationale": "The asset thesis is specific, but the cash realization and funding path is incomplete."
+          },
+          "evidence_sufficiency": {
+            "value": 2,
+            "rationale": "Audited statements expose claims but do not prove collectability, waterfall, or realization timing. The focused research response confirms rather than closes the key gap."
+          },
+          "downside_control": {
+            "value": 1,
+            "rationale": "Illiquidity and related-party claims can produce permanent impairment despite asset coverage."
+          },
+          "return_vs_alternatives": {
+            "value": 2,
+            "rationale": "The base annualized return is below the hurdle and realization may take longer than modeled."
+          }
+        },
+        "vote": "defer",
+        "expected_return_range_pct": [
+          -12.5,
+          8.9
+        ],
+        "horizon_years": 7,
+        "claims": [
+          {
+            "claim": "Illiquidity, related-party claims, realization duration, and funding can overwhelm gross NAV.",
+            "evidence_paths": [
+              "AZLCZ/research/valuation.json",
+              "AZLCZ/research/evidence_reconciliation_2026-07-15.json"
+            ]
+          },
+          {
+            "claim": "At 2355 per share, the modeled return range does not justify treating unresolved optionality as cash-equivalent value.",
+            "evidence_paths": [
+              "AZLCZ/research/valuation.json"
+            ]
+          }
+        ],
+        "strongest_counter_explanation": "The asset inventory may be real, but collective gross acreage, related entities, cancellable leases, and absent realization catalysts make the shareholder claim much less certain than the headline NAV.",
+        "most_important_missing_fact": "Related-party note collectability and railway realizability remain insufficiently tested.",
+        "falsifiers": [
+          "Build project-by-project gross-to-net ownership and cash waterfalls.",
+          "Map every parcel into leased, optioned, constrained, related-entity-owned, and residual categories."
+        ],
+        "specialist_findings": "After the one-loop research response, classification improved but the decisive fact remains unresolved; the vote remains defer.",
+        "confidence": "medium"
+      }
+    ]
+  },
+  "valuation_reconciliation": {
+    "status": "complete",
+    "selected_primary_method": "gross-to-net component NAV with probability, timing, tax, and realization discounts",
+    "rejected_averages": [
+      "Do not average gross comparable NAV with owner-cash value.",
+      "Do not average contracted cash with uncontracted option success values.",
+      "Do not use consensus averaging to erase unresolved beneficiary, overlap, probability, timing, or capital differences."
+    ],
+    "disagreements": [
+      {
+        "classification": "factual",
+        "issue": "No project-level ownership and partner waterfall converts gross economics to per-share cash.",
+        "resolution": "unresolved; carried to tribunal and chair blocker"
+      },
+      {
+        "classification": "assumption-based",
+        "issue": "Probability, timing, and realization deductions drive much of the low/high spread.",
+        "resolution": "Retain explicit scenarios; do not collapse to a consensus point estimate."
+      },
+      {
+        "classification": "methodological",
+        "issue": "Operating cash streams and asset/option NAV answer different questions.",
+        "resolution": "Use gross-to-net component NAV with probability, timing, tax, and realization discounts and treat corroborating comparables only as cross-checks."
+      }
+    ]
+  },
+  "adversarial_review": {
+    "status": "complete_with_residual_risks",
+    "tests": [
+      {
+        "test": "double counting",
+        "result": "Component schedule is explicit, but unresolved physical/contract ownership prevents independent proof of every overlap control."
+      },
+      {
+        "test": "beneficiary mismatch",
+        "result": "Material risk remains wherever gross acreage or project economics cannot be traced to one share."
+      },
+      {
+        "test": "hidden capital and dilution",
+        "result": "Modeled reserves exist, but enforceable remaining-capital and financing terms are incomplete."
+      },
+      {
+        "test": "multiple and comparable dependence",
+        "result": "Low/base/high dispersion remains sensitive to duration, unit values, and realization discounts."
+      },
+      {
+        "test": "governance, tax, and legal realization",
+        "result": "Residual risk remains and must not be converted into an approved recommendation."
+      }
+    ],
+    "residual_risks": [
+      "No project-level ownership and partner waterfall converts gross economics to per-share cash.",
+      "No parcel-level map supports a non-overlapping residual-acre balance.",
+      "No legal/engineering record supports transferable water quantity, delivery economics, and dated realization.",
+      "Related-party note collectability and railway realizability remain insufficiently tested."
+    ],
+    "strongest_failure_path": "Gross collective acreage and project values are attributed to shareholders despite related-entity ownership, cancellable leases, parcel overlap, water restrictions, and illiquid related-party claims; realization takes far longer and costs more than modeled."
+  },
+  "chair_synthesis": {
+    "status": "blocked",
+    "primary_method": "gross-to-net component NAV with probability, timing, tax, and realization discounts",
+    "weighting_rationale": "The primary method maps each legal economic claim once and forces probability, timing, capital, tax, and realization into the component that causes them. Comparable and replacement-cost methods remain cross-checks because they cannot cure missing ownership or contract evidence.",
+    "agreed_facts": [
+      "The Corporation and related entities collectively report approximately 239,000 surface acres and 318,000 mineral acres.",
+      "FY2025 statements disclose 141,666 shares, rental cash, related-party notes receivable/payable, railway and mineral investments.",
+      "Renewable projects occupy different stages; development/construction leases can be cancelled, while one solar project entered a 30-year operating term in 2025.",
+      "The statements use an income-tax basis and differ materially from GAAP treatment."
+    ],
+    "disputed_facts": [
+      "No project-level ownership and partner waterfall converts gross economics to per-share cash.",
+      "No parcel-level map supports a non-overlapping residual-acre balance.",
+      "No legal/engineering record supports transferable water quantity, delivery economics, and dated realization.",
+      "Related-party note collectability and railway realizability remain insufficiently tested."
+    ],
+    "recommendation": "research_blocked: complete the named acceptance tests before any human decision or sizing discussion.",
+    "monitoring_plan": {
+      "operational_milestones": [
+        "Renewable project stage and cash-remittance roll-forward",
+        "Entity ownership and related-party claim reconciliation",
+        "Parcel inventory bridge",
+        "Water adjudication, transfer, and delivery evidence"
+      ],
+      "evidence_refresh_dates": [
+        "2026-09-30",
+        "2027-03-31"
+      ],
+      "valuation_refresh_triggers": [
+        "annual or interim financial update",
+        "project enters operations or terminates",
+        "related-party financing change",
+        "parcel sale or water adjudication",
+        "20% price move"
+      ],
+      "price_review_thresholds": [
+        {
+          "below": 1800,
+          "action": "refresh collectability and downside NAV"
+        },
+        {
+          "above": 3000,
+          "action": "require parcel and ownership evidence before increasing value"
+        }
+      ],
+      "thesis_break_conditions": [
+        "Gross-to-net project ownership cannot be reconciled",
+        "Related-party claims suffer impairment or subordination",
+        "Residual parcel count is materially below the low case",
+        "Water is legally nontransferable or economically undeliverable"
+      ],
+      "expected_catalyst_dates": [
+        "2026-09-30",
+        "2027-03-31"
+      ],
+      "outcome_horizons_months": [
+        6,
+        12,
+        24
+      ]
+    }
+  },
+  "synthesis": {
+    "strongest_dissent": "The asset inventory may be real, but collective gross acreage, related entities, cancellable leases, and absent realization catalysts make the shareholder claim much less certain than the headline NAV.",
+    "unresolved_items": [
+      "No parcel-level map supports a non-overlapping residual-acre balance.",
+      "No project-level ownership and partner waterfall converts gross economics to per-share cash.",
+      "Related-party note collectability and railway realizability remain insufficiently tested."
+    ],
+    "vote_split": {
+      "defer": 3
+    },
+    "score_medians": {
+      "explanatory_strength": 3,
+      "evidence_sufficiency": 2,
+      "downside_control": 1,
+      "return_vs_alternatives": 2
+    },
+    "score_ranges": {
+      "explanatory_strength": [
+        3,
+        3
+      ],
+      "evidence_sufficiency": [
+        2,
+        2
+      ],
+      "downside_control": [
+        1,
+        2
+      ],
+      "return_vs_alternatives": [
+        2,
+        2
+      ]
+    },
+    "dissent_ledger": [
+      {
+        "issue": "No parcel-level map supports a non-overlapping residual-acre balance.",
+        "impact": "high",
+        "status": "unresolved",
+        "owner_response": null
+      },
+      {
+        "issue": "No project-level ownership and partner waterfall converts gross economics to per-share cash.",
+        "impact": "high",
+        "status": "unresolved",
+        "owner_response": null
+      },
+      {
+        "issue": "Related-party note collectability and railway realizability remain insufficiently tested.",
+        "impact": "high",
+        "status": "unresolved",
+        "owner_response": null
+      }
+    ]
+  },
+  "component_review": {
+    "status": "ready_for_committee_review",
+    "decision_rule": "Each assigned rater records accept, challenge, or reject with a proposed range and evidence. The aggregator may not silently average disputed ranges.",
+    "items": [
+      {
+        "component_id": "current_lease_cash",
+        "label": "Current renewable, grazing, and access lease cash",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 127.0,
+          "base": 241.0,
+          "high": 354.0
+        },
+        "range_width_pct_of_base": 94.2,
+        "evidence_tier": "fy2024_fy2025_financials",
+        "recommended_raters": [
+          "hohn",
+          "marathon_capital_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "incremental_renewable_projects",
+        "label": "Incremental renewable projects in development or construction",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 423.0,
+          "base": 609.0,
+          "high": 1046.0
+        },
+        "range_width_pct_of_base": 102.3,
+        "evidence_tier": "approved_groundbreaker_crosscheck_plus_project_disclosures",
+        "recommended_raters": [
+          "klarman_asset_value",
+          "hk"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "residual_surface_acreage",
+        "label": "Residual surface acreage after lease overlap",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 425.0,
+          "base": 950.0,
+          "high": 2270.0
+        },
+        "range_width_pct_of_base": 194.2,
+        "evidence_tier": "approved_groundbreaker_transaction_ladder",
+        "recommended_raters": [
+          "klarman_asset_value",
+          "hk"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "mineral_option",
+        "label": "Mineral and helium option",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 5.0,
+          "base": 35.0,
+          "high": 150.0
+        },
+        "range_width_pct_of_base": 414.3,
+        "evidence_tier": "approved_groundbreaker_geology_crosscheck",
+        "recommended_raters": [
+          "klarman_asset_value",
+          "hk"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "water_option",
+        "label": "Little Colorado water-right option",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 15.0,
+          "base": 100.0,
+          "high": 350.0
+        },
+        "range_width_pct_of_base": 335.0,
+        "evidence_tier": "company_update_plus_approved_water_comparables",
+        "recommended_raters": [
+          "klarman_asset_value",
+          "hk"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "railway_and_notes",
+        "label": "Apache Railway interest and related-party notes",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 30.0,
+          "base": 75.0,
+          "high": 150.0
+        },
+        "range_width_pct_of_base": 160.0,
+        "evidence_tier": "fy2025_financials_and_approved_groundbreaker_crosscheck",
+        "recommended_raters": [
+          "greenblatt",
+          "marks_credit_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "realization_reserve",
+        "label": "Tax, governance, and illiquidity reserve",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": -100.0,
+          "base": -75.0,
+          "high": -40.0
+        },
+        "range_width_pct_of_base": 80.0,
+        "evidence_tier": "analyst_stress",
+        "recommended_raters": [
+          "marks_credit_cycle",
+          "pabrai"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      }
+    ]
+  },
+  "gates": {
+    "price": "pass",
+    "shares": "pass",
+    "reporting_period": "pass",
+    "filing_reconciliation": "pass",
+    "economic_claim": "pass",
+    "component_completeness": "pass",
+    "comparable_evidence": "pass",
+    "option_risking": "pass",
+    "disclosure_scan": "partial",
+    "short_scan": "partial",
+    "pre_mortem": "pass",
+    "evidence_tribunal": "blocked",
+    "valuation_reconciliation": "pass",
+    "adversarial_review": "pass",
+    "chair_synthesis": "blocked",
+    "explanation_contracts": "pass",
+    "independent_groups": "pass",
+    "owner": "not_run"
+  },
+  "human_decision": {
+    "status": "pending",
+    "decision": null,
+    "sizing": null,
+    "top_dissent_response": null,
+    "decided_at": null
+  },
+  "monitoring_plan": {
+    "operational_milestones": [
+      "Renewable project stage and cash-remittance roll-forward",
+      "Entity ownership and related-party claim reconciliation",
+      "Parcel inventory bridge",
+      "Water adjudication, transfer, and delivery evidence"
+    ],
+    "evidence_refresh_dates": [
+      "2026-09-30",
+      "2027-03-31"
+    ],
+    "valuation_refresh_triggers": [
+      "annual or interim financial update",
+      "project enters operations or terminates",
+      "related-party financing change",
+      "parcel sale or water adjudication",
+      "20% price move"
+    ],
+    "price_review_thresholds": [
+      {
+        "below": 1800,
+        "action": "refresh collectability and downside NAV"
+      },
+      {
+        "above": 3000,
+        "action": "require parcel and ownership evidence before increasing value"
+      }
+    ],
+    "thesis_break_conditions": [
+      "Gross-to-net project ownership cannot be reconciled",
+      "Related-party claims suffer impairment or subordination",
+      "Residual parcel count is materially below the low case",
+      "Water is legally nontransferable or economically undeliverable"
+    ],
+    "expected_catalyst_dates": [
+      "2026-09-30",
+      "2027-03-31"
+    ],
+    "outcome_horizons_months": [
+      6,
+      12,
+      24
+    ]
+  },
+  "final_state": "evidence_blocked",
+  "provenance": {
+    "prompt_version": "production-isolated-rater-2",
+    "model": "external isolated raters assembled deterministically",
+    "schema_path": "_system/templates/committee_schema.json",
+    "persona_registry_version": "1.1"
+  }
+}

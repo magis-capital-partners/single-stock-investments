@@ -1198,6 +1198,10 @@ function workbenchStatusBadge(status) {
 function renderValuationWorkbench(t) {
   const wb = t.valuation_workbench;
   if (!wb) return '';
+  const decision = wb.decision || {};
+  const business = wb.business || {};
+  const valuation = wb.valuation || {};
+  const optionality = wb.optionality || {};
   const committee = wb.committee || {};
   const evidence = wb.evidence || {};
   const method = wb.method_fit || {};
@@ -1205,6 +1209,24 @@ function renderValuationWorkbench(t) {
   const attribution = wb.attribution || {};
   const progress = committee.analysis_progress || {};
   const progressPct = progress.required ? Math.min(100, Number(progress.completed || 0) / Number(progress.required) * 100) : 0;
+  const decisionPage = `
+    <div class="metric-grid metric-grid-3">
+      <div class="metric"><div class="k">Decision readiness</div><div class="v">${workbenchStatusBadge(decision.status)}</div></div>
+      <div class="metric"><div class="k">Price / base value</div><div class="v mono">$${fmtNum(decision.price_per_share)} / $${fmtNum(decision.value_per_share?.base)}</div></div>
+      <div class="metric"><div class="k">Base annual return</div><div class="v mono">${fmtPct(decision.annualized_return_at_price_pct?.base)}</div></div>
+    </div>
+    <div class="metric-grid metric-grid-3" style="margin-top:9px">
+      <div class="metric"><div class="k">Low / high value</div><div class="v mono">$${fmtNum(decision.value_per_share?.low)} / $${fmtNum(decision.value_per_share?.high)}</div></div>
+      <div class="metric"><div class="k">Unvalued components</div><div class="v mono">${Number(decision.unvalued_component_count || 0)}</div></div>
+      <div class="metric"><div class="k">Evidence blockers</div><div class="v mono">${Number(decision.unresolved_evidence_count || 0)}</div></div>
+    </div>
+    <div class="workbench-callout"><strong>Power zone:</strong> ${escapeHtml(decision.primary_power_zone || 'review required')}<br><strong>Next:</strong> ${escapeHtml(decision.next_action || 'Complete evidence and committee gates.')}</div>`;
+  const ownershipRows = (business.components || []).map(row => `<tr><td><strong>${escapeHtml(row.label || row.component_id)}</strong><div class="tier-sub">${escapeHtml(row.category || '')} · ${escapeHtml(row.treatment || '')}</div></td><td>${escapeHtml(row.ownership_claim || '')}</td><td class="mono">$${fmtNum(row.range_per_share?.low)} / $${fmtNum(row.range_per_share?.base)} / $${fmtNum(row.range_per_share?.high)}</td><td>${escapeHtml(row.assumption_type || '')}</td></tr>`).join('');
+  const businessPage = `<div class="metric-grid metric-grid-3"><div class="metric"><div class="k">Ownership map</div><div class="v">${workbenchStatusBadge(business.status)}</div></div><div class="metric"><div class="k">Facts / estimates</div><div class="v mono">${(business.facts || []).length} / ${(business.estimates || []).length}</div></div><div class="metric"><div class="k">Judgments</div><div class="v mono">${(business.judgments || []).length}</div></div></div><table class="workbench-table"><thead><tr><th>Component</th><th>Economic claim</th><th>Low / base / high</th><th>Input type</th></tr></thead><tbody>${ownershipRows}</tbody></table>`;
+  const valueDrivers = (valuation.scenario_contract?.top_value_drivers || []).map(row => `<tr><td><strong>${escapeHtml(row.label || row.component_id)}</strong></td><td class="mono">$${fmtNum(row.base_per_share)}</td><td class="mono">$${fmtNum(row.range_width_per_share)}</td></tr>`).join('');
+  const valuationPage = `<div class="metric-grid metric-grid-3"><div class="metric"><div class="k">Market cap</div><div class="v mono">${valuation.market?.market_cap_m == null ? '—' : '$' + fmtNum(valuation.market.market_cap_m) + 'm'}</div></div><div class="metric"><div class="k">Base value</div><div class="v mono">$${fmtNum(valuation.valuation?.value_per_share?.base)}</div></div><div class="metric"><div class="k">Low-case downside</div><div class="v mono">${fmtPct(valuation.valuation?.downside_to_low_pct)}</div></div></div><div class="workbench-callout">${escapeHtml(valuation.scenario_contract?.rule || '')}</div>${valueDrivers ? `<h4 style="margin:13px 0 0">Largest uncertainty drivers</h4><table class="workbench-table"><thead><tr><th>Component</th><th>Base / share</th><th>Range width</th></tr></thead><tbody>${valueDrivers}</tbody></table>` : ''}`;
+  const optionRows = (optionality.options || []).map(row => `<tr><td><strong>${escapeHtml(row.label || row.component_id)}</strong></td><td>${escapeHtml(row.method || '')}</td><td class="mono">$${fmtNum(row.range_per_share?.low)} / $${fmtNum(row.range_per_share?.base)} / $${fmtNum(row.range_per_share?.high)}</td><td>${escapeHtml(row.falsifier || '')}</td></tr>`).join('');
+  const optionalityPage = `<div class="metric-grid metric-grid-3"><div class="metric"><div class="k">Optionality</div><div class="v">${workbenchStatusBadge(optionality.status)}</div></div><div class="metric"><div class="k">Explicit options</div><div class="v mono">${Number(optionality.option_count || 0)}</div></div></div><div class="workbench-callout">${escapeHtml(optionality.rule || '')}</div>${optionRows ? `<table class="workbench-table"><thead><tr><th>Option</th><th>Method</th><th>Low / base / high</th><th>Falsifier</th></tr></thead><tbody>${optionRows}</tbody></table>` : '<div class="summary" style="margin-top:10px">No separately material option has been identified; this is an explicit treatment, not an unvalued asset.</div>'}`;
   const committeePage = `
     <div class="metric-grid metric-grid-3">
       <div class="metric"><div class="k">Committee state</div><div class="v">${workbenchStatusBadge(committee.status)}</div></div>
@@ -1259,8 +1281,12 @@ function renderValuationWorkbench(t) {
     <div class="tier-sub" style="margin-top:8px">Unexplained reconciliation: ${fmtSignedDollar(attribution.unexplained_per_share)} &middot; ${escapeHtml(attribution.explanation || '')}</div>`;
   return `<div class="detail-section valuation-workbench">
     <div class="workbench-head"><div><h3>Valuation workbench ${workbenchStatusBadge(committee.status)}</h3><div class="tier-sub">One review surface for decisions, evidence, method fit, measured outcomes, and valuation changes &middot; ${escapeHtml(wb.as_of || '—')}</div></div>${wb.github_url ? `<a class="research-link" href="${wb.github_url}" target="_blank" rel="noopener">Audit file &rarr;</a>` : ''}</div>
-    <div class="workbench-tabs" role="tablist">${[['committee','Committee'],['evidence','Evidence'],['method','Method fit'],['outcomes','Outcomes'],['attribution','Value changes']].map(([id,label], index) => `<button type="button" class="workbench-tab ${index === 0 ? 'active' : ''}" data-workbench-tab="${id}">${label}</button>`).join('')}</div>
-    <div class="workbench-page active" data-workbench-page="committee">${committeePage}</div>
+    <div class="workbench-tabs" role="tablist">${[['decision','Decision'],['business','Business'],['valuation','Valuation'],['optionality','Optionality'],['evidence','Evidence'],['method','Method fit'],['committee','Committee'],['outcomes','Outcomes'],['attribution','Value changes']].map(([id,label], index) => `<button type="button" class="workbench-tab ${index === 0 ? 'active' : ''}" data-workbench-tab="${id}">${label}</button>`).join('')}</div>
+    <div class="workbench-page active" data-workbench-page="decision">${decisionPage}</div>
+    <div class="workbench-page" data-workbench-page="business">${businessPage}</div>
+    <div class="workbench-page" data-workbench-page="valuation">${valuationPage}</div>
+    <div class="workbench-page" data-workbench-page="optionality">${optionalityPage}</div>
+    <div class="workbench-page" data-workbench-page="committee">${committeePage}</div>
     <div class="workbench-page" data-workbench-page="evidence">${evidencePage}</div>
     <div class="workbench-page" data-workbench-page="method">${methodPage}</div>
     <div class="workbench-page" data-workbench-page="outcomes">${outcomesPage}</div>

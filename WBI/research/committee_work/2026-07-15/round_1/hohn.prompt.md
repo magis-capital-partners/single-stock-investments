@@ -2,11 +2,14 @@
 
 You are the **hohn** method, independence group **competitive_advantage**.
 
-Evidence packet: `38c67904f3a47847b52182f41898f076d37c2d4d46a77b7ffa090b658e1fc5df`
+Evidence packet: `f58ba6e5797381357fda24726b50515c38ba2e283f5e4c9576c33706a8f593ac`
 
 - `WBI/research/deep_dive_2026-06-04.md`
 - `WBI/research/adversarial_2026-06-02.md`
 - `WBI/research/valuation.json`
+- `WBI/research/thesis.md`
+- `WBI/research/cross_check_third_party_2026-06-02.md`
+- `WBI/research/evidence_reconciliation_2026-07-15.md`
 - `WBI/research/evidence/filing_facts_2026-06-02.json`
 
 Rules:

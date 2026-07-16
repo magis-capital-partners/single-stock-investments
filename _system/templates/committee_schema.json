@@ -14,11 +14,16 @@
     "selected_raters",
     "round_one",
     "pre_mortem",
+    "evidence_tribunal",
     "research_loop",
     "round_two",
+    "valuation_reconciliation",
+    "adversarial_review",
+    "chair_synthesis",
     "synthesis",
     "gates",
     "human_decision",
+    "monitoring_plan",
     "final_state",
     "provenance"
   ],
@@ -57,6 +62,18 @@
     },
     "round_one": {"$ref": "#/$defs/vote_round"},
     "pre_mortem": {"$ref": "#/$defs/pre_mortem"},
+    "evidence_tribunal": {
+      "type": "object",
+      "required": ["status", "resolved_facts", "disputed_facts", "unresolved_material_facts", "evidence_paths"],
+      "properties": {
+        "status": {"enum": ["complete", "blocked"]},
+        "resolved_facts": {"type": "array"},
+        "disputed_facts": {"type": "array"},
+        "unresolved_material_facts": {"type": "array"},
+        "evidence_paths": {"type": "array", "items": {"type": "string"}}
+      },
+      "additionalProperties": true
+    },
     "research_loop": {
       "type": "object",
       "required": ["loop_count", "questions", "responses", "evidence_hash_after"],
@@ -69,6 +86,42 @@
       "additionalProperties": false
     },
     "round_two": {"$ref": "#/$defs/vote_round"},
+    "valuation_reconciliation": {
+      "type": "object",
+      "required": ["status", "disagreements", "selected_primary_method", "rejected_averages"],
+      "properties": {
+        "status": {"enum": ["complete", "blocked"]},
+        "disagreements": {"type": "array"},
+        "selected_primary_method": {"type": ["string", "null"]},
+        "rejected_averages": {"type": "array"}
+      },
+      "additionalProperties": true
+    },
+    "adversarial_review": {
+      "type": "object",
+      "required": ["status", "tests", "residual_risks", "strongest_failure_path"],
+      "properties": {
+        "status": {"enum": ["complete", "complete_with_residual_risks", "blocked"]},
+        "tests": {"type": "array"},
+        "residual_risks": {"type": "array"},
+        "strongest_failure_path": {"type": "string"}
+      },
+      "additionalProperties": true
+    },
+    "chair_synthesis": {
+      "type": "object",
+      "required": ["status", "primary_method", "weighting_rationale", "agreed_facts", "disputed_facts", "recommendation", "monitoring_plan"],
+      "properties": {
+        "status": {"enum": ["complete", "blocked"]},
+        "primary_method": {"type": ["string", "null"]},
+        "weighting_rationale": {"type": "string"},
+        "agreed_facts": {"type": "array"},
+        "disputed_facts": {"type": "array"},
+        "recommendation": {"type": "string"},
+        "monitoring_plan": {"type": "object"}
+      },
+      "additionalProperties": true
+    },
     "synthesis": {
       "type": "object",
       "required": ["strongest_dissent", "unresolved_items", "vote_split", "score_medians", "score_ranges", "dissent_ledger"],
@@ -85,7 +138,7 @@
     "component_review": {"$ref": "#/$defs/component_review"},
     "gates": {
       "type": "object",
-      "required": ["price", "shares", "reporting_period", "filing_reconciliation", "economic_claim", "component_completeness", "comparable_evidence", "option_risking", "disclosure_scan", "short_scan", "pre_mortem", "explanation_contracts", "independent_groups", "owner"],
+      "required": ["price", "shares", "reporting_period", "filing_reconciliation", "economic_claim", "component_completeness", "comparable_evidence", "option_risking", "disclosure_scan", "short_scan", "pre_mortem", "evidence_tribunal", "valuation_reconciliation", "adversarial_review", "chair_synthesis", "explanation_contracts", "independent_groups", "owner"],
       "properties": {
         "price": {"$ref": "#/$defs/gate_status"},
         "shares": {"$ref": "#/$defs/gate_status"},
@@ -98,6 +151,10 @@
         "disclosure_scan": {"$ref": "#/$defs/gate_status"},
         "short_scan": {"$ref": "#/$defs/gate_status"},
         "pre_mortem": {"$ref": "#/$defs/gate_status"},
+        "evidence_tribunal": {"$ref": "#/$defs/gate_status"},
+        "valuation_reconciliation": {"$ref": "#/$defs/gate_status"},
+        "adversarial_review": {"$ref": "#/$defs/gate_status"},
+        "chair_synthesis": {"$ref": "#/$defs/gate_status"},
         "explanation_contracts": {"$ref": "#/$defs/gate_status"},
         "independent_groups": {"$ref": "#/$defs/gate_status"},
         "owner": {"$ref": "#/$defs/gate_status"}
@@ -109,12 +166,26 @@
       "required": ["status", "decision", "sizing", "top_dissent_response", "decided_at"],
       "properties": {
         "status": {"enum": ["pending", "complete"]},
-        "decision": {"type": ["string", "null"], "enum": [null, "approve", "watch", "defer", "reject"]},
+        "decision": {"type": ["string", "null"], "enum": [null, "buy", "add", "hold", "trim", "exit", "watch", "pass", "research_blocked", "approve", "defer", "reject"]},
         "sizing": {"type": ["string", "number", "null"]},
         "top_dissent_response": {"type": ["string", "null"]},
         "decided_at": {"type": ["string", "null"], "format": "date-time"}
       },
       "additionalProperties": false
+    },
+    "monitoring_plan": {
+      "type": "object",
+      "required": ["operational_milestones", "evidence_refresh_dates", "valuation_refresh_triggers", "price_review_thresholds", "thesis_break_conditions", "expected_catalyst_dates", "outcome_horizons_months"],
+      "properties": {
+        "operational_milestones": {"type": "array"},
+        "evidence_refresh_dates": {"type": "array"},
+        "valuation_refresh_triggers": {"type": "array"},
+        "price_review_thresholds": {"type": "array"},
+        "thesis_break_conditions": {"type": "array"},
+        "expected_catalyst_dates": {"type": "array"},
+        "outcome_horizons_months": {"type": "array", "items": {"enum": [6, 12, 24]}}
+      },
+      "additionalProperties": true
     },
     "final_state": {
       "enum": ["draft", "evidence_blocked", "committee_complete_decision_pending", "final"],

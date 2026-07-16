@@ -20,6 +20,7 @@ sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 
 from growth_theory import enrich_growth_explanation, load_filing_facts, theory_scenario  # noqa: E402
 from economic_value_framework import build_economic_value_analysis  # noqa: E402
+from universal_valuation_contract import build_universal_valuation_contract  # noqa: E402
 from lawrence_horizon import LAWRENCE_HORIZON_YEARS, RETURN_LABEL, SYNTHESIS_LABEL  # noqa: E402
 from valuation_synthesis import compute_synthesis  # noqa: E402
 CLASS_PATH = ROOT / "_system" / "portfolio" / "classification.json"
@@ -987,6 +988,7 @@ def compute_valuation(data: dict) -> dict:
     compute_component_valuation(data) or infer_minimal_component_valuation(data)
     build_economic_value_analysis(data)
     build_component_review_queue(data)
+    build_universal_valuation_contract(data)
     separated_views = compute_separated_valuation_views(data)
 
     # Lawrence yield_curve / holdco dated payoffs keep scenarios.base as stance gate.

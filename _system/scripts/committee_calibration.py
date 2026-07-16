@@ -19,9 +19,12 @@ def load_jsonl(path: Path) -> list[dict]:
 def summarize(rows: list[dict]) -> dict:
     valid = [r for r in rows if r.get("return_status") == "complete" and r.get("total_return_pct") is not None]
     by_persona: dict[str, list[dict]] = defaultdict(list)
+    by_persona_power_zone: dict[tuple[str, str], list[dict]] = defaultdict(list)
     for row in valid:
         for vote in row.get("votes", []):
-            by_persona[vote["persona"]].append({**vote, "total_return_pct": float(row["total_return_pct"])})
+            enriched = {**vote, "total_return_pct": float(row["total_return_pct"]), "power_zone": row.get("power_zone") or "unclassified"}
+            by_persona[vote["persona"]].append(enriched)
+            by_persona_power_zone[(vote["persona"], enriched["power_zone"])].append(enriched)
     methods = {}
     for persona, votes in sorted(by_persona.items()):
         actionable = [v for v in votes if v.get("vote") in ("approve", "reject")]
@@ -40,12 +43,25 @@ def summarize(rows: list[dict]) -> dict:
             "mean_total_return_pct": round(sum(v["total_return_pct"] for v in votes) / len(votes), 2),
             "calibration_use": "descriptive" if len(votes) < 20 else "eligible_for_review",
         }
+    power_zone_methods = {}
+    for (persona, power_zone), votes in sorted(by_persona_power_zone.items()):
+        ranged = [v for v in votes if isinstance(v.get("expected_return_range_pct"), list) and len(v["expected_return_range_pct"]) == 2]
+        hits = [v for v in ranged if float(v["expected_return_range_pct"][0]) <= v["total_return_pct"] <= float(v["expected_return_range_pct"][1])]
+        power_zone_methods[f"{persona}:{power_zone}"] = {
+            "persona": persona,
+            "power_zone": power_zone,
+            "completed_outcomes": len(votes),
+            "expected_range_observations": len(ranged),
+            "expected_range_hit_rate_pct": round(100 * len(hits) / len(ranged), 1) if ranged else None,
+            "calibration_use": "descriptive" if len(votes) < 20 else "eligible_for_review",
+        }
     return {
         "status": "ready" if valid else "insufficient_outcomes",
         "completed_outcomes": len(valid),
         "excluded_rows": len(rows) - len(valid),
         "methods": methods,
-        "warning": "Calibration is descriptive until each method has at least 20 completed, dividend-aware outcomes.",
+        "persona_power_zones": power_zone_methods,
+        "warning": "Calibration is descriptive until each persona has at least 20 completed, dividend-aware outcomes in the same power zone; weights never change automatically.",
     }
 
 

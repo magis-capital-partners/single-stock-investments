@@ -824,6 +824,10 @@ def valuation_workbench_summary(ticker_dir: Path) -> dict | None:
         return None
     return {
         "as_of": data.get("as_of"),
+        "decision": data.get("decision") or {},
+        "business": data.get("business") or {},
+        "valuation": data.get("valuation") or {},
+        "optionality": data.get("optionality") or {},
         "committee": data.get("committee") or {},
         "evidence": data.get("evidence") or {},
         "method_fit": data.get("method_fit") or {},

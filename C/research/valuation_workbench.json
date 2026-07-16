@@ -1,0 +1,763 @@
+{
+  "schema_version": "2.0",
+  "ticker": "C",
+  "as_of": "2026-07-15",
+  "decision": {
+    "status": "evidence_blocked",
+    "price_per_share": 134.89,
+    "market_cap_m": 235720.27,
+    "enterprise_value_m": null,
+    "value_per_share": {
+      "low": 32.0,
+      "base": 107.0,
+      "high": 172.0
+    },
+    "annualized_return_at_price_pct": {
+      "low": -18.58,
+      "base": -3.25,
+      "high": 3.53
+    },
+    "downside_to_low_pct": -76.28,
+    "unvalued_component_count": 0,
+    "unresolved_evidence_count": 3,
+    "primary_power_zone": "Credit, funding, and normalized financial returns",
+    "owner_decision": null,
+    "next_action": "Owner records decision, sizing, and a direct response to the strongest dissent."
+  },
+  "business": {
+    "status": "complete",
+    "components": [
+      {
+        "component_id": "tangible_common_equity",
+        "label": "Tangible common equity",
+        "category": "financial_asset",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Tangible common equity",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 97.0
+        },
+        "growth_driver": "Marks tangible capital for credit, asset quality, and regulatory constraints rather than treating all book value as distributable.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "adjusted_tangible_book",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 72.0,
+          "base": 97.0,
+          "high": 107.0
+        },
+        "evidence_tier": "analyst_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "2025 annual report tangible common equity and TBVPS.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "overlap_key": "tangible_common_equity",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "normalized_franchise_returns",
+        "label": "Normalized franchise return value",
+        "category": "operating_business",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Normalized franchise return value",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 15.0
+        },
+        "growth_driver": "Present value of sustainable returns above or below the required return on tangible common equity.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "excess_return_on_tangible_equity",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": -10.0,
+          "base": 15.0,
+          "high": 45.0
+        },
+        "evidence_tier": "analyst_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "2025 RoTCE was 7.7%; a full-cycle, segment-level return bridge is still required.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "overlap_key": "normalized_franchise_returns",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "transformation_and_excess_capital",
+        "label": "Transformation and excess-capital realization",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Transformation and excess-capital realization",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 10.0
+        },
+        "growth_driver": "Only value capital that can be returned after transformation costs, stress losses, and regulatory buffers.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "probability_weighted_capital_release",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.0,
+          "base": 10.0,
+          "high": 25.0
+        },
+        "evidence_tier": "analyst_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "CET1 was 13.18%; release timing and regulatory minimums remain unverified.",
+        "probability_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "Scenario range includes delay and failure outcomes.",
+          "probability_basis": "Starter probability is an explicit analyst judgment pending base-rate and milestone reconciliation.",
+          "remaining_capital_basis": "Remaining capital and financing are deducted in the stated option range."
+        },
+        "tax_and_realization_adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "overlap_key": "transformation_and_excess_capital",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "credit_funding_and_regulatory_reserve",
+        "label": "Credit, funding, and regulatory reserve",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Credit, funding, and regulatory reserve",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": -15.0
+        },
+        "growth_driver": "Explicit deduction for a worse credit cycle, funding pressure, conduct costs, and capital trapped above management targets.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "stress_loss_reserve",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": -30.0,
+          "base": -15.0,
+          "high": -5.0
+        },
+        "evidence_tier": "analyst_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "Annual-report credit, funding, and regulatory disclosures; detailed stress reconciliation pending.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "overlap_key": "credit_funding_and_regulatory_reserve",
+        "assumption_type": "judgment"
+      }
+    ],
+    "component_coverage": {
+      "all_material_components_identified": true,
+      "material_component_count": 4,
+      "additive_component_count": 4,
+      "embedded_component_count": 0,
+      "unvalued_component_count": 0,
+      "double_counting_flags": []
+    },
+    "facts": [],
+    "estimates": [],
+    "judgments": [
+      {
+        "component_id": "tangible_common_equity",
+        "label": "Tangible common equity",
+        "kind": "judgment",
+        "evidence_tier": "analyst_estimate",
+        "evidence": "2025 annual report tangible common equity and TBVPS.",
+        "method": "adjusted_tangible_book"
+      },
+      {
+        "component_id": "normalized_franchise_returns",
+        "label": "Normalized franchise return value",
+        "kind": "judgment",
+        "evidence_tier": "analyst_estimate",
+        "evidence": "2025 RoTCE was 7.7%; a full-cycle, segment-level return bridge is still required.",
+        "method": "excess_return_on_tangible_equity"
+      },
+      {
+        "component_id": "transformation_and_excess_capital",
+        "label": "Transformation and excess-capital realization",
+        "kind": "judgment",
+        "evidence_tier": "analyst_estimate",
+        "evidence": "CET1 was 13.18%; release timing and regulatory minimums remain unverified.",
+        "method": "probability_weighted_capital_release"
+      },
+      {
+        "component_id": "credit_funding_and_regulatory_reserve",
+        "label": "Credit, funding, and regulatory reserve",
+        "kind": "judgment",
+        "evidence_tier": "analyst_estimate",
+        "evidence": "Annual-report credit, funding, and regulatory disclosures; detailed stress reconciliation pending.",
+        "method": "stress_loss_reserve"
+      }
+    ]
+  },
+  "valuation": {
+    "status": "evidence_blocked",
+    "market": {
+      "price_per_share": 134.89,
+      "fully_diluted_shares": 1747500000,
+      "market_cap_m": 235720.27,
+      "enterprise_value_m": null
+    },
+    "valuation": {
+      "value_per_share": {
+        "low": 32.0,
+        "base": 107.0,
+        "high": 172.0
+      },
+      "probability_weighted_value_per_share": 107.0,
+      "expected_distributions_per_share": 0.0,
+      "annualized_return_at_price_pct": {
+        "low": -18.58,
+        "base": -3.25,
+        "high": 3.53
+      },
+      "downside_to_low_pct": -76.28,
+      "horizon_years": 7
+    },
+    "components": [
+      {
+        "component_id": "tangible_common_equity",
+        "label": "Tangible common equity",
+        "category": "financial_asset",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Tangible common equity",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 97.0
+        },
+        "growth_driver": "Marks tangible capital for credit, asset quality, and regulatory constraints rather than treating all book value as distributable.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "adjusted_tangible_book",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 72.0,
+          "base": 97.0,
+          "high": 107.0
+        },
+        "evidence_tier": "analyst_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "2025 annual report tangible common equity and TBVPS.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "overlap_key": "tangible_common_equity",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "normalized_franchise_returns",
+        "label": "Normalized franchise return value",
+        "category": "operating_business",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Normalized franchise return value",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 15.0
+        },
+        "growth_driver": "Present value of sustainable returns above or below the required return on tangible common equity.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "excess_return_on_tangible_equity",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": -10.0,
+          "base": 15.0,
+          "high": 45.0
+        },
+        "evidence_tier": "analyst_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "2025 RoTCE was 7.7%; a full-cycle, segment-level return bridge is still required.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "overlap_key": "normalized_franchise_returns",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "transformation_and_excess_capital",
+        "label": "Transformation and excess-capital realization",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Transformation and excess-capital realization",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 10.0
+        },
+        "growth_driver": "Only value capital that can be returned after transformation costs, stress losses, and regulatory buffers.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "probability_weighted_capital_release",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.0,
+          "base": 10.0,
+          "high": 25.0
+        },
+        "evidence_tier": "analyst_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "CET1 was 13.18%; release timing and regulatory minimums remain unverified.",
+        "probability_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "Scenario range includes delay and failure outcomes.",
+          "probability_basis": "Starter probability is an explicit analyst judgment pending base-rate and milestone reconciliation.",
+          "remaining_capital_basis": "Remaining capital and financing are deducted in the stated option range."
+        },
+        "tax_and_realization_adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "overlap_key": "transformation_and_excess_capital",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "credit_funding_and_regulatory_reserve",
+        "label": "Credit, funding, and regulatory reserve",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Credit, funding, and regulatory reserve",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": -15.0
+        },
+        "growth_driver": "Explicit deduction for a worse credit cycle, funding pressure, conduct costs, and capital trapped above management targets.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "stress_loss_reserve",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": -30.0,
+          "base": -15.0,
+          "high": -5.0
+        },
+        "evidence_tier": "analyst_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "Annual-report credit, funding, and regulatory disclosures; detailed stress reconciliation pending.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "overlap_key": "credit_funding_and_regulatory_reserve",
+        "assumption_type": "judgment"
+      }
+    ],
+    "scenario_contract": {
+      "rule": "Cases must change causal operating, capital, probability, timing, or financing drivers\u2014not only the terminal multiple.",
+      "top_value_drivers": [
+        {
+          "component_id": "normalized_franchise_returns",
+          "label": "Normalized franchise return value",
+          "base_per_share": 15.0,
+          "range_width_per_share": 55.0,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "tangible_common_equity",
+          "label": "Tangible common equity",
+          "base_per_share": 97.0,
+          "range_width_per_share": 35.0,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "transformation_and_excess_capital",
+          "label": "Transformation and excess-capital realization",
+          "base_per_share": 10.0,
+          "range_width_per_share": 25.0,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "credit_funding_and_regulatory_reserve",
+          "label": "Credit, funding, and regulatory reserve",
+          "base_per_share": -15.0,
+          "range_width_per_share": 25.0,
+          "scenario_assumptions": null
+        }
+      ],
+      "reverse_expectations": null
+    }
+  },
+  "optionality": {
+    "status": "present",
+    "option_count": 1,
+    "options": [
+      {
+        "component_id": "transformation_and_excess_capital",
+        "label": "Transformation and excess-capital realization",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Transformation and excess-capital realization",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 10.0
+        },
+        "growth_driver": "Only value capital that can be returned after transformation costs, stress losses, and regulatory buffers.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "probability_weighted_capital_release",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.0,
+          "base": 10.0,
+          "high": 25.0
+        },
+        "evidence_tier": "analyst_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "CET1 was 13.18%; release timing and regulatory minimums remain unverified.",
+        "probability_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "Scenario range includes delay and failure outcomes.",
+          "probability_basis": "Starter probability is an explicit analyst judgment pending base-rate and milestone reconciliation.",
+          "remaining_capital_basis": "Remaining capital and financing are deducted in the stated option range."
+        },
+        "tax_and_realization_adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "overlap_key": "transformation_and_excess_capital",
+        "assumption_type": "judgment"
+      }
+    ],
+    "rule": "Every option requires a beneficiary, probability, timing, remaining capital, failure case, and non-overlap control; absence of option value must be explicit rather than unvalued."
+  },
+  "committee": {
+    "status": "owner_decision_pending",
+    "as_of": "2026-07-15",
+    "packet_hash": "446a79f7d97798ff927ea1df13fecbad4c723d27372d7eb0deb894c310926b31",
+    "stage": "evidence_blocked",
+    "selected_raters": [
+      "marks_credit_cycle",
+      "greenblatt",
+      "hohn"
+    ],
+    "analysis_progress": {
+      "completed": 13,
+      "required": 13
+    },
+    "completed_outputs": [
+      "round_1/marks_credit_cycle.json",
+      "round_1/greenblatt.json",
+      "round_1/hohn.json",
+      "round_2/marks_credit_cycle.json",
+      "round_2/greenblatt.json",
+      "round_2/hohn.json",
+      "proposer.json",
+      "pre_mortem.json",
+      "evidence_tribunal.json",
+      "research_response.json",
+      "valuation_reconciliation.json",
+      "adversarial_review.json",
+      "chair_synthesis.json"
+    ],
+    "missing_outputs": [],
+    "owner_status": "pending",
+    "owner_decision": null,
+    "strongest_dissent": "The discount to accounting capital is justified because sub-cost-of-equity returns, transformation spending and regulatory constraints can persist while stress losses consume apparent excess capital.",
+    "unresolved_items": [
+      "Segment tangible capital and through-cycle returns cannot be independently reproduced."
+    ],
+    "next_action": "Owner records decision, sizing, and a direct response to the strongest dissent.",
+    "record_ref": "C/research/committee_2026-07-15.json",
+    "previous_record_ref": null,
+    "manifest_ref": "C/research/committee_work/2026-07-15/manifest.json"
+  },
+  "evidence": {
+    "status": "critical_gaps_open",
+    "open_count": 4,
+    "critical_count": 3,
+    "gaps": [
+      {
+        "id": "distributable_capital",
+        "priority": "critical",
+        "component_ids": [
+          "transformation_and_excess_capital"
+        ],
+        "question": "Reconcile regulatory minimums, management buffers, stress losses, transformation costs, and the timing of actual capital return.",
+        "evidence_required": "Primary filings or contracts plus an independently reproducible calculation and relevant cross-check.",
+        "acceptance_test": "The evidence reproduces the low/base/high bridge, resolves overlap, and identifies a falsifier and monitoring source.",
+        "status": "open",
+        "base_value_exposure_per_share": 10.0,
+        "current_methods": [
+          "probability_weighted_capital_release"
+        ],
+        "source": "curated_followup"
+      },
+      {
+        "id": "segment_rotce_normalization",
+        "priority": "critical",
+        "component_ids": [
+          "normalized_franchise_returns"
+        ],
+        "question": "Reconcile segment tangible capital, through-cycle credit costs, expenses, taxes, and normalized RoTCE.",
+        "evidence_required": "Primary filings or contracts plus an independently reproducible calculation and relevant cross-check.",
+        "acceptance_test": "The evidence reproduces the low/base/high bridge, resolves overlap, and identifies a falsifier and monitoring source.",
+        "status": "open",
+        "base_value_exposure_per_share": 15.0,
+        "current_methods": [
+          "excess_return_on_tangible_equity"
+        ],
+        "source": "curated_followup"
+      },
+      {
+        "id": "stress_claims",
+        "priority": "critical",
+        "component_ids": [
+          "credit_funding_and_regulatory_reserve"
+        ],
+        "question": "Build an independently reviewed credit, funding, legal, and regulatory stress bridge.",
+        "evidence_required": "Primary filings or contracts plus an independently reproducible calculation and relevant cross-check.",
+        "acceptance_test": "The evidence reproduces the low/base/high bridge, resolves overlap, and identifies a falsifier and monitoring source.",
+        "status": "open",
+        "base_value_exposure_per_share": -15.0,
+        "current_methods": [
+          "stress_loss_reserve"
+        ],
+        "source": "curated_followup"
+      },
+      {
+        "id": "committee_unresolved_1",
+        "priority": "high",
+        "component_ids": [],
+        "question": "Segment tangible capital and through-cycle returns cannot be independently reproduced.",
+        "evidence_required": "Resolve the committee's missing fact with primary evidence and update the affected valuation proof row.",
+        "acceptance_test": "The committee item is explicitly closed, sourced, and reflected in the valuation range or documented as immaterial.",
+        "valuation_effect": "Pending committee assessment.",
+        "status": "open",
+        "base_value_exposure_per_share": null,
+        "current_methods": [],
+        "source": "committee"
+      }
+    ]
+  },
+  "method_fit": {
+    "profile_id": "credit_and_normalized_returns",
+    "label": "Credit, funding, and normalized financial returns",
+    "current_archetype": "bank",
+    "primary_methods": [
+      "capital_structure_and_excess_return"
+    ],
+    "corroborating_methods": [
+      "stress_loss_waterfall",
+      "normalized_tangible_book"
+    ],
+    "primary_personas": [
+      "marks_credit_cycle"
+    ],
+    "cross_check_personas": [
+      "buffett_weschler",
+      "klarman_asset_value"
+    ],
+    "silent_personas": [
+      "greenblatt",
+      "hk",
+      "hohn",
+      "marathon_capital_cycle",
+      "munger",
+      "pabrai",
+      "stahl"
+    ],
+    "routing_reasons": [
+      "archetype=bank",
+      "component categories=financial_asset, liability_or_reserve",
+      "existing methods=excess_return, stress_loss, tangible_book",
+      "explicit reviewed profile"
+    ],
+    "required_evidence": [
+      "capital structure and maturities",
+      "normalized losses",
+      "regulatory or covenant capital",
+      "funding cost",
+      "distributable excess capital"
+    ],
+    "applicability_tests": [
+      "The balance sheet and funding structure are the operating engine rather than a financing afterthought.",
+      "Credit losses, reserve adequacy, and normalized returns can be measured through a cycle.",
+      "Regulatory capital and distributable excess capital can be reconciled.",
+      "Asset marks, liabilities, off-balance-sheet claims, and dilution are included once."
+    ],
+    "failure_modes": [
+      "industrial EV multiple applied to a financial balance sheet",
+      "regulatory capital treated as distributable",
+      "refinancing and off-balance-sheet claims omitted"
+    ],
+    "validation_cohort": [
+      {
+        "ticker": "MSB",
+        "archetype": "royalty_asset",
+        "primary_profile": "scarce_asset_optionality",
+        "purpose": "Test depletion, commodity exposure, finite reserves, and royalty-unit reconciliation.",
+        "status": "queued"
+      },
+      {
+        "ticker": "C",
+        "archetype": "financial_balance_sheet",
+        "primary_profile": "credit_and_normalized_returns",
+        "purpose": "Test tangible capital, credit losses, funding, regulation, and excess-capital realization.",
+        "status": "queued"
+      },
+      {
+        "ticker": "NVR",
+        "archetype": "quality_reinvestment",
+        "primary_profile": "quality_reinvestment",
+        "purpose": "Test owner earnings, capital-light reinvestment, cyclicality, and buyback value creation.",
+        "status": "queued"
+      },
+      {
+        "ticker": "NUE",
+        "archetype": "capital_cycle",
+        "primary_profile": "capital_cycle",
+        "purpose": "Test normalized margins, industry supply response, replacement cost, and reinvestment timing.",
+        "status": "queued"
+      },
+      {
+        "ticker": "BIIB",
+        "archetype": "binary_special_situation",
+        "primary_profile": "probability_weighted_special_situation",
+        "purpose": "Test product concentration, pipeline probabilities, patent cliffs, and catalyst timing.",
+        "status": "queued"
+      }
+    ],
+    "rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+  },
+  "outcomes": {
+    "status": "waiting_for_owner_decision",
+    "decision_date": null,
+    "schedule": [
+      {
+        "horizon_months": 6,
+        "target_date": null,
+        "status": "waiting_for_owner_decision",
+        "measurement_date": null,
+        "total_return_pct": null,
+        "return_status": null
+      },
+      {
+        "horizon_months": 12,
+        "target_date": null,
+        "status": "waiting_for_owner_decision",
+        "measurement_date": null,
+        "total_return_pct": null,
+        "return_status": null
+      },
+      {
+        "horizon_months": 24,
+        "target_date": null,
+        "status": "waiting_for_owner_decision",
+        "measurement_date": null,
+        "total_return_pct": null,
+        "return_status": null
+      }
+    ],
+    "recorded_outcome_count": 0,
+    "minimum_persona_outcomes_before_reweighting": 20,
+    "personas_eligible_for_weight_review": [],
+    "persona_power_zones_eligible_for_weight_review": [],
+    "weighting_rule": "Do not change a persona's relevance within a power zone until at least 20 attributable, dividend-aware outcomes exist there; never reweight automatically."
+  },
+  "attribution": {
+    "status": "baseline_established",
+    "current": {
+      "as_of": "2026-07-15",
+      "low": 32.0,
+      "base": 107.0,
+      "high": 172.0
+    },
+    "prior": null,
+    "base_change_per_share": null,
+    "base_change_pct": null,
+    "drivers": [],
+    "category_totals_per_share": {},
+    "unexplained_per_share": null,
+    "explanation": "The current component schedule is the first decision-grade baseline; attribution begins with the next dated valuation snapshot."
+  }
+}

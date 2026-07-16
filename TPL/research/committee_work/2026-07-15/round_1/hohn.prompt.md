@@ -2,11 +2,13 @@
 
 You are the **hohn** method, independence group **competitive_advantage**.
 
-Evidence packet: `001234b171a0f0c5bbfcaf109fee5c18d92e28926db63fe15e0ea06378fb4257`
+Evidence packet: `977313ee6896d1a9b5835578b2af3659662b71d29015f05df42c8c1a8968198b`
 
 - `TPL/research/deep_dive_2026-06-04.md`
 - `TPL/research/adversarial_2026-06-01.md`
 - `TPL/research/valuation.json`
+- `TPL/research/thesis.md`
+- `TPL/research/evidence_reconciliation_2026-07-15.json`
 - `TPL/research/evidence/filing_facts_2026-06-01.json`
 
 Rules:
