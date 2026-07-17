@@ -74,7 +74,6 @@ def drain_open_cursor_prs() -> None:
     print(f"Draining {len(open_prs)} open cursor PR(s) oldest-first: {', '.join(f'#{n}' for n in open_prs)}")
     for pr_number in open_prs:
         ensure_pr_ready(pr_number)
-        trigger_automerge(pr_number)
         wait_for_pr_merged(pr_number)
 
 
@@ -87,7 +86,8 @@ def ensure_pr_ready(pr_number: str) -> None:
 
 def check_conclusion(checks: list[dict], name: str) -> str | None:
     for row in checks:
-        if row.get("name") == name:
+        row_name = row.get("name") or ""
+        if row_name == name or name in row_name:
             return row.get("conclusion") or row.get("status")
     return None
 
@@ -98,6 +98,12 @@ def research_checks_passed(checks: list[dict]) -> bool:
     return lint in ("SUCCESS", "SKIPPED") and sync in ("SUCCESS", "SKIPPED")
 
 
+def format_research_check_status(checks: list[dict]) -> str:
+    lint = check_conclusion(checks, "research-lint") or "missing"
+    sync = check_conclusion(checks, "cloud-prompt-sync") or "missing"
+    return f"research-lint={lint}, cloud-prompt-sync={sync}"
+
+
 def trigger_automerge(pr_number: str) -> None:
     run(
         ["gh", "workflow", "run", "marvin-pr-automerge.yml", "-f", f"pr_number={pr_number}"],
@@ -105,9 +111,16 @@ def trigger_automerge(pr_number: str) -> None:
     )
 
 
-def wait_for_pr_merged(pr_number: str, *, timeout_sec: int = 5400, poll_sec: int = 30) -> None:
+def wait_for_pr_merged(
+    pr_number: str,
+    *,
+    timeout_sec: int = 5400,
+    poll_sec: int = 30,
+    automerge_redispatch_sec: int = 1200,
+) -> None:
     deadline = time.time() + timeout_sec
-    automerge_dispatched = False
+    last_automerge_at = 0.0
+    last_checks: list[dict] = []
     while time.time() < deadline:
         data = gh_json(["pr", "view", pr_number, "--json", "state,mergeable,isDraft,statusCheckRollup"])
         state = data.get("state")
@@ -119,26 +132,35 @@ def wait_for_pr_merged(pr_number: str, *, timeout_sec: int = 5400, poll_sec: int
 
         if data.get("isDraft"):
             ensure_pr_ready(pr_number)
-            automerge_dispatched = False
+            last_automerge_at = 0.0
 
         checks = data.get("statusCheckRollup") or []
+        last_checks = checks
+        check_status = format_research_check_status(checks)
+        now = time.time()
 
         if mergeable == "CONFLICTING":
-            print(f"PR #{pr_number} is CONFLICTING ? running conflict resolver...")
+            print(f"PR #{pr_number} is CONFLICTING - running conflict resolver...")
             proc = run([sys.executable, str(RESOLVE_PY), pr_number], check=False)
             if proc.returncode != 0:
                 print(proc.stderr or proc.stdout, file=sys.stderr)
-            automerge_dispatched = False
+            last_automerge_at = 0.0
             trigger_automerge(pr_number)
-            automerge_dispatched = True
-        elif mergeable == "MERGEABLE" and research_checks_passed(checks) and not automerge_dispatched:
-            trigger_automerge(pr_number)
-            automerge_dispatched = True
+            last_automerge_at = now
+            print(f"Dispatched automerge for PR #{pr_number} after conflict resolution.")
+        elif mergeable == "MERGEABLE" and research_checks_passed(checks):
+            if now - last_automerge_at >= automerge_redispatch_sec:
+                trigger_automerge(pr_number)
+                last_automerge_at = now
+                print(f"Dispatched automerge for PR #{pr_number} ({check_status}).")
 
-        print(f"Waiting on PR #{pr_number} (state={state}, mergeable={mergeable})...")
+        print(f"Waiting on PR #{pr_number} (state={state}, mergeable={mergeable}, {check_status})...")
         time.sleep(poll_sec)
 
-    raise TimeoutError(f"Timed out waiting for PR #{pr_number} to merge")
+    check_status = format_research_check_status(last_checks)
+    raise TimeoutError(
+        f"Timed out waiting for PR #{pr_number} to merge ({check_status})"
+    )
 
 
 def run_agent(ticker: str, pick_reason: str) -> tuple[str, str]:
@@ -192,7 +214,6 @@ def main() -> None:
             _url, pr_number = run_agent(ticker, args.pick_reason)
             print(f"Agent PR: #{pr_number}")
             ensure_pr_ready(pr_number)
-            trigger_automerge(pr_number)
             wait_for_pr_merged(pr_number)
         except Exception as exc:
             print(f"::error::{ticker} failed: {exc}", file=sys.stderr)
