@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -264,6 +265,65 @@ These prices are the present value of the explicit seven-year cash-flow and term
 """
 
 
+def can_seed(data: dict) -> bool:
+    """A default config is only honest when the valuation model is complete."""
+    inputs = data.get("inputs") or {}
+    base = (data.get("scenarios") or {}).get("base") or {}
+    try:
+        price_ok = float(inputs.get("price") or 0) > 0
+        fcf_ok = float(inputs.get("fcf_per_share") or 0) > 0
+    except (TypeError, ValueError):
+        return False
+    exit_ok = base.get("exit_pfcf_end") is not None or base.get("exit_pfcf_y10") is not None
+    return price_ok and fcf_ok and base.get("growth_y1_5") is not None and exit_ok
+
+
+def seed_default_config(ticker: str) -> Path | None:
+    """Write a mechanical pricing_model.json for a ticker that lacks one.
+
+    The seeded config never asserts a buy/sell decision. It marks the pricing
+    run as machine-generated so the entry-price table exists on the dashboard
+    while the decision language stays with the owner.
+    """
+    research = ROOT / ticker / "research"
+    config_path = research / "pricing_model.json"
+    if config_path.exists():
+        return config_path
+    valuation_path = research / "valuation.json"
+    if not valuation_path.exists():
+        return None
+    data = json.loads(valuation_path.read_text(encoding="utf-8"))
+    if not can_seed(data):
+        return None
+    route = data.get("valuation_method_route") or {}
+    failure_modes = route.get("failure_modes") or []
+    config = {
+        "as_of": date.today().isoformat(),
+        "seeded_by": "seed_default_config (mechanical; no analyst judgment recorded)",
+        "decision": "watch_pending_owner_review",
+        "strongest_counter_explanation": (
+            failure_modes[0]
+            if failure_modes
+            else "The component schedule may overstate durable earning power; no analyst has yet argued the bear case."
+        ),
+        "falsifiers": failure_modes or [
+            "Owner cash flow falls materially below the base scenario for two consecutive years.",
+            "The component schedule fails reconciliation against the next primary filing.",
+        ],
+        "pricing_conclusion": (
+            "Entry prices were computed mechanically from the routed power-zone profile "
+            f"({route.get('label') or 'unrouted; owner-earnings default'}). "
+            "They are decision inputs, not a decision; the owner must review the scenarios before acting."
+        ),
+        "economic_claim_note": (
+            data.get("economic_claim_note")
+            or "Per-share claims use fully diluted shares from valuation.inputs."
+        ),
+    }
+    config_path.write_text(json.dumps(config, indent=2) + "\n", encoding="utf-8")
+    return config_path
+
+
 def build(ticker: str) -> dict:
     research = ROOT / ticker / "research"
     valuation_path, config_path = research / "valuation.json", research / "pricing_model.json"
@@ -283,8 +343,18 @@ def build(ticker: str) -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("tickers", nargs="+", type=str.upper)
+    parser.add_argument(
+        "--seed-default-config",
+        action="store_true",
+        help="Write a mechanical pricing_model.json when missing (decision language stays with the owner).",
+    )
     args = parser.parse_args()
     for ticker in args.tickers:
+        if args.seed_default_config:
+            seeded = seed_default_config(ticker)
+            if seeded is None:
+                print(f"{ticker}: skipped (valuation.json missing or model incomplete; no config seeded)")
+                continue
         result = build(ticker)
         print(f"{ticker}: price={result['price']} base={result['component_value_per_share']['base']} entry15={result['primary_entry_price_15pct_base']} decision={result['decision']}")
     return 0

@@ -4,7 +4,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from build_power_zone_pricing import build_economic_value_bridge, entry_price_for_hurdle, implied_constant_growth
+from build_power_zone_pricing import (
+    build_economic_value_bridge,
+    can_seed,
+    entry_price_for_hurdle,
+    implied_constant_growth,
+)
 
 
 class PowerZonePricingTests(unittest.TestCase):
@@ -18,6 +23,37 @@ class PowerZonePricingTests(unittest.TestCase):
         self.assertIsNotNone(growth)
         self.assertGreater(growth, -25)
         self.assertLess(growth, 100)
+
+    def test_can_seed_requires_complete_model_inputs(self):
+        complete = {
+            "inputs": {"price": 50, "fcf_per_share": 3},
+            "scenarios": {"base": {"growth_y1_5": 0.05, "growth_y6_10": 0.03, "exit_pfcf_y10": 14}},
+        }
+        self.assertTrue(can_seed(complete))
+        self.assertFalse(
+            can_seed(
+                {
+                    "inputs": {"price": 50},
+                    "scenarios": {"base": {"growth_y1_5": 0.05, "exit_pfcf_y10": 14}},
+                }
+            )
+        )
+        self.assertFalse(
+            can_seed(
+                {
+                    "inputs": {"price": 50, "fcf_per_share": 3},
+                    "scenarios": {"base": {"exit_pfcf_y10": 14}},
+                }
+            )
+        )
+        self.assertFalse(
+            can_seed(
+                {
+                    "inputs": {"price": 50, "fcf_per_share": -1},
+                    "scenarios": {"base": {"growth_y1_5": 0.05, "exit_pfcf_y10": 14}},
+                }
+            )
+        )
 
     def test_economic_bridge_requires_complete_non_overlapping_coverage(self):
         data = {
