@@ -1,18 +1,23 @@
 # BABA — Investment Thesis
 
-**Last updated:** 2026-07-17
+**Last updated:** auto-sync
 
 ## Classification
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Archetype** (Stahl) | compounder |
+| **Moat** (Munger) | stable |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Implied 7yr IRR** (base) | 6.11% (total synthesis) |
+| **IRR method** | full |
+| **Lawrence bucket** | multi_sided |
+| **Payoff lens** | operating |
+| **MOI bucket** | pending |
+
+**Deep dive:** `BABA/research/deep_dive_2026-07-17.md` (auto-sync)
 
 ## One-line thesis
 

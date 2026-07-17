@@ -11,7 +11,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-17.
 | 7176.T | 7176.T/ | Simplex Financial Holdings Co., Ltd. | JP | 2026-07-09 | 2026-07-17 | unknown | watch |
 | 8697.T | 8697.T/ | Japan Exchange Group | JP | 2026-06-25 | 2026-07-17 | croupier | hold |
 | A | A/ | Agilent Technologies | US | 2026-07-10 | 2026-07-17 | unknown | watch |
-| AAOI | AAOI/ | Applied Optoelectronics, Inc. | US | — | — | unknown | watch |
+| AAOI | AAOI/ | Applied Optoelectronics, Inc. | US | 2026-07-17 | 2026-07-17 | unknown | watch |
 | AAPL | AAPL/ | Apple Inc. | US | 2026-07-10 | 2026-07-17 | unknown | watch |
 | ABBV | ABBV/ | AbbVie | US | 2026-07-10 | 2026-07-17 | unknown | watch |
 | ABMD.CVR | ABMD.CVR/ | Abiomed CVR (Johnson & Johnson acquisition) | US | 2026-07-09 | 2026-07-17 | unknown | watch |
@@ -73,6 +73,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-17.
 | B | B/ | Barrick Mining Corporation | US | 2026-07-09 | 2026-07-17 | unknown | watch |
 | B3SA3.SA | B3SA3.SA/ | B3 S.A. - Brasil Bolsa Balcao | EU | 2026-07-09 | 2026-07-17 | unknown | watch |
 | BA | BA/ | Boeing | US | 2026-07-09 | 2026-07-17 | unknown | watch |
+| BABA | BABA/ | Alibaba Group Holding Limited | US | 2026-07-17 | 2026-07-17 | unknown | watch |
 | BAC | BAC/ | Bank of America | US | 2026-07-09 | 2026-07-17 | unknown | watch |
 | BALL | BALL/ | Ball Corporation | US | 2026-07-09 | 2026-07-17 | unknown | watch |
 | BAX | BAX/ | Baxter International | US | 2026-07-09 | 2026-07-17 | unknown | watch |
@@ -643,4 +644,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-17.
 | ZBRA | ZBRA/ | Zebra Technologies | US | 2026-07-10 | 2026-07-17 | unknown | watch |
 | ZTS | ZTS/ | Zoetis | US | 2026-07-10 | 2026-07-17 | unknown | watch |
 
-**636 holdings total.** Registry: `_system/portfolio/registry.json`
+**637 holdings total.** Registry: `_system/portfolio/registry.json`
