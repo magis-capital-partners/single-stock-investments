@@ -50,7 +50,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-17.
 | ANET | ANET/ | Arista Networks | US | 2026-07-09 | 2026-07-17 | unknown | watch |
 | AON | AON/ | Aon plc | US | 2026-07-09 | 2026-07-17 | unknown | watch |
 | AOS | AOS/ | A. O. Smith | US | 2026-07-09 | 2026-07-17 | unknown | watch |
-| APA | APA/ | APA Corporation | US | 2026-07-09 | 2026-07-16 | unknown | watch |
+| APA | APA/ | APA Corporation | US | 2026-07-09 | 2026-07-17 | unknown | watch |
 | APD | APD/ | Air Products | US | 2026-07-09 | 2026-07-17 | unknown | watch |
 | APH | APH/ | Amphenol | US | 2026-07-09 | 2026-07-17 | unknown | watch |
 | APLD | APLD/ | Applied Digital | US | 2026-07-09 | 2026-07-17 | optionality | watch |
@@ -158,7 +158,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-17.
 | CRL | CRL/ | Charles River Laboratories | US | 2026-07-09 | 2026-07-17 | unknown | watch |
 | CRM | CRM/ | Salesforce | US | 2026-07-10 | 2026-07-17 | unknown | watch |
 | CRWD | CRWD/ | CrowdStrike | US | 2026-07-09 | 2026-07-17 | unknown | watch |
-| CSCO | CSCO/ | Cisco | US | 2026-07-09 | 2026-07-15 | unknown | watch |
+| CSCO | CSCO/ | Cisco | US | 2026-07-09 | 2026-07-17 | unknown | watch |
 | CSGP | CSGP/ | CoStar Group | US | 2026-07-09 | 2026-07-17 | platform | watch |
 | CSU | CSU/ | Constellation Software | CA | 2026-07-09 | 2026-07-16 | compounder | core |
 | CSU.DB | CSU.DB/ | Constellation Software Inc. (Series 1 Debentures) | CA | — | 2026-07-09 | unknown | watch |
@@ -218,8 +218,8 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-17.
 | EQR | EQR/ | Equity Residential | US | 2026-07-09 | 2026-07-17 | unknown | watch |
 | EQT | EQT/ | EQT Corporation | US | 2026-07-09 | 2026-07-10 | unknown | watch |
 | ERIE | ERIE/ | Erie Indemnity | US | 2026-07-09 | 2026-07-12 | unknown | watch |
-| ES | ES/ | Eversource Energy | US | 2026-07-09 | 2026-07-10 | unknown | watch |
-| ESS | ESS/ | Essex Property Trust | US | 2026-07-09 | 2026-07-10 | unknown | watch |
+| ES | ES/ | Eversource Energy | US | 2026-07-09 | 2026-07-17 | unknown | watch |
+| ESS | ESS/ | Essex Property Trust | US | 2026-07-09 | 2026-07-17 | unknown | watch |
 | ETN | ETN/ | Eaton Corporation | US | 2026-07-09 | 2026-07-13 | unknown | watch |
 | ETOR | ETOR/ | eToro Group Ltd. | US | 2026-07-09 | 2026-07-09 | unknown | watch |
 | ETR | ETR/ | Entergy | US | 2026-07-09 | 2026-07-17 | unknown | watch |
@@ -287,7 +287,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-17.
 | GPN | GPN/ | Global Payments | US | 2026-07-10 | 2026-07-17 | unknown | watch |
 | GPW.WA | GPW.WA/ | Warsaw Stock Exchange | EU | 2026-07-09 | 2026-07-17 | unknown | watch |
 | GRMN | GRMN/ | Garmin | US | 2026-07-10 | 2026-07-10 | unknown | watch |
-| GROY | GROY/ | Gold Royalty Corp. | US | 2026-07-09 | 2026-07-16 | unknown | watch |
+| GROY | GROY/ | Gold Royalty Corp. | US | 2026-07-09 | 2026-07-17 | unknown | watch |
 | GS | GS/ | Goldman Sachs Group, Inc. | US | 2026-07-09 | 2026-07-17 | unknown | watch |
 | GTX | GTX/ | Garrett Motion Inc. | US | 2026-07-09 | 2026-07-17 | unknown | watch |
 | GWW | GWW/ | W. W. Grainger | US | 2026-07-10 | 2026-07-10 | unknown | watch |
@@ -371,7 +371,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-17.
 | LEN | LEN/ | Lennar | US | 2026-07-10 | 2026-07-17 | unknown | watch |
 | LH | LH/ | Labcorp | US | 2026-07-10 | 2026-07-17 | unknown | watch |
 | LHX | LHX/ | L3Harris | US | 2026-07-10 | 2026-07-10 | unknown | watch |
-| LII | LII/ | Lennox International | US | 2026-07-10 | 2026-07-16 | unknown | watch |
+| LII | LII/ | Lennox International | US | 2026-07-10 | 2026-07-17 | unknown | watch |
 | LIN | LIN/ | Linde plc | US | 2026-07-10 | 2026-07-17 | unknown | watch |
 | LITE | LITE/ | Lumentum | US | 2026-07-10 | 2026-07-17 | unknown | watch |
 | LLY | LLY/ | Lilly (Eli) | US | 2026-07-10 | 2026-07-17 | unknown | watch |
