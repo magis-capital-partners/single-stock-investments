@@ -1,0 +1,184 @@
+{
+  "ticker": "BLSH",
+  "as_of": "2026-07-17",
+  "method": "full",
+  "irr_method": "full",
+  "lawrence_bucket": "multi_sided",
+  "valuation_mode": "operating",
+  "classification_inputs": {
+    "archetype": "croupier",
+    "moat": "unproven",
+    "dhando": "none",
+    "cycle": "mid",
+    "payoff_lens": "operating",
+    "predictive_attribute": "complexity_discount"
+  },
+  "inputs": {
+    "price": 23.13,
+    "price_source": "Yahoo BLSH close 2026-07-17",
+    "price_as_of": "2026-07-17",
+    "shares_millions": 127.7,
+    "shares_source": "FY2025 weighted average basic shares 127.723M (20-F FY2025)",
+    "fcf_per_share": 0.22,
+    "per_share": 0.22,
+    "fcf_source": "FY2025 cash from operating activities $28.6M divided by 127.7M basic shares (20-F FY2025 consolidated cash flow); excludes treasury fair-value volatility in net loss",
+    "revenue_other_fy2025_m": 158.9,
+    "revenue_other_source": "Other revenues $158.9M FY2025 (20-F income statement, Note 6: CoinDesk, indices, data, events, subscriptions)",
+    "exchange_gross_spread_fy2025_m": 78.3,
+    "exchange_gross_spread_source": "Digital asset sales $244.8B minus cost derecognized $244.7B = ~$78.3M gross spread FY2025 (20-F income statement, in thousands)",
+    "digital_asset_sales_fy2025_b": 244.8,
+    "net_loss_fy2025_m": 785.5,
+    "net_income_fy2024_m": 79.6,
+    "cash_m": 87.9,
+    "cash_source": "Cash and equivalents $87.9M at December 31, 2025 (20-F balance sheet)",
+    "related_party_borrowings_m": 514.8,
+    "related_party_source": "Borrowings due to related party SPV KY Limited $514.8M at December 31, 2025 (20-F Note 22)",
+    "finance_expense_fy2025_m": 52.4,
+    "admin_expense_fy2025_m": 153.1,
+    "normalization_note": "FY2025 reported net loss $785.5M driven by fair value losses on digital assets held ($675M), finance expense on related-party debt, and admin including share-based comp. Lawrence base uses filing OCF $28.6M as owner cash proxy, not GAAP net income or crypto treasury marks."
+  },
+  "estimates": {
+    "marvin_floor": {
+      "per_share": 0.22,
+      "return_pct": null,
+      "notes": "FY2025 operating cash flow per share; filings only"
+    },
+    "blended_best": {
+      "per_share": 0.22,
+      "return_pct": null,
+      "notes": "OCF-based owner cash; no approved third-party blend"
+    }
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": -0.05,
+      "growth_y6_10": 0.0,
+      "exit_pfcf_y10": 10,
+      "notes": "Crypto volume trough; CoinDesk ad weakness; related-party debt refinanced on worse terms"
+    },
+    "base": {
+      "growth_y1_5": 0.06,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 14,
+      "notes": "Exchange spread plus CoinDesk indices/data grow with institutional crypto adoption; OCF normalized off FY2025"
+    },
+    "bull": {
+      "growth_y1_5": 0.12,
+      "growth_y6_10": 0.06,
+      "exit_pfcf_y10": 18,
+      "notes": "Volume share gains + CCData/CoinDesk cross-sell; treasury gains remain off-base"
+    }
+  },
+  "btc_overlay": {
+    "as_of": "2026-07-17",
+    "crypto_exposure": "exchange_treasury",
+    "status": "partial",
+    "disclaimer": "Context only. Crypto and exchange metrics inform stance and overlays; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "in_base_irr": false,
+    "themes": [
+      {
+        "theme_id": "exchange_economics",
+        "label": "Digital asset exchange turnover vs owner spread",
+        "indicators": [
+          {
+            "id": "digital_asset_sales_fy2025_bn",
+            "label": "Digital asset sales (gross turnover, USD bn)",
+            "latest": 244.8,
+            "as_of": "2025-12-31",
+            "yoy_pct": -2.2,
+            "direction": "flat",
+            "source": "20-F FY2025 income statement",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "exchange_gross_spread_fy2025_m",
+            "label": "Exchange gross spread (USD m)",
+            "latest": 78.3,
+            "as_of": "2025-12-31",
+            "yoy_pct": null,
+            "direction": "flat",
+            "source": "20-F FY2025 digital sales minus cost derecognized",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ],
+    "in_model": {},
+    "not_in_model_requires_refresh": [
+      "treasury_btc_eth_fair_value_marks",
+      "customer_assets_safeguarded_growth"
+    ]
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "nav_floor",
+      "evidence": "Treasury digital assets and customer safeguarded assets marked at fair value; related-party debt $514.8M not in Lawrence FCF0"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating exchange and media business"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "CoinDesk Insights ad revenue cyclical; burden in admin; growth in other revenues line"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Exchange and subscription revenue recognized currently"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "block.one legacy; related-party SPV debt is liability not asset"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No dated legal recovery in base case"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "CoinDesk 20 index listed on Bullish Exchange (CD20/USDC-PERP cross-sell per 20-F)"
+    }
+  ],
+  "implied_return": {
+    "base_pct": null,
+    "label": "7yr IRR (total synthesis)",
+    "display": "pending mechanical refresh"
+  },
+  "stance": {
+    "proposal": "watch",
+    "rationale": "Pending mechanical IRR at live price"
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": false
+    },
+    "override_reason": null
+  },
+  "lawrence_horizon_years": 7
+}
