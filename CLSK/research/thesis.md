@@ -1,18 +1,23 @@
 # CLSK — Investment Thesis
 
-**Last updated:** 2026-07-17
+**Last updated:** auto-sync
 
 ## Classification
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
+| **Archetype** (Stahl) | optionality |
 | **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Cycle** | mid |
+| **Implied 7yr IRR** (base) | 7.5% (Lawrence base) |
+| **IRR method** | full |
+| **Lawrence bucket** | other |
+| **Payoff lens** | operating |
+| **MOI bucket** | pending |
+
+**Deep dive:** `CLSK/research/deep_dive_2026-07-17.md` (auto-sync)
 
 ## One-line thesis
 
