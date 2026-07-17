@@ -619,6 +619,43 @@ def main() -> int:
     else:
         warnings.append("missing dashboard/data/index_membership.json")
 
+    banks_path = ROOT / "dashboard" / "data" / "advantaged_banks_screener.json"
+    if banks_path.exists():
+        try:
+            banks = json.loads(banks_path.read_text(encoding="utf-8"))
+            bank_rows = banks.get("rows") or []
+            if not bank_rows:
+                warnings.append("advantaged_banks_screener has zero rows")
+            elif banks.get("row_count") not in (None, len(bank_rows)):
+                errors.append(
+                    f"advantaged_banks_screener row_count={banks.get('row_count')} "
+                    f"!= len(rows)={len(bank_rows)}"
+                )
+            missing_ticker = [i for i, r in enumerate(bank_rows) if not r.get("ticker")]
+            if missing_ticker:
+                errors.append(
+                    f"advantaged_banks_screener rows missing ticker at indices {missing_ticker[:5]}"
+                )
+            built_at = banks.get("built_at")
+            if built_at:
+                try:
+                    built_dt = datetime.fromisoformat(str(built_at).replace("Z", "+00:00"))
+                    age_days = (datetime.now(timezone.utc) - built_dt).total_seconds() / 86400
+                    if age_days > 7:
+                        warnings.append(
+                            f"advantaged_banks_screener built_at is {age_days:.0f}d old — rebuild"
+                        )
+                except ValueError:
+                    warnings.append("advantaged_banks_screener built_at not parseable")
+            if "advantaged_banks_screener" not in payload and bank_rows:
+                warnings.append(
+                    "advantaged_banks_screener.json exists but not embedded in dashboard_data.json"
+                )
+        except json.JSONDecodeError:
+            errors.append("advantaged_banks_screener.json is invalid JSON")
+    else:
+        warnings.append("missing dashboard/data/advantaged_banks_screener.json")
+
     for msg in warnings:
         print(f"WARN: {msg}")
     for msg in errors:

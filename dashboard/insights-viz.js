@@ -2809,6 +2809,9 @@
       </div>`;
 
     return `
+      <div class="detail-section">
+        <p class="tier-sub" style="margin-bottom:4px"><span class="badge badge-purple">Ownership signals</span> Specialist 13F ownership — not a watchlist. Prospecting lists (NOL, advantaged banks) live under Watchlist.</p>
+      </div>
       ${libraryHtml}
       ${scoreboardHtml}
       ${methodHtml}
