@@ -42,11 +42,11 @@ No third-party sources are indexed for Bloom Energy as of 2026-07-17. Marvin sta
 |------|-------------------|------------------|-------------|
 | Marvin floor | $0.25/sh FY2025 normalized | 7-year Lawrence model | watch |
 | External (combined) | — | — | — |
-| **Blended best estimate** | **$0.25/sh** | **Pending mechanical IRR** | **watch** |
+| **Blended best estimate** | **$0.25/sh** | **-33.6% per year (7yr synthesis)** | **watch** |
 
 **Weights:** 100% Marvin floor (no approved external sources).
 
-**Returns statement (blended):** Same as Marvin Lawrence base pending `marvin_valuation.py --write`; no third-party uplift applied.
+**Returns statement (blended):** **-33.6% per year** at **$221.89** on FY2025 normalized owner cash **$0.25 per share**; no third-party uplift applied.
 
 ## [HUMAN REVIEW]
 

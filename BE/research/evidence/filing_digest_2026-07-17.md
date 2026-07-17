@@ -10,11 +10,11 @@ Documents in folder: **130** (all listed below; Tier 1–3 extracted or keyword-
 
 | Tier | Kind | File date | Path | Chars |
 |------|------|-----------|------|-------|
-| full | S-1 | — | `investor-documents/ir-be/Bloom-Energy-Announces-1Q-2023-Financial-Results_Final.pdf` | 0 |
-| partial | 20-F | — | `investor-documents/ir-be/Bloom-Energy-Announces-First-Quarter-2020-Financial-Results-_1_.pdf` | 0 |
-| partial | 20-F | — | `investor-documents/ir-be/Bloom-Energy-Announces-Fourth-Quarter-2020-Financial-Results.pdf` | 0 |
-| partial | 20-F | — | `investor-documents/ir-be/Bloom-Energy-Announces-Second-Quarter-2020-Financial-Results.pdf` | 0 |
-| full | 20-F | — | `investor-documents/ir-be/Bloom-Energy-Announces-Third-Quarter-2020-Financial-Results.pdf` | 0 |
+| full | S-1 | — | `investor-documents/ir-be/Bloom-Energy-Announces-1Q-2023-Financial-Results_Final.pdf` | 30142 |
+| partial | 20-F | — | `investor-documents/ir-be/Bloom-Energy-Announces-First-Quarter-2020-Financial-Results-_1_.pdf` | 4919 |
+| partial | 20-F | — | `investor-documents/ir-be/Bloom-Energy-Announces-Fourth-Quarter-2020-Financial-Results.pdf` | 33234 |
+| partial | 20-F | — | `investor-documents/ir-be/Bloom-Energy-Announces-Second-Quarter-2020-Financial-Results.pdf` | 6415 |
+| full | 20-F | — | `investor-documents/ir-be/Bloom-Energy-Announces-Third-Quarter-2020-Financial-Results.pdf` | 6228 |
 | partial | 10-K | 2022-02-25 | `investor-documents/sec-edgar/10-K_20220225_rpt20211231_acc0001664703_22_000034.htm` | 30000 |
 | partial | 10-K | 2023-02-21 | `investor-documents/sec-edgar/10-K_20230221_rpt20221231_acc0001628280_23_004301.htm` | 30000 |
 | partial | 10-K | 2024-02-15 | `investor-documents/sec-edgar/10-K_20240215_rpt20231231_acc0001628280_24_005035.htm` | 30000 |
@@ -38,30 +38,30 @@ Documents in folder: **130** (all listed below; Tier 1–3 extracted or keyword-
 | scan | proxy | 2024-03-26 | `investor-documents/sec-edgar/DEF 14A_20240326_rpt20240326_acc0001628280_24_013081.htm` | 8000 |
 | scan | proxy | 2025-04-02 | `investor-documents/sec-edgar/DEF 14A_20250402_rpt20250402_acc0001628280_25_016206.htm` | 8000 |
 | full | proxy | 2026-04-08 | `investor-documents/sec-edgar/DEF 14A_20260408_rpt20251231_acc0001628280_26_024237.htm` | 120000 |
-| scan | shareholder | — | `investor-documents/ir-be/Bloom-Energy-Q120-Shareholder-Letter-_1_.pdf` | 0 |
-| scan | shareholder | — | `investor-documents/ir-be/Bloom-Energy-Q1_19-Shareholder-Letter.pdf` | 0 |
-| scan | shareholder | — | `investor-documents/ir-be/Bloom-Energy-Q218-Shareholder-Letter.pdf` | 0 |
-| scan | shareholder | — | `investor-documents/ir-be/Bloom-Energy-Q219-Shareholder-Letter_1_.pdf` | 0 |
-| scan | shareholder | — | `investor-documents/ir-be/Bloom-Energy-Q2_20-Shareholder-Letter.pdf` | 0 |
-| scan | shareholder | — | `investor-documents/ir-be/Bloom-Energy-Q3-Shareholder-Letter.pdf` | 0 |
-| scan | shareholder | — | `investor-documents/ir-be/Bloom-Energy-Q3_19-Shareholder-Letter.pdf` | 0 |
-| scan | shareholder | — | `investor-documents/ir-be/Bloom-Energy-Q3_20-Shareholder-Letter.pdf` | 0 |
-| scan | shareholder | — | `investor-documents/ir-be/Bloom-Energy-Q4-Shareholder-Letter.pdf` | 0 |
-| scan | shareholder | — | `investor-documents/ir-be/Bloom-Energy-Q4_19-Shareholder-Letter.pdf` | 0 |
-| scan | earnings | — | `investor-documents/ir-be/BE-4Q23-Earnings-Deck-Final.pdf` | 0 |
-| scan | earnings | — | `investor-documents/ir-be/Bloom-Energy-Q218-Earnings-Release.pdf` | 0 |
-| scan | earnings | — | `investor-documents/ir-be/Bloom-Energy-Q3-2018-Earnings-Release.pdf` | 0 |
-| scan | earnings | — | `investor-documents/ir-be/Bloom-Q1-2019-Earnings-Release.pdf` | 0 |
-| scan | earnings | — | `investor-documents/ir-be/Bloom-Q2-2019-Earnings-Release.pdf` | 0 |
-| scan | earnings | — | `investor-documents/ir-be/Bloom-Q4-2018-Earnings-Release.pdf` | 0 |
-| scan | earnings | — | `investor-documents/ir-be/Earnings-Script-Slides.pdf` | 0 |
-| scan | earnings | — | `investor-documents/ir-be/Q1-26-Earnings-release.pdf` | 0 |
-| scan | earnings | — | `investor-documents/ir-be/Q2-2024-Earnings-release.pdf` | 0 |
-| scan | earnings | — | `investor-documents/ir-be/Q2-25-Earnings-Release.pdf` | 0 |
-| scan | earnings | — | `investor-documents/ir-be/Q223-Earnings-Deck-FINAL.pdf` | 0 |
-| scan | earnings | — | `investor-documents/ir-be/Q3-2025-Earnings-release.pdf` | 0 |
-| scan | earnings | — | `investor-documents/ir-be/Q323-Earnings-Deck-Final.pdf` | 0 |
-| scan | earnings | — | `investor-documents/ir-be/Q324-Financial-Results-Earnings-release-1.pdf` | 0 |
+| scan | shareholder | — | `investor-documents/ir-be/Bloom-Energy-Q120-Shareholder-Letter-_1_.pdf` | 4142 |
+| scan | shareholder | — | `investor-documents/ir-be/Bloom-Energy-Q1_19-Shareholder-Letter.pdf` | 4267 |
+| scan | shareholder | — | `investor-documents/ir-be/Bloom-Energy-Q218-Shareholder-Letter.pdf` | 3761 |
+| scan | shareholder | — | `investor-documents/ir-be/Bloom-Energy-Q219-Shareholder-Letter_1_.pdf` | 4388 |
+| scan | shareholder | — | `investor-documents/ir-be/Bloom-Energy-Q2_20-Shareholder-Letter.pdf` | 4479 |
+| scan | shareholder | — | `investor-documents/ir-be/Bloom-Energy-Q3-Shareholder-Letter.pdf` | 2989 |
+| scan | shareholder | — | `investor-documents/ir-be/Bloom-Energy-Q3_19-Shareholder-Letter.pdf` | 4945 |
+| scan | shareholder | — | `investor-documents/ir-be/Bloom-Energy-Q3_20-Shareholder-Letter.pdf` | 4058 |
+| scan | shareholder | — | `investor-documents/ir-be/Bloom-Energy-Q4-Shareholder-Letter.pdf` | 4083 |
+| scan | shareholder | — | `investor-documents/ir-be/Bloom-Energy-Q4_19-Shareholder-Letter.pdf` | 5020 |
+| scan | earnings | — | `investor-documents/ir-be/BE-4Q23-Earnings-Deck-Final.pdf` | 5956 |
+| scan | earnings | — | `investor-documents/ir-be/Bloom-Energy-Q218-Earnings-Release.pdf` | 2430 |
+| scan | earnings | — | `investor-documents/ir-be/Bloom-Energy-Q3-2018-Earnings-Release.pdf` | 2101 |
+| scan | earnings | — | `investor-documents/ir-be/Bloom-Q1-2019-Earnings-Release.pdf` | 2129 |
+| scan | earnings | — | `investor-documents/ir-be/Bloom-Q2-2019-Earnings-Release.pdf` | 2135 |
+| scan | earnings | — | `investor-documents/ir-be/Bloom-Q4-2018-Earnings-Release.pdf` | 2551 |
+| scan | earnings | — | `investor-documents/ir-be/Earnings-Script-Slides.pdf` | 4820 |
+| scan | earnings | — | `investor-documents/ir-be/Q1-26-Earnings-release.pdf` | 7083 |
+| scan | earnings | — | `investor-documents/ir-be/Q2-2024-Earnings-release.pdf` | 6293 |
+| scan | earnings | — | `investor-documents/ir-be/Q2-25-Earnings-Release.pdf` | 7138 |
+| scan | earnings | — | `investor-documents/ir-be/Q223-Earnings-Deck-FINAL.pdf` | 6533 |
+| scan | earnings | — | `investor-documents/ir-be/Q3-2025-Earnings-release.pdf` | 6457 |
+| scan | earnings | — | `investor-documents/ir-be/Q323-Earnings-Deck-Final.pdf` | 6509 |
+| scan | earnings | — | `investor-documents/ir-be/Q324-Financial-Results-Earnings-release-1.pdf` | 6327 |
 | scan | 8-K | 2024-06-12 | `investor-documents/sec-edgar/8-K_20240612_rpt20240610_acc0001628280_24_027812.htm` | 6818 |
 | scan | 8-K | 2024-07-25 | `investor-documents/sec-edgar/8-K_20240725_rpt20240724_acc0001628280_24_033001.htm` | 6934 |
 | scan | 8-K | 2024-08-08 | `investor-documents/sec-edgar/8-K_20240808_rpt20240808_acc0001628280_24_036108.htm` | 4349 |
@@ -87,33 +87,33 @@ Documents in folder: **130** (all listed below; Tier 1–3 extracted or keyword-
 | scan | 8-K | 2026-05-27 | `investor-documents/sec-edgar/8-K_20260527_rpt20260521_acc0001628280_26_038451.htm` | 7272 |
 | scan | 8-K | 2026-06-17 | `investor-documents/sec-edgar/8-K_20260617_rpt20260615_acc0001193125_26_274388.htm` | 8000 |
 | scan | 8-K | 2026-07-09 | `investor-documents/sec-edgar/8-K_20260709_rpt20260709_acc0001628280_26_047734.htm` | 4233 |
-| scan | supplemental | — | `investor-documents/ir-be/Q1-23-SUPPLEMENTAL-FINANCIAL-INFORMATION-FINAL.pdf` | 0 |
-| scan | supplemental | — | `investor-documents/ir-be/Q1-26-Supplemental-financial-information.pdf` | 0 |
-| scan | supplemental | — | `investor-documents/ir-be/Q120-SUPPLEMENTAL-FINANCIAL-INFORMATION-_2_.pdf` | 0 |
-| scan | supplemental | — | `investor-documents/ir-be/Q124-Supplemental-Financial-Information-1.pdf` | 0 |
-| scan | supplemental | — | `investor-documents/ir-be/Q125-Supplemental-Financial-Information_.pdf` | 0 |
-| scan | supplemental | — | `investor-documents/ir-be/Q1_19-SUPPLEMENTAL-FINANCIAL-INFORMATION.pdf` | 0 |
-| scan | supplemental | — | `investor-documents/ir-be/Q1_21-SUPPLEMENTAL-FINANCIAL-INFORMATION.pdf` | 0 |
-| scan | supplemental | — | `investor-documents/ir-be/Q1_22-SUPPLEMENTAL-FINANCIAL-INFORMATION-FINAL.pdf` | 0 |
-| scan | supplemental | — | `investor-documents/ir-be/Q219-SUPPLEMENTAL-FINANCIAL-INFORMATION.pdf` | 0 |
-| scan | supplemental | — | `investor-documents/ir-be/Q221-SUPPLEMENTAL-FINANCIAL-INFORMATION_2_.pdf` | 0 |
-| scan | supplemental | — | `investor-documents/ir-be/Q224-Supplemental-Financial-Information.pdf` | 0 |
-| scan | supplemental | — | `investor-documents/ir-be/Q225-Supplemental-Financial-Information.pdf` | 0 |
-| scan | supplemental | — | `investor-documents/ir-be/Q2_20-SUPPLEMENTAL-FINANCIAL-INFORMATION.pdf` | 0 |
-| scan | supplemental | — | `investor-documents/ir-be/Q2_22-SUPPLEMENTAL-FINANCIAL-INFORMATION-FINAL.pdf` | 0 |
-| scan | supplemental | — | `investor-documents/ir-be/Q32025-Supplemental-financial-information.pdf` | 0 |
-| scan | supplemental | — | `investor-documents/ir-be/Q324-Supplemental-Financial-Information.pdf` | 0 |
-| scan | supplemental | — | `investor-documents/ir-be/Q3_19-SUPPLEMENTAL-FINANCIAL-INFORMATION.pdf` | 0 |
-| scan | supplemental | — | `investor-documents/ir-be/Q3_20-SUPPLEMENTAL-FINANCIAL-INFORMATION.pdf` | 0 |
-| scan | supplemental | — | `investor-documents/ir-be/Q3_21-SUPPLEMENTAL-FINANCIAL-INFORMATION.pdf` | 0 |
-| scan | supplemental | — | `investor-documents/ir-be/Q3_22-SUPPLEMENTAL-FINANCIAL-INFORMATION-FINAL.pdf` | 0 |
-| scan | supplemental | — | `investor-documents/ir-be/Q4-2024-Supplemental-deck-Final.pdf` | 0 |
-| scan | supplemental | — | `investor-documents/ir-be/Q4-2025-Supplemental-deck.pdf` | 0 |
-| scan | supplemental | — | `investor-documents/ir-be/Q4-SUPPLEMENTAL-FINANCIAL-INFORMATION.pdf` | 0 |
-| scan | supplemental | — | `investor-documents/ir-be/Q4_19-SUPPLEMENTAL-FINANCIAL-INFORMATION.pdf` | 0 |
-| scan | supplemental | — | `investor-documents/ir-be/Q4_20-SUPPLEMENTAL-FINANCIAL-INFORMATION.pdf` | 0 |
-| scan | supplemental | — | `investor-documents/ir-be/Q4_21-SUPPLEMENTAL-FINANCIAL-INFORMATION-FINAL.pdf` | 0 |
-| scan | supplemental | — | `investor-documents/ir-be/Q4_22-SUPPLEMENTAL-FINANCIAL-INFORMATION-FINAL.pdf` | 0 |
+| scan | supplemental | — | `investor-documents/ir-be/Q1-23-SUPPLEMENTAL-FINANCIAL-INFORMATION-FINAL.pdf` | 6723 |
+| scan | supplemental | — | `investor-documents/ir-be/Q1-26-Supplemental-financial-information.pdf` | 4298 |
+| scan | supplemental | — | `investor-documents/ir-be/Q120-SUPPLEMENTAL-FINANCIAL-INFORMATION-_2_.pdf` | 4473 |
+| scan | supplemental | — | `investor-documents/ir-be/Q124-Supplemental-Financial-Information-1.pdf` | 5693 |
+| scan | supplemental | — | `investor-documents/ir-be/Q125-Supplemental-Financial-Information_.pdf` | 4809 |
+| scan | supplemental | — | `investor-documents/ir-be/Q1_19-SUPPLEMENTAL-FINANCIAL-INFORMATION.pdf` | 4048 |
+| scan | supplemental | — | `investor-documents/ir-be/Q1_21-SUPPLEMENTAL-FINANCIAL-INFORMATION.pdf` | 5141 |
+| scan | supplemental | — | `investor-documents/ir-be/Q1_22-SUPPLEMENTAL-FINANCIAL-INFORMATION-FINAL.pdf` | 5771 |
+| scan | supplemental | — | `investor-documents/ir-be/Q219-SUPPLEMENTAL-FINANCIAL-INFORMATION.pdf` | 5005 |
+| scan | supplemental | — | `investor-documents/ir-be/Q221-SUPPLEMENTAL-FINANCIAL-INFORMATION_2_.pdf` | 5331 |
+| scan | supplemental | — | `investor-documents/ir-be/Q224-Supplemental-Financial-Information.pdf` | 5685 |
+| scan | supplemental | — | `investor-documents/ir-be/Q225-Supplemental-Financial-Information.pdf` | 6542 |
+| scan | supplemental | — | `investor-documents/ir-be/Q2_20-SUPPLEMENTAL-FINANCIAL-INFORMATION.pdf` | 5326 |
+| scan | supplemental | — | `investor-documents/ir-be/Q2_22-SUPPLEMENTAL-FINANCIAL-INFORMATION-FINAL.pdf` | 5743 |
+| scan | supplemental | — | `investor-documents/ir-be/Q32025-Supplemental-financial-information.pdf` | 5672 |
+| scan | supplemental | — | `investor-documents/ir-be/Q324-Supplemental-Financial-Information.pdf` | 5744 |
+| scan | supplemental | — | `investor-documents/ir-be/Q3_19-SUPPLEMENTAL-FINANCIAL-INFORMATION.pdf` | 5102 |
+| scan | supplemental | — | `investor-documents/ir-be/Q3_20-SUPPLEMENTAL-FINANCIAL-INFORMATION.pdf` | 4416 |
+| scan | supplemental | — | `investor-documents/ir-be/Q3_21-SUPPLEMENTAL-FINANCIAL-INFORMATION.pdf` | 5814 |
+| scan | supplemental | — | `investor-documents/ir-be/Q3_22-SUPPLEMENTAL-FINANCIAL-INFORMATION-FINAL.pdf` | 5804 |
+| scan | supplemental | — | `investor-documents/ir-be/Q4-2024-Supplemental-deck-Final.pdf` | 5634 |
+| scan | supplemental | — | `investor-documents/ir-be/Q4-2025-Supplemental-deck.pdf` | 4045 |
+| scan | supplemental | — | `investor-documents/ir-be/Q4-SUPPLEMENTAL-FINANCIAL-INFORMATION.pdf` | 4894 |
+| scan | supplemental | — | `investor-documents/ir-be/Q4_19-SUPPLEMENTAL-FINANCIAL-INFORMATION.pdf` | 5222 |
+| scan | supplemental | — | `investor-documents/ir-be/Q4_20-SUPPLEMENTAL-FINANCIAL-INFORMATION.pdf` | 5519 |
+| scan | supplemental | — | `investor-documents/ir-be/Q4_21-SUPPLEMENTAL-FINANCIAL-INFORMATION-FINAL.pdf` | 5959 |
+| scan | supplemental | — | `investor-documents/ir-be/Q4_22-SUPPLEMENTAL-FINANCIAL-INFORMATION-FINAL.pdf` | 6000 |
 | inventory | other | — | `investor-documents/ir-be/BE-Q4-2023-Financial-Results-FINAL.pdf` | 0 |
 | inventory | other | — | `investor-documents/ir-be/Bloom-Energy-Announces-2Q-2023-Financial-Results-FINAL.pdf` | 0 |
 | inventory | other | — | `investor-documents/ir-be/Bloom-Energy-Announces-4Q-2022-Financial-Results_Final.pdf` | 0 |
@@ -182,10 +182,56 @@ Documents in folder: **130** (all listed below; Tier 1–3 extracted or keyword-
 - LongTermPortionOfNonRecourseDebtExcludingRelatedPartyExcludingCurrentMaturities: 4.1
 
 ### `investor-documents/ir-be/Bloom-Energy-Announces-Third-Quarter-2020-Financial-Results.pdf`
-- *(no keyword hits; see cached full text in `research/evidence/_text/` if tier=full)*
+**Keyword snippets (related party, financials, segments):**
+- Revenue of $200.3 million, an increase of 6.6% sequentially from 2Q20, and gross margin of 28%
+-  Revenue of $200.3 million, gross margin of 28.0%, and net loss of $12.0 million
+- This press release contains forward-looking statements within the meaning of the federal securities laws
+- this press release due to a number of risks and uncertainties, including those included in the Risk Factor
+- This release includes a non-GAAP financial measure as defined by SEC rules. This non-GAAP financial
+- measure, please see the table below.
+- Loss (gain) on the Fair Value Adjustments for certain PPA derivatives3 (726)
+- Stock-based compensation 15,735
+- 1. Represents the profits and losses allocated to the non-controlling interests under the hypothetical liquidation at book value (HLBV) method
+- 2. Represents the adjustments to the fair value of the warrants issued or embedded derivatives associated with the convertible notes and other
+- 3. Represents the adjustments to the fair value of the derivative forward contract for one PPA entity (our first PPA company)
 
 ### `investor-documents/ir-be/Bloom-Energy-Announces-1Q-2023-Financial-Results_Final.pdf`
-- *(no keyword hits; see cached full text in `research/evidence/_text/` if tier=full)*
+**Keyword snippets (related party, financials, segments):**
+- Bloom Energy Reports Record Revenue in First Quarter 2023 Financial Results
+- SAN JOSE, Calif., May 9, 2023 -- Bloom Energy Corporation (NYSE: BE) reported today its total revenue
+- record revenue for the quarter was driven by continued growth in Product and Service revenue and
+- • Revenue of $275.2 million in the first quarter of 2023, an increase of 36.9% compared to $201.0
+- million in the first quarter of 2022. Product and Service revenue of $234.4 million in the first
+- will help them to position well for the future and, importantly, create revenue growth for us.”
+- Greg Cameron, President and CFO of Bloom Energy, added, “We had record first quarter revenue driven
+- product costs. We are reaffirming our 2023 framework for revenue and profitability.”
+- Revenue 275,191 462,577 201,039
+- Cost of Revenue 220,924 391,199 173,102
+- Cost of Revenue 216,763 321,823 169,242
+- Operating Income (Loss)  (34,092) 59,032 (39,351)
+- 1. A detailed reconciliation of GAAP to Non-GAAP financial measures is provided at the end of this press release
+- Bloom reaffirms outlook for the full-year 2023:
+- • Revenue:                                                                                                    $1.4 - $1.5 billion
+- • Product & Service Revenue:                                                                  $1.25 - $1.35 billion
+- This release includes certain non-GAAP financial measures as defined by the rules and regulations of the
+- financial measures set forth in this press release, and not to rely on any single financial measure to
+- evaluate our business. With respect to Bloom’s expectations regarding its 2023 Outlook, Bloom is not
+- regarding, and the potential variability of, reconciling items such as stock-based compensation expense.
+- This press release contains certain forward-looking statements, which are subject to the safe harbor provisions of
+- development, serving customers’ needs and revenue growth; Bloom’s 2023 framework for revenue and
+- profitability; Bloom’s financial outlook for 2023. Readers are cautioned that these forward-looking statements are
+- Deferred cost of revenue   40,390    46,191
+- Operating lease right-of-use assets1   129,377    126,955
+- Deferred cost of revenue   4,667    4,737
+- Total assets  $ 2,192,210   $ 1,946,627
+- Deferred revenue and customer deposits1   148,530    159,048
+- Operating lease liabilities1   16,148    16,227
+- Deferred revenue and customer deposits1   29,059    56,392
+- Operating lease liabilities1   135,287    132,363
+- Total revenue   275,191    201,039
+- Cost of revenue:
+- Total cost of revenue   220,924    173,102
+- Non-cash lease expense   7,934    3,072
 
 ### `investor-documents/sec-edgar/10-Q_20260429_rpt20260331_acc0001628280_26_028021.htm`
 **Keyword snippets (related party, financials, segments):**
@@ -323,13 +369,55 @@ Documents in folder: **130** (all listed below; Tier 1–3 extracted or keyword-
 - StockholdersEquity: 78,824
 
 ### `investor-documents/ir-be/Bloom-Energy-Announces-Second-Quarter-2020-Financial-Results.pdf`
-- *(no keyword hits; see cached full text in `research/evidence/_text/` if tier=full)*
+**Keyword snippets (related party, financials, segments):**
+- Revenue of $187.9 million, an increase of 19.9% sequentially from 1Q20 and above consensus estimates
+-  Revenue of $187.9 million, GAAP gross margin of 14.0% and net loss of $42.5 million.  Excluding
+- stock-based compensation, Bloom achieved 16.5% gross margin and $2.1 million adjusted
+- EBITDA*. Both revenue and adjusted EBITDA were above consensus estimates.
+- production and distribution of goods and services. Our business has proven to be resilient and our
+- Outlook for Q3 of FY20:
+- Bloom Energy will not be providing guidance for the third quarter of 2020.
+- on the business. The details are included at the end of the release.
+- Executive Appointment
+- The Company also announced the appointment of Sharelynn Moore as executive vice president and
+- Itron’s largest business segment, as well as Itron’s industrial IoT technology and smart city strategy.
+- This press release contains forward-looking statements within the meaning of the federal securities laws
+- described in this press release due to a number of risks and uncertainties, including those included in
+- the Risk Factor section of the Company’s Quarterly Report on Form 10-K for the year ended December
 
 ### `investor-documents/ir-be/Bloom-Energy-Announces-Fourth-Quarter-2020-Financial-Results.pdf`
-- *(no keyword hits; see cached full text in `research/evidence/_text/` if tier=full)*
+**Keyword snippets (related party, financials, segments):**
+- Q4 Revenue of $249.4 million; an increase of 16.8% from Q419; 2020 Full Year Revenue of $794.2 million,
+-  Revenue of $249.4 million in the fourth quarter of 2020, an increase of 16.8% compared to
+- revenue of $213.5 million in the fourth quarter of 2019, primarily driven by a 16.6% increase in
+-  Excluding stock-based compensation, non-GAAP gross margin was 27.0% in the fourth quarter of
+- improvements in gross margin and a $14.6 million reduction in stock-based compensation
+-  Excluding stock-based compensation, non-GAAP operating margin was 4.8% in the fourth
+-  Revenue of $794.2 million in 2020, an increase of 1.1% compared to revenue of $785.2 million in
+- the PPA II upgrade on revenue in 2019.
+-  Excluding stock-based compensation, non-GAAP gross margin of 23.1% in 2020, an increase of
+- million reduction in stock-based compensation expenses burdening operating expenses.
+-  Excluding stock-based compensation, non-GAAP operating margin of (0.9%) in 2020, an
+- KR Sridhar, founder, chairman, and chief executive officer, Bloom Energy, commented: “2020 was a year
+- financial performance during the fourth quarter of 2020 across revenue, gross margin, operating income
+- for 2021 that provides high project visibility into our 2021 guidance framework and improving cash flow
+- outlook. We continue to make significant progress on reducing our product costs, and our technology
+- Revenue 249,387 200,305 213,543 794,247 785,177
+- Cost of Revenue 185,761 144,318 188,595 628,454 687,590
+- Cost of Revenue2 182,097 140,750 180,001 610,979 642,161
+- Operating Income (loss) 2 11,990 15,363 (11,814) (6,892)   (36,513)
+- 2. Excludes stock-based compensation
 
 ### `investor-documents/ir-be/Bloom-Energy-Announces-First-Quarter-2020-Financial-Results-_1_.pdf`
-- *(no keyword hits; see cached full text in `research/evidence/_text/` if tier=full)*
+**Keyword snippets (related party, financials, segments):**
+- Revenue of $156.7 million, an increase of 6.6% versus 1Q19
+-  Revenue of $156.7 million, GAAP gross margin of 12.7% and net loss of $75.9 million.  Excluding
+- stock-based compensation, Bloom achieved 16.2% gross margin and ($9.8) million of Adjusted
+- Outlook for Q2 of FY20:
+- Bloom Energy will not be providing guidance for the second quarter of 2020.
+- This press release contains forward-looking statements within the meaning of the federal securities laws
+- performance. Actual events or results may differ materially from those described in this press release
+- due to a number of risks and uncertainties, including those included in the Risk Factor section of the
 
 ### `investor-documents/sec-edgar/10-Q_20251028_rpt20250930_acc0001628280_25_046844.htm`
 **Keyword snippets (related party, financials, segments):**
