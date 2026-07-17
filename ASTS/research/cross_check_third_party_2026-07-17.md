@@ -1,56 +1,62 @@
 # ASTS — Cross-Check: Third-Party Sources
 
-**Date:** 2026-07-17  
-**Agent:** Marvin  
-**Marvin dive:** `ASTS/research/deep_dive_2026-07-17.md`  
-**Source inventory:** `ASTS/third-party-analyses/source_inventory_2026-07-17.md`  
+**Date:** 2026-07-17
+**Agent:** Marvin (automated fill)
+**Marvin dive:** `ASTS/research/deep_dive_2026-07-17.md`
+**Source inventory:** `ASTS/third-party-analyses/source_inventory_2026-07-17.md`
 **Framework:** `_system/frameworks/third_party_cross_reference.md`, `external_view_blend.md`
 
 ## Executive summary
 
-No third-party sources are indexed for ASTS as of 2026-07-17. Marvin stance rests on **primary SEC filings only** (FY2025 10-K, Q1 2026 10-Q, proxy). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+Marvin floor **96896052865633.36%** per year (optionality; stance **watch**) from primary filings and `valuation.json`. No third-party sources indexed; filings-only stance. **[HUMAN REVIEW]** for approved-source numeric blend.
 
-**Synthesis:** Marvin floor only; no external blend. Base scenario annual return roughly **-8%** at **$57.23** on partial commercial ramp assumptions in `valuation.json`.
+**Synthesis (best estimate):** Marvin **96896052865633.36%** base · stance **watch**; external sources adjust conviction on catalyst timing, not primary IRR without human OK.
 
 ## Sources in scope
 
-| ID | Source | Type | Status | Reviewed |
-|----|--------|------|--------|----------|
-| — | Primary filings only | SEC | n/a | Yes |
+| Source ID | Title | Path | Status | Cross-check status |
+|-----------|-------|------|--------|-------------------|
+| (none) | Primary filings only | — | — | n/a |
 
 ## Agreements (facts)
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| — | — | — | No external sources |
+| Base return anchor | **96896052865633.36%** per year | Qualitative support only | `ASTS/research/deep_dive_2026-07-17.md` |
+| Archetype / stance | **optionality** · **watch** | See indexed sources | `valuation.json` |
+| Normalization | Reported OCF is positive because of working-capital and contract timing; economi | Cross-check vs posts | Marvin |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| — | — | — | — |
+| Primary IRR | **96896052865633.36%** (Lawrence / scenarios) | No single approved IRR unless promoted | Marvin **70%** numeric; external **30%** catalyst timing |
+| Third party | Filing-first | Context tier only | No numeric upgrade without human OK |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | -$3.42/sh owner cash FY2025 | Negative on Lawrence path | watch |
-| External (combined) | — | — | — |
-| **Blended best estimate** | **Scenario base ~$45/sh payoff yr7** | **~-8%/yr base scenario** | **watch** |
+| Marvin floor | See assumption ledger | **96896052865633.36%** | **watch** |
+| External (combined) | Narrative / catalyst | No change to base % | **watch** (conviction) |
+| **Blended best estimate** | **Filing anchor** | **96896052865633.36%** | **watch** |
 
-**Weights:** 100% Marvin filing floor; 0% external (none indexed).
+**Weights:** Marvin **70%** on numbers; indexed third party **30%** on catalyst timing and narrative (approved Substacks/HK context only in qualitative layer until human promotes).
 
-**Returns statement (blended):** At **$57.23**, Marvin base scenario implies roughly **-8% per year** over seven years; no third-party views in base IRR.
+**Returns statement (blended):** We expect **96896052865633.36%** per year at today's price on the Marvin base case; third-party sources may raise or lower conviction on timing but do not replace filing math without **[HUMAN REVIEW]**.
 
 ## [HUMAN REVIEW]
 
-- [x] Every **approved** source reviewed against filings (none indexed)
-- [x] Every **pending** source cited with **[PENDING APPROVAL]** only (none)
-- [ ] Blended estimate in `valuation.json` → `estimates.external[]` if material third party added
+- [ ] Every **approved** source reviewed against filings
+- [ ] Every **pending** source cited with **[PENDING APPROVAL]** only
+- [ ] Blended estimate in `valuation.json` → `estimates.external[]` if material
+
+## [PROPOSED MEMORY]
+
+- [PROPOSED COMPANY] ASTS: third-party cross-check fill 2026-07-17 — Marvin 96896052865633.36% unchanged
 
 ## Primary sources cited
 
 1. `ASTS/research/deep_dive_2026-07-17.md`
-2. `ASTS/third-party-analyses/source_inventory_2026-07-17.md`
-3. `ASTS/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001780312_26_000006.htm`
-4. `ASTS/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001193125_26_216950.htm`
+2. `ASTS/research/valuation.json`
+3. `ASTS/third-party-analyses/source_inventory_2026-07-17.md`

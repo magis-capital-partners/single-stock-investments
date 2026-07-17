@@ -11,7 +11,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-17.
 | 7176.T | 7176.T/ | Simplex Financial Holdings Co., Ltd. | JP | 2026-07-09 | 2026-07-17 | unknown | watch |
 | 8697.T | 8697.T/ | Japan Exchange Group | JP | 2026-06-25 | 2026-07-17 | croupier | hold |
 | A | A/ | Agilent Technologies | US | 2026-07-10 | 2026-07-17 | unknown | watch |
-| AAOI | AAOI/ | Applied Optoelectronics, Inc. | US | — | — | unknown | watch |
+| AAOI | AAOI/ | Applied Optoelectronics, Inc. | US | 2026-07-17 | 2026-07-17 | unknown | watch |
 | AAPL | AAPL/ | Apple Inc. | US | 2026-07-10 | 2026-07-17 | unknown | watch |
 | ABBV | ABBV/ | AbbVie | US | 2026-07-10 | 2026-07-17 | unknown | watch |
 | ABMD.CVR | ABMD.CVR/ | Abiomed CVR (Johnson & Johnson acquisition) | US | 2026-07-09 | 2026-07-17 | unknown | watch |
@@ -60,6 +60,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-17.
 | ARE | ARE/ | Alexandria Real Estate Equities | US | 2026-07-09 | 2026-07-17 | unknown | watch |
 | ARES | ARES/ | Ares Management | US | 2026-07-09 | 2026-07-17 | unknown | watch |
 | ASPN | ASPN/ | Aspen Aerogels, Inc. | US | 2026-07-09 | 2026-07-17 | unknown | watch |
+| ASTS | ASTS/ | AST SpaceMobile, Inc. | US | — | — | unknown | watch |
 | ASX.AX | ASX.AX/ | ASX Limited | AU | 2026-07-09 | 2026-07-17 | unknown | watch |
 | ATO | ATO/ | Atmos Energy | US | 2026-07-09 | 2026-07-17 | unknown | watch |
 | AVB | AVB/ | AvalonBay Communities | US | 2026-07-09 | 2026-07-17 | unknown | watch |
@@ -643,4 +644,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-17.
 | ZBRA | ZBRA/ | Zebra Technologies | US | 2026-07-10 | 2026-07-17 | unknown | watch |
 | ZTS | ZTS/ | Zoetis | US | 2026-07-10 | 2026-07-17 | unknown | watch |
 
-**636 holdings total.** Registry: `_system/portfolio/registry.json`
+**637 holdings total.** Registry: `_system/portfolio/registry.json`
