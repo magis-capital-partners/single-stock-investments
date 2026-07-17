@@ -60,7 +60,6 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-17.
 | ARE | ARE/ | Alexandria Real Estate Equities | US | 2026-07-09 | 2026-07-17 | unknown | watch |
 | ARES | ARES/ | Ares Management | US | 2026-07-09 | 2026-07-17 | unknown | watch |
 | ASPN | ASPN/ | Aspen Aerogels, Inc. | US | 2026-07-09 | 2026-07-17 | unknown | watch |
-| ASTS | ASTS/ | AST SpaceMobile, Inc. | US | — | — | unknown | watch |
 | ASX.AX | ASX.AX/ | ASX Limited | AU | 2026-07-09 | 2026-07-17 | unknown | watch |
 | ATO | ATO/ | Atmos Energy | US | 2026-07-09 | 2026-07-17 | unknown | watch |
 | AVB | AVB/ | AvalonBay Communities | US | 2026-07-09 | 2026-07-17 | unknown | watch |
@@ -74,11 +73,13 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-17.
 | B | B/ | Barrick Mining Corporation | US | 2026-07-09 | 2026-07-17 | unknown | watch |
 | B3SA3.SA | B3SA3.SA/ | B3 S.A. - Brasil Bolsa Balcao | EU | 2026-07-09 | 2026-07-17 | unknown | watch |
 | BA | BA/ | Boeing | US | 2026-07-09 | 2026-07-17 | unknown | watch |
+| BABA | BABA/ | Alibaba Group Holding Limited | US | 2026-07-17 | 2026-07-17 | unknown | watch |
 | BAC | BAC/ | Bank of America | US | 2026-07-09 | 2026-07-17 | unknown | watch |
 | BALL | BALL/ | Ball Corporation | US | 2026-07-09 | 2026-07-17 | unknown | watch |
 | BAX | BAX/ | Baxter International | US | 2026-07-09 | 2026-07-17 | unknown | watch |
 | BBY | BBY/ | Best Buy | US | 2026-07-09 | 2026-07-17 | unknown | watch |
 | BDX | BDX/ | Becton Dickinson | US | 2026-07-09 | 2026-07-17 | unknown | watch |
+| BE | BE/ | Bloom Energy Corporation | US | — | — | unknown | watch |
 | BEN | BEN/ | Franklin Resources | US | 2026-07-10 | 2026-07-17 | unknown | watch |
 | BF.B | BF.B/ | Brown–Forman | US | — | 2026-07-17 | unknown | watch |
 | BG | BG/ | Bunge Global | US | 2026-07-09 | 2026-07-17 | unknown | watch |
@@ -644,4 +645,5 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-17.
 | ZBRA | ZBRA/ | Zebra Technologies | US | 2026-07-10 | 2026-07-17 | unknown | watch |
 | ZTS | ZTS/ | Zoetis | US | 2026-07-10 | 2026-07-17 | unknown | watch |
 
-**637 holdings total.** Registry: `_system/portfolio/registry.json`
+**638 holdings total.** Registry: `_system/portfolio/registry.json`
+| ASTS | ASTS/ | AST SpaceMobile, Inc. | US | — | — | unknown | watch |
