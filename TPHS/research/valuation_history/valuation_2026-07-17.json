@@ -1,0 +1,1344 @@
+{
+  "ticker": "TPHS",
+  "as_of": "2026-07-17",
+  "method": "yield_curve",
+  "irr_method": "yield_curve",
+  "valuation_mode": "economic_value",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "none",
+    "dhando": "none",
+    "cycle": "trough",
+    "payoff_lens": "asset",
+    "predictive_attribute": "dormant_asset",
+    "stance": "watch"
+  },
+  "inputs": {
+    "price": 0.023,
+    "price_source": "OTC Pink aggregator quotes (Investing.com / YCharts) TPHS last trade 2026-07-17 [HUMAN REVIEW \u2014 confirm official OTC Markets closing print]",
+    "price_as_of": "2026-07-17",
+    "shares_outstanding": 64947266,
+    "shares_source": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf balance sheet, shares outstanding at March 31, 2026",
+    "market_cap_m_usd": 1.49,
+    "cash_m_usd": 0.054,
+    "cash_source": "Q1 2026 press release balance sheet, cash and cash equivalents at March 31, 2026",
+    "total_assets_m_usd": 0.157,
+    "total_liabilities_m_usd": 1.691,
+    "stockholders_deficit_m_usd": -1.534,
+    "book_value_per_share": -0.0236,
+    "book_value_source": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf balance sheet, March 31, 2026 (stockholders' deficit / shares outstanding)",
+    "note_payable_to_steel_m_usd": 1.372,
+    "note_payable_source": "Steel Promissory Note (up to $5.0 million facility), Steel Connect LLC affiliate of Steel Partners; $1.344M at 12/31/2025, $1.372M at 3/31/2026",
+    "federal_nol_m_usd": 329.9,
+    "state_nol_m_usd": 337.4,
+    "nol_source": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf, Net Operating Losses note, as of March 31, 2026",
+    "valuation_allowance_m_usd": 90.4,
+    "steel_partners_shares_acquired": 25862245,
+    "steel_partners_ownership_pct_est": 39.8,
+    "steel_ownership_source": "TPHS/investor-documents/sec-edgar/8-K_20250205_rpt20250205_acc0001104659_25_009671.htm Stock Purchase Agreement, Steel IP Investments LLC purchase of 25,862,245 shares for $2,586,200",
+    "ga_run_rate_q_m_usd": 0.126,
+    "ga_run_rate_source": "Q1 2026 press release, total operating expenses $126K for the quarter",
+    "other_income_fy2025_m_usd": 0.239,
+    "other_income_source": "FY2025 press release, other income line (IP licensing)",
+    "normalization_note": "No operating business remains after the May 20, 2025 transfer of the 95% TPHGreenwich JV interest (New Jersey property) into TPHGreenwich Trust for the benefit of shareholders of record on that date. Current common stock carries no claim on the Trust. The company today is a Steel Partners-controlled shell holding legacy Syms/Filene's Basement intellectual property and a large federal/state net operating loss carryforward, funded by a secured promissory note from a Steel Partners affiliate."
+  },
+  "scenarios": {
+    "bear": {
+      "price": 0.023,
+      "payoff": 0.005,
+      "years": 5,
+      "probability": 0.45,
+      "notes": "[Assumption] Steel Partners keeps advancing the secured promissory note to cover general and administrative costs but never discloses a plan to use the net operating loss shell or grow IP licensing. Continued dilution from note conversion or a going-private / Form 15 deregistration event leaves minority holders with a token residual value near the cash floor."
+    },
+    "base": {
+      "price": 0.023,
+      "payoff": 0.045,
+      "years": 5,
+      "probability": 0.4,
+      "notes": "[Assumption] Steel Partners retains Trinity Place as a preserved-net-operating-loss shell and modestly expands intellectual property licensing income; no committed acquisition or reverse-merger transaction is disclosed as of 2026-07-17. The base payoff reflects option value on the shell itself, not a filed cash flow forecast."
+    },
+    "bull": {
+      "price": 0.023,
+      "payoff": 0.12,
+      "years": 5,
+      "probability": 0.15,
+      "notes": "[Assumption] Steel Partners contributes or merges an operating business into the shell to use some of the $329.9 million federal net operating loss carryforward against real taxable income, consistent with Steel Partners' history of consolidating subsidiaries under its holding structure (Handy & Harman, WebFinancial, Steel Connect). No disclosed plan as of 2026-07-17; Section 382 ownership-change rules would likely cap the annual usable amount well below the face value."
+    }
+  },
+  "optionality_gate": {
+    "framework": "dormant_nol_shell_optionality",
+    "floor_pass": false,
+    "floor_metric": "cash_per_share_est",
+    "floor_value": 0.0008,
+    "primary_metric": "lawrence_base",
+    "notes": "Stockholders' equity is already negative (book value about -$0.024 per share at March 31, 2026) and the Steel Promissory Note is secured by all company assets ahead of equity. There is no GAAP or cash floor under the common stock; downside is bounded only by zero, not by book value.",
+    "primary_label": "annualized return",
+    "incumbent_sleeve": false,
+    "primary_return_pct": 14.4
+  },
+  "nav_overlay": {
+    "status": "complete",
+    "as_of": "2026-07-17",
+    "source": "SEC filings + IR press releases; no third-party analyses located in source_inventory scan",
+    "notes": "The company's only real optionality is the preserved federal/state net operating loss carryforward (~$330 million face, fully reserved with a $90.4 million valuation allowance) as a potential reverse-merger or acquisition shell for its controlling holder, Steel Partners. GAAP book value is negative and is not a floor for equity holders.",
+    "options": [
+      {
+        "id": "nol_shell_vehicle",
+        "label": "Preserved federal ($329.9M) and state ($337.4M) net operating loss carryforwards as an acquisition / reverse-merger shell",
+        "option_treatment": "probability_weighted",
+        "base_terminal_value_m_usd": 2.9,
+        "base_terminal_rationale": "[Assumption] Modest re-rating for shell optionality; no disclosed plan, no committed transaction, and Section 382 ownership-change limits would cap annual NOL usage well below face value even if a transaction occurs.",
+        "evidence": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf NOL note; charter 4.75% ownership-change transfer restriction preserving Section 382 rights",
+        "not_in_lawrence_base": false
+      },
+      {
+        "id": "ip_licensing_income",
+        "label": "Filene's Basement / Stanley Blacker / Running of the Brides brand licensing",
+        "option_treatment": "embedded_in_segment",
+        "base_terminal_value_m_usd": 0.0,
+        "base_terminal_rationale": "Already reflected in the small 'other income' line; immaterial ($0 to about $0.24 million per year); no separate terminal value.",
+        "evidence": "FY2025 press release other income $239K; Q1 2026 other income $0",
+        "not_in_lawrence_base": false
+      },
+      {
+        "id": "greenwich_jv_trust_interest",
+        "label": "95% interest in TPHGreenwich Holdings LLC (New Jersey property)",
+        "option_treatment": "zero",
+        "base_terminal_value_m_usd": 0.0,
+        "base_terminal_rationale": "Already assigned out of the company on May 20, 2025 into TPHGreenwich Trust for the benefit of shareholders of record on that date. Beneficial interests are non-transferable, so a buyer of TPHS common stock today acquires no claim on this asset. Explicit zero for current and future common stock.",
+        "evidence": "TPHS/investor-documents/ir-tphs/Executed-TPHGreenwich-Trust-Trust-Agreement-For-Website.pdf, dated 2025-05-20",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "steel_note_dilution_risk",
+        "label": "Steel Promissory Note (up to $5.0 million), secured by all company assets",
+        "option_treatment": "zero",
+        "base_terminal_value_m_usd": 0.0,
+        "base_terminal_rationale": "A liability, not an asset. Secured claim ranks ahead of common equity in any wind-down; explicit zero equity value contribution.",
+        "evidence": "Steel Promissory Note; $1.344M outstanding at 2025-12-31, $1.372M at 2026-03-31",
+        "not_in_lawrence_base": true
+      }
+    ]
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial \u2014 the $329.9 million federal NOL is a real economic asset to a taxpaying acquirer but carries a full valuation allowance on the balance sheet",
+      "treatment": "nav_overlay",
+      "evidence": "3/31/2026 press release NOL note; $90.4 million valuation allowance"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Yes \u2014 the entire remaining company is a loss-making shell (about $0.5 to $2.0 million per year of general and administrative and non-cash charges historically) funded by the Steel Promissory Note",
+      "treatment": "zero",
+      "evidence": "Q1 2026 operating loss $126K; FY2025 operating loss $1.69 million plus a $3.09 million pension settlement charge"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "No \u2014 the 95% Greenwich joint-venture interest (New Jersey property) was already distributed out of the company on 2025-05-20 into TPHGreenwich Trust for the benefit of then-record shareholders; it is not an asset of TPHS common stock today",
+      "treatment": "zero (out of scope)",
+      "evidence": "TPHGreenwich Trust Agreement dated 2025-05-20"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution or legal recovery?",
+      "answer": "No known litigation recovery; the pension plan termination (completed July 2025) already returned about $0.9 million of reversion cash to the company, largely offset by a $2.6 million non-cash settlement charge and $0.4 million excise tax",
+      "treatment": "embedded_in_segment",
+      "evidence": "FY2025 press release, Pension Settlement and Plan Asset Reversion note"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option already in revenue?",
+      "answer": "Yes \u2014 Filene's Basement / Stanley Blacker brand licensing income is already the entire (small) revenue base",
+      "treatment": "embedded_in_segment",
+      "evidence": "FY2025 other income $239K; Q1 2026 other income $0"
+    }
+  ],
+  "catalyst_paths": [
+    {
+      "event": "Base catalyst path",
+      "timing": "5 years",
+      "impact": "[Assumption] Steel Partners retains the shell as a preserved-NOL vehicle and modestly expands IP licensing income; no committed transaction disclosed."
+    },
+    {
+      "event": "Failure mode",
+      "timing": "bear scenario",
+      "impact": "Steel Partners keeps advancing the promissory note to fund general and administrative costs with no plan to use the NOL shell; continued dilution or a going-private event leaves minority holders with a token residual value."
+    },
+    {
+      "event": "Bull catalyst",
+      "timing": "bull scenario",
+      "impact": "Steel Partners contributes or merges an operating business into the shell to use a portion of the $329.9 million federal NOL against real taxable income."
+    }
+  ],
+  "human_review": {
+    "approved": false,
+    "entry_band_15pct": null,
+    "notes": [
+      "No disclosed plan from Steel Partners for use of the approximately $330 million net operating loss shell; base and bull scenarios are analyst assumptions, not filed guidance \u2014 treat as [PENDING APPROVAL] for any position sizing above a token watch weight",
+      "sec-edgar folder holds filings only through the 8-K dated 2025-02-05 (Steel Partners stock purchase agreement); the FY2025 10-K and 2025-2026 10-Qs have not yet been downloaded \u2014 press releases in investor-documents/ir-tphs/ are the best available primary source for 2025-2026 financials and should be reconciled against the audited 10-K once filed",
+      "Confirm the current OTC Pink closing price and shares outstanding against the next filed 10-Q; aggregator price quotes are used here because TPHS files are not current through mid-2026 on EDGAR",
+      "TPHGreenwich Trust beneficial interests belong only to holders of record as of 2025-05-20 and are non-transferable; confirm no residual claim exists for post-transfer buyers of TPHS common stock",
+      "Monitor for a Form 15 deregistration filing and any Schedule 13D/A amendments from Steel Partners affiliates"
+    ]
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": false
+    },
+    "override_reason": "Moat and dhando both fail (no operating business; equity has no bounded floor below the secured note). Optionality gate routes to watch even though the base dated-payoff return is modestly above zero.",
+    "approved_stance": "watch"
+  },
+  "approved_stance": "watch",
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -26.3
+    },
+    "base": {
+      "return_pct": 14.4
+    },
+    "bull": {
+      "return_pct": 39.2
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -26.3
+    },
+    "base": {
+      "return_pct": 14.4
+    },
+    "bull": {
+      "return_pct": 39.2
+    }
+  },
+  "implied_return": {
+    "base_pct": 14.4,
+    "label": "annualized return",
+    "display": "14.4% (base)"
+  },
+  "overlay_results": [],
+  "valuation_method_route": {
+    "schema_version": "1.0",
+    "status": "routed",
+    "profile_id": "scarce_asset_optionality",
+    "label": "Scarce assets, royalties, and optionality",
+    "score": 8.0,
+    "reasons": [
+      "archetype=optionality",
+      "component categories=real_option",
+      "existing methods=option"
+    ],
+    "primary_methods": [
+      "component_owner_cash_and_unit_nav"
+    ],
+    "corroborating_methods": [
+      "comparable_transactions",
+      "replacement_cost_or_reverse_nav"
+    ],
+    "primary_personas": [
+      "hk",
+      "stahl"
+    ],
+    "cross_check_personas": [
+      "klarman_asset_value",
+      "marks_credit_cycle"
+    ],
+    "silent_personas": [
+      "buffett_weschler",
+      "greenblatt",
+      "hohn",
+      "marathon_capital_cycle",
+      "munger",
+      "pabrai"
+    ],
+    "required_evidence": [
+      "legal economic claim",
+      "non-overlapping physical inventory",
+      "unit economics",
+      "realization timing",
+      "remaining owner capital"
+    ],
+    "failure_modes": [
+      "gross asset value mistaken for shareholder value",
+      "operating cash flow and NAV counted twice",
+      "remote options treated as contracted cash"
+    ],
+    "secondary_profiles": [
+      {
+        "profile_id": "quality_reinvestment",
+        "score": 3.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dcf, owner_cash"
+        ]
+      },
+      {
+        "profile_id": "credit_and_normalized_returns",
+        "score": 2.0,
+        "reasons": [
+          "component categories=financial_asset, liability_or_reserve"
+        ]
+      }
+    ],
+    "scorecard": {
+      "scarce_asset_optionality": {
+        "score": 8.0,
+        "reasons": [
+          "archetype=optionality",
+          "component categories=real_option",
+          "existing methods=option"
+        ]
+      },
+      "quality_reinvestment": {
+        "score": 3.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dcf, owner_cash"
+        ]
+      },
+      "capital_cycle": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
+      },
+      "credit_and_normalized_returns": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=financial_asset, liability_or_reserve"
+        ]
+      },
+      "catalyst_asset_value": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=financial_asset"
+        ]
+      },
+      "predictable_cash_flow": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=owner_cash"
+        ]
+      },
+      "binary_milestone": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=milestone"
+        ]
+      }
+    },
+    "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+  },
+  "universal_valuation_contract": {
+    "schema_version": "1.0",
+    "status": "decision_grade",
+    "ticker": "TPHS",
+    "as_of": "2026-07-17",
+    "economic_ownership_map": [
+      {
+        "component_id": "cash_and_working_capital",
+        "label": "Cash and working capital",
+        "category": "financial_asset",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Cash and working capital",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 0.0
+        },
+        "growth_driver": "Near-term cash only; no Trust claim (May 2025 transfer).",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "net_asset_value",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.0,
+          "base": 0.0,
+          "high": 0.0
+        },
+        "evidence_tier": "filing",
+        "evidence_level": "primary_verified",
+        "evidence": "Q1 2026 press release: cash ~$54k / 64.95M shares (~$0.0008).",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Run-rate G&A can consume cash quickly.",
+        "falsifier": "Cash is exhausted by G&A before any shell transaction.",
+        "overlap_key": "cash_and_working_capital",
+        "assumption_type": "fact"
+      },
+      {
+        "component_id": "ip_licensing_stub",
+        "label": "Legacy Syms / Filene's IP licensing stub",
+        "category": "operating_business",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Legacy Syms / Filene's IP licensing stub",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 0.01
+        },
+        "growth_driver": "Modest capitalization of residual IP cash, not a reinvestment compounder.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "owner_cash_dcf",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.0,
+          "base": 0.01,
+          "high": 0.02
+        },
+        "evidence_tier": "filing",
+        "evidence_level": "primary_verified",
+        "evidence": "FY2025 other income ~$0.239M from IP licensing; not a standalone growth engine.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "No growth reinvestment assumed.",
+        "falsifier": "IP income goes to zero and no replacement revenue appears.",
+        "overlap_key": "ip_licensing_stub",
+        "assumption_type": "fact"
+      },
+      {
+        "component_id": "nol_shell_option",
+        "label": "Preserved NOL shell option (Steel-controlled)",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Preserved NOL shell option (Steel-controlled)",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 0.04
+        },
+        "growth_driver": "Risked option on shell utility; face NOL is not equity value.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "milestone_project_option",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.0,
+          "base": 0.04,
+          "high": 0.1
+        },
+        "evidence_tier": "filing",
+        "evidence_level": "primary_verified",
+        "evidence": "Federal NOL ~$329.9M and state ~$337.4M at 3/31/2026 with full valuation allowance. Steel Partners ~39.8% via Feb 2025 SPA. No disclosed acquisition plan as of 2026-07-17. Section 382 would cap annual use.",
+        "probability_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "Five-year horizon aligned with yield-curve scenarios.",
+          "probability_basis": "Base assumes modest shell optionality (~40% scenario weight in dated payoff), not face NOL value.",
+          "remaining_capital_basis": "Shell is funded by Steel note advances; no large equity raise modeled in base."
+        },
+        "tax_and_realization_adjustments": "Section 382, control, and absence of a disclosed plan widen the range.",
+        "falsifier": "Going-private / Form 15 / note foreclosure leaves minority common with near-zero residual, or Steel never uses the shell.",
+        "overlap_key": "nol_shell_option",
+        "assumption_type": "fact"
+      },
+      {
+        "component_id": "steel_note_and_deficit_reserve",
+        "label": "Steel promissory note and equity deficit reserve",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Steel promissory note and equity deficit reserve",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": -0.01
+        },
+        "growth_driver": "Senior claim haircut on common; base payoff $0.045 already nets this risk judgmentally.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "realization_reserve",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": -0.03,
+          "base": -0.01,
+          "high": -0.01
+        },
+        "evidence_tier": "filing",
+        "evidence_level": "primary_verified",
+        "evidence": "Steel note ~$1.372M secured by all assets; stockholders' deficit ~-$1.534M (~-$0.024/sh).",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Secured claim sits ahead of equity.",
+        "falsifier": "Note conversion or foreclosure extinguishes common ahead of any shell payoff.",
+        "overlap_key": "steel_note_and_deficit_reserve",
+        "assumption_type": "fact"
+      }
+    ],
+    "component_coverage": {
+      "all_material_components_identified": true,
+      "material_component_count": 4,
+      "additive_component_count": 4,
+      "embedded_component_count": 0,
+      "unvalued_component_count": 0,
+      "double_counting_flags": []
+    },
+    "input_classification": {
+      "facts": [
+        {
+          "component_id": "cash_and_working_capital",
+          "label": "Cash and working capital",
+          "kind": "fact",
+          "evidence_tier": "filing",
+          "evidence": "Q1 2026 press release: cash ~$54k / 64.95M shares (~$0.0008).",
+          "method": "net_asset_value"
+        },
+        {
+          "component_id": "ip_licensing_stub",
+          "label": "Legacy Syms / Filene's IP licensing stub",
+          "kind": "fact",
+          "evidence_tier": "filing",
+          "evidence": "FY2025 other income ~$0.239M from IP licensing; not a standalone growth engine.",
+          "method": "owner_cash_dcf"
+        },
+        {
+          "component_id": "nol_shell_option",
+          "label": "Preserved NOL shell option (Steel-controlled)",
+          "kind": "fact",
+          "evidence_tier": "filing",
+          "evidence": "Federal NOL ~$329.9M and state ~$337.4M at 3/31/2026 with full valuation allowance. Steel Partners ~39.8% via Feb 2025 SPA. No disclosed acquisition plan as of 2026-07-17. Section 382 would cap annual use.",
+          "method": "milestone_project_option"
+        },
+        {
+          "component_id": "steel_note_and_deficit_reserve",
+          "label": "Steel promissory note and equity deficit reserve",
+          "kind": "fact",
+          "evidence_tier": "filing",
+          "evidence": "Steel note ~$1.372M secured by all assets; stockholders' deficit ~-$1.534M (~-$0.024/sh).",
+          "method": "realization_reserve"
+        }
+      ],
+      "estimates": [],
+      "judgments": []
+    },
+    "method_route": {
+      "schema_version": "1.0",
+      "status": "routed",
+      "profile_id": "scarce_asset_optionality",
+      "label": "Scarce assets, royalties, and optionality",
+      "score": 8.0,
+      "reasons": [
+        "archetype=optionality",
+        "component categories=real_option",
+        "existing methods=option"
+      ],
+      "primary_methods": [
+        "component_owner_cash_and_unit_nav"
+      ],
+      "corroborating_methods": [
+        "comparable_transactions",
+        "replacement_cost_or_reverse_nav"
+      ],
+      "primary_personas": [
+        "hk",
+        "stahl"
+      ],
+      "cross_check_personas": [
+        "klarman_asset_value",
+        "marks_credit_cycle"
+      ],
+      "silent_personas": [
+        "buffett_weschler",
+        "greenblatt",
+        "hohn",
+        "marathon_capital_cycle",
+        "munger",
+        "pabrai"
+      ],
+      "required_evidence": [
+        "legal economic claim",
+        "non-overlapping physical inventory",
+        "unit economics",
+        "realization timing",
+        "remaining owner capital"
+      ],
+      "failure_modes": [
+        "gross asset value mistaken for shareholder value",
+        "operating cash flow and NAV counted twice",
+        "remote options treated as contracted cash"
+      ],
+      "secondary_profiles": [
+        {
+          "profile_id": "quality_reinvestment",
+          "score": 3.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=dcf, owner_cash"
+          ]
+        },
+        {
+          "profile_id": "credit_and_normalized_returns",
+          "score": 2.0,
+          "reasons": [
+            "component categories=financial_asset, liability_or_reserve"
+          ]
+        }
+      ],
+      "scorecard": {
+        "scarce_asset_optionality": {
+          "score": 8.0,
+          "reasons": [
+            "archetype=optionality",
+            "component categories=real_option",
+            "existing methods=option"
+          ]
+        },
+        "quality_reinvestment": {
+          "score": 3.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=dcf, owner_cash"
+          ]
+        },
+        "capital_cycle": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=operating_business"
+          ]
+        },
+        "credit_and_normalized_returns": {
+          "score": 2.0,
+          "reasons": [
+            "component categories=financial_asset, liability_or_reserve"
+          ]
+        },
+        "catalyst_asset_value": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=financial_asset"
+          ]
+        },
+        "predictable_cash_flow": {
+          "score": 2.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=owner_cash"
+          ]
+        },
+        "binary_milestone": {
+          "score": 2.0,
+          "reasons": [
+            "component categories=real_option",
+            "existing methods=milestone"
+          ]
+        }
+      },
+      "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+    },
+    "market": {
+      "price_per_share": 0.023,
+      "fully_diluted_shares": 64947266,
+      "market_cap_m": 1.49,
+      "enterprise_value_m": null
+    },
+    "valuation": {
+      "value_per_share": {
+        "low": -0.03,
+        "base": 0.04,
+        "high": 0.11
+      },
+      "probability_weighted_value_per_share": 0.04,
+      "expected_distributions_per_share": 0.0,
+      "annualized_return_at_price_pct": {
+        "low": null,
+        "base": 11.7,
+        "high": 36.75
+      },
+      "downside_to_low_pct": -230.43,
+      "horizon_years": 5
+    },
+    "scenario_contract": {
+      "rule": "Cases must change causal operating, capital, probability, timing, or financing drivers\u2014not only the terminal multiple.",
+      "top_value_drivers": [
+        {
+          "component_id": "nol_shell_option",
+          "label": "Preserved NOL shell option (Steel-controlled)",
+          "base_per_share": 0.04,
+          "range_width_per_share": 0.1,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "ip_licensing_stub",
+          "label": "Legacy Syms / Filene's IP licensing stub",
+          "base_per_share": 0.01,
+          "range_width_per_share": 0.02,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "steel_note_and_deficit_reserve",
+          "label": "Steel promissory note and equity deficit reserve",
+          "base_per_share": -0.01,
+          "range_width_per_share": 0.02,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "cash_and_working_capital",
+          "label": "Cash and working capital",
+          "base_per_share": 0.0,
+          "range_width_per_share": 0.0,
+          "scenario_assumptions": null
+        }
+      ],
+      "reverse_expectations": null
+    },
+    "evidence": {
+      "unresolved_count": 0,
+      "blockers": [],
+      "validation_errors": []
+    },
+    "monitoring": {
+      "falsifiers": [
+        "Cash is exhausted by G&A before any shell transaction.",
+        "IP income goes to zero and no replacement revenue appears.",
+        "Going-private / Form 15 / note foreclosure leaves minority common with near-zero residual, or Steel never uses the shell.",
+        "Note conversion or foreclosure extinguishes common ahead of any shell payoff."
+      ],
+      "required_refresh_triggers": [
+        "new filing or material operating update",
+        "capital-structure change",
+        "material price move",
+        "component milestone or falsifier"
+      ]
+    },
+    "decision_rule": "No security is decision-grade until every material economic claim is valued exactly once and every material evidence blocker is resolved."
+  },
+  "method_profile": "dormant_shell_optionality",
+  "valuation_methodology": {
+    "mode": "component_economic_value",
+    "horizon_years": 5,
+    "decision_rule": "Use one complete component schedule for the NOL/IP shell. Dated yield-curve payoff remains the stance-gate IRR bridge."
+  },
+  "component_valuation": {
+    "schema_version": "1.0",
+    "all_material_components_identified": true,
+    "coverage_statement": "Common stock has no claim on TPHGreenwich Trust. Material claims are cash, IP stub, NOL-shell option, and Steel-note reserve.",
+    "components": [
+      {
+        "id": "cash_and_working_capital",
+        "label": "Cash and working capital",
+        "category": "financial_asset",
+        "overlap_key": "cash_and_working_capital",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": 0.0005,
+          "base": 0.0008,
+          "high": 0.0015,
+          "evidence_tier": "filing",
+          "evidence": "Q1 2026 press release: cash ~$54k / 64.95M shares (~$0.0008).",
+          "assumption_summary": "Near-term cash only; no Trust claim (May 2025 transfer).",
+          "cross_check": "Range must reconcile to primary filings and realization path before IC approval.",
+          "falsifier": "Cash is exhausted by G&A before any shell transaction."
+        }
+      },
+      {
+        "id": "ip_licensing_stub",
+        "label": "Legacy Syms / Filene's IP licensing stub",
+        "category": "operating_business",
+        "overlap_key": "ip_licensing_stub",
+        "treatment": "additive",
+        "valuation": {
+          "method": "owner_cash_dcf",
+          "basis": "per_share",
+          "low": 0.002,
+          "base": 0.008,
+          "high": 0.02,
+          "evidence_tier": "filing",
+          "evidence": "FY2025 other income ~$0.239M from IP licensing; not a standalone growth engine.",
+          "assumption_summary": "Modest capitalization of residual IP cash, not a reinvestment compounder.",
+          "cross_check": "Range must reconcile to primary filings and realization path before IC approval.",
+          "falsifier": "IP income goes to zero and no replacement revenue appears."
+        }
+      },
+      {
+        "id": "nol_shell_option",
+        "label": "Preserved NOL shell option (Steel-controlled)",
+        "category": "real_option",
+        "overlap_key": "nol_shell_option",
+        "treatment": "additive",
+        "valuation": {
+          "method": "milestone_project_option",
+          "basis": "per_share",
+          "low": 0.002,
+          "base": 0.036,
+          "high": 0.1,
+          "evidence_tier": "filing",
+          "evidence": "Federal NOL ~$329.9M and state ~$337.4M at 3/31/2026 with full valuation allowance. Steel Partners ~39.8% via Feb 2025 SPA. No disclosed acquisition plan as of 2026-07-17. Section 382 would cap annual use.",
+          "assumption_summary": "Risked option on shell utility; face NOL is not equity value.",
+          "cross_check": "Range must reconcile to primary filings and realization path before IC approval.",
+          "falsifier": "Going-private / Form 15 / note foreclosure leaves minority common with near-zero residual, or Steel never uses the shell."
+        }
+      },
+      {
+        "id": "steel_note_and_deficit_reserve",
+        "label": "Steel promissory note and equity deficit reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "steel_note_and_deficit_reserve",
+        "treatment": "additive",
+        "valuation": {
+          "method": "realization_reserve",
+          "basis": "per_share",
+          "low": -0.025,
+          "base": -0.015,
+          "high": -0.005,
+          "evidence_tier": "filing",
+          "evidence": "Steel note ~$1.372M secured by all assets; stockholders' deficit ~-$1.534M (~-$0.024/sh).",
+          "assumption_summary": "Senior claim haircut on common; base payoff $0.045 already nets this risk judgmentally.",
+          "cross_check": "Range must reconcile to primary filings and realization path before IC approval.",
+          "falsifier": "Note conversion or foreclosure extinguishes common ahead of any shell payoff."
+        }
+      }
+    ]
+  },
+  "economic_value": {
+    "schema_version": "1.0",
+    "method": "component_economic_value",
+    "gaap_role": "misleading_historical_cost",
+    "accounting_reference": "Q1 2026 IR press release balance sheet: negative equity; NOLs fully reserved; Trust assets off common.",
+    "economic_claim": {
+      "description": "One share of Trinity Place Holdings Inc. common stock after the May 2025 Trust transfer: cash, residual IP, and risked NOL-shell optionality net of the Steel note.",
+      "unit_label": "common share",
+      "unit_count": 64947266,
+      "unit_source": "TPHS Q1 2026 financials press release, shares outstanding at March 31, 2026",
+      "enterprise_to_equity_reconciliation": "No operating enterprise remains. Equity value is cash + IP stub + risked NOL option less Steel-note/deficit reserve. Trust property is excluded."
+    },
+    "component_groups": [
+      {
+        "id": "cash_and_working_capital",
+        "label": "Cash and working capital",
+        "component_ids": [
+          "cash_and_working_capital"
+        ],
+        "economic_claim": "Cash and working capital",
+        "valuation_basis": "Cash per share at the latest balance sheet.",
+        "adjustments": "Run-rate G&A can consume cash quickly.",
+        "overlap_control": "Unique overlap key cash_and_working_capital; no other component capitalizes the same claim."
+      },
+      {
+        "id": "ip_licensing_stub",
+        "label": "Legacy Syms / Filene's IP licensing stub",
+        "component_ids": [
+          "ip_licensing_stub"
+        ],
+        "economic_claim": "Legacy Syms / Filene's IP licensing stub",
+        "valuation_basis": "Capitalization of residual IP licensing cash.",
+        "adjustments": "No growth reinvestment assumed.",
+        "overlap_control": "Unique overlap key ip_licensing_stub; no other component capitalizes the same claim."
+      },
+      {
+        "id": "nol_shell_option",
+        "label": "Preserved NOL shell option (Steel-controlled)",
+        "component_ids": [
+          "nol_shell_option"
+        ],
+        "economic_claim": "Preserved NOL shell option (Steel-controlled)",
+        "valuation_basis": "Risked present value of NOL-shell utility under Steel control.",
+        "adjustments": "Section 382, control, and absence of a disclosed plan widen the range.",
+        "overlap_control": "Unique overlap key nol_shell_option; no other component capitalizes the same claim.",
+        "risk_and_timing": {
+          "probability_basis": "Base assumes modest shell optionality (~40% scenario weight in dated payoff), not face NOL value.",
+          "timing_basis": "Five-year horizon aligned with yield-curve scenarios.",
+          "remaining_capital_basis": "Shell is funded by Steel note advances; no large equity raise modeled in base."
+        }
+      },
+      {
+        "id": "steel_note_and_deficit_reserve",
+        "label": "Steel promissory note and equity deficit reserve",
+        "component_ids": [
+          "steel_note_and_deficit_reserve"
+        ],
+        "economic_claim": "Steel promissory note and equity deficit reserve",
+        "valuation_basis": "Senior note and deficit haircut to common.",
+        "adjustments": "Secured claim sits ahead of equity.",
+        "overlap_control": "Unique overlap key steel_note_and_deficit_reserve; no other component capitalizes the same claim."
+      }
+    ],
+    "wisdom_applied": [
+      "Klarman: NOLs are options, not assets at face.",
+      "Pabrai: avoid counting a reverse-merger lottery as base value without a disclosed plan."
+    ],
+    "limitations": [
+      "OTC Pink price needs official closing print confirmation [HUMAN REVIEW].",
+      "Component stack is designed to be consistent with the $0.045 five-year base dated payoff (~14.4%/yr stance gate).",
+      "No disclosed Steel plan; optionality can go to zero."
+    ]
+  },
+  "component_valuation_results": {
+    "status": "complete",
+    "decision_rule": "Use the complete low/base/high component schedule. Embedded components are estimated but not added twice.",
+    "all_material_components_identified": true,
+    "additive_components": [
+      {
+        "id": "cash_and_working_capital",
+        "label": "Cash and working capital",
+        "category": "financial_asset",
+        "overlap_key": "cash_and_working_capital",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "net_asset_value",
+        "evidence_tier": "filing",
+        "evidence": "Q1 2026 press release: cash ~$54k / 64.95M shares (~$0.0008).",
+        "cross_check": "Range must reconcile to primary filings and realization path before IC approval.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Near-term cash only; no Trust claim (May 2025 transfer).",
+        "falsifier": "Cash is exhausted by G&A before any shell transaction.",
+        "scenario_assumptions": null,
+        "low_per_share": 0.0,
+        "base_per_share": 0.0,
+        "high_per_share": 0.0
+      },
+      {
+        "id": "ip_licensing_stub",
+        "label": "Legacy Syms / Filene's IP licensing stub",
+        "category": "operating_business",
+        "overlap_key": "ip_licensing_stub",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "owner_cash_dcf",
+        "evidence_tier": "filing",
+        "evidence": "FY2025 other income ~$0.239M from IP licensing; not a standalone growth engine.",
+        "cross_check": "Range must reconcile to primary filings and realization path before IC approval.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Modest capitalization of residual IP cash, not a reinvestment compounder.",
+        "falsifier": "IP income goes to zero and no replacement revenue appears.",
+        "scenario_assumptions": null,
+        "low_per_share": 0.0,
+        "base_per_share": 0.01,
+        "high_per_share": 0.02
+      },
+      {
+        "id": "nol_shell_option",
+        "label": "Preserved NOL shell option (Steel-controlled)",
+        "category": "real_option",
+        "overlap_key": "nol_shell_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "milestone_project_option",
+        "evidence_tier": "filing",
+        "evidence": "Federal NOL ~$329.9M and state ~$337.4M at 3/31/2026 with full valuation allowance. Steel Partners ~39.8% via Feb 2025 SPA. No disclosed acquisition plan as of 2026-07-17. Section 382 would cap annual use.",
+        "cross_check": "Range must reconcile to primary filings and realization path before IC approval.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Risked option on shell utility; face NOL is not equity value.",
+        "falsifier": "Going-private / Form 15 / note foreclosure leaves minority common with near-zero residual, or Steel never uses the shell.",
+        "scenario_assumptions": null,
+        "low_per_share": 0.0,
+        "base_per_share": 0.04,
+        "high_per_share": 0.1
+      },
+      {
+        "id": "steel_note_and_deficit_reserve",
+        "label": "Steel promissory note and equity deficit reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "steel_note_and_deficit_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "realization_reserve",
+        "evidence_tier": "filing",
+        "evidence": "Steel note ~$1.372M secured by all assets; stockholders' deficit ~-$1.534M (~-$0.024/sh).",
+        "cross_check": "Range must reconcile to primary filings and realization path before IC approval.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Senior claim haircut on common; base payoff $0.045 already nets this risk judgmentally.",
+        "falsifier": "Note conversion or foreclosure extinguishes common ahead of any shell payoff.",
+        "scenario_assumptions": null,
+        "low_per_share": -0.03,
+        "base_per_share": -0.01,
+        "high_per_share": -0.01
+      }
+    ],
+    "embedded_components": [],
+    "total_equity_value_per_share": {
+      "low": -0.03,
+      "base": 0.04,
+      "high": 0.11
+    },
+    "material_component_count": 4,
+    "additive_component_count": 4,
+    "embedded_component_count": 0,
+    "market_price_per_share": 0.023,
+    "upside_downside_pct": {
+      "low": -230.4,
+      "base": 73.9,
+      "high": 378.3
+    }
+  },
+  "economic_value_analysis": {
+    "schema_version": "1.0",
+    "status": "complete",
+    "trigger": {
+      "required": true,
+      "reasons": [
+        "explicit_component_schedule",
+        "optionality_or_nav_overlay"
+      ],
+      "policy": "A complete economic-value analysis is required when any trigger fires; otherwise it is recommended."
+    },
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One share of Trinity Place Holdings Inc. common stock after the May 2025 Trust transfer: cash, residual IP, and risked NOL-shell optionality net of the Steel note.",
+      "unit_label": "common share",
+      "unit_count": 64947266,
+      "unit_source": "TPHS Q1 2026 financials press release, shares outstanding at March 31, 2026",
+      "enterprise_to_equity_reconciliation": "No operating enterprise remains. Equity value is cash + IP stub + risked NOL option less Steel-note/deficit reserve. Trust property is excluded."
+    },
+    "gaap_role": "misleading_historical_cost",
+    "accounting_reference": "Q1 2026 IR press release balance sheet: negative equity; NOLs fully reserved; Trust assets off common.",
+    "comparable_hierarchy": [
+      "issuer_arm_length_transaction",
+      "same_asset_transaction",
+      "public_peer",
+      "replacement_cost",
+      "approved_external_analysis"
+    ],
+    "gross_comparable_nav_per_share": null,
+    "risked_present_value_per_share": {
+      "low": -0.03,
+      "base": 0.04,
+      "high": 0.11
+    },
+    "component_groups": [
+      {
+        "id": "cash_and_working_capital",
+        "label": "Cash and working capital",
+        "component_ids": [
+          "cash_and_working_capital"
+        ],
+        "economic_claim": "Cash and working capital",
+        "valuation_basis": "Cash per share at the latest balance sheet.",
+        "adjustments": "Run-rate G&A can consume cash quickly.",
+        "overlap_control": "Unique overlap key cash_and_working_capital; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": 0.0,
+          "base": 0.0,
+          "high": 0.0
+        }
+      },
+      {
+        "id": "ip_licensing_stub",
+        "label": "Legacy Syms / Filene's IP licensing stub",
+        "component_ids": [
+          "ip_licensing_stub"
+        ],
+        "economic_claim": "Legacy Syms / Filene's IP licensing stub",
+        "valuation_basis": "Capitalization of residual IP licensing cash.",
+        "adjustments": "No growth reinvestment assumed.",
+        "overlap_control": "Unique overlap key ip_licensing_stub; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": 0.0,
+          "base": 0.01,
+          "high": 0.02
+        }
+      },
+      {
+        "id": "nol_shell_option",
+        "label": "Preserved NOL shell option (Steel-controlled)",
+        "component_ids": [
+          "nol_shell_option"
+        ],
+        "economic_claim": "Preserved NOL shell option (Steel-controlled)",
+        "valuation_basis": "Risked present value of NOL-shell utility under Steel control.",
+        "adjustments": "Section 382, control, and absence of a disclosed plan widen the range.",
+        "overlap_control": "Unique overlap key nol_shell_option; no other component capitalizes the same claim.",
+        "risk_and_timing": {
+          "probability_basis": "Base assumes modest shell optionality (~40% scenario weight in dated payoff), not face NOL value.",
+          "timing_basis": "Five-year horizon aligned with yield-curve scenarios.",
+          "remaining_capital_basis": "Shell is funded by Steel note advances; no large equity raise modeled in base."
+        },
+        "risked_present_value_per_share": {
+          "low": 0.0,
+          "base": 0.04,
+          "high": 0.1
+        }
+      },
+      {
+        "id": "steel_note_and_deficit_reserve",
+        "label": "Steel promissory note and equity deficit reserve",
+        "component_ids": [
+          "steel_note_and_deficit_reserve"
+        ],
+        "economic_claim": "Steel promissory note and equity deficit reserve",
+        "valuation_basis": "Senior note and deficit haircut to common.",
+        "adjustments": "Secured claim sits ahead of equity.",
+        "overlap_control": "Unique overlap key steel_note_and_deficit_reserve; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": -0.03,
+          "base": -0.01,
+          "high": -0.01
+        }
+      }
+    ],
+    "valuation_proof": [
+      {
+        "component_id": "cash_and_working_capital",
+        "economic_claim": "Cash and working capital",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "evidence_tier": "filing",
+        "evidence": "Q1 2026 press release: cash ~$54k / 64.95M shares (~$0.0008).",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Run-rate G&A can consume cash quickly.",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 0.0,
+          "high": 0.0
+        },
+        "treatment": "additive",
+        "overlap_key": "cash_and_working_capital",
+        "overlap_control": "Unique overlap key cash_and_working_capital; no other component capitalizes the same claim.",
+        "falsifier": "Cash is exhausted by G&A before any shell transaction.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "ip_licensing_stub",
+        "economic_claim": "Legacy Syms / Filene's IP licensing stub",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "owner_cash_dcf",
+        "evidence_tier": "filing",
+        "evidence": "FY2025 other income ~$0.239M from IP licensing; not a standalone growth engine.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "No growth reinvestment assumed.",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 0.01,
+          "high": 0.02
+        },
+        "treatment": "additive",
+        "overlap_key": "ip_licensing_stub",
+        "overlap_control": "Unique overlap key ip_licensing_stub; no other component capitalizes the same claim.",
+        "falsifier": "IP income goes to zero and no replacement revenue appears.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "nol_shell_option",
+        "economic_claim": "Preserved NOL shell option (Steel-controlled)",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "milestone_project_option",
+        "evidence_tier": "filing",
+        "evidence": "Federal NOL ~$329.9M and state ~$337.4M at 3/31/2026 with full valuation allowance. Steel Partners ~39.8% via Feb 2025 SPA. No disclosed acquisition plan as of 2026-07-17. Section 382 would cap annual use.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Section 382, control, and absence of a disclosed plan widen the range.",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 0.04,
+          "high": 0.1
+        },
+        "treatment": "additive",
+        "overlap_key": "nol_shell_option",
+        "overlap_control": "Unique overlap key nol_shell_option; no other component capitalizes the same claim.",
+        "falsifier": "Going-private / Form 15 / note foreclosure leaves minority common with near-zero residual, or Steel never uses the shell.",
+        "risk_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "Five-year horizon aligned with yield-curve scenarios.",
+          "probability_basis": "Base assumes modest shell optionality (~40% scenario weight in dated payoff), not face NOL value.",
+          "remaining_capital_basis": "Shell is funded by Steel note advances; no large equity raise modeled in base."
+        }
+      },
+      {
+        "component_id": "steel_note_and_deficit_reserve",
+        "economic_claim": "Steel promissory note and equity deficit reserve",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "realization_reserve",
+        "evidence_tier": "filing",
+        "evidence": "Steel note ~$1.372M secured by all assets; stockholders' deficit ~-$1.534M (~-$0.024/sh).",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Secured claim sits ahead of equity.",
+        "range_per_share": {
+          "low": -0.03,
+          "base": -0.01,
+          "high": -0.01
+        },
+        "treatment": "additive",
+        "overlap_key": "steel_note_and_deficit_reserve",
+        "overlap_control": "Unique overlap key steel_note_and_deficit_reserve; no other component capitalizes the same claim.",
+        "falsifier": "Note conversion or foreclosure extinguishes common ahead of any shell payoff.",
+        "risk_and_timing": null
+      }
+    ],
+    "wisdom_applied": [
+      "Klarman: NOLs are options, not assets at face.",
+      "Pabrai: avoid counting a reverse-merger lottery as base value without a disclosed plan."
+    ],
+    "limitations": [
+      "OTC Pink price needs official closing print confirmation [HUMAN REVIEW].",
+      "Component stack is designed to be consistent with the $0.045 five-year base dated payoff (~14.4%/yr stance gate).",
+      "No disclosed Steel plan; optionality can go to zero."
+    ],
+    "complete_component_coverage": true,
+    "validation_errors": [],
+    "registry_version": "1.0"
+  },
+  "component_review_queue": {
+    "status": "ready_for_committee_review",
+    "decision_rule": "Each assigned rater records accept, challenge, or reject with a proposed range and evidence. The aggregator may not silently average disputed ranges.",
+    "items": [
+      {
+        "component_id": "cash_and_working_capital",
+        "label": "Cash and working capital",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 0.0,
+          "high": 0.0
+        },
+        "range_width_pct_of_base": 0.0,
+        "evidence_tier": "filing",
+        "recommended_raters": [
+          "greenblatt",
+          "marks_credit_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "ip_licensing_stub",
+        "label": "Legacy Syms / Filene's IP licensing stub",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 0.01,
+          "high": 0.02
+        },
+        "range_width_pct_of_base": 200.0,
+        "evidence_tier": "filing",
+        "recommended_raters": [
+          "hohn",
+          "marathon_capital_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "nol_shell_option",
+        "label": "Preserved NOL shell option (Steel-controlled)",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 0.04,
+          "high": 0.1
+        },
+        "range_width_pct_of_base": 250.0,
+        "evidence_tier": "filing",
+        "recommended_raters": [
+          "klarman_asset_value",
+          "hk"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "steel_note_and_deficit_reserve",
+        "label": "Steel promissory note and equity deficit reserve",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": -0.03,
+          "base": -0.01,
+          "high": -0.01
+        },
+        "range_width_pct_of_base": 200.0,
+        "evidence_tier": "filing",
+        "recommended_raters": [
+          "marks_credit_cycle",
+          "pabrai"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      }
+    ]
+  }
+}
