@@ -1,0 +1,210 @@
+{
+  "ticker": "BE",
+  "as_of": "2026-07-17",
+  "method": "full",
+  "irr_method": "full",
+  "valuation_overlay": "segment_cashflow",
+  "lawrence_bucket": "other",
+  "payoff_lens": "operating",
+  "classification_inputs": {
+    "archetype": "turnaround",
+    "moat": "unproven",
+    "dhando": "none",
+    "cycle": "up",
+    "payoff_lens": "operating",
+    "predictive_attribute": "narrative_premium"
+  },
+  "inputs": {
+    "price": 221.89,
+    "price_source": "Yahoo BE close 2026-07-17",
+    "price_as_of": "2026-07-17",
+    "shares_millions": 319.7,
+    "shares_source": "Q1 2026 weighted average diluted shares 319.708M (10-Q Q1 2026)",
+    "fcf_per_share": 0.25,
+    "fcf_source": "FY2025 operating cash flow $113.9M minus capital spending on property and equipment $56.8M = $57.2M owner cash, divided by 227.4M FY2025 diluted shares (10-K FY2025 cash flow statement)",
+    "revenue_fy2025_m": 2023.99,
+    "revenue_fy2025_source": "FY2025 total revenue $2,024.0M (+37.3% YoY): product $1,531.3M, installation $204.1M, service $228.3M, electricity $60.4M (10-K FY2025 revenue disaggregation)",
+    "revenue_q1_2026_m": 751.05,
+    "revenue_q1_source": "Q1 2026 total revenue $751.1M (+130.4% YoY) per 10-Q Q1 2026",
+    "cash_m": 2491.4,
+    "cash_source": "Cash and equivalents $2,491.4M at March 31, 2026 (10-Q Q1 2026)",
+    "debt_recourse_lt_m": 2598.7,
+    "debt_source": "Long-term recourse debt $2,598.7M at March 31, 2026 excluding current maturities (10-Q Q1 2026)",
+    "normalization_note": "Lawrence base uses FY2025 filing-based owner cash, not Q1 2026 run-rate. Q1 2026 operating cash flow was $73.6M on a single quarter of AI datacenter-heavy product revenue; annualizing would overstate durability until backlog converts and margins repeat for four quarters."
+  },
+  "segment_build": {
+    "framework": "speedwell_reverse_dcf",
+    "as_of": "2026-07-17",
+    "horizon_years": 7,
+    "discount_rate_explicit": 0.1,
+    "segments": [
+      {
+        "id": "product",
+        "label": "Energy Server product (solid oxide fuel cell systems)",
+        "type": "operating",
+        "revenue_y0_m": 1531.3,
+        "revenue_share_pct": 75.6,
+        "owner_cash_y0_m": 43.2,
+        "owner_cash_y0_per_share": 0.19,
+        "owner_cash_y0_source": "FY2025 consolidated owner cash $57.2M allocated 75.6% by product revenue share (10-K revenue table)",
+        "growth_y1_5": 0.18,
+        "growth_y6_10": 0.08,
+        "exit_pfcf_y10": 16,
+        "notes": "Q1 2026 product revenue +208% YoY on datacenter demand; growth row cites filing trend with [Assumption] on sustainability"
+      },
+      {
+        "id": "installation",
+        "label": "Installation and deployment services",
+        "type": "operating",
+        "revenue_y0_m": 204.1,
+        "revenue_share_pct": 10.1,
+        "owner_cash_y0_m": 5.8,
+        "owner_cash_y0_per_share": 0.03,
+        "owner_cash_y0_source": "FY2025 consolidated owner cash allocated 10.1% by installation revenue share",
+        "growth_y1_5": 0.12,
+        "growth_y6_10": 0.05,
+        "exit_pfcf_y10": 12,
+        "notes": "Follows product ship cycle; Q1 2026 installation revenue declined 22.9% YoY as mix shifted to larger product blocks"
+      },
+      {
+        "id": "service_electricity",
+        "label": "Service and electricity (installed-base recurring)",
+        "type": "operating",
+        "revenue_y0_m": 288.6,
+        "revenue_share_pct": 14.3,
+        "owner_cash_y0_m": 8.2,
+        "owner_cash_y0_per_share": 0.04,
+        "owner_cash_y0_source": "FY2025 consolidated owner cash allocated 14.3% by service + electricity revenue ($228.3M + $60.4M)",
+        "growth_y1_5": 0.1,
+        "growth_y6_10": 0.06,
+        "exit_pfcf_y10": 14,
+        "notes": "Service revenue +6.9% FY2025; ~682 MW installed base in South Korea per 10-K; recurring take-or-pay and service contracts"
+      }
+    ],
+    "options": [
+      {
+        "id": "electrolyzer_hydrogen",
+        "label": "Bloom Electrolyzer / hydrogen platform",
+        "option_treatment": "probability_weighted",
+        "annual_drag_per_share": 0.02,
+        "base_terminal_value_bn": 0,
+        "base_terminal_rationale": "Electrolyzer revenue not separately broken out in FY2025 table; pre-scale option sized at zero in Lawrence base until disclosed revenue line exceeds 5% of total",
+        "overlay_base_terminal_bn": null,
+        "bull_terminal_value_bn": null,
+        "evidence": "10-K Item 1: unified platform serves power and hydrogen markets; Electrolyzer VIE referenced in XBRL",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "ai_datacenter_backlog",
+        "label": "AI datacenter behind-the-meter power backlog",
+        "option_treatment": "embedded_in_segment",
+        "annual_drag_per_share": 0.0,
+        "base_terminal_value_bn": 0,
+        "base_terminal_rationale": "Q1 2026 product surge embedded in product segment growth 18% years 1-5, not double-counted",
+        "evidence": "10-K risk factors cite AI data center market; Q1 2026 product revenue $653.3M (+208% YoY) per 10-Q"
+      },
+      {
+        "id": "convertible_dilution",
+        "label": "Convertible notes / equity-linked financing (2025-2026)",
+        "option_treatment": "dilution_drag",
+        "annual_drag_per_share": 0.15,
+        "base_terminal_value_bn": 0,
+        "base_terminal_rationale": "Shares outstanding rose to ~280.5M vs 227.4M FY2025 diluted average; Q1 2026 diluted 319.7M; induced conversion expense $66.2M FY2025",
+        "evidence": "10-K FY2025: financing cash inflow $1,508M; induced conversion expense; EntityCommonStockSharesOutstanding 280,548,215"
+      }
+    ],
+    "corporate_drag": {
+      "alphabet_level_drag_per_share": 0.2,
+      "notes": "Recourse debt ~$2.6B vs equity ~$769M FY2025; interest and convert accounting; SK Korea partnership concentration"
+    },
+    "reconciliation": {
+      "price_per_share": 221.89,
+      "slack_notes": "Segment sum cross-check after marvin_valuation.py --write"
+    }
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.05,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 10,
+      "notes": "Datacenter orders defer; natural gas or grid power cheaper; convert dilution continues; margin compression"
+    },
+    "base": {
+      "growth_y1_5": 0.15,
+      "growth_y6_10": 0.07,
+      "exit_pfcf_y10": 16,
+      "notes": "Product mix stays elevated vs FY2025 but not full Q1 run-rate; service base grows with installed MW"
+    },
+    "bull": {
+      "growth_y1_5": 0.25,
+      "growth_y6_10": 0.1,
+      "exit_pfcf_y10": 20,
+      "notes": "AI power bottleneck persists; electrolyzer wins utility hydrogen bids; operating margin expands toward mid-teens"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "PP&E and lease assets at cost; no land-at-zero pattern (10-K balance sheet)"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Manufacturing in California and Delaware; deployed Energy Servers are revenue-producing"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Consolidated operating income positive FY2025 $72.8M and Q1 2026 $72.2M (10-K, 10-Q)"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF path?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Deferred revenue and customer deposits $101M current + $43M noncurrent FY2025; Q1 2026 deferred revenue $194M current (10-K, 10-Q)"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "Partial",
+      "treatment": "milestone_nav",
+      "evidence": "Equity method investments $10.0M FY2025; SK joint ventures — immaterial to base IRR"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No royalty-trust or litigation recovery pattern"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Electrolyzer and AI datacenter power modeled inside product segment growth, not separate terminal"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "AI datacenter behind-the-meter power demand plus South Korea utility partnerships drive product revenue; service grows with installed MW base",
+    "filing_citation": "10-K FY2025 revenue disaggregation; Q1 2026 10-Q +130% total revenue",
+    "stress_test": "If Q1 2026 product spike is one-quarter heroics, normalized owner cash stays near FY2025 $0.25/sh and price at $222 implies severe overvaluation"
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": false
+    },
+    "override_reason": null
+  }
+}
