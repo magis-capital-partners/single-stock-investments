@@ -2252,6 +2252,8 @@ function renderWatchlistTab() {
   const registry = data.watchlist || [];
   const nol = data.nol_screener || {};
   const nolRows = nol.rows || [];
+  const banks = data.advantaged_banks_screener || {};
+  const bankRows = banks.rows || [];
 
   loading.style.display = 'none';
   content.style.display = 'block';
@@ -2273,7 +2275,7 @@ function renderWatchlistTab() {
               data-company="${escapeHtml(w.company)}" data-market="${escapeHtml(w.market)}">Onboard</button></td>
           </tr>`).join('')}
       </tbody>
-    </table>` : '<p class="form-hint">No registry watchlist entries. Add via onboard modal (watchlist only) or NOL screener below.</p>';
+    </table>` : '<p class="form-hint">No registry watchlist entries. Add via onboard modal (watchlist only) or NOL / banks screeners below.</p>';
 
   const hideZeroRealizable = localStorage.getItem('nolHideZeroRealizable') === '1';
   const filterNolRows = (rows) => hideZeroRealizable
@@ -2316,6 +2318,39 @@ function renderWatchlistTab() {
     <table class="darwin-table">${nolHead}<tbody>${largeRows.map(nolRowHtml).join('')}</tbody></table>` : ''}
     ${!visibleRows.length ? '<p class="form-hint">No rows match the current filter.</p>' : ''}` : '<p class="form-hint">NOL screener not built. Run: python _system/scripts/build_nol_screener.py --write</p>';
 
+  const banksLowCostOnly = localStorage.getItem('banksLowCostOnly') === '1';
+  const filterBankRows = (rows) => banksLowCostOnly
+    ? rows.filter(r => r.is_low_cost === true)
+    : rows;
+  const bankRowHtml = (r) => `
+          <tr>
+            <td class="mono">${escapeHtml(r.ticker)}${r.in_holdings ? ' <span class="badge badge-ok" title="Already a holding">H</span>' : ''}${r.in_watchlist ? ' <span class="badge badge-warn" title="On watchlist">W</span>' : ''}${r.is_low_cost ? ' <span class="badge badge-ok" title="Low-cost deposit franchise">LC</span>' : ''}</td>
+            <td>${escapeHtml(r.company)}</td>
+            <td><span class="badge badge-sleeve">${escapeHtml(r.edge_label || r.edge_type || '—')}</span></td>
+            <td class="mono" title="Approx. annual InterestExpenseDeposits ÷ period-end Deposits">${escapeHtml(r.cost_of_deposits_display || '—')}</td>
+            <td class="mono">${escapeHtml(r.dda_share_display || '—')}</td>
+            <td class="mono">${escapeHtml(r.roe_display || '—')}</td>
+            <td class="mono">${escapeHtml(r.p_tbv_display || '—')}</td>
+            <td class="mono">${escapeHtml(r.assets_display || '—')}</td>
+            <td class="mono">${escapeHtml(r.market_cap_display || '—')}</td>
+            <td class="mono" style="font-size:11px">${escapeHtml(r.filing_as_of || '—')}</td>
+            <td>${r.in_holdings ? '<span class="form-hint">holding</span>' : `<button type="button" class="btn-secondary btn-sm" data-bank-watch="${escapeHtml(r.ticker)}"
+              data-company="${escapeHtml(r.company)}" data-market="${escapeHtml(r.market)}">+ Watchlist</button>`}</td>
+          </tr>`;
+  const bankHead = `<thead><tr>
+        <th>Ticker</th><th>Company</th><th>Edge</th><th>Cost dep. (approx)</th><th>DDA %</th><th>ROE</th><th>P/TBV</th><th>Assets</th><th>Mkt cap</th><th>Filing</th><th></th>
+      </tr></thead>`;
+  const visibleBanks = filterBankRows(bankRows);
+  const lowCostCount = banks.low_cost_count != null ? banks.low_cost_count : bankRows.filter(r => r.is_low_cost).length;
+  const banksTable = bankRows.length ? `
+    <label class="form-hint" style="display:inline-flex;align-items:center;gap:6px;margin-bottom:10px">
+      <input type="checkbox" id="banks-low-cost-only" ${banksLowCostOnly ? 'checked' : ''}>
+      Show low-cost only
+    </label>
+    <table class="darwin-table">${bankHead}<tbody>${visibleBanks.map(bankRowHtml).join('')}</tbody></table>
+    ${!visibleBanks.length ? '<p class="form-hint">No rows match the current filter.</p>' : ''}`
+    : '<p class="form-hint">Advantaged banks screener not built. Run: python _system/scripts/build_advantaged_banks_screener.py --write</p>';
+
   content.innerHTML = `
     <div class="watchlist-section">
       <h3>Registry watchlist (${registry.length})</h3>
@@ -2327,12 +2362,26 @@ function renderWatchlistTab() {
       <p class="form-hint" style="margin-bottom:10px">${escapeHtml(nol.criteria || 'Deferred tax asset screen from SEC companyfacts + seed list.')}</p>
       ${nolTable}
       <p class="form-hint" style="margin-top:10px">Seed: <code>${escapeHtml(nol.seed_path || '_system/reference/market-data/screens/nol_seed.csv')}</code> · Rebuild: <code>python _system/scripts/build_nol_screener.py --write</code></p>
+    </div>
+    <div class="watchlist-section">
+      <h3>Advantaged banks screener (${bankRows.length}${lowCostCount != null ? ` · ${lowCostCount} low-cost` : ''})</h3>
+      <p class="form-hint" style="margin-bottom:10px">${escapeHtml(banks.criteria || 'Competitive-franchise banks: low-cost deposits, BaaS/fintech, niche platforms. Seed list + SEC companyfacts.')}</p>
+      <p class="form-hint" style="margin-bottom:10px">Framed by Moore community-bank handbook (<code>_system/reference/investment-wisdom/moore/</code>).</p>
+      ${banksTable}
+      <p class="form-hint" style="margin-top:10px">Seed: <code>${escapeHtml(banks.seed_path || '_system/reference/market-data/screens/advantaged_banks_seed.csv')}</code> · Rebuild: <code>python _system/scripts/build_advantaged_banks_screener.py --write</code></p>
     </div>`;
 
   const hideZeroCb = content.querySelector('#nol-hide-zero');
   if (hideZeroCb) {
     hideZeroCb.addEventListener('change', () => {
       localStorage.setItem('nolHideZeroRealizable', hideZeroCb.checked ? '1' : '0');
+      renderWatchlistTab();
+    });
+  }
+  const banksLowCostCb = content.querySelector('#banks-low-cost-only');
+  if (banksLowCostCb) {
+    banksLowCostCb.addEventListener('change', () => {
+      localStorage.setItem('banksLowCostOnly', banksLowCostCb.checked ? '1' : '0');
       renderWatchlistTab();
     });
   }
@@ -2348,6 +2397,14 @@ function renderWatchlistTab() {
   content.querySelectorAll('[data-nol-watch]').forEach(btn => {
     btn.addEventListener('click', () => openOnboardModal({
       ticker: btn.dataset.nolWatch,
+      company: btn.dataset.company,
+      market: btn.dataset.market,
+      watchlistOnly: true,
+    }));
+  });
+  content.querySelectorAll('[data-bank-watch]').forEach(btn => {
+    btn.addEventListener('click', () => openOnboardModal({
+      ticker: btn.dataset.bankWatch,
       company: btn.dataset.company,
       market: btn.dataset.market,
       watchlistOnly: true,

@@ -1,6 +1,6 @@
 # Investment Wisdom — Index
 
-Last updated: 2026-06-01 — added John Mihaljevic / Manual of Ideas + moi_lens framework
+Last updated: 2026-07-17 — added David B. Moore community bank handbook
 
 | Genius | Folder | Count | Primary use in Marvin |
 |--------|--------|-------|------------------------|
@@ -10,6 +10,7 @@ Last updated: 2026-06-01 — added John Mihaljevic / Manual of Ideas + moi_lens 
 | Horizon Kinetics | `horizon-kinetics/` | 331 PDFs + 5 extracts | Equity yield curve, predictive attributes, time arbitrage |
 | Chris Hohn / TCI | `tci/` | 32 letters + extract | Operating mechanics, thesis pillars, valuation bridge |
 | John Mihaljevic / MOI | `mihaljevic/` | 1 PDF + extract | Idea generation, uses/misuses, special situations |
+| David B. Moore | `moore/` | 1 PDF | Community bank / thrift mechanics, credit, M&A, valuation |
 
 **Mental models catalog:** `_system/frameworks/mental_models.md`
 
@@ -135,6 +136,19 @@ python _system/scripts/build_wisdom_manifest.py
 EPUB is **not committed to git** (copyright). `Manual-of-Ideas-full-text.txt` is generated locally for agent read.
 
 **Memory section:** `[PROPOSED MOI]` in daily log until human promotes
+
+---
+
+## David B. Moore (`moore/`)
+
+| File | Theme | Apply when |
+|------|-------|------------|
+| `Analyzing-and-Investing-in-Community-Bank-Stocks-David-B-Moore.pdf` | Community banks/thrifts (<~$15B assets): BS/IS, ALM, credit, accounting traps, regulation, M&A, valuation, strategies | Bank/thrift onboard or deep dive; call-report reading; bank M&A comps |
+| `README.md` | Scope + Drive path | Catalog |
+
+**Drive:** `Research Sources/Investment Wisdom/moore/`
+
+**Memory section:** `[PROPOSED COMPANY]` / bank-sector notes in daily log until human promotes
 
 ---
 

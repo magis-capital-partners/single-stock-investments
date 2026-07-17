@@ -646,4 +646,5 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-17.
 | ZBRA | ZBRA/ | Zebra Technologies | US | 2026-07-10 | 2026-07-17 | unknown | watch |
 | ZTS | ZTS/ | Zoetis | US | 2026-07-10 | 2026-07-17 | unknown | watch |
 
-**639 holdings total.** Registry: `_system/portfolio/registry.json`
+**638 holdings total.** Registry: `_system/portfolio/registry.json`
+| ASTS | ASTS/ | AST SpaceMobile, Inc. | US | — | — | unknown | watch |

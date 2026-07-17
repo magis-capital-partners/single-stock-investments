@@ -2505,6 +2505,23 @@ def build_nol_screener() -> dict | None:
     return _load_json(path)
 
 
+def build_advantaged_banks_screener() -> dict | None:
+    """Rebuild advantaged-banks screener (seed + SEC deposit/ROE enrich)."""
+    path = DATA_DIR / "advantaged_banks_screener.json"
+    script = ROOT / "_system" / "scripts" / "build_advantaged_banks_screener.py"
+    if not script.exists():
+        return _load_json(path)
+    import subprocess
+
+    subprocess.run(
+        [sys.executable, str(script), "--write"],
+        cwd=str(ROOT),
+        check=False,
+        timeout=300,
+    )
+    return _load_json(path)
+
+
 def build_equity_models() -> dict:
     """Run equity model ingest and return payload for dashboard merge."""
     script = ROOT / "_system" / "scripts" / "build_equity_model_dashboard.py"
@@ -2609,6 +2626,12 @@ def main() -> None:
         payload["nol_screener"] = nol
         payload["summary"]["nol_screener_count"] = nol.get("row_count") or len(
             nol.get("rows") or []
+        )
+    banks = build_advantaged_banks_screener()
+    if banks:
+        payload["advantaged_banks_screener"] = banks
+        payload["summary"]["advantaged_banks_count"] = banks.get("row_count") or len(
+            banks.get("rows") or []
         )
     index_membership = load_index_membership()
     if index_membership:
