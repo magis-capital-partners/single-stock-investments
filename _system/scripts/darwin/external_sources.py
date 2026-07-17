@@ -65,6 +65,15 @@ def risk_dashboard_latest() -> Path | None:
     return p if p.exists() else None
 
 
+def ls_algo_screened_csv() -> Path | None:
+    """Live screened ETF universe (Underlying column = tradeable reference)."""
+    root = ls_algo_root()
+    if not root:
+        return None
+    p = root / "data" / "etf_screened_today.csv"
+    return p if p.exists() else None
+
+
 def save_sources_manifest() -> dict:
     EXTERNAL_ROOT.mkdir(parents=True, exist_ok=True)
     payload = {

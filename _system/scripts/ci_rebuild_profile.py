@@ -95,7 +95,11 @@ PROFILES: dict[str, list[list[str]]] = {
         ["_system/scripts/build_biotech_peer_short_stub.py"],
         ["_system/scripts/build_biotech_composite.py"],
         ["_system/scripts/build_research_memory.py"],
-        ["_system/scripts/build_power_zones.py"],
+        # Runs build_power_zones.py internally, then method routing, workbench,
+        # entry pricing, and gated IC initialization for the ls-algo sleeve.
+        # The screener sync stage self-skips in CI (_external/ls-algo absent);
+        # build_dashboard_data.py below picks up the refreshed rows.
+        ["_system/scripts/darwin/run_ls_algo_valuation_pipeline.py", "--skip-dashboard"],
         ["_system/scripts/clean_activist_indexes.py"],
         ["_system/scripts/cleanup_activist_false_positives.py"],
         ["_system/scripts/activist_triage.py", "--apply", "--fetch-sec"],

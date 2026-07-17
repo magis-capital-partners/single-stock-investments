@@ -89,25 +89,45 @@ def discover_evidence(ticker: str) -> list[Path]:
 
 
 def select_raters(valuation: dict) -> list[dict]:
+    """Pick three raters with distinct error profiles.
+
+    Preference order: the power-zone method route's primary personas, then its
+    cross-check personas, then component-coverage recommendations, then the
+    static defaults. Personas the route explicitly silenced are never seated;
+    the same routing that chose the valuation method chooses who reviews it.
+    """
+    route = valuation.get("valuation_method_route") or {}
+    silent = set(route.get("silent_personas") or [])
+    route_ranked = [
+        persona
+        for persona in [*(route.get("primary_personas") or []), *(route.get("cross_check_personas") or [])]
+        if persona not in silent
+    ]
     queue = valuation.get("component_review_queue") or {}
-    ranked: list[str] = []
     counts = Counter(
         persona
         for item in queue.get("items", [])
         for persona in item.get("recommended_raters", [])
     )
-    ranked.extend(persona for persona, _ in counts.most_common())
-    ranked.extend(DEFAULT_RATERS)
+    ranked: list[str] = list(dict.fromkeys([
+        *route_ranked,
+        *(persona for persona, _ in counts.most_common() if persona not in silent),
+        *(persona for persona in DEFAULT_RATERS if persona not in silent),
+    ]))
     selected = []
     groups: set[str] = set()
     for persona in ranked:
         group = GROUPS.get(persona, persona)
         if group in groups:
             continue
+        if persona in route_ranked:
+            reason = "Selected before scoring from the power-zone method route (persona chose or cross-checks the valuation method)."
+        else:
+            reason = "Selected before scoring from component coverage and a distinct error profile."
         selected.append({
             "persona": persona,
             "independence_group": group,
-            "selection_reason": "Selected before scoring from component coverage and a distinct error profile.",
+            "selection_reason": reason,
             "required_inputs_status": "partial",
         })
         groups.add(group)

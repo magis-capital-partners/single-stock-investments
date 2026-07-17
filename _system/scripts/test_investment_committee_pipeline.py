@@ -25,6 +25,49 @@ class InvestmentCommitteePipelineTests(unittest.TestCase):
         self.assertEqual(len({r["independence_group"] for r in raters}), 3)
         self.assertEqual(raters[0]["persona"], "hk")
 
+    def test_power_zone_route_personas_lead_rater_selection(self):
+        valuation = {
+            "valuation_method_route": {
+                "primary_personas": ["hk", "stahl"],
+                "cross_check_personas": ["klarman_asset_value", "marks_credit_cycle"],
+                "silent_personas": [
+                    "hohn",
+                    "pabrai",
+                    "buffett_weschler",
+                    "greenblatt",
+                    "marathon_capital_cycle",
+                ],
+            },
+            "component_review_queue": {"items": [{"recommended_raters": ["pabrai"]}]},
+        }
+        raters = select_raters(valuation)
+        personas = [r["persona"] for r in raters]
+        self.assertEqual(personas, ["hk", "klarman_asset_value", "marks_credit_cycle"])
+        self.assertEqual(len({r["independence_group"] for r in raters}), 3)
+        self.assertNotIn("pabrai", personas)
+        self.assertIn("power-zone method route", raters[0]["selection_reason"])
+
+    def test_silenced_route_without_three_groups_raises(self):
+        valuation = {
+            "valuation_method_route": {
+                "primary_personas": ["hk", "stahl"],
+                "cross_check_personas": [],
+                "silent_personas": [
+                    "hohn",
+                    "pabrai",
+                    "buffett_weschler",
+                    "greenblatt",
+                    "marathon_capital_cycle",
+                    "marks_credit_cycle",
+                    "klarman_asset_value",
+                    "munger",
+                    "moi",
+                ],
+            },
+        }
+        with self.assertRaises(ValueError):
+            select_raters(valuation)
+
     def test_incomplete_vote_is_rejected(self):
         expected = {"persona": "hk", "independence_group": "scarce_assets"}
         errors = validate_vote({"persona": "hk", "independence_group": "scarce_assets"}, expected)
