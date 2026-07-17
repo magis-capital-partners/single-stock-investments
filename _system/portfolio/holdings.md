@@ -79,7 +79,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-17.
 | BAX | BAX/ | Baxter International | US | 2026-07-09 | 2026-07-17 | unknown | watch |
 | BBY | BBY/ | Best Buy | US | 2026-07-09 | 2026-07-17 | unknown | watch |
 | BDX | BDX/ | Becton Dickinson | US | 2026-07-09 | 2026-07-17 | unknown | watch |
-| BE | BE/ | Bloom Energy Corporation | US | — | — | unknown | watch |
+| BE | BE/ | Bloom Energy Corporation | US | 2026-07-17 | 2026-07-17 | unknown | watch |
 | BEN | BEN/ | Franklin Resources | US | 2026-07-10 | 2026-07-17 | unknown | watch |
 | BF.B | BF.B/ | Brown–Forman | US | — | 2026-07-17 | unknown | watch |
 | BG | BG/ | Bunge Global | US | 2026-07-09 | 2026-07-17 | unknown | watch |
@@ -89,6 +89,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-17.
 | BKRB | BKRB/ | Berkshire Hathaway Inc. (Class B) | US | 2026-07-09 | 2026-07-17 | unknown | watch |
 | BLDR | BLDR/ | Builders FirstSource | US | 2026-07-09 | 2026-07-17 | unknown | watch |
 | BLK | BLK/ | BlackRock | US | 2026-07-09 | 2026-07-17 | unknown | watch |
+| BLSH | BLSH/ | Bullish Global Limited | US | — | — | unknown | watch |
 | BMY | BMY/ | Bristol Myers Squibb | US | 2026-07-09 | 2026-07-17 | unknown | watch |
 | BMYS.KL | BMYS.KL/ | Bursa Malaysia Berhad | EU | 2026-07-09 | 2026-07-17 | unknown | watch |
 | BN | BN/ | Brookfield Corporation | US | 2026-07-09 | 2026-07-17 | platform | hold |
@@ -645,4 +646,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-17.
 | ZBRA | ZBRA/ | Zebra Technologies | US | 2026-07-10 | 2026-07-17 | unknown | watch |
 | ZTS | ZTS/ | Zoetis | US | 2026-07-10 | 2026-07-17 | unknown | watch |
 
-**638 holdings total.** Registry: `_system/portfolio/registry.json`
+**639 holdings total.** Registry: `_system/portfolio/registry.json`
