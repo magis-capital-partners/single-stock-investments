@@ -164,3 +164,7 @@ Rollback: every artifact is additive (`advantaged_banks_*` files, one payload ke
 - Live enrich: TBBK ROE ~33%, P/TBV ~4.1×, assets ~$9.9B (matches deep-dive ballpark). VBNK `pending_sec` (Canadian filer / thin US-GAAP tags).
 - Cost-of-deposits uses FY interest expense ÷ period-end deposits (approx.); TBBK prints ~1.9% so may not get the LC badge even with a strong franchise — edge_type column carries the thesis.
 - Remaining human action: promote names via Watchlist `+ Watchlist` / Onboard; suggest TBBK first with PDF at `c:\Users\drewg\Projects\investing-docs\TBBK_Deep_Dive_2026-05-18.pdf`.
+
+## 7. Watchlist UI (2026-07-17 follow-up)
+
+Banks is a Watchlist **sub-tab** (Queue / NOL / Banks), not a stacked section under NOL. Persists via `ssp_watchlist_view_v1`; deep links `#/watchlist/queue|nol|banks`.

@@ -211,6 +211,8 @@
   .memory-score-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
   .memory-biotech { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 8px 0; }
   .memory-sub-nav .view-tab { font-size: 13px; padding: 6px 12px; }
+  .watchlist-sub-nav { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
+  .watchlist-sub-nav .view-tab { font-size: 13px; padding: 6px 12px; }
   .memory-filter-row .source-pill { font-size: 12px; }
   @media (max-width: 520px) { .memory-score-row { grid-template-columns: 1fr; } }
   .divergence-flag { color: var(--accent-amber); margin-left: 4px; }
@@ -933,6 +935,22 @@ const TICKER_SORT_KEY = 'ssp_ticker_sort_v1';
 const MEMORY_VIEW_KEY = 'ssp_memory_view_v1';
 const MEMORY_TYPE_KEY = 'ssp_memory_type_v1';
 const BIOTECH_SCOPE_KEY = 'ssp_biotech_scope_v1';
+const WATCHLIST_VIEW_KEY = 'ssp_watchlist_view_v1';
+const WATCHLIST_VIEWS = new Set(['queue', 'nol', 'banks']);
+
+function defaultWatchlistView() {
+  try {
+    const saved = localStorage.getItem(WATCHLIST_VIEW_KEY);
+    if (WATCHLIST_VIEWS.has(saved)) return saved;
+  } catch (_) { /* ignore */ }
+  const nolRows = ((data && data.nol_screener) || {}).rows || [];
+  const bankRows = ((data && data.advantaged_banks_screener) || {}).rows || [];
+  if (nolRows.length) return 'nol';
+  if (bankRows.length) return 'banks';
+  return 'queue';
+}
+
+let watchlistViewMode = 'nol';
 
 let memoryViewMode = (() => {
   try { return localStorage.getItem(MEMORY_VIEW_KEY) || 'ledger'; } catch (_) { return 'ledger'; }
@@ -976,10 +994,19 @@ function parseRouteFromHashString(hash) {
     return {
       view: 'holdings',
       ticker: holdingsMatch[1] ? decodeURIComponent(holdingsMatch[1]).toUpperCase() : null,
+      watchlistSub: null,
     };
   }
-  const viewMatch = /^#\/(watchlist|insights|activist|darwin)$/i.exec(hash || '');
-  if (viewMatch) return { view: viewMatch[1].toLowerCase(), ticker: null };
+  const watchlistMatch = /^#\/watchlist(?:\/(queue|nol|banks))?$/i.exec(hash || '');
+  if (watchlistMatch) {
+    return {
+      view: 'watchlist',
+      ticker: null,
+      watchlistSub: watchlistMatch[1] ? watchlistMatch[1].toLowerCase() : null,
+    };
+  }
+  const viewMatch = /^#\/(insights|activist|darwin)$/i.exec(hash || '');
+  if (viewMatch) return { view: viewMatch[1].toLowerCase(), ticker: null, watchlistSub: null };
   return null;
 }
 
@@ -996,6 +1023,9 @@ function parseRouteFromHash() {
 function syncRouteHash() {
   if (activeView === 'holdings') {
     setAppHash(selected ? `#/holdings/${encodeURIComponent(selected)}` : '#/holdings');
+  } else if (activeView === 'watchlist') {
+    const sub = WATCHLIST_VIEWS.has(watchlistViewMode) ? watchlistViewMode : defaultWatchlistView();
+    setAppHash(`#/watchlist/${sub}`);
   } else {
     setAppHash(`#/${activeView}`);
   }
@@ -1005,6 +1035,10 @@ function applyRouteFromHash() {
   if (!data) return false;
   const route = parseRouteFromHash();
   if (!route) return false;
+  if (route.view === 'watchlist' && route.watchlistSub && WATCHLIST_VIEWS.has(route.watchlistSub)) {
+    watchlistViewMode = route.watchlistSub;
+    try { localStorage.setItem(WATCHLIST_VIEW_KEY, watchlistViewMode); } catch (_) { /* ignore */ }
+  }
   setView(route.view, { syncHash: false });
   if (route.view === 'holdings' && route.ticker) {
     const hit = data.tickers.find(x => x.ticker === route.ticker);
@@ -1467,12 +1501,14 @@ async function load() {
   renderValuationFilters();
   renderSummary();
   renderWatchlist();
+  watchlistViewMode = defaultWatchlistView();
   renderWatchlistTab();
   renderTable();
   renderDarwin();
   renderInsights();
   renderActivist();
   if (!applyRouteFromHash() && data.tickers.length) selectTicker(data.tickers[0].ticker);
+  else if (activeView === 'watchlist') renderWatchlistTab();
 }
 
 function setDarwinAccount(_aid) {
@@ -1497,6 +1533,7 @@ function setView(view, opts = {}) {
   document.getElementById('watchlist-wrap').style.display =
     view === 'holdings' && (data.watchlist || []).length ? 'block' : 'none';
   if (view === 'valuation') renderValuationQueue();
+  if (view === 'watchlist') renderWatchlistTab();
   if (opts.syncHash !== false) syncRouteHash();
 }
 
@@ -1666,6 +1703,12 @@ function renderInsights(opts = {}) {
     biotechSearch,
     biotechShowLimit,
   });
+  if (window.IndexViz && IndexViz.bindIndexWatchToggles && data.index_membership) {
+    IndexViz.bindIndexWatchToggles(content, data.index_membership, {
+      escapeHtml,
+      linkHtml,
+    });
+  }
   content.querySelectorAll('[data-use-latest-quarter]').forEach(btn => {
     btn.addEventListener('click', () => {
       const timeModel = InsightsViz.buildTimeModel(insights, data.document_catalog);
@@ -2240,16 +2283,38 @@ function renderDarwin() {
   }
 }
 
-function renderWatchlistTab() {
-  const loading = document.getElementById('watchlist-loading');
-  const content = document.getElementById('watchlist-content');
+function setWatchlistView(sub, opts = {}) {
+  const next = WATCHLIST_VIEWS.has(sub) ? sub : defaultWatchlistView();
+  watchlistViewMode = next;
+  try { localStorage.setItem(WATCHLIST_VIEW_KEY, watchlistViewMode); } catch (_) { /* ignore */ }
+  renderWatchlistTab();
+  if (opts.syncHash !== false && activeView === 'watchlist') syncRouteHash();
+}
+
+function renderWatchlistSubNav(active) {
   const registry = data.watchlist || [];
   const nol = data.nol_screener || {};
-  const nolRows = nol.rows || [];
+  const banks = data.advantaged_banks_screener || {};
+  const nolCount = nol.row_count != null ? nol.row_count : (nol.rows || []).length;
+  const actionable = nol.actionable_count != null
+    ? nol.actionable_count
+    : (nol.rows || []).filter(r => r.is_actionable).length;
+  const bankCount = banks.row_count != null ? banks.row_count : (banks.rows || []).length;
+  const lowCost = banks.low_cost_count != null
+    ? banks.low_cost_count
+    : (banks.rows || []).filter(r => r.is_low_cost).length;
+  const tabs = [
+    { id: 'queue', label: `Queue (${registry.length})` },
+    { id: 'nol', label: `NOL (${nolCount}${actionable != null ? ` · ${actionable} actionable` : ''})` },
+    { id: 'banks', label: `Banks (${bankCount}${lowCost != null ? ` · ${lowCost} low-cost` : ''})` },
+  ];
+  return `<nav class="view-tabs watchlist-sub-nav" id="watchlist-sub-nav" aria-label="Watchlist views">
+    ${tabs.map(t => `<button type="button" class="view-tab${active === t.id ? ' active' : ''}" data-watchlist-view="${t.id}">${escapeHtml(t.label)}</button>`).join('')}
+  </nav>`;
+}
 
-  loading.style.display = 'none';
-  content.style.display = 'block';
-
+function renderWatchlistQueueBody() {
+  const registry = data.watchlist || [];
   const registryTable = registry.length ? `
     <table class="darwin-table">
       <thead><tr>
@@ -2267,13 +2332,22 @@ function renderWatchlistTab() {
               data-company="${escapeHtml(w.company)}" data-market="${escapeHtml(w.market)}">Onboard</button></td>
           </tr>`).join('')}
       </tbody>
-    </table>` : '<p class="form-hint">No registry watchlist entries. Add via onboard modal (watchlist only) or NOL screener below.</p>';
+    </table>` : '<p class="form-hint">No registry watchlist entries. Promote names from the NOL or Banks tabs via <strong>+ Watchlist</strong>.</p>';
+  return `
+    <div class="watchlist-section">
+      <h3>Promote queue (${registry.length})</h3>
+      <p class="form-hint" style="margin-bottom:10px">Names already added via + Watchlist. Promote to a full holding via Onboard. Stored in <code>registry.json</code> watchlist.</p>
+      ${registryTable}
+    </div>`;
+}
 
+function renderWatchlistNolBody() {
+  const nol = data.nol_screener || {};
+  const nolRows = nol.rows || [];
   const hideZeroRealizable = localStorage.getItem('nolHideZeroRealizable') === '1';
   const filterNolRows = (rows) => hideZeroRealizable
     ? rows.filter(r => r.is_actionable === true)
     : rows;
-
   const nolRowHtml = (r) => `
           <tr class="${r.fully_reserved ? 'nol-row-muted' : ''}">
             <td class="mono">${escapeHtml(r.ticker)}${r.in_holdings ? ' <span class="badge badge-ok" title="Already a holding">H</span>' : ''}${r.in_watchlist ? ' <span class="badge badge-warn" title="On watchlist">W</span>' : ''}${r.is_actionable ? ' <span class="badge badge-ok" title="Actionable realizable DTA">A</span>' : ''}</td>
@@ -2290,11 +2364,9 @@ function renderWatchlistTab() {
             <td>${r.in_holdings ? '<span class="form-hint">holding</span>' : `<button type="button" class="btn-secondary btn-sm" data-nol-watch="${escapeHtml(r.ticker)}"
               data-company="${escapeHtml(r.company)}" data-market="${escapeHtml(r.market)}">+ Watchlist</button>`}</td>
           </tr>`;
-
   const nolHead = `<thead><tr>
         <th>Ticker</th><th>Company</th><th>Notes</th><th>Cap</th><th>Mkt cap</th><th>DTA/mcap</th><th>Realizable DTA</th><th>DTA/sh</th><th>Allowance</th><th>NOL DTA</th><th>Filing</th><th></th>
       </tr></thead>`;
-
   const visibleRows = filterNolRows(nolRows);
   const smallRows = visibleRows.filter(r => r.is_small_cap);
   const largeRows = visibleRows.filter(r => !r.is_small_cap);
@@ -2308,25 +2380,96 @@ function renderWatchlistTab() {
     <table class="darwin-table">${nolHead}<tbody>${smallRows.map(nolRowHtml).join('')}</tbody></table>` : ''}
     ${largeRows.length ? `<h4 style="font-size:12px;color:var(--text-muted);margin:16px 0 8px">Mid / large cap (${largeRows.length})</h4>
     <table class="darwin-table">${nolHead}<tbody>${largeRows.map(nolRowHtml).join('')}</tbody></table>` : ''}
-    ${!visibleRows.length ? '<p class="form-hint">No rows match the current filter.</p>' : ''}` : '<p class="form-hint">NOL screener not built. Run: python _system/scripts/build_nol_screener.py --write</p>';
-
-  content.innerHTML = `
-    <div class="watchlist-section">
-      <h3>Registry watchlist (${registry.length})</h3>
-      <p class="form-hint" style="margin-bottom:10px">Promote to full holding via Onboard. Stored in <code>registry.json</code> watchlist.</p>
-      ${registryTable}
-    </div>
+    ${!visibleRows.length ? '<p class="form-hint">No rows match the current filter.</p>' : ''}`
+    : '<p class="form-hint">NOL screener not built. Run: python _system/scripts/build_nol_screener.py --write</p>';
+  return `
     <div class="watchlist-section">
       <h3>NOL carryforward screener (${nolRows.length}${nol.small_cap_count != null ? ` · ${nol.small_cap_count} small/micro` : ''}${actionableCount != null ? ` · ${actionableCount} actionable` : ''})</h3>
       <p class="form-hint" style="margin-bottom:10px">${escapeHtml(nol.criteria || 'Deferred tax asset screen from SEC companyfacts + seed list.')}</p>
       ${nolTable}
       <p class="form-hint" style="margin-top:10px">Seed: <code>${escapeHtml(nol.seed_path || '_system/reference/market-data/screens/nol_seed.csv')}</code> · Rebuild: <code>python _system/scripts/build_nol_screener.py --write</code></p>
     </div>`;
+}
+
+function renderWatchlistBanksBody() {
+  const banks = data.advantaged_banks_screener || {};
+  const bankRows = banks.rows || [];
+  const banksLowCostOnly = localStorage.getItem('banksLowCostOnly') === '1';
+  const filterBankRows = (rows) => banksLowCostOnly
+    ? rows.filter(r => r.is_low_cost === true)
+    : rows;
+  const bankRowHtml = (r) => `
+          <tr>
+            <td class="mono">${escapeHtml(r.ticker)}${r.in_holdings ? ' <span class="badge badge-ok" title="Already a holding">H</span>' : ''}${r.in_watchlist ? ' <span class="badge badge-warn" title="On watchlist">W</span>' : ''}${r.is_low_cost ? ' <span class="badge badge-ok" title="Low-cost deposit franchise">LC</span>' : ''}</td>
+            <td>${escapeHtml(r.company)}</td>
+            <td><span class="badge badge-sleeve">${escapeHtml(r.edge_label || r.edge_type || '—')}</span></td>
+            <td class="mono" title="Approx. annual InterestExpenseDeposits ÷ period-end Deposits">${escapeHtml(r.cost_of_deposits_display || '—')}</td>
+            <td class="mono">${escapeHtml(r.dda_share_display || '—')}</td>
+            <td class="mono">${escapeHtml(r.roe_display || '—')}</td>
+            <td class="mono">${escapeHtml(r.p_tbv_display || '—')}</td>
+            <td class="mono">${escapeHtml(r.assets_display || '—')}</td>
+            <td class="mono">${escapeHtml(r.market_cap_display || '—')}</td>
+            <td class="mono" style="font-size:11px">${escapeHtml(r.filing_as_of || '—')}</td>
+            <td>${r.in_holdings ? '<span class="form-hint">holding</span>' : `<button type="button" class="btn-secondary btn-sm" data-bank-watch="${escapeHtml(r.ticker)}"
+              data-company="${escapeHtml(r.company)}" data-market="${escapeHtml(r.market)}">+ Watchlist</button>`}</td>
+          </tr>`;
+  const bankHead = `<thead><tr>
+        <th>Ticker</th><th>Company</th><th>Edge</th><th>Cost dep. (approx)</th><th>DDA %</th><th>ROE</th><th>P/TBV</th><th>Assets</th><th>Mkt cap</th><th>Filing</th><th></th>
+      </tr></thead>`;
+  const visibleBanks = filterBankRows(bankRows);
+  const lowCostCount = banks.low_cost_count != null ? banks.low_cost_count : bankRows.filter(r => r.is_low_cost).length;
+  const banksTable = bankRows.length ? `
+    <label class="form-hint" style="display:inline-flex;align-items:center;gap:6px;margin-bottom:10px">
+      <input type="checkbox" id="banks-low-cost-only" ${banksLowCostOnly ? 'checked' : ''}>
+      Show low-cost only
+    </label>
+    <table class="darwin-table">${bankHead}<tbody>${visibleBanks.map(bankRowHtml).join('')}</tbody></table>
+    ${!visibleBanks.length ? '<p class="form-hint">No rows match the current filter.</p>' : ''}`
+    : '<p class="form-hint">Advantaged banks screener not built. Run: python _system/scripts/build_advantaged_banks_screener.py --write</p>';
+  return `
+    <div class="watchlist-section">
+      <h3>Advantaged banks screener (${bankRows.length}${lowCostCount != null ? ` · ${lowCostCount} low-cost` : ''})</h3>
+      <p class="form-hint" style="margin-bottom:10px">${escapeHtml(banks.criteria || 'Competitive-franchise banks: low-cost deposits, BaaS/fintech, niche platforms. Seed list + SEC companyfacts.')}</p>
+      <p class="form-hint" style="margin-bottom:10px">Framed by Moore community-bank handbook (<code>_system/reference/investment-wisdom/moore/</code>).</p>
+      ${banksTable}
+      <p class="form-hint" style="margin-top:10px">Seed: <code>${escapeHtml(banks.seed_path || '_system/reference/market-data/screens/advantaged_banks_seed.csv')}</code> · Rebuild: <code>python _system/scripts/build_advantaged_banks_screener.py --write</code></p>
+    </div>`;
+}
+
+function renderWatchlistTab() {
+  const loading = document.getElementById('watchlist-loading');
+  const content = document.getElementById('watchlist-content');
+  if (!loading || !content || !data) return;
+
+  if (!WATCHLIST_VIEWS.has(watchlistViewMode)) {
+    watchlistViewMode = defaultWatchlistView();
+  }
+
+  loading.style.display = 'none';
+  content.style.display = 'block';
+
+  let body = '';
+  if (watchlistViewMode === 'queue') body = renderWatchlistQueueBody();
+  else if (watchlistViewMode === 'banks') body = renderWatchlistBanksBody();
+  else body = renderWatchlistNolBody();
+
+  content.innerHTML = `${renderWatchlistSubNav(watchlistViewMode)}${body}`;
+
+  content.querySelectorAll('[data-watchlist-view]').forEach(btn => {
+    btn.addEventListener('click', () => setWatchlistView(btn.dataset.watchlistView));
+  });
 
   const hideZeroCb = content.querySelector('#nol-hide-zero');
   if (hideZeroCb) {
     hideZeroCb.addEventListener('change', () => {
       localStorage.setItem('nolHideZeroRealizable', hideZeroCb.checked ? '1' : '0');
+      renderWatchlistTab();
+    });
+  }
+  const banksLowCostCb = content.querySelector('#banks-low-cost-only');
+  if (banksLowCostCb) {
+    banksLowCostCb.addEventListener('change', () => {
+      localStorage.setItem('banksLowCostOnly', banksLowCostCb.checked ? '1' : '0');
       renderWatchlistTab();
     });
   }
@@ -2342,6 +2485,14 @@ function renderWatchlistTab() {
   content.querySelectorAll('[data-nol-watch]').forEach(btn => {
     btn.addEventListener('click', () => openOnboardModal({
       ticker: btn.dataset.nolWatch,
+      company: btn.dataset.company,
+      market: btn.dataset.market,
+      watchlistOnly: true,
+    }));
+  });
+  content.querySelectorAll('[data-bank-watch]').forEach(btn => {
+    btn.addEventListener('click', () => openOnboardModal({
+      ticker: btn.dataset.bankWatch,
       company: btn.dataset.company,
       market: btn.dataset.market,
       watchlistOnly: true,

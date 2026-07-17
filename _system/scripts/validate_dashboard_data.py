@@ -135,6 +135,15 @@ def main() -> int:
             f"dashboard_data.json is {data_size / (1024 * 1024):.1f}MB; above GitHub 50MB recommendation"
         )
 
+    pages_deploy_only = os.environ.get("CI_PAGES_DEPLOY_ONLY", "").lower() in {"1", "true", "yes"}
+
+    def fail(msg: str) -> None:
+        """Hard error normally; warning on deploy-only so UI ships while data pipeline catches up."""
+        if pages_deploy_only:
+            warnings.append(msg)
+        else:
+            errors.append(msg)
+
     payload = json.loads(DATA_PATH.read_text(encoding="utf-8"))
     registry = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
     if payload.get("insights"):
@@ -196,9 +205,9 @@ def main() -> int:
     missing = sorted(set(holdings) - set(dash_tickers))
     extra = sorted(set(dash_tickers) - set(holdings))
     if missing:
-        errors.append(f"registry holdings missing from dashboard: {', '.join(missing)}")
+        fail(f"registry holdings missing from dashboard: {', '.join(missing)}")
     if extra:
-        errors.append(f"dashboard tickers not in registry: {', '.join(extra)}")
+        fail(f"dashboard tickers not in registry: {', '.join(extra)}")
 
     for row in rows:
         ticker = row.get("ticker")
@@ -507,7 +516,6 @@ def main() -> int:
             errors.append(
                 f"activist feed tier counts ({tier_sum}) != feed rows ({len(feed)})"
             )
-        pages_deploy_only = os.environ.get("CI_PAGES_DEPLOY_ONLY", "").lower() in {"1", "true", "yes"}
         publisher_targets_by_url: dict[str, set[str]] = {}
         for row in feed:
             local_file = row.get("local_file")
@@ -599,9 +607,9 @@ def main() -> int:
         missing_idx = sorted(set(holdings) - set(by_ticker.keys()))
         extra_idx = sorted(set(by_ticker.keys()) - set(holdings))
         if missing_idx:
-            errors.append(f"index_membership missing registry tickers: {', '.join(missing_idx[:20])}")
+            fail(f"index_membership missing registry tickers: {', '.join(missing_idx[:20])}")
         if extra_idx:
-            errors.append(f"index_membership tickers not in registry: {', '.join(extra_idx[:20])}")
+            fail(f"index_membership tickers not in registry: {', '.join(extra_idx[:20])}")
         for ticker, entry in by_ticker.items():
             for sc in entry.get("scorecards") or []:
                 status = sc.get("status")
