@@ -646,3 +646,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-17.
 | ZTS | ZTS/ | Zoetis | US | 2026-07-10 | 2026-07-17 | unknown | watch |
 
 **638 holdings total.** Registry: `_system/portfolio/registry.json`
+| ASTS | ASTS/ | AST SpaceMobile, Inc. | US | — | — | unknown | watch |
