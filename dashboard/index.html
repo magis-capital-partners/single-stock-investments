@@ -1666,6 +1666,12 @@ function renderInsights(opts = {}) {
     biotechSearch,
     biotechShowLimit,
   });
+  if (window.IndexViz && IndexViz.bindIndexWatchToggles && data.index_membership) {
+    IndexViz.bindIndexWatchToggles(content, data.index_membership, {
+      escapeHtml,
+      linkHtml,
+    });
+  }
   content.querySelectorAll('[data-use-latest-quarter]').forEach(btn => {
     btn.addEventListener('click', () => {
       const timeModel = InsightsViz.buildTimeModel(insights, data.document_catalog);

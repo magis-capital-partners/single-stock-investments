@@ -52,6 +52,50 @@ INDEX_NEWS_CATEGORIES = {"index_inclusion", "index_addition", "index_deletion"}
 DEFAULT_MAX_CANDIDATE_DISTANCE_PCT = 15.0
 NASDAQ_EXCLUDE_TICKERS = {"NDAQ", "CBOE", "CME", "ICE", "MIAX", "SPGI", "MCO"}
 
+# Explicit size-membership language required to promote news into Confirmed.
+_SIZE_INDEX = (
+    r"(?:russell\s*1000|russell\s*2000|s&p\s*500|s&p\s*midcap(?:\s*400)?|s&p\s*400|"
+    r"nasdaq[- ]?100|dow(?:\s+jones)?|djia|ftse\s*(?:100|250)|s&p/tsx(?:\s+composite)?)"
+)
+_SIZE_MEMBERSHIP_CUE = re.compile(
+    rf"\b(?:joins?|joined|joining|added\s+to|to\s+be\s+added\s+to|will\s+be\s+added\s+to|"
+    rf"removed\s+from|dropped\s+from|deleted\s+from|exit(?:s|ed|ing)?\s+from)\s+"
+    rf"(?:the\s+)?{_SIZE_INDEX}\b"
+    rf"|{_SIZE_INDEX}\s+(?:exit|removal|deletion)\b"
+    rf"|\b(?:exit|removal|deletion)\s+(?:from\s+)?(?:the\s+)?{_SIZE_INDEX}\b"
+    rf"|\breplaced?\b.{{0,60}}\bin\s+the\s+dow\b",
+    re.I,
+)
+# Soft / promotional join language — keep as news note, never Confirmed.
+# Trailing fluff like "recasts growth investor base" is allowed when a clear
+# size cue already matched; these patterns catch promotional-primary headlines.
+_SOFT_JOIN_NOISE = re.compile(
+    r"\b(?:spotlight|draws?\s+fresh|could\s+be\s+\d|fairly\s+valued|undervalued|"
+    r"investment\s+case|jumps\s+as|spin[- ]?off\s+joins|indexes?\s+spotlight|"
+    r"factor\s+move)\b",
+    re.I,
+)
+_EFFECTIVE_IN_TITLE = re.compile(
+    r"\bon\s+(?P<mon>january|february|march|april|may|june|july|august|september|"
+    r"october|november|december)\s+(?P<day>\d{1,2})(?:st|nd|rd|th)?"
+    r"(?:,?\s*(?P<year>\d{4}))?",
+    re.I,
+)
+_MONTH_NUM = {
+    "january": 1,
+    "february": 2,
+    "march": 3,
+    "april": 4,
+    "may": 5,
+    "june": 6,
+    "july": 7,
+    "august": 8,
+    "september": 9,
+    "october": 10,
+    "november": 11,
+    "december": 12,
+}
+
 
 def now_iso() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
@@ -83,6 +127,53 @@ def days_until(d: date | None, today: date) -> int | None:
     return (d - today).days
 
 
+def parse_effective_from_title(title: str, announced: str | None = None) -> str | None:
+    """Best-effort effective date from 'on June 22' style titles."""
+    m = _EFFECTIVE_IN_TITLE.search(title or "")
+    if not m:
+        return None
+    mon = _MONTH_NUM.get((m.group("mon") or "").lower())
+    day = int(m.group("day") or 0)
+    year_s = m.group("year")
+    if not mon or not day:
+        return None
+    if year_s:
+        year = int(year_s)
+    else:
+        ann = parse_date(announced)
+        year = ann.year if ann else date.today().year
+    try:
+        return date(year, mon, day).isoformat()
+    except ValueError:
+        return None
+
+
+def is_quality_gated_news(
+    *,
+    title: str,
+    action: str,
+    style_subset: bool,
+    index_id: str | None = None,
+    current_memberships: set[str] | None = None,
+) -> bool:
+    """Promote news into Confirmed only for clear parent size membership flips.
+
+    Soft/promotional join language stays in News notes. Already-member status is
+    not used here (seed often updates after a real recon add like APLD); the float
+    model applies already_member / completed_migration separately.
+    """
+    del index_id, current_memberships  # reserved for callers / future lint hooks
+    if style_subset or action == "reclassify":
+        return False
+    if action not in {"add", "delete"}:
+        return False
+    if _SOFT_JOIN_NOISE.search(title or ""):
+        return False
+    if not _SIZE_MEMBERSHIP_CUE.search(title or ""):
+        return False
+    return True
+
+
 def load_announcements() -> list[dict]:
     if not ANNOUNCEMENTS.exists():
         return []
@@ -99,7 +190,11 @@ def load_announcements() -> list[dict]:
 
 
 def append_announcement(row: dict, *, existing: list[dict] | None = None) -> bool:
-    """Append if not duplicate (exact key or same triple within 14 days). Returns True if written."""
+    """Append if not duplicate (exact key or same triple within 14 days). Returns True if written.
+
+    Style/subset reclassify notes collapse per ticker within 14 days: related indexes
+    merge onto the existing row instead of creating redundant table rows.
+    """
     ANNOUNCEMENTS.parent.mkdir(parents=True, exist_ok=True)
     rows = existing if existing is not None else load_announcements()
     key = (
@@ -122,6 +217,30 @@ def append_announcement(row: dict, *, existing: list[dict] | None = None) -> boo
             ed = parse_date(e.get("announced") or e.get("effective"))
             if ed and abs((ann_d - ed).days) <= 14:
                 return False
+        # Collapse style/subset noise: one row per ticker per ~2 weeks
+        if (
+            row.get("style_subset")
+            and e.get("style_subset")
+            and row.get("action") == "reclassify"
+            and e.get("action") == "reclassify"
+            and e.get("ticker") == row.get("ticker")
+            and ann_d
+        ):
+            ed = parse_date(e.get("announced") or e.get("effective"))
+            if ed and abs((ann_d - ed).days) <= 14:
+                related = set(e.get("related_indexes") or [])
+                if e.get("index"):
+                    related.add(e["index"])
+                if row.get("index"):
+                    related.add(row["index"])
+                e["related_indexes"] = sorted(related)
+                # Prefer the longer / more specific title
+                if len(row.get("title") or "") > len(e.get("title") or ""):
+                    e["title"] = row.get("title")
+                    e["source_url"] = row.get("source_url") or e.get("source_url")
+                    e["index"] = row.get("index") or e.get("index")
+                rewrite_announcements(rows)
+                return False
     with ANNOUNCEMENTS.open("a", encoding="utf-8") as fh:
         fh.write(json.dumps(row, ensure_ascii=False) + "\n")
     rows.append(row)
@@ -132,6 +251,48 @@ def rewrite_announcements(rows: list[dict]) -> None:
     ANNOUNCEMENTS.parent.mkdir(parents=True, exist_ok=True)
     body = "".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows)
     ANNOUNCEMENTS.write_text(body, encoding="utf-8")
+
+
+def collapse_style_announcements(rows: list[dict]) -> list[dict]:
+    """Idempotent collapse of style_subset reclassify notes (one per ticker / 14d window)."""
+    kept: list[dict] = []
+    style_buckets: dict[str, list[dict]] = {}
+    for r in rows:
+        if r.get("style_subset") and r.get("action") == "reclassify":
+            style_buckets.setdefault(str(r.get("ticker") or ""), []).append(r)
+        else:
+            kept.append(r)
+    for ticker, group in style_buckets.items():
+        if not ticker:
+            kept.extend(group)
+            continue
+        group.sort(key=lambda x: str(x.get("announced") or ""))
+        clusters: list[list[dict]] = []
+        for r in group:
+            ad = parse_date(r.get("announced"))
+            placed = False
+            for cluster in clusters:
+                cd = parse_date(cluster[0].get("announced"))
+                if ad and cd and abs((ad - cd).days) <= 14:
+                    cluster.append(r)
+                    placed = True
+                    break
+            if not placed:
+                clusters.append([r])
+        for cluster in clusters:
+            primary = max(cluster, key=lambda x: len(x.get("title") or ""))
+            related = set(primary.get("related_indexes") or [])
+            for r in cluster:
+                if r.get("index"):
+                    related.add(r["index"])
+                for idx in r.get("related_indexes") or []:
+                    related.add(idx)
+            primary = dict(primary)
+            primary["related_indexes"] = sorted(related)
+            primary["style_subset"] = True
+            primary["quality_gated"] = False
+            kept.append(primary)
+    return kept
 
 
 def memberships_lookup(seed: dict) -> dict[str, set[str]]:
@@ -216,20 +377,25 @@ def _try_append_extracted(
         style_subset = bool(ev.get("style_subset")) or (
             action == "reclassify" and _is_style_or_subset_index(title)
         )
+        quality_gated = is_quality_gated_news(
+            title=title,
+            action=action,
+            style_subset=style_subset,
+            index_id=index_id,
+            current_memberships=current,
+        )
         row = {
             "ticker": ticker,
             "index": index_id,
             "action": action,
             "announced": announced,
-            "effective": None,
+            "effective": parse_effective_from_title(title, announced),
             "source_url": source_url,
             "source_type": source_type,
             "confidence": "news_unconfirmed",
             "title": title,
             "style_subset": style_subset,
-            # Style/factor subset moves are tracked but never Confirmed parent events
-            "quality_gated": (not style_subset)
-            and not (action == "reclassify" and _is_style_or_subset_index(title)),
+            "quality_gated": quality_gated,
         }
         if append_announcement(row, existing=existing):
             out.append(row)
@@ -296,14 +462,15 @@ def lint_announcement_conflicts(rows: list[dict], seed: dict | None = None) -> l
     return warnings
 
 
-def retag_announcements_style_subset() -> int:
-    """One-time / idempotent: re-run titles through extractor; set style_subset on each row."""
+def retag_announcements_style_subset(seed: dict | None = None) -> int:
+    """Idempotent: re-tag style_subset + quality_gated; collapse style note dupes."""
     path = ANNOUNCEMENTS
     if not path.exists():
         return 0
+    mem = memberships_lookup(seed or {})
     lines = path.read_text(encoding="utf-8").splitlines()
     changed = 0
-    out_lines: list[str] = []
+    rows: list[dict] = []
     for line in lines:
         line = line.strip()
         if not line:
@@ -311,12 +478,11 @@ def retag_announcements_style_subset() -> int:
         try:
             row = json.loads(line)
         except json.JSONDecodeError:
-            out_lines.append(line)
             continue
         title = row.get("title") or ""
         ticker = row.get("ticker")
         if not title or not ticker:
-            out_lines.append(json.dumps(row, ensure_ascii=False))
+            rows.append(row)
             continue
         events = extract_index_events(title, "", candidate_tickers=[ticker])
         style = False
@@ -331,14 +497,30 @@ def retag_announcements_style_subset() -> int:
                 (row.get("action") == "reclassify")
                 and not re.search(r"\brussell\s*1000\b|\brussell\s*2000\b", title, re.I)
             )
-        prev = bool(row.get("style_subset"))
+        prev_style = bool(row.get("style_subset"))
+        prev_qg = bool(row.get("quality_gated"))
         row["style_subset"] = style
-        if style:
-            row["quality_gated"] = False
-        if prev != style:
+        if not row.get("effective"):
+            eff = parse_effective_from_title(title, row.get("announced"))
+            if eff:
+                row["effective"] = eff
+        if row.get("confidence") == "provider_confirmed":
+            row["quality_gated"] = not style
+        else:
+            row["quality_gated"] = is_quality_gated_news(
+                title=title,
+                action=str(row.get("action") or ""),
+                style_subset=style,
+                index_id=row.get("index"),
+                current_memberships=mem.get(ticker) or set(),
+            )
+        if prev_style != style or prev_qg != bool(row.get("quality_gated")):
             changed += 1
-        out_lines.append(json.dumps(row, ensure_ascii=False))
-    path.write_text("\n".join(out_lines) + ("\n" if out_lines else ""), encoding="utf-8")
+        rows.append(row)
+    collapsed = collapse_style_announcements(rows)
+    if len(collapsed) != len(rows):
+        changed += len(rows) - len(collapsed)
+    rewrite_announcements(collapsed)
     return changed
 
 
@@ -623,8 +805,8 @@ def scorecard_russell(
     elif breakpoint_mcap and mcap:
         dist = ((float(mcap) - float(breakpoint_mcap)) / float(breakpoint_mcap)) * 100.0
         if index_id == "russell_1000":
-            # Non-members near/above breakpoint are R1000 candidates (not mega-caps far above)
-            near = near_boundary(dist, max_cand_dist) and dist >= -max_cand_dist
+            # Non-members at/above breakpoint, within +max_cand_dist (mutex vs R2000).
+            near = float(mcap) >= float(breakpoint_mcap) and dist <= max_cand_dist
             checks["rank"] = check_result(
                 near,
                 rank,
@@ -632,14 +814,13 @@ def scorecard_russell(
                 rank_method,
             )
         else:
-            # R2000: only names inside [band_low, breakpoint] (or near below breakpoint).
-            # Mega-caps far above breakpoint are never R2000 candidates.
+            # R2000: strictly inside [band_low, breakpoint]. No overlap with R1000 zone.
             in_r2000_band = True
-            if band_low is not None and band_high is not None:
-                in_r2000_band = band_low <= float(mcap) <= float(breakpoint_mcap) * (1 + max_cand_dist / 100.0)
-            elif float(mcap) > float(breakpoint_mcap) * (1 + max_cand_dist / 100.0):
-                in_r2000_band = False
-            near = near_boundary(dist, max_cand_dist) and dist <= max_cand_dist and in_r2000_band
+            if band_low is not None:
+                in_r2000_band = band_low <= float(mcap) <= float(breakpoint_mcap)
+            else:
+                in_r2000_band = float(mcap) <= float(breakpoint_mcap)
+            near = in_r2000_band and abs(float(dist)) <= max_cand_dist
             checks["rank"] = check_result(
                 near,
                 rank,
@@ -752,18 +933,10 @@ def finalize_scorecard(
         elif mi_ineligible_from_missing(missing) and not known:
             status = "n_a"
         elif floor_only:
-            # Clearing a min-mcap floor is not candidacy; need near-boundary only
-            if near_boundary(distance_pct, max_cand_dist) and not fails and passes:
-                # For floor indices, distance is usually largely positive (above floor).
-                # Treat "near" as within max_cand_dist *above* the floor (0..+max), not far above.
-                if distance_pct is not None and 0 <= float(distance_pct) <= max_cand_dist:
-                    status = "inclusion_candidate"
-                    gating = None
-                else:
-                    status = "n_a"
-                    gating = gating or "above_floor_not_near_cutoff"
-            else:
-                status = "n_a" if unknowns or not passes else ("ineligible" if fails else "n_a")
+            # Min-mcap floors (MSCI/Nasdaq/S&P 500 threshold) are not reconstitution
+            # cutoffs — membership is seed/committee only. Never invent candidates.
+            status = "n_a" if unknowns or not passes else ("ineligible" if fails else "n_a")
+            gating = gating or ("above_floor_membership_seed_only" if passes and not fails else gating)
         elif near_boundary(distance_pct, max_cand_dist) and not fails and passes:
             status = "inclusion_candidate"
             gating = None
@@ -1100,6 +1273,12 @@ def build_for_ticker(
     confirmed_events = []
     news_notes = []
     for a in t_anns:
+        is_style = bool(a.get("style_subset"))
+        qg = (
+            False
+            if is_style
+            else bool(a.get("quality_gated") or a.get("confidence") == "provider_confirmed")
+        )
         row_ev = {
             "ticker": ticker,
             "index": a.get("index"),
@@ -1110,17 +1289,12 @@ def build_for_ticker(
             "source_type": a.get("source_type"),
             "confidence": a.get("confidence"),
             "title": a.get("title"),
-            "style_subset": bool(a.get("style_subset")),
-            "quality_gated": (
-                False
-                if a.get("style_subset")
-                else bool(a.get("quality_gated") or a.get("confidence") == "provider_confirmed")
-            ),
+            "style_subset": is_style,
+            "quality_gated": qg,
+            "related_indexes": list(a.get("related_indexes") or []),
         }
-        # Surface provider_confirmed always; news only if quality_gated.
-        # Style/subset never upgrades scorecards or confirmed_soon.
-        is_style = bool(row_ev.get("style_subset"))
-        if (a.get("confidence") == "provider_confirmed" or row_ev.get("quality_gated")) and not is_style:
+        # Provider always; news only if tightened quality_gated. Style → news notes.
+        if (a.get("confidence") == "provider_confirmed" or qg) and not is_style:
             confirmed_events.append(row_ev)
         else:
             news_notes.append(row_ev)
@@ -1225,9 +1399,9 @@ def build(today: date | None = None, *, purge_announcements: bool = True) -> dic
         company_names=company_names,
         holdings_tickers=set(holdings),
     )
-    n_retag = retag_announcements_style_subset()
+    n_retag = retag_announcements_style_subset(seed)
     if n_retag:
-        print(f"Retagged style_subset on {n_retag} announcement rows")
+        print(f"Retagged style_subset/quality_gated on {n_retag} announcement rows")
     announcements = load_announcements()
     seed = apply_confirmed_to_seed(seed, announcements, today)
     save_json(DATA_DIR / "index_memberships_seed.json", seed)
@@ -1334,9 +1508,15 @@ def build(today: date | None = None, *, purge_announcements: bool = True) -> dic
         1
         for row in by_ticker.values()
         for ev in row.get("confirmed_events") or []
-        if ev.get("quality_gated")
+        if ev.get("quality_gated") or ev.get("confidence") == "provider_confirmed"
     )
     news_note_count = sum(len(row.get("news_notes") or []) for row in by_ticker.values())
+    style_note_count = sum(
+        1
+        for row in by_ticker.values()
+        for ev in row.get("news_notes") or []
+        if ev.get("style_subset")
+    )
 
     payload = {
         "generated": now_iso(),
@@ -1356,9 +1536,17 @@ def build(today: date | None = None, *, purge_announcements: bool = True) -> dic
             "high_priority_watch": high_priority_watch,
             "ticker_count": len(by_ticker),
             "quality_gated_events": quality_events,
+            "provider_confirmed_events": sum(
+                1
+                for row in by_ticker.values()
+                for ev in row.get("confirmed_events") or []
+                if ev.get("confidence") == "provider_confirmed"
+            ),
             "news_notes": news_note_count,
+            "style_subset_notes": style_note_count,
             "max_candidate_distance_pct": max_cand,
             "top_float_impacts": float_summary.get("top_float_impacts") or [],
+            "top_float_impact_estimates": float_summary.get("top_float_impact_estimates") or [],
             "aum_as_of": float_summary.get("aum_as_of"),
             "aum_stale": float_summary.get("aum_stale"),
         },

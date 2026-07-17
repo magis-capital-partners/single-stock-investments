@@ -635,6 +635,9 @@ def events_from_ticker_row(
             style_subset=False,
             rules=rules,
         )
+        # Candidates need real float/ADV — no wallpaper constants in the model.
+        if impact.get("float_flag") != "float_adj" or impact.get("status") != "ok":
+            continue
         impact["event_source"] = "candidate"
         impact["distance_to_boundary_pct"] = dist
         _append(impact)
@@ -713,8 +716,18 @@ def attach_float_impact(
         return (src_rank, mig, float_ok, -dollars, -adv, -pct)
 
     top.sort(key=_rank)
+    # Default table: confirmed/news with float_adj only. Estimates (candidates /
+    # float_unknown) go to a separate list for an optional UI toggle.
+    primary: list[dict] = []
+    estimates: list[dict] = []
+    for r in top:
+        if r.get("event_source") != "candidate" and r.get("float_flag") == "float_adj":
+            primary.append(r)
+        else:
+            estimates.append(r)
     return {
-        "top_float_impacts": top[:40],
+        "top_float_impacts": primary[:40],
+        "top_float_impact_estimates": estimates[:40],
         "aum_as_of": registry.get("as_of"),
         "aum_stale": aum_stale(registry),
     }

@@ -247,13 +247,13 @@
       });
     rows.sort((a, b) => String(b.announced || '').localeCompare(String(a.announced || '')));
     if (!rows.length) {
-      return '<p class="muted">No confirmed index events yet. News headlines appear under News notes.</p>';
+      return '<p class="muted">No size-membership events yet. Style/subset headlines stay under News notes.</p>';
     }
     const body = rows
       .slice(0, 40)
       .map((r) => {
         const confLabel =
-          r.confidence === 'provider_confirmed' ? 'provider_confirmed' : 'quality_gated';
+          r.confidence === 'provider_confirmed' ? 'provider' : 'news (size cue)';
         const src =
           r.source_url && linkHtml ? linkHtml(r.source_url, confLabel) : e(confLabel);
         const bridge =
@@ -268,45 +268,73 @@
           <td>${e(r.action)}</td>
           ${renderPctFloatCell(r.fi)}
           <td class="mono">${e(r.announced || '—')}</td>
-          <td class="mono">${e(r.effective || '—')}</td>
+          <td class="mono">${e(r.effective || 'unknown')}</td>
           <td>${src}${bridge}</td>
         </tr>`;
       })
       .join('');
-    return `<h4 style="margin:12px 0 6px;font-size:13px">Confirmed (provider / quality-gated)</h4>
+    return `<h4 style="margin:12px 0 6px;font-size:13px">Size membership events (provider or clear size cue)</h4>
       <table class="insights-table"><thead><tr>
       <th>Ticker</th><th>Index</th><th>Action</th><th title="Base-case net forced flow as % of float (signed)">% float</th><th>Announced</th><th>Effective</th><th>Source</th>
     </tr></thead><tbody>${body}</tbody></table>`;
   }
 
-  function renderNewsNotesTable(byTicker, escapeHtml, linkHtml) {
+  function renderNewsNotesTable(byTicker, escapeHtml, linkHtml, options) {
     const e = escapeHtml || esc;
-    const rows = [];
+    const showStyle = !!(options && options.showStyleSubset);
+    const sizeRows = [];
+    const styleRows = [];
     Object.keys(byTicker || {})
       .sort()
       .forEach((t) => {
         const entry = byTicker[t];
         (entry.news_notes || []).forEach((ev) => {
-          rows.push({
+          const row = {
             ticker: t,
             fi: findMatchingImpact(entry, ev.index, ev.action),
             ...ev,
-          });
+          };
+          if (ev.style_subset) styleRows.push(row);
+          else sizeRows.push(row);
         });
       });
-    rows.sort((a, b) => String(b.announced || '').localeCompare(String(a.announced || '')));
-    if (!rows.length) {
+    sizeRows.sort((a, b) => String(b.announced || '').localeCompare(String(a.announced || '')));
+    styleRows.sort((a, b) => String(b.announced || '').localeCompare(String(a.announced || '')));
+    const rows = showStyle ? sizeRows.concat(styleRows) : sizeRows;
+    if (!sizeRows.length && !styleRows.length) {
       return '<p class="muted">No news index notes.</p>';
+    }
+    const styleToggle =
+      styleRows.length && !showStyle
+        ? `<p class="muted" style="margin:8px 0">
+            ${styleRows.length} style/subset note${styleRows.length === 1 ? '' : 's'} hidden
+            (Growth/Value/Defensive/2500/Top 50 — no size-migration flow).
+            <button type="button" class="index-toggle-style" style="margin-left:6px;font:inherit;cursor:pointer">Show style notes</button>
+          </p>`
+        : styleRows.length && showStyle
+          ? `<p class="muted" style="margin:8px 0">
+              Showing style/subset notes.
+              <button type="button" class="index-toggle-style" style="margin-left:6px;font:inherit;cursor:pointer">Hide style notes</button>
+            </p>`
+          : '';
+    if (!rows.length) {
+      return `<h4 style="margin:16px 0 6px;font-size:13px">News notes (unconfirmed)</h4>${styleToggle}`;
     }
     const body = rows
       .slice(0, 40)
       .map((r) => {
-        const label = r.style_subset ? 'style/subset' : 'news';
+        const related =
+          r.related_indexes && r.related_indexes.length
+            ? ` <span class="muted" title="Collapsed related indexes">(+${e(
+                r.related_indexes.filter((x) => x !== r.index).join(', ')
+              )})</span>`
+            : '';
+        const label = r.style_subset ? 'style/subset' : r.confidence || 'news';
         const src =
           r.source_url && linkHtml ? linkHtml(r.source_url, label) : e(label);
         return `<tr>
           <td class="mono">${e(r.ticker)}</td>
-          <td>${e(r.index)}</td>
+          <td>${e(r.index)}${related}</td>
           <td>${e(r.action)}</td>
           ${renderPctFloatCell(r.fi)}
           <td class="mono">${e(r.announced || '—')}</td>
@@ -316,23 +344,15 @@
       })
       .join('');
     return `<h4 style="margin:16px 0 6px;font-size:13px">News notes (unconfirmed)</h4>
+      ${styleToggle}
       <table class="insights-table"><thead><tr>
       <th>Ticker</th><th>Index</th><th>Action</th><th>% float</th><th>Announced</th><th>Effective</th><th>Source</th>
     </tr></thead><tbody>${body}</tbody></table>`;
   }
 
-  function renderFloatImpactsTable(summary, byTicker, escapeHtml) {
+  function renderFloatImpactRows(rows, byTicker, escapeHtml) {
     const e = escapeHtml || esc;
-    const rows = summary.top_float_impacts || [];
-    if (!rows.length) {
-      return '<p class="muted">No float-impact estimates yet (need float_pct, ADV, and AUM registry).</p>';
-    }
-    const stale = summary.aum_stale
-      ? ` <span class="badge badge-warn">AUM stale (as-of ${e(summary.aum_as_of || '?')})</span>`
-      : summary.aum_as_of
-        ? ` <span class="muted">AUM as-of ${e(summary.aum_as_of)}</span>`
-        : '';
-    const body = rows
+    return rows
       .slice(0, 40)
       .map((r) => {
         const entry = byTicker[r.ticker] || {};
@@ -362,8 +382,42 @@
         </tr>`;
       })
       .join('');
+  }
+
+  function renderFloatImpactsTable(summary, byTicker, escapeHtml, options) {
+    const e = escapeHtml || esc;
+    const showEstimates = !!(options && options.showFloatEstimates);
+    const primary = summary.top_float_impacts || [];
+    const estimates = summary.top_float_impact_estimates || [];
+    const rows = showEstimates ? primary.concat(estimates) : primary;
+    const stale = summary.aum_stale
+      ? ` <span class="badge badge-warn">AUM stale (as-of ${e(summary.aum_as_of || '?')})</span>`
+      : summary.aum_as_of
+        ? ` <span class="muted">AUM as-of ${e(summary.aum_as_of)}</span>`
+        : '';
+    const estToggle =
+      estimates.length
+        ? `<p class="muted" style="margin-bottom:8px">
+            ${
+              showEstimates
+                ? `Showing candidates / float-unknown estimates.`
+                : `${estimates.length} estimate row${estimates.length === 1 ? '' : 's'} hidden (candidates or missing float).`
+            }
+            <button type="button" class="index-toggle-float-est" style="margin-left:6px;font:inherit;cursor:pointer">${
+              showEstimates ? 'Hide estimates' : 'Show estimates'
+            }</button>
+          </p>`
+        : '';
+    if (!rows.length) {
+      return `<h3 style="margin:16px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary)">Float impact (forced flow)</h3>
+        <p class="muted" style="margin-bottom:8px">Confirmed/news events with float-adjusted inputs only by default.${stale}</p>
+        ${estToggle}
+        <p class="muted">No float-adjusted size-migration impacts yet.</p>`;
+    }
+    const body = renderFloatImpactRows(rows, byTicker, e);
     return `<h3 style="margin:16px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary)">Float impact (forced flow)</h3>
-      <p class="muted" style="margin-bottom:8px">Actual (confirmed/news) and expected (near-boundary candidates) net index demand as % of company float. Negative = net forced selling. Both sides of Russell migrations modeled per Horizon Kinetics (2013). Asterisk (*) = float unknown — cap-weighted constant, not stock-specific.${stale}</p>
+      <p class="muted" style="margin-bottom:8px">Net index demand as % of company float (float-adjusted). Negative = net forced selling. Both sides of Russell migrations modeled per Horizon Kinetics (2013). Asterisk (*) = float unknown — cap-weighted constant.${stale}</p>
+      ${estToggle}
       <table class="insights-table"><thead><tr>
         <th>Ticker</th><th>Index</th><th>Action</th><th>% float</th><th>ADV days</th><th>HK cliff</th><th>Conf</th><th>Detail</th>
       </tr></thead><tbody>${body}</tbody></table>`;
@@ -441,6 +495,8 @@
   function renderIndexWatch(payload, options) {
     const escapeHtml = (options && options.escapeHtml) || esc;
     const linkHtml = options && options.linkHtml;
+    const showStyleSubset = !!(options && options.showStyleSubset);
+    const showFloatEstimates = !!(options && options.showFloatEstimates);
     const summary = (payload && payload.portfolio_summary) || {};
     const caption =
       (payload && payload.caption) ||
@@ -448,28 +504,34 @@
     const byTicker = (payload && payload.by_ticker) || {};
     const calendar = (payload && payload.calendar) || [];
     const maxDist = summary.max_candidate_distance_pct != null ? summary.max_candidate_distance_pct : 15;
+    const floatCount =
+      (summary.top_float_impacts || []).length +
+      (showFloatEstimates ? (summary.top_float_impact_estimates || []).length : 0);
 
     const stats = [
       `Candidates: <strong>${(summary.inclusion_candidates || []).length}</strong>`,
       `Deletion risks: <strong>${(summary.deletion_risks || []).length}</strong>`,
       `Confirmed ≤30d: <strong>${(summary.confirmed_next_30d || []).length}</strong>`,
-      `Provider events: <strong>${summary.provider_confirmed_events != null ? summary.provider_confirmed_events : (summary.quality_gated_events != null ? summary.quality_gated_events : '—')}</strong>`,
-      `News notes: <strong>${summary.news_notes != null ? summary.news_notes : '—'}</strong>`,
-      `Float impacts: <strong>${(summary.top_float_impacts || []).length}</strong>`,
+      `Size events: <strong>${summary.quality_gated_events != null ? summary.quality_gated_events : '—'}</strong>`,
+      `News notes: <strong>${summary.news_notes != null ? summary.news_notes : '—'}</strong>` +
+        (summary.style_subset_notes
+          ? ` <span class="muted">(${summary.style_subset_notes} style)</span>`
+          : ''),
+      `Float impacts: <strong>${floatCount}</strong>`,
     ].join(' · ');
 
-    return `<div class="index-watch-panel">
+    return `<div class="index-watch-panel" data-show-style="${showStyleSubset ? '1' : '0'}" data-show-float-est="${showFloatEstimates ? '1' : '0'}">
       <p class="muted" style="margin-bottom:8px">${escapeHtml(caption)}</p>
       <p style="margin-bottom:8px">${stats}</p>
       <h3 style="margin:12px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary)">Reconstitution calendar</h3>
       ${renderCalendarStrip(calendar, escapeHtml)}
-      ${renderFloatImpactsTable(summary, byTicker, escapeHtml)}
+      ${renderFloatImpactsTable(summary, byTicker, escapeHtml, { showFloatEstimates })}
       <h3 style="margin:12px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary)">Index events</h3>
-      <p class="muted" style="margin-bottom:6px">Confirmed = provider notices or quality-gated headlines with effective dates. News notes are unconfirmed (style-box moves included). % float = base-case net forced flow / company float (signed).</p>
+      <p class="muted" style="margin-bottom:6px">Size events = provider notices or headlines with an explicit parent-index add/delete cue. Style/subset notes (Growth/Value/Defensive/2500) are hidden by default and never drive float impact. % float = base-case net forced flow / company float (signed).</p>
       ${renderConfirmedTable(byTicker, escapeHtml, linkHtml)}
-      ${renderNewsNotesTable(byTicker, escapeHtml, linkHtml)}
+      ${renderNewsNotesTable(byTicker, escapeHtml, linkHtml, { showStyleSubset })}
       <h3 style="margin:16px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary)">Potential (near-boundary)</h3>
-      <p class="muted" style="margin-bottom:8px">Only |distance| ≤ ${escapeHtml(String(maxDist))}%. Min-mcap floor passes alone are not candidates.</p>
+      <p class="muted" style="margin-bottom:8px">Only |distance| ≤ ${escapeHtml(String(maxDist))}%. Min-mcap floor passes alone are not candidates. A name is never both Russell 1000 and Russell 2000 candidate.</p>
       ${renderPotentialTable(byTicker, escapeHtml, {
         ...(options && options.filter),
         maxDistanceAbs: maxDist,
@@ -478,10 +540,44 @@
     </div>`;
   }
 
+  function bindIndexWatchToggles(root, payload, options) {
+    if (!root || !payload) return;
+    const opts = options || {};
+    const panel = root.querySelector('.index-watch-panel');
+    if (!panel) return;
+    const rerender = (patch) => {
+      const next = {
+        ...opts,
+        showStyleSubset: !!(patch.showStyleSubset != null
+          ? patch.showStyleSubset
+          : panel.getAttribute('data-show-style') === '1'),
+        showFloatEstimates: !!(patch.showFloatEstimates != null
+          ? patch.showFloatEstimates
+          : panel.getAttribute('data-show-float-est') === '1'),
+      };
+      const wrap = document.createElement('div');
+      wrap.innerHTML = renderIndexWatch(payload, next);
+      const fresh = wrap.firstElementChild;
+      if (fresh) panel.replaceWith(fresh);
+      bindIndexWatchToggles(root, payload, next);
+    };
+    panel.querySelectorAll('.index-toggle-style').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        rerender({ showStyleSubset: panel.getAttribute('data-show-style') !== '1' });
+      });
+    });
+    panel.querySelectorAll('.index-toggle-float-est').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        rerender({ showFloatEstimates: panel.getAttribute('data-show-float-est') !== '1' });
+      });
+    });
+  }
+
   global.IndexViz = {
     renderBadge,
     renderHoldingsCell,
     renderIndexWatch,
+    bindIndexWatchToggles,
     renderCalendarStrip,
     BADGE_CLASS,
     STATUS_LABEL,
