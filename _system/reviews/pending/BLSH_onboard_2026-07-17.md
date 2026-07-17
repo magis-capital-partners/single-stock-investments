@@ -6,7 +6,7 @@
 
 ## Download
 
-Success: us_shared exit 0
+Success: skipped
 
 ## [HUMAN REVIEW]
 
