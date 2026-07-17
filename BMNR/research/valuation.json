@@ -53,6 +53,169 @@
       "notes": "Stockholders equity per share at May 31, 2026; no approved third-party blend"
     }
   },
+  "component_valuation": {
+    "schema_version": "1.0",
+    "all_material_components_identified": true,
+    "coverage_statement": "Every currently identified material claim is valued once: ETH treasury look-through, trajectory net of dilution, staking annuity, and senior-claim reserve. Lawrence yield-curve payoff remains the stance-gate IRR bridge.",
+    "components": [
+      {
+        "id": "eth_look_through_today",
+        "label": "ETH treasury fair value per share (May 31, 2026)",
+        "category": "financial_asset",
+        "overlap_key": "eth_look_through_today",
+        "treatment": "additive",
+        "valuation": {
+          "method": "unit_nav",
+          "basis": "per_share",
+          "low": 10.5,
+          "base": 18.76,
+          "high": 22.0,
+          "evidence_tier": "filing",
+          "evidence": "$10.856B ETH fair value divided by 579,652,432 shares at May 31, 2026 (10-Q Q3 FY2026 digital asset table). Low case applies ~40% ETH mark haircut from May marks.",
+          "assumption_summary": "Look-through ETH per diluted common share before trajectory and operating overlays.",
+          "cross_check": "Reconcile to GAAP CryptoAssetFairValue and share count on each filing refresh.",
+          "falsifier": "ETH fair value per share falls below the low case after sustained spot decline and further dilution."
+        }
+      },
+      {
+        "id": "eth_trajectory_net_dilution",
+        "label": "Seven-year ETH price path net of ATM dilution",
+        "category": "real_option",
+        "overlap_key": "eth_trajectory_net_dilution",
+        "treatment": "additive",
+        "valuation": {
+          "method": "milestone_nav",
+          "basis": "per_share",
+          "low": -1.5,
+          "base": 4.5,
+          "high": 18.0,
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Base aligns with scenarios.base.sotp_build eth_growth_net_dilution (+$4.5/sh): 8% ETH CAGR for 7 years offset by 10% cumulative ATM dilution [Assumption]. Bear embeds dilution exceeding token appreciation.",
+          "assumption_summary": "Incremental per-share value from ETH beta net of issuance, not double-counted with static look-through.",
+          "cross_check": "Range must reconcile to filing ETH purchases, share issuance, and live spot before IC approval.",
+          "falsifier": "ATM issuance dilutes ETH per share faster than token price rises for two consecutive quarters.",
+          "driver_model": {
+            "type": "milestone_nav",
+            "timing_basis": "Seven-year Lawrence horizon",
+            "scenarios": {
+              "base": {
+                "success_probability": 0.55,
+                "remaining_cost_m": 0
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "staking_and_legacy_cash",
+        "label": "Staking and legacy operating cash (capitalized)",
+        "category": "operating_business",
+        "overlap_key": "staking_and_legacy_cash",
+        "treatment": "additive",
+        "valuation": {
+          "method": "owner_cash_dcf",
+          "basis": "per_share",
+          "low": 0.5,
+          "base": 0.74,
+          "high": 1.5,
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Nine-month FY2026 staking and validation revenue $56.924M on 579.7M shares; modest margin capitalized at 10 times [Assumption] in base payoff build.",
+          "assumption_summary": "Small operating annuity from staking yield; legacy mining immaterial.",
+          "cross_check": "Reconcile to revenue segment table and corporate burn before promoting to base IRR.",
+          "falsifier": "Staking yield falls below corporate G&A drag for two reporting periods."
+        }
+      },
+      {
+        "id": "warrants_tax_preferred_reserve",
+        "label": "Warrants, deferred tax, and preferred-claim reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "warrants_tax_preferred_reserve",
+        "treatment": "additive",
+        "valuation": {
+          "method": "realization_reserve",
+          "basis": "per_share",
+          "low": -1.0,
+          "base": 0.0,
+          "high": 0.0,
+          "evidence_tier": "filing",
+          "evidence": "Warrant liability $2.1M and deferred tax liability $92.3M at May 31, 2026 (10-Q Q3 FY2026); BMNP preferred stock claims not fully modeled [HUMAN REVIEW].",
+          "assumption_summary": "Reserve for senior claims and tax on unrealized crypto gains; base zero pending preferred waterfall.",
+          "cross_check": "Update when preferred conversion terms and ATM pace clarify dilution stack.",
+          "falsifier": "Preferred or warrant conversion materially reduces common look-through below the low case."
+        }
+      }
+    ]
+  },
+  "economic_value": {
+    "schema_version": "1.0",
+    "method": "component_economic_value",
+    "gaap_role": "cross_check",
+    "accounting_reference": "ETH marked to fair value under ASU 2023-08 on the balance sheet (~$18.76/sh at May 31, 2026); GAAP net income is mark-dominated ($9.04B unrealized loss nine months FY2026) and not used for Lawrence owner cash.",
+    "economic_claim": {
+      "description": "One diluted common share of Bitmine Immersion Technologies, including look-through ETH treasury at fair value, seven-year ETH trajectory net of ATM dilution, capitalized staking yield, and reserves for warrants, deferred tax, and preferred claims.",
+      "unit_label": "common share",
+      "unit_count": 579652432,
+      "unit_source": "579,652,432 common shares issued and outstanding at May 31, 2026 (10-Q Q3 FY2026 cover page)",
+      "enterprise_to_equity_reconciliation": "No operating enterprise debt at scale; equity equals digital assets at fair value plus cash less warrant, deferred tax, and preferred claims. ETH trajectory and staking are incremental to static look-through; G&A burn is reflected in Lawrence operating segments, not double-counted here."
+    },
+    "component_groups": [
+      {
+        "id": "eth_look_through_today",
+        "label": "ETH treasury fair value per share (May 31, 2026)",
+        "component_ids": ["eth_look_through_today"],
+        "economic_claim": "ETH treasury fair value per share (May 31, 2026)",
+        "valuation_basis": "Fair-value ETH stack divided by diluted common shares.",
+        "adjustments": "Low case applies ETH mark haircut; high case modest premium to May marks.",
+        "overlap_control": "Unique overlap key eth_look_through_today; no other component capitalizes the same claim."
+      },
+      {
+        "id": "eth_trajectory_net_dilution",
+        "label": "Seven-year ETH price path net of ATM dilution",
+        "component_ids": ["eth_trajectory_net_dilution"],
+        "economic_claim": "Seven-year ETH price path net of ATM dilution",
+        "valuation_basis": "Risked incremental ETH per share from price path net of issuance.",
+        "adjustments": "Probability, timing, and dilution pace are inside the range.",
+        "overlap_control": "Unique overlap key eth_trajectory_net_dilution; no other component capitalizes the same claim.",
+        "risk_and_timing": {
+          "probability_basis": "Base assumes moderate ETH appreciation with partial dilution offset; bear assumes dilution dominates.",
+          "timing_basis": "Seven-year Lawrence horizon aligned with yield-curve stance gate.",
+          "remaining_capital_basis": "Further ATM issuance is the primary remaining owner-funded dilution risk."
+        }
+      },
+      {
+        "id": "staking_and_legacy_cash",
+        "label": "Staking and legacy operating cash (capitalized)",
+        "component_ids": ["staking_and_legacy_cash"],
+        "economic_claim": "Staking and legacy operating cash (capitalized)",
+        "valuation_basis": "Capitalized staking and legacy operating margin net of direct costs.",
+        "adjustments": "Does not double-count ETH fair value; yield is incremental operating cash.",
+        "overlap_control": "Unique overlap key staking_and_legacy_cash; no other component capitalizes the same claim."
+      },
+      {
+        "id": "warrants_tax_preferred_reserve",
+        "label": "Warrants, deferred tax, and preferred-claim reserve",
+        "component_ids": ["warrants_tax_preferred_reserve"],
+        "economic_claim": "Warrants, deferred tax, and preferred-claim reserve",
+        "valuation_basis": "Reserve for senior financing claims and tax on crypto marks.",
+        "adjustments": "Negative additive; preferred waterfall pending [HUMAN REVIEW].",
+        "overlap_control": "Unique overlap key warrants_tax_preferred_reserve; no other component capitalizes the same claim."
+      }
+    ],
+    "wisdom_applied": [
+      "Klarman: separate static look-through from issuance-driven dilution; do not treat GAAP net income as owner cash.",
+      "Pabrai: partial dhando when the hard asset floor exists but equity per share is not bounded."
+    ],
+    "limitations": [
+      "May 31, 2026 marks may lag live ETH spot at refresh date.",
+      "BMNP preferred stock and post-May ATM issuance not fully captured.",
+      "Component base (~$24.0) bridges to the seven-year dated payoff used for stance-gate IRR."
+    ]
+  },
+  "valuation_methodology": {
+    "mode": "component_economic_value",
+    "horizon_years": 7,
+    "decision_rule": "Use one complete component schedule (ETH look-through + trajectory + staking + reserves). Lawrence yield-curve payoff remains the stance-gate IRR bridge, not a second asset stack."
+  },
   "optionality_gate": {
     "framework": "eth_treasury_levered",
     "floor_pass": true,
@@ -60,7 +223,7 @@
     "floor_value": 18.76,
     "primary_metric": "lawrence_base",
     "primary_label": "annualized return",
-    "primary_return_pct": null,
+    "primary_return_pct": 6.3,
     "incumbent_sleeve": false,
     "overlay_nav_per_share": 18.76,
     "notes": "Price $15.69 trades below May 31 ETH fair value per share (~$18.76) and GAAP equity per share (~$20.02); dhando partial because ATM dilution and mark volatility remain unbounded."
@@ -321,22 +484,788 @@
     }
   ],
   "implied_return": {
-    "base_pct": null,
-    "label": "7yr IRR (total synthesis)",
-    "display": "pending mechanical write"
+    "base_pct": 6.3,
+    "label": "annualized return",
+    "display": "6.3% (base)"
   },
   "stance": {
     "proposal": "watch",
-    "rationale": "Pending mechanical IRR at live price"
+    "rationale": "Base 6.3% per year over seven years is below the ~15% accumulate hurdle despite partial ETH floor"
   },
   "stance_proposal": {
     "suggested": "watch",
     "irr_band": "<15%",
     "gates": {
       "moat_ok": false,
-      "dhando_ok": true
+      "dhando_ok": true,
+      "floor_pass": true,
+      "valuation_mode": "optionality"
     },
     "override_reason": null
   },
-  "lawrence_horizon_years": 7
+  "lawrence_horizon_years": 7,
+  "catalyst_paths": [
+    {
+      "event": "Base catalyst path",
+      "timing": "7 years",
+      "impact": "ETH +8% per year; net ETH per share flat after dilution; mNAV discount narrows modestly"
+    },
+    {
+      "event": "Failure mode",
+      "timing": "bear scenario",
+      "impact": "ETH price falls 40% from May 2026 marks; continued ATM dilution 12% per year; mNAV discount persists"
+    }
+  ],
+  "total_return_panel": {
+    "schema_version": "3.0",
+    "ticker": "BMNR",
+    "as_of": "2026-07-17",
+    "status": "partial",
+    "error": "Vendor events are discovery evidence; primary-source completeness has not been established.",
+    "price_source": "yahoo:BMNR",
+    "currency": "USD",
+    "return_currency": "USD",
+    "fx_basis": "listing_currency_nominal",
+    "history_start": "2025-06-05",
+    "history_end": "2026-07-17",
+    "price_points": 280,
+    "price_interval": "1d",
+    "history_basis": "earliest_available_vendor_trading_history",
+    "chart_scale": "logarithmic",
+    "chart_y_axis": "cumulative_return_pct",
+    "chart_series": [
+      "total_return",
+      "price_only"
+    ],
+    "return_contract": "split-adjusted close excluding dividends; event amounts normalized for later splits; cash reinvested at ex-date close; pre-tax nominal",
+    "coverage": {
+      "status": "vendor_only",
+      "start": null,
+      "end": null,
+      "note": "Vendor events are discovery evidence; primary-source completeness has not been established.",
+      "ledger_path": null
+    },
+    "event_count": 1,
+    "event_counts": {
+      "regular_dividend": 1
+    },
+    "cash_distributions_on_initial_share_path": 0.01,
+    "distribution_contribution_by_type": {
+      "regular_dividend": 0.01
+    },
+    "cumulative_distributions_per_share": 0.01,
+    "start_price": 7.75,
+    "end_price": 15.69,
+    "price_index_end": 202.45,
+    "total_return_index_end": 202.51,
+    "cumulative_price_return_pct": 102.45,
+    "cumulative_total_return_pct": 102.51,
+    "price_only_annualized_pct": 88.32,
+    "total_return_annualized_pct": 88.37,
+    "market_cap_m": null,
+    "shares_outstanding": null,
+    "price_for_market_cap": 15.69,
+    "chart": "BMNR/research/charts/total_return_2026-07-17.svg",
+    "panel_json": "BMNR/research/total_return_panel.json"
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -6.9
+    },
+    "base": {
+      "return_pct": 6.3
+    },
+    "bull": {
+      "return_pct": 15.1
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -6.9
+    },
+    "base": {
+      "return_pct": 6.3
+    },
+    "bull": {
+      "return_pct": 15.1
+    }
+  },
+  "overlay_results": [],
+  "component_valuation_results": {
+    "status": "inferred_minimal",
+    "decision_rule": "Dated-payoff fallback. Add an explicit component_valuation schedule before drawing asset-level conclusions.",
+    "all_material_components_identified": false,
+    "additive_components": [
+      {
+        "id": "dated_payoff_fallback",
+        "label": "Dated payoff (fallback)",
+        "category": "dated_payoff",
+        "treatment": "additive",
+        "method": "dated_payoff",
+        "evidence_tier": "model_input",
+        "evidence": "scenarios.base.payoff",
+        "low_per_share": 24.0,
+        "base_per_share": 24.0,
+        "high_per_share": 24.0
+      }
+    ],
+    "embedded_components": [],
+    "total_equity_value_per_share": {
+      "low": 24.0,
+      "base": 24.0,
+      "high": 24.0
+    },
+    "material_component_count": 1,
+    "additive_component_count": 1,
+    "embedded_component_count": 0,
+    "market_price_per_share": 15.69,
+    "upside_downside_pct": {
+      "low": 53.0,
+      "base": 53.0,
+      "high": 53.0
+    }
+  },
+  "economic_value_analysis": {
+    "schema_version": "1.0",
+    "status": "evidence_blocked",
+    "trigger": {
+      "required": true,
+      "reasons": [
+        "optionality_or_nav_overlay"
+      ],
+      "policy": "A complete economic-value analysis is required when any trigger fires; otherwise it is recommended."
+    },
+    "method": "economic_claim_to_risked_present_value",
+    "economic_claim": {},
+    "gaap_role": null,
+    "accounting_reference": null,
+    "comparable_hierarchy": [
+      "issuer_arm_length_transaction",
+      "same_asset_transaction",
+      "public_peer",
+      "replacement_cost",
+      "approved_external_analysis"
+    ],
+    "gross_comparable_nav_per_share": null,
+    "risked_present_value_per_share": {
+      "low": 24.0,
+      "base": 24.0,
+      "high": 24.0
+    },
+    "component_groups": [
+      {
+        "id": "dated_payoff_fallback",
+        "label": "Dated payoff (fallback)",
+        "component_ids": [
+          "dated_payoff_fallback"
+        ],
+        "economic_claim": "Dated payoff (fallback)",
+        "valuation_basis": "dated_payoff",
+        "adjustments": "Risk and timing are reflected in the low/base/high range.",
+        "overlap_control": "Unique overlap key dated_payoff_fallback.",
+        "risked_present_value_per_share": {
+          "low": 24.0,
+          "base": 24.0,
+          "high": 24.0
+        }
+      }
+    ],
+    "valuation_proof": [
+      {
+        "component_id": "dated_payoff_fallback",
+        "economic_claim": "Dated payoff (fallback)",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "dated_payoff",
+        "evidence_tier": "model_input",
+        "evidence": "scenarios.base.payoff",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Risk and timing are reflected in the low/base/high range.",
+        "range_per_share": {
+          "low": 24.0,
+          "base": 24.0,
+          "high": 24.0
+        },
+        "treatment": "additive",
+        "overlap_key": "dated_payoff_fallback",
+        "overlap_control": "Unique overlap key dated_payoff_fallback.",
+        "falsifier": "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods.",
+        "risk_and_timing": null
+      }
+    ],
+    "wisdom_applied": [],
+    "limitations": [],
+    "complete_component_coverage": true,
+    "validation_errors": [
+      "complete component schedule required",
+      "economic_claim.description required",
+      "economic_claim.enterprise_to_equity_reconciliation required",
+      "economic_claim.unit_count required",
+      "economic_claim.unit_label required",
+      "economic_claim.unit_source required",
+      "economic_value.schema_version 1.0 required",
+      "gaap_role required"
+    ],
+    "registry_version": "1.0"
+  },
+  "valuation_method_route": {
+    "schema_version": "1.0",
+    "status": "routed",
+    "profile_id": "scarce_asset_optionality",
+    "label": "Scarce assets, royalties, and optionality",
+    "score": 6.0,
+    "reasons": [
+      "archetype=optionality"
+    ],
+    "primary_methods": [
+      "component_owner_cash_and_unit_nav"
+    ],
+    "corroborating_methods": [
+      "comparable_transactions",
+      "replacement_cost_or_reverse_nav"
+    ],
+    "primary_personas": [
+      "hk",
+      "stahl"
+    ],
+    "cross_check_personas": [
+      "klarman_asset_value",
+      "marks_credit_cycle"
+    ],
+    "silent_personas": [
+      "buffett_weschler",
+      "greenblatt",
+      "hohn",
+      "marathon_capital_cycle",
+      "munger",
+      "pabrai"
+    ],
+    "required_evidence": [
+      "legal economic claim",
+      "non-overlapping physical inventory",
+      "unit economics",
+      "realization timing",
+      "remaining owner capital"
+    ],
+    "failure_modes": [
+      "gross asset value mistaken for shareholder value",
+      "operating cash flow and NAV counted twice",
+      "remote options treated as contracted cash"
+    ],
+    "secondary_profiles": [
+      {
+        "profile_id": "catalyst_asset_value",
+        "score": 2.0,
+        "reasons": [
+          "component categories=dated_payoff",
+          "existing methods=dated_payoff"
+        ]
+      }
+    ],
+    "scorecard": {
+      "scarce_asset_optionality": {
+        "score": 6.0,
+        "reasons": [
+          "archetype=optionality"
+        ]
+      },
+      "quality_reinvestment": {
+        "score": 0.0,
+        "reasons": []
+      },
+      "capital_cycle": {
+        "score": 0.0,
+        "reasons": []
+      },
+      "credit_and_normalized_returns": {
+        "score": 0.0,
+        "reasons": []
+      },
+      "catalyst_asset_value": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=dated_payoff",
+          "existing methods=dated_payoff"
+        ]
+      },
+      "predictable_cash_flow": {
+        "score": 0.0,
+        "reasons": []
+      },
+      "binary_milestone": {
+        "score": 0.0,
+        "reasons": []
+      }
+    },
+    "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+  },
+  "universal_valuation_contract": {
+    "schema_version": "1.0",
+    "status": "evidence_blocked",
+    "ticker": "BMNR",
+    "as_of": "2026-07-17",
+    "economic_ownership_map": [
+      {
+        "component_id": "dated_payoff_fallback",
+        "label": "Dated payoff (fallback)",
+        "category": "dated_payoff",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Dated payoff (fallback)",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 24.0
+        },
+        "growth_driver": null,
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "dated_payoff",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 24.0,
+          "base": 24.0,
+          "high": 24.0
+        },
+        "evidence_tier": "model_input",
+        "evidence_level": "analyst_estimated",
+        "evidence": "scenarios.base.payoff",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Risk and timing are reflected in the low/base/high range.",
+        "falsifier": "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods.",
+        "overlap_key": "dated_payoff_fallback",
+        "assumption_type": "estimate"
+      }
+    ],
+    "component_coverage": {
+      "all_material_components_identified": false,
+      "material_component_count": 1,
+      "additive_component_count": 1,
+      "embedded_component_count": 0,
+      "unvalued_component_count": 1,
+      "double_counting_flags": []
+    },
+    "input_classification": {
+      "facts": [],
+      "estimates": [
+        {
+          "component_id": "dated_payoff_fallback",
+          "label": "Dated payoff (fallback)",
+          "kind": "estimate",
+          "evidence_tier": "model_input",
+          "evidence": "scenarios.base.payoff",
+          "method": "dated_payoff"
+        }
+      ],
+      "judgments": []
+    },
+    "method_route": {
+      "schema_version": "1.0",
+      "status": "routed",
+      "profile_id": "scarce_asset_optionality",
+      "label": "Scarce assets, royalties, and optionality",
+      "score": 6.0,
+      "reasons": [
+        "archetype=optionality"
+      ],
+      "primary_methods": [
+        "component_owner_cash_and_unit_nav"
+      ],
+      "corroborating_methods": [
+        "comparable_transactions",
+        "replacement_cost_or_reverse_nav"
+      ],
+      "primary_personas": [
+        "hk",
+        "stahl"
+      ],
+      "cross_check_personas": [
+        "klarman_asset_value",
+        "marks_credit_cycle"
+      ],
+      "silent_personas": [
+        "buffett_weschler",
+        "greenblatt",
+        "hohn",
+        "marathon_capital_cycle",
+        "munger",
+        "pabrai"
+      ],
+      "required_evidence": [
+        "legal economic claim",
+        "non-overlapping physical inventory",
+        "unit economics",
+        "realization timing",
+        "remaining owner capital"
+      ],
+      "failure_modes": [
+        "gross asset value mistaken for shareholder value",
+        "operating cash flow and NAV counted twice",
+        "remote options treated as contracted cash"
+      ],
+      "secondary_profiles": [
+        {
+          "profile_id": "catalyst_asset_value",
+          "score": 2.0,
+          "reasons": [
+            "component categories=dated_payoff",
+            "existing methods=dated_payoff"
+          ]
+        }
+      ],
+      "scorecard": {
+        "scarce_asset_optionality": {
+          "score": 6.0,
+          "reasons": [
+            "archetype=optionality"
+          ]
+        },
+        "quality_reinvestment": {
+          "score": 0.0,
+          "reasons": []
+        },
+        "capital_cycle": {
+          "score": 0.0,
+          "reasons": []
+        },
+        "credit_and_normalized_returns": {
+          "score": 0.0,
+          "reasons": []
+        },
+        "catalyst_asset_value": {
+          "score": 2.0,
+          "reasons": [
+            "component categories=dated_payoff",
+            "existing methods=dated_payoff"
+          ]
+        },
+        "predictable_cash_flow": {
+          "score": 0.0,
+          "reasons": []
+        },
+        "binary_milestone": {
+          "score": 0.0,
+          "reasons": []
+        }
+      },
+      "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+    },
+    "market": {
+      "price_per_share": 15.69,
+      "fully_diluted_shares": null,
+      "market_cap_m": null,
+      "enterprise_value_m": null
+    },
+    "valuation": {
+      "value_per_share": {
+        "low": 24.0,
+        "base": 24.0,
+        "high": 24.0
+      },
+      "probability_weighted_value_per_share": 24.0,
+      "expected_distributions_per_share": 0.0,
+      "annualized_return_at_price_pct": {
+        "low": 6.26,
+        "base": 6.26,
+        "high": 6.26
+      },
+      "downside_to_low_pct": 52.96,
+      "horizon_years": 7
+    },
+    "scenario_contract": {
+      "rule": "Cases must change causal operating, capital, probability, timing, or financing drivers\u2014not only the terminal multiple.",
+      "top_value_drivers": [
+        {
+          "component_id": "dated_payoff_fallback",
+          "label": "Dated payoff (fallback)",
+          "base_per_share": 24.0,
+          "range_width_per_share": 0.0,
+          "scenario_assumptions": null
+        }
+      ],
+      "reverse_expectations": null
+    },
+    "evidence": {
+      "unresolved_count": 9,
+      "blockers": [
+        "A complete, explicit ownership/component schedule has not been supplied.",
+        "complete component schedule required",
+        "economic_claim.description required",
+        "economic_claim.enterprise_to_equity_reconciliation required",
+        "economic_claim.unit_count required",
+        "economic_claim.unit_label required",
+        "economic_claim.unit_source required",
+        "economic_value.schema_version 1.0 required",
+        "gaap_role required"
+      ],
+      "validation_errors": [
+        "complete component schedule required",
+        "economic_claim.description required",
+        "economic_claim.enterprise_to_equity_reconciliation required",
+        "economic_claim.unit_count required",
+        "economic_claim.unit_label required",
+        "economic_claim.unit_source required",
+        "economic_value.schema_version 1.0 required",
+        "gaap_role required"
+      ]
+    },
+    "monitoring": {
+      "falsifiers": [
+        "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods."
+      ],
+      "required_refresh_triggers": [
+        "new filing or material operating update",
+        "capital-structure change",
+        "material price move",
+        "component milestone or falsifier"
+      ]
+    },
+    "decision_rule": "No security is decision-grade until every material economic claim is valued exactly once and every material evidence blocker is resolved."
+  },
+  "context_overlay": {
+    "as_of": "2026-07-17",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": 0.95,
+            "as_of": "2026-07-17",
+            "yoy_pct": 196.9,
+            "direction": "up",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.540999889373779,
+            "as_of": "2026-07-17",
+            "yoy_pct": 1.7,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.2729997634887695,
+            "as_of": "2026-07-17",
+            "yoy_pct": 6.7,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 100.75499725341797,
+            "as_of": "2026-07-17",
+            "yoy_pct": 2.1,
+            "direction": "up",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 18.770000457763672,
+            "as_of": "2026-07-17",
+            "yoy_pct": 13.6,
+            "direction": "up",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": 1.46,
+            "as_of": "2026-07-17",
+            "yoy_pct": 22.7,
+            "direction": "up",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 11.68,
+            "as_of": "2026-07-17",
+            "yoy_pct": 32.3,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "insider_signal": {
+    "as_of": "2026-07-17",
+    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
+    "in_base_irr": false,
+    "window_days": 365,
+    "ics": 4.94,
+    "band": "moderate",
+    "bull_case_support": "moderate",
+    "scenario_confidence": {
+      "priors": {
+        "bear": 0.2,
+        "base": 0.55,
+        "bull": 0.25
+      },
+      "tilted": {
+        "bear": 0.2,
+        "base": 0.527,
+        "bull": 0.274
+      },
+      "bull_delta": 0.024,
+      "bear_delta": 0.0,
+      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
+    },
+    "factors": {
+      "buy_score": 4.756,
+      "sell_score": -0.461,
+      "cluster_bonus": 0.0,
+      "net_buy_usd": 77256916.88,
+      "net_sell_usd": 6672960.0,
+      "price_today": 15.69
+    },
+    "top_buys": [
+      {
+        "insider": "Lee Thomas Jong",
+        "date": "2025-07-17",
+        "shares": 4500,
+        "price": 44.0,
+        "value_usd": 198000.0,
+        "shares_owned_after": 226722,
+        "contrib": 1.574
+      },
+      {
+        "insider": "BITMINE IMMERSION TECHNOLOGIES, INC.",
+        "date": "2026-03-12",
+        "shares": 86956513,
+        "price": 0.886,
+        "value_usd": 77043470.52,
+        "shares_owned_after": 100655143,
+        "contrib": 1.377
+      },
+      {
+        "insider": "Love Lori",
+        "date": "2026-04-16",
+        "shares": 474,
+        "price": 22.0466,
+        "value_usd": 10450.09,
+        "shares_owned_after": 36556,
+        "contrib": 0.973
+      },
+      {
+        "insider": "Love Lori",
+        "date": "2026-04-20",
+        "shares": 227,
+        "price": 22.01,
+        "value_usd": 4996.27,
+        "shares_owned_after": 36783,
+        "contrib": 0.832
+      }
+    ],
+    "top_sells": [
+      {
+        "insider": "Bates Jonathan Robert",
+        "date": "2025-09-11",
+        "shares": 250000,
+        "price": 0.0,
+        "value_usd": 0.0,
+        "is_10b5_1": false,
+        "contrib": -0.124
+      },
+      {
+        "insider": "Lee Thomas Jong",
+        "date": "2026-01-23",
+        "shares": 231700,
+        "price": 28.8,
+        "value_usd": 6672960.0,
+        "is_10b5_1": false,
+        "contrib": -0.113
+      },
+      {
+        "insider": "MOW RAYMOND",
+        "date": "2025-12-18",
+        "shares": 55000,
+        "price": 0.0,
+        "value_usd": 0.0,
+        "is_10b5_1": false,
+        "contrib": -0.101
+      },
+      {
+        "insider": "Innovative Digital Investors Emerging Technology LP",
+        "date": "2025-08-26",
+        "shares": 1484438,
+        "price": 0.0,
+        "value_usd": 0.0,
+        "is_10b5_1": false,
+        "contrib": -0.09
+      },
+      {
+        "insider": "NELSON ERIK S",
+        "date": "2025-10-13",
+        "shares": 38872,
+        "price": 0.0,
+        "value_usd": 0.0,
+        "is_10b5_1": false,
+        "contrib": -0.034
+      }
+    ],
+    "narrative_hooks": [],
+    "transaction_count": 45
+  },
+  "lens_consensus": {
+    "as_of": "2026-07-17",
+    "shared_inputs_ref": "valuation.json@2026-07-17",
+    "valuation_richness": 0.79,
+    "blended_return_pct": 2.24,
+    "band_pct": [
+      -6.9,
+      6.3
+    ],
+    "weighted_median_pct": 6.3,
+    "median_mean_flag": true,
+    "stance": "pass",
+    "agreement_pct": 100,
+    "dissent_count": 0,
+    "lawrence_divergence": false,
+    "top_dissents": [],
+    "contributor_count": 8,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
+  }
 }
