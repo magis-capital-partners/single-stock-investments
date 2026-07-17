@@ -1,0 +1,153 @@
+{
+  "ticker": "CLSK",
+  "as_of": "2026-07-17",
+  "method": "full",
+  "irr_method": "full",
+  "valuation_mode": "optionality",
+  "lawrence_bucket": "other",
+  "payoff_lens": "operating",
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "unproven",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating",
+    "predictive_attribute": "complexity_discount"
+  },
+  "inputs": {
+    "price": 13.03,
+    "price_source": "Yahoo CLSK close 2026-07-17",
+    "price_as_of": "2026-07-17",
+    "shares_millions": 317.8,
+    "shares_source": "FY2025 weighted average diluted shares 317,761,220 (10-K FY2025)",
+    "fcf_per_share": 0.99,
+    "fcf_source": "FY2025 operating cash flow $461.0M minus capital spending on productive assets $144.7M = $316.3M owner cash; divided by 317.8M FY2025 diluted shares (10-K FY2025 cash flow statement)",
+    "revenue_fy2025_m": 766.3,
+    "revenue_fy2025_source": "FY2025 digital currency mining revenue $766.3M (+102% YoY vs $379.0M) per 10-K FY2025",
+    "revenue_h1_fy2026_m": 317.6,
+    "revenue_h1_source": "H1 FY2026 digital currency mining revenue $317.6M (-7.7% YoY vs $344.0M) per 10-Q Q2 FY2026",
+    "cash_m": 43.0,
+    "cash_source": "Cash and cash equivalents $43.0M at September 30, 2025 (10-K FY2025)",
+    "long_term_debt_m": 1788.2,
+    "debt_source": "Long-term debt $1,788.2M at March 31, 2026 excluding current portion $2.5M (10-Q Q2 FY2026)",
+    "stockholders_equity_m": 986.2,
+    "equity_source": "Stockholders equity $986.2M at March 31, 2026 vs $2,175.1M at September 30, 2025 (10-Q Q2 FY2026)",
+    "hashrate_eh_s": 45.6,
+    "hashrate_source": "CleanSpark average hashrate 45.6 EH/s, 4.3% of global network at September 30, 2025 (10-K FY2025 MD&A)",
+    "normalization_note": "Lawrence base uses FY2025 filing-based owner cash (operating cash flow minus capital spending), excluding bitcoin fair-value mark gains/losses in net income. Q2 FY2026 GAAP operating loss reflects $471M YTD fair-value losses on bitcoin, not normalized mining margin."
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": -0.08,
+      "growth_y6_10": -0.03,
+      "exit_multiple": 8,
+      "notes": "Hashprice compression, rising network difficulty, continued convert dilution; AI pivot delayed"
+    },
+    "base": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.02,
+      "exit_multiple": 10,
+      "notes": "Flat-to-modest owner cash on 45+ EH/s fleet; treasury/DAM supplements ops; HPC option not in Lawrence FCF path"
+    },
+    "bull": {
+      "growth_y1_5": 0.12,
+      "growth_y6_10": 0.06,
+      "exit_multiple": 14,
+      "notes": "BTC price recovery + hash-share hold + partial AI hosting cash flow; dilution contained"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "nav_floor",
+      "evidence": "Bitcoin held at fair value under ASC 350-60; fleet PP&E at depreciated cost while power sites have strategic value (10-K)"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant assets?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "~95,000 miners not yet in service; 271-acre Texas campus + 285 MW power agreements signed October 2025 (10-K Item 1)"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Pre-revenue AI/HPC build-out; GAAP losses when BTC marks turn negative (10-Q Q2 FY2026)"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF path?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "Cancelable miner purchase commitments; Submer AI data center MOU October 2025 (10-K)"
+    },
+    {
+      "q": 5,
+      "question": "Private / illiquid stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No material hidden stakes (10-K)"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "none"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Digital Asset Management (Spot+) premiums in treasury; majority of BTC still sold for working capital (10-K MD&A)"
+    }
+  ],
+  "btc_overlay": {
+    "as_of": "2026-07-17",
+    "crypto_exposure": "miner",
+    "status": "partial",
+    "in_base_irr": false,
+    "themes": ["btc_network_economics"],
+    "mining_economics_context": {
+      "hashrate_eh_s": 45.6,
+      "global_share_pct": 4.3,
+      "miner_efficiency_w_th": 16.7,
+      "fleet_miners_owned": 336544,
+      "fleet_miners_in_service": 241934,
+      "operational_mw": 1027,
+      "source": "10-K FY2025 MD&A and Item 1"
+    },
+    "in_model": {
+      "owner_cash_per_share_fy2025": 0.99,
+      "mining_revenue_fy2025_m": 766.3
+    },
+    "not_in_model_requires_refresh": [
+      "AI/HPC hosting revenue path",
+      "Texas 285 MW campus conversion timing",
+      "Convertible note dilution at $19.16 and $14.80 conversion prices (10-Q Note 13)"
+    ]
+  },
+  "optionality_gate": {
+    "primary_metric": "lawrence_base",
+    "primary_label": "annualized return",
+    "notes": "Lawrence consolidated owner cash excludes BTC fair-value marks; overlay sizes AI campus and undeployed hash capacity separately."
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "evidence_refresh": {
+    "type": "btc_network_economics",
+    "as_of": "2026-07-17"
+  }
+}
