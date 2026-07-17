@@ -1,6 +1,6 @@
 # Investment Wisdom Library
 
-Curated PDF writings for Marvin's mental-model layer: **Charlie Munger**, **Mohnish Pabrai**, **Murray Stahl**, **Horizon Kinetics**, **Chris Hohn / TCI**, and **John Mihaljevic / Manual of Ideas** extracts.
+Curated PDF writings for Marvin's mental-model layer: **Charlie Munger**, **Mohnish Pabrai**, **Murray Stahl**, **Horizon Kinetics**, **Chris Hohn / TCI**, **John Mihaljevic / Manual of Ideas**, and specialist handbooks (e.g. **David B. Moore** on community banks).
 
 **Path:** `_system/reference/investment-wisdom/`
 
@@ -20,7 +20,8 @@ investment-wisdom/
 ├── stahl/              ← croupiers, exchanges, diversification, spinoffs
 ├── horizon-kinetics/   ← equity yield curve, quarterly commentary extracts (.txt)
 ├── tci/                ← Chris Hohn letters; operating mechanics + valuation bridge
-└── mihaljevic/         ← Manual of Ideas; idea generation, uses/misuses
+├── mihaljevic/         ← Manual of Ideas; idea generation, uses/misuses
+└── moore/              ← Community bank / thrift analysis handbook
 ```
 
 ## Stahl source vault
