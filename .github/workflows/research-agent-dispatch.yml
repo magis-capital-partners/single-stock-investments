@@ -1,0 +1,150 @@
+name: Research Agent Dispatcher
+
+on:
+  workflow_call:
+    inputs:
+      ticker:
+        type: string
+        required: false
+        default: ""
+      reason:
+        type: string
+        required: false
+        default: ""
+      force:
+        type: boolean
+        required: false
+        default: false
+    secrets:
+      CURSOR_API_KEY:
+        required: false
+      HK_PDFS_ROOT:
+        required: false
+      RESEARCH_VAULT_REPO_URL:
+        required: false
+      RESEARCH_VAULT_CLONE_TOKEN:
+        required: false
+  workflow_dispatch:
+    inputs:
+      ticker:
+        description: Optional explicit holding; blank selects the next material evidence change
+        required: false
+        type: string
+      reason:
+        description: Judgment reason for an explicit ticker
+        required: false
+        type: choice
+        options: [manual_material_change, new_documents, new_valuation_news, onboard_pending]
+        default: manual_material_change
+      force:
+        description: Explicitly bypass duplicate/cooldown suppression
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  select:
+    runs-on: ubuntu-latest
+    outputs:
+      ticker: ${{ steps.select.outputs.ticker }}
+      reason: ${{ steps.select.outputs.reason }}
+      skip: ${{ steps.select.outputs.skip }}
+      evidence_hash: ${{ steps.select.outputs.evidence_hash }}
+      manifest_json: ${{ steps.select.outputs.manifest_json }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts/ci_checkout_workspace.sh
+            _system/scripts/ci_resolve_checkout_ref.sh
+            _system/scripts/ci_sparse_checkout_paths.py
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Checkout evidence-selection workspace
+        run: bash _system/scripts/ci_checkout_workspace.sh marvin-pick main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - id: select
+        env:
+          TICKER_INPUT: ${{ inputs.ticker }}
+          REASON_INPUT: ${{ inputs.reason }}
+          FORCE_INPUT: ${{ inputs.force }}
+        run: |
+          ARGS=(--json --require-new)
+          if [ -n "$TICKER_INPUT" ]; then ARGS=("$TICKER_INPUT" --json --require-new); fi
+          if [ "$FORCE_INPUT" = "true" ]; then ARGS+=(--force); fi
+          python _system/scripts/marvin_pick_ticker.py "${ARGS[@]}" > pick.json
+          TICKER=$(python -c "import json; print(json.load(open('pick.json')).get('ticker') or '')")
+          SKIP=$(python -c "import json; print('true' if json.load(open('pick.json')).get('skip') else 'false')")
+          PICK_REASON=$(python -c "import json; print(json.load(open('pick.json')).get('reason') or '')")
+          if [ -n "$REASON_INPUT" ] && [ -n "$TICKER" ]; then PICK_REASON="$REASON_INPUT"; fi
+          echo "ticker=$TICKER" >> "$GITHUB_OUTPUT"
+          echo "reason=$PICK_REASON" >> "$GITHUB_OUTPUT"
+          echo "skip=$SKIP" >> "$GITHUB_OUTPUT"
+          if [ "$SKIP" = "true" ] || [ -z "$TICKER" ]; then
+            echo "evidence_hash=" >> "$GITHUB_OUTPUT"
+            echo "manifest_json={}" >> "$GITHUB_OUTPUT"
+            cat pick.json
+            exit 0
+          fi
+          python _system/scripts/build_research_agent_manifest.py "$TICKER" --reason "$PICK_REASON" > manifest.json
+          HASH=$(python -c "import json; print(json.load(open('manifest.json'))['evidence_hash'])")
+          MANIFEST=$(python -c "import json; print(json.dumps(json.load(open('manifest.json')), separators=(',', ':')))")
+          echo "evidence_hash=$HASH" >> "$GITHUB_OUTPUT"
+          echo "manifest_json=$MANIFEST" >> "$GITHUB_OUTPUT"
+          cat manifest.json
+
+  research:
+    needs: select
+    if: needs.select.outputs.skip != 'true' && needs.select.outputs.ticker != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    concurrency:
+      group: research-agent-${{ needs.select.outputs.ticker }}
+      cancel-in-progress: false
+    env:
+      RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+      RESEARCH_VAULT_ROOT: _external/research-vault
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts/ci_checkout_workspace.sh
+            _system/scripts/ci_resolve_checkout_ref.sh
+            _system/scripts/ci_sparse_checkout_paths.py
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Checkout constrained research workspace
+        run: bash _system/scripts/ci_checkout_workspace.sh marvin-agent main
+      - name: Persist run-local evidence manifest
+        env:
+          MANIFEST_JSON: ${{ needs.select.outputs.manifest_json }}
+          TICKER: ${{ needs.select.outputs.ticker }}
+        run: |
+          mkdir -p "$TICKER/research"
+          printf '%s\n' "$MANIFEST_JSON" > "$TICKER/research/research_agent_manifest.json"
+      - uses: ./.github/actions/marvin-agent
+        env:
+          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
+          HK_PDFS_ROOT: ${{ secrets.HK_PDFS_ROOT || '/opt/cursor/hk_pdfs' }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        with:
+          ticker: ${{ needs.select.outputs.ticker }}
+          pick_reason: ${{ needs.select.outputs.reason }}
+          evidence_hash: ${{ needs.select.outputs.evidence_hash }}
+          evidence_manifest: ${{ needs.select.outputs.ticker }}/research/research_agent_manifest.json
+          evidence_manifest_json: ${{ needs.select.outputs.manifest_json }}
+          force: ${{ inputs.force }}
+
+  caught-up:
+    needs: select
+    if: needs.select.outputs.skip == 'true' || needs.select.outputs.ticker == ''
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "No Cursor research call—no unprocessed material evidence is ready."

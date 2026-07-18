@@ -4,6 +4,10 @@
 
 This file is the **single source of truth** for Cursor Cloud Agent runs (`marvin_deep_dive.mjs`). Local Marvin uses the same pipeline via `marvin_cloud_refresh.py`.
 
+## Admission and token boundary
+
+The agent may run only through `research-agent-dispatch.yml` after the shared gate admits a new stable evidence hash. Treat the injected evidence manifest as the work boundary: synthesize source meaning, conflicts, uncertainty, and narrative implications from those artifacts. Do not spend agent time re-downloading sources, rebuilding indexes, routing Power Zones, calculating deterministic valuation outputs, generating dashboards, or rotating through an unchanged ticker. `marvin_cloud_refresh.py` performs those mechanical steps and records the completed evidence hash.
+
 ## Framework read order (before writing)
 
 1. `_system/frameworks/decision_stack.md`

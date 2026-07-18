@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0",
+  "default": {
+    "daily_repo_limit": 4,
+    "per_subject_daily_limit": 1,
+    "duplicate_evidence_block": true,
+    "cooldown_hours": 0
+  },
+  "consumers": {
+    "marvin_research": {
+      "daily_repo_limit": 1,
+      "per_subject_daily_limit": 1,
+      "duplicate_evidence_block": true,
+      "cooldown_hours": 24,
+      "allowed_reasons": [
+        "manual_material_change",
+        "new_documents",
+        "new_valuation_news",
+        "no_deep_dive",
+        "onboard_pending",
+        "batch_onboard_pending"
+      ]
+    },
+    "investment_committee": {
+      "daily_repo_limit": 40,
+      "per_subject_daily_limit": 1,
+      "duplicate_evidence_block": true,
+      "cooldown_hours": 0,
+      "baseline_calls_per_ticker": 5,
+      "maximum_calls_per_ticker": 9
+    },
+    "vicki_ir": {
+      "daily_repo_limit": 2,
+      "per_subject_daily_limit": 1,
+      "duplicate_evidence_block": true,
+      "cooldown_hours": 72,
+      "allowed_reasons": ["ir_gap", "adapter_failed", "manual_override"]
+    },
+    "ci_autofix": {
+      "daily_repo_limit": 2,
+      "per_subject_daily_limit": 1,
+      "duplicate_evidence_block": true,
+      "cooldown_hours": 168,
+      "minimum_repeat_count": 2,
+      "maximum_failed_jobs": 2
+    }
+  }
+}

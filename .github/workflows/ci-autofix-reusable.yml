@@ -45,6 +45,14 @@ jobs:
           cache: npm
           cache-dependency-path: .ci-autofix-source/_system/ci_autofix/package-lock.json
 
+      - name: Restore CI token ledger
+        uses: actions/cache@v4
+        with:
+          path: .llm-state/ci_autofix
+          key: llm-state-ci-autofix-${{ github.repository_id }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            llm-state-ci-autofix-${{ github.repository_id }}-
+
       - name: Install CI Autofix dependencies
         working-directory: .ci-autofix-source/_system/ci_autofix
         run: npm ci
@@ -57,4 +65,15 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           CI_AUTOFIX_RUN_ID: ${{ inputs.run_id }}
           CI_AUTOFIX_FORCE_AGENT: ${{ inputs.force_agent }}
+          LLM_LEDGER_PATH: .llm-state/ci_autofix/ledger.jsonl
+          LLM_GATE_SCRIPT: .ci-autofix-source/_system/scripts/llm_call_gate.py
+          LLM_POLICY_PATH: .ci-autofix-source/_system/config/llm_usage_policy.json
         run: node .ci-autofix-source/_system/ci_autofix/ci_autofix.mjs
+
+      - name: Upload CI token audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: llm-audit-ci-${{ github.run_id }}
+          path: .llm-state/ci_autofix/ledger.jsonl
+          if-no-files-found: ignore

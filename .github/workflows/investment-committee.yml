@@ -59,14 +59,33 @@ jobs:
       - uses: actions/checkout@v4
         with:
           sparse-checkout: |
+            .github/actions/llm-gate
+            _system/config/llm_usage_policy.json
+            _system/scripts/llm_call_gate.py
             _system/scripts/committee_task_runner.mjs
+            _system/scripts/package.json
+            _system/scripts/package-lock.json
             ${{ matrix.prompt_path }}
+      - name: Admit committee judgment call
+        id: llm_gate
+        uses: ./.github/actions/llm-gate
+        with:
+          consumer: investment_committee
+          subject: ${{ matrix.task_key }}
+          reason: ${{ matrix.task_id }}
+          evidence_hash: ${{ matrix.evidence_hash }}
       - uses: actions/setup-node@v4
+        if: steps.llm_gate.outputs.approved == 'true'
         with:
           node-version: "22"
+          cache: npm
+          cache-dependency-path: _system/scripts/package-lock.json
       - working-directory: _system/scripts
-        run: npm install --no-save @cursor/sdk
+        if: steps.llm_gate.outputs.approved == 'true'
+        run: npm ci --ignore-scripts
       - name: Run isolated committee task
+        id: agent
+        if: steps.llm_gate.outputs.approved == 'true'
         env:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
           GITHUB_REPOSITORY: ${{ github.repository }}
@@ -77,6 +96,22 @@ jobs:
           PROMPT_PATH: ${{ matrix.prompt_path }}
           OUTPUT_PATH: ${{ matrix.output_path }}
         run: node _system/scripts/committee_task_runner.mjs
+      - name: Record committee call outcome
+        if: always() && steps.llm_gate.outputs.approved == 'true'
+        env:
+          STATUS: ${{ steps.agent.outcome == 'success' && 'completed' || 'failed' }}
+        run: |
+          python _system/scripts/llm_call_gate.py record \
+            --consumer investment_committee --subject "${{ matrix.task_key }}" \
+            --reason "${{ matrix.task_id }}" --evidence-hash "${{ matrix.evidence_hash }}" \
+            --ledger "${{ steps.llm_gate.outputs.ledger }}" --status "$STATUS"
+      - name: Upload committee call audit
+        if: always() && steps.llm_gate.outputs.approved == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: llm-audit-committee-${{ matrix.task_key }}-${{ github.run_id }}
+          path: ${{ steps.llm_gate.outputs.ledger }}
+          if-no-files-found: ignore
 
   assemble:
     if: inputs.mode == 'assemble'

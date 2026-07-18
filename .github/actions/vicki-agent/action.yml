@@ -5,11 +5,35 @@ inputs:
   ticker:
     description: Ticker symbol
     required: true
+  reason:
+    description: Why deterministic IR handling failed
+    required: true
+  evidence_hash:
+    description: Stable hash of the IR gap and adapter state
+    required: true
+  adapter_path:
+    description: Reusable adapter file the agent must create or repair
+    required: true
+  force:
+    required: false
+    default: "false"
 
 runs:
   using: composite
   steps:
+    - name: Admit browser judgment call
+      id: llm_gate
+      uses: ./.github/actions/llm-gate
+      with:
+        consumer: vicki_ir
+        subject: ${{ inputs.ticker }}
+        reason: ${{ inputs.reason }}
+        evidence_hash: ${{ inputs.evidence_hash }}
+        state_file: ${{ inputs.adapter_path }}
+        force: ${{ inputs.force }}
+
     - name: Check Cursor API key
+      if: steps.llm_gate.outputs.approved == 'true'
       shell: bash
       env:
         CURSOR_API_KEY: ${{ env.CURSOR_API_KEY }}
@@ -20,24 +44,56 @@ runs:
         fi
 
     - name: Set up Node.js
+      if: steps.llm_gate.outputs.approved == 'true'
       uses: actions/setup-node@v4
       with:
         node-version: "22"
+        cache: npm
+        cache-dependency-path: _system/scripts/package-lock.json
 
     - name: Install Cursor SDK
+      if: steps.llm_gate.outputs.approved == 'true'
       shell: bash
       working-directory: _system/scripts
-      run: npm install --no-save @cursor/sdk
+      run: npm ci --ignore-scripts
 
     - name: Run Vicki IR harvest
+      id: agent
+      if: steps.llm_gate.outputs.approved == 'true'
       shell: bash
       env:
         CURSOR_API_KEY: ${{ env.CURSOR_API_KEY }}
         TICKER: ${{ inputs.ticker }}
-        PICK_REASON: ir_gap
+        PICK_REASON: ${{ inputs.reason }}
+        IR_EVIDENCE_HASH: ${{ inputs.evidence_hash }}
+        IR_ADAPTER_PATH: ${{ inputs.adapter_path }}
         GITHUB_REPOSITORY: ${{ env.GITHUB_REPOSITORY }}
       run: node _system/scripts/vicki_ir_harvest.mjs
 
+    - name: Record browser call outcome
+      if: always() && steps.llm_gate.outputs.approved == 'true'
+      shell: bash
+      env:
+        STATUS: ${{ steps.agent.outcome == 'success' && 'completed' || 'failed' }}
+      run: |
+        python _system/scripts/llm_call_gate.py record \
+          --consumer vicki_ir --subject "${{ inputs.ticker }}" \
+          --reason "${{ inputs.reason }}" --evidence-hash "${{ inputs.evidence_hash }}" \
+          --ledger "${{ steps.llm_gate.outputs.ledger }}" --status "$STATUS"
+
+    - name: Upload browser call audit
+      if: always() && steps.llm_gate.outputs.approved == 'true'
+      uses: actions/upload-artifact@v4
+      with:
+        name: llm-audit-vicki-${{ inputs.ticker }}-${{ github.run_id }}
+        path: ${{ steps.llm_gate.outputs.ledger }}
+        if-no-files-found: ignore
+
     - name: Summary
       shell: bash
-      run: echo "Vicki IR harvest PR started for ${{ inputs.ticker }}."
+      run: |
+        if [ "${{ steps.llm_gate.outputs.approved }}" = "true" ]; then
+          echo "Vicki IR exception PR started for ${{ inputs.ticker }}."
+        else
+          echo "No Vicki call: ${{ steps.llm_gate.outputs.gate_reason }}."
+        fi

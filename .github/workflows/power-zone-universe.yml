@@ -34,7 +34,8 @@ jobs:
           fetch-depth: 0
           sparse-checkout-cone-mode: false
           sparse-checkout: |
-            /.github/workflows/power-zone-universe.yml
+            /.github/actions/**
+            /.github/workflows/**
             /_system/**
             /dashboard/**
             /docs/**
@@ -47,6 +48,7 @@ jobs:
       - name: Validate cutover pipeline
         working-directory: _system/scripts
         run: |
+          python -m pip install --disable-pip-version-check -r requirements-governance.txt
           python -m unittest \
             test_generalized_valuation_system \
             test_investment_committee_pipeline \
@@ -55,7 +57,11 @@ jobs:
             test_decision_authority \
             test_security_decision_pipeline \
             test_human_decision \
-            test_valuation_authority_cutover
+            test_valuation_authority_cutover \
+            test_llm_call_gate \
+            test_agent_evidence_gates \
+            test_committee_task_queue \
+            test_llm_workflow_governance
 
       - name: Process canonical universe
         env:
@@ -75,9 +81,11 @@ jobs:
                          '*/research/valuation_contract.json' \
                          '*/research/valuation_workbench.json' \
                          '*/research/pricing_analysis.json' \
-                         '*/research/committee_work' \
                          '_system/reviews/pending/power_zone_universe_run_*.json' \
                          dashboard/data/power_zones.json
+          while IFS= read -r -d '' path; do
+            git add -A -- "$path"
+          done < <(find . -mindepth 3 -maxdepth 3 -type d -path './*/research/committee_work' -print0)
           if git diff --cached --quiet; then
             echo "No authority artifacts changed."
             exit 0

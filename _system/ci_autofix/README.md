@@ -1,6 +1,6 @@
 # Magis CI Autofix
 
-This package triages failed GitHub Actions runs, notifies Slack, and dispatches a Cursor Cloud Agent for failures that look code-fixable.
+This package triages failed GitHub Actions runs and notifies by default. It dispatches a Cursor Cloud Agent only for a repeated, narrow code/test/schema failure with actionable logs and a new stable signature.
 
 ## Secrets
 
@@ -77,10 +77,12 @@ Notify-only by default:
 - fork PR failures
 - no usable logs
 
-Cursor dispatch by default:
+Cursor admission requires all of the following:
 
-- test failures
-- build failures
-- type/lint failures
-- generated artifact drift
-- workflow logic bugs with actionable logs
+- test, code, or schema classification with actionable logs;
+- the same stable failure signature at least twice;
+- no more than two failed jobs;
+- no prior dispatch for the signature in the cooldown window;
+- the shared daily budget has capacity.
+
+Build, lint, generated drift, workflow, platform, authentication, permission, transient, broad, and unclassified failures are notify-only unless a human uses the audited manual force override. Every admitted attempt is written to the shared ledger and uses the pinned SDK lockfile.

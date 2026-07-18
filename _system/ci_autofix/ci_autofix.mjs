@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import process from "node:process";
 import YAML from "yaml";
@@ -12,6 +13,9 @@ const cursorApiKey = process.env.CURSOR_API_KEY;
 const slackWebhookUrl = process.env.SLACK_WEBHOOK_URL;
 const forceAgent = String(process.env.CI_AUTOFIX_FORCE_AGENT || "false").toLowerCase() === "true";
 const eventPath = process.env.GITHUB_EVENT_PATH;
+const llmLedgerPath = process.env.LLM_LEDGER_PATH || ".llm-state/ci_autofix/ledger.jsonl";
+const llmGateScript = process.env.LLM_GATE_SCRIPT || "_system/scripts/llm_call_gate.py";
+const llmPolicyPath = process.env.LLM_POLICY_PATH || "_system/config/llm_usage_policy.json";
 const config = loadConfig();
 
 if (!repo) fail("GITHUB_REPOSITORY is required.");
@@ -44,7 +48,23 @@ async function main() {
   const event = readEvent();
   const skippedWorkflow = (config.cursor?.skip_workflows || []).includes(run.name);
   const forkPr = isForkPullRequest(run, event);
-  const classification = classifyFailure({ run, failedJobs, failedLog, skippedWorkflow, forkPr });
+  let classification = classifyFailure({ run, failedJobs, failedLog, skippedWorkflow, forkPr });
+  const signature = failureSignature(run, failedJobs, failedLog);
+  classification = { ...classification, signature };
+  if (classification.action === "cursor_agent" && !forceAgent) {
+    const maxJobs = Number(config.cursor?.maximum_failed_jobs || 2);
+    if (failedJobs.length > maxJobs) {
+      classification = { ...classification, action: "notify_only", reason: `Change surface too broad: ${failedJobs.length} failed jobs exceeds ${maxJobs}.` };
+    } else {
+      const repeatCount = await repeatedFailureCount(run);
+      const minimum = Number(config.cursor?.minimum_repeat_count || 2);
+      if (repeatCount < minimum) {
+        classification = { ...classification, action: "notify_only", reason: `Failure has reproduced ${repeatCount}/${minimum} required times on this SHA.` };
+      } else if (await existingSignature(signature)) {
+        classification = { ...classification, action: "notify_only", reason: `Failure signature ${signature} already has an issue or PR.` };
+      }
+    }
+  }
   const runUrl = run.html_url || `${repoUrl}/actions/runs/${runId}`;
   const summary = makeSummary({ run, failedJobs, failedLog, classification, runUrl });
 
@@ -73,6 +93,12 @@ async function main() {
     return;
   }
 
+  const llmGate = reserveLlmCall(signature, classification.category, forceAgent);
+  if (!llmGate.approved) {
+    console.log(`No Cursor dispatch: shared LLM gate ${llmGate.gate_reason}`);
+    return;
+  }
+
   if (!cursorApiKey) {
     const text = `${summary}\n\nCursor was not dispatched because CURSOR_API_KEY is not configured.`;
     await createIssue({
@@ -87,10 +113,18 @@ async function main() {
       runUrl,
       category: "configuration",
     });
+    recordLlmCall(signature, classification.category, "failed");
     return;
   }
 
-  const agentResult = await dispatchCursor({ run, failedJobs, failedLog, classification, runUrl });
+  let agentResult;
+  try {
+    agentResult = await dispatchCursor({ run, failedJobs, failedLog, classification, runUrl });
+    recordLlmCall(signature, classification.category, "completed");
+  } catch (err) {
+    recordLlmCall(signature, classification.category, "failed");
+    throw err;
+  }
   const agentText = [
     `Cursor Cloud Agent dispatched for ${repo}.`,
     `Workflow: ${run.name}`,
@@ -239,6 +273,21 @@ function classifyFailure({ run, failedJobs, failedLog, skippedWorkflow, forkPr }
         /temporarily unavailable/,
       ],
     },
+    {
+      category: "test_failure",
+      reason: "A deterministic test or assertion failed with actionable logs.",
+      patterns: [/assertionerror/, /tests? failed/, /failed tests?/, /expected .* received/, /pytest.*failed/],
+    },
+    {
+      category: "code_failure",
+      reason: "A compiler, type checker, parser, or linter found a localized code defect.",
+      patterns: [/syntaxerror/, /typeerror/, /type check/, /compilation failed/, /lint errors?/, /eslint/, /ruff.*failed/, /py_compile/],
+    },
+    {
+      category: "schema_failure",
+      reason: "A deterministic schema or contract validation failed.",
+      patterns: [/schema validation/, /jsonschema/, /additional properties are not allowed/, /required property/],
+    },
   ];
 
   if (skippedWorkflow) {
@@ -261,7 +310,62 @@ function classifyFailure({ run, failedJobs, failedLog, skippedWorkflow, forkPr }
     return { category: "no_logs", action: "notify_only", reason: "No failed logs were available for agent context." };
   }
 
-  return { category: "agent_fixable", action: "cursor_agent", reason: "Failure has logs and does not match a notify-only guardrail." };
+  return {
+    category: "unclassified",
+    action: config.classify?.default_action || "notify_only",
+    reason: "Failure does not match the narrow test/code/schema allowlist.",
+  };
+}
+
+function failureSignature(run, failedJobs, failedLog) {
+  const normalizedLog = String(failedLog || "")
+    .split("\n")
+    .filter((line) => /error|failed|exception|traceback|assert/i.test(line))
+    .slice(0, 80)
+    .join("\n")
+    .replace(/\b\d{4}-\d{2}-\d{2}[T ][\d:.+-]+Z?\b/g, "<time>")
+    .replace(/\b[0-9a-f]{7,64}\b/gi, "<sha>");
+  const value = JSON.stringify({
+    workflow: run.workflow_id || run.name,
+    sha: run.head_sha,
+    jobs: failedJobs.map((job) => job.name).sort(),
+    log: normalizedLog,
+  });
+  return createHash("sha256").update(value).digest("hex").slice(0, 24);
+}
+
+async function repeatedFailureCount(run) {
+  if (!run.workflow_id || !run.head_sha) return 1;
+  const data = await github(`/repos/${owner}/${name}/actions/workflows/${run.workflow_id}/runs?head_sha=${encodeURIComponent(run.head_sha)}&status=completed&per_page=20`);
+  const separateRuns = (data.workflow_runs || []).filter((row) => ["failure", "timed_out"].includes(row.conclusion)).length;
+  return Math.max(separateRuns, Number(run.run_attempt || 1));
+}
+
+async function existingSignature(signature) {
+  const query = encodeURIComponent(`repo:${repo} \"CI-Autofix-Agent-Signature: ${signature}\"`);
+  const data = await github(`/search/issues?q=${query}&per_page=1`);
+  return Number(data.total_count || 0) > 0;
+}
+
+function reserveLlmCall(signature, reason, force) {
+  const args = [
+    llmGateScript, "evaluate",
+    "--consumer", "ci_autofix", "--subject", signature,
+    "--reason", reason, "--evidence-hash", signature,
+    "--ledger", llmLedgerPath, "--policy", llmPolicyPath, "--reserve",
+  ];
+  if (force) args.push("--force");
+  const output = execFileSync("python", args, { encoding: "utf8" });
+  return JSON.parse(output);
+}
+
+function recordLlmCall(signature, reason, status) {
+  execFileSync("python", [
+    llmGateScript, "record",
+    "--consumer", "ci_autofix", "--subject", signature,
+    "--reason", reason, "--evidence-hash", signature,
+    "--ledger", llmLedgerPath, "--policy", llmPolicyPath, "--status", status,
+  ], { stdio: "inherit" });
 }
 
 function makeSummary({ run, failedJobs, failedLog, classification, runUrl }) {
@@ -430,6 +534,7 @@ Branch: ${run.head_branch || "unknown"}
 SHA: ${run.head_sha || "unknown"}
 Classification: ${classification.category}
 Classifier reason: ${classification.reason}
+CI-Autofix-Signature: ${classification.signature}
 ${repoNotes}
 Failed jobs:
 ${failedJobText || "No failed job details available."}
@@ -438,6 +543,9 @@ Failed log excerpt:
 \`\`\`text
 ${truncate(failedLog, config.cursor?.max_log_chars || 45000)}
 \`\`\`
+
+Include this exact marker in the pull request body:
+CI-Autofix-Agent-Signature: ${classification.signature}
 `;
 }
 

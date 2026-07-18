@@ -61,6 +61,9 @@ jobs:
   onboard:
     runs-on: ubuntu-latest
     timeout-minutes: 360
+    outputs:
+      ticker: ${{ steps.vars.outputs.ticker }}
+      watchlist_only: ${{ steps.vars.outputs.watchlist_only }}
     env:
       RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
       RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
@@ -147,32 +150,18 @@ jobs:
         with:
           message: "feat: onboard ${{ steps.vars.outputs.ticker }} ($(date -u +%Y-%m-%d))"
 
-      - name: Check Cursor API key
-        if: steps.vars.outputs.watchlist_only != 'true'
-        id: cursor
-        env:
-          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
-        run: |
-          if [ -z "$CURSOR_API_KEY" ]; then
-            echo "ready=false" >> "$GITHUB_OUTPUT"
-            echo "::warning::CURSOR_API_KEY not set — skipping deep dive"
-          else
-            echo "ready=true" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Run Marvin deep dive (Cloud Agent → PR)
-        if: steps.vars.outputs.watchlist_only != 'true' && steps.cursor.outputs.ready == 'true'
-        uses: ./.github/actions/marvin-agent
-        env:
-          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
-          HK_PDFS_ROOT: ${{ secrets.HK_PDFS_ROOT || '/opt/cursor/hk_pdfs' }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-        with:
-          ticker: ${{ steps.vars.outputs.ticker }}
-          pick_reason: onboard
-
       - name: Summary
         if: success()
         run: |
           echo "Onboard finished for ${{ steps.vars.outputs.ticker }}"
-          echo "Deploy Dashboard chains via workflow_run after this workflow completes."
+          echo "Research is admitted separately only when its evidence manifest is ready and unprocessed."
+
+  research:
+    needs: onboard
+    if: needs.onboard.outputs.watchlist_only != 'true'
+    uses: ./.github/workflows/research-agent-dispatch.yml
+    with:
+      ticker: ${{ needs.onboard.outputs.ticker }}
+      reason: onboard_pending
+      force: false
+    secrets: inherit

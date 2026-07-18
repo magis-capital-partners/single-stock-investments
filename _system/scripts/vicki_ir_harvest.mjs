@@ -18,6 +18,8 @@ const apiKey = process.env.CURSOR_API_KEY?.trim();
 const repo = process.env.GITHUB_REPOSITORY?.trim();
 const startingRef = process.env.CURSOR_STARTING_REF?.trim();
 const pickReason = process.env.PICK_REASON?.trim() || "ir_gap";
+const evidenceHash = process.env.IR_EVIDENCE_HASH?.trim();
+const adapterPath = process.env.IR_ADAPTER_PATH?.trim() || `${ticker}/investor-documents/ir_adapter.json`;
 const date = new Date().toISOString().slice(0, 10);
 
 if (!apiKey) {
@@ -49,6 +51,13 @@ ${runbook}
 ---
 
 **Cloud agent reminder:** You are Vicki, not Marvin. Focus on browser IR harvest only. Open a PR with PDFs + indexes when done.
+
+This is an exception run for IR evidence hash \`${evidenceHash || "missing"}\`.
+First confirm deterministic downloaders cannot complete the job. On success,
+write \`${adapterPath}\` with the IR base URL, stable URL patterns, pagination,
+document/date selectors, redirect or anti-bot behavior, last_verified date, and
+\`deterministic_status: "working"\` plus \`evidence_hash: "${evidenceHash || ""}"\`.
+Future harvests must be able to skip Vicki.
 `;
 
 const repoUrl = `https://github.com/${repo}`;

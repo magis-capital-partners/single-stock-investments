@@ -111,7 +111,7 @@ def main() -> int:
             "",
             "## Next steps (analyses)",
             "",
-            "1. **Deep dives:** `gh workflow run marvin-deep-dive.yml -f ticker=TICKER` for each new holding, or wait for daily `marvin-refresh` (`onboard_pending` priority).",
+            "1. **Research:** the onboard and daily workflows call the shared evidence-gated dispatcher; use `gh workflow run marvin-deep-dive.yml -f ticker=TICKER` only for an eligible manual material change.",
             "2. **Economic-value contract:** choose the nearest map in `_system/templates/component_valuation_templates.json`; complete `economic_value` under `_system/templates/economic_value_schema.json`. No material asset may remain implicit or unvalued.",
             "3. **Mechanical refresh** (after dive + `valuation.json`): `python _system/scripts/marvin_cloud_refresh.py {TICKER} --date YYYY-MM-DD`",
             "4. **Canadian (ALS.TO, PSK.TO):** IR-only download via `us_ticker_config`; add SEDAR PDFs or Vicki brief if IR scrape is thin.",

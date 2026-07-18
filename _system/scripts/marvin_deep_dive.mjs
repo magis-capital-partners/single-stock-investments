@@ -22,6 +22,9 @@ const apiKey = process.env.CURSOR_API_KEY?.trim();
 const repo = process.env.GITHUB_REPOSITORY?.trim();
 const startingRef = process.env.CURSOR_STARTING_REF?.trim();
 const pickReason = process.env.PICK_REASON?.trim() || "scheduled";
+const evidenceHash = process.env.RESEARCH_EVIDENCE_HASH?.trim();
+const evidenceManifest = process.env.RESEARCH_EVIDENCE_MANIFEST?.trim();
+const evidenceManifestJson = process.env.RESEARCH_EVIDENCE_MANIFEST_JSON?.trim();
 const hkPdfsRoot = process.env.HK_PDFS_ROOT?.trim() || "/opt/cursor/hk_pdfs";
 const date = new Date().toISOString().slice(0, 10);
 
@@ -54,6 +57,17 @@ ${runbook}
 **Cloud agent reminder:** You MUST finish by running:
 \`python _system/scripts/marvin_cloud_refresh.py ${ticker} --date ${date}\`
 after narrative + valuation.json updates. Do not hand-merge valuation sections; \`refresh_deep_dive_v2.py\` owns structure.
+
+This run is authorized only for evidence packet \`${evidenceHash || "missing"}\`.
+Materialize the exact JSON below at \`${evidenceManifest || "the generated manifest"}\`, read it first, and
+restrict exploration to its changed evidence plus existing decision artifacts.
+Routine routing, arithmetic, pricing, committee assembly, and dashboard work are
+owned by deterministic scripts. Do not spend judgment time recreating them.
+
+Evidence manifest:
+\`\`\`json
+${evidenceManifestJson || "{}"}
+\`\`\`
 `;
 
 const repoUrl = `https://github.com/${repo}`;
@@ -70,7 +84,13 @@ try {
       repos: [repoSpec],
       autoCreatePR: true,
       skipReviewerRequest: true,
-      envVars: { HK_PDFS_ROOT: hkPdfsRoot },
+      envVars: {
+        HK_PDFS_ROOT: hkPdfsRoot,
+        RESEARCH_EVIDENCE_HASH: evidenceHash || "",
+        RESEARCH_EVIDENCE_MANIFEST: evidenceManifest || "",
+        RESEARCH_EVIDENCE_MANIFEST_JSON: evidenceManifestJson || "{}",
+        RESEARCH_PICK_REASON: pickReason,
+      },
     },
   });
 

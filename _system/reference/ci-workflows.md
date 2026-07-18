@@ -2,13 +2,13 @@
 
 Shared logic lives in **composite actions** (`.github/actions/`) — these do **not** appear in the GitHub Actions sidebar. Only top-level workflow files in `.github/workflows/` are listed.
 
-## Architecture (2026-07-12 consolidation)
+## Architecture (2026-07-18 token-governed consolidation)
 
 ```
 Data Pipeline (single scheduled writer lane)
   ├─ 03:00 UTC  intake-full (nightly)
   ├─ 06:00 UTC  activist
-  ├─ 12:00 UTC  downloads  ──workflow_run──► Daily Sync (Marvin pick)
+  ├─ 12:00 UTC  downloads  ──► Daily Sync ──► Research Agent Dispatcher
   ├─ 14:00 UTC  drive intake (daily; skip rebuild if 0 imports)
   └─ :30 /6h    portfolio news
         │
@@ -20,8 +20,8 @@ Manual only
   Darwin Portfolio Refresh
   Legacy wrappers: Drive / Activist / News (emergency)
 
-Agent workflows (open PRs)
-  Marvin Deep Dive, Vicki IR Harvest, Marvin Onboard
+Agent admission (open PRs only after a shared gate)
+  Research Agent Dispatcher, Investment Committee, Vicki IR Adapter, CI Autofix
 ```
 
 ## Composite actions (hidden from sidebar)
@@ -34,8 +34,9 @@ Agent workflows (open PRs)
 | `.github/actions/commit-main/` | Push to main with rebase retry |
 | `.github/actions/deploy-oauth/` | Wrangler OAuth proxy deploy |
 | `.github/actions/publish-dashboard/` | Rebuild + validate + Pages deploy |
-| `.github/actions/marvin-agent/` | Cursor SDK + deep dive |
-| `.github/actions/vicki-agent/` | Cursor SDK + IR harvest |
+| `.github/actions/llm-gate/` | Evidence hashes, cooldowns, budgets, ledger reservation |
+| `.github/actions/marvin-agent/` | Gated synthesis from a compact evidence manifest |
+| `.github/actions/vicki-agent/` | Gated reusable IR adapter repair |
 
 ## CI bootstrap checkout (all jobs)
 
@@ -62,12 +63,12 @@ Sparse ticker paths are applied with **`git sparse-checkout set --stdin`** (batc
 | Workflow | Schedule / trigger | Commits main? | Chains deploy? |
 |----------|-------------------|---------------|----------------|
 | **Data Pipeline** | multiple crons + manual job picker | Yes | Yes |
-| Daily Download & Dashboard Sync | after Data Pipeline downloads / manual | No (Marvin PR) | No |
+| Daily Download & Research Dispatch | daily / manual | No (gated research PR) | No |
 | Darwin Portfolio Refresh | **manual only** | Yes | Yes |
 | Drive / Activist / News | manual fallback only | Yes | Yes |
 | Deploy Dashboard (GitHub Pages) | narrow push, manual, workflow_run | No | N/A |
 | Deploy OAuth Proxy (Cloudflare) | push oauth-proxy, manual | No | No |
-| Marvin Onboard / Deep Dive / Vicki | manual / queue | varies | On merge |
+| Marvin Onboard / Research Dispatcher / Vicki | manual, daily, or queue | varies | On merge |
 | Research quality (PR) | PR paths | No | No |
 | CI bootstrap smoke | PR/push bootstrap paths | No | No |
 | CI Autofix | upstream **failures ≥5 min** (not Deploy Dashboard) | Maybe | No |
@@ -103,4 +104,4 @@ Mode selection: `_system/scripts/ci_dashboard_deploy_mode.sh`.
 | Drive PDFs | Data Pipeline → `drive` (auto 14:00) or Drive Intake Sync manual |
 | Darwin refresh | **Darwin Portfolio Refresh** (manual) |
 | Live site stale | Deploy Dashboard (skip rebuild) |
-| Deep dive | Marvin Deep Dive |
+| Material evidence deep dive | Research Deep Dive Dispatch → Research Agent Dispatcher |

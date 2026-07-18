@@ -77,20 +77,22 @@ See **`_system/reference/ci-workflows.md`** for the full capability matrix, shar
 
 | Workflow | Trigger | What it does |
 |----------|---------|--------------|
-| [`daily-sync.yml`](.github/workflows/daily-sync.yml) | Daily 12:00 UTC + manual | Download holdings → news → auto Marvin refresh if new docs → **chains Deploy Dashboard** |
+| [`daily-sync.yml`](.github/workflows/daily-sync.yml) | Daily 12:00 UTC + manual | Deterministic download/news, then call the evidence-gated research dispatcher |
 | [`drive-intake-sync.yml`](.github/workflows/drive-intake-sync.yml) | Hourly :20 UTC + manual | Import Drive PDFs → activist scan → rebuild → **chains Deploy Dashboard** |
 | [`activist-scan-sync.yml`](.github/workflows/activist-scan-sync.yml) | Daily 06:00 UTC + manual | SEC/publisher activist scan → rebuild → **chains Deploy Dashboard** |
 | [`portfolio-news.yml`](.github/workflows/portfolio-news.yml) | Every 6h :30 UTC + manual | Portfolio news ingest → **chains Deploy Dashboard** |
 | [`darwin-refresh.yml`](.github/workflows/darwin-refresh.yml) | Mon 12:00 UTC + push paths + manual | Full Darwin rebuild → **chains Deploy Dashboard** |
 | [`dashboard-pages.yml`](.github/workflows/dashboard-pages.yml) | Push paths + manual + workflow_run | Optional OAuth deploy → rebuild JSON → GitHub Pages |
 | [`deploy-oauth-proxy.yml`](.github/workflows/deploy-oauth-proxy.yml) | Push oauth-proxy + manual | Cloudflare Worker deploy (or local Wrangler) |
-| [`marvin-onboard.yml`](.github/workflows/marvin-onboard.yml) | Manual + repository_dispatch | Onboard ticker → optional deep dive PR → **chains Deploy Dashboard** |
-| [`marvin-deep-dive.yml`](.github/workflows/marvin-deep-dive.yml) | Manual (mode: deep-dive / auto-pick / batch) + push queue | Cursor Cloud Agent → PR(s) |
+| [`marvin-onboard.yml`](.github/workflows/marvin-onboard.yml) | Manual + repository_dispatch | Onboard and download deterministically, then request evidence-gated research |
+| [`marvin-deep-dive.yml`](.github/workflows/marvin-deep-dive.yml) | Manual compatibility UI | Route deep-dive, auto-pick, and serial batch requests through one dispatcher |
+| [`research-agent-dispatch.yml`](.github/workflows/research-agent-dispatch.yml) | Reusable + manual | The only Marvin agent entrypoint; builds manifest, gates, deduplicates, dispatches |
 | [`power-zone-universe.yml`](.github/workflows/power-zone-universe.yml) | Nightly + manual | Route registry universe → contracts → workbenches → pricing → gated IC |
-| [`investment-committee.yml`](.github/workflows/investment-committee.yml) | Manual stage advance | Run each committee method in an isolated Cloud Agent task; assemble only after validation |
-| [`vicki-ir-harvest.yml`](.github/workflows/vicki-ir-harvest.yml) | Manual + push queue file | Browser IR harvest for ir_gap tickers |
+| [`investment-committee.yml`](.github/workflows/investment-committee.yml) | Manual stage advance | Five-call committee baseline; conditionally escalate to at most nine calls |
+| [`vicki-ir-harvest.yml`](.github/workflows/vicki-ir-harvest.yml) | Manual + push queue file | Repair/create a reusable IR adapter only after deterministic failure |
 | [`research-quality.yml`](.github/workflows/research-quality.yml) | PRs touching `**/research/**` | Lint dives + verify cloud prompt sync |
-| [`ci-autofix.yml`](.github/workflows/ci-autofix.yml) | Failed workflow_run + manual | Triage CI failures → optional Cursor autofix |
+| [`llm-governance.yml`](.github/workflows/llm-governance.yml) | Agent/workflow PRs + main | Enforce token policy, evidence gates, call budgets, lockfiles, and deprecations |
+| [`ci-autofix.yml`](.github/workflows/ci-autofix.yml) | Failed workflow_run + manual | Notify by default; agent only for repeated narrow code/test/schema signatures |
 
 See [`_system/reference/ci-workflows.md`](_system/reference/ci-workflows.md) for composite actions (hidden from sidebar) and orchestration diagram.
 
@@ -131,16 +133,18 @@ Matching logic lives in [`letter_matching.py`](_system/scripts/letter_matching.p
 | Context | Model | Notes |
 |---------|--------|--------|
 | **IDE Composer** (local Marvin chat) | Your Cursor setting (e.g. Composer 2.5) | Uses your plan’s Composer allowance |
-| **GitHub Actions cloud Marvin** | `composer-2.5` in `marvin_deep_dive.mjs` | `CURSOR_API_KEY`; opens PR — not IDE tokens |
+| **Research coordinator** | `composer-2.5` in `marvin_deep_dive.mjs` | One evidence-changed ticker/day through the shared admission gate |
+| **Investment Committee** | `composer-2.5` | Five-call baseline; up to nine only on evidence or disagreement escalation |
+| **Vicki / CI Autofix** | `composer-2.5` | Exception-only, with cooldown, deduplication, and daily budgets |
 | **Python scripts** | No LLM | Power Zone router, universal contract/workbench, pricing gates, dashboard build; `marvin_valuation` is compatibility-only |
 
-Cloud prompt stays aligned with local refresh via `_system/prompts/cloud_marvin_runbook.md`; CI runs `check_cloud_marvin_sync.py` on PRs.
+All active cloud consumers use the shared policy, stable evidence hashes, append-only audit ledgers, pinned SDK lockfiles, and `npm ci`. See [`_system/frameworks/llm_token_governance.md`](_system/frameworks/llm_token_governance.md).
 
 Push to `main` after downloads or research triggers a Pages deploy automatically when dashboard-related paths change.
 
-**Onboard → research:** Dashboard **+ Add holding** triggers `marvin-onboard.yml` (scaffold + download on `main`, then Cloud Marvin PR if `CURSOR_API_KEY` is set). See `_system/frameworks/onboard_research_automation.md`.
+**Onboard → research:** Dashboard **+ Add holding** triggers deterministic scaffold/download, then the shared dispatcher. A cloud PR starts only when an evidence manifest is ready and not previously processed. See `_system/frameworks/onboard_research_automation.md`.
 
-**Daily analysis loop:** `daily-sync` (12:00 UTC) downloads holdings → `marvin-refresh` picks one holding (onboard-pending first, then no dive, then new filings/news) → Cursor PR. Skips when caught up (manual **force_rotate** optional).
+**Daily analysis loop:** `daily-sync` downloads holdings and news, then the dispatcher picks at most one eligible holding. Unchanged evidence, duplicate hashes, cooldowns, and the one-call daily budget all suppress Cursor.
 
 ### Secrets (Settings → Secrets → Actions)
 
@@ -149,7 +153,7 @@ Push to `main` after downloads or research triggers a Pages deploy automatically
 | `GOOGLE_APPLICATION_CREDENTIALS_JSON` | Drive intake + PDF store sync | Full service-account JSON for `pdf-store-uploader@single-stock-pdf-store.iam.gserviceaccount.com`; folder access is already on the Shared Drive |
 | `RESEARCH_VAULT_REPO_URL` | Letter backfill + insight rebuilds | `https://github.com/magis-capital-partners/research-vault.git` |
 | `RESEARCH_VAULT_CLONE_TOKEN` | Clone/push private vault from CI | Fine-grained PAT with **Contents read+write** on `research-vault` |
-| `CURSOR_API_KEY` | Marvin deep dive in CI (manual + **daily auto**) | [Cursor Dashboard → Integrations](https://cursor.com/dashboard/integrations) |
+| `CURSOR_API_KEY` | Gated research, committee judgment, IR adapter repair, and narrow CI autofix | [Cursor Dashboard → Integrations](https://cursor.com/dashboard/integrations) |
 | `HK_PDFS_ROOT` | Optional — full HK vault on cloud agent VM (default `/opt/cursor/hk_pdfs`) | [Cursor Dashboard → Cloud Agents → Secrets](https://cursor.com/dashboard/cloud-agents); see `_system/frameworks/hk_cross_reference.md` |
 
 ### Local publish

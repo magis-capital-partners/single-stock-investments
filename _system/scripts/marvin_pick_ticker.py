@@ -2,18 +2,18 @@
 """Pick the next ticker for Marvin's daily deep dive.
 
 Priority (registry holdings only):
-  1. Explicit ticker (CLI arg) — always runs
+  1. Explicit ticker with ready, unprocessed evidence
   2. Recently onboarded holding with no deep dive yet (`onboard_pending`)
   3. Any holding with no deep dive yet (`no_deep_dive`)
   4. Holdings with primary documents newer than the latest deep dive
   5. Holdings with refresh-eligible valuation news newer than the latest deep dive
-  6. Optional --force-rotate: oldest deep dive when nothing new (--require-new skips instead)
 """
 from __future__ import annotations
 
 import argparse
 import json
 import re
+import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -24,6 +24,7 @@ sys.path.insert(0, str(SCRIPTS))
 
 from portfolio_news_common import latest_refresh_news_activity  # noqa: E402
 from portfolio_registry import load_registry  # noqa: E402
+from build_research_agent_manifest import build_manifest  # noqa: E402
 
 SKIP = {"_system", "dashboard", ".git", ".github", ".cursor"}
 DATE_RE = re.compile(r"deep_dive_(\d{4}-\d{2}-\d{2})\.md$")
@@ -124,6 +125,26 @@ def _max_dt(current: datetime | None, candidate: datetime | None) -> datetime | 
     return max(current, candidate)
 
 
+def stable_file_activity(path: Path) -> datetime | None:
+    """Use committed activity instead of checkout mtimes, which change on every runner."""
+    try:
+        relative = path.relative_to(ROOT).as_posix()
+        raw = subprocess.check_output(
+            ["git", "log", "-1", "--format=%cI", "--", relative],
+            cwd=ROOT,
+            text=True,
+            stderr=subprocess.DEVNULL,
+        ).strip()
+        if raw:
+            return datetime.fromisoformat(raw.replace("Z", "+00:00"))
+    except (OSError, subprocess.CalledProcessError, ValueError):
+        pass
+    try:
+        return datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc)
+    except OSError:
+        return None
+
+
 def latest_document_activity(ticker: str) -> datetime | None:
     """Latest timestamp from downloads, SEC manifest, or primary document files."""
     ticker_dir = ROOT / ticker
@@ -145,10 +166,7 @@ def latest_document_activity(ticker: str) -> datetime | None:
                     fname = Path(str(local)).name
                     lp = ticker_dir / "investor-documents" / "sec-edgar" / fname
                     if lp.exists():
-                        latest = _max_dt(
-                            latest,
-                            datetime.fromtimestamp(lp.stat().st_mtime, tz=timezone.utc),
-                        )
+                        latest = _max_dt(latest, stable_file_activity(lp))
         except (json.JSONDecodeError, ValueError, OSError):
             pass
 
@@ -171,20 +189,14 @@ def latest_document_activity(ticker: str) -> datetime | None:
             if "DOWNLOAD_MANIFEST.json" in f.name:
                 continue
             try:
-                latest = _max_dt(
-                    latest,
-                    datetime.fromtimestamp(f.stat().st_mtime, tz=timezone.utc),
-                )
+                latest = _max_dt(latest, stable_file_activity(f))
             except OSError:
                 continue
 
     index = ticker_dir / "INDEX.csv"
     if index.exists():
         try:
-            latest = _max_dt(
-                latest,
-                datetime.fromtimestamp(index.stat().st_mtime, tz=timezone.utc),
-            )
+            latest = _max_dt(latest, stable_file_activity(index))
         except OSError:
             pass
 
@@ -220,36 +232,56 @@ def _activity_snapshot(ticker: str) -> dict:
     }
 
 
+def agent_state(ticker: str) -> dict:
+    path = ROOT / ticker.upper() / "research" / "agent_run_state.json"
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+
+def research_candidate(ticker: str, reason: str, *, force: bool = False) -> dict | None:
+    manifest = build_manifest(ticker, reason)
+    if not manifest["ready"] and not force:
+        return None
+    state = agent_state(ticker)
+    if state.get("evidence_hash") == manifest["evidence_hash"] and not force:
+        return None
+    snap = _activity_snapshot(ticker)
+    return {
+        "ticker": ticker,
+        "skip": False,
+        "reason": reason,
+        "evidence_hash": manifest["evidence_hash"],
+        "evidence_artifact_count": manifest["artifact_count"],
+        **{key: value for key, value in snap.items() if key != "reason"},
+    }
+
+
 def pick_ticker(
     explicit: str | None = None,
     *,
-    require_new_documents: bool = True,
-    force_rotate: bool = False,
+    force: bool = False,
 ) -> dict:
     if explicit:
         explicit = explicit.strip()
         if explicit not in list_tickers():
             raise SystemExit(f"Unknown ticker: {explicit}")
-        snap = _activity_snapshot(explicit)
+        candidate = research_candidate(explicit, "manual_material_change", force=force)
+        if candidate:
+            return candidate
         return {
-            "ticker": explicit,
-            "skip": False,
-            "reason": "manual_override",
-            **{k: v for k, v in snap.items() if k != "reason"},
+            "ticker": None,
+            "skip": True,
+            "reason": "unchanged_or_evidence_not_ready",
+            "requested_ticker": explicit,
         }
 
     pending_onboard = onboard_pending_holdings()
-    if pending_onboard:
-        _, t = pending_onboard[0]
-        snap = _activity_snapshot(t)
-        return {
-            "ticker": t,
-            "skip": False,
-            "reason": "onboard_pending",
-            "deep_dive_at": snap["deep_dive_at"],
-            "document_at": snap["document_at"],
-            "news_at": snap["news_at"],
-        }
+    for _, ticker in pending_onboard:
+        candidate = research_candidate(ticker, "onboard_pending", force=force)
+        if candidate:
+            return candidate
 
     universe = holdings_tickers()
     no_dive: list[str] = []
@@ -259,7 +291,8 @@ def pick_ticker(
         snap = _activity_snapshot(ticker)
         dive_dt = snap["deep_dive_at"]
         if dive_dt is None:
-            no_dive.append(ticker)
+            if research_candidate(ticker, "no_deep_dive", force=force):
+                no_dive.append(ticker)
             continue
         if not snap.get("trigger_at") or not snap.get("reason"):
             continue
@@ -268,48 +301,15 @@ def pick_ticker(
 
     if no_dive:
         t = sorted(no_dive)[0]
-        snap = _activity_snapshot(t)
-        return {
-            "ticker": t,
-            "skip": False,
-            "reason": "no_deep_dive",
-            "deep_dive_at": snap["deep_dive_at"],
-            "document_at": snap["document_at"],
-            "news_at": snap["news_at"],
-        }
+        return research_candidate(t, "no_deep_dive", force=force) or {"ticker": None, "skip": True, "reason": "evidence_not_ready"}
 
     if stale:
         stale.sort(key=lambda x: (-x[0].timestamp(), x[2]))
-        trigger_dt, reason, t = stale[0]
-        snap = _activity_snapshot(t)
-        return {
-            "ticker": t,
-            "skip": False,
-            "reason": reason,
-            "deep_dive_at": snap["deep_dive_at"],
-            "document_at": snap["document_at"],
-            "news_at": snap["news_at"],
-            "trigger_at": trigger_dt.isoformat(),
-        }
-
-    if force_rotate and not require_new_documents:
-        ranked: list[tuple[datetime, str]] = []
-        for ticker in universe:
-            dive_dt, _ = latest_deep_dive(ticker)
-            if dive_dt:
-                ranked.append((dive_dt, ticker))
-        if ranked:
-            ranked.sort(key=lambda x: (x[0], x[1]))
-            t = ranked[0][1]
-            snap = _activity_snapshot(t)
-            return {
-                "ticker": t,
-                "skip": False,
-                "reason": "rotate_oldest_dive",
-                "deep_dive_at": snap["deep_dive_at"],
-                "document_at": snap["document_at"],
-                "news_at": snap["news_at"],
-            }
+        for trigger_dt, reason, ticker in stale:
+            candidate = research_candidate(ticker, reason, force=force)
+            if candidate:
+                candidate["trigger_at"] = trigger_dt.isoformat()
+                return candidate
 
     return {
         "ticker": None,
@@ -326,28 +326,17 @@ def main() -> None:
     parser.add_argument("ticker", nargs="?", help="Explicit ticker override")
     parser.add_argument("--json", action="store_true", help="Emit JSON result")
     parser.add_argument(
-        "--force-rotate",
-        action="store_true",
-        help="If no new documents or news, pick oldest deep dive anyway",
-    )
-    parser.add_argument(
         "--require-new",
         action="store_true",
         default=True,
         help="Default: skip when no holdings have new activity (default: true)",
     )
-    parser.add_argument(
-        "--no-require-new",
-        action="store_false",
-        dest="require_new",
-        help="Allow rotation fallback without new activity",
-    )
+    parser.add_argument("--force", action="store_true", help="Bypass evidence-state suppression for an explicit manual rerun")
     args = parser.parse_args()
 
     result = pick_ticker(
         args.ticker,
-        require_new_documents=args.require_new and not args.force_rotate,
-        force_rotate=args.force_rotate or not args.require_new,
+        force=args.force,
     )
 
     if args.json:
