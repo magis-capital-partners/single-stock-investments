@@ -159,7 +159,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-18.
 | CRL | CRL/ | Charles River Laboratories | US | 2026-07-09 | 2026-07-18 | unknown | watch |
 | CRM | CRM/ | Salesforce | US | 2026-07-10 | 2026-07-18 | unknown | watch |
 | CRWD | CRWD/ | CrowdStrike | US | 2026-07-09 | 2026-07-18 | unknown | watch |
-| CRWV | CRWV/ | CoreWeave, Inc. | US | — | — | unknown | watch |
+| CRWV | CRWV/ | CoreWeave, Inc. | US | 2026-07-18 | 2026-07-18 | unknown | watch |
 | CSCO | CSCO/ | Cisco | US | 2026-07-09 | 2026-07-18 | unknown | watch |
 | CSGP | CSGP/ | CoStar Group | US | 2026-07-09 | 2026-07-18 | platform | watch |
 | CSU | CSU/ | Constellation Software | CA | 2026-07-09 | 2026-07-18 | compounder | core |
@@ -250,6 +250,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-18.
 | FIX | FIX/ | Comfort Systems USA | US | 2026-07-09 | 2026-07-18 | unknown | watch |
 | FLEX | FLEX/ | Flex Ltd. | US | 2026-07-10 | 2026-07-18 | unknown | watch |
 | FLUX | FLUX/ | Flux Power Holdings, Inc. | US | 2026-07-09 | 2026-07-18 | unknown | watch |
+| FLY | FLY/ | Firefly Aerospace Inc. | US | — | — | unknown | watch |
 | FMCCK | FMCCK/ | Ford Motor Credit Company LLC (Preferred) | US | 2026-07-09 | 2026-07-18 | unknown | watch |
 | FMCCL | FMCCL/ | Ford Motor Credit Company LLC (Preferred) | US | 2026-07-09 | 2026-07-18 | unknown | watch |
 | FNMAO | FNMAO/ | Federal National Mortgage Association (Preferred) | US | 2026-07-09 | 2026-07-18 | unknown | watch |
@@ -652,4 +653,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-18.
 | ZBRA | ZBRA/ | Zebra Technologies | US | 2026-07-10 | 2026-07-18 | unknown | watch |
 | ZTS | ZTS/ | Zoetis | US | 2026-07-10 | 2026-07-18 | unknown | watch |
 
-**645 holdings total.** Registry: `_system/portfolio/registry.json`
+**646 holdings total.** Registry: `_system/portfolio/registry.json`
