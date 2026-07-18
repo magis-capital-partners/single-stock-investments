@@ -111,7 +111,22 @@ def evaluate(
     if (state or {}).get("evidence_hash") == evidence_hash and not force:
         return {**base, "decision": "suppressed", "gate_reason": "evidence_already_processed"}
 
-    relevant = [row for row in ledger if row.get("consumer") == consumer]
+    # A reservation is a concurrency/budget lock, not a permanent charge when
+    # the same run later records a failed startup. Catch-up workflows may retry
+    # those calls; completed and still-running reservations remain protected.
+    failed = {
+        (row.get("run_id"), row.get("subject"), row.get("evidence_hash"))
+        for row in ledger
+        if row.get("status") == "failed"
+    }
+    effective_ledger = [
+        row for row in ledger
+        if not (
+            row.get("status") == "reserved"
+            and (row.get("run_id"), row.get("subject"), row.get("evidence_hash")) in failed
+        )
+    ]
+    relevant = [row for row in effective_ledger if row.get("consumer") == consumer]
     same = [row for row in relevant if row.get("subject") == subject]
     if config.get("duplicate_evidence_block", True) and not force:
         if any(row.get("evidence_hash") == evidence_hash and row.get("status") in TERMINAL_CALL_STATUSES for row in same):
