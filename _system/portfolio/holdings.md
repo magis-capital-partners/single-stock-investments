@@ -252,6 +252,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-18.
 | FIX | FIX/ | Comfort Systems USA | US | 2026-07-09 | 2026-07-18 | unknown | watch |
 | FLEX | FLEX/ | Flex Ltd. | US | 2026-07-10 | 2026-07-18 | unknown | watch |
 | FLUX | FLUX/ | Flux Power Holdings, Inc. | US | 2026-07-09 | 2026-07-18 | unknown | watch |
+| FLY | FLY/ | Firefly Aerospace Inc. | US | — | — | unknown | watch |
 | FMCCK | FMCCK/ | Ford Motor Credit Company LLC (Preferred) | US | 2026-07-09 | 2026-07-18 | unknown | watch |
 | FMCCL | FMCCL/ | Ford Motor Credit Company LLC (Preferred) | US | 2026-07-09 | 2026-07-18 | unknown | watch |
 | FNMAO | FNMAO/ | Federal National Mortgage Association (Preferred) | US | 2026-07-09 | 2026-07-18 | unknown | watch |
