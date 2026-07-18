@@ -40,13 +40,13 @@ No approved third-party sources are indexed for IREN as of this scan. Sell-side 
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | **$0.85/sh** normalized (FY2025 OCF path) | **-1.75%** per year total synthesis | watch |
+| Marvin floor | **$0.85/sh** normalized (FY2025 OCF path) | **2.32%** per year total synthesis | watch |
 | External (combined) | Not modeled | Not modeled | n/a |
-| **Blended best estimate** | **$0.85/sh** | **-1.75%** per year | **watch** |
+| **Blended best estimate** | **$0.85/sh** | **2.32%** per year | **watch** |
 
 **Weights:** 100% Marvin floor — no approved external sources.
 
-**Returns statement (blended):** At **~$33.62**, Marvin base total synthesis implies about **-1.75%** per year over seven years on normalized owner cash of **$0.85** per share.
+**Returns statement (blended):** At **~$33.62**, Marvin base total synthesis implies about **2.32%** per year over seven years on normalized owner cash of **$0.85** per share.
 
 ## [HUMAN REVIEW]
 
@@ -56,7 +56,7 @@ No approved third-party sources are indexed for IREN as of this scan. Sell-side 
 
 ## [PROPOSED MEMORY]
 
-- [PROPOSED COMPANY] IREN: miner-to-AI pivot; Microsoft **$9.7B** + NVIDIA **$3.4B** contracts (8-K); watch at **-1.75%** on **$0.85/sh** owner cash at **~$33.62**
+- [PROPOSED COMPANY] IREN: miner-to-AI pivot; Microsoft **$9.7B** + NVIDIA **$3.4B** contracts (8-K); watch at **2.32%** on **$0.85/sh** owner cash at **~$33.62**
 
 ## Primary sources cited
 
