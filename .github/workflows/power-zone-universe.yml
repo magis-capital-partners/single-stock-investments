@@ -104,4 +104,9 @@ jobs:
           git push origin "HEAD:${GITHUB_REF_NAME}"
 
       - name: Summary
-        run: echo "Power Zone universe processing completed for all companies."
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "Power Zone universe processing completed for all companies."
+          gh api --method POST "repos/${{ github.repository }}/dispatches" \
+            -f event_type=advance-investment-committee

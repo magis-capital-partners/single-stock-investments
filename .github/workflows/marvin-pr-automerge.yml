@@ -184,3 +184,13 @@ jobs:
           github.event.action != 'opened'
         run: |
           echo "Merged PR #${{ steps.pr.outputs.number }} (${{ steps.meta.outputs.head_ref }}) into main."
+
+      - name: Advance any committee task merged by this PR
+        if: |
+          steps.meta.outputs.is_draft == 'false' ||
+          github.event.action != 'opened'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api --method POST "repos/${{ github.repository }}/dispatches" \
+            -f event_type=advance-investment-committee

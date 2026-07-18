@@ -6,7 +6,7 @@ GitHub Actions is an event-driven production pipeline, not an operator menu. Rep
 
 1. **Data Pipeline** owns intake, activist data, downloads, Drive intake, and news on separate schedules. The jobs remain separate so a slow download cannot consume another job's time allowance.
 2. **Power Zone Universe** runs after a successful download stage, with a weekly fallback. It deterministically routes each company to its valuation method, refreshes Power Zones, and creates frozen committee packets.
-3. **Auto - Investment Committee** starts when a committee packet or task output lands on `main`. It selects one pending company, runs at most three isolated raters in parallel, and advances again when their PRs merge. Deterministic assembly replaces an extra agent call.
+3. **Auto - Investment Committee** starts from internal events when a committee packet or task output lands. It selects one pending company, runs at most three isolated raters in parallel, and advances again when their PRs merge. An hourly catch-up tick recovers missed or budget-deferred events. Deterministic assembly replaces an extra agent call.
 4. **Auto - Daily Research**, **Auto - Research Queue**, and **Vicki IR Harvest** run only from material-evidence or queue events. The shared LLM gate suppresses duplicate evidence and enforces per-consumer budgets.
 5. Dashboard, Darwin, letter, OAuth, quality, security, and CI repair workflows respond only to schedules or relevant file changes.
 
