@@ -50,9 +50,10 @@ Dashboard add holding  → repository event → Auto - Onboard Ticker
 | Research quality (PR) | research PR paths | Prompt sync and research lint |
 | CI bootstrap smoke | CI bootstrap paths | Sparse checkout and push-helper tests |
 | LLM Workflow Governance | agent/workflow paths | Budgets, timeouts, retention, deprecations |
+| Security - Weekly Code Scan | Sunday schedule | Sparse sequential Actions, Python, and JavaScript CodeQL |
 | Auto - CI Repair | selected failed workflows | Notify; agent only for repeated narrow signatures |
 
-GitHub-managed Dependency Graph, Pages build/deployment, and CodeQL can also appear in the sidebar. CodeQL default setup is intentionally limited to Actions and Python and runs weekly; JavaScript dependency auditing remains in LLM Workflow Governance.
+GitHub-managed Dependency Graph and Pages build/deployment can also appear in the sidebar. CodeQL default setup is disabled; the bounded weekly repository workflow owns code scanning.
 
 ## Capacity limits
 

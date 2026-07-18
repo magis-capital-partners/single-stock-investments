@@ -49,7 +49,7 @@ class WorkflowGovernanceTests(unittest.TestCase):
         }
         active = {path.name for path in (ROOT / ".github" / "workflows").glob("*.yml")}
         self.assertTrue(retired.isdisjoint(active))
-        self.assertLessEqual(len(active), 18)
+        self.assertLessEqual(len(active), 19)
 
     def test_only_dispatcher_invokes_marvin_action(self):
         callers = []

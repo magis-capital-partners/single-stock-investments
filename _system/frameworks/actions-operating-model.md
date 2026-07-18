@@ -18,5 +18,6 @@ GitHub Actions is an event-driven production pipeline, not an operator menu. Rep
 - Large repository jobs use sparse checkout or the bounded workspace checkout profiles. Full rebuild jobs free runner disk before materializing data.
 - Writer jobs share the `data-commit-main` concurrency lane. Research and committee agents write PRs instead of racing direct commits.
 - Governance tests fail changes that restore manual runs, omit a timeout, exceed parallelism caps, retain artifacts too long, or resurrect deprecated wrappers.
+- Code scanning uses one weekly sparse workflow with languages run sequentially; managed default setup is disabled so bot data commits do not launch overlapping multi-hour scans.
 
 The result is automatic back-pressure: new evidence creates queued work, gates admit only necessary judgment calls, and merged outputs trigger the next bounded stage without a human choosing a workflow or mode.
