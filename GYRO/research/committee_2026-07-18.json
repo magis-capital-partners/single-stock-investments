@@ -1,0 +1,1094 @@
+{
+  "schema_version": "1.0",
+  "protocol_version": "production-2.0",
+  "ticker": "GYRO",
+  "review": {
+    "level": "full_ic",
+    "trigger": "production committee pipeline",
+    "as_of": "2026-07-18",
+    "owner": null
+  },
+  "evidence_packet": {
+    "frozen_at": "2026-07-18T15:47:44.154373+00:00",
+    "hash_method": "sha256(canonical-json(sorted(path,sha256,bytes)))",
+    "packet_hash": "5a07dc63860a51a7178c059f3d7d12a863cf3f5440b7d7645e23825204367b07",
+    "freshness_status": "mixed",
+    "references": [
+      {
+        "path": "GYRO/research/deep_dive_2026-07-17.md",
+        "sha256": "1c235b3ee7d3bcc9173685d8ccb2d88f79e71c2ec0e76c54471ca863edf0a9c0",
+        "bytes": 25571,
+        "role": "frozen local evidence",
+        "status": "available"
+      },
+      {
+        "path": "GYRO/research/adversarial_2026-07-17.md",
+        "sha256": "98b385e18bbdc67974875cb7ea362bae4bdf289d8fd9ea722156dd8b1e4d4a32",
+        "bytes": 10826,
+        "role": "frozen local evidence",
+        "status": "available"
+      },
+      {
+        "path": "GYRO/research/valuation_route.json",
+        "sha256": "1c153f1a863cb18c62b680881a8006537085cd9c776a0f7a2151b54f7b996569",
+        "bytes": 5560,
+        "role": "frozen local evidence",
+        "status": "available"
+      },
+      {
+        "path": "GYRO/research/valuation_contract.json",
+        "sha256": "aafc57216d4fe066938245933f1e2d7742b001fa33c50de058b6edf6d14c1b48",
+        "bytes": 21585,
+        "role": "frozen local evidence",
+        "status": "available"
+      },
+      {
+        "path": "GYRO/research/valuation.json",
+        "sha256": "df698fe12e2013050eea1d94aba3fe30ff5829b5c99944dc55ab57a63b4538fb",
+        "bytes": 72448,
+        "role": "frozen local evidence",
+        "status": "available"
+      },
+      {
+        "path": "GYRO/research/thesis.md",
+        "sha256": "630dcf991c416893b5667ba7a2d1b25e5a8237834076afd0c868c5659828890b",
+        "bytes": 2477,
+        "role": "frozen local evidence",
+        "status": "available"
+      },
+      {
+        "path": "GYRO/research/cross_check_third_party_2026-07-17.md",
+        "sha256": "91a5158372c5f1133e264437ec273514ad29f61401559889569acc49a1143731",
+        "bytes": 1907,
+        "role": "frozen local evidence",
+        "status": "available"
+      },
+      {
+        "path": "GYRO/research/evidence/filing_facts_2026-07-17.json",
+        "sha256": "fc84ebbe04346eb139d6cf6f8878bcc1c3326c1f5bbbac32bbbcdd6fc65a9e1e",
+        "bytes": 1788,
+        "role": "frozen local evidence",
+        "status": "available"
+      }
+    ]
+  },
+  "proposer": {
+    "recommendation_hidden_in_round_one": true,
+    "thesis": "**Last updated:** 2026-07-17 **Deep dive:** `GYRO/research/deep_dive_2026-07-17.md` **Valuation:** `GYRO/research/valuation.json` **Adversarial:** pass \u00b7 `GYRO/research/adversarial_2026-07-17.md`",
+    "explanation_contracts": [],
+    "open_questions": []
+  },
+  "selected_raters": [
+    {
+      "persona": "hk",
+      "independence_group": "scarce_assets",
+      "selection_reason": "Selected before scoring from the power-zone method route (persona chose or cross-checks the valuation method).",
+      "required_inputs_status": "partial"
+    },
+    {
+      "persona": "klarman_asset_value",
+      "independence_group": "asset_realization",
+      "selection_reason": "Selected before scoring from the power-zone method route (persona chose or cross-checks the valuation method).",
+      "required_inputs_status": "partial"
+    },
+    {
+      "persona": "marks_credit_cycle",
+      "independence_group": "credit_cycle",
+      "selection_reason": "Selected before scoring from the power-zone method route (persona chose or cross-checks the valuation method).",
+      "required_inputs_status": "partial"
+    }
+  ],
+  "round_one": {
+    "evidence_hash": "5a07dc63860a51a7178c059f3d7d12a863cf3f5440b7d7645e23825204367b07",
+    "peer_outputs_visible": false,
+    "votes": [
+      {
+        "persona": "hk",
+        "independence_group": "scarce_assets",
+        "evidence_status": "sufficient",
+        "scores": {
+          "explanatory_strength": {
+            "value": 3,
+            "rationale": "The dated liquidation-NAV discount is a specific mechanism with a signed B2K contract and audited component map, but this is a wind-down not a recurring scarce-asset engine, and the illiquidity-versus-mispricing story is not yet hard to vary against a moving management floor."
+          },
+          "evidence_sufficiency": {
+            "value": 3,
+            "rationale": "Primary filings reconcile the liquidation-basis NAV bridge and overlap controls, yet Article 78 and B2K site-plan milestones remain unresolved, the B2K option carries no explicit success probability, and no like-for-like comparable transactions corroborate the real-estate NRV mark."
+          },
+          "downside_control": {
+            "value": 3,
+            "rationale": "The modeled bear case still annualizes near 13.5% to a ~$9 payoff, but the disclosed floor already fell about 15% in 2025, management may need dilutive capital through 2028, and micro-cap liquidity can trap holders even when NAV is directionally right."
+          },
+          "return_vs_alternatives": {
+            "value": 4,
+            "rationale": "If management's $11.79 liquidation estimate and 2028 timing hold, the base ~33% annualized return and even the stressed bear path clear a 12% hurdle from $5.80, though realization depends on legal milestones already embedded optimistically in NRV."
+          }
+        },
+        "vote": "watch",
+        "expected_return_range_pct": [
+          13.5,
+          33.4
+        ],
+        "horizon_years": 2.5,
+        "claims": [
+          {
+            "claim": "Liquidation-basis net assets ($11.79 per share) is the correct economic claim when components are counted once, B2K upside stays embedded in real_estate_nrv, and debt plus estimated liquidation costs are netted before equity.",
+            "evidence_paths": [
+              "GYRO/research/valuation.json",
+              "GYRO/research/valuation_contract.json",
+              "GYRO/research/deep_dive_2026-07-17.md"
+            ]
+          },
+          {
+            "claim": "At $5.80, the dated-payoff math is attractive only if the B2K path already priced at $28.74M gross and the 2028 dissolution target survive Article 78 and further timeline extensions.",
+            "evidence_paths": [
+              "GYRO/research/valuation.json",
+              "GYRO/research/adversarial_2026-07-17.md"
+            ]
+          },
+          {
+            "claim": "Scarce-land framing overstates the case: GYRO is a finite real-estate liquidation, not a durable royalty or inventory asset with repeated monetization cycles.",
+            "evidence_paths": [
+              "GYRO/research/valuation_route.json",
+              "GYRO/research/deep_dive_2026-07-17.md"
+            ]
+          }
+        ],
+        "strongest_counter_explanation": "The roughly 51% discount may be fair compensation for a re-estimatable management NAV, pending Article 78 litigation, a B2K contract already marked at its high end, twice-extended liquidation timing, possible dilutive financing, and daily volume too thin to arbitrage the gap.",
+        "most_important_missing_fact": "Outcome of the Article 78 appeal and current Town of Smithtown site-plan status for the B2K parcel, both still pending as of the frozen 10-Q filed 2026-05-13.",
+        "falsifiers": [
+          "Adverse Article 78 ruling or Smithtown denial forces real-estate NRV below the $22 per share low case.",
+          "B2K closes at the $24.0M low end or fails, pulling disclosed net assets toward the ~$9 per share bear payoff.",
+          "Further liquidation-cost re-estimation or a dilutive capital raise before distributions.",
+          "Independent comparable land sales on Long Island/Westchester re-mark the Flowerfield or Cortlandt parcels below management NRV."
+        ],
+        "specialist_findings": "HK review: overlap discipline is sound (B2K embedded, no double count). Scarce-asset admission test fails on durability and recurring monetization; treat as dated liquidation NAV. Unit economics rest on management marks with the B2K high contract price already in base NRV; corroborating comparable transactions are absent. Watch pending legal and entitlement milestones before treating the discount as cash-equivalent value.",
+        "confidence": "medium"
+      },
+      {
+        "persona": "klarman_asset_value",
+        "independence_group": "asset_realization",
+        "evidence_status": "sufficient",
+        "scores": {
+          "explanatory_strength": {
+            "value": 4,
+            "rationale": "The mechanism is specific and testable: a thinly traded liquidation vehicle trades at roughly half its own audited net-asset estimate because entitlement litigation and micro-cap illiquidity delay price convergence to disclosed cash value. Component overlap is controlled and the B2K option is embedded once in real-estate NRV."
+          },
+          "evidence_sufficiency": {
+            "value": 3,
+            "rationale": "Primary filings establish the economic claim, liquidation-basis NAV bridge, signed B2K contract range, debt stack, and cost accrual. Two decision-critical catalyst statuses remain open as of the frozen packet: Article 78 appeal outcome and Smithtown site-plan approval on the B2K parcel."
+          },
+          "downside_control": {
+            "value": 3,
+            "rationale": "Bear and component-low paths are quantified and the B2K contract sets a $24.0M gross floor on the largest parcel, but the disclosed NAV itself is a management mark that fell about 15% in FY2025, additional capital may be needed through 2028, and daily volume is too thin to treat exit as frictionless."
+          },
+          "return_vs_alternatives": {
+            "value": 4,
+            "rationale": "At $5.80 the stressed bear path still annualizes near 13.5% to roughly $9.00 per share, while the filing-based base of $11.79 implies about 33% per year if the 2028 dissolution target holds. Both sit above a zero-return alternative, and the base clears the 15% hurdle once the realization path is accepted."
+          }
+        },
+        "vote": "watch",
+        "expected_return_range_pct": [
+          13.5,
+          33.4
+        ],
+        "horizon_years": 3,
+        "claims": [
+          {
+            "claim": "Audited liquidation-basis net assets ($11.79 per share as of 2026-03-31) reconcile to a complete per-share component schedule with B2K entitlement embedded in real-estate NRV rather than double-counted.",
+            "evidence_paths": [
+              "GYRO/research/valuation.json",
+              "GYRO/research/valuation_contract.json",
+              "GYRO/research/deep_dive_2026-07-17.md"
+            ]
+          },
+          {
+            "claim": "A dated realization path exists through the B2K purchase agreement ($24.0M to $28.74M on ~49 acres), planned property sales, debt retirement, and target dissolution by 2028-12-31, but the base NRV already assumes the $28.74M high-end B2K price before site-plan approval.",
+            "evidence_paths": [
+              "GYRO/research/valuation.json",
+              "GYRO/research/deep_dive_2026-07-17.md"
+            ]
+          },
+          {
+            "claim": "At $5.80, even the stressed bear payoff (~$9.00 per share over 3.46 years) stays positive, yet that conservative path sits just below the 15% Klarman hurdle and depends on litigation and entitlement milestones that remain unresolved in the frozen packet.",
+            "evidence_paths": [
+              "GYRO/research/valuation.json",
+              "GYRO/research/adversarial_2026-07-17.md"
+            ]
+          }
+        ],
+        "strongest_counter_explanation": "The discount may be rational because management's liquidation NAV already capitalizes an optimistic B2K outcome, has been revised down materially once, and still depends on unresolved Article 78 litigation and entitlement approvals that have already forced two timeline extensions.",
+        "most_important_missing_fact": "Whether Article 78 has been decided and whether Smithtown granted final site-plan approval on the B2K parcel, because the base real-estate NRV already uses the $28.74M high-end B2K assumption.",
+        "falsifiers": [
+          "An adverse Article 78 ruling or Smithtown denial forces a subdivision redesign and re-mark real-estate NRV below the $22.00 per share low case.",
+          "The B2K deal closes at the $24.0M low end or fails entirely, pulling Flowerfield NRV below the current filing estimate.",
+          "A dilutive capital raise or another cost re-estimation through 2028 cuts per-share recovery below the component-low $6.30 schedule."
+        ],
+        "specialist_findings": "Independent Klarman review: this is a genuine catalyst-backed liquidation discount with audited component proof and a signed contract on the largest parcel, but approval should wait until the two open legal/regulatory catalysts confirm the high-end B2K mark already embedded in NAV.",
+        "confidence": "medium"
+      },
+      {
+        "persona": "marks_credit_cycle",
+        "independence_group": "credit_cycle",
+        "evidence_status": "insufficient_evidence",
+        "scores": {
+          "explanatory_strength": {
+            "value": 4,
+            "rationale": "The liquidation NAV bridge cleanly separates real-estate NRV, cash, loans payable, and the cost accrual, and the dated payoff scenarios name the Article 78 and B2K financing checkpoints."
+          },
+          "evidence_sufficiency": {
+            "value": 2,
+            "rationale": "Audited liquidation-basis statements anchor the claim, but the three disclosed debt facilities still do not fully reconcile to the $10.79M balance-sheet total and the October 2026 Rialto maturity is not stress-tested with explicit refinance or dilution math."
+          },
+          "downside_control": {
+            "value": 3,
+            "rationale": "The modeled bear case still annualizes above 13% per year, yet FY2025 already cut disclosed NAV about 15%, the component low case leaves only about 9% upside to price, and management's possible additional capital through 2028 is not quantified in the stress path."
+          },
+          "return_vs_alternatives": {
+            "value": 3,
+            "rationale": "Base annualized return clears a credit hurdle if the 2028 liquidation schedule holds, but refinancing risk, a 15% mortgage facility, and an unresolved litigation overhang keep the realized range closer to the low-case 3% annualized path than the headline base case."
+          }
+        },
+        "vote": "watch",
+        "expected_return_range_pct": [
+          2.8,
+          33.4
+        ],
+        "horizon_years": 3,
+        "claims": [
+          {
+            "claim": "Loans payable of about $10.8M are senior to equity distributions and the October 2026 Rialto mortgage maturity is a near-term refinancing checkpoint while a separate facility was recently refinanced at 15%.",
+            "evidence_paths": [
+              "GYRO/research/valuation.json",
+              "GYRO/research/deep_dive_2026-07-17.md",
+              "GYRO/research/adversarial_2026-07-17.md"
+            ]
+          },
+          {
+            "claim": "Management's disclosed liquidation NAV already embeds debt and cost accruals, but FY2025 showed a material downward re-estimation and management states additional capital may be needed through 2028, so equity recovery can shrink even if collateral value is real.",
+            "evidence_paths": [
+              "GYRO/research/valuation.json",
+              "GYRO/research/valuation_contract.json",
+              "GYRO/research/deep_dive_2026-07-17.md"
+            ]
+          },
+          {
+            "claim": "Component overlap controls appear clean and the embedded B2K option is not double-counted, but the credit cross-check cannot sign off until the debt waterfall and maturity schedule reconcile to the audited liability lines.",
+            "evidence_paths": [
+              "GYRO/research/valuation_contract.json",
+              "GYRO/research/adversarial_2026-07-17.md"
+            ]
+          }
+        ],
+        "strongest_counter_explanation": "The headline $11.79 liquidation NAV assumes optimistic B2K pricing and an on-schedule 2028 finish; an adverse Article 78 ruling, failed October 2026 refinance, or dilutive capital raise could compress equity recovery toward the $6.30 component low case while fixed claims stay senior.",
+        "most_important_missing_fact": "Line-item reconciliation of the three disclosed loan facilities to the $10,790,194 balance-sheet total, including rates, covenants, and the expected outcome of the October 2026 Rialto mortgage maturity.",
+        "falsifiers": [
+          "Reconcile each loan facility to the audited loans-payable total with maturity schedule and covenant headroom.",
+          "Model a dilutive capital raise through 2028 and its per-share impact on the liquidation payoff.",
+          "Stress a failed or punitive refinance at the October 2026 maturity against cash, rental receipts, and remaining asset-sale timing."
+        ],
+        "specialist_findings": "Credit cross-check: leverage and fixed claims are material but subordinate to real-estate NRV; survivability looks plausible if refinances extend on acceptable terms, yet the vote stays on watch until debt reconciliation and the October 2026 checkpoint are closed.",
+        "confidence": "medium"
+      }
+    ]
+  },
+  "pre_mortem": {
+    "status": "complete",
+    "failure_story": "The committee treated management's quarterly liquidation-basis net asset estimate ($11.79 per share as of 2026-03-31) as near-contracted shareholder cash on a 2.46-year path to December 31, 2028. The Article 78 appeal on the Flowerfield subdivision was lost, forcing a redesign that voided or delayed the signed B2K land-sale contract. Smithtown site-plan approval never arrived on the assumed schedule. Entitlement, legal, and administrative burn continued while rental receipts fell short of forecasts. Management raised dilutive capital through the existing shelf registration to fund operations past the 2028 target, and the liquidation timeline slipped again. Net assets in liquidation were re-estimated downward for a second consecutive cycle (after the prior year's drop from $13.91 to $11.76 per share). Realized distributions fell well below the base-case payoff, the market discount never closed on roughly 2,000 to 6,000 shares traded daily, and capital was trapped in an illiquid micro-cap with a negative total return despite the disclosed NAV story.",
+    "earliest_warning_signals": [
+      "Article 78 appeal (Incorporated Village of Head of the Harbor v. Town of Smithtown) remained pending as of the 10-Q filed 2026-05-13, and the company stated Flowerfield would not be sold until it was resolved.",
+      "Net assets in liquidation per share had already fallen about 15% in one year, from $13.91 (12/31/2024) to $11.76 (12/31/2025), as the target completion date was extended and cost estimates rose.",
+      "The company had extended its liquidation target twice already (originally end of 2026, then 2028), signaling schedule risk before any new capital was committed.",
+      "B2K site-plan approval was still outstanding at packet freeze; management expected Q3 2026 approval but the base NAV already embedded the $28.74 million high-end B2K price.",
+      "Management disclosed in the 10-K FY2025 MD&A that additional capital may be needed through 2028, a direct dilution risk to per-share payoff.",
+      "The 2021 mortgage loan with Rialto Capital matured October 10, 2026 with only an extension option, and the refinanced 2023 LLYR facility carried a 15% rate as of January 2026.",
+      "Daily trading volume was often only a few thousand shares, so building or exiting a position near the quoted price was structurally difficult.",
+      "The three named debt facilities did not fully reconcile to the $10,790,194 loans-payable total in the available filing extract, leaving leverage and maturity exposure under-tested."
+    ],
+    "forensic_checks": [
+      "Track the Article 78 docket and any subsequent zoning or subdivision filings for an adverse ruling or forced redesign of the Flowerfield eight-lot plan.",
+      "Obtain Smithtown Planning Department records on the B2K 49-acre site-plan submission and compare approval timing to the B2K agreement's subdivision and closing contingencies.",
+      "Reconcile the original bank line, 2021 Rialto mortgage, and 2023 LLYR mortgage footnotes to the $10,790,194 balance-sheet total and stress refinancing at or before the October 2026 maturity.",
+      "Monitor each quarterly liquidation-basis re-estimation in 10-Q and 10-K filings for downward revisions to real-estate net realizable value, remaining cost accruals, or target dissolution dates.",
+      "Verify whether the B2K contract terminated, closed at the $24.0 million low end, or survived entitlement changes; quantify per-share impact versus the $28.74 million already in base NRV.",
+      "Scan 8-K and prospectus filings (424B5 shelf registration on file) for dilutive equity raises, rights offerings, or loan amendments that shrink net assets in liquidation per share.",
+      "Confirm no interim distributions were assumed in the base payoff and that cash burn matched the $16,709,887 estimated remaining liquidation and operating costs net of receipts.",
+      "Review Star Equity Fund LP standstill expiration (December 31, 2026, or 2027 under stated conditions) for renewed activism that accelerates a below-NRV sale.",
+      "Compare Cortlandt Manor subdivision progress against the 2027 approval assumption and test whether the 2014 appraised-value price floor still binds if timelines slip further."
+    ],
+    "short_source_coverage": "partial",
+    "unresolved_items": [
+      "Article 78 appeal outcome was unknown at packet freeze; an adverse ruling is the single largest swing factor between base NAV and a materially lower realized payoff.",
+      "B2K site-plan status with the Town of Smithtown was unconfirmed at commit date despite the base case already booking the high-end contract value.",
+      "Debt facility line items did not fully reconcile to the consolidated loans-payable total, leaving maturity, rate, and covenant exposure partially untested.",
+      "No approved or pending third-party research was indexed; the thesis rested entirely on primary filings with no external blend or independent NAV cross-check.",
+      "No public short-seller report was located, but the adversarial scan noted that a name this small and thinly traded could still carry undisclosed short interest without a published bear case.",
+      "Human sign-off on stance and litigation status was still open; mechanical tools proposed accumulate while Marvin recommended hold pending appeal and site-plan resolution.",
+      "Whether management would execute a dilutive capital raise before asset sales completed remained a disclosed possibility, not a modeled probability in the base payoff path."
+    ]
+  },
+  "evidence_tribunal": {
+    "status": "blocked",
+    "resolved_facts": [],
+    "disputed_facts": [
+      "insufficient_or_outside_power_zone"
+    ],
+    "unresolved_material_facts": [
+      "The expected outcome of the October 2026 Rialto mortgage maturity, including current loan-to-value and debt-service coverage against the documented extension thresholds and any post-freeze extension, refinance, or default record."
+    ],
+    "evidence_paths": [
+      "GYRO/research/deep_dive_2026-07-17.md",
+      "GYRO/research/adversarial_2026-07-17.md",
+      "GYRO/research/valuation_route.json",
+      "GYRO/research/valuation_contract.json",
+      "GYRO/research/valuation.json",
+      "GYRO/research/thesis.md",
+      "GYRO/research/cross_check_third_party_2026-07-17.md",
+      "GYRO/research/evidence/filing_facts_2026-07-17.json"
+    ],
+    "method": "deterministic_vote_and_packet_reconciliation"
+  },
+  "research_loop": {
+    "loop_count": 1,
+    "questions": [
+      "Line-item reconciliation of the disclosed loan facilities to the $10,790,194 balance-sheet total, including rates, covenants, and maturity schedule.",
+      "What is the expected outcome of the October 2026 Rialto mortgage maturity, including extension-option conditions and covenant headroom?",
+      "What is the per-share impact of a dilutive capital raise through 2028 on the liquidation payoff?",
+      "What happens to equity recovery if the October 2026 refinance fails or reprices punitively, given cash, rental receipts, and remaining asset-sale timing?"
+    ],
+    "responses": [
+      {
+        "question": "Line-item reconciliation of the disclosed loan facilities to the $10,790,194 balance-sheet total, including rates, covenants, and maturity schedule.",
+        "answer": "The frozen packet confirms audited loans payable of $10,790,194 as of 2026-03-31 and names three facility groups with rates: an original bank line at 3.85%, a 2021 Rialto mortgage at 3.75% with initial maturity 2026-10-10 and a five-year extension option, and a 2023 LLYR mortgage refinanced to 15% effective 2026-01-01. Deep dive and adversarial review both state that the facility balances available in the text extract do not fully reconcile to the balance-sheet total, so a complete line-item schedule with covenant headroom on every facility remains open.",
+        "evidence_paths": [
+          "GYRO/research/deep_dive_2026-07-17.md",
+          "GYRO/research/adversarial_2026-07-17.md",
+          "GYRO/research/valuation.json",
+          "GYRO/research/valuation_contract.json"
+        ],
+        "status": "partially_answered"
+      },
+      {
+        "question": "What is the expected outcome of the October 2026 Rialto mortgage maturity, including extension-option conditions and covenant headroom?",
+        "answer": "Terms are documented but the outcome is not resolved. Valuation.json and the deep dive record the 2021 Rialto mortgage initial maturity on 2026-10-10, a five-year extension option, and lender discretion to decline extension if loan-to-value exceeds 70% or debt-service coverage falls below 1.3x. The frozen packet contains no post-freeze record of extension, refinance, or default, so the expected October 2026 checkpoint outcome remains unknown.",
+        "evidence_paths": [
+          "GYRO/research/valuation.json",
+          "GYRO/research/deep_dive_2026-07-17.md",
+          "GYRO/research/committee_work/2026-07-18/pre_mortem.json"
+        ],
+        "status": "unresolved"
+      },
+      {
+        "question": "What is the per-share impact of a dilutive capital raise through 2028 on the liquidation payoff?",
+        "answer": "Management discloses that additional capital may be needed through 2028 and the deep dive flags dilutive financing as a financing risk, but the frozen valuation path does not quantify per-share dilution. Bear scenario stress cuts payoff to about $9.00 per share via entitlement and timeline slippage without modeling new share issuance; the component low schedule is $6.30 per share on operating drivers, not an explicit capital-raise bridge at the 2,199,308 share count.",
+        "evidence_paths": [
+          "GYRO/research/deep_dive_2026-07-17.md",
+          "GYRO/research/valuation.json",
+          "GYRO/research/committee_work/2026-07-18/pre_mortem.json"
+        ],
+        "status": "unresolved"
+      },
+      {
+        "question": "What happens to equity recovery if the October 2026 refinance fails or reprices punitively, given cash, rental receipts, and remaining asset-sale timing?",
+        "answer": "The packet shows cash of $3,950,227 against $10,790,194 loans payable as of 2026-03-31 and notes that rental receipts do not fully offset holding and entitlement burn, so a failed near-term refinance would add liquidity pressure ahead of asset sales. Valuation.json flags failure to extend or refinance on similar terms as a catalyst risk and the bear path still implies about $9.00 per share, but no explicit stress model isolates a punitive October 2026 refinance against cash, receipts, and sale timing.",
+        "evidence_paths": [
+          "GYRO/research/deep_dive_2026-07-17.md",
+          "GYRO/research/valuation.json",
+          "GYRO/research/adversarial_2026-07-17.md"
+        ],
+        "status": "partially_answered"
+      }
+    ],
+    "evidence_hash_after": "5a07dc63860a51a7178c059f3d7d12a863cf3f5440b7d7645e23825204367b07"
+  },
+  "round_two": {
+    "evidence_hash": "5a07dc63860a51a7178c059f3d7d12a863cf3f5440b7d7645e23825204367b07",
+    "peer_outputs_visible": false,
+    "votes": [
+      {
+        "persona": "hk",
+        "independence_group": "scarce_assets",
+        "evidence_status": "sufficient",
+        "scores": {
+          "explanatory_strength": {
+            "value": 3,
+            "rationale": "The dated liquidation-NAV discount remains a specific mechanism with a signed B2K contract and audited component map, but this is a finite wind-down not a durable scarce-asset engine, and the illiquidity-versus-mispricing story is still not hard to vary against a moving management floor."
+          },
+          "evidence_sufficiency": {
+            "value": 2,
+            "rationale": "Audited liquidation-basis NAV and overlap controls are present, but the targeted research response confirms loan-facility reconciliation remains incomplete, the October 2026 Rialto outcome is unknown, dilution is undisclosed in per-share terms, and no like-for-like comparable transactions corroborate the real-estate NRV mark."
+          },
+          "downside_control": {
+            "value": 2,
+            "rationale": "The bear scenario still annualizes near 13.5% on entitlement slippage alone, but cash of $3.95M against $10.79M loans, an unresolved October 2026 refinance checkpoint, and unmodeled dilutive capital needs leave a financing tail that can compress payoff below the stated bear case."
+          },
+          "return_vs_alternatives": {
+            "value": 3,
+            "rationale": "Base payoff math near 33% per year is attractive if management's $11.79 estimate and 2028 timing hold, but return is now more explicitly sensitive to unresolved legal milestones and financing assumptions the research loop could not close."
+          }
+        },
+        "vote": "watch",
+        "expected_return_range_pct": [
+          13.5,
+          33.4
+        ],
+        "horizon_years": 2.5,
+        "claims": [
+          {
+            "claim": "Liquidation-basis net assets ($11.79 per share) remains the correct economic claim when components are counted once, B2K upside stays embedded in real_estate_nrv, and debt plus estimated liquidation costs are netted before equity.",
+            "evidence_paths": [
+              "GYRO/research/valuation.json",
+              "GYRO/research/valuation_contract.json",
+              "GYRO/research/deep_dive_2026-07-17.md"
+            ]
+          },
+          {
+            "claim": "The one-loop research response improved classification on debt terms but did not resolve the October 2026 Rialto maturity, per-share dilution impact, or a punitive-refinance stress path.",
+            "evidence_paths": [
+              "GYRO/research/committee_work/2026-07-18/research_response.json",
+              "GYRO/research/adversarial_2026-07-17.md"
+            ]
+          },
+          {
+            "claim": "Scarce-land framing still overstates the case: GYRO is a finite real-estate liquidation, not a recurring royalty or inventory asset with repeated monetization cycles.",
+            "evidence_paths": [
+              "GYRO/research/valuation_route.json",
+              "GYRO/research/deep_dive_2026-07-17.md"
+            ]
+          }
+        ],
+        "strongest_counter_explanation": "The roughly 51% discount may be fair compensation for a re-estimatable management NAV, pending Article 78 litigation, a B2K contract already marked at its high end, twice-extended liquidation timing, possible dilutive financing with no per-share bridge modeled, and daily volume too thin to arbitrage the gap.",
+        "most_important_missing_fact": "Outcome of the Article 78 appeal and current Town of Smithtown site-plan status for the B2K parcel, both still pending as of the frozen 10-Q filed 2026-05-13.",
+        "falsifiers": [
+          "Adverse Article 78 ruling or Smithtown denial forces real-estate NRV below the $22 per share low case.",
+          "B2K closes at the $24.0M low end or fails, pulling disclosed net assets toward the ~$9 per share bear payoff.",
+          "Failed October 2026 Rialto extension or dilutive capital raise before distributions shrinks per-share payoff below the modeled bear case.",
+          "Independent comparable land sales on Long Island/Westchester re-mark the Flowerfield or Cortlandt parcels below management NRV."
+        ],
+        "specialist_findings": "After the one-loop research response, overlap discipline remains sound and the dated liquidation NAV path is still the right economic frame, but financing and capital-requirement gaps confirmed rather than closed; B2K option still lacks explicit success probability; vote remains watch pending legal and entitlement milestones.",
+        "confidence": "medium"
+      },
+      {
+        "persona": "klarman_asset_value",
+        "independence_group": "asset_realization",
+        "evidence_status": "sufficient",
+        "scores": {
+          "explanatory_strength": {
+            "value": 4,
+            "rationale": "The liquidation-discount mechanism remains specific and testable: audited liquidation-basis net assets reconcile to a complete per-share component schedule, the B2K entitlement is embedded once in real-estate NRV, and overlap controls are clean. The targeted research response did not weaken the causal story; it confirmed the mark-and-path framework while leaving catalyst timing open."
+          },
+          "evidence_sufficiency": {
+            "value": 2,
+            "rationale": "Core audited NAV and component proof are present, but the research loop explicitly left four financing and realization gaps open: loan facilities still do not reconcile to the $10.79M balance-sheet total, the October 2026 Rialto maturity outcome is unknown, per-share dilution from a capital raise through 2028 is unquantified, and Article 78 plus Smithtown B2K site-plan status remain unresolved at packet freeze."
+          },
+          "downside_control": {
+            "value": 2,
+            "rationale": "The stressed bear path (~$9.00 per share, ~13.5% annualized) excludes punitive October 2026 refinancing and explicit share dilution even though cash is only $3.95M against $10.79M debt and management discloses possible additional capital needs. Component-low $6.30 per share offers thin margin above price, and the disclosed NAV itself fell about 15% in FY2025."
+          },
+          "return_vs_alternatives": {
+            "value": 3,
+            "rationale": "Base filing NAV implies ~33% per year if the 2028 dissolution target holds, but that path already books the $28.74M B2K high end before approvals. The conservative bear annualizes just below the 15% hurdle, and unmodeled financing stress could compress recovery further, so return versus alternatives is attractive only if catalyst and credit checkpoints clear."
+          }
+        },
+        "vote": "watch",
+        "expected_return_range_pct": [
+          13.5,
+          33.4
+        ],
+        "horizon_years": 3,
+        "claims": [
+          {
+            "claim": "Audited liquidation-basis net assets ($11.79 per share as of 2026-03-31) still reconcile to a complete per-share component schedule with B2K entitlement embedded in real-estate NRV rather than double-counted.",
+            "evidence_paths": [
+              "GYRO/research/valuation.json",
+              "GYRO/research/valuation_contract.json",
+              "GYRO/research/deep_dive_2026-07-17.md"
+            ]
+          },
+          {
+            "claim": "The targeted research response confirmed that debt maturity, covenant headroom, and dilutive-capital math remain decision-critical open items: facility line items do not fully reconcile to loans payable, the October 2026 Rialto checkpoint is unresolved, and no per-share dilution bridge exists despite management's disclosure that additional capital may be needed through 2028.",
+            "evidence_paths": [
+              "GYRO/research/committee_work/2026-07-18/research_response.json",
+              "GYRO/research/deep_dive_2026-07-17.md",
+              "GYRO/research/adversarial_2026-07-17.md"
+            ]
+          },
+          {
+            "claim": "At $5.80 the upside case still depends on unresolved entitlement catalysts already embedded in base NRV, while the bear payoff (~$9.00 over 3.46 years) sits just below the 15% Klarman hurdle and does not isolate a failed near-term refinance against thin cash and rental burn.",
+            "evidence_paths": [
+              "GYRO/research/valuation.json",
+              "GYRO/research/committee_work/2026-07-18/research_response.json",
+              "GYRO/research/committee_work/2026-07-18/pre_mortem.json"
+            ]
+          }
+        ],
+        "strongest_counter_explanation": "The discount may be rational because management's liquidation NAV already capitalizes an optimistic B2K high-end outcome contingent on unresolved Article 78 litigation and Smithtown site-plan approval, while the October 2026 Rialto maturity, incomplete debt reconciliation, and possible dilutive capital raise could force liquidity-driven concessions before the asset marks convert to cash.",
+        "most_important_missing_fact": "Whether Article 78 has been decided and whether Smithtown granted final site-plan approval on the B2K parcel, because the base real-estate NRV already uses the $28.74M high-end B2K assumption and the research loop did not close these catalyst statuses.",
+        "falsifiers": [
+          "An adverse Article 78 ruling or Smithtown denial forces a subdivision redesign and re-mark real-estate NRV below the $22.00 per share low case.",
+          "The October 2026 Rialto refinance fails or reprices punitively, forcing asset sales or dilutive equity before the B2K closing clock starts.",
+          "A dilutive capital raise or another cost re-estimation through 2028 cuts per-share recovery below the component-low $6.30 schedule."
+        ],
+        "specialist_findings": "Round-two Klarman review: component overlap and audited NAV proof remain intact, but the targeted research response closed none of the two legal/regulatory catalysts and confirmed financing blind spots (debt reconciliation, October 2026 maturity, unquantified dilution). Approval should wait until entitlement milestones confirm the high-end B2K mark and debt maturity headroom is line-item verified.",
+        "confidence": "low"
+      },
+      {
+        "persona": "marks_credit_cycle",
+        "independence_group": "credit_cycle",
+        "evidence_status": "insufficient_evidence",
+        "scores": {
+          "explanatory_strength": {
+            "value": 4,
+            "rationale": "The liquidation NAV bridge still cleanly separates real-estate NRV, cash, senior loans payable, and the cost accrual, and the targeted response names the three facility groups, the October 2026 Rialto maturity, and the January 2026 LLYR repricing to 15%."
+          },
+          "evidence_sufficiency": {
+            "value": 2,
+            "rationale": "The research loop confirms audited loans payable of $10.79M and documents extension covenants, but facility balances still do not fully reconcile to the balance-sheet total and the October 2026 checkpoint outcome, dilution math, and an explicit punitive-refinance stress remain unresolved."
+          },
+          "downside_control": {
+            "value": 3,
+            "rationale": "Cash of $3.95M against $10.79M debt plus the 15% LLYR precedent show real refinancing risk, yet the operational bear path still annualizes above 13% and the component low schedule at $6.30 per share bounds some equity impairment without modeling failed October 2026 refinance or dilution."
+          },
+          "return_vs_alternatives": {
+            "value": 3,
+            "rationale": "Base annualized return clears a 12% credit hurdle only if the 2028 liquidation schedule and acceptable refinances hold, but the component low path annualizes near 3% and unresolved maturity risk keeps realized outcomes closer to that stressed equity stub than to the headline base case."
+          }
+        },
+        "vote": "watch",
+        "expected_return_range_pct": [
+          2.8,
+          33.4
+        ],
+        "horizon_years": 3,
+        "claims": [
+          {
+            "claim": "Senior loans payable of about $10.8M remain a binding claim ahead of equity distributions; the October 2026 Rialto maturity is a near-term checkpoint with a five-year extension option conditioned on loan-to-value below 70% and debt-service coverage above 1.3x, and the January 2026 LLYR refinance at 15% shows punitive repricing is already in play.",
+            "evidence_paths": [
+              "GYRO/research/valuation.json",
+              "GYRO/research/deep_dive_2026-07-17.md",
+              "GYRO/research/committee_work/2026-07-18/research_response.json"
+            ]
+          },
+          {
+            "claim": "The targeted research response partially answered liquidity pressure ($3.95M cash versus $10.79M debt and holding-cost burn) but did not close line-item facility reconciliation or quantify per-share dilution from management's stated possible capital need through 2028.",
+            "evidence_paths": [
+              "GYRO/research/committee_work/2026-07-18/research_response.json",
+              "GYRO/research/adversarial_2026-07-17.md",
+              "GYRO/research/deep_dive_2026-07-17.md"
+            ]
+          },
+          {
+            "claim": "Valuation-proof overlap controls for loans payable and the embedded B2K option remain clean, but the credit cross-check cannot approve until debt waterfall, maturity outcomes, and a punitive-refinance stress tie to audited liability lines.",
+            "evidence_paths": [
+              "GYRO/research/valuation_contract.json",
+              "GYRO/research/valuation.json",
+              "GYRO/research/committee_work/2026-07-18/research_response.json"
+            ]
+          }
+        ],
+        "strongest_counter_explanation": "Even with real collateral, a failed or punitive October 2026 Rialto refinance on top of the existing 15% LLYR facility could force asset sales or dilutive capital before the B2K closing, compressing equity recovery toward the $6.30 component low case while fixed claims stay senior.",
+        "most_important_missing_fact": "The expected outcome of the October 2026 Rialto mortgage maturity, including current loan-to-value and debt-service coverage against the documented extension thresholds and any post-freeze extension, refinance, or default record.",
+        "falsifiers": [
+          "Reconcile each loan facility balance to the audited $10,790,194 total with maturity schedule, rates, and covenant headroom on every line.",
+          "Model a failed or punitive October 2026 refinance against cash, rental receipts, and remaining asset-sale timing with per-share equity recovery.",
+          "Quantify a dilutive capital raise through 2028 and its per-share impact on the liquidation payoff at the 2,199,308 share count."
+        ],
+        "specialist_findings": "After the one-loop targeted research response, facility terms and liquidity pressure are better documented but the decisive credit gaps from round one remain open; survivability looks plausible if refinances extend on acceptable terms, so the vote stays watch with insufficient_evidence until the October 2026 checkpoint and debt waterfall reconcile.",
+        "confidence": "medium"
+      }
+    ]
+  },
+  "valuation_reconciliation": {
+    "status": "complete",
+    "disagreements": [
+      {
+        "type": "score",
+        "dimension": "explanatory_strength",
+        "range": [
+          3,
+          4
+        ]
+      },
+      {
+        "type": "score",
+        "dimension": "downside_control",
+        "range": [
+          2,
+          3
+        ]
+      }
+    ],
+    "selected_primary_method": "scarce_asset_optionality",
+    "rejected_averages": [
+      "No incompatible valuation methods were averaged to manufacture consensus."
+    ],
+    "method": "deterministic_classification"
+  },
+  "adversarial_review": {
+    "status": "complete_with_residual_risks",
+    "tests": [
+      "Track the Article 78 docket and any subsequent zoning or subdivision filings for an adverse ruling or forced redesign of the Flowerfield eight-lot plan.",
+      "Obtain Smithtown Planning Department records on the B2K 49-acre site-plan submission and compare approval timing to the B2K agreement's subdivision and closing contingencies.",
+      "Reconcile the original bank line, 2021 Rialto mortgage, and 2023 LLYR mortgage footnotes to the $10,790,194 balance-sheet total and stress refinancing at or before the October 2026 maturity.",
+      "Monitor each quarterly liquidation-basis re-estimation in 10-Q and 10-K filings for downward revisions to real-estate net realizable value, remaining cost accruals, or target dissolution dates.",
+      "Verify whether the B2K contract terminated, closed at the $24.0 million low end, or survived entitlement changes; quantify per-share impact versus the $28.74 million already in base NRV.",
+      "Scan 8-K and prospectus filings (424B5 shelf registration on file) for dilutive equity raises, rights offerings, or loan amendments that shrink net assets in liquidation per share.",
+      "Confirm no interim distributions were assumed in the base payoff and that cash burn matched the $16,709,887 estimated remaining liquidation and operating costs net of receipts.",
+      "Review Star Equity Fund LP standstill expiration (December 31, 2026, or 2027 under stated conditions) for renewed activism that accelerates a below-NRV sale.",
+      "Compare Cortlandt Manor subdivision progress against the 2027 approval assumption and test whether the 2014 appraised-value price floor still binds if timelines slip further."
+    ],
+    "residual_risks": [
+      "Article 78 appeal outcome was unknown at packet freeze; an adverse ruling is the single largest swing factor between base NAV and a materially lower realized payoff.",
+      "B2K site-plan status with the Town of Smithtown was unconfirmed at commit date despite the base case already booking the high-end contract value.",
+      "Debt facility line items did not fully reconcile to the consolidated loans-payable total, leaving maturity, rate, and covenant exposure partially untested.",
+      "No approved or pending third-party research was indexed; the thesis rested entirely on primary filings with no external blend or independent NAV cross-check.",
+      "No public short-seller report was located, but the adversarial scan noted that a name this small and thinly traded could still carry undisclosed short interest without a published bear case.",
+      "Human sign-off on stance and litigation status was still open; mechanical tools proposed accumulate while Marvin recommended hold pending appeal and site-plan resolution.",
+      "Whether management would execute a dilutive capital raise before asset sales completed remained a disclosed possibility, not a modeled probability in the base payoff path."
+    ],
+    "strongest_failure_path": "The committee treated management's quarterly liquidation-basis net asset estimate ($11.79 per share as of 2026-03-31) as near-contracted shareholder cash on a 2.46-year path to December 31, 2028. The Article 78 appeal on the Flowerfield subdivision was lost, forcing a redesign that voided or delayed the signed B2K land-sale contract. Smithtown site-plan approval never arrived on the assumed schedule. Entitlement, legal, and administrative burn continued while rental receipts fell short of forecasts. Management raised dilutive capital through the existing shelf registration to fund operations past the 2028 target, and the liquidation timeline slipped again. Net assets in liquidation were re-estimated downward for a second consecutive cycle (after the prior year's drop from $13.91 to $11.76 per share). Realized distributions fell well below the base-case payoff, the market discount never closed on roughly 2,000 to 6,000 shares traded daily, and capital was trapped in an illiquid micro-cap with a negative total return despite the disclosed NAV story.",
+    "source": "independent_pre_mortem"
+  },
+  "chair_synthesis": {
+    "status": "complete",
+    "primary_method": "component liquidation-basis NAV with dated payoff curve",
+    "weighting_rationale": "GYRO reports on ASC 205-30 liquidation-basis accounting, so the economic claim is audited net assets in liquidation per share, not recurring owner earnings. The routed primary method (component_owner_cash_and_unit_nav) maps real-estate NRV, cash, senior debt, and the net liquidation-cost accrual once, with the B2K entitlement embedded in real_estate_nrv rather than double-counted. That dated-payoff path dominates because it matches the legal wind-down structure and ties directly to quarterly filing estimates. Comparable-transaction and replacement-cost corroborators stay silent in practice: no indexed like-for-like Long Island or Westchester land sales were available at packet freeze. Marks credit-cycle review is a senior-claim survivability test, not an alternate equity value; it bounds financing tail risk but does not replace the liquidation NAV bridge. The chair does not average the headline 33% base return, the 13.5% entitlement-slippage bear, and the ~3% component-low credit stub into a blended consensus.",
+    "agreed_facts": [
+      "As of 2026-03-31, audited liquidation-basis net assets were $11.79 per share on 2,199,308 shares outstanding, versus a market price near $5.80 (roughly 51% discount).",
+      "Real estate is carried at management estimated net realizable value on liquidation-basis accounting; the disclosed NAV is already a fair-value floor, not a GAAP historical-cost understatement.",
+      "The signed B2K purchase agreement (2025-07-30) prices the ~49-acre Flowerfield parcel at $24.0M to $28.74M gross; the base real-estate NRV already uses the $28.74M high end before Smithtown site-plan approval.",
+      "Net assets in liquidation per share fell from $13.91 (12/31/2024) to $11.76 (12/31/2025), about 15%, before ticking to $11.79 in Q1 2026; management has extended the target dissolution date twice and now targets 2028-12-31.",
+      "Cash was $3,950,227 against loans payable of $10,790,194 as of 2026-03-31; three disclosed facility groups (bank line, 2021 Rialto mortgage, 2023 LLYR mortgage) are named but do not fully reconcile to the balance-sheet total in the frozen extract.",
+      "The Article 78 appeal on the Flowerfield eight-lot subdivision and B2K site-plan approval with the Town of Smithtown remained pending as of the 10-Q filed 2026-05-13.",
+      "All three independent raters voted watch in round two; no rater recommended add, buy, hold-for-sizing, or pass."
+    ],
+    "disputed_facts": [
+      "Whether the ~51% market discount is mispricing or fair compensation for re-estimatable management NAV, micro-cap illiquidity (~2,000-6,000 shares/day), and unresolved entitlement litigation.",
+      "Whether the October 2026 Rialto mortgage maturity extends, refinances acceptably, or forces punitive repricing or asset sales ahead of the B2K closing clock (credit cross-check flagged insufficient_evidence).",
+      "Per-share impact of a dilutive capital raise through 2028: management discloses possible additional capital needs, but the frozen valuation path does not quantify issuance at the current share count.",
+      "Whether the B2K high-end mark and 2028 timeline survive Article 78 and Smithtown approval without another NAV downward re-estimation.",
+      "Whether scarce-land or catalyst-asset framing adds explanatory power beyond a finite liquidation schedule (HK dissent: this is a wind-down, not a durable recurring monetization asset)."
+    ],
+    "strongest_dissent": "Marks credit-cycle cross-check: even with real collateral, a failed or punitive October 2026 Rialto refinance on top of the existing 15% LLYR facility could force asset sales or dilutive capital before the B2K closing, compressing equity recovery toward the $6.30 component-low case while fixed claims stay senior. The targeted research loop improved facility-term documentation but did not close line-item debt reconciliation or model punitive-refinance math.",
+    "dissent_ledger": [
+      {
+        "persona": "marks_credit_cycle",
+        "issue": "Debt waterfall and October 2026 Rialto maturity outcome unresolved",
+        "impact": "high",
+        "status": "unresolved",
+        "vote": "watch",
+        "evidence_status": "insufficient_evidence"
+      },
+      {
+        "persona": "hk",
+        "issue": "Scarce-asset durability test fails; discount may be rational for a finite wind-down",
+        "impact": "medium",
+        "status": "preserved",
+        "vote": "watch",
+        "evidence_status": "sufficient"
+      },
+      {
+        "persona": "klarman_asset_value",
+        "issue": "Base NRV already books B2K high end before entitlement milestones confirm",
+        "impact": "high",
+        "status": "preserved",
+        "vote": "watch",
+        "evidence_status": "sufficient"
+      }
+    ],
+    "value_range_per_share": {
+      "low": 6.3,
+      "base": 11.79,
+      "high": 13.5,
+      "low_source": "component valuation schedule (operating and entitlement drivers)",
+      "base_source": "audited liquidation-basis NAV per 10-Q 2026-03-31",
+      "high_source": "bull scenario payoff if full entitlement success holds 2028 timeline"
+    },
+    "scenario_payoff_per_share": {
+      "bear": 9.0,
+      "base": 11.79,
+      "bull": 13.5
+    },
+    "expected_return_range_pct": {
+      "low": 2.8,
+      "base": 33.4,
+      "high": 33.4,
+      "note": "Low bound reflects component-low annualized path (~3%) and credit-stress framing; base reflects filing NAV realized on schedule. Range is not averaged across methods."
+    },
+    "entry_range_per_share": {
+      "reference_price": 5.8,
+      "actionable_low": 5.0,
+      "actionable_high": 6.5,
+      "condition": "No new capital commitment until Article 78 outcome and B2K site-plan status are confirmed; current price already offers theoretical upside to base NAV but carries unresolved legal and financing checkpoints."
+    },
+    "recommendation": "watch",
+    "recommendation_rationale": "Unanimous watch across three independent groups. The primary liquidation-NAV method shows attractive base math (~33% annualized to $11.79 over ~2.5 years) and even the entitlement-slippage bear (~13.5% to ~$9.00) stays positive, but decision-grade entry is blocked by open Article 78 litigation, unconfirmed B2K site-plan approval with the high-end price already in base NRV, incomplete debt-facility reconciliation, and unquantified dilution or October 2026 refinance stress. This is a monitoring stance, not a sizing or capital decision.",
+    "monitoring_plan": {
+      "operational_milestones": [
+        "Article 78 appeal docket outcome and any forced Flowerfield subdivision redesign",
+        "Town of Smithtown B2K 49-acre site-plan approval or denial versus contract contingencies",
+        "Line-item reconciliation of bank line, Rialto mortgage, and LLYR mortgage to the $10,790,194 loans-payable total with covenant headroom",
+        "October 2026 Rialto mortgage maturity: extension, refinance, or default",
+        "Quarterly liquidation-basis NAV re-estimation in 10-Q and 10-K filings",
+        "B2K contract status: termination, low-end $24.0M close, or high-end $28.74M close",
+        "Scan shelf registration and 8-K filings for dilutive equity raises or loan amendments",
+        "Cortlandt Manor subdivision progress against the 2027 approval assumption",
+        "Star Equity Fund LP standstill expiration (2026-12-31 or 2027 under stated conditions)"
+      ],
+      "evidence_refresh_dates": [
+        "2026-08-15",
+        "2026-10-15",
+        "2026-11-15"
+      ],
+      "valuation_refresh_triggers": [
+        "Article 78 ruling or Smithtown site-plan decision",
+        "October 2026 Rialto maturity outcome",
+        "Quarterly liquidation-basis NAV revision exceeding $0.50 per share",
+        "B2K contract amendment, termination, or closing",
+        "Dilutive capital raise or material loan amendment",
+        "20% price move without corresponding filing update"
+      ],
+      "price_review_thresholds": [
+        {
+          "below": 5.0,
+          "action": "Re-underwrite downside if catalysts deteriorate; do not add on price alone"
+        },
+        {
+          "above": 7.5,
+          "action": "Require confirmed entitlement milestones before treating discount as closed"
+        },
+        {
+          "crosses_base_nav": 11.79,
+          "action": "Thesis largely realized; reassess remaining liquidation timeline and distribution path"
+        }
+      ],
+      "thesis_break_conditions": [
+        "Adverse Article 78 ruling or Smithtown denial forces real-estate NRV below the $22.00 per share component low case",
+        "B2K deal fails or closes at $24.0M low end with further timeline extension",
+        "Failed or punitive October 2026 refinance plus dilutive capital raise cuts per-share recovery below the $6.30 component-low schedule",
+        "Another consecutive downward NAV re-estimation cycle without asset-sale proceeds",
+        "Liquidation target slips beyond 2028 with rising cost accruals"
+      ],
+      "expected_catalyst_dates": [
+        "2026-10-10",
+        "2026-12-31",
+        "2027-12-31",
+        "2028-12-31"
+      ],
+      "outcome_horizons_months": [
+        6,
+        12,
+        24
+      ]
+    }
+  },
+  "synthesis": {
+    "strongest_dissent": "The roughly 51% discount may be fair compensation for a re-estimatable management NAV, pending Article 78 litigation, a B2K contract already marked at its high end, twice-extended liquidation timing, possible dilutive financing with no per-share bridge modeled, and daily volume too thin to arbitrage the gap.",
+    "unresolved_items": [
+      "Outcome of the Article 78 appeal and current Town of Smithtown site-plan status for the B2K parcel, both still pending as of the frozen 10-Q filed 2026-05-13.",
+      "The expected outcome of the October 2026 Rialto mortgage maturity, including current loan-to-value and debt-service coverage against the documented extension thresholds and any post-freeze extension, refinance, or default record.",
+      "Whether Article 78 has been decided and whether Smithtown granted final site-plan approval on the B2K parcel, because the base real-estate NRV already uses the $28.74M high-end B2K assumption and the research loop did not close these catalyst statuses."
+    ],
+    "vote_split": {
+      "watch": 3
+    },
+    "score_medians": {
+      "explanatory_strength": 4,
+      "evidence_sufficiency": 2,
+      "downside_control": 2,
+      "return_vs_alternatives": 3
+    },
+    "score_ranges": {
+      "explanatory_strength": [
+        3,
+        4
+      ],
+      "evidence_sufficiency": [
+        2,
+        2
+      ],
+      "downside_control": [
+        2,
+        3
+      ],
+      "return_vs_alternatives": [
+        3,
+        3
+      ]
+    },
+    "dissent_ledger": [
+      {
+        "issue": "Outcome of the Article 78 appeal and current Town of Smithtown site-plan status for the B2K parcel, both still pending as of the frozen 10-Q filed 2026-05-13.",
+        "impact": "high",
+        "status": "unresolved",
+        "owner_response": null
+      },
+      {
+        "issue": "The expected outcome of the October 2026 Rialto mortgage maturity, including current loan-to-value and debt-service coverage against the documented extension thresholds and any post-freeze extension, refinance, or default record.",
+        "impact": "high",
+        "status": "unresolved",
+        "owner_response": null
+      },
+      {
+        "issue": "Whether Article 78 has been decided and whether Smithtown granted final site-plan approval on the B2K parcel, because the base real-estate NRV already uses the $28.74M high-end B2K assumption and the research loop did not close these catalyst statuses.",
+        "impact": "high",
+        "status": "unresolved",
+        "owner_response": null
+      }
+    ]
+  },
+  "component_review": {
+    "status": "ready_for_committee_review",
+    "decision_rule": "Each assigned rater records accept, challenge, or reject with a proposed range and evidence. The aggregator may not silently average disputed ranges.",
+    "items": [
+      {
+        "component_id": "real_estate_nrv",
+        "label": "Real estate held for sale at estimated NRV",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 22.0,
+          "base": 24.55,
+          "high": 27.0
+        },
+        "range_width_pct_of_base": 20.4,
+        "evidence_tier": "audited",
+        "recommended_raters": [
+          "greenblatt",
+          "marks_credit_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "cash_and_other_assets",
+        "label": "Cash and other assets",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 1.5,
+          "base": 1.87,
+          "high": 2.2
+        },
+        "range_width_pct_of_base": 37.4,
+        "evidence_tier": "audited",
+        "recommended_raters": [
+          "greenblatt",
+          "marks_credit_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "loans_payable",
+        "label": "Loans payable",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": -5.2,
+          "base": -4.91,
+          "high": -4.5
+        },
+        "range_width_pct_of_base": 14.3,
+        "evidence_tier": "audited",
+        "recommended_raters": [
+          "marks_credit_cycle",
+          "pabrai"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "estimated_liquidation_costs",
+        "label": "Estimated liquidation and operating costs (net)",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": -9.5,
+          "base": -7.6,
+          "high": -6.0
+        },
+        "range_width_pct_of_base": 46.1,
+        "evidence_tier": "audited",
+        "recommended_raters": [
+          "marks_credit_cycle",
+          "pabrai"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "other_liabilities",
+        "label": "Other liabilities",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": -2.5,
+          "base": -2.12,
+          "high": -1.8
+        },
+        "range_width_pct_of_base": 33.0,
+        "evidence_tier": "audited",
+        "recommended_raters": [
+          "marks_credit_cycle",
+          "pabrai"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "b2k_entitlement_option",
+        "label": "B2K Flowerfield entitlement option (embedded in NRV)",
+        "treatment": "embedded",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 0.0,
+          "high": 2.0
+        },
+        "range_width_pct_of_base": 20000.0,
+        "evidence_tier": "filing",
+        "recommended_raters": [
+          "klarman_asset_value",
+          "hk"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      }
+    ]
+  },
+  "gates": {
+    "price": "pass",
+    "shares": "pass",
+    "reporting_period": "pass",
+    "filing_reconciliation": "pass",
+    "economic_claim": "pass",
+    "component_completeness": "pass",
+    "comparable_evidence": "pass",
+    "option_risking": "pass",
+    "disclosure_scan": "partial",
+    "short_scan": "partial",
+    "pre_mortem": "pass",
+    "evidence_tribunal": "blocked",
+    "valuation_reconciliation": "pass",
+    "adversarial_review": "pass",
+    "chair_synthesis": "pass",
+    "explanation_contracts": "pass",
+    "independent_groups": "pass",
+    "owner": "not_run"
+  },
+  "human_decision": {
+    "status": "pending",
+    "decision": null,
+    "sizing": null,
+    "top_dissent_response": null,
+    "decided_at": null
+  },
+  "monitoring_plan": {
+    "operational_milestones": [
+      "Article 78 appeal docket outcome and any forced Flowerfield subdivision redesign",
+      "Town of Smithtown B2K 49-acre site-plan approval or denial versus contract contingencies",
+      "Line-item reconciliation of bank line, Rialto mortgage, and LLYR mortgage to the $10,790,194 loans-payable total with covenant headroom",
+      "October 2026 Rialto mortgage maturity: extension, refinance, or default",
+      "Quarterly liquidation-basis NAV re-estimation in 10-Q and 10-K filings",
+      "B2K contract status: termination, low-end $24.0M close, or high-end $28.74M close",
+      "Scan shelf registration and 8-K filings for dilutive equity raises or loan amendments",
+      "Cortlandt Manor subdivision progress against the 2027 approval assumption",
+      "Star Equity Fund LP standstill expiration (2026-12-31 or 2027 under stated conditions)"
+    ],
+    "evidence_refresh_dates": [
+      "2026-08-15",
+      "2026-10-15",
+      "2026-11-15"
+    ],
+    "valuation_refresh_triggers": [
+      "Article 78 ruling or Smithtown site-plan decision",
+      "October 2026 Rialto maturity outcome",
+      "Quarterly liquidation-basis NAV revision exceeding $0.50 per share",
+      "B2K contract amendment, termination, or closing",
+      "Dilutive capital raise or material loan amendment",
+      "20% price move without corresponding filing update"
+    ],
+    "price_review_thresholds": [
+      {
+        "below": 5.0,
+        "action": "Re-underwrite downside if catalysts deteriorate; do not add on price alone"
+      },
+      {
+        "above": 7.5,
+        "action": "Require confirmed entitlement milestones before treating discount as closed"
+      },
+      {
+        "crosses_base_nav": 11.79,
+        "action": "Thesis largely realized; reassess remaining liquidation timeline and distribution path"
+      }
+    ],
+    "thesis_break_conditions": [
+      "Adverse Article 78 ruling or Smithtown denial forces real-estate NRV below the $22.00 per share component low case",
+      "B2K deal fails or closes at $24.0M low end with further timeline extension",
+      "Failed or punitive October 2026 refinance plus dilutive capital raise cuts per-share recovery below the $6.30 component-low schedule",
+      "Another consecutive downward NAV re-estimation cycle without asset-sale proceeds",
+      "Liquidation target slips beyond 2028 with rising cost accruals"
+    ],
+    "expected_catalyst_dates": [
+      "2026-10-10",
+      "2026-12-31",
+      "2027-12-31",
+      "2028-12-31"
+    ],
+    "outcome_horizons_months": [
+      6,
+      12,
+      24
+    ]
+  },
+  "final_state": "evidence_blocked",
+  "provenance": {
+    "prompt_version": "token-efficient-isolated-rater-3",
+    "model": "five-call baseline with conditional escalation and deterministic support assembly",
+    "schema_path": "_system/templates/committee_schema.json",
+    "persona_registry_version": "1.1"
+  }
+}
