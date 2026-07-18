@@ -1,0 +1,53 @@
+{
+  "loop_count": 1,
+  "questions": [
+    "Line-item reconciliation of the disclosed loan facilities to the $10,790,194 balance-sheet total, including rates, covenants, and maturity schedule.",
+    "What is the expected outcome of the October 2026 Rialto mortgage maturity, including extension-option conditions and covenant headroom?",
+    "What is the per-share impact of a dilutive capital raise through 2028 on the liquidation payoff?",
+    "What happens to equity recovery if the October 2026 refinance fails or reprices punitively, given cash, rental receipts, and remaining asset-sale timing?"
+  ],
+  "responses": [
+    {
+      "question": "Line-item reconciliation of the disclosed loan facilities to the $10,790,194 balance-sheet total, including rates, covenants, and maturity schedule.",
+      "answer": "The frozen packet confirms audited loans payable of $10,790,194 as of 2026-03-31 and names three facility groups with rates: an original bank line at 3.85%, a 2021 Rialto mortgage at 3.75% with initial maturity 2026-10-10 and a five-year extension option, and a 2023 LLYR mortgage refinanced to 15% effective 2026-01-01. Deep dive and adversarial review both state that the facility balances available in the text extract do not fully reconcile to the balance-sheet total, so a complete line-item schedule with covenant headroom on every facility remains open.",
+      "evidence_paths": [
+        "GYRO/research/deep_dive_2026-07-17.md",
+        "GYRO/research/adversarial_2026-07-17.md",
+        "GYRO/research/valuation.json",
+        "GYRO/research/valuation_contract.json"
+      ],
+      "status": "partially_answered"
+    },
+    {
+      "question": "What is the expected outcome of the October 2026 Rialto mortgage maturity, including extension-option conditions and covenant headroom?",
+      "answer": "Terms are documented but the outcome is not resolved. Valuation.json and the deep dive record the 2021 Rialto mortgage initial maturity on 2026-10-10, a five-year extension option, and lender discretion to decline extension if loan-to-value exceeds 70% or debt-service coverage falls below 1.3x. The frozen packet contains no post-freeze record of extension, refinance, or default, so the expected October 2026 checkpoint outcome remains unknown.",
+      "evidence_paths": [
+        "GYRO/research/valuation.json",
+        "GYRO/research/deep_dive_2026-07-17.md",
+        "GYRO/research/committee_work/2026-07-18/pre_mortem.json"
+      ],
+      "status": "unresolved"
+    },
+    {
+      "question": "What is the per-share impact of a dilutive capital raise through 2028 on the liquidation payoff?",
+      "answer": "Management discloses that additional capital may be needed through 2028 and the deep dive flags dilutive financing as a financing risk, but the frozen valuation path does not quantify per-share dilution. Bear scenario stress cuts payoff to about $9.00 per share via entitlement and timeline slippage without modeling new share issuance; the component low schedule is $6.30 per share on operating drivers, not an explicit capital-raise bridge at the 2,199,308 share count.",
+      "evidence_paths": [
+        "GYRO/research/deep_dive_2026-07-17.md",
+        "GYRO/research/valuation.json",
+        "GYRO/research/committee_work/2026-07-18/pre_mortem.json"
+      ],
+      "status": "unresolved"
+    },
+    {
+      "question": "What happens to equity recovery if the October 2026 refinance fails or reprices punitively, given cash, rental receipts, and remaining asset-sale timing?",
+      "answer": "The packet shows cash of $3,950,227 against $10,790,194 loans payable as of 2026-03-31 and notes that rental receipts do not fully offset holding and entitlement burn, so a failed near-term refinance would add liquidity pressure ahead of asset sales. Valuation.json flags failure to extend or refinance on similar terms as a catalyst risk and the bear path still implies about $9.00 per share, but no explicit stress model isolates a punitive October 2026 refinance against cash, receipts, and sale timing.",
+      "evidence_paths": [
+        "GYRO/research/deep_dive_2026-07-17.md",
+        "GYRO/research/valuation.json",
+        "GYRO/research/adversarial_2026-07-17.md"
+      ],
+      "status": "partially_answered"
+    }
+  ],
+  "evidence_hash_after": "5a07dc63860a51a7178c059f3d7d12a863cf3f5440b7d7645e23825204367b07"
+}
