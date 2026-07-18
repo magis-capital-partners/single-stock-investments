@@ -108,6 +108,13 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /.github/**
+            /_system/**
+            /dashboard/**
+            /docs/**
+            /*/research/**
       - name: Fetch main for rebase smoke tests
         run: git fetch origin main --depth=50
       - uses: actions/setup-python@v5
@@ -128,6 +135,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /Makefile
+            /_system/scripts/**
+            /_system/reference/letter_date_overrides.json
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -138,14 +150,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: false
-          android: true
-          dotnet: true
-          haskell: true
-          docker-images: true
-          swap-storage: true
       - uses: actions/checkout@v4
         with:
           sparse-checkout: |
