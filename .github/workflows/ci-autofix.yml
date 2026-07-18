@@ -4,15 +4,17 @@ on:
   workflow_run:
     workflows:
       - Activist Scan Sync
-      - Daily Download & Dashboard Sync
+      - Daily Download & Research Dispatch
       - Data Pipeline
       - Darwin Portfolio Refresh
       - Deploy OAuth Proxy (Cloudflare)
       - Drive Intake Sync
-      - Marvin Deep Dive
+      - Research Deep Dive Dispatch
+      - Research Agent Dispatcher
       - Marvin Onboard Ticker
       - Portfolio News Ingest
       - Research quality (PR)
+      - LLM Workflow Governance
       - Vicki IR Harvest
     types: [completed]
     branches: [main]
@@ -76,9 +78,21 @@ jobs:
         if: github.event_name == 'workflow_dispatch' || steps.duration.outputs.long_enough == 'true'
         uses: actions/checkout@v4
         with:
-          sparse-checkout: _system/ci_autofix
-          sparse-checkout-cone-mode: true
+          sparse-checkout: |
+            _system/ci_autofix
+            _system/scripts/llm_call_gate.py
+            _system/config/llm_usage_policy.json
+          sparse-checkout-cone-mode: false
           filter: blob:none
+
+      - name: Restore CI token ledger
+        if: github.event_name == 'workflow_dispatch' || steps.duration.outputs.long_enough == 'true'
+        uses: actions/cache@v4
+        with:
+          path: .llm-state/ci_autofix
+          key: llm-state-ci-autofix-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            llm-state-ci-autofix-
 
       - name: Set up Node.js
         if: github.event_name == 'workflow_dispatch' || steps.duration.outputs.long_enough == 'true'
@@ -102,7 +116,16 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           CI_AUTOFIX_RUN_ID: ${{ github.event.inputs.run_id || github.event.workflow_run.id }}
           CI_AUTOFIX_FORCE_AGENT: ${{ github.event.inputs.force_agent || 'false' }}
+          LLM_LEDGER_PATH: .llm-state/ci_autofix/ledger.jsonl
         run: node _system/ci_autofix/ci_autofix.mjs
+
+      - name: Upload CI token audit
+        if: always() && (github.event_name == 'workflow_dispatch' || steps.duration.outputs.long_enough == 'true')
+        uses: actions/upload-artifact@v4
+        with:
+          name: llm-audit-ci-${{ github.run_id }}
+          path: .llm-state/ci_autofix/ledger.jsonl
+          if-no-files-found: ignore
 
       - name: Skipped short failure
         if: github.event_name == 'workflow_run' && steps.duration.outputs.long_enough != 'true'

@@ -33,6 +33,8 @@ GROUPS = {
     "moi": "special_situations",
 }
 DEFAULT_RATERS = ("hohn", "pabrai", "marks_credit_cycle")
+BASELINE_LLM_CALLS = 5
+MAXIMUM_LLM_CALLS = 9
 
 
 def read_json(path: Path) -> dict:
@@ -152,7 +154,7 @@ Evidence packet: `{packet}`
 
 Rules:
 
-1. Do not inspect another rater's output or any synthesis.
+1. Do not inspect another rater's output or any synthesis. In round two, you may read only your own round-one vote and the targeted research response.
 2. Ignore time already spent on the idea and prior portfolio ownership.
 3. Score explanatory strength, evidence sufficiency, downside control, and return versus alternatives from 1-5 with a rationale.
 4. Use `insufficient_evidence` or `outside_power_zone` when appropriate; abstention is valid.
@@ -160,6 +162,131 @@ Rules:
 6. Audit the economic claim, every valuation-proof row, comparable adjustments, capital requirements, option probabilities, and overlap controls before voting.
 7. Return only one JSON object matching the committee schema vote definition.
 """
+
+
+def deterministic_proposer(ticker: str, valuation: dict, contract: dict, refs: list[dict]) -> dict:
+    """Create the neutral case packet without spending an LLM call."""
+    thesis_path = ROOT / ticker / "research" / "thesis.md"
+    thesis = ""
+    if thesis_path.exists():
+        paragraphs = [part.strip() for part in thesis_path.read_text(encoding="utf-8", errors="ignore").split("\n\n")]
+        thesis = next((part.replace("\n", " ") for part in paragraphs if part and not part.startswith("#")), "")
+    if not thesis:
+        thesis = str(
+            ((valuation.get("economic_value_analysis") or {}).get("economic_claim"))
+            or valuation.get("one_line_thesis")
+            or "The frozen evidence packet contains the complete decision claim."
+        )
+    required_contract_keys = {
+        "id", "mechanism", "evidence_paths", "distinguishing_test",
+        "counter_explanation", "falsifier", "valuation_link",
+    }
+    explanation_contracts = [
+        {key: row[key] for key in required_contract_keys}
+        for row in (valuation.get("explanation_contracts") or [])
+        if isinstance(row, dict) and required_contract_keys <= set(row)
+    ]
+    gaps = contract.get("gaps") or contract.get("open_gaps") or []
+    open_questions = []
+    for gap in gaps:
+        if isinstance(gap, dict):
+            open_questions.append(str(gap.get("question") or gap.get("description") or gap.get("id") or gap))
+        else:
+            open_questions.append(str(gap))
+    return {
+        "recommendation_hidden_in_round_one": True,
+        "thesis": thesis,
+        "explanation_contracts": explanation_contracts,
+        "open_questions": open_questions,
+    }
+
+
+def escalation_decision(votes: list[dict]) -> dict:
+    """Admit extra calls only when disagreement or evidence insufficiency is material."""
+    reasons = []
+    split = Counter(vote.get("vote") for vote in votes)
+    if not split or max(split.values()) < 2:
+        reasons.append("no_two_vote_majority")
+    if any(vote.get("evidence_status") != "sufficient" for vote in votes):
+        reasons.append("insufficient_or_outside_power_zone")
+    for dim in DIMS:
+        values = [((vote.get("scores") or {}).get(dim) or {}).get("value") for vote in votes]
+        values = [value for value in values if isinstance(value, int)]
+        if values and max(values) - min(values) > 2:
+            reasons.append(f"score_dispersion:{dim}")
+    ranges = [vote.get("expected_return_range_pct") for vote in votes if vote.get("expected_return_range_pct")]
+    if len(ranges) >= 2:
+        bases = [(float(row[0]) + float(row[1])) / 2 for row in ranges]
+        if max(bases) - min(bases) >= 10:
+            reasons.append("return_range_dispersion_10pct")
+    return {
+        "required": bool(reasons),
+        "research_required": any(vote.get("evidence_status") == "insufficient_evidence" for vote in votes),
+        "reasons": reasons,
+        "baseline_llm_calls": BASELINE_LLM_CALLS,
+        "maximum_llm_calls": MAXIMUM_LLM_CALLS,
+    }
+
+
+def carry_round_one_forward(work: Path, raters: list[dict]) -> None:
+    for row in raters:
+        source = work / "round_1" / f"{row['persona']}.json"
+        target = work / "round_2" / f"{row['persona']}.json"
+        if source.exists() and not target.exists():
+            write_json(target, read_json(source))
+
+
+def deterministic_committee_support(work: Path, votes: list[dict], escalation: dict) -> None:
+    """Assemble factual/reconciliation/adversarial support without agent calls."""
+    manifest = read_json(work / "manifest.json")
+    packet = manifest["packet_hash"]
+    evidence_paths = [row["path"] for row in manifest.get("evidence") or []]
+    missing = sorted({
+        str(vote.get("most_important_missing_fact") or "").strip()
+        for vote in votes
+        if vote.get("evidence_status") == "insufficient_evidence" and vote.get("most_important_missing_fact")
+    })
+    claims = [claim for vote in votes for claim in (vote.get("claims") or [])]
+    write_json(work / "evidence_tribunal.json", {
+        "status": "blocked" if missing else "complete",
+        "resolved_facts": claims if not missing else [],
+        "disputed_facts": escalation.get("reasons") or [],
+        "unresolved_material_facts": missing,
+        "evidence_paths": evidence_paths,
+        "method": "deterministic_vote_and_packet_reconciliation",
+    })
+    response_path = work / "research_response.json"
+    if not response_path.exists():
+        write_json(response_path, {
+            "loop_count": 0,
+            "questions": [],
+            "responses": [],
+            "evidence_hash_after": packet,
+        })
+    disagreements = []
+    split = Counter(vote.get("vote") for vote in votes)
+    if len(split) > 1:
+        disagreements.append({"type": "recommendation", "vote_split": dict(split)})
+    for dim in DIMS:
+        values = [vote["scores"][dim]["value"] for vote in votes]
+        if max(values) != min(values):
+            disagreements.append({"type": "score", "dimension": dim, "range": [min(values), max(values)]})
+    route = read_json(ROOT / manifest["ticker"] / "research" / "valuation_route.json")
+    write_json(work / "valuation_reconciliation.json", {
+        "status": "complete",
+        "disagreements": disagreements,
+        "selected_primary_method": route.get("profile_id"),
+        "rejected_averages": ["No incompatible valuation methods were averaged to manufacture consensus."],
+        "method": "deterministic_classification",
+    })
+    pre_mortem = read_json(work / "pre_mortem.json")
+    write_json(work / "adversarial_review.json", {
+        "status": "complete_with_residual_risks" if pre_mortem.get("unresolved_items") else "complete",
+        "tests": pre_mortem.get("forensic_checks") or [],
+        "residual_risks": pre_mortem.get("unresolved_items") or [],
+        "strongest_failure_path": pre_mortem.get("failure_story") or "No completed pre-mortem failure path.",
+        "source": "independent_pre_mortem",
+    })
 
 
 def initialize(ticker: str, as_of: str) -> Path:
@@ -193,7 +320,7 @@ def initialize(ticker: str, as_of: str) -> Path:
     raters = select_raters(valuation)
     work = research / "committee_work" / as_of
     manifest = {
-        "pipeline_version": "2.0",
+        "pipeline_version": "3.0-token-efficient",
         "ticker": ticker,
         "as_of": as_of,
         "stage": "round_one_open",
@@ -203,6 +330,13 @@ def initialize(ticker: str, as_of: str) -> Path:
         "frozen_at": datetime.now(timezone.utc).isoformat(),
         "evidence": refs,
         "selected_raters": raters,
+        "llm_policy": {
+            "baseline_calls": BASELINE_LLM_CALLS,
+            "maximum_calls": MAXIMUM_LLM_CALLS,
+            "baseline_tasks": ["pre_mortem", "round1:<three-independent-raters>", "chair_synthesis"],
+            "conditional_tasks": ["targeted_research", "round2:<three-independent-raters>"],
+            "deterministic_tasks": ["proposer", "evidence_tribunal", "valuation_reconciliation", "adversarial_review", "assembly"],
+        },
         "required_files": {
             "proposer": "proposer.json",
             "pre_mortem": "pre_mortem.json",
@@ -215,10 +349,7 @@ def initialize(ticker: str, as_of: str) -> Path:
         },
     }
     write_json(work / "manifest.json", manifest)
-    (work / "proposer.prompt.md").write_text(
-        f"# {ticker} committee proposer\n\nPacket `{frozen_hash}`. Present the decision claim, complete component valuation, evidence quality, strongest causal explanation, expected return range, downside, alternatives, and unresolved facts. Do not invent facts or write a capital decision. Return proposer.json only.\n",
-        encoding="utf-8",
-    )
+    write_json(work / "proposer.json", deterministic_proposer(ticker, valuation, contract, refs))
     for round_number in (1, 2):
         round_dir = work / f"round_{round_number}"
         round_dir.mkdir(parents=True, exist_ok=True)
@@ -234,7 +365,7 @@ def initialize(ticker: str, as_of: str) -> Path:
         encoding="utf-8",
     )
     (work / "research_response.prompt.md").write_text(
-        f"# {ticker} targeted committee research response\n\nPacket `{frozen_hash}`. Read the proposer, round-one reviews, pre-mortem, and evidence tribunal. Answer only the highest-value unresolved factual questions using the frozen evidence. If the packet cannot answer a question, leave it unresolved. Do not change the frozen evidence or read/write round-two votes. Return research_response.json only.\n",
+        f"# {ticker} targeted committee research response\n\nPacket `{frozen_hash}`. Read the deterministic proposer, round-one reviews, and pre-mortem. Answer only decision-material questions raised by insufficient-evidence votes using the frozen packet. If the packet cannot answer a question, mark it unresolved. Do not change the packet or read/write round-two votes. Return one research_loop object with loop_count=1, questions, schema-valid responses, and evidence_hash_after=`{frozen_hash}`.\n",
         encoding="utf-8",
     )
     (work / "valuation_reconciliation.prompt.md").write_text(
@@ -343,7 +474,7 @@ def assemble(work: Path) -> Path:
     tribunal_blocked = bool(evidence_tribunal.get("unresolved_material_facts")) or evidence_tribunal.get("status") != "complete"
     adversarial_blocked = adversarial_review.get("status") not in {"complete", "complete_with_residual_risks"}
     chair_blocked = chair_synthesis.get("status") != "complete"
-    blocked = any(v["evidence_status"] == "insufficient_evidence" for v in round_two) or not economic_complete or not component_complete or tribunal_blocked or adversarial_blocked or chair_blocked
+    blocked = any(v["evidence_status"] != "sufficient" for v in round_two) or not economic_complete or not component_complete or tribunal_blocked or adversarial_blocked or chair_blocked
     record = {
         "schema_version": "1.0",
         "protocol_version": "production-2.0",
@@ -400,7 +531,7 @@ def assemble(work: Path) -> Path:
             "outcome_horizons_months": [6, 12, 24],
         },
         "final_state": "evidence_blocked" if blocked else "committee_complete_decision_pending",
-        "provenance": {"prompt_version": "production-isolated-rater-2", "model": "external isolated raters assembled deterministically", "schema_path": "_system/templates/committee_schema.json", "persona_registry_version": "1.1"},
+        "provenance": {"prompt_version": "token-efficient-isolated-rater-3", "model": "five-call baseline with conditional escalation and deterministic support assembly", "schema_path": "_system/templates/committee_schema.json", "persona_registry_version": "1.1"},
     }
     if record["component_review"] is None:
         record.pop("component_review")

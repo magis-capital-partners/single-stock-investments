@@ -1,4 +1,10 @@
-# CI Autofix rollout (ls-algo + etf-dashboard)
+# Deprecated CI Autofix rollout snapshots
+
+These static snapshots are retained only as historical artifacts. They predate the shared LLM admission gate and must not be deployed. `apply_rollout.sh` now fails closed.
+
+Use `_system/ci_autofix/install_org_repos.ps1` to install the current token-governed workflow, policy, ledger, and pinned dependencies.
+
+## Historical instructions (do not use)
 
 Prepared commits for repos the cloud agent cannot push to directly (`cursor[bot]` lacks write access to `GoldmanDrew/*`).
 

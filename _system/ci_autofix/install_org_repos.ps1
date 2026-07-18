@@ -50,6 +50,9 @@ function Format-WorkflowRunList($WorkflowNames) {
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $SourceCiDir = Resolve-Path $ScriptDir
+$SourceRepoRoot = Resolve-Path (Join-Path $ScriptDir "..\..")
+$SourceGate = Join-Path $SourceRepoRoot "_system\scripts\llm_call_gate.py"
+$SourcePolicy = Join-Path $SourceRepoRoot "_system\config\llm_usage_policy.json"
 
 gh auth status | Out-Host
 if ($LASTEXITCODE -ne 0) {
@@ -79,9 +82,12 @@ foreach ($repo in $repos) {
     git -C $target checkout -B $BranchName | Out-Host
 
     New-Item -ItemType Directory -Force -Path (Join-Path $target ".github\workflows") | Out-Null
-    New-Item -ItemType Directory -Force -Path (Join-Path $target "_system") | Out-Null
-    robocopy $SourceCiDir (Join-Path $target "_system\ci_autofix") /MIR /XD node_modules /NFL /NDL /NJH /NJS /nc /ns /np | Out-Null
+    New-Item -ItemType Directory -Force -Path (Join-Path $target "_system\scripts") | Out-Null
+    New-Item -ItemType Directory -Force -Path (Join-Path $target "_system\config") | Out-Null
+    robocopy $SourceCiDir (Join-Path $target "_system\ci_autofix") /MIR /XD node_modules rollout /NFL /NDL /NJH /NJS /nc /ns /np | Out-Null
     if ($LASTEXITCODE -gt 7) { throw "robocopy failed for $full with exit code $LASTEXITCODE" }
+    Copy-Item -Force $SourceGate (Join-Path $target "_system\scripts\llm_call_gate.py")
+    Copy-Item -Force $SourcePolicy (Join-Path $target "_system\config\llm_usage_policy.json")
 
     $workflowNames = Get-WorkflowNamesForAutofix $target
     $workflowRunList = Format-WorkflowRunList $workflowNames
@@ -138,6 +144,14 @@ jobs:
           cache: npm
           cache-dependency-path: _system/ci_autofix/package-lock.json
 
+      - name: Restore CI Autofix call ledger
+        uses: actions/cache@v4
+        with:
+          path: .llm-state/ci_autofix
+          key: llm-ci-autofix-`${{ github.repository_id }}-`${{ github.run_id }}
+          restore-keys: |
+            llm-ci-autofix-`${{ github.repository_id }}-
+
       - name: Install CI Autofix dependencies
         working-directory: _system/ci_autofix
         run: npm ci
@@ -150,7 +164,16 @@ jobs:
           SLACK_WEBHOOK_URL: `${{ secrets.SLACK_WEBHOOK_URL }}
           CI_AUTOFIX_RUN_ID: `${{ github.event.inputs.run_id || github.event.workflow_run.id }}
           CI_AUTOFIX_FORCE_AGENT: `${{ github.event.inputs.force_agent || 'false' }}
+          LLM_LEDGER_PATH: .llm-state/ci_autofix/ledger.jsonl
         run: node _system/ci_autofix/ci_autofix.mjs
+
+      - name: Upload CI token audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: llm-audit-ci-`${{ github.run_id }}
+          path: .llm-state/ci_autofix/ledger.jsonl
+          if-no-files-found: ignore
 "@
 
     $config = @"
@@ -161,6 +184,8 @@ cursor:
   model: composer-2.5
   max_log_chars: 45000
   max_agent_attempts_per_sha: 1
+  minimum_repeat_count: 2
+  maximum_failed_jobs: 2
   skip_fork_prs: true
   skip_workflows:
     - CI Autofix
@@ -186,12 +211,13 @@ classify:
     - permissions
     - human_required
   transient_retry_first: true
+  default_action: notify_only
 "@
 
     Set-Content -Path (Join-Path $target ".github\workflows\ci-autofix.yml") -Value $workflow -Encoding UTF8
     Set-Content -Path (Join-Path $target ".github\ci-autofix.yml") -Value $config -Encoding UTF8
 
-    git -C $target add .github/workflows/ci-autofix.yml .github/ci-autofix.yml _system/ci_autofix | Out-Host
+    git -C $target add .github/workflows/ci-autofix.yml .github/ci-autofix.yml _system/ci_autofix _system/scripts/llm_call_gate.py _system/config/llm_usage_policy.json | Out-Host
     if (git -C $target diff --staged --quiet) {
         Write-Host "No changes."
         continue

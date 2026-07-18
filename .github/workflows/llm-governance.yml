@@ -1,0 +1,68 @@
+name: LLM Workflow Governance
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/actions/llm-gate/**"
+      - ".github/actions/marvin-agent/**"
+      - ".github/actions/vicki-agent/**"
+      - ".github/workflows/**"
+      - "_system/config/llm_usage_policy.json"
+      - "_system/ci_autofix/**"
+      - "_system/scripts/*committee*"
+      - "_system/scripts/*evidence*"
+      - "_system/scripts/*llm*"
+      - "_system/scripts/*marvin*"
+      - "_system/scripts/*vicki*"
+      - "_system/scripts/package*.json"
+  push:
+    branches: [main]
+    paths:
+      - ".github/actions/llm-gate/**"
+      - ".github/actions/marvin-agent/**"
+      - ".github/actions/vicki-agent/**"
+      - ".github/workflows/**"
+      - "_system/config/llm_usage_policy.json"
+      - "_system/ci_autofix/**"
+      - "_system/scripts/*committee*"
+      - "_system/scripts/*evidence*"
+      - "_system/scripts/*llm*"
+      - "_system/scripts/*marvin*"
+      - "_system/scripts/*vicki*"
+      - "_system/scripts/package*.json"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate admission, evidence, committee, and workflow governance
+        working-directory: _system/scripts
+        run: |
+          python -m unittest \
+            test_llm_call_gate \
+            test_agent_evidence_gates \
+            test_investment_committee_pipeline \
+            test_committee_task_queue \
+            test_llm_workflow_governance
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: |
+            _system/scripts/package-lock.json
+            _system/ci_autofix/package-lock.json
+      - name: Validate pinned agent dependencies
+        run: |
+          npm ci --ignore-scripts --prefix _system/scripts
+          npm ci --ignore-scripts --prefix _system/ci_autofix
+          npm audit --omit=dev --audit-level=high --prefix _system/scripts
+          npm audit --omit=dev --audit-level=high --prefix _system/ci_autofix

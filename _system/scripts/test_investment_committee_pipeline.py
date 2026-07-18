@@ -4,7 +4,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from investment_committee_pipeline import packet_hash, select_raters, validate_vote
+from investment_committee_pipeline import escalation_decision, packet_hash, select_raters, validate_vote
 
 
 class InvestmentCommitteePipelineTests(unittest.TestCase):
@@ -73,6 +73,37 @@ class InvestmentCommitteePipelineTests(unittest.TestCase):
         errors = validate_vote({"persona": "hk", "independence_group": "scarce_assets"}, expected)
         self.assertIn("all four calibrated scores are required", errors)
         self.assertIn("invalid vote", errors)
+
+    def test_unanimous_sufficient_round_does_not_escalate(self):
+        votes = []
+        for _ in range(3):
+            votes.append({
+                "vote": "approve",
+                "evidence_status": "sufficient",
+                "scores": {dim: {"value": 4, "rationale": "clear"} for dim in (
+                    "explanatory_strength", "evidence_sufficiency", "downside_control", "return_vs_alternatives"
+                )},
+                "expected_return_range_pct": [12, 18],
+            })
+        result = escalation_decision(votes)
+        self.assertFalse(result["required"])
+        self.assertEqual(result["baseline_llm_calls"], 5)
+
+    def test_insufficient_evidence_admits_targeted_research_and_second_round(self):
+        votes = []
+        for index in range(3):
+            votes.append({
+                "vote": "defer" if index == 0 else "watch",
+                "evidence_status": "insufficient_evidence" if index == 0 else "sufficient",
+                "scores": {dim: {"value": 2 + index, "rationale": "varies"} for dim in (
+                    "explanatory_strength", "evidence_sufficiency", "downside_control", "return_vs_alternatives"
+                )},
+                "expected_return_range_pct": [5 + index, 10 + index],
+            })
+        result = escalation_decision(votes)
+        self.assertTrue(result["required"])
+        self.assertTrue(result["research_required"])
+        self.assertEqual(result["maximum_llm_calls"], 9)
 
 
 if __name__ == "__main__":

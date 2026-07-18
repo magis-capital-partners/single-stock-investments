@@ -6,6 +6,8 @@ cursor:
   draft_pr: true
   max_log_chars: 45000
   max_agent_attempts_per_sha: 1
+  minimum_repeat_count: 2
+  maximum_failed_jobs: 2
   skip_fork_prs: true
   skip_workflows:
     - CI Autofix
@@ -31,6 +33,7 @@ classify:
     - permissions
     - human_required
   transient_retry_first: true
+  default_action: notify_only
 
 repo_notes: |
   This repo publishes the dashboard from docs/ on main. If dashboard/ changes are

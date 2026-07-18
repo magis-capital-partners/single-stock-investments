@@ -52,7 +52,7 @@ Separate **facts**, **inferences**, and **opinions**. Cite file paths and page r
 |------|----------|----------|
 | Download | `daily-sync.yml` job `download-and-sync` | 12:00 UTC — pull SEC/IR for all holdings, rebuild INDEX + dashboard JSON, push |
 | News | `daily-sync.yml` job `portfolio-news` or `portfolio-news.yml` | Polygon bulk + Google News RSS → `dashboard/data/portfolio_news.json`; review `_system/reviews/pending/news_{date}.md` |
-| Refresh analysis | `daily-sync.yml` job `marvin-refresh` | After news — pick ticker with **new primary documents or refresh-eligible valuation news** since last deep dive; skip if caught up; Cursor cloud agent opens PR |
-| Manual refresh | `marvin-daily-deep-dive.yml` | Optional ticker; **force_rotate** if you want oldest dive refreshed without new activity |
+| Refresh analysis | `research-agent-dispatch.yml` | Build a compact manifest and admit at most one changed ticker; unchanged/duplicate/cooldown/budget cases skip Cursor |
+| Manual refresh | `marvin-deep-dive.yml` | Compatibility UI routed through the same gate; force is an audited incident override, not rotation |
 
-Picker: `_system/scripts/marvin_pick_ticker.py --json` · News ingest: `_system/scripts/ingest_portfolio_news.py`
+Picker: `_system/scripts/marvin_pick_ticker.py --json` · Manifest: `_system/scripts/build_research_agent_manifest.py` · Policy: `_system/config/llm_usage_policy.json` · News ingest: `_system/scripts/ingest_portfolio_news.py`

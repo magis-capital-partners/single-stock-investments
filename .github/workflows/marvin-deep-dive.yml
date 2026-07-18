@@ -1,35 +1,31 @@
-name: Marvin Deep Dive
+name: Research Deep Dive Dispatch
 
-# Modes: deep-dive (single ticker), auto-pick (new docs / force_rotate), batch (sequential queue drain).
-# Daily auto-pick also runs in daily-sync.yml after download.
-
+# Compatibility UI for manual and queued deep dives. Every path delegates to
+# the same evidence-hashed dispatcher; this workflow never calls Cursor itself.
 on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "Run mode"
+        description: Run mode
         required: true
         type: choice
-        options:
-          - deep-dive
-          - auto-pick
-          - batch
+        options: [deep-dive, auto-pick, batch]
         default: deep-dive
       ticker:
-        description: "Ticker (required for deep-dive; optional override for auto-pick)"
+        description: Ticker for deep-dive mode
         required: false
         type: string
-      force_rotate:
-        description: "auto-pick only: refresh oldest deep dive if no new documents"
+      force:
+        description: Explicit manual override for unchanged evidence
         required: false
         type: boolean
         default: false
       tickers:
-        description: "batch only: comma-separated tickers (empty = queue file)"
+        description: Batch comma-separated tickers; blank uses the queue
         required: false
         type: string
       max_parallel:
-        description: "batch only: ignored (batch always runs sequentially with merge gate)"
+        description: Batch concurrency; one is safest for research PR sequencing
         required: false
         default: "1"
         type: string
@@ -39,126 +35,21 @@ on:
       - _system/data/deep_dive_dispatch_queue.json
 
 permissions:
-  contents: write
+  contents: read
   pull-requests: write
 
-concurrency:
-  group: marvin-deep-dive-${{ github.event.inputs.mode || 'batch' }}-${{ github.event.inputs.ticker || github.sha }}
-  cancel-in-progress: false
-
 jobs:
-  single-ticker:
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'deep-dive'
-    runs-on: ubuntu-latest
-    timeout-minutes: 120
-    env:
-      RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
-      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
-      RESEARCH_VAULT_ROOT: _external/research-vault
-    steps:
-      - uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: false
-          android: true
-          dotnet: true
-          haskell: true
-          docker-images: true
-          swap-storage: true
-      - uses: actions/checkout@v4
-        with:
-          sparse-checkout: |
-            _system/scripts/ci_checkout_workspace.sh
-            _system/scripts/ci_resolve_checkout_ref.sh
-            _system/scripts/ci_sparse_checkout_paths.py
-          sparse-checkout-cone-mode: false
-          fetch-depth: 1
-      - name: Checkout workspace (marvin-agent)
-        run: bash _system/scripts/ci_checkout_workspace.sh marvin-agent
-      - name: Validate ticker
-        run: |
-          if [ -z "${{ github.event.inputs.ticker }}" ]; then
-            echo "::error::ticker is required for deep-dive mode"
-            exit 1
-          fi
-      - uses: ./.github/actions/marvin-agent
-        env:
-          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
-          HK_PDFS_ROOT: ${{ secrets.HK_PDFS_ROOT || '/opt/cursor/hk_pdfs' }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-        with:
-          ticker: ${{ github.event.inputs.ticker }}
-
-  auto-pick:
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'auto-pick'
-    runs-on: ubuntu-latest
-    timeout-minutes: 120
-    env:
-      RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
-      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
-      RESEARCH_VAULT_ROOT: _external/research-vault
-    steps:
-      - uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: false
-          android: true
-          dotnet: true
-          haskell: true
-          docker-images: true
-          swap-storage: true
-      - uses: actions/checkout@v4
-        with:
-          sparse-checkout: |
-            _system/scripts/ci_checkout_workspace.sh
-            _system/scripts/ci_resolve_checkout_ref.sh
-            _system/scripts/ci_sparse_checkout_paths.py
-          sparse-checkout-cone-mode: false
-          fetch-depth: 1
-      - name: Checkout workspace (marvin-pick)
-        run: bash _system/scripts/ci_checkout_workspace.sh marvin-pick
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - name: Pick ticker
-        id: pick
-        env:
-          TICKER_OVERRIDE: ${{ github.event.inputs.ticker }}
-          FORCE_ROTATE: ${{ github.event.inputs.force_rotate }}
-        run: |
-          if [ -n "$TICKER_OVERRIDE" ]; then
-            python _system/scripts/marvin_pick_ticker.py "$TICKER_OVERRIDE" --json > pick.json
-          elif [ "$FORCE_ROTATE" = "true" ]; then
-            python _system/scripts/marvin_pick_ticker.py --json --force-rotate > pick.json
-          else
-            python _system/scripts/marvin_pick_ticker.py --json --require-new > pick.json
-          fi
-          cat pick.json
-          TICKER=$(python -c "import json; print(json.load(open('pick.json')).get('ticker') or '')")
-          SKIP=$(python -c "import json; print('true' if json.load(open('pick.json')).get('skip') else 'false')")
-          REASON=$(python -c "import json; print(json.load(open('pick.json')).get('reason') or '')")
-          echo "ticker=$TICKER" >> "$GITHUB_OUTPUT"
-          echo "skip=$SKIP" >> "$GITHUB_OUTPUT"
-          echo "reason=$REASON" >> "$GITHUB_OUTPUT"
-      - uses: ./.github/actions/marvin-agent
-        if: steps.pick.outputs.skip != 'true' && steps.pick.outputs.ticker != ''
-        env:
-          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
-          HK_PDFS_ROOT: ${{ secrets.HK_PDFS_ROOT || '/opt/cursor/hk_pdfs' }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-        with:
-          ticker: ${{ steps.pick.outputs.ticker }}
-          pick_reason: ${{ steps.pick.outputs.reason }}
-      - name: Summary
-        if: always()
-        run: |
-          if [ "${{ steps.pick.outputs.skip }}" = "true" ]; then
-            echo "Skipped ΓÇö no holdings with new primary documents since last deep dive."
-            echo "Re-run auto-pick with force_rotate enabled to refresh the oldest analysis."
-          elif [ -n "${{ steps.pick.outputs.ticker }}" ]; then
-            echo "Refresh started for ${{ steps.pick.outputs.ticker }} (${{ steps.pick.outputs.reason }})."
-          fi
+  single:
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.mode != 'batch'
+    uses: ./.github/workflows/research-agent-dispatch.yml
+    with:
+      ticker: ${{ github.event.inputs.mode == 'deep-dive' && github.event.inputs.ticker || '' }}
+      reason: ${{ github.event.inputs.mode == 'deep-dive' && 'manual_material_change' || '' }}
+      force: ${{ github.event.inputs.force == 'true' }}
+    secrets: inherit
 
   batch-prepare:
-    if: |
+    if: >
       github.event_name == 'push' ||
       (github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'batch')
     runs-on: ubuntu-latest
@@ -166,91 +57,39 @@ jobs:
       tickers: ${{ steps.matrix.outputs.tickers }}
       max_parallel: ${{ steps.matrix.outputs.max_parallel }}
     steps:
-      - uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: false
-          android: true
-          dotnet: true
-          haskell: true
-          docker-images: true
-          swap-storage: true
       - uses: actions/checkout@v4
         with:
           sparse-checkout: |
-            _system/scripts/ci_checkout_workspace.sh
-            _system/scripts/ci_resolve_checkout_ref.sh
-            _system/scripts/ci_sparse_checkout_paths.py
-          sparse-checkout-cone-mode: false
-          fetch-depth: 1
-      - name: Checkout workspace (minimal)
-        run: bash _system/scripts/ci_checkout_workspace.sh minimal
+            _system/scripts/build_deep_dive_dispatch_matrix.py
+            _system/data/deep_dive_dispatch_queue.json
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Build matrix
-        id: matrix
+      - id: matrix
         env:
           TICKERS_INPUT: ${{ github.event.inputs.tickers }}
+          MAX_PARALLEL_INPUT: ${{ github.event.inputs.max_parallel }}
         run: |
           if [ -n "$TICKERS_INPUT" ]; then
-            TICKERS_JSON=$(python _system/scripts/build_deep_dive_dispatch_matrix.py --tickers "$TICKERS_INPUT")
+            TICKERS=$(python _system/scripts/build_deep_dive_dispatch_matrix.py --tickers "$TICKERS_INPUT")
           else
-            TICKERS_JSON=$(python _system/scripts/build_deep_dive_dispatch_matrix.py --use-queue)
+            TICKERS=$(python _system/scripts/build_deep_dive_dispatch_matrix.py --use-queue)
           fi
-          echo "tickers=$TICKERS_JSON" >> "$GITHUB_OUTPUT"
-          MAXP="${{ github.event.inputs.max_parallel }}"
-          if [ -z "$MAXP" ] && [ -f _system/data/deep_dive_dispatch_queue.json ]; then
-            MAXP=$(python -c "import json; print(json.load(open('_system/data/deep_dive_dispatch_queue.json')).get('max_parallel') or 3)")
-          fi
-          MAXP="${MAXP:-3}"
+          MAXP="${MAX_PARALLEL_INPUT:-1}"
+          echo "tickers=$TICKERS" >> "$GITHUB_OUTPUT"
           echo "max_parallel=$MAXP" >> "$GITHUB_OUTPUT"
-          echo "Batch tickers: $TICKERS_JSON (max_parallel=$MAXP)"
-      - name: Skip if empty
-        if: steps.matrix.outputs.tickers == '[]'
-        run: echo "No tickers to process."
 
-  batch-sequential:
+  batch:
     needs: batch-prepare
     if: needs.batch-prepare.outputs.tickers != '[]'
-    runs-on: ubuntu-latest
-    timeout-minutes: 4320
-    env:
-      RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
-      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
-      RESEARCH_VAULT_ROOT: _external/research-vault
-      TICKERS_JSON: ${{ needs.batch-prepare.outputs.tickers }}
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    steps:
-      - uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: false
-          android: true
-          dotnet: true
-          haskell: true
-          docker-images: true
-          swap-storage: true
-      - uses: actions/checkout@v4
-        with:
-          sparse-checkout: |
-            _system/scripts/ci_checkout_workspace.sh
-            _system/scripts/ci_resolve_checkout_ref.sh
-            _system/scripts/ci_sparse_checkout_paths.py
-          sparse-checkout-cone-mode: false
-          fetch-depth: 0
-      - name: Checkout workspace (marvin-agent)
-        run: bash _system/scripts/ci_checkout_workspace.sh marvin-agent
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - name: Install Cursor SDK
-        run: npm install --no-save @cursor/sdk
-        working-directory: _system/scripts
-      - name: Sequential drain (agent ΓåÆ automerge ΓåÆ next)
-        env:
-          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
-          HK_PDFS_ROOT: ${{ secrets.HK_PDFS_ROOT || '/opt/cursor/hk_pdfs' }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-        run: python _system/scripts/marvin_batch_drain.py --pick-reason batch_onboard_pending
+    strategy:
+      fail-fast: false
+      max-parallel: ${{ fromJson(needs.batch-prepare.outputs.max_parallel) }}
+      matrix:
+        ticker: ${{ fromJson(needs.batch-prepare.outputs.tickers) }}
+    uses: ./.github/workflows/research-agent-dispatch.yml
+    with:
+      ticker: ${{ matrix.ticker }}
+      reason: batch_onboard_pending
+      force: false
+    secrets: inherit

@@ -15,6 +15,11 @@ on:
         required: false
         default: "2"
         type: string
+      force:
+        description: Explicitly bypass working-adapter and active-gap checks
+        required: false
+        default: false
+        type: boolean
   push:
     branches: [main]
     paths:
@@ -59,11 +64,14 @@ jobs:
         id: matrix
         env:
           TICKERS_INPUT: ${{ github.event.inputs.tickers }}
+          FORCE_INPUT: ${{ github.event.inputs.force || 'false' }}
         run: |
+          FORCE_ARG=()
+          if [ "$FORCE_INPUT" = "true" ]; then FORCE_ARG+=(--force); fi
           if [ -n "$TICKERS_INPUT" ]; then
-            TICKERS_JSON=$(python _system/scripts/build_vicki_dispatch_matrix.py --tickers "$TICKERS_INPUT")
+            TICKERS_JSON=$(python _system/scripts/build_vicki_dispatch_matrix.py --tickers "$TICKERS_INPUT" "${FORCE_ARG[@]}")
           else
-            TICKERS_JSON=$(python _system/scripts/build_vicki_dispatch_matrix.py --use-queue)
+            TICKERS_JSON=$(python _system/scripts/build_vicki_dispatch_matrix.py --use-queue "${FORCE_ARG[@]}")
           fi
           echo "tickers=$TICKERS_JSON" >> "$GITHUB_OUTPUT"
           MAXP="${{ github.event.inputs.max_parallel }}"
@@ -106,9 +114,22 @@ jobs:
           fetch-depth: 1
       - name: Checkout workspace (marvin-agent)
         run: bash _system/scripts/ci_checkout_workspace.sh marvin-agent
+      - name: Verify deterministic adapter failure
+        id: adapter
+        env:
+          FORCE_INPUT: ${{ github.event.inputs.force || 'false' }}
+        run: |
+          ARGS=("${{ matrix.ticker }}" --github-output)
+          if [ "$FORCE_INPUT" = "true" ]; then ARGS+=(--force); fi
+          python _system/scripts/ir_adapter_gate.py "${ARGS[@]}"
       - uses: ./.github/actions/vicki-agent
+        if: steps.adapter.outputs.eligible == 'true'
         env:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
           GITHUB_REPOSITORY: ${{ github.repository }}
         with:
           ticker: ${{ matrix.ticker }}
+          reason: ${{ steps.adapter.outputs.reason }}
+          evidence_hash: ${{ steps.adapter.outputs.evidence_hash }}
+          adapter_path: ${{ steps.adapter.outputs.adapter_path }}
+          force: ${{ github.event.inputs.force || 'false' }}

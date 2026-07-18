@@ -1,0 +1,112 @@
+from __future__ import annotations
+
+import json
+import tempfile
+import unittest
+from pathlib import Path
+from unittest.mock import patch
+
+import committee_task_queue
+import investment_committee_pipeline
+import jsonschema
+
+
+DIMS = ("explanatory_strength", "evidence_sufficiency", "downside_control", "return_vs_alternatives")
+
+
+class CommitteeTaskQueueTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self.tmp.name)
+        self.work = self.root / "AAA" / "research" / "committee_work" / "2026-07-18"
+        (self.work / "round_1").mkdir(parents=True)
+        (self.work / "round_2").mkdir(parents=True)
+        raters = [
+            {"persona": "hohn", "independence_group": "competitive_advantage", "selection_reason": "test", "required_inputs_status": "complete"},
+            {"persona": "pabrai", "independence_group": "asymmetry_downside", "selection_reason": "test", "required_inputs_status": "complete"},
+            {"persona": "marks_credit_cycle", "independence_group": "credit_cycle", "selection_reason": "test", "required_inputs_status": "complete"},
+        ]
+        self.write(self.work / "manifest.json", {
+            "ticker": "AAA", "as_of": "2026-07-18", "packet_hash": investment_committee_pipeline.packet_hash([]),
+            "selected_raters": raters, "evidence": [], "stage": "round_one_open",
+            "frozen_at": "2026-07-18T12:00:00+00:00",
+        })
+        research = self.root / "AAA" / "research"
+        self.write(research / "valuation.json", {
+            "ticker": "AAA", "inputs": {"price": 10, "shares_outstanding": 100},
+            "economic_value_analysis": {"status": "complete", "valuation_proof": []},
+            "component_valuation_results": {"status": "complete", "all_material_components_identified": True},
+        })
+        self.write(research / "valuation_contract.json", {"status": "decision_grade"})
+        self.write(research / "valuation_route.json", {"profile_id": "quality_reinvestment"})
+        for row in raters:
+            (self.work / "round_1" / f"{row['persona']}.prompt.md").write_text("prompt", encoding="utf-8")
+            (self.work / "round_2" / f"{row['persona']}.prompt.md").write_text("prompt", encoding="utf-8")
+        (self.work / "pre_mortem.prompt.md").write_text("prompt", encoding="utf-8")
+        (self.work / "chair_synthesis.prompt.md").write_text("prompt", encoding="utf-8")
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    @staticmethod
+    def write(path: Path, value: dict) -> None:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(value), encoding="utf-8")
+
+    @staticmethod
+    def vote(persona: str, group: str) -> dict:
+        return {
+            "persona": persona,
+            "independence_group": group,
+            "evidence_status": "sufficient",
+            "scores": {dim: {"value": 4, "rationale": "supported"} for dim in DIMS},
+            "vote": "approve",
+            "expected_return_range_pct": [12, 18],
+            "horizon_years": 5,
+            "claims": [{"claim": "claim", "evidence_paths": ["valuation_contract.json"]}],
+            "strongest_counter_explanation": "cycle",
+            "most_important_missing_fact": "none material",
+            "falsifiers": ["return below hurdle"],
+            "specialist_findings": "within power zone",
+            "confidence": "medium",
+        }
+
+    def test_five_call_baseline_materializes_support_deterministically(self):
+        with patch.object(committee_task_queue, "ROOT", self.root), patch.object(
+            investment_committee_pipeline, "ROOT", self.root
+        ):
+            first = committee_task_queue.next_tasks("AAA", "2026-07-18")
+            self.assertEqual(len(first), 4)
+            self.assertNotIn("proposer", {row["task_id"] for row in first})
+            self.assertTrue((self.work / "proposer.json").exists())
+            self.write(self.work / "pre_mortem.json", {
+                "status": "complete", "failure_story": "cycle breaks", "earliest_warning_signals": [],
+                "forensic_checks": ["cash conversion"], "short_source_coverage": "partial", "unresolved_items": [],
+            })
+            manifest = json.loads((self.work / "manifest.json").read_text())
+            for row in manifest["selected_raters"]:
+                self.write(self.work / "round_1" / f"{row['persona']}.json", self.vote(row["persona"], row["independence_group"]))
+            second = committee_task_queue.next_tasks("AAA", "2026-07-18")
+            self.assertEqual([row["task_id"] for row in second], ["chair-synthesis"])
+            self.assertTrue((self.work / "valuation_reconciliation.json").exists())
+            self.assertTrue((self.work / "adversarial_review.json").exists())
+            self.assertEqual(len(list((self.work / "round_2").glob("*.json"))), 3)
+            self.write(self.work / "chair_synthesis.json", {
+                "status": "complete", "primary_method": "quality_reinvestment",
+                "weighting_rationale": "method fit", "agreed_facts": [], "disputed_facts": [],
+                "recommendation": "watch",
+                "monitoring_plan": {
+                    "operational_milestones": [], "evidence_refresh_dates": [],
+                    "valuation_refresh_triggers": ["filing"], "price_review_thresholds": [],
+                    "thesis_break_conditions": [], "expected_catalyst_dates": [],
+                    "outcome_horizons_months": [6, 12, 24],
+                },
+            })
+            self.assertEqual(committee_task_queue.next_tasks("AAA", "2026-07-18"), [])
+            output = investment_committee_pipeline.assemble(self.work)
+            schema = json.loads((Path(__file__).resolve().parents[1] / "templates" / "committee_schema.json").read_text())
+            jsonschema.validate(json.loads(output.read_text()), schema)
+
+
+if __name__ == "__main__":
+    unittest.main()

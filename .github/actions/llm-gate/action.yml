@@ -1,0 +1,74 @@
+name: LLM judgment gate
+description: Enforce evidence hashes, cooldowns, and call budgets before a Cursor agent starts
+
+inputs:
+  consumer:
+    required: true
+    description: Policy consumer id
+  subject:
+    required: true
+    description: Ticker, task key, or failure signature
+  reason:
+    required: true
+    description: Admissible judgment reason
+  evidence_hash:
+    required: true
+    description: Stable evidence or failure hash
+  state_file:
+    required: false
+    default: ""
+    description: Optional completed-state JSON file
+  force:
+    required: false
+    default: "false"
+    description: Explicit manual budget override
+
+outputs:
+  approved:
+    value: ${{ steps.gate.outputs.approved }}
+  decision:
+    value: ${{ steps.gate.outputs.decision }}
+  gate_reason:
+    value: ${{ steps.gate.outputs.gate_reason }}
+  evidence_hash:
+    value: ${{ steps.gate.outputs.evidence_hash }}
+  ledger:
+    value: ${{ steps.paths.outputs.ledger }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
+    - id: paths
+      shell: bash
+      env:
+        CONSUMER: ${{ inputs.consumer }}
+      run: |
+        mkdir -p ".llm-state/$CONSUMER"
+        echo "ledger=.llm-state/$CONSUMER/ledger.jsonl" >> "$GITHUB_OUTPUT"
+
+    - uses: actions/cache@v4
+      with:
+        path: .llm-state/${{ inputs.consumer }}
+        key: llm-state-${{ inputs.consumer }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ inputs.subject }}
+        restore-keys: |
+          llm-state-${{ inputs.consumer }}-
+
+    - id: gate
+      shell: bash
+      env:
+        CONSUMER: ${{ inputs.consumer }}
+        SUBJECT: ${{ inputs.subject }}
+        REASON: ${{ inputs.reason }}
+        EVIDENCE_HASH: ${{ inputs.evidence_hash }}
+        STATE_FILE: ${{ inputs.state_file }}
+        FORCE: ${{ inputs.force }}
+        LEDGER: ${{ steps.paths.outputs.ledger }}
+      run: |
+        ARGS=(evaluate --consumer "$CONSUMER" --subject "$SUBJECT" --reason "$REASON" --evidence-hash "$EVIDENCE_HASH" --ledger "$LEDGER" --reserve --github-output)
+        if [ -n "$STATE_FILE" ]; then ARGS+=(--state-file "$STATE_FILE"); fi
+        if [ "$FORCE" = "true" ]; then ARGS+=(--force); fi
+        python _system/scripts/llm_call_gate.py "${ARGS[@]}"

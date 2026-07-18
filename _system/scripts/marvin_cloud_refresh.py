@@ -10,8 +10,10 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -407,6 +409,34 @@ def main() -> int:
     if not ok:
         print("DONE with failures — fix lint/errors before merge")
         return 1
+    evidence_hash = os.environ.get("RESEARCH_EVIDENCE_HASH", "").strip()
+    if evidence_hash:
+        manifest_path_raw = os.environ.get("RESEARCH_EVIDENCE_MANIFEST", "").strip()
+        manifest_json = os.environ.get("RESEARCH_EVIDENCE_MANIFEST_JSON", "").strip()
+        if manifest_path_raw and manifest_json:
+            manifest_path = ROOT / manifest_path_raw
+            manifest_path.parent.mkdir(parents=True, exist_ok=True)
+            try:
+                manifest_path.write_text(json.dumps(json.loads(manifest_json), indent=2) + "\n", encoding="utf-8")
+            except json.JSONDecodeError:
+                pass
+        state_path = ROOT / ticker / "research" / "agent_run_state.json"
+        state_path.write_text(
+            json.dumps(
+                {
+                    "schema_version": "1.0",
+                    "consumer": "marvin_research",
+                    "ticker": ticker,
+                    "evidence_hash": evidence_hash,
+                    "reason": os.environ.get("RESEARCH_PICK_REASON") or "material_evidence_change",
+                    "manifest_path": os.environ.get("RESEARCH_EVIDENCE_MANIFEST"),
+                    "completed_at": datetime.now(timezone.utc).isoformat(),
+                },
+                indent=2,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
     print("DONE OK")
     return 0
 
