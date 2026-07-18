@@ -19,7 +19,9 @@
     "fcf_per_share": 1.65,
     "per_share_source": "Marvin filings: FY26 guided EBITDA midpoint x 18% FCF conversion / shares (haircut vs 25% company target)",
     "shares_millions": 67.8,
-    "normalization_note": "Primary metric = Marvin filings owner cash; McIntyre external context only"
+    "normalization_note": "Primary metric = Marvin filings owner cash; McIntyre external context only",
+    "shares_outstanding": 67800000,
+    "shares_source": "Derived from inputs.shares_millions in the pre-existing valuation.json; [HUMAN REVIEW] confirm against the latest primary filing."
   },
   "segment_build": {
     "as_of": "2026-06-29",
@@ -154,16 +156,16 @@
     }
   },
   "implied_return": {
-    "base_pct": 15.4,
-    "label": "7yr IRR (Lawrence base)",
-    "display": "15.4% (Lawrence base)",
+    "base_pct": 18.05,
+    "label": "7yr IRR (total synthesis)",
+    "display": "18.05% (total synthesis)",
     "lawrence_stance_gate_pct": 15.4,
     "falsifier_adjusted_pct": 15.4,
-    "synthesis_pct": 17.15
+    "synthesis_pct": 18.05
   },
   "stance_proposal": {
     "suggested": "watch",
-    "irr_band": "10-15%",
+    "irr_band": "15\u201320%",
     "gates": {
       "moat_ok": false,
       "dhando_ok": true
@@ -275,9 +277,9 @@
     "qualitative_adjustments": [],
     "qualitative_manual": false,
     "qualitative_pp_cap_applied": false,
-    "numeric_weighted_pct": 17.15,
+    "numeric_weighted_pct": 18.05,
     "qualitative_pp": 0,
-    "total_synthesis_pct": 17.15,
+    "total_synthesis_pct": 18.05,
     "human_approval": "pending",
     "weight_audit": {
       "flags": [],
@@ -485,5 +487,1113 @@
     "price_for_market_cap": 13.79,
     "chart": "QDEL/research/charts/total_return_2026-07-15.svg",
     "panel_json": "QDEL/research/total_return_panel.json"
+  },
+  "valuation_mode": "economic_value",
+  "valuation_methodology": {
+    "mode": "component_economic_value",
+    "horizon_years": 7,
+    "decision_rule": "Use one complete non-overlapping component schedule. The legacy Lawrence return path remains a separate stance gate until the primary evidence bridges are complete."
+  },
+  "component_valuation": {
+    "schema_version": "1.0",
+    "all_material_components_identified": true,
+    "coverage_statement": "Phase 3 scaffold identifies every currently known material operating, financial, liability, reserve, and option claim once. Primary ownership and cash/NAV bridges remain open follow-up gates.",
+    "components": [
+      {
+        "id": "core_diagnostics_engine",
+        "label": "Labs and immunohematology owner cash",
+        "category": "operating_business",
+        "overlap_key": "core_diagnostics_engine",
+        "treatment": "additive",
+        "valuation": {
+          "method": "owner_cash_reinvestment_dcf",
+          "basis": "per_share",
+          "low": 4.83,
+          "base": 7.58,
+          "high": 10.34,
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Existing QDEL valuation inputs: Marvin filings: FY26 guided EBITDA midpoint x 18% FCF conversion / shares (haircut vs 25% company target); Primary metric = Marvin filings owner cash; McIntyre external context only [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+        }
+      },
+      {
+        "id": "product_and_pipeline_options",
+        "label": "Point-of-care, LEX, and molecular options",
+        "category": "real_option",
+        "overlap_key": "product_and_pipeline_options",
+        "treatment": "additive",
+        "valuation": {
+          "method": "milestone_project_option",
+          "basis": "per_share",
+          "low": 0.0,
+          "base": 1.1,
+          "high": 3.45,
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Existing QDEL valuation inputs: Marvin filings: FY26 guided EBITDA midpoint x 18% FCF conversion / shares (haircut vs 25% company target); Primary metric = Marvin filings owner cash; McIntyre external context only [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Net debt and working-capital claims",
+        "category": "financial_asset",
+        "overlap_key": "net_financial_claims",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": 0.41,
+          "base": 1.65,
+          "high": 2.76,
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Existing QDEL valuation inputs: Marvin filings: FY26 guided EBITDA midpoint x 18% FCF conversion / shares (haircut vs 25% company target); Primary metric = Marvin filings owner cash; McIntyre external context only [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+        }
+      },
+      {
+        "id": "downside_reserve",
+        "label": "Reimbursement, integration, and failure reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "downside_reserve",
+        "treatment": "additive",
+        "valuation": {
+          "method": "realization_reserve",
+          "basis": "per_share",
+          "low": -3.45,
+          "base": -1.65,
+          "high": -0.41,
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Existing QDEL valuation inputs: Marvin filings: FY26 guided EBITDA midpoint x 18% FCF conversion / shares (haircut vs 25% company target); Primary metric = Marvin filings owner cash; McIntyre external context only [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+        }
+      }
+    ]
+  },
+  "economic_value": {
+    "schema_version": "1.0",
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One diluted share of QDEL, including every currently identified operating claim, financial claim, liability, reserve, and material option.",
+      "unit_label": "diluted share",
+      "unit_count": 67800000,
+      "unit_source": "Derived from inputs.shares_millions in the pre-existing valuation.json; [HUMAN REVIEW] confirm against the latest primary filing.",
+      "enterprise_to_equity_reconciliation": "Operating and asset claims are valued once; cash, debt, financing, reserves, and other senior claims are separate components or explicitly reserved. No component is intended to overlap another."
+    },
+    "gaap_role": "cross_check",
+    "accounting_reference": "Existing research and filing-derived valuation inputs. The primary-source reconciliation remains an open evidence gate.",
+    "component_groups": [
+      {
+        "id": "core_diagnostics_engine",
+        "label": "Labs and immunohematology owner cash",
+        "component_ids": [
+          "core_diagnostics_engine"
+        ],
+        "economic_claim": "Labs and immunohematology owner cash",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key core_diagnostics_engine; no other component capitalizes the same claim."
+      },
+      {
+        "id": "product_and_pipeline_options",
+        "label": "Point-of-care, LEX, and molecular options",
+        "component_ids": [
+          "product_and_pipeline_options"
+        ],
+        "economic_claim": "Point-of-care, LEX, and molecular options",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key product_and_pipeline_options; no other component capitalizes the same claim.",
+        "risk_and_timing": {
+          "probability_basis": "Starter probability is explicit analyst judgment pending a primary-source milestone and ownership reconciliation.",
+          "timing_basis": "The range includes delay and failure outcomes; dated cash realization remains [HUMAN REVIEW].",
+          "remaining_capital_basis": "Remaining owner-funded capital, financing, and dilution are reserved until the primary sources-and-uses bridge is complete."
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Net debt and working-capital claims",
+        "component_ids": [
+          "net_financial_claims"
+        ],
+        "economic_claim": "Net debt and working-capital claims",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key net_financial_claims; no other component capitalizes the same claim."
+      },
+      {
+        "id": "downside_reserve",
+        "label": "Reimbursement, integration, and failure reserve",
+        "component_ids": [
+          "downside_reserve"
+        ],
+        "economic_claim": "Reimbursement, integration, and failure reserve",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key downside_reserve; no other component capitalizes the same claim."
+      }
+    ],
+    "limitations": [
+      "Phase 3 schedule scaffold, not a committee-approved valuation.",
+      "Universal followups remain open until primary evidence supports the ownership map, owner-cash or NAV bridge, and downside/capital claims."
+    ]
+  },
+  "component_valuation_results": {
+    "status": "complete",
+    "decision_rule": "Use the complete low/base/high component schedule. Embedded components are estimated but not added twice.",
+    "all_material_components_identified": true,
+    "additive_components": [
+      {
+        "id": "core_diagnostics_engine",
+        "label": "Labs and immunohematology owner cash",
+        "category": "operating_business",
+        "overlap_key": "core_diagnostics_engine",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "owner_cash_reinvestment_dcf",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Existing QDEL valuation inputs: Marvin filings: FY26 guided EBITDA midpoint x 18% FCF conversion / shares (haircut vs 25% company target); Primary metric = Marvin filings owner cash; McIntyre external context only [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "scenario_assumptions": null,
+        "low_per_share": 4.83,
+        "base_per_share": 7.58,
+        "high_per_share": 10.34
+      },
+      {
+        "id": "product_and_pipeline_options",
+        "label": "Point-of-care, LEX, and molecular options",
+        "category": "real_option",
+        "overlap_key": "product_and_pipeline_options",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "milestone_project_option",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Existing QDEL valuation inputs: Marvin filings: FY26 guided EBITDA midpoint x 18% FCF conversion / shares (haircut vs 25% company target); Primary metric = Marvin filings owner cash; McIntyre external context only [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "scenario_assumptions": null,
+        "low_per_share": 0.0,
+        "base_per_share": 1.1,
+        "high_per_share": 3.45
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Net debt and working-capital claims",
+        "category": "financial_asset",
+        "overlap_key": "net_financial_claims",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "net_asset_value",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Existing QDEL valuation inputs: Marvin filings: FY26 guided EBITDA midpoint x 18% FCF conversion / shares (haircut vs 25% company target); Primary metric = Marvin filings owner cash; McIntyre external context only [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "scenario_assumptions": null,
+        "low_per_share": 0.41,
+        "base_per_share": 1.65,
+        "high_per_share": 2.76
+      },
+      {
+        "id": "downside_reserve",
+        "label": "Reimbursement, integration, and failure reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "downside_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "realization_reserve",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Existing QDEL valuation inputs: Marvin filings: FY26 guided EBITDA midpoint x 18% FCF conversion / shares (haircut vs 25% company target); Primary metric = Marvin filings owner cash; McIntyre external context only [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "scenario_assumptions": null,
+        "low_per_share": -3.45,
+        "base_per_share": -1.65,
+        "high_per_share": -0.41
+      }
+    ],
+    "embedded_components": [],
+    "total_equity_value_per_share": {
+      "low": 1.79,
+      "base": 8.68,
+      "high": 16.14
+    },
+    "material_component_count": 4,
+    "additive_component_count": 4,
+    "embedded_component_count": 0,
+    "market_price_per_share": 13.79,
+    "upside_downside_pct": {
+      "low": -87.0,
+      "base": -37.1,
+      "high": 17.0
+    }
+  },
+  "economic_value_analysis": {
+    "schema_version": "1.0",
+    "status": "complete",
+    "trigger": {
+      "required": true,
+      "reasons": [
+        "explicit_component_schedule"
+      ],
+      "policy": "A complete economic-value analysis is required when any trigger fires; otherwise it is recommended."
+    },
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One diluted share of QDEL, including every currently identified operating claim, financial claim, liability, reserve, and material option.",
+      "unit_label": "diluted share",
+      "unit_count": 67800000,
+      "unit_source": "Derived from inputs.shares_millions in the pre-existing valuation.json; [HUMAN REVIEW] confirm against the latest primary filing.",
+      "enterprise_to_equity_reconciliation": "Operating and asset claims are valued once; cash, debt, financing, reserves, and other senior claims are separate components or explicitly reserved. No component is intended to overlap another."
+    },
+    "gaap_role": "cross_check",
+    "accounting_reference": "Existing research and filing-derived valuation inputs. The primary-source reconciliation remains an open evidence gate.",
+    "comparable_hierarchy": [
+      "issuer_arm_length_transaction",
+      "same_asset_transaction",
+      "public_peer",
+      "replacement_cost",
+      "approved_external_analysis"
+    ],
+    "gross_comparable_nav_per_share": null,
+    "risked_present_value_per_share": {
+      "low": 1.79,
+      "base": 8.68,
+      "high": 16.14
+    },
+    "component_groups": [
+      {
+        "id": "core_diagnostics_engine",
+        "label": "Labs and immunohematology owner cash",
+        "component_ids": [
+          "core_diagnostics_engine"
+        ],
+        "economic_claim": "Labs and immunohematology owner cash",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key core_diagnostics_engine; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": 4.83,
+          "base": 7.58,
+          "high": 10.34
+        }
+      },
+      {
+        "id": "product_and_pipeline_options",
+        "label": "Point-of-care, LEX, and molecular options",
+        "component_ids": [
+          "product_and_pipeline_options"
+        ],
+        "economic_claim": "Point-of-care, LEX, and molecular options",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key product_and_pipeline_options; no other component capitalizes the same claim.",
+        "risk_and_timing": {
+          "probability_basis": "Starter probability is explicit analyst judgment pending a primary-source milestone and ownership reconciliation.",
+          "timing_basis": "The range includes delay and failure outcomes; dated cash realization remains [HUMAN REVIEW].",
+          "remaining_capital_basis": "Remaining owner-funded capital, financing, and dilution are reserved until the primary sources-and-uses bridge is complete."
+        },
+        "risked_present_value_per_share": {
+          "low": 0.0,
+          "base": 1.1,
+          "high": 3.45
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Net debt and working-capital claims",
+        "component_ids": [
+          "net_financial_claims"
+        ],
+        "economic_claim": "Net debt and working-capital claims",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key net_financial_claims; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": 0.41,
+          "base": 1.65,
+          "high": 2.76
+        }
+      },
+      {
+        "id": "downside_reserve",
+        "label": "Reimbursement, integration, and failure reserve",
+        "component_ids": [
+          "downside_reserve"
+        ],
+        "economic_claim": "Reimbursement, integration, and failure reserve",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key downside_reserve; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": -3.45,
+          "base": -1.65,
+          "high": -0.41
+        }
+      }
+    ],
+    "valuation_proof": [
+      {
+        "component_id": "core_diagnostics_engine",
+        "economic_claim": "Labs and immunohematology owner cash",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "owner_cash_reinvestment_dcf",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Existing QDEL valuation inputs: Marvin filings: FY26 guided EBITDA midpoint x 18% FCF conversion / shares (haircut vs 25% company target); Primary metric = Marvin filings owner cash; McIntyre external context only [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "range_per_share": {
+          "low": 4.83,
+          "base": 7.58,
+          "high": 10.34
+        },
+        "treatment": "additive",
+        "overlap_key": "core_diagnostics_engine",
+        "overlap_control": "Unique overlap key core_diagnostics_engine; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "product_and_pipeline_options",
+        "economic_claim": "Point-of-care, LEX, and molecular options",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "milestone_project_option",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Existing QDEL valuation inputs: Marvin filings: FY26 guided EBITDA midpoint x 18% FCF conversion / shares (haircut vs 25% company target); Primary metric = Marvin filings owner cash; McIntyre external context only [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 1.1,
+          "high": 3.45
+        },
+        "treatment": "additive",
+        "overlap_key": "product_and_pipeline_options",
+        "overlap_control": "Unique overlap key product_and_pipeline_options; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "risk_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "The range includes delay and failure outcomes; dated cash realization remains [HUMAN REVIEW].",
+          "probability_basis": "Starter probability is explicit analyst judgment pending a primary-source milestone and ownership reconciliation.",
+          "remaining_capital_basis": "Remaining owner-funded capital, financing, and dilution are reserved until the primary sources-and-uses bridge is complete."
+        }
+      },
+      {
+        "component_id": "net_financial_claims",
+        "economic_claim": "Net debt and working-capital claims",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Existing QDEL valuation inputs: Marvin filings: FY26 guided EBITDA midpoint x 18% FCF conversion / shares (haircut vs 25% company target); Primary metric = Marvin filings owner cash; McIntyre external context only [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "range_per_share": {
+          "low": 0.41,
+          "base": 1.65,
+          "high": 2.76
+        },
+        "treatment": "additive",
+        "overlap_key": "net_financial_claims",
+        "overlap_control": "Unique overlap key net_financial_claims; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "downside_reserve",
+        "economic_claim": "Reimbursement, integration, and failure reserve",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "realization_reserve",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Existing QDEL valuation inputs: Marvin filings: FY26 guided EBITDA midpoint x 18% FCF conversion / shares (haircut vs 25% company target); Primary metric = Marvin filings owner cash; McIntyre external context only [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "range_per_share": {
+          "low": -3.45,
+          "base": -1.65,
+          "high": -0.41
+        },
+        "treatment": "additive",
+        "overlap_key": "downside_reserve",
+        "overlap_control": "Unique overlap key downside_reserve; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "risk_and_timing": null
+      }
+    ],
+    "wisdom_applied": [],
+    "limitations": [
+      "Phase 3 schedule scaffold, not a committee-approved valuation.",
+      "Universal followups remain open until primary evidence supports the ownership map, owner-cash or NAV bridge, and downside/capital claims."
+    ],
+    "complete_component_coverage": true,
+    "validation_errors": [],
+    "registry_version": "1.0"
+  },
+  "component_review_queue": {
+    "status": "ready_for_committee_review",
+    "decision_rule": "Each assigned rater records accept, challenge, or reject with a proposed range and evidence. The aggregator may not silently average disputed ranges.",
+    "items": [
+      {
+        "component_id": "core_diagnostics_engine",
+        "label": "Labs and immunohematology owner cash",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 4.83,
+          "base": 7.58,
+          "high": 10.34
+        },
+        "range_width_pct_of_base": 72.7,
+        "evidence_tier": "mixed_primary_and_estimate",
+        "recommended_raters": [
+          "hohn",
+          "marathon_capital_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "product_and_pipeline_options",
+        "label": "Point-of-care, LEX, and molecular options",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 1.1,
+          "high": 3.45
+        },
+        "range_width_pct_of_base": 313.6,
+        "evidence_tier": "mixed_primary_and_estimate",
+        "recommended_raters": [
+          "klarman_asset_value",
+          "hk"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Net debt and working-capital claims",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 0.41,
+          "base": 1.65,
+          "high": 2.76
+        },
+        "range_width_pct_of_base": 142.4,
+        "evidence_tier": "mixed_primary_and_estimate",
+        "recommended_raters": [
+          "greenblatt",
+          "marks_credit_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "downside_reserve",
+        "label": "Reimbursement, integration, and failure reserve",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": -3.45,
+          "base": -1.65,
+          "high": -0.41
+        },
+        "range_width_pct_of_base": 184.2,
+        "evidence_tier": "mixed_primary_and_estimate",
+        "recommended_raters": [
+          "marks_credit_cycle",
+          "pabrai"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      }
+    ]
+  },
+  "valuation_method_route": {
+    "schema_version": "1.0",
+    "status": "routed",
+    "profile_id": "capital_cycle",
+    "label": "Capital cycle and normalized industry economics",
+    "score": 7.0,
+    "reasons": [
+      "archetype=turnaround",
+      "component categories=operating_business"
+    ],
+    "primary_methods": [
+      "midcycle_capacity_value"
+    ],
+    "corroborating_methods": [
+      "replacement_cost",
+      "downcycle_liquidity_stress"
+    ],
+    "primary_personas": [
+      "marathon_capital_cycle"
+    ],
+    "cross_check_personas": [
+      "marks_credit_cycle",
+      "pabrai"
+    ],
+    "silent_personas": [
+      "buffett_weschler",
+      "greenblatt",
+      "hk",
+      "hohn",
+      "klarman_asset_value",
+      "munger",
+      "stahl"
+    ],
+    "required_evidence": [
+      "industry capacity and additions",
+      "utilization",
+      "normalized unit margins",
+      "maintenance versus growth capital",
+      "low-case liquidity"
+    ],
+    "failure_modes": [
+      "peak margins capitalized",
+      "supply response ignored",
+      "replacement cost used for assets that cannot earn their cost of capital"
+    ],
+    "secondary_profiles": [
+      {
+        "profile_id": "catalyst_asset_value",
+        "score": 7.0,
+        "reasons": [
+          "archetype=turnaround",
+          "component categories=financial_asset"
+        ]
+      },
+      {
+        "profile_id": "quality_reinvestment",
+        "score": 4.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dcf, owner_cash, reinvestment"
+        ]
+      }
+    ],
+    "scorecard": {
+      "scarce_asset_optionality": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=option"
+        ]
+      },
+      "quality_reinvestment": {
+        "score": 4.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dcf, owner_cash, reinvestment"
+        ]
+      },
+      "capital_cycle": {
+        "score": 7.0,
+        "reasons": [
+          "archetype=turnaround",
+          "component categories=operating_business"
+        ]
+      },
+      "credit_and_normalized_returns": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=financial_asset, liability_or_reserve"
+        ]
+      },
+      "catalyst_asset_value": {
+        "score": 7.0,
+        "reasons": [
+          "archetype=turnaround",
+          "component categories=financial_asset"
+        ]
+      },
+      "predictable_cash_flow": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=owner_cash"
+        ]
+      },
+      "binary_milestone": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=milestone"
+        ]
+      }
+    },
+    "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+  },
+  "universal_valuation_contract": {
+    "schema_version": "1.0",
+    "status": "decision_grade",
+    "ticker": "QDEL",
+    "as_of": "2026-06-29",
+    "economic_ownership_map": [
+      {
+        "component_id": "core_diagnostics_engine",
+        "label": "Labs and immunohematology owner cash",
+        "category": "operating_business",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Labs and immunohematology owner cash",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 7.58
+        },
+        "growth_driver": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "owner_cash_reinvestment_dcf",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 4.83,
+          "base": 7.58,
+          "high": 10.34
+        },
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "Existing QDEL valuation inputs: Marvin filings: FY26 guided EBITDA midpoint x 18% FCF conversion / shares (haircut vs 25% company target); Primary metric = Marvin filings owner cash; McIntyre external context only [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "overlap_key": "core_diagnostics_engine",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "product_and_pipeline_options",
+        "label": "Point-of-care, LEX, and molecular options",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Point-of-care, LEX, and molecular options",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 1.1
+        },
+        "growth_driver": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "milestone_project_option",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.0,
+          "base": 1.1,
+          "high": 3.45
+        },
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "Existing QDEL valuation inputs: Marvin filings: FY26 guided EBITDA midpoint x 18% FCF conversion / shares (haircut vs 25% company target); Primary metric = Marvin filings owner cash; McIntyre external context only [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "probability_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "The range includes delay and failure outcomes; dated cash realization remains [HUMAN REVIEW].",
+          "probability_basis": "Starter probability is explicit analyst judgment pending a primary-source milestone and ownership reconciliation.",
+          "remaining_capital_basis": "Remaining owner-funded capital, financing, and dilution are reserved until the primary sources-and-uses bridge is complete."
+        },
+        "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "overlap_key": "product_and_pipeline_options",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Net debt and working-capital claims",
+        "category": "financial_asset",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Net debt and working-capital claims",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 1.65
+        },
+        "growth_driver": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "net_asset_value",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.41,
+          "base": 1.65,
+          "high": 2.76
+        },
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "Existing QDEL valuation inputs: Marvin filings: FY26 guided EBITDA midpoint x 18% FCF conversion / shares (haircut vs 25% company target); Primary metric = Marvin filings owner cash; McIntyre external context only [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "overlap_key": "net_financial_claims",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "downside_reserve",
+        "label": "Reimbursement, integration, and failure reserve",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Reimbursement, integration, and failure reserve",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": -1.65
+        },
+        "growth_driver": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "realization_reserve",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": -3.45,
+          "base": -1.65,
+          "high": -0.41
+        },
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "Existing QDEL valuation inputs: Marvin filings: FY26 guided EBITDA midpoint x 18% FCF conversion / shares (haircut vs 25% company target); Primary metric = Marvin filings owner cash; McIntyre external context only [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "overlap_key": "downside_reserve",
+        "assumption_type": "judgment"
+      }
+    ],
+    "component_coverage": {
+      "all_material_components_identified": true,
+      "material_component_count": 4,
+      "additive_component_count": 4,
+      "embedded_component_count": 0,
+      "unvalued_component_count": 0,
+      "double_counting_flags": []
+    },
+    "input_classification": {
+      "facts": [],
+      "estimates": [],
+      "judgments": [
+        {
+          "component_id": "core_diagnostics_engine",
+          "label": "Labs and immunohematology owner cash",
+          "kind": "judgment",
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Existing QDEL valuation inputs: Marvin filings: FY26 guided EBITDA midpoint x 18% FCF conversion / shares (haircut vs 25% company target); Primary metric = Marvin filings owner cash; McIntyre external context only [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "method": "owner_cash_reinvestment_dcf"
+        },
+        {
+          "component_id": "product_and_pipeline_options",
+          "label": "Point-of-care, LEX, and molecular options",
+          "kind": "judgment",
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Existing QDEL valuation inputs: Marvin filings: FY26 guided EBITDA midpoint x 18% FCF conversion / shares (haircut vs 25% company target); Primary metric = Marvin filings owner cash; McIntyre external context only [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "method": "milestone_project_option"
+        },
+        {
+          "component_id": "net_financial_claims",
+          "label": "Net debt and working-capital claims",
+          "kind": "judgment",
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Existing QDEL valuation inputs: Marvin filings: FY26 guided EBITDA midpoint x 18% FCF conversion / shares (haircut vs 25% company target); Primary metric = Marvin filings owner cash; McIntyre external context only [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "method": "net_asset_value"
+        },
+        {
+          "component_id": "downside_reserve",
+          "label": "Reimbursement, integration, and failure reserve",
+          "kind": "judgment",
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Existing QDEL valuation inputs: Marvin filings: FY26 guided EBITDA midpoint x 18% FCF conversion / shares (haircut vs 25% company target); Primary metric = Marvin filings owner cash; McIntyre external context only [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "method": "realization_reserve"
+        }
+      ]
+    },
+    "method_route": {
+      "schema_version": "1.0",
+      "status": "routed",
+      "profile_id": "capital_cycle",
+      "label": "Capital cycle and normalized industry economics",
+      "score": 7.0,
+      "reasons": [
+        "archetype=turnaround",
+        "component categories=operating_business"
+      ],
+      "primary_methods": [
+        "midcycle_capacity_value"
+      ],
+      "corroborating_methods": [
+        "replacement_cost",
+        "downcycle_liquidity_stress"
+      ],
+      "primary_personas": [
+        "marathon_capital_cycle"
+      ],
+      "cross_check_personas": [
+        "marks_credit_cycle",
+        "pabrai"
+      ],
+      "silent_personas": [
+        "buffett_weschler",
+        "greenblatt",
+        "hk",
+        "hohn",
+        "klarman_asset_value",
+        "munger",
+        "stahl"
+      ],
+      "required_evidence": [
+        "industry capacity and additions",
+        "utilization",
+        "normalized unit margins",
+        "maintenance versus growth capital",
+        "low-case liquidity"
+      ],
+      "failure_modes": [
+        "peak margins capitalized",
+        "supply response ignored",
+        "replacement cost used for assets that cannot earn their cost of capital"
+      ],
+      "secondary_profiles": [
+        {
+          "profile_id": "catalyst_asset_value",
+          "score": 7.0,
+          "reasons": [
+            "archetype=turnaround",
+            "component categories=financial_asset"
+          ]
+        },
+        {
+          "profile_id": "quality_reinvestment",
+          "score": 4.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=dcf, owner_cash, reinvestment"
+          ]
+        }
+      ],
+      "scorecard": {
+        "scarce_asset_optionality": {
+          "score": 2.0,
+          "reasons": [
+            "component categories=real_option",
+            "existing methods=option"
+          ]
+        },
+        "quality_reinvestment": {
+          "score": 4.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=dcf, owner_cash, reinvestment"
+          ]
+        },
+        "capital_cycle": {
+          "score": 7.0,
+          "reasons": [
+            "archetype=turnaround",
+            "component categories=operating_business"
+          ]
+        },
+        "credit_and_normalized_returns": {
+          "score": 2.0,
+          "reasons": [
+            "component categories=financial_asset, liability_or_reserve"
+          ]
+        },
+        "catalyst_asset_value": {
+          "score": 7.0,
+          "reasons": [
+            "archetype=turnaround",
+            "component categories=financial_asset"
+          ]
+        },
+        "predictable_cash_flow": {
+          "score": 2.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=owner_cash"
+          ]
+        },
+        "binary_milestone": {
+          "score": 2.0,
+          "reasons": [
+            "component categories=real_option",
+            "existing methods=milestone"
+          ]
+        }
+      },
+      "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+    },
+    "market": {
+      "price_per_share": 13.79,
+      "fully_diluted_shares": 67800000,
+      "market_cap_m": 934.96,
+      "enterprise_value_m": null
+    },
+    "valuation": {
+      "value_per_share": {
+        "low": 1.79,
+        "base": 8.68,
+        "high": 16.14
+      },
+      "probability_weighted_value_per_share": 8.68,
+      "expected_distributions_per_share": 0.0,
+      "annualized_return_at_price_pct": {
+        "low": -25.3,
+        "base": -6.4,
+        "high": 2.27
+      },
+      "downside_to_low_pct": -87.02,
+      "horizon_years": 7
+    },
+    "scenario_contract": {
+      "rule": "Cases must change causal operating, capital, probability, timing, or financing drivers\u2014not only the terminal multiple.",
+      "top_value_drivers": [
+        {
+          "component_id": "core_diagnostics_engine",
+          "label": "Labs and immunohematology owner cash",
+          "base_per_share": 7.58,
+          "range_width_per_share": 5.51,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "product_and_pipeline_options",
+          "label": "Point-of-care, LEX, and molecular options",
+          "base_per_share": 1.1,
+          "range_width_per_share": 3.45,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "downside_reserve",
+          "label": "Reimbursement, integration, and failure reserve",
+          "base_per_share": -1.65,
+          "range_width_per_share": 3.04,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "net_financial_claims",
+          "label": "Net debt and working-capital claims",
+          "base_per_share": 1.65,
+          "range_width_per_share": 2.35,
+          "scenario_assumptions": null
+        }
+      ],
+      "reverse_expectations": null
+    },
+    "evidence": {
+      "unresolved_count": 0,
+      "blockers": [],
+      "validation_errors": []
+    },
+    "monitoring": {
+      "falsifiers": [
+        "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+      ],
+      "required_refresh_triggers": [
+        "new filing or material operating update",
+        "capital-structure change",
+        "material price move",
+        "component milestone or falsifier"
+      ]
+    },
+    "decision_rule": "No security is decision-grade until every material economic claim is valued exactly once and every material evidence blocker is resolved."
   }
 }

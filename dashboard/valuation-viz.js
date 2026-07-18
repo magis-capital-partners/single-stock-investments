@@ -414,12 +414,23 @@
     const rows = (queue.items || []).map((row) => {
       const meta = statusMeta(row.decision_status);
       const values = row.value_per_share || {};
+      const tier = String(row.next_gap_progress_tier || '');
+      const tierBadge = tier === 'partially_met'
+        ? '<span class="badge badge-warn">partially met</span>'
+        : tier === 'not_met'
+          ? '<span class="badge badge-bad">not met</span>'
+          : tier === 'met'
+            ? '<span class="badge badge-ok">met</span>'
+            : '';
+      const progress = row.next_gap_progress_note
+        ? `<div class="tier-sub">${tierBadge ? `${tierBadge} ` : ''}${escapeHtml(String(row.next_gap_progress_note).slice(0, 140))}</div>`
+        : (tierBadge ? `<div class="tier-sub">${tierBadge}</div>` : '');
       return `<tr class="clickable-row" data-valuation-queue-ticker="${escapeHtml(row.ticker)}">
         <td><strong>${escapeHtml(row.ticker)}</strong><div class="tier-sub">${escapeHtml(row.company || '')}</div></td>
         <td>${escapeHtml(String(row.method_profile || '—').replace(/_/g, ' '))}</td>
         <td><span class="badge ${meta.cls}">${escapeHtml(meta.label)}</span>${row.in_validation_cohort ? '<div class="tier-sub">cohort</div>' : ''}</td>
         <td class="mono">${Number(row.critical_gap_count || 0)} / ${Number(row.open_gap_count || 0)}</td>
-        <td>${escapeHtml(row.next_gap_id || '—')}${row.next_gap_question ? `<div class="tier-sub">${escapeHtml(String(row.next_gap_question).slice(0, 120))}</div>` : ''}</td>
+        <td>${escapeHtml(row.next_gap_id || '—')}${row.next_gap_question ? `<div class="tier-sub">${escapeHtml(String(row.next_gap_question).slice(0, 120))}</div>` : ''}${progress}</td>
         <td class="mono">${values.base == null ? '—' : '$' + fmtNum(values.base, 0)}</td>
       </tr>`;
     }).join('');

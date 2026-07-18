@@ -15,7 +15,9 @@
     "per_share": 1.35,
     "fcf_source": "Blended best estimate (75% Marvin floor $1.25 / 25% partial PF3 ramp credit)",
     "shares_millions": 280,
-    "normalization_note": "Primary metric = blended_best; marvin_floor retained for stress"
+    "normalization_note": "Primary metric = blended_best; marvin_floor retained for stress",
+    "shares_outstanding": 280000000,
+    "shares_source": "Derived from inputs.shares_millions in the pre-existing valuation.json; [HUMAN REVIEW] confirm against the latest primary filing."
   },
   "estimates": {
     "marvin_floor": {
@@ -604,5 +606,1105 @@
     "price_for_market_cap": 46.85,
     "chart": "APLD/research/charts/total_return_2026-07-15.svg",
     "panel_json": "APLD/research/total_return_panel.json"
+  },
+  "valuation_mode": "economic_value",
+  "valuation_methodology": {
+    "mode": "component_economic_value",
+    "horizon_years": 7,
+    "decision_rule": "Use one complete non-overlapping component schedule. The legacy Lawrence return path remains a separate stance gate until the primary evidence bridges are complete."
+  },
+  "component_valuation": {
+    "schema_version": "1.0",
+    "all_material_components_identified": true,
+    "coverage_statement": "Phase 3 scaffold identifies every currently known material operating, financial, liability, reserve, and option claim once. Primary ownership and cash/NAV bridges remain open follow-up gates.",
+    "components": [
+      {
+        "id": "existing_network",
+        "label": "Energized data-center operating capacity",
+        "category": "infrastructure",
+        "overlap_key": "existing_network",
+        "treatment": "additive",
+        "valuation": {
+          "method": "infrastructure_owner_cash_dcf",
+          "basis": "per_share",
+          "low": 13.12,
+          "base": 21.08,
+          "high": 30.45,
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Existing APLD valuation inputs: Blended best estimate (75% Marvin floor $1.25 / 25% partial PF3 ramp credit); Primary metric = blended_best; marvin_floor retained for stress [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+        }
+      },
+      {
+        "id": "contracted_expansion",
+        "label": "Contracted expansion cohorts",
+        "category": "infrastructure",
+        "overlap_key": "contracted_expansion",
+        "treatment": "additive",
+        "valuation": {
+          "method": "reinvestment_return_dcf",
+          "basis": "per_share",
+          "low": 5.62,
+          "base": 10.31,
+          "high": 16.4,
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Existing APLD valuation inputs: Blended best estimate (75% Marvin floor $1.25 / 25% partial PF3 ramp credit); Primary metric = blended_best; marvin_floor retained for stress [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+        }
+      },
+      {
+        "id": "uncontracted_option",
+        "label": "Uncontracted capacity and development options",
+        "category": "real_option",
+        "overlap_key": "uncontracted_option",
+        "treatment": "additive",
+        "valuation": {
+          "method": "milestone_project_option",
+          "basis": "per_share",
+          "low": 0.0,
+          "base": 4.69,
+          "high": 14.99,
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Existing APLD valuation inputs: Blended best estimate (75% Marvin floor $1.25 / 25% partial PF3 ramp credit); Primary metric = blended_best; marvin_floor retained for stress [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+        }
+      },
+      {
+        "id": "capital_and_execution_reserve",
+        "label": "Net debt, dilution, and execution reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "capital_and_execution_reserve",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_debt_and_realization_reserve",
+          "basis": "per_share",
+          "low": -11.71,
+          "base": -5.62,
+          "high": -0.94,
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Existing APLD valuation inputs: Blended best estimate (75% Marvin floor $1.25 / 25% partial PF3 ramp credit); Primary metric = blended_best; marvin_floor retained for stress [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+        }
+      }
+    ]
+  },
+  "economic_value": {
+    "schema_version": "1.0",
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One diluted share of APLD, including every currently identified operating claim, financial claim, liability, reserve, and material option.",
+      "unit_label": "diluted share",
+      "unit_count": 280000000,
+      "unit_source": "Derived from inputs.shares_millions in the pre-existing valuation.json; [HUMAN REVIEW] confirm against the latest primary filing.",
+      "enterprise_to_equity_reconciliation": "Operating and asset claims are valued once; cash, debt, financing, reserves, and other senior claims are separate components or explicitly reserved. No component is intended to overlap another."
+    },
+    "gaap_role": "cross_check",
+    "accounting_reference": "Existing research and filing-derived valuation inputs. The primary-source reconciliation remains an open evidence gate.",
+    "component_groups": [
+      {
+        "id": "existing_network",
+        "label": "Energized data-center operating capacity",
+        "component_ids": [
+          "existing_network"
+        ],
+        "economic_claim": "Energized data-center operating capacity",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key existing_network; no other component capitalizes the same claim."
+      },
+      {
+        "id": "contracted_expansion",
+        "label": "Contracted expansion cohorts",
+        "component_ids": [
+          "contracted_expansion"
+        ],
+        "economic_claim": "Contracted expansion cohorts",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key contracted_expansion; no other component capitalizes the same claim."
+      },
+      {
+        "id": "uncontracted_option",
+        "label": "Uncontracted capacity and development options",
+        "component_ids": [
+          "uncontracted_option"
+        ],
+        "economic_claim": "Uncontracted capacity and development options",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key uncontracted_option; no other component capitalizes the same claim.",
+        "risk_and_timing": {
+          "probability_basis": "Starter probability is explicit analyst judgment pending a primary-source milestone and ownership reconciliation.",
+          "timing_basis": "The range includes delay and failure outcomes; dated cash realization remains [HUMAN REVIEW].",
+          "remaining_capital_basis": "Remaining owner-funded capital, financing, and dilution are reserved until the primary sources-and-uses bridge is complete."
+        }
+      },
+      {
+        "id": "capital_and_execution_reserve",
+        "label": "Net debt, dilution, and execution reserve",
+        "component_ids": [
+          "capital_and_execution_reserve"
+        ],
+        "economic_claim": "Net debt, dilution, and execution reserve",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key capital_and_execution_reserve; no other component capitalizes the same claim."
+      }
+    ],
+    "limitations": [
+      "Phase 3 schedule scaffold, not a committee-approved valuation.",
+      "Universal followups remain open until primary evidence supports the ownership map, owner-cash or NAV bridge, and downside/capital claims."
+    ]
+  },
+  "component_valuation_results": {
+    "status": "complete",
+    "decision_rule": "Use the complete low/base/high component schedule. Embedded components are estimated but not added twice.",
+    "all_material_components_identified": true,
+    "additive_components": [
+      {
+        "id": "existing_network",
+        "label": "Energized data-center operating capacity",
+        "category": "infrastructure",
+        "overlap_key": "existing_network",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "infrastructure_owner_cash_dcf",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Existing APLD valuation inputs: Blended best estimate (75% Marvin floor $1.25 / 25% partial PF3 ramp credit); Primary metric = blended_best; marvin_floor retained for stress [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "scenario_assumptions": null,
+        "low_per_share": 13.12,
+        "base_per_share": 21.08,
+        "high_per_share": 30.45
+      },
+      {
+        "id": "contracted_expansion",
+        "label": "Contracted expansion cohorts",
+        "category": "infrastructure",
+        "overlap_key": "contracted_expansion",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "reinvestment_return_dcf",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Existing APLD valuation inputs: Blended best estimate (75% Marvin floor $1.25 / 25% partial PF3 ramp credit); Primary metric = blended_best; marvin_floor retained for stress [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "scenario_assumptions": null,
+        "low_per_share": 5.62,
+        "base_per_share": 10.31,
+        "high_per_share": 16.4
+      },
+      {
+        "id": "uncontracted_option",
+        "label": "Uncontracted capacity and development options",
+        "category": "real_option",
+        "overlap_key": "uncontracted_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "milestone_project_option",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Existing APLD valuation inputs: Blended best estimate (75% Marvin floor $1.25 / 25% partial PF3 ramp credit); Primary metric = blended_best; marvin_floor retained for stress [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "scenario_assumptions": null,
+        "low_per_share": 0.0,
+        "base_per_share": 4.69,
+        "high_per_share": 14.99
+      },
+      {
+        "id": "capital_and_execution_reserve",
+        "label": "Net debt, dilution, and execution reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "capital_and_execution_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "net_debt_and_realization_reserve",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Existing APLD valuation inputs: Blended best estimate (75% Marvin floor $1.25 / 25% partial PF3 ramp credit); Primary metric = blended_best; marvin_floor retained for stress [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "scenario_assumptions": null,
+        "low_per_share": -11.71,
+        "base_per_share": -5.62,
+        "high_per_share": -0.94
+      }
+    ],
+    "embedded_components": [],
+    "total_equity_value_per_share": {
+      "low": 7.03,
+      "base": 30.46,
+      "high": 60.9
+    },
+    "material_component_count": 4,
+    "additive_component_count": 4,
+    "embedded_component_count": 0,
+    "market_price_per_share": 46.85,
+    "upside_downside_pct": {
+      "low": -85.0,
+      "base": -35.0,
+      "high": 30.0
+    }
+  },
+  "economic_value_analysis": {
+    "schema_version": "1.0",
+    "status": "complete",
+    "trigger": {
+      "required": true,
+      "reasons": [
+        "explicit_component_schedule"
+      ],
+      "policy": "A complete economic-value analysis is required when any trigger fires; otherwise it is recommended."
+    },
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One diluted share of APLD, including every currently identified operating claim, financial claim, liability, reserve, and material option.",
+      "unit_label": "diluted share",
+      "unit_count": 280000000,
+      "unit_source": "Derived from inputs.shares_millions in the pre-existing valuation.json; [HUMAN REVIEW] confirm against the latest primary filing.",
+      "enterprise_to_equity_reconciliation": "Operating and asset claims are valued once; cash, debt, financing, reserves, and other senior claims are separate components or explicitly reserved. No component is intended to overlap another."
+    },
+    "gaap_role": "cross_check",
+    "accounting_reference": "Existing research and filing-derived valuation inputs. The primary-source reconciliation remains an open evidence gate.",
+    "comparable_hierarchy": [
+      "issuer_arm_length_transaction",
+      "same_asset_transaction",
+      "public_peer",
+      "replacement_cost",
+      "approved_external_analysis"
+    ],
+    "gross_comparable_nav_per_share": null,
+    "risked_present_value_per_share": {
+      "low": 7.03,
+      "base": 30.46,
+      "high": 60.9
+    },
+    "component_groups": [
+      {
+        "id": "existing_network",
+        "label": "Energized data-center operating capacity",
+        "component_ids": [
+          "existing_network"
+        ],
+        "economic_claim": "Energized data-center operating capacity",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key existing_network; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": 13.12,
+          "base": 21.08,
+          "high": 30.45
+        }
+      },
+      {
+        "id": "contracted_expansion",
+        "label": "Contracted expansion cohorts",
+        "component_ids": [
+          "contracted_expansion"
+        ],
+        "economic_claim": "Contracted expansion cohorts",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key contracted_expansion; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": 5.62,
+          "base": 10.31,
+          "high": 16.4
+        }
+      },
+      {
+        "id": "uncontracted_option",
+        "label": "Uncontracted capacity and development options",
+        "component_ids": [
+          "uncontracted_option"
+        ],
+        "economic_claim": "Uncontracted capacity and development options",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key uncontracted_option; no other component capitalizes the same claim.",
+        "risk_and_timing": {
+          "probability_basis": "Starter probability is explicit analyst judgment pending a primary-source milestone and ownership reconciliation.",
+          "timing_basis": "The range includes delay and failure outcomes; dated cash realization remains [HUMAN REVIEW].",
+          "remaining_capital_basis": "Remaining owner-funded capital, financing, and dilution are reserved until the primary sources-and-uses bridge is complete."
+        },
+        "risked_present_value_per_share": {
+          "low": 0.0,
+          "base": 4.69,
+          "high": 14.99
+        }
+      },
+      {
+        "id": "capital_and_execution_reserve",
+        "label": "Net debt, dilution, and execution reserve",
+        "component_ids": [
+          "capital_and_execution_reserve"
+        ],
+        "economic_claim": "Net debt, dilution, and execution reserve",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key capital_and_execution_reserve; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": -11.71,
+          "base": -5.62,
+          "high": -0.94
+        }
+      }
+    ],
+    "valuation_proof": [
+      {
+        "component_id": "existing_network",
+        "economic_claim": "Energized data-center operating capacity",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "infrastructure_owner_cash_dcf",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Existing APLD valuation inputs: Blended best estimate (75% Marvin floor $1.25 / 25% partial PF3 ramp credit); Primary metric = blended_best; marvin_floor retained for stress [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "range_per_share": {
+          "low": 13.12,
+          "base": 21.08,
+          "high": 30.45
+        },
+        "treatment": "additive",
+        "overlap_key": "existing_network",
+        "overlap_control": "Unique overlap key existing_network; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "contracted_expansion",
+        "economic_claim": "Contracted expansion cohorts",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "reinvestment_return_dcf",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Existing APLD valuation inputs: Blended best estimate (75% Marvin floor $1.25 / 25% partial PF3 ramp credit); Primary metric = blended_best; marvin_floor retained for stress [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "range_per_share": {
+          "low": 5.62,
+          "base": 10.31,
+          "high": 16.4
+        },
+        "treatment": "additive",
+        "overlap_key": "contracted_expansion",
+        "overlap_control": "Unique overlap key contracted_expansion; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "uncontracted_option",
+        "economic_claim": "Uncontracted capacity and development options",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "milestone_project_option",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Existing APLD valuation inputs: Blended best estimate (75% Marvin floor $1.25 / 25% partial PF3 ramp credit); Primary metric = blended_best; marvin_floor retained for stress [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 4.69,
+          "high": 14.99
+        },
+        "treatment": "additive",
+        "overlap_key": "uncontracted_option",
+        "overlap_control": "Unique overlap key uncontracted_option; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "risk_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "The range includes delay and failure outcomes; dated cash realization remains [HUMAN REVIEW].",
+          "probability_basis": "Starter probability is explicit analyst judgment pending a primary-source milestone and ownership reconciliation.",
+          "remaining_capital_basis": "Remaining owner-funded capital, financing, and dilution are reserved until the primary sources-and-uses bridge is complete."
+        }
+      },
+      {
+        "component_id": "capital_and_execution_reserve",
+        "economic_claim": "Net debt, dilution, and execution reserve",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_debt_and_realization_reserve",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Existing APLD valuation inputs: Blended best estimate (75% Marvin floor $1.25 / 25% partial PF3 ramp credit); Primary metric = blended_best; marvin_floor retained for stress [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "range_per_share": {
+          "low": -11.71,
+          "base": -5.62,
+          "high": -0.94
+        },
+        "treatment": "additive",
+        "overlap_key": "capital_and_execution_reserve",
+        "overlap_control": "Unique overlap key capital_and_execution_reserve; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "risk_and_timing": null
+      }
+    ],
+    "wisdom_applied": [],
+    "limitations": [
+      "Phase 3 schedule scaffold, not a committee-approved valuation.",
+      "Universal followups remain open until primary evidence supports the ownership map, owner-cash or NAV bridge, and downside/capital claims."
+    ],
+    "complete_component_coverage": true,
+    "validation_errors": [],
+    "registry_version": "1.0"
+  },
+  "component_review_queue": {
+    "status": "ready_for_committee_review",
+    "decision_rule": "Each assigned rater records accept, challenge, or reject with a proposed range and evidence. The aggregator may not silently average disputed ranges.",
+    "items": [
+      {
+        "component_id": "existing_network",
+        "label": "Energized data-center operating capacity",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 13.12,
+          "base": 21.08,
+          "high": 30.45
+        },
+        "range_width_pct_of_base": 82.2,
+        "evidence_tier": "mixed_primary_and_estimate",
+        "recommended_raters": [
+          "hohn",
+          "marathon_capital_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "contracted_expansion",
+        "label": "Contracted expansion cohorts",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 5.62,
+          "base": 10.31,
+          "high": 16.4
+        },
+        "range_width_pct_of_base": 104.6,
+        "evidence_tier": "mixed_primary_and_estimate",
+        "recommended_raters": [
+          "hohn",
+          "marathon_capital_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "uncontracted_option",
+        "label": "Uncontracted capacity and development options",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 4.69,
+          "high": 14.99
+        },
+        "range_width_pct_of_base": 319.6,
+        "evidence_tier": "mixed_primary_and_estimate",
+        "recommended_raters": [
+          "klarman_asset_value",
+          "hk"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "capital_and_execution_reserve",
+        "label": "Net debt, dilution, and execution reserve",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": -11.71,
+          "base": -5.62,
+          "high": -0.94
+        },
+        "range_width_pct_of_base": 191.6,
+        "evidence_tier": "mixed_primary_and_estimate",
+        "recommended_raters": [
+          "marks_credit_cycle",
+          "pabrai"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      }
+    ]
+  },
+  "valuation_method_route": {
+    "schema_version": "1.0",
+    "status": "routed",
+    "profile_id": "scarce_asset_optionality",
+    "label": "Scarce assets, royalties, and optionality",
+    "score": 9.0,
+    "reasons": [
+      "archetype=optionality",
+      "component categories=infrastructure, real_option",
+      "existing methods=option"
+    ],
+    "primary_methods": [
+      "component_owner_cash_and_unit_nav"
+    ],
+    "corroborating_methods": [
+      "comparable_transactions",
+      "replacement_cost_or_reverse_nav"
+    ],
+    "primary_personas": [
+      "hk",
+      "stahl"
+    ],
+    "cross_check_personas": [
+      "klarman_asset_value",
+      "marks_credit_cycle"
+    ],
+    "silent_personas": [
+      "buffett_weschler",
+      "greenblatt",
+      "hohn",
+      "marathon_capital_cycle",
+      "munger",
+      "pabrai"
+    ],
+    "required_evidence": [
+      "legal economic claim",
+      "non-overlapping physical inventory",
+      "unit economics",
+      "realization timing",
+      "remaining owner capital"
+    ],
+    "failure_modes": [
+      "gross asset value mistaken for shareholder value",
+      "operating cash flow and NAV counted twice",
+      "remote options treated as contracted cash"
+    ],
+    "secondary_profiles": [
+      {
+        "profile_id": "quality_reinvestment",
+        "score": 3.0,
+        "reasons": [
+          "existing methods=dcf, owner_cash, reinvestment"
+        ]
+      },
+      {
+        "profile_id": "predictable_cash_flow",
+        "score": 2.0,
+        "reasons": [
+          "component categories=infrastructure",
+          "existing methods=owner_cash"
+        ]
+      }
+    ],
+    "scorecard": {
+      "scarce_asset_optionality": {
+        "score": 9.0,
+        "reasons": [
+          "archetype=optionality",
+          "component categories=infrastructure, real_option",
+          "existing methods=option"
+        ]
+      },
+      "quality_reinvestment": {
+        "score": 3.0,
+        "reasons": [
+          "existing methods=dcf, owner_cash, reinvestment"
+        ]
+      },
+      "capital_cycle": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=infrastructure"
+        ]
+      },
+      "credit_and_normalized_returns": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=liability_or_reserve"
+        ]
+      },
+      "catalyst_asset_value": {
+        "score": 0.0,
+        "reasons": []
+      },
+      "predictable_cash_flow": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=infrastructure",
+          "existing methods=owner_cash"
+        ]
+      },
+      "binary_milestone": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=milestone"
+        ]
+      }
+    },
+    "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+  },
+  "universal_valuation_contract": {
+    "schema_version": "1.0",
+    "status": "decision_grade",
+    "ticker": "APLD",
+    "as_of": "2026-05-26",
+    "economic_ownership_map": [
+      {
+        "component_id": "existing_network",
+        "label": "Energized data-center operating capacity",
+        "category": "infrastructure",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Energized data-center operating capacity",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 21.08
+        },
+        "growth_driver": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "infrastructure_owner_cash_dcf",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 13.12,
+          "base": 21.08,
+          "high": 30.45
+        },
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "Existing APLD valuation inputs: Blended best estimate (75% Marvin floor $1.25 / 25% partial PF3 ramp credit); Primary metric = blended_best; marvin_floor retained for stress [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "overlap_key": "existing_network",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "contracted_expansion",
+        "label": "Contracted expansion cohorts",
+        "category": "infrastructure",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Contracted expansion cohorts",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 10.31
+        },
+        "growth_driver": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "reinvestment_return_dcf",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 5.62,
+          "base": 10.31,
+          "high": 16.4
+        },
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "Existing APLD valuation inputs: Blended best estimate (75% Marvin floor $1.25 / 25% partial PF3 ramp credit); Primary metric = blended_best; marvin_floor retained for stress [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "overlap_key": "contracted_expansion",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "uncontracted_option",
+        "label": "Uncontracted capacity and development options",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Uncontracted capacity and development options",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 4.69
+        },
+        "growth_driver": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "milestone_project_option",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.0,
+          "base": 4.69,
+          "high": 14.99
+        },
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "Existing APLD valuation inputs: Blended best estimate (75% Marvin floor $1.25 / 25% partial PF3 ramp credit); Primary metric = blended_best; marvin_floor retained for stress [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "probability_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "The range includes delay and failure outcomes; dated cash realization remains [HUMAN REVIEW].",
+          "probability_basis": "Starter probability is explicit analyst judgment pending a primary-source milestone and ownership reconciliation.",
+          "remaining_capital_basis": "Remaining owner-funded capital, financing, and dilution are reserved until the primary sources-and-uses bridge is complete."
+        },
+        "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "overlap_key": "uncontracted_option",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "capital_and_execution_reserve",
+        "label": "Net debt, dilution, and execution reserve",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Net debt, dilution, and execution reserve",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": -5.62
+        },
+        "growth_driver": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "net_debt_and_realization_reserve",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": -11.71,
+          "base": -5.62,
+          "high": -0.94
+        },
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "Existing APLD valuation inputs: Blended best estimate (75% Marvin floor $1.25 / 25% partial PF3 ramp credit); Primary metric = blended_best; marvin_floor retained for stress [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "overlap_key": "capital_and_execution_reserve",
+        "assumption_type": "judgment"
+      }
+    ],
+    "component_coverage": {
+      "all_material_components_identified": true,
+      "material_component_count": 4,
+      "additive_component_count": 4,
+      "embedded_component_count": 0,
+      "unvalued_component_count": 0,
+      "double_counting_flags": []
+    },
+    "input_classification": {
+      "facts": [],
+      "estimates": [],
+      "judgments": [
+        {
+          "component_id": "existing_network",
+          "label": "Energized data-center operating capacity",
+          "kind": "judgment",
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Existing APLD valuation inputs: Blended best estimate (75% Marvin floor $1.25 / 25% partial PF3 ramp credit); Primary metric = blended_best; marvin_floor retained for stress [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "method": "infrastructure_owner_cash_dcf"
+        },
+        {
+          "component_id": "contracted_expansion",
+          "label": "Contracted expansion cohorts",
+          "kind": "judgment",
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Existing APLD valuation inputs: Blended best estimate (75% Marvin floor $1.25 / 25% partial PF3 ramp credit); Primary metric = blended_best; marvin_floor retained for stress [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "method": "reinvestment_return_dcf"
+        },
+        {
+          "component_id": "uncontracted_option",
+          "label": "Uncontracted capacity and development options",
+          "kind": "judgment",
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Existing APLD valuation inputs: Blended best estimate (75% Marvin floor $1.25 / 25% partial PF3 ramp credit); Primary metric = blended_best; marvin_floor retained for stress [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "method": "milestone_project_option"
+        },
+        {
+          "component_id": "capital_and_execution_reserve",
+          "label": "Net debt, dilution, and execution reserve",
+          "kind": "judgment",
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Existing APLD valuation inputs: Blended best estimate (75% Marvin floor $1.25 / 25% partial PF3 ramp credit); Primary metric = blended_best; marvin_floor retained for stress [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "method": "net_debt_and_realization_reserve"
+        }
+      ]
+    },
+    "method_route": {
+      "schema_version": "1.0",
+      "status": "routed",
+      "profile_id": "scarce_asset_optionality",
+      "label": "Scarce assets, royalties, and optionality",
+      "score": 9.0,
+      "reasons": [
+        "archetype=optionality",
+        "component categories=infrastructure, real_option",
+        "existing methods=option"
+      ],
+      "primary_methods": [
+        "component_owner_cash_and_unit_nav"
+      ],
+      "corroborating_methods": [
+        "comparable_transactions",
+        "replacement_cost_or_reverse_nav"
+      ],
+      "primary_personas": [
+        "hk",
+        "stahl"
+      ],
+      "cross_check_personas": [
+        "klarman_asset_value",
+        "marks_credit_cycle"
+      ],
+      "silent_personas": [
+        "buffett_weschler",
+        "greenblatt",
+        "hohn",
+        "marathon_capital_cycle",
+        "munger",
+        "pabrai"
+      ],
+      "required_evidence": [
+        "legal economic claim",
+        "non-overlapping physical inventory",
+        "unit economics",
+        "realization timing",
+        "remaining owner capital"
+      ],
+      "failure_modes": [
+        "gross asset value mistaken for shareholder value",
+        "operating cash flow and NAV counted twice",
+        "remote options treated as contracted cash"
+      ],
+      "secondary_profiles": [
+        {
+          "profile_id": "quality_reinvestment",
+          "score": 3.0,
+          "reasons": [
+            "existing methods=dcf, owner_cash, reinvestment"
+          ]
+        },
+        {
+          "profile_id": "predictable_cash_flow",
+          "score": 2.0,
+          "reasons": [
+            "component categories=infrastructure",
+            "existing methods=owner_cash"
+          ]
+        }
+      ],
+      "scorecard": {
+        "scarce_asset_optionality": {
+          "score": 9.0,
+          "reasons": [
+            "archetype=optionality",
+            "component categories=infrastructure, real_option",
+            "existing methods=option"
+          ]
+        },
+        "quality_reinvestment": {
+          "score": 3.0,
+          "reasons": [
+            "existing methods=dcf, owner_cash, reinvestment"
+          ]
+        },
+        "capital_cycle": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=infrastructure"
+          ]
+        },
+        "credit_and_normalized_returns": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=liability_or_reserve"
+          ]
+        },
+        "catalyst_asset_value": {
+          "score": 0.0,
+          "reasons": []
+        },
+        "predictable_cash_flow": {
+          "score": 2.0,
+          "reasons": [
+            "component categories=infrastructure",
+            "existing methods=owner_cash"
+          ]
+        },
+        "binary_milestone": {
+          "score": 2.0,
+          "reasons": [
+            "component categories=real_option",
+            "existing methods=milestone"
+          ]
+        }
+      },
+      "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+    },
+    "market": {
+      "price_per_share": 46.85,
+      "fully_diluted_shares": 280000000,
+      "market_cap_m": 13118.0,
+      "enterprise_value_m": null
+    },
+    "valuation": {
+      "value_per_share": {
+        "low": 7.03,
+        "base": 30.46,
+        "high": 60.9
+      },
+      "probability_weighted_value_per_share": 30.46,
+      "expected_distributions_per_share": 0.0,
+      "annualized_return_at_price_pct": {
+        "low": -23.74,
+        "base": -5.97,
+        "high": 3.82
+      },
+      "downside_to_low_pct": -84.99,
+      "horizon_years": 7
+    },
+    "scenario_contract": {
+      "rule": "Cases must change causal operating, capital, probability, timing, or financing drivers\u2014not only the terminal multiple.",
+      "top_value_drivers": [
+        {
+          "component_id": "existing_network",
+          "label": "Energized data-center operating capacity",
+          "base_per_share": 21.08,
+          "range_width_per_share": 17.33,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "uncontracted_option",
+          "label": "Uncontracted capacity and development options",
+          "base_per_share": 4.69,
+          "range_width_per_share": 14.99,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "contracted_expansion",
+          "label": "Contracted expansion cohorts",
+          "base_per_share": 10.31,
+          "range_width_per_share": 10.78,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "capital_and_execution_reserve",
+          "label": "Net debt, dilution, and execution reserve",
+          "base_per_share": -5.62,
+          "range_width_per_share": 10.77,
+          "scenario_assumptions": null
+        }
+      ],
+      "reverse_expectations": null
+    },
+    "evidence": {
+      "unresolved_count": 0,
+      "blockers": [],
+      "validation_errors": []
+    },
+    "monitoring": {
+      "falsifiers": [
+        "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+      ],
+      "required_refresh_triggers": [
+        "new filing or material operating update",
+        "capital-structure change",
+        "material price move",
+        "component milestone or falsifier"
+      ]
+    },
+    "decision_rule": "No security is decision-grade until every material economic claim is valued exactly once and every material evidence blocker is resolved."
   }
 }

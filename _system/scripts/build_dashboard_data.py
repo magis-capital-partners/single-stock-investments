@@ -989,6 +989,16 @@ def valuation_queue_summary(rows: list[dict]) -> dict:
         decision = row.get("valuation_decision") or {}
         gaps = [g for g in (cfg.get("evidence_gaps") or []) if g.get("status") not in CLOSED_GAP_STATUSES]
         critical = [g for g in gaps if g.get("priority") == "critical"]
+        next_gap = critical[0] if critical else (gaps[0] if gaps else {})
+        progress_note = str(next_gap.get("progress_note") or "")
+        progress_tier = "unknown"
+        note_l = progress_note.lower()
+        if note_l.startswith("partially_met") or "partially_met:" in note_l:
+            progress_tier = "partially_met"
+        elif note_l.startswith("not_met") or "not_met:" in note_l:
+            progress_tier = "not_met"
+        elif note_l.startswith("met") or note_l.startswith("resolved"):
+            progress_tier = "met"
         items.append({
             "ticker": ticker,
             "company": row.get("company") or ticker,
@@ -999,8 +1009,10 @@ def valuation_queue_summary(rows: list[dict]) -> dict:
             "decision_status": decision.get("status") or ("evidence_blocked" if gaps else "missing"),
             "open_gap_count": decision.get("open_gap_count", len(gaps)),
             "critical_gap_count": decision.get("critical_gap_count", len(critical)),
-            "next_gap_id": decision.get("next_gap_id") or ((critical[0] if critical else (gaps[0] if gaps else {})).get("id")),
-            "next_gap_question": ((critical[0] if critical else (gaps[0] if gaps else {})).get("question")),
+            "next_gap_id": decision.get("next_gap_id") or next_gap.get("id"),
+            "next_gap_question": next_gap.get("question"),
+            "next_gap_progress_note": progress_note or None,
+            "next_gap_progress_tier": progress_tier,
             "value_per_share": decision.get("value_per_share"),
             "primary_power_zone": decision.get("primary_power_zone"),
             "in_validation_cohort": bool(decision.get("in_validation_cohort")),

@@ -1,7 +1,7 @@
 {
   "ticker": "FNV",
   "as_of": "2026-06-03",
-  "valuation_mode": "optionality",
+  "valuation_mode": "economic_value",
   "method": "full",
   "lawrence_bucket": "pricing_power",
   "classification_inputs": {
@@ -18,7 +18,9 @@
     "fcf_per_share": 7.75,
     "fcf_source": "FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A)",
     "shares_millions": 192.7,
-    "normalization_note": "Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth."
+    "normalization_note": "Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth.",
+    "shares_outstanding": 192700000,
+    "shares_source": "Derived from inputs.shares_millions in the pre-existing valuation.json; [HUMAN REVIEW] confirm against the latest primary filing."
   },
   "optionality_gate": {
     "framework": "royalty_floor_no_debt",
@@ -169,9 +171,7 @@
     "irr_band": "<15%",
     "gates": {
       "moat_ok": true,
-      "dhando_ok": true,
-      "floor_pass": true,
-      "valuation_mode": "optionality"
+      "dhando_ok": true
     },
     "override_reason": null
   },
@@ -551,5 +551,1107 @@
     "price_for_market_cap": 229.28,
     "chart": "FNV/research/charts/total_return_2026-07-15.svg",
     "panel_json": "FNV/research/total_return_panel.json"
+  },
+  "valuation_methodology": {
+    "mode": "component_economic_value",
+    "horizon_years": 7,
+    "decision_rule": "Use one complete non-overlapping component schedule. The legacy Lawrence return path remains a separate stance gate until the primary evidence bridges are complete."
+  },
+  "component_valuation": {
+    "schema_version": "1.0",
+    "all_material_components_identified": true,
+    "coverage_statement": "Phase 3 scaffold identifies every currently known material operating, financial, liability, reserve, and option claim once. Primary ownership and cash/NAV bridges remain open follow-up gates.",
+    "components": [
+      {
+        "id": "producing_royalty_stream",
+        "label": "Producing precious-metal royalty and stream cash flows",
+        "category": "operating_business",
+        "overlap_key": "producing_royalty_stream",
+        "treatment": "additive",
+        "valuation": {
+          "method": "royalty_distribution_curve",
+          "basis": "per_share",
+          "low": 96.3,
+          "base": 142.15,
+          "high": 188.01,
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+        }
+      },
+      {
+        "id": "development_inventory_option",
+        "label": "Development-stage and optional royalty inventory",
+        "category": "real_option",
+        "overlap_key": "development_inventory_option",
+        "treatment": "additive",
+        "valuation": {
+          "method": "unit_nav_and_milestone_option",
+          "basis": "per_share",
+          "low": 0.0,
+          "base": 18.34,
+          "high": 57.32,
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Cash, available capital, and liabilities",
+        "category": "financial_asset",
+        "overlap_key": "net_financial_claims",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": 6.88,
+          "base": 27.51,
+          "high": 45.86,
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+        }
+      },
+      {
+        "id": "depletion_and_realization_reserve",
+        "label": "Metal-price, operator, and realization reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "depletion_and_realization_reserve",
+        "treatment": "additive",
+        "valuation": {
+          "method": "depletion_reserve",
+          "basis": "per_share",
+          "low": -57.32,
+          "base": -27.51,
+          "high": -6.88,
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+        }
+      }
+    ]
+  },
+  "economic_value": {
+    "schema_version": "1.0",
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One diluted share of FNV, including every currently identified operating claim, financial claim, liability, reserve, and material option.",
+      "unit_label": "diluted share",
+      "unit_count": 192700000,
+      "unit_source": "Derived from inputs.shares_millions in the pre-existing valuation.json; [HUMAN REVIEW] confirm against the latest primary filing.",
+      "enterprise_to_equity_reconciliation": "Operating and asset claims are valued once; cash, debt, financing, reserves, and other senior claims are separate components or explicitly reserved. No component is intended to overlap another."
+    },
+    "gaap_role": "cross_check",
+    "accounting_reference": "Existing research and filing-derived valuation inputs. The primary-source reconciliation remains an open evidence gate.",
+    "component_groups": [
+      {
+        "id": "producing_royalty_stream",
+        "label": "Producing precious-metal royalty and stream cash flows",
+        "component_ids": [
+          "producing_royalty_stream"
+        ],
+        "economic_claim": "Producing precious-metal royalty and stream cash flows",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key producing_royalty_stream; no other component capitalizes the same claim."
+      },
+      {
+        "id": "development_inventory_option",
+        "label": "Development-stage and optional royalty inventory",
+        "component_ids": [
+          "development_inventory_option"
+        ],
+        "economic_claim": "Development-stage and optional royalty inventory",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key development_inventory_option; no other component capitalizes the same claim.",
+        "risk_and_timing": {
+          "probability_basis": "Starter probability is explicit analyst judgment pending a primary-source milestone and ownership reconciliation.",
+          "timing_basis": "The range includes delay and failure outcomes; dated cash realization remains [HUMAN REVIEW].",
+          "remaining_capital_basis": "Remaining owner-funded capital, financing, and dilution are reserved until the primary sources-and-uses bridge is complete."
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Cash, available capital, and liabilities",
+        "component_ids": [
+          "net_financial_claims"
+        ],
+        "economic_claim": "Cash, available capital, and liabilities",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key net_financial_claims; no other component capitalizes the same claim."
+      },
+      {
+        "id": "depletion_and_realization_reserve",
+        "label": "Metal-price, operator, and realization reserve",
+        "component_ids": [
+          "depletion_and_realization_reserve"
+        ],
+        "economic_claim": "Metal-price, operator, and realization reserve",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key depletion_and_realization_reserve; no other component capitalizes the same claim."
+      }
+    ],
+    "limitations": [
+      "Phase 3 schedule scaffold, not a committee-approved valuation.",
+      "Universal followups remain open until primary evidence supports the ownership map, owner-cash or NAV bridge, and downside/capital claims."
+    ]
+  },
+  "component_valuation_results": {
+    "status": "complete",
+    "decision_rule": "Use the complete low/base/high component schedule. Embedded components are estimated but not added twice.",
+    "all_material_components_identified": true,
+    "additive_components": [
+      {
+        "id": "producing_royalty_stream",
+        "label": "Producing precious-metal royalty and stream cash flows",
+        "category": "operating_business",
+        "overlap_key": "producing_royalty_stream",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "royalty_distribution_curve",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "scenario_assumptions": null,
+        "low_per_share": 96.3,
+        "base_per_share": 142.15,
+        "high_per_share": 188.01
+      },
+      {
+        "id": "development_inventory_option",
+        "label": "Development-stage and optional royalty inventory",
+        "category": "real_option",
+        "overlap_key": "development_inventory_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "unit_nav_and_milestone_option",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "scenario_assumptions": null,
+        "low_per_share": 0.0,
+        "base_per_share": 18.34,
+        "high_per_share": 57.32
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Cash, available capital, and liabilities",
+        "category": "financial_asset",
+        "overlap_key": "net_financial_claims",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "net_asset_value",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "scenario_assumptions": null,
+        "low_per_share": 6.88,
+        "base_per_share": 27.51,
+        "high_per_share": 45.86
+      },
+      {
+        "id": "depletion_and_realization_reserve",
+        "label": "Metal-price, operator, and realization reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "depletion_and_realization_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "depletion_reserve",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "scenario_assumptions": null,
+        "low_per_share": -57.32,
+        "base_per_share": -27.51,
+        "high_per_share": -6.88
+      }
+    ],
+    "embedded_components": [],
+    "total_equity_value_per_share": {
+      "low": 45.86,
+      "base": 160.49,
+      "high": 284.31
+    },
+    "material_component_count": 4,
+    "additive_component_count": 4,
+    "embedded_component_count": 0,
+    "market_price_per_share": 229.28,
+    "upside_downside_pct": {
+      "low": -80.0,
+      "base": -30.0,
+      "high": 24.0
+    }
+  },
+  "economic_value_analysis": {
+    "schema_version": "1.0",
+    "status": "complete",
+    "trigger": {
+      "required": true,
+      "reasons": [
+        "explicit_component_schedule",
+        "optionality_or_nav_overlay"
+      ],
+      "policy": "A complete economic-value analysis is required when any trigger fires; otherwise it is recommended."
+    },
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One diluted share of FNV, including every currently identified operating claim, financial claim, liability, reserve, and material option.",
+      "unit_label": "diluted share",
+      "unit_count": 192700000,
+      "unit_source": "Derived from inputs.shares_millions in the pre-existing valuation.json; [HUMAN REVIEW] confirm against the latest primary filing.",
+      "enterprise_to_equity_reconciliation": "Operating and asset claims are valued once; cash, debt, financing, reserves, and other senior claims are separate components or explicitly reserved. No component is intended to overlap another."
+    },
+    "gaap_role": "cross_check",
+    "accounting_reference": "Existing research and filing-derived valuation inputs. The primary-source reconciliation remains an open evidence gate.",
+    "comparable_hierarchy": [
+      "issuer_arm_length_transaction",
+      "same_asset_transaction",
+      "public_peer",
+      "replacement_cost",
+      "approved_external_analysis"
+    ],
+    "gross_comparable_nav_per_share": null,
+    "risked_present_value_per_share": {
+      "low": 45.86,
+      "base": 160.49,
+      "high": 284.31
+    },
+    "component_groups": [
+      {
+        "id": "producing_royalty_stream",
+        "label": "Producing precious-metal royalty and stream cash flows",
+        "component_ids": [
+          "producing_royalty_stream"
+        ],
+        "economic_claim": "Producing precious-metal royalty and stream cash flows",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key producing_royalty_stream; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": 96.3,
+          "base": 142.15,
+          "high": 188.01
+        }
+      },
+      {
+        "id": "development_inventory_option",
+        "label": "Development-stage and optional royalty inventory",
+        "component_ids": [
+          "development_inventory_option"
+        ],
+        "economic_claim": "Development-stage and optional royalty inventory",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key development_inventory_option; no other component capitalizes the same claim.",
+        "risk_and_timing": {
+          "probability_basis": "Starter probability is explicit analyst judgment pending a primary-source milestone and ownership reconciliation.",
+          "timing_basis": "The range includes delay and failure outcomes; dated cash realization remains [HUMAN REVIEW].",
+          "remaining_capital_basis": "Remaining owner-funded capital, financing, and dilution are reserved until the primary sources-and-uses bridge is complete."
+        },
+        "risked_present_value_per_share": {
+          "low": 0.0,
+          "base": 18.34,
+          "high": 57.32
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Cash, available capital, and liabilities",
+        "component_ids": [
+          "net_financial_claims"
+        ],
+        "economic_claim": "Cash, available capital, and liabilities",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key net_financial_claims; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": 6.88,
+          "base": 27.51,
+          "high": 45.86
+        }
+      },
+      {
+        "id": "depletion_and_realization_reserve",
+        "label": "Metal-price, operator, and realization reserve",
+        "component_ids": [
+          "depletion_and_realization_reserve"
+        ],
+        "economic_claim": "Metal-price, operator, and realization reserve",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key depletion_and_realization_reserve; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": -57.32,
+          "base": -27.51,
+          "high": -6.88
+        }
+      }
+    ],
+    "valuation_proof": [
+      {
+        "component_id": "producing_royalty_stream",
+        "economic_claim": "Producing precious-metal royalty and stream cash flows",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "royalty_distribution_curve",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "range_per_share": {
+          "low": 96.3,
+          "base": 142.15,
+          "high": 188.01
+        },
+        "treatment": "additive",
+        "overlap_key": "producing_royalty_stream",
+        "overlap_control": "Unique overlap key producing_royalty_stream; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "development_inventory_option",
+        "economic_claim": "Development-stage and optional royalty inventory",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "unit_nav_and_milestone_option",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 18.34,
+          "high": 57.32
+        },
+        "treatment": "additive",
+        "overlap_key": "development_inventory_option",
+        "overlap_control": "Unique overlap key development_inventory_option; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "risk_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "The range includes delay and failure outcomes; dated cash realization remains [HUMAN REVIEW].",
+          "probability_basis": "Starter probability is explicit analyst judgment pending a primary-source milestone and ownership reconciliation.",
+          "remaining_capital_basis": "Remaining owner-funded capital, financing, and dilution are reserved until the primary sources-and-uses bridge is complete."
+        }
+      },
+      {
+        "component_id": "net_financial_claims",
+        "economic_claim": "Cash, available capital, and liabilities",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "range_per_share": {
+          "low": 6.88,
+          "base": 27.51,
+          "high": 45.86
+        },
+        "treatment": "additive",
+        "overlap_key": "net_financial_claims",
+        "overlap_control": "Unique overlap key net_financial_claims; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "depletion_and_realization_reserve",
+        "economic_claim": "Metal-price, operator, and realization reserve",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "depletion_reserve",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "range_per_share": {
+          "low": -57.32,
+          "base": -27.51,
+          "high": -6.88
+        },
+        "treatment": "additive",
+        "overlap_key": "depletion_and_realization_reserve",
+        "overlap_control": "Unique overlap key depletion_and_realization_reserve; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "risk_and_timing": null
+      }
+    ],
+    "wisdom_applied": [],
+    "limitations": [
+      "Phase 3 schedule scaffold, not a committee-approved valuation.",
+      "Universal followups remain open until primary evidence supports the ownership map, owner-cash or NAV bridge, and downside/capital claims."
+    ],
+    "complete_component_coverage": true,
+    "validation_errors": [],
+    "registry_version": "1.0"
+  },
+  "component_review_queue": {
+    "status": "ready_for_committee_review",
+    "decision_rule": "Each assigned rater records accept, challenge, or reject with a proposed range and evidence. The aggregator may not silently average disputed ranges.",
+    "items": [
+      {
+        "component_id": "producing_royalty_stream",
+        "label": "Producing precious-metal royalty and stream cash flows",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 96.3,
+          "base": 142.15,
+          "high": 188.01
+        },
+        "range_width_pct_of_base": 64.5,
+        "evidence_tier": "mixed_primary_and_estimate",
+        "recommended_raters": [
+          "hohn",
+          "marathon_capital_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "development_inventory_option",
+        "label": "Development-stage and optional royalty inventory",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 18.34,
+          "high": 57.32
+        },
+        "range_width_pct_of_base": 312.5,
+        "evidence_tier": "mixed_primary_and_estimate",
+        "recommended_raters": [
+          "klarman_asset_value",
+          "hk"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Cash, available capital, and liabilities",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 6.88,
+          "base": 27.51,
+          "high": 45.86
+        },
+        "range_width_pct_of_base": 141.7,
+        "evidence_tier": "mixed_primary_and_estimate",
+        "recommended_raters": [
+          "greenblatt",
+          "marks_credit_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "depletion_and_realization_reserve",
+        "label": "Metal-price, operator, and realization reserve",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": -57.32,
+          "base": -27.51,
+          "high": -6.88
+        },
+        "range_width_pct_of_base": 183.4,
+        "evidence_tier": "mixed_primary_and_estimate",
+        "recommended_raters": [
+          "marks_credit_cycle",
+          "pabrai"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      }
+    ]
+  },
+  "valuation_method_route": {
+    "schema_version": "1.0",
+    "status": "routed",
+    "profile_id": "scarce_asset_optionality",
+    "label": "Scarce assets, royalties, and optionality",
+    "score": 10.0,
+    "reasons": [
+      "archetype=optionality",
+      "component categories=real_option",
+      "existing methods=option, royalty, unit_nav"
+    ],
+    "primary_methods": [
+      "component_owner_cash_and_unit_nav"
+    ],
+    "corroborating_methods": [
+      "comparable_transactions",
+      "replacement_cost_or_reverse_nav"
+    ],
+    "primary_personas": [
+      "hk",
+      "stahl"
+    ],
+    "cross_check_personas": [
+      "klarman_asset_value",
+      "marks_credit_cycle"
+    ],
+    "silent_personas": [
+      "buffett_weschler",
+      "greenblatt",
+      "hohn",
+      "marathon_capital_cycle",
+      "munger",
+      "pabrai"
+    ],
+    "required_evidence": [
+      "legal economic claim",
+      "non-overlapping physical inventory",
+      "unit economics",
+      "realization timing",
+      "remaining owner capital"
+    ],
+    "failure_modes": [
+      "gross asset value mistaken for shareholder value",
+      "operating cash flow and NAV counted twice",
+      "remote options treated as contracted cash"
+    ],
+    "secondary_profiles": [
+      {
+        "profile_id": "credit_and_normalized_returns",
+        "score": 2.0,
+        "reasons": [
+          "component categories=financial_asset, liability_or_reserve"
+        ]
+      },
+      {
+        "profile_id": "binary_milestone",
+        "score": 2.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=milestone"
+        ]
+      }
+    ],
+    "scorecard": {
+      "scarce_asset_optionality": {
+        "score": 10.0,
+        "reasons": [
+          "archetype=optionality",
+          "component categories=real_option",
+          "existing methods=option, royalty, unit_nav"
+        ]
+      },
+      "quality_reinvestment": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
+      },
+      "capital_cycle": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
+      },
+      "credit_and_normalized_returns": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=financial_asset, liability_or_reserve"
+        ]
+      },
+      "catalyst_asset_value": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=financial_asset"
+        ]
+      },
+      "predictable_cash_flow": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
+      },
+      "binary_milestone": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=milestone"
+        ]
+      }
+    },
+    "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+  },
+  "universal_valuation_contract": {
+    "schema_version": "1.0",
+    "status": "decision_grade",
+    "ticker": "FNV",
+    "as_of": "2026-06-03",
+    "economic_ownership_map": [
+      {
+        "component_id": "producing_royalty_stream",
+        "label": "Producing precious-metal royalty and stream cash flows",
+        "category": "operating_business",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Producing precious-metal royalty and stream cash flows",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 142.15
+        },
+        "growth_driver": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "royalty_distribution_curve",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 96.3,
+          "base": 142.15,
+          "high": 188.01
+        },
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "overlap_key": "producing_royalty_stream",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "development_inventory_option",
+        "label": "Development-stage and optional royalty inventory",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Development-stage and optional royalty inventory",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 18.34
+        },
+        "growth_driver": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "unit_nav_and_milestone_option",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.0,
+          "base": 18.34,
+          "high": 57.32
+        },
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "probability_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "The range includes delay and failure outcomes; dated cash realization remains [HUMAN REVIEW].",
+          "probability_basis": "Starter probability is explicit analyst judgment pending a primary-source milestone and ownership reconciliation.",
+          "remaining_capital_basis": "Remaining owner-funded capital, financing, and dilution are reserved until the primary sources-and-uses bridge is complete."
+        },
+        "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "overlap_key": "development_inventory_option",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Cash, available capital, and liabilities",
+        "category": "financial_asset",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Cash, available capital, and liabilities",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 27.51
+        },
+        "growth_driver": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "net_asset_value",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 6.88,
+          "base": 27.51,
+          "high": 45.86
+        },
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "overlap_key": "net_financial_claims",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "depletion_and_realization_reserve",
+        "label": "Metal-price, operator, and realization reserve",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Metal-price, operator, and realization reserve",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": -27.51
+        },
+        "growth_driver": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "depletion_reserve",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": -57.32,
+          "base": -27.51,
+          "high": -6.88
+        },
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "overlap_key": "depletion_and_realization_reserve",
+        "assumption_type": "judgment"
+      }
+    ],
+    "component_coverage": {
+      "all_material_components_identified": true,
+      "material_component_count": 4,
+      "additive_component_count": 4,
+      "embedded_component_count": 0,
+      "unvalued_component_count": 0,
+      "double_counting_flags": []
+    },
+    "input_classification": {
+      "facts": [],
+      "estimates": [],
+      "judgments": [
+        {
+          "component_id": "producing_royalty_stream",
+          "label": "Producing precious-metal royalty and stream cash flows",
+          "kind": "judgment",
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "method": "royalty_distribution_curve"
+        },
+        {
+          "component_id": "development_inventory_option",
+          "label": "Development-stage and optional royalty inventory",
+          "kind": "judgment",
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "method": "unit_nav_and_milestone_option"
+        },
+        {
+          "component_id": "net_financial_claims",
+          "label": "Cash, available capital, and liabilities",
+          "kind": "judgment",
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "method": "net_asset_value"
+        },
+        {
+          "component_id": "depletion_and_realization_reserve",
+          "label": "Metal-price, operator, and realization reserve",
+          "kind": "judgment",
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "method": "depletion_reserve"
+        }
+      ]
+    },
+    "method_route": {
+      "schema_version": "1.0",
+      "status": "routed",
+      "profile_id": "scarce_asset_optionality",
+      "label": "Scarce assets, royalties, and optionality",
+      "score": 10.0,
+      "reasons": [
+        "archetype=optionality",
+        "component categories=real_option",
+        "existing methods=option, royalty, unit_nav"
+      ],
+      "primary_methods": [
+        "component_owner_cash_and_unit_nav"
+      ],
+      "corroborating_methods": [
+        "comparable_transactions",
+        "replacement_cost_or_reverse_nav"
+      ],
+      "primary_personas": [
+        "hk",
+        "stahl"
+      ],
+      "cross_check_personas": [
+        "klarman_asset_value",
+        "marks_credit_cycle"
+      ],
+      "silent_personas": [
+        "buffett_weschler",
+        "greenblatt",
+        "hohn",
+        "marathon_capital_cycle",
+        "munger",
+        "pabrai"
+      ],
+      "required_evidence": [
+        "legal economic claim",
+        "non-overlapping physical inventory",
+        "unit economics",
+        "realization timing",
+        "remaining owner capital"
+      ],
+      "failure_modes": [
+        "gross asset value mistaken for shareholder value",
+        "operating cash flow and NAV counted twice",
+        "remote options treated as contracted cash"
+      ],
+      "secondary_profiles": [
+        {
+          "profile_id": "credit_and_normalized_returns",
+          "score": 2.0,
+          "reasons": [
+            "component categories=financial_asset, liability_or_reserve"
+          ]
+        },
+        {
+          "profile_id": "binary_milestone",
+          "score": 2.0,
+          "reasons": [
+            "component categories=real_option",
+            "existing methods=milestone"
+          ]
+        }
+      ],
+      "scorecard": {
+        "scarce_asset_optionality": {
+          "score": 10.0,
+          "reasons": [
+            "archetype=optionality",
+            "component categories=real_option",
+            "existing methods=option, royalty, unit_nav"
+          ]
+        },
+        "quality_reinvestment": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=operating_business"
+          ]
+        },
+        "capital_cycle": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=operating_business"
+          ]
+        },
+        "credit_and_normalized_returns": {
+          "score": 2.0,
+          "reasons": [
+            "component categories=financial_asset, liability_or_reserve"
+          ]
+        },
+        "catalyst_asset_value": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=financial_asset"
+          ]
+        },
+        "predictable_cash_flow": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=operating_business"
+          ]
+        },
+        "binary_milestone": {
+          "score": 2.0,
+          "reasons": [
+            "component categories=real_option",
+            "existing methods=milestone"
+          ]
+        }
+      },
+      "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+    },
+    "market": {
+      "price_per_share": 229.28,
+      "fully_diluted_shares": 192700000,
+      "market_cap_m": 44182.26,
+      "enterprise_value_m": null
+    },
+    "valuation": {
+      "value_per_share": {
+        "low": 45.86,
+        "base": 160.49,
+        "high": 284.31
+      },
+      "probability_weighted_value_per_share": 160.49,
+      "expected_distributions_per_share": 0.0,
+      "annualized_return_at_price_pct": {
+        "low": -20.54,
+        "base": -4.97,
+        "high": 3.12
+      },
+      "downside_to_low_pct": -80.0,
+      "horizon_years": 7
+    },
+    "scenario_contract": {
+      "rule": "Cases must change causal operating, capital, probability, timing, or financing drivers\u2014not only the terminal multiple.",
+      "top_value_drivers": [
+        {
+          "component_id": "producing_royalty_stream",
+          "label": "Producing precious-metal royalty and stream cash flows",
+          "base_per_share": 142.15,
+          "range_width_per_share": 91.71,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "development_inventory_option",
+          "label": "Development-stage and optional royalty inventory",
+          "base_per_share": 18.34,
+          "range_width_per_share": 57.32,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "depletion_and_realization_reserve",
+          "label": "Metal-price, operator, and realization reserve",
+          "base_per_share": -27.51,
+          "range_width_per_share": 50.44,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "net_financial_claims",
+          "label": "Cash, available capital, and liabilities",
+          "base_per_share": 27.51,
+          "range_width_per_share": 38.98,
+          "scenario_assumptions": null
+        }
+      ],
+      "reverse_expectations": null
+    },
+    "evidence": {
+      "unresolved_count": 0,
+      "blockers": [],
+      "validation_errors": []
+    },
+    "monitoring": {
+      "falsifiers": [
+        "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+      ],
+      "required_refresh_triggers": [
+        "new filing or material operating update",
+        "capital-structure change",
+        "material price move",
+        "component milestone or falsifier"
+      ]
+    },
+    "decision_rule": "No security is decision-grade until every material economic claim is valued exactly once and every material evidence blocker is resolved."
   }
 }
