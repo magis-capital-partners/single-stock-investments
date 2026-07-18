@@ -1,0 +1,61 @@
+{
+  "persona": "marks_credit_cycle",
+  "independence_group": "credit_cycle",
+  "evidence_status": "insufficient_evidence",
+  "scores": {
+    "explanatory_strength": {
+      "value": 3,
+      "rationale": "The levered-treasury mechanism (ETH look-through versus ATM dilution and corporate burn) is specific, but the financing-cycle stress path is not separated cleanly from pure ETH beta."
+    },
+    "evidence_sufficiency": {
+      "value": 2,
+      "rationale": "Filings anchor ETH units, share count, cash, and deferred tax, yet BMNP preferred claims, post-May ATM pace, and a full senior-claim waterfall remain unresolved for credit stress."
+    },
+    "downside_control": {
+      "value": 2,
+      "rationale": "May 2026 ETH fair value per share (~$18.76) offers a partial floor, but unbounded equity issuance, $287.6M nine-month operating cash use, and G&A far above staking revenue can overwhelm look-through value."
+    },
+    "return_vs_alternatives": {
+      "value": 2,
+      "rationale": "Base annualized return is 6.3% per year, below the 12% credit hurdle; the bull case (~15.1%) requires limited further dilution and ETH re-rating."
+    }
+  },
+  "vote": "defer",
+  "expected_return_range_pct": [
+    -6.9,
+    15.1
+  ],
+  "horizon_years": 7,
+  "claims": [
+    {
+      "claim": "BMNR carries no material term debt, but the equity-financing cycle is the dominant fixed-claim risk: shares outstanding rose to 579.7M from 232.4M in one year while nine-month operating cash use was $287.6M against $340.3M cash.",
+      "evidence_paths": [
+        "BMNR/research/valuation.json",
+        "BMNR/research/deep_dive_2026-07-17.md"
+      ]
+    },
+    {
+      "claim": "The warrants, deferred tax, and preferred-claim reserve is modeled at zero in base case despite $92.3M deferred tax liability and unresolved BMNP preferred stock; credit stress can absorb ETH look-through before common equity realizes upside.",
+      "evidence_paths": [
+        "BMNR/research/valuation.json",
+        "BMNR/research/valuation_contract.json"
+      ]
+    },
+    {
+      "claim": "Component overlap controls appear clean (static ETH look-through separated from trajectory net of dilution), but the eth_trajectory row lacks explicit remaining issuance capital and probability, so the low case ($8.5/sh total, -45.8% to price) is not a fully reconciled financing-cycle floor.",
+      "evidence_paths": [
+        "BMNR/research/valuation_contract.json",
+        "BMNR/research/adversarial_2026-07-17.md"
+      ]
+    }
+  ],
+  "strongest_counter_explanation": "Price at $15.69 sits below May 2026 ETH fair value per share (~$18.76); if ATM issuance pauses and ETH appreciates, mNAV could normalize without a refinancing or insolvency event because the company holds $340.3M cash and no operating debt at scale.",
+  "most_important_missing_fact": "BMNP preferred stock conversion terms and post-May 2026 ATM dilution pace reconciled to net ETH per diluted common share after all senior claims.",
+  "falsifiers": [
+    "Reconcile preferred, warrant, and deferred-tax claims into a per-share waterfall that nets against ETH look-through.",
+    "Track two consecutive quarters where ATM issuance dilutes ETH per share faster than token price rises.",
+    "Model corporate G&A and operating cash burn against staking inflow under a no-new-equity stress case."
+  ],
+  "specialist_findings": "Credit cross-check: survivability near term looks supported by cash and absent term maturities, but the equity stub is exposed to an open-ended issuance cycle and an under-modeled senior-claim stack; defer until the preferred waterfall and dilution path are evidenced.",
+  "confidence": "medium"
+}
