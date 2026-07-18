@@ -734,10 +734,9 @@ def attach_float_impact(
         return (src_rank, mig, float_ok, -dollars, -adv, -pct)
 
     top.sort(key=_rank)
-    # Default table: confirmed/news with float_adj only. Estimates = predicted
-    # candidates (float_adj or float_unknown*) and float_unknown confirmed.
+    # Float-impact table: confirmed/news with float_adj only.
+    # Predicted candidates live solely on predictor_watch (expected % float column).
     primary: list[dict] = []
-    estimates: list[dict] = []
     for r in top:
         if (
             r.get("event_source") != "candidate"
@@ -745,11 +744,9 @@ def attach_float_impact(
             and r.get("float_flag") == "float_adj"
         ):
             primary.append(r)
-        else:
-            estimates.append(r)
     return {
         "top_float_impacts": primary[:40],
-        "top_float_impact_estimates": estimates[:40],
+        "top_float_impact_estimates": [],
         "aum_as_of": registry.get("as_of"),
         "aum_stale": aum_stale(registry),
     }

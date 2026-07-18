@@ -1810,12 +1810,16 @@ def build(today: date | None = None, *, purge_announcements: bool = True) -> dic
             fi_primary = (row.get("float_impact") or {}).get("primary") or {}
             # Prefer candidate event float for this index
             est_pct = None
+            float_flag = None
             for ev in (row.get("float_impact") or {}).get("events") or []:
                 if ev.get("primary_index") == sc.get("index") and ev.get("event_source") == "candidate":
                     est_pct = ev.get("pct_of_float_base")
+                    float_flag = ev.get("float_flag")
                     break
             if est_pct is None:
                 est_pct = fi_primary.get("pct_of_float_base")
+            if float_flag is None:
+                float_flag = fi_primary.get("float_flag")
             predictor_watch.append(
                 {
                     "ticker": t,
@@ -1826,7 +1830,7 @@ def build(today: date | None = None, *, purge_announcements: bool = True) -> dic
                     "distance_to_boundary_pct": sc.get("distance_to_boundary_pct"),
                     "priority_score": (row.get("impact_proxy") or {}).get("priority_score"),
                     "pct_of_float_base": est_pct,
-                    "float_flag": fi_primary.get("float_flag"),
+                    "float_flag": float_flag,
                     "report_tier": (row.get("prediction") or {}).get("report_tier")
                     or sc.get("report_tier"),
                     "inclusion_probability_band": (row.get("prediction") or {}).get(
