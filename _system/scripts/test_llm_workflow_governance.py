@@ -79,6 +79,12 @@ class WorkflowGovernanceTests(unittest.TestCase):
         self.assertIn('row["task_key"] not in open_titles', workflow)
         self.assertIn('action = "waiting"', workflow)
 
+    def test_agent_pr_merge_continues_after_draft_promotion(self):
+        workflow = (ROOT / ".github" / "workflows" / "marvin-pr-automerge.yml").read_text(encoding="utf-8")
+        self.assertIn('echo "eligible=true"', workflow)
+        self.assertIn("if: steps.meta.outputs.eligible == 'true'", workflow)
+        self.assertNotIn("Stop after promoting draft", workflow)
+
     def test_policy_encodes_expected_call_budgets(self):
         policy = json.loads((ROOT / "_system" / "config" / "llm_usage_policy.json").read_text(encoding="utf-8"))
         self.assertEqual(policy["consumers"]["marvin_research"]["daily_repo_limit"], 1)
