@@ -17,6 +17,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 from vault_paths import wisdom_root  # noqa: E402
+from decision_authority import resolve_authority  # noqa: E402
 
 APPROVED_THIRD_PARTY = ROOT / "_system" / "frameworks" / "third_party_sources.md"
 HK_INDEX = wisdom_root() / "hk_ticker_index.json"
@@ -198,6 +199,25 @@ def method_label(method: str) -> str:
 
 
 def stance_proposal_block(val: dict) -> str:
+    ticker = str(val.get("ticker") or "").upper()
+    research = ROOT / ticker / "research" if ticker else ROOT
+    authority = resolve_authority(research, val)
+    if authority.get("authority_level") != "legacy_reference":
+        base_pct = (authority.get("return_range_pct") or {}).get("base")
+        recommendation = authority.get("decision") or "pending owner/committee review"
+        lines = [
+            "### Decision authority",
+            "",
+            f"**Status:** {authority.get('status')}  ",
+            f"**Authority:** {authority.get('authority_level')}  ",
+            f"**Power Zone:** {authority.get('profile_label') or authority.get('profile_id') or 'routing pending'}  ",
+            f"**Contract base return:** {str(base_pct) + '%' if base_pct is not None else 'not decision-grade'}  ",
+            f"**Recommendation/decision:** {recommendation}",
+            "",
+            "Legacy Marvin/Lawrence returns are migration references only and do not set the stance.",
+            "",
+        ]
+        return "\n".join(lines)
     base_pct = val.get("implied_return", {}).get("base_pct") or (val.get("results") or {}).get("base", {}).get(
         "return_pct", "?"
     )
@@ -227,6 +247,11 @@ def stance_proposal_block(val: dict) -> str:
 
 
 def primary_irr_pct(val: dict) -> float | int | str | None:
+    ticker = str(val.get("ticker") or "").upper()
+    authority = resolve_authority(ROOT / ticker / "research", val) if ticker else {}
+    contract_base = (authority.get("return_range_pct") or {}).get("base")
+    if contract_base is not None:
+        return contract_base
     return val.get("implied_return", {}).get("base_pct") or (val.get("results") or {}).get("base", {}).get(
         "return_pct"
     )
@@ -250,7 +275,9 @@ def growth_rates_for_irr(val: dict) -> tuple[float, float, float | int]:
 
 
 def patch_classification_stance(text: str, val: dict) -> str:
-    approved = val.get("approved_stance") or (val.get("stance_proposal") or {}).get("approved_stance")
+    ticker = str(val.get("ticker") or "").upper()
+    authority = resolve_authority(ROOT / ticker / "research", val) if ticker else {}
+    approved = authority.get("stance") if authority.get("actionable") else None
     if approved:
         text = re.sub(
             r"(\|\s*\*\*Stance\*\*[^|]*\|\s*)([^|]+)(\|)",
@@ -264,7 +291,12 @@ def patch_classification_stance(text: str, val: dict) -> str:
         text,
         count=1,
     )
-    display = (val.get("implied_return") or {}).get("display")
+    contract_base = (authority.get("return_range_pct") or {}).get("base")
+    display = (
+        f"{contract_base}% (contract base)"
+        if contract_base is not None
+        else ((val.get("implied_return") or {}).get("display") if authority.get("authority_level") == "legacy_reference" else None)
+    )
     if display:
         text = re.sub(
             rf"(\|\s*\*\*{re.escape(IMPLIED_IRR_LABEL)}\*\*[^|]*\|\s*)([^\|]+)(\|)",
@@ -1478,6 +1510,21 @@ def enrich_business_moat(body: str, val: dict, ticker: str, preserved: str | Non
 
 def irr_arithmetic(val: dict, ticker: str, preserved: str | None) -> str:
     base_pct = primary_irr_pct(val)
+    authority = resolve_authority(ROOT / ticker / "research", val)
+    if authority.get("authority_level") != "legacy_reference":
+        values = authority.get("value_per_share") or {}
+        returns = authority.get("return_range_pct") or {}
+        route = authority.get("profile_label") or authority.get("profile_id") or "routing pending"
+        return "\n".join([
+            "#### Contract valuation arithmetic (show your work)",
+            "",
+            f"**Power Zone:** {route}",
+            f"**Contract status:** {authority.get('contract_status')}",
+            f"**Low/base/high value per share:** {values.get('low')} / {values.get('base')} / {values.get('high')}",
+            f"**Low/base/high annualized return at price:** {returns.get('low')}% / {returns.get('base')}% / {returns.get('high')}%",
+            "",
+            "The component ownership map, causal assumptions, evidence tiers, overlap controls, and falsifiers are recorded in `valuation_contract.json`. Legacy Marvin/Lawrence scenario arithmetic is retained only as a migration cross-check.",
+        ])
     sotp_irr = yield_curve_sotp_irr(val, ticker)
     if sotp_irr:
         return sotp_irr
@@ -1625,7 +1672,7 @@ def build_valuation_section(ticker: str, val: dict, preserved_val: str | None) -
     price = inputs.get("price", "?")
     src = inputs.get("price_source", "")
     method = val.get("method", "full")
-    base_pct = val.get("implied_return", {}).get("base_pct") or val.get("results", {}).get("base", {}).get("return_pct", "?")
+    base_pct = primary_irr_pct(val) or "?"
     seg_body = segment_build_section(val, preserved_val)
     irr_body = irr_arithmetic(val, ticker, preserved_val)
     upside = ""

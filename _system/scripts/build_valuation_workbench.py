@@ -393,6 +393,11 @@ def build(ticker: str, as_of: str | None = None) -> dict:
     ticker = ticker.upper()
     research = ROOT / ticker / "research"
     valuation = read_json(research / "valuation.json")
+    canonical_route = read_json(research / "valuation_route.json")
+    if canonical_route:
+        # One route artifact controls the method shown in the workbench and the
+        # specialists later seated by the Investment Committee.
+        valuation["valuation_method_route"] = canonical_route
     reviewed_contract = read_json(research / "valuation_contract.json")
     if reviewed_contract:
         # The cohort contract merges curated evidence follow-ups and the
@@ -400,6 +405,12 @@ def build(ticker: str, as_of: str | None = None) -> dict:
         # computed contract so the dashboard cannot call an unresolved case
         # decision-grade merely because the arithmetic schedule is complete.
         valuation["universal_valuation_contract"] = reviewed_contract
+        valuation["universal_valuation_contract"]["method_route"] = (
+            canonical_route
+            or valuation["universal_valuation_contract"].get("method_route")
+            or valuation.get("valuation_method_route")
+            or {}
+        )
     scaffold = read_json(research / "valuation_model_scaffold.json")
     if not valuation or (scaffold and not valuation.get("method")):
         if not scaffold:

@@ -1,0 +1,624 @@
+{
+  "schema_version": "2.0",
+  "ticker": "SEVN",
+  "as_of": "2026-07-18",
+  "decision": {
+    "status": "decision_grade",
+    "price_per_share": 8.4,
+    "market_cap_m": null,
+    "enterprise_value_m": null,
+    "value_per_share": {
+      "low": 7.0,
+      "base": 11.9,
+      "high": 14.7
+    },
+    "annualized_return_at_price_pct": {
+      "low": -2.57,
+      "base": 5.1,
+      "high": 8.32
+    },
+    "downside_to_low_pct": -16.67,
+    "unvalued_component_count": 0,
+    "unresolved_evidence_count": 0,
+    "primary_power_zone": "Capital cycle and normalized industry economics",
+    "owner_decision": null,
+    "next_action": "Freeze the evidence packet and select three method-independent raters."
+  },
+  "business": {
+    "status": "complete",
+    "components": [
+      {
+        "component_id": "tangible_loan_book_equity",
+        "label": "Tangible loan-book equity (adjusted book)",
+        "category": "financial_asset",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Tangible loan-book equity (adjusted book)",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 14.9
+        },
+        "growth_driver": "Adjusted book as primary asset claim before market discount.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "unit_nav",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 12.5,
+          "base": 14.9,
+          "high": 16.0
+        },
+        "evidence_tier": "filing",
+        "evidence_level": "primary_verified",
+        "evidence": "Q1 2026 earnings presentation: book $14.47/sh, adjusted book $14.90/sh at 2026-03-31. Portfolio WA LTV 66%, risk rating 2.8, no realized losses.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Marks, ACL, and leverage are inside book.",
+        "falsifier": "Credit losses or mark-to-market force book below the low case.",
+        "overlap_key": "tangible_loan_book_equity",
+        "assumption_type": "fact"
+      },
+      {
+        "component_id": "external_manager_fee_drag",
+        "label": "External manager fee drag (Tremont/RMR)",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "External manager fee drag (Tremont/RMR)",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": -1.5
+        },
+        "growth_driver": "Structural drag versus internalized peers, capitalized as a reserve against book.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "realization_reserve",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": -2.5,
+          "base": -1.5,
+          "high": -0.8
+        },
+        "evidence_tier": "filing",
+        "evidence_level": "primary_verified",
+        "evidence": "1.5% base fee on equity + 20% incentive over 7% hurdle; FY2025 management fees ~$5.0M.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Structural versus internalized peers.",
+        "falsifier": "Fee load or internalization cost proves larger than the low case.",
+        "overlap_key": "external_manager_fee_drag",
+        "assumption_type": "fact"
+      },
+      {
+        "component_id": "cre_credit_and_redeployment_reserve",
+        "label": "CRE credit and capital-redeployment reserve",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "CRE credit and capital-redeployment reserve",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": -1.5
+        },
+        "growth_driver": "Haircut for credit cycle and deployment lag not fully in ACL (1.3% of commitments).",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "credit_loss_reserve",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": -3.0,
+          "base": -1.5,
+          "high": -0.5
+        },
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "Rights-offering capital still deploying ($56.6M cash, $44M unfunded commitments, $397.5M unused financing). Sector CRE fear; SEVN has zero CBD office but remains levered (D/E 1.4).",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Rights-offering capital not yet fully earning.",
+        "falsifier": "Realized losses or failed redeployment push economic equity below the low case.",
+        "overlap_key": "cre_credit_and_redeployment_reserve",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "distributable_earnings_franchise",
+        "label": "Distributable-earnings franchise (embedded in book multiple)",
+        "category": "operating_business",
+        "treatment": "embedded",
+        "included_in_component_id": "tangible_loan_book_equity",
+        "ownership_claim": "Tangible loan-book equity (adjusted book)",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 0.0
+        },
+        "growth_driver": "Earnings power is the cross-check for the book multiple, not a second stack.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "owner_cash_dcf",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.0,
+          "base": 0.0,
+          "high": 0.0
+        },
+        "evidence_tier": "filing",
+        "evidence_level": "primary_verified",
+        "evidence": "Q1 2026 DE $0.24/sh (temp dilution); Q4 2025 was $0.28/sh. Embedded in how the market capitalizes book \u2014 treated as embedded so not double-counted with book equity.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Marks, ACL, and leverage are inside book.",
+        "falsifier": "Dividend cut and DE permanently below coverage invalidate income-capitalization cross-checks.",
+        "overlap_key": "distributable_earnings_franchise",
+        "assumption_type": "fact"
+      }
+    ],
+    "component_coverage": {
+      "all_material_components_identified": true,
+      "material_component_count": 4,
+      "additive_component_count": 3,
+      "embedded_component_count": 1,
+      "unvalued_component_count": 0,
+      "double_counting_flags": []
+    },
+    "facts": [
+      {
+        "component_id": "tangible_loan_book_equity",
+        "label": "Tangible loan-book equity (adjusted book)",
+        "kind": "fact",
+        "evidence_tier": "filing",
+        "evidence": "Q1 2026 earnings presentation: book $14.47/sh, adjusted book $14.90/sh at 2026-03-31. Portfolio WA LTV 66%, risk rating 2.8, no realized losses.",
+        "method": "unit_nav"
+      },
+      {
+        "component_id": "external_manager_fee_drag",
+        "label": "External manager fee drag (Tremont/RMR)",
+        "kind": "fact",
+        "evidence_tier": "filing",
+        "evidence": "1.5% base fee on equity + 20% incentive over 7% hurdle; FY2025 management fees ~$5.0M.",
+        "method": "realization_reserve"
+      },
+      {
+        "component_id": "distributable_earnings_franchise",
+        "label": "Distributable-earnings franchise (embedded in book multiple)",
+        "kind": "fact",
+        "evidence_tier": "filing",
+        "evidence": "Q1 2026 DE $0.24/sh (temp dilution); Q4 2025 was $0.28/sh. Embedded in how the market capitalizes book \u2014 treated as embedded so not double-counted with book equity.",
+        "method": "owner_cash_dcf"
+      }
+    ],
+    "estimates": [],
+    "judgments": [
+      {
+        "component_id": "cre_credit_and_redeployment_reserve",
+        "label": "CRE credit and capital-redeployment reserve",
+        "kind": "judgment",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Rights-offering capital still deploying ($56.6M cash, $44M unfunded commitments, $397.5M unused financing). Sector CRE fear; SEVN has zero CBD office but remains levered (D/E 1.4).",
+        "method": "credit_loss_reserve"
+      }
+    ]
+  },
+  "valuation": {
+    "status": "decision_grade",
+    "market": {
+      "price_per_share": 8.4,
+      "fully_diluted_shares": null,
+      "market_cap_m": null,
+      "enterprise_value_m": null
+    },
+    "valuation": {
+      "value_per_share": {
+        "low": 7.0,
+        "base": 11.9,
+        "high": 14.7
+      },
+      "probability_weighted_value_per_share": 11.9,
+      "expected_distributions_per_share": 0.0,
+      "annualized_return_at_price_pct": {
+        "low": -2.57,
+        "base": 5.1,
+        "high": 8.32
+      },
+      "downside_to_low_pct": -16.67,
+      "horizon_years": 7
+    },
+    "components": [
+      {
+        "component_id": "tangible_loan_book_equity",
+        "label": "Tangible loan-book equity (adjusted book)",
+        "category": "financial_asset",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Tangible loan-book equity (adjusted book)",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 14.9
+        },
+        "growth_driver": "Adjusted book as primary asset claim before market discount.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "unit_nav",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 12.5,
+          "base": 14.9,
+          "high": 16.0
+        },
+        "evidence_tier": "filing",
+        "evidence_level": "primary_verified",
+        "evidence": "Q1 2026 earnings presentation: book $14.47/sh, adjusted book $14.90/sh at 2026-03-31. Portfolio WA LTV 66%, risk rating 2.8, no realized losses.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Marks, ACL, and leverage are inside book.",
+        "falsifier": "Credit losses or mark-to-market force book below the low case.",
+        "overlap_key": "tangible_loan_book_equity",
+        "assumption_type": "fact"
+      },
+      {
+        "component_id": "external_manager_fee_drag",
+        "label": "External manager fee drag (Tremont/RMR)",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "External manager fee drag (Tremont/RMR)",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": -1.5
+        },
+        "growth_driver": "Structural drag versus internalized peers, capitalized as a reserve against book.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "realization_reserve",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": -2.5,
+          "base": -1.5,
+          "high": -0.8
+        },
+        "evidence_tier": "filing",
+        "evidence_level": "primary_verified",
+        "evidence": "1.5% base fee on equity + 20% incentive over 7% hurdle; FY2025 management fees ~$5.0M.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Structural versus internalized peers.",
+        "falsifier": "Fee load or internalization cost proves larger than the low case.",
+        "overlap_key": "external_manager_fee_drag",
+        "assumption_type": "fact"
+      },
+      {
+        "component_id": "cre_credit_and_redeployment_reserve",
+        "label": "CRE credit and capital-redeployment reserve",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "CRE credit and capital-redeployment reserve",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": -1.5
+        },
+        "growth_driver": "Haircut for credit cycle and deployment lag not fully in ACL (1.3% of commitments).",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "credit_loss_reserve",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": -3.0,
+          "base": -1.5,
+          "high": -0.5
+        },
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "Rights-offering capital still deploying ($56.6M cash, $44M unfunded commitments, $397.5M unused financing). Sector CRE fear; SEVN has zero CBD office but remains levered (D/E 1.4).",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Rights-offering capital not yet fully earning.",
+        "falsifier": "Realized losses or failed redeployment push economic equity below the low case.",
+        "overlap_key": "cre_credit_and_redeployment_reserve",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "distributable_earnings_franchise",
+        "label": "Distributable-earnings franchise (embedded in book multiple)",
+        "category": "operating_business",
+        "treatment": "embedded",
+        "included_in_component_id": "tangible_loan_book_equity",
+        "ownership_claim": "Tangible loan-book equity (adjusted book)",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 0.0
+        },
+        "growth_driver": "Earnings power is the cross-check for the book multiple, not a second stack.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "owner_cash_dcf",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.0,
+          "base": 0.0,
+          "high": 0.0
+        },
+        "evidence_tier": "filing",
+        "evidence_level": "primary_verified",
+        "evidence": "Q1 2026 DE $0.24/sh (temp dilution); Q4 2025 was $0.28/sh. Embedded in how the market capitalizes book \u2014 treated as embedded so not double-counted with book equity.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Marks, ACL, and leverage are inside book.",
+        "falsifier": "Dividend cut and DE permanently below coverage invalidate income-capitalization cross-checks.",
+        "overlap_key": "distributable_earnings_franchise",
+        "assumption_type": "fact"
+      }
+    ],
+    "scenario_contract": {
+      "rule": "Cases must change causal operating, capital, probability, timing, or financing drivers\u2014not only the terminal multiple.",
+      "top_value_drivers": [
+        {
+          "component_id": "tangible_loan_book_equity",
+          "label": "Tangible loan-book equity (adjusted book)",
+          "base_per_share": 14.9,
+          "range_width_per_share": 3.5,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "cre_credit_and_redeployment_reserve",
+          "label": "CRE credit and capital-redeployment reserve",
+          "base_per_share": -1.5,
+          "range_width_per_share": 2.5,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "external_manager_fee_drag",
+          "label": "External manager fee drag (Tremont/RMR)",
+          "base_per_share": -1.5,
+          "range_width_per_share": 1.7,
+          "scenario_assumptions": null
+        }
+      ],
+      "reverse_expectations": null
+    }
+  },
+  "optionality": {
+    "status": "not_material_or_separately_identified",
+    "option_count": 0,
+    "options": [],
+    "rule": "Every option requires a beneficiary, probability, timing, remaining capital, failure case, and non-overlap control; absence of option value must be explicit rather than unvalued."
+  },
+  "committee": {
+    "status": "not_started",
+    "as_of": null,
+    "packet_hash": null,
+    "stage": null,
+    "selected_raters": [],
+    "analysis_progress": {
+      "completed": 0,
+      "required": 7
+    },
+    "completed_outputs": [],
+    "missing_outputs": [
+      "proposer.json",
+      "pre_mortem.json",
+      "evidence_tribunal.json",
+      "research_response.json",
+      "valuation_reconciliation.json",
+      "adversarial_review.json",
+      "chair_synthesis.json"
+    ],
+    "owner_status": "pending",
+    "owner_decision": null,
+    "strongest_dissent": null,
+    "unresolved_items": [],
+    "next_action": "Freeze the evidence packet and select three method-independent raters.",
+    "record_ref": null,
+    "previous_record_ref": null,
+    "manifest_ref": null
+  },
+  "evidence": {
+    "status": "clear",
+    "open_count": 0,
+    "critical_count": 0,
+    "gaps": []
+  },
+  "method_fit": {
+    "profile_id": "capital_cycle",
+    "label": "Capital cycle and normalized industry economics",
+    "current_archetype": "turnaround",
+    "primary_methods": [
+      "midcycle_capacity_value"
+    ],
+    "corroborating_methods": [
+      "replacement_cost",
+      "downcycle_liquidity_stress"
+    ],
+    "primary_personas": [
+      "marathon_capital_cycle"
+    ],
+    "cross_check_personas": [
+      "marks_credit_cycle",
+      "pabrai"
+    ],
+    "silent_personas": [
+      "buffett_weschler",
+      "greenblatt",
+      "hk",
+      "hohn",
+      "klarman_asset_value",
+      "munger",
+      "stahl"
+    ],
+    "routing_reasons": [
+      "archetype=turnaround",
+      "component categories=operating_business",
+      "explicit reviewed profile"
+    ],
+    "required_evidence": [
+      "industry capacity and additions",
+      "utilization",
+      "normalized unit margins",
+      "maintenance versus growth capital",
+      "low-case liquidity"
+    ],
+    "applicability_tests": [
+      "Industry capacity, additions, closures, and replacement costs can be measured.",
+      "Current margins can be located relative to a cycle rather than extrapolated.",
+      "Maintenance and growth capital are separated.",
+      "Leverage and liquidity survive the low case."
+    ],
+    "failure_modes": [
+      "peak margins capitalized",
+      "supply response ignored",
+      "replacement cost used for assets that cannot earn their cost of capital"
+    ],
+    "validation_cohort": [
+      {
+        "ticker": "MSB",
+        "archetype": "royalty_asset",
+        "primary_profile": "scarce_asset_optionality",
+        "purpose": "Test depletion, commodity exposure, finite reserves, and royalty-unit reconciliation.",
+        "status": "queued"
+      },
+      {
+        "ticker": "C",
+        "archetype": "financial_balance_sheet",
+        "primary_profile": "credit_and_normalized_returns",
+        "purpose": "Test tangible capital, credit losses, funding, regulation, and excess-capital realization.",
+        "status": "queued"
+      },
+      {
+        "ticker": "NVR",
+        "archetype": "quality_reinvestment",
+        "primary_profile": "quality_reinvestment",
+        "purpose": "Test owner earnings, capital-light reinvestment, cyclicality, and buyback value creation.",
+        "status": "queued"
+      },
+      {
+        "ticker": "NUE",
+        "archetype": "capital_cycle",
+        "primary_profile": "capital_cycle",
+        "purpose": "Test normalized margins, industry supply response, replacement cost, and reinvestment timing.",
+        "status": "queued"
+      },
+      {
+        "ticker": "BIIB",
+        "archetype": "binary_special_situation",
+        "primary_profile": "probability_weighted_special_situation",
+        "purpose": "Test product concentration, pipeline probabilities, patent cliffs, and catalyst timing.",
+        "status": "queued"
+      }
+    ],
+    "rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+  },
+  "outcomes": {
+    "status": "waiting_for_owner_decision",
+    "decision_date": null,
+    "schedule": [
+      {
+        "horizon_months": 6,
+        "target_date": null,
+        "status": "waiting_for_owner_decision",
+        "measurement_date": null,
+        "total_return_pct": null,
+        "return_status": null
+      },
+      {
+        "horizon_months": 12,
+        "target_date": null,
+        "status": "waiting_for_owner_decision",
+        "measurement_date": null,
+        "total_return_pct": null,
+        "return_status": null
+      },
+      {
+        "horizon_months": 24,
+        "target_date": null,
+        "status": "waiting_for_owner_decision",
+        "measurement_date": null,
+        "total_return_pct": null,
+        "return_status": null
+      }
+    ],
+    "recorded_outcome_count": 0,
+    "minimum_persona_outcomes_before_reweighting": 20,
+    "personas_eligible_for_weight_review": [],
+    "persona_power_zones_eligible_for_weight_review": [],
+    "weighting_rule": "Do not change a persona's relevance within a power zone until at least 20 attributable, dividend-aware outcomes exist there; never reweight automatically."
+  },
+  "attribution": {
+    "status": "baseline_established",
+    "current": {
+      "as_of": "2026-07-17",
+      "low": 7.0,
+      "base": 11.9,
+      "high": 14.7
+    },
+    "prior": null,
+    "base_change_per_share": null,
+    "base_change_pct": null,
+    "drivers": [],
+    "category_totals_per_share": {},
+    "unexplained_per_share": null,
+    "explanation": "The current component schedule is the first decision-grade baseline; attribution begins with the next dated valuation snapshot."
+  }
+}

@@ -29,11 +29,14 @@ from pathlib import Path
 
 from kpi_signal_enhancements import (
     analyze_growth_regime,
+    attach_human_summary,
     compute_leadership_risk,
     cross_metric_freshness,
     earnings_revision_signal,
+    is_growth_artifact,
     passes_materiality,
     peer_relative_signal,
+    regime_metric_priority,
     resolve_revenue_series,
     series_freshness,
     STALE_SERIES_MAX_DAYS,
@@ -241,9 +244,18 @@ def enrich_analysis(
     if tier == "emerging" and ttm_agrees is True:
         tier = "confirmed"
 
+    artifact = is_growth_artifact(
+        growth_latest=analysis.get("growth_latest"),
+        growth_prior=analysis.get("growth_prior"),
+        level_prior=analysis.get("level_prior"),
+        level_latest=analysis.get("level_latest"),
+        level_yoy_base=analysis.get("level_yoy_base"),
+    )
+
     accel = analysis.get("accel")
     out = {
         **analysis,
+        "metric": analysis.get("metric") or metric_key,
         "direction": direction,
         "signal_tier": tier,
         "tier": metric_tier(metric_key),
@@ -251,10 +263,16 @@ def enrich_analysis(
         "strength": round(strength({**analysis, "direction": direction}), 3),
         "confidence": (
             "high"
-            if accel is not None and threshold and abs(accel) >= HIGH_CONFIDENCE_MULT * threshold
+            if (
+                accel is not None
+                and threshold
+                and abs(accel) >= HIGH_CONFIDENCE_MULT * threshold
+                and not artifact
+            )
             else "med"
         ),
         "ttm_agrees": ttm_agrees,
+        "artifact": artifact,
         "display": False,
         "composite": False,
         "stale": stale,
@@ -262,19 +280,20 @@ def enrich_analysis(
         "series_age_days": fresh.get("age_days"),
         "revenue_proxy": bool(fresh.get("proxy")),
     }
-    return out
+    return attach_human_summary(out)
 
 
 def compute_yoy_growths(
     ordered: list[tuple[str, float]],
     dates: list[datetime | None],
     values: list[float],
-) -> tuple[list[tuple[str, float]], int]:
+) -> tuple[list[tuple[str, float]], int, dict | None]:
     nonzero = [abs(v) for v in values if abs(v) > 1e-9]
     scale = statistics.median(nonzero) if nonzero else 0.0
     denom_floor = max(1e-9, DENOMINATOR_FLOOR_FRAC * scale)
 
     growths: list[tuple[str, float]] = []
+    level_meta: dict | None = None
     suspect = 0
     lo, hi = YOY_MATCH_WINDOW
     for i in range(len(ordered)):
@@ -297,7 +316,22 @@ def compute_yoy_growths(
             suspect += 1
             continue
         growths.append((ordered[i][0], growth))
-    return growths, suspect
+        prior_level = level_meta.get("level_latest") if level_meta else None
+        level_meta = {
+            "level_latest": cur,
+            "level_yoy_base": prev,
+            "level_prior": prior_level if prior_level is not None else prev,
+            "period_latest": ordered[i][0],
+            "period_yoy_base": ordered[match][0],
+        }
+        if len(growths) >= 2:
+            # Prior growth period's level (previous YoY observation's current value).
+            prev_growth_period = growths[-2][0]
+            for period, value in ordered:
+                if period == prev_growth_period:
+                    level_meta["level_prior"] = value
+                    break
+    return growths, suspect, level_meta
 
 
 def analyze_growth_values(
@@ -345,6 +379,35 @@ def analyze_growth_values(
     )
 
 
+def _levels_for_period(
+    ordered: list[tuple[str, float]],
+    dates: list[datetime | None],
+    period: str,
+) -> tuple[float | None, float | None]:
+    """Return (year_ago_level, current_level) for a fiscal period."""
+    lo, hi = YOY_MATCH_WINDOW
+    target = None
+    for i, (p, _v) in enumerate(ordered):
+        if p == period:
+            target = i
+            break
+    if target is None or dates[target] is None:
+        return None, None
+    match = None
+    for j in range(target - 1, -1, -1):
+        if dates[j] is None:
+            continue
+        days = (dates[target] - dates[j]).days
+        if lo <= days <= hi:
+            match = j
+            break
+        if days > hi:
+            break
+    cur = ordered[target][1]
+    base = ordered[match][1] if match is not None else None
+    return base, cur
+
+
 def quarterly_to_ttm(ordered: list[tuple[str, float]]) -> list[tuple[str, float]]:
     if len(ordered) < 4:
         return []
@@ -372,7 +435,7 @@ def analyze_quarterly_yoy(
     meta = dict(series_meta or series_freshness(series))
     dates = [parse_date(p) for p, _v in ordered]
     values = [v for _p, v in ordered]
-    growths, suspect = compute_yoy_growths(ordered, dates, values)
+    growths, suspect, level_meta = compute_yoy_growths(ordered, dates, values)
     if len(growths) < YOY_MIN_GROWTH_POINTS:
         return None
 
@@ -393,11 +456,27 @@ def analyze_quarterly_yoy(
     if result is None:
         return None
 
+    if level_meta:
+        if level_meta.get("level_latest") is not None:
+            result["level_latest"] = level_meta["level_latest"]
+        if level_meta.get("level_prior") is not None:
+            result["level_prior"] = level_meta["level_prior"]
+        if level_meta.get("level_yoy_base") is not None:
+            result["level_yoy_base"] = level_meta["level_yoy_base"]
+        result["artifact"] = is_growth_artifact(
+            growth_latest=result.get("growth_latest"),
+            growth_prior=result.get("growth_prior"),
+            level_prior=result.get("level_prior"),
+            level_latest=result.get("level_latest"),
+            level_yoy_base=result.get("level_yoy_base"),
+        )
+        attach_human_summary(result)
+
     ttm_ordered = quarterly_to_ttm(ordered)
     if len(ttm_ordered) >= YOY_MIN_QUARTERS:
         ttm_dates = [parse_date(p) for p, _v in ttm_ordered]
         ttm_values = [v for _p, v in ttm_ordered]
-        ttm_growths, _ = compute_yoy_growths(ttm_ordered, ttm_dates, ttm_values)
+        ttm_growths, _, _ = compute_yoy_growths(ttm_ordered, ttm_dates, ttm_values)
         if len(ttm_growths) >= YOY_MIN_GROWTH_POINTS:
             ttm_gvals = [g for _p, g in ttm_growths]
             ttm_result = analyze_growth_values(
@@ -415,7 +494,7 @@ def analyze_quarterly_yoy(
                 base = {k: v for k, v in result.items() if k not in (
                     "signal_tier", "tier", "material", "strength", "confidence",
                     "ttm_agrees", "display", "composite", "stale", "latest_period",
-                    "series_age_days", "revenue_proxy",
+                    "series_age_days", "revenue_proxy", "human_summary", "artifact",
                 )}
                 result = enrich_analysis(
                     base,
@@ -443,8 +522,38 @@ def yoy_growth_series(series: list[dict]) -> list[tuple[str, float]]:
         return []
     dates = [parse_date(p) for p, _v in ordered]
     values = [v for _p, v in ordered]
-    growths, _ = compute_yoy_growths(ordered, dates, values)
+    growths, _, _ = compute_yoy_growths(ordered, dates, values)
     return growths
+
+
+def series_level_context(
+    series: list[dict],
+    *,
+    latest_period: str | None,
+    prior_period: str | None = None,
+) -> dict[str, float | None]:
+    """Map fiscal periods to raw levels for regime human summaries / artifact gates."""
+    cleaned: dict[str, float] = {}
+    for point in series:
+        value = to_float(point.get("value"))
+        period = str(point.get("period") or "")[:10]
+        if value is None or not parse_date(period):
+            continue
+        cleaned[period] = value
+    ordered = sorted(cleaned.items())
+    dates = [parse_date(p) for p, _v in ordered]
+    level_latest = cleaned.get(latest_period) if latest_period else None
+    level_prior = cleaned.get(prior_period) if prior_period else None
+    level_yoy_base = None
+    if latest_period:
+        level_yoy_base, cur = _levels_for_period(ordered, dates, latest_period)
+        if level_latest is None:
+            level_latest = cur
+    return {
+        "level_prior": level_prior,
+        "level_latest": level_latest,
+        "level_yoy_base": level_yoy_base,
+    }
 
 
 def build_regime_metric(
@@ -455,7 +564,16 @@ def build_regime_metric(
     evidence_ref: str,
     series_meta: dict | None = None,
 ) -> dict | None:
-    regime = analyze_growth_regime(growths, metric_key=metric_key)
+    latest_period = growths[-1][0] if growths else None
+    prior_period = growths[-2][0] if len(growths) >= 2 else None
+    levels = series_level_context(series, latest_period=latest_period, prior_period=prior_period)
+    regime = analyze_growth_regime(
+        growths,
+        metric_key=metric_key,
+        level_prior=levels.get("level_prior"),
+        level_latest=levels.get("level_latest"),
+        level_yoy_base=levels.get("level_yoy_base"),
+    )
     if not regime:
         return None
     meta = series_meta or series_freshness(series)
@@ -476,7 +594,7 @@ def build_regime_metric(
             "revenue_proxy": bool(meta.get("proxy")),
         }
     )
-    return regime
+    return attach_human_summary(regime)
 
 
 def analyze_series(
@@ -567,29 +685,34 @@ def collapse_core_signals(metrics: list[dict]) -> list[dict]:
         signal_tier = "confirmed" if tiers == {"confirmed"} or (tiers <= {"confirmed", "emerging"} and "confirmed" in tiers) else "emerging"
         avg_strength = statistics.mean(strength(m) for m in group)
         lead = group[0]
-        composite = {
-            "metric": "core_business",
-            "label": METRIC_LABELS["core_business"],
-            "source": lead.get("source"),
-            "evidence_ref": lead.get("evidence_ref"),
-            "direction": direction,
-            "signal_tier": signal_tier,
-            "tier": "primary",
-            "basis": lead.get("basis"),
-            "mode": "pct",
-            "growth_latest": lead.get("growth_latest"),
-            "growth_prior": lead.get("growth_prior"),
-            "accel": lead.get("accel"),
-            "threshold": lead.get("threshold"),
-            "strength": round(avg_strength, 3),
-            "confidence": "high" if avg_strength >= HIGH_CONFIDENCE_MULT else "med",
-            "material": True,
-            "ttm_agrees": any(m.get("ttm_agrees") for m in group if m.get("ttm_agrees") is not None) or None,
-            "composite": True,
-            "composite_members": [m.get("metric") for m in group],
-            "display": True,
-            "points": lead.get("points") or [],
-        }
+        composite = attach_human_summary(
+            {
+                "metric": "core_business",
+                "label": METRIC_LABELS["core_business"],
+                "source": lead.get("source"),
+                "evidence_ref": lead.get("evidence_ref"),
+                "direction": direction,
+                "signal_tier": signal_tier,
+                "tier": "primary",
+                "basis": lead.get("basis"),
+                "mode": "pct",
+                "growth_latest": lead.get("growth_latest"),
+                "growth_prior": lead.get("growth_prior"),
+                "level_prior": lead.get("level_prior"),
+                "level_latest": lead.get("level_latest"),
+                "level_yoy_base": lead.get("level_yoy_base"),
+                "accel": lead.get("accel"),
+                "threshold": lead.get("threshold"),
+                "strength": round(avg_strength, 3),
+                "confidence": "high" if avg_strength >= HIGH_CONFIDENCE_MULT else "med",
+                "material": True,
+                "ttm_agrees": any(m.get("ttm_agrees") for m in group if m.get("ttm_agrees") is not None) or None,
+                "composite": True,
+                "composite_members": [m.get("metric") for m in group],
+                "display": True,
+                "points": lead.get("points") or [],
+            }
+        )
         composites.append(composite)
         for m in group:
             m["display"] = False
@@ -599,9 +722,16 @@ def collapse_core_signals(metrics: list[dict]) -> list[dict]:
 
 
 def apply_display_cap(metrics: list[dict]) -> None:
-    """Cap visible inflections: composites first, then regime, then 2 primary + 1 secondary."""
+    """Cap visible inflections: composites first, then one regime, then 2 primary + 1 secondary.
+
+    Artifact / sign-flip signals stay in the payload for All signals but are not
+    displayed by default. When multiple regime rows fire, keep the highest-priority
+    metric only (revenue > operating income > CFO > net income / EPS).
+    """
     for m in metrics:
         if m.get("composite"):
+            if m.get("artifact"):
+                m["display"] = False
             continue
         if m.get("stale"):
             m["display"] = False
@@ -610,11 +740,15 @@ def apply_display_cap(metrics: list[dict]) -> None:
             m["display"] = False
             continue
         if m.get("signal_type") == "regime":
+            m["display"] = False
             continue
         if m.get("direction") not in ("accelerating", "decelerating", "downshift", "upshift"):
             m["display"] = False
             continue
         if m.get("signal_tier") == "steady":
+            m["display"] = False
+            continue
+        if m.get("artifact"):
             m["display"] = False
             continue
         if "display" not in m or m.get("collapsed_into"):
@@ -626,11 +760,14 @@ def apply_display_cap(metrics: list[dict]) -> None:
             for m in metrics
             if m.get("signal_type") == "regime"
             and not m.get("stale")
+            and not m.get("artifact")
             and m.get("direction") in ("downshift", "upshift")
             and m.get("signal_tier") in ("confirmed", "emerging")
         ],
-        key=lambda m: m.get("strength") or 0,
-        reverse=True,
+        key=lambda m: (
+            regime_metric_priority(m.get("metric") or ""),
+            -(m.get("strength") or 0),
+        ),
     )
     for m in regime_candidates[:1]:
         m["display"] = True
@@ -645,6 +782,7 @@ def apply_display_cap(metrics: list[dict]) -> None:
         and m.get("tier") != "excluded"
         and not m.get("collapsed_into")
         and not m.get("stale")
+        and not m.get("artifact")
     ]
     primary = sorted([m for m in candidates if m.get("tier") == "primary"], key=strength, reverse=True)
     secondary = sorted([m for m in candidates if m.get("tier") == "secondary"], key=strength, reverse=True)
@@ -704,6 +842,9 @@ def compute_business_momentum(metrics: list[dict]) -> dict | None:
 
 def finalize_ticker_entry(entry: dict, *, leadership_risk: dict | None = None) -> None:
     metrics = entry.get("metrics") or []
+    for m in metrics:
+        if not m.get("human_summary"):
+            attach_human_summary(m)
     metrics[:] = collapse_core_signals(metrics)
     apply_display_cap(metrics)
 

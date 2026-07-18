@@ -70,6 +70,8 @@ def discover_evidence(ticker: str) -> list[Path]:
     candidates = [
         latest(research, "deep_dive_*.md", exclude="deep_dive_committee_"),
         latest(research, "adversarial_*.md"),
+        research / "valuation_route.json",
+        research / "valuation_contract.json",
         research / "valuation.json",
         research / "thesis.md",
         latest(research, "cross_check_third_party_*.md"),
@@ -167,9 +169,25 @@ def initialize(ticker: str, as_of: str) -> Path:
     if not valuation_path.exists():
         raise FileNotFoundError(f"{ticker}: valuation.json missing")
     valuation = read_json(valuation_path)
+    canonical_route = research / "valuation_route.json"
+    if canonical_route.exists():
+        valuation["valuation_method_route"] = read_json(canonical_route)
+    contract_path = research / "valuation_contract.json"
+    contract = read_json(contract_path) if contract_path.exists() else (valuation.get("universal_valuation_contract") or {})
+    if contract.get("status") != "decision_grade":
+        raise ValueError(f"{ticker}: committee requires a decision-grade valuation contract")
+    if (valuation.get("valuation_method_route") or {}).get("status") in {"default_needs_review", "reviewer_coverage_blocked"}:
+        raise ValueError(f"{ticker}: canonical Power Zone route is not committee-ready")
     evidence_paths = discover_evidence(ticker)
-    if len(evidence_paths) < 3:
-        raise ValueError(f"{ticker}: at least three evidence artifacts are required")
+    substantive = [
+        path
+        for path in evidence_paths
+        if path.name == "thesis.md" or path.name.startswith(("deep_dive_", "adversarial_"))
+    ]
+    if len(evidence_paths) < 3 or not substantive:
+        raise ValueError(
+            f"{ticker}: at least three evidence artifacts, including a thesis, deep dive, or adversarial review, are required"
+        )
     refs = [file_reference(path) for path in evidence_paths]
     frozen_hash = packet_hash(refs)
     raters = select_raters(valuation)
@@ -180,6 +198,8 @@ def initialize(ticker: str, as_of: str) -> Path:
         "as_of": as_of,
         "stage": "round_one_open",
         "packet_hash": frozen_hash,
+        "route_hash": (valuation.get("valuation_method_route") or {}).get("input_hash"),
+        "contract_source": "valuation_contract.json" if contract_path.exists() else "valuation.json#universal_valuation_contract",
         "frozen_at": datetime.now(timezone.utc).isoformat(),
         "evidence": refs,
         "selected_raters": raters,
@@ -195,6 +215,10 @@ def initialize(ticker: str, as_of: str) -> Path:
         },
     }
     write_json(work / "manifest.json", manifest)
+    (work / "proposer.prompt.md").write_text(
+        f"# {ticker} committee proposer\n\nPacket `{frozen_hash}`. Present the decision claim, complete component valuation, evidence quality, strongest causal explanation, expected return range, downside, alternatives, and unresolved facts. Do not invent facts or write a capital decision. Return proposer.json only.\n",
+        encoding="utf-8",
+    )
     for round_number in (1, 2):
         round_dir = work / f"round_{round_number}"
         round_dir.mkdir(parents=True, exist_ok=True)
@@ -207,6 +231,10 @@ def initialize(ticker: str, as_of: str) -> Path:
     )
     (work / "evidence_tribunal.prompt.md").write_text(
         f"# {ticker} evidence tribunal\n\nPacket `{frozen_hash}`. Resolve disputed quantities, ownership, distributions, comparable validity, option beneficiary, and overlap before valuation debate. Separate resolved facts from material unresolved facts and cite packet paths. Return evidence_tribunal.json only.\n",
+        encoding="utf-8",
+    )
+    (work / "research_response.prompt.md").write_text(
+        f"# {ticker} targeted committee research response\n\nPacket `{frozen_hash}`. Read the proposer, round-one reviews, pre-mortem, and evidence tribunal. Answer only the highest-value unresolved factual questions using the frozen evidence. If the packet cannot answer a question, leave it unresolved. Do not change the frozen evidence or read/write round-two votes. Return research_response.json only.\n",
         encoding="utf-8",
     )
     (work / "valuation_reconciliation.prompt.md").write_text(

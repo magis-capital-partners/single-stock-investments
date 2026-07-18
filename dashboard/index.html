@@ -1126,7 +1126,8 @@ function applyRouteFromHash() {
 }
 
 const DARWIN_METHOD_LABELS = {
-  ira_marvin: 'IRA Marvin',
+  ira_marvin: 'Legacy IRA Marvin',
+  research_committee: 'IRA Research Committee',
   equal_weight: 'Equal weight',
   irr_ranked: 'IRR ranked',
   risk_parity_vol: 'Risk parity',
@@ -2295,7 +2296,7 @@ function renderDarwin() {
         }).join('')}</tbody>
       </table>
     </div>
-    ${conflicts.length ? `<div class="conflict-banner"><strong>Marvin conflicts — review before trade</strong><ul style="margin-top:8px;padding-left:18px">${conflicts.map(c => `<li>${escapeHtml(c.ticker)}: ${escapeHtml(c.reason || '')} (${c.weight_pct || '?'}%)</li>`).join('')}</ul></div>` : ''}
+    ${conflicts.length ? `<div class="conflict-banner"><strong>Decision-authority conflicts — review before trade</strong><ul style="margin-top:8px;padding-left:18px">${conflicts.map(c => `<li>${escapeHtml(c.ticker)}: ${escapeHtml(c.reason || '')} (${c.weight_pct || '?'}%)</li>`).join('')}</ul></div>` : ''}
     ${reviews.filter(r => r.severity === 'warn').length ? `<div class="conflict-banner" style="border-color:rgba(245,158,11,0.4);background:rgba(245,158,11,0.08)"><strong>Warnings</strong><ul style="margin-top:8px;padding-left:18px">${reviews.filter(r => r.severity === 'warn').map(r => `<li>${escapeHtml(r.ticker)}: ${escapeHtml(r.reason)}</li>`).join('')}</ul></div>` : ''}
     <div class="detail-section">
       <h3>Backtest vs paper (live tracking)</h3>
@@ -2323,7 +2324,7 @@ function renderDarwin() {
       <div class="summary-card"><div class="label">Cash reserve</div><div class="value" style="font-size:16px">${d.cash_weight_pct != null ? d.cash_weight_pct + '%' : '0%'}</div><div class="sub">unallocated when research caps limit exposure</div></div>
     </div>
     <div class="detail-section">
-      <h3>Target weights (Marvin + Darwin)</h3>
+      <h3>Target weights (Investment Committee + Darwin)</h3>
       <table class="darwin-table">
         <thead><tr><th>Ticker</th><th>Weight</th><th>Δ vs last</th><th>Stance</th><th>IRR</th><th>Trade?</th></tr></thead>
         <tbody>${(d.weights || []).map(w => `<tr>
@@ -2354,7 +2355,7 @@ function renderDarwin() {
       <h3>Benchmarks (in-sample production sim)</h3>
       <table class="darwin-table">
         <thead><tr><th>Policy</th><th>Sharpe</th><th>Cum ret</th><th>Turnover</th></tr></thead>
-        <tbody>${['ira_marvin','equal_weight','irr_ranked','champion','spy'].concat(d.tier === 0 ? [] : ['risk_parity_vol','genetic','ppo','ensemble']).concat((!ccBench.error && ccBench.periods) ? ['covered_call'] : []).concat((proxyKey && proxyBench && !proxyBench.error) ? [proxyKey] : []).map(k => {
+        <tbody>${['research_committee','ira_marvin','equal_weight','irr_ranked','champion','spy'].concat(d.tier === 0 ? [] : ['risk_parity_vol','genetic','ppo','ensemble']).concat((!ccBench.error && ccBench.periods) ? ['covered_call'] : []).concat((proxyKey && proxyBench && !proxyBench.error) ? [proxyKey] : []).map(k => {
           const b = d.benchmarks?.[k] || {};
           if (b.error) return '';
           const hi = k === (d.policy_id === 'ensemble' ? 'ensemble' : d.policy_id) || k === 'champion';

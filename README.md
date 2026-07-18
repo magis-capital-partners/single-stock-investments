@@ -86,6 +86,8 @@ See **`_system/reference/ci-workflows.md`** for the full capability matrix, shar
 | [`deploy-oauth-proxy.yml`](.github/workflows/deploy-oauth-proxy.yml) | Push oauth-proxy + manual | Cloudflare Worker deploy (or local Wrangler) |
 | [`marvin-onboard.yml`](.github/workflows/marvin-onboard.yml) | Manual + repository_dispatch | Onboard ticker → optional deep dive PR → **chains Deploy Dashboard** |
 | [`marvin-deep-dive.yml`](.github/workflows/marvin-deep-dive.yml) | Manual (mode: deep-dive / auto-pick / batch) + push queue | Cursor Cloud Agent → PR(s) |
+| [`power-zone-universe.yml`](.github/workflows/power-zone-universe.yml) | Nightly + manual | Route registry universe → contracts → workbenches → pricing → gated IC |
+| [`investment-committee.yml`](.github/workflows/investment-committee.yml) | Manual stage advance | Run each committee method in an isolated Cloud Agent task; assemble only after validation |
 | [`vicki-ir-harvest.yml`](.github/workflows/vicki-ir-harvest.yml) | Manual + push queue file | Browser IR harvest for ir_gap tickers |
 | [`research-quality.yml`](.github/workflows/research-quality.yml) | PRs touching `**/research/**` | Lint dives + verify cloud prompt sync |
 | [`ci-autofix.yml`](.github/workflows/ci-autofix.yml) | Failed workflow_run + manual | Triage CI failures → optional Cursor autofix |
@@ -102,6 +104,8 @@ python _system/scripts/marvin_cloud_refresh.py TICKER --date 2026-05-29
 ```
 
 3. **All holdings** — `python _system/scripts/batch_portfolio_refresh.py --date 2026-05-29`
+
+The authoritative valuation close is `python _system/scripts/run_security_decision_pipeline.py --scope all`. Marvin remains the evidence/narrative coordinator; Power Zones route methods and reviewers, the universal contract controls readiness, and only `human_decision.json` authorizes capital.
 
 **INDEX.csv:** prefer per-ticker regen: `python _system/scripts/build_folder_indexes.py --ticker SNOW` (avoid full-portfolio regen unless intentional).
 
@@ -128,7 +132,7 @@ Matching logic lives in [`letter_matching.py`](_system/scripts/letter_matching.p
 |---------|--------|--------|
 | **IDE Composer** (local Marvin chat) | Your Cursor setting (e.g. Composer 2.5) | Uses your plan’s Composer allowance |
 | **GitHub Actions cloud Marvin** | `composer-2.5` in `marvin_deep_dive.mjs` | `CURSOR_API_KEY`; opens PR — not IDE tokens |
-| **Python scripts** | No LLM | `marvin_valuation`, `refresh_deep_dive_v2`, dashboard build |
+| **Python scripts** | No LLM | Power Zone router, universal contract/workbench, pricing gates, dashboard build; `marvin_valuation` is compatibility-only |
 
 Cloud prompt stays aligned with local refresh via `_system/prompts/cloud_marvin_runbook.md`; CI runs `check_cloud_marvin_sync.py` on PRs.
 

@@ -7,7 +7,7 @@
 | Layer | Role | Canonical paths |
 |-------|------|-----------------|
 | **Normative** | How to think | `decision_stack.md`, `option_treatment.md`, triggered arsenal rows |
-| **Operative** | How machines run | `valuation.json`, `marvin_cloud_refresh.py` |
+| **Operative** | How machines run | `valuation_route.json`, `valuation_contract.json`, `run_security_decision_pipeline.py` |
 | **Narrative** | How reports read | `deep_dive_structure.md`, `report_prose.md`, `archetype_valuation_prose.md` |
 | **Adversarial** | What must not ship | `MILLY.md`, `lint_deep_dive.py`, `check_evidence_completeness.py`, CI |
 
@@ -36,6 +36,6 @@ If none apply → write proposal in `_system/proposals/` first; use `_system/pro
 ## Agent read order (every research task)
 
 1. `decision_stack.md`
-2. `{TICKER}/research/valuation.json` → open **only** arsenal rows from trigger map (`classification.md`)
+2. `{TICKER}/research/valuation_route.json` and `valuation_contract.json`, then `valuation.json` inputs → open only triggered arsenal rows
 3. Primary PDFs in `{TICKER}/`
 4. Mechanical close: `marvin_cloud_refresh.py` only

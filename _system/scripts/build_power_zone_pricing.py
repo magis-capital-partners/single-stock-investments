@@ -13,9 +13,55 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from marvin_valuation import compute_valuation  # noqa: E402
 from economic_value_framework import build_economic_value_analysis  # noqa: E402
+from decision_authority import load_contract, load_route, read_json  # noqa: E402
 
 HURDLES = (0.10, 0.12, 0.15, 0.20)
 VALUE_CASES = ("low", "base", "high")
+
+
+def build_contract_pricing(ticker: str, as_of: str | None = None) -> dict:
+    """Price a decision-grade universal contract without legacy Marvin math."""
+    ticker = ticker.upper()
+    research = ROOT / ticker / "research"
+    valuation = read_json(research / "valuation.json")
+    contract_source, contract = load_contract(research, valuation)
+    if contract.get("status") != "decision_grade":
+        raise ValueError(f"{ticker}: contract pricing requires decision_grade")
+    market = contract.get("market") or {}
+    value = (contract.get("valuation") or {}).get("value_per_share") or {}
+    years = int((contract.get("valuation") or {}).get("horizon_years") or 7)
+    distributions = float((contract.get("valuation") or {}).get("expected_distributions_per_share") or 0)
+    price = market.get("price_per_share")
+    if price is None or any(value.get(case) is None for case in VALUE_CASES):
+        raise ValueError(f"{ticker}: price and low/base/high contract values are required")
+    entries = {
+        case: {
+            f"{int(hurdle * 100)}pct": round((float(value[case]) + distributions) / ((1 + hurdle) ** years), 2)
+            for hurdle in HURDLES
+        }
+        for case in VALUE_CASES
+    }
+    route = load_route(research, valuation, contract)
+    pricing = {
+        "schema_version": "2.0",
+        "ticker": ticker,
+        "as_of": (as_of or contract.get("as_of") or date.today().isoformat())[:10],
+        "authority": "valuation_contract",
+        "contract_source": contract_source,
+        "contract_status": contract.get("status"),
+        "price": float(price),
+        "price_source": market.get("price_source") or (valuation.get("inputs") or {}).get("price_source"),
+        "component_value_per_share": value,
+        "annualized_return_at_price_pct": (contract.get("valuation") or {}).get("annualized_return_at_price_pct") or {},
+        "entry_prices_by_hurdle_and_case": entries,
+        "primary_entry_price_15pct_base": entries["base"]["15pct"],
+        "decision": "owner_review_required",
+        "pricing_conclusion": "Hurdle prices are derived from the decision-grade universal contract; they do not constitute a capital decision.",
+        "falsifiers": (contract.get("monitoring") or {}).get("falsifiers") or [],
+        "power_zone": {"profile_id": route.get("profile_id"), "label": route.get("label"), "input_hash": route.get("input_hash")},
+    }
+    (research / "pricing_analysis.json").write_text(json.dumps(pricing, indent=2) + "\n", encoding="utf-8")
+    return pricing
 
 
 def deep_merge(target: dict, patch: dict) -> dict:

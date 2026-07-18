@@ -1703,18 +1703,35 @@
   }
 
   function signalTierBadge(signalTier, escapeHtml) {
-    if (signalTier === 'confirmed') return '<span class="badge badge-ok" title="Two consecutive quarters beyond noise">confirmed</span>';
-    if (signalTier === 'emerging') return `<span class="badge badge-us" title="Latest quarter only">emerging</span>`;
+    if (signalTier === 'confirmed') {
+      return '<span class="badge badge-ok" title="Two quarters in a row beyond this company\'s normal noise band">confirmed</span>';
+    }
+    if (signalTier === 'emerging') {
+      return '<span class="badge badge-us" title="Latest quarter only — not yet confirmed by a second quarter">emerging</span>';
+    }
     return '<span class="tier-sub">—</span>';
   }
 
-  function strengthLabel(metric) {
-    const s = metric.strength != null
+  function strengthMultiplier(metric) {
+    return metric.strength != null
       ? metric.strength
       : Math.abs(metric.accel || 0) / Math.max(metric.threshold || 1e-9, 1e-9);
-    if (s >= 2) return `${s.toFixed(1)}× high`;
-    if (s >= 1) return `${s.toFixed(1)}×`;
-    return `${s.toFixed(1)}× weak`;
+  }
+
+  function strengthLabel(metric) {
+    const s = strengthMultiplier(metric);
+    const raw = `${s.toFixed(1)}× vs noise threshold`;
+    if (s >= 2) return `<span title="${raw}">strong</span>`;
+    if (s >= 1) return `<span title="${raw}">moderate</span>`;
+    return `<span title="${raw}">weak</span>`;
+  }
+
+  function inflectionWhatChanged(metric, escapeHtml) {
+    const summary = (metric.human_summary || '').trim();
+    if (summary) return escapeHtml(summary);
+    const label = metric.label || metric.metric || 'Metric';
+    const growth = formatGrowth(metric);
+    return escapeHtml(`${label}: ${growth}`);
   }
 
   function dataTierBadge(trends, escapeHtml) {
@@ -1851,18 +1868,40 @@
   }
 
   function matchesInflectionTier(row, tier) {
-    if (tier === 'all') {
-      return row.direction === 'accelerating' || row.direction === 'decelerating' || row.direction === 'downshift' || row.direction === 'upshift';
-    }
+    const active = row.direction === 'accelerating' || row.direction === 'decelerating'
+      || row.direction === 'downshift' || row.direction === 'upshift';
+    if (!active) return false;
+    if (tier === 'all') return true;
+    // Extreme / sign-flip prints stay under All signals only.
+    if (row.artifact) return false;
     if (tier === 'balance_sheet') {
       return (row.tier === 'excluded' || ['cash', 'total_assets', 'stockholders_equity', 'long_term_debt'].includes(String(row.metric || '').split('.').pop()))
         && (row.direction === 'accelerating' || row.direction === 'decelerating');
     }
-    if (tier === 'regime') return row.signal_type === 'regime' && (row.direction === 'downshift' || row.direction === 'upshift');
+    if (tier === 'regime') {
+      return row.signal_type === 'regime' && !!row.display
+        && (row.direction === 'downshift' || row.direction === 'upshift');
+    }
     if (tier === 'peer') return row.signal_type === 'peer_relative' || row.signal_type === 'estimate_revision';
     if (tier === 'confirmed') return row.signal_tier === 'confirmed';
     if (tier === 'emerging') return row.signal_tier === 'emerging';
     return !!row.display;
+  }
+
+  function inflectionHelpCopy(tier) {
+    if (tier === 'regime') {
+      return `
+        <p class="tier-sub" style="margin-bottom:6px">
+          Compares this quarter’s year-over-year growth to <strong>this company’s own history</strong>, not to peers.
+          Strengthening means above its normal band; softening means below.
+          Extreme percentages usually mean the business flipped between profit and loss — those stay under All signals.
+        </p>`;
+    }
+    return `
+      <p class="tier-sub" style="margin-bottom:6px">
+        Highlights meaningful changes in growth — not the growth rate alone.
+        <span title="YoY quarterly growth, 3-period smoothing, materiality floors, two-quarter persistence, and trailing-twelve-month cross-check">How this works</span>
+      </p>`;
   }
 
   function renderInflections(kpiTrends, escapeHtml, opts) {
@@ -1878,7 +1917,7 @@
     });
     let filtered = rows.filter(r => matchesInflectionTier(r, tier));
     if (search) {
-      filtered = filtered.filter(r => `${r.ticker} ${r.metric} ${r.label} ${r.source}`.toLowerCase().includes(search));
+      filtered = filtered.filter(r => `${r.ticker} ${r.metric} ${r.label} ${r.source} ${r.human_summary || ''}`.toLowerCase().includes(search));
     }
     filtered.sort((a, b) => {
       const sa = a.strength != null ? a.strength : Math.abs(a.accel || 0) / Math.max(a.threshold || 1e-9, 1e-9);
@@ -1889,33 +1928,41 @@
       if (!kpiTrends) {
         return `<p class="subhead">KPI trend data not built yet — run: python _system/scripts/build_fundamental_series.py then build_kpi_trends.py.</p>`;
       }
-      return `${renderInflectionCoverage(kpiTrends)}${inflectionTierTabs(tier, escapeHtml)}<p class="subhead">No inflections match this filter — try All signals or Emerging.</p>`;
+      return `${renderInflectionCoverage(kpiTrends)}${inflectionTierTabs(tier, escapeHtml)}${inflectionHelpCopy(tier)}<p class="subhead">No inflections match this filter — try All signals or Emerging.</p>`;
     }
-    const accel = filtered.filter(r => r.direction === 'accelerating').length;
-    const decel = filtered.length - accel;
+    const accel = filtered.filter(r => r.direction === 'accelerating' || r.direction === 'upshift').length;
+    const decel = filtered.filter(r => r.direction === 'decelerating' || r.direction === 'downshift').length;
     const cov = (kpiTrends && kpiTrends.coverage) || {};
+    const accelLabel = tier === 'regime' ? 'strengthening' : 'accelerating';
+    const decelLabel = tier === 'regime' ? 'softening' : 'decelerating';
     return `
       ${renderInflectionCoverage(kpiTrends)}
       ${inflectionTierTabs(tier, escapeHtml)}
       ${tier === 'displayed' || tier === 'confirmed' ? renderInflectionRollup(kpiTrends, escapeHtml) : ''}
+      ${inflectionHelpCopy(tier)}
       <p class="tier-sub" style="margin-bottom:8px">
-        ${accel} accelerating · ${decel} decelerating · ${cov.displayed_count || 0} displayed total · YoY quarterly growth with smoothing, materiality gates, persistence confirmation, and TTM cross-check
+        ${accel} ${accelLabel} · ${decel} ${decelLabel}${tier === 'displayed' || tier === 'confirmed' ? ` · ${cov.displayed_count || 0} displayed total` : ''}
       </p>
       <table class="darwin-table" id="insights-inflections-table">
-        <thead><tr><th>Ticker</th><th>Metric</th><th>Trend</th><th>Tier</th><th>Growth (prior → latest)</th><th>Strength</th><th>2nd deriv</th><th>Last periods</th><th>Source</th></tr></thead>
+        <thead><tr><th>Ticker</th><th>Metric</th><th>Trend</th><th>Tier</th><th>What changed</th><th>Growth</th><th>Strength</th><th>Last periods</th><th>Source</th></tr></thead>
         <tbody>
-          ${filtered.slice(0, 120).map(r => `
+          ${filtered.slice(0, 120).map(r => {
+            const accelTip = r.accel != null
+              ? (r.mode === 'diff' ? `Second derivative: ${r.accel}` : `Second derivative: ${(r.accel * 100).toFixed(1)} pp`)
+              : '';
+            return `
             <tr>
               <td><button type="button" class="linkish mono" data-select-ticker="${escapeHtml(r.ticker)}">${escapeHtml(r.ticker)}</button></td>
-              <td>${escapeHtml(r.label || r.metric)}${r.composite && r.composite_members ? `<div class="tier-sub">${escapeHtml(r.composite_members.join(', '))}</div>` : ''}${r.stale ? '<div class="tier-sub">stale series</div>' : ''}${r.revenue_proxy ? '<div class="tier-sub">revenue proxy</div>' : ''}${r.signal_type === 'regime' ? '<div class="tier-sub">growth regime</div>' : ''}</td>
-              <td>${trendBadge(r.direction, r.signal_tier)}</td>
+              <td>${escapeHtml(r.label || r.metric)}${r.composite && r.composite_members ? `<div class="tier-sub">${escapeHtml(r.composite_members.join(', '))}</div>` : ''}${r.stale ? '<div class="tier-sub">stale series</div>' : ''}${r.revenue_proxy ? '<div class="tier-sub">revenue proxy</div>' : ''}${r.signal_type === 'regime' ? '<div class="tier-sub">growth regime</div>' : ''}${r.artifact ? '<div class="tier-sub">volatile base</div>' : ''}</td>
+              <td title="${escapeHtml(accelTip)}">${trendBadge(r.direction, r.signal_tier)}</td>
               <td>${signalTierBadge(r.signal_tier, escapeHtml)}</td>
-              <td class="mono">${escapeHtml(formatGrowth(r))}${r.ttm_agrees === true ? ' ✓TTM' : r.ttm_agrees === false ? ' ✗TTM' : ''}</td>
-              <td class="mono">${escapeHtml(strengthLabel(r))}</td>
-              <td class="mono">${r.accel != null ? (r.mode === 'diff' ? r.accel : `${(r.accel * 100).toFixed(1)}pp`) : '—'}</td>
+              <td style="max-width:340px">${inflectionWhatChanged(r, escapeHtml)}</td>
+              <td class="mono" title="${escapeHtml(accelTip)}">${escapeHtml(formatGrowth(r))}${r.ttm_agrees === true ? ' ✓TTM' : r.ttm_agrees === false ? ' ✗TTM' : ''}</td>
+              <td>${strengthLabel(r)}</td>
               <td>${renderSparkline(r.points, r.direction)}</td>
               <td>${trendSourceBadge(r.source, escapeHtml)}</td>
-            </tr>`).join('')}
+            </tr>`;
+          }).join('')}
         </tbody>
       </table>`;
   }

@@ -451,6 +451,10 @@ def _kpi_growth_text(metric: dict) -> str:
 
 
 def _kpi_inflection_claim(metric: dict, *, source_label: str) -> str:
+    summary = (metric.get("human_summary") or "").strip()
+    if summary:
+        return f"{summary} Source: {source_label}."
+
     label = metric.get("label") or metric.get("metric") or "KPI"
     trend = metric.get("direction") or "steady"
     growth_text = _kpi_growth_text(metric)

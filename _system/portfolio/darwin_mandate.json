@@ -24,7 +24,7 @@
     "max_weight_pct_watch": 5.0,
     "allow_watch_stances": [],
     "exclude_negative_irr_unless_stance": ["core", "accumulate"],
-    "preferred_policy": "ira_marvin",
+    "preferred_policy": "research_committee",
     "ml_champion_min_sharpe": 0.25,
     "ml_champion_min_periods": 12,
     "stale_dive_days_for_review": 120,
@@ -76,6 +76,7 @@
     "champion_mode": "best_insample",
     "allow_ml_without_oos": true,
     "policies_active": [
+      "research_committee",
       "ira_marvin",
       "irr_ranked",
       "equal_weight",
@@ -140,13 +141,13 @@
         "id": 5,
         "claim": "Concentrated high-conviction book, low turnover",
         "action": "replicate",
-        "module": "darwin/constraints.py + ira_marvin policy"
+        "module": "darwin/constraints.py + research_committee policy"
       },
       {
         "id": 6,
         "claim": "Proprietary model weights and execution stack",
         "action": "skip",
-        "note": "Not replicable; Marvin IRR is our alpha prior"
+        "note": "Not replicable; decision-grade contract returns and committee authority are our alpha prior"
       }
     ]
   },

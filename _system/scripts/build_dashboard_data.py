@@ -25,6 +25,7 @@ from insight_format import (  # noqa: E402
     split_insight_rows,
 )
 from valuation_synthesis import website_implied_irr  # noqa: E402
+from decision_authority import contract_return_display, resolve_authority  # noqa: E402
 from macro_regime_panel import (  # noqa: E402
     build_portfolio_macro_regime,
     regime_to_compat_macro_list,
@@ -675,32 +676,36 @@ def classification_for(ticker: str, ticker_dir: Path, portfolio: dict[str, dict]
     if val:
         if not val.get("ticker"):
             val["ticker"] = ticker_dir.name
+        authority = resolve_authority(ticker_dir / "research", val)
         irr_web = website_implied_irr(val)
         inputs = val.get("classification_inputs") or {}
         for key in ("archetype", "moat", "dhando", "cycle", "investment_sleeve"):
             if inputs.get(key) and inputs[key] not in ("-", "—", "pending"):
                 out[key] = inputs[key]
-        if irr_web.get("display"):
-            out["implied_irr"] = irr_web["display"]
-        method = val.get("method", val.get("irr_method"))
+        authority_display = contract_return_display(authority)
+        if authority_display:
+            out["implied_irr"] = authority_display
+        elif authority.get("authority_level") == "legacy_reference" and irr_web.get("display"):
+            out["implied_irr"] = irr_web["display"] + " [legacy]"
+        method = authority.get("profile_id") or val.get("method", val.get("irr_method"))
         if method and out.get("irr_method") == "pending":
             out["irr_method"] = method
         bucket = val.get("lawrence_bucket")
         if bucket and out.get("lawrence_bucket") == "—":
             out["lawrence_bucket"] = bucket
-        proposal = val.get("stance_proposal", {})
-        if proposal.get("suggested"):
-            out["stance_proposed"] = proposal["suggested"]
-        if proposal.get("irr_band"):
-            out["irr_band"] = proposal["irr_band"]
-        approved = val.get("approved_stance") or proposal.get("approved_stance")
-        if approved:
-            out["stance"] = approved
-        elif proposal.get("suggested") and proposal["suggested"] != "pending":
-            out["stance"] = proposal["suggested"]
+        out["valuation_authority"] = authority.get("authority_level")
+        out["valuation_status"] = authority.get("status")
+        out["decision_actionable"] = bool(authority.get("actionable"))
+        if authority.get("decision"):
+            out["stance_proposed"] = authority["decision"]
+        if authority.get("actionable") and authority.get("stance"):
+            out["stance"] = authority["stance"]
         if val.get("as_of"):
             out["analysis_as_of"] = val["as_of"]
-        if irr_web.get("base_pct") is not None:
+        contract_base = (authority.get("return_range_pct") or {}).get("base")
+        if contract_base is not None:
+            out["analysis_irr_pct"] = float(contract_base)
+        elif authority.get("authority_level") == "legacy_reference" and irr_web.get("base_pct") is not None:
             out["analysis_irr_pct"] = float(irr_web["base_pct"])
         else:
             out["analysis_irr_pct"] = parse_irr_pct(out.get("implied_irr"))
@@ -725,20 +730,19 @@ def valuation_human_review(ticker_dir: Path) -> dict | None:
     val = load_valuation(ticker_dir)
     if not val:
         return None
-    approved = val.get("approved_stance")
-    proposal = val.get("stance_proposal") or {}
-    override = val.get("override_reason") or proposal.get("override_reason")
-    hr = val.get("human_review") or {}
-    if not approved and not override and not hr:
+    authority = resolve_authority(ticker_dir / "research", val)
+    if authority.get("authority_level") == "legacy_reference":
         return None
     return {
-        "approved_stance": approved,
-        "model_stance": proposal.get("suggested"),
-        "override_reason": override,
-        "entry_band_15pct": hr.get("entry_band_15pct"),
-        "live_price_confirmed": hr.get("live_price_confirmed"),
-        "approved_date": hr.get("approved_date"),
-        "notes": hr.get("notes"),
+        "approved_stance": authority.get("stance") if authority.get("actionable") else None,
+        "model_stance": authority.get("committee_recommendation"),
+        "override_reason": None,
+        "entry_band_15pct": None,
+        "live_price_confirmed": None,
+        "approved_date": None,
+        "notes": f"Authority: {authority.get('authority_level')} / {authority.get('status')}",
+        "authority_level": authority.get("authority_level"),
+        "decision_actionable": authority.get("actionable"),
     }
 
 
@@ -2038,22 +2042,19 @@ def build_decision_summary(
     human_review: dict | None,
     valuation: dict | None,
 ) -> dict | None:
-    if not lenses_doc:
-        return None
+    lenses_doc = lenses_doc or {}
     blend = lenses_doc.get("valuation_blend") or {}
     consensus = lenses_doc.get("consensus") or {}
-    lens_block = (valuation or {}).get("lens_consensus") or {}
-
-    approved = (human_review or {}).get("approved_stance")
-    if approved:
-        stance = approved
-        stance_source = "approved"
-    elif consensus.get("stance"):
-        stance = consensus["stance"]
-        stance_source = "lens_consensus"
+    actionable = bool(classification.get("decision_actionable"))
+    if actionable:
+        stance = classification.get("stance")
+        stance_source = "human_decision"
+    elif classification.get("stance_proposed"):
+        stance = classification.get("stance_proposed")
+        stance_source = classification.get("valuation_authority") or "investment_committee"
     else:
-        stance = classification.get("stance", "watch")
-        stance_source = "classification"
+        stance = "pending"
+        stance_source = classification.get("valuation_authority") or "valuation_contract"
 
     dissents = consensus.get("dissents") or []
     top_dissent = None
@@ -2067,10 +2068,7 @@ def build_decision_summary(
 
     house = classification.get("analysis_irr_pct")
     blend_pct = blend.get("blended_return_pct")
-    divergence = bool(
-        lens_block.get("lawrence_divergence")
-        or consensus.get("lawrence_divergence")
-    )
+    divergence = bool(consensus.get("lawrence_divergence"))
     if house is not None and blend_pct is not None and not divergence:
         divergence = abs(float(house) - float(blend_pct)) > 2.0
 
@@ -2184,9 +2182,9 @@ def build_ticker_row(
         active, silent_count = build_active_lenses(lenses)
         row["active_lenses"] = active
         row["silent_lens_count"] = silent_count
-        row["decision_summary"] = build_decision_summary(
-            classification, lenses, row.get("human_review"), val
-        )
+    row["decision_summary"] = build_decision_summary(
+        classification, lenses, row.get("human_review"), val
+    )
     full_insights = enrich_ticker_insights(load_insights_for_ticker(ticker, insights_doc), limit=200)
     display_insights = full_insights[:12]
     if not any(r.get("source") == "sumzero_research" for r in display_insights):

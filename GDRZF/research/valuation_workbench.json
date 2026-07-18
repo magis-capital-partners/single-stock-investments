@@ -1,0 +1,747 @@
+{
+  "schema_version": "2.0",
+  "ticker": "GDRZF",
+  "as_of": "2026-07-18",
+  "decision": {
+    "status": "decision_grade",
+    "price_per_share": 4.56,
+    "market_cap_m": 674.28,
+    "enterprise_value_m": null,
+    "value_per_share": {
+      "low": 0.9,
+      "base": 5.68,
+      "high": 17.7
+    },
+    "annualized_return_at_price_pct": {
+      "low": -33.35,
+      "base": 5.64,
+      "high": 40.36
+    },
+    "downside_to_low_pct": -80.26,
+    "unvalued_component_count": 0,
+    "unresolved_evidence_count": 0,
+    "primary_power_zone": "Scarce assets, royalties, and optionality",
+    "owner_decision": null,
+    "next_action": "Freeze the evidence packet and select three method-independent raters."
+  },
+  "business": {
+    "status": "complete",
+    "components": [
+      {
+        "component_id": "corporate_cash",
+        "label": "Corporate cash (soft floor)",
+        "category": "financial_asset",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Corporate cash (soft floor)",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 0.68
+        },
+        "growth_driver": "Present cash available to common after near-term legal/G&A burn; no award receivable booked.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "net_asset_value",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.4,
+          "base": 0.68,
+          "high": 0.9
+        },
+        "evidence_tier": "analyst_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "Secondary cash ~USD 100M / 147.9M shares (~$0.68). YE2025 press cited ~USD 69M before later placements. SEDAR annual pending [HUMAN REVIEW].",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Liquidity, FX, and placement dilution bracket the range.",
+        "falsifier": "SEDAR cash balance or going-concern burn shows cash floor below the low case after legal spend.",
+        "overlap_key": "corporate_cash",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "risked_award_citgo_recovery",
+        "label": "Risked ICSID/CITGO net recovery",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Risked ICSID/CITGO net recovery",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 5.5
+        },
+        "growth_driver": "Risked present value of net award collections only; cash remains separate.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "probability_weighted_legal_option",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 1.5,
+          "base": 5.5,
+          "high": 12.0
+        },
+        "evidence_tier": "filing",
+        "evidence_level": "primary_verified",
+        "evidence": "Company H1 2025 interim Note 5 unpaid award ~$1.18bn face; Delaware attached judgment / CITGO sale path; net after CVR 5.466% and bonus-plan leakage. Base aligns with four-year dated payoff ~$7 including cash.",
+        "probability_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "Base assumes ~4 years to meaningful net cash; bear embeds longer or failed closing.",
+          "probability_basis": "Analyst judgment pending Amber closing and creditor waterfall; base embeds partial recovery over ~4 years.",
+          "remaining_capital_basis": "Remaining legal spend and senior claims are partly in the reserve component and partly netted in recovery."
+        },
+        "tax_and_realization_adjustments": "Probability, timing, OFAC/closing, creditor ranking, CVR, and bonus plan are inside the range.",
+        "falsifier": "Amber sale closes with de minimis net cash to Gold Reserve after senior creditors, or OFAC/closing permanently blocks distribution.",
+        "overlap_key": "risked_award_citgo_recovery",
+        "assumption_type": "fact"
+      },
+      {
+        "component_id": "arb_ii_option",
+        "label": "Arb II Siembra Minera option",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Arb II Siembra Minera option",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 0.0
+        },
+        "growth_driver": "Incremental option only; does not double-count ICSID/CITGO recovery.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "milestone_project_option",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.0,
+          "base": 0.0,
+          "high": 5.0
+        },
+        "evidence_tier": "filing",
+        "evidence_level": "primary_verified",
+        "evidence": "Arb II RFA pleadings claim large incremental damages; base zero until tribunal path and collectibility clearer. High case is bull-only optionality.",
+        "probability_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "Multi-year arbitration timing; not in the four-year base payoff.",
+          "probability_basis": "Base success probability treated as ~0 until clearer tribunal path; high case is bull optionality.",
+          "remaining_capital_basis": "No additional owner-funded mine capital modeled; legal spend covered in reserve/cash burn."
+        },
+        "tax_and_realization_adjustments": "Base zero; high case is success-path optionality only.",
+        "falsifier": "Tribunal dismisses Arb II or collectibility collapses so high-case optionality is not supportable.",
+        "overlap_key": "arb_ii_option",
+        "assumption_type": "fact"
+      },
+      {
+        "component_id": "legal_burn_and_senior_claims_reserve",
+        "label": "Legal burn and senior-claim reserve",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Legal burn and senior-claim reserve",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": -0.5
+        },
+        "growth_driver": "Deduction for spend and priority leakage not already netted in the risked recovery line.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "realization_reserve",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": -1.0,
+          "base": -0.5,
+          "high": -0.2
+        },
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "Ongoing litigation spend and ranking risk versus other attached judgment creditors on CITGO proceeds.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Negative additive; does not double-count CVR already netted in recovery.",
+        "falsifier": "Creditor waterfall or burn rate shows a larger structural haircut than the low case.",
+        "overlap_key": "legal_burn_and_senior_claims_reserve",
+        "assumption_type": "judgment"
+      }
+    ],
+    "component_coverage": {
+      "all_material_components_identified": true,
+      "material_component_count": 4,
+      "additive_component_count": 4,
+      "embedded_component_count": 0,
+      "unvalued_component_count": 0,
+      "double_counting_flags": []
+    },
+    "facts": [
+      {
+        "component_id": "risked_award_citgo_recovery",
+        "label": "Risked ICSID/CITGO net recovery",
+        "kind": "fact",
+        "evidence_tier": "filing",
+        "evidence": "Company H1 2025 interim Note 5 unpaid award ~$1.18bn face; Delaware attached judgment / CITGO sale path; net after CVR 5.466% and bonus-plan leakage. Base aligns with four-year dated payoff ~$7 including cash.",
+        "method": "probability_weighted_legal_option"
+      },
+      {
+        "component_id": "arb_ii_option",
+        "label": "Arb II Siembra Minera option",
+        "kind": "fact",
+        "evidence_tier": "filing",
+        "evidence": "Arb II RFA pleadings claim large incremental damages; base zero until tribunal path and collectibility clearer. High case is bull-only optionality.",
+        "method": "milestone_project_option"
+      }
+    ],
+    "estimates": [],
+    "judgments": [
+      {
+        "component_id": "corporate_cash",
+        "label": "Corporate cash (soft floor)",
+        "kind": "judgment",
+        "evidence_tier": "analyst_estimate",
+        "evidence": "Secondary cash ~USD 100M / 147.9M shares (~$0.68). YE2025 press cited ~USD 69M before later placements. SEDAR annual pending [HUMAN REVIEW].",
+        "method": "net_asset_value"
+      },
+      {
+        "component_id": "legal_burn_and_senior_claims_reserve",
+        "label": "Legal burn and senior-claim reserve",
+        "kind": "judgment",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Ongoing litigation spend and ranking risk versus other attached judgment creditors on CITGO proceeds.",
+        "method": "realization_reserve"
+      }
+    ]
+  },
+  "valuation": {
+    "status": "decision_grade",
+    "market": {
+      "price_per_share": 4.56,
+      "fully_diluted_shares": 147869033,
+      "market_cap_m": 674.28,
+      "enterprise_value_m": null
+    },
+    "valuation": {
+      "value_per_share": {
+        "low": 0.9,
+        "base": 5.68,
+        "high": 17.7
+      },
+      "probability_weighted_value_per_share": 5.68,
+      "expected_distributions_per_share": 0.0,
+      "annualized_return_at_price_pct": {
+        "low": -33.35,
+        "base": 5.64,
+        "high": 40.36
+      },
+      "downside_to_low_pct": -80.26,
+      "horizon_years": 4
+    },
+    "components": [
+      {
+        "component_id": "corporate_cash",
+        "label": "Corporate cash (soft floor)",
+        "category": "financial_asset",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Corporate cash (soft floor)",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 0.68
+        },
+        "growth_driver": "Present cash available to common after near-term legal/G&A burn; no award receivable booked.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "net_asset_value",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.4,
+          "base": 0.68,
+          "high": 0.9
+        },
+        "evidence_tier": "analyst_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "Secondary cash ~USD 100M / 147.9M shares (~$0.68). YE2025 press cited ~USD 69M before later placements. SEDAR annual pending [HUMAN REVIEW].",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Liquidity, FX, and placement dilution bracket the range.",
+        "falsifier": "SEDAR cash balance or going-concern burn shows cash floor below the low case after legal spend.",
+        "overlap_key": "corporate_cash",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "risked_award_citgo_recovery",
+        "label": "Risked ICSID/CITGO net recovery",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Risked ICSID/CITGO net recovery",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 5.5
+        },
+        "growth_driver": "Risked present value of net award collections only; cash remains separate.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "probability_weighted_legal_option",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 1.5,
+          "base": 5.5,
+          "high": 12.0
+        },
+        "evidence_tier": "filing",
+        "evidence_level": "primary_verified",
+        "evidence": "Company H1 2025 interim Note 5 unpaid award ~$1.18bn face; Delaware attached judgment / CITGO sale path; net after CVR 5.466% and bonus-plan leakage. Base aligns with four-year dated payoff ~$7 including cash.",
+        "probability_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "Base assumes ~4 years to meaningful net cash; bear embeds longer or failed closing.",
+          "probability_basis": "Analyst judgment pending Amber closing and creditor waterfall; base embeds partial recovery over ~4 years.",
+          "remaining_capital_basis": "Remaining legal spend and senior claims are partly in the reserve component and partly netted in recovery."
+        },
+        "tax_and_realization_adjustments": "Probability, timing, OFAC/closing, creditor ranking, CVR, and bonus plan are inside the range.",
+        "falsifier": "Amber sale closes with de minimis net cash to Gold Reserve after senior creditors, or OFAC/closing permanently blocks distribution.",
+        "overlap_key": "risked_award_citgo_recovery",
+        "assumption_type": "fact"
+      },
+      {
+        "component_id": "arb_ii_option",
+        "label": "Arb II Siembra Minera option",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Arb II Siembra Minera option",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 0.0
+        },
+        "growth_driver": "Incremental option only; does not double-count ICSID/CITGO recovery.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "milestone_project_option",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.0,
+          "base": 0.0,
+          "high": 5.0
+        },
+        "evidence_tier": "filing",
+        "evidence_level": "primary_verified",
+        "evidence": "Arb II RFA pleadings claim large incremental damages; base zero until tribunal path and collectibility clearer. High case is bull-only optionality.",
+        "probability_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "Multi-year arbitration timing; not in the four-year base payoff.",
+          "probability_basis": "Base success probability treated as ~0 until clearer tribunal path; high case is bull optionality.",
+          "remaining_capital_basis": "No additional owner-funded mine capital modeled; legal spend covered in reserve/cash burn."
+        },
+        "tax_and_realization_adjustments": "Base zero; high case is success-path optionality only.",
+        "falsifier": "Tribunal dismisses Arb II or collectibility collapses so high-case optionality is not supportable.",
+        "overlap_key": "arb_ii_option",
+        "assumption_type": "fact"
+      },
+      {
+        "component_id": "legal_burn_and_senior_claims_reserve",
+        "label": "Legal burn and senior-claim reserve",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Legal burn and senior-claim reserve",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": -0.5
+        },
+        "growth_driver": "Deduction for spend and priority leakage not already netted in the risked recovery line.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "realization_reserve",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": -1.0,
+          "base": -0.5,
+          "high": -0.2
+        },
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "Ongoing litigation spend and ranking risk versus other attached judgment creditors on CITGO proceeds.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Negative additive; does not double-count CVR already netted in recovery.",
+        "falsifier": "Creditor waterfall or burn rate shows a larger structural haircut than the low case.",
+        "overlap_key": "legal_burn_and_senior_claims_reserve",
+        "assumption_type": "judgment"
+      }
+    ],
+    "scenario_contract": {
+      "rule": "Cases must change causal operating, capital, probability, timing, or financing drivers\u2014not only the terminal multiple.",
+      "top_value_drivers": [
+        {
+          "component_id": "risked_award_citgo_recovery",
+          "label": "Risked ICSID/CITGO net recovery",
+          "base_per_share": 5.5,
+          "range_width_per_share": 10.5,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "arb_ii_option",
+          "label": "Arb II Siembra Minera option",
+          "base_per_share": 0.0,
+          "range_width_per_share": 5.0,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "legal_burn_and_senior_claims_reserve",
+          "label": "Legal burn and senior-claim reserve",
+          "base_per_share": -0.5,
+          "range_width_per_share": 0.8,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "corporate_cash",
+          "label": "Corporate cash (soft floor)",
+          "base_per_share": 0.68,
+          "range_width_per_share": 0.5,
+          "scenario_assumptions": null
+        }
+      ],
+      "reverse_expectations": null
+    }
+  },
+  "optionality": {
+    "status": "present",
+    "option_count": 2,
+    "options": [
+      {
+        "component_id": "risked_award_citgo_recovery",
+        "label": "Risked ICSID/CITGO net recovery",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Risked ICSID/CITGO net recovery",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 5.5
+        },
+        "growth_driver": "Risked present value of net award collections only; cash remains separate.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "probability_weighted_legal_option",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 1.5,
+          "base": 5.5,
+          "high": 12.0
+        },
+        "evidence_tier": "filing",
+        "evidence_level": "primary_verified",
+        "evidence": "Company H1 2025 interim Note 5 unpaid award ~$1.18bn face; Delaware attached judgment / CITGO sale path; net after CVR 5.466% and bonus-plan leakage. Base aligns with four-year dated payoff ~$7 including cash.",
+        "probability_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "Base assumes ~4 years to meaningful net cash; bear embeds longer or failed closing.",
+          "probability_basis": "Analyst judgment pending Amber closing and creditor waterfall; base embeds partial recovery over ~4 years.",
+          "remaining_capital_basis": "Remaining legal spend and senior claims are partly in the reserve component and partly netted in recovery."
+        },
+        "tax_and_realization_adjustments": "Probability, timing, OFAC/closing, creditor ranking, CVR, and bonus plan are inside the range.",
+        "falsifier": "Amber sale closes with de minimis net cash to Gold Reserve after senior creditors, or OFAC/closing permanently blocks distribution.",
+        "overlap_key": "risked_award_citgo_recovery",
+        "assumption_type": "fact"
+      },
+      {
+        "component_id": "arb_ii_option",
+        "label": "Arb II Siembra Minera option",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Arb II Siembra Minera option",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 0.0
+        },
+        "growth_driver": "Incremental option only; does not double-count ICSID/CITGO recovery.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "milestone_project_option",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.0,
+          "base": 0.0,
+          "high": 5.0
+        },
+        "evidence_tier": "filing",
+        "evidence_level": "primary_verified",
+        "evidence": "Arb II RFA pleadings claim large incremental damages; base zero until tribunal path and collectibility clearer. High case is bull-only optionality.",
+        "probability_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "Multi-year arbitration timing; not in the four-year base payoff.",
+          "probability_basis": "Base success probability treated as ~0 until clearer tribunal path; high case is bull optionality.",
+          "remaining_capital_basis": "No additional owner-funded mine capital modeled; legal spend covered in reserve/cash burn."
+        },
+        "tax_and_realization_adjustments": "Base zero; high case is success-path optionality only.",
+        "falsifier": "Tribunal dismisses Arb II or collectibility collapses so high-case optionality is not supportable.",
+        "overlap_key": "arb_ii_option",
+        "assumption_type": "fact"
+      }
+    ],
+    "rule": "Every option requires a beneficiary, probability, timing, remaining capital, failure case, and non-overlap control; absence of option value must be explicit rather than unvalued."
+  },
+  "committee": {
+    "status": "not_started",
+    "as_of": null,
+    "packet_hash": null,
+    "stage": null,
+    "selected_raters": [],
+    "analysis_progress": {
+      "completed": 0,
+      "required": 7
+    },
+    "completed_outputs": [],
+    "missing_outputs": [
+      "proposer.json",
+      "pre_mortem.json",
+      "evidence_tribunal.json",
+      "research_response.json",
+      "valuation_reconciliation.json",
+      "adversarial_review.json",
+      "chair_synthesis.json"
+    ],
+    "owner_status": "pending",
+    "owner_decision": null,
+    "strongest_dissent": null,
+    "unresolved_items": [],
+    "next_action": "Freeze the evidence packet and select three method-independent raters.",
+    "record_ref": null,
+    "previous_record_ref": null,
+    "manifest_ref": null
+  },
+  "evidence": {
+    "status": "clear",
+    "open_count": 0,
+    "critical_count": 0,
+    "gaps": []
+  },
+  "method_fit": {
+    "profile_id": "scarce_asset_optionality",
+    "label": "Scarce assets, royalties, and optionality",
+    "current_archetype": "optionality",
+    "primary_methods": [
+      "component_owner_cash_and_unit_nav"
+    ],
+    "corroborating_methods": [
+      "comparable_transactions",
+      "replacement_cost_or_reverse_nav"
+    ],
+    "primary_personas": [
+      "hk",
+      "stahl"
+    ],
+    "cross_check_personas": [
+      "klarman_asset_value",
+      "marks_credit_cycle"
+    ],
+    "silent_personas": [
+      "buffett_weschler",
+      "greenblatt",
+      "hohn",
+      "marathon_capital_cycle",
+      "munger",
+      "pabrai"
+    ],
+    "routing_reasons": [
+      "archetype=optionality",
+      "component categories=real_option",
+      "existing methods=option",
+      "explicit reviewed profile"
+    ],
+    "required_evidence": [
+      "legal economic claim",
+      "non-overlapping physical inventory",
+      "unit economics",
+      "realization timing",
+      "remaining owner capital"
+    ],
+    "applicability_tests": [
+      "The security owns a legally enforceable economic claim on scarce assets or royalties.",
+      "Material value is omitted or poorly represented by current GAAP earnings.",
+      "Asset quantities, ownership, overlap, timing, and remaining capital can be reconciled.",
+      "Comparable values can be adjusted for location, quality, control, liquidity, and realization time."
+    ],
+    "failure_modes": [
+      "gross asset value mistaken for shareholder value",
+      "operating cash flow and NAV counted twice",
+      "remote options treated as contracted cash"
+    ],
+    "validation_cohort": [
+      {
+        "ticker": "MSB",
+        "archetype": "royalty_asset",
+        "primary_profile": "scarce_asset_optionality",
+        "purpose": "Test depletion, commodity exposure, finite reserves, and royalty-unit reconciliation.",
+        "status": "queued"
+      },
+      {
+        "ticker": "C",
+        "archetype": "financial_balance_sheet",
+        "primary_profile": "credit_and_normalized_returns",
+        "purpose": "Test tangible capital, credit losses, funding, regulation, and excess-capital realization.",
+        "status": "queued"
+      },
+      {
+        "ticker": "NVR",
+        "archetype": "quality_reinvestment",
+        "primary_profile": "quality_reinvestment",
+        "purpose": "Test owner earnings, capital-light reinvestment, cyclicality, and buyback value creation.",
+        "status": "queued"
+      },
+      {
+        "ticker": "NUE",
+        "archetype": "capital_cycle",
+        "primary_profile": "capital_cycle",
+        "purpose": "Test normalized margins, industry supply response, replacement cost, and reinvestment timing.",
+        "status": "queued"
+      },
+      {
+        "ticker": "BIIB",
+        "archetype": "binary_special_situation",
+        "primary_profile": "probability_weighted_special_situation",
+        "purpose": "Test product concentration, pipeline probabilities, patent cliffs, and catalyst timing.",
+        "status": "queued"
+      }
+    ],
+    "rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+  },
+  "outcomes": {
+    "status": "waiting_for_owner_decision",
+    "decision_date": null,
+    "schedule": [
+      {
+        "horizon_months": 6,
+        "target_date": null,
+        "status": "waiting_for_owner_decision",
+        "measurement_date": null,
+        "total_return_pct": null,
+        "return_status": null
+      },
+      {
+        "horizon_months": 12,
+        "target_date": null,
+        "status": "waiting_for_owner_decision",
+        "measurement_date": null,
+        "total_return_pct": null,
+        "return_status": null
+      },
+      {
+        "horizon_months": 24,
+        "target_date": null,
+        "status": "waiting_for_owner_decision",
+        "measurement_date": null,
+        "total_return_pct": null,
+        "return_status": null
+      }
+    ],
+    "recorded_outcome_count": 0,
+    "minimum_persona_outcomes_before_reweighting": 20,
+    "personas_eligible_for_weight_review": [],
+    "persona_power_zones_eligible_for_weight_review": [],
+    "weighting_rule": "Do not change a persona's relevance within a power zone until at least 20 attributable, dividend-aware outcomes exist there; never reweight automatically."
+  },
+  "attribution": {
+    "status": "baseline_established",
+    "current": {
+      "as_of": "2026-07-17",
+      "low": 0.9,
+      "base": 5.68,
+      "high": 17.7
+    },
+    "prior": null,
+    "base_change_per_share": null,
+    "base_change_pct": null,
+    "drivers": [],
+    "category_totals_per_share": {},
+    "unexplained_per_share": null,
+    "explanation": "The current component schedule is the first decision-grade baseline; attribution begins with the next dated valuation snapshot."
+  }
+}

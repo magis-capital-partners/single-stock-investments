@@ -17,6 +17,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 from dated_md import latest_dated_md  # noqa: E402
 from lawrence_horizon import IMPLIED_IRR_LABEL  # noqa: E402
+from decision_authority import contract_return_display, resolve_authority  # noqa: E402
 
 CLASS_PATH = ROOT / "_system" / "portfolio" / "classification.json"
 
@@ -71,7 +72,7 @@ def load_valuation(ticker: str) -> dict | None:
     return json.loads(target.read_text(encoding="utf-8"))
 
 
-def valuation_classification(val: dict) -> dict:
+def valuation_classification(val: dict, research: Path | None = None) -> dict:
     out = {}
     inputs = val.get("classification_inputs") or {}
     for key in ("archetype", "moat", "dhando", "cycle", "payoff_lens", "moi_bucket", "investment_sleeve"):
@@ -79,22 +80,31 @@ def valuation_classification(val: dict) -> dict:
             out[key] = inputs[key]
     if val.get("lawrence_bucket"):
         out["lawrence_bucket"] = val["lawrence_bucket"]
-    method = val.get("method", val.get("irr_method"))
-    if method:
-        out["irr_method"] = method
-    implied = val.get("implied_return", {})
-    if implied.get("display"):
-        out["implied_irr"] = implied["display"]
-    elif val.get("results", {}).get("base", {}).get("return_pct") is not None:
-        out["implied_irr"] = f"{val['results']['base']['return_pct']}% (base)"
-    proposal = val.get("stance_proposal", {})
-    if proposal.get("suggested") and proposal["suggested"] != "pending":
-        out["stance_proposed"] = proposal["suggested"]
-    approved = val.get("approved_stance") or proposal.get("approved_stance")
-    if approved:
-        out["stance"] = approved
-    elif proposal.get("suggested") and proposal["suggested"] != "pending":
-        out["stance"] = proposal["suggested"]
+    authority = resolve_authority(research, val) if research else None
+    if authority and authority.get("authority_level") != "legacy_reference":
+        out["irr_method"] = authority.get("profile_id") or "power_zone_contract"
+        display = contract_return_display(authority)
+        if display:
+            out["implied_irr"] = display
+        out["valuation_status"] = authority.get("status")
+        out["valuation_authority"] = authority.get("authority_level")
+        out["decision_actionable"] = bool(authority.get("actionable"))
+        if authority.get("decision"):
+            out["stance_proposed"] = authority["decision"]
+        if authority.get("actionable") and authority.get("stance"):
+            out["stance"] = authority["stance"]
+    else:
+        method = val.get("method", val.get("irr_method"))
+        if method:
+            out["irr_method"] = method
+        implied = val.get("implied_return", {})
+        if implied.get("display"):
+            out["implied_irr"] = implied["display"]
+        elif val.get("results", {}).get("base", {}).get("return_pct") is not None:
+            out["implied_irr"] = f"{val['results']['base']['return_pct']}% (legacy base)"
+        out["valuation_status"] = "legacy_only"
+        out["valuation_authority"] = "legacy_reference"
+        out["decision_actionable"] = False
     return out
 
 
@@ -169,7 +179,7 @@ def check_ticker(ticker: str, portfolio: dict, fix: bool) -> list[str]:
     from_json = portfolio.get(ticker, {})
     from_thesis = parse_thesis_classification(ticker_dir)
     val = load_valuation(ticker)
-    from_val = valuation_classification(val) if val else {}
+    from_val = valuation_classification(val, ticker_dir / "research") if val else {}
 
     merged = {**from_json, **from_thesis}
     for key in CLASS_FIELDS:
