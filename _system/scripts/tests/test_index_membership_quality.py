@@ -14,6 +14,7 @@ from build_index_membership import (  # noqa: E402
     finalize_scorecard,
     is_quality_gated_news,
     parse_effective_from_title,
+    report_tier_boost,
     scorecard_russell,
 )
 from index_event_extract import extract_index_events  # noqa: E402
@@ -171,6 +172,51 @@ class TestRussellMutex(unittest.TestCase):
         )
         self.assertNotEqual(r1["status"], "inclusion_candidate")
         self.assertEqual(r2["status"], "inclusion_candidate")
+
+    def test_inside_band_is_banding_hold(self):
+        # 1% above breakpoint → inside ±2.5% band
+        mi = {"ticker": "Z", "market_cap_usd": 5.7e9 * 1.01, "missing": []}
+        r1 = scorecard_russell(
+            "russell_1000",
+            {"band_pct": 0.025, "band_usd": [2.7e9, 9.6e9]},
+            mi,
+            False,
+            {},
+            breakpoint_mcap=5.7e9,
+            breakpoint_source="config",
+            band_usd=[2.7e9, 9.6e9],
+        )
+        self.assertEqual(r1["status"], "banding_hold")
+        self.assertEqual(r1.get("recon_status"), "banding_hold")
+
+    def test_outside_band_is_likely_add(self):
+        mi = {"ticker": "Z2", "market_cap_usd": 5.7e9 * 1.08, "missing": []}
+        r1 = scorecard_russell(
+            "russell_1000",
+            {"band_pct": 0.025, "band_usd": [2.7e9, 9.6e9]},
+            mi,
+            False,
+            {},
+            breakpoint_mcap=5.7e9,
+            breakpoint_source="config",
+            band_usd=[2.7e9, 9.6e9],
+        )
+        self.assertEqual(r1["status"], "inclusion_candidate")
+        self.assertEqual(r1.get("recon_status"), "likely_add")
+
+
+class TestReconWatchBoost(unittest.TestCase):
+    def test_provisional_beats_rumor(self):
+        boost_p, tier_p = report_tier_boost(
+            [{"confidence": "provisional", "index": "russell_1000", "action": "add"}]
+        )
+        boost_r, tier_r = report_tier_boost(
+            [{"confidence": "rumor", "index": "russell_1000", "action": "add"}]
+        )
+        self.assertEqual(tier_p, "provisional")
+        self.assertEqual(tier_r, "rumor")
+        self.assertGreater(boost_p, boost_r)
+        self.assertGreater(boost_p, 0)
 
 
 class TestFloorNoCandidate(unittest.TestCase):

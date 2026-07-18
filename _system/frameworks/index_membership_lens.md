@@ -66,7 +66,9 @@ AUM tiers in `index_aum.json`: `low` = observed ETFs; `base` = + index-fund esti
 
 **Breakpoint:** use dated `russell_1000.breakpoint_mcap_usd` in `index_rules.json` ($5.7B as of 2026-06-26). Never use portfolio-median mcap as the Russell breakpoint for candidacy.
 
-**Event gates:** style/subset (Top 50, Defensive, 2500, Growth/Value Benchmark) and bare "index reclassification" never produce size-migration float impact. Candidates (expected impact) and confirmed/news (actual impact) both appear in the float-impacts table.
+**Event gates:** style/subset (Top 50, Defensive, 2500, Growth/Value Benchmark) and bare "index reclassification" never produce size-migration float impact.
+
+**UI layers:** Confirmed size events → Float impact (default). Predicted adds/deletes (`inclusion_candidate`, `banding_hold`, `committee_watch`, `deletion_risk`, plus recon-watch tiers) → **Predictor watchlist** and float-impact Show estimates (Conf = predicted; asterisk when float unknown). Potential (near-boundary) stays below Index events.
 
 ## Inclusion probability band
 

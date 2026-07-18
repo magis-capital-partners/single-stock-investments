@@ -252,28 +252,44 @@ def fetch_sec_shares(cik: str) -> int | None:
     return None
 
 
-def priority_tickers(only_events: bool, max_n: int | None, explicit: list[str] | None) -> list[str]:
+def priority_tickers(
+    only_events: bool,
+    max_n: int | None,
+    explicit: list[str] | None,
+    *,
+    only_candidates: bool = False,
+) -> list[str]:
     if explicit:
         return [t.upper() for t in explicit]
     reg = json.loads(REGISTRY.read_text(encoding="utf-8")) if REGISTRY.exists() else {}
     holdings = list((reg.get("holdings") or {}).keys())
     event_first: list[str] = []
+    cand_first: list[str] = []
+    _pred = {
+        "inclusion_candidate",
+        "deletion_risk",
+        "banding_hold",
+        "committee_watch",
+    }
     if MEMBERSHIP.exists():
         mem = json.loads(MEMBERSHIP.read_text(encoding="utf-8"))
         by = mem.get("by_ticker") or {}
         for t, row in by.items():
             if row.get("confirmed_events") or row.get("news_notes"):
                 event_first.append(t)
-            else:
-                for sc in row.get("scorecards") or []:
-                    if sc.get("status") in {"inclusion_candidate", "deletion_risk"}:
-                        event_first.append(t)
-                        break
+            for sc in row.get("scorecards") or []:
+                if sc.get("status") in _pred:
+                    cand_first.append(t)
+                    break
+        for r in (mem.get("portfolio_summary") or {}).get("predictor_watch") or []:
+            if r.get("ticker"):
+                cand_first.append(str(r["ticker"]))
     # Dedupe preserve order
     seen = set()
     ordered = []
-    for t in event_first + holdings:
-        tu = t.upper()
+    lead = cand_first + event_first if only_candidates else event_first + cand_first + holdings
+    for t in lead:
+        tu = str(t).upper()
         if tu in seen:
             continue
         # US-ish only for Yahoo float
@@ -281,11 +297,10 @@ def priority_tickers(only_events: bool, max_n: int | None, explicit: list[str] |
             continue
         seen.add(tu)
         ordered.append(tu)
-        if only_events and t not in event_first and t.upper() not in {x.upper() for x in event_first}:
-            # still allow holdings after events when not only_events
-            pass
     if only_events:
         ordered = [t for t in ordered if t in {x.upper() for x in event_first}]
+    if only_candidates:
+        ordered = [t for t in ordered if t in {x.upper() for x in cand_first}]
     if max_n is not None:
         ordered = ordered[:max_n]
     return ordered
@@ -295,6 +310,11 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--tickers", nargs="*", help="Explicit tickers")
     ap.add_argument("--only-events", action="store_true")
+    ap.add_argument(
+        "--only-candidates",
+        action="store_true",
+        help="Prefer inclusion_candidate / banding_hold / committee_watch / deletion_risk",
+    )
     ap.add_argument("--max", type=int, default=None)
     ap.add_argument("--sleep", type=float, default=0.15)
     ap.add_argument("--sec-fallback", action="store_true", default=True)
@@ -309,7 +329,12 @@ def main() -> int:
             existing = {}
     by = dict(existing.get("by_ticker") or {})
 
-    tickers = priority_tickers(args.only_events, args.max, args.tickers)
+    tickers = priority_tickers(
+        args.only_events,
+        args.max,
+        args.tickers,
+        only_candidates=args.only_candidates,
+    )
     cik_map = load_sec_cik_map() if not args.no_sec_fallback else {}
     print(f"Fetching float/ADV for {len(tickers)} tickers…")
 

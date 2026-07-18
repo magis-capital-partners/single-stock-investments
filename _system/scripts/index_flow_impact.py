@@ -600,10 +600,16 @@ def events_from_ticker_row(
         impact["event_source"] = "news_note"
         _append(impact)
 
-    # 3) Pre-announcement candidates (expected impact before it happens)
+    # 3) Pre-announcement candidates / predictor statuses (expected impact)
+    _PRED_STATUSES = {
+        "inclusion_candidate",
+        "deletion_risk",
+        "banding_hold",
+        "committee_watch",
+    }
     for sc in row.get("scorecards") or []:
         status = sc.get("status")
-        if status not in {"inclusion_candidate", "deletion_risk"}:
+        if status not in _PRED_STATUSES:
             continue
         idx = sc.get("index")
         if not idx or idx not in (registry.get("indices") or {}):
@@ -611,14 +617,14 @@ def events_from_ticker_row(
         # Suppress candidates from portfolio_proxy_fallback breakpoint (Phase D)
         if sc.get("rank_method") == "portfolio_proxy_fallback":
             continue
-        action = "add" if status == "inclusion_candidate" else "delete"
+        if status in {"inclusion_candidate", "banding_hold", "committee_watch"}:
+            action = "add"
+        else:
+            action = "delete"
         k = _key(idx, action, "candidate")
         if k in seen_keys:
             continue
         dist = sc.get("distance_to_boundary_pct")
-        if idx in RUSSELL_BREAKPOINT_PAIR and dist is not None:
-            if abs(float(dist)) < 2.5 and status == "inclusion_candidate":
-                continue
         seen_keys.add(k)
         impact = compute_event_impact(
             ticker=ticker,
@@ -635,10 +641,16 @@ def events_from_ticker_row(
             style_subset=False,
             rules=rules,
         )
-        # Candidates need real float/ADV — no wallpaper constants in the model.
-        if impact.get("float_flag") != "float_adj" or impact.get("status") != "ok":
+        # Keep predicted rows even when float unknown (UI shows asterisk estimates).
+        # Drop only hard n_a (missing mcap / no AUM / style).
+        if impact.get("status") == "n_a":
+            continue
+        if impact.get("pct_of_float_base") is None:
             continue
         impact["event_source"] = "candidate"
+        impact["confidence"] = "rules_only"
+        impact["predicted"] = True
+        impact["recon_status"] = sc.get("recon_status") or status
         impact["distance_to_boundary_pct"] = dist
         _append(impact)
 
@@ -678,26 +690,32 @@ def attach_float_impact(
             "aum_as_of": registry.get("as_of"),
             "aum_stale": aum_stale(registry),
         }
-        if display and display.get("pct_of_float_base") is not None:
+        # Surface every usable event (confirmed + predicted) for summary tables
+        for ev in events:
+            if ev.get("status") == "n_a" or ev.get("pct_of_float_base") is None:
+                continue
             top.append(
                 {
                     "ticker": ticker,
-                    "pct_of_float_base": display["pct_of_float_base"],
-                    "pct_of_float_low": display.get("pct_of_float_low"),
-                    "pct_of_float_high": display.get("pct_of_float_high"),
-                    "pct_of_adv_days": display.get("pct_of_adv_days"),
-                    "net_flow_usd_base": display.get("net_flow_usd_base"),
-                    "hk_weight_cliff_ratio": display.get("hk_weight_cliff_ratio"),
-                    "is_russell_breakpoint_migration": display.get(
+                    "pct_of_float_base": ev["pct_of_float_base"],
+                    "pct_of_float_low": ev.get("pct_of_float_low"),
+                    "pct_of_float_high": ev.get("pct_of_float_high"),
+                    "pct_of_adv_days": ev.get("pct_of_adv_days"),
+                    "net_flow_usd_base": ev.get("net_flow_usd_base"),
+                    "hk_weight_cliff_ratio": ev.get("hk_weight_cliff_ratio"),
+                    "is_russell_breakpoint_migration": ev.get(
                         "is_russell_breakpoint_migration"
                     ),
-                    "assumed_graduation": display.get("assumed_graduation"),
-                    "primary_index": display.get("primary_index"),
-                    "action": display.get("action"),
-                    "confidence": display.get("confidence"),
-                    "event_source": display.get("event_source"),
-                    "float_flag": display.get("float_flag"),
-                    "status": display.get("status"),
+                    "assumed_graduation": ev.get("assumed_graduation"),
+                    "primary_index": ev.get("primary_index"),
+                    "action": ev.get("action"),
+                    "confidence": ev.get("confidence"),
+                    "event_source": ev.get("event_source"),
+                    "float_flag": ev.get("float_flag"),
+                    "status": ev.get("status"),
+                    "predicted": bool(ev.get("predicted")),
+                    "recon_status": ev.get("recon_status"),
+                    "distance_to_boundary_pct": ev.get("distance_to_boundary_pct"),
                 }
             )
 
@@ -716,12 +734,16 @@ def attach_float_impact(
         return (src_rank, mig, float_ok, -dollars, -adv, -pct)
 
     top.sort(key=_rank)
-    # Default table: confirmed/news with float_adj only. Estimates (candidates /
-    # float_unknown) go to a separate list for an optional UI toggle.
+    # Default table: confirmed/news with float_adj only. Estimates = predicted
+    # candidates (float_adj or float_unknown*) and float_unknown confirmed.
     primary: list[dict] = []
     estimates: list[dict] = []
     for r in top:
-        if r.get("event_source") != "candidate" and r.get("float_flag") == "float_adj":
+        if (
+            r.get("event_source") != "candidate"
+            and not r.get("predicted")
+            and r.get("float_flag") == "float_adj"
+        ):
             primary.append(r)
         else:
             estimates.append(r)
