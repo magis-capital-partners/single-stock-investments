@@ -1,0 +1,222 @@
+{
+  "ticker": "IONQ",
+  "as_of": "2026-07-18",
+  "method": "full",
+  "irr_method": "full",
+  "valuation_mode": "operating",
+  "valuation_overlay": "segment_cashflow",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "infrastructure",
+    "moat": "unproven",
+    "dhando": "partial",
+    "cycle": "up",
+    "payoff_lens": "operating",
+    "predictive_attribute": "quantum_platform_vs_burn"
+  },
+  "inputs": {
+    "price": null,
+    "price_source": "Pending marvin_cloud_refresh fetch_market_inputs",
+    "price_as_of": "2026-07-18",
+    "shares_millions": 359,
+    "shares_source": "358,822,219 weighted-average basic shares Q1 2026 (10-Q Q1 2026)",
+    "fcf_per_share": 0.08,
+    "per_share": 0.08,
+    "fcf_source": "Normalized owner cash per share after growth R&D and acquisition integration; FY2025 OCF ($283.2M) is ($0.79/sh at ~359M shares) and Q1 2026 operating loss ($271.5M) on revenue $64.7M (10-K FY2025 MD&A; 10-Q Q1 2026). Lawrence base uses a small positive run-rate path, not Q1 GAAP net income inflated by $1,057.6M warrant fair-value gain.",
+    "revenue_fy2025_m": 130.0,
+    "revenue_fy2024_m": 43.1,
+    "revenue_q1_2026_m": 64.7,
+    "revenue_q1_2025_m": 7.6,
+    "net_loss_fy2025_m": 512.1,
+    "net_loss_attributable_fy2025_m": 510.4,
+    "operating_loss_q1_2026_m": 271.5,
+    "net_income_q1_2026_m": 804.6,
+    "warrant_gain_q1_2026_m": 1057.6,
+    "rd_fy2025_m": 305.7,
+    "rd_q1_2026_m": 125.7,
+    "ocf_fy2025_m": -283.2,
+    "cash_dec2025_m": 1030.9,
+    "cash_mar2026_m": 493.5,
+    "cash_and_investments_dec2025_m": 3336.8,
+    "unearned_revenue_mar2026_m": 64.4,
+    "federal_nol_m": 653.8,
+    "financing_proceeds_fy2025_m": 3358.6,
+    "acquisitions_note": "2025: id Quantique SA, Capella Space, Oxford Ionics, Vector Atomic; Jan 2026: Skyloom Global (10-K Item 9A; 10-Q Note 3)",
+    "normalization_note": "Base owner cash $0.08/sh assumes revenue scale and contract mix lift gross profit toward breakeven owner cash by year 7; does not credit warrant mark-to-market or NOL asset in Lawrence gate."
+  },
+  "estimates": {
+    "marvin_floor": {
+      "per_share": 0.08,
+      "return_pct": null,
+      "notes": "Normalized owner cash after integration drag; filings only"
+    },
+    "blended_best": {
+      "per_share": 0.08,
+      "return_pct": null,
+      "notes": "Marvin floor only; no approved third-party blend"
+    }
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.05,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 10,
+      "notes": "Quantum hardware delays; integration failure; dilutive financing; competition from IBM/Google/Rigetti"
+    },
+    "base": {
+      "growth_y1_5": 0.22,
+      "growth_y6_10": 0.12,
+      "exit_pfcf_y10": 18,
+      "notes": "Contract revenue scales on specialized hardware builds and QCaaS; acquired Capella/Skyloom revenue embedded; R&D intensity moderates post-integration"
+    },
+    "bull": {
+      "growth_y1_5": 0.35,
+      "growth_y6_10": 0.18,
+      "exit_pfcf_y10": 22,
+      "notes": "Fault-tolerant roadmap accelerates; government quantum budgets expand; platform cross-sell across networking and sensing acquisitions"
+    }
+  },
+  "segment_build": {
+    "horizon_years": 7,
+    "segments": [
+      {
+        "id": "qcaas",
+        "label": "QCaaS and cloud access",
+        "type": "operating",
+        "owner_cash_y0_per_share": 0.04,
+        "growth_y1_5": 0.25,
+        "growth_y6_10": 0.12,
+        "exit_pfcf_y10": 18,
+        "evidence": "Revenue from providing access to QCaaS services (10-K Item 7 revenue recognition)"
+      },
+      {
+        "id": "hardware",
+        "label": "Quantum hardware and systems contracts",
+        "type": "operating",
+        "owner_cash_y0_per_share": 0.03,
+        "growth_y1_5": 0.2,
+        "growth_y6_10": 0.1,
+        "exit_pfcf_y10": 16,
+        "evidence": "FY2025 revenue increase driven by specialized quantum computing hardware arrangements (10-K MD&A)"
+      },
+      {
+        "id": "acquired_platform",
+        "label": "Acquired sensing, networking, and imagery (Capella, Skyloom, id Quantique, Vector Atomic, Oxford Ionics)",
+        "type": "operating",
+        "owner_cash_y0_per_share": 0.01,
+        "growth_y1_5": 0.18,
+        "growth_y6_10": 0.08,
+        "exit_pfcf_y10": 14,
+        "evidence": "2025 acquisitions ~39% of FY2025 revenue; Skyloom goodwill $166.3M (10-K Item 9A; 10-Q Note 3)"
+      }
+    ],
+    "options": [
+      {
+        "id": "fault_tolerant",
+        "label": "Fault-tolerant quantum computing roadmap",
+        "option_treatment": "probability_weighted",
+        "annual_drag_per_share": 0.15,
+        "base_terminal_value_bn": 0,
+        "base_terminal_rationale": "FTQC pre-profit at scale; explicit zero terminal in Lawrence base after option scan",
+        "evidence": "10-K Item 1 discusses FTQC as long-dated objective; R&D $305.7M FY2025",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "unearned_revenue",
+        "label": "Unearned revenue backlog",
+        "option_treatment": "embedded_in_segment",
+        "annual_drag_per_share": 0,
+        "base_terminal_value_bn": 0,
+        "base_terminal_rationale": "$64.4M unearned revenue at Mar 2026 modeled in segment growth, not separate NAV row",
+        "evidence": "Deferred revenue $51.0M current + $13.5M noncurrent (10-Q balance sheet)",
+        "not_in_lawrence_base": false
+      },
+      {
+        "id": "nol_asset",
+        "label": "Federal NOL carryforwards",
+        "option_treatment": "zero",
+        "annual_drag_per_share": 0,
+        "base_terminal_value_bn": 0,
+        "base_terminal_rationale": "NOL is tax shield not owner cash; ~$653.8M federal carryforwards (10-K tax note)",
+        "evidence": "10-K: federal NOL carryforwards ~$653.8M",
+        "not_in_lawrence_base": true
+      }
+    ],
+    "corporate_drag": {
+      "alphabet_level_drag_per_share": 0.12,
+      "notes": "Stock-based compensation and integration G&A; FY2025 net cash used in operations $283.2M"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Goodwill and intangibles from 2025 acquisitions; cash fell $537M Q1 2026 on deals while equity raised in 2025"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / pipeline?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "Fault-tolerant quantum roadmap; undeveloped qubit scaling path (10-K Item 1)"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Q1 2026 operating loss ($271.5M) on revenue $64.7M (10-Q)"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / RPO not in FCF path?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Unearned revenue $64.4M Mar 2026; smaller vs burn rate"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "Partial",
+      "treatment": "milestone_nav",
+      "evidence": "Privately-held securities in investment portfolio; purchases $2,757.8M FY2025 investing (10-K MD&A)"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No royalty-trust pattern"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Cost-to-cost revenue recognition on long-duration hardware contracts (10-K critical estimates)"
+    }
+  ],
+  "optionality_gate": {
+    "framework": "quantum_platform",
+    "floor_pass": true,
+    "floor_metric": "cash_per_share",
+    "floor_value": 1.37,
+    "primary_metric": "lawrence_base",
+    "primary_label": "7yr IRR",
+    "notes": "Cash $493.5M / 359M shares ~ $1.37/sh floor; does not pass dhando full at typical market cap"
+  },
+  "growth_explanation": {
+    "mechanism": "Contract hardware builds and QCaaS usage scale while acquisition revenue cross-sells across quantum networking and sensing stack",
+    "falsifiers": [
+      "Operating loss widens for two consecutive quarters while revenue growth decelerates",
+      "Major customer contract cancellation disclosed in 8-K",
+      "Diluted share count rises >15% in 12 months without proportional revenue lift"
+    ]
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "rationale": "Deep operating losses and negative OCF despite revenue acceleration; acquisition integration and dilution risk; cash floor partial only"
+  }
+}
