@@ -1,0 +1,61 @@
+{
+  "persona": "hk",
+  "independence_group": "scarce_assets",
+  "evidence_status": "insufficient_evidence",
+  "scores": {
+    "explanatory_strength": {
+      "value": 3,
+      "rationale": "The market-structure discount on a levered ETH wrapper is a specific mechanism with filing-backed look-through math, but the dilution-versus-beta path is not yet hard to vary."
+    },
+    "evidence_sufficiency": {
+      "value": 2,
+      "rationale": "May 31 ETH inventory and share count are primary-verified, while post-May ATM issuance, preferred waterfall, live spot versus marks, and treasury-vehicle comparables remain open."
+    },
+    "downside_control": {
+      "value": 2,
+      "rationale": "Price sits below May ETH fair value per share, but unbounded dilution, G&A burn above staking revenue, and an unmodeled preferred reserve leave the low case near $8.50 per share."
+    },
+    "return_vs_alternatives": {
+      "value": 2,
+      "rationale": "Base 6.3% per year is well below a mid-teens hurdle; bull 15.1% requires favorable ETH beta with limited further dilution."
+    }
+  },
+  "vote": "watch",
+  "expected_return_range_pct": [
+    -6.9,
+    15.1
+  ],
+  "horizon_years": 7,
+  "claims": [
+    {
+      "claim": "May 31 filing ETH look-through (~$18.76 per share) exceeds price ($15.69), giving a scarce-asset cushion, but that cushion is not a bounded common claim once ATM dilution and preferred seniority are applied.",
+      "evidence_paths": [
+        "BMNR/research/valuation.json",
+        "BMNR/research/deep_dive_2026-07-17.md"
+      ]
+    },
+    {
+      "claim": "The eth_trajectory_net_dilution additive row (+$4.50 base) lacks explicit success probability, post-May issuance reconciliation, and arm's-length comparable treasury transactions before incremental ETH beta can be treated as non-overlapping value.",
+      "evidence_paths": [
+        "BMNR/research/valuation.json",
+        "BMNR/research/valuation_contract.json"
+      ]
+    },
+    {
+      "claim": "Nine-month general and administrative expense ($335.7M) exceeds staking revenue ($56.9M), so per-share ETH accumulation depends on continued equity issuance rather than self-funded owner economics.",
+      "evidence_paths": [
+        "BMNR/research/deep_dive_2026-07-17.md",
+        "BMNR/research/valuation.json"
+      ]
+    }
+  ],
+  "strongest_counter_explanation": "The discount to May ETH marks is a rational price for an equity-financed dilution vehicle: management funds token purchases by issuing shares faster than ETH per share compounds, so the scarce asset on balance sheet does not translate into a fixed pro-rata common claim.",
+  "most_important_missing_fact": "Post-May 2026 ATM share issuance and ETH-per-diluted-share reconciled to BMNP preferred conversion and warrant waterfall.",
+  "falsifiers": [
+    "Reconcile quarter-by-quarter ETH purchases, shares issued, and ETH per diluted share from May 31, 2026 forward.",
+    "Model BMNP preferred and warrant claims as explicit per-share deductions before promoting static look-through to a downside floor.",
+    "Tie eth_trajectory base case to observed issuance cadence rather than assumed 10% cumulative dilution."
+  ],
+  "specialist_findings": "Scarce-asset read: the filing ETH stack is real and overlap keys are documented, but the wrapper fails durable-payoff tests until dilution pace and senior claims are proven; abstain from approve.",
+  "confidence": "medium"
+}
