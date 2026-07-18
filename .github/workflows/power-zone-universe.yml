@@ -81,9 +81,11 @@ jobs:
                          '*/research/valuation_contract.json' \
                          '*/research/valuation_workbench.json' \
                          '*/research/pricing_analysis.json' \
-                         '*/research/committee_work' \
                          '_system/reviews/pending/power_zone_universe_run_*.json' \
                          dashboard/data/power_zones.json
+          while IFS= read -r -d '' path; do
+            git add -A -- "$path"
+          done < <(find . -mindepth 3 -maxdepth 3 -type d -path './*/research/committee_work' -print0)
           if git diff --cached --quiet; then
             echo "No authority artifacts changed."
             exit 0
