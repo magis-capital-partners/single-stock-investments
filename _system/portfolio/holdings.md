@@ -342,6 +342,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-18.
 | IPCXR | IPCXR/ | Inflection Point Acquisition Corp. II (Rights) | US | 2026-07-09 | 2026-07-18 | unknown | watch |
 | IQV | IQV/ | IQVIA | US | 2026-07-10 | 2026-07-18 | unknown | watch |
 | IR | IR/ | Ingersoll Rand | US | 2026-07-10 | 2026-07-18 | unknown | watch |
+| IREN | IREN/ | Iris Energy Limited | US | — | — | unknown | watch |
 | IRM | IRM/ | Iron Mountain | US | 2026-07-10 | 2026-07-18 | unknown | watch |
 | ISRG | ISRG/ | Intuitive Surgical | US | 2026-07-10 | 2026-07-18 | unknown | watch |
 | IT | IT/ | Gartner | US | 2026-07-10 | 2026-07-18 | unknown | watch |
@@ -656,4 +657,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-18.
 | ZBRA | ZBRA/ | Zebra Technologies | US | 2026-07-10 | 2026-07-18 | unknown | watch |
 | ZTS | ZTS/ | Zoetis | US | 2026-07-10 | 2026-07-18 | unknown | watch |
 
-**649 holdings total.** Registry: `_system/portfolio/registry.json`
+**650 holdings total.** Registry: `_system/portfolio/registry.json`

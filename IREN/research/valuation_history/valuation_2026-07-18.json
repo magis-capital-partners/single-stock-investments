@@ -1,0 +1,843 @@
+{
+  "ticker": "IREN",
+  "as_of": "2026-07-18",
+  "method": "full",
+  "irr_method": "full",
+  "valuation_mode": "operating",
+  "valuation_overlay": "segment_cashflow",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "unproven",
+    "dhando": "partial",
+    "cycle": "up",
+    "payoff_lens": "levered",
+    "predictive_attribute": "narrative_vs_owner_cash"
+  },
+  "inputs": {
+    "price": 33.62,
+    "price_source": "Yahoo Finance IREN close 2026-07-17",
+    "price_as_of": "2026-07-18",
+    "shares_millions": 334,
+    "shares_source": "333,734,176 weighted-average basic shares Q3 FY2026 (10-Q Q3 FY2026)",
+    "fcf_per_share": 0.85,
+    "per_share": 0.85,
+    "fcf_source": "FY2025 net cash from operating activities $245.9M divided by ~334M current shares ($0.74/sh raw); Lawrence base uses $0.85/sh after modest normalization for bitcoin working-capital swings and before crediting Q3 FY2026 fair-value gains on assets held for sale (10-K FY2025 MD&A; 10-Q Q3 FY2026)",
+    "revenue_fy2025_m": 484.6,
+    "revenue_fy2024_m": 184.1,
+    "revenue_9m_fy2026_m": 569.8,
+    "revenue_9m_fy2025_m": 313.7,
+    "revenue_q3_fy2026_m": 144.8,
+    "net_income_fy2025_m": 86.9,
+    "net_income_q3_fy2026_m": 247.8,
+    "operating_income_fy2025_m": 17.3,
+    "ocf_fy2025_m": 245.9,
+    "ocf_9m_fy2026_m": 289.3,
+    "cash_mar2026_m": 2213.3,
+    "cash_jun2025_m": 404.6,
+    "stockholders_equity_mar2026_m": 2664.5,
+    "stockholders_equity_jun2025_m": 1817.5,
+    "total_assets_mar2026_m": 7264.9,
+    "hashrate_eh_s": 40.1,
+    "power_capacity_mw": 650,
+    "hashrate_source": "Installed hashrate capacity ~40.1 EH/s and ~650 MW operating data center capacity at June 30, 2025 (10-K FY2025 Item 1)",
+    "microsoft_contract_bn": 9.7,
+    "microsoft_contract_source": "Partner Statement of Work dated November 2, 2025: ~$9.7B through 2031 for GPU infrastructure at Childress Horizon 1-4 (~200 MW IT load, NVIDIA GB300) (8-K 2025-11-03)",
+    "nvidia_contract_bn": 3.4,
+    "nvidia_contract_source": "Managed services AI cloud contract referenced in 8-K 2026-05-19 ($3.4B; Dell GPU purchase ~$1.6B to support deployment)",
+    "dell_capex_commitment_bn": 7.4,
+    "dell_capex_source": "~$5.8B Dell purchase agreement November 2, 2025 plus ~$1.6B May 19, 2026 GPU procurement (8-K filings)",
+    "convert_proceeds_9m_m": 3299.6,
+    "convert_proceeds_source": "Proceeds from convertible debt $3,299.6M nine months ended March 31, 2026 (10-Q Q3 FY2026 cash flow statement)",
+    "impairment_9m_m": 188.4,
+    "impairment_source": "Impairment of long-lived assets held for use $188.4M nine months ended March 31, 2026 (10-Q Q3 FY2026)",
+    "rpo_microsoft_bn": 9.7,
+    "rpo_nvidia_bn": 3.4,
+    "rpo_other_m": 710.3,
+    "rpo_source": "Revenue remaining performance obligation $710.3M plus contract disclosures $9.7B Microsoft and $3.4B NVIDIA (10-Q Q3 FY2026)",
+    "normalization_note": "Bitcoin mining plus early AI cloud services. Q3 FY2026 GAAP net income ($247.8M in the quarter) includes fair-value adjustments and asset-sale gains not treated as run-rate owner cash. Lawrence base excludes Microsoft/NVIDIA contract NPV and GPU capex stack from starting owner cash; those are sized in ai_overlay and segment options."
+  },
+  "estimates": {
+    "marvin_floor": {
+      "per_share": 0.85,
+      "return_pct": null,
+      "notes": "FY2025 filing-based operating cash path; no third-party blend"
+    },
+    "blended_best": {
+      "per_share": 0.85,
+      "return_pct": null,
+      "notes": "Marvin floor only; no approved third-party blend"
+    }
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": -0.05,
+      "growth_y6_10": 0.0,
+      "exit_pfcf_y10": 8,
+      "notes": "Hashprice compression; GPU delivery delays; Microsoft/NVIDIA contract slippage; convert dilution"
+    },
+    "base": {
+      "growth_y1_5": 0.12,
+      "growth_y6_10": 0.06,
+      "exit_pfcf_y10": 12,
+      "notes": "Mining cash flat-to-modest; partial AI cloud ramp from contracted backlog; excludes full $9.7B Microsoft NPV in Lawrence FCF path"
+    },
+    "bull": {
+      "growth_y1_5": 0.28,
+      "growth_y6_10": 0.12,
+      "exit_pfcf_y10": 18,
+      "notes": "Horizon GPU tranches on time; AI cloud ARR scales; mining margin holds at 40+ EH/s"
+    }
+  },
+  "ai_overlay": {
+    "as_of": "2026-07-18",
+    "status": "partial",
+    "in_model": {
+      "lawrence_starting_owner_cash_per_share": 0.85,
+      "revenue_fy2025_m": 484.6,
+      "revenue_9m_fy2026_m": 569.8,
+      "cash_bn": 2.213,
+      "microsoft_contract_bn": 9.7,
+      "nvidia_contract_bn": 3.4,
+      "dell_capex_commitment_bn": 7.4
+    },
+    "not_in_model_requires_refresh": [
+      "Microsoft GPU tranche energization schedule and service-fee margin",
+      "NVIDIA managed-services AI cloud revenue recognition path",
+      "Dell GPU delivery timing versus $7.4B purchase stack",
+      "Convertible debt conversion dilution at current share price"
+    ],
+    "capex_stress_2026": {
+      "ocf_m_assumption": 350,
+      "capex_m": 5800,
+      "implied_fcf_per_share": -16.3,
+      "notes": "Illustrative trough if Dell/Microsoft GPU capex front-loads before service fees \u2014 not Lawrence starting cash flow"
+    },
+    "ai_inflection_bull": {
+      "fcf_per_share_y0": 2.5,
+      "growth_y1_5": 0.28,
+      "growth_y6_10": 0.12,
+      "exit_pfcf_y10": 18,
+      "fcf_y0_note": "Partial conversion of contracted GPU backlog to owner cash [Assumption]",
+      "computed_return_pct": 37.5
+    }
+  },
+  "segment_build": {
+    "horizon_years": 7,
+    "segments": [
+      {
+        "id": "bitcoin_mining",
+        "label": "Bitcoin mining (renewable-powered)",
+        "type": "operating",
+        "owner_cash_y0_per_share": 0.65,
+        "growth_y1_5": 0.03,
+        "growth_y6_10": 0.0,
+        "exit_pfcf_y10": 10,
+        "evidence": "FY2025 revenue $484.6M primarily mining; ~40.1 EH/s at June 30, 2025 (10-K FY2025)"
+      },
+      {
+        "id": "ai_cloud_services",
+        "label": "AI cloud services (existing fleet)",
+        "type": "operating",
+        "owner_cash_y0_per_share": 0.2,
+        "growth_y1_5": 0.35,
+        "growth_y6_10": 0.15,
+        "exit_pfcf_y10": 14,
+        "evidence": "AI Cloud Services revenue segment in 10-Q Q3 FY2026; early HPC/AI services revenue alongside mining"
+      }
+    ],
+    "options": [
+      {
+        "id": "microsoft_gpu_contract",
+        "label": "Microsoft GPU infrastructure contract (~$9.7B through 2031)",
+        "option_treatment": "probability_weighted",
+        "annual_drag_per_share": 0.25,
+        "base_terminal_value_bn": 0,
+        "overlay_base_terminal_bn": 2.0,
+        "base_terminal_rationale": "P_base ~25% of undiscounted contract value net of Dell capex and execution risk \u2014 not in Lawrence FCF0",
+        "evidence": "8-K 2025-11-03 Microsoft Agreement; RPO disclosure $9.7B (10-Q Q3 FY2026)",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "nvidia_ai_cloud_contract",
+        "label": "NVIDIA managed-services AI cloud ($3.4B)",
+        "option_treatment": "probability_weighted",
+        "annual_drag_per_share": 0.1,
+        "base_terminal_value_bn": 0,
+        "overlay_base_terminal_bn": 0.8,
+        "base_terminal_rationale": "P_base ~25% of contract value pending GPU deployment \u2014 context tier until 10-K exhibits filed",
+        "evidence": "8-K 2026-05-19 Dell Purchase Agreement supporting $3.4B NVIDIA contract",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "gpu_capex_stack",
+        "label": "Dell GPU purchase obligations (~$7.4B)",
+        "option_treatment": "embedded_in_segment",
+        "annual_drag_per_share": 0.4,
+        "base_terminal_value_bn": 0,
+        "base_terminal_rationale": "Capex and financing drag burdened in corporate/segment paths; not separate positive terminal",
+        "evidence": "8-K 2025-11-03 and 2026-05-19 Dell agreements; convert proceeds $3.3B 9M FY2026 (10-Q)",
+        "not_in_lawrence_base": false
+      }
+    ],
+    "corporate_drag": {
+      "alphabet_level_drag_per_share": 0.15,
+      "notes": "Stock-based compensation, integration G&A, and impairment noise ($188M 9M FY2026) net of interest income on cash"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "nav_floor",
+      "evidence": "Power sites and energized MW at Childress/Sweetwater carry strategic value beyond depreciated miner book; cash $2.2B Mar 2026 (10-Q Q3 FY2026)"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / pipeline?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "Horizon 1-4 GPU campus (~200 MW IT load) under Microsoft contract; expansion MW not yet in revenue (8-K 2025-11-03)"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Impairment $188M 9M FY2026; induced convert expense $112M (10-Q Q3 FY2026)"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / RPO not in FCF path?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "Microsoft $9.7B and NVIDIA $3.4B contract values disclosed; $710M short-term RPO (10-Q Q3 FY2026)"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No material hidden equity stakes (10-K FY2025)"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "none"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "AI cloud services revenue growing within consolidated segment table (10-Q Q3 FY2026)"
+    }
+  ],
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "growth_explanation": {
+    "mechanism": "Base Lawrence growth assumes modest mining cash stability plus AI cloud services ramp from existing fleet; Microsoft/NVIDIA contracted GPU capacity is modeled as probability-weighted options, not full RPO in starting owner cash.",
+    "stress_test": "If GPU tranches slip 12 months or Dell capex overruns, owner cash growth falls to bear scenario (-5% years 1-5).",
+    "theory_implied": {
+      "y1_5": 0.1053,
+      "y6_10": 0.0353,
+      "exit_pfcf_y10_segment_blend": 10.9,
+      "derivation": "segment_build owner-cash weighted blend (growth only; exit from scenarios.base)",
+      "segment_weights": [
+        {
+          "id": "bitcoin_mining",
+          "weight_pct": 76.5
+        },
+        {
+          "id": "ai_cloud_services",
+          "weight_pct": 23.5
+        }
+      ]
+    },
+    "lawrence_legacy": {
+      "y1_5": 0.12,
+      "y6_10": 0.06,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.1053,
+      "y6_10": 0.0353,
+      "exit_pfcf_y10": 12.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": 1.6326,
+      "as_of_filing_facts": "evidence/_text/10-K_20250828_rpt20250630_acc0001878848_25_000063.htm.txt"
+    },
+    "status": "partial",
+    "divergence": {
+      "theory_vs_lawrence_y1_5_pp": -1.5,
+      "falsifier_vs_theory_y1_5_pp": 0.0
+    }
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -18.4
+    },
+    "base": {
+      "return_pct": -2.1
+    },
+    "bull": {
+      "return_pct": 14.9
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -18.4
+    },
+    "base": {
+      "return_pct": -2.1
+    },
+    "bull": {
+      "return_pct": 14.9
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": -3.6
+    },
+    "falsifier_adjusted": {
+      "return_pct": -3.6
+    }
+  },
+  "implied_return": {
+    "base_pct": -1.75,
+    "label": "7yr IRR (total synthesis)",
+    "display": "-1.75% (total synthesis)",
+    "lawrence_stance_gate_pct": -2.1,
+    "falsifier_adjusted_pct": -2.1,
+    "synthesis_pct": -1.75
+  },
+  "overlay_results": [
+    {
+      "case": "AI inflection",
+      "method": "full (normalized FCF)",
+      "key_inputs": "FCF\u2080=$2.5 g1=28% g2=12% exit=18\u00d7",
+      "return_pct": 37.5,
+      "stance_gate": false,
+      "notes": "Partial conversion of contracted GPU backlog to owner cash [Assumption]"
+    },
+    {
+      "case": "Capex stress Y0",
+      "method": "illustrative trough",
+      "key_inputs": "OCF NoneB \u2212 capex NoneB",
+      "return_pct": null,
+      "display": "FCF ~$-16.3/sh (not 7yr IRR)",
+      "stance_gate": false
+    }
+  ],
+  "component_valuation_results": {
+    "status": "inferred_minimal",
+    "decision_rule": "Operating-only fallback. Add an explicit component_valuation schedule before drawing asset-level conclusions.",
+    "all_material_components_identified": false,
+    "additive_components": [
+      {
+        "id": "operating_business_fallback",
+        "label": "Operating business (fallback)",
+        "category": "operating_business",
+        "treatment": "additive",
+        "method": "owner_cash_dcf",
+        "evidence_tier": "model_input",
+        "evidence": "inputs.fcf_per_share and scenarios.base",
+        "low_per_share": 14.95,
+        "base_per_share": 16.61,
+        "high_per_share": 18.51
+      }
+    ],
+    "embedded_components": [],
+    "total_equity_value_per_share": {
+      "low": 14.95,
+      "base": 16.61,
+      "high": 18.51
+    },
+    "material_component_count": 1,
+    "additive_component_count": 1,
+    "embedded_component_count": 0,
+    "market_price_per_share": 33.62,
+    "upside_downside_pct": {
+      "low": -55.5,
+      "base": -50.6,
+      "high": -44.9
+    }
+  },
+  "economic_value_analysis": {
+    "schema_version": "1.0",
+    "status": "recommended",
+    "trigger": {
+      "required": false,
+      "reasons": [],
+      "policy": "A complete economic-value analysis is required when any trigger fires; otherwise it is recommended."
+    },
+    "method": "economic_claim_to_risked_present_value",
+    "economic_claim": {},
+    "gaap_role": null,
+    "accounting_reference": null,
+    "comparable_hierarchy": [
+      "issuer_arm_length_transaction",
+      "same_asset_transaction",
+      "public_peer",
+      "replacement_cost",
+      "approved_external_analysis"
+    ],
+    "gross_comparable_nav_per_share": null,
+    "risked_present_value_per_share": {
+      "low": 14.95,
+      "base": 16.61,
+      "high": 18.51
+    },
+    "component_groups": [
+      {
+        "id": "operating_business_fallback",
+        "label": "Operating business (fallback)",
+        "component_ids": [
+          "operating_business_fallback"
+        ],
+        "economic_claim": "Operating business (fallback)",
+        "valuation_basis": "owner_cash_dcf",
+        "adjustments": "Risk and timing are reflected in the low/base/high range.",
+        "overlap_control": "Unique overlap key operating_business_fallback.",
+        "risked_present_value_per_share": {
+          "low": 14.95,
+          "base": 16.61,
+          "high": 18.51
+        }
+      }
+    ],
+    "valuation_proof": [
+      {
+        "component_id": "operating_business_fallback",
+        "economic_claim": "Operating business (fallback)",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "owner_cash_dcf",
+        "evidence_tier": "model_input",
+        "evidence": "inputs.fcf_per_share and scenarios.base",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Risk and timing are reflected in the low/base/high range.",
+        "range_per_share": {
+          "low": 14.95,
+          "base": 16.61,
+          "high": 18.51
+        },
+        "treatment": "additive",
+        "overlap_key": "operating_business_fallback",
+        "overlap_control": "Unique overlap key operating_business_fallback.",
+        "falsifier": "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods.",
+        "risk_and_timing": null
+      }
+    ],
+    "wisdom_applied": [],
+    "limitations": [],
+    "complete_component_coverage": true,
+    "validation_errors": [],
+    "registry_version": "1.0"
+  },
+  "valuation_method_route": {
+    "schema_version": "1.0",
+    "status": "routed",
+    "profile_id": "scarce_asset_optionality",
+    "label": "Scarce assets, royalties, and optionality",
+    "score": 6.0,
+    "reasons": [
+      "archetype=optionality"
+    ],
+    "primary_methods": [
+      "component_owner_cash_and_unit_nav"
+    ],
+    "corroborating_methods": [
+      "comparable_transactions",
+      "replacement_cost_or_reverse_nav"
+    ],
+    "primary_personas": [
+      "hk",
+      "stahl"
+    ],
+    "cross_check_personas": [
+      "klarman_asset_value",
+      "marks_credit_cycle"
+    ],
+    "silent_personas": [
+      "buffett_weschler",
+      "greenblatt",
+      "hohn",
+      "marathon_capital_cycle",
+      "munger",
+      "pabrai"
+    ],
+    "required_evidence": [
+      "legal economic claim",
+      "non-overlapping physical inventory",
+      "unit economics",
+      "realization timing",
+      "remaining owner capital"
+    ],
+    "failure_modes": [
+      "gross asset value mistaken for shareholder value",
+      "operating cash flow and NAV counted twice",
+      "remote options treated as contracted cash"
+    ],
+    "secondary_profiles": [
+      {
+        "profile_id": "quality_reinvestment",
+        "score": 3.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dcf, owner_cash"
+        ]
+      },
+      {
+        "profile_id": "predictable_cash_flow",
+        "score": 2.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=owner_cash"
+        ]
+      }
+    ],
+    "scorecard": {
+      "scarce_asset_optionality": {
+        "score": 6.0,
+        "reasons": [
+          "archetype=optionality"
+        ]
+      },
+      "quality_reinvestment": {
+        "score": 3.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dcf, owner_cash"
+        ]
+      },
+      "capital_cycle": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
+      },
+      "credit_and_normalized_returns": {
+        "score": 0.0,
+        "reasons": []
+      },
+      "catalyst_asset_value": {
+        "score": 0.0,
+        "reasons": []
+      },
+      "predictable_cash_flow": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=owner_cash"
+        ]
+      },
+      "binary_milestone": {
+        "score": 0.0,
+        "reasons": []
+      }
+    },
+    "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+  },
+  "universal_valuation_contract": {
+    "schema_version": "1.0",
+    "status": "evidence_blocked",
+    "ticker": "IREN",
+    "as_of": "2026-07-18",
+    "economic_ownership_map": [
+      {
+        "component_id": "operating_business_fallback",
+        "label": "Operating business (fallback)",
+        "category": "operating_business",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Operating business (fallback)",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 16.61
+        },
+        "growth_driver": null,
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "owner_cash_dcf",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 14.95,
+          "base": 16.61,
+          "high": 18.51
+        },
+        "evidence_tier": "model_input",
+        "evidence_level": "analyst_estimated",
+        "evidence": "inputs.fcf_per_share and scenarios.base",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Risk and timing are reflected in the low/base/high range.",
+        "falsifier": "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods.",
+        "overlap_key": "operating_business_fallback",
+        "assumption_type": "estimate"
+      }
+    ],
+    "component_coverage": {
+      "all_material_components_identified": false,
+      "material_component_count": 1,
+      "additive_component_count": 1,
+      "embedded_component_count": 0,
+      "unvalued_component_count": 1,
+      "double_counting_flags": []
+    },
+    "input_classification": {
+      "facts": [],
+      "estimates": [
+        {
+          "component_id": "operating_business_fallback",
+          "label": "Operating business (fallback)",
+          "kind": "estimate",
+          "evidence_tier": "model_input",
+          "evidence": "inputs.fcf_per_share and scenarios.base",
+          "method": "owner_cash_dcf"
+        }
+      ],
+      "judgments": []
+    },
+    "method_route": {
+      "schema_version": "1.0",
+      "status": "routed",
+      "profile_id": "scarce_asset_optionality",
+      "label": "Scarce assets, royalties, and optionality",
+      "score": 6.0,
+      "reasons": [
+        "archetype=optionality"
+      ],
+      "primary_methods": [
+        "component_owner_cash_and_unit_nav"
+      ],
+      "corroborating_methods": [
+        "comparable_transactions",
+        "replacement_cost_or_reverse_nav"
+      ],
+      "primary_personas": [
+        "hk",
+        "stahl"
+      ],
+      "cross_check_personas": [
+        "klarman_asset_value",
+        "marks_credit_cycle"
+      ],
+      "silent_personas": [
+        "buffett_weschler",
+        "greenblatt",
+        "hohn",
+        "marathon_capital_cycle",
+        "munger",
+        "pabrai"
+      ],
+      "required_evidence": [
+        "legal economic claim",
+        "non-overlapping physical inventory",
+        "unit economics",
+        "realization timing",
+        "remaining owner capital"
+      ],
+      "failure_modes": [
+        "gross asset value mistaken for shareholder value",
+        "operating cash flow and NAV counted twice",
+        "remote options treated as contracted cash"
+      ],
+      "secondary_profiles": [
+        {
+          "profile_id": "quality_reinvestment",
+          "score": 3.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=dcf, owner_cash"
+          ]
+        },
+        {
+          "profile_id": "predictable_cash_flow",
+          "score": 2.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=owner_cash"
+          ]
+        }
+      ],
+      "scorecard": {
+        "scarce_asset_optionality": {
+          "score": 6.0,
+          "reasons": [
+            "archetype=optionality"
+          ]
+        },
+        "quality_reinvestment": {
+          "score": 3.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=dcf, owner_cash"
+          ]
+        },
+        "capital_cycle": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=operating_business"
+          ]
+        },
+        "credit_and_normalized_returns": {
+          "score": 0.0,
+          "reasons": []
+        },
+        "catalyst_asset_value": {
+          "score": 0.0,
+          "reasons": []
+        },
+        "predictable_cash_flow": {
+          "score": 2.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=owner_cash"
+          ]
+        },
+        "binary_milestone": {
+          "score": 0.0,
+          "reasons": []
+        }
+      },
+      "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+    },
+    "market": {
+      "price_per_share": 33.62,
+      "fully_diluted_shares": null,
+      "market_cap_m": null,
+      "enterprise_value_m": null
+    },
+    "valuation": {
+      "value_per_share": {
+        "low": 14.95,
+        "base": 16.61,
+        "high": 18.51
+      },
+      "probability_weighted_value_per_share": 16.61,
+      "expected_distributions_per_share": 0.0,
+      "annualized_return_at_price_pct": {
+        "low": -10.93,
+        "base": -9.58,
+        "high": -8.17
+      },
+      "downside_to_low_pct": -55.53,
+      "horizon_years": 7
+    },
+    "scenario_contract": {
+      "rule": "Cases must change causal operating, capital, probability, timing, or financing drivers\u2014not only the terminal multiple.",
+      "top_value_drivers": [
+        {
+          "component_id": "operating_business_fallback",
+          "label": "Operating business (fallback)",
+          "base_per_share": 16.61,
+          "range_width_per_share": 3.56,
+          "scenario_assumptions": null
+        }
+      ],
+      "reverse_expectations": null
+    },
+    "evidence": {
+      "unresolved_count": 1,
+      "blockers": [
+        "A complete, explicit ownership/component schedule has not been supplied."
+      ],
+      "validation_errors": []
+    },
+    "monitoring": {
+      "falsifiers": [
+        "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods."
+      ],
+      "required_refresh_triggers": [
+        "new filing or material operating update",
+        "capital-structure change",
+        "material price move",
+        "component milestone or falsifier"
+      ]
+    },
+    "decision_rule": "No security is decision-grade until every material economic claim is valued exactly once and every material evidence blocker is resolved."
+  },
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence envelope)",
+        "source": "scenarios.bear",
+        "return_pct": -18.4,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "hard_to_vary": "yes: asymmetric low weight is structural",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ]
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence envelope)",
+        "source": "scenarios.bull",
+        "return_pct": 14.9,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "hard_to_vary": "yes",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ]
+      }
+    ],
+    "qualitative_adjustments": [],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": -1.75,
+    "qualitative_pp": 0,
+    "total_synthesis_pct": -1.75,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}
