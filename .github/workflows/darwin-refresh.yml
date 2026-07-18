@@ -3,7 +3,7 @@ name: Darwin Portfolio Refresh
 # Manual only — no schedule, no push. Run when Darwin code/mandate needs a full rebuild.
 on:
   schedule:
-    - cron: "0 8 * * 1"
+    - cron: "20 1 * * 1-5"
   push:
     branches: [main]
     paths:
@@ -66,6 +66,9 @@ jobs:
           OAUTH_PROXY_URL: ${{ vars.OAUTH_PROXY_URL }}
         with:
           profile: darwin-full
+
+      - name: Refresh compact Darwin research contract
+        run: python _system/scripts/build_darwin_research_snapshot.py
 
       - name: Commit artifacts
         uses: ./.github/actions/commit-main

@@ -1,0 +1,62 @@
+name: LS-algo Universe Intake
+
+on:
+  schedule:
+    - cron: "45 2 * * *"
+  workflow_run:
+    workflows: [Data Pipeline]
+    types: [completed]
+    branches: [main]
+  repository_dispatch:
+    types: [sync-ls-algo-universe]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: data-commit-main
+  cancel-in-progress: false
+
+jobs:
+  intake:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts/ci_checkout_workspace.sh
+            _system/scripts/ci_resolve_checkout_ref.sh
+            _system/scripts/ci_sparse_checkout_paths.py
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Checkout workspace
+        run: bash _system/scripts/ci_checkout_workspace.sh full
+      - name: Checkout LS-algo screener
+        env:
+          LS_ALGO_TOKEN: ${{ secrets.LS_ALGO_REPO_TOKEN || github.token }}
+        run: |
+          git clone --depth 1 "https://x-access-token:${LS_ALGO_TOKEN}@github.com/GoldmanDrew/ls-algo.git" _external/ls-algo
+          test -f _external/ls-algo/data/etf_screened_today.csv
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build queue and onboard next deterministic batch
+        run: |
+          python _system/scripts/darwin/run_ls_algo_valuation_pipeline.py --skip-dashboard
+          python _system/scripts/build_dashboard_data.py
+          python _system/scripts/validate_dashboard_data.py
+      - name: Commit intake and dashboard
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A -- _system/data/ls_algo_underlying_gap.json _system/reviews/pending \
+                         _system/portfolio/registry.json dashboard/data docs/data
+          git add -A -- '*/README.md' '*/research' '*/investor-documents'
+          if git diff --cached --quiet; then
+            echo "No LS-algo intake changes."
+            exit 0
+          fi
+          git commit -m "chore(ls-algo): sync bounded underlying intake"
+          git push origin HEAD:main

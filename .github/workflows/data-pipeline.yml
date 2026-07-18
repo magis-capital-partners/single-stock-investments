@@ -167,7 +167,9 @@ jobs:
     needs: decide
     if: needs.decide.outputs.downloads == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 300
+    # Each run is bounded and resumable.  A single issuer endpoint cannot hold
+    # the Actions worker for GitHub's six-hour hard maximum.
+    timeout-minutes: 270
     concurrency:
       group: data-commit-main
       cancel-in-progress: false
@@ -205,9 +207,9 @@ jobs:
           DOWNLOAD_MODE: ${{ needs.decide.outputs.download_mode }}
         run: |
           if [ "$DOWNLOAD_MODE" = "light" ]; then
-            python _system/scripts/download_all_holdings.py --light
+            python _system/scripts/download_all_holdings.py --light --skip-indexes
           else
-            python _system/scripts/download_all_holdings.py
+            python _system/scripts/download_all_holdings.py --batch-size 8 --skip-aggregate-harvest
           fi
       - name: Commit and push workspace
         uses: ./.github/actions/commit-main

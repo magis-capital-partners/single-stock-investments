@@ -43,7 +43,7 @@ CLASS_PATH = ROOT / "_system" / "portfolio" / "classification.json"
 REGISTRY_PATH = ROOT / "_system" / "portfolio" / "registry.json"
 SLEEVES_PATH = ROOT / "_system" / "portfolio" / "investment_sleeves.json"
 GITHUB_REPO = "GoldmanDrew/single-stock-investments"
-ONBOARD_WORKFLOW = "marvin-onboard.yml"
+UNIVERSE_INTAKE_WORKFLOW = "ls-algo-universe.yml"
 
 
 def github_blob_url(rel_path: str) -> str:
@@ -2394,8 +2394,8 @@ def build() -> dict:
             "market_filters": sort_market_filters({r["market"] for r in rows}),
             "sleeve_filters": sleeve_filters,
             "github_repo": GITHUB_REPO,
-            "onboard_workflow": ONBOARD_WORKFLOW,
-            "onboard_dispatch_event": "onboard-ticker",
+            "universe_intake_workflow": UNIVERSE_INTAKE_WORKFLOW,
+            "universe_intake_dispatch_event": "sync-ls-algo-universe",
             "valuation_queue_tickers": (valuation_queue.get("counts") or {}).get("tickers"),
             "valuation_evidence_blocked": (valuation_queue.get("counts") or {}).get("evidence_blocked"),
             "valuation_critical_gaps": (valuation_queue.get("counts") or {}).get("critical_gaps"),

@@ -147,6 +147,8 @@ jobs:
           fetch-depth: 0
           sparse-checkout: |
             _system
+            dashboard/data
+            docs/data
             ${{ needs.prepare.outputs.ticker }}/research
       - uses: actions/setup-python@v5
         with:
@@ -156,6 +158,8 @@ jobs:
           python _system/scripts/committee_task_queue.py "${{ needs.prepare.outputs.ticker }}" --date "${{ needs.prepare.outputs.committee_date }}"
           python _system/scripts/investment_committee_pipeline.py validate "${{ needs.prepare.outputs.ticker }}" --date "${{ needs.prepare.outputs.committee_date }}"
           python _system/scripts/investment_committee_pipeline.py assemble "${{ needs.prepare.outputs.ticker }}" --date "${{ needs.prepare.outputs.committee_date }}"
+          python _system/scripts/refresh_valuation_dashboard_rows.py --tickers "${{ needs.prepare.outputs.ticker }}"
+          python _system/scripts/validate_dashboard_data.py
       - name: Commit assembled committee
         env:
           GH_TOKEN: ${{ github.token }}
@@ -164,7 +168,8 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add "${{ needs.prepare.outputs.ticker }}/research/committee_${{ needs.prepare.outputs.committee_date }}.json" \
                   "${{ needs.prepare.outputs.ticker }}/research/committee_work/${{ needs.prepare.outputs.committee_date }}/manifest.json" \
-                  "${{ needs.prepare.outputs.ticker }}/research/valuation_workbench.json"
+                  "${{ needs.prepare.outputs.ticker }}/research/valuation_workbench.json" \
+                  dashboard/data/dashboard_data.json docs/data/dashboard_data.json
           git commit -m "feat(ic): assemble ${{ needs.prepare.outputs.ticker }} committee ${{ needs.prepare.outputs.committee_date }}"
           git push origin HEAD:main
           gh api --method POST "repos/${{ github.repository }}/dispatches" \

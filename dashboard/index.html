@@ -656,8 +656,7 @@
       <div class="topbar-meta"><span class="dot dot-green"></span><span id="meta-updated">Loading…</span></div>
     </div>
     <div class="topbar-actions">
-      <button class="btn-secondary" id="btn-auth" title="Sign in with GitHub to run onboard">Sign in with GitHub</button>
-      <button class="btn-primary" id="btn-add-holding">+ Add holding</button>
+      <span class="form-hint">Universe intake is automated from LS-algo</span>
     </div>
   </header>
 
@@ -786,7 +785,7 @@
 <script>
 const GH_REPO = 'magis-capital-partners/single-stock-investments';
 const GITHUB_REPO = GH_REPO;
-const DISPATCH_EVENT = 'onboard-ticker';
+const DISPATCH_EVENT = 'sync-ls-algo-universe';
 const MARKET_BADGE = {
   SE: 'badge-se', AU: 'badge-se', UK: 'badge-us', US: 'badge-us', JP: 'badge-jp',
   CA: 'badge-jp', EU: 'badge-purple', IN: 'badge-warn', OTC: 'badge-warn',
@@ -1641,7 +1640,8 @@ async function load() {
   } catch {
     oauthConfig = { client_id: '' };
   }
-  MarvinOAuth.refreshAuthUi(document.getElementById('btn-auth'));
+  const authButton = document.getElementById('btn-auth');
+  if (authButton) MarvinOAuth.refreshAuthUi(authButton);
   const res = await fetch('data/dashboard_data.json?' + Date.now());
   data = await res.json();
   try {
@@ -2689,6 +2689,10 @@ function renderWatchlist() {
 }
 
 function openOnboardModal(prefill = {}) {
+  // Direct additions and watchlist promotions are paused while the deterministic
+  // LS-algo intake owns universe changes.  Keep this guard for old deep links.
+  return;
+  /* istanbul ignore next -- retained only for a future explicitly-enabled intake mode */
   document.getElementById('ob-ticker').value = prefill.ticker || '';
   document.getElementById('ob-company').value = prefill.company || '';
   document.getElementById('ob-market').value = prefill.market || 'US';
@@ -2719,17 +2723,7 @@ function onboardPayload() {
 }
 
 function ghWorkflowCommand(p) {
-  const flags = [
-    `-f ticker=${p.ticker}`,
-    `-f company=${JSON.stringify(p.company)}`,
-    `-f market=${p.market}`,
-  ];
-  if (p.cik) flags.push(`-f cik=${p.cik}`);
-  if (p.ir_url) flags.push(`-f ir_url=${JSON.stringify(p.ir_url)}`);
-  if (p.from_watchlist) flags.push('-f from_watchlist=true');
-  if (p.watchlist_only) flags.push('-f watchlist_only=true');
-  if (p.download_8k_exhibits) flags.push('-f download_8k_exhibits=true');
-  return `gh workflow run marvin-onboard.yml ${flags.join(' ')}`;
+  return 'Automatic LS-algo universe intake is enabled; direct ticker onboarding is paused.';
 }
 
 async function submitCloudOnboard() {
@@ -3325,7 +3319,7 @@ load().catch(err => {
   document.getElementById('detail').innerHTML = `<div class="loading">Failed to load data/dashboard_data.json<br><br>${escapeHtml(msg)}</div>`;
 });
 
-document.getElementById('btn-add-holding').addEventListener('click', () => openOnboardModal());
+document.getElementById('btn-add-holding')?.addEventListener('click', () => openOnboardModal());
 document.getElementById('ob-cancel').addEventListener('click', closeOnboardModal);
 document.getElementById('ob-submit-cloud').addEventListener('click', submitCloudOnboard);
 document.getElementById('ob-copy-gh').addEventListener('click', () => {
@@ -3333,7 +3327,7 @@ document.getElementById('ob-copy-gh').addEventListener('click', () => {
   navigator.clipboard.writeText(cmd);
   document.getElementById('ob-status').textContent = 'Copied:\n' + cmd;
 });
-document.getElementById('btn-auth').addEventListener('click', async () => {
+document.getElementById('btn-auth')?.addEventListener('click', async () => {
   const btn = document.getElementById('btn-auth');
   if (btn.dataset.signedIn === '1') {
     MarvinOAuth.clearAuth();
@@ -3396,7 +3390,8 @@ function startDevicePoll(intervalSec) {
         return;
       }
       closeDeviceModal();
-      await MarvinOAuth.refreshAuthUi(document.getElementById('btn-auth'));
+      const authButton = document.getElementById('btn-auth');
+      if (authButton) await MarvinOAuth.refreshAuthUi(authButton);
     } catch (e) {
       document.getElementById('device-status').textContent = e.message || String(e);
       stopDevicePoll();
