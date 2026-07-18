@@ -1,0 +1,58 @@
+{
+  "loop_count": 1,
+  "questions": [
+    "Post-May 2026 ATM share issuance and ETH-per-diluted-share reconciled to BMNP preferred conversion and warrant waterfall.",
+    "What per-share waterfall nets preferred, warrant, and deferred-tax claims against ETH look-through?",
+    "Does observed issuance cadence support the eth_trajectory base case 10% cumulative seven-year dilution assumption?",
+    "Under a no-new-equity stress case, does corporate G&A and operating cash burn exceed staking inflow?"
+  ],
+  "responses": [
+    {
+      "question": "Post-May 2026 ATM share issuance and ETH-per-diluted-share reconciled to BMNP preferred conversion and warrant waterfall.",
+      "answer": "The frozen packet anchors May 31, 2026 at 579.7 million common shares and 5,416,945 ETH (~$18.76 ETH fair value per share on $10.86 billion of token marks) but contains no post-May 2026 ATM issuance, share-count update, or ETH inventory reconciliation. Nine-month filing data shows shares outstanding rose from 232.4 million year over year while the company purchased 3,518,278 ETH units, confirming aggressive equity-funded accumulation through the measurement date. BMNP preferred conversion terms and a full preferred-and-warrant waterfall per diluted common share are flagged [HUMAN REVIEW] and not reconciled in the frozen evidence. Post-May forward reconciliation therefore remains open.",
+      "evidence_paths": [
+        "BMNR/research/deep_dive_2026-07-17.md",
+        "BMNR/research/valuation.json",
+        "BMNR/research/valuation_contract.json",
+        "BMNR/research/committee_work/2026-07-18/pre_mortem.json",
+        "BMNR/research/committee_work/2026-07-18/round_1/hk.json",
+        "BMNR/research/committee_work/2026-07-18/round_1/marks_credit_cycle.json"
+      ],
+      "status": "unresolved"
+    },
+    {
+      "question": "What per-share waterfall nets preferred, warrant, and deferred-tax claims against ETH look-through?",
+      "answer": "Filings document warrant liability of $2.1 million and deferred tax liability of $92.3 million at May 31, 2026, which is roughly $0.16 per share on 579.7 million shares before any preferred claim. The component schedule models warrants_tax_preferred_reserve at base zero pending preferred review, and valuation.json explicitly states BMNP preferred stock claims are not fully modeled. No frozen artifact provides preferred conversion terms, liquidation preference, share count, or exercise mechanics needed to convert treasury ETH fair value into bounded common look-through. Partial filing anchors exist for warrant and deferred tax; a decision-grade senior-claim waterfall does not.",
+      "evidence_paths": [
+        "BMNR/research/valuation.json",
+        "BMNR/research/valuation_contract.json",
+        "BMNR/research/deep_dive_2026-07-17.md",
+        "BMNR/research/evidence/management_facts_2026-07-17.json"
+      ],
+      "status": "partially_answered"
+    },
+    {
+      "question": "Does observed issuance cadence support the eth_trajectory base case 10% cumulative seven-year dilution assumption?",
+      "answer": "Observed filing cadence contradicts the base assumption. Common shares rose from 232.4 million to 579.7 million in roughly nine months, a 149% increase, while the eth_trajectory_net_dilution base row assumes only 10% cumulative ATM dilution over seven years at 8% ETH CAGR. The bear scenario embeds 12% dilution per year. Historical equity issuance therefore far exceeds the base path, and the frozen packet offers no post-May 2026 issuance data to show a slowdown. The 10% seven-year assumption remains analyst judgment rather than filing-evidenced cadence.",
+      "evidence_paths": [
+        "BMNR/research/deep_dive_2026-07-17.md",
+        "BMNR/research/valuation.json",
+        "BMNR/research/valuation_contract.json",
+        "BMNR/research/committee_work/2026-07-18/pre_mortem.json"
+      ],
+      "status": "partially_answered"
+    },
+    {
+      "question": "Under a no-new-equity stress case, does corporate G&A and operating cash burn exceed staking inflow?",
+      "answer": "Yes on filing arithmetic through May 31, 2026. Nine-month general and administrative expense was $335.7 million against $56.9 million of staking and validation revenue, and net cash used in operating activities was $287.6 million while cash stood at $340.3 million. Annualized, G&A alone exceeds staking revenue by roughly six times, so owner economics depend on continued equity issuance rather than self-funded treasury operations. The frozen packet does not isolate a full no-new-equity liquidity runway including treasury purchase commitments, but the operating burn versus staking gap is decisively negative.",
+      "evidence_paths": [
+        "BMNR/research/deep_dive_2026-07-17.md",
+        "BMNR/research/valuation.json",
+        "BMNR/research/committee_work/2026-07-18/pre_mortem.json",
+        "BMNR/research/committee_work/2026-07-18/round_1/marks_credit_cycle.json"
+      ],
+      "status": "partially_answered"
+    }
+  ],
+  "evidence_hash_after": "e0647786d0fb336f1ea6ff87c3ea771b0b112c921f23ec5b678dc6ba23e58467"
+}
