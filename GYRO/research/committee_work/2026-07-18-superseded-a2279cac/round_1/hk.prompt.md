@@ -2,7 +2,7 @@
 
 You are the **hk** method, independence group **scarce_assets**.
 
-Evidence packet: `5a07dc63860a51a7178c059f3d7d12a863cf3f5440b7d7645e23825204367b07`
+Evidence packet: `a2279cac268d13c541ea8a5cd6156c0009a3436292cdbb24a0ce370c4539f3df`
 
 - `GYRO/research/deep_dive_2026-07-17.md`
 - `GYRO/research/adversarial_2026-07-17.md`
@@ -15,7 +15,7 @@ Evidence packet: `5a07dc63860a51a7178c059f3d7d12a863cf3f5440b7d7645e23825204367b
 
 Rules:
 
-1. Do not inspect another rater's output or any synthesis. In round two, you may read only your own round-one vote and the targeted research response.
+1. Do not inspect another rater's output or any synthesis.
 2. Ignore time already spent on the idea and prior portfolio ownership.
 3. Score explanatory strength, evidence sufficiency, downside control, and return versus alternatives from 1-5 with a rationale.
 4. Use `insufficient_evidence` or `outside_power_zone` when appropriate; abstention is valid.
