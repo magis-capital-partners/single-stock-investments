@@ -8,9 +8,9 @@
 
 ## Executive summary
 
-Marvin base **3.2%** per year (total synthesis) from primary filings and `valuation.json` at **~$255**. One pending VIC PDF is indexed; no approved third-party source changes base IRR. **[HUMAN REVIEW]** for any promotion to `third_party_sources.md`.
+Marvin base **3.7%** per year (total synthesis) from primary filings and `valuation.json` at **$247.23**. One pending VIC PDF is indexed; no approved third-party source changes base IRR. **[HUMAN REVIEW]** for any promotion to `third_party_sources.md`.
 
-**Synthesis (best estimate):** Marvin **3.2%** · stance **watch** (Marvin proposal); registry **hold** is human override. External sources adjust conviction only until approved.
+**Synthesis (best estimate):** Marvin **3.7%** · stance **hold** (human override); Marvin proposal **watch**.
 
 ## Sources in scope
 
@@ -30,31 +30,31 @@ Marvin base **3.2%** per year (total synthesis) from primary filings and `valuat
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| Primary IRR | **3.2%** (total synthesis) | No approved numeric view | Marvin **100%** numeric until human promotes VIC or other source |
-| Stance | **watch** (Marvin) vs **hold** (registry) | — | Human override on quality compounder sleeve |
+| Primary IRR | **3.7%** (total synthesis) | No approved numeric view | Marvin **100%** numeric until human promotes VIC or other source |
+| Stance | **watch** (Marvin proposal) vs **hold** (registry) | — | Human override on quality compounder sleeve |
 | AI capex timing | Normalized **~$90B** sustainable capex **[Assumption]** | Pending external may differ on inflection year | Context tier only |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | **$5.35/sh** normalized | **3.2%** per year | **watch** |
+| Marvin floor | **$5.35/sh** normalized | **3.7%** per year | **watch** (Marvin proposal) |
 | External (VIC pending) | Not in base | No change | **[PENDING APPROVAL]** |
-| **Blended best estimate** | Filing anchor | **3.2%** | **watch** (Marvin); **hold** (human) |
+| **Blended best estimate** | Filing anchor | **3.7%** | **hold** (human override) |
 
 **Weights:** Marvin **100%** on numbers (no approved external IRR). Pending VIC is qualitative context only.
 
-**Returns statement (blended):** We expect **3.2%** per year at today's price on the Marvin base case; pending VIC does not alter filing math.
+**Returns statement (blended):** We expect **3.7%** per year at today's price on the Marvin base case; pending VIC does not alter filing math.
 
 ## [HUMAN REVIEW]
 
 - [ ] Review VIC PDF thesis vs filing-based capex normalization
-- [ ] Confirm whether **hold** override remains appropriate at **~$255** with **<15%** IRR
+- [ ] Confirm whether **hold** override remains appropriate at **$247.23** with **<15%** IRR
 - [ ] Promote any external source via `third_party_sources.md` before numeric blend
 
 ## [PROPOSED MEMORY]
 
-- [PROPOSED COMPANY] AMZN cross-check 2026-07-18: Marvin **3.2%** unchanged; one pending VIC source; hold override vs watch proposal
+- [PROPOSED COMPANY] AMZN cross-check 2026-07-18: Marvin **3.7%** unchanged; one pending VIC source; hold override
 
 ## Primary sources cited
 
