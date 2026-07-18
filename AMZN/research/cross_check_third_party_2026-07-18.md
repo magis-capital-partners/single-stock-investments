@@ -8,9 +8,9 @@
 
 ## Executive summary
 
-Marvin filing anchor: **3.2%** per year total synthesis (Lawrence stance gate **0.9%** per year on normalized **$5.35/sh** owner cash) at today's price. One third-party source is indexed (VIC PDF, **pending**). No approved external source adjusts base IRR.
+Marvin filing anchor: **3.68%** per year total synthesis (Lawrence scenario gate **1.9%** per year on normalized **$5.35/sh** owner cash) at **$247.23**. One third-party source is indexed (VIC PDF, **pending**). No approved external source adjusts base IRR.
 
-**Synthesis (best estimate):** Marvin **3.2%** per year · stance **watch** on return math (registry **hold** human override); pending VIC is context only until promoted in `third_party_sources.md`.
+**Synthesis (best estimate):** Marvin **3.68%** per year · stance **hold**; pending VIC is context only until promoted in `third_party_sources.md`.
 
 ## Sources in scope
 
@@ -30,20 +30,20 @@ Marvin filing anchor: **3.2%** per year total synthesis (Lawrence stance gate **
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| Primary IRR | **3.2%** synthesis / **0.9%** Lawrence gate | No approved IRR | Marvin **100%** numeric until human promotes source |
+| Primary IRR | **3.68%** synthesis / **1.9%** Lawrence gate | No approved IRR | Marvin **100%** numeric until human promotes source |
 | Third party | Filing-first | VIC pending | **[PENDING APPROVAL]** — context tier only |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | **$5.35/sh** normalized | **3.2%** synthesis | **watch** (math) |
+| Marvin floor | **$5.35/sh** normalized | **3.68%** synthesis | **hold** |
 | External (combined) | Not in base | No change to base % | n/a until approved |
-| **Blended best estimate** | **Filing anchor** | **3.2%** | **watch** |
+| **Blended best estimate** | **Filing anchor** | **3.68%** | **hold** |
 
 **Weights:** Marvin **100%** on numbers until an approved source is promoted. Pending VIC may inform qualitative conviction only.
 
-**Returns statement (blended):** We expect **3.2%** per year at today's price on the Marvin synthesis case; no third-party numeric adjustment without **[HUMAN REVIEW]**.
+**Returns statement (blended):** We expect **3.68%** per year at **$247.23** on the Marvin synthesis case; no third-party numeric adjustment without **[HUMAN REVIEW]**.
 
 ## [HUMAN REVIEW]
 
