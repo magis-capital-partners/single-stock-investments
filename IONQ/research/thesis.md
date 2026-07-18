@@ -1,18 +1,23 @@
 # IONQ — Investment Thesis
 
-**Last updated:** 2026-07-18
+**Last updated:** auto-sync
 
 ## Classification
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
+| **Archetype** (Stahl) | infrastructure |
 | **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Cycle** | up |
+| **Implied 7yr IRR** (base) | -21.35% (total synthesis) |
+| **IRR method** | full |
+| **Lawrence bucket** | other |
+| **Payoff lens** | operating |
+| **MOI bucket** | pending |
+
+**Deep dive:** `IONQ/research/deep_dive_2026-07-18.md` (auto-sync)
 
 ## One-line thesis
 

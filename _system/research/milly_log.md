@@ -165,3 +165,5 @@ One row per adversarial or consistency re-pass. Append via `milly_repass.py` or 
 | 2026-07-18 | FLY | standard_batch | BLOCKED | marvin_cloud_refresh |
 | 2026-07-18 | FLY | consistency_repass | FAIL | — |
 | 2026-07-18 | HIMS | standard_batch | OK | marvin_cloud_refresh |
+| 2026-07-18 | IONQ | standard_batch | OK | marvin_cloud_refresh |
+| 2026-07-18 | IONQ | standard_batch | OK | marvin_cloud_refresh |
