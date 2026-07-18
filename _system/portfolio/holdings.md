@@ -91,6 +91,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-18.
 | BLDR | BLDR/ | Builders FirstSource | US | 2026-07-09 | 2026-07-18 | unknown | watch |
 | BLK | BLK/ | BlackRock | US | 2026-07-09 | 2026-07-18 | unknown | watch |
 | BLSH | BLSH/ | Bullish Global Limited | US | 2026-07-17 | 2026-07-18 | unknown | watch |
+| BMNR | BMNR/ | BitMine Immersion Technologies, Inc. | US | 2026-07-17 | 2026-07-18 | unknown | watch |
 | BMY | BMY/ | Bristol Myers Squibb | US | 2026-07-09 | 2026-07-18 | unknown | watch |
 | BMYS.KL | BMYS.KL/ | Bursa Malaysia Berhad | EU | 2026-07-09 | 2026-07-18 | unknown | watch |
 | BN | BN/ | Brookfield Corporation | US | 2026-07-09 | 2026-07-18 | platform | hold |
@@ -653,4 +654,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-18.
 | ZBRA | ZBRA/ | Zebra Technologies | US | 2026-07-10 | 2026-07-18 | unknown | watch |
 | ZTS | ZTS/ | Zoetis | US | 2026-07-10 | 2026-07-18 | unknown | watch |
 
-**646 holdings total.** Registry: `_system/portfolio/registry.json`
+**647 holdings total.** Registry: `_system/portfolio/registry.json`
