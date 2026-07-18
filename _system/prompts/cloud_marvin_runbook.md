@@ -57,7 +57,7 @@ If **new_documents** or **new_valuation_news**: focus on what changed for owner 
 
 ## Phase 2 — Narrative + valuation inputs (you write)
 
-1. Update `{{TICKER}}/research/valuation.json` inputs (price, FCF/sh, scenarios) from filings — preserve `approved_stance`, `override_reason`, `human_review` if present.
+1. Update `{{TICKER}}/research/valuation.json` research inputs from filings. Treat legacy stance/IRR fields as migration references; never create a human decision. Map every material economic claim exactly once for the universal contract.
 2. Hyperscalers (`GOOGL`, `AMZN`, `META`, `MSFT`) or registry `valuation_flags`: ensure `segment_build` + `ai_overlay` exist; run `python _system/scripts/seed_hyperscaler_overlays.py {{TICKER}}` when overlays missing. Complete **Option scan** per `option_treatment.md` — no auto-zero terminals.
 3. Land / infrastructure with GAAP misstatement (e.g. `TPL`): set `nav_overlay` + `optionality_gate`; segment build for producing vs undeveloped reserves.
 4. **Growth:** State mechanism in Business & moat; growth rows in assumption ledger cite filing or **[Assumption]**. Optional `growth_explanation` in `valuation.json` (not rendered in markdown).
@@ -97,7 +97,7 @@ Rules: timeline covers the **relevant history** (capital-allocation decisions, m
 python _system/scripts/marvin_cloud_refresh.py {{TICKER}} --date {{date}}
 ```
 
-Includes: transcripts, filing + management evidence, market inputs, third-party scan, equity price, **total return panel** (`build_total_return_panel.py`), valuation write, `refresh_optionality_valuation` when `evidence_refresh.type` is set, deep dive v2 sync, lint, Milly, evidence completeness (strict when triggers apply), classification sync, **persona lenses** (`persona_lens.py`), insights merge, dashboard, cross-check fill/verify.
+Includes: transcripts, filing + management evidence, market inputs, third-party scan, equity price, **total return panel**, legacy compatibility math, optionality refresh, deep-dive sync, lint, Milly, evidence completeness, canonical Power Zone routing, universal contract/workbench generation, decision-grade pricing, gated Investment Committee initialization, authority-aware classification, and dashboard serving.
 
 | Also | Command |
 |------|---------|
@@ -110,10 +110,13 @@ For all holdings QA: `python _system/scripts/check_cross_checks.py`
 
 Fix any lint errors before finishing the PR.
 
-## Stance
+## Decision authority
 
-- Gate stance: `stance_proposal.suggested` in `valuation.json`
-- If `approved_stance` or `human_review.approved`: use **approved** stance in Classification and thesis; document override in [HUMAN REVIEW]
+- `valuation_route.json` chooses the economic method and eligible independent reviewers.
+- `valuation_contract.json` controls readiness and the value/return range.
+- `committee_YYYY-MM-DD.json` records the recommendation and dissent.
+- `human_decision.json` is the only actionable stance and sizing authority.
+- `implied_return`, `stance_proposal`, `approved_stance`, and persona consensus are legacy/context fields and must not be promoted into a new decision.
 
 ## PR checklist
 

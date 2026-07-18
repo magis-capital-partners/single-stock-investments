@@ -240,18 +240,8 @@ def main() -> int:
             optional=True,
         )
     ok &= run(
-        "valuation write",
+        "legacy valuation compatibility write",
         [PY, str(SCRIPTS / "marvin_valuation.py"), "--ticker", ticker, "--write"],
-    )
-    if (research / "pricing_model.json").exists():
-        ok &= run(
-            "economic pricing analysis",
-            [PY, str(SCRIPTS / "build_power_zone_pricing.py"), ticker],
-        )
-    ok &= run(
-        "valuation workbench",
-        [PY, str(SCRIPTS / "build_valuation_workbench.py"), ticker, "--date", args.date],
-        optional=True,
     )
     if ticker_has_theme_tag(ticker):
         run(
@@ -357,12 +347,6 @@ def main() -> int:
         [ticker],
         optional=True,
     )
-    if not args.skip_dashboard:
-        ok &= run(
-            "dashboard JSON",
-            [PY, str(SCRIPTS / "build_dashboard_data.py")],
-            optional=True,
-        )
     ok &= run_script("insights merge", "build_insights.py", [], optional=True)
     ok &= run_script(
         "persona calibration",
@@ -376,6 +360,28 @@ def main() -> int:
         [],
         optional=True,
     )
+    # Authority cutover: route and contract only after all evidence, optionality,
+    # narrative, Milly, and classification work is complete.  This stage makes
+    # legacy Marvin outputs non-authoritative and may freeze an IC packet only
+    # when the universal contract is decision-grade and a material trigger fires.
+    ok &= run(
+        "Power Zone decision pipeline",
+        [
+            PY,
+            str(SCRIPTS / "run_security_decision_pipeline.py"),
+            "--tickers",
+            ticker,
+            "--date",
+            args.date,
+            "--skip-dashboard",
+        ],
+    )
+    if not args.skip_dashboard:
+        ok &= run(
+            "dashboard JSON (authoritative decision state)",
+            [PY, str(SCRIPTS / "build_dashboard_data.py")],
+            optional=True,
+        )
     ok &= run(
         "cross-check verify",
         [PY, str(SCRIPTS / "check_cross_checks.py"), ticker],

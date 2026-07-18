@@ -22,8 +22,8 @@ runs:
       uses: ./.github/actions/checkout-vault
 
     - name: Install Darwin dependencies
-      # full/intake-full run run_ls_algo_valuation_pipeline (darwin package);
-      # darwin profiles need numpy for the allocation engine.
+      # Full profiles run the Power Zone decision pipeline; Darwin profiles
+      # need numpy for the downstream allocation engine.
       if: >
         contains(inputs.profile, 'darwin') ||
         inputs.profile == 'full' ||

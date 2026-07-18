@@ -133,6 +133,13 @@ class LsAlgoValuationPipelineTests(unittest.TestCase):
             ),
             encoding="utf-8",
         )
+        (research / "valuation_contract.json").write_text(
+            json.dumps({"status": "decision_grade"}),
+            encoding="utf-8",
+        )
+        route = json.loads((research / "valuation.json").read_text(encoding="utf-8"))["valuation_method_route"]
+        route["status"] = "routed"
+        (research / "valuation_route.json").write_text(json.dumps(route), encoding="utf-8")
         (research / "thesis.md").write_text("thesis", encoding="utf-8")
         (research / "deep_dive_2026-07-01.md").write_text("dive", encoding="utf-8")
         self._write(
@@ -156,6 +163,11 @@ class LsAlgoValuationPipelineTests(unittest.TestCase):
         research = pipeline.ROOT / "III" / "research"
         research.mkdir(parents=True)
         (research / "valuation.json").write_text("{}", encoding="utf-8")
+        self._write("III/research/valuation_contract.json", {"status": "decision_grade"})
+        self._write(
+            "III/research/valuation_route.json",
+            {"status": "routed", "primary_personas": ["hohn", "pabrai", "marks_credit_cycle"]},
+        )
         self._write(
             "III/research/valuation_workbench.json",
             {"decision": {"status": "decision_grade"}, "committee": {"status": "not_started"}},

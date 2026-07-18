@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "human_investment_decision_v1",
+  "title": "Human investment decision",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "ticker",
+    "status",
+    "decision",
+    "sizing",
+    "owner",
+    "committee_source",
+    "committee_packet_hash",
+    "top_dissent_response",
+    "attestation",
+    "decided_at"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "ticker": {"type": "string", "minLength": 1},
+    "status": {"const": "decided"},
+    "decision": {
+      "enum": ["approve", "accumulate", "core", "hold", "watch", "trim", "exit", "pass", "reject"]
+    },
+    "stance": {"type": ["string", "null"]},
+    "sizing": {"type": ["string", "number", "null"]},
+    "owner": {"type": "string", "minLength": 1},
+    "committee_source": {"type": "string", "pattern": "^committee_\\d{4}-\\d{2}-\\d{2}\\.json$"},
+    "committee_packet_hash": {"type": "string", "minLength": 16},
+    "top_dissent_response": {"type": "string", "minLength": 1},
+    "attestation": {"const": "I reviewed the frozen evidence, committee synthesis, and strongest dissent."},
+    "expires_at": {"type": ["string", "null"], "format": "date"},
+    "decided_at": {"type": "string", "format": "date-time"}
+  },
+  "additionalProperties": false
+}

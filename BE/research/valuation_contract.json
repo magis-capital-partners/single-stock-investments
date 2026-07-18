@@ -1,0 +1,268 @@
+{
+  "schema_version": "1.0",
+  "status": "evidence_blocked",
+  "ticker": "BE",
+  "as_of": "2026-07-17",
+  "economic_ownership_map": [
+    {
+      "component_id": "operating_business_fallback",
+      "label": "Operating business (fallback)",
+      "category": "operating_business",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Operating business (fallback)",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "current_operating_contribution": {
+        "starting_revenue_m": null,
+        "base_value_per_share": 6.76
+      },
+      "growth_driver": null,
+      "required_reinvestment": {
+        "model_type": null,
+        "base_incremental_after_tax_roic": null,
+        "base_remaining_cost_m": null,
+        "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+      },
+      "method": "owner_cash_dcf",
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": 6.05,
+        "base": 6.76,
+        "high": 7.56
+      },
+      "evidence_tier": "model_input",
+      "evidence_level": "analyst_estimated",
+      "evidence": "inputs.fcf_per_share and scenarios.base",
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "Risk and timing are reflected in the low/base/high range.",
+      "falsifier": "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods.",
+      "overlap_key": "operating_business_fallback",
+      "assumption_type": "estimate"
+    }
+  ],
+  "component_coverage": {
+    "all_material_components_identified": false,
+    "material_component_count": 1,
+    "additive_component_count": 1,
+    "embedded_component_count": 0,
+    "unvalued_component_count": 1,
+    "double_counting_flags": []
+  },
+  "input_classification": {
+    "facts": [],
+    "estimates": [
+      {
+        "component_id": "operating_business_fallback",
+        "label": "Operating business (fallback)",
+        "kind": "estimate",
+        "evidence_tier": "model_input",
+        "evidence": "inputs.fcf_per_share and scenarios.base",
+        "method": "owner_cash_dcf"
+      }
+    ],
+    "judgments": []
+  },
+  "method_route": {
+    "schema_version": "2.0",
+    "status": "routed",
+    "profile_id": "capital_cycle",
+    "label": "Capital cycle and normalized industry economics",
+    "score": 7.0,
+    "reasons": [
+      "archetype=turnaround",
+      "component categories=operating_business"
+    ],
+    "primary_methods": [
+      "midcycle_capacity_value"
+    ],
+    "corroborating_methods": [
+      "replacement_cost",
+      "downcycle_liquidity_stress"
+    ],
+    "primary_personas": [
+      "marathon_capital_cycle"
+    ],
+    "cross_check_personas": [
+      "marks_credit_cycle",
+      "pabrai"
+    ],
+    "silent_personas": [
+      "buffett_weschler",
+      "greenblatt",
+      "hk",
+      "hohn",
+      "klarman_asset_value",
+      "munger",
+      "stahl"
+    ],
+    "required_evidence": [
+      "industry capacity and additions",
+      "utilization",
+      "normalized unit margins",
+      "maintenance versus growth capital",
+      "low-case liquidity"
+    ],
+    "failure_modes": [
+      "peak margins capitalized",
+      "supply response ignored",
+      "replacement cost used for assets that cannot earn their cost of capital"
+    ],
+    "secondary_profiles": [
+      {
+        "profile_id": "catalyst_asset_value",
+        "score": 6.0,
+        "reasons": [
+          "archetype=turnaround"
+        ]
+      },
+      {
+        "profile_id": "quality_reinvestment",
+        "score": 3.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dcf, owner_cash"
+        ]
+      }
+    ],
+    "scorecard": {
+      "scarce_asset_optionality": {
+        "score": 0.0,
+        "reasons": []
+      },
+      "quality_reinvestment": {
+        "score": 3.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dcf, owner_cash"
+        ]
+      },
+      "capital_cycle": {
+        "score": 7.0,
+        "reasons": [
+          "archetype=turnaround",
+          "component categories=operating_business"
+        ]
+      },
+      "credit_and_normalized_returns": {
+        "score": 0.0,
+        "reasons": []
+      },
+      "catalyst_asset_value": {
+        "score": 6.0,
+        "reasons": [
+          "archetype=turnaround"
+        ]
+      },
+      "predictable_cash_flow": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=owner_cash"
+        ]
+      },
+      "binary_milestone": {
+        "score": 0.0,
+        "reasons": []
+      }
+    },
+    "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
+    "ticker": "BE",
+    "as_of": "2026-07-18",
+    "route_source": "canonical_power_zone_router",
+    "config_path": "_system/frameworks/power_zones.json",
+    "config_updated": "2026-07-14",
+    "classification": {
+      "archetype": "turnaround",
+      "moat": "unproven",
+      "dhando": "none",
+      "stance": "watch",
+      "cycle": "up",
+      "moi_bucket": "pending",
+      "payoff_lens": "operating",
+      "investment_sleeve": "-",
+      "predictive_attribute": "narrative_premium"
+    },
+    "specialist_power_zones": [],
+    "committee": {
+      "candidate_count": 3,
+      "independence_group_count": 3,
+      "committee_seatable": true,
+      "candidates": [
+        {
+          "persona": "marathon_capital_cycle",
+          "independence_group": "capital_cycle"
+        },
+        {
+          "persona": "marks_credit_cycle",
+          "independence_group": "credit_cycle"
+        },
+        {
+          "persona": "pabrai",
+          "independence_group": "asymmetry_downside"
+        }
+      ]
+    },
+    "input_hash": "80134685020d8e659c61e8e9331509314f6899708b7e3c46384026a8e77603c7",
+    "generated_at": "2026-07-18T13:01:44.350472+00:00"
+  },
+  "market": {
+    "price_per_share": 221.89,
+    "fully_diluted_shares": null,
+    "market_cap_m": null,
+    "enterprise_value_m": null
+  },
+  "valuation": {
+    "value_per_share": {
+      "low": 6.05,
+      "base": 6.76,
+      "high": 7.56
+    },
+    "probability_weighted_value_per_share": 6.76,
+    "expected_distributions_per_share": 0.0,
+    "annualized_return_at_price_pct": {
+      "low": -40.23,
+      "base": -39.27,
+      "high": -38.29
+    },
+    "downside_to_low_pct": -97.27,
+    "horizon_years": 7
+  },
+  "scenario_contract": {
+    "rule": "Cases must change causal operating, capital, probability, timing, or financing drivers\u2014not only the terminal multiple.",
+    "top_value_drivers": [
+      {
+        "component_id": "operating_business_fallback",
+        "label": "Operating business (fallback)",
+        "base_per_share": 6.76,
+        "range_width_per_share": 1.51,
+        "scenario_assumptions": null
+      }
+    ],
+    "reverse_expectations": null
+  },
+  "evidence": {
+    "unresolved_count": 1,
+    "blockers": [
+      "A complete, explicit ownership/component schedule has not been supplied."
+    ],
+    "validation_errors": []
+  },
+  "monitoring": {
+    "falsifiers": [
+      "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods."
+    ],
+    "required_refresh_triggers": [
+      "new filing or material operating update",
+      "capital-structure change",
+      "material price move",
+      "component milestone or falsifier"
+    ]
+  },
+  "decision_rule": "No security is decision-grade until every material economic claim is valued exactly once and every material evidence blocker is resolved.",
+  "authority": "universal_valuation_contract",
+  "legacy_reference_present": true
+}

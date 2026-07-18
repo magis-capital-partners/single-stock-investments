@@ -110,6 +110,7 @@ def build() -> dict:
     by_ticker: dict[str, dict] = {}
     for ticker, holding in sorted({**watchlist, **holdings}.items()):
         classification = (holding or {}).get("classification") or {}
+        route_doc = load_json(ROOT / ticker / "research" / "valuation_route.json", {})
         zone_results: dict[str, dict] = {}
         in_zone: list[str] = []
         for persona, zone in zones.items():
@@ -123,9 +124,19 @@ def build() -> dict:
                 in_zone.append(persona)
         classified = any(known(classification.get(f)) for f in ("archetype", "moat", "dhando", "investment_sleeve"))
         by_ticker[ticker] = {
-            "in_zone": sorted(in_zone, key=lambda p: -zone_results[p]["score"]),
+            "in_zone": (
+                [row.get("persona") for row in route_doc.get("specialist_power_zones") or [] if row.get("persona")]
+                if route_doc
+                else sorted(in_zone, key=lambda p: -zone_results[p]["score"])
+            ),
             "zones": zone_results,
             "classified": classified,
+            "valuation_route": {
+                "profile_id": route_doc.get("profile_id"),
+                "label": route_doc.get("label"),
+                "status": route_doc.get("status"),
+                "input_hash": route_doc.get("input_hash"),
+            } if route_doc else None,
         }
 
     tickers_with_zone = sum(1 for entry in by_ticker.values() if entry["in_zone"])

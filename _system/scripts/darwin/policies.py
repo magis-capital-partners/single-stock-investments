@@ -114,8 +114,8 @@ def policy_softmax_latent(
     return {tickers[i]: exps[i] / s for i in range(len(tickers))}
 
 
-def ira_marvin_ineligible(rows: list[dict], genome: dict | None = None) -> list[str]:
-    """Tickers that lack a current, deep-dive-backed allocatable return."""
+def research_committee_ineligible(rows: list[dict], genome: dict | None = None) -> list[str]:
+    """Tickers without a current, owner-authorized committee valuation."""
     g = genome or {}
     return [r["ticker"] for r in rows if r.get("ticker") and not is_allocatable(r, g)]
 
@@ -156,8 +156,8 @@ def cc_suitability_score(
     return max(0.35, min(1.75, score))
 
 
-def policy_ira_marvin(rows: list[dict], genome: dict | None = None) -> dict[str, float]:
-    """IRA: Marvin IRR × stance × dhando; drop negative IRR watch names."""
+def policy_research_committee(rows: list[dict], genome: dict | None = None) -> dict[str, float]:
+    """IRA: owner-authorized contract return; leave cash for unresolved names."""
     g = genome or {}
     use_cc = bool(g.get("cc_dual_score"))
     iv_map = g.get("iv_by_ticker") or {}
@@ -209,7 +209,13 @@ def policy_ira_marvin_cc(rows: list[dict], genome: dict | None = None) -> dict[s
     """IRA Marvin × covered-call suitability (Phase C dual score)."""
     g = dict(genome or {})
     g["cc_dual_score"] = True
-    return policy_ira_marvin(rows, g)
+    return policy_research_committee(rows, g)
+
+
+# Transitional aliases for historical backtests and stored policy IDs. New
+# production mandates use research_committee.
+ira_marvin_ineligible = research_committee_ineligible
+policy_ira_marvin = policy_research_committee
 
 
 POLICY_FNS = {
@@ -219,6 +225,7 @@ POLICY_FNS = {
     "risk_parity_vol": policy_risk_parity_vol,
     "ira_marvin": policy_ira_marvin,
     "ira_marvin_cc": policy_ira_marvin_cc,
+    "research_committee": policy_research_committee,
 }
 
 

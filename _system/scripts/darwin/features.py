@@ -15,6 +15,7 @@ if str(sys_path) not in sys.path:
     sys.path.insert(0, str(sys_path))
 
 from dated_md import dated_md_label, latest_dated_md  # noqa: E402
+from decision_authority import resolve_authority  # noqa: E402
 
 CLASS_PATH = ROOT / "_system" / "portfolio" / "classification.json"
 REGISTRY_PATH = ROOT / "_system" / "portfolio" / "registry.json"
@@ -198,6 +199,7 @@ def feature_row(
                     classification[key] = cl[key]
     else:
         val = load_valuation(ticker_dir) or {}
+    authority = resolve_authority(ticker_dir / "research", val)
     ge = val.get("growth_explanation") or {}
     fa = ge.get("falsifier_adjusted") or {}
     triggered = fa.get("triggered") or ge.get("falsifiers_triggered") or []
@@ -206,9 +208,8 @@ def feature_row(
     else:
         falsifier_count = int(triggered) if triggered else 0
 
-    irr_base = classification.get("analysis_irr_pct")
-    if irr_base is None:
-        irr_base = _parse_irr_pct(classification.get("implied_irr"))
+    contract_returns = authority.get("return_range_pct") or {}
+    irr_base = contract_returns.get("base")
     scenarios = val.get("scenarios") or val.get("results") or {}
     irr_bear = None
     irr_bull = None
@@ -216,14 +217,13 @@ def feature_row(
         irr_bear = scenarios["bear"].get("return_pct")
     if "bull" in scenarios:
         irr_bull = scenarios["bull"].get("return_pct")
-    ir = val.get("implied_return") or {}
-    if irr_base is None:
-        irr_base = ir.get("base_pct")
-    if irr_bear is None:
-        irr_bear = ir.get("bear_pct")
-    if irr_bull is None:
-        irr_bull = ir.get("bull_pct")
-    irr_fals = fa.get("irr_pct") or ir.get("falsifier_adjusted_pct")
+    if contract_returns:
+        irr_bear = contract_returns.get("low")
+        irr_bull = contract_returns.get("high")
+    elif authority.get("authority_level") == "legacy_reference":
+        # Visible for migration diagnostics, but never allocation-eligible.
+        irr_base = classification.get("analysis_irr_pct") or _parse_irr_pct(classification.get("implied_irr"))
+    irr_fals = irr_base if authority.get("actionable") else None
 
     research = ticker_dir / "research"
     if as_of and research.exists():
@@ -236,10 +236,7 @@ def feature_row(
 
     completeness = _completeness_stub(ticker_dir)
 
-    hr = val.get("human_review") or {}
-    human_pending = not val.get("approved_stance") and (
-        bool(hr) or bool((val.get("stance_proposal") or {}).get("suggested"))
-    )
+    human_pending = not bool(authority.get("actionable"))
 
     meta = holdings_meta.get(ticker, {})
     from .narrative import narrative_features_for_row
@@ -304,6 +301,9 @@ def feature_row(
         "feature_as_of": as_of,
         "one_line_thesis": one_line_thesis(ticker_dir),
         "human_review_pending": human_pending,
+        "decision_actionable": bool(authority.get("actionable")),
+        "decision_status": authority.get("status"),
+        "authority_level": authority.get("authority_level"),
         "persona_agreement_pct": persona_agreement_pct,
         "persona_high_relevance_count": superinvestor_overlap,
         "narrative_embedding": narr["narrative_embedding"],

@@ -1,0 +1,89 @@
+name: Power Zone Universe
+
+on:
+  workflow_dispatch:
+    inputs:
+      scope:
+        description: Universe scope
+        required: true
+        type: choice
+        options: [all, valued, priority]
+        default: all
+      dry_run:
+        description: Validate without writing artifacts
+        required: false
+        type: boolean
+        default: false
+  schedule:
+    - cron: "30 5 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: power-zone-universe-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  route-value-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /.github/workflows/power-zone-universe.yml
+            /_system/**
+            /dashboard/**
+            /docs/**
+            /*/research/**
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate cutover pipeline
+        working-directory: _system/scripts
+        run: |
+          python -m unittest \
+            test_generalized_valuation_system \
+            test_investment_committee_pipeline \
+            test_valuation_workbench \
+            test_power_zone_pricing \
+            test_decision_authority \
+            test_security_decision_pipeline \
+            test_human_decision \
+            test_valuation_authority_cutover
+
+      - name: Process canonical universe
+        env:
+          SCOPE: ${{ github.event.inputs.scope || 'all' }}
+          DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+        run: |
+          ARGS=(--scope "$SCOPE" --skip-dashboard)
+          if [ "$DRY_RUN" = "true" ]; then ARGS+=(--dry-run); fi
+          python _system/scripts/run_security_decision_pipeline.py "${ARGS[@]}"
+
+      - name: Commit authority artifacts
+        if: github.event.inputs.dry_run != 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A -- '*/research/valuation_route.json' \
+                         '*/research/valuation_contract.json' \
+                         '*/research/valuation_workbench.json' \
+                         '*/research/pricing_analysis.json' \
+                         '*/research/committee_work' \
+                         '_system/reviews/pending/power_zone_universe_run_*.json' \
+                         dashboard/data/power_zones.json
+          if git diff --cached --quiet; then
+            echo "No authority artifacts changed."
+            exit 0
+          fi
+          git commit -m "chore(valuation): process Power Zone universe"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+
+      - name: Summary
+        run: echo "Power Zone universe processing completed for ${{ github.event.inputs.scope || 'all' }}."

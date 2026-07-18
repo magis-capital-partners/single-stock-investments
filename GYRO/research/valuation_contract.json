@@ -1,0 +1,620 @@
+{
+  "schema_version": "1.0",
+  "status": "decision_grade",
+  "ticker": "GYRO",
+  "as_of": "2026-07-17",
+  "economic_ownership_map": [
+    {
+      "component_id": "real_estate_nrv",
+      "label": "Real estate held for sale at estimated NRV",
+      "category": "financial_asset",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Real estate held for sale at estimated NRV",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "current_operating_contribution": {
+        "starting_revenue_m": null,
+        "base_value_per_share": 24.55
+      },
+      "growth_driver": "ASC 205-30 estimated net realizable value, not historical cost.",
+      "required_reinvestment": {
+        "model_type": null,
+        "base_incremental_after_tax_roic": null,
+        "base_remaining_cost_m": null,
+        "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+      },
+      "method": "liquidation_nav",
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": 22.0,
+        "base": 24.55,
+        "high": 27.0
+      },
+      "evidence_tier": "audited",
+      "evidence_level": "primary_verified",
+      "evidence": "10-Q Q1 2026: real estate held for sale $53,990,000 / 2,199,308 shares = $24.55. Liquidation-basis already marks to estimated NRV (includes B2K $28.74M gross assumption).",
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "Entitlement and sale timing sit in the range. Embedded option documented in component_valuation with treatment=embedded.",
+      "falsifier": "Forced sale or failed entitlement marks real estate NRV below the low case.",
+      "overlap_key": "real_estate_nrv",
+      "assumption_type": "fact"
+    },
+    {
+      "component_id": "cash_and_other_assets",
+      "label": "Cash and other assets",
+      "category": "financial_asset",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Cash and other assets",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "current_operating_contribution": {
+        "starting_revenue_m": null,
+        "base_value_per_share": 1.87
+      },
+      "growth_driver": "Working capital available inside the liquidation plan.",
+      "required_reinvestment": {
+        "model_type": null,
+        "base_incremental_after_tax_roic": null,
+        "base_remaining_cost_m": null,
+        "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+      },
+      "method": "net_asset_value",
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": 1.5,
+        "base": 1.87,
+        "high": 2.2
+      },
+      "evidence_tier": "audited",
+      "evidence_level": "primary_verified",
+      "evidence": "Cash ~$3.95M plus other non-RE assets implied by total assets $58.1M less RE $54.0M.",
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "Burn through 2028 is partly in the cost accrual.",
+      "falsifier": "Cash burn through 2028 consumes more than the low-case residual.",
+      "overlap_key": "cash_and_other_assets",
+      "assumption_type": "fact"
+    },
+    {
+      "component_id": "loans_payable",
+      "label": "Loans payable",
+      "category": "liability_or_reserve",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Loans payable",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "current_operating_contribution": {
+        "starting_revenue_m": null,
+        "base_value_per_share": -4.91
+      },
+      "growth_driver": "Contractual debt senior to equity distributions.",
+      "required_reinvestment": {
+        "model_type": null,
+        "base_incremental_after_tax_roic": null,
+        "base_remaining_cost_m": null,
+        "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+      },
+      "method": "book_claim",
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": -5.2,
+        "base": -4.91,
+        "high": -4.5
+      },
+      "evidence_tier": "audited",
+      "evidence_level": "primary_verified",
+      "evidence": "Loans payable $10,790,194 / 2,199,308 shares = -$4.91.",
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "Senior to equity distributions.",
+      "falsifier": "Refinancing or default increases the claim above the low case.",
+      "overlap_key": "loans_payable",
+      "assumption_type": "fact"
+    },
+    {
+      "component_id": "estimated_liquidation_costs",
+      "label": "Estimated liquidation and operating costs (net)",
+      "category": "liability_or_reserve",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Estimated liquidation and operating costs (net)",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "current_operating_contribution": {
+        "starting_revenue_m": null,
+        "base_value_per_share": -7.6
+      },
+      "growth_driver": "Management's disclosed accrual through the 2028 target date.",
+      "required_reinvestment": {
+        "model_type": null,
+        "base_incremental_after_tax_roic": null,
+        "base_remaining_cost_m": null,
+        "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+      },
+      "method": "realization_reserve",
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": -9.5,
+        "base": -7.6,
+        "high": -6.0
+      },
+      "evidence_tier": "audited",
+      "evidence_level": "primary_verified",
+      "evidence": "Estimated liquidation and operating costs net of receipts $16,709,887 / shares = -$7.60 (includes B2K $4M seller credit already).",
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "Includes B2K seller credit.",
+      "falsifier": "Further re-estimation (as in FY2025 NAV drop $13.91\u2192$11.76) pushes costs beyond the low case.",
+      "overlap_key": "estimated_liquidation_costs",
+      "assumption_type": "fact"
+    },
+    {
+      "component_id": "other_liabilities",
+      "label": "Other liabilities",
+      "category": "liability_or_reserve",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Other liabilities",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "current_operating_contribution": {
+        "starting_revenue_m": null,
+        "base_value_per_share": -2.12
+      },
+      "growth_driver": "Remaining balance-sheet liabilities senior to equity.",
+      "required_reinvestment": {
+        "model_type": null,
+        "base_incremental_after_tax_roic": null,
+        "base_remaining_cost_m": null,
+        "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+      },
+      "method": "book_claim",
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": -2.5,
+        "base": -2.12,
+        "high": -1.8
+      },
+      "evidence_tier": "audited",
+      "evidence_level": "primary_verified",
+      "evidence": "Total liabilities $32.18M less loans $10.79M less estimated liquidation costs $16.71M \u2248 $4.68M / shares \u2248 -$2.12.",
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "Plug to reconcile to $11.79 net assets.",
+      "falsifier": "Unmodeled claims exceed the low case.",
+      "overlap_key": "other_liabilities",
+      "assumption_type": "fact"
+    },
+    {
+      "component_id": "b2k_entitlement_option",
+      "label": "B2K Flowerfield entitlement option (embedded in NRV)",
+      "category": "real_option",
+      "treatment": "embedded",
+      "included_in_component_id": "real_estate_nrv",
+      "ownership_claim": "Real estate held for sale at estimated NRV",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "current_operating_contribution": {
+        "starting_revenue_m": null,
+        "base_value_per_share": 0.0
+      },
+      "growth_driver": "Embedded in real_estate_nrv base; additive high only for upside above current NRV.",
+      "required_reinvestment": {
+        "model_type": null,
+        "base_incremental_after_tax_roic": null,
+        "base_remaining_cost_m": null,
+        "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+      },
+      "method": "milestone_project_option",
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": 0.0,
+        "base": 0.0,
+        "high": 2.0
+      },
+      "evidence_tier": "filing",
+      "evidence_level": "primary_verified",
+      "evidence": "B2K agreement $24.0\u2013$28.74M on ~49 acres; base NRV already uses $28.74M. Embedded so not added twice; high case is premium to current NRV if entitlements exceed the plan.",
+      "probability_and_timing": {
+        "success_probability": null,
+        "remaining_capital_m": null,
+        "timing_basis": "Target liquidation completion 2028-12-31; Article 78 can extend into 2029 in bear.",
+        "probability_basis": "Base assumes Smithtown site plan path supporting the \\.74M gross already in NRV.",
+        "remaining_capital_basis": "Seller credit \\ and entitlement costs are inside the liquidation cost accrual."
+      },
+      "tax_and_realization_adjustments": "Entitlement and sale timing sit in the range. Embedded option documented in component_valuation with treatment=embedded.",
+      "falsifier": "Article 78 or Smithtown denial collapses the B2K path and forces a re-mark below current NRV.",
+      "overlap_key": "b2k_entitlement_option",
+      "assumption_type": "fact"
+    }
+  ],
+  "component_coverage": {
+    "all_material_components_identified": true,
+    "material_component_count": 6,
+    "additive_component_count": 5,
+    "embedded_component_count": 1,
+    "unvalued_component_count": 0,
+    "double_counting_flags": []
+  },
+  "input_classification": {
+    "facts": [
+      {
+        "component_id": "real_estate_nrv",
+        "label": "Real estate held for sale at estimated NRV",
+        "kind": "fact",
+        "evidence_tier": "audited",
+        "evidence": "10-Q Q1 2026: real estate held for sale $53,990,000 / 2,199,308 shares = $24.55. Liquidation-basis already marks to estimated NRV (includes B2K $28.74M gross assumption).",
+        "method": "liquidation_nav"
+      },
+      {
+        "component_id": "cash_and_other_assets",
+        "label": "Cash and other assets",
+        "kind": "fact",
+        "evidence_tier": "audited",
+        "evidence": "Cash ~$3.95M plus other non-RE assets implied by total assets $58.1M less RE $54.0M.",
+        "method": "net_asset_value"
+      },
+      {
+        "component_id": "loans_payable",
+        "label": "Loans payable",
+        "kind": "fact",
+        "evidence_tier": "audited",
+        "evidence": "Loans payable $10,790,194 / 2,199,308 shares = -$4.91.",
+        "method": "book_claim"
+      },
+      {
+        "component_id": "estimated_liquidation_costs",
+        "label": "Estimated liquidation and operating costs (net)",
+        "kind": "fact",
+        "evidence_tier": "audited",
+        "evidence": "Estimated liquidation and operating costs net of receipts $16,709,887 / shares = -$7.60 (includes B2K $4M seller credit already).",
+        "method": "realization_reserve"
+      },
+      {
+        "component_id": "other_liabilities",
+        "label": "Other liabilities",
+        "kind": "fact",
+        "evidence_tier": "audited",
+        "evidence": "Total liabilities $32.18M less loans $10.79M less estimated liquidation costs $16.71M \u2248 $4.68M / shares \u2248 -$2.12.",
+        "method": "book_claim"
+      },
+      {
+        "component_id": "b2k_entitlement_option",
+        "label": "B2K Flowerfield entitlement option (embedded in NRV)",
+        "kind": "fact",
+        "evidence_tier": "filing",
+        "evidence": "B2K agreement $24.0\u2013$28.74M on ~49 acres; base NRV already uses $28.74M. Embedded so not added twice; high case is premium to current NRV if entitlements exceed the plan.",
+        "method": "milestone_project_option"
+      }
+    ],
+    "estimates": [],
+    "judgments": []
+  },
+  "method_route": {
+    "schema_version": "2.0",
+    "status": "routed",
+    "profile_id": "scarce_asset_optionality",
+    "label": "Scarce assets, royalties, and optionality",
+    "score": 10.0,
+    "reasons": [
+      "archetype=optionality",
+      "component categories=real_option",
+      "existing methods=option",
+      "investment_sleeve=real_assets_liquidation"
+    ],
+    "primary_methods": [
+      "component_owner_cash_and_unit_nav"
+    ],
+    "corroborating_methods": [
+      "comparable_transactions",
+      "replacement_cost_or_reverse_nav"
+    ],
+    "primary_personas": [
+      "hk",
+      "stahl"
+    ],
+    "cross_check_personas": [
+      "klarman_asset_value",
+      "marks_credit_cycle"
+    ],
+    "silent_personas": [
+      "buffett_weschler",
+      "greenblatt",
+      "hohn",
+      "marathon_capital_cycle",
+      "munger",
+      "pabrai"
+    ],
+    "required_evidence": [
+      "legal economic claim",
+      "non-overlapping physical inventory",
+      "unit economics",
+      "realization timing",
+      "remaining owner capital"
+    ],
+    "failure_modes": [
+      "gross asset value mistaken for shareholder value",
+      "operating cash flow and NAV counted twice",
+      "remote options treated as contracted cash"
+    ],
+    "secondary_profiles": [
+      {
+        "profile_id": "credit_and_normalized_returns",
+        "score": 2.0,
+        "reasons": [
+          "component categories=financial_asset, liability_or_reserve"
+        ]
+      },
+      {
+        "profile_id": "catalyst_asset_value",
+        "score": 2.0,
+        "reasons": [
+          "component categories=financial_asset",
+          "existing methods=liquidation"
+        ]
+      }
+    ],
+    "scorecard": {
+      "scarce_asset_optionality": {
+        "score": 10.0,
+        "reasons": [
+          "archetype=optionality",
+          "component categories=real_option",
+          "existing methods=option",
+          "investment_sleeve=real_assets_liquidation"
+        ]
+      },
+      "quality_reinvestment": {
+        "score": 0.0,
+        "reasons": []
+      },
+      "capital_cycle": {
+        "score": 0.0,
+        "reasons": []
+      },
+      "credit_and_normalized_returns": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=financial_asset, liability_or_reserve"
+        ]
+      },
+      "catalyst_asset_value": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=financial_asset",
+          "existing methods=liquidation"
+        ]
+      },
+      "predictable_cash_flow": {
+        "score": 0.0,
+        "reasons": []
+      },
+      "binary_milestone": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=milestone"
+        ]
+      }
+    },
+    "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
+    "ticker": "GYRO",
+    "as_of": "2026-07-18",
+    "route_source": "canonical_power_zone_router",
+    "config_path": "_system/frameworks/power_zones.json",
+    "config_updated": "2026-07-14",
+    "classification": {
+      "archetype": "optionality",
+      "moat": "n/a",
+      "dhando": "partial",
+      "stance": "hold",
+      "cycle": "-",
+      "moi_bucket": "asset / special situation",
+      "payoff_lens": "asset",
+      "investment_sleeve": "real_assets_liquidation",
+      "valuation_mode": "economic_value",
+      "implied_irr": 33.4,
+      "irr_method": "yield_curve",
+      "predictive_attribute": "equity_yield_curve"
+    },
+    "specialist_power_zones": [
+      {
+        "persona": "greenblatt",
+        "label": "Joel Greenblatt",
+        "independence_group": "special_situations",
+        "in_power_zone": true,
+        "fit": 0.667,
+        "matched": 2,
+        "known_fields": 2,
+        "matched_fields": [
+          "archetype",
+          "dhando"
+        ],
+        "excluded_by": null,
+        "match_rate": null,
+        "score": 57
+      },
+      {
+        "persona": "klarman_asset_value",
+        "label": "Klarman / Baupost",
+        "independence_group": "asset_realization",
+        "in_power_zone": true,
+        "fit": 0.667,
+        "matched": 2,
+        "known_fields": 2,
+        "matched_fields": [
+          "archetype",
+          "dhando"
+        ],
+        "excluded_by": null,
+        "match_rate": null,
+        "score": 57
+      },
+      {
+        "persona": "moi",
+        "label": "MOI / Mihaljevic",
+        "independence_group": "special_situations",
+        "in_power_zone": true,
+        "fit": 0.667,
+        "matched": 2,
+        "known_fields": 2,
+        "matched_fields": [
+          "archetype",
+          "dhando"
+        ],
+        "excluded_by": null,
+        "match_rate": null,
+        "score": 57
+      },
+      {
+        "persona": "pabrai",
+        "label": "Mohnish Pabrai",
+        "independence_group": "asymmetry_downside",
+        "in_power_zone": true,
+        "fit": 0.5,
+        "matched": 2,
+        "known_fields": 3,
+        "matched_fields": [
+          "dhando",
+          "archetype"
+        ],
+        "excluded_by": null,
+        "match_rate": null,
+        "score": 42
+      }
+    ],
+    "committee": {
+      "candidate_count": 5,
+      "independence_group_count": 4,
+      "committee_seatable": true,
+      "candidates": [
+        {
+          "persona": "hk",
+          "independence_group": "scarce_assets"
+        },
+        {
+          "persona": "stahl",
+          "independence_group": "scarce_assets"
+        },
+        {
+          "persona": "klarman_asset_value",
+          "independence_group": "asset_realization"
+        },
+        {
+          "persona": "marks_credit_cycle",
+          "independence_group": "credit_cycle"
+        },
+        {
+          "persona": "moi",
+          "independence_group": "special_situations"
+        }
+      ]
+    },
+    "input_hash": "3929a9ec0b53883617994685b542c96624acc69a7924ab5167dc0281b7ec1b84",
+    "generated_at": "2026-07-18T13:01:45.238987+00:00"
+  },
+  "market": {
+    "price_per_share": 5.8,
+    "fully_diluted_shares": 2199308,
+    "market_cap_m": 12.76,
+    "enterprise_value_m": null
+  },
+  "valuation": {
+    "value_per_share": {
+      "low": 6.3,
+      "base": 11.79,
+      "high": 16.9
+    },
+    "probability_weighted_value_per_share": 11.79,
+    "expected_distributions_per_share": 0.0,
+    "annualized_return_at_price_pct": {
+      "low": 2.79,
+      "base": 26.68,
+      "high": 42.83
+    },
+    "downside_to_low_pct": 8.62,
+    "horizon_years": 3
+  },
+  "scenario_contract": {
+    "rule": "Cases must change causal operating, capital, probability, timing, or financing drivers\u2014not only the terminal multiple.",
+    "top_value_drivers": [
+      {
+        "component_id": "real_estate_nrv",
+        "label": "Real estate held for sale at estimated NRV",
+        "base_per_share": 24.55,
+        "range_width_per_share": 5.0,
+        "scenario_assumptions": null
+      },
+      {
+        "component_id": "estimated_liquidation_costs",
+        "label": "Estimated liquidation and operating costs (net)",
+        "base_per_share": -7.6,
+        "range_width_per_share": 3.5,
+        "scenario_assumptions": null
+      },
+      {
+        "component_id": "cash_and_other_assets",
+        "label": "Cash and other assets",
+        "base_per_share": 1.87,
+        "range_width_per_share": 0.7,
+        "scenario_assumptions": null
+      },
+      {
+        "component_id": "loans_payable",
+        "label": "Loans payable",
+        "base_per_share": -4.91,
+        "range_width_per_share": 0.7,
+        "scenario_assumptions": null
+      },
+      {
+        "component_id": "other_liabilities",
+        "label": "Other liabilities",
+        "base_per_share": -2.12,
+        "range_width_per_share": 0.7,
+        "scenario_assumptions": null
+      }
+    ],
+    "reverse_expectations": null
+  },
+  "evidence": {
+    "unresolved_count": 0,
+    "blockers": [],
+    "validation_errors": []
+  },
+  "monitoring": {
+    "falsifiers": [
+      "Forced sale or failed entitlement marks real estate NRV below the low case.",
+      "Cash burn through 2028 consumes more than the low-case residual.",
+      "Refinancing or default increases the claim above the low case.",
+      "Further re-estimation (as in FY2025 NAV drop $13.91\u2192$11.76) pushes costs beyond the low case.",
+      "Unmodeled claims exceed the low case.",
+      "Article 78 or Smithtown denial collapses the B2K path and forces a re-mark below current NRV."
+    ],
+    "required_refresh_triggers": [
+      "new filing or material operating update",
+      "capital-structure change",
+      "material price move",
+      "component milestone or falsifier"
+    ]
+  },
+  "decision_rule": "No security is decision-grade until every material economic claim is valued exactly once and every material evidence blocker is resolved.",
+  "authority": "universal_valuation_contract",
+  "legacy_reference_present": true
+}

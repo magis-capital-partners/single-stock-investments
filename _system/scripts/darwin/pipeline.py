@@ -278,7 +278,8 @@ def run_pipeline(
 
     cc_sel = mandate_doc.get("covered_call") or {}
     prefer_cc_policy = bool(cc_sel.get("dual_score_selection")) and (
-        (mandate_doc.get("mandate") or {}).get("preferred_policy") in ("ira_marvin_cc", "ira_marvin")
+        (mandate_doc.get("mandate") or {}).get("preferred_policy")
+        in ("research_committee", "ira_marvin_cc", "ira_marvin")
     )
     liq_map_raw = load_liquidity_map()
     liquidity_by_ticker = {
@@ -309,7 +310,7 @@ def run_pipeline(
         univ_excl["excluded_total"] = sum(int(v or 0) for v in by_reason.values())
     features = {**features, "universe_exclusions": univ_excl}
 
-    ira_policy_name = "ira_marvin_cc" if ira_genome.get("cc_dual_score") else "ira_marvin"
+    ira_policy_name = "ira_marvin_cc" if ira_genome.get("cc_dual_score") else "research_committee"
     ira_raw = apply_policy(ira_policy_name, rows, ira_genome)
     ira_w, _ = apply_constraints(tickers, ira_raw, None, mandate_effective, falsifier_map)
 
@@ -454,7 +455,7 @@ def run_pipeline(
         return deflated_sharpe(raw, n_trials)
 
     policy_candidates = [
-        ("ira_marvin", ira_w, bt_ira),
+        ("research_committee", ira_w, bt_ira),
         ("irr_ranked", irr_w, bt_irr),
         ("equal_weight", eq_w, bt_eq),
     ]
@@ -496,7 +497,7 @@ def run_pipeline(
     m = mandate_doc.get("mandate") or {}
     min_sharpe = m.get("ml_champion_min_sharpe", 0.3)
     min_periods = m.get("ml_champion_min_periods", 12)
-    preferred = m.get("preferred_policy", "ira_marvin")
+    preferred = m.get("preferred_policy", "research_committee")
 
     explore = mandate_doc.get("exploration") or {}
     exploration_on = bool(explore.get("enabled", False)) and not tier0
@@ -537,7 +538,7 @@ def run_pipeline(
     else:
         pid = (
             ira_policy_name
-            if preferred in ("ira_marvin", "ira_marvin_cc")
+            if preferred in ("research_committee", "ira_marvin", "ira_marvin_cc")
             else preferred
         )
         policy_id, target_w, champion_bt = pid, ira_w, bt_ira
@@ -658,16 +659,20 @@ def run_pipeline(
         cc_oos_gate["promote_dual_score"] = True
         cc_oos_gate["reason"] = "oos_ok"
 
-    # If dual score requested but OOS gate fails, keep long-only ira_marvin weights for paper
+    # If dual score requested but the OOS gate fails, keep long-only committee-authority weights.
     if ira_genome.get("cc_dual_score") and cc_cfg.get("require_oos_for_dual_score", True) and not cc_oos_gate["passed"]:
-        if preferred in ("ira_marvin", "ira_marvin_cc") and policy_id in ("ira_marvin", "ira_marvin_cc"):
+        if preferred in ("research_committee", "ira_marvin", "ira_marvin_cc") and policy_id in (
+            "research_committee",
+            "ira_marvin",
+            "ira_marvin_cc",
+        ):
             # Rebuild without CC multiplier for production paper book
             plain_genome = {**ira_genome, "cc_dual_score": False, "max_names_cc": None}
-            plain_raw = apply_policy("ira_marvin", rows, plain_genome)
+            plain_raw = apply_policy("research_committee", rows, plain_genome)
             plain_w, _ = apply_constraints(tickers, plain_raw, prev_w, mandate_effective, falsifier_map)
             target_w, cash_weight = apply_research_freshness_caps(plain_w, features_by_ticker, mandate_doc)
-            policy_id = "ira_marvin"
-            cc_oos_gate["production_policy"] = "ira_marvin_gated"
+            policy_id = "research_committee"
+            cc_oos_gate["production_policy"] = "research_committee_gated"
             # refresh CC bench on gated weights
             if cc_cfg.get("enabled", False):
                 bt_cc = benchmark_covered_call(

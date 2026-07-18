@@ -1,0 +1,341 @@
+{
+  "schema_version": "1.0",
+  "status": "evidence_blocked",
+  "ticker": "BABA",
+  "as_of": "2026-07-17",
+  "economic_ownership_map": [
+    {
+      "component_id": "operating_business_fallback",
+      "label": "Operating business (fallback)",
+      "category": "operating_business",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Operating business (fallback)",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "current_operating_contribution": {
+        "starting_revenue_m": null,
+        "base_value_per_share": 87.95
+      },
+      "growth_driver": null,
+      "required_reinvestment": {
+        "model_type": null,
+        "base_incremental_after_tax_roic": null,
+        "base_remaining_cost_m": null,
+        "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+      },
+      "method": "owner_cash_dcf",
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": 78.97,
+        "base": 87.95,
+        "high": 98.26
+      },
+      "evidence_tier": "model_input",
+      "evidence_level": "analyst_estimated",
+      "evidence": "inputs.fcf_per_share and scenarios.base",
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "Risk and timing are reflected in the low/base/high range.",
+      "falsifier": "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods.",
+      "overlap_key": "operating_business_fallback",
+      "assumption_type": "estimate"
+    }
+  ],
+  "component_coverage": {
+    "all_material_components_identified": false,
+    "material_component_count": 1,
+    "additive_component_count": 1,
+    "embedded_component_count": 0,
+    "unvalued_component_count": 1,
+    "double_counting_flags": []
+  },
+  "input_classification": {
+    "facts": [],
+    "estimates": [
+      {
+        "component_id": "operating_business_fallback",
+        "label": "Operating business (fallback)",
+        "kind": "estimate",
+        "evidence_tier": "model_input",
+        "evidence": "inputs.fcf_per_share and scenarios.base",
+        "method": "owner_cash_dcf"
+      }
+    ],
+    "judgments": []
+  },
+  "method_route": {
+    "schema_version": "2.0",
+    "status": "routed",
+    "profile_id": "quality_reinvestment",
+    "label": "High-return compounder",
+    "score": 9.0,
+    "reasons": [
+      "archetype=compounder",
+      "component categories=operating_business",
+      "existing methods=dcf, owner_cash"
+    ],
+    "primary_methods": [
+      "owner_earnings_reinvestment_dcf"
+    ],
+    "corroborating_methods": [
+      "reverse_dcf",
+      "incremental_roic_runway"
+    ],
+    "primary_personas": [
+      "buffett_weschler",
+      "hohn"
+    ],
+    "cross_check_personas": [
+      "munger",
+      "marathon_capital_cycle"
+    ],
+    "silent_personas": [
+      "greenblatt",
+      "hk",
+      "klarman_asset_value",
+      "marks_credit_cycle",
+      "pabrai",
+      "stahl"
+    ],
+    "required_evidence": [
+      "normalized owner earnings",
+      "incremental return on capital",
+      "reinvestment runway",
+      "diluted share count",
+      "competitive-advantage mechanism"
+    ],
+    "failure_modes": [
+      "growth projected without its capital cost",
+      "stock compensation or acquisitions omitted",
+      "terminal value unsupported by a durable mechanism"
+    ],
+    "secondary_profiles": [
+      {
+        "profile_id": "predictable_cash_flow",
+        "score": 2.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=owner_cash"
+        ]
+      },
+      {
+        "profile_id": "capital_cycle",
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
+      }
+    ],
+    "scorecard": {
+      "scarce_asset_optionality": {
+        "score": 0.0,
+        "reasons": []
+      },
+      "quality_reinvestment": {
+        "score": 9.0,
+        "reasons": [
+          "archetype=compounder",
+          "component categories=operating_business",
+          "existing methods=dcf, owner_cash"
+        ]
+      },
+      "capital_cycle": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
+      },
+      "credit_and_normalized_returns": {
+        "score": 0.0,
+        "reasons": []
+      },
+      "catalyst_asset_value": {
+        "score": 0.0,
+        "reasons": []
+      },
+      "predictable_cash_flow": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=owner_cash"
+        ]
+      },
+      "binary_milestone": {
+        "score": 0.0,
+        "reasons": []
+      }
+    },
+    "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
+    "ticker": "BABA",
+    "as_of": "2026-07-18",
+    "route_source": "canonical_power_zone_router",
+    "config_path": "_system/frameworks/power_zones.json",
+    "config_updated": "2026-07-14",
+    "classification": {
+      "archetype": "compounder",
+      "moat": "stable",
+      "dhando": "partial",
+      "stance": "watch",
+      "cycle": "-",
+      "moi_bucket": "pending",
+      "payoff_lens": "operating",
+      "investment_sleeve": "-",
+      "predictive_attribute": "complexity_discount"
+    },
+    "specialist_power_zones": [
+      {
+        "persona": "lawrence",
+        "label": "Bryan Lawrence",
+        "independence_group": "quality_reinvestment",
+        "in_power_zone": true,
+        "fit": 1.0,
+        "matched": 3,
+        "known_fields": 3,
+        "matched_fields": [
+          "archetype",
+          "moat",
+          "dhando"
+        ],
+        "excluded_by": null,
+        "match_rate": null,
+        "score": 85
+      },
+      {
+        "persona": "buffett_weschler",
+        "label": "Buffett / Weschler",
+        "independence_group": "quality_reinvestment",
+        "in_power_zone": true,
+        "fit": 0.667,
+        "matched": 2,
+        "known_fields": 2,
+        "matched_fields": [
+          "archetype",
+          "moat"
+        ],
+        "excluded_by": null,
+        "match_rate": null,
+        "score": 57
+      },
+      {
+        "persona": "hohn",
+        "label": "Chris Hohn",
+        "independence_group": "competitive_advantage",
+        "in_power_zone": true,
+        "fit": 0.667,
+        "matched": 2,
+        "known_fields": 2,
+        "matched_fields": [
+          "archetype",
+          "moat"
+        ],
+        "excluded_by": null,
+        "match_rate": null,
+        "score": 57
+      },
+      {
+        "persona": "munger",
+        "label": "Charlie Munger",
+        "independence_group": "quality_reinvestment",
+        "in_power_zone": true,
+        "fit": 0.667,
+        "matched": 2,
+        "known_fields": 2,
+        "matched_fields": [
+          "archetype",
+          "moat"
+        ],
+        "excluded_by": null,
+        "match_rate": null,
+        "score": 57
+      }
+    ],
+    "committee": {
+      "candidate_count": 5,
+      "independence_group_count": 3,
+      "committee_seatable": true,
+      "candidates": [
+        {
+          "persona": "buffett_weschler",
+          "independence_group": "quality_reinvestment"
+        },
+        {
+          "persona": "hohn",
+          "independence_group": "competitive_advantage"
+        },
+        {
+          "persona": "munger",
+          "independence_group": "quality_reinvestment"
+        },
+        {
+          "persona": "marathon_capital_cycle",
+          "independence_group": "capital_cycle"
+        },
+        {
+          "persona": "lawrence",
+          "independence_group": "quality_reinvestment"
+        }
+      ]
+    },
+    "input_hash": "5d4c277885cbe0cf35a206ba9f88e76faacbe7e37189e6084bffbcf76a65102a",
+    "generated_at": "2026-07-18T13:01:44.327053+00:00"
+  },
+  "market": {
+    "price_per_share": 115.53,
+    "fully_diluted_shares": null,
+    "market_cap_m": null,
+    "enterprise_value_m": null
+  },
+  "valuation": {
+    "value_per_share": {
+      "low": 78.97,
+      "base": 87.95,
+      "high": 98.26
+    },
+    "probability_weighted_value_per_share": 87.95,
+    "expected_distributions_per_share": 0.0,
+    "annualized_return_at_price_pct": {
+      "low": -5.29,
+      "base": -3.82,
+      "high": -2.29
+    },
+    "downside_to_low_pct": -31.65,
+    "horizon_years": 7
+  },
+  "scenario_contract": {
+    "rule": "Cases must change causal operating, capital, probability, timing, or financing drivers\u2014not only the terminal multiple.",
+    "top_value_drivers": [
+      {
+        "component_id": "operating_business_fallback",
+        "label": "Operating business (fallback)",
+        "base_per_share": 87.95,
+        "range_width_per_share": 19.29,
+        "scenario_assumptions": null
+      }
+    ],
+    "reverse_expectations": null
+  },
+  "evidence": {
+    "unresolved_count": 1,
+    "blockers": [
+      "A complete, explicit ownership/component schedule has not been supplied."
+    ],
+    "validation_errors": []
+  },
+  "monitoring": {
+    "falsifiers": [
+      "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods."
+    ],
+    "required_refresh_triggers": [
+      "new filing or material operating update",
+      "capital-structure change",
+      "material price move",
+      "component milestone or falsifier"
+    ]
+  },
+  "decision_rule": "No security is decision-grade until every material economic claim is valued exactly once and every material evidence blocker is resolved.",
+  "authority": "universal_valuation_contract",
+  "legacy_reference_present": true
+}

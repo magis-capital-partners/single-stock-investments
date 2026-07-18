@@ -1,0 +1,106 @@
+name: Investment Committee
+
+on:
+  workflow_dispatch:
+    inputs:
+      ticker:
+        description: Security ticker
+        required: true
+        type: string
+      committee_date:
+        description: Committee date (YYYY-MM-DD)
+        required: true
+        type: string
+      mode:
+        description: Advance isolated tasks or assemble completed work
+        required: true
+        type: choice
+        options: [advance, assemble]
+        default: advance
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: investment-committee-${{ inputs.ticker }}-${{ inputs.committee_date }}-${{ inputs.mode }}
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    if: inputs.mode == 'advance'
+    runs-on: ubuntu-latest
+    outputs:
+      tasks: ${{ steps.queue.outputs.tasks }}
+      has_tasks: ${{ steps.queue.outputs.has_tasks }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system
+            ${{ inputs.ticker }}/research
+      - id: queue
+        run: |
+          TASKS=$(python _system/scripts/committee_task_queue.py "${{ inputs.ticker }}" --date "${{ inputs.committee_date }}")
+          echo "tasks=$TASKS" >> "$GITHUB_OUTPUT"
+          if [ "$TASKS" = "[]" ]; then echo "has_tasks=false" >> "$GITHUB_OUTPUT"; else echo "has_tasks=true" >> "$GITHUB_OUTPUT"; fi
+
+  isolated-tasks:
+    needs: prepare
+    if: needs.prepare.outputs.has_tasks == 'true'
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        include: ${{ fromJson(needs.prepare.outputs.tasks) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts/committee_task_runner.mjs
+            ${{ matrix.prompt_path }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - working-directory: _system/scripts
+        run: npm install --no-save @cursor/sdk
+      - name: Run isolated committee task
+        env:
+          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          CURSOR_STARTING_REF: ${{ github.ref_name }}
+          TICKER: ${{ matrix.ticker }}
+          COMMITTEE_DATE: ${{ matrix.as_of }}
+          TASK_KEY: ${{ matrix.task_key }}
+          PROMPT_PATH: ${{ matrix.prompt_path }}
+          OUTPUT_PATH: ${{ matrix.output_path }}
+        run: node _system/scripts/committee_task_runner.mjs
+
+  assemble:
+    if: inputs.mode == 'assemble'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          sparse-checkout: |
+            _system
+            ${{ inputs.ticker }}/research
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate and assemble
+        run: |
+          python _system/scripts/investment_committee_pipeline.py validate "${{ inputs.ticker }}" --date "${{ inputs.committee_date }}"
+          python _system/scripts/investment_committee_pipeline.py assemble "${{ inputs.ticker }}" --date "${{ inputs.committee_date }}"
+      - name: Commit assembled committee
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "${{ inputs.ticker }}/research/committee_${{ inputs.committee_date }}.json" \
+                  "${{ inputs.ticker }}/research/committee_work/${{ inputs.committee_date }}/manifest.json" \
+                  "${{ inputs.ticker }}/research/valuation_workbench.json"
+          git commit -m "feat(ic): assemble ${{ inputs.ticker }} committee ${{ inputs.committee_date }}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"

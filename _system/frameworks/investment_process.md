@@ -25,9 +25,12 @@ Single-stock research workflow for this workspace.
 - Tier 2 prompts from `archetype_models.json`; appendix detail in `mental_models.md` / `lawrence_irr.md` only if needed
 - Apply `ai_disruption_lens.md` where relevant
 - Write to `{TICKER}/research/` — not chat-only
-- Valuation: `{TICKER}/research/valuation.json` + `marvin_valuation.py --write`
+- Valuation authority: `valuation_route.json` → `valuation_contract.json` → `valuation_workbench.json` via `run_security_decision_pipeline.py`. `valuation.json` is an input/legacy envelope, not the final decision.
 
 ## 5. Review loop
+- Freeze a decision-grade evidence packet only after all critical acceptance tests close.
+- Run three isolated Power Zone committee reviewers plus an outside pre-mortem.
+- Preserve dissent and route the recommendation to `human_decision.json`; agents never size capital.
 - Copy summary to `_system/reviews/pending/`
 - Human discusses and corrects
 - Promote approved items to `_system/memory/MEMORY.md`

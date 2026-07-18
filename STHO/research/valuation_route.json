@@ -1,0 +1,219 @@
+{
+  "schema_version": "2.0",
+  "status": "routed",
+  "profile_id": "catalyst_asset_value",
+  "label": "Catalyst-backed asset value",
+  "score": 17.0,
+  "reasons": [
+    "archetype=holding_co",
+    "component categories=financial_asset",
+    "explicit reviewed profile"
+  ],
+  "primary_methods": [
+    "probability_weighted_catalyst_nav"
+  ],
+  "corroborating_methods": [
+    "break_value",
+    "timing_adjusted_payoff"
+  ],
+  "primary_personas": [
+    "klarman_asset_value",
+    "greenblatt"
+  ],
+  "cross_check_personas": [
+    "pabrai",
+    "marks_credit_cycle"
+  ],
+  "silent_personas": [
+    "buffett_weschler",
+    "hk",
+    "hohn",
+    "marathon_capital_cycle",
+    "munger",
+    "stahl"
+  ],
+  "required_evidence": [
+    "finite event tree",
+    "catalyst control and timing",
+    "break value",
+    "tax and legal claims",
+    "financing through realization"
+  ],
+  "failure_modes": [
+    "catalyst assumed rather than evidenced",
+    "delay and break cases omitted",
+    "gross proceeds used before tax and senior claims"
+  ],
+  "secondary_profiles": [
+    {
+      "profile_id": "scarce_asset_optionality",
+      "score": 9.0,
+      "reasons": [
+        "archetype=holding_co",
+        "component categories=real_option",
+        "existing methods=land, option"
+      ]
+    },
+    {
+      "profile_id": "credit_and_normalized_returns",
+      "score": 2.0,
+      "reasons": [
+        "component categories=financial_asset, liability_or_reserve"
+      ]
+    }
+  ],
+  "scorecard": {
+    "scarce_asset_optionality": {
+      "score": 9.0,
+      "reasons": [
+        "archetype=holding_co",
+        "component categories=real_option",
+        "existing methods=land, option"
+      ]
+    },
+    "quality_reinvestment": {
+      "score": 0.0,
+      "reasons": []
+    },
+    "capital_cycle": {
+      "score": 0.0,
+      "reasons": []
+    },
+    "credit_and_normalized_returns": {
+      "score": 2.0,
+      "reasons": [
+        "component categories=financial_asset, liability_or_reserve"
+      ]
+    },
+    "catalyst_asset_value": {
+      "score": 17.0,
+      "reasons": [
+        "archetype=holding_co",
+        "component categories=financial_asset",
+        "explicit reviewed profile"
+      ]
+    },
+    "predictable_cash_flow": {
+      "score": 0.0,
+      "reasons": []
+    },
+    "binary_milestone": {
+      "score": 2.0,
+      "reasons": [
+        "component categories=real_option",
+        "existing methods=probability"
+      ]
+    }
+  },
+  "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
+  "ticker": "STHO",
+  "as_of": "2026-07-18",
+  "route_source": "canonical_power_zone_router",
+  "config_path": "_system/frameworks/power_zones.json",
+  "config_updated": "2026-07-14",
+  "classification": {
+    "archetype": "holding_co",
+    "moat": "n/a",
+    "dhando": "partial",
+    "stance": "watch",
+    "cycle": "mid",
+    "moi_bucket": "pending",
+    "payoff_lens": "event",
+    "investment_sleeve": "-"
+  },
+  "specialist_power_zones": [
+    {
+      "persona": "greenblatt",
+      "label": "Joel Greenblatt",
+      "independence_group": "special_situations",
+      "in_power_zone": true,
+      "fit": 0.667,
+      "matched": 2,
+      "known_fields": 3,
+      "matched_fields": [
+        "archetype",
+        "dhando"
+      ],
+      "excluded_by": null,
+      "match_rate": null,
+      "score": 57
+    },
+    {
+      "persona": "klarman_asset_value",
+      "label": "Klarman / Baupost",
+      "independence_group": "asset_realization",
+      "in_power_zone": true,
+      "fit": 0.667,
+      "matched": 2,
+      "known_fields": 3,
+      "matched_fields": [
+        "archetype",
+        "dhando"
+      ],
+      "excluded_by": null,
+      "match_rate": null,
+      "score": 57
+    },
+    {
+      "persona": "moi",
+      "label": "MOI / Mihaljevic",
+      "independence_group": "special_situations",
+      "in_power_zone": true,
+      "fit": 0.667,
+      "matched": 2,
+      "known_fields": 3,
+      "matched_fields": [
+        "archetype",
+        "dhando"
+      ],
+      "excluded_by": null,
+      "match_rate": null,
+      "score": 57
+    },
+    {
+      "persona": "pabrai",
+      "label": "Mohnish Pabrai",
+      "independence_group": "asymmetry_downside",
+      "in_power_zone": true,
+      "fit": 0.5,
+      "matched": 2,
+      "known_fields": 3,
+      "matched_fields": [
+        "dhando",
+        "archetype"
+      ],
+      "excluded_by": null,
+      "match_rate": null,
+      "score": 42
+    }
+  ],
+  "committee": {
+    "candidate_count": 5,
+    "independence_group_count": 4,
+    "committee_seatable": true,
+    "candidates": [
+      {
+        "persona": "klarman_asset_value",
+        "independence_group": "asset_realization"
+      },
+      {
+        "persona": "greenblatt",
+        "independence_group": "special_situations"
+      },
+      {
+        "persona": "pabrai",
+        "independence_group": "asymmetry_downside"
+      },
+      {
+        "persona": "marks_credit_cycle",
+        "independence_group": "credit_cycle"
+      },
+      {
+        "persona": "moi",
+        "independence_group": "special_situations"
+      }
+    ]
+  },
+  "input_hash": "4f87631834afc64f65ebb56ec797c5a6e15f95ab771d7c57bed445c285cdb172",
+  "generated_at": "2026-07-18T13:01:46.338266+00:00"
+}

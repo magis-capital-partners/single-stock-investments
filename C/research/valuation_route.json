@@ -1,0 +1,151 @@
+{
+  "schema_version": "2.0",
+  "status": "routed",
+  "profile_id": "credit_and_normalized_returns",
+  "label": "Credit, funding, and normalized financial returns",
+  "score": 21.0,
+  "reasons": [
+    "archetype=bank",
+    "component categories=financial_asset, liability_or_reserve",
+    "existing methods=excess_return, stress_loss, tangible_book",
+    "explicit reviewed profile"
+  ],
+  "primary_methods": [
+    "capital_structure_and_excess_return"
+  ],
+  "corroborating_methods": [
+    "stress_loss_waterfall",
+    "normalized_tangible_book"
+  ],
+  "primary_personas": [
+    "marks_credit_cycle"
+  ],
+  "cross_check_personas": [
+    "buffett_weschler",
+    "klarman_asset_value"
+  ],
+  "silent_personas": [
+    "greenblatt",
+    "hk",
+    "hohn",
+    "marathon_capital_cycle",
+    "munger",
+    "pabrai",
+    "stahl"
+  ],
+  "required_evidence": [
+    "capital structure and maturities",
+    "normalized losses",
+    "regulatory or covenant capital",
+    "funding cost",
+    "distributable excess capital"
+  ],
+  "failure_modes": [
+    "industrial EV multiple applied to a financial balance sheet",
+    "regulatory capital treated as distributable",
+    "refinancing and off-balance-sheet claims omitted"
+  ],
+  "secondary_profiles": [
+    {
+      "profile_id": "binary_milestone",
+      "score": 2.0,
+      "reasons": [
+        "component categories=real_option",
+        "existing methods=probability"
+      ]
+    },
+    {
+      "profile_id": "scarce_asset_optionality",
+      "score": 1.0,
+      "reasons": [
+        "component categories=real_option"
+      ]
+    }
+  ],
+  "scorecard": {
+    "scarce_asset_optionality": {
+      "score": 1.0,
+      "reasons": [
+        "component categories=real_option"
+      ]
+    },
+    "quality_reinvestment": {
+      "score": 1.0,
+      "reasons": [
+        "component categories=operating_business"
+      ]
+    },
+    "capital_cycle": {
+      "score": 1.0,
+      "reasons": [
+        "component categories=operating_business"
+      ]
+    },
+    "credit_and_normalized_returns": {
+      "score": 21.0,
+      "reasons": [
+        "archetype=bank",
+        "component categories=financial_asset, liability_or_reserve",
+        "existing methods=excess_return, stress_loss, tangible_book",
+        "explicit reviewed profile"
+      ]
+    },
+    "catalyst_asset_value": {
+      "score": 1.0,
+      "reasons": [
+        "component categories=financial_asset"
+      ]
+    },
+    "predictable_cash_flow": {
+      "score": 1.0,
+      "reasons": [
+        "component categories=operating_business"
+      ]
+    },
+    "binary_milestone": {
+      "score": 2.0,
+      "reasons": [
+        "component categories=real_option",
+        "existing methods=probability"
+      ]
+    }
+  },
+  "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
+  "ticker": "C",
+  "as_of": "2026-07-18",
+  "route_source": "canonical_power_zone_router",
+  "config_path": "_system/frameworks/power_zones.json",
+  "config_updated": "2026-07-14",
+  "classification": {
+    "archetype": "bank",
+    "moat": "unproven",
+    "dhando": "pending",
+    "stance": "watch",
+    "cycle": "mid",
+    "moi_bucket": "pending",
+    "payoff_lens": "pending",
+    "investment_sleeve": "-"
+  },
+  "specialist_power_zones": [],
+  "committee": {
+    "candidate_count": 3,
+    "independence_group_count": 3,
+    "committee_seatable": true,
+    "candidates": [
+      {
+        "persona": "marks_credit_cycle",
+        "independence_group": "credit_cycle"
+      },
+      {
+        "persona": "buffett_weschler",
+        "independence_group": "quality_reinvestment"
+      },
+      {
+        "persona": "klarman_asset_value",
+        "independence_group": "asset_realization"
+      }
+    ]
+  },
+  "input_hash": "09210a3c97b1881596f248964522776caf87eb9fc823595a58bf4424682126fd",
+  "generated_at": "2026-07-18T13:01:44.475422+00:00"
+}

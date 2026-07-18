@@ -20,6 +20,8 @@ def adjusted_irr(row: dict) -> float | None:
 def research_status(row: dict, mandate: dict | None = None) -> str:
     """Classify a row using fixed, explainable research-policy states."""
     m = mandate or {}
+    if row.get("authority_level") and not row.get("decision_actionable"):
+        return "owner_decision_required"
     if not row.get("deep_dive_date"):
         return "research_missing"
     if adjusted_irr(row) is None:
@@ -54,7 +56,7 @@ def allocation_cap(row: dict, mandate: dict | None = None) -> float | None:
 def research_queue(rows: list[dict], mandate: dict | None = None, limit: int = 50) -> list[dict]:
     """Queue research work without estimating returns for incomplete names."""
     m = mandate or {}
-    priority = {"research_stale": 0, "valuation_incomplete": 1, "research_missing": 2, "irr_below_minimum": 3}
+    priority = {"owner_decision_required": 0, "research_stale": 1, "valuation_incomplete": 2, "research_missing": 3, "irr_below_minimum": 4}
     queued = []
     for row in rows:
         status = research_status(row, m)

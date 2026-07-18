@@ -1,0 +1,237 @@
+{
+  "schema_version": "2.0",
+  "status": "routed",
+  "profile_id": "capital_cycle",
+  "label": "Capital cycle and normalized industry economics",
+  "score": 7.0,
+  "reasons": [
+    "archetype=turnaround",
+    "component categories=operating_business"
+  ],
+  "primary_methods": [
+    "midcycle_capacity_value"
+  ],
+  "corroborating_methods": [
+    "replacement_cost",
+    "downcycle_liquidity_stress"
+  ],
+  "primary_personas": [
+    "marathon_capital_cycle"
+  ],
+  "cross_check_personas": [
+    "marks_credit_cycle",
+    "pabrai"
+  ],
+  "silent_personas": [
+    "buffett_weschler",
+    "greenblatt",
+    "hk",
+    "hohn",
+    "klarman_asset_value",
+    "munger",
+    "stahl"
+  ],
+  "required_evidence": [
+    "industry capacity and additions",
+    "utilization",
+    "normalized unit margins",
+    "maintenance versus growth capital",
+    "low-case liquidity"
+  ],
+  "failure_modes": [
+    "peak margins capitalized",
+    "supply response ignored",
+    "replacement cost used for assets that cannot earn their cost of capital"
+  ],
+  "secondary_profiles": [
+    {
+      "profile_id": "catalyst_asset_value",
+      "score": 7.0,
+      "reasons": [
+        "archetype=turnaround",
+        "component categories=financial_asset"
+      ]
+    },
+    {
+      "profile_id": "quality_reinvestment",
+      "score": 3.0,
+      "reasons": [
+        "component categories=operating_business",
+        "existing methods=dcf, owner_cash"
+      ]
+    }
+  ],
+  "scorecard": {
+    "scarce_asset_optionality": {
+      "score": 1.0,
+      "reasons": [
+        "existing methods=unit_nav"
+      ]
+    },
+    "quality_reinvestment": {
+      "score": 3.0,
+      "reasons": [
+        "component categories=operating_business",
+        "existing methods=dcf, owner_cash"
+      ]
+    },
+    "capital_cycle": {
+      "score": 7.0,
+      "reasons": [
+        "archetype=turnaround",
+        "component categories=operating_business"
+      ]
+    },
+    "credit_and_normalized_returns": {
+      "score": 3.0,
+      "reasons": [
+        "component categories=financial_asset, liability_or_reserve",
+        "existing methods=credit"
+      ]
+    },
+    "catalyst_asset_value": {
+      "score": 7.0,
+      "reasons": [
+        "archetype=turnaround",
+        "component categories=financial_asset"
+      ]
+    },
+    "predictable_cash_flow": {
+      "score": 2.0,
+      "reasons": [
+        "component categories=operating_business",
+        "existing methods=owner_cash"
+      ]
+    },
+    "binary_milestone": {
+      "score": 0.0,
+      "reasons": []
+    }
+  },
+  "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
+  "ticker": "SEVN",
+  "as_of": "2026-07-18",
+  "route_source": "canonical_power_zone_router",
+  "config_path": "_system/frameworks/power_zones.json",
+  "config_updated": "2026-07-14",
+  "classification": {
+    "archetype": "turnaround",
+    "moat": "unproven",
+    "dhando": "partial",
+    "stance": "watch",
+    "cycle": "-",
+    "moi_bucket": "levered",
+    "payoff_lens": "levered",
+    "investment_sleeve": "-",
+    "valuation_mode": "economic_value",
+    "implied_irr": 14.6,
+    "irr_method": "scenario"
+  },
+  "specialist_power_zones": [
+    {
+      "persona": "greenblatt",
+      "label": "Joel Greenblatt",
+      "independence_group": "special_situations",
+      "in_power_zone": true,
+      "fit": 0.667,
+      "matched": 2,
+      "known_fields": 2,
+      "matched_fields": [
+        "archetype",
+        "dhando"
+      ],
+      "excluded_by": null,
+      "match_rate": null,
+      "score": 57
+    },
+    {
+      "persona": "klarman_asset_value",
+      "label": "Klarman / Baupost",
+      "independence_group": "asset_realization",
+      "in_power_zone": true,
+      "fit": 0.667,
+      "matched": 2,
+      "known_fields": 2,
+      "matched_fields": [
+        "archetype",
+        "dhando"
+      ],
+      "excluded_by": null,
+      "match_rate": null,
+      "score": 57
+    },
+    {
+      "persona": "marks_credit_cycle",
+      "label": "Howard Marks / Oaktree",
+      "independence_group": "credit_cycle",
+      "in_power_zone": true,
+      "fit": 0.667,
+      "matched": 2,
+      "known_fields": 2,
+      "matched_fields": [
+        "archetype",
+        "dhando"
+      ],
+      "excluded_by": null,
+      "match_rate": null,
+      "score": 57
+    },
+    {
+      "persona": "moi",
+      "label": "MOI / Mihaljevic",
+      "independence_group": "special_situations",
+      "in_power_zone": true,
+      "fit": 0.667,
+      "matched": 2,
+      "known_fields": 2,
+      "matched_fields": [
+        "archetype",
+        "dhando"
+      ],
+      "excluded_by": null,
+      "match_rate": null,
+      "score": 57
+    },
+    {
+      "persona": "pabrai",
+      "label": "Mohnish Pabrai",
+      "independence_group": "asymmetry_downside",
+      "in_power_zone": true,
+      "fit": 0.5,
+      "matched": 2,
+      "known_fields": 2,
+      "matched_fields": [
+        "dhando",
+        "archetype"
+      ],
+      "excluded_by": null,
+      "match_rate": null,
+      "score": 42
+    }
+  ],
+  "committee": {
+    "candidate_count": 4,
+    "independence_group_count": 4,
+    "committee_seatable": true,
+    "candidates": [
+      {
+        "persona": "marathon_capital_cycle",
+        "independence_group": "capital_cycle"
+      },
+      {
+        "persona": "marks_credit_cycle",
+        "independence_group": "credit_cycle"
+      },
+      {
+        "persona": "pabrai",
+        "independence_group": "asymmetry_downside"
+      },
+      {
+        "persona": "moi",
+        "independence_group": "special_situations"
+      }
+    ]
+  },
+  "input_hash": "060b3623de601822591d55e3b87563e00dbf4307177b93c1677e8bfbfc29f1a2",
+  "generated_at": "2026-07-18T13:01:46.242237+00:00"
+}

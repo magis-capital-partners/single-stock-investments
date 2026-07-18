@@ -1,23 +1,23 @@
 {
   "schema_version": "2.0",
   "ticker": "AAOI",
-  "as_of": "2026-07-17",
+  "as_of": "2026-07-18",
   "decision": {
     "status": "evidence_blocked",
-    "price_per_share": 0,
+    "price_per_share": 99.77,
     "market_cap_m": null,
     "enterprise_value_m": null,
     "value_per_share": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": 15.67,
+      "base": 17.47,
+      "high": 19.54
     },
     "annualized_return_at_price_pct": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": -23.24,
+      "base": -22.04,
+      "high": -20.78
     },
-    "downside_to_low_pct": null,
+    "downside_to_low_pct": -84.29,
     "unvalued_component_count": 1,
     "unresolved_evidence_count": 0,
     "primary_power_zone": "Capital cycle and normalized industry economics",
@@ -26,47 +26,144 @@
   },
   "business": {
     "status": "incomplete",
-    "components": [],
+    "components": [
+      {
+        "component_id": "operating_business_fallback",
+        "label": "Operating business (fallback)",
+        "category": "operating_business",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Operating business (fallback)",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 17.47
+        },
+        "growth_driver": null,
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "owner_cash_dcf",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 15.67,
+          "base": 17.47,
+          "high": 19.54
+        },
+        "evidence_tier": "model_input",
+        "evidence_level": "analyst_estimated",
+        "evidence": "inputs.fcf_per_share and scenarios.base",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Risk and timing are reflected in the low/base/high range.",
+        "falsifier": "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods.",
+        "overlap_key": "operating_business_fallback",
+        "assumption_type": "estimate"
+      }
+    ],
     "component_coverage": {
       "all_material_components_identified": false,
-      "material_component_count": 0,
-      "additive_component_count": 0,
+      "material_component_count": 1,
+      "additive_component_count": 1,
       "embedded_component_count": 0,
       "unvalued_component_count": 1,
       "double_counting_flags": []
     },
     "facts": [],
-    "estimates": [],
+    "estimates": [
+      {
+        "component_id": "operating_business_fallback",
+        "label": "Operating business (fallback)",
+        "kind": "estimate",
+        "evidence_tier": "model_input",
+        "evidence": "inputs.fcf_per_share and scenarios.base",
+        "method": "owner_cash_dcf"
+      }
+    ],
     "judgments": []
   },
   "valuation": {
     "status": "evidence_blocked",
     "market": {
-      "price_per_share": 0,
+      "price_per_share": 99.77,
       "fully_diluted_shares": null,
       "market_cap_m": null,
       "enterprise_value_m": null
     },
     "valuation": {
       "value_per_share": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": 15.67,
+        "base": 17.47,
+        "high": 19.54
       },
-      "probability_weighted_value_per_share": null,
+      "probability_weighted_value_per_share": 17.47,
       "expected_distributions_per_share": 0.0,
       "annualized_return_at_price_pct": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": -23.24,
+        "base": -22.04,
+        "high": -20.78
       },
-      "downside_to_low_pct": null,
+      "downside_to_low_pct": -84.29,
       "horizon_years": 7
     },
-    "components": [],
+    "components": [
+      {
+        "component_id": "operating_business_fallback",
+        "label": "Operating business (fallback)",
+        "category": "operating_business",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Operating business (fallback)",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 17.47
+        },
+        "growth_driver": null,
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "owner_cash_dcf",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 15.67,
+          "base": 17.47,
+          "high": 19.54
+        },
+        "evidence_tier": "model_input",
+        "evidence_level": "analyst_estimated",
+        "evidence": "inputs.fcf_per_share and scenarios.base",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Risk and timing are reflected in the low/base/high range.",
+        "falsifier": "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods.",
+        "overlap_key": "operating_business_fallback",
+        "assumption_type": "estimate"
+      }
+    ],
     "scenario_contract": {
       "rule": "Cases must change causal operating, capital, probability, timing, or financing drivers\u2014not only the terminal multiple.",
-      "top_value_drivers": [],
+      "top_value_drivers": [
+        {
+          "component_id": "operating_business_fallback",
+          "label": "Operating business (fallback)",
+          "base_per_share": 17.47,
+          "range_width_per_share": 3.87,
+          "scenario_assumptions": null
+        }
+      ],
       "reverse_expectations": null
     }
   },
@@ -140,6 +237,7 @@
     ],
     "routing_reasons": [
       "archetype=turnaround",
+      "component categories=operating_business",
       "explicit reviewed profile"
     ],
     "required_evidence": [
@@ -238,9 +336,9 @@
     "status": "baseline_established",
     "current": {
       "as_of": "2026-07-17",
-      "low": null,
-      "base": null,
-      "high": null
+      "low": 15.67,
+      "base": 17.47,
+      "high": 19.54
     },
     "prior": null,
     "base_change_per_share": null,
