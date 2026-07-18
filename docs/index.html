@@ -105,10 +105,46 @@
   }
   .filter-btn.active { background: var(--accent-blue); color: #fff; border-color: var(--accent-blue); }
 
-  .main { display: grid; grid-template-columns: 1fr 380px; gap: 0; flex: 1; min-height: 0; }
+  .main { display: grid; grid-template-columns: 1fr minmax(420px, 42vw); gap: 0; flex: 1; min-height: 0; }
+  .main.detail-closed { grid-template-columns: 1fr; }
+  .main.detail-closed .detail { display: none; }
   @media (max-width: 1100px) { .main { grid-template-columns: 1fr; } }
 
   .table-wrap { overflow: auto; padding: 0 24px 24px; }
+  .col-group-toggles { display: inline-flex; flex-wrap: wrap; gap: 6px; margin-left: 8px; align-items: center; }
+  .col-group-toggles .filter-btn { font-size: 11px; padding: 5px 10px; }
+  .company-cell { max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .zone-chip {
+    display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600;
+    color: var(--accent-amber); white-space: nowrap;
+  }
+  .decision-range-track {
+    position: relative; height: 8px; margin: 10px 2px 2px; border-radius: 999px;
+    background: rgba(148, 163, 184, 0.18); overflow: visible;
+  }
+  .decision-range-fill {
+    position: absolute; inset: 0; border-radius: 999px;
+    background: linear-gradient(90deg, rgba(59,130,246,0.25), rgba(16,185,129,0.35));
+  }
+  .decision-range-mark {
+    position: absolute; top: -3px; width: 2px; height: 14px; margin-left: -1px; border-radius: 1px;
+  }
+  .decision-range-mark.base { background: var(--accent-cyan); }
+  .decision-range-mark.price { background: var(--accent-amber); width: 3px; }
+  .detail-sticky-header {
+    position: sticky; top: 0; z-index: 3; margin: -20px -20px 14px; padding: 14px 20px 12px;
+    background: linear-gradient(180deg, var(--bg-secondary) 70%, rgba(15,23,42,0));
+    border-bottom: 1px solid var(--border);
+  }
+  .detail-sticky-header .detail-close {
+    float: right; border: 1px solid var(--border); background: var(--bg-card);
+    color: var(--text-secondary); border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: 12px;
+  }
+  .detail-sticky-header .detail-close:hover { color: var(--text-primary); border-color: var(--border-active); }
+  .detail-thesis { margin-top: 8px; font-size: 13px; line-height: 1.45; color: var(--text-secondary); }
+  .read-next-card .research-box { margin-top: 0; }
+  .human-review-banner details { margin-top: 6px; }
+  .human-review-banner ul { margin: 6px 0 0 18px; padding: 0; color: var(--text-secondary); font-size: 12px; line-height: 1.45; }
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
   thead th {
     text-align: left; padding: 10px 12px; font-size: 10px; font-weight: 700;
@@ -373,8 +409,9 @@
   .main.model-expanded { grid-template-columns: 1fr !important; }
   .main.model-expanded .detail {
     border-left: none; border-top: 1px solid var(--border);
-    max-height: none; padding: 20px 24px 32px;
+    max-height: none; padding: 20px 24px 32px; display: block;
   }
+  .main.model-expanded .detail-sticky-header { margin: -20px -24px 14px; padding: 14px 24px 12px; }
   .liquidity-banner {
     background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.4);
     border-radius: 8px; padding: 12px 14px; font-size: 12px; line-height: 1.5;
@@ -647,33 +684,14 @@
     <span id="sleeve-filter-group" class="sleeve-filter-group"></span>
     <span id="valuation-filter-group" class="valuation-filter-group"></span>
     <button class="filter-btn" data-filter="needs-work">Needs work</button>
+    <span id="col-group-toggles" class="col-group-toggles" title="Optional column groups"></span>
   </div>
 
-  <div class="main" id="main-grid">
+  <div class="main detail-closed" id="main-grid">
     <div class="table-wrap">
       <table>
-        <thead>
-          <tr>
-            <th data-sort="ticker">Ticker</th>
-            <th data-sort="company">Company</th>
-            <th data-sort="market">Mkt</th>
-            <th data-sort="pdf_count">PDFs</th>
-            <th data-sort="completeness">Complete</th>
-            <th data-sort="last_download">Download</th>
-            <th data-sort="classification.archetype">Archetype</th>
-            <th data-sort="classification.investment_sleeve_label">Sleeve</th>
-            <th data-sort="component_valuation.total_equity_value_per_share.base">Value range</th>
-            <th data-sort="component_valuation.upside_downside_pct.base">Price vs base</th>
-            <th data-sort="component_valuation.status">Valuation</th>
-            <th data-sort="classification.stance">Stance</th>
-            <th data-sort="index_membership.priority_score">Index</th>
-            <th data-sort="essential_insights.status.label">Insight</th>
-            <th data-sort="essential_insights.freshness_days">Fresh</th>
-            <th data-sort="essential_insights.source_mix">Source</th>
-            <th data-sort="essential_insights.needs_work">Needs</th>
-            <th data-sort="activist.long_count">Activist</th>
-            <th data-sort="deep_dive.date">Deep dive</th>
-          </tr>
+        <thead id="holdings-thead">
+          <tr id="holdings-thead-row"></tr>
         </thead>
         <tbody id="tbody"></tbody>
       </table>
@@ -830,9 +848,60 @@ let data = null;
 let oauthConfig = null;
 let devicePollTimer = null;
 let devicePollCancelled = false;
+const HOLDINGS_SORT_KEY = 'ssp_holdings_sort_v1';
+const HOLDINGS_COL_GROUPS_KEY = 'ssp_holdings_col_groups_v1';
+const HOLDINGS_COLUMNS = [
+  { id: 'ticker', label: 'Ticker', sort: 'ticker', group: 'core' },
+  { id: 'company', label: 'Company', sort: 'company', group: 'core' },
+  { id: 'market', label: 'Mkt', sort: 'market', group: 'core' },
+  { id: 'sleeve', label: 'Sleeve', sort: 'classification.investment_sleeve_label', group: 'core' },
+  { id: 'stance', label: 'Stance', sort: 'classification.stance', group: 'core' },
+  { id: 'valuation', label: 'Val', sort: 'component_valuation.status', group: 'core' },
+  { id: 'value', label: 'Value', sort: 'component_valuation.total_equity_value_per_share.base', group: 'core' },
+  { id: 'vs_price', label: 'vs price', sort: 'component_valuation.upside_downside_pct.base', group: 'core' },
+  { id: 'irr', label: 'IRR', sort: 'classification.analysis_irr_pct', group: 'core' },
+  { id: 'zone', label: 'Zone', sort: 'power_zones.primary', group: 'core' },
+  { id: 'deep_dive', label: 'Dive', sort: 'deep_dive.date', group: 'core' },
+  { id: 'pdfs', label: 'PDFs', sort: 'pdf_count', group: 'ops' },
+  { id: 'completeness', label: 'Complete', sort: 'completeness', group: 'ops' },
+  { id: 'download', label: 'Download', sort: 'last_download', group: 'ops' },
+  { id: 'archetype', label: 'Archetype', sort: 'classification.archetype', group: 'ops' },
+  { id: 'insight', label: 'Insight', sort: 'essential_insights.status.label', group: 'insights' },
+  { id: 'fresh', label: 'Fresh', sort: 'essential_insights.freshness_days', group: 'insights' },
+  { id: 'source', label: 'Source', sort: 'essential_insights.source_mix', group: 'insights' },
+  { id: 'needs', label: 'Needs', sort: 'essential_insights.needs_work', group: 'insights' },
+  { id: 'index', label: 'Index', sort: 'index_membership.priority_score', group: 'index' },
+  { id: 'activist', label: 'Activist', sort: 'activist.long_count', group: 'index' },
+];
+const COL_GROUP_META = [
+  { id: 'ops', label: 'Ops' },
+  { id: 'insights', label: 'Insights' },
+  { id: 'index', label: 'Index' },
+];
+
 let selected = null;
-let sortKey = 'ticker';
-let sortAsc = true;
+let sortKey = (() => {
+  try {
+    const saved = JSON.parse(localStorage.getItem(HOLDINGS_SORT_KEY) || 'null');
+    if (saved && saved.key) return saved.key;
+  } catch (_) { /* ignore */ }
+  return 'classification.stance';
+})();
+let sortAsc = (() => {
+  try {
+    const saved = JSON.parse(localStorage.getItem(HOLDINGS_SORT_KEY) || 'null');
+    if (saved && typeof saved.asc === 'boolean') return saved.asc;
+  } catch (_) { /* ignore */ }
+  return true;
+})();
+let columnGroups = (() => {
+  const defaults = { ops: false, insights: false, index: false };
+  try {
+    return { ...defaults, ...JSON.parse(localStorage.getItem(HOLDINGS_COL_GROUPS_KEY) || '{}') };
+  } catch (_) {
+    return defaults;
+  }
+})();
 let marketFilter = 'ALL';
 let sleeveFilter = 'ALL';
 let valuationFilter = 'ALL';
@@ -1049,9 +1118,7 @@ function applyRouteFromHash() {
     }
   }
   if (route.view !== 'holdings') {
-    selected = null;
-    renderTable();
-    document.getElementById('detail').innerHTML = '';
+    clearTickerSelection({ syncHash: false });
     syncRouteHash();
     return true;
   }
@@ -1132,8 +1199,108 @@ function valuationHelpers() {
     fmtPct,
     fmtSignedDollar,
     linkHtml,
+    stanceBadgeClass: STANCE_BADGE,
+    personaMeta: (data && data.power_zones && data.power_zones.personas) || {},
     ghRepo: (data && data.summary && data.summary.github_repo) || '',
   };
+}
+
+function persistHoldingsSort() {
+  try { localStorage.setItem(HOLDINGS_SORT_KEY, JSON.stringify({ key: sortKey, asc: sortAsc })); } catch (_) { /* ignore */ }
+}
+
+function persistColumnGroups() {
+  try { localStorage.setItem(HOLDINGS_COL_GROUPS_KEY, JSON.stringify(columnGroups)); } catch (_) { /* ignore */ }
+}
+
+function visibleHoldingsColumns() {
+  return HOLDINGS_COLUMNS.filter((col) => col.group === 'core' || columnGroups[col.group]);
+}
+
+function renderPdfCell(t) {
+  const drive = Number(t.pdf_count || 0);
+  const sec = Number(t.sec_filings || 0);
+  const driveHtml = t.pdf_store?.drive_folder_url
+    ? `<a class="source-open-link" href="${t.pdf_store.drive_folder_url}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${drive}</a>`
+    : String(drive);
+  if (!drive && !sec) return '<span class="mono" style="color:var(--text-muted)">0</span>';
+  if (!drive && sec) {
+    return `<span class="mono" title="${sec} SEC filings">0 · +${sec} SEC</span>`;
+  }
+  return `<span class="mono">${driveHtml}${sec ? ` <span style="color:var(--text-muted);font-size:11px">+${sec} SEC</span>` : ''}</span>`;
+}
+
+function renderZoneCell(t) {
+  if (window.ValuationViz) {
+    return ValuationViz.renderPowerZoneCell(t, escapeHtml, (data.power_zones && data.power_zones.personas) || {});
+  }
+  return '<span class="mono" style="color:var(--text-muted)">—</span>';
+}
+
+function renderHumanReviewBanner(t) {
+  const hr = t.human_review;
+  if (!hr || typeof hr !== 'object') return '';
+  const notes = Array.isArray(hr.notes) ? hr.notes.filter(Boolean) : [];
+  const hasBody = !!(hr.approved_stance || hr.override_reason || hr.entry_band_15pct
+    || hr.live_price_confirmed || notes.length);
+  if (!hasBody) return '';
+  return `<div class="human-review-banner">
+    <strong>Human review</strong>
+    ${hr.approved_stance ? `<div class="hr-line">Approved stance: <strong>${escapeHtml(hr.approved_stance)}</strong>${hr.model_stance && hr.model_stance !== hr.approved_stance ? ` (model: ${escapeHtml(hr.model_stance)})` : ''}</div>` : ''}
+    ${hr.override_reason ? `<div class="hr-line">${escapeHtml(hr.override_reason)}</div>` : ''}
+    ${hr.entry_band_15pct ? `<div class="hr-line">Entry band (~15% IRR): ${escapeHtml(hr.entry_band_15pct)}</div>` : ''}
+    ${hr.live_price_confirmed ? `<div class="hr-line">Price confirmed: ${escapeHtml(hr.live_price_confirmed)}</div>` : ''}
+    ${notes.length ? `<details open><summary>${notes.length} note${notes.length === 1 ? '' : 's'}</summary><ul>${notes.map((n) => `<li>${escapeHtml(typeof n === 'string' ? n : (n.text || n.note || JSON.stringify(n)))}</li>`).join('')}</ul></details>` : ''}
+  </div>`;
+}
+
+function renderReadNextCard(t) {
+  const bullets = ((t.essential_insights || {}).bullets || []).slice(0, 3);
+  const thesis = t.one_line_thesis || t.deep_dive?.executive_summary;
+  const links = [
+    t.deep_dive?.github_url ? `<a class="research-link" href="${t.deep_dive.github_url}" target="_blank" rel="noopener">Deep dive${t.deep_dive.date ? ` · ${escapeHtml(t.deep_dive.date)}` : ''} →</a>` : '',
+    t.links?.folder ? linkHtml(t.links.folder, 'Folder →', 'research-link') : '',
+    t.links?.valuation ? linkHtml(t.links.valuation, 'valuation.json →', 'research-link') : '',
+    t.links?.adversarial ? linkHtml(t.links.adversarial, 'Milly →', 'research-link') : '',
+  ].filter(Boolean);
+  if (!thesis && !bullets.length && !links.length) {
+    return `<div class="detail-section read-next-card"><h3>Read next</h3><div class="summary" style="color:var(--text-muted)">No deep dive or ranked insights yet.</div></div>`;
+  }
+  return `<div class="detail-section read-next-card">
+    <h3>Read next</h3>
+    <div class="research-box">
+      ${thesis ? `<div class="thesis-line">${escapeHtml(stripMd(String(thesis).slice(0, 280)))}</div>` : ''}
+      ${bullets.length ? `<ul class="workbench-checks" style="margin-top:8px">${bullets.map((b) => `<li><strong>${escapeHtml(b.title || b.source || 'Insight')}</strong><div class="tier-sub">${escapeHtml(b.summary || '')}</div></li>`).join('')}</ul>` : ''}
+      ${links.length ? `<div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:12px">${links.join('')}</div>` : ''}
+    </div>
+  </div>`;
+}
+
+function clearTickerSelection(opts = {}) {
+  selected = null;
+  const grid = document.getElementById('main-grid');
+  grid.classList.remove('model-expanded');
+  grid.classList.add('detail-closed');
+  document.getElementById('detail').innerHTML = '<div class="loading">Select a ticker</div>';
+  renderTable();
+  if (opts.syncHash !== false) syncRouteHash();
+}
+
+function renderColumnGroupToggles() {
+  const group = document.getElementById('col-group-toggles');
+  if (!group) return;
+  group.innerHTML = COL_GROUP_META.map((g) => {
+    const active = columnGroups[g.id] ? ' active' : '';
+    return `<button type="button" class="filter-btn${active}" data-col-group="${g.id}">${escapeHtml(g.label)}</button>`;
+  }).join('');
+}
+
+function renderHoldingsThead() {
+  const row = document.getElementById('holdings-thead-row');
+  if (!row) return;
+  row.innerHTML = visibleHoldingsColumns().map((col) =>
+    `<th data-sort="${escapeHtml(col.sort)}" data-col="${escapeHtml(col.id)}">${escapeHtml(col.label)}</th>`
+  ).join('');
 }
 
 function renderValueRangeCell(t) {
@@ -2645,7 +2812,12 @@ function filtered() {
         return false;
       }
     }
-    if (needsWork && t.completeness >= 80 && !t.essential_insights?.needs_work) return false;
+    if (needsWork) {
+      const crit = Number(t.valuation_decision?.critical_gap_count || 0);
+      const insightNeeds = !!t.essential_insights?.needs_work;
+      const incomplete = (t.completeness || 0) < 80;
+      if (!insightNeeds && crit <= 0 && !incomplete) return false;
+    }
     if (window.ValuationViz && !ValuationViz.matchesValuationFilter(t, valuationFilter)) return false;
     if (q) {
       const e = t.essential_insights || {};
@@ -2672,6 +2844,20 @@ function filtered() {
       bv = b.classification?.analysis_irr_pct ?? parseIrrPct(b.classification?.implied_irr);
       av = av == null ? -Infinity : av;
       bv = bv == null ? -Infinity : bv;
+    } else if (sortKey === 'classification.stance') {
+      const order = { accumulate: 0, hold: 1, watch: 2, trim: 3, sell: 4, pass: 5 };
+      av = order[a.classification?.stance] ?? 9;
+      bv = order[b.classification?.stance] ?? 9;
+    } else if (sortKey === 'power_zones.primary') {
+      const label = (t) => {
+        if (window.ValuationViz) {
+          const z = ValuationViz.primaryPowerZone(t, (data.power_zones && data.power_zones.personas) || {});
+          return z.label || '';
+        }
+        return ((t.power_zones && t.power_zones.in_zone) || [])[0] || '';
+      };
+      av = label(a).toLowerCase();
+      bv = label(b).toLowerCase();
     } else if (sortKey === 'decision_summary.lens_blend_pct') {
       av = a.decision_summary?.lens_blend_pct;
       bv = b.decision_summary?.lens_blend_pct;
@@ -2727,42 +2913,74 @@ function filtered() {
   });
 }
 
-function renderTable() {
-  const rows = filtered();
-  const tbody = document.getElementById('tbody');
-  document.getElementById('empty').style.display = rows.length ? 'none' : 'block';
-  tbody.innerHTML = rows.map(t => `
-    <tr class="${selected === t.ticker ? 'selected' : ''}" data-ticker="${t.ticker}">
-      <td class="mono ticker-cell">${t.ticker}${t.equity_model?.ready ? ` <span class="badge badge-ok" title="Earnings model ${t.equity_model.production_spec || 'v5'} ready">M</span>` : ''}${t.onboard?.phase && t.onboard.phase !== 'complete' ? `<span class="onboard-badge">${t.onboard.phase}</span>` : ''}</td>
-      <td>${t.company}</td>
-      <td><span class="badge ${MARKET_BADGE[t.market] || 'badge-us'}">${t.market}</span></td>
-      <td class="mono">${t.pdf_store?.drive_folder_url
-        ? `<a class="source-open-link" href="${t.pdf_store.drive_folder_url}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${t.pdf_count}</a>`
-        : t.pdf_count}${t.sec_filings ? ` <span style="color:var(--text-muted);font-size:11px">+${t.sec_filings} SEC</span>` : ''}</td>
-      <td>
+function renderHoldingsCell(colId, t) {
+  switch (colId) {
+    case 'ticker':
+      return `<td class="mono ticker-cell">${t.ticker}${t.equity_model?.ready ? ` <span class="badge badge-ok" title="Earnings model ${t.equity_model.production_spec || 'v5'} ready">M</span>` : ''}${t.onboard?.phase && t.onboard.phase !== 'complete' ? `<span class="onboard-badge">${t.onboard.phase}</span>` : ''}</td>`;
+    case 'company':
+      return `<td class="company-cell" title="${escapeHtml(t.company)}">${escapeHtml(t.company)}</td>`;
+    case 'market':
+      return `<td><span class="badge ${MARKET_BADGE[t.market] || 'badge-us'}">${t.market}</span></td>`;
+    case 'sleeve':
+      return `<td>${t.classification?.investment_sleeve_label && t.classification.investment_sleeve_label !== '—'
+        ? `<span class="badge badge-sleeve">${escapeHtml(t.classification.investment_sleeve_label)}</span>`
+        : '<span style="color:var(--text-muted)">—</span>'}</td>`;
+    case 'stance':
+      return `<td><span class="badge ${STANCE_BADGE[t.classification?.stance] || 'badge-warn'}">${t.classification?.stance || '—'}</span></td>`;
+    case 'valuation':
+      return `<td>${renderValuationStatusCell(t)}</td>`;
+    case 'value':
+      return `<td>${renderValueRangeCell(t)}</td>`;
+    case 'vs_price':
+      return `<td>${renderPriceToBaseCell(t)}</td>`;
+    case 'irr':
+      return `<td>${renderIrrCell(t)}</td>`;
+    case 'zone':
+      return `<td>${renderZoneCell(t)}</td>`;
+    case 'deep_dive':
+      return `<td>${renderDeepDiveCell(t)}</td>`;
+    case 'pdfs':
+      return `<td>${renderPdfCell(t)}</td>`;
+    case 'completeness':
+      return `<td>
         <div style="display:flex;align-items:center;gap:8px">
           <div class="bar-wrap"><div class="bar-fill" style="width:${t.completeness}%"></div></div>
           <span class="mono" style="font-size:11px">${t.completeness}%</span>
         </div>
-      </td>
-      <td class="mono" style="font-size:11px;color:var(--text-secondary)">${t.last_download || '—'}</td>
-      <td><span class="badge ${ARCHETYPE_BADGE[t.classification?.archetype] || 'badge-warn'}">${t.classification?.archetype || '—'}</span></td>
-      <td>${t.classification?.investment_sleeve_label && t.classification.investment_sleeve_label !== '—'
-        ? `<span class="badge badge-sleeve">${escapeHtml(t.classification.investment_sleeve_label)}</span>`
-        : '<span style="color:var(--text-muted)">—</span>'}</td>
-      <td>${renderValueRangeCell(t)}</td>
-      <td>${renderPriceToBaseCell(t)}</td>
-      <td>${renderValuationStatusCell(t)}</td>
-      <td><span class="badge ${STANCE_BADGE[t.classification?.stance] || 'badge-warn'}">${t.classification?.stance || '—'}</span></td>
-      <td>${window.IndexViz ? IndexViz.renderHoldingsCell(t.index_membership) : '—'}</td>
-      <td>${renderInsightCell(t)}</td>
-      <td>${renderInsightFreshCell(t)}</td>
-      <td>${renderInsightSourceCell(t)}</td>
-      <td>${renderInsightNeedsCell(t)}</td>
-      <td>${window.ActivistViz ? ActivistViz.renderActivistBadge(t.activist) : '—'}</td>
-      <td>${renderDeepDiveCell(t)}</td>
+      </td>`;
+    case 'download':
+      return `<td class="mono" style="font-size:11px;color:var(--text-secondary)">${t.last_download || '—'}</td>`;
+    case 'archetype':
+      return `<td><span class="badge ${ARCHETYPE_BADGE[t.classification?.archetype] || 'badge-warn'}">${t.classification?.archetype || '—'}</span></td>`;
+    case 'insight':
+      return `<td>${renderInsightCell(t)}</td>`;
+    case 'fresh':
+      return `<td>${renderInsightFreshCell(t)}</td>`;
+    case 'source':
+      return `<td>${renderInsightSourceCell(t)}</td>`;
+    case 'needs':
+      return `<td>${renderInsightNeedsCell(t)}</td>`;
+    case 'index':
+      return `<td>${window.IndexViz ? IndexViz.renderHoldingsCell(t.index_membership) : '—'}</td>`;
+    case 'activist':
+      return `<td>${window.ActivistViz ? ActivistViz.renderActivistBadge(t.activist) : '—'}</td>`;
+    default:
+      return '<td>—</td>';
+  }
+}
+
+function renderTable() {
+  const rows = filtered();
+  const cols = visibleHoldingsColumns();
+  renderHoldingsThead();
+  renderColumnGroupToggles();
+  const tbody = document.getElementById('tbody');
+  document.getElementById('empty').style.display = rows.length ? 'none' : 'block';
+  tbody.innerHTML = rows.map((t) => `
+    <tr class="${selected === t.ticker ? 'selected' : ''}" data-ticker="${t.ticker}">
+      ${cols.map((col) => renderHoldingsCell(col.id, t)).join('')}
     </tr>`).join('');
-  tbody.querySelectorAll('tr').forEach(tr => {
+  tbody.querySelectorAll('tr').forEach((tr) => {
     tr.addEventListener('click', () => selectTicker(tr.dataset.ticker));
   });
 }
@@ -2811,37 +3029,52 @@ function selectTicker(ticker, opts = {}) {
   const modelBundle = getEquityModelBundle(ticker);
   const hasModel = modelBundle && modelBundle.model_ready;
   const hasValuationWorkbench = !!t.valuation_workbench;
-  document.getElementById('main-grid').classList.toggle('model-expanded', !!hasModel || hasValuationWorkbench);
+  const grid = document.getElementById('main-grid');
+  grid.classList.remove('detail-closed');
+  grid.classList.toggle('model-expanded', !!hasModel || hasValuationWorkbench);
   const modelHtml = (typeof EquityModelViz !== 'undefined' && hasModel)
     ? EquityModelViz.renderSection(modelBundle, { escapeHtml, linkHtml })
     : '';
   const developments = detailDevelopments(t);
   const iv = window.InsightsViz;
-  const tier0 = '';
-  const tier1 = iv ? iv.renderIdentityLine(t.classification, escapeHtml) : '';
-  const tier2 = '';
+  const identityLine = iv ? iv.renderIdentityLine(t.classification, escapeHtml) : '';
+  const activeLenses = (t.lenses && (t.lenses.active || t.lenses.personas)) || [];
+  const lensChips = (iv && activeLenses.length)
+    ? iv.renderActiveLensChips(
+      activeLenses,
+      t.lenses.silent_count || 0,
+      expandedPersona,
+      t.lenses,
+      escapeHtml,
+      t.power_zones
+    )
+    : '';
   const essentialInsights = iv
     ? iv.renderEssentialInsights(t.essential_insights, escapeHtml, linkHtml)
     : '';
   const trendBadges = iv && t.kpi_trends ? iv.renderTickerTrendBadges(t.kpi_trends, escapeHtml) : '';
   const trendSection = trendBadges
-    ? `<div class="detail-section"><h3>KPI trend</h3><div>${trendBadges}<span class="tier-sub" style="margin-left:6px">second-derivative signals — see Insights → Inflections</span></div></div>`
+    ? `<details class="detail-section"><summary>KPI trend</summary><div style="margin-top:8px">${trendBadges}<span class="tier-sub" style="margin-left:6px">second-derivative signals — see Insights → Inflections</span></div></details>`
     : '';
   const pzPersonas = (data.power_zones?.personas) || {};
   const pzInZone = (t.power_zones?.in_zone) || [];
+  const primaryZone = window.ValuationViz
+    ? ValuationViz.primaryPowerZone(t, pzPersonas)
+    : null;
   const powerZoneSection = pzInZone.length
-    ? `<div class="detail-section"><h3>Power zones</h3><div class="lens-chips">${pzInZone.map(pid => {
+    ? `<div class="detail-section"><h3>Power zones${primaryZone?.label ? ` · <span class="mono" style="font-size:11px">${escapeHtml(primaryZone.label)}</span>` : ''}</h3><div class="lens-chips">${pzInZone.map(pid => {
         const z = (t.power_zones.zones || {})[pid] || {};
         const meta = pzPersonas[pid] || {};
         return `<span class="lens-chip" title="${escapeHtml(meta.framework || '')} · fit ${z.fit != null ? Math.round(z.fit * 100) + '%' : '—'} · matched: ${(z.matched_fields || []).join(', ')}">⚡ ${escapeHtml(meta.label || pid)} · ${z.score != null ? z.score : '—'}</span>`;
       }).join('')}</div>
-      <p class="tier-sub" style="margin-top:6px">Personas whose framework has demonstrated alpha in this company type; lens IRRs default to these.</p></div>`
-    : '';
+      <p class="tier-sub" style="margin-top:6px">Personas whose framework fits this company type; lens IRRs default to these.</p></div>`
+    : `<div class="detail-section"><h3>Power zones</h3><div class="summary" style="color:var(--text-muted)">No persona zone for this name yet.</div></div>`;
   const dossier = t.dossier;
   const dossierTimeline = (dossier?.timeline || []).slice(0, 12);
   const dossierSection = dossier
-    ? `<div class="detail-section">
-      <h3>Company context${dossier.as_of ? ` · <span class="mono" style="font-size:11px">${escapeHtml(dossier.as_of)}</span>` : ''}${dossier.stale ? ' <span class="badge badge-warn">stale</span>' : ''}</h3>
+    ? `<details class="detail-section">
+      <summary>Company context${dossier.as_of ? ` · ${escapeHtml(dossier.as_of)}` : ''}${dossier.stale ? ' · stale' : ''}</summary>
+      <div style="margin-top:10px">
       ${dossier.industry ? `
       <div class="research-box" style="margin-bottom:10px">
         ${dossier.industry.structure ? `<div class="hr-line"><strong>Structure:</strong> ${escapeHtml(dossier.industry.structure)}</div>` : ''}
@@ -2857,8 +3090,9 @@ function selectTicker(ticker, opts = {}) {
             <div class="dev-label">${e.evidence_url ? linkHtml(e.evidence_url, e.label) : escapeHtml(e.label)}</div>
           </li>`).join('')}
       </ul>` : ''}
-      ${!dossier.has_agent_dossier ? `<p class="tier-sub" style="margin-top:6px">No agent dossier yet — timeline assembled from recent high-score insights. A Marvin deep-dive run will write the full history + industry view.</p>` : ''}
-    </div>`
+      ${!dossier.has_agent_dossier ? `<p class="tier-sub" style="margin-top:6px">No agent dossier yet — timeline assembled from recent high-score insights.</p>` : ''}
+      </div>
+    </details>`
     : '';
   const researchMemory = iv
     ? iv.renderResearchMemory(t.research_memory, escapeHtml, linkHtml, GH_REPO)
@@ -2866,71 +3100,49 @@ function selectTicker(ticker, opts = {}) {
   const discussants = (data.insights?.ticker_discussants || {})[t.ticker]
     || (data.insights?.ticker_discussants || {})[t.ticker.toUpperCase()]
     || [];
-  const tier3 = iv && (t.insights?.length || discussants.length)
-    ? iv.renderExternalContext(t.insights, activeInsightFilter, escapeHtml, linkHtml, discussants, GH_REPO)
+  const externalContext = iv && (t.insights?.length || discussants.length)
+    ? `<details class="detail-section"><summary>External context</summary><div style="margin-top:10px">${iv.renderExternalContext(t.insights, activeInsightFilter, escapeHtml, linkHtml, discussants, GH_REPO)}</div></details>`
     : '';
-  const consensusDetail = iv && t.lenses ? iv.renderConsensusDetail(t.lenses, escapeHtml) : '';
-  const filingRef = t.classification?.filing_irr_ref && t.classification?.irr_source === 'total_synthesis'
-    ? `<div class="tier-sub" style="margin-top:6px">Filing ref: ${escapeHtml(t.classification.filing_irr_ref)}</div>`
+  const consensusDetail = iv && t.lenses
+    ? `<details class="detail-section"><summary>Lens consensus</summary><div style="margin-top:10px">${iv.renderConsensusDetail(t.lenses, escapeHtml)}</div></details>`
     : '';
+  const icSection = t.investment_committee ? renderInvestmentCommittee(t) : '';
+  const thesisLine = t.one_line_thesis
+    ? `<div class="detail-thesis">${escapeHtml(stripMd(t.one_line_thesis))}</div>`
+    : '';
+  const diveLink = t.deep_dive?.github_url
+    ? `<a class="research-link" href="${t.deep_dive.github_url}" target="_blank" rel="noopener" style="margin-left:8px">Dive →</a>`
+    : '';
+
   document.getElementById('detail').innerHTML = `
-    <h2>${t.ticker}</h2>
-    <div class="subhead">${escapeHtml(t.company)} · ${escapeHtml(t.exchange)} · ${linkHtml(t.links?.folder, t.folder)}</div>
-
-    ${t.human_review ? `
-    <div class="human-review-banner">
-      <strong>Human review</strong>
-      ${t.human_review.approved_stance ? `<div class="hr-line">Approved stance: <strong>${escapeHtml(t.human_review.approved_stance)}</strong>${t.human_review.model_stance && t.human_review.model_stance !== t.human_review.approved_stance ? ` (model: ${escapeHtml(t.human_review.model_stance)})` : ''}</div>` : ''}
-      ${t.human_review.override_reason ? `<div class="hr-line">${escapeHtml(t.human_review.override_reason)}</div>` : ''}
-      ${t.human_review.entry_band_15pct ? `<div class="hr-line">Entry band (~15% IRR): ${escapeHtml(t.human_review.entry_band_15pct)}</div>` : ''}
-      ${t.human_review.live_price_confirmed ? `<div class="hr-line">Price confirmed: ${escapeHtml(t.human_review.live_price_confirmed)}</div>` : ''}
-    </div>` : ''}
-
-    ${tier0 || `
-    <div class="detail-section tier-0">
-      <div class="metric-grid metric-grid-3">
-        <div class="metric"><div class="k">Stance</div><div class="v"><span class="badge ${STANCE_BADGE[t.classification?.stance] || 'badge-warn'}">${t.classification?.stance || '—'}</span></div></div>
-        <div class="metric"><div class="k">Valuation status</div><div class="v">${renderValuationStatusCell(t)}</div></div>
-        <div class="metric"><div class="k">As of</div><div class="v mono">${escapeHtml(t.valuation_workbench?.as_of || t.classification?.analysis_as_of || '—')}</div></div>
-      </div>
-    </div>`}
-
-    ${tier1}
+    <div class="detail-sticky-header">
+      <button type="button" class="detail-close" data-detail-close title="Close detail (Esc)">Close</button>
+      <h2 style="margin:0">${t.ticker}${diveLink}</h2>
+      <div class="subhead">${escapeHtml(t.company)} · ${escapeHtml(t.exchange || t.market || '')} · ${linkHtml(t.links?.folder, t.folder || t.ticker)}</div>
+      ${thesisLine}
+    </div>
 
     ${window.ValuationViz ? ValuationViz.renderDecisionStrip(t, valuationHelpers()) : ''}
 
+    ${renderHumanReviewBanner(t)}
+
+    ${identityLine}
+    ${lensChips || ''}
+
     ${renderValuationWorkbench(t)}
-
     ${window.ValuationViz ? ValuationViz.renderPropertiesPanel(t, valuationHelpers()) : ''}
-
     ${renderPricingAnalysis(t)}
-
     ${window.ValuationViz ? ValuationViz.renderLegacyComponentNote(t, escapeHtml) : ''}
     ${t.valuation_workbench ? '' : renderComponentValuation(t)}
 
-    ${tier2}
-
-    ${essentialInsights}
-
-    ${trendSection}
-
     ${powerZoneSection}
 
-    ${dossierSection}
-
-    ${researchMemory}
-
-    ${tier3}
-
-    ${renderTotalReturnSection(t)}
-
-    ${window.ActivistViz ? ActivistViz.renderTickerActivistSection(t.activist, { escapeHtml }) : ''}
+    ${renderReadNextCard(t)}
 
     ${t.deep_dive ? `
-    <div class="detail-section">
-      <h3>Marvin deep dive · ${t.deep_dive.date || ''}</h3>
-      <div class="research-box">
-        ${t.one_line_thesis ? `<div class="thesis-line">${escapeHtml(stripMd(t.one_line_thesis))}</div>` : ''}
+    <details class="detail-section">
+      <summary>Marvin deep dive · ${escapeHtml(t.deep_dive.date || '')}</summary>
+      <div class="research-box" style="margin-top:10px">
         ${t.deep_dive.executive_summary
           ? `<div class="summary">${escapeHtml(stripMd(t.deep_dive.executive_summary))}</div>`
           : `<div class="summary" style="color:var(--text-muted)">Open the full report for the executive summary.</div>`}
@@ -2942,26 +3154,23 @@ function selectTicker(ticker, opts = {}) {
           ${t.links?.thesis ? `<a class="research-link" href="${t.links.thesis}" target="_blank" rel="noopener">Thesis →</a>` : ''}
         </div>
       </div>
-    </div>` : ''}
+    </details>` : ''}
 
+    ${((t.essential_insights || {}).bullets || []).length ? `<details class="detail-section"><summary>Essential insights</summary><div style="margin-top:10px">${essentialInsights}</div></details>` : ''}
+    ${trendSection}
+    ${dossierSection}
+    ${(t.research_memory && t.research_memory.claim_count) ? `<details class="detail-section"><summary>Research memory</summary><div style="margin-top:10px">${researchMemory}</div></details>` : ''}
+    ${externalContext}
+    ${consensusDetail}
+    ${icSection}
+
+    ${renderTotalReturnSection(t)}
+    ${window.ActivistViz ? ActivistViz.renderTickerActivistSection(t.activist, { escapeHtml }) : ''}
     ${modelHtml}
 
-    <details class="detail-section tier-4">
-      <summary>Infrastructure</summary>
-      <div class="metric-grid" style="margin-top:10px">
-        <div class="metric"><div class="k">README</div><div class="v">${t.readme ? '✓' : '✗'}</div></div>
-        <div class="metric"><div class="k">Download script</div><div class="v">${t.download_script ? '✓' : '✗'}</div></div>
-        <div class="metric"><div class="k">Index file</div><div class="v">${t.index_file ? '✓' : '✗'}</div></div>
-        <div class="metric"><div class="k">Research dir</div><div class="v">${t.research_dir ? '✓' : '✗'}</div></div>
-        <div class="metric"><div class="k">Completeness</div><div class="v">${t.completeness}%</div></div>
-        <div class="metric"><div class="k">Last download</div><div class="v">${t.last_download || '—'}</div></div>
-        <div class="metric"><div class="k">Last research</div><div class="v">${t.last_research || '—'}</div></div>
-      </div>
-    </details>
-
-    <div class="detail-section">
-      <h3>Recent developments</h3>
-      <ul class="dev-list">
+    <details class="detail-section">
+      <summary>Recent developments</summary>
+      <ul class="dev-list" style="margin-top:8px">
         ${(developments.length ? developments : [{ date: '—', label: 'No developments tracked yet', source: '' }]).map(d => `
           <li>
             <div class="dev-date">${d.date || ''} · ${d.type || ''}</div>
@@ -2969,7 +3178,19 @@ function selectTicker(ticker, opts = {}) {
             ${d.source ? `<span class="dev-src">${d.source}${d.url && d.type === '8-K' ? ' · SEC' : ''}</span>` : ''}
           </li>`).join('')}
       </ul>
-    </div>
+    </details>
+
+    <details class="detail-section tier-4">
+      <summary>Infrastructure · ${t.completeness}% · ${Number(t.pdf_count || 0)} PDFs${t.sec_filings ? ` · ${t.sec_filings} SEC` : ''}</summary>
+      <div class="metric-grid" style="margin-top:10px">
+        <div class="metric"><div class="k">README</div><div class="v">${t.readme ? '✓' : '✗'}</div></div>
+        <div class="metric"><div class="k">Download script</div><div class="v">${t.download_script ? '✓' : '✗'}</div></div>
+        <div class="metric"><div class="k">Index file</div><div class="v">${t.index_file ? '✓' : '✗'}</div></div>
+        <div class="metric"><div class="k">Research dir</div><div class="v">${t.research_dir ? '✓' : '✗'}</div></div>
+        <div class="metric"><div class="k">Last download</div><div class="v">${t.last_download || '—'}</div></div>
+        <div class="metric"><div class="k">Last research</div><div class="v">${t.last_research || '—'}</div></div>
+      </div>
+    </details>
 
     ${t.recent_files.length ? `
     <details class="detail-section">
@@ -2986,6 +3207,8 @@ function selectTicker(ticker, opts = {}) {
     EquityModelViz.afterRender(modelBundle);
   }
   wireDetailEvents(ticker);
+  const closeBtn = document.querySelector('#detail [data-detail-close]');
+  if (closeBtn) closeBtn.addEventListener('click', () => clearTickerSelection());
   if (opts.syncHash !== false) syncRouteHash();
 }
 
@@ -3066,16 +3289,30 @@ function onFilterClick(btn) {
 
 document.getElementById('search').addEventListener('input', renderTable);
 document.querySelector('#holdings-view .toolbar').addEventListener('click', (e) => {
+  const colBtn = e.target.closest('[data-col-group]');
+  if (colBtn) {
+    const id = colBtn.dataset.colGroup;
+    columnGroups[id] = !columnGroups[id];
+    persistColumnGroups();
+    renderTable();
+    return;
+  }
   const btn = e.target.closest('.filter-btn');
   if (btn) onFilterClick(btn);
 });
-document.querySelectorAll('thead th').forEach(th => {
-  th.addEventListener('click', () => {
-    const key = th.dataset.sort;
-    if (sortKey === key) sortAsc = !sortAsc;
-    else { sortKey = key; sortAsc = true; }
-    renderTable();
-  });
+document.getElementById('holdings-thead').addEventListener('click', (e) => {
+  const th = e.target.closest('th[data-sort]');
+  if (!th) return;
+  const key = th.dataset.sort;
+  if (sortKey === key) sortAsc = !sortAsc;
+  else { sortKey = key; sortAsc = true; }
+  persistHoldingsSort();
+  renderTable();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && selected && activeView === 'holdings') {
+    clearTickerSelection();
+  }
 });
 
 window.addEventListener('hashchange', () => {

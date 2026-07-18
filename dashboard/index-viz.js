@@ -9,16 +9,31 @@
     member: 'badge-us',
     inclusion_candidate: 'badge-warn',
     deletion_risk: 'badge-bad',
+    banding_hold: 'badge-purple',
+    committee_watch: 'badge-purple',
     ineligible: 'badge-purple',
     n_a: 'badge-warn',
   };
 
   const STATUS_LABEL = {
     member: 'Member',
-    inclusion_candidate: 'Candidate',
+    inclusion_candidate: 'Likely add',
     deletion_risk: 'Deletion risk',
+    banding_hold: 'Banding hold',
+    committee_watch: 'Committee watch',
     ineligible: 'Ineligible',
     n_a: 'n/a',
+  };
+
+  const RECON_LABEL = {
+    likely_add: 'likely add',
+    banding_hold: 'banding hold',
+    likely_delete: 'likely delete',
+    committee_watch: 'committee watch',
+    size_band_watch: 'size band',
+    announced: 'report: announced',
+    provisional: 'report: provisional',
+    rumor: 'report: rumor',
   };
 
   function esc(s) {
@@ -56,9 +71,15 @@
 
   function bestDistance(entry) {
     const cards = (entry && entry.scorecards) || [];
+    const watch = new Set([
+      'inclusion_candidate',
+      'deletion_risk',
+      'banding_hold',
+      'committee_watch',
+    ]);
     let best = null;
     for (const sc of cards) {
-      if (sc.status !== 'inclusion_candidate' && sc.status !== 'deletion_risk') continue;
+      if (!watch.has(sc.status)) continue;
       if (sc.distance_to_boundary_pct == null) continue;
       const a = Math.abs(sc.distance_to_boundary_pct);
       if (best == null || a < Math.abs(best)) best = sc.distance_to_boundary_pct;
@@ -141,15 +162,22 @@
       fi && fi.pct_of_float_base != null && fi.status !== 'n_a'
         ? ` · float ${formatPctFloat(fi.pct_of_float_base, fi.float_flag)}`
         : '';
+    const watchStatuses = new Set([
+      'inclusion_candidate',
+      'deletion_risk',
+      'banding_hold',
+      'committee_watch',
+    ]);
     const title = mem
       ? `In: ${mem}${floatBit}`
       : (entry.scorecards || [])
-          .filter((s) => s.status === 'inclusion_candidate' || s.status === 'deletion_risk')
+          .filter((s) => watchStatuses.has(s.status))
           .map((s) => `${s.index}: ${s.status}`)
           .slice(0, 3)
           .join('; ') || status;
+    const showDist = watchStatuses.has(status);
     return renderBadge(status, {
-      distance: status === 'inclusion_candidate' ? bestDistance(entry) : null,
+      distance: showDist ? bestDistance(entry) : null,
       confirmedSoon: confirmedSoon(entry),
       title,
     });
@@ -369,12 +397,15 @@
         const inferred = r.assumed_graduation
           ? ' <span class="badge badge-purple" title="R2000 exit inferred from mcap">pair inferred</span>'
           : '';
-        const src = r.event_source === 'candidate' ? 'candidate' : r.confidence || '—';
+        const src =
+          r.event_source === 'candidate' || r.predicted || r.confidence === 'rules_only'
+            ? 'predicted'
+            : r.confidence || '—';
         return `<tr>
           <td class="mono">${e(r.ticker)}${inferred}</td>
           <td>${e(r.primary_index || '—')}</td>
           <td>${e(r.action || '—')}</td>
-          ${renderPctFloatCell(fi)}
+          ${renderPctFloatCell(Object.assign({}, fi, r))}
           <td class="mono">${r.pct_of_adv_days == null ? '—' : e(Number(r.pct_of_adv_days).toFixed(2))}</td>
           <td>${cliff}</td>
           <td>${e(src)}</td>
@@ -382,6 +413,51 @@
         </tr>`;
       })
       .join('');
+  }
+
+  function renderPredictorWatchlist(summary, escapeHtml) {
+    const e = escapeHtml || esc;
+    const rows = summary.predictor_watch || [];
+    if (!rows.length) {
+      return `<h3 style="margin:16px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary)">Predictor watchlist</h3>
+        <p class="muted">No near-boundary predicted adds/deletes. Refresh float/ADV for candidates and append provisional lists to <span class="mono">index_recon_watch.jsonl</span>.</p>`;
+    }
+    const body = rows
+      .slice(0, 40)
+      .map((r) => {
+        const recon =
+          RECON_LABEL[r.recon_status] ||
+          RECON_LABEL[r.report_tier] ||
+          r.recon_status ||
+          '—';
+        const next = r.next_calendar_event;
+        const nextLabel = next
+          ? `${next.label || next.id} (${next.days_out != null ? next.days_out + 'd' : '—'})`
+          : '—';
+        const fi = {
+          pct_of_float_base: r.pct_of_float_base,
+          float_flag: r.float_flag,
+          status: r.pct_of_float_base == null ? 'n_a' : 'ok',
+        };
+        return `<tr>
+          <td class="mono">${e(r.ticker)}</td>
+          <td>${e(r.index || '—')}</td>
+          <td>${renderBadge(r.status, { distance: r.distance_to_boundary_pct })}</td>
+          <td class="muted">${e(recon)}</td>
+          <td class="mono">${r.distance_to_boundary_pct == null ? '—' : e(Number(r.distance_to_boundary_pct).toFixed(1) + '%')}</td>
+          ${renderPctFloatCell(fi)}
+          <td class="mono">${r.priority_score == null ? '—' : e(Number(r.priority_score).toFixed(2))}</td>
+          <td>${e(r.inclusion_probability_band || '—')}</td>
+          <td>${e(r.report_tier || '—')}</td>
+          <td>${e(nextLabel)}</td>
+        </tr>`;
+      })
+      .join('');
+    return `<h3 style="margin:16px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary)">Predictor watchlist</h3>
+      <p class="muted" style="margin-bottom:8px">Rules-based speculation before announcement: Russell banding, S&amp;P committee watch, and ingested recon reports (<span class="mono">announced / provisional / rumor</span>). Expected % float may be asterisked when float is unknown. Style/subset headlines never appear here.</p>
+      <table class="insights-table"><thead><tr>
+        <th>Ticker</th><th>Index</th><th>Status</th><th>Recon</th><th>Distance</th><th>% float</th><th>Priority</th><th>Prob</th><th>Report</th><th>Next event</th>
+      </tr></thead><tbody>${body}</tbody></table>`;
   }
 
   function renderFloatImpactsTable(summary, byTicker, escapeHtml, options) {
@@ -400,8 +476,8 @@
         ? `<p class="muted" style="margin-bottom:8px">
             ${
               showEstimates
-                ? `Showing candidates / float-unknown estimates.`
-                : `${estimates.length} estimate row${estimates.length === 1 ? '' : 's'} hidden (candidates or missing float).`
+                ? `Showing predicted / float-unknown estimates (${estimates.length}).`
+                : `${estimates.length} predicted / float-unknown estimate${estimates.length === 1 ? '' : 's'} hidden.`
             }
             <button type="button" class="index-toggle-float-est" style="margin-left:6px;font:inherit;cursor:pointer">${
               showEstimates ? 'Hide estimates' : 'Show estimates'
@@ -410,13 +486,13 @@
         : '';
     if (!rows.length) {
       return `<h3 style="margin:16px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary)">Float impact (forced flow)</h3>
-        <p class="muted" style="margin-bottom:8px">Confirmed/news events with float-adjusted inputs only by default.${stale}</p>
+        <p class="muted" style="margin-bottom:8px">Confirmed size events with float-adjusted inputs. Predicted impacts live in the Predictor watchlist and under Show estimates.${stale}</p>
         ${estToggle}
-        <p class="muted">No float-adjusted size-migration impacts yet.</p>`;
+        <p class="muted">No float-adjusted confirmed size-migration impacts yet.</p>`;
     }
     const body = renderFloatImpactRows(rows, byTicker, e);
     return `<h3 style="margin:16px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary)">Float impact (forced flow)</h3>
-      <p class="muted" style="margin-bottom:8px">Net index demand as % of company float (float-adjusted). Negative = net forced selling. Both sides of Russell migrations modeled per Horizon Kinetics (2013). Asterisk (*) = float unknown — cap-weighted constant.${stale}</p>
+      <p class="muted" style="margin-bottom:8px">Confirmed net index demand as % of company float. Negative = net forced selling. Predicted candidates use Show estimates (Conf = predicted). Asterisk (*) = float unknown.${stale}</p>
       ${estToggle}
       <table class="insights-table"><thead><tr>
         <th>Ticker</th><th>Index</th><th>Action</th><th>% float</th><th>ADV days</th><th>HK cliff</th><th>Conf</th><th>Detail</th>
@@ -435,9 +511,14 @@
       const entry = byTicker[t];
       const fi = primaryFloatImpact(entry);
       (entry.scorecards || []).forEach((sc) => {
-        if (sc.status !== 'inclusion_candidate' && sc.status !== 'deletion_risk') return;
-        if (dir === 'inclusion' && sc.status !== 'inclusion_candidate') return;
-        if (dir === 'exclusion' && sc.status !== 'deletion_risk') return;
+        const isAddish =
+          sc.status === 'inclusion_candidate' ||
+          sc.status === 'banding_hold' ||
+          sc.status === 'committee_watch';
+        const isDel = sc.status === 'deletion_risk';
+        if (!isAddish && !isDel) return;
+        if (dir === 'inclusion' && !isAddish) return;
+        if (dir === 'exclusion' && !isDel) return;
         if (indexFilter && sc.index !== indexFilter) return;
         const dist = sc.distance_to_boundary_pct;
         const near = dist != null && Math.abs(Number(dist)) <= maxDist;
@@ -508,9 +589,11 @@
       (summary.top_float_impacts || []).length +
       (showFloatEstimates ? (summary.top_float_impact_estimates || []).length : 0);
 
+    const predCount = (summary.predictor_watch || []).length;
     const stats = [
       `Candidates: <strong>${(summary.inclusion_candidates || []).length}</strong>`,
       `Deletion risks: <strong>${(summary.deletion_risks || []).length}</strong>`,
+      `Predictor: <strong>${predCount}</strong>`,
       `Confirmed ≤30d: <strong>${(summary.confirmed_next_30d || []).length}</strong>`,
       `Size events: <strong>${summary.quality_gated_events != null ? summary.quality_gated_events : '—'}</strong>`,
       `News notes: <strong>${summary.news_notes != null ? summary.news_notes : '—'}</strong>` +
@@ -526,6 +609,7 @@
       <h3 style="margin:12px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary)">Reconstitution calendar</h3>
       ${renderCalendarStrip(calendar, escapeHtml)}
       ${renderFloatImpactsTable(summary, byTicker, escapeHtml, { showFloatEstimates })}
+      ${renderPredictorWatchlist(summary, escapeHtml)}
       <h3 style="margin:12px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary)">Index events</h3>
       <p class="muted" style="margin-bottom:6px">Size events = provider notices or headlines with an explicit parent-index add/delete cue. Style/subset notes (Growth/Value/Defensive/2500) are hidden by default and never drive float impact. % float = base-case net forced flow / company float (signed).</p>
       ${renderConfirmedTable(byTicker, escapeHtml, linkHtml)}

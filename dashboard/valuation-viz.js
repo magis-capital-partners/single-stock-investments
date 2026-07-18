@@ -70,29 +70,169 @@
     }).join('')}</ul>`;
   }
 
+  function parseIrrNumber(raw) {
+    if (raw == null || raw === '' || raw === 'pending') return null;
+    if (typeof raw === 'number' && Number.isFinite(raw)) return raw;
+    const m = String(raw).match(/-?\d+(?:\.\d+)?/);
+    return m ? Number(m[0]) : null;
+  }
+
+  function displayReturn(t) {
+    const d = decisionOf(t);
+    const wb = t.valuation_workbench || {};
+    const decision = wb.decision || d;
+    const atPrice = decision.annualized_return_at_price_pct?.base
+      ?? d.annualized_return_at_price_pct?.base;
+    if (atPrice != null && Number.isFinite(Number(atPrice))) {
+      return {
+        pct: Number(atPrice),
+        label: 'Base return at price',
+        source: 'workbench',
+        sub: 'Implied annualized return at last price',
+      };
+    }
+    const cls = t.classification || {};
+    const thesis = cls.analysis_irr_pct ?? parseIrrNumber(cls.implied_irr);
+    if (thesis != null && Number.isFinite(Number(thesis))) {
+      return {
+        pct: Number(thesis),
+        label: 'Thesis IRR (classification)',
+        source: 'classification',
+        sub: 'House thesis IRR — not price-implied workbench return',
+      };
+    }
+    return {
+      pct: null,
+      label: 'Return',
+      source: 'missing',
+      sub: 'Return not modeled',
+    };
+  }
+
+  function primaryPowerZone(t, personaMeta) {
+    const d = decisionOf(t);
+    const wb = t.valuation_workbench || {};
+    const decision = wb.decision || d;
+    const explicit = d.primary_power_zone || decision.primary_power_zone;
+    if (explicit) {
+      const meta = (personaMeta || {})[explicit] || {};
+      return {
+        id: explicit,
+        label: meta.label || String(explicit).replace(/_/g, ' '),
+        source: 'decision',
+        fit: null,
+        score: null,
+      };
+    }
+    const inZone = (t.power_zones && t.power_zones.in_zone) || [];
+    if (inZone.length) {
+      const id = inZone[0];
+      const z = ((t.power_zones || {}).zones || {})[id] || {};
+      const meta = (personaMeta || {})[id] || {};
+      return {
+        id,
+        label: meta.label || String(id).replace(/_/g, ' '),
+        source: 'persona',
+        fit: z.fit,
+        score: z.score,
+      };
+    }
+    return { id: null, label: null, source: 'missing', fit: null, score: null };
+  }
+
+  function renderPowerZoneCell(t, escapeHtml, personaMeta) {
+    const z = primaryPowerZone(t, personaMeta);
+    if (!z.id) {
+      return '<span class="mono" style="color:var(--text-muted)" title="No persona power zone">No zone</span>';
+    }
+    const fit = z.fit != null ? ` · ${Math.round(Number(z.fit) * 100)}% fit` : '';
+    const title = z.source === 'persona'
+      ? `Top persona power zone${fit}`
+      : 'Primary power zone from valuation decision';
+    return `<span class="zone-chip" title="${escapeHtml(title)}">⚡ ${escapeHtml(z.label)}</span>`;
+  }
+
   function renderDecisionStrip(t, helpers) {
-    const { escapeHtml, fmtNum, fmtPct } = helpers;
+    const { escapeHtml, fmtNum, fmtPct, stanceBadgeClass, personaMeta } = helpers;
     const d = decisionOf(t);
     const wb = t.valuation_workbench || {};
     const decision = wb.decision || d;
     if (!t.valuation_workbench && !t.component_valuation && d.status === 'missing') return '';
     const meta = statusMeta(d.status || decision.status);
-    const values = decision.value_per_share || d.value_per_share || {};
-    const returns = decision.annualized_return_at_price_pct || {};
-    return `<div class="detail-section valuation-decision-strip">
-      <h3>Valuation decision</h3>
-      <div class="metric-grid metric-grid-3">
+    const values = decision.value_per_share || d.value_per_share
+      || t.component_valuation?.total_equity_value_per_share || {};
+    const price = decision.price_per_share ?? d.price_per_share
+      ?? t.component_valuation?.price_per_share;
+    const upside = d.upside_downside_pct?.base
+      ?? t.component_valuation?.upside_downside_pct?.base;
+    const ret = displayReturn(t);
+    const zone = primaryPowerZone(t, personaMeta || {});
+    const stance = t.classification?.stance || '—';
+    const stanceCls = (stanceBadgeClass && stanceBadgeClass[stance]) || 'badge-warn';
+    const asOf = wb.as_of || t.classification?.analysis_as_of || '—';
+    const hasWorkbench = !!t.valuation_workbench;
+    const crit = Number(d.critical_gap_count || 0);
+    const open = Number(d.open_gap_count || 0);
+    const provisional = !!(d.provisional || d.status === 'provisional' || d.status === 'evidence_blocked');
+
+    let gapsHtml;
+    if (hasWorkbench || crit > 0 || open > 0 || d.status === 'evidence_blocked') {
+      gapsHtml = `<div class="metric"><div class="k">Critical / open gaps</div><div class="v mono">${crit} / ${open}</div></div>`;
+    } else if (provisional) {
+      gapsHtml = `<div class="metric"><div class="k">Gaps</div><div class="v" style="font-size:12px;line-height:1.35">Provisional component valuation — workbench not built</div></div>`;
+    } else {
+      gapsHtml = `<div class="metric"><div class="k">Gaps</div><div class="v mono" style="color:var(--text-muted)">None tracked</div></div>`;
+    }
+
+    const zoneLabel = zone.id
+      ? `${zone.label}${zone.fit != null ? ` · ${Math.round(Number(zone.fit) * 100)}%` : ''}`
+      : 'No persona zone';
+    const retDisplay = ret.pct != null ? fmtPct(ret.pct) : 'not modeled';
+    const upsideCls = upside == null ? '' : (Number(upside) >= 0 ? 'irr-pass' : 'irr-fail');
+    const rangeLow = values.low;
+    const rangeHigh = values.high;
+    const rangeBase = values.base;
+    let trackHtml = '';
+    if (rangeLow != null && rangeHigh != null && rangeHigh > rangeLow) {
+      const span = Number(rangeHigh) - Number(rangeLow);
+      const basePct = rangeBase != null
+        ? Math.max(0, Math.min(100, ((Number(rangeBase) - Number(rangeLow)) / span) * 100))
+        : 50;
+      const pricePct = price != null
+        ? Math.max(0, Math.min(100, ((Number(price) - Number(rangeLow)) / span) * 100))
+        : null;
+      trackHtml = `<div class="decision-range-track" title="Low $${fmtNum(rangeLow)} · base $${fmtNum(rangeBase)} · high $${fmtNum(rangeHigh)}">
+        <div class="decision-range-fill"></div>
+        <div class="decision-range-mark base" style="left:${basePct}%"></div>
+        ${pricePct != null ? `<div class="decision-range-mark price" style="left:${pricePct}%"></div>` : ''}
+      </div>`;
+    }
+
+    const nextAction = d.next_action || decision.next_action
+      || (provisional && !hasWorkbench
+        ? 'Build valuation workbench or close provisional evidence before committee.'
+        : 'Close evidence gaps before committee freeze.');
+
+    return `<div class="detail-section valuation-decision-strip decision-hero">
+      <h3>Decision</h3>
+      <div class="metric-grid metric-grid-3 decision-band">
+        <div class="metric"><div class="k">Stance</div><div class="v"><span class="badge ${stanceCls}">${escapeHtml(stance)}</span></div></div>
         <div class="metric"><div class="k">Readiness</div><div class="v"><span class="badge ${meta.cls}">${escapeHtml(meta.label)}</span></div></div>
-        <div class="metric"><div class="k">Price / base</div><div class="v mono">$${fmtNum(decision.price_per_share || d.price_per_share)} / $${fmtNum(values.base)}</div></div>
-        <div class="metric"><div class="k">Base return at price</div><div class="v mono">${fmtPct(returns.base)}</div></div>
+        <div class="metric"><div class="k">As of</div><div class="v mono">${escapeHtml(asOf)}</div></div>
       </div>
-      <div class="metric-grid metric-grid-3" style="margin-top:9px">
-        <div class="metric"><div class="k">Low / high</div><div class="v mono">$${fmtNum(values.low)} / $${fmtNum(values.high)}</div></div>
-        <div class="metric"><div class="k">Critical / open gaps</div><div class="v mono">${Number(d.critical_gap_count || 0)} / ${Number(d.open_gap_count || 0)}</div></div>
-        <div class="metric"><div class="k">Power zone</div><div class="v" style="font-size:12px">${escapeHtml(d.primary_power_zone || decision.primary_power_zone || '—')}</div></div>
+      <div class="metric-grid metric-grid-3 decision-band" style="margin-top:9px">
+        <div class="metric"><div class="k">Price / base</div><div class="v mono">$${fmtNum(price)} / $${fmtNum(rangeBase)}</div></div>
+        <div class="metric"><div class="k">vs price</div><div class="v mono ${upsideCls}">${upside == null ? '—' : `${Number(upside) > 0 ? '+' : ''}${fmtPct(upside)}`}</div></div>
+        <div class="metric"><div class="k">Low / high</div><div class="v mono">$${fmtNum(rangeLow)} / $${fmtNum(rangeHigh)}</div></div>
       </div>
-      <div class="workbench-callout"><strong>Next:</strong> ${escapeHtml(d.next_action || decision.next_action || 'Close evidence gaps before committee freeze.')}${d.next_gap_id ? `<div class="tier-sub" style="margin-top:4px">Next gap: ${escapeHtml(d.next_gap_id)}</div>` : ''}</div>
-      ${(d.provisional || d.status === 'evidence_blocked') ? '<p class="tier-sub" style="margin-top:8px">Ranges are provisional until acceptance tests are met. Do not treat them as IC-approved targets.</p>' : ''}
+      ${trackHtml}
+      <div class="metric-grid metric-grid-3 decision-band" style="margin-top:9px">
+        <div class="metric"><div class="k">${escapeHtml(ret.label)}</div><div class="v mono">${escapeHtml(retDisplay)}<div class="tier-sub">${escapeHtml(ret.sub)}</div></div></div>
+        ${gapsHtml}
+        <div class="metric"><div class="k">Power zone</div><div class="v" style="font-size:12px">${escapeHtml(zoneLabel)}</div></div>
+      </div>
+      <div class="workbench-callout"><strong>Next:</strong> ${escapeHtml(nextAction)}${d.next_gap_id ? `<div class="tier-sub" style="margin-top:4px">Next gap: ${escapeHtml(d.next_gap_id)}</div>` : ''}</div>
+      ${provisional ? '<p class="tier-sub" style="margin-top:8px">Ranges are provisional until acceptance tests are met. Do not treat them as IC-approved targets.</p>' : ''}
     </div>`;
   }
 
@@ -473,6 +613,9 @@
   global.ValuationViz = {
     decisionOf,
     statusMeta,
+    displayReturn,
+    primaryPowerZone,
+    renderPowerZoneCell,
     renderValuationStatusCell,
     renderValueRangeCell,
     renderPriceToBaseCell,
