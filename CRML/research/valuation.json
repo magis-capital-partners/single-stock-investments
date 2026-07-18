@@ -1,0 +1,252 @@
+{
+  "ticker": "CRML",
+  "as_of": "2026-07-18",
+  "method": "yield_curve",
+  "irr_method": "scenario",
+  "valuation_mode": "optionality",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "unproven",
+    "dhando": "none",
+    "cycle": "up",
+    "payoff_lens": "asset",
+    "predictive_attribute": "complexity_discount"
+  },
+  "inputs": {
+    "price": 6.4,
+    "price_source": "Yahoo CRML via ownership_common fetch 2026-07-18",
+    "price_as_of": "2026-07-18",
+    "shares_millions": 104.9,
+    "shares_source": "104,912,853 ordinary shares at June 30, 2025 (20-F FY2025 cover page)",
+    "shares_fully_diluted_note": "Excludes ~14.5M shares for Tanbreez Stage 2 (92.5%), GEM warrant settlement, and warrant overhang [HUMAN REVIEW]",
+    "cash_m": 7.3,
+    "cash_source": "Cash on hand $7.3M at June 30, 2025 (20-F FY2025 going-concern disclosure)",
+    "total_assets_m": 171.7,
+    "total_assets_source": "Total assets $171.7M at June 30, 2025 vs $59.4M prior year (20-F balance sheet / filing_facts)",
+    "net_loss_fy2025_m": 51.9,
+    "net_loss_fy2024_m": 139.4,
+    "ocf_outflow_fy2025_m": 14.5,
+    "working_capital_deficit_m": 15.6,
+    "tanbreez_ownership_pct": 42,
+    "tanbreez_ownership_source": "42% equity interest in Tanbreez Mining Greenland A/S (20-F FY2025 Item 4.D)",
+    "tanbreez_resource_mt": 44.87,
+    "tanbreez_treo_pct": 0.38,
+    "tanbreez_resource_source": "Indicated 25.42 Mt + Inferred 19.45 Mt = 44.87 Mt at 0.38% TREO (20-F Tanbreez resource table)",
+    "pea_npv_bn": 3.0,
+    "pea_npv_source": "Company PEA press release March 31, 2025 cited in 20-F; pre-tax project NPV ~$3B at 12.5-15% discount [Assumption — not equity NAV]",
+    "wolfsberg_li2o_mt": 12.8,
+    "wolfsberg_resource_source": "Measured+Indicated 9.7 Mt at 1.03% Li2O + Inferred 3.1 Mt at 0.90% Li2O (20-F Wolfsberg table)",
+    "bmw_advance_m": 15.0,
+    "bmw_advance_source": "BMW offtake advance payment $15.0M June 5, 2024; restricted until Wolfsberg production (20-F)",
+    "normalization_note": "Pre-production explorer/evaluator. No mining revenue. Lawrence owner cash is negative (operating outflow). Value is risked asset option on Tanbreez (Greenland REE), Wolfsberg (Austria lithium), and minority lithium stakes — not filing OCF."
+  },
+  "scenarios": {
+    "bear": {
+      "price": 6.4,
+      "payoff": 1.5,
+      "years": 5,
+      "probability": 0.35,
+      "notes": "Greenland permitting delay or DFS failure; GEM arbitration cash/shares; repeated equity raises; cash floor erodes; Tanbreez option impaired"
+    },
+    "base": {
+      "price": 6.4,
+      "payoff": 4.0,
+      "years": 7,
+      "probability": 0.45,
+      "notes": "Partial risked value on 42% Tanbreez stake after DFS, financing, and dilution; Wolfsberg/BMW path delayed; heavy haircut vs company PEA NPV",
+      "sotp_build": {
+        "lines": [
+          {
+            "id": "cash_floor",
+            "label": "Cash and restricted advances (risked)",
+            "gaap_per_share": 0.07,
+            "uplift_per_share": 0.07,
+            "math": "$7.3M cash / 104.9M shares; BMW $15M advance restricted"
+          },
+          {
+            "id": "tanbreez_risked",
+            "label": "Tanbreez 42% stake (risked NAV)",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 2.86,
+            "math": "[Assumption] ~15% probability-weighted share of risked project equity vs PEA headline NPV"
+          },
+          {
+            "id": "wolfsberg_option",
+            "label": "Wolfsberg lithium option",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 0.57,
+            "math": "[Assumption] Inferred resource; BMW offtake path; zero in Lawrence FCF"
+          },
+          {
+            "id": "dilution_drag",
+            "label": "Future dilution (Stage 2 + GEM)",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": -0.5,
+            "math": "14.5M shares to Rimbal for 92.5%; GEM arbitration overhang"
+          }
+        ],
+        "year5_economic_nav_per_share": 4.0,
+        "years": 7,
+        "notes": "Partial risked value on 42% Tanbreez stake after DFS, financing, and dilution"
+      }
+    },
+    "bull": {
+      "price": 6.4,
+      "payoff": 14.0,
+      "years": 7,
+      "probability": 0.2,
+      "notes": "Tanbreez DFS supports mine build; Stage 2 to 92.5%; offtake with Ucore/BMW converts; REE price tailwind; financing without catastrophic dilution"
+    }
+  },
+  "nav_overlay": {
+    "status": "partial",
+    "as_of": "2026-07-18",
+    "source": "20-F FY2025 Tanbreez resource table + PEA disclosure",
+    "gaap_vs_fair_value": {
+      "note": "Mineral rights and exploration assets on balance sheet ($171.7M total assets) are not marked to PEA NPV; PEA is pre-tax project-level and highly uncertain"
+    },
+    "options": [
+      {
+        "id": "tanbreez_ree",
+        "label": "Tanbreez Greenland REE (42% economic interest)",
+        "option_treatment": "probability_weighted",
+        "P_base": 0.15,
+        "base_terminal_rationale": "Inferred portion of 44.87 Mt resource; Greenland jurisdiction; no reserves; PEA NPV not bankable until DFS",
+        "evidence": "20-F resource table; PEA press release March 31, 2025",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "wolfsberg_li",
+        "label": "Wolfsberg Austria lithium",
+        "option_treatment": "milestone_nav",
+        "base_terminal_rationale": "BMW $15M advance and offtake LOI; inferred resource only",
+        "evidence": "20-F Wolfsberg section; BMW Offtake Agreement June 2024",
+        "not_in_lawrence_base": true
+      },
+      {
+        "id": "weinebene_li",
+        "label": "Weinebene / Eastern Alps lithium (20%)",
+        "option_treatment": "zero",
+        "base_terminal_rationale": "Early-stage minority stake; zero until resource and path clarified",
+        "evidence": "20-F business description",
+        "not_in_lawrence_base": true
+      }
+    ],
+    "not_in_model_requires_refresh": [
+      "tanbreez_dfs_2025",
+      "greenland_stage2_approval",
+      "gem_arbitration_outcome",
+      "ree_spot_price_panel"
+    ]
+  },
+  "optionality_gate": {
+    "framework": "pre_production_resource_option",
+    "floor_pass": false,
+    "floor_metric": "cash_per_share",
+    "floor_value": 0.07,
+    "primary_metric": "lawrence_base",
+    "primary_return_pct": -6.5,
+    "primary_label": "annualized return",
+    "notes": "Cash floor ~$0.07/sh is not dhando protection at $6.40. Primary metric is seven-year risked asset payoff scenario."
+  },
+  "evidence_refresh": {
+    "type": "commodity_nav",
+    "as_of": "2026-07-18",
+    "commodities": ["ree", "lithium"],
+    "notes": "Rare earth and lithium spot inform overlay context; not auto-included in Lawrence base IRR"
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Yes",
+      "treatment": "nav_floor",
+      "evidence": "Total assets $171.7M includes mineral interests; PEA cites ~$3B pre-tax project NPV vs $7.3M cash (20-F)"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant royalty?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "44.87 Mt Tanbreez resource (mostly inferred); 4.7 Bt host rock kakortokite; no production (20-F)"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Net loss $51.9M FY2025; operating cash outflow $14.5M; exploration spend (20-F)"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF?",
+      "answer": "Partial",
+      "treatment": "milestone_nav",
+      "evidence": "BMW $15M advance restricted; Ucore REE offtake LOI August 2025 (20-F)"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "Yes",
+      "treatment": "nav_floor",
+      "evidence": "42% Tanbreez; 20% Weinebene/Eastern Alps lithium; Wolfsberg subsidiary (20-F)"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No dated legal recovery"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No operating revenue from mining yet"
+    }
+  ],
+  "implied_return": {
+    "base_pct": -6.5,
+    "label": "7yr IRR (total synthesis)",
+    "display": "-6.5% (total synthesis)",
+    "lawrence_stance_gate_pct": -6.5,
+    "falsifier_adjusted_pct": -6.5,
+    "synthesis_pct": -6.5
+  },
+  "stance": {
+    "proposal": "watch",
+    "rationale": "Pre-production resource option; base risked payoff below 15% hurdle at $6.40"
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": false
+    },
+    "override_reason": null
+  },
+  "lawrence_horizon_years": 7,
+  "estimates": {
+    "marvin_floor": {
+      "per_share": 0.07,
+      "return_pct": null,
+      "notes": "Cash per share at June 30, 2025; not a durable floor given burn and going concern"
+    },
+    "blended_best": {
+      "per_share": 4.0,
+      "return_pct": -6.5,
+      "notes": "Risked seven-year asset payoff; filings only; no approved third-party blend"
+    }
+  },
+  "growth_explanation": {
+    "mechanism": "Value creation requires Tanbreez DFS, Greenland approvals, project financing, and first production — not operating cash flow compounding.",
+    "falsifiers": [
+      "DFS delayed beyond 2026 or fails economic viability test",
+      "Greenland blocks Stage 2 transfer to 92.5%",
+      "GEM arbitration forces material cash or share settlement"
+    ]
+  }
+}
