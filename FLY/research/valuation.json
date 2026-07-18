@@ -238,12 +238,12 @@
     }
   },
   "implied_return": {
-    "base_pct": 0.1,
-    "label": "7yr IRR (total synthesis)",
-    "display": "0.1% (total synthesis)",
+    "base_pct": 2.2,
+    "label": "7yr IRR (Lawrence base)",
+    "display": "2.2% (Lawrence base)",
     "lawrence_stance_gate_pct": 2.2,
     "falsifier_adjusted_pct": 2.2,
-    "synthesis_pct": 0.1
+    "synthesis_pct": 4.6
   },
   "overlay_results": [],
   "growth_explanation": {
@@ -741,40 +741,54 @@
     "status": "complete",
     "paths": [
       {
+        "id": "theory_implied",
+        "label": "Segment-derived growth (pre-falsifier)",
+        "source": "segment_build weighted blend",
+        "return_pct": 3.5,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
         "id": "scenario_bear",
-        "label": "Bear scenario (Lawrence envelope)",
+        "label": "Bear scenario (Lawrence)",
         "source": "scenarios.bear",
         "return_pct": -12.1,
         "weight": 0.05,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
         "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
-        "hard_to_vary": "yes: asymmetric low weight is structural",
         "weight_falsifiers": [
           "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
-        ]
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
       },
       {
         "id": "scenario_bull",
-        "label": "Bull scenario (Lawrence envelope)",
+        "label": "Bull scenario (Lawrence)",
         "source": "scenarios.bull",
         "return_pct": 12.3,
-        "weight": 0.05,
+        "weight": 0.12,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
         "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
-        "hard_to_vary": "yes",
         "weight_falsifiers": [
           "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
-        ]
+        ],
+        "hard_to_vary": "yes"
       }
     ],
     "qualitative_adjustments": [],
     "qualitative_manual": false,
     "qualitative_pp_cap_applied": false,
-    "numeric_weighted_pct": 0.1,
+    "numeric_weighted_pct": 4.6,
     "qualitative_pp": 0,
-    "total_synthesis_pct": 0.1,
+    "total_synthesis_pct": 4.6,
     "human_approval": "pending",
     "weight_audit": {
       "flags": [],
@@ -795,5 +809,297 @@
       }
     },
     "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  },
+  "total_return_panel": {
+    "schema_version": "3.0",
+    "ticker": "FLY",
+    "as_of": "2026-07-18",
+    "status": "partial",
+    "error": "Vendor events are discovery evidence; primary-source completeness has not been established.",
+    "price_source": "yahoo:FLY",
+    "currency": "USD",
+    "return_currency": "USD",
+    "fx_basis": "listing_currency_nominal",
+    "history_start": "2025-08-07",
+    "history_end": "2026-07-17",
+    "price_points": 237,
+    "price_interval": "1d",
+    "history_basis": "earliest_available_vendor_trading_history",
+    "chart_scale": "logarithmic",
+    "chart_y_axis": "cumulative_return_pct",
+    "chart_series": [
+      "total_return",
+      "price_only"
+    ],
+    "return_contract": "split-adjusted close excluding dividends; event amounts normalized for later splits; cash reinvested at ex-date close; pre-tax nominal",
+    "coverage": {
+      "status": "vendor_only",
+      "start": null,
+      "end": null,
+      "note": "Vendor events are discovery evidence; primary-source completeness has not been established.",
+      "ledger_path": null
+    },
+    "event_count": 0,
+    "event_counts": {},
+    "cash_distributions_on_initial_share_path": 0,
+    "distribution_contribution_by_type": {},
+    "cumulative_distributions_per_share": 0,
+    "start_price": 60.35,
+    "end_price": 19.27,
+    "price_index_end": 31.93,
+    "total_return_index_end": 31.93,
+    "cumulative_price_return_pct": -68.07,
+    "cumulative_total_return_pct": -68.07,
+    "price_only_annualized_pct": -70.24,
+    "total_return_annualized_pct": -70.24,
+    "market_cap_m": null,
+    "shares_outstanding": null,
+    "price_for_market_cap": 19.27,
+    "chart": "FLY/research/charts/total_return_2026-07-18.svg",
+    "panel_json": "FLY/research/total_return_panel.json"
+  },
+  "context_overlay": {
+    "as_of": "2026-07-18",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": 0.95,
+            "as_of": "2026-07-17",
+            "yoy_pct": 196.9,
+            "direction": "up",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.540999889373779,
+            "as_of": "2026-07-17",
+            "yoy_pct": 1.7,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.2729997634887695,
+            "as_of": "2026-07-17",
+            "yoy_pct": 6.7,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 100.75499725341797,
+            "as_of": "2026-07-17",
+            "yoy_pct": 2.1,
+            "direction": "up",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 18.770000457763672,
+            "as_of": "2026-07-17",
+            "yoy_pct": 13.6,
+            "direction": "up",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": 1.46,
+            "as_of": "2026-07-17",
+            "yoy_pct": 22.7,
+            "direction": "up",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 11.68,
+            "as_of": "2026-07-17",
+            "yoy_pct": 32.3,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "insider_signal": {
+    "as_of": "2026-07-18",
+    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
+    "in_base_irr": false,
+    "window_days": 365,
+    "ics": 8.69,
+    "band": "exceptional",
+    "bull_case_support": "moderate",
+    "scenario_confidence": {
+      "priors": {
+        "bear": 0.2,
+        "base": 0.55,
+        "bull": 0.25
+      },
+      "tilted": {
+        "bear": 0.2,
+        "base": 0.433,
+        "bull": 0.367
+      },
+      "bull_delta": 0.117,
+      "bear_delta": 0.0,
+      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
+    },
+    "factors": {
+      "buy_score": 8.312,
+      "sell_score": -0.754,
+      "cluster_bonus": 0.0,
+      "net_buy_usd": 1215301.13,
+      "net_sell_usd": 384339492.55,
+      "price_today": 19.27
+    },
+    "top_buys": [
+      {
+        "insider": "Braden Pamela Joyce",
+        "date": "2025-08-06",
+        "shares": 8888,
+        "price": 45.0,
+        "value_usd": 399960.0,
+        "shares_owned_after": 24252,
+        "contrib": 1.921
+      },
+      {
+        "insider": "AEROEQUITY GP, LLC",
+        "date": "2025-08-06",
+        "shares": 11111,
+        "price": 45.0,
+        "value_usd": 499995.0,
+        "shares_owned_after": 11111,
+        "contrib": 1.26
+      },
+      {
+        "insider": "Konert Kirk Michael",
+        "date": "2025-08-06",
+        "shares": 3333,
+        "price": 45.0,
+        "value_usd": 149985.0,
+        "shares_owned_after": 3333,
+        "contrib": 1.127
+      },
+      {
+        "insider": "Lusczakoski Jonathan Donald",
+        "date": "2025-08-06",
+        "shares": 2222,
+        "price": 45.0,
+        "value_usd": 99990.0,
+        "shares_owned_after": 2222,
+        "contrib": 1.054
+      },
+      {
+        "insider": "Zurbuchen Thomas Hansueli",
+        "date": "2025-08-06",
+        "shares": 800,
+        "price": 45.0,
+        "value_usd": 36000.0,
+        "shares_owned_after": 800,
+        "contrib": 0.883
+      }
+    ],
+    "top_sells": [
+      {
+        "insider": "AEROEQUITY GP, LLC",
+        "date": "2026-06-01",
+        "shares": 5198872,
+        "price": 48.0,
+        "value_usd": 249545856.0,
+        "is_10b5_1": false,
+        "contrib": -0.135
+      },
+      {
+        "insider": "AEROEQUITY GP, LLC",
+        "date": "2026-06-01",
+        "shares": 2801128,
+        "price": 48.0,
+        "value_usd": 134454144.0,
+        "is_10b5_1": false,
+        "contrib": -0.135
+      },
+      {
+        "insider": "Wheeler David Leigh",
+        "date": "2026-05-18",
+        "shares": 3765,
+        "price": 45.1221,
+        "value_usd": 169884.71,
+        "is_10b5_1": false,
+        "contrib": -0.12
+      },
+      {
+        "insider": "Wheeler David Leigh",
+        "date": "2026-04-17",
+        "shares": 3766,
+        "price": 45.0366,
+        "value_usd": 169607.84,
+        "is_10b5_1": false,
+        "contrib": -0.093
+      },
+      {
+        "insider": "Boland Ryan Michael",
+        "date": "2026-03-23",
+        "shares": 539143,
+        "price": 0.0,
+        "value_usd": 0.0,
+        "is_10b5_1": false,
+        "contrib": -0.09
+      }
+    ],
+    "narrative_hooks": [],
+    "transaction_count": 45
+  },
+  "lens_consensus": {
+    "as_of": "2026-07-18",
+    "shared_inputs_ref": "valuation.json@2026-07-18",
+    "valuation_richness": 0.699,
+    "blended_return_pct": -1.0,
+    "band_pct": [
+      -12.1,
+      4.6
+    ],
+    "weighted_median_pct": 2.2,
+    "median_mean_flag": true,
+    "stance": "pass",
+    "agreement_pct": 100,
+    "dissent_count": 0,
+    "lawrence_divergence": false,
+    "top_dissents": [],
+    "contributor_count": 9,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
   }
 }
