@@ -91,6 +91,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-18.
 | BLDR | BLDR/ | Builders FirstSource | US | 2026-07-09 | 2026-07-18 | unknown | watch |
 | BLK | BLK/ | BlackRock | US | 2026-07-09 | 2026-07-18 | unknown | watch |
 | BLSH | BLSH/ | Bullish Global Limited | US | 2026-07-17 | 2026-07-18 | unknown | watch |
+| BMNR | BMNR/ | BitMine Immersion Technologies, Inc. | US | 2026-07-17 | 2026-07-18 | unknown | watch |
 | BMY | BMY/ | Bristol Myers Squibb | US | 2026-07-09 | 2026-07-18 | unknown | watch |
 | BMYS.KL | BMYS.KL/ | Bursa Malaysia Berhad | EU | 2026-07-09 | 2026-07-18 | unknown | watch |
 | BN | BN/ | Brookfield Corporation | US | 2026-07-09 | 2026-07-18 | platform | hold |
@@ -159,7 +160,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-18.
 | CRL | CRL/ | Charles River Laboratories | US | 2026-07-09 | 2026-07-18 | unknown | watch |
 | CRM | CRM/ | Salesforce | US | 2026-07-10 | 2026-07-18 | unknown | watch |
 | CRWD | CRWD/ | CrowdStrike | US | 2026-07-09 | 2026-07-18 | unknown | watch |
-| CRWV | CRWV/ | CoreWeave, Inc. | US | — | — | unknown | watch |
+| CRWV | CRWV/ | CoreWeave, Inc. | US | 2026-07-18 | 2026-07-18 | unknown | watch |
 | CSCO | CSCO/ | Cisco | US | 2026-07-09 | 2026-07-18 | unknown | watch |
 | CSGP | CSGP/ | CoStar Group | US | 2026-07-09 | 2026-07-18 | platform | watch |
 | CSU | CSU/ | Constellation Software | CA | 2026-07-09 | 2026-07-18 | compounder | core |
@@ -652,4 +653,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-18.
 | ZBRA | ZBRA/ | Zebra Technologies | US | 2026-07-10 | 2026-07-18 | unknown | watch |
 | ZTS | ZTS/ | Zoetis | US | 2026-07-10 | 2026-07-18 | unknown | watch |
 
-**645 holdings total.** Registry: `_system/portfolio/registry.json`
+**646 holdings total.** Registry: `_system/portfolio/registry.json`
