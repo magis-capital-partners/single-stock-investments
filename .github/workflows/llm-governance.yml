@@ -47,6 +47,7 @@ jobs:
       - name: Validate admission, evidence, committee, and workflow governance
         working-directory: _system/scripts
         run: |
+          python -m pip install --disable-pip-version-check -r requirements-governance.txt
           python -m unittest \
             test_llm_call_gate \
             test_agent_evidence_gates \

@@ -34,7 +34,8 @@ jobs:
           fetch-depth: 0
           sparse-checkout-cone-mode: false
           sparse-checkout: |
-            /.github/workflows/power-zone-universe.yml
+            /.github/actions/**
+            /.github/workflows/**
             /_system/**
             /dashboard/**
             /docs/**
@@ -47,6 +48,7 @@ jobs:
       - name: Validate cutover pipeline
         working-directory: _system/scripts
         run: |
+          python -m pip install --disable-pip-version-check -r requirements-governance.txt
           python -m unittest \
             test_generalized_valuation_system \
             test_investment_committee_pipeline \
