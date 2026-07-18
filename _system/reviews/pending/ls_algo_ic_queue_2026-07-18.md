@@ -3,9 +3,9 @@
 **Mode:** live
 **Material live underlyings visible:** 46
 
-## Committee packets initialized
+## Gate passed but initialization blocked
 
-- **BMNR** — packet frozen; round one open; triggers: material live ls-algo book position
+- **BMNR** — committee already independent_review_open; triggers: material live ls-algo book position
 
 ## Trigger fired while evidence-blocked (prioritize these evidence gaps)
 

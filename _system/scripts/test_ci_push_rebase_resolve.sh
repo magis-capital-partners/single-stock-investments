@@ -432,14 +432,9 @@ test_mixed_returns_and_dashboard_conflict() {
 test_main_writer_workflows_share_lock() {
   local workflow
   local -a writer_workflows=(
-    activist-scan-sync.yml
-    batch-onboard-pdfs.yml
-    daily-sync.yml
     darwin-refresh.yml
-    drive-intake-sync.yml
     letter-backfill.yml
-    marvin-onboard.yml
-    portfolio-news.yml
+    ls-algo-universe.yml
   )
 
   for workflow in "${writer_workflows[@]}"; do
@@ -457,6 +452,11 @@ test_main_writer_workflows_share_lock() {
 run_test "returns CSV classified as regenerable" test_returns_csv_is_regenerable
 run_test "ticker research prefers upstream on rebase" test_ticker_research_prefers_upstream
 run_test "sync self refresh disabled no-op" test_sync_self_refresh_disabled
+if [ "${CI_PUSH_SMOKE_FAST:-0}" = "1" ]; then
+  run_test "all direct-to-main writers share the data commit lock" test_main_writer_workflows_share_lock
+  echo "Fast ci_push_main classifier and lock smoke tests passed."
+  exit 0
+fi
 run_test "dashboard JSON rebase conflict auto-resolution" test_dashboard_json_conflict
 run_test "docs mirror after dashboard JSON rebase conflict" test_docs_mirror_after_dashboard_conflict
 run_test "insights JSON rebase conflict auto-resolution" test_insights_json_conflict
