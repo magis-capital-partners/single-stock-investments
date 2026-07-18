@@ -54,6 +54,32 @@ class SparseInfraGuardTests(unittest.TestCase):
         with self.assertRaises(SystemExit):
             bdd.refuse_infra_collapse(payload, prior)
 
+    def test_preserves_pdf_count_when_research_metadata_is_present(self):
+        rows = [
+            {
+                "ticker": "AAPL",
+                "pdf_count": 0,
+                "readme": "AAPL/README.md",
+                "research_dir": "AAPL/research",
+                "completeness": 80,
+            }
+        ]
+        prior = {
+            "AAPL": {
+                "ticker": "AAPL",
+                "pdf_count": 12,
+                "readme": "old-readme",
+                "research_dir": "old-research",
+                "completeness": 90,
+            }
+        }
+        restored = bdd.preserve_infra_from_prior(rows, prior)
+        self.assertEqual(restored, 1)
+        self.assertEqual(rows[0]["pdf_count"], 12)
+        self.assertEqual(rows[0]["readme"], "AAPL/README.md")
+        self.assertEqual(rows[0]["research_dir"], "AAPL/research")
+        self.assertEqual(rows[0]["completeness"], 90)
+
     def test_refuse_allows_healthy_payload(self):
         payload = {
             "summary": {

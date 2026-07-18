@@ -309,27 +309,23 @@ def workspace_is_sparse(tickers: list[str]) -> bool:
 
 
 def preserve_infra_from_prior(rows: list[dict], prior_by_ticker: dict[str, dict]) -> int:
-    """Copy prior infra stats onto rows when the current scan found empty trees."""
+    """Fill infra fields hidden by sparse checkout from the prior dashboard."""
     restored = 0
     for row in rows:
         prior = prior_by_ticker.get(row["ticker"])
         if not prior:
             continue
-        prior_pdfs = int(prior.get("pdf_count") or 0)
-        prior_research = bool(prior.get("research_dir"))
-        prior_readme = bool(prior.get("readme"))
-        empty_now = (
-            int(row.get("pdf_count") or 0) == 0
-            and not row.get("research_dir")
-            and not row.get("readme")
-        )
-        had_infra = prior_pdfs > 0 or prior_research or prior_readme
-        if not (empty_now and had_infra):
-            continue
+        changed = False
         for key in _INFRA_PRESERVE_KEYS:
-            if key in prior:
+            current_value = row.get(key)
+            prior_value = prior.get(key)
+            missing_now = current_value in (None, False, 0, "", [], {})
+            if key == "completeness":
+                missing_now = float(current_value or 0) < float(prior_value or 0)
+            if missing_now and prior_value not in (None, False, 0, "", [], {}):
                 row[key] = prior[key]
-        restored += 1
+                changed = True
+        restored += int(changed)
     return restored
 
 
