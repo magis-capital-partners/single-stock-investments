@@ -1,6 +1,12 @@
 name: Power Zone Universe
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - "*/research/valuation.json"
+      - "*/research/evidence_refresh.json"
+      - "*/research/evidence/*.json"
   schedule:
     - cron: "30 5 * * 1"
   workflow_run:
@@ -76,6 +82,7 @@ jobs:
             test_valuation_authority_cutover \
             test_llm_call_gate \
             test_agent_evidence_gates \
+            test_evidence_recovery \
             test_committee_task_queue \
             test_llm_workflow_governance
 

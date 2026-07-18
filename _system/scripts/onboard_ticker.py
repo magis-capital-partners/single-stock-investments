@@ -48,6 +48,29 @@ def write_status(ticker_dir: Path, phase: str, error: str | None = None, extra: 
 
 
 def lookup_cik(ticker: str) -> str | None:
+    # Hosted runners are occasionally denied by sec.gov.  Prefer committed,
+    # reproducible mappings before attempting the network.
+    for path in (
+        ROOT / "_system" / "reference" / "market-data" / "fundamentals" / "_sec_ticker_cik_map.json",
+        ROOT / "_system" / "reference" / "securities" / "sec_company_tickers.json",
+        ROOT / "_system" / "reference" / "market-data" / "index" / "sec_company_tickers.json",
+    ):
+        try:
+            cached = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        if isinstance(cached, dict):
+            direct = cached.get(ticker.upper()) or cached.get(ticker.upper().replace(".", "-"))
+            if direct and not isinstance(direct, dict):
+                return str(direct).zfill(10)
+            rows = cached.values()
+        else:
+            rows = cached
+        for row in rows:
+            if isinstance(row, dict) and str(row.get("ticker") or row.get("symbol") or "").upper() in {ticker.upper(), ticker.upper().replace(".", "-")}:
+                cik = row.get("cik_str") or row.get("cik")
+                if cik:
+                    return str(cik).zfill(10)
     try:
         req = urllib.request.Request(
             "https://www.sec.gov/files/company_tickers.json",

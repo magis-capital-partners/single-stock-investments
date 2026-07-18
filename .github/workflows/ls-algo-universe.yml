@@ -42,21 +42,48 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Build queue and onboard next deterministic batch
-        run: |
-          python _system/scripts/darwin/run_ls_algo_valuation_pipeline.py --skip-dashboard
-          python _system/scripts/build_dashboard_data.py
-          python _system/scripts/validate_dashboard_data.py
-      - name: Commit intake and dashboard
+      - name: Configure transactional commits
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A -- _system/data/ls_algo_underlying_gap.json _system/reviews/pending \
-                         _system/portfolio/registry.json dashboard/data docs/data
-          git add -A -- '*/README.md' '*/research' '*/investor-documents'
-          if git diff --cached --quiet; then
-            echo "No LS-algo intake changes."
-            exit 0
+      - name: Identity, onboard, and rebuild registry derivatives
+        run: |
+          python _system/scripts/darwin/build_ls_algo_underlying_gap.py
+          python _system/scripts/darwin/run_ls_algo_equity_onboard_all.py --batch-size 4 --max-evidence-backlog 24
+          python _system/scripts/sync_portfolio_from_registry.py
+          python _system/scripts/build_index_membership.py
+          python _system/scripts/build_evidence_recovery_queue.py
+          python _system/scripts/validate_evidence_recovery.py
+      - name: Checkpoint identity and registry state
+        run: |
+          git add -A -- _system/data/ls_algo_underlying_gap.json _system/data/evidence_recovery_queue.json \
+                         _system/reviews/pending _system/portfolio dashboard/data/index_membership.json \
+                         docs/data/index_membership.json
+          git add -A -- '*/README.md' '*/.onboard_status.json' '*/research/evidence_task_queue.json' \
+                         '*/third-party-analyses' '*/investor-documents'
+          if ! git diff --cached --quiet; then
+            bash _system/scripts/ci_push_main.sh "chore(ls-algo): checkpoint identity and evidence queue"
           fi
-          git commit -m "chore(ls-algo): sync bounded underlying intake"
-          git push origin HEAD:main
+      - name: Gather primary evidence and rebuild valuation authority
+        run: |
+          python _system/scripts/collect_evidence_recovery.py --limit 3
+          python _system/scripts/darwin/run_ls_algo_valuation_pipeline.py --no-onboard --skip-dashboard
+          python _system/scripts/build_evidence_recovery_queue.py
+          python _system/scripts/validate_evidence_recovery.py
+          python _system/scripts/build_index_membership.py
+          python _system/scripts/build_dashboard_data.py
+          python _system/scripts/validate_dashboard_data.py
+      - name: Commit evidence, valuation, and dashboard state
+        run: |
+          git add -A -- _system/data/evidence_recovery_queue.json _system/reviews/pending \
+                         dashboard/data docs/data _system/portfolio
+          git add -A -- '*/research' '*/investor-documents'
+          if ! git diff --cached --quiet; then
+            bash _system/scripts/ci_push_main.sh "chore(ls-algo): collect blocker evidence and refresh authority"
+          fi
+      - name: Admit newly ready blocker evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api --method POST "repos/${{ github.repository }}/dispatches" \
+            -f event_type=research-evidence-ready

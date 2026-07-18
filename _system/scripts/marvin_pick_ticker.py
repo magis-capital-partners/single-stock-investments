@@ -258,6 +258,19 @@ def research_candidate(ticker: str, reason: str, *, force: bool = False) -> dict
     }
 
 
+def evidence_recovery_candidates() -> list[str]:
+    path = ROOT / "_system" / "data" / "evidence_recovery_queue.json"
+    try:
+        queue = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return []
+    return [
+        str(row.get("ticker") or "").upper()
+        for row in queue.get("items") or []
+        if int(row.get("ready_count") or 0) > 0 and row.get("ticker")
+    ]
+
+
 def pick_ticker(
     explicit: str | None = None,
     *,
@@ -276,6 +289,13 @@ def pick_ticker(
             "reason": "unchanged_or_evidence_not_ready",
             "requested_ticker": explicit,
         }
+
+    # Newly gathered blocker evidence outranks ordinary onboarding and refresh
+    # work. Evidence hashes still suppress duplicate agent calls.
+    for ticker in evidence_recovery_candidates():
+        candidate = research_candidate(ticker, "evidence_gap_ready", force=force)
+        if candidate:
+            return candidate
 
     pending_onboard = onboard_pending_holdings()
     for _, ticker in pending_onboard:
