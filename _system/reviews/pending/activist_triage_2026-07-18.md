@@ -1,7 +1,7 @@
 # Activist triage — human review queue
 
 **Date:** 2026-07-18
-**Rows:** 40 (auto-triage could not resolve)
+**Rows:** 43 (auto-triage could not resolve)
 
 | Ticker | Side | Firm | Class | Stake | Age | Verdict rules |
 |--------|------|------|-------|-------|-----|---------------|
@@ -30,8 +30,11 @@
 | WYNN | long | unknown_activist | activist_13d | — | 3047 | rule_conflict, low_confidence, active_campaign, unknown_old |
 | WYNN | long | unknown_activist | activist_13d | — | 3070 | rule_conflict, low_confidence, active_campaign, unknown_old |
 | WYNN | long | unknown_activist | activist_13d | — | 3082 | rule_conflict, low_confidence, active_campaign, unknown_old |
+| TPHS | long | unknown_activist | activist_13d | — | 2592 | low_confidence, unknown_old |
 | LLY | long | unknown_activist | activist_13d | — | 1325 | low_confidence, unknown_old |
 | LLY | long | unknown_activist | activist_13d | 25.5% | 1360 | unknown_material, low_confidence, unknown_old |
+| GYRO | long | unknown_activist | activist_proxy | — | 1123 | unknown_material, low_confidence, unknown_old |
+| GYRO | long | unknown_activist | activist_proxy | — | 1177 | unknown_material, low_confidence, unknown_old |
 | CVX | long | unknown_activist | activist_13d | — | 1989 | low_confidence, unknown_old |
 | COR | long | sec_filer:walgreens_boots_alliance_holdings_llc_8199 | activist_13d | 1.7% | 712 | rule_conflict, active_campaign, sec_filer_old_low_stake |
 | CNP | long | unknown_activist | activist_proxy | — | 2942 | unknown_material, rule_conflict, low_confidence, active_campaign, unknown_old |
