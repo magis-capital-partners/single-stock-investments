@@ -9,10 +9,10 @@
 | **Archetype** (Stahl) | compounder |
 | **Moat** (Munger) | stable |
 | **Dhando** (Pabrai) | partial |
-| **Stance** | watch |
+| **Stance** | hold |
 | **Cycle** | - |
-| **Implied 7yr IRR** (base) | 3.2% (total synthesis) |
-| **IRR method** | full |
+| **Implied 7yr IRR** (base) | -1.49% (contract base, provisional) |
+| **IRR method** | quality_reinvestment |
 | **Lawrence bucket** | pricing_power |
 | **Payoff lens** | pending |
 | **MOI bucket** | pending |
@@ -43,4 +43,4 @@ Dominant e-commerce + AWS platform compounding at scale (FY2025 $717B sales, $78
 - Model capex vs. AWS/chips ROI through 2028.
 - Confirm valuation vs 5-year range before sizing.
 
-**Deep dive:** `AMZN/research/deep_dive_2026-06-04.md` (auto-sync)
+**Deep dive:** `AMZN/research/deep_dive_2026-07-18.md` (auto-sync)
