@@ -9,6 +9,7 @@ from unittest.mock import patch
 import committee_task_queue
 import investment_committee_pipeline
 import jsonschema
+import select_committee_work
 
 
 DIMS = ("explanatory_strength", "evidence_sufficiency", "downside_control", "return_vs_alternatives")
@@ -106,6 +107,18 @@ class CommitteeTaskQueueTests(unittest.TestCase):
             output = investment_committee_pipeline.assemble(self.work)
             schema = json.loads((Path(__file__).resolve().parents[1] / "templates" / "committee_schema.json").read_text())
             jsonschema.validate(json.loads(output.read_text()), schema)
+
+    def test_auto_selector_derives_company_and_date_from_manifest_path(self):
+        expected = [{"task_id": "pre_mortem"}]
+        with patch.object(select_committee_work, "ROOT", self.root), patch.object(
+            select_committee_work, "next_tasks", return_value=expected
+        ) as queued:
+            result = select_committee_work.select()
+        self.assertEqual(result["ticker"], "AAA")
+        self.assertEqual(result["committee_date"], "2026-07-18")
+        self.assertEqual(result["action"], "advance")
+        self.assertEqual(result["tasks"], expected)
+        queued.assert_called_once_with("AAA", "2026-07-18")
 
 
 if __name__ == "__main__":

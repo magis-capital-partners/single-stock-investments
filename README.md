@@ -67,32 +67,30 @@ powershell -ExecutionPolicy Bypass -File _system/scripts/setup_local.ps1
 
 1. **Settings → General → Change repository visibility → Public**
 2. **Settings → Pages → Build and deployment → Source: GitHub Actions**
-3. Run **Actions → Deploy Dashboard (GitHub Pages) → Run workflow**
+3. Push a dashboard change to `main`; deployment starts automatically.
 
 You can delete the old `DASHBOARD_SYNC_TOKEN` secret and archive `single-stock-dashboard` if no longer needed.
 
 ### Workflows
 
-See **`_system/reference/ci-workflows.md`** for the full capability matrix, shared actions, and orchestration diagram.
+The Actions tab is intentionally automatic: repository workflows do not expose manual run choices. See [`_system/frameworks/actions-operating-model.md`](_system/frameworks/actions-operating-model.md) for ownership, capacity limits, and orchestration.
 
 | Workflow | Trigger | What it does |
 |----------|---------|--------------|
-| [`daily-sync.yml`](.github/workflows/daily-sync.yml) | Daily 12:00 UTC + manual | Deterministic download/news, then call the evidence-gated research dispatcher |
-| [`drive-intake-sync.yml`](.github/workflows/drive-intake-sync.yml) | Hourly :20 UTC + manual | Import Drive PDFs → activist scan → rebuild → **chains Deploy Dashboard** |
-| [`activist-scan-sync.yml`](.github/workflows/activist-scan-sync.yml) | Daily 06:00 UTC + manual | SEC/publisher activist scan → rebuild → **chains Deploy Dashboard** |
-| [`portfolio-news.yml`](.github/workflows/portfolio-news.yml) | Every 6h :30 UTC + manual | Portfolio news ingest → **chains Deploy Dashboard** |
-| [`darwin-refresh.yml`](.github/workflows/darwin-refresh.yml) | Mon 12:00 UTC + push paths + manual | Full Darwin rebuild → **chains Deploy Dashboard** |
-| [`dashboard-pages.yml`](.github/workflows/dashboard-pages.yml) | Push paths + manual + workflow_run | Optional OAuth deploy → rebuild JSON → GitHub Pages |
-| [`deploy-oauth-proxy.yml`](.github/workflows/deploy-oauth-proxy.yml) | Push oauth-proxy + manual | Cloudflare Worker deploy (or local Wrangler) |
-| [`marvin-onboard.yml`](.github/workflows/marvin-onboard.yml) | Manual + repository_dispatch | Onboard and download deterministically, then request evidence-gated research |
-| [`marvin-deep-dive.yml`](.github/workflows/marvin-deep-dive.yml) | Manual compatibility UI | Route deep-dive, auto-pick, and serial batch requests through one dispatcher |
-| [`research-agent-dispatch.yml`](.github/workflows/research-agent-dispatch.yml) | Reusable + manual | The only Marvin agent entrypoint; builds manifest, gates, deduplicates, dispatches |
-| [`power-zone-universe.yml`](.github/workflows/power-zone-universe.yml) | Nightly + manual | Route registry universe → contracts → workbenches → pricing → gated IC |
-| [`investment-committee.yml`](.github/workflows/investment-committee.yml) | Manual stage advance | Five-call committee baseline; conditionally escalate to at most nine calls |
-| [`vicki-ir-harvest.yml`](.github/workflows/vicki-ir-harvest.yml) | Manual + push queue file | Repair/create a reusable IR adapter only after deterministic failure |
+| [`data-pipeline.yml`](.github/workflows/data-pipeline.yml) | Separate schedules | Intake, activist, light/full downloads, Drive, and news in bounded jobs |
+| [`daily-sync.yml`](.github/workflows/daily-sync.yml) | Successful download stage | Admit at most one evidence-changed research company |
+| [`darwin-refresh.yml`](.github/workflows/darwin-refresh.yml) | Weekly + relevant push paths | Full Darwin rebuild → **chains Deploy Dashboard** |
+| [`dashboard-pages.yml`](.github/workflows/dashboard-pages.yml) | Relevant push + successful upstream run | Deploy committed dashboard data to GitHub Pages |
+| [`deploy-oauth-proxy.yml`](.github/workflows/deploy-oauth-proxy.yml) | OAuth proxy path change | Deploy the Cloudflare Worker when credentials exist |
+| [`marvin-onboard.yml`](.github/workflows/marvin-onboard.yml) | Authenticated dashboard event | Onboard deterministically, then request evidence-gated research |
+| [`marvin-deep-dive.yml`](.github/workflows/marvin-deep-dive.yml) | Research queue change | Process queued evidence changes serially through the shared dispatcher |
+| [`research-agent-dispatch.yml`](.github/workflows/research-agent-dispatch.yml) | Reusable only | Build a manifest, gate duplicates/budgets, and dispatch the research agent |
+| [`power-zone-universe.yml`](.github/workflows/power-zone-universe.yml) | Successful downloads + weekly fallback | Route every company → contract → Power Zone pricing → committee packet |
+| [`investment-committee.yml`](.github/workflows/investment-committee.yml) | Committee packet/task change | Automatically advance independent votes and deterministic assembly |
+| [`vicki-ir-harvest.yml`](.github/workflows/vicki-ir-harvest.yml) | IR recovery queue change | Repair an IR adapter only after deterministic failure |
 | [`research-quality.yml`](.github/workflows/research-quality.yml) | PRs touching `**/research/**` | Lint dives + verify cloud prompt sync |
 | [`llm-governance.yml`](.github/workflows/llm-governance.yml) | Agent/workflow PRs + main | Enforce token policy, evidence gates, call budgets, lockfiles, and deprecations |
-| [`ci-autofix.yml`](.github/workflows/ci-autofix.yml) | Failed workflow_run + manual | Notify by default; agent only for repeated narrow code/test/schema signatures |
+| [`ci-autofix.yml`](.github/workflows/ci-autofix.yml) | Failed workflow run | Notify by default; agent only for repeated narrow code/test/schema signatures |
 
 See [`_system/reference/ci-workflows.md`](_system/reference/ci-workflows.md) for composite actions (hidden from sidebar) and orchestration diagram.
 
@@ -144,7 +142,7 @@ Push to `main` after downloads or research triggers a Pages deploy automatically
 
 **Onboard → research:** Dashboard **+ Add holding** triggers deterministic scaffold/download, then the shared dispatcher. A cloud PR starts only when an evidence manifest is ready and not previously processed. See `_system/frameworks/onboard_research_automation.md`.
 
-**Daily analysis loop:** `daily-sync` downloads holdings and news, then the dispatcher picks at most one eligible holding. Unchanged evidence, duplicate hashes, cooldowns, and the one-call daily budget all suppress Cursor.
+**Daily analysis loop:** Data Pipeline refreshes holdings and news; after a successful download stage, `daily-sync` asks the dispatcher for at most one eligible holding. Unchanged evidence, duplicate hashes, cooldowns, and the one-call daily budget all suppress Cursor.
 
 ### Secrets (Settings → Secrets → Actions)
 
@@ -175,7 +173,7 @@ git commit -m "research: YOUR_MESSAGE"
 git push origin main
 ```
 
-Or run **Actions → Marvin Deep Dive** with mode `deep-dive` and a ticker; review and merge the PR the cloud agent opens (must end with `marvin_cloud_refresh.py` per runbook).
+Cloud research begins from the evidence-change queue and opens a reviewable PR automatically; the Actions tab has no manual mode or ticker selector.
 
 Dashboard links use **filename date** (not mtime) for latest `deep_dive_*.md` / `adversarial_*.md`.
 

@@ -1,4 +1,4 @@
-name: Marvin PR automerge
+name: Auto - Agent PR Merge
 
 # Squash-merge Cursor cloud-agent deep dive PRs after research-quality CI passes.
 # Resolves shared-file conflicts with main before merge when needed.
@@ -7,12 +7,6 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
     branches: [main]
-  workflow_dispatch:
-    inputs:
-      pr_number:
-        description: PR number to automerge (cursor/* branches only)
-        required: true
-        type: number
 
 permissions:
   contents: write
@@ -33,11 +27,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "number=${{ inputs.pr_number }}" >> "$GITHUB_OUTPUT"
-          else
-            echo "number=${{ github.event.pull_request.number }}" >> "$GITHUB_OUTPUT"
-          fi
+          echo "number=${{ github.event.pull_request.number }}" >> "$GITHUB_OUTPUT"
 
       - name: Load PR metadata
         id: meta
@@ -76,8 +66,7 @@ jobs:
         id: meta2
         if: |
           steps.meta.outputs.is_draft == 'false' ||
-          github.event_name == 'workflow_dispatch' ||
-          (github.event_name == 'pull_request' && github.event.action != 'opened')
+          github.event.action != 'opened'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -94,24 +83,21 @@ jobs:
       - uses: actions/checkout@v4
         if: |
           steps.meta.outputs.is_draft == 'false' ||
-          github.event_name == 'workflow_dispatch' ||
-          (github.event_name == 'pull_request' && github.event.action != 'opened')
+          github.event.action != 'opened'
         with:
           fetch-depth: 0
 
       - uses: actions/setup-python@v5
         if: |
           steps.meta.outputs.is_draft == 'false' ||
-          github.event_name == 'workflow_dispatch' ||
-          (github.event_name == 'pull_request' && github.event.action != 'opened')
+          github.event.action != 'opened'
         with:
           python-version: "3.12"
 
       - name: Resolve merge conflicts with main
         if: |
           steps.meta.outputs.is_draft == 'false' ||
-          github.event_name == 'workflow_dispatch' ||
-          (github.event_name == 'pull_request' && github.event.action != 'opened')
+          github.event.action != 'opened'
         id: resolve
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -128,8 +114,7 @@ jobs:
       - name: Refresh head SHA
         if: |
           steps.meta.outputs.is_draft == 'false' ||
-          github.event_name == 'workflow_dispatch' ||
-          (github.event_name == 'pull_request' && github.event.action != 'opened')
+          github.event.action != 'opened'
         id: head
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -140,8 +125,7 @@ jobs:
       - name: Wait for research quality checks
         if: |
           steps.meta.outputs.is_draft == 'false' ||
-          github.event_name == 'workflow_dispatch' ||
-          (github.event_name == 'pull_request' && github.event.action != 'opened')
+          github.event.action != 'opened'
         uses: lewagon/wait-on-check-action@v1.3.4
         with:
           ref: ${{ steps.head.outputs.sha }}
@@ -153,8 +137,7 @@ jobs:
       - name: Ensure mergeable before squash
         if: |
           steps.meta.outputs.is_draft == 'false' ||
-          github.event_name == 'workflow_dispatch' ||
-          (github.event_name == 'pull_request' && github.event.action != 'opened')
+          github.event.action != 'opened'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -181,8 +164,7 @@ jobs:
       - name: Squash merge and delete branch
         if: |
           steps.meta.outputs.is_draft == 'false' ||
-          github.event_name == 'workflow_dispatch' ||
-          (github.event_name == 'pull_request' && github.event.action != 'opened')
+          github.event.action != 'opened'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -199,7 +181,6 @@ jobs:
       - name: Summary
         if: |
           steps.meta.outputs.is_draft == 'false' ||
-          github.event_name == 'workflow_dispatch' ||
-          (github.event_name == 'pull_request' && github.event.action != 'opened')
+          github.event.action != 'opened'
         run: |
           echo "Merged PR #${{ steps.pr.outputs.number }} (${{ steps.meta.outputs.head_ref }}) into main."

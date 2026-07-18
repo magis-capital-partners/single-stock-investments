@@ -1,25 +1,9 @@
-name: Vicki IR Harvest
+name: Auto - IR Recovery
 
 # Browser IR harvest for tickers where Marvin curl/urllib failed (ir_gap).
-# Trigger: push updated queue to main, or manual workflow_dispatch.
+# Trigger: a deterministic adapter failure updates the queue on main.
 
 on:
-  workflow_dispatch:
-    inputs:
-      tickers:
-        description: "Optional comma-separated tickers (empty = queue file)"
-        required: false
-        type: string
-      max_parallel:
-        description: "Max concurrent Vicki jobs"
-        required: false
-        default: "2"
-        type: string
-      force:
-        description: Explicitly bypass working-adapter and active-gap checks
-        required: false
-        default: false
-        type: boolean
   push:
     branches: [main]
     paths:
@@ -35,6 +19,7 @@ concurrency:
 jobs:
   prepare:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     outputs:
       tickers: ${{ steps.matrix.outputs.tickers }}
       max_parallel: ${{ steps.matrix.outputs.max_parallel }}
@@ -63,8 +48,8 @@ jobs:
       - name: Build matrix
         id: matrix
         env:
-          TICKERS_INPUT: ${{ github.event.inputs.tickers }}
-          FORCE_INPUT: ${{ github.event.inputs.force || 'false' }}
+          TICKERS_INPUT: ""
+          FORCE_INPUT: "false"
         run: |
           FORCE_ARG=()
           if [ "$FORCE_INPUT" = "true" ]; then FORCE_ARG+=(--force); fi
@@ -74,7 +59,7 @@ jobs:
             TICKERS_JSON=$(python _system/scripts/build_vicki_dispatch_matrix.py --use-queue "${FORCE_ARG[@]}")
           fi
           echo "tickers=$TICKERS_JSON" >> "$GITHUB_OUTPUT"
-          MAXP="${{ github.event.inputs.max_parallel }}"
+          MAXP=""
           if [ -z "$MAXP" ] && [ -f _system/data/vicki_dispatch_queue.json ]; then
             MAXP=$(python -c "import json; print(json.load(open('_system/data/vicki_dispatch_queue.json')).get('max_parallel') or 2)")
           fi
@@ -92,7 +77,7 @@ jobs:
     timeout-minutes: 90
     strategy:
       fail-fast: false
-      max-parallel: ${{ fromJson(needs.prepare.outputs.max_parallel) }}
+      max-parallel: 2
       matrix:
         ticker: ${{ fromJson(needs.prepare.outputs.tickers) }}
     steps:
@@ -117,7 +102,7 @@ jobs:
       - name: Verify deterministic adapter failure
         id: adapter
         env:
-          FORCE_INPUT: ${{ github.event.inputs.force || 'false' }}
+          FORCE_INPUT: "false"
         run: |
           ARGS=("${{ matrix.ticker }}" --github-output)
           if [ "$FORCE_INPUT" = "true" ]; then ARGS+=(--force); fi
@@ -132,4 +117,4 @@ jobs:
           reason: ${{ steps.adapter.outputs.reason }}
           evidence_hash: ${{ steps.adapter.outputs.evidence_hash }}
           adapter_path: ${{ steps.adapter.outputs.adapter_path }}
-          force: ${{ github.event.inputs.force || 'false' }}
+          force: "false"

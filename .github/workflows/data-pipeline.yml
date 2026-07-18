@@ -1,32 +1,19 @@
 name: Data Pipeline
 
-# Single writer lane for scheduled data jobs. Darwin is manual-only
-# (see darwin-refresh.yml). Marvin pick stays in daily-sync.yml after downloads.
+# Single scheduled writer lane for deterministic data jobs.
 
 on:
   schedule:
     - cron: "0 3 * * *"     # nightly intake-full
     - cron: "0 6 * * *"     # activist scan
-    - cron: "0 12 * * *"    # portfolio downloads
+    - cron: "0 12 * * 1,2,4,5,6" # light portfolio refresh
+    - cron: "0 10 * * 0,3"  # full document harvest twice weekly
     - cron: "0 14 * * *"    # drive intake (daily)
     - cron: "30 */6 * * *"  # portfolio news
-  workflow_dispatch:
-    inputs:
-      job:
-        description: "Which pipeline job to run"
-        required: true
-        type: choice
-        default: intake-full
-        options:
-          - intake-full
-          - activist
-          - downloads
-          - drive
-          - news
-          - all
 
 permissions:
   contents: write
+  pull-requests: write
 
 # Serialize writers across workflows without cancelling a long downloads run.
 # Each committing job opts into data-commit-main below.
@@ -34,10 +21,12 @@ permissions:
 jobs:
   decide:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     outputs:
       intake_full: ${{ steps.pick.outputs.intake_full }}
       activist: ${{ steps.pick.outputs.activist }}
       downloads: ${{ steps.pick.outputs.downloads }}
+      download_mode: ${{ steps.pick.outputs.download_mode }}
       drive: ${{ steps.pick.outputs.drive }}
       news: ${{ steps.pick.outputs.news }}
     steps:
@@ -45,43 +34,27 @@ jobs:
         env:
           EVENT_NAME: ${{ github.event_name }}
           SCHEDULE: ${{ github.event.schedule }}
-          JOB: ${{ github.event.inputs.job || '' }}
         run: |
           set -euo pipefail
-          intake_full=false; activist=false; downloads=false; drive=false; news=false
-          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
-            case "$JOB" in
-              intake-full) intake_full=true ;;
-              activist) activist=true ;;
-              downloads) downloads=true ;;
-              drive) drive=true ;;
-              news) news=true ;;
-              all)
-                intake_full=true; activist=true; downloads=true; drive=true; news=true
-                ;;
-              *) echo "::error::Unknown job=$JOB"; exit 1 ;;
-            esac
-          else
-            case "$SCHEDULE" in
-              "0 3 * * *") intake_full=true ;;
-              "0 6 * * *") activist=true ;;
-              "0 12 * * *") downloads=true ;;
-              "0 14 * * *") drive=true ;;
-              "30 */6 * * *") news=true ;;
-              *)
-                echo "::warning::Unrecognized schedule='$SCHEDULE'; defaulting to intake-full"
-                intake_full=true
-                ;;
-            esac
-          fi
+          intake_full=false; activist=false; downloads=false; drive=false; news=false; download_mode=light
+          case "$SCHEDULE" in
+            "0 3 * * *") intake_full=true ;;
+            "0 6 * * *") activist=true ;;
+            "0 12 * * 1,2,4,5,6") downloads=true; download_mode=light ;;
+            "0 10 * * 0,3") downloads=true; download_mode=full ;;
+            "0 14 * * *") drive=true ;;
+            "30 */6 * * *") news=true ;;
+            *) echo "::error::Unrecognized schedule='$SCHEDULE'"; exit 1 ;;
+          esac
           {
             echo "intake_full=$intake_full"
             echo "activist=$activist"
             echo "downloads=$downloads"
+            echo "download_mode=$download_mode"
             echo "drive=$drive"
             echo "news=$news"
           } >> "$GITHUB_OUTPUT"
-          echo "Selected: intake_full=$intake_full activist=$activist downloads=$downloads drive=$drive news=$news"
+          echo "Selected: intake_full=$intake_full activist=$activist downloads=$downloads($download_mode) drive=$drive news=$news"
 
   intake-full:
     needs: decide
@@ -194,7 +167,7 @@ jobs:
     needs: decide
     if: needs.decide.outputs.downloads == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 360
+    timeout-minutes: 300
     concurrency:
       group: data-commit-main
       cancel-in-progress: false
@@ -229,7 +202,13 @@ jobs:
         env:
           POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY || secrets.POLYGON_IO_API_KEY }}
           POLYGON_EARNINGS_CACHE_MAX_AGE_HOURS: "36"
-        run: python _system/scripts/download_all_holdings.py
+          DOWNLOAD_MODE: ${{ needs.decide.outputs.download_mode }}
+        run: |
+          if [ "$DOWNLOAD_MODE" = "light" ]; then
+            python _system/scripts/download_all_holdings.py --light
+          else
+            python _system/scripts/download_all_holdings.py
+          fi
       - name: Commit and push workspace
         uses: ./.github/actions/commit-main
         with:
@@ -274,10 +253,6 @@ jobs:
           if [ -z "$GOOGLE_APPLICATION_CREDENTIALS_JSON" ]; then
             echo "configured=false" >> "$GITHUB_OUTPUT"
             MSG="GOOGLE_APPLICATION_CREDENTIALS_JSON is not configured."
-            if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-              echo "::error::${MSG}"
-              exit 1
-            fi
             echo "::warning::Skipping Drive Intake — ${MSG}"
           else
             echo "configured=true" >> "$GITHUB_OUTPUT"
@@ -372,6 +347,7 @@ jobs:
     needs: [decide, intake-full, activist, downloads, drive, news]
     if: always()
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Summary
         run: |

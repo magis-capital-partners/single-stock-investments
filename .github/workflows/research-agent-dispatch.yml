@@ -24,23 +24,6 @@ on:
         required: false
       RESEARCH_VAULT_CLONE_TOKEN:
         required: false
-  workflow_dispatch:
-    inputs:
-      ticker:
-        description: Optional explicit holding; blank selects the next material evidence change
-        required: false
-        type: string
-      reason:
-        description: Judgment reason for an explicit ticker
-        required: false
-        type: choice
-        options: [manual_material_change, new_documents, new_valuation_news, onboard_pending]
-        default: manual_material_change
-      force:
-        description: Explicitly bypass duplicate/cooldown suppression
-        required: false
-        type: boolean
-        default: false
 
 permissions:
   contents: read
@@ -49,6 +32,7 @@ permissions:
 jobs:
   select:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     outputs:
       ticker: ${{ steps.select.outputs.ticker }}
       reason: ${{ steps.select.outputs.reason }}
@@ -146,5 +130,6 @@ jobs:
     needs: select
     if: needs.select.outputs.skip == 'true' || needs.select.outputs.ticker == ''
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - run: echo "No Cursor research call—no unprocessed material evidence is ready."

@@ -2,7 +2,14 @@ name: Darwin Portfolio Refresh
 
 # Manual only — no schedule, no push. Run when Darwin code/mandate needs a full rebuild.
 on:
-  workflow_dispatch:
+  schedule:
+    - cron: "0 8 * * 1"
+  push:
+    branches: [main]
+    paths:
+      - "_system/scripts/*darwin*"
+      - "_system/config/darwin*"
+      - ".github/workflows/darwin-refresh.yml"
 
 permissions:
   contents: write

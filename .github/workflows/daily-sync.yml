@@ -1,9 +1,8 @@
-name: Daily Download & Research Dispatch
+name: Auto - Daily Research
 
 # Data Pipeline owns deterministic downloads. After a successful download job,
 # the shared dispatcher admits at most one unprocessed material evidence change.
 on:
-  workflow_dispatch:
   workflow_run:
     workflows: ["Data Pipeline"]
     types: [completed]
@@ -20,22 +19,16 @@ concurrency:
 jobs:
   gate:
     runs-on: ubuntu-latest
-    if: >
-      github.event_name == 'workflow_dispatch' ||
-      github.event.workflow_run.conclusion == 'success'
+    timeout-minutes: 10
+    if: github.event.workflow_run.conclusion == 'success'
     outputs:
       downloads_ready: ${{ steps.check.outputs.downloads_ready }}
     steps:
       - id: check
         env:
           GH_TOKEN: ${{ github.token }}
-          EVENT_NAME: ${{ github.event_name }}
-          RUN_ID: ${{ github.event.workflow_run.id || '' }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
         run: |
-          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
-            echo "downloads_ready=true" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
           JOBS=$(gh api "repos/${{ github.repository }}/actions/runs/${RUN_ID}/jobs" \
             --jq '.jobs[] | select(.name=="downloads") | .conclusion' 2>/dev/null || true)
           if echo "$JOBS" | grep -qx success; then

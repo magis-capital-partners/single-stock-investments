@@ -1,4 +1,5 @@
 import json
+import re
 import unittest
 from pathlib import Path
 
@@ -9,6 +10,47 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class WorkflowGovernanceTests(unittest.TestCase):
+    def test_actions_surface_has_no_manual_run_choices(self):
+        for path in (ROOT / ".github" / "workflows").glob("*.yml"):
+            text = path.read_text(encoding="utf-8")
+            self.assertNotRegex(text, r"(?m)^\s{2}workflow_dispatch:\s*$", path.name)
+
+    def test_every_runner_job_has_a_hard_timeout(self):
+        for path in (ROOT / ".github" / "workflows").glob("*.yml"):
+            text = path.read_text(encoding="utf-8")
+            jobs = text.split("\njobs:\n", 1)
+            if len(jobs) != 2:
+                continue
+            blocks = re.split(r"(?m)(?=^  [A-Za-z0-9_-]+:\s*$)", jobs[1])
+            for block in blocks:
+                if re.search(r"(?m)^    runs-on:", block):
+                    self.assertRegex(block, r"(?m)^    timeout-minutes: [1-9][0-9]*$", path.name)
+                    timeout = int(re.search(r"(?m)^    timeout-minutes: ([0-9]+)$", block).group(1))
+                    self.assertLessEqual(timeout, 300, path.name)
+
+    def test_agent_parallelism_and_artifact_retention_are_bounded(self):
+        for path in (ROOT / ".github" / "workflows").glob("*.yml"):
+            text = path.read_text(encoding="utf-8")
+            for value in re.findall(r"(?m)^\s+max-parallel:\s+([0-9]+)\s*$", text):
+                self.assertLessEqual(int(value), 3, path.name)
+            lines = text.splitlines()
+            for index, line in enumerate(lines):
+                if "actions/upload-artifact@" in line:
+                    window = "\n".join(lines[index:index + 12])
+                    self.assertRegex(window, r"(?m)^\s+retention-days:\s+[1-7]\s*$", path.name)
+
+    def test_deprecated_wrapper_workflows_stay_removed(self):
+        retired = {
+            "activist-scan-sync.yml",
+            "drive-intake-sync.yml",
+            "portfolio-news.yml",
+            "batch-onboard-pdfs.yml",
+            "ci-autofix-reusable.yml",
+        }
+        active = {path.name for path in (ROOT / ".github" / "workflows").glob("*.yml")}
+        self.assertTrue(retired.isdisjoint(active))
+        self.assertLessEqual(len(active), 18)
+
     def test_only_dispatcher_invokes_marvin_action(self):
         callers = []
         for path in (ROOT / ".github" / "workflows").glob("*.yml"):

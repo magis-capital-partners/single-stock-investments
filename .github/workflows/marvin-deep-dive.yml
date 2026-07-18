@@ -1,34 +1,7 @@
-name: Research Deep Dive Dispatch
+name: Auto - Research Queue
 
-# Compatibility UI for manual and queued deep dives. Every path delegates to
-# the same evidence-hashed dispatcher; this workflow never calls Cursor itself.
+# Evidence queue only. This workflow never calls Cursor itself.
 on:
-  workflow_dispatch:
-    inputs:
-      mode:
-        description: Run mode
-        required: true
-        type: choice
-        options: [deep-dive, auto-pick, batch]
-        default: deep-dive
-      ticker:
-        description: Ticker for deep-dive mode
-        required: false
-        type: string
-      force:
-        description: Explicit manual override for unchanged evidence
-        required: false
-        type: boolean
-        default: false
-      tickers:
-        description: Batch comma-separated tickers; blank uses the queue
-        required: false
-        type: string
-      max_parallel:
-        description: Batch concurrency; one is safest for research PR sequencing
-        required: false
-        default: "1"
-        type: string
   push:
     branches: [main]
     paths:
@@ -39,20 +12,9 @@ permissions:
   pull-requests: write
 
 jobs:
-  single:
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.mode != 'batch'
-    uses: ./.github/workflows/research-agent-dispatch.yml
-    with:
-      ticker: ${{ github.event.inputs.mode == 'deep-dive' && github.event.inputs.ticker || '' }}
-      reason: ${{ github.event.inputs.mode == 'deep-dive' && 'manual_material_change' || '' }}
-      force: ${{ github.event.inputs.force == 'true' }}
-    secrets: inherit
-
   batch-prepare:
-    if: >
-      github.event_name == 'push' ||
-      (github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'batch')
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     outputs:
       tickers: ${{ steps.matrix.outputs.tickers }}
       max_parallel: ${{ steps.matrix.outputs.max_parallel }}
@@ -66,25 +28,17 @@ jobs:
         with:
           python-version: "3.12"
       - id: matrix
-        env:
-          TICKERS_INPUT: ${{ github.event.inputs.tickers }}
-          MAX_PARALLEL_INPUT: ${{ github.event.inputs.max_parallel }}
         run: |
-          if [ -n "$TICKERS_INPUT" ]; then
-            TICKERS=$(python _system/scripts/build_deep_dive_dispatch_matrix.py --tickers "$TICKERS_INPUT")
-          else
-            TICKERS=$(python _system/scripts/build_deep_dive_dispatch_matrix.py --use-queue)
-          fi
-          MAXP="${MAX_PARALLEL_INPUT:-1}"
+          TICKERS=$(python _system/scripts/build_deep_dive_dispatch_matrix.py --use-queue)
           echo "tickers=$TICKERS" >> "$GITHUB_OUTPUT"
-          echo "max_parallel=$MAXP" >> "$GITHUB_OUTPUT"
+          echo "max_parallel=1" >> "$GITHUB_OUTPUT"
 
   batch:
     needs: batch-prepare
     if: needs.batch-prepare.outputs.tickers != '[]'
     strategy:
       fail-fast: false
-      max-parallel: ${{ fromJson(needs.batch-prepare.outputs.max_parallel) }}
+      max-parallel: 1
       matrix:
         ticker: ${{ fromJson(needs.batch-prepare.outputs.tickers) }}
     uses: ./.github/workflows/research-agent-dispatch.yml

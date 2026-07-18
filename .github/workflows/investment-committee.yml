@@ -1,60 +1,57 @@
-name: Investment Committee
+name: Auto - Investment Committee
 
+# A Power Zone commit creates committee_work. Each merged isolated-task PR
+# changes that tree and automatically advances the next stage.
 on:
-  workflow_dispatch:
-    inputs:
-      ticker:
-        description: Security ticker
-        required: true
-        type: string
-      committee_date:
-        description: Committee date (YYYY-MM-DD)
-        required: true
-        type: string
-      mode:
-        description: Advance isolated tasks or assemble completed work
-        required: true
-        type: choice
-        options: [advance, assemble]
-        default: advance
+  push:
+    branches: [main]
+    paths:
+      - "*/research/committee_work/**/*.json"
+      - "_system/scripts/committee_*.py"
+      - "_system/scripts/investment_committee_pipeline.py"
+      - ".github/workflows/investment-committee.yml"
 
 permissions:
   contents: write
   pull-requests: write
 
 concurrency:
-  group: investment-committee-${{ inputs.ticker }}-${{ inputs.committee_date }}-${{ inputs.mode }}
+  group: investment-committee-auto
   cancel-in-progress: false
 
 jobs:
   prepare:
-    if: inputs.mode == 'advance'
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     outputs:
+      ticker: ${{ steps.queue.outputs.ticker }}
+      committee_date: ${{ steps.queue.outputs.committee_date }}
+      action: ${{ steps.queue.outputs.action }}
       tasks: ${{ steps.queue.outputs.tasks }}
-      has_tasks: ${{ steps.queue.outputs.has_tasks }}
     steps:
       - uses: actions/checkout@v4
         with:
+          sparse-checkout-cone-mode: false
           sparse-checkout: |
-            _system
-            ${{ inputs.ticker }}/research
+            /_system/scripts/**
+            /*/research/committee_work/**
+            /*/research/valuation.json
+            /*/research/valuation_contract.json
+            /*/research/valuation_workbench.json
+            /*/research/thesis.md
       - id: queue
-        run: |
-          TASKS=$(python _system/scripts/committee_task_queue.py "${{ inputs.ticker }}" --date "${{ inputs.committee_date }}")
-          echo "tasks=$TASKS" >> "$GITHUB_OUTPUT"
-          if [ "$TASKS" = "[]" ]; then echo "has_tasks=false" >> "$GITHUB_OUTPUT"; else echo "has_tasks=true" >> "$GITHUB_OUTPUT"; fi
+        run: python _system/scripts/select_committee_work.py --github-output "$GITHUB_OUTPUT"
 
   isolated-tasks:
     needs: prepare
-    if: needs.prepare.outputs.has_tasks == 'true'
+    if: needs.prepare.outputs.action == 'advance'
     strategy:
       fail-fast: false
-      max-parallel: 4
+      max-parallel: 3
       matrix:
         include: ${{ fromJson(needs.prepare.outputs.tasks) }}
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
         with:
@@ -89,7 +86,7 @@ jobs:
         env:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-          CURSOR_STARTING_REF: ${{ github.ref_name }}
+          CURSOR_STARTING_REF: main
           TICKER: ${{ matrix.ticker }}
           COMMITTEE_DATE: ${{ matrix.as_of }}
           TASK_KEY: ${{ matrix.task_key }}
@@ -105,37 +102,49 @@ jobs:
             --consumer investment_committee --subject "${{ matrix.task_key }}" \
             --reason "${{ matrix.task_id }}" --evidence-hash "${{ matrix.evidence_hash }}" \
             --ledger "${{ steps.llm_gate.outputs.ledger }}" --status "$STATUS"
-      - name: Upload committee call audit
+      - name: Upload compact committee audit
         if: always() && steps.llm_gate.outputs.approved == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: llm-audit-committee-${{ matrix.task_key }}-${{ github.run_id }}
           path: ${{ steps.llm_gate.outputs.ledger }}
           if-no-files-found: ignore
+          retention-days: 7
 
   assemble:
-    if: inputs.mode == 'assemble'
+    needs: prepare
+    if: needs.prepare.outputs.action == 'assemble'
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           sparse-checkout: |
             _system
-            ${{ inputs.ticker }}/research
+            ${{ needs.prepare.outputs.ticker }}/research
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - name: Validate and assemble
         run: |
-          python _system/scripts/investment_committee_pipeline.py validate "${{ inputs.ticker }}" --date "${{ inputs.committee_date }}"
-          python _system/scripts/investment_committee_pipeline.py assemble "${{ inputs.ticker }}" --date "${{ inputs.committee_date }}"
+          python _system/scripts/committee_task_queue.py "${{ needs.prepare.outputs.ticker }}" --date "${{ needs.prepare.outputs.committee_date }}"
+          python _system/scripts/investment_committee_pipeline.py validate "${{ needs.prepare.outputs.ticker }}" --date "${{ needs.prepare.outputs.committee_date }}"
+          python _system/scripts/investment_committee_pipeline.py assemble "${{ needs.prepare.outputs.ticker }}" --date "${{ needs.prepare.outputs.committee_date }}"
       - name: Commit assembled committee
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "${{ inputs.ticker }}/research/committee_${{ inputs.committee_date }}.json" \
-                  "${{ inputs.ticker }}/research/committee_work/${{ inputs.committee_date }}/manifest.json" \
-                  "${{ inputs.ticker }}/research/valuation_workbench.json"
-          git commit -m "feat(ic): assemble ${{ inputs.ticker }} committee ${{ inputs.committee_date }}"
-          git push origin "HEAD:${GITHUB_REF_NAME}"
+          git add "${{ needs.prepare.outputs.ticker }}/research/committee_${{ needs.prepare.outputs.committee_date }}.json" \
+                  "${{ needs.prepare.outputs.ticker }}/research/committee_work/${{ needs.prepare.outputs.committee_date }}/manifest.json" \
+                  "${{ needs.prepare.outputs.ticker }}/research/valuation_workbench.json"
+          git commit -m "feat(ic): assemble ${{ needs.prepare.outputs.ticker }} committee ${{ needs.prepare.outputs.committee_date }}"
+          git push origin HEAD:main
+
+  caught-up:
+    needs: prepare
+    if: needs.prepare.outputs.action == 'none'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - run: echo "No committee stage is ready; the automatic queue is caught up."

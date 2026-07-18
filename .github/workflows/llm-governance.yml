@@ -41,6 +41,14 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            .github
+            _system/ci_autofix
+            _system/config
+            _system/frameworks
+            _system/scripts
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"

@@ -64,6 +64,7 @@ permissions:
 jobs:
   ref-resolution:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
@@ -102,6 +103,7 @@ jobs:
 
   ci-push-rebase:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
@@ -121,6 +123,7 @@ jobs:
 
   letter-date-parser:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
@@ -133,6 +136,7 @@ jobs:
 
   checkout-minimal:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: jlumbroso/free-disk-space@main
         with:

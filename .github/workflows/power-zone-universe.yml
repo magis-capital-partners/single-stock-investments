@@ -1,31 +1,47 @@
 name: Power Zone Universe
 
 on:
-  workflow_dispatch:
-    inputs:
-      scope:
-        description: Universe scope
-        required: true
-        type: choice
-        options: [all, valued, priority]
-        default: all
-      dry_run:
-        description: Validate without writing artifacts
-        required: false
-        type: boolean
-        default: false
   schedule:
-    - cron: "30 5 * * *"
+    - cron: "30 5 * * 1"
+  workflow_run:
+    workflows: [Data Pipeline]
+    types: [completed]
+    branches: [main]
+  repository_dispatch:
+    types: [refresh-power-zones]
 
 permissions:
   contents: write
+  actions: read
 
 concurrency:
   group: power-zone-universe-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
+  gate:
+    if: github.event_name == 'workflow_run'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      downloads_ready: ${{ steps.check.outputs.downloads_ready }}
+    steps:
+      - id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+        run: |
+          JOBS=$(gh api "repos/${{ github.repository }}/actions/runs/${RUN_ID}/jobs" \
+            --jq '.jobs[] | select(.name=="downloads") | .conclusion' 2>/dev/null || true)
+          if echo "$JOBS" | grep -qx success; then
+            echo "downloads_ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "downloads_ready=false" >> "$GITHUB_OUTPUT"
+          fi
+
   route-value-gate:
+    needs: gate
+    if: always() && (github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && needs.gate.outputs.downloads_ready == 'true'))
     runs-on: ubuntu-latest
     timeout-minutes: 120
     steps:
@@ -64,16 +80,10 @@ jobs:
             test_llm_workflow_governance
 
       - name: Process canonical universe
-        env:
-          SCOPE: ${{ github.event.inputs.scope || 'all' }}
-          DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
         run: |
-          ARGS=(--scope "$SCOPE" --skip-dashboard)
-          if [ "$DRY_RUN" = "true" ]; then ARGS+=(--dry-run); fi
-          python _system/scripts/run_security_decision_pipeline.py "${ARGS[@]}"
+          python _system/scripts/run_security_decision_pipeline.py --scope all --skip-dashboard
 
       - name: Commit authority artifacts
-        if: github.event.inputs.dry_run != 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -94,4 +104,4 @@ jobs:
           git push origin "HEAD:${GITHUB_REF_NAME}"
 
       - name: Summary
-        run: echo "Power Zone universe processing completed for ${{ github.event.inputs.scope || 'all' }}."
+        run: echo "Power Zone universe processing completed for all companies."

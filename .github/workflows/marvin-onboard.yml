@@ -1,51 +1,6 @@
-name: Marvin Onboard Ticker
+name: Auto - Onboard Ticker
 
 on:
-  workflow_dispatch:
-    inputs:
-      ticker:
-        description: "Ticker symbol (e.g. SJT, 8697.T, TEQ.ST)"
-        required: true
-        type: string
-      company:
-        description: "Company name"
-        required: true
-        type: string
-      market:
-        description: "Market code"
-        required: true
-        type: choice
-        options:
-          - US
-          - JP
-          - CA
-          - SE
-          - EU
-          - OTC
-        default: US
-      cik:
-        description: "SEC CIK (US only, optional — auto-lookup if blank)"
-        required: false
-        type: string
-      ir_url:
-        description: "Investor relations URL(s), space-separated"
-        required: false
-        type: string
-      from_watchlist:
-        description: "Promote from watchlist"
-        required: false
-        type: boolean
-        default: false
-      watchlist_only:
-        description: "Add to watchlist only (no folder/download)"
-        required: false
-        type: boolean
-        default: false
-      download_8k_exhibits:
-        description: "Download 8-K exhibit PDFs (US royalty trusts etc.)"
-        required: false
-        type: boolean
-        default: false
   repository_dispatch:
     types: [onboard-ticker]
 
@@ -60,7 +15,7 @@ concurrency:
 jobs:
   onboard:
     runs-on: ubuntu-latest
-    timeout-minutes: 360
+    timeout-minutes: 240
     outputs:
       ticker: ${{ steps.vars.outputs.ticker }}
       watchlist_only: ${{ steps.vars.outputs.watchlist_only }}
@@ -94,30 +49,19 @@ jobs:
         env:
           DISPATCH_TOKEN: ${{ secrets.ONBOARD_DISPATCH_TOKEN }}
         run: |
-          if [ "${{ github.event_name }}" = "repository_dispatch" ]; then
-            PAYLOAD='${{ toJson(github.event.client_payload) }}'
-            echo "ticker=$(echo "$PAYLOAD" | jq -r '.ticker // empty')" >> "$GITHUB_OUTPUT"
-            echo "company=$(echo "$PAYLOAD" | jq -r '.company // empty')" >> "$GITHUB_OUTPUT"
-            echo "market=$(echo "$PAYLOAD" | jq -r '.market // "US"')" >> "$GITHUB_OUTPUT"
-            echo "cik=$(echo "$PAYLOAD" | jq -r '.cik // empty')" >> "$GITHUB_OUTPUT"
-            echo "ir_url=$(echo "$PAYLOAD" | jq -r '.ir_url // empty')" >> "$GITHUB_OUTPUT"
-            echo "from_watchlist=$(echo "$PAYLOAD" | jq -r '.from_watchlist // false')" >> "$GITHUB_OUTPUT"
-            echo "watchlist_only=$(echo "$PAYLOAD" | jq -r '.watchlist_only // false')" >> "$GITHUB_OUTPUT"
-            echo "download_8k_exhibits=$(echo "$PAYLOAD" | jq -r '.download_8k_exhibits // false')" >> "$GITHUB_OUTPUT"
-            TOKEN=$(echo "$PAYLOAD" | jq -r '.token // empty')
-            if [ -n "$DISPATCH_TOKEN" ] && [ -n "$TOKEN" ] && [ "$TOKEN" != "$DISPATCH_TOKEN" ]; then
-              echo "::error::Invalid onboard dispatch token"
-              exit 1
-            fi
-          else
-            echo "ticker=${{ github.event.inputs.ticker }}" >> "$GITHUB_OUTPUT"
-            echo "company=${{ github.event.inputs.company }}" >> "$GITHUB_OUTPUT"
-            echo "market=${{ github.event.inputs.market }}" >> "$GITHUB_OUTPUT"
-            echo "cik=${{ github.event.inputs.cik }}" >> "$GITHUB_OUTPUT"
-            echo "ir_url=${{ github.event.inputs.ir_url }}" >> "$GITHUB_OUTPUT"
-            echo "from_watchlist=${{ github.event.inputs.from_watchlist }}" >> "$GITHUB_OUTPUT"
-            echo "watchlist_only=${{ github.event.inputs.watchlist_only }}" >> "$GITHUB_OUTPUT"
-            echo "download_8k_exhibits=${{ github.event.inputs.download_8k_exhibits }}" >> "$GITHUB_OUTPUT"
+          PAYLOAD='${{ toJson(github.event.client_payload) }}'
+          echo "ticker=$(echo "$PAYLOAD" | jq -r '.ticker // empty')" >> "$GITHUB_OUTPUT"
+          echo "company=$(echo "$PAYLOAD" | jq -r '.company // empty')" >> "$GITHUB_OUTPUT"
+          echo "market=$(echo "$PAYLOAD" | jq -r '.market // "US"')" >> "$GITHUB_OUTPUT"
+          echo "cik=$(echo "$PAYLOAD" | jq -r '.cik // empty')" >> "$GITHUB_OUTPUT"
+          echo "ir_url=$(echo "$PAYLOAD" | jq -r '.ir_url // empty')" >> "$GITHUB_OUTPUT"
+          echo "from_watchlist=$(echo "$PAYLOAD" | jq -r '.from_watchlist // false')" >> "$GITHUB_OUTPUT"
+          echo "watchlist_only=$(echo "$PAYLOAD" | jq -r '.watchlist_only // false')" >> "$GITHUB_OUTPUT"
+          echo "download_8k_exhibits=$(echo "$PAYLOAD" | jq -r '.download_8k_exhibits // false')" >> "$GITHUB_OUTPUT"
+          TOKEN=$(echo "$PAYLOAD" | jq -r '.token // empty')
+          if [ -n "$DISPATCH_TOKEN" ] && [ -n "$TOKEN" ] && [ "$TOKEN" != "$DISPATCH_TOKEN" ]; then
+            echo "::error::Invalid onboard dispatch token"
+            exit 1
           fi
 
       - name: Set up Python
