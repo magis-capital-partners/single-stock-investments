@@ -119,7 +119,9 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--tickers", nargs="*", type=str.upper, help="Refresh only named ticker rows.")
     args = parser.parse_args()
-    tickers = tuple(args.tickers) if args.tickers else cohort_tickers()
+    # Preserve the distinction between no --tickers flag (refresh every
+    # materialized deep dive plus the valuation cohort) and an explicit list.
+    tickers = tuple(args.tickers) if args.tickers is not None else None
     for path in (ROOT / "dashboard" / "data" / "dashboard_data.json", ROOT / "docs" / "data" / "dashboard_data.json"):
         if path.exists():
             print(f"{path.relative_to(ROOT)}: {refresh(path, tickers)} valuation rows")
