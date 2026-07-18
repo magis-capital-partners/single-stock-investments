@@ -120,6 +120,15 @@ class CommitteeTaskQueueTests(unittest.TestCase):
         self.assertEqual(result["tasks"], expected)
         queued.assert_called_once_with("AAA", "2026-07-18")
 
+    def test_auto_selector_refreshes_a_stale_frozen_packet(self):
+        with patch.object(select_committee_work, "ROOT", self.root), patch.object(
+            select_committee_work, "packet_is_current", return_value=False
+        ), patch.object(select_committee_work, "next_tasks") as queued:
+            result = select_committee_work.select()
+        self.assertEqual(result["action"], "refresh")
+        self.assertEqual(result["ticker"], "AAA")
+        queued.assert_not_called()
+
 
 if __name__ == "__main__":
     unittest.main()

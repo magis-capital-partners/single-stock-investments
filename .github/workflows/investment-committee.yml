@@ -35,11 +35,9 @@ jobs:
           sparse-checkout: |
             /_system/scripts/**
             /*/research/committee_work/**
-            /*/research/valuation.json
-            /*/research/valuation_contract.json
-            /*/research/valuation_route.json
-            /*/research/valuation_workbench.json
-            /*/research/thesis.md
+            /*/research/*.json
+            /*/research/*.md
+            /*/research/evidence/*.json
       - id: queue
         run: python _system/scripts/select_committee_work.py --github-output "$GITHUB_OUTPUT"
 
@@ -140,6 +138,31 @@ jobs:
                   "${{ needs.prepare.outputs.ticker }}/research/committee_work/${{ needs.prepare.outputs.committee_date }}/manifest.json" \
                   "${{ needs.prepare.outputs.ticker }}/research/valuation_workbench.json"
           git commit -m "feat(ic): assemble ${{ needs.prepare.outputs.ticker }} committee ${{ needs.prepare.outputs.committee_date }}"
+          git push origin HEAD:main
+
+  refresh-stale-packet:
+    needs: prepare
+    if: needs.prepare.outputs.action == 'refresh'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          sparse-checkout: |
+            _system
+            ${{ needs.prepare.outputs.ticker }}/research
+      - name: Preserve stale packet and initialize current evidence
+        run: |
+          python _system/scripts/select_committee_work.py \
+            --refresh-ticker "${{ needs.prepare.outputs.ticker }}" \
+            --refresh-date "${{ needs.prepare.outputs.committee_date }}"
+      - name: Commit refreshed committee packet
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A -- "${{ needs.prepare.outputs.ticker }}/research/committee_work"
+          git commit -m "chore(ic): refresh ${{ needs.prepare.outputs.ticker }} frozen evidence"
           git push origin HEAD:main
 
   caught-up:
