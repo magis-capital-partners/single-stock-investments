@@ -1,0 +1,63 @@
+{
+  "persona": "marks_credit_cycle",
+  "independence_group": "credit_cycle",
+  "evidence_status": "insufficient_evidence",
+  "scores": {
+    "explanatory_strength": {
+      "value": 4,
+      "rationale": "The liquidation NAV bridge cleanly separates real-estate NRV, cash, loans payable, and the cost accrual, and the dated payoff scenarios name the Article 78 and B2K financing checkpoints."
+    },
+    "evidence_sufficiency": {
+      "value": 2,
+      "rationale": "Audited liquidation-basis statements anchor the claim, but the three disclosed debt facilities still do not fully reconcile to the $10.79M balance-sheet total and the October 2026 Rialto maturity is not stress-tested with explicit refinance or dilution math."
+    },
+    "downside_control": {
+      "value": 3,
+      "rationale": "The modeled bear case still annualizes above 13% per year, yet FY2025 already cut disclosed NAV about 15%, the component low case leaves only about 9% upside to price, and management's possible additional capital through 2028 is not quantified in the stress path."
+    },
+    "return_vs_alternatives": {
+      "value": 3,
+      "rationale": "Base annualized return clears a credit hurdle if the 2028 liquidation schedule holds, but refinancing risk, a 15% mortgage facility, and an unresolved litigation overhang keep the realized range closer to the low-case 3% annualized path than the headline base case."
+    }
+  },
+  "vote": "watch",
+  "expected_return_range_pct": [
+    2.8,
+    33.4
+  ],
+  "horizon_years": 3,
+  "claims": [
+    {
+      "claim": "Loans payable of about $10.8M are senior to equity distributions and the October 2026 Rialto mortgage maturity is a near-term refinancing checkpoint while a separate facility was recently refinanced at 15%.",
+      "evidence_paths": [
+        "GYRO/research/valuation.json",
+        "GYRO/research/deep_dive_2026-07-17.md",
+        "GYRO/research/adversarial_2026-07-17.md"
+      ]
+    },
+    {
+      "claim": "Management's disclosed liquidation NAV already embeds debt and cost accruals, but FY2025 showed a material downward re-estimation and management states additional capital may be needed through 2028, so equity recovery can shrink even if collateral value is real.",
+      "evidence_paths": [
+        "GYRO/research/valuation.json",
+        "GYRO/research/valuation_contract.json",
+        "GYRO/research/deep_dive_2026-07-17.md"
+      ]
+    },
+    {
+      "claim": "Component overlap controls appear clean and the embedded B2K option is not double-counted, but the credit cross-check cannot sign off until the debt waterfall and maturity schedule reconcile to the audited liability lines.",
+      "evidence_paths": [
+        "GYRO/research/valuation_contract.json",
+        "GYRO/research/adversarial_2026-07-17.md"
+      ]
+    }
+  ],
+  "strongest_counter_explanation": "The headline $11.79 liquidation NAV assumes optimistic B2K pricing and an on-schedule 2028 finish; an adverse Article 78 ruling, failed October 2026 refinance, or dilutive capital raise could compress equity recovery toward the $6.30 component low case while fixed claims stay senior.",
+  "most_important_missing_fact": "Line-item reconciliation of the three disclosed loan facilities to the $10,790,194 balance-sheet total, including rates, covenants, and the expected outcome of the October 2026 Rialto mortgage maturity.",
+  "falsifiers": [
+    "Reconcile each loan facility to the audited loans-payable total with maturity schedule and covenant headroom.",
+    "Model a dilutive capital raise through 2028 and its per-share impact on the liquidation payoff.",
+    "Stress a failed or punitive refinance at the October 2026 maturity against cash, rental receipts, and remaining asset-sale timing."
+  ],
+  "specialist_findings": "Credit cross-check: leverage and fixed claims are material but subordinate to real-estate NRV; survivability looks plausible if refinances extend on acceptable terms, yet the vote stays on watch until debt reconciliation and the October 2026 checkpoint are closed.",
+  "confidence": "medium"
+}
