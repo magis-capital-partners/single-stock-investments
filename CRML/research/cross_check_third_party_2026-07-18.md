@@ -10,7 +10,7 @@
 
 No third-party sources are indexed for Critical Metals Corp. as of 2026-07-18. Marvin stance rests on **primary filings only** (20-F FY2025, prior 20-F, corporate presentation inventory). Company press releases cited inside the 20-F (PEA, Tanbreez agreements, Ucore LOI) are treated as issuer disclosure, not independent third party.
 
-**Synthesis:** Marvin floor only; no external blend. Base annual return **-6.5%** on risked seven-year asset payoff **$4.00** per share at **$6.40**.
+**Synthesis:** Marvin floor only; no external blend. Base annual return **-6.53%** on risked seven-year asset payoff **$4.00** per share at **$6.40**.
 
 ## Sources in scope
 

@@ -1,29 +1,34 @@
 # CRML — Investment Thesis
 
-**Last updated:** 2026-07-18
+**Last updated:** auto-sync
 
 ## Classification
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
+| **Archetype** (Stahl) | optionality |
 | **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Dhando** (Pabrai) | none |
 | **Stance** | watch |
-| **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Cycle** | up |
+| **Implied 7yr IRR** (base) | -6.53% (total synthesis) |
+| **IRR method** | yield_curve |
+| **Lawrence bucket** | other |
+| **Payoff lens** | asset |
+| **MOI bucket** | — |
+
+**Deep dive:** `CRML/research/deep_dive_2026-07-18.md` (auto-sync)
 
 ## One-line thesis
 
-Critical Metals Corp. — thesis pending Marvin deep dive.
+Pre-production Greenland REE developer (Tanbreez 42%); watch at **-6.53%** base on **$4.00** seven-year risked payoff at **$6.40**.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest annual report (20-F FY2025)
+- [ ] Tanbreez DFS and Greenland Stage 2 approval
+- [ ] GEM arbitration outcome and fully diluted share count
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-07-18; awaiting deep dive.
+- Onboarded 2026-07-18; deep dive complete.
