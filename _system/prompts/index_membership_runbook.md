@@ -7,11 +7,44 @@
 ## Daily / CI
 
 1. Portfolio news ingest (existing `portfolio-news.yml`) classifies index adds/deletes into `index_inclusion`.
-2. Optional float/ADV refresh (Yahoo crumb + SEC shares fallback): `python _system/scripts/fetch_float_adv.py --only-events --max 80`
+2. Float/ADV refresh (Yahoo crumb + SEC shares fallback):
+   - Confirmed events: `python _system/scripts/fetch_float_adv.py --only-events --max 80`
+   - Predictor candidates (banding / committee / deletion risk): `python _system/scripts/fetch_float_adv.py --only-candidates --max 80`
 3. `build_index_membership.py` runs before `build_insights.py` / `build_dashboard_data.py` in rebuild profiles.
 4. Output: `dashboard/data/index_membership.json` (mirrored to `docs/` via rsync).
 
 Russell breakpoint mcap lives in `index_rules.json` (`russell_1000.breakpoint_mcap_usd`, dated). Style/subset headlines never produce size-migration float impact.
+
+## Predictor layers (Index Watch)
+
+| Layer | Source | UI |
+|-------|--------|-----|
+| Confirmed | Provider notice / quality-gated size add-delete | Float impact (default) + Index events |
+| Predicted | Rules scorecard + `index_recon_watch.jsonl` | **Predictor watchlist** (below Float impact); float estimates via Show estimates |
+| Noise | Style/subset (Growth/Value/2500/…) | Hidden style notes |
+
+**Potential (near-boundary)** stays **below** Index events. Do not promote it above Float impact.
+
+Statuses: `inclusion_candidate` (likely add), `banding_hold` (±2.5% contested), `committee_watch` (S&P), `deletion_risk`.
+
+### Recon watch ingest
+
+When FTSE/S&P publish provisional lists or a credible size-migration note appears:
+
+```bash
+python _system/scripts/ingest_index_recon_watch.py \
+  --ticker APLD --index russell_1000 --action add \
+  --confidence provisional --as-of 2026-06-01 \
+  --source-url "https://..." --title "..."
+```
+
+Tiers: `announced` > `provisional` > `rumor`. Never invent tickers. Style moves do not belong here.
+
+File: `_system/data/index_recon_watch.jsonl`
+
+### Rank-day snapshots
+
+Around Russell rank day, prefer frozen mcap proxies from `_system/data/index_rank_day_snapshots.json` (filled by the builder when a calendar rank-day window is active). Do not hand-edit unless correcting a bad proxy.
 
 ## Refresh constituent lists
 
@@ -80,10 +113,16 @@ python _system/scripts/build_index_membership.py --date YYYY-MM-DD
 
 ## Scorecard candidacy
 
-`inclusion_candidate` requires `|distance_to_boundary_pct| <= max_candidate_distance_pct` (default 15). Clearing a min-mcap floor alone (MSCI / Nasdaq-100) is **not** candidacy.
+`inclusion_candidate` requires `|distance_to_boundary_pct| <= max_candidate_distance_pct` (default 15). Inside the Russell ±2.5% band, non-members become `banding_hold` instead. Clearing a min-mcap floor alone (MSCI / Nasdaq-100) is **not** candidacy. S&P near-band non-members surface as `committee_watch`.
+
+## Calendar windows
+
+Before rank day / announcement / effective dates in `index_calendar.json`, refresh float for `--only-candidates`, ingest any provisional lists into recon watch, then rebuild membership. Post-effective: confirm seed membership and keep predicted rows only while still near-boundary.
 
 ## Tests
 
 ```bash
 python -m unittest _system.scripts.tests.test_index_event_extract
+python -m unittest _system.scripts.tests.test_index_flow_impact
+python -m unittest _system.scripts.tests.test_index_membership_quality
 ```

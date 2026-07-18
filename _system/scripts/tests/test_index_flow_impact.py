@@ -11,6 +11,7 @@ sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 
 from index_flow_impact import (  # noqa: E402
     compute_event_impact,
+    events_from_ticker_row,
     expand_migration_legs,
     load_aum_registry,
 )
@@ -233,6 +234,31 @@ class TestIndexFlowImpact(unittest.TestCase):
         ids = {lg["index"] for lg in legs}
         self.assertIn("russell_2000", ids)
         self.assertTrue(meta.get("assumed_graduation"))
+
+    def test_candidate_kept_when_float_unknown(self):
+        """Predicted rows survive without float_pct (asterisk estimates in UI)."""
+        row = {
+            "current_memberships": ["russell_2000"],
+            "confirmed_events": [],
+            "news_notes": [],
+            "scorecards": [
+                {
+                    "index": "russell_1000",
+                    "status": "inclusion_candidate",
+                    "recon_status": "likely_add",
+                    "distance_to_boundary_pct": 8.0,
+                    "rank_method": "config_breakpoint",
+                }
+            ],
+        }
+        mi = {"market_cap_usd": 8e9, "adv_dollar": 50e6}  # no float_pct
+        events = events_from_ticker_row("TEST", row, mi, self.reg)
+        cand = [e for e in events if e.get("event_source") == "candidate"]
+        self.assertTrue(cand)
+        self.assertTrue(cand[0].get("predicted"))
+        self.assertEqual(cand[0].get("confidence"), "rules_only")
+        self.assertEqual(cand[0].get("float_flag"), "float_unknown")
+        self.assertIsNotNone(cand[0].get("pct_of_float_base"))
 
 
 if __name__ == "__main__":
