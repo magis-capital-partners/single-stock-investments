@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-15T06:22:36Z",
+  "generated_at": "2026-07-17T23:28:57Z",
   "config_updated": "2026-07-14",
   "personas": {
     "pabrai": {
@@ -188,10 +188,76 @@
         ]
       },
       "min_matches": 2
+    },
+    "marathon_capital_cycle": {
+      "label": "Marathon / Capital Returns",
+      "framework": "Supply response, industry capacity, replacement economics, and reinvestment-cycle mistakes",
+      "rules": {
+        "archetype": [
+          "commodity_cyclical",
+          "cyclical",
+          "turnaround",
+          "infrastructure"
+        ],
+        "cycle": [
+          "peak",
+          "trough",
+          "transition"
+        ],
+        "investment_sleeve": [
+          "energy_infrastructure",
+          "real_assets_lt"
+        ]
+      },
+      "min_matches": 2
+    },
+    "marks_credit_cycle": {
+      "label": "Howard Marks / Oaktree",
+      "framework": "Leverage, refinancing, cycle position, liquidity, and downside under stress",
+      "rules": {
+        "archetype": [
+          "bank",
+          "insurer",
+          "commodity_cyclical",
+          "turnaround",
+          "infrastructure"
+        ],
+        "cycle": [
+          "peak",
+          "trough",
+          "transition"
+        ],
+        "dhando": [
+          "partial",
+          "full"
+        ]
+      },
+      "min_matches": 2
+    },
+    "klarman_asset_value": {
+      "label": "Klarman / Baupost",
+      "framework": "Catalyst-backed asset value, conservative NAV, realization friction, and downside recovery",
+      "rules": {
+        "archetype": [
+          "special_situation",
+          "holding_co",
+          "optionality",
+          "turnaround"
+        ],
+        "dhando": [
+          "full",
+          "partial"
+        ],
+        "cycle": [
+          "trough",
+          "transition"
+        ]
+      },
+      "min_matches": 2
     }
   },
-  "ticker_count": 634,
-  "tickers_in_zone": 36,
+  "ticker_count": 644,
+  "tickers_in_zone": 41,
   "by_ticker": {
     "0388.HK": {
       "in_zone": [
@@ -200,7 +266,8 @@
         "stahl",
         "lawrence",
         "buffett_weschler",
-        "munger"
+        "munger",
+        "marks_credit_cycle"
       ],
       "zones": {
         "pabrai": {
@@ -308,6 +375,43 @@
           "score": 85
         },
         "moi": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 3,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "marathon_capital_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 3,
+          "matched_fields": [
+            "cycle"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "marks_credit_cycle": {
+          "in_power_zone": true,
+          "fit": 0.667,
+          "matched": 2,
+          "known_fields": 3,
+          "matched_fields": [
+            "cycle",
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 57
+        },
+        "klarman_asset_value": {
           "in_power_zone": false,
           "fit": 0.333,
           "matched": 1,
@@ -401,7 +505,8 @@
         "stahl",
         "lawrence",
         "buffett_weschler",
-        "munger"
+        "munger",
+        "marks_credit_cycle"
       ],
       "zones": {
         "pabrai": {
@@ -519,11 +624,53 @@
           "excluded_by": null,
           "match_rate": null,
           "score": 28
+        },
+        "marathon_capital_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 3,
+          "matched_fields": [
+            "cycle"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "marks_credit_cycle": {
+          "in_power_zone": true,
+          "fit": 0.667,
+          "matched": 2,
+          "known_fields": 3,
+          "matched_fields": [
+            "cycle",
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 57
+        },
+        "klarman_asset_value": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 3,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
         }
       },
       "classified": true
     },
     "A": {
+      "in_zone": [],
+      "zones": {},
+      "classified": true
+    },
+    "AAOI": {
       "in_zone": [],
       "zones": {},
       "classified": true
@@ -614,7 +761,8 @@
         "stahl",
         "pabrai",
         "greenblatt",
-        "moi"
+        "moi",
+        "klarman_asset_value"
       ],
       "zones": {
         "pabrai": {
@@ -683,6 +831,31 @@
           "score": 28
         },
         "moi": {
+          "in_power_zone": true,
+          "fit": 0.667,
+          "matched": 2,
+          "known_fields": 3,
+          "matched_fields": [
+            "archetype",
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 57
+        },
+        "marks_credit_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 3,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "klarman_asset_value": {
           "in_power_zone": true,
           "fit": 0.667,
           "matched": 2,
@@ -806,6 +979,18 @@
           "excluded_by": null,
           "match_rate": null,
           "score": 42
+        },
+        "marathon_capital_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 1,
+          "matched_fields": [
+            "investment_sleeve"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
         }
       },
       "classified": true
@@ -942,6 +1127,30 @@
           "excluded_by": null,
           "match_rate": null,
           "score": 28
+        },
+        "marks_credit_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 2,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "klarman_asset_value": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 2,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
         }
       },
       "classified": true
@@ -1038,6 +1247,18 @@
           "excluded_by": null,
           "match_rate": null,
           "score": 28
+        },
+        "klarman_asset_value": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 1,
+          "matched_fields": [
+            "archetype"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
         }
       },
       "classified": true
@@ -1068,6 +1289,11 @@
       "classified": true
     },
     "ASPN": {
+      "in_zone": [],
+      "zones": {},
+      "classified": true
+    },
+    "ASTS": {
       "in_zone": [],
       "zones": {},
       "classified": true
@@ -1272,6 +1498,11 @@
       "zones": {},
       "classified": true
     },
+    "BABA": {
+      "in_zone": [],
+      "zones": {},
+      "classified": true
+    },
     "BAC": {
       "in_zone": [],
       "zones": {},
@@ -1293,6 +1524,11 @@
       "classified": true
     },
     "BDX": {
+      "in_zone": [],
+      "zones": {},
+      "classified": true
+    },
+    "BE": {
       "in_zone": [],
       "zones": {},
       "classified": true
@@ -1363,6 +1599,11 @@
       "classified": true
     },
     "BLK": {
+      "in_zone": [],
+      "zones": {},
+      "classified": true
+    },
+    "BLSH": {
       "in_zone": [],
       "zones": {},
       "classified": true
@@ -1533,6 +1774,30 @@
           "excluded_by": null,
           "match_rate": null,
           "score": 28
+        },
+        "marks_credit_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 2,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "klarman_asset_value": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 2,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
         }
       },
       "classified": true
@@ -1654,6 +1919,18 @@
           "excluded_by": null,
           "match_rate": null,
           "score": 42
+        },
+        "marathon_capital_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 1,
+          "matched_fields": [
+            "investment_sleeve"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
         }
       },
       "classified": true
@@ -1762,6 +2039,18 @@
           "excluded_by": null,
           "match_rate": null,
           "score": 28
+        },
+        "klarman_asset_value": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 1,
+          "matched_fields": [
+            "archetype"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
         }
       },
       "classified": true
@@ -1772,7 +2061,9 @@
         "greenblatt",
         "hk",
         "stahl",
-        "moi"
+        "moi",
+        "klarman_asset_value",
+        "marks_credit_cycle"
       ],
       "zones": {
         "pabrai": {
@@ -1843,6 +2134,45 @@
           "score": 28
         },
         "moi": {
+          "in_power_zone": true,
+          "fit": 1.0,
+          "matched": 3,
+          "known_fields": 3,
+          "matched_fields": [
+            "archetype",
+            "dhando",
+            "cycle"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 85
+        },
+        "marathon_capital_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 3,
+          "matched_fields": [
+            "cycle"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "marks_credit_cycle": {
+          "in_power_zone": true,
+          "fit": 0.667,
+          "matched": 2,
+          "known_fields": 3,
+          "matched_fields": [
+            "cycle",
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 57
+        },
+        "klarman_asset_value": {
           "in_power_zone": true,
           "fit": 1.0,
           "matched": 3,
@@ -2063,6 +2393,18 @@
           "excluded_by": null,
           "match_rate": null,
           "score": 28
+        },
+        "marathon_capital_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 1,
+          "matched_fields": [
+            "investment_sleeve"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
         }
       },
       "classified": true
@@ -2181,6 +2523,18 @@
           "excluded_by": null,
           "match_rate": null,
           "score": 28
+        },
+        "klarman_asset_value": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 1,
+          "matched_fields": [
+            "archetype"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
         }
       },
       "classified": true
@@ -2273,6 +2627,7 @@
       "in_zone": [
         "greenblatt",
         "moi",
+        "klarman_asset_value",
         "pabrai"
       ],
       "zones": {
@@ -2339,6 +2694,31 @@
           "score": 28
         },
         "moi": {
+          "in_power_zone": true,
+          "fit": 0.667,
+          "matched": 2,
+          "known_fields": 2,
+          "matched_fields": [
+            "archetype",
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 57
+        },
+        "marks_credit_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 2,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "klarman_asset_value": {
           "in_power_zone": true,
           "fit": 0.667,
           "matched": 2,
@@ -2487,6 +2867,30 @@
           "score": 85
         },
         "moi": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 2,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "marks_credit_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 2,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "klarman_asset_value": {
           "in_power_zone": false,
           "fit": 0.333,
           "matched": 1,
@@ -2685,6 +3089,30 @@
           "score": 85
         },
         "moi": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 2,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "marks_credit_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 2,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "klarman_asset_value": {
           "in_power_zone": false,
           "fit": 0.333,
           "matched": 1,
@@ -2944,6 +3372,30 @@
           "excluded_by": null,
           "match_rate": null,
           "score": 28
+        },
+        "marks_credit_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 2,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "klarman_asset_value": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 2,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
         }
       },
       "classified": true
@@ -3001,6 +3453,18 @@
           "excluded_by": null,
           "match_rate": null,
           "score": 42
+        },
+        "marathon_capital_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 1,
+          "matched_fields": [
+            "investment_sleeve"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
         }
       },
       "classified": true
@@ -3068,6 +3532,18 @@
           "excluded_by": null,
           "match_rate": null,
           "score": 42
+        },
+        "marathon_capital_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 1,
+          "matched_fields": [
+            "investment_sleeve"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
         }
       },
       "classified": true
@@ -3314,6 +3790,18 @@
           "excluded_by": null,
           "match_rate": null,
           "score": 42
+        },
+        "marathon_capital_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 1,
+          "matched_fields": [
+            "investment_sleeve"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
         }
       },
       "classified": true
@@ -3465,7 +3953,10 @@
         "pabrai",
         "greenblatt",
         "lawrence",
-        "moi"
+        "moi",
+        "marathon_capital_cycle",
+        "marks_credit_cycle",
+        "klarman_asset_value"
       ],
       "zones": {
         "pabrai": {
@@ -3582,6 +4073,45 @@
           "excluded_by": null,
           "match_rate": null,
           "score": 57
+        },
+        "marathon_capital_cycle": {
+          "in_power_zone": true,
+          "fit": 0.667,
+          "matched": 2,
+          "known_fields": 3,
+          "matched_fields": [
+            "cycle",
+            "investment_sleeve"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 57
+        },
+        "marks_credit_cycle": {
+          "in_power_zone": true,
+          "fit": 0.667,
+          "matched": 2,
+          "known_fields": 3,
+          "matched_fields": [
+            "cycle",
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 57
+        },
+        "klarman_asset_value": {
+          "in_power_zone": true,
+          "fit": 0.667,
+          "matched": 2,
+          "known_fields": 3,
+          "matched_fields": [
+            "archetype",
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 57
         }
       },
       "classified": true
@@ -3608,6 +4138,7 @@
         "greenblatt",
         "lawrence",
         "moi",
+        "klarman_asset_value",
         "pabrai"
       ],
       "zones": {
@@ -3702,6 +4233,31 @@
           "score": 57
         },
         "moi": {
+          "in_power_zone": true,
+          "fit": 0.667,
+          "matched": 2,
+          "known_fields": 2,
+          "matched_fields": [
+            "archetype",
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 57
+        },
+        "marks_credit_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 2,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "klarman_asset_value": {
           "in_power_zone": true,
           "fit": 0.667,
           "matched": 2,
@@ -3811,6 +4367,18 @@
           "excluded_by": null,
           "match_rate": null,
           "score": 28
+        },
+        "klarman_asset_value": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 1,
+          "matched_fields": [
+            "archetype"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
         }
       },
       "classified": true
@@ -3826,8 +4394,114 @@
       "classified": true
     },
     "GDRZF": {
-      "in_zone": [],
-      "zones": {},
+      "in_zone": [
+        "greenblatt",
+        "moi",
+        "klarman_asset_value",
+        "pabrai"
+      ],
+      "zones": {
+        "pabrai": {
+          "in_power_zone": true,
+          "fit": 0.5,
+          "matched": 2,
+          "known_fields": 3,
+          "matched_fields": [
+            "dhando",
+            "archetype"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 42
+        },
+        "greenblatt": {
+          "in_power_zone": true,
+          "fit": 0.667,
+          "matched": 2,
+          "known_fields": 3,
+          "matched_fields": [
+            "archetype",
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 57
+        },
+        "hk": {
+          "in_power_zone": false,
+          "fit": 0.5,
+          "matched": 1,
+          "known_fields": 1,
+          "matched_fields": [
+            "archetype"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 42
+        },
+        "stahl": {
+          "in_power_zone": false,
+          "fit": 0.5,
+          "matched": 1,
+          "known_fields": 1,
+          "matched_fields": [
+            "archetype"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 42
+        },
+        "lawrence": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 3,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "moi": {
+          "in_power_zone": true,
+          "fit": 0.667,
+          "matched": 2,
+          "known_fields": 3,
+          "matched_fields": [
+            "archetype",
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 57
+        },
+        "marks_credit_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 3,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "klarman_asset_value": {
+          "in_power_zone": true,
+          "fit": 0.667,
+          "matched": 2,
+          "known_fields": 3,
+          "matched_fields": [
+            "archetype",
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 57
+        }
+      },
       "classified": true
     },
     "GE": {
@@ -4002,6 +4676,30 @@
           "excluded_by": null,
           "match_rate": null,
           "score": 28
+        },
+        "marks_credit_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 2,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "klarman_asset_value": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 2,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
         }
       },
       "classified": true
@@ -4118,6 +4816,18 @@
           "excluded_by": null,
           "match_rate": null,
           "score": 42
+        },
+        "marathon_capital_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 1,
+          "matched_fields": [
+            "investment_sleeve"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
         }
       },
       "classified": true
@@ -4135,6 +4845,117 @@
     "GWW": {
       "in_zone": [],
       "zones": {},
+      "classified": true
+    },
+    "GYRO": {
+      "in_zone": [
+        "greenblatt",
+        "moi",
+        "klarman_asset_value",
+        "pabrai"
+      ],
+      "zones": {
+        "pabrai": {
+          "in_power_zone": true,
+          "fit": 0.5,
+          "matched": 2,
+          "known_fields": 3,
+          "matched_fields": [
+            "dhando",
+            "archetype"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 42
+        },
+        "greenblatt": {
+          "in_power_zone": true,
+          "fit": 0.667,
+          "matched": 2,
+          "known_fields": 2,
+          "matched_fields": [
+            "archetype",
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 57
+        },
+        "hk": {
+          "in_power_zone": false,
+          "fit": 0.5,
+          "matched": 1,
+          "known_fields": 2,
+          "matched_fields": [
+            "archetype"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 42
+        },
+        "stahl": {
+          "in_power_zone": false,
+          "fit": 0.5,
+          "matched": 1,
+          "known_fields": 2,
+          "matched_fields": [
+            "archetype"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 42
+        },
+        "lawrence": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 2,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "moi": {
+          "in_power_zone": true,
+          "fit": 0.667,
+          "matched": 2,
+          "known_fields": 2,
+          "matched_fields": [
+            "archetype",
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 57
+        },
+        "marks_credit_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 2,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "klarman_asset_value": {
+          "in_power_zone": true,
+          "fit": 0.667,
+          "matched": 2,
+          "known_fields": 2,
+          "matched_fields": [
+            "archetype",
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 57
+        }
+      },
       "classified": true
     },
     "HAL": {
@@ -4182,6 +5003,18 @@
           "fit": 0.333,
           "matched": 1,
           "known_fields": 2,
+          "matched_fields": [
+            "investment_sleeve"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "marathon_capital_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 1,
           "matched_fields": [
             "investment_sleeve"
           ],
@@ -4251,6 +5084,11 @@
       "zones": {},
       "classified": true
     },
+    "HGBL": {
+      "in_zone": [],
+      "zones": {},
+      "classified": true
+    },
     "HIG": {
       "in_zone": [],
       "zones": {},
@@ -4307,7 +5145,8 @@
         "stahl",
         "pabrai",
         "greenblatt",
-        "moi"
+        "moi",
+        "klarman_asset_value"
       ],
       "zones": {
         "pabrai": {
@@ -4376,6 +5215,31 @@
           "score": 28
         },
         "moi": {
+          "in_power_zone": true,
+          "fit": 0.667,
+          "matched": 2,
+          "known_fields": 3,
+          "matched_fields": [
+            "archetype",
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 57
+        },
+        "marks_credit_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 3,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "klarman_asset_value": {
           "in_power_zone": true,
           "fit": 0.667,
           "matched": 2,
@@ -4586,6 +5450,30 @@
           "excluded_by": null,
           "match_rate": null,
           "score": 28
+        },
+        "marks_credit_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 3,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "klarman_asset_value": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 3,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
         }
       },
       "classified": true
@@ -4628,6 +5516,18 @@
           "excluded_by": null,
           "match_rate": null,
           "score": 42
+        },
+        "marathon_capital_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 1,
+          "matched_fields": [
+            "investment_sleeve"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
         }
       },
       "classified": true
@@ -4822,7 +5722,8 @@
         "stahl",
         "pabrai",
         "greenblatt",
-        "moi"
+        "moi",
+        "klarman_asset_value"
       ],
       "zones": {
         "pabrai": {
@@ -4891,6 +5792,31 @@
           "score": 28
         },
         "moi": {
+          "in_power_zone": true,
+          "fit": 0.667,
+          "matched": 2,
+          "known_fields": 2,
+          "matched_fields": [
+            "archetype",
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 57
+        },
+        "marks_credit_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 2,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "klarman_asset_value": {
           "in_power_zone": true,
           "fit": 0.667,
           "matched": 2,
@@ -4994,6 +5920,18 @@
           "excluded_by": null,
           "match_rate": null,
           "score": 42
+        },
+        "marathon_capital_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 1,
+          "matched_fields": [
+            "investment_sleeve"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
         }
       },
       "classified": true
@@ -5012,6 +5950,7 @@
       "in_zone": [
         "hk",
         "stahl",
+        "marks_credit_cycle",
         "pabrai"
       ],
       "zones": {
@@ -5103,6 +6042,43 @@
           "score": 28
         },
         "moi": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 3,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "marathon_capital_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 3,
+          "matched_fields": [
+            "archetype"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "marks_credit_cycle": {
+          "in_power_zone": true,
+          "fit": 0.667,
+          "matched": 2,
+          "known_fields": 3,
+          "matched_fields": [
+            "archetype",
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 57
+        },
+        "klarman_asset_value": {
           "in_power_zone": false,
           "fit": 0.333,
           "matched": 1,
@@ -5629,7 +6605,8 @@
         "stahl",
         "pabrai",
         "greenblatt",
-        "moi"
+        "moi",
+        "klarman_asset_value"
       ],
       "zones": {
         "pabrai": {
@@ -5709,6 +6686,43 @@
           "excluded_by": null,
           "match_rate": null,
           "score": 57
+        },
+        "marathon_capital_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 3,
+          "matched_fields": [
+            "investment_sleeve"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "marks_credit_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 3,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "klarman_asset_value": {
+          "in_power_zone": true,
+          "fit": 0.667,
+          "matched": 2,
+          "known_fields": 3,
+          "matched_fields": [
+            "archetype",
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 57
         }
       },
       "classified": true
@@ -5771,6 +6785,18 @@
           "excluded_by": null,
           "match_rate": null,
           "score": 42
+        },
+        "marathon_capital_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 1,
+          "matched_fields": [
+            "investment_sleeve"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
         }
       },
       "classified": true
@@ -5942,6 +6968,18 @@
           "excluded_by": null,
           "match_rate": null,
           "score": 42
+        },
+        "marathon_capital_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 1,
+          "matched_fields": [
+            "investment_sleeve"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
         }
       },
       "classified": true
@@ -6108,6 +7146,18 @@
           "excluded_by": null,
           "match_rate": null,
           "score": 42
+        },
+        "marathon_capital_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 1,
+          "matched_fields": [
+            "investment_sleeve"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
         }
       },
       "classified": true
@@ -6247,6 +7297,30 @@
           "excluded_by": null,
           "match_rate": null,
           "score": 28
+        },
+        "marks_credit_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 3,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "klarman_asset_value": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 3,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
         }
       },
       "classified": true
@@ -6309,6 +7383,18 @@
           "excluded_by": null,
           "match_rate": null,
           "score": 42
+        },
+        "marathon_capital_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 1,
+          "matched_fields": [
+            "investment_sleeve"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
         }
       },
       "classified": true
@@ -6329,7 +7415,8 @@
         "stahl",
         "pabrai",
         "greenblatt",
-        "moi"
+        "moi",
+        "klarman_asset_value"
       ],
       "zones": {
         "pabrai": {
@@ -6409,6 +7496,31 @@
           "excluded_by": null,
           "match_rate": null,
           "score": 57
+        },
+        "marks_credit_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 3,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "klarman_asset_value": {
+          "in_power_zone": true,
+          "fit": 0.667,
+          "matched": 2,
+          "known_fields": 3,
+          "matched_fields": [
+            "archetype",
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 57
         }
       },
       "classified": true
@@ -6433,6 +7545,18 @@
           "fit": 0.333,
           "matched": 1,
           "known_fields": 2,
+          "matched_fields": [
+            "investment_sleeve"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "marathon_capital_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 1,
           "matched_fields": [
             "investment_sleeve"
           ],
@@ -6512,6 +7636,18 @@
           "excluded_by": null,
           "match_rate": null,
           "score": 28
+        },
+        "klarman_asset_value": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 1,
+          "matched_fields": [
+            "archetype"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
         }
       },
       "classified": true
@@ -6569,6 +7705,122 @@
     "PLTR": {
       "in_zone": [],
       "zones": {},
+      "classified": true
+    },
+    "PLWN": {
+      "in_zone": [
+        "hk",
+        "stahl",
+        "pabrai",
+        "greenblatt",
+        "moi",
+        "klarman_asset_value"
+      ],
+      "zones": {
+        "pabrai": {
+          "in_power_zone": true,
+          "fit": 0.75,
+          "matched": 3,
+          "known_fields": 4,
+          "matched_fields": [
+            "dhando",
+            "archetype",
+            "investment_sleeve"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 64
+        },
+        "greenblatt": {
+          "in_power_zone": true,
+          "fit": 0.667,
+          "matched": 2,
+          "known_fields": 3,
+          "matched_fields": [
+            "archetype",
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 57
+        },
+        "hk": {
+          "in_power_zone": true,
+          "fit": 1.0,
+          "matched": 2,
+          "known_fields": 2,
+          "matched_fields": [
+            "archetype",
+            "investment_sleeve"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 85
+        },
+        "stahl": {
+          "in_power_zone": true,
+          "fit": 1.0,
+          "matched": 2,
+          "known_fields": 2,
+          "matched_fields": [
+            "archetype",
+            "investment_sleeve"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 85
+        },
+        "lawrence": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 3,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "moi": {
+          "in_power_zone": true,
+          "fit": 0.667,
+          "matched": 2,
+          "known_fields": 3,
+          "matched_fields": [
+            "archetype",
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 57
+        },
+        "marks_credit_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 3,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "klarman_asset_value": {
+          "in_power_zone": true,
+          "fit": 0.667,
+          "matched": 2,
+          "known_fields": 3,
+          "matched_fields": [
+            "archetype",
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 57
+        }
+      },
       "classified": true
     },
     "PM": {
@@ -6687,7 +7939,8 @@
         "pabrai",
         "greenblatt",
         "lawrence",
-        "moi"
+        "moi",
+        "klarman_asset_value"
       ],
       "zones": {
         "pabrai": {
@@ -6804,6 +8057,43 @@
           "excluded_by": null,
           "match_rate": null,
           "score": 57
+        },
+        "marathon_capital_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 3,
+          "matched_fields": [
+            "investment_sleeve"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "marks_credit_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 3,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "klarman_asset_value": {
+          "in_power_zone": true,
+          "fit": 0.667,
+          "matched": 2,
+          "known_fields": 3,
+          "matched_fields": [
+            "archetype",
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 57
         }
       },
       "classified": true
@@ -6847,6 +8137,8 @@
       "in_zone": [
         "greenblatt",
         "moi",
+        "marks_credit_cycle",
+        "klarman_asset_value",
         "pabrai"
       ],
       "zones": {
@@ -6889,6 +8181,44 @@
           "score": 28
         },
         "moi": {
+          "in_power_zone": true,
+          "fit": 0.667,
+          "matched": 2,
+          "known_fields": 2,
+          "matched_fields": [
+            "archetype",
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 57
+        },
+        "marathon_capital_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 2,
+          "matched_fields": [
+            "archetype"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "marks_credit_cycle": {
+          "in_power_zone": true,
+          "fit": 0.667,
+          "matched": 2,
+          "known_fields": 2,
+          "matched_fields": [
+            "archetype",
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 57
+        },
+        "klarman_asset_value": {
           "in_power_zone": true,
           "fit": 0.667,
           "matched": 2,
@@ -6967,6 +8297,18 @@
           "excluded_by": null,
           "match_rate": null,
           "score": 42
+        },
+        "marathon_capital_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 1,
+          "matched_fields": [
+            "investment_sleeve"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
         }
       },
       "classified": true
@@ -7081,6 +8423,30 @@
           "excluded_by": null,
           "match_rate": null,
           "score": 28
+        },
+        "marks_credit_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 3,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "klarman_asset_value": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 3,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
         }
       },
       "classified": true
@@ -7131,7 +8497,8 @@
         "stahl",
         "pabrai",
         "greenblatt",
-        "moi"
+        "moi",
+        "klarman_asset_value"
       ],
       "zones": {
         "pabrai": {
@@ -7200,6 +8567,31 @@
           "score": 28
         },
         "moi": {
+          "in_power_zone": true,
+          "fit": 0.667,
+          "matched": 2,
+          "known_fields": 3,
+          "matched_fields": [
+            "archetype",
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 57
+        },
+        "marks_credit_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 3,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "klarman_asset_value": {
           "in_power_zone": true,
           "fit": 0.667,
           "matched": 2,
@@ -7312,6 +8704,18 @@
           "excluded_by": null,
           "match_rate": null,
           "score": 42
+        },
+        "marathon_capital_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 1,
+          "matched_fields": [
+            "investment_sleeve"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
         }
       },
       "classified": true
@@ -7324,6 +8728,107 @@
     "SCHW": {
       "in_zone": [],
       "zones": {},
+      "classified": true
+    },
+    "SEVN": {
+      "in_zone": [
+        "greenblatt",
+        "moi",
+        "marks_credit_cycle",
+        "klarman_asset_value",
+        "pabrai"
+      ],
+      "zones": {
+        "pabrai": {
+          "in_power_zone": true,
+          "fit": 0.5,
+          "matched": 2,
+          "known_fields": 2,
+          "matched_fields": [
+            "dhando",
+            "archetype"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 42
+        },
+        "greenblatt": {
+          "in_power_zone": true,
+          "fit": 0.667,
+          "matched": 2,
+          "known_fields": 2,
+          "matched_fields": [
+            "archetype",
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 57
+        },
+        "lawrence": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 3,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "moi": {
+          "in_power_zone": true,
+          "fit": 0.667,
+          "matched": 2,
+          "known_fields": 2,
+          "matched_fields": [
+            "archetype",
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 57
+        },
+        "marathon_capital_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 1,
+          "matched_fields": [
+            "archetype"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "marks_credit_cycle": {
+          "in_power_zone": true,
+          "fit": 0.667,
+          "matched": 2,
+          "known_fields": 2,
+          "matched_fields": [
+            "archetype",
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 57
+        },
+        "klarman_asset_value": {
+          "in_power_zone": true,
+          "fit": 0.667,
+          "matched": 2,
+          "known_fields": 2,
+          "matched_fields": [
+            "archetype",
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 57
+        }
+      },
       "classified": true
     },
     "SHC": {
@@ -7347,7 +8852,8 @@
         "stahl",
         "pabrai",
         "greenblatt",
-        "moi"
+        "moi",
+        "klarman_asset_value"
       ],
       "zones": {
         "pabrai": {
@@ -7427,6 +8933,43 @@
           "excluded_by": null,
           "match_rate": null,
           "score": 57
+        },
+        "marathon_capital_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 2,
+          "matched_fields": [
+            "investment_sleeve"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "marks_credit_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 2,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "klarman_asset_value": {
+          "in_power_zone": true,
+          "fit": 0.667,
+          "matched": 2,
+          "known_fields": 2,
+          "matched_fields": [
+            "archetype",
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 57
         }
       },
       "classified": true
@@ -7461,6 +9004,18 @@
           "fit": 0.333,
           "matched": 1,
           "known_fields": 2,
+          "matched_fields": [
+            "investment_sleeve"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "marathon_capital_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 1,
           "matched_fields": [
             "investment_sleeve"
           ],
@@ -7533,6 +9088,30 @@
           "score": 28
         },
         "moi": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 2,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "marks_credit_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 2,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "klarman_asset_value": {
           "in_power_zone": false,
           "fit": 0.333,
           "matched": 1,
@@ -7687,6 +9266,30 @@
           "score": 85
         },
         "moi": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 3,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "marks_credit_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 3,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "klarman_asset_value": {
           "in_power_zone": false,
           "fit": 0.333,
           "matched": 1,
@@ -7956,6 +9559,30 @@
           "excluded_by": null,
           "match_rate": null,
           "score": 28
+        },
+        "marks_credit_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 2,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "klarman_asset_value": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 2,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
         }
       },
       "classified": true
@@ -8008,6 +9635,18 @@
           "excluded_by": null,
           "match_rate": null,
           "score": 42
+        },
+        "marathon_capital_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 1,
+          "matched_fields": [
+            "investment_sleeve"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
         }
       },
       "classified": true
@@ -8040,6 +9679,117 @@
     "TOI": {
       "in_zone": [],
       "zones": {},
+      "classified": true
+    },
+    "TPHS": {
+      "in_zone": [
+        "greenblatt",
+        "moi",
+        "klarman_asset_value",
+        "pabrai"
+      ],
+      "zones": {
+        "pabrai": {
+          "in_power_zone": true,
+          "fit": 0.5,
+          "matched": 2,
+          "known_fields": 2,
+          "matched_fields": [
+            "archetype",
+            "cycle"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 42
+        },
+        "greenblatt": {
+          "in_power_zone": true,
+          "fit": 0.667,
+          "matched": 2,
+          "known_fields": 2,
+          "matched_fields": [
+            "archetype",
+            "cycle"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 57
+        },
+        "hk": {
+          "in_power_zone": false,
+          "fit": 0.5,
+          "matched": 1,
+          "known_fields": 1,
+          "matched_fields": [
+            "archetype"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 42
+        },
+        "stahl": {
+          "in_power_zone": false,
+          "fit": 0.5,
+          "matched": 1,
+          "known_fields": 1,
+          "matched_fields": [
+            "archetype"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 42
+        },
+        "moi": {
+          "in_power_zone": true,
+          "fit": 0.667,
+          "matched": 2,
+          "known_fields": 2,
+          "matched_fields": [
+            "archetype",
+            "cycle"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 57
+        },
+        "marathon_capital_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 2,
+          "matched_fields": [
+            "cycle"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "marks_credit_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 2,
+          "matched_fields": [
+            "cycle"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "klarman_asset_value": {
+          "in_power_zone": true,
+          "fit": 0.667,
+          "matched": 2,
+          "known_fields": 2,
+          "matched_fields": [
+            "archetype",
+            "cycle"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 57
+        }
+      },
       "classified": true
     },
     "TPL": {
@@ -8315,7 +10065,10 @@
       "in_zone": [
         "greenblatt",
         "moi",
-        "pabrai"
+        "marks_credit_cycle",
+        "klarman_asset_value",
+        "pabrai",
+        "marathon_capital_cycle"
       ],
       "zones": {
         "pabrai": {
@@ -8371,6 +10124,47 @@
           "excluded_by": null,
           "match_rate": null,
           "score": 85
+        },
+        "marathon_capital_cycle": {
+          "in_power_zone": true,
+          "fit": 0.667,
+          "matched": 2,
+          "known_fields": 3,
+          "matched_fields": [
+            "archetype",
+            "cycle"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 57
+        },
+        "marks_credit_cycle": {
+          "in_power_zone": true,
+          "fit": 1.0,
+          "matched": 3,
+          "known_fields": 3,
+          "matched_fields": [
+            "archetype",
+            "cycle",
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 85
+        },
+        "klarman_asset_value": {
+          "in_power_zone": true,
+          "fit": 1.0,
+          "matched": 3,
+          "known_fields": 3,
+          "matched_fields": [
+            "archetype",
+            "dhando",
+            "cycle"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 85
         }
       },
       "classified": true
@@ -8397,7 +10191,8 @@
     },
     "WBI": {
       "in_zone": [
-        "hohn"
+        "hohn",
+        "marathon_capital_cycle"
       ],
       "zones": {
         "pabrai": {
@@ -8460,6 +10255,31 @@
           "excluded_by": null,
           "match_rate": null,
           "score": 42
+        },
+        "marathon_capital_cycle": {
+          "in_power_zone": true,
+          "fit": 0.667,
+          "matched": 2,
+          "known_fields": 2,
+          "matched_fields": [
+            "archetype",
+            "investment_sleeve"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 57
+        },
+        "marks_credit_cycle": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 1,
+          "matched_fields": [
+            "archetype"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
         }
       },
       "classified": true
@@ -8515,6 +10335,8 @@
         "hohn",
         "buffett_weschler",
         "munger",
+        "marathon_capital_cycle",
+        "marks_credit_cycle",
         "pabrai"
       ],
       "zones": {
@@ -8631,6 +10453,44 @@
           "excluded_by": null,
           "match_rate": null,
           "score": 28
+        },
+        "marathon_capital_cycle": {
+          "in_power_zone": true,
+          "fit": 0.667,
+          "matched": 2,
+          "known_fields": 3,
+          "matched_fields": [
+            "cycle",
+            "investment_sleeve"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 57
+        },
+        "marks_credit_cycle": {
+          "in_power_zone": true,
+          "fit": 0.667,
+          "matched": 2,
+          "known_fields": 3,
+          "matched_fields": [
+            "cycle",
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 57
+        },
+        "klarman_asset_value": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 3,
+          "matched_fields": [
+            "dhando"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
         }
       },
       "classified": true
@@ -8699,6 +10559,18 @@
           "score": 85
         },
         "moi": {
+          "in_power_zone": false,
+          "fit": 0.333,
+          "matched": 1,
+          "known_fields": 1,
+          "matched_fields": [
+            "archetype"
+          ],
+          "excluded_by": null,
+          "match_rate": null,
+          "score": 28
+        },
+        "klarman_asset_value": {
           "in_power_zone": false,
           "fit": 0.333,
           "matched": 1,

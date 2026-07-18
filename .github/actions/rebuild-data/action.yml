@@ -22,7 +22,12 @@ runs:
       uses: ./.github/actions/checkout-vault
 
     - name: Install Darwin dependencies
-      if: contains(inputs.profile, 'darwin')
+      # full/intake-full run run_ls_algo_valuation_pipeline (darwin package);
+      # darwin profiles need numpy for the allocation engine.
+      if: >
+        contains(inputs.profile, 'darwin') ||
+        inputs.profile == 'full' ||
+        inputs.profile == 'intake-full'
       shell: bash
       run: pip install -r _system/scripts/requirements-darwin.txt
 

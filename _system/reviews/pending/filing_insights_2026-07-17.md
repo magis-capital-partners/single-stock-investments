@@ -1,10 +1,12 @@
 # Filing insights — human review queue
 
 **Date:** 2026-07-17
-**Rows:** 53
+**Rows:** 58
 
 | Ticker | Metric | Change | Confidence | Flags | Reason |
 |--------|--------|--------|------------|-------|--------|
+| AAOI | total_assets | -53.2% | low | footnote_pairing | low_confidence_or_skip_flags |
+| AAOI | Long-term debt | -21.5% | low | footnote_pairing | low_confidence_or_skip_flags |
 | ABX | cash | +246.2% | — | — | low_confidence_or_skip_flags |
 | ADBE | total_assets | +2.5% | low | footnote_pairing | low_confidence_or_skip_flags |
 | ADBE | Long-term debt | -33.5% | low | footnote_pairing | low_confidence_or_skip_flags |
@@ -16,7 +18,9 @@
 | AMZN | Long-term debt | +2157.8% | — | — | low_confidence_or_skip_flags |
 | AOS | total_assets | +3.1% | low | footnote_pairing | low_confidence_or_skip_flags |
 | AOS | Long-term debt | +55.3% | low | non_statement_debt | low_confidence_or_skip_flags |
+| ASTS | total_assets | -81.0% | low | footnote_pairing | low_confidence_or_skip_flags |
 | AWK | total_assets | -7.4% | low | footnote_pairing | low_confidence_or_skip_flags |
+| BE | total_assets | -39.6% | low | footnote_pairing | low_confidence_or_skip_flags |
 | CSGP | Operating income | +1333.3% | — | — | low_confidence_or_skip_flags |
 | CSGP | Net income | +400.0% | — | — | low_confidence_or_skip_flags |
 | CSGP | EPS (basic) | +300.0% | — | — | low_confidence_or_skip_flags |
@@ -38,6 +42,7 @@
 | RYN | Operating income | +336.9% | — | — | low_confidence_or_skip_flags |
 | SOC | cash | +207.5% | — | — | low_confidence_or_skip_flags |
 | SPGI | Long-term debt | +16533.3% | — | — | low_confidence_or_skip_flags |
+| TPHS | total_assets | +7077.6% | low | footnote_pairing | low_confidence_or_skip_flags |
 | TRC | Net income | +3486.7% | — | — | low_confidence_or_skip_flags |
 | TRC | cash | +312.3% | — | — | low_confidence_or_skip_flags |
 | WDAY | total_assets | -0.5% | low | footnote_pairing | low_confidence_or_skip_flags |
