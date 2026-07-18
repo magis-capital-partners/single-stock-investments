@@ -3,7 +3,7 @@
   "ticker": "BMNR",
   "as_of": "2026-07-18",
   "decision": {
-    "status": "decision_grade",
+    "status": "evidence_blocked",
     "price_per_share": 15.69,
     "market_cap_m": null,
     "enterprise_value_m": null,
@@ -19,10 +19,10 @@
     },
     "downside_to_low_pct": -45.83,
     "unvalued_component_count": 0,
-    "unresolved_evidence_count": 0,
+    "unresolved_evidence_count": 3,
     "primary_power_zone": "Scarce assets, royalties, and optionality",
     "owner_decision": null,
-    "next_action": "Complete isolated rater outputs, proposer case, pre-mortem, and research response without sharing peer votes."
+    "next_action": "Close critical evidence gaps before freezing a decision-grade packet."
   },
   "business": {
     "status": "complete",
@@ -512,29 +512,27 @@
     "rule": "Every option requires a beneficiary, probability, timing, remaining capital, failure case, and non-overlap control; absence of option value must be explicit rather than unvalued."
   },
   "committee": {
-    "status": "independent_review_open",
+    "status": "evidence_blocked",
     "as_of": "2026-07-18",
     "packet_hash": "e0647786d0fb336f1ea6ff87c3ea771b0b112c921f23ec5b678dc6ba23e58467",
-    "stage": "round_one_open",
+    "stage": "evidence_blocked",
     "selected_raters": [
       "hk",
       "klarman_asset_value",
       "marks_credit_cycle"
     ],
     "analysis_progress": {
-      "completed": 1,
+      "completed": 13,
       "required": 13
     },
     "completed_outputs": [
-      "proposer.json"
-    ],
-    "missing_outputs": [
       "round_1/hk.json",
       "round_1/klarman_asset_value.json",
       "round_1/marks_credit_cycle.json",
       "round_2/hk.json",
       "round_2/klarman_asset_value.json",
       "round_2/marks_credit_cycle.json",
+      "proposer.json",
       "pre_mortem.json",
       "evidence_tribunal.json",
       "research_response.json",
@@ -542,20 +540,65 @@
       "adversarial_review.json",
       "chair_synthesis.json"
     ],
+    "missing_outputs": [],
     "owner_status": "pending",
     "owner_decision": null,
-    "strongest_dissent": null,
-    "unresolved_items": [],
-    "next_action": "Complete isolated rater outputs, proposer case, pre-mortem, and research response without sharing peer votes.",
-    "record_ref": null,
+    "strongest_dissent": "The discount to May ETH marks is a rational price for an equity-financed dilution vehicle: management funds token purchases by issuing shares faster than ETH per share compounds, so the scarce asset on the balance sheet does not translate into a fixed pro-rata common claim.",
+    "unresolved_items": [
+      "BMNP preferred stock conversion terms and post-May 2026 ATM dilution pace reconciled to net ETH per fully diluted common share after all senior claims.",
+      "Post-May 2026 ATM share issuance and ETH-per-diluted-share reconciled to BMNP preferred conversion and warrant waterfall.",
+      "Quantified post-May 2026 ATM issuance pace and BMNP preferred-stock waterfall per diluted common share, without which per-share asset realization cannot be bounded."
+    ],
+    "next_action": "Close the committee's primary-evidence blockers before requesting an owner decision.",
+    "record_ref": "BMNR/research/committee_2026-07-18.json",
     "previous_record_ref": null,
     "manifest_ref": "BMNR/research/committee_work/2026-07-18/manifest.json"
   },
   "evidence": {
-    "status": "clear",
-    "open_count": 0,
+    "status": "gaps_open",
+    "open_count": 3,
     "critical_count": 0,
-    "gaps": []
+    "gaps": [
+      {
+        "id": "committee_unresolved_1",
+        "priority": "high",
+        "component_ids": [],
+        "question": "BMNP preferred stock conversion terms and post-May 2026 ATM dilution pace reconciled to net ETH per fully diluted common share after all senior claims.",
+        "evidence_required": "Resolve the committee's missing fact with primary evidence and update the affected valuation proof row.",
+        "acceptance_test": "The committee item is explicitly closed, sourced, and reflected in the valuation range or documented as immaterial.",
+        "valuation_effect": "Pending committee assessment.",
+        "status": "open",
+        "base_value_exposure_per_share": null,
+        "current_methods": [],
+        "source": "committee"
+      },
+      {
+        "id": "committee_unresolved_2",
+        "priority": "high",
+        "component_ids": [],
+        "question": "Post-May 2026 ATM share issuance and ETH-per-diluted-share reconciled to BMNP preferred conversion and warrant waterfall.",
+        "evidence_required": "Resolve the committee's missing fact with primary evidence and update the affected valuation proof row.",
+        "acceptance_test": "The committee item is explicitly closed, sourced, and reflected in the valuation range or documented as immaterial.",
+        "valuation_effect": "Pending committee assessment.",
+        "status": "open",
+        "base_value_exposure_per_share": null,
+        "current_methods": [],
+        "source": "committee"
+      },
+      {
+        "id": "committee_unresolved_3",
+        "priority": "high",
+        "component_ids": [],
+        "question": "Quantified post-May 2026 ATM issuance pace and BMNP preferred-stock waterfall per diluted common share, without which per-share asset realization cannot be bounded.",
+        "evidence_required": "Resolve the committee's missing fact with primary evidence and update the affected valuation proof row.",
+        "acceptance_test": "The committee item is explicitly closed, sourced, and reflected in the valuation range or documented as immaterial.",
+        "valuation_effect": "Pending committee assessment.",
+        "status": "open",
+        "base_value_exposure_per_share": null,
+        "current_methods": [],
+        "source": "committee"
+      }
+    ]
   },
   "method_fit": {
     "profile_id": "scarce_asset_optionality",

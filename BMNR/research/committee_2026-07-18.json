@@ -1,0 +1,1040 @@
+{
+  "schema_version": "1.0",
+  "protocol_version": "production-2.0",
+  "ticker": "BMNR",
+  "review": {
+    "level": "full_ic",
+    "trigger": "production committee pipeline",
+    "as_of": "2026-07-18",
+    "owner": null
+  },
+  "evidence_packet": {
+    "frozen_at": "2026-07-18T22:06:59.155102+00:00",
+    "hash_method": "sha256(canonical-json(sorted(path,sha256,bytes)))",
+    "packet_hash": "e0647786d0fb336f1ea6ff87c3ea771b0b112c921f23ec5b678dc6ba23e58467",
+    "freshness_status": "mixed",
+    "references": [
+      {
+        "path": "BMNR/research/deep_dive_2026-07-17.md",
+        "sha256": "5bd9bd1410845a980ed77d96aca41ce9e867cede3fc002f9672b46012b37e8ec",
+        "bytes": 19813,
+        "role": "frozen local evidence",
+        "status": "available"
+      },
+      {
+        "path": "BMNR/research/adversarial_2026-07-17.md",
+        "sha256": "acb3fe2acae46644f04dcba68b3920bf8bddb333df7855747454bf82126787eb",
+        "bytes": 2314,
+        "role": "frozen local evidence",
+        "status": "available"
+      },
+      {
+        "path": "BMNR/research/valuation_route.json",
+        "sha256": "d663684c7c6209d9367efb6c3d01c2743f255a985bdb3cfd7e4df45f7194fa38",
+        "bytes": 5559,
+        "role": "frozen local evidence",
+        "status": "available"
+      },
+      {
+        "path": "BMNR/research/valuation_contract.json",
+        "sha256": "0718af158fa955cbe3d546948fc45a4a371b7a449b9765ef37831246cfbd5633",
+        "bytes": 18348,
+        "role": "frozen local evidence",
+        "status": "available"
+      },
+      {
+        "path": "BMNR/research/valuation.json",
+        "sha256": "5ca4e901489231326c1d8c399afff56122f3db14822a1b7b3ec48c6523afa003",
+        "bytes": 71771,
+        "role": "frozen local evidence",
+        "status": "available"
+      },
+      {
+        "path": "BMNR/research/thesis.md",
+        "sha256": "bbd35e556f898bbc2f3f5040d5d552fd0b51788395812bb793c59081c9ee98e5",
+        "bytes": 781,
+        "role": "frozen local evidence",
+        "status": "available"
+      },
+      {
+        "path": "BMNR/research/cross_check_third_party_2026-07-17.md",
+        "sha256": "78db8b8582b045f281abdd288d7918765fd3559bbaca07f4f2840ec44f235022",
+        "bytes": 3075,
+        "role": "frozen local evidence",
+        "status": "available"
+      },
+      {
+        "path": "BMNR/research/evidence/filing_facts_2026-07-17.json",
+        "sha256": "b811499d6b44235713e30d78906a3c1c6d2b91095439863dbeb3492fdeeec97b",
+        "bytes": 3798,
+        "role": "frozen local evidence",
+        "status": "available"
+      },
+      {
+        "path": "BMNR/research/evidence/management_facts_2026-07-17.json",
+        "sha256": "dd2a8ff0817ff62df253dcb747464e4f24548b60eaed87ee74762e033bd471e2",
+        "bytes": 86,
+        "role": "frozen local evidence",
+        "status": "available"
+      }
+    ]
+  },
+  "proposer": {
+    "recommendation_hidden_in_round_one": true,
+    "thesis": "**Last updated:** auto-sync",
+    "explanation_contracts": [],
+    "open_questions": []
+  },
+  "selected_raters": [
+    {
+      "persona": "hk",
+      "independence_group": "scarce_assets",
+      "selection_reason": "Selected before scoring from the power-zone method route (persona chose or cross-checks the valuation method).",
+      "required_inputs_status": "partial"
+    },
+    {
+      "persona": "klarman_asset_value",
+      "independence_group": "asset_realization",
+      "selection_reason": "Selected before scoring from the power-zone method route (persona chose or cross-checks the valuation method).",
+      "required_inputs_status": "partial"
+    },
+    {
+      "persona": "marks_credit_cycle",
+      "independence_group": "credit_cycle",
+      "selection_reason": "Selected before scoring from the power-zone method route (persona chose or cross-checks the valuation method).",
+      "required_inputs_status": "partial"
+    }
+  ],
+  "round_one": {
+    "evidence_hash": "e0647786d0fb336f1ea6ff87c3ea771b0b112c921f23ec5b678dc6ba23e58467",
+    "peer_outputs_visible": false,
+    "votes": [
+      {
+        "persona": "hk",
+        "independence_group": "scarce_assets",
+        "evidence_status": "insufficient_evidence",
+        "scores": {
+          "explanatory_strength": {
+            "value": 3,
+            "rationale": "The market-structure discount on a levered ETH wrapper is a specific mechanism with filing-backed look-through math, but the dilution-versus-beta path is not yet hard to vary."
+          },
+          "evidence_sufficiency": {
+            "value": 2,
+            "rationale": "May 31 ETH inventory and share count are primary-verified, while post-May ATM issuance, preferred waterfall, live spot versus marks, and treasury-vehicle comparables remain open."
+          },
+          "downside_control": {
+            "value": 2,
+            "rationale": "Price sits below May ETH fair value per share, but unbounded dilution, G&A burn above staking revenue, and an unmodeled preferred reserve leave the low case near $8.50 per share."
+          },
+          "return_vs_alternatives": {
+            "value": 2,
+            "rationale": "Base 6.3% per year is well below a mid-teens hurdle; bull 15.1% requires favorable ETH beta with limited further dilution."
+          }
+        },
+        "vote": "watch",
+        "expected_return_range_pct": [
+          -6.9,
+          15.1
+        ],
+        "horizon_years": 7,
+        "claims": [
+          {
+            "claim": "May 31 filing ETH look-through (~$18.76 per share) exceeds price ($15.69), giving a scarce-asset cushion, but that cushion is not a bounded common claim once ATM dilution and preferred seniority are applied.",
+            "evidence_paths": [
+              "BMNR/research/valuation.json",
+              "BMNR/research/deep_dive_2026-07-17.md"
+            ]
+          },
+          {
+            "claim": "The eth_trajectory_net_dilution additive row (+$4.50 base) lacks explicit success probability, post-May issuance reconciliation, and arm's-length comparable treasury transactions before incremental ETH beta can be treated as non-overlapping value.",
+            "evidence_paths": [
+              "BMNR/research/valuation.json",
+              "BMNR/research/valuation_contract.json"
+            ]
+          },
+          {
+            "claim": "Nine-month general and administrative expense ($335.7M) exceeds staking revenue ($56.9M), so per-share ETH accumulation depends on continued equity issuance rather than self-funded owner economics.",
+            "evidence_paths": [
+              "BMNR/research/deep_dive_2026-07-17.md",
+              "BMNR/research/valuation.json"
+            ]
+          }
+        ],
+        "strongest_counter_explanation": "The discount to May ETH marks is a rational price for an equity-financed dilution vehicle: management funds token purchases by issuing shares faster than ETH per share compounds, so the scarce asset on balance sheet does not translate into a fixed pro-rata common claim.",
+        "most_important_missing_fact": "Post-May 2026 ATM share issuance and ETH-per-diluted-share reconciled to BMNP preferred conversion and warrant waterfall.",
+        "falsifiers": [
+          "Reconcile quarter-by-quarter ETH purchases, shares issued, and ETH per diluted share from May 31, 2026 forward.",
+          "Model BMNP preferred and warrant claims as explicit per-share deductions before promoting static look-through to a downside floor.",
+          "Tie eth_trajectory base case to observed issuance cadence rather than assumed 10% cumulative dilution."
+        ],
+        "specialist_findings": "Scarce-asset read: the filing ETH stack is real and overlap keys are documented, but the wrapper fails durable-payoff tests until dilution pace and senior claims are proven; abstain from approve.",
+        "confidence": "medium"
+      },
+      {
+        "persona": "klarman_asset_value",
+        "independence_group": "asset_realization",
+        "evidence_status": "sufficient",
+        "scores": {
+          "explanatory_strength": {
+            "value": 3,
+            "rationale": "The ETH look-through discount mechanism is specific and filing-backed, but the proposed gap-closer is passive mNAV normalization over seven years rather than a controllable liquidation, sale, or distribution path that Klarman requires to convert appraisal value into shareholder cash."
+          },
+          "evidence_sufficiency": {
+            "value": 3,
+            "rationale": "May 31, 2026 ETH fair value, share count, warrant liability, and deferred tax are primary-verified in the 10-Q, yet BMNP preferred claims, post-May ATM issuance, and live ETH spot versus May marks remain unresolved for a decision-grade realization audit."
+          },
+          "downside_control": {
+            "value": 2,
+            "rationale": "Static ETH fair value per share (~$18.76) sits above price today, but the component low case ($8.50/sh, -46% from $15.69) and unbounded ATM dilution mean per-share asset floor is not structurally bounded despite partial dhando."
+          },
+          "return_vs_alternatives": {
+            "value": 2,
+            "rationale": "Base annualized return 6.3% over seven years is well below the 15% Klarman hurdle; only the bull case (~15.1%) clears it and depends on favorable ETH trajectory plus limited further dilution."
+          }
+        },
+        "vote": "watch",
+        "expected_return_range_pct": [
+          -8.4,
+          14.9
+        ],
+        "horizon_years": 7,
+        "claims": [
+          {
+            "claim": "Filing-verified ETH look-through (~$18.76/sh at May 31, 2026) exceeds price ($15.69), but there is no independently evidenced catalyst to convert that asset into per-share cash beyond hoping the mNAV discount narrows.",
+            "evidence_paths": [
+              "BMNR/research/valuation.json",
+              "BMNR/research/deep_dive_2026-07-17.md",
+              "BMNR/research/valuation_contract.json"
+            ]
+          },
+          {
+            "claim": "The eth_trajectory_net_dilution component (+$4.5/sh base) lacks explicit success probability and post-May ATM reconciliation, so incremental asset value is analyst judgment rather than contractually or operationally secured.",
+            "evidence_paths": [
+              "BMNR/research/valuation.json",
+              "BMNR/research/valuation_contract.json"
+            ]
+          },
+          {
+            "claim": "Overlap controls in the component schedule are clean (unique keys, no double-count of static ETH with staking yield), but the warrants/tax/preferred reserve row at base zero understates senior claims relative to common look-through.",
+            "evidence_paths": [
+              "BMNR/research/valuation.json",
+              "BMNR/research/valuation_contract.json"
+            ]
+          }
+        ],
+        "strongest_counter_explanation": "The market may rationally price BMNR as an equity-financed ETH accumulator where ongoing ATM issuance will dilute look-through ETH per share faster than any mNAV discount can close, making the apparent NAV discount a financing-vehicle trap rather than a catalyst-backed margin of safety.",
+        "most_important_missing_fact": "Quantified post-May 2026 ATM issuance pace and BMNP preferred-stock waterfall per diluted common share, without which per-share asset realization cannot be bounded.",
+        "falsifiers": [
+          "ATM issuance dilutes ETH per share faster than token price rises for two consecutive quarters.",
+          "Preferred or warrant conversion materially reduces common look-through below the component low case ($10.50/sh on static ETH look-through).",
+          "ETH fair value per share falls below the low case after sustained spot decline and further dilution.",
+          "Management announces a dated liquidation, buyback, or distribution program that converts treasury ETH into per-share cash on a defined timeline."
+        ],
+        "specialist_findings": "Component audit: eth_look_through_today is filing-tier unit NAV and appropriately separated from trajectory; eth_trajectory_net_dilution is additive with null success_probability and no comparable realization precedents; staking_and_legacy_cash is immaterial and non-overlapping; warrants_tax_preferred_reserve base zero pending preferred review is the largest senior-claim gap. No comparable peer liquidation or forced-sale evidence is cited. Realization friction is high: ETH is marked fairly on balance sheet but common holders have no contractual path to cash except secondary sale or future corporate action. G&A ($335.7M nine months) exceeds staking revenue ($56.9M), eroding any operating bridge to asset realization. Price trades at ~0.84x May ETH fair value, offering a nominal discount, but Klarman would not treat this as cash-equivalent NAV without a dated catalyst and bounded dilution.",
+        "confidence": "medium"
+      },
+      {
+        "persona": "marks_credit_cycle",
+        "independence_group": "credit_cycle",
+        "evidence_status": "insufficient_evidence",
+        "scores": {
+          "explanatory_strength": {
+            "value": 3,
+            "rationale": "The levered-treasury mechanism (ETH look-through versus ATM dilution and corporate burn) is specific, but the financing-cycle stress path is not separated cleanly from pure ETH beta."
+          },
+          "evidence_sufficiency": {
+            "value": 2,
+            "rationale": "Filings anchor ETH units, share count, cash, and deferred tax, yet BMNP preferred claims, post-May ATM pace, and a full senior-claim waterfall remain unresolved for credit stress."
+          },
+          "downside_control": {
+            "value": 2,
+            "rationale": "May 2026 ETH fair value per share (~$18.76) offers a partial floor, but unbounded equity issuance, $287.6M nine-month operating cash use, and G&A far above staking revenue can overwhelm look-through value."
+          },
+          "return_vs_alternatives": {
+            "value": 2,
+            "rationale": "Base annualized return is 6.3% per year, below the 12% credit hurdle; the bull case (~15.1%) requires limited further dilution and ETH re-rating."
+          }
+        },
+        "vote": "defer",
+        "expected_return_range_pct": [
+          -6.9,
+          15.1
+        ],
+        "horizon_years": 7,
+        "claims": [
+          {
+            "claim": "BMNR carries no material term debt, but the equity-financing cycle is the dominant fixed-claim risk: shares outstanding rose to 579.7M from 232.4M in one year while nine-month operating cash use was $287.6M against $340.3M cash.",
+            "evidence_paths": [
+              "BMNR/research/valuation.json",
+              "BMNR/research/deep_dive_2026-07-17.md"
+            ]
+          },
+          {
+            "claim": "The warrants, deferred tax, and preferred-claim reserve is modeled at zero in base case despite $92.3M deferred tax liability and unresolved BMNP preferred stock; credit stress can absorb ETH look-through before common equity realizes upside.",
+            "evidence_paths": [
+              "BMNR/research/valuation.json",
+              "BMNR/research/valuation_contract.json"
+            ]
+          },
+          {
+            "claim": "Component overlap controls appear clean (static ETH look-through separated from trajectory net of dilution), but the eth_trajectory row lacks explicit remaining issuance capital and probability, so the low case ($8.5/sh total, -45.8% to price) is not a fully reconciled financing-cycle floor.",
+            "evidence_paths": [
+              "BMNR/research/valuation_contract.json",
+              "BMNR/research/adversarial_2026-07-17.md"
+            ]
+          }
+        ],
+        "strongest_counter_explanation": "Price at $15.69 sits below May 2026 ETH fair value per share (~$18.76); if ATM issuance pauses and ETH appreciates, mNAV could normalize without a refinancing or insolvency event because the company holds $340.3M cash and no operating debt at scale.",
+        "most_important_missing_fact": "BMNP preferred stock conversion terms and post-May 2026 ATM dilution pace reconciled to net ETH per diluted common share after all senior claims.",
+        "falsifiers": [
+          "Reconcile preferred, warrant, and deferred-tax claims into a per-share waterfall that nets against ETH look-through.",
+          "Track two consecutive quarters where ATM issuance dilutes ETH per share faster than token price rises.",
+          "Model corporate G&A and operating cash burn against staking inflow under a no-new-equity stress case."
+        ],
+        "specialist_findings": "Credit cross-check: survivability near term looks supported by cash and absent term maturities, but the equity stub is exposed to an open-ended issuance cycle and an under-modeled senior-claim stack; defer until the preferred waterfall and dilution path are evidenced.",
+        "confidence": "medium"
+      }
+    ]
+  },
+  "pre_mortem": {
+    "status": "complete",
+    "failure_story": "We treated BMNR as a discounted ETH wrapper trading below May 2026 token fair value per share, but the equity became a perpetual ATM financing vehicle. Aggressive share issuance diluted ETH per share faster than ETH appreciated, while nine-month G&A of $335.7 million and $287.6 million of operating cash burn consumed staking yield and treasury liquidity. Unmodeled BMNP preferred and warrant senior claims further reduced common look-through. ETH rose in aggregate but per-share economics deteriorated; the stock severely underperformed direct ETH and never closed the mNAV gap.",
+    "earliest_warning_signals": [
+      "Common shares outstanding rose to 579.7 million from 232.4 million year over year while the market kept pricing a structural mNAV discount near 0.84x ETH fair value.",
+      "Nine-month cash used in operating activities was $287.6 million and G&A was $335.7 million, far above $56.9 million of staking revenue, signaling corporate burn before any ETH beta.",
+      "Base Lawrence IRR was 6.3% per year at $15.69, already below the ~15% accumulate hurdle, implying insufficient compensation for unbounded dilution risk at entry.",
+      "ETH per diluted share trajectory was modeled with only 10% cumulative ATM dilution over seven years despite filings documenting repeated ATM and private placements during the treasury pivot.",
+      "Preferred stock (BMNP), warrant, and deferred tax claims on treasury economics were flagged [HUMAN REVIEW] but left at zero in the base payoff build."
+    ],
+    "forensic_checks": [
+      "Reconcile quarterly ETH units held divided by fully diluted common shares against ETH spot and filing fair-value marks; flag any quarter where dilution exceeds token accumulation.",
+      "Trace proceeds from every ATM, private placement, and warrant exercise to ETH purchases versus G&A, advisory fees, and operating burn.",
+      "Build a BMNP preferred and warrant conversion waterfall showing common look-through after senior claims, deferred tax liability ($92.3M at May 31, 2026), and strategic advisor warrants.",
+      "Net staking and validation revenue against custody, protocol, and corporate costs to test whether operating cash ever covers G&A drag.",
+      "Audit custody, validator, and counterparty exposures against 10-K risk factors for impairment or slashing events.",
+      "Verify the SOTP build does not double-count static ETH look-through (~$18.76/sh) with the seven-year trajectory net-of-dilution uplift (+$4.5/sh).",
+      "Run Tier-1 short activist registry and forensic short web scan; adversarial pass cited no_hit on short_scan_2026-05-28.md only."
+    ],
+    "short_source_coverage": "partial",
+    "unresolved_items": [
+      "BMNP preferred stock claims and post-May 31, 2026 ATM issuance are not fully modeled in static look-through or the senior-claim reserve.",
+      "No preferred and warrant waterfall converts filing-level treasury fair value into per-common-share realizability.",
+      "Management alignment, strategic advisor warrant economics, and Tom Lee chairman incentives remain insufficiently tested (management_facts document_count is zero).",
+      "Live ETH spot versus May 31, 2026 fair value marks was flagged [HUMAN REVIEW] but not confirmed before sizing.",
+      "Tier-1 forensic short scan was batch no_hit only; no local short_reports/ and no targeted activist diligence on a levered crypto treasury name."
+    ]
+  },
+  "evidence_tribunal": {
+    "status": "blocked",
+    "resolved_facts": [],
+    "disputed_facts": [
+      "insufficient_or_outside_power_zone"
+    ],
+    "unresolved_material_facts": [
+      "BMNP preferred stock conversion terms and post-May 2026 ATM dilution pace reconciled to net ETH per fully diluted common share after all senior claims.",
+      "Post-May 2026 ATM share issuance and ETH-per-diluted-share reconciled to BMNP preferred conversion and warrant waterfall.",
+      "Quantified post-May 2026 ATM issuance pace and BMNP preferred-stock waterfall per diluted common share, without which per-share asset realization cannot be bounded."
+    ],
+    "evidence_paths": [
+      "BMNR/research/deep_dive_2026-07-17.md",
+      "BMNR/research/adversarial_2026-07-17.md",
+      "BMNR/research/valuation_route.json",
+      "BMNR/research/valuation_contract.json",
+      "BMNR/research/valuation.json",
+      "BMNR/research/thesis.md",
+      "BMNR/research/cross_check_third_party_2026-07-17.md",
+      "BMNR/research/evidence/filing_facts_2026-07-17.json",
+      "BMNR/research/evidence/management_facts_2026-07-17.json"
+    ],
+    "method": "deterministic_vote_and_packet_reconciliation"
+  },
+  "research_loop": {
+    "loop_count": 1,
+    "questions": [
+      "Post-May 2026 ATM share issuance and ETH-per-diluted-share reconciled to BMNP preferred conversion and warrant waterfall.",
+      "What per-share waterfall nets preferred, warrant, and deferred-tax claims against ETH look-through?",
+      "Does observed issuance cadence support the eth_trajectory base case 10% cumulative seven-year dilution assumption?",
+      "Under a no-new-equity stress case, does corporate G&A and operating cash burn exceed staking inflow?"
+    ],
+    "responses": [
+      {
+        "question": "Post-May 2026 ATM share issuance and ETH-per-diluted-share reconciled to BMNP preferred conversion and warrant waterfall.",
+        "answer": "The frozen packet anchors May 31, 2026 at 579.7 million common shares and 5,416,945 ETH (~$18.76 ETH fair value per share on $10.86 billion of token marks) but contains no post-May 2026 ATM issuance, share-count update, or ETH inventory reconciliation. Nine-month filing data shows shares outstanding rose from 232.4 million year over year while the company purchased 3,518,278 ETH units, confirming aggressive equity-funded accumulation through the measurement date. BMNP preferred conversion terms and a full preferred-and-warrant waterfall per diluted common share are flagged [HUMAN REVIEW] and not reconciled in the frozen evidence. Post-May forward reconciliation therefore remains open.",
+        "evidence_paths": [
+          "BMNR/research/deep_dive_2026-07-17.md",
+          "BMNR/research/valuation.json",
+          "BMNR/research/valuation_contract.json",
+          "BMNR/research/committee_work/2026-07-18/pre_mortem.json",
+          "BMNR/research/committee_work/2026-07-18/round_1/hk.json",
+          "BMNR/research/committee_work/2026-07-18/round_1/marks_credit_cycle.json"
+        ],
+        "status": "unresolved"
+      },
+      {
+        "question": "What per-share waterfall nets preferred, warrant, and deferred-tax claims against ETH look-through?",
+        "answer": "Filings document warrant liability of $2.1 million and deferred tax liability of $92.3 million at May 31, 2026, which is roughly $0.16 per share on 579.7 million shares before any preferred claim. The component schedule models warrants_tax_preferred_reserve at base zero pending preferred review, and valuation.json explicitly states BMNP preferred stock claims are not fully modeled. No frozen artifact provides preferred conversion terms, liquidation preference, share count, or exercise mechanics needed to convert treasury ETH fair value into bounded common look-through. Partial filing anchors exist for warrant and deferred tax; a decision-grade senior-claim waterfall does not.",
+        "evidence_paths": [
+          "BMNR/research/valuation.json",
+          "BMNR/research/valuation_contract.json",
+          "BMNR/research/deep_dive_2026-07-17.md",
+          "BMNR/research/evidence/management_facts_2026-07-17.json"
+        ],
+        "status": "partially_answered"
+      },
+      {
+        "question": "Does observed issuance cadence support the eth_trajectory base case 10% cumulative seven-year dilution assumption?",
+        "answer": "Observed filing cadence contradicts the base assumption. Common shares rose from 232.4 million to 579.7 million in roughly nine months, a 149% increase, while the eth_trajectory_net_dilution base row assumes only 10% cumulative ATM dilution over seven years at 8% ETH CAGR. The bear scenario embeds 12% dilution per year. Historical equity issuance therefore far exceeds the base path, and the frozen packet offers no post-May 2026 issuance data to show a slowdown. The 10% seven-year assumption remains analyst judgment rather than filing-evidenced cadence.",
+        "evidence_paths": [
+          "BMNR/research/deep_dive_2026-07-17.md",
+          "BMNR/research/valuation.json",
+          "BMNR/research/valuation_contract.json",
+          "BMNR/research/committee_work/2026-07-18/pre_mortem.json"
+        ],
+        "status": "partially_answered"
+      },
+      {
+        "question": "Under a no-new-equity stress case, does corporate G&A and operating cash burn exceed staking inflow?",
+        "answer": "Yes on filing arithmetic through May 31, 2026. Nine-month general and administrative expense was $335.7 million against $56.9 million of staking and validation revenue, and net cash used in operating activities was $287.6 million while cash stood at $340.3 million. Annualized, G&A alone exceeds staking revenue by roughly six times, so owner economics depend on continued equity issuance rather than self-funded treasury operations. The frozen packet does not isolate a full no-new-equity liquidity runway including treasury purchase commitments, but the operating burn versus staking gap is decisively negative.",
+        "evidence_paths": [
+          "BMNR/research/deep_dive_2026-07-17.md",
+          "BMNR/research/valuation.json",
+          "BMNR/research/committee_work/2026-07-18/pre_mortem.json",
+          "BMNR/research/committee_work/2026-07-18/round_1/marks_credit_cycle.json"
+        ],
+        "status": "partially_answered"
+      }
+    ],
+    "evidence_hash_after": "e0647786d0fb336f1ea6ff87c3ea771b0b112c921f23ec5b678dc6ba23e58467"
+  },
+  "round_two": {
+    "evidence_hash": "e0647786d0fb336f1ea6ff87c3ea771b0b112c921f23ec5b678dc6ba23e58467",
+    "peer_outputs_visible": false,
+    "votes": [
+      {
+        "persona": "hk",
+        "independence_group": "scarce_assets",
+        "evidence_status": "insufficient_evidence",
+        "scores": {
+          "explanatory_strength": {
+            "value": 3,
+            "rationale": "The mNAV discount on a levered ETH wrapper is a specific mechanism with filing-backed look-through math, but the research loop confirms the dilution-versus-beta path is not hard to vary: nine-month share issuance rose 149% while the base trajectory assumes only 10% cumulative dilution over seven years."
+          },
+          "evidence_sufficiency": {
+            "value": 2,
+            "rationale": "May 31 ETH inventory and share count remain primary-verified, and the targeted response usefully quantifies warrant and deferred-tax drag (~$0.16 per share) and G&A-versus-staking burn, but post-May ATM issuance, BMNP preferred conversion terms, and a decision-grade senior-claim waterfall stay open."
+          },
+          "downside_control": {
+            "value": 2,
+            "rationale": "Price still sits below May ETH fair value per share, but unbounded ATM dilution, G&A roughly six times staking revenue, and an unmodeled preferred reserve leave the component low case near $8.50 per share with no contractual floor on common look-through."
+          },
+          "return_vs_alternatives": {
+            "value": 2,
+            "rationale": "Base 6.3% per year remains well below a mid-teens hurdle; the eth_trajectory_net_dilution additive base (+$4.50) lacks filing support after the research loop showed historical issuance far exceeds the assumed cadence."
+          }
+        },
+        "vote": "watch",
+        "expected_return_range_pct": [
+          -6.9,
+          15.1
+        ],
+        "horizon_years": 7,
+        "claims": [
+          {
+            "claim": "May 31 filing ETH look-through (~$18.76 per share) exceeds price ($15.69), giving a scarce-asset cushion, but that cushion is not a bounded common claim once ATM dilution and preferred seniority are applied.",
+            "evidence_paths": [
+              "BMNR/research/valuation.json",
+              "BMNR/research/deep_dive_2026-07-17.md",
+              "BMNR/research/committee_work/2026-07-18/research_response.json"
+            ]
+          },
+          {
+            "claim": "The eth_trajectory_net_dilution additive row (+$4.50 base) fails scarce-asset proof: success probability is null, filing cadence (149% share increase in nine months) contradicts the 10% seven-year dilution assumption, and no arm's-length treasury comparables support the incremental beta.",
+            "evidence_paths": [
+              "BMNR/research/valuation.json",
+              "BMNR/research/valuation_contract.json",
+              "BMNR/research/committee_work/2026-07-18/research_response.json"
+            ]
+          },
+          {
+            "claim": "Nine-month general and administrative expense ($335.7M) exceeds staking revenue ($56.9M), so per-share ETH accumulation depends on continued equity issuance rather than self-funded owner economics.",
+            "evidence_paths": [
+              "BMNR/research/deep_dive_2026-07-17.md",
+              "BMNR/research/valuation.json",
+              "BMNR/research/committee_work/2026-07-18/research_response.json"
+            ]
+          }
+        ],
+        "strongest_counter_explanation": "The discount to May ETH marks is a rational price for an equity-financed dilution vehicle: management funds token purchases by issuing shares faster than ETH per share compounds, so the scarce asset on the balance sheet does not translate into a fixed pro-rata common claim.",
+        "most_important_missing_fact": "Post-May 2026 ATM share issuance and ETH-per-diluted-share reconciled to BMNP preferred conversion and warrant waterfall.",
+        "falsifiers": [
+          "Reconcile quarter-by-quarter ETH purchases, shares issued, and ETH per diluted share from May 31, 2026 forward.",
+          "Model BMNP preferred and warrant claims as explicit per-share deductions before promoting static look-through to a downside floor.",
+          "Replace or reject the eth_trajectory base case until observed issuance cadence, success probability, and remaining owner-funded capital are filing-evidenced."
+        ],
+        "specialist_findings": "After the one-loop research response, overlap keys are documented and operating burn is confirmed, but the wrapper still fails durable-payoff and economic-claim tests: filing dilution pace contradicts the trajectory base, preferred waterfall is absent, and post-May reconciliation is unresolved. Abstain from approve.",
+        "confidence": "medium"
+      },
+      {
+        "persona": "klarman_asset_value",
+        "independence_group": "asset_realization",
+        "evidence_status": "insufficient_evidence",
+        "scores": {
+          "explanatory_strength": {
+            "value": 2,
+            "rationale": "The ETH look-through discount is filing-specific, but the only gap-closer is passive mNAV normalization over seven years. The research loop confirms observed share issuance rose 149% in nine months, contradicting the base 10% cumulative dilution path, and no dated liquidation, sale, or distribution catalyst exists."
+          },
+          "evidence_sufficiency": {
+            "value": 2,
+            "rationale": "May 31, 2026 ETH marks, share count, warrant liability, and deferred tax are primary-verified, yet the targeted research response leaves post-May ATM issuance unresolved and provides no preferred conversion waterfall. Decision-grade per-share asset realization cannot be bounded."
+          },
+          "downside_control": {
+            "value": 2,
+            "rationale": "Static ETH fair value per share (~$18.76) exceeds price today, but the component low case ($8.50/sh) and filing-confirmed G&A six times staking revenue with negative operating cash flow mean unbounded ATM dilution can erode look-through faster than any nominal discount offers cushion."
+          },
+          "return_vs_alternatives": {
+            "value": 2,
+            "rationale": "Base annualized return 6.3% over seven years remains well below the 15% Klarman hurdle; only the bull case (~15.1%) clears it and depends on favorable ETH trajectory plus dilution slowing from historically observed levels."
+          }
+        },
+        "vote": "defer",
+        "expected_return_range_pct": [
+          -8.4,
+          14.9
+        ],
+        "horizon_years": 7,
+        "claims": [
+          {
+            "claim": "Filing-verified ETH look-through (~$18.76/sh at May 31, 2026) exceeds price ($15.69), but the research loop left post-May ATM issuance and BMNP preferred waterfall unresolved, so per-share asset realization is not decision-grade.",
+            "evidence_paths": [
+              "BMNR/research/valuation.json",
+              "BMNR/research/deep_dive_2026-07-17.md",
+              "BMNR/research/committee_work/2026-07-18/research_response.json"
+            ]
+          },
+          {
+            "claim": "The eth_trajectory_net_dilution base row (+$4.5/sh) is contradicted by filing cadence: shares rose 149% in nine months versus a 10% cumulative seven-year dilution assumption, with null success_probability and no comparable realization precedents.",
+            "evidence_paths": [
+              "BMNR/research/valuation.json",
+              "BMNR/research/valuation_contract.json",
+              "BMNR/research/committee_work/2026-07-18/research_response.json"
+            ]
+          },
+          {
+            "claim": "Overlap controls are clean, but warrants_tax_preferred_reserve at base zero understates senior claims, and research confirms G&A ($335.7M nine months) exceeds staking revenue ($56.9M), so owner economics depend on continued equity issuance rather than asset conversion.",
+            "evidence_paths": [
+              "BMNR/research/valuation.json",
+              "BMNR/research/valuation_contract.json",
+              "BMNR/research/committee_work/2026-07-18/research_response.json"
+            ]
+          }
+        ],
+        "strongest_counter_explanation": "The market may rationally price BMNR as an equity-financed ETH accumulator where ongoing ATM issuance will dilute look-through ETH per share faster than any mNAV discount can close, making the apparent NAV discount a financing-vehicle trap rather than a catalyst-backed margin of safety.",
+        "most_important_missing_fact": "Quantified post-May 2026 ATM issuance pace and BMNP preferred-stock waterfall per diluted common share, without which per-share asset realization cannot be bounded.",
+        "falsifiers": [
+          "ATM issuance dilutes ETH per share faster than token price rises for two consecutive quarters.",
+          "Preferred or warrant conversion materially reduces common look-through below the component low case ($10.50/sh on static ETH look-through).",
+          "ETH fair value per share falls below the low case after sustained spot decline and further dilution.",
+          "Management announces a dated liquidation, buyback, or distribution program that converts treasury ETH into per-share cash on a defined timeline."
+        ],
+        "specialist_findings": "Round-two component audit after research loop: eth_look_through_today remains filing-tier unit NAV and is appropriately separated from trajectory; eth_trajectory_net_dilution is challenged because observed nine-month share growth (232.4M to 579.7M) contradicts the base 10% seven-year dilution assumption and success_probability remains null; staking_and_legacy_cash is immaterial and already falsified by G&A exceeding staking inflow; warrants_tax_preferred_reserve base zero still leaves preferred claims unmodeled despite partial warrant and deferred-tax anchors (~$0.16/sh). No comparable peer liquidation or forced-sale evidence is cited. Realization friction is high: ETH is marked fairly on balance sheet but common holders have no contractual path to cash except secondary sale or future corporate action. The research response confirms rather than closes the round-one gaps; vote moves from watch to defer pending bounded dilution and senior-claim reconciliation.",
+        "confidence": "medium"
+      },
+      {
+        "persona": "marks_credit_cycle",
+        "independence_group": "credit_cycle",
+        "evidence_status": "insufficient_evidence",
+        "scores": {
+          "explanatory_strength": {
+            "value": 3,
+            "rationale": "The levered-treasury and equity-financing-cycle mechanism is now sharper: filings show 149% share growth in nine months versus a 10% seven-year dilution assumption, separating financing stress from pure ETH beta. The research loop did not reconcile the two paths into one decision-grade forecast."
+          },
+          "evidence_sufficiency": {
+            "value": 2,
+            "rationale": "Round-two research confirmed filing anchors (579.7M shares, $287.6M operating cash use, $92.3M deferred tax) and decisively flagged the dilution-cadence mismatch, but BMNP preferred conversion terms, post-May 2026 ATM pace, and a full senior-claim waterfall remain unresolved."
+          },
+          "downside_control": {
+            "value": 2,
+            "rationale": "Near-term liquidity looks supported ($340.3M cash, no term debt), yet research confirmed G&A runs roughly six times staking revenue and operating burn exceeds inflow without new equity; the equity stub has no bounded dilution floor."
+          },
+          "return_vs_alternatives": {
+            "value": 2,
+            "rationale": "Base annualized return stays 6.3% per year, below a 12% credit hurdle; the filing-contradicted dilution assumption makes even the 15.1% bull case depend on an issuance slowdown not evidenced in the frozen packet."
+          }
+        },
+        "vote": "defer",
+        "expected_return_range_pct": [
+          -6.9,
+          15.1
+        ],
+        "horizon_years": 7,
+        "claims": [
+          {
+            "claim": "Observed issuance cadence (232.4M to 579.7M shares in roughly nine months, +149%) contradicts the eth_trajectory_net_dilution base assumption of 10% cumulative dilution over seven years; the financing-cycle stress path dominates the base payoff build.",
+            "evidence_paths": [
+              "BMNR/research/committee_work/2026-07-18/research_response.json",
+              "BMNR/research/valuation.json",
+              "BMNR/research/deep_dive_2026-07-17.md"
+            ]
+          },
+          {
+            "claim": "Under a no-new-equity stress case, nine-month G&A of $335.7M against $56.9M staking revenue and $287.6M operating cash use confirms owner economics depend on continued equity issuance rather than self-funded treasury operations.",
+            "evidence_paths": [
+              "BMNR/research/committee_work/2026-07-18/research_response.json",
+              "BMNR/research/valuation.json",
+              "BMNR/research/deep_dive_2026-07-17.md"
+            ]
+          },
+          {
+            "claim": "The warrants_tax_preferred_reserve row remains base zero despite $92.3M deferred tax liability (~$0.16 per share) and unresolved BMNP preferred claims; overlap controls are clean but the low case ($8.5 per share total) is not a reconciled senior-claim waterfall.",
+            "evidence_paths": [
+              "BMNR/research/committee_work/2026-07-18/research_response.json",
+              "BMNR/research/valuation_contract.json",
+              "BMNR/research/valuation.json"
+            ]
+          }
+        ],
+        "strongest_counter_explanation": "Price at $15.69 sits below May 2026 ETH fair value per share (~$18.76); with $340.3M cash, no operating debt at scale, and potential ATM pause, mNAV could normalize on ETH appreciation without a refinancing event or insolvency.",
+        "most_important_missing_fact": "BMNP preferred stock conversion terms and post-May 2026 ATM dilution pace reconciled to net ETH per fully diluted common share after all senior claims.",
+        "falsifiers": [
+          "Publish a per-share waterfall netting preferred, warrant, and deferred-tax claims against ETH look-through that bounds common equity.",
+          "Two consecutive quarters where ATM issuance dilutes ETH per share faster than token price rises.",
+          "Demonstrate corporate G&A and operating burn covered by staking inflow without new equity for two reporting periods."
+        ],
+        "specialist_findings": "Credit cross-check after research loop: near-term survivability is supported by cash and absent term maturities, but the equity-financing cycle is filing-evidenced as aggressive (149% share growth in nine months), base dilution assumptions are contradicted, and the senior-claim stack remains under-modeled; defer until preferred waterfall and post-May issuance are evidenced.",
+        "confidence": "medium"
+      }
+    ]
+  },
+  "valuation_reconciliation": {
+    "status": "complete",
+    "disagreements": [
+      {
+        "type": "recommendation",
+        "vote_split": {
+          "watch": 1,
+          "defer": 2
+        }
+      },
+      {
+        "type": "score",
+        "dimension": "explanatory_strength",
+        "range": [
+          2,
+          3
+        ]
+      }
+    ],
+    "selected_primary_method": "scarce_asset_optionality",
+    "rejected_averages": [
+      "No incompatible valuation methods were averaged to manufacture consensus."
+    ],
+    "method": "deterministic_classification"
+  },
+  "adversarial_review": {
+    "status": "complete_with_residual_risks",
+    "tests": [
+      "Reconcile quarterly ETH units held divided by fully diluted common shares against ETH spot and filing fair-value marks; flag any quarter where dilution exceeds token accumulation.",
+      "Trace proceeds from every ATM, private placement, and warrant exercise to ETH purchases versus G&A, advisory fees, and operating burn.",
+      "Build a BMNP preferred and warrant conversion waterfall showing common look-through after senior claims, deferred tax liability ($92.3M at May 31, 2026), and strategic advisor warrants.",
+      "Net staking and validation revenue against custody, protocol, and corporate costs to test whether operating cash ever covers G&A drag.",
+      "Audit custody, validator, and counterparty exposures against 10-K risk factors for impairment or slashing events.",
+      "Verify the SOTP build does not double-count static ETH look-through (~$18.76/sh) with the seven-year trajectory net-of-dilution uplift (+$4.5/sh).",
+      "Run Tier-1 short activist registry and forensic short web scan; adversarial pass cited no_hit on short_scan_2026-05-28.md only."
+    ],
+    "residual_risks": [
+      "BMNP preferred stock claims and post-May 31, 2026 ATM issuance are not fully modeled in static look-through or the senior-claim reserve.",
+      "No preferred and warrant waterfall converts filing-level treasury fair value into per-common-share realizability.",
+      "Management alignment, strategic advisor warrant economics, and Tom Lee chairman incentives remain insufficiently tested (management_facts document_count is zero).",
+      "Live ETH spot versus May 31, 2026 fair value marks was flagged [HUMAN REVIEW] but not confirmed before sizing.",
+      "Tier-1 forensic short scan was batch no_hit only; no local short_reports/ and no targeted activist diligence on a levered crypto treasury name."
+    ],
+    "strongest_failure_path": "We treated BMNR as a discounted ETH wrapper trading below May 2026 token fair value per share, but the equity became a perpetual ATM financing vehicle. Aggressive share issuance diluted ETH per share faster than ETH appreciated, while nine-month G&A of $335.7 million and $287.6 million of operating cash burn consumed staking yield and treasury liquidity. Unmodeled BMNP preferred and warrant senior claims further reduced common look-through. ETH rose in aggregate but per-share economics deteriorated; the stock severely underperformed direct ETH and never closed the mNAV gap.",
+    "source": "independent_pre_mortem"
+  },
+  "chair_synthesis": {
+    "status": "complete",
+    "primary_method": "component unit NAV with filing-verified ETH look-through and additive trajectory net of dilution",
+    "weighting_rationale": "BMNR is routed as scarce_asset_optionality with primary method component_owner_cash_and_unit_nav. The economic claim is a diluted common share of an Ethereum treasury vehicle, not recurring operating owner cash. Filing-verified static ETH look-through (~$18.76 per share at May 31, 2026 on 5,416,945 ETH and 579.7 million shares) is the decision-grade anchor because it is primary-verified, overlap-controlled, and separated from the eth_trajectory_net_dilution row. That component schedule dominates because it matches the levered-treasury payoff lens and maps directly to the 10-Q digital asset table. Marks credit-cycle review is a financing-cycle survivability and dilution stress test ($340.3M cash, no term debt, but 149% nine-month share growth and $287.6M operating cash use); it bounds equity-stub risk but does not replace unit NAV. Klarman asset-realization audit confirms no dated liquidation, buyback, or distribution catalyst, so passive mNAV normalization is corroboration only, not a competing primary value. Comparable-transaction and replacement-cost corroborators are silent: no indexed arm's-length crypto-treasury liquidation precedents appear in the frozen packet. Lawrence yield-curve base return (6.3% per year over seven years) remains the stance gate, not a second asset stack. The chair does not average static look-through ($18.76), the challenged trajectory uplift (+$4.50 base), and the component-low financing stress total ($8.50) into a blended consensus.",
+    "agreed_facts": [
+      "At May 31, 2026, BMNR held 5,416,945 ETH at fair value $10.86 billion plus 203 BTC at $15 million; common shares outstanding were 579.7 million versus 232.4 million at August 31, 2025.",
+      "Filing ETH fair value per share was ~$18.76 at May 31, 2026, exceeding the frozen market price of $15.69 (roughly 0.84x mNAV on May marks).",
+      "Nine-month general and administrative expense was $335.7 million against $56.9 million of staking and validation revenue; net cash used in operating activities was $287.6 million.",
+      "Cash was $340.3 million at May 31, 2026; the company carries no material operating term debt at scale in the frozen filings.",
+      "Deferred tax liability was $92.3 million (~$0.16 per share on 579.7 million shares) and warrant liability was $2.1 million; BMNP preferred stock claims are flagged but not fully modeled in the senior-claim reserve row.",
+      "Component overlap controls are clean: eth_look_through_today, eth_trajectory_net_dilution, staking_and_legacy_cash, and warrants_tax_preferred_reserve use distinct overlap keys with no double-count of static ETH with trajectory uplift.",
+      "Observed issuance cadence (149% share increase in roughly nine months) contradicts the eth_trajectory_net_dilution base assumption of 10% cumulative ATM dilution over seven years; the targeted research loop confirmed this mismatch.",
+      "Round-two votes split one watch (hk) and two defer (klarman_asset_value, marks_credit_cycle); no rater recommended add, buy, hold-for-sizing, or pass."
+    ],
+    "disputed_facts": [
+      "Whether the ~16% discount to May ETH marks is mispricing or a rational price for an equity-financed dilution vehicle where ATM issuance can outrun token appreciation.",
+      "Whether the eth_trajectory_net_dilution base row (+$4.50 per share) belongs in the primary payoff build given filing-contradicted dilution cadence and null success_probability.",
+      "BMNP preferred conversion terms, liquidation preference, and post-May 2026 ATM issuance pace needed to bound common look-through after senior claims.",
+      "Whether live ETH spot versus May 31, 2026 fair value marks materially changes static look-through before any capital decision.",
+      "Whether management alignment, strategic advisor warrant economics, and Tom Lee chairman incentives support a slowdown in dilution (management_facts document_count is zero in the frozen packet)."
+    ],
+    "strongest_dissent": "Klarman asset-realization and Marks credit-cycle cross-checks: the market may rationally price BMNR as an open-ended equity-financing cycle where management funds ETH purchases by issuing shares faster than ETH per diluted share compounds, making the apparent NAV discount a financing-vehicle trap rather than catalyst-backed margin of safety; near-term cash supports survivability but does not bound dilution or preferred seniority.",
+    "dissent_ledger": [
+      {
+        "persona": "klarman_asset_value",
+        "issue": "No dated catalyst converts treasury ETH into per-share cash; post-May ATM and preferred waterfall remain unresolved",
+        "impact": "high",
+        "status": "unresolved",
+        "vote": "defer",
+        "evidence_status": "insufficient_evidence"
+      },
+      {
+        "persona": "marks_credit_cycle",
+        "issue": "Equity-financing cycle dominates: 149% nine-month share growth contradicts base dilution path; senior-claim waterfall incomplete",
+        "impact": "high",
+        "status": "unresolved",
+        "vote": "defer",
+        "evidence_status": "insufficient_evidence"
+      },
+      {
+        "persona": "hk",
+        "issue": "Scarce ETH stack is real but not a bounded common claim until dilution pace and preferred seniority are proven",
+        "impact": "high",
+        "status": "preserved",
+        "vote": "watch",
+        "evidence_status": "insufficient_evidence"
+      }
+    ],
+    "value_range_per_share": {
+      "low": 8.5,
+      "base": 18.76,
+      "high": 24.0,
+      "low_source": "component schedule total (ETH mark haircut, trajectory stress, and financing-cycle dilution)",
+      "base_source": "filing-verified ETH fair value per share at May 31, 2026 (10-Q digital asset table; before unmodeled preferred claims)",
+      "high_source": "component schedule base total if eth_trajectory_net_dilution assumptions held (not filing-evidenced after research loop)"
+    },
+    "scenario_payoff_per_share": {
+      "bear": 10.5,
+      "base": 18.76,
+      "bull": 24.0
+    },
+    "expected_return_range_pct": {
+      "low": -8.4,
+      "base": 6.3,
+      "high": 15.1,
+      "note": "Base reflects Lawrence yield-curve stance gate at $15.69. Low bound reflects component-low annualized path and financing-stress framing. High bound requires bull scenario with limited further dilution. Range is not averaged across methods."
+    },
+    "entry_range_per_share": {
+      "reference_price": 15.69,
+      "actionable_low": null,
+      "actionable_high": null,
+      "condition": "No new capital commitment until post-May 2026 ATM issuance is reconciled to ETH per diluted share and a decision-grade BMNP preferred-and-warrant waterfall bounds common look-through. Nominal discount to May ETH marks alone is insufficient entry evidence."
+    },
+    "recommendation": "watch",
+    "recommendation_rationale": "Two defer and one watch across three independent groups. The primary component unit-NAV method shows filing-verified static ETH look-through above price, but base annualized return (6.3% per year) sits well below a mid-teens accumulate hurdle, the eth_trajectory additive row is filing-contradicted, G&A runs roughly six times staking revenue, and BMNP preferred plus post-May dilution remain unresolved after one targeted research loop. This is a monitoring stance pending senior-claim reconciliation and dilution cadence evidence, not a sizing or capital decision.",
+    "monitoring_plan": {
+      "operational_milestones": [
+        "Reconcile quarter-by-quarter ETH purchases, shares issued, and ETH per diluted share from May 31, 2026 forward",
+        "Publish a per-share waterfall netting BMNP preferred, warrant, and deferred-tax claims against ETH look-through",
+        "Track ATM, private placement, and warrant exercise proceeds versus ETH accumulation and G&A burn",
+        "Compare staking and validation revenue to general and administrative expense and operating cash flow each quarter",
+        "Monitor live ETH spot versus May 31, 2026 fair value marks and mNAV ratio",
+        "Scan 8-K and shelf filings for dilutive equity raises, preferred conversions, or treasury policy changes",
+        "Audit custody, validator, and counterparty exposures against 10-K risk factors"
+      ],
+      "evidence_refresh_dates": [
+        "2026-08-15",
+        "2026-09-15",
+        "2026-11-15"
+      ],
+      "valuation_refresh_triggers": [
+        "Next 10-Q or 10-K filing with updated ETH inventory and share count",
+        "Two consecutive quarters where ATM issuance dilutes ETH per share faster than token price rises",
+        "BMNP preferred conversion or material warrant exercise",
+        "ETH fair value per share move exceeding 20% from May 31, 2026 marks without corresponding filing update",
+        "Management announcement of buyback, distribution, or dated treasury liquidation program",
+        "20% price move without corresponding filing update"
+      ],
+      "price_review_thresholds": [
+        {
+          "below": 12.0,
+          "action": "Re-underwrite component-low financing stress if dilution continues; do not add on price alone"
+        },
+        {
+          "crosses_static_look_through": 18.76,
+          "action": "Require confirmed dilution slowdown and preferred waterfall before treating mNAV gap as closed"
+        },
+        {
+          "above": 24.0,
+          "action": "Reassess whether component base trajectory assumptions are filing-supported or fully priced"
+        }
+      ],
+      "thesis_break_conditions": [
+        "ATM issuance dilutes ETH per share faster than token price rises for two consecutive quarters",
+        "Preferred or warrant conversion materially reduces common look-through below the component low case ($8.50 total)",
+        "ETH fair value per share falls below the low case after sustained spot decline and further dilution",
+        "Corporate G&A and operating cash burn exceed staking inflow with no equity issuance for two reporting periods (liquidity stress)",
+        "Management abandons ETH treasury strategy or pivots capital away from token accumulation without shareholder distribution"
+      ],
+      "expected_catalyst_dates": [
+        "2026-08-31",
+        "2026-11-30",
+        "2027-05-31"
+      ],
+      "outcome_horizons_months": [
+        6,
+        12,
+        84
+      ]
+    }
+  },
+  "synthesis": {
+    "strongest_dissent": "The discount to May ETH marks is a rational price for an equity-financed dilution vehicle: management funds token purchases by issuing shares faster than ETH per share compounds, so the scarce asset on the balance sheet does not translate into a fixed pro-rata common claim.",
+    "unresolved_items": [
+      "BMNP preferred stock conversion terms and post-May 2026 ATM dilution pace reconciled to net ETH per fully diluted common share after all senior claims.",
+      "Post-May 2026 ATM share issuance and ETH-per-diluted-share reconciled to BMNP preferred conversion and warrant waterfall.",
+      "Quantified post-May 2026 ATM issuance pace and BMNP preferred-stock waterfall per diluted common share, without which per-share asset realization cannot be bounded."
+    ],
+    "vote_split": {
+      "watch": 1,
+      "defer": 2
+    },
+    "score_medians": {
+      "explanatory_strength": 3,
+      "evidence_sufficiency": 2,
+      "downside_control": 2,
+      "return_vs_alternatives": 2
+    },
+    "score_ranges": {
+      "explanatory_strength": [
+        2,
+        3
+      ],
+      "evidence_sufficiency": [
+        2,
+        2
+      ],
+      "downside_control": [
+        2,
+        2
+      ],
+      "return_vs_alternatives": [
+        2,
+        2
+      ]
+    },
+    "dissent_ledger": [
+      {
+        "issue": "BMNP preferred stock conversion terms and post-May 2026 ATM dilution pace reconciled to net ETH per fully diluted common share after all senior claims.",
+        "impact": "high",
+        "status": "unresolved",
+        "owner_response": null
+      },
+      {
+        "issue": "Post-May 2026 ATM share issuance and ETH-per-diluted-share reconciled to BMNP preferred conversion and warrant waterfall.",
+        "impact": "high",
+        "status": "unresolved",
+        "owner_response": null
+      },
+      {
+        "issue": "Quantified post-May 2026 ATM issuance pace and BMNP preferred-stock waterfall per diluted common share, without which per-share asset realization cannot be bounded.",
+        "impact": "high",
+        "status": "unresolved",
+        "owner_response": null
+      }
+    ]
+  },
+  "component_review": {
+    "status": "ready_for_committee_review",
+    "decision_rule": "Each assigned rater records accept, challenge, or reject with a proposed range and evidence. The aggregator may not silently average disputed ranges.",
+    "items": [
+      {
+        "component_id": "eth_look_through_today",
+        "label": "ETH treasury fair value per share (May 31, 2026)",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 10.5,
+          "base": 18.76,
+          "high": 22.0
+        },
+        "range_width_pct_of_base": 61.3,
+        "evidence_tier": "filing",
+        "recommended_raters": [
+          "greenblatt",
+          "marks_credit_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "eth_trajectory_net_dilution",
+        "label": "Seven-year ETH price path net of ATM dilution",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": -1.5,
+          "base": 4.5,
+          "high": 18.0
+        },
+        "range_width_pct_of_base": 433.3,
+        "evidence_tier": "mixed_primary_and_estimate",
+        "recommended_raters": [
+          "klarman_asset_value",
+          "hk"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "staking_and_legacy_cash",
+        "label": "Staking and legacy operating cash (capitalized)",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 0.5,
+          "base": 0.74,
+          "high": 1.5
+        },
+        "range_width_pct_of_base": 135.1,
+        "evidence_tier": "mixed_primary_and_estimate",
+        "recommended_raters": [
+          "hohn",
+          "marathon_capital_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "warrants_tax_preferred_reserve",
+        "label": "Warrants, deferred tax, and preferred-claim reserve",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": -1.0,
+          "base": 0.0,
+          "high": 0.0
+        },
+        "range_width_pct_of_base": 10000.0,
+        "evidence_tier": "filing",
+        "recommended_raters": [
+          "marks_credit_cycle",
+          "pabrai"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      }
+    ]
+  },
+  "gates": {
+    "price": "pass",
+    "shares": "blocked",
+    "reporting_period": "pass",
+    "filing_reconciliation": "pass",
+    "economic_claim": "pass",
+    "component_completeness": "pass",
+    "comparable_evidence": "pass",
+    "option_risking": "pass",
+    "disclosure_scan": "partial",
+    "short_scan": "partial",
+    "pre_mortem": "pass",
+    "evidence_tribunal": "blocked",
+    "valuation_reconciliation": "pass",
+    "adversarial_review": "pass",
+    "chair_synthesis": "pass",
+    "explanation_contracts": "pass",
+    "independent_groups": "pass",
+    "owner": "not_run"
+  },
+  "human_decision": {
+    "status": "pending",
+    "decision": null,
+    "sizing": null,
+    "top_dissent_response": null,
+    "decided_at": null
+  },
+  "monitoring_plan": {
+    "operational_milestones": [
+      "Reconcile quarter-by-quarter ETH purchases, shares issued, and ETH per diluted share from May 31, 2026 forward",
+      "Publish a per-share waterfall netting BMNP preferred, warrant, and deferred-tax claims against ETH look-through",
+      "Track ATM, private placement, and warrant exercise proceeds versus ETH accumulation and G&A burn",
+      "Compare staking and validation revenue to general and administrative expense and operating cash flow each quarter",
+      "Monitor live ETH spot versus May 31, 2026 fair value marks and mNAV ratio",
+      "Scan 8-K and shelf filings for dilutive equity raises, preferred conversions, or treasury policy changes",
+      "Audit custody, validator, and counterparty exposures against 10-K risk factors"
+    ],
+    "evidence_refresh_dates": [
+      "2026-08-15",
+      "2026-09-15",
+      "2026-11-15"
+    ],
+    "valuation_refresh_triggers": [
+      "Next 10-Q or 10-K filing with updated ETH inventory and share count",
+      "Two consecutive quarters where ATM issuance dilutes ETH per share faster than token price rises",
+      "BMNP preferred conversion or material warrant exercise",
+      "ETH fair value per share move exceeding 20% from May 31, 2026 marks without corresponding filing update",
+      "Management announcement of buyback, distribution, or dated treasury liquidation program",
+      "20% price move without corresponding filing update"
+    ],
+    "price_review_thresholds": [
+      {
+        "below": 12.0,
+        "action": "Re-underwrite component-low financing stress if dilution continues; do not add on price alone"
+      },
+      {
+        "crosses_static_look_through": 18.76,
+        "action": "Require confirmed dilution slowdown and preferred waterfall before treating mNAV gap as closed"
+      },
+      {
+        "above": 24.0,
+        "action": "Reassess whether component base trajectory assumptions are filing-supported or fully priced"
+      }
+    ],
+    "thesis_break_conditions": [
+      "ATM issuance dilutes ETH per share faster than token price rises for two consecutive quarters",
+      "Preferred or warrant conversion materially reduces common look-through below the component low case ($8.50 total)",
+      "ETH fair value per share falls below the low case after sustained spot decline and further dilution",
+      "Corporate G&A and operating cash burn exceed staking inflow with no equity issuance for two reporting periods (liquidity stress)",
+      "Management abandons ETH treasury strategy or pivots capital away from token accumulation without shareholder distribution"
+    ],
+    "expected_catalyst_dates": [
+      "2026-08-31",
+      "2026-11-30",
+      "2027-05-31"
+    ],
+    "outcome_horizons_months": [
+      6,
+      12,
+      84
+    ]
+  },
+  "final_state": "evidence_blocked",
+  "provenance": {
+    "prompt_version": "token-efficient-isolated-rater-3",
+    "model": "five-call baseline with conditional escalation and deterministic support assembly",
+    "schema_path": "_system/templates/committee_schema.json",
+    "persona_registry_version": "1.1"
+  }
+}
