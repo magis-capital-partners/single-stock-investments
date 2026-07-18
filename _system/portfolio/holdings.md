@@ -307,7 +307,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-18.
 | HGBL | HGBL/ | Heritage Global Inc. | US | 2026-07-16 | 2026-07-18 | unknown | watch |
 | HIG | HIG/ | Hartford (The) | US | 2026-07-10 | 2026-07-18 | unknown | watch |
 | HII | HII/ | Huntington Ingalls Industries | US | 2026-07-10 | 2026-07-18 | unknown | watch |
-| HIMS | HIMS/ | Hims & Hers Health, Inc. | US | — | — | unknown | watch |
+| HIMS | HIMS/ | Hims & Hers Health, Inc. | US | 2026-07-18 | 2026-07-18 | unknown | watch |
 | HKHC | HKHC/ | Horizon Kinetics Holding Corporation | US | 2026-07-09 | 2026-07-18 | unknown | watch |
 | HL | HL/ | Hecla Mining Company | US | 2026-07-09 | 2026-07-18 | unknown | watch |
 | HLT | HLT/ | Hilton Worldwide | US | 2026-07-10 | 2026-07-18 | unknown | watch |
@@ -337,6 +337,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-18.
 | INTU | INTU/ | Intuit | US | 2026-07-10 | 2026-07-18 | unknown | watch |
 | INV | INV/ | Innovex International, Inc. | US | 2026-07-09 | 2026-07-18 | unknown | watch |
 | INVH | INVH/ | Invitation Homes | US | 2026-07-10 | 2026-07-18 | unknown | watch |
+| IONQ | IONQ/ | IonQ, Inc. | US | 2026-07-18 | 2026-07-18 | unknown | watch |
 | IP | IP/ | International Paper | US | 2026-07-10 | 2026-07-18 | unknown | watch |
 | IPCXR | IPCXR/ | Inflection Point Acquisition Corp. II (Rights) | US | 2026-07-09 | 2026-07-18 | unknown | watch |
 | IQV | IQV/ | IQVIA | US | 2026-07-10 | 2026-07-18 | unknown | watch |
@@ -655,4 +656,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-18.
 | ZBRA | ZBRA/ | Zebra Technologies | US | 2026-07-10 | 2026-07-18 | unknown | watch |
 | ZTS | ZTS/ | Zoetis | US | 2026-07-10 | 2026-07-18 | unknown | watch |
 
-**648 holdings total.** Registry: `_system/portfolio/registry.json`
+**649 holdings total.** Registry: `_system/portfolio/registry.json`
