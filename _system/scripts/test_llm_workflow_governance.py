@@ -73,6 +73,12 @@ class WorkflowGovernanceTests(unittest.TestCase):
         self.assertNotIn("npm install --no-save", local_runner)
         self.assertIn("npm\", \"ci", local_runner)
 
+    def test_committee_does_not_duplicate_open_pr_tasks(self):
+        workflow = (ROOT / ".github" / "workflows" / "investment-committee.yml").read_text(encoding="utf-8")
+        self.assertIn("Exclude committee tasks with an open PR", workflow)
+        self.assertIn('row["task_key"] not in open_titles', workflow)
+        self.assertIn('action = "waiting"', workflow)
+
     def test_policy_encodes_expected_call_budgets(self):
         policy = json.loads((ROOT / "_system" / "config" / "llm_usage_policy.json").read_text(encoding="utf-8"))
         self.assertEqual(policy["consumers"]["marvin_research"]["daily_repo_limit"], 1)

@@ -30,8 +30,8 @@ jobs:
     outputs:
       ticker: ${{ steps.queue.outputs.ticker }}
       committee_date: ${{ steps.queue.outputs.committee_date }}
-      action: ${{ steps.queue.outputs.action }}
-      tasks: ${{ steps.queue.outputs.tasks }}
+      action: ${{ steps.pending.outputs.action }}
+      tasks: ${{ steps.pending.outputs.tasks }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -44,6 +44,28 @@ jobs:
             /*/research/evidence/*.json
       - id: queue
         run: python _system/scripts/select_committee_work.py --github-output "$GITHUB_OUTPUT"
+      - name: Exclude committee tasks with an open PR
+        id: pending
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ACTION: ${{ steps.queue.outputs.action }}
+          TASKS_JSON: ${{ steps.queue.outputs.tasks }}
+        run: |
+          OPEN_TITLES=$(gh pr list --state open --limit 100 --json title --jq '[.[].title]')
+          export OPEN_TITLES
+          python - <<'PY'
+          import json, os
+          tasks = json.loads(os.environ.get("TASKS_JSON") or "[]")
+          open_titles = set(json.loads(os.environ.get("OPEN_TITLES") or "[]"))
+          filtered = [row for row in tasks if row["task_key"] not in open_titles]
+          action = os.environ.get("ACTION") or "none"
+          if action == "advance" and tasks and not filtered:
+              action = "waiting"
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as handle:
+              handle.write(f"action={action}\n")
+              handle.write("tasks=" + json.dumps(filtered, separators=(",", ":")) + "\n")
+          print(f"committee action={action}; ready={len(filtered)}; already_in_flight={len(tasks) - len(filtered)}")
+          PY
 
   isolated-tasks:
     needs: prepare
@@ -184,3 +206,11 @@ jobs:
     timeout-minutes: 5
     steps:
       - run: echo "No committee stage is ready; the automatic queue is caught up."
+
+  waiting-for-prs:
+    needs: prepare
+    if: needs.prepare.outputs.action == 'waiting'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - run: echo "All missing committee tasks already have open PRs; no duplicate calls admitted."
