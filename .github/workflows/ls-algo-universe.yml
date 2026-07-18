@@ -59,8 +59,12 @@ jobs:
           git add -A -- _system/data/ls_algo_underlying_gap.json _system/data/evidence_recovery_queue.json \
                          _system/reviews/pending _system/portfolio dashboard/data/index_membership.json \
                          docs/data/index_membership.json
-          git add -A -- '*/README.md' '*/.onboard_status.json' '*/research/evidence_task_queue.json' \
-                         '*/third-party-analyses' '*/investor-documents'
+          shopt -s nullglob
+          checkpoint_paths=(*/README.md */.onboard_status.json */research/evidence_task_queue.json \
+                            */third-party-analyses */investor-documents)
+          if ((${#checkpoint_paths[@]})); then
+            git add -A -- "${checkpoint_paths[@]}"
+          fi
           if ! git diff --cached --quiet; then
             bash _system/scripts/ci_push_main.sh "chore(ls-algo): checkpoint identity and evidence queue"
           fi
@@ -77,7 +81,11 @@ jobs:
         run: |
           git add -A -- _system/data/evidence_recovery_queue.json _system/reviews/pending \
                          dashboard/data docs/data _system/portfolio
-          git add -A -- '*/research' '*/investor-documents'
+          shopt -s nullglob
+          evidence_paths=(*/research */investor-documents)
+          if ((${#evidence_paths[@]})); then
+            git add -A -- "${evidence_paths[@]}"
+          fi
           if ! git diff --cached --quiet; then
             bash _system/scripts/ci_push_main.sh "chore(ls-algo): collect blocker evidence and refresh authority"
           fi

@@ -138,7 +138,7 @@ def daily_refresh(holdings: dict, *, build_indexes: bool = True) -> None:
         except json.JSONDecodeError:
             continue
         er = val.get("evidence_refresh") or {}
-        if er.get("type") == "commodity_nav" or ticker in ("KEWL", "MSB"):
+        if er.get("type") == "commodity_nav" or ticker == "KEWL":
             run(
                 [PY, str(SCRIPTS / "fetch_market_inputs.py"), ticker, "--merge"],
                 f"{ticker} market inputs",

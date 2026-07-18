@@ -65,6 +65,9 @@ def committee_view(research: Path) -> dict:
     if owner.get("status") == "complete" and owner.get("decision"):
         status = "outcome_tracking"
         next_action = "Measure the recorded decision at each due 6-, 12-, and 24-month horizon."
+    elif str(manifest.get("stage") or "").lower() == "evidence_blocked":
+        status = "evidence_blocked"
+        next_action = "Close the committee's primary-evidence blockers before requesting an owner decision."
     elif active_record:
         status = "owner_decision_pending"
         next_action = "Owner records decision, sizing, and a direct response to the strongest dissent."
@@ -446,8 +449,7 @@ def build(ticker: str, as_of: str | None = None) -> dict:
     decision["unresolved_evidence_count"] = evidence.get("open_count") or 0
     if (evidence.get("open_count") or 0) > 0 or (evidence.get("critical_count") or 0) > 0:
         decision["status"] = "evidence_blocked"
-        if not decision.get("next_action"):
-            decision["next_action"] = "Close critical evidence gaps before freezing a decision-grade packet."
+        decision["next_action"] = "Close critical evidence gaps before freezing a decision-grade packet."
     return {
         "schema_version": "2.0",
         "ticker": ticker,

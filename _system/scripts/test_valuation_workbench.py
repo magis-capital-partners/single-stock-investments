@@ -15,6 +15,24 @@ class ValuationWorkbenchTests(unittest.TestCase):
     def test_add_months_handles_month_end(self):
         self.assertEqual(workbench.add_months("2026-08-31", 6), "2027-02-28")
 
+    def test_completed_but_evidence_blocked_committee_does_not_request_owner_decision(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            research = Path(tmp)
+            work = research / "committee_work/2026-07-18"
+            work.mkdir(parents=True)
+            (work / "manifest.json").write_text(json.dumps({
+                "as_of": "2026-07-18", "stage": "evidence_blocked", "selected_raters": []
+            }), encoding="utf-8")
+            (research / "committee_2026-07-18.json").write_text(json.dumps({
+                "review": {"as_of": "2026-07-18"}, "synthesis": {"unresolved_items": ["Reserve life missing"]}
+            }), encoding="utf-8")
+
+            with patch.object(workbench, "ROOT", research):
+                result = workbench.committee_view(research)
+
+            self.assertEqual(result["status"], "evidence_blocked")
+            self.assertIn("primary-evidence blockers", result["next_action"])
+
     def test_live_names_build_truthful_waiting_schedules(self):
         for ticker in ("TPL", "LB", "WBI", "AZLCZ"):
             with self.subTest(ticker=ticker):
@@ -22,7 +40,7 @@ class ValuationWorkbenchTests(unittest.TestCase):
                 self.assertEqual(row["ticker"], ticker)
                 self.assertEqual(row["decision"]["status"], "evidence_blocked")
                 self.assertGreater(row["decision"]["unresolved_evidence_count"], 0)
-                self.assertIn(row["committee"]["status"], {"independent_review_open", "owner_decision_pending"})
+                self.assertIn(row["committee"]["status"], {"evidence_blocked", "independent_review_open", "owner_decision_pending"})
                 self.assertGreater(row["evidence"]["open_count"], 0)
                 self.assertEqual(row["outcomes"]["status"], "waiting_for_owner_decision")
                 self.assertTrue(all(slot["target_date"] is None for slot in row["outcomes"]["schedule"]))

@@ -2,7 +2,15 @@
 
 ## Scope and sources
 
-This reconciliation tests the royalty stream, legal option and trust net assets against Mesabi Trust's primary filings. Sources: [2026 Form 10-K](https://www.sec.gov/Archives/edgar/data/65172/000110465926046864/msb-20260131.htm), [2026 Annual Report, Exhibit 13](https://www.sec.gov/Archives/edgar/data/65172/000110465926046864/msb-20260131xex13.htm), local exhibits under `MSB/investor-documents/sec-edgar/`, and text extracts under `MSB/research/evidence/_text/`.
+This reconciliation tests the royalty stream, legal option and trust net assets against Mesabi Trust's primary filings. Sources: [2026 Form 10-K](https://www.sec.gov/Archives/edgar/data/65172/000110465926046864/msb-20260131.htm), [2026 Annual Report, Exhibit 13](https://www.sec.gov/Archives/edgar/data/65172/000110465926046864/msb-20260131xex13.htm), the June 12, 2026 Form 10-Q, the July 14, 2026 distribution 8-K, local exhibits under `MSB/investor-documents/sec-edgar/`, and text extracts under `MSB/research/evidence/_text/`.
+
+### July 18, 2026 primary-evidence refresh
+
+- The April 30, 2026 Form 10-Q reports quarterly royalty income of **$2.078 million**, net income of **$1.087 million / $0.0829 per unit**, royalties received of **$1.625 million**, and a **$0.24** declared distribution. The comparable 2025 quarter reported $4.349 million of royalty income and $0.2768 of net income per unit.
+- April 30, 2026 cash was **$20.285 million** and the unallocated reserve was **$18.342 million**, or about **$1.398 per unit**, down from $20.403 million / $1.555 per unit at January 31. The existing $1/$2/$3 cash-claim range still brackets both disclosed observations.
+- The July 14, 2026 8-K declares only **$0.05 per unit**, versus $0.12 in the comparable prior-year period. The trustees cite the lower April royalty payment and the absence of any bonus royalty; they also state that they have received no specific update on 2026 Northshore production, sales, or shipments.
+- The same 8-K says the second-calendar-quarter royalty report and payment are due **July 30, 2026**. That filing is now the next deterministic refresh trigger.
+- The April 30 Form 10-Q still describes the September 2025 AAA arbitration as being in its early stages and supplies no claim amount, schedule, probability, or collectibility. No legal-option value is admitted to the base case.
 
 ## Facts reconciled
 
@@ -23,13 +31,13 @@ This reconciliation tests the royalty stream, legal option and trust net assets 
 |---|---|
 | status | partially_met |
 | evidence | Units, recent royalty reports (tons, base, bonus, thresholds), operator concentration, and entity-level grantor-trust tax treatment are primary-sourced. |
-| source path or URL | `MSB/investor-documents/sec-edgar/8-K_20260504_exhibit_msb-20260430xex99d1.htm_acc0001104659_26_054941.htm`; `8-K_20250502` royalty exhibit; `MSB/research/evidence/_text/10-K_20260422_...htm.txt` |
+| source path or URL | `MSB/investor-documents/sec-edgar/8-K_20260504_exhibit_msb-20260430xex99d1.htm_acc0001104659_26_054941.htm`; `MSB/investor-documents/sec-edgar/10-Q_20260612_rpt20260430_acc0001104659_26_073470.htm`; `MSB/investor-documents/sec-edgar/8-K_20260714_exhibit_msb-20260714xex99d1.htm_acc0001104659_26_083538.htm`; `8-K_20250502` royalty exhibit; `MSB/research/evidence/_text/10-K_20260422_...htm.txt` |
 | calculation | Q1 2025: $1,067,762 / 457,728 = $2.33 base $/ton; ($1,067,762+$1,281,315)/457,728 = $5.13 Mesabi royalty $/ton ex land-trust. Q1 2026: $1,201,501 / 938,572 = $1.28 base $/ton; payment / 13,120,010 = $0.124 per unit for the quarter. These are historical observations only and do **not** reproduce $30/$35/$42. |
 | remaining uncertainty | Full contractual base-royalty percentage table; independently usable realized pellet prices; Cliffs/Northshore recoverable reserve and production life schedule; discount-rate and duration assumptions for the PV bridge. |
 | affected valuation components | `producing_royalty_stream`, `depletion_and_concentration_reserve` |
 | valuation consequence | Keep provisional $30/$35/$42 and -$5/-$3/-$1. Do not mark the producing stream audited. Security remains evidence-blocked. |
-| falsifier | Northshore idles again, royalty-per-ton economics stay below the low case, or a primary reserve/production disclosure shows recoverable tonnage/cadence insufficient for the low case. |
-| monitoring source | Quarterly royalty-report 8-K exhibits; annual 10-K / Exhibit 13. |
+| falsifier | Northshore idles again, royalty-per-ton economics stay below the low case, distributions remain near the July 2026 $0.05 level, or a primary reserve/production disclosure shows recoverable tonnage/cadence insufficient for the low case. |
+| monitoring source | July 30, 2026 quarterly royalty report; subsequent royalty-report 8-K exhibits; quarterly 10-Q; annual 10-K / Exhibit 13. |
 
 **Why not `accepted`:** the written acceptance test requires reproducing the low/base/high bridge from primary evidence. Public filings still withhold the operator reserve/production schedule needed for that arithmetic.
 
@@ -54,8 +62,9 @@ This reconciliation tests the royalty stream, legal option and trust net assets 
 | Field | Content |
 |---|---|
 | status | met |
-| evidence | Audited January 31, 2026 unallocated reserve $20.403m including $19.751m unallocated cash. |
-| source path or URL | 2026 Form 10-K / Annual Report Exhibit 13 |
+| evidence | Audited January 31, 2026 unallocated reserve $20.403m including $19.751m unallocated cash; unaudited April 30, 2026 reserve $18.342m and cash $20.285m. |
+| source path or URL | 2026 Form 10-K / Annual Report Exhibit 13; `MSB/investor-documents/sec-edgar/10-Q_20260612_rpt20260430_acc0001104659_26_073470.htm` |
+| updated calculation | $18.342m / 13,120,010 is approximately $1.398 per unit; the existing model range still brackets the latest disclosed reserve. |
 | calculation | $20.403m / 13,120,010 ≈ $1.555 per unit, bracketed by model $1/$2/$3. |
 | remaining uncertainty | Contingent legal costs or other senior liabilities could consume the reserve. |
 | affected valuation components | `trust_cash_and_other_claims` |
@@ -65,4 +74,4 @@ This reconciliation tests the royalty stream, legal option and trust net assets 
 
 ## Valuation consequence
 
-Every material component remains valued exactly once, but the overall case remains **evidence-blocked** by reserve/depletion and legal-option evidence. Primary value should remain a finite, scenario-weighted royalty-distribution curve. The cash claim is additive; the arbitration claim is separately probability-weighted; ordinary royalties cannot be counted in both.
+Every material component remains valued exactly once, but the overall case remains **evidence-blocked** by reserve/depletion and legal-option evidence. The corrected provisional component sum is **$26 low / $34 base / $57 high**; the prior $41 contract base was stale because it still assigned $7 per unit to the undisclosed arbitration after the underlying valuation had reduced that base contribution to zero. At the July 17 close of **$24.40**, those provisional values imply roughly **0.9% / 4.8% / 12.9%** annualized returns over seven years, before distributions, but they are not committee-ready price targets. Primary value should remain a finite, scenario-weighted royalty-distribution curve. The cash claim is additive; the arbitration claim is separately probability-weighted; ordinary royalties cannot be counted in both. The July $0.05 distribution strengthens the downside warning and makes the July 30 royalty report mandatory before any evidence-gate upgrade.

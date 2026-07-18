@@ -31,6 +31,9 @@ BUSY_COMMITTEE_STATES = {
     "round_one_open", "independent_review_open", "ready_to_assemble",
     "committee_complete_decision_pending", "owner_decision_pending", "outcome_tracking",
 }
+FOLLOWUPS = ROOT / "_system" / "reference" / "valuation_followups.json"
+CLOSED_EVIDENCE_STATUSES = {"resolved", "accepted", "not_applicable", "met"}
+REVIEW_METADATA_FIELDS = {"cohort_purpose", "cohort_expected_profile", "profile_match"}
 
 
 def read_json(path: Path, default=None):
@@ -57,6 +60,44 @@ def selected_tickers(scope: str, explicit: list[str] | None = None) -> list[str]
         }
         return sorted(followup_names | portfolio_names)
     return sorted(entries)
+
+
+def curated_evidence_blockers(ticker: str) -> list[str]:
+    """Return only still-open curated gaps for the security.
+
+    The follow-up ledger is the readiness authority.  Rebuilding a contract
+    must not resurrect an accepted gap or silently drop a still-open one.
+    """
+    followups = read_json(FOLLOWUPS)
+    ticker_cfg = ((followups.get("tickers") or {}).get(ticker) or {})
+    blockers = []
+    for row in ticker_cfg.get("evidence_gaps") or []:
+        status = str(row.get("status") or "open").lower()
+        if status in CLOSED_EVIDENCE_STATUSES:
+            continue
+        gap_id = row.get("id") or "curated_evidence_gap"
+        question = row.get("question") or row.get("evidence_required") or "Primary evidence remains incomplete."
+        blockers.append(f"{gap_id}: {question}")
+    return sorted(set(blockers))
+
+
+def current_contract(ticker: str, valuation: dict, route: dict, reviewed: dict) -> dict:
+    """Recompute financial fields while retaining explicit review metadata."""
+    contract = build_universal_valuation_contract(valuation, route.get("profile_id"))
+    blockers = sorted(set((contract.get("evidence") or {}).get("blockers") or []) | set(curated_evidence_blockers(ticker)))
+    contract.setdefault("evidence", {})["blockers"] = blockers
+    contract["evidence"]["unresolved_count"] = len(blockers)
+    if blockers:
+        contract["status"] = "evidence_blocked"
+    for field in REVIEW_METADATA_FIELDS:
+        if field in reviewed:
+            contract[field] = reviewed[field]
+    contract["method_route"] = route
+    contract["authority"] = "universal_valuation_contract"
+    contract["legacy_reference_present"] = bool(
+        valuation.get("implied_return") or valuation.get("results_lawrence_legacy")
+    )
+    return contract
 
 
 def stage_routes(tickers: list[str], as_of: str, dry_run: bool) -> dict:
@@ -102,15 +143,7 @@ def stage_contracts(tickers: list[str], dry_run: bool) -> dict:
             valuation = read_json(valuation_path)
             route = read_json(research / "valuation_route.json") or build_route(ticker)
             reviewed = read_json(research / "valuation_contract.json")
-            if reviewed:
-                contract = reviewed
-            else:
-                contract = build_universal_valuation_contract(valuation, route.get("profile_id"))
-            contract["method_route"] = route
-            contract["authority"] = "universal_valuation_contract"
-            contract["legacy_reference_present"] = bool(
-                valuation.get("implied_return") or valuation.get("results_lawrence_legacy")
-            )
+            contract = current_contract(ticker, valuation, route, reviewed)
             if not dry_run:
                 write_json(research / "valuation_contract.json", contract)
             written.append({"ticker": ticker, "status": contract.get("status")})
@@ -241,7 +274,7 @@ def run_script(*argv: str) -> dict:
     }
 
 
-def write_summary(as_of: str, scope: str, tickers: list[str], stages: dict, dry_run: bool) -> Path | None:
+def write_summary(as_of: str, scope: str, tickers: list[str], stages: dict, dry_run: bool, explicit: bool = False) -> Path | None:
     summary = {
         "schema_version": "1.0",
         "as_of": as_of,
@@ -253,7 +286,11 @@ def write_summary(as_of: str, scope: str, tickers: list[str], stages: dict, dry_
     if dry_run:
         return None
     reviews = ROOT / "_system" / "reviews" / "pending"
-    path = reviews / f"power_zone_universe_run_{as_of}.json"
+    if explicit:
+        slug = "-".join(tickers).lower()[:80] or "none"
+        path = reviews / f"power_zone_security_run_{as_of}_{slug}.json"
+    else:
+        path = reviews / f"power_zone_universe_run_{as_of}.json"
     write_json(path, summary)
     return path
 
@@ -273,8 +310,10 @@ def main() -> int:
     routes = stage_routes(tickers, as_of, args.dry_run)
     print(f"[1/6] routes: {routes['processed']} processed, {len(routes['errors'])} errors")
     power_zones = {"status": "skipped", "returncode": 0, "command": None, "error_tail": None}
-    if not args.dry_run:
+    if not args.dry_run and not args.tickers:
         power_zones = run_script("_system/scripts/build_power_zones.py")
+    elif args.tickers:
+        power_zones["status"] = "targeted_route_only"
 
     contracts = stage_contracts(tickers, args.dry_run)
     print(f"[2/6] contracts: {len(contracts['written'])} written, {len(contracts['missing_valuation'])} missing, {len(contracts['errors'])} errors")
@@ -290,7 +329,10 @@ def main() -> int:
 
     dashboard = {"status": "skipped", "returncode": 0, "command": None, "error_tail": None}
     if not args.skip_dashboard and not args.dry_run:
-        dashboard = run_script("_system/scripts/build_dashboard_data.py")
+        if args.tickers:
+            dashboard = run_script("_system/scripts/refresh_valuation_dashboard_rows.py", "--tickers", *tickers)
+        else:
+            dashboard = run_script("_system/scripts/build_dashboard_data.py")
     print(f"[6/6] dashboard: {dashboard['status']}")
 
     stages = {
@@ -302,7 +344,7 @@ def main() -> int:
         "committees": committees,
         "dashboard": dashboard,
     }
-    summary = write_summary(as_of, args.scope, tickers, stages, args.dry_run)
+    summary = write_summary(as_of, args.scope, tickers, stages, args.dry_run, explicit=bool(args.tickers))
     if summary:
         print(f"summary: {summary.relative_to(ROOT).as_posix()}")
     errors = sum(len(stage.get("errors") or []) for stage in (routes, contracts, workbenches, pricing))
