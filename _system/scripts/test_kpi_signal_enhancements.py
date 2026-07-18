@@ -14,6 +14,8 @@ from kpi_signal_enhancements import (  # noqa: E402
     analyze_growth_regime,
     compute_leadership_risk,
     earnings_revision_signal,
+    human_summary_for_signal,
+    is_growth_artifact,
     passes_materiality,
     peer_relative_signal,
     resolve_revenue_series,
@@ -59,6 +61,9 @@ class RegimeTests(unittest.TestCase):
         self.assertIsNotNone(result)
         self.assertEqual(result["direction"], "downshift")
         self.assertIn(result["signal_tier"], ("confirmed", "emerging"))
+        self.assertFalse(result.get("artifact"))
+        self.assertTrue(result.get("human_summary"))
+        self.assertIn("normal", result["human_summary"].lower())
 
     def test_rare_negative_quarter(self) -> None:
         growths = [(f"2024-{m:02d}-01", 0.15) for m in range(1, 9)]
@@ -66,6 +71,58 @@ class RegimeTests(unittest.TestCase):
         result = analyze_growth_regime(growths, metric_key="operating_income")
         self.assertIsNotNone(result)
         self.assertEqual(result["direction"], "downshift")
+
+    def test_extreme_yoy_marked_artifact(self) -> None:
+        growths = [(f"2023-{m:02d}-01", 0.08) for m in range(1, 9)]
+        growths.extend([("2024-01-31", 0.10), ("2024-04-30", 4.32)])
+        result = analyze_growth_regime(
+            growths,
+            metric_key="operating_income",
+            level_prior=-10.0,
+            level_latest=40.0,
+            level_yoy_base=-10.0,
+        )
+        self.assertIsNotNone(result)
+        self.assertTrue(result.get("artifact"))
+        self.assertIn("flipped", result.get("human_summary", "").lower())
+
+
+class ArtifactTests(unittest.TestCase):
+    def test_sign_flip_is_artifact(self) -> None:
+        self.assertTrue(
+            is_growth_artifact(growth_latest=0.20, level_prior=-5.0, level_latest=8.0)
+        )
+
+    def test_extreme_growth_is_artifact(self) -> None:
+        self.assertTrue(is_growth_artifact(growth_latest=1.8, growth_prior=0.2))
+
+    def test_stable_growth_not_artifact(self) -> None:
+        self.assertFalse(
+            is_growth_artifact(
+                growth_latest=0.12,
+                growth_prior=0.08,
+                level_prior=100.0,
+                level_latest=112.0,
+                level_yoy_base=100.0,
+            )
+        )
+
+    def test_human_summary_for_acceleration(self) -> None:
+        text = human_summary_for_signal(
+            {
+                "metric": "revenues",
+                "direction": "accelerating",
+                "signal_tier": "confirmed",
+                "basis": "yoy",
+                "mode": "pct",
+                "growth_prior": 0.12,
+                "growth_latest": 0.19,
+                "ttm_agrees": True,
+                "artifact": False,
+            }
+        )
+        self.assertIn("sped up", text.lower())
+        self.assertIn("trailing-twelve-month", text.lower())
 
 
 class RevenueProxyTests(unittest.TestCase):

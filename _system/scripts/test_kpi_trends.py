@@ -21,6 +21,7 @@ from build_kpi_trends import (  # noqa: E402
     robust_vol,
     signal_tier_from_accels,
 )
+from kpi_signal_enhancements import attach_human_summary  # noqa: E402
 
 
 def quarterly(values: list[float], start_year: int = 2023) -> list[dict]:
@@ -252,6 +253,82 @@ class SignalQualityTests(unittest.TestCase):
         margins = derive_ratio_series(oi, rev)
         self.assertEqual(len(margins), len(rev))
         self.assertAlmostEqual(margins[-1]["value"], 0.2)
+
+    def test_artifact_regime_not_displayed(self) -> None:
+        metrics = [
+            attach_human_summary(
+                {
+                    "metric": "growth_regime.operating_income",
+                    "label": "Growth regime strengthening",
+                    "signal_type": "regime",
+                    "direction": "upshift",
+                    "signal_tier": "emerging",
+                    "tier": "primary",
+                    "basis": "yoy",
+                    "mode": "pct",
+                    "growth_prior": -1.03,
+                    "growth_latest": 4.32,
+                    "baseline_median": -0.02,
+                    "strength": 4.0,
+                    "artifact": True,
+                    "stale": False,
+                }
+            )
+        ]
+        apply_display_cap(metrics)
+        self.assertFalse(metrics[0]["display"])
+
+    def test_regime_priority_prefers_revenue(self) -> None:
+        metrics = [
+            attach_human_summary(
+                {
+                    "metric": "growth_regime.cfo",
+                    "label": "Growth regime softening",
+                    "signal_type": "regime",
+                    "direction": "downshift",
+                    "signal_tier": "emerging",
+                    "tier": "primary",
+                    "basis": "yoy",
+                    "mode": "pct",
+                    "growth_prior": 0.20,
+                    "growth_latest": -0.05,
+                    "baseline_median": 0.10,
+                    "strength": 2.5,
+                    "artifact": False,
+                    "stale": False,
+                }
+            ),
+            attach_human_summary(
+                {
+                    "metric": "growth_regime.revenues",
+                    "label": "Growth regime strengthening",
+                    "signal_type": "regime",
+                    "direction": "upshift",
+                    "signal_tier": "emerging",
+                    "tier": "primary",
+                    "basis": "yoy",
+                    "mode": "pct",
+                    "growth_prior": 0.08,
+                    "growth_latest": 0.18,
+                    "baseline_median": 0.09,
+                    "strength": 1.2,
+                    "artifact": False,
+                    "stale": False,
+                }
+            ),
+        ]
+        apply_display_cap(metrics)
+        by_metric = {m["metric"]: m for m in metrics}
+        self.assertTrue(by_metric["growth_regime.revenues"]["display"])
+        self.assertFalse(by_metric["growth_regime.cfo"]["display"])
+
+    def test_yoy_analysis_includes_human_summary(self) -> None:
+        base = [100.0, 80.0, 90.0, 150.0]
+        y2 = [v * 1.10 for v in base]
+        y3 = [base[0] * 1.10 * 1.12, base[1] * 1.10 * 1.20, base[2] * 1.10 * 1.35, base[3] * 1.10 * 1.60]
+        result = analyze_quarterly_yoy(quarterly(base + y2 + y3), metric_key="revenues")
+        self.assertIsNotNone(result)
+        self.assertTrue(result.get("human_summary"))
 
 
 class NewsFlowTests(unittest.TestCase):

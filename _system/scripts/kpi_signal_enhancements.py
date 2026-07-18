@@ -19,6 +19,39 @@ REGIME_MIN_GROWTH_POINTS = 8
 REGIME_CONFIRM_QUARTERS = 2
 REGIME_SIGMA = 1.0
 
+# Extreme YoY prints (often sign flips / thin bases) stay visible under All signals
+# but are demoted from Displayed / Growth regime defaults.
+ARTIFACT_GROWTH_ABS = 1.5
+
+# Prefer operating-flow regime stories over P&L noise when multiple fire.
+REGIME_METRIC_PRIORITY: dict[str, int] = {
+    "revenues": 0,
+    "revenue": 0,
+    "operating_income": 1,
+    "cfo": 2,
+    "net_income": 3,
+    "eps_basic": 4,
+}
+
+METRIC_PLAIN_NAMES: dict[str, str] = {
+    "revenues": "Revenue",
+    "revenue": "Revenue",
+    "operating_income": "Operating income",
+    "net_income": "Net income",
+    "eps_basic": "EPS",
+    "cfo": "Cash from operations",
+    "op_margin": "Operating margin",
+    "cfo_margin": "Cash conversion",
+    "core_business": "Core business",
+    "news_flow": "News flow",
+    "burn_rate": "Cash burn",
+    "eps_revision": "EPS vs consensus",
+    "total_assets": "Total assets",
+    "stockholders_equity": "Stockholders' equity",
+    "long_term_debt": "Long-term debt",
+    "cash": "Cash",
+}
+
 MATERIALITY_ACCEL_FLOORS: dict[str, float] = {
     "revenues": 0.03,
     "revenue": 0.03,
@@ -103,10 +136,185 @@ def passes_materiality(
     return abs(growth_latest) >= floor
 
 
+def metric_plain_name(metric_key: str) -> str:
+    base = metric_base_name(metric_key)
+    if base in METRIC_PLAIN_NAMES:
+        return METRIC_PLAIN_NAMES[base]
+    return base.replace("_", " ").title()
+
+
+def format_growth_pct(value: float | None, *, digits: int | None = None) -> str:
+    if value is None:
+        return "?"
+    abs_v = abs(value)
+    if digits is None:
+        digits = 0 if abs_v >= 0.10 else 1
+    return f"{value * 100:+.{digits}f}%"
+
+
+def level_sign_flip(level_prior: float | None, level_latest: float | None) -> bool:
+    if level_prior is None or level_latest is None:
+        return False
+    if abs(level_prior) < 1e-12 or abs(level_latest) < 1e-12:
+        return False
+    return (level_prior > 0) != (level_latest > 0)
+
+
+def level_transition_phrase(level_prior: float | None, level_latest: float | None) -> str | None:
+    if not level_sign_flip(level_prior, level_latest):
+        return None
+    assert level_prior is not None and level_latest is not None
+    if level_prior < 0 < level_latest:
+        return "flipped from loss to profit"
+    if level_prior > 0 > level_latest:
+        return "flipped from profit to loss"
+    return "flipped sign versus the year-ago quarter"
+
+
+def is_growth_artifact(
+    *,
+    growth_latest: float | None = None,
+    growth_prior: float | None = None,
+    level_prior: float | None = None,
+    level_latest: float | None = None,
+    level_yoy_base: float | None = None,
+) -> bool:
+    """True when YoY % is dominated by sign flips or extreme thin-base moves."""
+    for growth in (growth_latest, growth_prior):
+        if growth is not None and abs(growth) > ARTIFACT_GROWTH_ABS:
+            return True
+    if level_sign_flip(level_prior, level_latest):
+        return True
+    if level_sign_flip(level_yoy_base, level_latest):
+        return True
+    return False
+
+
+def regime_metric_priority(metric_key: str) -> int:
+    return REGIME_METRIC_PRIORITY.get(metric_base_name(metric_key), 99)
+
+
+def persistence_phrase(signal_tier: str | None) -> str:
+    if signal_tier == "confirmed":
+        return "two quarters"
+    if signal_tier == "emerging":
+        return "one quarter so far — not confirmed"
+    return "recent periods"
+
+
+def human_summary_for_signal(metric: dict) -> str:
+    """Plain-English claim for Inflections rows and insight events."""
+    name = metric_plain_name(metric.get("metric") or metric.get("label") or "Metric")
+    direction = metric.get("direction") or "steady"
+    signal_tier = metric.get("signal_tier") or "steady"
+    growth_latest = metric.get("growth_latest")
+    growth_prior = metric.get("growth_prior")
+    baseline = metric.get("baseline_median")
+    mode = metric.get("mode") or "pct"
+    basis = metric.get("basis") or ""
+    artifact = bool(metric.get("artifact"))
+    flip = level_transition_phrase(metric.get("level_prior"), metric.get("level_latest"))
+    yoy_suffix = " YoY" if basis == "yoy" else ""
+
+    def growth_span() -> str:
+        if mode == "diff":
+            prior = f"{growth_prior:+.0f}" if growth_prior is not None else "?"
+            latest = f"{growth_latest:+.0f}" if growth_latest is not None else "?"
+            return f"{prior} to {latest} per period"
+        return f"{format_growth_pct(growth_prior)} → {format_growth_pct(growth_latest)}{yoy_suffix}"
+
+    if metric.get("signal_type") == "regime":
+        normal = format_growth_pct(baseline) if baseline is not None else "its usual rate"
+        latest = format_growth_pct(growth_latest)
+        if artifact and flip:
+            return (
+                f"{name} {flip}. Versus this company's normal ~{normal} YoY, "
+                f"the latest print ({latest}) looks extreme because the base flipped sign. "
+                f"Treat as noisy ({persistence_phrase(signal_tier)})."
+            )
+        if artifact:
+            return (
+                f"{name} growth vs this company's normal ~{normal} YoY is extreme "
+                f"(latest {latest}). Large percentages usually mean a thin or sign-changing base. "
+                f"Treat cautiously ({persistence_phrase(signal_tier)})."
+            )
+        if direction == "upshift":
+            verb = "has stayed above" if signal_tier == "confirmed" else "jumped above"
+            return (
+                f"{name} growth {verb} this company's normal ~{normal} YoY "
+                f"(latest {latest}). {persistence_phrase(signal_tier).capitalize()}."
+            )
+        if direction == "downshift":
+            verb = "has stayed below" if signal_tier == "confirmed" else "fell below"
+            return (
+                f"{name} growth {verb} this company's normal ~{normal} YoY "
+                f"(latest {latest}). {persistence_phrase(signal_tier).capitalize()}."
+            )
+        return f"{name}: growth near this company's normal ~{normal} YoY."
+
+    if metric.get("signal_type") == "peer_relative":
+        peer_med = format_growth_pct(metric.get("peer_median") or growth_prior)
+        return (
+            f"{name} growth ({format_growth_pct(growth_latest)} YoY) is trailing sleeve peers "
+            f"(peer median ~{peer_med}). {persistence_phrase(signal_tier).capitalize()}."
+        )
+
+    if metric.get("signal_type") == "estimate_revision":
+        return f"{metric.get('label') or name}: surprise moved from {growth_span()}."
+
+    if artifact and flip:
+        return (
+            f"{name} {flip}, so the YoY path ({growth_span()}) is hard to read. "
+            f"Treat as noisy ({persistence_phrase(signal_tier)})."
+        )
+    if artifact:
+        return (
+            f"{name} growth move looks extreme ({growth_span()}). "
+            f"Large percentages usually mean a thin or sign-changing base. "
+            f"Treat cautiously ({persistence_phrase(signal_tier)})."
+        )
+
+    if direction == "accelerating":
+        lead = f"{name} growth sped up: {growth_span()}"
+    elif direction == "decelerating":
+        lead = f"{name} growth slowed: {growth_span()}"
+    else:
+        lead = f"{name} growth is steady around {format_growth_pct(growth_latest)}{yoy_suffix}"
+
+    members = metric.get("composite_members") or []
+    if metric.get("composite") and members:
+        member_text = ", ".join(metric_plain_name(m) for m in members[:4])
+        lead = f"Core operating metrics ({member_text}) are moving together — {lead[0].lower()}{lead[1:]}"
+
+    bits = [f"{lead} ({persistence_phrase(signal_tier)})"]
+    if metric.get("ttm_agrees") is True:
+        bits.append("Trailing-twelve-month growth agrees.")
+    elif metric.get("ttm_agrees") is False:
+        bits.append("Trailing-twelve-month growth does not yet confirm.")
+    return " ".join(bits)
+
+
+def attach_human_summary(metric: dict) -> dict:
+    """Mutate metric with artifact flag (if missing) and human_summary."""
+    if "artifact" not in metric:
+        metric["artifact"] = is_growth_artifact(
+            growth_latest=metric.get("growth_latest"),
+            growth_prior=metric.get("growth_prior"),
+            level_prior=metric.get("level_prior"),
+            level_latest=metric.get("level_latest"),
+            level_yoy_base=metric.get("level_yoy_base"),
+        )
+    metric["human_summary"] = human_summary_for_signal(metric)
+    return metric
+
+
 def analyze_growth_regime(
     growths: list[tuple[str, float]],
     *,
     metric_key: str,
+    level_prior: float | None = None,
+    level_latest: float | None = None,
+    level_yoy_base: float | None = None,
 ) -> dict | None:
     """First-derivative regime shift: YoY growth breaks below ticker baseline."""
     if len(growths) < REGIME_MIN_GROWTH_POINTS:
@@ -164,8 +372,21 @@ def analyze_growth_regime(
     if direction is None:
         return None
 
-    strength = abs(recent[-1] - median) / max(spread, decel_floor, 1e-9)
-    return {
+    growth_latest = recent[-1]
+    growth_prior = (
+        gvals[-REGIME_CONFIRM_QUARTERS - 1]
+        if len(gvals) > REGIME_CONFIRM_QUARTERS
+        else recent[0]
+    )
+    strength = abs(growth_latest - median) / max(spread, decel_floor, 1e-9)
+    artifact = is_growth_artifact(
+        growth_latest=growth_latest,
+        growth_prior=growth_prior,
+        level_prior=level_prior,
+        level_latest=level_latest,
+        level_yoy_base=level_yoy_base,
+    )
+    out = {
         "metric": f"growth_regime.{base}",
         "label": label,
         "signal_type": "regime",
@@ -174,18 +395,26 @@ def analyze_growth_regime(
         "tier": "primary" if base in {"revenues", "revenue", "operating_income", "cfo"} else "secondary",
         "basis": "yoy",
         "mode": "pct",
-        "growth_latest": round(recent[-1], 4),
-        "growth_prior": round(gvals[-REGIME_CONFIRM_QUARTERS - 1], 4) if len(gvals) > REGIME_CONFIRM_QUARTERS else round(recent[0], 4),
+        "growth_latest": round(growth_latest, 4),
+        "growth_prior": round(growth_prior, 4),
         "baseline_median": round(median, 4),
         "baseline_threshold": round(down_threshold if direction == "downshift" else up_threshold, 4),
         "strength": round(min(strength, 5.0), 3),
-        "confidence": "high" if signal_tier == "confirmed" and strength >= 1.5 else "med",
+        "confidence": "high" if signal_tier == "confirmed" and strength >= 1.5 and not artifact else "med",
         "material": True,
         "rare_negative": rare_negative,
+        "artifact": artifact,
         "as_of": recent_periods[-1],
         "display": False,
         "composite": False,
     }
+    if level_prior is not None:
+        out["level_prior"] = level_prior
+    if level_latest is not None:
+        out["level_latest"] = level_latest
+    if level_yoy_base is not None:
+        out["level_yoy_base"] = level_yoy_base
+    return attach_human_summary(out)
 
 
 def resolve_revenue_series(metrics: dict[str, list[dict]]) -> tuple[list[dict] | None, dict]:
@@ -375,23 +604,26 @@ def peer_relative_signal(
         return None
     gap = threshold - latest_growth
     strength = min(3.0, gap / max(mad, 0.01))
-    return {
-        "metric": f"{metric_base_name(metric_key)}.peer_relative",
-        "label": f"{metric_base_name(metric_key).replace('_', ' ').title()} vs sleeve peers",
-        "direction": "downshift",
-        "signal_type": "peer_relative",
-        "signal_tier": "confirmed" if gap >= mad * 1.5 else "emerging",
-        "tier": "primary",
-        "display": True,
-        "strength": round(strength, 3),
-        "growth_latest": latest_growth,
-        "growth_prior": median,
-        "basis": "yoy",
-        "mode": "pct",
-        "peer_median": round(median, 4),
-        "peer_threshold": round(threshold, 4),
-        "peer_count": len(clean),
-    }
+    return attach_human_summary(
+        {
+            "metric": f"{metric_base_name(metric_key)}.peer_relative",
+            "label": f"{metric_base_name(metric_key).replace('_', ' ').title()} vs sleeve peers",
+            "direction": "downshift",
+            "signal_type": "peer_relative",
+            "signal_tier": "confirmed" if gap >= mad * 1.5 else "emerging",
+            "tier": "primary",
+            "display": True,
+            "strength": round(strength, 3),
+            "growth_latest": latest_growth,
+            "growth_prior": median,
+            "basis": "yoy",
+            "mode": "pct",
+            "peer_median": round(median, 4),
+            "peer_threshold": round(threshold, 4),
+            "peer_count": len(clean),
+            "artifact": False,
+        }
+    )
 
 
 def earnings_revision_signal(events: list[dict]) -> dict | None:
@@ -438,18 +670,21 @@ def earnings_revision_signal(events: list[dict]) -> dict | None:
     else:
         return None
 
-    return {
-        "metric": "eps_revision",
-        "label": label,
-        "direction": direction,
-        "signal_type": "estimate_revision",
-        "signal_tier": "confirmed" if abs(revision) >= 0.15 else "emerging",
-        "tier": "secondary",
-        "display": True,
-        "strength": round(min(3.0, abs(revision) * 5), 3),
-        "growth_latest": round(latest, 4),
-        "growth_prior": round(prior, 4),
-        "basis": "surprise",
-        "mode": "pct",
-        "surprise_streak": len(surprises),
-    }
+    return attach_human_summary(
+        {
+            "metric": "eps_revision",
+            "label": label,
+            "direction": direction,
+            "signal_type": "estimate_revision",
+            "signal_tier": "confirmed" if abs(revision) >= 0.15 else "emerging",
+            "tier": "secondary",
+            "display": True,
+            "strength": round(min(3.0, abs(revision) * 5), 3),
+            "growth_latest": round(latest, 4),
+            "growth_prior": round(prior, 4),
+            "basis": "surprise",
+            "mode": "pct",
+            "surprise_streak": len(surprises),
+            "artifact": False,
+        }
+    )
