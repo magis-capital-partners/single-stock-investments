@@ -149,6 +149,11 @@
 
   function renderIdentityLine(classification, escapeHtml) {
     if (!classification) return '';
+    const sleeveLabel = classification.investment_sleeve_label && classification.investment_sleeve_label !== '—'
+      ? classification.investment_sleeve_label
+      : (classification.investment_sleeve && classification.investment_sleeve !== '-' && classification.investment_sleeve !== '—'
+        ? String(classification.investment_sleeve).replace(/_/g, ' ')
+        : null);
     const parts = [
       classification.archetype,
       classification.moat ? `moat ${classification.moat}` : null,
@@ -159,9 +164,7 @@
       classification.cycle && classification.cycle !== '-' && classification.cycle !== '—'
         ? `cycle ${classification.cycle}`
         : null,
-      classification.investment_sleeve_label && classification.investment_sleeve_label !== '—'
-        ? classification.investment_sleeve_label
-        : null,
+      sleeveLabel,
     ].filter(Boolean);
     if (!parts.length) return '';
     return `
