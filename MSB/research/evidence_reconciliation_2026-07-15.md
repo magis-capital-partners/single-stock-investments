@@ -43,7 +43,7 @@ This reconciliation tests the royalty stream, legal option and trust net assets 
 | calculation | $7/unit × 13,120,010 ≈ $91.84m; $13/unit × 13,120,010 ≈ $170.56m. Neither figure appears as a disclosed claim. Prior collected award ($5.43/unit) is a different dispute and cannot be copied as the current option value. |
 | remaining uncertainty | Statement of claim / damages methodology; hearing schedule; award or settlement; whether any remedy is incremental to ordinary royalty accruals. |
 | affected valuation components | `arbitration_and_bonus_option` |
-| valuation consequence | Keep provisional $0/$7/$13. Only incremental damages or a demonstrated contractual change excluded from the producing-stream model may sit here. Ordinary base/bonus/internal-use royalties stay in `producing_royalty_stream`. |
+| valuation consequence | Base value is $0 because the new claim has no disclosed amount, timing, probability, or collectibility. Keep $13 per unit only as an unapproved high sensitivity for a separately evidenced incremental recovery. Ordinary base/bonus/internal-use royalties stay in `producing_royalty_stream`. |
 | falsifier | Dismissal, adverse award, settlement below the separately modeled incremental amount, or a remedy limited to royalties already accrued in the producing stream. |
 | monitoring source | 8-K litigation updates; 10-Q/10-K Item 3; any AAA award or settlement exhibit. |
 

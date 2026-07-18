@@ -1,7 +1,7 @@
 {
   "ticker": "BWEL",
   "as_of": "2026-06-02",
-  "valuation_mode": "optionality",
+  "valuation_mode": "economic_value",
   "method": "full",
   "lawrence_bucket": "low_cost",
   "classification_inputs": {
@@ -290,9 +290,7 @@
     "irr_band": "<15%",
     "gates": {
       "moat_ok": true,
-      "dhando_ok": true,
-      "floor_pass": true,
-      "valuation_mode": "optionality"
+      "dhando_ok": true
     },
     "override_reason": null
   },
@@ -785,5 +783,1111 @@
     "price_for_market_cap": 548.5,
     "chart": "BWEL/research/charts/total_return_2026-07-15.svg",
     "panel_json": "BWEL/research/total_return_panel.json"
+  },
+  "valuation_methodology": {
+    "mode": "component_economic_value",
+    "horizon_years": 7,
+    "decision_rule": "Use one complete non-overlapping component schedule. The legacy Lawrence return path remains a separate stance gate until the primary evidence bridges are complete."
+  },
+  "component_valuation": {
+    "schema_version": "1.0",
+    "all_material_components_identified": true,
+    "coverage_statement": "Phase 3 scaffold identifies every currently known material operating, financial, liability, reserve, and option claim once. Primary ownership and cash/NAV bridges remain open follow-up gates.",
+    "components": [
+      {
+        "id": "current_operating_claim",
+        "label": "Farming and operating-asset owner cash",
+        "category": "operating_business",
+        "overlap_key": "current_operating_claim",
+        "treatment": "additive",
+        "valuation": {
+          "method": "owner_cash_reinvestment_dcf",
+          "basis": "per_share",
+          "low": 175.52,
+          "base": 274.25,
+          "high": 383.95,
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Existing BWEL valuation inputs: Mid-cycle owner cash: FY2024 dividend $20/sh and FY2025 $17.50/sh despite loss; normalized below peak $47.83 EPS; FY2025 equity $755.1M / 964,210 shares (investor-documents/ir-bwel/2025-06-30_Annual_Report.pdf); FY2025 trough: net loss ($28.9M), NRV/flood charges; Lawrence uses mid-cycle distributable cash not spot loss year. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+        }
+      },
+      {
+        "id": "asset_option_inventory",
+        "label": "Land, water, and mineral optionality",
+        "category": "real_option",
+        "overlap_key": "asset_option_inventory",
+        "treatment": "additive",
+        "valuation": {
+          "method": "unit_nav_and_milestone_option",
+          "basis": "per_share",
+          "low": 0.0,
+          "base": 98.73,
+          "high": 263.28,
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Existing BWEL valuation inputs: Mid-cycle owner cash: FY2024 dividend $20/sh and FY2025 $17.50/sh despite loss; normalized below peak $47.83 EPS; FY2025 equity $755.1M / 964,210 shares (investor-documents/ir-bwel/2025-06-30_Annual_Report.pdf); FY2025 trough: net loss ($28.9M), NRV/flood charges; Lawrence uses mid-cycle distributable cash not spot loss year. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Cash, debt, and other net claims",
+        "category": "financial_asset",
+        "overlap_key": "net_financial_claims",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": 16.45,
+          "base": 65.82,
+          "high": 109.7,
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Existing BWEL valuation inputs: Mid-cycle owner cash: FY2024 dividend $20/sh and FY2025 $17.50/sh despite loss; normalized below peak $47.83 EPS; FY2025 equity $755.1M / 964,210 shares (investor-documents/ir-bwel/2025-06-30_Annual_Report.pdf); FY2025 trough: net loss ($28.9M), NRV/flood charges; Lawrence uses mid-cycle distributable cash not spot loss year. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+        }
+      },
+      {
+        "id": "realization_reserve",
+        "label": "Commodity, water, and realization reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "realization_reserve",
+        "treatment": "additive",
+        "valuation": {
+          "method": "realization_reserve",
+          "basis": "per_share",
+          "low": -164.55,
+          "base": -82.27,
+          "high": -21.94,
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Existing BWEL valuation inputs: Mid-cycle owner cash: FY2024 dividend $20/sh and FY2025 $17.50/sh despite loss; normalized below peak $47.83 EPS; FY2025 equity $755.1M / 964,210 shares (investor-documents/ir-bwel/2025-06-30_Annual_Report.pdf); FY2025 trough: net loss ($28.9M), NRV/flood charges; Lawrence uses mid-cycle distributable cash not spot loss year. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+        }
+      }
+    ]
+  },
+  "economic_value": {
+    "schema_version": "1.0",
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One diluted share of BWEL, including every currently identified operating claim, financial claim, liability, reserve, and material option.",
+      "unit_label": "diluted share",
+      "unit_count": 964210,
+      "unit_source": "Existing valuation inputs.",
+      "enterprise_to_equity_reconciliation": "Operating and asset claims are valued once; cash, debt, financing, reserves, and other senior claims are separate components or explicitly reserved. No component is intended to overlap another."
+    },
+    "gaap_role": "misleading_historical_cost",
+    "accounting_reference": "Existing research and filing-derived valuation inputs. The primary-source reconciliation remains an open evidence gate.",
+    "component_groups": [
+      {
+        "id": "current_operating_claim",
+        "label": "Farming and operating-asset owner cash",
+        "component_ids": [
+          "current_operating_claim"
+        ],
+        "economic_claim": "Farming and operating-asset owner cash",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key current_operating_claim; no other component capitalizes the same claim."
+      },
+      {
+        "id": "asset_option_inventory",
+        "label": "Land, water, and mineral optionality",
+        "component_ids": [
+          "asset_option_inventory"
+        ],
+        "economic_claim": "Land, water, and mineral optionality",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key asset_option_inventory; no other component capitalizes the same claim.",
+        "risk_and_timing": {
+          "probability_basis": "Starter probability is explicit analyst judgment pending a primary-source milestone and ownership reconciliation.",
+          "timing_basis": "The range includes delay and failure outcomes; dated cash realization remains [HUMAN REVIEW].",
+          "remaining_capital_basis": "Remaining owner-funded capital, financing, and dilution are reserved until the primary sources-and-uses bridge is complete."
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Cash, debt, and other net claims",
+        "component_ids": [
+          "net_financial_claims"
+        ],
+        "economic_claim": "Cash, debt, and other net claims",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key net_financial_claims; no other component capitalizes the same claim."
+      },
+      {
+        "id": "realization_reserve",
+        "label": "Commodity, water, and realization reserve",
+        "component_ids": [
+          "realization_reserve"
+        ],
+        "economic_claim": "Commodity, water, and realization reserve",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key realization_reserve; no other component capitalizes the same claim."
+      }
+    ],
+    "limitations": [
+      "Phase 3 schedule scaffold, not a committee-approved valuation.",
+      "Universal followups remain open until primary evidence supports the ownership map, owner-cash or NAV bridge, and downside/capital claims."
+    ]
+  },
+  "component_valuation_results": {
+    "status": "complete",
+    "decision_rule": "Use the complete low/base/high component schedule. Embedded components are estimated but not added twice.",
+    "all_material_components_identified": true,
+    "additive_components": [
+      {
+        "id": "current_operating_claim",
+        "label": "Farming and operating-asset owner cash",
+        "category": "operating_business",
+        "overlap_key": "current_operating_claim",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "owner_cash_reinvestment_dcf",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Existing BWEL valuation inputs: Mid-cycle owner cash: FY2024 dividend $20/sh and FY2025 $17.50/sh despite loss; normalized below peak $47.83 EPS; FY2025 equity $755.1M / 964,210 shares (investor-documents/ir-bwel/2025-06-30_Annual_Report.pdf); FY2025 trough: net loss ($28.9M), NRV/flood charges; Lawrence uses mid-cycle distributable cash not spot loss year. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "scenario_assumptions": null,
+        "low_per_share": 175.52,
+        "base_per_share": 274.25,
+        "high_per_share": 383.95
+      },
+      {
+        "id": "asset_option_inventory",
+        "label": "Land, water, and mineral optionality",
+        "category": "real_option",
+        "overlap_key": "asset_option_inventory",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "unit_nav_and_milestone_option",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Existing BWEL valuation inputs: Mid-cycle owner cash: FY2024 dividend $20/sh and FY2025 $17.50/sh despite loss; normalized below peak $47.83 EPS; FY2025 equity $755.1M / 964,210 shares (investor-documents/ir-bwel/2025-06-30_Annual_Report.pdf); FY2025 trough: net loss ($28.9M), NRV/flood charges; Lawrence uses mid-cycle distributable cash not spot loss year. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "scenario_assumptions": null,
+        "low_per_share": 0.0,
+        "base_per_share": 98.73,
+        "high_per_share": 263.28
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Cash, debt, and other net claims",
+        "category": "financial_asset",
+        "overlap_key": "net_financial_claims",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "net_asset_value",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Existing BWEL valuation inputs: Mid-cycle owner cash: FY2024 dividend $20/sh and FY2025 $17.50/sh despite loss; normalized below peak $47.83 EPS; FY2025 equity $755.1M / 964,210 shares (investor-documents/ir-bwel/2025-06-30_Annual_Report.pdf); FY2025 trough: net loss ($28.9M), NRV/flood charges; Lawrence uses mid-cycle distributable cash not spot loss year. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "scenario_assumptions": null,
+        "low_per_share": 16.45,
+        "base_per_share": 65.82,
+        "high_per_share": 109.7
+      },
+      {
+        "id": "realization_reserve",
+        "label": "Commodity, water, and realization reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "realization_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "realization_reserve",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Existing BWEL valuation inputs: Mid-cycle owner cash: FY2024 dividend $20/sh and FY2025 $17.50/sh despite loss; normalized below peak $47.83 EPS; FY2025 equity $755.1M / 964,210 shares (investor-documents/ir-bwel/2025-06-30_Annual_Report.pdf); FY2025 trough: net loss ($28.9M), NRV/flood charges; Lawrence uses mid-cycle distributable cash not spot loss year. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "scenario_assumptions": null,
+        "low_per_share": -164.55,
+        "base_per_share": -82.27,
+        "high_per_share": -21.94
+      }
+    ],
+    "embedded_components": [],
+    "total_equity_value_per_share": {
+      "low": 27.42,
+      "base": 356.53,
+      "high": 734.99
+    },
+    "material_component_count": 4,
+    "additive_component_count": 4,
+    "embedded_component_count": 0,
+    "market_price_per_share": 548.5,
+    "upside_downside_pct": {
+      "low": -95.0,
+      "base": -35.0,
+      "high": 34.0
+    }
+  },
+  "economic_value_analysis": {
+    "schema_version": "1.0",
+    "status": "complete",
+    "trigger": {
+      "required": true,
+      "reasons": [
+        "explicit_component_schedule",
+        "optionality_or_nav_overlay"
+      ],
+      "policy": "A complete economic-value analysis is required when any trigger fires; otherwise it is recommended."
+    },
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One diluted share of BWEL, including every currently identified operating claim, financial claim, liability, reserve, and material option.",
+      "unit_label": "diluted share",
+      "unit_count": 964210,
+      "unit_source": "Existing valuation inputs.",
+      "enterprise_to_equity_reconciliation": "Operating and asset claims are valued once; cash, debt, financing, reserves, and other senior claims are separate components or explicitly reserved. No component is intended to overlap another."
+    },
+    "gaap_role": "misleading_historical_cost",
+    "accounting_reference": "Existing research and filing-derived valuation inputs. The primary-source reconciliation remains an open evidence gate.",
+    "comparable_hierarchy": [
+      "issuer_arm_length_transaction",
+      "same_asset_transaction",
+      "public_peer",
+      "replacement_cost",
+      "approved_external_analysis"
+    ],
+    "gross_comparable_nav_per_share": null,
+    "risked_present_value_per_share": {
+      "low": 27.42,
+      "base": 356.53,
+      "high": 734.99
+    },
+    "component_groups": [
+      {
+        "id": "current_operating_claim",
+        "label": "Farming and operating-asset owner cash",
+        "component_ids": [
+          "current_operating_claim"
+        ],
+        "economic_claim": "Farming and operating-asset owner cash",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key current_operating_claim; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": 175.52,
+          "base": 274.25,
+          "high": 383.95
+        }
+      },
+      {
+        "id": "asset_option_inventory",
+        "label": "Land, water, and mineral optionality",
+        "component_ids": [
+          "asset_option_inventory"
+        ],
+        "economic_claim": "Land, water, and mineral optionality",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key asset_option_inventory; no other component capitalizes the same claim.",
+        "risk_and_timing": {
+          "probability_basis": "Starter probability is explicit analyst judgment pending a primary-source milestone and ownership reconciliation.",
+          "timing_basis": "The range includes delay and failure outcomes; dated cash realization remains [HUMAN REVIEW].",
+          "remaining_capital_basis": "Remaining owner-funded capital, financing, and dilution are reserved until the primary sources-and-uses bridge is complete."
+        },
+        "risked_present_value_per_share": {
+          "low": 0.0,
+          "base": 98.73,
+          "high": 263.28
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Cash, debt, and other net claims",
+        "component_ids": [
+          "net_financial_claims"
+        ],
+        "economic_claim": "Cash, debt, and other net claims",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key net_financial_claims; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": 16.45,
+          "base": 65.82,
+          "high": 109.7
+        }
+      },
+      {
+        "id": "realization_reserve",
+        "label": "Commodity, water, and realization reserve",
+        "component_ids": [
+          "realization_reserve"
+        ],
+        "economic_claim": "Commodity, water, and realization reserve",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key realization_reserve; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": -164.55,
+          "base": -82.27,
+          "high": -21.94
+        }
+      }
+    ],
+    "valuation_proof": [
+      {
+        "component_id": "current_operating_claim",
+        "economic_claim": "Farming and operating-asset owner cash",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "owner_cash_reinvestment_dcf",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Existing BWEL valuation inputs: Mid-cycle owner cash: FY2024 dividend $20/sh and FY2025 $17.50/sh despite loss; normalized below peak $47.83 EPS; FY2025 equity $755.1M / 964,210 shares (investor-documents/ir-bwel/2025-06-30_Annual_Report.pdf); FY2025 trough: net loss ($28.9M), NRV/flood charges; Lawrence uses mid-cycle distributable cash not spot loss year. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "range_per_share": {
+          "low": 175.52,
+          "base": 274.25,
+          "high": 383.95
+        },
+        "treatment": "additive",
+        "overlap_key": "current_operating_claim",
+        "overlap_control": "Unique overlap key current_operating_claim; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "asset_option_inventory",
+        "economic_claim": "Land, water, and mineral optionality",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "unit_nav_and_milestone_option",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Existing BWEL valuation inputs: Mid-cycle owner cash: FY2024 dividend $20/sh and FY2025 $17.50/sh despite loss; normalized below peak $47.83 EPS; FY2025 equity $755.1M / 964,210 shares (investor-documents/ir-bwel/2025-06-30_Annual_Report.pdf); FY2025 trough: net loss ($28.9M), NRV/flood charges; Lawrence uses mid-cycle distributable cash not spot loss year. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 98.73,
+          "high": 263.28
+        },
+        "treatment": "additive",
+        "overlap_key": "asset_option_inventory",
+        "overlap_control": "Unique overlap key asset_option_inventory; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "risk_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "The range includes delay and failure outcomes; dated cash realization remains [HUMAN REVIEW].",
+          "probability_basis": "Starter probability is explicit analyst judgment pending a primary-source milestone and ownership reconciliation.",
+          "remaining_capital_basis": "Remaining owner-funded capital, financing, and dilution are reserved until the primary sources-and-uses bridge is complete."
+        }
+      },
+      {
+        "component_id": "net_financial_claims",
+        "economic_claim": "Cash, debt, and other net claims",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Existing BWEL valuation inputs: Mid-cycle owner cash: FY2024 dividend $20/sh and FY2025 $17.50/sh despite loss; normalized below peak $47.83 EPS; FY2025 equity $755.1M / 964,210 shares (investor-documents/ir-bwel/2025-06-30_Annual_Report.pdf); FY2025 trough: net loss ($28.9M), NRV/flood charges; Lawrence uses mid-cycle distributable cash not spot loss year. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "range_per_share": {
+          "low": 16.45,
+          "base": 65.82,
+          "high": 109.7
+        },
+        "treatment": "additive",
+        "overlap_key": "net_financial_claims",
+        "overlap_control": "Unique overlap key net_financial_claims; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "realization_reserve",
+        "economic_claim": "Commodity, water, and realization reserve",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "realization_reserve",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Existing BWEL valuation inputs: Mid-cycle owner cash: FY2024 dividend $20/sh and FY2025 $17.50/sh despite loss; normalized below peak $47.83 EPS; FY2025 equity $755.1M / 964,210 shares (investor-documents/ir-bwel/2025-06-30_Annual_Report.pdf); FY2025 trough: net loss ($28.9M), NRV/flood charges; Lawrence uses mid-cycle distributable cash not spot loss year. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "range_per_share": {
+          "low": -164.55,
+          "base": -82.27,
+          "high": -21.94
+        },
+        "treatment": "additive",
+        "overlap_key": "realization_reserve",
+        "overlap_control": "Unique overlap key realization_reserve; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "risk_and_timing": null
+      }
+    ],
+    "wisdom_applied": [],
+    "limitations": [
+      "Phase 3 schedule scaffold, not a committee-approved valuation.",
+      "Universal followups remain open until primary evidence supports the ownership map, owner-cash or NAV bridge, and downside/capital claims."
+    ],
+    "complete_component_coverage": true,
+    "validation_errors": [],
+    "registry_version": "1.0"
+  },
+  "component_review_queue": {
+    "status": "ready_for_committee_review",
+    "decision_rule": "Each assigned rater records accept, challenge, or reject with a proposed range and evidence. The aggregator may not silently average disputed ranges.",
+    "items": [
+      {
+        "component_id": "current_operating_claim",
+        "label": "Farming and operating-asset owner cash",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 175.52,
+          "base": 274.25,
+          "high": 383.95
+        },
+        "range_width_pct_of_base": 76.0,
+        "evidence_tier": "mixed_primary_and_estimate",
+        "recommended_raters": [
+          "hohn",
+          "marathon_capital_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "asset_option_inventory",
+        "label": "Land, water, and mineral optionality",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 98.73,
+          "high": 263.28
+        },
+        "range_width_pct_of_base": 266.7,
+        "evidence_tier": "mixed_primary_and_estimate",
+        "recommended_raters": [
+          "klarman_asset_value",
+          "hk"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Cash, debt, and other net claims",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 16.45,
+          "base": 65.82,
+          "high": 109.7
+        },
+        "range_width_pct_of_base": 141.7,
+        "evidence_tier": "mixed_primary_and_estimate",
+        "recommended_raters": [
+          "greenblatt",
+          "marks_credit_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "realization_reserve",
+        "label": "Commodity, water, and realization reserve",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": -164.55,
+          "base": -82.27,
+          "high": -21.94
+        },
+        "range_width_pct_of_base": 173.3,
+        "evidence_tier": "mixed_primary_and_estimate",
+        "recommended_raters": [
+          "marks_credit_cycle",
+          "pabrai"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      }
+    ]
+  },
+  "valuation_method_route": {
+    "schema_version": "1.0",
+    "status": "routed",
+    "profile_id": "scarce_asset_optionality",
+    "label": "Scarce assets, royalties, and optionality",
+    "score": 9.0,
+    "reasons": [
+      "archetype=optionality",
+      "component categories=real_option",
+      "existing methods=option, unit_nav"
+    ],
+    "primary_methods": [
+      "component_owner_cash_and_unit_nav"
+    ],
+    "corroborating_methods": [
+      "comparable_transactions",
+      "replacement_cost_or_reverse_nav"
+    ],
+    "primary_personas": [
+      "hk",
+      "stahl"
+    ],
+    "cross_check_personas": [
+      "klarman_asset_value",
+      "marks_credit_cycle"
+    ],
+    "silent_personas": [
+      "buffett_weschler",
+      "greenblatt",
+      "hohn",
+      "marathon_capital_cycle",
+      "munger",
+      "pabrai"
+    ],
+    "required_evidence": [
+      "legal economic claim",
+      "non-overlapping physical inventory",
+      "unit economics",
+      "realization timing",
+      "remaining owner capital"
+    ],
+    "failure_modes": [
+      "gross asset value mistaken for shareholder value",
+      "operating cash flow and NAV counted twice",
+      "remote options treated as contracted cash"
+    ],
+    "secondary_profiles": [
+      {
+        "profile_id": "quality_reinvestment",
+        "score": 4.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dcf, owner_cash, reinvestment"
+        ]
+      },
+      {
+        "profile_id": "credit_and_normalized_returns",
+        "score": 2.0,
+        "reasons": [
+          "component categories=financial_asset, liability_or_reserve"
+        ]
+      }
+    ],
+    "scorecard": {
+      "scarce_asset_optionality": {
+        "score": 9.0,
+        "reasons": [
+          "archetype=optionality",
+          "component categories=real_option",
+          "existing methods=option, unit_nav"
+        ]
+      },
+      "quality_reinvestment": {
+        "score": 4.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dcf, owner_cash, reinvestment"
+        ]
+      },
+      "capital_cycle": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
+      },
+      "credit_and_normalized_returns": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=financial_asset, liability_or_reserve"
+        ]
+      },
+      "catalyst_asset_value": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=financial_asset"
+        ]
+      },
+      "predictable_cash_flow": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=owner_cash"
+        ]
+      },
+      "binary_milestone": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=milestone"
+        ]
+      }
+    },
+    "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+  },
+  "universal_valuation_contract": {
+    "schema_version": "1.0",
+    "status": "decision_grade",
+    "ticker": "BWEL",
+    "as_of": "2026-06-02",
+    "economic_ownership_map": [
+      {
+        "component_id": "current_operating_claim",
+        "label": "Farming and operating-asset owner cash",
+        "category": "operating_business",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Farming and operating-asset owner cash",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 274.25
+        },
+        "growth_driver": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "owner_cash_reinvestment_dcf",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 175.52,
+          "base": 274.25,
+          "high": 383.95
+        },
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "Existing BWEL valuation inputs: Mid-cycle owner cash: FY2024 dividend $20/sh and FY2025 $17.50/sh despite loss; normalized below peak $47.83 EPS; FY2025 equity $755.1M / 964,210 shares (investor-documents/ir-bwel/2025-06-30_Annual_Report.pdf); FY2025 trough: net loss ($28.9M), NRV/flood charges; Lawrence uses mid-cycle distributable cash not spot loss year. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "overlap_key": "current_operating_claim",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "asset_option_inventory",
+        "label": "Land, water, and mineral optionality",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Land, water, and mineral optionality",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 98.73
+        },
+        "growth_driver": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "unit_nav_and_milestone_option",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.0,
+          "base": 98.73,
+          "high": 263.28
+        },
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "Existing BWEL valuation inputs: Mid-cycle owner cash: FY2024 dividend $20/sh and FY2025 $17.50/sh despite loss; normalized below peak $47.83 EPS; FY2025 equity $755.1M / 964,210 shares (investor-documents/ir-bwel/2025-06-30_Annual_Report.pdf); FY2025 trough: net loss ($28.9M), NRV/flood charges; Lawrence uses mid-cycle distributable cash not spot loss year. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "probability_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "The range includes delay and failure outcomes; dated cash realization remains [HUMAN REVIEW].",
+          "probability_basis": "Starter probability is explicit analyst judgment pending a primary-source milestone and ownership reconciliation.",
+          "remaining_capital_basis": "Remaining owner-funded capital, financing, and dilution are reserved until the primary sources-and-uses bridge is complete."
+        },
+        "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "overlap_key": "asset_option_inventory",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Cash, debt, and other net claims",
+        "category": "financial_asset",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Cash, debt, and other net claims",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 65.82
+        },
+        "growth_driver": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "net_asset_value",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 16.45,
+          "base": 65.82,
+          "high": 109.7
+        },
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "Existing BWEL valuation inputs: Mid-cycle owner cash: FY2024 dividend $20/sh and FY2025 $17.50/sh despite loss; normalized below peak $47.83 EPS; FY2025 equity $755.1M / 964,210 shares (investor-documents/ir-bwel/2025-06-30_Annual_Report.pdf); FY2025 trough: net loss ($28.9M), NRV/flood charges; Lawrence uses mid-cycle distributable cash not spot loss year. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "overlap_key": "net_financial_claims",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "realization_reserve",
+        "label": "Commodity, water, and realization reserve",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Commodity, water, and realization reserve",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": -82.27
+        },
+        "growth_driver": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "realization_reserve",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": -164.55,
+          "base": -82.27,
+          "high": -21.94
+        },
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "Existing BWEL valuation inputs: Mid-cycle owner cash: FY2024 dividend $20/sh and FY2025 $17.50/sh despite loss; normalized below peak $47.83 EPS; FY2025 equity $755.1M / 964,210 shares (investor-documents/ir-bwel/2025-06-30_Annual_Report.pdf); FY2025 trough: net loss ($28.9M), NRV/flood charges; Lawrence uses mid-cycle distributable cash not spot loss year. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "overlap_key": "realization_reserve",
+        "assumption_type": "judgment"
+      }
+    ],
+    "component_coverage": {
+      "all_material_components_identified": true,
+      "material_component_count": 4,
+      "additive_component_count": 4,
+      "embedded_component_count": 0,
+      "unvalued_component_count": 0,
+      "double_counting_flags": []
+    },
+    "input_classification": {
+      "facts": [],
+      "estimates": [],
+      "judgments": [
+        {
+          "component_id": "current_operating_claim",
+          "label": "Farming and operating-asset owner cash",
+          "kind": "judgment",
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Existing BWEL valuation inputs: Mid-cycle owner cash: FY2024 dividend $20/sh and FY2025 $17.50/sh despite loss; normalized below peak $47.83 EPS; FY2025 equity $755.1M / 964,210 shares (investor-documents/ir-bwel/2025-06-30_Annual_Report.pdf); FY2025 trough: net loss ($28.9M), NRV/flood charges; Lawrence uses mid-cycle distributable cash not spot loss year. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "method": "owner_cash_reinvestment_dcf"
+        },
+        {
+          "component_id": "asset_option_inventory",
+          "label": "Land, water, and mineral optionality",
+          "kind": "judgment",
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Existing BWEL valuation inputs: Mid-cycle owner cash: FY2024 dividend $20/sh and FY2025 $17.50/sh despite loss; normalized below peak $47.83 EPS; FY2025 equity $755.1M / 964,210 shares (investor-documents/ir-bwel/2025-06-30_Annual_Report.pdf); FY2025 trough: net loss ($28.9M), NRV/flood charges; Lawrence uses mid-cycle distributable cash not spot loss year. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "method": "unit_nav_and_milestone_option"
+        },
+        {
+          "component_id": "net_financial_claims",
+          "label": "Cash, debt, and other net claims",
+          "kind": "judgment",
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Existing BWEL valuation inputs: Mid-cycle owner cash: FY2024 dividend $20/sh and FY2025 $17.50/sh despite loss; normalized below peak $47.83 EPS; FY2025 equity $755.1M / 964,210 shares (investor-documents/ir-bwel/2025-06-30_Annual_Report.pdf); FY2025 trough: net loss ($28.9M), NRV/flood charges; Lawrence uses mid-cycle distributable cash not spot loss year. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "method": "net_asset_value"
+        },
+        {
+          "component_id": "realization_reserve",
+          "label": "Commodity, water, and realization reserve",
+          "kind": "judgment",
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Existing BWEL valuation inputs: Mid-cycle owner cash: FY2024 dividend $20/sh and FY2025 $17.50/sh despite loss; normalized below peak $47.83 EPS; FY2025 equity $755.1M / 964,210 shares (investor-documents/ir-bwel/2025-06-30_Annual_Report.pdf); FY2025 trough: net loss ($28.9M), NRV/flood charges; Lawrence uses mid-cycle distributable cash not spot loss year. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "method": "realization_reserve"
+        }
+      ]
+    },
+    "method_route": {
+      "schema_version": "1.0",
+      "status": "routed",
+      "profile_id": "scarce_asset_optionality",
+      "label": "Scarce assets, royalties, and optionality",
+      "score": 9.0,
+      "reasons": [
+        "archetype=optionality",
+        "component categories=real_option",
+        "existing methods=option, unit_nav"
+      ],
+      "primary_methods": [
+        "component_owner_cash_and_unit_nav"
+      ],
+      "corroborating_methods": [
+        "comparable_transactions",
+        "replacement_cost_or_reverse_nav"
+      ],
+      "primary_personas": [
+        "hk",
+        "stahl"
+      ],
+      "cross_check_personas": [
+        "klarman_asset_value",
+        "marks_credit_cycle"
+      ],
+      "silent_personas": [
+        "buffett_weschler",
+        "greenblatt",
+        "hohn",
+        "marathon_capital_cycle",
+        "munger",
+        "pabrai"
+      ],
+      "required_evidence": [
+        "legal economic claim",
+        "non-overlapping physical inventory",
+        "unit economics",
+        "realization timing",
+        "remaining owner capital"
+      ],
+      "failure_modes": [
+        "gross asset value mistaken for shareholder value",
+        "operating cash flow and NAV counted twice",
+        "remote options treated as contracted cash"
+      ],
+      "secondary_profiles": [
+        {
+          "profile_id": "quality_reinvestment",
+          "score": 4.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=dcf, owner_cash, reinvestment"
+          ]
+        },
+        {
+          "profile_id": "credit_and_normalized_returns",
+          "score": 2.0,
+          "reasons": [
+            "component categories=financial_asset, liability_or_reserve"
+          ]
+        }
+      ],
+      "scorecard": {
+        "scarce_asset_optionality": {
+          "score": 9.0,
+          "reasons": [
+            "archetype=optionality",
+            "component categories=real_option",
+            "existing methods=option, unit_nav"
+          ]
+        },
+        "quality_reinvestment": {
+          "score": 4.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=dcf, owner_cash, reinvestment"
+          ]
+        },
+        "capital_cycle": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=operating_business"
+          ]
+        },
+        "credit_and_normalized_returns": {
+          "score": 2.0,
+          "reasons": [
+            "component categories=financial_asset, liability_or_reserve"
+          ]
+        },
+        "catalyst_asset_value": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=financial_asset"
+          ]
+        },
+        "predictable_cash_flow": {
+          "score": 2.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=owner_cash"
+          ]
+        },
+        "binary_milestone": {
+          "score": 2.0,
+          "reasons": [
+            "component categories=real_option",
+            "existing methods=milestone"
+          ]
+        }
+      },
+      "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+    },
+    "market": {
+      "price_per_share": 548.5,
+      "fully_diluted_shares": 964210,
+      "market_cap_m": 528.87,
+      "enterprise_value_m": null
+    },
+    "valuation": {
+      "value_per_share": {
+        "low": 27.42,
+        "base": 356.53,
+        "high": 734.99
+      },
+      "probability_weighted_value_per_share": 356.53,
+      "expected_distributions_per_share": 0.0,
+      "annualized_return_at_price_pct": {
+        "low": -34.82,
+        "base": -5.97,
+        "high": 4.27
+      },
+      "downside_to_low_pct": -95.0,
+      "horizon_years": 7
+    },
+    "scenario_contract": {
+      "rule": "Cases must change causal operating, capital, probability, timing, or financing drivers\u2014not only the terminal multiple.",
+      "top_value_drivers": [
+        {
+          "component_id": "asset_option_inventory",
+          "label": "Land, water, and mineral optionality",
+          "base_per_share": 98.73,
+          "range_width_per_share": 263.28,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "current_operating_claim",
+          "label": "Farming and operating-asset owner cash",
+          "base_per_share": 274.25,
+          "range_width_per_share": 208.43,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "realization_reserve",
+          "label": "Commodity, water, and realization reserve",
+          "base_per_share": -82.27,
+          "range_width_per_share": 142.61,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "net_financial_claims",
+          "label": "Cash, debt, and other net claims",
+          "base_per_share": 65.82,
+          "range_width_per_share": 93.25,
+          "scenario_assumptions": null
+        }
+      ],
+      "reverse_expectations": null
+    },
+    "evidence": {
+      "unresolved_count": 0,
+      "blockers": [],
+      "validation_errors": []
+    },
+    "monitoring": {
+      "falsifiers": [
+        "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+      ],
+      "required_refresh_triggers": [
+        "new filing or material operating update",
+        "capital-structure change",
+        "material price move",
+        "component milestone or falsifier"
+      ]
+    },
+    "decision_rule": "No security is decision-grade until every material economic claim is valued exactly once and every material evidence blocker is resolved."
   }
 }

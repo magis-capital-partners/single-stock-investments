@@ -454,5 +454,1083 @@
     "price_for_market_cap": 45.93,
     "chart": "BN/research/charts/total_return_2026-07-15.svg",
     "panel_json": "BN/research/total_return_panel.json"
+  },
+  "valuation_mode": "economic_value",
+  "valuation_methodology": {
+    "mode": "component_economic_value",
+    "horizon_years": 7,
+    "decision_rule": "Use one complete non-overlapping component schedule. The legacy Lawrence return path remains a separate stance gate until the primary evidence bridges are complete."
+  },
+  "component_valuation": {
+    "schema_version": "1.0",
+    "all_material_components_identified": true,
+    "coverage_statement": "Phase 3 scaffold identifies every currently known material operating, financial, liability, reserve, and option claim once. Primary ownership and cash/NAV bridges remain open follow-up gates.",
+    "components": [
+      {
+        "id": "core_engine",
+        "label": "Look-through listed and private holdings",
+        "category": "operating_business",
+        "overlap_key": "core_engine",
+        "treatment": "additive",
+        "valuation": {
+          "method": "owner_cash_reinvestment_dcf",
+          "basis": "per_share",
+          "low": 28.48,
+          "base": 36.74,
+          "high": 46.85,
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy \u2014 base uses DE before realizations growth path [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+        }
+      },
+      {
+        "id": "reinvestment_or_assets",
+        "label": "Asset-management fee and carry engine",
+        "category": "financial_asset",
+        "overlap_key": "reinvestment_or_assets",
+        "treatment": "additive",
+        "valuation": {
+          "method": "look_through_nav",
+          "basis": "per_share",
+          "low": 3.67,
+          "base": 6.43,
+          "high": 11.02,
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy \u2014 base uses DE before realizations growth path [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Corporate cash, debt, preferred, and tax claims",
+        "category": "financial_asset",
+        "overlap_key": "net_financial_claims",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": 0.0,
+          "base": 2.3,
+          "high": 4.59,
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy \u2014 base uses DE before realizations growth path [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+        }
+      },
+      {
+        "id": "downside_reserve",
+        "label": "Realization and holding-company discount reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "downside_reserve",
+        "treatment": "additive",
+        "valuation": {
+          "method": "realization_reserve",
+          "basis": "per_share",
+          "low": -9.19,
+          "base": -4.13,
+          "high": -0.46,
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy \u2014 base uses DE before realizations growth path [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+        }
+      }
+    ]
+  },
+  "economic_value": {
+    "schema_version": "1.0",
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One diluted share of BN, including every currently identified operating claim, financial claim, liability, reserve, and material option.",
+      "unit_label": "diluted share",
+      "unit_count": null,
+      "unit_source": "[HUMAN REVIEW] Existing research lacks a reconciled diluted unit count; retrieve the latest primary filing before treating this as decision-grade.",
+      "enterprise_to_equity_reconciliation": "Operating and asset claims are valued once; cash, debt, financing, reserves, and other senior claims are separate components or explicitly reserved. No component is intended to overlap another."
+    },
+    "gaap_role": "misleading_historical_cost",
+    "accounting_reference": "Existing research and filing-derived valuation inputs. The primary-source reconciliation remains an open evidence gate.",
+    "component_groups": [
+      {
+        "id": "core_engine",
+        "label": "Look-through listed and private holdings",
+        "component_ids": [
+          "core_engine"
+        ],
+        "economic_claim": "Look-through listed and private holdings",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key core_engine; no other component capitalizes the same claim."
+      },
+      {
+        "id": "reinvestment_or_assets",
+        "label": "Asset-management fee and carry engine",
+        "component_ids": [
+          "reinvestment_or_assets"
+        ],
+        "economic_claim": "Asset-management fee and carry engine",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key reinvestment_or_assets; no other component capitalizes the same claim."
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Corporate cash, debt, preferred, and tax claims",
+        "component_ids": [
+          "net_financial_claims"
+        ],
+        "economic_claim": "Corporate cash, debt, preferred, and tax claims",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key net_financial_claims; no other component capitalizes the same claim."
+      },
+      {
+        "id": "downside_reserve",
+        "label": "Realization and holding-company discount reserve",
+        "component_ids": [
+          "downside_reserve"
+        ],
+        "economic_claim": "Realization and holding-company discount reserve",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key downside_reserve; no other component capitalizes the same claim."
+      }
+    ],
+    "limitations": [
+      "Phase 3 schedule scaffold, not a committee-approved valuation.",
+      "Universal followups remain open until primary evidence supports the ownership map, owner-cash or NAV bridge, and downside/capital claims."
+    ]
+  },
+  "component_valuation_results": {
+    "status": "complete",
+    "decision_rule": "Use the complete low/base/high component schedule. Embedded components are estimated but not added twice.",
+    "all_material_components_identified": true,
+    "additive_components": [
+      {
+        "id": "core_engine",
+        "label": "Look-through listed and private holdings",
+        "category": "operating_business",
+        "overlap_key": "core_engine",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "owner_cash_reinvestment_dcf",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy \u2014 base uses DE before realizations growth path [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "scenario_assumptions": null,
+        "low_per_share": 28.48,
+        "base_per_share": 36.74,
+        "high_per_share": 46.85
+      },
+      {
+        "id": "reinvestment_or_assets",
+        "label": "Asset-management fee and carry engine",
+        "category": "financial_asset",
+        "overlap_key": "reinvestment_or_assets",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "look_through_nav",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy \u2014 base uses DE before realizations growth path [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "scenario_assumptions": null,
+        "low_per_share": 3.67,
+        "base_per_share": 6.43,
+        "high_per_share": 11.02
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Corporate cash, debt, preferred, and tax claims",
+        "category": "financial_asset",
+        "overlap_key": "net_financial_claims",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "net_asset_value",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy \u2014 base uses DE before realizations growth path [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "scenario_assumptions": null,
+        "low_per_share": 0.0,
+        "base_per_share": 2.3,
+        "high_per_share": 4.59
+      },
+      {
+        "id": "downside_reserve",
+        "label": "Realization and holding-company discount reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "downside_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "realization_reserve",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy \u2014 base uses DE before realizations growth path [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "scenario_assumptions": null,
+        "low_per_share": -9.19,
+        "base_per_share": -4.13,
+        "high_per_share": -0.46
+      }
+    ],
+    "embedded_components": [],
+    "total_equity_value_per_share": {
+      "low": 22.96,
+      "base": 41.34,
+      "high": 62.0
+    },
+    "material_component_count": 4,
+    "additive_component_count": 4,
+    "embedded_component_count": 0,
+    "market_price_per_share": 45.93,
+    "upside_downside_pct": {
+      "low": -50.0,
+      "base": -10.0,
+      "high": 35.0
+    }
+  },
+  "economic_value_analysis": {
+    "schema_version": "1.0",
+    "status": "evidence_blocked",
+    "trigger": {
+      "required": true,
+      "reasons": [
+        "explicit_component_schedule"
+      ],
+      "policy": "A complete economic-value analysis is required when any trigger fires; otherwise it is recommended."
+    },
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One diluted share of BN, including every currently identified operating claim, financial claim, liability, reserve, and material option.",
+      "unit_label": "diluted share",
+      "unit_count": null,
+      "unit_source": "[HUMAN REVIEW] Existing research lacks a reconciled diluted unit count; retrieve the latest primary filing before treating this as decision-grade.",
+      "enterprise_to_equity_reconciliation": "Operating and asset claims are valued once; cash, debt, financing, reserves, and other senior claims are separate components or explicitly reserved. No component is intended to overlap another."
+    },
+    "gaap_role": "misleading_historical_cost",
+    "accounting_reference": "Existing research and filing-derived valuation inputs. The primary-source reconciliation remains an open evidence gate.",
+    "comparable_hierarchy": [
+      "issuer_arm_length_transaction",
+      "same_asset_transaction",
+      "public_peer",
+      "replacement_cost",
+      "approved_external_analysis"
+    ],
+    "gross_comparable_nav_per_share": null,
+    "risked_present_value_per_share": {
+      "low": 22.96,
+      "base": 41.34,
+      "high": 62.0
+    },
+    "component_groups": [
+      {
+        "id": "core_engine",
+        "label": "Look-through listed and private holdings",
+        "component_ids": [
+          "core_engine"
+        ],
+        "economic_claim": "Look-through listed and private holdings",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key core_engine; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": 28.48,
+          "base": 36.74,
+          "high": 46.85
+        }
+      },
+      {
+        "id": "reinvestment_or_assets",
+        "label": "Asset-management fee and carry engine",
+        "component_ids": [
+          "reinvestment_or_assets"
+        ],
+        "economic_claim": "Asset-management fee and carry engine",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key reinvestment_or_assets; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": 3.67,
+          "base": 6.43,
+          "high": 11.02
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Corporate cash, debt, preferred, and tax claims",
+        "component_ids": [
+          "net_financial_claims"
+        ],
+        "economic_claim": "Corporate cash, debt, preferred, and tax claims",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key net_financial_claims; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": 0.0,
+          "base": 2.3,
+          "high": 4.59
+        }
+      },
+      {
+        "id": "downside_reserve",
+        "label": "Realization and holding-company discount reserve",
+        "component_ids": [
+          "downside_reserve"
+        ],
+        "economic_claim": "Realization and holding-company discount reserve",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key downside_reserve; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": -9.19,
+          "base": -4.13,
+          "high": -0.46
+        }
+      }
+    ],
+    "valuation_proof": [
+      {
+        "component_id": "core_engine",
+        "economic_claim": "Look-through listed and private holdings",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "owner_cash_reinvestment_dcf",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy \u2014 base uses DE before realizations growth path [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "range_per_share": {
+          "low": 28.48,
+          "base": 36.74,
+          "high": 46.85
+        },
+        "treatment": "additive",
+        "overlap_key": "core_engine",
+        "overlap_control": "Unique overlap key core_engine; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "reinvestment_or_assets",
+        "economic_claim": "Asset-management fee and carry engine",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "look_through_nav",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy \u2014 base uses DE before realizations growth path [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "range_per_share": {
+          "low": 3.67,
+          "base": 6.43,
+          "high": 11.02
+        },
+        "treatment": "additive",
+        "overlap_key": "reinvestment_or_assets",
+        "overlap_control": "Unique overlap key reinvestment_or_assets; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "net_financial_claims",
+        "economic_claim": "Corporate cash, debt, preferred, and tax claims",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy \u2014 base uses DE before realizations growth path [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 2.3,
+          "high": 4.59
+        },
+        "treatment": "additive",
+        "overlap_key": "net_financial_claims",
+        "overlap_control": "Unique overlap key net_financial_claims; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "downside_reserve",
+        "economic_claim": "Realization and holding-company discount reserve",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "realization_reserve",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy \u2014 base uses DE before realizations growth path [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "range_per_share": {
+          "low": -9.19,
+          "base": -4.13,
+          "high": -0.46
+        },
+        "treatment": "additive",
+        "overlap_key": "downside_reserve",
+        "overlap_control": "Unique overlap key downside_reserve; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "risk_and_timing": null
+      }
+    ],
+    "wisdom_applied": [],
+    "limitations": [
+      "Phase 3 schedule scaffold, not a committee-approved valuation.",
+      "Universal followups remain open until primary evidence supports the ownership map, owner-cash or NAV bridge, and downside/capital claims."
+    ],
+    "complete_component_coverage": true,
+    "validation_errors": [
+      "economic_claim.unit_count required"
+    ],
+    "registry_version": "1.0"
+  },
+  "component_review_queue": {
+    "status": "ready_for_committee_review",
+    "decision_rule": "Each assigned rater records accept, challenge, or reject with a proposed range and evidence. The aggregator may not silently average disputed ranges.",
+    "items": [
+      {
+        "component_id": "core_engine",
+        "label": "Look-through listed and private holdings",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 28.48,
+          "base": 36.74,
+          "high": 46.85
+        },
+        "range_width_pct_of_base": 50.0,
+        "evidence_tier": "mixed_primary_and_estimate",
+        "recommended_raters": [
+          "hohn",
+          "marathon_capital_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "reinvestment_or_assets",
+        "label": "Asset-management fee and carry engine",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 3.67,
+          "base": 6.43,
+          "high": 11.02
+        },
+        "range_width_pct_of_base": 114.3,
+        "evidence_tier": "mixed_primary_and_estimate",
+        "recommended_raters": [
+          "greenblatt",
+          "marks_credit_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Corporate cash, debt, preferred, and tax claims",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 2.3,
+          "high": 4.59
+        },
+        "range_width_pct_of_base": 199.6,
+        "evidence_tier": "mixed_primary_and_estimate",
+        "recommended_raters": [
+          "greenblatt",
+          "marks_credit_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "downside_reserve",
+        "label": "Realization and holding-company discount reserve",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": -9.19,
+          "base": -4.13,
+          "high": -0.46
+        },
+        "range_width_pct_of_base": 211.4,
+        "evidence_tier": "mixed_primary_and_estimate",
+        "recommended_raters": [
+          "marks_credit_cycle",
+          "pabrai"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      }
+    ]
+  },
+  "valuation_method_route": {
+    "schema_version": "1.0",
+    "status": "routed",
+    "profile_id": "quality_reinvestment",
+    "label": "High-return compounder",
+    "score": 10.0,
+    "reasons": [
+      "archetype=platform",
+      "component categories=operating_business",
+      "existing methods=dcf, owner_cash, reinvestment"
+    ],
+    "primary_methods": [
+      "owner_earnings_reinvestment_dcf"
+    ],
+    "corroborating_methods": [
+      "reverse_dcf",
+      "incremental_roic_runway"
+    ],
+    "primary_personas": [
+      "buffett_weschler",
+      "hohn"
+    ],
+    "cross_check_personas": [
+      "munger",
+      "marathon_capital_cycle"
+    ],
+    "silent_personas": [
+      "greenblatt",
+      "hk",
+      "klarman_asset_value",
+      "marks_credit_cycle",
+      "pabrai",
+      "stahl"
+    ],
+    "required_evidence": [
+      "normalized owner earnings",
+      "incremental return on capital",
+      "reinvestment runway",
+      "diluted share count",
+      "competitive-advantage mechanism"
+    ],
+    "failure_modes": [
+      "growth projected without its capital cost",
+      "stock compensation or acquisitions omitted",
+      "terminal value unsupported by a durable mechanism"
+    ],
+    "secondary_profiles": [
+      {
+        "profile_id": "credit_and_normalized_returns",
+        "score": 2.0,
+        "reasons": [
+          "component categories=financial_asset, liability_or_reserve"
+        ]
+      },
+      {
+        "profile_id": "predictable_cash_flow",
+        "score": 2.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=owner_cash"
+        ]
+      }
+    ],
+    "scorecard": {
+      "scarce_asset_optionality": {
+        "score": 0.0,
+        "reasons": []
+      },
+      "quality_reinvestment": {
+        "score": 10.0,
+        "reasons": [
+          "archetype=platform",
+          "component categories=operating_business",
+          "existing methods=dcf, owner_cash, reinvestment"
+        ]
+      },
+      "capital_cycle": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
+      },
+      "credit_and_normalized_returns": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=financial_asset, liability_or_reserve"
+        ]
+      },
+      "catalyst_asset_value": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=financial_asset"
+        ]
+      },
+      "predictable_cash_flow": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=owner_cash"
+        ]
+      },
+      "binary_milestone": {
+        "score": 0.0,
+        "reasons": []
+      }
+    },
+    "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+  },
+  "universal_valuation_contract": {
+    "schema_version": "1.0",
+    "status": "evidence_blocked",
+    "ticker": "BN",
+    "as_of": "2026-05-26",
+    "economic_ownership_map": [
+      {
+        "component_id": "core_engine",
+        "label": "Look-through listed and private holdings",
+        "category": "operating_business",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Look-through listed and private holdings",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 36.74
+        },
+        "growth_driver": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "owner_cash_reinvestment_dcf",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 28.48,
+          "base": 36.74,
+          "high": 46.85
+        },
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy \u2014 base uses DE before realizations growth path [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "overlap_key": "core_engine",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "reinvestment_or_assets",
+        "label": "Asset-management fee and carry engine",
+        "category": "financial_asset",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Asset-management fee and carry engine",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 6.43
+        },
+        "growth_driver": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "look_through_nav",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 3.67,
+          "base": 6.43,
+          "high": 11.02
+        },
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy \u2014 base uses DE before realizations growth path [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "overlap_key": "reinvestment_or_assets",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Corporate cash, debt, preferred, and tax claims",
+        "category": "financial_asset",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Corporate cash, debt, preferred, and tax claims",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 2.3
+        },
+        "growth_driver": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "net_asset_value",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.0,
+          "base": 2.3,
+          "high": 4.59
+        },
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy \u2014 base uses DE before realizations growth path [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "overlap_key": "net_financial_claims",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "downside_reserve",
+        "label": "Realization and holding-company discount reserve",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Realization and holding-company discount reserve",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": -4.13
+        },
+        "growth_driver": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "realization_reserve",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": -9.19,
+          "base": -4.13,
+          "high": -0.46
+        },
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence_level": "analyst_estimated",
+        "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy \u2014 base uses DE before realizations growth path [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "overlap_key": "downside_reserve",
+        "assumption_type": "judgment"
+      }
+    ],
+    "component_coverage": {
+      "all_material_components_identified": true,
+      "material_component_count": 4,
+      "additive_component_count": 4,
+      "embedded_component_count": 0,
+      "unvalued_component_count": 0,
+      "double_counting_flags": []
+    },
+    "input_classification": {
+      "facts": [],
+      "estimates": [],
+      "judgments": [
+        {
+          "component_id": "core_engine",
+          "label": "Look-through listed and private holdings",
+          "kind": "judgment",
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy \u2014 base uses DE before realizations growth path [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "method": "owner_cash_reinvestment_dcf"
+        },
+        {
+          "component_id": "reinvestment_or_assets",
+          "label": "Asset-management fee and carry engine",
+          "kind": "judgment",
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy \u2014 base uses DE before realizations growth path [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "method": "look_through_nav"
+        },
+        {
+          "component_id": "net_financial_claims",
+          "label": "Corporate cash, debt, preferred, and tax claims",
+          "kind": "judgment",
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy \u2014 base uses DE before realizations growth path [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "method": "net_asset_value"
+        },
+        {
+          "component_id": "downside_reserve",
+          "label": "Realization and holding-company discount reserve",
+          "kind": "judgment",
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy \u2014 base uses DE before realizations growth path [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "method": "realization_reserve"
+        }
+      ]
+    },
+    "method_route": {
+      "schema_version": "1.0",
+      "status": "routed",
+      "profile_id": "quality_reinvestment",
+      "label": "High-return compounder",
+      "score": 10.0,
+      "reasons": [
+        "archetype=platform",
+        "component categories=operating_business",
+        "existing methods=dcf, owner_cash, reinvestment"
+      ],
+      "primary_methods": [
+        "owner_earnings_reinvestment_dcf"
+      ],
+      "corroborating_methods": [
+        "reverse_dcf",
+        "incremental_roic_runway"
+      ],
+      "primary_personas": [
+        "buffett_weschler",
+        "hohn"
+      ],
+      "cross_check_personas": [
+        "munger",
+        "marathon_capital_cycle"
+      ],
+      "silent_personas": [
+        "greenblatt",
+        "hk",
+        "klarman_asset_value",
+        "marks_credit_cycle",
+        "pabrai",
+        "stahl"
+      ],
+      "required_evidence": [
+        "normalized owner earnings",
+        "incremental return on capital",
+        "reinvestment runway",
+        "diluted share count",
+        "competitive-advantage mechanism"
+      ],
+      "failure_modes": [
+        "growth projected without its capital cost",
+        "stock compensation or acquisitions omitted",
+        "terminal value unsupported by a durable mechanism"
+      ],
+      "secondary_profiles": [
+        {
+          "profile_id": "credit_and_normalized_returns",
+          "score": 2.0,
+          "reasons": [
+            "component categories=financial_asset, liability_or_reserve"
+          ]
+        },
+        {
+          "profile_id": "predictable_cash_flow",
+          "score": 2.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=owner_cash"
+          ]
+        }
+      ],
+      "scorecard": {
+        "scarce_asset_optionality": {
+          "score": 0.0,
+          "reasons": []
+        },
+        "quality_reinvestment": {
+          "score": 10.0,
+          "reasons": [
+            "archetype=platform",
+            "component categories=operating_business",
+            "existing methods=dcf, owner_cash, reinvestment"
+          ]
+        },
+        "capital_cycle": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=operating_business"
+          ]
+        },
+        "credit_and_normalized_returns": {
+          "score": 2.0,
+          "reasons": [
+            "component categories=financial_asset, liability_or_reserve"
+          ]
+        },
+        "catalyst_asset_value": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=financial_asset"
+          ]
+        },
+        "predictable_cash_flow": {
+          "score": 2.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=owner_cash"
+          ]
+        },
+        "binary_milestone": {
+          "score": 0.0,
+          "reasons": []
+        }
+      },
+      "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+    },
+    "market": {
+      "price_per_share": 45.93,
+      "fully_diluted_shares": null,
+      "market_cap_m": null,
+      "enterprise_value_m": null
+    },
+    "valuation": {
+      "value_per_share": {
+        "low": 22.96,
+        "base": 41.34,
+        "high": 62.0
+      },
+      "probability_weighted_value_per_share": 41.34,
+      "expected_distributions_per_share": 0.0,
+      "annualized_return_at_price_pct": {
+        "low": -9.43,
+        "base": -1.49,
+        "high": 4.38
+      },
+      "downside_to_low_pct": -50.01,
+      "horizon_years": 7
+    },
+    "scenario_contract": {
+      "rule": "Cases must change causal operating, capital, probability, timing, or financing drivers\u2014not only the terminal multiple.",
+      "top_value_drivers": [
+        {
+          "component_id": "core_engine",
+          "label": "Look-through listed and private holdings",
+          "base_per_share": 36.74,
+          "range_width_per_share": 18.37,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "downside_reserve",
+          "label": "Realization and holding-company discount reserve",
+          "base_per_share": -4.13,
+          "range_width_per_share": 8.73,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "reinvestment_or_assets",
+          "label": "Asset-management fee and carry engine",
+          "base_per_share": 6.43,
+          "range_width_per_share": 7.35,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "net_financial_claims",
+          "label": "Corporate cash, debt, preferred, and tax claims",
+          "base_per_share": 2.3,
+          "range_width_per_share": 4.59,
+          "scenario_assumptions": null
+        }
+      ],
+      "reverse_expectations": null
+    },
+    "evidence": {
+      "unresolved_count": 1,
+      "blockers": [
+        "economic_claim.unit_count required"
+      ],
+      "validation_errors": [
+        "economic_claim.unit_count required"
+      ]
+    },
+    "monitoring": {
+      "falsifiers": [
+        "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+      ],
+      "required_refresh_triggers": [
+        "new filing or material operating update",
+        "capital-structure change",
+        "material price move",
+        "component milestone or falsifier"
+      ]
+    },
+    "decision_rule": "No security is decision-grade until every material economic claim is valued exactly once and every material evidence blocker is resolved."
   }
 }
