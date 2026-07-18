@@ -13,6 +13,7 @@ from pathlib import Path
 from build_dashboard_data import (
     ROOT,
     investment_committee_summary,
+    latest_deep_dive,
     load_power_zones,
     power_zones_for_ticker,
     property_register_summary,
@@ -61,6 +62,9 @@ def refresh(path: Path, tickers: tuple[str, ...] | None = None) -> int:
         ticker_dir = ROOT / ticker
         has_wb = (ticker_dir / "research" / "valuation_workbench.json").exists()
         has_props = (ticker_dir / "research" / "properties.json").exists()
+        has_deep_dive = any((ticker_dir / "research").glob("deep_dive_*.md"))
+        if has_deep_dive and (not targeted or ticker_key in wanted):
+            row["deep_dive"] = latest_deep_dive(ticker_dir, row.get("classification") or {})
         if (targeted and ticker_key in wanted) or (not targeted and (ticker_key in wanted or has_wb or has_props)):
             if has_wb or ticker_key in {t.upper() for t in DEFAULT_TICKERS}:
                 row["valuation_workbench"] = valuation_workbench_summary(ticker_dir)
