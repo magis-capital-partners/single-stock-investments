@@ -2631,6 +2631,8 @@ def merge_equity_model_rows(rows: list[dict], equity_payload: dict) -> None:
 def build_document_registry() -> dict | None:
     import subprocess
 
+    if os.environ.get("DASHBOARD_PRESERVE_DOCUMENT_REGISTRY") == "1":
+        return _load_json(DOCUMENT_REGISTRY_PATH)
     script = ROOT / "_system" / "scripts" / "build_document_registry.py"
     if script.exists():
         subprocess.run([sys.executable, str(script)], cwd=str(ROOT), check=False)
