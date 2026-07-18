@@ -1,22 +1,27 @@
 # CRWV — Investment Thesis
 
-**Last updated:** 2026-07-18
+**Last updated:** auto-sync
 
 ## Classification
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
+| **Archetype** (Stahl) | infrastructure |
 | **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Dhando** (Pabrai) | none |
 | **Stance** | watch |
-| **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Cycle** | up |
+| **Implied 7yr IRR** (base) | 6.2% (Lawrence base) |
+| **IRR method** | full |
+| **Lawrence bucket** | other |
+| **Payoff lens** | levered |
+| **MOI bucket** | pending |
+
+**Deep dive:** `CRWV/research/deep_dive_2026-07-18.md` (auto-sync)
 
 ## One-line thesis
 
-CoreWeave, Inc. — thesis pending Marvin deep dive.
+GPU cloud infrastructure landlord with **$60.7B** contracted backlog and **$5.1B** FY2025 revenue, but **$25B** debt, **~67%** Microsoft concentration, and **6.2%** base IRR at **$73.21** → **watch**.
 
 ## Key questions
 
@@ -26,4 +31,5 @@ CoreWeave, Inc. — thesis pending Marvin deep dive.
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-07-18; awaiting deep dive.
+- Core Scientific acquisition close terms; NVIDIA supplier-investor dual role
+- Lawrence FCF₀: raw OCF **$5.88/sh** vs normalized **$1.25/sh**

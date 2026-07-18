@@ -32,19 +32,19 @@ No third-party sources are indexed for CoreWeave as of this scan. Marvin stance 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
 | Owner cash starting point | $1.25/sh normalized after interest and growth capex | Not indexed | Raw OCF $5.88/sh not used as Lawrence FCF₀ |
-| Stance | watch (<15% base IRR) | Not indexed | No external weight |
+| Stance | watch (<15% base IRR at 6.2%) | Not indexed | No external weight |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | $1.25/sh starting owner cash | Base case computed via `marvin_valuation.py` | watch |
+| Marvin floor | $1.25/sh starting owner cash | 6.2% / 7yr | watch |
 | External (combined) | — | — | — |
-| **Blended best estimate** | **$1.25/sh** | **Marvin base only** | **watch** |
+| **Blended best estimate** | **$1.25/sh** | **6.2%** | **watch** |
 
 **Weights:** 100% Marvin filings; no approved external sources.
 
-**Returns statement (blended):** Pending mechanical refresh; base annual return at today's price will sync from `valuation.json` after `marvin_cloud_refresh.py`.
+**Returns statement (blended):** Marvin base **6.2%** per year at **$73.21** on **$1.25/sh** normalized owner cash; no approved external blend.
 
 ## [HUMAN REVIEW]
 
