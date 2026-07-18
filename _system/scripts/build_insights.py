@@ -22,6 +22,7 @@ from document_store import (  # noqa: E402
 from insight_format import format_letter_claim  # noqa: E402
 from fund_registry import canonicalize_fund_identity  # noqa: E402
 from fund_identity import consolidate_letter_funds_stable  # noqa: E402
+from ticker_identity import identity_match_ok  # noqa: E402
 from filing_facts import (  # noqa: E402
     filing_metadata_from_text_path,
     source_filing_ref_from_text_path,
@@ -2152,6 +2153,40 @@ def portfolio_company_hints(include_watchlist: bool = True) -> dict[str, set[str
     return hints
 
 
+def portfolio_identity_meta(include_watchlist: bool = True) -> dict[str, dict]:
+    """Book ticker -> company/market/exchange for cross-exchange identity filters."""
+    reg = load_registry()
+    rows = dict(reg.get("holdings") or {})
+    if include_watchlist:
+        rows.update(reg.get("watchlist") or {})
+    out: dict[str, dict] = {}
+    for ticker, meta in rows.items():
+        out[str(ticker).upper()] = {
+            "company": (meta or {}).get("company"),
+            "market": (meta or {}).get("market"),
+            "exchange": (meta or {}).get("exchange"),
+        }
+    return out
+
+
+def record_identity_ok(record: dict, identity_meta: dict[str, dict]) -> bool:
+    ticker = str(record.get("ref") or record.get("ticker") or "").upper()
+    meta = identity_meta.get(ticker) or {}
+    text = " ".join(
+        str(record.get(key) or "")
+        for key in ("title", "claim", "summary", "commentary", "thesis")
+    ).strip()
+    if not text:
+        return True
+    return identity_match_ok(
+        text,
+        ticker,
+        company=str(meta.get("company") or "") or None,
+        market=str(meta.get("market") or "") or None,
+        exchange=str(meta.get("exchange") or "") or None,
+    )
+
+
 def our_holdings_tickers() -> set[str]:
     return portfolio_tickers(include_watchlist=False)
 
@@ -2175,7 +2210,11 @@ def has_company_hint(text: str, ticker: str, company_hints: dict[str, set[str]])
     return any(hint in lower for hint in company_hints.get(str(ticker).upper(), set()))
 
 
-def strong_letter_ticker_evidence(record: dict, company_hints: dict[str, set[str]]) -> bool:
+def strong_letter_ticker_evidence(
+    record: dict,
+    company_hints: dict[str, set[str]],
+    identity_meta: dict[str, dict] | None = None,
+) -> bool:
     ticker = str(record.get("ref") or "").upper()
     text = " ".join(
         str(record.get(key) or "")
@@ -2185,12 +2224,19 @@ def strong_letter_ticker_evidence(record: dict, company_hints: dict[str, set[str
         return record.get("action") in {"add", "trim"}
     if is_letter_boilerplate(text):
         return False
+    if identity_meta is not None and not record_identity_ok(record, identity_meta):
+        return False
     if record.get("action") in {"add", "trim"}:
         return True
     return contains_ticker_token(text, ticker) or has_company_hint(text, ticker, company_hints)
 
 
-def front_record_allowed(record: dict, front_tickers: set[str], company_hints: dict[str, set[str]]) -> bool:
+def front_record_allowed(
+    record: dict,
+    front_tickers: set[str],
+    company_hints: dict[str, set[str]],
+    identity_meta: dict[str, dict] | None = None,
+) -> bool:
     scope = record.get("scope")
     if scope == "portfolio":
         return True
@@ -2199,8 +2245,10 @@ def front_record_allowed(record: dict, front_tickers: set[str], company_hints: d
     ticker = str(record.get("ref") or "").upper()
     if ticker not in front_tickers:
         return False
+    if identity_meta is not None and not record_identity_ok(record, identity_meta):
+        return False
     if record.get("source") == "superinvestor_letter":
-        return strong_letter_ticker_evidence(record, company_hints)
+        return strong_letter_ticker_evidence(record, company_hints, identity_meta)
     return True
 
 
@@ -2208,10 +2256,11 @@ def ticker_insights(
     records: list[dict],
     front_tickers: set[str],
     company_hints: dict[str, set[str]],
+    identity_meta: dict[str, dict] | None = None,
 ) -> dict[str, list[dict]]:
     by_ticker: dict[str, list[dict]] = {}
     for r in records:
-        if not front_record_allowed(r, front_tickers, company_hints):
+        if not front_record_allowed(r, front_tickers, company_hints, identity_meta):
             continue
         tk = str(r.get("ref", "")).upper()
         if not tk or not re.match(r"^[A-Z0-9][A-Z0-9.\-]{0,11}$", tk):
@@ -2242,6 +2291,7 @@ def ticker_discussants(
     letters: list[dict],
     our_tickers: set[str],
     company_hints: dict[str, set[str]],
+    identity_meta: dict[str, dict] | None = None,
 ) -> dict[str, list[dict]]:
     """Per-ticker summary of which funds discuss it (letters only)."""
     by_ticker: dict[str, dict[str, dict]] = {}
@@ -2263,7 +2313,7 @@ def ticker_discussants(
                 "commentary": pos.get("commentary") or "",
                 "thesis": pos.get("thesis") or "",
             }
-            if not strong_letter_ticker_evidence(position_record, company_hints):
+            if not strong_letter_ticker_evidence(position_record, company_hints, identity_meta):
                 continue
             commentary = pos.get("commentary") or pos.get("thesis") or ""
             ch = commentary_hash(commentary)
@@ -2465,10 +2515,11 @@ def events_from_records(
     front_tickers: set[str],
     holdings_tickers: set[str],
     company_hints: dict[str, set[str]],
+    identity_meta: dict[str, dict] | None = None,
 ) -> list[dict]:
     events: list[dict] = []
     for record in records:
-        if not front_record_allowed(record, front_tickers, company_hints):
+        if not front_record_allowed(record, front_tickers, company_hints, identity_meta):
             continue
         source = record.get("source")
         scope = record.get("scope")
@@ -2886,15 +2937,18 @@ def build_record_archive(
     records: list[dict],
     front_tickers: set[str],
     company_hints: dict[str, set[str]],
+    identity_meta: dict[str, dict] | None = None,
 ) -> dict:
     archived_tickers = {
         str(r.get("ref") or "").upper()
         for r in records
         if r.get("scope") == "ticker"
         and valid_ticker(str(r.get("ref") or "").upper())
-        and not front_record_allowed(r, front_tickers, company_hints)
+        and not front_record_allowed(r, front_tickers, company_hints, identity_meta)
     }
-    front_records = [r for r in records if front_record_allowed(r, front_tickers, company_hints)]
+    front_records = [
+        r for r in records if front_record_allowed(r, front_tickers, company_hints, identity_meta)
+    ]
     return {
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "record_count": len(records),
@@ -3010,6 +3064,7 @@ def main() -> int:
     front_tickers = portfolio_tickers(include_watchlist=True)
     holdings_tickers = our_holdings_tickers()
     company_hints = portfolio_company_hints(include_watchlist=True)
+    identity_meta = portfolio_identity_meta(include_watchlist=True)
     sumzero_doc = load_json(SUMZERO_INDEX)
     records.extend(from_sumzero_ideas(sumzero_doc if isinstance(sumzero_doc, dict) else None, front_tickers))
     records.extend(from_insider_transactions(front_tickers, holdings_tickers=holdings_tickers))
@@ -3045,10 +3100,14 @@ def main() -> int:
             pass
     terminalvalue_doc = load_json(TERMINALVALUE_SOURCES)
 
-    raw_events = events_from_records(records, front_tickers, holdings_tickers, company_hints)
+    raw_events = events_from_records(
+        records, front_tickers, holdings_tickers, company_hints, identity_meta
+    )
     scan_date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     events, event_triage_summary = finalize_events(raw_events, scan_date)
-    archive_meta = write_record_archive(build_record_archive(records, front_tickers, company_hints))
+    archive_meta = write_record_archive(
+        build_record_archive(records, front_tickers, company_hints, identity_meta)
+    )
     if preserve and prior:
         preserved_fields = preserved_letter_payload_fields(prior)
         letter_count_value = int(preserved_fields.get("letter_count") or prior_letter_count(prior))
@@ -3126,8 +3185,12 @@ def main() -> int:
                 downstream_duplicates_suppressed if not preserve else 0
             ),
         },
-        "ticker_discussants": ticker_discussants(letters, front_tickers, company_hints),
-        "by_ticker": ticker_insights(records, front_tickers, company_hints),
+        "ticker_discussants": ticker_discussants(
+            letters, front_tickers, company_hints, identity_meta
+        ),
+        "by_ticker": ticker_insights(
+            records, front_tickers, company_hints, identity_meta
+        ),
     }
     if preserved_fields:
         payload.update(preserved_fields)

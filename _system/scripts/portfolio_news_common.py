@@ -626,6 +626,8 @@ def match_holding(
     polygon_tickers: Iterable[str] | None = None,
 ) -> tuple[str | None, str | None]:
     """Return (ticker, match_tier) or (None, None)."""
+    from ticker_identity import identity_match_ok  # local import keeps news deps light
+
     blob = text or ""
     url_l = (url or "").lower()
     poly = {_norm_ticker(t) for t in (polygon_tickers or [])}
@@ -636,6 +638,15 @@ def match_holding(
 
     for ticker, cfg in configs.items():
         if cfg.exclude_patterns and any(p.search(blob) for p in cfg.exclude_patterns):
+            continue
+        # Drop foreign-exchange / wrong-issuer collisions (ASX: MSB vs NYSE MSB).
+        if not identity_match_ok(
+            blob,
+            ticker,
+            company=cfg.company,
+            market=cfg.market,
+            exchange=cfg.exchange,
+        ):
             continue
 
         best_score = 0

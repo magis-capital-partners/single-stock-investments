@@ -122,7 +122,10 @@ def load_security_master() -> lm.SecurityMaster:
         # fall back to an empty master; matcher then only emits nothing useful,
         # so make sure build_security_master.py ran first.
         data = {}
-    return lm.SecurityMaster.from_dict(data)
+    registry = load_json(ROOT / "_system" / "portfolio" / "registry.json")
+    if not isinstance(registry, dict):
+        registry = None
+    return lm.SecurityMaster.from_dict(data, registry=registry)
 
 
 def theme_stance(text: str, keywords: list[str]) -> str:

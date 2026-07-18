@@ -32,6 +32,7 @@ from macro_regime_panel import (  # noqa: E402
 )
 from insider_materiality import SIGNAL_THRESHOLD as INSIDER_SIGNAL_THRESHOLD  # noqa: E402
 from event_materiality import materiality_score as event_materiality_score  # noqa: E402
+from ticker_identity import identity_match_ok  # noqa: E402
 
 DATA_DIR = ROOT / "dashboard" / "data"
 OUTPUT = DATA_DIR / "dashboard_data.json"
@@ -1463,11 +1464,56 @@ def build_dossier_view(dossier: dict | None, insight_events: list[dict]) -> dict
     }
 
 
+_REGISTRY_IDENTITY_CACHE: dict[str, dict] | None = None
+
+
+def _holding_identity(ticker: str) -> dict:
+    global _REGISTRY_IDENTITY_CACHE
+    if _REGISTRY_IDENTITY_CACHE is None:
+        reg = _load_json(REGISTRY_PATH) or {}
+        cache: dict[str, dict] = {}
+        for bucket in ("holdings", "watchlist"):
+            for key, meta in ((reg.get(bucket) or {}) or {}).items():
+                cache[str(key).upper()] = {
+                    "company": (meta or {}).get("company"),
+                    "market": (meta or {}).get("market"),
+                    "exchange": (meta or {}).get("exchange"),
+                }
+        _REGISTRY_IDENTITY_CACHE = cache
+    return dict(_REGISTRY_IDENTITY_CACHE.get(str(ticker).upper()) or {})
+
+
+def _insight_text(row: dict) -> str:
+    return " ".join(
+        str(row.get(key) or "")
+        for key in ("title", "claim", "summary", "commentary", "thesis")
+    ).strip()
+
+
+def filter_identity_rows(ticker: str, rows: list[dict]) -> list[dict]:
+    """Drop cross-exchange / wrong-issuer attachments for a book ticker."""
+    ident = _holding_identity(ticker)
+    out: list[dict] = []
+    for row in rows or []:
+        text = _insight_text(row)
+        if text and not identity_match_ok(
+            text,
+            ticker,
+            company=str(ident.get("company") or "") or None,
+            market=str(ident.get("market") or "") or None,
+            exchange=str(ident.get("exchange") or "") or None,
+        ):
+            continue
+        out.append(row)
+    return out
+
+
 def load_insights_for_ticker(ticker: str, insights_doc: dict | None) -> list[dict]:
     if not insights_doc:
         return []
     by_ticker = insights_doc.get("by_ticker") or {}
-    return by_ticker.get(ticker.upper()) or by_ticker.get(ticker) or []
+    rows = by_ticker.get(ticker.upper()) or by_ticker.get(ticker) or []
+    return filter_identity_rows(ticker, rows)
 
 
 SOURCE_PRIORITY = {
@@ -1496,7 +1542,9 @@ def load_letter_discussants(ticker: str, insights_doc: dict | None) -> list[dict
     if not insights_doc:
         return []
     by_ticker = insights_doc.get("ticker_discussants") or {}
-    rows = by_ticker.get(ticker.upper()) or by_ticker.get(ticker) or []
+    rows = filter_identity_rows(
+        ticker, by_ticker.get(ticker.upper()) or by_ticker.get(ticker) or []
+    )
     out: list[dict] = []
     for r in rows:
         row = dict(r)
@@ -1529,7 +1577,9 @@ def load_events_for_ticker(ticker: str, insights_doc: dict | None) -> list[dict]
     if not insights_doc:
         return []
     by_ticker = insights_doc.get("events_by_ticker") or {}
-    rows = by_ticker.get(ticker.upper()) or by_ticker.get(ticker) or []
+    rows = filter_identity_rows(
+        ticker, by_ticker.get(ticker.upper()) or by_ticker.get(ticker) or []
+    )
     out: list[dict] = []
     for r in rows:
         row = dict(r)
@@ -2095,6 +2145,23 @@ def compact_research_memory(ticker: str, memory_doc: dict | None) -> dict | None
     mem = by_ticker.get(ticker.upper()) or by_ticker.get(ticker)
     if not mem:
         return None
+
+    def _claims(key: str, limit: int) -> list[dict]:
+        rows = []
+        for claim in mem.get(key) or []:
+            text = str(
+                claim.get("claim")
+                or claim.get("summary")
+                or claim.get("title")
+                or ""
+            )
+            wrapped = {"claim": text, "title": claim.get("title"), "summary": claim.get("summary")}
+            if filter_identity_rows(ticker, [wrapped]):
+                rows.append(claim)
+            if len(rows) >= limit:
+                break
+        return rows
+
     return {
         "claim_count": mem.get("claim_count", 0),
         "evidence_count": mem.get("evidence_count", 0),
@@ -2104,10 +2171,10 @@ def compact_research_memory(ticker: str, memory_doc: dict | None) -> dict | None
         "disconfirming_count": mem.get("disconfirming_count", 0),
         "mixed_count": mem.get("mixed_count", 0),
         "neutral_count": mem.get("neutral_count", 0),
-        "top_claims": (mem.get("top_claims") or [])[:4],
-        "inflection_claims": (mem.get("inflection_claims") or [])[:3],
-        "risk_claims": (mem.get("risk_claims") or [])[:3],
-        "ownership_claims": (mem.get("ownership_claims") or [])[:3],
+        "top_claims": _claims("top_claims", 4),
+        "inflection_claims": _claims("inflection_claims", 3),
+        "risk_claims": _claims("risk_claims", 3),
+        "ownership_claims": _claims("ownership_claims", 3),
         "biotech": mem.get("biotech") or {},
     }
 
