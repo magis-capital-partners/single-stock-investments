@@ -1,0 +1,1029 @@
+{
+  "ticker": "CLSK",
+  "as_of": "2026-07-17",
+  "method": "full",
+  "irr_method": "full",
+  "valuation_mode": "optionality",
+  "lawrence_bucket": "other",
+  "payoff_lens": "operating",
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "unproven",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating",
+    "predictive_attribute": "complexity_discount"
+  },
+  "inputs": {
+    "price": 13.03,
+    "price_source": "Yahoo CLSK close 2026-07-17",
+    "price_as_of": "2026-07-17",
+    "shares_millions": 317.8,
+    "shares_source": "FY2025 weighted average diluted shares 317,761,220 (10-K FY2025)",
+    "fcf_per_share": 0.99,
+    "fcf_source": "FY2025 operating cash flow $461.0M minus capital spending on productive assets $144.7M = $316.3M owner cash; divided by 317.8M FY2025 diluted shares (10-K FY2025 cash flow statement)",
+    "revenue_fy2025_m": 766.3,
+    "revenue_fy2025_source": "FY2025 digital currency mining revenue $766.3M (+102% YoY vs $379.0M) per 10-K FY2025",
+    "revenue_h1_fy2026_m": 317.6,
+    "revenue_h1_source": "H1 FY2026 digital currency mining revenue $317.6M (-7.7% YoY vs $344.0M) per 10-Q Q2 FY2026",
+    "cash_m": 43.0,
+    "cash_source": "Cash and cash equivalents $43.0M at September 30, 2025 (10-K FY2025)",
+    "long_term_debt_m": 1788.2,
+    "debt_source": "Long-term debt $1,788.2M at March 31, 2026 excluding current portion $2.5M (10-Q Q2 FY2026)",
+    "stockholders_equity_m": 986.2,
+    "equity_source": "Stockholders equity $986.2M at March 31, 2026 vs $2,175.1M at September 30, 2025 (10-Q Q2 FY2026)",
+    "hashrate_eh_s": 45.6,
+    "hashrate_source": "CleanSpark average hashrate 45.6 EH/s, 4.3% of global network at September 30, 2025 (10-K FY2025 MD&A)",
+    "normalization_note": "Lawrence base uses FY2025 filing-based owner cash (operating cash flow minus capital spending), excluding bitcoin fair-value mark gains/losses in net income. Q2 FY2026 GAAP operating loss reflects $471M YTD fair-value losses on bitcoin, not normalized mining margin."
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": -0.08,
+      "growth_y6_10": -0.03,
+      "exit_pfcf_y10": 8,
+      "notes": "Hashprice compression, rising network difficulty, continued convert dilution; AI pivot delayed"
+    },
+    "base": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 10,
+      "notes": "Flat-to-modest owner cash on 45+ EH/s fleet; treasury/DAM supplements ops; HPC option not in Lawrence FCF path"
+    },
+    "bull": {
+      "growth_y1_5": 0.12,
+      "growth_y6_10": 0.06,
+      "exit_pfcf_y10": 14,
+      "notes": "BTC price recovery + hash-share hold + partial AI hosting cash flow; dilution contained"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "nav_floor",
+      "evidence": "Bitcoin held at fair value under ASC 350-60; fleet PP&E at depreciated cost while power sites have strategic value (10-K)"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant assets?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "~95,000 miners not yet in service; 271-acre Texas campus + 285 MW power agreements signed October 2025 (10-K Item 1)"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Pre-revenue AI/HPC build-out; GAAP losses when BTC marks turn negative (10-Q Q2 FY2026)"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF path?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "Cancelable miner purchase commitments; Submer AI data center MOU October 2025 (10-K)"
+    },
+    {
+      "q": 5,
+      "question": "Private / illiquid stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No material hidden stakes (10-K)"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "none"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Digital Asset Management (Spot+) premiums in treasury; majority of BTC still sold for working capital (10-K MD&A)"
+    }
+  ],
+  "btc_overlay": {
+    "as_of": "2026-07-17",
+    "crypto_exposure": "miner",
+    "status": "partial",
+    "disclaimer": "Context only. Crypto and mining metrics inform stance and overlays; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "in_base_irr": false,
+    "themes": [
+      {
+        "theme_id": "btc_network_economics",
+        "label": "Bitcoin network and mining economics",
+        "indicators": [
+          {
+            "id": "btc_spot_usd",
+            "label": "Bitcoin spot (USD)",
+            "latest": 63885.91015625,
+            "as_of": "2026-07-17",
+            "yoy_pct": -46.4,
+            "direction": "down",
+            "source": "yahoo:BTC-USD",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "btc_hash_rate_eh",
+            "label": "Network hash rate (EH/s, 7d avg)",
+            "latest": 806.9019970486307,
+            "as_of": "2026-06-08",
+            "yoy_pct": null,
+            "direction": "flat",
+            "source": "mempool.space:hashrate",
+            "stale": true,
+            "in_base_irr": false
+          },
+          {
+            "id": "btc_difficulty",
+            "label": "Mining difficulty (index)",
+            "latest": 127170500429035.2,
+            "as_of": "2026-07-17",
+            "yoy_pct": null,
+            "direction": "flat",
+            "source": "mempool.space:difficulty",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "btc_avg_fee_per_block_usd",
+            "label": "Avg transaction fees per block (USD)",
+            "latest": 753.36,
+            "as_of": "2026-07-17",
+            "yoy_pct": null,
+            "direction": "flat",
+            "source": "mempool.space:fees",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "btc_hashprice_usd_ph_day",
+            "label": "Hashprice (USD/PH/day)",
+            "latest": 0.035763,
+            "as_of": "2026-07-17",
+            "yoy_pct": null,
+            "direction": "flat",
+            "source": "computed:hashprice",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "btc_breakeven_power_30jth",
+            "label": "Breakeven power cost at 30 J/TH ($/kWh)",
+            "latest": 0.0497,
+            "as_of": "2026-07-17",
+            "yoy_pct": null,
+            "direction": "flat",
+            "source": "computed:breakeven_30.0jth",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ],
+    "mining_economics_context": {
+      "hash_rate_eh": 806.9019970486307,
+      "difficulty": 127170500429035.2,
+      "avg_fee_per_block_usd": 753.36,
+      "hashprice_usd_ph_day": 0.035763,
+      "breakeven_power_usd_kwh_30jth": 0.0497,
+      "source": "mempool.space + computed"
+    },
+    "in_model": {},
+    "not_in_model_requires_refresh": [
+      "live_btc_spot_in_price_input",
+      "hashprice_vs_fleet_breakeven",
+      "post_halving_subsidy_schedule"
+    ]
+  },
+  "optionality_gate": {
+    "primary_metric": "lawrence_base",
+    "primary_label": "7yr IRR",
+    "notes": "Lawrence consolidated owner cash excludes BTC fair-value marks; overlay sizes AI campus and undeployed hash capacity separately.",
+    "primary_return_pct": 7.5
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": true,
+      "floor_pass": false,
+      "valuation_mode": "optionality"
+    },
+    "override_reason": null
+  },
+  "total_return_panel": {
+    "schema_version": "3.0",
+    "ticker": "CLSK",
+    "as_of": "2026-07-17",
+    "status": "partial",
+    "error": "Vendor events are discovery evidence; primary-source completeness has not been established.",
+    "price_source": "yahoo:CLSK",
+    "currency": "USD",
+    "return_currency": "USD",
+    "fx_basis": "listing_currency_nominal",
+    "history_start": "2016-11-16",
+    "history_end": "2026-07-17",
+    "price_points": 2428,
+    "price_interval": "1d",
+    "history_basis": "earliest_available_vendor_trading_history",
+    "chart_scale": "logarithmic",
+    "chart_y_axis": "cumulative_return_pct",
+    "chart_series": [
+      "total_return",
+      "price_only"
+    ],
+    "return_contract": "split-adjusted close excluding dividends; event amounts normalized for later splits; cash reinvested at ex-date close; pre-tax nominal",
+    "coverage": {
+      "status": "vendor_only",
+      "start": null,
+      "end": null,
+      "note": "Vendor events are discovery evidence; primary-source completeness has not been established.",
+      "ledger_path": null
+    },
+    "event_count": 1,
+    "event_counts": {
+      "split": 1
+    },
+    "cash_distributions_on_initial_share_path": 0,
+    "distribution_contribution_by_type": {},
+    "cumulative_distributions_per_share": 0,
+    "start_price": 34.9,
+    "end_price": 13.03,
+    "price_index_end": 37.34,
+    "total_return_index_end": 37.34,
+    "cumulative_price_return_pct": -62.66,
+    "cumulative_total_return_pct": -62.66,
+    "price_only_annualized_pct": -9.69,
+    "total_return_annualized_pct": -9.69,
+    "market_cap_m": null,
+    "shares_outstanding": null,
+    "price_for_market_cap": 13.03,
+    "chart": "CLSK/research/charts/total_return_2026-07-17.svg",
+    "panel_json": "CLSK/research/total_return_panel.json"
+  },
+  "context_overlay": {
+    "as_of": "2026-07-17",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": 0.95,
+            "as_of": "2026-07-17",
+            "yoy_pct": 196.9,
+            "direction": "up",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.540999889373779,
+            "as_of": "2026-07-17",
+            "yoy_pct": 1.7,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.2729997634887695,
+            "as_of": "2026-07-17",
+            "yoy_pct": 6.7,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 100.75499725341797,
+            "as_of": "2026-07-17",
+            "yoy_pct": 2.1,
+            "direction": "up",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 18.770000457763672,
+            "as_of": "2026-07-17",
+            "yoy_pct": 13.6,
+            "direction": "up",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": 1.46,
+            "as_of": "2026-07-17",
+            "yoy_pct": 22.7,
+            "direction": "up",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 11.68,
+            "as_of": "2026-07-17",
+            "yoy_pct": 32.3,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "insider_signal": {
+    "as_of": "2026-07-17",
+    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
+    "in_base_irr": false,
+    "window_days": 365,
+    "ics": 0.0,
+    "band": "negligible",
+    "bull_case_support": "none",
+    "scenario_confidence": {
+      "priors": {
+        "bear": 0.2,
+        "base": 0.55,
+        "bull": 0.25
+      },
+      "tilted": {
+        "bear": 0.28,
+        "base": 0.47,
+        "bull": 0.25
+      },
+      "bull_delta": 0.0,
+      "bear_delta": 0.08,
+      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
+    },
+    "factors": {
+      "buy_score": 0.0,
+      "sell_score": -1.0,
+      "cluster_bonus": 0.0,
+      "net_buy_usd": 0,
+      "net_sell_usd": 7208808.13,
+      "price_today": 13.03
+    },
+    "top_buys": [],
+    "top_sells": [
+      {
+        "insider": "Schultz S. Matthew",
+        "date": "2026-05-14",
+        "shares": 9031,
+        "price": 13.9807,
+        "value_usd": 126259.7,
+        "is_10b5_1": false,
+        "contrib": -0.169
+      },
+      {
+        "insider": "Vecchiarelli Gary Anthony",
+        "date": "2026-05-14",
+        "shares": 632,
+        "price": 13.9807,
+        "value_usd": 8835.8,
+        "is_10b5_1": false,
+        "contrib": -0.132
+      },
+      {
+        "insider": "Schultz S. Matthew",
+        "date": "2026-02-18",
+        "shares": 95095,
+        "price": 9.2534,
+        "value_usd": 879952.07,
+        "is_10b5_1": false,
+        "contrib": -0.129
+      },
+      {
+        "insider": "Schultz S. Matthew",
+        "date": "2026-02-18",
+        "shares": 9031,
+        "price": 9.2332,
+        "value_usd": 83385.03,
+        "is_10b5_1": false,
+        "contrib": -0.129
+      },
+      {
+        "insider": "Schultz S. Matthew",
+        "date": "2025-12-05",
+        "shares": 9031,
+        "price": 14.0729,
+        "value_usd": 127092.36,
+        "is_10b5_1": false,
+        "contrib": -0.129
+      }
+    ],
+    "narrative_hooks": [],
+    "transaction_count": 80
+  },
+  "lens_consensus": {
+    "as_of": "2026-07-17",
+    "shared_inputs_ref": "valuation.json@2026-07-17",
+    "valuation_richness": 0.0,
+    "blended_return_pct": 10.6,
+    "band_pct": [
+      10.6,
+      10.6
+    ],
+    "weighted_median_pct": 10.6,
+    "median_mean_flag": false,
+    "stance": "pass",
+    "agreement_pct": 100,
+    "dissent_count": 0,
+    "lawrence_divergence": true,
+    "top_dissents": [],
+    "contributor_count": 1,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -4.7
+    },
+    "base": {
+      "return_pct": 7.5
+    },
+    "bull": {
+      "return_pct": 19.7
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -4.7
+    },
+    "base": {
+      "return_pct": 7.5
+    },
+    "bull": {
+      "return_pct": 19.7
+    }
+  },
+  "implied_return": {
+    "base_pct": 12.52,
+    "label": "7yr IRR (total synthesis)",
+    "display": "12.52% (total synthesis)",
+    "lawrence_stance_gate_pct": 7.5,
+    "falsifier_adjusted_pct": 7.5,
+    "synthesis_pct": 12.52
+  },
+  "overlay_results": [],
+  "component_valuation_results": {
+    "status": "inferred_minimal",
+    "decision_rule": "Operating-only fallback. Add an explicit component_valuation schedule before drawing asset-level conclusions.",
+    "all_material_components_identified": false,
+    "additive_components": [
+      {
+        "id": "operating_business_fallback",
+        "label": "Operating business (fallback)",
+        "category": "operating_business",
+        "treatment": "additive",
+        "method": "owner_cash_dcf",
+        "evidence_tier": "model_input",
+        "evidence": "inputs.fcf_per_share and scenarios.base",
+        "low_per_share": 10.41,
+        "base_per_share": 11.48,
+        "high_per_share": 12.71
+      }
+    ],
+    "embedded_components": [],
+    "total_equity_value_per_share": {
+      "low": 10.41,
+      "base": 11.48,
+      "high": 12.71
+    },
+    "material_component_count": 1,
+    "additive_component_count": 1,
+    "embedded_component_count": 0,
+    "market_price_per_share": 13.03,
+    "upside_downside_pct": {
+      "low": -20.1,
+      "base": -11.9,
+      "high": -2.5
+    }
+  },
+  "economic_value_analysis": {
+    "schema_version": "1.0",
+    "status": "evidence_blocked",
+    "trigger": {
+      "required": true,
+      "reasons": [
+        "optionality_or_nav_overlay"
+      ],
+      "policy": "A complete economic-value analysis is required when any trigger fires; otherwise it is recommended."
+    },
+    "method": "economic_claim_to_risked_present_value",
+    "economic_claim": {},
+    "gaap_role": null,
+    "accounting_reference": null,
+    "comparable_hierarchy": [
+      "issuer_arm_length_transaction",
+      "same_asset_transaction",
+      "public_peer",
+      "replacement_cost",
+      "approved_external_analysis"
+    ],
+    "gross_comparable_nav_per_share": null,
+    "risked_present_value_per_share": {
+      "low": 10.41,
+      "base": 11.48,
+      "high": 12.71
+    },
+    "component_groups": [
+      {
+        "id": "operating_business_fallback",
+        "label": "Operating business (fallback)",
+        "component_ids": [
+          "operating_business_fallback"
+        ],
+        "economic_claim": "Operating business (fallback)",
+        "valuation_basis": "owner_cash_dcf",
+        "adjustments": "Risk and timing are reflected in the low/base/high range.",
+        "overlap_control": "Unique overlap key operating_business_fallback.",
+        "risked_present_value_per_share": {
+          "low": 10.41,
+          "base": 11.48,
+          "high": 12.71
+        }
+      }
+    ],
+    "valuation_proof": [
+      {
+        "component_id": "operating_business_fallback",
+        "economic_claim": "Operating business (fallback)",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "owner_cash_dcf",
+        "evidence_tier": "model_input",
+        "evidence": "inputs.fcf_per_share and scenarios.base",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Risk and timing are reflected in the low/base/high range.",
+        "range_per_share": {
+          "low": 10.41,
+          "base": 11.48,
+          "high": 12.71
+        },
+        "treatment": "additive",
+        "overlap_key": "operating_business_fallback",
+        "overlap_control": "Unique overlap key operating_business_fallback.",
+        "falsifier": "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods.",
+        "risk_and_timing": null
+      }
+    ],
+    "wisdom_applied": [],
+    "limitations": [],
+    "complete_component_coverage": true,
+    "validation_errors": [
+      "complete component schedule required",
+      "economic_claim.description required",
+      "economic_claim.enterprise_to_equity_reconciliation required",
+      "economic_claim.unit_count required",
+      "economic_claim.unit_label required",
+      "economic_claim.unit_source required",
+      "economic_value.schema_version 1.0 required",
+      "gaap_role required"
+    ],
+    "registry_version": "1.0"
+  },
+  "valuation_method_route": {
+    "schema_version": "1.0",
+    "status": "routed",
+    "profile_id": "scarce_asset_optionality",
+    "label": "Scarce assets, royalties, and optionality",
+    "score": 6.0,
+    "reasons": [
+      "archetype=optionality"
+    ],
+    "primary_methods": [
+      "component_owner_cash_and_unit_nav"
+    ],
+    "corroborating_methods": [
+      "comparable_transactions",
+      "replacement_cost_or_reverse_nav"
+    ],
+    "primary_personas": [
+      "hk",
+      "stahl"
+    ],
+    "cross_check_personas": [
+      "klarman_asset_value",
+      "marks_credit_cycle"
+    ],
+    "silent_personas": [
+      "buffett_weschler",
+      "greenblatt",
+      "hohn",
+      "marathon_capital_cycle",
+      "munger",
+      "pabrai"
+    ],
+    "required_evidence": [
+      "legal economic claim",
+      "non-overlapping physical inventory",
+      "unit economics",
+      "realization timing",
+      "remaining owner capital"
+    ],
+    "failure_modes": [
+      "gross asset value mistaken for shareholder value",
+      "operating cash flow and NAV counted twice",
+      "remote options treated as contracted cash"
+    ],
+    "secondary_profiles": [
+      {
+        "profile_id": "quality_reinvestment",
+        "score": 3.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dcf, owner_cash"
+        ]
+      },
+      {
+        "profile_id": "predictable_cash_flow",
+        "score": 2.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=owner_cash"
+        ]
+      }
+    ],
+    "scorecard": {
+      "scarce_asset_optionality": {
+        "score": 6.0,
+        "reasons": [
+          "archetype=optionality"
+        ]
+      },
+      "quality_reinvestment": {
+        "score": 3.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dcf, owner_cash"
+        ]
+      },
+      "capital_cycle": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
+      },
+      "credit_and_normalized_returns": {
+        "score": 0.0,
+        "reasons": []
+      },
+      "catalyst_asset_value": {
+        "score": 0.0,
+        "reasons": []
+      },
+      "predictable_cash_flow": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=owner_cash"
+        ]
+      },
+      "binary_milestone": {
+        "score": 0.0,
+        "reasons": []
+      }
+    },
+    "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+  },
+  "universal_valuation_contract": {
+    "schema_version": "1.0",
+    "status": "evidence_blocked",
+    "ticker": "CLSK",
+    "as_of": "2026-07-17",
+    "economic_ownership_map": [
+      {
+        "component_id": "operating_business_fallback",
+        "label": "Operating business (fallback)",
+        "category": "operating_business",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Operating business (fallback)",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "current_operating_contribution": {
+          "starting_revenue_m": null,
+          "base_value_per_share": 11.48
+        },
+        "growth_driver": null,
+        "required_reinvestment": {
+          "model_type": null,
+          "base_incremental_after_tax_roic": null,
+          "base_remaining_cost_m": null,
+          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
+        },
+        "method": "owner_cash_dcf",
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 10.41,
+          "base": 11.48,
+          "high": 12.71
+        },
+        "evidence_tier": "model_input",
+        "evidence_level": "analyst_estimated",
+        "evidence": "inputs.fcf_per_share and scenarios.base",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Risk and timing are reflected in the low/base/high range.",
+        "falsifier": "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods.",
+        "overlap_key": "operating_business_fallback",
+        "assumption_type": "estimate"
+      }
+    ],
+    "component_coverage": {
+      "all_material_components_identified": false,
+      "material_component_count": 1,
+      "additive_component_count": 1,
+      "embedded_component_count": 0,
+      "unvalued_component_count": 1,
+      "double_counting_flags": []
+    },
+    "input_classification": {
+      "facts": [],
+      "estimates": [
+        {
+          "component_id": "operating_business_fallback",
+          "label": "Operating business (fallback)",
+          "kind": "estimate",
+          "evidence_tier": "model_input",
+          "evidence": "inputs.fcf_per_share and scenarios.base",
+          "method": "owner_cash_dcf"
+        }
+      ],
+      "judgments": []
+    },
+    "method_route": {
+      "schema_version": "1.0",
+      "status": "routed",
+      "profile_id": "scarce_asset_optionality",
+      "label": "Scarce assets, royalties, and optionality",
+      "score": 6.0,
+      "reasons": [
+        "archetype=optionality"
+      ],
+      "primary_methods": [
+        "component_owner_cash_and_unit_nav"
+      ],
+      "corroborating_methods": [
+        "comparable_transactions",
+        "replacement_cost_or_reverse_nav"
+      ],
+      "primary_personas": [
+        "hk",
+        "stahl"
+      ],
+      "cross_check_personas": [
+        "klarman_asset_value",
+        "marks_credit_cycle"
+      ],
+      "silent_personas": [
+        "buffett_weschler",
+        "greenblatt",
+        "hohn",
+        "marathon_capital_cycle",
+        "munger",
+        "pabrai"
+      ],
+      "required_evidence": [
+        "legal economic claim",
+        "non-overlapping physical inventory",
+        "unit economics",
+        "realization timing",
+        "remaining owner capital"
+      ],
+      "failure_modes": [
+        "gross asset value mistaken for shareholder value",
+        "operating cash flow and NAV counted twice",
+        "remote options treated as contracted cash"
+      ],
+      "secondary_profiles": [
+        {
+          "profile_id": "quality_reinvestment",
+          "score": 3.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=dcf, owner_cash"
+          ]
+        },
+        {
+          "profile_id": "predictable_cash_flow",
+          "score": 2.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=owner_cash"
+          ]
+        }
+      ],
+      "scorecard": {
+        "scarce_asset_optionality": {
+          "score": 6.0,
+          "reasons": [
+            "archetype=optionality"
+          ]
+        },
+        "quality_reinvestment": {
+          "score": 3.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=dcf, owner_cash"
+          ]
+        },
+        "capital_cycle": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=operating_business"
+          ]
+        },
+        "credit_and_normalized_returns": {
+          "score": 0.0,
+          "reasons": []
+        },
+        "catalyst_asset_value": {
+          "score": 0.0,
+          "reasons": []
+        },
+        "predictable_cash_flow": {
+          "score": 2.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=owner_cash"
+          ]
+        },
+        "binary_milestone": {
+          "score": 0.0,
+          "reasons": []
+        }
+      },
+      "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+    },
+    "market": {
+      "price_per_share": 13.03,
+      "fully_diluted_shares": null,
+      "market_cap_m": null,
+      "enterprise_value_m": null
+    },
+    "valuation": {
+      "value_per_share": {
+        "low": 10.41,
+        "base": 11.48,
+        "high": 12.71
+      },
+      "probability_weighted_value_per_share": 11.48,
+      "expected_distributions_per_share": 0.0,
+      "annualized_return_at_price_pct": {
+        "low": -3.16,
+        "base": -1.79,
+        "high": -0.35
+      },
+      "downside_to_low_pct": -20.11,
+      "horizon_years": 7
+    },
+    "scenario_contract": {
+      "rule": "Cases must change causal operating, capital, probability, timing, or financing drivers\u2014not only the terminal multiple.",
+      "top_value_drivers": [
+        {
+          "component_id": "operating_business_fallback",
+          "label": "Operating business (fallback)",
+          "base_per_share": 11.48,
+          "range_width_per_share": 2.3,
+          "scenario_assumptions": null
+        }
+      ],
+      "reverse_expectations": null
+    },
+    "evidence": {
+      "unresolved_count": 9,
+      "blockers": [
+        "A complete, explicit ownership/component schedule has not been supplied.",
+        "complete component schedule required",
+        "economic_claim.description required",
+        "economic_claim.enterprise_to_equity_reconciliation required",
+        "economic_claim.unit_count required",
+        "economic_claim.unit_label required",
+        "economic_claim.unit_source required",
+        "economic_value.schema_version 1.0 required",
+        "gaap_role required"
+      ],
+      "validation_errors": [
+        "complete component schedule required",
+        "economic_claim.description required",
+        "economic_claim.enterprise_to_equity_reconciliation required",
+        "economic_claim.unit_count required",
+        "economic_claim.unit_label required",
+        "economic_claim.unit_source required",
+        "economic_value.schema_version 1.0 required",
+        "gaap_role required"
+      ]
+    },
+    "monitoring": {
+      "falsifiers": [
+        "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods."
+      ],
+      "required_refresh_triggers": [
+        "new filing or material operating update",
+        "capital-structure change",
+        "material price move",
+        "component milestone or falsifier"
+      ]
+    },
+    "decision_rule": "No security is decision-grade until every material economic claim is valued exactly once and every material evidence blocker is resolved."
+  },
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": -4.7,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 19.7,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 12.52,
+    "qualitative_pp": 0,
+    "total_synthesis_pct": 12.52,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}
