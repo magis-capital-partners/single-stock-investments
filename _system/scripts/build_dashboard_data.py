@@ -2394,7 +2394,11 @@ def build() -> dict:
         for t in tickers
     ]
     prior_by_ticker = load_prior_dashboard_rows()
-    if workspace_is_sparse(tickers) and prior_by_ticker:
+    preserve_sparse_infra = (
+        workspace_is_sparse(tickers)
+        or os.environ.get("DASHBOARD_PRESERVE_DOCUMENT_REGISTRY") == "1"
+    )
+    if preserve_sparse_infra and prior_by_ticker:
         restored = preserve_infra_from_prior(rows, prior_by_ticker)
         if restored:
             print(

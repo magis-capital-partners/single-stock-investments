@@ -3,12 +3,13 @@ from __future__ import annotations
 
 import sys
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 
-from fund_identity import consolidate_letter_funds, identity_core  # noqa: E402
+from fund_identity import consolidate_letter_funds, consolidate_letter_funds_stable, identity_core  # noqa: E402
 
 
 def letter(fund_id: str, fund: str, quarter: str) -> dict:
@@ -16,6 +17,26 @@ def letter(fund_id: str, fund: str, quarter: str) -> dict:
 
 
 class FundIdentityTests(unittest.TestCase):
+    def test_bounded_fixed_point_keeps_unique_result(self):
+        rows = [
+            {"fund_id": "jpmorgan-asset", "fund": "JPMorgan Asset", "quarter": "2020Q1"},
+            {"fund_id": "jpmorgan-asset", "fund": "JPMorgan Asset", "quarter": "2020Q2"},
+            {"fund_id": "jpmorgan-asset-guide", "fund": "JPMorgan Asset Guide", "quarter": "2020Q1"},
+            {"fund_id": "jpmorgan-asset-guide", "fund": "JPMorgan Asset Guide", "quarter": "2020Q2"},
+            {"fund_id": "jpmorgan-asset-guide-to", "fund": "JPMorgan Asset Guide To", "quarter": "2020Q3"},
+        ]
+        bounded_audit = {
+            "canonical_profiles": 3,
+            "profiles_consolidated": 2,
+            "residual_redundancy_groups": 0,
+            "idempotent": False,
+        }
+        with patch("fund_identity.consolidate_letter_funds", return_value=(rows, bounded_audit)):
+            merged, audit = consolidate_letter_funds_stable(rows, max_passes=1)
+        self.assertEqual(audit["residual_redundancy_groups"], 0)
+        self.assertTrue(audit.get("convergence_limit_reached"))
+        self.assertEqual(len(merged), len(rows))
+
     def test_period_date_hash_and_ordinal_noise(self) -> None:
         variants = [
             "Breach Inlet 1q18",
