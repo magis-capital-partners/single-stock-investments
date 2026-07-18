@@ -134,6 +134,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-18.
 | CINF | CINF/ | Cincinnati Financial | US | 2026-07-09 | 2026-07-18 | unknown | watch |
 | CKX | CKX/ | CKX Lands, Inc. | US | 2026-07-09 | 2026-07-18 | optionality | watch |
 | CL | CL/ | Colgate-Palmolive | US | 2026-07-09 | 2026-07-18 | unknown | watch |
+| CLSK | CLSK/ | CleanSpark, Inc. | US | 2026-07-17 | 2026-07-18 | optionality | watch |
 | CLX | CLX/ | Clorox | US | 2026-07-09 | 2026-07-18 | unknown | watch |
 | CMCSA | CMCSA/ | Comcast | US | 2026-07-09 | 2026-07-18 | unknown | watch |
 | CME | CME/ | CME Group Inc. | US | 2026-07-09 | 2026-07-18 | unknown | watch |
@@ -654,4 +655,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-18.
 | ZBRA | ZBRA/ | Zebra Technologies | US | 2026-07-10 | 2026-07-18 | unknown | watch |
 | ZTS | ZTS/ | Zoetis | US | 2026-07-10 | 2026-07-18 | unknown | watch |
 
-**646 holdings total.** Registry: `_system/portfolio/registry.json`
+**647 holdings total.** Registry: `_system/portfolio/registry.json`
