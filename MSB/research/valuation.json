@@ -36,7 +36,11 @@
   "legacy_component_valuation_snapshot": {
     "as_of": "2026-07-18",
     "status": "deprecated_unsupported_sensitivity",
-    "value_per_share": {"low": 26.0, "base": 34.0, "high": 57.0},
+    "value_per_share": {
+      "low": 26.0,
+      "base": 34.0,
+      "high": 57.0
+    },
     "rule": "Historical comparison only; excluded from Contract v2 production value."
   },
   "component_valuation": {
@@ -129,19 +133,50 @@
             "output_unit": "USD_per_unit",
             "inputs": [
               {
-                "id": "unallocated_reserve_m", "label": "Unallocated reserve", "kind": "fact",
-                "value": 18.341533, "unit": "USD_m", "locked": true,
-                "source": {"ref": "MSB/investor-documents/sec-edgar/10-Q_20260612_rpt20260430_acc0001104659_26_073470.htm", "locator": "Page 12, Comparison of Unallocated Reserve; April 30, 2026 amount $18,341,533", "as_of": "2026-04-30"}
+                "id": "unallocated_reserve_m",
+                "label": "Unallocated reserve",
+                "kind": "fact",
+                "value": 18.341533,
+                "unit": "USD_m",
+                "locked": true,
+                "source": {
+                  "ref": "MSB/investor-documents/sec-edgar/10-Q_20260612_rpt20260430_acc0001104659_26_073470.htm",
+                  "locator": "Page 12, Comparison of Unallocated Reserve; April 30, 2026 amount $18,341,533",
+                  "as_of": "2026-04-30"
+                }
               },
               {
-                "id": "diluted_units_m", "label": "Units outstanding", "kind": "fact",
-                "value": 13.12001, "unit": "million_units", "locked": true,
-                "source": {"ref": "MSB/investor-documents/sec-edgar/10-K_20260422_rpt20260131_acc0001104659_26_046864.htm", "locator": "Cover page, units outstanding at April 21, 2026", "as_of": "2026-04-21"}
+                "id": "diluted_units_m",
+                "label": "Units outstanding",
+                "kind": "fact",
+                "value": 13.12001,
+                "unit": "million_units",
+                "locked": true,
+                "source": {
+                  "ref": "MSB/investor-documents/sec-edgar/10-K_20260422_rpt20260131_acc0001104659_26_046864.htm",
+                  "locator": "Cover page, units outstanding at April 21, 2026",
+                  "as_of": "2026-04-21"
+                }
               }
             ],
             "assumptions": [],
-            "calculations": [{"id": "reserve_per_unit", "label": "Net trust reserve per unit", "op": "divide", "args": ["unallocated_reserve_m", "diluted_units_m"], "unit": "USD_per_unit"}],
-            "outputs": {"low": "reserve_per_unit", "base": "reserve_per_unit", "high": "reserve_per_unit"}
+            "calculations": [
+              {
+                "id": "reserve_per_unit",
+                "label": "Net trust reserve per unit",
+                "op": "divide",
+                "args": [
+                  "unallocated_reserve_m",
+                  "diluted_units_m"
+                ],
+                "unit": "USD_per_unit"
+              }
+            ],
+            "outputs": {
+              "low": "reserve_per_unit",
+              "base": "reserve_per_unit",
+              "high": "reserve_per_unit"
+            }
           },
           "falsifier": "Material contingent legal costs or other senior liabilities consume the unallocated reserve."
         }
@@ -362,11 +397,18 @@
               "id": "reserve_per_unit",
               "label": "Net trust reserve per unit",
               "op": "divide",
-              "args": ["unallocated_reserve_m", "diluted_units_m"],
+              "args": [
+                "unallocated_reserve_m",
+                "diluted_units_m"
+              ],
               "unit": "USD_per_unit"
             }
           ],
-          "outputs": {"low": "reserve_per_unit", "base": "reserve_per_unit", "high": "reserve_per_unit"}
+          "outputs": {
+            "low": "reserve_per_unit",
+            "base": "reserve_per_unit",
+            "high": "reserve_per_unit"
+          }
         },
         "low_per_share": 1.0,
         "base_per_share": 2.0,
@@ -1244,5 +1286,143 @@
   },
   "human_review": {
     "live_price_confirmed": false
+  },
+  "context_overlay": {
+    "as_of": "2026-07-19",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": 0.95,
+            "as_of": "2026-07-17",
+            "yoy_pct": 196.9,
+            "direction": "up",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.540999889373779,
+            "as_of": "2026-07-17",
+            "yoy_pct": 1.7,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.2729997634887695,
+            "as_of": "2026-07-17",
+            "yoy_pct": 6.7,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 100.75,
+            "as_of": "2026-07-17",
+            "yoy_pct": 2.0,
+            "direction": "up",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 18.770000457763672,
+            "as_of": "2026-07-17",
+            "yoy_pct": 13.6,
+            "direction": "up",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": 1.46,
+            "as_of": "2026-07-17",
+            "yoy_pct": 22.7,
+            "direction": "up",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 11.68,
+            "as_of": "2026-07-17",
+            "yoy_pct": 32.3,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      },
+      {
+        "theme_id": "gold_royalties",
+        "label": "Gold royalty sentiment",
+        "indicators": [
+          {
+            "id": "gold_spot_usd",
+            "label": "Gold spot (USD/oz)",
+            "latest": 368.4100036621094,
+            "as_of": "2026-07-17",
+            "yoy_pct": 19.8,
+            "direction": "up",
+            "good_for": "gold_price",
+            "source": "yahoo:GLD (GLD price proxy when London fix unavailable)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "gdx_etf",
+            "label": "GDX miners ETF (USD)",
+            "latest": 71.31999969482422,
+            "as_of": "2026-07-17",
+            "yoy_pct": 39.2,
+            "direction": "up",
+            "good_for": "royalty_sentiment",
+            "source": "yahoo:GDX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "gdx_gld_ratio",
+            "label": "GDX / GLD ratio (miners vs bullion)",
+            "latest": 0.1936,
+            "as_of": "2026-07-17",
+            "yoy_pct": 16.2,
+            "direction": "up",
+            "good_for": "royalty_multiple_sentiment",
+            "source": "ratio:GDX/GLD",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
   }
 }

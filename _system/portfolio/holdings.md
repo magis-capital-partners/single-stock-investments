@@ -6,14 +6,14 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-19.
 
 | Ticker | Folder | Company | Market | Last download | Last research | Archetype | Stance |
 |--------|--------|---------|--------|---------------|---------------|-----------|--------|
-| 0388.HK | 0388.HK/ | Hong Kong Exchanges and Clearing Ltd | EU | 2026-07-09 | 2026-07-19 | croupier | watch |
-| 3905.T | 3905.T/ | DataSection Co., Ltd. | JP | 2026-07-09 | 2026-07-19 | compounder | watch |
-| 7176.T | 7176.T/ | Simplex Financial Holdings Co., Ltd. | JP | 2026-07-09 | 2026-07-19 | unknown | watch |
+| 0388.HK | 0388.HK/ | Hong Kong Exchanges and Clearing Ltd | EU | 2026-07-19 | 2026-07-19 | croupier | watch |
+| 3905.T | 3905.T/ | DataSection Co., Ltd. | JP | 2026-07-19 | 2026-07-19 | compounder | watch |
+| 7176.T | 7176.T/ | Simplex Financial Holdings Co., Ltd. | JP | 2026-07-19 | 2026-07-19 | unknown | watch |
 | 8697.T | 8697.T/ | Japan Exchange Group | JP | 2026-06-25 | 2026-07-19 | croupier | hold |
-| A | A/ | Agilent Technologies | US | 2026-07-10 | 2026-07-19 | unknown | watch |
-| AAL | AAL/ | AAL | US | — | 2026-07-19 | unknown | watch |
-| AAOI | AAOI/ | Applied Optoelectronics, Inc. | US | 2026-07-17 | 2026-07-19 | unknown | watch |
-| AAPL | AAPL/ | Apple Inc. | US | 2026-07-10 | 2026-07-19 | unknown | watch |
+| A | A/ | Agilent Technologies | US | 2026-07-19 | 2026-07-19 | unknown | watch |
+| AAL | AAL/ | AAL | US | 2026-07-19 | 2026-07-19 | unknown | watch |
+| AAOI | AAOI/ | Applied Optoelectronics, Inc. | US | 2026-07-19 | 2026-07-19 | unknown | watch |
+| AAPL | AAPL/ | Apple Inc. | US | 2026-07-19 | 2026-07-19 | unknown | watch |
 | ABBV | ABBV/ | AbbVie | US | 2026-07-10 | 2026-07-19 | unknown | watch |
 | ABMD.CVR | ABMD.CVR/ | Abiomed CVR (Johnson & Johnson acquisition) | US | 2026-07-09 | 2026-07-19 | unknown | watch |
 | ABNB | ABNB/ | Airbnb | US | 2026-07-10 | 2026-07-19 | unknown | watch |
@@ -71,7 +71,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-19.
 | ARES | ARES/ | Ares Management | US | 2026-07-09 | 2026-07-19 | unknown | watch |
 | ARKK | ARKK/ | ARKK | US | — | 2026-07-19 | unknown | watch |
 | ARM | ARM/ | ARM | US | — | 2026-07-19 | unknown | watch |
-| ASHR | ASHR/ | ASHR | US | 2026-07-19 | 2026-07-19 | unknown | watch |
+| ASHR | ASHR/ | ASHR | US | — | 2026-07-19 | unknown | watch |
 | ASML | ASML/ | ASML | US | — | 2026-07-19 | unknown | watch |
 | ASPN | ASPN/ | Aspen Aerogels, Inc. | US | 2026-07-09 | 2026-07-19 | unknown | watch |
 | ASTS | ASTS/ | AST SpaceMobile, Inc. | US | 2026-07-17 | 2026-07-19 | unknown | watch |

@@ -1144,5 +1144,229 @@
   "synthesis": {
     "status": "incomplete",
     "reason": "no numeric paths"
+  },
+  "context_overlay": {
+    "as_of": "2026-07-19",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": 0.95,
+            "as_of": "2026-07-17",
+            "yoy_pct": 196.9,
+            "direction": "up",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.540999889373779,
+            "as_of": "2026-07-17",
+            "yoy_pct": 1.7,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.2729997634887695,
+            "as_of": "2026-07-17",
+            "yoy_pct": 6.7,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 100.75,
+            "as_of": "2026-07-17",
+            "yoy_pct": 2.0,
+            "direction": "up",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 18.770000457763672,
+            "as_of": "2026-07-17",
+            "yoy_pct": 13.6,
+            "direction": "up",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": 1.46,
+            "as_of": "2026-07-17",
+            "yoy_pct": 22.7,
+            "direction": "up",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 11.68,
+            "as_of": "2026-07-17",
+            "yoy_pct": 32.3,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "insider_signal": {
+    "as_of": "2026-07-19",
+    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
+    "in_base_irr": false,
+    "window_days": 365,
+    "ics": 10.0,
+    "band": "exceptional",
+    "bull_case_support": "moderate",
+    "scenario_confidence": {
+      "priors": {
+        "bear": 0.2,
+        "base": 0.55,
+        "bull": 0.25
+      },
+      "tilted": {
+        "bear": 0.2,
+        "base": 0.4,
+        "bull": 0.4
+      },
+      "bull_delta": 0.15,
+      "bear_delta": 0.0,
+      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
+    },
+    "factors": {
+      "buy_score": 49.082,
+      "sell_score": -1.0,
+      "cluster_bonus": 0.0,
+      "net_buy_usd": 6149315.16,
+      "net_sell_usd": 116154102.48,
+      "price_today": 134.89
+    },
+    "top_buys": [
+      {
+        "insider": "MOULDS JONATHAN PAUL",
+        "date": "2026-07-01",
+        "shares": 222,
+        "price": 142.556,
+        "value_usd": 31647.43,
+        "shares_owned_after": 1040,
+        "contrib": 2.641
+      },
+      {
+        "insider": "DUGAN JOHN CUNNINGHAM",
+        "date": "2026-07-01",
+        "shares": 438,
+        "price": 142.556,
+        "value_usd": 62439.53,
+        "shares_owned_after": 32842,
+        "contrib": 1.921
+      },
+      {
+        "insider": "REINER GARY M",
+        "date": "2026-07-01",
+        "shares": 385,
+        "price": 142.556,
+        "value_usd": 54884.06,
+        "shares_owned_after": 49731,
+        "contrib": 1.775
+      },
+      {
+        "insider": "TAYLOR DIANA L",
+        "date": "2026-07-01",
+        "shares": 253,
+        "price": 142.556,
+        "value_usd": 36066.67,
+        "shares_owned_after": 60489,
+        "contrib": 1.563
+      },
+      {
+        "insider": "Turley James S",
+        "date": "2026-07-01",
+        "shares": 165,
+        "price": 142.556,
+        "value_usd": 23521.74,
+        "shares_owned_after": 39447,
+        "contrib": 1.444
+      }
+    ],
+    "top_sells": [
+      {
+        "insider": "Fraser Jane Nind",
+        "date": "2026-01-20",
+        "shares": 67967,
+        "price": 118.04,
+        "value_usd": 8022824.68,
+        "is_10b5_1": false,
+        "contrib": -0.129
+      },
+      {
+        "insider": "DUGAN JOHN CUNNINGHAM",
+        "date": "2026-05-08",
+        "shares": 2117,
+        "price": 125.3,
+        "value_usd": 265260.1,
+        "is_10b5_1": false,
+        "contrib": -0.11
+      },
+      {
+        "insider": "Mason Mark",
+        "date": "2026-01-20",
+        "shares": 29209,
+        "price": 118.04,
+        "value_usd": 3447830.36,
+        "is_10b5_1": false,
+        "contrib": -0.101
+      },
+      {
+        "insider": "Mason Mark",
+        "date": "2026-02-20",
+        "shares": 1627,
+        "price": 114.3998,
+        "value_usd": 186128.47,
+        "is_10b5_1": false,
+        "contrib": -0.096
+      },
+      {
+        "insider": "Mason Mark",
+        "date": "2026-02-20",
+        "shares": 2000,
+        "price": 114.9583,
+        "value_usd": 229916.6,
+        "is_10b5_1": false,
+        "contrib": -0.096
+      }
+    ],
+    "narrative_hooks": [],
+    "transaction_count": 140
   }
 }

@@ -20,5 +20,229 @@
     "issuer_size_bucket": "unknown",
     "position_size_bucket": "mid",
     "notes": "Context overlay only \u2014 does not replace Lawrence IRR."
+  },
+  "context_overlay": {
+    "as_of": "2026-07-19",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": 0.95,
+            "as_of": "2026-07-17",
+            "yoy_pct": 196.9,
+            "direction": "up",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.540999889373779,
+            "as_of": "2026-07-17",
+            "yoy_pct": 1.7,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.2729997634887695,
+            "as_of": "2026-07-17",
+            "yoy_pct": 6.7,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 100.75,
+            "as_of": "2026-07-17",
+            "yoy_pct": 2.0,
+            "direction": "up",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 18.770000457763672,
+            "as_of": "2026-07-17",
+            "yoy_pct": 13.6,
+            "direction": "up",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": 1.46,
+            "as_of": "2026-07-17",
+            "yoy_pct": 22.7,
+            "direction": "up",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 11.68,
+            "as_of": "2026-07-17",
+            "yoy_pct": 32.3,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "insider_signal": {
+    "as_of": "2026-07-19",
+    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
+    "in_base_irr": false,
+    "window_days": 365,
+    "ics": 10.0,
+    "band": "exceptional",
+    "bull_case_support": "moderate",
+    "scenario_confidence": {
+      "priors": {
+        "bear": 0.2,
+        "base": 0.55,
+        "bull": 0.25
+      },
+      "tilted": {
+        "bear": 0.2,
+        "base": 0.4,
+        "bull": 0.4
+      },
+      "bull_delta": 0.15,
+      "bear_delta": 0.0,
+      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
+    },
+    "factors": {
+      "buy_score": 32.451,
+      "sell_score": -1.0,
+      "cluster_bonus": 0.0,
+      "net_buy_usd": 10989918.78,
+      "net_sell_usd": 31436055.2,
+      "price_today": null
+    },
+    "top_buys": [
+      {
+        "insider": "Zovighian Bernard J",
+        "date": "2026-02-12",
+        "shares": 25350,
+        "price": 59.2567,
+        "value_usd": 1502157.34,
+        "shares_owned_after": 106326,
+        "contrib": 1.985
+      },
+      {
+        "insider": "Zovighian Bernard J",
+        "date": "2025-12-08",
+        "shares": 25350,
+        "price": 59.2567,
+        "value_usd": 1502157.34,
+        "shares_owned_after": 106326,
+        "contrib": 1.985
+      },
+      {
+        "insider": "Ullem Scott B.",
+        "date": "2026-05-05",
+        "shares": 13000,
+        "price": 59.2567,
+        "value_usd": 770337.1,
+        "shares_owned_after": 52079,
+        "contrib": 1.944
+      },
+      {
+        "insider": "BOBO DONALD E JR",
+        "date": "2026-04-02",
+        "shares": 22680,
+        "price": 59.2567,
+        "value_usd": 1343941.96,
+        "shares_owned_after": 43946,
+        "contrib": 1.823
+      },
+      {
+        "insider": "Lippis Daniel J.",
+        "date": "2026-07-10",
+        "shares": 619,
+        "price": 72.68,
+        "value_usd": 44988.92,
+        "shares_owned_after": 40652,
+        "contrib": 1.792
+      }
+    ],
+    "top_sells": [
+      {
+        "insider": "Zovighian Bernard J",
+        "date": "2026-05-11",
+        "shares": 5489,
+        "price": 0.0,
+        "value_usd": 0.0,
+        "is_10b5_1": false,
+        "contrib": -0.155
+      },
+      {
+        "insider": "Zovighian Bernard J",
+        "date": "2026-05-08",
+        "shares": 4222,
+        "price": 0.0,
+        "value_usd": 0.0,
+        "is_10b5_1": false,
+        "contrib": -0.151
+      },
+      {
+        "insider": "Zovighian Bernard J",
+        "date": "2026-05-08",
+        "shares": 5398,
+        "price": 82.76,
+        "value_usd": 446738.48,
+        "is_10b5_1": false,
+        "contrib": -0.151
+      },
+      {
+        "insider": "Zovighian Bernard J",
+        "date": "2026-05-07",
+        "shares": 4153,
+        "price": 83.2,
+        "value_usd": 345529.6,
+        "is_10b5_1": false,
+        "contrib": -0.15
+      },
+      {
+        "insider": "Zovighian Bernard J",
+        "date": "2026-05-05",
+        "shares": 523,
+        "price": 0.0,
+        "value_usd": 0.0,
+        "is_10b5_1": false,
+        "contrib": -0.147
+      }
+    ],
+    "narrative_hooks": [],
+    "transaction_count": 143
   }
 }
