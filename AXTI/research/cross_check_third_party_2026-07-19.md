@@ -35,13 +35,13 @@ No third-party sources are indexed for AXTI as of this scan (`source_inventory_2
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor (mid-cycle) | $0.12/sh normalized start | pending price | watch |
-| External (combined) | — | — | — |
-| **Blended best estimate** | **Marvin only** | **pending** | **watch** |
+| Marvin floor (mid-cycle) | $0.12/sh normalized start | **-9.92%** (synthesis base) | watch |
+| External (combined) | n/a | n/a | n/a |
+| **Blended best estimate** | **Marvin only** | **-9.92%** | **watch** |
 
 **Weights:** 100% Marvin filings (no approved external sources).
 
-**Returns statement (blended):** Pending mechanical price fetch and `marvin_valuation.py` IRR; no external views in base case.
+**Returns statement (blended):** At **$45.86**, Marvin synthesis base case **-9.92%** per year over 7 years on **$0.12/sh** normalized owner cash. Lawrence scenario-only reference: **-32.8%**.
 
 ## [HUMAN REVIEW]
 

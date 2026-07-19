@@ -1,6 +1,6 @@
 # AXTI — Investment Thesis
 
-**Last updated:** 2026-07-19
+**Last updated:** auto-sync
 
 ## Classification
 
@@ -11,8 +11,13 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | trough |
-| **MOI bucket** (legacy) | pending |
+| **Implied 7yr IRR** (base) | — |
+| **IRR method** | capital_cycle |
+| **Lawrence bucket** | low_cost |
 | **Payoff lens** | operating |
+| **MOI bucket** | pending |
+
+**Deep dive:** `AXTI/research/deep_dive_2026-07-19.md` (auto-sync)
 
 ## One-line thesis
 

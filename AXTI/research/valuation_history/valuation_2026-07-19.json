@@ -19,7 +19,6 @@
     "price_source": "Yahoo AXTI close 2026-07-17",
     "price_as_of": "2026-07-17",
     "shares_millions": 65.4,
-    "shares_outstanding": 65423184,
     "shares_source": "65,423,184 common shares outstanding May 4, 2026 (10-Q Q1 2026 cover page)",
     "fcf_per_share": 0.12,
     "fcf_source": "[Assumption] Mid-cycle normalized owner cash: ~$7.8M annual (2021\u20132022 operating profit ~$13M less maintenance capital spending ~$6M) scaled to 65.4M diluted shares; current filing OCF minus capital spending is negative ($-0.29/sh FY2025)",
@@ -37,8 +36,7 @@
     "book_per_share_source": "$273.3M equity / 65.4M shares [Assumption] using current share count on year-end equity",
     "customer_concentration_top5_pct": 67,
     "customer_concentration_source": "Top five customers 67% of FY2025 revenue (10-K FY2025 concentration disclosure)",
-    "normalization_note": "Reported FY2025 owner cash is negative (operating cash flow -$12.8M minus capital spending $6.0M). Lawrence base uses mid-cycle normalized owner cash anchored to 2021\u20132022 substrate upcycle economics, not spot losses. Q1 2026 gross margin recovery (29.6%) and revenue acceleration support normalization path but are not yet in base year-zero cash.",
-    "lease_income_annual_usd": 0.0
+    "normalization_note": "Reported FY2025 owner cash is negative (operating cash flow -$12.8M minus capital spending $6.0M). Lawrence base uses mid-cycle normalized owner cash anchored to 2021\u20132022 substrate upcycle economics, not spot losses. Q1 2026 gross margin recovery (29.6%) and revenue acceleration support normalization path but are not yet in base year-zero cash."
   },
   "component_valuation": {
     "version": "1.0",
@@ -109,34 +107,15 @@
         "valuation": {
           "basis": "per_share",
           "method": "milestone_nav",
+          "low": 0.0,
+          "base": 0.5,
+          "high": 1.5,
+          "probability_base": 0.35,
+          "timing_years": 3,
+          "remaining_capital_per_share": 0.0,
           "evidence_tier": "filing",
           "evidence": "Tongmei withdrew STAR Market IPO July 8, 2026; pivot to HK listing (8-K 2026-07-08). Prior PE investment RMB 324M (~$49M). Listing outcome uncertain.",
-          "cross_check": "Probability-weighted; zero in Lawrence consolidated owner-cash path",
-          "falsifier": "HK listing fails or PE redemptions drain parent cash before listing",
-          "driver_model": {
-            "type": "milestone_project_option",
-            "timing_basis": "HK listing application per 8-K 2026-07-08; base realization 3 years",
-            "scenarios": {
-              "low": {
-                "success_probability": 0.0,
-                "success_value_m": 93.46,
-                "remaining_cost_m": 0.0,
-                "ownership_pct": 1.0
-              },
-              "base": {
-                "success_probability": 0.35,
-                "success_value_m": 93.46,
-                "remaining_cost_m": 0.0,
-                "ownership_pct": 1.0
-              },
-              "high": {
-                "success_probability": 0.55,
-                "success_value_m": 178.43,
-                "remaining_cost_m": 0.0,
-                "ownership_pct": 1.0
-              }
-            }
-          }
+          "cross_check": "Probability-weighted; zero in Lawrence consolidated owner-cash path"
         }
       },
       {
@@ -194,7 +173,7 @@
       "growth_y1_5": 0.15,
       "growth_y6_10": 0.08,
       "exit_pfcf_y10": 15,
-      "notes": "Production at spot $4.0"
+      "notes": "InP capacity ramp succeeds; gross margin sustains Q1 2026 levels; Tongmei HK listing unlocks value; customer mix diversifies"
     }
   },
   "option_scan": [
@@ -227,14 +206,16 @@
       "evidence": "AI-driven InP demand for high-speed optical data transmission cited in 10-K Item 1; revenue in substrate operations"
     }
   ],
+  "evidence_refresh": {
+    "type": "commodity_nav",
+    "as_of": "2026-07-19",
+    "notes": "Semiconductor substrate cycle; mid-cycle normalization per capital_cycle Power Zone route"
+  },
   "lawrence_horizon_years": 7,
   "implied_return": {
-    "base_pct": -9.92,
-    "label": "7yr IRR (total synthesis)",
-    "display": "-9.92% (total synthesis)",
-    "lawrence_stance_gate_pct": -32.8,
-    "falsifier_adjusted_pct": -32.8,
-    "synthesis_pct": -9.92
+    "base_pct": -32.8,
+    "label": "7yr IRR",
+    "display": "-32.8% (base)"
   },
   "stance_proposal": {
     "suggested": "watch",
@@ -253,57 +234,8 @@
     }
   },
   "synthesis": {
-    "status": "complete",
-    "paths": [
-      {
-        "id": "marvin_midcycle_base",
-        "label": "Marvin mid-cycle owner cash (filings)",
-        "source": "scenarios.base @ $0.12/sh normalized",
-        "return_pct": -5.88,
-        "weight": 0.85,
-        "type": "numeric",
-        "epistemic_tier": "A (primary filings + disclosed mid-cycle anchor)",
-        "weight_why": "Capital-cycle route requires normalized economics, not trough losses",
-        "hard_to_vary": "yes"
-      },
-      {
-        "id": "component_schedule",
-        "label": "Component schedule cross-check",
-        "source": "component_valuation",
-        "return_pct": -32.8,
-        "weight": 0.15,
-        "type": "numeric",
-        "epistemic_tier": "B (bounded estimates on Tongmei/HK option and PE redemption)",
-        "weight_why": "Corporate-structure risks not in pure DCF",
-        "hard_to_vary": "partial"
-      }
-    ],
-    "qualitative_adjustments": [],
-    "qualitative_manual": false,
-    "qualitative_pp_cap_applied": false,
-    "numeric_weighted_pct": -9.92,
-    "qualitative_pp": 0,
-    "total_synthesis_pct": -9.92,
-    "human_approval": "pending",
-    "weight_audit": {
-      "flags": [],
-      "deutsch_checks": {
-        "hard_to_vary": true,
-        "falsifiable": false,
-        "not_instrumentalist": true,
-        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
-      },
-      "qualitative_audit": {
-        "flags": [],
-        "deutsch_checks": {
-          "hard_to_vary": true,
-          "falsifiable": true,
-          "not_double_count": true,
-          "small_band": true
-        }
-      }
-    },
-    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+    "status": "incomplete",
+    "reason": "zero weights"
   },
   "total_return_panel": {
     "schema_version": "3.0",
@@ -347,9 +279,9 @@
     "cumulative_total_return_pct": 331.62,
     "price_only_annualized_pct": 5.33,
     "total_return_annualized_pct": 5.33,
-    "market_cap_m": 3000.31,
-    "shares_outstanding": 65423184,
-    "price_for_market_cap": 45.86,
+    "market_cap_m": null,
+    "shares_outstanding": null,
+    "price_for_market_cap": 45.86000061035156,
     "chart": "AXTI/research/charts/total_return_2026-07-19.svg",
     "panel_json": "AXTI/research/total_return_panel.json"
   },
@@ -473,12 +405,12 @@
       "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
     },
     "factors": {
-      "buy_score": 13.098,
+      "buy_score": 15.41,
       "sell_score": -1.0,
       "cluster_bonus": 0.0,
       "net_buy_usd": 2403867.98,
       "net_sell_usd": 78164315.02,
-      "price_today": 45.86
+      "price_today": null
     },
     "top_buys": [
       {
@@ -488,7 +420,7 @@
         "price": 5.21,
         "value_usd": 385003.37,
         "shares_owned_after": 2335225,
-        "contrib": 1.962
+        "contrib": 2.308
       },
       {
         "insider": "YOUNG MORRIS S",
@@ -497,7 +429,7 @@
         "price": 5.21,
         "value_usd": 364700.0,
         "shares_owned_after": 2509490,
-        "contrib": 1.299
+        "contrib": 1.528
       },
       {
         "insider": "YOUNG MORRIS S",
@@ -506,7 +438,7 @@
         "price": 5.21,
         "value_usd": 61509.26,
         "shares_owned_after": 2273134,
-        "contrib": 1.287
+        "contrib": 1.514
       },
       {
         "insider": "FISCHER GARY L",
@@ -515,7 +447,7 @@
         "price": 5.21,
         "value_usd": 342218.85,
         "shares_owned_after": 503400,
-        "contrib": 1.275
+        "contrib": 1.5
       },
       {
         "insider": "FISCHER GARY L",
@@ -524,7 +456,7 @@
         "price": 3.06,
         "value_usd": 282866.4,
         "shares_owned_after": 685543,
-        "contrib": 1.269
+        "contrib": 1.493
       }
     ],
     "top_sells": [
@@ -580,20 +512,17 @@
   "lens_consensus": {
     "as_of": "2026-07-19",
     "shared_inputs_ref": "valuation.json@2026-07-19",
-    "valuation_richness": 0.968,
-    "blended_return_pct": -29.3,
-    "band_pct": [
-      -42.4,
-      -9.92
-    ],
-    "weighted_median_pct": -32.8,
-    "median_mean_flag": true,
-    "stance": "pass",
-    "agreement_pct": 100,
+    "valuation_richness": 0.0,
+    "blended_return_pct": null,
+    "band_pct": null,
+    "weighted_median_pct": null,
+    "median_mean_flag": false,
+    "stance": "pending",
+    "agreement_pct": 0,
     "dissent_count": 0,
     "lawrence_divergence": false,
     "top_dissents": [],
-    "contributor_count": 8,
+    "contributor_count": 0,
     "in_base_irr": false,
     "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
   },
@@ -698,53 +627,11 @@
         "evidence_tier": "filing",
         "evidence": "Tongmei withdrew STAR Market IPO July 8, 2026; pivot to HK listing (8-K 2026-07-08). Prior PE investment RMB 324M (~$49M). Listing outcome uncertain.",
         "cross_check": "Probability-weighted; zero in Lawrence consolidated owner-cash path",
-        "driver_model_type": "milestone_project_option",
-        "driver_model": {
-          "type": "milestone_project_option",
-          "timing_basis": "HK listing application per 8-K 2026-07-08; base realization 3 years",
-          "scenarios": {
-            "low": {
-              "success_probability": 0.0,
-              "success_value_m": 93.46,
-              "remaining_cost_m": 0.0,
-              "ownership_pct": 1.0
-            },
-            "base": {
-              "success_probability": 0.35,
-              "success_value_m": 93.46,
-              "remaining_cost_m": 0.0,
-              "ownership_pct": 1.0
-            },
-            "high": {
-              "success_probability": 0.55,
-              "success_value_m": 178.43,
-              "remaining_cost_m": 0.0,
-              "ownership_pct": 1.0
-            }
-          }
-        },
+        "driver_model_type": null,
+        "driver_model": null,
         "assumption_summary": null,
-        "falsifier": "HK listing fails or PE redemptions drain parent cash before listing",
-        "scenario_assumptions": {
-          "low": {
-            "success_probability": 0.0,
-            "success_value_m": 93.46,
-            "remaining_cost_m": 0.0,
-            "ownership_pct": 1.0
-          },
-          "base": {
-            "success_probability": 0.35,
-            "success_value_m": 93.46,
-            "remaining_cost_m": 0.0,
-            "ownership_pct": 1.0
-          },
-          "high": {
-            "success_probability": 0.55,
-            "success_value_m": 178.43,
-            "remaining_cost_m": 0.0,
-            "ownership_pct": 1.0
-          }
-        },
+        "falsifier": null,
+        "scenario_assumptions": null,
         "low_per_share": 0.0,
         "base_per_share": 0.5,
         "high_per_share": 1.5
@@ -835,7 +722,7 @@
   },
   "economic_value_analysis": {
     "schema_version": "1.0",
-    "status": "complete",
+    "status": "evidence_blocked",
     "trigger": {
       "required": true,
       "reasons": [
@@ -1001,8 +888,8 @@
         "component_id": "tongmei_hk_listing_option",
         "economic_claim": "Tongmei Hong Kong listing option (STAR Market withdrawn July 2026)",
         "quantity": {
-          "value": 93.46,
-          "unit": "base success value, millions"
+          "value": 1,
+          "unit": "per-share economic claim"
         },
         "method": "milestone_nav",
         "evidence_tier": "filing",
@@ -1018,11 +905,11 @@
         "treatment": "additive",
         "overlap_key": "tongmei_listing_catalyst",
         "overlap_control": "Unique overlap key tongmei_listing_catalyst.",
-        "falsifier": "HK listing fails or PE redemptions drain parent cash before listing",
+        "falsifier": "The next decision milestone fails, remaining capital rises materially, or the stated success probability no longer fits observable progress.",
         "risk_and_timing": {
-          "success_probability": 0.35,
-          "remaining_capital_m": 0.0,
-          "timing_basis": "HK listing application per 8-K 2026-07-08; base realization 3 years",
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": null,
           "probability_basis": null,
           "remaining_capital_basis": null
         }
@@ -1103,7 +990,9 @@
     "wisdom_applied": [],
     "limitations": [],
     "complete_component_coverage": true,
-    "validation_errors": [],
+    "validation_errors": [
+      "option component tongmei_hk_listing_option requires probability, timing, and remaining-capital treatment"
+    ],
     "registry_version": "1.0"
   },
   "component_review_queue": {
@@ -1470,8 +1359,8 @@
         "ownership_claim": "Tongmei Hong Kong listing option (STAR Market withdrawn July 2026)",
         "ownership_percentage": 1.0,
         "quantity": {
-          "value": 93.46,
-          "unit": "base success value, millions"
+          "value": 1,
+          "unit": "per-share economic claim"
         },
         "method": "milestone_nav",
         "method_version": null,
@@ -1492,35 +1381,16 @@
         "evidence_tier": "filing",
         "evidence_level": "primary_verified",
         "evidence": "Tongmei withdrew STAR Market IPO July 8, 2026; pivot to HK listing (8-K 2026-07-08). Prior PE investment RMB 324M (~$49M). Listing outcome uncertain.",
-        "scenario_assumptions": {
-          "low": {
-            "success_probability": 0.0,
-            "success_value_m": 93.46,
-            "remaining_cost_m": 0.0,
-            "ownership_pct": 1.0
-          },
-          "base": {
-            "success_probability": 0.35,
-            "success_value_m": 93.46,
-            "remaining_cost_m": 0.0,
-            "ownership_pct": 1.0
-          },
-          "high": {
-            "success_probability": 0.55,
-            "success_value_m": 178.43,
-            "remaining_cost_m": 0.0,
-            "ownership_pct": 1.0
-          }
-        },
+        "scenario_assumptions": null,
         "probability_and_timing": {
-          "success_probability": 0.35,
-          "remaining_capital_m": 0.0,
-          "timing_basis": "HK listing application per 8-K 2026-07-08; base realization 3 years",
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": null,
           "probability_basis": null,
           "remaining_capital_basis": null
         },
         "tax_and_realization_adjustments": "Probability-weighted; zero in Lawrence consolidated owner-cash path",
-        "falsifier": "HK listing fails or PE redemptions drain parent cash before listing",
+        "falsifier": "The next decision milestone fails, remaining capital rises materially, or the stated success probability no longer fits observable progress.",
         "overlap_key": "tongmei_listing_catalyst",
         "assumption_type": "fact"
       },
@@ -1820,9 +1690,9 @@
     },
     "market": {
       "price_per_share": 45.86,
-      "fully_diluted_shares": 65423184,
-      "market_cap_m": 3000.31,
-      "enterprise_value_m": 2942.41
+      "fully_diluted_shares": null,
+      "market_cap_m": null,
+      "enterprise_value_m": null
     },
     "valuation": {
       "value_per_share": {
@@ -1879,26 +1749,7 @@
           "base_per_share": null,
           "legacy_base_per_share": 0.5,
           "range_width_per_share": null,
-          "scenario_assumptions": {
-            "low": {
-              "success_probability": 0.0,
-              "success_value_m": 93.46,
-              "remaining_cost_m": 0.0,
-              "ownership_pct": 1.0
-            },
-            "base": {
-              "success_probability": 0.35,
-              "success_value_m": 93.46,
-              "remaining_cost_m": 0.0,
-              "ownership_pct": 1.0
-            },
-            "high": {
-              "success_probability": 0.55,
-              "success_value_m": 178.43,
-              "remaining_cost_m": 0.0,
-              "ownership_pct": 1.0
-            }
-          }
+          "scenario_assumptions": null
         },
         {
           "component_id": "pe_redemption_liability",
@@ -1944,21 +1795,24 @@
       "low_base_high_ordered": true
     },
     "evidence": {
-      "unresolved_count": 5,
+      "unresolved_count": 6,
       "blockers": [
         "cash_and_liquidity: material component is legacy_sensitivity; a valid calculation proof is required",
         "dilution_reserve: material component is legacy_sensitivity; a valid calculation proof is required",
         "midcycle_substrate_operations: material component is legacy_sensitivity; a valid calculation proof is required",
+        "option component tongmei_hk_listing_option requires probability, timing, and remaining-capital treatment",
         "pe_redemption_liability: material component is legacy_sensitivity; a valid calculation proof is required",
         "tongmei_hk_listing_option: material component is legacy_sensitivity; a valid calculation proof is required"
       ],
-      "validation_errors": []
+      "validation_errors": [
+        "option component tongmei_hk_listing_option requires probability, timing, and remaining-capital treatment"
+      ]
     },
     "monitoring": {
       "falsifiers": [
         "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods.",
         "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods.",
-        "HK listing fails or PE redemptions drain parent cash before listing",
+        "The next decision milestone fails, remaining capital rises materially, or the stated success probability no longer fits observable progress.",
         "The obligation, financing claim, tax, or realization friction is materially larger than the low-case reserve.",
         "The obligation, financing claim, tax, or realization friction is materially larger than the low-case reserve.",
         "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods."
@@ -1971,18 +1825,11 @@
       ]
     },
     "change_control": {
-      "model_hash": "965fce7dabc2d719b7f658cbfed380231bf0dcacb55bc979e8e5d30d5408d188",
+      "model_hash": "ae2a12e909fc1abf325fdf4df9f9559d21e21d89f8907117813a71ceaf81fc79",
       "method_versions": [],
       "change_log": [],
       "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
     },
     "decision_rule": "No security is decision-grade until every material claim is valued exactly once by a valid calculation proof and every material evidence blocker is resolved."
-  },
-  "market_inputs": {},
-  "market_inputs_as_of": "2026-07-19",
-  "overlay_options": {
-    "lawrence_base": "lease_income_only_zero_production_royalty",
-    "overlay_base_payoff_7yr": 8.18,
-    "overlay_implied_return_pct": -21.83
   }
 }
