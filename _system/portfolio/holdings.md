@@ -94,12 +94,15 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-19.
 | BAC | BAC/ | Bank of America | US | 2026-07-09 | 2026-07-19 | unknown | watch |
 | BALL | BALL/ | Ball Corporation | US | 2026-07-09 | 2026-07-19 | unknown | watch |
 | BAX | BAX/ | Baxter International | US | 2026-07-09 | 2026-07-19 | unknown | watch |
+| BB | BB/ | BB | US | — | 2026-07-19 | unknown | watch |
+| BBAI | BBAI/ | BBAI | US | — | 2026-07-19 | unknown | watch |
 | BBY | BBY/ | Best Buy | US | 2026-07-09 | 2026-07-19 | unknown | watch |
 | BDX | BDX/ | Becton Dickinson | US | 2026-07-09 | 2026-07-19 | unknown | watch |
 | BE | BE/ | Bloom Energy Corporation | US | 2026-07-17 | 2026-07-19 | unknown | watch |
 | BEN | BEN/ | Franklin Resources | US | 2026-07-10 | 2026-07-19 | unknown | watch |
 | BF.B | BF.B/ | Brown–Forman | US | — | 2026-07-19 | unknown | watch |
 | BG | BG/ | Bunge Global | US | 2026-07-09 | 2026-07-19 | unknown | watch |
+| BIDU | BIDU/ | BIDU | US | — | 2026-07-19 | unknown | watch |
 | BIIB | BIIB/ | Biogen | US | 2026-07-09 | 2026-07-19 | unknown | watch |
 | BKNG | BKNG/ | Booking Holdings | US | 2026-07-09 | 2026-07-19 | unknown | watch |
 | BKR | BKR/ | Baker Hughes | US | 2026-07-09 | 2026-07-19 | unknown | watch |
@@ -115,6 +118,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-19.
 | BOLSAA.MX | BOLSAA.MX/ | Bolsa Mexicana de Valores SAB de CV | EU | 2026-07-09 | 2026-07-19 | unknown | watch |
 | BR | BR/ | Broadridge Financial Solutions | US | 2026-07-09 | 2026-07-19 | unknown | watch |
 | BRBR | BRBR/ | BellRing Brands, Inc. | US | 2026-07-09 | 2026-07-19 | unknown | watch |
+| BRK-B | BRK-B/ | BRK-B | US | — | 2026-07-19 | unknown | watch |
 | BRK.B | BRK.B/ | Berkshire Hathaway | US | — | 2026-07-19 | unknown | watch |
 | BRO | BRO/ | Brown & Brown | US | 2026-07-09 | 2026-07-19 | unknown | watch |
 | BSM | BSM/ | Black Stone Minerals LP | US | 2026-07-09 | 2026-07-19 | unknown | watch |
@@ -672,4 +676,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-19.
 | ZBRA | ZBRA/ | Zebra Technologies | US | 2026-07-10 | 2026-07-19 | unknown | watch |
 | ZTS | ZTS/ | Zoetis | US | 2026-07-10 | 2026-07-19 | unknown | watch |
 
-**665 holdings total.** Registry: `_system/portfolio/registry.json`
+**669 holdings total.** Registry: `_system/portfolio/registry.json`
