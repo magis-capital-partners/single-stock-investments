@@ -6,24 +6,27 @@
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
+| **Archetype** (Stahl) | cyclical |
 | **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
+| **Cycle** | trough |
 | **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Payoff lens** | operating |
 
 ## One-line thesis
 
-AXTI — thesis pending Marvin deep dive.
+Cyclical InP/GaAs substrate supplier recovering from 2023 trough; AI optical demand and Coherent/Casela contracts support mid-cycle normalization, but China/Tongmei complexity, customer concentration, dilution, and negative spot owner cash keep us at **watch** pending return math.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest annual report (10-K FY2025)
+- [x] Read latest quarterly report (10-Q Q1 2026)
+- [ ] Confirm mid-cycle owner cash path in next two quarters
+- [ ] Resolve Tongmei PE redemption and HK listing timeline
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-07-19; awaiting deep dive.
+- Mid-cycle normalization ($0.12/sh owner cash) requires human sign-off vs spot losses
+- Tongmei STAR withdrawal and ~$49M PE redemption rights
+- Shares outstanding +50% YoY from 2025–2026 offerings

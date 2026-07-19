@@ -1,57 +1,62 @@
 # AXTI — Cross-Check: Third-Party Sources
 
-**Date:** 2026-07-19
-**Agent:** Marvin
-**Marvin dive:** `AXTI/research/deep_dive_2026-07-19.md`
-**Source inventory:** `AXTI/third-party-analyses/source_inventory_2026-07-19.md`
+**Date:** 2026-07-19  
+**Agent:** Marvin  
+**Marvin dive:** `AXTI/research/deep_dive_2026-07-19.md`  
+**Source inventory:** `AXTI/third-party-analyses/source_inventory_2026-07-19.md`  
 **Framework:** `_system/frameworks/third_party_cross_reference.md`, `external_view_blend.md`
-<!-- THIRD_PARTY_CROSS_CHECK_STUB -->
 
 ## Executive summary
 
-No third-party sources are indexed for this ticker as of this scan. Marvin stance rests on **primary filings only** (10-K, 10-Q, IR). Re-run `scan_third_party_sources.py` when Substacks, fund letters, or HK material is added.
+No third-party sources are indexed for AXTI as of this scan (`source_inventory_2026-07-19.md` lists zero Substacks, fund letters, or HK vault matches). Marvin stance rests on **primary SEC filings only** (10-K FY2025, 10-Q Q1 2026, recent 8-K supply agreements and Tongmei events). Re-run `scan_third_party_sources.py` when external material is added.
 
-**Synthesis:** Marvin floor only; no external blend.
+**Synthesis:** Marvin floor only; no external blend. Base case uses mid-cycle normalized owner cash **$0.12 per share** [Assumption] anchored to 2021–2022 economics, not spot FY2025 losses.
 
 ## Sources in scope
 
-| (none) | Primary filings only | — | — | n/a |
+| Source | Type | Status | Role |
+|--------|------|--------|------|
+| Primary SEC filings | 10-K, 10-Q, 8-K | Approved (primary) | Sole input to base case |
+| Third-party | — | None indexed | — |
 
 ## Agreements (facts)
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| — | — | — | — |
+| — | — | — | No external sources to compare |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| — | — | — | — |
+| — | — | — | N/A until sources indexed |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | — | — | — |
+| Marvin floor (mid-cycle) | $0.12/sh normalized start | pending price | watch |
 | External (combined) | — | — | — |
-| **Blended best estimate** | **—** | **—** | **—** |
+| **Blended best estimate** | **Marvin only** | **pending** | **watch** |
 
-**Weights:** *[Document why]*
+**Weights:** 100% Marvin filings (no approved external sources).
 
-**Returns statement (blended):** *[One sentence; pending sources not in base IRR]*
+**Returns statement (blended):** Pending mechanical price fetch and `marvin_valuation.py` IRR; no external views in base case.
 
 ## [HUMAN REVIEW]
 
-- [ ] Every **approved** source reviewed against filings
-- [ ] Every **pending** source cited with **[PENDING APPROVAL]** only
-- [ ] Blended estimate in `valuation.json` → `estimates.external[]` if material
+- [ ] Re-scan when Substacks or fund letters added to inventory
+- [ ] Promote any future external source via `_system/frameworks/third_party_sources.md` before inclusion in base IRR
+- [ ] Confirm mid-cycle normalization assumption when sell-side or HK research becomes available
 
 ## [PROPOSED MEMORY]
 
-- [PROPOSED COMPANY] AXTI: third-party cross-check 2026-07-19
+- [PROPOSED COMPANY] AXTI: third-party cross-check 2026-07-19 — no indexed external sources; Marvin-only base case on SEC filings.
 
 ## Primary sources cited
 
 1. `AXTI/research/deep_dive_2026-07-19.md`
-2. `AXTI/third-party-analyses/source_inventory_2026-07-19.md`
+2. `AXTI/research/valuation.json`
+3. `AXTI/third-party-analyses/source_inventory_2026-07-19.md`
+4. `AXTI/investor-documents/sec-edgar/10-K_20260317_rpt20251231_acc0001437749_26_008612.htm`
+5. `AXTI/investor-documents/sec-edgar/10-Q_20260514_rpt20260331_acc0001437749_26_017054.htm`
