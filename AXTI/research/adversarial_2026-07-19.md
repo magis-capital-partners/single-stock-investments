@@ -49,12 +49,8 @@ re_pass: false
 | Check | Expected (valuation.json) | Found in dive | OK? |
 |-------|---------------------------|---------------|-----|
 | Returns statement | -9.92% | -9.92% | Yes |
-| Classification IRR | -9.92% | None% | — |
+| Classification IRR | -9.92% | -9.92% | Yes |
 | Valuation bridge base | -9.92% | -9.92% | Yes |
-
-**Lint notes:**
-- AXTI/research/deep_dive_2026-07-19.md: executive_summary_first_pct 12.7% vs valuation.json base -9.92% (tol 0.25pp)
-- AXTI/research/deep_dive_2026-07-19.md: missing Implied 7yr IRR in Classification
 
 ---
 
