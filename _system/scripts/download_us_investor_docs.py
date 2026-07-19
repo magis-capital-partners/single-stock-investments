@@ -339,6 +339,17 @@ def main() -> None:
     parser.add_argument("--ticker", required=True)
     args = parser.parse_args()
     config = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
+    if args.ticker.upper() not in config:
+        registry_path = ROOT / "_system" / "portfolio" / "registry.json"
+        registry = json.loads(registry_path.read_text(encoding="utf-8"))
+        holding = (registry.get("holdings") or {}).get(args.ticker.upper()) or {}
+        download_meta = holding.get("download") or {}
+        if download_meta.get("type") == "us_shared":
+            config[args.ticker.upper()] = {
+                "cik": download_meta.get("cik"),
+                "ir_roots": download_meta.get("ir_roots") or [],
+                **(download_meta.get("options") or {}),
+            }
     run_ticker(args.ticker, config)
 
 

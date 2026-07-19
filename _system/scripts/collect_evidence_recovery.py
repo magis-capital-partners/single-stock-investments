@@ -35,7 +35,10 @@ def main() -> int:
     parser.add_argument("--limit", type=int, default=3)
     args = parser.parse_args()
     aggregate = read(QUEUE)
-    selected = [row for row in (aggregate.get("items") or []) if int(row.get("ready_count") or 0) == 0][: max(args.limit, 0)]
+    selected = [
+        row for row in (aggregate.get("items") or [])
+        if int(row.get("ready_count") or 0) < int(row.get("task_count") or row.get("critical_count") or 1)
+    ][: max(args.limit, 0)]
     now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     for item in selected:
         ticker = item["ticker"]
@@ -50,36 +53,23 @@ def main() -> int:
                 holding.setdefault("download", {})["cik"] = cik
                 save_registry(registry)
                 subprocess.run([sys.executable, "_system/scripts/sync_portfolio_from_registry.py"], cwd=ROOT, check=False, timeout=120)
-        if not before:
-            try:
-                subprocess.run(
-                    [sys.executable, "_system/scripts/download_us_investor_docs.py", "--ticker", ticker],
-                    cwd=ROOT, check=False, timeout=480,
-                )
-            except subprocess.TimeoutExpired:
-                pass
-        collectors = {task.get("collector") for task in packet.get("tasks") or []}
-        if "market_and_filing_facts" in collectors and (ROOT / ticker / "research" / "valuation.json").exists():
-            try:
-                subprocess.run(
-                    [sys.executable, "_system/scripts/fetch_market_inputs.py", ticker, "--merge"],
-                    cwd=ROOT, check=False, timeout=180,
-                )
-            except subprocess.TimeoutExpired:
-                pass
+        try:
+            subprocess.run(
+                [sys.executable, "_system/scripts/automate_valuation_readiness.py", "--tickers", ticker,
+                 "--date", now[:10], "--collect", "--full-rerun"],
+                cwd=ROOT, check=False, timeout=900,
+            )
+        except subprocess.TimeoutExpired:
+            pass
         after = evidence_refs(ticker)
+        packet = read(path)
         for task in packet.get("tasks") or []:
-            if task.get("status") in {"closed", "resolved"}:
-                continue
             task["attempts"] = int(task.get("attempts") or 0) + 1
             task["last_attempt_at"] = now
-            task["evidence_refs"] = after
-            task["status"] = "evidence_ready" if after else "retry_pending"
-        packet["updated_at"] = now
         path.write_text(json.dumps(packet, indent=2) + "\n", encoding="utf-8")
         refresh = {
             "schema_version": "1.0", "ticker": ticker, "updated_at": now,
-            "status": "evidence_ready" if after else "retry_pending",
+            "status": "evidence_ready" if packet.get("ready_count") == packet.get("task_count") else "retry_pending",
             "new_artifact_count": len(set(after) - set(before)), "evidence_refs": after,
         }
         refresh_path = ROOT / ticker / "research" / "evidence_refresh.json"

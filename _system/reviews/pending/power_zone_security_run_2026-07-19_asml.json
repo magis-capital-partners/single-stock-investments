@@ -7,9 +7,9 @@
   "stages": {
     "routes": {
       "processed": 1,
-      "unchanged": 0,
+      "unchanged": 1,
       "statuses": {
-        "default_needs_review": 1
+        "routed": 1
       },
       "errors": []
     },
@@ -23,13 +23,11 @@
       "written": [
         {
           "ticker": "ASML",
-          "status": "evidence_blocked"
+          "status": "decision_grade"
         }
       ],
       "missing_valuation": [],
-      "scaffolded": [
-        "ASML"
-      ],
+      "scaffolded": [],
       "errors": []
     },
     "workbenches": {
@@ -41,17 +39,22 @@
     },
     "pricing": {
       "priced": [],
-      "skipped": [
-        "ASML"
-      ],
-      "errors": []
+      "skipped": [],
+      "errors": [
+        {
+          "ticker": "ASML",
+          "error": "ValueError: ASML: price and low/base/high contract values are required"
+        }
+      ]
     },
     "committees": {
       "initiated": [],
       "active": [],
       "blocked": [],
       "triggered_evidence_tasks": [],
-      "decision_grade_resting": []
+      "decision_grade_resting": [
+        "ASML"
+      ]
     },
     "dashboard": {
       "status": "skipped",

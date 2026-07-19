@@ -266,6 +266,12 @@ def onboard_one(
             dl_ok = True
             dl_detail = f"{dl_detail}; partial OK ({n_pdf} PDFs)"
 
+    subprocess.run(
+        [PY, str(SCRIPTS / "build_filing_evidence.py"), ticker],
+        cwd=ROOT, check=False, capture_output=True,
+    )
+    initialize_proof_first_valuation(ticker, today)
+
     write_status(
         ROOT / ticker,
         "complete" if dl_ok else "failed",

@@ -1,11 +1,14 @@
 {
   "schema_version": "2.0",
-  "status": "default_needs_review",
+  "status": "routed",
   "profile_id": "quality_reinvestment",
   "label": "High-return compounder",
-  "score": 0.0,
+  "score": 19.0,
   "reasons": [
-    "No decisive classification was supplied; owner-earnings is the conservative operating default."
+    "archetype=compounder",
+    "component categories=operating_business",
+    "existing methods=dcf, reinvestment",
+    "explicit reviewed profile"
   ],
   "primary_methods": [
     "owner_earnings_reinvestment_dcf"
@@ -42,19 +45,41 @@
     "stock compensation or acquisitions omitted",
     "terminal value unsupported by a durable mechanism"
   ],
-  "secondary_profiles": [],
+  "secondary_profiles": [
+    {
+      "profile_id": "capital_cycle",
+      "score": 1.0,
+      "reasons": [
+        "component categories=operating_business"
+      ]
+    },
+    {
+      "profile_id": "predictable_cash_flow",
+      "score": 1.0,
+      "reasons": [
+        "component categories=operating_business"
+      ]
+    }
+  ],
   "scorecard": {
     "scarce_asset_optionality": {
       "score": 0.0,
       "reasons": []
     },
     "quality_reinvestment": {
-      "score": 0.0,
-      "reasons": []
+      "score": 19.0,
+      "reasons": [
+        "archetype=compounder",
+        "component categories=operating_business",
+        "existing methods=dcf, reinvestment",
+        "explicit reviewed profile"
+      ]
     },
     "capital_cycle": {
-      "score": 0.0,
-      "reasons": []
+      "score": 1.0,
+      "reasons": [
+        "component categories=operating_business"
+      ]
     },
     "credit_and_normalized_returns": {
       "score": 0.0,
@@ -65,8 +90,10 @@
       "reasons": []
     },
     "predictable_cash_flow": {
-      "score": 0.0,
-      "reasons": []
+      "score": 1.0,
+      "reasons": [
+        "component categories=operating_business"
+      ]
     },
     "binary_milestone": {
       "score": 0.0,
@@ -80,14 +107,14 @@
   "config_path": "_system/frameworks/power_zones.json",
   "config_updated": "2026-07-14",
   "classification": {
-    "archetype": "unknown",
+    "archetype": "compounder",
     "moat": "unproven",
     "dhando": "pending",
     "stance": "watch",
     "cycle": "-",
     "moi_bucket": "pending",
     "payoff_lens": "pending",
-    "investment_sleeve": "-"
+    "investment_sleeve": "ls_algo_underlying"
   },
   "specialist_power_zones": [],
   "committee": {
@@ -113,6 +140,6 @@
       }
     ]
   },
-  "input_hash": "88e4e29f112a9ff7bcddef0b637b678931ef5cfd640401a5b5d73370715281a1",
-  "generated_at": "2026-07-19T05:40:09.500233+00:00"
+  "input_hash": "95aad0e15320c343c3e215c0b18eecf22e4bf8839c66b61af90717f4515345da",
+  "generated_at": "2026-07-19T13:03:32.112565+00:00"
 }

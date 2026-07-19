@@ -25,13 +25,17 @@ def main() -> int:
         research = ROOT / ticker / "research"
         workbench = read(research / "valuation_workbench.json")
         task_doc = read(research / "evidence_task_queue.json")
+        identity = read(research / "security_identity.json")
         task_ids = {str(row.get("id")) for row in task_doc.get("tasks") or []}
         for gap in ((workbench.get("evidence") or {}).get("gaps") or []):
             if str(gap.get("status") or "open").lower() not in {"closed", "complete", "resolved"}:
                 gap_id = str(gap.get("id") or "")
                 if gap_id and gap_id not in task_ids:
                     errors.append(f"{ticker}: blocker {gap_id} has no recovery task")
-        if str(holding.get("market") or "US") == "US" and not ((holding.get("download") or {}).get("cik")) and "sec_identity_required" not in task_ids:
+        if (str(holding.get("market") or "US") == "US"
+                and identity.get("security_type") != "exchange_traded_fund"
+                and not ((holding.get("download") or {}).get("cik"))
+                and "sec_identity_required" not in task_ids):
             errors.append(f"{ticker}: missing CIK has no identity recovery task")
     if errors:
         for error in errors[:50]:

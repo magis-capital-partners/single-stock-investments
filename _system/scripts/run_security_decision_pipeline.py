@@ -161,7 +161,9 @@ def stage_contracts(tickers: list[str], dry_run: bool, as_of: str | None = None)
         if not valuation_path.exists():
             try:
                 route = read_json(research / "valuation_route.json") or build_route(ticker, as_of)
-                scaffold = read_json(research / "valuation_model_scaffold.json") or _model_scaffold(ticker, route, as_of)
+                scaffold = read_json(research / "valuation_model_scaffold.json")
+                if ((scaffold.get("method_route") or {}).get("profile_id") != route.get("profile_id")):
+                    scaffold = _model_scaffold(ticker, route, as_of)
                 contract = build_universal_valuation_contract({"ticker": ticker, "as_of": as_of}, route.get("profile_id"))
                 contract["method_route"] = route
                 contract["authority"] = "universal_valuation_contract"

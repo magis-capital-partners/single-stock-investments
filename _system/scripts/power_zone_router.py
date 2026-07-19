@@ -119,11 +119,15 @@ def build_route(ticker: str, as_of: str | None = None) -> dict:
     classification = merged_classification(ticker, valuation, holding)
     valuation_for_route = dict(valuation)
     valuation_for_route["classification_inputs"] = classification
-    explicit = (
+    identity = read_json(research / "security_identity.json")
+    explicit = identity.get("valuation_profile") or (
         (read_json(ROOT / "_system" / "reference" / "valuation_followups.json").get("tickers") or {})
         .get(ticker, {})
         .get("method_profile")
     )
+    if identity.get("archetype"):
+        classification["archetype"] = identity["archetype"]
+        valuation_for_route["classification_inputs"] = classification
     method_route = route_valuation(valuation_for_route, explicit)
     config = read_json(CONFIG_PATH)
     fits = specialist_fit(classification, config)
@@ -140,6 +144,7 @@ def build_route(ticker: str, as_of: str | None = None) -> dict:
             if row.get("category")
         }),
         "explicit_profile": explicit,
+        "security_identity": identity,
         "config_updated": config.get("updated"),
     }
     status = method_route.get("status") or "default_needs_review"

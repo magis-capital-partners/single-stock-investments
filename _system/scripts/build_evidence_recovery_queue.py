@@ -46,7 +46,10 @@ def build() -> dict:
                 "acceptance_test": "Every material economic claim is valued exactly once using primary evidence.",
                 "status": "open",
             }]
-        if str(holding.get("market") or "US") == "US" and not ((holding.get("download") or {}).get("cik")):
+        identity = read(research / "security_identity.json")
+        if (str(holding.get("market") or "US") == "US"
+                and identity.get("security_type") != "exchange_traded_fund"
+                and not ((holding.get("download") or {}).get("cik"))):
             gaps = [
                 {
                     "id": "sec_identity_required", "priority": "critical",
@@ -59,11 +62,13 @@ def build() -> dict:
             ]
         prior = read(research / "evidence_task_queue.json")
         prior_by_id = {row.get("id"): row for row in prior.get("tasks") or []}
-        tasks = []
+        tasks = [dict(row) for row in prior.get("tasks") or [] if str(row.get("id") or "").startswith("method_input:")]
         for gap in gaps:
             if str(gap.get("status") or "open").lower() in {"closed", "complete", "resolved"}:
                 continue
             task_id = str(gap.get("id") or f"gap_{len(tasks)+1}")
+            if any(row.get("id") == task_id for row in tasks):
+                continue
             text = " ".join(str(gap.get(key) or "") for key in ("question", "evidence_required", "acceptance_test"))
             previous = prior_by_id.get(task_id) or {}
             tasks.append({
@@ -81,13 +86,18 @@ def build() -> dict:
         if not tasks:
             continue
         trigger = read(research / "committee_trigger.json")
-        packet = {"schema_version": "1.0", "ticker": ticker, "updated_at": now, "tasks": tasks}
+        packet = {"schema_version": "2.0" if prior.get("method_id") else "1.0", "ticker": ticker,
+                  "updated_at": now, "method_id": prior.get("method_id"),
+                  "ready_count": sum(task["status"] == "evidence_ready" for task in tasks),
+                  "task_count": len(tasks), "tasks": tasks}
+        research.mkdir(parents=True, exist_ok=True)
         (research / "evidence_task_queue.json").write_text(json.dumps(packet, indent=2) + "\n", encoding="utf-8")
         rows.append({
             "ticker": ticker,
             "triggered": str(trigger.get("status") or "").lower() == "open",
             "critical_count": sum(task["priority"] == "critical" for task in tasks),
             "ready_count": sum(task["status"] == "evidence_ready" for task in tasks),
+            "task_count": len(tasks),
             "task_ref": f"{ticker}/research/evidence_task_queue.json",
         })
     rows.sort(key=lambda row: (not row["triggered"], -row["critical_count"], row["ticker"]))

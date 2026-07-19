@@ -285,12 +285,12 @@ def initialize_proof_first_valuation(ticker: str, as_of: str) -> None:
     code = run_cmd(
         [
             PY,
-            str(SCRIPTS / "run_security_decision_pipeline.py"),
+            str(SCRIPTS / "automate_valuation_readiness.py"),
             "--tickers",
             ticker,
             "--date",
             as_of,
-            "--skip-dashboard",
+            "--full-rerun",
         ],
         "proof-first valuation scaffold",
     )
@@ -492,6 +492,9 @@ def onboard(args: argparse.Namespace) -> int:
                 return 2
     else:
         ok, detail = True, "skipped"
+
+    run_cmd([PY, str(SCRIPTS / "build_filing_evidence.py"), ticker], "filing fact ledger")
+    initialize_proof_first_valuation(ticker, today)
 
     if not args.skip_indexes:
         run_cmd([PY, str(SCRIPTS / "build_folder_indexes.py"), "--ticker", ticker], "indexes")

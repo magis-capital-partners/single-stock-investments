@@ -1,35 +1,80 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "2.0",
   "ticker": "ASHR",
-  "updated_at": "2026-07-19T05:40:45Z",
+  "updated_at": "2026-07-19T13:10:44.545667Z",
+  "method_id": "net_asset_value",
+  "ready_count": 0,
+  "task_count": 5,
   "tasks": [
     {
-      "id": "sec_identity_required",
+      "id": "method_input:net_asset_value:fund_nav_per_share",
       "priority": "critical",
-      "question": "Resolve the issuer SEC CIK before primary filing collection.",
-      "evidence_required": "Committed SEC ticker/CIK mapping or verified SEC submissions identity.",
-      "acceptance_test": "Registry download.cik is a ten-digit verified CIK.",
-      "collector": "sec_primary_documents",
-      "status": "evidence_ready",
-      "attempts": 1,
-      "last_attempt_at": "2026-07-19T05:40:44Z",
-      "evidence_refs": [
-        "ASHR/investor-documents/DOWNLOAD_MANIFEST.json"
-      ]
+      "field_id": "fund_nav_per_share",
+      "method_id": "net_asset_value",
+      "question": "Supply a primary-source value for fund nav per share.",
+      "evidence_required": "fund_nav_per_share",
+      "acceptance_test": "A locked fact-ledger row has a primary source ref, locator, as-of date, and value.",
+      "collector": "primary_documents_then_fact_ledger",
+      "status": "pending_collection",
+      "attempts": 0,
+      "last_attempt_at": null,
+      "evidence_refs": []
+    },
+    {
+      "id": "method_input:net_asset_value:holdings_coverage_pct",
+      "priority": "critical",
+      "field_id": "holdings_coverage_pct",
+      "method_id": "net_asset_value",
+      "question": "Supply a primary-source value for holdings coverage pct.",
+      "evidence_required": "holdings_coverage_pct",
+      "acceptance_test": "A locked fact-ledger row has a primary source ref, locator, as-of date, and value.",
+      "collector": "primary_documents_then_fact_ledger",
+      "status": "pending_collection",
+      "attempts": 0,
+      "last_attempt_at": null,
+      "evidence_refs": []
+    },
+    {
+      "id": "method_input:net_asset_value:expense_ratio",
+      "priority": "critical",
+      "field_id": "expense_ratio",
+      "method_id": "net_asset_value",
+      "question": "Supply a primary-source value for expense ratio.",
+      "evidence_required": "expense_ratio",
+      "acceptance_test": "A locked fact-ledger row has a primary source ref, locator, as-of date, and value.",
+      "collector": "primary_documents_then_fact_ledger",
+      "status": "pending_collection",
+      "attempts": 0,
+      "last_attempt_at": null,
+      "evidence_refs": []
+    },
+    {
+      "id": "method_input:net_asset_value:shares_outstanding",
+      "priority": "critical",
+      "field_id": "shares_outstanding",
+      "method_id": "net_asset_value",
+      "question": "Supply a primary-source value for shares outstanding.",
+      "evidence_required": "shares_outstanding",
+      "acceptance_test": "A locked fact-ledger row has a primary source ref, locator, as-of date, and value.",
+      "collector": "primary_documents_then_fact_ledger",
+      "status": "pending_collection",
+      "attempts": 0,
+      "last_attempt_at": null,
+      "evidence_refs": []
     },
     {
       "id": "complete_component_model_required",
       "priority": "critical",
-      "question": "A complete primary-sourced component valuation has not been built.",
-      "evidence_required": "normalized owner earnings; incremental return on capital; reinvestment runway; diluted share count; competitive-advantage mechanism",
-      "acceptance_test": "Every material economic claim is valued exactly once with causal low/base/high assumptions and primary evidence.",
+      "field_id": "component_model",
+      "method_id": "net_asset_value",
+      "question": "Build a complete primary-sourced component valuation.",
+      "evidence_required": "fund_nav_per_share; holdings_coverage_pct; expense_ratio; shares_outstanding",
+      "acceptance_test": "Every material economic claim is valued exactly once with a valid deterministic proof.",
       "collector": "primary_documents_then_model",
-      "status": "evidence_ready",
-      "attempts": 1,
-      "last_attempt_at": "2026-07-19T05:40:44Z",
-      "evidence_refs": [
-        "ASHR/investor-documents/DOWNLOAD_MANIFEST.json"
-      ]
+      "status": "pending_collection",
+      "attempts": 0,
+      "last_attempt_at": null,
+      "evidence_refs": []
     }
   ]
 }

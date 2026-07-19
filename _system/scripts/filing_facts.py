@@ -41,10 +41,28 @@ CANONICAL = {
         "CashAndCashEquivalentsAtCarryingValue",
         "CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents",
     ),
+    "operating_cash_flow": (
+        "NetCashProvidedByUsedInOperatingActivities",
+        "NetCashProvidedByUsedInOperatingActivitiesContinuingOperations",
+    ),
+    "capital_expenditures": (
+        "PaymentsToAcquirePropertyPlantAndEquipment",
+        "PaymentsForAdditionsToPropertyPlantAndEquipment",
+        "PaymentsToAcquireProductiveAssets",
+    ),
+    "shares_outstanding": (
+        "EntityCommonStockSharesOutstanding",
+        "CommonStockSharesOutstanding",
+        "WeightedAverageNumberOfDilutedSharesOutstanding",
+        "WeightedAverageNumberOfSharesOutstandingBasic",
+    ),
 }
 
 BALANCE_SHEET_METRICS = {"cash", "long_term_debt", "total_assets", "stockholders_equity"}
-INCOME_METRICS = {"revenues", "revenue", "operating_income", "net_income", "eps_basic"}
+INCOME_METRICS = {
+    "revenues", "revenue", "operating_income", "net_income", "eps_basic",
+    "operating_cash_flow", "capital_expenditures", "shares_outstanding",
+}
 
 SEGMENT_CONTEXT_TAGS = {
     "NumberOfOperatingSegments",
