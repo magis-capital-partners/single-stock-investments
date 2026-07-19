@@ -69,18 +69,22 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-19.
 | APTV | APTV/ | Aptiv | US | 2026-07-10 | 2026-07-19 | unknown | watch |
 | ARE | ARE/ | Alexandria Real Estate Equities | US | 2026-07-09 | 2026-07-19 | unknown | watch |
 | ARES | ARES/ | Ares Management | US | 2026-07-09 | 2026-07-19 | unknown | watch |
-| ARKK | ARKK/ | ARKK | US | 2026-07-19 | 2026-07-19 | unknown | watch |
+| ARKK | ARKK/ | ARKK | US | — | 2026-07-19 | unknown | watch |
 | ARM | ARM/ | ARM | US | — | 2026-07-19 | unknown | watch |
+| ASHR | ASHR/ | ASHR | US | — | 2026-07-19 | unknown | watch |
+| ASML | ASML/ | ASML | US | — | 2026-07-19 | unknown | watch |
 | ASPN | ASPN/ | Aspen Aerogels, Inc. | US | 2026-07-09 | 2026-07-19 | unknown | watch |
 | ASTS | ASTS/ | AST SpaceMobile, Inc. | US | 2026-07-17 | 2026-07-19 | unknown | watch |
 | ASX.AX | ASX.AX/ | ASX Limited | AU | 2026-07-09 | 2026-07-19 | unknown | watch |
 | ATO | ATO/ | Atmos Energy | US | 2026-07-09 | 2026-07-19 | unknown | watch |
+| AVAV | AVAV/ | AVAV | US | — | 2026-07-19 | unknown | watch |
 | AVB | AVB/ | AvalonBay Communities | US | 2026-07-09 | 2026-07-19 | unknown | watch |
 | AVGO | AVGO/ | Broadcom | US | 2026-07-09 | 2026-07-19 | unknown | watch |
 | AVY | AVY/ | Avery Dennison | US | 2026-07-09 | 2026-07-19 | unknown | watch |
 | AWK | AWK/ | American Water Works | US | 2026-07-09 | 2026-07-19 | unknown | watch |
 | AXON | AXON/ | Axon Enterprise, Inc. | US | 2026-07-09 | 2026-07-19 | unknown | watch |
 | AXP | AXP/ | American Express | US | 2026-07-09 | 2026-07-19 | unknown | watch |
+| AXTI | AXTI/ | AXTI | US | — | 2026-07-19 | unknown | watch |
 | AZLCZ | AZLCZ/ | Aztec Land and Cattle Company | US | 2026-07-09 | 2026-07-19 | unknown | watch |
 | AZO | AZO/ | AutoZone | US | 2026-07-09 | 2026-07-19 | unknown | watch |
 | B | B/ | Barrick Mining Corporation | US | 2026-07-09 | 2026-07-19 | unknown | watch |
@@ -668,4 +672,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-19.
 | ZBRA | ZBRA/ | Zebra Technologies | US | 2026-07-10 | 2026-07-19 | unknown | watch |
 | ZTS | ZTS/ | Zoetis | US | 2026-07-10 | 2026-07-19 | unknown | watch |
 
-**661 holdings total.** Registry: `_system/portfolio/registry.json`
+**665 holdings total.** Registry: `_system/portfolio/registry.json`
