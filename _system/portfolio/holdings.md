@@ -71,7 +71,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-19.
 | ARES | ARES/ | Ares Management | US | 2026-07-09 | 2026-07-19 | unknown | watch |
 | ARKK | ARKK/ | ARKK | US | — | 2026-07-19 | unknown | watch |
 | ARM | ARM/ | ARM | US | — | 2026-07-19 | unknown | watch |
-| ASHR | ASHR/ | ASHR | US | — | 2026-07-19 | unknown | watch |
+| ASHR | ASHR/ | ASHR | US | 2026-07-19 | 2026-07-19 | unknown | watch |
 | ASML | ASML/ | ASML | US | — | 2026-07-19 | unknown | watch |
 | ASPN | ASPN/ | Aspen Aerogels, Inc. | US | 2026-07-09 | 2026-07-19 | unknown | watch |
 | ASTS | ASTS/ | AST SpaceMobile, Inc. | US | 2026-07-17 | 2026-07-19 | unknown | watch |

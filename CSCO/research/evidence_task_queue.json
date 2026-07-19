@@ -1,20 +1,8 @@
 {
   "schema_version": "1.0",
   "ticker": "CSCO",
-  "updated_at": "2026-07-19T05:40:37Z",
+  "updated_at": "2026-07-19T05:40:45Z",
   "tasks": [
-    {
-      "id": "sec_identity_required",
-      "priority": "critical",
-      "question": "Resolve the issuer SEC CIK before primary filing collection.",
-      "evidence_required": "Committed SEC ticker/CIK mapping or verified SEC submissions identity.",
-      "acceptance_test": "Registry download.cik is a ten-digit verified CIK.",
-      "collector": "sec_primary_documents",
-      "status": "pending_collection",
-      "attempts": 0,
-      "last_attempt_at": null,
-      "evidence_refs": []
-    },
     {
       "id": "complete_component_model_required",
       "priority": "critical",
@@ -22,10 +10,12 @@
       "evidence_required": "normalized owner earnings; incremental return on capital; reinvestment runway; diluted share count; competitive-advantage mechanism",
       "acceptance_test": "Every material economic claim is valued exactly once with causal low/base/high assumptions and primary evidence.",
       "collector": "primary_documents_then_model",
-      "status": "pending_collection",
-      "attempts": 0,
-      "last_attempt_at": null,
-      "evidence_refs": []
+      "status": "evidence_ready",
+      "attempts": 1,
+      "last_attempt_at": "2026-07-19T05:40:44Z",
+      "evidence_refs": [
+        "CSCO/investor-documents/DOWNLOAD_MANIFEST.json"
+      ]
     }
   ]
 }
