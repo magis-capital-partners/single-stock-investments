@@ -19,6 +19,11 @@ on:
       - "_system/scripts/marvin_cloud_refresh.py"
       - "_system/scripts/batch_portfolio_refresh.py"
       - "_system/scripts/check_cloud_marvin_sync.py"
+      - "_system/scripts/build_insights.py"
+      - "_system/scripts/validate_dashboard_data.py"
+      - "_system/scripts/ci_push_main.sh"
+      - "dashboard/data/insights.json"
+      - "docs/data/insights.json"
 
 permissions:
   contents: read
@@ -79,3 +84,23 @@ jobs:
           python-version: "3.12"
       - name: Lint changed ticker research
         run: python _system/scripts/lint_pr_research.py --base origin/${{ github.base_ref }}
+
+  dashboard-integrity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts/ci_checkout_workspace.sh
+            _system/scripts/ci_resolve_checkout_ref.sh
+            _system/scripts/ci_sparse_checkout_paths.py
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Checkout dashboard validation workspace
+        run: bash _system/scripts/ci_checkout_workspace.sh dashboard
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate dashboard artifacts and letter corpus
+        run: python _system/scripts/validate_dashboard_data.py

@@ -53,6 +53,7 @@ LETTERS_INSIGHTS = letters_root() / "insights.json"
 # Full letter corpus is built offline (letter-backfill) and committed in dashboard/data/.
 # CI vault clones often lag; never regress below this floor on deploy rebuilds.
 MIN_LETTER_CORPUS = 15000
+MIN_CLASSIFIED_LETTER_CORPUS = 12000
 LETTER_REGRESSION_RATIO = 0.95
 NEWS_PATH = ROOT / "dashboard" / "data" / "portfolio_news.json"
 THEMES_DIR = ROOT / "_system" / "reference" / "market-data" / "themes"
@@ -367,17 +368,29 @@ def count_vault_letters() -> int:
     return len(letters)
 
 
+def letter_corpus_floor(document: dict | None) -> int:
+    policy_version = int((document or {}).get("classification_policy_version") or 0)
+    return MIN_CLASSIFIED_LETTER_CORPUS if policy_version >= 4 else MIN_LETTER_CORPUS
+
+
 def should_preserve_letter_corpus(prior: dict | None, vault_count: int) -> tuple[bool, str]:
     prior_count = prior_letter_count(prior)
-    if prior_count < MIN_LETTER_CORPUS:
-        return False, f"prior corpus {prior_count} below preserve floor {MIN_LETTER_CORPUS}"
+    corpus_floor = letter_corpus_floor(prior)
+    if prior_count < corpus_floor:
+        return False, f"prior corpus {prior_count} below preserve floor {corpus_floor}"
     if vault_count >= prior_count:
         return False, "vault corpus current"
-    if vault_count < MIN_LETTER_CORPUS:
-        return True, f"vault {vault_count} letters below floor {MIN_LETTER_CORPUS} (prior {prior_count})"
+    if vault_count < corpus_floor:
+        return True, f"vault {vault_count} letters below floor {corpus_floor} (prior {prior_count})"
     if vault_count < int(prior_count * LETTER_REGRESSION_RATIO):
         return True, f"vault {vault_count} regressed from prior {prior_count}"
     return False, "vault within tolerance of prior"
+
+
+def can_replace_preserved_letter_corpus(source_doc: dict, vault_count: int) -> bool:
+    """Only replace a committed corpus with a complete classified vault rebuild."""
+    policy_version = int(source_doc.get("classification_policy_version") or 0)
+    return policy_version >= 4 and vault_count >= MIN_CLASSIFIED_LETTER_CORPUS
 
 
 def load_preserved_letter_records() -> list[dict]:
@@ -390,6 +403,7 @@ def load_preserved_letter_records() -> list[dict]:
 
 def preserved_letter_payload_fields(prior: dict) -> dict:
     keys = (
+        "classification_policy_version",
         "letter_count",
         "letter_index",
         "consensus",
@@ -3035,7 +3049,7 @@ def main() -> int:
     vault_count = count_vault_letters()
     preserve, preserve_reason = should_preserve_letter_corpus(prior, vault_count)
     classification_policy_version = int(letters_source_doc.get("classification_policy_version") or 0)
-    if classification_policy_version >= 4:
+    if can_replace_preserved_letter_corpus(letters_source_doc, vault_count):
         preserve = False
         preserve_reason = "intentional classified-letter corpus rebuild"
     if preserve:

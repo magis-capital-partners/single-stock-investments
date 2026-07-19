@@ -349,7 +349,8 @@ def main() -> int:
         [ticker],
         optional=True,
     )
-    ok &= run_script("insights merge", "build_insights.py", [], optional=True)
+    ok &= run_script("insights merge", "build_insights.py", [])
+    ok &= run_script("dashboard integrity", "validate_dashboard_data.py", [])
     ok &= run_script(
         "persona calibration",
         "relevance_calibration_check.py",

@@ -120,8 +120,8 @@ regenerate_insights_artifacts() {
     return 1
   fi
   echo "Regenerating insights artifacts to resolve rebase conflicts..."
-  rm -f dashboard/data/insights.json 2>/dev/null || true
-  rm -f _system/reference/data-sources/insights_record_archive.json 2>/dev/null || true
+  # Keep committed artifacts: build_insights.py uses them as a safety baseline
+  # when the CI checkout lacks the full letter vault.
   if ! "$PYTHON" _system/scripts/build_insights.py; then
     echo "::error::build_insights.py failed while resolving a rebase conflict."
     return 1
