@@ -123,6 +123,8 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-19.
 | BRO | BRO/ | Brown & Brown | US | 2026-07-09 | 2026-07-19 | unknown | watch |
 | BSM | BSM/ | Black Stone Minerals LP | US | 2026-07-09 | 2026-07-19 | unknown | watch |
 | BSX | BSX/ | Boston Scientific | US | 2026-07-09 | 2026-07-19 | unknown | watch |
+| BTDR | BTDR/ | BTDR | US | — | 2026-07-19 | unknown | watch |
+| BULL | BULL/ | BULL | US | — | 2026-07-19 | unknown | watch |
 | BUR | BUR/ | Burford Capital Limited | US | 2026-07-09 | 2026-07-19 | unknown | watch |
 | BVERS | BVERS/ | Beaver Coal Company, Limited | OTC | 2026-07-09 | 2026-07-19 | optionality | watch |
 | BWEL | BWEL/ | J.G. Boswell Company | US | 2026-07-09 | 2026-07-19 | optionality | watch |
@@ -131,7 +133,9 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-19.
 | BYMA | BYMA/ | Bolsas y Mercados Argentinos S.A. | EU | 2026-07-09 | 2026-07-19 | unknown | watch |
 | C | C/ | Citigroup | US | 2026-07-09 | 2026-07-19 | unknown | watch |
 | CAH | CAH/ | Cardinal Health | US | 2026-07-09 | 2026-07-19 | unknown | watch |
+| CAMT | CAMT/ | CAMT | US | — | 2026-07-19 | unknown | watch |
 | CARR | CARR/ | Carrier Global | US | 2026-07-09 | 2026-07-19 | unknown | watch |
+| CART | CART/ | CART | US | — | 2026-07-19 | unknown | watch |
 | CASY | CASY/ | Casey's | US | 2026-07-09 | 2026-07-19 | unknown | watch |
 | CAT | CAT/ | Caterpillar Inc. | US | 2026-07-09 | 2026-07-19 | unknown | watch |
 | CB | CB/ | Chubb Limited | US | 2026-07-09 | 2026-07-19 | unknown | watch |
@@ -676,4 +680,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-19.
 | ZBRA | ZBRA/ | Zebra Technologies | US | 2026-07-10 | 2026-07-19 | unknown | watch |
 | ZTS | ZTS/ | Zoetis | US | 2026-07-10 | 2026-07-19 | unknown | watch |
 
-**669 holdings total.** Registry: `_system/portfolio/registry.json`
+**673 holdings total.** Registry: `_system/portfolio/registry.json`
