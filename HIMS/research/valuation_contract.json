@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "2.0",
   "status": "evidence_blocked",
   "ticker": "HIMS",
   "as_of": "2026-07-18",
@@ -16,27 +16,26 @@
         "value": 1,
         "unit": "per-share economic claim"
       },
-      "current_operating_contribution": {
-        "starting_revenue_m": null,
-        "base_value_per_share": 18.89
-      },
-      "growth_driver": null,
-      "required_reinvestment": {
-        "model_type": null,
-        "base_incremental_after_tax_roic": null,
-        "base_remaining_cost_m": null,
-        "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
-      },
       "method": "owner_cash_dcf",
+      "method_version": null,
+      "method_provenance": null,
       "comparable_ids": [],
       "range_per_share": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "legacy_range_per_share": {
         "low": 16.92,
         "base": 18.89,
         "high": 21.14
       },
+      "valuation_status": "legacy_sensitivity",
+      "calculation_proof": null,
       "evidence_tier": "model_input",
       "evidence_level": "analyst_estimated",
       "evidence": "inputs.fcf_per_share and scenarios.base",
+      "scenario_assumptions": null,
       "probability_and_timing": null,
       "tax_and_realization_adjustments": "Risk and timing are reflected in the low/base/high range.",
       "falsifier": "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods.",
@@ -61,7 +60,8 @@
         "kind": "estimate",
         "evidence_tier": "model_input",
         "evidence": "inputs.fcf_per_share and scenarios.base",
-        "method": "owner_cash_dcf"
+        "method": "owner_cash_dcf",
+        "valuation_status": "legacy_sensitivity"
       }
     ],
     "judgments": []
@@ -170,7 +170,7 @@
     },
     "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
     "ticker": "HIMS",
-    "as_of": "2026-07-18",
+    "as_of": "2026-07-19",
     "route_source": "canonical_power_zone_router",
     "config_path": "_system/frameworks/power_zones.json",
     "config_updated": "2026-07-14",
@@ -182,7 +182,7 @@
       "cycle": "mid",
       "moi_bucket": "pending",
       "payoff_lens": "operating",
-      "investment_sleeve": "-",
+      "investment_sleeve": "ls_algo_underlying",
       "predictive_attribute": "glp1_regulatory_overhang_vs_brand_scale"
     },
     "specialist_power_zones": [],
@@ -209,8 +209,8 @@
         }
       ]
     },
-    "input_hash": "c3500aa0e4668b1a59d372857993a893cafaa7264e913e5d945995f36b085ddd",
-    "generated_at": "2026-07-18T13:01:45.279879+00:00"
+    "input_hash": "ffade5cae6abe87a1d58adf2281bf7fb6db092914e6359b1d3aff3f5484f95c0",
+    "generated_at": "2026-07-19T02:24:07.498646+00:00"
   },
   "market": {
     "price_per_share": 32.84,
@@ -220,37 +220,72 @@
   },
   "valuation": {
     "value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "priced_components_per_share": {
+      "low": 0,
+      "base": 0,
+      "high": 0
+    },
+    "legacy_value_per_share": {
       "low": 16.92,
       "base": 18.89,
       "high": 21.14
     },
-    "probability_weighted_value_per_share": 18.89,
+    "probability_weighted_value_per_share": null,
     "expected_distributions_per_share": 0.0,
     "annualized_return_at_price_pct": {
-      "low": -9.04,
-      "base": -7.6,
-      "high": -6.1
+      "low": null,
+      "base": null,
+      "high": null
     },
-    "downside_to_low_pct": -48.48,
-    "horizon_years": 7
+    "downside_to_low_pct": null,
+    "horizon_years": 7,
+    "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
   },
   "scenario_contract": {
-    "rule": "Cases must change causal operating, capital, probability, timing, or financing drivers\u2014not only the terminal multiple.",
+    "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
     "top_value_drivers": [
       {
         "component_id": "operating_business_fallback",
         "label": "Operating business (fallback)",
-        "base_per_share": 18.89,
-        "range_width_per_share": 4.22,
+        "valuation_status": "legacy_sensitivity",
+        "base_per_share": null,
+        "legacy_base_per_share": 18.89,
+        "range_width_per_share": null,
         "scenario_assumptions": null
       }
     ],
     "reverse_expectations": null
   },
+  "calculation_proof_summary": {
+    "component_count": 1,
+    "priced_component_count": 0,
+    "proof_complete_pct": 0.0,
+    "status_counts": {
+      "bounded_estimate": 0,
+      "calculated": 0,
+      "legacy_sensitivity": 1,
+      "unpriced": 0
+    },
+    "all_material_components_priced": false,
+    "calculation_errors": [],
+    "aggregate_proof_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  "source_lineage": [],
+  "model_checks": {
+    "calculation_graphs_valid": true,
+    "component_sum_reconciles": false,
+    "no_double_counting": true,
+    "all_material_components_priced": false,
+    "low_base_high_ordered": true
+  },
   "evidence": {
     "unresolved_count": 1,
     "blockers": [
-      "A complete, explicit ownership/component schedule has not been supplied."
+      "operating_business_fallback: material component is legacy_sensitivity; a valid calculation proof is required"
     ],
     "validation_errors": []
   },
@@ -265,7 +300,13 @@
       "component milestone or falsifier"
     ]
   },
-  "decision_rule": "No security is decision-grade until every material economic claim is valued exactly once and every material evidence blocker is resolved.",
+  "change_control": {
+    "model_hash": "e10375183c2722470b6356f03596db0950ccbcfb97298248a148373bf03f648e",
+    "method_versions": [],
+    "change_log": [],
+    "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
+  },
+  "decision_rule": "No security is decision-grade until every material claim is valued exactly once by a valid calculation proof and every material evidence blocker is resolved.",
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true
 }

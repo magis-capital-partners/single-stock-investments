@@ -1,31 +1,33 @@
 {
   "schema_version": "2.0",
   "ticker": "HNFSA",
-  "as_of": "2026-07-18",
+  "as_of": "2026-07-19",
   "decision": {
-    "status": "decision_grade",
+    "status": "evidence_blocked",
     "price_per_share": 55.0,
     "market_cap_m": 66.55,
     "enterprise_value_m": 128.68,
     "value_per_share": {
-      "low": 32.4,
-      "base": 61.2,
-      "high": 97.2
+      "low": null,
+      "base": null,
+      "high": null
     },
     "annualized_return_at_price_pct": {
-      "low": -7.28,
-      "base": 1.54,
-      "high": 8.47
+      "low": null,
+      "base": null,
+      "high": null
     },
-    "downside_to_low_pct": -41.09,
-    "unvalued_component_count": 0,
+    "downside_to_low_pct": null,
+    "unvalued_component_count": 2,
     "unresolved_evidence_count": 0,
+    "proof_complete_pct": 0.0,
+    "model_hash": "3eab576e13355b6c58f837e4077cad16ebe29712999bc4c2d70fe3a17fc0499e",
     "primary_power_zone": "Scarce assets, royalties, and optionality",
     "owner_decision": null,
     "next_action": "Freeze the evidence packet and select three method-independent raters."
   },
   "business": {
-    "status": "complete",
+    "status": "incomplete",
     "components": [
       {
         "component_id": "operating_food_business",
@@ -39,27 +41,26 @@
           "value": 1,
           "unit": "per-share economic claim"
         },
-        "current_operating_contribution": {
-          "starting_revenue_m": null,
-          "base_value_per_share": 72.0
-        },
-        "growth_driver": "Provisional single-stack operating claim pending segment rebuild.",
-        "required_reinvestment": {
-          "model_type": null,
-          "base_incremental_after_tax_roic": null,
-          "base_remaining_cost_m": null,
-          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
-        },
         "method": "owner_cash_dcf",
+        "method_version": null,
+        "method_provenance": null,
         "comparable_ids": [],
         "range_per_share": {
+          "low": null,
+          "base": null,
+          "high": null
+        },
+        "legacy_range_per_share": {
           "low": 50.4,
           "base": 72.0,
           "high": 100.8
         },
+        "valuation_status": "legacy_sensitivity",
+        "calculation_proof": null,
         "evidence_tier": "analyst_estimate",
         "evidence_level": "analyst_estimated",
         "evidence": "Prior HNFSA optionality dive / filings; retrofit schedule pending full re-underwrite of segments.",
+        "scenario_assumptions": "Provisional single-stack operating claim pending segment rebuild.",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "Starter range from prior payoff.",
         "falsifier": "Operating cash collapses below the low case without offsetting asset value.",
@@ -78,27 +79,26 @@
           "value": 1,
           "unit": "per-share economic claim"
         },
-        "current_operating_contribution": {
-          "starting_revenue_m": null,
-          "base_value_per_share": -10.8
-        },
-        "growth_driver": "Market-structure haircut separate from operating value.",
-        "required_reinvestment": {
-          "model_type": null,
-          "base_incremental_after_tax_roic": null,
-          "base_remaining_cost_m": null,
-          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
-        },
         "method": "realization_reserve",
+        "method_version": null,
+        "method_provenance": null,
         "comparable_ids": [],
         "range_per_share": {
+          "low": null,
+          "base": null,
+          "high": null
+        },
+        "legacy_range_per_share": {
           "low": -18.0,
           "base": -10.8,
           "high": -3.6
         },
+        "valuation_status": "legacy_sensitivity",
+        "calculation_proof": null,
         "evidence_tier": "mixed_primary_and_estimate",
         "evidence_level": "analyst_estimated",
         "evidence": "Thin OTC market and control dynamics from prior dive.",
+        "scenario_assumptions": "Market-structure haircut separate from operating value.",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "Realization path dependent.",
         "falsifier": "Liquidity event removes the structural discount.",
@@ -111,7 +111,7 @@
       "material_component_count": 2,
       "additive_component_count": 2,
       "embedded_component_count": 0,
-      "unvalued_component_count": 0,
+      "unvalued_component_count": 2,
       "double_counting_flags": []
     },
     "facts": [],
@@ -123,7 +123,8 @@
         "kind": "judgment",
         "evidence_tier": "analyst_estimate",
         "evidence": "Prior HNFSA optionality dive / filings; retrofit schedule pending full re-underwrite of segments.",
-        "method": "owner_cash_dcf"
+        "method": "owner_cash_dcf",
+        "valuation_status": "legacy_sensitivity"
       },
       {
         "component_id": "illiquidity_reserve",
@@ -131,12 +132,13 @@
         "kind": "judgment",
         "evidence_tier": "mixed_primary_and_estimate",
         "evidence": "Thin OTC market and control dynamics from prior dive.",
-        "method": "realization_reserve"
+        "method": "realization_reserve",
+        "valuation_status": "legacy_sensitivity"
       }
     ]
   },
   "valuation": {
-    "status": "decision_grade",
+    "status": "evidence_blocked",
     "market": {
       "price_per_share": 55.0,
       "fully_diluted_shares": 1210000,
@@ -145,19 +147,30 @@
     },
     "valuation": {
       "value_per_share": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "priced_components_per_share": {
+        "low": 0,
+        "base": 0,
+        "high": 0
+      },
+      "legacy_value_per_share": {
         "low": 32.4,
         "base": 61.2,
         "high": 97.2
       },
-      "probability_weighted_value_per_share": 61.2,
+      "probability_weighted_value_per_share": null,
       "expected_distributions_per_share": 0.0,
       "annualized_return_at_price_pct": {
-        "low": -7.28,
-        "base": 1.54,
-        "high": 8.47
+        "low": null,
+        "base": null,
+        "high": null
       },
-      "downside_to_low_pct": -41.09,
-      "horizon_years": 7
+      "downside_to_low_pct": null,
+      "horizon_years": 7,
+      "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
     },
     "components": [
       {
@@ -172,27 +185,26 @@
           "value": 1,
           "unit": "per-share economic claim"
         },
-        "current_operating_contribution": {
-          "starting_revenue_m": null,
-          "base_value_per_share": 72.0
-        },
-        "growth_driver": "Provisional single-stack operating claim pending segment rebuild.",
-        "required_reinvestment": {
-          "model_type": null,
-          "base_incremental_after_tax_roic": null,
-          "base_remaining_cost_m": null,
-          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
-        },
         "method": "owner_cash_dcf",
+        "method_version": null,
+        "method_provenance": null,
         "comparable_ids": [],
         "range_per_share": {
+          "low": null,
+          "base": null,
+          "high": null
+        },
+        "legacy_range_per_share": {
           "low": 50.4,
           "base": 72.0,
           "high": 100.8
         },
+        "valuation_status": "legacy_sensitivity",
+        "calculation_proof": null,
         "evidence_tier": "analyst_estimate",
         "evidence_level": "analyst_estimated",
         "evidence": "Prior HNFSA optionality dive / filings; retrofit schedule pending full re-underwrite of segments.",
+        "scenario_assumptions": "Provisional single-stack operating claim pending segment rebuild.",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "Starter range from prior payoff.",
         "falsifier": "Operating cash collapses below the low case without offsetting asset value.",
@@ -211,27 +223,26 @@
           "value": 1,
           "unit": "per-share economic claim"
         },
-        "current_operating_contribution": {
-          "starting_revenue_m": null,
-          "base_value_per_share": -10.8
-        },
-        "growth_driver": "Market-structure haircut separate from operating value.",
-        "required_reinvestment": {
-          "model_type": null,
-          "base_incremental_after_tax_roic": null,
-          "base_remaining_cost_m": null,
-          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
-        },
         "method": "realization_reserve",
+        "method_version": null,
+        "method_provenance": null,
         "comparable_ids": [],
         "range_per_share": {
+          "low": null,
+          "base": null,
+          "high": null
+        },
+        "legacy_range_per_share": {
           "low": -18.0,
           "base": -10.8,
           "high": -3.6
         },
+        "valuation_status": "legacy_sensitivity",
+        "calculation_proof": null,
         "evidence_tier": "mixed_primary_and_estimate",
         "evidence_level": "analyst_estimated",
         "evidence": "Thin OTC market and control dynamics from prior dive.",
+        "scenario_assumptions": "Market-structure haircut separate from operating value.",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "Realization path dependent.",
         "falsifier": "Liquidity event removes the structural discount.",
@@ -240,24 +251,56 @@
       }
     ],
     "scenario_contract": {
-      "rule": "Cases must change causal operating, capital, probability, timing, or financing drivers\u2014not only the terminal multiple.",
+      "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
       "top_value_drivers": [
         {
           "component_id": "operating_food_business",
           "label": "Hanover Foods operating business",
-          "base_per_share": 72.0,
-          "range_width_per_share": 50.4,
-          "scenario_assumptions": null
+          "valuation_status": "legacy_sensitivity",
+          "base_per_share": null,
+          "legacy_base_per_share": 72.0,
+          "range_width_per_share": null,
+          "scenario_assumptions": "Provisional single-stack operating claim pending segment rebuild."
         },
         {
           "component_id": "illiquidity_reserve",
           "label": "OTC / control illiquidity reserve",
-          "base_per_share": -10.8,
-          "range_width_per_share": 14.4,
-          "scenario_assumptions": null
+          "valuation_status": "legacy_sensitivity",
+          "base_per_share": null,
+          "legacy_base_per_share": -10.8,
+          "range_width_per_share": null,
+          "scenario_assumptions": "Market-structure haircut separate from operating value."
         }
       ],
       "reverse_expectations": null
+    },
+    "calculation_proof_summary": {
+      "component_count": 2,
+      "priced_component_count": 0,
+      "proof_complete_pct": 0.0,
+      "status_counts": {
+        "bounded_estimate": 0,
+        "calculated": 0,
+        "legacy_sensitivity": 2,
+        "unpriced": 0
+      },
+      "all_material_components_priced": false,
+      "calculation_errors": [],
+      "aggregate_proof_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "model_checks": {
+      "calculation_graphs_valid": true,
+      "component_sum_reconciles": false,
+      "no_double_counting": true,
+      "all_material_components_priced": false,
+      "low_base_high_ordered": true
+    },
+    "source_lineage": [],
+    "change_control": {
+      "model_hash": "3eab576e13355b6c58f837e4077cad16ebe29712999bc4c2d70fe3a17fc0499e",
+      "method_versions": [],
+      "change_log": [],
+      "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
     }
   },
   "optionality": {
@@ -426,12 +469,12 @@
     "weighting_rule": "Do not change a persona's relevance within a power zone until at least 20 attributable, dividend-aware outcomes exist there; never reweight automatically."
   },
   "attribution": {
-    "status": "baseline_established",
+    "status": "waiting_for_proof_complete_baseline",
     "current": {
       "as_of": "2026-06-10",
-      "low": 32.4,
-      "base": 61.2,
-      "high": 97.2
+      "low": null,
+      "base": null,
+      "high": null
     },
     "prior": null,
     "base_change_per_share": null,
@@ -439,6 +482,11 @@
     "drivers": [],
     "category_totals_per_share": {},
     "unexplained_per_share": null,
-    "explanation": "The current component schedule is the first decision-grade baseline; attribution begins with the next dated valuation snapshot."
+    "legacy_value_per_share": {
+      "low": 32.4,
+      "base": 61.2,
+      "high": 97.2
+    },
+    "explanation": "A complete security value is intentionally withheld while material components are unpriced. Attribution restarts after the first proof-complete baseline."
   }
 }
