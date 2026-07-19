@@ -1,0 +1,1988 @@
+{
+  "ticker": "AXTI",
+  "as_of": "2026-07-19",
+  "method": "full",
+  "irr_method": "scenario",
+  "lawrence_bucket": "low_cost",
+  "payoff_lens": "operating",
+  "classification_inputs": {
+    "archetype": "cyclical",
+    "moat": "unproven",
+    "dhando": "partial",
+    "cycle": "trough",
+    "payoff_lens": "operating",
+    "predictive_attribute": "complexity_discount",
+    "investment_sleeve": "ls_algo_underlying"
+  },
+  "inputs": {
+    "price": 45.86,
+    "price_source": "Yahoo AXTI close 2026-07-17",
+    "price_as_of": "2026-07-17",
+    "shares_millions": 65.4,
+    "shares_outstanding": 65423184,
+    "shares_source": "65,423,184 common shares outstanding May 4, 2026 (10-Q Q1 2026 cover page)",
+    "fcf_per_share": 0.12,
+    "fcf_source": "[Assumption] Mid-cycle normalized owner cash: ~$7.8M annual (2021\u20132022 operating profit ~$13M less maintenance capital spending ~$6M) scaled to 65.4M diluted shares; current filing OCF minus capital spending is negative ($-0.29/sh FY2025)",
+    "revenue_fy2025_m": 88.3,
+    "revenue_fy2025_source": "FY2025 revenue $88.3M (10-K filed 2026-03-17; sec_companyfacts RevenueFromContractWithCustomerExcludingAssessedTax)",
+    "revenue_q1_2026_m": 26.9,
+    "revenue_q1_source": "Q1 2026 revenue $26.9M (+39% YoY vs $19.4M Q1 2025; 10-Q filed 2026-05-14)",
+    "gross_margin_q1_2026_pct": 29.6,
+    "gross_margin_fy2025_pct": 12.7,
+    "cash_m": 57.9,
+    "cash_source": "Cash, cash equivalents and restricted cash $57.9M at March 31, 2026 (10-Q; sec_companyfacts CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents)",
+    "equity_m": 273.3,
+    "equity_source": "Stockholders equity $273.3M at December 31, 2025 (10-K FY2025)",
+    "book_per_share": 4.18,
+    "book_per_share_source": "$273.3M equity / 65.4M shares [Assumption] using current share count on year-end equity",
+    "customer_concentration_top5_pct": 67,
+    "customer_concentration_source": "Top five customers 67% of FY2025 revenue (10-K FY2025 concentration disclosure)",
+    "normalization_note": "Reported FY2025 owner cash is negative (operating cash flow -$12.8M minus capital spending $6.0M). Lawrence base uses mid-cycle normalized owner cash anchored to 2021\u20132022 substrate upcycle economics, not spot losses. Q1 2026 gross margin recovery (29.6%) and revenue acceleration support normalization path but are not yet in base year-zero cash.",
+    "lease_income_annual_usd": 0.0
+  },
+  "component_valuation": {
+    "version": "1.0",
+    "all_material_components_identified": true,
+    "components": [
+      {
+        "id": "midcycle_substrate_operations",
+        "label": "Specialty substrate manufacturing (InP, GaAs, Ge) at mid-cycle utilization",
+        "category": "operating_business",
+        "overlap_key": "substrate_operating_cash",
+        "treatment": "additive",
+        "valuation_status": "bounded_estimate",
+        "valuation": {
+          "basis": "per_share",
+          "method": "dcf",
+          "low": 0.8,
+          "base": 1.4,
+          "high": 2.2,
+          "evidence_tier": "filing",
+          "evidence": "FY2021\u20132022 operating income ~$13M on ~$140M revenue; Q1 2026 revenue run-rate ~$108M with 29.6% gross margin; Coherent 6-inch InP supply agreement (8-K 2026-06-26) and Casela 2027 InP commitment (8-K 2026-06-17)",
+          "cross_check": "Capital-cycle midcycle_capacity_value route; compare to 2019\u20132022 revenue and margin band"
+        }
+      },
+      {
+        "id": "raw_materials_gallium",
+        "label": "Consolidated gallium raw-material subsidiaries (85.5% owned)",
+        "category": "operating_business",
+        "overlap_key": "gallium_vertical_integration",
+        "treatment": "embedded",
+        "included_in_component_id": "midcycle_substrate_operations",
+        "valuation_status": "bounded_estimate",
+        "valuation": {
+          "basis": "per_share",
+          "method": "manual",
+          "low": 0.0,
+          "base": 0.0,
+          "high": 0.0,
+          "evidence_tier": "filing",
+          "evidence": "Vertical integration embedded in substrate margin; Nanjing/Chaoyang JinMei Gallium 85.5% owned (10-K FY2025)",
+          "cross_check": "Not separately terminal-valued to avoid double-count with substrate operations"
+        }
+      },
+      {
+        "id": "cash_and_liquidity",
+        "label": "Cash, cash equivalents and restricted cash",
+        "category": "financial_asset",
+        "overlap_key": "balance_sheet_cash",
+        "treatment": "additive",
+        "valuation_status": "calculated",
+        "valuation": {
+          "basis": "per_share",
+          "method": "market_value",
+          "low": 0.75,
+          "base": 0.89,
+          "high": 0.89,
+          "evidence_tier": "filing",
+          "evidence": "$57.9M at March 31, 2026 / 65.4M shares (10-Q Q1 2026)",
+          "cross_check": "Down from $128.4M restricted+cash at Dec 2025 as proceeds deployed to Tongmei capacity"
+        }
+      },
+      {
+        "id": "tongmei_hk_listing_option",
+        "label": "Tongmei Hong Kong listing option (STAR Market withdrawn July 2026)",
+        "category": "real_option",
+        "overlap_key": "tongmei_listing_catalyst",
+        "treatment": "additive",
+        "valuation_status": "bounded_estimate",
+        "valuation": {
+          "basis": "per_share",
+          "method": "milestone_nav",
+          "evidence_tier": "filing",
+          "evidence": "Tongmei withdrew STAR Market IPO July 8, 2026; pivot to HK listing (8-K 2026-07-08). Prior PE investment RMB 324M (~$49M). Listing outcome uncertain.",
+          "cross_check": "Probability-weighted; zero in Lawrence consolidated owner-cash path",
+          "falsifier": "HK listing fails or PE redemptions drain parent cash before listing",
+          "driver_model": {
+            "type": "milestone_project_option",
+            "timing_basis": "HK listing application per 8-K 2026-07-08; base realization 3 years",
+            "scenarios": {
+              "low": {
+                "success_probability": 0.0,
+                "success_value_m": 93.46,
+                "remaining_cost_m": 0.0,
+                "ownership_pct": 1.0
+              },
+              "base": {
+                "success_probability": 0.35,
+                "success_value_m": 93.46,
+                "remaining_cost_m": 0.0,
+                "ownership_pct": 1.0
+              },
+              "high": {
+                "success_probability": 0.55,
+                "success_value_m": 178.43,
+                "remaining_cost_m": 0.0,
+                "ownership_pct": 1.0
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "pe_redemption_liability",
+        "label": "Tongmei private-equity redemption rights (~$49M gross)",
+        "category": "liability_or_reserve",
+        "overlap_key": "tongmei_pe_redemption",
+        "treatment": "additive",
+        "valuation_status": "bounded_estimate",
+        "valuation": {
+          "basis": "per_share",
+          "method": "manual",
+          "low": -1.0,
+          "base": -0.75,
+          "high": 0.0,
+          "evidence_tier": "filing",
+          "evidence": "Eleven PE funds invested RMB 324,404,508 (~$49M) in Tongmei; STAR withdrawal triggers redemption rights at original investment (8-K 2026-07-08)",
+          "cross_check": "High case assumes funds roll into HK listing; base assumes partial redemption"
+        }
+      },
+      {
+        "id": "dilution_reserve",
+        "label": "Equity dilution reserve (2025\u20132026 offerings)",
+        "category": "liability_or_reserve",
+        "overlap_key": "share_count_dilution",
+        "treatment": "additive",
+        "valuation_status": "bounded_estimate",
+        "valuation": {
+          "basis": "per_share",
+          "method": "manual",
+          "low": -0.5,
+          "base": -0.3,
+          "high": 0.0,
+          "evidence_tier": "filing",
+          "evidence": "Shares outstanding rose from ~43.5M (Q1 2025) to 65.4M (May 2026) after Dec 2025 and Apr 2026 offerings (424B5, 8-K filings)",
+          "cross_check": "S-3ASR shelf remains active; further dilution possible"
+        }
+      }
+    ]
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": -0.05,
+      "growth_y6_10": 0.0,
+      "exit_pfcf_y10": 8,
+      "notes": "China export or demand disruption; PE redemptions funded by parent; margin reverts to FY2025 trough; further dilution"
+    },
+    "base": {
+      "growth_y1_5": 0.08,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 12,
+      "notes": "Mid-cycle owner cash $0.12/sh; InP AI/datacenter demand via Coherent/Casela contracts; utilization normalizes toward 2021\u20132022 economics on higher revenue base"
+    },
+    "bull": {
+      "growth_y1_5": 0.15,
+      "growth_y6_10": 0.08,
+      "exit_pfcf_y10": 15,
+      "notes": "Production at spot $4.0"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "milestone_nav",
+      "evidence": "Tongmei subsidiary and China manufacturing assets may carry value below strategic worth; no land-at-zero pattern like TPL (10-K balance sheet)"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in owner-cash path?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Coherent 3-year 6-inch InP supply agreement (8-K 2026-06-26); Casela 2027 InP purchase commitment (8-K 2026-06-17); modeled in base growth, not separate terminal"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "Yes",
+      "treatment": "milestone_nav",
+      "evidence": "Tongmei PE stake and planned HK listing; STAR Market withdrawal July 2026 (8-K 2026-07-08)"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option already in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "AI-driven InP demand for high-speed optical data transmission cited in 10-K Item 1; revenue in substrate operations"
+    }
+  ],
+  "lawrence_horizon_years": 7,
+  "implied_return": {
+    "base_pct": -9.92,
+    "label": "7yr IRR (total synthesis)",
+    "display": "-9.92% (total synthesis)",
+    "lawrence_stance_gate_pct": -32.8,
+    "falsifier_adjusted_pct": -32.8,
+    "synthesis_pct": -9.92
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": true
+    },
+    "override_reason": "Negative reported owner cash; customer concentration 67%; China/Tongmei corporate structure complexity; dilution from 2025\u20132026 offerings"
+  },
+  "estimates": {
+    "marvin_floor": {
+      "per_share": null,
+      "return_pct": null,
+      "notes": "Computed after marvin_valuation.py --write with market price"
+    }
+  },
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "marvin_midcycle_base",
+        "label": "Marvin mid-cycle owner cash (filings)",
+        "source": "scenarios.base @ $0.12/sh normalized",
+        "return_pct": -5.88,
+        "weight": 0.85,
+        "type": "numeric",
+        "epistemic_tier": "A (primary filings + disclosed mid-cycle anchor)",
+        "weight_why": "Capital-cycle route requires normalized economics, not trough losses",
+        "hard_to_vary": "yes"
+      },
+      {
+        "id": "component_schedule",
+        "label": "Component schedule cross-check",
+        "source": "component_valuation",
+        "return_pct": -32.8,
+        "weight": 0.15,
+        "type": "numeric",
+        "epistemic_tier": "B (bounded estimates on Tongmei/HK option and PE redemption)",
+        "weight_why": "Corporate-structure risks not in pure DCF",
+        "hard_to_vary": "partial"
+      }
+    ],
+    "qualitative_adjustments": [],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": -9.92,
+    "qualitative_pp": 0,
+    "total_synthesis_pct": -9.92,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": false,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  },
+  "total_return_panel": {
+    "schema_version": "3.0",
+    "ticker": "AXTI",
+    "as_of": "2026-07-19",
+    "status": "partial",
+    "error": "Vendor events are discovery evidence; primary-source completeness has not been established.",
+    "price_source": "yahoo:AXTI",
+    "currency": "USD",
+    "return_currency": "USD",
+    "fx_basis": "listing_currency_nominal",
+    "history_start": "1998-05-21",
+    "history_end": "2026-07-17",
+    "price_points": 7082,
+    "price_interval": "1d",
+    "history_basis": "earliest_available_vendor_trading_history",
+    "chart_scale": "logarithmic",
+    "chart_y_axis": "cumulative_return_pct",
+    "chart_series": [
+      "total_return",
+      "price_only"
+    ],
+    "return_contract": "split-adjusted close excluding dividends; event amounts normalized for later splits; cash reinvested at ex-date close; pre-tax nominal",
+    "coverage": {
+      "status": "vendor_only",
+      "start": null,
+      "end": null,
+      "note": "Vendor events are discovery evidence; primary-source completeness has not been established.",
+      "ledger_path": null
+    },
+    "event_count": 0,
+    "event_counts": {},
+    "cash_distributions_on_initial_share_path": 0,
+    "distribution_contribution_by_type": {},
+    "cumulative_distributions_per_share": 0,
+    "start_price": 10.625,
+    "end_price": 45.86,
+    "price_index_end": 431.62,
+    "total_return_index_end": 431.62,
+    "cumulative_price_return_pct": 331.62,
+    "cumulative_total_return_pct": 331.62,
+    "price_only_annualized_pct": 5.33,
+    "total_return_annualized_pct": 5.33,
+    "market_cap_m": 3000.31,
+    "shares_outstanding": 65423184,
+    "price_for_market_cap": 45.86,
+    "chart": "AXTI/research/charts/total_return_2026-07-19.svg",
+    "panel_json": "AXTI/research/total_return_panel.json"
+  },
+  "context_overlay": {
+    "as_of": "2026-07-19",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": 0.95,
+            "as_of": "2026-07-17",
+            "yoy_pct": 196.9,
+            "direction": "up",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.540999889373779,
+            "as_of": "2026-07-17",
+            "yoy_pct": 1.7,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.2729997634887695,
+            "as_of": "2026-07-17",
+            "yoy_pct": 6.7,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 100.75,
+            "as_of": "2026-07-17",
+            "yoy_pct": 2.0,
+            "direction": "up",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 18.770000457763672,
+            "as_of": "2026-07-17",
+            "yoy_pct": 13.6,
+            "direction": "up",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": 1.46,
+            "as_of": "2026-07-17",
+            "yoy_pct": 22.7,
+            "direction": "up",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 11.68,
+            "as_of": "2026-07-17",
+            "yoy_pct": 32.3,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "insider_signal": {
+    "as_of": "2026-07-19",
+    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
+    "in_base_irr": false,
+    "window_days": 365,
+    "ics": 10.0,
+    "band": "exceptional",
+    "bull_case_support": "moderate",
+    "scenario_confidence": {
+      "priors": {
+        "bear": 0.2,
+        "base": 0.55,
+        "bull": 0.25
+      },
+      "tilted": {
+        "bear": 0.2,
+        "base": 0.4,
+        "bull": 0.4
+      },
+      "bull_delta": 0.15,
+      "bear_delta": 0.0,
+      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
+    },
+    "factors": {
+      "buy_score": 13.098,
+      "sell_score": -1.0,
+      "cluster_bonus": 0.0,
+      "net_buy_usd": 2403867.98,
+      "net_sell_usd": 78164315.02,
+      "price_today": 45.86
+    },
+    "top_buys": [
+      {
+        "insider": "YOUNG MORRIS S",
+        "date": "2026-06-01",
+        "shares": 73897,
+        "price": 5.21,
+        "value_usd": 385003.37,
+        "shares_owned_after": 2335225,
+        "contrib": 1.962
+      },
+      {
+        "insider": "YOUNG MORRIS S",
+        "date": "2025-11-14",
+        "shares": 70000,
+        "price": 5.21,
+        "value_usd": 364700.0,
+        "shares_owned_after": 2509490,
+        "contrib": 1.299
+      },
+      {
+        "insider": "YOUNG MORRIS S",
+        "date": "2026-06-02",
+        "shares": 11806,
+        "price": 5.21,
+        "value_usd": 61509.26,
+        "shares_owned_after": 2273134,
+        "contrib": 1.287
+      },
+      {
+        "insider": "FISCHER GARY L",
+        "date": "2026-02-26",
+        "shares": 65685,
+        "price": 5.21,
+        "value_usd": 342218.85,
+        "shares_owned_after": 503400,
+        "contrib": 1.275
+      },
+      {
+        "insider": "FISCHER GARY L",
+        "date": "2026-02-26",
+        "shares": 92440,
+        "price": 3.06,
+        "value_usd": 282866.4,
+        "shares_owned_after": 685543,
+        "contrib": 1.269
+      }
+    ],
+    "top_sells": [
+      {
+        "insider": "YOUNG MORRIS S",
+        "date": "2026-06-12",
+        "shares": 1200,
+        "price": 0.0,
+        "value_usd": 0.0,
+        "is_10b5_1": false,
+        "contrib": -0.202
+      },
+      {
+        "insider": "CHEN JESSE",
+        "date": "2026-06-15",
+        "shares": 6172,
+        "price": 115.2437,
+        "value_usd": 711284.12,
+        "is_10b5_1": false,
+        "contrib": -0.188
+      },
+      {
+        "insider": "CHANG DAVID C",
+        "date": "2026-06-15",
+        "shares": 8333,
+        "price": 111.1715,
+        "value_usd": 926392.11,
+        "is_10b5_1": false,
+        "contrib": -0.188
+      },
+      {
+        "insider": "YOUNG MORRIS S",
+        "date": "2026-06-02",
+        "shares": 123601,
+        "price": 113.3291,
+        "value_usd": 14007590.09,
+        "is_10b5_1": false,
+        "contrib": -0.186
+      },
+      {
+        "insider": "CHEN JESSE",
+        "date": "2026-06-12",
+        "shares": 13000,
+        "price": 95.7738,
+        "value_usd": 1245059.4,
+        "is_10b5_1": false,
+        "contrib": -0.184
+      }
+    ],
+    "narrative_hooks": [],
+    "transaction_count": 76
+  },
+  "lens_consensus": {
+    "as_of": "2026-07-19",
+    "shared_inputs_ref": "valuation.json@2026-07-19",
+    "valuation_richness": 0.968,
+    "blended_return_pct": -29.3,
+    "band_pct": [
+      -42.4,
+      -9.92
+    ],
+    "weighted_median_pct": -32.8,
+    "median_mean_flag": true,
+    "stance": "pass",
+    "agreement_pct": 100,
+    "dissent_count": 0,
+    "lawrence_divergence": false,
+    "top_dissents": [],
+    "contributor_count": 8,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
+  },
+  "economic_value": {
+    "schema_version": "1.0",
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One diluted share of AXT Inc., including specialty substrate operations, consolidated gallium raw materials, cash, Tongmei listing option, and PE redemption/dilution reserves.",
+      "unit_label": "diluted share",
+      "unit_count": 65423184,
+      "unit_source": "65,423,184 common shares outstanding May 4, 2026 (10-Q Q1 2026 cover page)",
+      "enterprise_to_equity_reconciliation": "Operating substrate value, cash, and real options are additive; PE redemption and dilution reserves are liability components; gallium vertical integration is embedded in substrate operations to avoid double-counting."
+    },
+    "gaap_role": "cross_check",
+    "accounting_reference": "FY2025 10-K and Q1 2026 10-Q via sec_companyfacts.json; mid-cycle owner cash is normalized [Assumption]."
+  },
+  "human_review": {
+    "live_price_confirmed": false
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -42.4
+    },
+    "base": {
+      "return_pct": -32.8
+    },
+    "bull": {
+      "return_pct": -27.1
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -42.4
+    },
+    "base": {
+      "return_pct": -32.8
+    },
+    "bull": {
+      "return_pct": -27.1
+    }
+  },
+  "overlay_results": [],
+  "component_valuation_results": {
+    "status": "complete",
+    "decision_rule": "Use the complete low/base/high component schedule. Embedded components are estimated but not added twice.",
+    "all_material_components_identified": true,
+    "additive_components": [
+      {
+        "id": "midcycle_substrate_operations",
+        "label": "Specialty substrate manufacturing (InP, GaAs, Ge) at mid-cycle utilization",
+        "category": "operating_business",
+        "overlap_key": "substrate_operating_cash",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "dcf",
+        "valuation_status": null,
+        "calculation_proof": null,
+        "evidence_tier": "filing",
+        "evidence": "FY2021\u20132022 operating income ~$13M on ~$140M revenue; Q1 2026 revenue run-rate ~$108M with 29.6% gross margin; Coherent 6-inch InP supply agreement (8-K 2026-06-26) and Casela 2027 InP commitment (8-K 2026-06-17)",
+        "cross_check": "Capital-cycle midcycle_capacity_value route; compare to 2019\u20132022 revenue and margin band",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": null,
+        "falsifier": null,
+        "scenario_assumptions": null,
+        "low_per_share": 0.8,
+        "base_per_share": 1.4,
+        "high_per_share": 2.2
+      },
+      {
+        "id": "cash_and_liquidity",
+        "label": "Cash, cash equivalents and restricted cash",
+        "category": "financial_asset",
+        "overlap_key": "balance_sheet_cash",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "market_value",
+        "valuation_status": null,
+        "calculation_proof": null,
+        "evidence_tier": "filing",
+        "evidence": "$57.9M at March 31, 2026 / 65.4M shares (10-Q Q1 2026)",
+        "cross_check": "Down from $128.4M restricted+cash at Dec 2025 as proceeds deployed to Tongmei capacity",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": null,
+        "falsifier": null,
+        "scenario_assumptions": null,
+        "low_per_share": 0.75,
+        "base_per_share": 0.89,
+        "high_per_share": 0.89
+      },
+      {
+        "id": "tongmei_hk_listing_option",
+        "label": "Tongmei Hong Kong listing option (STAR Market withdrawn July 2026)",
+        "category": "real_option",
+        "overlap_key": "tongmei_listing_catalyst",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "milestone_nav",
+        "valuation_status": null,
+        "calculation_proof": null,
+        "evidence_tier": "filing",
+        "evidence": "Tongmei withdrew STAR Market IPO July 8, 2026; pivot to HK listing (8-K 2026-07-08). Prior PE investment RMB 324M (~$49M). Listing outcome uncertain.",
+        "cross_check": "Probability-weighted; zero in Lawrence consolidated owner-cash path",
+        "driver_model_type": "milestone_project_option",
+        "driver_model": {
+          "type": "milestone_project_option",
+          "timing_basis": "HK listing application per 8-K 2026-07-08; base realization 3 years",
+          "scenarios": {
+            "low": {
+              "success_probability": 0.0,
+              "success_value_m": 93.46,
+              "remaining_cost_m": 0.0,
+              "ownership_pct": 1.0
+            },
+            "base": {
+              "success_probability": 0.35,
+              "success_value_m": 93.46,
+              "remaining_cost_m": 0.0,
+              "ownership_pct": 1.0
+            },
+            "high": {
+              "success_probability": 0.55,
+              "success_value_m": 178.43,
+              "remaining_cost_m": 0.0,
+              "ownership_pct": 1.0
+            }
+          }
+        },
+        "assumption_summary": null,
+        "falsifier": "HK listing fails or PE redemptions drain parent cash before listing",
+        "scenario_assumptions": {
+          "low": {
+            "success_probability": 0.0,
+            "success_value_m": 93.46,
+            "remaining_cost_m": 0.0,
+            "ownership_pct": 1.0
+          },
+          "base": {
+            "success_probability": 0.35,
+            "success_value_m": 93.46,
+            "remaining_cost_m": 0.0,
+            "ownership_pct": 1.0
+          },
+          "high": {
+            "success_probability": 0.55,
+            "success_value_m": 178.43,
+            "remaining_cost_m": 0.0,
+            "ownership_pct": 1.0
+          }
+        },
+        "low_per_share": 0.0,
+        "base_per_share": 0.5,
+        "high_per_share": 1.5
+      },
+      {
+        "id": "pe_redemption_liability",
+        "label": "Tongmei private-equity redemption rights (~$49M gross)",
+        "category": "liability_or_reserve",
+        "overlap_key": "tongmei_pe_redemption",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "manual",
+        "valuation_status": null,
+        "calculation_proof": null,
+        "evidence_tier": "filing",
+        "evidence": "Eleven PE funds invested RMB 324,404,508 (~$49M) in Tongmei; STAR withdrawal triggers redemption rights at original investment (8-K 2026-07-08)",
+        "cross_check": "High case assumes funds roll into HK listing; base assumes partial redemption",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": null,
+        "falsifier": null,
+        "scenario_assumptions": null,
+        "low_per_share": -1.0,
+        "base_per_share": -0.75,
+        "high_per_share": 0.0
+      },
+      {
+        "id": "dilution_reserve",
+        "label": "Equity dilution reserve (2025\u20132026 offerings)",
+        "category": "liability_or_reserve",
+        "overlap_key": "share_count_dilution",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "manual",
+        "valuation_status": null,
+        "calculation_proof": null,
+        "evidence_tier": "filing",
+        "evidence": "Shares outstanding rose from ~43.5M (Q1 2025) to 65.4M (May 2026) after Dec 2025 and Apr 2026 offerings (424B5, 8-K filings)",
+        "cross_check": "S-3ASR shelf remains active; further dilution possible",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": null,
+        "falsifier": null,
+        "scenario_assumptions": null,
+        "low_per_share": -0.5,
+        "base_per_share": -0.3,
+        "high_per_share": 0.0
+      }
+    ],
+    "embedded_components": [
+      {
+        "id": "raw_materials_gallium",
+        "label": "Consolidated gallium raw-material subsidiaries (85.5% owned)",
+        "category": "operating_business",
+        "overlap_key": "gallium_vertical_integration",
+        "treatment": "embedded",
+        "included_in_component_id": "midcycle_substrate_operations",
+        "method": "manual",
+        "valuation_status": null,
+        "calculation_proof": null,
+        "evidence_tier": "filing",
+        "evidence": "Vertical integration embedded in substrate margin; Nanjing/Chaoyang JinMei Gallium 85.5% owned (10-K FY2025)",
+        "cross_check": "Not separately terminal-valued to avoid double-count with substrate operations",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": null,
+        "falsifier": null,
+        "scenario_assumptions": null,
+        "low_per_share": 0.0,
+        "base_per_share": 0.0,
+        "high_per_share": 0.0
+      }
+    ],
+    "total_equity_value_per_share": {
+      "low": 0.05,
+      "base": 1.74,
+      "high": 4.59
+    },
+    "material_component_count": 6,
+    "additive_component_count": 5,
+    "embedded_component_count": 1,
+    "market_price_per_share": 45.86,
+    "upside_downside_pct": {
+      "low": -99.9,
+      "base": -96.2,
+      "high": -90.0
+    }
+  },
+  "economic_value_analysis": {
+    "schema_version": "1.0",
+    "status": "complete",
+    "trigger": {
+      "required": true,
+      "reasons": [
+        "explicit_component_schedule"
+      ],
+      "policy": "A complete economic-value analysis is required when any trigger fires; otherwise it is recommended."
+    },
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One diluted share of AXT Inc., including specialty substrate operations, consolidated gallium raw materials, cash, Tongmei listing option, and PE redemption/dilution reserves.",
+      "unit_label": "diluted share",
+      "unit_count": 65423184,
+      "unit_source": "65,423,184 common shares outstanding May 4, 2026 (10-Q Q1 2026 cover page)",
+      "enterprise_to_equity_reconciliation": "Operating substrate value, cash, and real options are additive; PE redemption and dilution reserves are liability components; gallium vertical integration is embedded in substrate operations to avoid double-counting."
+    },
+    "gaap_role": "cross_check",
+    "accounting_reference": "FY2025 10-K and Q1 2026 10-Q via sec_companyfacts.json; mid-cycle owner cash is normalized [Assumption].",
+    "comparable_hierarchy": [
+      "issuer_arm_length_transaction",
+      "same_asset_transaction",
+      "public_peer",
+      "replacement_cost",
+      "approved_external_analysis"
+    ],
+    "gross_comparable_nav_per_share": null,
+    "risked_present_value_per_share": {
+      "low": 0.05,
+      "base": 1.74,
+      "high": 4.59
+    },
+    "component_groups": [
+      {
+        "id": "midcycle_substrate_operations",
+        "label": "Specialty substrate manufacturing (InP, GaAs, Ge) at mid-cycle utilization",
+        "component_ids": [
+          "midcycle_substrate_operations"
+        ],
+        "economic_claim": "Specialty substrate manufacturing (InP, GaAs, Ge) at mid-cycle utilization",
+        "valuation_basis": "dcf",
+        "adjustments": "Capital-cycle midcycle_capacity_value route; compare to 2019\u20132022 revenue and margin band",
+        "overlap_control": "Unique overlap key substrate_operating_cash.",
+        "risked_present_value_per_share": {
+          "low": 0.8,
+          "base": 1.4,
+          "high": 2.2
+        }
+      },
+      {
+        "id": "cash_and_liquidity",
+        "label": "Cash, cash equivalents and restricted cash",
+        "component_ids": [
+          "cash_and_liquidity"
+        ],
+        "economic_claim": "Cash, cash equivalents and restricted cash",
+        "valuation_basis": "market_value",
+        "adjustments": "Down from $128.4M restricted+cash at Dec 2025 as proceeds deployed to Tongmei capacity",
+        "overlap_control": "Unique overlap key balance_sheet_cash.",
+        "risked_present_value_per_share": {
+          "low": 0.75,
+          "base": 0.89,
+          "high": 0.89
+        }
+      },
+      {
+        "id": "tongmei_hk_listing_option",
+        "label": "Tongmei Hong Kong listing option (STAR Market withdrawn July 2026)",
+        "component_ids": [
+          "tongmei_hk_listing_option"
+        ],
+        "economic_claim": "Tongmei Hong Kong listing option (STAR Market withdrawn July 2026)",
+        "valuation_basis": "milestone_nav",
+        "adjustments": "Probability-weighted; zero in Lawrence consolidated owner-cash path",
+        "overlap_control": "Unique overlap key tongmei_listing_catalyst.",
+        "risked_present_value_per_share": {
+          "low": 0.0,
+          "base": 0.5,
+          "high": 1.5
+        }
+      },
+      {
+        "id": "pe_redemption_liability",
+        "label": "Tongmei private-equity redemption rights (~$49M gross)",
+        "component_ids": [
+          "pe_redemption_liability"
+        ],
+        "economic_claim": "Tongmei private-equity redemption rights (~$49M gross)",
+        "valuation_basis": "manual",
+        "adjustments": "High case assumes funds roll into HK listing; base assumes partial redemption",
+        "overlap_control": "Unique overlap key tongmei_pe_redemption.",
+        "risked_present_value_per_share": {
+          "low": -1.0,
+          "base": -0.75,
+          "high": 0.0
+        }
+      },
+      {
+        "id": "dilution_reserve",
+        "label": "Equity dilution reserve (2025\u20132026 offerings)",
+        "component_ids": [
+          "dilution_reserve"
+        ],
+        "economic_claim": "Equity dilution reserve (2025\u20132026 offerings)",
+        "valuation_basis": "manual",
+        "adjustments": "S-3ASR shelf remains active; further dilution possible",
+        "overlap_control": "Unique overlap key share_count_dilution.",
+        "risked_present_value_per_share": {
+          "low": -0.5,
+          "base": -0.3,
+          "high": 0.0
+        }
+      }
+    ],
+    "valuation_proof": [
+      {
+        "component_id": "midcycle_substrate_operations",
+        "economic_claim": "Specialty substrate manufacturing (InP, GaAs, Ge) at mid-cycle utilization",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "dcf",
+        "evidence_tier": "filing",
+        "evidence": "FY2021\u20132022 operating income ~$13M on ~$140M revenue; Q1 2026 revenue run-rate ~$108M with 29.6% gross margin; Coherent 6-inch InP supply agreement (8-K 2026-06-26) and Casela 2027 InP commitment (8-K 2026-06-17)",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Capital-cycle midcycle_capacity_value route; compare to 2019\u20132022 revenue and margin band",
+        "range_per_share": {
+          "low": 0.8,
+          "base": 1.4,
+          "high": 2.2
+        },
+        "treatment": "additive",
+        "overlap_key": "substrate_operating_cash",
+        "overlap_control": "Unique overlap key substrate_operating_cash.",
+        "falsifier": "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "cash_and_liquidity",
+        "economic_claim": "Cash, cash equivalents and restricted cash",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "market_value",
+        "evidence_tier": "filing",
+        "evidence": "$57.9M at March 31, 2026 / 65.4M shares (10-Q Q1 2026)",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Down from $128.4M restricted+cash at Dec 2025 as proceeds deployed to Tongmei capacity",
+        "range_per_share": {
+          "low": 0.75,
+          "base": 0.89,
+          "high": 0.89
+        },
+        "treatment": "additive",
+        "overlap_key": "balance_sheet_cash",
+        "overlap_control": "Unique overlap key balance_sheet_cash.",
+        "falsifier": "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "tongmei_hk_listing_option",
+        "economic_claim": "Tongmei Hong Kong listing option (STAR Market withdrawn July 2026)",
+        "quantity": {
+          "value": 93.46,
+          "unit": "base success value, millions"
+        },
+        "method": "milestone_nav",
+        "evidence_tier": "filing",
+        "evidence": "Tongmei withdrew STAR Market IPO July 8, 2026; pivot to HK listing (8-K 2026-07-08). Prior PE investment RMB 324M (~$49M). Listing outcome uncertain.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Probability-weighted; zero in Lawrence consolidated owner-cash path",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 0.5,
+          "high": 1.5
+        },
+        "treatment": "additive",
+        "overlap_key": "tongmei_listing_catalyst",
+        "overlap_control": "Unique overlap key tongmei_listing_catalyst.",
+        "falsifier": "HK listing fails or PE redemptions drain parent cash before listing",
+        "risk_and_timing": {
+          "success_probability": 0.35,
+          "remaining_capital_m": 0.0,
+          "timing_basis": "HK listing application per 8-K 2026-07-08; base realization 3 years",
+          "probability_basis": null,
+          "remaining_capital_basis": null
+        }
+      },
+      {
+        "component_id": "pe_redemption_liability",
+        "economic_claim": "Tongmei private-equity redemption rights (~$49M gross)",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "manual",
+        "evidence_tier": "filing",
+        "evidence": "Eleven PE funds invested RMB 324,404,508 (~$49M) in Tongmei; STAR withdrawal triggers redemption rights at original investment (8-K 2026-07-08)",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "High case assumes funds roll into HK listing; base assumes partial redemption",
+        "range_per_share": {
+          "low": -1.0,
+          "base": -0.75,
+          "high": 0.0
+        },
+        "treatment": "additive",
+        "overlap_key": "tongmei_pe_redemption",
+        "overlap_control": "Unique overlap key tongmei_pe_redemption.",
+        "falsifier": "The obligation, financing claim, tax, or realization friction is materially larger than the low-case reserve.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "dilution_reserve",
+        "economic_claim": "Equity dilution reserve (2025\u20132026 offerings)",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "manual",
+        "evidence_tier": "filing",
+        "evidence": "Shares outstanding rose from ~43.5M (Q1 2025) to 65.4M (May 2026) after Dec 2025 and Apr 2026 offerings (424B5, 8-K filings)",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "S-3ASR shelf remains active; further dilution possible",
+        "range_per_share": {
+          "low": -0.5,
+          "base": -0.3,
+          "high": 0.0
+        },
+        "treatment": "additive",
+        "overlap_key": "share_count_dilution",
+        "overlap_control": "Unique overlap key share_count_dilution.",
+        "falsifier": "The obligation, financing claim, tax, or realization friction is materially larger than the low-case reserve.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "raw_materials_gallium",
+        "economic_claim": "Specialty substrate manufacturing (InP, GaAs, Ge) at mid-cycle utilization",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "manual",
+        "evidence_tier": "filing",
+        "evidence": "Vertical integration embedded in substrate margin; Nanjing/Chaoyang JinMei Gallium 85.5% owned (10-K FY2025)",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Capital-cycle midcycle_capacity_value route; compare to 2019\u20132022 revenue and margin band",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 0.0,
+          "high": 0.0
+        },
+        "treatment": "embedded",
+        "overlap_key": "gallium_vertical_integration",
+        "overlap_control": "Unique overlap key substrate_operating_cash.",
+        "falsifier": "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods.",
+        "risk_and_timing": null
+      }
+    ],
+    "wisdom_applied": [],
+    "limitations": [],
+    "complete_component_coverage": true,
+    "validation_errors": [],
+    "registry_version": "1.0"
+  },
+  "component_review_queue": {
+    "status": "ready_for_committee_review",
+    "decision_rule": "Each assigned rater records accept, challenge, or reject with a proposed range and evidence. The aggregator may not silently average disputed ranges.",
+    "items": [
+      {
+        "component_id": "midcycle_substrate_operations",
+        "label": "Specialty substrate manufacturing (InP, GaAs, Ge) at mid-cycle utilization",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 0.8,
+          "base": 1.4,
+          "high": 2.2
+        },
+        "range_width_pct_of_base": 100.0,
+        "evidence_tier": "filing",
+        "recommended_raters": [
+          "hohn",
+          "marathon_capital_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "cash_and_liquidity",
+        "label": "Cash, cash equivalents and restricted cash",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 0.75,
+          "base": 0.89,
+          "high": 0.89
+        },
+        "range_width_pct_of_base": 15.7,
+        "evidence_tier": "filing",
+        "recommended_raters": [
+          "greenblatt",
+          "marks_credit_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "tongmei_hk_listing_option",
+        "label": "Tongmei Hong Kong listing option (STAR Market withdrawn July 2026)",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 0.5,
+          "high": 1.5
+        },
+        "range_width_pct_of_base": 300.0,
+        "evidence_tier": "filing",
+        "recommended_raters": [
+          "klarman_asset_value",
+          "hk"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "pe_redemption_liability",
+        "label": "Tongmei private-equity redemption rights (~$49M gross)",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": -1.0,
+          "base": -0.75,
+          "high": 0.0
+        },
+        "range_width_pct_of_base": 133.3,
+        "evidence_tier": "filing",
+        "recommended_raters": [
+          "marks_credit_cycle",
+          "pabrai"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "dilution_reserve",
+        "label": "Equity dilution reserve (2025\u20132026 offerings)",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": -0.5,
+          "base": -0.3,
+          "high": 0.0
+        },
+        "range_width_pct_of_base": 166.7,
+        "evidence_tier": "filing",
+        "recommended_raters": [
+          "marks_credit_cycle",
+          "pabrai"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "raw_materials_gallium",
+        "label": "Consolidated gallium raw-material subsidiaries (85.5% owned)",
+        "treatment": "embedded",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 0.0,
+          "high": 0.0
+        },
+        "range_width_pct_of_base": 0.0,
+        "evidence_tier": "filing",
+        "recommended_raters": [
+          "hohn",
+          "marathon_capital_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      }
+    ]
+  },
+  "valuation_method_route": {
+    "schema_version": "1.0",
+    "status": "routed",
+    "profile_id": "capital_cycle",
+    "label": "Capital cycle and normalized industry economics",
+    "score": 7.0,
+    "reasons": [
+      "archetype=cyclical",
+      "component categories=operating_business"
+    ],
+    "primary_methods": [
+      "midcycle_capacity_value"
+    ],
+    "corroborating_methods": [
+      "replacement_cost",
+      "downcycle_liquidity_stress"
+    ],
+    "primary_personas": [
+      "marathon_capital_cycle"
+    ],
+    "cross_check_personas": [
+      "marks_credit_cycle",
+      "pabrai"
+    ],
+    "silent_personas": [
+      "buffett_weschler",
+      "greenblatt",
+      "hk",
+      "hohn",
+      "klarman_asset_value",
+      "munger",
+      "stahl"
+    ],
+    "required_evidence": [
+      "industry capacity and additions",
+      "utilization",
+      "normalized unit margins",
+      "maintenance versus growth capital",
+      "low-case liquidity"
+    ],
+    "failure_modes": [
+      "peak margins capitalized",
+      "supply response ignored",
+      "replacement cost used for assets that cannot earn their cost of capital"
+    ],
+    "secondary_profiles": [
+      {
+        "profile_id": "quality_reinvestment",
+        "score": 2.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dcf"
+        ]
+      },
+      {
+        "profile_id": "credit_and_normalized_returns",
+        "score": 2.0,
+        "reasons": [
+          "component categories=financial_asset, liability_or_reserve"
+        ]
+      }
+    ],
+    "scorecard": {
+      "scarce_asset_optionality": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=real_option"
+        ]
+      },
+      "quality_reinvestment": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dcf"
+        ]
+      },
+      "capital_cycle": {
+        "score": 7.0,
+        "reasons": [
+          "archetype=cyclical",
+          "component categories=operating_business"
+        ]
+      },
+      "credit_and_normalized_returns": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=financial_asset, liability_or_reserve"
+        ]
+      },
+      "catalyst_asset_value": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=financial_asset"
+        ]
+      },
+      "predictable_cash_flow": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
+      },
+      "binary_milestone": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=milestone"
+        ]
+      }
+    },
+    "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+  },
+  "universal_valuation_contract": {
+    "schema_version": "2.0",
+    "status": "evidence_blocked",
+    "ticker": "AXTI",
+    "as_of": "2026-07-19",
+    "economic_ownership_map": [
+      {
+        "component_id": "midcycle_substrate_operations",
+        "label": "Specialty substrate manufacturing (InP, GaAs, Ge) at mid-cycle utilization",
+        "category": "operating_business",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Specialty substrate manufacturing (InP, GaAs, Ge) at mid-cycle utilization",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "dcf",
+        "method_version": null,
+        "method_provenance": null,
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": null,
+          "base": null,
+          "high": null
+        },
+        "legacy_range_per_share": {
+          "low": 0.8,
+          "base": 1.4,
+          "high": 2.2
+        },
+        "valuation_status": "legacy_sensitivity",
+        "calculation_proof": null,
+        "evidence_tier": "filing",
+        "evidence_level": "primary_verified",
+        "evidence": "FY2021\u20132022 operating income ~$13M on ~$140M revenue; Q1 2026 revenue run-rate ~$108M with 29.6% gross margin; Coherent 6-inch InP supply agreement (8-K 2026-06-26) and Casela 2027 InP commitment (8-K 2026-06-17)",
+        "scenario_assumptions": null,
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Capital-cycle midcycle_capacity_value route; compare to 2019\u20132022 revenue and margin band",
+        "falsifier": "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods.",
+        "overlap_key": "substrate_operating_cash",
+        "assumption_type": "fact"
+      },
+      {
+        "component_id": "cash_and_liquidity",
+        "label": "Cash, cash equivalents and restricted cash",
+        "category": "financial_asset",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Cash, cash equivalents and restricted cash",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "market_value",
+        "method_version": null,
+        "method_provenance": null,
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": null,
+          "base": null,
+          "high": null
+        },
+        "legacy_range_per_share": {
+          "low": 0.75,
+          "base": 0.89,
+          "high": 0.89
+        },
+        "valuation_status": "legacy_sensitivity",
+        "calculation_proof": null,
+        "evidence_tier": "filing",
+        "evidence_level": "primary_verified",
+        "evidence": "$57.9M at March 31, 2026 / 65.4M shares (10-Q Q1 2026)",
+        "scenario_assumptions": null,
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Down from $128.4M restricted+cash at Dec 2025 as proceeds deployed to Tongmei capacity",
+        "falsifier": "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods.",
+        "overlap_key": "balance_sheet_cash",
+        "assumption_type": "fact"
+      },
+      {
+        "component_id": "tongmei_hk_listing_option",
+        "label": "Tongmei Hong Kong listing option (STAR Market withdrawn July 2026)",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Tongmei Hong Kong listing option (STAR Market withdrawn July 2026)",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 93.46,
+          "unit": "base success value, millions"
+        },
+        "method": "milestone_nav",
+        "method_version": null,
+        "method_provenance": null,
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": null,
+          "base": null,
+          "high": null
+        },
+        "legacy_range_per_share": {
+          "low": 0.0,
+          "base": 0.5,
+          "high": 1.5
+        },
+        "valuation_status": "legacy_sensitivity",
+        "calculation_proof": null,
+        "evidence_tier": "filing",
+        "evidence_level": "primary_verified",
+        "evidence": "Tongmei withdrew STAR Market IPO July 8, 2026; pivot to HK listing (8-K 2026-07-08). Prior PE investment RMB 324M (~$49M). Listing outcome uncertain.",
+        "scenario_assumptions": {
+          "low": {
+            "success_probability": 0.0,
+            "success_value_m": 93.46,
+            "remaining_cost_m": 0.0,
+            "ownership_pct": 1.0
+          },
+          "base": {
+            "success_probability": 0.35,
+            "success_value_m": 93.46,
+            "remaining_cost_m": 0.0,
+            "ownership_pct": 1.0
+          },
+          "high": {
+            "success_probability": 0.55,
+            "success_value_m": 178.43,
+            "remaining_cost_m": 0.0,
+            "ownership_pct": 1.0
+          }
+        },
+        "probability_and_timing": {
+          "success_probability": 0.35,
+          "remaining_capital_m": 0.0,
+          "timing_basis": "HK listing application per 8-K 2026-07-08; base realization 3 years",
+          "probability_basis": null,
+          "remaining_capital_basis": null
+        },
+        "tax_and_realization_adjustments": "Probability-weighted; zero in Lawrence consolidated owner-cash path",
+        "falsifier": "HK listing fails or PE redemptions drain parent cash before listing",
+        "overlap_key": "tongmei_listing_catalyst",
+        "assumption_type": "fact"
+      },
+      {
+        "component_id": "pe_redemption_liability",
+        "label": "Tongmei private-equity redemption rights (~$49M gross)",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Tongmei private-equity redemption rights (~$49M gross)",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "manual",
+        "method_version": null,
+        "method_provenance": null,
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": null,
+          "base": null,
+          "high": null
+        },
+        "legacy_range_per_share": {
+          "low": -1.0,
+          "base": -0.75,
+          "high": 0.0
+        },
+        "valuation_status": "legacy_sensitivity",
+        "calculation_proof": null,
+        "evidence_tier": "filing",
+        "evidence_level": "primary_verified",
+        "evidence": "Eleven PE funds invested RMB 324,404,508 (~$49M) in Tongmei; STAR withdrawal triggers redemption rights at original investment (8-K 2026-07-08)",
+        "scenario_assumptions": null,
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "High case assumes funds roll into HK listing; base assumes partial redemption",
+        "falsifier": "The obligation, financing claim, tax, or realization friction is materially larger than the low-case reserve.",
+        "overlap_key": "tongmei_pe_redemption",
+        "assumption_type": "fact"
+      },
+      {
+        "component_id": "dilution_reserve",
+        "label": "Equity dilution reserve (2025\u20132026 offerings)",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Equity dilution reserve (2025\u20132026 offerings)",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "manual",
+        "method_version": null,
+        "method_provenance": null,
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": null,
+          "base": null,
+          "high": null
+        },
+        "legacy_range_per_share": {
+          "low": -0.5,
+          "base": -0.3,
+          "high": 0.0
+        },
+        "valuation_status": "legacy_sensitivity",
+        "calculation_proof": null,
+        "evidence_tier": "filing",
+        "evidence_level": "primary_verified",
+        "evidence": "Shares outstanding rose from ~43.5M (Q1 2025) to 65.4M (May 2026) after Dec 2025 and Apr 2026 offerings (424B5, 8-K filings)",
+        "scenario_assumptions": null,
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "S-3ASR shelf remains active; further dilution possible",
+        "falsifier": "The obligation, financing claim, tax, or realization friction is materially larger than the low-case reserve.",
+        "overlap_key": "share_count_dilution",
+        "assumption_type": "fact"
+      },
+      {
+        "component_id": "raw_materials_gallium",
+        "label": "Consolidated gallium raw-material subsidiaries (85.5% owned)",
+        "category": "operating_business",
+        "treatment": "embedded",
+        "included_in_component_id": "midcycle_substrate_operations",
+        "ownership_claim": "Specialty substrate manufacturing (InP, GaAs, Ge) at mid-cycle utilization",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "manual",
+        "method_version": null,
+        "method_provenance": null,
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": null,
+          "base": null,
+          "high": null
+        },
+        "legacy_range_per_share": {
+          "low": 0.0,
+          "base": 0.0,
+          "high": 0.0
+        },
+        "valuation_status": "legacy_sensitivity",
+        "calculation_proof": null,
+        "evidence_tier": "filing",
+        "evidence_level": "primary_verified",
+        "evidence": "Vertical integration embedded in substrate margin; Nanjing/Chaoyang JinMei Gallium 85.5% owned (10-K FY2025)",
+        "scenario_assumptions": null,
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Capital-cycle midcycle_capacity_value route; compare to 2019\u20132022 revenue and margin band",
+        "falsifier": "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods.",
+        "overlap_key": "gallium_vertical_integration",
+        "assumption_type": "fact"
+      }
+    ],
+    "component_coverage": {
+      "all_material_components_identified": true,
+      "material_component_count": 6,
+      "additive_component_count": 5,
+      "embedded_component_count": 1,
+      "unvalued_component_count": 5,
+      "double_counting_flags": []
+    },
+    "input_classification": {
+      "facts": [
+        {
+          "component_id": "midcycle_substrate_operations",
+          "label": "Specialty substrate manufacturing (InP, GaAs, Ge) at mid-cycle utilization",
+          "kind": "fact",
+          "evidence_tier": "filing",
+          "evidence": "FY2021\u20132022 operating income ~$13M on ~$140M revenue; Q1 2026 revenue run-rate ~$108M with 29.6% gross margin; Coherent 6-inch InP supply agreement (8-K 2026-06-26) and Casela 2027 InP commitment (8-K 2026-06-17)",
+          "method": "dcf",
+          "valuation_status": "legacy_sensitivity"
+        },
+        {
+          "component_id": "cash_and_liquidity",
+          "label": "Cash, cash equivalents and restricted cash",
+          "kind": "fact",
+          "evidence_tier": "filing",
+          "evidence": "$57.9M at March 31, 2026 / 65.4M shares (10-Q Q1 2026)",
+          "method": "market_value",
+          "valuation_status": "legacy_sensitivity"
+        },
+        {
+          "component_id": "tongmei_hk_listing_option",
+          "label": "Tongmei Hong Kong listing option (STAR Market withdrawn July 2026)",
+          "kind": "fact",
+          "evidence_tier": "filing",
+          "evidence": "Tongmei withdrew STAR Market IPO July 8, 2026; pivot to HK listing (8-K 2026-07-08). Prior PE investment RMB 324M (~$49M). Listing outcome uncertain.",
+          "method": "milestone_nav",
+          "valuation_status": "legacy_sensitivity"
+        },
+        {
+          "component_id": "pe_redemption_liability",
+          "label": "Tongmei private-equity redemption rights (~$49M gross)",
+          "kind": "fact",
+          "evidence_tier": "filing",
+          "evidence": "Eleven PE funds invested RMB 324,404,508 (~$49M) in Tongmei; STAR withdrawal triggers redemption rights at original investment (8-K 2026-07-08)",
+          "method": "manual",
+          "valuation_status": "legacy_sensitivity"
+        },
+        {
+          "component_id": "dilution_reserve",
+          "label": "Equity dilution reserve (2025\u20132026 offerings)",
+          "kind": "fact",
+          "evidence_tier": "filing",
+          "evidence": "Shares outstanding rose from ~43.5M (Q1 2025) to 65.4M (May 2026) after Dec 2025 and Apr 2026 offerings (424B5, 8-K filings)",
+          "method": "manual",
+          "valuation_status": "legacy_sensitivity"
+        },
+        {
+          "component_id": "raw_materials_gallium",
+          "label": "Consolidated gallium raw-material subsidiaries (85.5% owned)",
+          "kind": "fact",
+          "evidence_tier": "filing",
+          "evidence": "Vertical integration embedded in substrate margin; Nanjing/Chaoyang JinMei Gallium 85.5% owned (10-K FY2025)",
+          "method": "manual",
+          "valuation_status": "legacy_sensitivity"
+        }
+      ],
+      "estimates": [],
+      "judgments": []
+    },
+    "method_route": {
+      "schema_version": "1.0",
+      "status": "routed",
+      "profile_id": "capital_cycle",
+      "label": "Capital cycle and normalized industry economics",
+      "score": 7.0,
+      "reasons": [
+        "archetype=cyclical",
+        "component categories=operating_business"
+      ],
+      "primary_methods": [
+        "midcycle_capacity_value"
+      ],
+      "corroborating_methods": [
+        "replacement_cost",
+        "downcycle_liquidity_stress"
+      ],
+      "primary_personas": [
+        "marathon_capital_cycle"
+      ],
+      "cross_check_personas": [
+        "marks_credit_cycle",
+        "pabrai"
+      ],
+      "silent_personas": [
+        "buffett_weschler",
+        "greenblatt",
+        "hk",
+        "hohn",
+        "klarman_asset_value",
+        "munger",
+        "stahl"
+      ],
+      "required_evidence": [
+        "industry capacity and additions",
+        "utilization",
+        "normalized unit margins",
+        "maintenance versus growth capital",
+        "low-case liquidity"
+      ],
+      "failure_modes": [
+        "peak margins capitalized",
+        "supply response ignored",
+        "replacement cost used for assets that cannot earn their cost of capital"
+      ],
+      "secondary_profiles": [
+        {
+          "profile_id": "quality_reinvestment",
+          "score": 2.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=dcf"
+          ]
+        },
+        {
+          "profile_id": "credit_and_normalized_returns",
+          "score": 2.0,
+          "reasons": [
+            "component categories=financial_asset, liability_or_reserve"
+          ]
+        }
+      ],
+      "scorecard": {
+        "scarce_asset_optionality": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=real_option"
+          ]
+        },
+        "quality_reinvestment": {
+          "score": 2.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=dcf"
+          ]
+        },
+        "capital_cycle": {
+          "score": 7.0,
+          "reasons": [
+            "archetype=cyclical",
+            "component categories=operating_business"
+          ]
+        },
+        "credit_and_normalized_returns": {
+          "score": 2.0,
+          "reasons": [
+            "component categories=financial_asset, liability_or_reserve"
+          ]
+        },
+        "catalyst_asset_value": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=financial_asset"
+          ]
+        },
+        "predictable_cash_flow": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=operating_business"
+          ]
+        },
+        "binary_milestone": {
+          "score": 2.0,
+          "reasons": [
+            "component categories=real_option",
+            "existing methods=milestone"
+          ]
+        }
+      },
+      "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+    },
+    "market": {
+      "price_per_share": 45.86,
+      "fully_diluted_shares": 65423184,
+      "market_cap_m": 3000.31,
+      "enterprise_value_m": 2942.41
+    },
+    "valuation": {
+      "value_per_share": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "priced_components_per_share": {
+        "low": 0,
+        "base": 0,
+        "high": 0
+      },
+      "legacy_value_per_share": {
+        "low": 0.05,
+        "base": 1.74,
+        "high": 4.59
+      },
+      "probability_weighted_value_per_share": null,
+      "expected_distributions_per_share": 0.0,
+      "annualized_return_at_price_pct": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "downside_to_low_pct": null,
+      "horizon_years": 7,
+      "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
+    },
+    "scenario_contract": {
+      "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
+      "top_value_drivers": [
+        {
+          "component_id": "midcycle_substrate_operations",
+          "label": "Specialty substrate manufacturing (InP, GaAs, Ge) at mid-cycle utilization",
+          "valuation_status": "legacy_sensitivity",
+          "base_per_share": null,
+          "legacy_base_per_share": 1.4,
+          "range_width_per_share": null,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "cash_and_liquidity",
+          "label": "Cash, cash equivalents and restricted cash",
+          "valuation_status": "legacy_sensitivity",
+          "base_per_share": null,
+          "legacy_base_per_share": 0.89,
+          "range_width_per_share": null,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "tongmei_hk_listing_option",
+          "label": "Tongmei Hong Kong listing option (STAR Market withdrawn July 2026)",
+          "valuation_status": "legacy_sensitivity",
+          "base_per_share": null,
+          "legacy_base_per_share": 0.5,
+          "range_width_per_share": null,
+          "scenario_assumptions": {
+            "low": {
+              "success_probability": 0.0,
+              "success_value_m": 93.46,
+              "remaining_cost_m": 0.0,
+              "ownership_pct": 1.0
+            },
+            "base": {
+              "success_probability": 0.35,
+              "success_value_m": 93.46,
+              "remaining_cost_m": 0.0,
+              "ownership_pct": 1.0
+            },
+            "high": {
+              "success_probability": 0.55,
+              "success_value_m": 178.43,
+              "remaining_cost_m": 0.0,
+              "ownership_pct": 1.0
+            }
+          }
+        },
+        {
+          "component_id": "pe_redemption_liability",
+          "label": "Tongmei private-equity redemption rights (~$49M gross)",
+          "valuation_status": "legacy_sensitivity",
+          "base_per_share": null,
+          "legacy_base_per_share": -0.75,
+          "range_width_per_share": null,
+          "scenario_assumptions": null
+        },
+        {
+          "component_id": "dilution_reserve",
+          "label": "Equity dilution reserve (2025\u20132026 offerings)",
+          "valuation_status": "legacy_sensitivity",
+          "base_per_share": null,
+          "legacy_base_per_share": -0.3,
+          "range_width_per_share": null,
+          "scenario_assumptions": null
+        }
+      ],
+      "reverse_expectations": null
+    },
+    "calculation_proof_summary": {
+      "component_count": 6,
+      "priced_component_count": 0,
+      "proof_complete_pct": 0.0,
+      "status_counts": {
+        "bounded_estimate": 0,
+        "calculated": 0,
+        "legacy_sensitivity": 6,
+        "unpriced": 0
+      },
+      "all_material_components_priced": false,
+      "calculation_errors": [],
+      "aggregate_proof_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "source_lineage": [],
+    "model_checks": {
+      "calculation_graphs_valid": true,
+      "component_sum_reconciles": false,
+      "no_double_counting": true,
+      "all_material_components_priced": false,
+      "low_base_high_ordered": true
+    },
+    "evidence": {
+      "unresolved_count": 5,
+      "blockers": [
+        "cash_and_liquidity: material component is legacy_sensitivity; a valid calculation proof is required",
+        "dilution_reserve: material component is legacy_sensitivity; a valid calculation proof is required",
+        "midcycle_substrate_operations: material component is legacy_sensitivity; a valid calculation proof is required",
+        "pe_redemption_liability: material component is legacy_sensitivity; a valid calculation proof is required",
+        "tongmei_hk_listing_option: material component is legacy_sensitivity; a valid calculation proof is required"
+      ],
+      "validation_errors": []
+    },
+    "monitoring": {
+      "falsifiers": [
+        "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods.",
+        "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods.",
+        "HK listing fails or PE redemptions drain parent cash before listing",
+        "The obligation, financing claim, tax, or realization friction is materially larger than the low-case reserve.",
+        "The obligation, financing claim, tax, or realization friction is materially larger than the low-case reserve.",
+        "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods."
+      ],
+      "required_refresh_triggers": [
+        "new filing or material operating update",
+        "capital-structure change",
+        "material price move",
+        "component milestone or falsifier"
+      ]
+    },
+    "change_control": {
+      "model_hash": "965fce7dabc2d719b7f658cbfed380231bf0dcacb55bc979e8e5d30d5408d188",
+      "method_versions": [],
+      "change_log": [],
+      "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
+    },
+    "decision_rule": "No security is decision-grade until every material claim is valued exactly once by a valid calculation proof and every material evidence blocker is resolved."
+  },
+  "market_inputs": {},
+  "market_inputs_as_of": "2026-07-19",
+  "overlay_options": {
+    "lawrence_base": "lease_income_only_zero_production_royalty",
+    "overlay_base_payoff_7yr": 8.18,
+    "overlay_implied_return_pct": -21.83
+  }
+}
