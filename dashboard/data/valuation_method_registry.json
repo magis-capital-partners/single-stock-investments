@@ -1,0 +1,444 @@
+{
+  "schema_version": "1.0",
+  "governance": {
+    "production_rule": "Only approved, versioned method cards may produce a decision-grade component value.",
+    "library_role": "Library sources establish reusable method logic and failure modes; issuer primary evidence supplies company facts.",
+    "crowd_rule": "Independent reviewers nominate methods, challenge assumptions, and supply base rates. Incompatible values are never averaged.",
+    "arithmetic_rule": "Deterministic calculators, not LLMs, produce final values."
+  },
+  "method_cards": [
+    {
+      "method_id": "royalty_distribution_curve",
+      "version": "1.0",
+      "status": "approved",
+      "label": "Finite royalty distribution curve",
+      "power_zones": [
+        "scarce_asset_optionality"
+      ],
+      "economic_claim": "After-expense distributions from a legally defined royalty or trust claim over finite production.",
+      "required_inputs": [
+        "contractual royalty tiers",
+        "production by period",
+        "realized pricing or contractual index",
+        "bonus thresholds",
+        "trust expenses and taxes",
+        "reserve life",
+        "units outstanding",
+        "discount rate"
+      ],
+      "equation": "value_per_unit = sum((tons_t * royalty_per_ton_t - trust_costs_t) / (1+r)^t) / units",
+      "allowed_judgments": [
+        "production cadence within evidenced capacity and reserve bounds",
+        "realized price scenario",
+        "discount rate"
+      ],
+      "scenario_rule": "Cases vary production cadence, price/bonus attainment, downtime, reserve exhaustion, costs, and discount rate causally.",
+      "double_counting_exclusions": [
+        "Do not deduct depletion again when reserve exhaustion is already in the cash-flow schedule.",
+        "Do not include legal recovery for ordinary royalties already accrued."
+      ],
+      "failure_modes": [
+        "perpetual terminal value on a finite claim",
+        "operator concentration haircut added after downtime is modeled",
+        "undisclosed royalty tier invented"
+      ],
+      "corroborating_methods": [
+        "reverse_implied_production",
+        "comparable_royalty_transactions"
+      ],
+      "sources": [
+        {
+          "ref": "_system/frameworks/segment_cashflow_valuation.md",
+          "locator": "Core synthesis and reverse DCF"
+        },
+        {
+          "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+          "locator": "Producing royalties and non-overlap controls"
+        }
+      ]
+    },
+    {
+      "method_id": "net_asset_value",
+      "version": "1.0",
+      "status": "approved",
+      "label": "Reconciled net asset value",
+      "power_zones": [
+        "scarce_asset_optionality",
+        "catalyst_asset_value",
+        "credit_and_normalized_returns"
+      ],
+      "economic_claim": "Audited or contractually supported assets less senior claims, realization costs, taxes, and friction.",
+      "required_inputs": [
+        "asset quantity",
+        "unit value",
+        "ownership claim",
+        "senior claims",
+        "tax and realization costs",
+        "fully diluted units"
+      ],
+      "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+      "allowed_judgments": [
+        "bounded realization friction",
+        "timing discount when sale is not immediate"
+      ],
+      "scenario_rule": "Cases vary cited unit values, realization timing, and bounded friction; asset quantities remain source locked.",
+      "double_counting_exclusions": [
+        "Do not capitalize operating cash flow and the same asset inventory separately."
+      ],
+      "failure_modes": [
+        "gross asset value presented as equity value",
+        "taxes or senior claims omitted",
+        "stale or non-comparable unit mark"
+      ],
+      "corroborating_methods": [
+        "liquidation_value",
+        "comparable_transactions"
+      ],
+      "sources": [
+        {
+          "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+          "locator": "Economic ownership and unit NAV"
+        }
+      ]
+    },
+    {
+      "method_id": "owner_earnings_reinvestment_dcf",
+      "version": "1.0",
+      "status": "approved",
+      "label": "Owner earnings and reinvestment-return DCF",
+      "power_zones": [
+        "quality_reinvestment"
+      ],
+      "economic_claim": "Present value of distributable owner cash after charging the capital required for growth.",
+      "required_inputs": [
+        "normalized owner earnings",
+        "reinvestment rate",
+        "incremental after-tax ROIC",
+        "runway",
+        "discount rate",
+        "terminal economics"
+      ],
+      "equation": "cash_t = cash_(t-1)*(1+reinvestment*incremental_ROIC); value = PV(distributable cash + terminal owner earnings)",
+      "allowed_judgments": [
+        "reinvestment runway",
+        "incremental ROIC fade",
+        "discount rate",
+        "terminal owner-earnings multiple"
+      ],
+      "scenario_rule": "Growth changes only through reinvestment and incremental return; terminal assumptions must reconcile to competitive durability.",
+      "double_counting_exclusions": [
+        "Acquisition spend and stock compensation cannot be omitted from owner cash."
+      ],
+      "failure_modes": [
+        "growth without capital cost",
+        "historical ROIC substituted for incremental ROIC",
+        "terminal value dominates without a durability proof"
+      ],
+      "corroborating_methods": [
+        "reverse_dcf",
+        "incremental_roic_runway"
+      ],
+      "sources": [
+        {
+          "ref": "_system/frameworks/segment_cashflow_valuation.md",
+          "locator": "Owner cash, reinvestment and reverse expectations"
+        }
+      ]
+    },
+    {
+      "method_id": "midcycle_capacity_value",
+      "version": "1.0",
+      "status": "approved",
+      "label": "Capital-cycle normalized capacity value",
+      "power_zones": [
+        "capital_cycle"
+      ],
+      "economic_claim": "Equity value supported by normalized utilization and unit margins after maintenance capital and downside reserves.",
+      "required_inputs": [
+        "capacity",
+        "utilization",
+        "revenue per unit",
+        "normalized margin",
+        "maintenance capital",
+        "tax",
+        "net debt",
+        "shares"
+      ],
+      "equation": "equity = ((capacity*utilization*revenue_per_unit*margin - maintenance_capex)*(1-tax))*multiple - net_debt - downcycle_reserve",
+      "allowed_judgments": [
+        "normalized utilization",
+        "normalized unit margin",
+        "cycle-appropriate multiple",
+        "downcycle reserve"
+      ],
+      "scenario_rule": "Cases reconcile supply additions, utilization, price/margin, maintenance needs, and liquidity.",
+      "double_counting_exclusions": [
+        "Do not add replacement value for capacity already valued through normalized cash flow."
+      ],
+      "failure_modes": [
+        "peak margin capitalization",
+        "supply response omitted",
+        "replacement cost for assets unable to earn their cost of capital"
+      ],
+      "corroborating_methods": [
+        "replacement_cost",
+        "downcycle_liquidity_stress"
+      ],
+      "sources": [
+        {
+          "ref": "_system/frameworks/power_zones.json",
+          "locator": "capital_cycle profile"
+        }
+      ]
+    },
+    {
+      "method_id": "capital_structure_and_excess_return",
+      "version": "1.0",
+      "status": "approved",
+      "label": "Tangible capital and excess-return value",
+      "power_zones": [
+        "credit_and_normalized_returns"
+      ],
+      "economic_claim": "Tangible equity plus the finite value of normalized returns above the cost of equity, less stress losses and senior claims.",
+      "required_inputs": [
+        "tangible equity",
+        "normalized ROE",
+        "cost of equity",
+        "excess-return duration",
+        "stress losses",
+        "senior claims",
+        "shares"
+      ],
+      "equation": "value = (tangible_equity + max(ROE-COE,0)*tangible_equity*duration - stress_losses - senior_claims)/shares",
+      "allowed_judgments": [
+        "normalized ROE",
+        "cost of equity",
+        "excess-return duration",
+        "stress loss case"
+      ],
+      "scenario_rule": "Cases vary credit losses, funding cost, normalized ROE, duration, and distributable capital.",
+      "double_counting_exclusions": [
+        "Regulatory capital is not both tangible equity and distributable excess capital."
+      ],
+      "failure_modes": [
+        "industrial EV multiple",
+        "loss normalization without a stress case",
+        "off-balance-sheet claims omitted"
+      ],
+      "corroborating_methods": [
+        "stress_loss_waterfall",
+        "normalized_tangible_book"
+      ],
+      "sources": [
+        {
+          "ref": "_system/frameworks/power_zones.json",
+          "locator": "credit_and_normalized_returns profile"
+        }
+      ]
+    },
+    {
+      "method_id": "probability_weighted_catalyst_nav",
+      "version": "1.0",
+      "status": "approved",
+      "label": "Mutually exclusive catalyst event tree",
+      "power_zones": [
+        "catalyst_asset_value"
+      ],
+      "economic_claim": "Expected present equity payoff across exhaustive, mutually exclusive completion, delay, and break outcomes.",
+      "required_inputs": [
+        "event list",
+        "probability",
+        "payoff",
+        "remaining cost",
+        "timing",
+        "discount rate"
+      ],
+      "equation": "value = sum(probability_i*(payoff_i-cost_i)/(1+r_i)^years_i)",
+      "allowed_judgments": [
+        "base-rate-supported probabilities",
+        "timing",
+        "realization costs"
+      ],
+      "scenario_rule": "Every case is exhaustive and probabilities sum to one; delay and failure are explicit outcomes.",
+      "double_counting_exclusions": [
+        "A payoff and the underlying asset NAV cannot both be added."
+      ],
+      "failure_modes": [
+        "probabilities do not sum to one",
+        "catalyst assumed rather than evidenced",
+        "break value omitted"
+      ],
+      "corroborating_methods": [
+        "break_value",
+        "timing_adjusted_payoff"
+      ],
+      "sources": [
+        {
+          "ref": "_system/frameworks/optionality_valuation.md",
+          "locator": "Probability, beneficiary, timing and failure cases"
+        }
+      ]
+    },
+    {
+      "method_id": "risk_adjusted_milestone_value",
+      "version": "1.0",
+      "status": "approved",
+      "label": "Milestone risk-adjusted present value",
+      "power_zones": [
+        "binary_milestone"
+      ],
+      "economic_claim": "Net cash plus probability-weighted asset success values less remaining costs and dilution.",
+      "required_inputs": [
+        "asset milestones",
+        "base-rate success probability",
+        "success value",
+        "time",
+        "remaining costs",
+        "cash runway",
+        "dilution",
+        "shares"
+      ],
+      "equation": "value_per_share = (net_cash + sum(p_success*PV(success_value)-remaining_cost) - dilution)/shares",
+      "allowed_judgments": [
+        "reference-class probability",
+        "success value",
+        "time to milestone",
+        "future dilution"
+      ],
+      "scenario_rule": "Cases alter milestone probability, timing, costs, dilution and failure recovery using explicit reference classes.",
+      "double_counting_exclusions": [
+        "Pipeline value cannot also appear in an operating revenue forecast."
+      ],
+      "failure_modes": [
+        "unsupported success probabilities",
+        "cash burn omitted",
+        "failure recovery omitted"
+      ],
+      "corroborating_methods": [
+        "cash_runway_and_dilution",
+        "failure_recovery_value"
+      ],
+      "sources": [
+        {
+          "ref": "_system/frameworks/optionality_valuation.md",
+          "locator": "Milestone-based option framework"
+        }
+      ]
+    },
+    {
+      "method_id": "owner_cash_or_dividend_discount",
+      "version": "1.0",
+      "status": "approved",
+      "label": "Predictable owner-cash discount model",
+      "power_zones": [
+        "predictable_cash_flow"
+      ],
+      "economic_claim": "Value of sustainable owner cash or distributions after required funding and dilution.",
+      "required_inputs": [
+        "sustainable distribution",
+        "growth",
+        "required return",
+        "maintenance funding",
+        "dilution"
+      ],
+      "equation": "value = distribution*(1+growth)/(required_return-growth) - funding_or_dilution_per_share",
+      "allowed_judgments": [
+        "sustainable growth",
+        "required return",
+        "contract or regulatory renewal economics"
+      ],
+      "scenario_rule": "Required return must exceed growth; cases vary renewal/reset economics and funding causally.",
+      "double_counting_exclusions": [
+        "Growth capital cannot be ignored and then counted as free growth."
+      ],
+      "failure_modes": [
+        "dividend treated as earning power",
+        "required return not above growth",
+        "renewal or reset ignored"
+      ],
+      "corroborating_methods": [
+        "regulated_asset_base",
+        "yield_and_reverse_dcf"
+      ],
+      "sources": [
+        {
+          "ref": "_system/frameworks/segment_cashflow_valuation.md",
+          "locator": "Cash-flow duration and funding"
+        }
+      ]
+    }
+  ],
+  "audit": {
+    "generated_at": "2026-07-19T00:06:48.139786+00:00",
+    "method_count": 8,
+    "approved_count": 8,
+    "source_count": 9,
+    "source_records": [
+      {
+        "method": "royalty_distribution_curve@1.0",
+        "ref": "_system/frameworks/segment_cashflow_valuation.md",
+        "locator": "Core synthesis and reverse DCF",
+        "present": true,
+        "sha256": "032394996ce5abae2e6e606a7a482917bd37c9d6f138c0e0b69eba96e57e7869"
+      },
+      {
+        "method": "royalty_distribution_curve@1.0",
+        "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+        "locator": "Producing royalties and non-overlap controls",
+        "present": true,
+        "sha256": "6bf003d514d2e202c58f1b5be8ac43132091307f6dee6ca837909b7d61cbb2fc"
+      },
+      {
+        "method": "net_asset_value@1.0",
+        "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+        "locator": "Economic ownership and unit NAV",
+        "present": true,
+        "sha256": "6bf003d514d2e202c58f1b5be8ac43132091307f6dee6ca837909b7d61cbb2fc"
+      },
+      {
+        "method": "owner_earnings_reinvestment_dcf@1.0",
+        "ref": "_system/frameworks/segment_cashflow_valuation.md",
+        "locator": "Owner cash, reinvestment and reverse expectations",
+        "present": true,
+        "sha256": "032394996ce5abae2e6e606a7a482917bd37c9d6f138c0e0b69eba96e57e7869"
+      },
+      {
+        "method": "midcycle_capacity_value@1.0",
+        "ref": "_system/frameworks/power_zones.json",
+        "locator": "capital_cycle profile",
+        "present": true,
+        "sha256": "c247718fa8b974a7d234f198889e97981ecd76a226afc7bc37ae28ee40dbe9c1"
+      },
+      {
+        "method": "capital_structure_and_excess_return@1.0",
+        "ref": "_system/frameworks/power_zones.json",
+        "locator": "credit_and_normalized_returns profile",
+        "present": true,
+        "sha256": "c247718fa8b974a7d234f198889e97981ecd76a226afc7bc37ae28ee40dbe9c1"
+      },
+      {
+        "method": "probability_weighted_catalyst_nav@1.0",
+        "ref": "_system/frameworks/optionality_valuation.md",
+        "locator": "Probability, beneficiary, timing and failure cases",
+        "present": true,
+        "sha256": "cff50db70067baaf8676ab69b4fa4b2b1f0a8efcf742bd98e11fd8dd545b2917"
+      },
+      {
+        "method": "risk_adjusted_milestone_value@1.0",
+        "ref": "_system/frameworks/optionality_valuation.md",
+        "locator": "Milestone-based option framework",
+        "present": true,
+        "sha256": "cff50db70067baaf8676ab69b4fa4b2b1f0a8efcf742bd98e11fd8dd545b2917"
+      },
+      {
+        "method": "owner_cash_or_dividend_discount@1.0",
+        "ref": "_system/frameworks/segment_cashflow_valuation.md",
+        "locator": "Cash-flow duration and funding",
+        "present": true,
+        "sha256": "032394996ce5abae2e6e606a7a482917bd37c9d6f138c0e0b69eba96e57e7869"
+      }
+    ],
+    "errors": [],
+    "status": "pass"
+  }
+}

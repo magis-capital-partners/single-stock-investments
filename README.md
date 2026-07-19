@@ -107,6 +107,8 @@ python _system/scripts/marvin_cloud_refresh.py TICKER --date 2026-05-29
 
 The authoritative valuation close is `python _system/scripts/run_security_decision_pipeline.py --scope all`. Marvin remains the evidence/narrative coordinator; Power Zones route methods and reviewers, the universal contract controls readiness, and only `human_decision.json` authorizes capital.
 
+Valuation arithmetic is proof-first: source-locked facts and bounded assumptions flow through deterministic calculation graphs, while unsupported ranges are excluded as legacy sensitivities. See [`_system/frameworks/proof_first_valuation.md`](_system/frameworks/proof_first_valuation.md) and the approved [`valuation_method_registry.json`](_system/reference/valuation_method_registry.json).
+
 **INDEX.csv:** prefer per-ticker regen: `python _system/scripts/build_folder_indexes.py --ticker SNOW` (avoid full-portfolio regen unless intentional).
 
 **Dropbox research ingestion:** source-preserving bulk intake for the Stahl/Horizon Kinetics and SumZero Dropbox folders lives in [`_system/frameworks/dropbox_ingestion.md`](_system/frameworks/dropbox_ingestion.md). Run `python _system/scripts/dropbox_ingest.py --stahl-password stahl`; raw archives stay local while manifests, indexes, extracted text, and summaries are written under `_system/dropbox_ingestion/`.

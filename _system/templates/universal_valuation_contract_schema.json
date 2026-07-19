@@ -1,14 +1,38 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "universal_valuation_contract_v1",
-  "title": "Universal security valuation and decision contract",
+  "$id": "universal_valuation_contract_v2",
+  "title": "Proof-first universal security valuation and decision contract",
   "type": "object",
-  "required": ["schema_version", "status", "ticker", "economic_ownership_map", "component_coverage", "input_classification", "method_route", "market", "valuation", "scenario_contract", "evidence", "monitoring", "decision_rule"],
+  "required": [
+    "schema_version", "status", "ticker", "economic_ownership_map", "component_coverage",
+    "input_classification", "method_route", "market", "valuation", "scenario_contract",
+    "calculation_proof_summary", "source_lineage", "model_checks", "evidence", "monitoring",
+    "change_control", "decision_rule"
+  ],
   "properties": {
-    "schema_version": {"const": "1.0"},
+    "schema_version": {"const": "2.0"},
     "status": {"enum": ["decision_grade", "evidence_blocked"]},
     "ticker": {"type": ["string", "null"]},
-    "economic_ownership_map": {"type": "array"},
+    "economic_ownership_map": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["component_id", "treatment", "valuation_status", "range_per_share", "overlap_key"],
+        "properties": {
+          "valuation_status": {"enum": ["calculated", "bounded_estimate", "unpriced", "legacy_sensitivity"]},
+          "range_per_share": {
+            "type": "object",
+            "required": ["low", "base", "high"],
+            "properties": {
+              "low": {"type": ["number", "null"]},
+              "base": {"type": ["number", "null"]},
+              "high": {"type": ["number", "null"]}
+            }
+          },
+          "calculation_proof": {"type": ["object", "null"]}
+        }
+      }
+    },
     "component_coverage": {
       "type": "object",
       "required": ["all_material_components_identified", "unvalued_component_count", "double_counting_flags"],
@@ -25,10 +49,23 @@
     },
     "method_route": {"type": "object", "required": ["profile_id", "primary_methods", "corroborating_methods", "silent_personas"]},
     "market": {"type": "object"},
-    "valuation": {"type": "object", "required": ["value_per_share", "annualized_return_at_price_pct", "downside_to_low_pct"]},
+    "valuation": {
+      "type": "object",
+      "required": ["value_per_share", "priced_components_per_share", "annualized_return_at_price_pct", "downside_to_low_pct"]
+    },
     "scenario_contract": {"type": "object"},
+    "calculation_proof_summary": {
+      "type": "object",
+      "required": ["component_count", "priced_component_count", "proof_complete_pct", "status_counts", "all_material_components_priced", "calculation_errors", "aggregate_proof_hash"]
+    },
+    "source_lineage": {"type": "array"},
+    "model_checks": {
+      "type": "object",
+      "required": ["calculation_graphs_valid", "component_sum_reconciles", "no_double_counting", "all_material_components_priced", "low_base_high_ordered"]
+    },
     "evidence": {"type": "object", "required": ["unresolved_count", "blockers"]},
     "monitoring": {"type": "object", "required": ["falsifiers", "required_refresh_triggers"]},
+    "change_control": {"type": "object", "required": ["model_hash", "method_versions", "change_log", "rule"]},
     "decision_rule": {"type": "string", "minLength": 1}
   },
   "additionalProperties": true
