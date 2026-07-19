@@ -477,10 +477,11 @@ def _component_range_per_share(component: dict, shares: float | None) -> dict[st
 def compute_component_valuation(data: dict) -> dict | None:
     """Compute a universal, complete component valuation when supplied.
 
-    `component_valuation` deliberately uses direct low/base/high estimates.
-    The valuation method is disclosed per component rather than forcing every
-    security through a DCF. This supports operating companies, banks, funds,
-    pre-profit businesses, real assets, and holding companies.
+    Raw low/base/high estimates remain accepted as migration inputs, but the
+    proof-first universal contract excludes them unless `calculation_proof`
+    deterministically reproduces the outputs. This supports operating
+    companies, banks, funds, pre-profit businesses, real assets, and holding
+    companies without allowing an unsupported range to become decision-grade.
     """
     schedule = data.get("component_valuation")
     if not isinstance(schedule, dict):
@@ -525,6 +526,8 @@ def compute_component_valuation(data: dict) -> dict | None:
             "treatment": treatment,
             "included_in_component_id": component.get("included_in_component_id"),
             "method": valuation["method"],
+            "valuation_status": valuation.get("valuation_status"),
+            "calculation_proof": valuation.get("calculation_proof"),
             "evidence_tier": valuation.get("evidence_tier", "analyst_estimate"),
             "evidence": valuation["evidence"],
             "cross_check": valuation.get("cross_check"),

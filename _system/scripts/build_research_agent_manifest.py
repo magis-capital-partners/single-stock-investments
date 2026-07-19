@@ -18,6 +18,11 @@ def candidates(ticker: str) -> list[Path]:
         base / "investor-documents" / "ir_adapter.json",
         base / "research" / "evidence_refresh.json",
         base / "research" / "news_refresh.json",
+        base / "research" / "valuation_route.json",
+        base / "research" / "valuation_contract.json",
+        base / "research" / "valuation_workbench.json",
+        base / "research" / "evidence_task_queue.json",
+        base / "research" / "committee_trigger.json",
     ]
     globs = [
         base / "research" / "evidence",
@@ -50,6 +55,7 @@ def build_manifest(ticker: str, reason: str) -> dict:
         "evidence_hash": evidence_hash,
         "artifact_count": len(refs),
         "ready": bool(refs),
+        "decision_context_ready": any(ref["path"].endswith(("valuation_workbench.json", "evidence_task_queue.json")) for ref in refs),
     }
 
 

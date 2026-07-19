@@ -80,6 +80,14 @@ def sec_url(cik_path: str, accession: str, primary: str) -> str:
     return f"https://www.sec.gov/Archives/edgar/data/{cik_path}/{nodash}/{primary}"
 
 
+def manifest_path(path: Path) -> str:
+    """Store a portable repository-relative path, never a runner/workstation path."""
+    try:
+        return path.resolve().relative_to(ROOT.resolve()).as_posix()
+    except ValueError:
+        return path.as_posix()
+
+
 def download_8k_exhibits(
     cik_path: str,
     row: dict,
@@ -121,7 +129,7 @@ def download_8k_exhibits(
                 **row,
                 "exhibit": name,
                 "url": url,
-                "local": str(dest),
+                "local": manifest_path(dest),
                 "ok": ok,
             }
         )
@@ -182,7 +190,7 @@ def download_sec(cik: str, sec_dir: Path, log_file: Path, meta: dict | None = No
         filing_url = sec_url(cik_path, row["accession"], row["primary"])
         time.sleep(SLEEP_SEC)
         ok = download(filing_url, dest, SEC_UA, log_file)
-        manifest.append({**row, "url": filing_url, "local": str(dest), "ok": ok})
+        manifest.append({**row, "url": filing_url, "local": manifest_path(dest), "ok": ok})
         if meta.get("download_8k_exhibits"):
             manifest.extend(download_8k_exhibits(cik_path, row, sec_dir, log_file))
     return manifest

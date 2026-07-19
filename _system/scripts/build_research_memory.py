@@ -20,6 +20,7 @@ from memory_claim_sources import (  # noqa: E402
     load_biotech_factor_spec,
     supplemental_claim_rows,
 )
+from ticker_identity import identity_match_ok  # noqa: E402
 from memory_common import (  # noqa: E402
     SPECIALIST_FUND_TERMS,
     claim_type,
@@ -290,6 +291,15 @@ def build() -> tuple[dict, dict]:
             continue
         text = short_text(row.get("summary") or row.get("claim") or row.get("title") or "", 320)
         if not text or is_low_value_claim(text, row) or is_letter_table_debris(text):
+            continue
+        entity = entities["tickers"].get(ticker) or {}
+        if not identity_match_ok(
+            text,
+            ticker,
+            company=str(entity.get("company") or "") or None,
+            market=str(entity.get("market") or "") or None,
+            exchange=str(entity.get("exchange") or "") or None,
+        ):
             continue
         rows_by_ticker[ticker].append(row)
         src = source_record(row)

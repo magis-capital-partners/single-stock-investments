@@ -27,6 +27,16 @@ import re
 from dataclasses import dataclass, field
 from typing import Iterable
 
+from ticker_identity import (  # noqa: E402
+    exchange_token_family,
+    families_compatible,
+    identity_match_ok,
+    nearby_company_phrase,
+    company_names_conflict,
+    ticker_market_family,
+    EXPLICIT_EXCHANGE_TICKER_RE,
+)
+
 # ---------------------------------------------------------------------------
 # Exchange vocabulary + explicit-syntax regexes (Tier A)
 # ---------------------------------------------------------------------------
@@ -175,8 +185,26 @@ class SecurityMaster:
     single_token_re: re.Pattern[str] | None = None
 
     @classmethod
-    def from_dict(cls, data: dict) -> "SecurityMaster":
+    def from_dict(cls, data: dict, registry: dict | None = None) -> "SecurityMaster":
         by_ticker = {str(k).upper(): dict(v or {}) for k, v in (data or {}).items()}
+        # Overlay book market/exchange/company from the portfolio registry so
+        # bare US symbols (empty exchange in security_master) still reject
+        # foreign ``ASX:`` / ``LSE:`` attachments.
+        if registry:
+            for bucket in ("holdings", "watchlist"):
+                for ticker, row in ((registry.get(bucket) or {}) or {}).items():
+                    key = str(ticker).upper()
+                    meta = by_ticker.setdefault(key, {})
+                    if row.get("market") and not meta.get("market"):
+                        meta["market"] = row.get("market")
+                    if row.get("exchange") and not meta.get("exchange"):
+                        meta["exchange"] = row.get("exchange")
+                    if row.get("company") and not meta.get("name"):
+                        meta["name"] = row.get("company")
+                    meta.setdefault("in_book", bucket == "holdings" or bool(meta.get("in_book")))
+                    meta.setdefault("source", meta.get("source") or "book")
+                    meta.setdefault("entity_type", meta.get("entity_type") or "equity")
+                    meta.setdefault("validation_status", meta.get("validation_status") or "manual")
         symbol_to_ticker: dict[str, str] = {}
         numeric_to_ticker: dict[str, str] = {}
         name_alias_counts: dict[str, set[str]] = {}
@@ -262,20 +290,37 @@ class SecurityMaster:
             single_token_re=single_token_re,
         )
 
-    def resolve_symbol(self, sym: str) -> str | None:
+    def resolve_symbol(self, sym: str, exchange_token: str | None = None) -> str | None:
         if not sym:
             return None
         sym = SYMBOL_CORRECTIONS.get(sym.strip().upper().replace("-", "."), sym)
         s = sym.strip().upper().replace("-", ".")
         if s in self.by_ticker:
-            return s
-        # A dotted token is meaningful only when the complete exchange/class
-        # symbol is canonical.  Falling back to the base converted academic
-        # credentials such as ``B.S.`` into the one-letter equity ``B``.
-        if "." in s:
+            ticker = s
+        elif "." in s:
+            # A dotted token is meaningful only when the complete exchange/class
+            # symbol is canonical.  Falling back to the base converted academic
+            # credentials such as ``B.S.`` into the one-letter equity ``B``.
             return None
-        bare = s.split(".", 1)[0]
-        return self.symbol_to_ticker.get(s) or self.symbol_to_ticker.get(bare)
+        else:
+            bare = s.split(".", 1)[0]
+            ticker = self.symbol_to_ticker.get(s) or self.symbol_to_ticker.get(bare)
+        if not ticker:
+            return None
+        if exchange_token and not self.exchange_compatible(ticker, exchange_token):
+            return None
+        return ticker
+
+    def exchange_compatible(self, ticker: str, exchange_token: str) -> bool:
+        """True when an explicit venue token matches the book ticker's market."""
+        meta = self.by_ticker.get(ticker, {})
+        book_family = ticker_market_family(
+            ticker,
+            market=str(meta.get("market") or "") or None,
+            exchange=str(meta.get("exchange") or "") or None,
+        )
+        mention_family = exchange_token_family(exchange_token)
+        return families_compatible(book_family, mention_family)
 
     def resolve_numeric(self, num: str) -> str | None:
         n = str(num).strip()
@@ -495,25 +540,40 @@ _EXCHANGE_TOKENS: frozenset[str] = frozenset(
 def extract_explicit_symbols(text: str) -> list[dict]:
     """Return raw Tier-A symbol candidates with the rule that fired.
 
-    Each item: {"symbol": str, "numeric": bool, "rule": str, "span": (s, e)}.
+    Each item: {"symbol": str, "numeric": bool, "rule": str, "span": (s, e),
+    "exchange": optional venue token}.
     Used by the harvester to seed the security master and by the matcher.
     """
     out: list[dict] = []
 
-    def add(sym: str, rule: str, m: re.Match, numeric: bool = False) -> None:
+    def add(
+        sym: str,
+        rule: str,
+        m: re.Match,
+        numeric: bool = False,
+        exchange: str | None = None,
+    ) -> None:
         if not numeric and sym.upper() in COUNTRY_CODES:
             return
         if numeric or _looks_symbol(sym):
-            out.append({"symbol": sym.upper(), "numeric": numeric, "rule": rule, "span": m.span()})
+            item = {
+                "symbol": sym.upper(),
+                "numeric": numeric,
+                "rule": rule,
+                "span": m.span(),
+            }
+            if exchange:
+                item["exchange"] = exchange
+            out.append(item)
 
     for m in DOLLAR_TICKER_RE.finditer(text):
         add(m.group(1), "dollar", m)
-    for m in PAREN_EXCH_TICKER_RE.finditer(text):
-        sym = m.group(1)
-        add(sym, "paren_exch", m, numeric=sym.isdigit())
-    for m in EXCH_PREFIX_TICKER_RE.finditer(text):
-        sym = m.group(1)
-        add(sym, "exch_prefix", m, numeric=sym.isdigit())
+    for m in EXPLICIT_EXCHANGE_TICKER_RE.finditer(text):
+        sym = m.group("sym")
+        exch = m.group("exch")
+        # Prefer the paren-aware classification when the match sits in "(EXCH: TICKER)".
+        rule = "paren_exch" if m.start() > 0 and text[m.start() - 1] == "(" else "exch_prefix"
+        add(sym, rule, m, numeric=sym.isdigit(), exchange=exch)
     for m in PAREN_NUM_EXCH_RE.finditer(text):
         add(m.group(1), "paren_num_exch", m, numeric=True)
     for m in DOTTED_TICKER_RE.finditer(text):
@@ -657,6 +717,26 @@ def _semantic_entity_allowed(
         return strong_explicit or any(
             re.search(r"\bOsisko Gold Royalt(?:y|ies)\b", window, re.I) for window in windows
         )
+
+    meta = master.by_ticker.get(ticker, {})
+    company = str(meta.get("name") or "")
+    aliases = [str(a) for a in (meta.get("aliases") or []) if a]
+    if not identity_match_ok(
+        text,
+        ticker,
+        company=company or None,
+        market=str(meta.get("market") or "") or None,
+        exchange=str(meta.get("exchange") or "") or None,
+        aliases=aliases,
+    ):
+        return False
+
+    # Reject "Foreign Co (TICKER)" / "Foreign Co (EXCH: TICKER)" when the nearby
+    # issuer phrase conflicts with the book name, even without an exchange tag.
+    for pos in spans[:12]:
+        phrase = nearby_company_phrase(text, pos)
+        if phrase and company and company_names_conflict(phrase, company, aliases):
+            return False
 
     return True
 
@@ -828,10 +908,13 @@ def match_letter(text: str, master: SecurityMaster, as_of: str | None = None) ->
 
     # --- Tier A: explicit syntax ---
     for hit in extract_explicit_symbols(text):
+        exchange_token = hit.get("exchange")
         if hit["numeric"]:
             ticker = master.resolve_numeric(hit["symbol"])
+            if ticker and exchange_token and not master.exchange_compatible(ticker, exchange_token):
+                continue
         else:
-            ticker = master.resolve_symbol(hit["symbol"])
+            ticker = master.resolve_symbol(hit["symbol"], exchange_token=exchange_token)
         if not ticker:
             continue
         if hit["rule"] == "paren_company" and not parenthetical_is_ticker(

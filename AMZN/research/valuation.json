@@ -1,6 +1,6 @@
 {
   "ticker": "AMZN",
-  "as_of": "2026-05-26",
+  "as_of": "2026-07-18",
   "method": "full",
   "lawrence_bucket": "pricing_power",
   "classification_inputs": {
@@ -10,14 +10,15 @@
     "cycle": "-"
   },
   "inputs": {
-    "price": 263.36,
-    "price_source": "Stooq close 2026-05-25 (confirm live)",
+    "price": 247.23,
+    "price_source": "Yahoo AMZN close 2026-07-17",
     "fcf_per_share": 5.35,
     "fcf_source": "Q1-26 TTM OCF $148.5B less normalized capex ~$90B / ~10.95B diluted shares (not TTM FCF $1.2B)",
     "shares_millions": 10949,
     "normalization_note": "AI capex TTM $147.3B depresses reported FCF; Lawrence base uses mid-cycle owner cash flow after capex normalizes",
     "shares_outstanding": 10949000000,
-    "shares_source": "Derived from inputs.shares_millions in the pre-existing valuation.json; [HUMAN REVIEW] confirm against the latest primary filing."
+    "shares_source": "Derived from inputs.shares_millions in the pre-existing valuation.json; [HUMAN REVIEW] confirm against the latest primary filing.",
+    "price_as_of": "2026-07-17"
   },
   "scenarios": {
     "bear": {
@@ -41,22 +42,22 @@
   },
   "results": {
     "bear": {
-      "return_pct": -5.9
+      "return_pct": -5.0
     },
     "base": {
-      "return_pct": 0.9
+      "return_pct": 1.9
     },
     "bull": {
-      "return_pct": 6.1
+      "return_pct": 7.2
     }
   },
   "implied_return": {
-    "base_pct": 3.2,
+    "base_pct": 3.68,
     "label": "7yr IRR (total synthesis)",
-    "display": "3.2% (total synthesis)",
-    "lawrence_stance_gate_pct": 0.9,
-    "falsifier_adjusted_pct": 0.9,
-    "synthesis_pct": 3.2
+    "display": "3.68% (total synthesis)",
+    "lawrence_stance_gate_pct": 1.9,
+    "falsifier_adjusted_pct": 1.9,
+    "synthesis_pct": 3.68
   },
   "stance_proposal": {
     "suggested": "watch",
@@ -72,7 +73,7 @@
       "case": "AI inflection",
       "method": "full (normalized FCF)",
       "key_inputs": "FCF\u2080=$9.0 g1=12% g2=8% exit=30\u00d7",
-      "return_pct": 15.1,
+      "return_pct": 16.2,
       "stance_gate": false,
       "notes": "[Assumption] capex ~$90B sustainable vs $147B TTM; needs mgmt guide"
     },
@@ -116,7 +117,7 @@
       "growth_y6_10": 0.08,
       "exit_pfcf_y10": 30,
       "drivers": "AWS AI share, ads, silicon, FCF inflection",
-      "computed_return_pct": 15.1
+      "computed_return_pct": 16.2
     }
   },
   "valuation_overlay": "segment_cashflow",
@@ -182,13 +183,13 @@
   },
   "results_lawrence_legacy": {
     "bear": {
-      "return_pct": -5.9
+      "return_pct": -5.0
     },
     "base": {
-      "return_pct": 0.9
+      "return_pct": 1.9
     },
     "bull": {
-      "return_pct": 6.1
+      "return_pct": 7.2
     }
   },
   "option_scan": [
@@ -214,7 +215,7 @@
         "id": "scenario_bear",
         "label": "Bear scenario (Lawrence)",
         "source": "scenarios.bear",
-        "return_pct": -5.9,
+        "return_pct": -5.0,
         "weight": 0.05,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
@@ -228,7 +229,7 @@
         "id": "scenario_bull",
         "label": "Bull scenario (Lawrence)",
         "source": "scenarios.bull",
-        "return_pct": 6.1,
+        "return_pct": 7.2,
         "weight": 0.12,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
@@ -266,9 +267,9 @@
     ],
     "qualitative_manual": false,
     "qualitative_pp_cap_applied": false,
-    "numeric_weighted_pct": 3.4,
+    "numeric_weighted_pct": 3.88,
     "qualitative_pp": -0.2,
-    "total_synthesis_pct": 3.2,
+    "total_synthesis_pct": 3.68,
     "human_approval": "pending",
     "weight_audit": {
       "flags": [],
@@ -295,7 +296,7 @@
     "synthesis_in_dive": true
   },
   "context_overlay": {
-    "as_of": "2026-07-09",
+    "as_of": "2026-07-18",
     "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
     "themes": [
       {
@@ -305,9 +306,9 @@
           {
             "id": "hy_oas",
             "label": "High-yield OAS credit spread (%)",
-            "latest": 0.51,
-            "as_of": "2026-07-09",
-            "yoy_pct": 194.4,
+            "latest": 0.95,
+            "as_of": "2026-07-17",
+            "yoy_pct": 196.9,
             "direction": "up",
             "good_for": "risk_regime",
             "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
@@ -317,9 +318,9 @@
           {
             "id": "ust_10y",
             "label": "US Treasury 10Y yield (%)",
-            "latest": 4.536999702453613,
-            "as_of": "2026-07-09",
-            "yoy_pct": 4.5,
+            "latest": 4.540999889373779,
+            "as_of": "2026-07-17",
+            "yoy_pct": 1.7,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^TNX",
@@ -329,9 +330,9 @@
           {
             "id": "ust_2y",
             "label": "US Treasury 2Y yield (%)",
-            "latest": 4.269000053405762,
-            "as_of": "2026-07-09",
-            "yoy_pct": 8.9,
+            "latest": 4.2729997634887695,
+            "as_of": "2026-07-17",
+            "yoy_pct": 6.7,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^FVX",
@@ -341,9 +342,9 @@
           {
             "id": "dxy_broad",
             "label": "Trade-weighted USD index (broad)",
-            "latest": 100.91400146484375,
-            "as_of": "2026-07-09",
-            "yoy_pct": 3.5,
+            "latest": 100.75,
+            "as_of": "2026-07-17",
+            "yoy_pct": 2.0,
             "direction": "up",
             "good_for": "dollar_regime",
             "source": "yahoo:DX-Y.NYB",
@@ -353,10 +354,10 @@
           {
             "id": "vix_level",
             "label": "VIX index level",
-            "latest": 16.059999465942383,
-            "as_of": "2026-07-09",
-            "yoy_pct": 0.8,
-            "direction": "flat",
+            "latest": 18.770000457763672,
+            "as_of": "2026-07-17",
+            "yoy_pct": 13.6,
+            "direction": "up",
             "good_for": "vol_regime",
             "source": "yahoo:^VIX",
             "stale": false,
@@ -365,9 +366,9 @@
           {
             "id": "credit_impulse_1m",
             "label": "HYG vs TLT 1-month return spread (%)",
-            "latest": 0.33,
-            "as_of": "2026-07-09",
-            "yoy_pct": 147.1,
+            "latest": 1.46,
+            "as_of": "2026-07-17",
+            "yoy_pct": 22.7,
             "direction": "up",
             "good_for": "credit_impulse",
             "source": "spread:HYG-TLT:21d",
@@ -377,9 +378,9 @@
           {
             "id": "spy_20d_realized_vol",
             "label": "SPY 20-day realized vol (annualized %)",
-            "latest": 15.46,
-            "as_of": "2026-07-09",
-            "yoy_pct": 47.4,
+            "latest": 11.68,
+            "as_of": "2026-07-17",
+            "yoy_pct": 32.3,
             "direction": "up",
             "good_for": "equity_vol",
             "source": "realized_vol:SPY:20d",
@@ -391,7 +392,7 @@
     ]
   },
   "insider_signal": {
-    "as_of": "2026-07-09",
+    "as_of": "2026-07-18",
     "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
     "in_base_irr": false,
     "window_days": 365,
@@ -418,8 +419,8 @@
       "sell_score": -1.0,
       "cluster_bonus": 0.0,
       "net_buy_usd": 0,
-      "net_sell_usd": 4338479810.33,
-      "price_today": 263.36
+      "net_sell_usd": 2577882338.88,
+      "price_today": 247.23
     },
     "top_buys": [],
     "top_sells": [
@@ -430,7 +431,7 @@
         "price": 0.0,
         "value_usd": 0.0,
         "is_10b5_1": false,
-        "contrib": -0.166
+        "contrib": -0.154
       },
       {
         "insider": "BEZOS JEFFREY P",
@@ -439,7 +440,7 @@
         "price": 0.0,
         "value_usd": 0.0,
         "is_10b5_1": false,
-        "contrib": -0.162
+        "contrib": -0.15
       },
       {
         "insider": "BEZOS JEFFREY P",
@@ -470,60 +471,42 @@
       }
     ],
     "narrative_hooks": [],
-    "transaction_count": 218
+    "transaction_count": 220
   },
   "lens_consensus": {
-    "as_of": "2026-05-26",
-    "shared_inputs_ref": "valuation.json@2026-05-26",
-    "valuation_richness": 0.716,
-    "blended_return_pct": -0.03,
+    "as_of": "2026-07-18",
+    "shared_inputs_ref": "valuation.json@2026-07-18",
+    "valuation_richness": 0.667,
+    "blended_return_pct": 1.13,
     "band_pct": [
-      -5.9,
-      3.2
+      -5.0,
+      3.9
     ],
-    "weighted_median_pct": 0.9,
+    "weighted_median_pct": 1.9,
     "median_mean_flag": false,
-    "stance": "pass",
-    "agreement_pct": 20,
-    "dissent_count": 6,
-    "lawrence_divergence": true,
+    "stance": "watch",
+    "agreement_pct": 85,
+    "dissent_count": 1,
+    "lawrence_divergence": false,
     "top_dissents": [
       {
-        "persona": "hohn",
-        "label": "Chris Hohn / TCI",
-        "verdict": "watch",
-        "return_pct": 0.9,
-        "key_metric": "fcf_yield=2.03",
-        "conviction": 0.705,
-        "falsifier": "FCF yield < 0.5% or commoditized archetype (turnaround/optionality only)"
-      },
-      {
-        "persona": "lawrence",
-        "label": "Lawrence (house IRR)",
-        "verdict": "watch",
-        "return_pct": 3.2,
-        "key_metric": "synthesis_pct=3.2",
-        "conviction": 0.59,
-        "falsifier": "Synthesis incomplete or irr_method pending"
-      },
-      {
-        "persona": "munger",
-        "label": "Charlie Munger",
-        "verdict": "watch",
-        "return_pct": 0.9,
-        "key_metric": "moat=stable",
-        "conviction": 0.555,
-        "falsifier": "Moat eroding/unproven or irr_method pending"
+        "persona": "pabrai",
+        "label": "Mohnish Pabrai",
+        "verdict": "pass",
+        "return_pct": -5.0,
+        "key_metric": "downside_upside_ratio=0.694",
+        "conviction": 1.0,
+        "falsifier": "dhando -> none OR net-debt/EBITDA > 3 OR bear return < -15%"
       }
     ],
-    "contributor_count": 7,
+    "contributor_count": 10,
     "in_base_irr": false,
     "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
   },
   "total_return_panel": {
     "schema_version": "3.0",
     "ticker": "AMZN",
-    "as_of": "2026-07-15",
+    "as_of": "2026-07-18",
     "status": "partial",
     "error": "Vendor events are discovery evidence; primary-source completeness has not been established.",
     "price_source": "yahoo:AMZN",
@@ -531,8 +514,8 @@
     "return_currency": "USD",
     "fx_basis": "listing_currency_nominal",
     "history_start": "1997-05-15",
-    "history_end": "2026-07-15",
-    "price_points": 7336,
+    "history_end": "2026-07-17",
+    "price_points": 7338,
     "price_interval": "1d",
     "history_basis": "earliest_available_vendor_trading_history",
     "chart_scale": "logarithmic",
@@ -557,17 +540,17 @@
     "distribution_contribution_by_type": {},
     "cumulative_distributions_per_share": 0,
     "start_price": 0.0979,
-    "end_price": 254.96,
-    "price_index_end": 260383.81,
-    "total_return_index_end": 260383.81,
-    "cumulative_price_return_pct": 260283.81,
-    "cumulative_total_return_pct": 260283.81,
-    "price_only_annualized_pct": 30.95,
-    "total_return_annualized_pct": 30.95,
-    "market_cap_m": null,
-    "shares_outstanding": null,
-    "price_for_market_cap": 263.36,
-    "chart": "AMZN/research/charts/total_return_2026-07-15.svg",
+    "end_price": 247.23,
+    "price_index_end": 252489.35,
+    "total_return_index_end": 252489.35,
+    "cumulative_price_return_pct": 252389.35,
+    "cumulative_total_return_pct": 252389.35,
+    "price_only_annualized_pct": 30.81,
+    "total_return_annualized_pct": 30.81,
+    "market_cap_m": 2706921.27,
+    "shares_outstanding": 10949000000,
+    "price_for_market_cap": 247.23,
+    "chart": "AMZN/research/charts/total_return_2026-07-18.svg",
     "panel_json": "AMZN/research/total_return_panel.json"
   },
   "valuation_mode": "economic_value",
@@ -822,11 +805,11 @@
     "material_component_count": 4,
     "additive_component_count": 4,
     "embedded_component_count": 0,
-    "market_price_per_share": 263.36,
+    "market_price_per_share": 247.23,
     "upside_downside_pct": {
-      "low": -63.0,
-      "base": -10.0,
-      "high": 42.0
+      "low": -60.6,
+      "base": -4.1,
+      "high": 51.3
     }
   },
   "economic_value_analysis": {
@@ -1273,7 +1256,7 @@
     "schema_version": "1.0",
     "status": "decision_grade",
     "ticker": "AMZN",
-    "as_of": "2026-05-26",
+    "as_of": "2026-07-18",
     "economic_ownership_map": [
       {
         "component_id": "primary_operating_segment",
@@ -1598,9 +1581,9 @@
       "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
     },
     "market": {
-      "price_per_share": 263.36,
+      "price_per_share": 247.23,
       "fully_diluted_shares": 10949000000,
-      "market_cap_m": 2883528.64,
+      "market_cap_m": 2706921.27,
       "enterprise_value_m": null
     },
     "valuation": {
@@ -1612,11 +1595,11 @@
       "probability_weighted_value_per_share": 237.02,
       "expected_distributions_per_share": 0.0,
       "annualized_return_at_price_pct": {
-        "low": -13.24,
-        "base": -1.49,
-        "high": 5.14
+        "low": -12.45,
+        "base": -0.6,
+        "high": 6.09
       },
-      "downside_to_low_pct": -63.0,
+      "downside_to_low_pct": -60.58,
       "horizon_years": 7
     },
     "scenario_contract": {
@@ -1673,5 +1656,8 @@
       ]
     },
     "decision_rule": "No security is decision-grade until every material economic claim is valued exactly once and every material evidence blocker is resolved."
+  },
+  "human_review": {
+    "live_price_confirmed": false
   }
 }

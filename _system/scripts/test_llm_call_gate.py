@@ -49,6 +49,17 @@ class LlmCallGateTests(unittest.TestCase):
         self.assertFalse(result["approved"])
         self.assertEqual(result["gate_reason"], "duplicate_evidence_hash")
 
+    def test_failed_startup_releases_its_reservation_for_retry(self):
+        ledger = [
+            {"timestamp": AT.isoformat(), "consumer": "test", "subject": "AAA", "evidence_hash": "a" * 64, "status": "reserved", "run_id": "10"},
+            {"timestamp": AT.isoformat(), "consumer": "test", "subject": "AAA", "evidence_hash": "a" * 64, "status": "failed", "run_id": "10"},
+        ]
+        result = evaluate(
+            consumer="test", subject="AAA", reason="material", evidence_hash="a" * 64,
+            policy_doc=POLICY, ledger=ledger, at=AT,
+        )
+        self.assertTrue(result["approved"])
+
 
 if __name__ == "__main__":
     unittest.main()

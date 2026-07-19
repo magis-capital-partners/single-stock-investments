@@ -25,6 +25,11 @@ def test_kewl_copper_eligible():
     assert commodities_for_ticker("KEWL", val) == ["copper"]
 
 
+def test_msb_is_iron_ore_royalty_not_copperwood():
+    val = {"ticker": "MSB", "classification_inputs": {"archetype": "resource"}}
+    assert commodities_for_ticker("MSB", val) == []
+
+
 def test_strip_copper():
     val = {
         "inputs": {"price": 100, "copper_spot_usd_per_lb": 6.5},
@@ -68,6 +73,7 @@ def test_strip_orphan_market_inputs():
 if __name__ == "__main__":
     test_mrsh_not_copper_eligible()
     test_kewl_copper_eligible()
+    test_msb_is_iron_ore_royalty_not_copperwood()
     test_strip_copper()
     test_strip_orphan_market_inputs()
     print("OK test_fetch_market_inputs")

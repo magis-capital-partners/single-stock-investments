@@ -1,7 +1,6 @@
 name: Deploy OAuth Proxy (Cloudflare)
 
 on:
-  workflow_dispatch:
   push:
     branches: [main]
     paths:
@@ -13,6 +12,7 @@ permissions:
 jobs:
   oauth-secrets:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     outputs:
       configured: ${{ steps.check.outputs.configured }}
     steps:
@@ -30,6 +30,7 @@ jobs:
     needs: oauth-secrets
     if: needs.oauth-secrets.outputs.configured == 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: jlumbroso/free-disk-space@main
         with:
@@ -62,8 +63,9 @@ jobs:
     needs: oauth-secrets
     if: needs.oauth-secrets.outputs.configured != 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
-      - name: Manual deploy required
+      - name: Deployment configuration missing
         run: |
           echo "::warning::CLOUDFLARE_API_TOKEN not set — skipping CI deploy."
           echo "Deploy locally: cd dashboard/oauth-proxy && npx wrangler login && npx wrangler deploy"

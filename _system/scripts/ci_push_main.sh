@@ -199,17 +199,8 @@ regenerate_dashboard_json() {
     return 1
   fi
   echo "Regenerating dashboard JSON to resolve rebase conflicts..."
-  if [ -f "_system/scripts/build_insights.py" ]; then
-    if ! "$PYTHON" _system/scripts/build_insights.py; then
-      echo "::error::build_insights.py failed while rebuilding dashboard artifacts."
-      return 1
-    fi
-    git add dashboard/data/insights.json 2>/dev/null || true
-    git add _system/reference/data-sources/insights_record_archive.json 2>/dev/null || true
-  fi
-  if [ -f "_system/scripts/build_activist_feed.py" ]; then
-    regenerate_activist_feed_artifacts || return 1
-  fi
+  # Insight and activist artifacts have dedicated conflict classifiers and
+  # rebuild paths. Keep this generic recovery scoped to dashboard assembly.
   if ! "$PYTHON" _system/scripts/build_dashboard_data.py; then
     echo "::error::build_dashboard_data.py failed while resolving a rebase conflict."
     return 1

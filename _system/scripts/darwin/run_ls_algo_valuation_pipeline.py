@@ -84,14 +84,14 @@ def run_script(argv: list[str]) -> bool:
 def stage_sync(onboard: bool, dry_run: bool) -> str:
     if ls_algo_screened_csv() is None:
         return "skipped (ls-algo screener not available on this host)"
-    if not GAP_BUILDER.exists():
-        return "skipped (gap builder not installed in this checkout)"
+    if not GAP_BUILDER.exists() or not ONBOARD_RUNNER.exists():
+        return "failed (LS-algo intake components are missing)"
     if dry_run:
         return "would run build_ls_algo_underlying_gap.py" + (" + equity onboard" if onboard else "")
     ok = run_script(["_system/scripts/darwin/build_ls_algo_underlying_gap.py"])
     if not ok:
         return "gap builder failed (continuing with existing registry)"
-    if onboard and ONBOARD_RUNNER.exists():
+    if onboard:
         ok = run_script(["_system/scripts/darwin/run_ls_algo_equity_onboard_all.py", "--batch-size", "10"])
         return "gap + onboard complete" if ok else "gap complete; onboard failed"
     return "gap complete (onboard not requested)"
@@ -329,11 +329,8 @@ def main() -> int:
         help="Report every stage without writing files or freezing committee packets",
     )
     parser.add_argument("--skip-sync", action="store_true", help="Skip the screener gap sync stage")
-    parser.add_argument(
-        "--onboard",
-        action="store_true",
-        help="Also run the equity onboarder for new screener names (heavy; local use)",
-    )
+    parser.add_argument("--no-onboard", dest="onboard", action="store_false", help="Sync the gap without onboarding new names.")
+    parser.set_defaults(onboard=True)
     parser.add_argument(
         "--skip-dashboard",
         action="store_true",

@@ -27,7 +27,6 @@ DEFAULT_SYMBOLS = {
 # Explicit registry: only tickers that use copper / Copperwood royalty math.
 TICKER_SYMBOLS: dict[str, list[str]] = {
     "KEWL": ["copper"],
-    "MSB": ["copper"],
 }
 
 COPPER_INPUT_KEYS = (

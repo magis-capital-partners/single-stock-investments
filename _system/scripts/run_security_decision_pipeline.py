@@ -31,6 +31,9 @@ BUSY_COMMITTEE_STATES = {
     "round_one_open", "independent_review_open", "ready_to_assemble",
     "committee_complete_decision_pending", "owner_decision_pending", "outcome_tracking",
 }
+FOLLOWUPS = ROOT / "_system" / "reference" / "valuation_followups.json"
+CLOSED_EVIDENCE_STATUSES = {"resolved", "accepted", "not_applicable", "met"}
+REVIEW_METADATA_FIELDS = {"cohort_purpose", "cohort_expected_profile", "profile_match"}
 
 
 def read_json(path: Path, default=None):
@@ -57,6 +60,44 @@ def selected_tickers(scope: str, explicit: list[str] | None = None) -> list[str]
         }
         return sorted(followup_names | portfolio_names)
     return sorted(entries)
+
+
+def curated_evidence_blockers(ticker: str) -> list[str]:
+    """Return only still-open curated gaps for the security.
+
+    The follow-up ledger is the readiness authority.  Rebuilding a contract
+    must not resurrect an accepted gap or silently drop a still-open one.
+    """
+    followups = read_json(FOLLOWUPS)
+    ticker_cfg = ((followups.get("tickers") or {}).get(ticker) or {})
+    blockers = []
+    for row in ticker_cfg.get("evidence_gaps") or []:
+        status = str(row.get("status") or "open").lower()
+        if status in CLOSED_EVIDENCE_STATUSES:
+            continue
+        gap_id = row.get("id") or "curated_evidence_gap"
+        question = row.get("question") or row.get("evidence_required") or "Primary evidence remains incomplete."
+        blockers.append(f"{gap_id}: {question}")
+    return sorted(set(blockers))
+
+
+def current_contract(ticker: str, valuation: dict, route: dict, reviewed: dict) -> dict:
+    """Recompute financial fields while retaining explicit review metadata."""
+    contract = build_universal_valuation_contract(valuation, route.get("profile_id"))
+    blockers = sorted(set((contract.get("evidence") or {}).get("blockers") or []) | set(curated_evidence_blockers(ticker)))
+    contract.setdefault("evidence", {})["blockers"] = blockers
+    contract["evidence"]["unresolved_count"] = len(blockers)
+    if blockers:
+        contract["status"] = "evidence_blocked"
+    for field in REVIEW_METADATA_FIELDS:
+        if field in reviewed:
+            contract[field] = reviewed[field]
+    contract["method_route"] = route
+    contract["authority"] = "universal_valuation_contract"
+    contract["legacy_reference_present"] = bool(
+        valuation.get("implied_return") or valuation.get("results_lawrence_legacy")
+    )
+    return contract
 
 
 def stage_routes(tickers: list[str], as_of: str, dry_run: bool) -> dict:
@@ -90,33 +131,62 @@ def stage_routes(tickers: list[str], as_of: str, dry_run: bool) -> dict:
     }
 
 
-def stage_contracts(tickers: list[str], dry_run: bool) -> dict:
-    written, missing, errors = [], [], []
+def _model_scaffold(ticker: str, route: dict, as_of: str) -> dict:
+    return {
+        "schema_version": "2.0",
+        "ticker": ticker,
+        "as_of": as_of,
+        "status": "evidence_blocked_model_required",
+        "method_route": route,
+        "required_component_map": route.get("required_evidence") or [],
+        "required_outputs": [
+            "complete non-overlapping economic ownership map",
+            "primary-source input ledger",
+            "approved versioned method card",
+            "deterministic low/base/high calculation proof",
+            "enterprise-to-equity and per-share reconciliation",
+            "reverse expectations, falsifiers, and refresh triggers",
+        ],
+        "unvalued_component_count": 1,
+        "next_action": "Gather the listed primary evidence and compile the first proof-complete component model; never substitute an analyst plug.",
+    }
+
+
+def stage_contracts(tickers: list[str], dry_run: bool, as_of: str | None = None) -> dict:
+    written, missing, scaffolded, errors = [], [], [], []
+    as_of = (as_of or date.today().isoformat())[:10]
     for ticker in tickers:
         research = ROOT / ticker / "research"
         valuation_path = research / "valuation.json"
         if not valuation_path.exists():
-            missing.append(ticker)
+            try:
+                route = read_json(research / "valuation_route.json") or build_route(ticker, as_of)
+                scaffold = read_json(research / "valuation_model_scaffold.json") or _model_scaffold(ticker, route, as_of)
+                contract = build_universal_valuation_contract({"ticker": ticker, "as_of": as_of}, route.get("profile_id"))
+                contract["method_route"] = route
+                contract["authority"] = "universal_valuation_contract"
+                contract["model_scaffold_ref"] = f"{ticker}/research/valuation_model_scaffold.json"
+                contract["next_action"] = scaffold["next_action"]
+                if not dry_run:
+                    write_json(research / "valuation_model_scaffold.json", scaffold)
+                    write_json(research / "valuation_contract.json", contract)
+                scaffolded.append(ticker)
+                written.append({"ticker": ticker, "status": contract.get("status")})
+            except Exception as exc:
+                missing.append(ticker)
+                errors.append({"ticker": ticker, "error": f"{type(exc).__name__}: {exc}"})
             continue
         try:
             valuation = read_json(valuation_path)
             route = read_json(research / "valuation_route.json") or build_route(ticker)
             reviewed = read_json(research / "valuation_contract.json")
-            if reviewed:
-                contract = reviewed
-            else:
-                contract = build_universal_valuation_contract(valuation, route.get("profile_id"))
-            contract["method_route"] = route
-            contract["authority"] = "universal_valuation_contract"
-            contract["legacy_reference_present"] = bool(
-                valuation.get("implied_return") or valuation.get("results_lawrence_legacy")
-            )
+            contract = current_contract(ticker, valuation, route, reviewed)
             if not dry_run:
                 write_json(research / "valuation_contract.json", contract)
             written.append({"ticker": ticker, "status": contract.get("status")})
         except Exception as exc:
             errors.append({"ticker": ticker, "error": f"{type(exc).__name__}: {exc}"})
-    return {"written": written, "missing_valuation": missing, "errors": errors}
+    return {"written": written, "missing_valuation": missing, "scaffolded": scaffolded, "errors": errors}
 
 
 def stage_workbenches(tickers: list[str], as_of: str, dry_run: bool) -> dict:
@@ -124,6 +194,9 @@ def stage_workbenches(tickers: list[str], as_of: str, dry_run: bool) -> dict:
     for ticker in tickers:
         research = ROOT / ticker / "research"
         if not (research / "valuation.json").exists() and not (research / "valuation_model_scaffold.json").exists():
+            if dry_run:
+                written.append(ticker)
+                continue
             skipped.append(ticker)
             continue
         try:
@@ -241,7 +314,7 @@ def run_script(*argv: str) -> dict:
     }
 
 
-def write_summary(as_of: str, scope: str, tickers: list[str], stages: dict, dry_run: bool) -> Path | None:
+def write_summary(as_of: str, scope: str, tickers: list[str], stages: dict, dry_run: bool, explicit: bool = False) -> Path | None:
     summary = {
         "schema_version": "1.0",
         "as_of": as_of,
@@ -253,7 +326,11 @@ def write_summary(as_of: str, scope: str, tickers: list[str], stages: dict, dry_
     if dry_run:
         return None
     reviews = ROOT / "_system" / "reviews" / "pending"
-    path = reviews / f"power_zone_universe_run_{as_of}.json"
+    if explicit:
+        slug = "-".join(tickers).lower()[:80] or "none"
+        path = reviews / f"power_zone_security_run_{as_of}_{slug}.json"
+    else:
+        path = reviews / f"power_zone_universe_run_{as_of}.json"
     write_json(path, summary)
     return path
 
@@ -273,13 +350,16 @@ def main() -> int:
     routes = stage_routes(tickers, as_of, args.dry_run)
     print(f"[1/6] routes: {routes['processed']} processed, {len(routes['errors'])} errors")
     power_zones = {"status": "skipped", "returncode": 0, "command": None, "error_tail": None}
-    if not args.dry_run:
+    if not args.dry_run and not args.tickers:
         power_zones = run_script("_system/scripts/build_power_zones.py")
+    elif args.tickers:
+        power_zones["status"] = "targeted_route_only"
 
-    contracts = stage_contracts(tickers, args.dry_run)
-    print(f"[2/6] contracts: {len(contracts['written'])} written, {len(contracts['missing_valuation'])} missing, {len(contracts['errors'])} errors")
+    contracts = stage_contracts(tickers, args.dry_run, as_of)
+    print(f"[2/6] contracts: {len(contracts['written'])} ready, {len(contracts['scaffolded'])} model scaffolds, {len(contracts['missing_valuation'])} missing, {len(contracts['errors'])} errors")
 
-    workbenches = stage_workbenches(tickers, as_of, args.dry_run)
+    contract_tickers = [row["ticker"] for row in contracts["written"]]
+    workbenches = stage_workbenches(contract_tickers, as_of, args.dry_run)
     print(f"[3/6] workbenches: {len(workbenches['written'])} built, {len(workbenches['skipped'])} skipped, {len(workbenches['errors'])} errors")
 
     pricing = stage_pricing(workbenches["written"], as_of, args.dry_run)
@@ -290,7 +370,10 @@ def main() -> int:
 
     dashboard = {"status": "skipped", "returncode": 0, "command": None, "error_tail": None}
     if not args.skip_dashboard and not args.dry_run:
-        dashboard = run_script("_system/scripts/build_dashboard_data.py")
+        if args.tickers:
+            dashboard = run_script("_system/scripts/refresh_valuation_dashboard_rows.py", "--tickers", *tickers)
+        else:
+            dashboard = run_script("_system/scripts/build_dashboard_data.py")
     print(f"[6/6] dashboard: {dashboard['status']}")
 
     stages = {
@@ -302,7 +385,7 @@ def main() -> int:
         "committees": committees,
         "dashboard": dashboard,
     }
-    summary = write_summary(as_of, args.scope, tickers, stages, args.dry_run)
+    summary = write_summary(as_of, args.scope, tickers, stages, args.dry_run, explicit=bool(args.tickers))
     if summary:
         print(f"summary: {summary.relative_to(ROOT).as_posix()}")
     errors = sum(len(stage.get("errors") or []) for stage in (routes, contracts, workbenches, pricing))

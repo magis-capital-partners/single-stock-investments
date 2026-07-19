@@ -303,6 +303,10 @@ def initialize(ticker: str, as_of: str) -> Path:
     contract = read_json(contract_path) if contract_path.exists() else (valuation.get("universal_valuation_contract") or {})
     if contract.get("status") != "decision_grade":
         raise ValueError(f"{ticker}: committee requires a decision-grade valuation contract")
+    proof_summary = contract.get("calculation_proof_summary") or {}
+    model_checks = contract.get("model_checks") or {}
+    if not proof_summary.get("all_material_components_priced") or not all(model_checks.values()):
+        raise ValueError(f"{ticker}: committee requires complete, valid calculation proofs and passing model checks")
     if (valuation.get("valuation_method_route") or {}).get("status") in {"default_needs_review", "reviewer_coverage_blocked"}:
         raise ValueError(f"{ticker}: canonical Power Zone route is not committee-ready")
     evidence_paths = discover_evidence(ticker)
@@ -460,6 +464,7 @@ def assemble(work: Path) -> Path:
     dissent = min(round_two, key=lambda v: (v["scores"]["return_vs_alternatives"]["value"], v["scores"]["downside_control"]["value"]))
     unresolved = sorted({v["most_important_missing_fact"] for v in round_two if v["most_important_missing_fact"]})
     valuation = read_json(ROOT / ticker / "research" / "valuation.json")
+    contract = read_json(ROOT / ticker / "research" / "valuation_contract.json")
     economic = valuation.get("economic_value_analysis") or {}
     component = valuation.get("component_valuation_results") or {}
     proof = economic.get("valuation_proof") or []
@@ -471,10 +476,13 @@ def assemble(work: Path) -> Path:
         for row in proof
     )
     option_complete = all(row.get("falsifier") and row.get("range_per_share") for row in options)
+    proof_summary = contract.get("calculation_proof_summary") or {}
+    model_checks = contract.get("model_checks") or {}
+    proof_complete = bool(proof_summary.get("all_material_components_priced")) and bool(model_checks) and all(model_checks.values())
     tribunal_blocked = bool(evidence_tribunal.get("unresolved_material_facts")) or evidence_tribunal.get("status") != "complete"
     adversarial_blocked = adversarial_review.get("status") not in {"complete", "complete_with_residual_risks"}
     chair_blocked = chair_synthesis.get("status") != "complete"
-    blocked = any(v["evidence_status"] != "sufficient" for v in round_two) or not economic_complete or not component_complete or tribunal_blocked or adversarial_blocked or chair_blocked
+    blocked = any(v["evidence_status"] != "sufficient" for v in round_two) or not economic_complete or not component_complete or not proof_complete or tribunal_blocked or adversarial_blocked or chair_blocked
     record = {
         "schema_version": "1.0",
         "protocol_version": "production-2.0",
@@ -507,6 +515,7 @@ def assemble(work: Path) -> Path:
             "filing_reconciliation": "pass",
             "economic_claim": "pass" if economic_complete else "blocked",
             "component_completeness": "pass" if component_complete else "blocked",
+            "calculation_proof": "pass" if proof_complete else "blocked",
             "comparable_evidence": "pass" if comparable_complete else "partial",
             "option_risking": "pass" if option_complete else "blocked",
             "disclosure_scan": "partial",

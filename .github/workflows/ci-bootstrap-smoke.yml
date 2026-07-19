@@ -21,6 +21,8 @@ on:
       - "_system/scripts/calibrate_letter_dates.py"
       - "_system/scripts/test_letter_date_parser.py"
       - "_system/scripts/test_fund_registry_date.py"
+      - "_system/scripts/fund_identity.py"
+      - "_system/scripts/test_fund_identity.py"
       - "_system/scripts/test_ci_push_rebase_resolve.sh"
       - "_system/scripts/test_ci_push_empty_rebase.sh"
       - "_system/scripts/test_validate_dashboard_sparse.py"
@@ -49,6 +51,8 @@ on:
       - "_system/scripts/calibrate_letter_dates.py"
       - "_system/scripts/test_letter_date_parser.py"
       - "_system/scripts/test_fund_registry_date.py"
+      - "_system/scripts/fund_identity.py"
+      - "_system/scripts/test_fund_identity.py"
       - "_system/scripts/test_ci_push_rebase_resolve.sh"
       - "_system/scripts/test_ci_push_empty_rebase.sh"
       - "_system/scripts/test_validate_dashboard_sparse.py"
@@ -64,6 +68,7 @@ permissions:
 jobs:
   ref-resolution:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
@@ -102,10 +107,18 @@ jobs:
 
   ci-push-rebase:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /.github/**
+            /_system/**
+            /dashboard/**
+            /docs/**
+            /*/research/**
       - name: Fetch main for rebase smoke tests
         run: git fetch origin main --depth=50
       - uses: actions/setup-python@v5
@@ -114,6 +127,7 @@ jobs:
       - name: CI push rebase conflict resolver smoke tests
         env:
           CI_PUSH_SKIP_SELF_REFRESH: "1"
+          CI_PUSH_SMOKE_FAST: "1"
         run: |
           bash _system/scripts/test_ci_push_empty_rebase.sh
           bash _system/scripts/test_ci_push_multi_rebase.sh
@@ -121,10 +135,16 @@ jobs:
 
   letter-date-parser:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /Makefile
+            /_system/scripts/**
+            /_system/reference/letter_date_overrides.json
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -133,15 +153,8 @@ jobs:
 
   checkout-minimal:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: false
-          android: true
-          dotnet: true
-          haskell: true
-          docker-images: true
-          swap-storage: true
       - uses: actions/checkout@v4
         with:
           sparse-checkout: |

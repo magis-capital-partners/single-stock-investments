@@ -1,0 +1,98 @@
+name: LS-algo Universe Intake
+
+on:
+  schedule:
+    - cron: "45 2 * * *"
+  workflow_run:
+    workflows: [Data Pipeline]
+    types: [completed]
+    branches: [main]
+  repository_dispatch:
+    types: [sync-ls-algo-universe]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: data-commit-main
+  cancel-in-progress: false
+
+jobs:
+  intake:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts/ci_checkout_workspace.sh
+            _system/scripts/ci_resolve_checkout_ref.sh
+            _system/scripts/ci_sparse_checkout_paths.py
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Checkout workspace
+        run: bash _system/scripts/ci_checkout_workspace.sh marvin-pick
+      - name: Checkout LS-algo screener
+        env:
+          LS_ALGO_TOKEN: ${{ secrets.LS_ALGO_REPO_TOKEN || github.token }}
+        run: |
+          git clone --depth 1 "https://x-access-token:${LS_ALGO_TOKEN}@github.com/GoldmanDrew/ls-algo.git" _external/ls-algo
+          test -f _external/ls-algo/data/etf_screened_today.csv
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Configure transactional commits
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: Identity, onboard, and rebuild registry derivatives
+        run: |
+          python _system/scripts/darwin/build_ls_algo_underlying_gap.py
+          python _system/scripts/darwin/run_ls_algo_equity_onboard_all.py --batch-size 4 --max-evidence-backlog 300
+          python _system/scripts/darwin/build_ls_algo_underlying_gap.py
+          python _system/scripts/sync_portfolio_from_registry.py
+          python _system/scripts/build_index_membership.py
+          python _system/scripts/build_evidence_recovery_queue.py
+          python _system/scripts/validate_evidence_recovery.py
+      - name: Checkpoint identity and registry state
+        run: |
+          git add --sparse -A -- _system/data/ls_algo_underlying_gap.json _system/data/evidence_recovery_queue.json \
+                         _system/reviews/pending _system/portfolio dashboard/data/index_membership.json \
+                         docs/data/index_membership.json
+          shopt -s nullglob
+          checkpoint_paths=(*/README.md */.onboard_status.json */research/evidence_task_queue.json \
+                            */third-party-analyses */investor-documents)
+          if ((${#checkpoint_paths[@]})); then
+            git add --sparse -A -- "${checkpoint_paths[@]}"
+          fi
+          if ! git diff --cached --quiet; then
+            bash _system/scripts/ci_push_main.sh "chore(ls-algo): checkpoint identity and evidence queue"
+          fi
+      - name: Gather primary evidence and rebuild valuation authority
+        run: |
+          python _system/scripts/collect_evidence_recovery.py --limit 4
+          python _system/scripts/darwin/run_ls_algo_valuation_pipeline.py --no-onboard --skip-dashboard
+          python _system/scripts/build_evidence_recovery_queue.py
+          python _system/scripts/validate_evidence_recovery.py
+          python _system/scripts/build_index_membership.py
+          DASHBOARD_PRESERVE_DOCUMENT_REGISTRY=1 python _system/scripts/build_dashboard_data.py
+          python _system/scripts/validate_dashboard_data.py
+      - name: Commit evidence, valuation, and dashboard state
+        run: |
+          git add --sparse -A -- _system/data/evidence_recovery_queue.json _system/reviews/pending \
+                         dashboard/data docs/data _system/portfolio
+          shopt -s nullglob
+          evidence_paths=(*/research */investor-documents)
+          if ((${#evidence_paths[@]})); then
+            git add --sparse -A -- "${evidence_paths[@]}"
+          fi
+          if ! git diff --cached --quiet; then
+            bash _system/scripts/ci_push_main.sh "chore(ls-algo): collect blocker evidence and refresh authority"
+          fi
+      - name: Admit newly ready blocker evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api --method POST "repos/${{ github.repository }}/dispatches" \
+            -f event_type=research-evidence-ready

@@ -380,7 +380,7 @@ def consolidate_letter_funds(letters: list[dict], *, _verify: bool = True) -> tu
 
 
 def consolidate_letter_funds_stable(
-    letters: list[dict], *, max_passes: int = 5
+    letters: list[dict], *, max_passes: int = 25
 ) -> tuple[list[dict], dict]:
     """Iterate corpus identity resolution until aliases reach a fixed point.
 
@@ -409,6 +409,23 @@ def consolidate_letter_funds_stable(
                     for idx, row in enumerate(audits)
                 ],
             }
+    last_audit = audits[-1]
+    if not last_audit.get("residual_redundancy_groups"):
+        return current, {
+            **last_audit,
+            "convergence_passes": max_passes,
+            "convergence_limit_reached": True,
+            "pass_summaries": [
+                {
+                    "pass": idx + 1,
+                    "canonical_profiles": row.get("canonical_profiles"),
+                    "profiles_consolidated": row.get("profiles_consolidated"),
+                    "residual_redundancy_groups": row.get("residual_redundancy_groups"),
+                    "idempotent": row.get("idempotent"),
+                }
+                for idx, row in enumerate(audits)
+            ],
+        }
     raise RuntimeError(
-        f"Fund identity consolidation did not converge after {max_passes} passes"
+        f"Fund identity consolidation retained redundant identities after {max_passes} passes"
     )

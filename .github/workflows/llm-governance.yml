@@ -41,6 +41,15 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            .github
+            _system/ci_autofix
+            _system/config
+            _system/frameworks
+            _system/scripts
+            _system/templates
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -51,6 +60,7 @@ jobs:
           python -m unittest \
             test_llm_call_gate \
             test_agent_evidence_gates \
+            test_evidence_recovery \
             test_investment_committee_pipeline \
             test_committee_task_queue \
             test_llm_workflow_governance

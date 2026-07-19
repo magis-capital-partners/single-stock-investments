@@ -16,7 +16,8 @@ import json
 import shutil
 import subprocess
 import sys
-from datetime import datetime
+import time
+from datetime import datetime, timezone
 from pathlib import Path
 
 SCRIPTS_DIR = Path(__file__).resolve().parent
@@ -38,9 +39,14 @@ def dedicated_investor_script(ticker: str) -> Path | None:
     return scripts[0] if scripts else None
 
 
-def run(cmd: list[str], label: str, *, cwd: Path | None = None) -> None:
+def run(cmd: list[str], label: str, *, cwd: Path | None = None, timeout: int = 900) -> None:
     print(f"\n=== {label} ===")
-    subprocess.run(cmd, cwd=cwd or ROOT, check=False)
+    try:
+        subprocess.run(cmd, cwd=cwd or ROOT, check=False, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        # A slow or broken issuer endpoint must not consume the entire Actions
+        # allocation.  The next bounded run will resume at the next ticker.
+        print(f"! {label} exceeded {timeout}s; continuing")
 
 
 def powershell_script(script: Path) -> list[str] | None:
@@ -50,9 +56,9 @@ def powershell_script(script: Path) -> list[str] | None:
     return None
 
 
-def harvest_documents(holdings: dict) -> None:
+def harvest_documents(holdings: dict, *, tickers: list[str], include_aggregates: bool) -> None:
     """Heavy, network- and OCR-intensive per-ticker document/transcript harvest."""
-    for ticker in sorted(holdings.keys()):
+    for ticker in tickers:
         dl = (holdings[ticker].get("download") or {})
         dtype = dl.get("type", "us_shared")
 
@@ -96,19 +102,20 @@ def harvest_documents(holdings: dict) -> None:
             else:
                 run([PY, str(SCRIPTS / "download_ir_harvest.py"), "--ticker", ticker], f"{ticker} ({dtype} harvest)")
 
-    if any((holdings.get(t, {}).get("download") or {}).get("type") == "eu_teq" for t in holdings):
+    if include_aggregates and any((holdings.get(t, {}).get("download") or {}).get("type") == "eu_teq" for t in tickers):
         run([PY, str(SCRIPTS / "download_teq_st.py")], "TEQ.ST")
 
-    if "CSU" in holdings:
+    if include_aggregates and "CSU" in tickers:
         run([PY, str(SCRIPTS / "download_csu.py")], "CSU")
 
-    if any(t in holdings for t in ("OTCM", "FRMO", "KEWL")):
+    if include_aggregates and any(t in tickers for t in ("OTCM", "FRMO", "KEWL")):
         run([PY, str(SCRIPTS / "download_otc_api.py")], "OTC tickers (OTCM/FRMO/KEWL)")
 
-    run([PY, str(SCRIPTS / "download_transcripts.py"), "--register-legacy"], "Transcript harvest (IR + Polygon timing)")
-    run([PY, str(SCRIPTS / "transcript_gap_report.py")], "Transcript coverage report")
+    if include_aggregates:
+        run([PY, str(SCRIPTS / "download_transcripts.py"), "--register-legacy"], "Transcript harvest (IR + Polygon timing)")
+        run([PY, str(SCRIPTS / "transcript_gap_report.py")], "Transcript coverage report")
 
-    for ticker in sorted(holdings.keys()):
+    for ticker in tickers:
         tx_dir = ROOT / ticker / "investor-documents" / "transcripts"
         if tx_dir.is_dir() and any(tx_dir.iterdir()):
             run(
@@ -116,10 +123,11 @@ def harvest_documents(holdings: dict) -> None:
                 f"{ticker} management evidence",
             )
 
-    run([PY, str(SCRIPTS / "refresh_equity_model.py")], "Equity model refresh (IR + pipeline)")
+    if include_aggregates:
+        run([PY, str(SCRIPTS / "refresh_equity_model.py")], "Equity model refresh (IR + pipeline)")
 
 
-def daily_refresh(holdings: dict) -> None:
+def daily_refresh(holdings: dict, *, build_indexes: bool = True) -> None:
     """Fast, daily-changing market/thematic refresh plus dashboard rebuild."""
     for ticker in sorted(holdings.keys()):
         val_path = ROOT / ticker / "research" / "valuation.json"
@@ -130,7 +138,7 @@ def daily_refresh(holdings: dict) -> None:
         except json.JSONDecodeError:
             continue
         er = val.get("evidence_refresh") or {}
-        if er.get("type") == "commodity_nav" or ticker in ("KEWL", "MSB"):
+        if er.get("type") == "commodity_nav" or ticker == "KEWL":
             run(
                 [PY, str(SCRIPTS / "fetch_market_inputs.py"), ticker, "--merge"],
                 f"{ticker} market inputs",
@@ -145,9 +153,38 @@ def daily_refresh(holdings: dict) -> None:
     run([PY, str(SCRIPTS / "fetch_insider_transactions.py")], "Insider Form 4 transactions")
     run([PY, str(SCRIPTS / "apply_insider_signal.py")], "Insider conviction overlay")
 
-    run([PY, str(SCRIPTS / "build_folder_indexes.py")], "Build INDEX.csv files")
+    if build_indexes:
+        run([PY, str(SCRIPTS / "build_folder_indexes.py")], "Build INDEX.csv files", timeout=1200)
     run([PY, str(SCRIPTS / "sync_portfolio_from_registry.py")], "Sync portfolio from registry")
     run([PY, str(SCRIPTS / "build_dashboard_data.py")], "Rebuild dashboard JSON")
+
+
+def select_batch(holdings: dict, batch_size: int, cursor_path: Path) -> list[str]:
+    """Return the next deterministic issuer batch and persist the resume cursor."""
+    tickers = sorted(holdings)
+    if not tickers or batch_size <= 0:
+        return tickers
+    try:
+        state = json.loads(cursor_path.read_text(encoding="utf-8"))
+        offset = int(state.get("next_offset", 0)) % len(tickers)
+    except (OSError, ValueError, json.JSONDecodeError):
+        offset = 0
+    batch = [tickers[(offset + i) % len(tickers)] for i in range(min(batch_size, len(tickers)))]
+    cursor_path.parent.mkdir(parents=True, exist_ok=True)
+    cursor_path.write_text(
+        json.dumps(
+            {
+                "updated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                "universe_size": len(tickers),
+                "last_batch": batch,
+                "next_offset": (offset + len(batch)) % len(tickers),
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    return batch
 
 
 def main() -> None:
@@ -158,17 +195,22 @@ def main() -> None:
         help="Skip the heavy per-ticker document/transcript harvest; only refresh "
         "daily market/thematic data and rebuild the dashboard.",
     )
+    parser.add_argument("--batch-size", type=int, default=0, help="Bound full-harvest work to the next N holdings.")
+    parser.add_argument("--skip-indexes", action="store_true", help="Skip portfolio-wide INDEX.csv rebuild for a light refresh.")
+    parser.add_argument("--skip-aggregate-harvest", action="store_true", help="Skip transcript/model aggregate work in a bounded batch.")
     args = parser.parse_args()
 
     reg = load_registry()
     holdings = reg.get("holdings") or {}
 
+    batch = select_batch(holdings, args.batch_size, ROOT / "_system" / "data" / "download_cursor.json")
     if args.light:
         print("=== Light daily refresh (document harvest skipped) ===")
     else:
-        harvest_documents(holdings)
+        print(f"=== Bounded document harvest: {len(batch)} of {len(holdings)} holdings ===")
+        harvest_documents(holdings, tickers=batch, include_aggregates=not args.skip_aggregate_harvest)
 
-    daily_refresh(holdings)
+    daily_refresh(holdings, build_indexes=not args.skip_indexes)
     print("\nLight daily refresh finished." if args.light else "\nAll download jobs finished.")
 
 

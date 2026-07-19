@@ -1,32 +1,22 @@
-name: CI Autofix
+name: Auto - CI Repair
 
 on:
   workflow_run:
     workflows:
-      - Activist Scan Sync
-      - Daily Download & Research Dispatch
+      - Auto - Daily Research
       - Data Pipeline
       - Darwin Portfolio Refresh
       - Deploy OAuth Proxy (Cloudflare)
-      - Drive Intake Sync
-      - Research Deep Dive Dispatch
+      - Auto - Research Queue
       - Research Agent Dispatcher
-      - Marvin Onboard Ticker
-      - Portfolio News Ingest
+      - LS-algo Universe Intake
+      - Power Zone Universe
+      - Auto - Investment Committee
       - Research quality (PR)
       - LLM Workflow Governance
-      - Vicki IR Harvest
+      - Auto - IR Recovery
     types: [completed]
     branches: [main]
-  workflow_dispatch:
-    inputs:
-      run_id:
-        description: "Workflow run ID to investigate"
-        required: true
-      force_agent:
-        description: "Force Cursor agent even if classifier would normally notify only"
-        required: false
-        default: "false"
 
 permissions:
   actions: read
@@ -36,17 +26,12 @@ permissions:
   checks: read
 
 concurrency:
-  group: ci-autofix-${{ github.event.workflow_run.id || github.event.inputs.run_id }}
+  group: ci-autofix-${{ github.event.workflow_run.id }}
   cancel-in-progress: false
 
 jobs:
   triage-and-dispatch:
-    if: >
-      github.event_name == 'workflow_dispatch' ||
-      (
-        github.event.workflow_run.conclusion == 'failure' &&
-        github.event.workflow_run.name != 'CI Autofix'
-      )
+    if: github.event.workflow_run.conclusion == 'failure' && github.event.workflow_run.name != 'Auto - CI Repair'
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
@@ -75,7 +60,7 @@ jobs:
           PY
 
       - name: Checkout
-        if: github.event_name == 'workflow_dispatch' || steps.duration.outputs.long_enough == 'true'
+        if: steps.duration.outputs.long_enough == 'true'
         uses: actions/checkout@v4
         with:
           sparse-checkout: |
@@ -86,7 +71,7 @@ jobs:
           filter: blob:none
 
       - name: Restore CI token ledger
-        if: github.event_name == 'workflow_dispatch' || steps.duration.outputs.long_enough == 'true'
+        if: steps.duration.outputs.long_enough == 'true'
         uses: actions/cache@v4
         with:
           path: .llm-state/ci_autofix
@@ -95,7 +80,7 @@ jobs:
             llm-state-ci-autofix-
 
       - name: Set up Node.js
-        if: github.event_name == 'workflow_dispatch' || steps.duration.outputs.long_enough == 'true'
+        if: steps.duration.outputs.long_enough == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: "22"
@@ -103,29 +88,30 @@ jobs:
           cache-dependency-path: _system/ci_autofix/package-lock.json
 
       - name: Install CI Autofix dependencies
-        if: github.event_name == 'workflow_dispatch' || steps.duration.outputs.long_enough == 'true'
+        if: steps.duration.outputs.long_enough == 'true'
         working-directory: _system/ci_autofix
         run: npm ci
 
       - name: Triage failure and dispatch Cursor if appropriate
-        if: github.event_name == 'workflow_dispatch' || steps.duration.outputs.long_enough == 'true'
+        if: steps.duration.outputs.long_enough == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           GITHUB_TOKEN: ${{ github.token }}
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          CI_AUTOFIX_RUN_ID: ${{ github.event.inputs.run_id || github.event.workflow_run.id }}
-          CI_AUTOFIX_FORCE_AGENT: ${{ github.event.inputs.force_agent || 'false' }}
+          CI_AUTOFIX_RUN_ID: ${{ github.event.workflow_run.id }}
+          CI_AUTOFIX_FORCE_AGENT: "false"
           LLM_LEDGER_PATH: .llm-state/ci_autofix/ledger.jsonl
         run: node _system/ci_autofix/ci_autofix.mjs
 
       - name: Upload CI token audit
-        if: always() && (github.event_name == 'workflow_dispatch' || steps.duration.outputs.long_enough == 'true')
+        if: always() && steps.duration.outputs.long_enough == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: llm-audit-ci-${{ github.run_id }}
           path: .llm-state/ci_autofix/ledger.jsonl
           if-no-files-found: ignore
+          retention-days: 7
 
       - name: Skipped short failure
         if: github.event_name == 'workflow_run' && steps.duration.outputs.long_enough != 'true'

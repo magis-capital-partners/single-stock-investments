@@ -11,6 +11,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-18.
 | 7176.T | 7176.T/ | Simplex Financial Holdings Co., Ltd. | JP | 2026-07-09 | 2026-07-18 | unknown | watch |
 | 8697.T | 8697.T/ | Japan Exchange Group | JP | 2026-06-25 | 2026-07-18 | croupier | hold |
 | A | A/ | Agilent Technologies | US | 2026-07-10 | 2026-07-18 | unknown | watch |
+| AAL | AAL/ | AAL | US | — | 2026-07-18 | unknown | watch |
 | AAOI | AAOI/ | Applied Optoelectronics, Inc. | US | 2026-07-17 | 2026-07-18 | unknown | watch |
 | AAPL | AAPL/ | Apple Inc. | US | 2026-07-10 | 2026-07-18 | unknown | watch |
 | ABBV | ABBV/ | AbbVie | US | 2026-07-10 | 2026-07-18 | unknown | watch |
@@ -19,6 +20,9 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-18.
 | ABT | ABT/ | Abbott Laboratories | US | 2026-07-09 | 2026-07-18 | unknown | watch |
 | ABX | ABX/ | Abacus Life Inc. | US | 2026-07-09 | 2026-07-18 | unknown | watch |
 | ACGL | ACGL/ | Arch Capital Group | US | 2026-07-09 | 2026-07-18 | unknown | watch |
+| ACHR | ACHR/ | ACHR | US | — | 2026-07-18 | unknown | watch |
+| ACLS | ACLS/ | ACLS | US | — | 2026-07-18 | unknown | watch |
+| ACMR | ACMR/ | ACMR | US | — | 2026-07-18 | unknown | watch |
 | ACN | ACN/ | Accenture | US | 2026-07-09 | 2026-07-18 | unknown | watch |
 | ADBE | ADBE/ | Adobe Inc. | US | 2026-07-09 | 2026-07-18 | unknown | watch |
 | ADI | ADI/ | Analog Devices | US | 2026-07-09 | 2026-07-18 | unknown | watch |
@@ -27,13 +31,17 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-18.
 | ADP | ADP/ | Automatic Data Processing | US | 2026-07-09 | 2026-07-18 | unknown | watch |
 | ADSK | ADSK/ | Autodesk | US | 2026-07-09 | 2026-07-18 | unknown | watch |
 | AEE | AEE/ | Ameren | US | 2026-07-09 | 2026-07-18 | unknown | watch |
+| AEHR | AEHR/ | AEHR | US | — | 2026-07-18 | unknown | watch |
 | AEP | AEP/ | American Electric Power | US | 2026-07-09 | 2026-07-18 | unknown | watch |
 | AES | AES/ | AES Corporation | US | 2026-07-09 | 2026-07-18 | unknown | watch |
 | AFL | AFL/ | Aflac | US | 2026-07-09 | 2026-07-18 | unknown | watch |
+| AFRM | AFRM/ | AFRM | US | — | 2026-07-18 | unknown | watch |
+| AI | AI/ | AI | US | — | 2026-07-18 | unknown | watch |
 | AIG | AIG/ | American International Group | US | 2026-07-09 | 2026-07-18 | unknown | watch |
 | AIZ | AIZ/ | Assurant | US | 2026-07-09 | 2026-07-18 | unknown | watch |
 | AJG | AJG/ | Arthur J. Gallagher & Co. | US | 2026-07-09 | 2026-07-18 | unknown | watch |
 | AKAM | AKAM/ | Akamai Technologies | US | 2026-07-09 | 2026-07-18 | unknown | watch |
+| ALAB | ALAB/ | ALAB | US | — | 2026-07-18 | unknown | watch |
 | ALB | ALB/ | Albemarle Corporation | US | 2026-07-09 | 2026-07-18 | unknown | watch |
 | ALGN | ALGN/ | Align Technology | US | 2026-07-09 | 2026-07-18 | unknown | watch |
 | ALL | ALL/ | Allstate | US | 2026-07-09 | 2026-07-18 | unknown | watch |
@@ -656,4 +664,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-18.
 | ZBRA | ZBRA/ | Zebra Technologies | US | 2026-07-10 | 2026-07-18 | unknown | watch |
 | ZTS | ZTS/ | Zoetis | US | 2026-07-10 | 2026-07-18 | unknown | watch |
 
-**649 holdings total.** Registry: `_system/portfolio/registry.json`
+**657 holdings total.** Registry: `_system/portfolio/registry.json`

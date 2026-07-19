@@ -1,0 +1,63 @@
+{
+  "persona": "klarman_asset_value",
+  "independence_group": "asset_realization",
+  "evidence_status": "sufficient",
+  "scores": {
+    "explanatory_strength": {
+      "value": 3,
+      "rationale": "The ETH look-through discount mechanism is specific and filing-backed, but the proposed gap-closer is passive mNAV normalization over seven years rather than a controllable liquidation, sale, or distribution path that Klarman requires to convert appraisal value into shareholder cash."
+    },
+    "evidence_sufficiency": {
+      "value": 3,
+      "rationale": "May 31, 2026 ETH fair value, share count, warrant liability, and deferred tax are primary-verified in the 10-Q, yet BMNP preferred claims, post-May ATM issuance, and live ETH spot versus May marks remain unresolved for a decision-grade realization audit."
+    },
+    "downside_control": {
+      "value": 2,
+      "rationale": "Static ETH fair value per share (~$18.76) sits above price today, but the component low case ($8.50/sh, -46% from $15.69) and unbounded ATM dilution mean per-share asset floor is not structurally bounded despite partial dhando."
+    },
+    "return_vs_alternatives": {
+      "value": 2,
+      "rationale": "Base annualized return 6.3% over seven years is well below the 15% Klarman hurdle; only the bull case (~15.1%) clears it and depends on favorable ETH trajectory plus limited further dilution."
+    }
+  },
+  "vote": "watch",
+  "expected_return_range_pct": [
+    -8.4,
+    14.9
+  ],
+  "horizon_years": 7,
+  "claims": [
+    {
+      "claim": "Filing-verified ETH look-through (~$18.76/sh at May 31, 2026) exceeds price ($15.69), but there is no independently evidenced catalyst to convert that asset into per-share cash beyond hoping the mNAV discount narrows.",
+      "evidence_paths": [
+        "BMNR/research/valuation.json",
+        "BMNR/research/deep_dive_2026-07-17.md",
+        "BMNR/research/valuation_contract.json"
+      ]
+    },
+    {
+      "claim": "The eth_trajectory_net_dilution component (+$4.5/sh base) lacks explicit success probability and post-May ATM reconciliation, so incremental asset value is analyst judgment rather than contractually or operationally secured.",
+      "evidence_paths": [
+        "BMNR/research/valuation.json",
+        "BMNR/research/valuation_contract.json"
+      ]
+    },
+    {
+      "claim": "Overlap controls in the component schedule are clean (unique keys, no double-count of static ETH with staking yield), but the warrants/tax/preferred reserve row at base zero understates senior claims relative to common look-through.",
+      "evidence_paths": [
+        "BMNR/research/valuation.json",
+        "BMNR/research/valuation_contract.json"
+      ]
+    }
+  ],
+  "strongest_counter_explanation": "The market may rationally price BMNR as an equity-financed ETH accumulator where ongoing ATM issuance will dilute look-through ETH per share faster than any mNAV discount can close, making the apparent NAV discount a financing-vehicle trap rather than a catalyst-backed margin of safety.",
+  "most_important_missing_fact": "Quantified post-May 2026 ATM issuance pace and BMNP preferred-stock waterfall per diluted common share, without which per-share asset realization cannot be bounded.",
+  "falsifiers": [
+    "ATM issuance dilutes ETH per share faster than token price rises for two consecutive quarters.",
+    "Preferred or warrant conversion materially reduces common look-through below the component low case ($10.50/sh on static ETH look-through).",
+    "ETH fair value per share falls below the low case after sustained spot decline and further dilution.",
+    "Management announces a dated liquidation, buyback, or distribution program that converts treasury ETH into per-share cash on a defined timeline."
+  ],
+  "specialist_findings": "Component audit: eth_look_through_today is filing-tier unit NAV and appropriately separated from trajectory; eth_trajectory_net_dilution is additive with null success_probability and no comparable realization precedents; staking_and_legacy_cash is immaterial and non-overlapping; warrants_tax_preferred_reserve base zero pending preferred review is the largest senior-claim gap. No comparable peer liquidation or forced-sale evidence is cited. Realization friction is high: ETH is marked fairly on balance sheet but common holders have no contractual path to cash except secondary sale or future corporate action. G&A ($335.7M nine months) exceeds staking revenue ($56.9M), eroding any operating bridge to asset realization. Price trades at ~0.84x May ETH fair value, offering a nominal discount, but Klarman would not treat this as cash-equivalent NAV without a dated catalyst and bounded dilution.",
+  "confidence": "medium"
+}

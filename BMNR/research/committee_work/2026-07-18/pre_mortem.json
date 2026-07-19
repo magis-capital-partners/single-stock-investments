@@ -1,0 +1,28 @@
+{
+  "status": "complete",
+  "failure_story": "We treated BMNR as a discounted ETH wrapper trading below May 2026 token fair value per share, but the equity became a perpetual ATM financing vehicle. Aggressive share issuance diluted ETH per share faster than ETH appreciated, while nine-month G&A of $335.7 million and $287.6 million of operating cash burn consumed staking yield and treasury liquidity. Unmodeled BMNP preferred and warrant senior claims further reduced common look-through. ETH rose in aggregate but per-share economics deteriorated; the stock severely underperformed direct ETH and never closed the mNAV gap.",
+  "earliest_warning_signals": [
+    "Common shares outstanding rose to 579.7 million from 232.4 million year over year while the market kept pricing a structural mNAV discount near 0.84x ETH fair value.",
+    "Nine-month cash used in operating activities was $287.6 million and G&A was $335.7 million, far above $56.9 million of staking revenue, signaling corporate burn before any ETH beta.",
+    "Base Lawrence IRR was 6.3% per year at $15.69, already below the ~15% accumulate hurdle, implying insufficient compensation for unbounded dilution risk at entry.",
+    "ETH per diluted share trajectory was modeled with only 10% cumulative ATM dilution over seven years despite filings documenting repeated ATM and private placements during the treasury pivot.",
+    "Preferred stock (BMNP), warrant, and deferred tax claims on treasury economics were flagged [HUMAN REVIEW] but left at zero in the base payoff build."
+  ],
+  "forensic_checks": [
+    "Reconcile quarterly ETH units held divided by fully diluted common shares against ETH spot and filing fair-value marks; flag any quarter where dilution exceeds token accumulation.",
+    "Trace proceeds from every ATM, private placement, and warrant exercise to ETH purchases versus G&A, advisory fees, and operating burn.",
+    "Build a BMNP preferred and warrant conversion waterfall showing common look-through after senior claims, deferred tax liability ($92.3M at May 31, 2026), and strategic advisor warrants.",
+    "Net staking and validation revenue against custody, protocol, and corporate costs to test whether operating cash ever covers G&A drag.",
+    "Audit custody, validator, and counterparty exposures against 10-K risk factors for impairment or slashing events.",
+    "Verify the SOTP build does not double-count static ETH look-through (~$18.76/sh) with the seven-year trajectory net-of-dilution uplift (+$4.5/sh).",
+    "Run Tier-1 short activist registry and forensic short web scan; adversarial pass cited no_hit on short_scan_2026-05-28.md only."
+  ],
+  "short_source_coverage": "partial",
+  "unresolved_items": [
+    "BMNP preferred stock claims and post-May 31, 2026 ATM issuance are not fully modeled in static look-through or the senior-claim reserve.",
+    "No preferred and warrant waterfall converts filing-level treasury fair value into per-common-share realizability.",
+    "Management alignment, strategic advisor warrant economics, and Tom Lee chairman incentives remain insufficiently tested (management_facts document_count is zero).",
+    "Live ETH spot versus May 31, 2026 fair value marks was flagged [HUMAN REVIEW] but not confirmed before sizing.",
+    "Tier-1 forensic short scan was batch no_hit only; no local short_reports/ and no targeted activist diligence on a levered crypto treasury name."
+  ]
+}
