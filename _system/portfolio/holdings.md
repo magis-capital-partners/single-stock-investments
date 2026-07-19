@@ -69,7 +69,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-19.
 | APTV | APTV/ | Aptiv | US | 2026-07-10 | 2026-07-19 | unknown | watch |
 | ARE | ARE/ | Alexandria Real Estate Equities | US | 2026-07-09 | 2026-07-19 | unknown | watch |
 | ARES | ARES/ | Ares Management | US | 2026-07-09 | 2026-07-19 | unknown | watch |
-| ARKK | ARKK/ | ARKK | US | — | 2026-07-19 | unknown | watch |
+| ARKK | ARKK/ | ARKK | US | 2026-07-19 | 2026-07-19 | unknown | watch |
 | ARM | ARM/ | ARM | US | — | 2026-07-19 | unknown | watch |
 | ASPN | ASPN/ | Aspen Aerogels, Inc. | US | 2026-07-09 | 2026-07-19 | unknown | watch |
 | ASTS | ASTS/ | AST SpaceMobile, Inc. | US | 2026-07-17 | 2026-07-19 | unknown | watch |
