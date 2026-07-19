@@ -1508,30 +1508,36 @@ def enrich_business_moat(body: str, val: dict, ticker: str, preserved: str | Non
     return body
 
 
+def _contract_valuation_block(authority: dict) -> str:
+    if authority.get("authority_level") == "legacy_reference":
+        return ""
+    values = authority.get("value_per_share") or {}
+    returns = authority.get("return_range_pct") or {}
+    route = authority.get("profile_label") or authority.get("profile_id") or "routing pending"
+    return "\n".join([
+        "",
+        "#### Contract valuation arithmetic (show your work)",
+        "",
+        f"**Power Zone:** {route}",
+        f"**Contract status:** {authority.get('contract_status')}",
+        f"**Low/base/high value per share:** {values.get('low')} / {values.get('base')} / {values.get('high')}",
+        f"**Low/base/high annualized return at price:** {returns.get('low')}% / {returns.get('base')}% / {returns.get('high')}%",
+        "",
+        "The component ownership map, causal assumptions, evidence tiers, overlap controls, and falsifiers are recorded in `valuation_contract.json`. Legacy Marvin/Lawrence scenario arithmetic is retained only as a migration cross-check.",
+    ])
+
+
 def irr_arithmetic(val: dict, ticker: str, preserved: str | None) -> str:
     base_pct = primary_irr_pct(val)
     authority = resolve_authority(ROOT / ticker / "research", val)
-    if authority.get("authority_level") != "legacy_reference":
-        values = authority.get("value_per_share") or {}
-        returns = authority.get("return_range_pct") or {}
-        route = authority.get("profile_label") or authority.get("profile_id") or "routing pending"
-        return "\n".join([
-            "#### Contract valuation arithmetic (show your work)",
-            "",
-            f"**Power Zone:** {route}",
-            f"**Contract status:** {authority.get('contract_status')}",
-            f"**Low/base/high value per share:** {values.get('low')} / {values.get('base')} / {values.get('high')}",
-            f"**Low/base/high annualized return at price:** {returns.get('low')}% / {returns.get('base')}% / {returns.get('high')}%",
-            "",
-            "The component ownership map, causal assumptions, evidence tiers, overlap controls, and falsifiers are recorded in `valuation_contract.json`. Legacy Marvin/Lawrence scenario arithmetic is retained only as a migration cross-check.",
-        ])
+    contract_suffix = _contract_valuation_block(authority)
     sotp_irr = yield_curve_sotp_irr(val, ticker)
     if sotp_irr:
-        return sotp_irr
+        return sotp_irr + contract_suffix
 
     if preserved and "#### IRR arithmetic" in preserved:
         m = re.search(
-            r"#### IRR arithmetic \(show your work\)(.*?)(?=\n\*\*Upside / downside|\n## |\Z)",
+            r"#### IRR arithmetic \(show your work\)(.*?)(?=\n\*\*Upside / downside|\n## |\n#### Contract valuation|\Z)",
             preserved,
             re.DOTALL | re.IGNORECASE,
         )
@@ -1551,7 +1557,7 @@ def irr_arithmetic(val: dict, ticker: str, preserved: str | None) -> str:
                 and not re.search(r"P₀|FCF₀|Cash₀/sh|g1=|exit=\d", body)
                 and not pct_mismatch
             ):
-                return "#### IRR arithmetic (show your work)\n\n" + body
+                return "#### IRR arithmetic (show your work)\n\n" + body + contract_suffix
 
     method = val.get("method", "full")
     inputs = val.get("inputs", {})
@@ -1593,11 +1599,13 @@ def irr_arithmetic(val: dict, ticker: str, preserved: str | None) -> str:
             if price and payoff and base_pct
             else "",
         ]
-        return "\n".join(lines)
+        return "\n".join(lines) + contract_suffix
 
     if method in ("full", "scenario"):
         fcf = inputs.get("fcf_per_share") or inputs.get("per_share")
         g1, g2, ex = growth_rates_for_irr(val)
+        scenario_base = (val.get("scenarios") or {}).get("base", {}).get("return_pct")
+        synthesis_pct = (val.get("implied_return") or {}).get("synthesis_pct")
         lines += [
             "How we calculated the annual return (base case). Verify with "
             f"`python _system/scripts/marvin_valuation.py --ticker {ticker}`",
@@ -1607,13 +1615,25 @@ def irr_arithmetic(val: dict, ticker: str, preserved: str | None) -> str:
             f"({inputs.get('per_share_source', inputs.get('fcf_source', ''))})",
             f"3. **Growth in years 1–5:** **{g1*100:.1f}%** per year · **years 6–{LAWRENCE_HORIZON_YEARS}:** **{g2*100:.1f}%** per year",
             f"4. **Selling multiple in year 10:** **{ex} times** year-10 cash flow",
-            f"5. **Annual return at today's price:** **{base_pct}%** per year over {LAWRENCE_HORIZON_YEARS} years "
-            "(`implied_return.base_pct` in `valuation.json`)",
         ]
-        return "\n".join(lines)
+        if scenario_base is not None:
+            lines.append(
+                f"5. **Lawrence scenario return at today's price:** **{scenario_base}%** per year over "
+                f"{LAWRENCE_HORIZON_YEARS} years (`scenarios.base`)"
+            )
+        if synthesis_pct is not None and synthesis_pct != scenario_base:
+            lines.append(
+                f"6. **Total synthesis return:** **{synthesis_pct}%** per year (weighted blend in `valuation.json` → `synthesis`)"
+            )
+        elif base_pct is not None:
+            lines.append(
+                f"5. **Annual return at today's price:** **{base_pct}%** per year over {LAWRENCE_HORIZON_YEARS} years "
+                "(`implied_return.base_pct` in `valuation.json`)"
+            )
+        return "\n".join(lines) + contract_suffix
 
     lines.append("IRR pending. See [HUMAN REVIEW].")
-    return "\n".join(lines)
+    return "\n".join(lines) + contract_suffix
 
 
 def book_estimate_section(ticker: str) -> str:

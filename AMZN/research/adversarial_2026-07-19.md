@@ -54,10 +54,6 @@ re_pass: false
 | Classification IRR | 3.68% | 3.68% | Yes |
 | Valuation bridge base | 3.68% | 3.68% | Yes |
 
-**Lint notes:**
-- AMZN/research/adversarial_2026-07-18.md: block_final=true — resolve before final dive
-- AMZN/research: adversarial date adversarial_2026-07-18.md != dive 2026-07-19
-
 ---
 
 ## Disclosure scan
