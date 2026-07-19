@@ -131,13 +131,50 @@ def stage_routes(tickers: list[str], as_of: str, dry_run: bool) -> dict:
     }
 
 
-def stage_contracts(tickers: list[str], dry_run: bool) -> dict:
-    written, missing, errors = [], [], []
+def _model_scaffold(ticker: str, route: dict, as_of: str) -> dict:
+    return {
+        "schema_version": "2.0",
+        "ticker": ticker,
+        "as_of": as_of,
+        "status": "evidence_blocked_model_required",
+        "method_route": route,
+        "required_component_map": route.get("required_evidence") or [],
+        "required_outputs": [
+            "complete non-overlapping economic ownership map",
+            "primary-source input ledger",
+            "approved versioned method card",
+            "deterministic low/base/high calculation proof",
+            "enterprise-to-equity and per-share reconciliation",
+            "reverse expectations, falsifiers, and refresh triggers",
+        ],
+        "unvalued_component_count": 1,
+        "next_action": "Gather the listed primary evidence and compile the first proof-complete component model; never substitute an analyst plug.",
+    }
+
+
+def stage_contracts(tickers: list[str], dry_run: bool, as_of: str | None = None) -> dict:
+    written, missing, scaffolded, errors = [], [], [], []
+    as_of = (as_of or date.today().isoformat())[:10]
     for ticker in tickers:
         research = ROOT / ticker / "research"
         valuation_path = research / "valuation.json"
         if not valuation_path.exists():
-            missing.append(ticker)
+            try:
+                route = read_json(research / "valuation_route.json") or build_route(ticker, as_of)
+                scaffold = read_json(research / "valuation_model_scaffold.json") or _model_scaffold(ticker, route, as_of)
+                contract = build_universal_valuation_contract({"ticker": ticker, "as_of": as_of}, route.get("profile_id"))
+                contract["method_route"] = route
+                contract["authority"] = "universal_valuation_contract"
+                contract["model_scaffold_ref"] = f"{ticker}/research/valuation_model_scaffold.json"
+                contract["next_action"] = scaffold["next_action"]
+                if not dry_run:
+                    write_json(research / "valuation_model_scaffold.json", scaffold)
+                    write_json(research / "valuation_contract.json", contract)
+                scaffolded.append(ticker)
+                written.append({"ticker": ticker, "status": contract.get("status")})
+            except Exception as exc:
+                missing.append(ticker)
+                errors.append({"ticker": ticker, "error": f"{type(exc).__name__}: {exc}"})
             continue
         try:
             valuation = read_json(valuation_path)
@@ -149,7 +186,7 @@ def stage_contracts(tickers: list[str], dry_run: bool) -> dict:
             written.append({"ticker": ticker, "status": contract.get("status")})
         except Exception as exc:
             errors.append({"ticker": ticker, "error": f"{type(exc).__name__}: {exc}"})
-    return {"written": written, "missing_valuation": missing, "errors": errors}
+    return {"written": written, "missing_valuation": missing, "scaffolded": scaffolded, "errors": errors}
 
 
 def stage_workbenches(tickers: list[str], as_of: str, dry_run: bool) -> dict:
@@ -157,6 +194,9 @@ def stage_workbenches(tickers: list[str], as_of: str, dry_run: bool) -> dict:
     for ticker in tickers:
         research = ROOT / ticker / "research"
         if not (research / "valuation.json").exists() and not (research / "valuation_model_scaffold.json").exists():
+            if dry_run:
+                written.append(ticker)
+                continue
             skipped.append(ticker)
             continue
         try:
@@ -315,10 +355,11 @@ def main() -> int:
     elif args.tickers:
         power_zones["status"] = "targeted_route_only"
 
-    contracts = stage_contracts(tickers, args.dry_run)
-    print(f"[2/6] contracts: {len(contracts['written'])} written, {len(contracts['missing_valuation'])} missing, {len(contracts['errors'])} errors")
+    contracts = stage_contracts(tickers, args.dry_run, as_of)
+    print(f"[2/6] contracts: {len(contracts['written'])} ready, {len(contracts['scaffolded'])} model scaffolds, {len(contracts['missing_valuation'])} missing, {len(contracts['errors'])} errors")
 
-    workbenches = stage_workbenches(tickers, as_of, args.dry_run)
+    contract_tickers = [row["ticker"] for row in contracts["written"]]
+    workbenches = stage_workbenches(contract_tickers, as_of, args.dry_run)
     print(f"[3/6] workbenches: {len(workbenches['written'])} built, {len(workbenches['skipped'])} skipped, {len(workbenches['errors'])} errors")
 
     pricing = stage_pricing(workbenches["written"], as_of, args.dry_run)

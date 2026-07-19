@@ -200,6 +200,8 @@ def decision_view(valuation: dict, committee: dict) -> dict:
         "downside_to_low_pct": (contract.get("valuation") or {}).get("downside_to_low_pct"),
         "unvalued_component_count": (contract.get("component_coverage") or {}).get("unvalued_component_count"),
         "unresolved_evidence_count": (contract.get("evidence") or {}).get("unresolved_count"),
+        "proof_complete_pct": (contract.get("calculation_proof_summary") or {}).get("proof_complete_pct"),
+        "model_hash": (contract.get("change_control") or {}).get("model_hash"),
         "primary_power_zone": (contract.get("method_route") or {}).get("label"),
         "owner_decision": committee.get("owner_decision"),
         "next_action": committee.get("next_action"),
@@ -227,6 +229,10 @@ def valuation_view(valuation: dict) -> dict:
         "valuation": contract.get("valuation") or {},
         "components": contract.get("economic_ownership_map") or [],
         "scenario_contract": contract.get("scenario_contract") or {},
+        "calculation_proof_summary": contract.get("calculation_proof_summary") or {},
+        "model_checks": contract.get("model_checks") or {},
+        "source_lineage": contract.get("source_lineage") or [],
+        "change_control": contract.get("change_control") or {},
     }
 
 
@@ -333,8 +339,26 @@ def attribution_causes(old_proof: dict, new_proof: dict, old_component: dict, ne
 
 
 def attribution_view(research: Path, current: dict) -> dict:
-    current_total = (current.get("component_valuation_results") or {}).get("total_equity_value_per_share") or {}
+    contract = current.get("universal_valuation_contract") or {}
+    current_total = (
+        (contract.get("valuation") or {}).get("value_per_share")
+        if contract.get("schema_version") == "2.0"
+        else (current.get("component_valuation_results") or {}).get("total_equity_value_per_share")
+    ) or {}
     current_point = {"as_of": current.get("as_of"), "low": current_total.get("low"), "base": current_total.get("base"), "high": current_total.get("high")}
+    if current_total.get("base") is None:
+        return {
+            "status": "waiting_for_proof_complete_baseline",
+            "current": current_point,
+            "prior": None,
+            "base_change_per_share": None,
+            "base_change_pct": None,
+            "drivers": [],
+            "category_totals_per_share": {},
+            "unexplained_per_share": None,
+            "legacy_value_per_share": (contract.get("valuation") or {}).get("legacy_value_per_share"),
+            "explanation": "A complete security value is intentionally withheld while material components are unpriced. Attribution restarts after the first proof-complete baseline.",
+        }
     snapshots = complete_component_snapshots(research)
     current_as_of = str(current.get("as_of") or "")[:10]
     prior_candidates = [(path, data) for path, data in snapshots if str(data.get("as_of") or "")[:10] < current_as_of]
@@ -431,7 +455,7 @@ def build(ticker: str, as_of: str | None = None) -> dict:
             "schema_version": "2.0", "ticker": ticker, "as_of": effective_date,
             "decision": {"status": "evidence_blocked", "price_per_share": None, "market_cap_m": None, "enterprise_value_m": None, "value_per_share": {}, "annualized_return_at_price_pct": {}, "downside_to_low_pct": None, "unvalued_component_count": 1, "unresolved_evidence_count": 1, "primary_power_zone": route.get("label"), "owner_decision": None, "next_action": scaffold.get("next_action")},
             "business": {"status": "incomplete", "components": [], "component_coverage": {"unvalued_component_count": 1}, "facts": [], "estimates": [], "judgments": []},
-            "valuation": {"status": "evidence_blocked", "market": {}, "valuation": {}, "components": [], "scenario_contract": {"rule": "Build causal low/base/high scenarios before drawing a conclusion."}},
+            "valuation": {"status": "evidence_blocked", "market": {}, "valuation": {}, "components": [], "scenario_contract": {"rule": "Build causal low/base/high scenarios before drawing a conclusion."}, "calculation_proof_summary": {"component_count": 0, "priced_component_count": 0, "proof_complete_pct": 0, "status_counts": {"unpriced": 1}, "all_material_components_priced": False, "calculation_errors": [], "aggregate_proof_hash": None}, "model_checks": {"all_material_components_priced": False}, "source_lineage": [], "change_control": {"model_hash": None, "method_versions": [], "change_log": []}},
             "optionality": {"status": "not_yet_mapped", "option_count": 0, "options": [], "rule": "Optionality remains unvalued until the component map is complete."},
             "committee": {"status": "not_started", "analysis_progress": {"completed": 0, "required": 0}, "owner_status": "pending", "owner_decision": None, "next_action": "Complete the component model before freezing an IC evidence packet."},
             "evidence": {"status": "critical_gaps_open", "open_count": 1, "critical_count": 1, "gaps": [gap]},

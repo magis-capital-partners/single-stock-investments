@@ -275,6 +275,29 @@ def run_cmd(cmd: list[str], label: str, check: bool = False) -> int:
     return result.returncode
 
 
+def initialize_proof_first_valuation(ticker: str, as_of: str) -> None:
+    """Route a newly onboarded security through the canonical valuation authority.
+
+    New securities intentionally start evidence-blocked.  The canonical pipeline
+    writes their Power Zone route, proof-first model scaffold, universal contract,
+    and workbench so no onboarding path can fall back to a legacy IRR output.
+    """
+    code = run_cmd(
+        [
+            PY,
+            str(SCRIPTS / "run_security_decision_pipeline.py"),
+            "--tickers",
+            ticker,
+            "--date",
+            as_of,
+            "--skip-dashboard",
+        ],
+        "proof-first valuation scaffold",
+    )
+    if code != 0:
+        raise RuntimeError(f"proof-first valuation scaffold failed with code {code}")
+
+
 def run_download(ticker: str, download: dict) -> tuple[bool, str]:
     dtype = download.get("type", "us_shared")
     if dtype == "us_shared":
@@ -444,6 +467,12 @@ def onboard(args: argparse.Namespace) -> int:
         [PY, str(SCRIPTS / "scaffold_cross_check.py"), ticker, "--date", today],
         "cross-check scaffold",
     )
+    try:
+        initialize_proof_first_valuation(ticker, today)
+    except RuntimeError as exc:
+        write_status(ticker_dir, "failed", error=str(exc))
+        write_pending_review(ticker, company, market, False, str(exc))
+        return 4
 
     if not args.skip_download:
         write_status(ticker_dir, "downloading")

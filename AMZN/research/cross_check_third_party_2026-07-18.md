@@ -8,57 +8,52 @@
 
 ## Executive summary
 
-Marvin base **3.7%** per year (total synthesis) from primary filings and `valuation.json` at **$247.23**. One pending VIC PDF is indexed; no approved third-party source changes base IRR. **[HUMAN REVIEW]** for any promotion to `third_party_sources.md`.
+Marvin filing anchor: **3.68%** per year total synthesis (Lawrence scenario gate **1.9%** per year on normalized **$5.35/sh** owner cash) at **$247.23**. One third-party source is indexed (VIC PDF, **pending**). No approved external source adjusts base IRR.
 
-**Synthesis (best estimate):** Marvin **3.7%** · stance **hold** (human override); Marvin proposal **watch**.
+**Synthesis (best estimate):** Marvin **3.68%** per year · stance **hold**; pending VIC is context only until promoted in `third_party_sources.md`.
 
 ## Sources in scope
 
 | Source ID | Title | Path | Status | Cross-check status |
 |-----------|-------|------|--------|-------------------|
-| vic | VIC PDF intake — AMZN VIC PDF | `AMZN/third-party-analyses/vic/vic_pdf_2026-06-18_amzn-vic-pdf_04954f7a79.pdf` | **[PENDING APPROVAL]** | Not used in base IRR |
+| vic | VIC PDF intake — AMZN VIC PDF | `third-party-analyses/vic/vic_pdf_2026-06-18_amzn-vic-pdf_04954f7a79.pdf` | **[PENDING APPROVAL]** | Not reviewed for numeric blend |
 
 ## Agreements (facts)
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| Scale and AWS momentum | FY2025 sales **$716.9B**; Q1 AWS **+28%** | Pending VIC not reviewed | `10-K`, Q1 2026 earnings release |
-| Capex vs OCF | TTM OCF **$148.5B**; productive-asset capex **$151.0B** | — | `10-Q` Mar 2026 extract |
-| Normalization | Base uses **$5.35/sh** owner cash, not TTM **~$1.2B** FCF | — | `valuation.json`; evidence reconciliation |
+| Operating momentum | Q1 2026 net sales **$181.5B** (+17%); AWS **+28%** | n/a (pending) | `10-Q_20260430`; Q1 earnings release |
+| Capital intensity | TTM OCF **$148.5B**; TTM capex **$147.3B**; FCF **$1.2B** | n/a | Q1 supplemental metrics |
+| Normalization | Lawrence base uses **$5.35/sh** mid-cycle owner cash, not TTM FCF | n/a | `valuation.json` |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| Primary IRR | **3.7%** (total synthesis) | No approved numeric view | Marvin **100%** numeric until human promotes VIC or other source |
-| Stance | **watch** (Marvin proposal) vs **hold** (registry) | — | Human override on quality compounder sleeve |
-| AI capex timing | Normalized **~$90B** sustainable capex **[Assumption]** | Pending external may differ on inflection year | Context tier only |
+| Primary IRR | **3.68%** synthesis / **1.9%** Lawrence gate | No approved IRR | Marvin **100%** numeric until human promotes source |
+| Third party | Filing-first | VIC pending | **[PENDING APPROVAL]** — context tier only |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | **$5.35/sh** normalized | **3.7%** per year | **watch** (Marvin proposal) |
-| External (VIC pending) | Not in base | No change | **[PENDING APPROVAL]** |
-| **Blended best estimate** | Filing anchor | **3.7%** | **hold** (human override) |
+| Marvin floor | **$5.35/sh** normalized | **3.68%** synthesis | **hold** |
+| External (combined) | Not in base | No change to base % | n/a until approved |
+| **Blended best estimate** | **Filing anchor** | **3.68%** | **hold** |
 
-**Weights:** Marvin **100%** on numbers (no approved external IRR). Pending VIC is qualitative context only.
+**Weights:** Marvin **100%** on numbers until an approved source is promoted. Pending VIC may inform qualitative conviction only.
 
-**Returns statement (blended):** We expect **3.7%** per year at today's price on the Marvin base case; pending VIC does not alter filing math.
+**Returns statement (blended):** We expect **3.68%** per year at **$247.23** on the Marvin synthesis case; no third-party numeric adjustment without **[HUMAN REVIEW]**.
 
 ## [HUMAN REVIEW]
 
-- [ ] Review VIC PDF thesis vs filing-based capex normalization
-- [ ] Confirm whether **hold** override remains appropriate at **$247.23** with **<15%** IRR
-- [ ] Promote any external source via `third_party_sources.md` before numeric blend
-
-## [PROPOSED MEMORY]
-
-- [PROPOSED COMPANY] AMZN cross-check 2026-07-18: Marvin **3.7%** unchanged; one pending VIC source; hold override
+- [ ] Review VIC PDF against filings if promotion to approved registry is desired
+- [ ] Every **pending** source cited with **[PENDING APPROVAL]** only
+- [ ] Blended estimate in `valuation.json` → `estimates.external[]` if material
 
 ## Primary sources cited
 
 1. `AMZN/research/deep_dive_2026-07-18.md`
 2. `AMZN/research/valuation.json`
-3. `AMZN/research/evidence_reconciliation_2026-07-18.md`
-4. `AMZN/third-party-analyses/source_inventory_2026-07-18.md`
+3. `AMZN/third-party-analyses/source_inventory_2026-07-18.md`
+4. `AMZN/investor-documents/sec-edgar/10-Q_20260430_rpt20260331_acc0001018724_26_000014.htm`

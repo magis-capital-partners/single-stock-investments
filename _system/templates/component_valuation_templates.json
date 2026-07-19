@@ -1,6 +1,6 @@
 {
-  "version": "3.0",
-  "purpose": "Starting component maps. Replace every placeholder with an evidence-backed low/base/high range before a schedule is complete.",
+  "version": "4.0",
+  "purpose": "Starting component maps. A value is production-eligible only when a deterministic calculation proof reproduces its low/base/high outputs; otherwise classify it as unpriced or legacy_sensitivity.",
   "templates": {
     "operating_company": [
       "core operating segments", "cash and investments", "non-operating assets", "debt and liabilities", "corporate reserve"
@@ -34,11 +34,20 @@
     ]
   },
   "required_component_fields": [
-    "id", "label", "category", "overlap_key", "treatment", "valuation.method", "valuation.evidence"
+    "id", "label", "category", "overlap_key", "treatment", "method", "evidence", "valuation_status"
   ],
-  "economic_value_contract": "Every explicit component schedule also requires economic_value.schema_version 1.0, an exact economic claim, GAAP role, exhaustive non-overlapping component groups, comparable adjustments where applicable, and the generated valuation-proof table.",
+  "calculation_proof_required_fields": [
+    "schema_version", "method_id", "method_version", "output_unit", "inputs", "assumptions", "calculations", "outputs"
+  ],
+  "valuation_statuses": {
+    "calculated": "Reproduced entirely from locked cited facts and deterministic arithmetic.",
+    "bounded_estimate": "Reproduced from cited facts plus disclosed judgments constrained to approved ranges.",
+    "unpriced": "A material input is unavailable; no complete component range is displayed.",
+    "legacy_sensitivity": "A historical unsupported range retained for comparison but excluded from security value."
+  },
+  "economic_value_contract": "Every explicit component schedule requires an exact economic claim, exhaustive non-overlapping component groups, source-locked facts, bounded assumptions, deterministic formulas, low/base/high output nodes, falsifiers, and a generated calculation trace.",
   "falsifier_rule": "valuation.falsifier may override the deterministic category/method falsifier; one is always emitted in the valuation proof.",
-  "valuation_range_rule": "Supply either valuation.low/base/high with a supported basis or valuation.driver_model with low/base/high scenarios.",
+  "valuation_range_rule": "Raw low/base/high fields are legacy inputs. Production ranges must be emitted by calculation_proof outputs; missing material inputs produce unpriced, never an analyst plug.",
   "driver_models": {
     "revenue_owner_cash_dcf": "Capital-free royalty, toll, or lease revenue converted to after-tax owner cash.",
     "reinvestment_return_dcf": "Infrastructure or service growth that explicitly charges the capital needed to create incremental owner cash.",

@@ -252,6 +252,38 @@
     const progress = committee.analysis_progress || {};
     const progressPct = progress.required ? Math.min(100, Number(progress.completed || 0) / Number(progress.required) * 100) : 0;
     const ic = t.investment_committee;
+    const proofSummary = valuation.calculation_proof_summary || {};
+    const valueText = (row) => row.range_per_share?.base == null
+      ? 'unpriced'
+      : `$${fmtNum(row.range_per_share.low)} / $${fmtNum(row.range_per_share.base)} / $${fmtNum(row.range_per_share.high)}`;
+    const sourceLink = (source) => {
+      const ref = source?.ref || '';
+      if (!ref) return '';
+      const url = helpers.ghRepo ? `https://github.com/${helpers.ghRepo}/blob/main/${ref}` : ref;
+      return linkHtml ? linkHtml(url, ref) : escapeHtml(ref);
+    };
+    const proofCards = (valuation.components || business.components || []).map((row) => {
+      const proof = row.calculation_proof;
+      const legacy = row.legacy_range_per_share;
+      const traces = proof?.traces || {};
+      const scenarios = ['low', 'base', 'high'].map((scenario) => {
+        const steps = traces[scenario] || [];
+        if (!steps.length) return '';
+        return `<details style="margin-top:6px" ${scenario === 'base' ? 'open' : ''}><summary class="tier-sub">${escapeHtml(scenario)} case · $${fmtNum(proof.outputs?.[scenario])}</summary>
+          <table class="workbench-table"><thead><tr><th>Step</th><th>Value</th><th>Derivation</th></tr></thead><tbody>${steps.map((step) => `<tr>
+            <td><strong>${escapeHtml(step.label || step.id)}</strong><div class="tier-sub">${escapeHtml(step.kind || '')} · ${escapeHtml(step.unit || '')}</div></td>
+            <td class="mono">${fmtNum(step.value)}</td>
+            <td>${step.substituted_formula ? `<span class="mono">${escapeHtml(step.substituted_formula)} = ${fmtNum(step.value)}</span>` : escapeHtml(step.rationale || 'Source-locked input')}
+              ${step.source ? `<div class="tier-sub">${sourceLink(step.source)} · ${escapeHtml(step.source.locator || '')} · as of ${escapeHtml(step.source.as_of || '—')}</div>` : ''}</td>
+          </tr>`).join('')}</tbody></table></details>`;
+      }).join('');
+      return `<div class="workbench-item" style="margin-top:9px">
+        <div class="workbench-item-head"><div class="workbench-item-title">${escapeHtml(row.label || row.component_id)}</div>${workbenchStatusBadge(row.valuation_status || 'unpriced', escapeHtml)}</div>
+        <p><strong>Production value:</strong> <span class="mono">${valueText(row)}</span></p>
+        ${legacy ? `<p class="tier-sub"><strong>Legacy sensitivity, excluded:</strong> <span class="mono">$${fmtNum(legacy.low)} / $${fmtNum(legacy.base)} / $${fmtNum(legacy.high)}</span></p>` : ''}
+        ${proof ? `<div class="tier-sub">Method ${escapeHtml(proof.method_id || row.method || '')}@${escapeHtml(proof.method_version || '—')} · proof ${escapeHtml(String(proof.proof_hash || '').slice(0, 12))}</div>${scenarios}` : '<p class="tier-sub">No valid calculation graph. This component remains outside the security value until its material inputs are evidenced.</p>'}
+      </div>`;
+    }).join('');
 
     const ownershipRows = (business.components || []).map((row) => `<tr>
       <td><strong>${escapeHtml(row.label || row.component_id)}</strong>
@@ -259,16 +291,16 @@
         ${row.falsifier ? `<div class="tier-sub">Falsifier: ${escapeHtml(row.falsifier)}</div>` : ''}
       </td>
       <td>${escapeHtml(row.ownership_claim || '')}${row.evidence ? `<div class="tier-sub">${escapeHtml(String(row.evidence).slice(0, 220))}</div>` : ''}</td>
-      <td class="mono">$${fmtNum(row.range_per_share?.low)} / $${fmtNum(row.range_per_share?.base)} / $${fmtNum(row.range_per_share?.high)}</td>
-      <td>${escapeHtml(row.assumption_type || row.evidence_level || '')}</td>
+      <td class="mono">${valueText(row)}${row.legacy_range_per_share ? `<div class="tier-sub">legacy $${fmtNum(row.legacy_range_per_share.low)} / $${fmtNum(row.legacy_range_per_share.base)} / $${fmtNum(row.legacy_range_per_share.high)}</div>` : ''}</td>
+      <td>${workbenchStatusBadge(row.valuation_status || 'unpriced', escapeHtml)}<div class="tier-sub">${escapeHtml(row.assumption_type || row.evidence_level || '')}</div></td>
     </tr>`).join('');
 
     const scheduleRows = (valuation.components || business.components || []).map((row) => `<tr>
       <td><strong>${escapeHtml(row.label || row.component_id)}</strong><div class="tier-sub">${escapeHtml(row.method || '')}</div></td>
-      <td class="mono">$${fmtNum(row.range_per_share?.low)}</td>
-      <td class="mono">$${fmtNum(row.range_per_share?.base)}</td>
-      <td class="mono">$${fmtNum(row.range_per_share?.high)}</td>
-      <td>${escapeHtml(row.assumption_type || '')}</td>
+      <td class="mono">${row.range_per_share?.low == null ? '—' : '$' + fmtNum(row.range_per_share.low)}</td>
+      <td class="mono">${row.range_per_share?.base == null ? '—' : '$' + fmtNum(row.range_per_share.base)}</td>
+      <td class="mono">${row.range_per_share?.high == null ? '—' : '$' + fmtNum(row.range_per_share.high)}</td>
+      <td>${workbenchStatusBadge(row.valuation_status || 'unpriced', escapeHtml)}</td>
     </tr>`).join('');
 
     const valueDrivers = (valuation.scenario_contract?.top_value_drivers || []).map((row) => `<tr>
@@ -322,6 +354,11 @@
         <div class="metric"><div class="k">Unvalued components</div><div class="v mono">${Number(decision.unvalued_component_count || 0)}</div></div>
         <div class="metric"><div class="k">Evidence blockers</div><div class="v mono">${Number(decision.unresolved_evidence_count || 0)}</div></div>
       </div>
+      <div class="metric-grid metric-grid-3" style="margin-top:9px">
+        <div class="metric"><div class="k">Calculation proof</div><div class="v mono">${fmtNum(decision.proof_complete_pct ?? proofSummary.proof_complete_pct ?? 0)}%</div></div>
+        <div class="metric"><div class="k">Priced components</div><div class="v mono">${Number(proofSummary.priced_component_count || 0)} / ${Number(proofSummary.component_count || 0)}</div></div>
+        <div class="metric"><div class="k">Model hash</div><div class="v mono" style="font-size:11px">${escapeHtml(String(decision.model_hash || valuation.change_control?.model_hash || '—').slice(0, 12))}</div></div>
+      </div>
       <div class="workbench-callout"><strong>Power zone:</strong> ${escapeHtml(decision.primary_power_zone || 'review required')}<br><strong>Next:</strong> ${escapeHtml(decision.next_action || 'Complete evidence and committee gates.')}</div>`;
 
     const businessPage = `
@@ -342,7 +379,8 @@
         <div class="metric"><div class="k">Low-case downside</div><div class="v mono">${fmtPct(valuation.valuation?.downside_to_low_pct)}</div></div>
       </div>
       <div class="workbench-callout">${escapeHtml(valuation.scenario_contract?.rule || '')}</div>
-      ${scheduleRows ? `<h4 style="margin:13px 0 0">Component schedule</h4><table class="workbench-table"><thead><tr><th>Component</th><th>Low</th><th>Base</th><th>High</th><th>Type</th></tr></thead><tbody>${scheduleRows}</tbody></table>` : ''}
+      ${scheduleRows ? `<h4 style="margin:13px 0 0">Component schedule</h4><table class="workbench-table"><thead><tr><th>Component</th><th>Low</th><th>Base</th><th>High</th><th>Status</th></tr></thead><tbody>${scheduleRows}</tbody></table>` : ''}
+      ${proofCards ? `<h4 style="margin:13px 0 0">Show the math</h4><div class="workbench-list">${proofCards}</div>` : ''}
       ${valueDrivers ? `<h4 style="margin:13px 0 0">Largest uncertainty drivers</h4><table class="workbench-table"><thead><tr><th>Component</th><th>Base / share</th><th>Range width</th></tr></thead><tbody>${valueDrivers}</tbody></table>` : ''}
       ${reverseHtml}`;
 

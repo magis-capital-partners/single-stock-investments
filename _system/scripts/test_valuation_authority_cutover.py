@@ -31,6 +31,13 @@ class ValuationAuthorityCutoverTests(unittest.TestCase):
             source = (ROOT / "_system" / "scripts" / name).read_text(encoding="utf-8")
             self.assertIn("decision_authority", source, name)
 
+    def test_every_onboarding_entry_point_initializes_proof_first_valuation(self):
+        onboard = (ROOT / "_system" / "scripts" / "onboard_ticker.py").read_text(encoding="utf-8")
+        sp500 = (ROOT / "_system" / "scripts" / "darwin" / "bulk_sp500_onboard.py").read_text(encoding="utf-8")
+        self.assertIn("initialize_proof_first_valuation(ticker, today)", onboard)
+        self.assertIn("initialize_proof_first_valuation(ticker, today)", sp500)
+        self.assertIn("run_security_decision_pipeline.py", onboard)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "2.0",
   "status": "evidence_blocked",
   "ticker": "WEST",
   "as_of": "2026-07-07",
@@ -262,6 +262,12 @@
       "base": null,
       "high": null
     },
+    "priced_components_per_share": {
+      "low": 0,
+      "base": 0,
+      "high": 0
+    },
+    "legacy_value_per_share": null,
     "probability_weighted_value_per_share": null,
     "expected_distributions_per_share": 0.0,
     "annualized_return_at_price_pct": {
@@ -270,17 +276,40 @@
       "high": null
     },
     "downside_to_low_pct": null,
-    "horizon_years": 7
+    "horizon_years": 7,
+    "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
   },
   "scenario_contract": {
-    "rule": "Cases must change causal operating, capital, probability, timing, or financing drivers\u2014not only the terminal multiple.",
+    "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
     "top_value_drivers": [],
     "reverse_expectations": null
+  },
+  "calculation_proof_summary": {
+    "component_count": 0,
+    "priced_component_count": 0,
+    "proof_complete_pct": 0.0,
+    "status_counts": {
+      "bounded_estimate": 0,
+      "calculated": 0,
+      "legacy_sensitivity": 0,
+      "unpriced": 0
+    },
+    "all_material_components_priced": false,
+    "calculation_errors": [],
+    "aggregate_proof_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  "source_lineage": [],
+  "model_checks": {
+    "calculation_graphs_valid": true,
+    "component_sum_reconciles": false,
+    "no_double_counting": true,
+    "all_material_components_priced": false,
+    "low_base_high_ordered": true
   },
   "evidence": {
     "unresolved_count": 1,
     "blockers": [
-      "A complete, explicit ownership/component schedule has not been supplied."
+      "A complete economic ownership map has not been supplied."
     ],
     "validation_errors": []
   },
@@ -293,7 +322,13 @@
       "component milestone or falsifier"
     ]
   },
-  "decision_rule": "No security is decision-grade until every material economic claim is valued exactly once and every material evidence blocker is resolved.",
+  "change_control": {
+    "model_hash": "1f521d8eb04c9685a311e1e565ca36158ed6fc978ec9c420b6b4a16c4381ec47",
+    "method_versions": [],
+    "change_log": [],
+    "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
+  },
+  "decision_rule": "No security is decision-grade until every material claim is valued exactly once by a valid calculation proof and every material evidence blocker is resolved.",
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true
 }

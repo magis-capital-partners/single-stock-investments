@@ -79,8 +79,10 @@ class SecurityDecisionPipelineTests(unittest.TestCase):
 
         self.assertEqual(result["errors"], [])
         contract = json.loads((pipeline.ROOT / "MSB/research/valuation_contract.json").read_text())
-        self.assertEqual(contract["valuation"]["value_per_share"]["base"], 34)
-        self.assertEqual(contract["evidence"]["blockers"], ["open_gap: Need reserve life."])
+        self.assertIsNone(contract["valuation"]["value_per_share"]["base"])
+        self.assertEqual(contract["valuation"]["legacy_value_per_share"]["base"], 34)
+        self.assertIn("open_gap: Need reserve life.", contract["evidence"]["blockers"])
+        self.assertTrue(any("valid calculation proof" in row for row in contract["evidence"]["blockers"]))
         self.assertEqual(contract["cohort_purpose"], "royalty test")
         self.assertEqual(contract["status"], "evidence_blocked")
 
@@ -98,6 +100,22 @@ class SecurityDecisionPipelineTests(unittest.TestCase):
             pipeline.registry_entries = old_entries
         self.assertEqual(result["initiated"], [])
         self.assertEqual(result["triggered_evidence_tasks"][0]["ticker"], "BBB")
+
+    def test_missing_model_gets_autonomous_evidence_blocked_scaffold(self):
+        self.write("ZZZ/research/valuation_route.json", {
+            "profile_id": "quality_reinvestment", "status": "routed", "label": "High-return compounder",
+            "required_evidence": ["normalized owner earnings", "incremental return on capital"],
+            "primary_methods": ["owner_earnings_reinvestment_dcf"], "corroborating_methods": ["reverse_dcf"],
+            "silent_personas": [],
+        })
+        result = pipeline.stage_contracts(["ZZZ"], dry_run=False, as_of="2026-07-18")
+        self.assertEqual(result["errors"], [])
+        self.assertEqual(result["scaffolded"], ["ZZZ"])
+        scaffold = json.loads((pipeline.ROOT / "ZZZ/research/valuation_model_scaffold.json").read_text())
+        contract = json.loads((pipeline.ROOT / "ZZZ/research/valuation_contract.json").read_text())
+        self.assertIn("deterministic low/base/high calculation proof", scaffold["required_outputs"])
+        self.assertEqual(contract["status"], "evidence_blocked")
+        self.assertEqual(contract["component_coverage"]["unvalued_component_count"], 1)
 
     def test_priority_scope_is_core_hold_and_accumulate_only(self):
         old_entries = pipeline.registry_entries

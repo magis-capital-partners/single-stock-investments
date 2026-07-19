@@ -1,25 +1,27 @@
 {
   "schema_version": "2.0",
   "ticker": "BE",
-  "as_of": "2026-07-18",
+  "as_of": "2026-07-19",
   "decision": {
     "status": "evidence_blocked",
     "price_per_share": 221.89,
     "market_cap_m": null,
     "enterprise_value_m": null,
     "value_per_share": {
-      "low": 6.05,
-      "base": 6.76,
-      "high": 7.56
+      "low": null,
+      "base": null,
+      "high": null
     },
     "annualized_return_at_price_pct": {
-      "low": -40.23,
-      "base": -39.27,
-      "high": -38.29
+      "low": null,
+      "base": null,
+      "high": null
     },
-    "downside_to_low_pct": -97.27,
+    "downside_to_low_pct": null,
     "unvalued_component_count": 1,
     "unresolved_evidence_count": 0,
+    "proof_complete_pct": 0.0,
+    "model_hash": "65ed1b0fb9d10d3de6db48436177f1210e8843fe46b3cb6c28aea797e5864a80",
     "primary_power_zone": "Capital cycle and normalized industry economics",
     "owner_decision": null,
     "next_action": "Freeze the evidence packet and select three method-independent raters."
@@ -39,27 +41,26 @@
           "value": 1,
           "unit": "per-share economic claim"
         },
-        "current_operating_contribution": {
-          "starting_revenue_m": null,
-          "base_value_per_share": 6.76
-        },
-        "growth_driver": null,
-        "required_reinvestment": {
-          "model_type": null,
-          "base_incremental_after_tax_roic": null,
-          "base_remaining_cost_m": null,
-          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
-        },
         "method": "owner_cash_dcf",
+        "method_version": null,
+        "method_provenance": null,
         "comparable_ids": [],
         "range_per_share": {
+          "low": null,
+          "base": null,
+          "high": null
+        },
+        "legacy_range_per_share": {
           "low": 6.05,
           "base": 6.76,
           "high": 7.56
         },
+        "valuation_status": "legacy_sensitivity",
+        "calculation_proof": null,
         "evidence_tier": "model_input",
         "evidence_level": "analyst_estimated",
         "evidence": "inputs.fcf_per_share and scenarios.base",
+        "scenario_assumptions": null,
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "Risk and timing are reflected in the low/base/high range.",
         "falsifier": "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods.",
@@ -83,7 +84,8 @@
         "kind": "estimate",
         "evidence_tier": "model_input",
         "evidence": "inputs.fcf_per_share and scenarios.base",
-        "method": "owner_cash_dcf"
+        "method": "owner_cash_dcf",
+        "valuation_status": "legacy_sensitivity"
       }
     ],
     "judgments": []
@@ -98,19 +100,30 @@
     },
     "valuation": {
       "value_per_share": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "priced_components_per_share": {
+        "low": 0,
+        "base": 0,
+        "high": 0
+      },
+      "legacy_value_per_share": {
         "low": 6.05,
         "base": 6.76,
         "high": 7.56
       },
-      "probability_weighted_value_per_share": 6.76,
+      "probability_weighted_value_per_share": null,
       "expected_distributions_per_share": 0.0,
       "annualized_return_at_price_pct": {
-        "low": -40.23,
-        "base": -39.27,
-        "high": -38.29
+        "low": null,
+        "base": null,
+        "high": null
       },
-      "downside_to_low_pct": -97.27,
-      "horizon_years": 7
+      "downside_to_low_pct": null,
+      "horizon_years": 7,
+      "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
     },
     "components": [
       {
@@ -125,27 +138,26 @@
           "value": 1,
           "unit": "per-share economic claim"
         },
-        "current_operating_contribution": {
-          "starting_revenue_m": null,
-          "base_value_per_share": 6.76
-        },
-        "growth_driver": null,
-        "required_reinvestment": {
-          "model_type": null,
-          "base_incremental_after_tax_roic": null,
-          "base_remaining_cost_m": null,
-          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
-        },
         "method": "owner_cash_dcf",
+        "method_version": null,
+        "method_provenance": null,
         "comparable_ids": [],
         "range_per_share": {
+          "low": null,
+          "base": null,
+          "high": null
+        },
+        "legacy_range_per_share": {
           "low": 6.05,
           "base": 6.76,
           "high": 7.56
         },
+        "valuation_status": "legacy_sensitivity",
+        "calculation_proof": null,
         "evidence_tier": "model_input",
         "evidence_level": "analyst_estimated",
         "evidence": "inputs.fcf_per_share and scenarios.base",
+        "scenario_assumptions": null,
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "Risk and timing are reflected in the low/base/high range.",
         "falsifier": "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods.",
@@ -154,17 +166,47 @@
       }
     ],
     "scenario_contract": {
-      "rule": "Cases must change causal operating, capital, probability, timing, or financing drivers\u2014not only the terminal multiple.",
+      "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
       "top_value_drivers": [
         {
           "component_id": "operating_business_fallback",
           "label": "Operating business (fallback)",
-          "base_per_share": 6.76,
-          "range_width_per_share": 1.51,
+          "valuation_status": "legacy_sensitivity",
+          "base_per_share": null,
+          "legacy_base_per_share": 6.76,
+          "range_width_per_share": null,
           "scenario_assumptions": null
         }
       ],
       "reverse_expectations": null
+    },
+    "calculation_proof_summary": {
+      "component_count": 1,
+      "priced_component_count": 0,
+      "proof_complete_pct": 0.0,
+      "status_counts": {
+        "bounded_estimate": 0,
+        "calculated": 0,
+        "legacy_sensitivity": 1,
+        "unpriced": 0
+      },
+      "all_material_components_priced": false,
+      "calculation_errors": [],
+      "aggregate_proof_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "model_checks": {
+      "calculation_graphs_valid": true,
+      "component_sum_reconciles": false,
+      "no_double_counting": true,
+      "all_material_components_priced": false,
+      "low_base_high_ordered": true
+    },
+    "source_lineage": [],
+    "change_control": {
+      "model_hash": "65ed1b0fb9d10d3de6db48436177f1210e8843fe46b3cb6c28aea797e5864a80",
+      "method_versions": [],
+      "change_log": [],
+      "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
     }
   },
   "optionality": {
@@ -333,12 +375,12 @@
     "weighting_rule": "Do not change a persona's relevance within a power zone until at least 20 attributable, dividend-aware outcomes exist there; never reweight automatically."
   },
   "attribution": {
-    "status": "baseline_established",
+    "status": "waiting_for_proof_complete_baseline",
     "current": {
       "as_of": "2026-07-17",
-      "low": 6.05,
-      "base": 6.76,
-      "high": 7.56
+      "low": null,
+      "base": null,
+      "high": null
     },
     "prior": null,
     "base_change_per_share": null,
@@ -346,6 +388,11 @@
     "drivers": [],
     "category_totals_per_share": {},
     "unexplained_per_share": null,
-    "explanation": "The current component schedule is the first decision-grade baseline; attribution begins with the next dated valuation snapshot."
+    "legacy_value_per_share": {
+      "low": 6.05,
+      "base": 6.76,
+      "high": 7.56
+    },
+    "explanation": "A complete security value is intentionally withheld while material components are unpriced. Attribution restarts after the first proof-complete baseline."
   }
 }

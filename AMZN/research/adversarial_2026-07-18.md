@@ -56,7 +56,6 @@ re_pass: false
 
 **Lint notes:**
 - AMZN/research/deep_dive_2026-07-18.md: classification -1.49% vs valuation.json base 3.68% (tol 0.25pp)
-- AMZN/research/deep_dive_2026-07-18.md: executive_summary_first_pct 3.2% vs valuation.json base 3.68% (tol 0.25pp)
 - AMZN/research: adversarial date adversarial_2026-05-29.md != dive 2026-07-18
 
 ---

@@ -24,7 +24,15 @@ def component_fixture(explicit=True):
             "all_material_components_identified": True,
             "components": [{
                 "id": "asset", "label": "Asset", "category": "operating_business", "overlap_key": "asset", "treatment": "additive",
-                "valuation": {"method": "owner_cash_dcf", "evidence_tier": "primary", "evidence": "filing", "low": 40, "base": 60, "high": 90},
+                "valuation": {
+                    "method": "owner_earnings_reinvestment_dcf", "evidence_tier": "primary", "evidence": "filing", "low": 40, "base": 60, "high": 90,
+                    "valuation_status": "calculated",
+                    "calculation_proof": {
+                        "schema_version": "1.0", "method_id": "owner_earnings_reinvestment_dcf", "method_version": "1.0", "output_unit": "USD_per_share",
+                        "inputs": [{"id": "value", "kind": "fact", "values": {"low": 40, "base": 60, "high": 90}, "unit": "USD_per_share", "locked": True, "source": {"ref": "filing", "locator": "valuation schedule", "as_of": "2026-07-15"}}],
+                        "assumptions": [], "calculations": [], "outputs": {"low": "value", "base": "value", "high": "value"}
+                    },
+                },
             }],
         }
         data["economic_value"] = {
