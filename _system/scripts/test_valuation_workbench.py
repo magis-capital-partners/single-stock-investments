@@ -44,7 +44,9 @@ class ValuationWorkbenchTests(unittest.TestCase):
                 self.assertGreater(row["evidence"]["open_count"], 0)
                 self.assertEqual(row["outcomes"]["status"], "waiting_for_owner_decision")
                 self.assertTrue(all(slot["target_date"] is None for slot in row["outcomes"]["schedule"]))
-                self.assertEqual(row["attribution"]["status"], "baseline_established")
+                self.assertEqual(row["attribution"]["status"], "waiting_for_proof_complete_baseline")
+                self.assertIsNone(row["decision"]["value_per_share"].get("base"))
+                self.assertEqual(row["valuation"]["calculation_proof_summary"]["proof_complete_pct"], 0.0)
 
     def test_cross_power_zone_cohort_values_every_component_but_stays_blocked(self):
         expected = {

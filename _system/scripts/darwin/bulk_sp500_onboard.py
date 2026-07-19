@@ -173,6 +173,7 @@ def onboard_one(
     sleep_s: float,
 ) -> dict:
     from onboard_ticker import (  # local import after path setup
+        initialize_proof_first_valuation,
         scaffold_folder,
         write_status,
         write_thesis,
@@ -250,6 +251,7 @@ def onboard_one(
             check=False,
             capture_output=True,
         )
+        initialize_proof_first_valuation(ticker, today)
 
     ret_ok, ret_detail = write_returns(ticker)
     if sleep_s:
