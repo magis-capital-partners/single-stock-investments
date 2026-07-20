@@ -14,6 +14,7 @@
 - **BMNR** — workbench evidence_blocked; triggers: material live ls-algo book position
 - **CLSK** — workbench evidence_blocked; triggers: material live ls-algo book position
 - **CRCL** — workbench evidence_blocked; triggers: material live ls-algo book position
+- **CRML** — workbench evidence_blocked; triggers: material live ls-algo book position
 - **CRWV** — workbench evidence_blocked; triggers: material live ls-algo book position
 - **HIMS** — workbench evidence_blocked; triggers: material live ls-algo book position
 - **IONQ** — workbench evidence_blocked; triggers: material live ls-algo book position

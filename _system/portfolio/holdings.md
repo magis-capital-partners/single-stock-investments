@@ -192,6 +192,8 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-20.
 | CRH | CRH/ | CRH plc | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | CRL | CRL/ | Charles River Laboratories | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | CRM | CRM/ | Salesforce | US | 2026-07-10 | 2026-07-20 | unknown | watch |
+| CRML | CRML/ | CRML | US | — | 2026-07-20 | unknown | watch |
+| CRUS | CRUS/ | CRUS | US | — | 2026-07-20 | unknown | watch |
 | CRWD | CRWD/ | CrowdStrike | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | CRWV | CRWV/ | CoreWeave, Inc. | US | 2026-07-18 | 2026-07-20 | unknown | watch |
 | CSCO | CSCO/ | Cisco | US | 2026-07-09 | 2026-07-20 | unknown | watch |
@@ -218,7 +220,9 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-20.
 | DGX | DGX/ | Quest Diagnostics | US | 2026-07-10 | 2026-07-20 | unknown | watch |
 | DHI | DHI/ | D. R. Horton | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | DHR | DHR/ | Danaher Corporation | US | 2026-07-09 | 2026-07-20 | compounder | hold |
+| DIA | DIA/ | DIA | US | — | 2026-07-20 | unknown | watch |
 | DIS | DIS/ | Walt Disney Company (The) | US | 2026-07-10 | 2026-07-20 | unknown | watch |
+| DJT | DJT/ | DJT | US | — | 2026-07-20 | unknown | watch |
 | DLR | DLR/ | Digital Realty | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | DLTR | DLTR/ | Dollar Tree | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | DMLP | DMLP/ | Dorchester Minerals LP | US | 2026-07-09 | 2026-07-20 | unknown | watch |
@@ -688,4 +692,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-20.
 | ZBRA | ZBRA/ | Zebra Technologies | US | 2026-07-10 | 2026-07-20 | unknown | watch |
 | ZTS | ZTS/ | Zoetis | US | 2026-07-10 | 2026-07-20 | unknown | watch |
 
-**681 holdings total.** Registry: `_system/portfolio/registry.json`
+**685 holdings total.** Registry: `_system/portfolio/registry.json`

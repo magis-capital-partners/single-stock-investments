@@ -1,34 +1,29 @@
 # CRML — Investment Thesis
 
-**Last updated:** auto-sync
+**Last updated:** 2026-07-20
 
 ## Classification
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | optionality |
+| **Archetype** (Stahl) | unknown |
 | **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | none |
+| **Dhando** (Pabrai) | pending |
 | **Stance** | watch |
-| **Cycle** | up |
-| **Implied 7yr IRR** (base) | -6.53% (total synthesis) |
-| **IRR method** | yield_curve |
-| **Lawrence bucket** | other |
-| **Payoff lens** | asset |
-| **MOI bucket** | — |
-
-**Deep dive:** `CRML/research/deep_dive_2026-07-18.md` (auto-sync)
+| **Cycle** | - |
+| **MOI bucket** (legacy) | pending |
+| **Payoff lens** | pending |
 
 ## One-line thesis
 
-Pre-production Greenland REE developer (Tanbreez 42%); watch at **-6.53%** base on **$4.00** seven-year risked payoff at **$6.40**.
+CRML — thesis pending Marvin deep dive.
 
 ## Key questions
 
-- [x] Read latest annual report (20-F FY2025)
-- [ ] Tanbreez DFS and Greenland Stage 2 approval
-- [ ] GEM arbitration outcome and fully diluted share count
+- [ ] Read latest annual report
+- [ ] Read latest quarterly report
+- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-07-18; deep dive complete.
+- Onboarded 2026-07-20; awaiting deep dive.
