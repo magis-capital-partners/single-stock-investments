@@ -496,6 +496,12 @@ ci_push_main() {
 
   sync_self_from_origin_main
 
+  # A self-refresh updates this tracked helper in the worktree. Stage that
+  # update before committing so a later rebase always starts from a clean tree.
+  if ! git diff --quiet -- _system/scripts/ci_push_main.sh; then
+    git add _system/scripts/ci_push_main.sh
+  fi
+
   if git diff --staged --quiet; then
     echo "No staged changes to commit."
     exit 0
@@ -512,7 +518,6 @@ ci_push_main() {
   while [ "$attempt" -le "$MAX_ATTEMPTS" ]; do
     git fetch origin main
     if ! git rebase origin/main; then
-      sync_self_from_origin_main
       while rebase_in_progress && try_resolve_rebase_conflicts; do
         echo "Resolved regenerable rebase conflicts; continuing rebase (attempt $attempt/$MAX_ATTEMPTS)."
       done

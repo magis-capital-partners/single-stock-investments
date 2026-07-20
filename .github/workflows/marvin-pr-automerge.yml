@@ -15,7 +15,7 @@ permissions:
 
 concurrency:
   group: agent-automerge-${{ github.event.pull_request.number }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   automerge:
@@ -75,7 +75,7 @@ jobs:
       - uses: actions/checkout@v4
         if: steps.meta.outputs.eligible == 'true'
         with:
-          fetch-depth: 0
+          fetch-depth: 1
 
       - uses: actions/setup-python@v5
         if: steps.meta.outputs.eligible == 'true'
@@ -112,7 +112,7 @@ jobs:
         with:
           ref: ${{ steps.head.outputs.sha }}
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          wait-interval: 30
+          wait-interval: 10
           check-regexp: (cloud-prompt-sync|research-lint|dashboard-integrity)
           allowed-conclusions: success,skipped
 

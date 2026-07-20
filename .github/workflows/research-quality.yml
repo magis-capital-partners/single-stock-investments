@@ -27,9 +27,76 @@ on:
 
 permissions:
   contents: read
+  pull-requests: read
+
+concurrency:
+  group: research-quality-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      prompt_sync: ${{ steps.classify.outputs.prompt_sync }}
+      research_lint: ${{ steps.classify.outputs.research_lint }}
+      dashboard_integrity: ${{ steps.classify.outputs.dashboard_integrity }}
+    steps:
+      - id: classify
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+              per_page: 100,
+            });
+            const names = files.map(file => file.filename);
+            const has = predicate => names.some(predicate);
+            const promptSync = has(name =>
+              name === '_system/prompts/cloud_marvin_runbook.md' ||
+              name === '_system/scripts/check_cloud_marvin_sync.py' ||
+              name === '_system/scripts/marvin_deep_dive.mjs'
+            );
+            const researchLint = has(name =>
+              /(^|\/)research\//.test(name) ||
+              [
+                '_system/scripts/lint_deep_dive.py',
+                '_system/scripts/lint_adversarial.py',
+                '_system/scripts/lint_pr_research.py',
+                '_system/scripts/check_evidence_completeness.py',
+                '_system/scripts/refresh_optionality_valuation.py',
+                '_system/scripts/filing_facts.py',
+              ].includes(name)
+            );
+            const dashboardIntegrity = has(name =>
+              /(^|\/)research\//.test(name) ||
+              [
+                '_system/scripts/build_insights.py',
+                '_system/scripts/validate_dashboard_data.py',
+                '_system/scripts/ci_push_main.sh',
+                '_system/scripts/marvin_cloud_refresh.py',
+                'dashboard/data/insights.json',
+                'docs/data/insights.json',
+              ].includes(name)
+            );
+            core.setOutput('prompt_sync', String(promptSync));
+            core.setOutput('research_lint', String(researchLint));
+            core.setOutput('dashboard_integrity', String(dashboardIntegrity));
+            await core.summary
+              .addHeading('Research-quality plan')
+              .addTable([
+                [{data: 'Check', header: true}, {data: 'Runs', header: true}],
+                ['cloud-prompt-sync', String(promptSync)],
+                ['research-lint', String(researchLint)],
+                ['dashboard-integrity', String(dashboardIntegrity)],
+              ])
+              .write();
+
   cloud-prompt-sync:
+    needs: changes
+    if: needs.changes.outputs.prompt_sync == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -58,6 +125,8 @@ jobs:
         run: python _system/scripts/check_cloud_marvin_sync.py
 
   research-lint:
+    needs: changes
+    if: needs.changes.outputs.research_lint == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -77,8 +146,10 @@ jobs:
             _system/scripts/ci_sparse_checkout_paths.py
           sparse-checkout-cone-mode: false
           fetch-depth: 1
-      - name: Checkout workspace (full history for PR diff)
-        run: bash _system/scripts/ci_checkout_workspace.sh history
+      - name: Checkout workspace (shallow PR diff)
+        run: |
+          bash _system/scripts/ci_checkout_workspace.sh history "" 2
+          git fetch --depth=1 origin "+refs/heads/${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -86,6 +157,8 @@ jobs:
         run: python _system/scripts/lint_pr_research.py --base origin/${{ github.base_ref }}
 
   dashboard-integrity:
+    needs: changes
+    if: needs.changes.outputs.dashboard_integrity == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
