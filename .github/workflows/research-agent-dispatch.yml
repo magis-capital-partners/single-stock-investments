@@ -37,7 +37,9 @@ jobs:
       ticker: ${{ steps.select.outputs.ticker }}
       reason: ${{ steps.select.outputs.reason }}
       skip: ${{ steps.select.outputs.skip }}
+      skip_reason: ${{ steps.select.outputs.skip_reason }}
       evidence_hash: ${{ steps.select.outputs.evidence_hash }}
+      primary_evidence_count: ${{ steps.select.outputs.primary_evidence_count }}
       manifest_json: ${{ steps.select.outputs.manifest_json }}
     steps:
       - uses: actions/checkout@v4
@@ -58,6 +60,7 @@ jobs:
           TICKER_INPUT: ${{ inputs.ticker }}
           REASON_INPUT: ${{ inputs.reason }}
           FORCE_INPUT: ${{ inputs.force }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           ARGS=(--json --require-new)
           if [ -n "$TICKER_INPUT" ]; then ARGS=("$TICKER_INPUT" --json --require-new); fi
@@ -67,20 +70,43 @@ jobs:
           SKIP=$(python -c "import json; print('true' if json.load(open('pick.json')).get('skip') else 'false')")
           PICK_REASON=$(python -c "import json; print(json.load(open('pick.json')).get('reason') or '')")
           if [ -n "$REASON_INPUT" ] && [ -n "$TICKER" ]; then PICK_REASON="$REASON_INPUT"; fi
-          echo "ticker=$TICKER" >> "$GITHUB_OUTPUT"
-          echo "reason=$PICK_REASON" >> "$GITHUB_OUTPUT"
-          echo "skip=$SKIP" >> "$GITHUB_OUTPUT"
           if [ "$SKIP" = "true" ] || [ -z "$TICKER" ]; then
+            echo "ticker=$TICKER" >> "$GITHUB_OUTPUT"
+            echo "reason=$PICK_REASON" >> "$GITHUB_OUTPUT"
+            echo "skip=$SKIP" >> "$GITHUB_OUTPUT"
+            echo "skip_reason=$PICK_REASON" >> "$GITHUB_OUTPUT"
             echo "evidence_hash=" >> "$GITHUB_OUTPUT"
+            echo "primary_evidence_count=0" >> "$GITHUB_OUTPUT"
             echo "manifest_json={}" >> "$GITHUB_OUTPUT"
             cat pick.json
             exit 0
           fi
           python _system/scripts/build_research_agent_manifest.py "$TICKER" --reason "$PICK_REASON" > manifest.json
           HASH=$(python -c "import json; print(json.load(open('manifest.json'))['evidence_hash'])")
+          PRIMARY_COUNT=$(python -c "import json; print(json.load(open('manifest.json'))['artifact_count'])")
           MANIFEST=$(python -c "import json; print(json.dumps(json.load(open('manifest.json')), separators=(',', ':')))")
+          ACTIVE_PR=$(gh pr list --repo "$GITHUB_REPOSITORY" --state open --json number,headRefName,title | python -c 'import json, os, sys; ticker=os.environ["TICKER"].upper(); prs=json.load(sys.stdin); matches=[p for p in prs if p["headRefName"].startswith("cursor/") and (ticker in p["headRefName"].upper() or ticker in p["title"].upper())]; print(matches[0]["number"] if matches else "")')
+          if [ -n "$ACTIVE_PR" ]; then
+            echo "ticker=" >> "$GITHUB_OUTPUT"
+            echo "reason=active_cursor_pr_$ACTIVE_PR" >> "$GITHUB_OUTPUT"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "skip_reason=active_cursor_pr_$ACTIVE_PR" >> "$GITHUB_OUTPUT"
+            echo "evidence_hash=$HASH" >> "$GITHUB_OUTPUT"
+            echo "primary_evidence_count=$PRIMARY_COUNT" >> "$GITHUB_OUTPUT"
+            echo "manifest_json=$MANIFEST" >> "$GITHUB_OUTPUT"
+            echo "### Research dispatch suppressed" >> "$GITHUB_STEP_SUMMARY"
+            echo "Ticker **$TICKER** already has Cursor PR #$ACTIVE_PR open; no overlapping agent run was started." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          echo "ticker=$TICKER" >> "$GITHUB_OUTPUT"
+          echo "reason=$PICK_REASON" >> "$GITHUB_OUTPUT"
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+          echo "skip_reason=" >> "$GITHUB_OUTPUT"
           echo "evidence_hash=$HASH" >> "$GITHUB_OUTPUT"
+          echo "primary_evidence_count=$PRIMARY_COUNT" >> "$GITHUB_OUTPUT"
           echo "manifest_json=$MANIFEST" >> "$GITHUB_OUTPUT"
+          echo "### Research dispatch admitted" >> "$GITHUB_STEP_SUMMARY"
+          echo "Ticker **$TICKER** admitted on primary-evidence fingerprint \`$HASH\` ($PRIMARY_COUNT source record(s))." >> "$GITHUB_STEP_SUMMARY"
           cat manifest.json
 
   research:
@@ -90,7 +116,7 @@ jobs:
     timeout-minutes: 120
     concurrency:
       group: research-agent-${{ needs.select.outputs.ticker }}
-      cancel-in-progress: false
+      cancel-in-progress: true
     env:
       RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
       RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}

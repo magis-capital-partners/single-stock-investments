@@ -82,6 +82,27 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Verify immutable research provenance
+        if: steps.meta.outputs.eligible == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ steps.pr.outputs.number }}
+          REPO: ${{ github.repository }}
+          HEAD_REF: ${{ steps.meta.outputs.head_ref }}
+        run: |
+          mapfile -t TICKERS < <(gh api --paginate "repos/$REPO/pulls/$PR/files" --jq '.[].filename' | sed -nE 's|^([^/]+)/research/research_agent_manifest\.json$|\1|p' | sort -u)
+          if [ "${#TICKERS[@]}" -eq 0 ]; then
+            echo "::error::Cursor research PR must include research_agent_manifest.json."
+            exit 1
+          fi
+          for TICKER in "${TICKERS[@]}"; do
+            MANIFEST="$(mktemp)"
+            STATE="$(mktemp)"
+            gh api "repos/$REPO/contents/$TICKER/research/research_agent_manifest.json?ref=$HEAD_REF" --jq .content | base64 --decode > "$MANIFEST"
+            gh api "repos/$REPO/contents/$TICKER/research/agent_run_state.json?ref=$HEAD_REF" --jq .content | base64 --decode > "$STATE"
+            python _system/scripts/validate_research_pr_provenance.py --ticker "$TICKER" --manifest "$MANIFEST" --state "$STATE"
+          done
+
       - name: Resolve merge conflicts with main
         if: steps.meta.outputs.eligible == 'true'
         id: resolve

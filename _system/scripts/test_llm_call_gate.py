@@ -29,6 +29,18 @@ class LlmCallGateTests(unittest.TestCase):
         )
         self.assertTrue(result["approved"])
 
+    def test_new_evidence_bypasses_subject_cooldown(self):
+        policy = {
+            "default": {"daily_repo_limit": 4, "per_subject_daily_limit": 2},
+            "consumers": {"test": {"cooldown_hours": 24}},
+        }
+        ledger = [{"timestamp": AT.isoformat(), "consumer": "test", "subject": "AAA", "evidence_hash": "a" * 64, "status": "reserved"}]
+        result = evaluate(
+            consumer="test", subject="AAA", reason="material", evidence_hash="b" * 64,
+            policy_doc=policy, ledger=ledger, at=AT.replace(hour=13),
+        )
+        self.assertTrue(result["approved"])
+
     def test_daily_budget_counts_reservations_not_completion_events(self):
         ledger = [
             {"timestamp": AT.isoformat(), "consumer": "test", "subject": "AAA", "evidence_hash": "a" * 64, "status": "reserved"},

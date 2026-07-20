@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build a stable, small evidence manifest for one research-agent decision."""
+"""Build a stable primary-evidence manifest for one research-agent decision."""
 from __future__ import annotations
 
 import argparse
@@ -10,52 +10,76 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 
 
+VOLATILE_KEYS = {
+    "generated_at",
+    "updated_at",
+    "created_at",
+    "downloaded_at",
+    "fetched_at",
+    "refreshed_at",
+    "timestamp",
+    "run_id",
+    "run_attempt",
+}
+
+
 def candidates(ticker: str) -> list[Path]:
+    """Return only documents that can authorize a new research judgment call.
+
+    Derived valuation, narrative, queue, chart, and scan artifacts are excluded
+    deliberately: refreshes rewrite them even when no new primary evidence exists.
+    """
     base = ROOT / ticker.upper()
-    fixed = [
-        base / "INDEX.csv",
+    primary = [
         base / "investor-documents" / "DOWNLOAD_MANIFEST.json",
-        base / "investor-documents" / "ir_adapter.json",
-        base / "research" / "evidence_refresh.json",
-        base / "research" / "news_refresh.json",
-        base / "research" / "valuation_route.json",
-        base / "research" / "valuation_contract.json",
-        base / "research" / "valuation_workbench.json",
-        base / "research" / "evidence_task_queue.json",
-        base / "research" / "committee_trigger.json",
+        base / "investor-documents" / "TRANSCRIPT_MANIFEST.json",
+        base / "research" / "authorized_evidence.json",
     ]
-    globs = [
-        base / "research" / "evidence",
-        base / "third-party-analyses",
-    ]
-    rows = [path for path in fixed if path.is_file()]
-    for directory in globs:
-        if not directory.is_dir():
-            continue
-        matches = [path for path in directory.rglob("*.json") if path.is_file()]
-        rows.extend(sorted(matches, key=lambda p: p.as_posix())[-20:])
-    return sorted(set(rows), key=lambda p: p.as_posix())
+    return [path for path in primary if path.is_file()]
+
+
+def normalized_value(value):
+    """Remove refresh metadata and canonicalize primary-evidence records."""
+    if isinstance(value, dict):
+        return {
+            str(key): normalized_value(child)
+            for key, child in sorted(value.items())
+            if str(key).lower() not in VOLATILE_KEYS
+        }
+    if isinstance(value, list):
+        normalized = [normalized_value(child) for child in value]
+        return sorted(normalized, key=lambda child: json.dumps(child, sort_keys=True, separators=(",", ":")))
+    return value
+
+
+def evidence_reference(path: Path) -> dict:
+    raw = path.read_bytes()
+    try:
+        normalized = normalized_value(json.loads(raw))
+        digest_source = json.dumps(normalized, sort_keys=True, separators=(",", ":")).encode()
+    except json.JSONDecodeError:
+        digest_source = raw
+    return {
+        "path": path.relative_to(ROOT).as_posix(),
+        "sha256": hashlib.sha256(digest_source).hexdigest(),
+        "bytes": len(raw),
+    }
 
 
 def build_manifest(ticker: str, reason: str) -> dict:
     refs = []
     for path in candidates(ticker):
-        raw = path.read_bytes()
-        refs.append({
-            "path": path.relative_to(ROOT).as_posix(),
-            "sha256": hashlib.sha256(raw).hexdigest(),
-            "bytes": len(raw),
-        })
+        refs.append(evidence_reference(path))
     canonical_evidence = {"ticker": ticker.upper(), "evidence": refs}
     evidence_hash = hashlib.sha256(json.dumps(canonical_evidence, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
     return {
-        "schema_version": "1.0",
+        "schema_version": "2.0",
         **canonical_evidence,
         "reason": reason,
         "evidence_hash": evidence_hash,
         "artifact_count": len(refs),
         "ready": bool(refs),
-        "decision_context_ready": any(ref["path"].endswith(("valuation_workbench.json", "evidence_task_queue.json")) for ref in refs),
+        "primary_evidence_ready": bool(refs),
     }
 
 

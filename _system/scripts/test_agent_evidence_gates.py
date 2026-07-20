@@ -32,6 +32,44 @@ class AgentEvidenceGateTests(unittest.TestCase):
         self.assertTrue(first["ready"])
         self.assertEqual(first["evidence_hash"], second["evidence_hash"])
 
+    def test_generated_refresh_artifacts_do_not_change_primary_evidence_hash(self):
+        self.write("AAA/investor-documents/DOWNLOAD_MANIFEST.json", [{"accession": "0001"}])
+        with patch.object(build_research_agent_manifest, "ROOT", self.root):
+            first = build_research_agent_manifest.build_manifest("AAA", "new_documents")
+        self.write("AAA/research/valuation_route.json", {"generated_at": "2026-07-20T00:00:00Z"})
+        self.write("AAA/research/valuation_workbench.json", {"generated_at": "2026-07-20T00:00:00Z"})
+        self.write("AAA/research/evidence_task_queue.json", {"items": ["refresh"]})
+        with patch.object(build_research_agent_manifest, "ROOT", self.root):
+            second = build_research_agent_manifest.build_manifest("AAA", "new_documents")
+        self.assertEqual(first["evidence_hash"], second["evidence_hash"])
+
+    def test_manifest_refresh_timestamp_does_not_change_primary_evidence_hash(self):
+        self.write(
+            "AAA/investor-documents/DOWNLOAD_MANIFEST.json",
+            [{"accession": "0001", "generated_at": "2026-07-20T00:00:00Z"}],
+        )
+        with patch.object(build_research_agent_manifest, "ROOT", self.root):
+            first = build_research_agent_manifest.build_manifest("AAA", "new_documents")
+        self.write(
+            "AAA/investor-documents/DOWNLOAD_MANIFEST.json",
+            [{"accession": "0001", "generated_at": "2026-07-20T01:00:00Z"}],
+        )
+        with patch.object(build_research_agent_manifest, "ROOT", self.root):
+            second = build_research_agent_manifest.build_manifest("AAA", "new_documents")
+        self.assertEqual(first["evidence_hash"], second["evidence_hash"])
+
+    def test_new_primary_document_changes_evidence_hash(self):
+        self.write("AAA/investor-documents/DOWNLOAD_MANIFEST.json", [{"accession": "0001"}])
+        with patch.object(build_research_agent_manifest, "ROOT", self.root):
+            first = build_research_agent_manifest.build_manifest("AAA", "new_documents")
+        self.write(
+            "AAA/investor-documents/DOWNLOAD_MANIFEST.json",
+            [{"accession": "0001"}, {"accession": "0002"}],
+        )
+        with patch.object(build_research_agent_manifest, "ROOT", self.root):
+            second = build_research_agent_manifest.build_manifest("AAA", "new_documents")
+        self.assertNotEqual(first["evidence_hash"], second["evidence_hash"])
+
     def test_working_ir_adapter_suppresses_vicki(self):
         self.write("AAA/.onboard_status.json", {"download_detail": "ir_gap"})
         self.write("AAA/investor-documents/ir_adapter.json", {"deterministic_status": "working"})

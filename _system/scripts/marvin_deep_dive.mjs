@@ -64,6 +64,12 @@ restrict exploration to its changed evidence plus existing decision artifacts.
 Routine routing, arithmetic, pricing, committee assembly, and dashboard work are
 owned by deterministic scripts. Do not spend judgment time recreating them.
 
+Before opening the PR, you MUST run the supplied refresh command with its cloud
+environment intact and commit both \`${ticker}/research/research_agent_manifest.json\`
+and \`${ticker}/research/agent_run_state.json\`. The state file must carry this exact
+evidence hash. These two files are required provenance for automatic merge; do not
+replace them with generated timestamps or a new fingerprint.
+
 Evidence manifest:
 \`\`\`json
 ${evidenceManifestJson || "{}"}

@@ -141,7 +141,14 @@ def evaluate(
         return {**base, "decision": "suppressed", "gate_reason": "per_subject_daily_limit"}
 
     cooldown = timedelta(hours=float(config.get("cooldown_hours") or 0))
-    completed_times = [parse_time(row.get("timestamp")) for row in same if row.get("status") in BUDGET_STATUSES]
+    # A new primary-evidence fingerprint is a new decision event. Cooldown
+    # only guards retries of that same evidence; it must never strand a ticker
+    # when a new filing or explicitly authorized packet arrives.
+    completed_times = [
+        parse_time(row.get("timestamp"))
+        for row in same
+        if row.get("status") in BUDGET_STATUSES and row.get("evidence_hash") == evidence_hash
+    ]
     completed_times = [value for value in completed_times if value]
     if cooldown and completed_times and at - max(completed_times) < cooldown and not force:
         return {**base, "decision": "suppressed", "gate_reason": "subject_cooldown"}
