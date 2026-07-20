@@ -274,6 +274,8 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-20.
 | EVRG | EVRG/ | Evergy | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | EW | EW/ | Edwards Lifesciences | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | EWJ | EWJ/ | EWJ | US | — | 2026-07-20 | unknown | watch |
+| EWW | EWW/ | EWW | US | — | 2026-07-20 | unknown | watch |
+| EWY | EWY/ | EWY | US | — | 2026-07-20 | unknown | watch |
 | EXC | EXC/ | Exelon | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | EXE | EXE/ | Expand Energy | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | EXPD | EXPD/ | Expeditors International | US | 2026-07-09 | 2026-07-20 | unknown | watch |
@@ -289,6 +291,8 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-20.
 | FE | FE/ | FirstEnergy | US | 2026-07-10 | 2026-07-20 | unknown | watch |
 | FFIV | FFIV/ | F5, Inc. | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | FICO | FICO/ | Fair Isaac | US | 2026-07-09 | 2026-07-20 | unknown | watch |
+| FIG | FIG/ | FIG | US | — | 2026-07-20 | unknown | watch |
+| FIGR | FIGR/ | FIGR | US | — | 2026-07-20 | unknown | watch |
 | FIHO12.MX | FIHO12.MX/ | FibraHotel (Concentradora Fibra Hotelera Mexicana) | EU | — | 2026-07-20 | unknown | watch |
 | FIS | FIS/ | Fidelity National Information Services | US | 2026-07-10 | 2026-07-20 | unknown | watch |
 | FISV | FISV/ | Fiserv | US | 2026-07-10 | 2026-07-20 | unknown | watch |
@@ -700,4 +704,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-20.
 | ZBRA | ZBRA/ | Zebra Technologies | US | 2026-07-10 | 2026-07-20 | unknown | watch |
 | ZTS | ZTS/ | Zoetis | US | 2026-07-10 | 2026-07-20 | unknown | watch |
 
-**693 holdings total.** Registry: `_system/portfolio/registry.json`
+**697 holdings total.** Registry: `_system/portfolio/registry.json`
