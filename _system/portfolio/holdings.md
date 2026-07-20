@@ -84,7 +84,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-20.
 | AWK | AWK/ | American Water Works | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | AXON | AXON/ | Axon Enterprise, Inc. | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | AXP | AXP/ | American Express | US | 2026-07-09 | 2026-07-20 | unknown | watch |
-| AXTI | AXTI/ | AXTI | US | — | 2026-07-20 | unknown | watch |
+| AXTI | AXTI/ | AXTI | US | — | 2026-07-20 | cyclical | watch |
 | AZLCZ | AZLCZ/ | Aztec Land and Cattle Company | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | AZO | AZO/ | AutoZone | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | B | B/ | Barrick Mining Corporation | US | 2026-07-09 | 2026-07-20 | unknown | watch |
@@ -180,11 +180,15 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-20.
 | COPX | COPX/ | COPX | US | — | 2026-07-20 | unknown | watch |
 | COR | COR/ | Cencora | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | CORBF | CORBF/ | Corbus Pharmaceuticals Holdings, Inc. | US | 2026-07-09 | 2026-07-20 | unknown | watch |
+| CORZ | CORZ/ | CORZ | US | — | 2026-07-20 | unknown | watch |
 | COST | COST/ | Costco | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | CPAY | CPAY/ | Corpay | US | 2026-07-09 | 2026-07-20 | unknown | watch |
+| CPNG | CPNG/ | CPNG | US | — | 2026-07-20 | unknown | watch |
 | CPRT | CPRT/ | Copart | US | 2026-07-09 | 2026-07-20 | compounder | core |
 | CPT | CPT/ | Camden Property Trust | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | CRCL | CRCL/ | Circle Internet Group, Inc. | US | 2026-07-09 | 2026-07-20 | unknown | watch |
+| CRDD | CRDD/ | CRDD | US | — | 2026-07-20 | unknown | watch |
+| CRDO | CRDO/ | CRDO | US | — | 2026-07-20 | unknown | watch |
 | CRH | CRH/ | CRH plc | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | CRL | CRL/ | Charles River Laboratories | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | CRM | CRM/ | Salesforce | US | 2026-07-10 | 2026-07-20 | unknown | watch |
@@ -684,4 +688,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-20.
 | ZBRA | ZBRA/ | Zebra Technologies | US | 2026-07-10 | 2026-07-20 | unknown | watch |
 | ZTS | ZTS/ | Zoetis | US | 2026-07-10 | 2026-07-20 | unknown | watch |
 
-**677 holdings total.** Registry: `_system/portfolio/registry.json`
+**681 holdings total.** Registry: `_system/portfolio/registry.json`
