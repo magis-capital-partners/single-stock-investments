@@ -52,7 +52,6 @@ apply_sparse_paths() {
     echo "_system"
     echo ".github"
     echo "dashboard"
-    echo "docs"
     python3 "$SCRIPT_DIR/ci_sparse_checkout_paths.py" "$PROFILE"
   } >"$paths_file"
   local count
@@ -77,14 +76,14 @@ case "$PROFILE" in
     ;;
   pages)
     git sparse-checkout init --no-cone
-    git sparse-checkout set _system .github dashboard docs
+    git sparse-checkout set _system .github dashboard
     git fetch --depth="$FETCH_DEPTH" --filter=blob:none origin "$REF"
     checkout_ref
     ;;
   news|marvin-pick|darwin|dashboard)
     git sparse-checkout init --no-cone
     # Seed with base dirs so fetch can resolve scripts before path list runs.
-    git sparse-checkout set _system .github dashboard docs
+    git sparse-checkout set _system .github dashboard
     git fetch --depth="$FETCH_DEPTH" --filter=blob:none origin "$REF"
     checkout_ref
     apply_sparse_paths

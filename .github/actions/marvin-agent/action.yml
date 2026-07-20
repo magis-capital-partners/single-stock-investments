@@ -75,12 +75,21 @@ runs:
       working-directory: _system/scripts
       run: npm ci --ignore-scripts
 
+    - name: Resolve model from ladder
+      id: model
+      if: steps.llm_gate.outputs.approved == 'true'
+      shell: bash
+      run: |
+        python _system/scripts/llm_call_gate.py model \
+          --consumer marvin_research --reason "${{ inputs.pick_reason }}"
+
     - name: Run Marvin deep dive
       id: agent
       if: steps.llm_gate.outputs.approved == 'true'
       shell: bash
       env:
         CURSOR_API_KEY: ${{ env.CURSOR_API_KEY }}
+        CURSOR_MODEL_ID: ${{ steps.model.outputs.model }}
         HK_PDFS_ROOT: ${{ env.HK_PDFS_ROOT }}
         TICKER: ${{ inputs.ticker }}
         PICK_REASON: ${{ inputs.pick_reason }}

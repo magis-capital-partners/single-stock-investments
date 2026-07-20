@@ -69,7 +69,7 @@ jobs:
       RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
       RESEARCH_VAULT_ROOT: _external/research-vault
     steps:
-      - uses: jlumbroso/free-disk-space@main
+      - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
         with:
           tool-cache: false
           android: true
@@ -98,7 +98,6 @@ jobs:
           GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
         with:
           profile: full
-          mirror_docs: "true"
           validate: "true"
       - name: Commit artifacts
         uses: ./.github/actions/commit-main
@@ -118,7 +117,7 @@ jobs:
       RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
       RESEARCH_VAULT_ROOT: _external/research-vault
     steps:
-      - uses: jlumbroso/free-disk-space@main
+      - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
         with:
           tool-cache: false
           android: true
@@ -156,7 +155,6 @@ jobs:
           OAUTH_PROXY_URL: ${{ vars.OAUTH_PROXY_URL }}
         with:
           profile: activist
-          mirror_docs: "true"
           validate: "true"
       - name: Commit artifacts
         uses: ./.github/actions/commit-main
@@ -174,7 +172,7 @@ jobs:
       group: data-commit-main
       cancel-in-progress: false
     steps:
-      - uses: jlumbroso/free-disk-space@main
+      - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
         with:
           tool-cache: false
           android: true
@@ -229,7 +227,7 @@ jobs:
       RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
       RESEARCH_VAULT_ROOT: _external/research-vault
     steps:
-      - uses: jlumbroso/free-disk-space@main
+      - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
         with:
           tool-cache: false
           android: true
@@ -295,7 +293,6 @@ jobs:
           OAUTH_PROXY_URL: ${{ vars.OAUTH_PROXY_URL }}
         with:
           profile: insights
-          mirror_docs: "true"
           validate: "true"
       - name: Commit imported documents
         if: steps.google_creds.outputs.configured == 'true' && steps.import.outputs.imported != '0'
@@ -341,7 +338,7 @@ jobs:
         run: python ingest_portfolio_news.py
       - name: Commit news artifacts
         run: |
-          git add dashboard/data/portfolio_news.json docs/data/portfolio_news.json _system/data/news_seen.json _system/reviews/pending/news_*.md
+          git add dashboard/data/portfolio_news.json _system/data/news_seen.json _system/reviews/pending/news_*.md
           git add '*/research/news/news_index.json' 2>/dev/null || true
           bash _system/scripts/ci_push_main.sh "chore: refresh portfolio news $(date -u +%Y-%m-%d)"
 

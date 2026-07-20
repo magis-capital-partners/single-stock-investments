@@ -27,6 +27,9 @@ MIN_TOTAL_PDFS_FLOOR = 100
 MIN_RESEARCH_DIR_RATIO = 0.10
 GITHUB_HARD_LIMIT_BYTES = 100 * 1024 * 1024
 GITHUB_WARN_LIMIT_BYTES = 50 * 1024 * 1024
+# Sharded payload budgets: keep first paint fast as the universe grows.
+CORE_MAX_MB = 6.0
+TICKER_SHARD_MAX_MB = 2.0
 
 
 def sparse_checkout_enabled(root: Path = ROOT) -> bool:
@@ -663,6 +666,48 @@ def main() -> int:
             errors.append("advantaged_banks_screener.json is invalid JSON")
     else:
         warnings.append("missing dashboard/data/advantaged_banks_screener.json")
+
+    # --- Sharded payload gates (speed budget) --------------------------------
+    # core.json is the SPA boot payload; keep it small so first paint stays
+    # fast as the ticker universe grows. Ticker/insight shards are lazy.
+    core_path = ROOT / "dashboard" / "data" / "core.json"
+    tickers_dir = ROOT / "dashboard" / "data" / "tickers"
+    insights_dir = ROOT / "dashboard" / "data" / "insights"
+    if core_path.exists():
+        core_mb = core_path.stat().st_size / 1e6
+        if core_mb > CORE_MAX_MB:
+            errors.append(
+                f"core.json is {core_mb:.2f} MB (budget {CORE_MAX_MB} MB) - "
+                "slim rows further in build_dashboard_shards.py"
+            )
+        try:
+            core_doc = json.loads(core_path.read_text(encoding="utf-8"))
+            core_count = len(core_doc.get("tickers") or [])
+            if core_count != len(rows):
+                errors.append(
+                    f"core.json has {core_count} tickers vs dashboard_data.json {len(rows)} - rerun build"
+                )
+        except json.JSONDecodeError:
+            errors.append("core.json is invalid JSON")
+        if tickers_dir.exists():
+            shard_files = list(tickers_dir.glob("*.json"))
+            if len(shard_files) < len(rows):
+                warnings.append(
+                    f"only {len(shard_files)} ticker shards for {len(rows)} rows - rerun build"
+                )
+            oversize = [
+                f.name for f in shard_files if f.stat().st_size / 1e6 > TICKER_SHARD_MAX_MB
+            ]
+            if oversize:
+                errors.append(
+                    f"ticker shards over {TICKER_SHARD_MAX_MB} MB: {', '.join(sorted(oversize)[:5])}"
+                )
+        else:
+            errors.append("core.json exists but dashboard/data/tickers/ missing")
+        if not (insights_dir / "manifest.json").exists():
+            warnings.append("dashboard/data/insights/manifest.json missing - insights tab will not lazy-load")
+    else:
+        warnings.append("dashboard/data/core.json missing - SPA falls back to monolithic payload")
 
     for msg in warnings:
         print(f"WARN: {msg}")

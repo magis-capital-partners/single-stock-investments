@@ -5,10 +5,6 @@ inputs:
   profile:
     description: full|intake-full|activist|darwin|darwin-full|insights|pages-fast|minimal|none
     required: true
-  mirror_docs:
-    description: Mirror dashboard/ to docs/ after rebuild
-    required: false
-    default: "false"
   validate:
     description: Run validate_dashboard_data.py
     required: false
@@ -65,11 +61,6 @@ runs:
         OAUTH_CLIENT_ID: ${{ env.OAUTH_CLIENT_ID }}
         OAUTH_PROXY_URL: ${{ env.OAUTH_PROXY_URL }}
       run: python _system/scripts/ci_rebuild_profile.py "${{ inputs.profile }}"
-
-    - name: Mirror dashboard to docs
-      if: inputs.mirror_docs == 'true'
-      shell: bash
-      run: rsync -a --delete --exclude '.git' --exclude '.wrangler' dashboard/ docs/
 
     - name: Validate dashboard JSON
       if: inputs.validate == 'true'

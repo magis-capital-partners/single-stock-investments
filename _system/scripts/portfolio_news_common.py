@@ -12,7 +12,6 @@ from typing import Iterable
 ROOT = Path(__file__).resolve().parents[2]
 REGISTRY_PATH = ROOT / "_system" / "portfolio" / "registry.json"
 PORTFOLIO_NEWS_PATH = ROOT / "dashboard" / "data" / "portfolio_news.json"
-DOCS_PORTFOLIO_NEWS_PATH = ROOT / "docs" / "data" / "portfolio_news.json"
 NEWS_SEEN_PATH = ROOT / "_system" / "data" / "news_seen.json"
 
 POLICY_VERSION = 4

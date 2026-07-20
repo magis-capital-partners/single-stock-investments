@@ -2812,6 +2812,9 @@ def main() -> None:
     OUTPUT.write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
     write_oauth_config()
     print(f"Wrote {OUTPUT} ({payload['summary']['ticker_count']} tickers)")
+    from build_dashboard_shards import write_shards
+
+    write_shards(payload, insights_doc, DATA_DIR)
 
 
 if __name__ == "__main__":

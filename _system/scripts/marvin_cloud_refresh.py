@@ -344,6 +344,12 @@ def main() -> int:
         optional=True,
     )
     ok &= run_script(
+        "thesis card",
+        "build_thesis_card.py",
+        [ticker],
+        optional=True,
+    )
+    ok &= run_script(
         "persona lenses",
         "persona_lens.py",
         [ticker],

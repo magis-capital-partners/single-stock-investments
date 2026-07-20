@@ -14,6 +14,7 @@ Data Pipeline
   └─ every 6 hours     portfolio news
              │
              ├─ successful downloads → Auto - Daily Research (≤1 research call)
+             ├─ successful downloads → LS-algo Universe Intake (onboard + evidence)
              └─ successful downloads → Power Zone Universe
                                            │
                                            └─ committee_work change
@@ -26,7 +27,7 @@ Data Pipeline
 Relevant data commits → Deploy Dashboard
 IR failure queue       → Auto - IR Recovery (≤2 parallel)
 Repeated CI failure    → Auto - CI Repair (notify-first)
-Dashboard add holding  → repository event → Auto - Onboard Ticker
+New tickers            → LS-algo Universe Intake (registry-driven onboarding)
 ```
 
 ## Visible workflow ownership
@@ -37,14 +38,14 @@ Dashboard add holding  → repository event → Auto - Onboard Ticker
 | Auto - Daily Research | successful Data Pipeline download job | Admit one material evidence change |
 | Auto - Research Queue | queue file change | Serial queued research |
 | Research Agent Dispatcher | reusable only | Evidence manifest, token gate, research PR |
-| Power Zone Universe | successful downloads; Monday fallback; authenticated API event | Canonical valuation route, contract, workbench, pricing, committee initialization |
-| Auto - Investment Committee | committee packet/output change | Independent votes, conditional escalation, deterministic assembly |
+| Power Zone Universe | successful downloads; Monday fallback; authenticated API event | Canonical valuation route, contract, workbench, pricing, committee initialization (sole owner of the valuation pipeline) |
+| LS-algo Universe Intake | daily 02:45; successful downloads; dispatch | LS-algo screener onboard, evidence recovery, registry derivatives |
+| Auto - Investment Committee | committee packet/output change; 4-hourly sweep | Independent votes, conditional escalation, deterministic assembly |
 | Auto - Agent PR Merge | Cursor PR events | Wait for research checks, resolve allowed conflicts, squash merge |
 | Auto - IR Recovery | IR queue change | Exception-only browser adapter repair |
-| Auto - Onboard Ticker | authenticated dashboard event | Deterministic scaffold/download then gated research |
-| Darwin Portfolio Refresh | weekly and Darwin code changes | Full Darwin data rebuild |
-| Darwin Research Snapshot | weekday schedule | Compact Darwin research contract |
-| Letter Backfill | Sunday schedule | Import letters and rebuild insights |
+| Darwin Portfolio Refresh | weekday 01:20 and Darwin code changes | Full Darwin data rebuild (includes research snapshot) |
+| Letter Backfill | Sunday 16:00 | Import letters and rebuild insights |
+| Memory Digest | Sunday 14:00 | Aggregate unpromoted [PROPOSED] bullets + corrections into one pending review |
 | Deploy Dashboard | relevant push or successful upstream run | Validate and publish Pages |
 | Deploy OAuth Proxy | OAuth source change | Deploy Cloudflare worker when configured |
 | Research quality (PR) | research PR paths | Prompt sync and research lint |
@@ -73,6 +74,6 @@ GitHub-managed Dependency Graph and Pages build/deployment can also appear in th
 | `minimal` / `marvin-agent` | `_system`, `.github` | agents and utilities |
 | `news` / `marvin-pick` | base plus holdings research metadata | news and evidence selection |
 | `darwin` / `dashboard` | base only; zero ticker trees | Darwin and dashboard rebuild |
-| `pages` | `_system`, `.github`, `dashboard`, `docs` | deploy-only |
+| `pages` | `_system`, `.github`, `dashboard` | deploy-only |
 
 Sparse ticker paths are applied once with `git sparse-checkout set --stdin`. Darwin/dashboard profiles have a hard cap of 200 extra paths.

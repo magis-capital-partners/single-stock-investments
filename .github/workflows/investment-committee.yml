@@ -4,7 +4,9 @@ name: Auto - Investment Committee
 # changes that tree and automatically advances the next stage.
 on:
   schedule:
-    - cron: "17 * * * *"
+    # Safety-net sweep every 4h; the repository_dispatch chain
+    # (automerge -> advance-investment-committee) provides responsiveness.
+    - cron: "17 */4 * * *"
   repository_dispatch:
     types: [advance-investment-committee]
   push:
@@ -105,11 +107,18 @@ jobs:
       - working-directory: _system/scripts
         if: steps.llm_gate.outputs.approved == 'true'
         run: npm ci --ignore-scripts
+      - name: Resolve model from ladder
+        id: model
+        if: steps.llm_gate.outputs.approved == 'true'
+        run: |
+          python _system/scripts/llm_call_gate.py model \
+            --consumer investment_committee --task-id "${{ matrix.task_id }}"
       - name: Run isolated committee task
         id: agent
         if: steps.llm_gate.outputs.approved == 'true'
         env:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
+          CURSOR_MODEL_ID: ${{ steps.model.outputs.model }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           CURSOR_STARTING_REF: main
           TICKER: ${{ matrix.ticker }}
@@ -148,7 +157,6 @@ jobs:
           sparse-checkout: |
             _system
             dashboard/data
-            docs/data
             ${{ needs.prepare.outputs.ticker }}/research
       - uses: actions/setup-python@v5
         with:
@@ -169,7 +177,7 @@ jobs:
           git add "${{ needs.prepare.outputs.ticker }}/research/committee_${{ needs.prepare.outputs.committee_date }}.json" \
                   "${{ needs.prepare.outputs.ticker }}/research/committee_work/${{ needs.prepare.outputs.committee_date }}/manifest.json" \
                   "${{ needs.prepare.outputs.ticker }}/research/valuation_workbench.json" \
-                  dashboard/data/dashboard_data.json docs/data/dashboard_data.json
+                  dashboard/data/dashboard_data.json
           git commit -m "feat(ic): assemble ${{ needs.prepare.outputs.ticker }} committee ${{ needs.prepare.outputs.committee_date }}"
           git push origin HEAD:main
           gh api --method POST "repos/${{ github.repository }}/dispatches" \

@@ -64,7 +64,6 @@ jobs:
             /.github/workflows/**
             /_system/**
             /dashboard/**
-            /docs/**
             /*/research/**
 
       - uses: actions/setup-python@v5
@@ -111,8 +110,7 @@ jobs:
                          '_system/reviews/pending/power_zone_universe_run_*.json' \
                          dashboard/data/valuation_method_registry.json \
                          dashboard/data/power_zones.json \
-                         dashboard/data/dashboard_data.json \
-                         docs/data/dashboard_data.json
+                         dashboard/data/dashboard_data.json
           while IFS= read -r -d '' path; do
             git add -A -- "$path"
           done < <(find . -mindepth 3 -maxdepth 3 -type d -path './*/research/committee_work' -print0)

@@ -7,7 +7,6 @@ on:
       # Deploy-only / light rebuild when committed dashboard or deploy scripts change.
       # Heavy research/data rebuilds happen in Data Pipeline before workflow_run deploy.
       - "dashboard/**"
-      - "docs/**"
       - "_system/scripts/build_dashboard_data.py"
       - "_system/scripts/validate_dashboard_data.py"
       - "_system/scripts/ci_dashboard_deploy_mode.sh"
@@ -153,7 +152,7 @@ jobs:
         run: |
           bash _system/scripts/ci_dashboard_deploy_mode.sh
           echo "Deploy mode: $(cat "$GITHUB_OUTPUT")"
-      - uses: jlumbroso/free-disk-space@main
+      - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
         if: steps.mode.outputs.needs_disk_cleanup == 'true'
         with:
           tool-cache: false

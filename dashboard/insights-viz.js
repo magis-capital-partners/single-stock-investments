@@ -575,167 +575,7 @@
       return `<p class="subhead">No letters indexed for ${escapeHtml(period.label)}. `
         + `${latestLabel ? `<button type="button" class="linkish" data-use-latest-quarter>Use ${escapeHtml(latestLabel)}</button> instead.` : ''}</p>`;
     }
-    if (activeSection === 'themes') {
-      if (!emptyForPeriod) {
-        return '<p class="subhead">No superinvestor letter themes yet — run make persona-fetch-letters</p>';
-      }
-      return `<p class="subhead">No themes indexed for ${escapeHtml(period.label)}. `
-        + `<button type="button" class="linkish" data-use-latest-quarter>Use ${escapeHtml(latestLabel)}</button> instead, `
-        + `or open <strong>Letters</strong> for catalog-only PDFs.</p>`;
-    }
     return `<p class="subhead">No data for ${escapeHtml(period?.label || 'this period')}.</p>`;
-  }
-
-  function themeSentimentBar(row) {
-    const bull = Number(row.bullish || 0);
-    const bear = Number(row.bearish || 0);
-    const neutral = Number(row.neutral || 0);
-    const total = bull + bear + neutral;
-    if (!total) return '<span class="mono" style="color:var(--text-muted)">—</span>';
-    const bp = Math.round((bull / total) * 100);
-    const brp = Math.round((bear / total) * 100);
-    const np = 100 - bp - brp;
-    return `<span style="display:inline-flex;width:72px;height:8px;border-radius:4px;overflow:hidden;background:var(--border-subtle,#333)" title="bull ${bull} · bear ${bear} · neutral ${neutral}">
-      <span style="width:${bp}%;background:var(--accent-green,#4ade80)"></span>
-      <span style="width:${brp}%;background:var(--accent-red,#f87171)"></span>
-      <span style="width:${np}%;background:var(--text-muted,#666)"></span>
-    </span>`;
-  }
-
-  function filterThemesBySearch(themes, search) {
-    if (!search) return themes || [];
-    const q = String(search).trim().toLowerCase();
-    if (!q) return themes || [];
-    return (themes || []).filter(t => String(t.theme || '').toLowerCase().includes(q));
-  }
-
-  function themeQoqForPeriod(themeQoqByQ, period) {
-    if (!themeQoqByQ || !period || period.all || period.quarters?.length !== 1) return null;
-    return themeQoqByQ[period.quarters[0]] || null;
-  }
-
-  function renderThemeMomentum(shifts, priorLabel, escapeHtml, opts) {
-    const { search } = opts || {};
-    let rows = shifts || [];
-    if (search) {
-      const q = String(search).trim().toLowerCase();
-      rows = rows.filter(r => String(r.theme || '').toLowerCase().includes(q));
-    }
-    if (!rows.length) {
-      return '<p class="subhead">No quarter-over-quarter theme shifts for this period.</p>';
-    }
-    return `
-      <p class="tier-sub" style="margin-bottom:8px">Fund-count change vs ${escapeHtml(priorLabel || 'prior quarter')} — macro momentum only (ticker shifts live in <strong>Consensus</strong>).</p>
-      <table class="darwin-table" id="insights-theme-momentum-table">
-        <thead><tr><th>Theme</th><th>Funds</th><th>Δ funds</th><th>Δ bull</th><th>Δ bear</th><th>Top tickers</th><th></th></tr></thead>
-        <tbody>
-          ${rows.slice(0, 40).map(r => `
-            <tr>
-              <td><button type="button" class="linkish" data-theme-drill="${escapeHtml(r.theme)}">${escapeHtml(r.theme)}</button></td>
-              <td class="mono">${r.fund_count || 0}</td>
-              <td>${formatConsensusDelta(r.delta_funds)}</td>
-              <td>${formatConsensusDelta(r.delta_bullish)}</td>
-              <td>${formatConsensusDelta(r.delta_bearish)}</td>
-              <td class="mono" style="font-size:11px">${(r.top_tickers || []).slice(0, 5).join(', ') || '—'}</td>
-              <td><button type="button" class="linkish" data-theme-drill="${escapeHtml(r.theme)}" style="font-size:11px">Letters</button></td>
-            </tr>`).join('')}
-        </tbody>
-      </table>`;
-  }
-
-  function renderThemeRankings(themes, escapeHtml, opts) {
-    const { period, timeModel, viewMode = 'snapshot', themeQoq = null, search = '', glossary = null } = opts || {};
-    const viewTabs = [
-      { id: 'snapshot', label: 'Snapshot' },
-      { id: 'momentum', label: 'Momentum' },
-    ];
-    const tabNav = `<nav class="view-tabs" id="insights-theme-view-tabs" style="margin-bottom:10px">
-      ${viewTabs.map(t => `<button type="button" class="view-tab${viewMode === t.id ? ' active' : ''}" data-theme-view-mode="${t.id}">${t.label}</button>`).join('')}
-    </nav>`;
-
-    if (viewMode === 'momentum') {
-      const qoq = themeQoq;
-      if (!qoq?.shifts?.length) {
-        return tabNav + '<p class="subhead">Momentum view needs a single indexed quarter (try <strong>Latest</strong> or a specific Q).</p>';
-      }
-      return tabNav + renderThemeMomentum(qoq.shifts, quarterLabel(qoq.prior_quarter), escapeHtml, { search });
-    }
-
-    const filtered = filterThemesBySearch(themes, search);
-    if (!filtered?.length) {
-      return tabNav + renderPeriodEmptyState('themes', period, timeModel, escapeHtml);
-    }
-    const glossaryMap = glossary || {};
-    return `
-      ${tabNav}
-      <p class="tier-sub" style="margin-bottom:10px">
-        Macro themes from letter extractions — frequency and stance mix.
-        Ticker agreement: <strong>Consensus</strong>. Source letters: <strong>Letters</strong>.
-      </p>
-      <table class="darwin-table" id="insights-theme-table">
-        <thead><tr><th>Theme</th><th>Funds</th><th>Sentiment</th><th>Bull</th><th>Bear</th><th>Neutral</th><th>Top tickers</th><th></th></tr></thead>
-        <tbody>
-          ${filtered.map(t => {
-            const kw = (glossaryMap[t.theme] || []).slice(0, 4).join(', ');
-            const title = kw ? ` title="${escapeHtml(kw)}"` : '';
-            return `
-            <tr>
-              <td><button type="button" class="linkish" data-theme-drill="${escapeHtml(t.theme)}"${title}>${escapeHtml(t.theme)}</button></td>
-              <td class="mono">${t.letter_count ?? t.fund_count ?? 0}</td>
-              <td>${themeSentimentBar(t)}</td>
-              <td>${t.bullish || 0}</td>
-              <td>${t.bearish || 0}</td>
-              <td>${t.neutral || 0}</td>
-              <td class="mono" style="font-size:11px">${(t.top_tickers || []).slice(0, 6).join(', ') || '—'}</td>
-              <td><button type="button" class="linkish" data-theme-drill="${escapeHtml(t.theme)}" style="font-size:11px">Letters</button></td>
-            </tr>`;
-          }).join('')}
-        </tbody>
-      </table>`;
-  }
-
-  function filterThemesForBook(themes, letterIndex, period, bookOnly) {
-    if (!bookOnly || !themes?.length) return themes || [];
-    const activeThemes = new Set();
-    filterLetterIndex(letterIndex, { period, bookOnly: true }).forEach(row => {
-      (row.themes || []).forEach(theme => {
-        const label = typeof theme === 'string' ? theme : theme?.theme;
-        if (label) activeThemes.add(String(label).toLowerCase());
-      });
-    });
-    if (!activeThemes.size) return [];
-    return themes.filter(t => activeThemes.has(String(t.theme || '').toLowerCase()));
-  }
-
-  function themesForPeriod(byQ, fallback, period) {
-    if (!period || period.all) return byQ?.all || fallback || [];
-    if (period.quarters.length === 1 && byQ?.[period.quarters[0]]) return byQ[period.quarters[0]];
-    const merged = new Map();
-    period.quarters.forEach(qid => {
-      (byQ?.[qid] || []).forEach(t => {
-        const key = t.theme || 'Other';
-        const row = merged.get(key) || {
-          theme: key,
-          letter_count: 0,
-          fund_count: 0,
-          bullish: 0,
-          bearish: 0,
-          neutral: 0,
-          top_tickers: [],
-          _tickers: new Set(),
-        };
-        row.letter_count += Number(t.letter_count || 0);
-        row.fund_count += Number(t.fund_count || 0);
-        row.bullish += Number(t.bullish || 0);
-        row.bearish += Number(t.bearish || 0);
-        row.neutral += Number(t.neutral || 0);
-        (t.top_tickers || []).forEach(tk => row._tickers.add(tk));
-        merged.set(key, row);
-      });
-    });
-    return Array.from(merged.values())
-      .map(row => ({ ...row, top_tickers: Array.from(row._tickers).slice(0, 8), _tickers: undefined }))
-      .sort((a, b) => (b.letter_count - a.letter_count) || String(a.theme).localeCompare(String(b.theme)));
   }
 
   function renderLetterIndex(rows, escapeHtml, linkHtml, ghRepo, onFundClick, positionStats, period, timeModel) {
@@ -3618,7 +3458,6 @@
       eventReview = 'unreviewed',
       eventReviewState = {},
       eventLastSeenAt = null,
-      themesViewMode = 'snapshot',
     } = options || {};
 
     const profiles = insights?.fund_profiles || {};
@@ -3626,17 +3465,10 @@
       return renderFundDetail(profiles[selectedFundId], escapeHtml, linkHtml, ghRepo);
     }
 
-    const byQ = insights?.theme_rankings_by_quarter || {};
     const letterIndex = insights?.letter_index || [];
     const timeModel = buildTimeModel(insights, documentCatalog);
     const periodQuarter = activeSection === 'consensus' ? (options?.consensusQuarter || quarter || 'last4') : quarter;
     const period = periodFromSelection(periodQuarter, timeModel);
-    let themes = filterThemesForBook(
-      themesForPeriod(byQ, insights?.theme_rankings || [], period),
-      letterIndex,
-      period,
-      bookOnly,
-    );
     const knownTickers = SearchMatch.catalogKnownTickers(documentCatalog);
     let funds = Object.values(insights?.fund_profiles || {});
     if (!funds.length) {
@@ -3695,9 +3527,6 @@
       { id: 'memory', label: 'Research memory' },
       { id: 'sources', label: 'Pipeline status' },
     ];
-
-    // Overview merged into Pipeline status
-    if (activeSection === 'overview') activeSection = 'sources';
 
     let body = '';
     if (activeSection === 'inflections') {
@@ -3856,26 +3685,6 @@
       ${body}`;
   }
 
-  function attachThemesHandlers(root, opts) {
-    const { onThemeDrill, onUseLatestQuarter, onViewMode } = opts || {};
-    if (!root) return;
-    root.querySelectorAll('[data-theme-drill]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        if (onThemeDrill) onThemeDrill(btn.dataset.themeDrill || '');
-      });
-    });
-    root.querySelectorAll('[data-use-latest-quarter]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        if (onUseLatestQuarter) onUseLatestQuarter();
-      });
-    });
-    root.querySelectorAll('[data-theme-view-mode]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        if (onViewMode) onViewMode(btn.dataset.themeViewMode || 'snapshot');
-      });
-    });
-  }
-
   global.InsightsViz = {
     renderDecisionSummary,
     renderIdentityLine,
@@ -3896,7 +3705,6 @@
     diversifyEvents,
     attachConsensusHandlers,
     attachTickerInsightsHandlers,
-    attachThemesHandlers,
     buildConsensusCsv,
     buildTimeModel,
     STANCE_BADGE,

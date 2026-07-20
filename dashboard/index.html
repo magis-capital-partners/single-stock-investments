@@ -942,10 +942,14 @@ let insightsEventWorkflow = {
 let insightsEventLastSeenAt = (() => {
   try { return localStorage.getItem(INSIGHTS_EVENT_LAST_SEEN_KEY); } catch (_) { return null; }
 })();
+const INSIGHTS_LIVE_SECTIONS = new Set([
+  'letters', 'inflections', 'events', 'index_watch', 'consensus',
+  'funds', 'documents', 'tickers', 'memory', 'sources',
+]);
 let insightsSection = (() => {
   try {
     const stored = localStorage.getItem(INSIGHTS_SECTION_KEY) || 'letters';
-    return stored === 'themes' ? 'letters' : stored;
+    return INSIGHTS_LIVE_SECTIONS.has(stored) ? stored : 'letters';
   } catch (_) {
     return 'letters';
   }
@@ -970,9 +974,6 @@ let insightsTickerInsiderTier = 'signal';
 let tickerInsightsSelectedTicker = null;
 let insightsPdfSourceTab = 'all';
 let insightsPdfTimeMode = 'period';
-let insightsThemesViewMode = (() => {
-  try { return localStorage.getItem(THEMES_VIEW_KEY) || 'snapshot'; } catch (_) { return 'snapshot'; }
-})();
 let activistSideFilter = 'all';
 let activistReviewFilter = '';
 let activistSearch = '';
@@ -1004,7 +1005,6 @@ const INSIGHTS_SECTION_KEY = 'ssp_insights_section_v1';
 const INSIGHTS_EVENT_TIER_KEY = 'ssp_insights_event_tier_v1';
 const CONSENSUS_QUARTER_KEY = 'ssp_consensus_quarter_v1';
 const CONSENSUS_VIEW_KEY = 'ssp_consensus_view_v1';
-const THEMES_VIEW_KEY = 'ssp_themes_view_v1';
 const TICKER_VIEW_KEY = 'ssp_ticker_view_v1';
 const TICKER_SORT_KEY = 'ssp_ticker_sort_v1';
 const MEMORY_VIEW_KEY = 'ssp_memory_view_v1';
@@ -1641,6 +1641,110 @@ function renderTotalReturnSection(t) {
     </div>`;
 }
 
+// --- Lazy shard loading -----------------------------------------------------
+// The SPA boots from the slim data/core.json and fetches heavy payloads on
+// demand: per-ticker detail shards, insights section shards, and standalone
+// artifacts (kpi_trends, document_catalog, research_memory, index_membership).
+const shardPromises = {};
+const loadedShards = new Set();
+
+async function fetchShardJson(url) {
+  const res = await fetch(url + '?' + Date.now());
+  if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
+  return res.json();
+}
+
+function loadShardOnce(key, url, apply) {
+  if (loadedShards.has(key)) return Promise.resolve();
+  if (!shardPromises[key]) {
+    shardPromises[key] = fetchShardJson(url)
+      .then((doc) => {
+        apply(doc);
+        loadedShards.add(key);
+      })
+      .catch((err) => {
+        delete shardPromises[key];
+        console.warn(`shard load failed: ${key}`, err);
+        throw err;
+      });
+  }
+  return shardPromises[key];
+}
+
+function loadInsightsShard(name) {
+  if (name === 'manifest') {
+    return loadShardOnce('insights:manifest', 'data/insights/manifest.json', (doc) => {
+      data.insights = Object.assign({}, doc, data.insights || {});
+    });
+  }
+  return loadShardOnce(`insights:${name}`, `data/insights/${name}.json`, (doc) => {
+    data.insights = Object.assign({}, data.insights || {}, doc);
+  });
+}
+
+function loadLazyFile(key) {
+  const loaders = {
+    research_memory: () => loadShardOnce('file:research_memory', 'data/research_memory.json', (doc) => { data.research_memory = doc; }),
+    index_membership: () => loadShardOnce('file:index_membership', 'data/index_membership.json', (doc) => { data.index_membership = doc; }),
+    kpi_trends: () => loadShardOnce('file:kpi_trends', 'data/kpi_trends.json', (doc) => { data.kpi_trends = doc; }),
+    document_catalog: () => loadShardOnce('file:document_catalog', 'data/document_catalog.json', (doc) => { data.document_catalog = doc; }),
+    activist_feed: () => loadShardOnce('file:activist_feed', 'data/activist_feed.json', (doc) => { data.activist_feed = doc; }),
+    darwin_bundle: () => loadShardOnce('file:darwin_bundle', 'data/darwin_bundle.json', (doc) => {
+      if (doc.darwin) data.darwin = doc.darwin;
+      if (doc.darwin_accounts) data.darwin_accounts = doc.darwin_accounts;
+      if (doc.darwin_serving) data.darwin_serving = doc.darwin_serving;
+    }),
+  };
+  return loaders[key] ? loaders[key]() : Promise.resolve();
+}
+
+// Insights section -> shards it needs before first render.
+const INSIGHTS_SECTION_SHARDS = {
+  letters: ['letters', 'registry'],
+  events: ['events'],
+  consensus: ['consensus', 'profiles', 'letters'],
+  funds: ['registry', 'profiles'],
+  tickers: [],
+  sources: [],
+};
+// Insights section -> standalone lazy files it needs.
+const INSIGHTS_SECTION_FILES = {
+  inflections: ['kpi_trends'],
+  index_watch: ['index_membership'],
+  documents: ['document_catalog'],
+  memory: ['research_memory'],
+};
+
+function insightsSectionReady(section) {
+  const shards = ['manifest', ...(INSIGHTS_SECTION_SHARDS[section] || [])];
+  const files = INSIGHTS_SECTION_FILES[section] || [];
+  return shards.every((s) => loadedShards.has(`insights:${s}`))
+    && files.every((f) => loadedShards.has(`file:${f}`));
+}
+
+function loadInsightsSection(section) {
+  const shards = ['manifest', ...(INSIGHTS_SECTION_SHARDS[section] || [])];
+  const files = INSIGHTS_SECTION_FILES[section] || [];
+  return Promise.all([
+    ...shards.map((s) => loadInsightsShard(s)),
+    ...files.map((f) => loadLazyFile(f)),
+  ]);
+}
+
+function loadTickerDetail(ticker) {
+  const row = data.tickers.find((x) => x.ticker === ticker);
+  if (!row || row.__detail) return Promise.resolve(row);
+  const shardPath = row.detail_shard
+    || `data/tickers/${ticker.replace(/[^A-Za-z0-9._-]/g, '_')}.json`;
+  return loadShardOnce(`ticker:${ticker}`, shardPath, (full) => {
+    const idx = data.tickers.findIndex((x) => x.ticker === ticker);
+    if (idx >= 0) {
+      data.tickers[idx] = Object.assign({}, data.tickers[idx], full, { __detail: true });
+    }
+  }).then(() => data.tickers.find((x) => x.ticker === ticker));
+}
+// ---------------------------------------------------------------------------
+
 async function load() {
   try {
     oauthConfig = await MarvinOAuth.loadConfig();
@@ -1649,25 +1753,25 @@ async function load() {
   }
   const authButton = document.getElementById('btn-auth');
   if (authButton) MarvinOAuth.refreshAuthUi(authButton);
-  const res = await fetch('data/dashboard_data.json?' + Date.now());
-  data = await res.json();
   try {
-    const insightsRes = await fetch('data/insights.json?' + Date.now());
-    if (insightsRes.ok) data.insights = await insightsRes.json();
+    data = await fetchShardJson('data/core.json');
   } catch {
-    data.insights = null;
-  }
-  try {
-    const memoryRes = await fetch('data/research_memory.json?' + Date.now());
-    if (memoryRes.ok) data.research_memory = await memoryRes.json();
-  } catch {
-    data.research_memory = null;
-  }
-  try {
-    const indexRes = await fetch('data/index_membership.json?' + Date.now());
-    if (indexRes.ok) data.index_membership = await indexRes.json();
-  } catch {
-    data.index_membership = null;
+    // Older build without shards: fall back to the monolithic payload.
+    const res = await fetch('data/dashboard_data.json?' + Date.now());
+    data = await res.json();
+    data.tickers.forEach((t) => { t.__detail = true; });
+    ['kpi_trends', 'document_catalog', 'activist_feed', 'darwin', 'darwin_accounts', 'darwin_serving']
+      .forEach((k) => { if (data[k] != null) loadedShards.add(`file:${k === 'darwin' || k === 'darwin_accounts' || k === 'darwin_serving' ? 'darwin_bundle' : k}`); });
+    try {
+      const insightsRes = await fetch('data/insights.json?' + Date.now());
+      if (insightsRes.ok) {
+        data.insights = await insightsRes.json();
+        ['manifest', 'letters', 'events', 'consensus', 'registry', 'profiles', 'tickers']
+          .forEach((s) => loadedShards.add(`insights:${s}`));
+      }
+    } catch {
+      data.insights = null;
+    }
   }
   document.getElementById('meta-updated').textContent =
     `Updated ${data.generated_at.replace('T', ' ').replace('Z', ' UTC')} · ${data.summary.ticker_count} tickers`;
@@ -1709,6 +1813,10 @@ function setView(view, opts = {}) {
     view === 'holdings' && (data.watchlist || []).length ? 'block' : 'none';
   if (view === 'valuation') renderValuationQueue();
   if (view === 'watchlist') renderWatchlistTab();
+  // Lazy-loaded tabs fetch their shards on first open.
+  if (view === 'insights') renderInsights();
+  if (view === 'activist') renderActivist();
+  if (view === 'darwin') renderDarwin();
   if (opts.syncHash !== false) syncRouteHash();
 }
 
@@ -1737,6 +1845,20 @@ function renderValuationQueue() {
 function renderActivist() {
   const loading = document.getElementById('activist-loading');
   const content = document.getElementById('activist-content');
+  if (!data.activist_feed && !loadedShards.has('file:activist_feed')) {
+    loading.textContent = 'Loading activist feed…';
+    loading.style.display = '';
+    content.style.display = 'none';
+    if (activeView === 'activist') {
+      loadLazyFile('activist_feed').then(
+        () => renderActivist(),
+        () => {
+          loading.textContent = 'Activist feed not built. Run: python _system/scripts/build_activist_feed.py';
+        },
+      );
+    }
+    return;
+  }
   const feed = data.activist_feed;
   if (!feed || !window.ActivistViz) {
     loading.textContent = 'Activist feed not built. Run: python _system/scripts/build_activist_feed.py';
@@ -1824,6 +1946,20 @@ function renderInsights(opts = {}) {
   const refocusSearch = Boolean(opts.refocusSearch);
   const loading = document.getElementById('insights-loading');
   const content = document.getElementById('insights-content');
+  if (!insightsSectionReady(insightsSection)) {
+    loading.textContent = 'Loading insights…';
+    loading.style.display = '';
+    content.style.display = 'none';
+    if (activeView === 'insights') {
+      loadInsightsSection(insightsSection).then(
+        () => renderInsights(opts),
+        () => {
+          loading.textContent = 'Insights not built. Run: python _system/scripts/build_insights.py';
+        },
+      );
+    }
+    return;
+  }
   const insights = data.insights;
   if (!insights || !window.InsightsViz) {
     loading.textContent = 'Insights not built. Run: python _system/scripts/build_insights.py';
@@ -1866,7 +2002,6 @@ function renderInsights(opts = {}) {
     ...insightsEventFilters,
     eventReviewState: insightsEventWorkflow,
     eventLastSeenAt: insightsEventLastSeenAt,
-    themesViewMode: insightsThemesViewMode,
     memoryViewMode,
     memoryTypeFilter,
     memoryBiotechOnly,
@@ -2208,6 +2343,23 @@ function renderInsights(opts = {}) {
 
 function renderDarwin() {
   if (window.DarwinViz) DarwinViz.destroyCharts();
+  const loading = document.getElementById('darwin-loading');
+  const content = document.getElementById('darwin-content');
+  if (!data.darwin_serving && !data.darwin_accounts && !data.darwin
+      && !loadedShards.has('file:darwin_bundle')) {
+    loading.textContent = 'Loading Darwin portfolio…';
+    loading.style.display = '';
+    content.style.display = 'none';
+    if (activeView === 'darwin') {
+      loadLazyFile('darwin_bundle').then(
+        () => renderDarwin(),
+        () => {
+          loading.textContent = 'Darwin portfolio not built. Run: make darwin-build';
+        },
+      );
+    }
+    return;
+  }
   const serving = data.darwin_serving || {};
   const bundle = data.darwin_accounts || {};
   const acctRow = (serving.accounts || {})[activeDarwinAccount] || {};
@@ -2215,8 +2367,6 @@ function renderDarwin() {
   const paper = acctRow.paper
     ? { last_mark: acctRow.paper, inception_date: acctRow.paper_inception }
     : (bundle['paper_' + activeDarwinAccount] || {});
-  const loading = document.getElementById('darwin-loading');
-  const content = document.getElementById('darwin-content');
   if (!d) {
     loading.textContent = 'Darwin portfolio not built. Run: make darwin-build';
     content.style.display = 'none';
@@ -3085,6 +3235,24 @@ function selectTicker(ticker, opts = {}) {
   renderTable();
   const t = data.tickers.find(x => x.ticker === ticker);
   if (!t) return;
+  if (!t.__detail) {
+    // Slim core row: render a placeholder, fetch the detail shard, re-render.
+    const grid0 = document.getElementById('main-grid');
+    grid0.classList.remove('detail-closed');
+    document.getElementById('detail').innerHTML =
+      `<div class="loading">Loading ${escapeHtml(ticker)} detail…</div>`;
+    loadTickerDetail(ticker).then(
+      () => { if (selected === ticker) selectTicker(ticker, { ...opts, syncHash: false }); },
+      () => {
+        if (selected === ticker) {
+          document.getElementById('detail').innerHTML =
+            `<div class="loading">Failed to load detail shard for ${escapeHtml(ticker)}</div>`;
+        }
+      },
+    );
+    if (opts.syncHash !== false) syncRouteHash();
+    return;
+  }
   const modelBundle = getEquityModelBundle(ticker);
   const hasModel = modelBundle && modelBundle.model_ready;
   const hasValuationWorkbench = !!t.valuation_workbench;
@@ -3156,7 +3324,8 @@ function selectTicker(ticker, opts = {}) {
   const researchMemory = iv
     ? iv.renderResearchMemory(t.research_memory, escapeHtml, linkHtml, GH_REPO)
     : '';
-  const discussants = (data.insights?.ticker_discussants || {})[t.ticker]
+  const discussants = t.letter_discussants
+    || (data.insights?.ticker_discussants || {})[t.ticker]
     || (data.insights?.ticker_discussants || {})[t.ticker.toUpperCase()]
     || [];
   const externalContext = iv && (t.insights?.length || discussants.length)
@@ -3381,7 +3550,7 @@ window.addEventListener('hashchange', () => {
 
 load().catch(err => {
   const msg = err && err.message ? err.message : String(err);
-  document.getElementById('detail').innerHTML = `<div class="loading">Failed to load data/dashboard_data.json<br><br>${escapeHtml(msg)}</div>`;
+  document.getElementById('detail').innerHTML = `<div class="loading">Failed to load data/core.json<br><br>${escapeHtml(msg)}</div>`;
 });
 
 document.getElementById('btn-add-holding')?.addEventListener('click', () => openOnboardModal());

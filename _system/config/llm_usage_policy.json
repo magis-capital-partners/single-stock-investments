@@ -1,5 +1,24 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
+  "model_ladder": {
+    "notes": "Cheap fast model by default; frontier reserved for judgment-heavy lanes: brand-new deep dives (which include the Milly adversarial pass) and IC chair synthesis. Escalation keys match llm_call_gate.resolve_model.",
+    "default_model": "composer-2.5",
+    "frontier_model": "claude-sonnet-5-thinking-high",
+    "consumers": {
+      "marvin_research": {
+        "frontier_reasons": [
+          "no_deep_dive",
+          "onboard_pending",
+          "batch_onboard_pending"
+        ]
+      },
+      "investment_committee": {
+        "frontier_task_ids": ["chair-synthesis"]
+      },
+      "vicki_ir": {},
+      "ci_autofix": {}
+    }
+  },
   "default": {
     "daily_repo_limit": 4,
     "per_subject_daily_limit": 1,

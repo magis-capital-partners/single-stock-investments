@@ -18,8 +18,31 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  gate:
+    # Only chain off Data Pipeline runs whose deterministic downloads job
+    # succeeded (matches Auto - Daily Research). Cron and dispatch skip the gate.
+    if: github.event_name == 'workflow_run'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      downloads_ready: ${{ steps.check.outputs.downloads_ready }}
+    steps:
+      - id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+        run: |
+          JOBS=$(gh api "repos/${{ github.repository }}/actions/runs/${RUN_ID}/jobs" \
+            --jq '.jobs[] | select(.name=="downloads") | .conclusion' 2>/dev/null || true)
+          if echo "$JOBS" | grep -qx success; then
+            echo "downloads_ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "downloads_ready=false" >> "$GITHUB_OUTPUT"
+          fi
+
   intake:
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    needs: gate
+    if: always() && (github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && needs.gate.outputs.downloads_ready == 'true'))
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
@@ -67,7 +90,7 @@ jobs:
       - name: Commit the complete onboarding transaction
         run: |
           git add --sparse -A -- _system/data/evidence_recovery_queue.json _system/reviews/pending \
-                         dashboard/data docs/data _system/portfolio
+                         dashboard/data _system/portfolio
           shopt -s nullglob
           evidence_paths=(*/README.md */.onboard_status.json */research */third-party-analyses */investor-documents)
           if ((${#evidence_paths[@]})); then

@@ -5,6 +5,10 @@ set -euo pipefail
 ROOT=$(cd "$(dirname "$0")/../.." && pwd)
 cd "$ROOT"
 
+# Individual tests check out main during cleanup, so file-content assertions
+# must read from the ref this script started on (the PR merge commit in CI).
+SMOKE_START_REF=$(git rev-parse HEAD)
+
 export CI_PUSH_SKIP_SELF_REFRESH=1
 
 # shellcheck disable=SC1091
@@ -215,89 +219,6 @@ test_activist_feed_json_conflict() {
   fi
 }
 
-test_docs_mirror_after_dashboard_conflict() {
-  git checkout -b "$TMP_BRANCH" >/dev/null
-
-  python3 _system/scripts/build_dashboard_data.py >/dev/null
-  mirror_dashboard_to_docs
-  git add dashboard/data/ docs/
-  git commit -m "test: base dashboard+docs snapshot" >/dev/null
-
-  python3 _system/scripts/build_dashboard_data.py >/dev/null
-  mirror_dashboard_to_docs
-  echo '{"__ci_mirror_test_marker__":true}' > docs/data/dashboard_data.json
-  git add dashboard/data/ docs/
-  git commit -m "test: local dashboard with stale docs mirror" >/dev/null
-
-  git branch test-main-conflict "$MAIN_REF" >/dev/null
-  git checkout test-main-conflict >/dev/null
-  python3 _system/scripts/build_dashboard_data.py >/dev/null
-  mirror_dashboard_to_docs
-  git add dashboard/data/ docs/
-  git commit -m "test: main dashboard+docs regen" >/dev/null
-
-  git checkout "$TMP_BRANCH" >/dev/null
-  if git rebase test-main-conflict; then
-    echo "FAIL: expected rebase conflict in dashboard/docs JSON"
-    exit 1
-  fi
-
-  while rebase_in_progress && try_resolve_rebase_conflicts; do
-    :
-  done
-  if rebase_in_progress; then
-    echo "FAIL: docs mirror conflict resolution helper did not finish rebase"
-    exit 1
-  fi
-  if ! cmp -s dashboard/data/dashboard_data.json docs/data/dashboard_data.json; then
-    echo "FAIL: docs/data/dashboard_data.json not mirrored after conflict resolution"
-    exit 1
-  fi
-  if grep -q '__ci_mirror_test_marker__' docs/data/dashboard_data.json 2>/dev/null; then
-    echo "FAIL: stale docs/data/dashboard_data.json survived rebase resolution"
-    exit 1
-  fi
-}
-
-test_insights_docs_mirror_conflict() {
-  git checkout -b "$TMP_BRANCH" >/dev/null
-
-  python3 _system/scripts/build_insights.py >/dev/null
-  mirror_dashboard_to_docs
-  git add dashboard/data/insights.json _system/reference/data-sources/insights_record_archive.json docs/data/insights.json
-  git commit -m "test: base insights+docs snapshot" >/dev/null
-
-  python3 _system/scripts/build_insights.py >/dev/null
-  mirror_dashboard_to_docs
-  git add dashboard/data/insights.json _system/reference/data-sources/insights_record_archive.json docs/data/insights.json
-  git commit -m "test: local insights+docs regen" >/dev/null
-
-  git branch test-main-conflict "$MAIN_REF" >/dev/null
-  git checkout test-main-conflict >/dev/null
-  python3 _system/scripts/build_insights.py >/dev/null
-  mirror_dashboard_to_docs
-  git add dashboard/data/insights.json _system/reference/data-sources/insights_record_archive.json docs/data/insights.json
-  git commit -m "test: main insights+docs regen" >/dev/null
-
-  git checkout "$TMP_BRANCH" >/dev/null
-  if git rebase test-main-conflict; then
-    echo "FAIL: expected rebase conflict in insights artifacts"
-    exit 1
-  fi
-
-  while rebase_in_progress && try_resolve_rebase_conflicts; do
-    :
-  done
-  if rebase_in_progress; then
-    echo "FAIL: insights+docs mirror conflict resolution helper did not finish rebase"
-    exit 1
-  fi
-  if ! cmp -s dashboard/data/insights.json docs/data/insights.json; then
-    echo "FAIL: docs/data/insights.json not mirrored after conflict resolution"
-    exit 1
-  fi
-}
-
 test_returns_csv_is_regenerable() {
   is_regenerable_artifact "_system/reference/market-data/returns/SPY.csv" || {
     echo "FAIL: SPY.csv should be classified as regenerable"
@@ -435,14 +356,20 @@ test_main_writer_workflows_share_lock() {
     darwin-refresh.yml
     letter-backfill.yml
     ls-algo-universe.yml
+    memory-digest.yml
   )
 
+  local text
   for workflow in "${writer_workflows[@]}"; do
-    if ! grep -A2 '^concurrency:' ".github/workflows/$workflow" | grep -qx '  group: data-commit-main'; then
+    # Earlier tests may leave HEAD on main; read the workflow from the ref this
+    # script started on so new writers are validated on PR branches too.
+    text=$(git show "${SMOKE_START_REF:-HEAD}:.github/workflows/$workflow" 2>/dev/null \
+      || cat ".github/workflows/$workflow")
+    if ! printf '%s\n' "$text" | grep -A2 '^concurrency:' | grep -qx '  group: data-commit-main'; then
       echo "FAIL: $workflow must use the shared data-commit-main lock"
       exit 1
     fi
-    if ! grep -A2 '^concurrency:' ".github/workflows/$workflow" | grep -qx '  cancel-in-progress: false'; then
+    if ! printf '%s\n' "$text" | grep -A2 '^concurrency:' | grep -qx '  cancel-in-progress: false'; then
       echo "FAIL: $workflow must keep queued writers instead of cancelling them"
       exit 1
     fi
@@ -458,9 +385,7 @@ if [ "${CI_PUSH_SMOKE_FAST:-0}" = "1" ]; then
   exit 0
 fi
 run_test "dashboard JSON rebase conflict auto-resolution" test_dashboard_json_conflict
-run_test "docs mirror after dashboard JSON rebase conflict" test_docs_mirror_after_dashboard_conflict
 run_test "insights JSON rebase conflict auto-resolution" test_insights_json_conflict
-run_test "insights docs mirror rebase conflict auto-resolution" test_insights_docs_mirror_conflict
 run_test "activist feed JSON rebase conflict auto-resolution" test_activist_feed_json_conflict
 run_test "INDEX.csv rebase conflict auto-resolution" test_index_csv_conflict
 run_test "mixed generated artifact rebase conflict auto-resolution" test_mixed_generated_conflict

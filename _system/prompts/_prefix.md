@@ -7,7 +7,7 @@ Before answering:
 4. Read _system/portfolio/holdings.md
 5. Read _system/frameworks/decision_stack.md; for {TICKER} read valuation.json and open only frameworks from classification.md trigger map (see investment-frameworks.mdc — not the full frameworks folder)
 6. Read _system/frameworks/investment_process.md when doing discover/download workflow
-7. For ticker {TICKER}: read {TICKER}/README.md if present; scan {TICKER}/research/ for prior work
+7. For ticker {TICKER}: read {TICKER}/research/thesis_card.json plus the latest research/evidence/filing_digest_*.md first (compact card: thesis, base IRR, key assumptions, open questions, top citations). Open the full deep dive only when the card is missing or your task changes the thesis/valuation itself. Read {TICKER}/README.md if present.
 8. Prefer primary sources in ticker folders (PDFs, INDEX.csv) over memory
 9. Write analysis to {TICKER}/research/ — not chat-only
 10. Mechanical close: marvin_cloud_refresh.py {TICKER} --date YYYY-MM-DD (do not duplicate its steps)

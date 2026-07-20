@@ -6,7 +6,9 @@ Profiles (aliases in parentheses):
   insights (pages-fast)— letters/index/insights/research_memory + dashboard
   activist             — activist feed + document registry slice
   darwin (darwin-full) — IRA tier download + Darwin portfolio + dashboard
-  full (intake-full)    — nightly full rebuild (~30 scripts)
+  full (intake-full)    — nightly full rebuild (documents, KPI, insights, memory);
+                          valuation lives in Power Zone Universe, activist in the
+                          dedicated Data Pipeline job
 
 Removed: darwin-fast (use insights or darwin).
 """
@@ -95,15 +97,11 @@ PROFILES: dict[str, list[list[str]]] = {
         ["_system/scripts/build_biotech_peer_short_stub.py"],
         ["_system/scripts/build_biotech_composite.py"],
         ["_system/scripts/build_research_memory.py"],
-        # Canonical portfolio-wide route -> contract -> workbench -> pricing ->
-        # gated IC sequence.  It routes every registry security but only builds
-        # contracts/workbenches where valuation research exists.
-        ["_system/scripts/run_security_decision_pipeline.py", "--scope", "all", "--skip-dashboard"],
-        ["_system/scripts/clean_activist_indexes.py"],
-        ["_system/scripts/cleanup_activist_false_positives.py"],
-        ["_system/scripts/activist_triage.py", "--apply", "--fetch-sec"],
-        ["_system/scripts/build_activist_feed.py"],
-        ["_system/scripts/auto_resolve_filing_events.py"],
+        # Backfill compact agent-context cards for the whole universe.
+        ["_system/scripts/build_thesis_card.py", "--all"],
+        # Valuation authority is owned by the Power Zone Universe workflow
+        # (run_security_decision_pipeline) and the activist slice by the
+        # dedicated 06:00 Data Pipeline job; neither is duplicated here.
         ["_system/scripts/build_dashboard_data.py"],
     ],
 }

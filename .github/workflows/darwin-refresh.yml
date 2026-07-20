@@ -1,6 +1,6 @@
 name: Darwin Portfolio Refresh
 
-# Manual only — no schedule, no push. Run when Darwin code/mandate needs a full rebuild.
+# Weekday 01:20 UTC cron plus push triggers on Darwin code paths; also manual dispatch.
 on:
   schedule:
     - cron: "20 1 * * 1-5"
@@ -27,7 +27,7 @@ jobs:
       RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
       RESEARCH_VAULT_ROOT: _external/research-vault
     steps:
-      - uses: jlumbroso/free-disk-space@main
+      - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
         with:
           tool-cache: false
           android: true

@@ -1,0 +1,53 @@
+name: Memory Digest
+
+# Weekly knowledge-compounding sweep: aggregate unpromoted [PROPOSED ...]
+# bullets from daily logs plus corrections into one pending review so the
+# human filter promotes learning instead of letting it pile up. The script
+# never writes MEMORY.md (human-quality-filter rule).
+on:
+  schedule:
+    # Sunday 14:00 UTC — clear of the 06:00 activist job, the 10:00 full
+    # downloads run, and the 16:00 letter backfill.
+    - cron: "0 14 * * 0"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: data-commit-main
+  cancel-in-progress: false
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/memory
+            _system/reviews
+            _system/scripts/build_memory_digest.py
+            _system/scripts/ci_push_main.sh
+            .github/actions/commit-main
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build weekly memory digest
+        run: |
+          python _system/scripts/build_memory_digest.py \
+            --date "$(date -u +%Y-%m-%d)" --days 7 --write
+
+      - name: Commit pending review digest
+        uses: ./.github/actions/commit-main
+        with:
+          message: |
+            Weekly memory digest for human review.
+
+            Aggregate unpromoted [PROPOSED] bullets and corrections into one
+            pending review (build_memory_digest.py).
+          git_add: _system/reviews/pending/
