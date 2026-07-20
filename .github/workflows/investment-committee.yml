@@ -107,11 +107,18 @@ jobs:
       - working-directory: _system/scripts
         if: steps.llm_gate.outputs.approved == 'true'
         run: npm ci --ignore-scripts
+      - name: Resolve model from ladder
+        id: model
+        if: steps.llm_gate.outputs.approved == 'true'
+        run: |
+          python _system/scripts/llm_call_gate.py model \
+            --consumer investment_committee --task-id "${{ matrix.task_id }}"
       - name: Run isolated committee task
         id: agent
         if: steps.llm_gate.outputs.approved == 'true'
         env:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
+          CURSOR_MODEL_ID: ${{ steps.model.outputs.model }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           CURSOR_STARTING_REF: main
           TICKER: ${{ matrix.ticker }}

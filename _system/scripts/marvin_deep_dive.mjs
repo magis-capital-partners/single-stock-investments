@@ -26,6 +26,9 @@ const evidenceHash = process.env.RESEARCH_EVIDENCE_HASH?.trim();
 const evidenceManifest = process.env.RESEARCH_EVIDENCE_MANIFEST?.trim();
 const evidenceManifestJson = process.env.RESEARCH_EVIDENCE_MANIFEST_JSON?.trim();
 const hkPdfsRoot = process.env.HK_PDFS_ROOT?.trim() || "/opt/cursor/hk_pdfs";
+// Model ladder (_system/config/llm_usage_policy.json): callers escalate
+// judgment-heavy reasons via `llm_call_gate.py model`; cheap default otherwise.
+const modelId = process.env.CURSOR_MODEL_ID?.trim() || "composer-2.5";
 const date = new Date().toISOString().slice(0, 10);
 
 if (!apiKey) {
@@ -82,10 +85,11 @@ try {
   console.log(`Starting Marvin deep dive for ${ticker} on ${repoUrl}...`);
   console.log(`Starting ref: ${startingRef || "(Cursor default branch)"}`);
   console.log(`HK_PDFS_ROOT (cloud): ${hkPdfsRoot}`);
+  console.log(`Model: ${modelId}`);
   const repoSpec = startingRef ? { url: repoUrl, startingRef } : { url: repoUrl };
   const result = await Agent.prompt(prompt, {
     apiKey,
-    model: { id: "composer-2.5" },
+    model: { id: modelId },
     cloud: {
       repos: [repoSpec],
       autoCreatePR: true,

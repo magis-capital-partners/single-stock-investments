@@ -69,6 +69,25 @@ def consumer_policy(policy_doc: dict, consumer: str) -> dict:
     return {**(policy_doc.get("default") or {}), **((policy_doc.get("consumers") or {}).get(consumer) or {})}
 
 
+def resolve_model(policy_doc: dict, consumer: str, *, reason: str = "", task_id: str = "") -> str:
+    """Pick the model per the ladder: cheap default, frontier on escalation keys.
+
+    Frontier lanes are judgment-heavy: brand-new deep dives (reason keys) and
+    IC chair synthesis (task_id keys). Everything mechanical stays cheap.
+    """
+    ladder = policy_doc.get("model_ladder") or {}
+    default = ladder.get("default_model") or "composer-2.5"
+    frontier = ladder.get("frontier_model") or default
+    config = (ladder.get("consumers") or {}).get(consumer) or {}
+    if config.get("model"):
+        return config["model"]
+    if reason and reason in (config.get("frontier_reasons") or []):
+        return frontier
+    if task_id and task_id in (config.get("frontier_task_ids") or []):
+        return frontier
+    return default
+
+
 def parse_time(value: str | None) -> datetime | None:
     if not value:
         return None
@@ -169,20 +188,31 @@ def write_github_output(result: dict) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=("evaluate", "record"))
+    parser.add_argument("command", choices=("evaluate", "record", "model"))
     parser.add_argument("--consumer", required=True)
-    parser.add_argument("--subject", required=True)
-    parser.add_argument("--reason", required=True)
+    parser.add_argument("--subject", required=False, default="")
+    parser.add_argument("--reason", required=False, default="")
+    parser.add_argument("--task-id", default="")
     parser.add_argument("--evidence-hash")
     parser.add_argument("--evidence-path", action="append", default=[])
     parser.add_argument("--state-file", type=Path)
     parser.add_argument("--policy", type=Path, default=DEFAULT_POLICY)
-    parser.add_argument("--ledger", type=Path, required=True)
+    parser.add_argument("--ledger", type=Path)
     parser.add_argument("--status", choices=("reserved", "completed", "failed", "suppressed"), default="completed")
     parser.add_argument("--force", action="store_true")
     parser.add_argument("--reserve", action="store_true")
     parser.add_argument("--github-output", action="store_true")
     args = parser.parse_args()
+    if args.command == "model":
+        model = resolve_model(read_json(args.policy), args.consumer, reason=args.reason, task_id=args.task_id)
+        output = os.environ.get("GITHUB_OUTPUT")
+        if output:
+            with Path(output).open("a", encoding="utf-8") as handle:
+                handle.write(f"model={model}\n")
+        print(model)
+        return 0
+    if not args.subject or not args.reason or not args.ledger:
+        raise SystemExit(f"--subject, --reason, and --ledger are required for '{args.command}'")
     evidence_hash = stable_evidence_hash([Path(p) for p in args.evidence_path], args.evidence_hash)
     if args.command == "record":
         event = {

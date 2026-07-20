@@ -96,6 +96,37 @@ class WorkflowGovernanceTests(unittest.TestCase):
         persistent_ref = '"pull/${{ github.event.pull_request.number }}/head"'
         self.assertEqual(workflow.count(persistent_ref), 3)
 
+    def test_model_ladder_defaults_cheap_and_escalates_frontier(self):
+        import llm_call_gate
+
+        policy = json.loads((ROOT / "_system" / "config" / "llm_usage_policy.json").read_text(encoding="utf-8"))
+        ladder = policy["model_ladder"]
+        self.assertEqual(ladder["default_model"], "composer-2.5")
+        self.assertNotEqual(ladder["frontier_model"], ladder["default_model"])
+        cheap = ladder["default_model"]
+        frontier = ladder["frontier_model"]
+        # Mechanical lanes stay on the cheap default.
+        self.assertEqual(llm_call_gate.resolve_model(policy, "vicki_ir", reason="ir_gap"), cheap)
+        self.assertEqual(llm_call_gate.resolve_model(policy, "ci_autofix"), cheap)
+        self.assertEqual(llm_call_gate.resolve_model(policy, "marvin_research", reason="new_documents"), cheap)
+        self.assertEqual(llm_call_gate.resolve_model(policy, "investment_committee", task_id="round1-munger"), cheap)
+        # Judgment-heavy lanes escalate: brand-new deep dives and chair synthesis.
+        self.assertEqual(llm_call_gate.resolve_model(policy, "marvin_research", reason="no_deep_dive"), frontier)
+        self.assertEqual(llm_call_gate.resolve_model(policy, "marvin_research", reason="onboard_pending"), frontier)
+        self.assertEqual(llm_call_gate.resolve_model(policy, "investment_committee", task_id="chair-synthesis"), frontier)
+
+    def test_agent_runners_and_callers_wire_the_model_ladder(self):
+        for name in ("marvin_deep_dive.mjs", "committee_task_runner.mjs", "vicki_ir_harvest.mjs"):
+            text = (ROOT / "_system" / "scripts" / name).read_text(encoding="utf-8")
+            self.assertIn("CURSOR_MODEL_ID", text, name)
+            self.assertNotIn('model: { id: "composer-2.5" }', text, name)
+        marvin_action = (ROOT / ".github" / "actions" / "marvin-agent" / "action.yml").read_text(encoding="utf-8")
+        self.assertIn("llm_call_gate.py model", marvin_action)
+        self.assertIn("CURSOR_MODEL_ID: ${{ steps.model.outputs.model }}", marvin_action)
+        committee = (ROOT / ".github" / "workflows" / "investment-committee.yml").read_text(encoding="utf-8")
+        self.assertIn("llm_call_gate.py model", committee)
+        self.assertIn("CURSOR_MODEL_ID: ${{ steps.model.outputs.model }}", committee)
+
     def test_policy_encodes_expected_call_budgets(self):
         policy = json.loads((ROOT / "_system" / "config" / "llm_usage_policy.json").read_text(encoding="utf-8"))
         self.assertEqual(policy["consumers"]["marvin_research"]["daily_repo_limit"], 4)

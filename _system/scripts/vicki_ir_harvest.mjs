@@ -68,7 +68,8 @@ try {
   const repoSpec = startingRef ? { url: repoUrl, startingRef } : { url: repoUrl };
   const result = await Agent.prompt(prompt, {
     apiKey,
-    model: { id: "composer-2.5" },
+    // Vicki is a mechanical browser lane; stays on the cheap ladder default.
+    model: { id: process.env.CURSOR_MODEL_ID?.trim() || "composer-2.5" },
     cloud: {
       repos: [repoSpec],
       autoCreatePR: true,

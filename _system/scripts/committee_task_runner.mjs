@@ -9,6 +9,9 @@ const startingRef = process.env.CURSOR_STARTING_REF?.trim();
 const promptPath = process.env.PROMPT_PATH?.trim();
 const outputPath = process.env.OUTPUT_PATH?.trim();
 const taskKey = process.env.TASK_KEY?.trim();
+// Model ladder (_system/config/llm_usage_policy.json): chair synthesis runs on
+// the frontier model via `llm_call_gate.py model`; rater votes stay cheap.
+const modelId = process.env.CURSOR_MODEL_ID?.trim() || "composer-2.5";
 
 for (const [name, value] of Object.entries({ CURSOR_API_KEY: apiKey, GITHUB_REPOSITORY: repo, PROMPT_PATH: promptPath, OUTPUT_PATH: outputPath, TASK_KEY: taskKey })) {
   if (!value) {
@@ -39,7 +42,7 @@ try {
   const repoSpec = startingRef ? { url: `https://github.com/${repo}`, startingRef } : { url: `https://github.com/${repo}` };
   const result = await Agent.prompt(prompt, {
     apiKey,
-    model: { id: "composer-2.5" },
+    model: { id: modelId },
     cloud: { repos: [repoSpec], autoCreatePR: true, skipReviewerRequest: true },
   });
   console.log("Status:", result.status);
