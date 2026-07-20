@@ -15,7 +15,7 @@
 | # | Section | Content |
 |---|---------|---------|
 | 1 | `## What this business is` | Five sentences max: customers, revenue engine, segments, geography if relevant. **No** archetype/moat/dhando codes. |
-| 2 | `## Why the market might be wrong` | Q5 in prose: predictive attribute; inefficiency + catalyst when asset/event lens |
+| 2 | `## Why the market might be wrong` | Q5 in prose: predictive attribute; inefficiency + catalyst when asset/event lens. **Funds with zero-marked sleeves (`edge: shadow`):** lead with the mark understatement, not a thin discount to reported NAV (`optionality_valuation.md` § D). **Crypto / digital-asset book below look-through NAV (CMSG-class):** lead with that discount (`crypto_economics_valuation.md`). |
 | 3 | `## Executive summary` | 120–180 words: synthesize 1–2 + base return + stance. **Do not** open with `**Stahl**` / `**Archetype**` labels. |
 | 4 | `## Business & moat` | Stahl + Hohn mechanics + **Mental models** — **no IRR math** |
 | 5 | `## Payoff & return` | Six-question gate table, dhando, stance — points to Valuation & IRR |

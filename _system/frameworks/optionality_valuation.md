@@ -183,6 +183,53 @@ When SOTP or NAV overlay exists, report in Valuation & IRR:
 
 ---
 
+### D. Fund / CEF look-through (CEE, PSH, Urbana, NAN)
+
+**Sleeve:** `fund_nav_discounts` in `_system/portfolio/investment_sleeves.json`  
+**Proposal:** `_system/proposals/cef_etf_nav_discount_workflow.md`  
+**Enforced by:** `lint_deep_dive.py` (shadow / zero-marked sleeve narrative checks)
+
+Use when the security is a **closed-end fund**, **listed investment company**, or hard-to-arb **ETF**, and the edge is price versus reported or economic NAV.
+
+| Edge tag (`fund_nav_overlay.edge`) | Meaning | Examples |
+|------------------------------------|---------|----------|
+| `classic` | Price meaningfully below *reported* NAV; catalyst may be tender/repurchase/activist | PSH, NAN, Urbana Class A |
+| `shadow` | Reported NAV understates value (Level 3 / sanctions zero marks) | CEE Russia sleeve |
+| `holdco` | Permanent-capital look-through with private + public marks | Urbana private sleeve |
+
+**Three NAVs (never average silently):**
+
+1. **Reported NAV** — sponsor/SEC figure (discount/premium to market).
+2. **Liquid economic NAV** — freely transferable holdings + cash − liabilities − fee reserve (dhando floor).
+3. **Complete economic NAV** — liquid NAV + risked zero-marked / private sleeves.
+
+**Option treatment:** zero-marked sleeves default to `zero` in base until human sets `realization_probability_base`. Bull sensitivity may show recovery.
+
+#### Mandatory narrative when `edge: shadow` or `zero_marked_sleeves` is non-empty
+
+This is the CEE failure mode: agents wrote a classic CEF discount story (−4% to reported NAV) and buried Russia.
+
+| Section | Required |
+|---------|----------|
+| **Why the market might be wrong** | Lead with the **accounting / mark** problem (zero, Level 3, frozen, sanctions). Do **not** lead with “trades at X% to reported NAV” when that discount is thin and a zero-marked sleeve is material. |
+| **Executive summary** | Name the zero-marked sleeve and that reported NAV excludes it. State base still prices the sleeve at zero until human sets recovery probability. Give an **illustration** of economic NAV or $/share sleeve size when evidence exists. |
+| **Option scan** | Explicit row for the zero-marked sleeve with treatment `zero` or `probability_weighted`. |
+| **Valuation & IRR** | Three-NAV table (reported / liquid / complete or illustration). Sleeve cost and/or mark-to-market illustration in the assumption ledger. |
+| **Lens failure mode** | “Treating price ≈ reported NAV as ‘fair’ while ignoring zero-marked sleeves.” |
+
+**Anti-pattern (forbidden):** Calling the fund “almost at NAV” or sizing on a thin reported-NAV discount when `fund_nav_overlay.edge` is `shadow` or any `zero_marked_sleeves[]` row has material cost / share count.
+
+**Primary metrics:**
+
+- `classic` / `holdco`: discount to reported (and liquid) NAV; scenario IRR on discount close.
+- `shadow`: **primary** = discount to economic NAV *illustration* (or sleeve $/share); reported-NAV discount is secondary context only. Base IRR may still keep the sleeve at $0.
+
+**Predictive attributes:** `cef_market_structure_discount`, `level3_or_sanction_zero_mark`, `tender_or_repurchase_catalyst`
+
+**Dashboard:** sleeve filter **NAV discounts**; row field `fund_nav` (discount %, edge chip).
+
+---
+
 ## valuation.json shape
 
 ```json
@@ -190,7 +237,7 @@ When SOTP or NAV overlay exists, report in Valuation & IRR:
   "valuation_mode": "optionality",
   "method": "yield_curve",
   "optionality_gate": {
-    "framework": "holdco_sotp | mineral_floor_option | hk_royalty_curve",
+    "framework": "holdco_sotp | mineral_floor_option | hk_royalty_curve | fund_lookthrough_nav",
     "floor_pass": true,
     "floor_metric": "book_per_share",
     "floor_value": 8.55,
@@ -199,6 +246,31 @@ When SOTP or NAV overlay exists, report in Valuation & IRR:
     "notes": "Do not use base Lawrence IRR as sole stance gate"
   },
   "scenarios": { "bear": {}, "base": {}, "bull": {} }
+}
+```
+
+Fund / CEF shape (in addition to the above):
+
+```json
+{
+  "instrument_type": "closed_end_fund",
+  "optionality_gate": {
+    "framework": "fund_lookthrough_nav",
+    "floor_metric": "liquid_nav_per_share",
+    "primary_metric": "discount_to_reported_nav"
+  },
+  "fund_nav_overlay": {
+    "edge": "classic | shadow | holdco",
+    "as_of": "YYYY-MM-DD",
+    "market_price": 0,
+    "reported_nav": 0,
+    "discount_to_reported_nav_pct": 0,
+    "liquid_nav_per_share": 0,
+    "complete_nav_per_share_base": 0,
+    "currency": "USD",
+    "zero_marked_sleeves": [],
+    "evidence_refresh": { "type": "fund_nav" }
+  }
 }
 ```
 

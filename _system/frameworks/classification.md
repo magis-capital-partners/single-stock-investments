@@ -34,9 +34,10 @@ Read `{TICKER}/research/valuation.json` **before** opening optional frameworks. 
 | `payoff_lens: levered` | `equity_stub_valuation.md` | cloud refresh |
 | `segment_build` or `valuation_overlay: segment_cashflow` | `segment_cashflow_valuation.md` | cloud refresh |
 | `ai_overlay` (keys present) | `ai_infrastructure_valuation.md` | cloud refresh |
-| `btc_overlay` or `holdings_crypto.json` tag | `crypto_economics_valuation.md` | `fetch_crypto_panel.py` + `apply_btc_context_overlay.py` |
+| `btc_overlay` or `holdings_crypto.json` tag | `crypto_economics_valuation.md` (incl. look-through crypto/book NAV §) | `fetch_crypto_panel.py` + `apply_btc_context_overlay.py`; lint crypto-NAV narrative |
 | `nav_overlay` or `optionality_gate` | `optionality_valuation.md` | cloud refresh |
-| `evidence_refresh.type` (e.g. `commodity_nav`) | `optionality_valuation.md` § Mechanical refresh | `fetch_market_inputs` + `refresh_optionality_valuation` inside cloud refresh |
+| `fund_nav_overlay` or `instrument_type` in `closed_end_fund` / `listed_investment_co` / `etf` | `optionality_valuation.md` § D (fund look-through); if `edge: shadow` or `zero_marked_sleeves[]`, mandatory Q5/exec narrative | `refresh_fund_nav_overlay.py` + `lint_deep_dive.py` shadow checks + cloud refresh |
+| `evidence_refresh.type` (e.g. `commodity_nav`, `fund_nav`) | `optionality_valuation.md` § Mechanical refresh | `fetch_market_inputs` + `refresh_optionality_valuation` / fund NAV refresh inside cloud refresh |
 | `book_estimate_config.json` exists | `current_book_estimate.md` | `current_book_estimate.py --write` |
 | HK index ticker (TPL, ICE, MSB, SJT) | `hk_cross_reference.md` | `scan_third_party_sources --with-hk` |
 | Every listed ticker | `third_party_cross_reference.md` | `fill_cross_check` + `check_cross_checks` |

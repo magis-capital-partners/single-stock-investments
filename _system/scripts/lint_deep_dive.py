@@ -144,8 +144,176 @@ def extract_executive_summary(text: str) -> str | None:
     return m.group(1).strip() if m else None
 
 
+def extract_section(text: str, heading: str) -> str | None:
+    m = re.search(
+        rf"## {re.escape(heading)}\s*\n+(.*?)(?=\n## |\Z)",
+        text,
+        re.DOTALL | re.IGNORECASE,
+    )
+    return m.group(1).strip() if m else None
+
+
 def word_count(s: str) -> int:
     return len(re.findall(r"\b[\w']+\b", s))
+
+
+_SHADOW_NEEDLES = re.compile(
+    r"\b(zero[- ]mark|marked at zero|at zero|to zero|shadow(?:-|\s+)(?:nav|net asset)|"
+    r"level[- ]?3|sanction|frozen|write[- ]?off|carried at zero|valued at zero|"
+    r"zeros? (?:russia|the|a) )\b",
+    re.IGNORECASE,
+)
+_THIN_REPORTED_LEAD = re.compile(
+    r"(trade[sd]?|trading)\s+at\s+[+\-]?\d+(?:\.\d+)?%\s+(vs|to|below|above)\s+reported",
+    re.IGNORECASE,
+)
+
+
+def lint_shadow_fund_nav(rel: Path, text: str, val: dict) -> list[str]:
+    """Catch CEE-class failure: classic CEF discount story burying a zero-marked sleeve."""
+    errors: list[str] = []
+    overlay = val.get("fund_nav_overlay") if isinstance(val, dict) else None
+    if not isinstance(overlay, dict):
+        return errors
+    sleeves = overlay.get("zero_marked_sleeves") or []
+    edge = str(overlay.get("edge") or "").lower()
+    if edge != "shadow" and not sleeves:
+        return errors
+
+    why = extract_section(text, "Why the market might be wrong") or ""
+    exec_sum = extract_executive_summary(text) or ""
+    valuation = extract_section(text, "Valuation & IRR (assumption ledger)") or ""
+
+    if not _SHADOW_NEEDLES.search(why):
+        errors.append(
+            f"{rel}: fund shadow/zero-marked sleeve — "
+            "'Why the market might be wrong' must name the zero mark / sanctions / Level-3 understatement "
+            "(optionality_valuation.md § D); do not lead with a thin reported-NAV discount alone"
+        )
+    elif _THIN_REPORTED_LEAD.search(why.split("\n")[0] if why else "") and not _SHADOW_NEEDLES.search(
+        why.split("\n")[0]
+    ):
+        errors.append(
+            f"{rel}: fund shadow edge — first sentence of Q5 leads with reported-NAV discount; "
+            "lead with the accounting mark (optionality_valuation.md § D)"
+        )
+
+    if not _SHADOW_NEEDLES.search(exec_sum):
+        errors.append(
+            f"{rel}: fund shadow/zero-marked sleeve — Executive summary must name the zero-marked sleeve "
+            "and that reported NAV excludes it"
+        )
+
+    if not re.search(r"reported\s+net asset value|reported NAV|three (views|NAVs)", valuation, re.I):
+        errors.append(
+            f"{rel}: fund shadow edge — Valuation must present reported vs economic/illustration NAV "
+            "(three-NAV table or equivalent)"
+        )
+
+    if sleeves and not re.search(r"Option scan|zero[- ]mark|Russia|Level", text, re.I):
+        errors.append(
+            f"{rel}: zero_marked_sleeves in valuation.json but dive lacks Option scan / zero-mark discussion"
+        )
+
+    if re.search(r"almost at (NAV|net asset value)|no (real |meaningful )?edge", text, re.I) and edge == "shadow":
+        errors.append(
+            f"{rel}: forbidden 'almost at NAV' / 'no edge' framing while fund_nav_overlay.edge is shadow"
+        )
+
+    return errors
+
+
+_CRYPTO_NAV_NEEDLES = re.compile(
+    r"\b(look[- ]through|crypto\s+NAV|mNAV|book\s+(?:value\s+)?(?:discount|per share)|"
+    r"discount\s+to\s+(?:book|NAV|net asset|crypto)|below\s+(?:book|NAV)|"
+    r"digital[- ]asset|bitcoin\s+(?:treasury|holdings)|marked\s+bitcoin)\b",
+    re.IGNORECASE,
+)
+_NO_OPTIONS_CLAIM = re.compile(
+    r"no material (?:options?|optionality)|option scan:\s*none|no (?:significant )?options?",
+    re.IGNORECASE,
+)
+
+
+def _crypto_holdings_map() -> dict:
+    path = ROOT / "_system" / "portfolio" / "holdings_crypto.json"
+    if not path.exists():
+        return {}
+    data = json.loads(path.read_text(encoding="utf-8"))
+    holdings = data.get("holdings") if isinstance(data, dict) else None
+    return holdings if isinstance(holdings, dict) else {}
+
+
+def _material_crypto_book_discount(val: dict) -> bool:
+    """True when valuation shows price meaningfully below book / crypto look-through."""
+    be = val.get("book_estimate") if isinstance(val, dict) else None
+    if isinstance(be, dict):
+        for key in ("discount_to_book_pct", "price_to_book", "discount_pct"):
+            raw = be.get(key)
+            if raw is None:
+                continue
+            try:
+                x = float(raw)
+            except (TypeError, ValueError):
+                continue
+            if key == "price_to_book":
+                if x > 0 and x < 0.85:
+                    return True
+            elif x >= 15:  # percent discount
+                return True
+        # Nested current vs price fields used by current_book_estimate.py
+        price = be.get("price") or (val.get("inputs") or {}).get("price")
+        book = be.get("current_book_per_share") or be.get("book_per_share")
+        try:
+            if price is not None and book is not None:
+                p, b = float(price), float(book)
+                if b > 0 and (b - p) / b >= 0.15:
+                    return True
+        except (TypeError, ValueError):
+            pass
+    # Explicit agent flag
+    flags = val.get("classification_inputs") if isinstance(val, dict) else None
+    if isinstance(flags, dict) and flags.get("crypto_nav_discount"):
+        return True
+    overlay = val.get("btc_overlay") if isinstance(val, dict) else None
+    if isinstance(overlay, dict) and overlay.get("lookthrough_discount_pct") is not None:
+        try:
+            return float(overlay["lookthrough_discount_pct"]) >= 15
+        except (TypeError, ValueError):
+            pass
+    return False
+
+
+def lint_crypto_nav_discount(rel: Path, text: str, val: dict, ticker: str) -> list[str]:
+    """Catch CMSG-class failure: cash IRR story burying look-through crypto/book NAV discount."""
+    errors: list[str] = []
+    holdings = _crypto_holdings_map()
+    if ticker not in holdings:
+        return errors
+    if not _material_crypto_book_discount(val):
+        # Soft: still require Bitcoin economics section when overlay present
+        return errors
+
+    why = extract_section(text, "Why the market might be wrong") or ""
+    exec_sum = extract_executive_summary(text) or ""
+
+    if not _CRYPTO_NAV_NEEDLES.search(why):
+        errors.append(
+            f"{rel}: crypto look-through NAV discount — "
+            "'Why the market might be wrong' must lead with discount to book / crypto NAV "
+            "(crypto_economics_valuation.md); do not lead only with owner-cash IRR"
+        )
+    if not _CRYPTO_NAV_NEEDLES.search(exec_sum):
+        errors.append(
+            f"{rel}: crypto look-through NAV discount — Executive summary must name "
+            "the discount to book or crypto NAV"
+        )
+    if _NO_OPTIONS_CLAIM.search(text):
+        errors.append(
+            f"{rel}: forbidden 'no material options' while holdings_crypto + book/crypto "
+            "NAV discount apply (option_treatment.md row 1c)"
+        )
+    return errors
 
 
 def lint_file(path: Path, *, legacy: bool, strict: bool) -> tuple[list[str], list[str]]:
@@ -278,6 +446,8 @@ def lint_file(path: Path, *, legacy: bool, strict: bool) -> tuple[list[str], lis
     ticker = ticker_from_dive_path(path)
     if ticker and not legacy:
         val = load_valuation(ticker)
+        errors.extend(lint_shadow_fund_nav(rel, text, val))
+        errors.extend(lint_crypto_nav_discount(rel, text, val, ticker))
         overlay = val.get("valuation_overlay")
         if overlay == "segment_cashflow":
             if not SEGMENT_MAP.search(text):

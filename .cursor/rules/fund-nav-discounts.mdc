@@ -1,0 +1,31 @@
+﻿---
+description: Fund / CEF NAV discounts and shadow (zero-marked) sleeves
+globs:
+  - "**/research/deep_dive_*.md"
+  - "**/research/valuation.json"
+  - "_system/scripts/onboard_fund_nav_sleeve.py"
+alwaysApply: false
+---
+
+# Fund NAV discounts & shadow sleeves
+
+When `valuation.json` has `fund_nav_overlay`, or `instrument_type` is `closed_end_fund` / `listed_investment_co` / `etf`, read `_system/frameworks/optionality_valuation.md` § D before writing the dive.
+
+## Shadow edge (CEE-class)
+
+If `fund_nav_overlay.edge` is `shadow` **or** `zero_marked_sleeves` is non-empty:
+
+1. **Why the market might be wrong** must lead with the zero / Level-3 / sanctions mark — not "trades at X% to reported NAV".
+2. **Executive summary** must name the zero-marked sleeve and that reported NAV excludes it; base may still price recovery at $0 until human sets P.
+3. **Valuation** must show reported vs liquid vs economic/illustration NAV (three views).
+4. Never say the fund is "almost at NAV" or has "no edge" solely because price ≈ reported NAV.
+5. Run `python _system/scripts/lint_deep_dive.py {TICKER}` — shadow narrative checks are errors.
+
+## Classic / holdco fund edges
+
+- `classic`: reported-NAV discount + catalyst (tender/buyback) can lead.
+- `holdco`: private + public look-through; still complete option scan for under-marks.
+
+## Sleeve
+
+Portfolio membership: `fund_nav_discounts` in `_system/portfolio/investment_sleeves.json`.

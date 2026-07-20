@@ -1,0 +1,90 @@
+{
+  "ticker": "URB.A.TO",
+  "as_of": "2026-07-20",
+  "valuation_mode": "optionality",
+  "method": "scenario",
+  "instrument_type": "listed_investment_co",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "holding_co",
+    "moat": "n/a",
+    "dhando": "partial",
+    "stance": "watch",
+    "cycle": "-",
+    "payoff_lens": "asset",
+    "investment_sleeve": "fund_nav_discounts"
+  },
+  "inputs": {
+    "price": 8.45,
+    "price_source": "Yahoo URB-A.TO ~CAD 8.45 (2026-07-20).",
+    "currency": "CAD",
+    "shares_outstanding": null,
+    "normalization_note": "Urbana weekly net assets per share CAD 14.49 as of 2026-07-10 (company site)."
+  },
+  "optionality_gate": {
+    "framework": "fund_lookthrough_nav",
+    "floor_pass": true,
+    "floor_metric": "reported_nav",
+    "floor_value": 14.49,
+    "primary_metric": "discount_to_reported_nav",
+    "primary_label": "discount to reported NAV",
+    "primary_return_pct": 9.8,
+    "notes": "Stance uses liquid/reported NAV floor + discount-close scenarios. Zero-marked sleeves stay at zero in base until human sets realization probability."
+  },
+  "fund_nav_overlay": {
+    "edge": "holdco",
+    "as_of": "2026-07-20",
+    "currency": "CAD",
+    "market_price": 8.45,
+    "reported_nav": 14.49,
+    "liquid_nav_per_share": null,
+    "complete_nav_per_share_base": 14.49,
+    "discount_to_reported_nav_pct": -41.68,
+    "discount_to_liquid_nav_pct": null,
+    "discount_to_complete_nav_pct": -41.68,
+    "shares_outstanding": null,
+    "expense_ratio_net": null,
+    "leverage_pct": null,
+    "zero_marked_sleeves": [],
+    "private_note": "Private + public financials/exchanges portfolio; private marks need look-through schedule.",
+    "evidence_refresh": {
+      "type": "fund_nav",
+      "sources": [
+        "sponsor_nav",
+        "market_price"
+      ]
+    },
+    "refreshed_at": "2026-07-20T16:20:31Z"
+  },
+  "scenarios": {
+    "bear": {
+      "price": 8.45,
+      "payoff": 10.14,
+      "years": 5,
+      "implied_irr_pct": 3.7,
+      "notes": "Discount persists; NAV flat to slightly up"
+    },
+    "base": {
+      "price": 8.45,
+      "payoff": 13.51,
+      "years": 5,
+      "implied_irr_pct": 9.8,
+      "notes": "Partial discount close toward liquid/reported NAV over five years; no heroic private/Russia recovery"
+    },
+    "bull": {
+      "price": 8.45,
+      "payoff": 17.94,
+      "years": 5,
+      "implied_irr_pct": 16.3,
+      "notes": "Discount nearly closes to complete NAV with modest NAV growth"
+    }
+  },
+  "estimates": {
+    "implied_irr_base_pct": 9.8,
+    "irr_method": "scenario"
+  },
+  "human_review": [
+    "Confirm live market price and latest sponsor NAV before sizing.",
+    "Zero-marked or private sleeves: set realization_probability_base only after evidence review."
+  ]
+}

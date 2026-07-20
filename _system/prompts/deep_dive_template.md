@@ -29,11 +29,15 @@ Copy structure for `{TICKER}/research/deep_dive_{date}.md`.
 
 {2–3 sentences. Q5: predictive attribute; name inefficiency if `asset`/`event` lens; catalyst + timeline when event-driven.}
 
+{If `fund_nav_overlay.edge` is `shadow` or `zero_marked_sleeves` is non-empty: **lead with the accounting mark** (zero / Level 3 / sanctions). Do not lead with a thin discount to reported NAV. See `optionality_valuation.md` § D.}
+
+{If ticker is in `holdings_crypto.json` and price sits below look-through book / crypto NAV: **lead with that discount** (governance, liquidity, fee drag). Do not lead only with a low owner-cash IRR. See `crypto_economics_valuation.md`.}
+
 ---
 
 ## Executive summary
 
-{120–180 words. Business + stance + **one** base IRR %. No step-by-step math.}
+{120–180 words. Business + stance + **one** base IRR %. No step-by-step math. For crypto look-through discounts, name the NAV gap even if base IRR stays a conservative cash scenario.}
 
 ---
 

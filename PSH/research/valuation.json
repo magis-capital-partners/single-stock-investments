@@ -1,0 +1,90 @@
+{
+  "ticker": "PSH",
+  "as_of": "2026-07-20",
+  "valuation_mode": "optionality",
+  "method": "scenario",
+  "instrument_type": "closed_end_fund",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "holding_co",
+    "moat": "n/a",
+    "dhando": "partial",
+    "stance": "watch",
+    "cycle": "-",
+    "payoff_lens": "asset",
+    "investment_sleeve": "fund_nav_discounts"
+  },
+  "inputs": {
+    "price": 50.5,
+    "price_source": "Yahoo PSHD.L (USD line) ~$50.50 (2026-07-20); GBP line PSH.L ~3768p.",
+    "currency": "USD",
+    "shares_outstanding": 175030590,
+    "normalization_note": "Company weekly NAV $77.06 per share as of 2026-07-14 (PSH site)."
+  },
+  "optionality_gate": {
+    "framework": "fund_lookthrough_nav",
+    "floor_pass": true,
+    "floor_metric": "liquid_nav_per_share",
+    "floor_value": 77.06,
+    "primary_metric": "discount_to_reported_nav",
+    "primary_label": "discount to reported NAV",
+    "primary_return_pct": 8.3,
+    "notes": "Stance uses liquid/reported NAV floor + discount-close scenarios. Zero-marked sleeves stay at zero in base until human sets realization probability."
+  },
+  "fund_nav_overlay": {
+    "edge": "classic",
+    "as_of": "2026-07-20",
+    "currency": "USD",
+    "market_price": 50.5,
+    "reported_nav": 77.06,
+    "liquid_nav_per_share": 77.06,
+    "complete_nav_per_share_base": 77.06,
+    "discount_to_reported_nav_pct": -34.47,
+    "discount_to_liquid_nav_pct": -34.47,
+    "discount_to_complete_nav_pct": -34.47,
+    "shares_outstanding": 175030590,
+    "expense_ratio_net": 0.015,
+    "leverage_pct": null,
+    "zero_marked_sleeves": [],
+    "private_note": null,
+    "evidence_refresh": {
+      "type": "fund_nav",
+      "sources": [
+        "sponsor_nav",
+        "market_price"
+      ]
+    },
+    "refreshed_at": "2026-07-20T16:20:31Z"
+  },
+  "scenarios": {
+    "bear": {
+      "price": 50.5,
+      "payoff": 53.94,
+      "years": 5,
+      "implied_irr_pct": 1.3,
+      "notes": "Discount persists; NAV flat to slightly up"
+    },
+    "base": {
+      "price": 50.5,
+      "payoff": 75.25,
+      "years": 5,
+      "implied_irr_pct": 8.3,
+      "notes": "Partial discount close toward liquid/reported NAV over five years; no heroic private/Russia recovery"
+    },
+    "bull": {
+      "price": 50.5,
+      "payoff": 95.4,
+      "years": 5,
+      "implied_irr_pct": 13.6,
+      "notes": "Discount nearly closes to complete NAV with modest NAV growth"
+    }
+  },
+  "estimates": {
+    "implied_irr_base_pct": 8.3,
+    "irr_method": "scenario"
+  },
+  "human_review": [
+    "Confirm live market price and latest sponsor NAV before sizing.",
+    "Zero-marked or private sleeves: set realization_probability_base only after evidence review."
+  ]
+}

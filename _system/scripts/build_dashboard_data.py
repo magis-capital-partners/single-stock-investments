@@ -652,6 +652,45 @@ def load_valuation(ticker_dir: Path) -> dict | None:
     return None
 
 
+def fund_nav_summary(ticker_dir: Path, holdings_meta: dict | None = None) -> dict | None:
+    """Compact NAV-discount sleeve payload for dashboard chips/columns."""
+    val = load_valuation(ticker_dir) or {}
+    overlay = val.get("fund_nav_overlay") if isinstance(val, dict) else None
+    cls = (holdings_meta or {}).get("classification") or {}
+    instrument = (
+        (val or {}).get("instrument_type")
+        or cls.get("instrument_type")
+        or (holdings_meta or {}).get("instrument_type")
+    )
+    edge = None
+    if isinstance(overlay, dict):
+        edge = overlay.get("edge")
+    edge = edge or cls.get("fund_edge")
+    if not overlay and not instrument and not edge:
+        return None
+    overlay = overlay or {}
+    disc = overlay.get("discount_to_reported_nav_pct")
+    return {
+        "instrument_type": instrument or "closed_end_fund",
+        "edge": edge or "classic",
+        "edge_label": {
+            "classic": "Classic discount",
+            "shadow": "Shadow NAV",
+            "holdco": "Holdco look-through",
+        }.get(str(edge or "classic"), str(edge or "classic")),
+        "as_of": overlay.get("as_of") or val.get("as_of"),
+        "currency": overlay.get("currency") or (val.get("inputs") or {}).get("currency"),
+        "market_price": overlay.get("market_price"),
+        "reported_nav": overlay.get("reported_nav"),
+        "liquid_nav_per_share": overlay.get("liquid_nav_per_share"),
+        "complete_nav_per_share_base": overlay.get("complete_nav_per_share_base"),
+        "discount_to_reported_nav_pct": disc,
+        "discount_to_liquid_nav_pct": overlay.get("discount_to_liquid_nav_pct"),
+        "discount_to_complete_nav_pct": overlay.get("discount_to_complete_nav_pct"),
+        "has_zero_marked_sleeve": bool(overlay.get("zero_marked_sleeves")),
+    }
+
+
 def classification_for(ticker: str, ticker_dir: Path, portfolio: dict[str, dict]) -> dict:
     from_thesis = parse_classification_from_thesis(ticker_dir)
     from_json = portfolio.get(ticker, {})
@@ -667,6 +706,8 @@ def classification_for(ticker: str, ticker_dir: Path, portfolio: dict[str, dict]
         "lawrence_bucket": "—",
         "investment_sleeve": "—",
         "investment_sleeve_label": "—",
+        "instrument_type": "—",
+        "fund_edge": "—",
     }
     out = {k: merged.get(k, defaults[k]) for k in defaults}
     val = load_valuation(ticker_dir)
@@ -676,9 +717,14 @@ def classification_for(ticker: str, ticker_dir: Path, portfolio: dict[str, dict]
         authority = resolve_authority(ticker_dir / "research", val)
         irr_web = website_implied_irr(val)
         inputs = val.get("classification_inputs") or {}
-        for key in ("archetype", "moat", "dhando", "cycle", "investment_sleeve"):
+        for key in ("archetype", "moat", "dhando", "cycle", "investment_sleeve", "payoff_lens"):
             if inputs.get(key) and inputs[key] not in ("-", "—", "pending"):
                 out[key] = inputs[key]
+        if val.get("instrument_type"):
+            out["instrument_type"] = val["instrument_type"]
+        fund_overlay = val.get("fund_nav_overlay") or {}
+        if isinstance(fund_overlay, dict) and fund_overlay.get("edge"):
+            out["fund_edge"] = fund_overlay["edge"]
         authority_display = contract_return_display(authority)
         if authority_display:
             out["implied_irr"] = authority_display
@@ -2274,6 +2320,11 @@ def build_ticker_row(
     row["kpi_trends"] = kpi_trends_for_ticker(ticker)
     row["power_zones"] = power_zones_for_ticker(ticker)
     row["index_membership"] = index_membership_for_ticker(ticker)
+    row["fund_nav"] = fund_nav_summary(ticker_dir, meta)
+    if row["fund_nav"] and classification.get("instrument_type") in ("—", "-", None, ""):
+        classification["instrument_type"] = row["fund_nav"].get("instrument_type") or "—"
+    if row["fund_nav"] and classification.get("fund_edge") in ("—", "-", None, ""):
+        classification["fund_edge"] = row["fund_nav"].get("edge") or "—"
     return row
 
 
@@ -2417,9 +2468,16 @@ def build() -> dict:
 
     sleeve_filters = [{"id": "ALL", "label": "All sleeves"}]
     real_assets_union: set[str] = set()
+    fund_nav_union: set[str] = set()
     for sleeve_id in _INVESTMENT_SLEEVE_LABELS:
         if sleeve_id.startswith("real_assets"):
             real_assets_union.update(
+                t
+                for t, sid in _INVESTMENT_SLEEVE_INDEX.items()
+                if sid == sleeve_id
+            )
+        if sleeve_id == "fund_nav_discounts":
+            fund_nav_union.update(
                 t
                 for t, sid in _INVESTMENT_SLEEVE_INDEX.items()
                 if sid == sleeve_id
@@ -2436,7 +2494,18 @@ def build() -> dict:
                 ),
             }
         )
+    if fund_nav_union:
+        sleeve_filters.append(
+            {
+                "id": "fund_nav_all",
+                "label": "NAV discounts",
+                "count": sum(1 for r in rows if r["ticker"] in fund_nav_union),
+            }
+        )
     for sleeve_id, label in sorted(_INVESTMENT_SLEEVE_LABELS.items(), key=lambda x: x[1]):
+        # Meta filter fund_nav_all already covers this single sleeve.
+        if sleeve_id == "fund_nav_discounts" and fund_nav_union:
+            continue
         count = sum(
             1
             for r in rows

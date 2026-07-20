@@ -75,6 +75,9 @@ Legacy `moi_bucket` values map 1:1 → `payoff_lens` (see `moi_lens.md`).
 | HK equity yield curve | Dated contractual payoff | `mental_models.md` Tier 3 |
 | Segment cash-flow sum | Multi-segment compounder | `segment_cashflow_valuation.md` |
 | Optionality / NAV overlay | `asset` lens | `optionality_valuation.md` |
+| Fund / CEF NAV discount | `fund_nav_overlay` or sleeve `fund_nav_discounts` | `optionality_valuation.md` § D; `refresh_fund_nav_overlay.py` |
+| Shadow / zero-marked fund sleeve | `edge: shadow` or `zero_marked_sleeves[]` | Same § D **mandatory narrative**; lint fails if exec/Q5 bury the zero mark |
+| Crypto / digital-asset look-through discount | `holdings_crypto.json` + book or crypto NAV ≫ price | `crypto_economics_valuation.md` look-through §; lint fails if Q5/exec ignore NAV gap |
 | Mechanical overlay refresh | `evidence_refresh.type` in valuation.json | `optionality_valuation.md` § Mechanical refresh; `marvin_cloud_refresh.py` |
 | Insider conviction (Form 4) | US CIK + `insider_signal` in valuation.json | `optionality_valuation.md` § Insider conviction; `apply_insider_signal.py` |
 | Option treatment ladder | Every dive — scan table | `option_treatment.md` |
