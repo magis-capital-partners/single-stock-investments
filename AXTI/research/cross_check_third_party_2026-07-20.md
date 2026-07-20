@@ -3,12 +3,12 @@
 **Date:** 2026-07-20  
 **Agent:** Marvin  
 **Marvin dive:** `AXTI/research/deep_dive_2026-07-20.md`  
-**Source inventory:** `AXTI/third-party-analyses/source_inventory_2026-07-19.md`  
+**Source inventory:** `AXTI/third-party-analyses/source_inventory_2026-07-20.md`  
 **Framework:** `_system/frameworks/third_party_cross_reference.md`, `external_view_blend.md`
 
 ## Executive summary
 
-No third-party sources are indexed for AXTI as of this scan (`source_inventory_2026-07-19.md` lists zero Substacks, fund letters, or HK vault matches). Marvin stance rests on **primary SEC filings only** (10-K FY2025, 10-Q Q1 2026, recent 8-K supply agreements and Tongmei events). This refresh was authorized by agent dispatch manifest on disk; full-tier text extracts remain unavailable (`filing_facts_2026-07-20.json`: `no_full_tier_text_extract`).
+No third-party sources are indexed for AXTI as of this scan (`source_inventory_2026-07-20.md` lists zero Substacks, fund letters, or HK vault matches). Marvin stance rests on **primary SEC filings only** (10-K FY2025, 10-Q Q1 2026, recent 8-K supply agreements and Tongmei events). This refresh was authorized by agent dispatch manifest on disk; full-tier text extracts remain unavailable (`filing_facts_2026-07-20.json`: `no_full_tier_text_extract`).
 
 **Synthesis:** Marvin floor only; no external blend. Base case uses mid-cycle normalized owner cash **$0.12 per share** [Assumption] anchored to 2021–2022 economics, not spot FY2025 losses.
 
@@ -58,6 +58,6 @@ No third-party sources are indexed for AXTI as of this scan (`source_inventory_2
 
 1. `AXTI/research/deep_dive_2026-07-20.md`
 2. `AXTI/research/valuation.json`
-3. `AXTI/third-party-analyses/source_inventory_2026-07-19.md`
+3. `AXTI/third-party-analyses/source_inventory_2026-07-20.md`
 4. `AXTI/investor-documents/sec-edgar/10-K_20260317_rpt20251231_acc0001437749_26_008612.htm`
 5. `AXTI/investor-documents/sec-edgar/10-Q_20260514_rpt20260331_acc0001437749_26_017054.htm`
