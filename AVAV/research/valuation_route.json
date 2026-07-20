@@ -3,9 +3,11 @@
   "status": "routed",
   "profile_id": "quality_reinvestment",
   "label": "High-return compounder",
-  "score": 16.0,
+  "score": 19.0,
   "reasons": [
     "archetype=compounder",
+    "component categories=operating_business",
+    "existing methods=dcf, owner_cash",
     "explicit reviewed profile"
   ],
   "primary_methods": [
@@ -43,22 +45,42 @@
     "stock compensation or acquisitions omitted",
     "terminal value unsupported by a durable mechanism"
   ],
-  "secondary_profiles": [],
+  "secondary_profiles": [
+    {
+      "profile_id": "predictable_cash_flow",
+      "score": 2.0,
+      "reasons": [
+        "component categories=operating_business",
+        "existing methods=owner_cash"
+      ]
+    },
+    {
+      "profile_id": "capital_cycle",
+      "score": 1.0,
+      "reasons": [
+        "component categories=operating_business"
+      ]
+    }
+  ],
   "scorecard": {
     "scarce_asset_optionality": {
       "score": 0.0,
       "reasons": []
     },
     "quality_reinvestment": {
-      "score": 16.0,
+      "score": 19.0,
       "reasons": [
         "archetype=compounder",
+        "component categories=operating_business",
+        "existing methods=dcf, owner_cash",
         "explicit reviewed profile"
       ]
     },
     "capital_cycle": {
-      "score": 0.0,
-      "reasons": []
+      "score": 1.0,
+      "reasons": [
+        "component categories=operating_business"
+      ]
     },
     "credit_and_normalized_returns": {
       "score": 0.0,
@@ -69,8 +91,11 @@
       "reasons": []
     },
     "predictable_cash_flow": {
-      "score": 0.0,
-      "reasons": []
+      "score": 2.0,
+      "reasons": [
+        "component categories=operating_business",
+        "existing methods=owner_cash"
+      ]
     },
     "binary_milestone": {
       "score": 0.0,
@@ -79,23 +104,90 @@
   },
   "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
   "ticker": "AVAV",
-  "as_of": "2026-07-19",
+  "as_of": "2026-07-20",
   "route_source": "canonical_power_zone_router",
   "config_path": "_system/frameworks/power_zones.json",
   "config_updated": "2026-07-14",
   "classification": {
     "archetype": "compounder",
-    "moat": "unproven",
-    "dhando": "pending",
+    "moat": "stable",
+    "dhando": "partial",
     "stance": "watch",
-    "cycle": "-",
+    "cycle": "mid",
     "moi_bucket": "pending",
-    "payoff_lens": "pending",
-    "investment_sleeve": "ls_algo_underlying"
+    "payoff_lens": "operating",
+    "investment_sleeve": "ls_algo_underlying",
+    "predictive_attribute": "integration_discount"
   },
-  "specialist_power_zones": [],
+  "specialist_power_zones": [
+    {
+      "persona": "lawrence",
+      "label": "Bryan Lawrence",
+      "independence_group": "quality_reinvestment",
+      "in_power_zone": true,
+      "fit": 1.0,
+      "matched": 3,
+      "known_fields": 3,
+      "matched_fields": [
+        "archetype",
+        "moat",
+        "dhando"
+      ],
+      "excluded_by": null,
+      "match_rate": null,
+      "score": 85
+    },
+    {
+      "persona": "buffett_weschler",
+      "label": "Buffett / Weschler",
+      "independence_group": "quality_reinvestment",
+      "in_power_zone": true,
+      "fit": 0.667,
+      "matched": 2,
+      "known_fields": 3,
+      "matched_fields": [
+        "archetype",
+        "moat"
+      ],
+      "excluded_by": null,
+      "match_rate": null,
+      "score": 57
+    },
+    {
+      "persona": "hohn",
+      "label": "Chris Hohn",
+      "independence_group": "competitive_advantage",
+      "in_power_zone": true,
+      "fit": 0.667,
+      "matched": 2,
+      "known_fields": 3,
+      "matched_fields": [
+        "archetype",
+        "moat"
+      ],
+      "excluded_by": null,
+      "match_rate": null,
+      "score": 57
+    },
+    {
+      "persona": "munger",
+      "label": "Charlie Munger",
+      "independence_group": "quality_reinvestment",
+      "in_power_zone": true,
+      "fit": 0.667,
+      "matched": 2,
+      "known_fields": 3,
+      "matched_fields": [
+        "archetype",
+        "moat"
+      ],
+      "excluded_by": null,
+      "match_rate": null,
+      "score": 57
+    }
+  ],
   "committee": {
-    "candidate_count": 4,
+    "candidate_count": 5,
     "independence_group_count": 3,
     "committee_seatable": true,
     "candidates": [
@@ -114,9 +206,13 @@
       {
         "persona": "marathon_capital_cycle",
         "independence_group": "capital_cycle"
+      },
+      {
+        "persona": "lawrence",
+        "independence_group": "quality_reinvestment"
       }
     ]
   },
-  "input_hash": "4bcc8fb451d77f99db50d7957408b6adb02ef098b4ca1a4b1808dd16981a1c17",
-  "generated_at": "2026-07-19T12:58:03.547201+00:00"
+  "input_hash": "602b6edeeb4f84315498cc8dcdeee9b8d40d633a61c80da9c9678faaf78d30c7",
+  "generated_at": "2026-07-20T21:04:55.169087+00:00"
 }
