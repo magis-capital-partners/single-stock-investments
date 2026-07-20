@@ -177,3 +177,4 @@ One row per adversarial or consistency re-pass. Append via `milly_repass.py` or 
 | 2026-07-19 | AXTI | standard_batch | OK | marvin_cloud_refresh |
 | 2026-07-19 | AXTI | standard_batch | OK | marvin_cloud_refresh |
 | 2026-07-20 | AXTI | standard_batch | OK | marvin_cloud_refresh |
+| 2026-07-20 | AXTI | standard_batch | OK | marvin_cloud_refresh |
