@@ -67,6 +67,15 @@ class GeneralizedValuationSystemTests(unittest.TestCase):
         self.assertEqual(incomplete["universal_valuation_contract"]["status"], "evidence_blocked")
         self.assertIn("unvalued_component_count must equal zero", strict_contract_errors(incomplete))
 
+    def test_universal_contract_blocks_decision_grade_without_market_price(self):
+        fixture = component_fixture()
+        fixture["inputs"]["price"] = None
+        contract = compute_valuation(fixture)["universal_valuation_contract"]
+        self.assertEqual(contract["status"], "evidence_blocked")
+        self.assertTrue(
+            any("Market price per share is missing" in row for row in contract["evidence"]["blockers"])
+        )
+
     def test_primary_derived_inputs_are_not_labeled_primary_verified(self):
         fixture = component_fixture()
         fixture["component_valuation"]["components"][0]["valuation"]["evidence_tier"] = "primary_derived"

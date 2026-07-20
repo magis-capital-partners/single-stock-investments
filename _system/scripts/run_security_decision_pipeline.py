@@ -366,6 +366,8 @@ def main() -> int:
 
     pricing = stage_pricing(workbenches["written"], as_of, args.dry_run)
     print(f"[4/6] pricing: {len(pricing['priced'])} priced, {len(pricing['errors'])} errors")
+    for row in pricing.get("errors") or []:
+        print(f"  pricing error {row.get('ticker')}: {row.get('error')}")
 
     committees = stage_committees(workbenches["written"], as_of, args.dry_run)
     print(f"[5/6] committees: {len(committees['initiated'])} initialized, {len(committees['blocked'])} blocked, {len(committees['triggered_evidence_tasks'])} evidence tasks")

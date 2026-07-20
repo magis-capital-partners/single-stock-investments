@@ -73,6 +73,14 @@ def build_universal_valuation_contract(data: dict, explicit_profile: str | None 
     distributions = float((data.get("valuation_methodology") or {}).get("expected_distributions_per_share") or 0)
     validation_errors = list(economic.get("validation_errors") or [])
     evidence_blockers: list[str] = []
+    try:
+        price_ok = price is not None and float(price) > 0
+    except (TypeError, ValueError):
+        price_ok = False
+    if not price_ok:
+        evidence_blockers.append(
+            "Market price per share is missing or non-positive; cannot mark decision_grade or compute entry prices."
+        )
     records, evaluated_rows = [], []
     buckets = {"facts": [], "estimates": [], "judgments": []}
     old_proof = {str(row.get("component_id")): row for row in economic.get("valuation_proof") or []}
