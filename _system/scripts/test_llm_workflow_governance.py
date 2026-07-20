@@ -85,6 +85,17 @@ class WorkflowGovernanceTests(unittest.TestCase):
         self.assertIn("if: steps.meta.outputs.eligible == 'true'", workflow)
         self.assertNotIn("Stop after promoting draft", workflow)
 
+    def test_power_zone_writer_uses_shared_lock_and_retry_push(self):
+        workflow = (ROOT / ".github" / "workflows" / "power-zone-universe.yml").read_text(encoding="utf-8")
+        self.assertIn("group: data-commit-main", workflow)
+        self.assertIn('bash _system/scripts/ci_push_main.sh "chore(valuation): process Power Zone universe"', workflow)
+        self.assertNotIn('git push origin "HEAD:${GITHUB_REF_NAME}"', workflow)
+
+    def test_research_quality_checks_use_persistent_pr_head_ref(self):
+        workflow = (ROOT / ".github" / "workflows" / "research-quality.yml").read_text(encoding="utf-8")
+        persistent_ref = '"pull/${{ github.event.pull_request.number }}/head"'
+        self.assertEqual(workflow.count(persistent_ref), 3)
+
     def test_policy_encodes_expected_call_budgets(self):
         policy = json.loads((ROOT / "_system" / "config" / "llm_usage_policy.json").read_text(encoding="utf-8"))
         self.assertEqual(policy["consumers"]["marvin_research"]["daily_repo_limit"], 4)
