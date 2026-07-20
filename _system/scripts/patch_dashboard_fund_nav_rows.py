@@ -72,7 +72,7 @@ def main() -> int:
             f["label"] = labels.get("fund_nav_discounts", "NAV discounts") if f["id"] == "fund_nav_discounts" else "NAV discounts"
 
     data["summary"]["ticker_count"] = len(rows)
-    OUTPUT.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+    OUTPUT.write_text(json.dumps(data, separators=(",", ":"), ensure_ascii=False) + "\n", encoding="utf-8")
     print(f"Wrote {OUTPUT} ({len(rows)} tickers, fund sleeve count={fund_count})")
     return 0
 
