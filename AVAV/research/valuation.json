@@ -1,0 +1,199 @@
+{
+  "ticker": "AVAV",
+  "as_of": "2026-07-20",
+  "method": "full",
+  "irr_method": "full",
+  "lawrence_bucket": "pricing_power",
+  "payoff_lens": "operating",
+  "classification_inputs": {
+    "archetype": "compounder",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating",
+    "predictive_attribute": "integration_discount",
+    "investment_sleeve": "ls_algo_underlying"
+  },
+  "valuation_overlay": "segment_cashflow",
+  "inputs": {
+    "price": 142.6,
+    "price_source": "Yahoo AVAV close 2026-07-20",
+    "price_as_of": "2026-07-20",
+    "shares_millions": 49.1,
+    "shares_outstanding": 49100000,
+    "shares_source": "49,087,346 weighted-average diluted shares FY2026 (10-K filed 2026-06-29; sec_companyfacts WeightedAverageNumberOfDilutedSharesOutstanding)",
+    "fcf_per_share": 2.75,
+    "fcf_source": "[Assumption] Normalized owner cash bridge from FY2026 segment adjusted EBITDA $286.1M (AxS $288.7M + SCDE -$2.6M; 10-K Business Segment Results) less maintenance capital spending ~$40M, cash interest ~$50M on ~$729M long-term debt, normalized cash taxes ~$35M, and stock-based compensation ~$25M not fully in adjusted metrics; spot GAAP operating cash flow was -$78.4M (sec_companyfacts)",
+    "revenue_fy2026_m": 1976.8,
+    "revenue_fy2026_source": "FY2026 revenue $1,976.8M (sec_companyfacts RevenueFromContractWithCustomerExcludingAssessedTax; 10-K filed 2026-06-29)",
+    "revenue_fy2025_m": 820.6,
+    "revenue_fy2025_source": "FY2025 revenue $820.6M (10-K; legacy AV pre full-year BlueHalo)",
+    "funded_backlog_m": 1183.0,
+    "funded_backlog_source": "Funded backlog ~$1,183.0M at April 30, 2026; ~85% expected revenue recognition in fiscal 2027 (10-K Item 1)",
+    "cash_m": 377.3,
+    "cash_source": "Cash and cash equivalents $377.3M at April 30, 2026 (sec_companyfacts CashAndCashEquivalentsAtCarryingValue)",
+    "long_term_debt_m": 729.0,
+    "debt_source": "Long-term debt noncurrent $729.0M at April 30, 2026 (sec_companyfacts)",
+    "goodwill_impairment_m": 240.7,
+    "goodwill_impairment_source": "Goodwill impairment ~$241M in Space reporting unit after SCAR program stop-work/termination (10-K FY2026 risk factors and notes)",
+    "normalization_note": "FY2026 GAAP operating loss -$311M and diluted EPS -$5.40 reflect $204M intangible amortization, $241M goodwill impairment, and BlueHalo integration costs. Lawrence base uses segment adjusted EBITDA bridged to normalized owner cash, not spot losses.",
+    "lease_income_annual_usd": 0.0
+  },
+  "segment_build": {
+    "as_of": "2026-07-20",
+    "segments": [
+      {
+        "id": "axs",
+        "label": "Autonomous Systems (AxS) — Switchblade, UAS, MacCready Works",
+        "revenue_m": 1358.1,
+        "revenue_source": "AxS revenue $1,358.1M FY2026 (10-K Business Segment Results)",
+        "adj_ebitda_m": 288.7,
+        "adj_ebitda_source": "AxS segment adjusted EBITDA $288.7M FY2026 (10-K)",
+        "growth_y1_5": 0.1,
+        "growth_y6_10": 0.06,
+        "exit_ev_ebitda_y10": 14,
+        "notes": "Legacy AV plus BlueHalo/ESAero LMS and UAS; Switchblade volume and international demand drive growth"
+      },
+      {
+        "id": "scde",
+        "label": "Space, Cyber and Directed Energy (SCDE) — BlueHalo",
+        "revenue_m": 618.8,
+        "revenue_source": "SCDE revenue $618.8M FY2026; segment created on BlueHalo acquisition May 1, 2025 (10-K)",
+        "adj_ebitda_m": -2.6,
+        "adj_ebitda_source": "SCDE segment adjusted EBITDA -$2.6M FY2026 (10-K)",
+        "growth_y1_5": 0.12,
+        "growth_y6_10": 0.08,
+        "exit_ev_ebitda_y10": 12,
+        "notes": "Space/cyber/IAMD portfolio; SCAR impairment signals program risk; margin recovery is integration swing factor"
+      }
+    ],
+    "options": [
+      {
+        "id": "bluehalo_synergy",
+        "label": "BlueHalo revenue cross-sell and cost synergy",
+        "option_treatment": "embedded_in_segment",
+        "annual_drag_per_share": 0.0,
+        "base_terminal_value_bn": 0,
+        "base_terminal_rationale": "Synergy modeled in AxS/SCDE segment growth rows, not separate terminal",
+        "evidence": "10-K AxS revenue +$253.5M product and +$67M service from BlueHalo/ESAero acquisitions FY2026",
+        "not_in_lawrence_base": false
+      },
+      {
+        "id": "scar_program_recovery",
+        "label": "SCAR / Space program replacement after termination",
+        "option_treatment": "zero",
+        "annual_drag_per_share": 0.0,
+        "base_terminal_value_bn": 0,
+        "base_terminal_rationale": "Customer terminated SCAR OTA for convenience March 2026; $241M goodwill impairment taken; no base recovery without new contract",
+        "evidence": "10-K FY2026: stop-work January 2026, termination March 2026; goodwill impairment Space reporting unit",
+        "not_in_lawrence_base": true
+      }
+    ],
+    "corporate_drag_m": 85.0,
+    "corporate_drag_source": "[Assumption] Unallocated corporate, integration, and acquisition-related costs above segment adjusted EBITDA bridge to consolidated GAAP operating loss"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 12,
+      "notes": "Defense budget pressure, integration stumbles, further program cancellations, amortization persists; normalized owner cash flat"
+    },
+    "base": {
+      "growth_y1_5": 0.1,
+      "growth_y6_10": 0.06,
+      "exit_pfcf_y10": 18,
+      "notes": "Funded backlog $1.18B with 85% conversion in FY2027; segment adj EBITDA margin holds; integration costs fade"
+    },
+    "bull": {
+      "growth_y1_5": 0.15,
+      "growth_y6_10": 0.08,
+      "exit_pfcf_y10": 22,
+      "notes": "Loitering munitions demand sustained, BlueHalo cross-sell accelerates, SCDE margin inflects positive"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Goodwill and intangibles from BlueHalo acquisition are marked; $241M impairment taken on Space unit (10-K)"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "SCDE adj EBITDA -$2.6M FY2026; GAAP operating loss -$311M consolidated (10-K)"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in owner-cash path?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Funded backlog $1,183M at Apr 30, 2026; 85% expected revenue in FY2027 (10-K Item 1)"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating defense contractor; no holdco-style private marks"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option already in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Switchblade LMS demand and BlueHalo portfolio already in AxS/SCDE revenue"
+    }
+  ],
+  "lawrence_horizon_years": 7,
+  "implied_return": {
+    "base_pct": null,
+    "label": "7yr IRR (total synthesis)",
+    "display": "pending mechanical refresh",
+    "lawrence_stance_gate_pct": null,
+    "falsifier_adjusted_pct": null,
+    "synthesis_pct": null
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": false
+    },
+    "override_reason": "BlueHalo integration year: GAAP losses, $729M debt, $241M goodwill impairment; spot owner cash negative; bounded bear not fully proven until synergy evidence"
+  },
+  "estimates": {
+    "marvin_floor": {
+      "per_share": null,
+      "return_pct": null,
+      "notes": "Computed by marvin_valuation.py --write in cloud refresh"
+    }
+  },
+  "synthesis": {
+    "status": "pending",
+    "paths": [],
+    "qualitative_adjustments": [
+      {
+        "id": "integration_discount",
+        "factor": "Post-merger integration and amortization overhang",
+        "pp": -0.5,
+        "rationale": "FY2026 net loss, negative OCF, and goodwill impairment signal market may be ahead of normalized cash",
+        "sources": "10-K FY2026; sec_companyfacts",
+        "falsifier": "Two consecutive quarters of positive GAAP operating income and OCF conversion post-integration"
+      }
+    ],
+    "qualitative_manual": false,
+    "notes": "Capstone IRR pending marvin_cloud_refresh.py"
+  },
+  "evidence_refresh": {
+    "synthesis_in_dive": true
+  },
+  "human_review": {
+    "live_price_confirmed": false
+  }
+}
