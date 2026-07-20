@@ -1,0 +1,1021 @@
+{
+  "ticker": "AVAV",
+  "as_of": "2026-07-20",
+  "method": "full",
+  "irr_method": "full",
+  "lawrence_bucket": "pricing_power",
+  "payoff_lens": "operating",
+  "classification_inputs": {
+    "archetype": "compounder",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating",
+    "predictive_attribute": "integration_discount",
+    "investment_sleeve": "ls_algo_underlying"
+  },
+  "valuation_overlay": "segment_cashflow",
+  "inputs": {
+    "price": 142.6,
+    "price_source": "Yahoo AVAV close 2026-07-20",
+    "price_as_of": "2026-07-20",
+    "shares_millions": 49.1,
+    "shares_outstanding": 49100000,
+    "shares_source": "49,087,346 weighted-average diluted shares FY2026 (10-K filed 2026-06-29; sec_companyfacts WeightedAverageNumberOfDilutedSharesOutstanding)",
+    "fcf_per_share": 2.75,
+    "fcf_source": "[Assumption] Normalized owner cash bridge from FY2026 segment adjusted EBITDA $286.1M (AxS $288.7M + SCDE -$2.6M; 10-K Business Segment Results) less maintenance capital spending ~$40M, cash interest ~$50M on ~$729M long-term debt, normalized cash taxes ~$35M, and stock-based compensation ~$25M not fully in adjusted metrics; spot GAAP operating cash flow was -$78.4M (sec_companyfacts)",
+    "revenue_fy2026_m": 1976.8,
+    "revenue_fy2026_source": "FY2026 revenue $1,976.8M (sec_companyfacts RevenueFromContractWithCustomerExcludingAssessedTax; 10-K filed 2026-06-29)",
+    "revenue_fy2025_m": 820.6,
+    "revenue_fy2025_source": "FY2025 revenue $820.6M (10-K; legacy AV pre full-year BlueHalo)",
+    "funded_backlog_m": 1183.0,
+    "funded_backlog_source": "Funded backlog ~$1,183.0M at April 30, 2026; ~85% expected revenue recognition in fiscal 2027 (10-K Item 1)",
+    "cash_m": 377.3,
+    "cash_source": "Cash and cash equivalents $377.3M at April 30, 2026 (sec_companyfacts CashAndCashEquivalentsAtCarryingValue)",
+    "long_term_debt_m": 729.0,
+    "debt_source": "Long-term debt noncurrent $729.0M at April 30, 2026 (sec_companyfacts)",
+    "goodwill_impairment_m": 240.7,
+    "goodwill_impairment_source": "Goodwill impairment ~$241M in Space reporting unit after SCAR program stop-work/termination (10-K FY2026 risk factors and notes)",
+    "normalization_note": "FY2026 GAAP operating loss -$311M and diluted EPS -$5.40 reflect $204M intangible amortization, $241M goodwill impairment, and BlueHalo integration costs. Lawrence base uses segment adjusted EBITDA bridged to normalized owner cash, not spot losses.",
+    "lease_income_annual_usd": 0.0
+  },
+  "segment_build": {
+    "as_of": "2026-07-20",
+    "segments": [
+      {
+        "id": "axs",
+        "label": "Autonomous Systems (AxS) \u2014 Switchblade, UAS, MacCready Works",
+        "revenue_m": 1358.1,
+        "revenue_source": "AxS revenue $1,358.1M FY2026 (10-K Business Segment Results)",
+        "adj_ebitda_m": 288.7,
+        "adj_ebitda_source": "AxS segment adjusted EBITDA $288.7M FY2026 (10-K)",
+        "growth_y1_5": 0.1,
+        "growth_y6_10": 0.06,
+        "exit_ev_ebitda_y10": 14,
+        "notes": "Legacy AV plus BlueHalo/ESAero LMS and UAS; Switchblade volume and international demand drive growth"
+      },
+      {
+        "id": "scde",
+        "label": "Space, Cyber and Directed Energy (SCDE) \u2014 BlueHalo",
+        "revenue_m": 618.8,
+        "revenue_source": "SCDE revenue $618.8M FY2026; segment created on BlueHalo acquisition May 1, 2025 (10-K)",
+        "adj_ebitda_m": -2.6,
+        "adj_ebitda_source": "SCDE segment adjusted EBITDA -$2.6M FY2026 (10-K)",
+        "growth_y1_5": 0.12,
+        "growth_y6_10": 0.08,
+        "exit_ev_ebitda_y10": 12,
+        "notes": "Space/cyber/IAMD portfolio; SCAR impairment signals program risk; margin recovery is integration swing factor"
+      }
+    ],
+    "options": [
+      {
+        "id": "bluehalo_synergy",
+        "label": "BlueHalo revenue cross-sell and cost synergy",
+        "option_treatment": "embedded_in_segment",
+        "annual_drag_per_share": 0.0,
+        "base_terminal_value_bn": 0,
+        "base_terminal_rationale": "Synergy modeled in AxS/SCDE segment growth rows, not separate terminal",
+        "evidence": "10-K AxS revenue +$253.5M product and +$67M service from BlueHalo/ESAero acquisitions FY2026",
+        "not_in_lawrence_base": false
+      },
+      {
+        "id": "scar_program_recovery",
+        "label": "SCAR / Space program replacement after termination",
+        "option_treatment": "zero",
+        "annual_drag_per_share": 0.0,
+        "base_terminal_value_bn": 0,
+        "base_terminal_rationale": "Customer terminated SCAR OTA for convenience March 2026; $241M goodwill impairment taken; no base recovery without new contract",
+        "evidence": "10-K FY2026: stop-work January 2026, termination March 2026; goodwill impairment Space reporting unit",
+        "not_in_lawrence_base": true
+      }
+    ],
+    "corporate_drag_m": 85.0,
+    "corporate_drag_source": "[Assumption] Unallocated corporate, integration, and acquisition-related costs above segment adjusted EBITDA bridge to consolidated GAAP operating loss",
+    "horizon_years": 7
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 12,
+      "notes": "Defense budget pressure, integration stumbles, further program cancellations, amortization persists; normalized owner cash flat"
+    },
+    "base": {
+      "growth_y1_5": 0.1,
+      "growth_y6_10": 0.06,
+      "exit_pfcf_y10": 18,
+      "notes": "Funded backlog $1.18B with 85% conversion in FY2027; segment adj EBITDA margin holds; integration costs fade"
+    },
+    "bull": {
+      "growth_y1_5": 0.15,
+      "growth_y6_10": 0.08,
+      "exit_pfcf_y10": 22,
+      "notes": "Loitering munitions demand sustained, BlueHalo cross-sell accelerates, SCDE margin inflects positive"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Goodwill and intangibles from BlueHalo acquisition are marked; $241M impairment taken on Space unit (10-K)"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "SCDE adj EBITDA -$2.6M FY2026; GAAP operating loss -$311M consolidated (10-K)"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in owner-cash path?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Funded backlog $1,183M at Apr 30, 2026; 85% expected revenue in FY2027 (10-K Item 1)"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating defense contractor; no holdco-style private marks"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option already in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Switchblade LMS demand and BlueHalo portfolio already in AxS/SCDE revenue"
+    }
+  ],
+  "lawrence_horizon_years": 7,
+  "implied_return": {
+    "base_pct": -4.7,
+    "label": "7yr IRR (total synthesis)",
+    "display": "-4.7% (total synthesis)",
+    "lawrence_stance_gate_pct": -3.0,
+    "falsifier_adjusted_pct": -3.0,
+    "synthesis_pct": -4.7
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": "BlueHalo integration year: GAAP losses, $729M debt, $241M goodwill impairment; spot owner cash negative; bounded bear not fully proven until synergy evidence"
+  },
+  "estimates": {
+    "marvin_floor": {
+      "per_share": null,
+      "return_pct": null,
+      "notes": "Computed by marvin_valuation.py --write in cloud refresh"
+    }
+  },
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence envelope)",
+        "source": "scenarios.bear",
+        "return_pct": -12.7,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "hard_to_vary": "yes: asymmetric low weight is structural",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ]
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence envelope)",
+        "source": "scenarios.bull",
+        "return_pct": 3.3,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "hard_to_vary": "yes",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ]
+      }
+    ],
+    "qualitative_adjustments": [],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": -4.7,
+    "qualitative_pp": 0,
+    "total_synthesis_pct": -4.7,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  },
+  "evidence_refresh": {
+    "synthesis_in_dive": true
+  },
+  "human_review": {
+    "live_price_confirmed": false
+  },
+  "total_return_panel": {
+    "schema_version": "3.0",
+    "ticker": "AVAV",
+    "as_of": "2026-07-20",
+    "status": "partial",
+    "error": "Vendor events are discovery evidence; primary-source completeness has not been established.",
+    "price_source": "yahoo:AVAV",
+    "currency": "USD",
+    "return_currency": "USD",
+    "fx_basis": "listing_currency_nominal",
+    "history_start": "2007-01-23",
+    "history_end": "2026-07-20",
+    "price_points": 4903,
+    "price_interval": "1d",
+    "history_basis": "earliest_available_vendor_trading_history",
+    "chart_scale": "logarithmic",
+    "chart_y_axis": "cumulative_return_pct",
+    "chart_series": [
+      "total_return",
+      "price_only"
+    ],
+    "return_contract": "split-adjusted close excluding dividends; event amounts normalized for later splits; cash reinvested at ex-date close; pre-tax nominal",
+    "coverage": {
+      "status": "vendor_only",
+      "start": null,
+      "end": null,
+      "note": "Vendor events are discovery evidence; primary-source completeness has not been established.",
+      "ledger_path": null
+    },
+    "event_count": 0,
+    "event_counts": {},
+    "cash_distributions_on_initial_share_path": 0,
+    "distribution_contribution_by_type": {},
+    "cumulative_distributions_per_share": 0,
+    "start_price": 23.93,
+    "end_price": 142.6,
+    "price_index_end": 595.9,
+    "total_return_index_end": 595.9,
+    "cumulative_price_return_pct": 495.9,
+    "cumulative_total_return_pct": 495.9,
+    "price_only_annualized_pct": 9.59,
+    "total_return_annualized_pct": 9.59,
+    "market_cap_m": 7001.66,
+    "shares_outstanding": 49100000,
+    "price_for_market_cap": 142.6,
+    "chart": "AVAV/research/charts/total_return_2026-07-20.svg",
+    "panel_json": "AVAV/research/total_return_panel.json"
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -12.7
+    },
+    "base": {
+      "return_pct": -3.0
+    },
+    "bull": {
+      "return_pct": 3.3
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -12.7
+    },
+    "base": {
+      "return_pct": -3.0
+    },
+    "bull": {
+      "return_pct": 3.3
+    }
+  },
+  "overlay_results": [],
+  "component_valuation_results": {
+    "status": "inferred_minimal",
+    "decision_rule": "Operating-only fallback. Add an explicit component_valuation schedule before drawing asset-level conclusions.",
+    "all_material_components_identified": false,
+    "additive_components": [
+      {
+        "id": "operating_business_fallback",
+        "label": "Operating business (fallback)",
+        "category": "operating_business",
+        "treatment": "additive",
+        "method": "owner_cash_dcf",
+        "evidence_tier": "model_input",
+        "evidence": "inputs.fcf_per_share and scenarios.base",
+        "low_per_share": 58.18,
+        "base_per_share": 64.92,
+        "high_per_share": 72.66
+      }
+    ],
+    "embedded_components": [],
+    "total_equity_value_per_share": {
+      "low": 58.18,
+      "base": 64.92,
+      "high": 72.66
+    },
+    "material_component_count": 1,
+    "additive_component_count": 1,
+    "embedded_component_count": 0,
+    "market_price_per_share": 142.6,
+    "upside_downside_pct": {
+      "low": -59.2,
+      "base": -54.5,
+      "high": -49.0
+    }
+  },
+  "economic_value_analysis": {
+    "schema_version": "1.0",
+    "status": "recommended",
+    "trigger": {
+      "required": false,
+      "reasons": [],
+      "policy": "A complete economic-value analysis is required when any trigger fires; otherwise it is recommended."
+    },
+    "method": "economic_claim_to_risked_present_value",
+    "economic_claim": {},
+    "gaap_role": null,
+    "accounting_reference": null,
+    "comparable_hierarchy": [
+      "issuer_arm_length_transaction",
+      "same_asset_transaction",
+      "public_peer",
+      "replacement_cost",
+      "approved_external_analysis"
+    ],
+    "gross_comparable_nav_per_share": null,
+    "risked_present_value_per_share": {
+      "low": 58.18,
+      "base": 64.92,
+      "high": 72.66
+    },
+    "component_groups": [
+      {
+        "id": "operating_business_fallback",
+        "label": "Operating business (fallback)",
+        "component_ids": [
+          "operating_business_fallback"
+        ],
+        "economic_claim": "Operating business (fallback)",
+        "valuation_basis": "owner_cash_dcf",
+        "adjustments": "Risk and timing are reflected in the low/base/high range.",
+        "overlap_control": "Unique overlap key operating_business_fallback.",
+        "risked_present_value_per_share": {
+          "low": 58.18,
+          "base": 64.92,
+          "high": 72.66
+        }
+      }
+    ],
+    "valuation_proof": [
+      {
+        "component_id": "operating_business_fallback",
+        "economic_claim": "Operating business (fallback)",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "owner_cash_dcf",
+        "evidence_tier": "model_input",
+        "evidence": "inputs.fcf_per_share and scenarios.base",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Risk and timing are reflected in the low/base/high range.",
+        "range_per_share": {
+          "low": 58.18,
+          "base": 64.92,
+          "high": 72.66
+        },
+        "treatment": "additive",
+        "overlap_key": "operating_business_fallback",
+        "overlap_control": "Unique overlap key operating_business_fallback.",
+        "falsifier": "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods.",
+        "risk_and_timing": null
+      }
+    ],
+    "wisdom_applied": [],
+    "limitations": [],
+    "complete_component_coverage": true,
+    "validation_errors": [],
+    "registry_version": "1.0"
+  },
+  "valuation_method_route": {
+    "schema_version": "1.0",
+    "status": "routed",
+    "profile_id": "quality_reinvestment",
+    "label": "High-return compounder",
+    "score": 9.0,
+    "reasons": [
+      "archetype=compounder",
+      "component categories=operating_business",
+      "existing methods=dcf, owner_cash"
+    ],
+    "primary_methods": [
+      "owner_earnings_reinvestment_dcf"
+    ],
+    "corroborating_methods": [
+      "reverse_dcf",
+      "incremental_roic_runway"
+    ],
+    "primary_personas": [
+      "buffett_weschler",
+      "hohn"
+    ],
+    "cross_check_personas": [
+      "munger",
+      "marathon_capital_cycle"
+    ],
+    "silent_personas": [
+      "greenblatt",
+      "hk",
+      "klarman_asset_value",
+      "marks_credit_cycle",
+      "pabrai",
+      "stahl"
+    ],
+    "required_evidence": [
+      "normalized owner earnings",
+      "incremental return on capital",
+      "reinvestment runway",
+      "diluted share count",
+      "competitive-advantage mechanism"
+    ],
+    "failure_modes": [
+      "growth projected without its capital cost",
+      "stock compensation or acquisitions omitted",
+      "terminal value unsupported by a durable mechanism"
+    ],
+    "secondary_profiles": [
+      {
+        "profile_id": "predictable_cash_flow",
+        "score": 2.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=owner_cash"
+        ]
+      },
+      {
+        "profile_id": "capital_cycle",
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
+      }
+    ],
+    "scorecard": {
+      "scarce_asset_optionality": {
+        "score": 0.0,
+        "reasons": []
+      },
+      "quality_reinvestment": {
+        "score": 9.0,
+        "reasons": [
+          "archetype=compounder",
+          "component categories=operating_business",
+          "existing methods=dcf, owner_cash"
+        ]
+      },
+      "capital_cycle": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
+      },
+      "credit_and_normalized_returns": {
+        "score": 0.0,
+        "reasons": []
+      },
+      "catalyst_asset_value": {
+        "score": 0.0,
+        "reasons": []
+      },
+      "predictable_cash_flow": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=owner_cash"
+        ]
+      },
+      "binary_milestone": {
+        "score": 0.0,
+        "reasons": []
+      }
+    },
+    "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+  },
+  "universal_valuation_contract": {
+    "schema_version": "2.0",
+    "status": "evidence_blocked",
+    "ticker": "AVAV",
+    "as_of": "2026-07-20",
+    "economic_ownership_map": [
+      {
+        "component_id": "operating_business_fallback",
+        "label": "Operating business (fallback)",
+        "category": "operating_business",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Operating business (fallback)",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "owner_cash_dcf",
+        "method_version": null,
+        "method_provenance": null,
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": null,
+          "base": null,
+          "high": null
+        },
+        "legacy_range_per_share": {
+          "low": 58.18,
+          "base": 64.92,
+          "high": 72.66
+        },
+        "valuation_status": "legacy_sensitivity",
+        "calculation_proof": null,
+        "evidence_tier": "model_input",
+        "evidence_level": "analyst_estimated",
+        "evidence": "inputs.fcf_per_share and scenarios.base",
+        "scenario_assumptions": null,
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Risk and timing are reflected in the low/base/high range.",
+        "falsifier": "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods.",
+        "overlap_key": "operating_business_fallback",
+        "assumption_type": "estimate"
+      }
+    ],
+    "component_coverage": {
+      "all_material_components_identified": false,
+      "material_component_count": 1,
+      "additive_component_count": 1,
+      "embedded_component_count": 0,
+      "unvalued_component_count": 1,
+      "double_counting_flags": []
+    },
+    "input_classification": {
+      "facts": [],
+      "estimates": [
+        {
+          "component_id": "operating_business_fallback",
+          "label": "Operating business (fallback)",
+          "kind": "estimate",
+          "evidence_tier": "model_input",
+          "evidence": "inputs.fcf_per_share and scenarios.base",
+          "method": "owner_cash_dcf",
+          "valuation_status": "legacy_sensitivity"
+        }
+      ],
+      "judgments": []
+    },
+    "method_route": {
+      "schema_version": "1.0",
+      "status": "routed",
+      "profile_id": "quality_reinvestment",
+      "label": "High-return compounder",
+      "score": 9.0,
+      "reasons": [
+        "archetype=compounder",
+        "component categories=operating_business",
+        "existing methods=dcf, owner_cash"
+      ],
+      "primary_methods": [
+        "owner_earnings_reinvestment_dcf"
+      ],
+      "corroborating_methods": [
+        "reverse_dcf",
+        "incremental_roic_runway"
+      ],
+      "primary_personas": [
+        "buffett_weschler",
+        "hohn"
+      ],
+      "cross_check_personas": [
+        "munger",
+        "marathon_capital_cycle"
+      ],
+      "silent_personas": [
+        "greenblatt",
+        "hk",
+        "klarman_asset_value",
+        "marks_credit_cycle",
+        "pabrai",
+        "stahl"
+      ],
+      "required_evidence": [
+        "normalized owner earnings",
+        "incremental return on capital",
+        "reinvestment runway",
+        "diluted share count",
+        "competitive-advantage mechanism"
+      ],
+      "failure_modes": [
+        "growth projected without its capital cost",
+        "stock compensation or acquisitions omitted",
+        "terminal value unsupported by a durable mechanism"
+      ],
+      "secondary_profiles": [
+        {
+          "profile_id": "predictable_cash_flow",
+          "score": 2.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=owner_cash"
+          ]
+        },
+        {
+          "profile_id": "capital_cycle",
+          "score": 1.0,
+          "reasons": [
+            "component categories=operating_business"
+          ]
+        }
+      ],
+      "scorecard": {
+        "scarce_asset_optionality": {
+          "score": 0.0,
+          "reasons": []
+        },
+        "quality_reinvestment": {
+          "score": 9.0,
+          "reasons": [
+            "archetype=compounder",
+            "component categories=operating_business",
+            "existing methods=dcf, owner_cash"
+          ]
+        },
+        "capital_cycle": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=operating_business"
+          ]
+        },
+        "credit_and_normalized_returns": {
+          "score": 0.0,
+          "reasons": []
+        },
+        "catalyst_asset_value": {
+          "score": 0.0,
+          "reasons": []
+        },
+        "predictable_cash_flow": {
+          "score": 2.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=owner_cash"
+          ]
+        },
+        "binary_milestone": {
+          "score": 0.0,
+          "reasons": []
+        }
+      },
+      "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+    },
+    "market": {
+      "price_per_share": 142.6,
+      "fully_diluted_shares": 49100000,
+      "market_cap_m": 7001.66,
+      "enterprise_value_m": 6624.36
+    },
+    "valuation": {
+      "value_per_share": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "priced_components_per_share": {
+        "low": 0,
+        "base": 0,
+        "high": 0
+      },
+      "legacy_value_per_share": {
+        "low": 58.18,
+        "base": 64.92,
+        "high": 72.66
+      },
+      "probability_weighted_value_per_share": null,
+      "expected_distributions_per_share": 0.0,
+      "annualized_return_at_price_pct": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "downside_to_low_pct": null,
+      "horizon_years": 7,
+      "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
+    },
+    "scenario_contract": {
+      "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
+      "top_value_drivers": [
+        {
+          "component_id": "operating_business_fallback",
+          "label": "Operating business (fallback)",
+          "valuation_status": "legacy_sensitivity",
+          "base_per_share": null,
+          "legacy_base_per_share": 64.92,
+          "range_width_per_share": null,
+          "scenario_assumptions": null
+        }
+      ],
+      "reverse_expectations": null
+    },
+    "calculation_proof_summary": {
+      "component_count": 1,
+      "priced_component_count": 0,
+      "proof_complete_pct": 0.0,
+      "status_counts": {
+        "bounded_estimate": 0,
+        "calculated": 0,
+        "legacy_sensitivity": 1,
+        "unpriced": 0
+      },
+      "all_material_components_priced": false,
+      "calculation_errors": [],
+      "aggregate_proof_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "source_lineage": [],
+    "model_checks": {
+      "calculation_graphs_valid": true,
+      "component_sum_reconciles": false,
+      "no_double_counting": true,
+      "all_material_components_priced": false,
+      "low_base_high_ordered": true
+    },
+    "evidence": {
+      "unresolved_count": 1,
+      "blockers": [
+        "operating_business_fallback: material component is legacy_sensitivity; a valid calculation proof is required"
+      ],
+      "validation_errors": []
+    },
+    "monitoring": {
+      "falsifiers": [
+        "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods."
+      ],
+      "required_refresh_triggers": [
+        "new filing or material operating update",
+        "capital-structure change",
+        "material price move",
+        "component milestone or falsifier"
+      ]
+    },
+    "change_control": {
+      "model_hash": "d149952011fc6b0d491e713139c59f3059a95c1f4e34a1b52bab0fe6403b6e82",
+      "method_versions": [],
+      "change_log": [],
+      "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
+    },
+    "decision_rule": "No security is decision-grade until every material claim is valued exactly once by a valid calculation proof and every material evidence blocker is resolved."
+  },
+  "context_overlay": {
+    "as_of": "2026-07-20",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": 1.43,
+            "as_of": "2026-07-20",
+            "yoy_pct": 248.8,
+            "direction": "up",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.5980000495910645,
+            "as_of": "2026-07-20",
+            "yoy_pct": 5.2,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.328000068664551,
+            "as_of": "2026-07-20",
+            "yoy_pct": 10.7,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 100.9729995727539,
+            "as_of": "2026-07-20",
+            "yoy_pct": 3.2,
+            "direction": "up",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 18.649999618530273,
+            "as_of": "2026-07-20",
+            "yoy_pct": 12.0,
+            "direction": "up",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": 2.76,
+            "as_of": "2026-07-20",
+            "yoy_pct": 55.9,
+            "direction": "up",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 11.37,
+            "as_of": "2026-07-20",
+            "yoy_pct": 31.3,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "insider_signal": {
+    "as_of": "2026-07-20",
+    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
+    "in_base_irr": false,
+    "window_days": 365,
+    "ics": 3.54,
+    "band": "weak",
+    "bull_case_support": "none",
+    "scenario_confidence": {
+      "priors": {
+        "bear": 0.2,
+        "base": 0.55,
+        "bull": 0.25
+      },
+      "tilted": {
+        "bear": 0.209,
+        "base": 0.541,
+        "bull": 0.25
+      },
+      "bull_delta": 0.0,
+      "bear_delta": 0.009,
+      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
+    },
+    "factors": {
+      "buy_score": 4.082,
+      "sell_score": -1.0,
+      "cluster_bonus": 0.0,
+      "net_buy_usd": 377122.14,
+      "net_sell_usd": 8998395.77,
+      "price_today": 142.6
+    },
+    "top_buys": [
+      {
+        "insider": "Woodward Sean Thomas",
+        "date": "2026-06-30",
+        "shares": 97,
+        "price": 140.31,
+        "value_usd": 13610.07,
+        "shares_owned_after": 3995,
+        "contrib": 1.459
+      },
+      {
+        "insider": "Nawabi Wahid",
+        "date": "2026-06-30",
+        "shares": 97,
+        "price": 140.31,
+        "value_usd": 13610.07,
+        "shares_owned_after": 151737,
+        "contrib": 1.363
+      },
+      {
+        "insider": "Smith Robert Fendlay",
+        "date": "2026-04-13",
+        "shares": 1800,
+        "price": 194.39,
+        "value_usd": 349902.0,
+        "shares_owned_after": 1800,
+        "contrib": 1.26
+      }
+    ],
+    "top_sells": [
+      {
+        "insider": "Nawabi Wahid",
+        "date": "2026-07-10",
+        "shares": 5246,
+        "price": 144.58,
+        "value_usd": 758466.68,
+        "is_10b5_1": false,
+        "contrib": -0.265
+      },
+      {
+        "insider": "Nawabi Wahid",
+        "date": "2026-06-29",
+        "shares": 28265,
+        "price": 139.0,
+        "value_usd": 3928835.0,
+        "is_10b5_1": false,
+        "contrib": -0.241
+      },
+      {
+        "insider": "Woodward Sean Thomas",
+        "date": "2026-07-10",
+        "shares": 236,
+        "price": 144.58,
+        "value_usd": 34120.88,
+        "is_10b5_1": false,
+        "contrib": -0.207
+      },
+      {
+        "insider": "MULLER EDWARD R",
+        "date": "2026-07-13",
+        "shares": 996,
+        "price": 0.0,
+        "value_usd": 0.0,
+        "is_10b5_1": false,
+        "contrib": -0.189
+      },
+      {
+        "insider": "Woodward Sean Thomas",
+        "date": "2026-06-29",
+        "shares": 855,
+        "price": 139.0,
+        "value_usd": 118845.0,
+        "is_10b5_1": false,
+        "contrib": -0.189
+      }
+    ],
+    "narrative_hooks": [],
+    "transaction_count": 68
+  },
+  "lens_consensus": {
+    "as_of": "2026-07-20",
+    "shared_inputs_ref": "valuation.json@2026-07-20",
+    "valuation_richness": 0.759,
+    "blended_return_pct": -4.76,
+    "band_pct": [
+      -12.7,
+      -3.0
+    ],
+    "weighted_median_pct": -3.0,
+    "median_mean_flag": false,
+    "stance": "pass",
+    "agreement_pct": 100,
+    "dissent_count": 0,
+    "lawrence_divergence": false,
+    "top_dissents": [],
+    "contributor_count": 9,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
+  }
+}
