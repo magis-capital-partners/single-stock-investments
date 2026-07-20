@@ -352,6 +352,7 @@ test_main_writer_workflows_share_lock() {
     darwin-refresh.yml
     letter-backfill.yml
     ls-algo-universe.yml
+    memory-digest.yml
   )
 
   for workflow in "${writer_workflows[@]}"; do

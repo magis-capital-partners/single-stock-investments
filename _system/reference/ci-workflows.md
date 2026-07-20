@@ -45,6 +45,7 @@ New tickers            → LS-algo Universe Intake (registry-driven onboarding)
 | Auto - IR Recovery | IR queue change | Exception-only browser adapter repair |
 | Darwin Portfolio Refresh | weekday 01:20 and Darwin code changes | Full Darwin data rebuild (includes research snapshot) |
 | Letter Backfill | Sunday 16:00 | Import letters and rebuild insights |
+| Memory Digest | Sunday 14:00 | Aggregate unpromoted [PROPOSED] bullets + corrections into one pending review |
 | Deploy Dashboard | relevant push or successful upstream run | Validate and publish Pages |
 | Deploy OAuth Proxy | OAuth source change | Deploy Cloudflare worker when configured |
 | Research quality (PR) | research PR paths | Prompt sync and research lint |
