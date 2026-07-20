@@ -117,7 +117,7 @@ jobs:
           sparse-checkout-cone-mode: false
           fetch-depth: 1
       - name: Checkout workspace (minimal)
-        run: bash _system/scripts/ci_checkout_workspace.sh minimal
+        run: bash _system/scripts/ci_checkout_workspace.sh minimal "pull/${{ github.event.pull_request.number }}/head"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -148,7 +148,7 @@ jobs:
           fetch-depth: 1
       - name: Checkout workspace (shallow PR diff)
         run: |
-          bash _system/scripts/ci_checkout_workspace.sh history "" 2
+          bash _system/scripts/ci_checkout_workspace.sh history "pull/${{ github.event.pull_request.number }}/head" 2
           git fetch --depth=1 origin "+refs/heads/${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}"
       - uses: actions/setup-python@v5
         with:
@@ -171,7 +171,7 @@ jobs:
           sparse-checkout-cone-mode: false
           fetch-depth: 1
       - name: Checkout dashboard validation workspace
-        run: bash _system/scripts/ci_checkout_workspace.sh dashboard
+        run: bash _system/scripts/ci_checkout_workspace.sh dashboard "pull/${{ github.event.pull_request.number }}/head"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
