@@ -47,6 +47,8 @@ Compare deep dive **numeric claims** to:
 | 8 | Stance vs `valuation.json` gates |
 | 9 | **AI / capex** — if `ai_overlay` or hyperscaler: FCF₀ year, capex guide vs modeled capex, backlog $ |
 | 10 | **Option scan** — if business has segments, land, backlog, loss bets, or GAAP≠fair value: table present? zeros justified? |
+| 10b | **Fund shadow NAV** — if `fund_nav_overlay.edge` is `shadow` or `zero_marked_sleeves[]` non-empty: does Q5/exec lead with the zero mark (not a thin reported-NAV discount)? Three-NAV table present? |
+| 10c | **Crypto look-through NAV** — if `holdings_crypto.json` and price ≪ book/crypto NAV: does Q5/exec lead with that discount? Option scan must not say “no material options.” |
 
 Output: table **Claim in dive | Filing value | Match? | Severity**
 
@@ -59,6 +61,7 @@ When dive mentions options, hidden assets, undeveloped reserves, Other Bets, Rea
 | **`#### Option scan`** table in Business & moat | **Inference risk** |
 | Each material option has `option_treatment` + rationale in dive or `valuation.json` | **Inference risk** per unexplained zero |
 | GAAP book used as floor when filing assigns **no value** to core assets | **Factual error** |
+| Fund/CEF dive sizes on reported-NAV discount while a material sleeve is still disclosed at **$0** (sanctions/Level 3) without shadow-NAV treatment | **Factual error** (wrong edge) |
 | Segment sum ≪ price with **all** options at $0 and no [HUMAN REVIEW] | **Inference risk** |
 | Overlay-base return shown when Lawrence base < 15% and options material | **Warn** if missing |
 

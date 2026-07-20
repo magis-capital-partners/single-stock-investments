@@ -137,6 +137,17 @@ Read `archetype_models.json` for operating prompts. Below is **how to write the 
 
 ---
 
+### `holding_co` — regulated fund / CEF variant (e.g. CEE, PSH, Urbana)
+
+When `instrument_type` is `closed_end_fund` or `listed_investment_co`, or `fund_nav_overlay` is present:
+
+| Element | Rule |
+|---------|------|
+| **Lead metric** | Discount to **reported NAV** and to **liquid economic NAV**; complete NAV only with risked sleeves explicit |
+| **Bridge story** | "Price vs sponsor NAV; then ask whether NAV itself understates (zero marks) or overstates (stale privates)." |
+| **IRR method** | `scenario` (discount close / buyback) or `yield_curve` if dated tender; not operating FCF `full` |
+| **Dashboard tag** | Sleeve **NAV discounts**; edge chip `classic` / `shadow` / `holdco` |
+
 ### `holding_co` (e.g. FRMO)
 
 | Field | Guidance |

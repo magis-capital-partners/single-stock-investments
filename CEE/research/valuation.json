@@ -1,0 +1,120 @@
+{
+  "ticker": "CEE",
+  "as_of": "2026-07-20",
+  "valuation_mode": "optionality",
+  "method": "scenario",
+  "instrument_type": "closed_end_fund",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "holding_co",
+    "moat": "n/a",
+    "dhando": "partial",
+    "stance": "watch",
+    "cycle": "-",
+    "payoff_lens": "asset",
+    "investment_sleeve": "fund_nav_discounts",
+    "fund_edge": "shadow"
+  },
+  "inputs": {
+    "price": 20.48,
+    "price_source": "Yahoo CEE regularMarketPrice ~2026-07-20.",
+    "currency": "USD",
+    "shares_outstanding": 6520194,
+    "normalization_note": "Reported NAV zeros Russia. Liquid NAV ≈ reported. Edge is shadow NAV from the zero-marked Russia sleeve, not the thin discount to reported NAV."
+  },
+  "optionality_gate": {
+    "framework": "fund_lookthrough_nav",
+    "floor_pass": true,
+    "floor_metric": "liquid_nav_per_share",
+    "floor_value": 21.32,
+    "primary_metric": "shadow_nav_discount_illustration",
+    "primary_label": "discount to economic NAV illustration (Russia MTM)",
+    "primary_return_pct": 4.0,
+    "notes": "Base stance gate keeps Russia at zero (4%/yr liquid path). The investment edge is the Russia option: local-only MTM illustration implies ~23% discount to economic NAV. Do not treat -4% vs reported NAV as the thesis."
+  },
+  "fund_nav_overlay": {
+    "edge": "shadow",
+    "as_of": "2026-07-20",
+    "currency": "USD",
+    "market_price": 20.48,
+    "reported_nav": 21.32,
+    "liquid_nav_per_share": 21.32,
+    "complete_nav_per_share_base": 21.32,
+    "complete_nav_per_share_illustration_local": 26.6,
+    "complete_nav_per_share_illustration_full_proxy": 30.0,
+    "discount_to_reported_nav_pct": -3.94,
+    "discount_to_liquid_nav_pct": -3.94,
+    "discount_to_complete_nav_pct": -3.94,
+    "discount_to_mtm_nav_local_only_pct": -23.0,
+    "discount_to_mtm_nav_full_proxy_pct": -31.73,
+    "shares_outstanding": 6520194,
+    "expense_ratio_net": 0.0126,
+    "leverage_pct": null,
+    "zero_marked_sleeves": [
+      {
+        "id": "russia_equity_sleeve",
+        "label": "Russian securities marked at zero since 2022-03-14",
+        "option_treatment": "zero",
+        "cost_basis_total": 30722586,
+        "cost_basis_as_of": "2025-07-31",
+        "cost_basis_per_share": 4.71,
+        "reported_value": 0,
+        "proxy_gross_value_base": 0,
+        "proxy_gross_value_illustration_local_usd": 34401863,
+        "proxy_gross_value_illustration_full_usd": 56575250,
+        "proxy_per_share_illustration_local": 5.28,
+        "proxy_per_share_illustration_full": 8.68,
+        "realization_probability_base": 0.0,
+        "years_to_realization_base": null,
+        "friction_haircut_pct": null,
+        "evidence": "CEE-PH3.pdf Schedule of Investments; russia_mtm_illustration.json (MOEX proxies). Base stays zero until human sets P.",
+        "human_review": true
+      }
+    ],
+    "mtm_illustration_path": "CEE/research/russia_mtm_illustration.json",
+    "private_note": "Moscow marks are not realizable USD for a US CEF. ADR/GDR unit mapping can overstate full-proxy totals.",
+    "evidence_refresh": {
+      "type": "fund_nav",
+      "sources": [
+        "sponsor_nav",
+        "market_price",
+        "russia_mtm_illustration"
+      ]
+    },
+    "refreshed_at": "2026-07-20T16:35:00Z"
+  },
+  "scenarios": {
+    "bear": {
+      "price": 20.48,
+      "payoff": 18.51,
+      "years": 5,
+      "implied_irr_pct": -2.0,
+      "notes": "Liquid CE book weak; Russia stays zero; discount widens slightly"
+    },
+    "base": {
+      "price": 20.48,
+      "payoff": 24.92,
+      "years": 5,
+      "implied_irr_pct": 4.0,
+      "notes": "Russia stays $0 in base. Liquid book ~4%/yr with sticky reported-NAV discount. Shadow option not in the 4%."
+    },
+    "bull": {
+      "price": 20.48,
+      "payoff": 32.0,
+      "years": 5,
+      "implied_irr_pct": 9.3,
+      "notes": "Sensitivity only: liquid path plus roughly half of local-only Russia MTM (~$2.64/sh) realized over five years. Requires human P. Not base."
+    }
+  },
+  "estimates": {
+    "implied_irr_base_pct": 4.0,
+    "irr_method": "scenario",
+    "shadow_nav_note": "Primary edge is discount to economic NAV illustration (-23% local / -32% full proxy), not -4% vs reported NAV."
+  },
+  "human_review": [
+    "Set realization_probability_base for Russia sleeve (still 0 in base).",
+    "Refresh Russia share counts from latest N-PORT/N-CSR.",
+    "Approve ADR/GDR mapping before using full-proxy ~$30 NAV.",
+    "Do not size on reported-NAV discount alone."
+  ]
+}

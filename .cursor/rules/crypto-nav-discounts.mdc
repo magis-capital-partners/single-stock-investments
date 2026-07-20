@@ -1,0 +1,28 @@
+---
+description: Crypto / digital-asset look-through NAV discounts (CMSG-class)
+globs:
+  - "**/research/deep_dive_*.md"
+  - "**/research/valuation.json"
+  - "_system/portfolio/holdings_crypto.json"
+alwaysApply: false
+---
+
+# Crypto look-through NAV discounts
+
+When the ticker is in `_system/portfolio/holdings_crypto.json`, read `_system/frameworks/crypto_economics_valuation.md` before writing the dive.
+
+## CMSG-class (price well below book / crypto NAV)
+
+If `book_estimate` or look-through crypto NAV shows a material discount (about 15% or more):
+
+1. **Why the market might be wrong** must lead with the discount to book or crypto NAV (governance, OTC liquidity, fee drag, miner dilution) — not only a low owner-cash IRR.
+2. **Executive summary** must name that NAV gap even if base IRR stays a conservative cash scenario.
+3. **Option scan** must flag digital-asset treasury / hash optionality; never “no material options.”
+4. Keep `btc_overlay.in_base_irr: false` until human promotes marks into base.
+5. Prefer `payoff_lens: asset` and archetype `optionality` when the equity is mostly a claim on marked digital assets.
+6. Run `python _system/scripts/lint_deep_dive.py {TICKER}` — crypto-NAV narrative checks are errors when the discount is material.
+
+## Related
+
+- Fund/CEF reported-NAV zeros: `.cursor/rules/fund-nav-discounts.mdc` + `optionality_valuation.md` § D
+- Option scan row 1c: `option_treatment.md`

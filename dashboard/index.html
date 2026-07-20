@@ -396,6 +396,12 @@
   }
   .sleeve-filter-group { display: inline-flex; flex-wrap: wrap; gap: 6px; margin-left: 8px; }
   .badge-sleeve { background: rgba(34, 197, 94, 0.15); color: #86efac; border: 1px solid rgba(34, 197, 94, 0.35); }
+  .badge-fund { background: rgba(245, 158, 11, 0.16); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.4); }
+  .badge-fund-edge { background: rgba(14, 165, 233, 0.14); color: #7dd3fc; border: 1px solid rgba(14, 165, 233, 0.35); font-size: 10px; }
+  .nav-disc-pos { color: var(--positive); font-variant-numeric: tabular-nums; }
+  .nav-disc-neg { color: var(--negative); font-variant-numeric: tabular-nums; }
+  .nav-disc-flat { color: var(--text-muted); font-variant-numeric: tabular-nums; }
+  .sleeve-cell { display: flex; flex-direction: column; gap: 3px; align-items: flex-start; }
   .persona-tabs .view-tab { font-size: 11px; padding: 4px 8px; }
   .darwin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 18px; }
   .darwin-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 8px; }
@@ -854,6 +860,7 @@ const HOLDINGS_COLUMNS = [
   { id: 'company', label: 'Company', sort: 'company', group: 'core' },
   { id: 'market', label: 'Mkt', sort: 'market', group: 'core' },
   { id: 'sleeve', label: 'Sleeve', sort: 'classification.investment_sleeve_label', group: 'core' },
+  { id: 'nav_disc', label: 'NAV disc.', sort: 'fund_nav.discount_to_reported_nav_pct', group: 'core' },
   { id: 'stance', label: 'Stance', sort: 'classification.stance', group: 'core' },
   { id: 'valuation', label: 'Val', sort: 'component_valuation.status', group: 'core' },
   { id: 'value', label: 'Value', sort: 'component_valuation.total_equity_value_per_share.base', group: 'core' },
@@ -2803,6 +2810,8 @@ function filtered() {
       const sid = t.classification?.investment_sleeve;
       if (sleeveFilter === 'real_assets_all') {
         if (!sid || !String(sid).startsWith('real_assets')) return false;
+      } else if (sleeveFilter === 'fund_nav_all' || sleeveFilter === 'fund_nav_discounts') {
+        if (sid !== 'fund_nav_discounts' && !t.fund_nav) return false;
       } else if (sid !== sleeveFilter) {
         return false;
       }
@@ -2820,6 +2829,10 @@ function filtered() {
         t.ticker,
         t.company,
         e.status?.label,
+        t.classification?.investment_sleeve_label,
+        t.fund_nav?.edge,
+        t.fund_nav?.edge_label,
+        t.fund_nav?.instrument_type,
         ...(e.source_mix || []),
         ...(e.needs_work_reasons || []),
         ...((e.bullets || []).map(b => `${b.title || ''} ${b.summary || ''}`)),
@@ -2831,10 +2844,15 @@ function filtered() {
     let av = a[sortKey], bv = b[sortKey];
     if (sortKey.includes('.')) {
       const parts = sortKey.split('.');
-      av = a[parts[0]]?.[parts[1]];
-      bv = b[parts[0]]?.[parts[1]];
+      av = parts.reduce((o, k) => (o == null ? o : o[k]), a);
+      bv = parts.reduce((o, k) => (o == null ? o : o[k]), b);
     }
-    if (sortKey === 'classification.analysis_irr_pct') {
+    if (sortKey === 'fund_nav.discount_to_reported_nav_pct') {
+      av = a.fund_nav?.discount_to_reported_nav_pct;
+      bv = b.fund_nav?.discount_to_reported_nav_pct;
+      av = av == null ? Infinity : av;
+      bv = bv == null ? Infinity : bv;
+    } else if (sortKey === 'classification.analysis_irr_pct') {
       av = a.classification?.analysis_irr_pct ?? parseIrrPct(a.classification?.implied_irr);
       bv = b.classification?.analysis_irr_pct ?? parseIrrPct(b.classification?.implied_irr);
       av = av == null ? -Infinity : av;
@@ -2916,10 +2934,34 @@ function renderHoldingsCell(colId, t) {
       return `<td class="company-cell" title="${escapeHtml(t.company)}">${escapeHtml(t.company)}</td>`;
     case 'market':
       return `<td><span class="badge ${MARKET_BADGE[t.market] || 'badge-us'}">${t.market}</span></td>`;
-    case 'sleeve':
-      return `<td>${t.classification?.investment_sleeve_label && t.classification.investment_sleeve_label !== '—'
-        ? `<span class="badge badge-sleeve">${escapeHtml(t.classification.investment_sleeve_label)}</span>`
-        : '<span style="color:var(--text-muted)">—</span>'}</td>`;
+    case 'sleeve': {
+      const sleeveId = t.classification?.investment_sleeve;
+      const sleeveLabel = t.classification?.investment_sleeve_label;
+      const isFund = sleeveId === 'fund_nav_discounts' || !!t.fund_nav;
+      const badgeClass = isFund ? 'badge-fund' : 'badge-sleeve';
+      const edge = t.fund_nav?.edge_label || t.fund_nav?.edge;
+      if (!sleeveLabel || sleeveLabel === '—') {
+        return '<td><span style="color:var(--text-muted)">—</span></td>';
+      }
+      return `<td><div class="sleeve-cell">
+        <span class="badge ${badgeClass}">${escapeHtml(sleeveLabel)}</span>
+        ${edge && isFund ? `<span class="badge badge-fund-edge" title="Fund edge tag">${escapeHtml(edge)}</span>` : ''}
+      </div></td>`;
+    }
+    case 'nav_disc': {
+      const d = t.fund_nav?.discount_to_reported_nav_pct;
+      if (d == null || Number.isNaN(Number(d))) {
+        return '<td><span style="color:var(--text-muted)">—</span></td>';
+      }
+      const n = Number(d);
+      const cls = n < -1 ? 'nav-disc-pos' : (n > 1 ? 'nav-disc-neg' : 'nav-disc-flat');
+      const title = [
+        t.fund_nav?.as_of ? `as of ${t.fund_nav.as_of}` : '',
+        t.fund_nav?.reported_nav != null ? `NAV ${t.fund_nav.reported_nav}` : '',
+        t.fund_nav?.market_price != null ? `px ${t.fund_nav.market_price}` : '',
+      ].filter(Boolean).join(' · ');
+      return `<td class="${cls}" title="${escapeHtml(title)}">${n > 0 ? '+' : ''}${n.toFixed(1)}%</td>`;
+    }
     case 'stance':
       return `<td><span class="badge ${STANCE_BADGE[t.classification?.stance] || 'badge-warn'}">${t.classification?.stance || '—'}</span></td>`;
     case 'valuation':
@@ -2962,6 +3004,28 @@ function renderHoldingsCell(colId, t) {
     default:
       return '<td>—</td>';
   }
+}
+
+function renderFundNavPanel(t) {
+  const f = t.fund_nav;
+  if (!f) return '';
+  const disc = f.discount_to_reported_nav_pct;
+  const discTxt = disc == null || Number.isNaN(Number(disc))
+    ? '—'
+    : `${Number(disc) > 0 ? '+' : ''}${Number(disc).toFixed(1)}%`;
+  const discCls = disc == null ? '' : (Number(disc) < -1 ? 'nav-disc-pos' : (Number(disc) > 1 ? 'nav-disc-neg' : 'nav-disc-flat'));
+  return `<div class="detail-section">
+    <h3>NAV discount</h3>
+    <div class="metric-grid" style="margin-top:8px">
+      <div class="metric"><div class="k">Edge</div><div class="v"><span class="badge badge-fund-edge">${escapeHtml(f.edge_label || f.edge || '—')}</span></div></div>
+      <div class="metric"><div class="k">Vs reported NAV</div><div class="v ${discCls}">${discTxt}</div></div>
+      <div class="metric"><div class="k">Price</div><div class="v">${f.market_price != null ? escapeHtml(String(f.market_price)) : '—'}${f.currency ? ` <span style="color:var(--text-muted);font-size:11px">${escapeHtml(f.currency)}</span>` : ''}</div></div>
+      <div class="metric"><div class="k">Reported NAV</div><div class="v">${f.reported_nav != null ? escapeHtml(String(f.reported_nav)) : '—'}</div></div>
+      <div class="metric"><div class="k">Instrument</div><div class="v">${escapeHtml(String(f.instrument_type || '—').replace(/_/g, ' '))}</div></div>
+      <div class="metric"><div class="k">As of</div><div class="v">${escapeHtml(f.as_of || '—')}</div></div>
+    </div>
+    ${f.has_zero_marked_sleeve ? `<p class="subhead" style="margin-top:8px">Includes a zero-marked / Level-3 sleeve — base case keeps recovery at zero until human sets probability.</p>` : ''}
+  </div>`;
 }
 
 function renderTable() {
@@ -3123,6 +3187,7 @@ function selectTicker(ticker, opts = {}) {
 
     ${identityLine}
     ${lensChips || ''}
+    ${renderFundNavPanel(t)}
 
     ${renderValuationWorkbench(t)}
     ${window.ValuationViz ? ValuationViz.renderPropertiesPanel(t, valuationHelpers()) : ''}

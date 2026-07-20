@@ -25,6 +25,8 @@ Before finalizing valuation, complete this scan in **Business & moat** → **`##
 | # | Question | If yes → |
 |---|----------|----------|
 | 1 | **GAAP book misstates core assets?** (land at cost/zero, stakes at cost, trust assets unmarked) | `nav_overlay` + fair-value floor; **never** cite GAAP book as dhando floor |
+| 1b | **Fund / CEF NAV zeros or under-marks a sleeve?** (sanctions Level 3, frozen assets, share counts still disclosed) | `fund_nav_overlay` + `optionality_valuation.md` § D; set `edge: shadow`; base `zero` until human sets P; **lead Q5/exec with the mark, not the thin reported-NAV discount** |
+| 1c | **Equity is mostly look-through crypto / digital-asset book below NAV?** (CMSG, MSTR-class) | `btc_overlay` + `book_estimate` / look-through NAV; `payoff_lens: asset`; **lead Q5/exec with discount to book or crypto NAV**; do not pretend “no options” |
 | 2 | **Undeveloped reserves / acreage / dormant royalty?** | Segment or `nav_overlay`; undeveloped row with **zero in Lawrence**, partial in overlay base |
 | 3 | **In-business loss segment?** (Other Bets, Reality Labs, corp R&D drag) | Segment `options[]`; burden losses; see treatment ladder below |
 | 4 | **Backlog / RPO / contracted revenue not in FCF path?** | `ai_overlay` or segment growth bridge; schedule conversion |
@@ -52,6 +54,12 @@ Use **`option_treatment`** in `valuation.json` (`segment_build.options[]`, `nav_
 **Anti-pattern (forbidden):** Setting `zero` because “Speedwell says so” **without** completing the option scan and evidence column.
 
 **Anti-pattern (forbidden):** Using GAAP **book per share** as floor when filings state assigned assets carry **no value** on the balance sheet.
+
+**Anti-pattern (forbidden):** For funds/CEFs, writing a classic “discount to reported NAV” thesis when the schedule still lists a material sleeve at **$0** (sanctions, Level 3, frozen). That is a **shadow NAV** idea. Report three NAVs; keep recovery out of base until human sets P; never bury the zero mark in a footnote.
+
+**Anti-pattern (forbidden):** Equating “price ≈ reported NAV” with “no edge” without completing option-scan row 1b.
+
+**Anti-pattern (forbidden):** For crypto / digital-asset look-through names (row 1c), leading only with a low owner-cash IRR while ignoring a material discount to book or crypto NAV, or answering “no material options” when digital assets dominate GAAP.
 
 ---
 
