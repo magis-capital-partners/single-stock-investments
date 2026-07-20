@@ -68,7 +68,7 @@ AUM tiers in `index_aum.json`: `low` = observed ETFs; `base` = + index-fund esti
 
 **Event gates:** style/subset (Top 50, Defensive, 2500, Growth/Value Benchmark) and bare "index reclassification" never produce size-migration float impact.
 
-**UI layers:** Confirmed size events → Float impact (default). Predicted adds/deletes (`inclusion_candidate`, `banding_hold`, `committee_watch`, `deletion_risk`, plus recon-watch tiers) → **Predictor watchlist** and float-impact Show estimates (Conf = predicted; asterisk when float unknown). Potential (near-boundary) stays below Index events.
+**UI layers:** Confirmed size events → Float impact (float-adjusted only). Predicted adds/deletes (`inclusion_candidate`, `banding_hold`, `committee_watch`, `deletion_risk`, plus recon-watch tiers) → single **Predictor** table with expected % float (asterisk when float unknown). No separate Potential / candidates table.
 
 ## Inclusion probability band
 

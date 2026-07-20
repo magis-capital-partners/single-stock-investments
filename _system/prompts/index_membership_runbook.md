@@ -19,11 +19,11 @@ Russell breakpoint mcap lives in `index_rules.json` (`russell_1000.breakpoint_mc
 
 | Layer | Source | UI |
 |-------|--------|-----|
-| Confirmed | Provider notice / quality-gated size add-delete | Float impact (default) + Index events |
-| Predicted | Rules scorecard + `index_recon_watch.jsonl` | **Predictor watchlist** (below Float impact); float estimates via Show estimates |
+| Confirmed | Provider notice / quality-gated size add-delete | Float impact + Index events |
+| Predicted | Rules scorecard + `index_recon_watch.jsonl` | **Predictor** (single speculative table; expected % float column) |
 | Noise | Style/subset (Growth/Value/2500/…) | Hidden style notes |
 
-**Potential (near-boundary)** stays **below** Index events. Do not promote it above Float impact.
+Order: Calendar → Float impact (confirmed only) → Predictor → Index events. Do not add a separate Potential / candidates table.
 
 Statuses: `inclusion_candidate` (likely add), `banding_hold` (±2.5% contested), `committee_watch` (S&P), `deletion_risk`.
 

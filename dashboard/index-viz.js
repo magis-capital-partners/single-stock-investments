@@ -397,10 +397,7 @@
         const inferred = r.assumed_graduation
           ? ' <span class="badge badge-purple" title="R2000 exit inferred from mcap">pair inferred</span>'
           : '';
-        const src =
-          r.event_source === 'candidate' || r.predicted || r.confidence === 'rules_only'
-            ? 'predicted'
-            : r.confidence || '—';
+        const src = r.confidence || '—';
         return `<tr>
           <td class="mono">${e(r.ticker)}${inferred}</td>
           <td>${e(r.primary_index || '—')}</td>
@@ -419,7 +416,7 @@
     const e = escapeHtml || esc;
     const rows = summary.predictor_watch || [];
     if (!rows.length) {
-      return `<h3 style="margin:16px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary)">Predictor watchlist</h3>
+      return `<h3 style="margin:16px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary)">Predictor</h3>
         <p class="muted">No near-boundary predicted adds/deletes. Refresh float/ADV for candidates and append provisional lists to <span class="mono">index_recon_watch.jsonl</span>.</p>`;
     }
     const body = rows
@@ -453,147 +450,49 @@
         </tr>`;
       })
       .join('');
-    return `<h3 style="margin:16px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary)">Predictor watchlist</h3>
-      <p class="muted" style="margin-bottom:8px">Rules-based speculation before announcement: Russell banding, S&amp;P committee watch, and ingested recon reports (<span class="mono">announced / provisional / rumor</span>). Expected % float may be asterisked when float is unknown. Style/subset headlines never appear here.</p>
+    return `<h3 style="margin:16px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary)">Predictor</h3>
+      <p class="muted" style="margin-bottom:8px">Single pre-announcement watchlist: likely adds, banding holds, committee watch, and deletion risks. Expected % float is speculative (asterisk if float unknown). Style/subset headlines never appear here.</p>
       <table class="insights-table"><thead><tr>
-        <th>Ticker</th><th>Index</th><th>Status</th><th>Recon</th><th>Distance</th><th>% float</th><th>Priority</th><th>Prob</th><th>Report</th><th>Next event</th>
+        <th>Ticker</th><th>Index</th><th>Status</th><th>Recon</th><th>Distance</th><th>Expected % float</th><th>Priority</th><th>Prob</th><th>Report</th><th>Next event</th>
       </tr></thead><tbody>${body}</tbody></table>`;
   }
 
-  function renderFloatImpactsTable(summary, byTicker, escapeHtml, options) {
+  function renderFloatImpactsTable(summary, byTicker, escapeHtml) {
     const e = escapeHtml || esc;
-    const showEstimates = !!(options && options.showFloatEstimates);
-    const primary = summary.top_float_impacts || [];
-    const estimates = summary.top_float_impact_estimates || [];
-    const rows = showEstimates ? primary.concat(estimates) : primary;
+    const rows = summary.top_float_impacts || [];
     const stale = summary.aum_stale
       ? ` <span class="badge badge-warn">AUM stale (as-of ${e(summary.aum_as_of || '?')})</span>`
       : summary.aum_as_of
         ? ` <span class="muted">AUM as-of ${e(summary.aum_as_of)}</span>`
         : '';
-    const estToggle =
-      estimates.length
-        ? `<p class="muted" style="margin-bottom:8px">
-            ${
-              showEstimates
-                ? `Showing predicted / float-unknown estimates (${estimates.length}).`
-                : `${estimates.length} predicted / float-unknown estimate${estimates.length === 1 ? '' : 's'} hidden.`
-            }
-            <button type="button" class="index-toggle-float-est" style="margin-left:6px;font:inherit;cursor:pointer">${
-              showEstimates ? 'Hide estimates' : 'Show estimates'
-            }</button>
-          </p>`
-        : '';
     if (!rows.length) {
       return `<h3 style="margin:16px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary)">Float impact (forced flow)</h3>
-        <p class="muted" style="margin-bottom:8px">Confirmed size events with float-adjusted inputs. Predicted impacts live in the Predictor watchlist and under Show estimates.${stale}</p>
-        ${estToggle}
+        <p class="muted" style="margin-bottom:8px">Confirmed size-migration events with float-adjusted inputs only. Predicted names are in Predictor below.${stale}</p>
         <p class="muted">No float-adjusted confirmed size-migration impacts yet.</p>`;
     }
     const body = renderFloatImpactRows(rows, byTicker, e);
     return `<h3 style="margin:16px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary)">Float impact (forced flow)</h3>
-      <p class="muted" style="margin-bottom:8px">Confirmed net index demand as % of company float. Negative = net forced selling. Predicted candidates use Show estimates (Conf = predicted). Asterisk (*) = float unknown.${stale}</p>
-      ${estToggle}
+      <p class="muted" style="margin-bottom:8px">Confirmed net index demand as % of company float. Negative = net forced selling. Predicted / near-boundary names are not listed here.${stale}</p>
       <table class="insights-table"><thead><tr>
         <th>Ticker</th><th>Index</th><th>Action</th><th>% float</th><th>ADV days</th><th>HK cliff</th><th>Conf</th><th>Detail</th>
       </tr></thead><tbody>${body}</tbody></table>`;
-  }
-
-  function renderPotentialTable(byTicker, escapeHtml, filter) {
-    const e = escapeHtml || esc;
-    const dir = (filter && filter.direction) || 'all';
-    const indexFilter = (filter && filter.index) || '';
-    const showWeak = !!(filter && filter.showWeak);
-    const maxDist = (filter && filter.maxDistanceAbs) != null ? Number(filter.maxDistanceAbs) : 15;
-    const rows = [];
-    const weakRows = [];
-    Object.keys(byTicker || {}).forEach((t) => {
-      const entry = byTicker[t];
-      const fi = primaryFloatImpact(entry);
-      (entry.scorecards || []).forEach((sc) => {
-        const isAddish =
-          sc.status === 'inclusion_candidate' ||
-          sc.status === 'banding_hold' ||
-          sc.status === 'committee_watch';
-        const isDel = sc.status === 'deletion_risk';
-        if (!isAddish && !isDel) return;
-        if (dir === 'inclusion' && !isAddish) return;
-        if (dir === 'exclusion' && !isDel) return;
-        if (indexFilter && sc.index !== indexFilter) return;
-        const dist = sc.distance_to_boundary_pct;
-        const near = dist != null && Math.abs(Number(dist)) <= maxDist;
-        const row = {
-          ticker: t,
-          company: entry.company,
-          priority: (entry.impact_proxy || {}).priority_score || 0,
-          shock: (entry.impact_proxy || {}).demand_shock_pct_of_adv,
-          pctFloat: (entry.impact_proxy || {}).pct_of_float_base,
-          fi,
-          band: (entry.prediction || {}).inclusion_probability_band,
-          next: (entry.prediction || {}).next_calendar_event,
-          ...sc,
-        };
-        if (near || sc.status === 'deletion_risk') rows.push(row);
-        else weakRows.push(row);
-      });
-    });
-    rows.sort((a, b) => b.priority - a.priority);
-    weakRows.sort((a, b) => b.priority - a.priority);
-    const display = showWeak ? rows.concat(weakRows) : rows;
-    if (!display.length) {
-      return `<p class="muted">No near-boundary candidates (|distance| ≤ ${e(String(maxDist))}%).${
-        weakRows.length ? ` ${weakRows.length} weak floor-pass hits hidden.` : ''
-      }</p>`;
-    }
-    const body = display
-      .slice(0, 60)
-      .map((r) => {
-        const nextLabel = r.next
-          ? `${r.next.label || r.next.id} (${r.next.days_out != null ? r.next.days_out + 'd' : '—'})`
-          : '—';
-        return `<tr>
-          <td class="mono">${e(r.ticker)}</td>
-          <td>${e(r.index)}</td>
-          <td>${renderBadge(r.status, { distance: r.distance_to_boundary_pct })}</td>
-          <td>${e(r.gating_check || '—')}</td>
-          <td class="mono">${r.distance_to_boundary_pct == null ? '—' : e(Number(r.distance_to_boundary_pct).toFixed(1) + '%')}</td>
-          <td class="mono">${e(Number(r.priority).toFixed(2))}</td>
-          ${renderPctFloatCell(r.fi)}
-          <td class="mono">${r.shock == null ? '—' : e(Number(r.shock).toFixed(1) + '% ADV')}</td>
-          <td>${e(r.band || '—')}</td>
-          <td>${e(nextLabel)}</td>
-        </tr>`;
-      })
-      .join('');
-    const weakNote = !showWeak && weakRows.length
-      ? `<p class="muted" style="margin-top:6px">${weakRows.length} weak (far-from-boundary) hits hidden. Pass showWeak to expand.</p>`
-      : '';
-    return `<table class="insights-table"><thead><tr>
-      <th>Ticker</th><th>Index</th><th>Status</th><th>Gate</th><th>Distance</th><th>Priority</th><th>% float</th><th>Shock</th><th>Prob</th><th>Next event</th>
-    </tr></thead><tbody>${body}</tbody></table>${weakNote}`;
   }
 
   function renderIndexWatch(payload, options) {
     const escapeHtml = (options && options.escapeHtml) || esc;
     const linkHtml = options && options.linkHtml;
     const showStyleSubset = !!(options && options.showStyleSubset);
-    const showFloatEstimates = !!(options && options.showFloatEstimates);
     const summary = (payload && payload.portfolio_summary) || {};
     const caption =
       (payload && payload.caption) ||
       'The average large-cap S&P 500 index effect has fallen to near zero since 2010; treat these as research triggers, weighted by demand-shock size, not mechanical trades. Migrations across the Russell 1000/2000 breakpoint are typically net-negative for the promoted stock (Horizon Kinetics 2013).';
     const byTicker = (payload && payload.by_ticker) || {};
     const calendar = (payload && payload.calendar) || [];
-    const maxDist = summary.max_candidate_distance_pct != null ? summary.max_candidate_distance_pct : 15;
-    const floatCount =
-      (summary.top_float_impacts || []).length +
-      (showFloatEstimates ? (summary.top_float_impact_estimates || []).length : 0);
-
-    const predCount = (summary.predictor_watch || []).length;
+    const floatCount = (summary.top_float_impacts || []).length;
+    const watchCount = (summary.predictor_watch || []).length;
     const stats = [
-      `Candidates: <strong>${(summary.inclusion_candidates || []).length}</strong>`,
+      `Watch: <strong>${watchCount}</strong>`,
       `Deletion risks: <strong>${(summary.deletion_risks || []).length}</strong>`,
-      `Predictor: <strong>${predCount}</strong>`,
       `Confirmed ≤30d: <strong>${(summary.confirmed_next_30d || []).length}</strong>`,
       `Size events: <strong>${summary.quality_gated_events != null ? summary.quality_gated_events : '—'}</strong>`,
       `News notes: <strong>${summary.news_notes != null ? summary.news_notes : '—'}</strong>` +
@@ -603,24 +502,17 @@
       `Float impacts: <strong>${floatCount}</strong>`,
     ].join(' · ');
 
-    return `<div class="index-watch-panel" data-show-style="${showStyleSubset ? '1' : '0'}" data-show-float-est="${showFloatEstimates ? '1' : '0'}">
+    return `<div class="index-watch-panel" data-show-style="${showStyleSubset ? '1' : '0'}">
       <p class="muted" style="margin-bottom:8px">${escapeHtml(caption)}</p>
       <p style="margin-bottom:8px">${stats}</p>
       <h3 style="margin:12px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary)">Reconstitution calendar</h3>
       ${renderCalendarStrip(calendar, escapeHtml)}
-      ${renderFloatImpactsTable(summary, byTicker, escapeHtml, { showFloatEstimates })}
+      ${renderFloatImpactsTable(summary, byTicker, escapeHtml)}
       ${renderPredictorWatchlist(summary, escapeHtml)}
       <h3 style="margin:12px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary)">Index events</h3>
       <p class="muted" style="margin-bottom:6px">Size events = provider notices or headlines with an explicit parent-index add/delete cue. Style/subset notes (Growth/Value/Defensive/2500) are hidden by default and never drive float impact. % float = base-case net forced flow / company float (signed).</p>
       ${renderConfirmedTable(byTicker, escapeHtml, linkHtml)}
       ${renderNewsNotesTable(byTicker, escapeHtml, linkHtml, { showStyleSubset })}
-      <h3 style="margin:16px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary)">Potential (near-boundary)</h3>
-      <p class="muted" style="margin-bottom:8px">Only |distance| ≤ ${escapeHtml(String(maxDist))}%. Min-mcap floor passes alone are not candidates. A name is never both Russell 1000 and Russell 2000 candidate.</p>
-      ${renderPotentialTable(byTicker, escapeHtml, {
-        ...(options && options.filter),
-        maxDistanceAbs: maxDist,
-        showWeak: !!(options && options.filter && options.filter.showWeak),
-      })}
     </div>`;
   }
 
@@ -635,9 +527,6 @@
         showStyleSubset: !!(patch.showStyleSubset != null
           ? patch.showStyleSubset
           : panel.getAttribute('data-show-style') === '1'),
-        showFloatEstimates: !!(patch.showFloatEstimates != null
-          ? patch.showFloatEstimates
-          : panel.getAttribute('data-show-float-est') === '1'),
       };
       const wrap = document.createElement('div');
       wrap.innerHTML = renderIndexWatch(payload, next);
@@ -648,11 +537,6 @@
     panel.querySelectorAll('.index-toggle-style').forEach((btn) => {
       btn.addEventListener('click', () => {
         rerender({ showStyleSubset: panel.getAttribute('data-show-style') !== '1' });
-      });
-    });
-    panel.querySelectorAll('.index-toggle-float-est').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        rerender({ showFloatEstimates: panel.getAttribute('data-show-float-est') !== '1' });
       });
     });
   }
