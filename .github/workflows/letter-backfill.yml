@@ -2,7 +2,9 @@ name: Letter Backfill
 
 on:
   schedule:
-    - cron: "0 6 * * 0"
+    # Sunday 16:00 UTC — off the 06:00 activist slot and the 10:00 full
+    # downloads run so heavy jobs do not queue behind each other.
+    - cron: "0 16 * * 0"
 
 permissions:
   contents: write
@@ -20,7 +22,7 @@ jobs:
       RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
       RESEARCH_VAULT_ROOT: _external/research-vault
     steps:
-      - uses: jlumbroso/free-disk-space@main
+      - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
         with:
           tool-cache: false
           android: true

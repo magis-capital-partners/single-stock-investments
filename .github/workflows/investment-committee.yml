@@ -4,7 +4,9 @@ name: Auto - Investment Committee
 # changes that tree and automatically advances the next stage.
 on:
   schedule:
-    - cron: "17 * * * *"
+    # Safety-net sweep every 4h; the repository_dispatch chain
+    # (automerge -> advance-investment-committee) provides responsiveness.
+    - cron: "17 */4 * * *"
   repository_dispatch:
     types: [advance-investment-committee]
   push:

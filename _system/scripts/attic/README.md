@@ -12,3 +12,4 @@ for historical reference. Do not wire them into workflows. See
 | `migrate_economic_value_config.py` | One-shot economic-value config migration (completed). |
 | `plan_drive_reorg.py` | One-shot Drive reorg planner (reorg completed 2026-06). |
 | `organize_drive_orphan_folders.py` | One-shot Drive orphan folder cleanup (completed). |
+| `marvin_batch_drain.py` (+ test) | Batch PR drain helper; its automerge dispatch was removed and no workflow invokes it. |
