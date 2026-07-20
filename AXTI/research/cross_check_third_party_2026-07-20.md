@@ -8,7 +8,7 @@
 
 ## Executive summary
 
-No third-party sources are indexed for AXTI as of this scan (`source_inventory_2026-07-20.md` lists zero Substacks, fund letters, or HK vault matches). Marvin stance rests on **primary SEC filings only** (10-K FY2025, 10-Q Q1 2026, recent 8-K supply agreements and Tongmei events). This refresh was authorized by agent dispatch manifest on disk; full-tier text extracts remain unavailable (`filing_facts_2026-07-20.json`: `no_full_tier_text_extract`).
+No third-party sources are indexed for AXTI as of this scan (`source_inventory_2026-07-20.md` lists zero Substacks, fund letters, or HK vault matches). Marvin stance rests on **primary SEC filings only** (10-K FY2025, 10-Q Q1 2026, recent 8-K supply agreements and Tongmei events). This refresh was authorized by `research_agent_manifest.json` (`DOWNLOAD_MANIFEST.json` stabilized). Full-tier text extracts remain unavailable (`filing_facts_2026-07-20.json`: `no_full_tier_text_extract`).
 
 **Synthesis:** Marvin floor only; no external blend. Base case uses mid-cycle normalized owner cash **$0.12 per share** [Assumption] anchored to 2021–2022 economics, not spot FY2025 losses.
 
