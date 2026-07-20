@@ -148,7 +148,6 @@ jobs:
           sparse-checkout: |
             _system
             dashboard/data
-            docs/data
             ${{ needs.prepare.outputs.ticker }}/research
       - uses: actions/setup-python@v5
         with:
@@ -169,7 +168,7 @@ jobs:
           git add "${{ needs.prepare.outputs.ticker }}/research/committee_${{ needs.prepare.outputs.committee_date }}.json" \
                   "${{ needs.prepare.outputs.ticker }}/research/committee_work/${{ needs.prepare.outputs.committee_date }}/manifest.json" \
                   "${{ needs.prepare.outputs.ticker }}/research/valuation_workbench.json" \
-                  dashboard/data/dashboard_data.json docs/data/dashboard_data.json
+                  dashboard/data/dashboard_data.json
           git commit -m "feat(ic): assemble ${{ needs.prepare.outputs.ticker }} committee ${{ needs.prepare.outputs.committee_date }}"
           git push origin HEAD:main
           gh api --method POST "repos/${{ github.repository }}/dispatches" \

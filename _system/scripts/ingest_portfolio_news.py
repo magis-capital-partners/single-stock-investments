@@ -29,7 +29,6 @@ from pathlib import Path
 import requests
 
 from portfolio_news_common import (
-    DOCS_PORTFOLIO_NEWS_PATH,
     FEED_MIN_CONFIDENCE,
     NEGATIVE_PATTERNS,
     POLICY_VERSION,
@@ -480,8 +479,6 @@ def persist(items: list[NewsItem], configs: dict[str, HoldingNewsConfig]) -> Non
     }
     news_json = json.dumps(payload, indent=2) + "\n"
     PORTFOLIO_NEWS_PATH.write_text(news_json, encoding="utf-8")
-    if DOCS_PORTFOLIO_NEWS_PATH.parent.exists():
-        DOCS_PORTFOLIO_NEWS_PATH.write_text(news_json, encoding="utf-8")
 
     seen = _load_seen()
     seen_ids = set(seen.get("ids") or [])
@@ -587,7 +584,7 @@ def sanitize_existing_news(
     configs: dict[str, HoldingNewsConfig],
     *,
     source_path: Path = PORTFOLIO_NEWS_PATH,
-    output_paths: tuple[Path, ...] = (PORTFOLIO_NEWS_PATH, DOCS_PORTFOLIO_NEWS_PATH),
+    output_paths: tuple[Path, ...] = (PORTFOLIO_NEWS_PATH,),
 ) -> tuple[int, int, int]:
     """Reclassify the saved feed using the current subject-matching policy."""
     if not source_path.exists():

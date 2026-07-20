@@ -26,7 +26,6 @@ from index_market_inputs import load_fundamentals_cache, market_inputs_for_ticke
 DATA_DIR = ROOT / "_system" / "data"
 REF_INDEX = ROOT / "_system" / "reference" / "market-data" / "index"
 OUT_PATH = ROOT / "dashboard" / "data" / "index_membership.json"
-DOCS_OUT = ROOT / "docs" / "data" / "index_membership.json"
 REGISTRY = ROOT / "_system" / "portfolio" / "registry.json"
 NEWS_PATH = ROOT / "dashboard" / "data" / "portfolio_news.json"
 ANNOUNCEMENTS = DATA_DIR / "index_announcements.jsonl"
@@ -1948,8 +1947,6 @@ def main() -> int:
     today = date.fromisoformat(args.date) if args.date else date.today()
     payload = build(today=today, purge_announcements=not args.no_purge)
     save_json(OUT_PATH, payload)
-    if DOCS_OUT.parent.exists():
-        save_json(DOCS_OUT, payload)
     summary = payload["portfolio_summary"]
     print(
         f"Wrote {OUT_PATH} tickers={summary['ticker_count']} "

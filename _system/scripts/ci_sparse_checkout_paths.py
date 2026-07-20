@@ -7,7 +7,7 @@ Profiles:
   darwin       — Darwin refresh: no per-ticker trees (base paths only)
   dashboard    — deploy rebuild checkout (base paths only; alias of darwin)
 
-Base paths (_system, .github, dashboard, docs) are always set by
+Base paths (_system, .github, dashboard) are always set by
 ci_checkout_workspace.sh; this script only emits extra ticker paths.
 """
 from __future__ import annotations

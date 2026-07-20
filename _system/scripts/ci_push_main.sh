@@ -17,10 +17,7 @@ conflicted_files() {
 
 is_regenerable_artifact() {
   case "$1" in
-    dashboard/data/*.json|docs/data/*.json)
-      return 0
-      ;;
-    docs/INDEX.csv)
+    dashboard/data/*.json)
       return 0
       ;;
     */INDEX.csv)
@@ -178,21 +175,6 @@ regenerate_activist_feed_artifacts() {
   git add dashboard/data/activist_feed.json
 }
 
-mirror_dashboard_to_docs() {
-  if [ ! -d dashboard ] || [ ! -d docs ]; then
-    return 0
-  fi
-  echo "Mirroring dashboard/ to docs/ after regeneration..."
-  if command -v rsync >/dev/null 2>&1; then
-    rsync -a --delete --exclude '.git' --exclude '.wrangler' dashboard/ docs/
-    return 0
-  fi
-  echo "rsync not found; falling back to cp for dashboard/ → docs/ mirror"
-  find docs -mindepth 1 -maxdepth 1 ! -name '.git' ! -name '.wrangler' -exec rm -rf {} +
-  cp -a dashboard/. docs/
-  rm -rf docs/.git docs/.wrangler 2>/dev/null || true
-}
-
 regenerate_dashboard_json() {
   if [ ! -f "_system/scripts/build_dashboard_data.py" ]; then
     echo "::error::build_dashboard_data.py not found; cannot auto-resolve dashboard conflicts."
@@ -206,7 +188,6 @@ regenerate_dashboard_json() {
     return 1
   fi
   git add dashboard/data/ 2>/dev/null || true
-  git add docs/data/ 2>/dev/null || true
 }
 
 regenerate_folder_indexes() {
@@ -220,19 +201,6 @@ regenerate_folder_indexes() {
     return 1
   fi
   git add -- ':(glob)*/INDEX.csv' 2>/dev/null || true
-}
-
-regenerate_docs_index() {
-  if [ ! -f "_system/scripts/build_folder_indexes.py" ]; then
-    echo "::error::build_folder_indexes.py not found; cannot auto-resolve docs/INDEX.csv conflicts."
-    return 1
-  fi
-  echo "Regenerating docs/INDEX.csv to resolve rebase conflicts..."
-  if ! "$PYTHON" _system/scripts/build_folder_indexes.py --folder docs; then
-    echo "::error::build_folder_indexes.py failed while resolving a rebase conflict."
-    return 1
-  fi
-  git add docs/INDEX.csv 2>/dev/null || true
 }
 
 regenerate_portfolio_artifacts() {
@@ -285,7 +253,6 @@ regenerate_conflicted_artifacts() {
   local needs_insights=0
   local needs_activist=0
   local needs_indexes=0
-  local needs_docs_index=0
   local needs_portfolio=0
   local needs_market_returns=0
   local needs_research_events=0
@@ -302,14 +269,11 @@ regenerate_conflicted_artifacts() {
       dashboard/data/activist_feed.json)
         needs_activist=1
         ;;
-      dashboard/data/*.json|docs/data/*.json)
+      dashboard/data/*.json)
         needs_dashboard=1
         ;;
       _system/reference/data-sources/insights_record_archive.json)
         needs_insights=1
-        ;;
-      docs/INDEX.csv)
-        needs_docs_index=1
         ;;
       */INDEX.csv)
         needs_indexes=1
@@ -335,9 +299,6 @@ regenerate_conflicted_artifacts() {
   if [ "$needs_indexes" -eq 1 ]; then
     regenerate_folder_indexes || return 1
   fi
-  if [ "$needs_docs_index" -eq 1 ]; then
-    regenerate_docs_index || return 1
-  fi
   if [ "$needs_portfolio" -eq 1 ]; then
     regenerate_portfolio_artifacts || return 1
   fi
@@ -358,8 +319,7 @@ regenerate_conflicted_artifacts() {
   fi
 
   if [ "$needs_dashboard" -eq 1 ] || [ "$needs_insights" -eq 1 ] || [ "$needs_activist" -eq 1 ]; then
-    mirror_dashboard_to_docs
-    git add dashboard/data/ docs/ 2>/dev/null || true
+    git add dashboard/data/ 2>/dev/null || true
   fi
 
   stage_resolved_conflicts "$conflicted"
@@ -395,7 +355,7 @@ try_resolve_rebase_conflicts() {
   fi
   clean_regeneration_side_effects
   resolve_unmerged_regenerable_paths
-  git add dashboard/data/ docs/data/ 2>/dev/null || true
+  git add dashboard/data/ 2>/dev/null || true
   git add -- ':(glob)*/INDEX.csv' 2>/dev/null || true
   git add _system/portfolio/holdings.md _system/portfolio/classification.json _system/portfolio/us_ticker_config.json 2>/dev/null || true
   git add _system/reference/market-data/returns/ 2>/dev/null || true

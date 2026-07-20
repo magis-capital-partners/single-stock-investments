@@ -942,10 +942,14 @@ let insightsEventWorkflow = {
 let insightsEventLastSeenAt = (() => {
   try { return localStorage.getItem(INSIGHTS_EVENT_LAST_SEEN_KEY); } catch (_) { return null; }
 })();
+const INSIGHTS_LIVE_SECTIONS = new Set([
+  'letters', 'inflections', 'events', 'index_watch', 'consensus',
+  'funds', 'documents', 'tickers', 'memory', 'sources',
+]);
 let insightsSection = (() => {
   try {
     const stored = localStorage.getItem(INSIGHTS_SECTION_KEY) || 'letters';
-    return stored === 'themes' ? 'letters' : stored;
+    return INSIGHTS_LIVE_SECTIONS.has(stored) ? stored : 'letters';
   } catch (_) {
     return 'letters';
   }
@@ -970,9 +974,6 @@ let insightsTickerInsiderTier = 'signal';
 let tickerInsightsSelectedTicker = null;
 let insightsPdfSourceTab = 'all';
 let insightsPdfTimeMode = 'period';
-let insightsThemesViewMode = (() => {
-  try { return localStorage.getItem(THEMES_VIEW_KEY) || 'snapshot'; } catch (_) { return 'snapshot'; }
-})();
 let activistSideFilter = 'all';
 let activistReviewFilter = '';
 let activistSearch = '';
@@ -1004,7 +1005,6 @@ const INSIGHTS_SECTION_KEY = 'ssp_insights_section_v1';
 const INSIGHTS_EVENT_TIER_KEY = 'ssp_insights_event_tier_v1';
 const CONSENSUS_QUARTER_KEY = 'ssp_consensus_quarter_v1';
 const CONSENSUS_VIEW_KEY = 'ssp_consensus_view_v1';
-const THEMES_VIEW_KEY = 'ssp_themes_view_v1';
 const TICKER_VIEW_KEY = 'ssp_ticker_view_v1';
 const TICKER_SORT_KEY = 'ssp_ticker_sort_v1';
 const MEMORY_VIEW_KEY = 'ssp_memory_view_v1';
@@ -1706,7 +1706,6 @@ const INSIGHTS_SECTION_SHARDS = {
   funds: ['registry', 'profiles'],
   tickers: [],
   sources: [],
-  overview: [],
 };
 // Insights section -> standalone lazy files it needs.
 const INSIGHTS_SECTION_FILES = {
@@ -2003,7 +2002,6 @@ function renderInsights(opts = {}) {
     ...insightsEventFilters,
     eventReviewState: insightsEventWorkflow,
     eventLastSeenAt: insightsEventLastSeenAt,
-    themesViewMode: insightsThemesViewMode,
     memoryViewMode,
     memoryTypeFilter,
     memoryBiotechOnly,

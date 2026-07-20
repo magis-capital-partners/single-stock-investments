@@ -341,7 +341,7 @@ jobs:
         run: python ingest_portfolio_news.py
       - name: Commit news artifacts
         run: |
-          git add dashboard/data/portfolio_news.json docs/data/portfolio_news.json _system/data/news_seen.json _system/reviews/pending/news_*.md
+          git add dashboard/data/portfolio_news.json _system/data/news_seen.json _system/reviews/pending/news_*.md
           git add '*/research/news/news_index.json' 2>/dev/null || true
           bash _system/scripts/ci_push_main.sh "chore: refresh portfolio news $(date -u +%Y-%m-%d)"
 

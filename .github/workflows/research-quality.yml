@@ -23,7 +23,6 @@ on:
       - "_system/scripts/validate_dashboard_data.py"
       - "_system/scripts/ci_push_main.sh"
       - "dashboard/data/insights.json"
-      - "docs/data/insights.json"
 
 permissions:
   contents: read
@@ -78,7 +77,6 @@ jobs:
                 '_system/scripts/ci_push_main.sh',
                 '_system/scripts/marvin_cloud_refresh.py',
                 'dashboard/data/insights.json',
-                'docs/data/insights.json',
               ].includes(name)
             );
             core.setOutput('prompt_sync', String(promptSync));

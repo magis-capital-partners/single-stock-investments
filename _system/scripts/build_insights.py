@@ -47,7 +47,6 @@ from event_triage import triage_events, write_triage_queue  # noqa: E402
 from insider_materiality import score_form4_event  # noqa: E402
 
 OUTPUT = ROOT / "dashboard" / "data" / "insights.json"
-DOCS_OUTPUT = ROOT / "docs" / "data" / "insights.json"
 ARCHIVE_OUTPUT = ROOT / "_system" / "reference" / "data-sources" / "insights_record_archive.json"
 LETTERS_INSIGHTS = letters_root() / "insights.json"
 # Full letter corpus is built offline (letter-backfill) and committed in dashboard/data/.
@@ -3212,10 +3211,6 @@ def main() -> int:
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     serialized_payload = json.dumps(payload, separators=(",", ":")) + "\n"
     _atomic_write(OUTPUT, serialized_payload)
-    # The published GitHub Pages directory is a first-class dashboard build,
-    # not a stale snapshot of the local dashboard directory.
-    DOCS_OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-    _atomic_write(DOCS_OUTPUT, serialized_payload)
     print(
         f"Wrote {OUTPUT} ({len(records)} insight records, {len(events)} events, "
         f"{letter_count_value} letters"
