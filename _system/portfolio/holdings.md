@@ -255,8 +255,10 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-20.
 | EME | EME/ | Emcor | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | EMR | EMR/ | Emerson Electric | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | ENPH | ENPH/ | Enphase Energy, Inc. | US | 2026-07-09 | 2026-07-20 | unknown | watch |
+| ENTG | ENTG/ | ENTG | US | — | 2026-07-20 | unknown | watch |
 | ENX.PA | ENX.PA/ | Euronext N.V. | EU | 2026-07-09 | 2026-07-20 | unknown | watch |
 | EOG | EOG/ | EOG Resources | US | 2026-07-09 | 2026-07-20 | unknown | watch |
+| EOSE | EOSE/ | EOSE | US | — | 2026-07-20 | unknown | watch |
 | EQIX | EQIX/ | Equinix | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | EQPT | EQPT/ | EquipmentShare.com Inc | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | EQR | EQR/ | Equity Residential | US | 2026-07-09 | 2026-07-20 | unknown | watch |
@@ -264,12 +266,14 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-20.
 | ERIE | ERIE/ | Erie Indemnity | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | ES | ES/ | Eversource Energy | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | ESS | ESS/ | Essex Property Trust | US | 2026-07-09 | 2026-07-20 | unknown | watch |
+| ETHA | ETHA/ | ETHA | US | — | 2026-07-20 | unknown | watch |
 | ETN | ETN/ | Eaton Corporation | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | ETOR | ETOR/ | eToro Group Ltd. | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | ETR | ETR/ | Entergy | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | EVR | EVR/ | Evolve Royalties Ltd | CA | 2026-06-11 | 2026-07-20 | unknown | watch |
 | EVRG | EVRG/ | Evergy | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | EW | EW/ | Edwards Lifesciences | US | 2026-07-09 | 2026-07-20 | unknown | watch |
+| EWJ | EWJ/ | EWJ | US | — | 2026-07-20 | unknown | watch |
 | EXC | EXC/ | Exelon | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | EXE | EXE/ | Expand Energy | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | EXPD | EXPD/ | Expeditors International | US | 2026-07-09 | 2026-07-20 | unknown | watch |
@@ -696,4 +700,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-20.
 | ZBRA | ZBRA/ | Zebra Technologies | US | 2026-07-10 | 2026-07-20 | unknown | watch |
 | ZTS | ZTS/ | Zoetis | US | 2026-07-10 | 2026-07-20 | unknown | watch |
 
-**689 holdings total.** Registry: `_system/portfolio/registry.json`
+**693 holdings total.** Registry: `_system/portfolio/registry.json`
