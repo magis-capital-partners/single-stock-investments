@@ -3,9 +3,11 @@
   "status": "routed",
   "profile_id": "quality_reinvestment",
   "label": "High-return compounder",
-  "score": 16.0,
+  "score": 19.0,
   "reasons": [
     "archetype=compounder",
+    "component categories=operating_business",
+    "existing methods=dcf, owner_cash",
     "explicit reviewed profile"
   ],
   "primary_methods": [
@@ -43,22 +45,42 @@
     "stock compensation or acquisitions omitted",
     "terminal value unsupported by a durable mechanism"
   ],
-  "secondary_profiles": [],
+  "secondary_profiles": [
+    {
+      "profile_id": "predictable_cash_flow",
+      "score": 2.0,
+      "reasons": [
+        "component categories=operating_business",
+        "existing methods=owner_cash"
+      ]
+    },
+    {
+      "profile_id": "capital_cycle",
+      "score": 1.0,
+      "reasons": [
+        "component categories=operating_business"
+      ]
+    }
+  ],
   "scorecard": {
     "scarce_asset_optionality": {
       "score": 0.0,
       "reasons": []
     },
     "quality_reinvestment": {
-      "score": 16.0,
+      "score": 19.0,
       "reasons": [
         "archetype=compounder",
+        "component categories=operating_business",
+        "existing methods=dcf, owner_cash",
         "explicit reviewed profile"
       ]
     },
     "capital_cycle": {
-      "score": 0.0,
-      "reasons": []
+      "score": 1.0,
+      "reasons": [
+        "component categories=operating_business"
+      ]
     },
     "credit_and_normalized_returns": {
       "score": 0.0,
@@ -69,8 +91,11 @@
       "reasons": []
     },
     "predictable_cash_flow": {
-      "score": 0.0,
-      "reasons": []
+      "score": 2.0,
+      "reasons": [
+        "component categories=operating_business",
+        "existing methods=owner_cash"
+      ]
     },
     "binary_milestone": {
       "score": 0.0,
@@ -86,16 +111,34 @@
   "classification": {
     "archetype": "compounder",
     "moat": "unproven",
-    "dhando": "pending",
+    "dhando": "partial",
     "stance": "watch",
-    "cycle": "-",
+    "cycle": "up",
     "moi_bucket": "pending",
-    "payoff_lens": "pending",
-    "investment_sleeve": "-"
+    "payoff_lens": "operating",
+    "investment_sleeve": "ls_algo_underlying",
+    "predictive_attribute": "backlog_vs_burn"
   },
-  "specialist_power_zones": [],
+  "specialist_power_zones": [
+    {
+      "persona": "lawrence",
+      "label": "Bryan Lawrence",
+      "independence_group": "quality_reinvestment",
+      "in_power_zone": true,
+      "fit": 0.667,
+      "matched": 2,
+      "known_fields": 3,
+      "matched_fields": [
+        "archetype",
+        "dhando"
+      ],
+      "excluded_by": null,
+      "match_rate": null,
+      "score": 57
+    }
+  ],
   "committee": {
-    "candidate_count": 4,
+    "candidate_count": 5,
     "independence_group_count": 3,
     "committee_seatable": true,
     "candidates": [
@@ -114,9 +157,13 @@
       {
         "persona": "marathon_capital_cycle",
         "independence_group": "capital_cycle"
+      },
+      {
+        "persona": "lawrence",
+        "independence_group": "quality_reinvestment"
       }
     ]
   },
-  "input_hash": "c55c7f58c8acce245c2ef8b197aca21b9227a07116e1e7fdec8eb8bdcc9078fd",
-  "generated_at": "2026-07-20T16:17:47.447474+00:00"
+  "input_hash": "c503246a43f2074b8acb43f1954da8b8c6a80812649547b25a90c6390b7894b6",
+  "generated_at": "2026-07-20T17:13:55.011111+00:00"
 }

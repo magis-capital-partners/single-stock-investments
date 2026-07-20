@@ -2,7 +2,7 @@
   "schema_version": "2.0",
   "status": "evidence_blocked",
   "ticker": "ARM",
-  "as_of": "2026-07-19",
+  "as_of": "2026-07-20",
   "economic_ownership_map": [],
   "component_coverage": {
     "all_material_components_identified": false,
@@ -94,7 +94,7 @@
     },
     "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
     "ticker": "ARM",
-    "as_of": "2026-07-19",
+    "as_of": "2026-07-20",
     "route_source": "canonical_power_zone_router",
     "config_path": "_system/frameworks/power_zones.json",
     "config_updated": "2026-07-14",
@@ -106,7 +106,7 @@
       "cycle": "-",
       "moi_bucket": "pending",
       "payoff_lens": "pending",
-      "investment_sleeve": "-"
+      "investment_sleeve": "ls_algo_underlying"
     },
     "specialist_power_zones": [],
     "committee": {
@@ -132,8 +132,8 @@
         }
       ]
     },
-    "input_hash": "74cf19644ed06043c3d0ef91a4fb1488a7f17e7cb81da9632201802bc11c7e92",
-    "generated_at": "2026-07-19T04:26:16.952471+00:00"
+    "input_hash": "e19bd55216a7162cc10e3347a0632c1cde9c819e99465b10064ac696098a30dd",
+    "generated_at": "2026-07-20T17:13:54.004205+00:00"
   },
   "market": {
     "price_per_share": null,
@@ -192,9 +192,10 @@
     "low_base_high_ordered": true
   },
   "evidence": {
-    "unresolved_count": 1,
+    "unresolved_count": 2,
     "blockers": [
-      "A complete economic ownership map has not been supplied."
+      "A complete economic ownership map has not been supplied.",
+      "Market price per share is missing or non-positive; cannot mark decision_grade or compute entry prices."
     ],
     "validation_errors": []
   },
@@ -208,7 +209,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "79e0cf8ef40ce05aab139c8a47973a50e4efbc09ec64b9d43d700483630218bc",
+    "model_hash": "105bb8e5c2e5a24ae4082d2d1c3c35cd57b254b4f1141863deb1565f89aefb63",
     "method_versions": [],
     "change_log": [],
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
