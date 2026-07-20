@@ -1,25 +1,29 @@
 # FLY — Investment Thesis
 
-**Last updated:** auto-sync
+**Last updated:** 2026-07-20
 
 ## Classification
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | infrastructure |
+| **Archetype** (Stahl) | unknown |
 | **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | partial |
+| **Dhando** (Pabrai) | pending |
 | **Stance** | watch |
-| **Cycle** | up |
-| **Implied 7yr IRR** (base) | 4.6% (total synthesis) |
-| **IRR method** | full |
-| **Lawrence bucket** | other |
-| **Payoff lens** | operating |
-| **MOI bucket** | pending |
+| **Cycle** | - |
+| **MOI bucket** (legacy) | pending |
+| **Payoff lens** | pending |
 
-**Deep dive:** `FLY/research/deep_dive_2026-07-18.md` (auto-sync)
+## One-line thesis
 
-**One line:** National-security launch and spacecraft backlog (**$652.6M** RPO) at **watch** — **2.2%** base annual return at **$19.27** until operating leverage proves out.
+FLY — thesis pending Marvin deep dive.
 
-**Status:** Onboarded 2026-07-18 · Deep dive `deep_dive_2026-07-18.md`
+## Key questions
 
+- [ ] Read latest annual report
+- [ ] Read latest quarterly report
+- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+
+## [HUMAN REVIEW]
+
+- Onboarded 2026-07-20; awaiting deep dive.

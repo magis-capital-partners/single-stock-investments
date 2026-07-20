@@ -300,13 +300,17 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-20.
 | FIX | FIX/ | Comfort Systems USA | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | FLEX | FLEX/ | Flex Ltd. | US | 2026-07-10 | 2026-07-20 | unknown | watch |
 | FLUX | FLUX/ | Flux Power Holdings, Inc. | US | 2026-07-09 | 2026-07-20 | unknown | watch |
+| FLY | FLY/ | FLY | US | — | 2026-07-20 | unknown | watch |
 | FMCCK | FMCCK/ | Ford Motor Credit Company LLC (Preferred) | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | FMCCL | FMCCL/ | Ford Motor Credit Company LLC (Preferred) | US | 2026-07-09 | 2026-07-20 | unknown | watch |
+| FN | FN/ | FN | US | — | 2026-07-20 | unknown | watch |
 | FNMAO | FNMAO/ | Federal National Mortgage Association (Preferred) | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | FNMAP | FNMAP/ | Federal National Mortgage Association (Preferred) | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | FNV | FNV/ | Franco-Nevada Corporation | US | 2026-07-09 | 2026-07-20 | optionality | watch |
+| FORM | FORM/ | FORM | US | — | 2026-07-20 | unknown | watch |
 | FOX | FOX/ | Fox Corporation (Class B) | US | 2026-07-10 | 2026-07-20 | unknown | watch |
 | FOXA | FOXA/ | Fox Corporation (Class A) | US | 2026-07-10 | 2026-07-20 | unknown | watch |
+| FPS | FPS/ | FPS | US | — | 2026-07-20 | unknown | watch |
 | FRMI | FRMI/ | Fermi Inc. | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | FRMO | FRMO/ | FRMO Corporation | US | 2026-07-09 | 2026-07-20 | holding_co | hold |
 | FRT | FRT/ | Federal Realty Investment Trust | US | 2026-07-09 | 2026-07-20 | unknown | watch |
@@ -704,4 +708,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-20.
 | ZBRA | ZBRA/ | Zebra Technologies | US | 2026-07-10 | 2026-07-20 | unknown | watch |
 | ZTS | ZTS/ | Zoetis | US | 2026-07-10 | 2026-07-20 | unknown | watch |
 
-**697 holdings total.** Registry: `_system/portfolio/registry.json`
+**701 holdings total.** Registry: `_system/portfolio/registry.json`
