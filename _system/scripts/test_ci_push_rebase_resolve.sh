@@ -5,6 +5,10 @@ set -euo pipefail
 ROOT=$(cd "$(dirname "$0")/../.." && pwd)
 cd "$ROOT"
 
+# Individual tests check out main during cleanup, so file-content assertions
+# must read from the ref this script started on (the PR merge commit in CI).
+SMOKE_START_REF=$(git rev-parse HEAD)
+
 export CI_PUSH_SKIP_SELF_REFRESH=1
 
 # shellcheck disable=SC1091
@@ -355,12 +359,17 @@ test_main_writer_workflows_share_lock() {
     memory-digest.yml
   )
 
+  local text
   for workflow in "${writer_workflows[@]}"; do
-    if ! grep -A2 '^concurrency:' ".github/workflows/$workflow" | grep -qx '  group: data-commit-main'; then
+    # Earlier tests may leave HEAD on main; read the workflow from the ref this
+    # script started on so new writers are validated on PR branches too.
+    text=$(git show "${SMOKE_START_REF:-HEAD}:.github/workflows/$workflow" 2>/dev/null \
+      || cat ".github/workflows/$workflow")
+    if ! printf '%s\n' "$text" | grep -A2 '^concurrency:' | grep -qx '  group: data-commit-main'; then
       echo "FAIL: $workflow must use the shared data-commit-main lock"
       exit 1
     fi
-    if ! grep -A2 '^concurrency:' ".github/workflows/$workflow" | grep -qx '  cancel-in-progress: false'; then
+    if ! printf '%s\n' "$text" | grep -A2 '^concurrency:' | grep -qx '  cancel-in-progress: false'; then
       echo "FAIL: $workflow must keep queued writers instead of cancelling them"
       exit 1
     fi
