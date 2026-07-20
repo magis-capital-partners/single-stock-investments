@@ -52,10 +52,11 @@ If `evidence_refresh` is set: read `optionality_valuation.md` § **Mechanical re
 
 Read:
 
+- `{{TICKER}}/research/thesis_card.json` first (compact prior thesis: one-liner, base IRR, key assumptions, open questions, top citations)
 - `{{TICKER}}/research/evidence/filing_digest_{{date}}.md`
 - `{{TICKER}}/research/evidence/document_inventory.json`
 - Full-tier extracts under `{{TICKER}}/research/evidence/_text/`
-- Prior latest `deep_dive_*.md` (carry stance, blends, human overrides unless filings contradict)
+- Prior latest `deep_dive_*.md` **only when** the card is missing or your changes rewrite the thesis/valuation (carry stance, blends, human overrides unless filings contradict)
 
 If **new_documents** or **new_valuation_news**: focus on what changed for owner cash and valuation; do not re-litigate unchanged facts.
 

@@ -97,6 +97,8 @@ PROFILES: dict[str, list[list[str]]] = {
         ["_system/scripts/build_biotech_peer_short_stub.py"],
         ["_system/scripts/build_biotech_composite.py"],
         ["_system/scripts/build_research_memory.py"],
+        # Backfill compact agent-context cards for the whole universe.
+        ["_system/scripts/build_thesis_card.py", "--all"],
         # Valuation authority is owned by the Power Zone Universe workflow
         # (run_security_decision_pipeline) and the activist slice by the
         # dedicated 06:00 Data Pipeline job; neither is duplicated here.
