@@ -192,7 +192,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-20.
 | CRH | CRH/ | CRH plc | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | CRL | CRL/ | Charles River Laboratories | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | CRM | CRM/ | Salesforce | US | 2026-07-10 | 2026-07-20 | unknown | watch |
-| CRML | CRML/ | CRML | US | — | 2026-07-20 | unknown | watch |
+| CRML | CRML/ | CRML | US | 2026-07-18 | 2026-07-20 | unknown | watch |
 | CRUS | CRUS/ | CRUS | US | — | 2026-07-20 | unknown | watch |
 | CRWD | CRWD/ | CrowdStrike | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | CRWV | CRWV/ | CoreWeave, Inc. | US | 2026-07-18 | 2026-07-20 | unknown | watch |
@@ -223,17 +223,21 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-20.
 | DIA | DIA/ | DIA | US | — | 2026-07-20 | unknown | watch |
 | DIS | DIS/ | Walt Disney Company (The) | US | 2026-07-10 | 2026-07-20 | unknown | watch |
 | DJT | DJT/ | DJT | US | — | 2026-07-20 | unknown | watch |
+| DKNG | DKNG/ | DKNG | US | — | 2026-07-20 | unknown | watch |
 | DLR | DLR/ | Digital Realty | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | DLTR | DLTR/ | Dollar Tree | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | DMLP | DMLP/ | Dorchester Minerals LP | US | 2026-07-09 | 2026-07-20 | unknown | watch |
+| DNN | DNN/ | DNN | US | — | 2026-07-20 | unknown | watch |
 | DOC | DOC/ | Healthpeak Properties | US | 2026-07-10 | 2026-07-20 | unknown | watch |
 | DOV | DOV/ | Dover Corporation | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | DOW | DOW/ | Dow Inc. | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | DPZ | DPZ/ | Domino's | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | DRI | DRI/ | Darden Restaurants | US | 2026-07-09 | 2026-07-20 | unknown | watch |
+| DRNZ | DRNZ/ | DRNZ | US | — | 2026-07-20 | unknown | watch |
 | DRR.AX | DRR.AX/ | Deterra Royalties Limited | AU | 2026-06-02 | 2026-07-20 | unknown | watch |
 | DTE | DTE/ | DTE Energy | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | DUK | DUK/ | Duke Energy | US | 2026-07-09 | 2026-07-20 | unknown | watch |
+| DUOL | DUOL/ | DUOL | US | — | 2026-07-20 | unknown | watch |
 | DVA | DVA/ | DaVita | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | DVN | DVN/ | Devon Energy | US | 2026-07-09 | 2026-07-20 | unknown | watch |
 | DXCM | DXCM/ | Dexcom | US | 2026-07-09 | 2026-07-20 | unknown | watch |
@@ -692,4 +696,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-20.
 | ZBRA | ZBRA/ | Zebra Technologies | US | 2026-07-10 | 2026-07-20 | unknown | watch |
 | ZTS | ZTS/ | Zoetis | US | 2026-07-10 | 2026-07-20 | unknown | watch |
 
-**685 holdings total.** Registry: `_system/portfolio/registry.json`
+**689 holdings total.** Registry: `_system/portfolio/registry.json`
