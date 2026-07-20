@@ -85,7 +85,7 @@ jobs:
           HASH=$(python -c "import json; print(json.load(open('manifest.json'))['evidence_hash'])")
           PRIMARY_COUNT=$(python -c "import json; print(json.load(open('manifest.json'))['artifact_count'])")
           MANIFEST=$(python -c "import json; print(json.dumps(json.load(open('manifest.json')), separators=(',', ':')))")
-          ACTIVE_PR=$(gh pr list --repo "$GITHUB_REPOSITORY" --state open --json number,headRefName,title | python -c 'import json, os, sys; ticker=os.environ["TICKER"].upper(); prs=json.load(sys.stdin); matches=[p for p in prs if p["headRefName"].startswith("cursor/") and (ticker in p["headRefName"].upper() or ticker in p["title"].upper())]; print(matches[0]["number"] if matches else "")')
+          ACTIVE_PR=$(gh pr list --repo "$GITHUB_REPOSITORY" --state open --json number,headRefName,title | TICKER="$TICKER" python -c 'import json, os, sys; ticker=os.environ["TICKER"].upper(); prs=json.load(sys.stdin); matches=[p for p in prs if p["headRefName"].startswith("cursor/") and (ticker in p["headRefName"].upper() or ticker in p["title"].upper())]; print(matches[0]["number"] if matches else "")')
           if [ -n "$ACTIVE_PR" ]; then
             echo "ticker=" >> "$GITHUB_OUTPUT"
             echo "reason=active_cursor_pr_$ACTIVE_PR" >> "$GITHUB_OUTPUT"
