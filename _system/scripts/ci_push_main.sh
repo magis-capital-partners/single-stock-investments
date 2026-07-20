@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 # Rebase onto latest main and push (retries on transient rejections).
+#
+# Conflicts in derived artifacts are resolved by regeneration. Since the
+# dashboard payload was sharded (core.json + per-ticker/per-section shards),
+# giant-JSON collisions are rare; the resolver is a small classifier plus a
+# builder table instead of bespoke per-artifact recovery functions.
 set -euo pipefail
 MAX_ATTEMPTS="${CI_PUSH_MAX_ATTEMPTS:-5}"
 PYTHON="${PYTHON:-python3}"
@@ -7,384 +12,135 @@ PYTHON="${PYTHON:-python3}"
 git config user.name "${GIT_AUTHOR_NAME:-github-actions[bot]}"
 git config user.email "${GIT_AUTHOR_EMAIL:-41898282+github-actions[bot]@users.noreply.github.com}"
 
-rebase_in_progress() {
-  [ -d .git/rebase-merge ] || [ -d .git/rebase-apply ]
-}
+rebase_in_progress() { [ -d .git/rebase-merge ] || [ -d .git/rebase-apply ]; }
+conflicted_files() { git diff --name-only --diff-filter=U; }
 
-conflicted_files() {
-  git diff --name-only --diff-filter=U
-}
-
+# Derived artifacts that a builder can recreate from inputs after a rebase.
 is_regenerable_artifact() {
   case "$1" in
-    dashboard/data/*.json)
-      return 0
-      ;;
-    */INDEX.csv)
-      return 0
-      ;;
-    _system/portfolio/holdings.md|_system/portfolio/classification.json|_system/portfolio/us_ticker_config.json)
-      return 0
-      ;;
-    _system/reference/data-sources/insights_record_archive.json)
-      return 0
-      ;;
-    _system/reference/market-data/returns/*.csv)
-      return 0
-      ;;
-    _system/portfolio/research_events.jsonl)
-      return 0
-      ;;
-    _system/reference/market-data/external/sync_report.json)
-      return 0
-      ;;
-    *)
-      return 1
-      ;;
+    dashboard/data/*.json) return 0 ;;
+    */INDEX.csv) return 0 ;;
+    _system/portfolio/holdings.md|_system/portfolio/classification.json|_system/portfolio/us_ticker_config.json) return 0 ;;
+    _system/reference/data-sources/insights_record_archive.json) return 0 ;;
+    _system/reference/market-data/returns/*.csv) return 0 ;;
+    _system/portfolio/research_events.jsonl) return 0 ;;
+    _system/reference/market-data/external/sync_report.json) return 0 ;;
+    *) return 1 ;;
   esac
 }
 
-# During rebase onto origin/main, --ours is upstream (main). Prefer main for Marvin-owned
-# ticker research when Darwin refresh races concurrent deep-dive merges.
+# During rebase onto origin/main, --ours is upstream (main). Prefer main for
+# Marvin-owned ticker research when refresh jobs race deep-dive merges.
 is_prefer_upstream_on_rebase() {
   case "$1" in
-    */research/*|*/third-party-analyses/*)
-      return 0
-      ;;
-    _system/memory/daily/*|_system/research/milly_log.md)
-      return 0
-      ;;
-    _system/data/transcript_sync_summary.json)
-      return 0
-      ;;
-    _system/lenses/universe_percentiles.json)
-      return 0
-      ;;
-    _system/reference/investment-wisdom/*/extract_refresh_status.json)
-      return 0
-      ;;
-    _system/reference/market-data/themes/*|_system/reference/market-data/peers/*|_system/reference/market-data/commodities/*|_system/reference/market-data/insider/*)
-      return 0
-      ;;
-    *)
-      return 1
-      ;;
+    */research/*|*/third-party-analyses/*) return 0 ;;
+    _system/memory/daily/*|_system/research/milly_log.md) return 0 ;;
+    _system/data/transcript_sync_summary.json) return 0 ;;
+    _system/lenses/universe_percentiles.json) return 0 ;;
+    _system/reference/investment-wisdom/*/extract_refresh_status.json) return 0 ;;
+    _system/reference/market-data/themes/*|_system/reference/market-data/peers/*|_system/reference/market-data/commodities/*|_system/reference/market-data/insider/*) return 0 ;;
+    *) return 1 ;;
   esac
 }
 
 is_resolvable_rebase_conflict() {
-  local conflicted file
-  conflicted=$(conflicted_files)
-  if [ -z "$conflicted" ]; then
-    return 1
-  fi
-  while IFS= read -r file; do
-    if is_regenerable_artifact "$file" || is_prefer_upstream_on_rebase "$file"; then
-      continue
-    fi
-    echo "Non-resolvable rebase conflict in: $file"
-    return 1
-  done <<< "$conflicted"
-  return 0
-}
-
-is_regenerable_conflict() {
-  is_resolvable_rebase_conflict
-}
-
-resolve_prefer_upstream_conflicts() {
-  local file resolved=0
+  local file any=0
   while IFS= read -r file; do
     [ -n "$file" ] || continue
-    if ! is_prefer_upstream_on_rebase "$file"; then
-      continue
-    fi
-    echo "Preferring origin/main for rebase conflict: $file"
-    git checkout --ours -- "$file" 2>/dev/null || true
-    if [ -f "$file" ]; then
-      git add -- "$file"
-    else
-      git rm -f -- "$file" 2>/dev/null || true
-    fi
-    resolved=1
-  done <<< "$(conflicted_files)"
-  [ "$resolved" -eq 1 ]
-}
-
-regenerate_insights_artifacts() {
-  if [ ! -f "_system/scripts/build_insights.py" ]; then
-    echo "::error::build_insights.py not found; cannot auto-resolve insights conflicts."
-    return 1
-  fi
-  echo "Regenerating insights artifacts to resolve rebase conflicts..."
-  # Keep committed artifacts: build_insights.py uses them as a safety baseline
-  # when the CI checkout lacks the full letter vault.
-  if ! "$PYTHON" _system/scripts/build_insights.py; then
-    echo "::error::build_insights.py failed while resolving a rebase conflict."
-    return 1
-  fi
-  git add dashboard/data/insights.json 2>/dev/null || true
-  git add _system/reference/data-sources/insights_record_archive.json 2>/dev/null || true
-}
-
-clean_regeneration_side_effects() {
-  # build_insights.py may refresh triage queues; keep them out of intake commits.
-  if [ -d _system/reviews/pending ]; then
-    git restore --worktree _system/reviews/pending/ 2>/dev/null || true
-  fi
-}
-
-prepare_conflicted_files_for_regeneration() {
-  local file
-  while IFS= read -r file; do
-    [ -n "$file" ] || continue
-    if is_regenerable_artifact "$file"; then
-      rm -f "$file" 2>/dev/null || true
-    fi
-  done <<< "$(conflicted_files)"
-}
-
-stage_resolved_conflicts() {
-  local conflicted="$1"
-  local file
-  while IFS= read -r file; do
-    [ -n "$file" ] || continue
-    if is_regenerable_artifact "$file" && [ -f "$file" ]; then
-      git add -f "$file"
-    fi
-  done <<< "$conflicted"
-}
-
-regenerate_activist_feed_artifacts() {
-  if [ ! -f "_system/scripts/build_activist_feed.py" ]; then
-    echo "::error::build_activist_feed.py not found; cannot auto-resolve activist feed conflicts."
-    return 1
-  fi
-  echo "Regenerating activist feed to resolve rebase conflicts..."
-  rm -f dashboard/data/activist_feed.json 2>/dev/null || true
-  if [ -f "_system/scripts/clean_activist_indexes.py" ]; then
-    if ! "$PYTHON" _system/scripts/clean_activist_indexes.py; then
-      echo "::error::clean_activist_indexes.py failed while resolving a rebase conflict."
+    any=1
+    if ! is_regenerable_artifact "$file" && ! is_prefer_upstream_on_rebase "$file"; then
+      echo "Non-resolvable rebase conflict in: $file"
       return 1
     fi
-  fi
-  if ! "$PYTHON" _system/scripts/build_activist_feed.py; then
-    echo "::error::build_activist_feed.py failed while resolving a rebase conflict."
-    return 1
-  fi
-  git add dashboard/data/activist_feed.json
+  done <<< "$(conflicted_files)"
+  [ "$any" -eq 1 ]
 }
 
-regenerate_dashboard_json() {
-  if [ ! -f "_system/scripts/build_dashboard_data.py" ]; then
-    echo "::error::build_dashboard_data.py not found; cannot auto-resolve dashboard conflicts."
-    return 1
-  fi
-  echo "Regenerating dashboard JSON to resolve rebase conflicts..."
-  # Insight and activist artifacts have dedicated conflict classifiers and
-  # rebuild paths. Keep this generic recovery scoped to dashboard assembly.
-  if ! "$PYTHON" _system/scripts/build_dashboard_data.py; then
-    echo "::error::build_dashboard_data.py failed while resolving a rebase conflict."
-    return 1
-  fi
-  git add dashboard/data/ 2>/dev/null || true
+# Builder keys per artifact class. Dashboard assembly runs last so it sees the
+# other regenerated inputs. Keys map to run_builder cases below.
+builders_for() {
+  case "$1" in
+    dashboard/data/insights.json|_system/reference/data-sources/insights_record_archive.json) echo insights ;;
+    dashboard/data/activist_feed.json) echo activist ;;
+    dashboard/data/*.json) echo dashboard ;;
+    */INDEX.csv) echo indexes ;;
+    _system/portfolio/holdings.md|_system/portfolio/classification.json|_system/portfolio/us_ticker_config.json) echo portfolio ;;
+    _system/reference/market-data/returns/*.csv) echo returns ;;
+    _system/portfolio/research_events.jsonl) echo research_events ;;
+    _system/reference/market-data/external/sync_report.json) echo external_sync ;;
+  esac
 }
 
-regenerate_folder_indexes() {
-  if [ ! -f "_system/scripts/build_folder_indexes.py" ]; then
-    echo "::error::build_folder_indexes.py not found; cannot auto-resolve INDEX.csv conflicts."
-    return 1
-  fi
-  echo "Regenerating INDEX.csv files to resolve rebase conflicts..."
-  if ! "$PYTHON" _system/scripts/build_folder_indexes.py; then
-    echo "::error::build_folder_indexes.py failed while resolving a rebase conflict."
-    return 1
-  fi
-  git add -- ':(glob)*/INDEX.csv' 2>/dev/null || true
-}
-
-regenerate_portfolio_artifacts() {
-  if [ ! -f "_system/scripts/sync_portfolio_from_registry.py" ]; then
-    echo "::error::sync_portfolio_from_registry.py not found; cannot auto-resolve portfolio conflicts."
-    return 1
-  fi
-  echo "Regenerating portfolio artifacts to resolve rebase conflicts..."
-  if ! "$PYTHON" _system/scripts/sync_portfolio_from_registry.py; then
-    echo "::error::sync_portfolio_from_registry.py failed while resolving a rebase conflict."
-    return 1
-  fi
-  git add _system/portfolio/holdings.md _system/portfolio/classification.json _system/portfolio/us_ticker_config.json 2>/dev/null || true
-}
-
-regenerate_market_returns() {
-  if [ ! -f "_system/scripts/download_ira_research.py" ]; then
-    echo "::error::download_ira_research.py not found; cannot auto-resolve returns CSV conflicts."
-    return 1
-  fi
-  echo "Regenerating market returns CSVs to resolve rebase conflicts..."
-  if ! "$PYTHON" _system/scripts/download_ira_research.py --tier A; then
-    echo "::error::download_ira_research.py failed while resolving a rebase conflict."
-    return 1
-  fi
-  git add _system/reference/market-data/returns/ 2>/dev/null || true
-}
-
-regenerate_research_events_log() {
-  echo "Regenerating research_events.jsonl to resolve rebase conflicts..."
-  (
-    cd _system/scripts
-    "$PYTHON" -c "from darwin.research_events import rebuild_events_log; rebuild_events_log()"
-  )
-  git add _system/portfolio/research_events.jsonl 2>/dev/null || true
-}
-
-regenerate_external_sync_report() {
-  echo "Regenerating external market sync_report.json to resolve rebase conflicts..."
-  (
-    cd _system/scripts
-    "$PYTHON" -m darwin.import_external_data
-  ) || true
-  git add _system/reference/market-data/external/sync_report.json 2>/dev/null || true
+run_builder() {
+  case "$1" in
+    returns) "$PYTHON" _system/scripts/download_ira_research.py --tier A &&
+      git add _system/reference/market-data/returns/ ;;
+    indexes) "$PYTHON" _system/scripts/build_folder_indexes.py &&
+      git add -- ':(glob)*/INDEX.csv' ;;
+    portfolio) "$PYTHON" _system/scripts/sync_portfolio_from_registry.py &&
+      git add _system/portfolio/holdings.md _system/portfolio/classification.json _system/portfolio/us_ticker_config.json ;;
+    research_events) (cd _system/scripts && "$PYTHON" -c "from darwin.research_events import rebuild_events_log; rebuild_events_log()") &&
+      git add _system/portfolio/research_events.jsonl ;;
+    external_sync) (cd _system/scripts && "$PYTHON" -m darwin.import_external_data) || true
+      git add _system/reference/market-data/external/sync_report.json 2>/dev/null || true ;;
+    insights) "$PYTHON" _system/scripts/build_insights.py &&
+      git add dashboard/data/insights.json _system/reference/data-sources/insights_record_archive.json ;;
+    activist) { [ ! -f _system/scripts/clean_activist_indexes.py ] || "$PYTHON" _system/scripts/clean_activist_indexes.py; } &&
+      "$PYTHON" _system/scripts/build_activist_feed.py &&
+      git add dashboard/data/activist_feed.json ;;
+    dashboard) "$PYTHON" _system/scripts/build_dashboard_data.py &&
+      git add dashboard/data/ ;;
+  esac
 }
 
 regenerate_conflicted_artifacts() {
-  local conflicted file
-  local needs_dashboard=0
-  local needs_insights=0
-  local needs_activist=0
-  local needs_indexes=0
-  local needs_portfolio=0
-  local needs_market_returns=0
-  local needs_research_events=0
-  local needs_external_sync=0
-
+  local conflicted file key needed=" "
   conflicted=$(conflicted_files)
-  prepare_conflicted_files_for_regeneration
   while IFS= read -r file; do
     [ -n "$file" ] || continue
-    case "$file" in
-      dashboard/data/insights.json)
-        needs_insights=1
-        ;;
-      dashboard/data/activist_feed.json)
-        needs_activist=1
-        ;;
-      dashboard/data/*.json)
-        needs_dashboard=1
-        ;;
-      _system/reference/data-sources/insights_record_archive.json)
-        needs_insights=1
-        ;;
-      */INDEX.csv)
-        needs_indexes=1
-        ;;
-      _system/portfolio/holdings.md|_system/portfolio/classification.json|_system/portfolio/us_ticker_config.json)
-        needs_portfolio=1
-        ;;
-      _system/reference/market-data/returns/*.csv)
-        needs_market_returns=1
-        ;;
-      _system/portfolio/research_events.jsonl)
-        needs_research_events=1
-        ;;
-      _system/reference/market-data/external/sync_report.json)
-        needs_external_sync=1
-        ;;
-    esac
+    is_regenerable_artifact "$file" || continue
+    rm -f "$file" 2>/dev/null || true
+    key=$(builders_for "$file")
+    case "$needed" in *" $key "*) ;; *) needed="$needed$key " ;; esac
   done <<< "$conflicted"
 
-  if [ "$needs_market_returns" -eq 1 ]; then
-    regenerate_market_returns || return 1
-  fi
-  if [ "$needs_indexes" -eq 1 ]; then
-    regenerate_folder_indexes || return 1
-  fi
-  if [ "$needs_portfolio" -eq 1 ]; then
-    regenerate_portfolio_artifacts || return 1
-  fi
-  if [ "$needs_research_events" -eq 1 ]; then
-    regenerate_research_events_log || return 1
-  fi
-  if [ "$needs_external_sync" -eq 1 ]; then
-    regenerate_external_sync_report || return 1
-  fi
-  if [ "$needs_insights" -eq 1 ]; then
-    regenerate_insights_artifacts || return 1
-  fi
-  if [ "$needs_activist" -eq 1 ]; then
-    regenerate_activist_feed_artifacts || return 1
-  fi
-  if [ "$needs_dashboard" -eq 1 ]; then
-    regenerate_dashboard_json || return 1
-  fi
+  for key in returns indexes portfolio research_events external_sync insights activist dashboard; do
+    case "$needed" in
+      *" $key "*)
+        echo "Regenerating '$key' artifacts to resolve rebase conflicts..."
+        if ! run_builder "$key"; then
+          echo "::error::Builder '$key' failed while resolving a rebase conflict."
+          return 1
+        fi
+        ;;
+    esac
+  done
 
-  if [ "$needs_dashboard" -eq 1 ] || [ "$needs_insights" -eq 1 ] || [ "$needs_activist" -eq 1 ]; then
-    git add dashboard/data/ 2>/dev/null || true
-  fi
+  # Builders may refresh triage queues; keep them out of intake commits.
+  [ ! -d _system/reviews/pending ] || git restore --worktree _system/reviews/pending/ 2>/dev/null || true
 
-  stage_resolved_conflicts "$conflicted"
+  # Stage regenerated conflict paths; drop any a builder no longer emits.
+  while IFS= read -r file; do
+    [ -n "$file" ] || continue
+    is_regenerable_artifact "$file" || continue
+    if [ -f "$file" ]; then git add -f "$file"; else git rm -f --cached "$file" 2>/dev/null || true; fi
+  done <<< "$conflicted"
 }
 
-resolve_unmerged_regenerable_paths() {
-  local f
-  while IFS= read -r f; do
-    [ -n "$f" ] || continue
-    if ! is_regenerable_artifact "$f"; then
-      continue
-    fi
-    if [ -f "$f" ]; then
-      git add -f "$f"
-    else
-      git rm -f --cached "$f" 2>/dev/null || true
-      git rm -f "$f" 2>/dev/null || true
-    fi
-  done <<< "$(git diff --name-only --diff-filter=U)"
-}
-
-try_resolve_rebase_conflicts() {
-  if ! rebase_in_progress; then
-    return 1
-  fi
-  if ! is_resolvable_rebase_conflict; then
-    return 1
-  fi
-  resolve_prefer_upstream_conflicts || true
-  if ! regenerate_conflicted_artifacts; then
-    echo "::error::Artifact regeneration failed; rebase remains open."
-    return 1
-  fi
-  clean_regeneration_side_effects
-  resolve_unmerged_regenerable_paths
-  git add dashboard/data/ 2>/dev/null || true
-  git add -- ':(glob)*/INDEX.csv' 2>/dev/null || true
-  git add _system/portfolio/holdings.md _system/portfolio/classification.json _system/portfolio/us_ticker_config.json 2>/dev/null || true
-  git add _system/reference/market-data/returns/ 2>/dev/null || true
-  git add _system/reference/data-sources/insights_record_archive.json 2>/dev/null || true
-  git add _system/portfolio/research_events.jsonl 2>/dev/null || true
-  git add _system/reference/market-data/external/sync_report.json 2>/dev/null || true
-  if ! continue_rebase_after_resolution; then
-    # `git rebase --continue` returns non-zero when the next commit also
-    # conflicts. That is progress, not a failed resolution, provided the new
-    # conflict is another artifact set this helper knows how to regenerate.
-    if rebase_in_progress && is_resolvable_rebase_conflict; then
-      echo "Advanced to another regenerable rebase conflict; resolving the next commit."
-      return 0
-    fi
-    echo "::error::git rebase --continue failed after conflict resolution."
-    echo "::error::Unresolved paths:"
-    conflicted_files || true
-    return 1
-  fi
-  if ! rebase_in_progress; then
-    return 0
-  fi
-  is_resolvable_rebase_conflict
+resolve_prefer_upstream_conflicts() {
+  local file
+  while IFS= read -r file; do
+    [ -n "$file" ] || continue
+    is_prefer_upstream_on_rebase "$file" || continue
+    echo "Preferring origin/main for rebase conflict: $file"
+    git checkout --ours -- "$file" 2>/dev/null || true
+    if [ -f "$file" ]; then git add -- "$file"; else git rm -f -- "$file" 2>/dev/null || true; fi
+  done <<< "$(conflicted_files)"
 }
 
 continue_rebase_after_resolution() {
-  # Regeneration can reproduce origin/main byte-for-byte. In that case the
-  # rebased commit is intentionally empty and must be skipped rather than
-  # treated as a failed conflict resolution.
+  # Regeneration can reproduce origin/main byte-for-byte; skip the now-empty
+  # commit instead of treating it as a failed resolution.
   if git diff --cached --quiet; then
     echo "Resolved rebase commit is empty after regeneration; skipping it."
     GIT_EDITOR=true git rebase --skip
@@ -393,15 +149,50 @@ continue_rebase_after_resolution() {
   fi
 }
 
-_check_file_sizes_for_paths() {
-  local limit=$((100 * 1024 * 1024))
-  local warn=$((50 * 1024 * 1024))
-  local failed=0
-  local file size
-
+stage_remaining_regenerable_conflicts() {
+  # Safety net: builders (or test doubles) may rewrite a conflicted path
+  # without staging it. Stage regenerable paths so the rebase can continue.
+  local file
   while IFS= read -r file; do
     [ -n "$file" ] || continue
-    [ -f "$file" ] || continue
+    is_regenerable_artifact "$file" || continue
+    if [ -f "$file" ]; then git add -f -- "$file"; else git rm -f --cached -- "$file" 2>/dev/null || true; fi
+  done <<< "$(conflicted_files)"
+}
+
+try_resolve_rebase_conflicts() {
+  rebase_in_progress || return 1
+  is_resolvable_rebase_conflict || return 1
+  resolve_prefer_upstream_conflicts
+  if ! regenerate_conflicted_artifacts; then
+    echo "::error::Artifact regeneration failed; rebase remains open."
+    return 1
+  fi
+  stage_remaining_regenerable_conflicts
+  if [ -n "$(conflicted_files)" ]; then
+    echo "::error::Conflicted paths remain unmerged after regeneration:"
+    conflicted_files
+    return 1
+  fi
+  if ! continue_rebase_after_resolution; then
+    # A non-zero continue that lands on another regenerable conflict is
+    # progress on a multi-commit rebase, not a failure.
+    if rebase_in_progress && is_resolvable_rebase_conflict; then
+      echo "Advanced to another regenerable rebase conflict; resolving the next commit."
+      return 0
+    fi
+    echo "::error::git rebase --continue failed after conflict resolution."
+    conflicted_files || true
+    return 1
+  fi
+  rebase_in_progress || return 0
+  is_resolvable_rebase_conflict
+}
+
+_check_file_sizes_for_paths() {
+  local limit=$((100 * 1024 * 1024)) warn=$((50 * 1024 * 1024)) failed=0 file size
+  while IFS= read -r file; do
+    [ -n "$file" ] && [ -f "$file" ] || continue
     size=$(stat -c%s "$file" 2>/dev/null || stat -f%z "$file")
     if [ "$size" -gt "$limit" ]; then
       echo "::error::File $file is $((size / 1024 / 1024))MB; exceeds GitHub 100MB limit."
@@ -410,7 +201,6 @@ _check_file_sizes_for_paths() {
       echo "::warning::File $file is $((size / 1024 / 1024))MB; above GitHub 50MB recommendation."
     fi
   done
-
   [ "$failed" -eq 0 ]
 }
 
@@ -423,55 +213,35 @@ check_push_file_sizes() {
 }
 
 sync_self_from_origin_main() {
-  if [ "${CI_PUSH_SKIP_SELF_REFRESH:-0}" = "1" ]; then
-    return 0
-  fi
-  if ! git rev-parse --git-dir >/dev/null 2>&1; then
-    return 0
-  fi
+  [ "${CI_PUSH_SKIP_SELF_REFRESH:-0}" = "1" ] && return 0
+  git rev-parse --git-dir >/dev/null 2>&1 || return 0
   git fetch origin main >/dev/null 2>&1 || return 0
-  if ! git cat-file -e "origin/main:_system/scripts/ci_push_main.sh" 2>/dev/null; then
-    return 0
-  fi
-  local dest="_system/scripts/ci_push_main.sh"
-  local tmp
+  git cat-file -e "origin/main:_system/scripts/ci_push_main.sh" 2>/dev/null || return 0
+  local dest="_system/scripts/ci_push_main.sh" tmp
   tmp=$(mktemp)
   git show "origin/main:_system/scripts/ci_push_main.sh" > "$tmp"
-  if cmp -s "$tmp" "$dest"; then
-    rm -f "$tmp"
-    return 0
-  fi
+  if cmp -s "$tmp" "$dest"; then rm -f "$tmp"; return 0; fi
   echo "Syncing ci_push_main.sh from origin/main (conflict resolver update)."
-  cp "$tmp" "$dest"
-  chmod +x "$dest"
-  rm -f "$tmp"
-  # Reload functions only. Guard bottom-of-file re-entry: sourcing from inside a
-  # zero-arg function left $@ empty and re-invoked ci_push_main with no message.
+  cp "$tmp" "$dest" && chmod +x "$dest" && rm -f "$tmp"
+  # Reload functions only; the sourcing guard prevents zero-arg re-entry.
   # shellcheck disable=SC1091
   CI_PUSH_SOURCING=1 source "$dest"
 }
 
 ci_push_main() {
   local msg="${1:?commit message required}"
-
   sync_self_from_origin_main
-
-  # A self-refresh updates this tracked helper in the worktree. Stage that
-  # update before committing so a later rebase always starts from a clean tree.
-  if ! git diff --quiet -- _system/scripts/ci_push_main.sh; then
-    git add _system/scripts/ci_push_main.sh
-  fi
-
+  # A self-refresh updates this tracked helper in the worktree. Stage it so a
+  # later rebase always starts from a clean tree.
+  git diff --quiet -- _system/scripts/ci_push_main.sh || git add _system/scripts/ci_push_main.sh
   if git diff --staged --quiet; then
     echo "No staged changes to commit."
     exit 0
   fi
-
   if ! check_github_file_sizes; then
     echo "::error::Aborting commit: staged files exceed GitHub size limits."
     exit 1
   fi
-
   git commit -m "$msg"
 
   local attempt=1

@@ -31,7 +31,6 @@ regenerate_conflicted_artifacts() {
     git checkout --ours -- "$file"
   done <<< "$(git diff --name-only --diff-filter=U)"
 }
-clean_regeneration_side_effects() { return 0; }
 
 git checkout -b "$LOCAL_BRANCH" >/dev/null
 printf '{"version":"base"}\n' > "$FILE_ONE"
