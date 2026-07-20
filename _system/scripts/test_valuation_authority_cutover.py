@@ -36,7 +36,9 @@ class ValuationAuthorityCutoverTests(unittest.TestCase):
         sp500 = (ROOT / "_system" / "scripts" / "darwin" / "bulk_sp500_onboard.py").read_text(encoding="utf-8")
         self.assertIn("initialize_proof_first_valuation(ticker, today)", onboard)
         self.assertIn("initialize_proof_first_valuation(ticker, today)", sp500)
-        self.assertIn("run_security_decision_pipeline.py", onboard)
+        self.assertIn("automate_valuation_readiness.py", onboard)
+        self.assertIn("--full-rerun", onboard)
+        self.assertNotIn("run_security_decision_pipeline.py", onboard)
 
 
 if __name__ == "__main__":
